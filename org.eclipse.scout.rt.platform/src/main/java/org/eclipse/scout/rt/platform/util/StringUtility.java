@@ -321,6 +321,9 @@ public final class StringUtility {
     return lines;
   }
 
+  private static final Pattern ESC_0_PATTERN = Pattern.compile("[\"]");
+  private static final Pattern ESC_1_PATTERN = Pattern.compile("[']");
+
   /**
    * encode a string by escaping " -> "" and ' -> ''
    */
@@ -328,18 +331,21 @@ public final class StringUtility {
     if (s == null) {
       return null;
     }
-    s = s.replaceAll("[\"]", "\"\"");
-    s = s.replaceAll("[']", "''");
-    return s;
+    String s1 = ESC_0_PATTERN.matcher(s).replaceAll("\"\"");
+    s1 = ESC_1_PATTERN.matcher(s1).replaceAll("''");
+    return s1;
   }
+
+  private static final Pattern UNESC_0_PATTERN = Pattern.compile("[\"][\"]");
+  private static final Pattern UNESC_1_PATTERN = Pattern.compile("['][']");
 
   /**
    * decode a string by unescaping "" -> " and '' -> '
    */
   public static String stringUnesc(String s) {
-    s = s.replaceAll("[\"][\"]", "\"");
-    s = s.replaceAll("['][']", "'");
-    return s;
+    String s1 = UNESC_0_PATTERN.matcher(s).replaceAll("\"");
+    s1 = UNESC_1_PATTERN.matcher(s1).replaceAll("'");
+    return s1;
   }
 
   /**
@@ -362,6 +368,8 @@ public final class StringUtility {
     return replaceNewLines(text, " ");
   }
 
+  private static final Pattern NEWLINES_PATTERN = Pattern.compile("\r\n|\n\r");
+
   /**
    * Returns a new string resulting from replacing all new line characters ("\n", "\r\n", "\n\r" or "\r") with the given
    * replacement string.
@@ -377,7 +385,7 @@ public final class StringUtility {
     if (isNullOrEmpty(text)) {
       return text;
     }
-    String s = text.replaceAll("\r\n|\n\r", replacement);
+    String s = NEWLINES_PATTERN.matcher(text).replaceAll(replacement);
     s = s.replace("\n", replacement).replace("\r", replacement);
     return s;
   }
@@ -565,11 +573,13 @@ public final class StringUtility {
     return text;
   }
 
+  private static final Pattern TAGS_PATTERN = Pattern.compile("<[^>]+>", Pattern.DOTALL);
+
   public static String removeTags(String text) {
     if (text == null) {
       return null;
     }
-    text = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(text).replaceAll("");
+    text = TAGS_PATTERN.matcher(text).replaceAll("");
     return text;
   }
 
@@ -641,17 +651,20 @@ public final class StringUtility {
     return buf.toString();
   }
 
+  private static final Pattern WORD_WRAP_0_PATTERN = Pattern.compile("[\\n\\r]");
+  private static final Pattern WORD_WRAP_1_PATTERN = Pattern.compile("[ \\t]");
+
   public static String wrapWord(String s, int lineSize) {
     if (s == null) {
       return null;
     }
     StringBuilder buf = new StringBuilder();
-    for (String line : s.split("[\\n\\r]")) {
+    for (String line : WORD_WRAP_0_PATTERN.split(s)) {
       if (buf.length() > 0) {
         buf.append("\n");
       }
       StringBuilder wrappedLine = new StringBuilder();
-      for (String word : line.split("[ \\t]")) {
+      for (String word : WORD_WRAP_1_PATTERN.split(line)) {
         if (wrappedLine.length() > 0 && wrappedLine.length() + 1 + word.length() > lineSize) {
           buf.append(wrappedLine.toString());
           buf.append("\n");
@@ -669,12 +682,14 @@ public final class StringUtility {
     return buf.toString().trim();
   }
 
+  private static final Pattern UNWRAP_PATTERN = Pattern.compile("[ ]+");
+
   public static String unwrapText(String s) {
     if (s == null || s.isEmpty()) {
       return null;
     }
     s = s.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ');
-    s = s.replaceAll("[ ]+", " ");
+    s = UNWRAP_PATTERN.matcher(s).replaceAll(" ");
     return s.trim();
   }
 
@@ -989,6 +1004,14 @@ public final class StringUtility {
     return s.indexOf(what, start);
   }
 
+  private static final Pattern PHONE_0_PATTERN = Pattern.compile("[^#]");
+  private static final Pattern PHONE_1_PATTERN = Pattern.compile("[^(0-9|\\+)]|(\\(|\\))");
+  private static final Pattern PHONE_2_PATTERN = Pattern.compile("(^(0{2})[0-9]*)|(^\\+{1}[0-9]*)");
+  private static final Pattern PHONE_3_PATTERN = Pattern.compile("[^0-9]");
+  private static final Pattern PHONE_4_PATTERN = Pattern.compile("^(0{0,2})");
+  private static final Pattern PHONE_5_PATTERN = Pattern.compile("^(\\+)");
+  private static final Pattern PHONE_6_PATTERN = Pattern.compile("^[0]+");
+
   /**
    * Format phone numbers (to international phone number format - eg +41 41 882 32 21)
    *
@@ -1023,23 +1046,23 @@ public final class StringUtility {
     boolean hasCountryCode = false;
 
     // calc. pattern lenght without spaces, etc.
-    int patternLengh = formattingPattern.replaceAll("[^#]", "").length();
+    int patternLengh = PHONE_0_PATTERN.matcher(formattingPattern).replaceAll("").length();
 
     /* normalize phone number */
-    normalizedNumber = phoneNumber.replaceAll("[^(0-9|\\+)]|(\\(|\\))", "");
+    normalizedNumber = PHONE_1_PATTERN.matcher(phoneNumber).replaceAll("");
 
     // check for country code
-    hasCountryCode = normalizedNumber.matches("(^(0{2})[0-9]*)|(^\\+{1}[0-9]*)");
+    hasCountryCode = PHONE_2_PATTERN.matcher(normalizedNumber).matches();
 
     /* normalize country code (no spaces; no leading +/00 */
-    countryCode = countryCode.replaceAll("[^0-9]", "");
-    countryCode = countryCode.replaceAll("^(0{0,2})", "");
+    countryCode = PHONE_3_PATTERN.matcher(countryCode).replaceAll("");
+    countryCode = PHONE_4_PATTERN.matcher(countryCode).replaceAll("");
 
     // phone number has country code
     if (hasCountryCode) {
       // remove country code
-      normalizedNumber = normalizedNumber.replaceAll("^(0{0,2})", "");
-      normalizedNumber = normalizedNumber.replaceAll("^(\\+)", "");
+      normalizedNumber = PHONE_4_PATTERN.matcher(normalizedNumber).replaceAll("");
+      normalizedNumber = PHONE_5_PATTERN.matcher(normalizedNumber).replaceAll("");
       normalizedNumber = normalizedNumber.replaceAll("^" + countryCode, "");
     }
 
@@ -1071,7 +1094,7 @@ public final class StringUtility {
       }
 
       // remove zeros of the area code
-      formattedPhoneNumber = formattedPhoneNumber.replaceAll("^[0]+", "");
+      formattedPhoneNumber = PHONE_6_PATTERN.matcher(formattedPhoneNumber).replaceAll("");
       // add country code
       formattedPhoneNumber = "+" + countryCode + " " + formattedPhoneNumber;
 
@@ -1152,6 +1175,11 @@ public final class StringUtility {
     return s.split(regex, limit);
   }
 
+  private static final Pattern CAMEL_CASE_PATTERN = Pattern.compile(String.format("%s|%s|%s",
+      "(?<=[A-Z])(?=[A-Z][a-z])",
+      "(?<=[^A-Z])(?=[A-Z])",
+      "(?<=[A-Za-z])(?=[^A-Za-z])"));
+
   /**
    * @since 3.8.2
    */
@@ -1159,12 +1187,7 @@ public final class StringUtility {
     if (!hasText(s)) {
       return null;
     }
-    return s.replaceAll(
-        String.format("%s|%s|%s",
-            "(?<=[A-Z])(?=[A-Z][a-z])",
-            "(?<=[^A-Z])(?=[A-Z])",
-            "(?<=[A-Za-z])(?=[^A-Za-z])"),
-        " ");
+    return CAMEL_CASE_PATTERN.matcher(s).replaceAll(" ");
   }
 
   public static String substring(String s, int start) {
@@ -1375,27 +1398,39 @@ public final class StringUtility {
 
   private static final TagBounds TAG_BOUNDS_NOT_FOUND = new TagBounds(-1, -1);
 
+  private static final Pattern UNESC_WHITESPACE_0_PATTERN = Pattern.compile("\\\\n");
+  private static final Pattern UNESC_WHITESPACE_1_PATTERN = Pattern.compile("\\\\t");
+  private static final Pattern UNESC_WHITESPACE_2_PATTERN = Pattern.compile("\\\\r");
+  private static final Pattern UNESC_WHITESPACE_3_PATTERN = Pattern.compile("\\\\b");
+  private static final Pattern UNESC_WHITESPACE_4_PATTERN = Pattern.compile("\\\\f");
+
   public static String unescapeWhitespace(String s) {
     if (s == null) {
       return null;
     }
-    s = s.replaceAll("\\\\n", "\n");
-    s = s.replaceAll("\\\\t", "\t");
-    s = s.replaceAll("\\\\r", "\r");
-    s = s.replaceAll("\\\\b", "\b");
-    s = s.replaceAll("\\\\f", "\f");
+    s = UNESC_WHITESPACE_0_PATTERN.matcher(s).replaceAll("\n");
+    s = UNESC_WHITESPACE_1_PATTERN.matcher(s).replaceAll("\t");
+    s = UNESC_WHITESPACE_2_PATTERN.matcher(s).replaceAll("\r");
+    s = UNESC_WHITESPACE_3_PATTERN.matcher(s).replaceAll("\b");
+    s = UNESC_WHITESPACE_4_PATTERN.matcher(s).replaceAll("\f");
     return s;
   }
+
+  private static final Pattern ESC_WHITESPACE_0_PATTERN = Pattern.compile("\n");
+  private static final Pattern ESC_WHITESPACE_1_PATTERN = Pattern.compile("\t");
+  private static final Pattern ESC_WHITESPACE_2_PATTERN = Pattern.compile("\r");
+  private static final Pattern ESC_WHITESPACE_3_PATTERN = Pattern.compile("\b");
+  private static final Pattern ESC_WHITESPACE_4_PATTERN = Pattern.compile("\f");
 
   public static String escapeWhitespace(String s) {
     if (s == null) {
       return null;
     }
-    s = s.replaceAll("\n", "\\\\n");
-    s = s.replaceAll("\t", "\\\\t");
-    s = s.replaceAll("\r", "\\\\r");
-    s = s.replaceAll("\b", "\\\\b");
-    s = s.replaceAll("\f", "\\\\f");
+    s = ESC_WHITESPACE_0_PATTERN.matcher(s).replaceAll("\\\\n");
+    s = ESC_WHITESPACE_1_PATTERN.matcher(s).replaceAll("\\\\t");
+    s = ESC_WHITESPACE_2_PATTERN.matcher(s).replaceAll("\\\\r");
+    s = ESC_WHITESPACE_3_PATTERN.matcher(s).replaceAll("\\\\b");
+    s = ESC_WHITESPACE_4_PATTERN.matcher(s).replaceAll("\\\\f");
     return s;
   }
 
