@@ -776,6 +776,10 @@ jQuery (3.4.1)
 
 * License: MIT
 
+jQuery (3.5.1)
+
+* License: MIT
+
 jQuery Mobile (1.4.0)
 
 * License: MIT License

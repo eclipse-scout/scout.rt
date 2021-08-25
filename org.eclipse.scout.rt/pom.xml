@@ -605,6 +605,18 @@
       </dependency>
 
       <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-compress</artifactId>
+        <version>1.21</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.thoughtworks.xstream</groupId>
+        <artifactId>xstream</artifactId>
+        <version>1.4.17</version>
+      </dependency>
+
+      <dependency>
         <groupId>jakarta.servlet</groupId>
         <artifactId>jakarta.servlet-api</artifactId>
         <version>4.0.4</version>
@@ -938,6 +950,20 @@
         <artifactId>asm</artifactId>
         <version>7.3.1</version>
       </dependency>
+
+      <!-- BEGIN OWASP dependency check-->
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.7</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>okhttp</artifactId>
+        <version>3.14.9</version>
+      </dependency>
+      <!-- END OWASP dependency check-->
+
     </dependencies>
   </dependencyManagement>
 
