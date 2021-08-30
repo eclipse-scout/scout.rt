@@ -306,19 +306,14 @@ export function reset($scrollable) {
  *          If true, the scroll position will be animated so that the element moves smoothly to its new position. Default is false.
  * @param {boolean} [options.stop]
  *          If true, all running animations are stopped before executing the current scroll request. Default is true.
+ * @param {number} [options.scrollOffsetUp]
+ *          Additional margin to assume at the top of the target element (independent from any actual CSS margin).
+ *          Useful when elements are positioned outside of their boundaries (e.g. focus border). Default is 4.
+ * @param {number} [options.scrollOffsetDown]
+ *          Additional margin to assume at the bottom of the target element (independent from any actual CSS margin).
+ *          Useful when elements are positioned outside of their boundaries (e.g. focus border). Default is 8.
  */
 export function scrollTo($scrollable, $element, options) {
-  let scrollTo,
-    scrollOffsetUp = 4,
-    scrollOffsetDown = 8,
-    scrollableH = $scrollable.height(),
-    elementBounds = graphics.offsetBounds($element),
-    scrollableBounds = graphics.offsetBounds($scrollable),
-    elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp, // relative to scrollable y
-    elementTopNew = 0,
-    elementH = elementBounds.height + scrollOffsetDown,
-    elementBottom = elementTop + elementH;
-
   if (typeof options === 'string') {
     options = {
       align: options
@@ -326,6 +321,17 @@ export function scrollTo($scrollable, $element, options) {
   } else {
     options = _createDefaultScrollToOptions(options);
   }
+
+  let scrollTo,
+    scrollOffsetUp = scout.nvl(options.scrollOffsetUp, 4),
+    scrollOffsetDown = scout.nvl(options.scrollOffsetDown, 8),
+    scrollableH = $scrollable.height(),
+    elementBounds = graphics.offsetBounds($element),
+    scrollableBounds = graphics.offsetBounds($scrollable),
+    elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp, // relative to scrollable y
+    elementTopNew = 0,
+    elementH = elementBounds.height + scrollOffsetDown,
+    elementBottom = elementTop + elementH;
 
   let align = options.align;
   if (!align) {
@@ -359,7 +365,7 @@ export function scrollTo($scrollable, $element, options) {
       scrollTo = scrollTo + elementTopNew;
     }
   }
-  if (scrollTo) {
+  if (scrollTo !== undefined) {
     scrollTop($scrollable, scrollTo, options);
   }
 }
