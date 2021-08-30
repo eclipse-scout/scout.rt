@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 
 /**
@@ -33,8 +34,14 @@ public class ServletDiagnosticsProviderFactory {
     providers.add(new HttpRequestMethodContextValueProvider(request.getMethod()));
     providers.add(new HttpRequestQueryStringContextValueProvider(request.getQueryString()));
     providers.add(new HttpRequestUriContextValueProvider(request.getQueryString()));
-    HttpSession session = request.getSession(false);
-    providers.add(new HttpSessionIdContextValueProvider(session != null ? session.getId() : null));
+    providers.add(new HttpSessionIdContextValueProvider(getHttpSessionIdContextValue(request.getSession(false))));
     return providers;
+  }
+
+  protected String getHttpSessionIdContextValue(HttpSession session) {
+    if (session == null) {
+      return null;
+    }
+    return BEANS.get(HttpSessionIdLogHelper.class).getSessionIdForLogging(session);
   }
 }
