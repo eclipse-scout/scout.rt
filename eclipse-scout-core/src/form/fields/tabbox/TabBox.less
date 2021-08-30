@@ -86,6 +86,10 @@
     #scout.info-status();
   }
 
+  .tab-box.has-ok > & > .status {
+    #scout.ok-status();
+  }
+
   .tab-box.has-warning > & > .status {
     #scout.warning-status();
   }
@@ -192,6 +196,7 @@
   &.has-tooltip,
   &.has-info,
   &.has-warning,
+  &.has-ok,
   &.has-error {
     padding-right: @field-status-margin-left;
   }
@@ -202,6 +207,10 @@
 
   &.has-info > .status {
     #scout.info-status();
+  }
+
+  &.has-ok > .status {
+    #scout.ok-status();
   }
 
   &.has-warning > .status {

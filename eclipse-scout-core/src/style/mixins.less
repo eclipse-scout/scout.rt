@@ -209,6 +209,25 @@
     }
   }
 
+  .ok-status {
+    visibility: visible;
+    cursor: pointer;
+
+    &::before {
+      content: @icon-info;
+      color: @status-ok-color;
+      font-size: @status-font-icon-size;
+    }
+
+    &:hover::before {
+      color: @status-ok-hover-color;
+    }
+
+    &:active::before {
+      color: @status-ok-hover-color;
+    }
+  }
+
   .warning-status {
     visibility: visible;
     cursor: pointer;
