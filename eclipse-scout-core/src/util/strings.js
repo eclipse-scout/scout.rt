@@ -139,7 +139,8 @@ export function count(string, separator) {
 
 /**
  * Returns the HTML encoded text. Example: 'Foo<br>Bar' returns 'Foo&amp;lt;br&amp;gt;Bar'.
- * @param {string} text
+ * If the argument is or undefined, the same value is returned.
+ * @param {string|null|undefined} text plain text to encode
  * @return {string} HTML encoded text
  */
 export function encode(text) {
