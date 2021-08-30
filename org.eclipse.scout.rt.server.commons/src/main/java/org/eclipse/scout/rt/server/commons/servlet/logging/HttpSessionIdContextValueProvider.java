@@ -17,8 +17,12 @@ import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDia
 import org.slf4j.MDC;
 
 /**
- * This class provides the {@link HttpSession#getId()} to be set into the <code>diagnostic context map</code> for
- * logging purpose.
+ * This class provides a HTTP session identifier to be set into the <code>diagnostic context map</code> for logging
+ * purpose.
+ * <p>
+ * <b>Caution!</b> Writing the actual {@linkplain HttpSession#getId() HTTP session ID} to the log file might pose a
+ * security risk, since knowledge of the session id can enable attackers to hijack an active session. Consider
+ * obfuscating the id first, e.g. using {@link HttpSessionIdLogHelper}.
  *
  * @see #KEY
  * @see DiagnosticContextValueProcessor
