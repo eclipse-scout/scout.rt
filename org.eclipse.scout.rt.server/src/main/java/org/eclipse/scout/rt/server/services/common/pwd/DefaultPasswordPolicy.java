@@ -10,65 +10,22 @@
  */
 package org.eclipse.scout.rt.server.services.common.pwd;
 
-import java.util.Arrays;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.security.PasswordPolicy;
 
-import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.platform.text.TEXTS;
-
+/**
+ * @deprecated in 11.0, moved to {@link PasswordPolicy}
+ */
+@Deprecated
 public class DefaultPasswordPolicy implements IPasswordPolicy {
-
-  private static final int MIN_PASSWORD_LENGTH = 12;
 
   @Override
   public String getText() {
-    return TEXTS.get("DefaultPasswordPolicyText");
+    return BEANS.get(PasswordPolicy.class).getText();
   }
 
   @Override
   public void check(String userId, char[] newPassword, String userName, int historyIndex) {
-    if (newPassword == null || newPassword.length < MIN_PASSWORD_LENGTH) {
-      throw new VetoException(TEXTS.get("PasswordMin8Chars"));
-    }
-    if (historyIndex >= 0) {
-      throw new VetoException(TEXTS.get("PasswordNotSameAsLasts"));
-    }
-
-    char[] charsInPasswordSorted = Arrays.copyOf(newPassword, newPassword.length);
-    Arrays.sort(charsInPasswordSorted);
-    if (!containsOneOf(charsInPasswordSorted, "0123456789")) {
-      throw new VetoException(TEXTS.get("PasswordMinOneDigit"));
-    }
-    if (!containsOneOf(charsInPasswordSorted, "abcdefghijklmnopqrstuvwxyz")) {
-      throw new VetoException(TEXTS.get("PasswordMinOneChar", "a-z"));
-    }
-    if (!containsOneOf(charsInPasswordSorted, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")) {
-      throw new VetoException(TEXTS.get("PasswordMinOneChar", "A-Z"));
-    }
-    if (!containsOneOf(charsInPasswordSorted, "!@#$%^&*()_+|~-=\\`{}[]:\";'<>?,./")) {
-      throw new VetoException(TEXTS.get("PasswordMinOnNonStdChar"));
-    }
-    if (containsUsername(newPassword, userName)) {
-      throw new VetoException(TEXTS.get("PasswordUsernameNotPartOfPass"));
-    }
-  }
-
-  private static boolean containsUsername(char[] newPassword, String userName) {
-    if (userName == null) {
-      return false;
-    }
-    StringBuilder b = new StringBuilder(newPassword.length);
-    for (char c : newPassword) {
-      b.append(Character.toUpperCase(c));
-    }
-    return b.indexOf(userName.toUpperCase()) >= 0;
-  }
-
-  private static boolean containsOneOf(char[] charsOfPasswordSorted, String charsToSearch) {
-    for (char toFind : charsToSearch.toCharArray()) {
-      if (Arrays.binarySearch(charsOfPasswordSorted, toFind) >= 0) {
-        return true;
-      }
-    }
-    return false;
+    BEANS.get(PasswordPolicy.class).check(userName, newPassword, historyIndex);
   }
 }

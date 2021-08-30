@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -170,7 +170,7 @@ public class SecurityUtilityTest {
   public void testHashPassword() {
     final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] salt2 = SecurityUtility.createRandomBytes();
-    final int iterations = 10000;
+    final int iterations = ISecurityProvider.MIN_PASSWORD_HASH_ITERATIONS;
 
     // test hash
     byte[] hash1 = SecurityUtility.hashPassword(PASSWORD, salt, iterations);
@@ -228,30 +228,11 @@ public class SecurityUtilityTest {
       ok = true;
     }
     Assert.assertTrue(ok);
-    ok = false;
-    try {
-      SecurityUtility.hashPassword(PASSWORD, salt, 0);
-    }
-    catch (AssertionException e) {
-      ok = true;
-    }
-    Assert.assertTrue(ok);
-    ok = false;
-    try {
-      SecurityUtility.hashPassword(PASSWORD, salt, -1);
-    }
-    catch (AssertionException e) {
-      ok = true;
-    }
-    Assert.assertTrue(ok);
-    ok = false;
-    try {
-      SecurityUtility.hashPassword(PASSWORD, salt, 9999);
-    }
-    catch (AssertionException e) {
-      ok = true;
-    }
-    Assert.assertTrue(ok);
+
+    //iterations is max(min_iter, arg)
+    SecurityUtility.hashPassword(PASSWORD, salt, 0);
+    SecurityUtility.hashPassword(PASSWORD, salt, -1);
+    SecurityUtility.hashPassword(PASSWORD, salt, 9999);
   }
 
   @Test
