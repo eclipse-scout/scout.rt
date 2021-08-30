@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -262,16 +262,12 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
 
     private HashedPassword(final char[] password, final byte[] salt) {
       m_salt = salt;
-      m_hash = createPasswordHash(password, salt);
+      m_hash = SecurityUtility.hashPassword(password, salt);
     }
 
     @Override
     public boolean isEqual(final char[] password) {
-      return Arrays.equals(m_hash, createPasswordHash(password, m_salt));
-    }
-
-    protected byte[] createPasswordHash(final char[] password, final byte[] salt) {
-      return SecurityUtility.hash(toBytes(password), salt);
+      return SecurityUtility.verifyPasswordHash(password, m_salt, m_hash);
     }
 
     protected byte[] toBytes(final char[] password) {

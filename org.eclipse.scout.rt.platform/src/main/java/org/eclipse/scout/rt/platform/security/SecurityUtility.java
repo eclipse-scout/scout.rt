@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -218,10 +218,31 @@ public final class SecurityUtility {
   }
 
   /**
+   * @see ISecurityProvider#createPasswordHash(char[], byte[])
+   */
+  public static byte[] hashPassword(char[] password, byte[] salt) {
+    return SECURITY_PROVIDER.get().createPasswordHash(password, salt);
+  }
+
+  /**
+   * It is recommended to use {@link #hashPassword(char[], byte[])} without iteration count.
+   *
    * @see ISecurityProvider#createPasswordHash(char[], byte[], int)
    */
   public static byte[] hashPassword(char[] password, byte[] salt, int iterations) {
     return SECURITY_PROVIDER.get().createPasswordHash(password, salt, iterations);
+  }
+
+  /**
+   * This method is recommended in combination with {@link #hashPassword(char[], byte[])} where the iteration count is
+   * omitted. This has the advantage that the check of the password hash is independent of the creation of the hash. In
+   * case the iteration count is increased yearly, this method checks if the hash is valid
+   *
+   * @return true if calculated password has with {@link #hashPassword(char[], byte[], int)} matches the expected hash.
+   * @since 11.0
+   */
+  public static boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash) {
+    return SECURITY_PROVIDER.get().verifyPasswordHash(password, salt, expectedHash);
   }
 
   /**
