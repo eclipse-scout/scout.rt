@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,7 +81,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final CompletionPromise<RESULT> m_completionPromise;
   protected final AtomicBoolean m_finished = new AtomicBoolean(false);
 
-  protected volatile Set<String> m_executionHints = new HashSet<>();
+  protected final Set<String> m_executionHints = new HashSet<>();
 
   protected final Date m_firstFireTime;
   protected final boolean m_singleExecution;
@@ -122,7 +122,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_callableChain.addLast(new ICallableInterceptor<RESULT>() {
 
       @Override
-      public RESULT intercept(Chain<RESULT> chain) throws Exception {
+      public RESULT intercept(Chain<RESULT> chain) {
         // do not run task if run monitor is cancelled, return null as FutureTask must have been cancelled as well
         // (JobFutureTask is registered as a child of the run monitor), IFuture.awaitDoneAndGet will throw a FutureCancelledError
         JobFutureTask.this.cancel(false);

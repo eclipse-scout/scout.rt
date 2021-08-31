@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 public class ThreadNameDecorator implements ICallableDecorator {
 
   @Override
-  public IUndecorator decorate() throws Exception {
+  public IUndecorator decorate() {
     final ThreadInfo threadInfo = ThreadInfo.CURRENT.get();
     threadInfo.updateThreadName(IFuture.CURRENT.get().getJobInput().getThreadName(), null);
 

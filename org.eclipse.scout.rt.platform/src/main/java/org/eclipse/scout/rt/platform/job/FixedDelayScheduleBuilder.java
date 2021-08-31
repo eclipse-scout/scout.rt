@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.job;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.internal.FixedDelayTrigger;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.quartz.ScheduleBuilder;
@@ -63,7 +64,7 @@ public final class FixedDelayScheduleBuilder extends ScheduleBuilder<IFixedDelay
    * <p>
    * The job runs forever, unless the trigger's end time elapses, or the job is cancelled, or the job throws an
    * exception, and which in turn is not swallowed by the job's installed exception handling mechanism. See
-   * {@link JobInput#withExceptionHandling(Class, boolean)}.
+   * {@link JobInput#withExceptionHandling(ExceptionHandler, boolean)}.
    *
    * @param fixedDelay
    *          the delay between successive runs.
@@ -80,7 +81,7 @@ public final class FixedDelayScheduleBuilder extends ScheduleBuilder<IFixedDelay
    * <p>
    * At maximum, the job repeats as many times as specified. However, repeating execution is stopped once being
    * cancelled, or the job throws an exception, and which in turn is not swallowed by the job's installed exception
-   * handling mechanism. See {@link JobInput#withExceptionHandling(Class, boolean)}.
+   * handling mechanism. See {@link JobInput#withExceptionHandling(ExceptionHandler, boolean)}.
    *
    * @param repeatCount
    *          the maximum number of repetitions.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,7 +51,7 @@ public interface IJobManager {
   /**
    * Indicates the order of the job manager's {@link IPlatformListener} to shutdown itself upon entering platform state
    * {@link State#PlatformStopping}. Any listener depending on job manager facility must be configured with an order
-   * less than {@link #DESTROY_ORDER}.
+   * less than this value.
    */
   long DESTROY_ORDER = 5_900;
 
@@ -115,7 +115,8 @@ public interface IJobManager {
   /**
    * Checks whether all Futures accepted by the given Filter are in 'done-state' (completed or cancelled).
    * <p>
-   * See {@link newFutureFilterBuilder} to create a filter to match multiple criteria joined by logical 'AND' operation.
+   * See {@link Jobs#newFutureFilterBuilder()} to create a filter to match multiple criteria joined by logical 'AND'
+   * operation.
    * <p>
    * Example:
    *
@@ -137,7 +138,8 @@ public interface IJobManager {
    * Waits if necessary for at most the given time for all futures matching the given filter to complete, or until
    * cancelled, or the timeout elapses.
    * <p>
-   * See {@link newFutureFilterBuilder} to create a filter to match multiple criteria joined by logical 'AND' operation.
+   * See {@link Jobs#newFutureFilterBuilder()} to create a filter to match multiple criteria joined by logical 'AND'
+   * operation.
    * <p>
    * Example:
    *
@@ -185,8 +187,8 @@ public interface IJobManager {
    * A future is registered in job manager as long as not finished yet. A job is finished upon its completion, or upon a
    * premature cancellation, meaning that it will never commence execution.
    * <p>
-   * See {@link newFutureFilterBuilder} to create a filter to match multiple criteria joined by logical 'AND' operation.
-   * Use a {@link CollectorVisitor} to collect all visited Futures.
+   * See {@link Jobs#newFutureFilterBuilder()} to create a filter to match multiple criteria joined by logical 'AND'
+   * operation.
    * <p>
    * Example:
    *
@@ -206,7 +208,8 @@ public interface IJobManager {
   /**
    * Cancels all Futures which are accepted by the given Filter.
    * <p>
-   * See {@link newFutureFilterBuilder} to create a filter to match multiple criteria joined by logical 'AND' operation.
+   * See {@link Jobs#newFutureFilterBuilder()} to create a filter to match multiple criteria joined by logical 'AND'
+   * operation.
    * <p>
    * Example:
    *

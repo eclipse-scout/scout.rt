@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,7 +61,7 @@ public class JobInput {
    *
    * @param name
    *          the name with support for <em>formatting anchors</em> in the form of {} pairs.
-   * @param valueArgs
+   * @param args
    *          optional arguments to substitute <em>formatting anchors</em> in the name.
    */
   public JobInput withName(final String name, final Object... args) {
@@ -128,8 +128,8 @@ public class JobInput {
    * A semaphore initialized to <code>one</code> allows to run jobs in a mutually exclusive manner, and a semaphore
    * initialized to <code>zero</code> to run no job at all. The number of total permits available can be changed at any
    * time, which allows to adapt the maximal concurrency level to some dynamic criteria like time of day or system load.
-   * However, once calling {@link #seal()}, the number of permits cannot be changed anymore, and any attempts will
-   * result in an {@link AssertionException}.
+   * However, once calling {@link IExecutionSemaphore#seal()}, the number of permits cannot be changed anymore, and any
+   * attempts will result in an {@link AssertionException}.
    *
    * @see Jobs#newExecutionSemaphore(int)
    */
