@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
 import org.eclipse.scout.rt.platform.security.IPrincipalProducer2;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
@@ -123,23 +122,6 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
 
     public ServiceTunnelAccessTokenAuthConfig withEnabled(boolean enabled) {
       m_enabled = enabled;
-      return this;
-    }
-
-    /**
-     * @deprecated use {@link #getPrincipalProducer2()} instead. Will be removed in Scout 12.
-     */
-    @Deprecated
-    public IPrincipalProducer getPrincipalProducer() {
-      return name -> m_principalProducer.produce(name, null);
-    }
-
-    /**
-     * @deprecated use {@link #withPrincipalProducer2(IPrincipalProducer2)} instead. Will be removed in Scout 12.
-     */
-    @Deprecated
-    public ServiceTunnelAccessTokenAuthConfig withPrincipalProducer(IPrincipalProducer principalProducer) {
-      m_principalProducer = (name, token) -> principalProducer.produce(name);
       return this;
     }
 

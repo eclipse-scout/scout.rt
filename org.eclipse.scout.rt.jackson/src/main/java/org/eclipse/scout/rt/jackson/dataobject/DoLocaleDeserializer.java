@@ -16,14 +16,15 @@ import java.util.Locale;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer.Std;
 
-import sun.util.locale.LanguageTag;
-
 /**
- * Custom deserializer for {@link Locale} that specifically only handles deserializing "und" into the {@link Locale#ROOT} value.
- * All other values are deserialized using the default implementation.
- * TODO [22.0] pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
+ * Custom deserializer for {@link Locale} that specifically only handles deserializing "und" into the
+ * {@link Locale#ROOT} value. All other values are deserialized using the default implementation. TODO [22.0] pbz:
+ * Remove this class when Jackson is upgraded to 3.0 (issue 1600)
  */
 public class DoLocaleDeserializer extends Std {
+
+  private static final long serialVersionUID = 2429460681017940619L;
+  public static final String UNDETERMINED = "und"; // from sun.util.locale.LanguageTag.UNDETERMINED
 
   protected DoLocaleDeserializer() {
     super(Locale.class, STD_LOCALE);
@@ -31,7 +32,7 @@ public class DoLocaleDeserializer extends Std {
 
   @Override
   protected Object _deserialize(String value, DeserializationContext ctxt) throws IOException {
-    if (LanguageTag.UNDETERMINED.equals(value)) {
+    if (UNDETERMINED.equals(value)) {
       return Locale.ROOT;
     }
     return super._deserialize(value, ctxt);

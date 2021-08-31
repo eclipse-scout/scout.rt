@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,7 +55,7 @@ public class DoDateDeserializer extends DateDeserializer {
 
       String str = p.getText().trim();
       // Treat empty string and 'null' string as null value (as default Jackson date deserializer)
-      if (_isEmptyOrTextualNull(str)) {
+      if (str.isEmpty() || _hasTextualNull(str)) {
         return getNullValue(ctxt);
       }
       try {

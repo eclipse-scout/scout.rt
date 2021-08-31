@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,6 @@ import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyAutoCreateSelfSignedCertificateProperty;
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyCertificateAliasProperty;
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyKeyStorePasswordProperty;
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyKeyStorePathProperty;
@@ -64,14 +63,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JettyServer {
-  private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
 
   public static final String WEB_APP_FOLDER_KEY = "scout.jetty.webapp.folder";
   public static final String WEB_APP_CONTEXT_PATH = "scout.jetty.webapp.contextpath";
   public static final String SERVER_PORT_KEY = "scout.jetty.port"; // see also org.eclipse.scout.rt.platform.context.NodeIdentifier.compute()
 
+  private static final Logger LOG = LoggerFactory.getLogger(JettyServer.class);
+
   protected volatile Server m_server = null;
-  private boolean m_isInDevMode;
 
   public static void main(String[] args) {
     new JettyServer().start();
@@ -88,80 +87,86 @@ public class JettyServer {
     }
   }
 
-  protected void startInternal() throws Exception {
-    // read folder
-    File webappFolder = null;
+  protected File getWebappFolder() {
     String webappParam = System.getProperty(WEB_APP_FOLDER_KEY);
     if (webappParam == null || webappParam.isEmpty()) {
-      webappFolder = new File(Paths.get(".").toAbsolutePath().normalize().toFile(), "/src/main/webapp/");
+      return new File(Paths.get(".").toAbsolutePath().normalize().toFile(), "/src/main/webapp/");
     }
-    else {
-      webappFolder = new File(webappParam);
-    }
+    return new File(webappParam);
+  }
 
-    // port
-    int port = new JettyConfiguration.ScoutJettyPortProperty().getValue();
+  protected int getPort() {
+    return new JettyConfiguration.ScoutJettyPortProperty().getValue();
+  }
 
-    String contextPath = "/";
+  protected String getContextPath() {
     String contextPathConfig = System.getProperty(WEB_APP_CONTEXT_PATH);
     if (StringUtility.hasText(contextPathConfig)) {
       if (!contextPathConfig.startsWith("/")) {
         contextPathConfig = "/" + contextPathConfig;
       }
-      contextPath = contextPathConfig;
+      return contextPathConfig;
     }
+    return "/";
+  }
 
-    m_isInDevMode = new PlatformDevModeProperty().getValue();
+  protected boolean isUseTls() {
+    return CONFIG.getPropertyValue(ScoutJettyKeyStorePathProperty.class) != null;
+  }
 
-    WebAppContext webApp = createWebApp(webappFolder, contextPath);
-    Handler serverHandler = createServerHandler(webApp);
+  protected void startInternal() throws Exception {
+    int port = getPort();
+    boolean useTls = isUseTls();
+    File webappFolder = getWebappFolder();
+    String contextPath = getContextPath();
+
     m_server = new Server();
-    m_server.setHandler(serverHandler);
+    Handler handler = createContextHandler(webappFolder, contextPath);
+    ServerConnector connector = createServerConnector(port, useTls);
 
-    String protocol;
-    if (CONFIG.getPropertyValue(ScoutJettyKeyStorePathProperty.class) != null) {
-      // HTTPS Configuration
-      protocol = "https";
-      ServerConnector https = createHttpsServerConnector(port);
-      m_server.addConnector(https);
-    }
-    else {
-      // HTTP Configuration
-      protocol = "http";
-      ServerConnector http = createHttpServerConnector(port);
-      m_server.addConnector(http);
-    }
-
+    m_server.setHandler(handler);
+    m_server.addConnector(connector);
     m_server.start();
+    startConsoleInputReader();
+    logServerReady(useTls ? "https" : "http", port, contextPath);
+  }
 
-    startConsoleInputHandler();
-
-    if (LOG.isInfoEnabled()) {
-      StringBuilder sb = new StringBuilder();
-      sb.append("Server ready. The application is available on the following addresses:\n");
-      sb.append("---------------------------------------------------------------------\n");
-      sb.append("  ").append(protocol).append("://localhost:").append(port).append(contextPath).append("\n");
-      LocalHostAddressHelper localHostAddressHelper = BEANS.get(LocalHostAddressHelper.class);
-      String hostname = localHostAddressHelper.getHostName().toLowerCase(Locale.US);
-      String ip = localHostAddressHelper.getHostAddress();
-      sb.append("  ").append(protocol).append("://").append(hostname).append(":").append(port).append(contextPath).append("\n");
-      if (StringUtility.notEqualsIgnoreCase(hostname, ip)) {
-        sb.append("  ").append(protocol).append("://").append(ip).append(":").append(port).append(contextPath).append("\n");
-      }
-      sb.append("---------------------------------------------------------------------\n");
-      sb.append("To shut the server down, type \"shutdown\" in the console.\n");
-      LOG.info(sb.toString());
+  protected ServerConnector createServerConnector(int port, boolean useTls) {
+    if (useTls) {
+      return createHttpsServerConnector(port);
     }
+    return createHttpServerConnector(port);
+  }
+
+  protected void logServerReady(String protocol, int port, String contextPath) {
+    if (!LOG.isInfoEnabled()) {
+      return;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("Server ready. The application is available on the following addresses:\n");
+    sb.append("---------------------------------------------------------------------\n");
+    sb.append("  ").append(protocol).append("://localhost:").append(port).append(contextPath).append("\n");
+    LocalHostAddressHelper localHostAddressHelper = BEANS.get(LocalHostAddressHelper.class);
+    String hostname = localHostAddressHelper.getHostName().toLowerCase(Locale.US);
+    String ip = localHostAddressHelper.getHostAddress();
+    sb.append("  ").append(protocol).append("://").append(hostname).append(":").append(port).append(contextPath).append("\n");
+    if (StringUtility.notEqualsIgnoreCase(hostname, ip)) {
+      sb.append("  ").append(protocol).append("://").append(ip).append(":").append(port).append(contextPath).append("\n");
+    }
+    sb.append("---------------------------------------------------------------------\n");
+    sb.append("To shut the server down, type \"shutdown\" in the console.\n");
+    LOG.info(sb.toString());
   }
 
   public void shutdown() {
-    LOG.info("Shutting down application...");
+    LOG.info("Shutting down...");
     try {
       shutdownInternal();
-      LOG.info("Shutdown complete");
+      LOG.info("Shutdown complete.");
     }
     catch (Exception e) {
-      LOG.error("Error while shutting down application", e);
+      LOG.error("Error while shutting down.", e);
     }
   }
 
@@ -171,7 +176,7 @@ public class JettyServer {
     }
   }
 
-  protected void startConsoleInputHandler() {
+  protected void startConsoleInputReader() {
     final Thread t = new Thread("Console input handler") {
       @Override
       public void run() {
@@ -201,81 +206,55 @@ public class JettyServer {
     t.start();
   }
 
-  protected WebAppContext createWebApp(File webappDir, String contextPath) throws Exception {
+  protected Handler createContextHandler(File webappDir, String contextPath) throws Exception {
     String resourceBase = webappDir.getAbsolutePath();
-    WebAppContext webAppContext = new P_WebAppContext();
+    WebAppContext webAppContext = new P_WebAppContext(resourceBase, contextPath);
     webAppContext.setThrowUnavailableOnStartupException(true);
 
-    webAppContext.setContextPath(contextPath);
-    webAppContext.setResourceBase(resourceBase);
-    webAppContext.setParentLoaderPriority(true);
     LOG.info("Starting Jetty with resourceBase={}", resourceBase);
 
-    webAppContext.setConfigurationClasses(new String[]{
-        "org.eclipse.jetty.webapp.WebInfConfiguration",
-        "org.eclipse.jetty.webapp.WebXmlConfiguration",
-        "org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
-        "org.eclipse.jetty.plus.webapp.PlusConfiguration",
-        "org.eclipse.jetty.plus.webapp.EnvConfiguration",
-    });
-
-    webAppContext.configure();
-    return webAppContext;
-  }
-
-  /**
-   * @return the main handler to be set to the {@link Server}. The default implementation just returns the given
-   *         {@link WebAppContext}, unless a special context path is set. In that case, it wraps the given
-   *         <code>webAppContext</code> in a {@link P_RedirectToContextPathHandler} which redirects all GET requests to
-   *         URIs outside the context path to the context path.
-   *         <p>
-   *         This simplifies the use of a custom context path by redirecting all requests that do NOT start with the
-   *         specified context path to the context path (e.g. /login?debug=true to /myapp/login?debug=true). Custom
-   *         context paths are required when multiple Scout UI servers are run in parallel with different ports, because
-   *         otherwise they would destroy each others HTTP session (cookies are not specific to the port, only to the
-   *         host and context path).
-   */
-  protected Handler createServerHandler(WebAppContext webAppContext) {
-    if (!"/".equals(webAppContext.getContextPath())) {
-      return new P_RedirectToContextPathHandler(webAppContext);
+    if ("/".equals(contextPath)) {
+      return webAppContext;
     }
-    return webAppContext;
+
+    /**
+     * Wraps the given <code>webAppContext</code> in a {@link P_RedirectToContextPathHandler} which redirects all GET
+     * requests to URIs outside the context path to the context path.
+     * <p>
+     * This simplifies the use of a custom context path by redirecting all requests that do NOT start with the specified
+     * context path to the context path (e.g. /login?debug=true to /myapp/login?debug=true). Custom context paths are
+     * required when multiple Scout UI servers are run in parallel with different ports, because otherwise they would
+     * destroy each others HTTP session (cookies are not specific to the port, only to the host and context path).
+     */
+    return new P_RedirectToContextPathHandler(webAppContext);
   }
 
   protected ServerConnector createHttpServerConnector(int port) {
     HttpConfiguration httpConfig = new HttpConfiguration();
     httpConfig.setSendServerVersion(false);
     httpConfig.setSendDateHeader(false);
-    ServerConnector http = new ServerConnector(
-        m_server, new HttpConnectionFactory(httpConfig));
+    ServerConnector http = new ServerConnector(m_server, new HttpConnectionFactory(httpConfig));
     http.setPort(port);
     return http;
   }
 
   protected ServerConnector createHttpsServerConnector(int port) {
-    SslContextFactory sslContextFactory = createSslContextFactory();
+    SslContextFactory.Server sslContextFactory = createSslContextFactory();
     HttpConfiguration httpsConfig = new HttpConfiguration();
     httpsConfig.addCustomizer(new SecureRequestCustomizer());
     httpsConfig.setSendServerVersion(false);
     httpsConfig.setSendDateHeader(false);
-    ServerConnector https = new ServerConnector(
-        m_server,
-        new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
-        new HttpConnectionFactory(httpsConfig));
+    ServerConnector https = new ServerConnector(m_server, new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()), new HttpConnectionFactory(httpsConfig));
     https.setPort(port);
     return https;
   }
 
-  protected SslContextFactory createSslContextFactory() {
-    SslContextFactory sslContextFactory = new SslContextFactory.Server();
+  protected SslContextFactory.Server createSslContextFactory() {
+    SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
     String keyStorePath = resolveKeyStorePath(CONFIG.getPropertyValue(ScoutJettyKeyStorePathProperty.class));
-    String autoCertName = CONFIG.getPropertyValue(ScoutJettyAutoCreateSelfSignedCertificateProperty.class);
     String storepass = CONFIG.getPropertyValue(ScoutJettyKeyStorePasswordProperty.class);
     String keypass = CONFIG.getPropertyValue(ScoutJettyPrivateKeyPasswordProperty.class);
     String certAlias = CONFIG.getPropertyValue(ScoutJettyCertificateAliasProperty.class);
-    if (autoCertName != null) {
-      SecurityUtility.autoCreateSelfSignedCertificate(keyStorePath, storepass, keypass, certAlias, autoCertName);
-    }
     LOG.info("Setup SSL certificate using alias '{}' from keystore '{}':\n{}", certAlias, keyStorePath, SecurityUtility.keyStoreToHumanReadableText(keyStorePath, storepass, null));
     sslContextFactory.setKeyStorePath(keyStorePath);
     sslContextFactory.setKeyStorePassword(storepass);
@@ -329,13 +308,10 @@ public class JettyServer {
     return path;
   }
 
-  protected boolean isInDevMode() {
-    return m_isInDevMode;
-  }
+  protected static class P_WebAppContext extends WebAppContext {
 
-  protected class P_WebAppContext extends WebAppContext {
-
-    public P_WebAppContext() {
+    public P_WebAppContext(String webApp, String contextPath) {
+      super(webApp, contextPath);
       _scontext = new P_Context();
     }
 
@@ -368,7 +344,7 @@ public class JettyServer {
 
         // 3. In Dev mode only: The resource might be directly on the classpath because the IDE build copies it to the output dir.
         //                      Maven on the other hand copies it to outputDir/META-INF/resources
-        if (isInDevMode()) {
+        if (new PlatformDevModeProperty().getValue()) {
           return getClassLoader().getResource(path);
         }
         return null;
@@ -429,7 +405,7 @@ public class JettyServer {
    * </tr>
    * </table>
    */
-  protected class P_RedirectToContextPathHandler extends HandlerWrapper {
+  protected static class P_RedirectToContextPathHandler extends HandlerWrapper {
 
     protected final String m_contextPath;
 

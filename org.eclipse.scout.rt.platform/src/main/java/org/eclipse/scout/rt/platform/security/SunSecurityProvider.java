@@ -41,7 +41,6 @@ import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Collections;
-import java.util.Date;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherOutputStream;
@@ -56,14 +55,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-
-import sun.security.x509.CertificateExtensions;
-import sun.security.x509.DNSName;
-import sun.security.x509.GeneralName;
-import sun.security.x509.GeneralNames;
-import sun.security.x509.IPAddressName;
-import sun.security.x509.SubjectAlternativeNameExtension;
 
 /**
  * Utility class for encryption/decryption, hashing, random number generation and digital signatures.<br>
@@ -462,44 +453,6 @@ public class SunSecurityProvider implements ISecurityProvider {
   protected String getCipherAlgorithmPadding() {
     // PKCS5 padding scheme (as defined in <a href="http://tools.ietf.org/html/rfc2898">PKCS #5</a>).
     return "PKCS5Padding";
-  }
-
-  @Override
-  public void createSelfSignedCertificate(
-      String certificateAlias,
-      String x500Name,
-      String storePass,
-      String keyPass,
-      int keyBits,
-      int validDays,
-      OutputStream out) {
-    try {
-      sun.security.tools.keytool.CertAndKeyGen certGen = new sun.security.tools.keytool.CertAndKeyGen("RSA", "SHA256WithRSA", null);
-      certGen.generate(keyBits);
-      sun.security.x509.X500Name name = new sun.security.x509.X500Name(x500Name);
-      long validSecs = (long) validDays * 24L * 3600L;
-      GeneralNames generalNames = new GeneralNames()
-          .add(new GeneralName(new DNSName("localhost")))
-          .add(new GeneralName(new IPAddressName("127.0.0.1")));
-      if (!StringUtility.isNullOrEmpty(name.getCommonName())) {
-        generalNames.add(new GeneralName(new DNSName(name.getCommonName())));
-      }
-      CertificateExtensions extensions = new CertificateExtensions();
-      extensions.set(SubjectAlternativeNameExtension.NAME, new SubjectAlternativeNameExtension(generalNames));
-      X509Certificate cert = certGen.getSelfCertificate(name, new Date(), validSecs, extensions);
-      PrivateKey privateKey = certGen.getPrivateKey();
-
-      KeyStore ks = KeyStore.getInstance("jks");
-      ks.load(null, storePass.toCharArray());
-      ks.setKeyEntry(certificateAlias, privateKey, keyPass.toCharArray(), new X509Certificate[]{cert});
-      ks.store(out, storePass.toCharArray());
-    }
-    catch (GeneralSecurityException e) {
-      throw new ProcessingException("Security issue", e);
-    }
-    catch (IOException e) {
-      throw new ProcessingException("IO issue", e);
-    }
   }
 
   @Override

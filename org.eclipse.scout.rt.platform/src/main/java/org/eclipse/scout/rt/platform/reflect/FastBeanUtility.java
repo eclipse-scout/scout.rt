@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,15 +35,6 @@ public final class FastBeanUtility {
       return "";
     }
     return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-  }
-
-  /**
-   * @deprecated use {@link Introspector#decapitalize(String)} instead. Will be removed in Scout 12.
-   * @return Introspector#decapitalize(String)
-   */
-  @Deprecated
-  public static String decapitalize(String s) {
-    return Introspector.decapitalize(s);
   }
 
   public static boolean compareMethods(Method a, Method b) {

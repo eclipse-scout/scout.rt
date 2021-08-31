@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -119,30 +119,12 @@ public abstract class AbstractObjectSerializer implements IObjectSerializer {
 
   @Override
   public ObjectOutputStream createObjectOutputStream(OutputStream out) throws IOException {
-    return createObjectOutputStream(out, getObjectReplacer());
+    return new ReplacingObjectOutputStream(out, getObjectReplacer());
   }
 
   @Override
   public ObjectInputStream createObjectInputStream(InputStream in) throws IOException {
-    return createObjectInputStream(in, getObjectReplacer());
-  }
-
-  /**
-   * @deprecated use {@link #createObjectOutputStream(OutputStream)} instead. Will be removed in Scout 12.
-   */
-  @SuppressWarnings("DeprecatedIsStillUsed")
-  @Deprecated
-  protected ObjectOutputStream createObjectOutputStream(OutputStream out, IObjectReplacer objectReplacer) throws IOException {
-    return new ReplacingObjectOutputStream(out, objectReplacer);
-  }
-
-  /**
-   * @deprecated use {@link #createObjectInputStream(InputStream)} instead. Will be removed in Scout 12.
-   */
-  @SuppressWarnings("DeprecatedIsStillUsed")
-  @Deprecated
-  protected ObjectInputStream createObjectInputStream(InputStream in, IObjectReplacer objectReplacer) throws IOException {
-    return new ResolvingObjectInputStream(in, objectReplacer, getBlacklist(), getWhitelist());
+    return new ResolvingObjectInputStream(in, getObjectReplacer(), getBlacklist(), getWhitelist());
   }
 
   public static class ReplacingObjectOutputStream extends ObjectOutputStream {

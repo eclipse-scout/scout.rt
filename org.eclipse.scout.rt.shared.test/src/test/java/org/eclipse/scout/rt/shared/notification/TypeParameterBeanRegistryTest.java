@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,6 @@ import java.util.function.Consumer;
 import org.eclipse.scout.rt.platform.TypeParameterBeanRegistry;
 import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
-import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.Test;
 
 /**
@@ -112,7 +111,8 @@ public class TypeParameterBeanRegistryTest {
   public void testFunctionalInterface_innerClass() {
     final TypeParameterBeanRegistry<Consumer> reg = new TypeParameterBeanRegistry<>(Consumer.class);
     StringHolder holder1 = new StringHolder();
-    Consumer<String> stringConsumer1 = new Consumer<String>() {
+    //noinspection Convert2Lambda,Anonymous2MethodRef
+    Consumer<String> stringConsumer1 = new Consumer<>() {
       @Override
       public void accept(String t) {
         holder1.setValue(t);
@@ -124,14 +124,15 @@ public class TypeParameterBeanRegistryTest {
   }
 
   @Test
-  public void testFunctionalInterface_lamdbaExpression() {
+  public void testFunctionalInterface_LambdaExpression() {
     final TypeParameterBeanRegistry<Consumer> reg = new TypeParameterBeanRegistry<>(Consumer.class);
     Consumer<String> stringConsumer = this::consume;
 
     // fails to register without additional type information (used TypeCastUtility is not able to detect generic type parameter out of lambda)
-    ScoutAssert.assertThrows(IllegalArgumentException.class, () -> reg.registerBean(stringConsumer));
+    assertThrows(IllegalArgumentException.class, () -> reg.registerBean(stringConsumer));
 
     StringHolder holder = new StringHolder();
+    //noinspection CodeBlock2Expr
     Consumer<String> stringConsumer2 = input -> {
       holder.setValue(input);
     };

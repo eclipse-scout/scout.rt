@@ -32,6 +32,17 @@
     <dependency>
       <groupId>jakarta.xml.ws</groupId>
       <artifactId>jakarta.xml.ws-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- replace the activation-api with the impl. Scout includes the impl anyway and it includes the api classes as well. -->
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.activation</groupId>
+      <artifactId>jakarta.activation</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.jws</groupId>

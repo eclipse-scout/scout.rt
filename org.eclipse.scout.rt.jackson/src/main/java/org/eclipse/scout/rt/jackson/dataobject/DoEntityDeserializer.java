@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import org.eclipse.scout.rt.dataobject.AbstractDoCollection;
@@ -140,9 +141,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     for (JsonToken t = p.currentToken(); t == JsonToken.FIELD_NAME; t = p.nextToken()) {
       String attributeName = p.getCurrentName();
       p.nextToken(); // let current token point to the value
-      boolean isArray = p.getCurrentToken() == JsonToken.START_ARRAY;
-      boolean isObject = p.getCurrentToken() == JsonToken.START_OBJECT;
-      ResolvedType attributeType = findResolvedAttributeType(entity, attributeName, isObject, isArray);
+      ResolvedType attributeType = findResolvedAttributeType(entity, attributeName, p.currentToken());
       if (attributeType.hasRawClass(DoList.class) || attributeType.hasRawClass(DoSet.class) || attributeType.hasRawClass(DoCollection.class)) {
         DoNode<?> nodeValue = p.getCodec().readValue(p, attributeType);
 
@@ -203,28 +202,30 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     return newObject(ctxt, m_handledClass);
   }
 
-  protected JavaType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, boolean isObject, boolean isArray) {
+  protected JavaType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, JsonToken currentToken) {
     return m_doEntityDeserializerTypeStrategy.resolveAttributeType(entityInstance.getClass(), attributeName)
-        .orElseGet(() -> findResolvedFallbackAttributeType(attributeName, isObject, isArray));
+        .orElseGet(() -> findResolvedFallbackAttributeType(attributeName, currentToken));
   }
 
-  protected JavaType findResolvedFallbackAttributeType(String attributeName, boolean isObject, boolean isArray) {
+  protected JavaType findResolvedFallbackAttributeType(String attributeName, JsonToken currentToken) {
     if (DoMapEntity.class.isAssignableFrom(m_handledClass)) {
       // DoMapEntity<T> structure is deserialized as typed Map<String, T>
       return findResolvedDoMapEntityType();
     }
-    else if (isObject) {
+    if (currentToken == JsonToken.START_OBJECT) {
       // fallback to default handling, if no attribute definition could be found
       return TypeFactory.defaultInstance().constructType(DoEntity.class);
     }
-    else if (isArray) {
+    if (currentToken == JsonToken.START_ARRAY) {
       // array-like JSON structure is deserialized as raw DoList (using DoList as generic structure instead of DoSet or DoCollection)
       return TypeFactory.defaultInstance().constructType(DoList.class);
     }
-    else {
-      // JSON scalar values are deserialized as raw object using default jackson typing
-      return TypeFactory.unknownType();
+    if (currentToken == JsonToken.VALUE_NUMBER_FLOAT) {
+      // deserialize floating point numbers as BigDecimal
+      return TypeFactory.defaultInstance().constructType(BigDecimal.class);
     }
+    // JSON scalar values are deserialized as raw object using default jackson typing
+    return TypeFactory.unknownType();
   }
 
   /**

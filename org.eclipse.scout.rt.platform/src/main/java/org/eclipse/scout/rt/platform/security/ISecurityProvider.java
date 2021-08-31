@@ -286,49 +286,6 @@ public interface ISecurityProvider {
   byte[] createSecureRandomBytes(int numBytes);
 
   /**
-   * Create a self-signed X509 certificate with public key and private key in a JKS keystore.
-   * <p>
-   * Similar to: openssl req -nodes -newkey rsa:4096 -days 3650 -x509 -keyout cert_private.key -out cert_public.pem
-   *
-   * @param certificateAlias
-   *          is the alias used in the keystore for accessing the certificate, this is not the certificate name (DN)
-   * @param x500Name
-   *          or Subject DN or Issuer DN for example "CN=host.domain.com,C=CH,S=ZH,L=Zurich,O=My Company",
-   *
-   *          <pre>
-  X.500 name format is
-  CN: CommonName: host.domain.com
-  C: CountryName: CH
-  S: StateOrProvinceName: ZH
-  L: Locality: Zurich
-  O: Organization: My Company
-  OU: OrganizationalUnit:
-   *          </pre>
-   *
-   * @param storePass
-   *          keystore password
-   * @param keyPass
-   *          private key password
-   * @param keyBits
-   *          typically 4096
-   * @param validDays
-   *          typically 365 days
-   * @param out
-   *          where to write the generated keystore to
-   * @since 10.0
-   */
-  default void createSelfSignedCertificate(
-      String certificateAlias,
-      String x500Name,
-      String storePass,
-      String keyPass,
-      int keyBits,
-      int validDays,
-      OutputStream out) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
    * @param keyStoreInput
    *          stream
    * @param storePass

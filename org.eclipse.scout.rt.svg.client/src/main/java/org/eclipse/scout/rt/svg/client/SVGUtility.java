@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -297,7 +297,6 @@ public final class SVGUtility {
    * @param contextElement
    *          is the {@link SVGTextContentElement} containing optional style and font information context for the
    *          wrapping algorithm
-   * @param text
    * @param wordWrap
    *          in px
    * @return the wrapped text with additional newline characters where it was wrapped.
@@ -484,7 +483,9 @@ public final class SVGUtility {
 
   private static float convertToPx(String valueWithUnit) {
     Matcher m = Pattern.compile("([0-9.]+)([^0-9.]*)").matcher(valueWithUnit);
-    m.matches();
+    if (!m.matches()) {
+      return 0.0f;
+    }
     float f = Float.parseFloat(m.group(1));
     String unit = m.group(2);
     if (unit == null) {
