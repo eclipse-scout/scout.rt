@@ -40,7 +40,7 @@ public final class MessageBoxes {
   /**
    * Creates a message box with no defined buttons.
    * <p>
-   * Do not forget to call {@link #show()} at the end.
+   * Do not forget to call {@link IMessageBox#show()} at the end.
    */
   public static IMessageBox create() {
     return BEANS.get(IMessageBox.class);
@@ -49,7 +49,7 @@ public final class MessageBoxes {
   /**
    * Creates a message box with one button labeled OK.
    * <p>
-   * Do not forget to call {@link #show()} at the end.
+   * Do not forget to call {@link IMessageBox#show()} at the end.
    */
   public static IMessageBox createOk() {
     return create().withYesButtonText(TEXTS.get("OkButton"));
@@ -57,6 +57,8 @@ public final class MessageBoxes {
 
   /**
    * Creates e message box with yes and not buttons.
+   * <p>
+   * Do not forget to call {@link IMessageBox#show()} at the end.
    */
   public static IMessageBox createYesNo() {
     return create().withYesButtonText(TEXTS.get("YesButton")).withNoButtonText(TEXTS.get("NoButton"));
@@ -64,6 +66,8 @@ public final class MessageBoxes {
 
   /**
    * Creates a message box with yes, no and cancel buttons.
+   * <p>
+   * Do not forget to call {@link IMessageBox#show()} at the end.
    */
   public static IMessageBox createYesNoCancel() {
     return createYesNo().withCancelButtonText(TEXTS.get("CancelButton"));

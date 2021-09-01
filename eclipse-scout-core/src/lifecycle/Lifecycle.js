@@ -250,12 +250,8 @@ export default class Lifecycle {
   }
 
   _showYesNoCancelMessageBox(message, yesAction, noAction) {
-    return MessageBoxes.create(this.widget)
-      .withSeverity(Status.Severity.WARNING)
+    return MessageBoxes.createYesNoCancel(this.widget)
       .withHeader(message)
-      .withYes()
-      .withNo()
-      .withCancel()
       .buildAndOpen()
       .then(option => {
         if (option === MessageBox.Buttons.YES) {

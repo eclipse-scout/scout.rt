@@ -1796,7 +1796,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       // ensure all fields have the right save-needed-state
       checkSaveNeeded();
       if (isSaveNeeded() && isAskIfNeedSave()) {
-        int result = MessageBoxes.createYesNoCancel().withHeader(getCancelVerificationText()).withSeverity(IStatus.INFO).show();
+        int result = MessageBoxes.createYesNoCancel()
+            .withHeader(getCancelVerificationText())
+            .show();
 
         if (result == IMessageBox.YES_OPTION) {
           doOk();
