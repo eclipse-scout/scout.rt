@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -291,7 +291,7 @@ public abstract class AbstractSeleniumTest {
    * Finds the message box button at the given index position (1-based, or last() to get the last opened).
    */
   public WebElement findMessageBoxButton(WebElement messageBox, String xPathIndex) {
-    return messageBox.findElement(By.xpath(String.format("//*[@class='box-button unfocusable'][%s]", xPathIndex)));
+    return messageBox.findElement(By.xpath(String.format("//*[contains(@class, 'action unfocusable button box-button')][%s]", xPathIndex)));
   }
 
   public boolean elementNotExists(String modelClass) {
