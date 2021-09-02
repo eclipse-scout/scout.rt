@@ -102,7 +102,7 @@ public interface ISecurityProvider {
   /**
    * Creates a hash for the given data using the given salt.<br>
    * <br>
-   * <b>Important:</b> For hashing of passwords use {@link #createPasswordHash(char[], byte[], int)}!
+   * <b>Important:</b> For hashing of passwords use {@link #createPasswordHash(char[], byte[])}!
    *
    * @param data
    *          The {@link InputStream} providing the data to hash.
@@ -120,15 +120,30 @@ public interface ISecurityProvider {
   byte[] createHash(InputStream data, byte[] salt, int iterations);
 
   /**
-   * see {@link #createPasswordHash(char[], byte[], int)} with default iteration count
+   * Creates a hash for the given password.<br>
+   *
+   * @param password
+   *          The password to create the hash for. Must not be {@code null} or empty.
+   * @param salt
+   *          The salt to use. Use {@link #createSecureRandomBytes(int)} to generate a new random salt for each
+   *          credential. Do not use the same salt for multiple credentials. The salt should be at least 32 bytes long.
+   *          Remember to save the salt with the hashed password! Must not be {@code null} or an empty array.
+   * @return the password hash
+   * @throws AssertionException
+   *           If one of the following conditions is {@code true}:<br>
+   *           <ul>
+   *           <li>The password is {@code null} or an empty array</li>
+   *           <li>The salt is {@code null} or an empty array</li>
+   *           </ul>
+   * @throws ProcessingException
+   *           If there is an error creating the hash. <br>
    */
   default byte[] createPasswordHash(char[] password, byte[] salt) {
     return createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS);
   }
 
   /**
-   * Creates a hash for the given password.<br>
-   *
+   * @deprecated use {@link #createPasswordHash(char[], byte[])}
    * @param password
    *          The password to create the hash for. Must not be {@code null} or empty.
    * @param salt
@@ -154,6 +169,8 @@ public interface ISecurityProvider {
    * @throws ProcessingException
    *           If there is an error creating the hash. <br>
    */
+  @SuppressWarnings("DeprecatedIsStillUsed")
+  @Deprecated
   byte[] createPasswordHash(char[] password, byte[] salt, int iterations);
 
   /**

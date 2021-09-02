@@ -225,10 +225,10 @@ public final class SecurityUtility {
   }
 
   /**
-   * It is recommended to use {@link #hashPassword(char[], byte[])} without iteration count.
-   *
-   * @see ISecurityProvider#createPasswordHash(char[], byte[], int)
+   * @deprecated use {@link #hashPassword(char[], byte[])} without iteration count.
+   * @see ISecurityProvider#createPasswordHash(char[], byte[]) 
    */
+  @Deprecated
   public static byte[] hashPassword(char[] password, byte[] salt, int iterations) {
     return SECURITY_PROVIDER.get().createPasswordHash(password, salt, iterations);
   }
@@ -260,7 +260,7 @@ public final class SecurityUtility {
    * @throws AssertionException
    *           If data is {@code null}.
    * @see ISecurityProvider#createHash(InputStream, byte[], int)
-   * @see ISecurityProvider#createPasswordHash(char[], byte[], int)
+   * @see ISecurityProvider#createPasswordHash(char[], byte[])
    */
   public static byte[] hash(byte[] data, byte[] salt) {
     Assertions.assertNotNull(data, "no data provided");

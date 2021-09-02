@@ -185,11 +185,11 @@ public class SunSecurityProvider implements ISecurityProvider {
    * do so replace this bean with your own implementation overwriting the method
    * {@link #getPasswordHashSecretKeyAlgorithm()}.
    */
+  @SuppressWarnings("deprecation")
   @Override
   public byte[] createPasswordHash(char[] password, byte[] salt, int iterations) {
     assertGreater(assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
     assertGreater(assertNotNull(salt, "salt must not be null.").length, 0, "empty salt is not allowed.");
-    iterations = Math.max(MIN_PASSWORD_HASH_ITERATIONS, iterations);
     // other checks are done by the PBEKeySpec constructor
 
     try {
