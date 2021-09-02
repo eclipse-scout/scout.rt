@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,10 +55,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
 
   public AbstractAccessControlService() {
     m_userIdSearchPatterns = new Pattern[]{
-        Pattern.compile(".*\\\\([^/@]+)"),
-        Pattern.compile(".*\\\\([^/@]+)[/@].*"),
-        Pattern.compile("([^/@]+)"),
-        Pattern.compile("([^/@]+)[/@].*"),
+        Pattern.compile("(.*)"),
     };
   }
 
@@ -96,10 +93,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
    * The first group of the pattern is assumed to be the username.<br>
    * By default the following patterns are applied in this order:
    * <ul>
-   * <li>".*\\\\([^/@]+)" matching "DOMAIN\\user" to "user"
-   * <li>".*\\\\([^/@]+)[/@].*" matching "DOMAIN\\user@domain.com" to "user"
-   * <li>"([^/@]+)" matching "user" to "user"
-   * <li>"([^/@]+)[/@].*" matching "user@domain.com" to "user"
+   * <li>".*"
    * </ul>
    */
   protected void setUserIdSearchPatterns(String... patterns) {
