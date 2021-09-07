@@ -318,6 +318,10 @@ export default class ErrorHandler {
       iconId: icons.SLIPPERY
     };
 
+    if (session.inDevelopmentMode) {
+      options.noButtonText = session.optText('ui.Ignore', 'Ignore');
+    }
+
     session.showFatalMessage(options, errorCode);
   }
 

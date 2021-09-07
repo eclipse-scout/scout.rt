@@ -63,6 +63,7 @@ export default class Session {
     this.loggedOut = false;
     this.inspector = false;
     this.persistent = false;
+    this.inDevelopmentMode = false;
     this.desktop = null;
     this.layoutValidator = new LayoutValidator();
     this.focusManager = null;
@@ -385,7 +386,10 @@ export default class Session {
    * @param {[]} data.events
    * @param data.startupData
    * @param data.startupData.clientSession
+   * @param data.startupData.clientSessionId
    * @param data.startupData.pollingInterval
+   * @param data.startupData.persistent
+   * @param data.startupData.inDevelopmentMode
    * @param data.error
    * @param data.sessionTerminated
    */
@@ -404,6 +408,9 @@ export default class Session {
 
     // Mark session as persistent (means a persistent session cookie is used and the client session will be restored after a browser restart)
     this.persistent = data.startupData.persistent;
+
+    // true if the UiServer runs in development mode (see Platform.get().inDevelopmentMode())
+    this.inDevelopmentMode = !!data.startupData.inDevelopmentMode; // may be undefined
 
     // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
     this.clientSessionId = data.startupData.clientSessionId;
@@ -1043,6 +1050,9 @@ export default class Session {
         this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' (' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
         this.optText('ui.UiInconsistentMsg', ''));
       boxOptions.iconId = icons.SLIPPERY;
+      if (this.inDevelopmentMode) {
+        boxOptions.noButtonText = this.optText('ui.Ignore', 'Ignore');
+      }
     } else if (jsonError.code === Session.JsonResponseError.UNSAFE_UPLOAD) {
       boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);

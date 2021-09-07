@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -258,6 +259,9 @@ public class ErrorPopup {
         TEXTS.get("InternalProcessingErrorMsg", (errorCode == null ? "" : " (" + TEXTS.get("ErrorCodeX", errorCode) + ")")),
         TEXTS.get("UiInconsistentMsg"));
     m_yesButtonText = TEXTS.get("Reload");
+    if (Platform.get().inDevelopmentMode()) {
+      m_noButtonText = TEXTS.get("Ignore");
+    }
     m_reloadOnYesClick = true;
   }
 }

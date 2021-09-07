@@ -53,7 +53,7 @@ export default class BoxButtons extends Widget {
   _renderDefaultButtonIndex() {
     for (let i = 0; i < this.buttons.length; i++) {
       let button = this.buttons[i];
-      button.setSelected(button.isVisible() && button.enabledComputed && this.isDefaultButtonIndex(i));
+      button.$container.toggleClass('default', button.isVisible() && button.enabledComputed && this.isDefaultButtonIndex(i));
     }
   }
 

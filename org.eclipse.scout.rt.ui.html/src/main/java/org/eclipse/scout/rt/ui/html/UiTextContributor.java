@@ -155,6 +155,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.DateRange",
         "ui.Up",
         "ui.Continue",
+        "ui.Ignore",
         "ui.ErrorCodeX",
         "ui.InternalUiErrorMsg",
         "ui.UiInconsistentMsg",
