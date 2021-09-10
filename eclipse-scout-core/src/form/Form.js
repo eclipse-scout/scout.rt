@@ -489,7 +489,7 @@ export default class Form extends Widget {
 
   /**
    * Will call {@link #close()} if there is a close menu or button, otherwise {@link #cancel()) will be called.
- */
+   */
   _abort() {
     // Search for a close button in the menus and buttons of the root group box
     let hasCloseButton = this.rootGroupBox.controls

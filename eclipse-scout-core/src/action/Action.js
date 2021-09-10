@@ -31,11 +31,6 @@ export default class Action extends Widget {
     this.tabbable = false;
     this.text = null;
     this.textPosition = Action.TextPosition.DEFAULT;
-    /**
-     * Supported action styles are:
-     * - default: regular menu-look, also used in overflow menus
-     * - button: menu looks like a button
-     */
     this.textVisible = true;
     this.toggleAction = false;
     this.tooltipText = null;
@@ -46,7 +41,13 @@ export default class Action extends Widget {
   }
 
   static ActionStyle = {
+    /**
+     * regular menu-look, also used in overflow menus
+     */
     DEFAULT: 0,
+    /**
+     * menu looks like a button
+     */
     BUTTON: 1
   };
 
@@ -137,6 +138,13 @@ export default class Action extends Widget {
     }
   }
 
+  _removeText() {
+    if (this.$text) {
+      this.$text.remove();
+      this.$text = null;
+    }
+  }
+
   setTextPosition(textPosition) {
     this.setProperty('textPosition', textPosition);
   }
@@ -144,13 +152,6 @@ export default class Action extends Widget {
   _renderTextPosition() {
     this.$container.toggleClass('bottom-text', this.textPosition === Action.TextPosition.BOTTOM);
     this.invalidateLayoutTree();
-  }
-
-  _removeText() {
-    if (this.$text) {
-      this.$text.remove();
-      this.$text = null;
-    }
   }
 
   setIconId(iconId) {

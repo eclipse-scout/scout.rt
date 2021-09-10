@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, ContextMenuPopup, Event, HtmlComponent, icons, MenuExecKeyStroke, MenuKeyStroke, objects, scout, strings, tooltips, TreeVisitResult} from '../index';
+import {Action, arrays, ContextMenuPopup, Event, HtmlComponent, icons, MenuExecKeyStroke, MenuKeyStroke, scout, strings, tooltips, TreeVisitResult} from '../index';
 
 export default class Menu extends Action {
 
@@ -311,8 +311,8 @@ export default class Menu extends Action {
     }
   }
 
-  _renderText(text) {
-    super._renderText(text);
+  _renderText() {
+    super._renderText();
     this.$container.toggleClass('has-text', strings.hasText(this.text) && this.textVisible);
     if (!this.rendering) {
       this._renderSubMenuIcon();
