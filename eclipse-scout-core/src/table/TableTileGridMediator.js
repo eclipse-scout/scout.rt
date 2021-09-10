@@ -31,7 +31,6 @@ export default class TableTileGridMediator extends Widget {
     this.tileMappings = []; // used only in scout classic
     this.tilesMap = {}; // tiles by rowId
     this.tileFilterMap = {};
-    this.groups = {};
     this.groupForTileMap = {}; // groupId by tile
     this.tableState = {}; // always stores the last table state before tileMode activation
 
@@ -254,8 +253,15 @@ export default class TableTileGridMediator extends Widget {
       options.menuFilter = this.table._filterMenusHandler;
       origShowContextMenu.call(tileGrid, options);
     }.bind(this);
-    // use the table's keyStrokeContext bindTarget for each tileGrid as well to ensure that the tileGrid's keyStrokes are active when the table is active
+    // Use the table's keyStrokeContext $bindTarget for each tileGrid as well, to ensure that in tileMode the tileGrids
+    // keyStrokes work when the focus is in the tableHeader/Footer (or just outside the actual TileGrid).
+    // Adapt all keyStrokes to stop propagation. This is necessary since several tileGrids now use the same $bindTarget and the keyStroke
+    // should only be executed once. The TileGridSelectionHandler takes care of the correct selection behaviour.
     tileGrid.keyStrokeContext.$bindTarget = this.table.keyStrokeContext.$bindTarget;
+    tileGrid.keyStrokeContext.keyStrokes.forEach(ks => {
+      ks.stopPropagation = true;
+      ks.stopImmediatePropagation = true;
+    });
   }
 
   _createTileAccordion() {
@@ -365,7 +371,6 @@ export default class TableTileGridMediator extends Widget {
 
   reset() {
     this.tilesMap = {};
-    this.groups = {};
     this.groupForTileMap = {};
     this.tileAccordion.deleteAllTiles();
     this.tileAccordion.deleteAllGroups();
