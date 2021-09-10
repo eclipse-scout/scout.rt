@@ -65,6 +65,13 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWid
       }
     });
 
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_HTML_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isHtmlEnabled();
+      }
+    });
+
     putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_TOOLTIP_TEXT, model) {
       @Override
       protected String modelValue() {

@@ -31,13 +31,14 @@ export default class Action extends Widget {
     this.tabbable = false;
     this.text = null;
     this.textPosition = Action.TextPosition.DEFAULT;
+    this.htmlEnabled = false;
     this.textVisible = true;
     this.toggleAction = false;
     this.tooltipText = null;
     this.showTooltipWhenSelected = true;
 
     this._doubleClickSupport = new DoubleClickSupport();
-    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'tabbable', 'text', 'textPosition', 'tooltipText', 'toggleAction']);
+    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'tabbable', 'text', 'textPosition', 'htmlEnabled', 'tooltipText', 'toggleAction']);
   }
 
   static ActionStyle = {
@@ -132,7 +133,11 @@ export default class Action extends Widget {
         this.$text = this.$container.appendSpan('content text');
         HtmlComponent.install(this.$text, this.session);
       }
-      this.$text.text(text);
+      if (this.htmlEnabled) {
+        this.$text.html(text);
+      } else {
+        this.$text.text(text);
+      }
     } else {
       this._removeText();
     }
@@ -152,6 +157,15 @@ export default class Action extends Widget {
   _renderTextPosition() {
     this.$container.toggleClass('bottom-text', this.textPosition === Action.TextPosition.BOTTOM);
     this.invalidateLayoutTree();
+  }
+
+  setHtmlEnabled(htmlEnabled) {
+    this.setProperty('htmlEnabled', htmlEnabled);
+  }
+
+  _renderHtmlEnabled() {
+    // Render the text again when html enabled changes dynamically
+    this._renderText();
   }
 
   setIconId(iconId) {

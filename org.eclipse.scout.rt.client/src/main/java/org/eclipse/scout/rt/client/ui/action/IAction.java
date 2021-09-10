@@ -25,6 +25,7 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
   String PROP_IMAGE = "image";
   String PROP_TEXT = "text";
   String PROP_TEXT_POSITION = "textPosition";
+  String PROP_HTML_ENABLED = "htmlEnabled";
   String PROP_TOOLTIP_TEXT = "tooltipText";
   String PROP_SELECTED = "selected";
   String PROP_VISIBLE = "visible";
@@ -92,6 +93,10 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
   String getTextPosition();
 
   void setTextPosition(String position);
+
+  boolean isHtmlEnabled();
+
+  void setHtmlEnabled(boolean htmlEnabled);
 
   int getActionStyle();
 

@@ -269,6 +269,16 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   }
 
   @Override
+  public boolean isHtmlEnabled() {
+    return m_wrappedMenu.isHtmlEnabled();
+  }
+
+  @Override
+  public void setHtmlEnabled(boolean htmlEnabled) {
+    unsupported();
+  }
+
+  @Override
   public int getActionStyle() {
     return m_wrappedMenu.getActionStyle();
   }

@@ -133,6 +133,12 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     return TEXT_POSITION_DEFAULT;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(46)
+  protected boolean getConfiguredHtmlEnabled() {
+    return false;
+  }
+
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(50)
   protected String getConfiguredTooltipText() {
@@ -273,6 +279,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     setIconId(getConfiguredIconId());
     setText(getConfiguredText());
     setTextPosition(getConfiguredTextPosition());
+    setHtmlEnabled(getConfiguredHtmlEnabled());
     setTooltipText(getConfiguredTooltipText());
     setKeyStroke(getConfiguredKeyStroke());
     setKeyStrokeFirePolicy(getConfiguredKeyStrokeFirePolicy());
@@ -390,6 +397,16 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   @Override
   public void setTextPosition(String position) {
     propertySupport.setPropertyString(PROP_TEXT_POSITION, position);
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
+    return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
+  }
+
+  @Override
+  public void setHtmlEnabled(boolean htmlEnabled) {
+    propertySupport.setPropertyBool(PROP_HTML_ENABLED, htmlEnabled);
   }
 
   @Override
@@ -578,6 +595,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     String[] keys = new String[keyCount];
     keys[0] = firstKey;
     keys[1] = secondKey;
+    // noinspection ManualArrayCopy
     for (int i = 0; i < otherKeys.length; ++i) {
       keys[i + 2] = otherKeys[i];
     }
