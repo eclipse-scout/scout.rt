@@ -104,14 +104,49 @@ export default class Popup extends Widget {
 
   // Note that these strings are also used as CSS classes
   static Alignment = {
+    /**
+     * The entire popup is positioned horizontally left of the anchor.
+     */
     LEFT: 'left',
+    /**
+     * With arrow: The arrow at the left edge of the popup is aligned horizontally with the center of the anchor.
+     * <p>
+     * Without arrow: The left edges of both the popup and the anchor are aligned horizontally.
+     */
     LEFTEDGE: 'leftedge',
+    /**
+     * The entire popup is positioned vertically above the anchor.
+     */
     TOP: 'top',
+    /**
+     * With arrow: The arrow at the top edge of the popup is aligned vertically with the center of the anchor.
+     * <p>
+     * Without arrow: The top edges of both the popup and the anchor are aligned vertically.
+     */
     TOPEDGE: 'topedge',
+    /**
+     * The centers of both the popup and the anchor are aligned in the respective dimension.
+     */
     CENTER: 'center',
+    /**
+     * The entire popup is positioned horizontally to the right of the anchor.
+     */
     RIGHT: 'right',
+    /**
+     * With arrow: The arrow at the right edge of the popup is aligned horizontally with the center of the anchor.
+     * <p>
+     * Without arrow: The right edges of both the popup and the anchor are aligned horizontally.
+     */
     RIGHTEDGE: 'rightedge',
+    /**
+     * The entire popup is positioned vertically below the anchor.
+     */
     BOTTOM: 'bottom',
+    /**
+     * With arrow: The arrow at the bottom edge of the popup is aligned vertically with the center of the anchor.
+     * <p>
+     * Without arrow: The bottom edges of both the popup and the anchor are aligned vertically.
+     */
     BOTTOMEDGE: 'bottomedge'
   };
 
