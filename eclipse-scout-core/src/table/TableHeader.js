@@ -41,7 +41,7 @@ export default class TableHeader extends Widget {
 
   _render() {
     this.$container = this.table.$data.beforeDiv('table-header')
-      .cssBorderLeftWidth(this.table.rowBorderLeftWidth);
+      .cssBorderLeftWidth(this.table.rowBorderLeftWidth || '');
 
     // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
     this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
