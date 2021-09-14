@@ -65,49 +65,10 @@ export default class GroupBoxLayout extends AbstractLayout {
     if (htmlMenuBar) {
       if (this.groupBox.menuBarPosition === GroupBox.MenuBarPosition.TITLE) {
         // position: TITLE
-        // Use Math.floor/ceil and +1 to avoid rounding issues with text-ellipsis and title label
-        menuBarSize = htmlMenuBar.prefSize({
-          exact: true
-        });
-        let headerSize = graphics.prefSize($header);
-        let headerWidth = headerSize.width - statusWidth;
-        let $control = $header.children('.group-box-control');
-        if ($control.length > 0) {
-          headerWidth -= graphics.size($control, true).width;
-        }
-        let titleWidth = Math.ceil(graphics.prefSize($title, true).width) + 1;
-        let menuBarWidth = menuBarSize.width;
-
-        if ((titleWidth + menuBarWidth) < headerWidth) {
-          // title and menu-bar both fit into the title
-          // let menu-bar use all the available width
-          menuBarWidth = Math.floor(headerWidth - titleWidth);
-          menuBarSize.width = menuBarWidth;
-          $title.cssWidth('');
-        } else {
-          // title and menu-bar don't fit into the title
-          // scale down until both fit into the title, try to keep the same width-ratio (r)
-          let scaleFactor = (titleWidth + menuBarWidth) / headerWidth;
-          let rLabel = (titleWidth / headerWidth) / scaleFactor;
-          let rMenuBar = (menuBarWidth / headerWidth) / scaleFactor;
-
-          if (rLabel < rMenuBar) {
-            rLabel = Math.max(0.33, rLabel);
-            rMenuBar = 1.0 - rLabel;
-          } else {
-            rMenuBar = Math.max(0.33, rMenuBar);
-            rLabel = 1.0 - rMenuBar;
-          }
-
-          titleWidth = rLabel * headerWidth;
-          menuBarWidth = rMenuBar * headerWidth;
-
-          menuBarSize.width = Math.floor(menuBarWidth);
-          $title.cssWidth(Math.floor(titleWidth));
-        }
+        menuBarSize = this._updateHeaderMenuBar(htmlMenuBar, $header, $title, statusWidth);
       } else {
         // position: TOP and BOTTOM
-        menuBarSize = this._menuBarSize(htmlMenuBar, containerSize, statusWidth);
+        menuBarSize = this._updateMenuBar(htmlMenuBar, containerSize, statusWidth);
         menuBarHeight = menuBarSize.height;
         setWidthForStatus($title);
       }
@@ -151,6 +112,72 @@ export default class GroupBoxLayout extends AbstractLayout {
         $element.cssWidth('');
       }
     }
+  }
+
+  _updateMenuBar(htmlMenuBar, containerSize, statusWidth) {
+    let $groupBox = this.groupBox.$container;
+    if (!this.groupBox.mainBox &&
+      ($groupBox.hasClass('menubar-position-top') && $groupBox.hasClass('has-scroll-shadow-top')) ||
+      ($groupBox.hasClass('menubar-position-bottom') && $groupBox.hasClass('has-scroll-shadow-bottom'))) {
+      htmlMenuBar.$comp.cssPaddingRight(statusWidth);
+      statusWidth = 0;
+    } else {
+      htmlMenuBar.$comp.cssPaddingRight('');
+    }
+    return this._menuBarSize(htmlMenuBar, containerSize, statusWidth);
+  }
+
+  _menuBarSize(htmlMenuBar, containerSize, statusWidth) {
+    let menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
+    if (!this.groupBox.mainBox) {
+      // adjust size of menubar as well if it is in a regular group box
+      menuBarSize.width -= statusWidth;
+    }
+    return menuBarSize;
+  }
+
+  _updateHeaderMenuBar(htmlMenuBar, $header, $title, statusWidth) {
+    // Use Math.floor/ceil and +1 to avoid rounding issues with text-ellipsis and title label
+    let menuBarSize = htmlMenuBar.prefSize({
+      exact: true
+    });
+    let headerSize = graphics.prefSize($header).subtract(graphics.insets($header));
+    let headerWidth = headerSize.width - statusWidth;
+    let $control = $header.children('.group-box-control');
+    if ($control.length > 0) {
+      headerWidth -= graphics.size($control, true).width;
+    }
+    let titleWidth = Math.ceil(graphics.prefSize($title, true).width) + 1;
+    let menuBarWidth = menuBarSize.width;
+
+    if ((titleWidth + menuBarWidth) < headerWidth) {
+      // title and menu-bar both fit into the title
+      // let menu-bar use all the available width
+      menuBarWidth = Math.floor(headerWidth - titleWidth);
+      menuBarSize.width = menuBarWidth;
+      $title.cssWidth('');
+    } else {
+      // title and menu-bar don't fit into the title
+      // scale down until both fit into the title, try to keep the same width-ratio (r)
+      let scaleFactor = (titleWidth + menuBarWidth) / headerWidth;
+      let rLabel = (titleWidth / headerWidth) / scaleFactor;
+      let rMenuBar = (menuBarWidth / headerWidth) / scaleFactor;
+
+      if (rLabel < rMenuBar) {
+        rLabel = Math.max(0.33, rLabel);
+        rMenuBar = 1.0 - rLabel;
+      } else {
+        rMenuBar = Math.max(0.33, rMenuBar);
+        rLabel = 1.0 - rMenuBar;
+      }
+
+      titleWidth = rLabel * headerWidth;
+      menuBarWidth = rMenuBar * headerWidth;
+
+      menuBarSize.width = Math.floor(menuBarWidth);
+      $title.cssWidth(Math.floor(titleWidth));
+    }
+    return menuBarSize;
   }
 
   _$status() {
@@ -256,15 +283,6 @@ export default class GroupBoxLayout extends AbstractLayout {
     }
     options.includeMargin = true;
     return this.groupBox.notification.htmlComp.prefSize(options).height;
-  }
-
-  _menuBarSize(htmlMenuBar, containerSize, statusWidth) {
-    let menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
-    if (!this.groupBox.mainBox) {
-      // adjust size of menubar as well if it is in a regular group box
-      menuBarSize.width -= statusWidth;
-    }
-    return menuBarSize;
   }
 
   /**

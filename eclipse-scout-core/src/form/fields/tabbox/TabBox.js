@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompositeField, FormField, HtmlComponent, scout, SingleLayout, TabArea, TabBoxLayout} from '../../../index';
+import {arrays, CompositeField, FormField, HtmlComponent, scout, SingleLayout, TabArea, TabBoxLayout, widgets} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -26,11 +26,13 @@ export default class TabBox extends CompositeField {
     this.tabItems = [];
     this.tabAreaStyle = TabArea.DisplayStyle.DEFAULT;
 
+    this._$tabContent = null;
+    this._statusPositionOrig = null;
     this._addWidgetProperties(['tabItems', 'selectedTab']);
     this._addPreserveOnPropertyChangeProperties(['selectedTab']);
-    this._$tabContent = null;
 
     this._tabBoxHeaderPropertyChangeHander = this._onTabBoxHeaderPropertyChange.bind(this);
+    this._selectedTabScrollTopChangeHandler = this._updateScrollShadow.bind(this);
   }
 
   /**
@@ -171,6 +173,7 @@ export default class TabBox extends CompositeField {
   _renderSelectedTab() {
     if (this.selectedTab) {
       this.selectedTab.render(this._$tabContent);
+      this.selectedTab.on('propertyChange:scrollTop', this._selectedTabScrollTopChangeHandler);
     }
     if (this.rendered) {
       HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
@@ -179,8 +182,31 @@ export default class TabBox extends CompositeField {
 
   _removeSelectedTab() {
     if (this.selectedTab) {
+      this.selectedTab.off('propertyChange:scrollTop', this._selectedTabScrollTopChangeHandler);
       this.selectedTab.remove();
     }
+  }
+
+  _updateScrollShadow() {
+    if (!this.rendered) {
+      return;
+    }
+    let hasScrollShadowTop = this.selectedTab && this.selectedTab.hasScrollShadow('top');
+    let oldHasScrollShadowTop = this.$container.hasClass('has-scroll-shadow-top');
+    this.$container.toggleClass('has-scroll-shadow-top', hasScrollShadowTop);
+    if (oldHasScrollShadowTop !== hasScrollShadowTop) {
+      this.invalidateLayout();
+    }
+
+    // Enlarge header line if there is a shadow, but only if there is a header (controlled by labelVisible)
+    if (hasScrollShadowTop && this.labelVisible) {
+      widgets.preserveAndSetProperty(() => this.setStatusPosition(FormField.StatusPosition.TOP), () => this.statusPosition, this, '_statusPositionOrig');
+    } else {
+      widgets.resetProperty(preservedValue => this.setStatusPosition(preservedValue), this, '_statusPositionOrig');
+    }
+
+    // Prevent flickering of status icon
+    this.validateLayout();
   }
 
   setTabAreaStyle(tabAreaStyle) {
@@ -217,6 +243,11 @@ export default class TabBox extends CompositeField {
       // Also invalidate tab item if a notification is shown because notification size depends on status visibility
       this.selectedTab.invalidateLayoutTree();
     }
+  }
+
+  _renderLabelVisible() {
+    super._renderLabelVisible();
+    this._updateScrollShadow();
   }
 
   /**

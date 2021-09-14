@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, ContextMenuPopupLayout, HtmlComponent, MenuDestinations, menuNavigationKeyStrokes, Popup, RowLayout, Rectangle, graphics} from '../index';
+import {Action, arrays, ContextMenuPopupLayout, graphics, HtmlComponent, MenuDestinations, menuNavigationKeyStrokes, Popup, Rectangle, RowLayout} from '../index';
 import $ from 'jquery';
 
 export default class ContextMenuPopup extends Popup {
@@ -80,7 +80,8 @@ export default class ContextMenuPopup extends Popup {
 
   _installScrollbars(options) {
     super._installScrollbars({
-      axis: 'y'
+      axis: 'y',
+      scrollShadow: 'none'
     });
   }
 

@@ -39,6 +39,20 @@
   &.collapsed > .menubar {
     display: none;
   }
+
+  &.has-scroll-shadow-top:not(.menubar-position-top) > .group-box-header {
+    width: 100%;
+    margin-left: 0;
+    padding-left: @mandatory-indicator-width;
+  }
+
+  &.has-scroll-shadow-top.menubar-position-top,
+  &.has-scroll-shadow-bottom.menubar-position-bottom {
+    & > .menubar {
+      margin-left: 0;
+      padding-left: @mandatory-indicator-width;
+    }
+  }
 }
 
 .root-group-box,

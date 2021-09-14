@@ -22,9 +22,6 @@ import {
   graphics,
   icons,
   inspector,
-  KeyStrokeContext,
-  LoadingSupport,
-  LogicalGrid,
   objects,
   scout,
   scrollbars,
@@ -2166,8 +2163,8 @@ export default class Widget {
 
   _onScroll() {
     let $scrollable = this.get$Scrollable();
-    this.scrollTop = $scrollable[0].scrollTop;
-    this.scrollLeft = $scrollable[0].scrollLeft;
+    this._setProperty('scrollTop', $scrollable[0].scrollTop);
+    this._setProperty('scrollLeft', $scrollable[0].scrollLeft);
   }
 
   setScrollTop(scrollTop) {
@@ -2175,13 +2172,7 @@ export default class Widget {
       this.getDelegateScrollable().setScrollTop(scrollTop);
       return;
     }
-    if (this.scrollTop === scrollTop) {
-      return;
-    }
-    this.scrollTop = scrollTop;
-    if (this.rendered) {
-      this._renderScrollTop();
-    }
+    this.setProperty('scrollTop', scrollTop);
   }
 
   _renderScrollTop() {
@@ -2204,13 +2195,7 @@ export default class Widget {
       this.getDelegateScrollable().setScrollLeft(scrollLeft);
       return;
     }
-    if (this.scrollLeft === scrollLeft) {
-      return;
-    }
-    this.scrollLeft = scrollLeft;
-    if (this.rendered) {
-      this._renderScrollLeft();
-    }
+    this.setProperty('scrollLeft', scrollLeft);
   }
 
   _renderScrollLeft() {
@@ -2236,6 +2221,10 @@ export default class Widget {
    */
   get$Scrollable() {
     return this.$container;
+  }
+
+  hasScrollShadow(position) {
+    return scrollbars.hasScrollShadow(this.get$Scrollable(), position);
   }
 
   /**

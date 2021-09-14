@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -127,4 +127,100 @@
 
 .hybrid-scrollable {
   #scout.hide-scrollbars();
+}
+
+.scroll-shadow {
+  transition: box-shadow 250ms;
+  position: absolute;
+  pointer-events: none;
+
+  #scout.scroll-shadow();
+
+  &.gradient {
+    --scroll-shadow-color: @scroll-shadow-gradient-color;
+    --scroll-shadow-size: 20px;
+    --scroll-shadow-blur: 15px;
+    --scroll-shadow-spread: 15px;
+  }
+
+  &.large {
+    --scroll-shadow-size: @scroll-shadow-size-large;
+    --scroll-shadow-blur: @scroll-shadow-size-large;
+    --scroll-shadow-spread: @scroll-shadow-size-large;
+  }
+}
+
+#scout {
+  .scroll-shadow() {
+    --scroll-shadow-color: @scroll-shadow-color;
+    --scroll-shadow-size: @scroll-shadow-size;
+    --scroll-shadow-blur: @scroll-shadow-blur;
+    --scroll-shadow-spread: @scroll-shadow-spread;
+    @scroll-shadow-blur-spread-color: var(--scroll-shadow-blur) calc(-1 * var(--scroll-shadow-spread)) var(--scroll-shadow-color);
+    @scroll-shadow-top: inset 0 var(--scroll-shadow-size) @scroll-shadow-blur-spread-color;
+    @scroll-shadow-bottom: inset 0 calc(-1 * var(--scroll-shadow-size)) @scroll-shadow-blur-spread-color;
+    @scroll-shadow-left: inset var(--scroll-shadow-size) 0 @scroll-shadow-blur-spread-color;
+    @scroll-shadow-right: inset calc(-1 * var(--scroll-shadow-size)) 0 @scroll-shadow-blur-spread-color;
+    @scroll-shadow-none: inset 0 0 0 0 transparent;
+
+    &.top {
+      box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-none;
+
+      &.bottom {
+        box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-none;
+
+        &.left {
+          box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-left;
+        }
+
+        &.right {
+          box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-none;
+
+          &.left {
+            box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-left;
+          }
+        }
+      }
+
+      &.left {
+        box-shadow: @scroll-shadow-top, @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-left;
+
+        &.right {
+          box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-left;
+        }
+      }
+
+      &.right {
+        box-shadow: @scroll-shadow-top, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-none;
+      }
+    }
+
+    &.bottom {
+      box-shadow: @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-none;
+
+      &.right {
+        box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-none;
+      }
+    }
+
+    &.left {
+      box-shadow: @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-left;
+
+      &.right {
+        box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-left;
+      }
+
+      &.bottom {
+        box-shadow: @scroll-shadow-none, @scroll-shadow-none, @scroll-shadow-bottom, @scroll-shadow-left;
+
+        &.right {
+          box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-bottom, @scroll-shadow-left;
+        }
+      }
+    }
+
+    &.right {
+      box-shadow: @scroll-shadow-none, @scroll-shadow-right, @scroll-shadow-none, @scroll-shadow-none;
+    }
+  }
 }
