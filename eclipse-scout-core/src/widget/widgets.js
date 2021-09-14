@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Widget} from '../index';
+import {arrays} from '../index';
 import $ from 'jquery';
 
 let uniqueIdSeqNo = 0;
@@ -67,10 +67,26 @@ export function findFirstFocusableWidget(widgets, container, checkTabbable) {
   return arrays.find(widgets, widget => widget.isFocusable(checkTabbable));
 }
 
+export function preserveAndSetProperty(setter, getter, preserver, preserverName) {
+  if (preserver[preserverName] === null) {
+    preserver[preserverName] = getter();
+  }
+  setter();
+}
+
+export function resetProperty(setter, preserver, preserverName) {
+  if (preserver[preserverName] != null) {
+    setter(preserver[preserverName]);
+    preserver[preserverName] = null;
+  }
+}
+
 export default {
   createUniqueId,
   findFirstFocusableWidget,
   get,
   uniqueIdSeqNo,
-  updateFirstLastMarker
+  updateFirstLastMarker,
+  preserveAndSetProperty,
+  resetProperty
 };

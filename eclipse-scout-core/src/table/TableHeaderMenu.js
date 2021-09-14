@@ -134,7 +134,8 @@ export default class TableHeaderMenu extends Popup {
     this.$body = this.$container.appendDiv('table-header-menu-body');
     HtmlComponent.install(this.$body, this.session);
     this._installScrollbars({
-      axis: 'y'
+      axis: 'y',
+      scrollShadow: 'none'
     });
     this.$columnActions = this.$body.appendDiv('table-header-menu-actions');
 

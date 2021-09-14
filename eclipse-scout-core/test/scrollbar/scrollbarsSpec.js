@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {graphics, NullWidget, scrollbars} from '../../src/index';
+import {_onScrollableVisibleChange, _processDomMutation} from '../../src/scrollbar/scrollbars';
 
 describe('scrollbars', () => {
   let session;
@@ -41,17 +42,17 @@ describe('scrollbars', () => {
         exec = true;
       };
       let $container = createScrollable();
-      let $content = scrollbars.install($container, {
+      scrollbars.install($container, {
         parent: new NullWidget(),
         session: session
       });
-      let $element = createContent($content);
+      let $element = createContent($container);
 
       scrollbars.onScroll($element, handler);
       $container.scroll();
       expect(exec).toBe(true);
+      scrollbars.uninstall($container, session);
     });
-
   });
 
   describe('offScroll', () => {
@@ -62,11 +63,11 @@ describe('scrollbars', () => {
         exec = true;
       };
       let $container = createScrollable();
-      let $content = scrollbars.install($container, {
+      scrollbars.install($container, {
         parent: new NullWidget(),
         session: session
       });
-      let $element = createContent($content);
+      let $element = createContent($container);
 
       scrollbars.onScroll($element, handler);
       $container.scroll();
@@ -76,6 +77,7 @@ describe('scrollbars', () => {
       scrollbars.offScroll(handler);
       $container.scroll();
       expect(exec).toBe(false);
+      scrollbars.uninstall($container, session);
     });
 
   });
@@ -184,8 +186,89 @@ describe('scrollbars', () => {
       });
       // Position should now have been set automatically by Scrollbar._renderOnAttach()
       expect($scrollable.css('position')).toBe('relative');
+      scrollbars.uninstall($scrollable, session);
     });
-
   });
 
+  describe('scrollShadow', () => {
+    it('is installed automatically', () => {
+      let $container = createScrollable();
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session
+      });
+      createContent($container);
+
+      expect($container.data('scroll-shadow')[0]).toBe($container.next()[0]);
+      scrollbars.uninstall($container, session);
+    });
+
+    it('gets class top if container is scrolled down', () => {
+      let $container = createScrollable();
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session
+      });
+      createContent($container);
+
+      let $scrollShadow = $container.data('scroll-shadow');
+      expect($scrollShadow).not.toHaveClass('top');
+
+      $container[0].scrollTop = 10;
+      $container.scroll(); // trigger scroll event
+      expect($scrollShadow).toHaveClass('top');
+
+      $container[0].scrollTop = 0;
+      $container.scroll();
+      expect($scrollShadow).not.toHaveClass('top');
+
+      scrollbars.uninstall($container, session);
+    });
+
+    it('is moved along with the element', () => {
+      let $container = createScrollable();
+      let $another = session.$entryPoint.appendDiv();
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session
+      });
+      createContent($container);
+
+      let $scrollShadow = $container.data('scroll-shadow');
+      expect($scrollShadow[0]).toBe($container.next()[0]);
+      expect($scrollShadow.next()[0]).toBe($another[0]);
+
+      // Move scrollable to the end -> shadow has to be moved as well
+      $container.insertAfter($another);
+
+      // MutationObserver is sometimes not executed when running headless, even when using setTimeout -> call processing explicitly
+      _processDomMutation({addedNodes: [$container[0]]});
+      expect($scrollShadow[0]).toBe($container.next()[0]);
+      expect($scrollShadow.next()[0]).toBeFalsy();
+      scrollbars.uninstall($container, session);
+    });
+
+    it('changes its visibility based on the visibility of the scrollable', () => {
+      let $container = createScrollable();
+      $container.setVisible(false);
+      scrollbars.install($container, {
+        parent: new NullWidget(),
+        session: session
+      });
+      createContent($container);
+
+      let $scrollShadow = $container.data('scroll-shadow');
+      _onScrollableVisibleChange($container[0], false);
+      expect($scrollShadow.isVisible()).toBe(false);
+
+      $container.setVisible(true);
+      _onScrollableVisibleChange($container[0], true);
+      expect($scrollShadow.isVisible()).toBe(true);
+
+      $container.setVisible(false);
+      _onScrollableVisibleChange($container[0], false);
+      expect($scrollShadow.isVisible()).toBe(false);
+      scrollbars.uninstall($container, session);
+    });
+  });
 });
