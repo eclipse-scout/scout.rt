@@ -77,10 +77,6 @@ import sun.security.x509.SubjectAlternativeNameExtension;
  */
 @Order(5500)
 public class SunSecurityProvider implements ISecurityProvider {
-  /**
-   * Specifies the minimum of password hash iterations.
-   */
-  protected static final int MIN_PASSWORD_HASH_ITERATIONS = 10000;
 
   /**
    * Buffer size for {@link InputStream} read.
@@ -189,11 +185,11 @@ public class SunSecurityProvider implements ISecurityProvider {
    * do so replace this bean with your own implementation overwriting the method
    * {@link #getPasswordHashSecretKeyAlgorithm()}.
    */
+  @SuppressWarnings("deprecation")
   @Override
   public byte[] createPasswordHash(char[] password, byte[] salt, int iterations) {
     assertGreater(assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
     assertGreater(assertNotNull(salt, "salt must not be null.").length, 0, "empty salt is not allowed.");
-    assertGreaterOrEqual(iterations, MIN_PASSWORD_HASH_ITERATIONS, "iterations must be > {}", MIN_PASSWORD_HASH_ITERATIONS);
     // other checks are done by the PBEKeySpec constructor
 
     try {

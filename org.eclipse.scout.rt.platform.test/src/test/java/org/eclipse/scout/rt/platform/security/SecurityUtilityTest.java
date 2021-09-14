@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ public class SecurityUtilityTest {
 
     byte[] encryptData3 = SecurityUtility.encrypt(new byte[]{}, PASSWORD, salt, KEY_LEN);
     byte[] decryptedEmpty = SecurityUtility.decrypt(encryptData3, PASSWORD, salt, KEY_LEN);
-    Assert.assertTrue(Arrays.equals(decryptedEmpty, new byte[]{}));
+    Assert.assertArrayEquals(decryptedEmpty, new byte[]{});
 
     String decryptedString = new String(SecurityUtility.decrypt(encryptData, PASSWORD, salt, KEY_LEN), ENCODING);
     Assert.assertEquals(origData, decryptedString);
@@ -160,7 +160,7 @@ public class SecurityUtilityTest {
     Assert.assertFalse(Arrays.equals(hash, hash3));
 
     // ensure same input -> same output
-    Assert.assertTrue(Arrays.equals(hash, hash2));
+    Assert.assertArrayEquals(hash, hash2);
 
     // ensure different input -> different output
     Assert.assertFalse(Arrays.equals(hash4, hash5));
@@ -170,14 +170,12 @@ public class SecurityUtilityTest {
   public void testHashPassword() {
     final byte[] salt = SecurityUtility.createRandomBytes();
     final byte[] salt2 = SecurityUtility.createRandomBytes();
-    final int iterations = 10000;
 
     // test hash
-    byte[] hash1 = SecurityUtility.hashPassword(PASSWORD, salt, iterations);
-    byte[] hash2 = SecurityUtility.hashPassword(PASSWORD, salt2, iterations);
-    byte[] hash3 = SecurityUtility.hashPassword(PASSWORD, salt, iterations);
-    byte[] hash4 = SecurityUtility.hashPassword("other".toCharArray(), salt, iterations);
-    byte[] hash5 = SecurityUtility.hashPassword(PASSWORD, salt, iterations + 1);
+    byte[] hash1 = SecurityUtility.hashPassword(PASSWORD, salt);
+    byte[] hash2 = SecurityUtility.hashPassword(PASSWORD, salt2);
+    byte[] hash3 = SecurityUtility.hashPassword(PASSWORD, salt);
+    byte[] hash4 = SecurityUtility.hashPassword("other".toCharArray(), salt);
 
     // ensure hashing was executed
     Assert.assertFalse(Arrays.equals(String.valueOf(PASSWORD).getBytes(ENCODING), hash1));
@@ -186,18 +184,15 @@ public class SecurityUtilityTest {
     Assert.assertFalse(Arrays.equals(hash1, hash2));
 
     // ensure same input -> same output
-    Assert.assertTrue(Arrays.equals(hash1, hash3));
+    Assert.assertArrayEquals(hash1, hash3);
 
     // ensure different input -> different output
     Assert.assertFalse(Arrays.equals(hash4, hash1));
 
-    // ensure different iterations matter
-    Assert.assertFalse(Arrays.equals(hash5, hash1));
-
     // test invalid values
     boolean ok = false;
     try {
-      SecurityUtility.hashPassword(null, salt, iterations);
+      SecurityUtility.hashPassword(null, salt);
     }
     catch (AssertionException e) {
       ok = true;
@@ -206,7 +201,7 @@ public class SecurityUtilityTest {
 
     ok = false;
     try {
-      SecurityUtility.hashPassword(PASSWORD, null, iterations);
+      SecurityUtility.hashPassword(PASSWORD, null);
     }
     catch (AssertionException e) {
       ok = true;
@@ -214,7 +209,7 @@ public class SecurityUtilityTest {
     Assert.assertTrue(ok);
     ok = false;
     try {
-      SecurityUtility.hashPassword("".toCharArray(), salt, iterations);
+      SecurityUtility.hashPassword("".toCharArray(), salt);
     }
     catch (AssertionException e) {
       ok = true;
@@ -222,31 +217,7 @@ public class SecurityUtilityTest {
     Assert.assertTrue(ok);
     ok = false;
     try {
-      SecurityUtility.hashPassword(PASSWORD, new byte[]{}, iterations);
-    }
-    catch (AssertionException e) {
-      ok = true;
-    }
-    Assert.assertTrue(ok);
-    ok = false;
-    try {
-      SecurityUtility.hashPassword(PASSWORD, salt, 0);
-    }
-    catch (AssertionException e) {
-      ok = true;
-    }
-    Assert.assertTrue(ok);
-    ok = false;
-    try {
-      SecurityUtility.hashPassword(PASSWORD, salt, -1);
-    }
-    catch (AssertionException e) {
-      ok = true;
-    }
-    Assert.assertTrue(ok);
-    ok = false;
-    try {
-      SecurityUtility.hashPassword(PASSWORD, salt, 9999);
+      SecurityUtility.hashPassword(PASSWORD, new byte[]{});
     }
     catch (AssertionException e) {
       ok = true;
