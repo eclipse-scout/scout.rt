@@ -36,7 +36,7 @@ export function nvl(...args) {
  *
  * @param {string} parameterName
  * @param {object} [value]
- * @param {function} [type] if this optional parameter is set, the given value must be of this type (instanceof check)
+ * @param {*} [type] if this optional parameter is set, the given value must be of this type (instanceof check)
  * @return {object} the value
  */
 export function assertParameter(parameterName, value, type) {
