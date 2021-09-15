@@ -236,6 +236,23 @@ describe('scout.arrays', () => {
 
   });
 
+  describe('contains', () => {
+
+    it('checks if single element is contained in array', () => {
+      expect(arrays.contains()).toBe(false);
+      expect(arrays.contains(null)).toBe(false);
+      expect(arrays.contains(null, 'x')).toBe(false);
+      expect(arrays.contains(['a', 'b', 'c'])).toBe(false);
+      expect(arrays.contains(['a', 'b', undefined, 'c'])).toBe(true);
+      expect(arrays.contains(['a', 'b', null, 'c'])).toBe(false);
+      expect(arrays.contains(['a', 'b', null, 'c'], null)).toBe(true);
+      expect(arrays.contains(['a', 'b', 'c', '1', '2', '3'], 'b')).toBe(true);
+      expect(arrays.contains(['a', 'b', 'c', '1', '2', '3'], 'B')).toBe(false);
+      expect(arrays.contains(['a', 'b', 'c', '1', '2', '3'], 2)).toBe(false);
+    });
+
+  });
+
   describe('max', () => {
     it('returns 0 iff input contains 0', () => {
       expect(arrays.max([null, 5])).toBe(5);

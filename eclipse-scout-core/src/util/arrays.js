@@ -185,6 +185,11 @@ export function move(arr, fromIndex, toIndex) {
   insert(arr, element, toIndex);
 }
 
+export function contains(haystack, needle) {
+  haystack = ensure(haystack);
+  return haystack.indexOf(needle) !== -1;
+}
+
 export function containsAny(haystack, needles) {
   haystack = ensure(haystack);
   needles = ensure(needles);
@@ -574,6 +579,7 @@ export function randomElement(array) {
 export default {
   $indexOf,
   $remove,
+  contains,
   containsAll,
   containsAny,
   diff,
