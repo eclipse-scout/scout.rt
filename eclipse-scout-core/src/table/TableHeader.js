@@ -278,7 +278,7 @@ export default class TableHeader extends Widget {
     }
     let $text = $col.children('.table-header-item-text');
     if ($text.isContentTruncated() || ($col.width() + $col.position().left) > $col.parent().width()) {
-      let text = strings.plainText($col.html(), {
+      let text = strings.plainText($text.html(), {
         trim: true
       });
       if (strings.hasText(text)) {

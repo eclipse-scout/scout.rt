@@ -98,4 +98,14 @@ describe('PlainTextEncoder', () => {
     expect(encoder.encode(htmlText, {compact: true})).toBe('Hello!\n\nI like coding!');
   });
 
+  it('removes font icons if configured', () => {
+    let htmlText = '<span class="table-cell-icon font-icon"></span><span class="text">Text</span>';
+    expect(encoder.encode(htmlText)).toBe('Text');
+    expect(encoder.encode(htmlText, {removeFontIcons: true})).toBe('Text');
+
+    htmlText = '<span\nclass="font-icon xy-icon"></span>\n<span class="text">Text</span>';
+    expect(encoder.encode(htmlText)).toBe('\nText');
+    expect(encoder.encode(htmlText, {removeFontIcons: true})).toBe('\nText');
+  });
+
 });

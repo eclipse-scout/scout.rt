@@ -853,13 +853,16 @@ export default class Table extends Widget {
 
     if (tooltipText) {
       return tooltipText;
-    } else if ($row.data('aggregateRow') && $cell.text().trim() && ($cell.isContentTruncated() || ($cell.children('.table-cell-icon').length && !$cell.children('.table-cell-icon').isVisible()))) {
+    }
+    if ($row.data('aggregateRow') && $cell.text().trim() && ($cell.isContentTruncated() || ($cell.children('.table-cell-icon').length && !$cell.children('.table-cell-icon').isVisible()))) {
       $cell = $cell.clone();
       $cell.children('.table-cell-icon').setVisible(true);
       return $cell.html();
-    } else if (this._isTruncatedCellTooltipEnabled(column) && $cell.isContentTruncated()) {
+    }
+    if (this._isTruncatedCellTooltipEnabled(column) && $cell.isContentTruncated()) {
       return strings.plainText($cell.html(), {
-        trim: true
+        trim: true,
+        removeFontIcons: true
       });
     }
   }
