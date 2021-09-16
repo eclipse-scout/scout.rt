@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.platform.security;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -196,7 +195,8 @@ public interface ISecurityProvider {
       return true;
     }
     //2014
-    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(StandardCharsets.UTF_8.encode(CharBuffer.wrap(password)).array()), salt, 3557))) {
+
+    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_8)), salt, 3557))) {
       return true;
     }
     return false;
