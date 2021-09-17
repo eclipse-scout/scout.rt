@@ -10,10 +10,10 @@
  */
 .desktop-tab.simple-tab {
   width: @desktop-tab-width;
-  min-width: @desktop-tab-min-width;
+  min-width: @desktop-tab-min-width ;
+  margin: @desktop-tab-margin-top @desktop-tab-margin-right 0 0;
   padding: @desktop-tab-padding @desktop-tab-padding 0 @desktop-tab-padding-left;
-  margin: @desktop-tab-margin-top @desktop-tab-margin @desktop-tab-margin;
-  border-radius: @desktop-tab-border-radius;
+  border-radius: @desktop-tab-border-radius @desktop-tab-border-radius 0 0;
   border-right-width: 0;
   background-color: @desktop-tab-background-color;
 
@@ -49,7 +49,7 @@
   & > .closer {
     color: @desktop-tab-sub-title-color;
     padding: 4px;
-    margin: 1px;
+    margin: 7px;
     border-radius: @border-radius-medium;
 
     & > .key-box {
@@ -94,12 +94,7 @@
   }
 
   &.selected {
-    width: @desktop-tab-selected-width;
-    min-width: @desktop-tab-selected-min-width;
     background-color: @simple-tab-selected-background-color;
-    margin: @desktop-tab-selected-margin-top 0 0;
-    padding: @desktop-tab-selected-padding @desktop-tab-selected-padding 0 @desktop-tab-selected-padding-left;
-    border-radius: @desktop-tab-selected-border-radius @desktop-tab-selected-border-radius 0 0;
 
     & > .title-line {
       & > .icon-container {
@@ -126,7 +121,6 @@
 
     & > .closer {
       color: @closer-color;
-      margin: 7px;
 
       &:hover {
         background-color: @hover-background-color;
@@ -138,12 +132,12 @@
       }
     }
 
-    & > .key-box {
-      bottom: @desktop-tab-key-box-bottom + @desktop-tab-margin;
-    }
-
     & > .edge {
-      #scout.inverted-bottom-round-edge(@border-radius: @desktop-tab-selected-border-radius, @color: @simple-tab-selected-background-color);
+      #scout.inverted-bottom-round-edge(@border-radius: @desktop-tab-border-radius, @color: @simple-tab-selected-background-color);
+
+      &.right {
+        z-index: 1; // lay over right tab
+      }
     }
 
     &.first > .edge.left {
@@ -221,19 +215,19 @@
 
 .keyframes-flash-desktop-tab-selected-edge() {
   0% {
-    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @simple-tab-selected-background-color;
+    box-shadow: 0 @desktop-tab-border-radius 0 0 @simple-tab-selected-background-color;
   }
   25% {
-    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @desktop-tab-selected-flash-background-color;
+    box-shadow: 0 @desktop-tab-border-radius 0 0 @desktop-tab-selected-flash-background-color;
   }
   50% {
-    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @simple-tab-selected-background-color;
+    box-shadow: 0 @desktop-tab-border-radius 0 0 @simple-tab-selected-background-color;
   }
   75% {
-    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @desktop-tab-selected-flash-background-color;
+    box-shadow: 0 @desktop-tab-border-radius 0 0 @desktop-tab-selected-flash-background-color;
   }
   100% {
-    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @simple-tab-selected-background-color;
+    box-shadow: 0 @desktop-tab-border-radius 0 0 @simple-tab-selected-background-color;
   }
 }
 

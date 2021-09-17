@@ -41,6 +41,10 @@
 
     & > .edge {
       #scout.inverted-bottom-round-edge(@border-radius: @view-tab-selected-border-radius, @color: @view-tab-selected-background-color);
+
+      &.right {
+        z-index: 1; // lay over right tab
+      }
     }
 
     & > .key-box {
