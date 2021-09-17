@@ -397,7 +397,9 @@ export default class ValueField extends FormField {
   }
 
   /**
-   * @param {function} validator the validator to be added
+   * @param {function} validator the validator to be added.
+   *     A validator is a function that accepts a raw value and either returns the validated value or
+   *     throws an Error, a Status or an error message (string) if the value is invalid.
    * @param {boolean} [revalidate] True, to revalidate the value, false to just add the validator and do nothing else. Default is true.
    */
   addValidator(validator, revalidate) {
@@ -420,7 +422,10 @@ export default class ValueField extends FormField {
    * Replaces all existing validators with the given one. If you want to add multiple validators, use {@link #addValidator}.
    * <p>
    * Remember calling the default validator which is passed as parameter to the validate function, if needed.
+   *
    * @param {function} validator the new validator which replaces every other. If null, the default validator is used.
+   *     A validator is a function that accepts a raw value and either returns the validated value or
+   *     throws an Error, a Status or an error message (string) if the value is invalid.
    */
   setValidator(validator, revalidate) {
     if (!validator) {
