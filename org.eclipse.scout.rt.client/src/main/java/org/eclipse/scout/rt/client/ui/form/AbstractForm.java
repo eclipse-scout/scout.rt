@@ -451,15 +451,13 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
-   * Override this method to mark a form as closable. In case of closable the close button [X] is displayed either in
-   * the form or the view header. The default implementations says a form displayed as a dialog containing a
-   * {@link AbstractCloseButton} or a {@link AbstractCancelButton} is closable.
+   * Defines whether the form should display a close button [X] in the form header resp. view tab. By default, the form
+   * is closable if it is a view, and if it is a dialog, it is only closable if it has an {@link AbstractCloseButton} or an {@link AbstractCancelButton}.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(190)
   protected boolean getConfiguredClosable() {
-    // legacy support if not overwritten
-    return getDisplayHint() == DISPLAY_HINT_DIALOG && hasCloseOrCancelButton();
+    return getDisplayHint() == DISPLAY_HINT_VIEW || (getDisplayHint() == DISPLAY_HINT_DIALOG && hasCloseOrCancelButton());
   }
 
   /**

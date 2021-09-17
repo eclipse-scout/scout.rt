@@ -521,12 +521,13 @@ button::-moz-focus-inner {
     content: @icon-remove-bold;
   }
 
-  &:active, &.active {
-    color: @active-color;
-  }
-
   &:hover {
     background-color: @hover-background-color;
+    color: @closer-hover-color;
+  }
+
+  &:active, &.active {
+    background-color: @active-background-color;
   }
 }
 
@@ -536,7 +537,7 @@ button::-moz-focus-inner {
   color: @save-needer-color;
 
   &::before {
-    content: @icon-pencil-solid;
+    content: @icon-pencil-underline-solid;
   }
 }
 

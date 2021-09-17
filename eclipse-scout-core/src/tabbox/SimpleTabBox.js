@@ -223,6 +223,9 @@ export default class SimpleTabBox extends Widget {
     // if current view is the view to remove reset current view
     if (this.currentView === view) {
       this.currentView = null;
+    } else {
+      // Don't change selected view if not the selected view was removed
+      showSiblingView = false;
     }
 
     if (index > -1) {

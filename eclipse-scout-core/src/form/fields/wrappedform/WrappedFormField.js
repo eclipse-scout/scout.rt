@@ -59,8 +59,9 @@ export default class WrappedFormField extends FormField {
       return;
     }
 
-    this.innerForm.displayHint = Form.DisplayHint.VIEW; // by definition, an inner form is a view.
-    this.innerForm.modal = false; // by definition, an inner form is not modal.
+    this.innerForm.setDisplayHint(Form.DisplayHint.VIEW); // by definition, an inner form is a view.
+    this.innerForm.setModal(false); // by definition, an inner form is not modal.
+    this.innerForm.setClosable(false); // Disable close key stroke
     this.innerForm.renderInitialFocusEnabled = this.initialFocusEnabled; // do not render initial focus of form if disabled.
 
     this.innerForm.render();

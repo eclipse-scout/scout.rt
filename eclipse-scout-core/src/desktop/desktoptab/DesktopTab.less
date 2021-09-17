@@ -17,8 +17,26 @@
   border-right-width: 0;
   background-color: @desktop-tab-background-color;
 
-  & > .title {
-    font-size: @font-size-plus;
+  & > .title-line {
+    .closable& {
+      margin-right: 25px;
+    }
+
+    & > .icon-container {
+      color: @desktop-tab-sub-title-color;
+    }
+
+    & > .title {
+      font-size: @font-size-plus;
+    }
+
+    & > .status-container {
+      color: @desktop-tab-sub-title-color;
+
+      & > .save-needer {
+        color: inherit;
+      }
+    }
   }
 
   & > .sub-title {
@@ -28,12 +46,30 @@
     padding-top: 1px;
   }
 
-  & > .status-container > .save-needer {
+  & > .closer {
     color: @desktop-tab-sub-title-color;
+    padding: 4px;
+    margin: 1px;
+    border-radius: @border-radius-medium;
+
+    & > .key-box {
+      top: 0;
+      right: 0;
+    }
+
+    &:hover {
+      color: @desktop-header-color;
+      background-color: @desktop-tab-closer-hover-background-color;
+    }
+
+    &:active, &.active {
+      background-color: @desktop-tab-closer-active-background-color;
+    }
   }
 
   & > .key-box {
     bottom: @desktop-tab-key-box-bottom;
+    margin-left: 4px;
   }
 
   &.animate-modality-highlight {
@@ -44,7 +80,7 @@
   &:active {
     background-color: @desktop-tab-hover-background-color;
 
-    & > .title {
+    & > .title-line > .title {
       color: inherit;
     }
   }
@@ -52,7 +88,7 @@
   &.disabled {
     background-color: transparent;
 
-    & > .title {
+    & > .title-line > .title {
       color: @desktop-header-disabled-color;
     }
   }
@@ -65,17 +101,41 @@
     padding: @desktop-tab-selected-padding @desktop-tab-selected-padding 0 @desktop-tab-selected-padding-left;
     border-radius: @desktop-tab-selected-border-radius @desktop-tab-selected-border-radius 0 0;
 
-    & > .title {
-      color: @desktop-tab-selected-color;
-      font-weight: @font-weight-bold;
+    & > .title-line {
+      & > .icon-container {
+        color: @status-info-color;
+      }
+
+      & > .title {
+        color: @desktop-tab-selected-color;
+        font-weight: @font-weight-bold;
+      }
+
+      & > .status-container {
+        color: @status-info-color;
+
+        & > .save-needer {
+          color: @desktop-tab-selected-save-needer-color;
+        }
+      }
     }
 
     & > .sub-title {
       color: @desktop-tab-selected-sub-title-color;
     }
 
-    & > .status-container > .save-needer {
-      color: @desktop-tab-selected-save-needer-color;
+    & > .closer {
+      color: @closer-color;
+      margin: 7px;
+
+      &:hover {
+        background-color: @hover-background-color;
+        color: @closer-hover-color;
+      }
+
+      &:active, &.active {
+        background-color: @active-background-color;
+      }
     }
 
     & > .key-box {

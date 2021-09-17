@@ -31,11 +31,10 @@ export default class DesktopTabSelectKeyStroke extends RangeKeyStroke {
     );
 
     // rendering hints
-    this.renderingHints.hAlign = HAlign.RIGHT;
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let viewIndex = event.which - keys['1'];
       return this._viewTabs()[viewIndex].$container;
-    }.bind(this);
+    };
   }
 
   /**

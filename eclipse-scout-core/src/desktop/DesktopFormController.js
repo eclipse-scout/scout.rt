@@ -51,6 +51,13 @@ export default class DesktopFormController extends FormController {
     }
   }
 
+  isFormShown(form) {
+    if (form.isPopupWindow()) {
+      return this._popupWindows.some(popup => popup.form.id === form.id);
+    }
+    return super.isFormShown(form);
+  }
+
   /**
    * @override FormController.js
    */

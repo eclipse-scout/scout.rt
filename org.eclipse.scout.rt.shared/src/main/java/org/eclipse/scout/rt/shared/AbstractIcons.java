@@ -83,6 +83,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Pencil = "font:\uE02F";
   public static final String PencilBold = "font:\uE04B";
   public static final String PencilSolid = "font:\uE04F";
+  public static final String PencilUnderlineSolid = "font:\uE050";
   public static final String ExclamationMarkBold = "font:\uE060";
   public static final String Slippery = "font:\uE044";
 
