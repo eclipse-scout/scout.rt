@@ -27,17 +27,15 @@
   }
 }
 
-.mobile-view {
-  border-top: @dialog-border-top-size solid @active-color;
+.mobile-view > .header > .title {
+  font-weight: bold;
 }
 
 .dialog {
   position: absolute;
-  background-color: @background-color;
-  border: solid 1px @border-color;
-  border-top: @dialog-border-top-size solid @active-color;
-  border-top-left-radius: @border-radius;
-  border-top-right-radius: @border-radius;
+  background-color: @popup-background-color;
+  border-radius: @popup-border-radius;
+  overflow: hidden;
   #scout.drop-shadow-large();
   margin: 10px; /* minimum padding to desktop */
   margin-bottom: 15px;
@@ -86,11 +84,10 @@
 }
 
 .form > .header {
-  overflow: auto; /* clearfix */
-  zoom: 1; /* clearfix */
-  margin-top: @form-title-margin-top;
-  margin-left: 20px;
-  margin-right: 14px;
+  padding-top: @form-title-padding-top;
+  padding-left: 20px;
+  padding-right: 10px;
+  overflow: hidden; // Necessary to make header as height as content because of the floating closable.
 
   &.no-title {
     position: absolute;
@@ -105,8 +102,6 @@
   }
 
   & > .icon-container {
-    float: left;
-
     & > .icon {
       margin-right: 5px;
 
@@ -119,16 +114,18 @@
   & > .title {
     #scout.overflow-ellipsis-nowrap();
     font-size: @font-size-large;
-    color: @active-color;
+    color: @title-color;
   }
 
   & > .sub-title {
     #scout.overflow-ellipsis-nowrap();
-    color: @active-color;
+    color: @sub-title-color;
   }
 
   & > .status-container {
     float: right;
+    margin-top: -8px;
+    margin-right: -2px;
 
     & > .status {
       /* make sure close icon overlaps drag-handle */
@@ -139,7 +136,9 @@
       margin-left: 5px;
 
       &.closer {
+        border-radius: @closer-border-radius;
         margin-left: 7px;
+        padding: 7px;
       }
     }
   }

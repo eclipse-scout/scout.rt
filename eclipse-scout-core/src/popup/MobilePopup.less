@@ -9,10 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .mobile-popup {
-  background-color: @background-color;
-  border-top: @dialog-border-top-size solid @active-color;
-  border-top-left-radius: @border-radius;
-  border-top-right-radius: @border-radius;
+  background-color: @popup-background-color;
+  border-top-left-radius: @popup-border-radius;
+  border-top-right-radius: @popup-border-radius;
+  overflow: hidden;
   margin-top: 30px;
   #scout.drop-shadow(@x: 0, @y: 0, @blur: 30px, @spread: 5px, @alpha: 0.5);
 
@@ -37,15 +37,16 @@
   & > .title {
     #scout.overflow-ellipsis-nowrap();
     #scout.font-text-large();
-    color: @active-color;
     width: 100%;
   }
 
   & > .closer {
     position: absolute;
-    top: 0;
-    right: 4px;
-    padding: @mobile-popup-title-margin-top;
+    top: 6px;
+    right: 6px;
+    padding: 7px;
+    z-index: 1;
+    border-radius: @closer-border-radius;
 
     &::before {
       display: none;

@@ -42,14 +42,30 @@
     }
   }
 
-  & > .close-action {
+  & > .actions {
     position: absolute;
     top: 0;
     right: 0;
     /* should lay over drag and resize handles */
     z-index: 11;
-    padding: 10px;
-    font-size: 17px;
+    white-space: nowrap;
+
+    & > .action {
+      color: @closer-action-color;
+      margin: 7px 7px 7px @menubar-item-margin-x;
+      border-radius: @closer-border-radius;
+      padding: 7px;
+      font-size: 17px;
+      min-width: 30px;
+
+      &:hover {
+        color: @closer-hover-color;
+      }
+
+      &.disabled {
+        color: @disabled-color
+      }
+    }
   }
 
   & > .popup-widget {
