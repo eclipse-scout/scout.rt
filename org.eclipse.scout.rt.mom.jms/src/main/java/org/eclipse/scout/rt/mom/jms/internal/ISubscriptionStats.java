@@ -26,19 +26,19 @@ public interface ISubscriptionStats {
   boolean invokingReceive();
 
   /**
-   * @return the number of messages recevied, including null messages
+   * @return the number of messages received, including null messages
    * @since 6.1
    */
   long receivedMessages();
 
   /**
-   * @return the number of non-null messages recevied
+   * @return the number of non-null messages received
    * @since 6.1
    */
   long receivedNonNullMessages();
 
   /**
-   * @return the number of message errors occured upon calling receive()
+   * @return the number of message errors occurred upon calling receive()
    */
   long receivedErrors();
 }

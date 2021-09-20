@@ -104,7 +104,7 @@ public final class UserAgents {
       return parser.parseIdentifier(userAgent);
     }
     catch (RuntimeException e) {
-      LOG.error("UserAgentIdentifier could not be parsed. Exception occured while parsing. UserAgent: {}", userAgent, e);
+      LOG.error("UserAgentIdentifier could not be parsed. Exception occurred while parsing. UserAgent: {}", userAgent, e);
     }
     return createDefault();
   }
