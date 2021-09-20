@@ -18,6 +18,11 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 public abstract class AbstractMobileFormPopup<T extends IForm> extends AbstractFormPopup<T> implements IMobilePopup<T> {
 
   @Override
+  protected boolean getConfiguredWithGlassPane() {
+    return true;
+  }
+
+  @Override
   protected void decorateForm(IForm form) {
     super.decorateForm(form);
     if (form.getRootGroupBox() != null) {
