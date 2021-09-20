@@ -100,7 +100,7 @@ export function onScrollStartEndDuringTouch($elem, startHandler, endHandler) {
     }
 
     clearTimeout(scrollTimeout);
-    // Check some ms later if a scroll event has occured in the mean time.
+    // Check some ms later if a scroll event has occurred in the mean time.
     // If yes it (probably) is still scrolling. If no it (probably) is not scrolling anymore -> call handler
     checkLater();
   };

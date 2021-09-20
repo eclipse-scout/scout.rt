@@ -24,7 +24,7 @@ public class ProcessingExceptionMapper extends AbstractExceptionMapper<Processin
 
   @Override
   public Response toResponseImpl(ProcessingException exception) {
-    LOG.error("Exception occured while processing rest request", exception);
+    LOG.error("Exception occurred while processing REST request", exception);
     return createResponse(exception);
   }
 

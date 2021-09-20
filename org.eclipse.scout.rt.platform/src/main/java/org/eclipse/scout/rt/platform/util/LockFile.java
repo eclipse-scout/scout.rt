@@ -47,22 +47,27 @@ public class LockFile {
   }
 
   /**
-   * Call using try ... finally. <code>
-   * try{
+   * Call using try-finally:
+   *
+   * <pre>
+   * try {
    *   lockFile.lock();
    *   ...
    * }
-   * catch(TimedOutError e){
-   *   //handle
+   * catch (TimedOutError e){
+   *   // handle
    * }
-   * finally{
+   * finally {
    *   lockFile.unlock();
    * }
-   * </code>
+   * </pre>
+   * <p>
+   * Returns with lock acquired.
    *
-   * @return with lock acquired
-   * @throw {@link TimedOutError} if the lock could not be acquired within timeout
-   * @throw {@link ProcessingException} if an error occured while acquiring the lock
+   * @throws TimedOutError
+   *           if the lock could not be acquired within timeout
+   * @throws ProcessingException
+   *           if an error occurred while acquiring the lock
    */
   public synchronized void lock(int timeout, TimeUnit unit) {
     long waitUntilNanoTime = System.nanoTime() + unit.toNanos(timeout);

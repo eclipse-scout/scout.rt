@@ -32,11 +32,11 @@ public class DefaultExceptionMapper extends AbstractExceptionMapper<Exception> {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionMapper.class);
 
-  public static final String DEFAULT_ERROR_MESSAGE = "An internal server error has occured.";
+  public static final String DEFAULT_ERROR_MESSAGE = "An internal server error has occurred.";
 
   @Override
   public Response toResponseImpl(Exception exception) {
-    LOG.error("Exception occured while processing rest request", exception);
+    LOG.error("Exception occurred while processing REST request", exception);
     return createResponse(exception);
   }
 

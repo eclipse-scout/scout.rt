@@ -11,11 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.decimalfield;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertComparableEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -144,14 +140,14 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
     assertEquals(m_formatter.format(12.247), formatValueInternal(BigDecimal.valueOf(12.2465)));
     setRoundingMode(RoundingMode.UNNECESSARY);
 
-    boolean exceptionOccured = false;
+    boolean exceptionOccurred = false;
     try {
       formatValueInternal(BigDecimal.valueOf(12.2465));
     }
     catch (ArithmeticException e) {
-      exceptionOccured = true;
+      exceptionOccurred = true;
     }
-    assertTrue("Expected an ArithmeticException when formatting a value with more fraction digits than maxFractionDigits and RoundingMode.UNNECESSARY.", exceptionOccured);
+    assertTrue("Expected an ArithmeticException when formatting a value with more fraction digits than maxFractionDigits and RoundingMode.UNNECESSARY.", exceptionOccurred);
   }
 
   @Test

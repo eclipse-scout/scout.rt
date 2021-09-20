@@ -41,7 +41,7 @@ export function bootstrap(fonts) {
     fonts: fonts,
     onComplete: (success, badFonts) => {
       if (!success && badFonts && badFonts.length) {
-        $.log.warn('Timeout ocurred while pre-loading the following fonts:\n\n- ' + badFonts.join('\n- ') + '\n\n' +
+        $.log.warn('Timeout occurred while pre-loading the following fonts:\n\n- ' + badFonts.join('\n- ') + '\n\n' +
           'Rendering will now continue, but font measurements may be inaccurate. ' +
           'To prevent unnecessary startup delays and layout problems, check the @font-face ' +
           'definitions and the referenced "src" URLs or programmatically add additional font-specific ' +

@@ -712,7 +712,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       injectMenusInternal(menus);
     }
     catch (Exception e) {
-      LOG.error("error occured while dynamically contribute menus.", e);
+      LOG.error("Error occurred while dynamically contributing menus.", e);
     }
     menus.addAllOrdered(contributedMenus);
     new MoveActionNodesHandler<>(menus).moveModelObjects();
