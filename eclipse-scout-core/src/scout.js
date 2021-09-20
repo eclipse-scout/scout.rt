@@ -34,10 +34,11 @@ export function nvl(...args) {
  * Use this method in your functions to assert that a mandatory parameter is passed
  * to the function. Throws an error when value is not set.
  *
+ * @template T
  * @param {string} parameterName
- * @param {object} [value]
+ * @param {T} [value]
  * @param {*} [type] if this optional parameter is set, the given value must be of this type (instanceof check)
- * @return {object} the value
+ * @return {T} the value
  */
 export function assertParameter(parameterName, value, type) {
   if (objects.isNullOrUndefined(value)) {
