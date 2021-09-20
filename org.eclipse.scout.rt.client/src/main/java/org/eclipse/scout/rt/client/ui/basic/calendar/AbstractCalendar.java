@@ -249,7 +249,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
       injectMenusInternal(menus);
     }
     catch (Exception e) {
-      LOG.error("error occured while dynamically contributing menus.", e);
+      LOG.error("Error occurred while dynamically contributing menus.", e);
     }
     new MoveActionNodesHandler<>(menus).moveModelObjects();
     ICalendarContextMenu contextMenu = new CalendarContextMenu(this, menus.getOrderedList());

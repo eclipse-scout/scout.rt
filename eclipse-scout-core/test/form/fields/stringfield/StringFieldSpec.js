@@ -191,7 +191,7 @@ describe('StringField', function() {
 
     it('should not break when displayText is very long (regex is too big)', function() {
       // this test doesn't expect anything - the test succeeds when no exception is thrown
-      // with a large displayText. In ticket #169354 the issue occured with a displayText
+      // with a large displayText. In ticket #169354 the issue occurred with a displayText
       // that hat 55'577 bytes, so this is about the size which causes Chrome too crash.
       var longText = '';
       for (var i = 0; i < 3500; i++) {

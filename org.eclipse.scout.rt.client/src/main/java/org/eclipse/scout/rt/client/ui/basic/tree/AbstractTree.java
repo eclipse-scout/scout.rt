@@ -693,7 +693,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       injectMenusInternal(menus);
     }
     catch (Exception e) {
-      LOG.error("Error occured while dynamically contributing menus.", e);
+      LOG.error("Error occurred while dynamically contributing menus.", e);
     }
 
     menus.addAllOrdered(contributedMenus);

@@ -196,7 +196,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
       injectMenusInternal(menus);
     }
     catch (Exception e) {
-      LOG.error("error occured while dynamically contribute menus.", e);
+      LOG.error("Error occurred while dynamically contribute menus.", e);
     }
     new MoveActionNodesHandler<>(menus).moveModelObjects();
     m_menus = menus.getOrderedList();

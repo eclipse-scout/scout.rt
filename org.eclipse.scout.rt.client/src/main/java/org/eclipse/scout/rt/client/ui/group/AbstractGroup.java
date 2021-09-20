@@ -105,7 +105,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   }
 
   protected void handleInitException(Exception exception) {
-    throw new PlatformException("Exception occured while initializing group", exception);
+    throw new PlatformException("Exception occurred while initializing group", exception);
   }
 
   protected void execInitGroup() {
@@ -135,7 +135,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     if (viewOrder == IOrdered.DEFAULT_ORDER) {
       while (cls != null && IGroup.class.isAssignableFrom(cls)) {
         if (cls.isAnnotationPresent(Order.class)) {
-          Order order = (Order) cls.getAnnotation(Order.class);
+          Order order = cls.getAnnotation(Order.class);
           return order.value();
         }
         cls = cls.getSuperclass();

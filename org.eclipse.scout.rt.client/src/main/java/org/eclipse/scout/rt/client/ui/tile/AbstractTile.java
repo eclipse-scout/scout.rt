@@ -104,7 +104,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   protected void handleInitException(Exception exception) {
-    throw new PlatformException("Exception occured while initializing tile", exception);
+    throw new PlatformException("Exception occurred while initializing tile", exception);
   }
 
   protected void execInitTile() {

@@ -251,7 +251,7 @@ public class MailHelper {
       return;
     }
     catch (UnsupportedCharsetException e) {
-      LOG.trace("autoFixCharset: UnsupportedCharsetException has occured.", e); // explicitly trace
+      LOG.trace("autoFixCharset: UnsupportedCharsetException has occurred.", e); // explicitly trace
     }
 
     try {
@@ -265,7 +265,7 @@ public class MailHelper {
       part.setHeader(CONTENT_TYPE_ID, contentType.replace(charset, StandardCharsets.UTF_8.name()));
     }
     catch (IOException e) { // includes UnsupportedEncodingException
-      LOG.trace("autoFixCharset: IOException has occured.", e); // explicitly trace
+      LOG.trace("autoFixCharset: IOException has occurred.", e); // explicitly trace
     }
   }
 
