@@ -906,6 +906,9 @@ export default class Desktop extends Widget {
   }
 
   getPopups() {
+    if (!this.$container) {
+      return [];
+    }
     let popups = [];
     this.$container.children('.popup').each((i, elem) => {
       let $popup = $(elem);
