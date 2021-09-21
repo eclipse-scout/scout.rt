@@ -258,6 +258,19 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   /**
+   * Configures the initial value of {@link AbstractSmartField#getMaxLength()
+   * <p>
+   * Subclasses can override this method
+   * <p>
+   * Default is 500
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(330)
+  protected int getConfiguredMaxLength() {
+    return 500;
+  }
+
+  /**
    * called before any lookup is performed (key, text, browse)
    */
   @ConfigOperation
@@ -390,6 +403,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
       setLookupCall(call);
     }
     setWildcard(getConfiguredWildcard());
+    setMaxLength(getConfiguredMaxLength());
   }
 
   private void initLookupRowFetcher() {
@@ -558,6 +572,19 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   @Override
   public void setColumnDescriptors(ColumnDescriptor[] columnDescriptors) {
     setProperty(PROP_COLUMN_DESCRIPTORS, columnDescriptors);
+  }
+
+  @Override
+  public void setMaxLength(int maxLength) {
+    boolean changed = propertySupport.setPropertyInt(PROP_MAX_LENGTH, Math.max(0, maxLength));
+    if (changed && isInitConfigDone()) {
+      setValue(getValue());
+    }
+  }
+
+  @Override
+  public int getMaxLength() {
+    return propertySupport.getPropertyInt(PROP_MAX_LENGTH);
   }
 
   @Override
@@ -838,6 +865,9 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   }
 
   protected void lookupByTextInternal(String text, boolean synchronous) {
+    if (StringUtility.length(text) > getMaxLength()) {
+      text = StringUtility.substring(text, 0, getMaxLength());
+    }
     doSearch(QueryParam.createByText(text), synchronous);
   }
 

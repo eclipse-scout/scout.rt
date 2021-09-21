@@ -86,15 +86,15 @@ public class LocalLookupCall<T> extends LookupCall<T> {
     }
     s = s.replace(getWildcard(), WILDCARD_PLACEHOLDER);
     s = s.toLowerCase();
-    s = StringUtility.escapeRegexMetachars(s);
 
     // replace repeating wildcards to prevent regex DoS
     String duplicateWildcards = WILDCARD_PLACEHOLDER.concat(WILDCARD_PLACEHOLDER);
     while (s.contains(duplicateWildcards)) {
       s = s.replace(duplicateWildcards, WILDCARD_PLACEHOLDER);
     }
+    s = StringUtility.escapeRegexMetachars(s);
 
-    if (!s.contains(WILDCARD_PLACEHOLDER)) {
+    if (!s.endsWith(WILDCARD_PLACEHOLDER)) {
       s = s.concat(WILDCARD_PLACEHOLDER);
     }
 

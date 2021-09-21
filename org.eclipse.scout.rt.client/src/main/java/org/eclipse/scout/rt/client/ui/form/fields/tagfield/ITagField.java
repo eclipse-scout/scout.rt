@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 public interface ITagField extends IValueField<Set<String>> {
 
   String PROP_RESULT = "result";
+  String PROP_MAX_LENGTH = "maxLength";
 
   void addTag(String tag);
 
@@ -28,10 +29,20 @@ public interface ITagField extends IValueField<Set<String>> {
 
   void removeAllTags();
 
+  /**
+   * @param maxLength
+   *          of the text in this field. Negative values are automatically converted to 0.
+   */
+  void setMaxLength(int maxLength);
+
+  /**
+   * @return the maximum length of text.
+   */
+  int getMaxLength();
+
   void lookupByText(String proposal);
 
   ITagFieldUIFacade getUIFacade();
 
   ILookupCallResult<String> getResult();
-
 }

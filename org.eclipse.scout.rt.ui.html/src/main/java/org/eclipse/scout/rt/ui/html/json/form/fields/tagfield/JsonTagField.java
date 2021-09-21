@@ -67,6 +67,12 @@ public class JsonTagField extends JsonValueField<ITagField> {
         return JsonLookupCallResult.toJson((ILookupCallResult<String>) value);
       }
     });
+    putJsonProperty(new JsonProperty<ITagField>(ITagField.PROP_MAX_LENGTH, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getMaxLength();
+      }
+    });
   }
 
   @Override
