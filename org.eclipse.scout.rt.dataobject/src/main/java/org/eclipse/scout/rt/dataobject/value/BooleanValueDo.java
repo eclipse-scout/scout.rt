@@ -40,7 +40,12 @@ public class BooleanValueDo extends DoEntity implements IValueDo<Boolean> {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public Boolean isValue() {
+  public Boolean getValue() {
     return value().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public boolean isValue() {
+    return nvl(getValue());
   }
 }

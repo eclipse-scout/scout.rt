@@ -68,12 +68,18 @@ public class EntityDataObjectSignatureDo extends DoEntity {
     return typeVersion().get();
   }
 
+  /**
+   * See {@link #parentTypeVersion()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public EntityDataObjectSignatureDo withParentTypeVersion(String parentTypeVersion) {
     parentTypeVersion().set(parentTypeVersion);
     return this;
   }
 
+  /**
+   * See {@link #parentTypeVersion()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public String getParentTypeVersion() {
     return parentTypeVersion().get();

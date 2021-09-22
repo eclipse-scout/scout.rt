@@ -46,12 +46,14 @@ public class DateTimeValueDo extends DoEntity implements IValueDo<Date> {
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
+  @ValueFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
   public DateTimeValueDo withValue(Date value) {
     value().set(value);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  @ValueFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
   public Date getValue() {
     return value().get();
   }

@@ -61,6 +61,13 @@ public class FixtureUuIdLookupRestrictionDo extends AbstractLookupRestrictionDo<
 
   @Override
   @Generated("DoConvenienceMethodsGenerator")
+  public FixtureUuIdLookupRestrictionDo withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
   public FixtureUuIdLookupRestrictionDo withMaxRowCount(Integer maxRowCount) {
     maxRowCount().set(maxRowCount);
     return this;

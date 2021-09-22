@@ -76,6 +76,13 @@ public class FixtureDataLookupRestrictionDo extends AbstractLookupRestrictionDo<
 
   @Override
   @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRestrictionDo withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
   public FixtureDataLookupRestrictionDo withMaxRowCount(Integer maxRowCount) {
     maxRowCount().set(maxRowCount);
     return this;

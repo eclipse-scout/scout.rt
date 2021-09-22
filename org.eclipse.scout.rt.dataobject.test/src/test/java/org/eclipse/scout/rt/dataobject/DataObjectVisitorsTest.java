@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -189,14 +188,14 @@ public class DataObjectVisitorsTest {
     List<DoEntity> visited = new ArrayList<>();
     DataObjectVisitors.forEachRecIf(fixtureEntity, OtherEntityFixtureDo.class, o -> {
       visited.add(o);
-      return BooleanUtility.nvl(o.isActive());
+      return o.isActive();
     });
     assertEquals(7, visited.size());
 
     List<OtherEntityFixtureDo> expected = new ArrayList<>();
-    addAllRecIf(expected, fixtureEntity.getOtherEntities(), OtherEntityFixtureDo::isActive);
-    addAllRecIf(expected, fixtureEntity.getOtherEntitiesList(), OtherEntityFixtureDo::isActive);
-    addAllRecIf(expected, fixtureEntity.getOtherEntitiesMap().values(), OtherEntityFixtureDo::isActive);
+    addAllRecIf(expected, fixtureEntity.getOtherEntities(), OtherEntityFixtureDo::getActive);
+    addAllRecIf(expected, fixtureEntity.getOtherEntitiesList(), OtherEntityFixtureDo::getActive);
+    addAllRecIf(expected, fixtureEntity.getOtherEntitiesMap().values(), OtherEntityFixtureDo::getActive);
     assertEquals(expected.size(), visited.size());
     CollectionUtility.containsAll(visited, expected);
   }

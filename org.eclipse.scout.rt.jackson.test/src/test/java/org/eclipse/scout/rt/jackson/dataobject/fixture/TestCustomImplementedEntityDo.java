@@ -163,12 +163,16 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  @SuppressWarnings("unchecked")
+  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public TestCustomImplementedEntityDo withDateAttribute(Date dateAttribute) {
     dateAttribute().set(dateAttribute);
     return this;
   }
 
+  @SuppressWarnings("unchecked")
+  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public Date getDateAttribute() {
     return dateAttribute().get();

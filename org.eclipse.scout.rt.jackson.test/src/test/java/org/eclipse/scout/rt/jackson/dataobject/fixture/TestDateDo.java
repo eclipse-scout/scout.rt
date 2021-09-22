@@ -106,123 +106,147 @@ public class TestDateDo extends DoEntity {
     return dateDefault().get();
   }
 
+  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withDateOnly(Date dateOnly) {
     dateOnly().set(dateOnly);
     return this;
   }
 
+  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public Date getDateOnly() {
     return dateOnly().get();
   }
 
+  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withDateOnlyDoList(Collection<? extends Date> dateOnlyDoList) {
     dateOnlyDoList().updateAll(dateOnlyDoList);
     return this;
   }
 
+  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withDateOnlyDoList(Date... dateOnlyDoList) {
     dateOnlyDoList().updateAll(dateOnlyDoList);
     return this;
   }
 
+  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public List<Date> getDateOnlyDoList() {
     return dateOnlyDoList().get();
   }
 
+  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withDateOnlyList(List<Date> dateOnlyList) {
     dateOnlyList().set(dateOnlyList);
     return this;
   }
 
+  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public List<Date> getDateOnlyList() {
     return dateOnlyList().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  @ValueFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
   public TestDateDo withDateWithTimestamp(Date dateWithTimestamp) {
     dateWithTimestamp().set(dateWithTimestamp);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  @ValueFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
   public Date getDateWithTimestamp() {
     return dateWithTimestamp().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  @ValueFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS Z")
   public TestDateDo withDateWithTimestampWithTimezone(Date dateWithTimestampWithTimezone) {
     dateWithTimestampWithTimezone().set(dateWithTimestampWithTimezone);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  @ValueFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS Z")
   public Date getDateWithTimestampWithTimezone() {
     return dateWithTimestampWithTimezone().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  @ValueFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   public TestDateDo withDateWithTimestampZulu(Date dateWithTimestampZulu) {
     dateWithTimestampZulu().set(dateWithTimestampZulu);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  @ValueFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   public Date getDateWithTimestampZulu() {
     return dateWithTimestampZulu().get();
   }
 
+  @ValueFormat(pattern = "yy-MM")
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withDateYearMonth(Date dateYearMonth) {
     dateYearMonth().set(dateYearMonth);
     return this;
   }
 
+  @ValueFormat(pattern = "yy-MM")
   @Generated("DoConvenienceMethodsGenerator")
   public Date getDateYearMonth() {
     return dateYearMonth().get();
   }
 
+  @ValueFormat(pattern = "abcd")
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withInvalidDateFormat(Date invalidDateFormat) {
     invalidDateFormat().set(invalidDateFormat);
     return this;
   }
 
+  @ValueFormat(pattern = "abcd")
   @Generated("DoConvenienceMethodsGenerator")
   public Date getInvalidDateFormat() {
     return invalidDateFormat().get();
   }
 
+  @ValueFormat(pattern = "yyyyMMdd")
   @Generated("DoConvenienceMethodsGenerator")
+  @AttributeName("customDateFormatCustomAttributeName")
   public TestDateDo withCustomDateFormat(Date customDateFormat) {
     customDateFormat().set(customDateFormat);
     return this;
   }
 
+  @ValueFormat(pattern = "yyyyMMdd")
   @Generated("DoConvenienceMethodsGenerator")
+  @AttributeName("customDateFormatCustomAttributeName")
   public Date getCustomDateFormat() {
     return customDateFormat().get();
   }
 
+  @ValueFormat(pattern = "yyyyMMddHHmm")
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withCustomDateDoList(Collection<? extends Date> customDateDoList) {
     customDateDoList().updateAll(customDateDoList);
     return this;
   }
 
+  @ValueFormat(pattern = "yyyyMMddHHmm")
   @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withCustomDateDoList(Date... customDateDoList) {
     customDateDoList().updateAll(customDateDoList);
     return this;
   }
 
+  @ValueFormat(pattern = "yyyyMMddHHmm")
   @Generated("DoConvenienceMethodsGenerator")
   public List<Date> getCustomDateDoList() {
     return customDateDoList().get();

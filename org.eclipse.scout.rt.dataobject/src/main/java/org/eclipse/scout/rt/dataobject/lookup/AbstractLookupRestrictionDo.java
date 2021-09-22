@@ -87,8 +87,16 @@ public abstract class AbstractLookupRestrictionDo<SELF extends AbstractLookupRes
     return active().get();
   }
 
+  public boolean isActive() {
+    return nvl(getActive());
+  }
+
   public Boolean getEnabled() {
     return enabled().get();
+  }
+
+  public boolean isEnabled() {
+    return nvl(getEnabled());
   }
 
   public Integer getMaxRowCount() {

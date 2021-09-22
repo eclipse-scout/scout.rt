@@ -190,12 +190,12 @@ public class DoPredicatesTest {
     assertFalse(exists(EntityFixtureDo::otherEntities, predicate).test(m_entity2));
     assertFalse(exists(EntityFixtureDo::otherEntities, predicate).test(entityWithoutOtherEntities));
 
-    predicate = n -> n.isActive();
+    predicate = n -> n.getActive();
     assertTrue(exists(EntityFixtureDo::otherEntities, predicate).test(m_entity1));
     assertTrue(exists(EntityFixtureDo::otherEntities, predicate).test(m_entity2));
     assertFalse(exists(EntityFixtureDo::otherEntities, predicate).test(entityWithoutOtherEntities));
 
-    predicate = n -> !n.isActive();
+    predicate = n -> !n.getActive();
     assertFalse(exists(EntityFixtureDo::otherEntities, predicate).test(m_entity1));
     assertTrue(exists(EntityFixtureDo::otherEntities, predicate).test(m_entity2));
     assertFalse(exists(EntityFixtureDo::otherEntities, predicate).test(entityWithoutOtherEntities));
@@ -228,12 +228,12 @@ public class DoPredicatesTest {
     assertTrue(notExists(EntityFixtureDo::otherEntities, predicate).test(m_entity2));
     assertTrue(notExists(EntityFixtureDo::otherEntities, predicate).test(entityWithoutOtherEntities));
 
-    predicate = n -> n.isActive();
+    predicate = n -> n.getActive();
     assertFalse(notExists(EntityFixtureDo::otherEntities, predicate).test(m_entity1));
     assertFalse(notExists(EntityFixtureDo::otherEntities, predicate).test(m_entity2));
     assertTrue(notExists(EntityFixtureDo::otherEntities, predicate).test(entityWithoutOtherEntities));
 
-    predicate = n -> !n.isActive();
+    predicate = n -> !n.getActive();
     assertTrue(notExists(EntityFixtureDo::otherEntities, predicate).test(m_entity1));
     assertFalse(notExists(EntityFixtureDo::otherEntities, predicate).test(m_entity2));
     assertTrue(notExists(EntityFixtureDo::otherEntities, predicate).test(entityWithoutOtherEntities));

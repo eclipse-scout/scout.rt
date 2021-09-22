@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.dataobject.enumeration.EnumName;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
-import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
@@ -191,8 +190,8 @@ public class DataObjectSignatureComparator {
   protected void compareAttribute(AttributeDataObjectSignatureDo previousAttribute, AttributeDataObjectSignatureDo currentAttribute, String currentTypeName) {
     String currentAttributeName = currentAttribute.getName();
 
-    boolean previousList = BooleanUtility.nvl(previousAttribute.isList());
-    boolean currentList = BooleanUtility.nvl(currentAttribute.isList());
+    boolean previousList = previousAttribute.isList();
+    boolean currentList = currentAttribute.isList();
     if (previousList != currentList) {
       m_differences.add(String.format("[ACTION] DO Entity '%s' attribute '%s' has change list/non-list. Old: '%s', new: '%s'", currentTypeName, currentAttributeName, previousList, currentList));
     }

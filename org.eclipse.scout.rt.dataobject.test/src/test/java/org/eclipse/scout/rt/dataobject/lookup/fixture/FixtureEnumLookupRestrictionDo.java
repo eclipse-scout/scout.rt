@@ -61,6 +61,13 @@ public class FixtureEnumLookupRestrictionDo extends AbstractLookupRestrictionDo<
 
   @Override
   @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRestrictionDo withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
   public FixtureEnumLookupRestrictionDo withMaxRowCount(Integer maxRowCount) {
     maxRowCount().set(maxRowCount);
     return this;

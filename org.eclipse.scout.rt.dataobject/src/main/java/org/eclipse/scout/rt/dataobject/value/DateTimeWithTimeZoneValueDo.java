@@ -46,12 +46,14 @@ public class DateTimeWithTimeZoneValueDo extends DoEntity implements IValueDo<Da
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
+  @ValueFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS Z")
   public DateTimeWithTimeZoneValueDo withValue(Date value) {
     value().set(value);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  @ValueFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS Z")
   public Date getValue() {
     return value().get();
   }

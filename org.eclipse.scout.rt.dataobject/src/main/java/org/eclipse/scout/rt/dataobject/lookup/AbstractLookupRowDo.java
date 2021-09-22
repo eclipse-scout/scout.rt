@@ -106,12 +106,22 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public Boolean isEnabled() {
+  public Boolean getEnabled() {
     return enabled().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public Boolean isActive() {
+  public boolean isEnabled() {
+    return nvl(getEnabled());
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Boolean getActive() {
     return active().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public boolean isActive() {
+    return nvl(getActive());
   }
 }

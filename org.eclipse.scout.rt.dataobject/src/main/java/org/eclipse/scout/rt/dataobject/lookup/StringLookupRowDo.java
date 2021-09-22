@@ -44,6 +44,13 @@ public class StringLookupRowDo extends AbstractHierarchicalLookupRowDo<StringLoo
 
   @Override
   @Generated("DoConvenienceMethodsGenerator")
+  public StringLookupRowDo withParentId(String parentId) {
+    parentId().set(parentId);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
   public StringLookupRowDo withText(String text) {
     text().set(text);
     return this;
@@ -60,13 +67,6 @@ public class StringLookupRowDo extends AbstractHierarchicalLookupRowDo<StringLoo
   @Generated("DoConvenienceMethodsGenerator")
   public StringLookupRowDo withActive(Boolean active) {
     active().set(active);
-    return this;
-  }
-
-  @Override
-  @Generated("DoConvenienceMethodsGenerator")
-  public StringLookupRowDo withParentId(String parentId) {
-    parentId().set(parentId);
     return this;
   }
 }
