@@ -264,10 +264,10 @@ export default class Column {
       }
     }
 
-    return this._buildCell(content, style, cssClass);
+    return this._buildCell(cell, content, style, cssClass);
   }
 
-  _buildCell(content, style, cssClass) {
+  _buildCell(cell, content, style, cssClass) {
     return '<div class="' + cssClass + '" style="' + style + '">' + content + '</div>';
   }
 
