@@ -21,7 +21,7 @@ export default class BeanColumn extends Column {
     let cell = this.cell(row);
     let cssClass = this._cellCssClass(cell);
     let style = this._cellStyle(cell);
-    let $cell = $(super._buildCell('', style, cssClass));
+    let $cell = $(super._buildCell(cell, '', style, cssClass));
     let value = this.table.cellValue(this, row);
 
     if (cell.errorStatus) {
