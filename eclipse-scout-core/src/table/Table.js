@@ -686,7 +686,7 @@ export default class Table extends Widget {
     if ($appLink) {
       this._triggerAppLinkAction(column, row, $appLink.data('ref'), $appLink);
     } else {
-      this._triggerRowClick(row, mouseButton);
+      this._triggerRowClick(event, row, mouseButton, column);
     }
   }
 
@@ -2086,10 +2086,12 @@ export default class Table extends Widget {
     this.session.onRequestsDone(this._updateMenuBar.bind(this));
   }
 
-  _triggerRowClick(row, mouseButton, column) {
+  _triggerRowClick(originalEvent, row, mouseButton, column) {
     let event = {
+      originalEvent: originalEvent,
       row: row,
-      mouseButton: mouseButton
+      mouseButton: mouseButton,
+      column: column
     };
     this.trigger('rowClick', event);
   }
