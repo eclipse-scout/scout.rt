@@ -242,8 +242,8 @@ export function pushAll(arr, arr2) {
  * If the arrays contain objects instead of primitives, it uses their id to check for equality.
  */
 export function union(array1, array2) {
-  let result = [],
-    map = {};
+  let result = [];
+  let map = {};
 
   array1 = ensure(array1);
   array2 = ensure(array2);
@@ -437,11 +437,8 @@ export function findIndexFromReverse(arr, startIndex, predicate) {
  * Pushes all elements to the given array that are not null or undefined.
  */
 export function pushIfDefined(arr, ...elements) {
-  elements = elements.filter(element => {
-    return element !== null && element !== undefined;
-  });
-  if (arr && elements.length) {
-    arr.push(...elements);
+  if (arr) {
+    pushAll(arr, elements.filter(element => element !== null && element !== undefined));
   }
 }
 

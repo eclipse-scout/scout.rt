@@ -456,6 +456,7 @@ export function truncateText(text, horizontalSpace, measureText) {
   return text;
 }
 
+// noinspection JSDeprecatedSymbols
 export default {
   asString,
   box,
@@ -470,6 +471,7 @@ export default {
   hasText,
   insertAt,
   join,
+  length,
   /** @deprecated */
   lowercaseFirstLetter,
   nl2br,
@@ -483,8 +485,11 @@ export default {
   repeat,
   splitMax,
   startsWith,
+  toLowerCase,
   toLowerCaseFirstLetter,
+  toUpperCase,
   toUpperCaseFirstLetter,
+  trim,
   truncateText,
   /** @deprecated */
   uppercaseFirstLetter
