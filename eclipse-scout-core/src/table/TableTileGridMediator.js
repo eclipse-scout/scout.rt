@@ -467,7 +467,7 @@ export default class TableTileGridMediator extends Widget {
     if (!this.table.tileMode) {
       return;
     }
-    this.table._triggerRowClick(this.table.rowsMap[event.tile.rowId], event.mouseButton);
+    this.table._triggerRowClick(event, this.table.rowsMap[event.tile.rowId], event.mouseButton);
   }
 
   _onTableRowsSelected(event) {
