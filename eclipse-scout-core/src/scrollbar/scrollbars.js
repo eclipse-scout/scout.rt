@@ -141,6 +141,9 @@ export function _installNativeInternal($container, options) {
 }
 
 function installScrollShadow($container, session, options) {
+  if (!Device.get().supportsIntersectionObserver()) {
+    return;
+  }
   let scrollShadowStyle = _computeScrollShadowStyle(options);
   if (scrollShadowStyle.length === 0) {
     return;
@@ -172,7 +175,9 @@ function uninstallScrollShadow($container, session) {
     $container.off('scroll', handler);
     $container.removeData('scroll-shadow-handler');
   }
-  intersectionObserver.unobserve($container[0]);
+  if (intersectionObserver) {
+    intersectionObserver.unobserve($container[0]);
+  }
   let $scrollables = _$scrollables[session];
   if (!$scrollables || !$scrollables.some($scrollable => $scrollable.data('scroll-shadow'))) {
     _uninstallMutationObserver();
