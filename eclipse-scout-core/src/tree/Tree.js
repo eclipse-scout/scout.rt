@@ -398,7 +398,7 @@ export default class Tree extends Widget {
     // Detach nodes from jQuery objects (because those will be removed)
     this.visitNodes(this._resetTreeNode.bind(this));
 
-    this._uninstallDragAndDropHandler();
+    dragAndDrop.uninstallDragAndDropHandler(this);
     this._uninstallNodeTooltipSupport();
     this.$fillBefore = null;
     this.$fillAfter = null;
@@ -1177,51 +1177,26 @@ export default class Tree extends Widget {
     this.setProperty('dropMaximumSize', dropMaximumSize);
   }
 
-  _createDragAndDropHandler() {
-    return dragAndDrop.handler(this, {
-      supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      onDrop: event => this.trigger('drop', event),
-      dropType: () => this.dropType,
-      dropMaximumSize: () => this.dropMaximumSize,
-      additionalDropProperties: event => {
-        let $target = $(event.currentTarget);
-        let properties = {
-          nodeId: ''
-        };
-        if ($target.hasClass('tree-node')) {
-          let node = $target.data('node');
-          properties.nodeId = node.id;
-        }
-        return properties;
-      }
-    });
-  }
-
   _installOrUninstallDragAndDropHandler() {
-    if (this.dropType && this.enabledComputed) {
-      this._installDragAndDropHandler();
-    } else {
-      this._uninstallDragAndDropHandler();
-    }
-  }
-
-  _installDragAndDropHandler() {
-    if (this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler = this._createDragAndDropHandler();
-    if (!this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler.install(this.$container, '.tree-data,.tree-node');
-  }
-
-  _uninstallDragAndDropHandler() {
-    if (!this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler.uninstall();
-    this.dragAndDropHandler = null;
+    dragAndDrop.installOrUninstallDragAndDropHandler(
+      {
+        target: this,
+        doInstall: () => this.dropType && this.enabledComputed,
+        selector: '.tree-data,.tree-node',
+        onDrop: event => this.trigger('drop', event),
+        dropType: () => this.dropType,
+        additionalDropProperties: event => {
+          let $target = $(event.currentTarget);
+          let properties = {
+            nodeId: ''
+          };
+          if ($target.hasClass('tree-node')) {
+            let node = $target.data('node');
+            properties.nodeId = node.id;
+          }
+          return properties;
+        }
+      });
   }
 
   _updateMarkChildrenChecked(node, init, checked, checkChildrenChecked) {

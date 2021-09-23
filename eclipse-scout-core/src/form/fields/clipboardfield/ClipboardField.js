@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, dragAndDrop, InputFieldKeyStrokeContext, keys, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
+import {arrays, Device, InputFieldKeyStrokeContext, keys, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
 import $ from 'jquery';
 
 export default class ClipboardField extends ValueField {
@@ -84,19 +84,12 @@ export default class ClipboardField extends ValueField {
       .on('cut', this._onCopy.bind(this));
   }
 
-  _renderProperties() {
-    super._renderProperties();
-    this._renderDropType();
-  }
-
-  _createDragAndDropHandler() {
-    return dragAndDrop.handler(this, {
-      supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      onDrop: event => this.trigger('drop', event),
-      dropType: () => this.dropType,
-      dropMaximumSize: () => this.maximumSize,
-      allowedTypes: () => this.allowedMimeTypes
-    });
+  _getDragAndDropHandlerOptions() {
+    let options = super._getDragAndDropHandlerOptions();
+    options.allowedTypes = () => this.allowedMimeTypes;
+    // use the smaller property (this.maximumSize for backwards compatibility) but ignore null values which would result in a maximum size of zero.
+    options.dropMaximumSize = () => Math.min(scout.nvl(this.dropMaximumSize, this.maximumSize), scout.nvl(this.maximumSize, this.dropMaximumSize));
+    return options;
   }
 
   _renderDisplayText() {
