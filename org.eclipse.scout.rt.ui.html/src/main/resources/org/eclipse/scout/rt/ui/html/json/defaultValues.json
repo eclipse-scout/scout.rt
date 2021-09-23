@@ -65,6 +65,7 @@
       "keyStroke": null,
       "keyStrokeFirePolicy": 0,
       "textPosition": "default",
+      "htmlEnabled": false,
       "actionStyle": 0
     },
     "Menu": {

@@ -116,6 +116,7 @@
 @icon-disabled-color: @palette-gray-5;
 @icon-inverted-color: @palette-white;
 @icon-light-color: @palette-gray-6;
+@icon-light-hover-color: @palette-gray-10;
 @item-selection-background-color: @palette-blue-0;
 @item-selection-border-color: @palette-blue-6;
 @item-selection-disabled-background-color: @palette-gray-4;
@@ -184,7 +185,9 @@
 @check-box-border-color: @border-color;
 @check-box-disabled-color: @disabled-color;
 @check-box-checked-color: @palette-blue-6;
+@closer-action-color: @palette-gray-7;
 @closer-color: @icon-light-color;
+@closer-hover-color: @icon-light-hover-color;
 @collapse-handle-active-background-color: darken(@collapse-handle-hover-background-color, 5%);
 @collapse-handle-background-color: @button-background-color;
 @collapse-handle-border-color: @palette-gray-4;
@@ -248,8 +251,10 @@
 @desktop-header-disabled-color: @disabled-inverted-color;
 @desktop-header-background-color: @palette-blue-5;
 @desktop-header-border-color: @border-color;
-@desktop-tab-background-color: transparent;
+@desktop-tab-background-color: fade(@palette-black, 10%);
 @desktop-tab-flash-background-color: fade(@palette-black, 40%);
+@desktop-tab-closer-hover-background-color: fade(@palette-black, 14%);
+@desktop-tab-closer-active-background-color: fade(@palette-black, 20%);
 @desktop-tab-sub-title-color: fade(@desktop-header-color, 70%);
 @desktop-tab-selected-color: @title-color;
 @desktop-tab-selected-sub-title-color: @sub-title-color;
@@ -340,6 +345,9 @@
 @scrollbar-thumb-inverted-hover-color: fade(@scrollbar-thumb-inverted-main-color, 40%);
 @scrollbar-thumb-inverted-small-color: fade(@scrollbar-thumb-inverted-main-color, 15%);
 @scrollbar-thumb-inverted-small-hover-color: fade(@scrollbar-thumb-inverted-main-color, 15%);
+@scroll-shadow-alpha: 30%;
+@scroll-shadow-color: rgba(0, 0, 0, @scroll-shadow-alpha);
+@scroll-shadow-gradient-color: @background-color;
 @status-menu-color: @palette-gray-7;
 @status-menu-hover-color: @hover-color;
 @status-ok-color: @ok-color;

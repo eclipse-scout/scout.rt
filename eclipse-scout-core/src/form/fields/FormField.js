@@ -1201,7 +1201,7 @@ export default class FormField extends Widget {
   }
 
   /**
-   * @return {FormFieldLayout} the default layout FormFieldLayout. Override this function if your field needs another layout.
+   * @return {FormFieldLayout|AbstractLayout} the default layout FormFieldLayout. Override this function if your field needs another layout.
    */
   _createLayout() {
     return new FormFieldLayout(this);

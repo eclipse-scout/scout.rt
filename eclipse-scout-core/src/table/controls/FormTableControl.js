@@ -84,6 +84,7 @@ export default class FormTableControl extends TableControl {
     form.setDisplayHint(Form.DisplayHint.VIEW);
     form.setModal(false);
     form.setAskIfNeedSave(false);
+    form.setClosable(false);
   }
 
   onControlContainerOpened() {

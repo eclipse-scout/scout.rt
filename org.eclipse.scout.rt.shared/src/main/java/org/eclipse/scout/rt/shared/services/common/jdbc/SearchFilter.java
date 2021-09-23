@@ -14,6 +14,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 
@@ -25,6 +29,7 @@ public class SearchFilter implements Serializable {
 
   private boolean m_completed;
   private AbstractFormData m_formData;
+  private IDoEntity m_data;
   private List<String> m_displayTexts;
 
   public SearchFilter() {
@@ -35,6 +40,10 @@ public class SearchFilter implements Serializable {
     m_completed = other.m_completed;
     if (other.m_formData != null) {
       m_formData = other.m_formData.deepCopy();
+    }
+    if (other.m_data != null) {
+      IDataObjectMapper mapper = BEANS.get(IDataObjectMapper.class);
+      m_data = mapper.readValue(mapper.writeValue(other.m_data), other.m_data.getClass());
     }
     m_displayTexts = new ArrayList<>(other.m_displayTexts);
   }
@@ -54,6 +63,14 @@ public class SearchFilter implements Serializable {
     m_displayTexts.add(s);
   }
 
+  public IDoEntity getData() {
+    return m_data;
+  }
+
+  public void setData(IDoEntity data) {
+    m_data = data;
+  }
+
   /**
    * clear all elements in the filter
    */
@@ -61,6 +78,7 @@ public class SearchFilter implements Serializable {
     m_completed = false;
     m_displayTexts.clear();
     m_formData = null;
+    m_data = null;
   }
 
   public String[] getDisplayTexts() {
@@ -109,6 +127,9 @@ public class SearchFilter implements Serializable {
     if (m_formData != null) {
       buf.append(m_formData.toString());
     }
+    if (m_data != null) {
+      buf.append(BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(m_data));
+    }
     buf.append(']');
     return buf.toString();
   }
@@ -120,6 +141,7 @@ public class SearchFilter implements Serializable {
     result = prime * result + (m_completed ? 1231 : 1237);
     result = prime * result + ((m_displayTexts == null) ? 0 : m_displayTexts.hashCode());
     result = prime * result + ((m_formData == null) ? 0 : m_formData.hashCode());
+    result = prime * result + ((m_data == null) ? 0 : m_data.hashCode());
     return result;
   }
 
@@ -152,6 +174,14 @@ public class SearchFilter implements Serializable {
       }
     }
     else if (!m_formData.equals(other.m_formData)) {
+      return false;
+    }
+    if (m_data == null) {
+      if (other.m_data != null) {
+        return false;
+      }
+    }
+    else if (!m_data.equals(other.m_data)) {
       return false;
     }
     return true;

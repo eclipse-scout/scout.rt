@@ -60,6 +60,17 @@ public class PersonFixtureDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  public PersonFixtureDo withRelation(String relation) {
+    relation().set(relation);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getRelation() {
+    return relation().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public PersonFixtureDo withChildren(Collection<? extends PersonFixtureDo> children) {
     children().updateAll(children);
     return this;

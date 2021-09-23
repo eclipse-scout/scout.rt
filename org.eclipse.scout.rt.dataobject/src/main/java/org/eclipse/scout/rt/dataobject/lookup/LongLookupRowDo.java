@@ -44,6 +44,13 @@ public class LongLookupRowDo extends AbstractHierarchicalLookupRowDo<LongLookupR
 
   @Override
   @Generated("DoConvenienceMethodsGenerator")
+  public LongLookupRowDo withParentId(Long parentId) {
+    parentId().set(parentId);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
   public LongLookupRowDo withText(String text) {
     text().set(text);
     return this;
@@ -60,13 +67,6 @@ public class LongLookupRowDo extends AbstractHierarchicalLookupRowDo<LongLookupR
   @Generated("DoConvenienceMethodsGenerator")
   public LongLookupRowDo withActive(Boolean active) {
     active().set(active);
-    return this;
-  }
-
-  @Override
-  @Generated("DoConvenienceMethodsGenerator")
-  public LongLookupRowDo withParentId(Long parentId) {
-    parentId().set(parentId);
     return this;
   }
 }

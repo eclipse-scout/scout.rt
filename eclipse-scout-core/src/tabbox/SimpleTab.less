@@ -12,25 +12,82 @@
   position: relative;
   display: inline-block;
   vertical-align: top;
-  padding: 5px;
+  padding: @simple-tab-padding;
   background-color: @simple-tab-background-color;
   border-right: 1px solid @border-color;
   cursor: pointer;
   width: 120px;
   min-width: 60px;
 
-  &:hover > .title {
+  & > .title-line {
+    display: flex;
+    align-items: center;
+
+    .closable& {
+      margin-right: 20px;
+    }
+
+    & > .icon-container {
+
+      & > .icon {
+        margin-right: 5px;
+        vertical-align: middle;
+
+        &.font-icon {
+          font-size: 14px;
+        }
+      }
+    }
+
+    & > .title {
+      #scout.overflow-ellipsis-nowrap();
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    & > .status-container {
+      position: relative;
+      display: inline-flex;
+      margin-left: 4px;
+      color: @status-info-color;
+
+      & > .status {
+        margin-left: 5px;
+      }
+    }
+  }
+
+  & > .closer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: @simple-tab-padding;
+    display: none;
+
+    :hover&,
+    .closable.selected& {
+      display: inline-block;
+    }
+  }
+
+  & > .sub-title {
+    #scout.overflow-ellipsis-nowrap();
+    padding-top: 2px;
+    color: @simple-tab-sub-title-color;
+  }
+
+  &:hover > .title-line > .title {
     color: @hover-color;
   }
 
-  &:active > .title {
+  &:active > .title-line > .title {
     color: @active-color;
   }
 
   &.disabled {
     cursor: default;
 
-    & > .title {
+    & > .title-line > .title {
       color: @disabled-color;
     }
   }
@@ -39,60 +96,9 @@
     cursor: default;
     background-color: @simple-tab-selected-background-color;
 
-    & > .title {
+    & > .title-line > .title {
       color: @simple-tab-selected-color;
     }
-  }
-
-  & > .title,
-  & > .sub-title {
-    #scout.overflow-ellipsis-nowrap();
-  }
-
-  & > .sub-title {
-    padding-top: 2px;
-    color: @simple-tab-sub-title-color;
-  }
-
-  & > .icon {
-    float: right;
-    margin-left: 5px;
-  }
-
-  & > .status-container {
-    float: right;
-    position: relative;
-
-    & > .status {
-      vertical-align: middle;
-      display: inline-block;
-      margin-left: 5px;
-
-      &.closer {
-        margin-left: 7px;
-      }
-    }
-  }
-
-  & > .icon-container {
-    float: left;
-
-    & > .icon {
-      margin-right: 5px;
-      vertical-align: middle;
-
-      &.font-icon {
-        font-size: 14px;
-      }
-    }
-  }
-
-  &.closable .closer {
-    display: none;
-  }
-
-  &.closable.selected .closer {
-    display: inline-block;
   }
 }
 

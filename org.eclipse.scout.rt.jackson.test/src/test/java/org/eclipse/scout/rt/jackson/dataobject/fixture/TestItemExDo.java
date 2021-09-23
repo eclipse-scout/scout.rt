@@ -30,6 +30,7 @@ public class TestItemExDo extends TestItemDo {
    * *************************************************************************/
 
   @Override
+  @AttributeName("idEx")
   @Generated("DoConvenienceMethodsGenerator")
   public TestItemExDo withId(String id) {
     id().set(id);

@@ -26,6 +26,7 @@ export default class CompositeField extends FormField {
   /**
    *
    * @param {FormField[]} fields
+   * @returns void
    */
   setFields(fields) {
     throw new Error('Not implemented');

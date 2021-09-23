@@ -108,8 +108,8 @@ public class AbstractRestLookupCallTest {
   protected <ID> void assertLookupRow(AbstractLookupRowDo<?, ID> expected, ILookupRow<ID> actual, ID expectedParentId) {
     assertEquals(expected.getId(), actual.getKey());
     assertEquals(expected.getText(), actual.getText());
-    assertEquals(expected.isActive(), actual.isActive());
-    assertEquals(expected.isEnabled(), actual.isEnabled());
+    assertEquals(expected.getActive(), actual.isActive());
+    assertEquals(expected.getEnabled(), actual.isEnabled());
     assertEquals(expectedParentId, actual.getParentKey());
   }
 

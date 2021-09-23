@@ -47,9 +47,7 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
       insets = htmlContainer.insets(),
       containerSize = htmlContainer.availableSize({
         exact: true
-      }).subtract(htmlContainer.insets()),
-      clientArea = new Rectangle(insets.left, insets.top, containerSize.width, containerSize.height),
-      left = clientArea.x;
+      }).subtract(htmlContainer.insets());
 
     menuBarMinumumSize = menuBar.htmlComp.prefSize({
       widthHint: 0
@@ -61,35 +59,32 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
     }
 
     tabAreaPrefSize = tabArea.htmlComp.prefSize({
-      widthHint: clientArea.width - menuBarMinumumSize.width - menuBarMargins.horizontal() - statusSizeLarge.width,
+      widthHint: containerSize.width - menuBarMinumumSize.width - menuBarMargins.horizontal() - statusSizeLarge.width,
       exact: false
     });
 
-    // layout tabItemsBar
-    tabArea.htmlComp.setBounds(new Rectangle(
-      clientArea.x + tabAreaMargins.left,
-      insets.top + tabAreaMargins.top,
+    // layout tabArea
+    tabArea.htmlComp.setSize(new Dimension(
       tabAreaPrefSize.width,
-      clientArea.height - tabAreaMargins.vertical()
+      containerSize.height - tabAreaMargins.vertical()
     ));
 
     menuBar.htmlComp.layout.collapsed = tabArea.htmlComp.layout.overflowTabs.length > 0;
     // layout menuBar
     menuBar.htmlComp.setBounds(new Rectangle(
-      left + tabAreaPrefSize.width + tabAreaMargins.horizontal() + menuBarMargins.left,
-      insets.top + menuBarMargins.top,
-      clientArea.width - tabAreaPrefSize.width - tabAreaMargins.horizontal() - menuBarMargins.horizontal() - statusSizeLarge.width,
-      clientArea.height - menuBarMargins.vertical()
+      insets.left + tabAreaPrefSize.width + tabAreaMargins.horizontal(),
+      insets.top,
+      containerSize.width - tabAreaPrefSize.width - tabAreaMargins.horizontal() - menuBarMargins.horizontal() - statusSizeLarge.width,
+      containerSize.height - menuBarMargins.vertical()
     ));
 
     // layout status
     if (this.tabBoxHeader.tabBox.statusPosition === FormField.StatusPosition.TOP && $status && $status.isVisible()) {
       $status.cssWidth(this.fieldStatusWidth)
-        .cssRight(insets.left)
-        .cssHeight(clientArea.height - graphics.margins($status).vertical())
-        .cssLineHeight(clientArea.height - graphics.margins($status).vertical());
+        .cssRight(insets.right)
+        .cssHeight(containerSize.height - graphics.margins($status).vertical())
+        .cssLineHeight(containerSize.height - graphics.margins($status).vertical());
     }
-
   }
 
   preferredLayoutSize($container, options) {

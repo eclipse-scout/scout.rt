@@ -906,6 +906,9 @@ export default class Desktop extends Widget {
   }
 
   getPopups() {
+    if (!this.$container) {
+      return [];
+    }
     let popups = [];
     this.$container.children('.popup').each((i, elem) => {
       let $popup = $(elem);
@@ -1187,7 +1190,20 @@ export default class Desktop extends Widget {
     }
   }
 
+  /**
+   * @see {@link Form.isShown}
+   * @param {Form} form
+   */
+  isFormShown(form) {
+    let displayParent = form.displayParent || this;
+    return displayParent.formController.isFormShown(form);
+  }
+
   activateForm(form) {
+    if (!form) {
+      this._setFormActivated(null);
+      return;
+    }
     let displayParent = form.displayParent || this;
     displayParent.formController.activateForm(form);
     this._setFormActivated(form);

@@ -69,6 +69,7 @@ export {default as HAlign} from './util/HAlign';
 export {default as aggregation} from './util/aggregation';
 export {default as webstorage} from './util/webstorage';
 export {default as cookies} from './util/cookies';
+export {default as ViewportScroller} from './util/ViewportScroller';
 export {default as ajax} from './ajax/ajax';
 export {default as AjaxCall} from './ajax/AjaxCall';
 export {default as AjaxError} from './ajax/AjaxError';

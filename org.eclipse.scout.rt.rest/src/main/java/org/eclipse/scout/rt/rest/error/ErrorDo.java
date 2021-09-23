@@ -63,23 +63,35 @@ public class ErrorDo extends DoEntity {
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  /**
+   * See {@link #httpStatus()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public ErrorDo withHttpStatus(Integer httpStatus) {
     httpStatus().set(httpStatus);
     return this;
   }
 
+  /**
+   * See {@link #httpStatus()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public Integer getHttpStatus() {
     return httpStatus().get();
   }
 
+  /**
+   * See {@link #errorCode()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public ErrorDo withErrorCode(String errorCode) {
     errorCode().set(errorCode);
     return this;
   }
 
+  /**
+   * See {@link #errorCode()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public String getErrorCode() {
     return errorCode().get();

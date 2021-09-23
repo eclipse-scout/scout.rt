@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureEnumLookupRestricti
 import org.eclipse.scout.rt.dataobject.lookup.fixture.FixtureEnumLookupRowDo;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
-import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -242,7 +241,7 @@ public class LookupHelperTest {
   protected final <ID, LOOKUP_ROW extends AbstractLookupRowDo<LOOKUP_ROW, ID>> void assertActiveLookupRows(LookupResponse<LOOKUP_ROW> response, @SuppressWarnings("unchecked") ID... expectedActiveIds) {
     assertNotNull(response);
     List<ID> actualActiveIds = response.rows().stream()
-        .filter(row -> BooleanUtility.nvl(row.isActive()))
+        .filter(row -> row.isActive())
         .map(AbstractLookupRowDo::getId)
         .collect(Collectors.toList());
     assertEquals(Arrays.asList(expectedActiveIds), actualActiveIds);

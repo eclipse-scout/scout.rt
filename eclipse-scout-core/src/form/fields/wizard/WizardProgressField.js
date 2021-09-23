@@ -49,7 +49,8 @@ export default class WizardProgressField extends FormField {
     this.$wizardStepsBody = this.$field.appendDiv('wizard-steps-body');
 
     this._installScrollbars({
-      axis: 'x'
+      axis: 'x',
+      scrollShadow: 'none'
     });
 
     // If this field is the first field in a form's main box, mark the form as "wizard-container-form"

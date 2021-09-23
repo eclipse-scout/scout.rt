@@ -31,6 +31,7 @@ import {
   TabBox,
   TabItemKeyStroke,
   tooltips,
+  widgets,
   WrappedFormField
 } from '../../../index';
 import $ from 'jquery';
@@ -72,6 +73,7 @@ export default class GroupBox extends CompositeField {
     this.$body = null;
     this.$title = null;
     this.$subLabel = null;
+    this._statusPositionOrig = null;
   }
 
   static BorderDecoration = {
@@ -99,6 +101,7 @@ export default class GroupBox extends CompositeField {
       menuOrder: new GroupBoxMenuItemsOrder(),
       ellipsisPosition: this.menuBarEllipsisPosition
     });
+    this.menuBar.on('propertyChange:visible', () => this._updateMenuBarStyle());
     this._setFields(this.fields);
     this._setMainBox(this.mainBox);
     this._updateMenuBar();
@@ -218,6 +221,7 @@ export default class GroupBox extends CompositeField {
     this.addContainer(this.$parent, this.mainBox ? 'root-group-box' : 'group-box');
 
     this.$header = this.$container.appendDiv('group-box-header');
+    HtmlComponent.install(this.$header, this.session); // Complete layout chain for elements inside header (e.g. allow top status to invalidate layout when visibility changes)
     this.$title = this.$header.appendDiv('title');
     this.$borderBottom = this.$header.appendDiv('bottom-border');
     this.addLabel();
@@ -358,6 +362,36 @@ export default class GroupBox extends CompositeField {
    */
   get$Scrollable() {
     return this.$body;
+  }
+
+  _onScroll() {
+    super._onScroll();
+    this._updateScrollShadow();
+  }
+
+  _updateScrollShadow() {
+    if (!this.rendered) {
+      return;
+    }
+    let hasScrollShadowTop = this.hasScrollShadow('top');
+    let hasScrollShadowBottom = this.hasScrollShadow('bottom');
+    let oldHasScrollShadowTop = this.$container.hasClass('has-scroll-shadow-top');
+    this.$container.toggleClass('has-scroll-shadow-top', hasScrollShadowTop);
+    this.$container.toggleClass('has-scroll-shadow-bottom', hasScrollShadowBottom);
+    if (oldHasScrollShadowTop !== hasScrollShadowTop) {
+      this.invalidateLayout();
+    }
+
+    // Enlarge header line if there is a shadow, but don't do it if there is a menubar on top
+    let hasMenubarTop = this.$container.hasClass('menubar-position-top');
+    if (hasScrollShadowTop && !hasMenubarTop) {
+      widgets.preserveAndSetProperty(() => this.setStatusPosition(FormField.StatusPosition.TOP), () => this.statusPosition, this, '_statusPositionOrig');
+    } else {
+      widgets.resetProperty(preservedValue => this.setStatusPosition(preservedValue), this, '_statusPositionOrig');
+    }
+
+    // Prevent flickering of status icon
+    this.validateLayout();
   }
 
   setMainBox(mainBox) {
@@ -572,14 +606,12 @@ export default class GroupBox extends CompositeField {
       position = GroupBox.MenuBarPosition.TOP;
     }
 
-    let hasMenubar = position === GroupBox.MenuBarPosition.TITLE;
-    this.$header.toggleClass('has-menubar', hasMenubar);
-
     if (position === GroupBox.MenuBarPosition.BOTTOM) {
       this.menuBar.setPosition(MenuBar.Position.BOTTOM);
     } else { // top + title
       this.menuBar.setPosition(MenuBar.Position.TOP);
     }
+    this._renderMenuBarStyle();
 
     if (this.rendered) {
       this.menuBar.remove();
@@ -598,6 +630,20 @@ export default class GroupBox extends CompositeField {
       this.menuBar.remove();
       this._renderMenuBarVisible();
     }
+  }
+
+  _updateMenuBarStyle() {
+    if (this.rendered) {
+      this._renderMenuBarStyle();
+    }
+  }
+
+  _renderMenuBarStyle() {
+    let visible = this.menuBar.visible;
+    let hasTitleMenuBar = this.menuBarPosition === GroupBox.MenuBarPosition.TITLE;
+    this.$header.toggleClass('has-menubar', visible && hasTitleMenuBar);
+    this.$container.toggleClass('menubar-position-top', visible && !hasTitleMenuBar && this.menuBar.position === MenuBar.Position.TOP);
+    this.$container.toggleClass('menubar-position-bottom', visible && !hasTitleMenuBar && this.menuBar.position === MenuBar.Position.BOTTOM);
   }
 
   /**

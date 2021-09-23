@@ -111,6 +111,7 @@
 @check-box-field-label-padding-top: 2px;
 @check-box-size: 18px;
 @checkable-cell-padding-adjustment: 2px; /* Adjustment to shift the checkbox a little upwards to align it with the text (resp. first line of the text in case of multiline table cells) */
+@closer-border-radius: 7px;
 @compact-outline-node-padding-x: 16px;
 @compact-outline-node-padding-y: @outline-breadcrumb-node-padding-y;
 @compact-outline-title-padding-x: @compact-outline-node-padding-x;
@@ -128,7 +129,7 @@
 @date-picker-day-padding-y: 5px;
 @desktop-bench-drop-shadow-top: 3px;
 @desktop-bench-border-left-width: 1px;
-@desktop-bench-drop-shadow-border-top-left-radius: @desktop-tab-selected-border-radius;
+@desktop-bench-drop-shadow-border-top-left-radius: @desktop-tab-border-radius;
 @desktop-header-height: 64px;
 @desktop-logo-height: 32px;
 @desktop-logo-min-width: 0;
@@ -138,18 +139,14 @@
 @desktop-notification-no-icon-padding-y: 16px;
 @desktop-tab-border-radius: @view-tab-border-radius;
 @desktop-tab-key-box-bottom: @view-tab-key-box-bottom;
-@desktop-tab-margin: @view-tab-margin;
 @desktop-tab-margin-top: @view-tab-margin-top;
-@desktop-tab-padding: 4px;
-@desktop-tab-padding-left: 14px;
-@desktop-tab-width: @desktop-tab-selected-width - @desktop-tab-margin * 2;
-@desktop-tab-min-width: @desktop-tab-selected-min-width - @desktop-tab-margin * 2;
-@desktop-tab-selected-width: 200px;
-@desktop-tab-selected-min-width: 130px;
-@desktop-tab-selected-border-radius: @view-tab-selected-border-radius;
-@desktop-tab-selected-padding: @desktop-tab-padding + @desktop-tab-margin;
-@desktop-tab-selected-padding-left: @desktop-tab-padding-left + @desktop-tab-margin;
-@desktop-tab-selected-margin-top: @view-tab-selected-margin-top;
+@desktop-tab-margin-right: 3px;
+@desktop-tab-padding: 10px;
+@desktop-tab-padding-left: 20px;
+@desktop-tab-width: 200px;
+@desktop-tab-min-width: 130px;
+@desktop-tab-border-radius: @view-tab-selected-border-radius;
+@desktop-tab-margin-top: @view-tab-selected-margin-top;
 @desktop-tool-box-item-border-radius: @view-tab-border-radius;
 @desktop-tool-box-item-font-size: 14px;
 @desktop-tool-box-item-margin: 3px;
@@ -164,7 +161,7 @@
 @detail-table-row-padding-y: 11px;
 @detail-table-footer-with-handle-margin-left: 30px;
 @dialog-border-top-size: 5px;
-@form-title-margin-top: 10px;
+@form-title-padding-top: 16px;
 @group-collapse-icon-margin-top: -1px;
 @group-box-control-font-size: 16px;
 @group-box-control-width: 25px;
@@ -236,7 +233,12 @@
 @scrollbar-size: 14px;
 @scrollbar-thumb-size: 4px;
 @scrollbar-thumb-hover-size: 8px;
+@scroll-shadow-size-large: 10px;
+@scroll-shadow-size: 5px;
+@scroll-shadow-blur: @scroll-shadow-size;
+@scroll-shadow-spread: @scroll-shadow-size + 1; // +1 to ensure firefox does not draw a light shadow on the side of the scrollable
 @search-outline-panel-padding-bottom: 14px;
+@simple-tab-padding: 5px;
 @split-box-splitter-line-size: 3px;
 @split-box-x-splitter-padding: 19px;
 @split-box-y-splitter-padding: 6px;
@@ -257,9 +259,9 @@
 @table-cell-padding-right: @table-cell-padding-left;
 @table-cell-padding-right-last: @scrollbar-size;
 @table-control-content-padding: 10px;
-@table-control-container-height: 360px;
+@table-control-container-height: 364px;
 @table-control-container-height-dense: 320px;
-@table-control-resize-border-width: 3px;
+@table-control-resize-border-width: 2px;
 @table-control-size: 40px;
 @table-footer-height: @main-menubar-height;
 @table-footer-text-filter-height: 32px;

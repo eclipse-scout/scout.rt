@@ -71,6 +71,7 @@ const REMOVE_BOLD = 'font:\uE045';
 const PENCIL = 'font:\uE02F';
 const PENCIL_BOLD = 'font:\uE04B';
 const PENCIL_SOLID = 'font:\uE04F';
+const PENCIL_UNDERLINE_SOLID = 'font:\uE050';
 const SLIPPERY = 'font:\uE044';
 
 /* font awesome icons */
@@ -237,6 +238,7 @@ export default {
   PENCIL,
   PENCIL_BOLD,
   PENCIL_SOLID,
+  PENCIL_UNDERLINE_SOLID,
   PERSON_SOLID,
   PLUS,
   PLUS_BOLD,

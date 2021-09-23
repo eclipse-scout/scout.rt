@@ -325,6 +325,28 @@ describe('Form', () => {
         .catch(fail)
         .always(done);
     });
+
+    it('activates the form if it is still open after close', done => {
+      // Use case: press x icon on an inactive tab for a form that shows a message box
+      // -> form cannot be closed because the user has to confirm the msg box
+      let form = helper.createFormWithOneField();
+      form.setDisplayHint(Form.DisplayHint.VIEW);
+      form.open()
+        .then(() => {
+          form.touch();
+          let desktop = form.session.desktop;
+          expect(desktop.activeForm).toBe(form);
+
+          desktop.activateForm(null);
+          expect(desktop.activeForm).toBe(null);
+
+          form.abort();
+          expect(form.destroyed).toBe(false);
+          expect(desktop.activeForm).toBe(form);
+        })
+        .catch(fail)
+        .always(done);
+    });
   });
 
   describe('destroy', () => {

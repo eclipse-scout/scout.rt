@@ -269,8 +269,8 @@ public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupR
    */
   protected ILookupRow<ID> transformLookupRow(AbstractLookupRowDo<?, ID> row) {
     return new LookupRow<>(row.getId(), row.getText())
-        .withActive(row.isActive())
-        .withEnabled(row.isEnabled())
+        .withActive(row.getActive())
+        .withEnabled(row.getEnabled())
         .withParentKey(extractParentKey(row));
   }
 

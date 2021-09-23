@@ -10,15 +10,33 @@
  */
 .desktop-tab.simple-tab {
   width: @desktop-tab-width;
-  min-width: @desktop-tab-min-width;
+  min-width: @desktop-tab-min-width ;
+  margin: @desktop-tab-margin-top @desktop-tab-margin-right 0 0;
   padding: @desktop-tab-padding @desktop-tab-padding 0 @desktop-tab-padding-left;
-  margin: @desktop-tab-margin-top @desktop-tab-margin @desktop-tab-margin;
-  border-radius: @desktop-tab-border-radius;
+  border-radius: @desktop-tab-border-radius @desktop-tab-border-radius 0 0;
   border-right-width: 0;
   background-color: @desktop-tab-background-color;
 
-  & > .title {
-    font-size: @font-size-plus;
+  & > .title-line {
+    .closable& {
+      margin-right: 25px;
+    }
+
+    & > .icon-container {
+      color: @desktop-tab-sub-title-color;
+    }
+
+    & > .title {
+      font-size: @font-size-plus;
+    }
+
+    & > .status-container {
+      color: @desktop-tab-sub-title-color;
+
+      & > .save-needer {
+        color: inherit;
+      }
+    }
   }
 
   & > .sub-title {
@@ -28,12 +46,30 @@
     padding-top: 1px;
   }
 
-  & > .status-container > .save-needer {
+  & > .closer {
     color: @desktop-tab-sub-title-color;
+    padding: 4px;
+    margin: 7px;
+    border-radius: @border-radius-medium;
+
+    & > .key-box {
+      top: 0;
+      right: 0;
+    }
+
+    &:hover {
+      color: @desktop-header-color;
+      background-color: @desktop-tab-closer-hover-background-color;
+    }
+
+    &:active, &.active {
+      background-color: @desktop-tab-closer-active-background-color;
+    }
   }
 
   & > .key-box {
     bottom: @desktop-tab-key-box-bottom;
+    margin-left: 4px;
   }
 
   &.animate-modality-highlight {
@@ -44,7 +80,7 @@
   &:active {
     background-color: @desktop-tab-hover-background-color;
 
-    & > .title {
+    & > .title-line > .title {
       color: inherit;
     }
   }
@@ -52,38 +88,56 @@
   &.disabled {
     background-color: transparent;
 
-    & > .title {
+    & > .title-line > .title {
       color: @desktop-header-disabled-color;
     }
   }
 
   &.selected {
-    width: @desktop-tab-selected-width;
-    min-width: @desktop-tab-selected-min-width;
     background-color: @simple-tab-selected-background-color;
-    margin: @desktop-tab-selected-margin-top 0 0;
-    padding: @desktop-tab-selected-padding @desktop-tab-selected-padding 0 @desktop-tab-selected-padding-left;
-    border-radius: @desktop-tab-selected-border-radius @desktop-tab-selected-border-radius 0 0;
 
-    & > .title {
-      color: @desktop-tab-selected-color;
-      font-weight: @font-weight-bold;
+    & > .title-line {
+      & > .icon-container {
+        color: @status-info-color;
+      }
+
+      & > .title {
+        color: @desktop-tab-selected-color;
+        font-weight: @font-weight-bold;
+      }
+
+      & > .status-container {
+        color: @status-info-color;
+
+        & > .save-needer {
+          color: @desktop-tab-selected-save-needer-color;
+        }
+      }
     }
 
     & > .sub-title {
       color: @desktop-tab-selected-sub-title-color;
     }
 
-    & > .status-container > .save-needer {
-      color: @desktop-tab-selected-save-needer-color;
-    }
+    & > .closer {
+      color: @closer-color;
 
-    & > .key-box {
-      bottom: @desktop-tab-key-box-bottom + @desktop-tab-margin;
+      &:hover {
+        background-color: @hover-background-color;
+        color: @closer-hover-color;
+      }
+
+      &:active, &.active {
+        background-color: @active-background-color;
+      }
     }
 
     & > .edge {
-      #scout.inverted-bottom-round-edge(@border-radius: @desktop-tab-selected-border-radius, @color: @simple-tab-selected-background-color);
+      #scout.inverted-bottom-round-edge(@border-radius: @desktop-tab-border-radius, @color: @simple-tab-selected-background-color);
+
+      &.right {
+        z-index: 1; // lay over right tab
+      }
     }
 
     &.first > .edge.left {
@@ -161,19 +215,19 @@
 
 .keyframes-flash-desktop-tab-selected-edge() {
   0% {
-    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @simple-tab-selected-background-color;
+    box-shadow: 0 @desktop-tab-border-radius 0 0 @simple-tab-selected-background-color;
   }
   25% {
-    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @desktop-tab-selected-flash-background-color;
+    box-shadow: 0 @desktop-tab-border-radius 0 0 @desktop-tab-selected-flash-background-color;
   }
   50% {
-    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @simple-tab-selected-background-color;
+    box-shadow: 0 @desktop-tab-border-radius 0 0 @simple-tab-selected-background-color;
   }
   75% {
-    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @desktop-tab-selected-flash-background-color;
+    box-shadow: 0 @desktop-tab-border-radius 0 0 @desktop-tab-selected-flash-background-color;
   }
   100% {
-    box-shadow: 0 @desktop-tab-selected-border-radius 0 0 @simple-tab-selected-background-color;
+    box-shadow: 0 @desktop-tab-border-radius 0 0 @simple-tab-selected-background-color;
   }
 }
 

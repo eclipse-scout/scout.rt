@@ -1127,7 +1127,7 @@ export default class Outline extends Tree {
         // Workaround for javascript not being able to prevent hover event propagation:
         // In case of tabs, the hover selector is defined on the element that is the direct parent
         // of the glass pane. Under these circumstances, the hover style isn't be prevented by the glass pane.
-        tab.$container.addClass('no-hover');
+        tab.$container.addClass('glasspane-parent');
       }
     });
     return $glassPanes;

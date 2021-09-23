@@ -4088,7 +4088,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       }
     }
     catch (Exception ex) {
-      LOG.error("Error occured while applying row decoration", ex);
+      LOG.error("Error occurred while applying row decoration", ex);
     }
     finally {
       for (ITableRow tableRow : rows) {

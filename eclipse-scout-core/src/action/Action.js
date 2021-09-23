@@ -31,22 +31,24 @@ export default class Action extends Widget {
     this.tabbable = false;
     this.text = null;
     this.textPosition = Action.TextPosition.DEFAULT;
-    /**
-     * Supported action styles are:
-     * - default: regular menu-look, also used in overflow menus
-     * - button: menu looks like a button
-     */
+    this.htmlEnabled = false;
     this.textVisible = true;
     this.toggleAction = false;
     this.tooltipText = null;
     this.showTooltipWhenSelected = true;
 
     this._doubleClickSupport = new DoubleClickSupport();
-    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'tabbable', 'text', 'textPosition', 'tooltipText', 'toggleAction']);
+    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'tabbable', 'text', 'textPosition', 'htmlEnabled', 'tooltipText', 'toggleAction']);
   }
 
   static ActionStyle = {
+    /**
+     * regular menu-look, also used in overflow menus
+     */
     DEFAULT: 0,
+    /**
+     * menu looks like a button
+     */
     BUTTON: 1
   };
 
@@ -131,9 +133,20 @@ export default class Action extends Widget {
         this.$text = this.$container.appendSpan('content text');
         HtmlComponent.install(this.$text, this.session);
       }
-      this.$text.text(text);
+      if (this.htmlEnabled) {
+        this.$text.html(text);
+      } else {
+        this.$text.text(text);
+      }
     } else {
       this._removeText();
+    }
+  }
+
+  _removeText() {
+    if (this.$text) {
+      this.$text.remove();
+      this.$text = null;
     }
   }
 
@@ -146,11 +159,13 @@ export default class Action extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _removeText() {
-    if (this.$text) {
-      this.$text.remove();
-      this.$text = null;
-    }
+  setHtmlEnabled(htmlEnabled) {
+    this.setProperty('htmlEnabled', htmlEnabled);
+  }
+
+  _renderHtmlEnabled() {
+    // Render the text again when html enabled changes dynamically
+    this._renderText();
   }
 
   setIconId(iconId) {

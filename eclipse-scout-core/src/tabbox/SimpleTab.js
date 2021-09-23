@@ -28,9 +28,6 @@ export default class SimpleTab extends Widget {
     this.status = null;
     this.selected = false;
 
-    // Order: $statusContainer, $iconContainer, $title, $subTitle
-    // - Status container needs to be the first element because it is "float: right".
-    // - Icon container is "float: left" , must be before title.
     this.$title = null;
     this.$subTitle = null;
     this.$iconContainer = null;
@@ -41,7 +38,11 @@ export default class SimpleTab extends Widget {
 
     this._viewPropertyChangeListener = this._onViewPropertyChange.bind(this);
     this._viewRemoveListener = this._onViewRemove.bind(this);
-    this._glassPaneContribution = element => this.$statusContainer;
+    this._glassPaneContribution = element => {
+      // glass pane will be added as direct child which does not prevent clicks and hover effects -> glasspane-parent marker needed
+      this.$close.addClass('glasspane-parent');
+      return this.$close;
+    };
   }
 
   _init(model) {
@@ -74,6 +75,17 @@ export default class SimpleTab extends Widget {
   _render() {
     this.$container = this.$parent.prependDiv('simple-tab');
     this.$container.on('mousedown', this._onMouseDown.bind(this));
+    this.$titleLine = this.$container.appendDiv('title-line');
+    this.$iconContainer = this.$titleLine.appendDiv('icon-container');
+    this.$title = this.$titleLine.appendDiv('title');
+    tooltips.installForEllipsis(this.$title, {
+      parent: this
+    });
+    this.$statusContainer = this.$titleLine.appendDiv('status-container');
+    this.$subTitle = this.$container.appendDiv('sub-title');
+    tooltips.installForEllipsis(this.$subTitle, {
+      parent: this
+    });
   }
 
   _renderProperties() {
@@ -89,108 +101,8 @@ export default class SimpleTab extends Widget {
   }
 
   _remove() {
-    this._remove$Title();
-    this._remove$SubTitle();
-    this._remove$IconContainer();
-    this._remove$StatusContainer();
     this.$close = null;
     super._remove();
-  }
-
-  _getOrCreate$Title() {
-    if (this.$title) {
-      return this.$title;
-    }
-    this.$title = this.$container.makeDiv('title');
-    tooltips.installForEllipsis(this.$title, {
-      parent: this
-    });
-    if (this.$subTitle) {
-      this.$title.insertBefore(this.$subTitle);
-    } else if (this.$iconContainer) {
-      this.$title.insertAfter(this.$iconContainer);
-    } else if (this.$statusContainer) {
-      this.$title.insertAfter(this.$statusContainer);
-    } else {
-      this.$title.appendTo(this.$container);
-    }
-    return this.$title;
-  }
-
-  _getOrCreate$SubTitle() {
-    if (this.$subTitle) {
-      return this.$subTitle;
-    }
-    this.$subTitle = this.$container.makeDiv('sub-title');
-    tooltips.installForEllipsis(this.$subTitle, {
-      parent: this
-    });
-    if (this.$title) {
-      this.$subTitle.insertAfter(this.$title);
-    } else if (this.$iconContainer) {
-      this.$subTitle.insertAfter(this.$iconContainer);
-    } else if (this.$statusContainer) {
-      this.$subTitle.insertAfter(this.$statusContainer);
-    } else {
-      this.$subTitle.appendTo(this.$container);
-    }
-    return this.$subTitle;
-  }
-
-  _getOrCreate$IconContainer() {
-    if (this.$iconContainer) {
-      return this.$iconContainer;
-    }
-    this.$iconContainer = this.$container.makeDiv('icon-container');
-    if (this.$title) {
-      this.$iconContainer.insertBefore(this.$title);
-    } else if (this.$subTitle) {
-      this.$iconContainer.insertBefore(this.$subTitle);
-    } else if (this.$statusContainer) {
-      this.$iconContainer.insertAfter(this.$statusContainer);
-    } else {
-      this.$iconContainer.appendTo(this.$container);
-    }
-    return this.$iconContainer;
-  }
-
-  _getOrCreate$StatusContainer() {
-    if (this.$statusContainer) {
-      return this.$statusContainer;
-    }
-    // Prepend because of "float: right"
-    this.$statusContainer = this.$container.prependDiv('status-container');
-    return this.$statusContainer;
-  }
-
-  _remove$Title() {
-    if (this.$title) {
-      tooltips.uninstall(this.$title);
-      this.$title.remove();
-      this.$title = null;
-    }
-  }
-
-  _remove$SubTitle() {
-    if (this.$subTitle) {
-      tooltips.uninstall(this.$subTitle);
-      this.$subTitle.remove();
-      this.$subTitle = null;
-    }
-  }
-
-  _remove$IconContainer() {
-    if (this.$iconContainer) {
-      this.$iconContainer.remove();
-      this.$iconContainer = null;
-    }
-  }
-
-  _remove$StatusContainer() {
-    if (this.$statusContainer) {
-      this.$statusContainer.remove();
-      this.$statusContainer = null;
-    }
   }
 
   setTitle(title) {
@@ -199,9 +111,7 @@ export default class SimpleTab extends Widget {
 
   _renderTitle() {
     if (this.title || this.subTitle) { // $title is always needed if subtitle is not empty
-      this._getOrCreate$Title().textOrNbsp(this.title);
-    } else {
-      this._remove$Title();
+      this.$title.textOrNbsp(this.title);
     }
   }
 
@@ -214,12 +124,11 @@ export default class SimpleTab extends Widget {
       if (!this.title) {
         this._renderTitle();
       }
-      this._getOrCreate$SubTitle().textOrNbsp(this.subTitle);
+      this.$subTitle.textOrNbsp(this.subTitle);
     } else {
       if (!this.title) {
         this._renderTitle();
       }
-      this._remove$SubTitle();
     }
   }
 
@@ -228,11 +137,7 @@ export default class SimpleTab extends Widget {
   }
 
   _renderIconId(iconId) {
-    if (this.iconId) {
-      this._getOrCreate$IconContainer().icon(this.iconId);
-    } else {
-      this._remove$IconContainer();
-    }
+    this.$iconContainer.icon(this.iconId);
   }
 
   setClosable(closable) {
@@ -245,9 +150,8 @@ export default class SimpleTab extends Widget {
         return;
       }
       this.$container.addClass('closable');
-      this.$close = this._getOrCreate$StatusContainer().appendDiv('status closer')
+      this.$close = this.$container.appendDiv('closer')
         .on('click', this._onClose.bind(this));
-      this._statusContainerUsageCounter++;
     } else {
       if (!this.$close) {
         return;
@@ -255,10 +159,6 @@ export default class SimpleTab extends Widget {
       this.$container.removeClass('closable');
       this.$close.remove();
       this.$close = null;
-      this._statusContainerUsageCounter--;
-      if (this._statusContainerUsageCounter === 0) {
-        this._remove$StatusContainer();
-      }
     }
   }
 
@@ -288,7 +188,7 @@ export default class SimpleTab extends Widget {
       if (this.$saveNeeded) {
         return;
       }
-      this.$saveNeeded = this._getOrCreate$StatusContainer().prependDiv('status save-needer');
+      this.$saveNeeded = this.$statusContainer.prependDiv('status save-needer');
       this._statusContainerUsageCounter++;
     } else {
       if (!this.$saveNeeded) {
@@ -298,9 +198,6 @@ export default class SimpleTab extends Widget {
       this.$saveNeeded.remove();
       this.$saveNeeded = null;
       this._statusContainerUsageCounter--;
-      if (this._statusContainerUsageCounter === 0) {
-        this._remove$StatusContainer();
-      }
     }
   }
 
@@ -321,18 +218,15 @@ export default class SimpleTab extends Widget {
         if (!status || !status.iconId) {
           return;
         }
-        let $statusIcon = this._getOrCreate$StatusContainer().appendIcon(status.iconId, 'status');
+        let $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
         if (status.cssClass()) {
           $statusIcon.addClass(status.cssClass());
         }
         this._statusIconDivs.push($statusIcon);
       });
     }
-
     this._statusContainerUsageCounter += (this._statusIconDivs.length === 0 ? 0 : 1);
-    if (this._statusContainerUsageCounter === 0) {
-      this._remove$StatusContainer();
-    }
+    this.$container.toggleClass('has-status', this._statusContainerUsageCounter > 0);
   }
 
   select() {
@@ -348,10 +242,14 @@ export default class SimpleTab extends Widget {
   }
 
   _renderSelected() {
-    this.$container.select(this.selected);
+    this.$container.toggleClass('selected', this.selected);
   }
 
   _onMouseDown(event) {
+    if (this.$close && this.$close.isOrHas(event.target)) {
+      return;
+    }
+
     this.trigger('click');
 
     // When the tab is clicked the user wants to execute the action and not see the tooltip

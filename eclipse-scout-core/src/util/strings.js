@@ -155,9 +155,10 @@ export function encode(text) {
  * Tries to preserve the new lines. Since it does not consider the style, it won't be right in any cases.
  * A div for example always generates a new line, even if display style is not set to block.
  *
- * Options:
- * - compact: Multiple consecutive empty lines are reduced to a single empty line
- * - trim: Calls string.trim(). White space at the beginning and the end of the text gets removed.
+ * @param {object} [options]
+ * @param {boolean} [options.compact] Multiple consecutive empty lines are reduced to a single empty line. Default is false.
+ * @param {boolean}[options.trim] Calls string.trim(). White space at the beginning and the end of the text gets removed.. Default is false.
+ * @param {boolean} [options.removeFontIcons] Removes font icons. Default is false.
  */
 export function plainText(text, options) {
   if (!plainTextEncoder) { // lazy instantiation to avoid cyclic dependency errors during webpack bootstrap
@@ -457,6 +458,7 @@ export function truncateText(text, horizontalSpace, measureText) {
   return text;
 }
 
+// noinspection JSDeprecatedSymbols
 export default {
   asString,
   box,
@@ -471,6 +473,7 @@ export default {
   hasText,
   insertAt,
   join,
+  length,
   /** @deprecated */
   lowercaseFirstLetter,
   nl2br,
@@ -484,8 +487,11 @@ export default {
   repeat,
   splitMax,
   startsWith,
+  toLowerCase,
   toLowerCaseFirstLetter,
+  toUpperCase,
   toUpperCaseFirstLetter,
+  trim,
   truncateText,
   /** @deprecated */
   uppercaseFirstLetter

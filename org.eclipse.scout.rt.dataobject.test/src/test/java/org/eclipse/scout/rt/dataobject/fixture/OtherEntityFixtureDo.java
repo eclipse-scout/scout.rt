@@ -56,8 +56,13 @@ public class OtherEntityFixtureDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public Boolean isActive() {
+  public Boolean getActive() {
     return active().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public boolean isActive() {
+    return nvl(getActive());
   }
 
   @Generated("DoConvenienceMethodsGenerator")

@@ -36,6 +36,10 @@ export default class PlainTextEncoder {
     // Separate td with ' '
     text = text.replace(/<\/td>/gi, ' ');
 
+    if (options.removeFontIcons) {
+      text = text.replace(/<span\s+class="[^"]*font-icon[^"]*">[^<]*<\/span>/gmi, '');
+    }
+
     // Replace remaining tags
     text = text.replace(/<[^>]+>/gi, '');
 

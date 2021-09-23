@@ -197,6 +197,7 @@ export default class Page extends TreeNode {
   _initDetailForm(form) {
     if (form instanceof Form) {
       form.setModal(false);
+      form.setClosable(false);
     }
     if (form instanceof TileOverviewForm) {
       form.setPage(this);

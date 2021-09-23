@@ -334,6 +334,10 @@ button {
   &.borderless {
     background-color: transparent;
     border: 0;
+
+    &:focus {
+      #scout.box-shadow-focus-inset();
+    }
   }
 
   & > .text {
@@ -452,6 +456,7 @@ button {
     &:hover, &.active, &:active, &.selected {
       background-color: @button-disabled-background-color;
       border-color: @button-disabled-border-color;
+      color: @button-disabled-color;
     }
   }
 
@@ -511,17 +516,20 @@ button::-moz-focus-inner {
   font-size: 17px;
   cursor: pointer;
   color: @closer-color;
+  padding: 4px;
+  border-radius: @border-radius;
 
   &::before {
     content: @icon-remove-bold;
   }
 
-  &:active, &.active {
-    color: @active-color;
-  }
-
   &:hover {
     background-color: @hover-background-color;
+    color: @closer-hover-color;
+  }
+
+  &:active, &.active {
+    background-color: @active-background-color;
   }
 }
 
@@ -531,7 +539,7 @@ button::-moz-focus-inner {
   color: @save-needer-color;
 
   &::before {
-    content: @icon-pencil-solid;
+    content: @icon-pencil-underline-solid;
   }
 }
 

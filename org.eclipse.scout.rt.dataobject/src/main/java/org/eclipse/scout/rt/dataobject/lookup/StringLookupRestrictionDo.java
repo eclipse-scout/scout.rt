@@ -68,6 +68,13 @@ public class StringLookupRestrictionDo extends AbstractLookupRestrictionDo<Strin
 
   @Override
   @Generated("DoConvenienceMethodsGenerator")
+  public StringLookupRestrictionDo withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
   public StringLookupRestrictionDo withMaxRowCount(Integer maxRowCount) {
     maxRowCount().set(maxRowCount);
     return this;

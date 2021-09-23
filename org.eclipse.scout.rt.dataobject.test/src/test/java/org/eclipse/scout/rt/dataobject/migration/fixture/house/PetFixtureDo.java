@@ -60,7 +60,12 @@ public class PetFixtureDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public Boolean isFamilyFriendly() {
+  public Boolean getFamilyFriendly() {
     return familyFriendly().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public boolean isFamilyFriendly() {
+    return nvl(getFamilyFriendly());
   }
 }

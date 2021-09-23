@@ -68,6 +68,13 @@ public class LongLookupRestrictionDo extends AbstractLookupRestrictionDo<LongLoo
 
   @Override
   @Generated("DoConvenienceMethodsGenerator")
+  public LongLookupRestrictionDo withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
   public LongLookupRestrictionDo withMaxRowCount(Integer maxRowCount) {
     maxRowCount().set(maxRowCount);
     return this;

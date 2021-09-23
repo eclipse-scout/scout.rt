@@ -54,7 +54,7 @@ export default class Session {
       touch: Device.get().supportsOnlyTouch(),
       standalone: Device.get().isStandalone()
     });
-    this.locale = null;
+    this.locale = new Locale(); // Ensure there is always a locale even if not passed and startup request fails
     this.textMap = new TextMap();
 
     this.ready = false; // true after desktop has been completely rendered

@@ -30,6 +30,9 @@ export default class WidgetPopup extends Popup {
     this.windowPaddingY = 0;
     this.windowResizeType = 'layoutAndPosition';
     this.$dragHandle = null;
+    // Action bar on the top right corner, is used to display the close action but may also be used by popups to add custom actions.
+    // The bar will only be added automatically if the popup is closable.
+    this.$actions = null;
     this._moveHandler = this._onMove.bind(this);
     this._resizeHandler = this._onResize.bind(this);
     this._autoPositionOrig = null;
@@ -60,6 +63,7 @@ export default class WidgetPopup extends Popup {
 
   _remove() {
     this.$dragHandle = null;
+    this.$actions = null;
     super._remove();
   }
 
@@ -100,14 +104,22 @@ export default class WidgetPopup extends Popup {
   _createCloseAction() {
     return scout.create('Action', {
       parent: this,
-      cssClass: 'close-action',
+      cssClass: 'close-action menu-item',
       iconId: icons.REMOVE
     });
   }
 
   _renderClosable() {
     if (this.closeAction) {
-      this.closeAction.render();
+      if (!this.$actions) {
+        this.$actions = this.$container.appendDiv('actions');
+      }
+      this.closeAction.render(this.$actions);
+    } else {
+      if (this.$actions && this.$actions.children().length === 0) {
+        this.$actions.remove();
+        this.$actions = null;
+      }
     }
   }
 

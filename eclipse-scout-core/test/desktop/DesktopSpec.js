@@ -632,14 +632,17 @@ describe('Desktop', () => {
       expect(desktop.activeForm).toBe(null);
 
       let form = formHelper.createFormWithOneField();
+      expect(form.isShown()).toBe(false);
       desktop.showForm(form);
       expect(form.rendered).toBe(true);
       expect(desktop.activeForm).toBe(form);
+      expect(form.isShown()).toBe(true);
 
       let anotherForm = formHelper.createFormWithOneField();
       desktop.showForm(anotherForm);
       expect(form.rendered).toBe(true);
       expect(desktop.activeForm).toBe(anotherForm);
+      expect(form.isShown()).toBe(true);
     });
 
     it('adds a view to the bench if displayHint is View', () => {
@@ -650,7 +653,37 @@ describe('Desktop', () => {
 
       expect(form.rendered).toBe(true);
       expect(form.parent).toBe(tabBox);
+      expect(form.isShown()).toBe(true);
       expect(form.$container.parent()[0]).toBe(tabBox.$viewContent[0]);
+    });
+  });
+
+  describe('hideForm', () => {
+    beforeEach(() => {
+      session._renderDesktop();
+    });
+
+    it('hides the form', () => {
+      let form = formHelper.createFormWithOneField();
+      desktop.showForm(form);
+      expect(form.isShown()).toBe(true);
+
+      desktop.hideForm(form);
+      expect(form.rendered).toBe(false);
+      expect(form.isShown()).toBe(false);
+      expect(form.destroyed).toBe(false);
+    });
+
+    it('removes the view from the bench if displayHint is View', () => {
+      let form = formHelper.createFormWithOneField();
+      form.displayHint = Form.DisplayHint.VIEW;
+      desktop.showForm(form);
+      expect(form.isShown()).toBe(true);
+
+      desktop.hideForm(form);
+      expect(form.rendered).toBe(false);
+      expect(form.isShown()).toBe(false);
+      expect(form.destroyed).toBe(false);
     });
   });
 

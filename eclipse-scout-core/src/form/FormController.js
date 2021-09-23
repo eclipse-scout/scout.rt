@@ -26,6 +26,7 @@ export default class FormController {
    * Adds the given view or dialog to this controller and renders it.
    * position is only used if form is a view. this position determines at which position the tab is placed.
    * if select view is set the view rendered in _renderView is also selected.
+   * @param {Form} form
    */
   registerAndRender(form, position, selectView) {
     scout.assertProperty(form, 'displayParent');
@@ -38,12 +39,23 @@ export default class FormController {
     }
   }
 
+  /**
+   * @param {Form} form
+   */
+  isFormShown(form) {
+    if (form.isView()) {
+      return this.displayParent.views.indexOf(form) > -1;
+    }
+    return this.displayParent.dialogs.indexOf(form) > -1;
+  }
+
   _renderPopupWindow(formAdapterId, position) {
     throw new Error('popup window only supported by DesktopFormController');
   }
 
   /**
    * Removes the given view or dialog from this controller and DOM. However, the form's adapter is not destroyed. That only happens once the Form is closed.
+   * @param {Form} form
    */
   unregisterAndRemove(form) {
     if (!form) {

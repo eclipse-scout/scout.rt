@@ -78,6 +78,7 @@ export default class FormMenu extends Menu {
   _adaptForm(form) {
     form.setDisplayHint(Form.DisplayHint.VIEW);
     form.setModal(false);
+    form.setClosable(false);
   }
 
   /**

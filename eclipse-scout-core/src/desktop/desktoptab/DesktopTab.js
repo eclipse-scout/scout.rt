@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, scout, SimpleTab} from '../../index';
+import {arrays, HAlign, scout, SimpleTab} from '../../index';
 
 export default class DesktopTab extends SimpleTab {
 
@@ -22,6 +22,17 @@ export default class DesktopTab extends SimpleTab {
     this.$container.on('contextmenu', this._onContextMenu.bind(this));
     this.$container.prependDiv('edge left');
     this.$container.appendDiv('edge right');
+  }
+
+  _renderClosable() {
+    super._renderClosable();
+    if (this.closable && this.view.closeKeyStroke) {
+      this.view.closeKeyStroke.renderingHints = {
+        hAlign: HAlign.RIGHT,
+        render: () => !!this.$close,
+        $drawingArea: () => this.$close
+      };
+    }
   }
 
   _onContextMenu(event) {
@@ -51,16 +62,12 @@ export default class DesktopTab extends SimpleTab {
   }
 
   _onCloseAll() {
-    let openViews = this.parent.tabs.map(desktopTab => {
-      return desktopTab.view;
-    });
+    let openViews = this.parent.tabs.map(desktopTab => desktopTab.view);
     this.session.desktop.cancelViews(openViews);
   }
 
   _onCloseOther() {
-    let openViews = this.parent.tabs.map(desktopTab => {
-      return desktopTab.view;
-    });
+    let openViews = this.parent.tabs.map(desktopTab => desktopTab.view);
     arrays.remove(openViews, this.view);
     this.session.desktop.cancelViews(openViews);
   }

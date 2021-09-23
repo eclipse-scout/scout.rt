@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Button,
+  Button, AbortKeyStroke,
   DialogLayout,
   Event,
   FileChooserController,
@@ -17,7 +17,7 @@ import {
   FormLayout,
   GlassPaneRenderer,
   GroupBox,
-  HtmlComponent,
+  HtmlComponent, KeyStrokeContext,
   MessageBoxController,
   Rectangle,
   scout,
@@ -62,6 +62,7 @@ export default class Form extends Widget {
     this.formController = null;
     this.messageBoxController = null;
     this.fileChooserController = null;
+    this.closeKeyStroke = null;
     this._glassPaneRenderer = null;
     this._preMaximizedBounds = null;
     this._resizeHandler = this._onResize.bind(this);
@@ -107,6 +108,11 @@ export default class Form extends Widget {
     this._setStatus(this.status);
     this.cacheBoundsKey = scout.nvl(model.cacheBoundsKey, this.objectType);
     this._installLifecycle();
+    this._setClosable(this.closable);
+  }
+
+  _createKeyStrokeContext() {
+    return new KeyStrokeContext();
   }
 
   _render() {
@@ -489,7 +495,7 @@ export default class Form extends Widget {
 
   /**
    * Will call {@link #close()} if there is a close menu or button, otherwise {@link #cancel()) will be called.
- */
+   */
   _abort() {
     // Search for a close button in the menus and buttons of the root group box
     let hasCloseButton = this.rootGroupBox.controls
@@ -509,6 +515,16 @@ export default class Form extends Widget {
       this.close();
     } else {
       this.cancel();
+    }
+    this._afterAbort();
+  }
+
+  _afterAbort() {
+    if (!this.destroyed && this.isShown()) {
+      // If the form is still shown after an abort request, something (e.g. a validation message box) is probably open
+      // -> activate the form to show the validation message
+      // Checking for destroyed would be sufficient for most cases. But maybe a certain form does not really close the form on an abort request but just hides it. This is where isShown comes in.
+      this.activate();
     }
   }
 
@@ -539,6 +555,27 @@ export default class Form extends Widget {
    */
   _createRevealInvalidFieldEvent(validationResult) {
     return new Event({validationResult: validationResult});
+  }
+
+  /**
+   * Override this method to provide a key stroke which closes the form.
+   * The default implementation returns an AbortKeyStroke which handles the ESC key and calls {@link abort}.
+   * <p>
+   * The key stroke is only active if {@link this.closable} is set to true.
+   * @return KeyStroke
+   */
+  _createCloseKeyStroke() {
+    return new AbortKeyStroke(this, () => this.$close);
+  }
+
+  _setClosable(closable) {
+    this._setProperty('closable', closable);
+    if (this.closable) {
+      this.closeKeyStroke = this._createCloseKeyStroke();
+      this.keyStrokeContext.registerKeyStroke(this.closeKeyStroke);
+    } else {
+      this.keyStrokeContext.unregisterKeyStroke(this.closeKeyStroke);
+    }
   }
 
   setClosable(closable) {
@@ -629,6 +666,17 @@ export default class Form extends Widget {
 
   hide() {
     this.session.desktop.hideForm(this);
+  }
+
+  /**
+   * Checks whether the form is shown, which means whether a form has been added to the form stack of the display parent, e.g. by using {@link showForm}.<br>
+   * It does not necessarily mean the user can see the content of the form for sure,
+   * e.g. if the form is opened as a view the tab may be inactive because another view is active, or in case of a dialog it may be hidden behind another dialog or shown in an inactive view.
+   *
+   * @returns {boolean}
+   */
+  isShown() {
+    return this.session.desktop.isFormShown(this);
   }
 
   _renderHeader() {

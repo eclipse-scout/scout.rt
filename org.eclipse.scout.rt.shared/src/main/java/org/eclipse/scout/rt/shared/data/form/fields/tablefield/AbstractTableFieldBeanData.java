@@ -114,6 +114,11 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData i
     return row;
   }
 
+  public void addRow(AbstractTableRowData rowData) {
+    m_rowList.add(rowData);
+    setValueSet(true);
+  }
+
   /**
    * @return Creates a new {@link AbstractTableRowData} without adding it to this {@link AbstractTableFieldBeanData}.
    *         Its actual type is the one returned by {@link #getRowType()}.

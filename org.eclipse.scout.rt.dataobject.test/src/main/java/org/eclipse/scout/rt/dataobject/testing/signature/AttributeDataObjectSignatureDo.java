@@ -68,8 +68,13 @@ public class AttributeDataObjectSignatureDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public Boolean isList() {
+  public Boolean getList() {
     return list().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public boolean isList() {
+    return nvl(getList());
   }
 
   @Generated("DoConvenienceMethodsGenerator")
