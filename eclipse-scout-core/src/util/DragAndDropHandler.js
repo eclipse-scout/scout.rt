@@ -20,6 +20,7 @@ export default class DragAndDropHandler {
     this.dropMaximumSize = null;
     this.target = null;
     this.onDrop = null;
+    this.validateFiles = null;
 
     $.extend(this, options);
     this.supportedScoutTypes = arrays.ensure(options.supportedScoutTypes);
@@ -75,22 +76,27 @@ export default class DragAndDropHandler {
         return;
       }
       try {
-        this.validateFiles(files);
+        this.validateFiles(files, this._validateFiles.bind(this));
       } catch (error) {
-        this._validationFailed(files, error);
+        this._validationFailed(error);
         return;
       }
       event.stopPropagation();
       event.preventDefault();
-      let formattedDropEvent = {
+      this.onDrop({
         originalEvent: event,
         files: files
-      };
-      this.onDrop(formattedDropEvent);
+      });
     }
   }
 
-  validateFiles(files) {
+  /**
+   *
+   * @param {File[]} files
+   * @private
+   * @throws {dropValidationErrorMessage} validationErrorMessage
+   */
+  _validateFiles(files) {
     if (!this.dropMaximumSize) {
       return;
     }
@@ -104,17 +110,17 @@ export default class DragAndDropHandler {
   }
 
   /**
-   * @param {object} error object containing message and optionally a title
+   * @param {dropValidationErrorMessage} error
    */
-  _validationFailed(files, error) {
+  _validationFailed(error) {
     $.log.isDebugEnabled() && $.log.debug('File validation failed', error);
     let title = '';
     let message = 'Invalid files';
-    if (typeof error === 'object') {
+    if (error) {
       title = error.title || title;
       message = error.message || message;
     }
-    MessageBoxes.createOk(this.target)
+    return MessageBoxes.createOk(this.target)
       .withSeverity(Status.Severity.ERROR)
       .withHeader(title)
       .withBody(message)
@@ -129,4 +135,12 @@ export default class DragAndDropHandler {
         this.allowedTypes ? this.allowedTypes() : undefined);
     }
   }
+
+  // ----------------- TYPEDEF -----------------
+
+  /**
+   * @typedef dropValidationErrorMessage
+   * @property {string} title
+   * @property {string} message
+   */
 }

@@ -70,13 +70,10 @@ export default class ImageField extends FormField {
     }
   }
 
-  _installDragAndDropHandler() {
-    if (this.dragAndDropHandler) {
-      return;
-    }
-    // add drag and drop event listeners to field container, img field might be hidden (e.g. if no image has been set)
-    this.dragAndDropHandler = this._createDragAndDropHandler();
-    this.dragAndDropHandler.install(this.$fieldContainer);
+  _getDragAndDropHandlerOptions() {
+    let options = super._getDragAndDropHandlerOptions();
+    options.container = () => this.$fieldContainer;
+    return options;
   }
 
   setImageUrl(imageUrl) {

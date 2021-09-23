@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DragAndDropHandler} from '../index';
+import {arrays, dragAndDrop, DragAndDropHandler} from '../index';
 
 const SCOUT_TYPES = {
   FILE_TRANSFER: 1 << 0, // IDNDSupport.TYPE_FILE_TRANSFER (NOSONAR)
@@ -38,7 +38,7 @@ export function scoutTypeToDragTypeMapping(scoutTypesArray) {
  * Check if specific scout type is supported by dataTransfer, if event is not handled by this field (desktop might handle it)
  *
  * @param event including event.originalEvent.dataTransfer
- * @param fieldAllowedTypes allowed types on field (integer, bitwise comparision used)
+ * @param fieldAllowedTypes allowed types on field (integer, bitwise comparison used)
  * @param scoutTypeArray e.g. FILE_TRANSFER
  */
 export function verifyDataTransferTypesScoutTypes(event, scoutTypeArray, fieldAllowedTypes) {
@@ -116,10 +116,86 @@ export function dataTransferTypesContains(dataTransfer, needleArray) {
   return false;
 }
 
-export function handler(target, options) {
-  options = options || {};
-  options.target = target;
+/**
+ *
+ * @param {DragAndDropOptions} options
+ * @return {null|DragAndDropHandler}
+ */
+export function handler(options) {
+  if (!options || !options.target) {
+    return null;
+  }
   return new DragAndDropHandler(options);
+}
+
+/**
+ * installs or uninstalls a {@link DragAndDropHandler} on the target.
+ *
+ * @param {DragAndDropOptions} options
+ */
+export function installOrUninstallDragAndDropHandler(options) {
+  if (!options.target) {
+    return;
+  }
+  options = $.extend({}, _createDragAndDropHandlerOptions(options.target), options);
+  if (options.doInstall()) {
+    _installDragAndDropHandler(options);
+  } else {
+    uninstallDragAndDropHandler(options.target);
+  }
+}
+
+/**
+ *
+ * @param {DragAndDropOptions} options
+ * @private
+ */
+export function _installDragAndDropHandler(options) {
+  if (options.target.dragAndDropHandler) {
+    return;
+  }
+  options.target.dragAndDropHandler = handler(options);
+  if (!options.target.dragAndDropHandler) {
+    return;
+  }
+  let $container = options.container();
+  if (!$container) {
+    return;
+  }
+  options.target.dragAndDropHandler.install($container, options.selector);
+}
+
+/**
+ *
+ * @param {DragAndDropTarget} target
+ * @private
+ */
+export function _createDragAndDropHandlerOptions(target) {
+  return {
+    target: target,
+    supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    validateFiles: (files, defaultValidator) => defaultValidator(files),
+    onDrop: (files) => {
+    },
+    dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    dropMaximumSize: () => target.dropMaximumSize,
+    doInstall: () => target.enabledComputed,
+    container: () => target.$container,
+    additionalDropProperties: (event) => {
+    }
+  };
+}
+
+/**
+ * uninstalls a {@link DragAndDropHandler} from the target. If no handler is installed, this function does nothing.
+ * @param {DragAndDropTarget} target the target widget.
+ */
+export function uninstallDragAndDropHandler(target) {
+  if (!target || !target.dragAndDropHandler) {
+    return;
+  }
+  target.dragAndDropHandler.uninstall();
+  target.dragAndDropHandler = null;
 }
 
 export default {
@@ -128,7 +204,71 @@ export default {
   dataTransferTypesContains,
   dataTransferTypesContainsScoutTypes,
   handler,
+  installOrUninstallDragAndDropHandler,
   scoutTypeToDragTypeMapping,
+  uninstallDragAndDropHandler,
   verifyDataTransferTypes,
   verifyDataTransferTypesScoutTypes
 };
+
+// ----------------- TYPEDEF -----------------
+
+/**
+ * @typedef {Widget} DragAndDropTarget
+ * @property {number} [dropMaximumSize] default drop maximum size used in {@link DragAndDropOptions.dropMaximumSize}. If the target object contains a different field or function to retrieve this value override the supplier.
+ * @property {boolean} [enabledComputed]  default install/uninstall criteria used in {@link DragAndDropOptions.doInstall}. If the target object contains a different field or function to retrieve this value override the supplier.
+ * @property {$} [$container] default container used in {@link DragAndDropOptions.container}. If the target object contains a different field or function to retrieve this value override the supplier.
+ * @property {DragAndDropHandler} [dragAndDropHandler] installed drag & drop handler. Will be managed through {@link DragAndDropHandler}
+ */
+
+/**
+ * @callback validateFiles
+ * @param {File[]} files
+ * @param {DragAndDropHandler._validateFiles} defaultValidator
+ * @throws {dropValidationErrorMessage} validationErrorMessage
+ */
+
+/**
+ * @callback onDrop
+ * @param {File[]} files
+ */
+
+/**
+ * @callback additionalDropProperties
+ * @param {Event} event
+ * @returns {Object}
+ */
+
+/**
+ * @callback doInstall
+ * @returns {boolean}
+ */
+
+/**
+ * @callback container
+ * @returns {$}
+ */
+
+/**
+ * @callback dropType
+ * @returns {dragAndDrop.SCOUT_TYPES.FILE_TRANSFER | number}
+ */
+
+/**
+ * @callback dropMaximumSize
+ * @returns {number}
+ */
+
+/**
+ * @typedef {Object} DragAndDropOptions
+ * @property {DragAndDropTarget} target the target object where the handler shall be installed.
+ * @property {onDrop} onDrop Will be called when a valid element has been dropped.
+ * @property {doInstall} [doInstall] Determines if the drag & drop handler should be installed or uninstalled. Default implementation is checking {@link DragAndDropTarget.enabledComputed}
+ * @property {container} [container] Returns the dom container providing the necessary drag & drop events. Default is {@link DragAndDropTarget.$container}
+ * @property {SCOUT_TYPES} [supportedScoutTypes] The scout type which will be allowed to drop into the target. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
+ * @property {String} [selector] CSS selector which will be added to the event source.
+ * @property {dropType} [dropType] Returns the allowed drop type during a drop event. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
+ * @property {dropMaximumSize} [dropMaximumSize] Returns the maximum allowed size of a dropped object. Default is {@link DragAndDropTarget.dropMaximumSize}
+ * @property {validateFiles} [validateFiles] An optional function to add a custom file validation logic. Throw a {@link dropValidationErrorMessage} to indicate a failed validation. if no custom validator is installed, the default maximum file size validator is invoked.
+ * @property {additionalDropProperties} [additionalDropProperties] Returns additional drop properties to be used in {@link DragAndDropHandler.uploadFiles} as uploadProperties
+ */
