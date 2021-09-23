@@ -10,8 +10,8 @@
  */
 package org.eclipse.scout.rt.dataobject.migration;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.Bean;
@@ -27,16 +27,21 @@ public class DoStructureMigrationStatsContextData implements IDoStructureMigrati
 
   private static final Logger LOG = LoggerFactory.getLogger(DoStructureMigrationStatsContextData.class);
 
-  protected final AtomicInteger m_dataObjectsProcessed = new AtomicInteger();
-  protected final AtomicInteger m_dataObjectsChanged = new AtomicInteger();
-  protected final AtomicLong m_accumulatedMigrationDurationNano = new AtomicLong(); // nanoseconds
+  protected final AtomicLong m_startNanos = new AtomicLong();
+  protected final LongAdder m_dataObjectsProcessed = new LongAdder();
+  protected final LongAdder m_dataObjectsChanged = new LongAdder();
+  protected final LongAdder m_accumulatedMigrationDurationNano = new LongAdder(); // nanoseconds
+
+  public void start() {
+    m_startNanos.compareAndSet(0, System.nanoTime());
+  }
 
   protected void incrementDataObjectsProcessed() {
-    m_dataObjectsProcessed.incrementAndGet();
+    m_dataObjectsProcessed.increment();
   }
 
   protected void incrementDataObjectsChanged() {
-    m_dataObjectsChanged.incrementAndGet();
+    m_dataObjectsChanged.increment();
   }
 
   /**
@@ -44,7 +49,7 @@ public class DoStructureMigrationStatsContextData implements IDoStructureMigrati
    *          {@link System#nanoTime()} when migration was started
    */
   protected void addMigrationDuration(long startNano) {
-    m_accumulatedMigrationDurationNano.addAndGet(System.nanoTime() - startNano);
+    m_accumulatedMigrationDurationNano.add(System.nanoTime() - startNano);
   }
 
   /**
@@ -55,7 +60,12 @@ public class DoStructureMigrationStatsContextData implements IDoStructureMigrati
    *          {@link DoStructureMigrator#migrateDataObject(DoStructureMigrationContext, IDataObject)}.
    */
   public void printStats(String name, Integer entityCount) {
-    LOG.info("Migration of {}{} entities finished in {} milliseconds accumulated migration time. Changed {} of {} processed data objects.",
-        entityCount == null ? "" : entityCount + " ", name, StringUtility.formatNanos(m_accumulatedMigrationDurationNano.get()), m_dataObjectsChanged.get(), m_dataObjectsProcessed.get());
+    LOG.info("Migration of {}{} entities finished in {} ms (accumulated raw data object migration took {} ms). Changed {} of {} processed data objects.",
+        entityCount == null ? "" : entityCount + " ",
+        name,
+        m_startNanos.get() == 0 ? "?" : StringUtility.formatNanos(System.nanoTime() - m_startNanos.get()),
+        StringUtility.formatNanos(m_accumulatedMigrationDurationNano.sum()),
+        m_dataObjectsChanged.sum(),
+        m_dataObjectsProcessed.sum());
   }
 }
