@@ -39,6 +39,9 @@ export default class SimpleTab extends Widget {
     this._viewPropertyChangeListener = this._onViewPropertyChange.bind(this);
     this._viewRemoveListener = this._onViewRemove.bind(this);
     this._glassPaneContribution = element => {
+      if (!this.$close) {
+        return null;
+      }
       // glass pane will be added as direct child which does not prevent clicks and hover effects -> glasspane-parent marker needed
       this.$close.addClass('glasspane-parent');
       return this.$close;
