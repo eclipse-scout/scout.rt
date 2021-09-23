@@ -232,7 +232,6 @@ export default class RadioButtonGroup extends ValueField {
     }, this);
     this._provideTabIndex(); // depends on rendered fields
     this.invalidateLogicalGrid();
-    this.validateLayoutTree(); // prevent flickering
   }
 
   /**

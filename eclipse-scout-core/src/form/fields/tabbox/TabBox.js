@@ -176,7 +176,7 @@ export default class TabBox extends CompositeField {
       this.selectedTab.on('propertyChange:scrollTop', this._selectedTabScrollTopChangeHandler);
     }
     if (this.rendered) {
-      HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
+      HtmlComponent.get(this._$tabContent).invalidateLayoutTree();
     }
   }
 

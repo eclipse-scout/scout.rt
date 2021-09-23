@@ -494,6 +494,10 @@ export default class Device {
     });
   }
 
+  supportsMicrotask() {
+    return typeof queueMicrotask === 'function';
+  }
+
   hasPrettyScrollbars() {
     return this.supportsFeature('_prettyScrollbars', property => {
       return this.scrollbarWidth === 0;

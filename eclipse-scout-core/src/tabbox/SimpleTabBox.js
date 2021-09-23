@@ -119,7 +119,9 @@ export default class SimpleTabBox extends Widget {
       view: view
     });
 
-    this.revalidateLayout();
+    if (this.rendered) {
+      this.viewContent.invalidateLayoutTree();
+    }
   }
 
   setLayoutData(layoutData) {
@@ -129,15 +131,6 @@ export default class SimpleTabBox extends Widget {
 
   getLayoutData() {
     return this.layoutData;
-  }
-
-  revalidateLayout() {
-    if (this.rendered) {
-      this.viewContent.invalidateLayoutTree();
-      // Layout immediate to prevent 'laggy' form visualization,
-      // but not initially while desktop gets rendered because it will be done at the end anyway
-      this.viewContent.validateLayoutTree();
-    }
   }
 
   /**
@@ -255,7 +248,6 @@ export default class SimpleTabBox extends Widget {
         }
         if (this.rendered) {
           this.viewContent.invalidateLayoutTree();
-          this.viewContent.validateLayoutTree();
         }
       }
     }

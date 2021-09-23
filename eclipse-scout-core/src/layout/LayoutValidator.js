@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays} from '../index';
+import {arrays, Device} from '../index';
 
 export default class LayoutValidator {
 
@@ -67,10 +67,20 @@ export default class LayoutValidator {
   }
 
   _scheduleValidation() {
-    if (this._validateTimeoutId === null) {
-      this._validateTimeoutId = setTimeout(() => {
-        this.validate();
+    if (this._validateTimeoutId !== null) {
+      // Task already scheduled
+      return;
+    }
+    if (Device.get().supportsMicrotask()) {
+      this._validateTimeoutId = true; // boolean is sufficient, an id is only necessary for legacy purpose when setTimeout is used
+      queueMicrotask(() => {
+        // Validate, but only if still required
+        if (this._validateTimeoutId) {
+          this.validate();
+        }
       });
+    } else {
+      this._validateTimeoutId = setTimeout(() => this.validate());
     }
   }
 
@@ -78,7 +88,9 @@ export default class LayoutValidator {
    * Layouts all invalid components (as long as they haven't been removed).
    */
   validate() {
-    clearTimeout(this._validateTimeoutId);
+    if (!Device.get().supportsMicrotask()) {
+      clearTimeout(this._validateTimeoutId);
+    }
     this._validateTimeoutId = null;
     this._invalidComponents.slice().forEach(function(comp) {
       if (comp.validateLayout()) {
