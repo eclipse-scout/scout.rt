@@ -498,6 +498,10 @@ export default class Device {
     return typeof queueMicrotask === 'function';
   }
 
+  supportsIntersectionObserver() {
+    return typeof IntersectionObserver === 'function';
+  }
+
   hasPrettyScrollbars() {
     return this.supportsFeature('_prettyScrollbars', property => {
       return this.scrollbarWidth === 0;
