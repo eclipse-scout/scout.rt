@@ -178,7 +178,7 @@ export default class FileChooser extends Widget {
 
   _remove() {
     this._glassPaneRenderer.removeGlassPanes();
-    this._uninstallDragAndDropHandler();
+    dragAndDrop.uninstallDragAndDropHandler(this);
     this._uninstallFocusContext();
     super._remove();
   }
@@ -189,44 +189,6 @@ export default class FileChooser extends Widget {
 
   _uninstallFocusContext() {
     this.session.focusManager.uninstallFocusContext(this.$container);
-  }
-
-  _createDragAndDropHandler() {
-    return dragAndDrop.handler(this, {
-      supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      validateFiles: () => {
-      },
-      onDrop: event => this.addFiles(event.files),
-      dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      dropMaximumSize: () => this.maximumUploadSize
-    });
-  }
-
-  _installOrUninstallDragAndDropHandler() {
-    if (this.enabledComputed) {
-      this._installDragAndDropHandler();
-    } else {
-      this._uninstallDragAndDropHandler();
-    }
-  }
-
-  _installDragAndDropHandler() {
-    if (this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler = this._createDragAndDropHandler();
-    if (!this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler.install(this.$container);
-  }
-
-  _uninstallDragAndDropHandler() {
-    if (!this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler.uninstall();
-    this.dragAndDropHandler = null;
   }
 
   /**
@@ -293,6 +255,17 @@ export default class FileChooser extends Widget {
       this.displayParent.fileChooserController.unregisterAndRemove(this);
     }
     this.destroy();
+  }
+
+  _installOrUninstallDragAndDropHandler() {
+    dragAndDrop.installOrUninstallDragAndDropHandler(this,
+      {
+        onDrop: event => this.addFiles(event.files),
+        dropMaximumSize: () => this.maximumUploadSize,
+        // disable file validation
+        validateFiles: () => {
+        }
+      });
   }
 
   browse() {

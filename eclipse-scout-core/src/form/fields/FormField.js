@@ -268,7 +268,7 @@ export default class FormField extends Widget {
     this._removeIcon();
     this.removeMandatoryIndicator();
     this._removeDisabledCopyOverlay();
-    this._uninstallDragAndDropHandler();
+    dragAndDrop.uninstallDragAndDropHandler(this);
   }
 
   setFieldStyle(fieldStyle) {
@@ -1306,40 +1306,17 @@ export default class FormField extends Widget {
     this.setProperty('dropMaximumSize', dropMaximumSize);
   }
 
-  _createDragAndDropHandler() {
-    return dragAndDrop.handler(this, {
-      supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      onDrop: event => this.trigger('drop', event),
-      dropType: () => this.dropType,
-      dropMaximumSize: () => this.dropMaximumSize
-    });
-  }
-
   _installOrUninstallDragAndDropHandler() {
-    if (this.dropType && this.enabledComputed) {
-      this._installDragAndDropHandler();
-    } else {
-      this._uninstallDragAndDropHandler();
-    }
+    dragAndDrop.installOrUninstallDragAndDropHandler(this, this._getDragAndDropHandlerOptions());
   }
 
-  _installDragAndDropHandler() {
-    if (this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler = this._createDragAndDropHandler();
-    if (!this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler.install(this.$field || this.$container);
-  }
-
-  _uninstallDragAndDropHandler() {
-    if (!this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler.uninstall();
-    this.dragAndDropHandler = null;
+  _getDragAndDropHandlerOptions() {
+    return {
+      doInstall: () => this.dropType && this.enabledComputed,
+      container: () => this.$field || this.$container,
+      dropType: () => this.dropType,
+      onDrop: event => this.trigger('drop', event)
+    };
   }
 
   _updateDisabledCopyOverlay() {

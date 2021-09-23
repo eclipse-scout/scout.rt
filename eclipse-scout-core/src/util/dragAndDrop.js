@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DragAndDropHandler} from '../index';
+import {arrays, dragAndDrop, DragAndDropHandler} from '../index';
 
 const SCOUT_TYPES = {
   FILE_TRANSFER: 1 << 0, // IDNDSupport.TYPE_FILE_TRANSFER (NOSONAR)
@@ -116,10 +116,90 @@ export function dataTransferTypesContains(dataTransfer, needleArray) {
   return false;
 }
 
-export function handler(target, options) {
+export function handler(options) {
   options = options || {};
-  options.target = target;
+  if (!options.target) {
+    return null;
+  }
   return new DragAndDropHandler(options);
+}
+
+/**
+ * installs or uninstalls a drag & drop handler on the target.
+ *
+ * @param target: the target object where the handler shall be installed.
+ * @param options:
+ *   [doInstall]
+ *   function which determines if the drag & drop handler should be installed or uninstalled
+ *   Default is checking {@code target.enabledComputed}
+ *   [container]
+ *   a function which returns the dom container providing the necessary drag & drop events
+ *   Default is using {@code target.$container}
+ *   [supportedScoutTypes]
+ *   The scout type which will be allowed to drop into the target
+ *   Default is {@code dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
+ *   [dropType]
+ *   function which returns the allowed drop type during a drop event
+ *   Default is supplying {@code dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
+ *   [dropMaximumSize]
+ *   function which returns the maximum allowed size of a dropped object
+ *   Default is {@code target.dropMaximumSize}
+ *   [customValidateFiles(files)]
+ *   an optional function to add a custom file validation logic.
+ *   use {@code throw {title: title, message: message}; } to indicate a failed validation.
+ *   [onDrop(files)]
+ *   function which will be called when a valid element has been dropped
+ *   [additionalDropProperties]
+ *   Optional argument which will be used in {@link DragAndDropHandler.uploadFiles} as uploadProperties.
+ */
+export function installOrUninstallDragAndDropHandler(target, options) {
+  if (!target) {
+    return;
+  }
+  options = $.extend({}, _createDragAndDropHandlerOptions(target), options);
+  if (options.doInstall()) {
+    _installDragAndDropHandler(options);
+  } else {
+    uninstallDragAndDropHandler(target);
+  }
+}
+
+export function _installDragAndDropHandler(options) {
+  if (options.target.dragAndDropHandler) {
+    return;
+  }
+  options.target.dragAndDropHandler = handler(options);
+  if (!options.target.dragAndDropHandler) {
+    return;
+  }
+  let $container = options.container();
+  if (!$container) {
+    return;
+  }
+  options.target.dragAndDropHandler.install($container, options.selector);
+}
+
+export function _createDragAndDropHandlerOptions(target) {
+  return {
+    target: target,
+    supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    customValidateFiles: () => {
+    },
+    onDrop: () => {
+    },
+    dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    dropMaximumSize: () => target.dropMaximumSize,
+    doInstall: () => target.enabledComputed,
+    container: () => target.$container
+  };
+}
+
+export function uninstallDragAndDropHandler(target) {
+  if (!target || !target.dragAndDropHandler) {
+    return;
+  }
+  target.dragAndDropHandler.uninstall();
+  target.dragAndDropHandler = null;
 }
 
 export default {
@@ -128,7 +208,9 @@ export default {
   dataTransferTypesContains,
   dataTransferTypesContainsScoutTypes,
   handler,
+  installOrUninstallDragAndDropHandler,
   scoutTypeToDragTypeMapping,
+  uninstallDragAndDropHandler,
   verifyDataTransferTypes,
   verifyDataTransferTypesScoutTypes
 };

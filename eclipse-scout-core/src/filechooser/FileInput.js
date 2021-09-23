@@ -152,50 +152,23 @@ export default class FileInput extends Widget {
   }
 
   _remove() {
-    this._uninstallDragAndDropHandler();
+    dragAndDrop.uninstallDragAndDropHandler(this);
     super._remove();
   }
 
-  _createDragAndDropHandler() {
-    return dragAndDrop.handler(this, {
-      supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      validateFiles: () => {
-      },
-      onDrop: event => {
-        if (event.files.length >= 1) {
-          this._setFiles(event.files);
-        }
-      },
-      dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-      dropMaximumSize: () => this.maximumUploadSize
-    });
-  }
-
   _installOrUninstallDragAndDropHandler() {
-    if (this.enabledComputed) {
-      this._installDragAndDropHandler();
-    } else {
-      this._uninstallDragAndDropHandler();
-    }
-  }
-
-  _installDragAndDropHandler() {
-    if (this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler = this._createDragAndDropHandler();
-    if (!this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler.install(this.$container);
-  }
-
-  _uninstallDragAndDropHandler() {
-    if (!this.dragAndDropHandler) {
-      return;
-    }
-    this.dragAndDropHandler.uninstall();
-    this.dragAndDropHandler = null;
+    dragAndDrop.installOrUninstallDragAndDropHandler(this,
+      {
+        onDrop: event => {
+          if (event.files.length >= 1) {
+            this._setFiles(event.files);
+          }
+        },
+        dropMaximumSize: () => this.maximumUploadSize,
+        // disable file validation
+        validateFiles: () => {
+        }
+      });
   }
 
   clear() {

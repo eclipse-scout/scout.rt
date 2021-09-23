@@ -20,6 +20,7 @@ export default class DragAndDropHandler {
     this.dropMaximumSize = null;
     this.target = null;
     this.onDrop = null;
+    this.customValidateFiles = null;
 
     $.extend(this, options);
     this.supportedScoutTypes = arrays.ensure(options.supportedScoutTypes);
@@ -76,17 +77,19 @@ export default class DragAndDropHandler {
       }
       try {
         this.validateFiles(files);
+        if (this.customValidateFiles) {
+          this.customValidateFiles(files);
+        }
       } catch (error) {
         this._validationFailed(files, error);
         return;
       }
       event.stopPropagation();
       event.preventDefault();
-      let formattedDropEvent = {
+      this.onDrop({
         originalEvent: event,
         files: files
-      };
-      this.onDrop(formattedDropEvent);
+      });
     }
   }
 
