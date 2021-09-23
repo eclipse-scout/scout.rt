@@ -719,7 +719,6 @@ export default class TableFooter extends Widget {
       }
 
       this.table.filter();
-      this.validateLayoutTree();
     }
   }
 

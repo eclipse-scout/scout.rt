@@ -450,7 +450,6 @@ export default class TileGrid extends Widget {
     if (this.rendered) {
       this._renderTileDelta();
       this._renderTileOrder(currentTiles);
-      this.validateLayoutTree(); // prevent flickering in virtual mode
     }
   }
 

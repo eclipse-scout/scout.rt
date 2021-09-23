@@ -94,8 +94,6 @@ export default class DesktopBench extends Widget {
       }, this);
       // ensure the correct view tab area is visible (header or center part)
       this.headerTabAreaController._onViewsChanged();
-      // prevent flickering
-      this.validateLayoutTree();
     }
   }
 
@@ -267,7 +265,6 @@ export default class DesktopBench extends Widget {
     if (this.changingCounter === 0 && this.changed && this.rendered) {
       this.htmlComp.layout.reset();
       this.htmlComp.invalidateLayoutTree();
-      this.htmlComp.validateLayoutTree();
       this.changed = false;
     }
   }
@@ -293,7 +290,6 @@ export default class DesktopBench extends Widget {
       this.htmlComp.layout.setCacheKey(this.layoutCacheKey);
       this.htmlComp.layout.reset();
       this.htmlComp.invalidateLayoutTree();
-      this.htmlComp.validateLayoutTree();
     }
     this._updateSplitterMovable();
   }
@@ -673,9 +669,6 @@ export default class DesktopBench extends Widget {
         } else {
           this.htmlComp.layout.reset();
           this.htmlComp.invalidateLayoutTree();
-          // Layout immediately to prevent 'laggy' form visualization,
-          // but not initially while desktop gets rendered because it will be done at the end anyway
-          this.htmlComp.validateLayoutTree();
         }
       }
     }
@@ -730,8 +723,6 @@ export default class DesktopBench extends Widget {
         } else {
           this.htmlComp.layout.reset();
           this.htmlComp.invalidateLayoutTree();
-          // Layout immediately to make sure column width is adjusted along with the removal and not delayed (Scout JS)
-          this.htmlComp.validateLayoutTree();
         }
       }
     }

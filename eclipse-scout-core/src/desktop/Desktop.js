@@ -797,8 +797,6 @@ export default class Desktop extends Widget {
       }
     } else {
       this.setNavigationVisible(true);
-      // Layout immediately to have view tabs positioned correctly before animation starts
-      this.validateLayoutTree();
     }
   }
 
