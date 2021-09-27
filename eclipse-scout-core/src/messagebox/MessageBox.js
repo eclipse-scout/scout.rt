@@ -137,7 +137,8 @@ export default class MessageBox extends Widget {
     this.$buttons.on('copy', this._onCopy.bind(this));
 
     this._installScrollbars({
-      axis: 'y'
+      axis: 'y',
+      scrollShadow: 'none'
     });
 
     // Render properties
@@ -200,6 +201,7 @@ export default class MessageBox extends Widget {
   _renderHeader() {
     this.$header.html(strings.nl2br(this.header));
     this.$header.setVisible(this.header || this.iconId);
+    this.$header.toggleClass('has-text', strings.hasText(this.header));
   }
 
   _renderBody() {

@@ -76,10 +76,12 @@
 @info-color: @palette-blue-1-1;
 @ok-color: @palette-green-3;
 @error-background-color: @background-color;
+@error-box-shadow-focus-color: mix(@error-color, @palette-black, 50%);
+@warning-box-shadow-focus-color: mix(@warning-color, @palette-black, 50%);
+@ok-box-shadow-focus-color: mix(@ok-color, @palette-black, 50%);
 @focus-border-color: @focus-color;
 @focus-color: @palette-blue-1-1;
-@focus-box-shadow-color: @focus-color;
-@focus-box-shadow-size: 2px;
+@focus-box-shadow-color: darken(@focus-color, 30%);
 @hover-background-color: fade(@palette-white, 15%);
 @highlight-inverted-background-color: @palette-orange-5;
 @hover-color: @active-color;
@@ -93,6 +95,8 @@
 @label-color: @palette-gray-5-1;
 @panel-background-color: @palette-gray-8;
 @popup-background-color: #283438;
+@selected-background-color: @palette-blue-1-1;
+@selected-hover-background-color: darken(@selected-background-color, 10%);
 @text-color-dark: @palette-black;
 @text-color: @palette-gray-1;
 @text-disabled-color: @disabled-color;
@@ -113,7 +117,6 @@
 @button-border-color: @palette-blue-4;
 @button-color: @palette-blue-1-1;
 @button-disabled-border-color: @disabled-color;
-@button-selected-color: @palette-black;
 @calendar-component-intro-color: @palette-gray-2;
 @calendar-day-color: @text-color;
 @calendar-mode-selected-background-color: @border-color;
@@ -145,6 +148,7 @@
 @dashboard-tile-menu-hover-color: @hover-color;
 @dashboard-tile-menu-active-color: @hover-color;
 @default-button-background-color: @selected-background-color;
+@default-button-color: @palette-black;
 @desktop-header-background-color: @palette-gray-4;
 @desktop-header-border-color: @palette-gray-8;
 @desktop-notification-background-color: @palette-gray-4;

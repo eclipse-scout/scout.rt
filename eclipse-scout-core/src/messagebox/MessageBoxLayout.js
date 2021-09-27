@@ -25,6 +25,12 @@ export default class MessageBoxLayout extends AbstractLayout {
       messageBoxMargins = htmlComp.margins();
 
     messageBoxSize = DialogLayout.fitContainerInWindow(windowSize, currentBounds.point(), messageBoxSize, messageBoxMargins);
+
+    // Add markers to be able to style the msg box in a different way when it uses the full width or height
+    $container
+      .toggleClass('full-width', (currentBounds.x === 0 && messageBoxMargins.horizontal() === 0 && windowSize.width === messageBoxSize.width))
+      .toggleClass('full-height', (currentBounds.y === 0 && messageBoxMargins.vertical() === 0 && windowSize.height === messageBoxSize.height));
+
     graphics.setSize($container, messageBoxSize);
 
     let buttonsSize = graphics.size(this.messageBox.$buttons, {
