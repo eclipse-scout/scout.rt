@@ -110,11 +110,6 @@ export default class FileChooser extends Widget {
     let $handle = this.$container.appendDiv('drag-handle');
     this.$container.draggable($handle);
 
-    this.$container.appendDiv('closable')
-      .on('click', () => {
-        this.cancel();
-      });
-
     this.$content = this.$container.appendDiv('file-chooser-content');
     this.$title = this.$content.appendDiv('file-chooser-title')
       .text(this.session.text(this.multiSelect ? 'ui.ChooseFiles' : 'ui.ChooseFile'));
