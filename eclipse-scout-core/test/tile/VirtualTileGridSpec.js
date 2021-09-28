@@ -620,7 +620,7 @@ describe('VirtualTileGrid', () => {
       tileGrid.insertTiles(tile3);
       expect(tileGrid.tiles.length).toBe(4);
       expect(tileGrid.filteredTiles.length).toBe(1);
-      $tiles = tileGrid.$container.children('.tile');
+      let $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(1);
       expect($tiles.eq(0).data('widget')).toBe(tileGrid.tiles[1]);
 
@@ -630,7 +630,7 @@ describe('VirtualTileGrid', () => {
       expect(tileGrid.filteredTiles.length).toBe(2);
       expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[1]);
       expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[4]);
-      let $tiles = tileGrid.$container.children('.tile');
+      $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(2);
       expect($tiles.eq(0).data('widget')).toBe(tileGrid.tiles[1]);
       expect($tiles.eq(1).data('widget')).toBe(tileGrid.tiles[4]);

@@ -167,7 +167,9 @@ describe('ObjectFactory', () => {
     it('uses namespace of given object type if provided', () => {
       window.my = {};
       let my = window.my;
-      my.StringField = () => {
+      my.StringField = class StringField {
+        constructor() {
+        }
       };
       let object = ObjectFactory.get()._createObjectByType('my.StringField');
       expect(object instanceof my.StringField).toBe(true);
@@ -175,7 +177,9 @@ describe('ObjectFactory', () => {
 
     it('considers variants', () => {
       window.test = {};
-      window.test.VariantStringField = () => {
+      window.test.VariantStringField = class VariantStringField {
+        constructor() {
+        }
       };
       let object = ObjectFactory.get()._createObjectByType('test.StringField:Variant');
       expect(object).not.toBe(null);
@@ -186,7 +190,9 @@ describe('ObjectFactory', () => {
     it('considers variants also within a custom namespace for object type', () => {
       window.my = {};
       let my = window.my;
-      my.VariantStringField = () => {
+      my.VariantStringField = class VariantStringField {
+        constructor() {
+        }
       };
       let object = ObjectFactory.get()._createObjectByType('my.StringField:Variant');
       expect(object instanceof my.VariantStringField).toBe(true); // objectType is 'my.StringField'
@@ -195,7 +201,9 @@ describe('ObjectFactory', () => {
     it('considers variants also within a custom namespace for variant', () => {
       window.my = {};
       let my = window.my;
-      my.VariantStringField = () => {
+      my.VariantStringField = class VariantStringField{
+        constructor() {
+        }
       };
       let object = ObjectFactory.get()._createObjectByType('StringField:my.Variant');
       expect(object instanceof my.VariantStringField).toBe(true); // objectType is '[scout.]StringField'
@@ -204,7 +212,9 @@ describe('ObjectFactory', () => {
     it('considers variants also within a custom namespace for variant and a different variant for objectType', () => {
       window.your = {};
       let your = window.your;
-      your.VariantStringField = () => {
+      your.VariantStringField = class VariantStringField {
+        constructor() {
+        }
       };
       let object = ObjectFactory.get()._createObjectByType('my.StringField:your.Variant');
       expect(object instanceof your.VariantStringField).toBe(true); // objectType is 'my.StringField'
@@ -213,7 +223,9 @@ describe('ObjectFactory', () => {
     it('can handle too many variants in objectType', () => {
       window.my = {};
       let my = window.my;
-      my.VariantStringField = () => {
+      my.VariantStringField = class VariantStringField {
+        constructor() {
+        }
       };
       let object = ObjectFactory.get()._createObjectByType('my.StringField:Variant:Foo');
       expect(object instanceof my.VariantStringField).toBe(true);
@@ -226,7 +238,9 @@ describe('ObjectFactory', () => {
         }
       };
       let my = window.my;
-      my.inner.space.StringField = () => {
+      my.inner.space.StringField = class StringField {
+        constructor() {
+        }
       };
       let object = ObjectFactory.get()._createObjectByType('my.inner.space.StringField');
       expect(object instanceof my.inner.space.StringField).toBe(true);
@@ -234,7 +248,9 @@ describe('ObjectFactory', () => {
 
     it('throws errors', () => {
       let my = window.my;
-      my.VariantStringField = () => {
+      my.VariantStringField = class VariantStringField {
+        constructor() {
+        }
       };
       expect(() => {
         ObjectFactory.get()._createObjectByType('my.StringField:NotExistingVariant');
@@ -253,7 +269,9 @@ describe('ObjectFactory', () => {
       it('tries to create an object without variant if with variant fails also with custom namespace', () => {
         window.my = {};
         let my = window.my;
-        my.StringField = () => {
+        my.StringField = class StringField {
+          constructor() {
+          }
         };
         let model = {
           variantLenient: true

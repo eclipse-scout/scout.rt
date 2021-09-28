@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DeferredGlassPaneTarget, Device, Form, scout} from '../index';
+import {arrays, DeferredGlassPaneTarget, Form, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -72,12 +72,6 @@ export default class GlassPaneRenderer {
       .on('mousedown', this._onMouseDown.bind(this));
 
     this._adjustGlassPaneSize($glassPane, $glassPaneTarget);
-
-    // This is required in touch mode, because FastClick messes up the order
-    // of mouse/click events which is especially important for TouchPopups.
-    if (Device.get().supportsOnlyTouch()) {
-      $glassPane.addClass('needsclick');
-    }
 
     // Glasspanes in popup-windows must be visible, otherwise the user cannot recognize that the popup
     // is blocked, since the widget that blocks (e.g a message-box) may be opened in the main-window.

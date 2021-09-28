@@ -21,7 +21,7 @@ module.exports = (env, args) => {
     'eclipse-scout-chart-theme': './src/eclipse-scout-chart-theme.less',
     'eclipse-scout-chart-theme-dark': './src/eclipse-scout-chart-theme-dark.less'
   };
-  config.externals = {
+  Object.assign(config.externals, {
     // Dependencies should not be included in the resulting js file.
     // The consumer has to include them by himself which gives him more control (maybe his site has already added jQuery or he wants to use another version)
     // Left side is the import name, right side the name of the global variable added by the plugin (e.g. window.jQuery)
@@ -29,7 +29,7 @@ module.exports = (env, args) => {
     '@eclipse-scout/core': 'scout',
     'chart.js': 'Chart',
     'chartjs-plugin-datalabels': 'ChartDataLabels'
-  };
+  });
   config.optimization.splitChunks = undefined; // disable splitting
 
   return config;

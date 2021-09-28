@@ -23,7 +23,6 @@ function deleteFile(filename) {
         if (unlinkErr) {
           throw unlinkErr;
         }
-        console.log(`deleted ${filename}`);
       });
     }
   });

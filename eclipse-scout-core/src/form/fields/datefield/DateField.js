@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -211,8 +211,6 @@ export default class DateField extends ValueField {
 
       this.$dateFieldIcon = fields.appendIcon(this.$field, 'date')
         .on('mousedown', this._onDateIconMouseDown.bind(this));
-      // avoid fastclick on icon. Otherwise the blur event overtakes the mousedown event.
-      this.$dateFieldIcon.addClass('needsclick');
 
     } else if (!this.hasDate && this.$dateField) {
       // Remove $dateField
@@ -265,8 +263,6 @@ export default class DateField extends ValueField {
 
       this.$timeFieldIcon = fields.appendIcon(this.$field, 'time')
         .on('mousedown', this._onTimeIconMouseDown.bind(this));
-      // avoid fastclick on icon. Otherwise the blur event overtakes the mousedown event.
-      this.$timeFieldIcon.addClass('needsclick');
 
     } else if (!this.hasTime && this.$timeField) {
       // Remove $timeField
@@ -709,8 +705,6 @@ export default class DateField extends ValueField {
         // date clear icon
         this.$dateClearIcon = this.$field.appendSpan('icon date-clear unfocusable text-field-icon action')
           .on('mousedown', this._onDateClearIconMouseDown.bind(this));
-        // avoid fastclick on icon. Otherwise the blur event overtakes the mousedown event.
-        this.$dateClearIcon.addClass('needsclick');
       }
     } else {
       if (this.$dateClearIcon) {
@@ -726,8 +720,6 @@ export default class DateField extends ValueField {
       // date clear icon
       this.$timeClearIcon = this.$field.appendSpan('icon time-clear unfocusable text-field-icon action')
         .on('mousedown', this._onTimeClearIconMouseDown.bind(this));
-      // avoid fastclick on icon. Otherwise the blur event overtakes the mousedown event.
-      this.$timeClearIcon.addClass('needsclick');
     } else if ((!this.hasTime || !this.isClearable()) && this.$timeClearIcon) {
       // Remove $dateField
       this.$timeClearIcon.remove();

@@ -207,6 +207,7 @@ export function onSwipe($element, id, onDown, onMove, onUp) {
   $element.on('remove', event => $window.off('.' + id));
 
   $element.on(touchdown(touch), event => {
+    let origPosLeft = $element.position().left;
     let acceptDown = !onDown || !!onDown({originalEvent: event, originalLeft: origPosLeft, deltaX: 0, newLeft: origPosLeft, direction: 0});
     if (!acceptDown) {
       return;
@@ -214,7 +215,6 @@ export function onSwipe($element, id, onDown, onMove, onUp) {
 
     let dragging = true;
     let origPageX = events.pageX(event);
-    let origPosLeft = $element.position().left;
     let curPosLeft = origPosLeft;
     let direction = 0;
 

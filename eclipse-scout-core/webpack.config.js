@@ -21,13 +21,13 @@ module.exports = (env, args) => {
     'eclipse-scout-core-theme': './src/index.less',
     'eclipse-scout-core-theme-dark': './src/index-dark.less'
   };
-  config.externals = {
+  Object.assign(config.externals, {
     // Dependencies should not be included in the resulting js file.
     // The consumer has to include them by himself which gives him more control (maybe his site has already added jQuery or he wants to use another version)
     // Left side is the import name, right side the name of the global variable added by the plugin (e.g. window.jQuery)
     'jquery': 'jQuery',
     'sourcemapped-stacktrace': 'sourceMappedStackTrace'
-  };
+  });
   config.optimization.splitChunks = undefined; // disable splitting
 
   return config;

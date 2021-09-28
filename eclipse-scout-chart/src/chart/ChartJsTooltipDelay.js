@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,9 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {App, Device} from '@eclipse-scout/core';
-import ChartJs from 'chart.js';
+import {Chart} from 'chart.js';
 
-ChartJs.defaults.global.plugins.tooltipDelay = {
+Chart.defaults.plugins.tooltipDelay = {
   showTooltipDelay: 700,
   resetTooltipDelay: 200
 };
@@ -19,11 +19,11 @@ ChartJs.defaults.global.plugins.tooltipDelay = {
 let pluginId = 'tooltipDelay';
 
 /**
- * copied from chart.js core_plugins.notify
+ * copied from chart.js PluginService._notify
  */
 let _notifyOthers = (chart, hook, args) => {
   // <customized>
-  let descriptors = chart.$plugins.descriptors;
+  let descriptors = chart._plugins._descriptors(chart);
   // </customized>
   let ilen = descriptors.length;
   let i, descriptor, plugin, params, method;
@@ -38,14 +38,12 @@ let _notifyOthers = (chart, hook, args) => {
     // </customized>
     method = plugin[hook];
     if (typeof method === 'function') {
-      params = [chart].concat(args || []);
-      params.push(descriptor.options);
-      if (method.apply(plugin, params) === false) {
+      params = [chart, args, descriptor.options];
+      if (method.apply(plugin, params) === false && args.cancelable) {
         return false;
       }
     }
   }
-
   return true;
 };
 
@@ -64,7 +62,7 @@ let _drawTooltip = (chart, args) => {
     return;
   }
 
-  tooltip.draw();
+  tooltip.draw(chart.ctx);
 
   // <customized>
   _notifyOthers(chart, 'afterTooltipDraw', [args]);
@@ -122,6 +120,6 @@ export default class ChartJsTooltipDelay {
 
 App.addListener('init', () => {
   if (!Device.get().supportsOnlyTouch()) {
-    ChartJs.plugins.register(new ChartJsTooltipDelay());
+    Chart.register(new ChartJsTooltipDelay());
   }
 });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, scout, Widget} from '../index';
+import {scout, Widget} from '../index';
 import $ from 'jquery';
 
 export default class GlassPane extends Widget {
@@ -21,12 +21,6 @@ export default class GlassPane extends Widget {
     this.$container = this.$parent
       .appendDiv('glasspane')
       .on('mousedown', this._onMouseDown.bind(this));
-
-    // This is required in touch mode, because FastClick messes up the order
-    // of mouse/click events which is especially important for TouchPopups.
-    if (Device.get().supportsOnlyTouch()) {
-      this.$container.addClass('needsclick');
-    }
 
     this.$parent.addClass('glasspane-parent');
     let cssPosition = this.$parent.css('position');

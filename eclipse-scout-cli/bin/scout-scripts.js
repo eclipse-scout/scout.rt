@@ -29,7 +29,7 @@ const path = require('path');
 const webpackConfigFileName = './webpack.config.js';
 const webpackCustomConfigFileName = './webpack.config.custom.js';
 const webpackYargsOptions = {
-  boolean: ['progress', 'profile', 'clean'],
+  boolean: ['progress', 'profile'],
   array: ['resDirArray', 'themes']
 };
 const karmaYargsOptions = prepareWebpackYargsOptionsForKarma();
@@ -154,8 +154,6 @@ function readWebpackConfig() {
 
 function runWebpackWatch(args) {
   const configFilePath = readWebpackConfig();
-  // Don't clean the dist folder in watch mode, may be overridden by command line argument
-  args = Object.assign({clean: false}, args);
   const {compiler, statsConfig} = createWebpackCompiler(configFilePath, args);
   compiler.watch({}, (err, stats) => logWebpack(err, stats, statsConfig));
 }

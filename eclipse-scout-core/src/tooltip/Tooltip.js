@@ -39,6 +39,7 @@ export default class Tooltip extends Widget {
     this.tooltipPosition = 'top';
     this.scrollType = 'position';
     this.htmlEnabled = false;
+    this.$arrow = null;
     this.$content = null;
     this.menus = [];
     this._addWidgetProperties(['menus']);

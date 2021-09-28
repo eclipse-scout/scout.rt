@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,11 +12,10 @@ import {App, objects, scout} from '../index';
 import $ from 'jquery';
 
 let instance;
-/* global FastClick */
 
 /**
  * Provides information about the device and its supported features.<p>
- * The informations are detected lazily.
+ * The information is detected lazily.
  *
  * @singleton
  */
@@ -45,8 +44,14 @@ export default class Device {
   static Browser = {
     UNKNOWN: 'Unknown',
     FIREFOX: 'Firefox',
+    /**
+     * Chromium based: Google Chrome, Microsoft Edge, Brave, Opera
+     */
     CHROME: 'Chrome',
     INTERNET_EXPLORER: 'InternetExplorer',
+    /**
+     * Only Legacy Edge. Chromium based Edge is reported as CHROME
+     */
     EDGE: 'Edge',
     SAFARI: 'Safari'
   };
@@ -77,10 +82,7 @@ export default class Device {
     this.scrollbarWidth = this._detectScrollbarWidth();
     this.type = this._detectType(this.userAgent);
 
-    if (this._needsFastClick()) {
-      // We use Fastclick to prevent the 300ms delay when touching an element.
-      promises.push(this._loadFastClickDeferred());
-    } else if (this.isIos()) {
+    if (this.isIos()) {
       this._installActiveHandler();
     }
 
@@ -89,37 +91,6 @@ export default class Device {
     }
 
     return promises;
-  }
-
-  /**
-   * The 300ms delay exists because the browser does not know whether the user wants to just tab or wants to zoom using double tab.
-   * Therefore most browsers add the delay only if zoom is enabled. This works for firefox, chrome (>=32) and safari/ios (>=9.3).
-   * It does not work if safari is opened in standalone/homescreen mode or in cordova. For IE (and safari since ios 9.3) it can be disabled using a css property called touch-action.
-   * By default, zooming is disabled and home screen mode is enabled, see meta tags viewport and apple-mobile-web-app-capable in head.html
-   * <p>
-   * @return {boolean} true if it is an older iOS (< 9.3), running in homescreen mode or running in a cordova container. Otherwise false.
-   */
-  _needsFastClick() {
-    if (!this.isIos()) {
-      // Currently only IOS still has the issue -> don't load the script for other systems and browsers
-      return false;
-    }
-
-    if (this.systemVersion >= 9.3 && !this.isStandalone() && this.browser !== Device.Browser.UNKNOWN) {
-      // With iOS >= 9.3 the delay is gone if zooming is disabled, but not for the home screen / web app mode.
-      // It is also necessary if running in a Cordova container (browser is set to unknown in that case)
-      return false;
-    }
-
-    // -> load only for older IOS devices or if running in home screen mode or Cordova
-    return true;
-  }
-
-  _loadFastClickDeferred() {
-    return this._loadScriptDeferred('fastclick-1.0.6.js', () => {
-      FastClick.attach(document.body);
-      $.log.isInfoEnabled() && $.log.info('FastClick script loaded and attached');
-    });
   }
 
   _loadScriptDeferred(scriptUrl, doneFunc) {
@@ -295,10 +266,9 @@ export default class Device {
     browser = scout.nvl(browser, this.browser);
     version = scout.nvl(version, this.browserVersion);
     let browsers = Device.Browser;
-    return !((browser === browsers.INTERNET_EXPLORER && version < 11) ||
-      (browser === browsers.CHROME && version < 40) ||
-      (browser === browsers.FIREFOX && version < 35) ||
-      (browser === browsers.SAFARI && version < 8));
+    return (browser === browsers.CHROME && version >= 58)
+      || (browser === browsers.FIREFOX && version >= 55)
+      || (browser === browsers.SAFARI && version >= 13);
   }
 
   /**

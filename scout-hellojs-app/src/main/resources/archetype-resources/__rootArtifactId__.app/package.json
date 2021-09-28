@@ -2,9 +2,9 @@
   "name": "@${simpleArtifactName}/app",
   "version": "${version}",
   "engines": {
-    "node": ">=12.1.0",
-    "npm": ">=6.9.0",
-    "pnpm": ">=5"
+    "node": ">=16.13.0",
+    "npm": ">=8.1.0",
+    "pnpm": ">=6.22.2"
   },
   "main": "./src/main/js/index.js",
   "files": [

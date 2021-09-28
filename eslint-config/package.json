@@ -10,9 +10,9 @@
   },
   "license": "EPL-1.0",
   "engines": {
-    "node": ">=12.2.0",
-    "npm": ">=6.9.0",
-    "pnpm": ">=5"
+    "node": ">=16.13.0",
+    "npm": ">=8.1.0",
+    "pnpm": ">=6.22.2"
   },
   "keywords": [
     "scout",
@@ -46,13 +46,13 @@
     "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "devDependencies": {
-    "@eclipse-scout/releng": "^10.0.0",
-    "eslint": "7.9.0"
+    "@eclipse-scout/releng": "^22.0.0",
+    "eslint": "8.3.0"
   },
   "dependencies": {
     "eslint-config-google": "0.14.0"
   },
   "peerDependencies": {
-    "eslint": ">=7.9.0"
+    "eslint": ">=8.3.0"
   }
 }

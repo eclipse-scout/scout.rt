@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,27 +26,19 @@ scout.selenium = {
     scout.Session.prototype._sendCancelRequest = this.origSendCancelRequest;
   },
 
-  setSupportsTouch: function(touch) {
+  setSupportsTouch: touch => {
     scout.Device.get().features['_onlyTouch'] = touch;
-    // Also load FastClick because without it, we would not test the real thing
-    // However: once FastClick is loaded, we cannot unload it. This means you
-    // should not switch touch mode in the middle of a selenium test.
-    if (touch) {
-      scout.Device.get()._loadFastClickDeferred();
+  },
+
+  scrollToBottom: $element => {
+    if ($element && $element.length > 0) {
+      $element[0].scrollTop = $element[0].scrollHeight;
     }
   },
 
-  scrollToBottom: function($element) {
+  scrollToRight: $element => {
     if ($element && $element.length > 0) {
-      var scrollHeight = $element[0].scrollHeight;
-      $element[0].scrollTop = scrollHeight;
-    }
-  },
-
-  scrollToRight: function($element) {
-    if ($element && $element.length > 0) {
-      var scrollWidth = $element[0].scrollWidth;
-      $element[0].scrollLeft = scrollWidth;
+      $element[0].scrollLeft = $element[0].scrollWidth;
     }
   }
 

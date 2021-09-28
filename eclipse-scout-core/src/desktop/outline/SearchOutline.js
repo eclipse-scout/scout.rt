@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,7 +56,7 @@ export default class SearchOutline extends Outline {
     this.$queryField = this.$searchPanel.appendElement('<input>', 'search-outline-field')
       .on('input', this._createOnQueryFieldInputFunction().bind(this))
       .on('keypress', this._onQueryFieldKeyPress.bind(this));
-    this.$clearIcon = this.$searchPanel.appendSpan('clear-icon unfocusable needsclick action text-field-icon')
+    this.$clearIcon = this.$searchPanel.appendSpan('clear-icon unfocusable action text-field-icon')
       .on('mousedown', this._onClearIconMouseDown.bind(this));
 
     this.$searchStatus = this.$searchPanel.appendDiv('search-outline-status')
@@ -127,12 +127,11 @@ export default class SearchOutline extends Outline {
 
   _createOnQueryFieldInputFunction(event) {
     let debounceFunction = $.debounce(this._search.bind(this));
-    let fn = function(event) {
+    return function(event) {
       this._updateHasText();
       // debounced search
       debounceFunction();
     };
-    return fn;
   }
 
   _onClearIconMouseDown(event) {

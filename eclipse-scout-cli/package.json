@@ -10,9 +10,9 @@
   },
   "license": "EPL-1.0",
   "engines": {
-    "node": ">=12.2.0",
-    "npm": ">=6.9.0",
-    "pnpm": ">=5"
+    "node": ">=16.13.0",
+    "npm": ">=8.1.0",
+    "pnpm": ">=6.22.2"
   },
   "keywords": [
     "scout",
@@ -35,38 +35,38 @@
     "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "dependencies": {
-    "@babel/cli": "7.11.6",
-    "@babel/core": "7.11.6",
-    "@babel/plugin-proposal-class-properties": "7.10.4",
-    "@babel/plugin-proposal-object-rest-spread": "7.11.0",
-    "@babel/plugin-transform-object-assign": "7.10.4",
-    "@babel/preset-env": "7.11.5",
-    "babel-loader": "8.1.0",
-    "clean-webpack-plugin": "3.0.0",
-    "copy-webpack-plugin": "6.1.0",
-    "css-loader": "4.3.0",
-    "jasmine-core": "3.6.0",
+    "@babel/cli": "7.16.0",
+    "@babel/core": "7.16.0",
+    "@babel/plugin-proposal-class-properties": "7.16.0",
+    "@babel/plugin-proposal-object-rest-spread": "7.16.0",
+    "@babel/plugin-transform-object-assign": "7.16.0",
+    "@babel/preset-env": "7.16.4",
+    "babel-loader": "8.2.3",
+    "copy-webpack-plugin": "10.0.0",
+    "style-loader": "3.3.1",
+    "css-loader": "6.5.1",
+    "jasmine-core": "3.10.1",
     "jasmine-jquery": "2.1.1",
-    "jquery": "3.5.1",
-    "karma": "5.2.2",
+    "jquery": "3.6.0",
+    "karma": "6.3.9",
     "karma-chrome-launcher": "3.1.0",
     "karma-jasmine": "4.0.1",
     "karma-jasmine-ajax": "0.1.13",
     "@metahub/karma-jasmine-jquery": "4.0.1",
     "@eclipse-scout/karma-jasmine-scout": "22.0.0-snapshot",
-    "karma-jasmine-html-reporter": "1.5.4",
+    "karma-jasmine-html-reporter": "1.7.0",
     "karma-junit-reporter": "2.0.1",
-    "karma-webpack": "4.0.2",
-    "less": "3.12.2",
-    "less-loader": "7.0.1",
-    "mini-css-extract-plugin": "0.11.2",
-    "optimize-css-assets-webpack-plugin": "5.0.4",
-    "terser-webpack-plugin": "4.2.0",
-    "webpack": "4.44.1",
-    "yargs-parser": "20.0.0"
+    "karma-webpack": "5.0.0",
+    "less": "4.1.2",
+    "less-loader": "10.2.0",
+    "mini-css-extract-plugin": "2.4.5",
+    "css-minimizer-webpack-plugin": "3.1.4",
+    "terser-webpack-plugin": "5.2.5",
+    "webpack": "5.64.2",
+    "yargs-parser": "21.0.0"
   },
   "devDependencies": {
-    "@eclipse-scout/releng": "^10.0.0"
+    "@eclipse-scout/releng": "^22.0.0"
   },
   "bin": {
     "scout-scripts": "./bin/scout-scripts.js"

@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
@@ -19,7 +18,6 @@ const webpack = require('webpack');
 
 /**
  * @param {string} args.mode development or production
- * @param {boolean} args.clean true, to clean the dist folder before each build. Default is true.
  * @param {boolean} args.progress true, to show build progress in percentage. Default is true.
  * @param {boolean} args.profile true, to show timing information for each build step. Default is false.
  * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
@@ -51,10 +49,50 @@ module.exports = (env, args) => {
     // In production mode create external source maps without source code to map stack traces.
     // Otherwise stack traces would point to the minified source code which makes it quite impossible to analyze productive issues.
     devtool: devMode ? false : 'nosources-source-map',
+    resolve: {
+
+      // no automatic polyfills. clients must add the desired polyfills themselves.
+      fallback: {
+        assert: false,
+        buffer: false,
+        console: false,
+        constants: false,
+        crypto: false,
+        domain: false,
+        events: false,
+        http: false,
+        https: false,
+        os: false,
+        path: false,
+        punycode: false,
+        process: false,
+        querystring: false,
+        stream: false,
+        string_decoder: false,
+        sys: false,
+        timers: false,
+        tty: false,
+        url: false,
+        util: false,
+        vm: false,
+        zlib: false
+      }
+    },
+    // expect these apis in the browser
+    externals: {
+      'crypto': 'crypto',
+      'canvas': 'canvas',
+      'fs': 'fs',
+      'http': 'http',
+      'https': 'https',
+      'url': 'url',
+      'zlib': 'zlib'
+    },
     output: {
       filename: jsFilename,
       path: outDir,
-      devtoolModuleFilenameTemplate: devMode ? undefined : prodDevtoolModuleFilenameTemplate
+      devtoolModuleFilenameTemplate: devMode ? undefined : prodDevtoolModuleFilenameTemplate,
+      clean: true
     },
     performance: {
       hints: false
@@ -91,7 +129,8 @@ module.exports = (env, args) => {
             sourceMap: devMode,
             lessOptions: {
               relativeUrls: false,
-              rewriteUrls: 'off'
+              rewriteUrls: 'off',
+              math: 'always'
             }
           }
         }]
@@ -112,11 +151,9 @@ module.exports = (env, args) => {
               [require.resolve('@babel/preset-env'), {
                 debug: false,
                 targets: {
-                  firefox: '35',
-                  chrome: '40',
-                  ie: '11',
-                  edge: '12',
-                  safari: '8'
+                  firefox: '55',
+                  chrome: '58',
+                  safari: '13'
                 }
               }]
             ]
@@ -132,7 +169,8 @@ module.exports = (env, args) => {
     ],
     optimization: {
       splitChunks: {
-        chunks: 'all'
+        chunks: 'all',
+        name: (module, chunks, cacheGroupKey) => computeChunkName(module, chunks, cacheGroupKey)
       }
     }
   };
@@ -150,13 +188,13 @@ module.exports = (env, args) => {
   }
 
   if (!devMode) {
-    const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+    const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
     const TerserPlugin = require('terser-webpack-plugin');
     config.optimization.minimizer = [
       // minify css
-      new OptimizeCssAssetsPlugin({
-        assetNameRegExp: /\.min\.css$/g,
-        cssProcessorPluginOptions: {
+      new CssMinimizerPlugin({
+        test: /\.min\.css$/g,
+        minimizerOptions: {
           preset: ['default', {
             discardComments: {removeAll: true}
           }]
@@ -164,16 +202,9 @@ module.exports = (env, args) => {
       }),
       // minify js
       new TerserPlugin({
-        test: /\.js(\?.*)?$/i,
-        cache: true,
-        parallel: true
+        test: /\.js(\?.*)?$/i
       })
     ];
-  }
-
-  if (nvl(args.clean, false)) {
-    // see: https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder
-    config.plugins.push(new CleanWebpackPlugin());
   }
 
   if (devMode) {
@@ -218,14 +249,66 @@ function addThemes(entry, options = {}) {
   });
 }
 
+function computeChunkName(module, chunks, cacheGroupKey) {
+  const entryPointDelim = '~';
+  const allChunksNames = chunks
+    .map(chunk => chunk.name)
+    .filter(chunkName => !!chunkName)
+    .join(entryPointDelim);
+  let fileName = cacheGroupKey === 'defaultVendors' ? 'vendors' : cacheGroupKey;
+
+  if (allChunksNames.length < 1) {
+    // there is no chunk name (e.g. lazy loaded module): derive chunk-name from filename
+    const segmentDelim = '-';
+    if (fileName.length > 0) {
+      fileName += segmentDelim;
+    }
+    return fileName + computeModuleId(module);
+  }
+
+  if (fileName.length > 0) {
+    fileName += entryPointDelim;
+  }
+  return fileName + allChunksNames;
+}
+
+function computeModuleId(module) {
+  const nodeModules = 'node_modules';
+  let id = module.userRequest;
+  const nodeModulesPos = id.lastIndexOf(nodeModules);
+  if (nodeModulesPos < 0) {
+    // use file name
+    id = path.basename(id, '.js');
+  } else {
+    // use js-module name
+    id = id.substring(nodeModulesPos + nodeModules.length + path.sep.length);
+    let end = id.indexOf(path.sep);
+    if (end >= 0) {
+      if (id.startsWith('@')) {
+        const next = id.indexOf(path.sep, end + 1);
+        if (next >= 0) {
+          end = next;
+        }
+      }
+      id = id.substring(0, end);
+    }
+  }
+
+  return id.replace(/[/\\\-@:_.|]+/g, '').toLowerCase();
+}
+
 function ensureArray(array) {
   if (array === undefined || array === null) {
     return [];
   }
-  if (!Array.isArray(array)) {
-    return [array];
+  if (Array.isArray(array)) {
+    return array;
   }
-  return array;
+  const isIterable = typeof array[Symbol.iterator] === 'function' && typeof array !== 'string';
+  if (isIterable) {
+    return Array.from(array);
+  }
+  return [array];
 }
 
 function nvl(arg, defaultValue) {

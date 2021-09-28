@@ -10,9 +10,9 @@
   },
   "license": "EPL-1.0",
   "engines": {
-    "node": ">=12.1.0",
-    "npm": ">=6.9.0",
-    "pnpm": ">=5"
+    "node": ">=16.13.0",
+    "npm": ">=8.1.0",
+    "pnpm": ">=6.22.2"
   },
   "main": "src/index.js",
   "files": [
@@ -27,11 +27,11 @@
   },
   "devDependencies": {
     "@eclipse-scout/releng": "^10.0.0",
-    "jasmine-core": "3.6.0",
+    "jasmine-core": "3.10.1",
     "jasmine-ajax": "4.0.0"
   },
   "dependencies": {
-    "jquery": "3.5.1",
+    "jquery": "3.6.0",
     "sourcemapped-stacktrace": "1.1.11"
   },
   "keywords": [

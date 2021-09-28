@@ -388,18 +388,6 @@ easymock (2.4)
 
 * License: MIT license
 
-FastClick (1.0.1)
-
-* License: MIT License
-* Project: https://github.com/ftlabs/fastclick
-* Source: https://github.com/ftlabs/fastclick/tree/v1.0.1
-
-FastClick (1.0.6)
-
-* License: MIT License
-* Project: https://github.com/ftlabs/fastclick
-* Source: https://github.com/ftlabs/fastclick/tree/v1.0.1
-
 Font Awesome (4.2.0)
 
 * License: OFL-1.1 AND MIT

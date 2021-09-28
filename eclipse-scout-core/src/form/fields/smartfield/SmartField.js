@@ -158,7 +158,6 @@ export default class SmartField extends ValueField {
       this.addMandatoryIndicator();
     }
     this.addIcon();
-    this.$icon.addClass('needsclick');
     this.addStatus();
   }
 
