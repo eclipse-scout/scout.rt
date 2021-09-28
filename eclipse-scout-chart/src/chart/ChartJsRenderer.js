@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -2170,11 +2170,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     for (let i = 0; i < axes.length; i++) {
-      axes[i] = $.extend(true, {}, axes[i], {
-        ticks: {
-          maxTicksLimit: maxTicks,
-          stepSize: (this.onlyIntegers ? 1 : undefined)
-        }
+      axes[i].ticks = $.extend(true, {}, axes[i].ticks, {
+        maxTicksLimit: maxTicks,
+        stepSize: (this.onlyIntegers ? 1 : undefined)
       });
       if (maxMinValue) {
         axes[i].ticks.suggestedMax = maxMinValue.maxValue;
