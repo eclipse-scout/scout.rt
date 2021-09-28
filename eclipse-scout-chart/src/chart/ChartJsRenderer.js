@@ -2329,11 +2329,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     for (let i = 0; i < axes.length; i++) {
-      axes[i] = $.extend(true, {}, axes[i], {
-        ticks: {
-          maxTicksLimit: maxTicks,
-          stepSize: (this.onlyIntegers ? 1 : undefined)
-        }
+      axes[i].ticks = $.extend(true, {}, axes[i].ticks, {
+        maxTicksLimit: maxTicks,
+        stepSize: (this.onlyIntegers ? 1 : undefined)
       });
       if (maxMinValue) {
         axes[i].ticks.suggestedMax = maxMinValue.maxValue;
