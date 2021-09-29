@@ -194,9 +194,11 @@ public interface ISecurityProvider {
     if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2016))) {
       return true;
     }
-    //2014
-
+    //2014 variants
     if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_8)), salt, 3557))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_16)), salt, 3557))) {
       return true;
     }
     return false;
