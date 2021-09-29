@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,17 +35,21 @@ describe('ChartJsRendererSpec', () => {
       defaultScalesConfig = $.extend(true, {}, defaultConfig, {
         options: {
           scales: {
-            minSpaceBetweenXTicks: 150,
-            minSpaceBetweenYTicks: 35,
-            xAxes: [{}],
-            yAxes: [{}]
+            x: {
+              minSpaceBetweenTicks: 150
+            },
+            y: {
+              minSpaceBetweenTicks: 35
+            }
           }
         }
       }),
       defaultScaleConfig = $.extend(true, {}, defaultConfig, {
         options: {
-          scale: {
-            minSpaceBetweenTicks: 35
+          scales: {
+            r: {
+              minSpaceBetweenTicks: 35
+            }
           }
         }
       });
@@ -55,31 +59,42 @@ describe('ChartJsRendererSpec', () => {
 
       renderer._adjustGridMaxMin(config, chartArea);
 
-      expect(config.options.scales.xAxes[0]).toEqual({});
-      expect(config.options.scales.yAxes[0]).toEqual({
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150 // default value, not part of this test
+      });
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 45,
+        suggestedMin: 10,
         ticks: {
-          maxTicksLimit: 8,
-          stepSize: 1, // default value, not part of this test
-          suggestedMax: 45,
-          suggestedMin: 10
+          maxTicksLimit: 9,
+          stepSize: undefined // default value, not part of this test
         }
       });
     });
 
     it('horizontal bar chart, min/max is set on x axis', () => {
-      let config = $.extend(true, {}, defaultScalesConfig, {type: Chart.Type.BAR_HORIZONTAL});
+      let config = $.extend(true, {}, defaultScalesConfig, {
+        type: Chart.Type.BAR,
+        options: {
+          indexAxis: 'y'
+        }
+      });
 
       renderer._adjustGridMaxMin(config, chartArea);
 
-      expect(config.options.scales.xAxes[0]).toEqual({
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150, // default value, not part of this test
+        suggestedMax: 45,
+        suggestedMin: 10,
         ticks: {
-          maxTicksLimit: 5,
-          stepSize: 1, // default value, not part of this test
-          suggestedMax: 45,
-          suggestedMin: 10
+          maxTicksLimit: 6,
+          stepSize: undefined // default value, not part of this test
         }
       });
-      expect(config.options.scales.yAxes[0]).toEqual({});
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35 // default value, not part of this test
+      });
     });
 
     it('polar area chart, min/max is set on scale', () => {
@@ -87,13 +102,13 @@ describe('ChartJsRendererSpec', () => {
 
       renderer._adjustGridMaxMin(config, chartArea);
 
-      expect(config.options.scale).toEqual({
+      expect(config.options.scales.r).toEqual({
         minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 45,
+        suggestedMin: 10,
         ticks: {
-          maxTicksLimit: 4,
-          stepSize: 1, // default value, not part of this test
-          suggestedMax: 45,
-          suggestedMin: 10
+          maxTicksLimit: 5,
+          stepSize: undefined // default value, not part of this test
         }
       });
     });
@@ -103,11 +118,9 @@ describe('ChartJsRendererSpec', () => {
         type: Chart.Type.BUBBLE,
         options: {
           scales: {
-            xAxes: [
-              {
-                offset: true
-              }
-            ]
+            x: {
+              offset: true
+            }
           }
         }
       });
@@ -131,21 +144,23 @@ describe('ChartJsRendererSpec', () => {
         yValuePerPixel = (maxY - minY) / (height - 2 * padding),
         yPaddingValue = yValuePerPixel * padding;
 
-      expect(config.options.scales.xAxes[0]).toEqual({
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150, // default value, not part of this test
         offset: true,
+        suggestedMax: 46,
+        suggestedMin: 11,
         ticks: {
-          maxTicksLimit: 5,
-          stepSize: 1, // default value, not part of this test
-          suggestedMax: 46,
-          suggestedMin: 11
+          maxTicksLimit: 6,
+          stepSize: undefined // default value, not part of this test
         }
       });
-      expect(config.options.scales.yAxes[0]).toEqual({
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 43 + yPaddingValue,
+        suggestedMin: 11 - yPaddingValue,
         ticks: {
-          maxTicksLimit: 8,
-          stepSize: 1, // default value, not part of this test
-          suggestedMax: 43 + yPaddingValue,
-          suggestedMin: 11 - yPaddingValue
+          maxTicksLimit: 9,
+          stepSize: undefined // default value, not part of this test
         }
       });
     });
@@ -165,14 +180,12 @@ describe('ChartJsRendererSpec', () => {
           type: Chart.Type.BUBBLE,
           options: {
             scales: {
-              xLabelMap: labelMap,
-              yLabelMap: labelMap,
-              xAxes: [
-                {
-                  offset: true
-                }
-              ]
-            }
+              x: {
+                offset: true
+              }
+            },
+            xLabelMap: labelMap,
+            yLabelMap: labelMap
           }
         });
 
@@ -188,21 +201,23 @@ describe('ChartJsRendererSpec', () => {
 
       renderer._adjustGridMaxMin(config, chartArea);
 
-      expect(config.options.scales.xAxes[0]).toEqual({
+      expect(config.options.scales.x).toEqual({
+        minSpaceBetweenTicks: 150, // default value, not part of this test
         offset: true,
+        suggestedMax: 43,
+        suggestedMin: 11,
         ticks: {
-          maxTicksLimit: 5,
-          stepSize: 1, // default value, not part of this test
-          suggestedMax: 43,
-          suggestedMin: 11
+          maxTicksLimit: 6,
+          stepSize: undefined // default value, not part of this test
         }
       });
-      expect(config.options.scales.yAxes[0]).toEqual({
+      expect(config.options.scales.y).toEqual({
+        minSpaceBetweenTicks: 35, // default value, not part of this test
+        suggestedMax: 52,
+        suggestedMin: 2,
         ticks: {
-          maxTicksLimit: 8,
-          stepSize: 1, // default value, not part of this test
-          suggestedMax: 52,
-          suggestedMin: 2
+          maxTicksLimit: 9,
+          stepSize: undefined // default value, not part of this test
         }
       });
     });
@@ -230,7 +245,9 @@ describe('ChartJsRendererSpec', () => {
             label: 'Dataset 1'
           }]
         },
-        bubble: {}
+        options: {
+          bubble: {}
+        }
       };
 
     it('neither sizeOfLargestBubble nor minBubbleSize is set', () => {
@@ -249,7 +266,7 @@ describe('ChartJsRendererSpec', () => {
 
     it('only sizeOfLargestBubble is set', () => {
       let config = $.extend(true, {}, defaultConfig);
-      config.bubble.sizeOfLargestBubble = 20;
+      config.options.bubble.sizeOfLargestBubble = 20;
 
       renderer._adjustBubbleSizes(config, chartArea);
 
@@ -264,7 +281,7 @@ describe('ChartJsRendererSpec', () => {
 
     it('only sizeOfLargestBubble is set, maxR equals 0', () => {
       let config = $.extend(true, {}, defaultConfig);
-      config.bubble.sizeOfLargestBubble = 20;
+      config.options.bubble.sizeOfLargestBubble = 20;
 
       config.data.datasets[0].data = [
         {z: 0},
@@ -283,7 +300,7 @@ describe('ChartJsRendererSpec', () => {
 
     it('only minBubbleSize is set', () => {
       let config = $.extend(true, {}, defaultConfig);
-      config.bubble.minBubbleSize = 5;
+      config.options.bubble.minBubbleSize = 5;
 
       renderer._adjustBubbleSizes(config, chartArea);
 
@@ -298,7 +315,7 @@ describe('ChartJsRendererSpec', () => {
 
     it('only minBubbleSize is set, minR equals 0', () => {
       let config = $.extend(true, {}, defaultConfig);
-      config.bubble.minBubbleSize = 5;
+      config.options.bubble.minBubbleSize = 5;
 
       config.data.datasets[0].data.push({z: 0});
 
@@ -316,8 +333,8 @@ describe('ChartJsRendererSpec', () => {
 
     it('sizeOfLargestBubble and minBubbleSize are set, scaling is sufficient', () => {
       let config = $.extend(true, {}, defaultConfig);
-      config.bubble.sizeOfLargestBubble = 20;
-      config.bubble.minBubbleSize = 5;
+      config.options.bubble.sizeOfLargestBubble = 20;
+      config.options.bubble.minBubbleSize = 5;
 
       renderer._adjustBubbleSizes(config, chartArea);
 
@@ -332,8 +349,8 @@ describe('ChartJsRendererSpec', () => {
 
     it('sizeOfLargestBubble and minBubbleSize are set, scaling is not sufficient', () => {
       let config = $.extend(true, {}, defaultConfig);
-      config.bubble.sizeOfLargestBubble = 20;
-      config.bubble.minBubbleSize = 5;
+      config.options.bubble.sizeOfLargestBubble = 20;
+      config.options.bubble.minBubbleSize = 5;
 
       config.data.datasets[0].data.push({z: 1});
 

@@ -37,6 +37,7 @@ export default class Tooltip extends Widget {
     this.$anchor = null;
     this.autoRemove = true;
     this.tooltipPosition = 'top';
+    this.tooltipDirection = 'right';
     this.scrollType = 'position';
     this.htmlEnabled = false;
     this.$arrow = null;
@@ -271,6 +272,9 @@ export default class Tooltip extends Widget {
     if (this.arrowPositionUnit === '%') {
       arrowPosition = tooltipWidth * this.arrowPosition / 100;
     }
+    if (this.tooltipDirection === 'left') {
+      arrowPosition = tooltipWidth - arrowPosition;
+    }
 
     top = y - tooltipHeight - arrowSizeY;
     left = x - arrowPosition;
@@ -300,7 +304,7 @@ export default class Tooltip extends Widget {
     // Make sure arrow is never positioned outside of the tooltip
     arrowPosition = Math.min(arrowPosition, this.$container.outerWidth() - arrowSizeX);
     arrowPosition = Math.max(arrowPosition, arrowSizeX);
-    this.$arrow.cssLeft(arrowPosition - 1);
+    this.$arrow.cssLeft(arrowPosition);
     this.$container
       .cssLeft(left)
       .cssTop(top);

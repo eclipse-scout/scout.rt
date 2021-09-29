@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,8 +19,10 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     this.suppressLegendBox = true;
 
     let defaultConfig = {
-      speedo: {
-        greenAreaPosition: undefined
+      options: {
+        speedo: {
+          greenAreaPosition: undefined
+        }
       }
     };
     chart.config = $.extend(true, {}, defaultConfig, chart.config);
@@ -53,7 +55,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
       chartData.axes.length > 0 ||
       chartData.chartValueGroups.length !== 1 ||
       chartData.chartValueGroups[0].values.length !== 3 ||
-      chartConfig.speedo.greenAreaPosition === undefined) {
+      chartConfig.options.speedo.greenAreaPosition === undefined) {
       return false;
     }
     return true;
@@ -74,7 +76,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     this.my = this.chartBox.yOffset + this.chartBox.height - (this.chartBox.height - this.r * 1.12) / 2;
 
     // number of parts in the scale
-    this.parts = this.chart.config.speedo.greenAreaPosition === SpeedoChartRenderer.Position.CENTER ?
+    this.parts = this.chart.config.options.speedo.greenAreaPosition === SpeedoChartRenderer.Position.CENTER ?
       SpeedoChartRenderer.NUM_PARTS_GREEN_CENTER : SpeedoChartRenderer.NUM_PARTS_GREEN_EDGE;
 
     // number of lines per part
@@ -203,8 +205,8 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
       legendValue = value ? this._formatValue(value) : 0,
       maxLegendValue = maxValue ? this._formatValue(maxValue) : 0;
 
-    // tooltips for min/max value
-    if (this.chart.config.options.tooltips.enabled) {
+    // tooltip for min/max value
+    if (this.chart.config.options.plugins.tooltip.enabled) {
       // min value
       let $minLegend = this.$svg.appendSVG('text', 'line-label line-chart-wire-label')
         .attr('x', this.chartBox.mX() - this.r)
@@ -234,7 +236,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     }
 
     // actual value
-    if (this.chart.config.options.legend.display) {
+    if (this.chart.config.options.plugins.legend.display) {
       this._renderLineLabel(positions.x2 + padding, positions.y2 + positions.v * padding, legendValue, '', false)
         .addClass('speedo-chart-label')
         .attr('style', 'font-size: ' + this.scaleWeight * 1.55 + 'px;');
@@ -317,7 +319,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
   }
 
   _getColorForPart(part) {
-    let position = this.chart.config.speedo.greenAreaPosition;
+    let position = this.chart.config.options.speedo.greenAreaPosition;
     switch (position) {
       case SpeedoChartRenderer.Position.LEFT:
         // only four parts

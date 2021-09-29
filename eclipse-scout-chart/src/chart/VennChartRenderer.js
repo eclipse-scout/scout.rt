@@ -19,8 +19,10 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
     this.suppressLegendBox = true;
 
     let defaultConfig = {
-      venn: {
-        numberOfCircles: undefined
+      options: {
+        venn: {
+          numberOfCircles: undefined
+        }
       }
     };
     chart.config = $.extend(true, {}, defaultConfig, chart.config);
@@ -47,7 +49,7 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
 
     // basic values
     this.data = this.chart.data.chartValueGroups;
-    this.numberOfCircles = this.chart.config.venn.numberOfCircles;
+    this.numberOfCircles = this.chart.config.options.venn.numberOfCircles;
 
     // render parameter
     let distR = 10,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,8 +55,10 @@ describe('FulfillmentChartRendererSpec', () => {
         chartValueGroups: [actualChartValue, totalChartValue]
       };
       let config = {
-        fulfillment: {
-          startValue: 2
+        options: {
+          fulfillment: {
+            startValue: 2
+          }
         }
       };
       let chart = {
@@ -67,7 +69,7 @@ describe('FulfillmentChartRendererSpec', () => {
       let fulfillment = new FulfillmentChartRenderer(chart);
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(false);
 
-      config.fulfillment.startValue = 0;
+      config.options.fulfillment.startValue = 0;
       fulfillment = new FulfillmentChartRenderer(chart);
       expect(fulfillment.shouldAnimateRemoveOnUpdate(opts)).toBe(false);
     });

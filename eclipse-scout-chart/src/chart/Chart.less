@@ -385,10 +385,6 @@
         fill: @chart-axis-line-color-inverted;
       }
     }
-
-    > .tooltip-background {
-      fill: @chart-tooltip-background-color;
-    }
   }
 }
 
@@ -819,4 +815,44 @@ text.venn-legend {
   font-size: @font-size-normal;
   dominant-baseline: auto;
   text-anchor: start;
+}
+
+/*** chart tooltip ***/
+.tooltip.chart-tooltip > .tooltip-content > .attribute {
+  white-space: nowrap;
+  padding-top: 2px;
+  padding-bottom: 2px;
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  & > label {
+    display: inline-block;
+    min-width: 80px;
+    max-width: 120px;
+    padding-right: 10px;
+    white-space: normal;
+    vertical-align: top;
+    font-size: @field-label-font-size;
+    padding-top: @font-size-normal - @field-label-font-size;
+
+    &:last-child {
+      font-size: @font-size-normal;
+      max-width: 100%;
+    }
+  }
+
+  & > .value {
+    display: inline-block;
+    min-width: 20px;
+    white-space: normal;
+    vertical-align: top;
+    font-size: @font-size-normal;
+    font-weight: @font-weight-normal;
+  }
 }

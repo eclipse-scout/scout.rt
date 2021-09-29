@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,8 +24,10 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
     this.suppressLegendBox = true;
 
     let defaultConfig = {
-      fulfillment: {
-        startValue: undefined
+      options: {
+        fulfillment: {
+          startValue: undefined
+        }
       }
     };
     chart.config = $.extend(true, {}, defaultConfig, chart.config);
@@ -65,7 +67,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
       arcClass += ' ' + chartGroupCss;
     }
 
-    let startValue = scout.nvl(this.chart.config.fulfillment.startValue, 0);
+    let startValue = scout.nvl(this.chart.config.options.fulfillment.startValue, 0);
     let end = 0;
     let lastEnd = 0;
     if (total) {
@@ -177,7 +179,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
    * If startValue is not set use default implementation.
    */
   shouldAnimateRemoveOnUpdate(opts) {
-    let startValue = objects.optProperty(this.chart, 'config', 'fulfillment', 'startValue');
+    let startValue = objects.optProperty(this.chart, 'config', 'options', 'fulfillment', 'startValue');
     if (!objects.isNullOrUndefined(startValue)) {
       return false;
     }

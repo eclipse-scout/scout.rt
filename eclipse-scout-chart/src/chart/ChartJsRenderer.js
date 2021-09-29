@@ -10,86 +10,100 @@
  */
 import {AbstractChartRenderer, Chart} from '../index';
 import ChartJs from 'chart.js/auto';
-import {arrays, colorSchemes, Event, numbers, objects, strings, styles} from '@eclipse-scout/core';
-// noinspection ES6UnusedImports
-import chartjs_plugin_datalabels from 'chartjs-plugin-datalabels';
-// noinspection ES6UnusedImports
-import ChartJsTooltipDelay from './ChartJsTooltipDelay';
+import {arrays, colorSchemes, Event, graphics, numbers, objects, scout, strings, styles, tooltips} from '@eclipse-scout/core';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import $ from 'jquery';
+
+ChartJs.register(ChartDataLabels);
 
 /**
- * @typedef ChartJs
- * @property {object} [defaults]
- * @property {object} [defaults.global]
- * @property {object} [defaults.global.legend]
- * @property {object} [defaults.global.legend.labels]
- * @property {object} [defaults.global.elements]
- * @property {object} [defaults.global.elements.line]
- * @property {object} [defaults.global.elements.point]
- * @property {object} [defaults.global.elements.arc]
- * @property {object} [defaults.global.elements.rectangle]
- * @property {object} [defaults.global.tooltips]
+ * @typedef CoreChartOptions
+ * @property {number} [font.size]
  */
+
+/**
+ * @typedef TickOptions
+ * @property {number} maxRotation
+ */
+
+/**
+ * @typedef Scale
+ * @property {number} labelRotation
+ * @property {number} height
+ * @property {object} _labelSizes
+ * @property {object} _labelSizes.widest
+ */
+
+/**
+ * @typedef TooltipModel
+ * @property {array} _tooltipItems
+ */
+
+/**
+ * @typedef ArcElement
+ * @property {number} innerRadius
+ * @property {number} outerRadius
+ * @property {number} startAngle
+ * @property {number} endAngle
+ */
+
+/**
+ * @typedef PointElement
+ * @property {number} angle
+ */
+
+/**
+ * @typedef BarElement
+ * @property {number} height
+ * @property {number} width
+ */
+
 $.extend(true, ChartJs.defaults, {
   maintainAspectRatio: false,
-  legend: {
-    labels: {
-      usePointStyle: true,
-      boxWidth: 7
-    }
-  },
   elements: {
     line: {
-      tension: 0,
-      fill: false,
       borderWidth: 2
     },
     point: {
       radius: 0,
       hitRadius: 10,
       hoverRadius: 7,
-      borderWidth: 1,
       hoverBorderWidth: 2
     },
     arc: {
       borderWidth: 1
     },
-    rectangle: {
+    bar: {
       borderWidth: 1,
       borderSkipped: ''
     }
   },
-  tooltips: {
-    borderWidth: 0,
-    cornerRadius: 3,
-    xPadding: 12,
-    yPadding: 8,
-    titleSpacing: 4,
-    titleMarginBottom: 8,
-    bodySpacing: 4
-  },
-  overrides: {
-    line: {
-      elements: {
-        point: {
-          borderWidth: 2
-        }
+  plugins: {
+    legend: {
+      labels: {
+        usePointStyle: true,
+        boxWidth: 7
       }
-    },
-    horizontalBar: {
-      elements: {
-        rectangle: {
-          borderSkipped: ''
-        }
+    }
+  }
+});
+$.extend(true, ChartJs.overrides, {
+  line: {
+    elements: {
+      point: {
+        borderWidth: 2
       }
     }
   }
 });
 
 let chartJsGlobalsInitialized = false;
+const PHI = (1 + Math.sqrt(5)) / 2; // golden ratio
 
 /**
  * @typedef Dataset
  * @property {string} [datasetId]
+ * @property {array} [data]
  *
  * @property {array|string} [backgroundColor]
  * @property {array|string} [backgroundColorBackup]
@@ -128,10 +142,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this.colorSchemeCssClass = '';
     this.minRadialChartDatalabelSpace = 25;
 
-    this._tooltipTitle = this._formatTooltipTitle.bind(this);
-    this._tooltipLabel = this._formatTooltipLabel.bind(this);
-    this._tooltipLabelColor = this._computeTooltipLabelColor.bind(this);
-
     this._labelFormatter = this._formatLabel.bind(this);
     this._xLabelFormatter = this._formatXLabel.bind(this);
     this._yLabelFormatter = this._formatYLabel.bind(this);
@@ -161,6 +171,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this._legendPointerLeaveHandler = this._onLegendLeavePointer.bind(this);
 
     this._resizeHandler = this._onResize.bind(this);
+    this._tooltipRenderer = this._renderTooltip.bind(this);
+    this._tooltip = null;
+    this._tooltipTimeoutId = null;
   }
 
   _validateChartData() {
@@ -206,7 +219,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       chartConfigDataValid = false;
     }
 
-    if (chartConfigDataValid && scout.isOneOf(this.chart.config.type, Chart.Type.POLAR_AREA, Chart.Type.RADAR)) {
+    if (chartConfigDataValid && scout.isOneOf(config.type, Chart.Type.POLAR_AREA, Chart.Type.RADAR)) {
       // check lengths
       let i, length = 0;
       for (i = 0; i < config.data.datasets.length; i++) {
@@ -240,10 +253,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     /**
      * @property {number} options.bubble.sizeOfLargestBubble
      * @property {object} options.numberFormatter
-     * @property {number} options.tooltips.titleFontFamily
-     * @property {object} options.scales.scaleLabelByTypeMap
-     * @property {object} options.scales.xLabelMap
-     * @property {object} options.scales.yLabelMap
+     * @property {object} options.scaleLabelByTypeMap
+     * @property {object} options.xLabelMap
+     * @property {object} options.yLabelMap
      */
     let config = $.extend(true, {}, this.chart.config);
     this._adjustConfig(config);
@@ -278,8 +290,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let config = $.extend(true, {}, this.chart.config);
     this._adjustConfig(config);
 
-    let hiddenDataIndices = [];
-
     let targetData = this.chartJs.config.data,
       sourceData = config.data;
 
@@ -294,7 +304,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }
       // 1. Property not set on target
       if (!target[property]) {
-        target[property] = source[property];
+        let src = source[property];
+        if (src || setToUndefined) {
+          target[property] = src;
+        }
         return;
       }
       // 2. Property not set on source
@@ -306,7 +319,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         }
         // Empty array
         if (Array.isArray(target[property])) {
-          target[property].splice(0);
+          target[property].splice(0, target[property].length);
           return;
         }
         // Otherwise set to undefined
@@ -327,7 +340,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         sourceLength = source[property].length;
       if (targetLength > sourceLength) {
         // Target array is longer than source array
-        target[property].splice(sourceLength);
+        target[property].splice(sourceLength, targetLength - sourceLength);
       } else if (targetLength < sourceLength) {
         // Source array is longer than target array
         target[property].push(...source[property].splice(targetLength));
@@ -347,19 +360,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }
       if (!sourceData.datasets) {
         sourceData.datasets = [];
-      }
-
-      // If the chart is a pie-, doughnut- or polar-area-chart, not complete datasets are hidden but elements of each dataset.
-      // Store these hidden data indices to apply them to newly added datasets.
-      if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA) && targetData.datasets.length) {
-        let meta = this.chartJs.getDatasetMeta(0);
-        if (meta && meta.data && Array.isArray(meta.data)) {
-          meta.data.forEach((dataMeta, idx) => {
-            if (dataMeta.hidden) {
-              hiddenDataIndices.push(idx);
-            }
-          });
-        }
       }
 
       // if all datasets have no id set, add artificial dataset ids
@@ -389,8 +389,27 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           transferProperty(sourceDataset, targetDataset, 'hoverBackgroundColor', true);
           transferProperty(sourceDataset, targetDataset, 'hoverBorderColor', true);
           transferProperty(sourceDataset, targetDataset, 'legendColor', true);
+          transferProperty(sourceDataset, targetDataset, 'pointBackgroundColor', true);
           transferProperty(sourceDataset, targetDataset, 'pointHoverBackgroundColor', true);
+          transferProperty(sourceDataset, targetDataset, 'pointBorderColor', true);
+          transferProperty(sourceDataset, targetDataset, 'pointHoverBorderColor', true);
+
+          transferProperty(sourceDataset, targetDataset, 'uncheckedBackgroundColor', true);
+          transferProperty(sourceDataset, targetDataset, 'uncheckedHoverBackgroundColor', true);
+          transferProperty(sourceDataset, targetDataset, 'checkedBackgroundColor', true);
+          transferProperty(sourceDataset, targetDataset, 'checkedHoverBackgroundColor', true);
+          transferProperty(sourceDataset, targetDataset, 'uncheckedPointBackgroundColor', true);
+          transferProperty(sourceDataset, targetDataset, 'uncheckedPointHoverBackgroundColor', true);
+          transferProperty(sourceDataset, targetDataset, 'checkedPointBackgroundColor', true);
+          transferProperty(sourceDataset, targetDataset, 'checkedPointHoverBackgroundColor', true);
+
           transferProperty(sourceDataset, targetDataset, 'lineTension', true);
+
+          transferProperty(sourceDataset, targetDataset, 'pointRadius', true);
+          transferProperty(sourceDataset, targetDataset, 'uncheckedPointRadius', true);
+          transferProperty(sourceDataset, targetDataset, 'checkedPointRadius', true);
+
+          this._adjustDatasetBorderWidths(targetDataset);
         }
       });
 
@@ -423,8 +442,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     // update label maps for scales (the label maps, despite being part of the config, can be updated, without redrawing the whole chart)
-    transferProperty(config.options.scales, this.chartJs.config.options.scales, 'xLabelMap', true);
-    transferProperty(config.options.scales, this.chartJs.config.options.scales, 'yLabelMap', true);
+    transferProperty(config.options, this.chartJs.config.options, 'xLabelMap', true);
+    transferProperty(config.options, this.chartJs.config.options, 'yLabelMap', true);
 
     $.extend(true, this.chartJs.config, {
       options: {
@@ -433,21 +452,13 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         }
       }
     });
-    this.chartJs.update();
+    let scales = this.chartJs.config.options.scales || {},
+      axes = [scales.x || {}, scales.y || {}, scales.yDiffType || {}, scales.r || {}];
+    axes.forEach(axis => {
+      (axis.ticks || {}).stepSize = undefined;
+    });
 
-    // Apply hidden data indices (only set for pie-, doughnut- or polar-area-chart)
-    if (hiddenDataIndices.length) {
-      targetData.datasets.forEach((dataset, datasetIndex) => {
-        let meta = this.chartJs.getDatasetMeta(datasetIndex);
-        if (meta && meta.data && Array.isArray(meta.data)) {
-          hiddenDataIndices
-            .filter(dataIndex => meta.data.length > dataIndex)
-            .forEach(dataIndex => {
-              meta.data[dataIndex].hidden = true;
-            });
-        }
-      });
-    }
+    this.chartJs.update();
 
     this._adjustSize(this.chartJs.config, this.chartJs.chartArea);
     this.chartJs.update();
@@ -508,6 +519,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         transferArrayValues(dataset.pointBackgroundColor, dataset.uncheckedPointBackgroundColor, uncheckedIndices) +
         transferArrayValues(dataset.pointHoverBackgroundColor, dataset.uncheckedPointHoverBackgroundColor, uncheckedIndices) +
         transferArrayValues(dataset.pointRadius, dataset.uncheckedPointRadius, uncheckedIndices);
+
+      this._adjustDatasetBorderWidths(dataset);
     });
 
     return 0 < changed;
@@ -540,13 +553,15 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (config.type === Chart.Type.COMBO_BAR_LINE) {
       config.type = Chart.Type.BAR;
 
-      let scaleLabelByTypeMap = ((config.options || {}).scales || {}).scaleLabelByTypeMap;
+      let scaleLabelByTypeMap = (config.options || {}).scaleLabelByTypeMap;
       if (scaleLabelByTypeMap) {
         scaleLabelByTypeMap[Chart.Type.BAR] = scaleLabelByTypeMap[Chart.Type.COMBO_BAR_LINE];
       }
-    } else if (config.type === Chart.Type.BAR_HORIZONTAL) {
+    } else if (this._isHorizontalBar(config)) {
       config.type = Chart.Type.BAR;
-      config.options.indexAxis = 'y';
+      config.options = $.extend(true, {}, config.options, {
+        indexAxis: 'y'
+      });
     }
   }
 
@@ -556,10 +571,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     let setLabelMap = (identifier, labelMap) => {
       if (!$.isEmptyObject(labelMap)) {
-        config.options = $.extend(true, {}, {
-          scales: {}
-        }, config.options);
-        config.options.scales[identifier] = labelMap;
+        config.options[identifier] = labelMap;
       }
     };
 
@@ -586,8 +598,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _isHorizontalBar(config) {
-    return config.type === Chart.Type.BAR_HORIZONTAL
-      || (config.type === Chart.Type.BAR && config.options.indexAxis === 'y');
+    return config && (config.type === Chart.Type.BAR_HORIZONTAL
+      || (config.type === Chart.Type.BAR && config.options && config.options.indexAxis === 'y'));
   }
 
   _computeLabelMap(axis) {
@@ -610,15 +622,81 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _adjustBarBorderWidth(config) {
-    if (!config || !config.data || !config.type || !scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL)) {
+    if (!config || !config.data || !config.type || !scout.isOneOf(config.type, Chart.Type.BAR)) {
       return;
     }
 
     config.data.datasets.forEach(dataset => {
       if ((dataset.type || Chart.Type.BAR) === Chart.Type.BAR) {
+        dataset.borderWidth = dataset.borderWidth || 1;
         dataset.hoverBorderWidth = dataset.hoverBorderWidth || 2;
+        this._adjustDatasetBorderWidths(dataset);
       }
     });
+  }
+
+  _adjustDatasetBorderWidths(dataset) {
+    this._adjustDatasetBorderWidth(dataset);
+    this._adjustDatasetBorderWidth(dataset, true);
+  }
+
+  /**
+   * Sets the borderWidth to 0 if the backgroundColor and the borderColor are identical and backups the original value.
+   * This method is idempotent as it restores the original state first and then applies its logic.
+   *
+   * @param {Dataset} dataset
+   * @param {boolean?} hover whether hoverBorderWidth, hoverBackgroundColor and hoverBorderColor should be considered instead of borderWidth, backgroundColor and borderColor
+   */
+  _adjustDatasetBorderWidth(dataset, hover) {
+    if (!dataset) {
+      return;
+    }
+    let borderWidthIdentifier = hover ? 'hoverBorderWidth' : 'borderWidth',
+      borderWidthBackupIdentifier = hover ? 'hoverBorderWidthBackup' : 'borderWidthBackup',
+      backgroundColorIdentifier = hover ? 'hoverBackgroundColor' : 'backgroundColor',
+      borderColorIdentifier = hover ? 'hoverBorderColor' : 'borderColor';
+    // restore original state if there is an backup
+    if (dataset[borderWidthBackupIdentifier]) {
+      dataset[borderWidthIdentifier] = dataset[borderWidthBackupIdentifier];
+      delete dataset[borderWidthBackupIdentifier];
+    }
+    // do nothing if there is no borderWidth set on the dataset
+    if (!dataset[borderWidthIdentifier]) {
+      return;
+    }
+    let isBorderWidthArray = Array.isArray(dataset[borderWidthIdentifier]),
+      isBackgroundColorArray = Array.isArray(dataset[backgroundColorIdentifier]),
+      isBorderColorArray = Array.isArray(dataset[borderColorIdentifier]),
+      isArray = isBorderWidthArray || isBackgroundColorArray || isBorderColorArray;
+    // if none of the properties is an array, simply backup the borderWidth and set it to 0
+    if (!isArray && dataset[backgroundColorIdentifier] === dataset[borderColorIdentifier]) {
+      dataset[borderWidthBackupIdentifier] = dataset[borderWidthIdentifier];
+      dataset[borderWidthIdentifier] = 0;
+      return;
+    }
+    // at least one of the properties is an array, therefore the borderWidth needs to be an array from now on
+    let dataLength = (dataset.data || []).length;
+    if (!isBorderWidthArray) {
+      dataset[borderWidthIdentifier] = arrays.init(dataLength, dataset[borderWidthIdentifier]);
+    } else if (dataset[borderWidthIdentifier].length < dataLength) {
+      dataset[borderWidthIdentifier].push(...arrays.init(dataLength - dataset[borderWidthIdentifier].length, dataset[borderWidthIdentifier][0]));
+    }
+    let borderWidth = dataset[borderWidthIdentifier],
+      length = borderWidth.length,
+      borderWidthBackup = arrays.init(length);
+    for (let i = 0; i < length; i++) {
+      // it makes no difference if the backgroundColor/borderColor is not an array as a not-array-value is applied to every element by chart.js
+      let backgroundColor = isBackgroundColorArray ? dataset[backgroundColorIdentifier][i] : dataset[backgroundColorIdentifier],
+        borderColor = isBorderColorArray ? dataset[borderColorIdentifier][i] : dataset[borderColorIdentifier];
+      borderWidthBackup[i] = borderWidth[i];
+      if (backgroundColor === borderColor) {
+        borderWidth[i] = 0;
+      }
+    }
+    // only set the backup if at least one of the borderWidths changed
+    if (!arrays.equals(borderWidth, borderWidthBackup)) {
+      dataset[borderWidthBackupIdentifier] = borderWidthBackup;
+    }
   }
 
   _adjustMaxSegments(config) {
@@ -691,138 +769,226 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     config.options = $.extend(true, {}, {
-      hover: {
-        mode: 'nearest'
-      },
-      tooltips: {
-        mode: 'nearest',
-        callbacks: {
-          title: this._tooltipTitle,
-          label: this._tooltipLabel,
-          labelColor: this._tooltipLabelColor
-        }
+      plugins: {
+        tooltip: {}
       }
     }, config.options);
+
+    let tooltip = config.options.plugins.tooltip;
+
+    if (!tooltip.enabled) {
+      return;
+    }
+
+    tooltip.enabled = false;
+    tooltip.external = this._tooltipRenderer;
   }
 
-  _formatTooltipTitle(tooltipItems, data) {
-    let config = this.chartJs.config,
-      ctx = this.chartJs.ctx,
-      tooltipItem = tooltipItems[0],
-      title,
-      defaultGlobal = ChartJs.defaults,
-      defaultTypeTooltips = {},
-      defaultGlobalTooltips = defaultGlobal.tooltips;
-    if (ChartJs.defaults[config.type]) {
-      defaultTypeTooltips = $.extend(true, {}, defaultTypeTooltips, ChartJs.defaults[config.type].tooltips);
-    }
-    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR)) {
-      let label = data.labels[tooltipItem.index];
-      title = config.options.reformatLabels ? this._formatLabel(label) : label;
-    } else if (config.type === Chart.Type.BUBBLE) {
-      let xAxis = config.options.scales.xAxes[0],
-        yAxis = config.options.scales.yAxes[0],
-        xAxisLabel = xAxis.scaleLabel.labelString,
-        yAxisLabel = yAxis.scaleLabel.labelString;
-      xAxisLabel = xAxisLabel ? (xAxisLabel + ':') : ChartJsRenderer.ARROW_LEFT_RIGHT;
-      yAxisLabel = yAxisLabel ? (yAxisLabel + ':') : ' ' + ChartJsRenderer.ARROW_UP_DOWN + ' ';
+  _createTooltipTitles(tooltipItem, data) {
+    let config = tooltipItem.chart.config,
+      datasets = data.datasets,
+      dataset = datasets[tooltipItem.datasetIndex],
       title = [];
-      let xTickLabel = xAxis.ticks.callback(tooltipItem.xLabel);
+    if (config.type === Chart.Type.BUBBLE) {
+      let xAxis = config.options.scales.x,
+        yAxis = config.options.scales.y,
+        xAxisLabel = xAxis.title.text,
+        yAxisLabel = yAxis.title.text;
+      xAxisLabel = xAxisLabel ? strings.encode(xAxisLabel) : ChartJsRenderer.ARROW_LEFT_RIGHT;
+      yAxisLabel = yAxisLabel ? strings.encode(yAxisLabel) : '&nbsp;' + ChartJsRenderer.ARROW_UP_DOWN + '&nbsp;';
+      let xTickLabel = xAxis.ticks.callback(dataset.data[tooltipItem.dataIndex].x);
       if (xTickLabel) {
-        title.push(xAxisLabel + ' ' + xTickLabel);
+        title.push(this._createTooltipAttribute(xAxisLabel, strings.encode(xTickLabel)));
       }
-      let yTickLabel = yAxis.ticks.callback(tooltipItem.yLabel);
+      let yTickLabel = yAxis.ticks.callback(dataset.data[tooltipItem.dataIndex].y);
       if (yTickLabel) {
-        title.push(yAxisLabel + ' ' + yTickLabel);
+        title.push(this._createTooltipAttribute(yAxisLabel, strings.encode(yTickLabel)));
       }
     } else {
-      let defaultTypeTooltipTitle;
-      if (defaultTypeTooltips.callbacks) {
-        defaultTypeTooltipTitle = defaultTypeTooltips.callbacks.title;
-      }
-      let defaultTooltipTitle = defaultTypeTooltipTitle || defaultGlobalTooltips.callbacks.title;
-      title = defaultTooltipTitle.call(this.chartJs, tooltipItems, data);
+      let label = data.labels[tooltipItem.dataIndex];
+      title.push(this._createTooltipAttribute(config.options.reformatLabels ? this._formatLabel(label) : label));
     }
-    let horizontalSpace = this.$canvas.cssWidth() - (2 * config.options.tooltips.xPadding),
-      measureText = ctx.measureText.bind(ctx),
-      oldFont = ctx.font,
-      titleFontStyle = config.options.tooltips.titleFontStyle || defaultTypeTooltips.titleFontStyle || defaultGlobalTooltips.titleFontStyle || defaultGlobal.defaultFontStyle,
-      titleFontSize = config.options.tooltips.titleFontSize || defaultTypeTooltips.titleFontSize || defaultGlobalTooltips.titleFontSize || defaultGlobal.defaultFontSize,
-      titleFontFamily = config.options.tooltips.titleFontFamily || defaultTypeTooltips.titleFontFamily || defaultGlobalTooltips.titleFontFamily || defaultGlobal.defaultFontFamily,
-      result = [];
-    ctx.font = titleFontStyle + ' ' + titleFontSize + 'px ' + titleFontFamily;
-    arrays.ensure(title).forEach(titleLine => result.push(strings.truncateText(titleLine, horizontalSpace, measureText)));
-    ctx.font = oldFont;
-    return result;
+    return title;
   }
 
-  _formatTooltipLabel(tooltipItem, data) {
-    let config = this.chartJs.config,
-      ctx = this.chartJs.ctx,
-      datasets = data ? data.datasets : null,
-      dataset = datasets ? datasets[tooltipItem.datasetIndex] : null,
-      label, value,
-      defaultGlobal = ChartJs.defaults,
-      defaultTypeTooltips = {},
-      defaultGlobalTooltips = defaultGlobal.tooltips;
-    if (ChartJs.defaults[config.type]) {
-      defaultTypeTooltips = $.extend(true, {}, defaultTypeTooltips, ChartJs.defaults[config.type].tooltips);
-    }
-    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR)) {
+  _createTooltipAttributes(tooltipItem, data) {
+    let config = tooltipItem.chart.config,
+      datasets = data.datasets,
+      dataset = datasets[tooltipItem.datasetIndex],
+      label, value;
+    if (config.type === Chart.Type.BUBBLE) {
       label = dataset.label;
-      value = this._formatLabel(dataset.data[tooltipItem.index]);
+      value = this._formatLabel(dataset.data[tooltipItem.dataIndex].z);
+    } else {
+      label = dataset.label;
+      value = this._formatLabel(dataset.data[tooltipItem.dataIndex]);
+    }
+    return [this._createTooltipAttribute(strings.encode(label), strings.encode(value))];
+  }
+
+  _createTooltipAttribute(label, value) {
+    return '<div class="attribute">' +
+      (label ? '<label>' + label + '</label>' : '') +
+      (value ? '<div class="value">' + value + '</div>' : '') +
+      '</div>';
+  }
+
+  _renderTooltip(context) {
+    let isHideTooltip = context.tooltip.opacity === 0 || context.tooltip._tooltipItems.length < 1;
+    if (isHideTooltip) {
+      if (this._tooltipTimeoutId) {
+        clearTimeout(this._tooltipTimeoutId);
+        this._tooltipTimeoutId = undefined;
+      }
+      if (this._tooltip) {
+        this._tooltip.destroy();
+        this._tooltip = null;
+      }
+      return;
+    }
+
+    let isTooltipShowing = !!this._tooltip;
+    if (isTooltipShowing) {
+      this._renderTooltipLater(context);
+    } else {
+      this._tooltipTimeoutId = setTimeout(() => this._renderTooltipLater(context), tooltips.DEFAULT_TOOLTIP_DELAY);
+    }
+  }
+
+  _renderTooltipLater(context) {
+    let tooltip = context.tooltip;
+    if (tooltip._tooltipItems.length < 1) {
+      return;
+    }
+    if (this._tooltip) {
+      this._tooltip.destroy();
+      this._tooltip = null;
+    }
+
+    let tooltipItem = tooltip._tooltipItems[0],
+      data = context.chart.data,
+      titles = this._createTooltipTitles(tooltipItem, data),
+      labels = this._createTooltipAttributes(tooltipItem, data),
+      tooltipText = titles.concat(labels).join('');
+
+    let positionAndOffset = this._computeTooltipPositionAndOffset(tooltipItem),
+      origin = graphics.offsetBounds(this.$canvas);
+    origin.x += tooltip.caretX + positionAndOffset.offsetX;
+    origin.y += tooltip.caretY + positionAndOffset.offsetY;
+    // Tooltip adds origin.height to origin.y in 'bottom' mode, but origin.y is already the correct value for 'top' and 'bottom' mode
+    origin.height = 0;
+
+    this._tooltip = scout.create({
+      objectType: 'Tooltip',
+      parent: this.chart,
+      $anchor: this.$canvas,
+      text: tooltipText,
+      htmlEnabled: true,
+      cssClass: 'chart-tooltip',
+      tooltipPosition: positionAndOffset.tooltipPosition,
+      tooltipDirection: positionAndOffset.tooltipDirection,
+      origin: origin
+    });
+    this._tooltip.render();
+
+    this._tooltip.$container
+      .css('pointer-events', 'none');
+  }
+
+  _computeTooltipPositionAndOffset(tooltipItem) {
+    let tooltipPosition = 'top',
+      tooltipDirection = 'right',
+      offsetX = 0,
+      offsetY = 0;
+
+    let chart = tooltipItem.chart,
+      datasetIndex = tooltipItem.datasetIndex,
+      dataIndex = tooltipItem.dataIndex,
+      config = chart.config,
+      datasets = config.data.datasets,
+      dataset = datasets[datasetIndex],
+      value = dataset.data[dataIndex];
+
+    if (this._isHorizontalBar(config)) {
+      tooltipDirection = value < 0 ? 'left' : 'right';
+    } else if ((dataset.type || config.type) === Chart.Type.BAR) {
+      tooltipPosition = value < 0 ? 'bottom' : 'top';
+    } else if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
+      // noinspection JSValidateTypes
+      /**
+       * @type ArcElement
+       */
+      let element = chart.getDatasetMeta(datasetIndex).data[dataIndex];
+      let startAngle = element.startAngle,
+        endAngle = element.endAngle,
+        angle = (startAngle + endAngle) / 2;
+      tooltipPosition = (0 <= angle && angle < Math.PI) ? 'bottom' : 'top';
+      tooltipDirection = (-Math.PI / 2 <= angle && angle < Math.PI / 2) ? 'right' : 'left';
+    } else if (config.type === Chart.Type.RADAR) {
+      // noinspection JSValidateTypes
+      /**
+       * @type PointElement
+       */
+      let element = chart.getDatasetMeta(datasetIndex).data[dataIndex];
+      let angle = element.angle;
+      tooltipPosition = (0 <= angle && angle < Math.PI) ? 'bottom' : 'top';
+      tooltipDirection = (-Math.PI / 2 <= angle && angle < Math.PI / 2) ? 'right' : 'left';
     } else if (config.type === Chart.Type.BUBBLE) {
-      label = dataset.label;
-      value = this._formatLabel(dataset.data[tooltipItem.index].z);
-    } else {
-      let defaultTypeTooltipLabel;
-      if (defaultTypeTooltips.callbacks) {
-        defaultTypeTooltipLabel = defaultTypeTooltips.callbacks.label;
-      }
-      let defaultTooltipLabel = defaultTypeTooltipLabel || defaultGlobalTooltips.callbacks.label;
-      label = defaultTooltipLabel.call(this.chartJs, tooltipItem, data);
+      let element = chart.getDatasetMeta(datasetIndex).data[dataIndex];
+      let chartArea = chart.chartArea,
+        mid = chartArea.left + (chartArea.width / 2);
+      tooltipDirection = element.x < mid ? 'left' : 'right';
     }
-    label = ' ' + label;
-    value = value ? ' ' + value : '';
-    let colorRectSize = config.options.tooltips.displayColors ? config.options.tooltips.bodyFontSize || defaultTypeTooltips.bodyFontSize || defaultGlobalTooltips.bodyFontSize || defaultGlobal.defaultFontSize : 0,
-      horizontalSpace = this.$canvas.cssWidth() - (2 * config.options.tooltips.xPadding) - colorRectSize,
-      measureText = ctx.measureText.bind(ctx),
-      result = label + (value ? ':' + value : '');
-    if (measureText(result).width > horizontalSpace) {
-      if (measureText(value).width > horizontalSpace / 2) {
-        return strings.truncateText(value, horizontalSpace, measureText);
-      }
-      return strings.truncateText(label, horizontalSpace - measureText(value ? ':' + value : '').width, measureText) + (value ? ':' + value : '');
-    }
-    return result;
-  }
 
-  _computeTooltipLabelColor(tooltipItem, chart) {
-    let config = chart.config,
-      tooltips = config.options ? config.options.tooltips : null,
-      tooltipBackgroundColor = tooltips ? tooltips.backgroundColor : null,
-      datasets = chart.data ? chart.data.datasets : null,
-      dataset = datasets ? datasets[tooltipItem.datasetIndex] : null,
-      backgroundColor;
-    if (scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
-      backgroundColor = dataset.legendColor || dataset.borderColor;
-    }
-    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-      let legendColor = Array.isArray(dataset.legendColor) ? dataset.legendColor[tooltipItem.index] : dataset.legendColor,
-        datasetBackgroundColor = Array.isArray(dataset.backgroundColor) ? dataset.backgroundColor[tooltipItem.index] : dataset.backgroundColor;
-      backgroundColor = legendColor || this._adjustColorOpacity(datasetBackgroundColor, 1);
-    }
-    if (!backgroundColor || typeof backgroundColor === 'function') {
-      let defaultTypeTooltipLabelColor;
-      if (ChartJs.defaults[config.type] && ChartJs.defaults[config.type].callbacks) {
-        defaultTypeTooltipLabelColor = ChartJs.defaults[config.type].callbacks.labelColor;
+    if (this._isHorizontalBar(config)) {
+      // noinspection JSValidateTypes
+      /**
+       * @type BarElement
+       */
+      let element = chart.getDatasetMeta(datasetIndex).data[dataIndex];
+      let height = element.height,
+        width = element.width,
+        // golden ratio: (a + b) / a = a / b = PHI
+        // and a + b = width
+        // -> b = width / (PHI + 1)
+        b = width / (PHI + 1);
+
+      offsetY = -height / 2;
+      offsetX = tooltipDirection === 'left' ? b : -b;
+    } else if (scout.isOneOf(config.type, Chart.Type.LINE, Chart.Type.BUBBLE, Chart.Type.RADAR) || dataset.type === Chart.Type.LINE) {
+      // noinspection JSValidateTypes
+      /**
+       * @type PointElement
+       */
+      let element = chart.getDatasetMeta(datasetIndex).data[dataIndex];
+      let options = element.options,
+        offset = options.hoverRadius + options.hoverBorderWidth;
+      if (config.type === Chart.Type.BUBBLE) {
+        offset += value.r;
       }
-      let defaultTooltipLabelColor = defaultTypeTooltipLabelColor || ChartJs.defaults.tooltips.callbacks.labelColor;
-      backgroundColor = defaultTooltipLabelColor.call(chart, tooltipItem, chart).backgroundColor;
+
+      offsetY = tooltipPosition === 'top' ? -offset : offset;
+    } else if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
+      // noinspection JSValidateTypes
+      /**
+       * @type ArcElement
+       */
+      let element = chart.getDatasetMeta(datasetIndex).data[dataIndex];
+      let startAngle = element.startAngle,
+        endAngle = element.endAngle,
+        angle = (startAngle + endAngle) / 2,
+        innerRadius = element.innerRadius,
+        outerRadius = element.outerRadius,
+        offset = (outerRadius - innerRadius) / 2;
+      offsetX = offset * Math.cos(angle);
+      offsetY = offset * Math.sin(angle);
     }
+
     return {
-      borderColor: tooltipBackgroundColor,
-      backgroundColor: backgroundColor
+      tooltipPosition: tooltipPosition,
+      tooltipDirection: tooltipDirection,
+      offsetX: offsetX,
+      offsetY: offsetY
     };
   }
 
@@ -833,135 +999,140 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     config.options = $.extend(true, {}, config.options);
 
-    this._adjustScale(config);
-    this._adjustScales(config);
+    this._adjustScalesR(config);
+    this._adjustScalesXY(config);
   }
 
-  _adjustScale(config) {
+  _adjustScalesR(config) {
     if (!config || !config.type || !config.options) {
       return;
     }
 
     if (scout.isOneOf(config.type, Chart.Type.POLAR_AREA, Chart.Type.RADAR)) {
       config.options = $.extend(true, {}, {
-        scale: {}
+        scales: {
+          r: {}
+        }
       }, config.options);
     }
 
-    let options = config.options;
-    options.minSpaceBetweenTicks = 35;
-    if (options.scale) {
-      options.scale = $.extend(true, {}, {
+    let options = config.options,
+      scales = options ? options.scales : {};
+    if (scales && scales.r) {
+      scales.r = $.extend(true, {}, {
+        minSpaceBetweenTicks: 35,
+        beginAtZero: true,
         angleLines: {
           display: false
         },
         ticks: {
-          beginAtZero: true,
           callback: this._labelFormatter
         },
         pointLabels: {
-          fontSize: ChartJs.defaults.font.size
+          font: {
+            size: ChartJs.defaults.font.size
+          }
         }
-      }, options.scale);
+      }, scales.r);
     }
   }
 
-  _adjustScales(config) {
+  _adjustScalesXY(config) {
     if (!config || !config.type || !config.options) {
       return;
     }
 
-    if (scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.LINE, Chart.Type.BUBBLE)) {
+    if (scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.LINE, Chart.Type.BUBBLE)) {
       config.options = $.extend(true, {}, {
-        minSpaceBetweenXTicks: 150,
-        minSpaceBetweenYTicks: 35,
         scales: {
-          xAxes: [{}],
-          yAxes: [{}]
+          x: {
+            minSpaceBetweenTicks: 150
+          },
+          y: {
+            minSpaceBetweenTicks: 35
+          }
         }
       }, config.options);
     }
 
-    this._adjustXAxes(config);
-    this._adjustYAxes(config);
+    this._adjustXAxis(config);
+    this._adjustYAxis(config);
   }
 
-  _adjustXAxes(config) {
-    if (!config || !config.type || !config.options || !config.options.scales || !config.options.scales.xAxes) {
+  _adjustXAxis(config) {
+    if (!config || !config.type || !config.options || !config.options.scales || !config.options.scales.x) {
       return;
     }
 
     let type = config.type,
-      xAxes = config.options.scales.xAxes;
+      scales = config.options.scales;
 
-    for (let i = 0; i < xAxes.length; i++) {
-      if (this._isHorizontalBar(config) || type === Chart.Type.BUBBLE) {
-        xAxes[i] = $.extend(true, {}, {
-          offset: type === Chart.Type.BUBBLE,
-          gridLines: {
-            drawBorder: false,
-            drawTicks: false
-          },
-          ticks: {
-            padding: 5,
-            beginAtZero: this._isHorizontalBar(config)
-          }
-        }, xAxes[i]);
-      } else {
-        xAxes[i] = $.extend(true, {}, {
-          offset: true,
-          gridLines: {
-            display: false
-          }
-        }, xAxes[i]);
-      }
-      if (this._isHorizontalBar(config) || type === Chart.Type.BUBBLE || config.options.reformatLabels) {
-        xAxes[i] = $.extend(true, {}, {
-          ticks: {
-            callback: this._xLabelFormatter
-          }
-        }, xAxes[i]);
-      }
-      xAxes[i].afterCalculateTickRotation = this._xAxisFitter;
+    if (this._isHorizontalBar(config) || type === Chart.Type.BUBBLE) {
+      scales.x = $.extend(true, {}, {
+        beginAtZero: this._isHorizontalBar(config),
+        offset: type === Chart.Type.BUBBLE,
+        grid: {
+          drawBorder: false,
+          drawTicks: false
+        },
+        ticks: {
+          padding: 5
+        }
+      }, scales.x);
+    } else {
+      scales.x = $.extend(true, {}, {
+        offset: true,
+        grid: {
+          display: false,
+          drawBorder: false
+        }
+      }, scales.x);
     }
+    if (this._isHorizontalBar(config) || type === Chart.Type.BUBBLE || config.options.reformatLabels) {
+      scales.x = $.extend(true, {}, {
+        ticks: {
+          callback: this._xLabelFormatter
+        }
+      }, scales.x);
+    }
+    scales.x.afterCalculateLabelRotation = this._xAxisFitter;
   }
 
-  _adjustYAxes(config) {
-    if (!config || !config.type || !config.options || !config.options.scales || !config.options.scales.yAxes) {
+  _adjustYAxis(config) {
+    if (!config || !config.type || !config.options || !config.options.scales || !config.options.scales.y) {
       return;
     }
 
     let type = config.type,
-      yAxes = config.options.scales.yAxes;
+      scales = config.options.scales;
 
-    for (let i = 0; i < yAxes.length; i++) {
-      if (this._isHorizontalBar(config)) {
-        yAxes[i] = $.extend(true, {}, {
-          gridLines: {
-            display: false
-          }
-        }, yAxes[i]);
-      } else {
-        yAxes[i] = $.extend(true, {}, {
-          gridLines: {
-            drawBorder: false,
-            drawTicks: false
-          },
-          ticks: {
-            padding: 5,
-            beginAtZero: type !== Chart.Type.BUBBLE
-          }
-        }, yAxes[i]);
-      }
-      if (!this._isHorizontalBar(config) || config.options.reformatLabels) {
-        yAxes[i] = $.extend(true, {}, {
-          ticks: {
-            callback: this._yLabelFormatter
-          }
-        }, yAxes[i]);
-      }
-      yAxes[i].afterFit = this._yAxisFitter;
+    if (this._isHorizontalBar(config)) {
+      scales.y = $.extend(true, {}, {
+        grid: {
+          display: false,
+          drawBorder: false
+        }
+      }, scales.y);
+    } else {
+      scales.y = $.extend(true, {}, {
+        beginAtZero: type !== Chart.Type.BUBBLE,
+        grid: {
+          drawBorder: false,
+          drawTicks: false
+        },
+        ticks: {
+          padding: 5
+        }
+      }, scales.y);
     }
+    if (!this._isHorizontalBar(config) || config.options.reformatLabels) {
+      scales.y = $.extend(true, {}, {
+        ticks: {
+          callback: this._yLabelFormatter
+        }
+      }, scales.y);
+    }
+    scales.y.afterFit = this._yAxisFitter;
   }
 
   _adjustPlugins(config) {
@@ -979,10 +1150,61 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         formatter: this._radialChartDatalabelsFormatter
       }, plugins.datalabels);
       plugins.datalabels.display = this._radialChartDatalabelsDisplayHandler;
-    } else if (scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
+      // since the this._radialChartDatalabelsDisplayHandler depends on values that are animated, we need to update the labels during the animation
+      this._updatingDatalabels = false;
+      let animation = config.options.animation || {},
+        onProgress = animation.onProgress,
+        onComplete = animation.onComplete,
+        updateDatalabels = animation => {
+          if (this._updatingDatalabels) {
+            return;
+          }
+          this._updatingDatalabels = true;
+          // invert the _actives of the datalabel plugin and call its afterEvent-hook
+          // this hook will update its _actives to chart.getActiveElements() and recalculate the labels for all elements that changed
+          // setting _actives to the complement of chart.getActiveElements() guarantees that all labels are updated
+          let chart = animation.chart,
+            metas = chart.getSortedVisibleDatasetMetas(),
+            activeElements = [...chart.getActiveElements()],
+            inactiveElements = [];
+
+          metas.forEach((meta, datasetIndex) => {
+            meta.data.forEach((element, index) => {
+              let activeIndex = arrays.findIndex(activeElements, activeElement => activeElement.datasetIndex === datasetIndex && activeElement.index === index);
+              if (activeIndex > 0) {
+                activeElements.splice(activeIndex, 1);
+              } else {
+                inactiveElements.push({
+                  datasetIndex: datasetIndex,
+                  index: index,
+                  element: element
+                });
+              }
+            });
+          });
+
+          // the datalabels plugin stores its data on the chart in $datalabels (see EXPANDO_KEY in chartjs-plugin-datalabels)
+          chart['$' + ChartDataLabels.id]._actives = inactiveElements;
+          // noinspection JSCheckFunctionSignatures
+          ChartDataLabels.afterEvent(chart);
+          this._updatingDatalabels = false;
+        },
+        updateDatalabelsAndDefaultCallback = (animation, defaultCallback) => {
+          updateDatalabels(animation);
+          if (defaultCallback) {
+            defaultCallback(animation);
+          }
+        };
+
+      config.options.animation = $.extend(true, {}, config.options.animation, {
+        onProgress: animation => updateDatalabelsAndDefaultCallback(animation, onProgress),
+        onComplete: animation => updateDatalabelsAndDefaultCallback(animation, onComplete)
+      });
+
+    } else if (scout.isOneOf(config.type, Chart.Type.BAR, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
       plugins.datalabels = $.extend(true, {}, {
         backgroundColor: this._datalabelBackgroundColorHandler,
-        borderRadius: 4
+        borderRadius: 3
       }, plugins.datalabels);
       plugins.datalabels.display = 'auto';
     }
@@ -1039,8 +1261,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _getLabelMap(identifier) {
-    if (this.chartJs && this.chartJs.config && this.chartJs.config.options && this.chartJs.config.options.scales) {
-      return this.chartJs.config.options.scales[identifier];
+    if (this.chartJs && this.chartJs.config && this.chartJs.config.options) {
+      return this.chartJs.config.options[identifier];
     }
   }
 
@@ -1084,13 +1306,17 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     return this.session.locale.decimalFormat.format(Math.sign(label) * abs) + abbreviation;
   }
 
+  /**
+   * @param {Scale} xAxis
+   */
   _fitXAxis(xAxis) {
     if (!xAxis || xAxis.labelRotation === 0) {
       return;
     }
     let maxHeight = this.maxXAxesTicksHeigth,
-      defaultGlobal = ChartJs.defaults,
-      defaultTicks = ChartJs.defaults.scale.ticks,
+      fontDefaults = ChartJs.defaults.font,
+      ticksDefaults = ChartJs.defaults.scale.ticks,
+      ticksFontDefaults = ticksDefaults.font || {},
       fontSize,
       maxRotation;
     if (this.chartJs) {
@@ -1100,10 +1326,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
     if (xAxis.options && xAxis.options.ticks) {
       maxRotation = xAxis.options.ticks.maxRotation;
-      fontSize = xAxis.options.ticks.fontSize;
+      let ticksFont = xAxis.options.ticks.font || {};
+      fontSize = ticksFont.size;
     }
-    maxRotation = maxRotation || defaultTicks.maxRotation;
-    fontSize = fontSize || defaultTicks.font.size || defaultGlobal.font.size;
+    maxRotation = maxRotation || ticksDefaults.maxRotation;
+    fontSize = fontSize || ticksFontDefaults.size || fontDefaults.size;
     // if the chart is very narrow, chart.js sometimes calculates with a negative width of the canvas
     // this causes NaN for labelRotation and height
     if (isNaN(xAxis.labelRotation)) {
@@ -1116,13 +1343,15 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       // => height = sin(labelRotation) * labelLength + sin(90° - labelRotation) * fontSize
       // <=> labelLength = (height - sin(90° - labelRotation) * fontSize) / sin(labelRotation)
       maxLabelLength = (maxHeight - (fontSize * Math.sin(((90 - labelRotation) / 180) * Math.PI))) / Math.sin((labelRotation / 180) * Math.PI);
-    if (xAxis.longestLabelWidth > maxLabelLength) {
+    let labelSizes = xAxis._labelSizes || {},
+      widest = labelSizes.widest || {};
+    if (widest.width > maxLabelLength) {
       let measureText = xAxis.ctx.measureText.bind(xAxis.ctx);
-      xAxis._ticks.forEach(tick => {
+      xAxis.ticks.forEach(tick => {
         tick.label = strings.truncateText(tick.label, maxLabelLength, measureText);
       });
       // reset label sizes, chart.js will recalculate them using the new truncated labels
-      xAxis._labelSizes = null;
+      xAxis._labelSizes = undefined;
     }
   }
 
@@ -1131,36 +1360,41 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
     let padding = 0,
-      tickMarkLength = 0;
+      tickLength = 0;
     if (yAxis.options && yAxis.options.ticks) {
       padding = yAxis.options.ticks.padding || 0;
     }
-    if (yAxis.options && yAxis.options.gridLines) {
-      tickMarkLength = yAxis.options.gridLines.tickMarkLength || 0;
+    if (yAxis.options && yAxis.options.grid) {
+      tickLength = yAxis.options.grid.tickLength || 0;
     }
-    if (yAxis.longestLabelWidth > yAxis.maxWidth - padding) {
-      let horizontalSpace = yAxis.maxWidth - padding - tickMarkLength,
+    let labelSizes = yAxis._labelSizes || {},
+      widest = labelSizes.widest || {};
+    if (widest.width > yAxis.maxWidth - padding) {
+      let horizontalSpace = yAxis.maxWidth - padding - tickLength,
         measureText = yAxis.ctx.measureText.bind(yAxis.ctx);
-      yAxis._ticks.forEach(tick => {
+      yAxis.ticks.forEach(tick => {
         tick.label = strings.truncateText(tick.label, horizontalSpace, measureText);
       });
     }
   }
 
   _displayDatalabelsOnRadialChart(context) {
-    let data = context.chart.getDatasetMeta(context.datasetIndex).data[context.dataIndex],
-      model = data._model,
-      // Compute the biggest circle that fits inside sector/arc with center in the middle between inner and outer radius.
-      // First compute a circle C1 that touches the straight boundaries of the sector/arc. Then compute a circle C2 that touches the inner and the outer radius.
-      // The smaller one of these two circles is the biggest possible circle that fits inside sector/arc with center in the middle between inner and outer radius.
-      // circle C1:
-      midRadius = (model.outerRadius + model.innerRadius) / 2,
+    // noinspection JSValidateTypes
+    /**
+     * @type ArcElement
+     */
+    let element = context.chart.getDatasetMeta(context.datasetIndex).data[context.dataIndex];
+    // Compute the biggest circle that fits inside sector/arc with center in the middle between inner and outer radius.
+    // First compute a circle C1 that touches the straight boundaries of the sector/arc. Then compute a circle C2 that touches the inner and the outer radius.
+    // The smaller one of these two circles is the biggest possible circle that fits inside sector/arc with center in the middle between inner and outer radius.
+    // circle C1:
+    let midRadius = (element.outerRadius + element.innerRadius) / 2,
       // If the difference between the angles is greater than pi, it is no longer possible for a circle to be inside the sector/arc and touch both straight boundaries.
-      angle = Math.min((model.endAngle - model.startAngle), Math.PI) / 2,
+      angle = Math.min((element.endAngle - element.startAngle), Math.PI) / 2,
       radius1 = Math.abs(Math.sin(angle)) * midRadius,
       diameter1 = radius1 * 2,
       // circle C2:
-      diameter2 = model.outerRadius - model.innerRadius;
+      diameter2 = element.outerRadius - element.innerRadius;
     return Math.min(diameter1, diameter2) > this.minRadialChartDatalabelSpace;
   }
 
@@ -1180,10 +1414,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _computeSumOfVisibleElements(context) {
     let dataset = context.dataset,
-      meta = context.chart.getDatasetMeta(context.datasetIndex),
+      chart = context.chart,
       sum = 0;
     for (let i = 0; i < dataset.data.length; i++) {
-      if (meta.data[i] && !meta.data[i].hidden) {
+      if (chart.getDataVisibility(i)) {
         sum += dataset.data[i];
       }
     }
@@ -1205,9 +1439,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this._adjustColorSchemeCssClass(config);
     this._adjustDatasetColors(config);
     this._adjustLegendColors(config);
-    this._adjustTooltipColors(config);
-    this._adjustScaleColors(config);
-    this._adjustScalesColors(config);
+    this._adjustScalesRColors(config);
+    this._adjustScalesXYColors(config);
     this._adjustPluginColors(config);
   }
 
@@ -1262,12 +1495,14 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       setProperty('hoverBackgroundColor', hoverBackgroundColor);
       setProperty('hoverBorderColor', hoverBorderColor);
       setProperty('legendColor', legendColor);
-      setProperty('pointHoverBackgroundColor', pointHoverBackgroundColor);
-      setProperty('pointBorderColor', this.firstOpaqueBackgroundColor);
-      setProperty('pointHoverBorderColor', this.firstOpaqueBackgroundColor);
+      if (scout.isOneOf(type, Chart.Type.LINE, Chart.Type.RADAR) || (type === Chart.Type.BAR && elem.type === Chart.Type.LINE)) {
+        setProperty('pointHoverBackgroundColor', pointHoverBackgroundColor);
+        setProperty('pointBorderColor', this.firstOpaqueBackgroundColor);
+        setProperty('pointHoverBorderColor', this.firstOpaqueBackgroundColor);
+      }
       if (checkable) {
         let datasetLength = elem.data.length;
-        if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.BAR_HORIZONTAL, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.BUBBLE) || (type === Chart.Type.BAR && (elem.type || Chart.Type.BAR) === Chart.Type.BAR)) {
+        if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.BUBBLE) || (type === Chart.Type.BAR && (elem.type || Chart.Type.BAR) === Chart.Type.BAR)) {
           let uncheckedBackgroundColor = (multipleColorsPerDataset ? colors.backgroundColors : arrays.init(datasetLength, colors.backgroundColors[idx])),
             uncheckedHoverBackgroundColor = (multipleColorsPerDataset ? colors.hoverBackgroundColors : arrays.init(datasetLength, colors.hoverBackgroundColors[idx])),
 
@@ -1302,6 +1537,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           setProperty('pointRadius', elem.uncheckedPointRadius);
         }
       }
+      this._adjustDatasetBorderWidths(elem);
     });
     if (checkable) {
       this._checkItems(config);
@@ -1533,10 +1769,12 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     config.options = $.extend(true, {}, config.options, {
-      legend: {
-        labels: {
-          fontColor: this._computeLabelColor(config.type),
-          generateLabels: this._legendLabelGenerator
+      plugins: {
+        legend: {
+          labels: {
+            color: this._computeLabelColor(config.type),
+            generateLabels: this._legendLabelGenerator
+          }
         }
       }
     });
@@ -1551,14 +1789,14 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       data = config.data,
       measureText = chart.ctx.measureText.bind(chart.ctx),
       horizontalSpace;
-    if (scout.isOneOf(config.options.legend.position, Chart.Position.LEFT, Chart.Position.RIGHT)) {
+    if (scout.isOneOf(config.options.plugins.legend.position, Chart.Position.LEFT, Chart.Position.RIGHT)) {
       horizontalSpace = Math.min(250, this.$canvas.cssWidth() / 3);
     } else {
       horizontalSpace = Math.min(250, this.$canvas.cssWidth() * 2 / 3);
     }
     let defaultTypeGenerateLabels;
-    if (ChartJs.defaults[config.type] && ChartJs.defaults[config.type].legend && ChartJs.defaults[config.type].legend.labels) {
-      defaultTypeGenerateLabels = ChartJs.defaults[config.type].legend.labels.generateLabels;
+    if (ChartJs.overrides[config.type] && ChartJs.overrides[config.type].plugins && ChartJs.overrides[config.type].plugins.legend && ChartJs.overrides[config.type].plugins.legend.labels) {
+      defaultTypeGenerateLabels = ChartJs.overrides[config.type].plugins.legend.labels.generateLabels;
     }
     let defaultGenerateLabels = defaultTypeGenerateLabels || ChartJs.defaults.plugins.legend.labels.generateLabels;
     let labels = defaultGenerateLabels.call(chart, chart);
@@ -1566,7 +1804,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       elem.text = strings.truncateText(elem.text, horizontalSpace, measureText);
       let dataset = data.datasets[idx],
         fillStyle;
-      if (dataset && scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
+      if (dataset && scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
         fillStyle = dataset.legendColor || this._adjustColorOpacity(dataset.borderColor, 1);
       } else if (data.datasets.length && scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
         dataset = data.datasets[0];
@@ -1582,26 +1820,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     return labels;
   }
 
-  _adjustTooltipColors(config) {
-    if (!config || !config.type || !config.options) {
-      return;
-    }
-
-    let tooltipBackgroundColor = this._computeTooltipBackgroundColor(config.type);
-    config.options = $.extend(true, {}, config.options, {
-      tooltips: {
-        backgroundColor: tooltipBackgroundColor,
-        multiKeyBackground: tooltipBackgroundColor
-      }
-    });
-  }
-
-  _computeTooltipBackgroundColor(type) {
-    return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'tooltip-background'], 'fill').fill;
-  }
-
-  _adjustScaleColors(config) {
-    if (!config || !config.type || !config.options || !config.options.scale) {
+  _adjustScalesRColors(config) {
+    if (!config || !config.type || !config.options || !config.options.scales || !config.options.scales.r) {
       return;
     }
 
@@ -1610,14 +1830,14 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       gridColor = this._computeGridColor(config.type),
       scaleTicksColor = this._computeScaleTicksColor(config.type);
 
-    config.options.scale.ticks = $.extend(true, {}, config.options.scale.ticks, {
-      fontColor: scaleTicksColor,
+    config.options.scales.r.ticks = $.extend(true, {}, config.options.scales.r.ticks, {
+      color: scaleTicksColor,
       backdropColor: labelBackdropColor
     });
-    config.options.scale.pointLabels = $.extend(true, {}, config.options.scale.pointLabels, {
-      fontColor: labelColor
+    config.options.scales.r.pointLabels = $.extend(true, {}, config.options.scales.r.pointLabels, {
+      color: labelColor
     });
-    config.options.scale.gridLines = $.extend(true, {}, config.options.scale.gridLines, {
+    config.options.scales.r.grid = $.extend(true, {}, config.options.scales.r.grid, {
       color: gridColor
     });
   }
@@ -1634,14 +1854,18 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     return styles.get([this.colorSchemeCssClass, type + '-chart', 'elements', 'scale-ticks'], 'fill').fill;
   }
 
-  _adjustScalesColors(config) {
+  _adjustScalesXYColors(config) {
     if (!config || !config.type || !config.options || !config.options.scales) {
       return;
     }
 
-    let xAxes = config.options.scales.xAxes || [],
-      yAxes = config.options.scales.yAxes || [],
-      axes = [...xAxes, ...yAxes];
+    let axes = [];
+    if (config.options.scales.x) {
+      axes.push(config.options.scales.x);
+    }
+    if (config.options.scales.y) {
+      axes.push(config.options.scales.y);
+    }
 
     if (!axes.length) {
       return;
@@ -1652,15 +1876,14 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       axisLabelColor = this._computeAxisLabelColor(config.type);
 
     axes.forEach(elem => {
-      elem.gridLines = $.extend(true, {}, elem.gridLines, {
-        zeroLineColor: gridColor,
+      elem.grid = $.extend(true, {}, elem.grid, {
         color: gridColor
       });
       elem.ticks = $.extend(true, {}, elem.ticks, {
-        fontColor: labelColor
+        color: labelColor
       });
-      elem.scaleLabel = $.extend(true, {}, elem.scaleLabel, {
-        fontColor: axisLabelColor
+      elem.title = $.extend(true, {}, elem.title, {
+        color: axisLabelColor
       });
     });
   }
@@ -1703,25 +1926,27 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config.options.onHover = this._hoverHandler;
     }
 
-    if (!config.options.legend) {
+    if (!config.options.plugins || !config.options.plugins.legend) {
       return;
     }
 
-    if (config.options.legend.clickable) {
-      config.options.legend.onClick = this._legendClickHandler;
-      config.options.legend.onHover = this._legendPointerHoverHandler;
-      config.options.legend.onLeave = this._legendPointerLeaveHandler;
+    let legend = config.options.plugins.legend;
+    if (legend.clickable) {
+      legend.onClick = this._legendClickHandler;
+      legend.onHover = this._legendPointerHoverHandler;
+      legend.onLeave = this._legendPointerLeaveHandler;
     } else {
-      config.options.legend.onClick = e => e.stopPropagation();
-      config.options.legend.onHover = this._legendHoverHandler;
-      config.options.legend.onLeave = this._legendLeaveHandler;
+      legend.onClick = () => {
+      };
+      legend.onHover = this._legendHoverHandler;
+      legend.onLeave = this._legendLeaveHandler;
     }
   }
 
   /**
    * @param {object[]} items
-   * @param {number} items._index
-   * @param {number} items._datasetIndex
+   * @param {number} items.index
+   * @param {number} items.datasetIndex
    */
   _onClick(event, items) {
     if (!items.length) {
@@ -1729,12 +1954,12 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
     let relevantItem = this._selectRelevantItem(items);
 
-    if (this._isMaxSegmentsExceeded(this.chartJs.config, relevantItem._index)) {
+    if (this._isMaxSegmentsExceeded(this.chartJs.config, relevantItem.index)) {
       return;
     }
 
-    let itemIndex = relevantItem._index,
-      datasetIndex = relevantItem._datasetIndex,
+    let itemIndex = relevantItem.index,
+      datasetIndex = relevantItem.datasetIndex,
       clickObject = {
         datasetIndex: datasetIndex,
         dataIndex: itemIndex
@@ -1757,8 +1982,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
    * Selects the most relevant item. Default is the first item.
    *
    * @param {object[]} items
-   * @param {number} items._index
-   * @param {number} items._datasetIndex
+   * @param {number} items.index
+   * @param {number} items.datasetIndex
    * @private
    */
   _selectRelevantItem(items) {
@@ -1769,7 +1994,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       // The smallest bubble, which is drawn in the foreground, is the most relevant item for the bubble chart.
       // If two bubbles are the same size, we choose the one which comes later in the array (bubble with array index n + 1 is draw in front of bubble with array index n)
       items.forEach(item => {
-        if (chartDatasets[item._datasetIndex].data[item._index].z <= chartDatasets[relevantItem._datasetIndex].data[relevantItem._index].z) {
+        if (chartDatasets[item.datasetIndex].data[item.index].z <= chartDatasets[relevantItem.datasetIndex].data[relevantItem.index].z) {
           relevantItem = item;
         }
       });
@@ -1809,35 +2034,35 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _onHoverPointer(event, items) {
     this._onHover(event, items);
-    if (items.length && !this._isMaxSegmentsExceeded(this.chartJs.config, items[0]._index)) {
+    if (items.length && !this._isMaxSegmentsExceeded(this.chartJs.config, items[0].index)) {
       this.$canvas.css('cursor', 'pointer');
     } else {
       this.$canvas.css('cursor', 'default');
     }
   }
 
-  _onLegendClick(event, item) {
+  _onLegendClick(e, legendItem, legend) {
     if (!this.chartJs.config || !this.chartJs.config.type) {
       return;
     }
 
     let type = this.chartJs.config.type,
       defaultTypeLegendClick;
-    if (ChartJs.defaults[type] && ChartJs.defaults[type].legend) {
-      defaultTypeLegendClick = ChartJs.defaults[type].legend.onClick;
+    if (ChartJs.overrides[type] && ChartJs.overrides[type].plugins && ChartJs.overrides[type].plugins.legend) {
+      defaultTypeLegendClick = ChartJs.overrides[type].plugins.legend.onClick;
     }
     let defaultLegendClick = defaultTypeLegendClick || ChartJs.defaults.plugins.legend.onClick;
-    defaultLegendClick.call(this.chartJs, event, item);
-    this._onLegendLeave(event, item);
-    this._onLegendHoverPointer(event, item, true);
+    defaultLegendClick.call(this.chartJs, e, legendItem, legend);
+    this._onLegendLeave(e, legendItem, legend);
+    this._onLegendHoverPointer(e, legendItem, true);
   }
 
-  _onLegendHover(event, item, animated) {
-    let index = item.datasetIndex,
+  _onLegendHover(e, legendItem, legend) {
+    let index = legendItem.datasetIndex,
       config = this.chartJs.config,
       type = config.type;
     if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-      index = item.index;
+      index = legendItem.index;
     }
 
     if (this.legendHoverDatasets.indexOf(index) > -1) {
@@ -1851,25 +2076,21 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       this.chartJs.update();
     }
     this._updateHoverStyle(index, true);
-    if (animated) {
-      this.chartJs.render();
-    } else {
-      this.chartJs.render({duration: 0});
-    }
+    this.chartJs.render();
     this.legendHoverDatasets.push(index);
   }
 
-  _onLegendHoverPointer(event, item, animated) {
-    this._onLegendHover(event, item, animated);
+  _onLegendHoverPointer(e, legendItem, legend) {
+    this._onLegendHover(e, legendItem, legend);
     this.$canvas.css('cursor', 'pointer');
   }
 
-  _onLegendLeave(event, item) {
-    let index = item.datasetIndex,
+  _onLegendLeave(e, legendItem, legend) {
+    let index = legendItem.datasetIndex,
       config = this.chartJs.config,
       type = config.type;
     if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-      index = item.index;
+      index = legendItem.index;
     }
 
     if (this.legendHoverDatasets.indexOf(index) < 0) {
@@ -1902,6 +2123,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     dataset.backgroundColorBackup = dataset.backgroundColor;
     // overwrite the current background color with the hover color
     dataset.backgroundColor = dataset.hoverBackgroundColor;
+    this._adjustDatasetBorderWidths(dataset);
   }
 
   /**
@@ -1913,35 +2135,46 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (dataset) {
       dataset.backgroundColor = dataset.backgroundColorBackup || dataset.backgroundColor;
       delete dataset.backgroundColorBackup;
+      this._adjustDatasetBorderWidths(dataset);
     } else {
       this.chartJs.config.data.datasets.forEach(dataset => this._restoreBackgroundColor(dataset));
     }
   }
 
-  _onLegendLeavePointer(event, item) {
-    this._onLegendLeave(event, item);
+  _onLegendLeavePointer(e, legendItem, legend) {
+    this._onLegendLeave(e, legendItem, legend);
     this.$canvas.css('cursor', 'default');
   }
 
-  _updateHoverStyle(index, enabled) {
+  _updateHoverStyle(datasetIndex, enabled) {
     let config = this.chartJs.config,
       type = config.type,
+      mode,
+      elements = [],
       datasets = config.data.datasets,
-      dataset = datasets ? datasets[index] : null,
+      dataset = datasets ? datasets[datasetIndex] : null,
       datasetType = dataset ? dataset.type : null;
-    if ((datasetType || type) === Chart.Type.LINE) {
-      this.chartJs.updateHoverStyle(this.chartJs.getDatasetMeta(index).data, 'point', enabled);
-    } else if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-      let elements = [];
-      for (let i = 0; i < datasets.length; i++) {
-        elements.push(this.chartJs.getDatasetMeta(i).data[index]);
-      }
-      this.chartJs.updateHoverStyle(elements, 'point', enabled);
+    if (scout.isOneOf(type, Chart.Type.LINE, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA) || datasetType === Chart.Type.LINE) {
+      mode = 'point';
     } else {
-      let elements = this.chartJs.getDatasetMeta(index).data;
-      if (elements && elements.length) {
-        this.chartJs.updateHoverStyle(this.chartJs.getDatasetMeta(index).data, 'dataset', enabled);
-      }
+      mode = 'dataset';
+    }
+    if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
+      this.chartJs.getSortedVisibleDatasetMetas().forEach((meta, index) => elements.push({
+        element: meta.data[datasetIndex],
+        datasetIndex: index,
+        index: datasetIndex
+      }));
+    } else {
+      this.chartJs.getDatasetMeta(datasetIndex).data.forEach((element, index) => elements.push({
+        element: element,
+        datasetIndex: datasetIndex,
+        index: index
+      }));
+    }
+    if (elements && elements.length) {
+      // noinspection JSCheckFunctionSignatures
+      this.chartJs.updateHoverStyle(elements, mode, enabled);
     }
   }
 
@@ -1984,8 +2217,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       // Compute a scalingFactor and an offset to get the new radius newR = r * scalingFactor + offset.
       bubbleScalingFactor = 1,
       bubbleRadiusOffset = 0,
-      sizeOfLargestBubble = config.bubble ? config.bubble.sizeOfLargestBubble : 0,
-      minBubbleSize = config.bubble ? config.bubble.minBubbleSize : 0;
+      sizeOfLargestBubble = (config.options || {}).bubble ? config.options.bubble.sizeOfLargestBubble : 0,
+      minBubbleSize = (config.options || {}).bubble ? config.options.bubble.minBubbleSize : 0;
     if (sizeOfLargestBubble) {
       let width = Math.abs(chartArea.right - chartArea.left),
         height = Math.abs(chartArea.top - chartArea.bottom);
@@ -2134,44 +2367,48 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _adjustGridMaxMin(config, chartArea) {
-    if (!config || !config.type || !config.options || !config.options.adjustGridMaxMin || (!config.options.scale && !config.options.scales) || !chartArea) {
+    if (!config || !config.type || !config.options || !config.options.adjustGridMaxMin || !config.options.scales || !chartArea) {
       return;
     }
 
     let type = config.type;
-    if (!scout.isOneOf(type, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
+    if (!scout.isOneOf(type, Chart.Type.BAR, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
       return;
     }
 
-    let options = config.options,
-      scales = options.scales,
-      scale = options.scale,
-      minSpaceBetweenXTicks = options.minSpaceBetweenTicks,
-      minSpaceBetweenYTicks = options.minSpaceBetweenTicks;
+    let scales = config.options.scales,
+      xAxis = scales.x,
+      yAxis = scales.y,
+      rAxis = scales.r,
+      minSpaceBetweenXTicks = xAxis ? xAxis.minSpaceBetweenTicks : 1,
+      minSpaceBetweenYTicks = yAxis ? yAxis.minSpaceBetweenTicks : 1;
+
+    if (rAxis) {
+      minSpaceBetweenXTicks = rAxis.minSpaceBetweenTicks;
+      minSpaceBetweenYTicks = rAxis.minSpaceBetweenTicks;
+    }
+
     let width = Math.abs(chartArea.right - chartArea.left),
       height = Math.abs(chartArea.top - chartArea.bottom),
-      maxXTicks = Math.max(Math.floor(width / minSpaceBetweenXTicks), 3),
-      maxYTicks = Math.max(Math.floor(height / minSpaceBetweenYTicks), 3);
+      maxXTicks = Math.max(Math.floor(width / minSpaceBetweenXTicks) + 1, 3),
+      maxYTicks = Math.max(Math.floor(height / minSpaceBetweenYTicks) + 1, 3);
 
     let yBoundaries = this._computeYBoundaries(config, height),
       yBoundary = yBoundaries.yBoundary,
       yBoundaryDiffType = yBoundaries.yBoundaryDiffType;
 
-    if (scale) {
-      this._adjustScaleMaxMin(scale, Math.min(maxXTicks, maxYTicks), yBoundary);
+    if (rAxis) {
+      this._adjustAxisMaxMin(rAxis, Math.ceil(Math.min(maxXTicks, maxYTicks) / 2), yBoundary);
       return;
     }
 
-    let xAxes = scales.xAxes,
-      yAxes = scales.yAxes;
-
     if (yBoundaryDiffType) {
-      this._adjustAxes(arrays.ensure(yAxes[0]), maxYTicks, yBoundary);
-      this._adjustAxes(arrays.ensure(yAxes[1]), maxYTicks, yBoundaryDiffType);
+      this._adjustAxisMaxMin(yAxis, maxYTicks, yBoundary);
+      this._adjustAxisMaxMin(scales.yDiffType, maxYTicks, yBoundaryDiffType);
     } else if (this._isHorizontalBar(config)) {
-      this._adjustAxes(xAxes, maxXTicks, yBoundary);
+      this._adjustAxisMaxMin(xAxis, maxXTicks, yBoundary);
     } else {
-      this._adjustAxes(yAxes, maxYTicks, yBoundary);
+      this._adjustAxisMaxMin(yAxis, maxYTicks, yBoundary);
     }
 
     if (type !== Chart.Type.BUBBLE) {
@@ -2179,7 +2416,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     let xBoundary = this._computeXBoundaryBubble(config, width);
-    this._adjustAxes(xAxes, maxXTicks, xBoundary);
+    this._adjustAxisMaxMin(xAxis, maxXTicks, xBoundary);
   }
 
   _computeBoundaryBubble(config, identifier, space) {
@@ -2188,10 +2425,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     let datasets = config.data.datasets,
-      axes = config.options.scales[identifier + 'Axes'],
-      axis = (axes && axes.length) ? axes[0] : null,
+      axis = config.options.scales[identifier],
       offset = axis && axis.offset,
-      labelMap = config.options.scales[identifier + 'LabelMap'],
+      labelMap = config.options[identifier + 'LabelMap'],
       boundary;
 
     let maxR = this._computeMaxMinValue(datasets, 'r', true).maxValue,
@@ -2267,80 +2503,72 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
 
-    if (!config.options || !config.options.scales || !config.options.scales.yAxes || config.options.scales.yAxes.length !== 1) {
+    if (!config.options || !config.options.scales || !config.options.scales.y || config.options.scales.yDiffType) {
       return;
     }
 
     let type = config.type,
-      scales = config.options.scales,
-      yAxis = scales.yAxes[0],
+      options = config.options,
+      scales = options.scales,
+      yAxis = scales.y,
       yAxisDiffType = $.extend(true, {}, yAxis);
-    scales.yAxes.push(yAxisDiffType);
+    scales.yDiffType = yAxisDiffType;
 
-    yAxis.id = 'yAxis';
-    yAxisDiffType.id = 'yAxisDiffType';
+    yAxis.id = 'y';
+    yAxisDiffType.id = 'yDiffType';
 
     if (config.data && config.data.datasets && config.data.datasets.length && config.data.datasets[0].type && config.data.datasets[0].type !== type) {
       yAxisDiffType.position = Chart.Position.LEFT;
       yAxis.position = Chart.Position.RIGHT;
-      yAxis.gridLines.drawOnChartArea = false;
+      yAxis.grid.drawOnChartArea = false;
     } else {
       yAxis.position = Chart.Position.LEFT;
       yAxisDiffType.position = Chart.Position.RIGHT;
-      yAxisDiffType.gridLines.drawOnChartArea = false;
+      yAxisDiffType.grid.drawOnChartArea = false;
     }
 
-    yAxis.gridLines.drawBorder = true;
-    yAxis.gridLines.drawTicks = true;
-    yAxisDiffType.gridLines.drawBorder = true;
-    yAxisDiffType.gridLines.drawTicks = true;
+    yAxis.grid.drawBorder = true;
+    yAxis.grid.drawTicks = true;
+    yAxisDiffType.grid.drawBorder = true;
+    yAxisDiffType.grid.drawTicks = true;
 
     let yAxisType = (datasets[0].type || type),
       yAxisDiffTypeType = (datasetsDiffType[0].type || type),
       yAxisTypeLabel = this.chart.session.text('ui.' + yAxisType),
       yAxisDiffTypeTypeLabel = this.chart.session.text('ui.' + yAxisDiffTypeType),
-      yAxisScaleLabel = scales.scaleLabelByTypeMap ? scales.scaleLabelByTypeMap[yAxisType] : null,
-      yAxisDiffTypeScaleLabel = scales.scaleLabelByTypeMap ? scales.scaleLabelByTypeMap[yAxisDiffTypeType] : null;
+      yAxisScaleLabel = options.scaleLabelByTypeMap ? options.scaleLabelByTypeMap[yAxisType] : null,
+      yAxisDiffTypeScaleLabel = options.scaleLabelByTypeMap ? options.scaleLabelByTypeMap[yAxisDiffTypeType] : null;
 
-    yAxis.scaleLabel.display = true;
-    yAxis.scaleLabel.labelString = yAxisScaleLabel ? yAxisScaleLabel + ' (' + yAxisTypeLabel + ')' : yAxisTypeLabel;
-    yAxisDiffType.scaleLabel.display = true;
-    yAxisDiffType.scaleLabel.labelString = yAxisDiffTypeScaleLabel ? yAxisDiffTypeScaleLabel + ' (' + yAxisDiffTypeTypeLabel + ')' : yAxisDiffTypeTypeLabel;
+    yAxis.title.display = true;
+    yAxis.title.text = yAxisScaleLabel ? yAxisScaleLabel + ' (' + yAxisTypeLabel + ')' : yAxisTypeLabel;
+    yAxisDiffType.title.display = true;
+    yAxisDiffType.title.text = yAxisDiffTypeScaleLabel ? yAxisDiffTypeScaleLabel + ' (' + yAxisDiffTypeTypeLabel + ')' : yAxisDiffTypeTypeLabel;
 
     datasets.forEach(dataset => {
-      dataset.yAxisID = 'yAxis';
+      dataset.yAxisID = 'y';
     });
     datasetsDiffType.forEach(dataset => {
-      dataset.yAxisID = 'yAxisDiffType';
+      dataset.yAxisID = 'yDiffType';
     });
   }
 
-  _adjustScaleMaxMin(scale, maxTicks, maxMinValue) {
-    scale.ticks = $.extend(true, {}, scale.ticks, {
-      maxTicksLimit: Math.ceil(maxTicks / 2),
-      stepSize: (this.onlyIntegers ? 1 : undefined)
-    });
-    if (maxMinValue) {
-      scale.ticks.suggestedMax = maxMinValue.maxValue;
-      scale.ticks.suggestedMin = maxMinValue.minValue;
-    }
-  }
-
-  _adjustAxes(axes, maxTicks, maxMinValue) {
-    if (!axes || !Array.isArray(axes) || !axes.length) {
+  _adjustAxisMaxMin(axis, maxTicks, maxMinValue) {
+    if (!axis) {
       return;
     }
 
-    for (let i = 0; i < axes.length; i++) {
-      axes[i].ticks = $.extend(true, {}, axes[i].ticks, {
-        maxTicksLimit: maxTicks,
-        stepSize: (this.onlyIntegers ? 1 : undefined)
-      });
-      if (maxMinValue) {
-        axes[i].ticks.suggestedMax = maxMinValue.maxValue;
-        axes[i].ticks.suggestedMin = maxMinValue.minValue;
-      }
+    let maxRangeBetweenTwoTicks = 1;
+
+    axis.ticks = $.extend(true, {}, axis.ticks, {
+      maxTicksLimit: maxTicks
+    });
+    if (maxMinValue) {
+      axis.suggestedMax = maxMinValue.maxValue;
+      axis.suggestedMin = maxMinValue.minValue;
+
+      maxRangeBetweenTwoTicks = (maxMinValue.maxValue - maxMinValue.minValue) / (maxTicks - 1);
     }
+    axis.ticks.stepSize = this.onlyIntegers && maxRangeBetweenTwoTicks < 1 ? 1 : undefined;
   }
 
   _remove(afterRemoveFunc) {

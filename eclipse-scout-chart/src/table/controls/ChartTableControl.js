@@ -656,8 +656,10 @@ export default class ChartTableControl extends TableControl {
         handleResize: true,
         colorScheme: this.chartColorScheme,
         maxSegments: 5,
-        legend: {
-          display: false
+        plugins: {
+          legend: {
+            display: false
+          }
         }
       }
     };
@@ -776,11 +778,6 @@ export default class ChartTableControl extends TableControl {
       data.labels = labels;
     }
 
-    // duplicate the dataset for pie charts, this is necessary for datalabels on the segments and outside of the pie chart
-    if (this.chartType === Chart.Type.PIE) {
-      data.datasets[1] = $.extend(true, {}, dataset);
-    }
-
     return data;
   }
 
@@ -853,22 +850,24 @@ export default class ChartTableControl extends TableControl {
       if (this.chartType !== Chart.Type.PIE) {
         config.options = $.extend(true, {}, config.options, {
           scales: {
-            xAxes: [{
+            x: {
               ticks: {
                 fontFamily: fontFamily
               }
-            }],
-            yAxes: [{
+            },
+            y: {
               ticks: {
                 fontFamily: fontFamily
               }
-            }]
+            }
           }
         });
       }
       config.options = $.extend(true, {}, config.options, {
-        tooltips: {
-          titleFontFamily: fontFamily
+        plugins: {
+          tooltip: {
+            titleFontFamily: fontFamily
+          }
         }
       });
       config.options = $.extend(true, {}, config.options, {
@@ -894,22 +893,22 @@ export default class ChartTableControl extends TableControl {
       if (!(xAxis.column instanceof NumberColumn)) {
         config.options = $.extend(true, {}, config.options, {
           scales: {
-            xAxes: [{
+            x: {
               ticks: {
                 callback: label => this._formatLabel(label, xAxis)
               }
-            }]
+            }
           }
         });
       }
       if (!(yAxis.column instanceof NumberColumn)) {
         config.options = $.extend(true, {}, config.options, {
           scales: {
-            yAxes: [{
+            y: {
               ticks: {
                 callback: label => this._formatLabel(label, yAxis)
               }
-            }]
+            }
           }
         });
       }
@@ -988,7 +987,7 @@ export default class ChartTableControl extends TableControl {
       return;
     }
 
-    config.bubble = $.extend(true, {}, config.bubble, {
+    config.options.bubble = $.extend(true, {}, config.options.bubble, {
       sizeOfLargestBubble: 25,
       minBubbleSize: 5
     });
@@ -999,19 +998,22 @@ export default class ChartTableControl extends TableControl {
       return;
     }
 
-    // first dataset is hidden but datalabels are displayed outside of the chart
-    config.data.datasets[0].weight = 0;
     config.data.datasets[0].datalabels = {
-      display: 'auto',
-      color: styles.get([this.chartColorScheme, this.chartType + '-chart', 'elements', 'label'], 'fill').fill,
-      formatter: (value, context) => {
-        return context.chart.data.labels[context.dataIndex];
-      },
-      anchor: 'end',
-      align: 'end',
-      clamp: true,
-      offset: 10,
-      padding: 4
+      labels: {
+        index: {
+          display: 'auto',
+          color: styles.get([this.chartColorScheme, this.chartType + '-chart', 'elements', 'label'], 'fill').fill,
+          formatter: (value, context) => {
+            return context.chart.data.labels[context.dataIndex];
+          },
+          anchor: 'end',
+          align: 'end',
+          clamp: true,
+          offset: 10,
+          padding: 4
+        },
+        labels: {}
+      }
     };
 
     config.options = $.extend(true, {}, config.options, {
@@ -1040,16 +1042,12 @@ export default class ChartTableControl extends TableControl {
 
     config.options = $.extend(true, {}, config.options, {
       scales: {
-        xAxes: [{
-          ticks: {
-            beginAtZero: true
-          }
-        }],
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
-          }
-        }]
+        x: {
+          beginAtZero: true
+        },
+        y: {
+          beginAtZero: true
+        }
       }
     });
   }
@@ -1105,9 +1103,7 @@ export default class ChartTableControl extends TableControl {
     let filters = [];
     if (this.chart && this.chart.config.data) {
       let maxSegments = this.chart.config.options.maxSegments,
-        // first dataset is hidden on pie charts
-        datasetIndex = this.chartType === Chart.Type.PIE ? 1 : 0,
-        dataset = this.chart.config.data.datasets[datasetIndex],
+        dataset = this.chart.config.data.datasets[0],
         getFilters = index => ({deterministicKey: dataset.deterministicKeys[index]});
       if (this.chartType === Chart.Type.PIE) {
         getFilters = index => {
@@ -1119,7 +1115,7 @@ export default class ChartTableControl extends TableControl {
         };
       }
 
-      let checkedIndices = this.chart.checkedItems.filter(item => item.datasetIndex === datasetIndex)
+      let checkedIndices = this.chart.checkedItems.filter(item => item.datasetIndex === 0)
         .map(item => item.dataIndex);
       checkedIndices.forEach(index => {
         arrays.pushAll(filters, getFilters(index));

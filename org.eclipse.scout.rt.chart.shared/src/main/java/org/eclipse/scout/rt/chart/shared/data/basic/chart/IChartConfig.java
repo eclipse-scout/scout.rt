@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,20 +45,20 @@ public interface IChartConfig extends Serializable {
 
   int DEFAULT_MAX_SEGMENTS_PIE = 5;
 
-  String SPEEDO_CHART_GREEN_AREA_POSITION = "speedo.greenAreaPosition";
+  String SPEEDO_CHART_GREEN_AREA_POSITION = "options.speedo.greenAreaPosition";
 
-  String SALESFUNNEL_NORMALIZED = "salesfunnel.normalized";
-  String SALESFUNNEL_CALC_CONVERSION_RATE = "salesfunnel.calcConversionRate";
+  String SALESFUNNEL_NORMALIZED = "options.salesfunnel.normalized";
+  String SALESFUNNEL_CALC_CONVERSION_RATE = "options.salesfunnel.calcConversionRate";
 
-  String VENN_NUMBER_OF_CIRCLES = "venn.numberOfCircles";
+  String VENN_NUMBER_OF_CIRCLES = "options.venn.numberOfCircles";
 
   /**
    * Indicates the value from which the animation should be started. If not set, the animation starts from 0.
    */
-  String FULFILLMENT_START_VALUE = "fulfillment.startValue";
+  String FULFILLMENT_START_VALUE = "options.fulfillment.startValue";
 
-  String BUBBLE_SIZE_OF_LARGEST_BUBBLE = "bubble.sizeOfLargestBubble";
-  String BUBBLE_MIN_BUBBLE_SIZE = "bubble.minBubbleSize";
+  String BUBBLE_SIZE_OF_LARGEST_BUBBLE = "options.bubble.sizeOfLargestBubble";
+  String BUBBLE_MIN_BUBBLE_SIZE = "options.bubble.minBubbleSize";
 
   IChartConfig copy();
 

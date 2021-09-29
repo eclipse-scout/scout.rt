@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,9 +31,11 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     this.suppressLegendBox = true;
 
     let defaultConfig = {
-      salesfunnel: {
-        normalized: undefined,
-        calcConversionRate: undefined
+      options: {
+        salesfunnel: {
+          normalized: undefined,
+          calcConversionRate: undefined
+        }
       }
     };
     chart.config = $.extend(true, {}, defaultConfig, chart.config);
@@ -47,8 +49,8 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       chartData.axes.length !== chartData.chartValueGroups.length ||
       chartData.chartValueGroups.length === 0 ||
       chartData.chartValueGroups[0].values.length === 0 ||
-      chartConfig.salesfunnel.normalized === undefined ||
-      chartConfig.salesfunnel.calcConversionRate === undefined) {
+      chartConfig.options.salesfunnel.normalized === undefined ||
+      chartConfig.options.salesfunnel.calcConversionRate === undefined) {
       return false;
     }
     return true;
@@ -70,7 +72,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       this.conversionRateWidth;
     this.centerX = this.barAreaWidth / 2;
 
-    if (this.chart.config.salesfunnel.normalized) {
+    if (this.chart.config.options.salesfunnel.normalized) {
       this._renderBarsNormalized(chartData.chartValueGroups);
     } else {
       this._renderBarsAccordingToValues(chartData.chartValueGroups);
@@ -131,7 +133,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       }
       if (i > 0) {
         this._renderLabelSeparatorLine(yCoord, labelLineWidth);
-        if (this.chart.config.salesfunnel.calcConversionRate) {
+        if (this.chart.config.options.salesfunnel.calcConversionRate) {
           this._renderConversionRate(i, startPointX, this._calcConversionRate(chartValueGroups[i - 1].values[0], chartValueGroups[i].values[0]));
         }
       }
@@ -157,10 +159,10 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
         .attr('opacity', 0)
         .animateSVG('opacity', 1, this.animationDuration, null, true);
     }
-    if (this.chart.config.options.tooltips.enabled && this.chart.data.axes.length > 0) {
+    if (this.chart.config.options.plugins.tooltip.enabled && this.chart.data.axes.length > 0) {
       let desc = this.chart.data.axes[barIndexFromTop][secondLabel ? 1 : 0].label,
-        textBoundings = this._measureText(label, labelClass);
-      this._renderWireLabels(desc, $label, x - textBoundings.width / 2, y - textBoundings.height);
+        textBounds = this._measureText(label, labelClass);
+      this._renderWireLabels(desc, $label, x - textBounds.width / 2, y - textBounds.height);
     }
   }
 
@@ -207,12 +209,11 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       return;
     }
     let ctrlY = barIndexFromTop * this.barHeight,
-      labelRenderPointY = ctrlY,
       labelClass = this._dynamicCssClass('salesfunnel-conversionrate-label');
 
     let $label = this.$svg.appendSVG('text', labelClass)
       .attr('x', startPointX)
-      .attr('y', labelRenderPointY)
+      .attr('y', ctrlY)
       .text('↓ ' + conversionRate + '%');
     if (this.animationDuration) {
       $label
@@ -322,7 +323,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       }
       if (i > 0) {
         this._renderLabelSeparatorLine(yCoord, labelLineWidth);
-        if (this.chart.config.salesfunnel.calcConversionRate) {
+        if (this.chart.config.options.salesfunnel.calcConversionRate) {
           this._renderConversionRate(i, startPointX, this._calcConversionRate(chartValueGroups[i - 1].values[0], chartValueGroups[i].values[0]));
         }
       }
@@ -417,7 +418,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
   }
 
   _dynamicConversionRateWidth() {
-    if (!this.chart.config.salesfunnel.calcConversionRate) {
+    if (!this.chart.config.options.salesfunnel.calcConversionRate) {
       return 0; // don't show conversion rate
     }
     if (this.chartBox.width <= this.widthThresholdSmall) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  */
 import {ObjectFactory, strings, styles} from '@eclipse-scout/core';
 import $ from 'jquery';
-import {Chart, AbstractChartRenderer} from '../index';
+import {AbstractChartRenderer, Chart} from '../index';
 
 export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
 
@@ -243,7 +243,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
       removeFunc: () => {
       }
     };
-    if (!this.chart.config.options.tooltips.enabled) {
+    if (!this.chart.config.options.plugins.tooltip.enabled) {
       return legend;
     }
     let padding = 5,

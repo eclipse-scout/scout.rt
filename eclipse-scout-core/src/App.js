@@ -196,7 +196,7 @@ export default class App {
    */
   _init(options) {
     options = options || {};
-    if (!this._checkBrowserCompability(options)) {
+    if (!this._checkBrowserCompatibility(options)) {
       return;
     }
 
@@ -219,7 +219,7 @@ export default class App {
     return $.resolvedPromise();
   }
 
-  _checkBrowserCompability(options) {
+  _checkBrowserCompatibility(options) {
     let device = Device.get();
     let app = this;
     $.log.isInfoEnabled() && $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);

@@ -138,17 +138,17 @@ export default class Chart extends Widget {
         animation: {
           duration: Chart.DEFAULT_ANIMATION_DURATION
         },
-        tooltips: {
-          enabled: true
-        },
-        legend: {
-          display: true,
-          clickable: false,
-          position: Chart.Position.RIGHT
-        },
         plugins: {
           datalabels: {
             display: false
+          },
+          tooltip: {
+            enabled: true
+          },
+          legend: {
+            display: true,
+            clickable: false,
+            position: Chart.Position.RIGHT
           }
         }
       }
@@ -173,9 +173,9 @@ export default class Chart extends Widget {
         return;
       }
       // Property not set on source -> remove from target
-      if (!source.options || !source.options.scales || !source.options.scales[identifier]) {
-        if (target.options && target.options.scales) {
-          delete target.options.scales[identifier];
+      if (!source.options || !source.options[identifier]) {
+        if (target.options) {
+          delete target.options[identifier];
         }
         if (target.options && objects.isEmpty(target.options.scales) && !(source.options && source.options.scales)) {
           delete target.options.scales;
@@ -185,10 +185,7 @@ export default class Chart extends Widget {
         }
         return;
       }
-      target.options = $.extend(true, {
-        scales: {}
-      }, target.options);
-      target.options.scales[identifier] = source.options.scales[identifier];
+      target.options[identifier] = source.options[identifier];
     };
     transferLabelMap(config, oldConfigWithNewData, 'xLabelMap');
     transferLabelMap(config, oldConfigWithNewData, 'yLabelMap');
