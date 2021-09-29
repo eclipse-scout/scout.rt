@@ -109,8 +109,8 @@ public class PlannerTest {
     planner.replaceResources(newResources);
 
     assertEquals(1, planner.getSelectedResources().size());
-    assertNotEquals(resource, planner.getSelectedResource());
-    assertEquals(newResources.get(1), planner.getSelectedResource());
+    assertNotSame(resource, planner.getSelectedResource());
+    assertSame(newResources.get(1), planner.getSelectedResource());
   }
 
   /**

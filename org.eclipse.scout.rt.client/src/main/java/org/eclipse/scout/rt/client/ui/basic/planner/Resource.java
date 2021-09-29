@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.planner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -172,4 +173,20 @@ public class Resource<RI> implements ICellObserver, IActivityObserver {
     return getId() + " " + m_cell.toString();
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Resource<?> resource = (Resource<?>) o;
+    return Objects.equals(m_id, resource.m_id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_id);
+  }
 }

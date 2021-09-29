@@ -20,7 +20,7 @@ public interface ICalendarUIFacade {
 
   void fireComponentActionFromUI();
 
-  void fireComponentMoveFromUI(CalendarComponent comp, Date newDate);
+  void fireComponentMoveFromUI(CalendarComponent comp, Date fromDate, Date toDate);
 
   void fireReloadFromUI();
 
