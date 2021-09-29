@@ -8,23 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  CalendarComponent,
-  CalendarLayout,
-  CalendarListComponent,
-  DateRange,
-  dates,
-  Device,
-  GroupBox,
-  HtmlComponent,
-  KeyStrokeContext,
-  menus,
-  objects,
-  scout,
-  scrollbars,
-  strings,
-  Widget
-} from '../index';
+import {CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, Device, events, GroupBox, HtmlComponent, KeyStrokeContext, menus, numbers, objects, Point, Range, scout, scrollbars, strings, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Calendar extends Widget {
@@ -82,6 +66,12 @@ export default class Calendar extends Widget {
     this._listComponents = [];
     this.menuInjectionTarget = null;
     this._menuInjectionTargetMenusChangedHandler = null;
+
+    // Temporary data structure to store data while mouse actions are handled
+    this._moveData = null;
+
+    this._mouseMoveHandler = this._onMouseMove.bind(this);
+    this._mouseUpHandler = this._onMouseUp.bind(this);
 
     this._addWidgetProperties(['components', 'menus', 'selectedComponent']);
     this._addPreserveOnPropertyChangeProperties(['selectedComponent']);
@@ -348,6 +338,9 @@ export default class Calendar extends Widget {
     this.$grid.find('.calendar-day').on('mousedown', mousedownCallbackWithTime);
     let mousedownCallback = this._onDayMouseDown.bind(this, false);
     this.$topGrid.find('.calendar-day').on('mousedown', mousedownCallback);
+
+    this.$window = this.$container.window();
+    this.$container.on('mousedown touchstart', this._onMouseDown.bind(this));
 
     this._updateScreen(false, false);
   }
@@ -737,6 +730,7 @@ export default class Calendar extends Widget {
         .data('new-width', contentW);
       $('.calendar-day:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid).data('new-width', contentW);
       $('.calendar-day:nth-child(' + ($selected.index() + 1) + ')', this.$grid).data('new-width', contentW);
+      this.widthPerDivision = contentW;
     } else if (this._isWorkWeek()) {
       this.$topGrid.find('.calendar-day-name').data('new-width', 0);
       this.$grids.find('.calendar-day').data('new-width', 0);
@@ -746,10 +740,12 @@ export default class Calendar extends Widget {
         .data('new-width', newWidthWorkWeek);
       $('.calendar-day:nth-child(-n+6)', this.$grid)
         .data('new-width', newWidthWorkWeek);
+      this.widthPerDivision = newWidthWorkWeek;
     } else if (this._isMonth() || this._isWeek()) {
       let newWidthMonthOrWeek = Math.round(contentW / 7);
       this.$grids.find('.calendar-day').data('new-width', newWidthMonthOrWeek);
       this.$topGrid.find('.calendar-day-name').data('new-width', newWidthMonthOrWeek);
+      this.widthPerDivision = newWidthMonthOrWeek;
     }
 
     // layout components
@@ -1030,6 +1026,11 @@ export default class Calendar extends Widget {
       }
     }
 
+    this.$window
+      .off('mousemove touchmove', this._mouseMoveHandler)
+      .off('mouseup touchend touchcancel', this._mouseUpHandler);
+    this._moveData = null;
+
     super._remove();
   }
 
@@ -1280,7 +1281,341 @@ export default class Calendar extends Widget {
     return this.$grid;
   }
 
+  _onMouseDown(event) {
+    if (this._moveData) {
+      // Do nothing, when dragging is already in progress. This can happen when the user leaves
+      // the browser window (e.g. using Alt-Tab) while holding the mouse button pressed and
+      // then returns and presses the mouse button again.
+      return;
+    }
+
+    let component = this._getCalendarComponentForMouseEvent(event);
+    // component has to be marked as draggable by the backend
+    // dragging of fullDay components is not supported yet
+    // dragging of components spanning more than one day is not supported yet
+    if (!component || !component.draggable || (!this._isMonth() && component.fullDay) || component._$parts.length > 1) {
+      return;
+    }
+
+    // Ignore right mouse button clicks (allow bubble up --> could trigger context menu)
+    if (event.which === 3) {
+      // Select clicked widget first, otherwise we might display the wrong context menu
+      return;
+    }
+
+    this.$window
+      .off('mousemove touchmove', this._mouseMoveHandler)
+      .off('mouseup touchend touchcancel', this._mouseUpHandler)
+      .on('mousemove touchmove', this._mouseMoveHandler)
+      .on('mouseup touchend touchcancel', this._mouseUpHandler);
+
+    this._moveData = this._newMoveData(event);
+
+    this._onComponentMouseDown(event, component);
+    this._moveData.onMove = this._onComponentMouseMove.bind(this);
+    this._moveData.onUp = this._onComponentMouseUp.bind(this);
+  }
+
+  _onMouseMove(event) {
+    events.fixTouchEvent(event);
+
+    this._moveData.event = event;
+    this._moveData.currentCursorPosition = new Point(
+      event.pageX - this._moveData.containerOffset.left + this._moveData.containerScrollPosition.x,
+      event.pageY - this._moveData.containerOffset.top + this._moveData.containerScrollPosition.y
+    );
+
+    this._scrollViewportWhileDragging(event);
+
+    if (this._moveData.onMove && !this._moveData.cancelled) {
+      this._moveData.onMove(event);
+    }
+  }
+
+  _scrollViewportWhileDragging(event, options) {
+    if (!this._moveData || this._moveData.mode === 'pan' || this._moveData.cancelled) {
+      return;
+    }
+
+    if (!this._moveData.viewportScroller) {
+      this._moveData.viewportScroller = scout.create('ViewportScroller', $.extend({
+        viewportWidth: this.$grid.width(),
+        viewportHeight: this.$grid.height(),
+        active: () => !!this._moveData,
+        scroll: (dx, dy) => {
+          let newScrollTop = this.get$Scrollable().scrollTop() + dy;
+          scrollbars.scrollTop(this.get$Scrollable(), newScrollTop);
+          this._moveData.containerScrollPosition = new Point(this.get$Scrollable().scrollLeft(), this.get$Scrollable().scrollTop());
+        }
+      }));
+    }
+
+    // Mouse position (viewport-relative coordinates) in pixel
+    let mouse = this._moveData.currentCursorPosition.subtract(this._moveData.containerScrollPosition);
+    this._moveData.viewportScroller.update(mouse);
+  }
+
+  _onMouseUp(event) {
+    this.$window
+      .off('mousemove touchmove', this._mouseMoveHandler)
+      .off('mouseup touchend touchcancel', this._mouseUpHandler);
+
+    events.fixTouchEvent(event);
+
+    this._moveData.event = event;
+
+    if (this._moveData.onUp && !this._moveData.cancelled) {
+      this._moveData.onUp(event);
+    }
+
+    this._moveData = null;
+  }
+
+  _onComponentMouseDown(event, component) {
+
+    // Prepare for dragging
+    this._moveData.component = component;
+    this._moveData.logicalX = component._$parts[0].closest('.calendar-day').data().day;
+    this._moveData.logicalY = Math.round(component._$parts[0].position().top) / this.heightPerDivision;
+    if (this._isMonth()) {
+      this._moveData.logicalY = component._$parts[0].closest('.calendar-day').data().week;
+    }
+
+    // Prevent scrolling on touch devices (like "touch-action: none" but with better browser support).
+    // Theoretically, unwanted scrolling can be prevented by adding the CSS rule "touch-action: none"
+    // to the element. Unfortunately, not all devices support this (e.g. Apple Safari on iOS).
+    // Therefore, we always suppress the scrolling in JS. Because this also suppresses the 'click'
+    // event, click actions have to be triggered manually in the 'mouseup' handler.
+    event.preventDefault();
+  }
+
+  _onComponentMouseMove(event) {
+    if (!this._moveData.rafId) {
+      this._moveData.rafId = requestAnimationFrame(this._whileComponentMove.bind(this));
+    }
+  }
+
+  _onComponentMouseUp(event) {
+    this._endComponentMove();
+  }
+
+  _whileComponentMove() {
+    this._moveData.rafId = null;
+
+    let pixelDistance = new Point(
+      this._moveData.currentCursorPosition.x - this._moveData.startCursorPosition.x,
+      this._moveData.currentCursorPosition.y - this._moveData.startCursorPosition.y);
+
+    // Ignore small mouse movements
+    if (!this._moveData.moving) {
+      if (Math.abs(pixelDistance.x) < 7 && Math.abs(pixelDistance.y) < 7) {
+        return;
+      }
+      this._moveData.moving = true;
+    }
+
+    // Snap to grid
+    let logicalDistance = this.toLogicalPosition(pixelDistance);
+
+    // Limit logical distance
+    let minX = 1;
+    let minY = this._isMonth() ? 1 : 0;
+    let maxX = this._isWorkWeek() ? this.workDayIndices.length : 7;
+    let maxY = this._isMonth() ?
+      this.monthViewNumberOfWeeks :
+      (24 * this.numberOfHourDivisions) - Math.ceil(this._moveData.component.getLengthInHoursDecimal() * this.numberOfHourDivisions);
+
+    function limitDistance(newPosition) {
+      let newX = newPosition.x;
+      let newY = newPosition.y;
+      if (newX < minX) {
+        logicalDistance.x -= (newX - minX);
+      } else if (newX > maxX) {
+        logicalDistance.x -= (newX - maxX);
+      }
+      if (newY < minY) {
+        logicalDistance.y -= (newY - minY);
+      } else if (newY > maxY) {
+        logicalDistance.y -= (newY - maxY);
+      }
+    }
+
+    limitDistance(new Point(this._moveData.logicalX, this._moveData.logicalY).add(logicalDistance));
+
+    this._moveData.distance = logicalDistance;
+
+    // Update logical position
+    let newLogicalPosition = new Point(this._moveData.logicalX, this._moveData.logicalY).add(this._moveData.distance);
+
+    this._setComponentLogicalPosition(this._moveData.component, newLogicalPosition);
+  }
+
+  _endComponentMove() {
+    if (this._moveData.rafId) {
+      cancelAnimationFrame(this._moveData.rafId);
+      this._moveData.rafId = null;
+    }
+
+    let component = this._moveData.component;
+
+    if (this._moveData.distance) {
+      let moved = false;
+      // Move pixel position by distance
+      let logicalPosition = new Point(this._moveData.logicalX, this._moveData.logicalY).add(this._moveData.distance);
+
+      // Logical position
+      let diffX = logicalPosition.x - this._moveData.logicalX;
+      let diffY = logicalPosition.y - this._moveData.logicalY;
+
+      moved = moved || !!diffX || !!diffY;
+
+      if (moved) {
+        let appointmentToDate = dates.parseJsonDate(component.toDate);
+        let appointmentFromDate = dates.parseJsonDate(component.fromDate);
+
+        let daysShift = diffX;
+        if (this._isMonth()) {
+          // in month mode the y-axis is a shit in weeks
+          daysShift += diffY * 7;
+        } else {
+          // time difference (y-axis) only if we are not in month mode
+          let timeDiff = this._hourMinuteByDivision(diffY);
+          appointmentFromDate = dates.shiftTime(appointmentFromDate, timeDiff.hour, timeDiff.minute);
+          appointmentToDate = dates.shiftTime(appointmentToDate, timeDiff.hour, timeDiff.minute);
+        }
+        appointmentFromDate = dates.shift(appointmentFromDate, 0, 0, daysShift);
+        appointmentToDate = dates.shift(appointmentToDate, 0, 0, daysShift);
+
+        component.fromDate = this._format(appointmentFromDate, 'yyyy-MM-dd HH:mm:ss.SSS');
+        component.toDate = this._format(appointmentToDate, 'yyyy-MM-dd HH:mm:ss.SSS');
+        component.coveredDaysRange = new Range(dates.trunc(appointmentFromDate), dates.trunc(appointmentToDate));
+        this._renderComponents();
+
+        this.trigger('componentMove', {
+          component: component
+        });
+      }
+    }
+  }
+
+  _setComponentLogicalPosition(component, vararg, y) {
+    let logicalPosition;
+    if (vararg instanceof Point) {
+      logicalPosition = vararg;
+    } else {
+      logicalPosition = new Point(vararg, y);
+    }
+    let currDay = component._$parts[0].closest('.calendar-day').data('day');
+    let currWeek = component._$parts[0].closest('.calendar-day').data('week');
+
+    if (component.rendered) {
+      if (this._isMonth()) {
+        if (currDay !== logicalPosition.x || currWeek !== logicalPosition.y) {
+          let newContainer =
+            $('.calendar-week:not(.hidden) > .calendar-day')
+              .filter(function() {
+                return $(this).data('day') === logicalPosition.x &&
+                  $(this).data('week') === logicalPosition.y;
+              });
+          let csc = newContainer.find('.calendar-scrollable-components');
+          newContainer = csc.length > 0 ? csc : newContainer;
+          component._$parts[0].detach().appendTo(newContainer);
+        }
+      } else {
+        if (currDay !== logicalPosition.x) {
+          component._$parts[0].detach().appendTo($('.calendar-week:not(.hidden) > .calendar-day')
+            .filter(function() {
+              return $(this).data('day') === logicalPosition.x;
+            }));
+        }
+
+        let pos = this._dayPositionByDivision(logicalPosition.y) + '%';
+        component._$parts[0].css('top', pos);
+      }
+    }
+  }
+
+  _getCalendarComponentForMouseEvent(event) {
+    let $elem = $(event.target);
+    $elem = $.ensure($elem);
+    while ($elem && $elem.length > 0) {
+      let component = $elem.data('component');
+      if (component) {
+        return component;
+      }
+      $elem = $elem.parent();
+    }
+    return null;
+  }
+
+  _newMoveData(event) {
+    let moveData = {};
+    moveData.event = event;
+    moveData.cancel = () => {
+      moveData.cancelled = true;
+    };
+
+    moveData.unitX = this.widthPerDivision;
+    moveData.unitY = this.heightPerDivision;
+    if (this._isMonth()) {
+      moveData.unitY = $(event.target).closest('.calendar-day').height();
+    }
+
+    moveData.containerOffset = this.$grid.offset();
+    moveData.containerScrollPosition = new Point(this.get$Scrollable().scrollLeft(), this.get$Scrollable().scrollTop());
+
+    moveData.startCursorPosition = new Point(
+      event.pageX - moveData.containerOffset.left + moveData.containerScrollPosition.x,
+      event.pageY - moveData.containerOffset.top + moveData.containerScrollPosition.y
+    );
+    moveData.currentCursorPosition = moveData.startCursorPosition;
+
+    return moveData;
+  }
+
+  toLogicalPosition(vararg, y, roundingMode) {
+    let pixelPosition;
+    if (vararg instanceof Point) {
+      pixelPosition = vararg;
+      roundingMode = y;
+    } else {
+      pixelPosition = new Point(vararg, y);
+    }
+
+    if (this._isDay()) {
+      pixelPosition.x = 0;
+    }
+
+    return new Point(
+      numbers.round(pixelPosition.x / this._moveData.unitX, roundingMode),
+      numbers.round(pixelPosition.y / this._moveData.unitY, roundingMode)
+    );
+  }
+
   /* -- helper ---------------------------------------------------- */
+
+  _hourMinuteByDivision(number) {
+    // from division number to decimal hour.min
+    number /= this.numberOfHourDivisions;
+    // Separate the int from the decimal part
+    let hour = Math.floor(number);
+    let decPart = number - hour;
+
+    let min = 1 / 60;
+    // Round to nearest minute
+    decPart = min * Math.round(decPart / min);
+
+    let minute = Math.floor(decPart * 60);
+    return {
+      hour: hour,
+      minute: minute
+    };
+  }
+
+  _dayPositionByDivision(number) {
+    let hourMin = this._hourMinuteByDivision(number);
+    return this._dayPosition(hourMin.hour, hourMin.minute);
+  }
 
   _dayPosition(hour, minutes) {
     // Height position in percent of total calendar

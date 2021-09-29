@@ -30,6 +30,6 @@ public interface ICalendarItemProviderExtension<OWNER extends AbstractCalendarIt
 
   void execLoadItemsInBackground(CalendarItemProviderLoadItemsInBackgroundChain chain, IClientSession session, Date minDate, Date maxDate, Set<ICalendarItem> result);
 
-  void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date newDate);
+  void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date fromDate, Date toDate);
 
 }

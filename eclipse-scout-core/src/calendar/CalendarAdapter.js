@@ -35,6 +35,8 @@ export default class CalendarAdapter extends ModelAdapter {
       this._sendModelChange();
     } else if (event.type === 'selectionChange') {
       this._sendSelectionChange();
+    } else if (event.type === 'componentMove') {
+      this._sendComponentMove(event);
     } else {
       super._onWidgetEvent(event);
     }
@@ -68,6 +70,14 @@ export default class CalendarAdapter extends ModelAdapter {
     this._send('selectionChange', {
       date: this._jsonSelectedDate(),
       componentId: selectedComponentId
+    });
+  }
+
+  _sendComponentMove(event) {
+    this._send('componentMove', {
+      componentId: event.component.id,
+      fromDate: event.component.fromDate,
+      toDate: event.component.toDate
     });
   }
 }

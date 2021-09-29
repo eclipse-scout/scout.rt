@@ -115,7 +115,7 @@ export default class CalendarComponent extends Widget {
         .addClass(this.item.cssClass)
         .data('component', this)
         .data('partDay', partDay)
-        .mousedown(this._onMouseDown.bind(this))
+        .mouseup(this._onMouseUp.bind(this))
         .on('contextmenu', this._onContextMenu.bind(this));
       $part.appendDiv('calendar-component-leftcolorborder');
       $part.appendDiv('content', this.item.subject);
@@ -166,6 +166,12 @@ export default class CalendarComponent extends Widget {
   _getHours(date) {
     let d = dates.parseJsonDate(date);
     return d.getHours() + d.getMinutes() / 60;
+  }
+
+  getLengthInHoursDecimal() {
+    let toTimestamp = dates.parseJsonDate(this.toDate, true);
+    let fromTimestamp = dates.parseJsonDate(this.fromDate, true);
+    return (toTimestamp - fromTimestamp) / (1000 * 60 * 60);
   }
 
   _findDayInGrid(date, $grid) {
@@ -253,7 +259,12 @@ export default class CalendarComponent extends Widget {
     this.parent._selectedComponentChanged(this, $part.data('partDay'), updateScrollPosition);
   }
 
-  _onMouseDown(event) {
+  _onMouseUp(event) {
+    // don't show popup if dragging is in process
+    if (this.parent._moveData && this.parent._moveData.moving) {
+      return;
+    }
+
     let $part = $(event.delegateTarget);
     this.updateSelectedComponent($part, false);
 
@@ -285,9 +296,6 @@ export default class CalendarComponent extends Widget {
       });
       popup.open();
     }
-
-    // stop propagation to avoid fire mouse-down event on calendar-day (Calendar#_onDayMouseDown)
-    event.stopPropagation();
   }
 
   _onContextMenu(event) {

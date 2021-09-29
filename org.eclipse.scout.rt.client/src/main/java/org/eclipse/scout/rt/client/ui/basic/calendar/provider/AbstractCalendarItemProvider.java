@@ -166,7 +166,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    */
   @ConfigOperation
   @Order(20)
-  protected void execItemMoved(ICalendarItem item, Date newDate) {
+  protected void execItemMoved(ICalendarItem item, Date fromDate, Date toDate) {
   }
 
   @ConfigOperation
@@ -325,8 +325,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   }
 
   @Override
-  public void onItemMoved(ICalendarItem item, Date newDate) {
-    interceptItemMoved(item, newDate);
+  public void onItemMoved(ICalendarItem item, Date fromDate, Date toDate) {
+    interceptItemMoved(item, fromDate, toDate);
   }
 
   private void ensureItemsLoadedInternal(Date minDate, Date maxDate) {
@@ -383,7 +383,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     }
 
     @Override
-    public void run() throws Exception {
+    public void run() {
       if (RunMonitor.CURRENT.get().isCancelled()) {
         return;
       }
@@ -445,8 +445,8 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     }
 
     @Override
-    public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date newDate) {
-      getOwner().execItemMoved(item, newDate);
+    public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date fromDate, Date toDate) {
+      getOwner().execItemMoved(item, fromDate, toDate);
     }
 
   }
@@ -469,10 +469,10 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     chain.execLoadItemsInBackground(session, minDate, maxDate, result);
   }
 
-  protected final void interceptItemMoved(ICalendarItem item, Date newDate) {
+  protected final void interceptItemMoved(ICalendarItem item, Date fromDate, Date toDate) {
     List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions = getAllExtensions();
     CalendarItemProviderItemMovedChain chain = new CalendarItemProviderItemMovedChain(extensions);
-    chain.execItemMoved(item, newDate);
+    chain.execItemMoved(item, fromDate, toDate);
   }
 
 }

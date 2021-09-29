@@ -56,4 +56,9 @@ public interface CssClasses {
    * align a field with the label of the radio button.
    */
   String RADIOBUTTON_INDENTATION = "radiobutton-indentation";
+
+  /**
+   * Class that applies a larger font size for button icons.
+   */
+  String BUTTON_ICON_LARGE = "button-icon-large";
 }
