@@ -15,138 +15,21 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
- * Collection of additional {@link Stream} support that is missing in Java 8.
+ * Collection of additional {@link Stream} support methods.
  */
 public final class StreamUtility {
 
   private StreamUtility() {
-  }
-
-  /**
-   * Negates a predicate or method reference, e.g. not(Objects::equals).
-   * <p>
-   * <b>Note:</b> This method is motivated by Java 11's {@link Predicate#not(Predicate)} and can be removed when
-   * upgrading.
-   */
-  public static <T> Predicate<T> not(Predicate<T> p) {
-    return p.negate();
-  }
-
-  /**
-   * Returns a sequential ordered <code>Stream</code> produced by consecutive invocation of the <code>next</code>
-   * function to an initial element, as long as the given <code>terminate</code> predicate returns <code>false</code>.
-   * <p>
-   * <b>Note:</b> This method is motivated by Java 9's <code>Stream#iterate(Object, Predicate, UnaryOperator)</code> and
-   * can be removed when upgrading.
-   */
-  public static <T> Stream<T> iterate(T initialElement, Predicate<? super T> hasNext, UnaryOperator<T> next) {
-    Assertions.assertNotNull(next);
-    Assertions.assertNotNull(hasNext);
-
-    Spliterator<T> spliterator = new Spliterators.AbstractSpliterator<T>(Long.MAX_VALUE, Spliterator.ORDERED | Spliterator.IMMUTABLE) {
-      private T m_prev;
-      private boolean m_started;
-      private boolean m_exhausted;
-
-      @Override
-      public boolean tryAdvance(Consumer<? super T> action) {
-        Objects.requireNonNull(action);
-        if (m_exhausted) {
-          return false;
-        }
-        T currentElement;
-        if (m_started) {
-          currentElement = next.apply(m_prev);
-        }
-        else {
-          currentElement = initialElement;
-          m_started = true;
-        }
-        if (!hasNext.test(currentElement)) {
-          m_prev = null;
-          m_exhausted = true;
-          return false;
-        }
-        m_prev = currentElement;
-        action.accept(currentElement);
-        return true;
-      }
-
-      @Override
-      public void forEachRemaining(Consumer<? super T> action) {
-        Assertions.assertNotNull(action);
-        if (m_exhausted) {
-          return;
-        }
-        m_exhausted = true;
-        T currentElement = m_started ? next.apply(m_prev) : initialElement;
-        m_prev = null;
-        while (hasNext.test(currentElement)) {
-          action.accept(currentElement);
-          currentElement = next.apply(currentElement);
-        }
-      }
-    };
-
-    return StreamSupport.stream(spliterator, false);
-  }
-
-  /**
-   * Wraps the given stream into one that streams elements as long as the given predicate evaluates to
-   * <code>true</code>. The stream returned does not support parallel execution and invoking {@link Stream#parallel()}
-   * does not have any effects.
-   * <p>
-   * <b>Note:</b> This method is motivated by Java 9's <code>Stream#takeWhile(Predicate)</code> and can be removed when
-   * upgrading.
-   */
-  public static <T> Stream<T> takeWhile(Stream<T> stream, Predicate<? super T> predicate) {
-    Assertions.assertNotNull(predicate);
-    Spliterator<T> streamSpliterator = Assertions.assertNotNull(stream).spliterator();
-
-    Spliterator<T> takeWhileSpleiterator = new Spliterators.AbstractSpliterator<T>(Long.MAX_VALUE, Spliterator.ORDERED | Spliterator.IMMUTABLE) {
-      private boolean m_exhausted;
-
-      @Override
-      public Spliterator<T> trySplit() {
-        // this implementation does not support parallel execution
-        return null;
-      }
-
-      @Override
-      public boolean tryAdvance(Consumer<? super T> action) {
-        Assertions.assertNotNull(action);
-        if (m_exhausted) {
-          return false;
-        }
-
-        return streamSpliterator.tryAdvance(t -> {
-          if (predicate.test(t)) {
-            action.accept(t);
-          }
-          else {
-            m_exhausted = true;
-          }
-        });
-      }
-    };
-
-    return StreamSupport.stream(takeWhileSpleiterator, false);
   }
 
   /**
@@ -354,12 +237,13 @@ public final class StreamUtility {
   }
 
   /**
-   * Use this method together with <code>Collectors.toMap(keyMapper, valueMapper, mergeFunction, hashMapType)</code>
-   * as argument for the 'mergeFunction'. It does the same thing as the JRE, when the same method with two parameters
-   * is used.
+   * Use this method together with <code>Collectors.toMap(keyMapper, valueMapper, mergeFunction, mapFactory)</code> as
+   * argument for the 'mergeFunction'. It does the same thing as the default toMap() merge function
+   * <code>Collectors.throwingMerger</code> in JDK 8 and is similar to the default merge function
+   * <code>Collectors.uniqKeysMapMerger</code> in JDKs >=9.
    *
    * @return a merge function which always throws {@code IllegalStateException}.
-   * @see Collectors#throwingMerger
+   * @see Collectors#toMap(Function, Function, BinaryOperator, Supplier)
    */
   public static <T> BinaryOperator<T> throwingMerger() {
     return (u, v) -> {
