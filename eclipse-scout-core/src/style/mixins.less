@@ -396,6 +396,15 @@
     white-space: nowrap;
   }
 
+  // Can be used in a before or after element to enlarge a text to a size it would have if it was bold
+  .bold-text-enlarger() {
+    content: attr(data-text);
+    display: block;
+    font-weight: @title-font-weight;
+    visibility: hidden;
+    height: 0;
+  }
+
   .button-focus(@box-shadow-size: @focus-box-shadow-size, @box-shadow-color: @focus-box-shadow-color, @border-color: mix(@button-border-color, @focus-box-shadow-color, 25%)) {
     #scout.box-shadow-focus(@box-shadow-size: @box-shadow-size, @box-shadow-color: @box-shadow-color);
     border-color: @border-color;

@@ -76,7 +76,7 @@ export default class WizardProgressField extends FormField {
       // Tooltips are only uninstalled if user clicked outside container. However, the steps
       // may be updated by clicking inside the container. Therefore, manually make sure all
       // tooltips are uninstalled before destroying the DOM elements.
-      tooltips.uninstall($(this).children('.wizard-step-content'));
+      tooltips.uninstall($(this));
     });
     this.$wizardStepsBody.empty();
 
@@ -95,10 +95,8 @@ export default class WizardProgressField extends FormField {
         $step.attr('data-step-index', step.index);
       }
 
-      // Content
-      let $content = $step.appendDiv('wizard-step-content');
       if (strings.hasText(step.tooltipText)) {
-        tooltips.install($content, {
+        tooltips.install($step, {
           parent: this,
           text: step.tooltipText,
           tooltipPosition: 'bottom'
@@ -106,7 +104,7 @@ export default class WizardProgressField extends FormField {
       }
 
       // Icon
-      let $icon = $content.appendDiv('wizard-step-content-icon-container').appendDiv('wizard-step-content-icon');
+      let $icon = $step.appendDiv('icon');
       if (step.iconId) {
         $icon.icon(step.iconId);
       } else if (step.finished) {
@@ -115,17 +113,16 @@ export default class WizardProgressField extends FormField {
         $icon.text(index + 1);
       }
       // Text
-      let $text = $content.appendDiv('wizard-step-content-text');
-      $text.appendDiv('wizard-step-title').textOrNbsp(step.title);
+      let $text = $step.appendDiv('text');
+      $text.appendDiv('title').textOrNbsp(step.title).attr('data-text', step.title);
       if (step.subTitle) {
-        $text.appendDiv('wizard-step-sub-title').textOrNbsp(step.subTitle);
+        $text.appendDiv('sub-title').textOrNbsp(step.subTitle);
       }
 
       // Separator
       if (index < this.steps.length - 1) {
         this.$wizardStepsBody
-          .appendDiv('wizard-step-separator')
-          .icon(icons.ANGLE_RIGHT);
+          .appendDiv('wizard-step-separator');
       }
     });
 
@@ -146,8 +143,8 @@ export default class WizardProgressField extends FormField {
 
   _updateStepClasses(step) {
     let $step = step.$step;
-    $step.removeClass('active-step before-active-step after-active-step first last action-enabled disabled');
-    $step.off('click.active-step');
+    $step.removeClass('selected first last action-enabled disabled');
+    $step.off('click.selected');
 
     // Important: those indices correspond to the UI's data structures (this.steps) and are not necessarily
     // consistent with the server indices (because the server does not send invisible steps).
@@ -156,19 +153,16 @@ export default class WizardProgressField extends FormField {
 
     if (this.enabledComputed && step.enabled && step.actionEnabled && stepIndex !== this.activeStepIndex) {
       $step.addClass('action-enabled');
-      $step.on('click.active-step', this._onStepClick.bind(this));
+      $step.on('click.selected', this._onStepClick.bind(this));
     } else if (!this.enabledComputed || !step.enabled) {
       $step.addClass('disabled');
     }
+    $step.toggleClass('finished', step.finished);
 
     if (stepIndex >= 0 && activeStepIndex >= 0) {
       // Active
-      if (stepIndex < activeStepIndex) {
-        $step.addClass('before-active-step');
-      } else if (stepIndex > activeStepIndex) {
-        $step.addClass('after-active-step');
-      } else {
-        $step.addClass('active-step');
+      if (stepIndex === activeStepIndex) {
+        $step.addClass('selected');
       }
       // First / last
       if (stepIndex === 0) {

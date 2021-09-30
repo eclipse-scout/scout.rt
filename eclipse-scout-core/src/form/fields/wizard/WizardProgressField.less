@@ -8,13 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-#scout {
-
-  .wizard-step-color(@color) {
-    color: @color;
-  }
-}
-
 .wizard-steps {
   overflow: hidden;
   margin-left: @mandatory-indicator-width;
@@ -22,137 +15,131 @@
 }
 
 .wizard-steps-body {
-  height: @wizard-progress-height;
+  display: flex;
+  align-items: center;
+  height: @wizard-steps-height;
   overflow: hidden;
   white-space: nowrap; /* Allows the last wizard-step to be 100% without line break */
-  border-bottom: @wizard-progress-border-width solid @border-color;
-  /* This creates a new stacking context: */
+  border-bottom: @wizard-steps-border-width solid @border-color;
   position: relative;
-  z-index: 0;
 }
 
 .wizard-step {
-  display: inline-block;
-  height: @wizard-progress-height - @wizard-progress-border-width;
-  line-height: @wizard-progress-height - @wizard-progress-border-width;
   position: relative;
-  /* Spacing */
-  padding-left: @wizard-progress-content-h-padding;
-  padding-right: @wizard-progress-content-h-padding;
+  display: inline-flex;
+  align-items: center;
+  padding-left: @wizard-step-padding-x;
+  padding-right: @wizard-step-padding-x;
 
-  /* Step content */
+  & > .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: @wizard-step-icon-size;
+    height: @wizard-step-icon-size;
+    border: 1px solid @wizard-step-icon-border-color;
+    border-radius: 50%;
+    margin-right: @wizard-step-icon-margin-right;
+    font-size: @font-size-small;
 
-  & > .wizard-step-content {
-    display: inline-table;
-    line-height: normal;
-    vertical-align: middle;
-    min-height: 30px;
+    & > .font-icon {
+      font-size: 14px;
+    }
+  }
 
-    & > .wizard-step-content-icon-container {
-      vertical-align: middle;
-      display: inline-block;
-      width: @wizard-progress-icon-container-size;
-      height: @wizard-progress-icon-container-size;
-      border-radius: 50%;
-      padding: @wizard-progress-icon-container-padding;
-      margin-right: @wizard-progress-icon-container-margin-right;
-      font-weight: bold;
+  & > .text {
+    & > .title {
+      #scout.overflow-ellipsis-nowrap();
 
-      & > .wizard-step-content-icon {
-        height: 100%;
-        width: 100%;
-        border-radius: 50%;
-        border: @wizard-progress-icon-container-border-width solid;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      &::before {
+        #scout.bold-text-enlarger();
       }
     }
 
-    & > .wizard-step-content-text {
-      vertical-align: middle;
-      display: inline-block;
-
-      & > .wizard-step-title {
-        #scout.overflow-ellipsis-nowrap();
-        font-weight: bold;
-      }
-
-      & > .wizard-step-sub-title {
-        #scout.overflow-ellipsis-nowrap();
-        font-size: 12px;
-      }
+    & > .sub-title {
+      #scout.overflow-ellipsis-nowrap();
+      color: @sub-title-color;
+      letter-spacing: @sub-title-letter-spacing;
+      font-size: @sub-title-font-size;
     }
   }
 
   &.first {
-    /* 3px = box-shadow width */
-    padding-left: 3px;
+    padding-left: 0;
   }
 
   &.last {
-    padding-right: 3px;
+    padding-right: 0;
   }
 
-  &.last > .wizard-step-content {
-    max-width: none;
-  }
-
-  /* Hover state */
-
-  &.action-enabled:hover {
+  &.action-enabled {
     cursor: pointer;
+    color: @link-color;
 
-    & > .wizard-step-content > .wizard-step-content-text > .wizard-step-title {
-      color: @hover-color;
+    &:hover {
+      & > .icon {
+        color: @hover-color;
+        background-color: @hover-background-color;
+      }
+
+      & > .text > .title {
+        color: @hover-color;
+      }
+    }
+
+    &:active, &.active {
+      & > .icon {
+        background-color: @active-background-color;
+      }
     }
   }
 
-  /* Step types */
+  &.finished {
+    & > .icon {
+      color: @wizard-step-finished-color;
+      background-color: @wizard-step-finished-background-color;
+      border-color: @wizard-step-finished-background-color;
+    }
 
-  &.active-step {
-    & > .wizard-step-content > .wizard-step-content-icon-container {
-      padding: @wizard-progress-icon-container-padding - @wizard-progress-icon-container-border-width;
-      border: @wizard-progress-icon-container-border-width solid @wizard-step-active-step-border-color;
-      #scout.glow(@wizard-step-active-step-border-color, 3px);
+    &.action-enabled {
+      &:hover > .icon {
+        color: @wizard-step-finished-color;
+        background-color: darken(@wizard-step-finished-background-color, 6%);
+        border-color: darken(@wizard-step-finished-background-color, 6%);
+      }
+
+      &:active > .icon,
+      &.active > .icon {
+        color: @wizard-step-finished-color;
+        background-color: darken(@wizard-step-finished-background-color, 13%);
+        border-color: darken(@wizard-step-finished-background-color, 13%);
+      }
+    }
+  }
+
+  &.selected {
+    & > .icon {
+      color: @wizard-step-selected-icon-color;
+      background-color: @wizard-step-selected-icon-background-color;
+      border-color: @wizard-step-selected-icon-background-color;
+      font-weight: bold;
+    }
+
+    & > .text > .title {
+      font-weight: @title-font-weight;
     }
   }
 
   &.disabled {
-    #scout.wizard-step-color(@wizard-step-disabled-text-color);
-
-    & > .wizard-step-content > .wizard-step-content-icon-container > .wizard-step-content-icon {
+    & > .icon {
       background-color: @wizard-step-disabled-background-color;
       color: @wizard-step-disabled-color;
       border-color: @wizard-step-disabled-border-color;
     }
-  }
 
-  &:not(.disabled) {
-    &.active-step {
-      #scout.wizard-step-color(@wizard-step-active-step-text-color);
-
-      & > .wizard-step-content > .wizard-step-content-icon-container > .wizard-step-content-icon {
-        background-color: @wizard-step-active-step-background-color;
-        color: @wizard-step-active-step-color;
-        border-color: @wizard-step-active-step-border-color;
-      }
-    }
-
-    &.before-active {
-      & > .wizard-step-content > .wizard-step-content-icon-container > .wizard-step-content-icon {
-        background-color: @wizard-step-before-active-step-background-color;
-        color: @wizard-step-before-active-step-color;
-        border-color: @wizard-step-before-active-step-border-color;
-      }
-    }
-
-    &.after-active {
-      & > .wizard-step-content > .wizard-step-content-icon-container > .wizard-step-content-icon {
-        background-color: @wizard-step-after-active-step-background-color;
-        color: @wizard-step-after-active-step-color;
-        border-color: @wizard-step-after-active-step-border-color;
-      }
+    & > .text > .title,
+    & > .text > .sub-title {
+      color: @wizard-step-disabled-color;
     }
   }
 }
@@ -162,51 +149,19 @@
 }
 
 .wizard-step-separator {
-  display: inline-block;
-  max-height: @wizard-progress-height - (2 * @wizard-progress-border-width);
-  position: relative;
-  /* Spacing */
-  padding-left: @wizard-progress-content-h-padding;
-  padding-right: @wizard-progress-content-h-padding;
-  #scout.font-icon();
-  font-size: 28px;
-  color: @wizard-step-disabled-color;
-  vertical-align: middle;
+  height: 1px;
+  width: 40px;
+  background-color: @border-color;
+  flex-shrink: 0;
+  flex-grow: 0;
 }
 
 .wizard-steps.compact {
   & > .wizard-steps-body {
-    height: @wizard-progress-compact-height;
-
-    & > .wizard-step {
-      padding-left: @wizard-progress-compact-content-h-padding - @wizard-progress-icon-container-padding;
-      padding-right: @wizard-progress-compact-content-h-padding;
-      height: @wizard-progress-compact-height - @wizard-progress-border-width;
-      line-height: @wizard-progress-compact-height - @wizard-progress-border-width;
-
-      & > .wizard-step-content {
-        min-height: 0;
-
-        & > .wizard-step-content-icon-container {
-          width: @wizard-progress-compact-icon-container-size;
-          height: @wizard-progress-compact-icon-container-size;
-          margin-right: @wizard-progress-compact-icon-container-margin-right;
-
-          & > .wizard-step-content-icon {
-            font-size: 11px;
-
-            & > .icon {
-              font-size: 9px;
-            }
-          }
-        }
-      }
-    }
+    height: @wizard-steps-compact-height;
 
     & > .wizard-step-separator {
-      padding-left: @wizard-progress-compact-content-h-padding;
-      padding-right: @wizard-progress-compact-content-h-padding;
-      font-size: 22px;
+      width: 20px;
     }
   }
 }

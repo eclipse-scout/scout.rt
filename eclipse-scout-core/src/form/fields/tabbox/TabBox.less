@@ -171,11 +171,7 @@
 
       // Before element is needed to enlarge the label so that the other tabs won't move when the tab is getting bold because it is selected
       &::before {
-        content: attr(data-text);
-        display: block;
-        font-weight: @title-font-weight;
-        visibility: hidden;
-        height: 0;
+        #scout.bold-text-enlarger();
       }
 
       .selected& {
