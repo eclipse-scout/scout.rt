@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -170,13 +170,12 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
 
   @Override
   public String getText() {
-    char[] c = (char[]) getValueInternal(TEXT_BIT);
-    return c != null ? new String(c) : null;
+    return (String) getValueInternal(TEXT_BIT);
   }
 
   @Override
   public LookupRow<ID_TYPE> withText(String text) {
-    setValueInternal(TEXT_BIT, text != null ? text.toCharArray() : null);
+    setValueInternal(TEXT_BIT, text);
     return this;
   }
 
