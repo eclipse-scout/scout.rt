@@ -219,7 +219,7 @@ public final class SecurityUtility {
 
   /**
    * @deprecated use {@link #hashPassword(char[], byte[])} without iteration count.
-   * @see ISecurityProvider#createPasswordHash(char[], byte[]) 
+   * @see ISecurityProvider#createPasswordHash(char[], byte[])
    */
   @Deprecated
   public static byte[] hashPassword(char[] password, byte[] salt, int iterations) {
@@ -399,7 +399,7 @@ public final class SecurityUtility {
    *          keystore password
    * @param keyPass
    *          private key password. Optional.
-   * @return human readable text of the keystore content
+   * @return human-readable text of the keystore content
    * @since 10.0
    */
   public static String keyStoreToHumanReadableText(InputStream keyStoreInput, String storePass, String keyPass) {

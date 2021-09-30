@@ -46,6 +46,7 @@ import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyAutoCreateSelfSignedCertificateProperty;
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyCertificateAliasProperty;
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyKeyStorePasswordProperty;
 import org.eclipse.scout.dev.jetty.JettyConfiguration.ScoutJettyKeyStorePathProperty;
@@ -55,7 +56,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.security.ICertificateProvider;
 import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -206,7 +207,7 @@ public class JettyServer {
     t.start();
   }
 
-  protected Handler createContextHandler(File webappDir, String contextPath) throws Exception {
+  protected Handler createContextHandler(File webappDir, String contextPath) {
     String resourceBase = webappDir.getAbsolutePath();
     WebAppContext webAppContext = new P_WebAppContext(resourceBase, contextPath);
     webAppContext.setThrowUnavailableOnStartupException(true);
@@ -217,14 +218,14 @@ public class JettyServer {
       return webAppContext;
     }
 
-    /**
+    /*
      * Wraps the given <code>webAppContext</code> in a {@link P_RedirectToContextPathHandler} which redirects all GET
      * requests to URIs outside the context path to the context path.
      * <p>
      * This simplifies the use of a custom context path by redirecting all requests that do NOT start with the specified
      * context path to the context path (e.g. /login?debug=true to /myapp/login?debug=true). Custom context paths are
      * required when multiple Scout UI servers are run in parallel with different ports, because otherwise they would
-     * destroy each others HTTP session (cookies are not specific to the port, only to the host and context path).
+     * destroy each other's HTTP session (cookies are not specific to the port, only to the host and context path).
      */
     return new P_RedirectToContextPathHandler(webAppContext);
   }
@@ -252,10 +253,14 @@ public class JettyServer {
   protected SslContextFactory.Server createSslContextFactory() {
     SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
     String keyStorePath = resolveKeyStorePath(CONFIG.getPropertyValue(ScoutJettyKeyStorePathProperty.class));
+    String autoCertName = CONFIG.getPropertyValue(ScoutJettyAutoCreateSelfSignedCertificateProperty.class);
     String storepass = CONFIG.getPropertyValue(ScoutJettyKeyStorePasswordProperty.class);
     String keypass = CONFIG.getPropertyValue(ScoutJettyPrivateKeyPasswordProperty.class);
     String certAlias = CONFIG.getPropertyValue(ScoutJettyCertificateAliasProperty.class);
-    LOG.info("Setup SSL certificate using alias '{}' from keystore '{}':\n{}", certAlias, keyStorePath, SecurityUtility.keyStoreToHumanReadableText(keyStorePath, storepass, null));
+    if (autoCertName != null) {
+      BEANS.optional(ICertificateProvider.class).ifPresent(p -> p.autoCreateSelfSignedCertificate(keyStorePath, storepass.toCharArray(), keypass.toCharArray(), certAlias, autoCertName));
+    }
+    LOG.info("Setup SSL certificate using alias '{}' from keystore '{}'.", certAlias, keyStorePath);
     sslContextFactory.setKeyStorePath(keyStorePath);
     sslContextFactory.setKeyStorePassword(storepass);
     sslContextFactory.setKeyManagerPassword(keypass);
@@ -288,7 +293,7 @@ public class JettyServer {
   }
 
   protected String resolveKeyStorePath(String path) {
-    if (path.startsWith("classpath:")) {
+    if (path != null && path.startsWith("classpath:")) {
       String subPath = path.substring(10);
       URL res;
       res = getClass().getResource(subPath);
@@ -317,7 +322,7 @@ public class JettyServer {
 
     /**
      * Implementation hint: This class must not be an anonymous class and must have 'public' visibility. That is because
-     * some JAX-WS implementors like METRO uses reflection to access it's methods.
+     * some JAX-WS implementors like METRO uses reflection to access its methods.
      */
     public class P_Context extends Context {
 
@@ -374,8 +379,8 @@ public class JettyServer {
 
   /**
    * {@link Handler} that can be set as the {@link Server}s main handler. It wraps the given {@link ContextHandler} and
-   * redirects all GET requests for URIs outside of the context path to the context path. Non-GET requests are
-   * <i>not</i> redirected.
+   * redirects all GET requests for URIs outside the context path to the context path. Non-GET requests are <i>not</i>
+   * redirected.
    * <p>
    * Example for contextPath = <code>/myapp</code>:
    * <table border=1 cellspacing=0 cellpadding=3>
@@ -429,7 +434,7 @@ public class JettyServer {
         return;
       }
 
-      // Otherwise redirect to the specified context path (while preserving all other parts of the URI)
+      // Otherwise, redirect to the specified context path (while preserving all other parts of the URI)
       StringBuilder redirectUri = new StringBuilder();
       redirectUri.append(request.getScheme()).append("://").append(request.getServerName());
       if (("http".equals(request.getScheme()) && request.getServerPort() != 80) || ("https".equals(request.getScheme()) && request.getServerPort() != 443)) {

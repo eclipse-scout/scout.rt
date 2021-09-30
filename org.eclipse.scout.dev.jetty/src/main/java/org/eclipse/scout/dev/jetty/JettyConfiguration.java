@@ -54,6 +54,24 @@ public final class JettyConfiguration {
   /**
    * @since 10.0
    */
+  public static class ScoutJettyAutoCreateSelfSignedCertificateProperty extends AbstractStringConfigProperty {
+    @Override
+    public String getKey() {
+      return "scout.jetty.autoCreateSelfSignedCertificate";
+    }
+
+    @Override
+    public String description() {
+      return "Setting this property to a valid X-500 name will automatically generate a self-signed SSL certificate and store it in the keystore file path specified.\n"
+          + "This property is the X500 name (DN) for which the certificate is issued.\n"
+          + "For example 'CN=my-host.my-domain.com,C=US,ST=CA,L=Sunnyvale,O=My Company Inc.'.\n"
+          + "Use in development only!";
+    }
+  }
+
+  /**
+   * @since 10.0
+   */
   public static class ScoutJettyKeyStorePasswordProperty extends AbstractStringConfigProperty {
     @Override
     public String getKey() {
