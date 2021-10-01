@@ -14,14 +14,19 @@
 
 .table {
   position: relative;
+  --table-row-margin-x: @table-row-margin-x;
+  --table-row-padding-y: @table-row-padding-y;
 
   &:focus,
-  &.focused {
+  &.focused,
+  &.perma-focus {
     outline: none;
 
-    & .table-row.selected {
-      background-color: @item-selection-background-color;
-      border-color: @item-selection-border-color;
+    & .table-row {
+      &.selected::after {
+        background-color: @item-selection-background-color;
+        border-color: @item-selection-border-color;
+      }
     }
   }
 
@@ -42,14 +47,9 @@
 
     & > .table-data > .table-row {
 
-      &.selected {
+      &.selected::after {
         /* Don't draw selection */
-        background-color: transparent;
-        border-color: @table-row-border-color;
-
-        & > .table-cell {
-          color: @text-color;
-        }
+        display: none;
       }
 
       &.checked,
@@ -58,7 +58,7 @@
         background-color: @table-row-checked-background-color;
 
         & > .table-cell {
-          color: @text-selection-color;
+          color: @table-row-checked-color;
         }
       }
     }
@@ -75,10 +75,6 @@
         }
       }
     }
-  }
-
-  &.checkable.header-invisible > .table-data > .table-row.selected.first {
-    border-top-color: @control-background-color;
   }
 
   &.structured {
@@ -120,12 +116,15 @@
   position: relative;
   overflow: hidden;
   width: 100%;
-
-  /* Draw the .table-data DIV one pixel higher, over the header (for selection border). */
-  /* - To make height calculation correct, this margin has to be subtracted again */
-  /*   from .table-data's height. See TableLayout.layout(). */
-  margin-top: -1px;
+  // selected table-row is moved by -1px. Add at least 1px padding to make selection fully visible even on the first row
   padding-top: 1px;
+
+  :not(.header-invisible) > & {
+    /* Draw the .table-data DIV one pixel higher, over the header (for selection border). */
+    /* - To make height calculation correct, this margin has to be subtracted again */
+    /*   from .table-data's height. See TableLayout.layout(). */
+    margin-top: -1px;
+  }
 
   & > .scrollbar.y-axis {
     /* Make scrollbar visually centered */
@@ -137,6 +136,10 @@
   & > .scrollbar {
     opacity: 1;
     transition: opacity @loading-fade-duration;
+  }
+
+  & > .scrollbar {
+    z-index: 2; // should lay over cell editor popup
   }
 }
 
@@ -165,10 +168,6 @@
 .table-row,
 .table-aggregate-row {
   position: relative;
-  overflow: hidden;
-  border-left: 0 solid transparent;
-  border-right: 0 solid transparent;
-  border-bottom: 1px solid @table-row-border-color;
 
   &.sum-selection {
     color: @item-selection-border-color;
@@ -176,34 +175,36 @@
 
   &:active {
     background-color: @table-row-active-background-color;
-  }
 
-  &.selected {
-    background-color: @item-selection-nonfocus-background-color;
-    border-color: @item-selection-nonfocus-border-color;
-    border-left-color: transparent;
-    border-right-color: transparent;
-
-    &.select-top,
-    &.select-middle {
-      /* Disable bottom-border. Instead, we add the border in the ::after pseudo element, because otherwise */
-      /* it would interfere with the 2px left border (missing control of 'border join behaviour' in CSS) */
-      border-bottom: 0;
-    }
-
-    &.select-top::after,
-    &.select-middle::after {
-      border-bottom: 1px solid @table-row-border-color;
-      content: '';
-      display: block;
+    &.selected {
+      background-color: inherit;
     }
   }
 
-  &.select-single,
-  &.select-top {
-    border-top: 1px solid @item-selection-nonfocus-border-color;
-    /* Move the row 1px up to cover the bottom border of the previous row. */
-    margin-top: -1px;
+  &.selected::after {
+    #scout.item-selection();
+    z-index: 1; // Ensure selection covers aggregate row which is moved -1px to top
+  }
+
+  &.select-top::after,
+  &.select-middle::after {
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  &.select-middle::after,
+  &.select-bottom::after {
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  &.select-single::after,
+  &.select-top::after {
+    /* Move the selection 1px up to cover the bottom border of the previous row. */
+    top: -1px;
+    height: calc(100% + 1px);
   }
 
   &.checked {
@@ -211,13 +212,23 @@
   }
 }
 
+.table-row {
+  margin-left: var(--table-row-margin-x);
+  margin-right: var(--table-row-margin-x);
+}
+
 .table-cell {
   color: @text-color;
   display: table-cell;
-  padding: @table-row-padding-y @table-cell-padding-right @table-row-padding-y @table-cell-padding-left;
+  padding: var(--table-row-padding-y) @table-cell-padding-right var(--table-row-padding-y) @table-cell-padding-left;
+  border-bottom: 1px solid @table-row-border-color;
   position: relative;
   #scout.overflow-ellipsis();
   vertical-align: top; /* for multiline text */
+
+  .last-row-at-bottom > .table-row.last > & {
+    border-bottom: 0;
+  }
 
   & > .width-fix {
     /* Some browsers (e.g. IE9) need an additional <div> with display:inline-block below the table-cell */
@@ -289,7 +300,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      padding: @table-row-padding-y 8px @table-row-padding-y @table-row-control-padding-left;
+      padding: var(--table-row-padding-y) 8px var(--table-row-padding-y) @table-row-control-padding-left;
       cursor: pointer;
       line-height: @table-row-control-line-height; /* Necessary to align with the text, depends on the used font size */
 
@@ -305,7 +316,6 @@
           /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
           #scout.transform(rotate(89.99deg));
         }
-
       }
 
       &:hover::before {
@@ -316,7 +326,7 @@
 
   &.checkable {
     /* same padding for left and right, it's by purpose */
-    padding: @table-row-padding-y - @checkable-cell-padding-adjustment @table-cell-padding-left 0 @table-cell-padding-left;
+    padding: calc(var(--table-row-padding-y) - @checkable-cell-padding-adjustment) @table-cell-padding-left 0 @table-cell-padding-left;
     cursor: pointer;
     text-overflow: clip;
   }
@@ -395,10 +405,24 @@
 
 .table-aggregate {
   overflow: hidden;
+
+  & > .table-cell {
+    border-bottom: 0;
+  }
 }
 
 .table-aggregate-row {
   background-color: @table-aggregate-row-background-color;
+  min-width: 100%;
+  border-top: 1px solid @table-row-border-color;
+  border-bottom: 1px solid @table-row-border-color;
+  margin-top: -1px; // top border should cover bottom border of the previous row
+  padding-left: var(--table-row-margin-x);
+  padding-right: var(--table-row-margin-x);
+
+  & > .table-cell {
+    border-bottom: 0;
+  }
 }
 
 .table-aggregate-cell {
@@ -414,6 +438,10 @@
   &.selection > .table-cell-icon {
     color: @table-aggregate-cell-selection-color;
   }
+}
+
+.before-aggregate-row > .table-cell {
+  border-bottom-color: transparent;
 }
 
 .column-background-effect-bar-chart {

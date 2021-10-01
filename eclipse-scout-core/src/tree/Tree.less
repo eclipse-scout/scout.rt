@@ -15,15 +15,9 @@
   &.focused {
     outline: none;
 
-    & .tree-node.selected {
+    & .tree-node.selected::after {
       background-color: @item-selection-background-color;
       border-color: @item-selection-border-color;
-    }
-
-    /* first child is the scrollbar */
-
-    .tree-node:nth-of-type(1).selected {
-      border-top-color: @item-selection-nonfocus-background-color;
     }
   }
 }
@@ -66,21 +60,19 @@
   display: flex;
   align-items: start;
   position: relative;
-  border: 1px solid transparent;
-  border-left: 0 solid transparent;
-  border-right: 0 solid transparent;
   padding: @tree-node-padding-y @tree-node-padding-right @tree-node-padding-y @tree-node-padding-left;
   #scout.overflow-ellipsis-nowrap();
 
   &:active {
     background-color: @tree-node-active-background-color;
+
+    &.selected {
+      background-color: inherit;
+    }
   }
 
-  &.selected {
-    background-color: @item-selection-nonfocus-background-color;
-    border-color: @item-selection-nonfocus-border-color;
-    border-left-color: transparent;
-    border-right-color: transparent;
+  &.selected::after {
+    #scout.item-selection();
   }
 
   &.disabled {
@@ -95,12 +87,6 @@
 
   .disabled.read-only > .tree-data > & {
     color: @read-only-color;
-  }
-
-  /*first child is the scrollbar*/
-
-  &:nth-of-type(1).selected {
-    border-top-color: @item-selection-nonfocus-background-color;
   }
 
   & > .text {
@@ -236,12 +222,11 @@
   & > .tree-data {
     & > .tree-node,
     & > .animation-wrapper > .tree-node {
-      overflow: visible;
       white-space: normal;
       display: none;
       border-top: 0;
       border-bottom: 1px solid @border-color;
-      padding: 8px;
+      padding: 8px 10px;
 
       &.ancestor-of-selected,
       &.child-of-selected,
@@ -253,88 +238,15 @@
 
       &.selected {
         display: flex;
-        color: @outline-selection-color;
         cursor: default;
-      }
-
-      /* arrow is created using ::before and ::after*/
-
-      &.ancestor-of-selected::before,
-      &.ancestor-of-selected::after,
-      &.selected::before,
-      &.selected::after {
-        position: absolute;
-        left: 50%;
-        margin-left: -13px;
-        border: solid transparent;
-        content: '';
-        height: 0;
-        width: 0;
-        z-index: 1;
-      }
-
-      &.ancestor-of-selected::before,
-      &.selected::before {
-        border-color: @border-color transparent transparent transparent;
-        border-width: 6px 12px 0 12px;
-        bottom: -7px;
-      }
-
-      &.ancestor-of-selected::after,
-      &.selected::after {
-        border-color: @control-background-color transparent transparent transparent;
-        border-width: 6px 12px 0 12px;
-        bottom: -6px;
-      }
-
-      &:active::after {
-        border-top-color: @tree-node-active-background-color;
-      }
-
-      &.selected::after {
-        border-top-color: @item-selection-nonfocus-background-color;
-      }
-
-      &.ancestor-of-selected.leaf::before,
-      &.ancestor-of-selected.leaf::after,
-      &.selected.leaf::before,
-      &.selected.leaf::after {
-        display: none;
-      }
-
-      & > .tree-node-control {
-        display: none;
       }
 
       & > .text {
         white-space: normal;
       }
-    }
-  }
 
-  &:focus > .tree-data,
-  &.focused > .tree-data {
-    & > .tree-node,
-    & > .animation-wrapper > .tree-node {
-
-      &.parent-of-selected {
-        border-color: @item-selection-border-color;
-      }
-
-      &.parent-of-selected::before {
-        border-top-color: @item-selection-border-color;
-      }
-
-      &.selected {
-        border-color: @item-selection-border-color;
-      }
-
-      &.selected::before {
-        border-top-color: @item-selection-border-color;
-      }
-
-      &.selected::after {
-        border-top-color: @item-selection-background-color;
+      & > .tree-node-control {
+        display: none;
       }
     }
   }

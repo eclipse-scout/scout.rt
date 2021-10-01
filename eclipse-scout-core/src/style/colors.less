@@ -101,16 +101,13 @@
 @ok-color: @palette-green-4;
 @error-background-color: @palette-red-0;
 @error-border-color: @error-color;
-@error-glow-color: @error-color;
-@error-box-shadow-focus-color: fade(@error-color, 40%);
-@warning-box-shadow-focus-color: fade(@warning-color, 40%);
-@ok-box-shadow-focus-color: fade(@ok-color, 40%);
+@error-focus-box-shadow-color: fade(@error-color, 40%);
+@warning-focus-box-shadow-color: fade(@warning-color, 40%);
+@ok-focus-box-shadow-color: fade(@ok-color, 40%);
 @focus-border-color: @palette-blue-6;
 @focus-box-shadow-color: darken(@palette-blue-1, 10%);
+@focus-box-shadow-border-color: darken(@focus-box-shadow-color, 10%);
 @focus-color: @palette-blue-6;
-@focus-glow-color: fade(@focus-border-color, 50%);
-@focus-border-color-inverted: @selected-color;
-@focus-glow-color-inverted: fade(@selected-color, 50%);
 @highlight-color: @palette-orange-4;
 @highlight-inverted-background-color: @highlight-color;
 @hover-color: @palette-blue-6;
@@ -121,6 +118,7 @@
 @icon-light-color: @palette-gray-6;
 @icon-light-hover-color: @palette-gray-10;
 @item-selection-background-color: @palette-blue-0;
+@item-selection-background-mix-blend-mode: multiply;
 @item-selection-border-color: @palette-blue-6;
 @item-selection-disabled-background-color: @palette-gray-4;
 @item-selection-disabled-border-color: @palette-gray-6;
@@ -212,7 +210,7 @@
 @dashboard-tile-menu-color: @palette-gray-6;
 @dashboard-tile-menu-hover-color: @palette-gray-7;
 @dashboard-tile-menu-active-color: @palette-gray-9;
-@date-picker-background-color: @control-popup-background-color;
+@date-picker-background-color: @popup-background-color;
 @date-picker-header-background-color: @panel-background-color;
 @date-picker-day-hover-border-color: @item-selection-border-color;
 @date-picker-day-hover-background-color: @item-selection-background-color;
@@ -328,8 +326,6 @@
 @planner-activity-level-background-color: @palette-white;
 @popup-background-color: @control-background-color;
 @popup-border-color: @border-color;
-@control-popup-border-color: @palette-blue-6;
-@control-popup-background-color: @popup-background-color;
 @profile-menu-icon-background: linear-gradient(180deg, @palette-blue-6 -145%, @palette-blue-2 56%);
 @profile-menu-icon-color: @icon-inverted-color;
 @proposal-chooser-status-background-color: @panel-background-color;
@@ -396,8 +392,9 @@
 @table-info-warning-hover-color: @palette-blue-6;
 @table-row-active-background-color: @item-active-background-color;
 @table-structure-row-background-color: @palette-gray-1;
-@table-row-border-color: @border-color;
+@table-row-border-color: fade(@palette-black, 13%); // Use transparent color to improve the look of cells with a background color
 @table-row-checked-background-color: @palette-blue-5;
+@table-row-checked-color: @selected-color;
 @table-row-checked-selected-focus-background-color: lighten(@palette-blue-5, 22%);
 @table-row-checked-selected-background-color: greyscale(@table-row-checked-selected-focus-background-color);
 @table-row-control-color: @tree-node-control-color;
@@ -465,10 +462,11 @@
 @tile-table-default-color: @palette-gray-9;
 @tile-table-default-inverted-selection-background-color: @palette-blue-5;
 @tile-table-default-inverted-selection-border-color: @palette-white;
+@tile-table-default-inverted-selection-mix-blend-mode: soft-light;
+@tile-table-default-inverted-border-color: fade(@palette-white, 25%);
 @tile-table-alternative-inverted-selection-background-color: @palette-cyan-3;
 @tile-table-alternative-inverted-selection-border-color: @tile-table-default-inverted-selection-border-color;
-@tile-table-alternative-selection-background-color: @palette-cyan-1;
-@tile-table-alternative-selection-border-color: @palette-cyan-4;
+@tile-table-alternative-inverted-selection-mix-blend-mode: @tile-table-default-inverted-selection-mix-blend-mode;
 @time-picker-hours-background-color: @date-picker-header-background-color;
 @time-picker-hover-selected-background-color: @date-picker-day-hover-selected-background-color;
 @time-picker-now-color: @date-picker-now-color;

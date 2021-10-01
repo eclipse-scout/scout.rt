@@ -109,8 +109,7 @@
 }
 
 .check-box-field.cell-editor-form-field > .field {
-  /* 1px because cell editor popup starts at the table row which has a 1px border and check box field does not have a border */
-  padding-top: @table-row-padding-y - @checkable-cell-padding-adjustment + 0.5px;
+  padding-top: calc(var(--table-row-padding-y) - @checkable-cell-padding-adjustment + 1px);
 }
 
 .check-box-field.disabled > .field {

@@ -33,7 +33,6 @@ import {
   PageLayout,
   scout,
   TableControlAdapterMenu,
-  TableRow,
   TableRowDetail,
   TileOutlineOverview,
   Tree,
@@ -92,6 +91,7 @@ export default class Outline extends Tree {
     this._additionalContainerClasses += ' outline';
     this.nodePaddingLevelCheckable = 20; /* outline is not checkable. set to same value as not-checkable */
     this.nodePaddingLevelNotCheckable = 20; /* outline uses different level-paddings that normal trees */
+    this.nodePaddingLevelHierarchyRow = this.nodePaddingLevelNotCheckable;
     this._scrolldirections = 'y';
     this._addWidgetProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
   }
@@ -220,9 +220,8 @@ export default class Outline extends Tree {
 
     if (this.compact) {
       if (node.row && node.getOutline().selectedNode() !== node) {
-        return node.row._hierarchyLevel * this.nodePaddingLevel;
+        return this.nodePaddingLeft + node.row.hierarchyLevel * this.nodePaddingLevelHierarchyRow;
       }
-      return 0;
     }
     return super._computeNodePaddingLeft(node);
   }
@@ -692,6 +691,9 @@ export default class Outline extends Tree {
 
   _renderCompact() {
     this.$container.toggleClass('compact', this.compact);
+    this.nodePaddingLeft = null;
+    this.nodeControlPaddingLeft = null;
+    this._updateNodePaddingsLeft();
     this.invalidateLayoutTree();
   }
 

@@ -115,6 +115,10 @@ export default class ProposalChooser extends Widget {
 
   _renderModel() {
     this.model.render();
+
+    // Make sure container never gets the focus, but looks focused
+    this.model.$container.setTabbable(false);
+    this.model.$container.addClass('focused');
   }
 
   _renderProperties() {

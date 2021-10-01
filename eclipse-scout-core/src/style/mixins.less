@@ -38,16 +38,29 @@
     #scout.drop-shadow(@x, @y, @blur, @spread, @alpha);
   }
 
-  .focus-border(@bordersize: 1px) {
-    outline: none;
-    border: @bordersize solid @focus-border-color;
-    #scout.glow(@focus-glow-color);
+  .focus-border(@box-shadow-size: @focus-box-shadow-size, @box-shadow-color: @focus-box-shadow-color, @border-color: @focus-box-shadow-border-color) {
+    #scout.focus-box-shadow(@box-shadow-size, @box-shadow-color);
+    border-color: @border-color;
   }
 
   .no-focus-border() {
     outline: none;
     border: 0;
     box-shadow: 0 0 0 0;
+  }
+
+  .focus-box-shadow(@box-shadow-size: @focus-box-shadow-size, @box-shadow-color: @focus-box-shadow-color) {
+    outline: none;
+    box-shadow: 0 0 0 @box-shadow-size @box-shadow-color;
+  }
+
+  .focus-inset-box-shadow() {
+    outline: none;
+    box-shadow: inset 0 0 0 @focus-box-shadow-size @focus-box-shadow-color;
+  }
+
+  .focus-box-shadow-transition() {
+    transition: box-shadow 0.3s ease;
   }
 
   .alternative-focus-border() {
@@ -405,25 +418,6 @@
     height: 0;
   }
 
-  .button-focus(@box-shadow-size: @focus-box-shadow-size, @box-shadow-color: @focus-box-shadow-color, @border-color: mix(@button-border-color, @focus-box-shadow-color, 25%)) {
-    #scout.box-shadow-focus(@box-shadow-size: @box-shadow-size, @box-shadow-color: @box-shadow-color);
-    border-color: @border-color;
-  }
-
-  .box-shadow-focus(@box-shadow-size: @focus-box-shadow-size, @box-shadow-color: @focus-box-shadow-color) {
-    outline: none;
-    box-shadow: 0 0 0 @box-shadow-size @box-shadow-color;
-  }
-
-  .box-shadow-focus-inset() {
-    outline: none;
-    box-shadow: inset 0 0 0 @focus-box-shadow-size @focus-box-shadow-color;
-  }
-
-  .box-shadow-focus-transition() {
-    transition: box-shadow 0.3s ease;
-  }
-
   .triangle-top-left(@size, @color) {
     width: 0;
     height: 0;
@@ -434,6 +428,20 @@
 
   .triangle-top-left-color(@color) {
     border-color: @color transparent transparent transparent;
+  }
+
+  .item-selection(@background-color: @item-selection-nonfocus-background-color, @border-color: @item-selection-nonfocus-border-color) {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: @background-color;
+    mix-blend-mode: @item-selection-background-mix-blend-mode;
+    border: @item-selection-border-width solid @border-color;
+    border-radius: @control-border-radius;
+    pointer-events: none;
   }
 
   /* Font Mixins */
@@ -523,11 +531,11 @@
 
   .chooser-popup {
     position: absolute;
-    border: solid 1px @control-popup-border-color;
+    border: solid @popup-border-width @popup-border-color;
     border-radius: @control-popup-border-radius;
+    #scout.drop-shadow-large();
     overflow: hidden;
-    background-color: @control-popup-background-color;
-    #scout.focus-border();
+    background-color: @popup-background-color;
 
     &.bottom {
       margin-top: 5px;
@@ -539,11 +547,6 @@
 
     &.touch {
       background-color: @table-header-background-color;
-    }
-
-    &.alternative {
-      #scout.drop-shadow();
-      border-radius: @control-alternative-border-radius;
     }
   }
 

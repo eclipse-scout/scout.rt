@@ -76,9 +76,9 @@
 @info-color: @palette-blue-1-1;
 @ok-color: @palette-green-3;
 @error-background-color: @background-color;
-@error-box-shadow-focus-color: mix(@error-color, @palette-black, 50%);
-@warning-box-shadow-focus-color: mix(@warning-color, @palette-black, 50%);
-@ok-box-shadow-focus-color: mix(@ok-color, @palette-black, 50%);
+@error-focus-box-shadow-color: mix(@error-color, @palette-black, 50%);
+@warning-focus-box-shadow-color: mix(@warning-color, @palette-black, 50%);
+@ok-focus-box-shadow-color: mix(@ok-color, @palette-black, 50%);
 @focus-border-color: @focus-color;
 @focus-color: @palette-blue-1-1;
 @focus-box-shadow-color: darken(@focus-color, 30%);
@@ -88,8 +88,9 @@
 @icon-light-color: @text-color;
 @icon-light-hover-color: @icon-light-color;
 @item-active-background-color: @item-selection-background-color;
-@item-selection-background-color: @palette-gray-4;
+@item-selection-background-color: fade(@palette-blue-1-1, 9%);
 @item-selection-border-color: @palette-blue-1-1;
+@item-selection-background-mix-blend-mode: normal;
 @item-selection-nonfocus-background-color: @item-selection-background-color;
 @item-selection-nonfocus-border-color: @border-color;
 @label-color: @palette-gray-5-1;
@@ -188,7 +189,6 @@
 @scrollbar-thumb-inverted-small-color: fade(@scrollbar-thumb-inverted-main-color, 15%);
 @scrollbar-thumb-inverted-small-hover-color: fade(@scrollbar-thumb-inverted-main-color, 15%);
 @scroll-shadow-alpha: 70%;
-@search-outline-field-focus-glow-color: @focus-glow-color;
 @selected-color: @palette-black;
 @slider-thumb-color: @palette-gray-2;
 @slider-thumb-border-color: @palette-gray-2-1;
@@ -221,6 +221,7 @@
 @table-info-hover-color: @hover-color;
 @table-info-warning-color: @status-warning-color;
 @table-info-warning-hover-color: @status-warning-hover-color;
+@table-row-border-color: fade(@palette-white, 9%);
 @table-structure-row-background-color: @palette-gray-4;
 @tag-element-background-color-hover: @palette-cyan-2;
 @tag-element-background-color: @palette-cyan-3;
@@ -244,6 +245,13 @@
 @tile-default-link-active-color: @link-active-color;
 @tile-default-link-color: @link-color;
 @tile-default-link-hover-color: @link-hover-color;
+@tile-table-default-inverted-selection-background-color: @item-selection-background-color;
+@tile-table-default-inverted-selection-border-color: @item-selection-border-color;
+@tile-table-default-inverted-selection-border-color: @item-selection-border-color;
+@tile-table-default-inverted-selection-mix-blend-mode: @item-selection-background-mix-blend-mode;
+@tile-table-alternative-inverted-selection-background-color: @tile-table-default-inverted-selection-background-color;
+@tile-table-alternative-inverted-selection-border-color: @tile-table-default-inverted-selection-border-color;
+@tile-table-default-color: @tile-default-color;
 @tile-overview-color: @palette-blue-1-1;
 @tile-placeholder-background-color: @palette-gray-5;
 @tile-scrollbar-thumb-inverted-main-color: @palette-white;

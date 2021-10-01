@@ -24,13 +24,16 @@
       border-radius: @control-alternative-border-radius;
     }
 
-    &:focus,
-    &.focused {
-      #scout.focus-border();
+    &.no-rows-selected,
+    &.no-nodes-selected {
+      &:focus,
+      &.focused {
+        #scout.focus-border();
+      }
     }
 
-    &.ie {
-      border-radius: 0;
+    & > .table-data > .table-row > .table-cell {
+      border-bottom: 0;
     }
   }
 }

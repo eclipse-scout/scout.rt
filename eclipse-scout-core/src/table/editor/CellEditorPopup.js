@@ -139,12 +139,10 @@ export default class CellEditorPopup extends Popup {
       $tableData = this.table.$data,
       $row = this.row.$row,
       $cell = this.$anchor,
-      insetsLeft = $tableData.cssPxValue('padding-left') + $row.cssBorderLeftWidth();
+      insetsLeft = $tableData.cssPaddingLeft() + $row.cssMarginLeft() + $row.cssBorderLeftWidth();
 
     cellBounds = graphics.bounds($cell);
-    cellBounds.x += $cell.cssMarginX(); // first cell popup has a negative left margin
     rowBounds = graphics.bounds($row);
-    rowBounds.y += $row.cssMarginY(); // row has a negative top margin
     this.setLocation(new Point(insetsLeft + cellBounds.x, $tableData.scrollTop() + rowBounds.y));
   }
 

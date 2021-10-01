@@ -39,15 +39,18 @@ export default class CellEditorPopupLayout extends AbstractLayout {
     cellBounds = graphics.bounds($cell, {
       exact: true
     });
-    cellBounds.x += $cell.cssMarginX(); // first cell popup has a negative left margin
     rowBounds = graphics.bounds($row, {
       exact: true
     });
-    rowBounds.y += $row.cssMarginY(); // row has a negative top margin
     margin = this.cellEditorPopup.$container.cssMarginLeft();
     if (margin < 0) {
-      // extend the width if the popup has a negative margin (used for the first cell)
+      // extend the width if the popup has a negative margin
       cellBounds.width = cellBounds.width + -margin;
+    }
+    margin = this.cellEditorPopup.$container.cssMarginTop();
+    if (margin < 0) {
+      // extend the height if the popup has a negative margin
+      rowBounds.height = rowBounds.height + -margin;
     }
     return new Dimension(cellBounds.width, rowBounds.height);
   }

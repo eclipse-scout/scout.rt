@@ -9,51 +9,25 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .cell-editor-popup {
-  /* make sure it is behind the scrollbar */
-  z-index: 0;
+  /* make sure it is behind the scrollbar but above selection */
+  z-index: 1;
 
-  &.first {
-    /* Hide the left border of the field */
-    margin-left: -1px;
-  }
+  // Move popup up to align it with the selection border
+  margin-top: -1px;
 }
 
 .cell-editor-field {
+  padding: var(--table-row-padding-y) @table-cell-padding-right - @item-selection-border-width var(--table-row-padding-y) @table-cell-padding-left - @item-selection-border-width;
+  border-width: @item-selection-border-width;
 
-  /* -1px correction is necessary because the table-cell does not have a border but the fields have
-   * For some reason Microsoft Edge requires 1px less padding than all other browsers, to avoid a
-   * 'jumpy' UI when user clicks into an editable cell */
-  padding: @table-row-padding-y @table-cell-padding-right - 1px @table-row-padding-y @table-cell-padding-left - 1px;
-  border-radius: 0;
-
-  &.ms-edge {
-    padding-left: @table-cell-padding-left - 2px;
-  }
-
-  &.first {
-    /* Correction for margin-left -1px */
-    padding-left: @table-cell-padding-left;
-
-    &.ms-edge {
-      padding-left: @table-cell-padding-left - 1px;
-    }
-  }
-
-  &.halign-right {
-    padding-right: @table-cell-padding-left - 1px;
-    padding-left: @table-cell-padding-right - 1px;
-
-    &.ms-edge {
-      padding-left: @table-cell-padding-right - 2px;
-    }
-  }
-
-  &.halign-center {
-    padding-right: @table-cell-padding-left - 1px;
-  }
-
-  &:focus {
+  &:focus,
+  &.focused {
+    border-color: @item-selection-border-color;
     box-shadow: none;
-  }
 
+    &.has-error {
+      border-color: @error-border-color;
+      box-shadow: none;
+    }
+  }
 }

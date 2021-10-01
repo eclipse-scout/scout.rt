@@ -116,22 +116,18 @@
 
   /* Table.less */
 
-  .table-cell {
-    padding-top: 4px; /* padding: @table-row-padding-y @table-cell-padding-right @table-row-padding-y @table-cell-padding-left; */
-    padding-bottom: 4px;
+  .table,
+  .detail-table.table {
+    --table-row-padding-y: 4px;
+  }
 
-    &.checkable {
-      padding-top: 4px; /* @table-row-padding-y - @checkable-cell-padding-adjustment @table-cell-padding-left 0 @table-cell-padding-left; */
-      padding-bottom: 4px;
-      line-height: 0; /* somehow inline-block causes additional height when line-height is not set. (font-size would work) */
-    }
+  .table-cell {
 
     &.table-node {
 
-      > .table-row-control {
+      & > .table-row-control {
         /* padding: @table-row-padding-y 8px @table-row-padding-y @table-row-control-padding-left; */
         padding-top: 6px;
-        padding-bottom: 4px;
       }
     }
   }
@@ -146,36 +142,8 @@
         min-height: 24px;
       }
     }
-
-    & .table-aggregate {
-      & > .table-cell {
-        padding-top: 4px; /* @detail-table-row-padding-y; */
-        padding-bottom: 4px; /* @detail-table-row-padding-y; */
-      }
-    }
-
-    & > .table-data {
-
-      & > .table-row,
-      & > .table-aggregate-row {
-
-        & > .table-cell {
-          padding-top: 3px; /* @detail-table-row-padding-y - 1px; */
-          padding-bottom: 3px; /* @detail-table-row-padding-y - 1px; */
-
-          &.checkable {
-            padding-top: 3px; /* @detail-table-row-padding-y - @checkable-cell-padding-adjustment - 1px; */
-            padding-bottom: 3px;
-          }
-
-          & > .table-row-control {
-            padding-top: 4px; /* @detail-table-row-padding-y - 1px; */
-            padding-bottom: 4px; /* @detail-table-row-padding-y - 1px; */
-          }
-        }
-      }
-    }
   }
+
 
   /* ContextMenuPopup.less */
 

@@ -596,14 +596,14 @@ export default class Tree extends Widget {
   }
 
   _calculateFillerDimension(range) {
-    let outerWidth = 0;
+    let dataWidth = 0;
     if (this.rendered) {
       // the outer-width is only correct if this tree is already rendered. otherwise wrong values are returned.
-      outerWidth = this.$data.outerWidth();
+      dataWidth = this.$data.width();
     }
     let dimension = {
       height: 0,
-      width: Math.max(outerWidth, this.maxNodeWidth)
+      width: Math.max(dataWidth, this.maxNodeWidth)
     };
     for (let i = range.from; i < range.to; i++) {
       let node = this.visibleNodesFlat[i];
@@ -966,7 +966,13 @@ export default class Tree extends Widget {
 
   _setCheckable(checkable) {
     this._setProperty('checkable', checkable);
-    if (this.checkable) {
+    this._updateNodePaddingLevel();
+  }
+
+  _updateNodePaddingLevel() {
+    if (this.isBreadcrumbStyleActive()) {
+      this.nodePaddingLevel = 0;
+    } else if (this.checkable) {
       this.nodePaddingLevel = this.nodePaddingLevelCheckable;
     } else {
       this.nodePaddingLevel = this.nodePaddingLevelNotCheckable;
@@ -994,7 +1000,7 @@ export default class Tree extends Widget {
         $checkbox.remove();
       }
 
-      $node.css('padding-left', this._computeNodePaddingLeft(node));
+      $node.cssPaddingLeft(this._computeNodePaddingLeft(node));
 
       // Recursion
       if (node.childNodes) {
@@ -1008,6 +1014,8 @@ export default class Tree extends Widget {
 
   _renderDisplayStyle() {
     this.$container.toggleClass('breadcrumb', this.isBreadcrumbStyleActive());
+    this.nodePaddingLeft = null;
+    this.nodeControlPaddingLeft = null;
     this._updateNodePaddingsLeft();
     // update scrollbar if mode has changed (from tree to bc or vice versa)
     this.invalidateLayoutTree();
@@ -1055,6 +1063,8 @@ export default class Tree extends Widget {
         }
       }, this);
     }
+
+    this.$container.toggleClass('no-nodes-selected', this.selectedNodes.length === 0);
 
     this.selectedNodes.forEach(function(node) {
       if (!this.visibleNodesMap[node.id]) {
@@ -1355,14 +1365,16 @@ export default class Tree extends Widget {
       this.removeFilter(this.breadcrumbFilter, true);
       this.filter();
     }
+    this._updateNodePaddingLevel();
   }
 
   _updateNodePaddingsLeft() {
     this.$nodes().each((index, element) => {
-      let $node = $(element),
-        node = $node.data('node'),
-        paddingLeft = this._computeNodePaddingLeft(node);
-      $node.css('padding-left', objects.isNullOrUndefined(paddingLeft) ? '' : paddingLeft);
+      let $node = $(element);
+      let node = $node.data('node');
+      let paddingLeft = this._computeNodePaddingLeft(node);
+      $node.cssPaddingLeft(objects.isNullOrUndefined(paddingLeft) ? '' : paddingLeft);
+      node._updateControl($node.children('.tree-node-control'), this);
     });
   }
 
@@ -2145,7 +2157,7 @@ export default class Tree extends Widget {
   _computeNodePaddingLeft(node) {
     this._computeNodePaddings();
     if (this.isBreadcrumbStyleActive()) {
-      return null;
+      return this.nodePaddingLeft;
     }
     let padding = node.level * this.nodePaddingLevel + this.nodePaddingLeft;
     if (this.checkable) {

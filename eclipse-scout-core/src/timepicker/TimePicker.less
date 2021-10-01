@@ -10,15 +10,10 @@
  */
 .time-picker-popup {
   position: absolute;
-  border: 1px solid @control-popup-border-color;
+  border: @popup-border-width solid @popup-border-color;
   border-radius: @control-popup-border-radius;
-  #scout.focus-border();
   overflow: hidden;
-
-  &.alternative {
-    #scout.drop-shadow();
-    border-radius: @control-alternative-border-radius;
-  }
+  #scout.drop-shadow-large();
 }
 
 .time-picker {

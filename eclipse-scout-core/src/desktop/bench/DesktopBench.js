@@ -403,7 +403,7 @@ export default class DesktopBench extends Widget {
       content.uiCssClass = 'detail-form';
     } else if (node.detailTable && node.detailTableVisible) {
       content = node.detailTable;
-      content.uiCssClass = 'detail-table';
+      content.uiCssClass = 'detail-table perma-focus';
     }
 
     return content;

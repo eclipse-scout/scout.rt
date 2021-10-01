@@ -54,14 +54,14 @@ describe('Table', () => {
       let model = helper.createModelFixture(2, 1);
       let table = helper.createTable(model);
       table.render();
-      expect(table.$container).toHaveClass('table');
+      expect(table.$container).not.toHaveClass('checkable');
 
       // checkable table (row style)
       model.checkable = true;
       model.checkableStyle = Table.CheckableStyle.TABLE_ROW;
       table = helper.createTable(model);
       table.render();
-      expect(table.$container).toHaveClass('table checkable');
+      expect(table.$container).toHaveClass('checkable');
 
       // row must have 'checked' class
       table.checkRow(table.rows[0], true, true);

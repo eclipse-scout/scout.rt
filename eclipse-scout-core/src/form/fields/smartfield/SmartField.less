@@ -48,59 +48,14 @@
 
   /* Multiline SmartField */
 
-  &.popup-open {
-
-    & > .multiline.field.focused {
-      box-shadow: none;
-    }
-
-    & > .field > .multiline-input {
-
-      &.has-error:focus {
-        border-bottom-color: @error-border-color;
-      }
-
-      &:focus {
-        #scout.glow(@focus-glow-color);
-        border-bottom-color: @focus-color;
-        border-bottom-right-radius: @control-border-radius;
-        border-bottom-left-radius: @control-border-radius;
-      }
-
-      &.alternative {
-        &:focus {
-          box-shadow: none;
-          border-bottom-right-radius: 0;
-          border-bottom-left-radius: 0;
-        }
-      }
-    }
-
-    & > .field > .multiline-lines.focused {
-      border-color: @border-color;
-    }
-  }
-
-  &.has-error > .multiline.field.focused {
-    #scout.glow(@error-glow-color);
-  }
-
-  & > .multiline.field.focused {
-    #scout.glow(@focus-glow-color);
-  }
-
   & > .field > .multiline-input {
-    border-bottom-color: @border-color;
     border-radius: @control-border-radius @control-border-radius 0 0;
     width: 100%;
     padding-left: @text-field-padding-x;
 
     &:focus {
-      box-shadow: none;
-    }
-
-    &.has-error:focus {
-      border-bottom-color: @error-border-color;
+      border-bottom-right-radius: @control-border-radius;
+      border-bottom-left-radius: @control-border-radius;
     }
 
     &.alternative {
@@ -109,6 +64,8 @@
       padding-right: @text-field-alternative-padding-right;
 
       &:focus {
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
         border-bottom-color: @focus-color;
       }
 
@@ -140,14 +97,6 @@
     &.disabled {
       background-color: @control-disabled-background-color;
     }
-
-    &.focused {
-      border-color: @focus-border-color;
-    }
-
-    &.has-error {
-      border-color: @error-border-color;
-    }
   }
 
   &.alternative > .field > .multiline-lines,
@@ -156,7 +105,6 @@
     padding-top: 6px;
 
     &.disabled {
-      color: @disabled-color;
       background-color: transparent;
     }
   }
@@ -166,8 +114,12 @@
     padding-right: @text-field-alternative-padding-right;
   }
 
-  &.disabled.read-only > .field > .multiline-lines {
-    color: @read-only-color;
+  &.disabled > .field > .multiline-lines {
+    color: @disabled-color;
+
+    .read-only& {
+      color: @read-only-color;
+    }
   }
 }
 
@@ -264,19 +216,19 @@
 .proposal-chooser {
 
   & > .active-filter {
-    padding-left: 7px;
-    padding-right: 7px;
     position: absolute;
   }
 
   & > .status {
-    padding: 7px 8px 0 10px;
+    display: flex;
+    align-items: center;
   }
 
   & > .active-filter,
   & > .status {
+    padding: 0 @proposal-chooser-padding-x;
     background-color: @proposal-chooser-status-background-color;
-    border-top: solid 1px @item-selection-border-color;
+    border-top: solid 1px @border-color;
     height: @logical-grid-row-height;
     overflow: hidden;
     white-space: nowrap;
@@ -305,60 +257,33 @@
   }
 
   & > .table {
-    /* Avoids a bug where the table is overlapping the status-field by 1 pixel */
-    overflow: hidden;
-
-    & > .table-data > .table-row {
-
-      /* Use text-field-padding-x for the first cell, so the text in the
-       * table is exactly left-aligned with the text in the text-field above */
-
-      & > .table-cell.first {
-        padding-left: @text-field-padding-x;
-      }
-
-      &.selected {
-        background-color: @item-selection-background-color;
-        border-color: @item-selection-border-color;
-      }
+    & > .table-header {
+      padding-left: @proposal-chooser-padding-x;
+      padding-right: @proposal-chooser-padding-x;
     }
-  }
 
-  &:not(.touch) > .table {
-    & > .table-data > .table-row {
-      &.selected.last {
-        /* Change color of last element to avoid double-border effect */
-        border-bottom-color: @item-selection-background-color;
+    & > .table-data {
+      padding: @proposal-chooser-padding-y @proposal-chooser-padding-x;
+
+      & > .table-row.first {
+        border-top: 1px solid @table-row-border-color;
       }
 
-      &.last {
-        border-bottom-color: transparent;
+      & > .scrollbar.y-axis > .scrollbar-thumb > .scrollbar-thumb-handle {
+        margin-left: 1px;
       }
     }
   }
 
-  & > .tree > .tree-data > .tree-node {
-    &.selected {
-      /* tree is not focused but should look as if it were */
-      background-color: @item-selection-background-color;
-      border-color: @item-selection-border-color;
-    }
+  & > .tree {
+    & > .tree-data {
+      padding: @proposal-chooser-padding-y @proposal-chooser-padding-x;
 
-    &.selected.last {
-      /* Change color of last element to avoid double-border effect */
-      border-bottom-color: @item-selection-background-color;
-    }
-
-    &.first {
-      border-top-color: @item-selection-nonfocus-background-color;
-    }
-
-    &.last {
-      border-bottom-color: transparent;
-    }
-
-    &.inactive {
-      font-style: italic;
+      & > .tree-node {
+        &.inactive {
+          font-style: italic;
+        }
+      }
     }
   }
 }

@@ -15,6 +15,8 @@
   background-color: @table-header-background-color;
   border-bottom: 2px solid @table-header-border-color;
   z-index: 0; /* begin new stacking context */
+  padding-left: var(--table-row-margin-x);
+  padding-right: var(--table-row-margin-x);
 
   // TableHeader.js will set a border width if the row has one for the selection
   border-left: 0 solid transparent;

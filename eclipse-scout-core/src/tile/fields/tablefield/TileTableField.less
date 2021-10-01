@@ -9,14 +9,19 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .tile.dashboard > .table-field {
-  .dashboard-tile-small-horizontal-padding(@tile-field-padding, @tile-field-padding - @table-cell-padding-left - 1); // -1 = table-row padding, see below
+  .dashboard-tile-small-horizontal-padding(@tile-field-padding, @tile-field-padding - @table-cell-padding-left);
+  padding-bottom: 12px;
+
+  &.label-hidden {
+    padding-top: 7px;
+  }
 
   & > label {
     padding-bottom: @dashboard-tile-label-large-padding-bottom;
   }
 
   .compact& {
-    .dashboard-tile-small-horizontal-padding(@tile-field-compact-padding-x, @tile-field-compact-padding-x - @table-cell-padding-left - 1); // -1 = table-row padding, see below
+    .dashboard-tile-small-horizontal-padding(@tile-field-compact-padding-x, @tile-field-compact-padding-x - @table-cell-padding-left);
 
     & > label {
       padding-bottom: @dashboard-tile-label-padding-bottom;
@@ -24,14 +29,11 @@
   }
 
   /* adjust menu bar when visible */
-
   &.has-menubar {
-    padding-bottom: 10px;
+    padding-bottom: 2px;
 
-    & > .table > .menubar {
-      &.bottom {
-        padding-top: 8px;
-      }
+    & > .table > .menubar.bottom {
+      padding-top: 1px;
     }
   }
 
@@ -47,7 +49,6 @@
 
     & > .table-header {
       background-color: transparent;
-      border-bottom-width: 2px;
 
       & > .table-header-item {
         color: @tile-table-default-color;
@@ -68,95 +69,82 @@
       }
     }
 
-    &.header-invisible > .table-data {
-      /* override negative margin top, otherwise selection border of first row would be cut off */
-      margin-top: 0;
-    }
-
-    /* No selection color for non-focused table tiles */
-
-    &:not(:focus):not(.focused) > .table-data > .table-row {
+    &:not(:focus):not(.focused) > .table-data > .table-row.selected::after {
+      /* No selection color for non-focused table tiles */
       background-color: transparent;
-      border-top-color: transparent;
+      border: 0;
     }
 
-    /* Draw left and right selection border (because tile tables have on border) */
-
-    & > .table-data > .table-row {
-      /* Do not use transparent left/right border, because otherwise the corners would not look good. */
-      /* Instead, a padding is used, which is replaced by a border in the selected state. */
-      padding-left: 1px;
-      padding-right: 1px;
-
-      &.selected {
-        border-left-width: 1px;
-        border-right-width: 1px;
-        padding-left: 0;
-        padding-right: 0;
+    & > .table-data {
+      & + .scroll-shadow {
+        .scroll-shadow.gradient();
+        --scroll-shadow-color: @tile-default-background-color;
       }
 
-      & > .table-cell,
-      & > .table-cell > .font-icon {
-        color: @tile-table-default-color;
+      & > .table-row {
+        & > .table-cell,
+        & > .table-cell > .font-icon {
+          color: @tile-table-default-color;
+        }
       }
     }
 
     & > .menubar {
       background-color: transparent;
-
-      &.bottom {
-        border-top-width: 2px;
-      }
-    }
-  }
-
-  &:not(.label-hidden) > .table > .table-header {
-
-    & > .table-header-resize {
-      padding-top: 0;
-    }
-
-    & > .table-header-item {
-      padding-top: 0;
     }
   }
 }
 
 .tile.dashboard {
-
   &.inverted > .table-field > .table {
 
     &:focus,
     &.focused {
-
-      & > .table-data > .table-row.selected {
+      & > .table-data > .table-row.selected::after {
         background-color: @tile-table-default-inverted-selection-background-color;
         border-color: @tile-table-default-inverted-selection-border-color;
+        mix-blend-mode: @tile-table-alternative-inverted-selection-mix-blend-mode;
       }
     }
 
-    & > .table-header > .table-header-item,
-    & > .table-data > .table-row > .table-cell {
-      color: @tile-default-inverted-color;
+    & > .table-header {
+      border-bottom-color: @tile-table-default-inverted-border-color;
 
-      & > .font-icon {
+      & > .table-header-item {
         color: @tile-default-inverted-color;
       }
+
+      & > .table-header-resize {
+        background-color: @tile-table-default-inverted-border-color;
+      }
     }
 
-    & > .menubar > .menubar-box > .menu-item {
-      color: @tile-default-inverted-color;
+    & > .table-data {
+      & > .table-row {
+        &:active {
+          background-color: transparent;
+        }
+
+        & > .table-cell {
+          color: @tile-default-inverted-color;
+          border-bottom-color: @tile-table-default-inverted-border-color;
+
+          & > .font-icon {
+            color: @tile-default-inverted-color;
+          }
+        }
+      }
+
+      & + .scroll-shadow {
+        --scroll-shadow-color: @tile-default-inverted-background-color;
+      }
     }
-  }
 
-  &.color-alternative > .table-field > .table {
+    & > .menubar {
+      border-top-color: @tile-table-default-inverted-border-color;
 
-    &:focus,
-    &.focused {
-
-      & > .table-data > .table-row.selected {
-        background-color: @tile-table-alternative-selection-background-color;
-        border-color: @tile-table-alternative-selection-border-color;
+      & > .menubar-box > .menu-item {
+        color: @tile-default-inverted-color;
       }
     }
   }
@@ -165,24 +153,52 @@
 
     &:focus,
     &.focused {
-
-      & > .table-data > .table-row.selected {
+      & > .table-data > .table-row.selected::after {
         background-color: @tile-table-alternative-inverted-selection-background-color;
         border-color: @tile-table-alternative-inverted-selection-border-color;
+        mix-blend-mode: @tile-table-alternative-inverted-selection-mix-blend-mode;
       }
     }
 
-    & > .table-header > .table-header-item,
-    & > .table-data > .table-row > .table-cell {
-      color: @tile-alternative-inverted-color;
+    & > .table-header {
+      border-bottom-color: @tile-table-default-inverted-border-color;
 
-      & > .font-icon {
+      & > .table-header-item {
         color: @tile-alternative-inverted-color;
       }
+
+      & > .table-header-resize {
+        background-color: @tile-table-default-inverted-border-color;
+      }
     }
 
-    & > .menubar > .menubar-box > .menu-item {
-      color: @tile-alternative-inverted-color;
+    & > .table-data {
+      & > .table-row {
+        &:active {
+          background-color: transparent;
+        }
+
+        & > .table-cell {
+          color: @tile-alternative-inverted-color;
+          border-bottom-color: @tile-table-default-inverted-border-color;
+
+          & > .font-icon {
+            color: @tile-alternative-inverted-color;
+          }
+        }
+      }
+
+      & + .scroll-shadow {
+        --scroll-shadow-color: @tile-alternative-inverted-background-color;
+      }
+    }
+
+    & > .menubar {
+      border-top-color: @tile-table-default-inverted-border-color;
+
+      & > .menubar-box > .menu-item {
+        color: @tile-alternative-inverted-color;
+      }
     }
   }
 }

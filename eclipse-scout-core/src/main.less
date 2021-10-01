@@ -171,7 +171,7 @@ textarea,
 
   &.has-error:focus,
   &.has-error.focused {
-    #scout.glow(@error-glow-color);
+    #scout.focus-box-shadow(@box-shadow-color: @error-focus-box-shadow-color);
   }
 
   &.read-only {
@@ -199,7 +199,7 @@ input.alternative,
   background-color: @text-field-alternative-background-color;
   border-color: transparent;
   border-bottom-color: @text-field-alternative-border-color;
-  border-radius: @control-alternative-border-radius;
+  border-radius: 0;
   border-left-width: 0;
   border-right-width: 0;
   padding-left: @text-field-alternative-padding-left;
@@ -467,7 +467,7 @@ a,
 
   &:focus {
     outline-color: @link-color;
-    #scout.box-shadow-focus();
+    #scout.focus-box-shadow();
   }
 }
 

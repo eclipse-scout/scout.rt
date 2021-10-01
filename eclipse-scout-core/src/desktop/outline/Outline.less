@@ -76,7 +76,10 @@
       &.selected {
         color: @outline-selection-color;
         background-color: @outline-selection-background-color;
-        border: 0;
+
+        &::after {
+          display: none;
+        }
 
         & > .font-icon,
         & > .tree-node-control {
@@ -161,14 +164,6 @@
 
       &.ancestor-of-selected {
         border-bottom-color: @outline-breadcrumb-ancestor-border-color;
-
-        &::before {
-          display: none;
-        }
-
-        &::after {
-          display: none;
-        }
       }
 
       &:active {
@@ -179,17 +174,6 @@
         background-color: @outline-selection-background-color;
         color: @outline-selection-color;
         cursor: default;
-
-        &::before {
-          border-top-color: @outline-selection-background-color;
-          border-width: 8px 13px 0 13px;
-          bottom: -8px;
-        }
-
-        &::after {
-          border-width: 0;
-          border-top-color: @outline-selection-background-color;
-        }
       }
 
       &.selected > .text,
@@ -217,16 +201,8 @@
         border-color: @outline-breadcrumb-border-color;
       }
 
-      &.parent-of-selected::before {
-        border-color: transparent;
-      }
-
       &.selected {
         border-color: @outline-breadcrumb-border-color;
-      }
-
-      &.selected::before {
-        border-top-color: @outline-selection-background-color;
       }
     }
   }
@@ -314,18 +290,6 @@
           font-weight: bold;
         }
 
-        &::before {
-          border-top-color: @outline-breadcrumb-border-color;
-          border-width: 6px 12px 0 12px;
-          bottom: -7px;
-        }
-
-        &::after {
-          border-top-color: @desktop-navigation-body-background-color;
-          border-width: 6px 12px 0 12px;
-          bottom: -6px;
-        }
-
         & > .font-icon,
         & > .tree-node-control {
           color: @outline-node-font-icon-color;
@@ -359,11 +323,6 @@
     background-color: transparent;
     color: @desktop-navigation-color;
     border-bottom: 0;
-
-    &::before,
-    &::after {
-      display: none;
-    }
 
     & .tile-overview-content {
       margin-left: 20px;

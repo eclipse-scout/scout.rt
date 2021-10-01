@@ -30,6 +30,7 @@ export default class TableRow {
     this.childRows = [];
     this.expanded = false;
     this.status = TableRow.Status.NON_CHANGED;
+    this.hierarchyLevel = 0;
   }
 
   static Status = {

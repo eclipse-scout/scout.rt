@@ -34,7 +34,7 @@
       }
 
       &.keyboard-navigation {
-        #scout.button-focus(@box-shadow-color: @focus-color, @border-color: mix(@color, @focus-color, 25%));
+        #scout.focus-border(@box-shadow-color: @focus-color, @border-color: mix(@color, @focus-color, 25%));
       }
 
       &.disabled {
@@ -57,7 +57,7 @@
         }
 
         &.keyboard-navigation {
-          #scout.button-focus(@box-shadow-color: @focus-color, @border-color: mix(@color, @focus-color, 25%));
+          #scout.focus-border(@box-shadow-color: @focus-color, @border-color: mix(@color, @focus-color, 25%));
         }
 
         &.disabled {
@@ -90,7 +90,7 @@
       }
     }
 
-    .severity-button(@error-color, @focus-color: @error-box-shadow-focus-color);
+    .severity-button(@error-color, @focus-color: @error-focus-box-shadow-color);
   }
 
   &.warning {
@@ -102,7 +102,7 @@
       }
     }
 
-    .severity-button(@warning-color, @focus-color: @warning-box-shadow-focus-color);
+    .severity-button(@warning-color, @focus-color: @warning-focus-box-shadow-color);
   }
 
   &.ok {
@@ -114,7 +114,7 @@
       }
     }
 
-    .severity-button(@ok-color, @focus-color: @ok-box-shadow-focus-color);
+    .severity-button(@ok-color, @focus-color: @ok-focus-box-shadow-color);
   }
 
   &.animate-open {

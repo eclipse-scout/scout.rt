@@ -171,7 +171,7 @@ export default class TableLayout extends AbstractLayout {
       currentWidth = 0,
       totalInitialWidth = 0,
       tableWidth = widthHint || this.table.$data.width(),
-      availableWidth = Math.floor(tableWidth - this.table.rowBorderWidth);
+      availableWidth = Math.floor(tableWidth - (this.table.rowBorders.horizontal() + this.table.rowMargins.horizontal()));
 
     // Don't resize fixed and auto optimize width columns
     this.table.visibleColumns().forEach(column => {

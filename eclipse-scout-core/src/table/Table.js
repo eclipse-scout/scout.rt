@@ -23,6 +23,7 @@ import {
   Event,
   graphics,
   HtmlComponent,
+  Insets,
   KeyStrokeContext,
   LoadingSupport,
   MenuBar,
@@ -117,9 +118,8 @@ export default class Table extends Widget {
     this.rowsMap = {}; // rows by id
     this.rowHeight = 0;
     this.rowWidth = 0;
-    this.rowBorderWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableLayout.js
-    this.rowBorderLeftWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
-    this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
+    this.rowInsets = new Insets(); // read-only, set by _calculateRowInsets(), also used in TableHeader.js
+    this.rowMargins = new Insets(); // read-only, set by _calculateRowInsets(), also used in TableLayout.js
     this.rowIconVisible = false;
     this.rowIconColumnWidth = Column.NARROW_MIN_WIDTH;
     this.staticMenus = [];
@@ -490,7 +490,7 @@ export default class Table extends Widget {
     });
     this._installImageListeners();
     this._installCellTooltipSupport();
-    this._calculateRowBorderWidth();
+    this._calculateRowInsets();
     this._updateRowWidth();
     this._updateRowHeight();
     this._renderViewport();
@@ -1504,11 +1504,10 @@ export default class Table extends Widget {
     return rowDiv;
   }
 
-  _calculateRowBorderWidth() {
+  _calculateRowInsets() {
     let $tableRowDummy = this.$data.appendDiv('table-row');
-    this.rowBorderLeftWidth = $tableRowDummy.cssBorderLeftWidth();
-    this.rowBorderRightWidth = $tableRowDummy.cssBorderRightWidth();
-    this.rowBorderWidth = this.rowBorderLeftWidth + this.rowBorderRightWidth;
+    this.rowMargins = graphics.margins($tableRowDummy);
+    this.rowBorders = graphics.borders($tableRowDummy);
     $tableRowDummy.remove();
   }
 
@@ -1521,7 +1520,7 @@ export default class Table extends Widget {
       // If autoResizeColumns is enabled, it is not possible to do a proper calculation with this bug
       // -> Use regular width and live with the consequence that the last cell of a table with many columns is not fully visible
       return sum + column._realWidthIfAvailable();
-    }, this.rowBorderWidth);
+    }, this.rowBorders.horizontal());
   }
 
   /**
@@ -2030,7 +2029,7 @@ export default class Table extends Widget {
    */
   _columnAtX(x) {
     let columnOffsetRight = 0,
-      columnOffsetLeft = this.$data.offset().left + this.rowBorderLeftWidth,
+      columnOffsetLeft = this.$data.offset().left + this.rowBorders.left + this.rowMargins.left,
       scrollLeft = this.$data.scrollLeft();
 
     if (x < columnOffsetLeft) {
@@ -3281,6 +3280,7 @@ export default class Table extends Widget {
       }
       return false;
     };
+    this._renderNoRowsSelectedMarker();
 
     for (let i = 0; i < rows.length; i++) { // traditional for loop, elements might be added during loop
       let row = rows[i];
@@ -3329,6 +3329,7 @@ export default class Table extends Widget {
   }
 
   _removeSelection() {
+    this.$container.addClass('no-rows-selected');
     this.selectedRows.forEach(row => {
       if (!row.$row) {
         return;
@@ -3336,6 +3337,10 @@ export default class Table extends Widget {
       row.$row.select(false);
       row.$row.toggleClass(Table.SELECTION_CLASSES, false);
     }, this);
+  }
+
+  _renderNoRowsSelectedMarker() {
+    this.$container.toggleClass('no-rows-selected', this.selectedRows.length === 0);
   }
 
   addRowToSelection(row, ongoingSelection) {
@@ -3579,7 +3584,7 @@ export default class Table extends Widget {
     this._maxLevel = 0;
     this.rows = [];
     this.visitRows((row, level) => {
-      row._hierarchyLevel = level;
+      row.hierarchyLevel = level;
       this._maxLevel = Math.max(level, this._maxLevel);
       this.rows.push(row);
     });
@@ -4929,6 +4934,8 @@ export default class Table extends Widget {
     }
     let viewRange = this._calculateCurrentViewRange();
     this._renderViewRange(viewRange);
+    this._renderLastRowAtBottomMarker();
+    this._renderNoRowsSelectedMarker(); // Necessary to call it here if there are no rows at all
   }
 
   _rerenderViewport() {
@@ -4987,6 +4994,24 @@ export default class Table extends Widget {
     this._renderBackgroundEffect();
     this._renderSelection();
     this.viewRangeDirty = false;
+  }
+
+  _renderLastRowAtBottomMarker() {
+    if (this.$rows().is(':animated')) {
+      // Don't change state if rows are animated (e.g. by filtering) because the last row may temporarily be at the end but will be moved up by animation.
+      // State will be updated before the animation runs.
+      return;
+    }
+    let lastVisibleRow = this._lastVisibleRow();
+    if (lastVisibleRow && lastVisibleRow.$row) {
+      this.$data.toggleClass('last-row-at-bottom', graphics.offsetBounds(lastVisibleRow.$row).bottom() >= graphics.offsetBounds(this.$data).bottom());
+    } else {
+      this.$data.removeClass('last-row-at-bottom');
+    }
+  }
+
+  _lastVisibleRow() {
+    return this.visibleRows[this.visibleRows.length - 1];
   }
 
   _removeRangeMarkers() {

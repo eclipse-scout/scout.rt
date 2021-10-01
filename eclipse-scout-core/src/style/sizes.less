@@ -19,8 +19,9 @@
 @borderless-field-padding-y: @text-field-padding-y + 1px;
 @collapse-handle-border-radius: @border-radius-medium;
 @control-border-radius: @border-radius;
-@control-alternative-border-radius: 0;
+@control-alternative-border-radius: @control-border-radius;
 @control-popup-border-radius: @border-radius;
+@item-selection-border-width: 2px;
 @logical-grid-row-height: 30px;
 @logical-grid-row-height-dense: 24px;
 @logical-grid-row-gap: 10px;
@@ -93,7 +94,6 @@
 @busyindicator-large-size: 100px;
 @busyindicator-large-border-width: 2px;
 @button-border-radius: @border-radius;
-@button-focus-border-radius: 6px;
 @button-padding-x: 7px;
 @button-padding-y: 2px;
 @button-margin-top: 1px; /* Necessary to align icon with text */
@@ -152,13 +152,13 @@
 @desktop-tool-box-item-margin: 3px;
 @desktop-tool-box-item-margin-top: @view-tab-margin-top;
 @detail-table-border-radius: 4px;
-@detail-table-data-padding-x: @bench-padding-x - @table-cell-padding-left;
+@detail-table-row-margin-x: @bench-padding-x - @table-cell-padding-left;
 @detail-table-header-menubar-padding-right: 10px;
 @detail-table-header-item-padding-x: @bench-padding-x - @table-header-item-padding-left;
 @detail-table-header-item-padding-y: @table-header-item-padding-y;
 @detail-table-header-item-margin-top: 6px;
 @detail-table-header-item-margin-bottom: 6px;
-@detail-table-row-padding-y: 11px;
+@detail-table-row-padding-y: 10px;
 @detail-table-footer-with-handle-margin-left: 30px;
 @dialog-border-top-size: 5px;
 @form-title-padding-top: 16px;
@@ -225,6 +225,9 @@
 @planner-resource-title-width: 150px;
 @planner-scale-height: 45px;
 @popup-border-radius: @border-radius-large;
+@popup-border-width: 0;
+@proposal-chooser-padding-x: 12px;
+@proposal-chooser-padding-y: 8px;
 @radio-button-circle-size: 18px;
 @radio-button-border-width: 1px;
 @radio-button-label-padding-top: 2px;
@@ -234,7 +237,7 @@
 @scrollbar-margin: 8px;
 @scrollbar-side-padding: 5px;
 @scrollbar-side-padding-hover: 3px;
-@scrollbar-size: 14px;
+@scrollbar-size: @scrollbar-thumb-size + 2 * @scrollbar-side-padding; // thumb needs to be in the middle
 @scrollbar-thumb-size: 4px;
 @scrollbar-thumb-hover-size: 8px;
 @scroll-shadow-size-large: 10px;
@@ -259,7 +262,7 @@
 @tab-item-title-padding-bottom: @group-box-title-padding-bottom;
 @tab-item-title-padding-top: @group-box-title-padding-top;
 @tab-item-title-margin-top: @group-box-header-margin-top;
-@table-cell-padding-left: 8px;
+@table-cell-padding-left: 10px;
 @table-cell-padding-right: @table-cell-padding-left;
 @table-cell-padding-right-last: @scrollbar-size;
 @table-control-content-padding: 10px;
@@ -287,6 +290,7 @@
 @table-info-margin-x: 15px;
 @table-menubar-padding: 8px;
 @table-row-padding-y: 7px;
+@table-row-margin-x: 0px;
 @table-row-level-padding-width: 20px;
 @table-row-control-line-height: @tree-node-control-line-height;
 @table-row-control-padding-left: @tree-node-control-padding-left;
@@ -316,8 +320,8 @@
 @tree-node-control-padding-left: 13px;
 @tree-node-font-icon-line-height: 15px;
 @tree-node-padding-left: 28px;
-@tree-node-padding-right: 6px;
-@tree-node-padding-y: 6px;
+@tree-node-padding-right: 7px;
+@tree-node-padding-y: 7px;
 @view-tab-key-box-bottom: 9px;
 @view-tab-icon-font-size: 20px;
 @view-tab-selected-width: 56px;

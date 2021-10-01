@@ -41,7 +41,7 @@ export default class TableHeader extends Widget {
 
   _render() {
     this.$container = this.table.$data.beforeDiv('table-header')
-      .cssBorderLeftWidth(this.table.rowBorderLeftWidth || '');
+      .cssBorderLeftWidth(this.table.rowBorders.left || '');
 
     // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
     this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
@@ -183,7 +183,7 @@ export default class TableHeader extends Widget {
     columnWidth -= margins.horizontal();
 
     if (isLastColumn) {
-      remainingHeaderSpace = this.$container.width() - this.table.rowWidth + graphics.insets(this.table.$data).right;
+      remainingHeaderSpace = this.$container.width() - this.table.rowWidth + graphics.insets(this.$container).right;
 
       if (remainingHeaderSpace < menuBarWidth) {
         adjustment = menuBarWidth;
@@ -773,7 +773,7 @@ export default class TableHeader extends Widget {
     // table has been horizontally scrolled to the right would behave very strange.
     let $headerColumnResizedHelper = this.$container
       .appendDiv('table-column-resize-helper')
-      .css('width', this.table.rowWidth + this.table.rowBorderWidth);
+      .css('width', this.table.rowWidth + this.table.rowBorders.horizontal());
     let $dataColumnResizedHelper = this.table.$data
       .appendDiv('table-column-resize-helper')
       .css('width', this.table.rowWidth);

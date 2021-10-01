@@ -194,6 +194,9 @@ export default class Popup extends Widget {
     return new CloseKeyStroke(this);
   }
 
+  /**
+   * @return {PopupLayout|AbstractLayout}
+   */
   _createLayout() {
     return new PopupLayout(this);
   }

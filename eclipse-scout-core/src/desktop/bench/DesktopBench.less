@@ -86,6 +86,8 @@
 }
 
 .detail-table.table {
+  --table-row-margin-x: @detail-table-row-margin-x;
+  --table-row-padding-y: @detail-table-row-padding-y;
 
   &.loading {
     & > .loading-indicator {
@@ -101,8 +103,6 @@
   }
 
   & > .table-header {
-    padding-left: @detail-table-data-padding-x;
-    padding-right: @detail-table-data-padding-x;
     background-color: @detail-table-header-background-color;
     border-bottom-color: @detail-table-header-border-color;
 
@@ -118,23 +118,8 @@
     }
   }
 
-  & > .table-data {
-    padding-left: @detail-table-data-padding-x;
-    padding-right: @detail-table-data-padding-x;
-  }
-
   & > .table-footer {
     background-color: @detail-table-footer-background-color;
-  }
-
-  & .table-aggregate {
-    /* Desktop table has a 2px (left) border. */
-    margin-left: @detail-table-data-padding-x + 2px;
-
-    & > .table-cell {
-      padding-top: @detail-table-row-padding-y;
-      padding-bottom: @detail-table-row-padding-y;
-    }
   }
 
   & > .table-data {
@@ -144,96 +129,6 @@
 
     & + .scroll-shadow {
       .scroll-shadow.large();
-    }
-
-    & > .table-row,
-    & > .table-aggregate-row {
-      /* Desktop table has a 2px border. Top and bottom border are added to the table cell. */
-      border-left-width: 2px;
-      border-right-width: 2px;
-
-      &.selected {
-        background-color: @item-selection-background-color;
-        border-color: @item-selection-border-color;
-      }
-
-      & > .table-cell {
-        /* Replace first and last pixel of specified row padding by a transparent border. This border will be */
-        /* set to the selection color when the row is selected, thus creating the illusion that the 2px selection */
-        /* border is drawn around the cell. See CSS rules below. */
-        padding-top: @detail-table-row-padding-y - 1px;
-        padding-bottom: @detail-table-row-padding-y - 1px;
-        border-top: 1px solid transparent;
-        border-bottom: 1px solid transparent;
-
-        &.checkable {
-          padding-top: @detail-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
-          padding-bottom: 0;
-        }
-
-        & > .table-row-control {
-          padding-top: @detail-table-row-padding-y - 1px;
-          padding-bottom: @detail-table-row-padding-y - 1px;
-        }
-      }
-
-      &.select-top > .table-cell {
-        border-top-color: @item-selection-border-color;
-      }
-
-      &.select-bottom > .table-cell {
-        border-bottom-color: @item-selection-border-color;
-      }
-
-      &.select-single > .table-cell {
-        border-top-color: @item-selection-border-color;
-        border-bottom-color: @item-selection-border-color;
-      }
-    }
-
-    & > .cell-editor-popup > .check-box-field {
-      border-top: 2px solid @item-selection-border-color;
-      border-bottom: 2px solid @item-selection-border-color;
-
-      & > .field {
-        padding-top: @detail-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
-      }
-    }
-
-    & > .cell-editor-popup > .cell-editor-form-field > input,
-    & > .cell-editor-popup > .cell-editor-form-field > .field > input {
-      border-top: 2px solid @item-selection-border-color;
-      border-bottom: 2px solid @item-selection-border-color;
-    }
-  }
-}
-
-@media only screen and(min-resolution: 96.96dpi) {
-  /* 1.01dppx / 101% */
-  /* The browser may not display the 2px border properly when zoomed, it draws a white gap between the cell and the row border.
-     To prevent that the border is reduced to the simple 1px border. This is also applied if windows font size is set to medium (125%) */
-  .detail-table.table {
-
-    & > .table-data {
-
-      & > .table-row,
-      & > .table-aggregate-row {
-        border-left-width: 1px;
-        border-right-width: 1px;
-
-        &.select-top > .table-cell {
-          border-top-color: transparent;
-        }
-
-        &.select-bottom > .table-cell {
-          border-bottom-color: transparent;
-        }
-
-        &.select-single > .table-cell {
-          border-top-color: transparent;
-          border-bottom-color: transparent;
-        }
-      }
     }
   }
 }

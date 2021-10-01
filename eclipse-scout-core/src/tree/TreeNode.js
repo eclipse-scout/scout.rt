@@ -206,7 +206,7 @@ export default class TreeNode {
       .attr('data-nodeid', this.id)
       .attr('data-level', this.level);
     if (!objects.isNullOrUndefined(paddingLeft)) {
-      this.$node.css('padding-left', paddingLeft);
+      this.$node.cssPaddingLeft(paddingLeft);
     }
     this.$text = this.$node.appendSpan('text');
 

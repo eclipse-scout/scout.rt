@@ -23,9 +23,12 @@
       border-radius: @control-alternative-border-radius;
     }
 
-    &:focus,
-    &.focused {
-      #scout.focus-border();
+    &.no-rows-selected,
+    &.no-nodes-selected{
+      &:focus,
+      &.focused {
+        #scout.focus-border();
+      }
     }
 
     &.ie {

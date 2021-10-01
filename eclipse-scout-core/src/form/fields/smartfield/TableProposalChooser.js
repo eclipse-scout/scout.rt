@@ -146,11 +146,8 @@ export default class TableProposalChooser extends ProposalChooser {
 
   _renderModel() {
     this.model.setVirtual(this.smartField.virtual());
-    this.model.render();
-
-    // Make sure table never gets the focus, but looks focused
-    this.model.$container.setTabbable(false);
-    this.model.$container.addClass('focused');
+    super._renderModel();
+    this.model.$data.addClass('top-border-on-first-row');
   }
 
   getSelectedLookupRow() {

@@ -90,7 +90,7 @@
   height: @table-header-menu-cmd-height;
 
   &:focus {
-    #scout.box-shadow-focus();
+    #scout.focus-border();
     outline: none;
   }
 
@@ -258,26 +258,22 @@
 
   & > .table-data {
     margin-top: 0;
-    padding: 2px 4px;
+    padding: 3px 4px;
 
     & > .table-row {
-      border: 0;
       border-radius: @border-radius;
-      border-top: 1px solid @table-header-menu-background-color;
+      margin-bottom: 1px;
 
-      &.select-single,
-      &.select-top,
-      &.selected {
-        border-top: 1px solid @table-header-menu-background-color;
-        margin-top: 0;
+      &.last {
+        margin-bottom: 0;
       }
 
-      &.first {
-        border-top: 0;
-      }
+      & > .table-cell {
+        border: 0;
 
-      & > .table-cell.halign-right {
-        padding-right: 12px;
+        &.halign-right {
+          padding-right: 12px;
+        }
       }
     }
   }
