@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, objects, strings} from '../index';
+import {arrays, Device, events, objects, strings} from '../index';
 
 /**
  * @returns {number} the x coordinate where the event happened, works for touch events as well.
@@ -181,6 +181,67 @@ export function addPropagationListener(source, target, types, filter) {
   });
 }
 
+/**
+ * @typedef {Object} SwipeCallbackEvent
+ * @property {MouseEvent|TouchEvent} originalEvent The original event received from the browser.
+ * @property {number} originalLeft The left position of the element at the moment the swipe was started.
+ * @property {number} deltaX The horizontal delta the swipe has already moved (negative values mean to the left of the original left position).
+ * @property {number} newLeft The current left position of the element.
+ */
+
+/**
+ * Adds swipe event listeners to the element given.
+ *
+ * @param {jQuery} $element The element on which the listeners should be attached.
+ * @param {string} id An event listener id used to be registered on the window object.
+ * @param {function(SwipeCallbackEvent)} [onDown] Callback to be invoked when the swipe is started (mouse or touch down).
+ * @param {function(SwipeCallbackEvent)} [onMove] Callback to be invoked when mouse (or finger if touch) is moved (while being down).
+ * @param {function(SwipeCallbackEvent)} [onUp] Callback to be invoked when the swipe is ended (mouse or finger released).
+ */
+export function onSwipe($element, id, onDown, onMove, onUp) {
+  let $window = $element.window();
+  let touch = Device.get().supportsOnlyTouch();
+
+  $element.on('touchmove', event => event.preventDefault()); // prevent scrolling the background when swiping (iOS)
+  $element.on('remove', event => $window.off('.' + id));
+
+  $element.on(touchdown(touch), event => {
+    let acceptDown = !onDown || !!onDown({originalEvent: event, originalLeft: origPosLeft, deltaX: 0, newLeft: origPosLeft});
+    if (!acceptDown) {
+      return;
+    }
+
+    let dragging = true;
+    let origPageX = events.pageX(event);
+    let origPosLeft = $element.position().left;
+    let curPosLeft = origPosLeft;
+
+    $window.on(touchmove(touch, id), event => {
+      let pageX = events.pageX(event);
+      let deltaX = pageX - origPageX;
+      let newLeft = origPosLeft + deltaX;
+      if (onMove) {
+        let l = onMove({originalEvent: event, originalLeft: origPosLeft, deltaX: deltaX, newLeft: newLeft});
+        curPosLeft = l ? l : newLeft;
+      } else {
+        curPosLeft = newLeft;
+      }
+    });
+
+    $window.on(touchendcancel(touch, id), event => {
+      if (!dragging) {
+        // On iOS touchcancel and touchend are fired right after each other when swiping twice very fast -> Ignore the second event
+        return;
+      }
+      dragging = false;
+      $window.off('.' + id);
+      if (onUp) {
+        onUp({originalEvent: event, originalLeft: origPosLeft, deltaX: curPosLeft - origPosLeft, newLeft: curPosLeft});
+      }
+    });
+  });
+}
+
 export default {
   addPropagationListener,
   fixTouchEvent,
@@ -193,5 +254,6 @@ export default {
   touchOrMouse,
   touchdown,
   touchendcancel,
-  touchmove
+  touchmove,
+  onSwipe
 };
