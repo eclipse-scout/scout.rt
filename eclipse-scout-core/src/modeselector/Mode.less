@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,12 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .mode {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
-  border: 1px solid @border-color;
-  height: 100%;
-  padding: @mode-padding;
+  border: @mode-border-width solid @border-color;
+  border-radius: 0;
+  flex: 1 1 0;
+  padding: @mode-padding-y @mode-padding-x;
   #scout.overflow-ellipsis();
 
   &.first {
@@ -31,45 +29,41 @@
 
   &:not(.last):not(.selected) {
     border-right: none;
-    padding-right: @mode-padding + 1px; /* account for the missing border, so that text does not jump */
+    padding-right: @mode-padding-x + @mode-border-width; /* account for the missing border, so that text does not jump */
   }
 
   &.after-selected {
     border-left: none;
-    padding-left: @mode-padding + 1px; /* account for the missing border, so that text does not jump */
+    padding-left: @mode-padding-x + @mode-border-width; /* account for the missing border, so that text does not jump */
   }
 
-  &:hover {
-    color: @mode-hover-text-color;
-  }
-
-  &:not(.disabled):not(.selected):active {
-    color: @button-active-color;
-    background-color: @button-active-background-color;
-  }
-
+  // override button (the selected mode cannot be clicked. therefore do not show hover and active colors)
   &.selected {
-    color: @mode-selected-text-color;
-    background-color: @mode-selected-background-color;
-    border: none;
-  }
+    color: @selected-color;
+    cursor: default;
 
-  &:not(.disabled) {
-    cursor: pointer;
-  }
+    &:hover {
+      background-color: @selected-background-color;
+      border-color: @selected-background-color;
+    }
 
-  &.disabled,
-  &.alternative.disabled {
-    color: @button-disabled-color;
-
-    &.selected {
-      background-color: @button-disabled-background-color;
-      border: solid 1px @button-disabled-border-color;
+    &:active {
+      background-color: @selected-background-color;
+      border-color: @selected-background-color;
     }
   }
 
-  & > .icon.with-label {
-    margin-right: 8px;
+  &.disabled:hover {
+    color: @button-disabled-color;
+    background-color: @button-disabled-background-color;
+    border-color: @button-disabled-border-color;
+  }
+
+  & > .icon {
+    padding: 0; // remove padding from button
+    &.with-label {
+      margin-right: 8px;
+    }
   }
 }
 
@@ -79,11 +73,41 @@
 
 .mode-selector.alternative {
   & > .mode {
+    color: @mode-color;
+    border: @mode-alternative-border-width transparent solid;
+    background-color: transparent;
+    border-radius: @button-border-radius + @mode-alternative-border-width;
 
-    &.selected:not(.disabled) {
-      background-color: inherit;
-      border: 1px solid @mode-alternative-selected-color;
-      color: @mode-alternative-selected-color;
+    &:hover {
+      border-color: transparent;
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &:active {
+      border-color: transparent;
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    &.selected {
+      color: @button-color;
+      transition: color 500ms ease;
+
+      &:hover {
+        border: @mode-alternative-border-width transparent solid;
+        background-color: transparent;
+      }
+    }
+
+    &.mode-selector-dragging {
+      // do not show animations and hover-effects during drag
+      background-color: transparent;
+      transition: unset;
+    }
+
+    &.disabled {
+      color: @button-disabled-color;
+      background-color: transparent;
+      cursor: default;
     }
   }
 }

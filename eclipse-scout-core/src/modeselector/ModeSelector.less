@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,35 @@
   position: relative;
   background-color: @control-background-color;
   white-space: nowrap;
-  display: table;
-  table-layout: fixed;
+  display: inline-flex;
   overflow: hidden;
+
+  & > .mode-slider {
+    display: none;
+  }
+
+  &.alternative {
+    background-color: @mode-alternative-background-color;
+    border-radius: @button-border-radius;
+
+    &:not(.disabled) > .mode-slider {
+      display: block;
+      position: absolute;
+      top: @mode-slider-padding;
+      height: calc(100% - (@mode-slider-padding * 2));
+      background-color: @mode-alternative-selected-background-color;
+      border-radius: @button-border-radius;
+      transition: left 500ms ease;
+
+      // do not show animations during drag
+      &.mode-selector-dragging {
+        transition: unset;
+      }
+    }
+  }
+}
+
+// used to read the padding from ModeSelector.js (ModeSelector.SLIDER_PADDING)
+.mode-slider-padding {
+  padding-left: @mode-slider-padding;
 }

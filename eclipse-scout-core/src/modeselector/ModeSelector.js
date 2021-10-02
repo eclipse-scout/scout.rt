@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,9 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HtmlComponent, ModeSelectorLayout, Widget} from '../index';
+import {arrays, events, HtmlComponent, ModeSelectorLayout, styles, Widget} from '../index';
 
 export default class ModeSelector extends Widget {
+
+  static SLIDER_PADDING = null; // Configured in sizes.css
 
   constructor() {
     super();
@@ -19,6 +21,9 @@ export default class ModeSelector extends Widget {
 
     this.modes = [];
     this.selectedMode = null;
+    this.$slider = null;
+
+    ModeSelector.SLIDER_PADDING = $.pxToNumber(styles.get('mode-slider-padding', 'padding-left')['paddingLeft']);
 
     this._modePropertyChangeHandler = this._onModePropertyChange.bind(this);
   }
@@ -37,6 +42,7 @@ export default class ModeSelector extends Widget {
 
   _renderProperties() {
     super._renderProperties();
+    this._renderSlider();
     this._renderModes();
   }
 
@@ -57,9 +63,15 @@ export default class ModeSelector extends Widget {
     }, this);
   }
 
+  _renderSlider() {
+    this.$slider = this.$container.appendDiv('mode-slider');
+    this._updateSlider();
+  }
+
   _renderModes() {
     this.modes.forEach(mode => {
       mode.render();
+      this._registerDragHandlers(mode.$container);
     });
     this._updateMarkers();
   }
@@ -75,8 +87,8 @@ export default class ModeSelector extends Widget {
     if (selectedMode && !selectedMode.selected) {
       selectedMode.setSelected(true);
     }
-    this._updateMarkers();
     this._setProperty('selectedMode', selectedMode);
+    this._updateMarkers();
   }
 
   _onModePropertyChange(event) {
@@ -84,6 +96,8 @@ export default class ModeSelector extends Widget {
       this.setSelectedMode(event.source);
     } else if (event.propertyName === 'visible') {
       this._updateMarkers();
+    } else if (event.propertyName === 'enabled') {
+      this._updateSlider();
     }
   }
 
@@ -108,6 +122,59 @@ export default class ModeSelector extends Widget {
         visibleModes[selectedModeIndex + 1].$container.addClass('after-selected');
       }
     }
+    this._updateSlider();
+  }
+
+  _updateSlider() {
+    if (!this.$slider) {
+      return;
+    }
+    if (!this.selectedMode) {
+      this.$slider.setVisible(false);
+      return;
+    }
+
+    let visibleNodes = this.modes.filter(m => m.isVisible());
+    let index = visibleNodes.indexOf(this.selectedMode);
+    let sliderVisible = index >= 0 && this.selectedMode.enabled; // do not use enabledComputed here as it still contains the old value
+    this.$slider.setVisible(sliderVisible);
+    if (!sliderVisible) {
+      return;
+    }
+
+    let cssSliderWidth = '(100% - ' + 2 * ModeSelector.SLIDER_PADDING + 'px) / ' + visibleNodes.length;
+    let sliderPosX = ModeSelector.SLIDER_PADDING + 'px + ((' + cssSliderWidth + ') * ' + index + ')';
+    this.$slider.cssLeft('calc(' + sliderPosX + ')');
+    this.$slider.cssWidth('calc(' + cssSliderWidth + ')');
+  }
+
+  _registerDragHandlers($mode) {
+    let className = 'mode-selector-dragging';
+    let onDown = /** @type {SwipeCallbackEvent} */e => this.selectedMode && this.selectedMode.$container === $mode;
+    let onMove = /** @type {SwipeCallbackEvent} */e => {
+      let maxX = this.$container.width() - $mode.outerWidth() - ModeSelector.SLIDER_PADDING + 1;
+      let minX = ModeSelector.SLIDER_PADDING;
+      let newModeLeft = Math.max(Math.min(e.newLeft, maxX), minX); // limit to the size of the ModeSelector
+      this.$container.children().addClass(className);
+      if (newModeLeft !== e.originalLeft) {
+        this.$slider.cssLeft(newModeLeft);
+      }
+      return newModeLeft;
+    };
+    let onUp = /** @type {SwipeCallbackEvent} */e => {
+      this.$container.children().removeClass(className);
+      let visibleModes = this.modes.filter(m => m.isVisible());
+      let modeWidth = this.$container.width() / visibleModes.length;
+      let modeCenter = e.newLeft + (modeWidth / 2.0);
+      let index = Math.floor(modeCenter / modeWidth);
+      let newSelectedMode = visibleModes[index];
+      if (newSelectedMode === this.selectedMode) {
+        this._updateSlider(); // move back to original position
+      } else {
+        this.setSelectedMode(newSelectedMode); // updates the slider position
+      }
+    };
+    events.onSwipe($mode, className, onDown, onMove, onUp);
   }
 
   findModeById(id) {
