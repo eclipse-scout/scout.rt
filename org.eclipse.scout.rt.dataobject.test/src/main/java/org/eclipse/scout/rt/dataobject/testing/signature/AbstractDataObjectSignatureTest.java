@@ -86,7 +86,7 @@ public abstract class AbstractDataObjectSignatureTest {
    * @return <code>true</code> if the provided data object attribute should be processed for signature generation,
    *         <code>false</code> otherwise.
    */
-  protected boolean acceptAttribut(Class<? extends IDoEntity> dataObjectClass, String attributeName) {
+  protected boolean acceptAttribute(Class<? extends IDoEntity> dataObjectClass, String attributeName) {
     return true;
   }
 
@@ -104,7 +104,7 @@ public abstract class AbstractDataObjectSignatureTest {
 
   @Test
   public void testStructure() {
-    DataObjectSignatureDo signature = BEANS.get(DataObjectSignatureGenerator.class).createSignature(CollectionUtility.hashSet(getPackageNamePrefix()), this::acceptDataObject, this::acceptAttribut);
+    DataObjectSignatureDo signature = BEANS.get(DataObjectSignatureGenerator.class).createSignature(CollectionUtility.hashSet(getPackageNamePrefix()), this::acceptDataObject, this::acceptAttribute);
     compareSignatures(signature);
   }
 
