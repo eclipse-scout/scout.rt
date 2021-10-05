@@ -53,7 +53,7 @@ import org.eclipse.scout.rt.platform.util.StreamUtility;
 public class DoEntity implements IDoEntity {
 
   private final Map<String, DoNode<?>> m_attributes = new LinkedHashMap<>();
-  private final List<IDoEntityContribution> m_contributions = new ArrayList<>();
+  private List<IDoEntityContribution> m_contributions; // lazy init, because contributions are used rarely
 
   /**
    * @return Node of attribute {@code attributeName} or {@code null}, if attribute is not available.
@@ -199,7 +199,15 @@ public class DoEntity implements IDoEntity {
   }
 
   @Override
+  public boolean hasContributions() {
+    return !CollectionUtility.isEmpty(m_contributions); // no call to getContributions because internal representation is created otherwise
+  }
+
+  @Override
   public Collection<IDoEntityContribution> getContributions() {
+    if (m_contributions == null) {
+      m_contributions = new ArrayList<>(); // create on first access
+    }
     return m_contributions;
   }
 
@@ -221,7 +229,11 @@ public class DoEntity implements IDoEntity {
     if (!m_attributes.equals(doEntity.m_attributes)) {
       return false;
     }
-    if (!CollectionUtility.equalsCollection(m_contributions, doEntity.m_contributions, false)) { // element order is not relevant
+
+    // handle null and empty contributions the same way (lazy init of m_contributions)
+    List<IDoEntityContribution> contributions = hasContributions() ? m_contributions : null;
+    List<IDoEntityContribution> otherContributions = doEntity.hasContributions() ? doEntity.m_contributions : null;
+    if (!CollectionUtility.equalsCollection(contributions, otherContributions, false)) { // element order is not relevant
       return false;
     }
 
@@ -231,7 +243,8 @@ public class DoEntity implements IDoEntity {
   @Override
   public int hashCode() {
     int result = m_attributes.hashCode();
-    result = 31 * result + CollectionUtility.hashCodeCollection(m_contributions); // element order is not relevant
+    Collection<? extends IDoEntityContribution> contributions = hasContributions() ? m_contributions : null; // handle null and empty contributions the same way (lazy init of m_contributions)
+    result = 31 * result + CollectionUtility.hashCodeCollection(contributions); // element order is not relevant
     return result;
   }
 

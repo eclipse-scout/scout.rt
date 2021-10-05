@@ -25,6 +25,14 @@ import org.junit.runner.RunWith;
 public class DataObjectContributionTest {
 
   @Test
+  public void testHasContributions() {
+    SimpleFixtureDo doEntity = BEANS.get(SimpleFixtureDo.class);
+    assertFalse(doEntity.hasContributions());
+    doEntity.putContribution(BEANS.get(FirstSimpleContributionFixtureDo.class));
+    assertTrue(doEntity.hasContributions());
+  }
+
+  @Test
   public void testHasGetContribution() {
     SimpleFixtureDo doEntity = BEANS.get(SimpleFixtureDo.class);
     assertTrue(doEntity.getContributions().isEmpty());
@@ -103,5 +111,17 @@ public class DataObjectContributionTest {
 
     // Order of contributions must not be relevant for comparison
     assertEquals(doEntity1, doEntity2);
+    assertEquals(doEntity1.hashCode(), doEntity2.hashCode());
+  }
+
+  @Test
+  public void testEqualityHashCodeWithLazyInit() {
+    SimpleFixtureDo doEntity1 = BEANS.get(SimpleFixtureDo.class);
+    SimpleFixtureDo doEntity2 = BEANS.get(SimpleFixtureDo.class);
+    doEntity2.getContributions(); // internal contribution list is created
+
+    // Existence of internal contribution list must not be relevant for comparison
+    assertEquals(doEntity1, doEntity2);
+    assertEquals(doEntity1.hashCode(), doEntity2.hashCode());
   }
 }

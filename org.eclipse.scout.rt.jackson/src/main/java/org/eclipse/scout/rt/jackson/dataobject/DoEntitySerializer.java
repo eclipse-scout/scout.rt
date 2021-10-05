@@ -92,8 +92,8 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
   }
 
   protected void serializeContributions(JsonGenerator gen, IDoEntity entity, SerializerProvider provider) throws IOException {
-    Collection<IDoEntityContribution> contributions = entity.getContributions();
-    if (!contributions.isEmpty()) {
+    if (entity.hasContributions()) {
+      Collection<IDoEntityContribution> contributions = entity.getContributions();
       validateContributions(entity, contributions);
       serializeCollection(m_context.getContributionsAttributeName(), contributions, gen, provider);
     }

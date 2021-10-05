@@ -39,6 +39,8 @@ public class RawDoEntityDeserializerTypeStrategy implements IDoEntityDeserialize
 
   @Override
   public void putContributions(IDoEntity doEntity, String attributeName, Collection<?> contributions) {
-    doEntity.putList(attributeName, CollectionUtility.arrayList(contributions)); // for raw do entity, handle contributions as regular node (DoList)
+    if (!CollectionUtility.isEmpty(contributions)) {
+      doEntity.putList(attributeName, CollectionUtility.arrayList(contributions)); // for raw do entity, handle contributions as regular node (DoList)
+    }
   }
 }

@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 public class TestCustomImplementedEntityDo implements IDoEntity {
 
   private final Map<String, DoNode<?>> m_attributes = new LinkedHashMap<>();
-  private final List<IDoEntityContribution> m_contributions = new ArrayList<>();
+  private List<IDoEntityContribution> m_contributions;
 
   // attributes
   private static final String DATE_ATTRIBUTE = "dateAttribute";
@@ -123,7 +123,15 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
   }
 
   @Override
+  public boolean hasContributions() {
+    return !CollectionUtility.isEmpty(m_contributions);
+  }
+
+  @Override
   public Collection<IDoEntityContribution> getContributions() {
+    if (m_contributions == null) {
+      m_contributions = new ArrayList<>();
+    }
     return m_contributions;
   }
 
