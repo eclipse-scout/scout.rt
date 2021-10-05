@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntityContribution;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -48,7 +49,9 @@ public class DefaultDoEntityDeserializerTypeStrategy implements IDoEntityDeseria
   @Override
   public void putContributions(IDoEntity doEntity, String attributeName, Collection<?> contributions) {
     // add contributions to corresponding list in do entity
-    //noinspection unchecked
-    doEntity.getContributions().addAll((Collection<? extends IDoEntityContribution>) contributions);
+    if (!CollectionUtility.isEmpty(contributions)) {
+      //noinspection unchecked
+      doEntity.getContributions().addAll((Collection<? extends IDoEntityContribution>) contributions);
+    }
   }
 }

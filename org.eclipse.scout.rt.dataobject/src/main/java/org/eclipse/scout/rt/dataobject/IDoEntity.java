@@ -328,6 +328,15 @@ public interface IDoEntity extends IDataObject {
   }
 
   /**
+   * @return <code>true</code> if contributions are available, <code>false</code> otherwise.
+   */
+  boolean hasContributions();
+
+  /**
+   * For read-only calls it's recommended to call {@link #hasContributions()} before calling this method because this
+   * method might create an internal representation to store contributions which is usually not necessary if used
+   * read-only.
+   *
    * @return An mutable collection of DO entity contributions (never <code>null</code>).
    */
   Collection<IDoEntityContribution> getContributions();
@@ -351,6 +360,9 @@ public interface IDoEntity extends IDataObject {
    */
   default <CONTRIBUTION extends IDoEntityContribution> CONTRIBUTION getContribution(Class<CONTRIBUTION> contributionClass) {
     assertNotNull(contributionClass, "contributionClass is required");
+    if (!hasContributions()) {
+      return null;
+    }
     return getContributions().stream()
         .filter(contribution -> contributionClass.equals(contribution.getClass()))
         .findFirst()
@@ -382,6 +394,9 @@ public interface IDoEntity extends IDataObject {
    * @return <code>true</code> if the DO entity contribution was available and removed, <code>false</code> otherwise.
    */
   default boolean removeContribution(Class<? extends IDoEntityContribution> contributionClass) {
+    if (!hasContributions()) {
+      return false;
+    }
     return getContributions().removeIf(contribution -> contributionClass.equals(contribution.getClass()));
   }
 }
