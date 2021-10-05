@@ -27,7 +27,12 @@ public abstract class AbstractTableCustomizer implements ITableCustomizer {
   }
 
   @Override
-  public void modifyColumn(ICustomColumn<?> col) {
+  public boolean isCustomizable(IColumn<?> column) {
+    return column instanceof ICustomColumn;
+  }
+
+  @Override
+  public void modifyColumn(IColumn<?> col) {
   }
 
   @Override
@@ -35,7 +40,7 @@ public abstract class AbstractTableCustomizer implements ITableCustomizer {
   }
 
   @Override
-  public void removeColumn(ICustomColumn<?> col) {
+  public void removeColumn(IColumn<?> col) {
   }
 
   @Override
@@ -45,7 +50,6 @@ public abstract class AbstractTableCustomizer implements ITableCustomizer {
 
   @Override
   public void setSerializedData(byte[] data) {
-
   }
 
 }

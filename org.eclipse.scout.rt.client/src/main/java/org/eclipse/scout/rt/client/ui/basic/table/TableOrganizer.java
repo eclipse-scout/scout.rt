@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.IShowInvisibleColumnsForm;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
@@ -47,14 +46,14 @@ public class TableOrganizer implements ITableOrganizer {
   @Override
   @SuppressWarnings("squid:CommentedOutCodeLine")
   public boolean isColumnRemovable(IColumn column) {
-    // We could write column.isVisible() || isCustomizable() && hasRemovePermission() && isCustom(column)
+    // We could write column.isVisible() || isCustomizable() && hasRemovePermission() && getCustomizer().isCustomizable(column)
     // here but the outcome would be the same as 'true', because the given column is always visible here.
     return true;
   }
 
   @Override
   public boolean isColumnModifiable(IColumn column) {
-    return isCustomizable() && hasModifyPermission() && isCustom(column);
+    return isCustomizable() && hasModifyPermission() && getCustomizer().isCustomizable(column);
   }
 
   @Override
@@ -75,9 +74,9 @@ public class TableOrganizer implements ITableOrganizer {
 
   @Override
   public void removeColumn(IColumn column) {
-    if (isCustom(column)) {
-      if (isCustomizable() && hasRemovePermission()) {
-        getCustomizer().removeColumn((ICustomColumn) column);
+    if (isCustomizable() && getCustomizer().isCustomizable(column)) {
+      if (hasRemovePermission()) {
+        getCustomizer().removeColumn(column);
       }
     }
     else {
@@ -96,13 +95,9 @@ public class TableOrganizer implements ITableOrganizer {
 
   @Override
   public void modifyColumn(IColumn column) {
-    if (isCustomizable() && hasModifyPermission()) {
-      getCustomizer().modifyColumn((ICustomColumn) column);
+    if (isColumnModifiable(column)) {
+      getCustomizer().modifyColumn(column);
     }
-  }
-
-  protected boolean isCustom(IColumn column) {
-    return column instanceof ICustomColumn;
   }
 
   protected boolean isCustomizable() {

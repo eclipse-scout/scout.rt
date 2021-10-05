@@ -32,14 +32,19 @@ public interface ITableCustomizer {
   void addColumn(IColumn<?> insertAfterColumn);
 
   /**
+   * @return true if given column is a custom column and can be modified or removed by this customizer
+   */
+  boolean isCustomizable(IColumn<?> column);
+
+  /**
    * Modify an existing custom column
    */
-  void modifyColumn(ICustomColumn<?> col);
+  void modifyColumn(IColumn<?> col);
 
   /**
    * Remove an existing custom column
    */
-  void removeColumn(ICustomColumn<?> col);
+  void removeColumn(IColumn<?> col);
 
   /**
    * Remove all existing custom columns
