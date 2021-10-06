@@ -15,9 +15,9 @@ import {Dimension, graphics, HtmlEnvironment, PopupLayout, SmartFieldPopup} from
  * when the autoSize flag is set to true. Otherwise it uses the given size, like a regular
  * layout. The autoSize feature is used, when a child of the SmartFieldPopupLayout invalidates the
  * tree up to the popup. Since the popup is a validate root it must re-layout itself.
- * However: the size of the popup dependes on the field it belongs to.
+ * However: the size of the popup depends on the field it belongs to.
  *
- *  The proposal-chooser DIV is not always present.
+ * The proposal-chooser DIV is not always present.
  */
 export default class SmartFieldPopupLayout extends PopupLayout {
 

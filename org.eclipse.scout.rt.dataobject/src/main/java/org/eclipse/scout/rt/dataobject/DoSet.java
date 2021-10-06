@@ -56,6 +56,6 @@ public final class DoSet<V> extends AbstractDoCollection<V, Set<V>> {
 
   @Override
   public String toString() {
-    return "DoSet [m_set=" + get() + " exists=" + exists() + "]";
+    return "DoSet [m_set=" + (exists() ? get() : "[]") + " exists=" + exists() + "]";
   }
 }

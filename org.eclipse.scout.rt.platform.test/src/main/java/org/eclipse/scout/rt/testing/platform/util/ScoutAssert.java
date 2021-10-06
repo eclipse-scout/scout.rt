@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,9 +22,7 @@ import java.util.Objects;
 
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.junit.Assert;
 import org.junit.ComparisonFailure;
-import org.junit.function.ThrowingRunnable;
 
 public final class ScoutAssert {
 
@@ -137,29 +135,6 @@ public final class ScoutAssert {
     List<String> expectedLines = IOUtility.readLines(expectedFile, charsetName);
     List<String> actualLines = IOUtility.readLines(actualFile, charsetName);
     assertListEquals(expectedLines, actualLines);
-  }
-
-  /**
-   * Asserts that the given {@link ITestExecutable} throws an exception of expected type.
-   *
-   * @deprecated Use {@link Assert#assertThrows(Class, ThrowingRunnable)} instead. Will be removed in Scout 12.
-   */
-  @Deprecated
-  public static <T extends Throwable> T assertThrows(Class<T> expectedType, ITestExecutable r) {
-    try {
-      r.execute();
-    }
-    catch (AssertionError e) {
-      throw e;
-    }
-    catch (Throwable t) { // NOSONAR squid:S1181
-      if (expectedType.isInstance(t)) {
-        return expectedType.cast(t);
-      }
-      throw new AssertionError("Expecting [" + expectedType.getName() + "] but a [" + t.getClass().getName() + "] was thrown", t);
-    }
-
-    throw new AssertionError("Expecting [" + expectedType.getName() + "] but nothing was thrown");
   }
 
   /**

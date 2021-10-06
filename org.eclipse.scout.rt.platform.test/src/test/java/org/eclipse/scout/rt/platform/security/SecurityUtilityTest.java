@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.platform.security;
 
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -164,6 +166,19 @@ public class SecurityUtilityTest {
 
     // ensure different input -> different output
     Assert.assertFalse(Arrays.equals(hash4, hash5));
+  }
+
+  @Test
+  public void testHashLegacyPassword() {
+    char[] password = "test.1234".toCharArray();
+    byte[] salt = Base64Utility.decode("NSZei2H8Y5YYMzGXe+tiSbJ6TeKEN1sNR7ovARa4OZE=");
+    byte[] expectedHash = Base64Utility.decode("qNGznjbmYm8p3Aihh3DLX5sZcHOYXJ2icH2t7zXHObNDqr4J2dzBv7J1//PkWqXLMpCs7kEGIBxq6ukslJOA2g==");
+
+    ByteBuffer bytes = StandardCharsets.UTF_16.encode(CharBuffer.wrap(password));
+    byte[] passwordBytes = new byte[bytes.remaining()];
+    bytes.get(passwordBytes);
+    Assert.assertArrayEquals(expectedHash, SecurityUtility.hash(passwordBytes, salt));
+    Assert.assertTrue(SecurityUtility.verifyPasswordHash(password, salt, expectedHash));
   }
 
   @Test

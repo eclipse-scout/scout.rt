@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,17 +60,17 @@ public class TestingHttpServer {
    */
   public static class FixtureServlet extends AbstractHttpServlet {
     private static final long serialVersionUID = 1L;
-    public static IServletRequestHandler FIXTURE_GET;
-    public static IServletRequestHandler FIXTURE_POST;
+    public static IServletRequestHandler fixtureGet;
+    public static IServletRequestHandler fixturePost;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      FIXTURE_GET.handle(req, resp);
+      fixtureGet.handle(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      FIXTURE_POST.handle(req, resp);
+      fixturePost.handle(req, resp);
     }
   }
 
@@ -97,26 +97,11 @@ public class TestingHttpServer {
     catch (MalformedURLException e) {
       throw new ProcessingException("create URL '{}'", urlText, e);
     }
-    FixtureServlet.FIXTURE_GET = null;
-    FixtureServlet.FIXTURE_POST = null;
+    FixtureServlet.fixtureGet = null;
+    FixtureServlet.fixturePost = null;
 
-    WebAppContext webAppContext = new WebAppContext();
+    WebAppContext webAppContext = new WebAppContext(Resource.newResource(resourceBaseUrl), contextPath);
     webAppContext.setThrowUnavailableOnStartupException(true);
-    webAppContext.setContextPath(contextPath);
-    webAppContext.setBaseResource(Resource.newResource(resourceBaseUrl));
-    webAppContext.setParentLoaderPriority(true);
-    webAppContext.setConfigurationClasses(new String[]{
-        "org.eclipse.jetty.webapp.WebInfConfiguration",
-        "org.eclipse.jetty.webapp.WebXmlConfiguration",
-        "org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
-    });
-    interceptCreateWebAppContext(webAppContext);
-    try {
-      webAppContext.configure();
-    }
-    catch (Exception e) {
-      throw new ProcessingException("configure contextPath='{}' resourceBaseUrl='{}' ", contextPath, resourceBaseUrl, e);
-    }
     m_server = new Server(port) {
       @Override
       public void handle(HttpChannel channel) throws IOException, ServletException {
@@ -146,7 +131,7 @@ public class TestingHttpServer {
    * set the current GET handler on the global {@link ServletHandler}
    */
   public TestingHttpServer withServletGetHandler(IServletRequestHandler handler) {
-    FixtureServlet.FIXTURE_GET = handler;
+    FixtureServlet.fixtureGet = handler;
     return this;
   }
 
@@ -154,7 +139,7 @@ public class TestingHttpServer {
    * set the current POST handler on the global {@link ServletHandler}
    */
   public TestingHttpServer withServletPostHandler(IServletRequestHandler handler) {
-    FixtureServlet.FIXTURE_POST = handler;
+    FixtureServlet.fixturePost = handler;
     return this;
   }
 
@@ -190,8 +175,8 @@ public class TestingHttpServer {
 
   public void stop() {
     try {
-      FixtureServlet.FIXTURE_GET = null;
-      FixtureServlet.FIXTURE_POST = null;
+      FixtureServlet.fixtureGet = null;
+      FixtureServlet.fixturePost = null;
       m_server.stop();
     }
     catch (Exception e) {

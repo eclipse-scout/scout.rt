@@ -88,14 +88,14 @@ public final class CalendarItemProviderChains {
       super(extensions);
     }
 
-    public void execItemMoved(final ICalendarItem item, final Date newDate) {
+    public void execItemMoved(final ICalendarItem item, final Date fromDate, final Date toDate) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider> next) {
-          next.execItemMoved(CalendarItemProviderItemMovedChain.this, item, newDate);
+          next.execItemMoved(CalendarItemProviderItemMovedChain.this, item, fromDate, toDate);
         }
       };
-      callChain(methodInvocation, item, newDate);
+      callChain(methodInvocation, item, fromDate, toDate);
     }
   }
 

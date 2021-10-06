@@ -808,8 +808,6 @@ export default class GroupBox extends CompositeField {
   _onControlClick(event) {
     if (this.expandable) {
       this.setExpanded(!this.expanded);
-      // Prevent flickering when expanding the group box
-      this.validateLayoutTree();
     }
     $.suppressEvent(event); // otherwise, the event would be triggered twice sometimes (by group-box-control and group-box-title)
   }

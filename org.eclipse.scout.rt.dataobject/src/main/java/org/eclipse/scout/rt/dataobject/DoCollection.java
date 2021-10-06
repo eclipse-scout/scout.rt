@@ -58,17 +58,23 @@ public final class DoCollection<V> extends AbstractDoCollection<V, Collection<V>
 
   @Override
   protected int valueHashCode() {
+    if (!exists()) {
+      return 0;
+    }
     return CollectionUtility.hashCodeCollection(get(), false);
   }
 
   @Override
   protected boolean valueEquals(DoNode other) {
+    if (!exists() && !other.exists()) {
+      return true;
+    }
     //noinspection unchecked
     return CollectionUtility.equalsCollection(get(), (Collection<V>) other.get(), false);
   }
 
   @Override
   public String toString() {
-    return "DoCollection [m_collection=" + get() + " exists=" + exists() + "]";
+    return "DoCollection [m_collection=" + (exists() ? get() : "[]") + " exists=" + exists() + "]";
   }
 }

@@ -44,8 +44,8 @@ public abstract class AbstractCalendarItemProviderExtension<OWNER extends Abstra
   }
 
   @Override
-  public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date newDate) {
-    chain.execItemMoved(item, newDate);
+  public void execItemMoved(CalendarItemProviderItemMovedChain chain, ICalendarItem item, Date fromDate, Date toDate) {
+    chain.execItemMoved(item, fromDate, toDate);
   }
 
 }

@@ -21,9 +21,9 @@
   height: calc(~'100% - '(7px * 2));
 }
 
-.notification-font-icon-style(@color, @font-size: 16px) {
-  color: @background-color;
-  background-color: @color;
+.notification-font-icon-style(@background-color, @font-size: 16px) {
+  color: @notification-font-icon-color;
+  background-color: @background-color;
   font-size: @font-size;
   border-radius: 50%;
 }

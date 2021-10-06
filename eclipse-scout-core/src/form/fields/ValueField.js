@@ -277,7 +277,6 @@ export default class ValueField extends FormField {
       }
     } else {
       if (this.$clearIcon) {
-        // Remove $dateField
         this.$clearIcon.remove();
         this.$clearIcon = null;
       }

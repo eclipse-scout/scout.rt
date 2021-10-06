@@ -17,12 +17,16 @@
   #scout.drop-shadow-large();
   background-color: @messagebox-background-color;
   border-radius: @border-radius-medium;
+  overflow: hidden;
   margin: 10px /* minimum padding to desktop */ 10px 15px;
 
-  .severity-button(@color) {
+  &.full-height.full-width {
+    border-radius: 0;
+  }
+
+  .severity-button(@color, @hover-color: darken(@color, 6%), @active-color: darken(@color, 13%), @focus-color: @focus-box-shadow-color) {
     & > .box-buttons > .box-button {
       border-color: @color;
-      font-weight: @font-weight-bold;
       color: @color;
 
       &:focus {
@@ -30,29 +34,36 @@
       }
 
       &.keyboard-navigation {
-        box-shadow: 0 0 0 @focus-box-shadow-size fade(@color, 50%);
+        #scout.button-focus(@box-shadow-color: @focus-color, @border-color: mix(@color, @focus-color, 25%));
       }
 
       &.disabled {
-        cursor: default;
-        color: @disabled-color;
-        border-color: @disabled-color;
+        color: @button-disabled-color;
+        border-color: @button-disabled-border-color;
       }
 
       &.default {
-        color: @button-selected-color;
-
-        &:hover {
-          background-color: darken(@color, 5%);
-        }
-
+        color: @default-button-color;
         background-color: @color;
 
+        &:hover {
+          background-color: @hover-color;
+          border-color: @hover-color;
+        }
+
+        &.active, &:active {
+          background-color: @active-color;
+          border-color: @active-color;
+        }
+
+        &.keyboard-navigation {
+          #scout.button-focus(@box-shadow-color: @focus-color, @border-color: mix(@color, @focus-color, 25%));
+        }
+
         &.disabled {
-          cursor: default;
-          color: @disabled-color;
-          border-color: @disabled-color;
-          background-color: @palette-white;
+          color: @button-disabled-color;
+          border-color: @button-disabled-border-color;
+          background-color: @button-disabled-background-color;
         }
       }
     }
@@ -63,11 +74,11 @@
       color: @info-color;
 
       & > .font-icon.messagebox-icon {
-        .notification-font-icon-style(@info-color, @font-size-smaller);
+        .notification-font-icon-style(@info-color, 14px);
       }
     }
 
-    .severity-button(@info-color);
+    .severity-button(@info-color, @default-button-hover-background-color, @default-button-active-background-color);
   }
 
   &.error {
@@ -75,11 +86,11 @@
       color: @error-color;
 
       & > .font-icon.messagebox-icon {
-        .notification-font-icon-style(@error-color, @font-size-smaller);
+        .notification-font-icon-style(@error-color, 14px);
       }
     }
 
-    .severity-button(@error-color);
+    .severity-button(@error-color, @focus-color: @error-box-shadow-focus-color);
   }
 
   &.warning {
@@ -87,11 +98,11 @@
       color: @warning-color;
 
       & > .font-icon.messagebox-icon {
-        .notification-font-icon-style(@warning-color, @font-size-smaller);
+        .notification-font-icon-style(@warning-color, 14px);
       }
     }
 
-    .severity-button(@warning-color);
+    .severity-button(@warning-color, @focus-color: @warning-box-shadow-focus-color);
   }
 
   &.ok {
@@ -99,11 +110,11 @@
       color: @ok-color;
 
       & > .font-icon.messagebox-icon {
-        .notification-font-icon-style(@ok-color, @font-size-smaller);
+        .notification-font-icon-style(@ok-color, 14px);
       }
     }
 
-    .severity-button(@ok-color);
+    .severity-button(@ok-color, @focus-color: @ok-box-shadow-focus-color);
   }
 
   &.animate-open {
@@ -119,8 +130,7 @@
 .messagebox-content {
   min-height: 30px;
   background-color: @messagebox-background-color;
-  padding: @messagebox-label-padding 26px 21px 26px;
-  border-radius: @border-radius-medium;
+  padding: @messagebox-label-padding 26px 17px 26px;
 
   /* add a bit of extra space to the scrollbar on the right */
 
@@ -137,7 +147,6 @@
   font-size: @font-size-smaller;
   justify-content: center;
   flex-shrink: 0;
-  margin-right: 12px;
 }
 
 .messagebox-label {
@@ -164,7 +173,11 @@
 .messagebox-header {
   font-size: @font-size-large;
   font-weight: @font-weight-bold;
-  padding-bottom: 20px;
+  padding-bottom: 16px;
+
+  &.has-text > .messagebox-icon {
+    margin-right: 12px;
+  }
 }
 
 .messagebox-body {
@@ -174,7 +187,7 @@
 .messagebox-buttons {
   display: flex;
   justify-content: center;
-  padding: 0 26px 25px 26px;
+  padding: 4px 26px 25px 26px;
 }
 
 @media (max-width: @messagebox-max-width) {
@@ -184,19 +197,18 @@
     /* no need to have a margin on small screens */
     margin: 0;
 
-    & > .box-buttons {
+    & > .messagebox-buttons {
+      padding-left: 10px;
+      padding-right: 10px;
+
       & > .box-button {
         min-width: 70px; /* less min width for buttons on small screens */
-        margin-right: 4px;
-      }
+        margin-right: 8px;
 
-      & > .messagebox-buttons {
-        padding: 0 10px 20px 10px;
+        &:last-child {
+          margin-right: 0;
+        }
       }
-    }
-
-    & > .messagebox-content {
-      padding: 10px; /* loose less space on small screens */
     }
   }
 }

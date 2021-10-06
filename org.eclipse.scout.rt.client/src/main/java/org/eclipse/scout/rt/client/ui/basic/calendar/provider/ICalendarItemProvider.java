@@ -53,10 +53,6 @@ public interface ICalendarItemProvider extends IPropertyObserver {
 
   /**
    * @return the current set of items in the requested range
-   *         <p>
-   *         is the currently loaded range is just a part of the requested range, a call to
-   *         {@link #execItemMovedAction(ICalendarItem, Date)} is launched and will result in a
-   *         PropertyChangeEvent("items")
    */
   Set<ICalendarItem> getItems(Date minDate, Date maxDate);
 
@@ -66,6 +62,6 @@ public interface ICalendarItemProvider extends IPropertyObserver {
 
   void onItemAction(ICalendarItem item);
 
-  void onItemMoved(ICalendarItem item, Date newDate);
+  void onItemMoved(ICalendarItem item, Date fromDate, Date toDate);
 
 }

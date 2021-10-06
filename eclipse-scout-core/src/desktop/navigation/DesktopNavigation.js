@@ -96,7 +96,6 @@ export default class DesktopNavigation extends Widget {
     // Layout immediate to prevent flickering when breadcrumb mode is enabled
     // but not initially while desktop gets rendered because it will be done at the end anyway
     if (this.rendered) {
-      this.outline.validateLayoutTree();
       this.outline.validateFocus();
     }
   }

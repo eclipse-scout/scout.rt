@@ -1,0 +1,165 @@
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: @button-color;
+  background-color: @button-background-color;
+  border: 1px solid @button-border-color;
+  border-radius: @button-border-radius;
+  cursor: pointer;
+  padding: @button-padding-y @button-padding-x;
+
+  &.borderless {
+    background-color: transparent;
+    border: 0;
+
+    &:focus {
+      #scout.box-shadow-focus-inset();
+    }
+  }
+
+  & > .text {
+    #scout.overflow-ellipsis-nowrap();
+  }
+
+  & > .icon {
+    /* Padding only relevant for icons larger than the container */
+    padding-top: 2px;
+    padding-bottom: 2px;
+
+    &.with-label {
+      margin-right: 8px;
+    }
+
+    &.loading,
+    &.broken {
+      .hidden();
+    }
+
+    &.image-icon {
+      max-height: 100%;
+    }
+  }
+
+  & > .font-icon {
+    font-size: @button-font-icon-size;
+  }
+
+  & > .submenu-icon {
+    #scout.submenu-icon();
+    padding-left: 8px;
+
+    .selected& {
+      #scout.submenu-icon-open();
+    }
+  }
+
+  & > .button-label,
+  & > .icon,
+  & > .submenu-icon {
+    opacity: 1;
+    transition: opacity @loading-fade-duration;
+  }
+
+  &:hover {
+    color: @button-hover-color;
+    background-color: @hover-background-color;
+  }
+
+  &:active, &.active {
+    color: @button-active-color;
+    background-color: @button-active-background-color;
+  }
+
+  &.selected {
+    color: @selected-color;
+    background-color: @selected-background-color;
+    border-color: @selected-background-color;
+
+    &:hover {
+      background-color: @selected-hover-background-color;
+      border-color: @selected-hover-background-color;
+    }
+
+    &.active, &:active {
+      background-color: @selected-active-background-color;
+      border-color: @selected-active-background-color;
+    }
+
+    &.has-popup {
+      color: @button-color;
+      background-color: @selected-with-popup-background-color;
+    }
+  }
+
+  &:focus {
+    #scout.button-focus();
+  }
+
+  &.default {
+    background-color: @default-button-background-color;
+    /* border is necessary to align the text with text from buttons with a real border */
+    border-color: @default-button-background-color;
+    color: @default-button-color;
+
+    &:hover {
+      background-color: @default-button-hover-background-color;
+      border-color: @default-button-hover-background-color;
+    }
+
+    &:active, &.active {
+      color: @default-button-color;
+      background-color: @default-button-active-background-color;
+      border-color: @default-button-active-background-color;
+    }
+
+    &.selected {
+      color: @default-button-color;
+      background-color: @default-button-selected-background-color;
+      border-color: @default-button-selected-background-color;
+    }
+
+    &:focus {
+      #scout.button-focus();
+    }
+  }
+
+  &:disabled,
+  &.disabled {
+    background-color: @button-disabled-background-color;
+    border-color: @button-disabled-border-color;
+    color: @button-disabled-color;
+    cursor: default;
+
+    &:hover, &.active, &:active, &.selected {
+      background-color: @button-disabled-background-color;
+      border-color: @button-disabled-border-color;
+      color: @button-disabled-color;
+    }
+  }
+
+  &.loading {
+    & > .button-label,
+    & > .icon,
+    & > .submenu-icon {
+      opacity: 0;
+      transition: opacity @loading-fade-duration;
+    }
+
+    & > .loading-indicator {
+      #scout.loading-indicator(20px);
+    }
+  }
+}

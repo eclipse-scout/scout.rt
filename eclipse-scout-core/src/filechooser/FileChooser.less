@@ -18,24 +18,6 @@
   background-color: @filechooser-background-color;
   .messagebox.severity-button(@info-color);
 
-  & > .closable {
-    position: absolute;
-    right: 5px;
-    margin: 8px;
-    #scout.font-icon();
-    font-size: 17px;
-    cursor: pointer;
-    color: @closer-color;
-
-    &::before {
-      content: @icon-remove-bold;
-    }
-
-    &:hover {
-      color: @hover-color;
-    }
-  }
-
   /* Helper class used during width calculation - required on very narrow screens (e.g. Word AddIn) */
 
   &.calc-helper {

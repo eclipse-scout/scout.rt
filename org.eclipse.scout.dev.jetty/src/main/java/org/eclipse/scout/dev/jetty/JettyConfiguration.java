@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,7 +64,7 @@ public final class JettyConfiguration {
     public String description() {
       return "Setting this property to a valid X-500 name will automatically generate a self-signed SSL certificate and store it in the keystore file path specified.\n"
           + "This property is the X500 name (DN) for which the certificate is issued.\n"
-          + "For example 'CN=my-host.my-domain.com,C=US,S=CA,L=Sunnyvale,O=My Company Inc.'.\n"
+          + "For example 'CN=my-host.my-domain.com,C=US,ST=CA,L=Sunnyvale,O=My Company Inc.'.\n"
           + "Use in development only!";
     }
   }

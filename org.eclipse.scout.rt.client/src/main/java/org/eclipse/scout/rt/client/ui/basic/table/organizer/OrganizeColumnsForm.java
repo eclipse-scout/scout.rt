@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
@@ -1361,8 +1360,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 Table columnsTable = getColumnsTableField().getTable();
                 if (OrganizeColumnsForm.this.isCustomizable() && columnsTable.getSelectedRow() != null) {
                   IColumn<?> selectedCol = columnsTable.getKeyColumn().getValue(columnsTable.getSelectedRow());
-                  if (selectedCol instanceof ICustomColumn<?>) {
-                    m_organizedTable.getTableCustomizer().modifyColumn((ICustomColumn<?>) selectedCol);
+                  if (isColumnModifiable(selectedCol)) {
+                    m_organizedTable.getTableCustomizer().modifyColumn(selectedCol);
                     getColumnsTableField().reloadTableData();
                   }
                 }
@@ -1559,7 +1558,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     prefs.addTableColumnsConfig(m_organizedTable, configName);
     prefs.setAllTableColumnPreferences(m_organizedTable, configName);
-    if (m_organizedTable.isCustomizable()) {
+    if (isCustomizable()) {
       prefs.setTableCustomizerData(m_organizedTable.getTableCustomizer(), configName);
     }
   }
@@ -1659,7 +1658,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
    * requires a different state for that menu.
    */
   protected boolean isColumnRemovable(IColumn<?> column) {
-    return isCustomizable() && column instanceof ICustomColumn;
+    return isCustomizable() && m_organizedTable.getTableCustomizer().isCustomizable(column);
   }
 
   /**
@@ -1691,8 +1690,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
       Table columnsTable = getColumnsTableField().getTable();
       for (ITableRow selectedRow : columnsTable.getSelectedRows()) {
         IColumn<?> selectedColumn = columnsTable.getKeyColumn().getValue(selectedRow);
-        if (selectedColumn instanceof ICustomColumn) {
-          m_organizedTable.getTableCustomizer().removeColumn((ICustomColumn) selectedColumn);
+        if (isColumnRemovable(selectedColumn)) {
+          m_organizedTable.getTableCustomizer().removeColumn(selectedColumn);
         }
       }
       getColumnsTableField().reloadTableData();
@@ -1738,7 +1737,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         }
 
         // CustomColumn
-        if (col instanceof ICustomColumn<?>) {
+        if (isCustomizable() && m_organizedTable.getTableCustomizer().isCustomizable(col)) {
           columnsTable.getCustomColumnColumn().setValue(row, TEXTS.get("CustomColumAbbreviation"));
         }
 

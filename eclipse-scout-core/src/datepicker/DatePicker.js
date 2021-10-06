@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -474,76 +474,45 @@ export default class DatePicker extends Widget {
   }
 
   _registerSwipeHandlers() {
-    let $window = this.$scrollable.window();
-
-    this.$scrollable.on('touchmove', event => {
-      // prevent scrolling the background when swiping the date picker (iOS)
-      event.preventDefault();
-    });
-
-    this.$scrollable.on('remove', event => {
-      $window.off('.datepickerDrag');
-    });
-
-    this.$scrollable.on(events.touchdown(this.touch), event => {
-      let origPageX = events.pageX(event);
-      let moveX = 0;
-
+    let prevDate, nextDate;
+    let onDown = /** @type {SwipeCallbackEvent} */e => {
       // stop pending animations, otherwise the months may be removed by the animation stop handler before touchend is executed
       this.$scrollable.stop(true);
 
       // Prepare months. On the first swipe the 3 boxes are already rendered, so nothing happens when setMonths is called.
       // But on a subsequent swipe (while the pane is still moving) the next month needs to be rendered.
-      let prevDate = dates.shift(this.viewDate, 0, -1, 0);
-      let nextDate = dates.shift(this.viewDate, 0, 1, 0);
+      prevDate = dates.shift(this.viewDate, 0, -1, 0);
+      nextDate = dates.shift(this.viewDate, 0, 1, 0);
       this.setMonths([prevDate, this.viewDate, nextDate]);
-      let scrollableLeft = this.$scrollable.position().left;
-
       this.swiped = false;
-      let started = true;
+      return true;
+    };
+    let onMove = /** @type {SwipeCallbackEvent} */e => {
+      let minX = this.$container.width() - this.$scrollable.outerWidth();
+      let newScrollableLeft = Math.max(Math.min(e.newLeft, 0), minX); // limit the drag range
+      if (newScrollableLeft !== e.originalLeft) {
+        this.$scrollable.cssLeft(newScrollableLeft); // set the new position
+      }
+      return newScrollableLeft;
+    };
+    let onUp = /** @type {SwipeCallbackEvent} */e => {
+      // If the movement is less than this value (in px), the swipe won't happen. Instead, the value is selected.
+      let minMove = 5;
+      let viewDate = this.viewDate;
 
-      $window.on(events.touchmove(this.touch, 'datepickerDrag'), event => {
-        let pageX = events.pageX(event);
-        moveX = pageX - origPageX;
-        let newScrollableLeft = scrollableLeft + moveX;
-        let minX = this.$container.width() - this.$scrollable.outerWidth();
+      // Detect in which direction the swipe happened
+      if (e.deltaX < -minMove) {
+        viewDate = nextDate; // dragged left -> use next month
+      } else if (e.deltaX > minMove) {
+        viewDate = prevDate; // dragged right -> use previous month
+      }
 
-        // limit the drag range
-        newScrollableLeft = Math.max(Math.min(newScrollableLeft, 0), minX);
-
-        // set the new position
-        if (newScrollableLeft !== scrollableLeft) {
-          this.$scrollable.cssLeft(newScrollableLeft);
-        }
-      });
-
-      $window.on(events.touchendcancel(this.touch, 'datepickerDrag'), event => {
-        $window.off('.datepickerDrag');
-        if (!started) {
-          // On iOS touchcancel and touchend are fired right after each other when swiping twice very fast -> Ignore the second event
-          return;
-        }
-        started = false;
-
-        // If the movement is less than this value (in px), the swipe won't happen. Instead, the value is selected.
-        let minMove = 5;
-        let viewDate = this.viewDate;
-
-        // Detect in which direction the swipe happened
-        if (moveX < -minMove) {
-          // dragged left -> use next month
-          viewDate = nextDate;
-        } else if (moveX > minMove) {
-          // dragged right -> use previous month
-          viewDate = prevDate;
-        }
-
-        if (this.viewDate !== viewDate) {
-          this.swiped = true;
-          this.setViewDate(viewDate);
-        }
-      });
-    });
+      if (this.viewDate !== viewDate) {
+        this.swiped = true;
+        this.setViewDate(viewDate);
+      }
+    };
+    events.onSwipe(this.$scrollable, 'datepickerDrag', onDown, onMove, onUp);
   }
 
   _onNavigationMouseDown(event) {

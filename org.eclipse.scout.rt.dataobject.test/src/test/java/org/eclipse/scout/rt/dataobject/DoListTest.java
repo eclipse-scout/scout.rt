@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -399,14 +400,14 @@ public class DoListTest {
 
   @Test
   public void testSort() {
-    m_testDoList.sort((left, right) -> left.compareTo(right));
+    m_testDoList.sort(Comparator.naturalOrder());
     assertEquals(Arrays.asList("bar", "baz", "foo"), m_testDoList.get());
 
-    m_testDoList.sort((left, right) -> right.compareTo(left));
+    m_testDoList.sort(Comparator.reverseOrder());
     assertEquals(Arrays.asList("foo", "baz", "bar"), m_testDoList.get());
   }
 
-  protected Function<String, DoValue<String>> listValueAccessor = new Function<String, DoValue<String>>() {
+  protected Function<String, DoValue<String>> listValueAccessor = new Function<>() {
     @Override
     public DoValue<String> apply(String input) {
       for (String item : m_testDoList.get()) {
@@ -438,6 +439,36 @@ public class DoListTest {
   public void testFind() {
     assertEquals(Arrays.asList("bar"), m_testDoList.find("bar"::equals));
     assertEquals(Arrays.asList("bar", "baz"), m_testDoList.find((input) -> "bar".equals(input) || "baz".equals(input)));
+  }
+
+  /**
+   * Methods from {@link DoList} must not create the node if it's not necessary.
+   */
+  @Test
+  public void testIdempotentMethodCalls() {
+    DoList<String> list = new DoList<>(null, m_lazyCreate);
+    assertFalse(list.exists());
+
+    assertThrows(IndexOutOfBoundsException.class, () -> list.get(0));
+    assertFalse(list.exists());
+
+    assertThrows(IndexOutOfBoundsException.class, () -> list.remove(0));
+    assertFalse(list.exists());
+
+    assertNull(list.first());
+    assertFalse(list.exists());
+
+    assertNull(list.last());
+    assertFalse(list.exists());
+
+    assertFalse(list.listIterator().hasNext());
+    assertFalse(list.exists());
+
+    list.sort(Comparator.naturalOrder());
+    assertFalse(list.exists());
+
+    assertNotNull(list.toString());
+    assertFalse(list.exists());
   }
 
   @Test

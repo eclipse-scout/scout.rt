@@ -165,7 +165,6 @@ export default class FieldStatus extends Widget {
       // close
       this.hideTooltip();
     }
-    this.validateLayoutTree(); // ensure the field status position is up to date, to prevent the tooltip from "jumping"
     if (this.tooltip) {
       // update existing tooltip
       this.tooltip.setText(this.status.message);

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.dataobject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -53,6 +54,9 @@ public final class DoList<V> extends AbstractDoCollection<V, List<V>> implements
    * Returns the element at the specified position in this list.
    */
   public V get(int index) {
+    if (!exists()) {
+      throw new IndexOutOfBoundsException("Node doesn't exist");
+    }
     return get().get(index);
   }
 
@@ -62,6 +66,9 @@ public final class DoList<V> extends AbstractDoCollection<V, List<V>> implements
    * @return the element previously at the specified position
    */
   public V remove(int index) {
+    if (!exists()) {
+      throw new IndexOutOfBoundsException("Node doesn't exist");
+    }
     return get().remove(index);
   }
 
@@ -69,36 +76,41 @@ public final class DoList<V> extends AbstractDoCollection<V, List<V>> implements
    * Returns first element of this list or {@code null} if list is empty.
    */
   public V first() {
-    return get().size() == 0 ? null : get(0);
+    return size() == 0 ? null : get(0);
   }
 
   /**
    * Returns last element of this list or {@code null} if list is empty.
    */
   public V last() {
-    return get().size() == 0 ? null : get(get().size() - 1);
+    return size() == 0 ? null : get(get().size() - 1);
   }
 
   /**
    * @return an {@code ListIterator} over the elements in this list.
    */
   public ListIterator<V> listIterator() {
+    if (!exists()) {
+      return Collections.emptyListIterator();
+    }
     return get().listIterator();
   }
 
   /**
-   * Sorts the internal list using {@code comparator} and returns the list.
+   * Sorts the internal list using {@code comparator}.
    */
-  public List<V> sort(Comparator<V> comparator) {
+  public void sort(Comparator<V> comparator) {
+    if (!exists()) {
+      return;
+    }
     List<V> list = get();
     list.sort(comparator);
-    return list;
   }
 
   // ArrayList already implemented hashCode/equals with considering element position, thus no need to override valueHashCode/valueEquals.
 
   @Override
   public String toString() {
-    return "DoList [m_list=" + get() + " exists=" + exists() + "]";
+    return "DoList [m_list=" + (exists() ? get() : "[]") + " exists=" + exists() + "]";
   }
 }
