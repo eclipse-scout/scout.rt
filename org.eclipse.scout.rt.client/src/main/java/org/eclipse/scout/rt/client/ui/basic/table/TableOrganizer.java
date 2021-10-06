@@ -46,14 +46,14 @@ public class TableOrganizer implements ITableOrganizer {
   @Override
   @SuppressWarnings("squid:CommentedOutCodeLine")
   public boolean isColumnRemovable(IColumn column) {
-    // We could write column.isVisible() || isCustomizable() && hasRemovePermission() && getCustomizer().isCustomizable(column)
+    // We could write column.isVisible() || getCustomizer().isCustomizable(column) && hasRemovePermission()
     // here but the outcome would be the same as 'true', because the given column is always visible here.
     return true;
   }
 
   @Override
   public boolean isColumnModifiable(IColumn column) {
-    return isCustomizable() && hasModifyPermission() && getCustomizer().isCustomizable(column);
+    return isCustomizable(column) && hasModifyPermission();
   }
 
   @Override
@@ -74,7 +74,7 @@ public class TableOrganizer implements ITableOrganizer {
 
   @Override
   public void removeColumn(IColumn column) {
-    if (isCustomizable() && getCustomizer().isCustomizable(column)) {
+    if (isCustomizable(column)) {
       if (hasRemovePermission()) {
         getCustomizer().removeColumn(column);
       }
@@ -102,6 +102,10 @@ public class TableOrganizer implements ITableOrganizer {
 
   protected boolean isCustomizable() {
     return m_table.isCustomizable();
+  }
+
+  protected boolean isCustomizable(IColumn<?> column) {
+    return isCustomizable() && getCustomizer().isCustomizable(column);
   }
 
   protected ITableCustomizer getCustomizer() {

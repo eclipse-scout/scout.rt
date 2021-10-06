@@ -1737,7 +1737,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         }
 
         // CustomColumn
-        if (m_organizedTable.getTableCustomizer().isCustomizable(col)) {
+        if (isCustomizable() && m_organizedTable.getTableCustomizer().isCustomizable(col)) {
           columnsTable.getCustomColumnColumn().setValue(row, TEXTS.get("CustomColumAbbreviation"));
         }
 
