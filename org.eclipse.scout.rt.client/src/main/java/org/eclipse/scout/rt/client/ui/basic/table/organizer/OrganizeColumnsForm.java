@@ -59,8 +59,8 @@ import org.eclipse.scout.rt.client.ui.dnd.JavaTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractLinkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.HorizontalGroupBoxBodyGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
@@ -70,7 +70,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.text.TEXTS;
@@ -171,6 +170,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
       return 880;
     }
 
+    @Override
+    protected int getConfiguredHeightInPixel() {
+      return 350;
+    }
+
     @Order(10)
     @ClassId("abaf2e0c-1c14-4b99-81dc-8b83453f5766")
     public class GroupBox extends AbstractGroupBox {
@@ -183,6 +187,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
       @Override
       protected int getConfiguredGridColumnCount() {
         return 5;
+      }
+
+      @Override
+      protected boolean getConfiguredBorderVisible() {
+        return false;
       }
 
       @Order(5)
@@ -215,7 +224,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
           @Override
           protected int getConfiguredGridH() {
-            return 6;
+            return 3;
           }
 
           @Override
@@ -595,13 +604,18 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
           return false;
         }
 
+        @Override
+        protected String getConfiguredMenuBarPosition() {
+          return IGroupBox.MENU_BAR_POSITION_TITLE;
+        }
+
         @Order(10)
         @ClassId("eefd05cf-b8b6-4c07-82c9-91aaafe9b8b6")
         public class ColumnsTableField extends AbstractTableField<Table> {
 
           @Override
           protected int getConfiguredGridH() {
-            return 6;
+            return 3;
           }
 
           @Override
@@ -1395,65 +1409,49 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             }
           }
         }
-      }
-    }
 
-    @Order(80)
-    @ClassId("d25a64d4-25f8-40aa-bf51-2705a5aa6bc2")
-    public class CopyWidthsOfColumnsButton extends AbstractLinkButton {
+        @Order(80)
+        @ClassId("d25a64d4-25f8-40aa-bf51-2705a5aa6bc2")
+        public class CopyWidthsOfColumnsMenu extends AbstractMenu {
 
-      public static final String COLUMN_COPY_CLIPBOARD_IDENTIFIER = "dev.table.menu.column.width.copy.ident";
-
-      @Override
-      protected String getConfiguredLabel() {
-        return "Dev: " + TEXTS.get("CopyWidthsOfColumnsMenu");
-      }
-
-      @Override
-      protected boolean getConfiguredProcessButton() {
-        return false;
-      }
-
-      @Override
-      protected void execInitField() {
-        // This button is only visible in development mode
-        setVisibleGranted(Platform.get().inDevelopmentMode());
-      }
-
-      @Override
-      protected void execClickAction() {
-        try {
-          StringBuilder sb = new StringBuilder();
-
-          // Add an identifier for fast identification
-          sb.append(COLUMN_COPY_CLIPBOARD_IDENTIFIER);
-          sb.append("\n");
-
-          // only visible columns are of interest
-          for (IColumn<?> column : m_organizedTable.getColumnSet().getVisibleColumns()) {
-            sb.append(column.getClass().getName());
-            sb.append("\t");
-            sb.append(column.getWidth());
-            sb.append("\n");
+          @Override
+          protected String getConfiguredText() {
+            return TEXTS.get("CopyWidthsOfColumnsMenu");
           }
 
-          // calling the service to write the buffer to the clipboard
-          IClipboardService svc = BEANS.opt(IClipboardService.class);
-          if (svc == null) {
-            LOG.info(sb.toString());
-            MessageBoxes.createOk().withBody(TEXTS.get("SeeLogFileForColumnWidthsOutput")).show();
+          @Override
+          protected byte getConfiguredHorizontalAlignment() {
+            return HORIZONTAL_ALIGNMENT_RIGHT;
           }
-          else {
-            svc.setTextContents(sb.toString());
+
+          @Override
+          protected void execInitAction() {
+            // This menu is only visible in development mode
+            setVisibleGranted(Platform.get().inDevelopmentMode());
           }
-        }
-        catch (RuntimeException e) {
-          throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-              .withContextInfo("button", getLabel());
+
+          @Override
+          protected void execAction() {
+            StringBuilder sb = new StringBuilder();
+            for (IColumn<?> column : m_organizedTable.getColumnSet().getVisibleColumns()) {
+              sb.append(column.getClass().getName());
+              sb.append("\t");
+              sb.append(column.getWidth());
+              sb.append("\n");
+            }
+            // calling the service to write the buffer to the clipboard
+            IClipboardService svc = BEANS.opt(IClipboardService.class);
+            if (svc == null) {
+              LOG.info(sb.toString());
+              MessageBoxes.createOk().withBody(TEXTS.get("SeeLogFileForColumnWidthsOutput")).show();
+            }
+            else {
+              svc.setTextContents(sb.toString());
+            }
+          }
         }
       }
     }
-
   }
 
   public void updateColumnVisibilityAndOrder() {

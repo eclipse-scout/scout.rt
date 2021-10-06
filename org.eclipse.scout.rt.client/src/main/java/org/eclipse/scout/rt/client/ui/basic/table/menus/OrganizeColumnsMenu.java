@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.shared.AbstractIcons;
 
 @ClassId("dc8237d6-18b8-4406-91b0-bb4a95bf9fec")
 public class OrganizeColumnsMenu extends AbstractFormMenu<IOrganizeColumnsForm> {
+
   private final ITable m_table;
 
   public OrganizeColumnsMenu(ITable table) {
@@ -69,13 +70,20 @@ public class OrganizeColumnsMenu extends AbstractFormMenu<IOrganizeColumnsForm> 
     return TEXTS.get("TableOrganize");
   }
 
+  @Override
+  protected boolean getConfiguredPopupResizable() {
+    return true;
+  }
+
+  @Override
+  protected boolean getConfiguredPopupMovable() {
+    return true;
+  }
+
   /**
    * Whether or not new, delete or modify menus for custom columns must be displayed.
-   *
-   * @return
    */
   public boolean isColumnsCustomizable() {
     return getTable().getTableCustomizer() != null;
   }
-
 }

@@ -23,5 +23,4 @@ public class OrganizeColumnsFormProvider implements IOrganizeColumnsFormProvider
   public IOrganizeColumnsForm createOrganizeColumnsForm(ITable table) {
     return new OrganizeColumnsForm(table);
   }
-
 }
