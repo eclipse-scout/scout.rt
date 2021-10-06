@@ -8,7 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, fields, FormField, InputFieldKeyStrokeContext, keys, LookupCall, objects, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldLayout, Status, strings, ValueField} from '../../../index';
+import {
+  arrays,
+  Device,
+  fields,
+  FormField,
+  InputFieldKeyStrokeContext,
+  keys,
+  LookupCall,
+  objects,
+  QueryBy,
+  scout,
+  SimpleLoadingSupport,
+  SmartFieldCancelKeyStroke,
+  SmartFieldLayout,
+  Status,
+  strings,
+  ValueField
+} from '../../../index';
 import $ from 'jquery';
 
 export default class SmartField extends ValueField {
@@ -182,13 +199,18 @@ export default class SmartField extends ValueField {
   }
 
   _renderDisplayText() {
+    let displayText = this._prepareDisplayText();
+    fields.valOrText(this.$field, displayText);
+    super._renderDisplayText();
+  }
+
+  _prepareDisplayText() {
     let displayText = scout.nvl(this.displayText, ''),
       textLines = displayText.split('\n');
     if (textLines.length) {
       displayText = textLines[0];
     }
-    fields.valOrText(this.$field, displayText);
-    super._renderDisplayText();
+    return displayText;
   }
 
   /**
