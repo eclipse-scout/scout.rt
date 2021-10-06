@@ -17,6 +17,9 @@ export default class FormMenu extends Menu {
     this.form = null;
     this.toggleAction = true;
     this.popupStyle = null;
+    this.popupClosable = false;
+    this.popupMovable = false;
+    this.popupResizable = false;
     this._addWidgetProperties('form');
     this._formDestroyHandler = this._onFormDestroy.bind(this);
   }
@@ -66,7 +69,7 @@ export default class FormMenu extends Menu {
 
   _setForm(form) {
     if (this.form) {
-      this.form.off('destroy', this._formDestroyHandler)
+      this.form.off('destroy', this._formDestroyHandler);
     }
     this._setProperty('form', form);
     if (this.form) {
@@ -189,7 +192,10 @@ export default class FormMenu extends Menu {
       closeOnAnchorMouseDown: false,
       cssClass: 'form-menu-popup',
       horizontalAlignment: this.popupHorizontalAlignment,
-      verticalAlignment: this.popupVerticalAlignment
+      verticalAlignment: this.popupVerticalAlignment,
+      closable: this.popupClosable,
+      movable: this.popupMovable,
+      resizable: this.popupResizable
     });
   }
 

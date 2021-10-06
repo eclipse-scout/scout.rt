@@ -36,6 +36,14 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 public abstract class AbstractFormMenu<FORM extends IForm> extends AbstractMenu implements IFormMenu<FORM> {
 
   @Override
+  protected void initConfig() {
+    super.initConfig();
+    setPopupClosable(getConfiguredPopupClosable());
+    setPopupMovable(getConfiguredPopupMovable());
+    setPopupResizable(getConfiguredPopupResizable());
+  }
+
+  @Override
   protected boolean getConfiguredToggleAction() {
     return true;
   }
@@ -58,12 +66,60 @@ public abstract class AbstractFormMenu<FORM extends IForm> extends AbstractMenu 
    * Subclasses can override this method. Default is {@code null}.
    *
    * @return a form type token
-   * @see {@link #startForm(IForm)} for details how the form gets started
+   * @see #startForm() for details how the form gets started
    */
   @ConfigProperty(ConfigProperty.FORM)
   @Order(90)
   protected Class<FORM> getConfiguredForm() {
     return null;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredPopupClosable() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredPopupMovable() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredPopupResizable() {
+    return false;
+  }
+
+  @Override
+  public boolean isPopupClosable() {
+    return propertySupport.getPropertyBool(PROP_POPUP_CLOSABLE);
+  }
+
+  @Override
+  public void setPopupClosable(boolean popupClosable) {
+    propertySupport.setPropertyBool(PROP_POPUP_CLOSABLE, popupClosable);
+  }
+
+  @Override
+  public boolean isPopupMovable() {
+    return propertySupport.getPropertyBool(PROP_POPUP_MOVABLE);
+  }
+
+  @Override
+  public void setPopupMovable(boolean popupMovable) {
+    propertySupport.setPropertyBool(PROP_POPUP_MOVABLE, popupMovable);
+  }
+
+  @Override
+  public boolean isPopupResizable() {
+    return propertySupport.getPropertyBool(PROP_POPUP_RESIZABLE);
+  }
+
+  @Override
+  public void setPopupResizable(boolean popupResizable) {
+    propertySupport.setPropertyBool(PROP_POPUP_RESIZABLE, popupResizable);
   }
 
   @Override

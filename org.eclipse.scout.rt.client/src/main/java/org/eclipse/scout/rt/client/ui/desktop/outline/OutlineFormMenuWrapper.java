@@ -51,4 +51,34 @@ public class OutlineFormMenuWrapper extends OutlineMenuWrapper implements IFormM
     getWrappedMenu().setForm(f);
   }
 
+  @Override
+  public boolean isPopupClosable() {
+    return getWrappedMenu().isPopupClosable();
+  }
+
+  @Override
+  public void setPopupClosable(boolean popupClosable) {
+    getWrappedMenu().setPopupClosable(popupClosable);
+  }
+
+  @Override
+  public boolean isPopupMovable() {
+    return getWrappedMenu().isPopupMovable();
+  }
+
+  @Override
+  public void setPopupMovable(boolean popupMovable) {
+    getWrappedMenu().setPopupMovable(popupMovable);
+  }
+
+  @Override
+  public boolean isPopupResizable() {
+    return getWrappedMenu().isPopupResizable();
+  }
+
+  @Override
+  public void setPopupResizable(boolean popupResizable) {
+    getWrappedMenu().setPopupResizable(popupResizable);
+  }
+
 }

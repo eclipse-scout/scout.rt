@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
@@ -49,6 +50,24 @@ public class JsonFormMenu<FORM_MENU extends IFormMenu<? extends IForm>> extends 
       @Override
       public boolean accept() {
         return getModel().isSelected();
+      }
+    });
+    putJsonProperty(new JsonProperty<IFormMenu<? extends IForm>>(IFormMenu.PROP_POPUP_CLOSABLE, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isPopupClosable();
+      }
+    });
+    putJsonProperty(new JsonProperty<IFormMenu<? extends IForm>>(IFormMenu.PROP_POPUP_MOVABLE, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isPopupMovable();
+      }
+    });
+    putJsonProperty(new JsonProperty<IFormMenu<? extends IForm>>(IFormMenu.PROP_POPUP_RESIZABLE, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isPopupResizable();
       }
     });
     getJsonProperty(IAction.PROP_SELECTED).addLazyProperty(getJsonProperty(IFormMenu.PROP_FORM));

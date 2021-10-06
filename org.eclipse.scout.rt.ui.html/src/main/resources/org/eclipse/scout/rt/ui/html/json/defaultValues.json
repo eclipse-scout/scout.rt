@@ -328,7 +328,10 @@
       "saveNeededVisible": false
     },
     "FormMenu": {
-      "toggleAction": true
+      "toggleAction": true,
+      "popupClosable": false,
+      "popupMovable": false,
+      "popupResizable": false
     },
     "Tree": {
       "toggleBreadcrumbStyleEnabled": false,

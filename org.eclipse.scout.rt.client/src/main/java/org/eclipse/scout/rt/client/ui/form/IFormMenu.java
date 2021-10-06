@@ -16,7 +16,11 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
  * @since 6.0
  */
 public interface IFormMenu<FORM extends IForm> extends IMenu {
+
   String PROP_FORM = "form";
+  String PROP_POPUP_CLOSABLE = "popupClosable";
+  String PROP_POPUP_MOVABLE = "popupMovable";
+  String PROP_POPUP_RESIZABLE = "popupResizable";
 
   FORM getForm();
 
@@ -26,4 +30,16 @@ public interface IFormMenu<FORM extends IForm> extends IMenu {
    * The form is shown whenever the menu is selected.
    */
   void setForm(FORM f);
+
+  boolean isPopupClosable();
+
+  void setPopupClosable(boolean popupClosable);
+
+  boolean isPopupMovable();
+
+  void setPopupMovable(boolean popupMovable);
+
+  boolean isPopupResizable();
+
+  void setPopupResizable(boolean popupResizable);
 }
