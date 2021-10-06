@@ -13,9 +13,11 @@ package org.eclipse.scout.rt.client.ui.messagebox;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.text.TEXTS;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -131,37 +133,59 @@ public final class MessageBoxes {
    * @since Scout 4.0.1
    */
   public static boolean showDeleteConfirmationMessage(String itemType, Collection<?> items) {
-    StringBuilder t = new StringBuilder();
+    int result = createDeleteConfirmationMessage(itemType, items).show();
+    return result == IMessageBox.YES_OPTION;
+  }
 
-    int n = 0;
-    if (items != null) {
-      n = items.size();
-      int i = 0;
-      for (Object item : items) {
-        if (i < 10 || i == n - 1) {
-          t.append("- ");
-          t.append(StringUtility.emptyIfNull(item));
-          t.append("\n");
-        }
-        else if (i == 10) {
-          t.append("  ...\n");
-        }
-        i++;
-      }
-    }
-    //
+  /**
+   * Convenience function for simple delete confirmation message box
+   *
+   * @param items
+   *          a list of multiple items
+   * @return <code>IMessageBox</code>
+   * @since Scout 22.0
+   */
+  public static IMessageBox createDeleteConfirmationMessage(Collection<?> items) {
+    return createDeleteConfirmationMessage(null, items);
+  }
+
+  /**
+   * Convenience function for simple delete confirmation message box
+   *
+   * @param itemType
+   *          display text in plural such as "Persons", "Relations", "Tickets", ...
+   * @param items
+   *          a list of multiple items
+   * @return <code>IMessageBox</code>
+   * @since Scout 22.0
+   */
+  public static IMessageBox createDeleteConfirmationMessage(String itemType, Collection<?> items) {
+    final boolean hasItems = !CollectionUtility.isEmpty(items);
     String header = null;
-    String body = null;
     if (itemType != null) {
-      header = (n > 0 ? TEXTS.get("DeleteConfirmationTextX", itemType) : TEXTS.get("DeleteConfirmationTextNoItemListX", itemType));
-      body = (n > 0 ? t.toString() : null);
+      header = (hasItems ? TEXTS.get("DeleteConfirmationTextX", itemType) : TEXTS.get("DeleteConfirmationTextNoItemListX", itemType));
     }
     else {
-      header = (n > 0 ? TEXTS.get("DeleteConfirmationText") : TEXTS.get("DeleteConfirmationTextNoItemList"));
-      body = (n > 0 ? t.toString() : null);
+      header = (hasItems ? TEXTS.get("DeleteConfirmationText") : TEXTS.get("DeleteConfirmationTextNoItemList"));
     }
+    return createYesNo().withHeader(header).withBody(createDeleteConfirmationMessageBody(items));
+  }
 
-    int result = createYesNo().withHeader(header).withBody(body).show();
-    return result == IMessageBox.YES_OPTION;
+  private static String createDeleteConfirmationMessageBody(Collection<?> items) {
+    if (CollectionUtility.isEmpty(items)) {
+      return null;
+    }
+    final int maxVisibleItemsCount = 10;
+    final int excessItemsMessageLines = 2;
+    final int hiddenItemsCount = items.size() - maxVisibleItemsCount;
+    final boolean showExcessItemsEntry = hiddenItemsCount > excessItemsMessageLines;
+    String body = items.stream()
+        .limit(maxVisibleItemsCount + (showExcessItemsEntry ? 0 : excessItemsMessageLines))
+        .map(item -> "- " + StringUtility.emptyIfNull(item))
+        .collect(Collectors.joining("\n"));
+    if (showExcessItemsEntry) {
+      body += "\n...\n" + TEXTS.get("XAdditional", Integer.toString(hiddenItemsCount)) + "\n";
+    }
+    return body;
   }
 }
