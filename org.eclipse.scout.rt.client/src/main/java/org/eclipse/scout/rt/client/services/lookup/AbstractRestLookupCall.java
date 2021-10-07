@@ -271,7 +271,10 @@ public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupR
     return new LookupRow<>(row.getId(), row.getText())
         .withActive(row.getActive())
         .withEnabled(row.getEnabled())
-        .withParentKey(extractParentKey(row));
+        .withParentKey(extractParentKey(row))
+        .withCssClass(row.getCssClass())
+        .withIconId(row.getIconId())
+        .withTooltipText(row.getTooltipText());
   }
 
   /**
