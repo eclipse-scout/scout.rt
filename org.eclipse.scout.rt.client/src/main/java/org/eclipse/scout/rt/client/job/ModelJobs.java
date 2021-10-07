@@ -115,7 +115,7 @@ public final class ModelJobs {
    *   ...
    * </pre>
    *
-   * @see {@link IJobManager#awaitDone(Predicate, long, TimeUnit)}
+   * @see IJobManager#awaitDone(Predicate, long, TimeUnit)
    */
   public static final String EXECUTION_HINT_UI_INTERACTION_REQUIRED = "ui.interaction.required";
 
