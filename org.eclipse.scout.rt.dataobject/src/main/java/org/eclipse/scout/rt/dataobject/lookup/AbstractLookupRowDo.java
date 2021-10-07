@@ -62,6 +62,10 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
     return doValue("cssClass");
   }
 
+  public DoValue<String> tooltipText() {
+    return doValue("tooltipText");
+  }
+
   /* **************************************************************************
    * HELPER METHODS
    * *************************************************************************/
@@ -118,6 +122,11 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
     return self();
   }
 
+  public SELF withTooltipText(String tooltipText) {
+    tooltipText().set(tooltipText);
+    return self();
+  }
+
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
@@ -155,5 +164,10 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   @Generated("DoConvenienceMethodsGenerator")
   public String getCssClass() {
     return cssClass().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getTooltipText() {
+    return tooltipText().get();
   }
 }
