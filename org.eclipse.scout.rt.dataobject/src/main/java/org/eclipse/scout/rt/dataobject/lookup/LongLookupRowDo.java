@@ -66,4 +66,25 @@ public class LongLookupRowDo extends AbstractLookupRowDo<LongLookupRowDo, Long> 
     active().set(active);
     return this;
   }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public LongLookupRowDo withIconId(String iconId) {
+    iconId().set(iconId);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public LongLookupRowDo withCssClass(String cssClass) {
+    cssClass().set(cssClass);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public LongLookupRowDo withTooltipText(String tooltipText) {
+    tooltipText().set(tooltipText);
+    return this;
+  }
 }
