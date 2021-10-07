@@ -56,4 +56,25 @@ public class FixtureEnumLookupRowDo extends AbstractLookupRowDo<FixtureEnumLooku
     active().set(active);
     return this;
   }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRowDo withIconId(String iconId) {
+    iconId().set(iconId);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRowDo withCssClass(String cssClass) {
+    cssClass().set(cssClass);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureEnumLookupRowDo withTooltipText(String tooltipText) {
+    tooltipText().set(tooltipText);
+    return this;
+  }
 }

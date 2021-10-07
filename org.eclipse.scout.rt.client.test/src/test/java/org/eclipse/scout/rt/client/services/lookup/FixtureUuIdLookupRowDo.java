@@ -56,4 +56,25 @@ public class FixtureUuIdLookupRowDo extends AbstractLookupRowDo<FixtureUuIdLooku
     active().set(active);
     return this;
   }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureUuIdLookupRowDo withIconId(String iconId) {
+    iconId().set(iconId);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureUuIdLookupRowDo withCssClass(String cssClass) {
+    cssClass().set(cssClass);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureUuIdLookupRowDo withTooltipText(String tooltipText) {
+    tooltipText().set(tooltipText);
+    return this;
+  }
 }
