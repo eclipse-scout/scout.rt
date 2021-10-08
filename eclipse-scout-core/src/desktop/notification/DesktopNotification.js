@@ -69,7 +69,7 @@ export default class DesktopNotification extends ScoutNotification {
     this.$container = this.$parent.prependDiv('desktop-notification');
     this.$content = this.$container.appendDiv('desktop-notification-content');
     this.$messageText = this.$content.appendDiv('desktop-notification-message');
-    this.$loader = this.$content.appendDiv('desktop-notification-loader');
+    this.$loader = this.$container.appendDiv('desktop-notification-loader');
 
     if (Device.get().supportsCssAnimation()) {
       this.$loader.addClass('animated');

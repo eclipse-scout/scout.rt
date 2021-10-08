@@ -106,6 +106,12 @@
   &.no-icon {
     padding: @desktop-notification-no-icon-padding-y 12px @desktop-notification-no-icon-padding-y 23px;
   }
+
+  /* Prevent overlay of text/loader and close icon */
+
+  &.closable {
+    padding-right: 35px;
+  }
 }
 
 .desktop-notification-content {
@@ -159,11 +165,6 @@
     }
   }
 
-  /* Prevent overlay of text and close icon */
-  &.closable {
-    padding-right: 35px;
-  }
-
   & > .closer {
     position: absolute;
     padding: 4px;
@@ -194,7 +195,8 @@
 }
 
 .desktop-notification-loader {
-  display: inline-block;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .desktop-notification-loader.animated::after {
@@ -204,7 +206,7 @@
   vertical-align: middle;
   margin-top: -3px;
   margin-left: 16px;
-  margin-right: 6px;
+  margin-right: 10px;
   border-radius: 50%;
   border: 1px fade(@busyindicator-active-color, 80%) solid;
   width: 14px;

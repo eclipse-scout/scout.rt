@@ -145,6 +145,7 @@ export default class Notification extends Widget {
   }
 
   _renderClosable() {
+    this.$container.toggleClass('closable', this.closable);
     this.$content.toggleClass('closable', this.closable);
     if (!this.closable) {
       this._removeCloser();
