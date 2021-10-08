@@ -738,6 +738,19 @@ public class StringUtilityTest {
   }
 
   @Test
+  public void testCamelCaseToUpperCase() {
+    assertEquals(null, StringUtility.camelCaseToUpperCase(null));
+    assertEquals("", StringUtility.camelCaseToUpperCase(""));
+    assertEquals(" ", StringUtility.camelCaseToUpperCase(" "));
+    assertEquals("A", StringUtility.camelCaseToUpperCase("A"));
+    assertEquals("B", StringUtility.camelCaseToUpperCase("b"));
+    assertEquals("FOO", StringUtility.camelCaseToUpperCase("Foo"));
+    assertEquals("FOO", StringUtility.camelCaseToUpperCase("foo"));
+    assertEquals("FOO_BAR", StringUtility.camelCaseToUpperCase("FooBar"));
+    assertEquals("FOO_BAR", StringUtility.camelCaseToUpperCase("fooBar"));
+  }
+
+  @Test
   public void testRandomId() {
     assertNotNull(StringUtility.randomId());
     assertEquals(8, StringUtility.randomId().length());
