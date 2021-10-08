@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,7 @@ export default class TimePicker extends Widget {
     this.$container = this.$parent
       .appendDiv('time-picker')
       .toggleClass('touch', this.touch);
+    this.$parent.appendDiv('time-picker-separator');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
     this._renderTimeSelection();
@@ -51,15 +52,18 @@ export default class TimePicker extends Widget {
       $time;
     let $box = this.$parent.makeDiv('day-table');
     for (i = 0; i < 24; i++) {
-      // reset minutes always every hour line starts with :00
+      // reset minutes always every hour line starts with 00
       date.setMinutes(0);
       currentHours = date.getHours();
 
       $hourRow = $box.appendDiv('hour-row');
-      $time = $hourRow.appendDiv('cell  hours')
+      let $hour = $hourRow.appendDiv('cell  hours')
         .data('time', new Date(date))
         .on('click', this._onTimeClick.bind(this));
-      $time.appendSpan('text')
+      if (now.getHours() === date.getHours()) {
+        $hour.addClass('now');
+      }
+      $hour.appendSpan('text')
         .text(dates.format(date, this.session.locale, 'HH'));
 
       while (currentHours === date.getHours()) {
@@ -67,7 +71,7 @@ export default class TimePicker extends Widget {
           .data('time', new Date(date))
           .on('click', this._onTimeClick.bind(this));
 
-        $time.appendSpan('text').text(dates.format(date, this.session.locale, ':mm'));
+        $time.appendSpan('text').text(dates.format(date, this.session.locale, 'mm'));
         if (dates.isSameTime(now, date)) {
           $time.addClass('now');
         }

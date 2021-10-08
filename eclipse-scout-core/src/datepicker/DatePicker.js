@@ -375,8 +375,7 @@ export default class DatePicker extends Widget {
   _build$DateBox(viewDate) {
     let cl, i, day, dayEnabled, dayInMonth, $day,
       now = new Date(),
-      start = new Date(viewDate),
-      weekdays = this.dateFormat.symbols.weekdaysShortOrdered;
+      start = new Date(viewDate);
 
     let $box = this.$container
       .makeDiv('date-picker-month')
@@ -384,9 +383,9 @@ export default class DatePicker extends Widget {
 
     // Create weekday header
     let $weekdays = $box.appendDiv('date-picker-weekdays');
-    weekdays.forEach(weekday => {
-      $weekdays.appendDiv('date-picker-weekday', weekday);
-    });
+    this.dateFormat.symbols.weekdaysShortOrdered
+      .map(weekday => weekday.length > 2 ? weekday.substr(0, 2) : weekday)
+      .forEach(weekday => $weekdays.appendDiv('date-picker-weekday', weekday.toUpperCase()));
 
     // Find start date (-1)
     let $week;
@@ -457,7 +456,7 @@ export default class DatePicker extends Widget {
       '  <div class="date-picker-left-m" data-shift="-1"></div>' +
       '  <div class="date-picker-right-y" data-shift="12"></div>' +
       '  <div class="date-picker-right-m" data-shift="1"></div>' +
-      '  <div class="date-picker-header-month"></div>' +
+      '  <div class="date-picker-header-month">&nbsp;</div>' +
       '</div>';
     return this.$container
       .appendElement(headerHtml)

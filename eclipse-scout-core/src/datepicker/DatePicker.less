@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  */
 .date-picker-popup {
   position: absolute;
-  width: 252px;
+  width: 306px;
   border: @popup-border-width solid @popup-border-color;
   border-radius: @control-popup-border-radius;
   overflow: hidden;
@@ -34,20 +34,22 @@
 }
 
 .date-picker-month {
-  display: table;
   width: 100%;
-  padding: 0 6px 3px 6px;
+  padding: 0 0 13px 13px;
 }
 
 .date-picker-weekdays {
-  display: table-row;
+  color: @palette-gray-6-1;
+  font-weight: @font-weight-bold;
 }
 
 .date-picker-weekday {
-  display: table-cell;
+  display: inline-flex;
   height: @date-picker-header-height;
-  text-align: center;
-  vertical-align: middle;
+  width: 36px;
+  margin: 2px;
+  justify-content: center;
+  padding-top: 7px;
 }
 
 .date-picker-week {
@@ -55,50 +57,32 @@
 }
 
 .date-picker-day {
-  display: table-cell;
-  text-align: center;
-  vertical-align: middle;
-
-  .date-picker.touch & {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  margin: 2px;
+  border-radius: 8px;
+  justify-content: center;
 
   & > .text {
-    display: inline-block;
-    padding: @date-picker-day-padding-y @date-picker-day-padding-x;
-    margin-top: 2px;
-    border-radius: 50%;
-    border: 1px solid transparent;
-  }
-
-  &.ten > .text {
-    /* increase padding a bit to center days between 10 and 19 nicer */
-    padding-right: @date-picker-day-padding-x + 1px;
+    padding-top: @date-picker-day-padding-top;
   }
 
   /* Hover effect is disabled on touch devices because the hover effect does not vanish on touch end which is annoying especially when swiping. */
 
-  &:active:not(.disabled),
-  .date-picker:not(.touch) &:hover:not(.disabled) {
-    & > .text {
-      border-color: @date-picker-day-hover-border-color;
-      background-color: @date-picker-day-hover-background-color;
-    }
-
-    &.date-picker-now > .text {
-      border-color: @date-picker-now-hover-border-color;
-      background-color: @date-picker-now-hover-background-color;
-    }
+  .date-picker:not(.touch) &:hover {
+    background-color: @date-picker-day-hover-background-color;
 
     &.selected {
-      & > .text {
-        background-color: @date-picker-day-hover-selected-background-color;
-      }
+      background-color: @date-picker-day-selected-background-color;
+    }
+  }
 
-      &.date-picker-now > .text {
-        background-color: @date-picker-now-hover-selected-background-color;
-      }
+  .date-picker:not(.touch) &:active {
+    background-color: @active-background-color;
+
+    &.selected {
+      background-color: @date-picker-day-selected-background-color;
     }
   }
 
@@ -106,42 +90,26 @@
     color: @date-picker-out-color;
   }
 
-  &.date-picker-weekend {
-    color: @date-picker-weekend-color;
-  }
-
-  &.date-picker-out-weekend {
-    color: @date-picker-out-weekend-color;
-  }
-
   &.date-picker-now {
     color: @date-picker-now-color;
     font-weight: bold;
-  }
 
-  &.preselected {
     & > .text {
-      border-color: @date-picker-day-preselected-border-color;
-      border-style: dashed;
-    }
-
-    &.date-picker-now > .text {
-      border-color: @date-picker-now-preselected-border-color;
+      border-bottom: 2px @date-picker-now-color solid;
+      margin-bottom: 5px;
     }
   }
 
   &.selected {
     color: @date-picker-day-selected-color;
-
-    & > .text {
-      background-color: @date-picker-day-selected-background-color;
-    }
+    background-color: @date-picker-day-selected-background-color;
+    font-weight: @font-weight-bold;
 
     &.date-picker-now {
-      color: @date-picker-now-selected-color;
+      background-color: @date-picker-now-selected-background-color;
 
       & > .text {
-        background-color: @date-picker-now-selected-background-color;
+        border-bottom-color: @date-picker-day-selected-color;
       }
     }
   }
@@ -150,70 +118,61 @@
 
   &.disabled {
     color: @date-picker-day-disabled-color;
+    background-color: @date-picker-background-color;
   }
 }
 
 .date-picker-header {
-  line-height: @date-picker-header-height;
-  height: @date-picker-header-height;
-  padding: 0 10px;
-  background-color: @date-picker-header-background-color;
-  border-bottom: 1px solid @border-color;
-
-  /* Additional space between navigation buttons on touch devices */
-
-  &.touch {
-    padding-left: 18px;
-    padding-right: 18px;
-
-    & > .date-picker-left-m {
-      margin-left: 26px;
-    }
-
-    & > .date-picker-right-m {
-      margin-right: 26px;
-    }
-  }
+  padding: 17px 10px 14px 10px;
 }
 
 .date-picker-separator {
   position: absolute;
-  top: @date-picker-header-height * 2 - 1px;
+  top: 98px;
   left: 0;
   height: 1px;
   width: 100%;
-  border-bottom: 1px solid @border-color;
+  border-bottom: 1px solid @date-picker-separator-color;
 }
 
 .date-picker-header-month {
   text-align: center;
   cursor: default;
-  font-size: 13px;
-  padding-top: @date-picker-header-month-padding-top;
+  font-size: 18px;
+  line-height: 30px;
+  #scout.overflow-ellipsis-nowrap();
 }
 
 .date-picker-left-y,
 .date-picker-left-m,
 .date-picker-right-y,
 .date-picker-right-m {
-  text-align: center;
-  width: 22px;
-  line-height: @date-picker-header-height;
-  height: @date-picker-header-height;
+  width: 24px;
+  height: 24px;
+  margin: 3px 2px 6px 2px;
+  padding-top: 4px;
+  color: @date-picker-arrow-color;
+  border-radius: @border-radius;
+  display: flex;
+  justify-content: center;
   cursor: pointer;
   #scout.font-icon();
   font-size: 17px;
 
   &:hover {
-    color: @hover-color;
+    background-color: @hover-background-color;
   }
 
   &:active {
-    color: @active-color;
+    background-color: @active-background-color;
   }
 }
 
-.date-picker-left-y,
+.date-picker-left-y {
+  float: left;
+  margin-left: 5px;
+}
+
 .date-picker-left-m {
   float: left;
 }
@@ -226,7 +185,11 @@
   content: @icon-angle-left;
 }
 
-.date-picker-right-y,
+.date-picker-right-y {
+  float: right;
+  margin-right: 7px;
+}
+
 .date-picker-right-m {
   float: right;
 }
@@ -239,8 +202,3 @@
   content: @icon-angle-right;
 }
 
-.touch-popup-widget-container {
-  & > .date-picker {
-    border: none;
-  }
-}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,96 +16,79 @@
   #scout.drop-shadow-large();
 }
 
+.time-picker-separator {
+  position: absolute;
+  top: 0;
+  left: 40px;
+  height: 100%;
+  border-right: 1px @palette-gray-4 solid;
+}
+
 .time-picker {
   position: relative;
   background-color: @control-background-color;
-
-  &.touch {
-    overflow-x: hidden;
-    overflow-y: auto;
-    min-width: 160px;
-  }
 }
 
 .day-table {
-  display: table;
   width: 100%;
 
   & > .hour-row {
-    display: table-row;
-    padding-left: 20px;
-    padding-right: 20px;
+    display: flex;
 
-    &:hover {
-      & > .label {
-        font-weight: bold;
-        color: @button-color;
-      }
+    &:hover:not(.disabled) > .hours {
+      background-color: @hover-background-color;
     }
 
     & > .cell {
-      display: table-cell;
-      text-align: center;
-      vertical-align: middle;
-      border-top: 1px solid transparent;
-      border-bottom: 1px solid transparent;
-      padding: 2px;
+      padding: 6px 8px;
       cursor: pointer;
-
-      .time-picker.touch & {
-        padding: 5px;
-      }
-
-      &:first-child {
-        padding-left: 7px;
-
-        .time-picker.touch & {
-          padding-left: 15px;
-        }
-      }
+      width: 32px;
+      height: 32px;
+      margin: 2px;
+      border-radius: @border-radius;
 
       &:last-child {
-        padding-right: 12px;
-
-        .time-picker.touch & {
-          padding-right: 20px;
-        }
+        margin-right: 13px;
       }
 
       & > .text {
         display: inline-block;
-        padding: 5px;
-        border: 1px solid transparent;
-        border-radius: @border-radius;
+        padding-bottom: 2px;
+        padding-top: @time-picker-cell-padding-top;
       }
 
       &.hours {
-        background-color: @time-picker-hours-background-color;
-        border-right: 1px solid @border-color;
+        color: @time-picker-hours-color;
+        margin: 2px 13px 2px 4px;
 
-        &:active:not(.disabled),
-        .time-picker:not(.touch) &:hover:not(.disabled) {
-          + .minutes {
-            & > .text {
-              border-color: @item-selection-border-color;
-              background-color: @item-selection-background-color;
-            }
+        &.now {
+          color: @date-picker-now-color;
 
-            &.now > .text {
-              border-color: @time-picker-now-hover-border-color;
-              background-color: @time-picker-now-hover-background-color;
-            }
-
-            &.selected {
-              & > .text {
-                background-color: @time-picker-hover-selected-background-color;
-              }
-
-              &.now > .text {
-                background-color: @time-picker-now-hover-selected-background-color;
-              }
-            }
+          & > .text {
+            border-bottom: 2px @date-picker-now-color solid;
+            font-weight: @font-weight-bold;
           }
+        }
+
+        &.selected {
+          color: @item-selection-border-color;
+
+          & > .text {
+            font-weight: @font-weight-bold;
+            border-color: @selected-background-color;
+          }
+        }
+
+        &:hover:not(.disabled) + .minutes {
+          background-color: @hover-background-color;
+
+          &.selected {
+            background-color: @time-picker-hover-selected-background-color;
+          }
+        }
+
+        &:active:not(.disabled) {
+          background-color: @active-background-color;
         }
       }
 
@@ -114,67 +97,38 @@
         &.now {
           color: @time-picker-now-color;
           font-weight: bold;
+
+          & > .text {
+            border-bottom: 2px @date-picker-now-color solid;
+            font-weight: @font-weight-bold;
+          }
         }
 
         &.selected {
           color: @time-picker-selected-color;
+          background-color: @time-picker-selected-background-color;
 
-          & > .text {
-            background-color: @time-picker-selected-background-color;
-          }
-
-          &.now {
-            color: @time-picker-now-selected-color;
-
-            & > .text {
-              background-color: @time-picker-now-selected-background-color;
-            }
+          &.now > .text {
+            border-color: @time-picker-now-selected-color;
           }
         }
 
-        &.preselected {
-          & > .text {
-            border-color: @item-selection-border-color;
-            border-style: dashed;
-          }
-
-          &.now > .text {
-            border-color: @time-picker-now-preselected-border-color;
-          }
-        }
-
-        /* Hover effect is disabled on touch devices because the hover effect does not vanish on touch end which is annoying especially when swiping. */
-
-        &:active:not(.disabled),
-        .time-picker:not(.touch) &:hover:not(.disabled) {
-          & > .text {
-            border-color: @item-selection-border-color;
-            background-color: @item-selection-background-color;
-          }
-
-          &.now > .text {
-            border-color: @time-picker-now-hover-border-color;
-            background-color: @time-picker-now-hover-background-color;
-          }
+        &:hover:not(.disabled) {
+          background-color: @hover-background-color;
 
           &.selected {
-            & > .text {
-              background-color: @time-picker-hover-selected-background-color;
-            }
+            background-color: @time-picker-hover-selected-background-color;
+          }
+        }
 
-            &.now > .text {
-              background-color: @time-picker-now-hover-selected-background-color;
-            }
+        &:active:not(.disabled) {
+          background-color: @active-background-color;
+
+          &.selected {
+            background-color: @time-picker-hover-selected-background-color;
           }
         }
       }
     }
   }
 }
-
-.touch-popup-widget-container {
-  & > .time-picker {
-    border: none;
-  }
-}
-
