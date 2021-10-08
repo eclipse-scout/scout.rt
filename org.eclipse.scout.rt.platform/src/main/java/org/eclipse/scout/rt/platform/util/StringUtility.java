@@ -1148,6 +1148,33 @@ public final class StringUtility {
   }
 
   /**
+   * Transforms a camel case formatted string to upper case with underlines string.
+   * <p>
+   * Examples:
+   * <ul>
+   * <li>foo -> FOO
+   * <li>fooBar -> FOO_BAR
+   * <li>FooBar -> FOO_BAR
+   * </ul>
+   */
+  public static String camelCaseToUpperCase(String s) {
+    if (isNullOrEmpty(s)) {
+      return s;
+    }
+    int len = s.length();
+    StringBuilder builder = new StringBuilder(len);
+    builder.append(Character.toUpperCase(s.charAt(0)));
+    for (int i = 1; i < len; i++) {
+      char c = s.charAt(i);
+      if (Character.isUpperCase(c)) {
+        builder.append('_');
+      }
+      builder.append(Character.toUpperCase(c));
+    }
+    return builder.toString();
+  }
+
+  /**
    * Null-safe version of {@link String#split(String)}.
    * <p>
    * Splits the string around matches of the <code>regex</code>. Returns an empty array if the provided string
