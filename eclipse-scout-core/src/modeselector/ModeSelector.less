@@ -26,8 +26,8 @@
     &:not(.disabled) > .mode-slider {
       display: block;
       position: absolute;
-      top: @mode-slider-padding;
-      height: calc(100% - (@mode-slider-padding * 2));
+      top: 0;
+      height: 100%;
       background-color: @mode-alternative-selected-background-color;
       border-radius: @button-border-radius;
       transition: left 500ms ease;
@@ -38,9 +38,4 @@
       }
     }
   }
-}
-
-// used to read the padding from ModeSelector.js (ModeSelector.SLIDER_PADDING)
-.mode-slider-padding {
-  padding-left: @mode-slider-padding;
 }
