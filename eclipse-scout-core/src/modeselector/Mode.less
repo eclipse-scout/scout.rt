@@ -15,28 +15,6 @@
   padding: @mode-padding-y @mode-padding-x;
   #scout.overflow-ellipsis();
 
-  &.first {
-    border-radius: @button-border-radius 0 0 @button-border-radius;
-  }
-
-  &.last {
-    border-radius: 0 @button-border-radius @button-border-radius 0;
-  }
-
-  &.first.last {
-    border-radius: @button-border-radius;
-  }
-
-  &:not(.last):not(.selected) {
-    border-right: none;
-    padding-right: @mode-padding-x + @mode-border-width; /* account for the missing border, so that text does not jump */
-  }
-
-  &.after-selected {
-    border-left: none;
-    padding-left: @mode-padding-x + @mode-border-width; /* account for the missing border, so that text does not jump */
-  }
-
   // override button (the selected mode cannot be clicked. therefore do not show hover and active colors)
   &.selected {
     color: @selected-color;
@@ -108,6 +86,41 @@
       color: @button-disabled-color;
       background-color: transparent;
       cursor: default;
+    }
+  }
+}
+
+.mode-selector:not(.alternative) > .mode {
+
+  &.first {
+    border-top-left-radius: @button-border-radius;
+    border-bottom-left-radius: @button-border-radius;
+  }
+
+  &.last {
+    border-top-right-radius: @button-border-radius;
+    border-bottom-right-radius: @button-border-radius;
+  }
+
+  &:not(.last):not(.selected) {
+    border-right: none;
+    padding-right: @mode-padding-x + @mode-border-width; /* account for the missing border, so that text does not jump */
+  }
+
+  &.after-selected {
+    border-left: none;
+    padding-left: @mode-padding-x + @mode-border-width; /* account for the missing border, so that text does not jump */
+  }
+
+  .dense & {
+    &:not(.last):not(.selected) {
+      border-right: none;
+      padding-right: @mode-padding-dense-x + @mode-border-width; /* account for the missing border, so that text does not jump */
+    }
+
+    &.after-selected {
+      border-left: none;
+      padding-left: @mode-padding-dense-x + @mode-border-width; /* account for the missing border, so that text does not jump */
     }
   }
 }
