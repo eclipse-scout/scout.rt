@@ -182,7 +182,7 @@ export default class TableHeader extends Widget {
 
     columnWidth -= margins.horizontal();
 
-    if (isLastColumn) {
+    if (isLastColumn && menuBarWidth > 0) {
       remainingHeaderSpace = this.$container.width() - this.table.rowWidth + graphics.insets(this.$container).right;
 
       if (remainingHeaderSpace < menuBarWidth) {
