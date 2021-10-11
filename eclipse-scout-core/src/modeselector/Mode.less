@@ -61,30 +61,35 @@
 
   & > .icon {
     padding: 0; // remove padding from button
+
     &.with-label {
       margin-right: 8px;
     }
   }
 }
 
-.dense .mode {
-  padding: @mode-padding-dense;
-}
-
 .mode-selector.alternative {
+  border: @mode-alternative-border-width solid transparent;
+
   & > .mode {
     color: @mode-color;
-    border: @mode-alternative-border-width transparent solid;
+    border: none;
     background-color: transparent;
-    border-radius: @button-border-radius + @mode-alternative-border-width;
+    border-radius: @button-border-radius;
+
+    &:not(.last):not(.selected) {
+      padding-right: @mode-padding-x;
+    }
+
+    &.after-selected {
+      padding-left: @mode-padding-x;
+    }
 
     &:hover {
-      border-color: transparent;
       background-color: rgba(0, 0, 0, 0.05);
     }
 
     &:active {
-      border-color: transparent;
       background-color: rgba(0, 0, 0, 0.1);
     }
 
@@ -93,7 +98,6 @@
       transition: color 500ms ease;
 
       &:hover {
-        border: @mode-alternative-border-width transparent solid;
         background-color: transparent;
       }
     }
@@ -108,6 +112,31 @@
       color: @button-disabled-color;
       background-color: transparent;
       cursor: default;
+    }
+  }
+}
+
+.dense .mode-selector {
+
+  & > .mode {
+    padding: @mode-padding-dense;
+
+    &:not(.last):not(.selected) {
+      padding-right: @mode-padding-dense-x + @mode-border-width; /* account for the missing border, so that text does not jump */
+    }
+
+    &.after-selected {
+      padding-left: @mode-padding-dense-x + @mode-border-width; /* account for the missing border, so that text does not jump */
+    }
+  }
+
+  &.alternative > .mode {
+    &:not(.last):not(.selected) {
+      padding-right: @mode-padding-dense-x;
+    }
+
+    &.after-selected {
+      padding-left: @mode-padding-dense-x;
     }
   }
 }

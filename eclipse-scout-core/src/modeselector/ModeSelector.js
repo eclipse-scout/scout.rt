@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, events, HtmlComponent, ModeSelectorLayout, styles, Widget} from '../index';
+import {arrays, events, HtmlComponent, ModeSelectorLayout, Widget} from '../index';
 
 export default class ModeSelector extends Widget {
-
-  static SLIDER_PADDING = null; // Configured in sizes.css
 
   constructor() {
     super();
@@ -22,8 +20,6 @@ export default class ModeSelector extends Widget {
     this.modes = [];
     this.selectedMode = null;
     this.$slider = null;
-
-    ModeSelector.SLIDER_PADDING = $.pxToNumber(styles.get('mode-slider-padding', 'padding-left')['paddingLeft']);
 
     this._modePropertyChangeHandler = this._onModePropertyChange.bind(this);
   }
@@ -142,8 +138,8 @@ export default class ModeSelector extends Widget {
       return;
     }
 
-    let cssSliderWidth = '(100% - ' + 2 * ModeSelector.SLIDER_PADDING + 'px) / ' + visibleNodes.length;
-    let sliderPosX = ModeSelector.SLIDER_PADDING + 'px + ((' + cssSliderWidth + ') * ' + index + ')';
+    let cssSliderWidth = '100% / ' + visibleNodes.length;
+    let sliderPosX = cssSliderWidth + ' * ' + index;
     this.$slider.cssLeft('calc(' + sliderPosX + ')');
     this.$slider.cssWidth('calc(' + cssSliderWidth + ')');
   }
@@ -152,8 +148,8 @@ export default class ModeSelector extends Widget {
     let className = 'mode-selector-dragging';
     let onDown = /** @type {SwipeCallbackEvent} */e => this.selectedMode && this.selectedMode.$container === $mode;
     let onMove = /** @type {SwipeCallbackEvent} */e => {
-      let maxX = this.$container.width() - $mode.outerWidth() - ModeSelector.SLIDER_PADDING + 1;
-      let minX = ModeSelector.SLIDER_PADDING;
+      let maxX = this.$container.width() - $mode.outerWidth() + 1;
+      let minX = 0;
       let newModeLeft = Math.max(Math.min(e.newLeft, maxX), minX); // limit to the size of the ModeSelector
       this.$container.children().addClass(className);
       if (newModeLeft !== e.originalLeft) {
