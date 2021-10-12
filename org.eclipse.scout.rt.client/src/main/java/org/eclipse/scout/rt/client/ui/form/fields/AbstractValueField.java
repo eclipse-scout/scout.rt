@@ -165,6 +165,10 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   @Override
   public void storeToXml(Element x) {
     super.storeToXml(x);
+    storeValueToXml(x);
+  }
+
+  protected void storeValueToXml(Element x) {
     VALUE value = getValue();
     try {
       XmlUtility.setObjectAttribute(x, "value", value);
@@ -179,6 +183,10 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   @Override
   public void loadFromXml(Element x) {
     super.loadFromXml(x);
+    loadValueFromXml(x);
+  }
+
+  protected void loadValueFromXml(Element x) {
     try {
       VALUE value = TypeCastUtility.castValue(XmlUtility.getObjectAttribute(x, "value"), getHolderType());
       setValue(value);
