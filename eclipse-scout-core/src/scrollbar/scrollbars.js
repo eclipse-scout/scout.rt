@@ -76,6 +76,7 @@ export function removeScrollable(session, $container) {
  *          <li>To adjust the style, add one of the following values: large or gradient.</li>
  *          <li>To disable the scroll shadow completely, set the value to none.</li>
  *        </ul>
+ * @param {function} [options.scrollShadowCustomizer] function to customize the scroll shadow
  * @param {Session} [options.session]
  * @param {Widget} [options.parent]
  */
@@ -140,7 +141,7 @@ export function _installNativeInternal($container, options) {
   $container.css('-webkit-overflow-scrolling', 'touch');
 }
 
-function installScrollShadow($container, session, options) {
+export function installScrollShadow($container, session, options) {
   if (!Device.get().supportsIntersectionObserver()) {
     return;
   }
@@ -154,6 +155,7 @@ function installScrollShadow($container, session, options) {
   $shadow.data('scroll-shadow-parent', $container);
   $container.data('scroll-shadow', $shadow);
   $container.data('scroll-shadow-style', scrollShadowStyle);
+  $container.data('scroll-shadow-customizer', options.scrollShadowCustomizer);
   let handler = () => updateScrollShadow($container);
   $container.data('scroll-shadow-handler', handler);
   $container.on('scroll', handler);
@@ -163,13 +165,14 @@ function installScrollShadow($container, session, options) {
   intersectionObserver.observe($container[0]);
 }
 
-function uninstallScrollShadow($container, session) {
+export function uninstallScrollShadow($container, session) {
   let $shadow = $container.data('scroll-shadow');
   if ($shadow) {
     $shadow.remove();
     $container.removeData('scroll-shadow');
   }
   $container.removeData('scroll-shadow-style');
+  $container.removeData('scroll-shadow-customizer');
   let handler = $container.data('scroll-shadow-handler');
   if (handler) {
     $container.off('scroll', handler);
@@ -241,6 +244,11 @@ export function updateScrollShadow($container) {
   graphics.setBounds($shadow, graphics.bounds($container, {exact: true}));
   graphics.setMargins($shadow, graphics.margins($container));
   $shadow.css('border-radius', $container.css('border-radius'));
+
+  let customizer = $container.data('scroll-shadow-customizer');
+  if (customizer) {
+    customizer($container, $shadow);
+  }
 
   function atStart(scrollPos) {
     return scrollPos === 0;
@@ -945,6 +953,7 @@ export default {
   fix,
   getScrollables,
   install,
+  installScrollShadow,
   isHybridScrolling,
   isJsScrolling,
   isLocationInView,
@@ -967,5 +976,6 @@ export default {
   storeScrollPositions,
   unfix,
   uninstall,
+  uninstallScrollShadow,
   update
 };
