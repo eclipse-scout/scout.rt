@@ -214,10 +214,9 @@
 @date-picker-day-hover-background-color: @hover-background-color;
 @date-picker-day-selected-color: @palette-white;
 @date-picker-day-selected-background-color: @selected-background-color;
-@date-picker-day-disabled-color: @palette-gray-5;
+@date-picker-day-preselected-background-color: fade(@palette-black, 4%);
+@date-picker-day-disabled-color: darken(@palette-gray-4, 10%);
 @date-picker-now-color: @palette-orange-5;
-@date-picker-now-hover-background-color: @palette-orange-0;
-@date-picker-now-selected-background-color: @date-picker-day-selected-background-color;
 @date-picker-out-color: @palette-gray-6-1;
 @date-picker-out-weekend-color: @palette-blue-2;
 @date-picker-weekend-color: @palette-blue-6;
@@ -465,13 +464,13 @@
 @tile-table-alternative-inverted-selection-background-color: @palette-cyan-3;
 @tile-table-alternative-inverted-selection-border-color: @tile-table-default-inverted-selection-border-color;
 @tile-table-alternative-inverted-selection-mix-blend-mode: @tile-table-default-inverted-selection-mix-blend-mode;
+@time-picker-disabled-color: @date-picker-day-disabled-color;
 @time-picker-hours-color: @palette-gray-7;
-@time-picker-hover-selected-background-color: @date-picker-day-selected-background-color;
 @time-picker-now-color: @date-picker-now-color;
-@time-picker-now-hover-background-color: @date-picker-now-hover-background-color;
 @time-picker-now-selected-color: @time-picker-selected-color;
 @time-picker-selected-color: @date-picker-day-selected-color;
 @time-picker-selected-background-color: @date-picker-day-selected-background-color;
+@time-picker-preselected-background-color: @date-picker-day-preselected-background-color;
 @tooltip-ok-background-color: @ok-color;
 @tooltip-ok-color: @palette-white;
 @tooltip-info-background-color: @palette-gray-9;

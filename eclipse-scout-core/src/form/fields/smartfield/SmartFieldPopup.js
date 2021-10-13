@@ -15,6 +15,8 @@ export default class SmartFieldPopup extends Popup {
   constructor() {
     super();
     this.animateRemoval = SmartFieldPopup.hasPopupAnimation();
+    this.windowPaddingX = 0;
+    this.windowPaddingY = 0;
   }
 
   _init(options) {

@@ -10,16 +10,22 @@
  */
 .date-picker-popup {
   position: absolute;
-  width: 306px;
+  width: 290px;
   border: @popup-border-width solid @popup-border-color;
   border-radius: @control-popup-border-radius;
   overflow: hidden;
   #scout.drop-shadow-large();
+  margin: @control-popup-margin;
 }
 
 .date-picker {
   position: relative;
   background-color: @date-picker-background-color;
+
+  &.touch-only :not(.selected):not(.disabled):not(:active):hover {
+    // Disable sticky hover effect on touch devices
+    background-color: inherit;
+  }
 }
 
 .date-picker-scrollable {
@@ -35,56 +41,38 @@
 
 .date-picker-month {
   width: 100%;
-  padding: 0 0 13px 13px;
+  padding: 0 13px 13px 13px;
 }
 
 .date-picker-weekdays {
   color: @palette-gray-6-1;
   font-weight: @font-weight-bold;
+  display: flex;
+  justify-content: space-between;
 }
 
 .date-picker-weekday {
   display: inline-flex;
   height: @date-picker-header-height;
-  width: 36px;
+  width: @date-picker-day-size;
   margin: 2px;
   justify-content: center;
   padding-top: 7px;
 }
 
 .date-picker-week {
-  display: table-row;
+  display: flex;
+  justify-content: space-between;
 }
 
 .date-picker-day {
   display: inline-flex;
-  width: 36px;
-  height: 36px;
+  width: @date-picker-day-size;
+  height: @date-picker-day-size;
   margin: 2px;
-  border-radius: 8px;
+  border-radius: @date-picker-day-border-radius;
   justify-content: center;
-
-  & > .text {
-    padding-top: @date-picker-day-padding-top;
-  }
-
-  /* Hover effect is disabled on touch devices because the hover effect does not vanish on touch end which is annoying especially when swiping. */
-
-  .date-picker:not(.touch) &:hover {
-    background-color: @date-picker-day-hover-background-color;
-
-    &.selected {
-      background-color: @date-picker-day-selected-background-color;
-    }
-  }
-
-  .date-picker:not(.touch) &:active {
-    background-color: @active-background-color;
-
-    &.selected {
-      background-color: @date-picker-day-selected-background-color;
-    }
-  }
+  align-items: center;
 
   &.date-picker-out {
     color: @date-picker-out-color;
@@ -92,12 +80,24 @@
 
   &.date-picker-now {
     color: @date-picker-now-color;
-    font-weight: bold;
+    font-weight: @font-weight-bold;
 
     & > .text {
       border-bottom: 2px @date-picker-now-color solid;
-      margin-bottom: 5px;
+      margin-bottom: -2px;
     }
+  }
+
+  &.preselected {
+    background-color: @date-picker-day-preselected-background-color;
+  }
+
+  &:hover {
+    background-color: @date-picker-day-hover-background-color;
+  }
+
+  &:active {
+    background-color: @active-background-color;
   }
 
   &.selected {
@@ -105,20 +105,14 @@
     background-color: @date-picker-day-selected-background-color;
     font-weight: @font-weight-bold;
 
-    &.date-picker-now {
-      background-color: @date-picker-now-selected-background-color;
-
-      & > .text {
-        border-bottom-color: @date-picker-day-selected-color;
-      }
+    &.date-picker-now > .text {
+      border-bottom-color: @date-picker-day-selected-color;
     }
   }
 
-  /* Must be after other style definitions, because 'disabled' should overrule other definitions */
-
   &.disabled {
     color: @date-picker-day-disabled-color;
-    background-color: @date-picker-background-color;
+    background-color: inherit;
   }
 }
 
@@ -147,8 +141,8 @@
 .date-picker-left-m,
 .date-picker-right-y,
 .date-picker-right-m {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   margin: 3px 2px 6px 2px;
   padding-top: 4px;
   color: @date-picker-arrow-color;
@@ -201,4 +195,3 @@
 .date-picker-right-m::before {
   content: @icon-angle-right;
 }
-

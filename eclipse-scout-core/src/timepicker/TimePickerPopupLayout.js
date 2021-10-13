@@ -47,7 +47,6 @@ export default class TimePickerPopupLayout extends PopupLayout {
       .add(htmlComp.insets())
       .add(htmlPicker.margins());
 
-    prefSize.height = Math.max(15, Math.min(350, prefSize.height)); // at least some pixels height in case there is no data, no status, no active filter
     return prefSize;
   }
 }

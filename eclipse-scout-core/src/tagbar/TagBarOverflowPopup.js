@@ -15,6 +15,8 @@ export default class TagBarOverflowPopup extends Popup {
   constructor() {
     super();
 
+    this.windowPaddingX = 0;
+    this.windowPaddingY = 0;
     this._tagBarPropertyChangeListener = null;
 
     // We need not only to return which element receives the initial focus

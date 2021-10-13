@@ -14,6 +14,8 @@
   border-radius: @control-popup-border-radius;
   overflow: hidden;
   #scout.drop-shadow-large();
+  max-height: 350px;
+  margin: @control-popup-margin;
 }
 
 .time-picker-separator {
@@ -27,6 +29,18 @@
 .time-picker {
   position: relative;
   background-color: @control-background-color;
+
+  &.touch-only :not(.selected):not(.disabled):not(:active):hover {
+    &,
+    & > .cell {
+      // Disable sticky hover effect on touch devices
+      background-color: inherit;
+    }
+  }
+
+  .touch-popup-widget-container > & {
+    max-height: 300px;
+  }
 }
 
 .day-table {
@@ -35,98 +49,98 @@
   & > .hour-row {
     display: flex;
 
-    &:hover:not(.disabled) > .hours {
+    &:hover > .hours,
+    &:hover > .hours.preselected {
       background-color: @hover-background-color;
     }
 
     & > .cell {
-      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      width: 32px;
-      height: 32px;
+      width: @time-picker-cell-size;
+      height: @time-picker-cell-size;
       margin: 2px;
-      border-radius: @border-radius;
+      border-radius: @time-picker-cell-border-radius;
 
       &:last-child {
         margin-right: 13px;
       }
+    }
 
-      & > .text {
-        display: inline-block;
-        padding-bottom: 2px;
-        padding-top: @time-picker-cell-padding-top;
-      }
+    & > .hours {
+      color: @time-picker-hours-color;
+      margin: 2px 13px 2px 4px;
 
-      &.hours {
-        color: @time-picker-hours-color;
-        margin: 2px 13px 2px 4px;
+      &.now {
+        color: @date-picker-now-color;
 
-        &.now {
-          color: @date-picker-now-color;
-
-          & > .text {
-            border-bottom: 2px @date-picker-now-color solid;
-            font-weight: @font-weight-bold;
-          }
-        }
-
-        &.selected {
-          color: @item-selection-border-color;
-
-          & > .text {
-            font-weight: @font-weight-bold;
-            border-color: @selected-background-color;
-          }
-        }
-
-        &:hover:not(.disabled) + .minutes {
-          background-color: @hover-background-color;
-
-          &.selected {
-            background-color: @time-picker-hover-selected-background-color;
-          }
-        }
-
-        &:active:not(.disabled) {
-          background-color: @active-background-color;
+        & > .text {
+          border-bottom: 2px @date-picker-now-color solid;
+          margin-bottom: -2px;
+          font-weight: @font-weight-bold;
         }
       }
 
-      &.minutes {
+      &.preselected {
+        background-color: @time-picker-preselected-background-color;
+      }
 
-        &.now {
-          color: @time-picker-now-color;
-          font-weight: bold;
-
-          & > .text {
-            border-bottom: 2px @date-picker-now-color solid;
-            font-weight: @font-weight-bold;
-          }
-        }
+      &:hover + .minutes {
+        background-color: @hover-background-color;
 
         &.selected {
-          color: @time-picker-selected-color;
           background-color: @time-picker-selected-background-color;
-
-          &.now > .text {
-            border-color: @time-picker-now-selected-color;
-          }
         }
+      }
 
-        &:hover:not(.disabled) {
-          background-color: @hover-background-color;
+      &:active {
+        background-color: @active-background-color;
+      }
 
-          &.selected {
-            background-color: @time-picker-hover-selected-background-color;
-          }
+      &.selected {
+        color: @item-selection-border-color;
+
+        & > .text {
+          font-weight: @font-weight-bold;
+          border-bottom: 2px @selected-background-color solid;
+          margin-bottom: -2px;
         }
+      }
+    }
 
-        &:active:not(.disabled) {
-          background-color: @active-background-color;
+    & > .minutes {
 
-          &.selected {
-            background-color: @time-picker-hover-selected-background-color;
-          }
+      &.now {
+        color: @time-picker-now-color;
+        font-weight: @font-weight-bold;
+
+        & > .text {
+          border-bottom: 2px @date-picker-now-color solid;
+          margin-bottom: -2px;
+          font-weight: @font-weight-bold;
+        }
+      }
+
+      &.preselected {
+        background-color: @time-picker-preselected-background-color;
+      }
+
+      &:hover {
+        background-color: @hover-background-color;
+      }
+
+      &:active {
+        background-color: @active-background-color;
+      }
+
+      &.selected {
+        color: @time-picker-selected-color;
+        background-color: @time-picker-selected-background-color;
+
+        &.now > .text {
+          border-color: @time-picker-now-selected-color;
         }
       }
     }

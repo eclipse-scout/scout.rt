@@ -14,6 +14,8 @@ export default class DatePickerPopup extends Popup {
 
   constructor() {
     super();
+    this.windowPaddingX = 0;
+    this.windowPaddingY = 0;
   }
 
   _init(options) {

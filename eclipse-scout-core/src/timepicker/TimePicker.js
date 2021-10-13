@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, Device, HtmlComponent, scrollbars, Widget} from '../index';
+import {dates, Device, HtmlComponent, scrollbars, TimePickerTouchPopup, Widget} from '../index';
 import $ from 'jquery';
 
 export default class TimePicker extends Widget {
@@ -23,8 +23,6 @@ export default class TimePicker extends Widget {
     this.selectedTime = null;
     this.resolution = null;
     this.$scrollable = null;
-
-    this.touch = Device.get().supportsOnlyTouch();
   }
 
   _init(options) {
@@ -35,7 +33,7 @@ export default class TimePicker extends Widget {
   _render() {
     this.$container = this.$parent
       .appendDiv('time-picker')
-      .toggleClass('touch', this.touch);
+      .toggleClass('touch-only', Device.get().supportsOnlyTouch());
     this.$parent.appendDiv('time-picker-separator');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
@@ -93,6 +91,22 @@ export default class TimePicker extends Widget {
     });
   }
 
+  _scrollTo($scrollTo) {
+    if (!$scrollTo) {
+      return;
+    }
+    if (this.parent instanceof TimePickerTouchPopup) {
+      // setTimeout seems to be necessary on ios
+      setTimeout(() => {
+        if (this.rendered) {
+          scrollbars.scrollTo(this.$container, $scrollTo, 'center');
+        }
+      });
+    } else {
+      scrollbars.scrollTo(this.$container, $scrollTo, 'center');
+    }
+  }
+
   preselectTime(time) {
     if (time) {
       // Clear selection when a date is preselected
@@ -124,9 +138,7 @@ export default class TimePicker extends Widget {
         }
       }
     });
-    if ($scrollTo) {
-      scrollbars.scrollTo(this.$container, $scrollTo, 'center');
-    }
+    this._scrollTo($scrollTo);
   }
 
   selectTime(time) {
@@ -161,9 +173,7 @@ export default class TimePicker extends Widget {
         }
       }
     });
-    if ($scrollTo) {
-      scrollbars.scrollTo(this.$container, $scrollTo, 'center');
-    }
+    this._scrollTo($scrollTo);
   }
 
   shiftViewDate(years, months, days) {
@@ -225,20 +235,6 @@ export default class TimePicker extends Widget {
     }
 
     return null;
-  }
-
-  _isDateAllowed(date) {
-    // when allowedDates is empty or not set, any date is allowed
-    if (!this.allowedDates || this.allowedDates.length === 0) {
-      return true;
-    }
-    // when allowedDates is set, only dates contained in this array are allowed
-    let allowedDateAsTimestamp,
-      dateAsTimestamp = date.getTime();
-    return this.allowedDates.some(allowedDate => {
-      allowedDateAsTimestamp = allowedDate.getTime();
-      return allowedDateAsTimestamp === dateAsTimestamp;
-    });
   }
 
   _onNavigationMouseDown(event) {

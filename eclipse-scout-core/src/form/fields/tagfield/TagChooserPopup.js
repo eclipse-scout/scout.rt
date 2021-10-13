@@ -16,6 +16,8 @@ export default class TagChooserPopup extends Popup {
     super();
 
     this.table = null;
+    this.windowPaddingX = 0;
+    this.windowPaddingY = 0;
   }
 
   _init(model) {
