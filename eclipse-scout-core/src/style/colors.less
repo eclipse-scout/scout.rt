@@ -285,7 +285,7 @@
 @messagebox-background-color: @popup-background-color;
 @messagebox-body-color: @palette-black;
 @mode-color: @palette-gray-7;
-@mode-alternative-selected-background-color: @button-background-color;
+@mode-alternative-selected-background-color: @palette-white;
 @mode-alternative-background-color: rgba(0, 0, 0, 0.08);
 @navigate-up-button-border-color: @button-border-color;
 @navigate-up-button-color: @button-color;
@@ -324,7 +324,7 @@
 @planner-timeline-background-color: @panel-background-color;
 @planner-activity-color: @text-color;
 @planner-activity-level-background-color: @palette-white;
-@popup-background-color: @control-background-color;
+@popup-background-color: @background-color;
 @popup-border-color: @border-color;
 @profile-menu-icon-background: linear-gradient(180deg, @palette-blue-6 -145%, @palette-blue-2 56%);
 @profile-menu-icon-color: @icon-inverted-color;
@@ -406,9 +406,13 @@
 @tab-item-selected-color: @title-color;
 @tab-item-marked-border-color: @palette-gray-6;
 @tab-item-selection-marker-color: @selected-background-color;
-@tag-element-background-color: @palette-cyan-2;
-@tag-element-background-color-hover: @palette-cyan-3;
-@tag-icon-color: @palette-cyan-5;
+@tag-element-background-color: @palette-blue-1;
+@tag-element-hover-background-color: darken(@tag-element-background-color, 8%);
+@tag-element-active-background-color: darken(@tag-element-background-color, 12%);
+@tag-element-focus-background-color: @tag-element-hover-background-color;
+@tag-overflow-element-selected-background-color: darken(@tag-element-background-color, 12%);
+@tag-overflow-element-selected-color: @palette-blue-7;
+@tag-icon-color: @palette-blue-5;
 @tag-text-color: @palette-black;
 @tile-background-color: @palette-gray-1;
 @tile-border-color: @border-color;

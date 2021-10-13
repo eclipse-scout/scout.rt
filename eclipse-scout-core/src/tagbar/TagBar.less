@@ -10,85 +10,97 @@
  */
 .tag-element,
 .overflow-icon {
-  display: inline-block;
+  display: inline-flex;
   user-select: none;
   white-space: nowrap;
   color: @tag-text-color;
   outline: none;
-
-  border-radius: 2px;
+  border-radius: @border-radius;
   background-color: @tag-element-background-color;
-  padding: 0 5px;
   height: @tag-field-tag-height;
   line-height: @tag-field-tag-height;
   margin: @tag-field-tag-margin-y @tag-field-tag-margin-right 0 0;
+  overflow: hidden; // Keep rounded edges on remove icon hover
 
-  &:hover:not(.disabled) {
-    background-color: @tag-element-background-color-hover;
-  }
-
-  &.focused {
-    background-color: @palette-cyan-4;
-
-    & > .tag-remove-icon::before {
-      color: @palette-black;
-    }
+  &.focused:not(:hover) {
+    background-color: @tag-element-focus-background-color;
   }
 }
 
 .tag-element {
   & > .tag-text {
     max-width: 85px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 1px;
-    display: inline-block;
-    vertical-align: middle;
-  }
+    #scout.overflow-ellipsis();
+    padding: 0 @tag-element-padding-x;
 
-  &.clickable {
-    &:hover {
-      cursor: pointer;
+    .removable& {
+      padding-right: 4px;
+    }
+
+    .clickable& {
+      &:hover {
+        cursor: pointer;
+        background-color: @tag-element-hover-background-color;
+      }
+
+      &:active,
+      &.active {
+        background-color: @tag-element-active-background-color;
+      }
     }
   }
 }
 
 .overflow-icon {
+  align-items: center;
+  color: @tag-icon-color;
+  padding: 0 6px;
+  vertical-align: bottom;
+
   &::before {
     #scout.font-icon();
     position: relative;
-    font-size: @font-size-extra-small;
-    content: @icon-chevron-down-bold;
-    color: @tag-icon-color;
+    font-size: 16px;
+    content: @icon-angle-down-bold;
   }
 
   &:hover {
-    background-color: @tag-element-background-color-hover;
     cursor: pointer;
+    background-color: @tag-element-hover-background-color;
   }
 
-  &.focused::before {
-    color: @palette-black;
+  &:active,
+  &.active {
+    background-color: @tag-element-active-background-color;
+  }
+
+  &.selected {
+    background-color: @tag-overflow-element-selected-background-color;
+    color: @tag-overflow-element-selected-color;
   }
 }
 
 .tag-remove-icon {
-  padding-left: 3px;
-  display: inline-block;
-  vertical-align: middle;
+  color: @tag-icon-color;
+  display: flex;
+  justify-content: center;
+  width: @tag-field-tag-height;
+  padding-top: 1px;
 
   &::before {
     #scout.font-icon();
     position: relative;
     content: @icon-remove-bold;
-    color: @tag-icon-color;
   }
 
   &:hover {
     cursor: pointer;
+    background-color: @tag-element-hover-background-color;
+    color: @palette-black;
+  }
 
-    &::before {
-      color: @palette-black;
-    }
+  &:active,
+  &.active {
+    background-color: @tag-element-active-background-color;
   }
 }

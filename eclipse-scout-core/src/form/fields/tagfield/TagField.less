@@ -38,13 +38,15 @@
 
     & > input {
       border: none;
-      padding: 0 3px;
-      height: 100%;
+      padding-left: 3px;
+      padding-right: 3px;
       background-color: transparent;
+      min-height: @tag-field-tag-height;
+      height: 100%;
 
       &.fullwidth {
         width: 100%;
-        padding: 0 0 0 @text-field-padding-x - @tag-field-tag-margin-right;
+        padding-left: @text-field-padding-x - @tag-field-tag-margin-right;
 
         &.alternative {
           padding-left: @text-field-alternative-padding-left;

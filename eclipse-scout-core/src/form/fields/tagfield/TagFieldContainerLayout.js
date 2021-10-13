@@ -41,9 +41,9 @@ export default class TagFieldContainerLayout extends AbstractLayout {
         maxTagBarWidth = availableSize.width * (1 - TagFieldContainerLayout.MIN_INPUT_TAG_RATIO);
       }
 
-      let prefTagBarSize = htmlTagBar.prefSize();
+      let prefTagBarSize = htmlTagBar.prefSize(true);
       let tagBarWidth = Math.min(maxTagBarWidth, prefTagBarSize.width);
-      htmlTagBar.setSize(new Dimension(tagBarWidth, availableSize.height));
+      htmlTagBar.setSize(new Dimension(tagBarWidth, prefTagBarSize.height).subtract(htmlTagBar.margins()));
 
       let inputWidth = availableSize.width - tagBarWidth;
       $input.cssWidth(inputWidth);

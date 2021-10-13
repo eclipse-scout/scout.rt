@@ -9,23 +9,23 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .tag-overflow-popup {
-  padding: 5px 7px 9px 5px;
+  padding: 8px - @tag-field-tag-margin-y 8px - @tag-field-tag-margin-right 8px 8px;
   max-width: 250px;
-}
-
-.tag-overflow-popup-head {
-  position: absolute;
   background-color: @popup-background-color;
-  color: @active-color;
-  border: 1px solid @border-color;
-  border-bottom-width: 0;
+  border-radius: @control-popup-border-radius;
+  overflow: hidden;
+  #scout.drop-shadow-large();
+  margin: @control-popup-margin;
 
-  &:hover {
-    background-color: @popup-background-color !important; /* NOSONAR important to avoid super specific selector */
+  & > .popup-body {
+    display: inline;
   }
 
-  &.overflow-icon {
-    margin: 0;
-    border-radius: 0;
+  &.animate-open {
+    .popup-animate-open();
+  }
+
+  &.animate-remove {
+    .popup-animate-remove();
   }
 }

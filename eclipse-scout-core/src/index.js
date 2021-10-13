@@ -187,8 +187,6 @@ export {default as PopupAdapter} from './popup/PopupAdapter';
 export {default as PopupLayout} from './popup/PopupLayout';
 export {default as PopupManager} from './popup/PopupManager';
 export {default as PopupManagerAdapter} from './popup/PopupManagerAdapter';
-export {default as PopupWithHead} from './popup/PopupWithHead';
-export {default as PopupWithHeadLayout} from './popup/PopupWithHeadLayout';
 export {default as TouchPopup} from './popup/TouchPopup';
 export {default as TouchPopupLayout} from './popup/TouchPopupLayout';
 export {default as WidgetPopup} from './popup/WidgetPopup';
@@ -549,7 +547,6 @@ export {default as TagChooserPopup} from './form/fields/tagfield/TagChooserPopup
 export {default as TagChooserPopupLayout} from './form/fields/tagfield/TagChooserPopupLayout';
 export {default as TagField} from './form/fields/tagfield/TagField';
 export {default as TagFieldAdapter} from './form/fields/tagfield/TagFieldAdapter';
-export {default as TagFieldCancelKeyStroke} from './form/fields/tagfield/TagFieldCancelKeyStroke';
 export {default as TagFieldEnterKeyStroke} from './form/fields/tagfield/TagFieldEnterKeyStroke';
 export {default as TagFieldDeleteKeyStroke} from './form/fields/tagfield/TagFieldDeleteKeyStroke';
 export {default as TagFieldNavigationKeyStroke} from './form/fields/tagfield/TagFieldNavigationKeyStroke';
@@ -572,6 +569,7 @@ export {default as Switch} from './switch/Switch';
 export {default as TagBar} from './tagbar/TagBar';
 export {default as TagBarLayout} from './tagbar/TagBarLayout';
 export {default as TagBarOverflowPopup} from './tagbar/TagBarOverflowPopup';
+export {default as TagBarOverflowPopupLayout} from './tagbar/TagBarOverflowPopupLayout';
 export {default as Tile} from './tile/Tile';
 export {default as TileAdapter} from './tile/TileAdapter';
 export {default as TileGrid} from './tile/TileGrid';
@@ -705,8 +703,8 @@ export default self;
 
 /**
  * @typedef {Form|TileOverviewForm|UnsavedFormChangesForm|FieldStatus|StatusMenuMapping|FormField|CompositeField|ValueField|WidgetField|Button|WizardProgressField|CarouselField|TileField|TreeField|ImageField|TableField
- * |PlaceholderField|WrappedFormField|PlannerField|CalendarField|AccordionField|BreadcrumbBarField|OutlineTileField|TabArea|TabBoxHeader|Tab|ProposalChooser|TableProposalChooser|TreeProposalChooser|MenubarBox|MenuBar|MenuBox
- * |DesktopToolBox|Tile|BeanTile|CompositeTile|WidgetTile|PlaceholderTile|HtmlTile|TileGrid|PageTileGrid|Tree|CompactTree|Outline|Group|Image|Icon|Label|Popup|TagChooserPopup|SmartFieldPopup|ContextMenuPopup|TouchPopup|PopupWithHead
+ * |PlaceholderField|WrappedFormField|PlannerField|CalendarField|AccordionField|BreadcrumbBarField|OutlineTileField|TabArea|TabBoxHeader|Tab|ProposalChooser|TableProposalChooser|TreeProposalChooser|MenuBarBox|MenuBar|MenuBox
+ * |DesktopToolBox|Tile|BeanTile|CompositeTile|WidgetTile|PlaceholderTile|HtmlTile|TileGrid|PageTileGrid|Tree|CompactTree|Outline|Group|Image|Icon|Label|Popup|TagChooserPopup|SmartFieldPopup|ContextMenuPopup|TouchPopup|
  * |WidgetPopup|TableHeaderMenu|CellEditorPopup|DatePickerPopup|TimePickerPopup|PopupManager|TableFooter|TableHeader|TableRowTileMapping|TableRowDetail|Table|TableTileGridMediator|TableHeaderMenuGroup|Action|Menu|TableHeaderMenuButton
  * |TableControl|ViewButton|Mode|BreadcrumbItem|IFrame|Slider|Switch|SimpleTab|DesktopTab|SimpleTabArea|DesktopTabArea|SimpleTabBox|TagBar|Composite|NullWidget|Desktop|DesktopLogo|BenchColumn|DesktopBench|DesktopHeader|OutlineOverview
  * |TileOutlineOverview|DesktopNavigation|ViewButtonBox|ViewMenuTab|Planner|PlannerHeader|BusyIndicator|Tooltip|TableInfoSelectionTooltip|TableTooltip|TableInfoLoadTooltip|TableInfoFilterTooltip|WidgetTooltip|CalendarComponent|Calendar
