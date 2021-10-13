@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, PopupWithHead, TagBar, TagFieldDeleteKeyStroke, TagFieldNavigationKeyStroke} from '../index';
+import {arrays, Popup, TagBar, TagBarOverflowPopupLayout, TagFieldDeleteKeyStroke, TagFieldNavigationKeyStroke} from '../index';
 
-export default class TagBarOverflowPopup extends PopupWithHead {
+export default class TagBarOverflowPopup extends Popup {
 
   constructor() {
     super();
@@ -48,7 +48,16 @@ export default class TagBarOverflowPopup extends PopupWithHead {
   _render() {
     super._render();
 
-    this.$body.addClass('tag-overflow-popup');
+    this.$container.addClass('tag-overflow-popup');
+    this.$body = this.$container.appendDiv('popup-body');
+  }
+
+  _createLayout() {
+    return new TagBarOverflowPopupLayout(this);
+  }
+
+  _renderProperties() {
+    super._renderProperties();
     this._renderTags();
   }
 
@@ -56,27 +65,12 @@ export default class TagBarOverflowPopup extends PopupWithHead {
     let tagBar = this.parent;
     let visibleTags = tagBar.visibleTags();
     let allTags = arrays.ensure(tagBar.tags);
-    let overflowTags = allTags.filter(tagText => {
-      return visibleTags.indexOf(tagText) === -1;
-    });
-
-    let clickHandler = tagBar._onTagClick.bind(tagBar);
-    let removeHandler = tagBar._onTagRemoveClick.bind(tagBar);
-    TagBar.renderTags(this.$body, overflowTags, tagBar.enabledComputed, clickHandler, removeHandler);
+    let overflowTags = allTags.filter(tagText => visibleTags.indexOf(tagText) === -1);
+    tagBar.renderTags(this.$body, overflowTags);
 
     if (!this.rendering) {
-      this.revalidateLayout();
+      this.invalidateLayoutTree();
     }
-
-  }
-
-  _renderHead() {
-    super._renderHead();
-
-    this._copyCssClassToHead('overflow-icon');
-    this.$head
-      .removeClass('popup-head menu-item')
-      .addClass('tag-overflow-popup-head');
   }
 
   _focusFirstTagElement() {

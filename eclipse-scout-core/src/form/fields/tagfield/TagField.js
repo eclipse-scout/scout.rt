@@ -10,14 +10,13 @@
  */
 import {
   arrays,
+  fields,
   HtmlComponent,
   InputFieldKeyStrokeContext,
-  fields,
   keys,
   LookupCall,
   scout,
   strings,
-  TagFieldCancelKeyStroke,
   TagFieldContainerLayout,
   TagFieldDeleteKeyStroke,
   TagFieldEnterKeyStroke,
@@ -45,7 +44,8 @@ export default class TagField extends ValueField {
 
     this.tagBar = scout.create('TagBar', {
       parent: this,
-      tags: this.value
+      tags: this.value,
+      clickable: model.clickable
     });
     this.tagBar.on('tagRemove', this._onTagRemove.bind(this));
     this.on('propertyChange', this._onValueChange.bind(this));
@@ -59,7 +59,6 @@ export default class TagField extends ValueField {
   _initKeyStrokeContext() {
     super._initKeyStrokeContext();
     this.keyStrokeContext.registerKeyStroke([
-      new TagFieldCancelKeyStroke(this),
       new TagFieldEnterKeyStroke(this),
       new TagFieldNavigationKeyStroke(this._createFieldAdapter()),
       new TagFieldDeleteKeyStroke(this._createFieldAdapter()),
@@ -80,6 +79,7 @@ export default class TagField extends ValueField {
     this.fieldHtmlComp.setLayout(new TagFieldContainerLayout(this));
     this.tagBar.render($fieldContainer);
     let $field = $fieldContainer.appendElement('<input>', 'field')
+      .attr('type', 'text') // So that css rules from main.less are applied
       .on('keydown', this._onInputKeydown.bind(this))
       .on('keyup', this._onInputKeyup.bind(this))
       .on('input', this._onFieldInput.bind(this));

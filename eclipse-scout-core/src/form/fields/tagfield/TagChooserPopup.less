@@ -13,4 +13,13 @@
 
   min-width: 150px;
   max-width: 250px;
+
+  & > .table > .table-data {
+    // Somehow the chooser is 3px too large -> reduce the size by that amount
+    padding: @proposal-chooser-padding-y @proposal-chooser-padding-x @proposal-chooser-padding-y - 3px @proposal-chooser-padding-x;
+
+    & > .table-row.first {
+      border-top: 1px solid @table-row-border-color;
+    }
+  }
 }

@@ -60,14 +60,18 @@ export default class TagBar extends Widget {
     }
   }
 
-  /**
-   * This function is also used by sub- and friend-classes like the TagOverflowPopup.
-   */
   _renderTags() {
     let tags = arrays.ensure(this.tags);
-    let clickHandler = this.clickable ? this._onTagClick.bind(this) : null;
-    let removeHandler = this._onTagRemoveClick.bind(this);
-    TagBar.renderTags(this.$container, tags, this.enabledComputed, clickHandler, removeHandler);
+    this.renderTags(this.$container, tags, this.enabledComputed);
+    this.invalidateLayoutTree();
+  }
+
+  setClickable(clickable) {
+    this.setProperty('clickable', clickable);
+  }
+
+  _renderClickable() {
+    this._renderTagsClickable(this.$container.children('.tag-element'));
     this.invalidateLayoutTree();
   }
 
@@ -81,6 +85,12 @@ export default class TagBar extends Widget {
     this.trigger('tagClick', {
       tag: tag
     });
+  }
+
+  _renderEnabled() {
+    super._renderEnabled();
+    this._renderTagsRemovable(this.$container.children('.tag-element'));
+    this.invalidateLayoutTree();
   }
 
   _onTagRemoveClick(event) {
@@ -105,7 +115,7 @@ export default class TagBar extends Widget {
   }
 
   _onOverflowIconMousedown(event) {
-    this.openOverflowPopup();
+    this.toggleOverflowPopup();
     return false;
   }
 
@@ -121,9 +131,15 @@ export default class TagBar extends Widget {
     if (this.overflow) {
       return;
     }
+    this.$overflowIcon.addClass('selected');
     this.overflow = this._createOverflowPopup();
-    this.overflow.on('close', this._onOverflowPopupClose.bind(this));
     this.overflow.open();
+    this.overflow.one('destroy', event => {
+      if (this.$overflowIcon) {
+        this.$overflowIcon.removeClass('selected');
+      }
+      this.overflow = null;
+    });
   }
 
   _createOverflowPopup() {
@@ -131,20 +147,23 @@ export default class TagBar extends Widget {
       parent: this,
       closeOnAnchorMouseDown: false,
       focusableContainer: true,
-      $anchor: this.$container,
-      $headBlueprint: this.$overflowIcon,
+      $anchor: this.$overflowIcon,
       cssClass: this.cssClass
     });
   }
 
   closeOverflowPopup() {
-    if (this.overflow && !this.overflow.destroying) {
+    if (this.overflow) {
       this.overflow.close();
     }
   }
 
-  _onOverflowPopupClose() {
-    this.overflow = null;
+  toggleOverflowPopup() {
+    if (this.overflow) {
+      this.closeOverflowPopup();
+    } else {
+      this.openOverflowPopup();
+    }
   }
 
   _installTooltipSupport() {
@@ -212,7 +231,7 @@ export default class TagBar extends Widget {
   _updateErrorStatusClasses(statusClass, hasStatus) {
     super._updateErrorStatusClasses(statusClass, hasStatus);
     this.$container.removeClass(FormField.SEVERITY_CSS_CLASSES);
-    this.$container.addClass(statusClass, hasStatus);
+    this.$container.addClass(statusClass);
   }
 
   /**
@@ -229,6 +248,63 @@ export default class TagBar extends Widget {
         tags.push(TagBar.getTagData($(this)));
       });
     return tags;
+  }
+
+  renderTags($parent, tags) {
+    $parent.find('.tag-element').remove();
+    tags.forEach(tagText => this.renderTag($parent, tagText));
+    let $tags = $parent.children('.tag-element');
+    this._renderTagsClickable($tags);
+    this._renderTagsRemovable($tags);
+  }
+
+  renderTag($parent, tagText) {
+    let $tag = $parent
+      .appendDiv('tag-element')
+      .data('tag', tagText);
+    $tag.appendSpan('tag-text', tagText);
+    return $tag;
+  }
+
+  _renderTagsClickable($tags) {
+    $tags.each((i, tag) => {
+      let $tag = $(tag);
+      let $tagText = $tag.children('.tag-text');
+      let clickHandler = $tag.data('click-handler');
+      if (this.clickable) {
+        if (!clickHandler) {
+          clickHandler = this._onTagClick.bind(this);
+          $tag.data('click-handler', clickHandler);
+          $tagText.on('mousedown', clickHandler);
+        }
+      } else {
+        $tagText.off('mousedown', clickHandler);
+        $tag.removeData('click-handler');
+      }
+      $tag.toggleClass('clickable', this.clickable);
+    });
+  }
+
+  _renderTagsRemovable($tags) {
+    $tags.each((i, tag) => {
+      let $tag = $(tag);
+      let $tagRemove = $tag.children('.tag-remove-icon');
+      let removeHandler = $tag.data('remove-handler');
+      if (this.enabledComputed) {
+        if (!removeHandler) {
+          removeHandler = this._onTagRemoveClick.bind(this);
+          $tag.data('remove-handler', removeHandler);
+          $tag
+            .appendSpan('tag-remove-icon')
+            .on('click', removeHandler);
+        }
+      } else {
+        $tagRemove.off('click', removeHandler);
+        $tagRemove.remove();
+        $tag.removeData('remove-handler');
+      }
+      $tag.toggleClass('removable', this.enabledComputed);
+    });
   }
 
   // --- static helpers ---
@@ -268,32 +344,5 @@ export default class TagBar extends Widget {
       return tagData;
     }
     return $tag.parent().data('tag');
-  }
-
-  static renderTags($parent, tags, enabled, clickHandler, removeHandler) {
-    $parent.find('.tag-element').remove();
-    tags.forEach(tagText => {
-      TagBar.renderTag($parent, tagText, enabled, clickHandler, removeHandler);
-    }, this);
-  }
-
-  static renderTag($parent, tagText, enabled, clickHandler, removeHandler) {
-    let $element = $parent
-      .appendDiv('tag-element')
-      .data('tag', tagText);
-    let $tagText = $element.appendSpan('tag-text', tagText);
-    if (clickHandler) {
-      $tagText
-        .addClass('clickable')
-        .on('mousedown', clickHandler);
-    }
-    if (enabled) {
-      $element
-        .appendSpan('tag-remove-icon')
-        .on('click', removeHandler);
-    } else {
-      $element.addClass('disabled');
-    }
-    return $element;
   }
 }

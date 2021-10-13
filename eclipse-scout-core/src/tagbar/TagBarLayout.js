@@ -83,6 +83,7 @@ export default class TagBarLayout extends AbstractLayout {
     let hasTags = this.tagBar.tags && this.tagBar.tags.length > 0;
     let availableSize = htmlContainer.availableSize();
     let prefTagsWidth = 0;
+    let prefTagsHeight = 0;
 
     if (!hasTags) {
       return new Dimension(0, availableSize.height);
@@ -90,11 +91,13 @@ export default class TagBarLayout extends AbstractLayout {
 
     let $tagElements = $container.find('.tag-element');
     $tagElements.removeClass('hidden');
-    $tagElements.each(function() {
-      prefTagsWidth += graphics.size($(this), {
+    $tagElements.each((i, elem) => {
+      let size = graphics.size($(elem), {
         includeMargin: true
-      }).width;
+      });
+      prefTagsWidth += size.width;
+      prefTagsHeight = Math.max(size.height, prefTagsHeight);
     });
-    return new Dimension(prefTagsWidth, availableSize.height);
+    return new Dimension(prefTagsWidth, prefTagsHeight).add(htmlContainer.insets());
   }
 }
