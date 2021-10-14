@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.services.common.perf.internal;
 
 import java.beans.PropertyChangeListener;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
@@ -84,5 +86,15 @@ public class PerformanceAnalyzerService implements IPerformanceAnalyzerService {
   @Override
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     m_propertySupport.removePropertyChangeListener(propertyName, listener);
+  }
+
+  @Override
+  public List<PropertyChangeListener> getPropertyChangeListeners() {
+    return m_propertySupport.getPropertyChangeListeners();
+  }
+
+  @Override
+  public Map<String, List<PropertyChangeListener>> getSpecificPropertyChangeListeners() {
+    return m_propertySupport.getSpecificPropertyChangeListeners();
   }
 }

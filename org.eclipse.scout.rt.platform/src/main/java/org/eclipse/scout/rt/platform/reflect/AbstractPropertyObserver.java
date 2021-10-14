@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.reflect;
 
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,10 +39,12 @@ public abstract class AbstractPropertyObserver implements IPropertyObserver {
     propertySupport.removePropertyChangeListener(propertyName, listener);
   }
 
-  public ArrayList<PropertyChangeListener> getPropertyChangeListeners() {
+  @Override
+  public List<PropertyChangeListener> getPropertyChangeListeners() {
     return propertySupport.getPropertyChangeListeners();
   }
 
+  @Override
   public Map<String, List<PropertyChangeListener>> getSpecificPropertyChangeListeners() {
     return propertySupport.getSpecificPropertyChangeListeners();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 import static org.junit.Assert.*;
 
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.fixture.AddRemoveFieldsForm;
@@ -275,7 +275,7 @@ public class CompositeFieldAddRemoveMoveFieldTest extends AbstractLocalExtension
    * {@link AbstractCompositeField.P_FieldPropertyChangeListener} registered
    */
   protected void assertFieldPropertyChangeListener(AbstractFormField field) {
-    ArrayList<PropertyChangeListener> propertyChangeListeners = field.getPropertyChangeListeners();
+    List<PropertyChangeListener> propertyChangeListeners = field.getPropertyChangeListeners();
     int count = 0;
     for (PropertyChangeListener listener : propertyChangeListeners) {
       if (listener instanceof AbstractCompositeField.P_FieldPropertyChangeListener) {
