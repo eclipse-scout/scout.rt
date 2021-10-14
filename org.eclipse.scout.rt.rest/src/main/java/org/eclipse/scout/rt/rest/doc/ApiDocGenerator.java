@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,9 @@ package org.eclipse.scout.rt.rest.doc;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.chrono.IsoChronology;
@@ -20,6 +23,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -118,13 +122,7 @@ public class ApiDocGenerator {
   protected static final String TEXT_LINE_SEPARATOR = "\n";
 
   public List<ResourceDescriptor> getResourceDescriptors() {
-    return BEANS.all(IRestResource.class).stream()
-        .filter(this::acceptRestResource)
-        .sorted(Comparator.comparing(res -> res.getClass().getSimpleName()))
-        .sorted(Comparator.comparing(res -> "/" + getPath(res)))
-        .map(this::toResourceDescriptor)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
+    return getResourceDescriptorsInternal(BEANS.all(IRestResource.class));
   }
 
   /**
@@ -143,6 +141,22 @@ public class ApiDocGenerator {
           .collect(Collectors.toList());
     }
     return descriptors;
+  }
+
+  public List<ResourceDescriptor> getResourceDescriptors(Collection<Class<? extends IRestResource>> restResourceClass) {
+    return getResourceDescriptorsInternal(restResourceClass.stream()
+        .map(BEANS::get)
+        .collect(Collectors.toList()));
+  }
+
+  protected List<ResourceDescriptor> getResourceDescriptorsInternal(Collection<IRestResource> restResources) {
+    return restResources.stream()
+        .filter(this::acceptRestResource)
+        .sorted(Comparator.comparing(res -> res.getClass().getSimpleName()))
+        .sorted(Comparator.comparing(res -> "/" + getPath(res)))
+        .map(this::toResourceDescriptor)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
   }
 
   protected ResourceDescriptor toResourceDescriptor(IRestResource resource) {
@@ -183,7 +197,7 @@ public class ApiDocGenerator {
     }
 
     String path = getPath(m);
-    String signature = generateMethodSignature(m);
+    MethodSignatureDescriptor methodSignature = generateMethodSignature(m);
     DescriptionDescriptor description = generateMethodDescription(m);
     String produces = getProduces(m);
     String consumes = getConsumes(m);
@@ -192,7 +206,7 @@ public class ApiDocGenerator {
         .withMethod(m)
         .withHttpMethod(httpMethod)
         .withPath(path)
-        .withSignature(signature)
+        .withSignature(methodSignature)
         .withDescription(description)
         .withConsumes(consumes)
         .withProduces(produces);
@@ -317,29 +331,35 @@ public class ApiDocGenerator {
     return ObjectUtility.nvl(toDescriptionDescriptor(res.getClass().getAnnotation(ApiDocDescription.class)), DescriptionDescriptor.NONE);
   }
 
-  protected String generateMethodSignature(Method m) {
-    String args = Arrays.stream(m.getParameters())
-        .map(param -> {
-          String paramName = param.getName();
-          if (param.isAnnotationPresent(PathParam.class)) {
-            paramName = param.getAnnotation(PathParam.class).value();
-          }
-          else if (param.isAnnotationPresent(QueryParam.class)) {
-            paramName = param.getAnnotation(QueryParam.class).value();
-          }
-          else if (param.isAnnotationPresent(ApiDocParam.class)) {
-            paramName = param.getAnnotation(ApiDocParam.class).value();
-          }
-          return param.getType().getSimpleName() + " " + paramName;
-        })
-        .collect(Collectors.joining(", "));
-    String ex = "";
-    if (m.getExceptionTypes().length > 0) {
-      ex = " throws " + Arrays.stream(m.getExceptionTypes())
-          .map(Class::getSimpleName)
-          .collect(Collectors.joining(", "));
+  protected MethodSignatureDescriptor generateMethodSignature(Method m) {
+    return new MethodSignatureDescriptor()
+        .withMethod(m)
+        .withReturnType(TypeDescriptor.of(m.getGenericReturnType()))
+        .withParameterTypes(Arrays.stream(m.getParameters())
+            .map(this::toParameterTypeDescriptor)
+            .sorted(Comparator.comparing(ParameterTypeDescriptor::getName))
+            .collect(Collectors.toList()))
+        .withExceptionTypes(Arrays.stream(m.getGenericExceptionTypes())
+            .map(TypeDescriptor::of)
+            .sorted(Comparator.comparing(typeDescriptor -> typeDescriptor.getTypeClass().getSimpleName()))
+            .collect(Collectors.toList()));
+  }
+
+  protected ParameterTypeDescriptor toParameterTypeDescriptor(Parameter param) {
+    String paramName = param.getName();
+    if (param.isAnnotationPresent(PathParam.class)) {
+      paramName = param.getAnnotation(PathParam.class).value();
     }
-    return m.getReturnType().getSimpleName() + " " + m.getName() + "(" + args + ")" + ex;
+    else if (param.isAnnotationPresent(QueryParam.class)) {
+      paramName = param.getAnnotation(QueryParam.class).value();
+    }
+    else if (param.isAnnotationPresent(ApiDocParam.class)) {
+      paramName = param.getAnnotation(ApiDocParam.class).value();
+    }
+    return new ParameterTypeDescriptor()
+        .withType(param.getParameterizedType())
+        .withName(paramName)
+        .withParameter(param);
   }
 
   protected DescriptionDescriptor generateMethodDescription(Method m) {
@@ -479,7 +499,7 @@ public class ApiDocGenerator {
               .cssClass("header"),
           HTML.div(
               HTML.div(HTML.raw(m.getDescription().toHtml())).cssClass("description"),
-              HTML.div(m.getSignature()).cssClass("signature"),
+              HTML.div(m.getSignature().toString()).cssClass("signature"),
               HTML.div(
                   StringUtility.hasText(m.getConsumes()) ? HTML.div(HTML.span("Consumes ").cssClass("k"), HTML.span(m.getConsumes()).cssClass("v")).cssClass("line") : null,
                   StringUtility.hasText(m.getProduces()) ? HTML.div(HTML.span("Produces ").cssClass("k"), HTML.span(m.getProduces()).cssClass("v")).cssClass("line") : null)
@@ -693,7 +713,7 @@ public class ApiDocGenerator {
                 .put("path", StringUtility.join("/", r.getPath(), m.getPath()))
                 .put("scopes", CollectionUtility.format(r.getScopes()))
                 .put("description", m.getDescription().toPlainText(false))
-                .put("signature", m.getSignature())
+                .put("signature", m.getSignature().toString())
                 .putIf("consumes", m.getConsumes(), Objects::nonNull)
                 .putIf("produces", m.getProduces(), Objects::nonNull)
                 .build()))
@@ -794,7 +814,7 @@ public class ApiDocGenerator {
     private String m_httpMethod;
     private String m_path;
 
-    private String m_signature;
+    private MethodSignatureDescriptor m_signature;
     private DescriptionDescriptor m_description;
 
     private String m_consumes;
@@ -827,11 +847,11 @@ public class ApiDocGenerator {
       return this;
     }
 
-    public String getSignature() {
+    public MethodSignatureDescriptor getSignature() {
       return m_signature;
     }
 
-    public MethodDescriptor withSignature(String signature) {
+    public MethodDescriptor withSignature(MethodSignatureDescriptor signature) {
       m_signature = signature;
       return this;
     }
@@ -860,6 +880,169 @@ public class ApiDocGenerator {
 
     public MethodDescriptor withProduces(String produces) {
       m_produces = produces;
+      return this;
+    }
+  }
+
+  public static class MethodSignatureDescriptor implements Comparable<MethodSignatureDescriptor> {
+
+    private Method m_method;
+
+    private TypeDescriptor m_returnType;
+    private List<ParameterTypeDescriptor> m_parameterTypes;
+    private List<TypeDescriptor> m_exceptionTypes;
+
+    public Method getMethod() {
+      return m_method;
+    }
+
+    public MethodSignatureDescriptor withMethod(Method method) {
+      m_method = method;
+      return this;
+    }
+
+    public TypeDescriptor getReturnType() {
+      return m_returnType;
+    }
+
+    public MethodSignatureDescriptor withReturnType(TypeDescriptor returnType) {
+      m_returnType = returnType;
+      return this;
+    }
+
+    public List<ParameterTypeDescriptor> getParameterTypes() {
+      return m_parameterTypes;
+    }
+
+    public MethodSignatureDescriptor withParameterTypes(List<ParameterTypeDescriptor> parameterTypes) {
+      m_parameterTypes = parameterTypes;
+      return this;
+    }
+
+    public List<TypeDescriptor> getExceptionTypes() {
+      return m_exceptionTypes;
+    }
+
+    public MethodSignatureDescriptor withExceptionTypes(List<TypeDescriptor> exceptionTypes) {
+      m_exceptionTypes = exceptionTypes;
+      return this;
+    }
+
+    @Override
+    public String toString() {
+      String args = m_parameterTypes.stream()
+          .map(type -> type.getTypeClass().getSimpleName() + " " + type.getName())
+          .collect(Collectors.joining(", "));
+      String ex = "";
+      if (m_exceptionTypes != null && m_exceptionTypes.size() > 0) {
+        ex = " throws " + m_exceptionTypes.stream()
+            .map(TypeDescriptor::getTypeClass)
+            .map(Class::getSimpleName)
+            .collect(Collectors.joining(", "));
+      }
+      return m_returnType.getClass().getSimpleName() + " " + m_method.getName() + "(" + args + ")" + ex;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      MethodSignatureDescriptor that = (MethodSignatureDescriptor) o;
+      return Objects.equals(toString(), that.toString());
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(toString());
+    }
+
+    @Override
+    public int compareTo(MethodSignatureDescriptor o) {
+      if (o == this) {
+        return 0;
+      }
+      if (o == null) {
+        return 1;
+      }
+      return this.toString().compareTo(o.toString());
+    }
+  }
+
+  public static class TypeDescriptor {
+
+    public static TypeDescriptor of(Type type) {
+      return new TypeDescriptor()
+          .withType(type);
+    }
+
+    private Class<?> m_class;
+    private List<Class<?>> m_genericClasses;
+
+    public Class<?> getTypeClass() {
+      return m_class;
+    }
+
+    public List<Class<?>> getGenericClasses() {
+      return m_genericClasses;
+    }
+
+    public TypeDescriptor withType(Type type) {
+      if (type instanceof Class<?>) {
+        m_class = (Class<?>) type;
+      }
+      else if (type instanceof ParameterizedType) {
+        ParameterizedType parameterizedType = (ParameterizedType) type;
+        Type[] generics = parameterizedType.getActualTypeArguments();
+        Class<?> rawClass = (Class<?>) parameterizedType.getRawType();
+        m_class = rawClass;
+        m_genericClasses = Arrays.stream(generics)
+            .map(genericType -> {
+              if (genericType instanceof Class<?>) {
+                return (Class<?>) genericType;
+              }
+              // fallback for unknown generic types (like java.lang.reflect.WildcardType)
+              return Object.class;
+            })
+            .collect(Collectors.toList());
+      }
+      else {
+        throw new UnsupportedOperationException("Unsupported type " + type);
+      }
+      return this;
+    }
+  }
+
+  public static class ParameterTypeDescriptor extends TypeDescriptor {
+
+    private Parameter m_parameter;
+
+    private String m_name;
+
+    @Override
+    public ParameterTypeDescriptor withType(Type type) {
+      super.withType(type);
+      return this;
+    }
+
+    public Parameter getParameter() {
+      return m_parameter;
+    }
+
+    public ParameterTypeDescriptor withParameter(Parameter parameter) {
+      m_parameter = parameter;
+      return this;
+    }
+
+    public String getName() {
+      return m_name;
+    }
+
+    public ParameterTypeDescriptor withName(String name) {
+      m_name = name;
       return this;
     }
   }
