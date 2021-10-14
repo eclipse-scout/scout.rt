@@ -281,6 +281,11 @@ export default class Tooltip extends Widget {
       left -= overlapX;
       arrowPosition = x - left;
     }
+    // Move tooltip to the right if it overlaps the left edge
+    if (left < this.windowPaddingX) {
+      left = this.windowPaddingX;
+      arrowPosition = x - this.windowPaddingX;
+    }
 
     // Move tooltip to the bottom, arrow on top
     this.$arrow.removeClass('arrow-top arrow-bottom');
