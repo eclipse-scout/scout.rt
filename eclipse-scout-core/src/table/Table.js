@@ -4688,15 +4688,6 @@ export default class Table extends Widget {
     }
 
     this.$container.setTabbable(enabled);
-
-    if (this._isDataRendered()) {
-      // Enable/disable all checkboxes
-      this.$rows().each(function() {
-        let $row = $(this),
-          row = $row.data('row');
-        $row.find('input').setEnabled(enabled && row.enabled);
-      });
-    }
   }
 
   /**

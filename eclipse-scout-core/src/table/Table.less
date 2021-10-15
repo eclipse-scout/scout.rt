@@ -337,34 +337,17 @@
   }
 
   & > .check-box {
-    #scout.checkbox();
 
-    &::before {
-      #scout.checkbox-before();
-    }
-
-    &.checked::before {
-      #scout.checkbox-before-checked();
-    }
-
-    &.undefined::before {
-      /* tri-state */
-      #scout.checkbox-before-undefined();
-    }
-
-    &.disabled,
     .table.disabled > .table-data > .table-row > & {
       #scout.checkbox-disabled();
 
-      &::before {
-        #scout.checkbox-before-disabled();
+      &.checked {
+        #scout.checkbox-checked-disabled();
       }
-    }
 
-    &.disabled.undefined::before,
-    .table.disabled > .table-data > .table-row > &.undefined::before {
-      /* tri-state */
-      #scout.checkbox-before-undefined-disabled();
+      &.undefined {
+        #scout.checkbox-undefined-disabled();
+      }
     }
   }
 

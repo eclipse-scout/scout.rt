@@ -131,48 +131,52 @@
   width: @tree-node-checkbox-size;
   height: @tree-node-checkbox-size;
 
-  & .check-box {
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
-    font-size: @font-size-normal;
-    #scout.checkbox();
+  & > .check-box {
+    &:not(.checked).children-checked {
+      #scout.checkbox-undefined();
 
-    &.disabled,
-    .tree.disabled > .tree-data > .tree-node > &,
-    .tree.disabled > .tree-data > .animation-wrapper > .tree-node > & {
-
-      cursor: default;
+      // Check box gets disabled class if a single node is disabled
+      &.disabled {
+        #scout.checkbox-disabled();
+        #scout.checkbox-undefined-disabled();
+      }
     }
 
-    &::before {
-      #scout.checkbox-before();
-    }
-
-    &.checked::before {
-      #scout.checkbox-before-checked();
-    }
-
-    &.disabled,
+    // If the tree or a parent widget is disabled, the check box doesn't get the disabled class
     .tree.disabled > .tree-data > .tree-node > &,
     .tree.disabled > .tree-data > .animation-wrapper > .tree-node > & {
       #scout.checkbox-disabled();
 
+      &.checked {
+        #scout.checkbox-checked-disabled();
+      }
+
+      &:not(.checked).children-checked {
+        #scout.checkbox-undefined-disabled();
+      }
+    }
+  }
+}
+
+// The class can be added if the parent node should not visualize that a child node is checked.
+// Currently, there is no official property on the tree for this case because it is rarely used.
+// .tree is necessary to be more specific than rule above
+.tree.no-children-checked-style {
+  & > .tree-data > .tree-node,
+  & > .tree-data > .animation-wrapper > .tree-node {
+    & > .tree-node-checkbox > :not(.checked).children-checked {
+      background-color: inherit;
+      border-color: @check-box-border-color;
+
+      .disabled&,
+      &.disabled {
+        background-color: inherit;
+        border-color: @check-box-disabled-border-color;
+      }
+
       &::before {
-        #scout.checkbox-before-disabled();
+        display: none;
       }
-
-      :hover::before {
-        #scout.checkbox-before-disabled();
-      }
-    }
-
-    &:not(.checked).children-checked::after {
-      #scout.checkbox-after-children-checked();
-    }
-
-    &.disabled:not(.checked).children-checked::after {
-      #scout.checkbox-after-children-checked-disabled();
     }
   }
 }

@@ -9,22 +9,24 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .check-box-field > .field {
-  padding: 6px 0;
+  padding: @check-box-field-padding-y 0;
   outline: none;
   display: flex;
 
-  & > .check-box,
   & > .label {
     color: @control-color;
+  }
+
+  & > .check-box,
+  & > .label {
     cursor: pointer;
-    vertical-align: middle;
   }
 
   /* only the label should be clickable, not the whole field */
 
   & > .label {
     padding-top: @check-box-field-label-padding-top;
-    padding-left: 7px;
+    padding-left: @check-box-field-label-padding-left;
     max-width: calc(~'100% - ' @check-box-size);
     #scout.overflow-ellipsis();
 
@@ -52,38 +54,6 @@
 
   & > .check-box {
     flex: none; /* never shrink check-box */
-    #scout.checkbox();
-
-    &:focus {
-      outline: none;
-      border-color: @focus-border-color;
-    }
-
-    &::before {
-      #scout.checkbox-before();
-    }
-
-    &.checked::before {
-      #scout.checkbox-before-checked();
-    }
-
-    &.undefined::before {
-      /* tri-state */
-      #scout.checkbox-before-undefined();
-    }
-
-    &.disabled {
-      #scout.checkbox-disabled();
-
-      &::before {
-        #scout.checkbox-before-disabled();
-      }
-
-      &.undefined::before {
-        /* tri-state */
-        #scout.checkbox-before-undefined-disabled();
-      }
-    }
   }
 
   /* Same spacings as defined in CellEditorPopup.less, but as margin, not as padding */
@@ -95,6 +65,11 @@
 
     &.last {
       margin-right: @table-cell-padding-right-last !important;
+    }
+
+    &:focus {
+      border-width: 1px;
+      #scout.focus-border();
     }
   }
 
@@ -129,9 +104,9 @@
 }
 
 .checkbox-indentation {
-  margin-left: @check-box-size + 7px; // 7px = label padding left (see above)
+  margin-left: @check-box-size + @check-box-field-label-padding-left;
 
   .radiobutton-group-body > & {
-    margin-left: @check-box-size + 7px - @mandatory-indicator-width;
+    margin-left: @check-box-size + @check-box-field-label-padding-left - @mandatory-indicator-width;
   }
 }

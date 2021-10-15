@@ -938,18 +938,6 @@ export default class Tree extends Widget {
     let enabled = this.enabledComputed;
     this.$data.setEnabled(enabled);
     this.$container.setTabbable(enabled);
-
-    if (this.rendered) {
-      // Enable/disable all checkboxes
-      this.$nodes().each(function() {
-        let $node = $(this),
-          node = $node.data('node');
-
-        $node.children('.tree-node-checkbox')
-          .children('.check-box')
-          .toggleClass('disabled', !(enabled && node.enabled));
-      });
-    }
   }
 
   /**

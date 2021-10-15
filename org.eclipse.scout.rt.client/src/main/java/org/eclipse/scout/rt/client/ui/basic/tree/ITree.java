@@ -66,6 +66,11 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   String PROP_CONTEXT_MENU = "contextMenu";
 
   /**
+   * Add this class to a tree if the parent node should not visualize that a child node is checked.
+   */
+  String CLS_NO_CHILDREN_CHECKED_STYLE = "no-children-checked-style";
+
+  /**
    * @since 5.1.0
    */
   AbstractEventBuffer<TreeEvent> createEventBuffer();

@@ -119,7 +119,7 @@
 @icon-light-hover-color: @palette-gray-10;
 @item-selection-background-color: @palette-blue-0;
 @item-selection-background-mix-blend-mode: multiply;
-@item-selection-border-color: @palette-blue-6;
+@item-selection-border-color: @selected-background-color;
 @item-selection-disabled-background-color: @palette-gray-4;
 @item-selection-disabled-border-color: @palette-gray-6;
 @item-selection-nonfocus-background-color: @palette-gray-2;
@@ -182,9 +182,12 @@
 @calendar-weekend-out-color: @palette-blue-2;
 @carousel-status-item-color: @palette-gray-5;
 @carousel-current-item-color: @palette-black;
-@check-box-border-color: @border-color;
-@check-box-disabled-color: @disabled-color;
-@check-box-checked-color: @palette-blue-6;
+@check-box-border-color: @palette-gray-7;
+@check-box-checked-color: @selected-color;
+@check-box-checked-background-color: @selected-background-color;
+@check-box-checked-border-color: @check-box-checked-background-color;
+@check-box-checked-disabled-background-color: @disabled-color;
+@check-box-disabled-border-color: @disabled-color;
 @closer-action-color: @palette-gray-7;
 @closer-color: @icon-light-color;
 @closer-hover-color: @icon-light-hover-color;
@@ -302,9 +305,9 @@
 @outline-group-background-color: @palette-blue-0;
 @outline-in-background-selection-background-color: @outline-selection-background-color;
 @outline-in-background-selection-color: @outline-selection-color;
-@outline-selection-background-color: @palette-blue-5;
-@outline-selection-color: @palette-white;
-@outline-title-color: @palette-blue-6;
+@outline-selection-background-color: @selected-background-color;
+@outline-selection-color: @selected-color;
+@outline-title-color: @outline-selection-background-color;
 @outline-title-border-color: @border-color;
 @outline-node-control-color: @outline-node-font-icon-color;
 @outline-node-font-icon-color: @icon-light-color;

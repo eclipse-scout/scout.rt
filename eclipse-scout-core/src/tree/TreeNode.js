@@ -263,7 +263,7 @@ export default class TreeNode {
     let $checkbox = $checkboxContainer
       .appendDiv('check-box')
       .toggleClass('checked', this.checked)
-      .toggleClass('disabled', !(this.getTree().enabled && this.enabled));
+      .toggleClass('disabled', !this.enabled);
     $checkbox.toggleClass('children-checked', !!this.childrenChecked);
   }
 
@@ -287,7 +287,7 @@ export default class TreeNode {
     $node
       .children('.tree-node-checkbox')
       .children('.check-box')
-      .toggleClass('disabled', !(tree.enabled && this.enabled));
+      .toggleClass('disabled', !this.enabled);
 
     if (!this.parentNode && tree.selectedNodes.length === 0 || // root nodes have class child-of-selected if no node is selected
       tree._isChildOfSelectedNodes(this)) {

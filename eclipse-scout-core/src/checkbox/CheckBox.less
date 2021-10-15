@@ -1,0 +1,95 @@
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+.check-box {
+  #scout.checkbox();
+
+  &:focus {
+    #scout.focus-border();
+  }
+
+  &.checked {
+    #scout.checkbox-checked();
+  }
+
+  &.undefined {
+    #scout.checkbox-undefined();
+  }
+
+  &.disabled {
+    #scout.checkbox-disabled();
+
+    &.checked {
+      #scout.checkbox-checked-disabled();
+    }
+
+    &.undefined {
+      #scout.checkbox-undefined-disabled();
+    }
+  }
+}
+
+#scout {
+
+  .checkbox() {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    width: @check-box-size;
+    height: @check-box-size;
+    border: @check-box-border-width solid @check-box-border-color;
+    border-radius: @check-box-border-radius;
+    background-color: @control-background-color;
+  }
+
+  .checkbox-checked() {
+    background-color: @check-box-checked-background-color;
+    border-color: @check-box-checked-border-color;
+    color: @check-box-checked-color;
+
+    &::before {
+      position: absolute;
+      display: block;
+      line-height: @check-box-size;
+      width: @check-box-size - 2 * @check-box-border-width;
+      #scout.font-icon();
+      content: @icon-checked-bold;
+      font-size: 11px;
+    }
+  }
+
+  .checkbox-disabled() {
+    border-color: @check-box-disabled-border-color;
+  }
+
+  .checkbox-checked-disabled {
+    background-color: @check-box-checked-disabled-background-color;
+  }
+
+  .checkbox-undefined() {
+    background-color: @check-box-checked-background-color;
+    border-color: @check-box-checked-border-color;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: calc(50% - 1px);
+      left: calc(50% - 5px);
+      width: 10px;
+      border-radius: 1px;
+      height: 2px;
+      background-color: @check-box-checked-color;
+    }
+  }
+
+  .checkbox-undefined-disabled() {
+    background-color: @check-box-checked-disabled-background-color;
+  }
+}

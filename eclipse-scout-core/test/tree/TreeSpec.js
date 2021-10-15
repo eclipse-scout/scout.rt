@@ -2206,22 +2206,6 @@ describe('Tree', () => {
       node1 = tree.nodes[1];
       node2 = tree.nodes[2];
     });
-
-    it('disables checkboxes when tree is disabled', () => {
-      tree.render();
-
-      expect(node0.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).not.toHaveClass('disabled');
-      expect(node2.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');
-
-      tree.setEnabled(false);
-      expect(node0.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');
-      expect(node2.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');
-
-      // Re-enable tree
-      tree.setEnabled(true);
-      expect(node0.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).not.toHaveClass('disabled');
-      expect(node2.$node.children('.tree-node-checkbox').children('div').eq(0)[0]).toHaveClass('disabled');
-    });
   });
 
   describe('test visible list and map', () => {
