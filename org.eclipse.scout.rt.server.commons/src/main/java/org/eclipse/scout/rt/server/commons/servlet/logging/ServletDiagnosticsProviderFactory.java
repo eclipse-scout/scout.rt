@@ -33,7 +33,7 @@ public class ServletDiagnosticsProviderFactory {
     List<IDiagnosticContextValueProvider> providers = new ArrayList<>();
     providers.add(new HttpRequestMethodContextValueProvider(request.getMethod()));
     providers.add(new HttpRequestQueryStringContextValueProvider(request.getQueryString()));
-    providers.add(new HttpRequestUriContextValueProvider(request.getQueryString()));
+    providers.add(new HttpRequestUriContextValueProvider(request.getRequestURI()));
     providers.add(new HttpSessionIdContextValueProvider(getHttpSessionIdContextValue(request.getSession(false))));
     return providers;
   }
