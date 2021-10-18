@@ -35,6 +35,6 @@
   },
   "dependencies": {
     "@eclipse-scout/core": "10.0.0-snapshot",
-    "jquery": "3.4.1"
+    "jquery": "3.5.1"
   }
 }
