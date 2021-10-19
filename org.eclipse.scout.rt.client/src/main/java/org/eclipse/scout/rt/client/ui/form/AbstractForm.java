@@ -1685,7 +1685,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       IValidateContentDescriptor desc = f.validateContent();
       if (desc != null) {
         if (desc.getErrorStatus() != null) {
-          invalidTexts.add(desc.getDisplayText() + ": " + desc.getErrorStatus().getMessage());
+          invalidTexts.add(desc.getDisplayText());
         }
         else {
           mandatoryTexts.add(desc.getDisplayText());
@@ -1701,7 +1701,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
         LOG.info("there are fields with errors");
       }
       firstProblem.activateProblemLocation();
-      throw new VetoException().withHtmlMessage(createValidationMessageBoxHtml(invalidTexts, mandatoryTexts));
+      throw new VetoException().withTitle(TEXTS.get("FormValidationFailedTitle")).withHtmlMessage(createValidationMessageBoxHtml(invalidTexts, mandatoryTexts));
     }
     if (!interceptValidate()) {
       VetoException veto = new VetoException("Validate " + getClass().getSimpleName());
@@ -1719,17 +1719,19 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     List<CharSequence> content = new ArrayList<>();
 
     if (!mandatoryTexts.isEmpty()) {
-      content.add(HTML.bold(TEXTS.get("FormEmptyMandatoryFieldsMessage")));
+      content.add(HTML.div(TEXTS.get("FormEmptyMandatoryFieldsMessage")));
 
       List<IHtmlListElement> mandatoryTextElements = new ArrayList<>();
       for (String e : mandatoryTexts) {
         mandatoryTextElements.add(HTML.li(e));
       }
       content.add(HTML.ul(mandatoryTextElements));
-      content.add(HTML.br());
     }
     if (!invalidTexts.isEmpty()) {
-      content.add(HTML.bold(TEXTS.get("FormInvalidFieldsMessage")));
+      if (content.size() > 0) {
+        content.add(HTML.br());
+      }
+      content.add(HTML.div(TEXTS.get("FormInvalidFieldsMessage")));
 
       List<IHtmlListElement> invalidTextElements = new ArrayList<>();
       for (String e : invalidTexts) {

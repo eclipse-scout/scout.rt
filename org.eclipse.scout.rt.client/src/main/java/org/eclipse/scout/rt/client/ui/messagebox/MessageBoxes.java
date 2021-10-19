@@ -13,9 +13,13 @@ package org.eclipse.scout.rt.client.ui.messagebox;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.html.HTML;
+import org.eclipse.scout.rt.platform.html.IHtmlElement;
+import org.eclipse.scout.rt.platform.html.IHtmlListElement;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -168,10 +172,10 @@ public final class MessageBoxes {
     else {
       header = (hasItems ? TEXTS.get("DeleteConfirmationText") : TEXTS.get("DeleteConfirmationTextNoItemList"));
     }
-    return createYesNo().withHeader(header).withBody(createDeleteConfirmationMessageBody(items));
+    return createYesNo().withHeader(header).withHtml(createDeleteConfirmationMessageHtml(items));
   }
 
-  private static String createDeleteConfirmationMessageBody(Collection<?> items) {
+  private static IHtmlElement createDeleteConfirmationMessageHtml(Collection<?> items) {
     if (CollectionUtility.isEmpty(items)) {
       return null;
     }
@@ -179,13 +183,14 @@ public final class MessageBoxes {
     final int excessItemsMessageLines = 2;
     final int hiddenItemsCount = items.size() - maxVisibleItemsCount;
     final boolean showExcessItemsEntry = hiddenItemsCount > excessItemsMessageLines;
-    String body = items.stream()
+    List<IHtmlListElement> elements = items.stream()
         .limit(maxVisibleItemsCount + (showExcessItemsEntry ? 0 : excessItemsMessageLines))
-        .map(item -> "- " + StringUtility.emptyIfNull(item))
-        .collect(Collectors.joining("\n"));
+        .map(item -> HTML.li(StringUtility.emptyIfNull(item)))
+        .collect(Collectors.toList());
     if (showExcessItemsEntry) {
-      body += "\n...\n" + TEXTS.get("XAdditional", Integer.toString(hiddenItemsCount));
+      elements.add(HTML.li("...  "));
+      elements.add(HTML.li(TEXTS.get("XAdditional", Integer.toString(hiddenItemsCount))));
     }
-    return body + "\n";
+    return HTML.ul(elements);
   }
 }

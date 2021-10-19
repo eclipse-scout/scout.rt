@@ -206,7 +206,8 @@ export default class MessageBox extends Widget {
 
   _renderBody() {
     this.$body.html(strings.nl2br(this.body));
-    this.$body.setVisible(this.body);
+    this.$body.setVisible(!!this.body);
+    this.$content.toggleClass('has-body', !!this.body);
   }
 
   _renderHtml() {

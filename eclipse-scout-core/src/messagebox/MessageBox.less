@@ -131,6 +131,9 @@
   min-height: 30px;
   background-color: @messagebox-background-color;
   padding: @messagebox-label-padding 26px 17px 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   /* add a bit of extra space to the scrollbar on the right */
 
@@ -151,19 +154,6 @@
 
 .messagebox-label {
   word-wrap: break-word;
-  text-align: center;
-
-  &.messagebox-html {
-    padding-top: 10px;
-
-    & > ul {
-      display: flex;
-      text-align: left;
-      flex-direction: column;
-      flex-wrap: wrap;
-      align-content: center;
-    }
-  }
 }
 
 .copyable {
@@ -173,7 +163,8 @@
 .messagebox-header {
   font-size: @font-size-large;
   font-weight: @font-weight-bold;
-  padding-bottom: 16px;
+  padding-bottom: 14px;
+  text-align: center;
 
   &.has-text > .messagebox-icon {
     margin-right: 12px;
@@ -182,6 +173,48 @@
 
 .messagebox-body {
   color: @messagebox-body-color;
+}
+
+.messagebox-html {
+  .has-body > & {
+    padding-top: 10px;
+  }
+
+  // Ensure top and bottom gaps are always the same for every message box even if the content starts with an element having a margin (e.g. p, ul, etc)
+  // Small draw back: if there is a text node before a p element, the p element will lose its margin anyway.
+  // If that is not desired, the text node has to be wrapped into a regular html node (span, div, p etc.)
+  & > :first-child {
+    margin-top: 0;
+  }
+
+  & > :last-child {
+    margin-bottom: 0;
+  }
+
+  & > p {
+    margin: 8px 0;
+
+    & + ul {
+      // Reduce gap slightly if ul follows a p so that it looks the same as without a p
+      margin-top: -4px;
+    }
+  }
+
+  & > ul {
+    margin: 5px 0;
+  }
+
+  & > ul {
+    padding-left: 26px;
+
+    & > li {
+      margin-top: 3px;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+  }
 }
 
 .messagebox-buttons {

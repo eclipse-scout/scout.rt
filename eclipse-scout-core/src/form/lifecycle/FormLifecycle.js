@@ -15,6 +15,7 @@ export default class FormLifecycle extends Lifecycle {
   constructor() {
     super();
 
+    this.validationFailedTextKey = 'FormValidationFailedTitle';
     this.emptyMandatoryElementsTextKey = 'FormEmptyMandatoryFieldsMessage';
     this.invalidElementsTextKey = 'FormInvalidFieldsMessage';
     this.saveChangesQuestionTextKey = 'FormSaveChangesQuestion';

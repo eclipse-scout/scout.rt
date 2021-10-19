@@ -79,6 +79,9 @@ public class ErrorPopup {
   }
 
   protected String computeIconId() {
+    if (m_parsedError instanceof VetoException) {
+      return null;
+    }
     if (m_status != null && m_status.getSeverity() == IStatus.ERROR) {
       return AbstractIcons.Slippery;
     }

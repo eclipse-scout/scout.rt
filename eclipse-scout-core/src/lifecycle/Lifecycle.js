@@ -26,6 +26,9 @@ export default class Lifecycle {
 
   constructor() {
     this.widget = null;
+    this.validationFailedTextKey = null;
+    this.validationFailedText = null;
+
     this.emptyMandatoryElementsTextKey = null;
     this.emptyMandatoryElementsText = null;
 
@@ -48,6 +51,9 @@ export default class Lifecycle {
   init(model) {
     scout.assertParameter('widget', model.widget);
     $.extend(this, model);
+    if (objects.isNullOrUndefined(this.validationFailedText)) {
+      this.validationFailedText = this.session().text(this.validationFailedTextKey);
+    }
     if (objects.isNullOrUndefined(this.emptyMandatoryElementsText)) {
       this.emptyMandatoryElementsText = this.session().text(this.emptyMandatoryElementsTextKey);
     }
@@ -272,6 +278,7 @@ export default class Lifecycle {
   _showStatusMessageBox(status) {
     return MessageBoxes.createOk(this.widget)
       .withSeverity(status.severity)
+      .withHeader(this.validationFailedText)
       .withBody(status.message, true)
       .buildAndOpen()
       .then(() => {
@@ -361,7 +368,7 @@ export default class Lifecycle {
     // ----- Helper function -----
 
     function appendTitleAndList($div, title, elements, elementTextFunc) {
-      $div.appendElement('<strong>').text(title);
+      $div.appendDiv().text(title);
       let $ul = $div.appendElement('<ul>');
       elements.forEach(function(element) {
         $ul.appendElement('<li>').text(elementTextFunc.call(this, element));
