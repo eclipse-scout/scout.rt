@@ -230,7 +230,7 @@ describe('Calendar', function() {
 
     it('navigate forward and back (with first day of month selected)', function() {
       // empty parent div
-      var $div = $('<div/>');
+      var $div = $('<div></div>');
 
       // init model
       var model = helper.createSimpleModel();
@@ -264,7 +264,7 @@ describe('Calendar', function() {
 
     it('navigate forward and back (with last day of month selected)', function() {
       // empty parent div
-      var $div = $('<div/>');
+      var $div = $('<div></div>');
 
       // init model
       var model = helper.createSimpleModel();
