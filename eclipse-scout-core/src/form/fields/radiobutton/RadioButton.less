@@ -102,8 +102,14 @@
         border-color: @radio-button-disabled-border-color;
       }
 
-      &.checked::before {
-        background-color: @radio-button-disabled-color;
+      &.checked {
+        &::before {
+          background-color: @radio-button-checked-disabled-background-color;
+        }
+
+        &::after {
+          border-color: @radio-button-checked-disabled-background-color;
+        }
       }
     }
   }
