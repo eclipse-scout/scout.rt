@@ -1443,6 +1443,9 @@ export default class Session {
     // noinspection JSValidateTypes
     $loadingRoot.appendDiv('application-loading02').hide()
       .fadeIn();
+    // noinspection JSValidateTypes
+    $loadingRoot.appendDiv('application-loading03').hide()
+      .fadeIn();
   }
 
   _removeApplicationLoading() {
