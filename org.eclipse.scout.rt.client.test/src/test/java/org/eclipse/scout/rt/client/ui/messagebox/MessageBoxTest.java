@@ -62,7 +62,7 @@ public class MessageBoxTest {
   @Test
   public void testShowDeleteConfirmationMessageOneObject() {
     MessageBoxes.showDeleteConfirmationMessage("Alice");
-    assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n");
+    assertMessageBox(TEXTS.get("DeleteConfirmationText"), null, "<ul><li>Alice</li></ul>");
   }
 
   /**
@@ -72,7 +72,7 @@ public class MessageBoxTest {
   @Test
   public void testShowDeleteConfirmationMessageSingletonList() {
     MessageBoxes.showDeleteConfirmationMessage(Collections.singletonList("Alice"));
-    assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n");
+    assertMessageBox(TEXTS.get("DeleteConfirmationText"), null, "<ul><li>Alice</li></ul>");
   }
 
   /**
@@ -143,28 +143,26 @@ public class MessageBoxTest {
   @Test
   public void testShowDeleteConfirmationMessageArray() {
     MessageBoxes.showDeleteConfirmationMessage(new String[]{"Alice", "Bob", "Cleo"});
-    assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n- Bob\n- Cleo\n");
+    assertMessageBox(TEXTS.get("DeleteConfirmationText"), null, "<ul><li>Alice</li><li>Bob</li><li>Cleo</li></ul>");
   }
 
   /**
-   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an simple list. Bug 440433.
-   *
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a simple list. Bug 440433.
    */
   @Test
   public void testShowDeleteConfirmationMessageList() {
     MessageBoxes.showDeleteConfirmationMessage(Arrays.asList("Alice", "Bob", "Cleo"));
-    assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n- Bob\n- Cleo\n");
+    assertMessageBox(TEXTS.get("DeleteConfirmationText"), null, "<ul><li>Alice</li><li>Bob</li><li>Cleo</li></ul>");
   }
 
   /**
-   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with an simple list. Bug 440433.
-   *
+   * Test method for {@link MessageBoxes#showDeleteConfirmationMessage} with a simple list. Bug 440433.
    */
   @Test
   public void testShowDeleteConfirmationMessageListAsObject() {
     Object o = Arrays.asList("Alice", "Bob", "Cleo");
     MessageBoxes.showDeleteConfirmationMessage(o);
-    assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n- Bob\n- Cleo\n");
+    assertMessageBox(TEXTS.get("DeleteConfirmationText"), null, "<ul><li>Alice</li><li>Bob</li><li>Cleo</li></ul>");
   }
 
   /**
@@ -174,7 +172,7 @@ public class MessageBoxTest {
   @Test
   public void testShowDeleteConfirmationMessageArrayTextX() {
     MessageBoxes.showDeleteConfirmationMessage("Person", new String[]{"Alice", null, "Cleo"});
-    assertMessageBox(TEXTS.get("DeleteConfirmationTextX", "Person"), "- Alice\n- \n- Cleo\n");
+    assertMessageBox(TEXTS.get("DeleteConfirmationTextX", "Person"), null, "<ul><li>Alice</li><li></li><li>Cleo</li></ul>");
   }
 
   /**
@@ -184,7 +182,7 @@ public class MessageBoxTest {
   @Test
   public void testShowDeleteConfirmationMessageListTextX() {
     MessageBoxes.showDeleteConfirmationMessage("Person", Arrays.asList("Alice", null, "Cleo"));
-    assertMessageBox(TEXTS.get("DeleteConfirmationTextX", "Person"), "- Alice\n- \n- Cleo\n");
+    assertMessageBox(TEXTS.get("DeleteConfirmationTextX", "Person"), null, "<ul><li>Alice</li><li></li><li>Cleo</li></ul>");
   }
 
   /**
@@ -194,7 +192,8 @@ public class MessageBoxTest {
   @Test
   public void testShowDeleteConfirmationMessageBigArray() {
     MessageBoxes.showDeleteConfirmationMessage(new String[]{"Alice", "Bob", "Cleo", "Dominic", "Emma", "Fiona", "George", "Heidi", "Ingrid", "James", "Kyla", "Louis", "Maria"});
-    assertMessageBox(TEXTS.get("DeleteConfirmationText"), "- Alice\n- Bob\n- Cleo\n- Dominic\n- Emma\n- Fiona\n- George\n- Heidi\n- Ingrid\n- James\n...\n3 more\n");
+    assertMessageBox(TEXTS.get("DeleteConfirmationText"), null,
+        "<ul><li>Alice</li><li>Bob</li><li>Cleo</li><li>Dominic</li><li>Emma</li><li>Fiona</li><li>George</li><li>Heidi</li><li>Ingrid</li><li>James</li><li>...  </li><li>3 more</li></ul>");
   }
 
   /**
@@ -204,7 +203,7 @@ public class MessageBoxTest {
   @Test
   public void testShowDeleteConfirmationMessageBigList() {
     MessageBoxes.showDeleteConfirmationMessage("Numbers", Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12));
-    assertMessageBox(TEXTS.get("DeleteConfirmationTextX", "Numbers"), "- 1\n- 2\n- 3\n- 4\n- 5\n- 6\n- 7\n- 8\n- 9\n- 10\n- 11\n- 12\n");
+    assertMessageBox(TEXTS.get("DeleteConfirmationTextX", "Numbers"), null, "<ul><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>10</li><li>11</li><li>12</li></ul>");
   }
 
   @Test

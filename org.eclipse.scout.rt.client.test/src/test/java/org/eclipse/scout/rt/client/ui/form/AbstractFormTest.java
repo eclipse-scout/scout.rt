@@ -11,11 +11,11 @@
 package org.eclipse.scout.rt.client.ui.form;
 
 import static org.junit.Assert.*;
+
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormTest.WrapperTestFormWithClassId.MainBox.EmbeddedField;
-import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
@@ -106,25 +106,6 @@ public class AbstractFormTest {
   }
 
   /**
-   * Tests that the text of the error status is used instead of the display text of the {@link IValidateContentDescriptor}.
-   */
-  @Test
-  public void testValidForm_ErrorStatus() {
-    String errorMessage = "";
-    try {
-      TestForm form = new TestForm();
-      form.getMainBox().addErrorStatus(new Status("ErrorMessage"));
-      form.validateForm();
-    }
-    catch (VetoException ve) {
-      errorMessage = ve.getDisplayMessage();
-    }
-
-    final String expectedTextPart = "Main Box: ErrorMessage";
-    assertTrue("expected errorMessage contains: '" + expectedTextPart + "', but was '" + errorMessage + "'", errorMessage.contains(expectedTextPart));
-  }
-
-  /**
    * Tests the html veto exception error message creation
    */
   @Test
@@ -133,9 +114,9 @@ public class AbstractFormTest {
     String htmlErrorMessage = "";
 
     String expectedErrorMessage = HTML.fragment(
-        HTML.bold(TEXTS.get("FormEmptyMandatoryFieldsMessage")),
-        HTML.ul(HTML.li(form.getStringField().getFullyQualifiedLabel(": "))),
-        HTML.br()).toHtml();
+        HTML.div(TEXTS.get("FormEmptyMandatoryFieldsMessage")),
+        HTML.ul(HTML.li(form.getStringField().getFullyQualifiedLabel(": "))))
+        .toHtml();
 
     try {
       form.validateForm();
