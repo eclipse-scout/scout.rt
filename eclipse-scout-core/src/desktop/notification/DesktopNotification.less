@@ -192,6 +192,11 @@
 
 .desktop-notification-message {
   #scout.overflow-ellipsis();
+
+  .desktop-notification.loading > .desktop-notification-content.offline-message > &.offline-message-text {
+    #scout.font-text-normal();
+    color: @text-color;
+  }
 }
 
 .desktop-notification-loader {

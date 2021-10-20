@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,17 +22,23 @@ export default class OfflineDesktopNotification extends DesktopNotification {
     super._init(model);
     this.closable = false;
     this.duration = DesktopNotification.INFINITE;
-    this.status = new Status({
+
+    this.connectionInterruptedStatus = new Status({
       message: this.session.text('ui.ConnectionInterrupted'),
       severity: Status.Severity.ERROR
     });
+    this.reconnectingStatus = new Status({
+      message: this.session.text('ui.Reconnecting_'),
+      severity: Status.Severity.ERROR
+    });
+
+    this._setStatus(this.connectionInterruptedStatus);
   }
 
   _render() {
     super._render();
     this.$content.addClass('offline-message');
     this.$messageText.addClass('offline-message-text');
-    this.$loader.text(this.session.text('ui.Reconnecting_'));
   }
 
   reconnect() {
@@ -40,7 +46,7 @@ export default class OfflineDesktopNotification extends DesktopNotification {
     if (this.connectFailedReset) {
       clearTimeout(this.connectFailedReset);
     }
-    this.$messageText.hide();
+    this.setStatus(this.reconnectingStatus);
   }
 
   reconnectFailed() {
@@ -48,7 +54,7 @@ export default class OfflineDesktopNotification extends DesktopNotification {
     this.connectFailedReset = setTimeout(() => {
       this.connectFailedReset = null;
       this.setLoading(false);
-      this.$messageText.show();
+      this.setStatus(this.connectionInterruptedStatus);
     }, 1100 /* this delay must be < Reconnector.interval */);
   }
 
@@ -61,6 +67,5 @@ export default class OfflineDesktopNotification extends DesktopNotification {
       message: this.session.text('ui.ConnectionReestablished'),
       severity: Status.Severity.OK
     });
-    this.$messageText.show();
   }
 }
