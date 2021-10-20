@@ -8,6 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-.mode-selector-field > .mode-selector {
-  margin-left: @mandatory-indicator-width;
+.mode-selector-field {
+  &.alternative > label.top {
+    padding-bottom: @top-label-border-padding-bottom;
+  }
+
+  & > .mode-selector {
+    margin-left: @mandatory-indicator-width;
+  }
 }
