@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,7 @@ public class JsonResponse {
   public static final int ERR_SESSION_TIMEOUT = 10;
   public static final int ERR_UI_PROCESSING = 20;
   public static final int ERR_UNSAFE_UPLOAD = 30;
+  public static final int ERR_REJECTED_UPLOAD = 31;
   public static final int ERR_VERSION_MISMATCH = 40;
 
   public static final String PROP_SEQUENCE_NO = "#";
