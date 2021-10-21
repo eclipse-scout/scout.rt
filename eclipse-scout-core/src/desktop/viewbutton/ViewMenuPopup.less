@@ -16,7 +16,7 @@
   overflow: hidden;
 
   & > .tile-grid.scrollable {
-    padding: 24px;
+    padding: 10px;
   }
 
   & > .tile-grid.no-icons > .view-menu-tile {
@@ -28,51 +28,46 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  align-items: center;
   text-align: center;
   color: @link-color;
   background-color: @view-menu-tile-background-color;
   border-radius: 12px;
   border: 2px solid transparent;
-  padding: 16px 10px;
+  padding: 12px 6px 0 6px;
+  min-height: 110px;
   cursor: pointer;
-  min-height: 130px;
-
-  &.text-only {
-    justify-content: center;
-  }
 
   & > .icon {
     font-size: @font-size-icon-large;
-    padding-top: 16px;
-    padding-bottom: 18px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
   }
 
   & > .label {
-    font-weight: bold;
+    font-weight: @font-weight-bold;
     #scout.overflow-ellipsis();
+    font-size: @font-size-small;
+  }
+
+  &.text-only {
+    justify-content: center;
+    padding: 12px 8px;
+
+    & > .label {
+      font-size: @font-size-normal;
+    }
   }
 
   &.selected {
-
-    &::before {
-      content: '';
-      border: 2px solid @view-menu-tile-selected-border-color;
-      width: calc(100% + 12px);
-      height: calc(100% + 12px);
-      position: absolute;
-      top: -6px;
-      left: -6px;
-      border-radius: 15px;
-    }
+    border-color: @view-menu-tile-selected-border-color;
   }
 
   &:hover {
     background-color: @view-menu-tile-hover-background-color;
-  }
-
-  &.checked {
-    color: @selected-color;
-    background-color: @selected-background-color;
   }
 
   &.disabled {
@@ -81,11 +76,6 @@
 
     &:hover {
       background-color: @view-menu-tile-background-color;
-    }
-
-    &.checked {
-      background-color: @selected-background-color;
-      color: @disabled-inverted-color;
     }
   }
 }

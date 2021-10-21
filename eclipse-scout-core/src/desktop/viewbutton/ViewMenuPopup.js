@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, Tile, ViewMenuPopupEnterKeyStroke, WidgetPopup} from '../../index';
+import {Tile, ViewMenuPopupEnterKeyStroke, WidgetPopup} from '../../index';
 
 /**
  * Popup menu to switch between outlines.
@@ -33,18 +33,28 @@ export default class ViewMenuPopup extends WidgetPopup {
       cssClass: noIcons ? 'no-icons' : '',
       selectable: true,
       multiSelect: false,
-      gridColumnCount: tiles.length > 4 ? 3 : 2,
+      gridColumnCount: this._computeGridColumnCount(tiles),
       layoutConfig: {
-        columnWidth: 120,
-        rowHeight: 130,
-        vgap: 18,
-        hgap: 18
+        columnWidth: 100,
+        rowHeight: -1,
+        vgap: 10,
+        hgap: 10
       }
     });
     let tile = this.widget.tiles.find(tile => tile.viewMenu.selected);
     if (tile) {
       this.widget.selectTile(tile);
     }
+  }
+
+  _computeGridColumnCount(tiles) {
+    if (tiles.length > 8) {
+      return 4;
+    }
+    if (tiles.length > 4) {
+      return 3;
+    }
+    return 2;
   }
 
   _createTiles() {
@@ -63,7 +73,8 @@ export default class ViewMenuPopup extends WidgetPopup {
         {
           objectType: 'Icon',
           iconDesc: menu.iconId,
-          visible: !!menu.iconId
+          visible: !!menu.iconId,
+          prepend: true
         },
         {
           objectType: 'Label',
@@ -84,7 +95,13 @@ export default class ViewMenuPopup extends WidgetPopup {
 
   _renderWidget() {
     super._renderWidget();
-    this.widget.$container.on('click', '.tile', event => this.activateTile(scout.widget(event.target)));
+    this.widget.$container.on('click', '.tile', event => {
+      let target = scout.widget(event.target);
+      if (!(target instanceof Tile)) {
+        target = target.findParent(parent => parent instanceof Tile);
+      }
+      this.activateTile(target);
+    });
   }
 
   activateTile(tile) {
