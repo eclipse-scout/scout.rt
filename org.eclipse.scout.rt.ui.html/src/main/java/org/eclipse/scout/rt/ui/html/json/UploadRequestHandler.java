@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,9 +14,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,8 +40,12 @@ import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
+import org.eclipse.scout.rt.platform.resource.MimeTypes;
 import org.eclipse.scout.rt.platform.security.MalwareScanner;
+import org.eclipse.scout.rt.platform.security.RejectedResourceException;
 import org.eclipse.scout.rt.platform.security.UnsafeResourceException;
+import org.eclipse.scout.rt.platform.util.FileUtility;
+import org.eclipse.scout.rt.platform.util.HexUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
@@ -139,11 +147,16 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     Map<String, String> uploadProperties = new HashMap<>();
     List<BinaryResource> uploadResources = new ArrayList<>();
     try {
-      readUploadData(httpServletRequest, uploadable.getMaximumUploadSize(), uploadProperties, uploadResources);
+      readUploadData(httpServletRequest, uploadable, uploadProperties, uploadResources);
     }
     catch (UnsafeResourceException e) { // NOSONAR
-      // LOG is done by MalwareScanner which is the only class throwing this exception
+      // LOG is done in MalwareScanner, verifyFileSafety is the only methods throwing this exception
       writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createUnsafeUploadResponse());
+      return;
+    }
+    catch (RejectedResourceException e) { // NOSONAR
+      // verifyFileName and verifyFileIntegrity are the only methods throwing this exception
+      writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createRejectedUploadResponse());
       return;
     }
 
@@ -187,10 +200,11 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
    * Since 5.2 this performs a {@link MalwareScanner#scan(BinaryResource)} on the resources and throws a
    * {@link PlatformException} if some resources are unsafe
    */
-  protected void readUploadData(HttpServletRequest httpReq, long maxSize, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException {
+  protected void readUploadData(HttpServletRequest httpReq, IUploadable uploadable, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException {
+    Set<String> validFileExtensions = getValidFileExtensionsFor(uploadable, uploadProperties);
     ServletFileUpload upload = new ServletFileUpload();
     upload.setHeaderEncoding(StandardCharsets.UTF_8.name());
-    upload.setSizeMax(maxSize);
+    upload.setSizeMax(uploadable.getMaximumUploadSize());
     for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
       FileItemStream item = it.next();
       String filename = item.getName();
@@ -198,17 +212,23 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         String[] parts = StringUtility.split(filename, "[/\\\\]");
         filename = parts[parts.length - 1];
       }
+      if (EMPTY_UPLOAD_FILENAME.equals(filename)) {
+        filename = "";
+      }
+      String ext = ("" + FileUtility.getFileExtension(filename)).toLowerCase(Locale.ROOT);
+      verifyFileName(validFileExtensions, filename, ext);
       byte[] content;
       try (InputStream in = item.openStream()) {
         content = IOUtility.readBytes(in);
       }
       String contentType = item.getContentType();
       BinaryResource res = BinaryResources.create()
-          .withFilename((EMPTY_UPLOAD_FILENAME.equals(filename)) ? "" : filename)
+          .withFilename(filename)
           .withContentType(contentType)
           .withContent(content)
           .build();
       verifyFileSafety(res);
+      verifyFileIntegrity(res);
 
       if (item.isFormField()) {
         // Handle non-file fields (interpreted as properties)
@@ -224,6 +244,16 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         uploadResources.add(res);
       }
     }
+  }
+
+  /**
+   * @param uploadable
+   *          is the JsonAdapter that triggers the upload
+   * @return the set of valid extensions for that adapter. An empty set means <code>all</code> extensions are valid.
+   * @since 10.x
+   */
+  protected Set<String> getValidFileExtensionsFor(IUploadable uploadable, Map<String, String> uploadProperties) {
+    return Collections.emptySet();
   }
 
   /**
@@ -254,13 +284,37 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   }
 
   /**
+   * @throws RejectedResourceException
+   *           when filename extension is not accepted
+   */
+  protected void verifyFileName(Set<String> validFileExtensions, String filename, String ext) {
+    if (!validFileExtensions.isEmpty() && !validFileExtensions.contains("*") && !validFileExtensions.contains(ext)) {
+      throw new RejectedResourceException("Filename '{}' has no accepted extension.", filename);
+    }
+  }
+
+  /**
    * Checks the resource to be upload for malware
    *
-   * @throws PlatformException
+   * @throws UnsafeResourceException
    *           when unsafe
    */
   protected void verifyFileSafety(BinaryResource res) {
-    //do malware scan
+    //do malware scan and log issues
     BEANS.get(MalwareScanner.class).scan(res);
+  }
+
+  /**
+   * @throws RejectedResourceException
+   *           when not compliant
+   */
+  protected void verifyFileIntegrity(BinaryResource res) {
+    if (!MimeTypes.verifyMagic(res)) {
+      byte[] content = res.getContent();
+      String header = (content == null || content.length == 0) ? "" : HexUtility.encode(Arrays.copyOfRange(content, 0, Math.min(8, content.length)));
+      String message = "File '{}' has content header '{}' which does not match its extension.";
+      LOG.info(message, res.getFilename(), header);
+      throw new RejectedResourceException(message, res.getFilename(), header);
+    }
   }
 }

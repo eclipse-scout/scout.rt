@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,11 +67,24 @@ public class JsonRequestHelper {
   }
 
   /**
+   * UI Text <code>ui.UnsafeUpload</code>
+   *
    * @return {@link JSONObject} to indicate that the file upload is unsafe.
    */
   public JSONObject createUnsafeUploadResponse() {
     final JsonResponse response = new JsonResponse();
     response.markAsError(JsonResponse.ERR_UNSAFE_UPLOAD, "Unsafe file upload.");
+    return response.toJson();
+  }
+
+  /**
+   * UI Text <code>ui.RejectedUpload</code>
+   *
+   * @return {@link JSONObject} to indicate that the file upload was rejected.
+   */
+  public JSONObject createRejectedUploadResponse() {
+    final JsonResponse response = new JsonResponse();
+    response.markAsError(JsonResponse.ERR_REJECTED_UPLOAD, "Rejected file upload.");
     return response.toJson();
   }
 

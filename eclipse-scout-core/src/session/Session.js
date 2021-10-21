@@ -122,6 +122,7 @@ export default class Session {
     SESSION_TIMEOUT: 10,
     UI_PROCESSING: 20,
     UNSAFE_UPLOAD: 30,
+    REJECTED_UPLOAD: 31,
     VERSION_MISMATCH: 40
   };
 
@@ -1045,6 +1046,12 @@ export default class Session {
     } else if (jsonError.code === Session.JsonResponseError.UNSAFE_UPLOAD) {
       boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);
+      boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
+      boxOptions.yesButtonAction = () => {
+      };
+    } else if (jsonError.code === Session.JsonResponseError.REJECTED_UPLOAD) {
+      boxOptions.header = this.optText('ui.RejectedUpload', boxOptions.header);
+      boxOptions.body = this.optText('ui.RejectedUploadMsg', boxOptions.body);
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
       boxOptions.yesButtonAction = () => {
       };
