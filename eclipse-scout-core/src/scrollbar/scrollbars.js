@@ -300,7 +300,6 @@ function _uninstallMutationObserver() {
   mutationObserver = null;
 }
 
-
 /**
  * Installs an intersection observer that tracks the visibility of a scrollable in order to update the visibility of the scroll shadow accordingly.
  */
@@ -721,14 +720,17 @@ export function scrollToBottom($scrollable, options) {
 
 /**
  * @param location object with x and y properties
- * @eturns {boolean} true if the location is visible in the current viewport of the $scrollable, or if $scrollable is null
+ * @param $scrollables one or more scrollables to check against
+ * @eturns {boolean} true if the location is visible in the current viewport of all the $scrollables, or if $scrollables is null
  */
-export function isLocationInView(location, $scrollable) {
-  if (!$scrollable || $scrollable.length === 0) {
+export function isLocationInView(location, $scrollables) {
+  if (!$scrollables || $scrollables.length === 0) {
     return true;
   }
-  let scrollableOffsetBounds = graphics.offsetBounds($scrollable);
-  return scrollableOffsetBounds.contains(location.x, location.y);
+  return $scrollables.toArray().every(scrollable => {
+    let scrollableOffsetBounds = graphics.offsetBounds($(scrollable));
+    return scrollableOffsetBounds.contains(location.x, location.y);
+  });
 }
 
 /**
