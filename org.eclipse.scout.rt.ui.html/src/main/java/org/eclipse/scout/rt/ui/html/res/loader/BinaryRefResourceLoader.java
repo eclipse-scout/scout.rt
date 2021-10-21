@@ -134,7 +134,7 @@ public class BinaryRefResourceLoader extends AbstractResourceLoader {
           .call(() -> BinaryRefs.loadBinaryResource(uri));
     }
     catch (Exception e) {
-      LOG.warn("Unable to load binary resource for URI {}", uri);
+      LOG.warn("Unable to load binary resource for URI {}", uri, e);
     }
     return null;
   }
