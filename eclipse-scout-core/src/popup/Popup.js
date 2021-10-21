@@ -959,7 +959,7 @@ export default class Popup extends Widget {
       return;
     }
     let anchorBounds = this.getAnchorBounds();
-    return scrollbars.isLocationInView(anchorBounds.center(), this.$anchor.scrollParent());
+    return scrollbars.isLocationInView(anchorBounds.center(), this.$anchor.scrollParents());
   }
 
   _triggerLocationChange() {
