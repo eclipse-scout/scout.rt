@@ -60,6 +60,7 @@ public class UiTextContributor implements IUiTextContributor {
         "SaveChangesOfSelectedItems",
         "FormsCannotBeSaved",
         "NotAllCheckedFormsCanBeSaved",
+        "FormValidationFailedTitle",
         // From org.eclipse.scout.rt.ui.html
         "ui.CodeUndefined",
         "ui.CalendarToday",
