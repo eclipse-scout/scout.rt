@@ -8,7 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, Device, events, GroupBox, HtmlComponent, KeyStrokeContext, menus, numbers, objects, Point, Range, scout, scrollbars, strings, Widget} from '../index';
+import {
+  CalendarComponent,
+  CalendarLayout,
+  CalendarListComponent,
+  DateRange,
+  dates,
+  Device,
+  events,
+  GroupBox,
+  HtmlComponent,
+  KeyStrokeContext,
+  menus,
+  numbers,
+  objects,
+  Point,
+  Range,
+  scout,
+  scrollbars,
+  strings,
+  Widget
+} from '../index';
 import $ from 'jquery';
 
 export default class Calendar extends Widget {
@@ -162,6 +182,10 @@ export default class Calendar extends Widget {
     date = dates.ensure(date);
     this._setProperty('selectedDate', date);
     this._yearPanel.selectDate(this.selectedDate);
+  }
+
+  _renderSelectedDate() {
+    this._updateModel(true, false);
   }
 
   setDisplayMode(displayMode) {
