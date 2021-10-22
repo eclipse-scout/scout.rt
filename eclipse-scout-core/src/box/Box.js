@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,6 +34,15 @@ export default class Box {
   }
 
   _render() {
+    // add background-elements which can be styled individually
+    this.$backgroundElements = $('<div>')
+      .addClass('box-background-elements')
+      .appendTo(this.$parent);
+
+    $('<div>').addClass('box-background-element-1').appendTo(this.$backgroundElements);
+    $('<div>').addClass('box-background-element-2').appendTo(this.$backgroundElements);
+    $('<div>').addClass('box-background-element-3').appendTo(this.$backgroundElements);
+
     this.$container = $('<div>')
       .addClass('box')
       .appendTo(this.$parent);

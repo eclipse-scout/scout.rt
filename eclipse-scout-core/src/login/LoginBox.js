@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,12 +64,10 @@ export default class LoginBox extends Box {
       .attr('autocapitalize', 'off')
       .attr('autocorrect', 'off')
       .placeholder(this.texts.get('ui.User'))
-      .addClass('alternative')
       .appendTo(this.$form);
     this.$password = $('<input>')
       .attr('type', 'password')
       .placeholder(this.texts.get('ui.Password'))
-      .addClass('alternative')
       .appendTo(this.$form);
     this.$button = $('<button>')
       .attr('type', 'submit')
@@ -122,6 +120,18 @@ export default class LoginBox extends Box {
   }
 
   redirect(data) {
+    this.$backgroundElements.addClass('box-background-elements-fadeout');
+    if (Device.get().supportsCssAnimation()) {
+      this.$backgroundElements.oneAnimationEnd(() => {
+        this._redirect(data);
+      });
+    } else {
+      // fallback for old browsers that do not support the animation-end event
+      this._redirect(data);
+    }
+  }
+
+  _redirect(data) {
     // Calculate target URL
     let url = this.redirectUrl;
     if (!url) {
