@@ -23,9 +23,12 @@
     outline: none;
 
     & .table-row {
-      &.selected::after {
+      &.selected {
         background-color: @item-selection-background-color;
-        border-color: @item-selection-border-color;
+
+        &::after {
+          border-color: @item-selection-border-color;
+        }
       }
     }
   }
@@ -47,9 +50,13 @@
 
     & > .table-data > .table-row {
 
-      &.selected::after {
+      &.selected {
         /* Don't draw selection */
-        display: none;
+        background-color: transparent;
+
+        &::after {
+          display: none;
+        }
       }
 
       &.checked,
@@ -175,15 +182,15 @@
 
   &:active {
     background-color: @table-row-active-background-color;
-
-    &.selected {
-      background-color: inherit;
-    }
   }
 
-  &.selected::after {
-    #scout.item-selection();
-    z-index: 1; // Ensure selection covers aggregate row which is moved -1px to top
+  &.selected {
+    background-color: @item-selection-nonfocus-background-color;
+
+    &::after {
+      #scout.item-selection-border();
+      z-index: 1; // Ensure selection covers aggregate row which is moved -1px to top
+    }
   }
 
   &.select-top::after,

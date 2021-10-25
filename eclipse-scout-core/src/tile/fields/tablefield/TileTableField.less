@@ -69,10 +69,13 @@
       }
     }
 
-    &:not(:focus):not(.focused) > .table-data > .table-row.selected::after {
+    &:not(:focus):not(.focused) > .table-data > .table-row.selected {
       /* No selection color for non-focused table tiles */
       background-color: transparent;
-      border: 0;
+
+      &::after {
+        border: 0;
+      }
     }
 
     & > .table-data {
@@ -100,10 +103,12 @@
 
     &:focus,
     &.focused {
-      & > .table-data > .table-row.selected::after {
+      & > .table-data > .table-row.selected {
         background-color: @tile-table-default-inverted-selection-background-color;
-        border-color: @tile-table-default-inverted-selection-border-color;
-        mix-blend-mode: @tile-table-alternative-inverted-selection-mix-blend-mode;
+
+        &::after {
+          border-color: @tile-table-default-inverted-selection-border-color;
+        }
       }
     }
 
@@ -153,10 +158,12 @@
 
     &:focus,
     &.focused {
-      & > .table-data > .table-row.selected::after {
+      & > .table-data > .table-row.selected {
         background-color: @tile-table-alternative-inverted-selection-background-color;
-        border-color: @tile-table-alternative-inverted-selection-border-color;
-        mix-blend-mode: @tile-table-alternative-inverted-selection-mix-blend-mode;
+
+        &::after {
+          border-color: @tile-table-alternative-inverted-selection-border-color;
+        }
       }
     }
 
