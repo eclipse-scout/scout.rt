@@ -277,5 +277,7 @@ public class DataObjectInventoryTest {
 
     assertEquals(CollectionUtility.hashSet(SimpleFixtureDo.class), inv.getContributionContainers(FirstSimpleContributionFixtureDo.class));
     assertEquals(CollectionUtility.hashSet(SimpleFixtureDo.class), inv.getContributionContainers(SecondSimpleContributionFixtureDo.class));
+
+    assertEquals(CollectionUtility.hashSet(FirstSimpleContributionFixtureDo.class, SecondSimpleContributionFixtureDo.class), inv.getContributionClasses(SimpleFixtureDo.class));
   }
 }

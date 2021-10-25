@@ -76,6 +76,12 @@ public class DataObjectInventory {
    */
   private final Map<Class<? extends IDoEntity>, Set<Class<? extends IDoEntity>>> m_contributionClassToContainers = new HashMap<>();
 
+  /**
+   * Map of {@link IDoEntity} container class to its {@link IDoEntityContribution contributions} (see
+   * {@link ContributesTo} annotation).
+   */
+  private final Map<Class<? extends IDoEntity>, Set<Class<? extends IDoEntityContribution>>> m_containerClassToContributionClasses = new HashMap<>();
+
   @PostConstruct
   protected void init() {
     ClassInventory.get()
@@ -162,7 +168,17 @@ public class DataObjectInventory {
    * @see ContributesTo
    */
   public Set<Class<? extends IDoEntity>> getContributionContainers(Class<? extends IDoEntityContribution> contributionClass) {
-    return Collections.unmodifiableSet(m_contributionClassToContainers.computeIfAbsent(contributionClass, k -> new HashSet<>()));
+    Set<Class<? extends IDoEntity>> containerClasses = m_contributionClassToContainers.get(contributionClass);
+    return containerClasses == null ? Collections.emptySet() : Collections.unmodifiableSet(containerClasses);
+  }
+
+  /**
+   * @return {@link IDoEntityContribution} classes for a given {@link IDoEntity} container class.
+   * @see ContributesTo
+   */
+  public Set<Class<? extends IDoEntityContribution>> getContributionClasses(Class<? extends IDoEntity> containerClass) {
+    Set<Class<? extends IDoEntityContribution>> contributionClasses = m_containerClassToContributionClasses.get(containerClass);
+    return contributionClasses == null ? Collections.emptySet() : Collections.unmodifiableSet(contributionClasses);
   }
 
   /**
@@ -228,7 +244,7 @@ public class DataObjectInventory {
         .stream()
         .map(classInventory::getAllKnownSubClasses)
         .flatMap(Set::stream)
-        .filter(ci -> (ci.isInstanciable() && !ci.hasAnnotation(TypeVersion.class))) // only data objects (instanciable) are relevant (ignore other interfaces or abstract classes)
+        .filter(ci -> (ci.isInstanciable() && !ci.hasAnnotation(TypeVersion.class))) // only data objects (instantiable) are relevant (ignore other interfaces or abstract classes)
         .map(IClassInfo::name)
         .distinct()
         .collect(Collectors.joining("\n"));
@@ -292,6 +308,7 @@ public class DataObjectInventory {
       Set<Class<? extends IDoEntity>> containerClasses = contributesToAnn == null ? Collections.emptySet() : CollectionUtility.hashSet(contributesToAnn.value());
       if (!containerClasses.isEmpty()) {
         m_contributionClassToContainers.put(contributionClass, containerClasses);
+        containerClasses.forEach(containerClass -> m_containerClassToContributionClasses.computeIfAbsent(containerClass, k -> new HashSet<>()).add(contributionClass));
         LOG.debug("Registered class {} with containers '{}'", contributionClass, containerClasses);
       }
       else {
