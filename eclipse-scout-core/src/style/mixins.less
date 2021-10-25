@@ -374,15 +374,13 @@
     border-color: @color transparent transparent transparent;
   }
 
-  .item-selection(@background-color: @item-selection-nonfocus-background-color, @border-color: @item-selection-nonfocus-border-color) {
+  .item-selection-border(@border-color: @item-selection-nonfocus-border-color) {
     content: '';
     position: absolute;
     width: 100%;
     height: 100%;
     top: 0;
     left: 0;
-    background-color: @background-color;
-    mix-blend-mode: @item-selection-background-mix-blend-mode;
     border: @item-selection-border-width solid @border-color;
     border-radius: @control-border-radius;
     pointer-events: none;

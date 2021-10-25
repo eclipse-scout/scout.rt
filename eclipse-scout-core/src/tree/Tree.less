@@ -15,9 +15,12 @@
   &.focused {
     outline: none;
 
-    & .tree-node.selected::after {
+    & .tree-node.selected {
       background-color: @item-selection-background-color;
-      border-color: @item-selection-border-color;
+
+      &::after {
+        border-color: @item-selection-border-color;
+      }
     }
   }
 }
@@ -65,14 +68,14 @@
 
   &:active {
     background-color: @tree-node-active-background-color;
-
-    &.selected {
-      background-color: inherit;
-    }
   }
 
-  &.selected::after {
-    #scout.item-selection();
+  &.selected {
+    background-color: @item-selection-nonfocus-background-color;
+
+    &::after {
+      #scout.item-selection-border();
+    }
   }
 
   &.disabled {

@@ -118,7 +118,6 @@
 @icon-light-color: @palette-gray-6;
 @icon-light-hover-color: @palette-gray-10;
 @item-selection-background-color: @palette-blue-0;
-@item-selection-background-mix-blend-mode: multiply;
 @item-selection-border-color: @selected-background-color;
 @item-selection-disabled-background-color: @palette-gray-4;
 @item-selection-disabled-border-color: @palette-gray-6;
@@ -461,13 +460,11 @@
 @tile-scrollbar-thumb-inverted-small-color: fade(@tile-scrollbar-thumb-inverted-main-color, 15%);
 @tile-scrollbar-thumb-inverted-small-hover-color: fade(@tile-scrollbar-thumb-inverted-main-color, 15%);
 @tile-table-default-color: @palette-gray-9;
-@tile-table-default-inverted-selection-background-color: @palette-blue-5;
-@tile-table-default-inverted-selection-border-color: @palette-white;
-@tile-table-default-inverted-selection-mix-blend-mode: soft-light;
+@tile-table-default-inverted-selection-background-color: lighten(@tile-default-inverted-background-color, 2%);
+@tile-table-default-inverted-selection-border-color: fade(@palette-white, 50%);
 @tile-table-default-inverted-border-color: fade(@palette-white, 25%);
-@tile-table-alternative-inverted-selection-background-color: @palette-cyan-3;
+@tile-table-alternative-inverted-selection-background-color: lighten(@tile-alternative-inverted-background-color, 2%);
 @tile-table-alternative-inverted-selection-border-color: @tile-table-default-inverted-selection-border-color;
-@tile-table-alternative-inverted-selection-mix-blend-mode: @tile-table-default-inverted-selection-mix-blend-mode;
 @time-picker-disabled-color: @date-picker-day-disabled-color;
 @time-picker-hours-color: @palette-gray-7;
 @time-picker-now-color: @date-picker-now-color;
