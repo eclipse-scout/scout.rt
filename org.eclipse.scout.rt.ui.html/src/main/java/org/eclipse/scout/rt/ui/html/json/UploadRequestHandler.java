@@ -15,8 +15,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -24,6 +25,8 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -74,6 +77,9 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   private static final String EMPTY_UPLOAD_FILENAME = "*empty*";
 
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
+
+  public static final Set<String> DEFAULT_VALID_FILE_EXTENSIONS = Stream.of("avi", "bmp", "docx", "dotx", "gif", "html", "jpg", "jpeg", "log", "m2v", "mkv", "mov", "mp3", "mp4", "mpg", "m4p", "oga", "ogv", "pdf", "png", "potx", "ppsx",
+      "pptx", "sldx", "svg", "thmx", "tif", "tiff", "txt", "vcard", "vcf", "vcs", "xlsx", "xltx").collect(Collectors.toSet());
 
   private final HttpCacheControl m_httpCacheControl = BEANS.get(HttpCacheControl.class);
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
@@ -143,27 +149,33 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     if (httpServletRequest.getParameter("legacy") != null) {
       httpServletResponse.setContentType("text/plain");
     }
-    // Read uploaded data
-    Map<String, String> uploadProperties = new HashMap<>();
-    List<BinaryResource> uploadResources = new ArrayList<>();
-    try {
-      readUploadData(httpServletRequest, uploadable, uploadProperties, uploadResources);
-    }
-    catch (UnsafeResourceException e) { // NOSONAR
-      // LOG is done in MalwareScanner, verifyFileSafety is the only methods throwing this exception
-      writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createUnsafeUploadResponse());
-      return;
-    }
-    catch (RejectedResourceException e) { // NOSONAR
-      // verifyFileName and verifyFileIntegrity are the only methods throwing this exception
-      writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createRejectedUploadResponse());
-      return;
-    }
 
+    // Read uploaded data
     // GUI requests for the same session must be processed consecutively
     final ReentrantLock uiSessionLock = uiSession.uiSessionLock();
     uiSessionLock.lock();
     try {
+      if (uiSession.isDisposed()) {
+        writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createSessionTimeoutResponse());
+        return;
+      }
+      Map<String, String> uploadProperties = new HashMap<>();
+      List<BinaryResource> uploadResources = new ArrayList<>();
+      try {
+        readUploadData(httpServletRequest, uploadable, uploadProperties, uploadResources);
+      }
+      catch (UnsafeResourceException e) { // NOSONAR
+        // LOG is done in MalwareScanner, verifyFileSafety is the only methods throwing this exception
+        writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createUnsafeUploadResponse());
+        return;
+      }
+      catch (RejectedResourceException e) { // NOSONAR
+        // verifyFileName and verifyFileIntegrity are the only methods throwing this exception
+        //mark resources as FAILED
+        uploadResources = null;
+        uploadProperties = null;
+        //continue
+      }
       if (uiSession.isDisposed()) {
         writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createSessionTimeoutResponse());
         return;
@@ -249,11 +261,20 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   /**
    * @param uploadable
    *          is the JsonAdapter that triggers the upload
-   * @return the set of valid extensions for that adapter. An empty set means <code>all</code> extensions are valid.
+   * @return the set of accepted lowercase file extensions for that uploadable. If the set contains '*' then all files
+   *         are accepted.
    * @since 10.x
    */
   protected Set<String> getValidFileExtensionsFor(IUploadable uploadable, Map<String, String> uploadProperties) {
-    return Collections.emptySet();
+    Collection<String> extList = uploadable.getAcceptedUploadFileExtensions();
+    if (extList != null && !extList.isEmpty()) {
+      return new HashSet<>(extList);
+    }
+    return getValidFileExtensionsDefault();
+  }
+
+  protected Set<String> getValidFileExtensionsDefault() {
+    return DEFAULT_VALID_FILE_EXTENSIONS;
   }
 
   /**
