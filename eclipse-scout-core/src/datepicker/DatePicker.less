@@ -41,7 +41,7 @@
 
 .date-picker-month {
   width: 100%;
-  padding: 0 13px 13px 13px;
+  padding: 0 @date-picker-month-padding @date-picker-month-padding @date-picker-month-padding;
 }
 
 .date-picker-weekdays {
@@ -55,7 +55,7 @@
   display: inline-flex;
   height: @date-picker-header-height;
   width: @date-picker-day-size;
-  margin: 2px;
+  margin: @date-picker-day-margin;
   justify-content: center;
   padding-top: 7px;
 }
@@ -69,13 +69,17 @@
   display: inline-flex;
   width: @date-picker-day-size;
   height: @date-picker-day-size;
-  margin: 2px;
+  margin: @date-picker-day-margin;
   border-radius: @date-picker-day-border-radius;
   justify-content: center;
   align-items: center;
 
-  &.date-picker-out {
+  &.date-picker-out, &.date-picker-out-weekend {
     color: @date-picker-out-color;
+  }
+
+  &.date-picker-day-weekend-separator {
+    margin-left: 5px;
   }
 
   &.date-picker-now {
@@ -127,6 +131,14 @@
   height: 1px;
   width: 100%;
   border-bottom: 1px solid @date-picker-separator-color;
+}
+
+.date-picker-weekend-separator {
+  position: absolute;
+  top: @date-picker-header-height + @date-picker-day-margin;
+  height: calc(100% - @date-picker-month-padding - @date-picker-header-height - @date-picker-day-margin - @date-picker-day-margin);
+  width: 0;
+  border-right: 1px @date-picker-separator-color solid;
 }
 
 .date-picker-header-month {
