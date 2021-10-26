@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.ui.html.res;
+
+import java.util.Collection;
 
 /**
  * Base interface for code that handles file uploads in a HTTP context. Currently this is only used as a common base
@@ -24,4 +26,10 @@ public interface IUploadable {
    */
   long getMaximumUploadSize();
 
+  /**
+   * @return the set of accepted lowercase file extensions for that uploadable. '*' is supported but not recommended!
+   */
+  default Collection<String> getAcceptedUploadFileExtensions() {
+    return null;
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.security.AccessController;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,6 +39,8 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.Platform;
@@ -86,6 +89,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonRequestHelper;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.management.SessionMonitorMBean;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceUploader;
@@ -877,7 +881,14 @@ public class UiSession implements IUiSession {
       m_processingJsonRequest = true;
       try {
         // 1. Process the JSON request.
-        ModelJobs.schedule(() -> resourceConsumer.consumeBinaryResource(uploadResources, uploadProperties), createFileUploadModelJobInput(clientRunContext));
+        ModelJobs.schedule(() -> {
+          if (uploadResources != null) {
+            resourceConsumer.consumeBinaryResource(uploadResources, uploadProperties);
+          }
+          else {
+            markFileUploadFailed(resourceConsumer);
+          }
+        }, createFileUploadModelJobInput(clientRunContext));
 
         // 2. Wait for all model jobs of the session.
         BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
@@ -904,7 +915,9 @@ public class UiSession implements IUiSession {
         return null;
       }
     }
-    finally {
+    finally
+
+    {
       m_httpContext.clear();
       if (m_disposing) {
         dispose();
@@ -912,11 +925,30 @@ public class UiSession implements IUiSession {
     }
   }
 
+  protected void markFileUploadFailed(IBinaryResourceConsumer resourceConsumer) {
+    if (resourceConsumer instanceof JsonFormField) {
+      Object model = ((JsonFormField) resourceConsumer).getModel();
+      if (model instanceof IFormField) {
+        ((IFormField) model).addErrorStatus(new ValidationFailedStatus<BinaryResource>(TEXTS.get("ui.RejectedUpload")));
+        return;
+      }
+    }
+    m_currentJsonResponse.markAsError(JsonResponse.ERR_REJECTED_UPLOAD, "Rejected file upload.");
+  }
+
   protected JSONObject processFileUploadWithUploader(HttpServletRequest req, HttpServletResponse res, IBinaryResourceUploader resourceUploader,
       List<BinaryResource> uploadResources, Map<String, String> uploadProperties) {
     ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
 
-    IFuture<List<String>> future = ModelJobs.schedule(() -> resourceUploader.uploadBinaryResources(uploadResources, uploadProperties), createFileUploadModelJobInput(clientRunContext));
+    IFuture<List<String>> future = ModelJobs.schedule(() -> {
+      if (uploadResources != null) {
+        return resourceUploader.uploadBinaryResources(uploadResources, uploadProperties);
+      }
+      else {
+        markFileUploadFailed(resourceUploader);
+        return Collections.emptyList();
+      }
+    }, createFileUploadModelJobInput(clientRunContext));
 
     List<String> links = future.awaitDoneAndGet();
     if (uploadResources.size() != links.size()) {
@@ -934,6 +966,10 @@ public class UiSession implements IUiSession {
     }
     LOG.debug("Uploaded " + links.size() + " resources. Returning links to resoruce=" + json);
     return json;
+  }
+
+  protected void markFileUploadFailed(IBinaryResourceUploader resourceUploader) {
+    m_currentJsonResponse.markAsError(JsonResponse.ERR_REJECTED_UPLOAD, "Rejected file upload.");
   }
 
   /**
