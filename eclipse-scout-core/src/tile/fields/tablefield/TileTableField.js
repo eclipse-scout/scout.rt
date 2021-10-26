@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,10 +43,6 @@ export default class TileTableField extends TableField {
       return;
     }
     if (this.table) {
-      // Never show header menus for this widget
-      this.table.setHeaderMenusEnabled(false);
-      // Disable sorting for user but don't disabled sorting in Java because CoreTableTile needs sorting functionality.
-      this.table.setSortEnabled(false);
       this.table.$container
         .on('blur', this._tableBlurHandler)
         .on('focus', this._tableFocusHandler);
