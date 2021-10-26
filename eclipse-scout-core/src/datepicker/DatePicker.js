@@ -30,11 +30,13 @@ export default class DatePicker extends Widget {
     // Only the this.currentMonth is visible, the others are needed for the swipe animation.
     // The month is an object with the properties viewDate, rendered and $container
     this.months = [];
+    this._showWeekendSeparator = true;
   }
 
   _init(options) {
     super._init(options);
     this._setDateFormat(this.dateFormat);
+    this._showWeekendSeparator = this.dateFormat.symbols.firstDayOfWeek === 1; // only add the separator if the weeks starts on Monday
   }
 
   _render() {
@@ -116,7 +118,9 @@ export default class DatePicker extends Widget {
   _renderMonths() {
     // Render the months if needed
     this.months.forEach(function(month) {
-      if (!month.rendered) {
+      if (month.rendered) {
+        this._layoutWeekendSeparator(month);
+      } else {
         this._renderMonth(month);
 
         // move month to correct position in DOM.
@@ -156,6 +160,9 @@ export default class DatePicker extends Widget {
     }
 
     let $box = this.$parent.makeDiv('date-picker-month-box');
+    if (this._showWeekendSeparator) {
+      month.$weekendSeparator = $box.appendDiv('date-picker-weekend-separator');
+    }
     this._build$DateBox(month.viewDate).appendTo($box);
     $box.on('DOMMouseScroll mousewheel', this._onMouseWheel.bind(this))
       .appendTo(this.$scrollable);
@@ -209,6 +216,27 @@ export default class DatePicker extends Widget {
           this.resetMonths();
         });
     }
+  }
+
+  _layoutWeekendSeparators() {
+    this.months.forEach(m => this._layoutWeekendSeparator(m));
+  }
+
+  _layoutWeekendSeparator(month) {
+    if (!month.$weekendSeparator) {
+      return;
+    }
+    let $weekdays = this.$container.find('.date-picker-weekdays').first().children();
+    let $friday = $weekdays.eq(4); // Friday is always pos 4 as the separator is only available if the weeks starts on Monday
+    let $saturday = $weekdays.eq(5); // Saturday is always pos 5 as the separator is only available if the weeks starts on Monday
+
+    let fridayTopRight = graphics.position($friday).x + graphics.size($friday, {includeMargin: true}).width;
+    let saturdayTopLeft = graphics.position($saturday).x;
+    let space = saturdayTopLeft - fridayTopRight; // space between Friday cell an Saturday cell
+    let borderWidth = month.$weekendSeparator.cssBorderWidthX();
+
+    let posLeft = Math.floor(fridayTopRight + (space / 2) - borderWidth);
+    month.$weekendSeparator.cssLeft(posLeft);
   }
 
   preselectDate(date, animated) {
@@ -407,6 +435,9 @@ export default class DatePicker extends Widget {
 
       if ((start.getDay() === 6) || (start.getDay() === 0)) {
         cl = (start.getMonth() !== viewDate.getMonth() ? ' date-picker-out-weekend' : ' date-picker-weekend');
+        if (this._showWeekendSeparator && start.getDay() === 6) {
+          cl += ' date-picker-day-weekend-separator';
+        }
       } else {
         cl = (start.getMonth() !== viewDate.getMonth() ? ' date-picker-out' : '');
       }
