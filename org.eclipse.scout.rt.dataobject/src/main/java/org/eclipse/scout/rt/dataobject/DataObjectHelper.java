@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -157,6 +158,18 @@ public class DataObjectHelper {
       return Objects.toString(entity);
     }
     return getDataObjectMapper().writeValue(entity);
+  }
+
+  /**
+   * @return json as byte[]
+   */
+  public byte[] toBytes(IDoEntity entity) {
+    if (entity == null) {
+      return new byte[0];
+    }
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    getDataObjectMapper().writeValue(out, entity);
+    return out.toByteArray();
   }
 
   /**
