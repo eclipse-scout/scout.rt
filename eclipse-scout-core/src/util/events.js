@@ -222,7 +222,7 @@ export function onSwipe($element, id, onDown, onMove, onUp) {
       let newLeft = origPosLeft + deltaX;
       if (onMove) {
         let l = onMove({originalEvent: event, originalLeft: origPosLeft, deltaX: deltaX, newLeft: newLeft});
-        curPosLeft = l ? l : newLeft;
+        curPosLeft = typeof l === 'number' ? l : newLeft;
       } else {
         curPosLeft = newLeft;
       }

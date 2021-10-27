@@ -52,10 +52,12 @@
       border-color: @selected-background-color;
     }
 
-    &.disabled:hover {
-      color: @selected-color;
-      background-color: @selected-disabled-background-color;
-      border-color: @selected-disabled-background-color;
+    &.disabled {
+      background-color: @mode-selected-background-disabled-color;
+
+      &:hover {
+        background-color: @mode-selected-background-disabled-color;
+      }
     }
   }
 
@@ -99,6 +101,14 @@
 
       &:hover {
         background-color: transparent;
+      }
+
+      &.disabled {
+        background-color: @mode-alternative-selected-background-disabled-color;
+
+        &:hover {
+          background-color: @mode-alternative-selected-background-disabled-color;
+        }
       }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,17 @@ export default class ModeSelectorLayout extends AbstractLayout {
   constructor(modeSelector) {
     super();
     this.modeSelector = modeSelector;
+  }
+
+  layout($container) {
+    super.layout($container);
+
+    if (this.modeSelector.$slider) {
+      // Hide slider here so that size changes triggered by the layout are not animated (css changes applied while an element is hidden are not animated).
+      // The slider will then become visible again (if necessary) in _updateSlider()
+      this.modeSelector.$slider.setVisible(false);
+    }
+    this.modeSelector._updateSlider();
   }
 
   preferredLayoutSize($container, options) {

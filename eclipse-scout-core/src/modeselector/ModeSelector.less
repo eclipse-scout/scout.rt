@@ -30,12 +30,16 @@
       height: 100%;
       background-color: @mode-alternative-selected-background-color;
       border-radius: @button-border-radius;
-      transition: left 500ms ease;
+      transition: left 500ms ease, width 500ms ease;
 
       // do not show animations during drag
       &.mode-selector-dragging {
         transition: unset;
       }
+    }
+
+    & > .mode.mode-selector-dragging {
+      pointer-events: none; // prevent click event when releasing the slider
     }
   }
 }
