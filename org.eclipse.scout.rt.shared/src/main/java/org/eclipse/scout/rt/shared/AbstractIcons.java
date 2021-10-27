@@ -86,6 +86,17 @@ public abstract class AbstractIcons implements Serializable {
   public static final String PencilUnderlineSolid = "font:\uE050";
   public static final String ExclamationMarkBold = "font:\uE060";
   public static final String Slippery = "font:\uE044";
+  public static final String DiagramArea = "font:\uE070";
+  public static final String DiagramBar = "font:\uE071";
+  public static final String DiagramBarsHorizontal = "font:\uE072";
+  public static final String DiagramBarsVertical = "font:\uE073";
+  public static final String DiagramDoughnut = "font:\uE074";
+  public static final String DiagramLine = "font:\uE075";
+  public static final String DiagramLineAngular = "font:\uE076";
+  public static final String DiagramLineSmooth = "font:\uE077";
+  public static final String DiagramPie = "font:\uE078";
+  public static final String DiagramRadar = "font:\uE079";
+  public static final String DiagramScatter = "font:\uE07A";
 
   /* awesome font icons */
   public static final String RotateLeftBold = "font:\uF0E2";

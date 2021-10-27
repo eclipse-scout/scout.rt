@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  - Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+  - All rights reserved. This program and the accompanying materials
+  - are made available under the terms of the Eclipse Public License v1.0
+  - which accompanies this distribution, and is available at
+  - http://www.eclipse.org/legal/epl-v10.html
+  -
+  - Contributors:
+  -     BSI Business Systems Integration AG - initial API and implementation
+  -->
+
+<!-- Generator: Adobe Illustrator 25.3.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+     viewBox="0 0 24.0005 24" style="enable-background:new 0 0 24.0005 24;" xml:space="preserve">
+<g>
+	<path d="M23.2495,21.9075h-21.75V1.3421c0-0.4136-0.3359-0.75-0.7495-0.75S0,0.9285,0,1.3421v21.3154
+		c0,0.4141,0.3364,0.751,0.75,0.751h22.4995c0.4141,0,0.751-0.3369,0.751-0.751C24.0005,22.2444,23.6636,21.9075,23.2495,21.9075z"
+  />
+  <path d="M11.4077,21.0394h2.3682c0.4141,0,0.751-0.3369,0.751-0.75V2.5262c0-0.4136-0.3369-0.7495-0.751-0.7495h-2.3682
+		c-0.4136,0-0.75,0.3359-0.75,0.7495v17.7632C10.6577,20.7025,10.9941,21.0394,11.4077,21.0394z M12.1577,19.5394V3.2762h0.8682
+		v16.2632H12.1577z"/>
+  <path d="M17.3286,21.0394h2.3682c0.4141,0,0.751-0.3369,0.751-0.75V7.263c0-0.4136-0.3369-0.7495-0.751-0.7495h-2.3682
+		c-0.4131,0-0.75,0.3359-0.75,0.7495v13.0264C16.5786,20.7025,16.9155,21.0394,17.3286,21.0394z M18.0786,19.5394V8.013h0.8682
+		v11.5264H18.0786z"/>
+  <path d="M5.4868,21.0394H7.855c0.4136,0,0.75-0.3369,0.75-0.75v-9.4736c0-0.4131-0.3364-0.7495-0.75-0.75H5.4868
+		c-0.4136,0.0005-0.75,0.3369-0.75,0.75v9.4736C4.7368,20.7025,5.0732,21.0394,5.4868,21.0394z M7.1055,11.5657v7.9736H6.2363
+		v-7.9736H7.1055z"/>
+</g>
+</svg>
