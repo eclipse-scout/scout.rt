@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DateColumn, icons, NumberColumn, objects, scout, strings, styles, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
+import {arrays, DateColumn, icons, NumberColumn, objects, scout, scrollbars, strings, styles, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
 import {Chart, ChartTableControlLayout, ChartTableUserFilter} from '../../index';
 import $ from 'jquery';
 
@@ -77,13 +77,14 @@ export default class ChartTableControl extends TableControl {
 
   _renderChartType() {
     this._selectChartType();
-    if (this.oldChartType) {
-      this.$yAxisSelect.animateAVCSD('width', this.chartType === Chart.Type.BUBBLE ? 175 : 0);
-      this.$yAxisSelect.animateAVCSD('margin-right', this.chartType === Chart.Type.BUBBLE ? 15 : 0);
-    } else {
-      this.$yAxisSelect.css('width', this.chartType === Chart.Type.BUBBLE ? 175 : 0);
-      this.$yAxisSelect.css('margin-right', this.chartType === Chart.Type.BUBBLE ? 15 : 0);
-    }
+    this.$yAxisSelect.toggleClass('hide', this.chartType !== Chart.Type.BUBBLE);
+    this.$yAxisSelect.toggleClass('animated', scout.isOneOf(Chart.Type.BUBBLE, this.chartType, this.oldChartType) && !!this.oldChartType);
+    this.$yAxisSelect.data('scroll-shadow').setVisible(false);
+    this.$yAxisSelect.oneAnimationEnd(() => {
+      scrollbars.update(this.$yAxisSelect);
+      this.$yAxisSelect.data('scroll-shadow').setVisible(true);
+      this.$yAxisSelect.removeClass('animated');
+    });
 
     if (this.contentRendered) {
       this.chart.$container.animateAVCSD('opacity', 0, () => {
@@ -117,7 +118,7 @@ export default class ChartTableControl extends TableControl {
     let chartGroup = this[groupName];
     if (chartGroup) {
       let $element = this[map][chartGroup.id];
-      $element.siblings().animateAVCSD('height', 30);
+      $element.siblings('.select-axis').animateAVCSD('height', 30);
       $element.selectOne('selected');
 
       if (chartGroup.modifier > 0) {
@@ -158,19 +159,24 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _renderChartSelect(cssClass, chartType, renderSvgIcon) {
-    let $svg = this.$chartSelect
-      .appendSVG('svg', cssClass + ' select-chart')
+  _renderChartSelect(cssClass, chartType, iconId) {
+    let icon = scout.create('Icon', {
+      parent: this,
+      iconDesc: iconId,
+      cssClass: cssClass
+    });
+    icon.render(this.$chartSelect);
+    this.$contentContainer.one('remove', () => icon.destroy());
+    let $iconContainer = icon.$container;
+    $iconContainer
       .toggleClass('disabled', !this.enabledComputed || !this._hasColumns())
       .data('chartType', chartType);
 
     if (this.enabledComputed && this._hasColumns()) {
-      $svg.on('click', this._onClickChartType.bind(this));
+      $iconContainer.on('click', this._onClickChartType.bind(this));
     }
 
-    this._chartTypeMap[chartType] = $svg;
-
-    renderSvgIcon($svg);
+    this._chartTypeMap[chartType] = $iconContainer;
   }
 
   /**
@@ -186,88 +192,19 @@ export default class ChartTableControl extends TableControl {
     let supportedChartTypes = this._getSupportedChartTypes();
 
     if (scout.isOneOf(Chart.Type.BAR, supportedChartTypes)) {
-      this._renderChartSelect('chart-bar', Chart.Type.BAR, renderSvgIconBar);
+      this._renderChartSelect('chart-bar', Chart.Type.BAR, icons.DIAGRAM_BARS_VERTICAL);
     }
     if (scout.isOneOf(Chart.Type.BAR_HORIZONTAL, supportedChartTypes)) {
-      this._renderChartSelect('chart-stacked', Chart.Type.BAR_HORIZONTAL, renderSvgIconStacked);
+      this._renderChartSelect('chart-stacked', Chart.Type.BAR_HORIZONTAL, icons.DIAGRAM_BARS_HORIZONTAL);
     }
     if (scout.isOneOf(Chart.Type.LINE, supportedChartTypes)) {
-      this._renderChartSelect('chart-line', Chart.Type.LINE, renderSvgIconLine);
+      this._renderChartSelect('chart-line', Chart.Type.LINE, icons.DIAGRAM_LINE);
     }
     if (scout.isOneOf(Chart.Type.PIE, supportedChartTypes)) {
-      this._renderChartSelect('chart-pie', Chart.Type.PIE, renderSvgIconPie.bind(this));
+      this._renderChartSelect('chart-pie', Chart.Type.PIE, icons.DIAGRAM_PIE);
     }
     if (scout.isOneOf(Chart.Type.BUBBLE, supportedChartTypes)) {
-      this._renderChartSelect('chart-bubble', Chart.Type.BUBBLE, renderSvgIconBubble);
-    }
-
-    function renderSvgIconBar($svg) {
-      let show = [2, 4, 3, 3.5, 5];
-
-      for (let s = 0; s < show.length; s++) {
-        $svg.appendSVG('rect', 'select-fill')
-          .attr('x', s * 13)
-          .attr('y', 50 - show[s] * 9)
-          .attr('width', 11)
-          .attr('height', show[s] * 9);
-      }
-    }
-
-    function renderSvgIconStacked($svg) {
-      let show = [2, 4, 3.5, 4.5];
-
-      for (let s = 0; s < show.length; s++) {
-        $svg.appendSVG('rect', 'select-fill')
-          .attr('x', 0)
-          .attr('y', 16 + s * 9)
-          .attr('width', show[s] * 14)
-          .attr('height', 7);
-      }
-    }
-
-    function renderSvgIconLine($svg) {
-      let show = [0, 1.7, 1, 2, 1.5, 2.5],
-        pathPoints = [];
-
-      for (let s = 0; s < show.length; s++) {
-        pathPoints.push(2 + (s * 12) + ',' + (45 - show[s] * 11));
-      }
-
-      $svg
-        .appendSVG('path', 'select-fill-line')
-        .attr('d', 'M' + pathPoints.join('L'));
-    }
-
-    function renderSvgIconPie($svg) {
-      let show = [
-        [0, 0.1],
-        [0.1, 0.25],
-        [0.25, 1]
-      ];
-
-      for (let s = 0; s < show.length; s++) {
-        $svg
-          .appendSVG('path', 'select-fill-pie')
-          .attr('d', this._pathSegment(37, 30, 24, show[s][0], show[s][1]));
-      }
-    }
-
-    function renderSvgIconBubble($svg) {
-      $svg.appendSVG('line', 'select-fill-line')
-        .attr('x1', 3).attr('y1', 53)
-        .attr('x2', 63).attr('y2', 53);
-
-      $svg.appendSVG('line', 'select-fill-line')
-        .attr('x1', 8).attr('y1', 12)
-        .attr('x2', 8).attr('y2', 58);
-
-      $svg.appendSVG('circle', 'select-fill')
-        .attr('cx', 22).attr('cy', 40)
-        .attr('r', 5);
-
-      $svg.appendSVG('circle', 'select-fill')
-        .attr('cx', 50).attr('cy', 26)
-        .attr('r', 11);
+      this._renderChartSelect('chart-bubble', Chart.Type.BUBBLE, icons.DIAGRAM_SCATTER);
     }
   }
 
@@ -437,14 +374,7 @@ export default class ChartTableControl extends TableControl {
 
     this._addListeners();
 
-    // add addition rectangle for hover and event handling
-    $('.select-chart', this.$contentContainer)
-      .appendSVG('rect', 'select-events')
-      .attr('width', 65)
-      .attr('height', 60)
-      .attr('fill', 'none')
-      .attr('pointer-events', 'all');
-
+    this._renderAxisSelectorsContainer();
     let columnCount = this._renderAxisSelectors();
 
     // draw first chart
@@ -464,14 +394,30 @@ export default class ChartTableControl extends TableControl {
     this.chart.on('valueClick', this._chartValueClickedHandler);
   }
 
+  _renderAxisSelectorsContainer() {
+    this.$axisSelectContainer = this.$contentContainer
+      .appendDiv('axis-select-container');
+  }
+
   _renderAxisSelectors() {
     // create container for x/y-axis
-    this.$xAxisSelect = this.$contentContainer
+    this.$xAxisSelect = this.$axisSelectContainer
       .appendDiv('xaxis-select')
       .data('groupId', 1);
-    this.$yAxisSelect = this.$contentContainer
+    scrollbars.install(this.$xAxisSelect, {
+      parent: this,
+      session: this.session,
+      axis: 'y'
+    });
+
+    this.$yAxisSelect = this.$axisSelectContainer
       .appendDiv('yaxis-select')
       .data('groupId', 2);
+    scrollbars.install(this.$yAxisSelect, {
+      parent: this,
+      session: this.session,
+      axis: 'y'
+    });
 
     // map for selection (column id, $element)
     this._chartGroup1Map = {};
@@ -556,19 +502,17 @@ export default class ChartTableControl extends TableControl {
       this.$yAxisSelect.append($yDiv);
     }
 
-    if (numberOfAxisItems < 2) {
-      let $bubbleSelect = this.$contentContainer.find('.chart-bubble.select-chart');
-      if ($bubbleSelect) {
-        $bubbleSelect.remove();
-      }
-    }
-
     // map for selection (column id, $element)
     this._aggregationMap = {};
 
     if (this._hasColumns()) {
       // create container for data
-      this.$dataSelect = this.$contentContainer.appendDiv('data-select');
+      this.$dataSelect = this.$axisSelectContainer.appendDiv('data-select');
+      scrollbars.install(this.$dataSelect, {
+        parent: this,
+        session: this.session,
+        axis: 'y'
+      });
 
       // add data-count for no column restriction (all columns)
       let countDesc = this.session.text('ui.Count');
@@ -1237,9 +1181,12 @@ export default class ChartTableControl extends TableControl {
     this.$xAxisSelect.each((index, element) => {
       tooltips.uninstall($(element));
     });
+    scrollbars.uninstall(this.$xAxisSelect, this.session);
     this.$yAxisSelect.each((index, element) => {
       tooltips.uninstall($(element));
     });
+    scrollbars.uninstall(this.$yAxisSelect, this.session);
+    scrollbars.uninstall(this.$dataSelect, this.session);
     this._uninstallScrollbars();
   }
 
