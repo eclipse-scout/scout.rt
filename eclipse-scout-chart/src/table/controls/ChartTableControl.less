@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,120 +28,128 @@
 /* chart - type select */
 
 .chart-select {
-  padding: 10px 40px 10px 30px;
-}
+  display: flex;
+  flex-flow: column;
 
-svg.select-chart {
-  height: 60px;
-  width: 65px;
-  display: block;
-}
+  width: 75px;
+  margin: 25px;
 
-svg.select-chart:not(.disabled) > rect.select-events:not(.disabled) {
-  cursor: pointer;
-}
 
-rect.select-fill, circle.select-fill {
-  fill: @chart-type-color;
-}
+  & > .icon {
+    padding: 15px 0;
+    margin-bottom: 8px;
+    min-width: 60px;
 
-path.select-fill-line, line.select-fill-line {
-  stroke: @chart-type-color;
-  fill: @table-control-container-background-color;
-  stroke-width: 3px;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
+    font-size: 26px;
+    font-weight: @icon-font-weight-light;
+    text-align: center;
 
-path.select-fill-pie {
-  stroke: @table-control-container-background-color;
-  fill: @chart-type-color;
-  stroke-width: 1px;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
+    border-radius: @border-radius-medium;
 
-svg.select-chart:hover:not(.disabled) {
-  & rect.select-fill, & circle.select-fill, & path.select-fill-pie {
-    fill: @chart-selected-color;
-  }
+    color: @button-color;
 
-  & path.select-fill-line, & line.select-fill-line {
-    stroke: @chart-selected-color;
-  }
-}
+    &:not(.disabled) {
+      cursor: pointer;
 
-svg.select-chart.selected:not(.disabled) {
-  & rect.select-fill, & circle.select-fill, & path.select-fill-pie {
-    fill: @chart-selected-color;
-  }
+      &.selected,
+      &.selected:hover {
+        background-color: @default-button-background-color;
+        color: @default-button-color;
+      }
 
-  & path.select-fill-line, & line.select-fill-line {
-    stroke: @chart-selected-color;
-  }
-}
+      &:hover {
+        color: @button-hover-color;
+        background-color: @hover-background-color;
+      }
+    }
 
-/* chart - axis and data select */
-
-.xaxis-select, .yaxis-select, .data-select {
-  margin-top: 10px;
-  margin-right: 15px;
-  width: 175px;
-  display: inline-block;
-  overflow: hidden;
-
-  & > .disabled {
-    cursor: default;
-    background-color: @table-control-container-background-color;
-    color: @table-control-disabled-color;
-
-    &:hover {
-      color: @table-control-disabled-color;
+    &.disabled {
+      color: @button-disabled-color;
     }
   }
 }
 
-.yaxis-select {
-  width: 0;
-  margin-right: 0;
+/* chart - axis and data select */
+@chart-table-control-axis-select-width: 175px;
+.axis-select-container {
+  display: flex;
+  position: relative;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  max-height: calc(100% - 50px);
+  min-height: 310px;
+
+  & > .xaxis-select,
+  & > .yaxis-select,
+  & > .data-select {
+    display: inline-block;
+    overflow: hidden;
+    width: @chart-table-control-axis-select-width;
+    padding: 3px 0;
+    border-left: 1px solid @border-color;
+  }
+
+  & > :first-child {
+    width: @chart-table-control-axis-select-width - 1px;
+    border-left: none;
+  }
+
+  & > .yaxis-select {
+    &.hide {
+      width: 0;
+      border-width: 0;
+    }
+
+    &.animated {
+      #scout.animation(show-axis-select 0.5s ease-in-out 1);
+
+      &.hide {
+        #scout.animation(hide-axis-select 0.5s ease-in-out 1);
+      }
+    }
+  }
 }
 
 .select-axis, .select-data {
-  background-color: @control-background-color;
   position: relative;
+  height: 30px;
+  width: calc(100% - 8px);
+  margin: 0 4px 2px;
   padding-left: 8px;
   padding-right: 20px;
-  height: 30px;
-  line-height: 30px;
-  width: 100%;
+  border-radius: @border-radius;
+
   cursor: pointer;
+
+  line-height: 30px;
   #scout.overflow-ellipsis();
-  border-top: 1px solid @border-color;
-  border-left: 1px solid @border-color;
-  border-right: 1px solid @border-color;
 
   &:hover {
-    color: @hover-color;
+    background-color: @hover-background-color;
   }
 
   &:last-child {
-    border-bottom: 1px solid @border-color;
+    margin-bottom: 0;
   }
 
   &.selected {
     background-color: @chart-selected-color;
     color: @palette-white;
-    border-top: 1px solid transparent;
-    border-left: 1px solid @chart-selected-color;
-    border-right: 1px solid @chart-selected-color;
-    border-bottom: 1px solid transparent;
   }
 
-  &.selected + & {
-    border-top: 1px solid transparent;
+  &.disabled {
+    cursor: default;
+    background-color: @table-control-container-background-color;
+    color: @table-control-disabled-color;
+
+    &:hover {
+      background-color: @table-control-container-background-color;
+    }
   }
 
-  & .select-axis-group {
+  & > .select-axis-group {
     position: relative;
     top: -7px;
     font-size: @font-size-extra-small;
@@ -157,54 +165,33 @@ svg.select-chart.selected:not(.disabled) {
     position: absolute;
     font-size: 16px;
     line-height: 16px;
-    right: 9px;
+    right: 8px;
     top: 6px;
     #scout.font-icon();
-  }
-
-  &.axis-ver.selected::before {
-    content: @icon-long-arrow-down-bold;
-  }
-
-  &.axis-hor.selected::before {
-    content: @icon-long-arrow-right-bold;
-    right: 5px;
-  }
-
-  &.axis-around.selected::before {
-    content: @icon-rotate-right-bold;
-    right: 6px;
-  }
-
-  &.axis-up.selected::before {
-    content: @icon-long-arrow-up-bold;
   }
 
   &.data-count.selected::before {
     content: @icon-count;
     font-size: 20px;
-    top: 4px;
     right: 5px;
   }
 
   &.data-sum.selected::before {
     content: @icon-sum-bold;
-    top: 6px;
-    right: 8px;
   }
 
   &.data-avg.selected::before {
     content: @icon-median;
     top: 2px;
-    right: 8px;
     font-size: 30px;
   }
 }
 
 .chart-container > .chart {
+  position: relative;
   flex-grow: 1;
   align-self: stretch;
-  margin: 20px 15px 10px 0;
+  margin: 35px 25px 25px;
   min-width: 350px;
   min-height: 300px;
   max-height: 600px;
@@ -218,16 +205,94 @@ svg.select-chart.selected:not(.disabled) {
   }
 }
 
-.chart-table-control > .pie-chart {
-  & > .elements {
-    #scout.chart-colors-schemes(@chart-data-color-1);
-    #scout.chart-colors-schemes(@chart-data-color-1, @darken: 10, @additional-classes: ~".hover");
+@chart-table-control-chart-data-color: @palette-orange-4;
+.chart-table-control {
+  & > .bar-chart,
+  & > .horizontalBar-chart {
+    & > .elements {
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color);
+      #scout.chart-stroke-colors-schemes(@chart-table-control-chart-data-color);
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @darken: 10, @additional-classes: ~".hover");
+      #scout.chart-stroke-colors-schemes(@chart-table-control-chart-data-color, @darken: 10, @additional-classes: ~".hover");
+    }
+
+    &.checkable > .elements {
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @opacity: 20);
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @additional-classes: ~".checked");
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @opacity: 35, @additional-classes: ~".hover");
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @darken: 10, @additional-classes: ~".hover.checked");
+    }
   }
 
-  &.checkable > .elements {
-    #scout.chart-colors-schemes(@chart-data-color-1, @opacity: 70);
-    #scout.chart-colors-schemes(@chart-data-color-1, @additional-classes: ~".checked");
-    #scout.chart-colors-schemes(@chart-data-color-1, @opacity: 85, @additional-classes: ~".hover");
-    #scout.chart-colors-schemes(@chart-data-color-1, @darken: 10, @additional-classes: ~".hover.checked");
+  & > .line-chart {
+    #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @opacity: 20);
+    #scout.chart-stroke-colors-schemes(@chart-table-control-chart-data-color);
+    #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @opacity: 35, @additional-classes: ~".hover");
+
+    #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @additional-classes: ~".legend");
   }
+
+  & > .pie-chart {
+    & > .elements {
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color);
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @darken: 10, @additional-classes: ~".hover");
+    }
+
+    &.checkable > .elements {
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @opacity: 70);
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @additional-classes: ~".checked");
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @opacity: 85, @additional-classes: ~".hover");
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @darken: 10, @additional-classes: ~".hover.checked");
+    }
+  }
+
+  & > .bubble-chart {
+    & > .elements {
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @opacity: 20);
+      #scout.chart-stroke-colors-schemes(@chart-table-control-chart-data-color);
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @opacity: 35, @additional-classes: ~".hover");
+      #scout.chart-stroke-colors-schemes(@chart-table-control-chart-data-color, @darken: 10, @additional-classes: ~".hover");
+    }
+
+    &.checkable > .elements {
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @additional-classes: ~".checked");
+      #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @darken: 10, @additional-classes: ~".hover.checked");
+    }
+
+    #scout.chart-colors-schemes(@chart-table-control-chart-data-color, @additional-classes: ~".legend");
+  }
+}
+
+/*** Animations ***/
+
+/*** show ***/
+.keyframes-show-axis-select() {
+  from {
+    width: 0;
+    border-width: 0;
+  }
+}
+
+@-webkit-keyframes show-axis-select {
+  .keyframes-show-axis-select();
+}
+
+@keyframes show-axis-select {
+  .keyframes-show-axis-select();
+}
+
+/*** hide ***/
+.keyframes-hide-axis-select() {
+  from {
+    width: @chart-table-control-axis-select-width;
+    border-width: 1px;
+  }
+}
+
+@-webkit-keyframes hide-axis-select {
+  .keyframes-hide-axis-select();
+}
+
+@keyframes hide-axis-select {
+  .keyframes-hide-axis-select();
 }
