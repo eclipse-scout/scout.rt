@@ -42,6 +42,11 @@ public abstract class AbstractButtonTile extends AbstractFormFieldTile<Button> {
     return null;
   }
 
+  @Override
+  protected String getConfiguredCssClass() {
+    return "button-tile";
+  }
+
   /**
    * If set, this value is applied to the tile field's "preventDoubleClick" property.
    */
