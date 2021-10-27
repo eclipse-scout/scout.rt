@@ -131,7 +131,7 @@ export default class PageTileGrid extends TileGrid {
       outline: this.outline,
       page: page
     });
-    let tile = scout.create('FormFieldTile', {
+    let tile = scout.create('ButtonTile', {
       parent: this,
       cssClass: this.compact ? 'compact' : null,
       tileWidget: button

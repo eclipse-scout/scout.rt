@@ -600,6 +600,7 @@ export {default as WidgetTileAdapter} from './tile/WidgetTileAdapter';
 export {default as PlaceholderTile} from './tile/PlaceholderTile';
 export {default as FormFieldTile} from './tile/fields/FormFieldTile';
 export {default as FormFieldTileAdapter} from './tile/fields/FormFieldTileAdapter';
+export {default as ButtonTile} from './tile/fields/button/ButtonTile';
 export {default as TileButton} from './tile/fields/button/TileButton';
 export {default as TileTableField} from './tile/fields/tablefield/TileTableField';
 export {default as SimpleTab} from './tabbox/SimpleTab';
