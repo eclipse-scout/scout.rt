@@ -8,7 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+.calendar-field {
 
-.calendar-field > .group-box-body {
-  padding-right: 0;
+  > .group-box-body {
+    padding-right: 0;
+  }
+
+  // add the default margin for form-fields when calendar used inside a regular form
+  .form:not(.detail-form) & > .field {
+    margin-left: @mandatory-indicator-width;
+  }
 }
