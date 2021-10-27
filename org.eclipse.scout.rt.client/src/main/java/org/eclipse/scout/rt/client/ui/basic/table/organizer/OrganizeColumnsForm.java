@@ -999,6 +999,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
 
               @Override
+              protected String getConfiguredCssClass() {
+                return "organize-columns-behind-scrollbar-column";
+              }
+
+              @Override
               protected boolean getConfiguredVisible() {
                 // touch devices don't have a regular scrollbar -> no need to show the column
                 return !UserAgentUtility.isTouchDevice();
