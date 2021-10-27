@@ -118,7 +118,8 @@ export default class TableHeader extends Widget {
 
     if (isFirstColumn) {
       $header.addClass('first');
-    } else if (isLastColumn) {
+    }
+    if (isLastColumn) {
       $header.addClass('last');
     }
 
