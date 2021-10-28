@@ -39,6 +39,14 @@ public interface IMimeMagic {
   IMimeMagic WOFF = createMagic(0, "774f4646", "774f4632");
   IMimeMagic ZIP = createMagic(0, "504b0304", "504b0506", "504b0708");
 
+  /**
+   * Validate file content or {@link BinaryResource}. Check headers and content in order to find out if the file is
+   * valid or corrupt or malware
+   *
+   * @return true if the content of this resource complies with the mime type
+   */
+  boolean matches(BinaryResource res);
+
   static IMimeMagic createMagic(int pos, String... hexMagics) {
     byte[][] magics = new byte[hexMagics.length][];
     for (int i = 0; i < hexMagics.length; i++) {
@@ -67,12 +75,4 @@ public interface IMimeMagic {
       return false;
     };
   }
-
-  /**
-   * Validate file content or {@link BinaryResource}. Check headers and content in order to find out if the file is
-   * valid or corrupt or malware
-   *
-   * @return true if the content of this resource complies with the mime type
-   */
-  boolean matches(BinaryResource res);
 }
