@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -973,10 +973,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
           continue;
         }
         Object candidateKey = view.computeExclusiveKey();
-        if (candidateKey == null) {
-          continue;
-        }
-        else {
+        if (candidateKey != null) {
           LOG.debug("form: {} vs {}", candidateKey, exclusiveKey);
           if (exclusiveKey.equals(candidateKey)
               && view.getClass() == formClass
@@ -1415,13 +1412,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public void addKeyStrokes(IKeyStroke... keyStrokes) {
     if (keyStrokes != null && keyStrokes.length > 0) {
-      Map<String, IKeyStroke> map = new HashMap<>();
-      Set<IKeyStroke> currentKeyStrokes = getKeyStrokesInternal();
-      if (CollectionUtility.hasElements(currentKeyStrokes)) {
-        for (IKeyStroke ks : currentKeyStrokes) {
-          map.put(ks.getKeyStroke(), ks);
-        }
-      }
+      Map<String, IKeyStroke> map = getKeyStrokesInternalMap();
       for (IKeyStroke ks : keyStrokes) {
         map.put(ks.getKeyStroke(), ks);
       }
@@ -1432,13 +1423,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public void removeKeyStrokes(IKeyStroke... keyStrokes) {
     if (keyStrokes != null && keyStrokes.length > 0) {
-      Map<String, IKeyStroke> map = new HashMap<>();
-      Set<IKeyStroke> currentKeyStrokes = getKeyStrokesInternal();
-      if (CollectionUtility.hasElements(currentKeyStrokes)) {
-        for (IKeyStroke ks : currentKeyStrokes) {
-          map.put(ks.getKeyStroke(), ks);
-        }
-      }
+      Map<String, IKeyStroke> map = getKeyStrokesInternalMap();
       for (IKeyStroke ks : keyStrokes) {
         map.remove(ks.getKeyStroke());
       }
@@ -1446,9 +1431,20 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     }
   }
 
+  protected Map<String, IKeyStroke> getKeyStrokesInternalMap() {
+    Map<String, IKeyStroke> map = new HashMap<>();
+    Set<IKeyStroke> currentKeyStrokes = getKeyStrokesInternal();
+    if (CollectionUtility.hasElements(currentKeyStrokes)) {
+      for (IKeyStroke ks : currentKeyStrokes) {
+        map.put(ks.getKeyStroke(), ks);
+      }
+    }
+    return map;
+  }
+
   @Override
   public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
-    // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
+    // ActionFinder performs instance-of checks. Hence, the menu replacement mapping is not required
     return MenuUtility.getMenuByClass(this, menuType);
   }
 
@@ -1474,7 +1470,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   @Override
   public <T extends IViewButton> T getViewButton(Class<? extends T> searchType) {
-    // ActionFinder performs instance-of checks. Hence the viewbutton replacement mapping is not required
+    // ActionFinder performs instance-of checks. Hence, the view-button replacement mapping is not required
     return new ActionFinder().findAction(getViewButtons(), searchType);
   }
 
@@ -1766,7 +1762,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       if (m_pendingPositionResponses.isEmpty()) {
         fireRequestGeolocation();
       }
-      ClientCallback<Coordinates> responseFuture = new ClientCallback<Coordinates>() {
+      ClientCallback<Coordinates> responseFuture = new ClientCallback<>() {
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
           removePendingResponse();
@@ -1997,6 +1993,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   protected void disposeChildren(List<? extends IWidget> widgetsToDispose) {
     // do not include child forms in dispose because they will be disposed in closeInternal() using IForm#doClose
+    //noinspection SuspiciousMethodCalls
     widgetsToDispose.removeAll(m_formStore.values());
     super.disposeChildren(widgetsToDispose);
   }
@@ -2008,6 +2005,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   protected void interceptInitChildren(List<? extends IWidget> widgets) {
     // same as in dispose: exclude the forms. Form will be initialized when they are started.
+    //noinspection SuspiciousMethodCalls
     widgets.removeAll(m_formStore.values());
     super.initChildren(widgets);
   }
@@ -2248,8 +2246,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
    * occurs while handling the deep-link a {@link DeepLinkException} is thrown, usually this exception is thrown when
    * the business-logic failed to find the resource addressed by the deep-link (similar to the 404 HTTP error status).
    *
-   * @param deepLinkPath
-   * @return
    * @throws DeepLinkException
    *           when deep-link could not be executed
    */
@@ -2812,6 +2808,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       // identify (by displayParent) and add relevant open forms to the formSet
       // formStore guarantees the order of insertion, therefore nested forms should be collected correctly
       for (IForm form : showedForms) {
+        //noinspection SuspiciousMethodCalls
         if (formSet.contains(form.getDisplayParent())) {
           formSet.add(form);
         }
@@ -2834,12 +2831,9 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       return true;
     }
 
-    formSet = formSet.stream().filter(form -> getForms(form)
-        .stream()
-        .filter(IForm::isModal)
-        .findAny()
-        .map(f -> false)
-        .orElse(true)).collect(Collectors.toSet());
+    formSet = formSet.stream()
+        .filter(form -> getForms(form).stream().noneMatch(IForm::isModal))
+        .collect(Collectors.toSet());
 
     // if formSet contains only one element simply call doCancel on that form. Using the UnsavedFormChangesForm is not necessary in this case.
     if (!alwaysShowUnsavedChangesForm && formSet.size() == 1) {
@@ -3046,13 +3040,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   protected class P_LocalPropertyChangeListener implements PropertyChangeListener {
-
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      if (evt.getPropertyName() == PROP_DISPLAY_STYLE) {
+      if (PROP_DISPLAY_STYLE.equals(evt.getPropertyName())) {
         initDisplayStyle((String) evt.getNewValue());
       }
     }
-
   }
 }
