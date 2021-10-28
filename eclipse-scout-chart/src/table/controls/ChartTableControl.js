@@ -871,6 +871,15 @@ export default class ChartTableControl extends TableControl {
           titleFontFamily: fontFamily
         }
       });
+      config.options = $.extend(true, {}, config.options, {
+        plugins: {
+          datalabels: {
+            font: {
+              family: fontFamily
+            }
+          }
+        }
+      });
     }
   }
 
