@@ -27,7 +27,8 @@ public interface IUploadable {
   long getMaximumUploadSize();
 
   /**
-   * @return the set of accepted lowercase file extensions for that uploadable. '*' is supported but not recommended!
+   * @return the set of accepted lowercase file extensions or media types for that uploadable. '*' is supported but not
+   *         recommended!
    */
   default Collection<String> getAcceptedUploadFileExtensions() {
     return null;

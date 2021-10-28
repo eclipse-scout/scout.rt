@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -165,7 +166,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         readUploadData(httpServletRequest, uploadable, uploadProperties, uploadResources);
       }
       catch (UnsafeResourceException e) { // NOSONAR
-        // LOG is done in MalwareScanner, verifyFileSafety is the only methods throwing this exception
+        // LOG is done in MalwareScanner, verifyFileSafety is the only method throwing this exception
         writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createUnsafeUploadResponse());
         return;
       }
@@ -261,16 +262,32 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   /**
    * @param uploadable
    *          is the JsonAdapter that triggers the upload
-   * @return the set of accepted lowercase file extensions for that uploadable. If the set contains '*' then all files
-   *         are accepted.
+   * @return the set of accepted lowercase file extensions or media types for that uploadable. If the set contains '*'
+   *         then all files are accepted.
    * @since 10.x
    */
   protected Set<String> getValidFileExtensionsFor(IUploadable uploadable, Map<String, String> uploadProperties) {
-    Collection<String> extList = uploadable.getAcceptedUploadFileExtensions();
-    if (extList != null && !extList.isEmpty()) {
-      return new HashSet<>(extList);
+    Set<String> extSet = toExtensionsLowercase(uploadable.getAcceptedUploadFileExtensions());
+    if (extSet.isEmpty()) {
+      return getValidFileExtensionsDefault();
     }
-    return getValidFileExtensionsDefault();
+    return extSet;
+  }
+
+  protected Set<String> toExtensionsLowercase(Collection<String> extOrMediaList) {
+    if (extOrMediaList == null) {
+      return Collections.emptySet();
+    }
+    Set<String> extSet = new HashSet<>();
+    for (String extOrMedia : extOrMediaList) {
+      if (extOrMedia != null && extOrMedia.indexOf('/') < 0) {
+        extSet.add(extOrMedia);
+      }
+      else {
+        MimeTypes.findByMimeTypeName(extOrMedia).forEach(t -> extSet.add(t.getFileExtension()));
+      }
+    }
+    return extSet;
   }
 
   protected Set<String> getValidFileExtensionsDefault() {

@@ -915,9 +915,7 @@ public class UiSession implements IUiSession {
         return null;
       }
     }
-    finally
-
-    {
+    finally {
       m_httpContext.clear();
       if (m_disposing) {
         dispose();

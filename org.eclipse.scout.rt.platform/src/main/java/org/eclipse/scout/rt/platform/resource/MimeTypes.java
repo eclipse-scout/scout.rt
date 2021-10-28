@@ -10,14 +10,13 @@
  */
 package org.eclipse.scout.rt.platform.resource;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -27,8 +26,7 @@ import org.eclipse.scout.rt.platform.util.FileUtility;
  * Support for extensible {@link MimeType} enums
  */
 public final class MimeTypes {
-  private static final Map<String/*type-name*/, IMimeType> NAME_TO_MIMETYPE = new ConcurrentHashMap<>();
-  private static final Map<String/*ext-lowercase*/, IMimeType> EXT_TO_MIMETYPE = new ConcurrentHashMap<>();
+  private static final Map<String/*ext-lowercase*/, IMimeType> EXT_TO_MIMETYPE = Collections.synchronizedMap(new LinkedHashMap<>());
   private static final Pattern EXT_LIST_PATTERN = Pattern.compile("[\\s,;.]");
 
   static {
@@ -40,26 +38,30 @@ public final class MimeTypes {
   private MimeTypes() {
   }
 
-  public static void register(IMimeType t, boolean overwrite) {
+  /**
+   * @return true if the {@link IMimeType} was added
+   */
+  public static boolean register(IMimeType t, boolean overwrite) {
+    if (t.getFileExtension() == null) {
+      return false;
+    }
     if (overwrite) {
-      NAME_TO_MIMETYPE.put(t.getType(), t);
-      if (t.getFileExtension() != null) {
-        EXT_TO_MIMETYPE.put(t.getFileExtension(), t);
-      }
+      EXT_TO_MIMETYPE.put(t.getFileExtension(), t);
+      return true;
     }
     else {
-      NAME_TO_MIMETYPE.putIfAbsent(t.getType(), t);
-      if (t.getFileExtension() != null) {
-        EXT_TO_MIMETYPE.putIfAbsent(t.getFileExtension(), t);
-      }
+      return EXT_TO_MIMETYPE.putIfAbsent(t.getFileExtension(), t) != null;
     }
   }
 
-  public static IMimeType findByMimeTypeName(String mimeTypeName) {
-    if (mimeTypeName == null) {
+  /**
+   * @return the {@link IMimeType} that was removed or null
+   */
+  public static IMimeType unregister(String fileExtension) {
+    if (fileExtension == null) {
       return null;
     }
-    return NAME_TO_MIMETYPE.get(mimeTypeName);
+    return EXT_TO_MIMETYPE.remove(fileExtension);
   }
 
   public static IMimeType findByFileExtension(String fileExtension) {
@@ -69,14 +71,26 @@ public final class MimeTypes {
     return EXT_TO_MIMETYPE.get(fileExtension.toLowerCase(Locale.ROOT));
   }
 
-  public static Collection<IMimeType> findByContentMagic(BinaryResource res) {
-    Collection<IMimeType> list = new ArrayList<>();
-    for (IMimeType t : NAME_TO_MIMETYPE.values()) {
-      if (t.getMagic() != null && t.getMagic().matches(res)) {
-        list.add(t);
-      }
+  public static Collection<IMimeType> findByMimeTypeName(String mimeTypeName) {
+    if (mimeTypeName == null) {
+      return Collections.emptyList();
     }
-    return list;
+    return EXT_TO_MIMETYPE
+        .values()
+        .stream()
+        .filter(t -> Objects.equals(mimeTypeName, t.getType()))
+        .collect(Collectors.toList());
+  }
+
+  public static Collection<IMimeType> findByContentMagic(BinaryResource res) {
+    if (res == null) {
+      return Collections.emptyList();
+    }
+    return EXT_TO_MIMETYPE
+        .values()
+        .stream()
+        .filter(t -> t.getMagic() != null && t.getMagic().matches(res))
+        .collect(Collectors.toList());
   }
 
   /**
@@ -103,15 +117,5 @@ public final class MimeTypes {
       return true;
     }
     return false;
-  }
-
-  private static Set<String> toExtensionsLowercase(String validFileExtensions) {
-    if (validFileExtensions == null) {
-      return Collections.emptySet();
-    }
-    return Arrays.stream(EXT_LIST_PATTERN.split(validFileExtensions.replace("*.", "")))
-        .map(s -> s.trim().toLowerCase(Locale.ROOT))
-        .filter(s -> !s.isEmpty())
-        .collect(Collectors.toSet());
   }
 }
