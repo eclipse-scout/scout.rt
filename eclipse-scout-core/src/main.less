@@ -405,10 +405,24 @@ button::-moz-focus-inner {
   border: 0;
   background-color: @application-loading-background-color;
   pointer-events: none;
+
+  &.fadeout {
+    #scout.animation(application-loading-fade-out @loading-fade-duration linear 1);
+  }
 }
 
-.application-loading-root-fadeout {
-  #scout.animation(fade-out @loading-fade-duration linear 1);
+.keyframes-application-loading-fade-out() {
+  to {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes application-loading-fade-out {
+  .keyframes-application-loading-fade-out();
+}
+
+@keyframes application-loading-fade-out {
+  .keyframes-application-loading-fade-out();
 }
 
 .application-loading01 {

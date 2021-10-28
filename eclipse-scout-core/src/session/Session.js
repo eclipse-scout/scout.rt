@@ -1434,23 +1434,37 @@ export default class Session {
   }
 
   _renderApplicationLoading() {
-    let $loadingRoot = $('body').appendDiv('application-loading-root')
-      .addClass('application-loading-root')
-      .fadeIn();
+    let $body = $('body'),
+      $loadingRoot = $body.children('.application-loading-root');
+    if (!$loadingRoot.length) {
+      $loadingRoot = $body.appendDiv('application-loading-root')
+        .addClass('application-loading-root')
+        .fadeIn();
+    }
+    this._renderApplicationLoadingElement($loadingRoot, 'application-loading01');
+    this._renderApplicationLoadingElement($loadingRoot, 'application-loading02');
+    this._renderApplicationLoadingElement($loadingRoot, 'application-loading03');
+  }
+
+  _renderApplicationLoadingElement($loadingRoot, cssClass) {
+    if ($loadingRoot.children('.' + cssClass).length) {
+      return;
+    }
     // noinspection JSValidateTypes
-    $loadingRoot.appendDiv('application-loading01').hide()
-      .fadeIn();
-    // noinspection JSValidateTypes
-    $loadingRoot.appendDiv('application-loading02').hide()
-      .fadeIn();
-    // noinspection JSValidateTypes
-    $loadingRoot.appendDiv('application-loading03').hide()
+    $loadingRoot.appendDiv(cssClass).hide()
       .fadeIn();
   }
 
   _removeApplicationLoading() {
     let $loadingRoot = $('body').children('.application-loading-root');
-    $loadingRoot.addClass('application-loading-root-fadeout');
+    // the fadeout animation only contains a to-value and no from-value
+    // therefore set the current value to the elements style
+    $loadingRoot.css('opacity', $loadingRoot.css('opacity'));
+    if ($loadingRoot.css('opacity') == 1) {
+      $loadingRoot.addClass('fadeout and-more');
+    } else {
+      $loadingRoot.addClass('fadeout');
+    }
     if (Device.get().supportsCssAnimation()) {
       $loadingRoot.oneAnimationEnd(() => {
         $loadingRoot.remove();
