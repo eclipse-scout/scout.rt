@@ -34,7 +34,7 @@ export default class TimePickerPopup extends Popup {
   }
 
   _render() {
-    this.$container = this.$parent.appendDiv('time-picker-popup');
+    this.$container = this.$parent.appendDiv('popup time-picker-popup');
     this.$container.toggleClass('alternative', this.field.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(this._createLayout());

@@ -88,7 +88,7 @@ export default class TouchPopup extends Popup {
   }
 
   _render() {
-    this.$container = this.$parent.appendDiv('touch-popup');
+    this.$container = this.$parent.appendDiv('popup touch-popup');
 
     this._$header = this.$container.appendDiv('touch-popup-header');
     this._$header
