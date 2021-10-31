@@ -78,15 +78,25 @@ public class DoStructureMigrator {
   /**
    * Migrates the raw data object.
    * <p>
-   * Uses latest version to migrate too.
+   * Uses latest version to migrate too. Uses no intial local context data.
    */
   public boolean migrateDataObject(DoStructureMigrationContext ctx, IDataObject dataObject) {
     return migrateDataObject(ctx, dataObject, (NamespaceVersion) null /* latest version */);
   }
 
   /**
-   * <b>ATTENTION:</b> use {@link #migrateDataObject(DoStructureMigrationContext, IDataObject)} instead. Only use this
-   * for tests and very special cases.
+   * Migrates the raw data object.
+   * <p>
+   * Uses latest version to migrate too. Uses given initial local context data during migration.
+   */
+  public boolean migrateDataObject(DoStructureMigrationContext ctx, IDataObject dataObject, IDoStructureMigrationLocalContextData... initialLocalContextData) {
+    return migrateDataObject(ctx, dataObject, null /* latest version */, initialLocalContextData);
+  }
+
+  /**
+   * <b>ATTENTION:</b> use {@link #migrateDataObject(DoStructureMigrationContext, IDataObject)} or
+   * {@link #migrateDataObject(DoStructureMigrationContext, IDataObject, IDoStructureMigrationLocalContextData...)}
+   * instead. Only use this for tests and very special cases.
    * <p>
    * Migrates the raw data object.
    *
@@ -95,12 +105,16 @@ public class DoStructureMigrator {
    *          data object parts are migrated.
    * @param toVersion
    *          Versions to migrate to, <code>null</code> if migrating to latest version.
+   * @param initialLocalContextData
+   *          Initial local context data to use.
    */
-  public boolean migrateDataObject(DoStructureMigrationContext ctx, IDataObject dataObject, NamespaceVersion toVersion) {
+  public boolean migrateDataObject(DoStructureMigrationContext ctx, IDataObject dataObject, NamespaceVersion toVersion, IDoStructureMigrationLocalContextData... initialLocalContextData) {
     assertNotNull(ctx, "ctx is required");
     assertNotNull(dataObject, "dataObject is required");
 
-    DoStructureMigrationContext ctxCopy = ctx.copy(); // copy context to work on own stack for local context data.
+    // copy context to work on own stack for local context data.
+    // Local context may be initialized via initialLocalContextData.
+    DoStructureMigrationContext ctxCopy = ctx.initializedCopy(initialLocalContextData);
     DoStructureMigrationStatsContextData stats = ctxCopy.getStats();
     IDoStructureMigrationLogger logger = ctxCopy.getLogger();
 

@@ -13,9 +13,11 @@ package org.eclipse.scout.rt.dataobject.migration;
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -61,6 +63,19 @@ public class DoStructureMigrationContext {
    */
   protected DoStructureMigrationContext copy() {
     return new DoStructureMigrationContext(this);
+  }
+
+  /**
+   * Clones the context via {@link #copy} and pushes the given initial local context datas to the local context data
+   * map. If no initial local context datas are provided behaves same as {@link #copy}.
+   */
+  protected DoStructureMigrationContext initializedCopy(IDoStructureMigrationLocalContextData... initialLocalContextDatas) {
+    DoStructureMigrationContext copy = copy();
+    if (initialLocalContextDatas != null) {
+      // Calling push without a remove is okay here because these provided locale contexts are valid for the whole data object
+      Arrays.stream(initialLocalContextDatas).filter(Objects::nonNull).forEach(copy::push);
+    }
+    return copy;
   }
 
   /**
