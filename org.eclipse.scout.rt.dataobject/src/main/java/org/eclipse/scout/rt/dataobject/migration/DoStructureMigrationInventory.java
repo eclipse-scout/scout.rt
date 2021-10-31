@@ -301,6 +301,13 @@ public class DoStructureMigrationInventory {
   }
 
   /**
+   * @return Unmodifiable list of ordered versions according to VersionedItemInventory.
+   */
+  public List<NamespaceVersion> getAllVersionsOrdered() {
+    return Collections.unmodifiableList(new ArrayList<>(m_orderedVersions));
+  }
+
+  /**
    * For each type name {@link #findNextMigrationHandlerVersion(String, NamespaceVersion)} is called. The lowest version
    * of all type names defines the starting point.
    *
