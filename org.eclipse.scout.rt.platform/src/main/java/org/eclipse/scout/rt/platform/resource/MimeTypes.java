@@ -104,16 +104,19 @@ public final class MimeTypes {
   public static boolean verifyMagic(BinaryResource res) {
     String ext = FileUtility.getFileExtension(res.getFilename());
     IMimeType mimeType = MimeTypes.findByFileExtension(ext);
-    if (mimeType != null && mimeType.getMagic() != null) {
+    if (mimeType == null) {
+      return true;
+    }
+    if (mimeType.getMagic() != null) {
       //there is a verifier, let's decide
       if (mimeType.getMagic().matches(res)) {
         return true;
       }
       return false;
     }
-    //no verifier, check if the file content yields a different mime than the file extension
-    Set<String> detectedExt = MimeTypes.findByContentMagic(res).stream().map(t -> t.getFileExtension()).collect(Collectors.toSet());
-    if (detectedExt.isEmpty() || detectedExt.contains(ext)) {
+    //no verifier, check if the file content yields a different mime major part than the file extension
+    Set<String> detectedMajorParts = MimeTypes.findByContentMagic(res).stream().map(t -> t.getMajorPart()).collect(Collectors.toSet());
+    if (detectedMajorParts.isEmpty() || detectedMajorParts.contains(ext)) {
       return true;
     }
     return false;

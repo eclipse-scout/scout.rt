@@ -14,7 +14,23 @@ package org.eclipse.scout.rt.platform.resource;
  * Support for extensible {@link MimeType} enums
  */
 public interface IMimeType {
+
+  /**
+   * @return the mime type or media type in the format majorPart/minorPart
+   */
   String getType();
+
+  default String getMajorPart() {
+    String t = getType();
+    int i = t.indexOf('/');
+    return i > 0 ? t.substring(0, i) : "";
+  }
+
+  default String getMinorPart() {
+    String t = getType();
+    int i = t.indexOf('/');
+    return i > 0 ? t.substring(i + 1) : "";
+  }
 
   String getFileExtension();
 
