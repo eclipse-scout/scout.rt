@@ -353,8 +353,7 @@ export default class FormFieldLayout extends AbstractLayout {
     formField.$icon
       .cssRight(right)
       .cssTop(fieldBounds.y)
-      .cssHeight(height)
-      .cssLineHeight(height);
+      .cssHeight(height);
   }
 
   _layoutClearIcon(formField, fieldBounds, right, top) {
@@ -368,15 +367,13 @@ export default class FormFieldLayout extends AbstractLayout {
         .cssLeft(fieldBounds.x)
         .cssRight('')
         .cssTop(fieldBounds.y)
-        .cssHeight(height)
-        .cssLineHeight(height);
+        .cssHeight(height);
     } else {
       formField.$clearIcon
         .cssLeft('')
         .cssRight(right)
         .cssTop(fieldBounds.y)
-        .cssHeight(height)
-        .cssLineHeight(height);
+        .cssHeight(height);
     }
   }
 

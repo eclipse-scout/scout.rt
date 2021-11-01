@@ -74,7 +74,7 @@ export default class TableFooter extends Widget {
     if (filter) {
       this._$textFilter.val(filter.text);
     }
-    this.$clearIcon = $filter.appendSpan('clear-icon unfocusable needsclick')
+    this.$clearIcon = $filter.appendSpan('clear-icon unfocusable needsclick action text-field-icon')
       .on('mousedown', this._onDeleteFilterMouseDown.bind(this));
 
     // load info ("X rows loaded, click to reload")

@@ -56,7 +56,7 @@
 
   &:not(.disabled):not(.compact-date) > .field {
     & > .icon.date {
-      display: block;
+      display: flex;
     }
 
     & > input.date {
@@ -70,7 +70,7 @@
 
   &:not(.disabled):not(.compact-time) > .field {
     & > .icon.time {
-      display: block;
+      display: flex;
     }
 
     & > input.time {
@@ -96,13 +96,8 @@
       color: @text-field-icon-error-color;
     }
 
-    &.date-focused > .icon.date::before,
-    &.date-focused > .field > .icon.date-clear:hover::before {
-      color: @highlight-color;
-    }
-
     & > .field > .date-clear {
-      display: block;
+      display: flex;
     }
 
     & > .field > .icon.date {
@@ -132,13 +127,8 @@
       color: @text-field-icon-error-color;
     }
 
-    &.time-focused > .icon.time::before,
-    &.time-focused > .field > .icon.time-clear:hover::before {
-      color: @highlight-color;
-    }
-
     & > .field > .time-clear {
-      display: block;
+      display: flex;
     }
 
     & > .field > .icon.time {
@@ -187,7 +177,7 @@
 
 .date-field.date-clearable > .field {
   & > .icon.date-clear {
-    display: block;
+    display: flex;
   }
 
   & > .icon.date {
@@ -197,7 +187,7 @@
 
 .date-field.time-clearable > .field {
   & > .icon.time-clear {
-    display: block;
+    display: flex;
   }
 
   & > .icon.time {

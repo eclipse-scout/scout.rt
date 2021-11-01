@@ -41,29 +41,35 @@
   &.has-icon.clearable-always.has-text:not(.loading):not(.disabled):not(.compact),
   &.has-icon.clearable-focused.has-text.focused:not(.loading):not(.disabled):not(.compact) {
 
-    > input {
-      padding-right: @text-field-padding-x + 40px;
+    & > .clear-icon {
+      margin-right: 0;
+    }
+
+    & > input {
+      padding-right: @text-field-icon-outer-width + @text-field-icon-size + @text-field-icon-margin-x;
+
+      &.alternative {
+        padding-right: @text-field-alternative-icon-outer-width * 2;
+      }
     }
 
     &.halign-right > input {
-      padding-left: @text-field-padding-x + 15px;
-      padding-right: @text-field-padding-x + 15px;
+      padding-left: @text-field-icon-outer-width;
+      padding-right: @text-field-icon-outer-width;
+
+      &.alternative {
+        padding-left: @text-field-alternative-icon-outer-width;
+        padding-right: @text-field-alternative-icon-outer-width;
+      }
     }
 
-    > .icon {
-      display: block;
+    & > .icon {
+      display: flex;
     }
   }
 
 
-  &.has-icon {
-
-    & > .icon {
-      cursor: pointer;
-
-      &::before {
-        content: @icon-arrow-right-bold;
-      }
-    }
+  &.has-icon > .icon::before {
+    content: @icon-arrow-right-bold;
   }
 }

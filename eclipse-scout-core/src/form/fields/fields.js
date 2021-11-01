@@ -28,7 +28,7 @@ export function appendIcon($field, cssClass) {
    * a new focus target, so we cannot simply change the focus target, because at the end the wrong target would be
    * focused and the popup would be closed immediately. With 'unfocusable' the focus manager will prevent the default focus (and does not execute _handleIEEvent either)
    */
-  let $icon = $field.appendSpan('icon unfocusable');
+  let $icon = $field.appendSpan('icon unfocusable text-field-icon');
   if (cssClass) {
     $icon.addClass(cssClass);
   }

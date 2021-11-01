@@ -107,7 +107,7 @@
       padding-right: @text-field-padding-x + 15px;
 
       & ~ .clear-icon {
-        display: block;
+        display: flex;
       }
     }
   }
@@ -118,16 +118,6 @@
     right: 0;
     top: 0;
     min-height: @table-footer-text-filter-height;
-    line-height: @table-footer-text-filter-height;
-    padding-right: @text-field-padding-x;
-    cursor: pointer;
-
-    &::before {
-      #scout.font-icon();
-      font-size: 13px;
-      content: @icon-remove-bold;
-      color: @text-field-icon-color;
-    }
   }
 }
 

@@ -19,58 +19,24 @@
     min-height: @logical-grid-row-height;
   }
 
-  & > .icon,
-  & > .field > .icon,
-  & > .clear-icon,
-  & > .field > .clear-icon {
+  & > .text-field-icon,
+  & > .field > .text-field-icon {
     display: none;
     position: absolute;
-    padding-right: @text-field-padding-x;
-
-    &::before {
-      #scout.font-icon();
-      font-size: 13px;
-      color: @text-field-icon-color;
-    }
   }
 
   &.alternative {
-    & > .icon,
-    & > .field > .icon,
-    & > .clear-icon,
-    & > .field > .clear-icon {
-      padding-right: @text-field-alternative-icon-padding-right;
+    & > .text-field-icon,
+    & > .field > .text-field-icon {
+      margin-right: 0;
     }
-  }
-
-  & > .clear-icon,
-  & > .field > .clear-icon {
-    cursor: pointer;
-
-    &::before {
-      content: @icon-remove-bold;
-    }
-
-    &:hover::before {
-      color: @highlight-color;
-    }
-  }
-
-  & > .icon,
-  & > .field > .icon {
-    cursor: text;
-  }
-
-  &.halign-right > .clear-icon,
-  &.halign-right > .field > .clear-icon {
-    padding-left: @text-field-padding-x;
-    padding-right: 0;
   }
 
   &.alternative.halign-right {
     & > .clear-icon,
     & > .field > .clear-icon {
-      padding-left: @text-field-alternative-icon-padding-right;
+      margin-left: 0;
+      margin-right: @text-field-icon-margin-x;
     }
   }
 
@@ -79,19 +45,11 @@
     #scout.value-field-with-icon(~'.clear-icon');
 
     & > .clear-icon {
-      display: block;
+      display: flex;
     }
 
     & > .icon {
       display: none;
-    }
-
-    & > .clear-icon,
-    & > .field > .clear-icon {
-
-      &:hover::before {
-        color: @highlight-color;
-      }
     }
 
     & > input,
@@ -133,7 +91,7 @@
 
     & > .icon,
     & > .field > .icon {
-      display: block;
+      display: flex;
     }
 
     & > input,

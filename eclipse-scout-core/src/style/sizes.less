@@ -45,9 +45,10 @@
 @text-field-padding-top-compensation: 1px;
 @text-field-alternative-padding-left: 0;
 @text-field-alternative-padding-right: 0;
-@text-field-alternative-icon-padding-right: 4px;
-@text-field-icon-outer-width: 30px;
-@text-field-alternative-icon-outer-width: 23px;
+@text-field-icon-size: 24px;
+@text-field-icon-margin-x: (@logical-grid-row-height - 2px - @text-field-icon-size) / 2; // same margin to the right as to the top and bottom of an input field
+@text-field-icon-outer-width: @text-field-icon-size + 2 * @text-field-icon-margin-x;
+@text-field-alternative-icon-outer-width: @text-field-icon-size + @text-field-icon-margin-x;
 @top-label-font-size: @font-size-small;
 @top-label-border-padding-bottom: 4px;
 

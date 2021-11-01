@@ -707,7 +707,7 @@ export default class DateField extends ValueField {
     if (this.hasDate || this.isClearable()) {
       if (!this.$dateClearIcon) {
         // date clear icon
-        this.$dateClearIcon = this.$field.appendSpan('icon date-clear unfocusable')
+        this.$dateClearIcon = this.$field.appendSpan('icon date-clear unfocusable text-field-icon action')
           .on('mousedown', this._onDateClearIconMouseDown.bind(this));
         // avoid fastclick on icon. Otherwise the blur event overtakes the mousedown event.
         this.$dateClearIcon.addClass('needsclick');
@@ -724,7 +724,7 @@ export default class DateField extends ValueField {
   _renderTimeClearable() {
     if (this.hasTime && this.isClearable() && !this.$timeClearIcon) {
       // date clear icon
-      this.$timeClearIcon = this.$field.appendSpan('icon time-clear unfocusable')
+      this.$timeClearIcon = this.$field.appendSpan('icon time-clear unfocusable text-field-icon action')
         .on('mousedown', this._onTimeClearIconMouseDown.bind(this));
       // avoid fastclick on icon. Otherwise the blur event overtakes the mousedown event.
       this.$timeClearIcon.addClass('needsclick');

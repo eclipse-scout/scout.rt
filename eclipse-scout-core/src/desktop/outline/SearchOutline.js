@@ -56,7 +56,7 @@ export default class SearchOutline extends Outline {
     this.$queryField = this.$searchPanel.appendElement('<input>', 'search-outline-field')
       .on('input', this._createOnQueryFieldInputFunction().bind(this))
       .on('keypress', this._onQueryFieldKeyPress.bind(this));
-    this.$clearIcon = this.$searchPanel.appendSpan('clear-icon unfocusable needsclick')
+    this.$clearIcon = this.$searchPanel.appendSpan('clear-icon unfocusable needsclick action text-field-icon')
       .on('mousedown', this._onClearIconMouseDown.bind(this));
 
     this.$searchStatus = this.$searchPanel.appendDiv('search-outline-status')

@@ -286,6 +286,7 @@ export default class StringField extends BasicField {
     if (this.hasAction) {
       if (!this.$icon) {
         this.addIcon();
+        this.$icon.addClass('action');
       }
       this.$container.addClass('has-icon');
     } else {
