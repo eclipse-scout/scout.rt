@@ -2132,6 +2132,7 @@ export default class Table extends Widget {
     this.trigger('prepareCellEdit', event);
 
     if (!event.defaultPrevented) {
+      this.selectRow(row);
       let field = column.createEditor(row);
       this.startCellEdit(column, row, field);
     }
