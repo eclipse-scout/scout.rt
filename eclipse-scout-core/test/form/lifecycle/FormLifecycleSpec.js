@@ -301,5 +301,34 @@ describe('FormLifecycle', () => {
       expect(html).toContain('BarField');
     });
 
+    it('should list labels of missing and invalid fields with html labels as plain text', () => {
+      field.setLabelHtmlEnabled(true);
+      field.setLabel('<i>Foo</i><b>Field</b>');
+      let missingFields = [{
+        valid: false,
+        validByErrorStatus: false,
+        validByMandatory: true,
+        field: field,
+        label: field.label,
+        reveal: () => {
+        }
+      }];
+      let invalidField = helper.createField('StringField', session.desktop);
+      invalidField.setLabelHtmlEnabled(true);
+      invalidField.setLabel('<b>Bar</b><i>Field</i>');
+      let invalidFields = [{
+        valid: false,
+        validByErrorStatus: true,
+        validByMandatory: false,
+        field: invalidField,
+        label: invalidField.label,
+        reveal: () => {
+        }
+      }];
+      let html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);
+      expect(html).toContain('FooField');
+      expect(html).toContain('BarField');
+    });
+
   });
 });

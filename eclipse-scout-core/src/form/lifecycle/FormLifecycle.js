@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, Lifecycle, scout, ValueField} from '../../index';
+import {Form, Lifecycle, scout, strings, ValueField} from '../../index';
 
 export default class FormLifecycle extends Lifecycle {
 
@@ -60,11 +60,11 @@ export default class FormLifecycle extends Lifecycle {
   }
 
   _invalidElementText(element) {
-    return element.label;
+    return strings.plainText(element.label);
   }
 
   _missingElementText(element) {
-    return element.label;
+    return strings.plainText(element.label);
   }
 
   _validateWidget() {
