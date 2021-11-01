@@ -77,6 +77,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String SearchBold = "font:\uE042";
   public static final String Folder = "font:\uE02B";
   public static final String FolderBold = "font:\uE043";
+  public static final String Slippery = "font:\uE044";
   public static final String RemoveBold = "font:\uE045";
   public static final String Sum = "font:\ue02C";
   public static final String SumBold = "font:\ue025";
@@ -84,8 +85,9 @@ public abstract class AbstractIcons implements Serializable {
   public static final String PencilBold = "font:\uE04B";
   public static final String PencilSolid = "font:\uE04F";
   public static final String PencilUnderlineSolid = "font:\uE050";
+  public static final String RotateLeft = "font:\uE051";
+  public static final String RotateRight = "font:\uE052";
   public static final String ExclamationMarkBold = "font:\uE060";
-  public static final String Slippery = "font:\uE044";
   public static final String DiagramArea = "font:\uE070";
   public static final String DiagramBar = "font:\uE071";
   public static final String DiagramBarsHorizontal = "font:\uE072";
@@ -99,8 +101,6 @@ public abstract class AbstractIcons implements Serializable {
   public static final String DiagramScatter = "font:\uE07A";
 
   /* awesome font icons */
-  public static final String RotateLeftBold = "font:\uF0E2";
-  public static final String RotateRightBold = "font:\uF01E";
   public static final String ChevronLeftBold = "font:\uF053";
   public static final String ChevronRightBold = "font:\uF054";
   public static final String ArrowRightBold = "font:\uF061";

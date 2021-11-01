@@ -66,13 +66,15 @@ const EXPAND_ALL = 'font:\uE036';
 const COLLAPSE_ALL = 'font:\uE037';
 const COLLAPSE = 'font:\uE600';
 const ELLIPSIS_V = 'font:\uE041';
+const SLIPPERY = 'font:\uE044';
 const REMOVE = 'font:\uE035';
 const REMOVE_BOLD = 'font:\uE045';
 const PENCIL = 'font:\uE02F';
 const PENCIL_BOLD = 'font:\uE04B';
 const PENCIL_SOLID = 'font:\uE04F';
 const PENCIL_UNDERLINE_SOLID = 'font:\uE050';
-const SLIPPERY = 'font:\uE044';
+const ROTATE_LEFT = 'font:\uE051';
+const ROTATE_RIGHT = 'font:\uE052';
 const DIAGRAM_AREA = 'font:\uE070';
 const DIAGRAM_BAR = 'font:\uE071';
 const DIAGRAM_BARS_HORIZONTAL = 'font:\uE072';
@@ -86,8 +88,6 @@ const DIAGRAM_RADAR = 'font:\uE079';
 const DIAGRAM_SCATTER = 'font:\uE07A';
 
 /* font awesome icons */
-const ROTATE_LEFT_BOLD = 'font:\uF0E2';
-const ROTATE_RIGHT_BOLD = 'font:\uF01E';
 const CHEVRON_LEFT_BOLD = 'font:\uF053';
 const CHEVRON_RIGHT_BOLD = 'font:\uF054';
 const CHEVRON_UP_BOLD = 'font:\uF077';
@@ -266,8 +266,8 @@ export default {
   PLUS_BOLD,
   REMOVE,
   REMOVE_BOLD,
-  ROTATE_LEFT_BOLD,
-  ROTATE_RIGHT_BOLD,
+  ROTATE_LEFT,
+  ROTATE_RIGHT,
   SEARCH,
   SEARCH_BOLD,
   SQUARE_BOLD,
