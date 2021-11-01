@@ -126,7 +126,31 @@ public class AbstractFormTest {
     }
 
     assertEquals(expectedErrorMessage, htmlErrorMessage);
+  }
 
+  /**
+   * Tests the html veto exception error message creation of a field with a html label
+   */
+  @Test
+  public void testVetoExceptionHtmlMessageWithHtmlLabel() {
+    TestFormWithMandatoryField form = new TestFormWithMandatoryField();
+    form.getStringField().setLabelHtmlEnabled(true);
+    form.getStringField().setLabel(HTML.italic("String") + " " + HTML.bold("Field"));
+    String htmlErrorMessage = "";
+
+    String expectedErrorMessage = HTML.fragment(
+        HTML.div(TEXTS.get("FormEmptyMandatoryFieldsMessage")),
+        HTML.ul(HTML.li(form.getMainBox().getFullyQualifiedLabel(": ") + ": " + "String Field")))
+        .toHtml();
+
+    try {
+      form.validateForm();
+    }
+    catch (VetoException ve) {
+      htmlErrorMessage = ve.getHtmlMessage().toHtml();
+    }
+
+    assertEquals(expectedErrorMessage, htmlErrorMessage);
   }
 
   // Test classes

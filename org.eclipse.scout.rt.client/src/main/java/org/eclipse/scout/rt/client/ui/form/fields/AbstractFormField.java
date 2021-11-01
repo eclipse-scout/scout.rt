@@ -60,6 +60,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.Holder;
+import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
@@ -1396,7 +1397,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
         b.append(s);
       }
     }
-    String s = getLabel();
+    String s = !isLabelHtmlEnabled() ? getLabel() : HTML.raw(getLabel()).toPlainText();
     if (s != null) {
       if (b.length() > 0) {
         b.append(separator);
