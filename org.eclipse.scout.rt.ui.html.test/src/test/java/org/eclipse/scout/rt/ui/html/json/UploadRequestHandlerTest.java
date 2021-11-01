@@ -80,8 +80,13 @@ public class UploadRequestHandlerTest {
     new UploadRequestHandler().verifyFileIntegrity(BinaryResources.create().withFilename("x.jpg").withContent(HexUtility.decode("474946383761")).build());
   }
 
-  @Test(expected = RejectedResourceException.class)
+  @Test()
   public void testVerifyFileIntegrityWithUnknownExtAsGif() {
     new UploadRequestHandler().verifyFileIntegrity(BinaryResources.create().withFilename("x.foobar").withContent(HexUtility.decode("474946383761")).build());
+  }
+
+  @Test(expected = RejectedResourceException.class)
+  public void testVerifyFileIntegrityWithNonImageExtAsGif() {
+    new UploadRequestHandler().verifyFileIntegrity(BinaryResources.create().withFilename("x.foobar.mov").withContent(HexUtility.decode("474946383761")).build());
   }
 }
