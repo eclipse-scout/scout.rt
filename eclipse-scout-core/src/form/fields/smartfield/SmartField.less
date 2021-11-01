@@ -251,6 +251,12 @@
 
       & > .table-row.first {
         border-top: 1px solid @table-row-border-color;
+
+        &.selected::after {
+          // If header is invisible, selection of first row starts at 0
+          // Since we now have a top border we can move it to -1px again to cover the border
+          top: -1px;
+        }
       }
 
       & > .scrollbar.y-axis > .scrollbar-thumb > .scrollbar-thumb-handle {

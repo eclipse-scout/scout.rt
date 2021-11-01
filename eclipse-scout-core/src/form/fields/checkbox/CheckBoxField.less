@@ -62,6 +62,7 @@
     padding: 0;
     margin: 0 @table-cell-padding-right 0 @table-cell-padding-left;
     vertical-align: top;
+    border-width: 1px;
 
     &.last {
       margin-right: @table-cell-padding-right-last !important;
@@ -84,7 +85,11 @@
 }
 
 .check-box-field.cell-editor-form-field > .field {
-  padding-top: calc(var(--table-row-padding-y) - @checkable-cell-padding-adjustment + 1px);
+  padding-top: calc(var(--table-row-padding-y) - @checkable-cell-padding-adjustment);
+
+  .cell-editor-popup.overflow-top & {
+    padding-top: calc(var(--table-row-padding-y) - @checkable-cell-padding-adjustment + 1px);
+  }
 }
 
 .check-box-field.disabled > .field {

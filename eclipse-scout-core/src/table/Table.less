@@ -123,14 +123,12 @@
   position: relative;
   overflow: hidden;
   width: 100%;
-  // selected table-row is moved by -1px. Add at least 1px padding to make selection fully visible even on the first row
-  padding-top: 1px;
 
   :not(.header-invisible) > & {
-    /* Draw the .table-data DIV one pixel higher, over the header (for selection border). */
-    /* - To make height calculation correct, this margin has to be subtracted again */
-    /*   from .table-data's height. See TableLayout.layout(). */
+    /* Draw the .table-data div one pixel higher, over the header (for selection border).
+       Add the padding to keep the size of the first row and not overdraw the header line with the row background */
     margin-top: -1px;
+    padding-top: 1px;
   }
 
   & > .scrollbar.y-axis {
@@ -207,11 +205,19 @@
     border-top-right-radius: 0;
   }
 
-  &.select-single::after,
-  &.select-top::after {
-    /* Move the selection 1px up to cover the bottom border of the previous row. */
-    top: -1px;
-    height: calc(100% + 1px);
+  &.select-single,
+  &.select-top {
+    &::after {
+      /* Move the selection 1px up to cover the bottom border of the previous row. */
+      top: -1px;
+      height: calc(100% + 1px);
+    }
+
+    .header-invisible > .table-data > &.first::after {
+      // Move to 0 again to make selection fully visible.
+      // Don't change height to have the same size as for other rows
+      top: 0;
+    }
   }
 
   &.checked {

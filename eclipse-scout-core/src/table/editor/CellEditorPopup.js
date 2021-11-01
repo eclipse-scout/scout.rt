@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorTabKeyStroke, events, FormField, graphics, Point, Popup, scout} from '../../index';
+import {CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorTabKeyStroke, events, FormField, graphics, Point, Popup, Rectangle, scout} from '../../index';
 import $ from 'jquery';
 
 export default class CellEditorPopup extends Popup {
@@ -87,6 +87,8 @@ export default class CellEditorPopup extends Popup {
       cssClass: cssClass
     });
 
+    this._alignWithSelection();
+
     // Make sure cell content is not visible while the editor is open (especially necessary for transparent editors like checkboxes)
     this.$anchor.css('visibility', 'hidden');
 
@@ -107,6 +109,30 @@ export default class CellEditorPopup extends Popup {
       this.table.$container.addClass('focused');
     }
     this.session.keyStrokeManager.on('keyStroke', this._keyStrokeHandler);
+  }
+
+  /**
+   * Selection border is an after element that is moved to top a little to cover the border of the previous row.
+   * This won't happen for the first row if there is no table header, since there is no space on top to move it up.
+   * In that case the selection is moved down by 1px to ensure the height of the selection always stays the same.
+   * If there is no border between the rows, there is no adjustment necessary, the selection is as height as the row.
+   * -> Position and size of the cell editor popup depends on the selection of the current row and the table style (with or without row borders)
+   */
+  _alignWithSelection() {
+    let selectionTop = this._rowSelectionBounds().y;
+    if (selectionTop < 0) {
+      this.$container.cssMarginTop(selectionTop);
+      this.$container.addClass('overflow-top');
+    }
+  }
+
+  _rowSelectionBounds() {
+    let bounds = new Rectangle();
+    let style = getComputedStyle(this.row.$row[0], ':after');
+    if (style) {
+      bounds = new Rectangle($.pxToNumber(style['left']), $.pxToNumber(style['top']), $.pxToNumber(style['width']), $.pxToNumber(style['height']));
+    }
+    return bounds;
   }
 
   _postRender() {

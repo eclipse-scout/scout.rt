@@ -47,10 +47,11 @@ export default class CellEditorPopupLayout extends AbstractLayout {
       // extend the width if the popup has a negative margin
       cellBounds.width = cellBounds.width + -margin;
     }
-    margin = this.cellEditorPopup.$container.cssMarginTop();
-    if (margin < 0) {
-      // extend the height if the popup has a negative margin
-      rowBounds.height = rowBounds.height + -margin;
+    let selectionHeight = this.cellEditorPopup._rowSelectionBounds().height;
+    if (selectionHeight) {
+      // Use height of selection if available (the selection may be larger than the row if it covers the border of the previous row)
+      this._htmlContainer.$comp.toggleClass('overflow-bottom', selectionHeight > rowBounds.height && this._htmlContainer.$comp.cssMarginTop() === 0);
+      rowBounds.height = selectionHeight;
     }
     return new Dimension(cellBounds.width, rowBounds.height);
   }

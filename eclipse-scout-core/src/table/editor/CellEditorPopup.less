@@ -11,14 +11,22 @@
 .cell-editor-popup {
   /* make sure it is behind the scrollbar but above selection */
   z-index: 1;
-
-  // Move popup up to align it with the selection border
-  margin-top: -1px;
 }
 
 .cell-editor-field {
-  padding: var(--table-row-padding-y) @table-cell-padding-right - @item-selection-border-width var(--table-row-padding-y) @table-cell-padding-left - @item-selection-border-width;
+  --padding-top: var(--table-row-padding-y) - @item-selection-border-width;
+  --padding-bottom: var(--table-row-padding-y) - @item-selection-border-width;
+  padding: calc(var(--padding-top)) @table-cell-padding-right - @item-selection-border-width calc(var(--padding-bottom)) @table-cell-padding-left - @item-selection-border-width;
   border-width: @item-selection-border-width;
+
+  .cell-editor-popup.overflow-top & {
+    --padding-top: var(--table-row-padding-y) - @item-selection-border-width + 1px; // cell editor is moved up by 1px
+    --padding-bottom: var(--table-row-padding-y) - @item-selection-border-width + 1px; // bottom row has 1px border
+  }
+
+  .cell-editor-popup.overflow-bottom & {
+    --padding-bottom: var(--table-row-padding-y) - @item-selection-border-width + 2px; // bottom row has 1px border and cell editor is moved down by 1px
+  }
 
   &:focus,
   &.focused {

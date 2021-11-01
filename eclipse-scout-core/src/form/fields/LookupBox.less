@@ -32,8 +32,17 @@
       }
     }
 
-    & > .table-data > .table-row > .table-cell {
-      border-bottom: 0;
+    & > .table-data > .table-row {
+      & > .table-cell {
+        border-bottom: 0;
+      }
+
+      &.selected::after {
+        // Since there is no top border there is no need to increase the size of the selection
+        // -> This makes a table row selection as big as a tree node selection
+        top: 0;
+        height: 100%;
+      }
     }
   }
 }
