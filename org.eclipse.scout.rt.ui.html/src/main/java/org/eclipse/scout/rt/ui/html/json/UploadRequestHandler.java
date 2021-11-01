@@ -226,10 +226,12 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         filename = parts[parts.length - 1];
       }
       if (EMPTY_UPLOAD_FILENAME.equals(filename)) {
-        filename = "";
+        filename = null;
       }
-      String ext = ("" + FileUtility.getFileExtension(filename)).toLowerCase(Locale.ROOT);
-      verifyFileName(validFileExtensions, filename, ext);
+      if (StringUtility.hasText(filename)) {
+        String ext = FileUtility.getFileExtension(filename).toLowerCase(Locale.ROOT);
+        verifyFileName(validFileExtensions, filename, ext);
+      }
       byte[] content;
       try (InputStream in = item.openStream()) {
         content = IOUtility.readBytes(in);
