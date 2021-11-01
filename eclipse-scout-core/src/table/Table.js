@@ -3827,7 +3827,7 @@ export default class Table extends Widget {
       this.resizeColumn(column, calculatedSize);
     }
     column.autoOptimizeWidthRequired = false;
-    this._triggerColumnResizedToFit();
+    this._triggerColumnResizedToFit(column);
   }
 
   /**
