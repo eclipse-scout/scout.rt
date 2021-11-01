@@ -154,10 +154,11 @@
 
 .messagebox-label {
   word-wrap: break-word;
-}
+  word-break: break-word;
 
-.copyable {
-  #scout.user-select(text);
+  &.copyable {
+    #scout.user-select(text);
+  }
 }
 
 .messagebox-header {
