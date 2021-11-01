@@ -43,7 +43,6 @@ export default class TileTableField extends TableField {
       return;
     }
     if (this.table) {
-      this.table.setSortEnabled(true);
       this.table.$container
         .on('blur', this._tableBlurHandler)
         .on('focus', this._tableFocusHandler);
