@@ -227,6 +227,10 @@ export default class DatePicker extends Widget {
       return;
     }
     let $weekdays = this.$container.find('.date-picker-weekdays').first().children();
+    if ($weekdays.length < 6) {
+      return;
+    }
+
     let $friday = $weekdays.eq(4); // Friday is always pos 4 as the separator is only available if the weeks starts on Monday
     let $saturday = $weekdays.eq(5); // Saturday is always pos 5 as the separator is only available if the weeks starts on Monday
 
