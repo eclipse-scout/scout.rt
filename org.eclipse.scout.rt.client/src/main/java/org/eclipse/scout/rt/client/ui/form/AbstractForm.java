@@ -110,6 +110,7 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.html.HTML;
+import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.html.IHtmlListElement;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
@@ -452,7 +453,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   /**
    * Defines whether the form should display a close button [X] in the form header resp. view tab. By default, the form
-   * is closable if it is a view, and if it is a dialog, it is only closable if it has an {@link AbstractCloseButton} or an {@link AbstractCancelButton}.
+   * is closable if it is a view, and if it is a dialog, it is only closable if it has an {@link AbstractCloseButton} or
+   * an {@link AbstractCancelButton}.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(190)
@@ -1684,11 +1686,12 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     Consumer<IFormField> v = f -> {
       IValidateContentDescriptor desc = f.validateContent();
       if (desc != null) {
+        String plainDesc = BEANS.get(HtmlHelper.class).toPlainText(desc.getDisplayText());
         if (desc.getErrorStatus() != null) {
-          invalidTexts.add(desc.getDisplayText());
+          invalidTexts.add(plainDesc);
         }
         else {
-          mandatoryTexts.add(desc.getDisplayText());
+          mandatoryTexts.add(plainDesc);
         }
         firstProblemRef.compareAndSet(null, desc);
       }
