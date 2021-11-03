@@ -87,15 +87,14 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private static final String INITIALLY_VISIBLE = "INITIALLY_VISIBLE";
   private static final String INITIALLY_GROUPED = "INITIALLY_GROUPED";
   private static final String INITIALLY_SORTED_ASC = "INITIALLY_SORTED_ASC";
-  private static final String INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN = "INITIALLY_ALWWAYS_INCLUDE_SORT_AT_BEGIN";
-  private static final String INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END = "INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END";
+  private static final String INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN = "INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN";
+  private static final String INITIALLY_ALWAYS_INCLUDE_SORT_AT_END = "INITIALLY_ALWAYS_INCLUDE_SORT_AT_END";
   private static final String COMPACTED = "COMPACTED";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractColumn.class);
   private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED, DISPLAYABLE, COMPACTED);
   private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, PRIMARY_KEY, SUMMARY, INITIALLY_VISIBLE,
-      INITIALLY_GROUPED, INITIALLY_SORTED_ASC, INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN, INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END);
-
+      INITIALLY_GROUPED, INITIALLY_SORTED_ASC, INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN, INITIALLY_ALWAYS_INCLUDE_SORT_AT_END);
   private static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PARENT_KEY, COMPACTED);
 
   private ITable m_table;
@@ -109,15 +108,15 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   /**
    * Provides 8 boolean flags.<br>
-   * Currently all are used: {@link #INITIALIZED}, {@link #PRIMARY_KEY}, {@link #SUMMARY}, {@link #INITIALLY_VISIBLE},
-   * {@link #INITIALLY_SORTED_ASC}, {@link #INITIALLY_GROUPED}, {@link #INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END},
+   * Used: {@link #INITIALIZED}, {@link #PRIMARY_KEY}, {@link #SUMMARY}, {@link #INITIALLY_VISIBLE},
+   * {@link #INITIALLY_SORTED_ASC}, {@link #INITIALLY_GROUPED}, {@link #INITIALLY_ALWAYS_INCLUDE_SORT_AT_END},
    * {@link #INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN}
    */
   private byte m_flags;
 
   /**
    * Provides 8 boolean flags.<br>
-   * Currently all are used: {@link #PARENT_KEY}
+   * Used: {@link #PARENT_KEY}, {@link #COMPACTED}
    */
   private byte m_flags2;
 
@@ -391,10 +390,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * Configures if the column belongs to the primary key of the parent row. Typically there are the same amount of
+   * Configures if the column belongs to the primary key of the parent row. Typically, there are the same amount of
    * primary key columns ({@link AbstractColumn#getConfiguredPrimaryKey()}) as parent key columns. return {@code true}
-   * if the column value belongs to the the primary key of the parent row in a hierarchical table, {@code false}
-   * otherwise.
+   * if the column value belongs to the primary key of the parent row in a hierarchical table, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(91)
@@ -474,7 +472,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   /**
    * Configures the background color of this column (except background color of header, see
-   * {@link #getConfiguredHeaderBackgroundColor()}. The color is represented by the HEX value (e.g. FFFFFF).
+   * {@link #getConfiguredHeaderBackgroundColor()}). The color is represented by the HEX value (e.g. FFFFFF).
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    *
@@ -515,7 +513,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   /**
    * Configures the sort index of this column. A sort index {@code < 0} means that the column is not considered for
    * sorting. For a column to be considered for sorting, the sort index must be {@code >= 0}. Several columns might have
-   * set a sort index. Sorting starts with the column having the the lowest sort index ({@code >= 0}).
+   * set a sort index. Sorting starts with the column having the lowest sort index ({@code >= 0}).
    * <p>
    * Subclasses can override this method. Default is {@code -1}.
    *
@@ -1163,12 +1161,12 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public boolean isInitialAlwaysIncludeSortAtEnd() {
-    return FLAGS_BIT_HELPER.isBitSet(INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END, m_flags);
+    return FLAGS_BIT_HELPER.isBitSet(INITIALLY_ALWAYS_INCLUDE_SORT_AT_END, m_flags);
   }
 
   @Override
   public void setInitialAlwaysIncludeSortAtEnd(boolean b) {
-    m_flags = FLAGS_BIT_HELPER.changeBit(INITIALLY_ALWWAYS_INCLUDE_SORT_AT_END, b, m_flags);
+    m_flags = FLAGS_BIT_HELPER.changeBit(INITIALLY_ALWAYS_INCLUDE_SORT_AT_END, b, m_flags);
   }
 
   /**
@@ -1630,8 +1628,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
 
   @Override
   public VALUE/* validValue */ validateValue(ITableRow row, VALUE rawValue) {
-    VALUE vinternal = validateValueInternal(row, rawValue);
-    VALUE validatedValue = interceptValidateValue(row, vinternal);
+    VALUE vInternal = validateValueInternal(row, rawValue);
+    VALUE validatedValue = interceptValidateValue(row, vInternal);
     return validatedValue;
   }
 
@@ -1697,14 +1695,14 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * @return a default editor independent of the current row. Should only be created once for performance reasons.
    */
   protected IValueField<VALUE> createDefaultEditor() {
-    return new AbstractValueField<VALUE>() {
+    return new AbstractValueField<>() {
     };
   }
 
   /**
    * Complete editing of a cell
    * <p>
-   * By default this calls {@link #setValue(ITableRow, Object)} and delegates to
+   * By default, this calls {@link #setValue(ITableRow, Object)} and delegates to
    * {@link #interceptParseValue(ITableRow, Object)} and {@link #interceptValidateValue(ITableRow, Object)}.
    */
   @Override
@@ -1782,7 +1780,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * by default, there is not display text set on the column
+   * by default, there is no display text set on the column
    */
   protected String formatValueInternal(ITableRow row, VALUE value) {
     return null;
@@ -1898,8 +1896,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void setHorizontalAlignment(int hAglin) {
-    boolean changed = propertySupport.setPropertyInt(PROP_HORIZONTAL_ALIGNMENT, hAglin);
+  public void setHorizontalAlignment(int hAlign) {
+    boolean changed = propertySupport.setPropertyInt(PROP_HORIZONTAL_ALIGNMENT, hAlign);
     if (changed && isInitialized()) {
       reinitCells();
     }

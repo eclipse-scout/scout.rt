@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -74,17 +74,22 @@ export default class AggregateTableControl extends TableControl {
   }
 
   _renderAggregate() {
+    let aggregateCells = [];
     this.table.visibleColumns().forEach(function(column, c) {
       let aggregateValue, cell, $cell;
 
       aggregateValue = this.aggregateRow[c];
       // Aggregation functions are not available if column is grouped -> do not show aggregated value
-      if (aggregateValue === undefined || aggregateValue === null || column.grouped) {
+      let isEmpty = aggregateValue === undefined || aggregateValue === null || column.grouped;
+      if (isEmpty) {
         cell = column.createAggrEmptyCell();
       } else {
         cell = column.createAggrValueCell(aggregateValue);
       }
       $cell = $(column.buildCell(cell, {}));
+      if (!isEmpty) {
+        aggregateCells.push($cell);
+      }
 
       // install tooltips
       this._installCellTooltip($cell);
@@ -95,15 +100,13 @@ export default class AggregateTableControl extends TableControl {
       }
 
       $cell.appendTo(this.$contentContainer);
-
-      if ($cell.isContentTruncated()) {
-        $cell.children('.table-cell-icon').setVisible(false);
-      }
     }, this);
 
     if (this.aggregateRow.selection) {
       this.$contentContainer.addClass('selection');
     }
+
+    aggregateCells.forEach($c => this.table._resizeAggregateCell($c));
   }
 
   _rerenderAggregate() {
@@ -115,21 +118,12 @@ export default class AggregateTableControl extends TableControl {
   _installCellTooltip($cell) {
     tooltips.install($cell, {
       parent: this,
-      text: this._cellTooltipText.bind(this),
+      text: this.table._cellTooltipText.bind(this.table),
       htmlEnabled: true,
       arrowPosition: 50,
       arrowPositionUnit: '%',
       nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible()
     });
-  }
-
-  _cellTooltipText($cell) {
-    if ($cell.text().trim() && ($cell.isContentTruncated() || ($cell.children('.table-cell-icon').length && !$cell.children('.table-cell-icon').isVisible()))) {
-      $cell = $cell.clone();
-      $cell.children('.table-cell-icon').setVisible(true);
-      return $cell.html();
-    }
-    return null;
   }
 
   _aggregate() {

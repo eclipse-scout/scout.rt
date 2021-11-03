@@ -44,6 +44,11 @@
     font-weight: @font-weight-normal;
     color: @tooltip-small-color;
   }
+
+  & > .table-cell-icon {
+    // necessary to overrule default icon color in table-cell tooltips (e.g. when hovering a grouping number value having an ellipsis)
+    color: @tooltip-info-color;
+  }
 }
 
 .tooltip-menus {

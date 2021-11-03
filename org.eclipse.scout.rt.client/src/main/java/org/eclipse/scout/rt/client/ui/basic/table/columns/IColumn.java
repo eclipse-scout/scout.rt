@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -320,7 +320,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   boolean isParentKey();
 
   /**
-   * the value in this column is part of the row summary text (for example in a explorer tree node)
+   * the value in this column is part of the row summary text (for example in an explorer tree node)
    */
   boolean isSummary();
 
@@ -349,7 +349,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   void setFont(FontSpec f);
 
-  void setHorizontalAlignment(int hAglin);
+  void setHorizontalAlignment(int hAlign);
 
   /**
    * <0 for left alignment 0 for center alignment and > 0 for right alignment. This alignment is used for header cell

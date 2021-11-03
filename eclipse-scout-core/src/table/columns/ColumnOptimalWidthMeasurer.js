@@ -77,7 +77,8 @@ export default class ColumnOptimalWidthMeasurer {
   }
 
   _measure() {
-    let optimalWidth = this.column.minWidth;
+    let maxWidth = this.column.minWidth;
+    let maxOverlap = 0;
     // Since the measurement may be async due to image loading, the $measurement is hidden (=display: none) until the real measurement starts.
     // Otherwise it would influence the scroll width of the real table data
     this.$measurement
@@ -85,9 +86,12 @@ export default class ColumnOptimalWidthMeasurer {
       .removeClass('hidden')
       .children()
       .each(function() {
-        optimalWidth = Math.max(optimalWidth, graphics.size($(this), true).width);
+        if (this.dataset.overlap) {
+          maxOverlap = Math.max(maxOverlap, parseInt(this.dataset.overlap, 10));
+        }
+        maxWidth = Math.max(maxWidth, graphics.size($(this), true).width);
       });
-    return optimalWidth;
+    return maxWidth + maxOverlap;
   }
 
   _resolve(optimalWidth) {
@@ -130,7 +134,68 @@ export default class ColumnOptimalWidthMeasurer {
   }
 
   _appendAggregateRow(row) {
-    this._appendToMeasurement($(this.column.buildCellForAggregateRow(row)));
+    this._appendToMeasurement(this._build$CellForAggregateRow(row));
+  }
+
+  /**
+   * For aggregate rows the text of neighbour cells may overlap into the own cell.
+   * To ensure there is enough space for the content of this cell, the overlap of the neighbour must be included.
+   * To have access to neighbour cells and to measure its sizes the whole aggregate row must be constructed.
+   *
+   * @returns {$} The created cell
+   */
+  _build$CellForAggregateRow(row) {
+    let columns = this.table.visibleColumns();
+    let colIndex = columns.indexOf(this.column);
+    let $row = this.table._buildAggregateRowDiv(row);
+
+    $row.appendTo(this.table.$data);
+    columns
+      .map(c => c.buildCellForAggregateRow(row))
+      .forEach(c => $(c).appendTo($row));
+    let $cell = $row.children().eq(colIndex);
+
+    let aggregateOverlap = this._getAggregateOverlap($cell); // compute the overlap
+    if (aggregateOverlap > 0) {
+      $cell[0].dataset.overlap = aggregateOverlap + '';
+    }
+    $row.detach();
+
+    return $cell;
+  }
+
+  /**
+   * Compute how much the neighbour cell overlaps into the given cell.
+   * @param {$} $cell The cell for which the overlap should be computed
+   * @returns {number} The overlap in pixels.
+   */
+  _getAggregateOverlap($cell) {
+    if (!$cell || !$cell.length || $cell.hasClass('empty')) {
+      return 0;
+    }
+    let cellRange = this.table._getAggrCellRange($cell);
+    if (cellRange.length < 2) {
+      return 0;
+    }
+    let $neighbour = cellRange[cellRange.length - 1];
+    if ($neighbour.hasClass('empty') || $cell.hasClass('halign-right') == $neighbour.hasClass('halign-right')) {
+      return 0;
+    }
+    let $neighbourText = $neighbour.children('.text');
+    if (!$neighbourText || !$neighbourText.length) {
+      return 0;
+    }
+    let overlap = graphics.size($neighbourText).width - $neighbour.cssMaxWidth() + $neighbour.cssPaddingLeft();
+    if (overlap <= 0) {
+      return 0;
+    }
+    for (let i = cellRange.length - 1; i > 0; i--) {
+      let $aggrCell = cellRange[i];
+      if ($aggrCell.hasClass('empty')) {
+        overlap -= $aggrCell.cssMaxWidth();
+      }
+    }
+    return Math.max(0, overlap);
   }
 
   _appendToMeasurement($calc) {

@@ -249,7 +249,7 @@
       "dropMaximumSize": 52428800,
       "estimatedRowCount": 0,
       "filters": [],
-      "groupingStyle": "bottom",
+      "groupingStyle": "top",
       "hasReloadHandler": false,
       "headerEnabled": true,
       "headerMenusEnabled": true,

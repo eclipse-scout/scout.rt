@@ -378,6 +378,14 @@
     text-align: right;
     padding-right: @table-cell-padding-left;
     padding-left: @table-cell-padding-right;
+
+    &.table-aggregate-cell {
+      direction: rtl;
+
+      & > .text, & > .table-cell-icon {
+        direction: ltr;
+      }
+    }
   }
 
   &.halign-center {
@@ -411,9 +419,17 @@
 
 .table-aggregate {
   overflow: hidden;
+  padding-left: var(--table-row-margin-x);
+  padding-right: var(--table-row-margin-x);
 
   & > .table-cell {
+    padding: var(--table-row-padding-y) @table-cell-padding-right 0 @table-cell-padding-left;
     border-bottom: 0;
+    height: 100%;
+
+    & > .font-icon {
+      margin-top: 1px;
+    }
   }
 }
 
@@ -425,17 +441,43 @@
   margin-top: -1px; // top border should cover bottom border of the previous row
   padding-left: var(--table-row-margin-x);
   padding-right: var(--table-row-margin-x);
+  font-size: 12px;
 
   & > .table-cell {
     border-bottom: 0;
+  }
+
+  &.grouping-style-top > .table-aggregate-cell {
+    padding-top: @table-aggregate-padding-y-large;
+    padding-bottom: @table-aggregate-padding-y-small;
+  }
+
+  &.grouping-style-bottom > .table-aggregate-cell {
+    padding-top: @table-aggregate-padding-y-small;
+    padding-bottom: @table-aggregate-padding-y-large;
   }
 }
 
 .table-aggregate-cell {
   font-weight: bold;
+  overflow: visible;
+  vertical-align: middle;
+  height: 24px + @table-aggregate-padding-y-large + @table-aggregate-padding-y-small;
+
+  & > .text {
+    display: inline-block;
+    vertical-align: middle;
+    #scout.overflow-ellipsis-nowrap();
+  }
 
   & > .table-cell-icon {
+    display: inline-block;
     color: @text-color;
+    vertical-align: middle;
+  }
+
+  &.sum > .table-cell-icon, &.avg > .table-cell-icon {
+    font-size: @font-size-extra-small;
   }
 
   /* if aggregation is based on selected rows */

@@ -174,7 +174,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   /**
    * Provides 4 boolean flags.<br>
-   * Currently used: {@link #AUTO_DISCARD_ON_DELETE}, {@link #SORT_VALID}, {@link #INITIAL_MULTI_LINE_TEXT},
+   * Used: {@link #AUTO_DISCARD_ON_DELETE}, {@link #SORT_VALID}, {@link #INITIAL_MULTI_LINE_TEXT},
    * {@link #ACTION_RUNNING}
    */
   private byte m_flags;
@@ -327,12 +327,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   /**
    * Configures whether the row icon is visible.
    * <p>
-   * If set to true the gui creates a column which contains the row icons. The column has a fixed width (@see
-   * {@link AbstractTable#getConfiguredRowIconColumnWidth()}, is not movable and always the first column (resp. the
+   * If set to true the gui creates a column which contains the row icons. The column has a fixed width (see
+   * {@link AbstractTable#getConfiguredRowIconColumnWidth()}), is not movable and always the first column (resp. the
    * second if the table is checkable). The column is not available in the model.
    * <p>
    * If you need other settings or if you need the icon at another column position, you cannot use the row icons.
-   * Instead you have to create a column and use {@link Cell#setIconId(String)} to set the icons on it's cells.
+   * Instead, you have to create a column and use {@link Cell#setIconId(String)} to set the icons on its cells.
    * <p>
    * Subclasses can override this method. Default is false.
    *
@@ -365,7 +365,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * <p>
    * Subclasses can override this method. Default is {@code true}.
    *
-   * @return {@code true} if more then one row in this table can be selected at once, {@code false} otherwise.
+   * @return {@code true} if more than one row in this table can be selected at once, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(30)
@@ -379,7 +379,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * <p>
    * Subclasses can override this method. Default is {@code true}.
    *
-   * @return {@code true} if more then one row in this table can be checked, {@code false} otherwise.
+   * @return {@code true} if more than one row in this table can be checked, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(32)
@@ -629,7 +629,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @ConfigProperty(ConfigProperty.OBJECT)
   @Order(240)
   protected GroupingStyle getConfiguredGroupingStyle() {
-    return GroupingStyle.BOTTOM;
+    return GroupingStyle.TOP;
   }
 
   @ConfigProperty(ConfigProperty.OBJECT)
@@ -674,7 +674,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * Configurues whether the table should be in compact mode. Default is false.
+   * Configures whether the table should be in compact mode. Default is false.
    *
    * @see ITableCompactHandler
    */
@@ -792,8 +792,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * Transform text for copy: remove TABs and NEWLINEs because they would destroy column consistency when pasting into
-   * excel.
+   * Transform text for copy: remove tabs and newlines because they would destroy column consistency when pasting into
+   * Excel.
    * <p>
    * Trim and concatenate non-empty lines, but preserve multiple whitespace within original line.
    */
@@ -980,8 +980,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   private List<Class<? extends IColumn>> getConfiguredColumns() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IColumn>> foca = ConfigurationUtility.filterClasses(dca, IColumn.class);
-    return ConfigurationUtility.removeReplacedClasses(foca);
+    List<Class<IColumn>> columns = ConfigurationUtility.filterClasses(dca, IColumn.class);
+    return ConfigurationUtility.removeReplacedClasses(columns);
   }
 
   private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
@@ -1051,7 +1051,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         ksList.add(ks);
       }
     }
-    //add ENTER key stroke when default menu is used or execRowAction has an override
+    // add ENTER keystroke when default menu is used or execRowAction has an override
     Class<? extends IMenu> defaultMenuType = getDefaultMenuInternal();
     if (defaultMenuType != null || ConfigurationUtility.isMethodOverwrite(AbstractTable.class, "execRowAction", new Class[]{ITableRow.class}, this.getClass())) {
       ksList.add(new KeyStroke("ENTER") {
@@ -1208,7 +1208,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     if (tth != null) {
       tileTableHeader = ConfigurationUtility.newInnerInstance(this, tth);
       tileTableHeader.setParentInternal(this);
-      // since we create the tileTableHeader lazy the table is already initialized and we must init the header manually.
+      // since we create the tileTableHeader lazy, the table is already initialized and must init the header manually.
       tileTableHeader.init();
       if (tileTableHeader instanceof IGroupBox) {
         ((IGroupBox) tileTableHeader).rebuildFieldGrid();
@@ -1552,7 +1552,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     else {
       rows = m_rootRows;
     }
-    CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>() {
+    CollectingVisitor<ITableRow> collector = new CollectingVisitor<>() {
       @Override
       protected boolean accept(ITableRow element) {
         return element.isExpanded() != expanded;
@@ -2139,7 +2139,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   /**
    * Checks whether the menu with the given class has been replaced by another menu. If so, the replacing menu's class
-   * is returned. Otherwise the given class itself.
+   * is returned. Otherwise, the given class itself.
    *
    * @return Returns the possibly available replacing menu class for the given class.
    * @see Replace
@@ -2632,14 +2632,16 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   @Override
   public void deselectRows(List<? extends ITableRow> rows) {
-    rows = resolveRows(rows);
-    if (CollectionUtility.hasElements(rows)) {
-      TreeSet<ITableRow> newSelection = new TreeSet<>(new RowIndexComparator());
-      newSelection.addAll(m_selectedRows);
-      if (newSelection.removeAll(rows)) {
-        m_selectedRows = new ArrayList<>(newSelection);
-        fireRowsSelected(m_selectedRows);
-      }
+    Set<ITableRow> rowsToDeselect = new HashSet<>(resolveRows(rows));
+    if (!CollectionUtility.hasElements(rowsToDeselect)) {
+      return; // nothing to deselect
+    }
+
+    TreeSet<ITableRow> newSelection = new TreeSet<>(new RowIndexComparator());
+    newSelection.addAll(m_selectedRows);
+    if (newSelection.removeAll(rowsToDeselect)) {
+      m_selectedRows = new ArrayList<>(newSelection);
+      fireRowsSelected(m_selectedRows);
     }
   }
 
@@ -2703,7 +2705,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   public void checkRows(Collection<? extends ITableRow> rows, boolean value, boolean enabledRowsOnly) {
     try {
       rows = resolveRows(rows);
-      // check checked count with multicheck
+      // check checked-count with multi-check
       if (!isMultiCheck() && value) {
         ITableRow rowToCheck = null;
         for (ITableRow row : rows) {
@@ -3404,7 +3406,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   public void deleteRows(Collection<? extends ITableRow> rows) {
 
     List<ITableRow> existingRows = getRows();
-    //peformance quick-check
+    // performance quick-check
     if (rows != existingRows) {
       rows = resolveRows(rows);
       CollectingVisitor<ITableRow> collector = new CollectingVisitor<>();
@@ -3428,8 +3430,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       // remove from selection
       deselectRows(deletedRows);
       uncheckRows(deletedRows);
-      //delete impl
-      //peformance quick-check
+      // delete impl
+      // performance quick-check
       if (rows == existingRows) {
         //remove all of them
         synchronized (m_cachedRowsLock) {
@@ -3496,7 +3498,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
     else if (internalRow.getStatus() == ITableRow.STATUS_INSERTED) {
       internalRow.setTableInternal(null);
-      // it was new and now it is gone, no further action required
+      // it was new, now it is gone, no further action required
     }
     else {
       internalRow.setStatus(ITableRow.STATUS_DELETED);
@@ -3637,7 +3639,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    * @param row
    *          The row holding the cells to be searched. Must not be <code>null</code>.
    * @return <code>true</code> if the cells described by the given columns and row have the same content as the given
-   *         searchValues. <code>false</code> otherwise. If the number of columns is different than the number of search
+   *         searchValues. <code>false</code> otherwise. If the number of columns is different from the number of search
    *         values only the columns are searched for which a search value exists (
    *         <code>min(searchValues.size(), keyColumns.size()</code>).
    */
@@ -3853,7 +3855,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
           col.setDisplayable(displayableState.get(col.getColumnId()));
         }
       }
-      // re link existing filters to new columns
+      // relink existing filters to new columns
       linkColumnFilters();
       // reapply compact state
       if (isCompact()) {
@@ -4037,10 +4039,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       boolean filterChanged = false;
       for (ITableRow row : set) {
         if (row.getTable() == AbstractTable.this && row instanceof InternalTableRow) {
-          InternalTableRow irow = (InternalTableRow) row;
-          boolean oldFlag = irow.isFilterAccepted();
-          applyRowFiltersInternal(irow);
-          boolean newFlag = irow.isFilterAccepted();
+          InternalTableRow internalRow = (InternalTableRow) row;
+          boolean oldFlag = internalRow.isFilterAccepted();
+          applyRowFiltersInternal(internalRow);
+          boolean newFlag = internalRow.isFilterAccepted();
           filterChanged = filterChanged || (oldFlag != newFlag);
         }
       }
@@ -4179,6 +4181,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         resolvedRows.add(row);
       }
       else {
+        //noinspection PlaceholderCountMatchesArgumentCount
         LOG.info("Could not resolve row with keys {} in table {}",
             row.getKeyValues(), this.getClass().getName(),
             LOG.isDebugEnabled() ? new Exception("stacktrace") : null);
@@ -4379,7 +4382,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       return;
     }
 
-    // Only toggle checked state if being fired by the left mousebutton (https://bugs.eclipse.org/bugs/show_bug.cgi?id=453543).
+    // Only toggle checked state if being fired by the left mouse button (https://bugs.eclipse.org/bugs/show_bug.cgi?id=453543).
     if (mouseButton != MouseButton.Left) {
       return;
     }
@@ -4391,8 +4394,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         //editable boolean columns consume this click
         IFormField field = ctxCol.prepareEdit(row);
         if (field instanceof IBooleanField) {
-          IBooleanField bfield = (IBooleanField) field;
-          bfield.toggleValue();
+          IBooleanField booleanField = (IBooleanField) field;
+          booleanField.toggleValue();
           ctxCol.completeEdit(row, field);
         }
       }

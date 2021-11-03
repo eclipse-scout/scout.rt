@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -299,13 +299,11 @@ public class BasicPropertySupport implements IListenerListWithManagement {
     }
     m_props.put(name, newValue);
     if (ObjectUtility.equals(oldValue, newValue)) {
-      // no change
-      return false;
+      return false; // no change
     }
-    else {
-      firePropertyChangeImpl(name, oldValue, newValue);
-      return true;
-    }
+
+    firePropertyChangeImpl(name, oldValue, newValue);
+    return true;
   }
 
   public void setPropertyAlwaysFire(String name, Object newValue) {
