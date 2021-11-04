@@ -81,7 +81,7 @@
   height: @calendar-header-button-height;
   color: @text-color;
   background-color: @button-background-color;
-  border: 1px solid @border-color;
+  border: 1px solid @control-border-color;
   border-radius: @button-border-radius;
   margin-right: 5px;
   line-height: @calendar-header-button-height - 1px;
@@ -148,18 +148,18 @@
 .calendar-mode {
   width: 65px;
 
-  border-top: 1px solid @border-color;
-  border-bottom: 1px solid @border-color;
-  border-left: 1px solid @border-color;
+  border-top: 1px solid @control-border-color;
+  border-bottom: 1px solid @control-border-color;
+  border-left: 1px solid @control-border-color;
 
   &.first {
-    border-left: 1px solid @border-color;
+    border-left: 1px solid @control-border-color;
     border-top-left-radius: @button-border-radius;
     border-bottom-left-radius: @button-border-radius;
   }
 
   &.last {
-    border-right: 1px solid @border-color;
+    border-right: 1px solid @control-border-color;
     border-top-right-radius: @button-border-radius;
     border-bottom-right-radius: @button-border-radius;
     margin-right: 5px;
@@ -177,7 +177,7 @@
 
 .calendar-mode-menu {
   padding: 5px 12px;
-  border: 1px solid @border-color;
+  border: 1px solid @control-border-color;
   border-radius: @button-border-radius;
 }
 
@@ -227,23 +227,23 @@
     background-color: @palette-blue-1; /* Default colors used when component has no specific class */
   }
 
-  &:hover > .calendar-component-leftcolorborder {
-    background-color: @palette-blue-2;
-  }
-
-  &.comp-selected > .calendar-component-leftcolorborder {
-    background-color: @palette-blue-6;
-  }
-
-  /* Default colors used when component has no specific class */
+   /* Default colors used when component has no specific class */
   background-color: @palette-blue-0;
 
   &:hover {
     background-color: @palette-blue-1;
+
+    & > .calendar-component-leftcolorborder {
+      background-color: @palette-blue-3;
+    }
   }
 
   &.comp-selected {
     background-color: @palette-blue-2;
+
+    & > .calendar-component-leftcolorborder {
+      background-color: @palette-blue-3;
+    }
   }
 
   /* Colors for type Appointment */
@@ -256,49 +256,45 @@
     }
 
     &:hover {
-      background-color: @palette-orange-2;
-    }
+      background-color: @palette-orange-1;
 
-    &:hover > .calendar-component-leftcolorborder {
-      background-color: @palette-orange-3;
-    }
-
-    &:hover .comp-selected > .calendar-component-leftcolorborder {
-      background-color: @palette-orange-4;
+      & > .calendar-component-leftcolorborder {
+        background-color: @palette-orange-3;
+      }
     }
 
     &.comp-selected {
-      background-color: @palette-orange-3;
-    }
+      background-color: @palette-orange-2;
 
-    &.comp-selected > .calendar-component-leftcolorborder {
-      background-color: @palette-orange-4;
+      & > .calendar-component-leftcolorborder {
+        background-color: @palette-orange-3;
+      }
     }
   }
 
   /* Colors for type Task */
 
   &.calendar-task {
-    background-color: @palette-cyan-0;
+    background-color: @palette-green-0;
 
     & > .calendar-component-leftcolorborder {
-      background-color: @palette-cyan-2;
+      background-color: @palette-green-2;
     }
 
     &:hover {
-      background-color: @palette-cyan-2;
-    }
+      background-color: @palette-green-1;
 
-    &:hover > .calendar-component-leftcolorborder {
-      background-color: @palette-cyan-3;
+      & > .calendar-component-leftcolorborder {
+        background-color: @palette-green-2;
+      }
     }
 
     &.comp-selected {
-      background-color: @palette-cyan-3;
-    }
+      background-color: @palette-green-2;
 
-    &.comp-selected > .calendar-component-leftcolorborder {
-      background-color: @palette-cyan-4;
+      & > .calendar-component-leftcolorborder {
+        background-color: @palette-green-3;
+      }
     }
   }
 }

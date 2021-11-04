@@ -36,6 +36,7 @@ export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
       event._treeCurrentNode = this.field.selectedNodes[0];
       event._$treeCurrentNode = event._treeCurrentNode.$node;
     }
+    this.field.$container.addClass('keyboard-navigation');
     return true;
   }
 

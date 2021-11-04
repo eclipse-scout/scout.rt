@@ -44,7 +44,7 @@
   height: @planner-header-button-height;
   color: @text-color;
   background-color: @button-background-color;
-  border: 1px solid @border-color;
+  border: 1px solid @control-border-color;
   border-radius: @button-border-radius;
   margin-right: 5px;
   line-height: @planner-header-button-height - 1px;
@@ -99,19 +99,19 @@
 .planner-mode {
   width: 65px;
   text-align: center;
-  border-top: 1px solid @border-color;
-  border-bottom: 1px solid @border-color;
-  border-left: 1px solid @border-color;
+  border-top: 1px solid @control-border-color;
+  border-bottom: 1px solid @control-border-color;
+  border-left: 1px solid @control-border-color;
   #scout.overflow-ellipsis-nowrap();
 
   &.first {
-    border-left: 1px solid @border-color;
+    border-left: 1px solid @control-border-color;
     border-top-left-radius: @button-border-radius;
     border-bottom-left-radius: @button-border-radius;
   }
 
   &.last {
-    border-right: 1px solid @border-color;
+    border-right: 1px solid @control-border-color;
     border-top-right-radius: @button-border-radius;
     border-bottom-right-radius: @button-border-radius;
     margin-right: 5px;

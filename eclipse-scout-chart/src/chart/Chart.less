@@ -593,51 +593,51 @@ path.fulfillment-chart {
   }
 
   &.auto-color {
-    fill: @chart-data-color-2;
+    fill: @chart-data-color;
 
     .clickable &:hover {
-      fill: @chart-data-color-3;
+      fill: @chart-data-hover-color;
     }
 
     &.selected {
-      fill: @chart-data-color-3;
+      fill: @chart-data-selected-color;
     }
   }
 
   .color-alternative &.auto-color {
-    fill: @chart-data-color-2-alternative;
+    fill: @chart-data-color-alternative;
 
     .clickable &:hover {
-      fill: @chart-data-color-3-alternative;
+      fill: @chart-data-hover-color-alternative;
     }
 
     &.selected {
-      fill: @chart-data-color-3-alternative;
+      fill: @chart-data-selected-color-alternative;
     }
   }
 
   .inverted & {
     &.auto-color {
-      fill: @chart-data-color-1-inverted;
+      fill: @chart-data-color-inverted;
 
-      .clickable &:hover {
-        fill: @chart-data-color-2-inverted;
+      .clickable&:hover {
+        fill: @chart-data-hover-color-inverted;
       }
 
       &.selected {
-        fill: @chart-data-color-2-inverted;
+        fill: @chart-data-selected-color-inverted;
       }
     }
 
     .color-alternative&.auto-color {
-      fill: @chart-data-color-2-alternative-inverted;
+      fill: @chart-data-color-alternative-inverted;
 
-      .clickable &:hover {
-        fill: @chart-data-color-3-alternative-inverted;
+      .clickable&:hover {
+        fill: @chart-data-hover-color-alternative-inverted;
       }
 
       &.selected {
-        fill: @chart-data-color-3-alternative-inverted;
+        fill: @chart-data-selected-color-alternative-inverted;
       }
     }
   }
@@ -714,23 +714,23 @@ polygon.salesfunnel-chart-bar {
   }
 
   &.auto-color:hover {
-    fill: @chart-data-active-color;
+    fill: @chart-data-hover-color;
   }
 
   .inverted &.auto-color:hover {
-    fill: @chart-data-active-color-inverted;
+    fill: @chart-data-white-hover-color;
   }
 
   .color-alternative &.auto-color:hover {
-    fill: @chart-data-active-color-alternative;
+    fill: @chart-data-hover-color-alternative;
   }
 
   .color-alternative.inverted &.auto-color:hover {
-    fill: @chart-data-active-color-alternative-inverted;
+    fill: @chart-data-white-hover-color;
   }
 
   .color-rainbow &.auto-color:hover {
-    fill: @chart-data-active-color-rainbow;
+    fill: @chart-data-hover-color-rainbow;
   }
 }
 
@@ -787,18 +787,18 @@ circle.venn-circle {
   }
 
   &.auto-color {
-    fill: @chart-data-color-2;
+    fill: @chart-data-color;
 
     .inverted & {
       fill: @chart-data-text-color;
     }
 
     .color-alternative & {
-      fill: @chart-data-color-2-alternative;
+      fill: @chart-data-color-alternative;
     }
 
     .color-alternative.inverted & {
-      fill: @chart-data-color-2-alternative-inverted;
+      fill: @chart-data-color-alternative-inverted;
     }
   }
 }

@@ -68,6 +68,16 @@
     &:hover, &.active, &:active {
       background-color: transparent;
     }
+
+    &.selected {
+      color: @selected-color;
+      background-color: @selected-disabled-background-color;
+
+      &.has-popup {
+        color: @menu-item-disabled-color;
+        background-color: @selected-with-popup-background-color;
+      }
+    }
   }
 
   &.menu-textandicon > .icon {

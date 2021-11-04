@@ -18,6 +18,7 @@
   --padding-bottom: var(--table-row-padding-y) - @item-selection-border-width;
   padding: calc(var(--padding-top)) @table-cell-padding-right - @item-selection-border-width calc(var(--padding-bottom)) @table-cell-padding-left - @item-selection-border-width;
   border-width: @item-selection-border-width;
+  background-color: @cell-editor-background-color;
 
   .cell-editor-popup.overflow-top & {
     --padding-top: var(--table-row-padding-y) - @item-selection-border-width + 1px; // cell editor is moved up by 1px

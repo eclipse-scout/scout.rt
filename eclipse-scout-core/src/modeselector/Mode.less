@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .mode {
-  border: @mode-border-width solid @border-color;
+  border: @mode-border-width solid @control-border-color;
   border-radius: 0;
   flex: 1 1 0;
   padding: @mode-padding-y @mode-padding-x;
@@ -51,12 +51,12 @@
       background-color: @selected-background-color;
       border-color: @selected-background-color;
     }
-  }
 
-  &.disabled:hover {
-    color: @button-disabled-color;
-    background-color: @button-disabled-background-color;
-    border-color: @button-disabled-border-color;
+    &.disabled:hover {
+      color: @selected-color;
+      background-color: @selected-disabled-background-color;
+      border-color: @selected-disabled-background-color;
+    }
   }
 
   & > .icon {
