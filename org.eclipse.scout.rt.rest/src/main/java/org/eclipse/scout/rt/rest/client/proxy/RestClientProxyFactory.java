@@ -78,23 +78,23 @@ public class RestClientProxyFactory {
 
   public Client createClientProxy(Client client, IRestClientExceptionTransformer exceptionTransformer) {
     assertNotNull(client, "client is required");
-    return createProxy(Client.class, new RestProxyInvcationHandler<>(client, exceptionTransformer));
+    return createProxy(Client.class, new RestProxyInvocationHandler<>(client, exceptionTransformer));
   }
 
   public WebTarget createWebTargetProxy(WebTarget webTarget, IRestClientExceptionTransformer exceptionTransformer) {
-    return createProxy(WebTarget.class, new RestProxyInvcationHandler<>(webTarget, exceptionTransformer));
+    return createProxy(WebTarget.class, new RestProxyInvocationHandler<>(webTarget, exceptionTransformer));
   }
 
   public Invocation.Builder createInvocationBuilderProxy(Invocation.Builder builder, IRestClientExceptionTransformer exceptionTransformer) {
-    return createProxy(Invocation.Builder.class, new RestProxyInvcationHandler<>(builder, exceptionTransformer));
+    return createProxy(Invocation.Builder.class, new RestProxyInvocationHandler<>(builder, exceptionTransformer));
   }
 
   public Invocation createInvocationProxy(Invocation invocation, IRestClientExceptionTransformer exceptionTransformer) {
-    return createProxy(Invocation.class, new RestProxyInvcationHandler<>(invocation, exceptionTransformer));
+    return createProxy(Invocation.class, new RestProxyInvocationHandler<>(invocation, exceptionTransformer));
   }
 
   public AsyncInvoker createAsyncInvokerProxy(AsyncInvoker asyncInvoker, IRestClientExceptionTransformer exceptionTransformer) {
-    return createProxy(AsyncInvoker.class, new RestProxyInvcationHandler<>(asyncInvoker, exceptionTransformer));
+    return createProxy(AsyncInvoker.class, new RestProxyInvocationHandler<>(asyncInvoker, exceptionTransformer));
   }
 
   public Future<?> createFutureProxy(Future<?> future, IRestClientExceptionTransformer exceptionTransformer) {
@@ -149,7 +149,7 @@ public class RestClientProxyFactory {
       return false;
     }
     InvocationHandler handler = Proxy.getInvocationHandler(o);
-    return RestProxyInvcationHandler.class.isInstance(handler);
+    return RestProxyInvocationHandler.class.isInstance(handler);
   }
 
   /**
@@ -160,16 +160,16 @@ public class RestClientProxyFactory {
     if (!isProxy(o)) {
       return o;
     }
-    RestProxyInvcationHandler handler = (RestProxyInvcationHandler) Proxy.getInvocationHandler(o);
+    RestProxyInvocationHandler handler = (RestProxyInvocationHandler) Proxy.getInvocationHandler(o);
     return (T) handler.unwrap();
   }
 
-  protected class RestProxyInvcationHandler<T> implements InvocationHandler {
+  protected class RestProxyInvocationHandler<T> implements InvocationHandler {
 
     private final T m_proxiedObject;
     private final IRestClientExceptionTransformer m_exceptionTransformer;
 
-    public RestProxyInvcationHandler(T proxiedObject, IRestClientExceptionTransformer exceptionTransformer) {
+    public RestProxyInvocationHandler(T proxiedObject, IRestClientExceptionTransformer exceptionTransformer) {
       m_proxiedObject = assertNotNull(proxiedObject, "proxiedObject is required");
       m_exceptionTransformer = IRestClientExceptionTransformer.identityIfNull(exceptionTransformer);
     }
@@ -209,7 +209,7 @@ public class RestClientProxyFactory {
 
     protected void warnDiscouragedMethodUsage(Method method) {
       if (isDiscouraged(method)) {
-        LOG.warn("Discuraged method invocation (e.g. running outside a RunContext or exeption transformation not available)");
+        LOG.warn("Discouraged method invocation (e.g. running outside a RunContext or exception transformation not available)");
       }
     }
 
@@ -285,7 +285,7 @@ public class RestClientProxyFactory {
     }
   }
 
-  protected class FutureExceptionTransformerInvocationHandler extends RestProxyInvcationHandler<Future> {
+  protected class FutureExceptionTransformerInvocationHandler extends RestProxyInvocationHandler<Future> {
     public FutureExceptionTransformerInvocationHandler(Future future, IRestClientExceptionTransformer exceptionTransformer) {
       super(future, exceptionTransformer);
     }
