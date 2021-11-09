@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -210,6 +211,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   private Map<Class<?>, Class<? extends IFormField>> m_fieldReplacements;
   private IContributionOwner m_contributionHolder;
 
+  // filter for fields to store in xml export
+  private Predicate<IFormField> m_storeToXmlFieldFilter;
+
   public AbstractForm() {
     this(true);
   }
@@ -221,6 +225,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     m_closeType = IButton.SYSTEM_TYPE_NONE;
     m_displayParent = new PreferredValue<>(null, false);
     m_eventHistory = createEventHistory();
+    m_storeToXmlFieldFilter = createDefaultStoreToXmlFieldFilter();
     setHandler(new NullFormHandler());
     setFormLoading(true);
     m_blockingCondition = Jobs.newBlockingCondition(false);
@@ -259,6 +264,18 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   @Override
   public final <T> T optContribution(Class<T> contribution) {
     return m_contributionHolder.optContribution(contribution);
+  }
+
+  public Predicate<IFormField> getStoreToXmlFieldFilter() {
+    return m_storeToXmlFieldFilter;
+  }
+
+  public void setStoreToXmlFieldFilter(Predicate<IFormField> storeToXmlFieldFilter) {
+    m_storeToXmlFieldFilter = storeToXmlFieldFilter != null ? storeToXmlFieldFilter : createDefaultStoreToXmlFieldFilter();
+  }
+
+  protected Predicate<IFormField> createDefaultStoreToXmlFieldFilter() {
+    return field -> true;
   }
 
   @Override
@@ -2187,8 +2204,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     final Element xFields = root.getOwnerDocument().createElement("fields");
     root.appendChild(xFields);
     Function<IFormField, TreeVisitResult> v = field -> {
-      if (field.getForm() != AbstractForm.this) {
-        // field is part of a wrapped form and is handled by the AbstractWrappedFormField
+      if (field.getForm() != AbstractForm.this || !getStoreToXmlFieldFilter().test(field)) {
+        // field is part of a wrapped form and is handled by the AbstractWrappedFormField or should not be included in the export
         return TreeVisitResult.CONTINUE;
       }
       Element xField = xFields.getOwnerDocument().createElement("field");
