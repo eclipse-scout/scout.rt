@@ -93,13 +93,6 @@
     #scout.loading-indicator(@busyindicator-large-size, @busyindicator-large-border-width);
   }
 
-  &.ie {
-    // Workaround for bug #227039. Focus calls come too early when table is not correctly layouted yet
-    // -> if table is big ie tries to scroll which leads to ugly flickering and moved desktop whenever a large page with table is clicked
-    height: 0;
-    width: 0;
-  }
-
   & > .table-header {
     background-color: @detail-table-header-background-color;
     border-bottom-color: @detail-table-header-border-color;

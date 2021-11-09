@@ -111,11 +111,7 @@ export default class OpenUriHandler {
 
   openUriAsNewWindow(uri) {
     let popupBlockerHandler = scout.create('PopupBlockerHandler', {session: this.session});
-    if (Device.get().isInternetExplorer()) {
-      popupBlockerHandler.openWindow(uri, null, 'location=yes,toolbar=yes,menubar=yes,resizable=yes,scrollbars=yes');
-    } else {
-      popupBlockerHandler.openWindow(uri);
-    }
+    popupBlockerHandler.openWindow(uri);
   }
 
   openUriAsPopupWindow(uri) {

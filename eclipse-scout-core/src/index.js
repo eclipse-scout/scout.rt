@@ -50,7 +50,6 @@ export {default as models} from './util/models';
 export {default as numbers} from './util/numbers';
 export {default as RoundingMode} from './util/RoundingMode';
 export {default as objects} from './util/objects';
-export {default as polyfills} from './util/polyfills';
 export {default as PromiseCreator} from './util/PromiseCreator';
 export {default as promises} from './util/promises';
 export {default as Range} from './util/Range';

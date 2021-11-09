@@ -350,7 +350,6 @@ export default class FormController {
     // HtmlComponent defers the layout when a component is currently being animated)
     if (dialog.animateOpening) {
       dialog.$container.addClassForAnimation('animate-open');
-      dialog.$container.addDeviceClass(); // no animation in IE
     }
   }
 }

@@ -23,11 +23,6 @@
     color: @label-color;
     font-size: @field-label-font-size;
 
-    &.empty {
-      /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
-      text-overflow: clip;
-    }
-
     .disabled& {
       color: @label-disabled-color;
     }

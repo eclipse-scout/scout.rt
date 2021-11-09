@@ -249,13 +249,6 @@
     border-bottom: 0;
   }
 
-  & > .width-fix {
-    /* Some browsers (e.g. IE9) need an additional <div> with display:inline-block below the table-cell */
-    display: inline-block;
-    #scout.overflow-ellipsis();
-    /* An additional max-width: must be added in browser. */
-  }
-
   .table-row.disabled > & {
     /* Table row is disabled -> use lighter disabled color */
     color: @disabled-color;

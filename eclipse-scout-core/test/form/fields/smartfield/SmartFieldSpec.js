@@ -202,6 +202,10 @@ describe('SmartField', () => {
       field.$field.val('b');
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
+
+      // do not animate the removal of the SmartFieldPopup. Otherwise it will not be removed yet, when the new one should be opened. Then nothing is updated.
+      field.popup.animateRemoval = false;
+
       expect(field.popup).not.toBe(null);
       expect(findTableProposals()).toEqual(['Bar', 'Baz']);
 

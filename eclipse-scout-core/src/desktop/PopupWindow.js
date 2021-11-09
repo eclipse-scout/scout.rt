@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, EventSupport, HtmlComponent, polyfills, Rectangle, scout, SingleLayout} from '../index';
+import {Dimension, EventSupport, HtmlComponent, Rectangle, scout, SingleLayout} from '../index';
 import $ from 'jquery';
 
 export default class PopupWindow {
@@ -52,8 +52,6 @@ export default class PopupWindow {
     // (page load is made by design in PopupBlockerHandler.openWindow)
     this.myWindow.popupWindow = this;
 
-    // Install polyfills on new window
-    polyfills.install(this.myWindow);
     scout.prepareDOM(myDocument);
 
     this.$container = $('.scout', myDocument);

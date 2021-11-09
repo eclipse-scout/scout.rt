@@ -67,8 +67,7 @@ export default class ClipboardField extends ValueField {
 
   _render() {
     // We don't use makeDiv() here intentionally because the DIV created must
-    // not have the 'unselectable' attribute. Otherwise clipboard-field will
-    // not work in IE9.
+    // not have the 'unselectable' attribute.
     this.addContainer(this.$parent, 'clipboard-field');
     this.addLabel();
     this.addField(this.$parent.makeElement('<div>').addClass('input-field'));

@@ -97,14 +97,6 @@ export function prefSize($elem, options) {
     'height': newHeight
   };
 
-  // IE: In order to measure the correct size for elements with flex-layout we must temporarily
-  // change the position property because with absolute or relative positioning the size of the
-  // element maybe influenced or limited by the parent element which makes it impossible to
-  // determine the preferred size.
-  if (Device.get().isInternetExplorer() && $elem.css('display') === 'flex') {
-    cssProperties.position = 'fixed';
-  }
-
   // modify properties which prevent reading the preferred size
   $elem.css(cssProperties);
 
@@ -137,7 +129,6 @@ export function prefSize($elem, options) {
  * - Measured size from this method:      h = 345.239990234375
  * - Set the size to an element:          $elem.css('height', h + 'px')
  * - Results:
- *    IE                   <div id="elem" style="height: 345.23px">     [Fractional part cut off after two digits]
  *    Firefox & Chrome     <div id="elem" style="height: 345.24px">     [Fractional part rounded to three digits]
  */
 export function exactPrefSize(prefSize, options) {

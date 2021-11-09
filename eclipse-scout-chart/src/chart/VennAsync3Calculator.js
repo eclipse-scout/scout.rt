@@ -117,13 +117,6 @@ export default class VennAsync3Calculator {
       rBest = this.rBest,
       errorBest = this.errorBest;
 
-    let stepFactor = 1;
-    // sorry... ie is (verry, buggy) slow
-    // TODO [15.4] bsh: find better solution for ie, or error calculation
-    if (Device.get().isInternetExplorer()) {
-      stepFactor = 5;
-    }
-
     for (let d = 0; d < maxD; d += dStep) {
       // calc x, y
       let x = x1 + d * Math.cos(alpha);
@@ -138,8 +131,8 @@ export default class VennAsync3Calculator {
         let maxX = Math.max(x1 + r1, x2 + r2, x + r);
         let minY = Math.min(y1 - r1, y2 - r2, y - r);
         let maxY = Math.max(y1 + r1, y2 + r2, y + r);
-        let stepX = (maxX - minX) / 100 * stepFactor;
-        let stepY = (maxY - minY) / 100 * stepFactor;
+        let stepX = (maxX - minX) / 100;
+        let stepY = (maxY - minY) / 100;
 
         // areas of venn
         let a1 = 0,

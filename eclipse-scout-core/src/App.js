@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {codes, Device, EventSupport, fonts, locales, logging, numbers, ObjectFactory, objects, polyfills, scout, Session, texts, webstorage} from './index';
+import {codes, Device, EventSupport, fonts, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage} from './index';
 import $ from 'jquery';
 
 let instance = null;
@@ -72,7 +72,7 @@ export default class App {
   }
 
   /**
-   * Initializes the logging framework, polyfills and the object factory.
+   * Initializes the logging framework and the object factory.
    * This happens at the prepare phase because all these things should be available from the beginning.
    */
   _prepare(options) {
@@ -84,7 +84,6 @@ export default class App {
   }
 
   _prepareEssentials(options) {
-    polyfills.install(window);
     ObjectFactory.get().init();
   }
 

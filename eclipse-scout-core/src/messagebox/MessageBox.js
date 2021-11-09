@@ -14,7 +14,6 @@ import {
   ClickActiveElementKeyStroke,
   clipboard,
   CopyKeyStroke,
-  Device,
   FocusAdjacentElementKeyStroke,
   FocusRule,
   Form,
@@ -256,26 +255,23 @@ export default class MessageBox extends Widget {
   }
 
   _onCopy(event) {
-    let ie = Device.get().isInternetExplorer();
-    let clipboardData = ie ? this.$container.window(true).clipboardData : objects.optProperty(event, 'originalEvent', 'clipboardData');
+    let clipboardData = objects.optProperty(event, 'originalEvent', 'clipboardData');
 
     if (clipboardData) {
-      // Internet Explorer only allows plain text (which must have data-type 'Text')
-      if (!ie) {
-        let htmlText = strings.join('<br/>',
-          this.$header[0].outerHTML,
-          this.$body[0].outerHTML,
-          this.$html[0].outerHTML,
-          this.hiddenText);
-        clipboardData.setData('text/html', htmlText);
-      }
-      let dataType = ie ? 'Text' : 'text/plain';
+      let htmlText = strings.join('<br/>',
+        this.$header[0].outerHTML,
+        this.$body[0].outerHTML,
+        this.$html[0].outerHTML,
+        this.hiddenText);
+      clipboardData.setData('text/html', htmlText);
+
       let plainText = strings.join('\n\n',
         this.header,
         this.body,
         strings.plainText(this.$html[0].outerHTML, {compact: true, trim: true}),
         this.hiddenText);
-      clipboardData.setData(dataType, plainText);
+      clipboardData.setData('text/plain', plainText);
+
       this.$container.window(true).getSelection().removeAllRanges();
       this._setCopyable(false);
       clipboard.showNotification(this);

@@ -51,51 +51,6 @@ describe('scout.FocusManager', () => {
 
   });
 
-  describe('Focus fixes for Internet Explorer (IE)', () => {
-
-    beforeEach(() => {
-      // simulate we are an IE
-      Device.get().browser = Device.Browser.INTERNET_EXPLORER;
-    });
-
-    it('Click on table-cell, must focus table', () => {
-      let tableHelper = new TableSpecHelper(session);
-      let tableModel = tableHelper.createModelFixture(2, 1);
-      let table = tableHelper.createTable(tableModel);
-      table.render();
-
-      // we don't really click - just simulate that the method has been called by the FocusManager
-      let event = {
-        target: $('.table-cell')[0],
-        preventDefault: () => {
-        }
-      };
-      spyOn(event, 'preventDefault');
-      focusManager._handleIEEvent(event);
-      expect(document.activeElement).toBe(table.$container[0]);
-      expect(event.preventDefault).toHaveBeenCalled();
-    });
-
-    it('Click on tree-node, must focus tree', () => {
-      let treeHelper = new TreeSpecHelper(session);
-      let treeModel = treeHelper.createModelFixture(1);
-      let tree = treeHelper.createTree(treeModel);
-      tree.render();
-
-      // we don't really click - just simulate that the method has been called by the FocusManager
-      let event = {
-        target: $('.tree-node')[0],
-        preventDefault: () => {
-        }
-      };
-      spyOn(event, 'preventDefault');
-      focusManager._handleIEEvent(event);
-      expect(document.activeElement).toBe(tree.$container[0]);
-      expect(event.preventDefault).toHaveBeenCalled();
-    });
-
-  });
-
   describe('validateFocus', () => {
 
     it('When nothing else is focusable, focus must be on the Desktop (=sandbox)', () => {

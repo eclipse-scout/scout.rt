@@ -17,6 +17,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -24,12 +25,15 @@ import java.util.stream.Stream;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
+import org.eclipse.scout.rt.shared.ui.UiEngineType;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.rt.shared.ui.webresource.ScriptResourceIndexes;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
@@ -73,14 +77,14 @@ public class HtmlDocumentParser {
     m_cache = BEANS.get(GlobalHttpResourceCache.class);
   }
 
-  public byte[] parseDocument(byte[] document) throws IOException {
+  public byte[] parseDocument(byte[] document) {
     // the order of calls is important: first we must resolve all includes
     m_workingContent = new String(document, StandardCharsets.UTF_8);
     replaceAllTags();
     return m_workingContent.getBytes(StandardCharsets.UTF_8);
   }
 
-  protected void replaceAllTags() throws IOException {
+  protected void replaceAllTags() {
     replaceIncludeTags();
     replaceBaseTags();
     replaceVersionTags();
@@ -94,18 +98,8 @@ public class HtmlDocumentParser {
 
   @SuppressWarnings("squid:S1149")
   protected void replaceScriptTags(Pattern pattern, String tagPrefix, String tagSuffix) {
-    Matcher m = pattern.matcher(m_workingContent);
-    StringBuffer sb = new StringBuffer();
-    while (m.find()) {
-      String srcPath = m.group(1);
-      //noinspection StringBufferReplaceableByString
-      StringBuilder scriptTag = new StringBuilder(tagPrefix);
-      scriptTag.append(createExternalPath(srcPath));
-      scriptTag.append(tagSuffix);
-      m.appendReplacement(sb, scriptTag.toString());
-    }
-    m.appendTail(sb);
-    m_workingContent = sb.toString();
+    m_workingContent = pattern.matcher(m_workingContent)
+        .replaceAll(r -> tagPrefix + createExternalPath(r.group(1)) + tagSuffix);
   }
 
   /**
@@ -132,6 +126,11 @@ public class HtmlDocumentParser {
 
   protected void replaceScriptsTags() {
     // <scout:scripts entryPoint="entry-point-name"/>
+    boolean isUnsupportedBrowser = UiEngineType.IE.equals(UserAgentUtility.getCurrentUserAgent().getUiEngineType());
+    if (isUnsupportedBrowser) {
+      m_workingContent = PATTERN_SCRIPTS_TAG.matcher(m_workingContent).replaceAll(SCRIPT_TAG_PREFIX + LegacyBrowserScriptLoader.LEGACY_BROWSERS_SCRIPT + SCRIPT_TAG_SUFFIX);
+      return;
+    }
     replaceEntryPointTags(PATTERN_SCRIPTS_TAG, ".js", SCRIPT_TAG_PREFIX, SCRIPT_TAG_SUFFIX);
   }
 
@@ -141,14 +140,8 @@ public class HtmlDocumentParser {
   }
 
   protected void replaceEntryPointTags(Pattern pattern, String fileSuffixFilter, String tagPrefix, String tagSuffix) {
-    Matcher m = pattern.matcher(m_workingContent);
-    StringBuffer sb = new StringBuffer();
-    while (m.find()) {
-      String entryPoint = m.group(1);
-      m.appendReplacement(sb, buildScriptTagsForEntryPoint(entryPoint, fileSuffixFilter, tagPrefix, tagSuffix));
-    }
-    m.appendTail(sb);
-    m_workingContent = sb.toString();
+    m_workingContent = pattern.matcher(m_workingContent)
+        .replaceAll(r -> buildScriptTagsForEntryPoint(r.group(1), fileSuffixFilter, tagPrefix, tagSuffix));
   }
 
   protected String buildScriptTagsForEntryPoint(String entryPoint, String fileSuffixFilter, String tagPrefix, String tagSuffix) {
@@ -184,27 +177,26 @@ public class HtmlDocumentParser {
   }
 
   @SuppressWarnings("squid:S1149")
-  protected void replaceIncludeTags() throws IOException {
+  protected void replaceIncludeTags() {
     // <scout:include template="no-script.html" />
-    Matcher m = PATTERN_INCLUDE_TAG.matcher(m_workingContent);
-    StringBuffer sb = new StringBuffer();
-    while (m.find()) {
-      String includeName = m.group(1);
+    m_workingContent = PATTERN_INCLUDE_TAG.matcher(m_workingContent).replaceAll(r -> {
+      String includeName = r.group(1);
       URL includeUrl = resolveInclude(includeName);
       if (includeUrl == null) {
-        throw new IOException("Could not resolve include '" + includeName + "'");
+        throw new ProcessingException("Could not resolve include '{}'.", includeName);
       }
-      else {
+
+      try {
         byte[] includeContent = IOUtility.readFromUrl(includeUrl);
         String replacement = new String(includeContent, StandardCharsets.UTF_8);
-        // Ensure exactly 1 newline before and after the replacement (to improve readability in resulting document)
-        replacement = "\n" + replacement.trim() + "\n";
-        m.appendReplacement(sb, replacement);
         LOG.trace("Resolved include '{}'", includeName);
+        // Ensure exactly 1 newline before and after the replacement (to improve readability in resulting document)
+        return "\n" + replacement.trim() + "\n";
       }
-    }
-    m.appendTail(sb);
-    m_workingContent = sb.toString();
+      catch (IOException e) {
+        throw new ProcessingException("Error reading include '{}'.", includeName, e);
+      }
+    });
   }
 
   protected URL resolveInclude(String includeName) {
@@ -214,65 +206,63 @@ public class HtmlDocumentParser {
         .orElse(null);
   }
 
-  @SuppressWarnings("squid:S1149")
   protected void replaceMessageTags() {
     // <scout:message key="ui.JavaScriptDisabledTitle" />
-    Matcher m = PATTERN_MESSAGE_TAG.matcher(m_workingContent);
-    StringBuffer sb = new StringBuffer();
+    m_workingContent = PATTERN_MESSAGE_TAG.matcher(m_workingContent).replaceAll(this::replaceMessageTag);
+  }
+
+  @SuppressWarnings("squid:S1149")
+  protected String replaceMessageTag(MatchResult r) {
     HtmlHelper htmlHelper = BEANS.get(HtmlHelper.class);
-    while (m.find()) {
-      Matcher m2 = PATTERN_KEY_VALUE.matcher(m.group(1));
-      String style = "";
-      List<String> keys = new ArrayList<>();
-      while (m2.find()) {
-        String key = m2.group(1);
-        String value = m2.group(2);
-        if (StringUtility.equalsIgnoreCase(key, "style")) {
-          style = StringUtility.lowercase(value);
-        }
-        else if (StringUtility.equalsIgnoreCase(key, "key")) {
-          keys.add(value);
-        }
+    Matcher m2 = PATTERN_KEY_VALUE.matcher(r.group(1));
+    String style = "";
+    List<String> keys = new ArrayList<>();
+    while (m2.find()) {
+      String key = m2.group(1);
+      String value = m2.group(2);
+      if (StringUtility.equalsIgnoreCase(key, "style")) {
+        style = StringUtility.lowercase(value);
       }
-      // Generate output
-      String text = "";
-      if (!keys.isEmpty()) {
-        switch (style) {
-          case "javascript":
-            // JavaScript style replacement
-            StringBuilder js = new StringBuilder("{");
-            for (String key : keys) {
-              js.append("'").append(key).append("': ");
-              js.append(toJavaScriptString(TEXTS.get(key)));
-              js.append(", ");
-            }
-            int length = js.length();
-            js.delete(length - 2, length);
-            js.append("}");
-            text = js.toString();
-            break;
-          case "plain":
-            // Plain normal replacement (only supports one key, because we don't know how to separate multiple keys)
-            text = TEXTS.get(keys.get(0));
-            break;
-          case "tag":
-            StringBuilder tags = new StringBuilder();
-            for (String key : keys) {
-              tags.append("<scout-text data-key=\"").append(htmlHelper.escape(key)).append("\" ");
-              tags.append("data-value=\"").append(htmlHelper.escape(TEXTS.get(key))).append("\"></scout-text>");
-            }
-            text = tags.toString();
-            break;
-          case "html":
-          default:
-            text = htmlHelper.escape(TEXTS.get(keys.get(0)));
-            break;
-        }
+      else if (StringUtility.equalsIgnoreCase(key, "key")) {
+        keys.add(value);
       }
-      m.appendReplacement(sb, Matcher.quoteReplacement(text));
     }
-    m.appendTail(sb);
-    m_workingContent = sb.toString();
+    // Generate output
+    String text = "";
+    if (!keys.isEmpty()) {
+      switch (style) {
+        case "javascript":
+          // JavaScript style replacement
+          StringBuilder js = new StringBuilder("{");
+          for (String key : keys) {
+            js.append("'").append(key).append("': ");
+            js.append(toJavaScriptString(TEXTS.get(key)));
+            js.append(", ");
+          }
+          int length = js.length();
+          js.delete(length - 2, length);
+          js.append("}");
+          text = js.toString();
+          break;
+        case "plain":
+          // Plain normal replacement (only supports one key, because we don't know how to separate multiple keys)
+          text = TEXTS.get(keys.get(0));
+          break;
+        case "tag":
+          StringBuilder tags = new StringBuilder();
+          for (String key : keys) {
+            tags.append("<scout-text data-key=\"").append(htmlHelper.escape(key)).append("\" ");
+            tags.append("data-value=\"").append(htmlHelper.escape(TEXTS.get(key))).append("\"></scout-text>");
+          }
+          text = tags.toString();
+          break;
+        case "html":
+        default:
+          text = htmlHelper.escape(TEXTS.get(keys.get(0)));
+          break;
+      }
+    }
+    return Matcher.quoteReplacement(text);
   }
 
   protected String toJavaScriptString(String text) {
@@ -285,13 +275,9 @@ public class HtmlDocumentParser {
 
   @SuppressWarnings("squid:S1149")
   protected void stripUnknownTags() {
-    Matcher m = PATTERN_UNKNOWN_TAG.matcher(m_workingContent);
-    StringBuffer sb = new StringBuffer();
-    while (m.find()) {
-      LOG.warn("Removing unknown or improperly formatted scout tag from '{}': {}", m_params.getHtmlPath(), m.group());
-      m.appendReplacement(sb, "");
-    }
-    m.appendTail(sb);
-    m_workingContent = sb.toString();
+    m_workingContent = PATTERN_UNKNOWN_TAG.matcher(m_workingContent).replaceAll(r -> {
+      LOG.warn("Removing unknown or improperly formatted scout tag from '{}': {}", m_params.getHtmlPath(), r.group());
+      return "";
+    });
   }
 }

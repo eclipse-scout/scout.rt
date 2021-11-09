@@ -126,12 +126,7 @@ export default class SmartFieldPopup extends Popup {
 
   // --- static helpers --- //
 
-  /**
-   * Don't do popup animation on Internet Explorer, because IE is slow when
-   * it comes to rendering the popup and the additional CSS animation causes the popup
-   * to flicker. Every other browser (including Edge) that supports CSS animation is fine.
-   */
   static hasPopupAnimation() {
-    return Device.get().supportsCssAnimation() && !Device.get().isInternetExplorer();
+    return Device.get().supportsCssAnimation();
   }
 }

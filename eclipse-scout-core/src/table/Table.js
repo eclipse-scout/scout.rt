@@ -3477,14 +3477,6 @@ export default class Table extends Widget {
     return this.$data.find(selector);
   }
 
-  $cellsForColIndexWidthFix(colIndex, includeAggrRows) {
-    let selector = '.table-row > div:nth-of-type(' + colIndex + ') > .width-fix ';
-    if (includeAggrRows) {
-      selector += ', .table-aggregate-row > div:nth-of-type(' + colIndex + ') > .width-fix';
-    }
-    return this.$data.find(selector);
-  }
-
   $cellsForRow($row) {
     return $row.children('.table-cell');
   }
@@ -3820,9 +3812,6 @@ export default class Table extends Widget {
     }
     if (maxWidth && maxWidth > 0 && calculatedSize > maxWidth) {
       calculatedSize = maxWidth;
-    }
-    if (Device.get().isInternetExplorer() && calculatedSize !== column.minWidth) {
-      calculatedSize++;
     }
     if (column.width !== calculatedSize) {
       this.resizeColumn(column, calculatedSize);

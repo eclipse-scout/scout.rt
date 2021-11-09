@@ -139,7 +139,6 @@ export function onScrollStartEndDuringTouch($elem, startHandler, endHandler) {
  * <p>
  * <b>Important</b>
  * This function only works in browsers supporting the Event constructor (e.g. KeyboardEvent: https://developer.mozilla.org/de/docs/Web/API/KeyboardEvent/KeyboardEvent).
- * -> It does not work for IE 11.
  * </p>
  *
  * @param target {HTMLElement} the element which should receive the event
@@ -161,7 +160,6 @@ export function propagateEvent(target, event) {
  * <p>
  * <b>Important</b>
  * This function only works in browsers supporting the Event constructor (e.g. KeyboardEvent: https://developer.mozilla.org/de/docs/Web/API/KeyboardEvent/KeyboardEvent).
- * -> It does not work for IE 11.
  * </p>
  *
  * @param source {HTMLElement} the element for which the event listener should be added.

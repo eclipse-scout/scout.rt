@@ -66,20 +66,6 @@ export default class Image extends Widget {
 
   _renderAutoFit() {
     this.$container.toggleClass('autofit', this.autoFit);
-    if (Device.get().isInternetExplorer()) {
-      if (this.autoFit) {
-        // autoFit css rule uses 100% as max width/height
-        // IE returns calculated values instead of the percentage.
-        // -> The original methods detect whether percentage is used and return the same values as below.
-        // Since the detection does not work it is done explicitly.
-        this.htmlComp.cssMinSize = () => new Dimension();
-        this.htmlComp.cssMaxSize = () => new Dimension(Number.MAX_VALUE, Number.MAX_VALUE);
-      } else {
-        delete this.htmlComp.cssMinSize;
-        delete this.htmlComp.cssMaxSize;
-      }
-      this.invalidateLayoutTree();
-    }
   }
 
   _onImageLoad(event) {

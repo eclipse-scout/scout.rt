@@ -347,14 +347,11 @@ export function reloadPage(options) {
       $('body').html('');
     }
 
-    // Reload window (using setTimeout, to overcome drawing issues in IE)
-    setTimeout(() => {
-      if (options.redirectUrl) {
-        window.location.href = options.redirectUrl;
-      } else {
-        window.location.reload();
-      }
-    });
+    if (options.redirectUrl) {
+      window.location.href = options.redirectUrl;
+    } else {
+      window.location.reload();
+    }
   }
 }
 

@@ -49,6 +49,9 @@ public class ResourceLoaders {
     if (resourcePath.endsWith("/texts.json")) {
       return new TextsLoader();
     }
+    if (resourcePath.endsWith('/' + LegacyBrowserScriptLoader.LEGACY_BROWSERS_SCRIPT)) {
+      return new LegacyBrowserScriptLoader();
+    }
 
     UiThemeHelper uiThemeHelper = UiThemeHelper.get();
     String theme = uiThemeHelper.getTheme(req);

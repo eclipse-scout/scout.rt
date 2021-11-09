@@ -58,65 +58,9 @@ export default class FocusManager {
     $container.on('mousedown', event => {
       if (!this._acceptFocusChangeOnMouseDown($(event.target))) {
         event.preventDefault();
-      } else {
-        // Because in IE DOM elements are focusable without tabindex we have to handle it here -> select next parent with tabindex.
-        this._handleIEEvent(event);
       }
       return true;
     });
-  }
-
-  /**
-   * Note: this method is a collection of bugfixes for focus problems which only occur on
-   * Internet Explorer. Focus handling in IE is different from focus-handling in Chrome and Firefox.
-   * Basically this method emulates the focus behavior of the other two browsers, by setting the
-   * focus programmatically to the correct element. And yes, the method is ugly since it deals with
-   * a lot of specific cases. However: distributing the IE specific bugfix code over several classes
-   * wouldn't be much better.
-   */
-  _handleIEEvent(event) {
-    if (!Device.get().isInternetExplorer()) {
-      return;
-    }
-
-    let
-      $elementToFocus,
-      $element = $(event.target);
-
-    // table fix - required because IE focuses the table-cell element (unlike Chrome and Firefox)
-    // that means in IE, the table-cell is focused. But all our styles apply to a focused table
-    // that's why we must set the focus programmatically to the closest table in the DOM.
-    if ($element.is('.table-cell') || $element.closest('.table-cell').length > 0) {
-      this.requestFocus($element.closest('.table'));
-      event.preventDefault();
-      return;
-    }
-
-    // tree fix - same issue as in table
-    if ($element.is('.tree-node') || $element.closest('.tree-node').length > 0) {
-      this.requestFocus($element.closest('.tree'));
-      event.preventDefault();
-      return;
-    }
-
-    let userSelect = $element.css('user-select');
-    let selectableElements =
-      'div:not(.desktop),[tabindex]:not([tabindex=-1]),radio,a[href],area[href],input:not([disabled]),' +
-      'select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe';
-
-    // other fixes (NBU)
-    if ($element.not(selectableElements).length === 0) {
-      return;
-    }
-
-    if ($element.closest('[contenteditable="true"]').length === 0 &&
-      (userSelect && userSelect === 'none')) {
-      $elementToFocus = $element.closest(selectableElements);
-      if ($elementToFocus) {
-        this.requestFocus($elementToFocus.get(0));
-      }
-      event.preventDefault();
-    }
   }
 
   /**

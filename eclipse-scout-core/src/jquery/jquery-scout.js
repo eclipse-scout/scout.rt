@@ -774,16 +774,10 @@ $.fn.attrXLINK = function(attributeName, value) {
 
 /**
  * This function adds a device specific CSS class to the current element.
- * The current implementation adds a class 'ie' if Internet Explorer is used.
+ * The current implementation adds a class 'ios' if it is an ios device.
  */
 $.fn.addDeviceClass = function() {
   let device = Device.get();
-  if (device.isInternetExplorer()) {
-    this.addClass('ie');
-    if (device.browserVersion === 9) {
-      this.addClass('ie9');
-    }
-  }
   if (device.isIos()) {
     this.addClass('ios');
   }
@@ -1755,15 +1749,6 @@ $.fn.selectAllText = function() {
     return this;
   }
 
-  // CreateTextRange is only available in IE
-  // noinspection JSUnresolvedVariable
-  if (myDocument.body.createTextRange) {
-    range = myDocument.body.createTextRange();
-    range.moveToElementText(element);
-    range.select();
-    return this;
-  }
-
   if (myWindow.getSelection) {
     range = myDocument.createRange();
     range.selectNodeContents(element);
@@ -1776,9 +1761,8 @@ $.fn.selectAllText = function() {
 
 $.fn._getClientAndScrollWidthRounded = function() {
   let element = this[0];
-  let device = Device.get();
-  if (device.isInternetExplorer() || device.isEdge()) {
-    // IE and Edge seem to round up the scrollWidth. Therefore the clientWidth must be rounded up as well to have a valid comparison.
+  if (Device.get().isEdge()) {
+    // Edge seem to round up the scrollWidth. Therefore the clientWidth must be rounded up as well to have a valid comparison.
     return {
       clientWidth: Math.ceil(element.getBoundingClientRect().width) - this.cssBorderWidthX(), // getBoundingClientRect includes the border -> remove it again to have the clientWidth
       scrollWidth: element.scrollWidth

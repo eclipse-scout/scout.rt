@@ -170,13 +170,10 @@ export default class LoginBox extends Box {
     this.$password
       .val('');
 
-    // async bind reset function because focus method on username field (see above) already triggers an input event on IE.
-    setTimeout(() => {
-      this.$user
-        .one('input.resetLoginError', this._resetButtonText.bind(this));
-      this.$password
-        .one('input.resetLoginError', this._resetButtonText.bind(this));
-    });
+    this.$user
+      .one('input.resetLoginError', this._resetButtonText.bind(this));
+    this.$password
+      .one('input.resetLoginError', this._resetButtonText.bind(this));
   }
 
   // ----- Helper functions -----

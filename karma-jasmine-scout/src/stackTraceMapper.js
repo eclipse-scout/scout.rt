@@ -19,7 +19,7 @@ function mapStackTraceSync(error) {
   let mapped = '';
   window.sourceMappedStackTrace.mapStackTrace(error.stack, mappedStack => {
     mapped = mappedStack.join('\n');
-  }, {sync: true});
+  }, {sync: true, cacheGlobally: true});
   return mapped;
 }
 

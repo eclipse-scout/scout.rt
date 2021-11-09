@@ -30,7 +30,6 @@ export default class LogoutApp extends App {
   }
 
   /**
-   * Default adds polyfills too, not required here
    * @override
    */
   _prepareEssentials(options) {
