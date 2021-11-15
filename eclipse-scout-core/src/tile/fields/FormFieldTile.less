@@ -12,7 +12,8 @@
   border: none;
   border-radius: @dashboard-tile-border-radius;
   color: @tile-default-color;
-  background-color: @tile-default-background-color;
+  --tile-background-color: @tile-default-background-color;
+  background-color: var(--tile-background-color);
   overflow: hidden;
 
   #scout.double-drop-shadow(@spread1: 1px, @color1: @dashboard-tile-border-color, @y2: 0px, @blur2: 0px);
@@ -95,7 +96,19 @@
       opacity: 1;
     }
 
-    &.has-menus > .status {
+    & > .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+
+      background-color: var(--tile-background-color);
+      box-shadow: 0 0 4px 4px var(--tile-background-color);
+      border-radius: 50%;
+
+      padding: 0;
+      margin: 0;
+
       // These properties are set by FormFieldLayout.js depending on StatusPosition, Label, etc.
       // In order to fix these values for the FormFieldTile we need !important.
       height: 24px !important;
@@ -103,10 +116,12 @@
       top: 12px !important;
       right: 12px !important;
       line-height: unset !important;
+    }
+
+    &.has-menus:not(.has-tooltip):not(.has-error) > .status {
       border-radius: @border-radius;
 
       &::before {
-        vertical-align: middle;
         color: @dashboard-tile-menu-color;
       }
 
@@ -140,11 +155,6 @@
 
       & > label {
         margin-right: @offset;
-      }
-
-      &.label-hidden > .status {
-        /* increase space between status and field if label is hidden (= status is displayed on the field's right side) */
-        margin-left: @field-status-margin-left + 10px;
       }
 
       & > .field {
@@ -190,11 +200,11 @@
   }
 
   &.inverted {
-    background-color: @tile-default-inverted-background-color;
+    --tile-background-color: @tile-default-inverted-background-color;
     color: @tile-default-inverted-color;
 
     &.disabled:not(.read-only) {
-      background-color: @tile-default-border-color;
+      --tile-background-color: @tile-default-border-color;
     }
 
     & > .form-field {
@@ -217,9 +227,13 @@
         }
       }
 
-      &.has-tooltip > .status,
-      &.has-menus > .status {
+      & > .status {
+        &::before {
+          color: @tile-default-inverted-color;
+        }
+      }
 
+      &.has-menus:not(.has-tooltip):not(.has-error) > .status {
         &::before {
           color: @tile-default-inverted-color;
         }
@@ -234,13 +248,8 @@
       }
 
       &.has-error > .status {
-
         &::before {
-          color: @palette-red-1;
-        }
-
-        &:hover::before {
-          color: @palette-red-2;
+          color: @palette-red-3;
         }
       }
 
@@ -266,11 +275,11 @@
   }
 
   &.color-alternative {
-    background-color: @tile-alternative-background-color;
+    --tile-background-color: @tile-alternative-background-color;
     color: @tile-alternative-color;
 
     &.disabled:not(.read-only) {
-      background-color: @tile-default-border-color;
+      --tile-background-color: @tile-default-border-color;
     }
 
     & > .form-field {
@@ -294,11 +303,11 @@
   }
 
   &.inverted.color-alternative {
-    background-color: @tile-alternative-inverted-background-color;
+    --tile-background-color: @tile-alternative-inverted-background-color;
     color: @tile-alternative-inverted-color;
 
     &.disabled:not(.read-only) {
-      background-color: @tile-default-border-color;
+      --tile-background-color: @tile-default-border-color;
     }
 
     & > .form-field {
@@ -319,25 +328,13 @@
         }
       }
 
-      &.has-tooltip > .status,
-      &.has-menus > .status {
+      &.has-menus:not(.has-tooltip):not(.has-error) > .status {
         &:hover {
           background-color: @tile-button-alternative-inverted-hover-background-color;
         }
 
         &:active {
           background-color: @tile-button-alternative-inverted-active-background-color;
-        }
-      }
-
-      &.has-error > .status {
-
-        &::before {
-          color: @palette-red-1;
-        }
-
-        &:hover::before {
-          color: @palette-red-0;
         }
       }
     }
@@ -347,7 +344,7 @@
     #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-selected-border-color, @y2: 0px, @blur2: 0px);
 
     &.inverted {
-      background-color: mix(@tile-default-inverted-background-color, @tile-default-inverted-selection-background-color, 35%);
+      --tile-background-color: mix(@tile-default-inverted-background-color, @tile-default-inverted-selection-background-color, 35%);
       #scout.double-drop-shadow(@spread1: 2px, @color1: @tile-default-inverted-background-color, @y2: 0px, @blur2: 0px);
     }
 
@@ -356,7 +353,7 @@
     }
 
     &.inverted.color-alternative {
-      background-color: mix(@tile-alternative-inverted-background-color, @tile-alternative-inverted-selection-background-color, 65%);
+      --tile-background-color: mix(@tile-alternative-inverted-background-color, @tile-alternative-inverted-selection-background-color, 65%);
       #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-alternative-selected-border-color, @y2: 0px, @blur2: 0px);
     }
 

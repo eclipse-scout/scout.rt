@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BrowserField, Device, Tile, WidgetTile} from '../../index';
+import {BrowserField, Device, FormFieldLayout, Tile, WidgetTile} from '../../index';
 
 export default class FormFieldTile extends WidgetTile {
 
@@ -27,6 +27,16 @@ export default class FormFieldTile extends WidgetTile {
     super._renderProperties();
     this._renderFieldLabelVisible();
     this._renderCompact();
+  }
+
+  _renderTileWidget() {
+    super._renderTileWidget();
+    if (this.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
+      return;
+    }
+    if (this.tileWidget && this.tileWidget.htmlComp && this.tileWidget.htmlComp.layout instanceof FormFieldLayout) {
+      this.tileWidget.htmlComp.layout.statusWidth = 0;
+    }
   }
 
   _renderDisplayStyle() {
