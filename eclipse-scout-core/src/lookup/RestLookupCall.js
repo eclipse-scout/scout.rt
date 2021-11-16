@@ -8,9 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupCall, scout} from '../index';
+import {arrays, LookupCall, objects, scout} from '../index';
 import $ from 'jquery';
 
+/**
+ * A lookup call that can load lookup rows from a REST service.
+ *
+ * API:
+ * ----
+ * By default, the REST service is expected to listen for POST requests at the URL defined by
+ * this.resourceUrl. It receives a restriction object and must return a list of matching lookup rows.
+ * The serialization format is JSON.
+ *
+ * Lookup rows:
+ * ------------
+ * The standard lookup row properties defined by Scout are usually sufficient (see AbstractLookupRowDo.java).
+ *
+ * Restriction:
+ * ------------
+ * The restriction object consists of a number of 'well-known' properties (e.g. 'text' in QueryBy.TEXT
+ * mode, see AbstractLookupRestrictionDo.java for details) and additional, service-dependent properties
+ * that can either be predefined in the model or added programmatically at runtime. Since all of those
+ * properties are sent in the same restriction object, some care must be taken to prevent accidental
+ * overwriting of properties.
+ *
+ * Order of precedence (lowest to highest):
+ * 1. Restrictions automatically applied to all clones after their creation in the respective cloneFor method.
+ *    These are: 'active' (ALL, TEXT, REC) and 'maxRowCount' (ALL, TEXT, REC)
+ * 2. Restrictions predefined in the model property 'restriction', shared by all clones.
+ * 3. Restrictions applied to clones programmatically, e.g. during a 'prepareLookupCall' event.
+ * 4. Hard-coded properties that are fundamental to the respective queryBy mode (cannot be overridden).
+ *    These are: 'ids' (KEY, KEYS) and 'text' (TEXT)
+ */
 export default class RestLookupCall extends LookupCall {
 
   constructor() {
@@ -42,6 +71,17 @@ export default class RestLookupCall extends LookupCall {
     this._restriction[key] = value;
   }
 
+  /**
+   * Adds the given key-value pair to 'this._restriction', but only if there is no predefined
+   * value for this key in 'this.restriction'. This prevents unintentional overriding of
+   * user-defined model restrictions.
+   */
+  _addRestrictionIfAbsent(key, value) {
+    if (!this.restriction || objects.isNullOrUndefined(this.restriction[key])) {
+      this.addRestriction(key, value);
+    }
+  }
+
   _getAll() {
     return this._call();
   }
@@ -63,22 +103,22 @@ export default class RestLookupCall extends LookupCall {
 
   cloneForAll() {
     let clone = super.cloneForAll();
-    clone.addRestriction('active', true);
-    clone.addRestriction('maxRowCount', this.maxRowCount);
+    clone._addRestrictionIfAbsent('active', true);
+    clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
     return clone;
   }
 
   cloneForText(text) {
     let clone = super.cloneForText(text);
-    clone.addRestriction('active', true);
-    clone.addRestriction('maxRowCount', this.maxRowCount);
+    clone._addRestrictionIfAbsent('active', true);
+    clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
     return clone;
   }
 
   cloneForRec(parentKey) {
     let clone = super.cloneForRec(parentKey);
-    clone.addRestriction('active', true);
-    clone.addRestriction('maxRowCount', this.maxRowCount);
+    clone._addRestrictionIfAbsent('active', true);
+    clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
     return clone;
   }
 
@@ -167,7 +207,7 @@ export default class RestLookupCall extends LookupCall {
       return value;
     };
 
-    let newRestrictions = {};
+    let resolvedRestriction = {};
     let restriction = $.extend({}, this.restriction, this._restriction);
     Object.keys(restriction).forEach(key => {
       let value = restriction[key];
@@ -180,11 +220,11 @@ export default class RestLookupCall extends LookupCall {
         newValue = resolveValue(value);
       }
       // Only add non-null restrictions
-      if (newValue) {
-        newRestrictions[key] = newValue;
+      if (!objects.isNullOrUndefined(newValue)) {
+        resolvedRestriction[key] = newValue;
       }
     });
-    return newRestrictions;
+    return resolvedRestriction;
   }
 
   _createAjaxCall() {
