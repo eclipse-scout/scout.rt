@@ -288,6 +288,10 @@
     margin-left: -(@loading-animation-size / 2);
     #scout.animation(fade-in 0.15s);
     #scout.loading-indicator-before(@loading-animation-size, @border-width);
+
+    &.animate-remove {
+      #scout.animation(fade-out-from-current 0.15s);
+    }
   }
 
   .loading-indicator-before(@loading-animation-size: 30px, @border-width: 1px) {
