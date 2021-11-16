@@ -187,6 +187,7 @@ export function addPropagationListener(source, target, types, filter) {
  * @property {number} originalLeft The left position of the element at the moment the swipe was started.
  * @property {number} deltaX The horizontal delta the swipe has already moved (negative values mean to the left of the original left position).
  * @property {number} newLeft The current left position of the element.
+ * @property {number} direction -1 if the move is to the left, 1 if the move is to the right, 0 or -0 if it is not moved yet
  */
 
 /**
@@ -206,7 +207,7 @@ export function onSwipe($element, id, onDown, onMove, onUp) {
   $element.on('remove', event => $window.off('.' + id));
 
   $element.on(touchdown(touch), event => {
-    let acceptDown = !onDown || !!onDown({originalEvent: event, originalLeft: origPosLeft, deltaX: 0, newLeft: origPosLeft});
+    let acceptDown = !onDown || !!onDown({originalEvent: event, originalLeft: origPosLeft, deltaX: 0, newLeft: origPosLeft, direction: 0});
     if (!acceptDown) {
       return;
     }
@@ -215,13 +216,18 @@ export function onSwipe($element, id, onDown, onMove, onUp) {
     let origPageX = events.pageX(event);
     let origPosLeft = $element.position().left;
     let curPosLeft = origPosLeft;
+    let direction = 0;
 
     $window.on(touchmove(touch, id), event => {
       let pageX = events.pageX(event);
       let deltaX = pageX - origPageX;
       let newLeft = origPosLeft + deltaX;
+      if (newLeft != curPosLeft) {
+        // only update swipe direction if it actually changed
+        direction = Math.sign(newLeft - curPosLeft);
+      }
       if (onMove) {
-        let l = onMove({originalEvent: event, originalLeft: origPosLeft, deltaX: deltaX, newLeft: newLeft});
+        let l = onMove({originalEvent: event, originalLeft: origPosLeft, deltaX: deltaX, newLeft: newLeft, direction: direction});
         curPosLeft = typeof l === 'number' ? l : newLeft;
       } else {
         curPosLeft = newLeft;
@@ -236,7 +242,7 @@ export function onSwipe($element, id, onDown, onMove, onUp) {
       dragging = false;
       $window.off('.' + id);
       if (onUp) {
-        onUp({originalEvent: event, originalLeft: origPosLeft, deltaX: curPosLeft - origPosLeft, newLeft: curPosLeft});
+        onUp({originalEvent: event, originalLeft: origPosLeft, deltaX: curPosLeft - origPosLeft, newLeft: curPosLeft, direction: direction});
       }
     });
   });

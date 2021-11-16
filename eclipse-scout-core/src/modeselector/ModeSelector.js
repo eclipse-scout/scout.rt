@@ -156,7 +156,7 @@ export default class ModeSelector extends Widget {
     let onUp = /** @type {SwipeCallbackEvent} */e => {
       this.$container.children().removeClass(className);
       let modeSelectingPos;
-      if (e.deltaX <= 0) {
+      if (e.direction < 0) {
         // slide left: use left end of slider
         modeSelectingPos = e.newLeft;
       } else {
