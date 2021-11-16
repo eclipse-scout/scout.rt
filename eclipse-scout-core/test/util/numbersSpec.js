@@ -14,7 +14,7 @@ import RoundingMode from '../../src/util/RoundingMode';
 describe('scout.numbers', function() {
 
   /**
-   * Test cases copied & extended from {@link java.math.RoundingMode}
+   * Test cases copied & extended from java.math.RoundingMode
    */
   describe('round', function() {
 
