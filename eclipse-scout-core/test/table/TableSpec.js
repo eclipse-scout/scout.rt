@@ -12,7 +12,6 @@ import {BeanColumn, Column, Device, graphics, IconColumn, icons, MenuDestination
 import {LocaleSpecHelper, TableSpecHelper} from '../../src/testing/index';
 
 /* global removePopups */
-
 describe('Table', () => {
   let session, helper;
 
