@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,8 +45,6 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
       return false;
     }
 
-    this.setLoading(true);
-
     // basic values
     this.data = this.chart.data.chartValueGroups;
     this.numberOfCircles = this.chart.config.venn.numberOfCircles;
@@ -81,7 +79,6 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
     // Final callback
     let draw = function() {
       this.readyToDraw = true;
-      this.setLoading(false);
       if (!this.$svg.isAttached()) {
         // user navigated away. do not try to render-> error
         return;
@@ -123,17 +120,7 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
 
   remove(requestAnimation, afterRemoveFunc) {
     this._cancelAsync3Calculator();
-    this.setLoading(false);
     super.remove(requestAnimation, afterRemoveFunc);
-  }
-
-  setLoading(loading) {
-    if (loading && !this.$loadingIndicator && this.chart && this.chart.rendered) {
-      this.$loadingIndicator = this.chart.$container.appendDiv('venn-chart-loading-indicator');
-    } else if (!loading && this.$loadingIndicator) {
-      this.$loadingIndicator.remove();
-      this.$loadingIndicator = null;
-    }
   }
 
   // calculation

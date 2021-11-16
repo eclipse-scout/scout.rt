@@ -820,25 +820,3 @@ text.venn-legend {
   dominant-baseline: auto;
   text-anchor: start;
 }
-
-.venn-chart-loading-indicator {
-  @loading-animation-size: 30px;
-  display: inline-block;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: -(@loading-animation-size / 2);
-  margin-left: -(@loading-animation-size / 2);
-  #scout.animation(fade-in 0.15s);
-
-  &::before {
-    #scout.animation(pulsate 2.0s linear infinite);
-    content: '';
-    display: inline-block;
-    vertical-align: middle;
-    border-radius: 50%;
-    border: 1px solid @border-color;
-    width: @loading-animation-size;
-    height: @loading-animation-size;
-  }
-}

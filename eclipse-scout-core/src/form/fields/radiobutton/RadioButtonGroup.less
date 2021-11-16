@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,11 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-.radiobutton-group-body > .radio-button > .field {
-  /* radio button group has a mandatory indicator, no need to create a margin */
-  margin-left: 0;
+.radiobutton-group-body {
+  & > .radio-button > .field {
+    /* radio button group has a mandatory indicator, no need to create a margin */
+    margin-left: 0;
+  }
+
+  & > .form-field {
+    opacity: 1;
+    transition: opacity @loading-fade-duration;
+  }
 }
 
-.radiobutton-group-body.loading > .loading-indicator {
-  #scout.loading-indicator();
+.radiobutton-group-body.loading {
+
+  & > .form-field {
+    opacity: 0;
+  }
+
+  & > .loading-indicator {
+    #scout.loading-indicator();
+  }
 }
