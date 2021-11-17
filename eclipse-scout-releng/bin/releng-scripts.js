@@ -9,8 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-#!/usr/bin/env node
-
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
 // terminate the Node.js process with a non-zero exit code.
@@ -33,7 +31,7 @@ const generateSnapshot = args => {
 
 const setInstallSnapshotDependencies = args => {
   const script = require('../scripts/updateVersion');
-  script.setPreInstallSnapshotDependencies({verbose: args.verbose, dryrun: args.dryrun})
+  script.setPreInstallSnapshotDependencies({verbose: args.verbose, dryrun: args.dryrun, workspaceRoot: args.workspaceRoot})
     .then(() => console.log('setPreInstallSnapshotDependencies version done'))
     .catch(e => {
       console.error('setPreInstallSnapshotDependencies version failed');
@@ -44,7 +42,7 @@ const setInstallSnapshotDependencies = args => {
 
 const setPublishSnapshotDependencies = args => {
   const script = require('../scripts/updateVersion');
-  script.setPrePublishSnapshotDependencies({verbose: args.verbose, dryrun: args.dryrun})
+  script.setPrePublishSnapshotDependencies({verbose: args.verbose, dryrun: args.dryrun, workspaceRoot: args.workspaceRoot})
     .then(() => console.log('setPrePublishSnapshotDependencies version done'))
     .catch(e => {
       console.error('setPrePublishSnapshotDependencies version failed');
@@ -55,7 +53,7 @@ const setPublishSnapshotDependencies = args => {
 
 const setInstallReleaseDependencies = args => {
   const script = require('../scripts/updateVersion');
-  script.setPreInstallReleaseDependencies({mapping: args.mapping, verbose: args.verbose, dryrun: args.dryrun})
+  script.setPreInstallReleaseDependencies({mapping: args.mapping, verbose: args.verbose, dryrun: args.dryrun, workspaceRoot: args.workspaceRoot})
     .then(() => console.log('setPreInstallReleaseDependencies version done'))
     .catch(e => {
       console.error('setPreInstallReleaseDependencies version failed');
@@ -69,7 +67,14 @@ const setPublishReleaseDependencies = args => {
     throw new Error('Please provide arguments for --newVersion or --mapping');
   }
   const script = require('../scripts/updateVersion');
-  script.setPrePublishReleaseDependencies({mapping: args.mapping, newVersion: args.newVersion, useRegexMap: args.useRegexMap, verbose: args.verbose, dryrun: args.dryrun})
+  script.setPrePublishReleaseDependencies({
+    mapping: args.mapping,
+    newVersion: args.newVersion,
+    useRegexMap: args.useRegexMap,
+    verbose: args.verbose,
+    dryrun: args.dryrun,
+    workspaceRoot: args.workspaceRoot
+  })
     .then(() => console.log('setPrePublishReleaseDependencies version done'))
     .catch(e => {
       console.error('setPrePublishReleaseDependencies version failed');
@@ -95,82 +100,44 @@ yargs
     console.log(`Unknown script ${argv._[0]}`);
   })
   .command('snapshot-version', 'Generates a new snapshot version for the module',
-    () => {},
+    () => {
+    },
     generateSnapshot
   )
   .command('snapshot-install-dependency', 'Updates dependencies that are not part of the workspace so they will be downloaded from the registry.',
-    () => {},
+    yargs => yargs.option('workspaceRoot', {description: 'Path to the pnpm workspace root directory (optional).', type: 'string', default: null}),
     setInstallSnapshotDependencies
   )
   .command('snapshot-publish-dependency', 'Adds the timestamp to the current version and updates the workspace dependencies in the same way as done for non workspace dependencies by the snapshot-install-dependency command.',
-    () => {},
+    yargs => yargs.option('workspaceRoot', {description: 'Path to the pnpm workspace root directory (optional).', type: 'string', default: null}),
     setPublishSnapshotDependencies
   )
   .command('release-install-dependency', 'Uses the given mapping to update dependencies that are not part of the workspace so they will be downloaded from the registry.',
-    yargs => {
-      return yargs
-        .option('mapping', {
-          description: '1 or more mappings with a regex and a version to specify which dependencies should be updated by what version. E.g.: --mapping.0.regex @your-dep --mapping.0.version 1.2.3',
-          type: 'string'
-        });
-    },
+    yargs => yargs
+      .option('mapping', {
+        description: '1 or more mappings with a regex and a version to specify which dependencies should be updated by what version. E.g.: --mapping.0.regex @your-dep --mapping.0.version 1.2.3 --mapping.1.regex @your-dep2 --mapping.1.version 4.5.6',
+        type: 'string'
+      })
+      .option('workspaceRoot', {description: 'Path to the pnpm workspace root directory (optional).', type: 'string', default: null}),
     setInstallReleaseDependencies
   )
   .command('release-publish-dependency', 'Updates the versions of the workspace modules with the new version provided. Also updates the dependencies to these workspace modules with the new version.',
-    yargs => {
-      return yargs
-        .option('newVersion', {
-          description: 'New version of the npm module',
-          type: 'string'
-        })
-        .option('useRegexMap', {
-          description: 'true if the modules in the workspace have different versions. the regex-version mapping is used to set the version',
-          type: 'boolean',
-          default: false
-        });
-    },
+    yargs => yargs
+      .option('newVersion', {description: 'New version of the npm module', type: 'string'})
+      .option('useRegexMap', {description: 'true if the modules in the workspace have different versions. the regex-version mapping is used to set the version', type: 'boolean', default: false})
+      .option('workspaceRoot', {description: 'Path to the pnpm workspace root directory (optional).', type: 'string', default: null}),
     setPublishReleaseDependencies
   )
   .command('snapshot-cleanup', 'Cleans up old modules on the artifactory.',
-    yargs => {
-      return yargs
-        .option('apikey', {
-          description: 'API Key for authentication',
-          type: 'string'
-        })
-        .option('url', {
-          description: 'URL of the artifactory',
-          type: 'string'
-        })
-        .option('user', {
-          description: 'Username',
-          type: 'string'
-        })
-        .option('pwd', {
-          description: 'Password',
-          type: 'string'
-        })
-        .option('reponame', {
-          description: 'Name of the repository',
-          type: 'string'
-        })
-        .option('keep', {
-          description: 'Number of Artifacts to keep',
-          type: 'number'
-        });
-    },
+    yargs => yargs
+      .option('apikey', {description: 'API Key for authentication', type: 'string'})
+      .option('url', {description: 'URL of the artifactory', type: 'string'})
+      .option('user', {description: 'Username', type: 'string'})
+      .option('pwd', {description: 'Password', type: 'string'})
+      .option('reponame', {description: 'Name of the repository', type: 'string'})
+      .option('keep', {description: 'Number of Artifacts to keep', type: 'number'}),
     cleanupArtifactory
   )
-  .option('dryrun', {
-    description: 'If true, simulation of the command',
-    type: 'boolean',
-    default: false
-  })
-  .option(
-    'verbose',
-    {
-      description: 'More Logging',
-      type: 'boolean',
-      default: false
-    }
+  .option('dryrun', {description: 'If true, simulation of the command', type: 'boolean', default: false})
+  .option('verbose', {description: 'More Logging', type: 'boolean', default: false}
   ).argv;

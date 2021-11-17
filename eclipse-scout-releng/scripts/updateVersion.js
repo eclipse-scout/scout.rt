@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-#!/usr/bin/env node
 /* eslint-disable max-len */
 
 // Makes the script crash on unhandled rejections instead of silently
@@ -127,7 +126,14 @@ const updateDependencyConstraints = ({dependencies, workspaceModuleNames = [], u
   for (const [moduleName, version] of Object.entries(dependencies)) {
     if (regex.test(version)) {
       if ((updateWorkspaceDependencies && workspaceModuleNames.includes(moduleName)) || (!updateWorkspaceDependencies && !workspaceModuleNames.includes(moduleName))) {
-        const versionConstraint = isSnapshot ? createSnapshotVersionConstraint(version) : createReleaseVersionConstraint({moduleName, mapping, newModuleVersion: newModuleVersion, useRegexMap, updateWorkspaceDependencies, verbose});
+        const versionConstraint = isSnapshot ? createSnapshotVersionConstraint(version) : createReleaseVersionConstraint({
+          moduleName,
+          mapping,
+          newModuleVersion: newModuleVersion,
+          useRegexMap,
+          updateWorkspaceDependencies,
+          verbose
+        });
         console.log(`dependency ${moduleName} with version ${version} needs to be updated. new constraint: ${versionConstraint}`);
         dependencies[moduleName] = versionConstraint;
       } else {
@@ -144,42 +150,54 @@ const updateDependencyConstraints = ({dependencies, workspaceModuleNames = [], u
 };
 
 /**
- * Finds pnpm-workspace.yaml file by going up the directory tree
- * @param dir where to start searching
- * @param verbose more logging
+ * Gets the directory closest to the file-system root that contains a 'pnpm-workspace.yaml' file. The search starts at the given start dir stepping up the parent directories.
+ * @param dir where to start searching.
  * @returns {Promise<*>}
  */
-const findWorkspaceFileDir = async (dir, verbose) => {
-  const filePath = path.join(dir, 'pnpm-workspace.yaml');
-  if (fs.existsSync(filePath)) {
-    if (verbose) {
-      console.log('workspace dir: ' + dir);
+const findWorkspaceFileDir = async (dir) => {
+  let pnpmWorkspace = null;
+  let parentDir = dir;
+  let currentDir;
+  do {
+    currentDir = parentDir;
+    parentDir = path.join(currentDir, '../');
+    let candidate = path.join(currentDir, 'pnpm-workspace.yaml');
+    if (fs.existsSync(candidate)) {
+      pnpmWorkspace = currentDir;
     }
-    return dir;
-  }
-
-  const parentDir = path.join(dir, '../');
-  if (dir === parentDir) {
-    return null;
-  }
-  return findWorkspaceFileDir(parentDir, verbose);
+  } while (currentDir !== parentDir);
+  return pnpmWorkspace;
 };
 
-const collectModulesInWorkspace = async (startDir, verbose) => {
-  let root = await findWorkspaceFileDir(startDir, verbose);
-  if (!root) {
-    root = path.join(startDir, '../'); // parent folder as default if no workspace file could be found
-    console.log(`unable to find workspace file. Use parent directory as workspace root: ${root}`);
+const collectModulesInWorkspace = async (startDir, verbose, workspaceRoot) => {
+  if (workspaceRoot) {
+    console.log(`use given workspace root: ${workspaceRoot}`);
+  } else {
+    workspaceRoot = await findWorkspaceFileDir(startDir);
+    if (workspaceRoot) {
+      console.log(`use workspace root found at: ${workspaceRoot}`);
+    } else {
+      workspaceRoot = path.join(startDir, '../'); // parent folder as default if no workspace file could be found
+      console.log(`unable to find workspace file. Use parent directory as workspace root: ${workspaceRoot}`);
+    }
   }
-  console.log(`start searching for package.json files at ${root}`);
-  return findWorkspacePackages.default(root);
+  return findWorkspacePackages.default(workspaceRoot);
 };
 
-const updateAllPackageJsons = async ({isSnapshot = true, updateWorkspaceDependencies = false, releaseDependencyMapping = {}, newVersion, useRegexMap = false, verbose = false, dryrun = false}) => {
+const updateAllPackageJsons = async ({
+                                       isSnapshot = true,
+                                       updateWorkspaceDependencies = false,
+                                       releaseDependencyMapping = {},
+                                       newVersion,
+                                       useRegexMap = false,
+                                       verbose = false,
+                                       dryrun = false,
+                                       workspaceRoot = null
+                                     }) => {
   const filename = './package.json';
   const filePath = path.resolve(filename);
   const dir = path.dirname(filePath);
-  const workspaceModules = await collectModulesInWorkspace(dir, verbose);
+  const workspaceModules = await collectModulesInWorkspace(dir, verbose, workspaceRoot);
   if (!workspaceModules || workspaceModules.length === 0) {
     console.log('no modules found');
     return;
@@ -206,11 +224,56 @@ const updateAllPackageJsons = async ({isSnapshot = true, updateWorkspaceDependen
     }
 
     // update dependencies of this module
-    updateDependencyConstraints({dependencies: packageJson.dependencies, workspaceModuleNames, updateWorkspaceDependencies, isSnapshot, mapping: releaseDependencyMapping, newModuleVersion: newVersion, useRegexMap, verbose});
-    updateDependencyConstraints({dependencies: packageJson.devDependencies, workspaceModuleNames, updateWorkspaceDependencies, isSnapshot, mapping: releaseDependencyMapping, newModuleVersion: newVersion, useRegexMap, verbose});
-    updateDependencyConstraints({dependencies: packageJson.peerDependencies, workspaceModuleNames, updateWorkspaceDependencies, isSnapshot, mapping: releaseDependencyMapping, newModuleVersion: newVersion, useRegexMap, verbose});
-    updateDependencyConstraints({dependencies: packageJson.bundledDependencies, workspaceModuleNames, updateWorkspaceDependencies, isSnapshot, mapping: releaseDependencyMapping, newModuleVersion: newVersion, useRegexMap, verbose});
-    updateDependencyConstraints({dependencies: packageJson.optionalDependencies, workspaceModuleNames, updateWorkspaceDependencies, isSnapshot, mapping: releaseDependencyMapping, newModuleVersion: newVersion, useRegexMap, verbose});
+    updateDependencyConstraints({
+      dependencies: packageJson.dependencies,
+      workspaceModuleNames,
+      updateWorkspaceDependencies,
+      isSnapshot,
+      mapping: releaseDependencyMapping,
+      newModuleVersion: newVersion,
+      useRegexMap,
+      verbose
+    });
+    updateDependencyConstraints({
+      dependencies: packageJson.devDependencies,
+      workspaceModuleNames,
+      updateWorkspaceDependencies,
+      isSnapshot,
+      mapping: releaseDependencyMapping,
+      newModuleVersion: newVersion,
+      useRegexMap,
+      verbose
+    });
+    updateDependencyConstraints({
+      dependencies: packageJson.peerDependencies,
+      workspaceModuleNames,
+      updateWorkspaceDependencies,
+      isSnapshot,
+      mapping: releaseDependencyMapping,
+      newModuleVersion: newVersion,
+      useRegexMap,
+      verbose
+    });
+    updateDependencyConstraints({
+      dependencies: packageJson.bundledDependencies,
+      workspaceModuleNames,
+      updateWorkspaceDependencies,
+      isSnapshot,
+      mapping: releaseDependencyMapping,
+      newModuleVersion: newVersion,
+      useRegexMap,
+      verbose
+    });
+    updateDependencyConstraints({
+      dependencies: packageJson.optionalDependencies,
+      workspaceModuleNames,
+      updateWorkspaceDependencies,
+      isSnapshot,
+      mapping: releaseDependencyMapping,
+      newModuleVersion: newVersion,
+      useRegexMap,
+      verbose
+    });
 
     if (!dryrun) {
       await writeFile(path.join(module.dir, 'package.json'), packageJson, verbose);
@@ -220,21 +283,21 @@ const updateAllPackageJsons = async ({isSnapshot = true, updateWorkspaceDependen
   }
 };
 
-const setPreInstallSnapshotDependencies = async ({verbose, dryrun}) => {
-  await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: false, verbose, dryrun});
+const setPreInstallSnapshotDependencies = async ({verbose, dryrun, workspaceRoot = null}) => {
+  await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: false, verbose, dryrun, workspaceRoot});
 };
 
-const setPrePublishSnapshotDependencies = async ({verbose, dryrun}) => {
+const setPrePublishSnapshotDependencies = async ({verbose, dryrun, workspaceRoot = null}) => {
   const timeStamp = generateTimeStamp();
-  await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: true, newVersion: timeStamp, verbose, dryrun});
+  await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: true, newVersion: timeStamp, verbose, dryrun, workspaceRoot});
 };
 
-const setPreInstallReleaseDependencies = async ({mapping, verbose, dryrun}) => {
-  await updateAllPackageJsons({isSnapshot: false, updateWorkspaceDependencies: false, releaseDependencyMapping: mapping, verbose, dryrun});
+const setPreInstallReleaseDependencies = async ({mapping, verbose, dryrun, workspaceRoot = null}) => {
+  await updateAllPackageJsons({isSnapshot: false, updateWorkspaceDependencies: false, releaseDependencyMapping: mapping, verbose, dryrun, workspaceRoot});
 };
 
-const setPrePublishReleaseDependencies = async ({mapping, newVersion, verbose, dryrun, useRegexMap}) => {
-  await updateAllPackageJsons({isSnapshot: false, updateWorkspaceDependencies: true, releaseDependencyMapping: mapping, newVersion, useRegexMap, verbose, dryrun});
+const setPrePublishReleaseDependencies = async ({mapping, newVersion, verbose, dryrun, useRegexMap, workspaceRoot = null}) => {
+  await updateAllPackageJsons({isSnapshot: false, updateWorkspaceDependencies: true, releaseDependencyMapping: mapping, newVersion, useRegexMap, verbose, dryrun, workspaceRoot});
 };
 
 module.exports = {

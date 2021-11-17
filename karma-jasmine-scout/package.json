@@ -26,7 +26,7 @@
     "release-postdependency": "releng-scripts release-publish-dependency"
   },
   "devDependencies": {
-    "@eclipse-scout/releng": "^10.0.0",
+    "@eclipse-scout/releng": "^22.0.0",
     "jasmine-core": "3.10.1",
     "jasmine-ajax": "4.0.0"
   },

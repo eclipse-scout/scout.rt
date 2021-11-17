@@ -9,8 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-#!/usr/bin/env node
-
 const axios = require('axios');
 
 // Makes the script crash on unhandled rejections instead of silently
