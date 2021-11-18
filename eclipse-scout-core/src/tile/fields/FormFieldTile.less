@@ -345,7 +345,7 @@
 
     &.inverted {
       --tile-background-color: mix(@tile-default-inverted-background-color, @tile-default-inverted-selection-background-color, 35%);
-      #scout.double-drop-shadow(@spread1: 2px, @color1: @tile-default-inverted-background-color, @y2: 0px, @blur2: 0px);
+      #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-default-selected-border-color, @y2: 0px, @blur2: 0px);
     }
 
     &.color-alternative {
@@ -362,7 +362,7 @@
       #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-light-alpha);
 
       &.inverted {
-        #scout.double-drop-shadow(@spread1: 2px, @color1: @tile-default-inverted-background-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
+        #scout.double-drop-shadow(@spread1: 2px, @color1: @dashboard-tile-default-selected-border-color, @alpha2: @dashboard-tile-drop-shadow-dark-alpha);
       }
 
       &.color-alternative {

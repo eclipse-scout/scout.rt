@@ -26,7 +26,7 @@
     box-shadow: inset 0 0 @radius @color;
   }
 
-  .drop-shadow(@x: 0px, @y: 6px, @blur: 13px, @spread: 0px, @alpha: @drop-shadow-alpha) {
+  .drop-shadow(@x: 0px, @y: @drop-shadow-y, @blur: @drop-shadow-blur, @spread: 0px, @alpha: @drop-shadow-alpha) {
     box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
   }
 
@@ -34,7 +34,7 @@
     box-shadow: @x1 @y1 @blur1 @spread1 @color1, @x2 @y2 @blur2 @spread2 rgba(0, 0, 0, @alpha2);
   }
 
-  .drop-shadow-large(@x: 0px, @y: 8px, @blur: 32px, @spread: 0px, @alpha: @drop-shadow-large-alpha) {
+  .drop-shadow-large(@x: 0px, @y: @drop-shadow-large-y, @blur: @drop-shadow-large-blur, @spread: 0px, @alpha: @drop-shadow-large-alpha) {
     #scout.drop-shadow(@x, @y, @blur, @spread, @alpha);
   }
 
@@ -302,7 +302,7 @@
       display: inline-block;
       vertical-align: middle;
       border-radius: 50%;
-      border: @border-width fade(@busyindicator-active-color, 80%) solid;
+      border: @border-width fade(@busyindicator-color, 80%) solid;
       width: @loading-animation-size;
       height: @loading-animation-size;
     }
@@ -477,16 +477,50 @@
 
   .chooser-popup {
     position: absolute;
-    border: solid @popup-border-width @popup-border-color;
-    border-radius: @control-popup-border-radius;
-    #scout.drop-shadow-large();
     overflow: hidden;
-    background-color: @popup-background-color;
-    margin: @control-popup-margin;
+    #scout.control-popup();
 
     &.touch {
       background-color: @table-header-background-color;
     }
+  }
+
+  .backdrop-filter(@background-color, @backdrop-filter, @fallback-background-color) {
+    background-color: @fallback-background-color; // For browsers that don't support backdrop-filter
+
+    @supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+      background-color: @background-color;
+      -webkit-backdrop-filter: @backdrop-filter;
+      backdrop-filter: @backdrop-filter;
+    }
+  }
+
+  .popup {
+    background-color: @popup-background-color;
+    border: @popup-border-width solid @popup-border-color;
+    border-radius: @popup-border-radius;
+    #scout.drop-shadow-large();
+  }
+
+  .popup-backdrop-filter() {
+    #scout.backdrop-filter(@background-color: @popup-backdrop-background-color, @backdrop-filter: @popup-backdrop-filter, @fallback-background-color: @popup-background-color);
+  }
+
+  // Second layer popups that are normally a little smaller than the other popups
+  .popup-2(@border-radius: @border-radius-medium) {
+    background-color: @popup-2-background-color;
+    border: @popup-border-width solid @popup-border-color;
+    border-radius: @border-radius;
+    #scout.drop-shadow-large();
+  }
+
+  .popup-2-backdrop-filter() {
+    #scout.backdrop-filter(@background-color: @popup-2-backdrop-background-color, @backdrop-filter: @popup-2-backdrop-filter, @fallback-background-color: @popup-2-background-color);
+  }
+
+  .control-popup() {
+    #scout.popup-2(@control-border-radius);
+    margin: @control-popup-margin;
   }
 
   /* Mixin for scrollbar positioning */

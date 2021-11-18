@@ -11,16 +11,12 @@
 .date-picker-popup {
   position: absolute;
   width: 290px;
-  border: @popup-border-width solid @popup-border-color;
-  border-radius: @control-popup-border-radius;
+  #scout.control-popup();
   overflow: hidden;
-  #scout.drop-shadow-large();
-  margin: @control-popup-margin;
 }
 
 .date-picker {
   position: relative;
-  background-color: @date-picker-background-color;
 
   &.touch-only :not(.selected):not(.disabled):not(:active):hover {
     // Disable sticky hover effect on touch devices
@@ -45,7 +41,7 @@
 }
 
 .date-picker-weekdays {
-  color: @palette-gray-6-1;
+  color: @date-picker-weekday-color;
   font-weight: @font-weight-bold;
   display: flex;
   justify-content: space-between;

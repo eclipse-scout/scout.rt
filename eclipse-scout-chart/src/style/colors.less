@@ -9,10 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-@chart-axis-line-color: @palette-gray-4;
+@chart-axis-line-color: @border-color;
 @chart-axis-line-color-inverted: fade(@chart-axis-line-color, 30%);
-@chart-axis-text-color: @palette-gray-7;
-@chart-axis-label-color: @palette-gray-7;
+@chart-axis-text-color: @tile-default-color;
+@chart-axis-label-color: @tile-default-color;
 @chart-axis-label-color-inverted: @palette-white;
 
 // Chart colors used for non chart.js charts (salesfunnel, fulfillment, venn)
@@ -36,7 +36,7 @@
 @chart-data-hover-color-alternative-inverted: darken(@chart-data-color-alternative-inverted, 7%);
 @chart-data-selected-color-alternative-inverted: darken(@chart-data-color-alternative-inverted, 12%);
 
-@chart-data-white-hover-color: @palette-gray-3; // For salesfunnel
+@chart-data-white-hover-color: @palette-gray-2; // For salesfunnel
 
 @chart-data-color-1: @palette-blue-3;
 @chart-data-color-2: lighten(@palette-blue-3, 5%);
@@ -73,15 +73,16 @@
 @chart-data-color-5-alternative-inverted: @palette-green-5;
 @chart-data-color-6-alternative-inverted: darken(@palette-green-5, 10%);
 
-@chart-data-text-color: @palette-white;
-@chart-legend-label-color: @palette-gray-7;
-@chart-legend-label-inverted-color: @palette-white;
+@chart-data-label-color: @text-inverted-color;
+@chart-legend-label-color: @chart-axis-label-color;
+@chart-legend-label-inverted-color: @chart-axis-label-color-inverted;
 @chart-line-label-color: @chart-axis-text-color;
+@chart-line-label-border-color: @chart-line-label-color;
+@chart-line-label-inverted-border-color: @chart-axis-label-color-inverted;
 @chart-line-label-background-color: @tile-default-background-color;
 @chart-alternative-line-label-background-color: @tile-alternative-background-color;
-@chart-selected-color: @selected-background-color;
-@chart-type-color: @palette-gray-5;
-@fulfillment-chart-inverted-label-color: @palette-gray-3;
+@fulfillment-chart-inverted-label-color: @tile-default-inverted-color;
+@fufillment-chart-inner-circle-color: @palette-gray-3;
 @speedo-chart-dark-green: @palette-green-4;
 @speedo-chart-green: @palette-green-3;
 @speedo-chart-yellow: @palette-orange-3;
@@ -89,4 +90,4 @@
 @salesfunnel-bar-label-color: @palette-white;
 @salesfunnel-alternative-bar-label-color: @salesfunnel-bar-label-color;
 @salesfunnel-inverted-bar-label-color: @tile-default-inverted-background-color;
-@salesfunnel-alternative-inverted-bar-label-color: @chart-data-color-4;
+@salesfunnel-alternative-inverted-bar-label-color: @salesfunnel-inverted-bar-label-color;

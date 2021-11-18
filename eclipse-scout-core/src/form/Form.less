@@ -10,7 +10,6 @@
  */
 .form {
   position: relative;
-  background-color: @form-background-color;
 
   &.dimmed-background {
     background-color: @dimmed-background-color;
@@ -33,10 +32,8 @@
 
 .dialog {
   position: absolute;
-  background-color: @popup-background-color;
-  border-radius: @popup-border-radius;
+  #scout.popup();
   overflow: hidden;
-  #scout.drop-shadow-large();
   margin: 10px; /* minimum padding to desktop */
   margin-bottom: 15px;
   /* min-width and min-height are read by Resizable.js to prevent a dialog from becoming too small

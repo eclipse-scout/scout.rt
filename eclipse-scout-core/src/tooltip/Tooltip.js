@@ -304,7 +304,7 @@ export default class Tooltip extends Widget {
     // Make sure arrow is never positioned outside of the tooltip
     arrowPosition = Math.min(arrowPosition, this.$container.outerWidth() - arrowSizeX);
     arrowPosition = Math.max(arrowPosition, arrowSizeX);
-    this.$arrow.cssLeft(arrowPosition);
+    this.$arrow.cssLeft(arrowPosition - this.$arrow.cssBorderLeftWidth());
     this.$container
       .cssLeft(left)
       .cssTop(top);

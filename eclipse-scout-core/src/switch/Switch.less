@@ -12,46 +12,74 @@
   position: absolute;
   right: 0;
   display: flex;
+
+  & > .switch-button {
+    margin-top: -2px;
+  }
 }
 
 .switch-label {
   margin-right: 8px;
 }
 
+.switch-button,
+.switch-button:before {
+  transition: .25s ease-in-out;
+}
+
 .switch-button {
-  width: 28px;
+  width: 36px;
   position: relative;
-  padding: 8px;
-  border-radius: 8px;
-  background: @switch-background-color;
+  height: 22px;
+  border-radius: 11px;
+  background-color: @switch-background-color;
   cursor: pointer;
   border: solid 1px @switch-border-color;
+  --activated-border-color: @switch-activated-border-color;
+  --activated-background-color: @switch-activated-background-color;
 
   &:before {
     content: '';
     display: block;
     position: absolute;
-    line-height: 30px;
-    text-indent: 40px;
-    height: 14px;
-    width: 14px;
-    border-radius: 100%;
-    top: 1px;
-    left: 1px;
-    right: auto;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
     border: solid 1px @switch-button-border-color;
     background-color: @switch-button-background-color;
   }
-}
 
-.switch-button, .switch-button:before {
-  transition: .25s ease-in-out;
-}
+  &.activated {
+    background-color: var(--activated-background-color);
+    border-color: var(--activated-border-color);
 
-.switch-button.activated {
-  &:before {
-    border-color: @switch-button-activated-border-color;
-    background-color: @switch-button-activated-background-color;
-    left: calc(~'100% - 15.5px');
+    &:before {
+      background-color: @switch-button-activated-background-color;
+      border-color: @switch-button-activated-border-color;
+      left: calc(~'100% - 18px');
+    }
+  }
+
+  .disabled > & {
+    background-color: @switch-disabled-background-color;
+    border-color: @switch-disabled-border-color;
+    cursor: unset;
+
+    &::before {
+      background-color: @switch-button-disabled-background-color;
+      border-color: @switch-button-disabled-border-color;
+    }
+
+    &.activated {
+      background-color: @disabled-color;
+      border-color: @disabled-color;
+
+      &::before {
+        background-color: @switch-button-activated-background-color;
+        border-color: @switch-button-activated-border-color;
+      }
+    }
   }
 }

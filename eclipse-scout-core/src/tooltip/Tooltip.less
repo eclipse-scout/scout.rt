@@ -12,8 +12,9 @@
   position: absolute;
   background-color: @tooltip-info-background-color;
   border-radius: @tooltip-border-radius;
+  border: @tooltip-border-width solid @tooltip-border-color;
   color: @tooltip-info-color;
-  #scout.drop-shadow-large();
+  #scout.drop-shadow(@y: 4px, @blur: 6px, @alpha: 5%);
   max-width: 300px;
   white-space: normal;
 
@@ -29,6 +30,8 @@
   min-width: 60px; /* Prevents tooltips with very short text from looking "strange" */
   #scout.overflow-ellipsis();
   font-weight: @tooltip-font-weight;
+  background-color: inherit; // Necessary if arrow has a border
+  border-radius: @tooltip-border-radius;
 
   .has-menus > & {
     font-weight: @font-weight-bold;
@@ -65,7 +68,7 @@
     }
 
     .info > & {
-      color: @palette-gray-1;
+      color: @tooltip-menu-color;
     }
 
     .warning > & {
@@ -84,21 +87,21 @@
   height: @tooltip-arrow-size;
   background-color: inherit;
   border: inherit;
-  #scout.transform(rotate(45deg));
 }
 
 .tooltip-arrow.arrow-bottom {
-  bottom: -2px;
-  margin-left: -(@tooltip-arrow-size / 2);
+  bottom: 0;
+  transform: translate(-50%, 50%) rotate(45deg);
 }
 
 .tooltip-arrow.arrow-top {
-  top: -2px;
-  margin-left: -(@tooltip-arrow-size / 2);
+  top: 0;
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .tooltip.error {
   background-color: @tooltip-error-background-color;
+  border-width: 0;
   color: @tooltip-error-color;
 
   & > .tooltip-arrow {
@@ -108,6 +111,7 @@
 
 .tooltip.warning {
   background-color: @tooltip-warning-background-color;
+  border-width: 0;
   color: @tooltip-warning-color;
 
   & > .tooltip-arrow {
@@ -117,6 +121,7 @@
 
 .tooltip.ok {
   background-color: @tooltip-ok-background-color;
+  border-width: 0;
   color: @tooltip-ok-color;
 
   & > .tooltip-arrow {

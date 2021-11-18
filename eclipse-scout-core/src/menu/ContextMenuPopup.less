@@ -10,10 +10,8 @@
  */
 
 .context-menu-popup {
-  background-color: @popup-background-color;
-  border-radius: @border-radius-medium;
+  #scout.popup-2();
   overflow: hidden;
-  #scout.drop-shadow-large();
 
   &.animate-open {
     .popup-animate-open();
@@ -26,8 +24,8 @@
 
 .context-menu {
   position: absolute;
-  background-color: @popup-background-color;
   margin: @context-menu-margin-y 0;
+  background-color: @popup-2-background-color;
 
   & > .menu-item {
     display: flex;

@@ -14,9 +14,7 @@
   left: 0;
   min-width: 200px;
   max-width: @messagebox-max-width;
-  #scout.drop-shadow-large();
-  background-color: @messagebox-background-color;
-  border-radius: @border-radius-medium;
+  #scout.popup-2();
   overflow: hidden;
   margin: 10px /* minimum padding to desktop */ 10px 15px;
 
@@ -74,7 +72,7 @@
       color: @info-color;
 
       & > .font-icon.messagebox-icon {
-        .notification-font-icon-style(@info-color, 14px);
+        background-color: @info-color;
       }
     }
 
@@ -86,7 +84,7 @@
       color: @error-color;
 
       & > .font-icon.messagebox-icon {
-        .notification-font-icon-style(@error-color, 14px);
+        background-color: @error-color;
       }
     }
 
@@ -98,7 +96,7 @@
       color: @warning-color;
 
       & > .font-icon.messagebox-icon {
-        .notification-font-icon-style(@warning-color, 14px);
+        background-color: @warning-color;
       }
     }
 
@@ -110,7 +108,7 @@
       color: @ok-color;
 
       & > .font-icon.messagebox-icon {
-        .notification-font-icon-style(@ok-color, 14px);
+        background-color: @ok-color;
       }
     }
 
@@ -129,7 +127,6 @@
 
 .messagebox-content {
   min-height: 30px;
-  background-color: @messagebox-background-color;
   padding: @messagebox-label-padding 26px 17px 26px;
   display: flex;
   flex-direction: column;
@@ -167,13 +164,15 @@
   padding-bottom: 14px;
   text-align: center;
 
+  & > .messagebox-icon {
+    color: @text-inverted-color;
+    font-size: 14px;
+    border-radius: 50%;
+  }
+
   &.has-text > .messagebox-icon {
     margin-right: 12px;
   }
-}
-
-.messagebox-body {
-  color: @messagebox-body-color;
 }
 
 .messagebox-html {

@@ -136,6 +136,7 @@ export default class ContextMenuPopup extends Popup {
     let endBodyBounds = new Rectangle(0, popupInsets.top + parentMenuPosition.top, bodyBounds.width, parentMenu.$container.cssHeight());
 
     this.bodyAnimating = true;
+    this.$container.addClass('animating');
     this.htmlComp.layout.disableAutoPosition();
     this._animateResizePopup(this.htmlComp.$comp, popupBounds, endPopupBounds);
     this._animateTextOffset(parentMenu.$subMenuBody, parentMenu.$subMenuBody.data('text-offset'));
@@ -175,6 +176,7 @@ export default class ContextMenuPopup extends Popup {
     if (!this.rendered || !parentMenu.$container) {
       return;
     }
+    this.$container.removeClass('animating');
     parentMenu.$placeHolder.replaceWith(parentMenu.$container);
     parentMenu.$container.toggleClass('expanded', false);
     this._updateFirstLastClass();
@@ -273,6 +275,7 @@ export default class ContextMenuPopup extends Popup {
     let endBodyBounds = new Rectangle(0, popupInsets.top, bodyBounds.width, bodyBounds.height);
 
     this.bodyAnimating = true;
+    this.$container.addClass('animating');
     this.htmlComp.layout.disableAutoPosition();
     this._animateResizePopup(this.htmlComp.$comp, popupBounds, endPopupBounds);
     this._animateTextOffset(this.$body, $oldBody.data('text-offset'));
@@ -312,6 +315,7 @@ export default class ContextMenuPopup extends Popup {
     if (!this.rendered) {
       return;
     }
+    this.$container.removeClass('animating');
     if ($oldBody) {
       $oldBody.detach();
       this.$body.cssTop('');

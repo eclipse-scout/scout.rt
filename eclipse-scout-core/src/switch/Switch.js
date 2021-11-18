@@ -46,6 +46,9 @@ export default class Switch extends Widget {
   }
 
   _onSwitchButtonClick() {
+    if (!this.enabledComputed) {
+      return;
+    }
     let event = new Event();
     this.trigger('switch', event);
     if (!event.defaultPrevented) {

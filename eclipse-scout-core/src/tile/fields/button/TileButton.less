@@ -85,8 +85,14 @@
 }
 
 .button-tile.dashboard {
-  & > .tile-button > .field > .label {
-    color: @link-color;
+  background-color: inherit;
+
+  & > .tile-button {
+    background-color: @tile-default-background-color;
+
+    & > .field > .label {
+      color: @link-color;
+    }
   }
 
   &:hover {
@@ -106,10 +112,18 @@
   }
 
   &.inverted {
-    & > .tile-button > .field {
-      & > .icon-container > .font-icon,
-      & > .label {
-        color: @tile-button-default-inverted-color;
+
+    & > .tile-button {
+      background-color: @tile-default-inverted-background-color;
+
+      & > .field {
+        & > .label {
+          color: @tile-button-default-inverted-color;
+        }
+
+        & > .icon-container > .font-icon {
+          color: @tile-button-default-inverted-icon-color;
+        }
       }
     }
 
@@ -126,10 +140,17 @@
   }
 
   &.color-alternative.inverted {
-    & > .tile-button > .field {
-      & > .icon-container > .font-icon,
-      & > .label {
-        color: @tile-button-alternative-inverted-color;
+    & > .tile-button {
+      background-color: @tile-alternative-inverted-background-color;
+
+      & > .field {
+        & > .label {
+          color: @tile-button-alternative-inverted-color;
+        }
+
+        & > .icon-container > .font-icon {
+          color: @tile-button-alternative-inverted-icon-color;
+        }
       }
     }
 
@@ -153,8 +174,8 @@
 
     & > .tile-button {
       &, .inverted&, .color-alternative.inverted& {
-        background-color: @tile-default-inner-border-color;
-        border-color: @button-disabled-border-color;
+        background-color: transparent;
+        border-color: transparent;
         cursor: default;
 
         & > .field {

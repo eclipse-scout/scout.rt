@@ -366,7 +366,7 @@
     }
 
     > .datalabel {
-      fill: @palette-white;
+      fill: @chart-data-label-color;
     }
 
     > .axis-label {
@@ -534,13 +534,12 @@ text.line-label {
   font-size: @font-size-normal;
 
   .inverted & {
-    fill: @palette-white;
+    fill: @chart-axis-label-color-inverted;
   }
 }
 
 text.line-label-background {
   font-size: @font-size-normal;
-
   fill: @chart-line-label-background-color;
 
   .inverted & {
@@ -558,7 +557,11 @@ text.line-label-background {
 
 line.label-line {
   stroke-width: 1px;
-  stroke: @palette-gray-7;
+  stroke: @chart-line-label-border-color;
+
+  .inverted & {
+    stroke: @chart-line-label-inverted-border-color;
+  }
 }
 
 /* --- Wire labels default ---*/
@@ -640,7 +643,7 @@ path.fulfillment-chart {
 }
 
 path.fulfillment-chart-inner-circle {
-  fill: @palette-gray-3;
+  fill: @fufillment-chart-inner-circle-color;
 }
 
 text.fulfillment-chart-label {
@@ -786,7 +789,7 @@ circle.venn-circle {
     fill: @chart-data-color;
 
     .inverted & {
-      fill: @chart-data-text-color;
+      fill: @chart-data-color-inverted;
     }
 
     .color-alternative & {

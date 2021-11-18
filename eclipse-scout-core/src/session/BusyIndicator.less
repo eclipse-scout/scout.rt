@@ -13,10 +13,8 @@
   top: 25%;
   left: 50%;
   max-width: 300px;
-  #scout.drop-shadow-large();
-  background-color: @popup-background-color;
-  border-radius: @border-radius-medium;
-
+  #scout.popup-2();
+  #scout.popup-2-backdrop-filter();
   .messagebox.severity-button(@info-color);
 
   /* Helper class used during width calculation - required on very narrow screens (e.g. Word AddIn) */
@@ -54,7 +52,7 @@
     height: @busyindicator-icon-size;
     margin-top: -3px;
     margin-right: 15px;
-    border: 1px fade(@busyindicator-active-color, 80%) solid;
+    border: 1px fade(@busyindicator-color, 80%) solid;
     border-radius: 50%;
     #scout.animation(pulsate 2s cubic-bezier(0.5, 0.1, 0.1, 0.5) infinite);
   }

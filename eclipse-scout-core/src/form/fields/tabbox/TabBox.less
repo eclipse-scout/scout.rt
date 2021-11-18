@@ -132,10 +132,6 @@
     display: none;
   }
 
-  &.selected {
-    color: @tab-item-selected-color;
-  }
-
   &.marked::after {
     display: block;
     background-color: @tab-item-marked-border-color;
@@ -147,6 +143,10 @@
 
   &:active {
     color: @tab-item-active-color;
+  }
+
+  &.selected {
+    color: @tab-item-selected-color;
   }
 
   &:focus {

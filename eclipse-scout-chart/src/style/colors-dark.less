@@ -10,11 +10,54 @@
  */
 
 @chart-alternative-line-label-background-color: @chart-line-label-color;
-@chart-axis-line-color: @text-color;
-@chart-axis-text-color: @text-color;
-@chart-axis-label-color: @palette-gray-2-1;
-@chart-legend-label-color: @text-color;
+@chart-axis-line-color-inverted: @chart-axis-line-color;
+@chart-axis-label-color-inverted: @chart-axis-label-color;
 @chart-line-label-background-color: @chart-line-label-color;
-@chart-type-color: @palette-gray-3;
 @fulfillment-chart-inverted-label-color: @chart-axis-text-color;
-@speedo-chart-dark-green: @palette-green-5;
+@fufillment-chart-inner-circle-color: @fade-white-2;
+
+@chart-data-color-1-rainbow: @palette-blue-2;
+@chart-data-color-2-rainbow: @palette-orange-2;
+@chart-data-color-3-rainbow: @palette-green-2;
+@chart-data-color-4-rainbow: @palette-gray-4;
+@chart-data-color-5-rainbow: @palette-red-2;
+@chart-data-color-6-rainbow: @palette-green-2;
+
+@chart-data-color-1: @palette-blue-3;
+@chart-data-color-2: lighten(@palette-blue-3, 8%);
+@chart-data-color-3: darken(@palette-blue-2, 8%);
+@chart-data-color-4: @palette-blue-2;
+@chart-data-color-5: @palette-blue-1;
+@chart-data-color-6: @palette-blue-0;
+
+@chart-data-color-1-inverted: @chart-data-color-6;
+@chart-data-color-2-inverted: @chart-data-color-5;
+@chart-data-color-3-inverted: @chart-data-color-4;
+@chart-data-color-4-inverted: @chart-data-color-3;
+@chart-data-color-5-inverted: @chart-data-color-2;
+@chart-data-color-6-inverted: @chart-data-color-1;
+
+@chart-data-color-1-alternative: darken(@palette-green-3, 5%);
+@chart-data-color-2-alternative: @palette-green-3;
+@chart-data-color-3-alternative: darken(@palette-green-2, 8%);
+@chart-data-color-4-alternative: @palette-green-2;
+@chart-data-color-5-alternative: @palette-green-1;
+@chart-data-color-6-alternative: @palette-green-0;
+
+@chart-data-color-1-alternative-inverted: @chart-data-color-6-alternative;
+@chart-data-color-2-alternative-inverted: @chart-data-color-5-alternative;
+@chart-data-color-3-alternative-inverted: @chart-data-color-4-alternative;
+@chart-data-color-4-alternative-inverted: @chart-data-color-3-alternative;
+@chart-data-color-5-alternative-inverted: @chart-data-color-2-alternative;
+@chart-data-color-6-alternative-inverted: @chart-data-color-1-alternative;
+
+@chart-data-color: @chart-data-color-3;
+@chart-data-color-inverted: @chart-data-color-3-inverted;
+@chart-data-color-alternative: @chart-data-color-3-alternative;
+@chart-data-color-rainbow: @chart-data-color-3-rainbow;
+@chart-data-color-alternative-inverted: @chart-data-color-3-alternative-inverted;
+
+@speedo-chart-dark-green: @palette-green-3;
+@speedo-chart-green: @palette-green-2;
+@speedo-chart-yellow: @palette-orange-2;
+@speedo-chart-red: @palette-red-2;

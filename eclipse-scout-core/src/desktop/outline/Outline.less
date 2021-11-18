@@ -81,9 +81,12 @@
           display: none;
         }
 
-        & > .font-icon,
         & > .tree-node-control {
-          color: fade(@outline-selection-color, 70%);
+          color: @outline-node-selected-control-color;
+        }
+
+        & > .font-icon {
+          color: @outline-node-selected-icon-color;;
         }
       }
     }

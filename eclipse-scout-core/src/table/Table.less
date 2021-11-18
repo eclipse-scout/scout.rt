@@ -110,10 +110,6 @@
     }
   }
 
-  & > .menubar {
-    border-color: @control-border-color;
-  }
-
   &.dimmed-background {
     background-color: @dimmed-background-color;
 
@@ -179,11 +175,9 @@
 .table-row,
 .table-aggregate-row {
   position: relative;
+}
 
-  &.sum-selection {
-    color: @item-selection-border-color;
-  }
-
+.table-row {
   &:active {
     background-color: @table-row-active-background-color;
   }
@@ -264,7 +258,7 @@
   }
 
   .table-row.checked > & {
-    color: @text-selection-color;
+    color: @table-row-checked-color;
   }
 
   &.empty,

@@ -211,7 +211,7 @@
   color: @calendar-component-color;
 
   &:not(.component-task):not(.component-month) {
-    border-bottom: 2px solid @form-background-color;
+    border-bottom: 2px solid transparent;
   }
 
   & > .content {
@@ -605,11 +605,11 @@
       height: 1px;
       width: 100%;
       content: '';
-      background-color: @palette-gray-3;
+      background-color: @calendar-light-line-color;
     }
 
     &.hour::after {
-      background-color: @border-color;
+      background-color: @calendar-line-color;
     }
 
     &::before {
