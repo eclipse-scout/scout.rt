@@ -1788,9 +1788,17 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let config = chart.config,
       data = config.data,
       measureText = chart.ctx.measureText.bind(chart.ctx),
+      legend = chart.legend,
+      legendLabelOptions = ((legend || {}).options || {}).labels || {},
+      boxWidth = legendLabelOptions.boxWidth || 0,
+      padding = legendLabelOptions.padding || 0,
       horizontalSpace;
     if (scout.isOneOf(config.options.plugins.legend.position, Chart.Position.LEFT, Chart.Position.RIGHT)) {
-      horizontalSpace = Math.min(250, this.$canvas.cssWidth() / 3);
+      if (legend.maxWidth || legend.width) {
+        horizontalSpace = Math.max((legend.maxWidth || legend.width) - boxWidth - 2 * padding, 0);
+      }
+      horizontalSpace = Math.min(250, horizontalSpace || 0, this.$canvas.cssWidth() / 3);
+
     } else {
       horizontalSpace = Math.min(250, this.$canvas.cssWidth() * 2 / 3);
     }
