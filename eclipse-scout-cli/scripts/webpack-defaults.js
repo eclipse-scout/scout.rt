@@ -159,6 +159,19 @@ module.exports = (env, args) => {
             ]
           }
         }
+      }, {
+        // to support css imports (currently not used by Scout but might be used by included 3rd party libs)
+        test: /\.css$/i,
+        use: [{
+          loader: require.resolve('style-loader')
+        }, {
+          loader: require.resolve('css-loader'),
+          options: {
+            sourceMap: devMode,
+            modules: false, // We don't want to work with CSS modules
+            url: false // Don't resolve URLs in LESS, because relative path does not match /res/fonts
+          }
+        }]
       }]
     },
     plugins: [
