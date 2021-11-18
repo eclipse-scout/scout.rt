@@ -171,6 +171,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this._legendPointerLeaveHandler = this._onLegendLeavePointer.bind(this);
 
     this._resizeHandler = this._onResize.bind(this);
+
+    this._tooltipTitleGenerator = this._generateTooltipTitle.bind(this);
+    this._tooltipLabelGenerator = this._generateTooltipLabel.bind(this);
+    this._tooltipLabelValueGenerator = this._generateTooltipLabelValue.bind(this);
+    this._tooltipLabelColorGenerator = this._generateTooltipLabelColor.bind(this);
     this._tooltipRenderer = this._renderTooltip.bind(this);
     this._tooltip = null;
     this._tooltipTimeoutId = null;
@@ -770,7 +775,14 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     config.options = $.extend(true, {}, {
       plugins: {
-        tooltip: {}
+        tooltip: {
+          callbacks: {
+            title: this._tooltipTitleGenerator,
+            label: this._tooltipLabelGenerator,
+            labelValue: this._tooltipLabelValueGenerator,
+            labelColor: this._tooltipLabelColorGenerator
+          }
+        }
       }
     }, config.options);
 
@@ -784,10 +796,14 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     tooltip.external = this._tooltipRenderer;
   }
 
-  _createTooltipTitles(tooltipItem, data) {
-    let config = tooltipItem.chart.config,
-      datasets = data.datasets,
-      dataset = datasets[tooltipItem.datasetIndex],
+  _generateTooltipTitle(tooltipItems) {
+    if (!tooltipItems || !tooltipItems.length) {
+      return '';
+    }
+    let tooltipItem = tooltipItems[0],
+      chart = tooltipItem.chart,
+      config = chart.config,
+      dataset = tooltipItem.dataset,
       title = [];
     if (config.type === Chart.Type.BUBBLE) {
       let xAxis = config.options.scales.x,
@@ -805,29 +821,53 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         title.push(this._createTooltipAttribute(yAxisLabel, strings.encode(yTickLabel)));
       }
     } else {
-      let label = data.labels[tooltipItem.dataIndex];
+      let label = chart.data.labels[tooltipItem.dataIndex];
       title.push(this._createTooltipAttribute(config.options.reformatLabels ? this._formatLabel(label) : label));
     }
     return title;
   }
 
-  _createTooltipAttributes(tooltipItem, data) {
-    let config = tooltipItem.chart.config,
-      datasets = data.datasets,
-      dataset = datasets[tooltipItem.datasetIndex],
-      label, value;
-    if (config.type === Chart.Type.BUBBLE) {
-      label = dataset.label;
-      value = this._formatLabel(dataset.data[tooltipItem.dataIndex].z);
-    } else {
-      label = dataset.label;
-      value = this._formatLabel(dataset.data[tooltipItem.dataIndex]);
-    }
-    return [this._createTooltipAttribute(strings.encode(label), strings.encode(value))];
+  _generateTooltipLabel(tooltipItem) {
+    return strings.encode(tooltipItem.dataset.label);
   }
 
-  _createTooltipAttribute(label, value) {
+  _generateTooltipLabelValue(tooltipItem) {
+    let config = tooltipItem.chart.config,
+      dataset = tooltipItem.dataset;
+    if (config.type === Chart.Type.BUBBLE) {
+      return strings.encode(this._formatLabel(dataset.data[tooltipItem.dataIndex].z));
+    }
+    return strings.encode(this._formatLabel(dataset.data[tooltipItem.dataIndex]));
+  }
+
+  _generateTooltipLabelColor(tooltipItem) {
+    let config = tooltipItem.chart.config,
+      dataset = tooltipItem.dataset,
+      backgroundColor;
+    if (scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
+      backgroundColor = dataset.legendColor || dataset.borderColor;
+    }
+    if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
+      let legendColor = Array.isArray(dataset.legendColor) ? dataset.legendColor[tooltipItem.dataIndex] : dataset.legendColor,
+        datasetBackgroundColor = Array.isArray(dataset.backgroundColor) ? dataset.backgroundColor[tooltipItem.dataIndex] : dataset.backgroundColor;
+      backgroundColor = legendColor || this._adjustColorOpacity(datasetBackgroundColor, 1);
+    }
+    if (!backgroundColor || objects.isFunction(backgroundColor)) {
+      let defaultTypeTooltipLabelColor;
+      if (ChartJs.overrides[config.type] && ChartJs.overrides[config.type].plugins && ChartJs.overrides[config.type].plugins.tooltip && ChartJs.overrides[config.type].plugins.tooltip.callbacks) {
+        defaultTypeTooltipLabelColor = ChartJs.overrides[config.type].plugins.tooltip.callbacks.labelColor;
+      }
+      let defaultTooltipLabelColor = defaultTypeTooltipLabelColor || ChartJs.defaults.plugins.tooltip.callbacks.labelColor;
+      backgroundColor = defaultTooltipLabelColor.call(tooltipItem.chart, tooltipItem).backgroundColor;
+    }
+    return {
+      backgroundColor: backgroundColor
+    };
+  }
+
+  _createTooltipAttribute(label, value, color) {
     return '<div class="attribute">' +
+      (color ? '<div class="color" style="background-color:' + color + '"></div>' : '') +
       (label ? '<label>' + label + '</label>' : '') +
       (value ? '<div class="value">' + value + '</div>' : '') +
       '</div>';
@@ -856,8 +896,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _renderTooltipLater(context) {
-    let tooltip = context.tooltip;
-    if (tooltip._tooltipItems.length < 1) {
+    let tooltip = context.tooltip,
+      tooltipItems = tooltip._tooltipItems;
+    if (tooltipItems.length < 1) {
       return;
     }
     if (this._tooltip) {
@@ -865,13 +906,35 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       this._tooltip = null;
     }
 
-    let tooltipItem = tooltip._tooltipItems[0],
-      data = context.chart.data,
-      titles = this._createTooltipTitles(tooltipItem, data),
-      labels = this._createTooltipAttributes(tooltipItem, data),
-      tooltipText = titles.concat(labels).join('');
+    let tooltipCallbacks = (tooltip.options || {}).callbacks || {},
+      tooltipTitle = tooltipCallbacks.title,
+      tooltipLabel = tooltipCallbacks.label,
+      tooltipLabelValue = tooltipCallbacks.labelValue,
+      tooltipColor = tooltipCallbacks.labelColor,
+      tooltipText = '';
 
-    let positionAndOffset = this._computeTooltipPositionAndOffset(tooltipItem),
+    if (objects.isFunction(tooltipTitle)) {
+      tooltipText += arrays.ensure(tooltipTitle(tooltipItems)).join('');
+    }
+
+    tooltipItems.forEach(tooltipItem => {
+      let label, labelValue, labelColor;
+      if (objects.isFunction(tooltipLabel)) {
+        label = tooltipLabel(tooltipItem);
+        label = objects.isString(label) ? label : '';
+      }
+      if (objects.isFunction(tooltipLabelValue)) {
+        labelValue = tooltipLabelValue(tooltipItem);
+        labelValue = objects.isString(labelValue) ? labelValue : '';
+      }
+      if (objects.isFunction(tooltipColor)) {
+        labelColor = tooltipColor(tooltipItem);
+        labelColor = objects.isPlainObject(labelColor) ? (labelColor.backgroundColor || '') : '';
+      }
+      tooltipText += this._createTooltipAttribute(label, labelValue, labelColor);
+    });
+
+    let positionAndOffset = this._computeTooltipPositionAndOffset(tooltipItems[0]),
       origin = graphics.offsetBounds(this.$canvas);
     origin.x += tooltip.caretX + positionAndOffset.offsetX;
     origin.y += tooltip.caretY + positionAndOffset.offsetY;
