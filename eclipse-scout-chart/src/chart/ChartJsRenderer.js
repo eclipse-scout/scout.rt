@@ -1944,8 +1944,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       legend.onHover = this._legendPointerHoverHandler;
       legend.onLeave = this._legendPointerLeaveHandler;
     } else {
-      legend.onClick = () => {
-      };
+      legend.onClick = e => e.native.stopPropagation();
       legend.onHover = this._legendHoverHandler;
       legend.onLeave = this._legendLeaveHandler;
     }
@@ -1982,7 +1981,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     let e = new Event();
     e.data = clickObject;
-    e.originalEvent = event;
+    e.originalEvent = event.native;
     this.chart._onValueClick(e);
   }
 
