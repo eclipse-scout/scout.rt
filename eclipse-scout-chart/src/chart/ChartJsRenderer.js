@@ -843,25 +843,32 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   _generateTooltipLabelColor(tooltipItem) {
     let config = tooltipItem.chart.config,
       dataset = tooltipItem.dataset,
-      backgroundColor;
+      legendColor, backgroundColor, borderColor, index;
     if (scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
-      backgroundColor = dataset.legendColor || dataset.borderColor;
+      borderColor = dataset.borderColor;
+      legendColor = dataset.legendColor;
+      index = tooltipItem.datasetIndex;
     }
     if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-      let legendColor = Array.isArray(dataset.legendColor) ? dataset.legendColor[tooltipItem.dataIndex] : dataset.legendColor,
-        datasetBackgroundColor = Array.isArray(dataset.backgroundColor) ? dataset.backgroundColor[tooltipItem.dataIndex] : dataset.backgroundColor;
-      backgroundColor = legendColor || this._adjustColorOpacity(datasetBackgroundColor, 1);
+      legendColor = Array.isArray(dataset.legendColor) ? dataset.legendColor[tooltipItem.dataIndex] : dataset.legendColor;
+      backgroundColor = Array.isArray(dataset.backgroundColor) ? dataset.backgroundColor[tooltipItem.dataIndex] : dataset.backgroundColor;
+      backgroundColor = this._adjustColorOpacity(backgroundColor, 1);
+      index = tooltipItem.dataIndex;
     }
-    if (!backgroundColor || objects.isFunction(backgroundColor)) {
+    if (objects.isFunction(legendColor)) {
+      legendColor = legendColor.call(tooltipItem.chart, index);
+    }
+    let tooltipLabelColor = legendColor || backgroundColor || borderColor;
+    if (!tooltipLabelColor || objects.isFunction(tooltipLabelColor)) {
       let defaultTypeTooltipLabelColor;
       if (ChartJs.overrides[config.type] && ChartJs.overrides[config.type].plugins && ChartJs.overrides[config.type].plugins.tooltip && ChartJs.overrides[config.type].plugins.tooltip.callbacks) {
         defaultTypeTooltipLabelColor = ChartJs.overrides[config.type].plugins.tooltip.callbacks.labelColor;
       }
       let defaultTooltipLabelColor = defaultTypeTooltipLabelColor || ChartJs.defaults.plugins.tooltip.callbacks.labelColor;
-      backgroundColor = defaultTooltipLabelColor.call(tooltipItem.chart, tooltipItem).backgroundColor;
+      tooltipLabelColor = defaultTooltipLabelColor.call(tooltipItem.chart, tooltipItem).backgroundColor;
     }
     return {
-      backgroundColor: backgroundColor
+      backgroundColor: tooltipLabelColor
     };
   }
 
@@ -1874,16 +1881,21 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     labels.forEach((elem, idx) => {
       elem.text = strings.truncateText(elem.text, horizontalSpace, measureText);
       let dataset = data.datasets[idx],
-        fillStyle;
+        legendColor, borderColor, backgroundColor;
       if (dataset && scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
-        fillStyle = dataset.legendColor || this._adjustColorOpacity(dataset.borderColor, 1);
+        legendColor = dataset.legendColor;
+        borderColor = this._adjustColorOpacity(dataset.borderColor, 1);
       } else if (data.datasets.length && scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
         dataset = data.datasets[0];
-        let legendColor = Array.isArray(dataset.legendColor) ? dataset.legendColor[idx] : dataset.legendColor,
-          backgroundColor = Array.isArray(dataset.backgroundColor) ? dataset.backgroundColor[idx] : dataset.backgroundColor;
-        fillStyle = legendColor || this._adjustColorOpacity(backgroundColor, 1);
+        legendColor = Array.isArray(dataset.legendColor) ? dataset.legendColor[idx] : dataset.legendColor;
+        backgroundColor = Array.isArray(dataset.backgroundColor) ? dataset.backgroundColor[idx] : dataset.backgroundColor;
+        backgroundColor = this._adjustColorOpacity(backgroundColor, 1);
       }
-      if (typeof fillStyle !== 'function') {
+      if (objects.isFunction(legendColor)) {
+        legendColor = legendColor.call(chart, idx);
+      }
+      let fillStyle = legendColor || backgroundColor || borderColor;
+      if (!objects.isFunction(fillStyle)) {
         elem.fillStyle = fillStyle;
         elem.strokeStyle = fillStyle;
       }
