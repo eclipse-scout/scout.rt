@@ -121,10 +121,10 @@ export default class DragAndDropHandler {
       .buildAndOpen();
   }
 
-  uploadFiles(files) {
-    if (files.length >= 1) {
-      this.target.session.uploadFiles(this.target, files,
-        this.additionalDropProperties ? this.additionalDropProperties(event) : undefined,
+  uploadFiles(event) {
+    if (event && event.originalEvent && event.files.length >= 1) {
+      this.target.session.uploadFiles(this.target, event.files,
+        this.additionalDropProperties ? this.additionalDropProperties(event.originalEvent) : undefined,
         this.dropMaximumSize ? this.dropMaximumSize() : undefined,
         this.allowedTypes ? this.allowedTypes() : undefined);
     }
