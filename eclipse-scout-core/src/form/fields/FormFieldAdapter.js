@@ -39,7 +39,7 @@ export default class FormFieldAdapter extends ModelAdapter {
 
   _onWidgetEvent(event) {
     if (event.type === 'drop' && this.widget.dragAndDropHandler) {
-      this.widget.dragAndDropHandler.uploadFiles(event.files);
+      this.widget.dragAndDropHandler.uploadFiles(event);
     } else {
       super._onWidgetEvent(event);
     }
