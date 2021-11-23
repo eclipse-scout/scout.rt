@@ -359,7 +359,7 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
   } else if (event.type === 'aggregationFunctionChanged') {
     this._onWidgetAggregationFunctionChanged(event);
   } else if (event.type === 'drop' && this.widget.dragAndDropHandler) {
-    this.widget.dragAndDropHandler.uploadFiles(event.files);
+    this.widget.dragAndDropHandler.uploadFiles(event);
   } else {
     scout.TableAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }

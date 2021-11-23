@@ -38,7 +38,7 @@ scout.FormFieldAdapter.prototype._goOnline = function() {
 
 scout.FormFieldAdapter.prototype._onWidgetEvent = function(event) {
   if (event.type === 'drop' && this.widget.dragAndDropHandler) {
-    this.widget.dragAndDropHandler.uploadFiles(event.files);
+    this.widget.dragAndDropHandler.uploadFiles(event);
   } else {
     scout.FormFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
