@@ -840,8 +840,6 @@ export default class TableHeaderMenu extends Popup {
     } else {
       this.table.removeFilterByKey(this.column.id);
     }
-    // callback to table
-    this.table.filter();
   }
 
   _updateFilterTableActions() {

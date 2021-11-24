@@ -1,0 +1,164 @@
+/*
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+.filter-field {
+  position: absolute;
+  bottom: ~'min(' @filter-field-bottom, calc(~'50% - ' @filter-field-height / 2) ~')';
+  right: @filter-field-right;
+  height: @filter-field-height;
+  width: @filter-field-width;
+  min-width: @filter-field-min-width;
+  max-width: @filter-field-max-width;
+  display: flex;
+  align-items: center;
+  z-index: 3;
+  border-radius: @border-radius;
+  #scout.drop-shadow();
+  background-color: var(--filter-field-background-color);
+  opacity: 1;
+
+  transition: bottom @filter-field-transition-duration ease-in-out,
+  right @filter-field-transition-duration ease-in-out,
+  height @filter-field-transition-duration ease-in-out,
+  width @filter-field-transition-duration ease-in-out,
+  min-width @filter-field-transition-duration ease-in-out,
+  max-width @filter-field-transition-duration ease-in-out,
+  box-shadow @filter-field-transition-duration ease-in-out,
+  opacity @filter-field-transition-duration ease-in-out;
+
+  :not(:hover) > &:not(.focused):not(.focus-inside-widget) {
+    opacity: 0;
+  }
+
+  &::before {
+    content: @icon-search;
+    #scout.font-icon();
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: (@filter-field-height - @filter-field-icon-size) / 2;
+    right: @text-field-icon-margin-x + 1px;
+    height: @filter-field-icon-size;
+    width: @filter-field-icon-size;
+    opacity: 0;
+    transition: bottom @filter-field-transition-duration ease-in-out,
+    right @filter-field-transition-duration ease-in-out,
+    opacity @filter-field-transition-duration ease-in-out;
+    font-size: @font-size-plus;
+    color: @label-color;
+    border-radius: @border-radius;
+  }
+
+  &:hover::before {
+    background-color: @hover-background-color;
+  }
+
+  & > :not(.key-box) {
+    opacity: 1;
+    transition: opacity @filter-field-transition-duration ease-in-out;
+  }
+
+  & > input {
+    width: 100%;
+    min-height: 100%;
+  }
+
+  &.clearable-always:not(.has-text),
+  &.clearable-focused:not(.has-text):not(.focused) {
+    & > .clear-icon {
+      .invisible();
+    }
+  }
+
+  & > .clear-icon {
+    display: flex;
+    right: @text-field-icon-margin-x + 1px;
+    margin-right: 0;
+    transition: right @filter-field-transition-duration ease-in-out,
+    opacity @filter-field-transition-duration ease-in-out;
+  }
+
+  & > .key-box {
+    top: calc(~'50% - ' 22px / 2) !important;
+  }
+
+  &:not(.focused).empty {
+    bottom: ~'min('@filter-field-bottom + ((@filter-field-height - @filter-field-icon-size) / 2), calc(~'50% - ' @filter-field-icon-size / 2) ~')';
+    right: @filter-field-right + @text-field-icon-margin-x + 1px;
+    height: @filter-field-icon-size;
+    width: @filter-field-icon-size;
+    min-width: @filter-field-icon-size;
+    max-width: @filter-field-icon-size;
+    box-shadow: none;
+    #scout.backdrop-filter(@background-color: var(--filter-field-transparent-background-color), @backdrop-filter: blur(2px), @fallback-background-color: var(--filter-field-background-color));
+
+    &::before {
+      bottom: 0;
+      right: 0;
+      opacity: 1;
+    }
+
+    & > :not(.key-box) {
+      opacity: 0;
+    }
+
+    & > input {
+      cursor: pointer;
+    }
+
+    & > .clear-icon {
+      right: 0;
+    }
+
+    & > .key-box.char {
+      margin-left: -10px;
+      margin-right: -5px;
+    }
+  }
+}
+
+.filter-field-container {
+  position: sticky;
+  top: ~'max(' calc(~'100% - ' @filter-field-bottom), calc(~'50% + ' @filter-field-height / 2) ~')';
+  left: calc(~'100% - ' @filter-field-right);
+  width: 0;
+  height: 0;
+  overflow: visible;
+  z-index: 3;
+
+  --filter-field-max-width: @filter-field-width;
+
+  &:not(:hover) > .filter-field:not(.focused):not(.focus-inside-widget) {
+    opacity: 1;
+  }
+
+  & > .filter-field {
+    bottom: 0;
+    right: 0;
+    max-width: var(--filter-field-max-width);
+
+    :not(:hover) > &:not(.focused):not(.focus-inside-widget) {
+      opacity: 0;
+    }
+
+    &:not(.focused).empty {
+      bottom: ((@filter-field-height - @filter-field-icon-size) / 2);
+      right: @text-field-icon-margin-x + 1px;
+    }
+  }
+}
+
+@supports not (bottom: min(50%, 42px)) {
+  .filter-field-container,
+  .filter-field {
+    .hidden();
+  }
+}

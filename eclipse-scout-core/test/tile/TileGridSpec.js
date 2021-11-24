@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -110,7 +110,6 @@ describe('TileGrid', () => {
         accept: tile => tile.label.indexOf('1') < 0
       };
       tileGrid.addFilter(filter);
-      tileGrid.filter();
 
       tileGrid.selectTiles(tileGrid.tiles[1]);
       expect(tileGrid.tiles[1].selected).toBe(false);
@@ -119,7 +118,6 @@ describe('TileGrid', () => {
       expect(tileGrid.tiles[0].selected).toBe(true);
 
       tileGrid.removeFilter(filter);
-      tileGrid.filter();
 
       tileGrid.selectTiles(tileGrid.tiles[1]);
       expect(tileGrid.tiles[1].selected).toBe(true);
@@ -457,7 +455,6 @@ describe('TileGrid', () => {
         accept: tile => tile.label.indexOf('1') < 0
       };
       tileGrid.addFilter(filter);
-      tileGrid.filter();
 
       tileGrid.render();
       let $tiles = tileGrid.$container.children('.tile');
@@ -906,7 +903,6 @@ describe('TileGrid', () => {
         accept: tile => tile.label.indexOf('1') < 0
       };
       tileGrid.addFilter(filter1);
-      tileGrid.filter();
       expect(tileGrid.filteredTiles.length).toBe(2);
       expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
       expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[2]);
@@ -918,7 +914,6 @@ describe('TileGrid', () => {
         accept: tile => tile.label.indexOf('2') < 0
       };
       tileGrid.addFilter(filter2);
-      tileGrid.filter();
       expect(tileGrid.filteredTiles.length).toBe(1);
       expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
       expect(tileGrid.tiles[0].filterAccepted).toBe(true);
@@ -926,7 +921,6 @@ describe('TileGrid', () => {
       expect(tileGrid.tiles[2].filterAccepted).toBe(false);
 
       tileGrid.removeFilter(filter1);
-      tileGrid.filter();
       expect(tileGrid.filteredTiles.length).toBe(2);
       expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
       expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[1]);
@@ -935,7 +929,6 @@ describe('TileGrid', () => {
       expect(tileGrid.tiles[2].filterAccepted).toBe(false);
 
       tileGrid.removeFilter(filter2);
-      tileGrid.filter();
       expect(tileGrid.filteredTiles.length).toBe(3);
       expect(tileGrid.filters.length).toBe(0);
       expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
@@ -947,7 +940,6 @@ describe('TileGrid', () => {
 
       // Add same first filter again
       tileGrid.addFilter(filter1);
-      tileGrid.filter();
       expect(tileGrid.filteredTiles.length).toBe(2);
       expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
       expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[2]);
@@ -973,7 +965,6 @@ describe('TileGrid', () => {
         }
       };
       tileGrid.addFilter(filter);
-      tileGrid.filter();
       expect(tileGrid.filteredTiles.length).toBe(1);
 
       // Insert tile 3 which is not accepted -> still only tile 1 visible
@@ -1006,7 +997,6 @@ describe('TileGrid', () => {
         }
       };
       tileGrid.addFilter(filter);
-      tileGrid.filter();
       expect(tileGrid.filteredTiles.length).toBe(1);
       expect(tileGrid.selectedTiles.length).toBe(1);
       expect(tileGrid.selectedTiles[0]).toBe(tileGrid.tiles[1]);
@@ -1054,11 +1044,9 @@ describe('TileGrid', () => {
         }
       };
       tileGrid.addFilter(filter);
-      tileGrid.filter();
       expect(tileGrid.$container).toHaveClass('empty');
 
       tileGrid.removeFilter(filter);
-      tileGrid.filter();
       expect(tileGrid.$container).not.toHaveClass('empty');
     });
 
@@ -1082,7 +1070,6 @@ describe('TileGrid', () => {
       };
       tileGrid.setTiles([tile0, tile1, tile2]);
       tileGrid.addFilter(filter1);
-      tileGrid.filter();
       expect(tileGrid.filteredTiles.length).toBe(2);
       expect(tileGrid.filteredTiles[0]).toBe(tile0);
       expect(tileGrid.filteredTiles[1]).toBe(tile2);
@@ -1096,7 +1083,6 @@ describe('TileGrid', () => {
       let tileGrid2 = createTileGrid(3);
       tileGrid2.setTiles([tile0, tile1, tile2]);
       tileGrid2.addFilter(filter1);
-      tileGrid2.filter();
       expect(tileGrid2.filteredTiles.length).toBe(2);
       expect(tileGrid2.filteredTiles[0]).toBe(tile0);
       expect(tileGrid2.filteredTiles[1]).toBe(tile2);
@@ -1107,7 +1093,7 @@ describe('TileGrid', () => {
 
   });
 
-  describe('addFilters', () => {
+  describe('addFilter', () => {
 
     it('adds the given filters', () => {
       let tileGrid = createTileGrid(3);
@@ -1115,7 +1101,7 @@ describe('TileGrid', () => {
       let filter0 = {
         accept: tile => tile.label.indexOf('0') < 0
       };
-      tileGrid.addFilters([filter0]);
+      tileGrid.addFilter(filter0);
       expect(tileGrid.filters.length).toBe(1);
       expect(tileGrid.filters).toEqual([filter0]);
 
@@ -1125,19 +1111,19 @@ describe('TileGrid', () => {
       let filter2 = {
         accept: tile => tile.label.indexOf('2') < 0
       };
-      tileGrid.addFilters([filter1, filter2]);
+      tileGrid.addFilter([filter1, filter2]);
       expect(tileGrid.filters.length).toBe(3);
       expect(tileGrid.filters).toEqual([filter0, filter1, filter2]);
 
       // Does nothing if same filters are added again
-      tileGrid.addFilters([filter1, filter2]);
+      tileGrid.addFilter([filter1, filter2]);
       expect(tileGrid.filters.length).toBe(3);
       expect(tileGrid.filters).toEqual([filter0, filter1, filter2]);
     });
 
   });
 
-  describe('removeFilters', () => {
+  describe('removeFilter', () => {
 
     it('invalidates the logical grid', () => {
       let model = {
@@ -1171,9 +1157,8 @@ describe('TileGrid', () => {
       expect(tileGrid.filters.length).toBe(1);
       expect(tileGrid.filteredTiles.length).toBe(0);
 
-      tileGrid.removeFilter(tileFilter);
       group.bodyAnimating = true; // simulate existing animation
-      tileGrid.filter();
+      tileGrid.removeFilter(tileFilter);
       expect(tileGrid.filters.length).toBe(0);
       expect(tileGrid.filteredTiles.length).toBe(3);
     });
@@ -1194,11 +1179,11 @@ describe('TileGrid', () => {
       expect(tileGrid.filters.length).toBe(3);
       expect(tileGrid.filters).toEqual([filter0, filter1, filter2]);
 
-      tileGrid.removeFilters([filter1, filter2]);
+      tileGrid.removeFilter([filter1, filter2]);
       expect(tileGrid.filters.length).toBe(1);
       expect(tileGrid.filters).toEqual([filter0]);
 
-      tileGrid.removeFilters([filter0, filter1]);
+      tileGrid.removeFilter([filter0, filter1]);
       expect(tileGrid.filters.length).toBe(0);
       expect(tileGrid.filters).toEqual([]);
     });

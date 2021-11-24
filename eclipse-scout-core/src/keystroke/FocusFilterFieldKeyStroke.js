@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,28 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Key, keys, KeyStroke, scout} from '../../index';
-import $ from 'jquery';
+import {Key, keys, KeyStroke, scout} from '../index';
 
 /**
- * Keystroke to move the cursor into field field to table footer.
+ * Keystroke to move the cursor into filter field.
  *
  * Hint: This keystroke is not implemented as RangeKeyStroke.js because:
  *       a) the accepted keys are not rendered on F1, but a condensed 'a-z' instead;
  *       b) there is no need to evaluate a concrete key's propagation status when being rendered (because of (a))
  *
  */
-export default class TableFocusFilterFieldKeyStroke extends KeyStroke {
+export default class FocusFilterFieldKeyStroke extends KeyStroke {
 
-  constructor(table) {
+  constructor(field) {
     super();
-    this.field = table;
+    this.field = field;
 
     this.renderingHints.$drawingArea = ($drawingArea, event) => event._$filterInput;
 
     this.virtualKeyStrokeWhich = 'a-Z;a-z;0-9';
     this.preventDefault = false; // false so that the key is inserted into the search field.
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
+    this.stopPropagation = true;
   }
 
   /**
@@ -40,15 +40,13 @@ export default class TableFocusFilterFieldKeyStroke extends KeyStroke {
       return false;
     }
 
-    let $filterInput = $('.table-text-filter', this.field.$container);
-    if (!$filterInput.length) {
+    let $filterInput = this.field.$container.data('filter-field');
+    if (!$filterInput || !$filterInput.length || !$filterInput.is(':focusable')) {
       return false;
     }
 
     let $activeElement = this.field.$container.activeElement();
-    let activeElementType = $activeElement[0].tagName.toLowerCase();
-    let focusOnInputField = (activeElementType === 'textarea' || activeElementType === 'input');
-    if (!$activeElement.hasClass('table-text-filter') || !focusOnInputField) {
+    if ($activeElement[0] !== $filterInput[0]) {
       event._$filterInput = $filterInput;
       this._isKeyStrokeInRange(event);
       return true;

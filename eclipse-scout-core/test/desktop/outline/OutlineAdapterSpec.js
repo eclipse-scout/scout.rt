@@ -24,6 +24,12 @@ describe('OutlineAdapter', () => {
     });
     helper = new OutlineSpecHelper(session);
     tableHelper = new TableSpecHelper(session);
+    $.fx.off = true;
+  });
+
+  afterEach(() => {
+    session = null;
+    $.fx.off = false;
   });
 
   function createOutlineWithDetailTable() {
@@ -66,7 +72,6 @@ describe('OutlineAdapter', () => {
 
     let filter = tableHelper.createTableTextFilter(table, 'cell 1');
     table.addFilter(filter);
-    table.filter();
 
     // Insert cell 2 -> must not be shown
     outline.insertNode({
@@ -105,7 +110,6 @@ describe('OutlineAdapter', () => {
 
     let filter = tableHelper.createTableTextFilter(table, 'cell 1');
     table.addFilter(filter);
-    table.filter();
 
     // Insert row and node separately, in Scout classic the OutlineMediator.js does not sync the rows to nodes because it happens on server side.
     table.insertRow({
@@ -185,7 +189,6 @@ describe('OutlineAdapter', () => {
 
     let filter = tableHelper.createTextColumnFilter(table, table.columns[0], 'cell 1');
     table.addFilter(filter);
-    table.filter();
 
     // Insert 2 rows / nodes. The first row is accepted by the filter, the second one isn't.
     table.insertRow({

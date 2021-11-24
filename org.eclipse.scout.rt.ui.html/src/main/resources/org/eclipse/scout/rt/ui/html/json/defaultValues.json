@@ -8,7 +8,6 @@
   /* *** Default value definitions *** */
   /* (Note: Array values are always tested without considering the order) */
   "defaults": {
-
     // Model adapters
     "Widget": {
       "enabled": true,
@@ -76,7 +75,9 @@
       "shrinkable": false,
       "subMenuVisibility": "default",
       "childActions": [],
-      "menuTypes": ["Table.EmptySpace"],
+      "menuTypes": [
+        "Table.EmptySpace"
+      ],
       "preventDoubleClick": false
     },
     "Button": {
@@ -202,7 +203,7 @@
     },
     "SplitBox": {
       "fieldCollapsed": false,
-      "fieldMinimized" : false,
+      "fieldMinimized": false,
       "collapsibleField": null,
       "minSplitterPosition": null,
       "splitHorizontal": true,
@@ -269,7 +270,8 @@
       "sortEnabled": true,
       "tableControls": [],
       "tableStatusVisible": false,
-      "tileMode": false
+      "tileMode": false,
+      "textFilterEnabled": true
     },
     "TableControl": {
       "toggleAction": true
@@ -305,7 +307,8 @@
     "Outline": {
       "toggleBreadcrumbStyleEnabled": true,
       "navigateButtonsVisible": true,
-      "outlineOverviewVisible":true,
+      "outlineOverviewVisible": true,
+      "textFilterEnabled": false,
       "dialogs": [],
       "views": [],
       "messageBoxes": [],
@@ -346,7 +349,8 @@
       "nodes": [],
       "selectedNodes": [],
       "filterEnabled": false,
-      "lazyExpandingEnabled": true
+      "lazyExpandingEnabled": true,
+      "textFilterEnabled": true
     },
     "ImageField": {
       "autoFit": false,
@@ -371,7 +375,6 @@
     "BeanField": {
       "preventInitialFocus": true
     },
-
     // Other objects
     "Cell": {
       "horizontalAlignment": -1,
@@ -491,12 +494,14 @@
       "selectedTiles": [],
       "scrollable": false,
       "tiles": [],
-      "withPlaceholders": false
+      "withPlaceholders": false,
+      "textFilterEnabled": false
     },
     "TileAccordion": {
       "exclusiveExpand": false,
       "multiSelect": true,
-      "selectable": false
+      "selectable": false,
+      "textFilterEnabled": false
     },
     "Accordion": {
       "exclusiveExpand": true,
@@ -529,7 +534,6 @@
       "animateResize": true
     }
   },
-
   /* *** Object type hierarchy *** */
   "objectTypeHierarchy": {
     "Widget": {

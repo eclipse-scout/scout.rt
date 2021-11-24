@@ -8,58 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  AggregateTableControl,
-  AppLinkKeyStroke,
-  arrays,
-  BooleanColumn,
-  clipboard,
-  Column,
-  ContextMenuKeyStroke,
-  ContextMenuPopup,
-  Device,
-  DoubleClickSupport,
-  dragAndDrop,
-  Event,
-  graphics,
-  HtmlComponent,
-  Insets,
-  KeyStrokeContext,
-  LoadingSupport,
-  MenuBar,
-  MenuDestinations,
-  MenuItemsOrder,
-  menus,
-  NumberColumn,
-  objects,
-  Range,
-  scout,
-  scrollbars,
-  Status,
-  strings,
-  styles,
-  TableCopyKeyStroke,
-  TableFocusFilterFieldKeyStroke,
-  TableLayout,
-  TableNavigationCollapseKeyStroke,
-  TableNavigationDownKeyStroke,
-  TableNavigationEndKeyStroke,
-  TableNavigationExpandKeyStroke,
-  TableNavigationHomeKeyStroke,
-  TableNavigationPageDownKeyStroke,
-  TableNavigationPageUpKeyStroke,
-  TableNavigationUpKeyStroke,
-  TableRefreshKeyStroke,
-  TableRow,
-  TableSelectAllKeyStroke,
-  TableSelectionHandler,
-  TableStartCellEditKeyStroke,
-  TableToggleRowKeyStroke,
-  TableUpdateBuffer,
-  TableUserFilter,
-  tooltips as tooltips_1,
-  Widget
-} from '../index';
+import {AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, clipboard, Column, ContextMenuKeyStroke, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, Event, FilterSupport, graphics, HtmlComponent, Insets, KeyStrokeContext, LoadingSupport, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn, objects, Range, scout, scrollbars, Status, strings, styles, TableCopyKeyStroke, TableLayout, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableToggleRowKeyStroke, TableUpdateBuffer, TableUserFilter, tooltips as tooltips_1, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Table extends Widget {
@@ -125,7 +74,6 @@ export default class Table extends Widget {
     this.staticMenus = [];
     this.selectionHandler = new TableSelectionHandler(this);
     this.tooltips = [];
-    this._filterMap = {};
     this._filteredRows = [];
     this.tableNodeColumn = null;
     this._maxLevel = 0;
@@ -140,6 +88,11 @@ export default class Table extends Widget {
     this.viewRangeDirty = false;
     this.viewRangeRendered = new Range(0, 0);
     this.virtual = true;
+
+    this.textFilterEnabled = true;
+    this.filterSupport = this._createFilterSupport();
+    this.filteredElementsDirty = false;
+
     this._doubleClickSupport = new DoubleClickSupport();
     this._permanentHeadSortColumns = [];
     this._permanentTailSortColumns = [];
@@ -253,6 +206,7 @@ export default class Table extends Widget {
     });
 
     this.menuBar = this._createMenuBar();
+    this.menuBar.on('propertyChange:visible', () => this._refreshMenuBarClasses());
     this._setSelectedRows(this.selectedRows);
     this._setKeyStrokes(this.keyStrokes);
     this._setMenus(this.menus);
@@ -395,7 +349,6 @@ export default class Table extends Widget {
       new TableNavigationEndKeyStroke(this),
       new TableNavigationCollapseKeyStroke(this),
       new TableNavigationExpandKeyStroke(this),
-      new TableFocusFilterFieldKeyStroke(this),
       new TableStartCellEditKeyStroke(this),
       new TableSelectAllKeyStroke(this),
       new TableRefreshKeyStroke(this),
@@ -506,6 +459,7 @@ export default class Table extends Widget {
     this._renderFooterVisible();
     this._renderCheckableStyle();
     this._renderHierarchicalStyle();
+    this._renderTextFilterEnabled();
   }
 
   _setCssClass(cssClass) {
@@ -543,6 +497,7 @@ export default class Table extends Widget {
     if (this.$data) {
       this._removeData();
     }
+    this.filterSupport.remove();
     super._remove();
   }
 
@@ -2731,11 +2686,7 @@ export default class Table extends Widget {
       this.rows.push(row);
     }, this);
 
-    let filterAcceptedRows = rows.filter(function(row) {
-      this._applyFiltersForRow(row);
-      return row.filterAccepted;
-    }, this);
-
+    this.filterSupport.applyFilters(rows);
     this._updateRowStructure({
       updateTree: true,
       filteredRows: true,
@@ -2743,7 +2694,7 @@ export default class Table extends Widget {
       visibleRows: true
     });
     // Notify changed filter if there are user filters and at least one of the new rows is accepted by them
-    if (this._filterCount() > 0 && filterAcceptedRows.length > 0) {
+    if (this._filterCount() > 0 && rows.some(row => row.filterAccepted)) {
       this._triggerFilter();
     }
 
@@ -3433,7 +3384,7 @@ export default class Table extends Widget {
   }
 
   _filterCount() {
-    return Object.keys(this._filterMap).length;
+    return this.filters.length;
   }
 
   filteredRows() {
@@ -3522,12 +3473,13 @@ export default class Table extends Widget {
     let updateTree = scout.nvl(options.updateTree, false),
       updateFilteredRows = scout.nvl(options.filteredRows, updateTree),
       applyFilters = scout.nvl(options.applyFilters, updateFilteredRows),
+      filtersChanged = scout.nvl(options.filtersChanged, false),
       updateVisibleRows = scout.nvl(options.visibleRows, updateFilteredRows);
     if (updateTree) {
       this._rebuildTreeStructure();
     }
     if (updateFilteredRows) {
-      this._updateFilteredRows(applyFilters);
+      this._updateFilteredRows(applyFilters, filtersChanged);
     }
     if (updateVisibleRows) {
       this._updateVisibleRows();
@@ -3689,15 +3641,6 @@ export default class Table extends Widget {
     this._renderEmptyData();
   }
 
-  filter() {
-    this._updateRowStructure({
-      filteredRows: true
-    });
-    this._renderRowDelta();
-    this._group();
-    this.revealSelection();
-  }
-
   /**
    * Sorts the given $rows according to the row index
    */
@@ -3729,30 +3672,11 @@ export default class Table extends Widget {
     });
   }
 
-  _rowAcceptedByFilters(row) {
-    for (let key in this._filterMap) { // NOSONAR
-      let filter = this._filterMap[key];
-      if (!filter.accept(row)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   /**
    * @returns {Boolean} true if row state has changed, false if not
    */
   _applyFiltersForRow(row) {
-    if (this._rowAcceptedByFilters(row)) {
-      if (!row.filterAccepted) {
-        row.filterAccepted = true;
-        return true;
-      }
-    } else if (row.filterAccepted) {
-      row.filterAccepted = false;
-      return true;
-    }
-    return false;
+    return this.filterSupport.applyFiltersForElement(row);
   }
 
   /**
@@ -3760,32 +3684,24 @@ export default class Table extends Widget {
    */
   filteredBy() {
     let filteredBy = [];
-    for (let key in this._filterMap) { // NOSONAR
-      let filter = this._filterMap[key];
+    this.filters.forEach(filter => {
       // check if filter supports label
       if (typeof filter.createLabel === 'function') {
         filteredBy.push(filter.createLabel());
       }
-    }
+    });
     return filteredBy;
   }
 
-  resetUserFilter() {
-    let filter;
-    for (let key in this._filterMap) { // NOSONAR
-      filter = this._filterMap[key];
-      if (filter instanceof TableUserFilter) {
-        this.removeFilterByKey(key);
-      }
-    }
+  resetUserFilter(applyFilter = true) {
+    this.filters.filter(filter => filter instanceof TableUserFilter)
+      .forEach(filter => this.removeFilter(filter, applyFilter));
 
-    // reset rows
-    this.filter();
     this._triggerFilterReset();
   }
 
   hasUserFilter() {
-    return objects.values(this._filterMap)
+    return this.filters
       .filter(filter => {
         return filter instanceof TableUserFilter;
       })
@@ -3821,43 +3737,125 @@ export default class Table extends Widget {
   }
 
   /**
-   * @param filter object with createKey() and accept()
+   * @param {Filter|function|(Filter|function)[]} filter The filters to add.
+   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  addFilter(filter) {
-    let key = filter.createKey();
-    if (!key) {
-      throw new Error('key has to be defined');
+  addFilter(filter, applyFilter = true) {
+    if (filter instanceof TableUserFilter) {
+      let previousFilter = this.getFilter(filter.createKey());
+      this.filterSupport.removeFilter(previousFilter);
     }
-    this._filterMap[key] = filter;
 
-    this.trigger('filterAdded', {
-      filter: filter
-    });
+    let added = this.filterSupport.addFilter(filter, applyFilter);
+    if (added && added.length) {
+      this.trigger('filterAdded', {
+        filter: added[0]
+      });
+    }
   }
 
-  removeFilter(filter) {
-    this.removeFilterByKey(filter.createKey());
+  /**
+   * @param {Filter|function|(Filter|function)[]} filter The filters to remove.
+   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   */
+  removeFilter(filter, applyFilter = true) {
+    let removed = this.filterSupport.removeFilter(filter, applyFilter);
+    if (removed && removed.length) {
+      this.trigger('filterRemoved', {
+        filter: removed[0]
+      });
+    }
   }
 
-  removeFilterByKey(key) {
-    if (!key) {
-      throw new Error('key has to be defined');
-    }
-    let filter = this._filterMap[key];
-    if (!filter) {
-      return;
-    }
-    delete this._filterMap[key];
-    this.trigger('filterRemoved', {
-      filter: filter
-    });
+  removeFilterByKey(key, applyFilter = true) {
+    this.removeFilter(this.getFilter(key), applyFilter);
   }
 
   getFilter(key) {
-    if (!key) {
-      throw new Error('key has to be defined');
+    return arrays.find(this.filters, f => {
+      if (!(f instanceof TableUserFilter)) {
+        return false;
+      }
+      return objects.equals(f.createKey(), key);
+    });
+  }
+
+  /**
+   * @param {Filter|function|(Filter|function)[]} filter The new filters.
+   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   */
+  setFilters(filters, applyFilter = true) {
+    this.resetUserFilter(false);
+    filters = filters.map(filter => this._ensureFilter(filter));
+    this.filterSupport.setFilters(filters, applyFilter);
+  }
+
+  _ensureFilter(filter) {
+    if (filter instanceof TableUserFilter || !filter.objectType) {
+      return filter;
     }
-    return this._filterMap[key];
+    if (filter.column) {
+      filter.column = this.columnById(filter.column);
+    }
+    filter.table = this;
+    filter.session = this.session;
+    return scout.create(filter);
+  }
+
+  filter() {
+    this.filterSupport.filter();
+  }
+
+  _filter(options) {
+    this._updateRowStructure($.extend({}, options, {filteredRows: true}));
+    this._renderRowDelta();
+    this._group();
+    this.revealSelection();
+  }
+
+  /**
+   * @returns {FilterSupport}
+   */
+  _createFilterSupport() {
+    return new FilterSupport({
+      widget: this,
+      $container: () => this.$container,
+      getElementsForFiltering: () => this.rows,
+      createTextFilter: () => scout.create('TableTextUserFilter', {
+        session: this.session,
+        table: this
+      }),
+      updateTextFilterText: (filter, text) => {
+        if (objects.equals(filter.text, text)) {
+          return false;
+        }
+        filter.text = text;
+        return true;
+      }
+    });
+  }
+
+  setTextFilterEnabled(textFilterEnabled) {
+    this.setProperty('textFilterEnabled', textFilterEnabled);
+  }
+
+  isTextFilterFieldVisible() {
+    return this.textFilterEnabled && !this.footerVisible;
+  }
+
+  _renderTextFilterEnabled() {
+    this.filterSupport.renderFilterField();
+  }
+
+  updateFilteredElements(result, opts) {
+    if (this.filteredElementsDirty) {
+      this._filter({
+        filteredRows: true,
+        applyFilters: false,
+        filtersChanged: true
+      });
+      this.filteredElementsDirty = false;
+    }
   }
 
   /**
@@ -4313,11 +4311,15 @@ export default class Table extends Widget {
   }
 
   _refreshMenuBarPosition() {
+    this.$container.removeClass('menubar-top');
+    this.$container.removeClass('menubar-bottom');
     if (this.menuBarVisible && this.menuBar.rendered) {
       if (this.menuBar.position === MenuBar.Position.TOP) {
         this.menuBar.$container.prependTo(this.$container);
+        this.$container.addClass('menubar-top');
       } else {
         this.menuBar.$container.appendTo(this.$container);
+        this.$container.addClass('menubar-bottom');
       }
     }
   }
@@ -4343,43 +4345,26 @@ export default class Table extends Widget {
     } else {
       this.menuBar.setMenuItems([]);
     }
+    this._refreshMenuBarClasses();
     if (this.contextMenu) {
       let contextMenuItems = this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
       this.contextMenu.updateMenuItems(contextMenuItems);
     }
   }
 
+  _refreshMenuBarClasses() {
+    if (!this.$container) {
+      return;
+    }
+    this.$container.toggleClass('has-menubar', this.menuBar && this.menuBar.visible);
+    this.$container.toggleClass('menubar-top', this.menuBar && this.menuBar.position === MenuBar.Position.TOP);
+    this.$container.toggleClass('menubar-bottom', this.menuBar && this.menuBar.position !== MenuBar.Position.TOP);
+
+  }
+
   _setKeyStrokes(keyStrokes) {
     this.updateKeyStrokes(keyStrokes, this.keyStrokes);
     this._setProperty('keyStrokes', keyStrokes);
-  }
-
-  setFilters(filters) {
-    let filter;
-    for (let key in this._filterMap) { // NOSONAR
-      filter = this._filterMap[key];
-      if (filter instanceof TableUserFilter) {
-        this.removeFilterByKey(key);
-      }
-    }
-    if (filters) {
-      filters.forEach(function(filter) {
-        filter = this._ensureFilter(filter);
-        this.addFilter(filter);
-      }, this);
-    }
-  }
-
-  _ensureFilter(filter) {
-    if (filter instanceof TableUserFilter) {
-      return filter;
-    }
-    if (filter.column) {
-      filter.column = this.columnById(filter.column);
-    }
-    filter.table = this;
-    filter.session = this.session;
-    return scout.create(filter);
   }
 
   setTableStatus(status) {
@@ -4648,6 +4633,8 @@ export default class Table extends Widget {
       this._removeFooter();
     }
     this.invalidateLayoutTree();
+
+    this.filterSupport.renderFilterField();
   }
 
   _renderFooter() {

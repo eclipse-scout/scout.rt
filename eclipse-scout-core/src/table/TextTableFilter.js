@@ -25,10 +25,6 @@ export default class TextTableFilter extends TableFilter {
     this.alwaysAcceptedRowIds = [];
   }
 
-  createKey() {
-    return 'TextTableFilter';
-  }
-
   accept(row) {
     if (!this.active || strings.empty(this.acceptedText) || this.alwaysAcceptedRowIds.indexOf(row.id) !== -1) {
       return true;

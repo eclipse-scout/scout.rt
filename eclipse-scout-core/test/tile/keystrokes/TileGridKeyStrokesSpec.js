@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,14 +39,6 @@ describe('TileGridKeyStrokes', () => {
     };
     model = $.extend({}, defaults, model);
     return scout.create('TileGrid', model);
-  }
-
-  function createTile(model) {
-    let defaults = {
-      parent: session.desktop
-    };
-    model = $.extend({}, defaults, model);
-    return scout.create('Tile', model);
   }
 
   describe('ctrl + a', () => {
@@ -235,7 +227,6 @@ describe('TileGridKeyStrokes', () => {
           }
         };
         tileGrid.addFilter(filter);
-        tileGrid.filter();
         expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
         expect(tileGrid.focusedTile).toBe(null);
 
@@ -410,7 +401,6 @@ describe('TileGridKeyStrokes', () => {
           }
         };
         tileGrid.addFilter(filter);
-        tileGrid.filter();
         expect(tileGrid.selectedTiles).toEqual([tiles[1]]);
         expect(tileGrid.focusedTile).toBe(null);
 
@@ -607,7 +597,6 @@ describe('TileGridKeyStrokes', () => {
           }
         };
         tileGrid.addFilter(filter);
-        tileGrid.filter();
         expect(tileGrid.selectedTiles).toEqual([tiles[3], tiles[4]]);
         expect(tileGrid.focusedTile).toBe(null);
 
@@ -787,7 +776,6 @@ describe('TileGridKeyStrokes', () => {
           }
         };
         tileGrid.addFilter(filter);
-        tileGrid.filter();
         expect(tileGrid.selectedTiles).toEqual([tiles[4], tiles[5]]);
         expect(tileGrid.focusedTile).toBe(null);
 

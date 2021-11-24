@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,6 +56,8 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    * @since 9.0
    */
   String PROP_CHECKABLE_STYLE = "checkableStyle";
+
+  String PROP_TEXT_FILTER_ENABLED = "textFilterEnabled";
 
   String DISPLAY_STYLE_DEFAULT = "default";
   String DISPLAY_STYLE_BREADCRUMB = "breadcrumb";
@@ -325,6 +327,10 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   CheckableStyle getCheckableStyle();
 
   void setCheckableStyle(CheckableStyle checkableStyle);
+
+  boolean isTextFilterEnabled();
+
+  void setTextFilterEnabled(boolean textFilterEnabled);
 
   /**
    * This is a hint for the UI if it is not capable of having variable node height based on node contents (such as

@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.accordion.AbstractAccordion;
 import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -86,6 +87,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   @Override
   protected void initConfig() {
     super.initConfig();
+    setTextFilterEnabled(getConfiguredTextFilterEnabled());
     setGroupManager(new DefaultGroupManager<>());
     setComparator(new DefaultComparator());
 
@@ -98,6 +100,12 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     setGridColumnCount(defaultGrid.getGridColumnCount());
     setTileGridLayoutConfig(defaultGrid.getLayoutConfig());
     setTileComparator(defaultGrid.getComparator());
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(70)
+  protected boolean getConfiguredTextFilterEnabled() {
+    return false;
   }
 
   @Override
@@ -601,6 +609,16 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   @Override
   public boolean isVirtual() {
     return propertySupport.getPropertyBool(PROP_VIRTUAL);
+  }
+
+  @Override
+  public void setTextFilterEnabled(boolean textFilterEnabled) {
+    propertySupport.setPropertyBool(PROP_TEXT_FILTER_ENABLED, textFilterEnabled);
+  }
+
+  @Override
+  public boolean isTextFilterEnabled() {
+    return propertySupport.getPropertyBool(PROP_TEXT_FILTER_ENABLED);
   }
 
   protected void handleSelectedTilesChange(IGroup changedGroup, PropertyChangeEvent event) {

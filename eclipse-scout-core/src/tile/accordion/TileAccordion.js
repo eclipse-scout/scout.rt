@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Accordion, arrays, EventDelegator, Group, objects, scout, TileAccordionSelectionHandler} from '../../index';
+import {Accordion, arrays, EventDelegator, FilterSupport, Group, KeyStrokeContext, objects, scout, TileAccordionLayout, TileAccordionSelectionHandler, TileTextFilter} from '../../index';
 
 export default class TileAccordion extends Accordion {
   constructor() {
@@ -19,11 +19,18 @@ export default class TileAccordion extends Accordion {
     this.selectable = null;
     this.takeTileFiltersFromGroup = true;
     this.tileComparator = null;
-    this.tileFilters = [];
+    this.filters = [];
     this.tileGridLayoutConfig = null;
     this.tileGridSelectionHandler = new TileAccordionSelectionHandler(this);
     this.withPlaceholders = null;
     this.virtual = null;
+
+    this.$filterFieldContainer = null;
+    this.textFilterEnabled = false;
+    this.filterSupport = this._createFilterSupport();
+    this.createTextFilter = null;
+    this.updateTextFilterText = null;
+
     this._selectionUpdateLocked = false;
     this._tileGridPropertyChangeHandler = this._onTileGridPropertyChange.bind(this);
     this._groupBodyHeightChangeHandler = this._onGroupBodyHeightChange.bind(this);
@@ -35,6 +42,33 @@ export default class TileAccordion extends Accordion {
   _render() {
     super._render();
     this.$container.addClass('tile-accordion');
+    this.$filterFieldContainer = this.$container.prependDiv('filter-field-container');
+  }
+
+  _createLayout() {
+    return new TileAccordionLayout(this);
+  }
+
+  _renderProperties() {
+    super._renderProperties();
+    this._renderTextFilterEnabled();
+  }
+
+  _remove() {
+    this.filterSupport.remove();
+    super._remove();
+  }
+
+  _init(model) {
+    super._init(model);
+    this.setFilters(this.filters);
+  }
+
+  /**
+   * @override
+   */
+  _createKeyStrokeContext() {
+    return new KeyStrokeContext();
   }
 
   /**
@@ -72,12 +106,11 @@ export default class TileAccordion extends Accordion {
     }
     this.setProperty('tileComparator', group.body.comparator);
 
-    if (this.tileFilters.length > 0) {
-      group.body.addFilters(this.tileFilters);
-      group.body.filter();
+    if (this.filters.length > 0) {
+      group.body.addFilter(this.filters);
     }
     if (this.takeTileFiltersFromGroup) {
-      this.setProperty('tileFilters', group.body.filters);
+      this.setFilters(group.body.filters);
     }
 
     if (this.withPlaceholders !== null) {
@@ -280,35 +313,88 @@ export default class TileAccordion extends Accordion {
     return count;
   }
 
-  addTileFilter(filter) {
-    let filters = this.tileFilters.slice();
-    if (filters.indexOf(filter) >= 0) {
-      return;
-    }
-    filters.push(filter);
-    this.setTileFilters(filters);
+  /**
+   * @param {Filter|function|(Filter|function)[]} filter The filters to add.
+   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   */
+  addFilter(filter, applyFilter = true) {
+    this.filterSupport.addFilter(filter, applyFilter);
   }
 
-  removeTileFilter(filter) {
-    let filters = this.tileFilters.slice();
-    if (!arrays.remove(filters, filter)) {
-      return;
-    }
-    this.setTileFilters(filters);
+  /**
+   * @param {Filter|function|(Filter|function)[]} filter The filters to remove.
+   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   */
+  removeFilter(filter, applyFilter = true) {
+    this.filterSupport.removeFilter(filter, applyFilter);
   }
 
-  setTileFilters(filters) {
+  /**
+   * @param {Filter|function|(Filter|function)[]} filter The new filters.
+   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   */
+  setFilters(filters, applyFilter = true) {
+    this.filterSupport.setFilters(filters, applyFilter);
+  }
+
+  _setFilters(filters) {
     filters = arrays.ensure(filters);
     this.groups.forEach(group => {
-      group.body.setFilters(filters);
+      group.body.setFilters(filters.slice(), false);
     });
-    this.setProperty('tileFilters', filters.slice());
+    this._setProperty('filters', filters.slice());
   }
 
-  filterTiles() {
+  filter() {
+    this.filterSupport.filter();
+  }
+
+  _filter() {
     this.groups.forEach(group => {
       group.body.filter();
     });
+  }
+
+  /**
+   * @returns {FilterSupport}
+   */
+  _createFilterSupport() {
+    return new FilterSupport({
+      widget: this,
+      $container: () => this.$filterFieldContainer,
+      filterElements: this._filter.bind(this),
+      createTextFilter: this._createTextFilter.bind(this),
+      updateTextFilterText: this._updateTextFilterText.bind(this)
+    });
+  }
+
+  _createTextFilter() {
+    if (objects.isFunction(this.createTextFilter)) {
+      return this.createTextFilter();
+    }
+    return new TileTextFilter();
+  }
+
+  _updateTextFilterText(filter, text) {
+    if (objects.isFunction(this.updateTextFilterText)) {
+      return this.updateTextFilterText(filter, text);
+    }
+    if (filter instanceof TileTextFilter) {
+      return filter.setText(text);
+    }
+    return false;
+  }
+
+  setTextFilterEnabled(textFilterEnabled) {
+    this.setProperty('textFilterEnabled', textFilterEnabled);
+  }
+
+  isTextFilterFieldVisible() {
+    return this.textFilterEnabled;
+  }
+
+  _renderTextFilterEnabled() {
+    this.filterSupport.renderFilterField();
   }
 
   getFilteredTiles() {

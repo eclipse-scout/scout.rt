@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -115,7 +115,7 @@ export default class OutlineAdapter extends TreeAdapter {
       this._filterDirty = false;
       // Explicitly call filter if some of the new rows are not accepted.
       // If they are accepted, table.insertRows() will trigger a filter event by itself that will be mediated to the outline by OutlineMediator.js
-      this.widget.filter(true);
+      this.widget.filter();
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -77,7 +77,7 @@ describe('TileAccordion', () => {
           rowHeight: 100
         },
         tileComparator: comparator,
-        tileFilters: [filter],
+        filters: [filter],
         gridColumnCount: 2,
         withPlaceholders: true
       });
@@ -125,7 +125,7 @@ describe('TileAccordion', () => {
       expect(accordion.groups[0].body.multiSelect).toBe(accordion.multiSelect);
       expect(accordion.groups[0].body.layoutConfig).toEqual(accordion.tileGridLayoutConfig);
       expect(accordion.groups[0].body.comparator).toEqual(accordion.tileComparator);
-      expect(accordion.groups[0].body.filters).toEqual(accordion.tileFilters);
+      expect(accordion.groups[0].body.filters).toEqual(accordion.filters);
       expect(accordion.groups[0].body.gridColumnCount).toBe(accordion.gridColumnCount);
       expect(accordion.groups[0].body.withPlaceholders).toBe(accordion.withPlaceholders);
     });
@@ -149,7 +149,7 @@ describe('TileAccordion', () => {
     });
   });
 
-  describe('addTileFilter', () => {
+  describe('addFilter', () => {
     it('adds the filter to every existing tile grid', () => {
       let accordion = createAccordion(2);
       let tile0 = createTile();
@@ -164,18 +164,16 @@ describe('TileAccordion', () => {
       let filter2 = {
         accept: tile => false
       };
-      expect(accordion.tileFilters).toEqual([]);
-      accordion.addTileFilter(filter);
-      accordion.filterTiles();
-      expect(accordion.tileFilters).toEqual([filter]);
+      expect(accordion.filters).toEqual([]);
+      accordion.addFilter(filter);
+      expect(accordion.filters).toEqual([filter]);
       expect(accordion.groups[0].body.filters).toEqual([filter]);
       expect(accordion.groups[0].body.filteredTiles).toEqual([tile1]);
       expect(accordion.groups[1].body.filters).toEqual([filter]);
       expect(accordion.groups[1].body.filteredTiles).toEqual([tile3]);
 
-      accordion.addTileFilter(filter2);
-      accordion.filterTiles();
-      expect(accordion.tileFilters).toEqual([filter, filter2]);
+      accordion.addFilter(filter2);
+      expect(accordion.filters).toEqual([filter, filter2]);
       expect(accordion.groups[0].body.filters).toEqual([filter, filter2]);
       expect(accordion.groups[0].body.filteredTiles).toEqual([]);
       expect(accordion.groups[1].body.filters).toEqual([filter, filter2]);
@@ -195,11 +193,10 @@ describe('TileAccordion', () => {
       let filter2 = {
         accept: tile => true
       };
-      expect(accordion.tileFilters).toEqual([]);
-      accordion.addTileFilter(filter);
-      accordion.addTileFilter(filter2);
-      accordion.filterTiles();
-      expect(accordion.tileFilters).toEqual([filter, filter2]);
+      expect(accordion.filters).toEqual([]);
+      accordion.addFilter(filter);
+      accordion.addFilter(filter2);
+      expect(accordion.filters).toEqual([filter, filter2]);
       expect(accordion.groups[0].body.filters).toEqual([filter, filter2]);
       expect(accordion.groups[0].body.filteredTiles).toEqual([tile1]);
 
@@ -210,13 +207,13 @@ describe('TileAccordion', () => {
           tiles: [tile2, tile3]
         }
       });
-      expect(accordion.tileFilters).toEqual([filter, filter2]);
+      expect(accordion.filters).toEqual([filter, filter2]);
       expect(accordion.groups[1].body.filters).toEqual([filter, filter2]);
       expect(accordion.groups[1].body.filteredTiles).toEqual([tile3]);
     });
   });
 
-  describe('removeTileFilter', () => {
+  describe('removeFilter', () => {
     it('removes the filter to every existing tile grid', () => {
       let accordion = createAccordion(2);
       let tile0 = createTile();
@@ -231,21 +228,18 @@ describe('TileAccordion', () => {
       let filter2 = {
         accept: tile => false
       };
-      accordion.setTileFilters([filter, filter2]);
-      accordion.filterTiles();
-      expect(accordion.tileFilters).toEqual([filter, filter2]);
+      accordion.setFilters([filter, filter2]);
+      expect(accordion.filters).toEqual([filter, filter2]);
 
-      accordion.removeTileFilter(filter);
-      accordion.filterTiles();
-      expect(accordion.tileFilters).toEqual([filter2]);
+      accordion.removeFilter(filter);
+      expect(accordion.filters).toEqual([filter2]);
       expect(accordion.groups[0].body.filters).toEqual([filter2]);
       expect(accordion.groups[0].body.filteredTiles).toEqual([]);
       expect(accordion.groups[1].body.filters).toEqual([filter2]);
       expect(accordion.groups[1].body.filteredTiles).toEqual([]);
 
-      accordion.removeTileFilter(filter2);
-      accordion.filterTiles();
-      expect(accordion.tileFilters).toEqual([]);
+      accordion.removeFilter(filter2);
+      expect(accordion.filters).toEqual([]);
       expect(accordion.groups[0].body.filters).toEqual([]);
       expect(accordion.groups[0].body.filteredTiles).toEqual([tile0, tile1]);
       expect(accordion.groups[1].body.filters).toEqual([]);
@@ -265,13 +259,11 @@ describe('TileAccordion', () => {
       let filter2 = {
         accept: tile => false
       };
-      accordion.setTileFilters([filter, filter2]);
-      accordion.filterTiles();
-      expect(accordion.tileFilters).toEqual([filter, filter2]);
+      accordion.setFilters([filter, filter2]);
+      expect(accordion.filters).toEqual([filter, filter2]);
 
-      accordion.removeTileFilter(filter);
-      accordion.filterTiles();
-      expect(accordion.tileFilters).toEqual([filter2]);
+      accordion.removeFilter(filter);
+      expect(accordion.filters).toEqual([filter2]);
       expect(accordion.groups[0].body.filters).toEqual([filter2]);
       expect(accordion.groups[0].body.filteredTiles).toEqual([]);
 
@@ -282,7 +274,7 @@ describe('TileAccordion', () => {
           tiles: [tile2, tile3]
         }
       });
-      expect(accordion.tileFilters).toEqual([filter2]);
+      expect(accordion.filters).toEqual([filter2]);
       expect(accordion.groups[1].body.filters).toEqual([filter2]);
       expect(accordion.groups[1].body.filteredTiles).toEqual([]);
     });
@@ -667,7 +659,6 @@ describe('TileAccordion', () => {
     it('triggers a property change event for tiles of the deleted group', () => {
       let accordion = createAccordion(1);
       let tile0 = createTile();
-      let tile1 = createTile();
       accordion.groups[0].body.insertTile(tile0);
       let tileEventTriggered = false;
       let filteredTileEventTriggered = false;

@@ -53,6 +53,8 @@ export default class Outline extends Tree {
     this.messageBoxController = null;
     this.fileChooserController = null;
 
+    this.textFilterEnabled = false;
+
     this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
     this._detailMenusNodesSelectedHandler = null;
     this._additionalContainerClasses += ' outline';
@@ -69,7 +71,7 @@ export default class Outline extends Tree {
     this.embedDetailContent = scout.nvl(model.embedDetailContent, this.compact);
 
     // add filter before first traversal of tree -> tree is only traversed once.
-    this.addFilter(new DetailTableTreeFilter(), true);
+    this.addFilter(new DetailTableTreeFilter(), false);
     super._init(model);
 
     this.mediator = this._createMediator();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,9 +26,7 @@ export default class TableAdapter extends ModelAdapter {
   _postCreateWidget() {
     // if a newly created table has already a userfilter defined, we need to fire the filter event after creation
     // because the original event had been fired before the eventhandler was registered.
-    if (objects.values(this.widget._filterMap).some(filter => {
-      return filter instanceof TableUserFilter;
-    })) {
+    if (this.widget.hasUserFilter()) {
       this._onWidgetFilter();
     }
   }

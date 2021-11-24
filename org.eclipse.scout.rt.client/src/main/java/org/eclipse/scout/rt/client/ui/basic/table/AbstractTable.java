@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1029,6 +1029,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setDropMaximumSize(getConfiguredDropMaximumSize());
     setScrollToSelection(getConfiguredScrollToSelection());
     setTableStatusVisible(getConfiguredTableStatusVisible());
+    setTextFilterEnabled(getConfiguredTextFilterEnabled());
     setTruncatedCellTooltipEnabled(getConfiguredTruncatedCellTooltipEnabled());
     setClientUiPreferencesEnabled(getConfiguredClientUiPreferencesEnabled());
     if (getTableCustomizer() == null) {
@@ -4227,6 +4228,16 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
+  public boolean isTextFilterEnabled() {
+    return propertySupport.getPropertyBool(PROP_TEXT_FILTER_ENABLED);
+  }
+
+  @Override
+  public void setTextFilterEnabled(boolean textFilterEnabled) {
+    propertySupport.setPropertyBool(PROP_TEXT_FILTER_ENABLED, textFilterEnabled);
+  }
+
+  @Override
   public final void decorateCell(ITableRow row, IColumn<?> col) {
     Cell cell = row.getCellForUpdate(col.getColumnIndex());
     decorateCellInternal(cell, row, col);
@@ -4542,6 +4553,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Order(200)
   protected boolean getConfiguredTableStatusVisible() {
     return false;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(210)
+  protected boolean getConfiguredTextFilterEnabled() {
+    return true;
   }
 
   @Override

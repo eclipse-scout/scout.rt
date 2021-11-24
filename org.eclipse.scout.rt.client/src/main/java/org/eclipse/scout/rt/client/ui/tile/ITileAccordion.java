@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ public interface ITileAccordion<T extends ITile> extends IAccordion, IExtensible
   String PROP_TILE_GRID_LAYOUT_CONFIG = "tileGridLayoutConfig";
   String PROP_TILE_COMPARATOR = "tileComparator";
   String PROP_SELECTED_TILES = "selectedTiles";
+  String PROP_TEXT_FILTER_ENABLED = "textFilterEnabled";
 
   void addTile(T tile);
 
@@ -129,6 +130,10 @@ public interface ITileAccordion<T extends ITile> extends IAccordion, IExtensible
   void setVirtual(boolean virtual);
 
   boolean isVirtual();
+
+  void setTextFilterEnabled(boolean textFilterEnabled);
+
+  boolean isTextFilterEnabled();
 
   void setTileGridLayoutConfig(TileGridLayoutConfig layoutConfig);
 

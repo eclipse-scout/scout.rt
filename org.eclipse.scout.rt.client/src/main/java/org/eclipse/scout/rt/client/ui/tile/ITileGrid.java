@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,6 +41,7 @@ public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, 
   String PROP_VIRTUAL = "virtual";
   String PROP_ANIMATE_TILE_REMOVAL = "animateTileRemoval";
   String PROP_ANIMATE_TILE_INSERTION = "animateTileInsertion";
+  String PROP_TEXT_FILTER_ENABLED = "textFilterEnabled";
 
   String PROP_ASYNC_LOAD_JOBNAME_PREFIX = "tileAsyncDataLoadJob";
   String PROP_ASYNC_LOAD_IDENTIFIER_PREFIX = "tileAsyncDataLoadIdentifier";
@@ -115,6 +116,10 @@ public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, 
   boolean isAnimateTileInsertion();
 
   void setAnimateTileInsertion(boolean animateTileInsertion);
+
+  boolean isTextFilterEnabled();
+
+  void setTextFilterEnabled(boolean textFilterEnabled);
 
   void addTiles(List<T> tiles);
 

@@ -141,9 +141,13 @@ export default class TreeNode {
     return this.parentNode.isDescendantOf(node);
   }
 
+  setFilterAccepted(filterAccepted) {
+    this.filterAccepted = filterAccepted;
+  }
+
   isFilterAccepted(forceFilter) {
     if (this.filterDirty || forceFilter) {
-      this.getTree()._applyFiltersForNode(this);
+      this.getTree().applyFiltersForNode(this, false);
     }
     return this.filterAccepted;
   }

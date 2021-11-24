@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -101,8 +101,7 @@ describe('TableHeaderMenu', () => {
       it('reflects the state of the filter', () => {
         let table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
         let column = table.columns[0];
-        let filter = createAndRegisterColumnFilter(table, column, ['AnotherValue']);
-        table.filter();
+        createAndRegisterColumnFilter(table, column, ['AnotherValue']);
         table.render();
         expect(table.filteredRows().length).toBe(1);
 
@@ -118,8 +117,7 @@ describe('TableHeaderMenu', () => {
       it('correctly updates the list after inserting a new row, if a filter is applied', () => {
         let table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
         let column = table.columns[0];
-        let filter = createAndRegisterColumnFilter(table, column, ['AnotherValue']);
-        table.filter();
+        createAndRegisterColumnFilter(table, column, ['AnotherValue']);
         table.render();
         expect(table.filteredRows().length).toBe(1);
 
@@ -144,8 +142,7 @@ describe('TableHeaderMenu', () => {
       it('always displays the selected value, even if the table does not contain the value anymore', () => {
         let table = createSingleColumnTableByTexts(['Value', 'AnotherValue', 'Value']);
         let column = table.columns[0];
-        let filter = createAndRegisterColumnFilter(table, column, ['AnotherValueNotInTable']);
-        table.filter();
+        createAndRegisterColumnFilter(table, column, ['AnotherValueNotInTable']);
         table.render();
         expect(table.filteredRows().length).toBe(0);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,6 +46,7 @@ export default class TableLayout extends AbstractLayout {
       htmlMenuBar.setSize(menuBarSize);
       menuBarHeight = menuBarSize.height;
     }
+    $container.css('--menubar-height', menuBarHeight + 'px');
     if (header) {
       headerHeight = graphics.size(header.$container).height;
       if (header.menuBar) {
@@ -74,6 +75,7 @@ export default class TableLayout extends AbstractLayout {
     }
     let controlsHeight = dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight + tileTableHeight;
     let dataHeight = containerSize.height - controlsHeight;
+    $container.css('--controls-height', controlsHeight + 'px');
     if ($data) {
       $data.css('height', 'calc(100% - ' + controlsHeight + 'px)');
       this._dataHeightPositive = $data.height() > 0;

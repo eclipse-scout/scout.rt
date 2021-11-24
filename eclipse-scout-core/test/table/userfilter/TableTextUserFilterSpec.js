@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,7 +70,6 @@ describe('TableTextUserFilter', () => {
 
       filter.text = 'cell11';
       table.addFilter(filter);
-      table.filter();
 
       expect(table.filteredRows().length).toBe(1);
       expect(table.filteredRows()[0]).toBe(table.rows[1]);
@@ -78,7 +77,6 @@ describe('TableTextUserFilter', () => {
       // Capitalization is not relevant
       filter.text = 'CeLL';
       table.addFilter(filter);
-      table.filter();
 
       expect(table.filteredRows().length).toBe(2);
       expect(table.filteredRows()[0]).toBe(table.rows[0]);
@@ -86,12 +84,10 @@ describe('TableTextUserFilter', () => {
 
       filter.text = 'asdf';
       table.addFilter(filter);
-      table.filter();
 
       expect(table.filteredRows().length).toBe(0);
 
       table.removeFilter(filter);
-      table.filter();
 
       expect(table.filteredRows().length).toBe(2);
     });
@@ -112,13 +108,11 @@ describe('TableTextUserFilter', () => {
 
       filter.text = 'cell10cell';
       table.addFilter(filter);
-      table.filter();
 
       expect(table.filteredRows().length).toBe(0);
 
       filter.text = 'cell10 cell';
       table.addFilter(filter);
-      table.filter();
 
       expect(table.filteredRows().length).toBe(1);
       expect(table.filteredRows()[0]).toBe(table.rows[1]);
@@ -153,19 +147,16 @@ describe('TableTextUserFilter', () => {
 
       filter.text = 'bean1';
       table.addFilter(filter);
-      table.filter();
 
       expect(table.filteredRows().length).toBe(1);
       expect(table.filteredRows()[0]).toBe(table.rows[1]);
 
       filter.text = 'asdf';
       table.addFilter(filter);
-      table.filter();
 
       expect(table.filteredRows().length).toBe(0);
 
       table.removeFilter(filter);
-      table.filter();
 
       expect(table.filteredRows().length).toBe(2);
     });

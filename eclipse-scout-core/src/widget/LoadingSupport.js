@@ -9,22 +9,20 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, scout} from '../index';
+import WidgetSupport from './WidgetSupport';
 
-export default class LoadingSupport {
+export default class LoadingSupport extends WidgetSupport {
 
   /**
-   * @param {object} options a mandatory options object
-   * @param {Widget} options.widget Widget that created the loading support
-   * @param {$|function} [options.$container] jQuery element that will be used for the loading visualization.
-   *  It may be a function to resolve the container later when the loading state will be visualized.
-   *  If this property is not set the $container of the widget is used by default.
-   * @param {number} [options.loadingIndicatorDelay] if not set: 250 ms
+   * @typedef {WidgetSupportOptions} LoadingSupportOptions
+   * @property {number} loadingIndicatorDelay if not set: 250 ms
+   */
+
+  /**
+   * @param {LoadingSupportOptions} options a mandatory options object
    */
   constructor(options) {
-    scout.assertParameter('widget', options.widget);
-
-    this.widget = options.widget;
-    this.options$Container = options.$container;
+    super(options);
     this.loadingIndicatorDelay = scout.nvl(options.loadingIndicatorDelay, 250); // ms
 
     this._$loadingIndicator = null;

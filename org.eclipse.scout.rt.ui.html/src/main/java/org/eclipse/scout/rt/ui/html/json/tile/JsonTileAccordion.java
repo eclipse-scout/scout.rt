@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,16 +33,22 @@ public class JsonTileAccordion<T extends ITileAccordion> extends JsonAccordion<T
 
     // Selectable and multi select have to be in sync because the selection behavior affects the whole accordion (every tile grid)
     // Other properties may theoretically be different for each tile grid (although it has not been tested so far if it really works).
-    putJsonProperty(new JsonProperty<T>(ITileAccordion.PROP_SELECTABLE, model) {
+    putJsonProperty(new JsonProperty<>(ITileAccordion.PROP_SELECTABLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isSelectable();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileAccordion.PROP_MULTI_SELECT, model) {
+    putJsonProperty(new JsonProperty<>(ITileAccordion.PROP_MULTI_SELECT, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isMultiSelect();
+      }
+    });
+    putJsonProperty(new JsonProperty<>(ITileAccordion.PROP_TEXT_FILTER_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTextFilterEnabled();
       }
     });
   }

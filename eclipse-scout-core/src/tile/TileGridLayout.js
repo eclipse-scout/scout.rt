@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -123,6 +123,7 @@ export default class TileGridLayout extends LogicalGridLayout {
     } else {
       this._onAnimationDone();
     }
+    this._updateFilterFieldMaxWidth($container);
   }
 
   _sizeChanged(htmlComp) {
@@ -436,5 +437,11 @@ export default class TileGridLayout extends LogicalGridLayout {
     // Reset to previous gridColumnCount (prefSize should not modify properties)
     this.widget.gridColumnCount = gridColumnCount;
     return prefSize;
+  }
+
+  _updateFilterFieldMaxWidth($container) {
+    let htmlComp = HtmlComponent.get($container),
+      width = htmlComp.availableSize().subtract(htmlComp.insets()).width;
+    this.widget.$filterFieldContainer.css('--filter-field-max-width', (width * 0.6) + 'px');
   }
 }

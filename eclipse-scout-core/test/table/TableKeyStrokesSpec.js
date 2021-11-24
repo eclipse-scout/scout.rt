@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -150,7 +150,6 @@ describe('TableKeyStrokes', () => {
         createKey: () => 1,
         accept: row => row !== rows[4]
       });
-      table.filter();
 
       table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [rows[0]]);
@@ -319,7 +318,6 @@ describe('TableKeyStrokes', () => {
         createKey: () => 1,
         accept: row => row !== rows[1]
       });
-      table.filter();
 
       table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [rows[5]]);
@@ -443,7 +441,6 @@ describe('TableKeyStrokes', () => {
           createKey: () => 1,
           accept: row => row !== rows[1]
         });
-        table.filter();
 
         table.$data.triggerKeyDown(keys.END, 'shift');
         helper.assertSelection(table, [rows[3], rows[4], rows[5]]);
@@ -537,7 +534,6 @@ describe('TableKeyStrokes', () => {
           createKey: () => 1,
           accept: row => row !== rows[4]
         });
-        table.filter();
 
         table.$data.triggerKeyDown(keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[3]]);

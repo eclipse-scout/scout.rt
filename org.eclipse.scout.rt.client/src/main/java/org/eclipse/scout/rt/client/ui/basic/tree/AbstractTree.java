@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -413,6 +413,12 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     return CheckableStyle.CHECKBOX_TREE_NODE;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(160)
+  protected boolean getConfiguredTextFilterEnabled() {
+    return true;
+  }
+
   private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IKeyStroke>> fca = ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
@@ -567,6 +573,7 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     setAutoTitle(getConfiguredAutoTitle());
     setCheckable(getConfiguredCheckable());
     setCheckableStyle(getConfiguredCheckableStyle());
+    setTextFilterEnabled(getConfiguredTextFilterEnabled());
     setNodeHeightHint(getConfiguredNodeHeightHint());
     setMultiCheck(getConfiguredMultiCheck());
     setMultiSelect(getConfiguredMultiSelect());
@@ -1020,6 +1027,16 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   @Override
   public void setCheckableStyle(CheckableStyle checkableStyle) {
     propertySupport.setProperty(PROP_CHECKABLE_STYLE, checkableStyle);
+  }
+
+  @Override
+  public boolean isTextFilterEnabled() {
+    return propertySupport.getPropertyBool(PROP_TEXT_FILTER_ENABLED);
+  }
+
+  @Override
+  public void setTextFilterEnabled(boolean textFilterEnabled) {
+    propertySupport.setProperty(PROP_TEXT_FILTER_ENABLED, textFilterEnabled);
   }
 
   @Override

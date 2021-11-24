@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -504,7 +504,6 @@ describe('HierarchicalTableSpec', () => {
     it('of all rows is valid if parent rows do not match a filter condition', () => {
       // expects 1 row and its parents are visible
       createAndRegisterColumnFilter(table, table.columns[0], ['row2']);
-      table.filter();
       let expectedRowIds = [0, 1, 2];
       expectRowIds(table.visibleRows, expectedRowIds);
       expect(arrays.equalsIgnoreOrder(expectedRowIds, Object.keys(table.visibleRowsMap).map(n => {
@@ -517,7 +516,6 @@ describe('HierarchicalTableSpec', () => {
     it('a single row matching the filter', () => {
       // expects 1 row and its parents are visible
       createAndRegisterColumnFilter(table, table.columns[0], ['row4']);
-      table.filter();
       let expectedRowIds = [3, 4];
       expectRowIds(table.visibleRows, expectedRowIds);
       table.selectRow(table.rows[4]);
@@ -527,7 +525,6 @@ describe('HierarchicalTableSpec', () => {
     it('a single row which is a parent row of a row matching the filter', () => {
       // expects 1 row and its parents are visible
       createAndRegisterColumnFilter(table, table.columns[0], ['row4']);
-      table.filter();
       let expectedRowIds = [3, 4];
       expectRowIds(table.visibleRows, expectedRowIds);
       table.selectRow(table.rows[3]);
@@ -537,7 +534,6 @@ describe('HierarchicalTableSpec', () => {
     it('of a not visible row due to a filter', () => {
       // expects 1 row and its parents are visible
       createAndRegisterColumnFilter(table, table.columns[0], ['row4']);
-      table.filter();
       let expectedRowIds = [3, 4];
       expectRowIds(table.visibleRows, expectedRowIds);
       table.selectRow(table.rows[2]);
@@ -746,7 +742,6 @@ describe('HierarchicalTableSpec', () => {
 
       // expects 1 row and its parents are visible
       createAndRegisterColumnFilter(table, column0, ['row2']);
-      table.filter();
       expect(table.getVisibleRows().length).toBe(3);
 
       table.collapseRow(rows[1]);
@@ -861,7 +856,6 @@ describe('HierarchicalTableSpec', () => {
 
     it('up - expect the row gets moved above the previous visible row', () => {
       createAndRegisterColumnFilter(table, table.columns[0], ['a']);
-      table.filter();
       expectRowIds(table.visibleRows, [1, 2, 3, 6]);
       table.moveVisibleRowUp(rows[6]);
       expectRowIds(table.rows, [0, 1, 6, 2, 3, 4, 5, 7]);
@@ -881,7 +875,6 @@ describe('HierarchicalTableSpec', () => {
 
     it('down - expect the row gets moved below the next visible row', () => {
       createAndRegisterColumnFilter(table, table.columns[0], ['a']);
-      table.filter();
       expectRowIds(table.visibleRows, [1, 2, 3, 6]);
 
       table.moveVisibleRowDown(rows[1]);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1982,7 +1982,6 @@ describe('Tree', () => {
         accept: node => node === tree.nodes[0]
       };
       tree.addFilter(filter);
-      tree.filter();
       expect(tree.nodes[0].filterAccepted).toBe(true);
       expect(tree.nodes[0].childNodes[0].filterAccepted).toBe(false);
 
@@ -2186,6 +2185,181 @@ describe('Tree', () => {
         done();
       });
     });
+
+    it('show/hide parents correctly depending on their children', () => {
+      let model = helper.createModelFixture(3, 2, true),
+        tree = helper.createTree(model),
+        node_0 = tree.nodesMap['0'],
+        node_0_0 = tree.nodesMap['0_0'],
+        node_0_0_0 = tree.nodesMap['0_0_0'], node_0_0_1 = tree.nodesMap['0_0_1'], node_0_0_2 = tree.nodesMap['0_0_2'],
+        node_0_1 = tree.nodesMap['0_1'],
+        node_0_1_0 = tree.nodesMap['0_1_0'], node_0_1_1 = tree.nodesMap['0_1_1'], node_0_1_2 = tree.nodesMap['0_1_2'],
+        node_0_2 = tree.nodesMap['0_2'],
+        node_0_2_0 = tree.nodesMap['0_2_0'], node_0_2_1 = tree.nodesMap['0_2_1'], node_0_2_2 = tree.nodesMap['0_2_2'],
+        node_1 = tree.nodesMap['1'],
+        node_1_0 = tree.nodesMap['1_0'],
+        node_1_0_0 = tree.nodesMap['1_0_0'], node_1_0_1 = tree.nodesMap['1_0_1'], node_1_0_2 = tree.nodesMap['1_0_2'],
+        node_1_1 = tree.nodesMap['1_1'],
+        node_1_1_0 = tree.nodesMap['1_1_0'], node_1_1_1 = tree.nodesMap['1_1_1'], node_1_1_2 = tree.nodesMap['1_1_2'],
+        node_1_2 = tree.nodesMap['1_2'],
+        node_1_2_0 = tree.nodesMap['1_2_0'], node_1_2_1 = tree.nodesMap['1_2_1'], node_1_2_2 = tree.nodesMap['1_2_2'],
+        node_2 = tree.nodesMap['2'],
+        node_2_0 = tree.nodesMap['2_0'],
+        node_2_0_0 = tree.nodesMap['2_0_0'], node_2_0_1 = tree.nodesMap['2_0_1'], node_2_0_2 = tree.nodesMap['2_0_2'],
+        node_2_1 = tree.nodesMap['2_1'],
+        node_2_1_0 = tree.nodesMap['2_1_0'], node_2_1_1 = tree.nodesMap['2_1_1'], node_2_1_2 = tree.nodesMap['2_1_2'],
+        node_2_2 = tree.nodesMap['2_2'],
+        node_2_2_0 = tree.nodesMap['2_2_0'], node_2_2_1 = tree.nodesMap['2_2_1'], node_2_2_2 = tree.nodesMap['2_2_2'],
+        allNodes = [
+          node_0,
+          node_0_0,
+          node_0_0_0, node_0_0_1, node_0_0_2,
+          node_0_1,
+          node_0_1_0, node_0_1_1, node_0_1_2,
+          node_0_2,
+          node_0_2_0, node_0_2_1, node_0_2_2,
+          node_1,
+          node_1_0,
+          node_1_0_0, node_1_0_1, node_1_0_2,
+          node_1_1,
+          node_1_1_0, node_1_1_1, node_1_1_2,
+          node_1_2,
+          node_1_2_0, node_1_2_1, node_1_2_2,
+          node_2,
+          node_2_0,
+          node_2_0_0, node_2_0_1, node_2_0_2,
+          node_2_1,
+          node_2_1_0, node_2_1_1, node_2_1_2,
+          node_2_2,
+          node_2_2_0, node_2_2_1, node_2_2_2
+        ],
+        expectExactlyNodesToBeVisible = exactlyVisibleNodes => {
+          Tree.visitNodes(node => {
+            if (exactlyVisibleNodes.indexOf(node) > -1) {
+              expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
+              expect(tree.visibleNodesMap[node.id]).toBeTruthy();
+            } else {
+              expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
+              expect(tree.visibleNodesMap[node.id]).toBeFalsy();
+            }
+          }, tree.nodes);
+        };
+
+      tree.render();
+
+      [node_2, node_2_0, node_2_1, node_2_2].forEach(node => node.enabled = false);
+
+      let idEndsWith0Filter = node => strings.endsWith(node.id, '0'),
+        level0Filter = node => node.level === 0,
+        enabledFilter = node => node.enabled;
+
+      expectExactlyNodesToBeVisible(allNodes);
+
+      tree.addFilter(idEndsWith0Filter);
+
+      expectExactlyNodesToBeVisible([
+        // nodes matching the filter
+        node_0, node_0_0, node_0_0_0, node_0_1_0, node_0_2_0, node_1_0, node_1_0_0, node_1_1_0, node_1_2_0, node_2_0, node_2_0_0, node_2_1_0, node_2_2_0,
+        // nodes not matching the filter but with children matching the filter
+        node_0_1, node_0_2, node_1, node_1_1, node_1_2, node_2, node_2_1, node_2_2
+      ]);
+
+      tree.addFilter(level0Filter);
+
+      // notice the nodes that where only visible due to their children are now hidden as there are no children anymore that match the filter
+      expectExactlyNodesToBeVisible([
+        // nodes matching the filter
+        node_0
+        // nodes not matching the filter but with children matching the filter
+        // -
+      ]);
+
+      tree.removeFilter(idEndsWith0Filter);
+
+      expectExactlyNodesToBeVisible([
+        // nodes matching the filter
+        node_0, node_1, node_2
+        // nodes not matching the filter but with children matching the filter
+        // -
+      ]);
+
+      tree.setFilters(idEndsWith0Filter);
+
+      // notice node_1 and node_2 changed from "nodes matching the filter" to "nodes not matching the filter but with children matching the filter"
+      expectExactlyNodesToBeVisible([
+        // nodes matching the filter
+        node_0, node_0_0, node_0_0_0, node_0_1_0, node_0_2_0, node_1_0, node_1_0_0, node_1_1_0, node_1_2_0, node_2_0, node_2_0_0, node_2_1_0, node_2_2_0,
+        // nodes not matching the filter but with children matching the filter
+        node_0_1, node_0_2, node_1, node_1_1, node_1_2, node_2, node_2_1, node_2_2
+      ]);
+
+      tree.addFilter(enabledFilter);
+
+      // situation stays the same as all nodes in level 2 are enabled, only node_2_0 is now a "node not matching the filter but with children matching the filter"
+      expectExactlyNodesToBeVisible([
+        // nodes matching the filter
+        node_0, node_0_0, node_0_0_0, node_0_1_0, node_0_2_0, node_1_0, node_1_0_0, node_1_1_0, node_1_2_0, node_2_0_0, node_2_1_0, node_2_2_0,
+        // nodes not matching the filter but with children matching the filter
+        node_0_1, node_0_2, node_1, node_1_1, node_1_2, node_2, node_2_0, node_2_1, node_2_2
+      ]);
+
+      // set node_2_0_0 and node_2_1_0 disabled, this will apply the filters again on those nodes
+      tree.updateNodes([node_2_0_0, node_2_1_0].map(node => ({
+        id: node.id,
+        enabled: false
+      })));
+
+      // as node_2_0_0 and node_2_1_0 are now disabled, they and their parents node_2_0 and node_2_1 are no longer visible
+      expectExactlyNodesToBeVisible([
+        // nodes matching the filter
+        node_0, node_0_0, node_0_0_0, node_0_1_0, node_0_2_0, node_1_0, node_1_0_0, node_1_1_0, node_1_2_0, node_2_2_0,
+        // nodes not matching the filter but with children matching the filter
+        node_0_1, node_0_2, node_1, node_1_1, node_1_2, node_2, node_2_2
+      ]);
+
+      // set node_2_2_0 disabled, this will apply the filters again on those nodes
+      tree.updateNodes({
+        id: node_2_2_0.id,
+        enabled: false
+      });
+
+      // as node_2_2_0 is now disabled, the whole 2-branch (node_2 and all children) is no longer visible
+      expectExactlyNodesToBeVisible([
+        // nodes matching the filter
+        node_0, node_0_0, node_0_0_0, node_0_1_0, node_0_2_0, node_1_0, node_1_0_0, node_1_1_0, node_1_2_0,
+        // nodes not matching the filter but with children matching the filter
+        node_0_1, node_0_2, node_1, node_1_1, node_1_2
+      ]);
+
+      // set the remaining nodes in the 2-branch on level 2 disabled, this will apply the filters again on those nodes
+      tree.updateNodes([node_2_0_1, node_2_0_2, node_2_1_1, node_2_1_2, node_2_2_1, node_2_2_2].map(node => ({
+        id: node.id,
+        enabled: false
+      })));
+
+      // as the whole 2-branch was already invisible the situation stays the same
+      expectExactlyNodesToBeVisible([
+        // nodes matching the filter
+        node_0, node_0_0, node_0_0_0, node_0_1_0, node_0_2_0, node_1_0, node_1_0_0, node_1_1_0, node_1_2_0,
+        // nodes not matching the filter but with children matching the filter
+        node_0_1, node_0_2, node_1, node_1_1, node_1_2
+      ]);
+
+      tree.removeFilter(idEndsWith0Filter);
+
+      // the 0-branch and the 1-branch are enabled and therefore visible, the 2-branch stays invisible
+      expectExactlyNodesToBeVisible([
+        // nodes matching the filter
+        node_0, node_0_0, node_0_0_0, node_0_0_1, node_0_0_2, node_0_1, node_0_1_0, node_0_1_1, node_0_1_2, node_0_2, node_0_2_0, node_0_2_1, node_0_2_2,
+        node_1, node_1_0, node_1_0_0, node_1_0_1, node_1_0_2, node_1_1, node_1_1_0, node_1_1_1, node_1_1_2, node_1_2, node_1_2_0, node_1_2_1, node_1_2_2
+        // nodes not matching the filter but with children matching the filter
+        // -
+      ]);
+
+      tree.setFilters([]);
+
+      expectExactlyNodesToBeVisible(allNodes);
+    });
   });
 
   describe('tree enabled/disabled', () => {
@@ -2247,7 +2421,7 @@ describe('Tree', () => {
         });
       });
 
-      it('filter node -> filtered node and children has to be removed from visible', () => {
+      it('filter node -> filtered node is visible due to not filtered children', () => {
         let filterNode = tree.nodes[0];
         let filter = {
           accept: node => node !== filterNode
@@ -2256,8 +2430,28 @@ describe('Tree', () => {
 
         tree.nodes.forEach(node => {
           if (node === filterNode) {
-            expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
-            expect(tree.visibleNodesMap[node.id]).toBeFalsy();
+            expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
+            expect(tree.visibleNodesMap[node.id]).toBeTruthy();
+            Tree.visitNodes(childNode => {
+              expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
+              expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
+            }, node.childNodes);
+          } else {
+            expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
+            expect(tree.visibleNodesMap[node.id]).toBeTruthy();
+            Tree.visitNodes(childNode => {
+              expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
+              expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
+            }, node.childNodes);
+          }
+        });
+
+        tree.collapseNode(filterNode);
+
+        tree.nodes.forEach(node => {
+          if (node === filterNode) {
+            expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
+            expect(tree.visibleNodesMap[node.id]).toBeTruthy();
             Tree.visitNodes(childNode => {
               expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
               expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
@@ -2284,22 +2478,30 @@ describe('Tree', () => {
           expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
           expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
         });
-        let nodeToChange = tree.nodes[0];
 
-        let clone = {
-          checked: nodeToChange.checked,
-          childNodeIndex: nodeToChange.childNodeIndex,
-          childNodes: nodeToChange.childNodes,
-          enabled: false,
-          expanded: nodeToChange.expanded,
-          expandedLazy: nodeToChange.expandedLazy,
-          id: '0',
-          lazyExpandingEnabled: nodeToChange.lazyExpandingEnabled,
-          leaf: nodeToChange.leaf,
-          text: nodeToChange.text
-        };
+        let nodeToChange = tree.nodes[0],
+          clones = [];
 
-        tree.updateNodes([clone]);
+        tree.visitNodes(node => {
+          if (node.level === 0 && node !== nodeToChange) {
+            return true;
+          }
+          clones.push({
+            checked: node.checked,
+            childNodeIndex: node.childNodeIndex,
+            childNodes: node.childNodes,
+            enabled: false,
+            expanded: node.expanded,
+            expandedLazy: node.expandedLazy,
+            id: node.id,
+            lazyExpandingEnabled: node.lazyExpandingEnabled,
+            leaf: node.leaf,
+            text: node.text
+          });
+          return false;
+        });
+
+        tree.updateNodes(clones);
 
         tree.nodes.forEach(node => {
           if (node === nodeToChange) {
@@ -2340,7 +2542,7 @@ describe('Tree', () => {
         let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         newNode0Child3.expanded = true;
         let filter = {
-          accept: node => tree.nodes[0].id !== node.id
+          accept: node => !(strings.startsWith(node.id, '0') && !strings.endsWith(node.id, '3'))
         };
         tree.addFilter(filter);
 
@@ -2364,11 +2566,16 @@ describe('Tree', () => {
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
         tree.nodes.forEach(node => {
           if (node === tree.nodes[0]) {
-            expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
-            expect(tree.visibleNodesMap[node.id]).toBeFalsy();
+            expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();
+            expect(tree.visibleNodesMap[node.id]).toBeTruthy();
             Tree.visitNodes(childNode => {
-              expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
-              expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
+              if (childNode.id === '0_3') {
+                expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
+                expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
+              } else {
+                expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeFalsy();
+                expect(tree.visibleNodesMap[childNode.id]).toBeFalsy();
+              }
             }, node.childNodes);
           } else {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeTruthy();

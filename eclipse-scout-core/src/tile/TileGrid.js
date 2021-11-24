@@ -8,36 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  ContextMenuKeyStroke,
-  DoubleClickSupport,
-  graphics,
-  HtmlComponent,
-  KeyStrokeContext,
-  LoadingSupport,
-  LogicalGridData,
-  MenuDestinations,
-  menus as menus_1,
-  numbers,
-  objects,
-  PlaceholderTile,
-  Range,
-  scout,
-  TileGridGridConfig,
-  TileGridLayout,
-  TileGridLayoutConfig,
-  TileGridSelectAllKeyStroke,
-  TileGridSelectDownKeyStroke,
-  TileGridSelectFirstKeyStroke,
-  TileGridSelectionHandler,
-  TileGridSelectLastKeyStroke,
-  TileGridSelectLeftKeyStroke,
-  TileGridSelectRightKeyStroke,
-  TileGridSelectUpKeyStroke,
-  VirtualScrolling,
-  Widget
-} from '../index';
+import {arrays, ContextMenuKeyStroke, DoubleClickSupport, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGridData, MenuDestinations, menus as menus_1, numbers, objects, PlaceholderTile, Range, scout, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, VirtualScrolling, Widget} from '../index';
 import $ from 'jquery';
 
 /**
@@ -57,7 +28,7 @@ export default class TileGrid extends Widget {
     this.empty = false;
     this.filters = [];
     this.filteredTiles = [];
-    this.filteredTilesDirty = true;
+    this.filteredElementsDirty = true;
     this.focusedTile = null;
     // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
     this.gridColumnCount = 4;
@@ -82,6 +53,13 @@ export default class TileGrid extends Widget {
     this.virtual = false;
     this.virtualScrolling = null;
     this.withPlaceholders = false;
+
+    this.$filterFieldContainer = null;
+    this.textFilterEnabled = false;
+    this.filterSupport = this._createFilterSupport();
+    this.createTextFilter = null;
+    this.updateTextFilterText = null;
+
     this._filterMenusHandler = this._filterMenus.bind(this);
     this._renderViewPortAfterAttach = false;
     this._scrollParentScrollHandler = this._onScrollParentScroll.bind(this);
@@ -98,8 +76,9 @@ export default class TileGrid extends Widget {
     this._setLayoutConfig(this.layoutConfig);
     this._initVirtualScrolling();
     this._initTiles();
-    this._applyFilters(this.tiles);
-    this._updateFilteredTiles();
+    this.setFilters(this.filters, false);
+    this.filter();
+    this.updateFilteredElements();
     this._setMenus(this.menus);
   }
 
@@ -175,6 +154,7 @@ export default class TileGrid extends Widget {
       .on('mousedown', TILE_SELECTOR, this._onTileMouseDown.bind(this))
       .on('click', TILE_SELECTOR, this._onTileClick.bind(this))
       .on('dblclick', TILE_SELECTOR, this._onTileDoubleClick.bind(this));
+    this.$filterFieldContainer = this.$container.prependDiv('filter-field-container');
   }
 
   _createLayout() {
@@ -188,6 +168,7 @@ export default class TileGrid extends Widget {
     this._renderVirtual();
     this._renderSelectable();
     this._renderEmpty();
+    this._renderTextFilterEnabled();
   }
 
   _remove() {
@@ -195,6 +176,7 @@ export default class TileGrid extends Widget {
     this.$fillAfter = null;
     this.viewRangeRendered = new Range(0, 0);
     this._updateVirtualScrollable();
+    this.filterSupport.remove();
     super._remove();
   }
 
@@ -216,7 +198,7 @@ export default class TileGrid extends Widget {
   }
 
   _updateTabbable() {
-    this.$container.setTabbable(this.enabled && this.selectable);
+    this.$container.setTabbable(this.enabled);
   }
 
   insertTile(tile) {
@@ -281,10 +263,10 @@ export default class TileGrid extends Widget {
     this._deleteTiles(tilesToDelete);
 
     this._sort(tiles);
-    this.filteredTilesDirty = this.filteredTilesDirty || tilesToDelete.length > 0 || tilesToInsert.length > 0 || !arrays.equals(this.tiles, tiles); // last check necessary if sorting changed
+    this.filteredElementsDirty = this.filteredElementsDirty || tilesToDelete.length > 0 || tilesToInsert.length > 0 || !arrays.equals(this.tiles, tiles); // last check necessary if sorting changed
     let currentTiles = this.tiles;
     this._setProperty('tiles', tiles);
-    this._updateFilteredTiles();
+    this.updateFilteredElements();
 
     if (this.rendered) {
       this._renderTileDelta();
@@ -437,15 +419,15 @@ export default class TileGrid extends Widget {
     let tiles = this.tiles.slice();
     this._sort(tiles);
     if (arrays.equals(this.tiles, tiles)) {
-      // Check is needed anyway to determine whether filteredTilesDirty needs to be set, so we can use it here as well to early return if nothing changed
+      // Check is needed anyway to determine whether filteredElementsDirty needs to be set, so we can use it here as well to early return if nothing changed
       return;
     }
     let currentTiles = this.tiles;
     this._setProperty('tiles', tiles);
 
     // Sort list of filtered tiles as well
-    this.filteredTilesDirty = true;
-    this._updateFilteredTiles();
+    this.filteredElementsDirty = true;
+    this.updateFilteredElements();
 
     if (this.rendered) {
       this._renderTileDelta();
@@ -802,7 +784,6 @@ export default class TileGrid extends Widget {
 
   _renderSelectable() {
     this.$container.toggleClass('selectable', this.selectable);
-    this._updateTabbable();
     this.invalidateLayoutTree();
   }
 
@@ -1001,98 +982,105 @@ export default class TileGrid extends Widget {
     }
   }
 
-  addFilter(filter) {
-    this.addFilters([filter]);
+  /**
+   * @param {Filter|function|(Filter|function)[]} filter The filters to add.
+   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   */
+  addFilter(filter, applyFilter = true) {
+    this.filterSupport.addFilter(filter, applyFilter);
   }
 
-  addFilters(filtersToAdd) {
-    filtersToAdd = arrays.ensure(filtersToAdd);
-    let filters = this.filters.slice();
-    filtersToAdd.forEach(filter => {
-      if (filters.indexOf(filter) >= 0) {
-        return;
-      }
-      filters.push(filter);
-    });
-    if (filters.length === this.filters.length) {
-      return;
-    }
-    this.setFilters(filters);
+  /**
+   * @param {Filter|function|(Filter|function)[]} filter The filters to remove.
+   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   */
+  removeFilter(filter, applyFilter = true) {
+    this.filterSupport.removeFilter(filter, applyFilter);
   }
 
-  removeFilter(filter) {
-    this.removeFilters([filter]);
-  }
-
-  removeFilters(filtersToRemove) {
-    filtersToRemove = arrays.ensure(filtersToRemove);
-    let filters = this.filters.slice();
-    if (!arrays.removeAll(filters, filtersToRemove)) {
-      return;
-    }
-    this.setFilters(filters);
-  }
-
-  setFilters(filters) {
-    this.setProperty('filters', filters.slice());
+  /**
+   * @param {Filter|function|(Filter|function)[]} filter The new filters.
+   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   */
+  setFilters(filters, applyFilter = true) {
+    this.filterSupport.setFilters(filters, applyFilter);
   }
 
   filter() {
-    let currentTiles = this.tiles;
-    // Full reset is set to true to loop through every tile and make sure tile.filterAccepted is correctly set
-    let filterResult = this._applyFilters(this.tiles, true);
-    this._updateFilteredTiles();
-    if (this.rendered) {
-      // Not all tiles may be rendered yet (e.g. if filter is active before grid is rendered and removed after grid is rendered)
-      // But updating the view range is necessary anyway (fillers, scrollbars, viewRangeRendered etc.)
-      this._renderTileDelta(filterResult);
-      this._renderTileOrder(currentTiles);
-    }
+    this.filterSupport.filter();
   }
 
   _applyFilters(tiles, fullReset) {
-    if (this.filters.length === 0 && !scout.nvl(fullReset, false)) {
-      return;
-    }
-    let newlyShownTiles = [];
-    let newlyHiddenTiles = [];
-    let changed = false;
-    tiles.forEach(function(tile) {
-      if (this._applyFiltersForTile(tile)) {
-        changed = true;
-        if (tile.filterAccepted) {
-          newlyShownTiles.push(tile);
-        } else {
-          newlyHiddenTiles.push(tile);
-          if (tile === this.focusedTile) {
-            this.setFocusedTile(null);
-          }
-        }
-      }
-    }, this);
-
-    if (changed) {
-      this.filteredTilesDirty = true;
-    }
-
-    // Non visible tiles must be deselected
-    this.deselectTiles(newlyHiddenTiles);
-    return {
-      newlyHiddenTiles: newlyHiddenTiles,
-      newlyShownTiles: newlyShownTiles
-    };
+    return this.filterSupport.applyFilters(tiles, fullReset);
   }
 
-  _updateFilteredTiles() {
-    let tiles = this.tiles;
-    if (this.filters.length > 0) {
-      tiles = this._filterTiles();
+  /**
+   * @returns {FilterSupport}
+   */
+  _createFilterSupport() {
+    return new FilterSupport({
+      widget: this,
+      $container: () => this.$filterFieldContainer,
+      getElementsForFiltering: () => this.tiles,
+      createTextFilter: this._createTextFilter.bind(this),
+      updateTextFilterText: this._updateTextFilterText.bind(this)
+    });
+  }
+
+  _createTextFilter() {
+    if (objects.isFunction(this.createTextFilter)) {
+      return this.createTextFilter();
     }
-    if (this.filteredTilesDirty) {
-      this.setProperty('filteredTiles', tiles);
-      this.invalidateLogicalGrid(false);
-      this.filteredTilesDirty = false;
+    return new TileTextFilter();
+  }
+
+  _updateTextFilterText(filter, text) {
+    if (objects.isFunction(this.updateTextFilterText)) {
+      return this.updateTextFilterText(filter, text);
     }
+    if (filter instanceof TileTextFilter) {
+      return filter.setText(text);
+    }
+    return false;
+  }
+
+  setTextFilterEnabled(textFilterEnabled) {
+    this.setProperty('textFilterEnabled', textFilterEnabled);
+  }
+
+  isTextFilterFieldVisible() {
+    return this.textFilterEnabled;
+  }
+
+  _renderTextFilterEnabled() {
+    this.filterSupport.renderFilterField();
+  }
+
+  updateFilteredElements(result, opts) {
+    if (!this.filteredElementsDirty) {
+      this._updateEmpty();
+      return;
+    }
+
+    this.setProperty('filteredTiles', this._filterTiles());
+    this.invalidateLogicalGrid(false);
+    this.filteredElementsDirty = false;
+
+    if (result) {
+      if (result.newlyHidden.some(tile => tile === this.focusedTile)) {
+        this.setFocusedTile(null);
+      }
+      // Non visible tiles must be deselected
+      this.deselectTiles(result.newlyHidden);
+
+      if (this.rendered) {
+        // Not all tiles may be rendered yet (e.g. if filter is active before grid is rendered and removed after grid is rendered)
+        // But updating the view range is necessary anyway (fillers, scrollbars, viewRangeRendered etc.)
+        this._renderTileDelta(result);
+        this._renderTileOrder(this.tiles);
+      }
+    }
+
     this._updateEmpty();
   }
 
@@ -1107,32 +1095,6 @@ export default class TileGrid extends Widget {
   _renderEmpty() {
     this.$container.toggleClass('empty', this.empty);
     this.invalidateLayoutTree();
-  }
-
-  /**
-   * @returns {Boolean} true if tile state has changed, false if not
-   */
-  _applyFiltersForTile(tile) {
-    if (this._tileAcceptedByFilters(tile)) {
-      if (!tile.filterAccepted) {
-        tile.setFilterAccepted(true);
-        return true;
-      }
-    } else if (tile.filterAccepted) {
-      tile.setFilterAccepted(false);
-      return true;
-    }
-    return false;
-  }
-
-  _tileAcceptedByFilters(tile) {
-    return !this.filters.some(filter => {
-      // return true if an element was found which is not accepted by the filter to break the some() loop
-      if (tile instanceof PlaceholderTile) {
-        return false;
-      }
-      return !filter.accept(tile);
-    });
   }
 
   /**
@@ -1380,14 +1342,14 @@ export default class TileGrid extends Widget {
     let tilesToRemove = arrays.diff(prevTiles, newTiles);
     let tilesToRender = arrays.diff(newTiles, prevTiles);
     if (filterResult) {
-      filterResult.newlyHiddenTiles.forEach(function(tile) {
+      filterResult.newlyHidden.forEach(function(tile) {
         if (tile.rendered) {
           this._removeTileByFilter(tile);
         }
       }, this);
     }
 
-    // tilesToRemove contains newlyHiddenTiles as well but remove() does nothing if it is already removing
+    // tilesToRemove contains newlyHidden as well but remove() does nothing if it is already removing
     tilesToRemove.forEach(tile => {
       tile.remove();
     });
@@ -1399,7 +1361,7 @@ export default class TileGrid extends Widget {
       // Suppress because Tile.js would invalidate which leads to poor performance if grid is used in a Group.js and group is being expanded while tiles are shown
       // invalidating will be done afterwards anyway so no need to do it for each tile
       this.htmlComp.suppressInvalidate = true;
-      filterResult.newlyShownTiles.forEach(function(tile) {
+      filterResult.newlyShown.forEach(function(tile) {
         if (tile.rendered) {
           this._renderTileVisibleForFilter(tile);
         }

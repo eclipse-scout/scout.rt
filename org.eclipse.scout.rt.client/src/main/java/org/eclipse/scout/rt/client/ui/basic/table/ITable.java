@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -272,6 +272,13 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * @since 10.0
    */
   String PROP_CLIENT_UI_PREFERENCES_ENABLED = "clientUiPreferencesEnabled";
+
+  /**
+   * type boolean
+   *
+   * @since 22.0
+   */
+  String PROP_TEXT_FILTER_ENABLED = "textFilterEnabled";
 
   /**
    * Alternative loading style. Adds a decent loading animation at the top of the table. To enable it, add this css
@@ -556,6 +563,10 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   boolean isClientUiPreferencesEnabled();
 
   void setClientUiPreferencesEnabled(boolean clientUiPreferencesEnabled);
+
+  boolean isTextFilterEnabled();
+
+  void setTextFilterEnabled(boolean textFilterEnabled);
 
   boolean isMultilineText();
 

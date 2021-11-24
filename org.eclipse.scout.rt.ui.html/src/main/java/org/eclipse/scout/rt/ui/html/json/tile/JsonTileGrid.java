@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -69,13 +69,13 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<T>(ITileGrid.PROP_TILES, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<>(ITileGrid.PROP_TILES, model, getUiSession()) {
       @Override
       protected List<? extends ITile> modelValue() {
         return getModel().getTiles();
       }
     });
-    putJsonProperty(new JsonAdapterProperty<T>(ITileGrid.PROP_SELECTED_TILES, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<>(ITileGrid.PROP_SELECTED_TILES, model, getUiSession()) {
       @Override
       protected List<? extends ITile> modelValue() {
         return getModel().getSelectedTiles();
@@ -86,7 +86,7 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
         return new JsonAdapterPropertyConfigBuilder().disposeOnChange(false).build();
       }
     });
-    putJsonProperty(new JsonAdapterProperty<T>(ITileGrid.PROP_FILTERED_TILES, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<>(ITileGrid.PROP_FILTERED_TILES, model, getUiSession()) {
       @Override
       protected List<? extends ITile> modelValue() {
         return getModel().getFilteredTiles();
@@ -112,37 +112,37 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
         return getModel().getGridColumnCount();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_SELECTABLE, model) {
+    putJsonProperty(new JsonProperty<>(ITileGrid.PROP_SELECTABLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isSelectable();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_MULTI_SELECT, model) {
+    putJsonProperty(new JsonProperty<>(ITileGrid.PROP_MULTI_SELECT, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isMultiSelect();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_WITH_PLACEHOLDERS, model) {
+    putJsonProperty(new JsonProperty<>(ITileGrid.PROP_WITH_PLACEHOLDERS, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isWithPlaceholders();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_SCROLLABLE, model) {
+    putJsonProperty(new JsonProperty<>(ITileGrid.PROP_SCROLLABLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isScrollable();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_LOGICAL_GRID, model) {
+    putJsonProperty(new JsonProperty<>(ITileGrid.PROP_LOGICAL_GRID, model) {
       @Override
       protected String modelValue() {
         return getModel().getLogicalGrid();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_LAYOUT_CONFIG, model) {
+    putJsonProperty(new JsonProperty<>(ITileGrid.PROP_LAYOUT_CONFIG, model) {
       @Override
       protected TileGridLayoutConfig modelValue() {
         return getModel().getLayoutConfig();
@@ -153,22 +153,28 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
         return new JsonTileGridLayoutConfig((TileGridLayoutConfig) value).toJson();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_VIRTUAL, model) {
+    putJsonProperty(new JsonProperty<>(ITileGrid.PROP_VIRTUAL, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isVirtual();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_ANIMATE_TILE_REMOVAL, model) {
+    putJsonProperty(new JsonProperty<>(ITileGrid.PROP_ANIMATE_TILE_REMOVAL, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isAnimateTileRemoval();
       }
     });
-    putJsonProperty(new JsonProperty<T>(ITileGrid.PROP_ANIMATE_TILE_INSERTION, model) {
+    putJsonProperty(new JsonProperty<>(ITileGrid.PROP_ANIMATE_TILE_INSERTION, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isAnimateTileInsertion();
+      }
+    });
+    putJsonProperty(new JsonProperty<>(ITileGrid.PROP_TEXT_FILTER_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTextFilterEnabled();
       }
     });
   }

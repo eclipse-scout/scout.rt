@@ -10,6 +10,7 @@
  */
 import {fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, scout, Status, strings, Table, TableFooterLayout, TableTextUserFilter, Widget} from '../index';
 import $ from 'jquery';
+import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
 
 export default class TableFooter extends Widget {
 
@@ -41,6 +42,8 @@ export default class TableFooter extends Widget {
     this.searchFieldKeyStrokeContext.$scopeTarget = function() {
       return this._$textFilter;
     }.bind(this);
+
+    this._focusFilterFieldKeyStroke = null;
   }
 
   _render() {
@@ -69,6 +72,10 @@ export default class TableFooter extends Widget {
       .appendTo($filter)
       .on('input', '', this._createOnFilterFieldInputFunction().bind(this))
       .placeholder(this.session.text('ui.FilterBy_'));
+
+    this.table.$container.data('filter-field', this._$textFilter);
+    this._focusFilterFieldKeyStroke = new FocusFilterFieldKeyStroke(this.table);
+    this.table.keyStrokeContext.registerKeyStroke(this._focusFilterFieldKeyStroke);
 
     filter = this.table.getFilter(TableTextUserFilter.TYPE);
     if (filter) {
@@ -133,6 +140,9 @@ export default class TableFooter extends Widget {
     this.$controlContainer.stop(false, true);
     this.animating = false; // Animation may not be started yet due to the delay, hence complete callback may not be executed -> make sure the flag is reset anyway
     this.open = false;
+
+    this.table.keyStrokeContext.unregisterKeyStroke(this._focusFilterFieldKeyStroke);
+    this._focusFilterFieldKeyStroke = null;
 
     this.table.off('rowsInserted', this._tableRowsChangedHandler);
     this.table.off('rowsDeleted', this._tableRowsChangedHandler);
@@ -717,8 +727,6 @@ export default class TableFooter extends Widget {
       } else {
         this.table.removeFilterByKey(TableTextUserFilter.TYPE);
       }
-
-      this.table.filter();
     }
   }
 
@@ -762,6 +770,7 @@ export default class TableFooter extends Widget {
 
   _onTableFilter(event) {
     this._renderInfoFilter();
+    this._updateInfoFilterVisibility();
     this._renderInfoSelection();
   }
 

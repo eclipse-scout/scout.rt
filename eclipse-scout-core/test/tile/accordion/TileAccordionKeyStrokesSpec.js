@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,18 +49,6 @@ describe('TileAccordionKeyStrokes', () => {
     };
     model = $.extend({}, defaults, model);
     return scout.create('TileAccordion', model);
-  }
-
-  function createGroup(model) {
-    let defaults = {
-      parent: session.desktop,
-      body: {
-        objectType: 'TileGrid',
-        scrollable: false
-      }
-    };
-    model = $.extend({}, defaults, model);
-    return scout.create('Group', model);
   }
 
   function createTile(model) {
@@ -357,8 +345,6 @@ describe('TileAccordionKeyStrokes', () => {
         };
         accordion.groups[0].body.addFilter(filter);
         accordion.groups[1].body.addFilter(filter);
-        accordion.groups[0].body.filter();
-        accordion.groups[1].body.filter();
         expect(accordion.getSelectedTiles()).toEqual([tiles[2]]);
         expect(accordion.getFocusedTile()).toBe(null);
 
@@ -585,8 +571,6 @@ describe('TileAccordionKeyStrokes', () => {
         };
         accordion.groups[0].body.addFilter(filter);
         accordion.groups[1].body.addFilter(filter);
-        accordion.groups[0].body.filter();
-        accordion.groups[1].body.filter();
         expect(accordion.getSelectedTiles()).toEqual([tiles[1]]);
         expect(accordion.getFocusedTile()).toBe(null);
 
@@ -688,8 +672,6 @@ describe('TileAccordionKeyStrokes', () => {
       };
       accordion.groups[0].body.addFilter(filter);
       accordion.groups[1].body.addFilter(filter);
-      accordion.groups[0].body.filter();
-      accordion.groups[1].body.filter();
       accordion.render();
       accordion.validateLayout();
       accordion.selectTile(tiles[0]);
@@ -919,8 +901,6 @@ describe('TileAccordionKeyStrokes', () => {
         };
         accordion.groups[0].body.addFilter(filter);
         accordion.groups[1].body.addFilter(filter);
-        accordion.groups[0].body.filter();
-        accordion.groups[1].body.filter();
         accordion.validateLayout();
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2]]);
         expect(accordion.getFocusedTile()).toBe(null);
@@ -1150,8 +1130,6 @@ describe('TileAccordionKeyStrokes', () => {
         };
         accordion.groups[0].body.addFilter(filter);
         accordion.groups[1].body.addFilter(filter);
-        accordion.groups[0].body.filter();
-        accordion.groups[1].body.filter();
         accordion.validateLayout();
         expect(accordion.getSelectedTiles()).toEqual([tiles[3], tiles[4]]);
         expect(accordion.getFocusedTile()).toBe(null);

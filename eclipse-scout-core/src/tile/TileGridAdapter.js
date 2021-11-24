@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,14 +49,14 @@ export default class TileGridAdapter extends ModelAdapter {
     if (!objects.isNullOrUndefined(tileIds)) {
       if (!this.tileFilter) {
         this.tileFilter = scout.create('RemoteTileFilter');
-        this.widget.addFilter(this.tileFilter);
+        this.widget.addFilter(this.tileFilter, false);
       }
       this.tileFilter.setTileIds(tileIds);
+      this.widget.filter();
     } else {
       this.widget.removeFilter(this.tileFilter);
       this.tileFilter = null;
     }
-    this.widget.filter();
   }
 
   _onWidgetTileClick(event) {

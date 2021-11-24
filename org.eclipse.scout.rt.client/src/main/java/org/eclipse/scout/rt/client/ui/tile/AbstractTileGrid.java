@@ -104,6 +104,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     setVirtual(getConfiguredVirtual());
     setAnimateTileRemoval(getConfiguredAnimateTileRemoval());
     setAnimateTileInsertion(getConfiguredAnimateTileInsertion());
+    setTextFilterEnabled(getConfiguredTextFilterEnabled());
 
     OrderedCollection<T> tiles = new OrderedCollection<>();
     injectTilesInternal(tiles);
@@ -294,6 +295,12 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   @Order(90)
   protected boolean getConfiguredAnimateTileInsertion() {
     return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredTextFilterEnabled() {
+    return false;
   }
 
   @Override
@@ -542,6 +549,16 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   @Override
   public void setAnimateTileInsertion(boolean animateTileInsertion) {
     propertySupport.setPropertyBool(PROP_ANIMATE_TILE_INSERTION, animateTileInsertion);
+  }
+
+  @Override
+  public boolean isTextFilterEnabled() {
+    return propertySupport.getPropertyBool(PROP_TEXT_FILTER_ENABLED);
+  }
+
+  @Override
+  public void setTextFilterEnabled(boolean textFilterEnabled) {
+    propertySupport.setPropertyBool(PROP_TEXT_FILTER_ENABLED, textFilterEnabled);
   }
 
   /**

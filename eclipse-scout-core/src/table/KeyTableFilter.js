@@ -25,10 +25,6 @@ export default class KeyTableFilter extends TableFilter {
     this.alwaysAcceptedRowIds = [];
   }
 
-  createKey() {
-    return 'KeyTableFilter';
-  }
-
   accept(row) {
     if (!this.active || arrays.empty(this.acceptedKeys) || this.alwaysAcceptedRowIds.indexOf(row.id) !== -1) {
       return true;

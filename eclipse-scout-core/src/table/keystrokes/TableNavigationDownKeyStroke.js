@@ -79,5 +79,8 @@ export default class TableNavigationDownKeyStroke extends AbstractTableNavigatio
     table.selectionHandler.lastActionRow = newActionRow;
     table.selectRows(newSelectedRows, true);
     table.scrollTo(newActionRow);
+    if (!table.isFocused()) {
+      table.focus();
+    }
   }
 }

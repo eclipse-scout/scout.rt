@@ -2841,8 +2841,6 @@ describe('Table', () => {
         selectedValues: ['B-filtered', 'D-filtered', 'F-filtered']
       });
 
-      table.filter();
-
       // Move row D one up
       let rowD = table.rows[3];
       table.moveVisibleRowUp(rowD);
@@ -2909,8 +2907,6 @@ describe('Table', () => {
         column: table.columns[0],
         selectedValues: ['B-filtered', 'D-filtered', 'F-filtered']
       });
-
-      table.filter();
 
       // Move row D one down
       let rowD = table.rows[3];

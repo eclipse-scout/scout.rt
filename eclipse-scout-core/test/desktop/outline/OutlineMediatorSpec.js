@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, Outline, scout} from '../../../src/index';
+import {Device, scout} from '../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../src/testing/index';
 
 describe('OutlineMediator', () => {
@@ -116,7 +116,6 @@ describe('OutlineMediator', () => {
       text: 'bar'
     });
     detailTable.addFilter(filter);
-    detailTable.filter();
 
     expect(page.childNodes.length).toBe(2); // still 2, but
     expect(page.childNodes[0].filterAccepted).toBe(false); // filter is not accepted for 'Foo'
