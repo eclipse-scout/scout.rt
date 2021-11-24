@@ -10,16 +10,6 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -109,7 +99,7 @@ public final class DataObjectVisitors {
     }
   }
 
-  private static final class P_ReplaceDataObjectVisitor<T> extends AbstractDataObjectVisitor {
+  private static final class P_ReplaceDataObjectVisitor<T> extends AbstractReplacingDataObjectVisitor {
 
     private final Class<? extends T> m_elementType;
     private final UnaryOperator<T> m_operator;
@@ -120,135 +110,13 @@ public final class DataObjectVisitors {
     }
 
     @Override
-    protected void caseCollection(Collection<?> collection) {
-      if (collection instanceof List) {
-        // order is important
-        updateList((List<?>) collection);
-      }
-      else {
-        // order can be ignored
-        updateCollection(collection);
-      }
-    }
-
-    @Override
-    protected void caseMap(Map<?, ?> map) {
-      updateMap(map);
-    }
-
-    @Override
-    protected void caseDoEntityNodes(Collection<DoNode<?>> nodes) {
-      for (DoNode<?> node : nodes) {
-        updateDoNode(node);
-      }
-    }
-
-    @Override
-    protected void caseDoEntityContributions(Collection<IDoEntityContribution> contributions) {
-      updateCollection(contributions);
-    }
-
-    @Override
-    protected void caseDoList(DoList<?> doList) {
-      updateList(doList.get());
-    }
-
-    @Override
-    protected void caseDoSet(DoSet<?> doSet) {
-      updateSet(doSet.get());
-    }
-
-    @Override
-    protected void caseDoCollection(DoCollection<?> doCollection) {
-      updateCollection(doCollection.get());
-    }
-
-
-    private <LT> void updateList(List<LT> list) {
-      ListIterator<LT> it = list.listIterator();
-      while (it.hasNext()) {
-        LT value = it.next();
-        LT newValue = applyOperatorOrVisit(value);
-        if (value != newValue) {
-          it.remove();
-          it.add(newValue);
-        }
-      }
-    }
-
-    private <CT> void updateCollection(Collection<CT> collection) {
-      List<CT> newValues = null;
-      Iterator<CT> it = collection.iterator();
-      while (it.hasNext()) {
-        CT value = it.next();
-        CT newValue = applyOperatorOrVisit(value);
-        if (value != newValue) {
-          it.remove();
-          if (newValues == null) {
-            newValues = new ArrayList<>();
-          }
-          newValues.add(newValue);
-        }
-      }
-      if (newValues != null) {
-        collection.addAll(newValues);
-      }
-    }
-
-    private <SET> void updateSet(Set<SET> set) {
-      Set<SET> newValues = null;
-      Iterator<SET> it = set.iterator();
-      while (it.hasNext()) {
-        SET value = it.next();
-        SET newValue = applyOperatorOrVisit(value);
-        if (value != newValue) {
-          it.remove();
-          if (newValues == null) {
-            newValues = new LinkedHashSet<>();
-          }
-          newValues.add(newValue);
-        }
-      }
-      if (newValues != null) {
-        set.addAll(newValues);
-      }
-    }
-
-    private <K, V> void updateMap(Map<K, V> map) {
-      Map<K, V> newEntries = null;
-      Iterator<Entry<K, V>> it = map.entrySet().iterator();
-      while (it.hasNext()) {
-        Entry<K, V> entry = it.next();
-        K key = entry.getKey();
-        K newKey = applyOperatorOrVisit(key);
-        V value = entry.getValue();
-        V newValue = applyOperatorOrVisit(value);
-
-        if (newKey != key || newValue != value) {
-          it.remove();
-          if (newEntries == null) {
-            newEntries = new HashMap<>();
-          }
-          newEntries.put(newKey, newValue);
-        }
-      }
-      if (newEntries != null) {
-        map.putAll(newEntries);
-      }
-    }
-
-    private <NT> void updateDoNode(DoNode<NT> node) {
-      node.set(applyOperatorOrVisit(node.get()));
-    }
-
-    @SuppressWarnings("unchecked")
-    private <OT> OT applyOperatorOrVisit(OT o) {
+    protected <OT> OT replaceOrVisit(OT o) {
       if (m_elementType.isInstance(o)) {
+        //noinspection unchecked
         return (OT) m_operator.apply(m_elementType.cast(o));
       }
       else {
-        visit(o);
-        return o;
+        return super.replaceOrVisit(o);
       }
     }
   }
