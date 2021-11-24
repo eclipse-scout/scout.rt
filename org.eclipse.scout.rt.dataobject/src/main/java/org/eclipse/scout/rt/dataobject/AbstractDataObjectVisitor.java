@@ -75,19 +75,23 @@ public abstract class AbstractDataObjectVisitor {
 
   protected void caseDoEntityNodes(Collection<DoNode<?>> nodes) {
     for (DoNode<?> node : nodes) {
-      if (node instanceof DoList) {
-        caseDoList((DoList<?>) node);
-      }
-      else if (node instanceof DoSet) {
-        caseDoSet((DoSet<?>) node);
-      }
-      else if (node instanceof DoCollection) {
-        caseDoCollection((DoCollection<?>) node);
-      }
-      else {
-        // DoValue
-        visit(node.get());
-      }
+      caseDoEntityNode(node);
+    }
+  }
+
+  protected void caseDoEntityNode(DoNode<?> node) {
+    if (node instanceof DoList) {
+      caseDoList((DoList<?>) node);
+    }
+    else if (node instanceof DoSet) {
+      caseDoSet((DoSet<?>) node);
+    }
+    else if (node instanceof DoCollection) {
+      caseDoCollection((DoCollection<?>) node);
+    }
+    else {
+      // DoValue
+      visit(node.get());
     }
   }
 
