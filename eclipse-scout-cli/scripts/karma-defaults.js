@@ -36,6 +36,7 @@ module.exports = (config, specEntryPoint) => {
   if (webpackConfig.output && webpackConfig.output.path) {
     fs.mkdirSync(webpackConfig.output.path, {recursive: true});
   }
+  webpackConfig.watch = true;
 
   const sourceMapPlugin = webpackConfig.plugins.find(plugin => plugin instanceof webpack.SourceMapDevToolPlugin);
   if (sourceMapPlugin) {
