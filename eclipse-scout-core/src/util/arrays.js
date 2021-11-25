@@ -539,12 +539,9 @@ export function flattenRec(arr, childrenAccessor) {
   }, []);
 }
 
-//
-// Use these methods if you have an array of jquery objects.
-// Reason $elem1 === $elem2 does often not work because new jquery objects are created for the same html node.
-// -> Html nodes need to be compared.
-//
-
+/**
+ * Replacement for indexOf() that works for arrays of jQuery objects (compares DOM nodes).
+ */
 export function $indexOf(arr, $element) {
   for (let i = 0; i < arr.length; i++) {
     if (arr[i][0] === $element[0]) {
@@ -553,6 +550,9 @@ export function $indexOf(arr, $element) {
   }
 }
 
+/**
+ * Replacement for remove() that works for arrays of jQuery objects (compares DOM nodes).
+ */
 export function $remove(arr, $element) {
   let index = $indexOf(arr, $element);
   if (index >= 0) {
@@ -571,6 +571,23 @@ export function randomElement(array) {
     return undefined;
   }
   return array[Math.floor(Math.random() * array.length)];
+}
+
+/**
+ * Converts the given array to a map. For each element, key and value is determined by the given functions.
+ * If no function is provided, the element itself is used.
+ *
+ * @template T
+ * @param {T[]} array - array of elements
+ * @param {function(T): string} [keyMapper] - function that maps each element to the target key
+ * @param {function(T): string} [valueExtractor] - function that maps each element to the target value
+ * @returns {object}
+ */
+export function toMap(array, keyMapper = (el => el), valueMapper = (el => el)) {
+  return objects.createMap(ensure(array).reduce((map, element) => {
+    map[keyMapper(element)] = valueMapper(element);
+    return map;
+  }, {}));
 }
 
 export default {
@@ -616,6 +633,7 @@ export default {
   remove,
   removeAll,
   replace,
+  toMap,
   union,
   randomElement
 };

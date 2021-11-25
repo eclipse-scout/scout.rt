@@ -862,4 +862,26 @@ describe('scout.arrays', () => {
 
   });
 
+  describe('toMap', () => {
+
+    it('converts an array to an object', () => {
+      expect(arrays.toMap()).toEqual({});
+      expect(arrays.toMap(['x'])).toEqual({x: 'x'});
+      expect(arrays.toMap([1, 2, 3])).toEqual({1: 1, 2: 2, 3: 3});
+      expect(arrays.toMap([{a: 1}])).toEqual({'[object Object]': {a: 1}});
+
+      expect(arrays.toMap(['x', 'x', 'x'])).toEqual({'x': 'x'});
+      expect(arrays.toMap(['one', 'two', 'three'])).toEqual({'one': 'one', 'two': 'two', 'three': 'three'});
+      expect(arrays.toMap(['one', 'two', 'three'], s => s.toUpperCase())).toEqual({'ONE': 'one', 'TWO': 'two', 'THREE': 'three'});
+      expect(arrays.toMap(['one', 'two', 'three'], s => s.substr(0, 1))).toEqual({'o': 'one', 't': 'three'});
+
+      let users = [
+        {id: 100, name: 'alice'},
+        {id: 101, name: 'bob'},
+        {id: 102, name: 'charlie'}
+      ];
+      expect(arrays.toMap(users, u => u.id, u => u.name)).toEqual({100: 'alice', 101: 'bob', 102: 'charlie'});
+    });
+  });
+
 });
