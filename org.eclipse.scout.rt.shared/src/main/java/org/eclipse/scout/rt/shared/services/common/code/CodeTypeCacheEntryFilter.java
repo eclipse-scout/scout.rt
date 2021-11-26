@@ -55,4 +55,9 @@ public class CodeTypeCacheEntryFilter implements ICacheEntryFilter<CodeTypeCache
     }
     return null;
   }
+
+  @Override
+  public String toString() {
+    return "CodeTypeCacheEntryFilter [m_codeTypeClasses=" + m_codeTypeClasses + ']';
+  }
 }
