@@ -25,6 +25,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -129,19 +132,39 @@ public class ClientNotificationNodeQueue {
    * Put notifications into queue and drop oldest ones, if capacity is reached.
    */
   private void putDroppingOld(Collection<? extends ClientNotificationMessage> notifications) {
-    int dropCount = 0;
+    List<ClientNotificationMessage> droppedNotifications = new ArrayList<>();
     for (ClientNotificationMessage message : notifications) {
       boolean inserted = m_notifications.offer(message);
       while (!inserted) {
         ClientNotificationMessage removed = m_notifications.poll();
         if (removed != null) {
-          dropCount++;
+          droppedNotifications.add(removed);
         }
         inserted = m_notifications.offer(message);
       }
     }
-    if (dropCount > 0) {
-      LOG.warn("Notification queue capacity reached. Remove oldest {} notification messages.", dropCount);
+    if (!droppedNotifications.isEmpty()) {
+      if (LOG.isWarnEnabled()) {
+        Function<Stream<? extends ClientNotificationMessage>, String> infoExtractor = s -> s
+            .map(m -> m.getNotification().getClass().getSimpleName() + " -> " + m.getAddress().prettyPrint())
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+            .entrySet().stream()
+            .sorted(Entry.<String, Long> comparingByValue().reversed())
+            .map(e -> e.getKey() + " (" + e.getValue() + "x)")
+            .collect(Collectors.joining(", ", "[", "]"));
+
+        LOG.warn("Notification queue capacity reached. Added {}, removed oldest {} notification messages. [clientNodeId={}, newNotifications={}, droppedNotifications={}]",
+            notifications.size(), droppedNotifications.size(), getNodeId(), infoExtractor.apply(notifications.stream()), infoExtractor.apply(droppedNotifications.stream()));
+      }
+      if (LOG.isDebugEnabled()) {
+        Function<Stream<? extends ClientNotificationMessage>, String> infoExtractor = s -> s
+            .map(m -> m.toString())
+            .collect(Collectors.joining("\n    ", "\n    ", ""));
+
+        LOG.debug("Notification queue capacity reached. Details:\n  newNotifications={}\n  droppedNotifications={}",
+            infoExtractor.apply(notifications.stream()), infoExtractor.apply(droppedNotifications.stream()),
+            new Exception("stacktrace for further analysis"));
+      }
     }
   }
 
