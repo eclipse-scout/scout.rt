@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
@@ -229,7 +230,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         filename = null;
       }
       if (StringUtility.hasText(filename)) {
-        String ext = FileUtility.getFileExtension(filename).toLowerCase(Locale.ROOT);
+        String ext = Optional.ofNullable(FileUtility.getFileExtension(filename)).map(name -> name.toLowerCase(Locale.ROOT)).orElse(null);
         verifyFileName(validFileExtensions, filename, ext);
       }
       byte[] content;
