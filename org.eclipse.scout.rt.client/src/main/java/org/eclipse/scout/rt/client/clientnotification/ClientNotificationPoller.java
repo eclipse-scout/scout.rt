@@ -73,19 +73,20 @@ public class ClientNotificationPoller {
       return;
     }
 
-    LOG.debug("Stopping client notification poller.");
+    LOG.debug("Stopping client notification poller [clientNodeId={}].", INode.ID);
     m_pollerFuture.cancel(true);
     m_pollerFuture = null;
   }
 
   protected static void handleMessagesReceived(List<ClientNotificationMessage> notifications) {
     if (LOG.isDebugEnabled()) {
-      LOG.debug("CLIENT NOTIFICATION returned with {} notifications ({}).", notifications.size(), notifications);
+      LOG.debug("Received {} notifications ({}) [clientNodeId={}].", notifications.size(), LOG.isTraceEnabled() ? notifications : "use level TRACE to see notifications", INode.ID);
     }
     // process notifications
     if (!notifications.isEmpty()) {
       BEANS.get(ClientNotificationDispatcher.class).dispatchNotifications(notifications);
     }
+    LOG.debug("Dispatched notifications [clientNodeId={}]", INode.ID);
   }
 
   private static final class P_NotificationPoller implements IRunnable {
@@ -104,6 +105,7 @@ public class ClientNotificationPoller {
               .withParentRunMonitor(outerRunMonitor)
               .run(() -> {
                 try {
+                  LOG.debug("Getting notifications from backend [clientNodeId={}]", INode.ID);
                   handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(INode.ID));
                 }
                 finally {
@@ -112,16 +114,16 @@ public class ClientNotificationPoller {
               });
         }
         catch (ThreadInterruptedError | FutureCancelledError e) {
-          LOG.debug("Client notification polling has been interrupted.", e);
+          LOG.debug("Client notification polling has been interrupted. [clientNodeId={}]", INode.ID, e);
         }
         catch (RuntimeException e) {
           if (!(e instanceof PlatformException && ((PlatformException) e).isConsumed())) {
-            LOG.error("Error receiving client notifications", e);
+            LOG.error("Error receiving client notifications [clientNodeId={}]", INode.ID, e);
           }
           SleepUtil.sleepSafe(10, TimeUnit.SECONDS); // sleep some time before connecting anew
         }
       }
-      LOG.debug("Client notification polling has ended because the job was cancelled.");
+      LOG.debug("Client notification polling has ended because the job was cancelled. [clientNodeId={}]", INode.ID);
     }
   }
 

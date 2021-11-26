@@ -50,4 +50,9 @@ public final class KeyCacheEntryFilter<K, V> implements ICacheEntryFilter<K, V> 
     }
     return null;
   }
+
+  @Override
+  public String toString() {
+    return "KeyCacheEntryFilter [m_keys=" + m_keys + ']';
+  }
 }

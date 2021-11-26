@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.clientnotification;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +27,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -85,6 +89,7 @@ public class ClientNotificationNodeQueue {
     Assertions.assertNotNull(userId);
     m_sessionUserCacheLock.writeLock().lock();
     try {
+      LOG.debug("Register session [sessionId={}, userId={}, clientNodeId={}]", sessionId, userId, getNodeId());
       m_sessions.add(sessionId);
       Set<String> userSessions = m_userToSessions.computeIfAbsent(userId, k -> new HashSet<>());
       userSessions.add(sessionId);
@@ -99,6 +104,7 @@ public class ClientNotificationNodeQueue {
     Assertions.assertNotNull(userId);
     m_sessionUserCacheLock.writeLock().lock();
     try {
+      LOG.debug("Unregister session [sessionId={}, userId={}, clientNodeId={}]", sessionId, userId, getNodeId());
       m_sessions.remove(sessionId);
       Iterator<Entry<String, Set<String>>> iterator = m_userToSessions.entrySet().iterator();
       while (iterator.hasNext()) {
@@ -128,19 +134,39 @@ public class ClientNotificationNodeQueue {
    * Put notifications into queue and drop the oldest ones, if capacity is reached.
    */
   private void putDroppingOld(Collection<? extends ClientNotificationMessage> notifications) {
-    int dropCount = 0;
+    List<ClientNotificationMessage> droppedNotifications = new ArrayList<>();
     for (ClientNotificationMessage message : notifications) {
       boolean inserted = m_notifications.offer(message);
       while (!inserted) {
         ClientNotificationMessage removed = m_notifications.poll();
         if (removed != null) {
-          dropCount++;
+          droppedNotifications.add(removed);
         }
         inserted = m_notifications.offer(message);
       }
     }
-    if (dropCount > 0) {
-      LOG.warn("Notification queue capacity reached. Remove oldest {} notification messages.", dropCount);
+    if (!droppedNotifications.isEmpty()) {
+      if (LOG.isWarnEnabled()) {
+        Function<Stream<? extends ClientNotificationMessage>, String> infoExtractor = s -> s
+            .map(m -> m.getNotification().getClass().getSimpleName() + " -> " + m.getAddress().prettyPrint())
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+            .entrySet().stream()
+            .sorted(Entry.<String, Long> comparingByValue().reversed())
+            .map(e -> e.getKey() + " (" + e.getValue() + "x)")
+            .collect(Collectors.joining(", ", "[", "]"));
+
+        LOG.warn("Notification queue capacity reached. Added {}, removed oldest {} notification messages. [clientNodeId={}, newNotifications={}, droppedNotifications={}]",
+            notifications.size(), droppedNotifications.size(), getNodeId(), infoExtractor.apply(notifications.stream()), infoExtractor.apply(droppedNotifications.stream()));
+      }
+      if (LOG.isDebugEnabled()) {
+        Function<Stream<? extends ClientNotificationMessage>, String> infoExtractor = s -> s
+            .map(m -> m.toString())
+            .collect(Collectors.joining("\n    ", "\n    ", ""));
+
+        LOG.debug("Notification queue capacity reached. Details:\n  newNotifications={}\n  droppedNotifications={}",
+            infoExtractor.apply(notifications.stream()), infoExtractor.apply(droppedNotifications.stream()),
+            new Exception("stacktrace for further analysis"));
+      }
     }
   }
 
@@ -155,7 +181,7 @@ public class ClientNotificationNodeQueue {
     m_lastConsumeAccess.set(System.currentTimeMillis());
 
     List<ClientNotificationMessage> result = getNotifications(maxAmount, maxWaitTime, unit);
-    LOG.debug("consumed {} notifications.", result.size());
+    LOG.debug("consumed {} notifications. [clientNodeId={}]", result.size(), getNodeId());
     return result;
   }
 
