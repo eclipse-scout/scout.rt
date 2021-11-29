@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Chart} from '../index';
 
 export default class AbstractChartRenderer {
 
@@ -137,6 +136,13 @@ export default class AbstractChartRenderer {
 
   isDataUpdatable() {
     return false;
+  }
+
+  refresh() {
+    if (this.rendered) {
+      this.remove(false);
+    }
+    this.render(false);
   }
 
   /**
