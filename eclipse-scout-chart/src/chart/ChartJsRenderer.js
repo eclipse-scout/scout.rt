@@ -672,8 +672,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       dataset[borderWidthIdentifier] = dataset[borderWidthBackupIdentifier];
       delete dataset[borderWidthBackupIdentifier];
     }
-    // do nothing if there is no borderWidth set on the dataset
-    if (!dataset[borderWidthIdentifier]) {
+    // do nothing if there is no borderWidth set on the dataset or the borderWidth is a function
+    if (!dataset[borderWidthIdentifier] || objects.isFunction(dataset[borderWidthIdentifier])) {
       return;
     }
     let isBorderWidthArray = Array.isArray(dataset[borderWidthIdentifier]),
