@@ -478,10 +478,12 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     return true;
   }
 
-  _updateChart(animated) {
-    let config = this.chartJs.config;
-    this._adjustColors(config);
-    this._renderChart(config, animated);
+  refresh() {
+    if (this.chartJs) {
+      this.chartJs.update();
+    } else {
+      super.refresh();
+    }
   }
 
   _renderCheckedItems() {

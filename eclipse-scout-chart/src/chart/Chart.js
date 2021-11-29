@@ -274,6 +274,7 @@ export default class Chart extends Widget {
    *   [requestAnimation] default false
    *   [debounce] default 0
    *   [onlyUpdateData] default false
+   *   [onlyRefresh] default false
    */
   updateChart(opts) {
     opts = opts || {};
@@ -309,6 +310,8 @@ export default class Chart extends Widget {
       this._updateChartOpts = null;
       if (opts.onlyUpdateData && this.chartRenderer && this.chartRenderer.isDataUpdatable()) {
         this.chartRenderer.updateData(opts.requestAnimation);
+      } else if (opts.onlyRefresh && this.chartRenderer) {
+        this.chartRenderer.refresh();
       } else if (this.chartRenderer) {
         this.chartRenderer.remove(this.chartRenderer.shouldAnimateRemoveOnUpdate(opts), chartAnimationStopping => {
           if (this.removing || chartAnimationStopping) {
