@@ -24,11 +24,24 @@ const findWorkspacePackages = require('@pnpm/find-workspace-packages');
 const fsp = fs.promises;
 
 const writeFile = async (fileName, file, verbose) => {
-  const stringified = JSON.stringify(file, null, 2);
-  if (verbose) {
-    console.log(`file: ${fileName}; new content:\n${stringified}`);
+  const newContentCompact = JSON.stringify(file);
+  const currentContent = await fsp.readFile(fileName, 'utf-8');
+  const currentContentCompact = JSON.stringify(JSON.parse(currentContent));
+  if (currentContentCompact === newContentCompact) {
+    // only change in formatting: skip write
+    return;
   }
-  await fsp.writeFile(fileName, stringified);
+
+  let newContent = JSON.stringify(file, null, 2);
+  if (!newContent.endsWith('\n')) {
+    // ensure file ends with a new line
+    newContent += '\n';
+  }
+  if (verbose) {
+    console.log(`file: ${fileName}; new content:\n${newContent}`);
+  }
+
+  await fsp.writeFile(fileName, newContent, 'utf-8');
   if (verbose) {
     console.log(`file ${fileName} saved`);
   }
