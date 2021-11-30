@@ -153,7 +153,7 @@ module.exports = (env, args) => {
                 targets: {
                   firefox: '55',
                   chrome: '58',
-                  safari: '12.2'
+                  safari: '12.1'
                 }
               }]
             ]
