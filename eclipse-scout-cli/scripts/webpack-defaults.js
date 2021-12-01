@@ -94,6 +94,7 @@ module.exports = (env, args) => {
       devtoolModuleFilenameTemplate: devMode ? undefined : prodDevtoolModuleFilenameTemplate,
       clean: true
     },
+    parallelism: 2,
     performance: {
       hints: false
     },
