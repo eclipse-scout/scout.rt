@@ -18,77 +18,59 @@ process.on('unhandledRejection', err => {
 
 const yargs = require('yargs');
 
-const generateSnapshot = args => {
-  const script = require('../scripts/updateVersion');
-  script.updateSnapshotVersion(args.verbose)
-    .then(() => console.log('snapshot version done'))
+const updateVersionSnapshotDependencies = args => {
+  const updateVersion = require('../scripts/update-version');
+  updateVersion.snapshotDependencies({verbose: args.verbose, dryrun: args.dryrun, workspaceRoot: args.workspaceRoot})
+    .then(() => console.log('version:snapshot:dependencies done'))
     .catch(e => {
-      console.error('snapshot version failed');
+      console.error('version:snapshot:dependencies failed');
       console.error(e);
       process.exitCode = 1;
     });
 };
 
-const setInstallSnapshotDependencies = args => {
-  const script = require('../scripts/updateVersion');
-  script.setPreInstallSnapshotDependencies({verbose: args.verbose, dryrun: args.dryrun, workspaceRoot: args.workspaceRoot})
-    .then(() => console.log('setPreInstallSnapshotDependencies version done'))
+const updateVersionSnapshot = args => {
+  const updateVersion = require('../scripts/update-version');
+  updateVersion.snapshot({verbose: args.verbose, dryrun: args.dryrun, workspaceRoot: args.workspaceRoot})
+    .then(() => console.log('version:snapshot done'))
     .catch(e => {
-      console.error('setPreInstallSnapshotDependencies version failed');
+      console.error('version:snapshot failed');
       console.error(e);
       process.exitCode = 1;
     });
 };
 
-const setPublishSnapshotDependencies = args => {
-  const script = require('../scripts/updateVersion');
-  script.setPrePublishSnapshotDependencies({verbose: args.verbose, dryrun: args.dryrun, workspaceRoot: args.workspaceRoot})
-    .then(() => console.log('setPrePublishSnapshotDependencies version done'))
+const updateVersionReleaseDependencies = args => {
+  const updateVersion = require('../scripts/update-version');
+  updateVersion.releaseDependencies({mapping: args.mapping, verbose: args.verbose, dryrun: args.dryrun, workspaceRoot: args.workspaceRoot})
+    .then(() => console.log('version:release:dependencies done'))
     .catch(e => {
-      console.error('setPrePublishSnapshotDependencies version failed');
+      console.error('version:release:dependencies failed');
       console.error(e);
       process.exitCode = 1;
     });
 };
 
-const setInstallReleaseDependencies = args => {
-  const script = require('../scripts/updateVersion');
-  script.setPreInstallReleaseDependencies({mapping: args.mapping, verbose: args.verbose, dryrun: args.dryrun, workspaceRoot: args.workspaceRoot})
-    .then(() => console.log('setPreInstallReleaseDependencies version done'))
-    .catch(e => {
-      console.error('setPreInstallReleaseDependencies version failed');
-      console.error(e);
-      process.exitCode = 1;
-    });
-};
-
-const setPublishReleaseDependencies = args => {
+const updateVersionRelease = args => {
   if (!args.newVersion && !args.mapping) {
     throw new Error('Please provide arguments for --newVersion or --mapping');
   }
-  const script = require('../scripts/updateVersion');
-  script.setPrePublishReleaseDependencies({
-    mapping: args.mapping,
-    newVersion: args.newVersion,
-    useRegexMap: args.useRegexMap,
-    verbose: args.verbose,
-    dryrun: args.dryrun,
-    workspaceRoot: args.workspaceRoot
-  })
-    .then(() => console.log('setPrePublishReleaseDependencies version done'))
+  const updateVersion = require('../scripts/update-version');
+  updateVersion.release({mapping: args.mapping, newVersion: args.newVersion, useRegexMap: args.useRegexMap, verbose: args.verbose, dryrun: args.dryrun, workspaceRoot: args.workspaceRoot})
+    .then(() => console.log('version:release done'))
     .catch(e => {
-      console.error('setPrePublishReleaseDependencies version failed');
+      console.error('version:release failed');
       console.error(e);
       process.exitCode = 1;
     });
 };
 
-const cleanupArtifactory = args => {
-  const script = require('../scripts/snapshot-cleanup');
-  script.doCleanup({url: args.url, apikey: args.apikey, user: args.user, pwd: args.pwd, reponame: args.reponame, keep: args.keep, dryrun: args.dryrun, verbose: args.verbose})
-    .then(() => console.log('Repository cleanup done'))
+const cleanupSnapshots = args => {
+  const snapshotCleanup = require('../scripts/snapshot-cleanup');
+  snapshotCleanup.doCleanup({url: args.url, apikey: args.apikey, user: args.user, pwd: args.pwd, reponame: args.reponame, keep: args.keep, dryrun: args.dryrun, verbose: args.verbose})
+    .then(() => console.log('cleanup:snapshots done'))
     .catch(e => {
-      console.error('Repository cleanup failed');
+      console.error('cleanup:snapshots failed');
       console.error(e);
       process.exitCode = 1;
     });
@@ -97,38 +79,33 @@ const cleanupArtifactory = args => {
 yargs
   .command('$0', 'default', () => {
   }, argv => {
-    console.log(`Unknown script ${argv._[0]}`);
+    throw new Error(`Unknown script ${argv._[0]}`);
   })
-  .command('snapshot-version', 'Generates a new snapshot version for the module',
-    () => {
-    },
-    generateSnapshot
-  )
-  .command('snapshot-install-dependency', 'Updates dependencies that are not part of the workspace so they will be downloaded from the registry.',
+  .command('version:snapshot:dependencies', 'Updates snapshot-dependencies that are not part of the pnpm-workspace to a snapshot-range.',
     yargs => yargs.option('workspaceRoot', {description: 'Path to the pnpm workspace root directory (optional).', type: 'string', default: null}),
-    setInstallSnapshotDependencies
+    updateVersionSnapshotDependencies
   )
-  .command('snapshot-publish-dependency', 'Adds the timestamp to the current version and updates the workspace dependencies in the same way as done for non workspace dependencies by the snapshot-install-dependency command.',
+  .command('version:snapshot', 'Adds the timestamp to the current snapshot-version and updates the pnpm-workspace dependencies to a snapshot-range.',
     yargs => yargs.option('workspaceRoot', {description: 'Path to the pnpm workspace root directory (optional).', type: 'string', default: null}),
-    setPublishSnapshotDependencies
+    updateVersionSnapshot
   )
-  .command('release-install-dependency', 'Uses the given mapping to update dependencies that are not part of the workspace so they will be downloaded from the registry.',
+  .command('version:release:dependencies', 'Updates snapshot-dependencies that are not part of the pnpm-workspace to the release versions of the given mapping.',
     yargs => yargs
       .option('mapping', {
         description: '1 or more mappings with a regex and a version to specify which dependencies should be updated by what version. E.g.: --mapping.0.regex @your-dep --mapping.0.version 1.2.3 --mapping.1.regex @your-dep2 --mapping.1.version 4.5.6',
         type: 'string'
       })
       .option('workspaceRoot', {description: 'Path to the pnpm workspace root directory (optional).', type: 'string', default: null}),
-    setInstallReleaseDependencies
+    updateVersionReleaseDependencies
   )
-  .command('release-publish-dependency', 'Updates the versions of the workspace modules with the new version provided. Also updates the dependencies to these workspace modules with the new version.',
+  .command('version:release', 'Updates the snapshot-versions of the pnpm-workspace modules with the new version provided. Also updates the dependencies to these pnpm-workspace modules with the new version.',
     yargs => yargs
       .option('newVersion', {description: 'New version of the npm module', type: 'string'})
       .option('useRegexMap', {description: 'true if the modules in the workspace have different versions. the regex-version mapping is used to set the version', type: 'boolean', default: false})
       .option('workspaceRoot', {description: 'Path to the pnpm workspace root directory (optional).', type: 'string', default: null}),
-    setPublishReleaseDependencies
+    updateVersionRelease
   )
-  .command('snapshot-cleanup', 'Cleans up old modules on the artifactory.',
+  .command('cleanup:snapshots', 'Cleans up old modules on the Artifactory repository.',
     yargs => yargs
       .option('apikey', {description: 'API Key for authentication', type: 'string'})
       .option('url', {description: 'URL of the artifactory', type: 'string'})
@@ -136,7 +113,7 @@ yargs
       .option('pwd', {description: 'Password', type: 'string'})
       .option('reponame', {description: 'Name of the repository', type: 'string'})
       .option('keep', {description: 'Number of Artifacts to keep', type: 'number'}),
-    cleanupArtifactory
+    cleanupSnapshots
   )
   .option('dryrun', {description: 'If true, simulation of the command', type: 'boolean', default: false})
   .option('verbose', {description: 'More Logging', type: 'boolean', default: false}

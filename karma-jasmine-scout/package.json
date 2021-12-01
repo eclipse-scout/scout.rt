@@ -19,11 +19,11 @@
     "src"
   ],
   "scripts": {
-    "snapshot-cleanup": "releng-scripts snapshot-cleanup",
-    "snapshot-predependency": "releng-scripts snapshot-install-dependency",
-    "snapshot-postdependency": "releng-scripts snapshot-publish-dependency",
-    "release-predependency": "releng-scripts release-install-dependency",
-    "release-postdependency": "releng-scripts release-publish-dependency"
+    "cleanup:snapshots": "releng-scripts cleanup:snapshots",
+    "version:snapshot:dependencies": "releng-scripts version:snapshot:dependencies",
+    "version:snapshot": "releng-scripts version:snapshot",
+    "version:release:dependencies": "releng-scripts version:release:dependencies",
+    "version:release": "releng-scripts version:release"
   },
   "devDependencies": {
     "@eclipse-scout/releng": "^22.0.0",

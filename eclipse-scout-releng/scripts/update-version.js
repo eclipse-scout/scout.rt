@@ -23,7 +23,7 @@ const fs = require('fs');
 const findWorkspacePackages = require('@pnpm/find-workspace-packages');
 const fsp = fs.promises;
 
-const writeFile = async (fileName, file, verbose) => {
+const writePackageJson = async (fileName, file, verbose) => {
   const newContentCompact = JSON.stringify(file);
   const currentContent = await fsp.readFile(fileName, 'utf-8');
   const currentContentCompact = JSON.stringify(JSON.parse(currentContent));
@@ -76,13 +76,6 @@ const generateSnapshotVersion = ({moduleVersion, timestamp, verbose}) => {
   }
   console.log(`new Version: ${newVersion}`);
   return newVersion;
-};
-
-const updateSnapshotVersion = async verbose => {
-  const filename = './package.json';
-  const packageJson = require(path.resolve(filename));
-  packageJson.version = generateSnapshotVersion({moduleVersion: packageJson.version, timestamp: generateTimeStamp(), verbose});
-  await writeFile(filename, packageJson, verbose);
 };
 
 /**
@@ -289,34 +282,33 @@ const updateAllPackageJsons = async ({
     });
 
     if (!dryrun) {
-      await writeFile(path.join(module.dir, 'package.json'), packageJson, verbose);
+      await writePackageJson(path.join(module.dir, 'package.json'), packageJson, verbose);
     } else {
       console.log(JSON.stringify(packageJson, null, 2));
     }
   }
 };
 
-const setPreInstallSnapshotDependencies = async ({verbose, dryrun, workspaceRoot = null}) => {
+const snapshotDependencies = async ({verbose, dryrun, workspaceRoot = null}) => {
   await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: false, verbose, dryrun, workspaceRoot});
 };
 
-const setPrePublishSnapshotDependencies = async ({verbose, dryrun, workspaceRoot = null}) => {
+const snapshot = async ({verbose, dryrun, workspaceRoot = null}) => {
   const timeStamp = generateTimeStamp();
   await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: true, newVersion: timeStamp, verbose, dryrun, workspaceRoot});
 };
 
-const setPreInstallReleaseDependencies = async ({mapping, verbose, dryrun, workspaceRoot = null}) => {
+const releaseDependencies = async ({mapping, verbose, dryrun, workspaceRoot = null}) => {
   await updateAllPackageJsons({isSnapshot: false, updateWorkspaceDependencies: false, releaseDependencyMapping: mapping, verbose, dryrun, workspaceRoot});
 };
 
-const setPrePublishReleaseDependencies = async ({mapping, newVersion, verbose, dryrun, useRegexMap, workspaceRoot = null}) => {
+const release = async ({mapping, newVersion, verbose, dryrun, useRegexMap, workspaceRoot = null}) => {
   await updateAllPackageJsons({isSnapshot: false, updateWorkspaceDependencies: true, releaseDependencyMapping: mapping, newVersion, useRegexMap, verbose, dryrun, workspaceRoot});
 };
 
 module.exports = {
-  updateSnapshotVersion,
-  setPreInstallSnapshotDependencies,
-  setPrePublishSnapshotDependencies,
-  setPreInstallReleaseDependencies,
-  setPrePublishReleaseDependencies
+  snapshotDependencies,
+  snapshot,
+  releaseDependencies,
+  release
 };
