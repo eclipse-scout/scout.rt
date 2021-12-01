@@ -107,18 +107,6 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
   }
 
   /**
-   * When the smart proposal finds no matching records and this property is not null, then it displays a link or menu
-   * with this label.<br>
-   * When clicked the method {@link AbstractSmartField#execBrowseNew(String)} is invoked, which in most cases is
-   * implemented as opening a "New XY..." dialog
-   */
-  @ConfigProperty(ConfigProperty.STRING)
-  @Order(315)
-  protected String getConfiguredBrowseNewText() {
-    return null;
-  }
-
-  /**
    * Configures the lookup call used to determine the display text of the smart column value.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
