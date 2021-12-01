@@ -420,17 +420,11 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
     f.setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isSortCodesByDisplayText() {
     return m_sortCodesByDisplayText;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setSortCodesByDisplayText(boolean b) {
     m_sortCodesByDisplayText = b;

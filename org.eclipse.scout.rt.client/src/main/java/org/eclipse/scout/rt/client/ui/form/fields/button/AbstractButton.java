@@ -160,9 +160,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     return false;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected boolean getConfiguredGridUseUiHeight() {
     return false;

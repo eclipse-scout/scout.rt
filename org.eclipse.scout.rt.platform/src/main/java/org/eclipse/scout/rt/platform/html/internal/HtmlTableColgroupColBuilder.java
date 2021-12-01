@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.html.internal;
 import org.eclipse.scout.rt.platform.html.IHtmlTableColgroupCol;
 
 /**
- * Builder for a html table colgroup col.
+ * Builder for a HTML table colgroup column element (&lt;col&gt;).
  */
 public class HtmlTableColgroupColBuilder extends EmptyHtmlNodeBuilder implements IHtmlTableColgroupCol {
 
@@ -23,28 +23,16 @@ public class HtmlTableColgroupColBuilder extends EmptyHtmlNodeBuilder implements
     super("col");
   }
 
-  /**
-   * Add a css class
-   */
   @Override
   public IHtmlTableColgroupCol cssClass(CharSequence cssClass) {
     return (IHtmlTableColgroupCol) super.cssClass(cssClass);
   }
 
-  /**
-   * Add a css style
-   */
   @Override
   public IHtmlTableColgroupCol style(CharSequence style) {
     return (IHtmlTableColgroupCol) super.style(style);
   }
 
-  /**
-   * Add an application local link
-   *
-   * @param ref
-   *          path to identify what is the link referring to.
-   */
   @Override
   public IHtmlTableColgroupCol appLink(CharSequence ref) {
     return (IHtmlTableColgroupCol) super.appLink(ref);

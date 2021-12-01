@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.html.IHtmlTableCell;
 
 /**
- * Builder for a html table data
+ * Builder for a HTML table data element (&lt;td&gt;).
  */
 public class HtmlTableDataBuilder extends HtmlNodeBuilder implements IHtmlTableCell {
 
@@ -31,28 +31,16 @@ public class HtmlTableDataBuilder extends HtmlNodeBuilder implements IHtmlTableC
     return this;
   }
 
-  /**
-   * Add a css class
-   */
   @Override
   public IHtmlTableCell cssClass(CharSequence cssClass) {
     return (IHtmlTableCell) super.cssClass(cssClass);
   }
 
-  /**
-   * Add a css style
-   */
   @Override
   public IHtmlTableCell style(CharSequence style) {
     return (IHtmlTableCell) super.style(style);
   }
 
-  /**
-   * Add an application local link
-   *
-   * @param ref
-   *          path to identify what is the link referring to.
-   */
   @Override
   public IHtmlTableCell appLink(CharSequence ref) {
     return (IHtmlTableCell) super.appLink(ref);

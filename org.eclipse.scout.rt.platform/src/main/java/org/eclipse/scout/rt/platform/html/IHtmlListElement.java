@@ -11,34 +11,19 @@
 package org.eclipse.scout.rt.platform.html;
 
 /**
- * Marker Interface for list element &lt;li&gt;text&lt;/li&gt
+ * HTML list element (&lt;li&gt;)
  */
 public interface IHtmlListElement extends IHtmlElement {
 
-  /**
-   * Add a css class
-   */
   @Override
   IHtmlListElement cssClass(CharSequence cssClass);
 
-  /**
-   * Add a css style
-   */
   @Override
   IHtmlListElement style(CharSequence style);
 
-  /**
-   * Add an application local link
-   *
-   * @param path
-   *          path to identify what is the link referring to.
-   */
   @Override
   IHtmlListElement appLink(CharSequence path);
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   IHtmlListElement addAttribute(String name, CharSequence value);
 }

@@ -13,6 +13,9 @@ package org.eclipse.scout.rt.platform.html.internal;
 import org.eclipse.scout.rt.platform.html.IHtmlInput;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
+/**
+ * Builder for a HTML input element (&lt;input&gt;).
+ */
 public class HtmlInputBuilder extends EmptyHtmlNodeBuilder implements IHtmlInput {
 
   private static final long serialVersionUID = 1L;

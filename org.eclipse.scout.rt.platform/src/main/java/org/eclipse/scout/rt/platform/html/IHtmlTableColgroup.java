@@ -11,13 +11,10 @@
 package org.eclipse.scout.rt.platform.html;
 
 /**
- * Marker Interface for table colgroup
+ * HTML table colgroup (&lt;colgroup&gt;)
  */
 public interface IHtmlTableColgroup extends IHtmlElement {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   IHtmlTableColgroup addAttribute(String name, CharSequence value);
 }

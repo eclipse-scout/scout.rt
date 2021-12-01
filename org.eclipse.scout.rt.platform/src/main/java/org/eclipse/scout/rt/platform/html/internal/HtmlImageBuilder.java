@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.platform.html.internal;
 
 /**
- * Builder for a html image.
+ * Builder for a HTML image element (&lt;img&gt;).
  */
 public class HtmlImageBuilder extends EmptyHtmlNodeBuilder {
 

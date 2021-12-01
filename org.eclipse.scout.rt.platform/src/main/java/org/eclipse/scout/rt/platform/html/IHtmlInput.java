@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.rt.platform.html;
 
+/**
+ * HTML input element (&lt;input&gt;)
+ */
 public interface IHtmlInput extends IHtmlElement {
 
   String TYPE_TEXT = "text";
@@ -38,27 +41,15 @@ public interface IHtmlInput extends IHtmlElement {
    */
   IHtmlInput checked();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   IHtmlInput cssClass(CharSequence cssClass);
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   IHtmlInput style(CharSequence style);
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   IHtmlInput appLink(CharSequence path);
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   IHtmlInput addAttribute(String name, CharSequence value);
 }

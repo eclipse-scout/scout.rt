@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.platform.html;
 
 /**
- * Marker Interface for table cell
+ * HTML table cell (&lt;th&gt;, &lt;td&gt;)
  */
 public interface IHtmlTableCell extends IHtmlElement {
 
@@ -20,30 +20,15 @@ public interface IHtmlTableCell extends IHtmlElement {
    */
   IHtmlTableCell colspan(int colspan);
 
-  /**
-   * Add a css class
-   */
   @Override
   IHtmlTableCell cssClass(CharSequence cssClass);
 
-  /**
-   * Add a css style
-   */
   @Override
   IHtmlTableCell style(CharSequence style);
 
-  /**
-   * Add an application local link
-   *
-   * @param path
-   *          path to identify what is the link referring to.
-   */
   @Override
   IHtmlTableCell appLink(CharSequence path);
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   IHtmlTableCell addAttribute(String name, CharSequence value);
 }

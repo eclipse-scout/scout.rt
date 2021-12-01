@@ -11,16 +11,12 @@
 package org.eclipse.scout.rt.platform.html;
 
 /**
- * Marker Interface for style element
+ * Style element (&lt;style&gt;)
  */
 public interface IStyleElement extends IHtmlElement {
 
-  IStyleElement type(String typeName);
+  IStyleElement type(String type);
 
-  /**
-   * Add a css class
-   */
   @Override
   IStyleElement cssClass(CharSequence cssClass);
-
 }

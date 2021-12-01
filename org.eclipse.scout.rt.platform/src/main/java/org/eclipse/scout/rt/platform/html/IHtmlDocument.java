@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.rt.platform.html;
 
+/**
+ * HTML document (&lt;html&gt;)
+ */
 public interface IHtmlDocument extends IHtmlElement {
 
   String HTML5_DOCTYPE = "<!DOCTYPE html>";
@@ -20,5 +23,4 @@ public interface IHtmlDocument extends IHtmlElement {
    * @return HTML document with HTML5 doctype {@value IHtmlDocument#HTML5_DOCTYPE}
    */
   IHtmlDocument doctype();
-
 }

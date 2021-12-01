@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlTableRow;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
- * Builder for a html table.
+ * Builder for a HTML table (&lt;table&gt;).
  */
 public class HtmlTableBuilder extends HtmlNodeBuilder implements IHtmlTable {
 
@@ -46,28 +46,16 @@ public class HtmlTableBuilder extends HtmlNodeBuilder implements IHtmlTable {
     return result;
   }
 
-  /**
-   * Add a css class
-   */
   @Override
   public IHtmlTable cssClass(CharSequence cssClass) {
     return (IHtmlTable) super.cssClass(cssClass);
   }
 
-  /**
-   * Add a css style
-   */
   @Override
   public IHtmlTable style(CharSequence style) {
     return (IHtmlTable) super.style(style);
   }
 
-  /**
-   * Add an application local link
-   *
-   * @param ref
-   *          path to identify what is the link referring to.
-   */
   @Override
   public IHtmlTable appLink(CharSequence ref) {
     return (IHtmlTable) super.appLink(ref);

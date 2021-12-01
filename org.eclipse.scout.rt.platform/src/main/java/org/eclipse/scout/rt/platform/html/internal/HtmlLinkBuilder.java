@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.platform.html.internal;
 
 /**
- * Builder for a html link.
+ * Builder for a HTML link (&lt;a href="..."&gt;text&lt;/a&gt;).
  */
 public class HtmlLinkBuilder extends HtmlNodeBuilder {
 

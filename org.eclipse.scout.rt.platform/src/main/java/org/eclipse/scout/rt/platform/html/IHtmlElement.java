@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.platform.html;
 
 /**
- * A HTML element.
+ * HTML element
  */
 public interface IHtmlElement extends IHtmlContent {
 
@@ -50,6 +50,7 @@ public interface IHtmlElement extends IHtmlContent {
    * @param ref
    *          Reference to identify what the link is referring to
    * @param cssClass
+   *          CSS class to add to the generated link element
    */
   IHtmlElement appLink(CharSequence ref, CharSequence cssClass);
 

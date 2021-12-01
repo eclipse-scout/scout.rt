@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlTableColgroup;
 import org.eclipse.scout.rt.platform.html.IHtmlTableColgroupCol;
 
 /**
- * Builder for a html table colgroup.
+ * Builder for a HTML table colgroup (&lt;colgroup&gt;).
  */
 public class HtmlTableColgroupBuilder extends HtmlNodeBuilder implements IHtmlTableColgroup {
 

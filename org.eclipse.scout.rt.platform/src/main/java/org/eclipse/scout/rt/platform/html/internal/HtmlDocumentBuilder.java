@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.platform.html.internal;
 
 import org.eclipse.scout.rt.platform.html.IHtmlDocument;
 
+/**
+ * Builder for a HTML document (&lt;html&gt;).
+ */
 public class HtmlDocumentBuilder extends HtmlNodeBuilder implements IHtmlDocument {
 
   private static final long serialVersionUID = 1L;

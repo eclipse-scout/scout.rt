@@ -11,34 +11,19 @@
 package org.eclipse.scout.rt.platform.html;
 
 /**
- * Marker Interface for html table
+ * HTML table (&lt;table&gt;)
  */
 public interface IHtmlTable extends IHtmlElement {
 
-  /**
-   * Add a css class
-   */
   @Override
   IHtmlTable cssClass(CharSequence cssClass);
 
-  /**
-   * Add a css style
-   */
   @Override
   IHtmlTable style(CharSequence style);
 
-  /**
-   * Add an application local link
-   *
-   * @param path
-   *          path to identify what is the link referring to.
-   */
   @Override
   IHtmlTable appLink(CharSequence path);
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   IHtmlTable addAttribute(String name, CharSequence value);
 }

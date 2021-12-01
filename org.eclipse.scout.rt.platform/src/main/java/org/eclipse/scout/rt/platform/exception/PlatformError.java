@@ -61,17 +61,11 @@ public class PlatformError extends Error implements IThrowableWithContextInfo {
     super(format.getMessage(), format.getThrowable());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public List<String> getContextInfos() {
     return CollectionUtility.arrayList(m_contextInfos);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public PlatformError withContextInfo(final String name, final Object value, final Object... valueArgs) {
     if (value == null) {
@@ -93,25 +87,16 @@ public class PlatformError extends Error implements IThrowableWithContextInfo {
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isConsumed() {
     return m_consumed;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void consume() {
     m_consumed = true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getDisplayMessage() {
     return extractMessageText();

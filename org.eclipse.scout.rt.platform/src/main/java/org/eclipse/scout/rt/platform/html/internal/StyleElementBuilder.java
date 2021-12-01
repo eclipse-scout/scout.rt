@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.platform.html.internal;
 
 import org.eclipse.scout.rt.platform.html.IStyleElement;
 
+/**
+ * Builder for a style element (&lt;style&gt;).
+ */
 public class StyleElementBuilder extends HtmlNodeBuilder implements IStyleElement {
 
   private static final long serialVersionUID = 1L;
@@ -21,33 +24,21 @@ public class StyleElementBuilder extends HtmlNodeBuilder implements IStyleElemen
   }
 
   @Override
-  public IStyleElement type(String typeName) {
-    addAttribute("type", typeName);
+  public IStyleElement type(String type) {
+    addAttribute("type", type);
     return this;
   }
 
-  /**
-   * Add a css class
-   */
   @Override
   public IStyleElement cssClass(CharSequence cssClass) {
     return (IStyleElement) super.cssClass(cssClass);
   }
 
-  /**
-   * Add a css style
-   */
   @Override
   public IStyleElement style(CharSequence style) {
     return (IStyleElement) super.style(style);
   }
 
-  /**
-   * Add an application local link
-   *
-   * @param ref
-   *          path to identify what is the link referring to.
-   */
   @Override
   public IStyleElement appLink(CharSequence ref) {
     return (IStyleElement) super.appLink(ref);

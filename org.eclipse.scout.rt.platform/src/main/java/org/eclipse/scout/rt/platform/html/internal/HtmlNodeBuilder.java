@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
- * Builder for a html node with start tag, end tag and attributes.
+ * Builder for a HTML node with start tag, end tag and attributes.
  */
 public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement {
 

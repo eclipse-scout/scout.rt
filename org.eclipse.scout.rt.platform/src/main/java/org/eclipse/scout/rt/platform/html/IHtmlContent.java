@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.html;
 import java.io.Serializable;
 
 /**
- * Marker Interface for any Html Content that may contain bind variables.
+ * Marker interface for any HTML content that may contain bind variables.
  */
 public interface IHtmlContent extends CharSequence, Serializable {
 
@@ -28,7 +28,7 @@ public interface IHtmlContent extends CharSequence, Serializable {
 
   /**
    * @param newLineToBr
-   *          {@code true} if new lines should be replaced by <b>br</b> tags, {@code false} otherwise (default is
+   *          {@code true} if new lines should be replaced by &lt;br&gt; tags, {@code false} otherwise (default is
    *          {@code true}).
    */
   IHtmlContent withNewLineToBr(boolean newLineToBr);
