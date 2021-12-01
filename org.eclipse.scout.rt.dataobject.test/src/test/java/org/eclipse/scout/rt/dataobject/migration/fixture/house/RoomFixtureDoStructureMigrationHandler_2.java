@@ -34,7 +34,7 @@ public class RoomFixtureDoStructureMigrationHandler_2 extends AbstractDoStructur
    * References {@link RoomFixtureDo}.
    */
   @Override
-  protected void initAttributeNameTranslations(Map<String, Map<String, String>> attributNameTranslations) {
-    attributNameTranslations.put("charlieFixture.RoomFixture", CollectionUtility.hashMap(new ImmutablePair<>("roomName", "name")));
+  protected void initAttributeNameTranslations(Map<String, Map<String, String>> attributeNameTranslations) {
+    attributeNameTranslations.put("charlieFixture.RoomFixture", CollectionUtility.hashMap(new ImmutablePair<>("roomName", "name")));
   }
 }
