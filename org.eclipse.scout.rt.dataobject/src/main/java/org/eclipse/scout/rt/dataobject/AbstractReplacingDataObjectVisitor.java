@@ -47,10 +47,8 @@ public abstract class AbstractReplacingDataObjectVisitor extends AbstractDataObj
   }
 
   @Override
-  protected void caseDoEntityNodes(Collection<DoNode<?>> nodes) {
-    for (DoNode<?> node : nodes) {
-      updateDoNode(node);
-    }
+  protected void caseDoEntityNode(DoNode<?> node) {
+    updateDoNode(node);
   }
 
   @Override

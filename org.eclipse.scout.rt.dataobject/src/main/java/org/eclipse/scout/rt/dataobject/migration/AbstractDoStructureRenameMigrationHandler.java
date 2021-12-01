@@ -26,11 +26,11 @@ import org.eclipse.scout.rt.platform.BEANS;
 public abstract class AbstractDoStructureRenameMigrationHandler extends AbstractDoStructureMigrationHandler {
 
   protected final Map<String, String> m_typeNameTranslations = new HashMap<>();
-  protected final Map<String, Map<String, String>> m_attributNameTranslations = new HashMap<>();
+  protected final Map<String, Map<String, String>> m_attributeNameTranslations = new HashMap<>();
 
   protected AbstractDoStructureRenameMigrationHandler() {
     initTypeNameTranslations(m_typeNameTranslations);
-    initAttributeNameTranslations(m_attributNameTranslations);
+    initAttributeNameTranslations(m_attributeNameTranslations);
   }
 
   /**
@@ -52,17 +52,17 @@ public abstract class AbstractDoStructureRenameMigrationHandler extends Abstract
    * if renamed in {@link #initTypeNameTranslations(Map)}).
    *
    * <pre>
-   * attributNameTranslations.put("example.Lorem", CollectionUtility.hashMap(new ImmutablePair<>("ipsum", "dolor")));
+   * attributeNameTranslations.put("example.Lorem", CollectionUtility.hashMap(new ImmutablePair<>("ipsum", "dolor")));
    * </pre>
    */
-  protected void initAttributeNameTranslations(Map<String, Map<String, String>> attributNameTranslations) {
+  protected void initAttributeNameTranslations(Map<String, Map<String, String>> attributeNameTranslations) {
   }
 
   @Override
   public Set<String> getTypeNames() {
     Set<String> typeNames = new HashSet<>();
     typeNames.addAll(m_typeNameTranslations.keySet());
-    typeNames.addAll(m_attributNameTranslations.keySet());
+    typeNames.addAll(m_attributeNameTranslations.keySet());
     return typeNames;
   }
 
@@ -77,8 +77,8 @@ public abstract class AbstractDoStructureRenameMigrationHandler extends Abstract
       changed = true;
     }
 
-    if (m_attributNameTranslations.containsKey(typeName)) {
-      Map<String, String> attributeTranslations = m_attributNameTranslations.get(typeName);
+    if (m_attributeNameTranslations.containsKey(typeName)) {
+      Map<String, String> attributeTranslations = m_attributeNameTranslations.get(typeName);
       for (Entry<String, String> entry : attributeTranslations.entrySet()) {
         String name = entry.getKey();
         String newName = entry.getValue();
