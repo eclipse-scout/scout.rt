@@ -14,6 +14,7 @@ import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 
 /**
  * Abstract base class for lookup rows with generic key type T.
@@ -64,6 +65,10 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
 
   public DoValue<String> tooltipText() {
     return doValue("tooltipText");
+  }
+
+  public DoValue<IDoEntity> additionalTableRowData() {
+    return doValue("additionalTableRowData");
   }
 
   /* **************************************************************************
@@ -118,6 +123,11 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
     return self();
   }
 
+  public SELF withAdditionalTableRowData(IDoEntity additionalTableRowData) {
+    additionalTableRowData().set(additionalTableRowData);
+    return self();
+  }
+
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
@@ -165,5 +175,10 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   @Generated("DoConvenienceMethodsGenerator")
   public String getTooltipText() {
     return tooltipText().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public IDoEntity getAdditionalTableRowData() {
+    return additionalTableRowData().get();
   }
 }

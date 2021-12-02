@@ -265,7 +265,8 @@ public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupR
   }
 
   /**
-   * Transforms one {@link AbstractLookupRowDo} into a {@link ILookupRow}.
+   * Transforms one {@link AbstractLookupRowDo} into a {@link ILookupRow}. <br>
+   * Override this method to set additional table row data (i.e. used for smartfields with table proposal chooser).
    */
   protected ILookupRow<ID> transformLookupRow(AbstractLookupRowDo<?, ID> row) {
     return new LookupRow<>(row.getId(), row.getText())
