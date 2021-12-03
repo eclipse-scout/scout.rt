@@ -24,8 +24,8 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -74,7 +74,7 @@ public class CollectionUtilityTest {
   }
 
   /**
-   * Test for {@link CollectionUtility#equalsCollection(List<? extends T> c1, List<? extends T> c2)}
+   * Test for {@link CollectionUtility#equalsCollection(List, List)}
    */
   @Test
   public void testEqualsCollectionList() {
@@ -227,7 +227,7 @@ public class CollectionUtilityTest {
   }
 
   /**
-   * Test for {@link CollectionUtility#lastElement(List<T> c)}
+   * Test for {@link CollectionUtility#lastElement(List)}
    */
   @Test
   public void testLastElementList() {
@@ -286,7 +286,7 @@ public class CollectionUtilityTest {
   }
 
   /**
-   * Test for {@link CollectionUtility#lastElement(List<T> c)}
+   * Test for {@link CollectionUtility#lastElement(List)}
    */
   @Test
   public void testLastElementMap() {
@@ -297,7 +297,7 @@ public class CollectionUtilityTest {
   }
 
   /**
-   * Test for {@link CollectionUtility#size(Collection<T> list)}
+   * Test for {@link CollectionUtility#size(Collection)}
    */
   @Test
   public void testSize() {
@@ -347,7 +347,7 @@ public class CollectionUtilityTest {
     // Test for null collections
     assertFalse(CollectionUtility.containsAny(createList(2L, 3L), (Collection<?>) null));
     assertFalse(CollectionUtility.containsAny(null, createList(2L, 3L)));
-    assertFalse(CollectionUtility.containsAny((Collection<Long>) null, (Collection<Long>) null));
+    assertFalse(CollectionUtility.containsAny(null, (Collection<Long>) null));
     // Test for null elements
     assertTrue(CollectionUtility.containsAny(createList(null, 1L), createList(new Object[]{null})));
   }
@@ -360,7 +360,7 @@ public class CollectionUtilityTest {
     // Test for null collections
     assertFalse(CollectionUtility.containsAny(createList(2L, 3L), (Object[]) null));
     assertFalse(CollectionUtility.containsAny(null, new Object[]{2L, 3L}));
-    assertFalse(CollectionUtility.containsAny((Collection<Object>) null, (Object[]) null));
+    assertFalse(CollectionUtility.containsAny(null, (Object[]) null));
 
     // Test for null elements
     assertTrue(CollectionUtility.containsAny(createList(null, 1L), createList(new Object[]{null})));
@@ -442,7 +442,7 @@ public class CollectionUtilityTest {
     assertEquals(3, map.size());
 
     // test that it is an ordered map
-    assertArrayEquals(new int[]{1,3,2}, map.entrySet().stream().mapToInt(Entry::getKey).toArray());
+    assertArrayEquals(new int[]{1, 3, 2}, map.keySet().stream().mapToInt(i -> i).toArray());
     assertFalse(map.isEmpty());
   }
 
@@ -476,7 +476,7 @@ public class CollectionUtilityTest {
     assertEquals(3, map.size());
 
     // test that it is an ordered map
-    assertArrayEquals(new int[]{1,3,2}, map.entrySet().stream().mapToInt(Entry::getKey).toArray());
+    assertArrayEquals(new int[]{1, 3, 2}, map.keySet().stream().mapToInt(i -> i).toArray());
 
     // test that it inserts null keys / values
     assertEquals("test", CollectionUtility.orderedHashMap(new ImmutablePair<Integer, String>(null, "test")).get(null));
@@ -522,11 +522,40 @@ public class CollectionUtilityTest {
     assertTrue(CollectionUtility.hasElements(hashMap));
   }
 
+  @Test
+  public void testPartition() {
+    List<String> list24 = CollectionUtility.arrayList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z");
+    Set<String> set24 = CollectionUtility.hashSet("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z");
+
+    List<List<String>> batchListMaxSize10 = CollectionUtility.arrayList(
+        CollectionUtility.arrayList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J"),
+        CollectionUtility.arrayList("K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"),
+        CollectionUtility.arrayList("U", "V", "W", "X", "Y", "Z"));
+    assertEquals(CollectionUtility.partition(list24, 10), batchListMaxSize10);
+    assertEquals(CollectionUtility.partition(set24, 10), batchListMaxSize10);
+
+    List<List<String>> batchListMaxSize5 = CollectionUtility.arrayList(
+        CollectionUtility.arrayList("A", "B", "C", "D", "E"),
+        CollectionUtility.arrayList("F", "G", "H", "I", "J"),
+        CollectionUtility.arrayList("K", "L", "M", "N", "O"),
+        CollectionUtility.arrayList("P", "Q", "R", "S", "T"),
+        CollectionUtility.arrayList("U", "V", "W", "X", "Y"),
+        CollectionUtility.arrayList("Z"));
+    assertEquals(CollectionUtility.partition(list24, 5), batchListMaxSize5);
+    assertEquals(CollectionUtility.partition(set24, 5), batchListMaxSize5);
+
+    List<String> listEmpty = new ArrayList<>();
+    Set<String> setEmpty = new HashSet<>();
+    assertEquals(CollectionUtility.partition(listEmpty, 10), new ArrayList<>());
+    assertEquals(CollectionUtility.partition(setEmpty, 10), new ArrayList<>());
+
+    assertEquals(CollectionUtility.partition(null, 10), new ArrayList<>());
+    assertEquals(CollectionUtility.partition(null, 10), new ArrayList<>());
+  }
+
   private List<Object> createList(Object... elements) {
     List<Object> list = new ArrayList<>();
-    for (Object o : elements) {
-      list.add(o);
-    }
+    Collections.addAll(list, elements);
     return list;
   }
 
@@ -541,9 +570,7 @@ public class CollectionUtilityTest {
 
   private Queue<Object> createQueue(Object... elements) {
     Queue<Object> list = new ConcurrentLinkedQueue<>();
-    for (Object o : elements) {
-      list.add(o);
-    }
+    Collections.addAll(list, elements);
     return list;
   }
 }

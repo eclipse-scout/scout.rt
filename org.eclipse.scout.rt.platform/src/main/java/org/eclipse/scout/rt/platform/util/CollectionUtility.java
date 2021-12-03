@@ -28,6 +28,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public final class CollectionUtility {
   private CollectionUtility() {
@@ -989,5 +990,24 @@ public final class CollectionUtility {
     else {
       return o.toString();
     }
+  }
+
+  /**
+   * Partition a list into fixed size of sublist.
+   *
+   * @param collection
+   *          input collection
+   * @param batchSize
+   *          max size of a sublist
+   * @return a list with sublist
+   */
+  public static <T> List<List<T>> partition(Collection<T> collection, int batchSize) {
+    if (isEmpty(collection)) {
+      return new ArrayList<>();
+    }
+    AtomicInteger counter = new AtomicInteger();
+    return new ArrayList<>(collection.stream()
+        .collect(Collectors.groupingBy(it -> counter.getAndIncrement() / batchSize))
+        .values());
   }
 }
