@@ -10,12 +10,11 @@
  */
 package org.eclipse.scout.rt.platform.security;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -63,7 +62,7 @@ public interface ICertificateProvider {
    * file already exists, then it is re-used and not created.
    *
    * @param keyStorePath
-   *          must be a URI starting with 'file:' for example file:/dev/data/... or file:/c:/dev/data/...
+   *          must be a valid and writable file path (see {@link Paths#get(String, String...)})
    * @see #createSelfSignedCertificate(String, String, char[], char[], int, int, OutputStream)
    * @since 22.0
    */
@@ -71,20 +70,16 @@ public interface ICertificateProvider {
     if (!StringUtility.hasText(x500Name)) {
       return;
     }
-    if (!keyStorePath.startsWith("file:")) {
-      throw new ProcessingException("When calling autoCreateSelfSignedCertificate then the keyStorePath ('{}') must be a 'file:' URL", keyStorePath);
-    }
-
     try {
-      File f = new File(new URI(keyStorePath).getSchemeSpecificPart());
-      if (!f.exists()) {
-        try (OutputStream jks = Files.newOutputStream(f.toPath())) {
+      Path path = Paths.get(keyStorePath);
+      if (!Files.exists(path)) {
+        try (OutputStream jks = Files.newOutputStream(path)) {
           createSelfSignedCertificate(certificateAlias, x500Name, storePass, keyPass, 4096, 365, jks);
         }
       }
     }
-    catch (IOException | URISyntaxException e) {
-      throw new ProcessingException("Create self-signed certificate '{}' with X500 name '{}' in {}", certificateAlias, x500Name, keyStorePath, e);
+    catch (IOException e) {
+      throw new ProcessingException("Could not create self-signed certificate '{}' with X500 name '{}' in {}", certificateAlias, x500Name, keyStorePath, e);
     }
   }
 }
