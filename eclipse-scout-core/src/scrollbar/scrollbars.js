@@ -544,10 +544,20 @@ export function scrollTo($scrollable, $element, options) {
     scrollableH = $scrollable.height(),
     elementBounds = graphics.offsetBounds($element),
     scrollableBounds = graphics.offsetBounds($scrollable),
-    elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp, // relative to scrollable y
-    elementTopNew = 0,
-    elementH = elementBounds.height + scrollOffsetDown,
-    elementBottom = elementTop + elementH;
+    elementY = elementBounds.y - scrollableBounds.y,
+    elementH = elementBounds.height,
+    elementTop = elementY - scrollOffsetUp, // relative to scrollable y
+    elementBottom = elementY + elementH + scrollOffsetDown;
+
+  //        ---          ^                     <-- elementTop
+  //         |           | scrollOffsetUp
+  //         |           v
+  //   +------------+    ^                     <-- elementY
+  //   |  element   |    | elementH
+  //   +------------+    v
+  //         |           ^
+  //         |           | scrollOffsetDown
+  //        ---          v                     <-- elementBottom
 
   let align = options.align;
   if (!align) {
@@ -576,7 +586,7 @@ export function scrollTo($scrollable, $element, options) {
 
     // If the viewport is very small, make sure the element is not moved outside on top
     // Otherwise when calling this function again, since the element is on the top of the view port, the scroll pane would scroll down which results in flickering
-    elementTopNew = elementTop - (scrollTo - $scrollable.scrollTop());
+    let elementTopNew = elementTop - (scrollTo - $scrollable.scrollTop());
     if (elementTopNew < 0) {
       scrollTo = scrollTo + elementTopNew;
     }
