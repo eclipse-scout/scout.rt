@@ -70,8 +70,18 @@ public abstract class AbstractDerbySqlService extends AbstractSqlService {
 
   protected void runDerbyCommand(String commands) throws SQLException {
     Assertions.assertTrue(StringUtility.hasText(commands), "Commands must be provided.");
+    ensureDriverLoaded();
     try (Connection connection = DriverManager.getConnection(commands)) {
       LOG.debug("Executed derby command '{}' on connection '{}'.", commands, connection);
+    }
+  }
+
+  protected void ensureDriverLoaded() throws SQLException {
+    try {
+      Class.forName(getJdbcDriverName());
+    }
+    catch (ClassNotFoundException e) {
+      throw new SQLException("Cannot load driver '" + getJdbcDriverName() + "'.", e);
     }
   }
 
