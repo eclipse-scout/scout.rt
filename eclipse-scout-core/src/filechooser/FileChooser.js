@@ -8,30 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  BoxButtons,
-  ClickActiveElementKeyStroke,
-  CloseKeyStroke,
-  Device,
-  dragAndDrop,
-  Event,
-  FileInput,
-  files as fileUtil,
-  FocusAdjacentElementKeyStroke,
-  FocusRule,
-  Form,
-  FormLayout,
-  GlassPaneRenderer,
-  HtmlComponent,
-  keys,
-  KeyStrokeContext,
-  MessageBoxes,
-  scout,
-  scrollbars,
-  Status,
-  Widget
-} from '../index';
+import {arrays, BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, Device, dragAndDrop, Event, FileInput, files as fileUtil, FocusAdjacentElementKeyStroke, FocusRule, Form, FormLayout, GlassPaneRenderer, HtmlComponent, keys, KeyStrokeContext, MessageBoxes, scout, scrollbars, Status, Widget} from '../index';
 
 export default class FileChooser extends Widget {
 
@@ -336,12 +313,10 @@ export default class FileChooser extends Widget {
         // Append a space to allow the browser to break the line here when it gets too long
         $file.append(' ');
         let $remove = $file
-          .appendSpan('remove menu-item')
+          .appendSpan('remove')
           .on('click', this.removeFile.bind(this, file));
         let $removeLink = $file.makeElement('<a>', 'remove-link', this.session.text('Remove'));
-        $remove.appendTextNode('(');
         $remove.append($removeLink);
-        $remove.appendTextNode(')');
       }, this);
       scrollbars.update(this.$files);
     }

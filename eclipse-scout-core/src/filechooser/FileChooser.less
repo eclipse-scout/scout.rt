@@ -80,6 +80,7 @@
   & > .file {
     text-indent: -@file-list-indent;
     word-break: break-all;
+    margin-bottom: 4px;
 
     &::before {
       #scout.font-icon();
@@ -92,10 +93,6 @@
     & > .remove {
       line-height: normal; /* override line-height of .menu-item */
       display: inline;
-
-      & > .remove-link {
-        text-decoration: underline;
-      }
     }
   }
 }
