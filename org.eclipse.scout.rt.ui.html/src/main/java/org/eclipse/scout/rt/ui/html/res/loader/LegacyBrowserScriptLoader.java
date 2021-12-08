@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.ui.html.ResourceBase;
 
 public class LegacyBrowserScriptLoader extends AbstractResourceLoader {
 
-  public static final String LEGACY_BROWSERS_SCRIPT = "legacy-browsers.js";
+  public static final String LEGACY_BROWSERS_SCRIPT = "legacy-browsers.js"; // see also TrivialAccessController.
 
   @Override
   public BinaryResource loadResource(String pathInfo) throws IOException {
