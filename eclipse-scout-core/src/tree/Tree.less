@@ -15,11 +15,14 @@
   &.focused {
     outline: none;
 
-    & .tree-node.selected {
-      background-color: @item-selection-background-color;
+    & > .tree-data {
+      & > .animation-wrapper > .tree-node.selected,
+      & > .tree-node.selected {
+        background-color: @item-selection-background-color;
 
-      &::after {
-        border-color: @item-selection-border-color;
+        &::after {
+          border-color: @item-selection-border-color;
+        }
       }
     }
   }
