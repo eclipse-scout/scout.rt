@@ -94,7 +94,6 @@ module.exports = (env, args) => {
       devtoolModuleFilenameTemplate: devMode ? undefined : prodDevtoolModuleFilenameTemplate,
       clean: true
     },
-    parallelism: 2,
     performance: {
       hints: false
     },
@@ -208,7 +207,6 @@ module.exports = (env, args) => {
       // minify css
       new CssMinimizerPlugin({
         test: /\.min\.css$/g,
-        parallel: false,
         minimizerOptions: {
           preset: ['default', {
             discardComments: {removeAll: true}
@@ -217,8 +215,7 @@ module.exports = (env, args) => {
       }),
       // minify js
       new TerserPlugin({
-        test: /\.js(\?.*)?$/i,
-        parallel: false
+        test: /\.js(\?.*)?$/i
       })
     ];
   }
