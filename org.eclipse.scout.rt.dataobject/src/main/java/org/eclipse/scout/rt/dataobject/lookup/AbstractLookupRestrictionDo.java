@@ -72,7 +72,7 @@ public abstract class AbstractLookupRestrictionDo<SELF extends AbstractLookupRes
   }
 
   /* **************************************************************************
-   * CONVENIENCE METHODS
+   * CUSTOM CONVENIENCE METHODS
    * *************************************************************************/
 
   public List<ID> getIds() {

@@ -42,7 +42,7 @@ public abstract class AbstractHierarchicalLookupRowDo<SELF extends AbstractHiera
   }
 
   /* **************************************************************************
-   * CONVENIENCE METHODS
+   * CUSTOM CONVENIENCE METHODS
    * *************************************************************************/
 
   public SELF withParentId(ID parentId) {

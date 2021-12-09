@@ -85,7 +85,7 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   }
 
   /* **************************************************************************
-   * CONVENIENCE METHODS
+   * CUSTOM CONVENIENCE METHODS
    * *************************************************************************/
 
   public SELF withId(ID id) {
