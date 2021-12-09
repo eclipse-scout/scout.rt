@@ -1029,9 +1029,9 @@ public final class CollectionUtility {
    */
   public static <T> List<List<T>> partition(Collection<T> collection, int batchSize) {
     if (isEmpty(collection)) {
-      return Collections.emptyList();
+      return new ArrayList<>();
     }
-    final AtomicInteger counter = new AtomicInteger();
+    AtomicInteger counter = new AtomicInteger();
     return new ArrayList<>(collection.stream()
         .collect(Collectors.groupingBy(it -> counter.getAndIncrement() / batchSize))
         .values());
