@@ -57,13 +57,14 @@
 }
 
 .tile.dashboard.compact > .tile-button {
+  padding-bottom: 0; // Override FormFieldTile.less
+
   & > .field {
-    padding-top: @tile-field-compact-padding-y;
-    padding-bottom: @tile-field-compact-padding-y;
+    padding-top: 12px;
+    padding-bottom: 12px;
 
     &.with-icon {
-      padding-top: 12px;
-      min-height: 98px;
+      min-height: 100px;
     }
 
     & > .label {

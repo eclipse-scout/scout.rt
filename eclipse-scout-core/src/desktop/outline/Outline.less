@@ -141,10 +141,6 @@
     }
   }
 
-  &.node-selected > .outline-title {
-    border-bottom-color: @outline-breadcrumb-ancestor-border-color;
-  }
-
   & > .tree-data {
     padding-top: 0;
 
@@ -153,20 +149,25 @@
       border-bottom: 1px solid @outline-breadcrumb-border-color;
       padding: @outline-breadcrumb-node-padding-y @outline-breadcrumb-node-padding-x;
 
-      &.group {
-        background-color: transparent;
-      }
-
       &.child-of-selected {
         background-color: @outline-breadcrumb-child-background-color;
 
+        .in-background& {
+          background-color: transparent;
+        }
+
         &:active {
-          background-color: @outline-breadcrumb-child-active-background-color;
+          background-color: @outline-breadcrumb-node-active-background-color;
         }
       }
 
       &.ancestor-of-selected {
-        border-bottom-color: @outline-breadcrumb-ancestor-border-color;
+        color: @text-color-1;
+        background-color: @outline-breadcrumb-ancestor-background-color;
+
+        .in-background& {
+          background-color: transparent;
+        }
       }
 
       &:active {
@@ -177,6 +178,14 @@
         background-color: @outline-selection-background-color;
         color: @outline-selection-color;
         cursor: default;
+
+        .in-background& {
+          background-color: @outline-in-background-selection-background-color;
+        }
+
+        & > .text > .compact-cell-header > .compact-cell-subtitle {
+          color: @outline-node-selected-icon-color;
+        }
       }
 
       &.selected > .text,
@@ -222,6 +231,7 @@
   }
 
   & > .tree-data {
+    background-color: @compact-outline-data-background-color;
 
     & > .tree-node {
       padding: 0;
@@ -241,16 +251,22 @@
       }
 
       & > .node-menubar {
-        position: absolute;
-        right: 0;
-        top: 0;
         width: auto;
-        padding: @compact-outline-node-padding-y - 7px @compact-outline-node-padding-x - @menubar-item-icononly-padding-x 0 0;
+        flex-grow: 0;
+        padding: 0 @compact-outline-node-padding-x - @menubar-item-icononly-padding-x 0 0;
+        min-height: @compact-outline-node-menubar-height;
+        height: @compact-outline-node-menubar-height; // Necessary for height: 100% to work in case node menubar has no explicit height set
+
+        & > .menubar-box > .menu-item {
+          color: inherit;
+        }
       }
 
       & > .detail-menubar {
-        padding: 0 @compact-outline-node-padding-x @compact-outline-node-padding-y @compact-outline-node-padding-x;
+        padding: 0 @compact-outline-node-padding-x 0 @compact-outline-node-padding-x;
+        min-height: @compact-outline-node-menubar-height;
         margin-left: -@menubar-item-icononly-padding-x;
+        background-color: @desktop-navigation-body-background-color;
 
         & > .menubar-box > .menu-item {
           padding-left: @menubar-item-icononly-padding-x;
@@ -273,6 +289,17 @@
         }
       }
 
+      & > .detail-content {
+        // to cover selection background
+        background-color: @desktop-navigation-body-background-color;
+
+        &.dimmed-background {
+          background-color: @compact-outline-data-background-color;
+        }
+
+        color: @desktop-navigation-color;
+      }
+
       & > .form {
         & > .root-group-box > .group-box-body {
           padding-left: @compact-outline-node-padding-x - @mandatory-indicator-width;
@@ -285,18 +312,8 @@
       }
 
       &.selected {
-        display: block;
-        background-color: transparent;
-        color: @desktop-navigation-color;
-
-        & > .text {
-          font-weight: bold;
-        }
-
-        & > .font-icon,
-        & > .tree-node-control {
-          color: @outline-node-font-icon-color;
-        }
+        display: flex;
+        flex-wrap: wrap; // Move detail menubar to next line
       }
 
       &.child-of-selected.animate-prev-selected {
@@ -310,8 +327,8 @@
       }
     }
 
-    &.detail-content-visible > .tree-node > .menubar {
-      padding-bottom: 0;
+    &.detail-content-visible > .tree-node > .detail-menubar {
+      border-bottom: 1px solid @outline-breadcrumb-border-color;
     }
   }
 
@@ -358,7 +375,7 @@
 
 .keyframes-tree-node-prev-selection() {
   00% {
-    background-color: @outline-breadcrumb-child-active-background-color;
+    background-color: @outline-breadcrumb-node-active-background-color;
   }
   100% {
     background-color: @outline-breadcrumb-child-background-color;

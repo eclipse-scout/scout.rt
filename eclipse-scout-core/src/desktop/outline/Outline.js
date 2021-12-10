@@ -8,40 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  defaultValues,
-  Desktop,
-  DetailTableTreeFilter,
-  Device,
-  FileChooserController,
-  Form,
-  GroupBoxMenuItemsOrder,
-  HtmlComponent,
-  keyStrokeModifier,
-  MenuBar,
-  menus as menuUtil,
-  MessageBoxController,
-  NavigateButton,
-  NavigateDownButton,
-  NavigateUpButton,
-  OutlineKeyStrokeContext,
-  OutlineLayout,
-  OutlineNavigateToTopKeyStroke,
-  OutlineOverview,
-  Page,
-  PageLayout,
-  scout,
-  TableControlAdapterMenu,
-  TableRowDetail,
-  TileOutlineOverview,
-  Tree,
-  TreeCollapseOrDrillUpKeyStroke,
-  TreeExpandOrDrillDownKeyStroke,
-  TreeNavigationDownKeyStroke,
-  TreeNavigationEndKeyStroke,
-  TreeNavigationUpKeyStroke
-} from '../../index';
+import {arrays, defaultValues, Desktop, DetailTableTreeFilter, Device, FileChooserController, Form, GroupBoxMenuItemsOrder, HtmlComponent, keyStrokeModifier, MenuBar, menus as menuUtil, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineKeyStrokeContext, OutlineLayout, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, scout, TableControlAdapterMenu, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke} from '../../index';
 import $ from 'jquery';
 
 /**
@@ -641,6 +608,13 @@ export default class Outline extends Tree {
   }
 
   /**
+   * @return {Page}
+   */
+  selectedNode() {
+    return /** @type {Page} */ super.selectedNode();
+  }
+
+  /**
    * Called by updateItemPath.
    *
    * @override
@@ -686,7 +660,7 @@ export default class Outline extends Tree {
   }
 
   _renderInBackground() {
-    this.$container.toggleClass('in-background', this.inBackground);
+    this.$container.toggleClass('in-background', this.inBackground && !this.compact);
   }
 
   _renderCompact() {
@@ -715,6 +689,7 @@ export default class Outline extends Tree {
     // Allow page to decorate based on content
     page._decorate();
     this.detailContent.render(page.$node);
+    this.detailContent.$container.addClass('detail-content');
     if (this.detailContent.htmlComp) {
       this.detailContent.htmlComp.validateRoot = false;
     }

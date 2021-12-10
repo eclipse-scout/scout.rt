@@ -18,8 +18,7 @@
 
   & > .left {
     flex-grow: 1;
-    font-size: @font-size-large;
-    font-weight: @font-weight-bold;
+    font-weight: @title-font-weight;
     #scout.overflow-ellipsis();
   }
 
@@ -62,6 +61,9 @@
 }
 
 .compact-cell-line-label {
+  font-size: @field-label-font-size;
+  color: @label-color;
+
   &:not(:empty) {
     margin-right: 4px;
   }

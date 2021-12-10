@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField} from '../../../index';
+import {Device, FormField} from '../../../index';
 
 export default class CalendarField extends FormField {
 
@@ -20,6 +20,7 @@ export default class CalendarField extends FormField {
 
   _render() {
     this.addContainer(this.$parent, 'calendar-field');
+    this.$container.toggleClass('mobile', Device.get().type === Device.Type.MOBILE);
     this.addLabel();
     this.addStatus();
     if (this.calendar) {

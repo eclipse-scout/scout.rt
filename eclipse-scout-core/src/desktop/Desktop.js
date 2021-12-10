@@ -8,35 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  BenchColumnLayoutData,
-  cookies,
-  DeferredGlassPaneTarget,
-  DesktopLayout,
-  DesktopNavigation,
-  Device,
-  DisableBrowserF5ReloadKeyStroke,
-  DisableBrowserTabSwitchingKeyStroke,
-  Event,
-  FileChooserController,
-  Form,
-  HtmlComponent,
-  HtmlEnvironment,
-  KeyStrokeContext,
-  MessageBoxController,
-  objects,
-  Outline, Popup,
-  scout,
-  SimpleTabArea,
-  strings,
-  styles,
-  Tree,
-  URL,
-  webstorage,
-  Widget,
-  widgets
-} from '../index';
+import {arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopLayout, DesktopNavigation, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, Event, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStrokeContext, MessageBoxController, objects, Outline, Popup, scout, SimpleTabArea, strings, styles, Tree, URL, webstorage, Widget, widgets} from '../index';
 import $ from 'jquery';
 
 export default class Desktop extends Widget {
@@ -588,7 +560,7 @@ export default class Desktop extends Widget {
   }
 
   _renderInBackground() {
-    this.$container.toggleClass('in-background', this.inBackground);
+    this.$container.toggleClass('in-background', this.inBackground && this.displayStyle !== Desktop.DisplayStyle.COMPACT);
     if (this.bench) {
       this.bench.$container.toggleClass('drop-shadow', this.inBackground);
     }

@@ -121,7 +121,8 @@
 @checkable-cell-padding-adjustment: 2px; /* Adjustment to shift the checkbox a little upwards to align it with the text (resp. first line of the text in case of multiline table cells) */
 @closer-border-radius: 7px;
 @compact-outline-node-padding-x: 16px;
-@compact-outline-node-padding-y: @outline-breadcrumb-node-padding-y;
+@compact-outline-node-padding-y: 14px;
+@compact-outline-node-menubar-height: 43px; // Depends on the paddings above, needs to be the height for a single line node
 @compact-outline-title-padding-x: @compact-outline-node-padding-x;
 @context-menu-margin-y: 6px;
 @context-menu-item-padding-y: 8px;
@@ -261,7 +262,7 @@
 @scroll-shadow-size: 5px;
 @scroll-shadow-blur: @scroll-shadow-size;
 @scroll-shadow-spread: @scroll-shadow-size + 1; // +1 to ensure firefox does not draw a light shadow on the side of the scrollable
-@search-outline-panel-padding-bottom: 14px;
+@search-outline-panel-padding-bottom: 16px;
 @simple-tab-padding: 5px;
 @split-box-splitter-line-size: 3px;
 @split-box-x-splitter-padding: 19px;

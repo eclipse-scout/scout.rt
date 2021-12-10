@@ -62,7 +62,8 @@ export default class PageLayout extends AbstractLayout {
         titleHeight = $text.outerHeight(true);
       }
       titleHeight = Math.max(titleHeight, iconHeight);
-      this.outline.detailContent.htmlComp.setSize(new Dimension(containerSize.width, containerSize.height - titleHeight - detailMenuBarHeight));
+      let htmlDetailContent = this.outline.detailContent.htmlComp;
+      htmlDetailContent.setSize(new Dimension(containerSize.width, containerSize.height - titleHeight - detailMenuBarHeight - htmlDetailContent.margins().vertical()));
     }
   }
 
@@ -104,7 +105,8 @@ export default class PageLayout extends AbstractLayout {
       detailMenuBarPrefSize = detailMenuBar.htmlComp.prefSize();
     }
     if (this.outline.detailContent) {
-      detailContentPrefSize = this.outline.detailContent.htmlComp.prefSize(options);
+      let htmlDetailContent = this.outline.detailContent.htmlComp;
+      detailContentPrefSize = htmlDetailContent.prefSize(options).add(htmlDetailContent.margins());
     }
 
     prefSize = new Dimension(Math.max(detailContentPrefSize.width, detailMenuBarPrefSize.width), titlePrefHeight + detailMenuBarPrefSize.height + detailContentPrefSize.height);

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HtmlComponent, icons, KeyStrokeContext, scout, ViewMenuOpenKeyStroke, Widget} from '../../index';
+import {arrays, Desktop, HtmlComponent, icons, KeyStrokeContext, scout, ViewMenuOpenKeyStroke, Widget} from '../../index';
 
 /**
  * Shows a list of view buttons with displayStyle=MENU
@@ -220,6 +220,9 @@ export default class ViewMenuTab extends Widget {
   }
 
   _renderInBackground() {
+    if (this.session.desktop.displayStyle === Desktop.DisplayStyle.COMPACT) {
+      return;
+    }
     if (!this.rendering) {
       if (this.session.desktop.inBackground) {
         this.$container.addClassForAnimation('animate-bring-to-back');

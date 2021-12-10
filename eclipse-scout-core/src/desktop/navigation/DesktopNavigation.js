@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CollapseHandle, DesktopNavigationLayout, HtmlComponent, scout, SingleLayout, styles, Tree, Widget} from '../../index';
+import {CollapseHandle, Desktop, DesktopNavigationLayout, HtmlComponent, scout, SingleLayout, styles, Tree, Widget} from '../../index';
 
 export default class DesktopNavigation extends Widget {
 
@@ -72,7 +72,7 @@ export default class DesktopNavigation extends Widget {
   }
 
   _renderInBackground() {
-    this.$container.toggleClass('in-background', this.desktop.inBackground);
+    this.$container.toggleClass('in-background', this.desktop.inBackground && this.desktop.displayStyle !== Desktop.DisplayStyle.COMPACT);
   }
 
   _renderViewButtonBox() {

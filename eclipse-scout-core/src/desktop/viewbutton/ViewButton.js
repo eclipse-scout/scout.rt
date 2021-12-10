@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, HtmlComponent, ViewButtonActionKeyStroke} from '../../index';
+import {Action, Desktop, HtmlComponent, ViewButtonActionKeyStroke} from '../../index';
 
 export default class ViewButton extends Action {
 
@@ -67,6 +67,9 @@ export default class ViewButton extends Action {
   }
 
   _renderInBackground() {
+    if (this.session.desktop.displayStyle === Desktop.DisplayStyle.COMPACT) {
+      return;
+    }
     if (!this.rendering) {
       if (this.session.desktop.inBackground) {
         this.$container.addClassForAnimation('animate-bring-to-back');

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, FormLayout, graphics, HtmlComponent, Insets, Point} from '../index';
+import {Dimension, FormLayout, graphics, HtmlComponent, Point} from '../index';
 
 export default class DialogLayout extends FormLayout {
 
@@ -39,8 +39,8 @@ export default class DialogLayout extends FormLayout {
 
     // Add markers to be able to style the dialog in a different way when it uses the full width or height
     $container
-      .toggleClass('full-width', (currentBounds.x === 0 && dialogMargins.horizontal() === 0 && windowSize.width === dialogSize.width))
-      .toggleClass('full-height', (currentBounds.y === 0 && dialogMargins.vertical() === 0 && windowSize.height === dialogSize.height));
+      .toggleClass('full-width', this.form.maximized || (currentBounds.x === 0 && dialogMargins.horizontal() === 0 && windowSize.width === dialogSize.width))
+      .toggleClass('full-height', this.form.maximized || (currentBounds.y === 0 && dialogMargins.vertical() === 0 && windowSize.height === dialogSize.height));
 
     // Ensure the dialog can only get larger, not smaller.
     // This prevents 'snapping' the dialog back to the calculated size when a field changes its visibility, but the user previously enlarged the dialog.
