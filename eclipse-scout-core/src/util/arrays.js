@@ -237,6 +237,16 @@ export function empty(arr) {
   return true;
 }
 
+/**
+ * @returns {number} the size of the array, or 0 if the argument is not an array
+ */
+export function length(arr) {
+  if (Array.isArray(arr)) {
+    return arr.length;
+  }
+  return 0;
+}
+
 export function pushAll(arr, arr2) {
   arr2 = ensure(arr2);
   arr.push(...arr2);
@@ -515,9 +525,9 @@ export function diff(arr1, arr2) {
   return diff;
 }
 
-export function flatMap(arr, func) {
+export function flatMap(arr, func = (x => x)) {
   let result = [];
-  arr.forEach(element => {
+  ensure(arr).forEach(element => {
     pushAll(result, func(element));
   });
   return result;
@@ -624,6 +634,7 @@ export default {
   insertBefore,
   insertAfter,
   last,
+  length,
   max,
   min,
   move,

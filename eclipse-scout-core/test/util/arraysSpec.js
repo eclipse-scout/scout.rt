@@ -638,6 +638,54 @@ describe('scout.arrays', () => {
 
   });
 
+  describe('empty', () => {
+
+    it('checks if the array is empty', () => {
+      expect(arrays.empty()).toBe(true);
+      expect(arrays.empty(null)).toBe(true);
+      expect(arrays.empty('test')).toBe(true);
+      expect(arrays.empty([])).toBe(true);
+      expect(arrays.empty({length: 2})).toBe(true);
+      expect(arrays.empty([1, 2, 3])).toBe(false);
+      expect(arrays.empty(['test'])).toBe(false);
+      expect(arrays.empty([0])).toBe(false);
+      expect(arrays.empty([null])).toBe(false);
+    });
+
+  });
+
+  describe('hasElements', () => {
+
+    it('checks if the array has elements', () => {
+      expect(arrays.hasElements()).toBe(false);
+      expect(arrays.hasElements(null)).toBe(false);
+      expect(arrays.hasElements('test')).toBe(false);
+      expect(arrays.hasElements([])).toBe(false);
+      expect(arrays.hasElements({length: 2})).toBe(false);
+      expect(arrays.hasElements([1, 2, 3])).toBe(true);
+      expect(arrays.hasElements(['test'])).toBe(true);
+      expect(arrays.hasElements([0])).toBe(true);
+      expect(arrays.hasElements([null])).toBe(true);
+    });
+
+  });
+
+  describe('length', () => {
+
+    it('returns the number of elements', () => {
+      expect(arrays.length()).toBe(0);
+      expect(arrays.length(null)).toBe(0);
+      expect(arrays.length('test')).toBe(0);
+      expect(arrays.length([])).toBe(0);
+      expect(arrays.length({length: 2})).toBe(0);
+      expect(arrays.length([1, 2, 3])).toBe(3);
+      expect(arrays.length(['test'])).toBe(1);
+      expect(arrays.length([0])).toBe(1);
+      expect(arrays.length([null])).toBe(1);
+    });
+
+  });
+
   describe('first', () => {
 
     it('finds first array element', () => {
@@ -747,15 +795,20 @@ describe('scout.arrays', () => {
   describe('flatMap', () => {
 
     it('returns flat list of all merged array elements', () => {
-      let arr = [
-        'a b c',
-        '1 2',
-        'x'
-      ];
-      let result = arrays.flatMap(arr, text => {
-        return text.split(' ');
-      });
-      expect(['a', 'b', 'c', '1', '2', 'x']).toEqual(result);
+      expect(arrays.flatMap()).toEqual([]);
+      expect(arrays.flatMap(null)).toEqual([]);
+      expect(arrays.flatMap(null, null)).toEqual([]); // null func, but still works because array is missing, too
+      expect(arrays.flatMap(null, s => s.split(' '))).toEqual([]);
+      expect(arrays.flatMap(null, s => s.split(' '))).toEqual([]);
+      expect(arrays.flatMap(['a b', 'c'])).toEqual(['a b', 'c']); // undefined func, fallback to default (identity)
+      expect(() => arrays.flatMap(['a b', 'c'], null)).toThrow(); // null func
+      expect(arrays.flatMap([], s => s.split(' '))).toEqual([]);
+      expect(arrays.flatMap(['a'], s => s.split(' '))).toEqual(['a']);
+      expect(arrays.flatMap(['a b', 'c'], s => s.split(' '))).toEqual(['a', 'b', 'c']);
+
+      let arr = ['a b c', '1 2', 'x'];
+      let result = arrays.flatMap(arr, s => s.split(' '));
+      expect(result).toEqual(['a', 'b', 'c', '1', '2', 'x']);
     });
 
   });
