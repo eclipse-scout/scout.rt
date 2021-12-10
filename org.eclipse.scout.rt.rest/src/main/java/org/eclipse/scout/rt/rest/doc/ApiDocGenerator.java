@@ -940,7 +940,7 @@ public class ApiDocGenerator {
             .map(Class::getSimpleName)
             .collect(Collectors.joining(", "));
       }
-      return m_returnType.getClass().getSimpleName() + " " + m_method.getName() + "(" + args + ")" + ex;
+      return m_returnType.getTypeClass().getSimpleName() + " " + m_method.getName() + "(" + args + ")" + ex;
     }
 
     @Override
