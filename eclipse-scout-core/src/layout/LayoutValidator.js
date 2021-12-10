@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device} from '../index';
+import {App, arrays, Device} from '../index';
 
 export default class LayoutValidator {
 
@@ -16,6 +16,7 @@ export default class LayoutValidator {
     this._invalidComponents = [];
     this._validateTimeoutId = null;
     this._postValidateFunctions = [];
+    this._suppressValidate = false;
   }
 
   invalidateTree(htmlComp) {
@@ -76,7 +77,12 @@ export default class LayoutValidator {
       queueMicrotask(() => {
         // Validate, but only if still required
         if (this._validateTimeoutId) {
-          this.validate();
+          try {
+            this.validate();
+          } catch (e) {
+            // Without handling the exception it would be swallowed (as it happens for promises)
+            App.get().errorHandler.handle(e);
+          }
         }
       });
     } else {
@@ -92,6 +98,9 @@ export default class LayoutValidator {
       clearTimeout(this._validateTimeoutId);
     }
     this._validateTimeoutId = null;
+    if (this._suppressValidate) {
+      return;
+    }
     this._invalidComponents.slice().forEach(function(comp) {
       if (comp.validateLayout()) {
         arrays.remove(this._invalidComponents, comp);
@@ -101,6 +110,19 @@ export default class LayoutValidator {
       func();
       arrays.remove(this._postValidateFunctions, func);
     }, this);
+  }
+
+  /**
+   * Suppresses every upcoming validations. The caller has to call {@link unsuppressValidate} to reactive validation again.
+   * Can be useful if the browser starts the processing of the micro task queue unexpectedly (e.g. when inserting certain DOM elements).
+   */
+  suppressValidate() {
+    this._suppressValidate = true;
+  }
+
+  unsuppressValidate() {
+    this._suppressValidate = false;
+    this._scheduleValidation();
   }
 
   /**

@@ -28,6 +28,9 @@ export default class IFrame extends Widget {
 
   _render() {
     let cssClass = 'iframe ' + Device.get().cssClassForIphone();
+    // Inserting an IFrame starts the processing of the micro task queue in Safari.
+    // This must not happen during rendering because it could trigger render again for elements being rendered (some layouts render parts of the widget, e.g. widgets with virtual scrolling)
+    this.session.layoutValidator.suppressValidate();
     if (this.wrapIframe) {
       this.$container = this.$parent.appendDiv('iframe-wrapper');
       this.$iframe = this.$container.appendElement('<iframe>', cssClass);
@@ -35,6 +38,7 @@ export default class IFrame extends Widget {
       this.$iframe = this.$parent.appendElement('<iframe>', cssClass);
       this.$container = this.$iframe;
     }
+    this.session.layoutValidator.unsuppressValidate();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
     this.$iframe.on('load', this._onLoad.bind(this));
