@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ParsingFailedStatus, scout, TimePickerTouchPopupLayout, TouchPopup} from '../index';
+import {ParsingFailedStatus, scout, TouchPopup} from '../index';
 
 export default class TimePickerTouchPopup extends TouchPopup {
 
@@ -19,6 +19,7 @@ export default class TimePickerTouchPopup extends TouchPopup {
   _init(options) {
     super._init(options);
     this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
+    this.addCssClass('time-picker-touch-popup');
   }
 
   /**
@@ -38,13 +39,6 @@ export default class TimePickerTouchPopup extends TouchPopup {
 
   getTimePicker() {
     return this._widget;
-  }
-
-  /**
-   * @override
-   */
-  _createLayout() {
-    return new TimePickerTouchPopupLayout(this);
   }
 
   _onFieldAcceptInput(event) {

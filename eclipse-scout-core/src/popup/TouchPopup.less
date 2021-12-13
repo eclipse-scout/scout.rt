@@ -8,41 +8,43 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+@touch-popup-padding-x: 15px;
+
 .touch-popup {
   position: absolute;
   overflow: hidden;
   #scout.popup-2();
   margin: 45px 10px 10px 10px;
-}
 
-.touch-popup-field {
-  position: absolute;
-  margin: 6px;
-}
-
-.touch-popup-widget-container {
-  position: absolute;
-  border-top: solid 1px @border-color;
-  background-color: @control-background-color;
-
-  & > .proposal-chooser > .table {
-    overflow: inherit;
+  & > .body {
+    display: flex;
+    flex-direction: column;
   }
 }
 
 .touch-popup-header {
-  margin: 8px 4px 2px 8px;
+  margin: 8px @touch-popup-padding-x - @menu-item-padding-x 8px @touch-popup-padding-x;
+  display: flex;
+  align-items: baseline;
 }
 
 .touch-popup-title {
-  font-size: @font-size-plus;
+  font-weight: @font-weight-bold;
   color: @title-color;
+  flex-grow: 1;
+  #scout.overflow-ellipsis-nowrap();
 }
 
-.touch-popup-close-icon {
-  position: absolute;
-  right: 7px;
-  top: 7px;
+.touch-popup-field {
+  position: relative;
+  margin: 0 @touch-popup-padding-x 8px;
+  flex: none;
+}
+
+.touch-popup-widget-container {
+  position: relative;
+  min-height: 0;
+  max-height: 400px;
 }
 
 @media (max-height: @iphone5-height) {

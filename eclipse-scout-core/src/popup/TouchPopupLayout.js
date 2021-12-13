@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, graphics, HtmlEnvironment, PopupLayout, Rectangle} from '../index';
+import {HtmlEnvironment, PopupLayout} from '../index';
 
 export default class TouchPopupLayout extends PopupLayout {
 
@@ -17,29 +17,22 @@ export default class TouchPopupLayout extends PopupLayout {
     this.doubleCalcPrefSize = false;
   }
 
-  layout($container) {
-    super.layout($container);
+  _setSize(prefSize) {
+    super._setSize(prefSize);
 
-    let popupSize = this.popup.htmlComp.size().subtract(this.popup.htmlComp.insets()),
-      headerHeight = graphics.size(this.popup._$header, true).height,
-      field = this.popup._field,
-      fieldHeight = field.htmlComp.prefSize().height,
-      fieldMargins = field.htmlComp.margins(),
-      fieldWidth = popupSize.width - fieldMargins.horizontal(),
-      widgetVerticalOffset = headerHeight + fieldHeight + fieldMargins.vertical();
-
-    field.htmlComp.setBounds(new Rectangle(0, headerHeight, fieldWidth, fieldHeight));
-    this.popup._widgetContainerHtmlComp.setBounds(
-      new Rectangle(0, widgetVerticalOffset, popupSize.width, popupSize.height - widgetVerticalOffset));
+    let htmlPopup = this.popup.htmlComp;
+    let htmlBody = this.popup.htmlBody;
+    let bodySize = prefSize.subtract(htmlPopup.insets());
+    htmlBody.setSize(bodySize.subtract(htmlBody.margins()));
   }
 
-  /**
-   * @override AbstractLayout.js
-   */
-  preferredLayoutSize($container) {
-    let popupWidth = HtmlEnvironment.get().formColumnWidth,
-      popupHeight = HtmlEnvironment.get().formRowHeight * 15;
+  preferredLayoutSize($container, options) {
+    let htmlComp = this.popup.htmlComp;
+    let htmlBody = this.popup.htmlBody;
 
-    return new Dimension(popupWidth, popupHeight);
+    let prefSize = htmlBody.prefSize(options)
+      .add(htmlComp.insets());
+    prefSize.width = HtmlEnvironment.get().formColumnWidth;
+    return prefSize.add(htmlBody.margins());
   }
 }

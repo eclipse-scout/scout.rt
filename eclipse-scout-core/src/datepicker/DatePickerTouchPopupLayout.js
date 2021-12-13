@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, graphics, HtmlEnvironment, TouchPopupLayout} from '../index';
+import {TouchPopupLayout} from '../index';
 
 export default class DatePickerTouchPopupLayout extends TouchPopupLayout {
 
@@ -22,23 +22,5 @@ export default class DatePickerTouchPopupLayout extends TouchPopupLayout {
   layout($container) {
     super.layout($container);
     this.popup.getDatePicker()._layoutWeekendSeparators();
-  }
-
-  /**
-   * @override
-   */
-  preferredLayoutSize($container, options) {
-    let popupWidth = HtmlEnvironment.get().formColumnWidth,
-      containerInsets = this.popup.htmlComp.insets(),
-      fieldHtmlComp = this.popup._field.htmlComp,
-      widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp,
-      fieldPrefSize = fieldHtmlComp.prefSize(options)
-        .add(fieldHtmlComp.margins()),
-      widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
-        .add(widgetContainerHtmlComp.margins()),
-      headerHeight = graphics.size(this.popup._$header, true).height,
-      popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
-
-    return new Dimension(popupWidth, popupHeight);
   }
 }

@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, HtmlComponent, Point, Popup, SingleLayout, TouchPopupLayout, ValueField} from '../index';
+import {FormField, HtmlComponent, Point, Popup, scout, SingleLayout, TouchPopupLayout, ValueField} from '../index';
+import RowLayout from '../layout/RowLayout';
 
 export default class TouchPopup extends Popup {
 
@@ -44,6 +45,11 @@ export default class TouchPopup extends Popup {
     this._field = this._touchField.clone(this._fieldOverrides());
     this._touchField.on('propertyChange', this._touchFieldPropertyChangeListener);
     this._initWidget(options);
+    this.doneAction = scout.create('Menu', {
+      parent: this,
+      text: this.session.text('ui.Done')
+    });
+    this.doneAction.on('action', this._onCloseIconClick.bind(this));
   }
 
   _destroy() {
@@ -58,7 +64,7 @@ export default class TouchPopup extends Popup {
   _fieldOverrides() {
     return {
       parent: this,
-      labelPosition: FormField.LabelPosition.ON_FIELD,
+      labelVisible: false,
       fieldStyle: FormField.FieldStyle.CLASSIC,
       popup: this,
       statusVisible: false,
@@ -89,14 +95,16 @@ export default class TouchPopup extends Popup {
 
   _render() {
     this.$container = this.$parent.appendDiv('popup touch-popup');
+    this.$body = this.$container.appendDiv('body');
+    this.htmlBody = HtmlComponent.install(this.$body, this.session);
+    this.htmlBody.setLayout(new RowLayout());
 
-    this._$header = this.$container.appendDiv('touch-popup-header');
-    this._$header
-      .appendDiv('status closer touch-popup-close-icon')
-      .on('click', this._onCloseIconClick.bind(this));
+    this._$header = this.$body.appendDiv('touch-popup-header');
+    HtmlComponent.install(this._$header, this.session);
     this._$header.appendDiv('touch-popup-title').textOrNbsp(this._touchField.label, 'empty');
+    this.doneAction.render(this._$header);
 
-    this._$widgetContainer = this.$container.appendDiv('touch-popup-widget-container');
+    this._$widgetContainer = this.$body.appendDiv('touch-popup-widget-container');
     this._widgetContainerHtmlComp = HtmlComponent.install(this._$widgetContainer, this.session);
     this._widgetContainerHtmlComp.setLayout(new SingleLayout());
 
@@ -114,6 +122,13 @@ export default class TouchPopup extends Popup {
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.validateRoot = true;
     this.htmlComp.setLayout(this._createLayout());
+  }
+
+  _handleGlassPanes() {
+    super._handleGlassPanes();
+    if (this._glassPaneRenderer) {
+      this._glassPaneRenderer.eachGlassPane($pane => $pane.addClass('dark'));
+    }
   }
 
   _onTouchFieldPropertyChange(event) {

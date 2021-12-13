@@ -19,6 +19,7 @@ export default class DatePickerTouchPopup extends TouchPopup {
   _init(options) {
     super._init(options);
     this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
+    this.addCssClass('date-picker-touch-popup');
   }
 
   /**

@@ -375,7 +375,6 @@ export {default as TimePicker} from './timepicker/TimePicker';
 export {default as TimePickerPopup} from './timepicker/TimePickerPopup';
 export {default as TimePickerPopupLayout} from './timepicker/TimePickerPopupLayout';
 export {default as TimePickerTouchPopup} from './timepicker/TimePickerTouchPopup';
-export {default as TimePickerTouchPopupLayout} from './timepicker/TimePickerTouchPopupLayout';
 export {default as Tree} from './tree/Tree';
 export {default as TreeAdapter} from './tree/TreeAdapter';
 export {default as TreeNode} from './tree/TreeNode';

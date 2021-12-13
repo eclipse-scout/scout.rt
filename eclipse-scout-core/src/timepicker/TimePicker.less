@@ -18,7 +18,7 @@
 .time-picker-separator {
   position: absolute;
   top: 0;
-  left: 40px;
+  left: 46px;
   height: 100%;
   border-right: 1px @palette-gray-4 solid;
 }
@@ -37,11 +37,29 @@
 
   .touch-popup-widget-container > & {
     max-height: 300px;
+    display: flex;
+    justify-content: center;
+
+    & > .day-table {
+      padding: 0;
+
+      & > .hour-row:first-child > .cell {
+        margin-top: 0;
+      }
+    }
+  }
+}
+
+.time-picker-touch-popup {
+  max-width: 200px;
+
+  & > .body > .touch-popup-widget-container > .time-picker-separator {
+    left: 84px;
   }
 }
 
 .day-table {
-  width: 100%;
+  padding: 0 13px 0 3px;
 
   & > .hour-row {
     display: flex;
@@ -49,6 +67,14 @@
     &:hover > .hours,
     &:hover > .hours.preselected {
       background-color: @hover-background-color;
+    }
+
+    &:first-child > .cell {
+      margin-top: 7px;
+    }
+
+    &:last-child > .cell {
+      margin-bottom: 7px;
     }
 
     & > .cell {
@@ -60,10 +86,6 @@
       height: @time-picker-cell-size;
       margin: 2px;
       border-radius: @time-picker-cell-border-radius;
-
-      &:last-child {
-        margin-right: 13px;
-      }
     }
 
     & > .hours {

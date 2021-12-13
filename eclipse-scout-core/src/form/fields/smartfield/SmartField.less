@@ -201,6 +201,29 @@
   }
 }
 
+
+.smart-field-touch-popup > .body {
+  & > .touch-popup-field {
+    & > .field {
+      & > .multiline-input {
+        border-radius: @control-border-radius @control-border-radius;
+      }
+
+      & > .multiline-lines {
+        display: none;
+      }
+    }
+  }
+
+  & > .touch-popup-widget-container .table-data {
+    padding: 2px @touch-popup-padding-x @touch-popup-padding-x;
+
+    & > .table-row.first {
+      border-top-color: transparent;
+    }
+  }
+}
+
 .dropdown-field-popup,
 .smart-field-popup,
 .proposal-field-popup {

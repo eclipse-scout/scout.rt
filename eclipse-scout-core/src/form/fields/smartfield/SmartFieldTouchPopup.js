@@ -29,6 +29,7 @@ export default class SmartFieldTouchPopup extends TouchPopup {
     this.setStatus(options.status);
     this.one('close', this._beforeClosePopup.bind(this));
     this.smartField.on('propertyChange', this._onPropertyChange.bind(this));
+    this.addCssClass('smart-field-touch-popup');
   }
 
   _initWidget(options) {

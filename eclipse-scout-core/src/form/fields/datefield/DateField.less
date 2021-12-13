@@ -204,11 +204,14 @@
   }
 }
 
-.touch-popup-field.date > .field {
+.touch-popup-field.date {
+  margin-bottom: 0;
 
-  & > input.time,
-  & > .icon.time,
-  & > .icon.time-clear {
-    .hidden();
+  & > .field {
+    & > input.time,
+    & > .icon.time,
+    & > .icon.time-clear {
+      .hidden();
+    }
   }
 }
