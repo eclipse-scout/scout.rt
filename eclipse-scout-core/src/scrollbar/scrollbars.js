@@ -538,9 +538,11 @@ export function scrollTo($scrollable, $element, options) {
     options = _createDefaultScrollToOptions(options);
   }
 
+  let align = (options.align ? options.align.toLowerCase() : undefined);
+
   let scrollTo,
-    scrollOffsetUp = scout.nvl(options.scrollOffsetUp, 4),
-    scrollOffsetDown = scout.nvl(options.scrollOffsetDown, 8),
+    scrollOffsetUp = scout.nvl(options.scrollOffsetUp, align === 'center' ? 0 : 4),
+    scrollOffsetDown = scout.nvl(options.scrollOffsetDown, align === 'center' ? 0 : 8),
     scrollableH = $scrollable.height(),
     elementBounds = graphics.offsetBounds($element),
     scrollableBounds = graphics.offsetBounds($scrollable),
@@ -559,14 +561,11 @@ export function scrollTo($scrollable, $element, options) {
   //         |           | scrollOffsetDown
   //        ---          v                     <-- elementBottom
 
-  let align = options.align;
   if (!align) {
     // If the element is above the visible area it will be aligned to top.
     // If the element is below the visible area it will be aligned to bottom.
     // If the element is already in the visible area no scrolling is done.
     align = (elementTop < 0) ? 'top' : (elementBottom > scrollableH ? 'bottom' : undefined);
-  } else {
-    align = align.toLowerCase();
   }
 
   if (align === 'center') {
