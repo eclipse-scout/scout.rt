@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,6 @@ import org.slf4j.impl.StaticLoggerBinder;
  * supports the following logging frameworks:
  * <ul>
  * <li>Logback</li>
- * <li>Log4j</li>
  * <li>java.util.logging</li>
  * </ul>
  * In any other case the {@link NullLoggerSupport} is installed. Hence <code>BEANS.get(ILoggerSupport.class)</code>
@@ -45,11 +44,9 @@ import org.slf4j.impl.StaticLoggerBinder;
 public class LoggerPlatformListener implements IPlatformListener {
 
   public static final String LOGGER_FACTORY_CLASS_STR_LOGBACK = "ch.qos.logback.classic.util.ContextSelectorStaticBinder";
-  public static final String LOGGER_FACTORY_CLASS_STR_LOG4J = "org.slf4j.impl.Log4jLoggerFactory";
   public static final String LOGGER_FACTORY_CLASS_STR_JUL = "org.slf4j.impl.JDK14LoggerFactory";
   public static final String LOGGER_SUPPORT_PACKAGE_NAME_PREFIX = "org.eclipse.scout.rt.platform.logger.";
   public static final String LOGGER_SUPPORT_CLASS_NAME_LOGBACK = LOGGER_SUPPORT_PACKAGE_NAME_PREFIX + "LogbackLoggerSupport";
-  public static final String LOGGER_SUPPORT_CLASS_NAME_LOG4J = LOGGER_SUPPORT_PACKAGE_NAME_PREFIX + "Log4jLoggerSupport";
   public static final String LOGGER_SUPPORT_CLASS_NAME_JUL = LOGGER_SUPPORT_PACKAGE_NAME_PREFIX + "JulLoggerSupport";
 
   private static final Logger LOG = LoggerFactory.getLogger(LoggerPlatformListener.class);
@@ -71,12 +68,9 @@ public class LoggerPlatformListener implements IPlatformListener {
   /**
    * Initialized the mapping of slf4j logger factory class ids to the fully qualified {@link ILoggerSupport}. Subclasses
    * may extend or replace the mapping.
-   *
-   * @param mapping
    */
   protected void registerLoggerSupportMappings(Map<String, String> mapping) {
     mapping.put(LOGGER_FACTORY_CLASS_STR_LOGBACK, LOGGER_SUPPORT_CLASS_NAME_LOGBACK);
-    mapping.put(LOGGER_FACTORY_CLASS_STR_LOG4J, LOGGER_SUPPORT_CLASS_NAME_LOG4J);
     mapping.put(LOGGER_FACTORY_CLASS_STR_JUL, LOGGER_SUPPORT_CLASS_NAME_JUL);
   }
 
@@ -118,7 +112,7 @@ public class LoggerPlatformListener implements IPlatformListener {
   protected ILoggerSupport createLoggerSupport(String loggerSupportFqcn) throws ClassNotFoundException {
     Class<?> clazz = SerializationUtility.getClassLoader().loadClass(loggerSupportFqcn);
     Assertions.assertTrue(ILoggerSupport.class.isAssignableFrom(clazz));
-    return ILoggerSupport.class.cast(BeanUtility.createInstance(clazz));
+    return (ILoggerSupport) BeanUtility.createInstance(clazz);
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,7 +68,7 @@ public class LogbackLoggerSupport extends AbstractLoggerSupport {
       case Level.OFF_INT:
         return LogLevel.OFF;
       default:
-        LOG.info("unknown log4j level '{}'. Falling back to scout log level '{}'", level, LogLevel.WARN);
+        LOG.info("unknown logback level '{}'. Falling back to scout log level '{}'", level, LogLevel.WARN);
         return LogLevel.WARN;
     }
   }
@@ -93,7 +93,7 @@ public class LogbackLoggerSupport extends AbstractLoggerSupport {
       case OFF:
         return Level.OFF;
       default:
-        LOG.info("unknown scout log level '{}'. Falling back to log4j level '{}'", level, Level.WARN);
+        LOG.info("unknown scout log level '{}'. Falling back to logback level '{}'", level, Level.WARN);
         return Level.WARN;
     }
   }

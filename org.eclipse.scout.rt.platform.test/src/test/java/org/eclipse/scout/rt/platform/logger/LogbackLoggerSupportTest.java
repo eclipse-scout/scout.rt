@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.logger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.logger.ILoggerSupport.LogLevel;
 import org.junit.After;
@@ -45,7 +44,7 @@ public class LogbackLoggerSupportTest {
   }
 
   @Test
-  public void testScoutToLog4jLevel() {
+  public void testScoutToLogbackLevel() {
     assertNull(m_loggerSupport.scoutToLogbackLevel(null));
     assertEquals(Level.ALL, m_loggerSupport.scoutToLogbackLevel(LogLevel.ALL));
     assertEquals(Level.TRACE, m_loggerSupport.scoutToLogbackLevel(LogLevel.TRACE));
@@ -57,7 +56,7 @@ public class LogbackLoggerSupportTest {
   }
 
   @Test
-  public void testLog4jToScoutLevel() {
+  public void testLogbackToScoutLevel() {
     assertNull(m_loggerSupport.logbackToScoutLevel(null));
     assertEquals(LogLevel.ALL, m_loggerSupport.logbackToScoutLevel(Level.ALL));
     assertEquals(LogLevel.TRACE, m_loggerSupport.logbackToScoutLevel(Level.TRACE));
