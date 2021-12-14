@@ -852,12 +852,16 @@ export default class ChartTableControl extends TableControl {
           scales: {
             x: {
               ticks: {
-                fontFamily: fontFamily
+                font: {
+                  family: fontFamily
+                }
               }
             },
             y: {
               ticks: {
-                fontFamily: fontFamily
+                font: {
+                  family: fontFamily
+                }
               }
             }
           }
@@ -866,7 +870,9 @@ export default class ChartTableControl extends TableControl {
       config.options = $.extend(true, {}, config.options, {
         plugins: {
           tooltip: {
-            titleFontFamily: fontFamily
+            titleFont: {
+              family: fontFamily
+            }
           }
         }
       });

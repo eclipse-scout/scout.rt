@@ -821,56 +821,62 @@ text.venn-legend {
 }
 
 /*** chart tooltip ***/
-.tooltip.chart-tooltip > .tooltip-content > .attribute {
-  white-space: nowrap;
-  padding-top: 2px;
-  padding-bottom: 2px;
+.tooltip.chart-tooltip {
+  --chart-tooltip-font-family: @font-default-family;
 
-  &:first-child {
-    padding-top: 0;
-  }
-
-  &:last-child {
-    padding-bottom: 0;
-  }
-
-  & > .color {
-    display: inline-block;
-    height: 10px;
-    width: 10px;
-    border-radius: 50%;
-    margin-right: 5px;
-  }
-
-  & > label {
-    display: inline-block;
-    min-width: 95px;
-    max-width: 95px;
-    padding-right: 10px;
-    white-space: normal;
-    vertical-align: top;
-    font-size: @field-label-font-size;
-    padding-top: @font-size-normal - @field-label-font-size;
+  & > .tooltip-content > .attribute {
+    white-space: nowrap;
+    padding-top: 2px;
+    padding-bottom: 2px;
 
     &:first-child {
-      min-width: 110px;
-      max-width: 110px;
+      padding-top: 0;
+    }
 
-      &:last-child {
-        font-size: @font-size-normal;
-        min-width: 100%;
-        max-width: 100%;
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    & > .color {
+      display: inline-block;
+      height: 10px;
+      width: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+
+    & > label {
+      display: inline-block;
+      min-width: 95px;
+      max-width: 95px;
+      padding-right: 10px;
+      white-space: normal;
+      vertical-align: top;
+      font-size: @field-label-font-size;
+      padding-top: @font-size-normal - @field-label-font-size;
+
+      &:first-child {
+        min-width: 110px;
+        max-width: 110px;
+
+        &:last-child {
+          font-size: @font-size-normal;
+          font-family: var(--chart-tooltip-font-family);
+          min-width: 100%;
+          max-width: 100%;
+        }
       }
     }
-  }
 
-  & > .value {
-    display: inline-block;
-    min-width: 20px;
-    max-width: 300px - 110px - 2 * @tooltip-padding-x;
-    white-space: normal;
-    vertical-align: top;
-    font-size: @font-size-normal;
-    font-weight: @font-weight-normal;
+    & > .value {
+      display: inline-block;
+      min-width: 20px;
+      max-width: 300px - 110px - 2 * @tooltip-padding-x;
+      white-space: normal;
+      vertical-align: top;
+      font-size: @font-size-normal;
+      font-weight: @font-weight-normal;
+      font-family: var(--chart-tooltip-font-family);
+    }
   }
 }

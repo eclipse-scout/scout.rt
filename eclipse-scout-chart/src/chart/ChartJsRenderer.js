@@ -58,6 +58,11 @@ ChartJs.register(ChartDataLabels);
  * @property {number} width
  */
 
+/**
+ * @typedef TooltipOptions
+ * @property {string} titleFont.family
+ */
+
 $.extend(true, ChartJs.defaults, {
   maintainAspectRatio: false,
   elements: {
@@ -861,6 +866,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let tooltipLabelColor = legendColor || backgroundColor || borderColor;
     if (!tooltipLabelColor || objects.isFunction(tooltipLabelColor)) {
       let defaultTypeTooltipLabelColor;
+      // noinspection DuplicatedCode
       if (ChartJs.overrides[config.type] && ChartJs.overrides[config.type].plugins && ChartJs.overrides[config.type].plugins.tooltip && ChartJs.overrides[config.type].plugins.tooltip.callbacks) {
         defaultTypeTooltipLabelColor = ChartJs.overrides[config.type].plugins.tooltip.callbacks.labelColor;
       }
@@ -913,7 +919,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       this._tooltip = null;
     }
 
-    let tooltipCallbacks = (tooltip.options || {}).callbacks || {},
+    let tooltipOptions = tooltip.options || {},
+      tooltipCallbacks = tooltipOptions.callbacks || {},
       tooltipTitle = tooltipCallbacks.title,
       tooltipLabel = tooltipCallbacks.label,
       tooltipLabelValue = tooltipCallbacks.labelValue,
@@ -963,6 +970,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     this._tooltip.$container
       .css('pointer-events', 'none');
+
+    if ((tooltipOptions.titleFont || {}).family) {
+      this._tooltip.$container
+        .css('--chart-tooltip-font-family', tooltipOptions.titleFont.family);
+    }
   }
 
   _computeTooltipPositionAndOffset(tooltipItem) {
@@ -1856,7 +1868,17 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _generateLegendLabels(chart) {
     let config = chart.config,
-      data = config.data,
+      defaultTypeGenerateLabels;
+    // noinspection DuplicatedCode
+    if (ChartJs.overrides[config.type] && ChartJs.overrides[config.type].plugins && ChartJs.overrides[config.type].plugins.legend && ChartJs.overrides[config.type].plugins.legend.labels) {
+      defaultTypeGenerateLabels = ChartJs.overrides[config.type].plugins.legend.labels.generateLabels;
+    }
+    let defaultGenerateLabels = defaultTypeGenerateLabels || ChartJs.defaults.plugins.legend.labels.generateLabels;
+    let labels = defaultGenerateLabels.call(chart, chart);
+    if (!this.rendered || this.removing) {
+      return labels;
+    }
+    let data = config.data,
       measureText = chart.ctx.measureText.bind(chart.ctx),
       legend = chart.legend,
       legendLabelOptions = ((legend || {}).options || {}).labels || {},
@@ -1872,12 +1894,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     } else {
       horizontalSpace = Math.min(250, this.$canvas.cssWidth() * 2 / 3);
     }
-    let defaultTypeGenerateLabels;
-    if (ChartJs.overrides[config.type] && ChartJs.overrides[config.type].plugins && ChartJs.overrides[config.type].plugins.legend && ChartJs.overrides[config.type].plugins.legend.labels) {
-      defaultTypeGenerateLabels = ChartJs.overrides[config.type].plugins.legend.labels.generateLabels;
-    }
-    let defaultGenerateLabels = defaultTypeGenerateLabels || ChartJs.defaults.plugins.legend.labels.generateLabels;
-    let labels = defaultGenerateLabels.call(chart, chart);
     labels.forEach((elem, idx) => {
       elem.text = strings.truncateText(elem.text, horizontalSpace, measureText);
       let dataset = data.datasets[idx],
@@ -2116,6 +2132,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _onHoverPointer(event, items) {
     this._onHover(event, items);
+    if (!this.rendered || this.removing) {
+      return;
+    }
     if (items.length && !this._isMaxSegmentsExceeded(this.chartJs.config, items[0].index)) {
       this.$canvas.css('cursor', 'pointer');
     } else {
@@ -2164,6 +2183,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _onLegendHoverPointer(e, legendItem, legend) {
     this._onLegendHover(e, legendItem, legend);
+    if (!this.rendered || this.removing) {
+      return;
+    }
     this.$canvas.css('cursor', 'pointer');
   }
 
@@ -2225,6 +2247,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
   _onLegendLeavePointer(e, legendItem, legend) {
     this._onLegendLeave(e, legendItem, legend);
+    if (!this.rendered || this.removing) {
+      return;
+    }
     this.$canvas.css('cursor', 'default');
   }
 
@@ -2654,12 +2679,14 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _remove(afterRemoveFunc) {
-    if (this.rendered) {
+    if (this.rendered && !this.removing) {
+      this.removing = true;
       this.$canvas.remove();
       this.$canvas = null;
       this.chartJs.destroy();
       this.chartJs = null;
     }
     super._remove(afterRemoveFunc);
+    this.removing = false;
   }
 }
