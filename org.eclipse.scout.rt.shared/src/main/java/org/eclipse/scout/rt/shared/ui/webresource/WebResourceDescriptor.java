@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.Objects;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.UriUtility;
 
 public class WebResourceDescriptor {
 
@@ -48,14 +49,14 @@ public class WebResourceDescriptor {
       return false;
     }
     WebResourceDescriptor that = (WebResourceDescriptor) o;
-    return Objects.equals(m_url, that.m_url) &&
+    return UriUtility.equals(m_url, that.m_url) &&
         Objects.equals(m_requestPath, that.m_requestPath) &&
         Objects.equals(m_resolvedPath, that.m_resolvedPath);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_url, m_requestPath, m_resolvedPath);
+    return Objects.hash(UriUtility.hashCode(m_url), m_requestPath, m_resolvedPath);
   }
 
   @Override
