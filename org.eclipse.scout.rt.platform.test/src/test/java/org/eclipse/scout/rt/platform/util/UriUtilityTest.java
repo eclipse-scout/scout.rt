@@ -89,4 +89,24 @@ public class UriUtilityTest {
     }
   }
 
+  @Test
+  public void testUrlEquals() throws Exception {
+    assertTrue(UriUtility.equals(null, null));
+    String s = "http://host/path/to?test=foo#anchor";
+    URL a = new URL(s);
+    URL b = new URL(s);
+    assertFalse(UriUtility.equals(a, null));
+    assertFalse(UriUtility.equals(null, b));
+    assertFalse(UriUtility.equals(a, new URL(s + "test")));
+    assertTrue(UriUtility.equals(a, b));
+  }
+
+  @Test
+  public void testUrlHashCode() throws Exception {
+    String s = "http://host/path/to?test=foo#anchor";
+    URL a = new URL(s);
+    URL b = new URL(s);
+    assertEquals(UriUtility.hashCode(a), UriUtility.hashCode(b));
+  }
+
 }

@@ -20,6 +20,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.slf4j.Logger;
@@ -264,4 +265,44 @@ public final class UriUtility {
     }
   }
 
+  /**
+   * Indicates whether the string representation of URL a is equal to the string representation of URL b.
+   * <p>
+   * <b>Warning: The returned value is not equal to the value of {@link URL#equals(Object)}.</b>
+   * <p>
+   * Compared to {@link URL#equals(Object)} this method does not do DNS lookups for hostnames and thus does not consider
+   * two URLs with hostnames resolving to the same IP address as equal. Compared to calling {@link URL#toURI()} and
+   * {@link URI#equals(Object)}, this method does no additional validation and is not case-insensitive with regard to
+   * hostnames.
+   *
+   * @see URL#equals(Object)
+   */
+  public static boolean equals(URL a, URL b) {
+    if (a == b) {
+      return true;
+    }
+    if (a == null) {
+      return false;
+    }
+    if (b == null) {
+      return false;
+    }
+    return ObjectUtility.equals(a.toString(), b.toString());
+  }
+
+  /**
+   * Generates a hash code based on the string representation of the URL.
+   * <p>
+   * <b>Warning: The returned value is not equal to the value of {@link URL#hashCode()}.</b>
+   * <p>
+   * Compared to {@link URL#hashCode()} this method does not do a DNS lookup for the hostname and thus does not generate
+   * the same hash code for two URLs with hostnames resolving to the same IP address. Compared to calling
+   * {@link URL#toURI()} and {@link URI#equals(Object)}, this method does no additional validation and is not
+   * case-insensitive with regard to hostnames.
+   *
+   * @see URL#hashCode()
+   */
+  public static int hashCode(URL a) {
+    return Objects.hashCode(a == null ? null : a.toString());
+  }
 }
