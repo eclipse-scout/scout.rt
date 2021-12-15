@@ -502,6 +502,7 @@ $.ajaxJson = url => $.ajax({
  * If it isn't, it will be passed to $() in order to create one.
  * <p>
  * Just using $() on an existing jQuery object would clone it which would work but is unnecessary.
+ * @returns $
  */
 $.ensure = $elem => {
   if ($elem instanceof $) {
@@ -569,7 +570,7 @@ $.fn.document = function(domElement) {
 
 /**
  * @param {boolean} [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
- * @returns {Window} window reference (defaultView) of the HTML element
+ * @returns {Window|$} window reference (defaultView) of the HTML element
  */
 $.fn.window = function(domElement) {
   let myDocument = this.document(true),
@@ -1554,21 +1555,25 @@ $.fn.hide = function(...args) {
 };
 
 const __origWidth = $.fn.width;
+// noinspection JSValidateTypes
 $.fn.width = function(...args) {
   return _ceilNumber(__origWidth.apply(this, args));
 };
 
 const __origOuterWidth = $.fn.outerWidth;
+// noinspection JSValidateTypes
 $.fn.outerWidth = function(...args) {
   return _ceilNumber(__origOuterWidth.apply(this, args));
 };
 
 const __origHeight = $.fn.height;
+// noinspection JSValidateTypes
 $.fn.height = function(...args) {
   return _ceilNumber(__origHeight.apply(this, args));
 };
 
 let __origOuterHeight = $.fn.outerHeight;
+// noinspection JSValidateTypes
 $.fn.outerHeight = function(...args) {
   return _ceilNumber(__origOuterHeight.apply(this, args));
 };

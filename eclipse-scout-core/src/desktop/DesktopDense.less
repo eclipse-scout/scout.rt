@@ -57,23 +57,28 @@
         /* By making sure menu items are always at least the same height as form fields, it is easier to align them with each other, especially when zoomed */
         min-height: @logical-grid-row-height-dense; /* @logical-grid-row-height; */
       }
+
+      & > .menu-button {
+        padding-top: 2px;
+        padding-bottom: 2px;
+      }
     }
   }
 
   /* GroupBox.less */
 
   .group-box-header {
-    margin-top: 2px; /* @group-box-title-margin-top; */
+    margin-top: 6px; /* @group-box-title-margin-top; */
 
     & > .title {
-      padding-top: 4px; /* padding: @group-box-title-padding-top 0 @group-box-title-padding-bottom 0; */
-      padding-bottom: 4px;
+      padding-top: 6px; /* padding: @group-box-title-padding-top 0 @group-box-title-padding-bottom 0; */
+      padding-bottom: 6px;
     }
   }
 
   .group-box-body {
-    padding-top: 8px; /* padding: @group-box-body-padding-top 0 @group-box-body-padding-bottom 0; */
-    padding-bottom: 6px;
+    padding-top: 10px; /* padding: @group-box-body-padding-top 0 @group-box-body-padding-bottom 0; */
+    padding-bottom: 8px;
 
     /* redefine */
 
@@ -86,13 +91,13 @@
   /* TabBox.less */
 
   .tab-box-header {
-    margin-top: 4px; /* @group-box-title-margin-top; */
+    margin-top: 6px; /* @group-box-title-margin-top; */
   }
 
   .tab-item {
     & > .title {
-      padding-top: 4px; /* padding: @tab-item-title-padding-top 0 @tab-item-title-padding-bottom; */
-      padding-bottom: 4px;
+      padding-top: 6px; /* padding: @tab-item-title-padding-top 0 @tab-item-title-padding-bottom; */
+      padding-bottom: 6px;
     }
   }
 
@@ -132,6 +137,12 @@
     }
   }
 
+  /* TableFooter.less */
+
+  .table-control-resize {
+    height: 12px;
+  }
+
   /* DesktopBench.less */
 
   .detail-table.table {
@@ -164,28 +175,21 @@
   /* main.less */
 
   .input-field {
-    padding-top: 3px; /* padding: @text-field-padding-y @text-field-padding-x; */
-    padding-bottom: 3px;
+    padding-top: 2px; /* padding: @text-field-padding-y @text-field-padding-x; */
+    padding-bottom: 2px;
   }
 
   /* Button */
 
-  .button {
+  .button-field > .button {
     padding-top: 0; /*   padding: @button-padding-y @button-padding-x; */
     padding-bottom: 0;
-
-    & > .button-label {
-      padding: 0 0;
-    }
+    min-height: @logical-grid-row-height-dense;
 
     & > .icon {
       padding-top: 0; /* padding-top: 2px; */
       padding-bottom: 0; /* padding-bottom: 2px; */
     }
-  }
-
-  .button-field > .button > .button-label {
-    padding: 0; /* @text-field-padding-y - @button-padding-y - @button-margin-top 0 */
   }
 
   /* RadioButton.less */

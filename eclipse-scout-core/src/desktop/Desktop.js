@@ -236,6 +236,7 @@ export default class Desktop extends Widget {
     // Desktop elements are added before this separator, all overlays are opened after (dialogs, popups, tooltips etc.)
     this.$overlaySeparator = this.$container.appendDiv('overlay-separator').setVisible(false);
 
+    this._renderDense();
     this._renderNavigationVisible();
     this._renderHeaderVisible();
     this._renderBenchVisible();
@@ -246,7 +247,6 @@ export default class Desktop extends Widget {
     this._renderNavigationHandleVisible();
     this._renderNotifications();
     this._renderBrowserHistoryEntry();
-    this._renderDense();
     this.addOns.forEach(addOn => {
       addOn.render();
     }, this);
