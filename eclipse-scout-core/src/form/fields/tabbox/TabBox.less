@@ -62,7 +62,7 @@
       & > .tab-item {
         flex-grow: 1;
         flex-basis: 0;
-        text-align: center;
+        justify-content: center;
       }
 
       & > .tab-item.first {
@@ -106,12 +106,14 @@
 
 .tab-item {
   position: relative;
-  display: inline-block;
-  vertical-align: middle;
+  display: inline-flex;
+  align-items: center; // In case the tab area gets very large (e.g. by large form fields in the menubar in dense mode)
+  vertical-align: middle; // Needed to align overflow menu item
   color: @tab-item-color;
   background-color: transparent;
   padding: 0 @tab-item-padding-x;
   cursor: pointer;
+  height: 100%; // Ensures the after element is always on the tab box header line (may not be the case on certain zoom levels or if the area is very large, see above)
 
   &::after {
     content: '';

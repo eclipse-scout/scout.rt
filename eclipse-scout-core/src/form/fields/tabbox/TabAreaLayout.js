@@ -206,7 +206,6 @@ export default class TabAreaLayout extends AbstractLayout {
     htmlComp.$comp.removeClass('hidden');
 
     prefSize = htmlComp.prefSize({
-      useCssSize: true,
       exact: true
     }).add(graphics.margins(htmlComp.$comp));
 
