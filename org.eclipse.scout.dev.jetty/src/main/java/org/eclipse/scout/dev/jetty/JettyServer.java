@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -276,7 +276,7 @@ public class JettyServer {
     if (autoCertName != null) {
       SecurityUtility.autoCreateSelfSignedCertificate(keyStorePath, storepass, keypass, certAlias, autoCertName);
     }
-    LOG.info("Setup SSL certificate using alias '{}' from keystore '{}':\n{}", certAlias, keyStorePath, SecurityUtility.keyStoreToHumanReadableText(keyStorePath, storepass, null));
+    LOG.info("Setup SSL certificate using alias '{}' from keystore '{}':\n{}", certAlias, keyStorePath, SecurityUtility.keyStoreToHumanReadableText(keyStorePath, storepass, keypass));
     sslContextFactory.setKeyStorePath(keyStorePath);
     sslContextFactory.setKeyStorePassword(storepass);
     sslContextFactory.setKeyManagerPassword(keypass);
