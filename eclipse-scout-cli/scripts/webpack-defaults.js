@@ -151,8 +151,8 @@ module.exports = (env, args) => {
               [require.resolve('@babel/preset-env'), {
                 debug: false,
                 targets: {
-                  firefox: '55',
-                  chrome: '58',
+                  firefox: '62',
+                  chrome: '69',
                   safari: '12.1'
                 }
               }]

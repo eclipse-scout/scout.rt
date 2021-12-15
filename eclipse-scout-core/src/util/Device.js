@@ -258,17 +258,16 @@ export default class Device {
   }
 
   /**
-   * This method returns false for very old browsers. Basically we check for the first version
-   * that supports ECMAScript 5. This methods excludes all browsers that are known to be
-   * unsupported, all others (e.g. unknown engines) are allowed by default.
+   * This method returns false for all browsers that are known to be unsupported, all others (e.g. unknown engines) are allowed by default.
+   * The supported browser versions are mainly determined by the features needed by Scout (e.g. class syntax, Array.flatMap, IntersectionObserver, Custom CSS Properties, CSS flex-box).
    */
   isSupportedBrowser(browser, version) {
     browser = scout.nvl(browser, this.browser);
     version = scout.nvl(version, this.browserVersion);
     let browsers = Device.Browser;
-    return (browser === browsers.CHROME && version >= 58)
-      || (browser === browsers.FIREFOX && version >= 55)
-      || (browser === browsers.SAFARI && version >= 13);
+    return (browser === browsers.CHROME && version >= 69)
+      || (browser === browsers.FIREFOX && version >= 62)
+      || (browser === browsers.SAFARI && version >= 12.1);
   }
 
   /**
