@@ -103,8 +103,7 @@ export default class FormFieldLayout extends AbstractLayout {
         formField.$status
           .cssTop(statusTop)
           .cssRight(right + formField.$label.cssMarginRight())
-          .cssHeight(statusHeight)
-          .cssLineHeight(null);
+          .cssHeight(statusHeight);
         // Add padding to label to prevent overlay of text and status icon
         let w = graphics.size(formField.$status, true).width;
         formField.$label.cssPaddingRight(w);
@@ -113,8 +112,7 @@ export default class FormFieldLayout extends AbstractLayout {
         formField.$status
           .cssTop(top)
           .cssRight(right)
-          .cssHeight(this.rowHeight)
-          .cssLineHeight(this.rowHeight);
+          .cssHeight(this.rowHeight);
         right += statusWidth + formField.$status.cssMarginX();
       }
     }

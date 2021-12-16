@@ -205,8 +205,7 @@ export default class GroupBoxLayout extends AbstractLayout {
     $status
       .cssTop(top)
       .cssRight(right)
-      .cssHeight(headerInnerHeight - statusMargins.vertical())
-      .cssLineHeight(headerInnerHeight - statusMargins.vertical());
+      .cssHeight(headerInnerHeight - statusMargins.vertical());
   }
 
   preferredLayoutSize($container, options) {

@@ -224,9 +224,6 @@
 @dashboard-tile-selected-border-color: @item-selection-border-color;
 @dashboard-tile-alternative-selected-border-color: @tile-alternative-inverted-background-color;
 @dashboard-tile-default-selected-border-color: @tile-default-inverted-background-color;
-@dashboard-tile-menu-color: @palette-gray-6;
-@dashboard-tile-menu-hover-color: @palette-gray-7;
-@dashboard-tile-menu-active-color: @palette-gray-9;
 @date-picker-day-hover-background-color: @hover-background-color;
 @date-picker-day-selected-color: @selected-color;
 @date-picker-day-selected-background-color: @selected-background-color;
@@ -360,15 +357,15 @@
 @scroll-shadow-color: rgba(0, 0, 0, @scroll-shadow-alpha);
 @scroll-shadow-gradient-color: @background-color;
 @status-menu-color: @palette-gray-7;
-@status-menu-hover-color: @hover-color;
+@status-menu-hover-color: @text-field-icon-hover-color;
 @status-ok-color: @ok-color;
-@status-ok-hover-color: @palette-green-4;
+@status-ok-hover-color: darken(@status-ok-color, 10%);
 @status-info-color: @text-field-icon-color; /* do not use the @info-color here as the icon should have the same color as field icons */
-@status-info-hover-color: @hover-color;
+@status-info-hover-color: @text-field-icon-hover-color;
 @status-warning-color: @warning-color;
-@status-warning-hover-color: @palette-orange-4;
+@status-warning-hover-color: darken(@status-warning-color, 10%);
 @status-error-color: @error-color;
-@status-error-hover-color: @palette-red-3;
+@status-error-hover-color: darken(@status-error-color, 10%);
 @slider-track-color: @palette-gray-5;
 @switch-background-color: fade(@palette-black, 12%);
 @switch-border-color: transparent;
@@ -447,6 +444,8 @@
 @tile-alternative-inverted-label-color: @tile-alternative-inverted-color;
 @tile-alternative-inverted-link-hover-color: fade(@tile-alternative-inverted-color, 85%);
 @tile-alternative-inverted-link-active-color: fade(@tile-alternative-inverted-color, 75%);
+@tile-alternative-inverted-status-hover-background-color: @tile-default-inverted-status-hover-background-color;
+@tile-alternative-inverted-status-active-background-color: @tile-default-inverted-status-active-background-color;
 @tile-button-alternative-inverted-active-background-color: darken(@tile-alternative-inverted-background-color, 10);
 @tile-button-alternative-inverted-hover-background-color: darken(@tile-alternative-inverted-background-color, 5);
 @tile-button-alternative-inverted-color: @tile-button-default-inverted-color;
@@ -471,6 +470,8 @@
 @tile-default-inverted-label-color: @tile-default-inverted-color;
 @tile-default-inverted-link-hover-color: fade(@tile-default-inverted-color, 85%);
 @tile-default-inverted-link-active-color: fade(@tile-default-inverted-color, 75%);
+@tile-default-inverted-status-hover-background-color: fade(@palette-black, 15%);
+@tile-default-inverted-status-active-background-color: fade(@palette-black, 20%);
 @tile-placeholder-background-color: @palette-gray-3;
 @tile-scrollbar-thumb-inverted-main-color: @palette-gray-4;
 @tile-scrollbar-thumb-inverted-color: fade(@tile-scrollbar-thumb-inverted-main-color, 30%);

@@ -149,9 +149,6 @@
 @date-picker-separator-color: @palette-gray-4;
 @date-picker-day-preselected-background-color: fade(@palette-white, 8%);
 @dashboard-tile-border-color: @border-color;
-@dashboard-tile-menu-color: @palette-white;
-@dashboard-tile-menu-hover-color: @hover-color;
-@dashboard-tile-menu-active-color: @hover-color;
 @dashboard-tile-alternative-selected-border-color: @dashboard-tile-selected-border-color;
 @dashboard-tile-default-selected-border-color: @dashboard-tile-selected-border-color;
 @desktop-bench-drop-shadow-color: fade(@palette-black, 35%);
@@ -192,8 +189,10 @@
 @slider-track-color: @palette-gray-3;
 @status-menu-color: @text-color-1;
 @status-info-color: @text-color-2;
-@status-ok-hover-color: @palette-green-1;
-@status-warning-hover-color: @palette-orange-3;
+@status-info-hover-color: @text-color-1;
+@status-ok-hover-color: lighten(@status-ok-color, 10%);
+@status-warning-hover-color: lighten(@status-warning-color, 10%);
+@status-error-hover-color: lighten(@status-error-color, 10%);
 @switch-background-color: @mode-alternative-background-color;
 @switch-border-color: @check-box-border-color;
 @switch-button-background-color: @text-color;
@@ -231,6 +230,8 @@
 @tile-default-inverted-selection-background-color: @tile-default-inverted-background-color;
 @tile-default-inverted-link-active-color: @link-active-color;
 @tile-default-inverted-link-hover-color: @link-hover-color;
+@tile-default-inverted-status-hover-background-color: @hover-background-color;
+@tile-default-inverted-status-active-background-color: @active-background-color;
 @tile-default-label-color: @text-color-1;
 @tile-default-link-active-color: @link-active-color;
 @tile-table-default-inverted-selection-background-color: @item-selection-background-color;

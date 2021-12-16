@@ -180,8 +180,12 @@ export default class FieldStatus extends Widget {
         menus: this.menus
       });
       this.tooltip.render();
+      this.$container.addClass('selected');
       this.tooltip.one('destroy', () => {
         this.tooltip = null;
+        if (this.$container) {
+          this.$container.removeClass('selected');
+        }
       });
     }
   }
@@ -213,8 +217,12 @@ export default class FieldStatus extends Widget {
       closeOnAnchorMouseDown: false
     });
     this.contextMenu.open();
+    this.$container.addClass('selected');
     this.contextMenu.one('destroy', () => {
       this.contextMenu = null;
+      if (this.$container) {
+        this.$container.removeClass('selected');
+      }
     });
   }
 

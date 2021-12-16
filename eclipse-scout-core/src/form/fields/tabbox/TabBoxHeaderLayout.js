@@ -82,8 +82,7 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
     if (this.tabBoxHeader.tabBox.statusPosition === FormField.StatusPosition.TOP && $status && $status.isVisible()) {
       $status.cssWidth(this.fieldStatusWidth)
         .cssRight(insets.right)
-        .cssHeight(containerSize.height - graphics.margins($status).vertical())
-        .cssLineHeight(containerSize.height - graphics.margins($status).vertical());
+        .cssHeight(containerSize.height - graphics.margins($status).vertical());
     }
   }
 

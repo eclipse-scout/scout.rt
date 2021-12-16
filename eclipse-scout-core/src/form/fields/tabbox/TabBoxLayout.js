@@ -103,8 +103,7 @@ export default class TabBoxLayout extends AbstractLayout {
     $status.cssWidth(this._statusWidth)
       .cssTop(statusTop)
       .cssRight(right)
-      .cssHeight(statusHeight)
-      .cssLineHeight(statusHeight);
+      .cssHeight(statusHeight);
   }
 
   /**
