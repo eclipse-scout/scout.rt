@@ -10,7 +10,9 @@
  */
 .filter-field {
   position: absolute;
-  bottom: ~'min(' @filter-field-bottom, calc(~'50% - ' @filter-field-height / 2) ~')';
+  --filter-field-bottom: @filter-field-bottom;
+  --filter-field-max-bottom: calc(~'50% - ' @filter-field-height / 2);
+  bottom: min(var(--filter-field-bottom), var(--filter-field-max-bottom));
   right: @filter-field-right;
   height: @filter-field-height;
   width: @filter-field-width;
@@ -91,7 +93,8 @@
   }
 
   &:not(.focused).empty {
-    bottom: ~'min('@filter-field-bottom + ((@filter-field-height - @filter-field-icon-size) / 2), calc(~'50% - ' @filter-field-icon-size / 2) ~')';
+    --filter-field-bottom: @filter-field-bottom + ((@filter-field-height - @filter-field-icon-size) / 2);
+    --filter-field-max-bottom: calc(~'50% - ' @filter-field-icon-size / 2);
     right: @filter-field-right + @text-field-icon-margin-x + 1px;
     height: @filter-field-icon-size;
     width: @filter-field-icon-size;
@@ -127,7 +130,9 @@
 
 .filter-field-container {
   position: sticky;
-  top: ~'max(' calc(~'100% - ' @filter-field-bottom), calc(~'50% + ' @filter-field-height / 2) ~')';
+  --filter-field-container-top: calc(~'100% - ' @filter-field-bottom);
+  --filter-field-container-min-top: calc(~'50% + ' @filter-field-height / 2);
+  top: max(var(--filter-field-container-top), var(--filter-field-container-min-top));
   left: calc(~'100% - ' @filter-field-right);
   width: 0;
   height: 0;
