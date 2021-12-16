@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,13 +14,19 @@ public class HtmlDocumentParserParameters {
 
   private final boolean m_minify;
   private final boolean m_cacheEnabled;
+  private final boolean m_isBrowserSupported;
   private final String m_basePath;
   private final String m_theme;
   private final String m_htmlPath;
 
   public HtmlDocumentParserParameters(String htmlPath, String theme, boolean minify, boolean cacheEnabled, String basePath) {
+    this(htmlPath, theme, minify, cacheEnabled, basePath, true);
+  }
+
+  public HtmlDocumentParserParameters(String htmlPath, String theme, boolean minify, boolean cacheEnabled, String basePath, boolean isBrowserSupported) {
     m_minify = minify;
     m_cacheEnabled = cacheEnabled;
+    m_isBrowserSupported = isBrowserSupported;
     m_basePath = basePath;
     m_theme = theme;
     m_htmlPath = htmlPath;
@@ -32,6 +38,10 @@ public class HtmlDocumentParserParameters {
 
   public boolean isCacheEnabled() {
     return m_cacheEnabled;
+  }
+
+  public boolean isBrowserSupported() {
+    return m_isBrowserSupported;
   }
 
   public String getHtmlPath() {

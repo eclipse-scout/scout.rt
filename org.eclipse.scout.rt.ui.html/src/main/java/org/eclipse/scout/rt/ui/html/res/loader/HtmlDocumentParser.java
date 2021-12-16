@@ -32,8 +32,6 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
-import org.eclipse.scout.rt.shared.ui.UiEngineType;
-import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.rt.shared.ui.webresource.ScriptResourceIndexes;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
@@ -126,8 +124,7 @@ public class HtmlDocumentParser {
 
   protected void replaceScriptsTags() {
     // <scout:scripts entryPoint="entry-point-name"/>
-    boolean isUnsupportedBrowser = UiEngineType.IE.equals(UserAgentUtility.getCurrentUserAgent().getUiEngineType());
-    if (isUnsupportedBrowser) {
+    if (!m_params.isBrowserSupported()) {
       m_workingContent = PATTERN_SCRIPTS_TAG.matcher(m_workingContent).replaceAll(SCRIPT_TAG_PREFIX + LegacyBrowserScriptLoader.LEGACY_BROWSERS_SCRIPT + SCRIPT_TAG_SUFFIX);
       return;
     }

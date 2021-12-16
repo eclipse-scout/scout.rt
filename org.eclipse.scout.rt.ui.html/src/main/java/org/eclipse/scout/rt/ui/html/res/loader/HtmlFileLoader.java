@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,8 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ExternalBaseUrlProperty;
+import org.eclipse.scout.rt.shared.ui.UiEngineType;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResources;
 
@@ -41,6 +43,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
   private static final String THEME_KEY = "ui.theme";
   private static final String LOCALE_KEY = "ui.locale";
   private static final String MINIFY_KEY = "ui.minify";
+  private static final String BROWSER_SUPPORTED_KEY = "ui.browserSupported";
 
   private final String m_theme;
   private final boolean m_minify;
@@ -63,6 +66,11 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     }
     attrs.put(THEME_KEY, m_theme);
     attrs.put(MINIFY_KEY, Boolean.toString(m_minify));
+
+    // include if the browser is supported because the injected scripts tags are different for unsupported legacy browsers
+    if (!isBrowserSupported()) {
+      attrs.put(BROWSER_SUPPORTED_KEY, Boolean.FALSE.toString());
+    }
     return new HttpCacheKey(pathInfo, attrs);
   }
 
@@ -115,13 +123,18 @@ public class HtmlFileLoader extends AbstractResourceLoader {
         .build();
   }
 
+  public boolean isBrowserSupported() {
+    return !UiEngineType.IE.equals(UserAgentUtility.getCurrentUserAgent().getUiEngineType());
+  }
+
   public HtmlDocumentParserParameters createHtmlDocumentParserParameters(String htmlPath) {
     return new HtmlDocumentParserParameters(
         htmlPath,
         m_theme,
         m_minify,
         m_cacheEnabled,
-        CONFIG.getPropertyValue(ExternalBaseUrlProperty.class));
+        CONFIG.getPropertyValue(ExternalBaseUrlProperty.class),
+        isBrowserSupported());
   }
 
   /**
