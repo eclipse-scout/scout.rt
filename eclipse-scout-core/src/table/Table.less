@@ -119,17 +119,21 @@
   }
 
   & > .filter-field {
-    bottom: ~'min(' @filter-field-bottom, calc(~'50% - ' (@filter-field-height + var(--controls-height)) / 2) ~')';
+    // TODO [fsh]: fix for prod-build (css minimizer)
+    //bottom: ~'min(' @filter-field-bottom, calc(~'50% - ' (@filter-field-height + var(--controls-height)) / 2) ~')';
 
     &:not(.focused).empty {
-      bottom: ~'min(' @filter-field-bottom + ((@filter-field-height - @filter-field-icon-size) / 2), calc(~'50% - ' (@filter-field-icon-size + var(--controls-height)) / 2) ~')';
+      // TODO [fsh]: fix for prod-build (css minimizer)
+      //bottom: ~'min(' @filter-field-bottom + ((@filter-field-height - @filter-field-icon-size) / 2), calc(~'50% - ' (@filter-field-icon-size + var(--controls-height)) / 2) ~')';
     }
 
     .has-menubar.menubar-bottom& {
-      bottom: calc(~'min(' @filter-field-bottom, calc(~'50% - ' (@filter-field-height + var(--controls-height)) / 2)~')' + var(--menubar-height));
+      // TODO [fsh]: fix for prod-build (css minimizer)
+      //bottom: calc(~'min(' @filter-field-bottom, calc(~'50% - ' (@filter-field-height + var(--controls-height)) / 2)~')' + var(--menubar-height));
 
       &:not(.focused).empty {
-        bottom: calc(~'min(' @filter-field-bottom + ((@filter-field-height - @filter-field-icon-size) / 2), calc(~'50% - ' (@filter-field-icon-size + var(--controls-height)) / 2)~')' + var(--menubar-height));
+        // TODO [fsh]: fix for prod-build (css minimizer)
+        //bottom: calc(~'min(' @filter-field-bottom + ((@filter-field-height - @filter-field-icon-size) / 2), calc(~'50% - ' (@filter-field-icon-size + var(--controls-height)) / 2)~')' + var(--menubar-height));
       }
     }
   }

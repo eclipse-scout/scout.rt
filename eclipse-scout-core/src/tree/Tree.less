@@ -28,10 +28,12 @@
   }
 
   & > .filter-field {
-    bottom: calc(~'min(' @filter-field-bottom, calc(~'50% - ' (@filter-field-height + var(--menubar-height)) / 2)~')' + var(--menubar-height));
+    // TODO [fsh]: fix for prod-build (css minimizer)
+    //bottom: calc(~'min(' @filter-field-bottom, calc(~'50% - ' (@filter-field-height + var(--menubar-height)) / 2)~')' + var(--menubar-height));
 
     &:not(.focused).empty {
-      bottom: calc(~'min(' @filter-field-bottom + ((@filter-field-height - @filter-field-icon-size) / 2), calc(~'50% - ' (@filter-field-icon-size + var(--menubar-height)) / 2)~')' + var(--menubar-height));
+      // TODO [fsh]: fix for prod-build (css minimizer)
+      //bottom: ~"calc(min(' @filter-field-bottom + ((@filter-field-height - @filter-field-icon-size) / 2) ~', calc(50% - (' @filter-field-icon-size ~'+ var(--menubar-height)) / 2)) + var(--menubar-height))';
     }
   }
 }
