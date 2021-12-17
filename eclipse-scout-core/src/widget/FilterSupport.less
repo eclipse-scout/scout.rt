@@ -35,7 +35,7 @@
   box-shadow @filter-field-transition-duration ease-in-out,
   opacity @filter-field-transition-duration ease-in-out;
 
-  :not(:hover) > &:not(.focused):not(.focus-inside-widget) {
+  :not(:hover) > &:not(.focused):not(.focus-inside-widget).empty {
     opacity: 0;
   }
 
@@ -141,7 +141,7 @@
 
   --filter-field-max-width: @filter-field-width;
 
-  &:not(:hover) > .filter-field:not(.focused):not(.focus-inside-widget) {
+  &:not(:hover) > .filter-field:not(.focused):not(.focus-inside-widget).empty {
     opacity: 1;
   }
 
@@ -150,7 +150,7 @@
     right: 0;
     max-width: var(--filter-field-max-width);
 
-    :not(:hover) > &:not(.focused):not(.focus-inside-widget) {
+    :not(:hover) > &:not(.focused):not(.focus-inside-widget).empty {
       opacity: 0;
     }
 

@@ -174,9 +174,9 @@ export default class TileGrid extends Widget {
   _remove() {
     this.$fillBefore = null;
     this.$fillAfter = null;
+    this.filterSupport.remove();
     this.viewRangeRendered = new Range(0, 0);
     this._updateVirtualScrollable();
-    this.filterSupport.remove();
     super._remove();
   }
 
@@ -1073,7 +1073,7 @@ export default class TileGrid extends Widget {
       // Non visible tiles must be deselected
       this.deselectTiles(result.newlyHidden);
 
-      if (this.rendered) {
+      if (this.rendered && !this.removing) {
         // Not all tiles may be rendered yet (e.g. if filter is active before grid is rendered and removed after grid is rendered)
         // But updating the view range is necessary anyway (fillers, scrollbars, viewRangeRendered etc.)
         this._renderTileDelta(result);

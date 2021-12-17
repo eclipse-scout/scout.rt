@@ -171,9 +171,7 @@ export default class FilterSupport extends WidgetSupport {
   }
 
   _onFocusOut(event) {
-    if (!this._updateFocusInsideWidget(event.relatedTarget)) {
-      this._resetFilterField();
-    }
+    this._updateFocusInsideWidget(event.relatedTarget);
   }
 
   _updateFocusInsideWidget(target) {
