@@ -25,7 +25,7 @@ export function sumFinish(currentState) {
   return currentState;
 }
 
-let sumSymbol = icons.SUM_BOLD;
+let sumSymbol = icons.SUM;
 
 export function avgStart() {
   return {
@@ -48,7 +48,7 @@ export function avgFinish(currentState) {
   }
 }
 
-let avgSymbol = icons.AVG_BOLD;
+let avgSymbol = icons.AVG;
 
 export function minStart() {
   return null;

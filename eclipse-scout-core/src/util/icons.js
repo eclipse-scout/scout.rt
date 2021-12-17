@@ -23,8 +23,8 @@ const EXCLAMATION_MARK_BOLD = 'font:\uE060';
 const EXCLAMATION_MARK_CIRCLE = 'font:\uE001';
 const INFO = 'font:\uE002';
 const CALENDAR = 'font:\uE029';
-const CALENDAR_BOLD = 'font:\uE003';
-const CLOCK_BOLD = 'font:\uE004';
+const FILE = 'font:\uE003';
+const CLOCK = 'font:\uE004';
 const CHECKED_BOLD = 'font:\uE005';
 const GROUP = 'font:\uE006';
 const GROUP_PLUS = 'font:\uE007';
@@ -51,13 +51,9 @@ const STAR_BOLD = 'font:\uE032';
 const STAR_SOLID = 'font:\uE033';
 const PERSON_SOLID = 'font:\uE034';
 const SEARCH = 'font:\uE02A';
-const SEARCH_BOLD = 'font:\uE042';
 const FOLDER = 'font:\uE02B';
-const FOLDER_BOLD = 'font:\uE043';
 const SUM = 'font:\uE02C';
-const SUM_BOLD = 'font:\uE025';
 const AVG = 'font:\uE03A';
-const AVG_BOLD = 'font:\uE026';
 const MAX = 'font:\uE039';
 const MAX_BOLD = 'font:\uE027';
 const MIN = 'font:\uE038';
@@ -70,11 +66,10 @@ const SLIPPERY = 'font:\uE044';
 const REMOVE = 'font:\uE035';
 const REMOVE_BOLD = 'font:\uE045';
 const PENCIL = 'font:\uE02F';
-const PENCIL_BOLD = 'font:\uE04B';
-const PENCIL_SOLID = 'font:\uE04F';
 const PENCIL_UNDERLINE_SOLID = 'font:\uE050';
 const ROTATE_LEFT = 'font:\uE051';
 const ROTATE_RIGHT = 'font:\uE052';
+const HOURGLASS = 'font:\uE053';
 const DIAGRAM_AREA = 'font:\uE070';
 const DIAGRAM_BAR = 'font:\uE071';
 const DIAGRAM_BARS_HORIZONTAL = 'font:\uE072';
@@ -105,7 +100,6 @@ const ANGLE_RIGHT_BOLD = 'font:\uF105';
 const ANGLE_UP_BOLD = 'font:\uF106';
 const ANGLE_DOWN_BOLD = 'font:\uF107';
 const CIRCLE_BOLD = 'font:\uF111';
-const FILE_SOLID = 'font:\uF15B';
 const LONG_ARROW_DOWN_BOLD = 'font:\uF175';
 const LONG_ARROW_UP_BOLD = 'font:\uF176';
 const LONG_ARROW_LEFT_BOLD = 'font:\uF177';
@@ -195,10 +189,10 @@ export default {
   EXCLAMATION_MARK_BOLD,
   EXCLAMATION_MARK_CIRCLE,
   INFO,
+  FILE,
   CALENDAR,
-  CALENDAR_BOLD,
-  CLOCK_BOLD,
   CHECKED_BOLD,
+  CLOCK,
   GROUP,
   GROUP_PLUS,
   ANGLE_DOUBLE_LEFT,
@@ -224,13 +218,9 @@ export default {
   STAR_SOLID,
   PERSON_SOLID,
   SEARCH,
-  SEARCH_BOLD,
   FOLDER,
-  FOLDER_BOLD,
   SUM,
-  SUM_BOLD,
   AVG,
-  AVG_BOLD,
   MAX,
   MAX_BOLD,
   MIN,
@@ -240,11 +230,10 @@ export default {
   COLLAPSE,
   ELLIPSIS_V,
   SLIPPERY,
+  HOURGLASS,
   REMOVE,
   REMOVE_BOLD,
   PENCIL,
-  PENCIL_BOLD,
-  PENCIL_SOLID,
   PENCIL_UNDERLINE_SOLID,
   ROTATE_LEFT,
   ROTATE_RIGHT,
@@ -276,7 +265,6 @@ export default {
   ANGLE_UP_BOLD,
   ANGLE_DOWN_BOLD,
   CIRCLE_BOLD,
-  FILE_SOLID,
   LONG_ARROW_DOWN_BOLD,
   LONG_ARROW_UP_BOLD,
   LONG_ARROW_LEFT_BOLD,

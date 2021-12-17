@@ -70,10 +70,11 @@
   @file-list-indent: 20px;
   position: relative;
   min-height: 100px;
-  max-height: 100px;
+  max-height: 200px;
   border-top: 1px solid @border-color;
   padding-top: 16px;
   margin-top: 10px;
+  margin-bottom: 0;
   list-style-type: none;
   padding-left: @file-list-indent;
 
@@ -84,7 +85,7 @@
 
     &::before {
       #scout.font-icon();
-      content: @icon-file-solid;
+      content: @icon-file;
       float: left;
       width: @file-list-indent;
       padding-left: 2px;

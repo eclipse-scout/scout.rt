@@ -8,39 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  AjaxCall,
-  App,
-  arrays,
-  BackgroundJobPollingStatus,
-  BackgroundJobPollingSupport,
-  Device,
-  EventSupport,
-  FileInput,
-  files as fileUtil,
-  FocusManager,
-  fonts,
-  icons,
-  LayoutValidator,
-  Locale,
-  MessageBox,
-  ModelAdapter,
-  NullWidget,
-  ObjectFactory,
-  objects,
-  Reconnector,
-  RemoteEvent,
-  ResponseQueue,
-  scout,
-  Status,
-  strings,
-  TextMap,
-  texts,
-  TypeDescriptor,
-  URL,
-  UserAgent,
-  webstorage
-} from '../index';
+import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, Device, EventSupport, FileInput, files as fileUtil, FocusManager, fonts, icons, LayoutValidator, Locale, MessageBox, ModelAdapter, NullWidget, ObjectFactory, objects, Reconnector, RemoteEvent, ResponseQueue, scout, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage} from '../index';
 import $ from 'jquery';
 
 export default class Session {
@@ -1044,7 +1012,7 @@ export default class Session {
     } else if (jsonError.code === Session.JsonResponseError.SESSION_TIMEOUT) {
       boxOptions.header = this.optText('ui.SessionTimeout', boxOptions.header);
       boxOptions.body = this.optText('ui.SessionExpiredMsg', boxOptions.body);
-      boxOptions.iconId = icons.SLIPPERY;
+      boxOptions.iconId = icons.HOURGLASS;
     } else if (jsonError.code === Session.JsonResponseError.UI_PROCESSING) {
       boxOptions.header = this.optText('ui.UnexpectedProblem', boxOptions.header);
       boxOptions.body = strings.join('\n\n',

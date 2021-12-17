@@ -1371,7 +1371,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected String getConfiguredIconId() {
-                return AbstractIcons.PencilSolid;
+                return AbstractIcons.Pencil;
               }
 
               @Override

@@ -35,9 +35,9 @@ public abstract class AbstractIcons implements Serializable {
   /* custom icons */
   public static final String ExclamationMarkCircle = "font:\uE001";
   public static final String Info = "font:\uE002";
+  public static final String File = "font:\uE003";
   public static final String Calendar = "font:\uE029";
-  public static final String CalendarBold = "font:\uE003";
-  public static final String ClockBold = "font:\uE004";
+  public static final String Clock = "font:\uE004";
   public static final String CheckedBold = "font:\uE005";
   public static final String Group = "font:\uE006";
   public static final String GroupPlus = "font:\uE007";
@@ -74,19 +74,16 @@ public abstract class AbstractIcons implements Serializable {
   public static final String Max = "font:\uE039";
   public static final String EllipsisV = "font:\uE041";
   public static final String Search = "font:\uE02A";
-  public static final String SearchBold = "font:\uE042";
   public static final String Folder = "font:\uE02B";
-  public static final String FolderBold = "font:\uE043";
   public static final String Slippery = "font:\uE044";
   public static final String RemoveBold = "font:\uE045";
   public static final String Sum = "font:\ue02C";
-  public static final String SumBold = "font:\ue025";
+  public static final String Avg = "font:\uE03A";
   public static final String Pencil = "font:\uE02F";
-  public static final String PencilBold = "font:\uE04B";
-  public static final String PencilSolid = "font:\uE04F";
   public static final String PencilUnderlineSolid = "font:\uE050";
   public static final String RotateLeft = "font:\uE051";
   public static final String RotateRight = "font:\uE052";
+  public static final String Hourglass = "font:\uE053";
   public static final String ExclamationMarkBold = "font:\uE060";
   public static final String DiagramArea = "font:\uE070";
   public static final String DiagramBar = "font:\uE071";
@@ -118,7 +115,6 @@ public abstract class AbstractIcons implements Serializable {
   public static final String AngleRightBold = "font:\uF105";
   public static final String AngleUpBold = "font:\uF106";
   public static final String AngleDownBold = "font:\uF107";
-  public static final String FileSolid = "font:\uF15B";
   public static final String LongArrowDownBold = "font:\uF175";
   public static final String LongArrowUpBold = "font:\uF176";
   public static final String LongArrowLeftBold = "font:\uF177";
