@@ -3787,7 +3787,13 @@ export default class Table extends Widget {
   setFilters(filters, applyFilter = true) {
     this.resetUserFilter(false);
     filters = filters.map(filter => this._ensureFilter(filter));
-    this.filterSupport.setFilters(filters, applyFilter);
+    let result = this.filterSupport.setFilters(filters, applyFilter);
+    result.filtersAdded.forEach(filter => this.trigger('filterAdded', {
+      filter: filter
+    }));
+    result.filtersRemoved.forEach(filter => this.trigger('filtersRemoved', {
+      filter: filter
+    }));
   }
 
   _ensureFilter(filter) {

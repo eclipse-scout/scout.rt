@@ -33,6 +33,12 @@ export default class FilterSupport extends WidgetSupport {
    */
 
   /**
+   * @typedef SetFiltersResult
+   * @property {Filter[]} filtersAdded An array of the filters added.
+   * @property {Filter[]} filtersRemoved An array of the filters removed.
+   */
+
+  /**
    * @param {FilterSupportOptions} options a mandatory options object
    */
   constructor(options) {
@@ -275,16 +281,30 @@ export default class FilterSupport extends WidgetSupport {
   /**
    * @param {Filter|function|(Filter|function)[]} filter The new filters.
    * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   * @return {SetFiltersResult}
    */
   setFilters(filters, applyFilter = true) {
     filters = arrays.ensure(filters);
     this._addSyntheticFilters(filters);
 
     if (this._getFilters().length === filters.length && filters.every(filter => this._hasFilter(this._getFilters(), filter))) {
-      return;
+      return {
+        filtersAdded: [],
+        filtersRemoved: []
+      };
     }
 
+    let oldFilters = this._getFilters().slice();
+
     this._setFilters(filters, applyFilter);
+
+    let filtersAdded = this._getFilters().filter(filter => !this._findFilter(oldFilters, filter)),
+      filtersRemoved = oldFilters.filter(filter => !this._findFilter(this._getFilters(), filter));
+
+    return {
+      filtersAdded: filtersAdded,
+      filtersRemoved: filtersRemoved
+    };
   }
 
   _setFilters(filters, applyFilter = true) {

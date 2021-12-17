@@ -198,7 +198,7 @@ export default class TileGrid extends Widget {
   }
 
   _updateTabbable() {
-    this.$container.setTabbable(this.enabled);
+    this.$container.setTabbable(this.enabled && (this.textFilterEnabled || this.selectable));
   }
 
   insertTile(tile) {
@@ -784,6 +784,7 @@ export default class TileGrid extends Widget {
 
   _renderSelectable() {
     this.$container.toggleClass('selectable', this.selectable);
+    this._updateTabbable();
     this.invalidateLayoutTree();
   }
 
@@ -1053,6 +1054,7 @@ export default class TileGrid extends Widget {
   }
 
   _renderTextFilterEnabled() {
+    this._updateTabbable();
     this.filterSupport.renderFilterField();
   }
 
