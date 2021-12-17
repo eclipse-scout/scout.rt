@@ -747,6 +747,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     return config.options.maxSegments - 1 <= index;
   }
 
+  /**
+   *  Fill temporary variable z for every bubble, if not yet set, and set bubble radius temporary to 1.
+   *  This allows the chart to render itself with correct dimensions and with no interfering from bubbles (very large bubbles make the chart grid itself smaller).
+   *  Later on in {@link _adjustBubbleSizes}, the bubble sizes will be calculated relative to the chart dimensions and the configured min/max sizes.
+   */
   _adjustBubbleRadii(config) {
     if (!config || !config.data || !config.type || config.type !== Chart.Type.BUBBLE) {
       return;
@@ -755,9 +760,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     config.data.datasets.forEach(dataset => dataset.data.forEach(data => {
       if (!isNaN(data.r)) {
         data.z = Math.pow(data.r, 2);
-      } else if (!isNaN(data.z)) {
-        data.r = Math.sqrt(data.z);
       }
+      data.r = 1;
     }));
   }
 
