@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -122,6 +122,7 @@ export default class Session {
     SESSION_TIMEOUT: 10,
     UI_PROCESSING: 20,
     UNSAFE_UPLOAD: 30,
+    REJECTED_UPLOAD: 31,
     VERSION_MISMATCH: 40
   };
 
@@ -1030,6 +1031,12 @@ export default class Session {
     } else if (jsonError.code === Session.JsonResponseError.UNSAFE_UPLOAD) {
       boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);
+      boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
+      boxOptions.yesButtonAction = function() {
+      };
+    } else if (jsonError.code === Session.JsonResponseError.REJECTED_UPLOAD) {
+      boxOptions.header = this.optText('ui.RejectedUpload', boxOptions.header);
+      boxOptions.body = this.optText('ui.RejectedUploadMsg', boxOptions.body);
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
       boxOptions.yesButtonAction = function() {
       };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,37 +12,48 @@ package org.eclipse.scout.rt.platform.resource;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 
 /**
  * Enumeration for a few well-known extensions and their mime types.
  * <p>
  * For file extension lookup based on mime type, the order of the mime types is relevant (first match returns).
+ * <p>
+ * This enum can be extended in {@link MimeTypes}
  */
-public enum MimeType {
+public enum MimeType implements IMimeType {
   AA("audio/audible", "aa"),
   AAC("audio/aac", "aac"),
   AMV("video/x-amv", "amv"),
   APPCACHE("text/cache-manifest", "appcache"),
   APPLICATION_OCTET_STREAM("application/octet-stream", "bin"),
   AVI("video/avi", "avi"),
-  BMP("image/bmp", "bmp"),
+  BMP("image/bmp", "bmp", IMimeMagic.BMP),
   CSS("text/css", "css"),
   CSV("text/csv", "csv"),
-  DOCX("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"),
-  DOTX("application/vnd.openxmlformats-officedocument.wordprocessingml.template", "dotx"),
+  DOC("application/msword", "doc", IMimeMagic.DOC_XLS_PPT),
+  DOCM("application/vnd.ms-word.document.macroEnabled.12", "docm", IMimeMagic.ZIP),
+  DOCX("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx", IMimeMagic.ZIP),
+  DOTX("application/vnd.openxmlformats-officedocument.wordprocessingml.template", "dotx", IMimeMagic.ZIP),
   EML("message/rfc822", "eml"),
+  EXE("application/vnd.microsoft.portable-executable", "exe", IMimeMagic.EXE_DLL_SYS),
+  DLL("application/vnd.microsoft.portable-executable", "dll", IMimeMagic.EXE_DLL_SYS),
+  SYS("application/vnd.microsoft.portable-executable", "sys", IMimeMagic.EXE_DLL_SYS),
   FLV("video/x-flv", "flv"),
-  GIF("image/gif", "gif"),
-  GZ("application/gzip", "gz"),
+  GIF("image/gif", "gif", IMimeMagic.GIF),
+  GZ("application/gzip", "gz", IMimeMagic.GZ),
   HTML("text/html", "html"),
   HTM("text/html", "htm"),
-  ICO("image/x-icon", "ico"),
+  ICO("image/x-icon", "ico", IMimeMagic.ICO),
   ICS("text/calendar", "ics"),
   IFB("text/calendar", "ifb"),
-  JAR("application/java-archive", "jar"),
-  JPG("image/jpeg", "jpg"),
+  JAR("application/java-archive", "jar", IMimeMagic.ZIP),
+  JPG("image/jpeg", "jpg", IMimeMagic.JPEG_JPG),
   JPE("image/jpeg", "jpe"),
-  JPEG("image/jpeg", "jpeg"),
+  JPEG("image/jpeg", "jpeg", IMimeMagic.JPEG_JPG),
+  JFIF("image/jpeg", "jfif", IMimeMagic.JPEG_JPG),
+  PJPEG("image/jpeg", "pjpeg", IMimeMagic.JPEG_JPG),
+  PJP("image/jpeg", "pjp", IMimeMagic.JPEG_JPG),
   JS("application/javascript", "js"),
   JSON("application/json", "json"),
   JSONML("application/jsonml+json", "jsonml"),
@@ -51,10 +62,10 @@ public enum MimeType {
   MIME("message/rfc822", "mime"),
   MKV("video/x-matroska", "mkv"),
   MOV("video/quicktime", "mov"),
-  MP3("audio/mpeg", "mp3"),
-  MP4("video/mp4", "mp4"),
+  MP3("audio/mpeg", "mp3", IMimeMagic.MP3),
+  MP4("video/mp4", "mp4", IMimeMagic.MP4),
   MPG("video/mpeg", "mpg"),
-  MSG("application/vnd.ms-outlook", "msg"),
+  MSG("application/vnd.ms-outlook", "msg", IMimeMagic.MSG),
   M4P("audio/mp4a-latm", "m4p"),
   OGA("audio/ogg", "oga"),
   OGV("video/ogg", "ogv"),
@@ -62,44 +73,53 @@ public enum MimeType {
   ONETMP("application/onenote", "onetmp"),
   ONETOC("application/onenote", "onetoc"),
   ONETOC2("application/onenote", "onetoc2"),
-  PDF("application/pdf", "pdf"),
-  PNG("image/png", "png"),
-  POTX("application/vnd.openxmlformats-officedocument.presentationml.template", "potx"),
-  PPSX("application/vnd.openxmlformats-officedocument.presentationml.slideshow", "ppsx"),
-  PPTX("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx"),
+  PDF("application/pdf", "pdf", IMimeMagic.PDF),
+  PNG("image/png", "png", IMimeMagic.PNG),
+  PPT("application/vnd.ms-powerpoint", "ppt", IMimeMagic.DOC_XLS_PPT),
+  PPSM("application/vnd.ms-powerpoint.slideshow.macroEnabled.12", "ppsm", IMimeMagic.ZIP),
+  PPTM("application/vnd.ms-powerpoint.presentation.macroEnabled.12", "pptm", IMimeMagic.ZIP),
+  POTX("application/vnd.openxmlformats-officedocument.presentationml.template", "potx", IMimeMagic.ZIP),
+  PPSX("application/vnd.openxmlformats-officedocument.presentationml.slideshow", "ppsx", IMimeMagic.ZIP),
+  PPTX("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx", IMimeMagic.ZIP),
   RSS("application/rss+xml", "rss"),
   SLDX("application/vnd.openxmlformats-officedocument.presentationml.slide", "sldx"),
   SVG("image/svg+xml", "svg"),
-  THMX("application/vnd.openxmlformats-officedocument.presentationml.presentation", "thmx"),
-  TIF("image/tiff", "tif"),
-  TIFF("image/tiff", "tiff"),
+  SVGZ("image/svg+xml", "svgz", IMimeMagic.GZ),
+  THMX("application/vnd.openxmlformats-officedocument.presentationml.presentation", "thmx", IMimeMagic.ZIP),
+  TIF("image/tiff", "tif", IMimeMagic.TIF_TIFF),
+  TIFF("image/tiff", "tiff", IMimeMagic.TIF_TIFF),
   TXT("text/plain", "txt"),
   VCARD("text/vcard", "vcard"),
   VCF("text/x-vcard", "vcf"),
   VCS("text/x-vcalendar", "vcs"),
   WEBM("video/webm", "webm"),
-  WOFF("application/font-woff", "woff"),
-  XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"),
-  XLTX("application/vnd.openxmlformats-officedocument.spreadsheetml.template", "xltx"),
+  WOFF("application/font-woff", "woff", IMimeMagic.WOFF),
+  XLS("application/vnd.ms-excel", "xls", IMimeMagic.DOC_XLS_PPT),
+  XLSB("application/vnd.ms-excel.sheet.binary.macroEnabled.12", "xlsb"),
+  XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", IMimeMagic.ZIP),
+  XLSM("application/vnd.ms-excel.sheet.macroEnabled.12", "xlsm", IMimeMagic.ZIP),
+  XLTX("application/vnd.openxmlformats-officedocument.spreadsheetml.template", "xltx", IMimeMagic.ZIP),
   XML("text/xml", "xml"),
-  ZIP("application/zip", "zip");
+  ZIP("application/zip", "zip", IMimeMagic.ZIP);
 
   private final String m_type;
   private final String m_fileExtension;
+  private IMimeMagic m_magic;
 
   MimeType(String type, String fileExtension) {
     m_type = type;
-    m_fileExtension = fileExtension;
+    m_fileExtension = fileExtension != null ? fileExtension.toLowerCase(Locale.ROOT) : null;
   }
 
-  public String getType() {
-    return m_type;
+  MimeType(String type, String fileExtension, IMimeMagic magic) {
+    m_type = type;
+    m_fileExtension = fileExtension != null ? fileExtension.toLowerCase(Locale.ROOT) : null;
+    m_magic = magic;
   }
 
-  public String getFileExtension() {
-    return m_fileExtension;
-  }
-
+  /**
+   * Use {@link MimeTypes#findByFileExtension(String)} in order to include extended enum values
+   */
   public static MimeType findByFileExtension(String fileExtension) {
     for (MimeType mimeType : values()) {
       if (mimeType.getFileExtension().equalsIgnoreCase(fileExtension)) {
@@ -109,6 +129,9 @@ public enum MimeType {
     return null;
   }
 
+  /**
+   * Use {@link MimeTypes#findByMimeTypeName(String)} in order to include extended enum values
+   */
   public static MimeType convertToMimeType(String mimeTypeText) {
     for (MimeType mimeType : values()) {
       if (mimeType.getType().equals(mimeTypeText)) {
@@ -116,6 +139,26 @@ public enum MimeType {
       }
     }
     return null;
+  }
+
+  @Override
+  public String getType() {
+    return m_type;
+  }
+
+  @Override
+  public String getFileExtension() {
+    return m_fileExtension;
+  }
+
+  @Override
+  public IMimeMagic getMagic() {
+    return m_magic;
+  }
+
+  @Override
+  public void setMagic(IMimeMagic magic) {
+    m_magic = magic;
   }
 
   /**
