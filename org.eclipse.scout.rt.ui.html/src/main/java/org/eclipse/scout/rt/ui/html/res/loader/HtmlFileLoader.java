@@ -103,7 +103,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
   @Override
   public BinaryResource loadResource(String pathInfo) throws IOException {
     URL url = WebResources
-        .resolveWebResource(pathInfo, m_minify)
+        .resolveWebResource(pathInfo, m_minify, m_cacheEnabled)
         .map(WebResourceDescriptor::getUrl)
         .orElse(null);
 

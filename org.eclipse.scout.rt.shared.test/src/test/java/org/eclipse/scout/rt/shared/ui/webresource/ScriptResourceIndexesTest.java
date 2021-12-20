@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,8 +40,8 @@ public class ScriptResourceIndexesTest {
         vendorsWidgets,
         vendorsWidgetsLoginLogout);
 
-    assertEquals(new HashSet<>(asList(widgetsLoginLogout, login, vendorsWidgetsLoginLogout)), indexes.getAssets("login", true));
-    assertEquals(new HashSet<>(asList(widgets, widgetsLoginLogout, vendorsWidgets, vendorsWidgetsLoginLogout)), indexes.getAssets("widgets-module", false));
+    assertEquals(new HashSet<>(asList(widgetsLoginLogout, login, vendorsWidgetsLoginLogout)), indexes.getAssets("login", true, false));
+    assertEquals(new HashSet<>(asList(widgets, widgetsLoginLogout, vendorsWidgets, vendorsWidgetsLoginLogout)), indexes.getAssets("widgets-module", false, false));
   }
 
   @Test
@@ -62,16 +62,16 @@ public class ScriptResourceIndexesTest {
         vendorsAsset1,
         vendorsAsset2);
 
-    assertEquals(themeDark, indexes.toMinifiedPath("widgets-theme-dark.css"));
-    assertEquals(vendorsAsset1, indexes.toMinifiedPath("vendors~widgets~login~logout.js"));
-    assertEquals(new HashSet<>(asList(vendorsAsset1, loginAsset, loginLogoutAsset)), indexes.getAssets("login", true));
-    assertEquals(new HashSet<>(asList(vendorsAsset1, vendorsAsset2, widgetsAsset)), indexes.getAssets("widgets", false));
+    assertEquals(themeDark, indexes.toMinifiedPath("widgets-theme-dark.css", false));
+    assertEquals(vendorsAsset1, indexes.toMinifiedPath("vendors~widgets~login~logout.js", false));
+    assertEquals(new HashSet<>(asList(vendorsAsset1, loginAsset, loginLogoutAsset)), indexes.getAssets("login", true, false));
+    assertEquals(new HashSet<>(asList(vendorsAsset1, vendorsAsset2, widgetsAsset)), indexes.getAssets("widgets", false, false));
   }
 
   protected ScriptResourceIndexes createIndexesForFileListLines(String... inputLines) {
     return new ScriptResourceIndexes() {
       @Override
-      public Stream<FileListEntry> getFileListEntries(boolean minified) {
+      public Stream<FileListEntry> getFileListEntries(boolean minified, boolean cacheEnabled) {
         return FileListParserTest.createParserForLines(inputLines).parse((URL) null);
       }
     };

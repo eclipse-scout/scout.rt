@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,10 +37,8 @@ public class HttpCacheObject implements Serializable {
    *          not null
    */
   public HttpCacheObject(HttpCacheKey cacheKey, BinaryResource resource) {
-    Assertions.assertNotNull(cacheKey);
-    Assertions.assertNotNull(resource);
-    m_cacheKey = cacheKey;
-    m_resource = resource;
+    m_cacheKey = Assertions.assertNotNull(cacheKey);
+    m_resource = Assertions.assertNotNull(resource);
   }
 
   public HttpCacheKey getCacheKey() {
@@ -60,7 +58,8 @@ public class HttpCacheObject implements Serializable {
   }
 
   /**
-   * @return an ETAG if the resource's {@link #getContentLength()} and {@link #getFingerprint()} are both not -1
+   * @return an ETAG if the resource's {@link BinaryResource#getContentLength()} and
+   *         {@link BinaryResource#getFingerprint()} are both not -1
    */
   public String createETag() {
     if (m_resource.getFingerprint() != -1L && m_resource.getContentLength() != -1L) {

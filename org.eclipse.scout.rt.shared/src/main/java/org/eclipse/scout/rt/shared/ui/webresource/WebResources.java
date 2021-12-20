@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,19 +41,21 @@ public class WebResources {
    * @param theme
    *          The theme to use. If the resource is a css file the file that matches the theme is returned instead of the
    *          normal file. For this the file must end with the theme name.
+   * @param cacheEnabled
+   *          Specifies if the cache is enabled
    * @return An {@link Optional} holding the first {@link WebResourceDescriptor} found for the given path or an empty
    *         {@link Optional} if the resource could not be found.
-   * @see IWebResourceResolver#resolveScriptResource(String, boolean, String)
+   * @see IWebResourceResolver#resolveScriptResource(String, boolean, boolean, String)
    */
-  public static Optional<WebResourceDescriptor> resolveScriptResource(String path, boolean minified, String theme) {
-    return resolveScriptResources(path, minified, theme).stream().findFirst();
+  public static Optional<WebResourceDescriptor> resolveScriptResource(String path, boolean minified, boolean cacheEnabled, String theme) {
+    return resolveScriptResources(path, minified, cacheEnabled, theme).stream().findFirst();
   }
 
   /**
-   * @see IWebResourceResolver#resolveScriptResource(String, boolean, String)
+   * @see IWebResourceResolver#resolveScriptResource(String, boolean, boolean, String)
    */
-  public static List<WebResourceDescriptor> resolveScriptResources(String path, boolean minified, String theme) {
-    return WEB_RESOURCES.get().resolveScriptResourceInternal(path, minified, theme);
+  public static List<WebResourceDescriptor> resolveScriptResources(String path, boolean minified, boolean cacheEnabled, String theme) {
+    return WEB_RESOURCES.get().resolveScriptResourceInternal(path, minified, cacheEnabled, theme);
   }
 
   /**
@@ -63,27 +65,29 @@ public class WebResources {
    *          The relative file path
    * @param minified
    *          If the resource should be loaded in a minified (if existing) or normal version
+   * @param cacheEnabled
+   *          Specifies if the cache is enabled
    * @return An {@link Optional} holding the first {@link WebResourceDescriptor} found or an empty {@link Optional} if
    *         the resource could not be found.
-   * @see IWebResourceResolver#resolveWebResource(String, boolean)
+   * @see IWebResourceResolver#resolveWebResource(String, boolean, boolean)
    */
-  public static Optional<WebResourceDescriptor> resolveWebResource(String path, boolean minified) {
-    return resolveWebResources(path, minified).stream().findFirst();
+  public static Optional<WebResourceDescriptor> resolveWebResource(String path, boolean minified, boolean cacheEnabled) {
+    return resolveWebResources(path, minified, cacheEnabled).stream().findFirst();
   }
 
   /**
-   * @see IWebResourceResolver#resolveWebResource(String, boolean)
+   * @see IWebResourceResolver#resolveWebResource(String, boolean, boolean)
    */
-  public static List<WebResourceDescriptor> resolveWebResources(String path, boolean minified) {
-    return WEB_RESOURCES.get().resolveWebResourceInternal(path, minified);
+  public static List<WebResourceDescriptor> resolveWebResources(String path, boolean minified, boolean cacheEnabled) {
+    return WEB_RESOURCES.get().resolveWebResourceInternal(path, minified, cacheEnabled);
   }
 
-  protected List<WebResourceDescriptor> resolveScriptResourceInternal(String path, boolean minified, String theme) {
-    return resolveResource(resolver -> resolver.resolveScriptResource(cleanPath(path), minified, theme));
+  protected List<WebResourceDescriptor> resolveScriptResourceInternal(String path, boolean minified, boolean cacheEnabled, String theme) {
+    return resolveResource(resolver -> resolver.resolveScriptResource(cleanPath(path), minified, cacheEnabled, theme));
   }
 
-  protected List<WebResourceDescriptor> resolveWebResourceInternal(String path, boolean minified) {
-    return resolveResource(resolver -> resolver.resolveWebResource(cleanPath(path), minified));
+  protected List<WebResourceDescriptor> resolveWebResourceInternal(String path, boolean minified, boolean cacheEnabled) {
+    return resolveResource(resolver -> resolver.resolveWebResource(cleanPath(path), minified, cacheEnabled));
   }
 
   protected List<WebResourceDescriptor> resolveResource(Function<IWebResourceResolver, List<WebResourceDescriptor>> callFunc) {

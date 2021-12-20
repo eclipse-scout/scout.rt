@@ -40,35 +40,35 @@ public abstract class AbstractWebResourceResolver implements IWebResourceResolve
   }
 
   @Override
-  public List<WebResourceDescriptor> resolveScriptResource(String path, boolean minified, String theme) {
+  public List<WebResourceDescriptor> resolveScriptResource(String path, boolean minified, boolean cacheEnabled, String theme) {
     if (path == null) {
       return emptyList();
     }
     String subFolder = getScriptResourceFolder(minified);
     String themePath = getThemePath(path, theme);
-    List<WebResourceDescriptor> themeResource = lookupResource(path, themePath, subFolder, minified);
+    List<WebResourceDescriptor> themeResource = lookupResource(path, themePath, subFolder, minified, cacheEnabled);
     if (hasElements(themeResource) || Objects.equals(path, themePath)) {
       return themeResource;
     }
-    return lookupResource(path, path, subFolder, minified);
+    return lookupResource(path, path, subFolder, minified, cacheEnabled);
   }
 
   @Override
-  public List<WebResourceDescriptor> resolveWebResource(String path, boolean minified) {
+  public List<WebResourceDescriptor> resolveWebResource(String path, boolean minified, boolean cacheEnabled) {
     if (path == null) {
       return emptyList();
     }
-    return lookupResource(path, path, WEB_RESOURCE_FOLDER_NAME, minified);
+    return lookupResource(path, path, WEB_RESOURCE_FOLDER_NAME, minified, cacheEnabled);
   }
 
   protected String getScriptResourceFolder(boolean minified) {
     return minified ? MIN_FOLDER_NAME : DEV_FOLDER_NAME;
   }
 
-  protected List<WebResourceDescriptor> lookupResource(String requestedPath, String path, String subFolder, boolean minified) {
+  protected List<WebResourceDescriptor> lookupResource(String requestedPath, String path, String subFolder, boolean minified, boolean cacheEnabled) {
     String[] lookupList = {null, null, path};
     if (minified) {
-      String pathFromIndex = ScriptResourceIndexes.getMinifiedPath(path);
+      String pathFromIndex = ScriptResourceIndexes.getMinifiedPath(path, cacheEnabled);
       if (Objects.equals(path, pathFromIndex)) {
         // no mapping in the script resource index. try with simple minified extension
         String minifiedPath = getMinifiedPath(path);

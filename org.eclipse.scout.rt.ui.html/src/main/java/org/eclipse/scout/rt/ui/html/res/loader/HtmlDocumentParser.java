@@ -149,7 +149,7 @@ public class HtmlDocumentParser {
   }
 
   protected Stream<String> getAssetsForEntryPoint(String entryPoint) {
-    return ScriptResourceIndexes.getAssetsForEntryPoint(entryPoint, m_params.isMinify()).stream();
+    return ScriptResourceIndexes.getAssetsForEntryPoint(entryPoint, m_params.isMinify(), m_params.isCacheEnabled()).stream();
   }
 
   protected void replaceBaseTags() {
@@ -198,7 +198,7 @@ public class HtmlDocumentParser {
 
   protected URL resolveInclude(String includeName) {
     return WebResources
-        .resolveWebResource(includeName, m_params.isMinify())
+        .resolveWebResource(includeName, m_params.isMinify(), m_params.isCacheEnabled())
         .map(WebResourceDescriptor::getUrl)
         .orElse(null);
   }

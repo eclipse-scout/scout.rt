@@ -47,12 +47,12 @@
   },
   "devDependencies": {
     "@eclipse-scout/releng": "^22.0.0",
-    "eslint": "8.3.0"
+    "eslint": "8.5.0"
   },
   "dependencies": {
     "eslint-config-google": "0.14.0"
   },
   "peerDependencies": {
-    "eslint": ">=8.3.0"
+    "eslint": ">=8.5.0"
   }
 }

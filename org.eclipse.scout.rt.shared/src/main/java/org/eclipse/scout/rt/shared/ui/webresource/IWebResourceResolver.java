@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,13 +25,15 @@ public interface IWebResourceResolver {
    *          The relative file path
    * @param minified
    *          If the resource should be loaded in a minified or normal version
+   * @param cacheEnabled
+   *          Specifies if the cache is enabled
    * @param theme
    *          The theme to use. If the resource is a css file the file that matches the theme is returned instead of the
    *          normal file. For this the file must end with the theme name.
    * @return A {@link List} holding the {@link WebResourceDescriptor} instances found for the given path or an empty
    *         {@link List} if the resource could not be found.
    */
-  List<WebResourceDescriptor> resolveScriptResource(String path, boolean minified, String theme);
+  List<WebResourceDescriptor> resolveScriptResource(String path, boolean minified, boolean cacheEnabled, String theme);
 
   /**
    * Tries to load the specified relative path in the web resources folder ("res" folder).
@@ -40,8 +42,10 @@ public interface IWebResourceResolver {
    *          The relative file path
    * @param minified
    *          If the resource should be loaded in a minified (if existing) or normal version
+   * @param cacheEnabled
+   *          Specifies if the cache is enabled
    * @return A {@link List} holding the {@link WebResourceDescriptor} instances or an empty {@link List} if the resource
    *         could not be found.
    */
-  List<WebResourceDescriptor> resolveWebResource(String path, boolean minified);
+  List<WebResourceDescriptor> resolveWebResource(String path, boolean minified, boolean cacheEnabled);
 }

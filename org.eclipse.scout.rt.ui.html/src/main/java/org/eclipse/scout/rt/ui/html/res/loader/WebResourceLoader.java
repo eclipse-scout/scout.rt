@@ -10,12 +10,13 @@
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
@@ -40,9 +41,7 @@ public class WebResourceLoader extends AbstractResourceLoader {
   @Override
   public BinaryResource loadResource(String pathInfo) {
     return lookupResource(pathInfo)
-        .map(this::toBinaryResources)
-        .map(br -> br.withFilename(pathInfo))
-        .map(BinaryResources::build)
+        .map(pair -> toBinaryResource(pair.getLeft(), pathInfo, pair.getRight()))
         .orElse(null);
   }
 
@@ -55,27 +54,39 @@ public class WebResourceLoader extends AbstractResourceLoader {
   }
 
   protected Optional<ImmutablePair<WebResourceDescriptor, Integer>> lookupResource(String file) {
-    return WebResources.resolveScriptResource(file, m_minify, m_theme)
+    return WebResources.resolveScriptResource(file, m_minify, m_cacheEnabled, m_theme)
         .map(descriptor -> new ImmutablePair<>(descriptor, HttpCacheControl.MAX_AGE_ONE_YEAR))
-        .or(() -> WebResources.resolveWebResource(file, m_minify)
+        .or(() -> WebResources.resolveWebResource(file, m_minify, m_cacheEnabled)
             .map(descriptor -> new ImmutablePair<>(descriptor, HttpCacheControl.MAX_AGE_4_HOURS)));
   }
 
-  protected BinaryResources toBinaryResources(ImmutablePair<WebResourceDescriptor, Integer> res) {
-    URL url = res.getLeft().getUrl();
+  protected BinaryResource toBinaryResource(WebResourceDescriptor descriptor, String pathInfo, int maxAge) {
+    URL url = descriptor.getUrl();
     try {
-      URLConnection connection = url.openConnection();
-      byte[] bytes = IOUtility.readFromUrl(url);
-      return BinaryResources.create()
+      byte[] bytes = getContent(descriptor);
+
+      // mime-type is computed based on pathInfo
+      BinaryResources resources = BinaryResources.create()
           .withContent(bytes)
           .withCharset(StandardCharsets.UTF_8)
-          .withLastModified(connection.getLastModified())
           .withCachingAllowed(m_cacheEnabled)
-          .withCacheMaxAge(res.getRight());
+          .withFilename(pathInfo)
+          .withCacheMaxAge(maxAge);
+      if (!Platform.get().inDevelopmentMode()) {
+        // don't apply lastModified in dev mode because this leaks a file handle which may block the webpack watcher from updating files (resource busy).
+        resources.withLastModified(url.openConnection().getLastModified());
+      }
+      return resources.build();
     }
     catch (IOException e) {
       throw new PlatformException("Unable to read from url '{}'.", url, e);
     }
   }
 
+  protected byte[] getContent(WebResourceDescriptor descriptor) throws IOException {
+    // do not use IOUtility.readFromUrl because it temporarily leaks a file handle when calling getContentLength
+    try (BufferedInputStream in = new BufferedInputStream(descriptor.getUrl().openConnection().getInputStream())) {
+      return IOUtility.readBytes(in, -1);
+    }
+  }
 }

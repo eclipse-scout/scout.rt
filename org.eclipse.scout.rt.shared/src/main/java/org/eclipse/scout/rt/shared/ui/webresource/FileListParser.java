@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,7 +68,7 @@ public class FileListParser {
       path = "./" + path;
     }
     Optional<ScriptRequest> result = ScriptRequest.tryParse(path);
-    if (!result.isPresent()) {
+    if (result.isEmpty()) {
       LOG.debug("Entry in script resource index ignored: '{}'.", rawLine);
       return Optional.empty();
     }
