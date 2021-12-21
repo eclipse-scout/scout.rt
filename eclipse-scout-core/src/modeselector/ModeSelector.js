@@ -155,15 +155,7 @@ export default class ModeSelector extends Widget {
     };
     let onUp = /** @type {SwipeCallbackEvent} */e => {
       this.$container.children().removeClass(className);
-      let modeSelectingPos;
-      if (e.direction < 0) {
-        // slide left: use left end of slider
-        modeSelectingPos = e.newLeft;
-      } else {
-        // slide right: use right end of slider
-        modeSelectingPos = e.newLeft + this.$slider.width();
-      }
-      let newSelectedMode = this._findModeByPos(modeSelectingPos);
+      let newSelectedMode = this._computeNewSelectedMode(e);
       if (!newSelectedMode || newSelectedMode === this.selectedMode || !newSelectedMode.enabled) {
         this._updateSlider(); // move back to original position
       } else {
@@ -171,6 +163,23 @@ export default class ModeSelector extends Widget {
       }
     };
     events.onSwipe($mode, className, onDown, onMove, onUp);
+  }
+
+  /**
+   *
+   * @param {SwipeCallbackEvent} e
+   */
+  _computeNewSelectedMode(e) {
+    if (e.direction === 0 || Math.abs(e.deltaX) <= 5) {
+      // ignore if the slide is below threshold
+      return this.selectedMode;
+    }
+    if (e.direction < 0) {
+      // slide left: use left end of slider
+      return this._findModeByPos(e.newLeft);
+    }
+    // slide right: use right end of slider
+    return this._findModeByPos(e.newLeft + this.$slider.width());
   }
 
   _findModeByPos(pos) {
