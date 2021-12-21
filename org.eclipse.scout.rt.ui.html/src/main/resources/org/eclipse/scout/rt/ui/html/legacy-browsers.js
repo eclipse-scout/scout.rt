@@ -20,19 +20,19 @@ if (entries && entries.length) {
   document.body.appendChild(root);
 }
 
+var loadingRoots = document.getElementsByClassName('application-loading-root');
+for (var i = 0; i < loadingRoots.length; i++) {
+  loadingRoots[i].classList.add('hidden');
+}
+
 var xmlHttp = new XMLHttpRequest();
 // noinspection JSFunctionExpressionToArrowFunction
 xmlHttp.onreadystatechange = function() {
   if (xmlHttp.readyState == 4 && xmlHttp.status >= 200 && xmlHttp.status < 300) {
     root.innerHTML = xmlHttp.responseText;
-    var i,
-      buttons = document.getElementsByClassName('button'),
-      loadingRoots = document.getElementsByClassName('application-loading-root');
-    for (i = 0; i < buttons.length; i++) {
+    var buttons = document.getElementsByClassName('button');
+    for (var i = 0; i < buttons.length; i++) {
       buttons[i].classList.add('hidden');
-    }
-    for (i = 0; i < loadingRoots.length; i++) {
-      loadingRoots[i].classList.add('hidden');
     }
   }
 };
