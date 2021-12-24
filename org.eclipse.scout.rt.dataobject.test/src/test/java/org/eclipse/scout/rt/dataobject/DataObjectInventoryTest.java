@@ -12,10 +12,12 @@ package org.eclipse.scout.rt.dataobject;
 
 import static org.junit.Assert.*;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.scout.rt.dataobject.fixture.AbstractLoremFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.CollectionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0;
 import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.DataObjectFixture_1_0_0_034;
@@ -27,6 +29,12 @@ import org.eclipse.scout.rt.dataobject.fixture.DateFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureInvalidTypeNameDo;
 import org.eclipse.scout.rt.dataobject.fixture.FirstSimpleContributionFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.IInterfaceFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.InterfaceContributionFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.Lorem1FixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.Lorem2FixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.LoremAbstractContributionFixtureDo;
+import org.eclipse.scout.rt.dataobject.fixture.OtherEntityContributionFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ProjectFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.ProjectSubFixtureDo;
@@ -279,5 +287,22 @@ public class DataObjectInventoryTest {
     assertEquals(CollectionUtility.hashSet(SimpleFixtureDo.class), inv.getContributionContainers(SecondSimpleContributionFixtureDo.class));
 
     assertEquals(CollectionUtility.hashSet(FirstSimpleContributionFixtureDo.class, SecondSimpleContributionFixtureDo.class), inv.getContributionClasses(SimpleFixtureDo.class));
+
+    // test get(All)ContributionClasses with contributions contributing to an interface
+    assertEquals(CollectionUtility.hashSet(IInterfaceFixtureDo.class), inv.getContributionContainers(InterfaceContributionFixtureDo.class));
+    assertEquals(CollectionUtility.hashSet(InterfaceContributionFixtureDo.class), inv.getContributionClasses(IInterfaceFixtureDo.class));
+    // getAllContributionClasses adds InterfaceContributionFixtureDo to the set, because contributed via IInterfaceFixtureDo
+    assertEquals(CollectionUtility.hashSet(FirstSimpleContributionFixtureDo.class, SecondSimpleContributionFixtureDo.class), inv.getContributionClasses(SimpleFixtureDo.class));
+    assertEquals(CollectionUtility.hashSet(FirstSimpleContributionFixtureDo.class, SecondSimpleContributionFixtureDo.class, InterfaceContributionFixtureDo.class), inv.getAllContributionClasses(SimpleFixtureDo.class));
+    assertEquals(CollectionUtility.hashSet(OtherEntityContributionFixtureDo.class), inv.getContributionClasses(OtherEntityFixtureDo.class));
+    assertEquals(CollectionUtility.hashSet(OtherEntityContributionFixtureDo.class, InterfaceContributionFixtureDo.class), inv.getAllContributionClasses(OtherEntityFixtureDo.class));
+
+    // test get(All)ContributionClasses with contributions contributing to an abstract class
+    assertEquals(Collections.emptySet(), inv.getContributionClasses(Lorem1FixtureDo.class));
+    assertEquals(Collections.emptySet(), inv.getContributionClasses(Lorem2FixtureDo.class));
+    assertEquals(CollectionUtility.hashSet(LoremAbstractContributionFixtureDo.class), inv.getContributionClasses(AbstractLoremFixtureDo.class));
+    assertEquals(CollectionUtility.hashSet(LoremAbstractContributionFixtureDo.class), inv.getAllContributionClasses(AbstractLoremFixtureDo.class));
+    assertEquals(CollectionUtility.hashSet(LoremAbstractContributionFixtureDo.class), inv.getAllContributionClasses(Lorem1FixtureDo.class));
+    assertEquals(CollectionUtility.hashSet(LoremAbstractContributionFixtureDo.class), inv.getAllContributionClasses(Lorem2FixtureDo.class));
   }
 }

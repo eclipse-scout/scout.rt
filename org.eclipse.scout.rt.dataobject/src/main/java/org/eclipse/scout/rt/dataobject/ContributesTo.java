@@ -24,5 +24,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ContributesTo {
 
+  /**
+   * Concrete DO entity classes as well as interfaces or abstract class are supported as container classes.
+   * <p>
+   * It's not recommended to defined {@link IDoEntity} or {@link DoEntity} as a container class.
+   */
   Class<? extends IDoEntity>[] value();
 }

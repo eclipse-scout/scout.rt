@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -164,6 +165,9 @@ public class DataObjectInventory {
   }
 
   /**
+   * A container class might be represented by an interface or abstract class too. Make sure to use
+   * {@link Class#isInstance(Object)} or {@link Class#isAssignableFrom(Class)} to check for a matching container.
+   *
    * @return Container classes for a given {@link IDoEntityContribution} class.
    * @see ContributesTo
    */
@@ -173,12 +177,54 @@ public class DataObjectInventory {
   }
 
   /**
+   * Use {@link #getAllContributionClasses(Class)} if all DO entity contributions that maybe contained in the container
+   * class are required.
+   *
    * @return {@link IDoEntityContribution} classes for a given {@link IDoEntity} container class.
    * @see ContributesTo
    */
   public Set<Class<? extends IDoEntityContribution>> getContributionClasses(Class<? extends IDoEntity> containerClass) {
     Set<Class<? extends IDoEntityContribution>> contributionClasses = m_containerClassToContributionClasses.get(containerClass);
     return contributionClasses == null ? Collections.emptySet() : Collections.unmodifiableSet(contributionClasses);
+  }
+
+  /**
+   * In contrast to {@link #getContributionClasses(Class)}, this method returns not only the DO entity contributions for
+   * exactly the provided container class, but also all DO entity contributions for the containers class super classes
+   * and interfaces.
+   *
+   * @return {@link IDoEntityContribution} classes for a given {@link IDoEntity} container class and it's parent
+   *         classes/interfaces.
+   * @see ContributesTo
+   */
+  public Set<Class<? extends IDoEntityContribution>> getAllContributionClasses(Class<? extends IDoEntity> containerClass) {
+    Set<Class<? extends IDoEntity>> collectedClasses = new HashSet<>();
+    collectDoEntityParents(containerClass, collectedClasses);
+
+    return collectedClasses.stream()
+        .map(clazz -> m_containerClassToContributionClasses.get(clazz))
+        .filter(Objects::nonNull)
+        .flatMap(Set::stream)
+        .collect(Collectors.toUnmodifiableSet());
+  }
+
+  protected void collectDoEntityParents(Class<? extends IDoEntity> doEntityClass, Set<Class<? extends IDoEntity>> collectedClasses) {
+    collectedClasses.add(doEntityClass);
+
+    Class<?> superclass = doEntityClass.getSuperclass();
+    if (superclass != null && IDoEntity.class.isAssignableFrom(superclass)) {
+      // super class implements IDoEntity
+      //noinspection unchecked
+      collectDoEntityParents((Class<? extends IDoEntity>) superclass, collectedClasses);
+    }
+
+    for (Class<?> interfaceClass : doEntityClass.getInterfaces()) {
+      if (IDoEntity.class.isAssignableFrom(interfaceClass)) {
+        // interface extends IDoEntity
+        //noinspection unchecked
+        collectDoEntityParents((Class<? extends IDoEntity>) interfaceClass, collectedClasses);
+      }
+    }
   }
 
   /**

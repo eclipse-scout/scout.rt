@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("scout.SimpleFixture")
-public class SimpleFixtureDo extends DoEntity {
+public class SimpleFixtureDo extends DoEntity implements IInterfaceFixtureDo {
 
   public DoValue<UUID> id() {
     return doValue("id");
