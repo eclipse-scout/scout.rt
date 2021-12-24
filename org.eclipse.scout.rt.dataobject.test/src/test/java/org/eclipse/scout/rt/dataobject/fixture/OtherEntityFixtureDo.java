@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.dataobject.fixture.DataObjectFixtureTypeVersions.Dat
 
 @TypeName("OtherEntityFixture")
 @TypeVersion(DataObjectFixture_1_0_0.class)
-public class OtherEntityFixtureDo extends DoEntity {
+public class OtherEntityFixtureDo extends DoEntity implements IInterfaceFixtureDo {
 
   public DoValue<String> id() {
     return doValue("id");
