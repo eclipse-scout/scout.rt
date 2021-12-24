@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.action.tree;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,7 +95,7 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
    * Used to add/remove menus.<br>
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
-   * @param fieldList
+   * @param actionNodes
    *          live and mutable collection of configured menus, not yet initialized
    */
   protected void injectActionNodesInternal(OrderedCollection<T> actionNodes) {
@@ -169,7 +168,8 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
   @Override
   public void setChildActions(Collection<? extends T> newList) {
     // remove old
-    removeChildActions(getChildActionsInternal());
+    List<T> oldList = getChildActions();
+    removeChildActions(oldList);
     // add new
     addChildActions(newList);
   }

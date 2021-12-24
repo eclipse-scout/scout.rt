@@ -10,15 +10,20 @@
  */
 package org.eclipse.scout.rt.client.ui.form.menu;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.imagefield.AbstractImageField;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.holders.BooleanHolder;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -40,6 +45,20 @@ public class AbstractMenuTest {
     assertEquals(2, menus.size());
     assertEquals(menus.get(0).getText(), "Menu1");
     assertEquals(menus.get(1).getText(), "Menu2");
+  }
+
+  @Test
+  public void testStructureChangedEventAfterRemovingChildActions() {
+    ImageField imageField = new ImageField();
+    IFormFieldContextMenu contextMenu = imageField.getContextMenu();
+    BooleanHolder eventWasTriggered = new BooleanHolder(false);
+    contextMenu.addContextMenuListener(event -> {
+      if (event.getType() == ContextMenuEvent.TYPE_STRUCTURE_CHANGED) {
+        eventWasTriggered.setValue(true);
+      }
+    });
+    contextMenu.setChildActions(Collections.emptyList());
+    assertTrue("ContextMenuEvent.TYPE_STRUCTURE_CHANGED was not triggered", BooleanUtility.nvl(eventWasTriggered.getValue()));
   }
 
   public class ImageField extends AbstractImageField {
