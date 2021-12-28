@@ -102,15 +102,15 @@
     <scout.base.version>22.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
-    <jetty.version>10.0.6</jetty.version>
+    <jetty.version>10.0.7</jetty.version>
     <slf4j.version>1.7.32</slf4j.version>
-    <logback.version>1.2.6</logback.version>
-    <jackson.version>2.12.5</jackson.version>
-    <jackson-databind.version>2.12.5</jackson-databind.version>
+    <logback.version>1.2.10</logback.version>
+    <jackson.version>2.12.6</jackson.version>
+    <jackson-databind.version>2.12.6</jackson-databind.version>
     <batik.version>1.14</batik.version>
     <activemq.version>5.16.3</activemq.version>
-    <artemis.version>2.17.0</artemis.version> <!-- do not use 2.18.0 because of https://issues.apache.org/jira/browse/ARTEMIS-3422. Issue will be fixed in 2.19.0 -->
-    <com.google.http-client.version>1.40.0</com.google.http-client.version>
+    <artemis.version>2.20.0</artemis.version>
+    <com.google.http-client.version>1.40.1</com.google.http-client.version>
     <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.rt/target/jacoco-all.exec</master_coverage_jacoco_destFile>
@@ -602,7 +602,7 @@
         <!-- must be compatible with the jakarta.ws.rs-api version -->
         <groupId>org.glassfish.jersey</groupId>
         <artifactId>jersey-bom</artifactId>
-        <version>2.34</version>
+        <version>2.35</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -610,7 +610,7 @@
       <dependency>
         <groupId>org.glassfish.jersey.media</groupId>
         <artifactId>jersey-media-json-jackson</artifactId>
-        <version>2.34</version>
+        <version>2.35</version>
         <exclusions>
           <exclusion>
             <groupId>jakarta.activation</groupId>
@@ -650,7 +650,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>3.12.4</version>
+        <version>4.2.0</version>
       </dependency>
 
       <dependency>
