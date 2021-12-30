@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util.date;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
@@ -27,7 +28,7 @@ public class StrictSimpleDateFormatTest {
     StringHolder pattern = new StringHolder();
     StringHolder input = new StringHolder();
 
-    pattern.setValue("yyyy-MM-dd hh:mm.ss.SSS");
+    pattern.setValue("yyyy-MM-dd HH:mm:ss.SSS");
     input.setValue("2019-01-18");
     ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
     ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
@@ -81,5 +82,124 @@ public class StrictSimpleDateFormatTest {
     pattern.setValue("yyyy-MM-dd");
     new SimpleDateFormat(pattern.getValue()).parse(input);
     ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input));
+  }
+
+  @Test
+  public void testWithTimeZone_DefaultTZ() throws ParseException {
+    testWithTimeZoneImpl(); // Default time zone
+  }
+
+  @Test
+  public void testWithTimeZone_CET() throws ParseException {
+    TimeZone backupTz = TimeZone.getDefault();
+    try {
+      TimeZone.setDefault(TimeZone.getTimeZone("CET"));
+      testWithTimeZoneImpl();
+    }
+    finally {
+      TimeZone.setDefault(backupTz);
+    }
+  }
+
+  @Test
+  public void testWithTimeZone_CEST() throws ParseException {
+    TimeZone backupTz = TimeZone.getDefault();
+    try {
+      TimeZone.setDefault(TimeZone.getTimeZone("CEST"));
+      testWithTimeZoneImpl();
+    }
+    finally {
+      TimeZone.setDefault(backupTz);
+    }
+  }
+
+  @Test
+  public void testWithTimeZone_UTC() throws ParseException {
+    TimeZone backupTz = TimeZone.getDefault();
+    try {
+      TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+      testWithTimeZoneImpl();
+    }
+    finally {
+      TimeZone.setDefault(backupTz);
+    }
+  }
+
+  @Test
+  public void testWithTimeZone_PST() throws ParseException {
+    TimeZone backupTz = TimeZone.getDefault();
+    try {
+      TimeZone.setDefault(TimeZone.getTimeZone("PST")); // UTC−08:00
+      testWithTimeZoneImpl();
+    }
+    finally {
+      TimeZone.setDefault(backupTz);
+    }
+  }
+
+  protected void testWithTimeZoneImpl() throws ParseException {
+    StringHolder pattern = new StringHolder();
+    StringHolder input = new StringHolder();
+
+    pattern.setValue("yyyy-MM-dd HH:mm:ss.SSS Z");
+    input.setValue("2019-01-18");
+    ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    input.setValue("2019-01-18 23:00:00.000");
+    ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    input.setValue("2019-01-18 23:00:00.000 +0700");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    input.setValue("2019-01-18 23:00:00.000 GMT-02:30");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    input.setValue("1990-12-31 00:00:00.000 +0500");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
+
+    pattern.setValue("yyyy-MM-dd Z");
+    input.setValue("2019-01-18");
+    ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    input.setValue("2019-01-18 +0700");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    input.setValue("2019-01-18 GMT-02:30");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
+
+    // Daylight saving time
+    pattern.setValue("yyyy-MM-dd HH:mm:ss.SSS Z");
+    input.setValue("2021-03-28 00:29:00.000 +0000");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    input.setValue("2021-03-28 01:29:00.000 +0000");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    input.setValue("2021-03-28 04:29:00.000 +0000");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    input.setValue("2021-10-31 00:29:00.000 +0000");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    input.setValue("2021-10-31 01:29:00.000 +0000");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    input.setValue("2021-10-31 04:29:00.000 +0000");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
+
+    // Correctly handle literal strings (even if they contain the letter 'Z')
+    pattern.setValue("'''$''' '-' yyyy-MM-dd '(A-Z)' HH:mm:ss.SSS Z");
+    input.setValue("'$' - 2019-01-18 (A-Z)");
+    ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    input.setValue("'$' - 2019-01-18 (A-Z) 23:00:00.000");
+    ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    input.setValue("'$' - 2019-01-18 (A-Z) 23:00:00.000 +0700");
+    new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
+    new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
   }
 }

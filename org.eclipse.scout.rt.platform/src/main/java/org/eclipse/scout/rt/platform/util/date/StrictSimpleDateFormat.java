@@ -6,9 +6,20 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import org.eclipse.scout.rt.platform.util.StringUtility;
+
 /**
  * Strict variant of {@link SimpleDateFormat}. When parsing a string, it only returns a valid date when the input string
  * matches the pattern <b>exactly</b>.
+ * <p>
+ * This prevents the parsing of strings with date and time information when the pattern only contains the date part but
+ * no time zone information. The default {@link SimpleDateFormat} implementation silently consumes the "surplus" time
+ * information, even when the lenient flag is disabled. This could lead to a "shifted day" problem when the resulting
+ * date object is formatted again with the same pattern. Example: {@code "1970-01-01 00:00"} → (parse) → <i>1969-12-31
+ * 22:00</i> → (format) → {@code "1969-12-31"}.
+ * <p>
+ * <b>Note:</b> When the pattern string contains a time zone character ({@code "Z"}, {@code "z"} or {@code "X"}), no
+ * validation is performed, since the potential problem does not apply in this case.
  * <p>
  * The behavior can be controlled by setting the {@link #setLenient(boolean)} flag. The default is <code>false</code>.
  * The check being performed in this case is even more strict than the default implementation. The following table shows
@@ -89,11 +100,24 @@ public class StrictSimpleDateFormat extends SimpleDateFormat {
   public Date parse(String source) throws ParseException {
     Date parsedDate = super.parse(source);
     if (parsedDate != null && !isLenient()) {
-      String formattedDate = format(parsedDate);
-      if (!source.equals(formattedDate)) {
-        throw new ParseException("Input string '" + source + "' does not exactly match pattern '" + toPattern() + "'", 0);
-      }
+      verifyParsedDate(source, parsedDate);
     }
     return parsedDate;
+  }
+
+  protected void verifyParsedDate(String source, Date parsedDate) throws ParseException {
+    String pattern = toPattern();
+    String patternWithoutQuotedStrings = pattern.replaceAll("''", "").replaceAll("'[^']*'", "");
+    if (StringUtility.containsRegEx(patternWithoutQuotedStrings, "[zZX]")) {
+      // If the pattern contains a time zone character, we cannot reliably check if the input string matches the date
+      // pattern by simply formatting the parsed date again, because the time zone used in the input string does not
+      // necessarily have to be the system time zone. Fortunately, we don't _have_ to check the pattern, because the
+      // particular problem this class attempts to solve does not apply in this case.
+      return;
+    }
+    String formattedDate = format(parsedDate);
+    if (!source.equals(formattedDate)) {
+      throw new ParseException("Input string '" + source + "' does not exactly match the pattern '" + pattern + "' (date is formatted back to '" + formattedDate + "' instead)", 0);
+    }
   }
 }
