@@ -1,0 +1,8 @@
+{
+  "_type" : "TestEntityWithDoValueOfObject",
+  "object" : {
+    "_type" : "TestItem",
+    "id" : "test-id",
+    "stringAttribute" : "test_value"
+  }
+}

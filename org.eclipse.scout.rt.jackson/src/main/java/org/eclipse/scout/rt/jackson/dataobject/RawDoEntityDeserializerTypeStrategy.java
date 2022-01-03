@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
-import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.core.JsonToken;
 
 @Bean
 public class RawDoEntityDeserializerTypeStrategy implements IDoEntityDeserializerTypeStrategy {
@@ -33,7 +33,7 @@ public class RawDoEntityDeserializerTypeStrategy implements IDoEntityDeserialize
   }
 
   @Override
-  public Optional<JavaType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName) {
+  public Optional<AttributeType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName, JsonToken currentToken) {
     return Optional.empty();
   }
 

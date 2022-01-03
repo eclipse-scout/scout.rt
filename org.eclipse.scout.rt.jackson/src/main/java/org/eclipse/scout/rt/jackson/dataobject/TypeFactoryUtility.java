@@ -15,11 +15,13 @@ import java.lang.reflect.Type;
 
 import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoNode;
 import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
@@ -29,17 +31,33 @@ public final class TypeFactoryUtility {
   }
 
   /**
-   * @return Jackson {@link JavaType} representing the declared {@link ParameterizedType} of {@link DoValue},
-   *         {@link DoList}, {@link DoSet} or a {@link DoCollection} type.
+   * @see #toAttributeType(ParameterizedType, JsonToken)
    */
-  public static JavaType toJavaType(ParameterizedType parametrizedType) {
+  public static AttributeType toAttributeType(ParameterizedType parametrizedType) {
+    return toAttributeType(parametrizedType, null);
+  }
+
+  /**
+   * Extracts type information of a {@link DoValue}, {@link DoList}, {@link DoSet}, {@link DoCollection} and the
+   * optional {@link JsonToken} if invoked during deserialization.
+   *
+   * @param parametrizedType
+   *          type of declared {@link DoNode}
+   * @param currentToken
+   *          optional {@link JsonToken} of the deserialization in progress
+   */
+  public static AttributeType toAttributeType(ParameterizedType parametrizedType, JsonToken currentToken) {
     if (ObjectUtility.isOneOf(parametrizedType.getRawType(), DoList.class, DoSet.class, DoCollection.class)) {
       JavaType listItemsType = TypeFactory.defaultInstance().constructType(parametrizedType.getActualTypeArguments()[0]);
-      return TypeFactory.defaultInstance().constructParametricType((Class<?>) parametrizedType.getRawType(), listItemsType);
+      return AttributeType.ofDoCollection(TypeFactory.defaultInstance().constructParametricType((Class<?>) parametrizedType.getRawType(), listItemsType));
     }
     else if (DoValue.class == parametrizedType.getRawType()) {
       Type typeArg = parametrizedType.getActualTypeArguments()[0];
-      return TypeFactory.defaultInstance().constructType(typeArg);
+      if (typeArg == Object.class && currentToken == JsonToken.START_ARRAY) {
+        // special case: declared DoNode<Object> with list-typed value
+        typeArg = DoList.class;
+      }
+      return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(typeArg));
     }
     throw new PlatformException("Could not convert type {}, only DoValue<?>, DoList<?>, DoSet<?> and DoCollection<?> supported", parametrizedType);
   }

@@ -1,0 +1,4 @@
+{
+  "_type" : "TestEntityWithDoValueOfObject",
+  "object" : [ "a", "b", "c" ]
+}

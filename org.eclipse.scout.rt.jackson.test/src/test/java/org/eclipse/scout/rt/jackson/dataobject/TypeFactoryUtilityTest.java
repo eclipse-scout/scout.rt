@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -32,14 +32,20 @@ public class TypeFactoryUtilityTest {
   @Test
   public void testToJavaType_DoValue() {
     ParameterizedType type = BEANS.get(DataObjectInventory.class).getAttributeDescription(TestItemDo.class, "id").get().getType();
-    JavaType jt = TypeFactoryUtility.toJavaType(type);
+    AttributeType attributeType = TypeFactoryUtility.toAttributeType(type);
+    assertTrue(attributeType.isDoValue());
+    assertFalse(attributeType.isDoCollection());
+    JavaType jt = attributeType.getJavaType();
     assertEquals(String.class, jt.getRawClass());
   }
 
   @Test
   public void testToJavaType_List() {
     ParameterizedType type = BEANS.get(DataObjectInventory.class).getAttributeDescription(TestCollectionsDo.class, "itemListAttribute").get().getType();
-    JavaType jt = TypeFactoryUtility.toJavaType(type);
+    AttributeType attributeType = TypeFactoryUtility.toAttributeType(type);
+    assertTrue(attributeType.isDoValue());
+    assertFalse(attributeType.isDoCollection());
+    JavaType jt = attributeType.getJavaType();
     assertEquals(List.class, jt.getRawClass());
     assertEquals(TestItemDo.class, jt.getBindings().getBoundType(0).getRawClass());
   }
@@ -47,7 +53,10 @@ public class TypeFactoryUtilityTest {
   @Test
   public void testToJavaType_DoList() {
     ParameterizedType type = BEANS.get(DataObjectInventory.class).getAttributeDescription(TestCollectionsDo.class, "itemDoListAttribute").get().getType();
-    JavaType jt = TypeFactoryUtility.toJavaType(type);
+    AttributeType attributeType = TypeFactoryUtility.toAttributeType(type);
+    assertFalse(attributeType.isDoValue());
+    assertTrue(attributeType.isDoCollection());
+    JavaType jt = attributeType.getJavaType();
     assertEquals(DoList.class, jt.getRawClass());
     assertEquals(TestItemDo.class, jt.getBindings().getBoundType(0).getRawClass());
   }
@@ -55,7 +64,10 @@ public class TypeFactoryUtilityTest {
   @Test
   public void testToJavaType_DoSet() {
     ParameterizedType type = BEANS.get(DataObjectInventory.class).getAttributeDescription(TestCollectionsDo.class, "itemDoSetAttribute").get().getType();
-    JavaType jt = TypeFactoryUtility.toJavaType(type);
+    AttributeType attributeType = TypeFactoryUtility.toAttributeType(type);
+    assertFalse(attributeType.isDoValue());
+    assertTrue(attributeType.isDoCollection());
+    JavaType jt = attributeType.getJavaType();
     assertEquals(DoSet.class, jt.getRawClass());
     assertEquals(TestItemDo.class, jt.getBindings().getBoundType(0).getRawClass());
   }
@@ -63,13 +75,16 @@ public class TypeFactoryUtilityTest {
   @Test
   public void testToJavaType_DoCollection() {
     ParameterizedType type = BEANS.get(DataObjectInventory.class).getAttributeDescription(TestCollectionsDo.class, "itemDoCollectionAttribute").get().getType();
-    JavaType jt = TypeFactoryUtility.toJavaType(type);
+    AttributeType attributeType = TypeFactoryUtility.toAttributeType(type);
+    assertFalse(attributeType.isDoValue());
+    assertTrue(attributeType.isDoCollection());
+    JavaType jt = attributeType.getJavaType();
     assertEquals(DoCollection.class, jt.getRawClass());
     assertEquals(TestItemDo.class, jt.getBindings().getBoundType(0).getRawClass());
   }
 
   @Test(expected = PlatformException.class)
   public void testToJavaType_Invalid() throws Exception {
-    TypeFactoryUtility.toJavaType((ParameterizedType) (List.class.getMethod("iterator").getGenericReturnType()));
+    TypeFactoryUtility.toAttributeType((ParameterizedType) (List.class.getMethod("iterator").getGenericReturnType()));
   }
 }

@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
-import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.core.JsonToken;
 
 @Bean
 public class DefaultDoEntityDeserializerTypeStrategy implements IDoEntityDeserializerTypeStrategy {
@@ -40,10 +40,10 @@ public class DefaultDoEntityDeserializerTypeStrategy implements IDoEntityDeseria
   }
 
   @Override
-  public Optional<JavaType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName) {
+  public Optional<AttributeType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName, JsonToken currentToken) {
     return m_dataObjectInventory.get().getAttributeDescription(entityClass, attributeName)
-        .map(a -> TypeFactoryUtility.toJavaType(a.getType()))
-        .filter(type -> type.getRawClass() != Object.class);
+        .map(a -> TypeFactoryUtility.toAttributeType(a.getType(), currentToken))
+        .filter(AttributeType::isKnown);
   }
 
   @Override
