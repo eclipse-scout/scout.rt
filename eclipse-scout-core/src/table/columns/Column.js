@@ -29,6 +29,7 @@ export default class Column {
     this.headerIconId = null;
     this.headerHtmlEnabled = false;
     this.headerTooltipText = null;
+    this.headerTooltipHtmlEnabled = false;
     this.horizontalAlignment = -1;
     this.htmlEnabled = false;
     this.index = -1;
