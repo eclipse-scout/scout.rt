@@ -40,6 +40,7 @@ import java.util.UUID;
 import org.eclipse.scout.rt.dataobject.DataObjectHelper;
 import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
@@ -72,6 +73,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDuplicatedAttributeDo
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestElectronicAddressDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEmptyObject;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithArrayDoValueDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithDoValueOfObjectDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithGenericValuesDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithInterface1Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithInterface2Do;
@@ -586,6 +588,97 @@ public class JsonDataObjectsSerializationTest {
     entity.put("uri", uri);
     String jsonEntity = s_dataObjectMapper.writeValueAsString(entity);
     assertJsonEquals("TestURI.json", jsonEntity);
+  }
+
+  @Test
+  public void testSerializeDeserialize_DoValueOfObject() throws Exception {
+    // String
+    TestEntityWithDoValueOfObjectDo stringObj = BEANS.get(TestEntityWithDoValueOfObjectDo.class).withObject("test-string");
+    String json = s_dataObjectMapper.writeValueAsString(stringObj);
+    assertJsonEquals("TestEntityWithDoValueOfObjectDo_String.json", json);
+
+    TestEntityWithDoValueOfObjectDo marshalled = s_dataObjectMapper.readValue(json, TestEntityWithDoValueOfObjectDo.class);
+    assertEquals("test-string", marshalled.getObject());
+    assertEquals(DoValue.class, marshalled.object().getClass());
+
+    // Long
+    TestEntityWithDoValueOfObjectDo LongObj = BEANS.get(TestEntityWithDoValueOfObjectDo.class).withObject(Long.valueOf(42));
+    json = s_dataObjectMapper.writeValueAsString(LongObj);
+    assertJsonEquals("TestEntityWithDoValueOfObjectDo_Long.json", json);
+
+    marshalled = s_dataObjectMapper.readValue(json, TestEntityWithDoValueOfObjectDo.class);
+    assertEquals(Integer.valueOf(42), marshalled.getObject()); // Integer because Jackson uses the smallest possible number type
+    assertEquals(DoValue.class, marshalled.object().getClass());
+
+    // Entity
+    TestEntityWithDoValueOfObjectDo entityObj = BEANS.get(TestEntityWithDoValueOfObjectDo.class).withObject(createTestItemDo("test-id", "test_value"));
+    json = s_dataObjectMapper.writeValueAsString(entityObj);
+    assertJsonEquals("TestEntityWithDoValueOfObjectDo_Entity.json", json);
+
+    marshalled = s_dataObjectMapper.readValue(json, TestEntityWithDoValueOfObjectDo.class);
+    assertEquals(createTestItemDo("test-id", "test_value"), marshalled.getObject());
+    assertEquals(DoValue.class, marshalled.object().getClass());
+
+    // ad-hoc Entity
+    TestEntityWithDoValueOfObjectDo adHocEntityObj = BEANS.get(TestEntityWithDoValueOfObjectDo.class).withObject(
+        BEANS.get(DoEntityBuilder.class)
+            .put("longValue", Long.valueOf(42))
+            .putList("listValue", List.of("a", "b", "c"))
+            .build());
+    json = s_dataObjectMapper.writeValueAsString(adHocEntityObj);
+    assertJsonEquals("TestEntityWithDoValueOfObjectDo_AdHocEntity.json", json);
+
+    marshalled = s_dataObjectMapper.readValue(json, TestEntityWithDoValueOfObjectDo.class);
+    assertEquals(DoEntity.class, marshalled.getObject().getClass());
+    DoEntity entity = (DoEntity) marshalled.getObject();
+    assertEquals(Integer.valueOf(42), entity.get("longValue"));
+    assertEquals(List.of("a", "b", "c"), entity.get("listValue"));
+    assertEquals(DoValue.class, marshalled.object().getClass());
+    assertEquals(DoList.class, entity.getNode("listValue").getClass());
+
+    // List
+    TestEntityWithDoValueOfObjectDo listObj = BEANS.get(TestEntityWithDoValueOfObjectDo.class).withObject(List.of("a", "b", "c"));
+    json = s_dataObjectMapper.writeValueAsString(listObj);
+    assertJsonEquals("TestEntityWithDoValueOfObjectDo_List.json", json);
+
+    marshalled = s_dataObjectMapper.readValue(json, TestEntityWithDoValueOfObjectDo.class);
+    assertEquals(ArrayList.class, marshalled.getObject().getClass());
+    assertEquals(List.of("a", "b", "c"), marshalled.getObject());
+    assertEquals(DoValue.class, marshalled.object().getClass());
+
+    // List of Entities
+    TestEntityWithDoValueOfObjectDo listOfEntitiesObj = BEANS.get(TestEntityWithDoValueOfObjectDo.class).withObject(
+        List.of(
+            createTestItemDo("test-id-a", "value-a"),
+            createTestItemDo("test-id-b", "value-b")));
+    json = s_dataObjectMapper.writeValueAsString(listOfEntitiesObj);
+    assertJsonEquals("TestEntityWithDoValueOfObjectDo_EntityList.json", json);
+
+    marshalled = s_dataObjectMapper.readValue(json, TestEntityWithDoValueOfObjectDo.class);
+    assertEquals(ArrayList.class, marshalled.getObject().getClass());
+    assertEquals(
+        List.of(
+            createTestItemDo("test-id-a", "value-a"),
+            createTestItemDo("test-id-b", "value-b")),
+        marshalled.getObject());
+    assertEquals(DoValue.class, marshalled.object().getClass());
+
+    // List of ad-hoc Entities
+    TestEntityWithDoValueOfObjectDo listOfAdHocEntitiesObj = BEANS.get(TestEntityWithDoValueOfObjectDo.class).withObject(
+        List.of(
+            BEANS.get(DoEntityBuilder.class).put("longValue", Long.valueOf(42)).putList("listValue", List.of("a", "b")).build(),
+            BEANS.get(DoEntityBuilder.class).put("longValue", Long.valueOf(43)).putList("listValue", List.of("c", "d")).build()));
+    json = s_dataObjectMapper.writeValueAsString(listOfAdHocEntitiesObj);
+    assertJsonEquals("TestEntityWithDoValueOfObjectDo_AdHocEntityList.json", json);
+
+    marshalled = s_dataObjectMapper.readValue(json, TestEntityWithDoValueOfObjectDo.class);
+    assertEquals(ArrayList.class, marshalled.getObject().getClass());
+    assertEquals(
+        List.of(
+            BEANS.get(DoEntityBuilder.class).put("longValue", Integer.valueOf(42)).putList("listValue", List.of("a", "b")).build(),
+            BEANS.get(DoEntityBuilder.class).put("longValue", Integer.valueOf(43)).putList("listValue", List.of("c", "d")).build()),
+        marshalled.getObject());
+    assertEquals(DoValue.class, marshalled.object().getClass());
   }
 
   // ------------------------------------ plain POJO test cases ------------------------------------

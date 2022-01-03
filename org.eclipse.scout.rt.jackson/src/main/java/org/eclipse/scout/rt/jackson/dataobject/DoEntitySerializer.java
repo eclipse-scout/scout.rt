@@ -119,9 +119,9 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
    * Serializes a collection attribute within {@link IDoEntity}
    */
   protected void serializeCollection(String attributeName, Collection<?> collection, JsonGenerator gen, SerializerProvider provider) throws IOException {
-    Optional<JavaType> type = getJavaType(attributeName);
+    Optional<AttributeType> type = getAttributeType(attributeName);
     if (type.isPresent()) {
-      serializeTypedAttribute(attributeName, collection, gen, provider, type.get());
+      serializeTypedAttribute(attributeName, collection, gen, provider, type.get().getJavaType());
     }
     else {
       // If no type definition is available, serialize all collection-like types (e.g. all {@link List} and {@link Set} implementations) as array using default jackson serializer.
@@ -140,9 +140,9 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
    * Serializes a map attribute within {@link IDoEntity}
    */
   protected void serializeMap(String attributeName, Map<?, ?> map, JsonGenerator gen, SerializerProvider provider) throws IOException {
-    Optional<JavaType> type = getJavaType(attributeName);
+    Optional<AttributeType> type = getAttributeType(attributeName);
     if (type.isPresent()) {
-      serializeTypedAttribute(attributeName, map, gen, provider, type.get());
+      serializeTypedAttribute(attributeName, map, gen, provider, type.get().getJavaType());
     }
     else {
       // If no type definition is available, serialize all {@link Map} types as object  using default jackson serializer
@@ -174,10 +174,10 @@ public class DoEntitySerializer extends StdSerializer<IDoEntity> {
     ser.serialize(obj, gen, provider);
   }
 
-  protected Optional<JavaType> getJavaType(String attributeName) {
+  protected Optional<AttributeType> getAttributeType(String attributeName) {
     return m_dataObjectInventory.get().getAttributeDescription(handledType(), attributeName)
-        .map(a -> TypeFactoryUtility.toJavaType(a.getType()))
-        .filter(t -> t.getRawClass() != Object.class); // filter completely unknown types, forcing to use the default behavior for unknown types
+        .map(a -> TypeFactoryUtility.toAttributeType(a.getType()))
+        .filter(AttributeType::isKnown); // filter completely unknown types, forcing to use the default behavior for unknown types
   }
 
   protected void validateContributions(IDoEntity doEntity, Collection<IDoEntityContribution> contributions) {

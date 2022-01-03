@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
 
-import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * Type resolver used for type resolution by {@link DoEntityDeserializer}.
@@ -39,9 +39,9 @@ public interface IDoEntityDeserializerTypeStrategy {
   String resolveTypeVersion(Class<? extends IDoEntity> entityClass);
 
   /**
-   * Resolves attribute type class for given {@code entityClass} and {@code attributeName}
+   * Resolves attribute type class for given {@code entityClass}, {@code attributeName} and the {@code currentToken}.
    */
-  Optional<JavaType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName);
+  Optional<AttributeType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName, JsonToken currentToken);
 
   /**
    * Adds the contributions to the given DO entity.

@@ -15,12 +15,11 @@ import java.math.BigDecimal;
 import java.util.Collection;
 
 import org.eclipse.scout.rt.dataobject.AbstractDoCollection;
-import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoMapEntity;
 import org.eclipse.scout.rt.dataobject.DoNode;
-import org.eclipse.scout.rt.dataobject.DoSet;
+import org.eclipse.scout.rt.dataobject.IDoCollection;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.type.ResolvedType;
 import com.fasterxml.jackson.core.util.JsonParserSequence;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
@@ -141,9 +139,9 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     for (JsonToken t = p.currentToken(); t == JsonToken.FIELD_NAME; t = p.nextToken()) {
       String attributeName = p.getCurrentName();
       p.nextToken(); // let current token point to the value
-      ResolvedType attributeType = findResolvedAttributeType(entity, attributeName, p.currentToken());
-      if (attributeType.hasRawClass(DoList.class) || attributeType.hasRawClass(DoSet.class) || attributeType.hasRawClass(DoCollection.class)) {
-        DoNode<?> nodeValue = p.getCodec().readValue(p, attributeType);
+      AttributeType attributeType = findResolvedAttributeType(entity, attributeName, p.currentToken());
+      if (attributeType.isDoCollection()) {
+        DoNode<?> nodeValue = p.getCodec().readValue(p, attributeType.getJavaType());
 
         // check if reading the 'contributions' property
         if (m_moduleContext.getContributionsAttributeName().equals(attributeName)) {
@@ -155,7 +153,14 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
         }
       }
       else {
-        Object value = p.getCodec().readValue(p, attributeType);
+        Object value = p.getCodec().readValue(p, attributeType.getJavaType());
+
+        if (value instanceof IDoCollection) {
+          // special case: Java collections referenced by a DoValue are handled as DoList, so that nested elements are
+          //               deserialized into data object structures (i.e. Do-classes), rather than Maps, such as Jackson's
+          //               default collection deserializer would use.
+          value = ((IDoCollection) value).get();
+        }
 
         // check if reading the 'type version' property
         if (m_moduleContext.getTypeVersionAttributeName().equals(attributeName)) {
@@ -202,30 +207,30 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     return newObject(ctxt, m_handledClass);
   }
 
-  protected JavaType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, JsonToken currentToken) {
-    return m_doEntityDeserializerTypeStrategy.resolveAttributeType(entityInstance.getClass(), attributeName)
-        .orElseGet(() -> findResolvedFallbackAttributeType(attributeName, currentToken));
+  protected AttributeType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, JsonToken currentToken) {
+    return m_doEntityDeserializerTypeStrategy.resolveAttributeType(entityInstance.getClass(), attributeName, currentToken)
+        .orElseGet(() -> findResolvedFallbackAttributeType(entityInstance, attributeName, currentToken));
   }
 
-  protected JavaType findResolvedFallbackAttributeType(String attributeName, JsonToken currentToken) {
+  protected AttributeType findResolvedFallbackAttributeType(IDoEntity entityInstance, String attributeName, JsonToken currentToken) {
     if (DoMapEntity.class.isAssignableFrom(m_handledClass)) {
       // DoMapEntity<T> structure is deserialized as typed Map<String, T>
-      return findResolvedDoMapEntityType();
+      return AttributeType.ofDoValue(findResolvedDoMapEntityType());
     }
     if (currentToken == JsonToken.START_OBJECT) {
       // fallback to default handling, if no attribute definition could be found
-      return TypeFactory.defaultInstance().constructType(DoEntity.class);
+      return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(DoEntity.class));
     }
     if (currentToken == JsonToken.START_ARRAY) {
       // array-like JSON structure is deserialized as raw DoList (using DoList as generic structure instead of DoSet or DoCollection)
-      return TypeFactory.defaultInstance().constructType(DoList.class);
+      return AttributeType.ofDoCollection(TypeFactory.defaultInstance().constructType(DoList.class));
     }
     if (currentToken == JsonToken.VALUE_NUMBER_FLOAT) {
       // deserialize floating point numbers as BigDecimal
-      return TypeFactory.defaultInstance().constructType(BigDecimal.class);
+      return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(BigDecimal.class));
     }
     // JSON scalar values are deserialized as raw object using default jackson typing
-    return TypeFactory.unknownType();
+    return AttributeType.ofDoValue(TypeFactory.unknownType());
   }
 
   /**

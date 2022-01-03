@@ -1,0 +1,7 @@
+{
+  "_type" : "TestEntityWithDoValueOfObject",
+  "object" : {
+    "listValue" : [ "a", "b", "c" ],
+    "longValue" : 42
+  }
+}
