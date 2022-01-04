@@ -33,7 +33,11 @@ export default class SimpleTabArea extends Widget {
   _render() {
     this.$container = this.$parent.appendDiv('simple-tab-area');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
-    this.htmlComp.setLayout(new SimpleTabAreaLayout(this));
+    this.htmlComp.setLayout(this._createLayout());
+  }
+
+  _createLayout() {
+    return new SimpleTabAreaLayout(this);
   }
 
   _renderProperties() {
@@ -76,6 +80,16 @@ export default class SimpleTabArea extends Widget {
 
   getTabs() {
     return this.tabs;
+  }
+
+  getVisibleTabs() {
+    return this.tabs.filter(tab => {
+      // Layout operates on dom elements directly -> check dom visibility
+      if (tab.$container) {
+        return tab.$container.isVisible();
+      }
+      return tab.visible;
+    });
   }
 
   selectTab(viewTab) {

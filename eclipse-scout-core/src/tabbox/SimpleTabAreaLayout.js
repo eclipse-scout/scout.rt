@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, scout, SimpleTabArea, styles} from '../index';
+import {AbstractLayout, Dimension, graphics, scout, SimpleTabArea, styles, widgets} from '../index';
 import $ from 'jquery';
 
 export default class SimpleTabAreaLayout extends AbstractLayout {
@@ -46,6 +46,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
     }
     $tabs.setVisible(true);
     this._overflowTabsIndizes = [];
+    widgets.updateFirstLastMarker(this.tabArea.getTabs());
 
     // All tabs fit in container -> no overflow menu necessary
     if (smallPrefSize.width <= containerSize.width) {
@@ -93,6 +94,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
         this._overflowTabsIndizes.push(i);
       }
     });
+    widgets.updateFirstLastMarker(this.tabArea.getVisibleTabs());
   }
 
   smallPrefSize(options = {}) {

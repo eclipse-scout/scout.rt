@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopTabBoxController, scout, SimpleTabBoxController} from '../../index';
+import {DesktopTabBoxController, scout} from '../../index';
 
 /**
  * The {@link {@link scout.HeaderViewTabAreaController}} is used to link the center {@link {@link SimpleTabBox}} (all forms with displayViewId='C')
@@ -44,9 +44,7 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
   }
 
   _onViewsChanged() {
-    if (this.bench.getViews().some(view => {
-      return 'C' !== view.displayViewId;
-    })) {
+    if (this.bench.getViews().some(view => 'C' !== view.displayViewId)) {
       // has views in other view stacks
       this._setViewTabAreaInHeader(false);
     } else {
@@ -59,6 +57,10 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
     this.tabAreaInHeader = inHeader;
     this.tabAreaCenter.setVisible(!inHeader);
     this.tabArea.setVisible(inHeader);
+    let desktop = this.tabArea.session.desktop;
+    if (desktop.rendered) {
+      desktop.$container.toggleClass('view-tab-area-in-bench', !inHeader);
+    }
   }
 
   getTabs() {
@@ -66,5 +68,10 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
       return this.tabArea.getTabs();
     }
     return this.tabAreaCenter.getTabs();
+  }
+
+  _onViewTabSelect(view) {
+    super._onViewTabSelect(view);
+    this.tabArea.updateFirstTabSelected();
   }
 }

@@ -34,7 +34,7 @@
 
     .desktop-bench-drop-shadow();
 
-    .desktop:not(.first-tab-selected):not(.navigation-invisible) > & {
+    .desktop:not(.first-tab-selected):not(.navigation-invisible):not(.view-tab-area-in-bench) > & {
       border-top-left-radius: @desktop-bench-drop-shadow-border-top-left-radius;
       overflow: hidden;
     }
@@ -54,6 +54,10 @@
     }
 
     & > .desktop-tab {
+      &.last > .edge.right {
+        z-index: 0; // Don't draw over view area / splitter  on the right
+      }
+
       & > .sub-title {
         color: @simple-tab-sub-title-color;
       }
@@ -61,6 +65,10 @@
       & > .status-container > .save-needer {
         color: @desktop-tab-selected-save-needer-color;
       }
+    }
+
+    &:not(.overflown) > .desktop-tab.last {
+      margin-right: 0;
     }
   }
 

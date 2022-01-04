@@ -615,6 +615,7 @@ export {default as DesktopLogo} from './desktop/DesktopLogo';
 export {default as DesktopLayout} from './desktop/DesktopLayout';
 export {default as DesktopTab} from './desktop/desktoptab/DesktopTab';
 export {default as DesktopTabArea} from './desktop/desktoptab/DesktopTabArea';
+export {default as DesktopTabAreaLayout} from './desktop/desktoptab/DesktopTabAreaLayout';
 export {default as DesktopTabBoxController} from './desktop/DesktopTabBoxController';
 export {default as DesktopTabSelectKeyStroke} from './desktop/bench/DesktopTabSelectKeyStroke';
 export {default as DisableBrowserF5ReloadKeyStroke} from './desktop/DisableBrowserF5ReloadKeyStroke';

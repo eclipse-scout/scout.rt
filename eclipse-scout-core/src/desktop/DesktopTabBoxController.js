@@ -33,13 +33,4 @@ export default class DesktopTabBoxController extends SimpleTabBoxController {
     // Don't create a tab if the view itself already has a header.
     return !view.headerVisible;
   }
-
-  _onViewTabSelect(view) {
-    super._onViewTabSelect(view);
-    let desktop = this.tabBox.session.desktop;
-    let firstTab = this.tabArea.tabs[0];
-    if (firstTab && desktop.rendered) {
-      this.tabBox.session.desktop.$container.toggleClass('first-tab-selected', firstTab.selected);
-    }
-  }
 }

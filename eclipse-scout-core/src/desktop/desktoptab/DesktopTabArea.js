@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {SimpleTabArea} from '../../index';
+import DesktopTabAreaLayout from './DesktopTabAreaLayout';
 
 export default class DesktopTabArea extends SimpleTabArea {
   constructor() {
@@ -18,5 +19,18 @@ export default class DesktopTabArea extends SimpleTabArea {
   _render() {
     super._render();
     this.$container.addClass('desktop-tab-area');
+  }
+
+  _createLayout() {
+    return new DesktopTabAreaLayout(this);
+  }
+
+  updateFirstTabSelected() {
+    let desktop = this.session.desktop;
+    if (!desktop.rendered) {
+      return;
+    }
+    let firstTab = this.getVisibleTabs()[0];
+    desktop.$container.toggleClass('first-tab-selected', firstTab && firstTab.selected);
   }
 }
