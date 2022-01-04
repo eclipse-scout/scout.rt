@@ -71,13 +71,14 @@
   }
 
   .inverted-bottom-round-edge(@border-radius: 12px, @width: 24px, @color: #ffffff) {
+    --color: @color; // Allows to change color only
     position: absolute;
     pointer-events: none;
     background-color: transparent;
     bottom: 0;
     height: 2 * @width;
     width: @width;
-    box-shadow: 0 @width 0 0 @color;
+    box-shadow: 0 @width 0 0 var(--color);
     // Cut the leftover on the bottom to only get the edge. Use 110%/-10% because with 100%/0% there are drawing issues, at least with Chrome (a very thin line won't be colored)
     clip-path: polygon(-10% 0, 110% 0, 110% 100%, -10% 100%);
 

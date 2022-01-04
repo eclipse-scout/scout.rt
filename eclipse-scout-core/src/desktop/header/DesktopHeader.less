@@ -102,16 +102,11 @@
     & > .view-tab-wrapper > .view-tab,
     & > .view-menu-tab {
       &.selected {
-
-        .outline-content-has-menubar& {
-          background-color: @main-menubar-background-color;
-        }
-
         .outline-content-has-dimmed-background& {
           background-color: @dimmed-background-color;
 
           & > .edge {
-            #scout.inverted-bottom-round-edge(@border-radius: @view-tab-selected-border-radius, @color: @dimmed-background-color);
+            --color: @dimmed-background-color;
           }
         }
       }
