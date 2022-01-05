@@ -11,6 +11,7 @@
 .view-button-box {
   display: inline-flex;
   min-height: @desktop-header-height;
+  max-height: @desktop-header-height; // Necessary for firefox, because it sometimes sets the height to 66px
   white-space: nowrap;
   #scout.font-text-large();
   overflow: visible; /* necessary if it is in the header to make rounded corner overlap into tab area */
