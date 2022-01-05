@@ -8,26 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  Button, AbortKeyStroke,
-  DialogLayout,
-  Event,
-  FileChooserController,
-  FocusRule,
-  FormLayout,
-  GlassPaneRenderer,
-  GroupBox,
-  HtmlComponent, KeyStrokeContext,
-  MessageBoxController,
-  Rectangle,
-  scout,
-  Status,
-  strings,
-  tooltips,
-  webstorage,
-  Widget,
-  WrappedFormField
-} from '../index';
+import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormLayout, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
 import $ from 'jquery';
 
 export default class Form extends Widget {
@@ -936,6 +917,9 @@ export default class Form extends Widget {
     } else if (!headerVisible && this.$header) {
       this._removeHeader();
     }
+    // If header contains no title it won't be a real header, it will be on the top right corner just containing icons.
+    let noTitleHeader = this.$header && this.$header.hasClass('no-title');
+    this.$container.toggleClass('header-visible', headerVisible && !noTitleHeader);
     this.invalidateLayoutTree();
   }
 

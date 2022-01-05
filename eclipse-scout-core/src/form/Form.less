@@ -33,15 +33,30 @@
 .dialog {
   position: absolute;
   #scout.popup();
-  overflow: hidden;
-  margin: 10px; /* minimum padding to desktop */
-  margin-bottom: 15px;
+  /* minimum padding to desktop */
+  margin: 10px 10px 15px;
   /* min-width and min-height are read by Resizable.js to prevent a dialog from becoming too small
      You can overrule these values with a specific CSS class on a dialog/form when you require a
      larger or smaller min-size. */
   min-width: 250px;
   min-height: 100px;
   top: 0; /* must be specified otherwise dialogs will be positioned at end of document and increase document size */
+
+  & > .header {
+    // overflow: hidden on dialog cannot be used without cutting the resize and drag handles
+    // A border radius on to the header and root-group-box is necessary if elements inside the dialog have a background color
+    border-top-left-radius: @popup-border-radius;
+    border-top-right-radius: @popup-border-radius;
+  }
+
+  & > .root-group-box {
+    border-radius: @popup-border-radius;
+
+    .header-visible& {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+  }
 
   &.animate-open {
     #scout.animation(fade-in ease-in 1);
