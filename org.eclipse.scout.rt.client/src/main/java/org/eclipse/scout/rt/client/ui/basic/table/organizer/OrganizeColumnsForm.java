@@ -667,6 +667,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             }
 
             @Override
+            protected boolean getConfiguredTextFilterEnabled() {
+              return false;
+            }
+
+            @Override
             protected void execDrop(ITableRow row, TransferObject transfer) {
               if (row != null && transfer instanceof JavaTransferObject) {
                 List<ITableRow> draggedRows = ((JavaTransferObject) transfer).getLocalObjectAsList(ITableRow.class);
@@ -871,12 +876,12 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
               @Override
               protected int getConfiguredWidth() {
-                return 40;
+                return 45;
               }
 
               @Override
               protected int getConfiguredMinWidth() {
-                return 40;
+                return 45;
               }
 
               @Override
