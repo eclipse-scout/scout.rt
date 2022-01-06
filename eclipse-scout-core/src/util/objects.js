@@ -366,6 +366,19 @@ export function isArray(obj) {
 }
 
 /**
+ * Checks whether the provided value is a promise or not.
+ * @param {any} value The value to check.
+ * @return {boolean} Returns true, in case the provided value is a thenable, false otherwise.
+ *
+ * Note: This method checks whether the provided value is a "thenable" (see https://promisesaplus.com/#terminology).
+ *       Checking for promise would require to check the behavior which is not possible. So you could provide an object
+ *       with a "then" function that does not conform to the Promises/A+ spec but this method would still return true.
+ */
+export function isPromise(value) {
+  return !!value && typeof value === 'object' && typeof value.then === 'function';
+}
+
+/**
  * Returns values from the given (map) object. By default only values of 'own' properties are returned.
  *
  * @returns {Array} an Array with values
@@ -728,6 +741,7 @@ export default {
   isNumber,
   isPlainObject,
   isString,
+  isPromise,
   keyByValue,
   mandatoryFunction,
   optProperty,

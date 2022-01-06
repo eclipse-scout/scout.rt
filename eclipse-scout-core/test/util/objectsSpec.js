@@ -281,6 +281,26 @@ describe('scout.objects', () => {
     });
   });
 
+  describe('isPromise', () => {
+    it('returns false for "not a promise" inputs', () => {
+      expect(objects.isPromise()).toBeFalse();
+      expect(objects.isPromise(null)).toBeFalse();
+      expect(objects.isPromise('foo')).toBeFalse();
+      expect(objects.isPromise(5)).toBeFalse();
+      expect(objects.isPromise(['foo'])).toBeFalse();
+      expect(objects.isPromise({foo: 'bar'})).toBeFalse();
+    });
+
+    it('returns true for thenables', () => {
+      expect(objects.isPromise($.resolvedPromise())).toBeTrue();
+      expect(objects.isPromise($.Deferred().promise())).toBeTrue();
+      expect(objects.isPromise({
+        then() {
+        }
+      })).toBeTrue();
+    });
+  });
+
   describe('values', () => {
     it('returns object values', () => {
       let Class = function() {
