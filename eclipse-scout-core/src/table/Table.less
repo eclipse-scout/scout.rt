@@ -16,6 +16,8 @@
   position: relative;
   --table-row-margin-x: @table-row-margin-x;
   --table-row-padding-y: @table-row-padding-y;
+  --table-aggregate-row-padding-y-small: @table-aggregate-padding-y-small;
+  --table-aggregate-row-padding-y-large: @table-aggregate-padding-y-large;
 
   &:focus,
   &.focused,
@@ -352,6 +354,16 @@
     padding: calc(var(--table-row-padding-y) - @checkable-cell-padding-adjustment) @table-cell-padding-left 0 @table-cell-padding-left;
     cursor: pointer;
     text-overflow: clip;
+
+    .grouping-style-top > .table-aggregate-cell& {
+      padding-top: calc(var(--table-aggregate-row-padding-y-large) - 1px);
+      padding-bottom: 3px;
+    }
+
+    .grouping-style-bottom > .table-aggregate-cell& {
+      padding-bottom: calc(var(--table-aggregate-row-padding-y-large) - 1px);
+      padding-top: 3px;
+    }
   }
 
   &.checkable.disabled,
@@ -448,13 +460,13 @@
   }
 
   &.grouping-style-top > .table-aggregate-cell {
-    padding-top: @table-aggregate-padding-y-large;
-    padding-bottom: @table-aggregate-padding-y-small;
+    padding-top: var(--table-aggregate-row-padding-y-large);
+    padding-bottom: var(--table-aggregate-row-padding-y-small);
   }
 
   &.grouping-style-bottom > .table-aggregate-cell {
-    padding-top: @table-aggregate-padding-y-small;
-    padding-bottom: @table-aggregate-padding-y-large;
+    padding-top: var(--table-aggregate-row-padding-y-small);
+    padding-bottom: var(--table-aggregate-row-padding-y-large);
   }
 }
 
@@ -462,7 +474,6 @@
   font-weight: bold;
   overflow: visible;
   vertical-align: middle;
-  height: 24px + @table-aggregate-padding-y-large + @table-aggregate-padding-y-small;
 
   & > .text {
     display: inline-block;

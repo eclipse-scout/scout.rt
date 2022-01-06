@@ -813,7 +813,7 @@ export default class Table extends Widget {
       let $textSpan = $cell.children('.text');
       let $iconSpan = $cell.children('.table-cell-icon');
       let iconAvailableButHidden = $iconSpan.length && !$iconSpan.isVisible();
-      if ($textSpan.isContentTruncated() || iconAvailableButHidden) {
+      if ($textSpan.length && $textSpan.isContentTruncated() || iconAvailableButHidden) {
         let $clone = $cell.clone();
         $clone.children('.table-cell-icon').setVisible(true);
         if ($cell.css('direction') === 'rtl') {
@@ -4025,7 +4025,7 @@ export default class Table extends Widget {
         // consume full space available
         cellSpaceForText += $aggrCell.cssMaxWidth();
       } else {
-        // first neighbour with content fount
+        // first neighbour with content found
         let growsTowardsEachOthers = $cell.hasClass('halign-right') ^ $aggrCell.hasClass('halign-right');
         if (growsTowardsEachOthers) {
           // cells grow towards each other: use the free space of the cell

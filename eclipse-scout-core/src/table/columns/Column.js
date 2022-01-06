@@ -682,6 +682,7 @@ export default class Column {
       text: this.cellTextForGrouping(row),
       iconId: cell.iconId,
       horizontalAlignment: this.horizontalAlignment,
+      htmlEnabled: false, // grouping cells need a text <span> to work which will only be created if html is disabled. Tags will be removed anyway by cellTextForGrouping
       cssClass: 'table-aggregate-cell' + (cell.cssClass ? ' ' + cell.cssClass : ''),
       backgroundColor: 'inherit',
       flowsLeft: this.horizontalAlignment > 0
