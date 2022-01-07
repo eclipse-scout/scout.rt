@@ -1,6 +1,6 @@
 {
   "name": "@eclipse-scout/core",
-  "version": "22.0.0-snapshot",
+  "version": "22.0.0-alpha.0",
   "description": "Eclipse Scout runtime",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
