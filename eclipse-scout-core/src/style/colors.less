@@ -135,7 +135,7 @@
 @read-only-color: @text-color;
 @selected-active-background-color: darken(@selected-hover-background-color, 10%);
 @selected-background-color: @accent-color-3;
-@selected-disabled-background-color: @disabled-color;
+@selected-disabled-background-color: @palette-gray-6-1;
 @selected-color: @text-inverted-color;
 @selected-hover-background-color: @accent-color-4;
 @selected-with-popup-background-color: @active-background-color;
@@ -157,7 +157,7 @@
 @text-field-icon-hover-color: @closer-hover-color;
 @text-field-icon-error-color: @error-border-color;
 @text-field-icon-focus-color: @focus-border-color;
-@text-field-placeholder-color: @palette-gray-6;
+@text-field-placeholder-color: fade(@palette-black, 55%); // Should have enough contrast to be readable on dimmed background as well
 @title-color: @text-color;
 
 /* -------------------------------- */
