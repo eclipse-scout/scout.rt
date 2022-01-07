@@ -8,32 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  Button,
-  ButtonAdapterMenu,
-  CompositeField,
-  Form,
-  FormField,
-  GroupBoxGridConfig,
-  GroupBoxLayout,
-  GroupBoxMenuItemsOrder,
-  HAlign,
-  HtmlComponent,
-  LogicalGridData,
-  LogicalGridLayout,
-  LogicalGridLayoutConfig,
-  MenuBar,
-  ResponsiveManager,
-  scout,
-  SplitBox,
-  strings,
-  TabBox,
-  TabItemKeyStroke,
-  tooltips,
-  widgets,
-  WrappedFormField
-} from '../../../index';
+import {arrays, Button, ButtonAdapterMenu, CompositeField, fields, Form, FormField, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, HAlign, HtmlComponent, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, MenuBar, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, WrappedFormField} from '../../../index';
 import $ from 'jquery';
 
 export default class GroupBox extends CompositeField {
@@ -370,25 +345,26 @@ export default class GroupBox extends CompositeField {
   }
 
   _updateScrollShadow() {
-    if (!this.rendered) {
+    if (this.mainBox || !this.rendered) {
+      // No need to do anything if it's the mainBox because header is invisible and the menu bar already takes the full width
       return;
     }
     let hasScrollShadowTop = this.hasScrollShadow('top');
     let hasScrollShadowBottom = this.hasScrollShadow('bottom');
     let oldHasScrollShadowTop = this.$container.hasClass('has-scroll-shadow-top');
+    let oldHasScrollShadowBottom = this.$container.hasClass('has-scroll-shadow-bottom');
+    let hasMenubarTop = this.$container.hasClass('menubar-position-top');
+    let hasMenubarBottom = this.$container.hasClass('menubar-position-bottom');
+    let headerVisible = this.$header.isVisible();
     this.$container.toggleClass('has-scroll-shadow-top', hasScrollShadowTop);
     this.$container.toggleClass('has-scroll-shadow-bottom', hasScrollShadowBottom);
-    if (oldHasScrollShadowTop !== hasScrollShadowTop) {
+    if ((headerVisible || hasMenubarTop) && oldHasScrollShadowTop !== hasScrollShadowTop
+      || hasMenubarBottom && oldHasScrollShadowBottom !== hasScrollShadowBottom) {
       this.invalidateLayout();
     }
 
     // Enlarge header line if there is a shadow, but don't do it if there is a menubar on top
-    let hasMenubarTop = this.$container.hasClass('menubar-position-top');
-    if (hasScrollShadowTop && !hasMenubarTop) {
-      widgets.preserveAndSetProperty(() => this.setStatusPosition(FormField.StatusPosition.TOP), () => this.statusPosition, this, '_statusPositionOrig');
-    } else {
-      widgets.resetProperty(preservedValue => this.setStatusPosition(preservedValue), this, '_statusPositionOrig');
-    }
+    fields.adjustStatusPositionForScrollShadow(this, () => hasScrollShadowTop && headerVisible && !hasMenubarTop);
 
     // Prevent flickering of status icon
     this.validateLayout();

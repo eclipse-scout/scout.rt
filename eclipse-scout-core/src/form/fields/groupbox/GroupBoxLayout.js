@@ -116,13 +116,26 @@ export default class GroupBoxLayout extends AbstractLayout {
 
   _updateMenuBar(htmlMenuBar, containerSize, statusWidth) {
     let $groupBox = this.groupBox.$container;
+    let $menuBar = htmlMenuBar.$comp;
     if (!this.groupBox.mainBox &&
       ($groupBox.hasClass('menubar-position-top') && $groupBox.hasClass('has-scroll-shadow-top')) ||
       ($groupBox.hasClass('menubar-position-bottom') && $groupBox.hasClass('has-scroll-shadow-bottom'))) {
-      htmlMenuBar.$comp.cssPaddingRight(statusWidth);
-      statusWidth = 0;
+      // Replace margin resp. status space with a padding so that menubar line is drawn as width as the shadow
+      // The left margin (mandatory indicator space) could actually be removed by css,
+      // but doing it here does not require any css adjustments for customized group boxes.
+      let margin = graphics.margins($menuBar);
+      if (margin.left > 0) {
+        $menuBar.cssPaddingLeft(margin.left);
+        $menuBar.cssMarginLeft(0);
+      }
+      if (statusWidth > 0) {
+        $menuBar.cssPaddingRight(statusWidth);
+        statusWidth = 0;
+      }
     } else {
-      htmlMenuBar.$comp.cssPaddingRight('');
+      $menuBar.cssPaddingLeft('');
+      $menuBar.cssMarginLeft('');
+      $menuBar.cssPaddingRight('');
     }
     return this._menuBarSize(htmlMenuBar, containerSize, statusWidth);
   }

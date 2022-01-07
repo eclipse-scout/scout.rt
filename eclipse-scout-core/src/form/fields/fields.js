@@ -173,6 +173,28 @@ export function selectIfIsTab(tabItem) {
   tabItem.select(tabItem);
 }
 
+/**
+ * Toggles FormField.statusPosition based on the given predicate in order to enlarge or reset the box header line while scrolling.
+ * The header line is enlarged to match the width of the scroll shadow.
+ * @param {GroupBox|TabBox} box
+ * @param {function} predicate
+ */
+export function adjustStatusPositionForScrollShadow(box, predicate) {
+  if (box.htmlComp) {
+    // Suppress layout invalidation to prevent dialogs from resetting the height.
+    // The box itself must not change its size while scrolling anyway, so there is no need to propagate the invalidation.
+    box.htmlComp.suppressInvalidate = true;
+  }
+  if (predicate()) {
+    widgets.preserveAndSetProperty(() => box.setStatusPosition(FormField.StatusPosition.TOP), () => box.statusPosition, box, '_statusPositionOrig');
+  } else {
+    widgets.resetProperty(preservedValue => box.setStatusPosition(preservedValue), box, '_statusPositionOrig');
+  }
+  if (box.htmlComp) {
+    box.htmlComp.suppressInvalidate = false;
+  }
+}
+
 export default {
   activateFirstField,
   appendIcon,
@@ -185,5 +207,6 @@ export default {
   makeTextField,
   selectAllParentTabsOf,
   selectIfIsTab,
-  valOrText
+  valOrText,
+  adjustStatusPositionForScrollShadow
 };

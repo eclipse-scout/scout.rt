@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompositeField, FormField, HtmlComponent, scout, SingleLayout, TabArea, TabBoxLayout, widgets} from '../../../index';
+import {arrays, CompositeField, fields, FormField, HtmlComponent, scout, SingleLayout, TabArea, TabBoxLayout} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -199,11 +199,7 @@ export default class TabBox extends CompositeField {
     }
 
     // Enlarge header line if there is a shadow, but only if there is a header (controlled by labelVisible)
-    if (hasScrollShadowTop && this.labelVisible) {
-      widgets.preserveAndSetProperty(() => this.setStatusPosition(FormField.StatusPosition.TOP), () => this.statusPosition, this, '_statusPositionOrig');
-    } else {
-      widgets.resetProperty(preservedValue => this.setStatusPosition(preservedValue), this, '_statusPositionOrig');
-    }
+    fields.adjustStatusPositionForScrollShadow(this, () => hasScrollShadowTop && this.labelVisible);
 
     // Prevent flickering of status icon
     this.validateLayout();
