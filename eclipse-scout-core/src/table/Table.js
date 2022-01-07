@@ -4953,7 +4953,8 @@ export default class Table extends Widget {
     }
     let lastVisibleRow = this._lastVisibleRow();
     if (lastVisibleRow && lastVisibleRow.$row) {
-      this.$data.toggleClass('last-row-at-bottom', graphics.offsetBounds(lastVisibleRow.$row).bottom() >= graphics.offsetBounds(this.$data).bottom());
+      // Use ceil because position may be fractional (offsetBounds uses ceil for the height only)
+      this.$data.toggleClass('last-row-at-bottom', Math.ceil(graphics.offsetBounds(lastVisibleRow.$row).bottom()) >= graphics.offsetBounds(this.$data).bottom());
     } else {
       this.$data.removeClass('last-row-at-bottom');
     }
