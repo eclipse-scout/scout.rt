@@ -2767,7 +2767,7 @@ export default class Tree extends Widget {
       result.newlyShown.forEach(node => this._expandAllParentNodes(node));
     }
     result.newlyShown.forEach(node => this._addToVisibleFlatList(node, this.filterAnimated));
-    this._nodesFiltered(result.newlyHidden.flatMap(node => this._removeFromFlatList(node, this.filterAnimated)));
+    this._nodesFiltered(arrays.flatMap(result.newlyHidden, node => this._removeFromFlatList(node, this.filterAnimated)));
     this.filteredElementsDirty = false;
   }
 
@@ -2855,7 +2855,7 @@ export default class Tree extends Widget {
 
     if (applyNewHiddenShownNodes) {
       newlyShown.forEach(node => this._addToVisibleFlatList(node, animated));
-      this._nodesFiltered(newlyHidden.flatMap(node => this._removeFromFlatList(node, animated)));
+      this._nodesFiltered(arrays.flatMap(newlyHidden, node => this._removeFromFlatList(node, animated)));
     }
 
     return {
