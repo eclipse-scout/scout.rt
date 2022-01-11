@@ -14,6 +14,7 @@ export default class OutlineViewButton extends ViewButton {
 
   constructor() {
     super();
+    this.outline = null;
     this._addWidgetProperties('outline');
     this._addPreserveOnPropertyChangeProperties(['outline']);
     this._addCloneProperties(['outline']);

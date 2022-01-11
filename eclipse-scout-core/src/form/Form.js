@@ -294,7 +294,9 @@ export default class Form extends Widget {
   }
 
   /**
-   * Method may be implemented to load the data. By default, the provided this.data is returned.
+   * Method may be implemented to load the data. <br>
+   * By default, a resolved promise containing the provided this.data is returned.
+   * @returns {Promise}
    */
   _load() {
     return $.resolvedPromise().then(() => {
@@ -319,6 +321,9 @@ export default class Form extends Widget {
     return $.resolvedPromise();
   }
 
+  /**
+   * @param {any} data
+   */
   setData(data) {
     this.setProperty('data', data);
   }
@@ -327,8 +332,11 @@ export default class Form extends Widget {
     // NOP
   }
 
+  /**
+   * @returns {any}
+   */
   exportData() {
-    // NOP
+    return null;
   }
 
   /**
@@ -382,7 +390,7 @@ export default class Form extends Widget {
 
   /**
    * This function is called by the lifecycle, when the 'save' function is called.<p>
-   * The data given to this function is the result of 'exportData' which was called in advance.
+   * The data given to this function is the result of {@link exportData} which was called in advance.
    *
    * @returns {Promise} promise which may contain a Status specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
    */
