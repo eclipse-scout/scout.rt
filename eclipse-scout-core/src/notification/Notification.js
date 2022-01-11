@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ export default class Notification extends Widget {
     this.status = Status.info();
     this.closable = false;
     this.htmlEnabled = false;
-    this.iconId = null;
     this._icon = null;
   }
 
@@ -28,15 +27,15 @@ export default class Notification extends Widget {
     // this allows to set the properties severity and message directly on the model object
     // without having a status object. because it's more convenient when you must create
     // a notification programmatically.
-    if (model.severity || model.message) {
+    if (model.severity || model.message || model.iconId) {
       this.status = new Status({
         severity: scout.nvl(model.severity, this.status.severity),
-        message: scout.nvl(model.message, this.status.message)
+        message: scout.nvl(model.message, this.status.message),
+        iconId: scout.nvl(model.iconId, this.status.iconId)
       });
     }
     texts.resolveTextProperty(this.status, 'message', this.session);
     this._setStatus(this.status);
-    this._setIconId(this.iconId);
   }
 
   _render() {
@@ -55,7 +54,6 @@ export default class Notification extends Widget {
   _renderProperties() {
     super._renderProperties();
     this._renderStatus();
-    this._renderIconId();
     this._renderClosable();
   }
 
@@ -80,6 +78,7 @@ export default class Notification extends Widget {
   _renderStatus() {
     if (this.status) {
       this.$container.addClass(this.status.cssClass());
+      this._renderIconId();
     }
     this._renderMessage();
   }
@@ -98,15 +97,17 @@ export default class Notification extends Widget {
   }
 
   setIconId(iconId) {
-    this.setProperty('iconId', iconId);
-  }
-
-  _setIconId(iconId) {
-    this._setProperty('iconId', iconId);
+    if (!this.status) {
+      this.status = Status.info();
+    }
+    this.status.iconId = iconId;
+    if (this.rendered) {
+      this._renderStatus();
+    }
   }
 
   _renderIconId() {
-    let hasIcon = !!this.iconId;
+    let hasIcon = this.status && !!this.status.iconId;
     this.$container.toggleClass('has-icon', hasIcon);
     this.$container.toggleClass('no-icon', !hasIcon);
     if (hasIcon) {
@@ -118,13 +119,13 @@ export default class Notification extends Widget {
 
   _renderIcon() {
     if (this._icon) {
-      this._icon.setIconDesc(this.iconId);
+      this._icon.setIconDesc(this.status.iconId);
       return;
     }
 
     this._icon = scout.create('Icon', {
       parent: this,
-      iconDesc: this.iconId,
+      iconDesc: this.status.iconId,
       prepend: true
     });
     this._icon.one('destroy', () => {

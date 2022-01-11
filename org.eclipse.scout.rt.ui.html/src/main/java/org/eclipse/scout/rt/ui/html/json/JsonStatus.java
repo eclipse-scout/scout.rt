@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonStatus implements IJsonObject {
@@ -37,7 +38,7 @@ public class JsonStatus implements IJsonObject {
     json.put("objectType", getObjectType());
     json.put("message", m_status.getMessage());
     json.put("severity", m_status.getSeverity());
-    json.put("iconId", m_status.getIconId());
+    json.put("iconId", BinaryResourceUrlUtility.createIconUrl(m_status.getIconId()));
     json.put("code", m_status.getCode());
     if (m_status.isMultiStatus()) {
       for (IStatus cs : ((IMultiStatus) m_status).getChildren()) {

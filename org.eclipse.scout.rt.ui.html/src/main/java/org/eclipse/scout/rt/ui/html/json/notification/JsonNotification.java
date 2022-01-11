@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
-import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 
 /**
  * @since 8.0
@@ -41,7 +40,7 @@ public class JsonNotification<NOTIFICATION extends INotification> extends Abstra
   protected void initJsonProperties(NOTIFICATION model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonProperty<NOTIFICATION>("status", model) {
+    putJsonProperty(new JsonProperty<>("status", model) {
       @Override
       protected IStatus modelValue() {
         return getModel().getStatus();
@@ -52,27 +51,16 @@ public class JsonNotification<NOTIFICATION extends INotification> extends Abstra
         return JsonStatus.toJson((IStatus) value);
       }
     });
-    putJsonProperty(new JsonProperty<NOTIFICATION>("closable", model) {
+    putJsonProperty(new JsonProperty<>("closable", model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isClosable();
       }
     });
-    putJsonProperty(new JsonProperty<NOTIFICATION>("htmlEnabled", model) {
+    putJsonProperty(new JsonProperty<>("htmlEnabled", model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isHtmlEnabled();
-      }
-    });
-    putJsonProperty(new JsonProperty<NOTIFICATION>("iconId", model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getIconId();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
   }

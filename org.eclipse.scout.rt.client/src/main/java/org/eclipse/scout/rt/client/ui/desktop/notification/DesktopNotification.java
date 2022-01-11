@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,7 +55,7 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    *          see {@link #isClosable()}
    */
   public DesktopNotification(IStatus status, long duration, boolean closable) {
-    this(status, duration, closable, null);
+    this(status, duration, closable, false);
   }
 
   /**
@@ -67,9 +67,11 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    *          see {@link #getDuration()}
    * @param closable
    *          see {@link #isClosable()}
+   * @param htmlEnabled
+   *          see {@link #isHtmlEnabled()}
    */
-  public DesktopNotification(IStatus status, long duration, boolean closable, String iconId) {
-    this(status, duration, closable, false, iconId, null);
+  public DesktopNotification(IStatus status, long duration, boolean closable, boolean htmlEnabled) {
+    this(status, duration, closable, htmlEnabled, null);
   }
 
   /**
@@ -87,32 +89,17 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    *          see {@link #getAppLinkConsumer()}
    */
   public DesktopNotification(IStatus status, long duration, boolean closable, boolean htmlEnabled, Consumer<String> appLinkConsumer) {
-    this(status, duration, closable, htmlEnabled, null, appLinkConsumer);
-  }
-
-  /**
-   * Creates a notification with the given attributes.
-   *
-   * @param status
-   *          see {@link #getStatus()}
-   * @param duration
-   *          see {@link #getDuration()}
-   * @param closable
-   *          see {@link #isClosable()}
-   * @param htmlEnabled
-   *          see {@link #isHtmlEnabled()}
-   * @param iconId
-   *          see {@link #getIconId()}
-   * @param appLinkConsumer
-   *          see {@link #getAppLinkConsumer()}
-   */
-  public DesktopNotification(IStatus status, long duration, boolean closable, boolean htmlEnabled, String iconId, Consumer<String> appLinkConsumer) {
-    super(status, closable, htmlEnabled, iconId, appLinkConsumer);
+    super(status, closable, htmlEnabled, appLinkConsumer);
     m_duration = duration;
     NativeNotificationDefaults nativeNotificationDefaults = IDesktop.CURRENT.get().getNativeNotificationDefaults();
     if (nativeNotificationDefaults != null) {
       withNativeNotificationTitle(nativeNotificationDefaults.getTitle());
-      withNativeNotificationIconId(nativeNotificationDefaults.getIconId());
+      if (status == null) {
+        withNativeNotificationStatus(new Status(null, IStatus.INFO, 0, nativeNotificationDefaults.getIconId()));
+      }
+      else {
+        withNativeNotificationStatus(new Status(status.getMessage(), status.getSeverity(), status.getCode(), nativeNotificationDefaults.getIconId()));
+      }
       withNativeNotificationVisibility(ObjectUtility.nvl(nativeNotificationDefaults.getVisibility(), NATIVE_NOTIFICATION_VISIBILITY_NONE));
     }
   }
@@ -162,14 +149,14 @@ public class DesktopNotification extends Notification implements IDesktopNotific
   }
 
   @Override
-  public DesktopNotification withNativeNotificationIconId(String nativeNotificationIconId) {
-    propertySupport.setPropertyString(PROP_NATIVE_NOTIFICATION_ICON_ID, nativeNotificationIconId);
+  public DesktopNotification withNativeNotificationStatus(IStatus nativeNotificationStatus) {
+    propertySupport.setProperty(PROP_NATIVE_NOTIFICATION_STATUS, nativeNotificationStatus);
     return this;
   }
 
   @Override
-  public String getNativeNotificationIconId() {
-    return propertySupport.getPropertyString(PROP_NATIVE_NOTIFICATION_ICON_ID);
+  public IStatus getNativeNotificationStatus() {
+    return propertySupport.getProperty(PROP_NATIVE_NOTIFICATION_STATUS, IStatus.class);
   }
 
   /**
@@ -182,6 +169,26 @@ public class DesktopNotification extends Notification implements IDesktopNotific
   @Override
   public boolean isNativeNotificationShown() {
     return propertySupport.getPropertyBool(PROP_NATIVE_NOTIFICATION_SHOWN);
+  }
+
+  @Override
+  public DesktopNotification withAppLinkConsumer(Consumer<String> appLinkConsumer) {
+    return (DesktopNotification) super.withAppLinkConsumer(appLinkConsumer);
+  }
+
+  @Override
+  public DesktopNotification withClosable(boolean closable) {
+    return (DesktopNotification) super.withClosable(closable);
+  }
+
+  @Override
+  public DesktopNotification withHtmlEnabled(boolean htmlEnabled) {
+    return (DesktopNotification) super.withHtmlEnabled(htmlEnabled);
+  }
+
+  @Override
+  public DesktopNotification withStatus(IStatus status) {
+    return (DesktopNotification) super.withStatus(status);
   }
 
   @Override

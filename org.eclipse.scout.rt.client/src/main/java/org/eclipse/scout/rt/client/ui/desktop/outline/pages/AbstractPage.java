@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -79,6 +79,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,6 +226,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public ITableRow getTableRowFor(ITreeNode childPage) {
+    //noinspection SuspiciousMethodCalls
     return m_pageToTableRowMap.get(childPage);
   }
 
@@ -264,7 +266,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
           buf.append(Arrays.toString((Object[]) o));
         }
         else {
-          buf.append(o.toString());
+          buf.append(o);
         }
       }
     }
@@ -392,7 +394,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Subclasses can override this method. Default is {@code null}.
    *
    * @return a form type token
-   * @see {@link #startDetailForm(IForm)} for details how the form gets started
+   * @see #startDetailForm() for details how the form gets started
    */
   @ConfigProperty(ConfigProperty.FORM)
   @Order(90)
@@ -407,7 +409,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * {@link #isCalculateVisibleLate()}.
    *
    * @see #calculateVisibleInternal()
-   * @return
    */
   @ConfigOperation
   @Order(100)
@@ -419,7 +420,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Called after this page has been added to the outline tree. This method may set a detail form or check some
    * parameters.
    * <p>
-   * Do not load table data here, this should be done lazily in {@link AbstractPageWithTable.execLoadTableData}.
+   * Do not load table data here, this should be done lazily in
+   * {@link AbstractPageWithTable#execLoadData(SearchFilter)}.
    * <p>
    * Subclasses can override this method. The default does nothing.
    *

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ public interface INotification extends IWidget {
   Notification withClosable(boolean closable);
 
   /**
-   * Whether or not the notification can be closed by the user.
+   * Whether the notification can be closed by the user.
    */
   boolean isClosable();
 
@@ -37,18 +37,6 @@ public interface INotification extends IWidget {
    * @return true, if the notification may contain html that needs to be rendered. false otherwise.
    */
   boolean isHtmlEnabled();
-
-  /**
-   * @return The icon id of the notification or {@code null}.
-   */
-  String getIconId();
-
-  /**
-   * Sets the new icon id of this notification.
-   * @param iconId The new icon Id. May be {@code null}.
-   * @return this instance
-   */
-  Notification withIconId(String iconId);
 
   void addNotificationListener(NotificationListener listener);
 

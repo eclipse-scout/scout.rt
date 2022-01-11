@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,12 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.notification.JsonNotification;
-import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.json.JSONObject;
 
 public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotification> extends JsonNotification<DESKTOP_NOTIFICATION> {
@@ -33,47 +34,47 @@ public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotifi
   protected void initJsonProperties(DESKTOP_NOTIFICATION model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>("duration", model) {
+    putJsonProperty(new JsonProperty<>("duration", model) {
       @Override
       protected Long modelValue() {
         return getModel().getDuration();
       }
     });
 
-    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>(IDesktopNotification.PROP_NATIVE_ONLY, model) {
+    putJsonProperty(new JsonProperty<>(IDesktopNotification.PROP_NATIVE_ONLY, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isNativeOnly();
       }
     });
 
-    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_TITLE, model) {
+    putJsonProperty(new JsonProperty<>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_TITLE, model) {
       @Override
       protected String modelValue() {
         return getModel().getNativeNotificationTitle();
       }
     });
 
-    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_ICON_ID, model) {
+    putJsonProperty(new JsonProperty<>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_STATUS, model) {
       @Override
-      protected String modelValue() {
-        return getModel().getNativeNotificationIconId();
+      protected IStatus modelValue() {
+        return getModel().getNativeNotificationStatus();
       }
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return BinaryResourceUrlUtility.createIconUrl((String) value);
+        return JsonStatus.toJson((IStatus) value);
       }
     });
 
-    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_VISIBILITY, model) {
+    putJsonProperty(new JsonProperty<>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_VISIBILITY, model) {
       @Override
       protected String modelValue() {
         return getModel().getNativeNotificationVisibility();
       }
     });
 
-    putJsonProperty(new JsonProperty<DESKTOP_NOTIFICATION>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_SHOWN, model) {
+    putJsonProperty(new JsonProperty<>(IDesktopNotification.PROP_NATIVE_NOTIFICATION_SHOWN, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isNativeNotificationShown();
@@ -87,7 +88,8 @@ public class JsonDesktopNotification<DESKTOP_NOTIFICATION extends IDesktopNotifi
       boolean shown = data.getBoolean(propertyName);
       addPropertyEventFilterCondition(IDesktopNotification.PROP_NATIVE_NOTIFICATION_SHOWN, shown);
       getModel().getUIFacade().setNativeNotificationShownFromUI(shown);
-    } else {
+    }
+    else {
       super.handleUiPropertyChange(propertyName, data);
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,7 +50,7 @@ public class Status implements IStatus, Serializable {
   }
 
   /**
-   * Status with error message and severity.
+   * Status with message and severity.
    *
    * @param severity
    *          {@link #ERROR}, {@link #WARNING}, {@link #INFO}
@@ -60,12 +60,26 @@ public class Status implements IStatus, Serializable {
   }
 
   /**
-   * Status with error message and severity, error code
+   * Status with message and severity, error code
    *
    * @param severity
    *          {@link #ERROR}, {@link #WARNING}, {@link #INFO}
    */
   public Status(String message, int severity, int code) {
+    this(message, severity, code, null);
+  }
+
+  /**
+   * Status with message, severity and icon.
+   */
+  public Status(String message, int severity, String iconId) {
+    this(message, severity, 0, iconId);
+  }
+
+  /**
+   * Status with message, severity, code and icon.
+   */
+  public Status(String message, int severity, int code, String iconId) {
     m_severity = severity;
     m_message = message;
     m_code = code;
@@ -75,7 +89,7 @@ public class Status implements IStatus, Serializable {
       clazz = clazz.getSuperclass();
     }
     m_order = clazz.getAnnotation(Order.class).value();
-
+    m_iconId = iconId;
   }
 
   /**

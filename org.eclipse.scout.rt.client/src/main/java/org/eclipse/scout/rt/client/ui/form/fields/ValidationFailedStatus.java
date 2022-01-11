@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,16 +12,15 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.status.Status;
 
 /**
  * Internal marker status for validation errors during setValue.
  *
  * @see AbstractValueField#validateValueInternal(Object)
- * @param invalid
- *          value type
  */
 @Order(20)
-public final class ValidationFailedStatus<VALUE> extends ScoutFieldStatus {
+public final class ValidationFailedStatus<VALUE> extends Status {
 
   private static final long serialVersionUID = 1L;
   private final VALUE m_invalidValue;

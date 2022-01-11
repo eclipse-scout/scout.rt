@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,9 +13,10 @@ package org.eclipse.scout.rt.client.ui.desktop.notification;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.ui.notification.INotification;
+import org.eclipse.scout.rt.platform.status.IStatus;
 
 /**
- * A notification is used to display a short information on the Desktop. If the given duration is >= 0, the notification
+ * A notification is used to display short information on the Desktop. If the given duration is >= 0, the notification
  * disappears automatically after the duration has passed.
  *
  * @since 5.2
@@ -53,7 +54,7 @@ public interface IDesktopNotification extends INotification {
 
   String PROP_NATIVE_NOTIFICATION_TITLE = "nativeNotificationTitle";
 
-  String PROP_NATIVE_NOTIFICATION_ICON_ID = "nativeNotificationIconId";
+  String PROP_NATIVE_NOTIFICATION_STATUS = "nativeNotificationStatus";
 
   String PROP_NATIVE_NOTIFICATION_SHOWN = "nativeNotificationShown";
 
@@ -97,12 +98,12 @@ public interface IDesktopNotification extends INotification {
    */
   String getNativeNotificationTitle();
 
-  DesktopNotification withNativeNotificationIconId(String nativeNotificationIconId);
+  DesktopNotification withNativeNotificationStatus(IStatus nativeNotificationStatus);
 
   /**
-   * The icon displayed on the native notification.
+   * The {@link IStatus} used for the native notification (holds message and icon).
    */
-  String getNativeNotificationIconId();
+  IStatus getNativeNotificationStatus();
 
   /**
    * Indicates, whether the native notification is shown. Once it is closed, the property will be set to false.

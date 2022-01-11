@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, Notification as ScoutNotification, strings} from '../../index';
+import {Device, Notification as ScoutNotification, scout, Status, strings} from '../../index';
 
 export default class DesktopNotification extends ScoutNotification {
 
@@ -20,7 +20,7 @@ export default class DesktopNotification extends ScoutNotification {
     this._removing = false;
     this.nativeOnly = false;
     this.nativeNotificationTitle = null;
-    this.nativeNotificationIconId = null;
+    this.nativeNotificationStatus = null; // holds native message & native icon
     this.nativeNotificationVisibility = DesktopNotification.NativeNotificationVisibility.NONE;
     this.nativeNotification = null;
     this.nativeNotificationShown = false;
@@ -58,7 +58,13 @@ export default class DesktopNotification extends ScoutNotification {
     let defaults = this.session.desktop.nativeNotificationDefaults;
     if (defaults) {
       this.nativeNotificationTitle = model.nativeNotificationTitle !== undefined ? model.nativeNotificationTitle : defaults.title;
-      this.nativeNotificationIconId = model.nativeNotificationIconId !== undefined ? model.nativeNotificationIconId : defaults.iconId;
+      if (this.nativeNotificationStatus) {
+        this.nativeNotificationStatus.iconId = this.nativeNotificationStatus.iconId !== undefined ? this.nativeNotificationStatus.iconId : defaults.iconId;
+      } else {
+        this.nativeNotificationStatus = new Status({
+          iconId: defaults.iconId
+        });
+      }
       this.nativeNotificationVisibility = scout.nvl(model.nativeNotificationVisibility !== undefined ? model.nativeNotificationVisibility : defaults.visibility, DesktopNotification.NativeNotificationVisibility.NONE);
     }
     this.resolveTextKeys(['nativeNotificationTitle']);
@@ -108,10 +114,24 @@ export default class DesktopNotification extends ScoutNotification {
       return;
     }
     let title = scout.nvl(this.nativeNotificationTitle, '');
-    let body = scout.nvl(strings.nl2br(this.status.message), '');
+    let body = (this.nativeNotificationStatus || {}).message;
+    if (strings.empty(body)) {
+      body = (this.status || {}).message;
+    }
+    if (!body) {
+      body = '';
+    }
+    if (this.htmlEnabled) {
+      body = strings.plainText(body, {removeFontIcons: true});
+    }
+    let iconId = (this.nativeNotificationStatus || {}).iconId;
+    if (strings.empty(iconId)) {
+      // icon must not be null or empty. If no icon it must be undefined
+      iconId = undefined;
+    }
     this.nativeNotification = new Notification(title, {
       body: body,
-      icon: this.nativeNotificationIconId
+      icon: iconId
     });
 
     this.nativeNotification.addEventListener('show', event => {
@@ -240,8 +260,13 @@ export default class DesktopNotification extends ScoutNotification {
     this.setProperty('nativeNotificationTitle', title);
   }
 
-  setNativeNotificationIconId(iconId) {
-    this.setProperty('nativeNotificationIconId', iconId);
+  setNativeNotificationStatus(status) {
+    this.setProperty('nativeNotificationStatus', status);
+  }
+
+  _setNativeNotificationStatus(status) {
+    status = Status.ensure(status);
+    this._setProperty('nativeNotificationStatus', status);
   }
 
   setNativeNotificationVisibility(visibility) {

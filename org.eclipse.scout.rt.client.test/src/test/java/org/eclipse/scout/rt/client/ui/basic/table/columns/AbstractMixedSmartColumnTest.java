@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,9 +21,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.fixture.TestCodeType;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
-import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -45,15 +45,15 @@ public class AbstractMixedSmartColumnTest {
 
   @Test
   public void testPrepareEditInternal() {
-    AbstractSmartColumn<Long> column = new AbstractSmartColumn<Long>() {
+    AbstractSmartColumn<Long> column = new AbstractSmartColumn<>() {
     };
     column.setCodeTypeClass(TestCodeType.class);
     column.setMandatory(true);
     ITableRow row = mock(ITableRow.class);
     @SuppressWarnings("unchecked")
     ISmartField<Long> field = (ISmartField<Long>) column.prepareEditInternal(row);
-    assertEquals("mandatory property to be progagated to field", column.isMandatory(), field.isMandatory());
-    assertEquals("code type class property to be progagated to field", column.getCodeTypeClass(), field.getCodeTypeClass());
+    assertEquals("mandatory property to be propagated to field", column.isMandatory(), field.isMandatory());
+    assertEquals("code type class property to be propagated to field", column.getCodeTypeClass(), field.getCodeTypeClass());
   }
 
   /**
@@ -73,10 +73,10 @@ public class AbstractMixedSmartColumnTest {
   }
 
   /**
-   * An unparsable error should lead to an error on the column
+   * An unparseable error should lead to an error on the column
    */
   @Test
-  public void testSetUnparsableValue() {
+  public void testSetUnparseableValue() {
     P_Table table = new P_Table();
     table.addRowsByArray(new Object[]{1L});
     ITableRow testRow = table.getRow(0);
@@ -89,7 +89,7 @@ public class AbstractMixedSmartColumnTest {
   }
 
   /**
-   * An unparsable error should be reset, if a valid value is entered
+   * An unparseable error should be reset, if a valid value is entered
    */
   @Test
   public void testResetParsingError() {
@@ -129,14 +129,14 @@ public class AbstractMixedSmartColumnTest {
 
   /**
    * Tests an issue from ticket #168697. When user has entered a search-text which returned no lookup-rows, the error
-   * was not displayed in the editable cell. Its basically the same test
+   * was not displayed in the editable cell. It is basically the same test
    */
   @Test
   public void testCompleteEdit_ValidationError() {
     assertCompleteEditWithErrors(true, ValidationFailedStatus.class);
   }
 
-  private void assertCompleteEditWithErrors(boolean useUiFacade, Class<? extends ScoutFieldStatus> statusClass) {
+  private void assertCompleteEditWithErrors(boolean useUiFacade, Class<? extends IStatus> statusClass) {
     P_Table table = new P_Table();
     table.addRowsByArray(new Long[]{3L});
     ISmartField<?> field = (ISmartField<?>) table.getEditableSmartColumn().prepareEdit(table.getRow(0));
@@ -151,7 +151,7 @@ public class AbstractMixedSmartColumnTest {
     table.getEditableSmartColumn().completeEdit(table.getRow(0), field);
     ICell c = table.getCell(0, 0);
     assertEquals("invalid Text", c.getText());
-    assertNotNull(String.format("The invalid cell should have an error status: value '%s'", c.getValue(), c.getErrorStatus()));
+    assertNotNull(String.format("The invalid cell should have an error status: value '%s', error-status: '%s'.", c.getValue(), c.getErrorStatus()));
     assertTrue(c.getErrorStatus().containsStatus(statusClass));
   }
 

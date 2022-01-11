@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -408,7 +409,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   void setMandatory(boolean b, boolean recursive);
 
   /**
-   * Adds an error status to field. use {@link ScoutFieldStatus} in order to set a custom icon.
+   * Adds an error status to field. use {@link Status} in order to set a custom icon.
    */
   void addErrorStatus(IStatus newStatus);
 
