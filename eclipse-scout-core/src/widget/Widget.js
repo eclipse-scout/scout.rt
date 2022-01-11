@@ -1556,9 +1556,11 @@ export default class Widget {
    * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is shown with this widget as its 'displayParent'.<br>
    * If the widget is not rendered yet, a scout.DeferredGlassPaneTarget is returned.<br>
    * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
+   * @param {Widget} element widget that requested a glass pane
+   * @returns [$]|[DeferredGlassPaneTarget]
    */
   glassPaneTargets(element) {
-    let resolveGlassPanes = function(element) {
+    let resolveGlassPanes = element => {
       // contributions
       let targets = arrays.flatMap(this._glassPaneContributions, cont => {
         let $elements = cont(element);
@@ -1568,7 +1570,7 @@ export default class Widget {
         return [];
       });
       return targets.concat(this._glassPaneTargets(element));
-    }.bind(this);
+    };
     if (this.rendered) {
       return resolveGlassPanes(element);
     }
@@ -1576,13 +1578,17 @@ export default class Widget {
     return DeferredGlassPaneTarget.createFor(this, resolveGlassPanes.bind(this, element));
   }
 
+  /**
+   *
+   * @param {Widget} element widget that requested a glass pane
+   * @returns [$]
+   */
   _glassPaneTargets(element) {
     // since popups are rendered outside the DOM of the widget parent-child hierarchy, get glassPaneTargets of popups belonging to this widget separately.
     return [this.$container].concat(
       this.session.desktop.getPopupsFor(this)
-        .reduce((acc, popup) => {
-          return acc.concat(popup.glassPaneTargets());
-        }, []));
+        .filter(popup => !element.has(popup))
+        .reduce((acc, popup) => acc.concat(popup.glassPaneTargets()), []));
   }
 
   addGlassPaneContribution(contribution) {

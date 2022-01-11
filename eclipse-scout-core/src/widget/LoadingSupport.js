@@ -15,7 +15,7 @@ export default class LoadingSupport extends WidgetSupport {
 
   /**
    * @typedef {WidgetSupportOptions} LoadingSupportOptions
-   * @property {number} loadingIndicatorDelay if not set: 250 ms
+   * @property {number} [loadingIndicatorDelay] if not set: 250 ms
    */
 
   /**

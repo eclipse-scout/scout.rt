@@ -1064,10 +1064,10 @@ export default class Outline extends Tree {
     this.setProperty('nodeMenuBarVisible', visible);
   }
 
-  glassPaneTargets() {
+  glassPaneTargets(element) {
     // MessageBoxes are often created with Outlines as displayParent. The default implementation of this function
     // would not render any glass panes when the outline is collapsed, thus we need to override this behavior.
-    return this._glassPaneTargets();
+    return this._glassPaneTargets(element);
   }
 
   _glassPaneTargets(element) {

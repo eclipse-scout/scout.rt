@@ -14,8 +14,8 @@
  */
 export default class DeferredGlassPaneTarget {
   constructor() {
-    this.$glassPaneTargets;
-    this.glassPaneRenderer;
+    this.$glassPaneTargets = null;
+    this.glassPaneRenderer = null;
   }
 
   ready($glassPaneTargets) {

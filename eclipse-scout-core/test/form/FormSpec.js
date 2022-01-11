@@ -596,6 +596,71 @@ describe('Form', () => {
         .always(done);
     });
 
+    it('does not block child popup if dialog is modal', done => {
+      let dialog = helper.createFormWithOneField({
+        modal: true
+      });
+      let popup = scout.create('Popup', {
+        parent: dialog,
+        withGlassPane: true
+      });
+      dialog.open()
+        .then(() => popup.open())
+        .then(() => {
+          expect($('.glasspane').length).toBe(7);
+          expect(desktop.navigation.$container.children('.glasspane').length).toBe(2);
+          expect(desktop.header.$container.children('.glasspane').length).toBe(2);
+          expect(desktop.bench.$container.children('.glasspane').length).toBe(2);
+          expect(dialog.$container.children('.glasspane').length).toBe(1);
+          expect(popup.$container.children('.glasspane').length).toBe(0); // Must not be covered
+
+          popup.close();
+          expect($('.glasspane').length).toBe(3);
+
+          dialog.close();
+          expect($('.glasspane').length).toBe(0);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('does not block child popup if dialog is modal and displayParent a view', done => {
+      // Use case: on mobile, a view with a dialog containing a touch popup is open
+      let view = helper.createFormWithOneField({
+        modal: false,
+        displayHint: Form.DisplayHint.VIEW
+      });
+      let dialog = helper.createFormWithOneField({
+        modal: true,
+        displayParent: view
+      });
+      let popup = scout.create('Popup', {
+        parent: dialog,
+        withGlassPane: true
+      });
+      view.open()
+        .then(() => dialog.open())
+        .then(() => popup.open())
+        .then(() => {
+          expect($('.glasspane').length).toBe(5);
+          expect(desktop.navigation.$container.children('.glasspane').length).toBe(1); // Provided by popup
+          expect(desktop.header.$container.children('.glasspane').length).toBe(1); // Provided by popup
+          expect(desktop.bench.$container.children('.glasspane').length).toBe(1); // Provided by popup
+          expect(view.$container.children('.glasspane').length).toBe(1); // Provided by dialog
+          expect(dialog.$container.children('.glasspane').length).toBe(1); // Provided by popup
+          expect(popup.$container.children('.glasspane').length).toBe(0); // Must not be covered
+
+          popup.close();
+          expect($('.glasspane').length).toBe(1);
+
+          dialog.close();
+          expect($('.glasspane').length).toBe(0);
+
+          view.close();
+        })
+        .catch(fail)
+        .always(done);
+    });
   });
 
   describe('rootGroupBox.gridData', () => {
@@ -923,6 +988,7 @@ describe('Form', () => {
           validByErrorStatus: true,
           validByMandatory: true,
           field: field,
+          label: field.label,
           reveal: () => {
             fields.selectAllParentTabsOf(field);
             field.focus();
