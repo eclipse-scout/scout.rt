@@ -113,26 +113,16 @@ const createReleaseVersionConstraint = ({moduleName, mapping, newModuleVersion, 
   throw new Error(`couldn't find a constraint for ${moduleName}! Please provide a matching regex`);
 };
 
-/**
- * Generates the constraint for a snapshot build
- * @param oldConstraint
- * @returns {string}
- */
-const createSnapshotVersionConstraint = oldConstraint => {
-  const cleanedModuleVersion = oldConstraint.replace(/-snapshot(.)*/i, '');
-  return `>=${cleanedModuleVersion}-snapshot <${cleanedModuleVersion}`; // ">=10.0.0-snapshot <10.0.0"
-};
-
 const updateDependencyConstraints = ({dependencies, workspaceModuleNames = [], updateWorkspaceDependencies, isSnapshot, mapping, verbose, newModuleVersion, useRegexMap}) => {
-  if (!dependencies) {
+  if (!dependencies || isSnapshot) {
     return;
   }
 
-  const regex = new RegExp('-snapshot$');
+  const regex = new RegExp('-snapshot\\s*<');
   for (const [moduleName, version] of Object.entries(dependencies)) {
     if (regex.test(version)) {
       if ((updateWorkspaceDependencies && workspaceModuleNames.includes(moduleName)) || (!updateWorkspaceDependencies && !workspaceModuleNames.includes(moduleName))) {
-        const versionConstraint = isSnapshot ? createSnapshotVersionConstraint(version) : createReleaseVersionConstraint({
+        const versionConstraint = createReleaseVersionConstraint({
           moduleName,
           mapping,
           newModuleVersion: newModuleVersion,
