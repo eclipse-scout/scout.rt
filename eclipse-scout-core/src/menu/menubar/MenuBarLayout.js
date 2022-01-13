@@ -25,10 +25,7 @@ export default class MenuBarLayout extends AbstractLayout {
     let menuItems = this._menuBar.orderedMenuItems.left.concat(this._menuBar.orderedMenuItems.right);
     let visibleMenuItems = this.visibleMenuItems();
     let htmlContainer = HtmlComponent.get($container);
-
-    let ellipsis = arrays.find(menuItems, menuItem => {
-      return menuItem.ellipsis;
-    });
+    let ellipsis = arrays.find(menuItems, menuItem => menuItem.ellipsis);
 
     this._setFirstLastMenuMarker(visibleMenuItems); // is required to determine available size correctly
     this.preferredLayoutSize($container, {
@@ -40,31 +37,21 @@ export default class MenuBarLayout extends AbstractLayout {
     if (ellipsis && this._overflowMenuItems.length > 0) {
       ellipsis.setHidden(false);
     }
-    visibleMenuItems.forEach(menuItem => {
-      menuItem._setOverflown(false);
-    }, this);
-
-    this._overflowMenuItems.forEach(menuItem => {
-      menuItem._setOverflown(true);
-    });
+    visibleMenuItems.forEach(menuItem => menuItem._setOverflown(false));
+    this._overflowMenuItems.forEach(menuItem => menuItem._setOverflown(true));
     if (ellipsis && this._overflowMenuItems.length === 0) {
       ellipsis.setHidden(true);
     }
     // remove all separators
-    this._overflowMenuItems = this._overflowMenuItems.filter(menuItem => {
-      return !menuItem.separator;
-    });
+    this._overflowMenuItems = this._overflowMenuItems.filter(menuItem => !menuItem.separator);
 
-    // set childActions to empty array to prevent the menuItems from calling remove.
     if (ellipsis) {
       ellipsis._closePopup();
       ellipsis.setChildActions(this._overflowMenuItems);
     }
 
     // trigger menu items layout
-    visibleMenuItems.forEach(menuItem => {
-      menuItem.validateLayout();
-    });
+    visibleMenuItems.forEach(menuItem => menuItem.validateLayout());
 
     visibleMenuItems.forEach(menuItem => {
       // Make sure open popups are at the correct position after layouting
@@ -123,7 +110,7 @@ export default class MenuBarLayout extends AbstractLayout {
   /**
    * Moves menu items into _overflowMenuItems until prefSize.width is smaller than prefWidth.
    * The moved menu items will be removed from the given visibleMenuItems parameter.
-   * @returns {number} the calculated preferred size
+   * @returns {Dimension} the calculated preferred size
    */
   _prefSizeWithOverflow(visibleMenuItems, prefWidth) {
     let overflowableIndexes = [];

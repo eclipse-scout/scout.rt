@@ -57,4 +57,8 @@ export default class EllipsisMenu extends Menu {
   isTabTarget() {
     return super.isTabTarget() && !this.hidden;
   }
+
+  _childrenForEnabledComputed() {
+    return this.childActions;
+  }
 }

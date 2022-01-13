@@ -126,6 +126,10 @@ describe('Menu', () => {
 
   describe('setTooltipText', () => {
 
+    function find$Tooltips() {
+      return $('body').find('.tooltip');
+    }
+
     it('can update the tooltip text', () => {
       let testMenu = helper.createMenu({
         text: 'My Test Menu',
@@ -133,36 +137,36 @@ describe('Menu', () => {
       });
       testMenu.render();
 
-      let tooltip = $('body').find('.tooltip');
-      expect(tooltip.length).toBe(0);
+      let $tooltip = find$Tooltips();
+      expect($tooltip.length).toBe(0);
 
       testMenu.$container.triggerMouseEnter();
       jasmine.clock().tick(1000);
 
-      tooltip = $('body').find('.tooltip');
-      expect(tooltip.length).toBe(1);
-      expect(tooltip.text()).toBe('moo');
+      $tooltip = find$Tooltips();
+      expect($tooltip.length).toBe(1);
+      expect($tooltip.text()).toBe('moo');
 
       testMenu.setTooltipText('quack');
 
-      tooltip = $('body').find('.tooltip');
-      expect(tooltip.length).toBe(1);
-      expect(tooltip.text()).toBe('quack');
+      $tooltip = find$Tooltips();
+      expect($tooltip.length).toBe(1);
+      expect($tooltip.text()).toBe('quack');
 
       testMenu.$container.triggerMouseLeave();
       testMenu.$container.triggerMouseEnter();
       jasmine.clock().tick(1000);
 
-      tooltip = $('body').find('.tooltip');
-      expect(tooltip.length).toBe(1);
-      expect(tooltip.text()).toBe('quack');
+      $tooltip = find$Tooltips();
+      expect($tooltip.length).toBe(1);
+      expect($tooltip.text()).toBe('quack');
 
       // Close
       testMenu.setTooltipText('meeeep');
       tooltips.close(testMenu.$container);
 
-      tooltip = $('body').find('.tooltip');
-      expect(tooltip.length).toBe(0);
+      $tooltip = find$Tooltips();
+      expect($tooltip.length).toBe(0);
     });
 
   });
@@ -213,7 +217,7 @@ describe('Menu', () => {
       expect(parent.enabledComputed).toBe(false);
 
       // add the child menu
-      menu.addChildActions(childMenu);
+      menu.insertChildActions(childMenu);
       expect(menu.inheritAccessibility).toBe(true);
       expect(menu.enabled).toBe(true);
       expect(menu.enabledComputed).toBe(true);
@@ -494,6 +498,42 @@ describe('Menu', () => {
       expect(menu.enabledComputed).toBe(false);
       menu.childActions[1].childActions[0].setVisible(true);
       expect(menu.enabledComputed).toBe(true);
+    });
+
+    it('is updated even if menu is in ellipsis', () => {
+      let ellipsis = scout.create('EllipsisMenu', {
+        parent: session.desktop
+      });
+      ellipsis.render();
+      let menu = helper.createMenu();
+      menu.render();
+      expect(menu.enabled).toBe(true);
+      expect(menu.enabledComputed).toBe(true);
+
+      menu._setOverflown(true);
+      ellipsis.setChildActions([menu]);
+      expect(ellipsis.enabledComputed).toBe(true);
+      expect(menu.enabled).toBe(true);
+      expect(menu.enabledComputed).toBe(true);
+      expect(menu.$container).not.toHaveClass('disabled');
+      ellipsis.setSelected(true);
+      expect(ellipsis.popup.$menuItems().eq(0)).not.toHaveClass('disabled'); // $container of the cloned menu item
+
+      ellipsis.setSelected(false);
+      menu.setEnabled(false);
+      expect(ellipsis.enabledComputed).toBe(true);
+      expect(menu.enabled).toBe(false);
+      expect(menu.enabledComputed).toBe(false);
+      expect(menu.$container).toHaveClass('disabled');
+      ellipsis.setSelected(true);
+      expect(ellipsis.popup.$menuItems().eq(0)).toHaveClass('disabled');
+
+      ellipsis.setSelected(false);
+      menu._setOverflown(false);
+      ellipsis.setChildActions([]);
+      expect(menu.enabled).toBe(false);
+      expect(menu.enabledComputed).toBe(false);
+      expect(menu.$container).toHaveClass('disabled');
     });
   });
 

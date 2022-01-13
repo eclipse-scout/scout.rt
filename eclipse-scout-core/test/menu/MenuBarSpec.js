@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Button, ButtonAdapterMenu, Dimension, GroupBoxMenuItemsOrder, HtmlComponent, MenuBar, MenuItemsOrder, menus, scout} from '../../src/index';
+import {Action, Button, ButtonAdapterMenu, Dimension, GroupBoxMenuItemsOrder, HtmlComponent, MenuBar, MenuItemsOrder, scout} from '../../src/index';
 import {MenuSpecHelper} from '../../src/testing/index';
 
 describe('MenuBar', () => {
@@ -490,11 +490,6 @@ describe('MenuBar', () => {
         menuBar = createMenuBar(),
         menusItems = [menu1, menu2];
 
-      let ellipsisMenu = menus.createEllipsisMenu({
-        parent: session.desktop
-      });
-      ellipsisMenu.render();
-
       menuBar.setMenuItems(menusItems);
       menuBar.render();
       expect(menu1.rendered).toBe(true);
@@ -504,12 +499,12 @@ describe('MenuBar', () => {
       expect(menu2.$container).toHaveClass('default');
       expect(menuBar.tabbableMenu).toBe(menu2);
 
-      menu2.setProperty('enabled', false);
+      menu2.setEnabled(false);
       expect(menuBar.defaultMenu).toBe(null);
       expect(menu2.$container).not.toHaveClass('default');
       expect(menuBar.tabbableMenu).toBe(menu1);
 
-      menu2.setProperty('enabled', true);
+      menu2.setEnabled(true);
       expect(menuBar.defaultMenu).toBe(menu2);
       expect(menu2.$container).toHaveClass('default');
       expect(menuBar.tabbableMenu).toBe(menu2);
@@ -524,11 +519,6 @@ describe('MenuBar', () => {
         menu2 = helper.createMenu(modelMenu2),
         menuBar = createMenuBar(),
         menuItems = [menu1, menu2];
-
-      let ellipsisMenu = menus.createEllipsisMenu({
-        parent: session.desktop
-      });
-      ellipsisMenu.render();
 
       menuBar.setMenuItems(menuItems);
       menuBar.render();
@@ -566,7 +556,7 @@ describe('MenuBar', () => {
       expect(menu2.$container).not.toHaveClass('default');
     });
 
-    it('considers rendered state of default menu', () => {
+    it('is called even if menu is in ellipsis', () => {
       let modelMenu1 = createModel('foo');
       let modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
@@ -575,11 +565,6 @@ describe('MenuBar', () => {
         menu2 = helper.createMenu(modelMenu2),
         menuBar = createMenuBar(),
         menuItems = [menu1, menu2];
-
-      let ellipsisMenu = menus.createEllipsisMenu({
-        parent: session.desktop
-      });
-      ellipsisMenu.render();
 
       menuBar.setMenuItems(menuItems);
       menuBar.render();
@@ -590,20 +575,22 @@ describe('MenuBar', () => {
       expect(menu2.$container).toHaveClass('default');
 
       // Move default menu into ellipsis and call updateDefaultMenu explicitly to recalculate state
-      menus.moveMenuIntoEllipsis(menu2, ellipsisMenu);
+      menu2._setOverflown(true);
+      menuBar._ellipsis.setChildActions([menu2]);
+      menuBar._ellipsis.setHidden(false);
       menuBar.updateDefaultMenu();
-      expect(menu1.rendered).toBe(true);
+      expect(menu1.overflown).toBe(false);
       expect(menu1.$container).not.toHaveClass('default');
-      expect(menu2.rendered).toBe(false);
+      expect(menu2.overflown).toBe(true);
       expect(menuBar.defaultMenu).toBe(menu2);
 
-      menu2.setProperty('enabled', false);
+      menu2.setEnabled(false);
       expect(menuBar.defaultMenu).toBe(null);
-      expect(menu2.rendered).toBe(false);
+      expect(menu2.overflown).toBe(true);
 
-      menu2.setProperty('enabled', true);
+      menu2.setEnabled(true);
       expect(menuBar.defaultMenu).toBe(menu2);
-      expect(menu2.rendered).toBe(false);
+      expect(menu2.overflown).toBe(true);
     });
   });
 

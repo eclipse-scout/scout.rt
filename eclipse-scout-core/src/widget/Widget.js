@@ -8,27 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  DeferredGlassPaneTarget,
-  Desktop,
-  Device,
-  Event,
-  EventDelegator,
-  EventSupport,
-  filters,
-  focusUtils,
-  Form,
-  graphics,
-  icons,
-  inspector,
-  objects,
-  scout,
-  scrollbars,
-  strings,
-  texts,
-  TreeVisitResult
-} from '../index';
+import {arrays, DeferredGlassPaneTarget, Desktop, Device, Event, EventDelegator, EventSupport, filters, focusUtils, Form, graphics, icons, inspector, objects, scout, scrollbars, strings, texts, TreeVisitResult} from '../index';
 import $ from 'jquery';
 
 export default class Widget {
@@ -806,11 +786,15 @@ export default class Widget {
     }
 
     let computedStateForChildren = scout.nvl(enabledComputedForChildren, enabledComputed);
-    this.children.forEach(child => {
+    this._childrenForEnabledComputed().forEach(child => {
       if (child.inheritAccessibility) {
         child.recomputeEnabled(computedStateForChildren);
       }
     });
+  }
+
+  _childrenForEnabledComputed() {
+    return this.children;
   }
 
   _computeEnabled(inheritAccessibility, parentEnabled) {
