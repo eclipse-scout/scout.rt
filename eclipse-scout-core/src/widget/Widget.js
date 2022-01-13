@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1399,19 +1399,22 @@ export default class Widget {
 
   /**
    * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
+   * @return {boolean} true if the property was changed, false if not.
    */
   _setProperty(propertyName, newValue) {
     scout.assertParameter('propertyName', propertyName);
     let oldValue = this[propertyName];
     if (objects.equals(oldValue, newValue)) {
-      return;
+      return false;
     }
     this[propertyName] = newValue;
     let event = this.triggerPropertyChange(propertyName, oldValue, newValue);
     if (event.defaultPrevented) {
       // Revert to old value if property change should be prevented
       this[propertyName] = oldValue;
+      return false; // not changed
     }
+    return true;
   }
 
   /**
@@ -1423,10 +1426,11 @@ export default class Widget {
    *    If there is a custom remove function (e.g. _removeXY where XY is the property name), it will be called instead of removing the widgets directly.
    * 3. Model update: If there is a custom set function (e.g. _setXY where XY is the property name), it will be called. Otherwise the default set function _setProperty is called.
    * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called. Otherwise nothing happens.
+   * @return {boolean} true if the property was changed, false if not.
    */
   setProperty(propertyName, value) {
     if (objects.equals(this[propertyName], value)) {
-      return;
+      return false;
     }
 
     value = this._prepareProperty(propertyName, value);
@@ -1437,6 +1441,7 @@ export default class Widget {
     if (this.rendered) {
       this._callRenderProperty(propertyName);
     }
+    return true;
   }
 
   _prepareProperty(propertyName, value) {

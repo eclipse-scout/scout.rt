@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -500,12 +500,13 @@ describe('Menu', () => {
       expect(menu.enabledComputed).toBe(true);
     });
 
-    it('is updated even if menu is in ellipsis', () => {
+    function testEnabledInEllipsis(inheritAccessibility) {
       let ellipsis = scout.create('EllipsisMenu', {
         parent: session.desktop
       });
       ellipsis.render();
       let menu = helper.createMenu();
+      menu.setInheritAccessibility(inheritAccessibility);
       menu.render();
       expect(menu.enabled).toBe(true);
       expect(menu.enabledComputed).toBe(true);
@@ -534,6 +535,14 @@ describe('Menu', () => {
       expect(menu.enabled).toBe(false);
       expect(menu.enabledComputed).toBe(false);
       expect(menu.$container).toHaveClass('disabled');
+    }
+
+    it('is updated even if menu is in ellipsis and has inheritAccessibility=false', () => {
+      testEnabledInEllipsis(false);
+    });
+
+    it('is updated even if menu is in ellipsis and has inheritAccessibility=true', () => {
+      testEnabledInEllipsis(true);
     });
   });
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -591,9 +591,9 @@ export default class Menu extends Action {
    * @override Widget.js
    */
   _setInheritAccessibility(inheritAccessibility) {
-    this._setProperty('inheritAccessibility', inheritAccessibility);
-    if (this.initialized) {
-      this._findRootMenu().recomputeEnabled();
+    let changed = this._setProperty('inheritAccessibility', inheritAccessibility);
+    if (changed) {
+      this._recomputeEnabledInMenuHierarchy();
     }
   }
 
@@ -601,16 +601,28 @@ export default class Menu extends Action {
    * @override Widget.js
    */
   _setEnabled(enabled) {
-    this._setProperty('enabled', enabled);
-    if (this.initialized) {
-      this._findRootMenu().recomputeEnabled();
+    let changed = this._setProperty('enabled', enabled);
+    if (changed) {
+      this._recomputeEnabledInMenuHierarchy();
     }
   }
 
   _setVisible(visible) {
-    this._setProperty('visible', visible);
-    if (this.initialized) {
-      this._findRootMenu().recomputeEnabled();
+    let changed = this._setProperty('visible', visible);
+    if (changed) {
+      this._recomputeEnabledInMenuHierarchy();
+    }
+  }
+
+  _recomputeEnabledInMenuHierarchy() {
+    if (!this.initialized) {
+      return;
+    }
+    let rootMenu = this._findRootMenu();
+    rootMenu.recomputeEnabled();
+    if (rootMenu !== this) {
+      // necessary in case this menu or a parent menu has inheritAccessibility=false. Because then this menu and its children are skipped in the line above!
+      this.recomputeEnabled();
     }
   }
 
