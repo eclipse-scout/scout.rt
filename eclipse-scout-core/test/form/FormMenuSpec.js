@@ -224,6 +224,29 @@ describe('FormMenu', () => {
       expect(contextMenu2.rendered).toBe(true);
     });
 
+    it('does not throw an exception if popup in ellipsis is closed', () => {
+      let ellipsisMenu = menus.createEllipsisMenu({
+        parent: session.desktop
+      });
+      ellipsisMenu.render();
+
+      let menu = createMenu();
+      // With scout classic, the owner is the null widget.
+      // The parent should be the menu, but may be reset to the owner when the popup is destroyed.
+      // This would lead to an exception when the form should be rendered because the null widget does not have a $container. (306348)
+      menu.form.setOwner(session.root);
+      menu.render();
+      menu.setSelected(true);
+      expect(menu.popup).toBeDefined();
+
+      menu.popup.animateRemoval = false;
+      menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
+      ellipsisMenu.setSelected(true);
+      ellipsisMenu.destroy();
+      menus.removeMenuFromEllipsis(menu);
+      session.layoutValidator.validate();
+    });
+
     describe('with mobile popup style', () => {
 
       it('opens and closes the form popup even if menu is not rendered', () => {

@@ -204,7 +204,7 @@ export default class MenuBoxLayout extends AbstractLayout {
   _createAndRenderEllipsis($container) {
     let ellipsis = menuUtil.createEllipsisMenu({
       parent: this.menuBox,
-      horizontalAlignment: 1,
+      hidden: false,
       compact: this.menuBox.compact
     });
     ellipsis.uiCssClass = this.menuBox.uiMenuCssClass;

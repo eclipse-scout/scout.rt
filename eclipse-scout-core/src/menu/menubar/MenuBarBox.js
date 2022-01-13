@@ -17,12 +17,6 @@ export default class MenuBarBox extends Widget {
     this.menuItems = [];
     this.tooltipPosition = MenuBar.Position.TOP;
     this._addWidgetProperties('menuItems');
-    this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
-  }
-
-  _destroy() {
-    super._destroy();
-    this._removeMenuHandlers();
   }
 
   _render() {
@@ -53,21 +47,12 @@ export default class MenuBarBox extends Widget {
   }
 
   _setMenuItems(menuItems) {
-    // remove property listeners of old menu items.
-    this._removeMenuHandlers();
-
     this._setProperty('menuItems', menuItems);
-    // add property listener of new menus
-    this._addMenuHandlers();
     this._updateTooltipPosition();
   }
 
   _removeMenuItems() {
-    this._removeMenuHandlers();
-    this.menuItems.forEach(item => {
-      item.overflow = false;
-      item.remove();
-    });
+    this.menuItems.forEach(item => item.remove());
   }
 
   _renderMenuItems() {
@@ -81,18 +66,6 @@ export default class MenuBarBox extends Widget {
     }
   }
 
-  _addMenuHandlers() {
-    this.menuItems.forEach(function(item) {
-      item.off('propertyChange', this._menuItemPropertyChangeHandler);
-    }, this);
-  }
-
-  _removeMenuHandlers() {
-    this.menuItems.forEach(function(item) {
-      item.off('propertyChange', this._menuItemPropertyChangeHandler);
-    }, this);
-  }
-
   _renderVisible() {
     super._renderVisible();
     this.revalidateLayout();
@@ -100,9 +73,7 @@ export default class MenuBarBox extends Widget {
 
   _onMenuItemPropertyChange(event) {
     if (event.propertyName === 'visible') {
-      this.setVisible(this.menuItems.some(m => {
-        return m.visible && !m.ellipsis;
-      }));
+      this.setVisible(this.menuItems.some(m => m.visible && !m.ellipsis));
     }
   }
 
@@ -116,8 +87,6 @@ export default class MenuBarBox extends Widget {
   }
 
   _updateTooltipPosition() {
-    this.menuItems.forEach(function(item) {
-      item.setTooltipPosition(this.tooltipPosition);
-    }, this);
+    this.menuItems.forEach(item => item.setTooltipPosition(this.tooltipPosition));
   }
 }

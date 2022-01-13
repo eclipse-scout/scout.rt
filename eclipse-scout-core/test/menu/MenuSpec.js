@@ -55,12 +55,12 @@ describe('Menu', () => {
       menu1.remove();
 
       // when button is used in overflow-menu, style should be back to menu-item
-      menu1.overflow = true;
+      menu1._setOverflown(true);
       menu1.render($sandbox);
       expect(menu1.$container.hasClass('menu-item')).toBe(true);
       menu1.remove();
 
-      menu1.overflow = false;
+      menu1._setOverflown(false);
       menu1.render($sandbox);
       expect(menu1.$container.hasClass('menu-item')).toBe(true);
     });

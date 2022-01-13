@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, icons, MenuDestinations, scout} from '../index';
-import $ from 'jquery';
+import {arrays, MenuDestinations, scout} from '../index';
 
 export function filterAccordingToSelection(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
   let allowedTypes = [];
@@ -163,17 +162,12 @@ export function _checkType(menu, types) {
 }
 
 export function createEllipsisMenu(options) {
-  let defaults = {
-    iconId: icons.ELLIPSIS_V,
-    tabbable: false
-  };
-  options = $.extend({}, defaults, options);
-  return scout.create('Menu', options);
+  return scout.create('EllipsisMenu', options);
 }
 
 export function moveMenuIntoEllipsis(menu, ellipsis) {
   menu.remove();
-  menu.overflow = true;
+  menu._setOverflown(true);
   menu.overflowMenu = ellipsis;
 
   let menusInEllipsis = ellipsis.childActions.slice();
@@ -182,7 +176,7 @@ export function moveMenuIntoEllipsis(menu, ellipsis) {
 }
 
 export function removeMenuFromEllipsis(menu, $parent) {
-  menu.overflow = false;
+  menu._setOverflown(false);
   menu.overflowMenu = null;
   if (!menu.rendered) {
     menu.render($parent);
