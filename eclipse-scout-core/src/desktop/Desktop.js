@@ -895,11 +895,11 @@ export default class Desktop extends Widget {
   }
 
   /**
-   * Destroys every popup which is a descendant of the given widget.
+   * Removes every popup which is a descendant of the given widget.
    */
-  destroyPopupsFor(widget) {
+  removePopupsFor(widget) {
     this.getPopupsFor(widget).forEach(popup => {
-      popup.destroy();
+      popup.remove();
     });
   }
 

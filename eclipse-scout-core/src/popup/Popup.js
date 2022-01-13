@@ -8,25 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  CloseKeyStroke,
-  DialogLayout,
-  Dimension,
-  Event,
-  FocusRule,
-  GlassPaneRenderer,
-  graphics,
-  HtmlComponent,
-  Insets,
-  KeyStrokeContext,
-  Point,
-  PopupLayout,
-  Rectangle,
-  scout,
-  scrollbars,
-  strings,
-  Widget
-} from '../index';
+import {CloseKeyStroke, DialogLayout, Dimension, Event, FocusRule, GlassPaneRenderer, graphics, HtmlComponent, Insets, KeyStrokeContext, Point, PopupLayout, Rectangle, scout, scrollbars, strings, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Popup extends Widget {
@@ -547,7 +529,8 @@ export default class Popup extends Widget {
     // processing the mousedown event, it's too late to detach the event and we must
     // deal with that situation by checking the rendered flag. Otherwise we would
     // run into an error later, since the $container is not available anymore.
-    if (!this.rendered) {
+    // Use the internal flag because popup should be closed even if the parent removal is pending due to a remove animation
+    if (!this._rendered) {
       return;
     }
     if (this._isMouseDownOutside(event)) {

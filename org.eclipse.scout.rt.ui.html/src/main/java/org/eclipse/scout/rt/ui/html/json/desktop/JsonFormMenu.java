@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -46,11 +45,6 @@ public class JsonFormMenu<FORM_MENU extends IFormMenu<? extends IForm>> extends 
       protected JsonAdapterPropertyConfig createConfig() {
         return JsonAdapterPropertyConfigBuilder.globalConfig();
       }
-
-      @Override
-      public boolean accept() {
-        return getModel().isSelected();
-      }
     });
     putJsonProperty(new JsonProperty<IFormMenu<? extends IForm>>(IFormMenu.PROP_POPUP_CLOSABLE, model) {
       @Override
@@ -70,6 +64,5 @@ public class JsonFormMenu<FORM_MENU extends IFormMenu<? extends IForm>> extends 
         return getModel().isPopupResizable();
       }
     });
-    getJsonProperty(IAction.PROP_SELECTED).addLazyProperty(getJsonProperty(IFormMenu.PROP_FORM));
   }
 }

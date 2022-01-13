@@ -521,8 +521,9 @@ export default class Widget {
       return;
     }
 
-    // Destroy open popups first, they are not animated
-    this.session.desktop.destroyPopupsFor(this);
+    // Remove open popups first, they would be positioned wrongly during the animation
+    // Normally they would be closed automatically by a user interaction (click),
+    this.session.desktop.removePopupsFor(this);
 
     this.removalPending = true;
     // Don't execute immediately to make sure nothing interferes with the animation (e.g. layouting) which could make it laggy
