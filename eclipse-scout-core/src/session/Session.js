@@ -319,7 +319,6 @@ export default class Session {
     }
 
     function onAjaxFail(jqXHR, textStatus, errorThrown, ...args) {
-      this._setApplicationLoading(false);
       this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
       return $.rejectedPromise(jqXHR, textStatus, errorThrown, ...args);
     }
@@ -1070,7 +1069,6 @@ export default class Session {
       }
       this._fatalMessagesOnScreen[errorCode] = true;
     }
-    this._setApplicationLoading(false);
 
     options = options || {};
     let model = {
@@ -1394,62 +1392,6 @@ export default class Session {
     return request;
   }
 
-  _setApplicationLoading(applicationLoading) {
-    if (applicationLoading) {
-      this._applicationLoadingTimeoutId = setTimeout(() => {
-        if (!this.desktop || !this.desktop.rendered) {
-          this._renderApplicationLoading();
-        }
-      }, 200);
-    } else {
-      clearTimeout(this._applicationLoadingTimeoutId);
-      this._applicationLoadingTimeoutId = null;
-      this._removeApplicationLoading();
-    }
-  }
-
-  _renderApplicationLoading() {
-    let $body = $('body'),
-      $loadingRoot = $body.children('.application-loading-root');
-    if (!$loadingRoot.length) {
-      $loadingRoot = $body.appendDiv('application-loading-root')
-        .addClass('application-loading-root')
-        .fadeIn();
-    }
-    this._renderApplicationLoadingElement($loadingRoot, 'application-loading01');
-    this._renderApplicationLoadingElement($loadingRoot, 'application-loading02');
-    this._renderApplicationLoadingElement($loadingRoot, 'application-loading03');
-  }
-
-  _renderApplicationLoadingElement($loadingRoot, cssClass) {
-    if ($loadingRoot.children('.' + cssClass).length) {
-      return;
-    }
-    // noinspection JSValidateTypes
-    $loadingRoot.appendDiv(cssClass).hide()
-      .fadeIn();
-  }
-
-  _removeApplicationLoading() {
-    let $loadingRoot = $('body').children('.application-loading-root');
-    // the fadeout animation only contains a to-value and no from-value
-    // therefore set the current value to the elements style
-    $loadingRoot.css('opacity', $loadingRoot.css('opacity'));
-    if ($loadingRoot.css('opacity') == 1) {
-      $loadingRoot.addClass('fadeout and-more');
-    } else {
-      $loadingRoot.addClass('fadeout');
-    }
-    if (Device.get().supportsCssAnimation()) {
-      $loadingRoot.oneAnimationEnd(() => {
-        $loadingRoot.remove();
-      });
-    } else {
-      // fallback for old browsers that do not support the animation-end event
-      $loadingRoot.remove();
-    }
-  }
-
   _processEvents(events) {
     let i = 0;
     while (i < events.length) {
@@ -1492,9 +1434,6 @@ export default class Session {
 
   start() {
     $.log.isInfoEnabled() && $.log.info('Session starting...');
-
-    // After a short time, display a loading animation (will be removed again in _renderDesktop)
-    this._setApplicationLoading(true);
 
     // Send startup request
     return this._sendStartupRequest();
@@ -1545,7 +1484,6 @@ export default class Session {
   _renderDesktop() {
     this.desktop.render(this.$entryPoint);
     this.desktop.invalidateLayoutTree(false);
-    this._setApplicationLoading(false);
   }
 
   _onLogout(event) {

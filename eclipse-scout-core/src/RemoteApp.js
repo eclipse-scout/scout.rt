@@ -50,6 +50,7 @@ export default class RemoteApp extends App {
 
   _fail(options, error, ...args) {
     $.log.error('App initialization failed', error);
+    this.setLoading(false);
     // Session.js already handled the error -> don't show a message here
     // Reject with original rejection arguments
     return $.rejectedPromise(error, ...args);

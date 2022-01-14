@@ -38,6 +38,7 @@ export default class App {
     this.events = this._createEventSupport();
     this.initialized = false;
     this.sessions = [];
+    this._loadingTimeoutId = null;
 
     // register the listeners which were added to scout before the app is created
     listeners.forEach(function(listener) {
@@ -195,8 +196,11 @@ export default class App {
    */
   _init(options) {
     options = options || {};
-    if (!this._checkBrowserCompatibility(options)) {
-      return;
+    this.setLoading(true)
+    let compatibilityPromise = this._checkBrowserCompatibility(options);
+    if (compatibilityPromise) {
+      this.setLoading(false);
+      return compatibilityPromise.then(newOptions => this._init(newOptions));
     }
 
     this._initVersion(options);
@@ -224,23 +228,79 @@ export default class App {
     $.log.isInfoEnabled() && $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
     if (!scout.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
       // No check requested or browser is supported
-      return true;
+      return;
     }
 
+    let deferred = $.Deferred();
+    let newOptions = objects.valueCopy(options);
+    newOptions.checkBrowserCompatibility = false;
     $('.scout').each(function() {
-      let $entryPoint = $(this),
-        $box = $entryPoint.appendDiv(),
-        newOptions = objects.valueCopy(options);
+      let $entryPoint = $(this);
+      let $box = $entryPoint.appendDiv();
 
-      newOptions.checkBrowserCompatibility = false;
       $box.load('unsupported-browser.html', () => {
         $box.find('button').on('click', () => {
           $box.remove();
-          app._init(newOptions);
+          deferred.resolve(newOptions);
         });
       });
     });
-    return false;
+    return deferred.promise();
+  }
+
+  setLoading(loading) {
+    if (loading) {
+      this._loadingTimeoutId = setTimeout(() => {
+        // Don't start loading if a desktop is already rendered to prevent flickering when the loading will be set to false after app initialization finishes
+        if (!this.sessions.some(session => session.desktop && session.desktop.rendered)) {
+          this._renderLoading();
+        }
+      }, 200);
+    } else {
+      clearTimeout(this._loadingTimeoutId);
+      this._loadingTimeoutId = null;
+      this._removeLoading();
+    }
+  }
+
+  _renderLoading() {
+    let $body = $('body'),
+      $loadingRoot = $body.children('.application-loading-root');
+    if (!$loadingRoot.length) {
+      $loadingRoot = $body.appendDiv('application-loading-root')
+        .addClass('application-loading-root')
+        .fadeIn();
+    }
+    this._renderLoadingElement($loadingRoot, 'application-loading01');
+    this._renderLoadingElement($loadingRoot, 'application-loading02');
+    this._renderLoadingElement($loadingRoot, 'application-loading03');
+  }
+
+  _renderLoadingElement($loadingRoot, cssClass) {
+    if ($loadingRoot.children('.' + cssClass).length) {
+      return;
+    }
+    // noinspection JSValidateTypes
+    $loadingRoot.appendDiv(cssClass).hide()
+      .fadeIn();
+  }
+
+  _removeLoading() {
+    let $loadingRoot = $('body').children('.application-loading-root');
+    // the fadeout animation only contains a to-value and no from-value
+    // therefore set the current value to the elements style
+    $loadingRoot.css('opacity', $loadingRoot.css('opacity'));
+    // Add animation listener before adding the classes to ensure the listener will always be triggered even while debugging
+    $loadingRoot.oneAnimationEnd(() => $loadingRoot.remove());
+    if ($loadingRoot.css('opacity') == 1) {
+      $loadingRoot.addClass('fadeout and-more');
+    } else {
+      $loadingRoot.addClass('fadeout');
+    }
+    if (!Device.get().supportsCssAnimation()) {
+      // fallback for old browsers that do not support the animation-end event
+      $loadingRoot.remove();
+    }
   }
 
   _initVersion(options) {
@@ -380,6 +440,7 @@ export default class App {
 
   _initDone(options) {
     this.initialized = true;
+    this.setLoading(false);
     this.trigger('init', {
       options: options
     });
@@ -388,6 +449,7 @@ export default class App {
 
   _fail(options, error, ...args) {
     $.log.error('App initialization failed.');
+    this.setLoading(false);
 
     return this.errorHandler.handle(error, ...args)
       .then(errorInfo => {
