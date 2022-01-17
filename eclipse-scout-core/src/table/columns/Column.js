@@ -447,6 +447,10 @@ export default class Column {
     return this.table.cellValue(this, row);
   }
 
+  cellValue(row) {
+    return this.table.cellValue(this, row);
+  }
+
   cellText(row) {
     return this.table.cellText(this, row);
   }

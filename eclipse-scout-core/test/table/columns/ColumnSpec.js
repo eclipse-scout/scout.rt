@@ -410,6 +410,36 @@ describe('Column', () => {
       expect(column1.selectedCell()).toBe(cell1);
     });
 
+    it('cellValue() and cellText() return the appropriate values', () => {
+      let model = helper.createModel([
+        helper.createModelColumn('col0', 'Column'),
+        helper.createModelColumn('col1', 'NumberColumn')
+      ], [
+        helper.createModelRow('row0', [helper.createModelCell('Text0', 'Value0'), helper.createModelCell('Number0', 0)]),
+        helper.createModelRow('row1', [helper.createModelCell('Text1'), helper.createModelCell('Number1', 1)])
+      ]);
+      let table = helper.createTable(model);
+      let row0 = table.rows[0];
+      let row1 = table.rows[1];
+      let column0 = table.columns[0];
+      let column1 = table.columns[1];
+
+      expect(column0.cellValue(row0)).toBe('Value0');
+      expect(column1.cellValue(row0)).toBe(0);
+      expect(column0.cellValue(row1)).toBeNull();
+      expect(column1.cellValue(row1)).toBe(1);
+
+      expect(column0.cellText(row0)).toBe('Text0');
+      expect(column1.cellText(row0)).toBe('Number0');
+      expect(column0.cellText(row1)).toBe('Text1');
+      expect(column1.cellText(row1)).toBe('Number1');
+
+      expect(column0.cellValueOrText(row0)).toBe('Text0');
+      expect(column1.cellValueOrText(row0)).toBe(0);
+      expect(column0.cellValueOrText(row1)).toBe('Text1');
+      expect(column1.cellValueOrText(row1)).toBe(1);
+    });
+
   });
 
   describe('autoOptimizeWidth', () => {
