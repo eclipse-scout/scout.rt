@@ -343,7 +343,8 @@ export default class Menu extends Action {
   }
 
   isTabTarget() {
-    return this.enabledComputed && this.visible && !this.overflown && (this.isButton() || !this.separator);
+    return this.enabledComputed && this.visible && !this.overflown && (this.isButton() || !this.separator)
+      && (!this.parentMenu || this.parentMenu.visible && !this.parentMenu.overflown); // Necessary for ComboMenu -> must return false if ComboMenu (parentMenu) is not shown
   }
 
   /**

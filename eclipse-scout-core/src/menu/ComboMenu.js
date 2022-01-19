@@ -8,21 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Menu} from '../index';
+import {HtmlComponent, Menu, widgets} from '../index';
 
 export default class ComboMenu extends Menu {
 
   constructor() {
     super();
-    this.childSelected = false;
-    this._childSelectedHandler = this._onChildSelected.bind(this);
-  }
-
-  _setChildActions(childActions) {
-    this.childActions.forEach(child => child.off('propertyChange:selected', this._childSelectedHandler));
-    super._setChildActions(childActions);
-    this.childActions.forEach(child => child.on('propertyChange:selected', this._childSelectedHandler));
-    this._updateChildSelected();
+    this._childVisibleChangeHandler = this._onChildVisibleChange.bind(this);
   }
 
   _render() {
@@ -36,8 +28,13 @@ export default class ComboMenu extends Menu {
 
   _renderProperties() {
     super._renderProperties();
-    this._renderChildSelected();
     this._renderChildActions();
+  }
+
+  _setChildActions(childActions) {
+    this.childActions.forEach(child => child.off('propertyChange:visible', this._childVisibleChangeHandler));
+    super._setChildActions(childActions);
+    this.childActions.forEach(child => child.on('propertyChange:visible', this._childVisibleChangeHandler));
   }
 
   _renderChildActions() {
@@ -47,6 +44,7 @@ export default class ComboMenu extends Menu {
       childAction.addCssClass('combo-menu-child');
       childAction.render();
     });
+    widgets.updateFirstLastMarker(this.childActions);
   }
 
   // @override
@@ -54,15 +52,22 @@ export default class ComboMenu extends Menu {
     return false;
   }
 
-  _onChildSelected(event) {
-    this._updateChildSelected();
+  _onChildVisibleChange(event) {
+    if (this.rendered) {
+      widgets.updateFirstLastMarker(this.childActions);
+    }
   }
 
-  _updateChildSelected() {
-    this.setProperty('childSelected', this.childActions.some(child => child.selected));
+  _doActionTogglesPopup() {
+    return false;
   }
 
-  _renderChildSelected() {
-    this.$container.toggleClass('child-selected', this.childSelected);
+  isToggleAction() {
+    return false;
+  }
+
+  isTabTarget() {
+    // To make children tabbable, combo menu must never be a tab target, even if its a default menu
+    return false;
   }
 }

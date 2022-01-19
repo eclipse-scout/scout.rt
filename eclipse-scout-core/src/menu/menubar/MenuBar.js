@@ -8,22 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  GroupBoxMenuItemsOrder,
-  HtmlComponent,
-  keys,
-  KeyStrokeContext,
-  Menu,
-  MenuBarLayout,
-  MenuBarLeftKeyStroke,
-  MenuBarRightKeyStroke,
-  MenuDestinations,
-  menus,
-  scout,
-  Widget,
-  widgets
-} from '../../index';
+import {arrays, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStrokeContext, Menu, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarRightKeyStroke, MenuDestinations, menus, scout, Widget, widgets} from '../../index';
 import ComboMenu from '../ComboMenu';
 
 export default class MenuBar extends Widget {
@@ -302,9 +287,7 @@ export default class MenuBar extends Widget {
       if (this.defaultMenu && this.defaultMenu.isTabTarget()) {
         this.setTabbableMenu(this.defaultMenu);
       } else {
-        this.setTabbableMenu(arrays.find(this.orderedMenuItems.all, item => {
-          return item.isTabTarget();
-        }));
+        this.setTabbableMenu(arrays.find(this.orderedMenuItems.all, item => item.isTabTarget()));
       }
     }
   }

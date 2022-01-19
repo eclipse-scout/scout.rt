@@ -367,8 +367,9 @@ export default class ContextMenuPopup extends Popup {
 
       // prevent loosing original parent
       let originalParent = menu.parent;
-      if (this.cloneMenuItems && !menu.cloneOf) {
-        // clone will recursively also clone all child actions.
+      // Clone menu items but only clone once unless it is for a different context menu (e.g. a context menu of a combo menu inside a context menu)
+      // Clone will recursively also clone all child actions.
+      if (this.cloneMenuItems && !menu.cloneOf || !this.has(menu)) {
         menu = menu.clone({
           parent: this,
           textPosition: Action.TextPosition.DEFAULT

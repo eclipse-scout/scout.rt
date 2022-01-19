@@ -18,24 +18,31 @@
     background-color: transparent;
   }
 
-  & > .menu-item:not(:first-child) {
-    margin-left: 3px;
+  & > .menu-item {
+    &:not(.first) {
+      margin-left: 3px;
 
-    &::before {
-      content: '';
-      position: absolute;
-      left: -1px;
-      top: 7px;
-      height: calc(100% - 14px);
-      width: 1px;
-      background-color: @border-color;
+      &::before {
+        content: '';
+        position: absolute;
+        left: -1px;
+        top: 7px;
+        height: calc(100% - 14px);
+        width: 1px;
+        background-color: @border-color;
+      }
     }
-  }
 
-  &:not(.disabled).child-selected,
-  &:not(.disabled):hover {
-    & > .menu-item:not(:first-child)::before {
+    &:focus::before {
       display: none;
+    }
+
+    &:not(.disabled):hover,
+    &.selected {
+      &::before,
+      & ~ .menu-item::before {
+        display: none;
+      }
     }
   }
 }
@@ -45,14 +52,19 @@
 
   & > .menu-item {
     border: 1px solid @button-border-color;
+    flex-grow: 1;
 
-    &:not(:last-child) {
+    &.menu-icononly:not(.first.last) { // Rule must not be applied if combo menu contains only one item
+      flex-grow: 0;
+    }
+
+    &:not(.last) {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
       border-right: 0;
     }
 
-    &:not(:first-child) {
+    &:not(.first) {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
       border-left: 0;
@@ -62,31 +74,64 @@
     .disabled& {
       border-color: @button-disabled-color;
     }
+
+    &:focus {
+      z-index: 1; // Allows box-shadow to draw over the right menu-item
+    }
   }
 
   &.default {
     & > .menu-item {
       .button.default();
 
+      &::before {
+        background-color: @default-combo-menu-separator-color;
+      }
+
       &.selected {
         background-color: @default-button-selected-background-color;
         border-color: @default-button-selected-background-color;
+      }
+
+      &.disabled {
+        color: @disabled-inverted-color;
+
+        &:hover, &.active, &:active, &.selected {
+          background-color: @default-button-background-color;
+          border-color: @default-button-background-color;
+        }
       }
     }
   }
 }
 
-.context-menu {
-  & > .combo-menu {
-    padding: 0;
+.context-menu > .combo-menu {
+  padding: 0;
 
-    & > .menu-item {
-      color: @context-menu-item-color;
-      padding-top: @context-menu-item-padding-y;
-      padding-bottom: @context-menu-item-padding-y;
+  & > .menu-item {
+    color: @context-menu-item-color;
+    padding: @context-menu-item-padding-y @context-menu-item-padding-right @context-menu-item-padding-y @context-menu-item-padding-left;
+    flex-grow: 1;
+    justify-content: start;
+    border-radius: 0;
 
-      &:first-child {
-        margin-left: @context-menu-item-padding-left - @menu-item-padding-x;
+    & > .font-icon {
+      color: @context-menu-item-icon-color;
+    }
+
+    &.menu-textandicon > .icon {
+      margin-right: @context-menu-item-icon-margin-right;
+    }
+
+    &.menu-icononly:not(.first.last) { // Rule must not be applied if combo menu contains only one item
+      flex-grow: 0;
+    }
+
+    &.disabled {
+      color: @menu-item-disabled-color;
+
+      & > .font-icon {
+        color: @menu-item-disabled-color;
       }
     }
   }
