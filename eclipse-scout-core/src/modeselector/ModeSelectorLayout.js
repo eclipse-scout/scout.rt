@@ -38,12 +38,17 @@ export default class ModeSelectorLayout extends AbstractLayout {
     });
 
     let maxWidth = 0;
-    this.modeSelector.modes.forEach(mode => {
-      let modeWidth = mode.htmlComp.prefSize().width;
-      if (modeWidth > maxWidth) {
-        maxWidth = modeWidth;
-      }
-    });
+    this.modeSelector.modes
+      .filter(mode => mode.rendered)
+      .forEach(mode => {
+        let oldModeStyle = mode.$container.attr('style');
+        mode.$container.css('flex', 'none');
+        let modeWidth = mode.htmlComp.prefSize().width;
+        if (modeWidth > maxWidth) {
+          maxWidth = modeWidth;
+        }
+        mode.$container.attrOrRemove('style', oldModeStyle);
+      });
 
     this.modeSelector.$container.attrOrRemove('style', oldStyle);
 
