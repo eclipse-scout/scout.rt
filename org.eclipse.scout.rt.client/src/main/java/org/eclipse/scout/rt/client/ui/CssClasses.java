@@ -61,4 +61,9 @@ public interface CssClasses {
    * Class that applies a larger font size for button icons.
    */
   String BUTTON_ICON_LARGE = "button-icon-large";
+
+  /**
+   * Class that is available on selected widgets and enables an alternative style.
+   */
+  String ALTERNATIVE = "alternative";
 }
