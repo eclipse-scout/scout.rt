@@ -9,12 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .outline.tree {
-
-  &.in-background > .tree-data > .tree-node.selected {
-    background-color: @outline-in-background-selection-background-color;
-    color: @outline-in-background-selection-color;
-  }
-
   & > .tree-data {
     padding-top: @outline-data-padding-top;
 
@@ -88,6 +82,20 @@
         & > .font-icon {
           color: @outline-node-selected-icon-color;;
         }
+      }
+    }
+  }
+
+  &.in-background > .tree-data {
+    & > .tree-node,
+    & > .animation-wrapper > .tree-node {
+      &.group {
+        background-color: @outline-in-background-group-background-color;
+      }
+
+      &.selected {
+        background-color: @outline-in-background-selection-background-color;
+        color: @outline-in-background-selection-color;
       }
     }
   }
