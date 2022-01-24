@@ -539,7 +539,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   /**
    * Configures the checkable column. The checkable column represents the check state of the row, i.e. if it is checked
-   * or not. If no checkable column is configured, only the row itself represents if the row was checked or not.
+   * or not. If no checkable column is configured, only the row itself represents if the row was checked or not. Note
+   * that {@link AbstractColumn#execCompleteEdit(ITableRow, IFormField)} as well as
+   * {@link AbstractColumn#execPrepareEdit(ITableRow)} are not supported for checkable columns.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    *
@@ -4388,7 +4390,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
 
     IColumn<?> ctxCol = getContextColumn();
-    if (isCellEditable(row, ctxCol)) {
+    if (isCellEditable(row, ctxCol) && !ctxCol.equals(getCheckableColumn())) {
       //cell-level checkbox
       if (ctxCol instanceof IBooleanColumn) {
         //editable boolean columns consume this click

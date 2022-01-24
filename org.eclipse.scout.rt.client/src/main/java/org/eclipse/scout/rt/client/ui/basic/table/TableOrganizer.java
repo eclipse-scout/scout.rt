@@ -48,7 +48,8 @@ public class TableOrganizer implements ITableOrganizer {
   public boolean isColumnRemovable(IColumn column) {
     // We could write column.isVisible() || getCustomizer().isCustomizable(column) && hasRemovePermission()
     // here but the outcome would be the same as 'true', because the given column is always visible here.
-    return true;
+    // The only exception is the checkable column (if it is set), which cannot be removed even if it is visible.
+    return getTable().getCheckableColumn() == null || !getTable().getCheckableColumn().equals(column);
   }
 
   @Override

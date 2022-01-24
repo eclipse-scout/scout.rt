@@ -2111,7 +2111,7 @@ export default class Table extends Widget {
       });
     }
 
-    if (column === this.checkableColumn) {
+    if (column === this.checkableColumn && column.guiOnly) {
       return scout.create('Cell', {
         value: row.checked,
         editable: true,

@@ -30,7 +30,9 @@ export default class TableToggleRowKeyStroke extends KeyStroke {
 
   handle(event) {
     let selectedRows = this.field.selectedRows.filter(row => {
-      return row.enabled;
+      return row.enabled &&
+        this.field.checkableColumn &&
+        this.field.checkableColumn.isCellEditable(row, this.field.checkableColumn.cell(row), event);
     });
     // Toggle checked state to 'true', except if every row is already checked
     let checked = selectedRows.some(row => {

@@ -110,10 +110,12 @@ export default class BooleanColumn extends Column {
   onMouseUp(event, $row) {
     let row = $row.data('row'),
       cell = this.cell(row);
-    if (this.table.checkableColumn === this) {
-      this.table.checkRow(row, !row.checked);
-    } else if (this.isCellEditable(row, cell, event)) {
-      this._toggleCellValue(row, cell);
+    if (this.isCellEditable(row, cell, event)) {
+      if (this.table.checkableColumn === this) {
+        this.table.checkRow(row, !row.checked);
+      } else {
+        this._toggleCellValue(row, cell);
+      }
     }
   }
 
