@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.debug.core.groups.GroupLaunchConfigurationType">
 <stringAttribute key="org.eclipse.debug.core.launchGroup.0.action" value="OUTPUT_REGEXP"/>
-<stringAttribute key="org.eclipse.debug.core.launchGroup.0.actionParam" value="Built at:"/>
+<stringAttribute key="org.eclipse.debug.core.launchGroup.0.actionParam" value="compiled .*successfully"/>
 <booleanAttribute key="org.eclipse.debug.core.launchGroup.0.adoptIfRunning" value="true"/>
 <booleanAttribute key="org.eclipse.debug.core.launchGroup.0.enabled" value="true"/>
 <stringAttribute key="org.eclipse.debug.core.launchGroup.0.mode" value="run"/>
