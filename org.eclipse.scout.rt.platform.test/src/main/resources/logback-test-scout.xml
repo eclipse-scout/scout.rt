@@ -46,4 +46,8 @@
 
   <logger name="org.quartz" level="WARN" />
   <logger name="org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer" level="DEBUG" />
+
+  <!-- Inclusion of optional, user-specific Logback configurations -->
+  <include file="${LOGBACK_INCLUDE_XML}" optional="true" />
+
 </included>
