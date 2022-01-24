@@ -33,4 +33,8 @@
   </root>
 
   <logger name="org.quartz" level="WARN" />
+
+  <!-- Inclusion of optional, user-specific Logback configurations -->
+  <include file="${LOGBACK_INCLUDE_XML}" optional="true" />
+
 </configuration>
