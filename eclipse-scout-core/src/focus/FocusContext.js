@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {filters, focusUtils, graphics, keys, Point, scrollbars} from '../index';
+import {arrays, filters, focusUtils, graphics, keys, Point, scrollbars} from '../index';
 import $ from 'jquery';
 
 /**
@@ -68,8 +68,20 @@ export default class FocusContext {
   _onKeyDown(event) {
     if (event.which === keys.TAB) {
       let activeElement = this.$container.activeElement(true),
-        $focusableElements = this.$container.find(':tabbable:visible'),
-        firstFocusableElement = $focusableElements.first()[0],
+        $focusableElements = this.$container.find(':tabbable:visible');
+
+      // Only works, if web component is tabbable. Other approach: Loop through all elements and check for shadowRoot.
+      // Probably some specific tags need to be excluded that use shadow dom (video, svg? Or check only a registered list of elements.
+      $focusableElements.slice().each((i, elem) => {
+        if (elem.shadowRoot) {
+          let $elements = $(elem.shadowRoot).find(':tabbable:visible');
+          arrays.pushAll($focusableElements, $elements.toArray());
+        } else {
+          $focusableElements.add(elem);
+        }
+      });
+
+      let firstFocusableElement = $focusableElements.first()[0],
         lastFocusableElement = $focusableElements.last()[0],
         activeElementIndex = $focusableElements.index(activeElement),
         focusedElement;

@@ -56,10 +56,14 @@ export default class FocusManager {
   installTopLevelMouseHandlers($container) {
     // Install 'mousedown' on top-level $container to accept or prevent focus gain
     $container.on('mousedown', event => {
-      if (!this._acceptFocusChangeOnMouseDown($(event.target))) {
-        event.preventDefault();
+      if (this._acceptFocusChangeOnMouseDown($(event.target))) {
+        return true;
       }
-      return true;
+      // Would be necessary if component itself is not tabbable
+      // if (event.target.shadowRoot && this._acceptFocusChangeOnMouseDown($(event.originalEvent.composedPath()[0]))) {
+      //   return true;
+      // }
+      event.preventDefault();
     });
   }
 
