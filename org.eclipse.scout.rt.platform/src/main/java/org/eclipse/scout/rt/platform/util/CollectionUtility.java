@@ -1010,4 +1010,23 @@ public final class CollectionUtility {
         .collect(Collectors.groupingBy(it -> counter.getAndIncrement() / batchSize))
         .values());
   }
+
+  /**
+   * Returns a set of all elements in the given collection that are contained more than once in the collection. If the
+   * argument is {@code null}, an empty set is returned. Elements are considered the same if they are
+   * {@link Object#equals(Object) equals}. {@code null} elements are allowed.
+   *
+   * @param collection
+   *          collection to check for duplicate values
+   * @return set of duplicate values
+   */
+  public static <T> Set<T> findDuplicates(Collection<T> collection) {
+    if (isEmpty(collection)) {
+      return Collections.emptySet();
+    }
+    Set<T> uniqueValues = new HashSet<>();
+    return collection.stream()
+        .filter(e -> !uniqueValues.add(e)) // add() returns false when the element already was in the set
+        .collect(Collectors.toSet());
+  }
 }

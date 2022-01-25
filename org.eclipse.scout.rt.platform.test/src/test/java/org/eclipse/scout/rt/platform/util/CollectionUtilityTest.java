@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -551,6 +552,28 @@ public class CollectionUtilityTest {
 
     assertEquals(CollectionUtility.partition(null, 10), new ArrayList<>());
     assertEquals(CollectionUtility.partition(null, 10), new ArrayList<>());
+  }
+
+  @Test
+  public void testFindDuplicates() {
+    Set<String> setWithNullElement = new HashSet<>();
+    setWithNullElement.add(null);
+
+    assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(null));
+    assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(new ArrayList<>()));
+    assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(CollectionUtility.arrayList("A", "B", "C")));
+    assertEquals(CollectionUtility.hashSet(), CollectionUtility.findDuplicates(CollectionUtility.arrayList(0, false, null)));
+    assertEquals(setWithNullElement, CollectionUtility.findDuplicates(CollectionUtility.arrayList(null, null)));
+    assertEquals(CollectionUtility.hashSet("C"), CollectionUtility.findDuplicates(CollectionUtility.arrayList("A", "C", "D", "C")));
+    assertEquals(CollectionUtility.hashSet("0", "C"), CollectionUtility.findDuplicates(CollectionUtility.arrayList("A", "C", "D", "C", "0", "1", "0", "0")));
+    assertEquals(CollectionUtility.hashSet("0", "C", null), CollectionUtility.findDuplicates(CollectionUtility.arrayList(null, "A", "C", "D", "C", "0", "1", null, "0")));
+
+    BigDecimal pi1 = new BigDecimal("3.14159265358979323846264338327");
+    BigDecimal pi2 = new BigDecimal("3.14159265358979323846264338327");
+    BigDecimal notPi = new BigDecimal("3.14159265358979323846264338328");
+    BigDecimal theAnswer1 = new BigDecimal("42");
+    BigDecimal theAnswer2 = new BigDecimal("42.0");
+    assertEquals(CollectionUtility.hashSet(new BigDecimal("3.14159265358979323846264338327")), CollectionUtility.findDuplicates(CollectionUtility.arrayList(pi1, pi2, notPi, theAnswer1, theAnswer2)));
   }
 
   private List<Object> createList(Object... elements) {
