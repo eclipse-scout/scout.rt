@@ -2697,10 +2697,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   _remove(afterRemoveFunc) {
     if (this.rendered && !this.removing) {
       this.removing = true;
-      this.$canvas.remove();
-      this.$canvas = null;
       this.chartJs.destroy();
       this.chartJs = null;
+      this.$canvas.remove();
+      this.$canvas = null;
     }
     super._remove(afterRemoveFunc);
     this.removing = false;
