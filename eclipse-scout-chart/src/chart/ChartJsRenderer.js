@@ -1891,7 +1891,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
     let defaultGenerateLabels = defaultTypeGenerateLabels || ChartJs.defaults.plugins.legend.labels.generateLabels;
     let labels = defaultGenerateLabels.call(chart, chart);
-    if (!this.rendered || this.removing) {
+    if (this.removing) {
       return labels;
     }
     let data = config.data,
