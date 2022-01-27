@@ -4378,7 +4378,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   protected void interceptRowClickSingleObserver(ITableRow row, MouseButton mouseButton) {
     // Only toggle checked state if the table and row are enabled.
-    if (!row.isEnabled() || !isEnabled()) {
+    if (!row.isEnabled() || !isEnabledIncludingParents()) {
       return;
     }
 
