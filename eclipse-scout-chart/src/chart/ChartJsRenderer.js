@@ -916,6 +916,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   _renderTooltipLater(context) {
+    if (!this.rendered || this.removing) {
+      return;
+    }
     let tooltip = context.tooltip,
       tooltipItems = tooltip._tooltipItems;
     if (tooltipItems.length < 1) {
