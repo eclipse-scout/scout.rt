@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ export default class BusyIndicator extends Widget {
     this.details = null;
     this.cancelButton = null;
     this.boxButtons = null;
+    this.inheritAccessibility = false; // do not inherit enabled-state. BusyIndicator must always be enabled even if parent is disabled
 
     this.$content = null;
     this.$buttons = null;

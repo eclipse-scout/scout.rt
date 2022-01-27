@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,26 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  AbortKeyStroke,
-  BoxButtons,
-  ClickActiveElementKeyStroke,
-  clipboard,
-  CopyKeyStroke,
-  FocusAdjacentElementKeyStroke,
-  FocusRule,
-  Form,
-  GlassPaneRenderer,
-  HtmlComponent,
-  keys,
-  KeyStrokeContext,
-  MessageBoxLayout,
-  objects,
-  scout,
-  Status,
-  strings,
-  Widget
-} from '../index';
+import {AbortKeyStroke, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, keys, KeyStrokeContext, MessageBoxLayout, objects, scout, Status, strings, Widget} from '../index';
 
 export default class MessageBox extends Widget {
 
@@ -51,7 +32,7 @@ export default class MessageBox extends Widget {
     this.noButton = null;
     this.cancelButton = null;
     this.abortButton = null; // button to be executed when abort() is called, e.g. when ESCAPE is pressed. points to the last (most right) button in the list (one of yes, no or cancel)
-
+    this.inheritAccessibility = false; // do not inherit enabled-state by default. Otherwise the MessageBox cannot be closed anymore
     this.$content = null;
     this.$header = null;
     this.$body = null;
