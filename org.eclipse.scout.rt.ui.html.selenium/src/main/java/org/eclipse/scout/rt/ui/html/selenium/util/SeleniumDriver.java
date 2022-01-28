@@ -40,8 +40,6 @@ import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.google.common.collect.ImmutableMap;
-
 public final class SeleniumDriver {
 
   static final int WINDOW_HEIGHT = 900;
@@ -169,7 +167,7 @@ public final class SeleniumDriver {
 
     try {
       CommandExecutor executor = driver.getCommandExecutor();
-      executor.execute(new Command(driver.getSessionId(), "setNetworkConditions", ImmutableMap.of("network_conditions", ImmutableMap.copyOf(map))));
+      executor.execute(new Command(driver.getSessionId(), "setNetworkConditions", Collections.singletonMap("network_conditions", map)));
     }
     catch (IOException e) {
       System.err.println(e);
