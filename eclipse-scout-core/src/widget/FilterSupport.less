@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,13 @@
   #scout.drop-shadow();
   background-color: var(--filter-field-background-color);
   opacity: 1;
+  visibility: visible;
+
+  // delay the "fade in" transition
+  --filter-field-opacity-transition-delay: 100ms;
+  // the visibility transition is not a smooth transition but allows to set the value visibility delayed
+  // set visibility to visible right before the "fade in" transition starts
+  --filter-field-visibility-transition-delay: var(--filter-field-opacity-transition-delay);
 
   transition: bottom @filter-field-transition-duration ease-in-out,
   right @filter-field-transition-duration ease-in-out,
@@ -33,10 +40,17 @@
   min-width @filter-field-transition-duration ease-in-out,
   max-width @filter-field-transition-duration ease-in-out,
   box-shadow @filter-field-transition-duration ease-in-out,
-  opacity @filter-field-transition-duration ease-in-out;
+  opacity @filter-field-transition-duration ease-in-out var(--filter-field-opacity-transition-delay),
+  visibility 0s var(--filter-field-visibility-transition-delay);
 
   :not(:hover) > &:not(.focused):not(.focus-inside-widget).empty {
     opacity: 0;
+    visibility: hidden;
+
+    // start the "fade out" transition right away
+    --filter-field-opacity-transition-delay: 0s;
+    // set visibility to hidden right after the "fade out" transition ends
+    --filter-field-visibility-transition-delay: calc(@filter-field-transition-duration + var(--filter-field-opacity-transition-delay));
   }
 
   &::before {
@@ -143,6 +157,10 @@
 
   &:not(:hover) > .filter-field:not(.focused):not(.focus-inside-widget).empty {
     opacity: 1;
+    visibility: visible;
+
+    --filter-field-opacity-transition-delay: 100ms;
+    --filter-field-visibility-transition-delay: var(--filter-field-opacity-transition-delay);
   }
 
   & > .filter-field {
@@ -152,6 +170,10 @@
 
     :not(:hover) > &:not(.focused):not(.focus-inside-widget).empty {
       opacity: 0;
+      visibility: hidden;
+
+      --filter-field-opacity-transition-delay: 0s;
+      --filter-field-visibility-transition-delay: calc(@filter-field-transition-duration + var(--filter-field-opacity-transition-delay));
     }
 
     &:not(.focused).empty {

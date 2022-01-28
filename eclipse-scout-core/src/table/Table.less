@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -134,6 +134,16 @@
       &:not(.focused).empty {
         --filter-field-max-bottom: calc(~'50% - ' (@filter-field-icon-size + var(--controls-height)) / 2);
       }
+    }
+
+    .has-cell-editor-popup& {
+      opacity: 0;
+      visibility: hidden;
+
+      // start the "fade out" transition right away
+      --filter-field-opacity-transition-delay: 0s;
+      // set visibility to hidden right after the "fade out" transition ends
+      --filter-field-visibility-transition-delay: calc(@filter-field-transition-duration + var(--filter-field-opacity-transition-delay));
     }
   }
 }
