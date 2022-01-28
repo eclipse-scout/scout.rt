@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -126,10 +126,12 @@ export default class FilterSupport extends WidgetSupport {
     this._filterField.$field.attr('tabIndex', -1);
 
     let color = styles.getFirstOpaqueBackgroundColor(this._filterField.$container),
-      transparentColorRgba = $.extend(true, {}, styles.rgb(color), {alpha: 0.5}),
-      transparentColor = 'rgba(' + transparentColorRgba.red + ', ' + transparentColorRgba.green + ', ' + transparentColorRgba.blue + ', ' + transparentColorRgba.alpha + ')';
+      colorRgba = $.extend(true, {red: 0, green: 0, blue: 0, alpha: 1}, styles.rgb(color)),
+      transparent50Color = 'rgba(' + colorRgba.red + ', ' + colorRgba.green + ', ' + colorRgba.blue + ', ' + 0.5 + ')',
+      transparent80Color = 'rgba(' + colorRgba.red + ', ' + colorRgba.green + ', ' + colorRgba.blue + ', ' + 0.8 + ')';
     this._filterField.$container.css('--filter-field-background-color', color);
-    this._filterField.$container.css('--filter-field-transparent-background-color', transparentColor);
+    this._filterField.$container.css('--filter-field-transparent-50-background-color', transparent50Color);
+    this._filterField.$container.css('--filter-field-transparent-80-background-color', transparent80Color);
 
     this._textFilter = this._createTextFilter();
     this._textFilter.synthetic = true;
