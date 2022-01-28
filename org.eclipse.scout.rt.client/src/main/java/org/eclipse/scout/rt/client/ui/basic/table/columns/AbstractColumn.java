@@ -405,6 +405,10 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * non-editable column is read-only.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
+   * <p>
+   * Overriding this method does not have any effect on columns marked as
+   * {@link AbstractTable#getConfiguredCheckableColumn()}. Instead, checkable columns can be set to editable=false by
+   * overriding {@link AbstractColumn#execInitColumn()}.
    *
    * @return {@code true} if this column is editable, {@code false} otherwise.
    */
