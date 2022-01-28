@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1028,6 +1028,16 @@ public class HttpClientInfoTest {
     httpClientInfo.setTablet(true);
     httpClientInfo.setStandalone(true);
     httpClientInfo.setSystemVersion(new HttpClientInfo.Version(5, 1, 0));
+    testMap.put(userAgent, httpClientInfo);
+
+    //iPad with Chrome for iOS
+    userAgent = "Mozilla/5.0 (iPad; CPU OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/87.0.4280.77 Mobile/15E148 Safari/604.1";
+    httpClientInfo = newHttpClientInfo(userAgent);
+    httpClientInfo.setEngineType(UiEngineType.SAFARI);
+    httpClientInfo.setSystem(UiSystem.IOS);
+    httpClientInfo.setWebkit(true);
+    httpClientInfo.setTablet(true);
+    httpClientInfo.setSystemVersion(new HttpClientInfo.Version(13, 3, 0));
     testMap.put(userAgent, httpClientInfo);
   }
 

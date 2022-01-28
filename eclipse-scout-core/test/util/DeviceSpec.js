@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,7 +71,7 @@ describe('Device', () => {
         systemVersion: 6,
         type: Device.Type.MOBILE,
         browser: Device.Browser.SAFARI,
-        browserVersion: 6
+        browserVersion: 536.26
       });
 
       // iPad 3
@@ -80,7 +80,7 @@ describe('Device', () => {
         systemVersion: 5.1,
         type: Device.Type.TABLET,
         browser: Device.Browser.SAFARI,
-        browserVersion: 5.1
+        browserVersion: 534.46
       });
 
       // iPad 3 (home screen icon mode)
@@ -91,6 +91,14 @@ describe('Device', () => {
         browser: Device.Browser.UNKNOWN
       });
 
+      // iPad with Chrome for iOS
+      test('Mozilla/5.0 (iPad; CPU OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/87.0.4280.77 Mobile/15E148 Safari/604.1', {
+        system: Device.System.IOS,
+        systemVersion: 13.3,
+        type: Device.Type.TABLET,
+        browser: Device.Browser.SAFARI,
+        browserVersion: 605.1
+      });
     });
 
     it('recognizes Android devices', () => {
@@ -130,8 +138,6 @@ describe('Device', () => {
     // measurement depends on the browser that runs the spec.
 
     it('recognizes supported browsers', () => {
-      let userAgent, device;
-
       // Microsoft Edge 12
       _test('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240',
         Device.Browser.EDGE, 12.10240);
@@ -149,7 +155,7 @@ describe('Device', () => {
 
       // Safari (6)
       _test('Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
-        Device.Browser.SAFARI, 6.0);
+        Device.Browser.SAFARI, 536.26);
 
       // Firefox (21) from v21 Firefox supports ECMA 5
       _test('Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1',
@@ -167,7 +173,5 @@ describe('Device', () => {
         expect(device.browserVersion).toEqual(expectedVersion);
       }
     });
-
   });
-
 });

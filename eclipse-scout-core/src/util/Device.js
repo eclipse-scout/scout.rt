@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -267,7 +267,7 @@ export default class Device {
     let browsers = Device.Browser;
     return (browser === browsers.CHROME && version >= 69)
       || (browser === browsers.FIREFOX && version >= 62)
-      || (browser === browsers.SAFARI && version >= 12.1);
+      || (browser === browsers.SAFARI && version >= 607.1);
   }
 
   /**
@@ -364,7 +364,7 @@ export default class Device {
     } else if (this.browser === browsers.EDGE) {
       versionRegex = /Edge\/([0-9]+\.?[0-9]*)/;
     } else if (this.browser === browsers.SAFARI) {
-      versionRegex = /Version\/([0-9]+\.?[0-9]*)/;
+      versionRegex = /AppleWebKit\/([0-9]+\.?[0-9]*)/;
     } else if (this.browser === browsers.FIREFOX) {
       versionRegex = /Firefox\/([0-9]+\.?[0-9]*)/;
     } else if (this.browser === browsers.CHROME) {
