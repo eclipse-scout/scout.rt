@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -422,6 +422,8 @@ export default class Session {
     // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
     let clientSessionData = this._getAdapterData(data.startupData.clientSession);
     this.desktop = this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter.widget);
+    App.get()._triggerDesktopReady(this.desktop);
+
     let renderDesktopImpl = function() {
       this._renderDesktop();
 
@@ -443,6 +445,7 @@ export default class Session {
       this._resumeBackgroundJobPolling();
 
       this.ready = true;
+      App.get()._triggerSessionReady(this);
 
       $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + Device.get());
       if ($.log.isDebugEnabled()) {

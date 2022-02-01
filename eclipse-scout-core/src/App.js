@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -196,7 +196,7 @@ export default class App {
    */
   _init(options) {
     options = options || {};
-    this.setLoading(true)
+    this.setLoading(true);
     let compatibilityPromise = this._checkBrowserCompatibility(options);
     if (compatibilityPromise) {
       this.setLoading(false);
@@ -224,7 +224,6 @@ export default class App {
 
   _checkBrowserCompatibility(options) {
     let device = Device.get();
-    let app = this;
     $.log.isInfoEnabled() && $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
     if (!scout.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
       // No check requested or browser is supported
@@ -400,9 +399,7 @@ export default class App {
 
     // TODO [7.0] cgu improve this, start must not be executed because it currently does a server request
     let desktop = this._createDesktop(session.root);
-    this.trigger('desktopReady', {
-      desktop: desktop
-    });
+    this._triggerDesktopReady(desktop);
     session.render(() => {
       session._renderDesktop();
 
@@ -411,12 +408,22 @@ export default class App {
       session.focusManager.validateFocus();
 
       session.ready = true;
-      this.trigger('sessionReady', {
-        session: session
-      });
+      this._triggerSessionReady(session);
       $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + Device.get());
     });
     return $.resolvedPromise();
+  }
+
+  _triggerDesktopReady(desktop) {
+    this.trigger('desktopReady', {
+      desktop: desktop
+    });
+  }
+
+  _triggerSessionReady(session) {
+    this.trigger('sessionReady', {
+      session: session
+    });
   }
 
   _createSession(options) {
