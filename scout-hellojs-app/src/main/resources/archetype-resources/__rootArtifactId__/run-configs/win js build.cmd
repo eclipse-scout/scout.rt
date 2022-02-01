@@ -7,18 +7,18 @@
 :: You need to rerun it if you update your JS dependencies (package.json).
 :: Please see the Scout documentation for details about the available run scripts: https://eclipsescout.github.io/22.0/technical-guide-js.html#command-line-interface-cli
 ::
-:: To make this script work you need a current version of Node.js (>=12.1.0), npm (>=6.9.0) and pnpm (>=5).
-:: Node.js (incl. npm) is available here: https://nodejs.org/.
+:: To make this script work you need a current version of Node.js (>=16.13.0), npm (>=8.1.0) and pnpm (>=6.22.2).
+:: Node.js (incl. npm) is available here: https://nodejs.org/.
 :: pnpm is available here: https://pnpm.js.org/
 
-:: Check if node is available
+:: Check if node is available
 where node >nul 2>nul
 if %errorlevel% neq 0 (
   echo node cannot be found. Make sure Node.js is installed and the PATH variable correctly set. See the content of this script for details. 1>&2
   exit /b 1
 )
 
-:: Check if pnpm is available
+:: Check if pnpm is available
 where pnpm >nul 2>nul
 if %errorlevel% neq 0 (
   echo pnpm cannot be found. Make sure pnpm is installed. See the content of this script for details. 1>&2

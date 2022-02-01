@@ -7,8 +7,8 @@
 # You need to rerun it if you update your JS dependencies (package.json).
 # Please see the Scout documentation for details about the available run scripts: https://eclipsescout.github.io/22.0/technical-guide-js.html#command-line-interface-cli
 #
-# To make this script work you need a current version of Node.js (>=12.1.0), npm (>=6.9.0) and pnpm (>=5).
-# Node.js (incl. npm) is available here: https://nodejs.org/.
+# To make this script work you need a current version of Node.js (>=16.13.0), npm (>=8.1.0) and pnpm (>=6.22.2).
+# Node.js (incl. npm) is available here: https://nodejs.org/.
 # pnpm is available here: https://pnpm.js.org/
 
 # Abort the script if any command fails
@@ -17,10 +17,10 @@ set -e
 # Specify the path to the node and npm binaries
 PATH=$PATH:/usr/local/bin
 
-# Check if node is available
+# Check if node is available
 command -v node >/dev/null 2>&1 || { echo >&2 "npm cannot be found. Make sure Node.js is installed and the PATH variable correctly set. See the content of this script for details."; exit 1; }
 
-# Check if pnpm is available
+# Check if pnpm is available
 command -v pnpm >/dev/null 2>&1 || { echo >&2 "pnpm cannot be found. Make sure pnpm is installed. See the content of this script for details."; exit 1; }
 
 # Install all JavaScript dependencies defined in the package.json => creates the node_modules folder
