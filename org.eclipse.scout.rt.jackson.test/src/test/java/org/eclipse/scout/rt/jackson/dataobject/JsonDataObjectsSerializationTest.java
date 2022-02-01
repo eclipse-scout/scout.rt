@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Currency;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -64,6 +65,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample1Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample1DoContributionFixtureDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample2Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample3Do;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCurrencyDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCustomImplementedEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDateDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapEntityDo;
@@ -576,6 +578,64 @@ public class JsonDataObjectsSerializationTest {
     finally {
       s_defaultJacksonObjectMapper.enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
     }
+  }
+
+  @Test
+  public void testSerializeDeserialize_Currency() throws Exception {
+    String jsonPlainCurrency = s_dataObjectMapper.writeValueAsString(Currency.getInstance("CHF"));
+    assertEquals("\"CHF\"", jsonPlainCurrency);
+
+    DoEntity entity = BEANS.get(DoEntity.class);
+    entity.put("currency", Currency.getInstance("USD"));
+    String jsonEntity = s_dataObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestCurrency.json", jsonEntity);
+
+    assertEquals(Currency.getInstance("EUR"), s_dataObjectMapper.readValue("\"EUR\"", Currency.class));
+    assertEquals(Currency.getInstance("EUR"), s_dataObjectMapper.readValue("\"eur\"", Currency.class));
+    assertNull(s_dataObjectMapper.readValue("null", Currency.class));
+
+    assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue("\"nop\"", Currency.class));
+  }
+
+  @Test
+  public void testSerializeDeserialize_CurrencyDo() throws Exception {
+    Map<Currency, String> currencyMap = new LinkedHashMap<>();
+    currencyMap.put(Currency.getInstance("CHF"), "Switzerland");
+    currencyMap.put(Currency.getInstance("EUR"), "Europe");
+    TestCurrencyDo currencyDo = BEANS.get(TestCurrencyDo.class)
+        .withCurrency(Currency.getInstance("CHF"))
+        .withCurrencies(Currency.getInstance("USD"), Currency.getInstance("EUR"))
+        .withCurrencyMap(currencyMap);
+
+    String json = s_dataObjectMapper.writeValueAsString(currencyDo);
+    assertJsonEquals("TestCurrencyDo.json", json);
+  }
+
+  @Test
+  public void testSerializeDeserialize_CurrencyDoLowercase() throws Exception {
+    Map<Currency, String> currencyMap = new LinkedHashMap<>();
+    currencyMap.put(Currency.getInstance("CHF"), "Switzerland");
+    currencyMap.put(Currency.getInstance("EUR"), "Europe");
+    TestCurrencyDo currencyDo = BEANS.get(TestCurrencyDo.class)
+        .withCurrency(Currency.getInstance("CHF"))
+        .withCurrencies(Currency.getInstance("USD"), Currency.getInstance("EUR"))
+        .withCurrencyMap(currencyMap);
+
+    String json = readResourceAsString("TestCurrencyDoLowercase.json");
+    TestCurrencyDo read = s_dataObjectMapper.readValue(json, TestCurrencyDo.class);
+    assertEquals(currencyDo, read);
+  }
+
+  @Test
+  public void testSerializeDeserialize_CurrencyDoNullValues() throws Exception {
+    String json = readResourceAsString("TestCurrencyDoNullValues.json");
+    TestCurrencyDo read = s_dataObjectMapper.readValue(json, TestCurrencyDo.class);
+    assertNull(read.getCurrency());
+    assertNull(read.getCurrencyMap());
+    List<Currency> nullValues = new ArrayList<>();
+    nullValues.add(null);
+    nullValues.add(null);
+    assertEquals(nullValues, read.getCurrencies());
   }
 
   @Test
