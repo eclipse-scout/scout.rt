@@ -1,0 +1,6 @@
+{
+  "_type" : "TestCurrency",
+  "currencies" : [ null, null ],
+  "currency" : null,
+  "currencyMap" : null
+}

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.dataobject.testing.signature;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Currency;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +38,7 @@ public class ScoutDataObjectSignatureTestCustomizer implements IDataObjectSignat
       Integer.class,
       BigDecimal.class,
       Locale.class,
+      Currency.class,
       URI.class,
       byte[].class,
 

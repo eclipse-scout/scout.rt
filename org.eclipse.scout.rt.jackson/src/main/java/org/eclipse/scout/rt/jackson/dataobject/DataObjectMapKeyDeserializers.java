@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.util.Currency;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
@@ -52,13 +53,16 @@ public class DataObjectMapKeyDeserializers implements KeyDeserializers {
     if (Locale.class.isAssignableFrom(rawClass)) {
       return new LocaleMapKeyDeserializer();
     }
+    if (Currency.class.isAssignableFrom(rawClass)) {
+      return new CurrencyMapKeyDeserializer();
+    }
     if (IId.class.isAssignableFrom(rawClass)) {
       @SuppressWarnings("unchecked")
       Class<? extends IId<?>> idClass = (Class<? extends IId<?>>) rawClass.asSubclass(IId.class);
       return new IIdMapKeyDeserializer(idClass);
     }
     else if (IEnum.class.isAssignableFrom(rawClass)) {
-      Class<? extends IEnum> enumClass = (Class<? extends IEnum>) rawClass.asSubclass(IEnum.class);
+      Class<? extends IEnum> enumClass = rawClass.asSubclass(IEnum.class);
       return new EnumMapKeyDeserializer(enumClass);
     }
     return null;

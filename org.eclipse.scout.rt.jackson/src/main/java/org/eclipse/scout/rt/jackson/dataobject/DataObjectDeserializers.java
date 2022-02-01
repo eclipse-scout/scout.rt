@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.util.Currency;
 import java.util.Date;
 import java.util.Locale;
 
@@ -94,6 +95,9 @@ public class DataObjectDeserializers extends Deserializers.Base {
     }
     else if (Locale.class.isAssignableFrom(rawClass)) {
       return new DoLocaleDeserializer();
+    }
+    else if (Currency.class.isAssignableFrom(rawClass)) {
+      return new DoCurrencyDeserializer();
     }
     else if (BinaryResource.class.isAssignableFrom(rawClass)) {
       return new DoBinaryResourceDeserializer();

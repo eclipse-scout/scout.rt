@@ -1,0 +1,9 @@
+{
+  "_type" : "TestCurrency",
+  "currencies" : [ "usd", "eUR" ],
+  "currency" : "chf",
+  "currencyMap" : {
+    "cHf" : "Switzerland",
+    "eur" : "Europe"
+  }
+}
