@@ -183,7 +183,7 @@ describe('CellEditor', () => {
     let table, $rows, $cells0;
 
     beforeEach(() => {
-      table = helper.createTable(helper.createModelFixture(2, 2));
+      table = helper.createTable(helper.createModelFixture(3, 2));
       table.render();
       helper.applyDisplayStyle(table);
       $rows = table.$rows();
@@ -202,6 +202,23 @@ describe('CellEditor', () => {
       jasmine.clock().tick(0);
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[1]);
+    });
+
+    it('starts the cell editor for the next visible cell', () => {
+      table.rows[0].cells[0].editable = true;
+      table.rows[0].cells[1].editable = true;
+      table.rows[1].cells[2].editable = true;
+      table.columns[0].visible = false;
+      table.columns[1].visible = false;
+
+      table.focusCell(table.columns[0], table.rows[0]);
+      jasmine.clock().tick(0);
+      assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
+
+      $(document.activeElement).triggerKeyInputCapture(keys.TAB);
+      jasmine.clock().tick(0);
+      jasmine.clock().tick(0);
+      assertCellEditorIsOpen(table, table.columns[2], table.rows[1]);
     });
   });
 
