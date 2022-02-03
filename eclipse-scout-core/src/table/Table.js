@@ -2199,7 +2199,7 @@ export default class Table extends Widget {
     let cell, column, predicate;
 
     predicate = function(column) {
-      if (column.guiOnly) {
+      if (!column.isVisible() || column.guiOnly) {
         // does not support tabbing
         return false;
       }
