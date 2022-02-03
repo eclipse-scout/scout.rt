@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
  * @see ITextField, ISmartField, INumberField, IDateField, IFileChooser, IListBox, ITreeBox, ICheckBox, IRadioButton,
  *      IToogleButton
  */
-public interface IValueField<VALUE> extends IFormField, IHolder<VALUE> {
+public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IResettableFormField {
   /*
    * Properties
    */
@@ -51,6 +51,7 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE> {
   /**
    * set field value to initValue and clear all error flags
    */
+  @Override
   void resetValue();
 
   void refreshDisplayText();

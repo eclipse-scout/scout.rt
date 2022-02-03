@@ -71,7 +71,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
 import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.IClipboardField;
 import org.eclipse.scout.rt.client.ui.form.fields.colorfield.IColorField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserbutton.IFileChooserButton;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
@@ -157,7 +156,6 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.calendar.JsonCalendarField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.clipboardfield.JsonClipboardField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.colorfield.JsonColorField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.composer.JsonComposerField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.filechooserbutton.JsonFileChooserButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield.JsonFileChooserField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
@@ -317,9 +315,6 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IHtmlField) {
       return new JsonHtmlField<>((IHtmlField) model, session, id, parent);
-    }
-    if (model instanceof IComposerField) {
-      return new JsonComposerField<>((IComposerField) model, session, id, parent);
     }
     if (model instanceof IBeanField) {
       return new JsonBeanField<IBeanField<?>>((IBeanField<?>) model, session, id, parent);

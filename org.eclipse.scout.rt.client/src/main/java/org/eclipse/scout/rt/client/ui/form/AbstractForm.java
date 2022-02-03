@@ -79,6 +79,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormFieldFilter;
+import org.eclipse.scout.rt.client.ui.form.fields.IResettableFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -86,7 +87,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
@@ -1850,12 +1850,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     setFormLoading(true);
     // reset values
     Consumer<IFormField> v = field -> {
-      if (field instanceof IValueField) {
-        IValueField f = (IValueField) field;
-        f.resetValue();
-      }
-      else if (field instanceof IComposerField) {
-        IComposerField f = (IComposerField) field;
+      if (field instanceof IResettableFormField) {
+        IResettableFormField f = (IResettableFormField) field;
         f.resetValue();
       }
     };

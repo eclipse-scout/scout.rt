@@ -10,15 +10,12 @@
  */
 package org.eclipse.scout.rt.client.services.common.search;
 
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerDisplayTextBuilder;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
@@ -50,20 +47,6 @@ public class DefaultSearchFilterService implements ISearchFilterService {
     }
     label = StringUtility.nullIfEmpty(label);
 
-    //composer
-    if (field instanceof AbstractComposerField) {
-      AbstractComposerField composerField = (AbstractComposerField) field;
-      ITreeNode rootNode = composerField.getTree().getRootNode();
-      if (rootNode != null) {
-        StringBuilder buf = new StringBuilder();
-        new ComposerDisplayTextBuilder().build(rootNode, buf, "");
-        String s = buf.toString();
-        if (StringUtility.hasText(s)) {
-          search.addDisplayText(s);
-        }
-      }
-      return;
-    }
     //list box
     if (field instanceof AbstractListBox<?>) {
       AbstractListBox<?> valueField = (AbstractListBox<?>) field;
