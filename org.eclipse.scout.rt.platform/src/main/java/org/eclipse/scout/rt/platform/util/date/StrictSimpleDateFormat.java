@@ -18,12 +18,9 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * date object is formatted again with the same pattern. Example: {@code "1970-01-01 00:00"} → (parse) → <i>1969-12-31
  * 22:00</i> → (format) → {@code "1969-12-31"}.
  * <p>
- * <b>Note:</b> When the pattern string contains a time zone character ({@code "Z"}, {@code "z"} or {@code "X"}), no
- * validation is performed, since the potential problem does not apply in this case.
- * <p>
- * The behavior can be controlled by setting the {@link #setLenient(boolean)} flag. The default is <code>false</code>.
- * The check being performed in this case is even more strict than the default implementation. The following table shows
- * some of the differences.
+ * The behavior can be controlled by setting the {@link #setLenient(boolean)} flag. The default is {@code false}. The
+ * check being performed in this case is even stricter than the default implementation. The following table shows some
+ * of the differences:
  * <p>
  * <table border=1>
  * <tr>
@@ -70,8 +67,9 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * </tr>
  * </table>
  * <p>
- * <b>Note:</b> setting the "lenient" flag to <code>true</code> will change the behavior back to the default of
- * {@link SimpleDateFormat}.
+ * <b>Note:</b> setting the "lenient" flag to {@code true} will change the behavior back to the default of
+ * {@link SimpleDateFormat}. The default behavior is automatically preserved if the pattern string contains time zone
+ * characters ({@code "Z"}, {@code "z"} or {@code "X"}), since the potential problem does not apply in this case.
  */
 public class StrictSimpleDateFormat extends SimpleDateFormat {
   private static final long serialVersionUID = 1L;
