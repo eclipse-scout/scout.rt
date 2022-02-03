@@ -42,7 +42,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendarField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.imagefield.AbstractImageField;
@@ -86,7 +85,6 @@ public class ClientContainerValidationService extends AbstractContainerValidatio
     addPossibleContributionForContainer(IMenu.class, AbstractValueField.class);
     addPossibleContributionForContainer(IMenu.class, AbstractButton.class);
     addPossibleContributionForContainer(ICalendar.class, AbstractCalendarField.class);
-    addPossibleContributionForContainer(ITree.class, AbstractComposerField.class);
     addPossibleContributionForContainer(IMenu.class, AbstractImageField.class);
     addPossibleContributionForContainer(IFormField.class, AbstractListBox.class);
     addPossibleContributionForContainer(ITable.class, AbstractListBox.class);

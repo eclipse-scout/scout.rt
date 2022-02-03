@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithCancelButton.InnerBox;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithCancelButton.InnerBox.CancelButton;
-import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithComposer.ComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithListBox.ListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithTable.TableField;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_BoxWithTree.TreeField;
@@ -49,7 +48,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.FormFieldEnabledTest.P_OuterFo
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
@@ -156,20 +154,6 @@ public class FormFieldEnabledTest {
     Assert.assertTrue(listBox.isEnabled());
     Assert.assertTrue(table.isEnabled());
     Assert.assertFalse(table.isEnabledIncludingParents());
-  }
-
-  @Test
-  public void testComposerInheritance() {
-    P_BoxWithComposer box = new P_BoxWithComposer();
-    ComposerField composerField = box.getFieldByClass(ComposerField.class);
-    ITree tree = composerField.getTree();
-    box.setEnabled(false);
-
-    Assert.assertFalse(box.isEnabled());
-    Assert.assertFalse(composerField.isEnabledIncludingParents());
-    Assert.assertTrue(composerField.isEnabled());
-    Assert.assertTrue(tree.isEnabled());
-    Assert.assertFalse(tree.isEnabledIncludingParents());
   }
 
   @Test
@@ -467,11 +451,6 @@ public class FormFieldEnabledTest {
           return CollectionUtility.hashSet(ValueFieldMenuType.NotNull);
         }
       }
-    }
-  }
-
-  public static class P_BoxWithComposer extends AbstractGroupBox {
-    public class ComposerField extends AbstractComposerField {
     }
   }
 

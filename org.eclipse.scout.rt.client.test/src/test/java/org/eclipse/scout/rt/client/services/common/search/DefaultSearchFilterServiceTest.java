@@ -10,22 +10,17 @@
  */
 package org.eclipse.scout.rt.client.services.common.search;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.services.common.search.DefaultSearchFilterServiceTest.MyComposerField.CarEntity;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerDisplayTextBuilder;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
@@ -33,14 +28,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadio
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
-import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
-import org.eclipse.scout.rt.shared.data.model.DataModelAttributeOp;
-import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
-import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -62,12 +52,12 @@ public class DefaultSearchFilterServiceTest {
 
   private static final String LABEL = "Label";
 
-  private DefaultSearchFilterService m_searchFilterService;
+  private ISearchFilterService m_searchFilterService;
   private SearchFilter m_searchFilter;
 
   @Before
   public void setUp() {
-    m_searchFilterService = new DefaultSearchFilterService();
+    m_searchFilterService = BEANS.get(ISearchFilterService.class);
     m_searchFilter = new SearchFilter();
   }
 
@@ -247,32 +237,6 @@ public class DefaultSearchFilterServiceTest {
     Assert.assertEquals(seqBox.getLabel() + " " + TEXTS.get("LogicLike") + " " + stringField.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
   }
 
-  @Test
-  public void testComposerField() {
-    MyComposerField composer = new MyComposerField();
-    composer.init();
-    runBasicAsserts(composer);
-
-    CarEntity carEntity = composer.new CarEntity();
-    ITreeNode carNode = composer.addEntityNode(
-        composer.getTree().getRootNode(),
-        carEntity,
-        true,
-        Collections.emptyList(),
-        new ArrayList<>());
-
-    composer.addAttributeNode(carNode,
-        carEntity.new ColorAttribute(),
-        DataModelConstants.AGGREGATION_NONE,
-        DataModelAttributeOp.create(DataModelConstants.OPERATOR_EQ),
-        CollectionUtility.arrayList("blue key"),
-        CollectionUtility.arrayList("blue value"));
-    m_searchFilterService.applySearchDelegate(composer, m_searchFilter, false);
-    StringBuilder result = new StringBuilder();
-    new ComposerDisplayTextBuilder().build(composer.getTree().getRootNode(), result, "");
-    Assert.assertEquals(result.toString().trim(), m_searchFilter.getDisplayTextsPlain());
-  }
-
   public void runBasicAsserts(IFormField f) {
     m_searchFilterService.applySearchDelegate(f, m_searchFilter, false);
     Assert.assertEquals("", m_searchFilter.getDisplayTextsPlain());
@@ -364,33 +328,6 @@ public class DefaultSearchFilterServiceTest {
     @Override
     protected String getConfiguredLabel() {
       return "SeqLabel";
-    }
-  }
-
-  public class MyComposerField extends AbstractComposerField {
-    @Order(80)
-    public class CarEntity extends AbstractDataModelEntity {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public String getConfiguredText() {
-        return "Auto";
-      }
-
-      @Order(10)
-      public class ColorAttribute extends AbstractDataModelAttribute {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public String getConfiguredText() {
-          return "Color";
-        }
-
-        @Override
-        public int getConfiguredType() {
-          return IDataModelAttribute.TYPE_STRING;
-        }
-      }
     }
   }
 }

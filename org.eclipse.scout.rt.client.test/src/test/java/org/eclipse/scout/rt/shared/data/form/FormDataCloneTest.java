@@ -22,7 +22,6 @@ import java.io.OutputStream;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -123,10 +122,6 @@ public class FormDataCloneTest {
       return getFieldByClass(Currency.class);
     }
 
-    public Composer getComposer() {
-      return getFieldByClass(Composer.class);
-    }
-
     public AddressTable getAddressTable() {
       return getFieldByClass(AddressTable.class);
     }
@@ -157,13 +152,6 @@ public class FormDataCloneTest {
       private static final long serialVersionUID = 1L;
 
       public Currency() {
-      }
-    }
-
-    public class Composer extends AbstractComposerData {
-      private static final long serialVersionUID = 1L;
-
-      public Composer() {
       }
     }
 

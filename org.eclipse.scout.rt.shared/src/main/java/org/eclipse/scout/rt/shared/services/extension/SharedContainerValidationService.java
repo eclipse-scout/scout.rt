@@ -19,10 +19,6 @@ import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
-import org.eclipse.scout.rt.shared.data.model.AbstractDataModel;
-import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
-import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
-import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 import org.eclipse.scout.rt.shared.extension.AbstractContainerValidationService;
 import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCode;
@@ -39,10 +35,6 @@ public class SharedContainerValidationService extends AbstractContainerValidatio
     addPossibleContributionForContainer(AbstractPropertyData.class, AbstractFormData.class);
     addPossibleContributionForContainer(AbstractFormFieldData.class, AbstractFormFieldData.class);
     addPossibleContributionForContainer(AbstractPropertyData.class, AbstractFormFieldData.class);
-    addPossibleContributionForContainer(IDataModelAttribute.class, AbstractDataModel.class);
-    addPossibleContributionForContainer(IDataModelEntity.class, AbstractDataModel.class);
-    addPossibleContributionForContainer(IDataModelAttribute.class, AbstractDataModelEntity.class);
-    addPossibleContributionForContainer(IDataModelEntity.class, AbstractDataModelEntity.class);
     addPossibleContributionForContainer(ICode.class, AbstractCode.class);
     addPossibleContributionForContainer(ICode.class, AbstractCodeTypeWithGeneric.class);
     addPossibleContributionForContainer(Serializable.class, AbstractTableRowData.class); // for row data extensions serializable beans are allowed.

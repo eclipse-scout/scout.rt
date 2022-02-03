@@ -97,6 +97,12 @@
     <module>../org.eclipse.scout.rt.chart.client</module>
     <module>../org.eclipse.scout.rt.chart.shared</module>
     <module>../org.eclipse.scout.rt.chart.ui.html</module>
+
+    <!-- datamodel -->
+    <module>../org.eclipse.scout.rt.datamodel.client</module>
+    <module>../org.eclipse.scout.rt.datamodel.server</module>
+    <module>../org.eclipse.scout.rt.datamodel.shared</module>
+    <module>../org.eclipse.scout.rt.datamodel.ui.html</module>
   </modules>
 
   <properties>
@@ -510,6 +516,26 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.chart.ui.html</artifactId>
+        <version>22.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
+        <version>22.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.datamodel.server</artifactId>
+        <version>22.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.datamodel.shared</artifactId>
+        <version>22.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.datamodel.ui.html</artifactId>
         <version>22.0-SNAPSHOT</version>
       </dependency>
 
