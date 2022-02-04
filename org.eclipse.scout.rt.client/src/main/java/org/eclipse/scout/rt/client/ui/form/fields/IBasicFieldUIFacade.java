@@ -31,7 +31,7 @@ public interface IBasicFieldUIFacade {
    * when a new value is set.
    *
    * @param text
+   *          new value of the display text in the ui.
    */
   void setDisplayTextFromUI(String text);
-
 }
