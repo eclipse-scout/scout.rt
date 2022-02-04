@@ -39,7 +39,7 @@ export default class Widget {
     this.cloneOf = null;
 
     /**
-     * The 'rendering' flag is set the true while the _inital_ rendering is performed.
+     * The 'rendering' flag is set the true while the _initial_ rendering is performed.
      * It is used to to something different in a _render* method when the method is
      * called for the first time.
      */
@@ -124,6 +124,12 @@ export default class Widget {
     READ_ONLY: 1
   };
 
+  /**
+   * Initializes the widget instance. All properties of the model parameter (object) are set as properties on the widget instance.
+   * Calls {@link Widget#_init} and triggers an <em>init</em> event when initialization has been completed.
+   *
+   * @param {object} model
+   */
   init(model) {
     let staticModel = this._jsonModel();
     if (staticModel) {
@@ -148,9 +154,12 @@ export default class Widget {
   }
 
   /**
-   * @param {object} options
-   * - parent (required): The parent widget
-   * - session (optional): If not specified the session of the parent is used
+   * Initializes the widget instance. All properties of the model parameter (object) are set as properties on the widget instance.
+   * Override this function to initialize widget specific properties in sub-classes.
+   *
+   * @param {object} model Properties:<ul>
+   *   <li>parent (required): parent widget</li>
+   *   <li>session (optional): If not specified, session of parent widget is used</li></ul>
    */
   _init(model) {
     if (!model.parent) {
