@@ -143,11 +143,11 @@ public class StrictSimpleDateFormatTest {
 
     pattern.setValue("yyyy-MM-dd HH:mm:ss.SSS Z");
     input.setValue("2019-01-18");
-    ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
-    ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    Assert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    Assert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
     input.setValue("2019-01-18 23:00:00.000");
-    ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
-    ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    Assert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    Assert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
     input.setValue("2019-01-18 23:00:00.000 +0700");
     new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
     new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
@@ -160,8 +160,8 @@ public class StrictSimpleDateFormatTest {
 
     pattern.setValue("yyyy-MM-dd Z");
     input.setValue("2019-01-18");
-    ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
-    ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    Assert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    Assert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
     input.setValue("2019-01-18 +0700");
     new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
     new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
@@ -193,11 +193,11 @@ public class StrictSimpleDateFormatTest {
     // Correctly handle literal strings (even if they contain the letter 'Z')
     pattern.setValue("'''$''' '-' yyyy-MM-dd '(A-Z)' HH:mm:ss.SSS Z");
     input.setValue("'$' - 2019-01-18 (A-Z)");
-    ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
-    ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    Assert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    Assert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
     input.setValue("'$' - 2019-01-18 (A-Z) 23:00:00.000");
-    ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
-    ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    Assert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input.getValue()));
+    Assert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue()));
     input.setValue("'$' - 2019-01-18 (A-Z) 23:00:00.000 +0700");
     new SimpleDateFormat(pattern.getValue()).parse(input.getValue());
     new StrictSimpleDateFormat(pattern.getValue()).parse(input.getValue());
