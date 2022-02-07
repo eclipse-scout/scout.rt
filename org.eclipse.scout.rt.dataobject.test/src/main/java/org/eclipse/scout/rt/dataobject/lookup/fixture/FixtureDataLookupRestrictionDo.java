@@ -20,11 +20,11 @@ import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.lookup.AbstractLookupRestrictionDo;
 
 @TypeName("start.FixtureDataLookupRestriction")
-public class FixtureDataLookupRestrictionDo extends AbstractLookupRestrictionDo<FixtureDataLookupRestrictionDo, Long> {
+public class FixtureDataLookupRestrictionDo extends AbstractLookupRestrictionDo<Long> {
 
   @Override
   public DoList<Long> ids() {
-    return createIdsAttribute(this);
+    return doList(IDS);
   }
 
   public DoValue<String> startsWith() {

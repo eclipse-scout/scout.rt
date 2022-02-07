@@ -20,11 +20,11 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.lookup.AbstractLookupRestrictionDo;
 
 @TypeName("scout.FixtureUuIdLookupRestriction")
-public class FixtureUuIdLookupRestrictionDo extends AbstractLookupRestrictionDo<FixtureUuIdLookupRestrictionDo, FixtureUuId> {
+public class FixtureUuIdLookupRestrictionDo extends AbstractLookupRestrictionDo<FixtureUuId> {
 
   @Override
   public DoList<FixtureUuId> ids() {
-    return createIdsAttribute(this);
+    return doList(IDS);
   }
 
   /* **************************************************************************

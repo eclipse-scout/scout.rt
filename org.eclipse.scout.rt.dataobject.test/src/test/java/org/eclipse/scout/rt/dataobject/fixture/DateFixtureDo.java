@@ -41,34 +41,29 @@ public class DateFixtureDo extends DoEntity {
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
-  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public DateFixtureDo withDate(Date date) {
     date().set(date);
     return this;
   }
 
-  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public Date getDate() {
     return date().get();
   }
 
-  @AttributeName("list")
   @Generated("DoConvenienceMethodsGenerator")
   public DateFixtureDo with_list(Collection<? extends Integer> _list) {
     _list().updateAll(_list);
     return this;
   }
 
-  @AttributeName("list")
   @Generated("DoConvenienceMethodsGenerator")
   public DateFixtureDo with_list(Integer... _list) {
     _list().updateAll(_list);
     return this;
   }
 
-  @AttributeName("list")
   @Generated("DoConvenienceMethodsGenerator")
   public List<Integer> get_list() {
     return _list().get();

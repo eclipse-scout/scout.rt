@@ -20,11 +20,11 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 @TypeName("scout.StringLookupRestriction")
-public class StringLookupRestrictionDo extends AbstractLookupRestrictionDo<StringLookupRestrictionDo, String> {
+public class StringLookupRestrictionDo extends AbstractLookupRestrictionDo<String> {
 
   @Override
   public DoList<String> ids() {
-    return createIdsAttribute(this);
+    return doList(IDS);
   }
 
   /**

@@ -13,15 +13,16 @@ package org.eclipse.scout.rt.dataobject.lookup.fixture;
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.lookup.AbstractLookupRowDo;
 
 @TypeName("start.FixtureDataLookupRow")
-public class FixtureDataLookupRowDo extends AbstractLookupRowDo<FixtureDataLookupRowDo, Long> {
+public class FixtureDataLookupRowDo extends AbstractLookupRowDo<Long> {
 
   @Override
   public DoValue<Long> id() {
-    return createIdAttribute(this);
+    return doValue(ID);
   }
 
   public DoValue<String> additionalData() {
@@ -89,6 +90,13 @@ public class FixtureDataLookupRowDo extends AbstractLookupRowDo<FixtureDataLooku
   @Generated("DoConvenienceMethodsGenerator")
   public FixtureDataLookupRowDo withTooltipText(String tooltipText) {
     tooltipText().set(tooltipText);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRowDo withAdditionalTableRowData(IDoEntity additionalTableRowData) {
+    additionalTableRowData().set(additionalTableRowData);
     return this;
   }
 }

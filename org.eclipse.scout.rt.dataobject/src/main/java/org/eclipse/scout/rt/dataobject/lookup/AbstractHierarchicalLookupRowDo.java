@@ -13,49 +13,92 @@ package org.eclipse.scout.rt.dataobject.lookup;
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 
 /**
  * Abstract base class for hierarchical lookup rows with generic key type T.
  *
- * @param <SELF>
- *          Type reference to concrete sub-class, used to implement with() methods returning concrete sub-class type
  * @param <ID>
  *          Lookup row id type
  */
-public abstract class AbstractHierarchicalLookupRowDo<SELF extends AbstractHierarchicalLookupRowDo<SELF, ID>, ID> extends AbstractLookupRowDo<SELF, ID> {
+public abstract class AbstractHierarchicalLookupRowDo<ID> extends AbstractLookupRowDo<ID> {
 
   public static final String PARENT_ID = "parentId";
 
   /**
    * A subclass should implement this method to specify the concrete attribute type.
    *
-   * @see AbstractHierarchicalLookupRowDo#createParentIdAttribute(AbstractHierarchicalLookupRowDo)
+   * @see AbstractHierarchicalLookupRowDo#PARENT_ID
    */
   public abstract DoValue<ID> parentId();
-
-  /* **************************************************************************
-   * HELPER METHODS
-   * *************************************************************************/
-
-  protected static <ID> DoValue<ID> createParentIdAttribute(AbstractHierarchicalLookupRowDo<?, ID> self) {
-    return self.doValue(PARENT_ID);
-  }
-
-  /* **************************************************************************
-   * CUSTOM CONVENIENCE METHODS
-   * *************************************************************************/
-
-  public SELF withParentId(ID parentId) {
-    parentId().set(parentId);
-    return self();
-  }
 
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  /**
+   * See {@link #parentId()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractHierarchicalLookupRowDo<ID> withParentId(ID parentId) {
+    parentId().set(parentId);
+    return this;
+  }
+
+  /**
+   * See {@link #parentId()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public ID getParentId() {
     return parentId().get();
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractHierarchicalLookupRowDo<ID> withText(String text) {
+    text().set(text);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractHierarchicalLookupRowDo<ID> withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractHierarchicalLookupRowDo<ID> withActive(Boolean active) {
+    active().set(active);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractHierarchicalLookupRowDo<ID> withIconId(String iconId) {
+    iconId().set(iconId);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractHierarchicalLookupRowDo<ID> withCssClass(String cssClass) {
+    cssClass().set(cssClass);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractHierarchicalLookupRowDo<ID> withTooltipText(String tooltipText) {
+    tooltipText().set(tooltipText);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractHierarchicalLookupRowDo<ID> withAdditionalTableRowData(IDoEntity additionalTableRowData) {
+    additionalTableRowData().set(additionalTableRowData);
+    return this;
   }
 }

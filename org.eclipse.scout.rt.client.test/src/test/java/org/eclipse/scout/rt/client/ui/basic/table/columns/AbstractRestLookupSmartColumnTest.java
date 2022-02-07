@@ -12,6 +12,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,9 +21,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.client.services.lookup.AbstractRestLookupCall;
+import org.eclipse.scout.rt.client.services.lookup.FixtureUuIdLookupRestrictionDo;
+import org.eclipse.scout.rt.client.services.lookup.FixtureUuIdLookupRowDo;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractRestLookupSmartColumnTest.P_Table.Column;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.lookup.AbstractLookupRowDo;
@@ -32,20 +37,15 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.client.services.lookup.AbstractRestLookupCall;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.client.services.lookup.FixtureUuIdLookupRestrictionDo;
-import org.eclipse.scout.rt.client.services.lookup.FixtureUuIdLookupRowDo;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractRestLookupSmartColumnTest.P_Table.Column;
 
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
@@ -148,7 +148,7 @@ public class AbstractRestLookupSmartColumnTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected Function<FixtureUuIdLookupRestrictionDo, LookupResponse<? extends AbstractLookupRowDo<?, FixtureUuId>>> remoteCall() {
+    protected Function<FixtureUuIdLookupRestrictionDo, LookupResponse<? extends AbstractLookupRowDo<FixtureUuId>>> remoteCall() {
       USED_LOOKUP_CALL_INSTANCES.add(this); // cloning an object does not necessarily call the constructor
       return REMOTE_SERVICE::lookupRows;
     }

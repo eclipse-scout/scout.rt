@@ -96,99 +96,84 @@ public class TestRenamedAttributeDo extends DoEntity {
     return get().get();
   }
 
-  @AttributeName("put")
   @Generated("DoConvenienceMethodsGenerator")
   public TestRenamedAttributeDo withPut(String put) {
     put().set(put);
     return this;
   }
 
-  @AttributeName("put")
   @Generated("DoConvenienceMethodsGenerator")
   public String getPut() {
     return put().get();
   }
 
-  @AttributeName("all")
   @Generated("DoConvenienceMethodsGenerator")
   public TestRenamedAttributeDo withAllAttribute(BigDecimal allAttribute) {
     allAttribute().set(allAttribute);
     return this;
   }
 
-  @AttributeName("all")
   @Generated("DoConvenienceMethodsGenerator")
   public BigDecimal getAllAttribute() {
     return allAttribute().get();
   }
 
-  @AttributeName("dateAttributeCustomName")
   @Generated("DoConvenienceMethodsGenerator")
   public TestRenamedAttributeDo withDateAttribute(Date dateAttribute) {
     dateAttribute().set(dateAttribute);
     return this;
   }
 
-  @AttributeName("dateAttributeCustomName")
   @Generated("DoConvenienceMethodsGenerator")
   public Date getDateAttribute() {
     return dateAttribute().get();
   }
 
-  @AttributeName("hashCode")
   @Generated("DoConvenienceMethodsGenerator")
   public TestRenamedAttributeDo withHashCodeAttribute(Integer hashCodeAttribute) {
     hashCodeAttribute().set(hashCodeAttribute);
     return this;
   }
 
-  @AttributeName("hashCode")
   @Generated("DoConvenienceMethodsGenerator")
   public Integer getHashCodeAttribute() {
     return hashCodeAttribute().get();
   }
 
-  @AttributeName("wait")
   @Generated("DoConvenienceMethodsGenerator")
   public TestRenamedAttributeDo withWaitAttribute(Integer waitAttribute) {
     waitAttribute().set(waitAttribute);
     return this;
   }
 
-  @AttributeName("wait")
   @Generated("DoConvenienceMethodsGenerator")
   public Integer getWaitAttribute() {
     return waitAttribute().get();
   }
 
-  @AttributeName("clone")
   @Generated("DoConvenienceMethodsGenerator")
   public TestRenamedAttributeDo withCloneAttribute(Collection<? extends BigDecimal> cloneAttribute) {
     cloneAttribute().updateAll(cloneAttribute);
     return this;
   }
 
-  @AttributeName("clone")
   @Generated("DoConvenienceMethodsGenerator")
   public TestRenamedAttributeDo withCloneAttribute(BigDecimal... cloneAttribute) {
     cloneAttribute().updateAll(cloneAttribute);
     return this;
   }
 
-  @AttributeName("clone")
   @Generated("DoConvenienceMethodsGenerator")
   public List<BigDecimal> getCloneAttribute() {
     return cloneAttribute().get();
   }
 
-  @AttributeName("finalize")
   @Generated("DoConvenienceMethodsGenerator")
   public TestRenamedAttributeDo withFinalizeAttribute(List<BigInteger> finalizeAttribute) {
     finalizeAttribute().set(finalizeAttribute);
     return this;
   }
 
-  @AttributeName("finalize")
   @Generated("DoConvenienceMethodsGenerator")
   public List<BigInteger> getFinalizeAttribute() {
     return finalizeAttribute().get();

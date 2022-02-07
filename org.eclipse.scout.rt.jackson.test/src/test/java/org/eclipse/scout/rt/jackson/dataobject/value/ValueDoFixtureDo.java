@@ -59,28 +59,24 @@ public class ValueDoFixtureDo extends DoEntity {
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
-  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public ValueDoFixtureDo withDate(Date date) {
     date().set(date);
     return this;
   }
 
-  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public Date getDate() {
     return date().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  @ValueFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
   public ValueDoFixtureDo withDateTime(Date dateTime) {
     dateTime().set(dateTime);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  @ValueFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
   public Date getDateTime() {
     return dateTime().get();
   }

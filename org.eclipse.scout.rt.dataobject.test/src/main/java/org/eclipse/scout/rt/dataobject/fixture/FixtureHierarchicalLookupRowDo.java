@@ -13,20 +13,21 @@ package org.eclipse.scout.rt.dataobject.fixture;
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.lookup.AbstractHierarchicalLookupRowDo;
 
 @TypeName("scout.FixtureHierarchicalLookupRow")
-public class FixtureHierarchicalLookupRowDo extends AbstractHierarchicalLookupRowDo<FixtureHierarchicalLookupRowDo, FixtureUuId> {
+public class FixtureHierarchicalLookupRowDo extends AbstractHierarchicalLookupRowDo<FixtureUuId> {
 
   @Override
   public DoValue<FixtureUuId> id() {
-    return createIdAttribute(this);
+    return doValue(ID);
   }
 
   @Override
   public DoValue<FixtureUuId> parentId() {
-    return createParentIdAttribute(this);
+    return doValue(PARENT_ID);
   }
 
   /* **************************************************************************
@@ -86,6 +87,13 @@ public class FixtureHierarchicalLookupRowDo extends AbstractHierarchicalLookupRo
   @Generated("DoConvenienceMethodsGenerator")
   public FixtureHierarchicalLookupRowDo withTooltipText(String tooltipText) {
     tooltipText().set(tooltipText);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureHierarchicalLookupRowDo withAdditionalTableRowData(IDoEntity additionalTableRowData) {
+    additionalTableRowData().set(additionalTableRowData);
     return this;
   }
 }

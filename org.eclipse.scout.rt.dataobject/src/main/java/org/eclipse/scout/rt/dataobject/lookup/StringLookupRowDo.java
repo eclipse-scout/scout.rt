@@ -13,22 +13,23 @@ package org.eclipse.scout.rt.dataobject.lookup;
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 
 /**
  * Generic lookup row implementation for objects using a {@code String} as identifier.
  */
 @TypeName("scout.StringLookupRow")
-public class StringLookupRowDo extends AbstractHierarchicalLookupRowDo<StringLookupRowDo, String> {
+public class StringLookupRowDo extends AbstractHierarchicalLookupRowDo<String> {
 
   @Override
   public DoValue<String> id() {
-    return createIdAttribute(this);
+    return doValue(ID);
   }
 
   @Override
   public DoValue<String> parentId() {
-    return createParentIdAttribute(this);
+    return doValue(PARENT_ID);
   }
 
   /* **************************************************************************
@@ -88,6 +89,13 @@ public class StringLookupRowDo extends AbstractHierarchicalLookupRowDo<StringLoo
   @Generated("DoConvenienceMethodsGenerator")
   public StringLookupRowDo withTooltipText(String tooltipText) {
     tooltipText().set(tooltipText);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public StringLookupRowDo withAdditionalTableRowData(IDoEntity additionalTableRowData) {
+    additionalTableRowData().set(additionalTableRowData);
     return this;
   }
 }

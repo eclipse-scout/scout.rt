@@ -13,16 +13,17 @@ package org.eclipse.scout.rt.client.services.lookup;
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.lookup.AbstractLookupRowDo;
 
 @TypeName("scout.FixtureUuIdLookupRow")
-public class FixtureUuIdLookupRowDo extends AbstractLookupRowDo<FixtureUuIdLookupRowDo, FixtureUuId> {
+public class FixtureUuIdLookupRowDo extends AbstractLookupRowDo<FixtureUuId> {
 
   @Override
   public DoValue<FixtureUuId> id() {
-    return createIdAttribute(this);
+    return doValue(ID);
   }
 
   /* **************************************************************************
@@ -75,6 +76,13 @@ public class FixtureUuIdLookupRowDo extends AbstractLookupRowDo<FixtureUuIdLooku
   @Generated("DoConvenienceMethodsGenerator")
   public FixtureUuIdLookupRowDo withTooltipText(String tooltipText) {
     tooltipText().set(tooltipText);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureUuIdLookupRowDo withAdditionalTableRowData(IDoEntity additionalTableRowData) {
+    additionalTableRowData().set(additionalTableRowData);
     return this;
   }
 }

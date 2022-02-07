@@ -67,12 +67,11 @@ public class LookupHelper {
    * @param rowClass
    *          Class type of lookup row to create
    */
-  public <LOOKUP_ROW extends AbstractLookupRowDo<LOOKUP_ROW, ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<RESTRICTION, ID>, DATA> LookupResponse<LOOKUP_ROW>
-      filterData(RESTRICTION restriction,
-          Stream<DATA> data,
-          Function<DATA, ID> idAccessor,
-          Function<DATA, String> textAccessor,
-          Class<LOOKUP_ROW> rowClass) {
+  public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>, DATA> LookupResponse<LOOKUP_ROW> filterData(RESTRICTION restriction,
+      Stream<DATA> data,
+      Function<DATA, ID> idAccessor,
+      Function<DATA, String> textAccessor,
+      Class<LOOKUP_ROW> rowClass) {
     return filterData(restriction, data, idAccessor, textAccessor, null, truePredicate(), rowClass, identityMapper(), lookupRowDoComparatorByText());
   }
 
@@ -99,13 +98,12 @@ public class LookupHelper {
    * @param rowClass
    *          Class type of lookup row to create
    */
-  public <LOOKUP_ROW extends AbstractLookupRowDo<LOOKUP_ROW, ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<RESTRICTION, ID>, DATA> LookupResponse<LOOKUP_ROW>
-      filterData(RESTRICTION restriction,
-          Stream<DATA> data,
-          Function<DATA, ID> idAccessor,
-          Function<DATA, String> textAccessor,
-          Class<LOOKUP_ROW> rowClass,
-          Comparator<LOOKUP_ROW> lookupRowDoComparator) {
+  public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>, DATA> LookupResponse<LOOKUP_ROW> filterData(RESTRICTION restriction,
+      Stream<DATA> data,
+      Function<DATA, ID> idAccessor,
+      Function<DATA, String> textAccessor,
+      Class<LOOKUP_ROW> rowClass,
+      Comparator<LOOKUP_ROW> lookupRowDoComparator) {
     return filterData(restriction, data, idAccessor, textAccessor, null, truePredicate(), rowClass, identityMapper(), lookupRowDoComparator);
   }
 
@@ -134,13 +132,12 @@ public class LookupHelper {
    * @param rowClass
    *          Class type of lookup row to create
    */
-  public <LOOKUP_ROW extends AbstractLookupRowDo<LOOKUP_ROW, ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<RESTRICTION, ID>, DATA> LookupResponse<LOOKUP_ROW>
-      filterData(RESTRICTION restriction,
-          Stream<DATA> data,
-          Function<DATA, ID> idAccessor,
-          Function<DATA, String> textAccessor,
-          Function<DATA, Boolean> activeAccessor,
-          Class<LOOKUP_ROW> rowClass) {
+  public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>, DATA> LookupResponse<LOOKUP_ROW> filterData(RESTRICTION restriction,
+      Stream<DATA> data,
+      Function<DATA, ID> idAccessor,
+      Function<DATA, String> textAccessor,
+      Function<DATA, Boolean> activeAccessor,
+      Class<LOOKUP_ROW> rowClass) {
     return filterData(restriction, data, idAccessor, textAccessor, activeAccessor, truePredicate(), rowClass, identityMapper(), lookupRowDoComparatorByText());
   }
 
@@ -152,14 +149,13 @@ public class LookupHelper {
    * @param additionalFilter
    *          Additional filter for stream of data
    */
-  public <LOOKUP_ROW extends AbstractLookupRowDo<LOOKUP_ROW, ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<RESTRICTION, ID>, DATA> LookupResponse<LOOKUP_ROW>
-      filterData(RESTRICTION restriction,
-          Stream<DATA> data,
-          Function<DATA, ID> idAccessor,
-          Function<DATA, String> textAccessor,
-          Function<DATA, Boolean> activeAccessor,
-          Predicate<DATA> additionalFilter,
-          Class<LOOKUP_ROW> rowClass) {
+  public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>, DATA> LookupResponse<LOOKUP_ROW> filterData(RESTRICTION restriction,
+      Stream<DATA> data,
+      Function<DATA, ID> idAccessor,
+      Function<DATA, String> textAccessor,
+      Function<DATA, Boolean> activeAccessor,
+      Predicate<DATA> additionalFilter,
+      Class<LOOKUP_ROW> rowClass) {
     return filterData(restriction, data, idAccessor, textAccessor, activeAccessor, additionalFilter, rowClass, identityMapper(), lookupRowDoComparatorByText());
   }
 
@@ -177,22 +173,22 @@ public class LookupHelper {
    *          Comparator the resulting {@link AbstractLookupRowDo} as sorted with. No sorting if Comparator is null.
    */
   @SuppressWarnings("squid:S00107")
-  public <LOOKUP_ROW extends AbstractLookupRowDo<LOOKUP_ROW, ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<RESTRICTION, ID>, DATA> LookupResponse<LOOKUP_ROW>
-      filterData(RESTRICTION restriction,
-          Stream<DATA> dataStream,
-          Function<DATA, ID> idAccessor,
-          Function<DATA, String> textAccessor,
-          Function<DATA, Boolean> activeAccessor,
-          Predicate<DATA> additionalFilter,
-          Class<LOOKUP_ROW> rowClass,
-          BiFunction<LOOKUP_ROW, DATA, LOOKUP_ROW> additionalMapper,
-          Comparator<LOOKUP_ROW> lookupRowDoComparator) {
+  public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>, DATA> LookupResponse<LOOKUP_ROW> filterData(RESTRICTION restriction,
+      Stream<DATA> dataStream,
+      Function<DATA, ID> idAccessor,
+      Function<DATA, String> textAccessor,
+      Function<DATA, Boolean> activeAccessor,
+      Predicate<DATA> additionalFilter,
+      Class<LOOKUP_ROW> rowClass,
+      BiFunction<LOOKUP_ROW, DATA, LOOKUP_ROW> additionalMapper,
+      Comparator<LOOKUP_ROW> lookupRowDoComparator) {
 
     Stream<LOOKUP_ROW> stream = dataStream
         .filter(restrictionPredicate(restriction, idAccessor, textAccessor, activeAccessor))
         .filter(additionalFilter)
         .map(data -> {
-          LOOKUP_ROW row = BEANS.get(rowClass)
+          LOOKUP_ROW row = BEANS.get(rowClass);
+          row
               .withId(idAccessor.apply(data))
               .withText(textAccessor.apply(data));
           if (activeAccessor != null) {
@@ -221,10 +217,9 @@ public class LookupHelper {
    * @param rowClass
    *          Class type of lookup row to create
    */
-  public <LOOKUP_ROW extends AbstractLookupRowDo<LOOKUP_ROW, ENUM>, ENUM extends Enum<?> & IEnum, RESTRICTION extends AbstractLookupRestrictionDo<RESTRICTION, ENUM>> LookupResponse<LOOKUP_ROW>
-      filterEnum(RESTRICTION restriction,
-          Class<ENUM> enumClass,
-          Class<LOOKUP_ROW> rowClass) {
+  public <LOOKUP_ROW extends AbstractLookupRowDo<ENUM>, ENUM extends Enum<?> & IEnum, RESTRICTION extends AbstractLookupRestrictionDo<ENUM>> LookupResponse<LOOKUP_ROW> filterEnum(RESTRICTION restriction,
+      Class<ENUM> enumClass,
+      Class<LOOKUP_ROW> rowClass) {
     return filterData(restriction,
         Arrays.stream(enumClass.getEnumConstants()),
         Function.identity(),
@@ -246,10 +241,9 @@ public class LookupHelper {
    * @param rowClass
    *          Class type of lookup row to create
    */
-  public <LOOKUP_ROW extends AbstractLookupRowDo<LOOKUP_ROW, ENUM>, ENUM extends Enum<?> & IEnum, RESTRICTION extends AbstractLookupRestrictionDo<RESTRICTION, ENUM>> LookupResponse<LOOKUP_ROW>
-      filterEnumKeepSorting(RESTRICTION restriction,
-          Class<ENUM> enumClass,
-          Class<LOOKUP_ROW> rowClass) {
+  public <LOOKUP_ROW extends AbstractLookupRowDo<ENUM>, ENUM extends Enum<?> & IEnum, RESTRICTION extends AbstractLookupRestrictionDo<ENUM>> LookupResponse<LOOKUP_ROW> filterEnumKeepSorting(RESTRICTION restriction,
+      Class<ENUM> enumClass,
+      Class<LOOKUP_ROW> rowClass) {
     return filterData(restriction,
         Arrays.stream(enumClass.getEnumConstants()),
         Function.identity(),
@@ -264,7 +258,7 @@ public class LookupHelper {
   /**
    * @return {@link AbstractLookupRestrictionDo#maxRowCount()} if not {@code null}, {@link #DEFAULT_MAX_ROWS} otherwise.
    */
-  public int maxRowCount(AbstractLookupRestrictionDo<?, ?> restriction) {
+  public int maxRowCount(AbstractLookupRestrictionDo<?> restriction) {
     return NumberUtility.nvl(restriction.getMaxRowCount(), DEFAULT_MAX_ROWS);
   }
 
@@ -294,7 +288,7 @@ public class LookupHelper {
   /**
    * {@link Comparator} working on {@link AbstractLookupRowDo#getText()}.
    */
-  public static <LOOKUP_ROW extends AbstractLookupRowDo<?, ?>> Comparator<LOOKUP_ROW> lookupRowDoComparatorByText() {
+  public static <LOOKUP_ROW extends AbstractLookupRowDo<?>> Comparator<LOOKUP_ROW> lookupRowDoComparatorByText() {
     return (o1, o2) -> StringUtility.compare(o1.getText(), o2.getText());
   }
 
@@ -305,7 +299,7 @@ public class LookupHelper {
    * <p>
    * If {@code restriction} is {@code null}, {@link #truePredicate()} is returned.
    */
-  public <ID, RESTRICTION extends AbstractLookupRestrictionDo<RESTRICTION, ID>, DATA> Predicate<DATA> restrictionPredicate(RESTRICTION restriction,
+  public <ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>, DATA> Predicate<DATA> restrictionPredicate(RESTRICTION restriction,
       Function<DATA, ID> idAccessor,
       Function<DATA, String> textAccessor,
       Function<DATA, Boolean> activeAccessor) {
@@ -388,7 +382,7 @@ public class LookupHelper {
   public <V, ID> Map<ID, String> resolve(
       Stream<V> values,
       Function<V, ID> idExtractor,
-      Function<Set<ID>, List<? extends AbstractLookupRowDo<?, ID>>> textResolver) {
+      Function<Set<ID>, List<? extends AbstractLookupRowDo<ID>>> textResolver) {
     Set<ID> ids = values
         .map(idExtractor)
         .filter(Objects::nonNull)

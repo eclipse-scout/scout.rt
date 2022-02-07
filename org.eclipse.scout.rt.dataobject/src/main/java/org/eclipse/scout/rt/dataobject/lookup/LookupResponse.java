@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 
 @TypeName("scout.LookupResponse")
 @SuppressWarnings("unchecked")
-public class LookupResponse<T extends AbstractLookupRowDo<?, ?>> extends DoEntity {
+public class LookupResponse<T extends AbstractLookupRowDo<?>> extends DoEntity {
 
   public DoList<T> rows() {
     return doList("rows");
@@ -31,7 +31,7 @@ public class LookupResponse<T extends AbstractLookupRowDo<?, ?>> extends DoEntit
   /**
    * Convenience method to create a {@link LookupResponse} with specified collection of rows.
    */
-  public static <T extends AbstractLookupRowDo<?, ?>> LookupResponse<T> create(Collection<T> rows) {
+  public static <T extends AbstractLookupRowDo<?>> LookupResponse<T> create(Collection<T> rows) {
     return BEANS.get(LookupResponse.class).withRows(rows);
   }
 

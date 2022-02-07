@@ -158,6 +158,7 @@ public class LookupHelperTest {
   @Test
   @SuppressWarnings({"ResultOfMethodCallIgnored", "EqualsWithItself"})
   public void testLookupRowDoComparatorByText() {
+    //noinspection EqualsWithItself
     assertThrows(NullPointerException.class, () -> LookupHelper.lookupRowDoComparatorByText().compare(null, null));
 
     FixtureEnumLookupRowDo r1 = BEANS.get(FixtureEnumLookupRowDo.class);
@@ -169,6 +170,7 @@ public class LookupHelperTest {
 
     r2.withText("b");
     assertEquals(-1, LookupHelper.lookupRowDoComparatorByText().compare(r1, r2));
+    //noinspection EqualsWithItself
     assertEquals(0, LookupHelper.lookupRowDoComparatorByText().compare(r1, r1));
     assertEquals(1, LookupHelper.lookupRowDoComparatorByText().compare(r2, r1));
   }
@@ -229,7 +231,7 @@ public class LookupHelperTest {
   }
 
   @SafeVarargs
-  protected final <ID, LOOKUP_ROW extends AbstractLookupRowDo<LOOKUP_ROW, ID>> void assertLookupResponse(LookupResponse<LOOKUP_ROW> response, @SuppressWarnings("unchecked") ID... expectedIds) {
+  protected final <ID, LOOKUP_ROW extends AbstractLookupRowDo<ID>> void assertLookupResponse(LookupResponse<LOOKUP_ROW> response, @SuppressWarnings("unchecked") ID... expectedIds) {
     assertNotNull(response);
     List<ID> actualIds = response.rows().stream()
         .map(AbstractLookupRowDo::getId)
@@ -238,7 +240,7 @@ public class LookupHelperTest {
   }
 
   @SafeVarargs
-  protected final <ID, LOOKUP_ROW extends AbstractLookupRowDo<LOOKUP_ROW, ID>> void assertActiveLookupRows(LookupResponse<LOOKUP_ROW> response, @SuppressWarnings("unchecked") ID... expectedActiveIds) {
+  protected final <ID, LOOKUP_ROW extends AbstractLookupRowDo<ID>> void assertActiveLookupRows(LookupResponse<LOOKUP_ROW> response, @SuppressWarnings("unchecked") ID... expectedActiveIds) {
     assertNotNull(response);
     List<ID> actualActiveIds = response.rows().stream()
         .filter(row -> row.isActive())
