@@ -20,11 +20,11 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
 import org.eclipse.scout.rt.dataobject.lookup.AbstractLookupRestrictionDo;
 
 @TypeName("start.FixtureEnumLookupRestriction")
-public class FixtureEnumLookupRestrictionDo extends AbstractLookupRestrictionDo<FixtureEnumLookupRestrictionDo, FixtureEnum> {
+public class FixtureEnumLookupRestrictionDo extends AbstractLookupRestrictionDo<FixtureEnum> {
 
   @Override
   public DoList<FixtureEnum> ids() {
-    return createIdsAttribute(this);
+    return doList(IDS);
   }
 
   /* **************************************************************************

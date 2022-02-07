@@ -43,14 +43,12 @@ public class DateValueDo extends DoEntity implements IValueDo<Date> {
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
-  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public DateValueDo withValue(Date value) {
     value().set(value);
     return this;
   }
 
-  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public Date getValue() {
     return value().get();

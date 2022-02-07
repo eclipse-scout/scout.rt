@@ -68,20 +68,23 @@ public class AbstractRestLookupCallTest {
     call.setKey(null);
     assertNull(call.getKey());
     assertEquals(0, call.getKeys().size());
-
     assertFalse(call.getRestriction().active().exists());
+
     call.setActive(null);
     assertEquals(TriState.UNDEFINED, call.getActive());
     assertTrue(call.getRestriction().active().exists());
     assertNull(call.getRestriction().active().get());
+
     call.setActive(TriState.TRUE);
     assertEquals(TriState.TRUE, call.getActive());
     assertTrue(call.getRestriction().active().exists());
     assertEquals(Boolean.TRUE, call.getRestriction().active().get());
+
     call.setActive(TriState.FALSE);
     assertEquals(TriState.FALSE, call.getActive());
     assertTrue(call.getRestriction().active().exists());
     assertEquals(Boolean.FALSE, call.getRestriction().active().get());
+
     call.setActive(TriState.UNDEFINED);
     assertEquals(TriState.UNDEFINED, call.getActive());
     assertTrue(call.getRestriction().active().exists());
@@ -105,7 +108,7 @@ public class AbstractRestLookupCallTest {
     assertLookupRow(fixtureRow, nonHierarchicalRow, null);
   }
 
-  protected <ID> void assertLookupRow(AbstractLookupRowDo<?, ID> expected, ILookupRow<ID> actual, ID expectedParentId) {
+  protected <ID> void assertLookupRow(AbstractLookupRowDo<ID> expected, ILookupRow<ID> actual, ID expectedParentId) {
     assertEquals(expected.getId(), actual.getKey());
     assertEquals(expected.getText(), actual.getText());
     assertEquals(expected.getActive(), actual.isActive());
@@ -124,7 +127,7 @@ public class AbstractRestLookupCallTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected Function<FixtureUuIdLookupRestrictionDo, LookupResponse<? extends AbstractLookupRowDo<?, FixtureUuId>>> remoteCall() {
+    protected Function<FixtureUuIdLookupRestrictionDo, LookupResponse<? extends AbstractLookupRowDo<FixtureUuId>>> remoteCall() {
       // Not used in this test
       return null;
     }
@@ -135,7 +138,7 @@ public class AbstractRestLookupCallTest {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected Function<FixtureUuIdLookupRestrictionDo, LookupResponse<? extends AbstractLookupRowDo<?, FixtureUuId>>> remoteCall() {
+    protected Function<FixtureUuIdLookupRestrictionDo, LookupResponse<? extends AbstractLookupRowDo<FixtureUuId>>> remoteCall() {
       // Not used in this test
       return null;
     }

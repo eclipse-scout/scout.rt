@@ -10,9 +10,10 @@
  */
 package org.eclipse.scout.rt.dataobject.lookup;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
@@ -21,12 +22,10 @@ import org.eclipse.scout.rt.dataobject.DoValue;
 /**
  * Abstract base class for lookup call restrictions
  *
- * @param <SELF>
- *          Type reference to concrete sub-class, used to implement with() methods returning concrete sub-class type
  * @param <ID>
  *          Lookup row id type
  */
-public abstract class AbstractLookupRestrictionDo<SELF extends AbstractLookupRestrictionDo<SELF, ID>, ID> extends DoEntity {
+public abstract class AbstractLookupRestrictionDo<ID> extends DoEntity {
 
   public static final String IDS = "ids";
   public static final String TEXT = "text";
@@ -38,7 +37,7 @@ public abstract class AbstractLookupRestrictionDo<SELF extends AbstractLookupRes
   /**
    * A subclass should implement this method to specify the concrete attribute type.
    *
-   * @see AbstractLookupRestrictionDo#createIdsAttribute(AbstractLookupRestrictionDo)
+   * @see AbstractLookupRestrictionDo#IDS
    */
   public abstract DoList<ID> ids();
 
@@ -59,77 +58,86 @@ public abstract class AbstractLookupRestrictionDo<SELF extends AbstractLookupRes
   }
 
   /* **************************************************************************
-   * HELPER METHODS
+   * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
-  @SuppressWarnings("unchecked")
-  protected SELF self() {
-    return (SELF) this;
+  /**
+   * See {@link #ids()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRestrictionDo<ID> withIds(Collection<? extends ID> ids) {
+    ids().updateAll(ids);
+    return this;
   }
 
-  protected static <ID> DoList<ID> createIdsAttribute(AbstractLookupRestrictionDo<?, ID> self) {
-    return self.doList(IDS);
+  /**
+   * See {@link #ids()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRestrictionDo<ID> withIds(ID... ids) {
+    ids().updateAll(ids);
+    return this;
   }
 
-  /* **************************************************************************
-   * CUSTOM CONVENIENCE METHODS
-   * *************************************************************************/
-
+  /**
+   * See {@link #ids()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
   public List<ID> getIds() {
     return ids().get();
   }
 
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRestrictionDo<ID> withText(String text) {
+    text().set(text);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public String getText() {
     return text().get();
   }
 
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRestrictionDo<ID> withActive(Boolean active) {
+    active().set(active);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public Boolean getActive() {
     return active().get();
   }
 
+  @Generated("DoConvenienceMethodsGenerator")
   public boolean isActive() {
     return nvl(getActive());
   }
 
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRestrictionDo<ID> withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public Boolean getEnabled() {
     return enabled().get();
   }
 
+  @Generated("DoConvenienceMethodsGenerator")
   public boolean isEnabled() {
     return nvl(getEnabled());
   }
 
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRestrictionDo<ID> withMaxRowCount(Integer maxRowCount) {
+    maxRowCount().set(maxRowCount);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public Integer getMaxRowCount() {
     return maxRowCount().get();
-  }
-
-  public SELF withIds(Collection<? extends ID> ids) {
-    ids().clear();
-    ids().get().addAll(ids);
-    return self();
-  }
-
-  public SELF withIds(@SuppressWarnings("unchecked") ID... ids) {
-    return withIds(Arrays.asList(ids));
-  }
-
-  public SELF withText(String text) {
-    text().set(text);
-    return self();
-  }
-
-  public SELF withActive(Boolean active) {
-    active().set(active);
-    return self();
-  }
-
-  public SELF withEnabled(Boolean enabled) {
-    enabled().set(enabled);
-    return self();
-  }
-
-  public SELF withMaxRowCount(Integer maxRowCount) {
-    maxRowCount().set(maxRowCount);
-    return self();
   }
 }

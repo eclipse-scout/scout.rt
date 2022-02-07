@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * {@code org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn}. Otherwise, batch lookups are
  * performed via service tunnel instead of calling a REST service.
  */
-public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupRestrictionDo<?, ID>, ID> implements ILookupCall<ID> {
+public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupRestrictionDo<ID>, ID> implements ILookupCall<ID> {
   private static final long serialVersionUID = 1L;
 
   protected RESTRICTION m_restrictionDo;
@@ -219,7 +219,7 @@ public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupR
 
   protected List<? extends ILookupRow<ID>> getData() {
     execPrepareRestriction(m_restrictionDo);
-    LookupResponse<? extends AbstractLookupRowDo<?, ID>> response = remoteCall().apply(m_restrictionDo);
+    LookupResponse<? extends AbstractLookupRowDo<ID>> response = remoteCall().apply(m_restrictionDo);
     return transformLookupResponse(response);
   }
 
@@ -232,7 +232,7 @@ public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupR
   /**
    * Return function to fetch {@link LookupResponse} from remote
    */
-  protected abstract Function<RESTRICTION, LookupResponse<? extends AbstractLookupRowDo<?, ID>>> remoteCall();
+  protected abstract Function<RESTRICTION, LookupResponse<? extends AbstractLookupRowDo<ID>>> remoteCall();
 
   /**
    * Loads data asynchronously, and calls the specified callback once completed.
@@ -258,7 +258,7 @@ public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupR
   /**
    * Transforms {@link LookupResponse} with a list of {@link AbstractLookupRowDo} into a list of {@link ILookupRow}.
    */
-  protected List<? extends ILookupRow<ID>> transformLookupResponse(LookupResponse<? extends AbstractLookupRowDo<?, ID>> response) {
+  protected List<? extends ILookupRow<ID>> transformLookupResponse(LookupResponse<? extends AbstractLookupRowDo<ID>> response) {
     return response.getRows().stream()
         .map(this::transformLookupRow)
         .collect(Collectors.toList());
@@ -268,7 +268,7 @@ public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupR
    * Transforms one {@link AbstractLookupRowDo} into a {@link ILookupRow}. <br>
    * Override this method to set additional table row data (i.e. used for smartfields with table proposal chooser).
    */
-  protected ILookupRow<ID> transformLookupRow(AbstractLookupRowDo<?, ID> row) {
+  protected ILookupRow<ID> transformLookupRow(AbstractLookupRowDo<ID> row) {
     return new LookupRow<>(row.getId(), row.getText())
         .withActive(row.getActive())
         .withEnabled(row.getEnabled())
@@ -281,10 +281,10 @@ public abstract class AbstractRestLookupCall<RESTRICTION extends AbstractLookupR
   /**
    * @return parent key if row is a {@link AbstractHierarchicalLookupRowDo}, {@code null} otherwise.
    */
-  protected ID extractParentKey(AbstractLookupRowDo<?, ID> row) {
+  protected ID extractParentKey(AbstractLookupRowDo<ID> row) {
     if (row instanceof AbstractHierarchicalLookupRowDo) {
       //noinspection unchecked
-      return ((AbstractHierarchicalLookupRowDo<?, ID>) row).getParentId();
+      return ((AbstractHierarchicalLookupRowDo<ID>) row).getParentId();
     }
     return null;
   }

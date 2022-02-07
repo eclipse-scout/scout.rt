@@ -19,12 +19,10 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 /**
  * Abstract base class for lookup rows with generic key type T.
  *
- * @param <SELF>
- *          Type reference to concrete sub-class, used to implement with() methods returning concrete sub-class type
  * @param <ID>
  *          Lookup row id type
  */
-public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF, ID>, ID> extends DoEntity {
+public abstract class AbstractLookupRowDo<ID> extends DoEntity {
 
   public static final String ID = "id";
   public static final String TEXT = "text";
@@ -39,7 +37,7 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   /**
    * A subclass should implement this method to specify the concrete attribute type.
    *
-   * @see AbstractLookupRowDo#createIdAttribute(AbstractLookupRowDo)
+   * @see AbstractLookupRowDo#ID
    */
   public abstract DoValue<ID> id();
 
@@ -72,74 +70,41 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   }
 
   /* **************************************************************************
-   * HELPER METHODS
-   * *************************************************************************/
-
-  @SuppressWarnings("unchecked")
-  protected SELF self() {
-    return (SELF) this;
-  }
-
-  protected static <ID> DoValue<ID> createIdAttribute(AbstractLookupRowDo<?, ID> self) {
-    return self.doValue(ID);
-  }
-
-  /* **************************************************************************
-   * CUSTOM CONVENIENCE METHODS
-   * *************************************************************************/
-
-  public SELF withId(ID id) {
-    id().set(id);
-    return self();
-  }
-
-  public SELF withText(String text) {
-    text().set(text);
-    return self();
-  }
-
-  public SELF withEnabled(Boolean enabled) {
-    enabled().set(enabled);
-    return self();
-  }
-
-  public SELF withActive(Boolean active) {
-    active().set(active);
-    return self();
-  }
-
-  public SELF withIconId(String iconId) {
-    iconId().set(iconId);
-    return self();
-  }
-
-  public SELF withCssClass(String cssClass) {
-    cssClass().set(cssClass);
-    return self();
-  }
-
-  public SELF withTooltipText(String tooltipText) {
-    tooltipText().set(tooltipText);
-    return self();
-  }
-
-  public SELF withAdditionalTableRowData(IDoEntity additionalTableRowData) {
-    additionalTableRowData().set(additionalTableRowData);
-    return self();
-  }
-
-  /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  /**
+   * See {@link #id()}.
+   */
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRowDo<ID> withId(ID id) {
+    id().set(id);
+    return this;
+  }
+
+  /**
+   * See {@link #id()}.
+   */
   @Generated("DoConvenienceMethodsGenerator")
   public ID getId() {
     return id().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRowDo<ID> withText(String text) {
+    text().set(text);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public String getText() {
     return text().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRowDo<ID> withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
@@ -153,6 +118,12 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRowDo<ID> withActive(Boolean active) {
+    active().set(active);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public Boolean getActive() {
     return active().get();
   }
@@ -163,8 +134,20 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRowDo<ID> withIconId(String iconId) {
+    iconId().set(iconId);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public String getIconId() {
     return iconId().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRowDo<ID> withCssClass(String cssClass) {
+    cssClass().set(cssClass);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
@@ -173,8 +156,20 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRowDo<ID> withTooltipText(String tooltipText) {
+    tooltipText().set(tooltipText);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public String getTooltipText() {
     return tooltipText().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractLookupRowDo<ID> withAdditionalTableRowData(IDoEntity additionalTableRowData) {
+    additionalTableRowData().set(additionalTableRowData);
+    return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")

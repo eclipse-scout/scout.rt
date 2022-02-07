@@ -172,7 +172,6 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
    * *************************************************************************/
 
   @SuppressWarnings("unchecked")
-  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public TestCustomImplementedEntityDo withDateAttribute(Date dateAttribute) {
     dateAttribute().set(dateAttribute);
@@ -180,7 +179,6 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
   }
 
   @SuppressWarnings("unchecked")
-  @ValueFormat(pattern = "yyyy-MM-dd")
   @Generated("DoConvenienceMethodsGenerator")
   public Date getDateAttribute() {
     return dateAttribute().get();
