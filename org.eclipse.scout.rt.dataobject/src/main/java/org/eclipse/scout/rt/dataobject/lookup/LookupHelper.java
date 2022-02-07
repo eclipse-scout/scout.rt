@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.dataobject.lookup;
 
-import java.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -27,7 +26,6 @@ import java.util.stream.Stream;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.nls.CollatorProvider;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
@@ -297,8 +295,7 @@ public class LookupHelper {
    * {@link Comparator} working on {@link AbstractLookupRowDo#getText()}.
    */
   public static <LOOKUP_ROW extends AbstractLookupRowDo<?, ?>> Comparator<LOOKUP_ROW> lookupRowDoComparatorByText() {
-    Collator collator = BEANS.get(CollatorProvider.class).getInstance();
-    return (o1, o2) -> collator.compare(o1.getText(), o2.getText());
+    return (o1, o2) -> StringUtility.compare(o1.getText(), o2.getText());
   }
 
   /**
