@@ -156,16 +156,16 @@ public class LookupHelperTest {
   }
 
   @Test
-  @SuppressWarnings("ResultOfMethodCallIgnored")
+  @SuppressWarnings({"ResultOfMethodCallIgnored", "EqualsWithItself"})
   public void testLookupRowDoComparatorByText() {
     assertThrows(NullPointerException.class, () -> LookupHelper.lookupRowDoComparatorByText().compare(null, null));
 
     FixtureEnumLookupRowDo r1 = BEANS.get(FixtureEnumLookupRowDo.class);
     FixtureEnumLookupRowDo r2 = BEANS.get(FixtureEnumLookupRowDo.class);
-    assertThrows(NullPointerException.class, () -> LookupHelper.lookupRowDoComparatorByText().compare(r1, r2));
+    assertEquals(0, LookupHelper.lookupRowDoComparatorByText().compare(r1, r2));
 
     r1.withText("a");
-    assertThrows(NullPointerException.class, () -> LookupHelper.lookupRowDoComparatorByText().compare(r1, r2));
+    assertEquals(1, LookupHelper.lookupRowDoComparatorByText().compare(r1, r2));
 
     r2.withText("b");
     assertEquals(-1, LookupHelper.lookupRowDoComparatorByText().compare(r1, r2));
