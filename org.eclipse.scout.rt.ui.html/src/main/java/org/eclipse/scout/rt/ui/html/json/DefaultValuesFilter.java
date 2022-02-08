@@ -172,7 +172,7 @@ public class DefaultValuesFilter {
         Object value = json.opt(prop);
         filterState.pushProperty(prop);
         if (!filterState.isCurrentPropertyProcessed() && checkPropertyValueEqualToDefaultValue(t, prop, value, filterState)) {
-          // Property value value is equal to the static default value -> remove the property
+          // Property value is equal to the static default value -> remove the property
           it.remove();
         }
         filterState.popProperty(prop);
@@ -265,7 +265,7 @@ public class DefaultValuesFilter {
           filterState.markCurrentPropertyAsProcessed();
           Object subDefaultValue = defaultValueObject.opt(prop);
           if (checkValueEqualToDefaultValue(subValue, subDefaultValue, filterState)) {
-            // Property value value is equal to the static default value -> remove the property
+            // Property value is equal to the static default value -> remove the property
             it.remove();
           }
         }
@@ -280,7 +280,6 @@ public class DefaultValuesFilter {
     }
     // Even more special case: If valueObject is now empty and it used to have the same keys as
     // the defaultValueObject, it is considered equal to the default value and MAY be removed.
-    //noinspection RedundantIfStatement
     if (valueObject.length() == 0 && sameKeys) {
       return true;
     }
