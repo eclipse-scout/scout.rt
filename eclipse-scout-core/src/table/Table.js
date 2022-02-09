@@ -3755,7 +3755,7 @@ export default class Table extends Widget {
   addFilter(filter, applyFilter = true) {
     if (filter instanceof TableUserFilter) {
       let previousFilter = this.getFilter(filter.createKey());
-      this.filterSupport.removeFilter(previousFilter);
+      this.filterSupport.removeFilter(previousFilter, false);
     }
 
     let added = this.filterSupport.addFilter(filter, applyFilter);

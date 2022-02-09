@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -303,6 +303,7 @@ export default class Tree extends Widget {
     this._removeFromFlatList(node, false); // ensure node is not longer in visible nodes list.
     node.destroy();
 
+    // noinspection JSUnresolvedVariable
     if (this._onNodeDeleted) { // Necessary for subclasses
       this._onNodeDeleted(node);
     }
@@ -1422,8 +1423,7 @@ export default class Tree extends Widget {
       node.expanded = expanded;
       node.expandedLazy = lazy;
 
-      let filterStateChanged = this.applyFiltersForNode(node, false, renderAnimated);
-      if (filterStateChanged && renderExpansionOpts.expansionChanged) {
+      if (renderExpansionOpts.expansionChanged) {
         if (node.parentNode) {
           // ensure node is visible under the parent node if there is a parent.
           this._rebuildParent(node.parentNode, opts);
@@ -1443,8 +1443,7 @@ export default class Tree extends Widget {
       }
 
       if (node.expanded) {
-        node.ensureLoadChildren().done(
-          this._addChildrenToFlatList.bind(this, node, null, renderAnimated, null, true));
+        node.ensureLoadChildren().done(this._addChildrenToFlatList.bind(this, node, null, renderAnimated, null, false));
       } else {
         this._removeChildrenFromFlatList(node, renderAnimated);
       }
@@ -1477,7 +1476,7 @@ export default class Tree extends Widget {
       return;
     }
     if (node.expanded || node.expandedLazy) {
-      this._addChildrenToFlatList(node, null, false, null, true);
+      this._addChildrenToFlatList(node, null, false, null, false);
     } else {
       this._removeChildrenFromFlatList(node, false);
     }
@@ -1580,7 +1579,6 @@ export default class Tree extends Widget {
   }
 
   _removeFromFlatList(node, animatedRemove) {
-    let removedNodes = [];
     if (this.visibleNodesMap[node.id]) {
       let index = this.visibleNodesFlat.indexOf(node);
       this._removeChildrenFromFlatList(node, false);
@@ -1591,12 +1589,10 @@ export default class Tree extends Widget {
           this.nodeWidthDirty = true;
         }
       }
-      removedNodes = arrays.ensure(this.visibleNodesFlat.splice(index, 1));
+      this.visibleNodesFlat.splice(index, 1);
       delete this.visibleNodesMap[node.id];
       this.hideNode(node, animatedRemove);
     }
-    removedNodes.push(node);
-    return removedNodes;
   }
 
   /**
@@ -1605,8 +1601,8 @@ export default class Tree extends Widget {
   _addToVisibleFlatList(node, renderingAnimated) {
     // if node already is in visible list don't do anything. If no parentNode is available this node is on toplevel, if a parent is available
     // it has to be in visible list and also be expanded
-    if (!this.visibleNodesMap[node.id] && node.isFilterAccepted() && (!node.parentNode ||
-      node.parentNode.expanded && this.visibleNodesMap[node.parentNode.id])) {
+    if (!this.visibleNodesMap[node.id] && node.filterAccepted
+      && (!node.parentNode || node.parentNode.expanded && this.visibleNodesMap[node.parentNode.id])) {
       if (this.initialTraversing) {
         // for faster index calculation
         this._addToVisibleFlatListNoCheck(node, this.visibleNodesFlat.length, renderingAnimated);
@@ -2748,10 +2744,8 @@ export default class Tree extends Widget {
     // Filter nodes
     this.nodes.forEach(node => {
       let result = this.applyFiltersForNode(node, false, this.filterAnimated);
-      arrays.removeAll(newlyHidden, result.newlyShown);
-      arrays.removeAll(newlyShown, result.newlyHidden);
-      result.newlyHidden.forEach(hidden => arrays.pushSet(newlyHidden, hidden));
-      result.newlyShown.forEach(shown => arrays.pushSet(newlyShown, shown));
+      newlyHidden.push(...result.newlyHidden);
+      newlyShown.push(...result.newlyShown);
     });
     return {
       newlyHidden: newlyHidden,
@@ -2764,10 +2758,13 @@ export default class Tree extends Widget {
       return;
     }
     if (opts.textFilterText) {
-      result.newlyShown.forEach(node => this._expandAllParentNodes(node));
+      this._nodesByIds(Object.keys(this.nodesMap))
+        .filter(it => it.filterAccepted)
+        .forEach(node => this._expandAllParentNodes(node));
     }
     result.newlyShown.forEach(node => this._addToVisibleFlatList(node, this.filterAnimated));
-    this._nodesFiltered(arrays.flatMap(result.newlyHidden, node => this._removeFromFlatList(node, this.filterAnimated)));
+    result.newlyHidden.forEach(node => this._removeFromFlatList(node, this.filterAnimated));
+    this._nodesFiltered(result.newlyHidden);
     this.filteredElementsDirty = false;
   }
 
@@ -2776,16 +2773,15 @@ export default class Tree extends Widget {
     let newlyHidden = [];
     for (let i = 0; i < this.visibleNodesFlat.length; i++) {
       let node = this.visibleNodesFlat[i];
-      let result = this.applyFiltersForNode(node, false, animated);
+      let result = this._applyFiltersForNodeRec(node, false, animated);
       if (result.newlyHidden.length) {
         if (!node.isFilterAccepted()) {
-          i--;
-          arrays.pushAll(newlyHidden, this._removeFromFlatList(node, animated));
+          newlyHidden.push(...result.newlyHidden);
         }
         this.viewRangeDirty = true;
       }
     }
-
+    newlyHidden.forEach(h => this._removeFromFlatList(h, animated));
     this._nodesFiltered(newlyHidden);
   }
 
@@ -2795,33 +2791,53 @@ export default class Tree extends Widget {
   }
 
   applyFiltersForNode(node, applyNewHiddenShownNodes = true, animated = false) {
-    let newlyHidden = [],
-      newlyShown = [];
+    let result = this._applyFiltersForNodeRec(node, true, animated);
+
+    // the result so far only includes the node and all its children.
+    // always include the parent nodes as well so that the filter has an effect
+    let parent = node.parentNode;
+    while (parent) {
+      let parentResult = this._applyFiltersForNodeRec(parent, false, animated);
+      result.newlyHidden.unshift(...parentResult.newlyHidden);
+      result.newlyShown.unshift(...parentResult.newlyShown);
+      parent = parent.parentNode;
+    }
+
+    if (applyNewHiddenShownNodes) {
+      result.newlyShown.forEach(node => this._addToVisibleFlatList(node, animated));
+      result.newlyHidden.forEach(node => this._removeFromFlatList(node, animated));
+      this._nodesFiltered(result.newlyHidden);
+    }
+    return result;
+  }
+
+  _applyFiltersForNodeRec(node, recursive, animated = false) {
+    let newlyHidden = [], newlyShown = [];
     animated = animated && this.filterAnimated;
-    node.filterDirty = true;
+
     let changed = this._applyFiltersForNode(node);
-    if (changed) {
-      let parents = [];
-      let parent = node.parentNode;
-
-      // collect all parents that need to be updated
-      // show: if node.filterAccepted === true, all parents with parent.filterAccepted === false need to be updated
-      // hide: if node.filterAccepted === false, all parents with parent.filterAccepted === true need to be updated...
-      //       ...EXCEPT there are other childNodes of parent with childNode.filterAccepted === true OR the parent is directly accepted by all filters
-      while (parent && parent.filterAccepted !== node.filterAccepted && (node.filterAccepted || (parent.childNodes.filter(child => parents.indexOf(child) === -1).every(child => !child.filterAccepted) && !this.filterSupport.elementAcceptedByFilters(parent)))) {
-        arrays.insert(parents, parent, 0);
-        parent = parent.parentNode;
-      }
-
-      let removeFrom = node.filterAccepted ? newlyHidden : newlyShown,
-        pushTo = node.filterAccepted ? newlyShown : newlyHidden;
-
-      parents.forEach(p => {
-        p.setFilterAccepted(node.filterAccepted);
-        arrays.remove(removeFrom, p);
-        arrays.pushSet(pushTo, p);
+    let hasChildrenWithFilterAccepted = false;
+    if (node.level < 32 /* see org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree.expandAllRec */) {
+      node.childNodes.forEach(childNode => {
+        if (recursive) {
+          let result = this._applyFiltersForNodeRec(childNode, true, animated);
+          newlyHidden.push(...result.newlyHidden);
+          newlyShown.push(...result.newlyShown);
+        }
+        hasChildrenWithFilterAccepted = hasChildrenWithFilterAccepted || childNode.filterAccepted;
       });
-      arrays.pushSet(pushTo, node);
+    }
+
+    // set filter accepted on this node if it has children with filter accepted (so that the children are visible)
+    if (!node.filterAccepted && hasChildrenWithFilterAccepted) {
+      node.setFilterAccepted(true);
+      changed = !changed;
+    }
+
+    // remember changed node
+    if (changed) {
+      let pushTo = node.filterAccepted ? newlyShown : newlyHidden;
+      pushTo.unshift(node);
 
       if (this.rendered) {
         this.viewRangeDirty = true;
@@ -2843,40 +2859,21 @@ export default class Tree extends Widget {
       }
     }
 
-    if (node.level < 32) {
-      node.childNodes.forEach(childNode => {
-        let result = this.applyFiltersForNode(childNode, false, animated);
-        arrays.removeAll(newlyHidden, result.newlyShown);
-        arrays.removeAll(newlyShown, result.newlyHidden);
-        result.newlyHidden.forEach(hidden => arrays.pushSet(newlyHidden, hidden));
-        result.newlyShown.forEach(shown => arrays.pushSet(newlyShown, shown));
-      });
-    }
-
-    if (applyNewHiddenShownNodes) {
-      newlyShown.forEach(node => this._addToVisibleFlatList(node, animated));
-      this._nodesFiltered(arrays.flatMap(newlyHidden, node => this._removeFromFlatList(node, animated)));
-    }
-
-    return {
-      newlyHidden: newlyHidden,
-      newlyShown: newlyShown
-    };
+    return {newlyHidden: newlyHidden, newlyShown: newlyShown};
   }
 
   /**
    * @returns {Boolean} true if node state has changed, false if not
    */
   _applyFiltersForNode(node) {
-    let changed = this.filterSupport.applyFiltersForElement(node) || node.filterDirty;
-    if (changed) {
+    let changed = this.filterSupport.applyFiltersForElement(node);
+    if (changed || node.filterDirty) {
       node.filterDirty = false;
       node.childNodes.forEach(childNode => {
         childNode.filterDirty = true;
       });
-      return true;
     }
-    return false;
+    return changed;
   }
 
   /**

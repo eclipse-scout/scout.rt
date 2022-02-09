@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -428,7 +428,9 @@ describe('Outline', () => {
       outline.render();
       outline.htmlComp.validateRoot = true; // Ensure layout calls will not be swallowed by DesktopLayout because there is no bench
       let node0 = outline.nodes[0];
-      outline.insertNodes(helper.createModelNodes(10), node0);
+      let newNodes = helper.createModelNodes(10);
+      newNodes.forEach(n => n.id = 'new-' + n.id); // Ensure the new nodes have a unique id
+      outline.insertNodes(newNodes, node0);
       let childNode9 = outline.nodes[0].childNodes[9];
       childNode9.detailForm = new FormSpecHelper(session).createFormWithOneField({modal: false});
 
