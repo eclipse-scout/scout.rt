@@ -375,6 +375,8 @@ public class CollectionUtilityTest {
     // Test out of bounds
     assertNull(CollectionUtility.getElement(createList(1L, 2L, 3L), -1));
     assertNull(CollectionUtility.getElement(createList(1L, 2L, 3L), 3));
+    // Test null list
+    assertNull(CollectionUtility.getElement(null, 0));
   }
 
   @Test

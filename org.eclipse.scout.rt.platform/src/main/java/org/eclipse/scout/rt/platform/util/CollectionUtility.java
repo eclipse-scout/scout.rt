@@ -343,7 +343,7 @@ public final class CollectionUtility {
    * @return null if the index is out of the list bounds or the element is null by itself.
    */
   public static <T> T getElement(List<T> list, int index) {
-    if (index >= 0 && index < list.size()) {
+    if (list != null && index >= 0 && index < list.size()) {
       return list.get(index);
     }
     return null;
