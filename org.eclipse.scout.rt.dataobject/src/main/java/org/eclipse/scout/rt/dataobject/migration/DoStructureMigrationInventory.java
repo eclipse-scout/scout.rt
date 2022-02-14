@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ITypeVersion;
+import org.eclipse.scout.rt.dataobject.TypeVersion;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -44,6 +45,9 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersionedModel;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersionedModel.VersionedItems;
 import org.eclipse.scout.rt.platform.namespace.Namespaces;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.Pair;
 
 /**
  * Inventory of data object structure migration related classes (namespaces, versions, migration handlers, context data
@@ -323,7 +327,9 @@ public class DoStructureMigrationInventory {
 
     NamespaceVersion lowestNextVersion = null;
     for (Entry<String, NamespaceVersion> entry : typeNames.entrySet()) {
-      NamespaceVersion nextVersion = findNextMigrationHandlerVersion(entry.getKey(), entry.getValue());
+      Pair<FindNextMigrationHandlerVersionStatus, NamespaceVersion> nextVersionPair = findNextMigrationHandlerVersion(entry.getKey(), entry.getValue());
+      NamespaceVersion nextVersion = nextVersionPair.getRight();
+      // only version is relevant, status can be ignored here
       if (nextVersion == null) {
         continue; // type name must not be considered (e.g. already current version)
       }
@@ -360,6 +366,79 @@ public class DoStructureMigrationInventory {
   }
 
   /**
+   * This method may be called to check whether a given type name/type version is valid, i.e. either already
+   * representing an existing DO entity with the corresponding type version or there are migration handlers available
+   * that would migrate that data object.
+   *
+   * @param typeName
+   *          Current type name
+   * @param version
+   *          Current type version
+   * @return <code>true</code> if the associated DO entity is either up-to-date or a migration is available for this
+   *         type name.
+   */
+  public boolean isUpToDateOrMigrationAvailable(String typeName, NamespaceVersion version) {
+    Pair<FindNextMigrationHandlerVersionStatus, NamespaceVersion> result = findNextMigrationHandlerVersion(typeName, version);
+    return ObjectUtility.isOneOf(result.getLeft(),
+        FindNextMigrationHandlerVersionStatus.UP_TO_DATE,
+        FindNextMigrationHandlerVersionStatus.NO_TYPE_VERSION_YET,
+        FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND);
+  }
+
+  protected enum FindNextMigrationHandlerVersionStatus {
+
+    /**
+     * Already the current type version (according to the {@link TypeVersion} annotation on the corresponding data
+     * object).
+     * <p>
+     * No {@link NamespaceVersion} is returned.
+     */
+    UP_TO_DATE,
+
+    /**
+     * No migration handlers found for this type name that would migrate this data object to an up-to-date type version.
+     * <p>
+     * Possible reason: unknown/foreign type name
+     * <p>
+     * No {@link NamespaceVersion} is returned.
+     */
+    NO_MIGRATION_HANDLERS,
+
+    /**
+     * No type version is present yet, starts with the first migration available for this type name.
+     * <p>
+     * The {@link NamespaceVersion} of the first available migration handler for this type name is returned.
+     */
+    NO_TYPE_VERSION_YET,
+
+    /**
+     * The provided type version is unknown.
+     * <p>
+     * If nothing went wrong with the corresponding data object when it was persisted, the type version could only be a
+     * newer one not yet known to this system (inserted into this system via e.g. import).
+     * <p>
+     * No {@link NamespaceVersion} is returned.
+     */
+    UNKNOWN_TYPE_VERSION,
+
+    /**
+     * The pair of type name/type version is somehow no consistent and no matching migration handler can be determined,
+     * e.g. not renamed type name for this type version or a migration handler is missing for this type name because
+     * type version is not up-to-date.
+     * <p>
+     * No {@link NamespaceVersion} is returned.
+     */
+    INVALID_TYPE_NAME_VERSION_PAIR,
+
+    /**
+     * Found a migration handlers that is going to be executed for this type name/version
+     * <p>
+     * The {@link NamespaceVersion} of the next migration handler is returned.
+     */
+    MIGRATION_HANDLER_FOUND
+  }
+
+  /**
    * Determines the lowest possible version for which a migration handler could be triggered for the provided type
    * name/version.
    * <p>
@@ -368,10 +447,11 @@ public class DoStructureMigrationInventory {
    *
    * @param version
    *          Type version of given type name (might be <code>null</code> if persisted without a type version yet)
-   * @return Lowest possible version or <code>null</code> if there will be no migration handler (already newest version
-   *         or due to other reasons).
+   * @return Non-<code>null</code> pair of status and lowest possible version or <code>null</code> namespace version if
+   *         there will be no migration handler that migrates this data object (already the newest version or due to
+   *         other reasons).
    */
-  protected NamespaceVersion findNextMigrationHandlerVersion(String typeName, NamespaceVersion version) {
+  protected Pair<FindNextMigrationHandlerVersionStatus, NamespaceVersion> findNextMigrationHandlerVersion(String typeName, NamespaceVersion version) {
     // Example used within comments:
     //
     // - Type name "lorem.Migrationless" with current type version "lorem-2" (@TypeVersion)
@@ -409,7 +489,7 @@ public class DoStructureMigrationInventory {
     NamespaceVersion typeVersion = m_typeNameToCurrentTypeVersion.get(typeName);
     if (typeVersion != null && typeVersion.equals(version)) {
       // Already the current type version, thus no need to check for migration handlers.
-      return null; // Example: "lorem-3" (current type version)
+      return ImmutablePair.of(FindNextMigrationHandlerVersionStatus.UP_TO_DATE, null); // Example: "lorem-3" (current type version)
     }
 
     // No type version maybe found for previously known type names due to renaming (example "lorem.Alpha").
@@ -417,20 +497,21 @@ public class DoStructureMigrationInventory {
     List<NamespaceVersion> versions = m_typeNameVersions.get(typeName);
     if (versions == null) {
       // Despite not having the current type version, no migration handlers are available that would handle this type name (rare case, unknown/foreign type name, no migration to trigger).
-      return null; // Example: type name "other.Example" or "lorem.Migrationless"
+      return ImmutablePair.of(FindNextMigrationHandlerVersionStatus.NO_MIGRATION_HANDLERS, null); // Example: type name "other.Example" or "lorem.Migrationless"
     }
 
     if (version == null) {
       // Persisted data object didn't have a type version yet -> start with first migration
       // Example: type name "lorem.Example" without a type version
-      return CollectionUtility.firstElement(versions);
+      NamespaceVersion firstVersion = CollectionUtility.firstElement(versions);
+      return ImmutablePair.of(FindNextMigrationHandlerVersionStatus.NO_TYPE_VERSION_YET, firstVersion);
     }
 
     if (!m_orderedVersions.contains(version)) {
       // The type version for this type name has a version that is unknown.
       // If nothing went wrong with the corresponding data object when it was persisted, the type version could only be a newer one not yet known to this system (inserted into this system via e.g. import).
       // This check is required because m_comparator must only be used with known type versions.
-      return null; // Example: "lorem.Example" with type version "lorem-7" (e.g. exported from a newer system)
+      return ImmutablePair.of(FindNextMigrationHandlerVersionStatus.UNKNOWN_TYPE_VERSION, null); // Example: "lorem.Example" with type version "lorem-7" (e.g. exported from a newer system)
     }
 
     // Search for the provided type version within the version having a migration handler for this type name.
@@ -440,11 +521,11 @@ public class DoStructureMigrationInventory {
       if (retVal + 1 == versions.size()) { // no more migration handlers
         // Example: "lorem.MissingMigration" with type version "lorem-2" (invalid, no migration handler present)
         // Example: "lorem.Alpha" with type version "lorem-2" (invalid, because should have been renamed to "lorem.Beta" when having "lorem-2")
-        return null;
+        return ImmutablePair.of(FindNextMigrationHandlerVersionStatus.INVALID_TYPE_NAME_VERSION_PAIR, null);
       }
 
       // The version after that one is the next version that should run a migration handler for this type name.
-      return versions.get(retVal + 1); // Example: "lorem.Example" with type version "lorem-2" -> "lorem-3" | "lorem.One" with type version "lorem-5" -> "lorem-6"
+      return ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, versions.get(retVal + 1)); // Example: "lorem.Example" with type version "lorem-2" -> "lorem-3" | "lorem.One" with type version "lorem-5" -> "lorem-6"
     }
 
     // No exact match found, happens for example if there was no migration handler executed yet for this type name.
@@ -464,11 +545,11 @@ public class DoStructureMigrationInventory {
       if (index + 1 < orderedVersions.size()) {
         // Example: "lorem.Alpha" with type version "lorem-1" -> "lorem-2" based on m_orderedVersions (first relevant migration handler for "lorem.Beta" is in "lorem-4")
         // Example: "lorem.SwitchAndRename" with type version "lorem-5" -> "lorem-6" based on m_orderedVersions (first relevant migration handler for "ipsum.SwitchAndRename" is in "ipsum-3")
-        return orderedVersions.get(index + 1);
+        return ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, orderedVersions.get(index + 1));
       }
 
       // If the current version is the last version in m_orderedVersions then something is wrong
-      return null; // Example: scenario 2
+      return ImmutablePair.of(FindNextMigrationHandlerVersionStatus.INVALID_TYPE_NAME_VERSION_PAIR, null); // Example: scenario 2
     }
 
     // insertionPoint: the index of the first element greater than the key
@@ -478,7 +559,7 @@ public class DoStructureMigrationInventory {
     // Example: "lorem.Switch" with type version "lorem-5" -> "lorem-6"
     // Example: "lorem.Switch" with type version "ipsum-2" -> "lorem-3"
     // Example: "ipsum.SwitchAndRename" with type version "ipsum-2" -> "lorem-3"
-    return versions.get(insertionPoint);
+    return ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, versions.get(insertionPoint));
   }
 
   public Map<String, IDoStructureMigrationHandler> getMigrationHandlers(NamespaceVersion version) {
