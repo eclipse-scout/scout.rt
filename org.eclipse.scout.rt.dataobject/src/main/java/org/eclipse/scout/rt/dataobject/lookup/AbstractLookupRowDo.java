@@ -34,11 +34,6 @@ public abstract class AbstractLookupRowDo<ID> extends DoEntity {
     withActive(true); // lookup rows are active by default
   }
 
-  /**
-   * A subclass should implement this method to specify the concrete attribute type.
-   *
-   * @see AbstractLookupRowDo#ID
-   */
   public abstract DoValue<ID> id();
 
   public DoValue<String> text() {
@@ -73,18 +68,12 @@ public abstract class AbstractLookupRowDo<ID> extends DoEntity {
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
-  /**
-   * See {@link #id()}.
-   */
   @Generated("DoConvenienceMethodsGenerator")
   public AbstractLookupRowDo<ID> withId(ID id) {
     id().set(id);
     return this;
   }
 
-  /**
-   * See {@link #id()}.
-   */
   @Generated("DoConvenienceMethodsGenerator")
   public ID getId() {
     return id().get();

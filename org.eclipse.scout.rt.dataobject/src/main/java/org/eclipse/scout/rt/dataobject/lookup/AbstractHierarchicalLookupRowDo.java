@@ -25,32 +25,28 @@ public abstract class AbstractHierarchicalLookupRowDo<ID> extends AbstractLookup
 
   public static final String PARENT_ID = "parentId";
 
-  /**
-   * A subclass should implement this method to specify the concrete attribute type.
-   *
-   * @see AbstractHierarchicalLookupRowDo#PARENT_ID
-   */
   public abstract DoValue<ID> parentId();
 
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
-  /**
-   * See {@link #parentId()}.
-   */
   @Generated("DoConvenienceMethodsGenerator")
   public AbstractHierarchicalLookupRowDo<ID> withParentId(ID parentId) {
     parentId().set(parentId);
     return this;
   }
 
-  /**
-   * See {@link #parentId()}.
-   */
   @Generated("DoConvenienceMethodsGenerator")
   public ID getParentId() {
     return parentId().get();
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public AbstractHierarchicalLookupRowDo<ID> withId(ID id) {
+    id().set(id);
+    return this;
   }
 
   @Override

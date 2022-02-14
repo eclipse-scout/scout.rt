@@ -34,11 +34,6 @@ public abstract class AbstractLookupRestrictionDo<ID> extends DoEntity {
   public static final String ENABLED = "enabled";
   public static final String MAX_ROW_COUNT = "maxRowCount";
 
-  /**
-   * A subclass should implement this method to specify the concrete attribute type.
-   *
-   * @see AbstractLookupRestrictionDo#IDS
-   */
   public abstract DoList<ID> ids();
 
   public DoValue<String> text() {
@@ -61,27 +56,18 @@ public abstract class AbstractLookupRestrictionDo<ID> extends DoEntity {
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
-  /**
-   * See {@link #ids()}.
-   */
   @Generated("DoConvenienceMethodsGenerator")
   public AbstractLookupRestrictionDo<ID> withIds(Collection<? extends ID> ids) {
     ids().updateAll(ids);
     return this;
   }
 
-  /**
-   * See {@link #ids()}.
-   */
   @Generated("DoConvenienceMethodsGenerator")
   public AbstractLookupRestrictionDo<ID> withIds(ID... ids) {
     ids().updateAll(ids);
     return this;
   }
 
-  /**
-   * See {@link #ids()}.
-   */
   @Generated("DoConvenienceMethodsGenerator")
   public List<ID> getIds() {
     return ids().get();
