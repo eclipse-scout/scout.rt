@@ -9,7 +9,7 @@
 ::
 :: To make this script work you need a current version of Node.js (>=16.13.0), npm (>=8.1.0) and pnpm (>=6.22.2).
 :: Node.js (incl. npm) is available here: https://nodejs.org/.
-:: pnpm is available here: https://pnpm.js.org/
+:: pnpm is available here: https://pnpm.io/
 
 :: Check if node is available
 where node >nul 2>nul
