@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
+import org.eclipse.scout.rt.dataobject.migration.DoStructureMigrationInventory.FindNextMigrationHandlerVersionStatus;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CharlieCustomerFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CharlieCustomerFixtureTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerFixtureDo;
@@ -175,24 +176,72 @@ public class DoStructureMigrationInventoryTest {
   }
 
   @Test
-  public void testFindNextMigrationHandlerVersion() {
+  public void testIsUpToDateOrMigrationAvailable() {
+    // Non-existing type names
+    assertFalse(s_inventory.isUpToDateOrMigrationAvailable("lorem.Ipsum", null));
+    assertFalse(s_inventory.isUpToDateOrMigrationAvailable("lorem.Dolor", CharlieFixture_1.VERSION));
+
     // Missing migration handler from charlieFixture-1 to -2 [lorem.Migrationless].
-    assertNull(s_inventory.findNextMigrationHandlerVersion("charlieFixture.PostalAddressFixture", CharlieFixture_1.VERSION));
+    assertFalse(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.PostalAddressFixture", CharlieFixture_1.VERSION));
 
     // Regular case [lorem.Example]
-    assertEquals(CharlieFixture_2.VERSION, s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", null));
-    assertEquals(CharlieFixture_2.VERSION, s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_1.VERSION));
-    assertEquals(CharlieFixture_3.VERSION, s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_2.VERSION));
-    assertEquals(CharlieFixture_4.VERSION, s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_3.VERSION));
-    assertEquals(CharlieFixture_5.VERSION, s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_4.VERSION));
-    assertNull(s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_5.VERSION)); // current type version
-    assertNull(s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", AlfaFixture_7.VERSION)); // invalid, unknown type version
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", null));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", CharlieFixture_1.VERSION));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", CharlieFixture_2.VERSION));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", CharlieFixture_3.VERSION));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", CharlieFixture_4.VERSION));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", CharlieFixture_5.VERSION)); // current type version
+
+    // invalid, unknown type version
+    assertFalse(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.RoomFixture", AlfaFixture_7.VERSION));
 
     //  [lorem.One/lorem.Two]
-    assertEquals(CharlieFixture_2.VERSION, s_inventory.findNextMigrationHandlerVersion("charlieFixture.BuildingFixture", CharlieFixture_1.VERSION));
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.BuildingFixture", CharlieFixture_1.VERSION));
+
     // invalid, BuildingFixture not available for this type version (next version from full list is returned due to possible renamings)
-    assertEquals(CharlieFixture_4.VERSION, s_inventory.findNextMigrationHandlerVersion("charlieFixture.BuildingFixture", CharlieFixture_3.VERSION));
-    assertNull(s_inventory.findNextMigrationHandlerVersion("charlieFixture.HouseFixture", CharlieFixture_2.VERSION)); // current type version
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.BuildingFixture", CharlieFixture_3.VERSION));
+
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.HouseFixture", CharlieFixture_2.VERSION)); // current type version
+  }
+
+  @Test
+  public void testFindNextMigrationHandlerVersion() {
+    // Missing migration handler from charlieFixture-1 to -2 [lorem.Migrationless].
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.NO_MIGRATION_HANDLERS, null),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.PostalAddressFixture", CharlieFixture_1.VERSION));
+
+    // Regular case [lorem.Example]
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.NO_TYPE_VERSION_YET, CharlieFixture_2.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", null));
+
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_2.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_1.VERSION));
+
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_3.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_2.VERSION));
+
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_4.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_3.VERSION));
+
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_5.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_4.VERSION));
+
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.UP_TO_DATE, null),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", CharlieFixture_5.VERSION)); // current type version
+
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.UNKNOWN_TYPE_VERSION, null),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.RoomFixture", AlfaFixture_7.VERSION)); // invalid, unknown type version
+
+    //  [lorem.One/lorem.Two]
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_2.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.BuildingFixture", CharlieFixture_1.VERSION));
+
+    // invalid, BuildingFixture not available for this type version (next version from full list is returned due to possible renamings)
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, CharlieFixture_4.VERSION),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.BuildingFixture", CharlieFixture_3.VERSION));
+
+    assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.UP_TO_DATE, null),
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.HouseFixture", CharlieFixture_2.VERSION)); // current type version
   }
 
   @Test
