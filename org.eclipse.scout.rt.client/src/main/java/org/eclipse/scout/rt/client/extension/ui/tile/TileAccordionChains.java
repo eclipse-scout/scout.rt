@@ -42,7 +42,7 @@ public final class TileAccordionChains {
           next.execTilesSelected(TilesSelectedChain.this, tiles);
         }
       };
-      callChain(methodInvocation, tiles);
+      callChain(methodInvocation);
     }
   }
 
@@ -59,7 +59,7 @@ public final class TileAccordionChains {
           next.execTileClick(TileClickChain.this, tile, mouseButton);
         }
       };
-      callChain(methodInvocation, tile);
+      callChain(methodInvocation);
     }
   }
 
@@ -76,7 +76,7 @@ public final class TileAccordionChains {
           next.execTileAction(TileActionChain.this, tile);
         }
       };
-      callChain(methodInvocation, tile);
+      callChain(methodInvocation);
     }
   }
 }

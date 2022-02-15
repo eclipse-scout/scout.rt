@@ -40,7 +40,7 @@ public final class ActionChains {
           next.execSelectionChanged(ActionSelectionChangedChain.this, selection);
         }
       };
-      callChain(methodInvocation, selection);
+      callChain(methodInvocation);
     }
   }
 

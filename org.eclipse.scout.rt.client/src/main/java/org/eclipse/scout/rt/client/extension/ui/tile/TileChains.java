@@ -93,7 +93,7 @@ public final class TileChains {
           next.execDataChanged(TileDataChangedTileChain.this, event);
         }
       };
-      callChain(methodInvocation, event);
+      callChain(methodInvocation);
     }
   }
 }

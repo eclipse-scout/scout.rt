@@ -44,7 +44,7 @@ public final class ColumnChains {
           next.execCompleteEdit(ColumnCompleteEditChain.this, row, editingField);
         }
       };
-      callChain(methodInvocation, row, editingField);
+      callChain(methodInvocation);
     }
   }
 
@@ -78,7 +78,7 @@ public final class ColumnChains {
           setReturnValue(next.execParseValue(ColumnParseValueChain.this, row, rawValue));
         }
       };
-      callChain(methodInvocation, row, rawValue);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -96,7 +96,7 @@ public final class ColumnChains {
           setReturnValue(next.execValidateValue(ColumnValidateValueChain.this, row, rawValue));
         }
       };
-      callChain(methodInvocation, row, rawValue);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -114,7 +114,7 @@ public final class ColumnChains {
           setReturnValue(next.execPrepareEdit(ColumnPrepareEditChain.this, row));
         }
       };
-      callChain(methodInvocation, row);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -132,7 +132,7 @@ public final class ColumnChains {
           next.execDecorateHeaderCell(ColumnDecorateHeaderCellChain.this, cell);
         }
       };
-      callChain(methodInvocation, cell);
+      callChain(methodInvocation);
     }
   }
 
@@ -149,7 +149,7 @@ public final class ColumnChains {
           next.execDecorateCell(ColumnDecorateCellChain.this, cell, row);
         }
       };
-      callChain(methodInvocation, cell, row);
+      callChain(methodInvocation);
     }
   }
 

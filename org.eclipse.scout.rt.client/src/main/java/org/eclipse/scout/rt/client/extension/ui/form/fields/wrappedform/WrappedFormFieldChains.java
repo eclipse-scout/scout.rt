@@ -43,7 +43,7 @@ public final class WrappedFormFieldChains {
           next.execInnerFormChanged(WrappedFormFieldInnerFormChangedChain.this, oldInnerForm, newInnerForm);
         }
       };
-      callChain(methodInvocation, oldInnerForm, newInnerForm);
+      callChain(methodInvocation);
     }
   }
 }

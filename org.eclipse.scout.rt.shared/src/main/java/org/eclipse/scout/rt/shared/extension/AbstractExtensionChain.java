@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
-
 /**
  * The abstract class of all extension delegations from extendible methods.
  */
@@ -105,22 +103,26 @@ public abstract class AbstractExtensionChain<EXTENSION> {
     }
   }
 
+  /**
+   * @deprecated As of release 22.0, replaced by {@link #callChain(MethodInvocation)}
+   */
+  @Deprecated
   protected void callChain(MethodInvocation<?> methodInvocation, Object... arguments) {
+    callChain(methodInvocation);
+  }
+
+  protected void callChain(MethodInvocation<?> methodInvocation) {
     if (hasNext()) {
       EXTENSION nextExtension = next();
-      MethodState methodState = new MethodState(CollectionUtility.arrayList(arguments));
       try {
         methodInvocation.callMethod(nextExtension);
-        methodState.setReturnValue(methodInvocation.getReturnValue());
       }
       catch (RuntimeException e) {
         methodInvocation.setException(e);
-        methodState.setException(e);
         throw e;
       }
       catch (Exception e) {
         methodInvocation.setException(e);
-        methodState.setException(e);
       }
       finally {
         previous();

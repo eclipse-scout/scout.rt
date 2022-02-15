@@ -44,7 +44,7 @@ public final class TreeFieldChains {
           next.execSave(TreeFieldSaveChain.this, insertedNodes, updatedNodes, deletedNodes);
         }
       };
-      callChain(methodInvocation, insertedNodes, updatedNodes, deletedNodes);
+      callChain(methodInvocation);
     }
   }
 
@@ -61,7 +61,7 @@ public final class TreeFieldChains {
           next.execSaveDeletedNode(TreeFieldSaveDeletedNodeChain.this, row);
         }
       };
-      callChain(methodInvocation, row);
+      callChain(methodInvocation);
     }
   }
 
@@ -78,7 +78,7 @@ public final class TreeFieldChains {
           next.execSaveUpdatedNode(TreeFieldSaveUpdatedNodeChain.this, row);
         }
       };
-      callChain(methodInvocation, row);
+      callChain(methodInvocation);
     }
   }
 
@@ -95,7 +95,7 @@ public final class TreeFieldChains {
           next.execLoadChildNodes(TreeFieldLoadChildNodesChain.this, parentNode);
         }
       };
-      callChain(methodInvocation, parentNode);
+      callChain(methodInvocation);
     }
   }
 
@@ -112,7 +112,7 @@ public final class TreeFieldChains {
           next.execSaveInsertedNode(TreeFieldSaveInsertedNodeChain.this, row);
         }
       };
-      callChain(methodInvocation, row);
+      callChain(methodInvocation);
     }
   }
 }

@@ -43,7 +43,7 @@ public final class PageFieldChains {
           next.execPageChanged(PageFieldPageChangedChain.this, oldPage, newPage);
         }
       };
-      callChain(methodInvocation, oldPage, newPage);
+      callChain(methodInvocation);
     }
   }
 }

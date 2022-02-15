@@ -43,7 +43,7 @@ public final class TabBoxChains {
           next.execTabSelected(TabBoxTabSelectedChain.this, selectedBox);
         }
       };
-      callChain(methodInvocation, selectedBox);
+      callChain(methodInvocation);
     }
   }
 }

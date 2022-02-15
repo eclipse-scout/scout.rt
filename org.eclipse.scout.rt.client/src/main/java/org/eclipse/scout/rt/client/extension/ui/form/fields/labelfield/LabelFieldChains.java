@@ -42,7 +42,7 @@ public final class LabelFieldChains {
           next.execAppLinkAction(LabelFieldAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, ref);
+      callChain(methodInvocation);
     }
   }
 }

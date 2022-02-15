@@ -43,7 +43,7 @@ public final class SmartColumnChains {
           next.execPrepareLookup(SmartColumnPrepareLookupChain.this, call, row);
         }
       };
-      callChain(methodInvocation, call, row);
+      callChain(methodInvocation);
     }
   }
 }

@@ -42,7 +42,7 @@ public final class BeanFieldChains {
           next.execAppLinkAction(BeanFieldAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, ref);
+      callChain(methodInvocation);
     }
   }
 }

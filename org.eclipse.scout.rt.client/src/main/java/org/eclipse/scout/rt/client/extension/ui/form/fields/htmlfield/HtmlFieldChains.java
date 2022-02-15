@@ -42,7 +42,7 @@ public final class HtmlFieldChains {
           next.execAppLinkAction(HtmlFieldAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, ref);
+      callChain(methodInvocation);
     }
   }
 }

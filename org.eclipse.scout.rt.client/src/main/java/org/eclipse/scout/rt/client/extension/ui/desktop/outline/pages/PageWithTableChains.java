@@ -47,7 +47,7 @@ public final class PageWithTableChains {
           next.execLoadData(PageWithTableLoadDataChain.this, filter);
         }
       };
-      callChain(methodInvocation, filter);
+      callChain(methodInvocation);
     }
   }
 
@@ -64,7 +64,7 @@ public final class PageWithTableChains {
           setReturnValue(next.execCreateChildPage(PageWithTableCreateChildPageChain.this, row));
         }
       };
-      callChain(methodInvocation, row);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }

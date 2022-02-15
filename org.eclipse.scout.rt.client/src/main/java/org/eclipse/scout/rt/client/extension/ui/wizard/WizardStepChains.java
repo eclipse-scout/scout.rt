@@ -41,7 +41,7 @@ public final class WizardStepChains {
           next.execDeactivate(WizardStepDeactivateChain.this, stepKind);
         }
       };
-      callChain(methodInvocation, stepKind);
+      callChain(methodInvocation);
     }
   }
 
@@ -75,7 +75,7 @@ public final class WizardStepChains {
           next.execFormClosed(WizardStepFormClosedChain.this, activation);
         }
       };
-      callChain(methodInvocation, activation);
+      callChain(methodInvocation);
     }
   }
 
@@ -92,7 +92,7 @@ public final class WizardStepChains {
           next.execActivate(WizardStepActivateChain.this, stepKind);
         }
       };
-      callChain(methodInvocation, stepKind);
+      callChain(methodInvocation);
     }
   }
 
@@ -109,7 +109,7 @@ public final class WizardStepChains {
           next.execFormDiscarded(WizardStepFormDiscardedChain.this, activation);
         }
       };
-      callChain(methodInvocation, activation);
+      callChain(methodInvocation);
     }
   }
 
@@ -126,7 +126,7 @@ public final class WizardStepChains {
           next.execFormStored(WizardStepFormStoredChain.this, activation);
         }
       };
-      callChain(methodInvocation, activation);
+      callChain(methodInvocation);
     }
   }
 

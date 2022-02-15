@@ -42,7 +42,7 @@ public final class FormFieldChains {
           next.execDataChanged(FormFieldDataChangedChain.this, dataTypes);
         }
       };
-      callChain(methodInvocation, dataTypes);
+      callChain(methodInvocation);
     }
   }
 
@@ -59,7 +59,7 @@ public final class FormFieldChains {
           next.execAddSearchTerms(FormFieldAddSearchTermsChain.this, search);
         }
       };
-      callChain(methodInvocation, search);
+      callChain(methodInvocation);
     }
   }
 
@@ -76,7 +76,7 @@ public final class FormFieldChains {
           next.execChangedMasterValue(FormFieldChangedMasterValueChain.this, newMasterValue);
         }
       };
-      callChain(methodInvocation, newMasterValue);
+      callChain(methodInvocation);
     }
   }
 

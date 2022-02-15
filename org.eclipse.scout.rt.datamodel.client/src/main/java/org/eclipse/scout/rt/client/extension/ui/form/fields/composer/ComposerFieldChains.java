@@ -53,7 +53,7 @@ public final class ComposerFieldChains {
           setReturnValue(next.execResolveEntityPath(ComposerFieldResolveEntityPathChain.this, node));
         }
       };
-      callChain(methodInvocation, node);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -71,7 +71,7 @@ public final class ComposerFieldChains {
           next.execResolveRootPathForTopLevelEntity(ComposerFieldResolveRootPathForTopLevelEntityChain.this, e, lifeList);
         }
       };
-      callChain(methodInvocation, e, lifeList);
+      callChain(methodInvocation);
     }
   }
 
@@ -106,7 +106,7 @@ public final class ComposerFieldChains {
           setReturnValue(next.execResolveAttributePath(ComposerFieldResolveAttributePathChain.this, node));
         }
       };
-      callChain(methodInvocation, node);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -124,7 +124,7 @@ public final class ComposerFieldChains {
           setReturnValue(next.execCreateAttributeNode(ComposerFieldCreateAttributeNodeChain.this, parentNode, a, aggregationType, op, values, texts));
         }
       };
-      callChain(methodInvocation, parentNode, a, aggregationType, op, values, texts);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -160,7 +160,7 @@ public final class ComposerFieldChains {
           setReturnValue(next.execCreateEitherNode(ComposerFieldCreateEitherNodeChain.this, parentNode, negated));
         }
       };
-      callChain(methodInvocation, parentNode, negated);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -178,7 +178,7 @@ public final class ComposerFieldChains {
           next.execResolveRootPathForTopLevelAttribute(ComposerFieldResolveRootPathForTopLevelAttributeChain.this, a, lifeList);
         }
       };
-      callChain(methodInvocation, a, lifeList);
+      callChain(methodInvocation);
     }
   }
 
@@ -195,7 +195,7 @@ public final class ComposerFieldChains {
           setReturnValue(next.execCreateAdditionalOrNode(ComposerFieldCreateAdditionalOrNodeChain.this, eitherOrNode, negated));
         }
       };
-      callChain(methodInvocation, eitherOrNode, negated);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -213,7 +213,7 @@ public final class ComposerFieldChains {
           setReturnValue(next.execCreateEntityNode(ComposerFieldCreateEntityNodeChain.this, parentNode, e, negated, values, texts));
         }
       };
-      callChain(methodInvocation, parentNode, e, negated, values, texts);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }

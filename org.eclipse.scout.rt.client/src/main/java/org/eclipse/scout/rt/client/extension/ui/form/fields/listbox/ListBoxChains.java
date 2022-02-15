@@ -79,7 +79,7 @@ public final class ListBoxChains {
           next.execFilterLookupResult(ListBoxFilterLookupResultChain.this, call, result);
         }
       };
-      callChain(methodInvocation, call, result);
+      callChain(methodInvocation);
     }
   }
 
@@ -96,7 +96,7 @@ public final class ListBoxChains {
           next.execPrepareLookup(ListBoxPrepareLookupChain.this, call);
         }
       };
-      callChain(methodInvocation, call);
+      callChain(methodInvocation);
     }
   }
 }

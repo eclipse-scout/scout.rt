@@ -40,7 +40,7 @@ public final class ChartChains {
           next.execValueClick(ChartValueClickChain.this, xIndex, yIndex, datasetIndex);
         }
       };
-      callChain(methodInvocation, xIndex, yIndex, datasetIndex);
+      callChain(methodInvocation);
     }
   }
 

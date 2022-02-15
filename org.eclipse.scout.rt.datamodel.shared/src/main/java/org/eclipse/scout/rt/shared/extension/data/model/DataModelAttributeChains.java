@@ -58,7 +58,7 @@ public final class DataModelAttributeChains {
           next.execPrepareLookup(DataModelAttributePrepareLookupChain.this, call);
         }
       };
-      callChain(methodInvocation, call);
+      callChain(methodInvocation);
     }
   }
 }

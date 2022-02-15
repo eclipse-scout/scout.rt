@@ -95,7 +95,7 @@ public final class PageChains {
           next.execDataChanged(PageDataChangedChain.this, dataTypes);
         }
       };
-      callChain(methodInvocation, dataTypes);
+      callChain(methodInvocation);
     }
   }
 
