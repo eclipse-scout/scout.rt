@@ -43,7 +43,7 @@ public final class FormMenuChains {
           next.execInitForm(FormMenuInitFormChain.this, form);
         }
       };
-      callChain(methodInvocation, form);
+      callChain(methodInvocation);
     }
   }
 }

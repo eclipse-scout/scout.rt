@@ -49,7 +49,7 @@ public final class TableChains {
           next.execAppLinkAction(TableAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, ref);
+      callChain(methodInvocation);
     }
   }
 
@@ -66,7 +66,7 @@ public final class TableChains {
           next.execRowAction(TableRowActionChain.this, row);
         }
       };
-      callChain(methodInvocation, row);
+      callChain(methodInvocation);
     }
   }
 
@@ -100,7 +100,7 @@ public final class TableChains {
           setReturnValue(next.execCreateTableRowDataMapper(TableCreateTableRowDataMapperChain.this, rowType));
         }
       };
-      callChain(methodInvocation, rowType);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -135,7 +135,7 @@ public final class TableChains {
           next.execResetColumns(TableResetColumnsChain.this, options);
         }
       };
-      callChain(methodInvocation, options);
+      callChain(methodInvocation);
     }
   }
 
@@ -152,7 +152,7 @@ public final class TableChains {
           next.execDecorateCell(TableDecorateCellChain.this, view, row, col);
         }
       };
-      callChain(methodInvocation, view, row, col);
+      callChain(methodInvocation);
     }
   }
 
@@ -169,7 +169,7 @@ public final class TableChains {
           next.execDrop(TableDropChain.this, row, t);
         }
       };
-      callChain(methodInvocation, row, t);
+      callChain(methodInvocation);
     }
   }
 
@@ -203,7 +203,7 @@ public final class TableChains {
           next.execRowClick(TableRowClickChain.this, row, mouseButton);
         }
       };
-      callChain(methodInvocation, row, mouseButton);
+      callChain(methodInvocation);
     }
   }
 
@@ -220,7 +220,7 @@ public final class TableChains {
           next.execRowsChecked(TableRowsCheckedChain.this, rows);
         }
       };
-      callChain(methodInvocation, rows);
+      callChain(methodInvocation);
     }
   }
 
@@ -237,7 +237,7 @@ public final class TableChains {
           next.execDecorateRow(TableDecorateRowChain.this, row);
         }
       };
-      callChain(methodInvocation, row);
+      callChain(methodInvocation);
     }
   }
 
@@ -254,7 +254,7 @@ public final class TableChains {
           setReturnValue(next.execCopy(TableCopyChain.this, rows));
         }
       };
-      callChain(methodInvocation, rows);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -272,7 +272,7 @@ public final class TableChains {
           next.execRowsSelected(TableRowsSelectedChain.this, rows);
         }
       };
-      callChain(methodInvocation, rows);
+      callChain(methodInvocation);
     }
   }
 
@@ -289,7 +289,7 @@ public final class TableChains {
           setReturnValue(next.execDrag(TableDragChain.this, rows));
         }
       };
-      callChain(methodInvocation, rows);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }

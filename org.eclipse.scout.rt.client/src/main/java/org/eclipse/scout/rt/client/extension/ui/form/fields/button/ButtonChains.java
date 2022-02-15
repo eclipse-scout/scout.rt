@@ -42,7 +42,7 @@ public final class ButtonChains {
           next.execSelectionChanged(ButtonSelectionChangedChain.this, selection);
         }
       };
-      callChain(methodInvocation, selection);
+      callChain(methodInvocation);
     }
   }
 

@@ -44,7 +44,7 @@ public final class SequenceBoxChains {
           setReturnValue(next.execIsLabelSuffixCandidate(SequenceBoxIsLabelSuffixCandidateChain.this, formField));
         }
       };
-      callChain(methodInvocation, formField);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -62,7 +62,7 @@ public final class SequenceBoxChains {
           next.execCheckFromTo(SequenceBoxCheckFromToChain.this, valueFields, changedIndex);
         }
       };
-      callChain(methodInvocation, valueFields, changedIndex);
+      callChain(methodInvocation);
     }
   }
 

@@ -44,7 +44,7 @@ public final class RadioButtonGroupChains {
           next.execPrepareLookup(RadioButtonGroupPrepareLookupChain.this, call);
         }
       };
-      callChain(methodInvocation, call);
+      callChain(methodInvocation);
     }
   }
 
@@ -61,7 +61,7 @@ public final class RadioButtonGroupChains {
           next.execFilterLookupResult(RadioButtonGroupFilterLookupResultChain.this, call, result);
         }
       };
-      callChain(methodInvocation, call, result);
+      callChain(methodInvocation);
     }
   }
 }

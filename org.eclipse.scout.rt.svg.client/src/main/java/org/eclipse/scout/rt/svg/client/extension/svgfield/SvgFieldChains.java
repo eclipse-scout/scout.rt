@@ -43,7 +43,7 @@ public final class SvgFieldChains {
           next.execClicked(SvgFieldClickedChain.this, e);
         }
       };
-      callChain(methodInvocation, e);
+      callChain(methodInvocation);
     }
   }
 
@@ -60,7 +60,7 @@ public final class SvgFieldChains {
           next.execAppLinkAction(SvgFieldAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, ref);
+      callChain(methodInvocation);
     }
   }
 }

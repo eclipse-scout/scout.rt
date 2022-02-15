@@ -95,7 +95,7 @@ public final class DesktopChains {
           next.execPageDetailFormChanged(DesktopPageDetailFormChangedChain.this, oldForm, newForm);
         }
       };
-      callChain(methodInvocation, oldForm, newForm);
+      callChain(methodInvocation);
     }
   }
 
@@ -112,7 +112,7 @@ public final class DesktopChains {
           next.execTablePageLoaded(DesktopTablePageLoadedChain.this, tablePage);
         }
       };
-      callChain(methodInvocation, tablePage);
+      callChain(methodInvocation);
     }
   }
 
@@ -129,7 +129,7 @@ public final class DesktopChains {
           next.execOutlineChanged(DesktopOutlineChangedChain.this, oldOutline, newOutline);
         }
       };
-      callChain(methodInvocation, oldOutline, newOutline);
+      callChain(methodInvocation);
     }
   }
 
@@ -146,7 +146,7 @@ public final class DesktopChains {
           setReturnValue(next.execFormAboutToShow(DesktopFormAboutToShowChain.this, form));
         }
       };
-      callChain(methodInvocation, form);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -181,7 +181,7 @@ public final class DesktopChains {
           next.execPageSearchFormChanged(DesktopPageSearchFormChangedChain.this, oldForm, newForm);
         }
       };
-      callChain(methodInvocation, oldForm, newForm);
+      callChain(methodInvocation);
     }
   }
 
@@ -198,7 +198,7 @@ public final class DesktopChains {
           next.execPageDetailTableChanged(DesktopPageDetailTableChangedChain.this, oldTable, newTable);
         }
       };
-      callChain(methodInvocation, oldTable, newTable);
+      callChain(methodInvocation);
     }
   }
 

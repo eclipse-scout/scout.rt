@@ -61,7 +61,7 @@ public final class ImageFieldChains {
           next.execDropRequest(ImageFieldDropRequestChain.this, transferObject);
         }
       };
-      callChain(methodInvocation, transferObject);
+      callChain(methodInvocation);
     }
   }
 }

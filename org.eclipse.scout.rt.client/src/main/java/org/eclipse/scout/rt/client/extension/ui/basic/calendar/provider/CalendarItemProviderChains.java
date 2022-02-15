@@ -44,7 +44,7 @@ public final class CalendarItemProviderChains {
           next.execLoadItems(CalendarItemProviderLoadItemsChain.this, minDate, maxDate, result);
         }
       };
-      callChain(methodInvocation, minDate, maxDate, result);
+      callChain(methodInvocation);
     }
   }
 
@@ -61,7 +61,7 @@ public final class CalendarItemProviderChains {
           next.execItemAction(CalendarItemProviderItemActionChain.this, item);
         }
       };
-      callChain(methodInvocation, item);
+      callChain(methodInvocation);
     }
   }
 
@@ -78,7 +78,7 @@ public final class CalendarItemProviderChains {
           next.execLoadItemsInBackground(CalendarItemProviderLoadItemsInBackgroundChain.this, session, minDate, maxDate, result);
         }
       };
-      callChain(methodInvocation, session, minDate, maxDate, result);
+      callChain(methodInvocation);
     }
   }
 
@@ -95,7 +95,7 @@ public final class CalendarItemProviderChains {
           next.execItemMoved(CalendarItemProviderItemMovedChain.this, item, fromDate, toDate);
         }
       };
-      callChain(methodInvocation, item, fromDate, toDate);
+      callChain(methodInvocation);
     }
   }
 

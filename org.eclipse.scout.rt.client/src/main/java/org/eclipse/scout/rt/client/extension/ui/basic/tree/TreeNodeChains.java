@@ -41,7 +41,7 @@ public final class TreeNodeChains {
           next.execDecorateCell(TreeNodeDecorateCellChain.this, cell);
         }
       };
-      callChain(methodInvocation, cell);
+      callChain(methodInvocation);
     }
   }
 

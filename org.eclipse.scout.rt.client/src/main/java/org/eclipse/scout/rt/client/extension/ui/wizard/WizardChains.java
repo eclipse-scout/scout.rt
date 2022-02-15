@@ -199,7 +199,7 @@ public final class WizardChains {
           next.execAnyFieldChanged(WizardAnyFieldChangedChain.this, source);
         }
       };
-      callChain(methodInvocation, source);
+      callChain(methodInvocation);
     }
   }
 
@@ -233,7 +233,7 @@ public final class WizardChains {
           next.execAppLinkAction(WizardAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, ref);
+      callChain(methodInvocation);
     }
   }
 
@@ -250,7 +250,7 @@ public final class WizardChains {
           next.execStepAction(WizardStepActionChain.this, step);
         }
       };
-      callChain(methodInvocation, step);
+      callChain(methodInvocation);
     }
   }
 

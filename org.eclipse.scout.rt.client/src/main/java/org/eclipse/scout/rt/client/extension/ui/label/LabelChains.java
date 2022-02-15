@@ -40,7 +40,7 @@ public final class LabelChains {
           next.execAppLinkAction(LabelAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, ref);
+      callChain(methodInvocation);
     }
   }
 }

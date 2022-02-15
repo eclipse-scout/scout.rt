@@ -63,7 +63,7 @@ public final class TileFieldChains {
           next.execDropRequest(TileFieldDropRequestChain.this, transferObject);
         }
       };
-      callChain(methodInvocation, transferObject);
+      callChain(methodInvocation);
     }
   }
 }

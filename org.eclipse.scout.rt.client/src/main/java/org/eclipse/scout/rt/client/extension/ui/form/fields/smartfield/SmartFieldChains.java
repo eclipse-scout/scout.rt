@@ -44,7 +44,7 @@ public final class SmartFieldChains {
           next.execFilterBrowseLookupResult(SmartFieldFilterBrowseLookupResultChain.this, call, result);
         }
       };
-      callChain(methodInvocation, call, result);
+      callChain(methodInvocation);
     }
   }
 
@@ -61,7 +61,7 @@ public final class SmartFieldChains {
           next.execFilterKeyLookupResult(SmartFieldFilterKeyLookupResultChain.this, call, result);
         }
       };
-      callChain(methodInvocation, call, result);
+      callChain(methodInvocation);
     }
   }
 
@@ -78,7 +78,7 @@ public final class SmartFieldChains {
           next.execPrepareLookup(SmartFieldPrepareLookupChain.this, call);
         }
       };
-      callChain(methodInvocation, call);
+      callChain(methodInvocation);
     }
   }
 
@@ -95,7 +95,7 @@ public final class SmartFieldChains {
           next.execPrepareTextLookup(SmartFieldPrepareTextLookupChain.this, call, text);
         }
       };
-      callChain(methodInvocation, call, text);
+      callChain(methodInvocation);
     }
   }
 
@@ -112,7 +112,7 @@ public final class SmartFieldChains {
           next.execPrepareBrowseLookup(SmartFieldPrepareBrowseLookupChain.this, call);
         }
       };
-      callChain(methodInvocation, call);
+      callChain(methodInvocation);
     }
   }
 
@@ -129,7 +129,7 @@ public final class SmartFieldChains {
           next.execFilterTextLookupResult(SmartFieldFilterTextLookupResultChain.this, call, result);
         }
       };
-      callChain(methodInvocation, call, result);
+      callChain(methodInvocation);
     }
   }
 
@@ -146,7 +146,7 @@ public final class SmartFieldChains {
           next.execPrepareRecLookup(SmartFieldPrepareRecLookupChain.this, call, parentKey);
         }
       };
-      callChain(methodInvocation, call, parentKey);
+      callChain(methodInvocation);
     }
   }
 
@@ -163,7 +163,7 @@ public final class SmartFieldChains {
           next.execFilterLookupResult(SmartFieldFilterLookupResultChain.this, call, result);
         }
       };
-      callChain(methodInvocation, call, result);
+      callChain(methodInvocation);
     }
   }
 
@@ -180,7 +180,7 @@ public final class SmartFieldChains {
           next.execFilterRecLookupResult(SmartFieldFilterRecLookupResultChain.this, call, result);
         }
       };
-      callChain(methodInvocation, call, result);
+      callChain(methodInvocation);
     }
   }
 
@@ -197,7 +197,7 @@ public final class SmartFieldChains {
           next.execPrepareKeyLookup(SmartFieldPrepareKeyLookupChain.this, call, key);
         }
       };
-      callChain(methodInvocation, call, key);
+      callChain(methodInvocation);
     }
   }
 }

@@ -61,7 +61,7 @@ public final class TableFieldChains {
           next.execSaveInsertedRow(TableFieldSaveInsertedRowChain.this, row);
         }
       };
-      callChain(methodInvocation, row);
+      callChain(methodInvocation);
     }
   }
 
@@ -78,7 +78,7 @@ public final class TableFieldChains {
           next.execSaveUpdatedRow(TableFieldSaveUpdatedRowChain.this, row);
         }
       };
-      callChain(methodInvocation, row);
+      callChain(methodInvocation);
     }
   }
 
@@ -95,7 +95,7 @@ public final class TableFieldChains {
           next.execSaveDeletedRow(TableFieldSaveDeletedRowChain.this, row);
         }
       };
-      callChain(methodInvocation, row);
+      callChain(methodInvocation);
     }
   }
 
@@ -112,7 +112,7 @@ public final class TableFieldChains {
           next.execSave(TableFieldSaveChain.this, insertedRows, updatedRows, deletedRows);
         }
       };
-      callChain(methodInvocation, insertedRows, updatedRows, deletedRows);
+      callChain(methodInvocation);
     }
   }
 }

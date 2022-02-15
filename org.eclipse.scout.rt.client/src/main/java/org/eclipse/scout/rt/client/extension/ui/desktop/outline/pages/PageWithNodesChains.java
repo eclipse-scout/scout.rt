@@ -43,7 +43,7 @@ public final class PageWithNodesChains {
           next.execCreateChildPages(PageWithNodesCreateChildPagesChain.this, pageList);
         }
       };
-      callChain(methodInvocation, pageList);
+      callChain(methodInvocation);
     }
   }
 }

@@ -45,7 +45,7 @@ public final class TreeBoxChains {
           next.execFilterNewNode(TreeBoxFilterNewNodeChain.this, newNode, treeLevel);
         }
       };
-      callChain(methodInvocation, newNode, treeLevel);
+      callChain(methodInvocation);
     }
   }
 
@@ -62,7 +62,7 @@ public final class TreeBoxChains {
           next.execLoadChildNodes(TreeBoxLoadChildNodesChain.this, parentNode);
         }
       };
-      callChain(methodInvocation, parentNode);
+      callChain(methodInvocation);
     }
   }
 
@@ -79,7 +79,7 @@ public final class TreeBoxChains {
           next.execPrepareLookup(TreeBoxPrepareLookupChain.this, call, parent);
         }
       };
-      callChain(methodInvocation, call, parent);
+      callChain(methodInvocation);
     }
   }
 
@@ -96,7 +96,7 @@ public final class TreeBoxChains {
           next.execFilterLookupResult(TreeBoxFilterLookupResultChain.this, call, result);
         }
       };
-      callChain(methodInvocation, call, result);
+      callChain(methodInvocation);
     }
   }
 }

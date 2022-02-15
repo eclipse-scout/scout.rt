@@ -44,7 +44,7 @@ public final class PlannerChains {
           next.execResourcesSelected(PlannerResourcesSelectedChain.this, resources);
         }
       };
-      callChain(methodInvocation, resources);
+      callChain(methodInvocation);
     }
   }
 
@@ -61,7 +61,7 @@ public final class PlannerChains {
           next.execSelectionRangeChanged(PlannerSelectionRangeChangedChain.this, selectionRange);
         }
       };
-      callChain(methodInvocation, selectionRange);
+      callChain(methodInvocation);
     }
   }
 
@@ -78,7 +78,7 @@ public final class PlannerChains {
           next.execViewRangeChanged(PlannerViewRangeChangedChain.this, viewRange);
         }
       };
-      callChain(methodInvocation, viewRange);
+      callChain(methodInvocation);
     }
   }
 
@@ -95,7 +95,7 @@ public final class PlannerChains {
           next.execDisplayModeChanged(PlannerDisplayModeChangedChain.this, displayMode);
         }
       };
-      callChain(methodInvocation, displayMode);
+      callChain(methodInvocation);
     }
   }
 
@@ -112,7 +112,7 @@ public final class PlannerChains {
           next.execActivitySelected(PlannerActivitySelectedChain.this, cell);
         }
       };
-      callChain(methodInvocation, cell);
+      callChain(methodInvocation);
     }
   }
 
@@ -146,7 +146,7 @@ public final class PlannerChains {
           next.execDecorateActivityCell(PlannerDecorateActivityChain.this, cell);
         }
       };
-      callChain(methodInvocation, cell);
+      callChain(methodInvocation);
     }
   }
 

@@ -43,7 +43,7 @@ public final class OutlineChains {
           next.execCreateChildPages(OutlineCreateChildPagesChain.this, pageList);
         }
       };
-      callChain(methodInvocation, pageList);
+      callChain(methodInvocation);
     }
   }
 

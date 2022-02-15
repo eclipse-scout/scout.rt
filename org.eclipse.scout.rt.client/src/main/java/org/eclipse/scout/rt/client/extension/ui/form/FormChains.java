@@ -131,7 +131,7 @@ public final class FormChains {
           next.execResetSearchFilter(FormResetSearchFilterChain.this, searchFilter);
         }
       };
-      callChain(methodInvocation, searchFilter);
+      callChain(methodInvocation);
     }
   }
 
@@ -148,7 +148,7 @@ public final class FormChains {
           next.execAddSearchTerms(FormAddSearchTermsChain.this, search);
         }
       };
-      callChain(methodInvocation, search);
+      callChain(methodInvocation);
     }
   }
 
@@ -165,7 +165,7 @@ public final class FormChains {
           next.execOnVetoException(FormOnVetoExceptionChain.this, e, code);
         }
       };
-      callChain(methodInvocation, e, code);
+      callChain(methodInvocation);
     }
   }
 
@@ -216,7 +216,7 @@ public final class FormChains {
           next.execTimer(FormTimerChain.this, timerId);
         }
       };
-      callChain(methodInvocation, timerId);
+      callChain(methodInvocation);
     }
   }
 
@@ -286,7 +286,7 @@ public final class FormChains {
           next.execOnCloseRequest(FormOnCloseRequestChain.this, kill, enabledButtonSystemTypes);
         }
       };
-      callChain(methodInvocation, kill, enabledButtonSystemTypes);
+      callChain(methodInvocation);
     }
   }
 
@@ -303,7 +303,7 @@ public final class FormChains {
           next.execDataChanged(FormDataChangedChain.this, dataTypes);
         }
       };
-      callChain(methodInvocation, dataTypes);
+      callChain(methodInvocation);
     }
   }
 }

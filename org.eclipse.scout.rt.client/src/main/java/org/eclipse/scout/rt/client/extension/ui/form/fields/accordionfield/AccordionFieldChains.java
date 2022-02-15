@@ -62,7 +62,7 @@ public final class AccordionFieldChains {
           next.execDropRequest(AccordionFieldDropRequestChain.this, transferObject);
         }
       };
-      callChain(methodInvocation, transferObject);
+      callChain(methodInvocation);
     }
   }
 }

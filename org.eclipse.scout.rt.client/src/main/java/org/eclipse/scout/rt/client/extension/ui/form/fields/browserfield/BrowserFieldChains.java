@@ -42,7 +42,7 @@ public final class BrowserFieldChains {
           next.execPostMessage(BrowserFieldPostMessageChain.this, data, origin);
         }
       };
-      callChain(methodInvocation, data, origin);
+      callChain(methodInvocation);
     }
   }
 
@@ -59,7 +59,7 @@ public final class BrowserFieldChains {
           next.execExternalWindowStateChanged(BrowserFieldExternalWindowStateChangedChain.this, windowState);
         }
       };
-      callChain(methodInvocation, windowState);
+      callChain(methodInvocation);
     }
   }
 }

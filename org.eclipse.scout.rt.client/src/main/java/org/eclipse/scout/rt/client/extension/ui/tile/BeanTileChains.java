@@ -41,7 +41,7 @@ public final class BeanTileChains {
           next.execAppLinkAction(BeanTileAppLinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, ref);
+      callChain(methodInvocation);
     }
   }
 

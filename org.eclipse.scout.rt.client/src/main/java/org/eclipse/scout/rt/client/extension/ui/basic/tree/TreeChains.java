@@ -46,7 +46,7 @@ public final class TreeChains {
           next.execDrop(TreeDropChain.this, node, t);
         }
       };
-      callChain(methodInvocation, node, t);
+      callChain(methodInvocation);
     }
   }
 
@@ -80,7 +80,7 @@ public final class TreeChains {
           next.execDropTargetChanged(TreeDropTargetChangedChain.this, node);
         }
       };
-      callChain(methodInvocation, node);
+      callChain(methodInvocation);
     }
   }
 
@@ -97,7 +97,7 @@ public final class TreeChains {
           setReturnValue(next.execDrag(TreeDragNodesChain.this, nodes));
         }
       };
-      callChain(methodInvocation, nodes);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -115,7 +115,7 @@ public final class TreeChains {
           next.execNodeAction(TreeNodeActionChain.this, node);
         }
       };
-      callChain(methodInvocation, node);
+      callChain(methodInvocation);
     }
   }
 
@@ -132,7 +132,7 @@ public final class TreeChains {
           next.execNodeClick(TreeNodeClickChain.this, node, mouseButton);
         }
       };
-      callChain(methodInvocation, node, mouseButton);
+      callChain(methodInvocation);
     }
   }
 
@@ -149,7 +149,7 @@ public final class TreeChains {
           next.execNodesChecked(TreeNodesCheckedChain.this, nodes);
         }
       };
-      callChain(methodInvocation, nodes);
+      callChain(methodInvocation);
     }
   }
 
@@ -166,7 +166,7 @@ public final class TreeChains {
           next.execAutoCheckChildNodes(TreeAutoCheckChildNodesChain.this, nodes, checked, enabledNodesOnly);
         }
       };
-      callChain(methodInvocation, nodes);
+      callChain(methodInvocation);
     }
   }
 
@@ -183,7 +183,7 @@ public final class TreeChains {
           next.execAppLinkAction(TreeHyperlinkActionChain.this, ref);
         }
       };
-      callChain(methodInvocation, ref);
+      callChain(methodInvocation);
     }
   }
 
@@ -200,7 +200,7 @@ public final class TreeChains {
           next.execNodesSelected(TreeNodesSelectedChain.this, e);
         }
       };
-      callChain(methodInvocation, e);
+      callChain(methodInvocation);
     }
   }
 
@@ -234,7 +234,7 @@ public final class TreeChains {
           next.execDecorateCell(TreeDecorateCellChain.this, node, cell);
         }
       };
-      callChain(methodInvocation, node, cell);
+      callChain(methodInvocation);
     }
   }
 
@@ -251,7 +251,7 @@ public final class TreeChains {
           setReturnValue(next.execDrag(TreeDragNodeChain.this, node));
         }
       };
-      callChain(methodInvocation, node);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }

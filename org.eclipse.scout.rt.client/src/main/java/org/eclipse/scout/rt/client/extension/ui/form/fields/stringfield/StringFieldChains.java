@@ -43,7 +43,7 @@ public final class StringFieldChains {
           next.execDropRequest(StringFieldDropRequestChain.this, transferObject);
         }
       };
-      callChain(methodInvocation, transferObject);
+      callChain(methodInvocation);
     }
   }
 

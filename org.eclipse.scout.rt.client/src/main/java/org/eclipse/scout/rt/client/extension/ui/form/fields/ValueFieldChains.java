@@ -41,7 +41,7 @@ public final class ValueFieldChains {
           setReturnValue(next.execValidateValue(ValueFieldValidateValueChain.this, rawValue));
         }
       };
-      callChain(methodInvocation, rawValue);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -59,7 +59,7 @@ public final class ValueFieldChains {
           setReturnValue(next.execFormatValue(ValueFieldFormatValueChain.this, validValue));
         }
       };
-      callChain(methodInvocation, validValue);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }
@@ -94,7 +94,7 @@ public final class ValueFieldChains {
           setReturnValue(next.execParseValue(ValueFieldParseValueChain.this, text));
         }
       };
-      callChain(methodInvocation, text);
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }

@@ -43,7 +43,7 @@ public final class DataModelAggregationFieldChains {
           next.execAttributeChanged(DataModelAggregationFieldAttributeChangedChain.this, attribute);
         }
       };
-      callChain(methodInvocation, attribute);
+      callChain(methodInvocation);
     }
   }
 }

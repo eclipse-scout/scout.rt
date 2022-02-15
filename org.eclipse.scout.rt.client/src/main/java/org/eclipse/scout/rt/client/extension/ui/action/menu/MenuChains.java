@@ -42,7 +42,7 @@ public final class MenuChains {
           next.execOwnerValueChanged(MenuOwnerValueChangedChain.this, newOwnerValue);
         }
       };
-      callChain(methodInvocation, newOwnerValue);
+      callChain(methodInvocation);
     }
   }
 }

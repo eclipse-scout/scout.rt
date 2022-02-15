@@ -45,7 +45,7 @@ public final class CalendarChains {
           next.execFilterCalendarItems(CalendarFilterCalendarItemsChain.this, changedProviderTypes, componentsByProvider);
         }
       };
-      callChain(methodInvocation, changedProviderTypes, componentsByProvider);
+      callChain(methodInvocation);
     }
   }
 
