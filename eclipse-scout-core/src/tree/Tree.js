@@ -1443,7 +1443,7 @@ export default class Tree extends Widget {
       }
 
       if (node.expanded) {
-        node.ensureLoadChildren().done(this._addChildrenToFlatList.bind(this, node, null, renderAnimated, null, false));
+        node.ensureLoadChildren().done(this._addChildrenToFlatList.bind(this, node, null, renderAnimated, null, true /* required that ctrl+shift+add expands all rows of a table-page */));
       } else {
         this._removeChildrenFromFlatList(node, renderAnimated);
       }
@@ -1476,7 +1476,7 @@ export default class Tree extends Widget {
       return;
     }
     if (node.expanded || node.expandedLazy) {
-      this._addChildrenToFlatList(node, null, false, null, false);
+      this._addChildrenToFlatList(node, null, false, null, true /* required so that double clicking a table-page-row expands the clicked child row */);
     } else {
       this._removeChildrenFromFlatList(node, false);
     }
@@ -2841,21 +2841,6 @@ export default class Tree extends Widget {
 
       if (this.rendered) {
         this.viewRangeDirty = true;
-      }
-    } else {
-      // this else branch is required when the filter-state of a node has not changed
-      // for instance Node "Telefon mit Sabrina" is visible for filter "tel" and also
-      // for filter "abr". However, it is possible that the node is _not_ attached, when
-      // we switch from one filter to another, because the node was not in the view-range
-      // with the previous filter. That's why we must make sure, the node is attached to
-      // the DOM, even though the filter state hasn't changed. Otherwise we'd have a
-      // problem when we insert nodes in this._insertNodeInDOMAtPlace.
-      if (!node.attached) {
-        this.showNode(node, animated);
-        if (node.attached) {
-          // If sibling nodes are hiding at the same time, the nodes to be shown should be added after these nodes to make the animation look correctly -> move them
-          node.$node.insertAfter(node.$node.nextAll('.hiding:last'));
-        }
       }
     }
 
