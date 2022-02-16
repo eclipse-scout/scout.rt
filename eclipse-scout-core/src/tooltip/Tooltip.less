@@ -17,11 +17,6 @@
   #scout.drop-shadow(@y: 4px, @blur: 6px, @alpha: 5%);
   max-width: 300px;
   white-space: normal;
-
-  &.has-menus {
-    padding-top: 6px;
-    padding-bottom: 6px;
-  }
 }
 
 .tooltip-content {
@@ -37,6 +32,7 @@
     font-weight: @font-weight-bold;
     padding-left: @context-menu-item-padding-left;
     padding-right: @context-menu-item-padding-right;
+    padding-top: @tooltip-padding-y + 6px;
   }
 
   & .small {
@@ -53,6 +49,12 @@
 
 .tooltip-menus {
   position: relative;
+  background-color: inherit; // Necessary if arrow has a border
+  padding-bottom: 6px;
+
+  .no-text > & {
+    padding-top: 6px;
+  }
 
   & > .menu-item {
     display: flex;
