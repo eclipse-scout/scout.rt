@@ -267,7 +267,7 @@ export default class Device {
     let browsers = Device.Browser;
     return (browser === browsers.CHROME && version >= 69)
       || (browser === browsers.FIREFOX && version >= 62)
-      || (browser === browsers.SAFARI && version >= 607.1);
+      || (browser === browsers.SAFARI && version >= 12);
   }
 
   /**
@@ -364,7 +364,11 @@ export default class Device {
     } else if (this.browser === browsers.EDGE) {
       versionRegex = /Edge\/([0-9]+\.?[0-9]*)/;
     } else if (this.browser === browsers.SAFARI) {
-      versionRegex = /AppleWebKit\/([0-9]+\.?[0-9]*)/;
+      if (this.isIos() && userAgent.indexOf('Version/') < 0) {
+        this.browserVersion = this.systemVersion;
+        return;
+      }
+      versionRegex = /Version\/([0-9]+\.?[0-9]*)/;
     } else if (this.browser === browsers.FIREFOX) {
       versionRegex = /Firefox\/([0-9]+\.?[0-9]*)/;
     } else if (this.browser === browsers.CHROME) {

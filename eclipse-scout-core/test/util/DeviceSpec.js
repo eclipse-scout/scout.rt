@@ -71,7 +71,7 @@ describe('Device', () => {
         systemVersion: 6,
         type: Device.Type.MOBILE,
         browser: Device.Browser.SAFARI,
-        browserVersion: 536.26
+        browserVersion: 6
       });
 
       // iPad 3
@@ -80,7 +80,7 @@ describe('Device', () => {
         systemVersion: 5.1,
         type: Device.Type.TABLET,
         browser: Device.Browser.SAFARI,
-        browserVersion: 534.46
+        browserVersion: 5.1
       });
 
       // iPad 3 (home screen icon mode)
@@ -97,7 +97,25 @@ describe('Device', () => {
         systemVersion: 13.3,
         type: Device.Type.TABLET,
         browser: Device.Browser.SAFARI,
-        browserVersion: 605.1
+        browserVersion: 13.3
+      });
+
+      // iPhone with Firefox for iOS
+      test('Mozilla/5.0 (iPhone; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4', {
+        system: Device.System.IOS,
+        systemVersion: 8.3,
+        type: Device.Type.MOBILE,
+        browser: Device.Browser.SAFARI,
+        browserVersion: 8.3
+      });
+
+      // iPhone with Edge for iOS
+      test('Mozilla/5.0 (iPhone; CPU iPhone OS 15_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) EdgiOS/97.0.1072.80 Version/15.0 Mobile/15E148 Safari/604.1', {
+        system: Device.System.IOS,
+        systemVersion: 15.3,
+        type: Device.Type.MOBILE,
+        browser: Device.Browser.SAFARI,
+        browserVersion: 15.0
       });
     });
 
@@ -155,7 +173,7 @@ describe('Device', () => {
 
       // Safari (6)
       _test('Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
-        Device.Browser.SAFARI, 536.26);
+        Device.Browser.SAFARI, 6.0);
 
       // Firefox (21) from v21 Firefox supports ECMA 5
       _test('Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1',
