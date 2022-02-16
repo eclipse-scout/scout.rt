@@ -34,7 +34,7 @@ export default class TreeLayout extends AbstractLayout {
     })
       .subtract(htmlContainer.insets());
 
-    if (this.tree.toggleBreadcrumbStyleEnabled) {
+    if (this.tree.toggleBreadcrumbStyleEnabled && this._sizeChanged(htmlContainer)) {
       this.tree.setBreadcrumbStyleActive(Math.floor(containerSize.width) <= this.tree.breadcrumbTogglingThreshold);
     }
 
