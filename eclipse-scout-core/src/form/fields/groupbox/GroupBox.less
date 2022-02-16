@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -119,6 +119,7 @@
     display: inline-block;
     vertical-align: middle;
     padding: @group-box-title-padding-top 0 @group-box-title-padding-bottom 0;
+    max-width: 100%;
 
     .group-box.has-sub-label > & {
       padding-bottom: @group-box-title-with-sub-label-padding-bottom;
@@ -135,6 +136,7 @@
       font-size: @sub-title-font-size;
       letter-spacing: @sub-title-letter-spacing;
       color: @sub-title-color;
+      #scout.overflow-ellipsis();
     }
   }
 
