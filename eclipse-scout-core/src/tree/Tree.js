@@ -1434,7 +1434,7 @@ export default class Tree extends Widget {
         }
       } else if (renderExpansionOpts.expandLazyChanged) {
         node.childNodes.forEach(child => {
-          this.applyFiltersForNode(child, false, renderAnimated);
+          this.applyFiltersForNode(child, true, renderAnimated);
         });
       }
 
@@ -1476,7 +1476,7 @@ export default class Tree extends Widget {
       return;
     }
     if (node.expanded || node.expandedLazy) {
-      this._addChildrenToFlatList(node, null, false, null, true /* required so that double clicking a table-page-row expands the clicked child row */);
+      this._addChildrenToFlatList(node, null, true, null, true /* required so that double clicking a table-page-row expands the clicked child row */);
     } else {
       this._removeChildrenFromFlatList(node, false);
     }
@@ -1652,8 +1652,6 @@ export default class Tree extends Widget {
         this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
         insertBatch = this.newInsertBatch(insertBatch.nextBatchInsertIndex());
         insertBatch = this._addChildrenToFlatListIfExpanded(1, node, insertIndex, animatedRendering, insertBatch, forceFilter);
-        // do not animate following
-        animatedRendering = false;
       } else {
         insertBatch.insertNodes.push(node);
         this.visibleNodesMap[node.id] = true;
@@ -2771,7 +2769,8 @@ export default class Tree extends Widget {
   filterVisibleNodes(animated) {
     // Filter nodes
     let newlyHidden = [];
-    for (let i = 0; i < this.visibleNodesFlat.length; i++) {
+    // iterate from end to beginning (child nodes first) so that the state of the children has already been updated
+    for (let i = this.visibleNodesFlat.length - 1; i >= 0; i--) {
       let node = this.visibleNodesFlat[i];
       let result = this._applyFiltersForNodeRec(node, false, animated);
       if (result.newlyHidden.length) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1300,6 +1300,50 @@ describe('Tree', () => {
       expect(child0.expanded).toBe(true);
       expect(tree.$selectedNodes().length).toBe(1);
       expect(grandchild0.$node.isSelected()).toBe(true);
+    });
+
+    it('only shows selected in breadcrumb mode', () => {
+      let model = helper.createModelFixture(10, 2);
+      let tree = helper.createTree(model);
+      tree.render(session.$entryPoint);
+
+      let nodeToExpand = tree.nodes[1];
+      tree._expandAllParentNodes(nodeToExpand);
+      tree.setNodeExpanded(nodeToExpand, true);
+      tree.setNodeExpanded(nodeToExpand, false);
+      expect(nodeToExpand.expanded).toBe(false);
+
+      let firstExpanded = nodeToExpand.childNodes[2];
+      // tree.setNodeExpanded(firstExpanded, true);
+      tree.doNodeAction(firstExpanded, true);
+      expect(firstExpanded.expanded).toBe(true);
+
+      let secondExpanded = nodeToExpand.childNodes[3];
+      // tree.setNodeExpanded(secondExpanded, true);
+      tree.doNodeAction(secondExpanded, true);
+      expect(secondExpanded.expanded).toBe(true);
+
+      tree.selectNode(firstExpanded);
+      expect(secondExpanded.filterAccepted).toBe(true); // still visible
+
+      tree.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
+
+      expect(secondExpanded.filterAccepted).toBe(false);  // no longer visible
+    });
+
+    it('in breadcrumb mode renders children', () => {
+      let model = helper.createModelFixture(10, 2);
+      let tree = helper.createTree(model);
+      tree.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
+      tree.viewRangeSize = 2;
+      tree.render(session.$entryPoint);
+      let nodeToSelect = tree.nodes[4];
+      tree.scrollTo(nodeToSelect);
+      tree.selectNode(nodeToSelect);
+
+      expect(nodeToSelect.childNodes[0].rendered).toBe(true);
+      expect(nodeToSelect.childNodes[1].rendered).toBe(true);
+      expect(nodeToSelect.childNodes[2].rendered).toBe(false); // not in viewRange
     });
 
     it('also expands the node if bread crumb mode is enabled', () => {
