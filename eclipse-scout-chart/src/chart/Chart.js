@@ -285,6 +285,8 @@ export default class Chart extends Widget {
       if (this._updateChartOpts) {
         // Inherit 'true' values from previously scheduled updates
         opts.requestAnimation = opts.requestAnimation || this._updateChartOpts.requestAnimation;
+        opts.onlyUpdateData = opts.onlyUpdateData || this._updateChartOpts.onlyUpdateData;
+        opts.onlyRefresh = opts.onlyRefresh || this._updateChartOpts.onlyRefresh;
       }
       this._updateChartTimeoutId = null;
       this._updateChartOpts = null;
