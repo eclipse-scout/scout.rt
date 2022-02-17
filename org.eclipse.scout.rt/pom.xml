@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+  ~ Copyright (c) 2010-2022 BSI Business Systems Integration AG.
   ~ All rights reserved. This program and the accompanying materials
   ~ are made available under the terms of the Eclipse Public License v1.0
   ~ which accompanies this distribution, and is available at
@@ -103,7 +103,7 @@
     <jackson-databind.version>2.9.10.8</jackson-databind.version>
     <batik.version>1.14</batik.version>
     <activemq.version>5.16.0</activemq.version>
-    <artemis.version>2.6.3</artemis.version>
+    <artemis.version>2.20.0</artemis.version>
     <com.google.http-client.version>1.38.0</com.google.http-client.version>
     <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
 
@@ -934,6 +934,16 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>31.0.1-jre</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.11.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>xmlgraphics-commons</artifactId>
+        <version>2.7</version>
       </dependency>
 
     </dependencies>
