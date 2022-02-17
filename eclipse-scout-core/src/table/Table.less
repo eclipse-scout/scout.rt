@@ -121,14 +121,14 @@
   }
 
   & > .filter-field {
-    --filter-field-max-bottom: calc(~'50% - ' (@filter-field-height + var(--controls-height)) / 2);
+    --filter-field-max-bottom: calc(~'50% - ' (var(--filter-field-height) + var(--controls-height)) / 2);
 
     &:not(.focused).empty {
       --filter-field-max-bottom: calc(~'50% - ' (@filter-field-icon-size + var(--controls-height)) / 2);
     }
 
     .has-menubar.menubar-bottom& {
-      --filter-field-max-bottom: calc(~'50% - ' (@filter-field-height + var(--controls-height)) / 2);
+      --filter-field-max-bottom: calc(~'50% - ' (var(--filter-field-height) + var(--controls-height)) / 2);
       bottom: calc(min(var(--filter-field-bottom), var(--filter-field-max-bottom)) + var(--menubar-height));
 
       &:not(.focused).empty {

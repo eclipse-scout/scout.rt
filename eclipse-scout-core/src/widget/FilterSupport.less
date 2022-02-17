@@ -10,11 +10,12 @@
  */
 .filter-field {
   position: absolute;
+  --filter-field-height: @filter-field-height;
   --filter-field-bottom: @filter-field-bottom;
-  --filter-field-max-bottom: calc(~'50% - ' @filter-field-height / 2);
+  --filter-field-max-bottom: calc(~'50% - ' var(--filter-field-height) / 2);
   bottom: min(var(--filter-field-bottom), var(--filter-field-max-bottom));
   right: @filter-field-right;
-  height: @filter-field-height;
+  height: var(--filter-field-height);
   width: @filter-field-width;
   min-width: @filter-field-min-width;
   max-width: @filter-field-max-width;
@@ -60,7 +61,7 @@
     justify-content: center;
     align-items: center;
     position: absolute;
-    bottom: (@filter-field-height - @filter-field-icon-size) / 2;
+    bottom: calc((var(--filter-field-height) - @filter-field-icon-size) / 2);
     right: @text-field-icon-margin-x + 1px;
     height: @filter-field-icon-size;
     width: @filter-field-icon-size;
@@ -107,7 +108,7 @@
   }
 
   &:not(.focused).empty {
-    --filter-field-bottom: @filter-field-bottom + ((@filter-field-height - @filter-field-icon-size) / 2);
+    --filter-field-bottom: @filter-field-bottom + ((var(--filter-field-height) - @filter-field-icon-size) / 2);
     --filter-field-max-bottom: calc(~'50% - ' @filter-field-icon-size / 2);
     right: @filter-field-right + @text-field-icon-margin-x + 1px;
     height: @filter-field-icon-size;
@@ -144,8 +145,9 @@
 
 .filter-field-container {
   position: sticky;
+  --filter-field-height: @filter-field-height;
   --filter-field-container-top: calc(~'100% - ' @filter-field-bottom);
-  --filter-field-container-min-top: calc(~'50% + ' @filter-field-height / 2);
+  --filter-field-container-min-top: calc(~'50% + ' var(--filter-field-height) / 2);
   top: max(var(--filter-field-container-top), var(--filter-field-container-min-top));
   left: calc(~'100% - ' @filter-field-right);
   width: 0;
@@ -177,7 +179,7 @@
     }
 
     &:not(.focused).empty {
-      bottom: ((@filter-field-height - @filter-field-icon-size) / 2);
+      bottom: calc((var(--filter-field-height) - @filter-field-icon-size) / 2);
       right: @text-field-icon-margin-x + 1px;
     }
   }
@@ -188,4 +190,9 @@
   .filter-field {
     .hidden();
   }
+}
+
+.dense .filter-field,
+.dense .filter-field-container {
+  --filter-field-height: @filter-field-height-dense;
 }
