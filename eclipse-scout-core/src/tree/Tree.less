@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@
   }
 
   & > .filter-field {
-    --filter-field-max-bottom: calc(~'50% - ' (@filter-field-height + var(--menubar-height)) / 2);
+    --filter-field-max-bottom: calc(~'50% - ' (var(--filter-field-height) + var(--menubar-height)) / 2);
     bottom: calc(min(var(--filter-field-bottom), var(--filter-field-max-bottom)) + var(--menubar-height));
 
     &:not(.focused).empty {
