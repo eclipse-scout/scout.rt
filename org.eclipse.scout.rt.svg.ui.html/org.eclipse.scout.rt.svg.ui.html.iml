@@ -40,7 +40,7 @@
     <orderEntry type="library" name="Maven: org.apache.xmlgraphics:batik-parser:1.14" level="project" />
     <orderEntry type="library" name="Maven: org.apache.xmlgraphics:batik-svg-dom:1.14" level="project" />
     <orderEntry type="library" name="Maven: org.apache.xmlgraphics:batik-awt-util:1.14" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.xmlgraphics:xmlgraphics-commons:2.6" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xmlgraphics:xmlgraphics-commons:2.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.xmlgraphics:batik-bridge:1.14" level="project" />
     <orderEntry type="library" name="Maven: org.apache.xmlgraphics:batik-xml:1.14" level="project" />
     <orderEntry type="library" name="Maven: org.apache.xmlgraphics:batik-css:1.14" level="project" />
@@ -61,7 +61,7 @@
     <orderEntry type="library" name="Maven: jakarta.servlet:jakarta.servlet-api:4.0.3" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.json" />
     <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.3.3" level="project" />
-    <orderEntry type="library" name="Maven: commons-io:commons-io:2.2" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.11.0" level="project" />
     <orderEntry type="module" module-name="eclipse-scout-core" />
   </component>
 </module>
