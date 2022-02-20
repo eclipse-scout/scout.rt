@@ -87,6 +87,7 @@ public class ClientNotificationNodeQueue {
     Assertions.assertNotNull(userId);
     m_sessionUserCacheLock.writeLock().lock();
     try {
+      LOG.debug("Register session [sessionId={}, userId={}, clientNodeId={}]", sessionId, userId, getNodeId());
       m_sessions.add(sessionId);
       Set<String> userSessions = m_userToSessions.computeIfAbsent(userId, k -> new HashSet<>());
       userSessions.add(sessionId);
@@ -101,6 +102,7 @@ public class ClientNotificationNodeQueue {
     Assertions.assertNotNull(userId);
     m_sessionUserCacheLock.writeLock().lock();
     try {
+      LOG.debug("Unregister session [sessionId={}, userId={}, clientNodeId={}]", sessionId, userId, getNodeId());
       m_sessions.remove(sessionId);
       Iterator<Entry<String, Set<String>>> iterator = m_userToSessions.entrySet().iterator();
       while (iterator.hasNext()) {
@@ -179,7 +181,7 @@ public class ClientNotificationNodeQueue {
     m_lastConsumeAccess.set(System.currentTimeMillis());
 
     List<ClientNotificationMessage> result = getNotifications(maxAmount, maxWaitTime, unit);
-    LOG.debug("consumed {} notifications.", result.size());
+    LOG.debug("consumed {} notifications. [clientNodeId={}]", result.size(), getNodeId());
     return result;
   }
 
