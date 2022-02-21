@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,6 +45,7 @@ export default class Chart extends Widget {
 
     this._updateChartTimeoutId = null;
     this._updateChartOpts = null;
+    this._updateChartOptsWhileNotAttached = [];
     this.updatedOnce = false;
   }
 
@@ -101,6 +102,11 @@ export default class Chart extends Widget {
       requestAnimation: true,
       debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
     });
+  }
+
+  _renderOnAttach() {
+    super._renderOnAttach();
+    this._updateChartOptsWhileNotAttached.splice(0).forEach(opts => this.updateChart($.extend(true, {}, opts, {debounce: true})));
   }
 
   _remove() {
@@ -310,6 +316,12 @@ export default class Chart extends Widget {
     function updateChartImpl() {
       this._updateChartTimeoutId = null;
       this._updateChartOpts = null;
+
+      if (!this.$container || !this.$container.isAttached()) {
+        this._updateChartOptsWhileNotAttached.push(opts);
+        return;
+      }
+
       if (opts.onlyUpdateData && this.chartRenderer && this.chartRenderer.isDataUpdatable()) {
         this.chartRenderer.updateData(opts.requestAnimation);
       } else if (opts.onlyRefresh && this.chartRenderer) {
