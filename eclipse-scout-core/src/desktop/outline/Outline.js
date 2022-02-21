@@ -1076,40 +1076,10 @@ export default class Outline extends Tree {
     if (desktop.navigation) {
       $elements.push(desktop.navigation.$body);
     }
-    if (desktop.bench && element instanceof Form && element.displayHint === Form.DisplayHint.VIEW) {
-      arrays.pushAll($elements, this._getBenchGlassPaneTargetsForView(element));
-    }
     if (desktop.bench && desktop.bench.outlineContent) {
       arrays.pushAll($elements, desktop.bench.outlineContent.glassPaneTargets(element));
     }
     return $elements;
-  }
-
-  _getBenchGlassPaneTargetsForView(view) {
-    let $glassPanes = [];
-    $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, this.session.desktop.header));
-    this.session.desktop.bench.visibleTabBoxes().forEach(function(tabBox) {
-      if (tabBox.hasView(view)) {
-        arrays.pushAll($glassPanes, this._getTabGlassPaneTargetsForView(view, tabBox));
-      } else if (tabBox.$container) {
-        $glassPanes.push(tabBox.$container);
-      }
-    }, this);
-    return $glassPanes;
-  }
-
-  _getTabGlassPaneTargetsForView(view, tabBox) {
-    let $glassPanes = [];
-    tabBox.tabArea.tabs.forEach(tab => {
-      if (tab.view !== view && tab.view.displayParent === this) {
-        $glassPanes.push(tab.$container);
-        // Workaround for javascript not being able to prevent hover event propagation:
-        // In case of tabs, the hover selector is defined on the element that is the direct parent
-        // of the glass pane. Under these circumstances, the hover style isn't be prevented by the glass pane.
-        tab.$container.addClass('glasspane-parent');
-      }
-    });
-    return $glassPanes;
   }
 
   _onGlassPaneMouseDown(glassPaneOwner, $glassPane) {
