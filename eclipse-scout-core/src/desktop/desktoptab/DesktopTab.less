@@ -85,6 +85,20 @@
     }
   }
 
+  &.glasspane-parent {
+    // Modality highlight does not work with pointer-events: none because mouse down is ignored on the glass pane completely by the browser
+    // -> we need to disable the hover effect manually
+    pointer-events: unset;
+
+    &:not(.disabled):not(.selected):hover {
+      background-color: @desktop-tab-background-color;
+    }
+
+    &:not(.selected):hover > .closer {
+      display: none;
+    }
+  }
+
   &.disabled {
     background-color: transparent;
 
