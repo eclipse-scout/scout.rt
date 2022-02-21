@@ -367,8 +367,8 @@ export default class Tree extends Widget {
   }
 
   _remove() {
-    // remove listener
     this.session.desktop.off('popupOpen', this._popupOpenHandler);
+    this.filterSupport.remove();
 
     // stop all animations
     if (this._$animationWrapper) {
@@ -382,9 +382,8 @@ export default class Tree extends Widget {
     this.$fillBefore = null;
     this.$fillAfter = null;
     this.$data = null;
-    // reset rendered view range because now range is rendered
+    // reset rendered view range because no range is rendered
     this.viewRangeRendered = new Range(0, 0);
-    this.filterSupport.remove();
     super._remove();
   }
 
@@ -2893,7 +2892,7 @@ export default class Tree extends Widget {
     }
     nodes = nodes.filter(function(node) {
       let index = indexHint === undefined ? this.visibleNodesFlat.indexOf(node) : indexHint;
-      if (index === -1 || !(this.viewRangeRendered.from + this.viewRangeSize >= index && this.viewRangeRendered.from <= index && this.viewRangeRendered.size() > 0) || node.attached) {
+      if (index === -1 || !(this.viewRangeRendered.from + this.viewRangeSize >= index && this.viewRangeRendered.from <= index && this.viewRangeSize > 0) || node.attached) {
         // node is not visible
         return false;
       }
