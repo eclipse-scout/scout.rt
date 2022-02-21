@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -605,6 +605,7 @@ export {default as FormFieldTile} from './tile/fields/FormFieldTile';
 export {default as FormFieldTileAdapter} from './tile/fields/FormFieldTileAdapter';
 export {default as ButtonTile} from './tile/fields/button/ButtonTile';
 export {default as TileButton} from './tile/fields/button/TileButton';
+export {default as TileHtmlField} from './tile/fields/htmlfield/TileHtmlField';
 export {default as TileTableField} from './tile/fields/tablefield/TileTableField';
 export {default as SimpleTab} from './tabbox/SimpleTab';
 export {default as SimpleTabArea} from './tabbox/SimpleTabArea';

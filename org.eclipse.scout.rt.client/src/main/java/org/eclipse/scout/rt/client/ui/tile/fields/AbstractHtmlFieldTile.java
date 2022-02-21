@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.tile.fields;
 
+import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.client.ui.tile.fields.AbstractHtmlFieldTile.HtmlField;
 import org.eclipse.scout.rt.platform.Order;
@@ -37,6 +38,7 @@ public abstract class AbstractHtmlFieldTile extends AbstractFormFieldTile<HtmlFi
   }
 
   @Order(10)
+  @ModelVariant("Tile")
   @ClassId("fce0eea7-14b9-447f-83fb-0dfbcb2a327e")
   public class HtmlField extends AbstractHtmlField {
 
