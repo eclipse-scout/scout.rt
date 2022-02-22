@@ -170,12 +170,15 @@ export default class RestLookupCall extends LookupCall {
         });
       })
       .catch(ajaxError => {
+        const message = ajaxError.jqXHR && ajaxError.jqXHR.status === 403 ?
+          this.session.text('YouAreNotAllowedToReadThisData') :
+          this.session.text('ErrorWhileLoadingData');
         this._deferred.resolve({
           queryBy: this.queryBy,
           text: this.searchText,
           key: this.key,
           lookupRows: [],
-          exception: this.session.text('ErrorWhileLoadingData')
+          exception: message
         });
       });
 

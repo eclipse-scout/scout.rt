@@ -195,6 +195,8 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.Inactive",
         "ui.All",
         "ui.CloseAllTabs",
-        "ui.CloseOtherTabs"));
+        "ui.CloseOtherTabs",
+        // From org.eclipse.scout.rt.security
+        "YouAreNotAllowedToReadThisData"));
   }
 }
