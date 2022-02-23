@@ -92,7 +92,7 @@ public final class NamespaceVersion {
   }
 
   /**
-   * Method may only be called if instance if created by either {{@link #of(String)}} or {@link #of(String, String)}
+   * Method may only be called if instance is created by either {{@link #of(String)}} or {@link #of(String, String)}
    * (version text is available).
    *
    * @return Full version string
