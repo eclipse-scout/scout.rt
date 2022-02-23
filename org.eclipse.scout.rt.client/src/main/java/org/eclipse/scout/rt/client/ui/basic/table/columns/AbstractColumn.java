@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnCompleteEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateCellChain;
@@ -96,6 +97,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INITIALIZED, PRIMARY_KEY, SUMMARY, INITIALLY_VISIBLE,
       INITIALLY_GROUPED, INITIALLY_SORTED_ASC, INITIALLY_ALWAYS_INCLUDE_SORT_AT_BEGIN, INITIALLY_ALWAYS_INCLUDE_SORT_AT_END);
   private static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PARENT_KEY, COMPACTED);
+  private static final Pattern COLUMN_ID_PATTERN = Pattern.compile("Column$");
 
   private ITable m_table;
 
@@ -1204,12 +1206,8 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     while (c.isAnnotationPresent(Replace.class)) {
       c = c.getSuperclass();
     }
-    String s = c.getSimpleName();
-    if (s.endsWith("Column")) {
-      s = s.replaceAll("Column$", "");
-    }
     //do not remove other suffixes
-    return s;
+    return COLUMN_ID_PATTERN.matcher(c.getSimpleName()).replaceAll("");
   }
 
   /**
