@@ -18,10 +18,9 @@ export default class LazyNodeFilter {
   accept(node) {
     if (node.expanded) {
       return true;
-    } else {
-      // not expanded: remove lazy expand marker (forget lazy expanded children)
-      node.childNodes.forEach(child => delete child._lazyNodeFilterAccepted);
     }
+    // not expanded: remove lazy expand marker (forget lazy expanded children)
+    node.childNodes.forEach(child => child._lazyNodeFilterAccepted = false);
 
     if (!node.parentNode || !node.parentNode.expandedLazy || !node.parentNode.lazyExpandingEnabled || !this.tree.lazyExpandingEnabled) {
       // no lazy expanding supported

@@ -1331,6 +1331,30 @@ describe('Tree', () => {
       expect(secondExpanded.filterAccepted).toBe(false);  // no longer visible
     });
 
+    it('only shows selected in breadcrumb mode even if a child has filter accepted=true', () => {
+      let model = helper.createModelFixture(2, 2);
+      let tree = helper.createTree(model);
+      tree.render(session.$entryPoint);
+
+      // To reproduce manually in an outline tree, the node needs to be expanded, collapsed and expanded again.
+      tree.setNodeExpanded(tree.nodes[0], true);
+
+      let firstChild = tree.nodes[0].childNodes[0];
+      let secondChild = tree.nodes[0].childNodes[1];
+      tree.setNodeExpanded(firstChild, true);
+      tree.setNodeExpanded(firstChild, false); // Remove from visible list, filterAccepted is still true
+
+      tree.selectNode(secondChild);
+      expect(firstChild.filterAccepted).toBe(true);
+      expect(firstChild.childNodes[0].filterAccepted).toBe(true);
+      expect(secondChild.filterAccepted).toBe(true);
+
+      tree.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
+      expect(firstChild.filterAccepted).toBe(false);
+      expect(firstChild.childNodes[0].filterAccepted).toBe(false);
+      expect(secondChild.filterAccepted).toBe(true);
+    });
+
     it('in breadcrumb mode renders children', () => {
       let model = helper.createModelFixture(10, 2);
       let tree = helper.createTree(model);
