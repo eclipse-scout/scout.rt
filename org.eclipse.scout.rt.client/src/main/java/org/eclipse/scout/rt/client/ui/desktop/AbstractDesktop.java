@@ -1968,6 +1968,14 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
+  public void reloadPageFromRoot(IPage<?> page) {
+    Bookmark bm = createBookmark(page);
+    page.setChildrenDirty(true);
+    //activate bookmark without activating the outline, since this would hide active tabs.
+    activateBookmark(bm, false);
+  }
+
+  @Override
   public void releaseUnusedPages() {
     for (IOutline outline : getAvailableOutlines()) {
       outline.releaseUnusedPages();

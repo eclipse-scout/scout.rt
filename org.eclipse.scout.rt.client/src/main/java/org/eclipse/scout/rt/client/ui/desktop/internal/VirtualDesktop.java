@@ -744,6 +744,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void reloadPageFromRoot(IPage<?> page) {
+    // NOP
+  }
+
+  @Override
   public void setNativeNotificationDefaults(NativeNotificationDefaults nativeNotificationDefaults) {
     // NOP
   }

@@ -31,5 +31,4 @@ public interface IBookmarkAdapter {
   String getOutlineClassName();
 
   String getOutlineTitle();
-
 }
