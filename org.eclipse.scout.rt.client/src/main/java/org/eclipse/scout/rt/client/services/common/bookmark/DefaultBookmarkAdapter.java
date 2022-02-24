@@ -60,5 +60,4 @@ public class DefaultBookmarkAdapter implements IBookmarkAdapter {
   public String getOutlineTitle() {
     return m_page.getOutline().getTitle();
   }
-
 }

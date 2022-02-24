@@ -402,9 +402,9 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   void refreshPages(List<Class<? extends IPage<?>>> pages);
 
   /**
-   * @see IDesktop#refreshPages(List)
    * @param pageTypes
    *          Must be classes that implement {@link IPage}.
+   * @see IDesktop#refreshPages(List)
    */
   void refreshPages(Class<?>... pageTypes);
 
@@ -689,10 +689,10 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * Activates a {@link Bookmark} on this desktop.
-   * <p />
+   * <p>
    * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and activated, afterwards every page from
    * the {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
-   * <p />
+   * <p>
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
    */
@@ -700,11 +700,11 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   /**
    * Activates a {@link Bookmark} on this desktop.
-   * <p />
+   * <p>
    * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and, if activateOutline is true, activated.
    * Afterwards every page from the {@link Bookmark#getPath()} will be selected (respecting the
    * {@link AbstractPageState}).
-   * <p />
+   * <p>
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
    */
@@ -1038,4 +1038,12 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    */
   NativeNotificationDefaults getNativeNotificationDefaults();
 
+  /**
+   * Reloads a page, and the pages leading to it, starting at its outline root. This method is called when page data
+   * changes (see {@link AbstractPage#execDataChanged(Object...)}) and is supposed to make sure that the outline does
+   * not display pages that do no longer exist, e.g. if the underlying entity got deleted.
+   *
+   * @since 22.0
+   */
+  void reloadPageFromRoot(IPage<?> page);
 }

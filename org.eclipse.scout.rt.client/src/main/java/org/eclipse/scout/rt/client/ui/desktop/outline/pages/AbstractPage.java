@@ -78,7 +78,6 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
-import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -482,15 +481,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
         if (isRootNode) {
           this.reloadPage(IReloadReason.DATA_CHANGED_TRIGGER);
         }
-        /*
-         * Ticket 77332 (deleting a node in the tree) also requires a reload So
-         * the selected and its ancestor nodes require same processing
-         */
         else if (desktop != null) { // NOSONAR
-          Bookmark bm = desktop.createBookmark();
-          setChildrenDirty(true);
-          //activate bookmark without activating the outline, since this would hide active tabs.
-          desktop.activateBookmark(bm, false);
+          /*
+           * Ticket 77332 (deleting a node in the tree) also requires a reload So
+           * the selected and its ancestor nodes require same processing
+           */
+          desktop.reloadPageFromRoot(this);
         }
       }
       catch (RuntimeException | PlatformError e) {
