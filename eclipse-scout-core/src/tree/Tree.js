@@ -128,10 +128,8 @@ export default class Tree extends Widget {
     this.initialTraversing = true;
     this._setCheckable(this.checkable);
     this._ensureTreeNodes(this.nodes);
-    this.visitNodes(this._initTreeNode.bind(this));
-    this.visitNodes(this._updateFlatListAndSelectionPath.bind(this));
+    this._initNodes(this.nodes);
     this.initialTraversing = false;
-    this.selectedNodes = this._nodesByIds(this.selectedNodes);
     this.menuBar = scout.create('MenuBar', {
       parent: this,
       position: MenuBar.Position.BOTTOM,
@@ -143,6 +141,22 @@ export default class Tree extends Widget {
     this._setDisplayStyle(this.displayStyle);
     this._setKeyStrokes(this.keyStrokes);
     this._setMenus(this.menus);
+  }
+
+  /**
+   * Initialize nodes, applies filters and updates flat list
+   */
+  _initNodes(nodes, parentNode) {
+    if (!nodes) {
+      nodes = this.nodes;
+    }
+    Tree.visitNodes(this._initTreeNode.bind(this), nodes, parentNode);
+    if (typeof this.selectedNodes[0] === 'string') {
+      this.selectedNodes = this._nodesByIds(this.selectedNodes);
+    }
+    this._updateSelectionPath();
+    nodes.forEach(node => this.applyFiltersForNode(node));
+    Tree.visitNodes((node, parentNode) => this._addToVisibleFlatList(node, false), nodes, parentNode);
   }
 
   /**
@@ -226,44 +240,23 @@ export default class Tree extends Widget {
   }
 
   isSelectedNode(node) {
-    if (this.initialTraversing) {
-      return this.selectedNodes.indexOf(node.id) > -1;
-    }
     return this.selectedNodes.indexOf(node) > -1;
   }
 
-  _updateFlatListAndSelectionPath(node, parentNode) {
-    // if this node is selected all parent nodes have to be added to selectionPath
-    if (this.isSelectedNode(node) && (node.parentNode && !this.visibleNodesMap[node.parentNode.id] || node.level === 0)) {
-      let p = node;
-      while (p) {
-        this._inSelectionPathList[p.id] = true;
-        p.filterDirty = true;
-
-        if (p !== node) {
-          // ensure node is expanded
-          node.expanded = true;
-          // if parent was filtered before, try refilter after adding to selection path.
-          if (p.level === 0) {
-            this.applyFiltersForNode(p);
-
-            // add visible nodes to visible nodes array when they are initialized
-            this._addToVisibleFlatList(p, false);
-
-            // process children
-            this._addChildrenToFlatList(p, this.visibleNodesFlat.length - 1, false, null, true);
-          }
-        }
-        p = p.parentNode;
-      }
-    } else if (node.parentNode && this.isSelectedNode(node.parentNode)) {
-      this._inSelectionPathList[node.id] = true;
+  _updateSelectionPath() {
+    let selectedNode = this.selectedNodes[0];
+    if (!selectedNode) {
+      return;
     }
+    this._inSelectionPathList[selectedNode.id] = true;
 
-    this.applyFiltersForNode(node);
+    selectedNode.childNodes.forEach(child => this._inSelectionPathList[child.id] = true);
 
-    // add visible nodes to visible nodes array when they are initialized
-    this._addToVisibleFlatList(node, false);
+    let parentNode = selectedNode.parentNode;
+    while (parentNode) {
+      this._inSelectionPathList[parentNode.id] = true;
+      parentNode = parentNode.parentNode;
+    }
   }
 
   _initTreeNode(node, parentNode) {
@@ -1432,9 +1425,7 @@ export default class Tree extends Widget {
           this._removeFromFlatList(node, false);
         }
       } else if (renderExpansionOpts.expandLazyChanged) {
-        node.childNodes.forEach(child => {
-          this.applyFiltersForNode(child, true, renderAnimated);
-        });
+        this.applyFiltersForNode(node, false, renderAnimated);
       }
 
       if (this.groupedNodes[node.id]) {
@@ -1648,7 +1639,8 @@ export default class Tree extends Widget {
       let insertIndex, isAlreadyAdded = this.visibleNodesMap[node.id];
       if (isAlreadyAdded) {
         this.insertBatchInVisibleNodes(insertBatch, this._showNodes(insertBatch), animatedRendering);
-        this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
+        // Animate rendering is always false because it would generate a bunch of animation wrappers which stay forever without really starting an animation...
+        this.checkAndHandleBatchAnimationWrapper(parentNode, false, insertBatch);
         insertBatch = this.newInsertBatch(insertBatch.nextBatchInsertIndex());
         insertBatch = this._addChildrenToFlatListIfExpanded(1, node, insertIndex, animatedRendering, insertBatch, forceFilter);
       } else {
@@ -2194,9 +2186,7 @@ export default class Tree extends Widget {
           parentNode.childNodes.push(entry);
         });
       }
-      // initialize node and add to visible list if node is visible
-      Tree.visitNodes(this._initTreeNode.bind(this), nodes, parentNode);
-      Tree.visitNodes(this._updateFlatListAndSelectionPath.bind(this), nodes, parentNode);
+      this._initNodes(nodes, parentNode);
       if (this.groupedNodes[parentNode.id]) {
         this._updateItemPath(false, parentNode);
       }
@@ -2219,9 +2209,7 @@ export default class Tree extends Widget {
       } else {
         arrays.pushAll(this.nodes, nodes);
       }
-      // initialize node and add to visible list if node is visible
-      Tree.visitNodes(this._initTreeNode.bind(this), nodes, parentNode);
-      Tree.visitNodes(this._updateFlatListAndSelectionPath.bind(this), nodes, parentNode);
+      this._initNodes(nodes, parentNode);
     }
     if (this.rendered) {
       this.viewRangeDirty = true;
@@ -2345,9 +2333,7 @@ export default class Tree extends Widget {
     }, this);
 
     // update child node indices
-    parentNodesToReindex.forEach(function(p) {
-      this._updateChildNodeIndex(p.childNodes);
-    }, this);
+    parentNodesToReindex.forEach(p => this._updateChildNodeIndex(p.childNodes));
     this._updateChildNodeIndex(topLevelNodesToReindex);
 
     this.deselectNodes(deletedNodes, {collectChildren: true});
@@ -2761,7 +2747,6 @@ export default class Tree extends Widget {
     }
     result.newlyShown.forEach(node => this._addToVisibleFlatList(node, this.filterAnimated));
     result.newlyHidden.forEach(node => this._removeFromFlatList(node, this.filterAnimated));
-    this._nodesFiltered(result.newlyHidden);
     this.filteredElementsDirty = false;
   }
 
@@ -2771,7 +2756,7 @@ export default class Tree extends Widget {
     // iterate from end to beginning (child nodes first) so that the state of the children has already been updated
     for (let i = this.visibleNodesFlat.length - 1; i >= 0; i--) {
       let node = this.visibleNodesFlat[i];
-      let result = this._applyFiltersForNodeRec(node, false, animated);
+      let result = this._applyFiltersForNodeRec(node, true, animated);
       if (result.newlyHidden.length) {
         if (!node.isFilterAccepted()) {
           newlyHidden.push(...result.newlyHidden);
@@ -2800,11 +2785,11 @@ export default class Tree extends Widget {
       result.newlyShown.unshift(...parentResult.newlyShown);
       parent = parent.parentNode;
     }
+    this._nodesFiltered(result.newlyHidden);
 
     if (applyNewHiddenShownNodes) {
       result.newlyShown.forEach(node => this._addToVisibleFlatList(node, animated));
       result.newlyHidden.forEach(node => this._removeFromFlatList(node, animated));
-      this._nodesFiltered(result.newlyHidden);
     }
     return result;
   }
@@ -2816,14 +2801,18 @@ export default class Tree extends Widget {
     let changed = this._applyFiltersForNode(node);
     let hasChildrenWithFilterAccepted = false;
     if (node.level < 32 /* see org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree.expandAllRec */) {
-      node.childNodes.forEach(childNode => {
-        if (recursive) {
+      if (recursive) {
+        node.childNodes.forEach(childNode => {
           let result = this._applyFiltersForNodeRec(childNode, true, animated);
           newlyHidden.push(...result.newlyHidden);
           newlyShown.push(...result.newlyShown);
-        }
-        hasChildrenWithFilterAccepted = hasChildrenWithFilterAccepted || childNode.filterAccepted;
-      });
+          hasChildrenWithFilterAccepted = hasChildrenWithFilterAccepted || childNode.filterAccepted;
+        });
+      } else if (!node.filterAccepted) {
+        // Check children only if filterAccepted is false because only then hasChildrenWithFilterAccepted is used (see below).
+        // This has great impact on performance when there are many nodes
+        hasChildrenWithFilterAccepted = node.childNodes.some(childNode => childNode.filterAccepted);
+      }
     }
 
     // set filter accepted on this node if it has children with filter accepted (so that the children are visible)
@@ -3053,6 +3042,10 @@ export default class Tree extends Widget {
           that.runningAnimationsFinishFunc();
           $node.removeClass('hiding');
           if (!$node.hasClass('showing')) {
+            // JQuery sets display to none which we don't need because node will be detached.
+            // If node is added using another method than slideDown (used by show node), it would be invisible.
+            // Example: parent is collapsed while nodes are hiding -> remove filter, expand parent -> invisible nodes
+            $node.css('display', '');
             $node.detach();
             node.attached = false;
           }
@@ -3066,15 +3059,11 @@ export default class Tree extends Widget {
   }
 
   _nodesToIds(nodes) {
-    return nodes.map(node => {
-      return node.id;
-    });
+    return nodes.map(node => node.id);
   }
 
   _nodesByIds(ids) {
-    return ids.map(id => {
-      return this.nodesMap[id];
-    });
+    return ids.map(id => this.nodesMap[id]);
   }
 
   _nodeById(id) {
