@@ -10,60 +10,52 @@
  */
 package org.eclipse.scout.rt.platform.events;
 
-import java.util.Map;
-import java.util.WeakHashMap;
+import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
+import org.eclipse.scout.rt.platform.config.ConfigUtility;
 
 /**
  * This class is Thread safe
  */
 public final class ListenerListRegistry {
 
-  private static ListenerListRegistry globalInstance = new ListenerListRegistry();
+  private static IListenerListProfiler globalInstance;
+  static {
+    if (ConfigUtility.getPropertyBoolean(EnableListenerListProfiling.KEY, false)) {
+      globalInstance = new DefaultListenerListProfiler();
+    }
+    else {
+      globalInstance = new DisabledListenerListProfiler();
+    }
+  }
 
-  public static ListenerListRegistry globalInstance() {
+  ListenerListRegistry() {
+    //singleton
+  }
+
+  public static IListenerListProfiler globalInstance() {
     return globalInstance;
   }
 
   /**
    * This method is intended for unit testing only
    */
-  static void setGlobalInstance(ListenerListRegistry newInstance) {
+  static void setGlobalInstance(IListenerListProfiler newInstance) {
     globalInstance = newInstance;
   }
 
-  private final Map<IListenerListWithManagement, Object> m_set = new WeakHashMap<>();
+  public static class EnableListenerListProfiling extends AbstractBooleanConfigProperty {
+    protected static final String KEY = "org.eclipse.scout.rt.platform.management.EnableListenerListProfiling";
 
-  ListenerListRegistry() {
-    //singleton
-  }
-
-  /**
-   * Add a weak reference to a event listener list
-   * <p>
-   * NOTE: This monitor does not add a reference to the argument. If the passed argument is not referenced by the source
-   * type, it is garbage collected almost immediately after the call to this method
-   */
-  public void registerAsWeakReference(IListenerListWithManagement eventListenerList) {
-    synchronized (m_set) {
-      m_set.put(eventListenerList, null);
+    @Override
+    public String getKey() {
+      return KEY;
     }
-  }
 
-  public int getListenerListCount() {
-    synchronized (m_set) {
-      return m_set.size();
+    @Override
+    public String description() {
+      return "Defines if all IListenerListWithManagement classes are monitored and exposed via JMX beans. "
+          + "Enable this feature to detect memory issues or possible leaks, this may result in a global "
+          + "performance decrease therefore this feature is disabled by default.";
     }
-  }
-
-  public ListenerListSnapshot createSnapshot() {
-    ListenerListSnapshot snapshot = new ListenerListSnapshot();
-    synchronized (m_set) {
-      for (IListenerListWithManagement list : m_set.keySet()) {
-        if (list != null) {
-          list.createSnapshot((context, listener) -> snapshot.add(list, context, listener));
-        }
-      }
-    }
-    return snapshot;
   }
 }
