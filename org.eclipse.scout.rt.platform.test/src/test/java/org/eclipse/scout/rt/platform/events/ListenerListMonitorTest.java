@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.events;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -37,17 +36,17 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class ListenerListMonitorTest {
 
-  private ListenerListRegistry m_originalListenerListRegistry;
+  private IListenerListProfiler m_originalListenerListProfiler;
 
   @Before
   public void runWithPrivateListenerListRegistry() {
-    m_originalListenerListRegistry = ListenerListRegistry.globalInstance();
-    ListenerListRegistry.setGlobalInstance(new ListenerListRegistry());
+    m_originalListenerListProfiler = ListenerListRegistry.globalInstance();
+    ListenerListRegistry.setGlobalInstance(new DefaultListenerListProfiler());
   }
 
   @After
   public void restoreOriginalListenerListRegistry() {
-    ListenerListRegistry.setGlobalInstance(m_originalListenerListRegistry);
+    ListenerListRegistry.setGlobalInstance(m_originalListenerListProfiler);
   }
 
   @Test
