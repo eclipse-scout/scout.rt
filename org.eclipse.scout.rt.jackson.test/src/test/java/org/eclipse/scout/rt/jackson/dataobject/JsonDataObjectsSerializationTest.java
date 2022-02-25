@@ -59,6 +59,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBigIntegerDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBinaryDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBinaryResourceDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCollectionsDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCollectionsIDoEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample1Do;
@@ -110,6 +111,10 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestStringPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestSubPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestThrowableDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestVersionedDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestWithEmptyTypeNameDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestWithoutTypeNameDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestWithoutTypeNameSubclassDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestWithoutTypeNameSubclassWithTypeNameDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -1372,6 +1377,91 @@ public class JsonDataObjectsSerializationTest {
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestBigIntegerDo.json", json);
+  }
+
+  @Test
+  public void testSerializeDeserialize_EntityWithoutTypeNameAnnotation() throws Exception {
+    TestWithoutTypeNameDo entity = BEANS.get(TestWithoutTypeNameDo.class)
+        .withId("foo")
+        .withValue("bar");
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestWithoutTypeName.json", json);
+
+    TestWithoutTypeNameDo marshalled = s_dataObjectMapper.readValue(json, TestWithoutTypeNameDo.class);
+    assertEqualsWithComparisonFailure(entity, marshalled);
+
+    // read without type information results in raw DoEntity
+    IDoEntity rawEntity = s_dataObjectMapper.readValue(json, IDoEntity.class);
+    assertEquals(DoEntity.class, rawEntity.getClass());
+    String jsonRaw = s_dataObjectMapper.writeValueAsString(rawEntity);
+    assertEquals(json, jsonRaw);
+  }
+
+  @Test
+  public void testSerializeDeserialize_EntityWithoutTypeNameAnnotationSubclass() throws Exception {
+    TestWithoutTypeNameDo entity = BEANS.get(TestWithoutTypeNameSubclassDo.class)
+        .withId("foo")
+        .withValue("bar")
+        .withIdSub("sub");
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestWithoutTypeNameSubclass.json", json);
+
+    TestWithoutTypeNameSubclassDo marshalled = s_dataObjectMapper.readValue(json, TestWithoutTypeNameSubclassDo.class);
+    assertEqualsWithComparisonFailure(entity, marshalled);
+
+    TestWithoutTypeNameDo marshalledSuperClass = s_dataObjectMapper.readValue(json, TestWithoutTypeNameDo.class);
+    assertEquals(TestWithoutTypeNameDo.class, marshalledSuperClass.getClass());
+    String jsonRaw = s_dataObjectMapper.writeValueAsString(marshalledSuperClass);
+    assertEquals(json, jsonRaw);
+
+    IDoEntity marshalledSuperInterface = s_dataObjectMapper.readValue(json, IDoEntity.class);
+    assertEquals(DoEntity.class, marshalledSuperInterface.getClass());
+    jsonRaw = s_dataObjectMapper.writeValueAsString(marshalledSuperInterface);
+    assertEquals(json, jsonRaw);
+  }
+
+  @Test
+  public void testSerializeDeserialize_EntityWithoutTypeNameAnnotationSubclassWithTypeName() throws Exception {
+    TestWithoutTypeNameDo entity = BEANS.get(TestWithoutTypeNameSubclassWithTypeNameDo.class)
+        .withId("foo")
+        .withValue("bar")
+        .withIdSub("sub");
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestWithoutTypeNameSubclassWithTN.json", json);
+
+    TestWithoutTypeNameDo marshalled = s_dataObjectMapper.readValue(json, TestWithoutTypeNameDo.class);
+    assertEqualsWithComparisonFailure(entity, marshalled);
+  }
+
+  @Test
+  public void testSerializeDeserialize_EntityWithEmptyTypeName() throws Exception {
+    TestWithEmptyTypeNameDo entity = BEANS.get(TestWithEmptyTypeNameDo.class)
+        .withId("foo2")
+        .withValue("bar2");
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestWithEmptyTypeName.json", json);
+
+    TestWithEmptyTypeNameDo marshalled = s_dataObjectMapper.readValue(json, TestWithEmptyTypeNameDo.class);
+    assertEqualsWithComparisonFailure(entity, marshalled);
+
+    IDoEntity marshalledSuperInterface = s_dataObjectMapper.readValue(json, IDoEntity.class);
+    assertEquals(DoEntity.class, marshalledSuperInterface.getClass());
+    String jsonRaw = s_dataObjectMapper.writeValueAsString(marshalledSuperInterface);
+    assertEquals(json, jsonRaw);
+  }
+
+  @Test
+  public void testSerializeDeserialize_CollectionsIDoEntityDo() throws  Exception {
+    Collection<IDoEntity> coll = new ArrayList<>();
+    coll.add(createTestItemDo("collection", "1"));
+    coll.add(createTestItemDo("collection", "2"));
+    TestCollectionsIDoEntityDo entity = BEANS.get(TestCollectionsIDoEntityDo.class)
+        .withDoEntityAttribute(createTestItemDo("bar", "1"))
+        .withDoEntityCollectionAttribute(coll)
+        .withDoEntityDoListAttribute(createTestItemDo("dolist", "1"), createTestItemDo("dolist", "2"))
+        .withDoEntityListAttribute(Arrays.asList(createTestItemDo("list", "1"), createTestItemDo("list", "2")));
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+    assertJsonEquals("TestCollectionsIDoEntity.json", json);
   }
 
   // ------------------------------------ DoEntity with collections test cases ------------------------------------

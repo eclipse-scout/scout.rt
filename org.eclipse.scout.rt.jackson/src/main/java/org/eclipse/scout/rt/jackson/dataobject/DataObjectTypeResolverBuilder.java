@@ -12,8 +12,9 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.util.Collection;
 
-import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JavaType;
@@ -26,6 +27,8 @@ import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder;
 @Bean
 public class DataObjectTypeResolverBuilder extends StdTypeResolverBuilder {
 
+  private final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
+
   @Override
   public TypeDeserializer buildTypeDeserializer(DeserializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
     return useForType(baseType) ? super.buildTypeDeserializer(config, baseType, subtypes) : null;
@@ -37,7 +40,11 @@ public class DataObjectTypeResolverBuilder extends StdTypeResolverBuilder {
   }
 
   protected boolean useForType(JavaType t) {
-    // do not write type information for "raw" DoEntity instances (only concrete instances, without IDoEntity marker interface)
-    return !DoEntity.class.equals(t.getRawClass());
+    // IDoEntity and sub-interfaces force to write a type name
+    if (t.getRawClass().isInterface()) {
+      return true;
+    }
+    // write type name if class is annotated with a type name
+    return m_dataObjectInventory.get().toTypeName(t.getRawClass()) != null;
   }
 }
