@@ -1,0 +1,35 @@
+{
+  "_type" : "TestCollectionsIDoEntity",
+  "doEntityAttribute" : {
+    "_type" : "TestItem",
+    "id" : "bar",
+    "stringAttribute" : "1"
+  },
+  "doEntityCollectionAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "collection",
+    "stringAttribute" : "1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "collection",
+    "stringAttribute" : "2"
+  } ],
+  "doEntityDoListAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "dolist",
+    "stringAttribute" : "1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "dolist",
+    "stringAttribute" : "2"
+  } ],
+  "doEntityListAttribute" : [ {
+    "_type" : "TestItem",
+    "id" : "list",
+    "stringAttribute" : "1"
+  }, {
+    "_type" : "TestItem",
+    "id" : "list",
+    "stringAttribute" : "2"
+  } ]
+}

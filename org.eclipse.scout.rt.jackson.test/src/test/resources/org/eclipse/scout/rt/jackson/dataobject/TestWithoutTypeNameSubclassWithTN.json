@@ -1,0 +1,6 @@
+{
+  "_type" : "TestWithoutTypeNameSubclassWithTypename",
+  "id" : "foo",
+  "idSub" : "sub",
+  "value" : "bar"
+}
