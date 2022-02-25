@@ -125,7 +125,7 @@ public abstract class AbstractDataObjectSignatureTest {
     catch (IOException | RuntimeException e) { // runtime exception possible due to data object mapper
       writeCurrentSignature(currentSignature);
       LOG.warn("Failed to read previous signature file", e);
-      fail("Failed to read previous signature file.");
+      fail("Failed to read previous signature file. Message=" + e.getMessage());
     }
 
     DataObjectSignatureComparator comparator = BEANS.get(DataObjectSignatureComparator.class);
