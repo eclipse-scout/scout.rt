@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.dataobject.lookup;
 
+import java.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.nls.CollatorProvider;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
@@ -289,7 +291,9 @@ public class LookupHelper {
    * {@link Comparator} working on {@link AbstractLookupRowDo#getText()}.
    */
   public static <LOOKUP_ROW extends AbstractLookupRowDo<?>> Comparator<LOOKUP_ROW> lookupRowDoComparatorByText() {
-    return (o1, o2) -> StringUtility.compare(o1.getText(), o2.getText());
+    Collator collator = BEANS.get(CollatorProvider.class).getInstance();
+    collator.setStrength(Collator.TERTIARY);
+    return Comparator.comparing(AbstractLookupRowDo::getText, Comparator.nullsFirst(collator));
   }
 
   /**
