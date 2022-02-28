@@ -255,6 +255,7 @@ export default class Chart extends Widget {
    */
   updateChart(opts) {
     opts = opts || {};
+    opts.enforceRerender = !opts.onlyUpdateData && !opts.onlyRefresh;
 
     // Cancel previously scheduled update and merge opts
     if (this._updateChartTimeoutId) {
@@ -263,6 +264,7 @@ export default class Chart extends Widget {
         // Inherit 'true' values from previously scheduled updates
         opts.requestAnimation = opts.requestAnimation || this._updateChartOpts.requestAnimation;
         opts.onlyUpdateData = opts.onlyUpdateData || this._updateChartOpts.onlyUpdateData;
+        opts.enforceRerender = opts.enforceRerender || this._updateChartOpts.enforceRerender;
       }
       this._updateChartTimeoutId = null;
       this._updateChartOpts = null;
@@ -292,9 +294,11 @@ export default class Chart extends Widget {
         return;
       }
 
-      if (opts.onlyUpdateData && this.chartRenderer && this.chartRenderer.isDataUpdatable()) {
-        this.chartRenderer.updateData(opts.requestAnimation);
-      } else if (this.chartRenderer) {
+      this.updatedOnce = true;
+      if (!this.chartRenderer) {
+        return; // nothing to render when there is no renderer.
+      }
+      if (opts.enforceRerender) {
         this.chartRenderer.remove(this.chartRenderer.shouldAnimateRemoveOnUpdate(opts), chartAnimationStopping => {
           if (this.removing || chartAnimationStopping) {
             // prevent exceptions trying to render after navigated away, and do not update/render while a running animation is being stopped
@@ -303,8 +307,9 @@ export default class Chart extends Widget {
           this.chartRenderer.render(opts.requestAnimation);
           this.trigger('chartRender');
         });
+      } else if (opts.onlyUpdateData && this.chartRenderer.isDataUpdatable()) {
+        this.chartRenderer.updateData(opts.requestAnimation);
       }
-      this.updatedOnce = true;
     }
   }
 
