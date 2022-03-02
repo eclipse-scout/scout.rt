@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.transaction.TransactionCancelledError;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -55,6 +58,22 @@ public class ExceptionHandler {
     else {
       handleThrowable(t);
     }
+  }
+
+  /**
+   * Converts a given Exception in a RuntimeException
+   */
+  public RuntimeException convertAsRuntimeException(Exception e) {
+    if (e instanceof VetoException) {
+      return (VetoException) e;
+    }
+    else if (e instanceof IOException) {
+      return new UncheckedIOException((IOException) e);
+    }
+    else if (e instanceof RuntimeException) {
+      return (RuntimeException) e;
+    }
+    return new RuntimeException(e);
   }
 
   /**
