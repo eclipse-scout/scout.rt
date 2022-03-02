@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
 
 /**
@@ -144,6 +145,23 @@ public class InternalTableRowTest {
     ir.setRowChanging(true);
     ir.setIconId(TEST_ICON_ID);
     assertFalse(ir.isRowPropertiesChanged());
+    ir.setRowChanging(false);
+  }
+
+  @Test
+  public void testChangedValue() {
+    int[] cellChangeBits =
+        new int[]{ICell.OBSERVER_BIT, ICell.VALUE_BIT, ICell.TEXT_BIT, ICell.ICON_ID_BIT, ICell.TOOLTIP_BIT, ICell.H_ALIGN_BIT, ICell.BG_COLOR_BIT, ICell.FG_COLOR_BIT, ICell.FONT_BIT, ICell.EDITABLE_BIT, ICell.CSS_CLASS_BIT,
+            ICell.HTML_ENABLED_BIT, ICell.MANDATORY_BIT, ICell.ERROR_STATUS_BIT};
+    TestTable table = new TestTable();
+    ITableRow row = table.createRow();
+    InternalTableRow ir = new InternalTableRow(table, row);
+    ir.setRowChanging(true);
+    for (int cellChangeBit : cellChangeBits) {
+      ir.cellChanged(ir.getCell(0), cellChangeBit);
+      assertEquals(1, ir.getUpdatedColumnIndexes(cellChangeBit).size());
+      assertEquals(Integer.valueOf(0), CollectionUtility.firstElement(ir.getUpdatedColumnIndexes(cellChangeBit)));
+    }
     ir.setRowChanging(false);
   }
 
