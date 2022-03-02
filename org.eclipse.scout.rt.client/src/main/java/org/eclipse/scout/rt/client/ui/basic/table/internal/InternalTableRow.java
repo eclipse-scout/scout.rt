@@ -34,16 +34,10 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
  */
 public class InternalTableRow extends TableRow implements ICellObserver {
 
+  private final Map<ICell, Integer> m_updatedCells;
   private ITable m_table;
   private int m_rowIndex;
   private int m_rowChanging = 0;
-  private final Map<ICell, Set<Integer>> m_updatedCells;
-
-  private InternalTableRow() {
-    super(null);
-    m_updatedCells = new HashMap<>();
-    setFilterAcceptedInternal(true);
-  }
 
   public InternalTableRow(ITable table) {
     super(table.getColumnSet());
@@ -468,19 +462,13 @@ public class InternalTableRow extends TableRow implements ICellObserver {
   }
 
   private void setCellChanged(ICell cell, int changeBit) {
-    Set<Integer> updatedBits = m_updatedCells.get(cell);
-    if (updatedBits == null) {
-      updatedBits = new HashSet<>();
-    }
-    updatedBits.add(changeBit);
-    m_updatedCells.put(cell, updatedBits);
+    m_updatedCells.compute(cell, (iCell, bitMask) -> setBit(bitMask, changeBit));
   }
 
   private List<ICell> getChangedCells(int changedBit) {
     List<ICell> cells = new ArrayList<>();
-    for (Entry<ICell, Set<Integer>> e : m_updatedCells.entrySet()) {
-      Set<Integer> value = e.getValue();
-      if (value != null && value.contains(changedBit)) {
+    for (Entry<ICell, Integer> e : m_updatedCells.entrySet()) {
+      if (isBitSet(e.getValue(), changedBit)) {
         cells.add(e.getKey());
       }
     }
@@ -489,8 +477,8 @@ public class InternalTableRow extends TableRow implements ICellObserver {
 
   private List<ICell> getChangedCells() {
     List<ICell> cells = new ArrayList<>();
-    for (Entry<ICell, Set<Integer>> e : m_updatedCells.entrySet()) {
-      Set<Integer> changedBits = e.getValue();
+    for (Entry<ICell, Integer> e : m_updatedCells.entrySet()) {
+      Integer changedBits = e.getValue();
       if (changedBits != null) {
         cells.add(e.getKey());
       }
@@ -526,6 +514,17 @@ public class InternalTableRow extends TableRow implements ICellObserver {
       indexesByCell.put(m_cells.get(i), i);
     }
     return indexesByCell;
+  }
+
+  private Integer setBit(Integer bitMask, int bitPos) {
+    return bitMask == null
+        ? 1 << bitPos
+        : bitMask.intValue() | 1 << bitPos;
+  }
+
+  private boolean isBitSet(Integer bitMask, int bitPos) {
+    return bitMask != null
+        && (bitMask.intValue() & 1 << bitPos) != 0;
   }
 
   @Override
