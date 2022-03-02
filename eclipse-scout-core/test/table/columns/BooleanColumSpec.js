@@ -95,6 +95,21 @@ describe('BooleanColumn', () => {
       expect($checkbox).not.toHaveClass('checked');
     });
 
+    it('triggers rowClick event correctly', () => {
+      let model = helper.createModelSingleColumnByValues([true, false], 'BooleanColumn');
+      let table = helper.createTable(model);
+      let column0 = table.columns[0];
+      column0.setEditable(true);
+      table.render();
+      table.on('rowClick', event => {
+        expect(event.row).toBeDefined();
+        expect(event.row).toBe(model.rows[1]);
+        expect(event.mouseButton).toBe(1);
+        expect(event.column).toBe(column0);
+      });
+      table.$cell(0, table.rows[1].$row).triggerClick();
+    });
+
     describe('setCellValue', () => {
       it('rebuilds the cell', () => {
         let model = helper.createModelSingleColumnByValues([true], 'BooleanColumn');

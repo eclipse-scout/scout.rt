@@ -633,11 +633,11 @@ export default class Table extends Widget {
       // Don't start cell editor or trigger click if row control was clicked (expansion itself is handled by the mouse down handler)
       return;
     }
+    let row = $row.data('row'); // read row before the $row potentially could be replaced by the column specific logic on mouse up
     if (mouseButton === 1) {
       column.onMouseUp(event, $row);
       $appLink = this._find$AppLink(event);
     }
-    let row = $row.data('row');
     if ($appLink) {
       this._triggerAppLinkAction(column, row, $appLink.data('ref'), $appLink);
     } else {
