@@ -10,8 +10,11 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import java.util.concurrent.Callable;
+
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 public final class LambdaUtility {
 
@@ -19,29 +22,19 @@ public final class LambdaUtility {
     // static access only
   }
 
-  public static void invokeSafely(UnsafeRunnable runnable) {
+  public static void invokeSafely(IRunnable runnable) {
     invokeSafely(() -> {
       runnable.run();
       return null;
     });
   }
 
-  public static <T> T invokeSafely(UnsafeSupplier<T> supplier) {
+  public static <T> T invokeSafely(Callable<T> supplier) {
     try {
-      return supplier.get();
+      return supplier.call();
     }
     catch (Exception e) {
-      throw BEANS.get(ExceptionHandler.class).convertAsRuntimeException(e);
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
-  }
-
-  @FunctionalInterface
-  public interface UnsafeRunnable {
-    void run() throws Exception;
-  }
-
-  @FunctionalInterface
-  public interface UnsafeSupplier<T> {
-    T get() throws Exception;
   }
 }
