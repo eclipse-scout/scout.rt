@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.ExecutionException;
@@ -46,6 +48,9 @@ public class DefaultRuntimeExceptionTranslator implements IExceptionTranslator<R
   protected RuntimeException translateInternal(final Throwable t) {
     if (t instanceof Error) {
       throw (Error) t;
+    }
+    else if (t instanceof IOException) {
+      return new UncheckedIOException((IOException) t);
     }
     else if (t instanceof RuntimeException) {
       return (RuntimeException) t;
