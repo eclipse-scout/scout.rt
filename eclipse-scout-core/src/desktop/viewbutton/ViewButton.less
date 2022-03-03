@@ -35,6 +35,11 @@
     border-radius: @view-tab-selected-border-radius;
   }
 
+  & > .edge {
+    // Ensure GlassPane.js does not set position: relative if glass pane is added before view tab is selected
+    position: absolute;
+  }
+
   &.selected:not(.in-background) {
     margin: @view-tab-selected-margin-top 0 0;
     border-radius: @view-tab-selected-border-radius @view-tab-selected-border-radius 0 0;
