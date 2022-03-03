@@ -213,8 +213,7 @@
     }
   }
 
-  .tooltip-status,
-  .info-status {
+  .tooltip-status {
     visibility: visible;
     cursor: pointer;
 
@@ -234,6 +233,10 @@
       background-color: @active-background-color;
       color: @status-info-hover-color;
     }
+  }
+
+  .info-status {
+    #scout.tooltip-status();
   }
 
   .ok-status {
