@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /*
  * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -201,7 +202,7 @@ describe('ObjectFactory', () => {
     it('considers variants also within a custom namespace for variant', () => {
       window.my = {};
       let my = window.my;
-      my.VariantStringField = class VariantStringField{
+      my.VariantStringField = class VariantStringField {
         constructor() {
         }
       };

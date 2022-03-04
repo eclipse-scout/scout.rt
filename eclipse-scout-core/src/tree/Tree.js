@@ -250,7 +250,9 @@ export default class Tree extends Widget {
     }
     this._inSelectionPathList[selectedNode.id] = true;
 
-    selectedNode.childNodes.forEach(child => this._inSelectionPathList[child.id] = true);
+    selectedNode.childNodes.forEach(child => {
+      this._inSelectionPathList[child.id] = true;
+    });
 
     let parentNode = selectedNode.parentNode;
     while (parentNode) {

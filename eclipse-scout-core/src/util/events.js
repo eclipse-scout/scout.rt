@@ -220,7 +220,7 @@ export function onSwipe($element, id, onDown, onMove, onUp) {
       let pageX = events.pageX(event);
       let deltaX = pageX - origPageX;
       let newLeft = origPosLeft + deltaX;
-      if (newLeft != curPosLeft) {
+      if (newLeft !== curPosLeft) {
         // only update swipe direction if it actually changed
         direction = Math.sign(newLeft - curPosLeft);
       }

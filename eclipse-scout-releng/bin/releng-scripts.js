@@ -76,6 +76,7 @@ const cleanupSnapshots = args => {
     });
 };
 
+// noinspection BadExpressionStatementJS
 yargs
   .command('$0', 'default', () => {
   }, argv => {
@@ -92,7 +93,8 @@ yargs
   .command('version:release:dependencies', 'Updates snapshot-dependencies that are not part of the pnpm-workspace to the release versions of the given mapping.',
     yargs => yargs
       .option('mapping', {
-        description: '1 or more mappings with a regex and a version to specify which dependencies should be updated by what version. E.g.: --mapping.0.regex @your-dep --mapping.0.version 1.2.3 --mapping.1.regex @your-dep2 --mapping.1.version 4.5.6',
+        description: '1 or more mappings with a regex and a version to specify which dependencies should be updated by what version. ' +
+          'E.g.: --mapping.0.regex @your-dep --mapping.0.version 1.2.3 --mapping.1.regex @your-dep2 --mapping.1.version 4.5.6',
         type: 'string'
       })
       .option('workspaceRoot', {description: 'Path to the pnpm workspace root directory (optional).', type: 'string', default: null}),

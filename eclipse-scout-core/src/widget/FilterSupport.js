@@ -51,7 +51,7 @@ export default class FilterSupport extends WidgetSupport {
       scout.assertParameter('getElementsForFiltering', options.getElementsForFiltering);
       this._getElementsForFiltering = options.getElementsForFiltering;
     }
-    this._getElementText = options.getElementText || ((element) => $(element).text());
+    this._getElementText = options.getElementText || (element => $(element).text());
 
     if (options.createTextFilter) {
       scout.assertParameter('updateTextFilterText', options.updateTextFilterText);

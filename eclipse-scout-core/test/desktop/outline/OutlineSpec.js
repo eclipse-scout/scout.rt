@@ -429,7 +429,9 @@ describe('Outline', () => {
       outline.htmlComp.validateRoot = true; // Ensure layout calls will not be swallowed by DesktopLayout because there is no bench
       let node0 = outline.nodes[0];
       let newNodes = helper.createModelNodes(10);
-      newNodes.forEach(n => n.id = 'new-' + n.id); // Ensure the new nodes have a unique id
+      newNodes.forEach(n => {
+        n.id = 'new-' + n.id;
+      }); // Ensure the new nodes have a unique id
       outline.insertNodes(newNodes, node0);
       let childNode9 = outline.nodes[0].childNodes[9];
       childNode9.detailForm = new FormSpecHelper(session).createFormWithOneField({modal: false});

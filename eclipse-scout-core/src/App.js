@@ -291,7 +291,7 @@ export default class App {
     $loadingRoot.css('opacity', $loadingRoot.css('opacity'));
     // Add animation listener before adding the classes to ensure the listener will always be triggered even while debugging
     $loadingRoot.oneAnimationEnd(() => $loadingRoot.remove());
-    if ($loadingRoot.css('opacity') == 1) {
+    if ($loadingRoot.css('opacity') === '1') {
       $loadingRoot.addClass('fadeout and-more');
     } else {
       $loadingRoot.addClass('fadeout');

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-/* eslint-disable max-len */
+/* eslint-disable max-len,indent */
 
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
@@ -150,7 +150,7 @@ const updateDependencyConstraints = ({dependencies, workspaceModuleNames = [], u
  * @param dir where to start searching.
  * @returns {Promise<*>}
  */
-const findWorkspaceFileDir = async (dir) => {
+const findWorkspaceFileDir = async dir => {
   let pnpmWorkspace = null;
   let parentDir = dir;
   let currentDir;

@@ -49,8 +49,12 @@ describe('ComboMenu', () => {
 
       let actionCalled = false;
       let selectedCalled = false;
-      comboMenu.on('action', () => actionCalled = true);
-      comboMenu.on('propertyChange:selected', () => selectedCalled = false);
+      comboMenu.on('action', () => {
+        actionCalled = true;
+      });
+      comboMenu.on('propertyChange:selected', () => {
+        selectedCalled = false;
+      });
       comboMenu.doAction();
       expect(actionCalled).toBe(true);
       expect(selectedCalled).toBe(false);
@@ -116,14 +120,18 @@ describe('ComboMenu', () => {
 
       comboMenu.childActions[1].setSelected(true);
       expect(session.desktop.getPopups().length).toBe(2);
-      session.desktop.getPopups().forEach(popup => popup.animateRemoval = false);
+      session.desktop.getPopups().forEach(popup => {
+        popup.animateRemoval = false;
+      });
 
       comboMenu.childActions[1].setSelected(false);
       expect(session.desktop.getPopups().length).toBe(1);
 
       comboMenu.childActions[1].setSelected(true);
       expect(session.desktop.getPopups().length).toBe(2);
-      session.desktop.getPopups().forEach(popup => popup.animateRemoval = false);
+      session.desktop.getPopups().forEach(popup => {
+        popup.animateRemoval = false;
+      });
 
       ellipsis.setSelected(false);
       expect(ellipsis.popup).toBe(null);

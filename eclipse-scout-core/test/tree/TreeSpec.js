@@ -1328,7 +1328,7 @@ describe('Tree', () => {
 
       tree.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
 
-      expect(secondExpanded.filterAccepted).toBe(false);  // no longer visible
+      expect(secondExpanded.filterAccepted).toBe(false); // no longer visible
     });
 
     it('only shows selected in breadcrumb mode even if a child has filter accepted=true', () => {
@@ -2315,7 +2315,9 @@ describe('Tree', () => {
 
       tree.render();
 
-      [node_2, node_2_0, node_2_1, node_2_2].forEach(node => node.enabled = false);
+      [node_2, node_2_0, node_2_1, node_2_2].forEach(node => {
+        node.enabled = false;
+      });
 
       let idEndsWith0Filter = node => strings.endsWith(node.id, '0'),
         level0Filter = node => node.level === 0,

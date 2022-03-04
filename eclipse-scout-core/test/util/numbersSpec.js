@@ -224,6 +224,7 @@ describe('scout.numbers', () => {
       // corner cases (lost precision!)
       expect(numbers.shiftDecimalPoint(0.0999999999999999, 1)).toBe(0.999999999999999);
       expect(numbers.shiftDecimalPoint(1.0999999999999999, 1)).toBe(10.999999999999998);
+      // eslint-disable-next-line
       expect(numbers.shiftDecimalPoint(2.0999999999999999, 1)).toBe(21);
     });
 

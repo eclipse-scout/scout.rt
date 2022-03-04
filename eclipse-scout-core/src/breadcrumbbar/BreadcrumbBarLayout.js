@@ -44,7 +44,7 @@ export default class BreadcrumbBarLayout extends AbstractLayout {
     this._collapse(breadcrumbItems, containerSize);
   }
 
-  _collapse = function($container, containerSize) {
+  _collapse($container, containerSize) {
     let currentIndex = 1;
     const visibleBreadcrumbItems = this._visibleBreadcrumbItems();
     let prefSize = this._actualPrefSize(visibleBreadcrumbItems, true);
@@ -116,7 +116,7 @@ export default class BreadcrumbBarLayout extends AbstractLayout {
   /**
    * @return {number} the preferred width of all breadcrumbItems (plus ellipsis breadcrumb)
    */
-  _breadcrumbItemsWidth = function(breadcrumbItems, considerEllipsis) {
+  _breadcrumbItemsWidth(breadcrumbItems, considerEllipsis) {
     let breadcrumbsWidth = 0;
     breadcrumbItems = breadcrumbItems || this._visibleBreadcrumbItems();
     breadcrumbItems.forEach(breadcrumbItem => {

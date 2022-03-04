@@ -20,7 +20,9 @@ export default class LazyNodeFilter {
       return true;
     }
     // not expanded: remove lazy expand marker (forget lazy expanded children)
-    node.childNodes.forEach(child => child._lazyNodeFilterAccepted = false);
+    node.childNodes.forEach(child => {
+      child._lazyNodeFilterAccepted = false;
+    });
 
     if (!node.parentNode || !node.parentNode.expandedLazy || !node.parentNode.lazyExpandingEnabled || !this.tree.lazyExpandingEnabled) {
       // no lazy expanding supported
@@ -33,7 +35,7 @@ export default class LazyNodeFilter {
       if (typeof selectedNode === 'string') {
         break;
       }
-      if (selectedNode == node) {
+      if (selectedNode === node) {
         node._lazyNodeFilterAccepted = true;
         return true;
       }

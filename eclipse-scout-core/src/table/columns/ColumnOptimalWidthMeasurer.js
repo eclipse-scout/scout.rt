@@ -178,7 +178,7 @@ export default class ColumnOptimalWidthMeasurer {
       return 0;
     }
     let $neighbour = cellRange[cellRange.length - 1];
-    if ($neighbour.hasClass('empty') || $cell.hasClass('halign-right') == $neighbour.hasClass('halign-right')) {
+    if ($neighbour.hasClass('empty') || $cell.hasClass('halign-right') === $neighbour.hasClass('halign-right')) {
       return 0;
     }
     let $neighbourText = $neighbour.children('.text');

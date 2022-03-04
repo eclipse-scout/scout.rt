@@ -175,13 +175,13 @@ export function _createDragAndDropHandlerOptions(target) {
     target: target,
     supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
     validateFiles: (files, defaultValidator) => defaultValidator(files),
-    onDrop: (files) => {
+    onDrop: files => {
     },
     dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
     dropMaximumSize: () => target.dropMaximumSize,
     doInstall: () => target.enabledComputed,
     container: () => target.$container,
-    additionalDropProperties: (event) => {
+    additionalDropProperties: event => {
     }
   };
 }
@@ -269,6 +269,7 @@ export default {
  * @property {String} [selector] CSS selector which will be added to the event source.
  * @property {dropType} [dropType] Returns the allowed drop type during a drop event. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
  * @property {dropMaximumSize} [dropMaximumSize] Returns the maximum allowed size of a dropped object. Default is {@link DragAndDropTarget.dropMaximumSize}
- * @property {validateFiles} [validateFiles] An optional function to add a custom file validation logic. Throw a {@link dropValidationErrorMessage} to indicate a failed validation. if no custom validator is installed, the default maximum file size validator is invoked.
+ * @property {validateFiles} [validateFiles] An optional function to add a custom file validation logic. Throw a {@link dropValidationErrorMessage} to indicate a failed validation.
+ *           If no custom validator is installed, the default maximum file size validator is invoked.
  * @property {additionalDropProperties} [additionalDropProperties] Returns additional drop properties to be used in {@link DragAndDropHandler.uploadFiles} as uploadProperties
  */

@@ -986,7 +986,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     let maxLabelPrefSize = 0;
-    this._tooltip.$container.find('label').each((idx, elem) => maxLabelPrefSize = Math.max(maxLabelPrefSize, graphics.prefSize($(elem)).width));
+    this._tooltip.$container.find('label').each((idx, elem) => {
+      maxLabelPrefSize = Math.max(maxLabelPrefSize, graphics.prefSize($(elem)).width);
+    });
     if (maxLabelPrefSize > 0) {
       this._tooltip.$container
         .css('--chart-tooltip-label-width', Math.min(maxLabelPrefSize, 120) + 'px');

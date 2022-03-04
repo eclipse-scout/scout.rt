@@ -848,7 +848,7 @@ export default class Table extends Widget {
   _isAggregatedTooltip($cell) {
     let $row = $cell.parent();
     return $row.data('aggregateRow') /* row in the table */
-      || $row.hasClass('table-aggregate') /* aggregate table control */;
+      || $row.hasClass('table-aggregate'); /* aggregate table control */
   }
 
   reload(reloadReason) {
