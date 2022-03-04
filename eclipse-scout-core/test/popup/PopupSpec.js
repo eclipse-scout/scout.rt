@@ -966,14 +966,14 @@ describe('Popup', () => {
         expect(popup.$container.cssMarginX()).toBe(20);
       });
 
-      it('move popup if it overlaps the desktop bottom without and with horizontal switch', function() {
-        var $anchor = $desktop.appendDiv('anchor');
-        var desktopHeight = 70 + 80 + 20;
+      it('move popup if it overlaps the desktop bottom without and with horizontal switch', () => {
+        let $anchor = $desktop.appendDiv('anchor');
+        let desktopHeight = 70 + 80 + 20;
         $desktop.cssHeight(desktopHeight);
 
         // without switch
         $desktop.cssWidth(70 + 80 + 70);
-        var popup = scout.create('WidgetPopup', {
+        let popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
           horizontalAlignment: Popup.Alignment.RIGHT,

@@ -109,7 +109,7 @@ export default class ImageField extends FormField {
   }
 
   setScrollBarEnabled(scrollBarEnabled) {
-    this.setProperty('scrollBarEnabled', scrollBarEnabled)
+    this.setProperty('scrollBarEnabled', scrollBarEnabled);
   }
 
   _renderScrollBarEnabled() {
