@@ -53,18 +53,20 @@
  */
 .login-button.default {
 
-  &.login-error {
-    border-color: @palette-red-4;
-    background-color: @palette-red-4;
+  &.login-error:not(.disabled) {
+    border-color: transparent;
+    background-color: @error-color;
 
     &:hover {
-      background-color: @palette-red-4;
-      border-color: @palette-red-4;
+      background-color: @error-default-button-background-hover-color;
     }
 
     &:active {
-      border-color: @palette-red-4;
-      background-color: darken(@palette-red-4, 5%);
+      background-color: @error-default-button-background-active-color;
+    }
+
+    &:focus {
+      #scout.focus-border(@box-shadow-color: @error-focus-box-shadow-color, @border-color: mix(@error-color, @error-focus-box-shadow-color, 25%));
     }
   }
 

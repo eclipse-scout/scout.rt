@@ -75,8 +75,14 @@
 @warning-color: @palette-orange-2;
 @ok-color: @palette-green-2;
 @error-background-color: @background-color;
+@error-default-button-background-hover-color: lighten(@error-color, 6%);
+@error-default-button-background-active-color: lighten(@error-color, 10%);
 @error-focus-box-shadow-color: mix(@error-color, @palette-black, 50%);
+@warning-default-button-background-hover-color: lighten(@warning-color, 8%);
+@warning-default-button-background-active-color: lighten(@warning-color, 12%);
 @warning-focus-box-shadow-color: mix(@warning-color, @palette-black, 50%);
+@ok-default-button-background-hover-color: lighten(@ok-color, 8%);
+@ok-default-button-background-active-color: lighten(@ok-color, 14%);
 @ok-focus-box-shadow-color: mix(@ok-color, @palette-black, 50%);
 @focus-border-color: @focus-color;
 @focus-box-shadow-color: darken(@focus-color, 30%);
@@ -102,7 +108,8 @@
 @popup-2-background-color: @palette-gray-6;
 @popup-2-backdrop-background-color: fade(@popup-2-background-color, 80%);
 @popup-2-backdrop-filter: blur(15px);
-@selected-hover-background-color: darken(@selected-background-color, 10%);
+@selected-hover-background-color: lighten(@selected-background-color, 8%);
+@selected-active-background-color: lighten(@selected-background-color, 12%);
 @selected-disabled-background-color: @palette-gray-5;
 @text-color: @palette-gray-2;
 @text-color-1: @palette-gray-3;
