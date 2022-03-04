@@ -88,7 +88,7 @@
       }
     }
 
-    .severity-button(@error-color, @focus-color: @error-focus-box-shadow-color);
+    .severity-button(@error-color, @error-default-button-background-hover-color, @error-default-button-background-active-color, @error-focus-box-shadow-color);
   }
 
   &.warning {
@@ -100,7 +100,7 @@
       }
     }
 
-    .severity-button(@warning-color, @focus-color: @warning-focus-box-shadow-color);
+    .severity-button(@warning-color, @warning-default-button-background-hover-color, @warning-default-button-background-active-color, @warning-focus-box-shadow-color);
   }
 
   &.ok {
@@ -112,7 +112,7 @@
       }
     }
 
-    .severity-button(@ok-color, @focus-color: @ok-focus-box-shadow-color);
+    .severity-button(@ok-color, @ok-default-button-background-hover-color, @ok-default-button-background-active-color, @ok-focus-box-shadow-color);
   }
 
   &.animate-open {
