@@ -315,6 +315,30 @@ describe('CellEditor', () => {
       expect(triggeredEvent.column).toBe(table.columns[0]);
       expect(triggeredEvent.field instanceof Widget).toBe(true);
     });
+
+    it('postpones opening if table is not rendered yet', () => {
+      table.remove();
+      table.columns[0].setEditable(true);
+      let field = createStringField(table);
+      table.startCellEdit(table.columns[0], table.rows[0], field);
+      expect(table.cellEditorPopup).toBe(null);
+
+      table.render();
+      assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
+      expect(table.cellEditorPopup.cell.field).toBe(field);
+    });
+
+    it('postpones opening if table is not attached yet', () => {
+      table.detach();
+      table.columns[0].setEditable(true);
+      let field = createStringField(table);
+      table.startCellEdit(table.columns[0], table.rows[0], field);
+      expect(table.cellEditorPopup).toBe(null);
+
+      table.attach();
+      assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
+      expect(table.cellEditorPopup.cell.field).toBe(field);
+    });
   });
 
   describe('completeCellEdit', () => {
@@ -571,6 +595,21 @@ describe('CellEditor', () => {
       jasmine.clock().tick(300);
       expect(updateRowCount).toBe(1);
     });
+
+    it('updates the value even if the table has been removed in the meantime', () => {
+      table.columns[0].setEditable(true);
+      table.markRowsAsNonChanged();
+      table.prepareCellEdit(table.columns[0], table.rows[0], true);
+      jasmine.clock().tick(300);
+      table.cellEditorPopup.cell.field.$field.val('Key 1');
+      table.cellEditorPopup.cell.field._userWasTyping = true;
+      table.cellEditorPopup.completeEdit(); // Will execute table.completeCellEdit async
+      table.remove();
+      jasmine.clock().tick(300);
+      expect(table.rows[0].cells[0].value).toBe('key1');
+      expect(table.rows[0].cells[0].text).toBe('Key 1');
+      expect(table.rows[0].status).toBe(TableRow.Status.UPDATED);
+    });
   });
 
   describe('cancelCellEdit', () => {
@@ -753,18 +792,57 @@ describe('CellEditor', () => {
       expect(table.cancelCellEdit).toHaveBeenCalled();
     });
 
-    it('closes popup (before) table is removed', () => {
+    it('removes popup when table is detached', () => {
       row0.cells[0].editable = true;
       table.render();
       table.prepareCellEdit(table.columns[0], row0);
       jasmine.clock().tick(0);
       expect(table.cellEditorPopup).toBeTruthy();
-      table.remove(); // called by parent.detach();
+      table.cellEditorPopup.cell.field.setValue('my new value');
+      table.detach();
       jasmine.clock().tick(0);
+      expect(table.cellEditorPopup.rendered).toBe(false);
+
+      // Destroys popup after complete edit, even if table is not attached anymore
+      table.completeCellEdit();
+      expect(table.rows[0].cells[0].value).toBe('my new value');
       expect(table.cellEditorPopup).toBe(null);
     });
 
-    it('closes popup when table is removed', () => {
+    it('removes popup when table is removed', () => {
+      row0.cells[0].editable = true;
+      table.render();
+      table.prepareCellEdit(table.columns[0], row0);
+      jasmine.clock().tick(0);
+      expect(table.cellEditorPopup).toBeTruthy();
+      table.cellEditorPopup.cell.field.setValue('my new value');
+      table.remove();
+      jasmine.clock().tick(0);
+      expect(table.cellEditorPopup.rendered).toBe(false);
+      expect(table.cellEditorPopup.cell.field.rendered).toBe(false);
+
+      // Destroys popup after complete edit, even if table is not rendered anymore
+      table.completeCellEdit();
+      expect(table.rows[0].cells[0].value).toBe('my new value');
+      expect(table.cellEditorPopup).toBe(null);
+    });
+
+    it('does not fail if table is detached and attached again', () => {
+      row0.cells[0].editable = true;
+      table.render();
+      table.prepareCellEdit(table.columns[0], row0);
+      jasmine.clock().tick(0);
+      expect(table.cellEditorPopup).toBeTruthy();
+      table.detach();
+      jasmine.clock().tick(0);
+      expect(table.cellEditorPopup.rendered).toBe(false);
+
+      table.attach();
+      expect(table.cellEditorPopup.rendered).toBe(true);
+      expect(table.cellEditorPopup.cell.field.rendered).toBe(true);
+    });
+
+    it('does not fail if table is removed and rendered again', () => {
       row0.cells[0].editable = true;
       table.render();
       table.prepareCellEdit(table.columns[0], row0);
@@ -772,7 +850,11 @@ describe('CellEditor', () => {
       expect(table.cellEditorPopup).toBeTruthy();
       table.remove();
       jasmine.clock().tick(0);
-      expect(table.cellEditorPopup).toBe(null);
+      expect(table.cellEditorPopup.rendered).toBe(false);
+
+      table.render();
+      expect(table.cellEditorPopup.rendered).toBe(true);
+      expect(table.cellEditorPopup.cell.field.rendered).toBe(true);
     });
   });
 
