@@ -94,13 +94,33 @@ describe('CellEditorAdapter', () => {
       };
       session._processSuccessResponse(message);
 
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       expect($findPopup().length).toBe(0);
       expect($findPopup().find('.form-field').length).toBe(0);
       expect(popup.rendered).toBe(false);
       expect(popup.cell.field.rendered).toBe(false);
     });
 
+    it('does not fail if end edit happens while table is detached', () => {
+      let popup = createTableAndStartCellEdit();
+      let table = popup.table;
+      popup.completeEdit();
+      table.detach();
+      // Server sends updateRows before endCell edit -> updateRows will start a new editor but since it is detached, the action is postponed
+      table.updateRows([{
+        id: table.rows[0].id,
+        cells: ['Adjusted text']
+      }]);
+      let field = popup.cell.field;
+      session._processSuccessResponse({events: [createEndCellEditEvent(popup.table, field.id)]});
+      jasmine.clock().tick(0);
+      expect(field.destroyed).toBe(true);
+      expect(table.cellEditorPopup).toBe(null);
+
+      table.attach();
+      // After attach, the postponed action is executed but must do nothing because editor has been closed in the meantime
+      expect(table.cellEditorPopup).toBe(null);
+    });
   });
 
   describe('completeEdit', () => {
@@ -147,7 +167,6 @@ describe('CellEditorAdapter', () => {
       expect(popup.rendered).toBe(true);
       expect(popup.cell.field.rendered).toBe(true);
     });
-
   });
 
   describe('cancelEdit', () => {

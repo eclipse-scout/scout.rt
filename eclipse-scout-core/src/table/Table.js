@@ -23,6 +23,7 @@ export default class Table extends Widget {
     this.contextColumn = null;
     this.checkable = false;
     this.checkableStyle = Table.CheckableStyle.CHECKBOX;
+    this.cellEditorPopup = null;
     this.compact = false;
     this.compactHandler = scout.create('TableCompactHandler', {table: this});
     this.compactColumn = null;
@@ -100,6 +101,7 @@ export default class Table extends Widget {
     this._popupOpenHandler = this._onDesktopPopupOpen.bind(this);
     this._rerenderViewPortAfterAttach = false;
     this._renderViewPortAfterAttach = false;
+    this._postAttachActions = [];
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
     this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus', 'tileTableHeader', 'tableTileGridMediator']);
 
@@ -475,7 +477,6 @@ export default class Table extends Widget {
   }
 
   _removeData() {
-    this._destroyCellEditorPopup();
     this._removeAggregateRows();
     this._uninstallImageListeners();
     this._uninstallCellTooltipSupport();
@@ -2068,8 +2069,24 @@ export default class Table extends Widget {
   }
 
   /**
-   * This functions starts the cell editor for the given row and column. Prepare must wait until
-   * a pending completeCellEdit operation is resolved.
+   * Starts cell editing for the cell at the given column and row, but only if editing is allowed.
+   * @see prepareCellEdit
+   */
+  focusCell(column, row) {
+    let cell = this.cell(column, row);
+    if (this.enabledComputed && row.enabled && cell.editable) {
+      this.prepareCellEdit(column, row);
+    }
+  }
+
+  /**
+   * Creates a cell editor for the cell at the given column and row, ensures the row is selected and passes the editor
+   * to {@link #startCellEdit} which starts the editing by rendering the editor in a {@link CellEditorPopup}.<br>
+   * If the completion of a previous cell edit is still in progress, the preparation is delayed until the completion is finished.
+   *
+   * @param {boolean} [openFieldPopupOnCellEdit] true to instruct the editor to open its control popup when the editor is rendered.
+   *    This only has an effect if the editor has a popup (e.g. SmartField or DateField).
+   * @returns Promise the promise will be resolved when the preparation has been finished.
    */
   prepareCellEdit(column, row, openFieldPopupOnCellEdit) {
     let promise = $.resolvedPromise();
@@ -2080,10 +2097,10 @@ export default class Table extends Widget {
   }
 
   /**
-   * @param openFieldPopupOnCellEdit when this parameter is set to true, the CellEditorPopup sets an
+   * @param {boolean} [openFieldPopupOnCellEdit] when this parameter is set to true, the CellEditorPopup sets an
    *    additional property 'cellEditor' on the editor-field. The field instance may use this property
    *    to decide whether or not it should open a popup immediately after it is rendered. This is used
-   *    for Smart- and DateFields.
+   *    for Smart- and DateFields. Default is false.
    */
   prepareCellEditInternal(column, row, openFieldPopupOnCellEdit) {
     let event = new Event({
@@ -3043,8 +3060,16 @@ export default class Table extends Widget {
   }
 
   startCellEdit(column, row, field) {
-    if (!this._isDataRendered() || !this.isAttachedAndRendered()) {
+    if (field.destroyed) {
+      // May happen if the action was postponed and the field destroyed in the meantime using endCellEdit.
+      return;
+    }
+    if (!this._isDataRendered()) {
       this._postRenderActions.push(this.startCellEdit.bind(this, column, row, field));
+      return;
+    }
+    if (!this.$container.isAttached()) {
+      this._postAttachActions.push(this.startCellEdit.bind(this, column, row, field));
       return;
     }
 
@@ -3066,11 +3091,6 @@ export default class Table extends Widget {
    *    value is updated by an updateRow event instead.
    */
   endCellEdit(field, saveEditorValue) {
-    if (!this._isDataRendered() || !this.isAttachedAndRendered()) {
-      this._postRenderActions.push(this.endCellEdit.bind(this, field, saveEditorValue));
-      return;
-    }
-
     if (!this.cellEditorPopup) {
       // the cellEditorPopup could already be removed by scrolling (out of view range) or be removed by update rows
       field.destroy();
@@ -5302,18 +5322,6 @@ export default class Table extends Widget {
     }
   }
 
-  focusCell(column, row) {
-    if (!this._isDataRendered() || !this.isAttachedAndRendered()) {
-      this._postRenderActions.push(this.focusCell.bind(this, column, row));
-      return;
-    }
-
-    let cell = this.cell(column, row);
-    if (this.enabledComputed && row.enabled && cell.editable) {
-      this.prepareCellEdit(column, row, false);
-    }
-  }
-
   _attach() {
     this.$parent.append(this.$container);
     super._attach();
@@ -5337,6 +5345,9 @@ export default class Table extends Widget {
     super._renderOnAttach();
     this._rerenderViewportAfterAttach();
     this._renderViewportAfterAttach();
+    let actions = this._postAttachActions;
+    this._postAttachActions = [];
+    actions.forEach(action => action());
   }
 
   _rerenderViewportAfterAttach() {
@@ -5363,11 +5374,6 @@ export default class Table extends Widget {
     // Detach helper stores the current scroll pos and restores in attach.
     // To make it work scrollTop needs to be reset here otherwise viewport won't be rendered by _onDataScroll
     super._detach();
-  }
-
-  _onDetach() {
-    super._onDetach();
-    this._destroyCellEditorPopup();
   }
 
   /**
