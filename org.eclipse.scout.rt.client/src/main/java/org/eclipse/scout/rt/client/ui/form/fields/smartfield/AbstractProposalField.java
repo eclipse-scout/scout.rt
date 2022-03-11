@@ -38,18 +38,10 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
   @Override
   protected void initConfig() {
     super.initConfig();
-    setMaxLength(getConfiguredMaxLength());
     setTrimText(getConfiguredTrimText());
   }
 
-  /**
-   * Configures the initial value of {@link AbstractProposalField#getMaxLength()
-   * <p>
-   * Subclasses can override this method
-   * <p>
-   * Default is 4000
-   */
-  @ConfigProperty(ConfigProperty.INTEGER)
+  @Override
   protected int getConfiguredMaxLength() {
     return 4000;
   }
@@ -77,19 +69,6 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
   @Override
   protected String formatValueInternal(VALUE value) {
     return value != null ? value.toString() : "";
-  }
-
-  @Override
-  public void setMaxLength(int maxLength) {
-    boolean changed = propertySupport.setPropertyInt(PROP_MAX_LENGTH, Math.max(0, maxLength));
-    if (changed && isInitConfigDone()) {
-      setValue(getValue());
-    }
-  }
-
-  @Override
-  public int getMaxLength() {
-    return propertySupport.getPropertyInt(PROP_MAX_LENGTH);
   }
 
   @Override

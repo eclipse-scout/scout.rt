@@ -119,11 +119,11 @@ export default class BreadcrumbBarLayout extends AbstractLayout {
   _breadcrumbItemsWidth = function(breadcrumbItems, considerEllipsis) {
     let breadcrumbsWidth = 0;
     breadcrumbItems = breadcrumbItems || this._visibleBreadcrumbItems();
-    breadcrumbItems.forEach(function(breadcrumbItem) {
+    breadcrumbItems.forEach(breadcrumbItem => {
       if (breadcrumbItem.rendered) {
         breadcrumbsWidth += breadcrumbItem.$container.outerWidth(true);
       }
-    }, this);
+    });
 
     if (considerEllipsis && this._breadcrumbBar._ellipsisBreadcrumbItem && this._breadcrumbBar._ellipsisBreadcrumbItem.rendered) {
       breadcrumbsWidth += this._breadcrumbBar._ellipsisBreadcrumbItem.$container.outerWidth(true);

@@ -80,12 +80,13 @@ public class ClientNotificationPoller {
 
   protected static void handleMessagesReceived(List<ClientNotificationMessage> notifications) {
     if (LOG.isDebugEnabled()) {
-      LOG.debug("CLIENT NOTIFICATION returned with {} notifications ({}).", notifications.size(), notifications);
+      LOG.debug("Received {} notifications ({}).", notifications.size(), LOG.isTraceEnabled() ? notifications : "use level TRACE to see notifications");
     }
     // process notifications
     if (!notifications.isEmpty()) {
       BEANS.get(ClientNotificationDispatcher.class).dispatchNotifications(notifications);
     }
+    LOG.debug("Dispatched notifications");
   }
 
   private static final class P_NotificationPoller implements IRunnable {
@@ -104,6 +105,7 @@ public class ClientNotificationPoller {
               .withParentRunMonitor(outerRunMonitor)
               .run(() -> {
                 try {
+                  LOG.debug("Getting notifications from backend");
                   handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(INode.ID));
                 }
                 finally {

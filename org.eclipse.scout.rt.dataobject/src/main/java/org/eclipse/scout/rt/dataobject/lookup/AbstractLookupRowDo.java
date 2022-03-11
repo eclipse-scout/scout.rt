@@ -54,6 +54,18 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
     return createParentIdAttribute(this);
   }
 
+  public DoValue<String> iconId() {
+    return doValue("iconId");
+  }
+
+  public DoValue<String> cssClass() {
+    return doValue("cssClass");
+  }
+
+  public DoValue<String> tooltipText() {
+    return doValue("tooltipText");
+  }
+
   /* **************************************************************************
    * HELPER METHODS
    * *************************************************************************/
@@ -100,6 +112,21 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
     return self();
   }
 
+  public SELF withIconId(String iconId) {
+    iconId().set(iconId);
+    return self();
+  }
+
+  public SELF withCssClass(String cssClass) {
+    cssClass().set(cssClass);
+    return self();
+  }
+
+  public SELF withTooltipText(String tooltipText) {
+    tooltipText().set(tooltipText);
+    return self();
+  }
+
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
@@ -127,5 +154,20 @@ public abstract class AbstractLookupRowDo<SELF extends AbstractLookupRowDo<SELF,
   @Generated("DoConvenienceMethodsGenerator")
   public ID getParentId() {
     return parentId().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getIconId() {
+    return iconId().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getCssClass() {
+    return cssClass().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getTooltipText() {
+    return tooltipText().get();
   }
 }

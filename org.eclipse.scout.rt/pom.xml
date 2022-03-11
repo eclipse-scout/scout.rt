@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+  ~ Copyright (c) 2010-2022 BSI Business Systems Integration AG.
   ~ All rights reserved. This program and the accompanying materials
   ~ are made available under the terms of the Eclipse Public License v1.0
   ~ which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>3.14.2</version>
+    <version>3.14.4</version>
     <relativePath/>
   </parent>
 
@@ -23,7 +23,6 @@
   <artifactId>org.eclipse.scout.rt</artifactId>
   <version>11.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Eclipse Scout RT</name>
   <description>Eclipse Scout RT</description>
 
   <modules>
@@ -102,13 +101,13 @@
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
     <jetty.version>9.4.43.v20210629</jetty.version>
     <slf4j.version>1.7.30</slf4j.version>
-    <logback.version>1.2.3</logback.version>
+    <logback.version>1.2.10</logback.version>
     <jackson.version>2.11.3</jackson.version>
     <jackson-databind.version>2.11.3</jackson-databind.version>
     <batik.version>1.14</batik.version>
-    <activemq.version>5.16.0</activemq.version>
-    <artemis.version>2.15.0</artemis.version>
-    <com.google.http-client.version>1.38.0</com.google.http-client.version>
+    <activemq.version>5.16.3</activemq.version>
+    <artemis.version>2.20.0</artemis.version>
+    <com.google.http-client.version>1.38.1</com.google.http-client.version>
     <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.rt/target/jacoco-all.exec</master_coverage_jacoco_destFile>
@@ -164,6 +163,11 @@
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
+        <artifactId>log4j-over-slf4j</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
         <artifactId>slf4j-jdk14</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
@@ -171,11 +175,6 @@
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>${logback.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.17</version>
       </dependency>
       <dependency>
         <groupId>org.quartz-scheduler</groupId>
@@ -247,6 +246,12 @@
         <groupId>com.fasterxml.jackson.module</groupId>
         <artifactId>jackson-module-jaxb-annotations</artifactId>
         <version>${jackson.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -605,6 +610,18 @@
       </dependency>
 
       <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-compress</artifactId>
+        <version>1.21</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.thoughtworks.xstream</groupId>
+        <artifactId>xstream</artifactId>
+        <version>1.4.18</version>
+      </dependency>
+
+      <dependency>
         <groupId>jakarta.servlet</groupId>
         <artifactId>jakarta.servlet-api</artifactId>
         <version>4.0.4</version>
@@ -747,7 +764,7 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-core</artifactId>
-        <version>1.2.3</version>
+        <version>${logback.version}</version>
       </dependency>
       <dependency>
         <groupId>jakarta.activation</groupId>
@@ -938,6 +955,31 @@
         <artifactId>asm</artifactId>
         <version>7.3.1</version>
       </dependency>
+
+      <!-- BEGIN OWASP dependency check-->
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.7</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>okhttp</artifactId>
+        <version>3.14.9</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>xmlgraphics-commons</artifactId>
+        <version>2.7</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <!-- END OWASP dependency check-->
+
     </dependencies>
   </dependencyManagement>
 

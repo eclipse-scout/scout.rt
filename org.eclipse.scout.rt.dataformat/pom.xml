@@ -20,7 +20,7 @@
   </parent>
 
   <artifactId>org.eclipse.scout.rt.dataformat</artifactId>
-  <name>${project.groupId}:${project.artifactId}</name>
+
 
   <dependencies>
     <!-- Build Dependencies -->

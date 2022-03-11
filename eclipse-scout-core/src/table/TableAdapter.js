@@ -396,7 +396,7 @@ export default class TableAdapter extends ModelAdapter {
     } else if (event.type === 'aggregationFunctionChanged') {
       this._onWidgetAggregationFunctionChanged(event);
     } else if (event.type === 'drop' && this.widget.dragAndDropHandler) {
-      this.widget.dragAndDropHandler.uploadFiles(event.files);
+      this.widget.dragAndDropHandler.uploadFiles(event);
     } else {
       super._onWidgetEvent(event);
     }

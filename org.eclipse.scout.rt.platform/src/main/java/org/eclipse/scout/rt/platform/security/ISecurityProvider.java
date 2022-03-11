@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,9 +10,12 @@
  */
 package org.eclipse.scout.rt.platform.security;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -26,6 +29,17 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  */
 @ApplicationScoped
 public interface ISecurityProvider {
+
+  /**
+   * Specifies the minimum of password hash iterations with PBKDF2-HMAC-SHA512.
+   * <p>
+   * https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+   */
+  int MIN_PASSWORD_HASH_ITERATIONS_2016 = 10000;
+  int MIN_PASSWORD_HASH_ITERATIONS_2019 = 20000;
+  int MIN_PASSWORD_HASH_ITERATIONS_2021 = 120000;
+
+  int MIN_PASSWORD_HASH_ITERATIONS = MIN_PASSWORD_HASH_ITERATIONS_2021;
 
   /**
    * Create a Message Authentication Code (MAC) for the given data and password.
@@ -90,7 +104,7 @@ public interface ISecurityProvider {
   /**
    * Creates a hash for the given data using the given salt.<br>
    * <br>
-   * <b>Important:</b> For hashing of passwords use {@link #createPasswordHash(char[], byte[], int)}!
+   * <b>Important:</b> For hashing of passwords use {@link #createPasswordHash(char[], byte[])}!
    *
    * @param data
    *          The {@link InputStream} providing the data to hash.
@@ -116,11 +130,33 @@ public interface ISecurityProvider {
    *          The salt to use. Use {@link #createSecureRandomBytes(int)} to generate a new random salt for each
    *          credential. Do not use the same salt for multiple credentials. The salt should be at least 32 bytes long.
    *          Remember to save the salt with the hashed password! Must not be {@code null} or an empty array.
+   * @return the password hash
+   * @throws AssertionException
+   *           If one of the following conditions is {@code true}:<br>
+   *           <ul>
+   *           <li>The password is {@code null} or an empty array</li>
+   *           <li>The salt is {@code null} or an empty array</li>
+   *           </ul>
+   * @throws ProcessingException
+   *           If there is an error creating the hash. <br>
+   */
+  default byte[] createPasswordHash(char[] password, byte[] salt) {
+    return createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS);
+  }
+
+  /**
+   * @deprecated use {@link #createPasswordHash(char[], byte[])}
+   * @param password
+   *          The password to create the hash for. Must not be {@code null} or empty.
+   * @param salt
+   *          The salt to use. Use {@link #createSecureRandomBytes(int)} to generate a new random salt for each
+   *          credential. Do not use the same salt for multiple credentials. The salt should be at least 32 bytes long.
+   *          Remember to save the salt with the hashed password! Must not be {@code null} or an empty array.
    * @param iterations
    *          Specifies how many times the method executes its underlying algorithm. A higher value is safer.<br>
    *          While there is a minimum number of iterations recommended to ensure data safety, this value changes every
-   *          year as technology improves. As by May 2016 at least 10000 iterations are recommended. Therefore this
-   *          method will not accept values below that limit.<br>
+   *          year as technology improves. As by Aug 2021 at least 120000 iterations are recommended, see
+   *          https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html.<br>
    *          Experimentation is important. To provide a good security use an iteration count so that the call to this
    *          method requires one half second to execute (on the production system). Also consider the number of users
    *          and the number of logins executed to find a value that scales in your environment.
@@ -135,7 +171,38 @@ public interface ISecurityProvider {
    * @throws ProcessingException
    *           If there is an error creating the hash. <br>
    */
+  @SuppressWarnings("DeprecatedIsStillUsed")
+  @Deprecated
   byte[] createPasswordHash(char[] password, byte[] salt, int iterations);
+
+  /**
+   * This method is recommended in combination with {@link #createPasswordHash(char[], byte[])} where the iteration
+   * count is omitted. This has the advantage that the check of the password hash is independent of the creation of the
+   * hash. In case the iteration count is increased yearly, this method checks if the hash is valid
+   *
+   * @return true if calculated password has with {@link #createPasswordHash(char[], byte[], int)} matches the expected
+   *         hash.
+   * @since 11.0
+   */
+  default boolean verifyPasswordHash(char[] password, byte[] salt, byte[] expectedHash) {
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2019))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createPasswordHash(password, salt, MIN_PASSWORD_HASH_ITERATIONS_2016))) {
+      return true;
+    }
+    //2014 variants
+    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_8)), salt, 3557))) {
+      return true;
+    }
+    if (Arrays.equals(expectedHash, createHash(new ByteArrayInputStream(new String(password).getBytes(StandardCharsets.UTF_16)), salt, 3557))) {
+      return true;
+    }
+    return false;
+  }
 
   /**
    * Encrypts the given data using the given {@link EncryptionKey}.<br>

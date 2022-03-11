@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Locale;
@@ -55,10 +56,8 @@ public class DataObjectHelper {
   }
 
   /**
-   * Returns attribute {@code attributeName} converted to a {@link Date} value.
-   *
-   * @see {@link IValueFormatConstants#parseDefaultDate} for default parse method for string-formatted using default
-   *      format
+   * Returns attribute {@code attributeName} converted to a {@link Date} value. see
+   * {@link IValueFormatConstants#parseDefaultDate} for default parse method for string-formatted using default format
    */
   public Date getDateAttribute(IDoEntity entity, String attributeName) {
     Object value = entity.get(attributeName);
@@ -79,7 +78,7 @@ public class DataObjectHelper {
       return null;
     }
     if (value instanceof UUID) {
-      return UUID.class.cast(value);
+      return (UUID) value;
     }
     else if (value instanceof String) {
       return UUID.fromString((String) value);
@@ -96,10 +95,10 @@ public class DataObjectHelper {
       return null;
     }
     if (value instanceof Locale) {
-      return Locale.class.cast(value);
+      return (Locale) value;
     }
     else if (value instanceof String) {
-      return Locale.forLanguageTag(String.class.cast(value));
+      return Locale.forLanguageTag((String) value);
     }
     throw new IllegalArgumentException("Cannot convert value '" + value + "' to Locale");
   }
@@ -153,6 +152,18 @@ public class DataObjectHelper {
       return Objects.toString(entity);
     }
     return getDataObjectMapper().writeValue(entity);
+  }
+
+  /**
+   * @return json as byte[]
+   */
+  public byte[] toBytes(IDoEntity entity) {
+    if (entity == null) {
+      return new byte[0];
+    }
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    getDataObjectMapper().writeValue(out, entity);
+    return out.toByteArray();
   }
 
   /**

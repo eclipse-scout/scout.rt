@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.shared.clientnotification;
 
 import java.io.Serializable;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * Address of a client notification that can be used for dispatching.
@@ -40,4 +43,19 @@ public interface IClientNotificationAddress extends Serializable {
    */
   boolean isNotifyAllNodes();
 
+  default String prettyPrint() {
+    if (isNotifyAllNodes()) {
+      return "all nodes";
+    }
+    if (isNotifyAllSessions()) {
+      return "all sessions";
+    }
+    if (CollectionUtility.hasElements(getUserIds())) {
+      return getUserIds().stream().sorted().collect(Collectors.joining(", ", "users [", "]"));
+    }
+    if (CollectionUtility.hasElements(getSessionIds())) {
+      return getSessionIds().stream().sorted().collect(Collectors.joining(", ", "sessions [", "]"));
+    }
+    return "unknown";
+  }
 }

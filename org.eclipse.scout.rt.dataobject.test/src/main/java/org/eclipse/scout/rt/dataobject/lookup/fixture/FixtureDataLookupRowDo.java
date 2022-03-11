@@ -32,14 +32,70 @@ public class FixtureDataLookupRowDo extends AbstractLookupRowDo<FixtureDataLooku
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  @Override
   @Generated("DoConvenienceMethodsGenerator")
-  public FixtureDataLookupRowDo withAdditionalData(String text) {
-    additionalData().set(text);
+  public FixtureDataLookupRowDo withId(Long id) {
+    id().set(id);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRowDo withAdditionalData(String additionalData) {
+    additionalData().set(additionalData);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
   public String getAdditionalData() {
     return additionalData().get();
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRowDo withText(String text) {
+    text().set(text);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRowDo withEnabled(Boolean enabled) {
+    enabled().set(enabled);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRowDo withActive(Boolean active) {
+    active().set(active);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRowDo withParentId(Long parentId) {
+    parentId().set(parentId);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRowDo withIconId(String iconId) {
+    iconId().set(iconId);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRowDo withCssClass(String cssClass) {
+    cssClass().set(cssClass);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public FixtureDataLookupRowDo withTooltipText(String tooltipText) {
+    tooltipText().set(tooltipText);
+    return this;
   }
 }

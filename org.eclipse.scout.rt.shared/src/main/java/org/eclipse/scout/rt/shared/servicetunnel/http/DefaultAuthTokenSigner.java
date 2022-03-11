@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.shared.servicetunnel.http;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.Principal;
+import java.util.List;
 
 import javax.security.auth.Subject;
 
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.security.JwtPrincipal;
 import org.eclipse.scout.rt.platform.security.SamlPrincipal;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
@@ -88,7 +90,8 @@ public class DefaultAuthTokenSigner {
     Principal principal = selectUserPrincipal();
     if (principal instanceof JwtPrincipal) {
       JwtPrincipal jwt = (JwtPrincipal) principal;
-      token.withCustomArgs(JWT_IDENTIFIER, jwt.getJwtTokenString(), jwt.getAccessToken(), jwt.getRefreshToken());
+      List<String> args = CollectionUtility.arrayList(JWT_IDENTIFIER, jwt.getJwtTokenString(), jwt.getAccessToken(), jwt.getRefreshToken());
+      token.withCustomArgs(CollectionUtility.arrayListWithoutNullElements(args));
     }
     else if (principal instanceof SamlPrincipal) {
       SamlPrincipal saml = (SamlPrincipal) principal;

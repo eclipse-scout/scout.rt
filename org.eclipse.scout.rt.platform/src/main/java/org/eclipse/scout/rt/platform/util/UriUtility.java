@@ -20,6 +20,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ public final class UriUtility {
   /**
    * Parses the given URL's query string using encoding UTF_8 and extracts the query parameter.
    *
-   * @param uri
+   * @param url url
    * @return map with parsed query parameters. Never <code>null</code>.
    */
   public static Map<String, String> getQueryParameters(URL url) {
@@ -51,7 +52,7 @@ public final class UriUtility {
   /**
    * Parses the given URL's query string using the given encoding and extracts the query parameter.
    *
-   * @param uri
+   * @param url url
    * @param encoding
    *          encoding of the query parameter. If <code>null</code> UTF_8 is used.
    * @return map with parsed query parameters. Never <code>null</code>.
@@ -66,7 +67,7 @@ public final class UriUtility {
   /**
    * Parses the given URI's query string using encoding UTF_8 and extracts the query parameter.
    *
-   * @param uri
+   * @param uri uri
    * @return map with parsed query parameters. Never <code>null</code>.
    */
   public static Map<String, String> getQueryParameters(URI uri) {
@@ -76,7 +77,7 @@ public final class UriUtility {
   /**
    * Parses the given URI's query string using the given encoding and extracts the query parameter.
    *
-   * @param uri
+   * @param uri uri
    * @param encoding
    *          encoding of the query parameter. If <code>null</code> UTF-8 is used.
    * @return map with parsed query parameters. Never <code>null</code>.
@@ -126,7 +127,7 @@ public final class UriUtility {
   /**
    * Splits the path of the given {@link URI} in its elements.
    *
-   * @param uri
+   * @param uri uri
    * @return the path elements or an empty string array if the uri or its path is <code>null</code>.
    */
   public static String[] getPath(URI uri) {
@@ -143,7 +144,7 @@ public final class UriUtility {
   /**
    * Converts the given URL into an URI.
    *
-   * @param url
+   * @param url url
    * @return <code>null</code> if the given url is <code>null</code>.
    */
   public static URI urlToUri(URL url) {
@@ -161,7 +162,7 @@ public final class UriUtility {
   /**
    * Converts the given URI into an URL.
    *
-   * @param uri
+   * @param uri uri
    * @return <code>null</code> if the given uri is <code>null</code>.
    */
   public static URL uriToUrl(URI uri) {
@@ -179,7 +180,7 @@ public final class UriUtility {
   /**
    * Parses the given string into an {@link URI}.
    *
-   * @param uri
+   * @param uri uri
    * @return <code>null</code> if the given string is null or has no text or a parsed {@link URI} instance.
    */
   public static URI toUri(String uri) {
@@ -197,7 +198,7 @@ public final class UriUtility {
   /**
    * Parses the given string into an {@link URL}.
    *
-   * @param url
+   * @param url url
    * @return <code>null</code> if the given string is null or has no text or a parsed {@link URL} instance.
    */
   public static URL toUrl(String url) {
@@ -239,7 +240,7 @@ public final class UriUtility {
   }
 
   /**
-   * Delegates to {@link URLDecoder#encode(String, String)} using default encoding.
+   * Delegates to {@link URLEncoder#encode(String, String)} using default encoding.
    *
    * @return the newly encoded String
    */
@@ -248,7 +249,7 @@ public final class UriUtility {
   }
 
   /**
-   * Delegates to {@link URLDecoder#encode(String, String)} using the given encoding.
+   * Delegates to {@link URLEncoder#encode(String, String)} using the given encoding.
    *
    * @return the newly encoded String
    */
@@ -264,4 +265,44 @@ public final class UriUtility {
     }
   }
 
+  /**
+   * Indicates whether the string representation of URL a is equal to the string representation of URL b.
+   * <p>
+   * <b>Warning: The returned value is not equal to the value of {@link URL#equals(Object)}.</b>
+   * <p>
+   * Compared to {@link URL#equals(Object)} this method does not do DNS lookups for hostnames and thus does not consider
+   * two URLs with hostnames resolving to the same IP address as equal. Compared to calling {@link URL#toURI()} and
+   * {@link URI#equals(Object)}, this method does no additional validation and is not case-insensitive with regard to
+   * hostnames.
+   *
+   * @see URL#equals(Object)
+   */
+  public static boolean equals(URL a, URL b) {
+    if (a == b) {
+      return true;
+    }
+    if (a == null) {
+      return false;
+    }
+    if (b == null) {
+      return false;
+    }
+    return ObjectUtility.equals(a.toString(), b.toString());
+  }
+
+  /**
+   * Generates a hash code based on the string representation of the URL.
+   * <p>
+   * <b>Warning: The returned value is not equal to the value of {@link URL#hashCode()}.</b>
+   * <p>
+   * Compared to {@link URL#hashCode()} this method does not do a DNS lookup for the hostname and thus does not generate
+   * the same hash code for two URLs with hostnames resolving to the same IP address. Compared to calling
+   * {@link URL#toURI()} and {@link URI#equals(Object)}, this method does no additional validation and is not
+   * case-insensitive with regard to hostnames.
+   *
+   * @see URL#hashCode()
+   */
+  public static int hashCode(URL a) {
+    return Objects.hashCode(a == null ? null : a.toString());
+  }
 }

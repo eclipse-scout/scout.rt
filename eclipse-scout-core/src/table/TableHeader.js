@@ -294,7 +294,8 @@ export default class TableHeader extends Widget {
       $col = $col.clone();
       $col.children('.table-header-item-state').remove();
       let text = strings.plainText($col.html(), {
-        trim: true
+        trim: true,
+        removeFontIcons: true
       });
       if (strings.hasText(text)) {
         return text;

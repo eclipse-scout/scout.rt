@@ -21,7 +21,8 @@ export default class ChartLayout extends AbstractLayout {
   layout($container) {
     let opts = {
       requestAnimation: true,
-      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
+      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT,
+      onlyUpdateData: true
     };
     // Don't request animations when the session is not ready or the chart was already updated once
     if (!this.chart.session.ready || this.chart.updatedOnce) {

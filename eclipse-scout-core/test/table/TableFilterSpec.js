@@ -332,7 +332,7 @@ describe('TableFilter', () => {
       let table = helper.createTable(model);
 
       table.render();
-      table.addFilter(helper.createTableTextFilter(table, 'asdf'))
+      table.addFilter(helper.createTableTextFilter(table, 'asdf'));
       table.detach();
       table.filter();
       table.attach();

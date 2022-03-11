@@ -42,14 +42,49 @@ public interface IPopup extends IWidget {
   String SCROLL_TYPE_LAYOUT_AND_POSITION = "layoutAndPosition";
   String SCROLL_TYPE_REMOVE = "remove";
 
+  /**
+   * The entire popup is positioned horizontally left of the anchor.
+   */
   String POPUP_ALIGNMENT_LEFT = "left";
+  /**
+   * With arrow: The arrow at the left edge of the popup is aligned horizontally with the center of the anchor.
+   * <p>
+   * Without arrow: The left edges of both the popup and the anchor are aligned horizontally.
+   */
   String POPUP_ALIGNMENT_LEFTEDGE = "leftedge";
+  /**
+   * The entire popup is positioned vertically above the anchor.
+   */
   String POPUP_ALIGNMENT_TOP = "top";
+  /**
+   * With arrow: The arrow at the top edge of the popup is aligned vertically with the center of the anchor.
+   * <p>
+   * Without arrow: The top edges of both the popup and the anchor are aligned vertically.
+   */
   String POPUP_ALIGNMENT_TOPEDGE = "topedge";
+  /**
+   * The centers of both the popup and the anchor are aligned in the respective dimension.
+   */
   String POPUP_ALIGNMENT_CENTER = "center";
+  /**
+   * The entire popup is positioned horizontally to the right of the anchor.
+   */
   String POPUP_ALIGNMENT_RIGHT = "right";
+  /**
+   * With arrow: The arrow at the right edge of the popup is aligned horizontally with the center of the anchor.
+   * <p>
+   * Without arrow: The right edges of both the popup and the anchor are aligned horizontally.
+   */
   String POPUP_ALIGNMENT_RIGHTEDGE = "rightedge";
+  /**
+   * The entire popup is positioned vertically below the anchor.
+   */
   String POPUP_ALIGNMENT_BOTTOM = "bottom";
+  /**
+   * With arrow: The arrow at the bottom edge of the popup is aligned vertically with the center of the anchor.
+   * <p>
+   * Without arrow: The bottom edges of both the popup and the anchor are aligned vertically.
+   */
   String POPUP_ALIGNMENT_BOTTOMEDGE = "bottomedge";
 
   void setAnchor(IWidget anchor);
@@ -132,5 +167,4 @@ public interface IPopup extends IWidget {
   void close();
 
   IPopupUIFacade getUIFacade();
-
 }

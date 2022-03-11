@@ -66,4 +66,25 @@ public class StringLookupRowDo extends AbstractLookupRowDo<StringLookupRowDo, St
     active().set(active);
     return this;
   }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public StringLookupRowDo withIconId(String iconId) {
+    iconId().set(iconId);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public StringLookupRowDo withCssClass(String cssClass) {
+    cssClass().set(cssClass);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public StringLookupRowDo withTooltipText(String tooltipText) {
+    tooltipText().set(tooltipText);
+    return this;
+  }
 }

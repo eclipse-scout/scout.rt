@@ -80,9 +80,6 @@ export default class ProposalField extends SmartField {
     if (this.trimText) {
       validValue = validValue.trim();
     }
-    if (validValue.length > this.maxLength) {
-      validValue = validValue.substring(0, this.maxLength);
-    }
     if (validValue === '') {
       validValue = null;
     }
@@ -205,10 +202,6 @@ export default class ProposalField extends SmartField {
 
   setTrimText(trimText) {
     this.setProperty('trimText', trimText);
-  }
-
-  setMaxLength(maxLength) {
-    this.setProperty('maxLength', maxLength);
   }
 
   /**
