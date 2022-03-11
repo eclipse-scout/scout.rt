@@ -53,7 +53,7 @@ public class JerseyTestRestClientHelper extends AbstractRestClientHelper {
   protected Configuration createClientConfig() {
     ClientConfig clientConfig = new ClientConfig();
     clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, createTestingConnectionManager());
-    clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, true); // FIXME [8.0] pbz: Check test failure at CI Jenkins with abr
+    clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, true);
     return clientConfig;
   }
 

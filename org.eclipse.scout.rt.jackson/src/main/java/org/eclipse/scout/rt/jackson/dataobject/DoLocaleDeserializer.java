@@ -18,8 +18,9 @@ import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer.Std;
 
 /**
  * Custom deserializer for {@link Locale} that specifically only handles deserializing "und" into the
- * {@link Locale#ROOT} value. All other values are deserialized using the default implementation. TODO [22.0] pbz:
- * Remove this class when Jackson is upgraded to 3.0 (issue 1600)
+ * {@link Locale#ROOT} value. All other values are deserialized using the default implementation.
+ * <p>
+ * TODO [23.0] pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
  */
 public class DoLocaleDeserializer extends Std {
 

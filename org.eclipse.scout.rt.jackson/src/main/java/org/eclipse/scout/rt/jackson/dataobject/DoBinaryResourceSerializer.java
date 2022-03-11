@@ -26,7 +26,7 @@ public class DoBinaryResourceSerializer extends StdSerializer<BinaryResource> {
     super(BinaryResource.class);
   }
 
-  // FIXME [pbz] check how we can do this only for DOs but not for all BinaryResources globally
+  // TODO [23.0] pbz check how we can do this only for DOs but not for all BinaryResources globally
 
   @Override
   public void serialize(BinaryResource br, JsonGenerator gen, SerializerProvider provider) throws IOException {
