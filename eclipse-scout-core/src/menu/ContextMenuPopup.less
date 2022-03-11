@@ -53,14 +53,21 @@
     &.selected {
       background-color: @item-selection-background-color;
 
+      &.has-popup {
+        color: @context-menu-item-color;
+
+        &.disabled {
+          color: @menu-item-disabled-color;
+          background-color: @item-selection-background-color;
+        }
+      }
+
       & > .submenu-icon {
         transform: none;
       }
     }
 
     &.expanded {
-      color: @active-color;
-
       & > .submenu-icon {
         #scout.submenu-icon-open();
       }
