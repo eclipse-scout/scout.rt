@@ -43,6 +43,8 @@ export default class TableHeader extends Widget {
     this.$container = this.table.$data.beforeDiv('table-header')
       .cssBorderLeftWidth(this.table.rowBorders.left || '');
 
+    scrollbars.installScrollShadow(this.$container, this.session, {scrollShadow: 'x', scrollShadowCustomizer: this._updateScrollShadow.bind(this)});
+
     // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
     this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
 
@@ -72,6 +74,8 @@ export default class TableHeader extends Widget {
     this.table.off('columnMoved', this._tableColumnMovedHandler);
 
     this._removeColumns();
+
+    scrollbars.uninstallScrollShadow(this.$container, this.session);
 
     super._remove();
   }
@@ -204,6 +208,8 @@ export default class TableHeader extends Widget {
     $header
       .cssMinWidth(columnWidth)
       .cssMaxWidth(columnWidth);
+
+    scrollbars.updateScrollShadow(this.$container);
   }
 
   /**
@@ -815,6 +821,12 @@ export default class TableHeader extends Widget {
     scrollbars.fix(this.$menuBarContainer);
     this._reconcileScrollPos();
     this._fixTimeout = scrollbars.unfix(this.$menuBarContainer, this._fixTimeout);
+  }
+
+  _updateScrollShadow($container, $shadow) {
+    // The last header resize item increases the scroll width of the header.
+    // To prevent having a constant right scroll shadow, the table data is used as a reference for the shadow computation
+    scrollbars.updateScrollShadowVisibility(this.table?.get$Scrollable(), $shadow, $container.data('scroll-shadow-style'));
   }
 
   _onMenuBarPropertyChange(event) {

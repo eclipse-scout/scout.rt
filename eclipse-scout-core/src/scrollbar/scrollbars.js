@@ -226,17 +226,8 @@ export function updateScrollShadow($container) {
   if (!$shadow) {
     return;
   }
-  let scrollTop = $container[0].scrollTop;
-  let scrollLeft = $container[0].scrollLeft;
-  let atTop = atStart(scrollTop);
-  let atBottom = atEnd(scrollTop, $container[0].scrollHeight, $container[0].offsetHeight);
-  let atLeft = atStart(scrollLeft);
-  let atRight = atEnd(scrollLeft, $container[0].scrollWidth, $container[0].offsetWidth);
   let style = $container.data('scroll-shadow-style');
-  $shadow.toggleClass('top', !atTop && style.indexOf('top') > -1);
-  $shadow.toggleClass('bottom', !atBottom && style.indexOf('bottom') > -1);
-  $shadow.toggleClass('left', !atLeft && style.indexOf('left') > -1);
-  $shadow.toggleClass('right', !atRight && style.indexOf('right') > -1);
+  updateScrollShadowVisibility($container, $shadow, style);
   graphics.setBounds($shadow, graphics.bounds($container, {exact: true}));
   graphics.setMargins($shadow, graphics.margins($container));
   $shadow.css('border-radius', $container.css('border-radius'));
@@ -245,6 +236,24 @@ export function updateScrollShadow($container) {
   if (customizer) {
     customizer($container, $shadow);
   }
+}
+
+/**
+ * Computes which edge needs a scroll shadow and toggles the corresponding classes (top, bottom, left, right)
+ * @param $container the element used as a reference for the computing.
+ * @param $shadow the element receiving the shadow.
+ */
+export function updateScrollShadowVisibility($container, $shadow, style) {
+  let scrollTop = $container[0].scrollTop;
+  let scrollLeft = $container[0].scrollLeft;
+  let atTop = atStart(scrollTop);
+  let atBottom = atEnd(scrollTop, $container[0].scrollHeight, $container[0].offsetHeight);
+  let atLeft = atStart(scrollLeft);
+  let atRight = atEnd(scrollLeft, $container[0].scrollWidth, $container[0].offsetWidth);
+  $shadow.toggleClass('top', !atTop && style.indexOf('top') > -1);
+  $shadow.toggleClass('bottom', !atBottom && style.indexOf('bottom') > -1);
+  $shadow.toggleClass('left', !atLeft && style.indexOf('left') > -1);
+  $shadow.toggleClass('right', !atRight && style.indexOf('right') > -1);
 
   function atStart(scrollPos) {
     return scrollPos === 0;
@@ -984,5 +993,7 @@ export default {
   unfix,
   uninstall,
   uninstallScrollShadow,
-  update
+  updateScrollShadowVisibility,
+  update,
+  updateScrollShadow
 };

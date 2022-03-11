@@ -93,6 +93,7 @@ export default class TableLayout extends AbstractLayout {
       // Size of last column may have to be adjusted due to the header menu items
       if (header) {
         header.resizeHeaderItem(lastColumn);
+        scrollbars.updateScrollShadow(header.$container);
       }
 
       this.table.setViewRangeSize(this.table.calculateViewRangeSize());
