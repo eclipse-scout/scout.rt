@@ -206,6 +206,11 @@ export function containsAll(haystack, needles) {
   });
 }
 
+/**
+ * @template T
+ * @param {T[]} arr
+ * @return {T}
+ */
 export function first(arr) {
   if (Array.isArray(arr)) {
     return arr[0];
@@ -213,6 +218,11 @@ export function first(arr) {
   return arr;
 }
 
+/**
+ * @template T
+ * @param {T[]} arr
+ * @return {T}
+ */
 export function last(arr) {
   if (Array.isArray(arr)) {
     return arr[arr.length - 1];
@@ -285,8 +295,8 @@ export function union(array1, array2) {
   return result;
 }
 
-// noinspection DuplicatedCode
 export function equalsIgnoreOrder(arr, arr2) {
+  // noinspection DuplicatedCode
   if (arr === arr2) {
     return true;
   }
@@ -302,8 +312,8 @@ export function equalsIgnoreOrder(arr, arr2) {
   return containsAll(arr, arr2);
 }
 
-// noinspection DuplicatedCode
 export function equals(arr, arr2) {
+  // noinspection DuplicatedCode
   if (arr === arr2) {
     return true;
   }
