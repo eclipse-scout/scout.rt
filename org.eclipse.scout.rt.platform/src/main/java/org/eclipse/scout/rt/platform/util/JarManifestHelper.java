@@ -49,13 +49,13 @@ public class JarManifestHelper {
   public Map<String, String> getAttributes(Class<?> manifestResourceBase) {
     try {
       // (1) Resolve classpath of manifestResourceBase within JAR file
-      String jarClassPath = toJarClasspath(manifestResourceBase);
-      if (jarClassPath == null) {
+      String jarClasspath = toJarClasspath(manifestResourceBase);
+      if (jarClasspath == null) {
         return CollectionUtility.emptyHashMap(); // Class not loaded from a JAR, e.g. no manifest available
       }
 
       // (2) Read manifest of defining JAR
-      URL url = new URL(jarClassPath);
+      URL url = new URL(jarClasspath);
       URLConnection conn = url.openConnection();
       if (conn instanceof JarURLConnection) {
         JarURLConnection jarConn = (JarURLConnection) conn;
@@ -92,14 +92,34 @@ public class JarManifestHelper {
     return DateUtility.parse(getAttribute(manifestResourceBase, MANIFEST_ATTRIBUTE_BUILD_TIME), MANIFEST_BUILD_TIME_PATTERN);
   }
 
+  /**
+   * Resolves classpath of class within a JAR file
+   */
   protected String toJarClasspath(Class<?> manifestResourceBase) {
-    // resolve classPath of class within jar file
-    String className = manifestResourceBase.getSimpleName() + ".class";
-    String classPath = manifestResourceBase.getResource(className).toString();
-    if (classPath.startsWith("jar")) {
-      return classPath;
+    String className = toClassName(manifestResourceBase);
+    String classpath = manifestResourceBase.getResource(className).toString();
+    if (StringUtility.lowercase(classpath).startsWith("jar")) {
+      return classpath;
     }
+    if (StringUtility.lowercase(classpath).startsWith("file")) {
+      // class is not packaged into a JAR file (e.g. development environment)
+      return null;
+    }
+    LOG.warn("Failed to load class {} as resource, className={}, classpath={}", manifestResourceBase, className, classpath);
     return null;
+  }
+
+  /**
+   * @return full class name of given class {@code manifestResourceBase} including name of all enclosing classes and a
+   *         {@code .class} suffix
+   */
+  protected String toClassName(Class<?> manifestResourceBase) {
+    String className = manifestResourceBase.getName() + ".class";
+    int packageLength = manifestResourceBase.getPackage().getName().length();
+    if (packageLength > 0) {
+      className = StringUtility.substring(className, packageLength + 1 /* dot */);
+    }
+    return className;
   }
 
   protected Map<String, String> extractAttributes(Attributes attributes) {
