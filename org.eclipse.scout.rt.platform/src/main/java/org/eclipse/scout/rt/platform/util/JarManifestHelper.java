@@ -89,7 +89,13 @@ public class JarManifestHelper {
    * @return value of manifest attribute {@value #MANIFEST_ATTRIBUTE_BUILD_TIME}
    */
   public Date getBuildDateAttribute(Class<?> manifestResourceBase) {
-    return DateUtility.parse(getAttribute(manifestResourceBase, MANIFEST_ATTRIBUTE_BUILD_TIME), MANIFEST_BUILD_TIME_PATTERN);
+    try {
+      return DateUtility.parse(getAttribute(manifestResourceBase, MANIFEST_ATTRIBUTE_BUILD_TIME), MANIFEST_BUILD_TIME_PATTERN);
+    }
+    catch (IllegalArgumentException e) {
+      LOG.warn("Failed to parse build date from manifest attribute {}", MANIFEST_ATTRIBUTE_BUILD_TIME, e);
+      return null;
+    }
   }
 
   /**
