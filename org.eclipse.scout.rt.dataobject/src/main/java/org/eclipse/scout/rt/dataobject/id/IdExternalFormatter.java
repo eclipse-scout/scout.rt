@@ -66,16 +66,14 @@ public class IdExternalFormatter {
   /**
    * Returns a string in the format <code>"[type-name]:[raw-id]"</code>.
    * <ul>
-   * <li><b>type-name</b> is computed by {@link #getName(IId)}.
+   * <li><b>type-name</b> is computed by {@link #getTypeName(IId)}.
    * <li><b>raw-id</b> is the unwrapped id (see {@link IId#unwrapAsString()}).
    * </ul>
    */
   public <ID extends IId<?>> String toExternalForm(ID id) {
-    StringBuilder sb = new StringBuilder();
-    sb.append(Assertions.assertNotNull(getTypeName(id), "Missing @{} in class {}", IdTypeName.class.getSimpleName(), id.getClass().getName()));
-    sb.append(":");
-    sb.append(id.unwrapAsString());
-    return sb.toString();
+    String typeName = Assertions.assertNotNull(getTypeName(id), "Missing @{} in class {}", IdTypeName.class.getSimpleName(), id.getClass().getName());
+    String rawId = id.unwrapAsString();
+    return typeName + ":" + rawId;
   }
 
   /**
