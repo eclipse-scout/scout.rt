@@ -19,7 +19,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 
 /**
  * JUnit tests for {@link BeanUtility}
@@ -28,16 +31,20 @@ import org.junit.Test;
  */
 public class BeanUtilityTest {
 
+  @Rule
+  public ErrorCollector collector = new ErrorCollector();
+
   @Test
   public void testGetConstructorNullAndDefault() throws Exception {
     assertNull(BeanUtility.findConstructor(null));
     //
-    assertEquals(1, OnlyDefalutConstructor.class.getConstructors().length);
-    Constructor<OnlyDefalutConstructor> expected = OnlyDefalutConstructor.class.getConstructor((Class<?>[]) null);
-    assertEquals(expected, BeanUtility.findConstructor(OnlyDefalutConstructor.class));
-    assertEquals(expected, BeanUtility.findConstructor(OnlyDefalutConstructor.class, (Class<?>[]) null));
+    assertEquals(1, OnlyDefaultConstructor.class.getConstructors().length);
+    @SuppressWarnings("JavaReflectionMemberAccess")
+    Constructor<OnlyDefaultConstructor> expected = OnlyDefaultConstructor.class.getConstructor((Class<?>[]) null);
+    assertEquals(expected, BeanUtility.findConstructor(OnlyDefaultConstructor.class));
+    assertEquals(expected, BeanUtility.findConstructor(OnlyDefaultConstructor.class, (Class<?>[]) null));
     //
-    assertNull(BeanUtility.findConstructor(OnlyPrivateDefalutConstructor.class));
+    assertNull(BeanUtility.findConstructor(OnlyPrivateDefaultConstructor.class));
   }
 
   @Test
@@ -46,6 +53,7 @@ public class BeanUtilityTest {
   }
 
   @Test
+  @SuppressWarnings("JavaReflectionMemberAccess")
   public void testGetConstructorNonStaticClass() throws Exception {
     assertNull(BeanUtility.findConstructor(NonStaticInnerClass.class));
     assertEquals(NonStaticInnerClass.class.getConstructor(BeanUtilityTest.class), BeanUtility.findConstructor(NonStaticInnerClass.class, BeanUtilityTest.class));
@@ -63,11 +71,11 @@ public class BeanUtilityTest {
 
   @Test
   public void testGetConstructorPolymorphismOverloadedConstructors() throws Exception {
-    assertEquals(MultyParamConstructor.class.getConstructor(), BeanUtility.findConstructor(MultyParamConstructor.class));
-    assertEquals(MultyParamConstructor.class.getConstructor(A.class), BeanUtility.findConstructor(MultyParamConstructor.class, A.class));
-    assertEquals(MultyParamConstructor.class.getConstructor(AExt.class), BeanUtility.findConstructor(MultyParamConstructor.class, AExt.class));
-    assertEquals(MultyParamConstructor.class.getConstructor(A.class), BeanUtility.findConstructor(MultyParamConstructor.class, AExt2.class));
-    assertEquals(MultyParamConstructor.class.getConstructor(AExt.class), BeanUtility.findConstructor(MultyParamConstructor.class, AExtExt.class));
+    assertEquals(MultiParamConstructor.class.getConstructor(), BeanUtility.findConstructor(MultiParamConstructor.class));
+    assertEquals(MultiParamConstructor.class.getConstructor(A.class), BeanUtility.findConstructor(MultiParamConstructor.class, A.class));
+    assertEquals(MultiParamConstructor.class.getConstructor(AExt.class), BeanUtility.findConstructor(MultiParamConstructor.class, AExt.class));
+    assertEquals(MultiParamConstructor.class.getConstructor(A.class), BeanUtility.findConstructor(MultiParamConstructor.class, AExt2.class));
+    assertEquals(MultiParamConstructor.class.getConstructor(AExt.class), BeanUtility.findConstructor(MultiParamConstructor.class, AExtExt.class));
   }
 
   @Test
@@ -96,6 +104,8 @@ public class BeanUtilityTest {
     assertEquals(ComplexTypeConstructor.class.getConstructor(Long.class), BeanUtility.findConstructor(ComplexTypeConstructor.class, Long.class));
     // auto-boxing
     assertEquals(ComplexTypeConstructor.class.getConstructor(Long.class), BeanUtility.findConstructor(ComplexTypeConstructor.class, long.class));
+    // incompatible types
+    assertNull(BeanUtility.findConstructor(ComplexTypeConstructor.class, String.class));
   }
 
   @Test
@@ -115,9 +125,9 @@ public class BeanUtilityTest {
     assertNull(BeanUtility.createInstance(null));
     assertNull(BeanUtility.createInstance(null, null, null));
     //
-    assertTrue(BeanUtility.createInstance(OnlyDefalutConstructor.class) instanceof OnlyDefalutConstructor);
-    assertTrue(BeanUtility.createInstance(OnlyDefalutConstructor.class, (Object[]) null) instanceof OnlyDefalutConstructor);
-    assertTrue(BeanUtility.createInstance(OnlyDefalutConstructor.class, null, null) instanceof OnlyDefalutConstructor);
+    assertTrue(BeanUtility.createInstance(OnlyDefaultConstructor.class) instanceof OnlyDefaultConstructor);
+    assertTrue(BeanUtility.createInstance(OnlyDefaultConstructor.class, (Object[]) null) instanceof OnlyDefaultConstructor);
+    assertTrue(BeanUtility.createInstance(OnlyDefaultConstructor.class, null, null) instanceof OnlyDefaultConstructor);
   }
 
   @Test
@@ -245,8 +255,8 @@ public class BeanUtilityTest {
 
   @Test
   public void testGetInterfacesHierarchyWithoutFilterClass() {
-    List<Class<? extends Object>> hierarchy = BeanUtility.getInterfacesHierarchy(InterfaceWithHierarchy.class, null);
-    Iterator<Class<? extends Object>> it = hierarchy.iterator();
+    List<Class<?>> hierarchy = BeanUtility.getInterfacesHierarchy(InterfaceWithHierarchy.class, null);
+    Iterator<Class<?>> it = hierarchy.iterator();
     assertEquals(Iterable.class, it.next());
     assertEquals(Collection.class, it.next());
     assertEquals(Set.class, it.next());
@@ -263,11 +273,60 @@ public class BeanUtilityTest {
     assertEquals(InterfaceWithHierarchy.class, it.next());
   }
 
-  public static class OnlyDefalutConstructor {
+  @Test
+  public void testTypeDistancePrimitiveTypes() {
+    List<ImmutablePair<Class<?>, Class<?>>> primitiveToObjectTypes = List.of(
+        ImmutablePair.of(boolean.class, Boolean.class),
+        ImmutablePair.of(byte.class, Byte.class),
+        ImmutablePair.of(char.class, Character.class),
+        ImmutablePair.of(short.class, Short.class),
+        ImmutablePair.of(int.class, Integer.class),
+        ImmutablePair.of(long.class, Long.class),
+        ImmutablePair.of(float.class, Float.class),
+        ImmutablePair.of(double.class, Double.class));
+
+    // declared and actual are primitive types
+    primitiveToObjectTypes.stream()
+        .map(Pair::getLeft)
+        .forEach(t -> collector.checkThat(
+            String.format("distance to itself [primitive]: %s", t.getSimpleName()),
+            BeanUtility.computeTypeDistance(t, t), CoreMatchers.is(0)));
+
+    // declared and actual are object types
+    primitiveToObjectTypes.stream()
+        .map(Pair::getRight)
+        .forEach(t -> collector.checkThat(
+            String.format("distance to itself [object type]: %s", t.getSimpleName()),
+            BeanUtility.computeTypeDistance(t, t), CoreMatchers.is(0)));
+
+    // declared is primitive, actual an object type -> un-boxing
+    primitiveToObjectTypes
+        .forEach(p -> collector.checkThat(
+            String.format("distance between declared=%s and actual=%s", p.getLeft().getSimpleName(), p.getRight().getSimpleName()), BeanUtility.computeTypeDistance(p.getLeft(), p.getRight()), CoreMatchers.is(1)));// declared is primitive, actual an object type -> un-boxing
+
+    // declared is primitive, actual null
+    primitiveToObjectTypes.stream()
+        .map(Pair::getLeft)
+        .forEach(t -> collector.checkThat(
+            String.format("distance between declared=%s and actual=<null>", t.getSimpleName()), BeanUtility.computeTypeDistance(t, null), CoreMatchers.is(-1)));
+
+    // declared is object type, actual a primitive -> boxing
+    primitiveToObjectTypes
+        .forEach(p -> collector.checkThat(
+            String.format("distance between declared=%s and actual=%s", p.getRight().getSimpleName(), p.getLeft().getName()), BeanUtility.computeTypeDistance(p.getRight(), p.getLeft()), CoreMatchers.is(1)));
+
+    // declared is object type, actual null
+    primitiveToObjectTypes.stream()
+        .map(Pair::getRight)
+        .forEach(t -> collector.checkThat(
+            String.format("distance between declared=%s and actual=<null>", t.getSimpleName()), BeanUtility.computeTypeDistance(t, null), CoreMatchers.is(0)));
   }
 
-  public static class OnlyPrivateDefalutConstructor {
-    private OnlyPrivateDefalutConstructor() {
+  public static class OnlyDefaultConstructor {
+  }
+
+  public static final class OnlyPrivateDefaultConstructor {
+    private OnlyPrivateDefaultConstructor() {
     }
   }
 
@@ -276,14 +335,14 @@ public class BeanUtilityTest {
     }
   }
 
-  public static class MultyParamConstructor {
-    public MultyParamConstructor() {
+  public static class MultiParamConstructor {
+    public MultiParamConstructor() {
     }
 
-    public MultyParamConstructor(A paramA) {
+    public MultiParamConstructor(A paramA) {
     }
 
-    public MultyParamConstructor(AExt paramAExt) {
+    public MultiParamConstructor(AExt paramAExt) {
     }
   }
 
