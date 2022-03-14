@@ -21,9 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.FastBeanInfo;
@@ -125,22 +128,20 @@ public final class BeanUtility {
     if (beanClass == null) {
       return new FastBeanInfo(beanClass, stopClass);
     }
-      CompositeObject key = new CompositeObject(beanClass, stopClass);
-      FastBeanInfo info = BEAN_INFO_CACHE.computeIfAbsent(key, k -> new FastBeanInfo(beanClass, stopClass));
-      return info;
+    CompositeObject key = new CompositeObject(beanClass, stopClass);
+    FastBeanInfo info = BEAN_INFO_CACHE.computeIfAbsent(key, k -> new FastBeanInfo(beanClass, stopClass));
+    return info;
   }
 
   /**
    * Clear the cache used by {@link #getFastBeanInfo(Class, Class)}
    */
   public static void clearFastBeanInfoCache() {
-      BEAN_INFO_CACHE.clear();
+    BEAN_INFO_CACHE.clear();
   }
 
   /**
    * Get all properties from this class up to (and excluding) stopClazz
-   *
-   * @param filter
    */
   public static FastPropertyDescriptor[] getFastPropertyDescriptors(Class<?> clazz, Class<?> stopClazz, IPropertyFilter filter) {
     FastBeanInfo info = getFastBeanInfo(clazz, stopClazz);
@@ -160,11 +161,8 @@ public final class BeanUtility {
   /**
    * Creates a new instance of the given class and init parameters. The constructor is derived from the parameter types.
    *
-   * @param <T>
    * @param c
    *          The class a new instance is created for.
-   * @param parameterTypes
-   *          The parameter types used for determining the constructor used for creating the new instance.
    * @param parameters
    *          The parameter objects the new instance is initialized with.
    * @return Returns a new instance of the given class or <code>null</code>, if no matching constructor can be found.
@@ -187,7 +185,6 @@ public final class BeanUtility {
    * Creates a new instance of the given class using the constructor that matches the given parameter types. The
    * resulting object is initialized with the given parameters.
    *
-   * @param <T>
    * @param c
    *          The class a new instance is created for.
    * @param parameterTypes
@@ -229,67 +226,95 @@ public final class BeanUtility {
     if (c == null) {
       return null;
     }
-    // find exact constructor
-    try {
-      Constructor<T> ctor = c.getConstructor(parameterTypes);
-      if (ctor != null) {
-        return ctor;
-      }
+
+    final Constructor<?>[] publicConstructors = c.getConstructors();
+    switch (publicConstructors.length) {
+      case 0:
+        return null;
+      case 1:
+        return checkParameterTypesAndCast(publicConstructors[0], parameterTypes);
     }
-    catch (NoSuchMethodException e) { // NOSONAR
-      LOG.debug("exact constructor does not exist");
+
+    final List<Constructor<T>> candidates = Stream.of(publicConstructors)
+        .map(ctor -> BeanUtility.<T> checkParameterTypesAndCast(ctor, parameterTypes))
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+
+    if (candidates.size() <= 1) {
+      return CollectionUtility.firstElement(candidates);
     }
-    // default constructor is not available
-    if (parameterTypes == null || parameterTypes.length == 0) {
-      return null;
-    }
-    // find best matching constructor
-    NavigableMap<Integer, Set<Constructor<T>>> candidates = new TreeMap<>();
-    for (Constructor<?> ctor : c.getConstructors()) {
+
+    // find best matching constructor using type distance
+    NavigableMap<Integer, Set<Constructor<T>>> weightedCandidates = new TreeMap<>();
+    for (Constructor<T> ctor : candidates) {
       int distance = 0;
+      // compute parameter type distances
+      // Note: constructor parameter count matches requested parameter count
+      //       and constructor parameter types are assignable from requested parameter types
+      //       both filters are already applied by checkParameterTypesAndCast
       Class<?>[] ctorParameters = ctor.getParameterTypes();
-      if (ctorParameters.length == parameterTypes.length) {
-        // check parameters
-        for (int i = 0; i < parameterTypes.length; i++) {
-          int currentParamDistance = computeTypeDistance(ctorParameters[i], parameterTypes[i]);
-          if (currentParamDistance == -1 && parameterTypes[i] != null) {
-            if (parameterTypes[i].isPrimitive()) {
-              // try auto-boxing
-              currentParamDistance = computeTypeDistance(ctorParameters[i], PRIMITIVE_COMPLEX_CLASS_MAP.get(parameterTypes[i]));
-            }
-            else if (COMPLEX_PRIMITIVE_CLASS_MAP.containsKey(parameterTypes[i])) {
-              // try auto-unboxing
-              currentParamDistance = computeTypeDistance(ctorParameters[i], COMPLEX_PRIMITIVE_CLASS_MAP.get(parameterTypes[i]));
-            }
-          }
-          if (currentParamDistance == -1) {
-            distance = -1;
-            break;
-          }
-          distance += currentParamDistance;
+      for (int i = 0; i < parameterTypes.length; i++) {
+        int currentParamDistance = computeTypeDistance(ctorParameters[i], parameterTypes[i]);
+        distance += currentParamDistance;
+      }
+      weightedCandidates.computeIfAbsent(distance, k -> new HashSet<>()).add(ctor);
+    }
+
+    // check ambiguity
+    // Note: there is always at least one entry in weightedCandidates
+    Set<Constructor<T>> bestMatchingConstructors = weightedCandidates.firstEntry().getValue();
+    if (bestMatchingConstructors.size() <= 1) {
+      return CollectionUtility.firstElement(bestMatchingConstructors);
+    }
+
+    throw new ProcessingException("More than one constructors found due to ambiguous parameter types [class=" + c + ", parameterTypes=" + Arrays.toString(parameterTypes) + "]");
+  }
+
+  /**
+   * Checks whether the given constructor can be invoked using parameters of the given types. If applicable, the
+   * wild-card typed constructor is cast to a bound type parameter and returned. Otherwise, {@code null} is returned.
+   */
+  private static <T> Constructor<T> checkParameterTypesAndCast(Constructor<?> constructor, Class<?>... invocationParameterTypes) {
+    // 1. check number of parameters
+    if (constructor.getParameterCount() != (invocationParameterTypes == null ? 0 : invocationParameterTypes.length)) {
+      return null;
+    }
+
+    // 2. check if actual parameter types are assignable to declared ones
+    //    Note: auto-boxing and unboxing is applied if one of a <declared, actual> parameter type pair
+    //          is primitiv and the other is not.
+    final Class<?>[] constructorParameterTypes = constructor.getParameterTypes();
+    for (int i = 0; i < constructorParameterTypes.length; i++) {
+      final Class<?> constructorParameterType = constructorParameterTypes[i];
+      Class<?> invocationParameterType = invocationParameterTypes[i];
+
+      if (constructorParameterType.isPrimitive()) {
+        if (invocationParameterType == null) {
+          // unboxing would raise a NPE
+          return null;
         }
-        if (distance >= 0) {
-          // collect candidates
-          @SuppressWarnings("unchecked")
-          Constructor<T> candidate = (Constructor<T>) ctor;
-          Set<Constructor<T>> rankedCtors = candidates.computeIfAbsent(distance, k -> new HashSet<>());
-          rankedCtors.add(candidate);
+        if (!invocationParameterType.isPrimitive()) {
+          // unbox complex type
+          invocationParameterType = COMPLEX_PRIMITIVE_CLASS_MAP.get(invocationParameterType);
         }
       }
+      else if (invocationParameterType == null) {
+        // null is always assignable to an object type
+        continue;
+      }
+      else if (invocationParameterType.isPrimitive()) {
+        // box primitive type
+        invocationParameterType = PRIMITIVE_COMPLEX_CLASS_MAP.get(invocationParameterType);
+      }
+
+      if (!constructorParameterType.isAssignableFrom(invocationParameterType)) {
+        return null;
+      }
     }
-    //
-    if (candidates.isEmpty()) {
-      return null;
-    }
-    // check ambiguity
-    Set<Constructor<T>> ctors = candidates.firstEntry().getValue();
-    if (ctors.isEmpty()) {
-      return null;
-    }
-    if (ctors.size() == 1) {
-      return CollectionUtility.firstElement(ctors);
-    }
-    throw new ProcessingException("More than one constructors found due to ambiguous parameter types [class=" + c + ", parameterTypes=" + Arrays.toString(parameterTypes) + "]");
+
+    @SuppressWarnings("unchecked")
+    Constructor<T> casted = (Constructor<T>) constructor;
+    return casted;
   }
 
   /**
@@ -337,6 +362,12 @@ public final class BeanUtility {
     if (declaredType == actualType) {
       // perfect match
       return 0;
+    }
+    if (PRIMITIVE_COMPLEX_CLASS_MAP.containsKey(declaredType)) {
+      return PRIMITIVE_COMPLEX_CLASS_MAP.get(declaredType) == actualType ? 1 : -1;
+    }
+    if (PRIMITIVE_COMPLEX_CLASS_MAP.containsKey(actualType)) {
+      return PRIMITIVE_COMPLEX_CLASS_MAP.get(actualType) == declaredType ? 1 : -1;
     }
     if (!declaredType.isAssignableFrom(actualType)) {
       // declaredType is not a superclass of actualType
