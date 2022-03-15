@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,27 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  CalendarComponent,
-  CalendarLayout,
-  CalendarListComponent,
-  DateRange,
-  dates,
-  Device,
-  events,
-  GroupBox,
-  HtmlComponent,
-  KeyStrokeContext,
-  menus,
-  numbers,
-  objects,
-  Point,
-  Range,
-  scout,
-  scrollbars,
-  strings,
-  Widget
-} from '../index';
+import {CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, Device, events, GroupBox, HtmlComponent, KeyStrokeContext, menus, numbers, objects, Point, Range, scout, scrollbars, strings, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Calendar extends Widget {
@@ -759,11 +739,9 @@ export default class Calendar extends Widget {
       this.$topGrid.find('.calendar-day-name').data('new-width', 0);
       this.$grids.find('.calendar-day').data('new-width', 0);
       let newWidthWorkWeek = Math.round(contentW / this.workDayIndices.length);
-      $('.calendar-day-name:nth-child(-n+6), ' +
-        '.calendar-day:nth-child(-n+6)', this.$topGrid)
-        .data('new-width', newWidthWorkWeek);
-      $('.calendar-day:nth-child(-n+6)', this.$grid)
-        .data('new-width', newWidthWorkWeek);
+      this.$topGrid.find('.calendar-day-name').slice(0, 5).data('new-width', newWidthWorkWeek);
+      this.$topGrid.find('.calendar-day').slice(0, 5).data('new-width', newWidthWorkWeek);
+      $('.calendar-day:nth-child(-n+6)', this.$grid).data('new-width', newWidthWorkWeek);
       this.widthPerDivision = newWidthWorkWeek;
     } else if (this._isMonth() || this._isWeek()) {
       let newWidthMonthOrWeek = Math.round(contentW / 7);
