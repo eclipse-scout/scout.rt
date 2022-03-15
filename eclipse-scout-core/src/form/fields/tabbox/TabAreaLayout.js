@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,50 +30,13 @@ export default class TabAreaLayout extends AbstractLayout {
   }
 
   layout($container) {
-    let ellipsis = this.tabArea.ellipsis,
-      htmlContainer = HtmlComponent.get($container),
+    let htmlContainer = HtmlComponent.get($container),
       containerSize = htmlContainer.availableSize().subtract(htmlContainer.insets());
 
     // compute visible and overflown tabs
     this.preferredLayoutSize($container, {
       widthHint: containerSize.width
     });
-
-    if (this.overflowTabs.length > 0) {
-      ellipsis.setHidden(false);
-    }
-
-    this.visibleTabs.forEach(tabItem => {
-      tabItem.setOverflown(false);
-    });
-
-    this.overflowTabs.forEach(tabItem => {
-      tabItem.setOverflown(true);
-    });
-
-    if (this.overflowTabs.length === 0) {
-      ellipsis.setHidden(true);
-    }
-
-    ellipsis.setText(this.overflowTabs.length + '');
-
-    ellipsis.setChildActions(this.overflowTabs.map(tab => {
-      let menu = scout.create('Menu', {
-        parent: ellipsis,
-        text: tab.label,
-        tab: tab,
-        visible: tab.visible
-      });
-      menu.on('action', event => {
-        $.log.isDebugEnabled() && $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tab);
-        // first close popup to ensure the focus is handled in the correct focus context.
-        ellipsis.popup.close();
-        tab.select();
-        tab.focus();
-      });
-      return menu;
-    }, this));
-
     this._layoutSelectionMarker();
   }
 
@@ -92,54 +55,77 @@ export default class TabAreaLayout extends AbstractLayout {
     }
   }
 
+  _updateEllipsis() {
+    let ellipsis = this.tabArea.ellipsis;
+    ellipsis.setHidden(this.overflowTabs.length < 1);
+    ellipsis.setText(this.overflowTabs.length + '');
+    this.visibleTabs.forEach(tabItem => tabItem.setOverflown(false));
+    this.overflowTabs.forEach(tabItem => tabItem.setOverflown(true));
+
+    ellipsis.setChildActions(this.overflowTabs.map(tab => {
+      let menu = scout.create('Menu', {
+        parent: ellipsis,
+        text: tab.label,
+        tab: tab,
+        visible: tab.visible
+      });
+      menu.on('action', event => {
+        $.log.isDebugEnabled() && $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tab);
+        // first close popup to ensure the focus is handled in the correct focus context.
+        ellipsis.popup.close();
+        tab.select();
+        tab.focus();
+      });
+      return menu;
+    }, this));
+  }
+
   preferredLayoutSize($container, options) {
     let htmlComp = HtmlComponent.get($container),
       prefSize = new Dimension(0, 0),
-      prefWidth = Number.MAX_VALUE,
-      visibleTabItems = this.tabArea.visibleTabs(),
-      overflowableIndexes = visibleTabItems.map((tabItem, index) => {
-        if (tabItem.selected) {
-          return -1;
-        }
-        return index;
-      }).filter(index => index >= 0);
+      prefWidth = Number.MAX_VALUE;
+    this.visibleTabs = this.tabArea.visibleTabs();
+    let overflowableIndexes = this.visibleTabs.map((tabItem, index) => {
+      if (tabItem.selected) {
+        return -1;
+      }
+      return index;
+    }).filter(index => index >= 0);
 
     this.overflowTabs = [];
 
-    // consider avoid falsy 0 in tabboxes a 0 withHint will be used to calculate the minimum width
+    // consider avoid falsy 0 in tab-boxes a 0 withHint will be used to calculate the minimum width
     if (options.widthHint === 0 || options.widthHint) {
       prefWidth = options.widthHint - htmlComp.insets().horizontal();
     }
 
     // shortcut for minimum size.
     if (prefWidth <= 0) {
-      return this._minSize(visibleTabItems).add(htmlComp.insets());
+      return this._minSize(this.visibleTabs).add(htmlComp.insets());
     }
 
-    let overflowIndex = -1;
-    this._setFirstLastMarker(visibleTabItems);
-    prefSize = this._prefSize(visibleTabItems);
+    this._setFirstLastMarker(this.visibleTabs);
+    this._updateEllipsis();
+    prefSize = this._prefSize(this.visibleTabs);
+
     while (prefSize.width > prefWidth && overflowableIndexes.length > 0) {
-      overflowIndex = overflowableIndexes.splice(-1)[0];
-      this.overflowTabs.splice(0, 0, visibleTabItems[overflowIndex]);
-      visibleTabItems.splice(overflowIndex, 1);
-      this._setFirstLastMarker(visibleTabItems);
-      prefSize = this._prefSize(visibleTabItems);
+      let overflowIndex = overflowableIndexes.splice(-1)[0];
+      this.overflowTabs.splice(0, 0, this.visibleTabs[overflowIndex]);
+      this.visibleTabs.splice(overflowIndex, 1);
+      this._setFirstLastMarker(this.visibleTabs);
+      this._updateEllipsis(); // update ellipsis here already so that the prefSize on the next line is correct
+      prefSize = this._prefSize(this.visibleTabs);
     }
-
-    this.visibleTabs = visibleTabItems;
 
     // Use the total available space if spreading tabs evenly.
     if (this.tabArea.displayStyle === TabArea.DisplayStyle.SPREAD_EVEN) {
       return graphics.prefSize($container, options);
     }
-
     return graphics.exactPrefSize(prefSize.add(htmlComp.insets()), options);
   }
 
   _minSize(tabItems) {
-    let visibleTabItems = [],
-      prefSize;
+    let visibleTabItems = [];
     this.overflowTabs = tabItems.filter(tabItem => {
       if (tabItem.selected) {
         visibleTabItems.push(tabItem);
@@ -150,23 +136,21 @@ export default class TabAreaLayout extends AbstractLayout {
 
     this.visibleTabs = visibleTabItems;
     this._setFirstLastMarker(visibleTabItems);
-    prefSize = this._prefSize(visibleTabItems);
-
-    return prefSize;
+    return this._prefSize(visibleTabItems);
   }
 
   _prefSize(tabItems, considerEllipsis) {
-    let prefSize = tabItems.map(tabItem => this._tabItemSize(tabItem.htmlComp)
-      ).reduce((prefSize, itemSize) => {
+    let prefSize = tabItems
+      .map(tabItem => this._tabItemSize(tabItem))
+      .reduce((prefSize, itemSize) => {
         prefSize.height = Math.max(prefSize.height, itemSize.height);
         prefSize.width += itemSize.width;
         return prefSize;
-      }, new Dimension(0, 0)),
-      ellipsisSize = new Dimension(0, 0);
+      }, new Dimension(0, 0));
 
     considerEllipsis = scout.nvl(considerEllipsis, this.overflowTabs.length > 0);
     if (considerEllipsis) {
-      ellipsisSize = this._tabItemSize(this.tabArea.ellipsis.htmlComp);
+      let ellipsisSize = this._tabItemSize(this.tabArea.ellipsis);
       prefSize.height = Math.max(prefSize.height, ellipsisSize.height);
       prefSize.width += ellipsisSize.width;
     }
@@ -193,8 +177,8 @@ export default class TabAreaLayout extends AbstractLayout {
     }
   }
 
-  _tabItemSize(htmlComp) {
-    let prefSize,
+  _tabItemSize(item) {
+    let htmlComp = item.htmlComp, prefSize,
       classList = htmlComp.$comp.attr('class');
 
     // temporarily revert display style to default. otherwise the pref size of the tab item will be the size of the container.
@@ -208,6 +192,19 @@ export default class TabAreaLayout extends AbstractLayout {
     prefSize = htmlComp.prefSize({
       exact: true
     }).add(graphics.margins(htmlComp.$comp));
+    if (item.fieldStatus && item.fieldStatus.htmlComp) {
+      let statusOverflownAndHidden = item.overflown && !item.fieldStatus.visible;
+      if (statusOverflownAndHidden) {
+        // overflown tabs have no fieldStatus: explicitly set to visible so that the real consumed space can be computed
+        item.fieldStatus.setVisible(true);
+      }
+      let statusWidth = item.fieldStatus.htmlComp.prefSize({includeMargin: true}).width;
+      if (statusOverflownAndHidden) {
+        // restore
+        item.fieldStatus.setVisible(false);
+      }
+      prefSize.width += statusWidth;
+    }
 
     htmlComp.$comp.attrOrRemove('class', classList);
 
