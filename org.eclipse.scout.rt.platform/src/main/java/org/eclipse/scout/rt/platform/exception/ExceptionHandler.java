@@ -26,6 +26,8 @@ public class ExceptionHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(ExceptionHandler.class);
 
+  protected static final String LOG_PATTERN = "{}: {}";
+
   /**
    * Method invoked to handle the given {@link Throwable}.
    * <p>
@@ -100,28 +102,29 @@ public class ExceptionHandler {
   protected void handlePlatformException(final PlatformException e) {
     if (e instanceof VetoException) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("", e);
+        LOG.debug(LOG_PATTERN, toLogArguments(e));
       }
       else {
-        LOG.info("{}: {}", e.getClass().getSimpleName(), e.getMessage());
+        // do not add stacktrace for VetoException
+        LOG.info(LOG_PATTERN, e.getClass().getSimpleName(), e.getMessage());
       }
     }
     else if (e instanceof ProcessingException) {
       switch (((ProcessingException) e).getStatus().getSeverity()) {
         case IProcessingStatus.INFO:
         case IProcessingStatus.OK:
-          LOG.info("", e);
+          LOG.info(LOG_PATTERN, toLogArguments(e));
           break;
         case IProcessingStatus.WARNING:
-          LOG.warn("", e);
+          LOG.warn(LOG_PATTERN, toLogArguments(e));
           break;
         default:
-          LOG.error("", e);
+          LOG.error(LOG_PATTERN, toLogArguments(e));
           break;
       }
     }
     else {
-      LOG.error("", e);
+      LOG.error(LOG_PATTERN, toLogArguments(e));
     }
   }
 
@@ -132,7 +135,14 @@ public class ExceptionHandler {
    * The default implementation logs the throwable as <code>ERROR</code>.
    */
   protected void handleThrowable(final Throwable t) {
-    LOG.error("{}:{}", t.getClass().getSimpleName(), ObjectUtility.nvl(t.getMessage(), "n/a"), t);
+    LOG.error(LOG_PATTERN, toLogArguments(t));
+  }
+
+  /**
+   * @return Arguments matching {@link #LOG_PATTERN} for given {@link Throwable}.
+   */
+  protected Object[] toLogArguments(Throwable t) {
+    return new Object[]{t.getClass().getSimpleName(), ObjectUtility.nvl(t.getMessage(), "n/a"), t};
   }
 
   /**
