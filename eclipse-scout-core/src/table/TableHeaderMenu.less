@@ -33,6 +33,11 @@
   display: inline-block;
   vertical-align: top;
   padding: @table-header-menu-padding;
+
+  & > .table-header-menu-group > .table-header-menu-group-text {
+    // Increase size a little to ensure every text is fully visible, at least for german and english (currently necessary for additional sorting group)
+    width: calc(100% + 12px);
+  }
 }
 
 .table-header-menu-filters {
