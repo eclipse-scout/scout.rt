@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Column, ColumnUserFilter, Device, graphics, GroupBoxMenuItemsOrder, inspector, MenuBar, MenuDestinations, scout, scrollbars, strings, styles, Table, tooltips, Widget} from '../index';
+import {arrays, Column, ColumnUserFilter, Device, graphics, GroupBoxMenuItemsOrder, inspector, MenuBar, MenuDestinations, objects, scout, scrollbars, strings, styles, Table, tooltips, Widget} from '../index';
 import $ from 'jquery';
 
 export default class TableHeader extends Widget {
@@ -459,21 +459,23 @@ export default class TableHeader extends Widget {
     let filtered = this.table.getFilter(column.id);
     if (column.sortActive || column.grouped || filtered) {
       if (column.minWidth < Column.DEFAULT_MIN_WIDTH) {
-        column.prefMinWidth = column.minWidth;
+        column.__minWidthWithoutState = column.minWidth;
+        column.__widthWithoutState = column.width;
         column.minWidth = Column.DEFAULT_MIN_WIDTH;
       }
       if (column.width < column.minWidth) {
         this.table.resizeColumn(column, column.minWidth);
       }
     } else {
-      // Reset to preferred min width if no state is visible
-      if (column.prefMinWidth !== null) {
-        column.minWidth = column.prefMinWidth;
-        column.prefMinWidth = null;
-        // Resize to old min width, assuming user has not manually changed the size because column is still as width as default_min_width
+      // Reset to previous min width if no state is visible
+      if (!objects.isNullOrUndefined(column.__minWidthWithoutState)) {
+        column.minWidth = column.__minWidthWithoutState;
+        // Resize to previous min width, assuming user has not manually changed the size because column is still as width as default_min_width
         if (column.width === Column.DEFAULT_MIN_WIDTH) {
-          this.table.resizeColumn(column, column.minWidth);
+          this.table.resizeColumn(column, column.__widthWithoutState);
         }
+        column.__minWidthWithoutState = null;
+        column.__widthWithoutState = null;
       }
     }
   }

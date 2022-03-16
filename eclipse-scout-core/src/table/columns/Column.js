@@ -43,7 +43,6 @@ export default class Column {
     this.type = 'text';
     this.width = 60;
     this.initialWidth = undefined; // the width the column initially has
-    this.prefMinWidth = null;
     this.minWidth = Column.DEFAULT_MIN_WIDTH; // the minimal width the column can have
     this.showSeparator = true;
     this.table = null;
