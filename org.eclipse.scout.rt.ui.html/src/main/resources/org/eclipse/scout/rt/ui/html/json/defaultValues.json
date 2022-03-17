@@ -361,7 +361,12 @@
     "BeanField": {
       "preventInitialFocus": true
     },
-
+    "ListBox": {
+      "clearable": "never"
+    },
+    "TreeBox": {
+      "clearable": "never"
+    },
     // Other objects
     "Cell": {
       "horizontalAlignment": -1,

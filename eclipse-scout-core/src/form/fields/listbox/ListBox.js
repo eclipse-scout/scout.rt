@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ListBoxLayout, LookupBox, scout, Table, ValueField, Event} from '../../../index';
+import {arrays, Event, ListBoxLayout, LookupBox, scout, Table} from '../../../index';
 
 export default class ListBox extends LookupBox {
 
@@ -17,7 +17,6 @@ export default class ListBox extends LookupBox {
 
     this.table = null;
     this.lookupStatus = null;
-    this.clearable = ValueField.Clearable.NEVER;
 
     this._addWidgetProperties(['table', 'filterBox']);
   }
