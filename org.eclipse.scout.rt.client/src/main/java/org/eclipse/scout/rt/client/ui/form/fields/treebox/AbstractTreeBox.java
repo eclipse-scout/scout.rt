@@ -465,7 +465,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
         interceptLoadChildNodes(parentNode);
         // when tree is non-incremental, mark all leaf cadidates as leafs
         if (!isLoadIncremental()) {
-          IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
+          IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
             @Override
             public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
               if (node.getChildNodeCount() == 0) {
@@ -742,7 +742,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   public void checkAllKeys() {
     final Set<T> keySet = new HashSet<>();
-    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
       @Override
       @SuppressWarnings("unchecked")
       public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
@@ -897,7 +897,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       //
       Set<T> checkedKeys = getCheckedKeys();
       Collection<ITreeNode> checkedNodes = m_tree.findNodes(checkedKeys);
-      IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
+      IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
         @Override
         public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
           element.setChecked(false);
@@ -953,7 +953,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       }
       if (!getTree().isCheckable()) {
         //checks follow selection
-        IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
+        IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
           @Override
           public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
             node.setChecked(node.isSelectedNode());
