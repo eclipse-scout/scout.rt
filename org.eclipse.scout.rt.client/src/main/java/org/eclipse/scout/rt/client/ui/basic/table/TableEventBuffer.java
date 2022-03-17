@@ -43,6 +43,24 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
  */
 public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
 
+  private static final Set<Integer> ROW_RELATED_EVENTS = Set.of(
+      TableEvent.TYPE_ALL_ROWS_DELETED,
+      TableEvent.TYPE_ROW_ACTION,
+      TableEvent.TYPE_ROW_CLICK,
+      TableEvent.TYPE_ROW_DROP_ACTION,
+      TableEvent.TYPE_ROW_FILTER_CHANGED,
+      TableEvent.TYPE_ROW_ORDER_CHANGED,
+      TableEvent.TYPE_ROWS_CHECKED,
+      TableEvent.TYPE_ROWS_COPY_REQUEST,
+      TableEvent.TYPE_ROWS_DELETED,
+      TableEvent.TYPE_ROWS_DRAG_REQUEST,
+      TableEvent.TYPE_ROWS_INSERTED,
+      TableEvent.TYPE_ROWS_SELECTED,
+      TableEvent.TYPE_ROWS_UPDATED,
+      TableEvent.TYPE_ROWS_EXPANDED,
+      TableEvent.TYPE_REQUEST_FOCUS_IN_CELL,
+      TableEvent.TYPE_SCROLL_TO_SELECTION);
+
   /**
    * Removes unnecessary events or combines events in the list.
    */
@@ -436,24 +454,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
   }
 
   protected Set<Integer> getRowRelatedEvents() {
-    Set<Integer> res = new HashSet<>();
-    res.add(TableEvent.TYPE_ALL_ROWS_DELETED);
-    res.add(TableEvent.TYPE_ROW_ACTION);
-    res.add(TableEvent.TYPE_ROW_CLICK);
-    res.add(TableEvent.TYPE_ROW_DROP_ACTION);
-    res.add(TableEvent.TYPE_ROW_FILTER_CHANGED);
-    res.add(TableEvent.TYPE_ROW_ORDER_CHANGED);
-    res.add(TableEvent.TYPE_ROWS_CHECKED);
-    res.add(TableEvent.TYPE_ROWS_COPY_REQUEST);
-    res.add(TableEvent.TYPE_ROWS_DELETED);
-    res.add(TableEvent.TYPE_ROWS_DRAG_REQUEST);
-    res.add(TableEvent.TYPE_ROWS_INSERTED);
-    res.add(TableEvent.TYPE_ROWS_SELECTED);
-    res.add(TableEvent.TYPE_ROWS_UPDATED);
-    res.add(TableEvent.TYPE_ROWS_EXPANDED);
-    res.add(TableEvent.TYPE_REQUEST_FOCUS_IN_CELL);
-    res.add(TableEvent.TYPE_SCROLL_TO_SELECTION);
-    return res;
+    return ROW_RELATED_EVENTS;
   }
 
   protected boolean isRowRelatedEvent(int type) {
