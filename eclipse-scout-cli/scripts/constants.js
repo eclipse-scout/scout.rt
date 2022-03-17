@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,12 @@ const path = require('path');
 const mode = {
   production: 'production',
   development: 'development'
+};
+
+const outDir = {
+  target: 'target',
+  dist: 'dist',
+  distKarma: 'dist-karma'
 };
 
 const outSubDir = {
@@ -31,26 +37,17 @@ const cssFilename = {
   development: '[name].css'
 };
 
-function getOutputDir() {
-  if (isMavenModule()) {
-    return 'target/dist'; // default for scout classic
-  }
-  return 'dist'; // default for scout js
-}
-
-function isMavenModule() {
-  const workingDir = process.cwd();
-  return fs.existsSync(path.resolve(workingDir, 'src', 'main')) || fs.existsSync(path.resolve(workingDir, 'src', 'test'));
-}
-
 module.exports = {
   mode: mode,
-  outDir: getOutputDir(),
+  outDir: outDir,
   outSubDir: outSubDir,
   fileListName: 'file-list',
   jsFilename: jsFilename,
   cssFilename: cssFilename,
-  isMavenModule,
+  isMavenModule: () => {
+    const workingDir = process.cwd();
+    return fs.existsSync(path.resolve(workingDir, 'src', 'main')) || fs.existsSync(path.resolve(workingDir, 'src', 'test'));
+  },
   getConstantsForMode: buildMode => {
     if (buildMode !== mode.production) {
       return {

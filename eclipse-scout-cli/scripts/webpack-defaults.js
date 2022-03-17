@@ -18,6 +18,7 @@ const webpack = require('webpack');
 
 /**
  * @param {string} args.mode development or production
+ * @param {boolean} args.clean true, to clean the dist folder before each build. Default is true.
  * @param {boolean} args.progress true, to show build progress in percentage. Default is true.
  * @param {boolean} args.profile true, to show timing information for each build step. Default is false.
  * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
@@ -25,7 +26,7 @@ const webpack = require('webpack');
 module.exports = (env, args) => {
   const {devMode, outSubDir, cssFilename, jsFilename} = scoutBuildConstants.getConstantsForMode(args.mode);
   const isMavenModule = scoutBuildConstants.isMavenModule();
-  const outDir = isMavenModule ? path.resolve(scoutBuildConstants.outDir, outSubDir) : path.resolve(scoutBuildConstants.outDir);
+  const outDir = getOutputDir(isMavenModule, outSubDir);
   const resDirArray = args.resDirArray || ['res'];
   console.log(`Webpack mode: ${args.mode}`);
 
@@ -92,7 +93,7 @@ module.exports = (env, args) => {
       filename: jsFilename,
       path: outDir,
       devtoolModuleFilenameTemplate: devMode ? undefined : prodDevtoolModuleFilenameTemplate,
-      clean: true
+      clean: nvl(args.clean, true)
     },
     performance: {
       hints: false
@@ -260,6 +261,13 @@ function addThemes(entry, options = {}) {
     let [key, value] = generator(name);
     entry[key] = value;
   });
+}
+
+function getOutputDir(isMavenModule, outSubDir) {
+  if (isMavenModule) {
+    return path.resolve(scoutBuildConstants.outDir.target, scoutBuildConstants.outDir.dist, outSubDir);
+  }
+  return path.resolve(scoutBuildConstants.outDir.dist);
 }
 
 function computeChunkName(module, chunks, cacheGroupKey) {

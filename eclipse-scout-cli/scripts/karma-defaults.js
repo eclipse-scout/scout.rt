@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+const fs = require('fs');
 const path = require('path');
-const scoutBuild = require('./constants');
 
 const jquery = require.resolve('jquery');
-const fs = require('fs');
 const webpack = require('webpack');
+
+const scoutBuildConstants = require('./constants');
 
 module.exports = (config, specEntryPoint) => {
   const webpackConfigFilePath = path.resolve('webpack.config.js');
@@ -24,18 +25,23 @@ module.exports = (config, specEntryPoint) => {
   }
   let webpackConfigProvider = require(webpackConfigFilePath);
 
-  const webpackArgs = Object.assign({mode: scoutBuild.mode.development}, config.webpackArgs);
+  const webpackArgs = Object.assign({mode: scoutBuildConstants.mode.development}, config.webpackArgs);
   const webpackConfig = webpackConfigProvider(null, webpackArgs);
   delete webpackConfig.entry;
   if (webpackConfig.optimization) {
     delete webpackConfig.optimization.splitChunks; // disable splitting for tests
   }
+
   if (webpackConfig.output) {
+    // remove output file as Karma uses an in-memory middleware and complains if an output file is present
     delete webpackConfig.output.filename;
   }
-  if (webpackConfig.output && webpackConfig.output.path) {
-    fs.mkdirSync(webpackConfig.output.path, {recursive: true});
-  }
+
+  // specify output directory for webpack (use different than normal output dir so that they are not polluted with test artifacts)
+  webpackConfig.output = webpackConfig.output || {};
+  webpackConfig.output.path = path.resolve(scoutBuildConstants.outDir.target, scoutBuildConstants.outDir.distKarma, scoutBuildConstants.outSubDir.development);
+  fs.mkdirSync(webpackConfig.output.path, {recursive: true});
+
   webpackConfig.watch = true;
 
   const sourceMapPlugin = webpackConfig.plugins.find(plugin => plugin instanceof webpack.SourceMapDevToolPlugin);
