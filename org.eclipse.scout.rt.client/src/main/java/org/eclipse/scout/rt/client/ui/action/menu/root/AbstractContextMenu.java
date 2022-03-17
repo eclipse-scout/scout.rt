@@ -33,8 +33,8 @@ import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 @ClassId("b34571a2-032b-4910-921a-bec4acd110ed")
 public abstract class AbstractContextMenu<T extends IWidget> extends AbstractMenu implements IContextMenu {
 
-  private final FastListenerList<ContextMenuListener> m_listeners = new FastListenerList<>();
-  private final PropertyChangeListener m_menuVisibilityListener = new P_VisibilityOfMenuItemChangedListener();
+  private FastListenerList<ContextMenuListener> m_listeners;
+  private PropertyChangeListener m_menuVisibilityListener;
 
   public AbstractContextMenu(T container, List<? extends IMenu> initialChildList) {
     this(container, initialChildList, true);
@@ -77,6 +77,9 @@ public abstract class AbstractContextMenu<T extends IWidget> extends AbstractMen
 
   @Override
   public IFastListenerList<ContextMenuListener> contextMenuListeners() {
+    if (m_listeners == null) {
+      m_listeners = new FastListenerList<>();
+    }
     return m_listeners;
   }
 
@@ -109,8 +112,8 @@ public abstract class AbstractContextMenu<T extends IWidget> extends AbstractMen
   protected void addScoutMenuVisibilityListenerRec(Collection<? extends IMenu> menus) {
     if (menus != null) {
       for (IMenu m : menus) {
-        m.addPropertyChangeListener(IMenu.PROP_CHILD_ACTIONS, m_menuVisibilityListener);
-        m.addPropertyChangeListener(IMenu.PROP_VISIBLE, m_menuVisibilityListener);
+        m.addPropertyChangeListener(IMenu.PROP_CHILD_ACTIONS, menuVisibilityListener());
+        m.addPropertyChangeListener(IMenu.PROP_VISIBLE, menuVisibilityListener());
         addScoutMenuVisibilityListenerRec(m.getChildActions());
       }
     }
@@ -119,8 +122,8 @@ public abstract class AbstractContextMenu<T extends IWidget> extends AbstractMen
   protected void removeScoutMenuVisibilityListenerRec(Collection<? extends IMenu> menus) {
     if (menus != null) {
       for (IMenu m : menus) {
-        m.removePropertyChangeListener(IMenu.PROP_CHILD_ACTIONS, m_menuVisibilityListener);
-        m.removePropertyChangeListener(IMenu.PROP_VISIBLE, m_menuVisibilityListener);
+        m.removePropertyChangeListener(IMenu.PROP_CHILD_ACTIONS, menuVisibilityListener());
+        m.removePropertyChangeListener(IMenu.PROP_VISIBLE, menuVisibilityListener());
         removeScoutMenuVisibilityListenerRec(m.getChildActions());
       }
     }
@@ -149,6 +152,25 @@ public abstract class AbstractContextMenu<T extends IWidget> extends AbstractMen
 
   protected abstract boolean isOwnerPropertyChangedListenerRequired();
 
+  @Override
+  protected IContextMenuExtension<? extends AbstractContextMenu> createLocalExtension() {
+    return new LocalContextMenuExtension<AbstractContextMenu>(this);
+  }
+
+  protected PropertyChangeListener menuVisibilityListener() {
+    if (m_menuVisibilityListener == null) {
+      m_menuVisibilityListener = new P_VisibilityOfMenuItemChangedListener();
+    }
+    return m_menuVisibilityListener;
+  }
+
+  protected static class LocalContextMenuExtension<OWNER extends AbstractContextMenu> extends LocalMenuExtension<OWNER> implements IContextMenuExtension<OWNER> {
+
+    public LocalContextMenuExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
   private class P_VisibilityOfMenuItemChangedListener implements PropertyChangeListener {
     @SuppressWarnings("unchecked")
     @Override
@@ -166,17 +188,4 @@ public abstract class AbstractContextMenu<T extends IWidget> extends AbstractMen
       handleOwnerPropertyChanged(evt);
     }
   }
-
-  protected static class LocalContextMenuExtension<OWNER extends AbstractContextMenu> extends LocalMenuExtension<OWNER> implements IContextMenuExtension<OWNER> {
-
-    public LocalContextMenuExtension(OWNER owner) {
-      super(owner);
-    }
-  }
-
-  @Override
-  protected IContextMenuExtension<? extends AbstractContextMenu> createLocalExtension() {
-    return new LocalContextMenuExtension<AbstractContextMenu>(this);
-  }
-
 }
