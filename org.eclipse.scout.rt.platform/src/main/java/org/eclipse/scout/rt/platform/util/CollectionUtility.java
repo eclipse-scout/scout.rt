@@ -308,16 +308,10 @@ public final class CollectionUtility {
    * @return <code>true</code> if the collection contains one of the values.
    */
   public static <T> boolean containsAny(Collection<T> c, Collection<? extends T> values) {
-    if (values == null || c == null) {
+    if (values == null || c == null || c.isEmpty() || values.isEmpty()) {
       return false;
     }
-    Set<T> set = hashSet(c);
-    for (T value : values) {
-      if (set.contains(value)) {
-        return true;
-      }
-    }
-    return false;
+    return !Collections.disjoint(c, values);
   }
 
   /**
@@ -325,16 +319,11 @@ public final class CollectionUtility {
    */
   @SafeVarargs
   public static <T> boolean containsAny(Collection<T> c, T... values) {
-    if (values == null || c == null) {
+    if (values == null || values.length == 0 || c == null || c.isEmpty()) {
       return false;
     }
-    Set<T> set = hashSet(c);
-    for (T value : values) {
-      if (set.contains(value)) {
-        return true;
-      }
-    }
-    return false;
+
+    return containsAny(c, arrayList(values));
   }
 
   /**

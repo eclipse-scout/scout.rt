@@ -356,15 +356,15 @@ public class CollectionUtilityTest {
   @Test
   public void testContainsAnyArray() {
     // Test for single valued list
-    assertTrue(CollectionUtility.containsAny(createList(2L, 1L), new Object[]{1L}));
-    assertFalse(CollectionUtility.containsAny(createList(2L, 3L), new Object[]{1L}));
+    assertTrue(CollectionUtility.containsAny(createList(2L, 1L), 1L));
+    assertFalse(CollectionUtility.containsAny(createList(2L, 3L), 1L));
     // Test for null collections
     assertFalse(CollectionUtility.containsAny(createList(2L, 3L), (Object[]) null));
-    assertFalse(CollectionUtility.containsAny(null, new Object[]{2L, 3L}));
+    assertFalse(CollectionUtility.containsAny(null, 2L, 3L));
     assertFalse(CollectionUtility.containsAny(null, (Object[]) null));
 
     // Test for null elements
-    assertTrue(CollectionUtility.containsAny(createList(null, 1L), createList(new Object[]{null})));
+    assertTrue(CollectionUtility.containsAny(createList(null, 1L), new Object[]{null}));
   }
 
   @Test
