@@ -980,9 +980,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this._tooltip.$container
       .css('pointer-events', 'none');
 
+    let reposition = false;
     if ((tooltipOptions.titleFont || {}).family) {
       this._tooltip.$container
         .css('--chart-tooltip-font-family', tooltipOptions.titleFont.family);
+      reposition = true;
     }
 
     let maxLabelPrefSize = 0;
@@ -992,6 +994,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (maxLabelPrefSize > 0) {
       this._tooltip.$container
         .css('--chart-tooltip-label-width', Math.min(maxLabelPrefSize, 120) + 'px');
+      reposition = true;
+    }
+    if (reposition) {
+      this._tooltip.position();
     }
   }
 
