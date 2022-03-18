@@ -831,11 +831,16 @@ export default class Calendar extends Widget {
 
   _updateScrollbars($parent, animate) {
     let $scrollables = $('.calendar-scrollable-components', $parent);
-    $scrollables.each(function() {
-      let $scrollable = $(this);
-      scrollbars.update($scrollable, true);
+    $scrollables.each((i, elem) => {
+      scrollbars.update($(elem), true);
     });
     this.updateScrollPosition(animate);
+  }
+
+  _uninstallComponentScrollbars($parent) {
+    $parent.find('.calendar-scrollable-components').each((i, elem) => {
+      scrollbars.uninstall($(elem), this.session);
+    });
   }
 
   _updateTopGrid() {
@@ -1015,18 +1020,8 @@ export default class Calendar extends Widget {
   }
 
   _remove() {
-    let $days = $('.calendar-day', this.$grid);
-
-    // Ensure that scrollbars are unregistered
-    for (let k = 0; k < $days.length; k++) {
-      let $day = $days.eq(k);
-      let $scrollableContainer = $day.children('.calendar-scrollable-components');
-
-      if ($scrollableContainer.length > 0) {
-        scrollbars.uninstall($scrollableContainer, this.session);
-        $scrollableContainer.remove();
-      }
-    }
+    this._uninstallComponentScrollbars(this.$grid);
+    this._uninstallComponentScrollbars(this.$topGrid);
 
     this.$window
       .off('mousemove touchmove', this._mouseMoveHandler)
@@ -1157,6 +1152,7 @@ export default class Calendar extends Widget {
 
     if (this._isMonth()) {
       this._uninstallScrollbars();
+      this._uninstallComponentScrollbars(this.$topGrid);
       this.$grid.removeClass('calendar-scrollable-components');
     } else {
       this.$grid.addClass('calendar-scrollable-components');
@@ -1166,16 +1162,18 @@ export default class Calendar extends Widget {
         session: this.session,
         axis: 'y'
       });
-
-      let $topDays = $('.calendar-scrollable-components', this.$topGrid);
-      for (k = 0; k < $topDays.length; k++) {
-        let $topDay = $topDays.eq(k);
+      this.$topGrid.find('.calendar-scrollable-components').each((i, elem) => {
+        let $topDay = $(elem);
+        if ($topDay.data('scrollable')) {
+          scrollbars.update($topDay);
+          return;
+        }
         scrollbars.install($topDay, {
           parent: this,
           session: this.session,
           axis: 'y'
         });
-      }
+      });
     }
   }
 
