@@ -23,6 +23,8 @@ public class ColumnDescriptor {
   private String m_cssClass;
   private int m_width;
   private boolean m_fixedWidth;
+  private boolean m_fixedPosition;
+  private boolean m_autoOptimizeWidth;
   private int m_horizontalAlignment = -1;
   private boolean m_visible = true;
   private boolean m_htmlEnabled = false;
@@ -99,6 +101,24 @@ public class ColumnDescriptor {
 
   public ColumnDescriptor withFixedWidth(boolean fixedWidth) {
     m_fixedWidth = fixedWidth;
+    return this;
+  }
+
+  public boolean isFixedPosition() {
+    return m_fixedPosition;
+  }
+
+  public ColumnDescriptor withFixedPosition(boolean fixedPosition) {
+    m_fixedPosition = fixedPosition;
+    return this;
+  }
+
+  public boolean isAutoOptimizeWidth() {
+    return m_autoOptimizeWidth;
+  }
+
+  public ColumnDescriptor withAutoOptimizeWidth(boolean autoOptimizeWidth) {
+    m_autoOptimizeWidth = autoOptimizeWidth;
     return this;
   }
 

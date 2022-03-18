@@ -457,6 +457,8 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     json.put("cssClass", descriptor.getCssClass());
     json.put("width", descriptor.getWidth());
     json.put("fixedWidth", descriptor.isFixedWidth());
+    json.put("fixedPosition", descriptor.isFixedPosition());
+    json.put("autoOptimizeWidth", descriptor.isAutoOptimizeWidth());
     json.put("horizontalAlignment", descriptor.getHorizontalAlignment());
     json.put("visible", descriptor.isVisible());
     json.put("htmlEnabled", descriptor.isHtmlEnabled());
