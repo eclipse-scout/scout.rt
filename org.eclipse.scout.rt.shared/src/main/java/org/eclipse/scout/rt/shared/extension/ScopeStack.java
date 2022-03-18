@@ -36,14 +36,8 @@ public class ScopeStack {
   }
 
   protected void pushScope(Class<?> owner, Deque<ExtensionScope<ExtensionRegistryItem>> scopes) {
-    ExtensionScope<ExtensionRegistryItem> currentScope = scopes.peek();
-    ExtensionScope<ExtensionRegistryItem> subScope = currentScope.createSubScope(owner);
-    if (subScope != null) {
-      scopes.push(subScope);
-    }
-    else {
-      scopes.push(currentScope);
-    }
+    ExtensionScope<ExtensionRegistryItem> subScope = scopes.peek().getSubScope(owner);
+    scopes.push(subScope);
   }
 
   public ExtensionScope<ExtensionRegistryItem> getContributionScope() {
