@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,10 +22,12 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
+import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -207,15 +210,14 @@ public class InternalTableRow extends TableRow implements ICellObserver {
 
   @Override
   public List<Object> getKeyValues() {
-    List<Object> pk = new ArrayList<>();
-    if (getTable() != null) {
-      int[] keyColumns = getTable().getColumnSet().getKeyColumnIndexes();
-      if (keyColumns.length == 0) {
-        keyColumns = getTable().getColumnSet().getAllColumnIndexes();
-      }
-      for (int keyIndex : keyColumns) {
-        pk.add(getCell(keyIndex).getValue());
-      }
+    if (getTable() == null) {
+      return new ArrayList<>(0);
+    }
+    ColumnSet columnSet = getTable().getColumnSet();
+    int[] keyColumns = columnSet.getKeyColumnCount() > 0 ? columnSet.getKeyColumnIndexes() : columnSet.getAllColumnIndexes();
+    List<Object> pk = new ArrayList<>(keyColumns.length);
+    for (int keyIndex : keyColumns) {
+      pk.add(getCell(keyIndex).getValue());
     }
     return pk;
   }
@@ -476,7 +478,7 @@ public class InternalTableRow extends TableRow implements ICellObserver {
   }
 
   private List<ICell> getChangedCells() {
-    List<ICell> cells = new ArrayList<>();
+    List<ICell> cells = new ArrayList<>(m_updatedCells.size());
     for (Entry<ICell, Integer> e : m_updatedCells.entrySet()) {
       Integer changedBits = e.getValue();
       if (changedBits != null) {
@@ -496,24 +498,17 @@ public class InternalTableRow extends TableRow implements ICellObserver {
     return getColumnIndexes(getChangedCells(changedBit));
   }
 
+  @SuppressWarnings("SuspiciousMethodCalls")
   private Set<Integer> getColumnIndexes(List<ICell> cells) {
-    Map<ICell, Integer> indexesByCell = createCellIndexMap();
+    if (CollectionUtility.isEmpty(cells)) {
+      return Collections.emptySet();
+    }
+
     Set<Integer> result = new HashSet<>();
     for (ICell cell : cells) {
-      Integer index = indexesByCell.get(cell);
-      if (index != null) {
-        result.add(index);
-      }
+      result.add(m_cells.indexOf(cell));
     }
     return result;
-  }
-
-  private Map<ICell, Integer> createCellIndexMap() {
-    Map<ICell, Integer> indexesByCell = new HashMap<>();
-    for (int i = 0; i < m_cells.size(); i++) {
-      indexesByCell.put(m_cells.get(i), i);
-    }
-    return indexesByCell;
   }
 
   private Integer setBit(Integer bitMask, int bitPos) {
