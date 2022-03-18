@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -135,9 +135,6 @@ export default class PopupLayout extends AbstractLayout {
    * @returns {Dimension}
    */
   _calcMaxSize() {
-    // Position the popup at the desired location before doing any calculations to consider the preferred bounds
-    this._position(false);
-
     let maxWidth, maxHeight,
       htmlComp = this.popup.htmlComp,
       windowPaddingX = this.popup.windowPaddingX,
@@ -159,7 +156,7 @@ export default class PopupLayout extends AbstractLayout {
       horizontalAlignment = this.popup.horizontalAlignment,
       verticalAlignment = this.popup.verticalAlignment;
 
-    // Decide whether the prefSize can be used or the popup needs to be shrinked so that it fits into the viewport
+    // Decide whether the prefSize can be used or the popup needs to be shrunken so that it fits into the viewport
     // The decision is based on the preferred opening direction
     // Example: The popup would like to be opened leftedge and bottom
     // If there is enough space on the right and on the bottom -> pref size is used
@@ -219,9 +216,6 @@ export default class PopupLayout extends AbstractLayout {
    * @returns {Insets}
    */
   _calcMaxSizeAroundAnchor() {
-    // Position the popup at the desired location before doing any calculations because positioning adds CSS classes which might change margins
-    this._position(false);
-
     let maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
       htmlComp = this.popup.htmlComp,
       windowPaddingX = this.popup.windowPaddingX,
