@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,6 +71,9 @@ public interface ICertificateProvider {
       return;
     }
     try {
+      if (keyStorePath.startsWith("file:")) {
+        keyStorePath = keyStorePath.substring(5);
+      }
       Path path = Paths.get(keyStorePath);
       if (!Files.exists(path)) {
         try (OutputStream jks = Files.newOutputStream(path)) {
