@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, graphics, HtmlComponent, objects, scout} from '../index';
+import {arrays, Device, graphics, HtmlComponent, Insets, objects, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -237,7 +237,7 @@ export function updateScrollShadow($container) {
   $shadow.toggleClass('bottom', !atBottom && style.indexOf('bottom') > -1);
   $shadow.toggleClass('left', !atLeft && style.indexOf('left') > -1);
   $shadow.toggleClass('right', !atRight && style.indexOf('right') > -1);
-  graphics.setBounds($shadow, graphics.bounds($container, {exact: true}));
+  graphics.setBounds($shadow, graphics.bounds($container, {exact: true}).subtract(insets($shadow)));
   graphics.setMargins($shadow, graphics.margins($container));
   $shadow.css('border-radius', $container.css('border-radius'));
 
@@ -252,6 +252,13 @@ export function updateScrollShadow($container) {
 
   function atEnd(scrollPos, scrollSize, offsetSize) {
     return scrollPos + 1 >= scrollSize - offsetSize;
+  }
+
+  function insets($shadow) {
+    return new Insets($shadow.cssPxValue('--scroll-shadow-inset-top'),
+      $shadow.cssPxValue('--scroll-shadow-inset-right'),
+      $shadow.cssPxValue('--scroll-shadow-inset-bottom'),
+      $shadow.cssPxValue('--scroll-shadow-inset-left'));
   }
 }
 

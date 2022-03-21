@@ -133,7 +133,7 @@
   transition: box-shadow 250ms;
   position: absolute;
   pointer-events: none;
-  z-index: 1; // ensure shadow layout over elements having a z-index
+  z-index: 1; // ensure shadow lays over elements having a z-index
 
   #scout.scroll-shadow();
 
@@ -157,6 +157,13 @@
     --scroll-shadow-size: @scroll-shadow-size;
     --scroll-shadow-blur: @scroll-shadow-blur;
     --scroll-shadow-spread: @scroll-shadow-spread;
+
+    // Allow a widget to adjust the size of the shadow container
+    --scroll-shadow-inset-top: 0;
+    --scroll-shadow-inset-right: 0;
+    --scroll-shadow-inset-bottom: 0;
+    --scroll-shadow-inset-left: 0;
+
     @scroll-shadow-blur-spread-color: var(--scroll-shadow-blur) calc(-1 * var(--scroll-shadow-spread)) var(--scroll-shadow-color);
     @scroll-shadow-top: inset 0 var(--scroll-shadow-size) @scroll-shadow-blur-spread-color;
     @scroll-shadow-bottom: inset 0 calc(-1 * var(--scroll-shadow-size)) @scroll-shadow-blur-spread-color;
