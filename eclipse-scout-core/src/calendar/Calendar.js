@@ -759,21 +759,26 @@ export default class Calendar extends Widget {
       });
     }
 
-    let afterLayoutCallback = this._afterLayout.bind(this);
-
     // animate old to new sizes
-    $('div', this.$container).each(function() {
-      let $e = $(this),
-        w = $e.data('new-width'),
-        h = $e.data('new-height');
+    $('div', this.$container).each((i, elem) => {
+      let $e = $(elem);
+      let w = $e.data('new-width');
+      let h = $e.data('new-height');
       $e.stop(false, true);
 
       if (w !== undefined && w !== $e.outerWidth()) {
         if (animate) {
-          $e.animateAVCSD('width', w, afterLayoutCallback.bind(this, $e, animate));
+          let opts = {
+            complete: () => this._afterLayout($e, animate)
+          };
+          if ($e[0] === this.$grids[0]) {
+            // Grid contains scroll shadows that should be updated during animation (don't due it always for performance reasons)
+            opts.progress = () => this._afterLayout($e, animate);
+          }
+          $e.animate({width: w}, opts);
         } else {
           $e.css('width', w);
-          afterLayoutCallback($e, animate);
+          this._afterLayout($e, animate);
         }
       }
       if (h !== undefined && h !== $e.outerHeight()) {
@@ -785,14 +790,14 @@ export default class Calendar extends Widget {
             if (h === 0) {
               $e.addClass('hidden');
             }
-            afterLayoutCallback($e, animate);
+            this._afterLayout($e, animate);
           });
         } else {
           $e.css('height', h);
           if (h === 0) {
             $e.addClass('hidden');
           }
-          afterLayoutCallback($e, animate);
+          this._afterLayout($e, animate);
         }
       }
     });
@@ -1171,7 +1176,8 @@ export default class Calendar extends Widget {
         scrollbars.install($topDay, {
           parent: this,
           session: this.session,
-          axis: 'y'
+          axis: 'y',
+          scrollShadow: 'none'
         });
       });
     }

@@ -353,8 +353,16 @@
   height: calc(~'100% - 25px');
   padding-right: @root-group-box-padding-right;
 
+  & + .scroll-shadow {
+    --scroll-shadow-inset-right: @root-group-box-padding-right;
+  }
+
   &.mobile {
     padding-right: @calendar-padding-right-mobile;
+
+    & + .scroll-shadow {
+      --scroll-shadow-inset-right: @calendar-padding-right-mobile;
+    }
   }
 }
 
