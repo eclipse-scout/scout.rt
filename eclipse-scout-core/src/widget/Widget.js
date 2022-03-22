@@ -524,7 +524,7 @@ export default class Widget {
    * After the animation is executed, the element gets removed using this._removeInternal.
    */
   _removeAnimated() {
-    if (!Device.get().supportsCssAnimation() || !this.$container || this.$container.isDisplayNone()) {
+    if (this.parent.removing || !Device.get().supportsCssAnimation() || !this.$container || this.$container.isDisplayNone()) {
       // Cannot remove animated, remove regularly
       this._removeInternal();
       return;

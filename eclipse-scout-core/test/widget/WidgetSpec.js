@@ -51,6 +51,13 @@ describe('Widget', () => {
     }
   }
 
+  function appendAnimateRemoveStyle() {
+    $(`<style>
+      @keyframes nop { 0% { opacity: 1; } 100% { opacity: 1; } }
+      .animate-remove { animation: nop; animation-duration: 1s;}
+      </style>`).appendTo($('#sandbox'));
+  }
+
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
@@ -869,6 +876,47 @@ describe('Widget', () => {
 
       // Expect that child is removed before parent
       expect(removeOrder).toEqual(['child', 'parent']);
+    });
+
+    it('removes after the animation if removing is animated', done => {
+      appendAnimateRemoveStyle();
+      let widget = createWidget({
+        parent: parent,
+        animateRemoval: true
+      });
+      widget.render(session.$entryPoint);
+
+      widget.remove();
+      expect(widget._rendered).toBe(true);
+      expect(widget.$container).toBeDefined();
+      expect(widget.removalPending).toBe(true);
+
+      widget.one('remove', () => {
+        expect(widget._rendered).toBe(false);
+        expect(widget.$container).toBe(null);
+        expect(widget.removalPending).toBe(false);
+        done();
+      });
+    });
+
+    it('removes the widget immediately if removing is animated but parent is being removed', () => {
+      let parentWidget = createWidget({
+        parent: parent
+      });
+      let widget = createWidget({
+        parent: parentWidget,
+        animateRemoval: true
+      });
+      parentWidget.render(session.$entryPoint);
+      widget.render();
+      expect(widget._rendered).toBe(true);
+      expect(widget.$container).toBeDefined();
+
+      parentWidget.remove();
+      expect(parentWidget._rendered).toBe(false);
+      expect(widget._rendered).toBe(false);
+      expect(widget.$container).toBe(null);
+      expect(widget.removalPending).toBe(false);
     });
   });
 
