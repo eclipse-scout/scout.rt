@@ -35,6 +35,14 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 @ClassId("c40132fa-5aac-4d25-8330-76b9210c07ca")
 public abstract class AbstractFormMenu<FORM extends IForm> extends AbstractMenu implements IFormMenu<FORM> {
 
+  public AbstractFormMenu() {
+    this(true);
+  }
+
+  public AbstractFormMenu(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -66,7 +74,7 @@ public abstract class AbstractFormMenu<FORM extends IForm> extends AbstractMenu 
    * Subclasses can override this method. Default is {@code null}.
    *
    * @return a form type token
-   * @see #startForm() for details how the form gets started
+   * @see #startForm() for details how the form gets started see startForm()
    */
   @ConfigProperty(ConfigProperty.FORM)
   @Order(90)
