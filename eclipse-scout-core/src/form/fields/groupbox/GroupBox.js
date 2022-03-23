@@ -184,12 +184,12 @@ export default class GroupBox extends CompositeField {
       render: () => true,
       offset: 0,
       hAlign: HAlign.RIGHT,
-      $drawingArea: function($drawingArea, event) {
-        if (this.labelVisible) {
+      $drawingArea: ($drawingArea, event) => {
+        if (this.$title && this.$title.isVisible()) {
           return this.$title;
         }
         return this.$body;
-      }.bind(this)
+      }
     };
 
     keyStrokes
