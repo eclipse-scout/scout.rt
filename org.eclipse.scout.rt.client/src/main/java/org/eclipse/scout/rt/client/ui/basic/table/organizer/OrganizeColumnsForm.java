@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -962,7 +963,32 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
 
               @Override
+              protected void execDecorateCell(Cell cell, ITableRow row) {
+                cell.setEditable(!isFixedWidth(row));
+              }
+
+              @Override
+              protected IFormField execPrepareEdit(ITableRow row) {
+                IFormField field = super.execPrepareEdit(row);
+                if (field == null) {
+                  return null;
+                }
+
+                field.setEnabledGranted(!isFixedWidth(row));
+                return field;
+              }
+
+              protected boolean isFixedWidth(ITableRow row) {
+                IColumn<?> column = getKeyColumn().getValue(row);
+                return column != null && column.isFixedWidth();
+              }
+
+              @Override
               protected void execCompleteEdit(ITableRow row, IFormField editingField) {
+                if (!editingField.isEnabled()) {
+                  return;
+                }
+
                 super.execCompleteEdit(row, editingField);
 
                 Integer enteredWidth = getValue(row);
