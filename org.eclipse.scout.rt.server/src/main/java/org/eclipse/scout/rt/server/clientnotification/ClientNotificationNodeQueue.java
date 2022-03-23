@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,8 @@
  */
 package org.eclipse.scout.rt.server.clientnotification;
 
-import java.util.ArrayList;
+import static java.util.stream.Collectors.toList;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -108,9 +109,7 @@ public class ClientNotificationNodeQueue {
       while (iterator.hasNext()) {
         Entry<String, Set<String>> entry = iterator.next();
         Set<String> sessions = entry.getValue();
-        if (sessions.contains(sessionId)) {
-          sessions.remove(sessionId);
-        }
+        sessions.remove(sessionId);
         if (sessions.isEmpty()) {
           iterator.remove();
         }
@@ -131,7 +130,7 @@ public class ClientNotificationNodeQueue {
   }
 
   /**
-   * Put notifications into queue and drop oldest ones, if capacity is reached.
+   * Put notifications into queue and drop the oldest ones, if capacity is reached.
    */
   private void putDroppingOld(Collection<? extends ClientNotificationMessage> notifications) {
     List<ClientNotificationMessage> droppedNotifications = new ArrayList<>();
@@ -211,16 +210,16 @@ public class ClientNotificationNodeQueue {
   }
 
   private List<ClientNotificationMessage> getRelevantNotifications(Collection<? extends ClientNotificationMessage> notificationInput) {
-    List<ClientNotificationMessage> notifications = new ArrayList<>(notificationInput);
-    notifications.removeIf(clientNotificationMessage -> !isRelevant(clientNotificationMessage.getAddress()));
-    return notifications;
+    return notificationInput.stream()
+        .filter(msg -> isRelevant(msg.getAddress()))
+        .collect(toList());
   }
 
   public boolean isRelevant(IClientNotificationAddress address) {
     return address.isNotifyAllSessions()
         || address.isNotifyAllNodes()
-        || CollectionUtility.containsAny(getAllSessionIds(), address.getSessionIds())
-        || CollectionUtility.containsAny(getAllUserIds(), address.getUserIds());
+        || CollectionUtility.hasElements(address.getSessionIds()) // do not filter with getAllSessionIds() as on the UI server there might be more sessions than here on the backend (if backend sessions expire before ui sessions)
+        || CollectionUtility.hasElements(address.getUserIds()); // do not filter with getAllUserIds() as on the UI server there might be more userIds than here on the backend (if backend sessions expire before ui sessions)
   }
 
   public Set<String /*sessionId*/> getAllSessionIds() {
@@ -241,7 +240,5 @@ public class ClientNotificationNodeQueue {
     finally {
       m_sessionUserCacheLock.readLock().unlock();
     }
-
   }
-
 }
