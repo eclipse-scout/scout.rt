@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CloseKeyStroke, DialogLayout, Dimension, Event, FocusRule, GlassPaneRenderer, graphics, HtmlComponent, Insets, KeyStrokeContext, Point, PopupLayout, Rectangle, scout, scrollbars, strings, Widget} from '../index';
+import {CloseKeyStroke, DialogLayout, Dimension, Event, FocusRule, GlassPaneRenderer, graphics, HtmlComponent, Insets, KeyStrokeContext, Point, PopupLayout, Rectangle, scout, scrollbars, strings, Widget, widgets} from '../index';
 import $ from 'jquery';
 
 export default class Popup extends Widget {
@@ -440,6 +440,15 @@ export default class Popup extends Widget {
         break;
     }
     return cssClass;
+  }
+
+  _animateRemovalWhileRemovingParent() {
+    if (!this.$anchor) {
+      // Allow remove animations for popups without an anchor
+      return true;
+    }
+    // If parent is the anchor, prevent remove animation to ensure popup will be removed together with the anchor
+    return widgets.get(this.$anchor) !== this.parent;
   }
 
   _isRemovalPrevented() {
