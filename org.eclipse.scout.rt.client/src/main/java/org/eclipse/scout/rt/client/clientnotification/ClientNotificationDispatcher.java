@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,7 +47,7 @@ public class ClientNotificationDispatcher {
   public void dispatchNotifications(List<ClientNotificationMessage> notifications) {
     final IClientSessionRegistry notificationService = BEANS.get(IClientSessionRegistry.class);
     if (notifications == null) {
-      LOG.error("Notifications null. Please check your configuration");
+      LOG.warn("Notifications are null. Please check your configuration.");
       return;
     }
 
@@ -77,7 +77,7 @@ public class ClientNotificationDispatcher {
               for (String sessionId : address.getSessionIds()) {
                 IClientSession session = notificationService.getClientSession(sessionId);
                 if (session == null) {
-                  LOG.info("received notification for invalid session '{}'.", sessionId);
+                  LOG.debug("received notification for invalid session '{}'.", sessionId);
                 }
                 else {
                   dispatchForSession(session, notification, address);
@@ -99,10 +99,8 @@ public class ClientNotificationDispatcher {
   /**
    * the notification will be applied sync if the method invocation is done in with a {@link IClientSession} in the
    * {@link RunContext}. The sync execution is due to piggyback notifications expected to be applied after a successful
-   * backendcall. In case no {@link IClientSession} is in the current {@link RunContext} the notification is applied
+   * backend call. In case no {@link IClientSession} is in the current {@link RunContext} the notification is applied
    * async.
-   *
-   * @param notification
    */
   public void dispatchForNode(final Serializable notification, final IClientNotificationAddress address) {
     if (IClientSession.CURRENT.get() != null) {
@@ -127,7 +125,7 @@ public class ClientNotificationDispatcher {
    * Dispatching is always done asynchronously to ensure that it is not handled within a model thread.
    *
    * @param session
-   *          the session describes the runcontext in which the notification should be processed.
+   *          the session describes the {@link RunContext} in which the notification should be processed.
    * @param notification
    *          the notification to process.
    */
@@ -169,13 +167,11 @@ public class ClientNotificationDispatcher {
   }
 
   /**
-   * @return pending notification futures to be able to to wait for completion.
+   * @return pending notification futures to be able to wait for completion.
    */
   public Set<IFuture<?>> getPendingNotifications() {
-    final Set<IFuture<?>> futures = new HashSet<>();
     synchronized (m_notificationFutures) {
-      futures.addAll(m_notificationFutures);
-      return futures;
+      return new HashSet<>(m_notificationFutures);
     }
   }
 
@@ -187,8 +183,8 @@ public class ClientNotificationDispatcher {
   private class P_NotificationFutureCallback implements IDoneHandler<Void> {
     private final IFuture<Void> m_future;
 
-    P_NotificationFutureCallback(IFuture<Void> furture) {
-      m_future = furture;
+    P_NotificationFutureCallback(IFuture<Void> future) {
+      m_future = future;
     }
 
     @Override

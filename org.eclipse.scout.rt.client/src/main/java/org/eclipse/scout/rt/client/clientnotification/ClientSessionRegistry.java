@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,14 +51,12 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
 
   /**
    * this method is expected to be called in the context of the specific session.
-   *
-   * @param session
    */
   protected void sessionStopped(final IClientSession session) {
     checkSession(session);
     final String sessionId = session.getId();
     final String userId = session.getUserId();
-    LOG.debug("Unregister client session [sessionid={}, userId={}].", sessionId, userId);
+    LOG.debug("Unregister client session [sessionId={}, userId={}].", sessionId, userId);
     // client session household
     synchronized (m_cacheLock) {
       m_sessionIdToSession.remove(session.getId());
@@ -81,13 +79,11 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
   /**
    * Register the session after session start. This method is expected to be called in the context of the specific
    * session.
-   *
-   * @param session
    */
   public void sessionStarted(final IClientSession session) {
     ensureUserIdAvailable(session);
     checkSession(session);
-    LOG.debug("Register client session [sessionid={}, userId={}].", session.getId(), session.getUserId());
+    LOG.debug("Register client session [sessionId={}, userId={}].", session.getId(), session.getUserId());
     registerUser(session);
   }
 
