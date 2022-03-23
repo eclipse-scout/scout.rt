@@ -241,7 +241,9 @@ export default class TableHeaderMenu extends Popup {
     if (this.filterTable) {
       this.filterTable.off('rowsChecked', this._filterTableRowsCheckedHandler);
     }
-    this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
+    if (this.tableHeader.rendered) {
+      this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
+    }
     this.$headerItem.select(false);
     this.table.off('columnMoved', this._onColumnMovedHandler);
     this.table.off('filterAdded', this._tableFilterHandler);

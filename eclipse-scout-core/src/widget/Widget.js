@@ -524,7 +524,8 @@ export default class Widget {
    * After the animation is executed, the element gets removed using this._removeInternal.
    */
   _removeAnimated() {
-    if (this.parent.removing || !Device.get().supportsCssAnimation() || !this.$container || this.$container.isDisplayNone()) {
+    let animateRemovalWhileRemovingParent = this._animateRemovalWhileRemovingParent();
+    if ((this.parent.removing && !animateRemovalWhileRemovingParent) || !Device.get().supportsCssAnimation() || !this.$container || this.$container.isDisplayNone()) {
       // Cannot remove animated, remove regularly
       this._removeInternal();
       return;
@@ -544,7 +545,7 @@ export default class Widget {
       if (!this.animateRemovalClass) {
         throw new Error('Missing animate removal class. Cannot remove animated.');
       }
-      if (!this.$container.isVisible() || !this.$container.isEveryParentVisible()) {
+      if (!this.$container.isVisible() || !this.$container.isEveryParentVisible() || !this.$container.isAttached()) {
         // If element is not visible, animationEnd would never fire -> remove it immediately
         this._removeInternal();
         return;
@@ -557,7 +558,14 @@ export default class Widget {
 
     // If the parent is being removed while the animation is running, the animationEnd event will never fire
     // -> Make sure remove is called nevertheless. Important: remove it before the parent is removed to maintain the regular remove order
-    this.parent.one('removing', this._parentRemovingWhileAnimatingHandler);
+    if (!animateRemovalWhileRemovingParent) {
+      this.parent.one('removing', this._parentRemovingWhileAnimatingHandler);
+    }
+  }
+
+  _animateRemovalWhileRemovingParent() {
+    // By default, remove animation is prevented when parent is being removed
+    return false;
   }
 
   _onParentRemovingWhileAnimating() {
