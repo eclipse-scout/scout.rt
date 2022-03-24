@@ -151,4 +151,10 @@ describe('ProposalField', () => {
     expect(field._getLastSearchText()).toBe('Bar');
   });
 
+  it('should clear error status on search text change', () => {
+    field.setErrorStatus(Status.error('functional'));
+    expect(field.errorStatus.containsStatus(Status)).toBe(true);
+    field._acceptInput(false, 'Bar', false, true, null);
+    expect(field.getErrorStatus).toBeUndefined();
+  });
 });

@@ -189,11 +189,12 @@ export default class ProposalField extends SmartField {
     // this causes a lookup which may fail and open a new proposal chooser (property
     // change for 'result').
     if (searchTextChanged) {
+      this.clearErrorStatus();
       this._acceptByText(sync, searchText);
     } else if (!this._hasUiError()) {
       this._inputAccepted(false);
     } else {
-      // even though there's nothing todo, someone could wait for our promise to be resolved
+      // even though there's nothing to do, someone could wait for our promise to be resolved
       this._acceptInputDeferred.resolve();
     }
 
