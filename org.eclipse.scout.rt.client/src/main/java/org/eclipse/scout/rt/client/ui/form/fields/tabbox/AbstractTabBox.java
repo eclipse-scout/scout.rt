@@ -206,7 +206,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
       int index = getFieldIndex(selectedBox);
       List<IGroupBox> boxes = getGroupBoxes();
       // next to right side
-      for (int i = index + 1; i < getFieldCount(); i++) {
+      for (int i = index + 1; i < boxes.size(); i++) {
         IGroupBox box = boxes.get(i);
         if (box.isVisible()) {
           return box;
