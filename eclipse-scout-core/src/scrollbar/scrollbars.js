@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -159,6 +159,17 @@ export function installScrollShadow($container, session, options) {
   _installMutationObserver(session);
   _installIntersectionObserver();
   intersectionObserver.observe($container[0]);
+
+  // this is required in addition to the intersection observer because the observer events are handled asynchronously later after all the setTimeout calls.
+  // Then the shadow might stay visible too long which has an impact on layout updates.
+  let containerElement = $container[0];
+  let visibleListener = e => {
+    if (e.target === containerElement) {
+      _onScrollableVisibleChange(containerElement, e.type === 'show');
+    }
+  };
+  $container.data('scroll-shadow-visible-listener', visibleListener);
+  $container.on('hide show', visibleListener);
 }
 
 export function uninstallScrollShadow($container, session) {
@@ -176,6 +187,10 @@ export function uninstallScrollShadow($container, session) {
   }
   if (intersectionObserver) {
     intersectionObserver.unobserve($container[0]);
+  }
+  let visibleListener = $container.data('scroll-shadow-visible-listener');
+  if (visibleListener) {
+    $container.off('hide show', visibleListener);
   }
   let $scrollables = _$scrollables[session];
   if (!$scrollables || !$scrollables.some($scrollable => $scrollable.data('scroll-shadow'))) {
@@ -733,7 +748,7 @@ export function scrollToBottom($scrollable, options) {
 /**
  * @param location object with x and y properties
  * @param $scrollables one or more scrollables to check against
- * @eturns {boolean} true if the location is visible in the current viewport of all the $scrollables, or if $scrollables is null
+ * @returns {boolean} true if the location is visible in the current viewport of all the $scrollables, or if $scrollables is null
  */
 export function isLocationInView(location, $scrollables) {
   if (!$scrollables || $scrollables.length === 0) {
