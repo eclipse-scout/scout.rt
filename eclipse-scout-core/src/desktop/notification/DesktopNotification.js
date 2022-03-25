@@ -160,18 +160,17 @@ export default class DesktopNotification extends ScoutNotification {
       return;
     }
     if (this.nativeNotificationVisibility === DesktopNotification.NativeNotificationVisibility.NONE) {
+      this._hideLaterIfNativeOnly();
       return;
     }
 
     if (this.nativeNotificationVisibility === DesktopNotification.NativeNotificationVisibility.BACKGROUND && !this._isDocumentHidden()) {
+      this._hideLaterIfNativeOnly();
       return;
     }
 
     if (window.Notification && Notification.permission === 'denied') {
-      if (this.nativeOnly) {
-        // If native notifications are not allowed, there is no need to keep the (invisible) desktop notification open
-        this.hide();
-      }
+      this._hideLaterIfNativeOnly();
       return;
     }
     if (this._checkNotificationPromise()) {
@@ -180,6 +179,14 @@ export default class DesktopNotification extends ScoutNotification {
       // noinspection JSIgnoredPromiseFromCall
       Notification.requestPermission(this._showNativeNotification.bind(this));
     }
+  }
+
+  _hideLaterIfNativeOnly() {
+    if (!this.nativeOnly) {
+      return;
+    }
+    // If native notifications are not shown, there is no need to keep the (invisible) desktop notification open (prevent dom-leak)
+    setTimeout(() => this.hide()); // async because this method is called in render and removing the notification within render throws exception
   }
 
   /**
