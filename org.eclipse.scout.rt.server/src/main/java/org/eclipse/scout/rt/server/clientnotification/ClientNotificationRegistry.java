@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,8 +87,6 @@ public class ClientNotificationRegistry {
 
   /**
    * This method should only be accessed from {@link ClientNotificationService}
-   *
-   * @param nodeId
    */
   void unregisterNode(String nodeId) {
     synchronized (m_notificationQueues) {
@@ -99,14 +97,12 @@ public class ClientNotificationRegistry {
   /**
    * This method should only be accessed from {@link ClientNotificationService}
    *
-   * @param notificationNodeId
    * @param maxAmount
    *          maximum number of notifications to be consumed
    * @param maxWaitTime
    *          maximum waiting time for new notifications
    * @param unit
    *          time unit for maxWaitTime
-   * @return
    */
   List<ClientNotificationMessage> consume(String notificationNodeId, int maxAmount, int maxWaitTime, TimeUnit unit) {
     ClientNotificationNodeQueue queue = getQueue(notificationNodeId);
@@ -129,8 +125,6 @@ public class ClientNotificationRegistry {
 
   /**
    * To access all session id's having to whom notifications will be provided by this server node.
-   *
-   * @return
    */
   public Set<String> getRegisteredSessionIds() {
     Set<String> allSessionIds = new HashSet<>();
@@ -160,8 +154,6 @@ public class ClientNotificationRegistry {
   /**
    * The notification will be distributed to all sessions of the given userId.
    *
-   * @param userId
-   * @param notification
    * @param distributeOverCluster
    *          flag to distribute notification over whole cluster
    */
@@ -176,8 +168,6 @@ public class ClientNotificationRegistry {
   /**
    * The notification will be distributed to all sessions of the given userIds.
    *
-   * @param userIds
-   * @param notification
    * @param distributeOverCluster
    *          flag to distribute notification over whole cluster
    */
@@ -194,7 +184,6 @@ public class ClientNotificationRegistry {
    *
    * @param sessionId
    *          the addressed session
-   * @param notification
    * @param distributeOverCluster
    *          flag to distribute notification over whole cluster
    */
@@ -209,7 +198,6 @@ public class ClientNotificationRegistry {
   /**
    * This notification will be distributed to all sessions.
    *
-   * @param notification
    * @param distributeOverCluster
    *          flag to distribute notification over whole cluster
    */
@@ -224,7 +212,6 @@ public class ClientNotificationRegistry {
   /**
    * This notification will be distributed to client nodes.
    *
-   * @param notification
    * @param distributeOverCluster
    *          flag to distribute notification over whole cluster
    */
@@ -252,8 +239,6 @@ public class ClientNotificationRegistry {
 
   /**
    * Publish without triggering cluster notification
-   *
-   * @param messages
    */
   public void publishWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages) {
     publishWithoutClusterNotification(messages, null);
@@ -262,7 +247,6 @@ public class ClientNotificationRegistry {
   /**
    * Publish without triggering cluster notification
    *
-   * @param messages
    * @param excludedUiNodeId
    *          may be <code>null</code>
    */
@@ -299,7 +283,6 @@ public class ClientNotificationRegistry {
    *
    * @param userId
    *          the addressed user
-   * @param notification
    * @param distributeOverCluster
    *          flag to distribute notification over whole cluster
    */
@@ -314,11 +297,10 @@ public class ClientNotificationRegistry {
   /**
    * To put a notifications with transactional behavior. The notification will be processed on successful commit of the
    * {@link ITransaction} surrounding the server call. The notification will be distributed to all sessions of the given
-   * userids.
+   * userIds.
    *
    * @param userIds
    *          the addressed user
-   * @param notification
    * @param distributeOverCluster
    *          flag to distribute notification over whole cluster
    */
@@ -337,7 +319,6 @@ public class ClientNotificationRegistry {
    *
    * @param sessionId
    *          the addressed session
-   * @param notification
    * @param distributeOverCluster
    *          flag to distribute notification over whole cluster
    */
@@ -353,7 +334,6 @@ public class ClientNotificationRegistry {
    * To put a notifications with transactional behavior. The notification will be processed on successful commit of the
    * {@link ITransaction} surrounding the server call. This notification will be distributed to all sessions.
    *
-   * @param notification
    * @param distributeOverCluster
    *          flag to distribute notification over whole cluster
    */
@@ -369,7 +349,6 @@ public class ClientNotificationRegistry {
    * To put a notifications with transactional behavior. The notification will be processed on successful commit of the
    * {@link ITransaction} surrounding the server call. This notification will be distributed to all client nodes.
    *
-   * @param notification
    * @param distributeOverCluster
    *          flag to distribute notification over whole cluster
    */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,26 +57,6 @@ public class ClientNotificationRegistryTest {
   }
 
   /**
-   * Tests that a notification for a single session is only consumed by nodes that have the session registered.
-   */
-  @Test
-  public void testNotificationsSingleSession() {
-    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
-    reg.registerSession("Node2", TEST_SESSION, TEST_USER);
-    reg.registerSession("Node2", "otherSession", TEST_USER);
-    reg.registerSession("Node3", "otherSession", TEST_USER);
-    reg.putForSession(TEST_SESSION, TEST_NOTIFICATION);
-
-    List<ClientNotificationMessage> notificationsN1 = consumeNoWait(reg, TEST_NODE);
-    List<ClientNotificationMessage> notificationsN2 = consumeNoWait(reg, "Node2");
-    List<ClientNotificationMessage> notificationsN3 = consumeNoWait(reg, "Node3");
-    assertSingleTestNotification(notificationsN1);
-    assertSingleTestNotification(notificationsN2);
-    assertTrue(notificationsN3.isEmpty());
-  }
-
-  /**
    * If a session is unregistered, no notification is consumed.
    */
   @Test
@@ -101,26 +81,6 @@ public class ClientNotificationRegistryTest {
     reg.putForUser(TEST_USER, TEST_NOTIFICATION);
     List<ClientNotificationMessage> notificationsNode = consumeNoWait(reg, "testNodeId");
     assertEquals(1, notificationsNode.size());
-  }
-
-  /**
-   * Tests that a notification for a single user is only consumed by nodes that have the user registered.
-   */
-  @Test
-  public void testNotificationsSingleUser() {
-    ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerSession(TEST_NODE, TEST_SESSION, TEST_USER);
-    reg.registerSession("Node2", TEST_SESSION, "User2");
-    reg.registerSession("Node2", "otherSession", TEST_USER);
-    reg.registerSession("Node3", "otherSession", "User2");
-    reg.putForUser(TEST_USER, TEST_NOTIFICATION);
-
-    List<ClientNotificationMessage> notificationsN1 = consumeNoWait(reg, TEST_NODE);
-    List<ClientNotificationMessage> notificationsN2 = consumeNoWait(reg, "Node2");
-    List<ClientNotificationMessage> notificationsN3 = consumeNoWait(reg, "Node3");
-    assertSingleTestNotification(notificationsN1);
-    assertSingleTestNotification(notificationsN2);
-    assertTrue(notificationsN3.isEmpty());
   }
 
   /**
@@ -206,7 +166,7 @@ public class ClientNotificationRegistryTest {
    * If no sessions are registered, the node should not be available in the registry
    */
   @Test
-  public void registeredNodeInitiallsNotAvailable() {
+  public void registeredNodeInitialsNotAvailable() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
     assertFalse(reg.getRegisteredNodeIds().contains(TEST_NODE));
   }
@@ -302,7 +262,7 @@ public class ClientNotificationRegistryTest {
   }
 
   /**
-   * If the notifications are already consumed, piggy back is not possible
+   * If the notifications are already consumed, piggyback is not possible
    */
   @Test
   public void testTransactionalNoPiggyBack() {
@@ -317,7 +277,7 @@ public class ClientNotificationRegistryTest {
       reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
       reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
       commit();
-      //no notifications for current request (piggy back)
+      //no notifications for current request (piggyback)
       List<ClientNotificationMessage> notifications = ClientNotificationCollector.CURRENT.get().consume();
       assertTrue(notifications.isEmpty());
       //notifications for current nodes
