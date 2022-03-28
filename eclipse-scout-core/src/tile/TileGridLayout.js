@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -151,7 +151,7 @@ export default class TileGridLayout extends LogicalGridLayout {
    */
   _layoutCellBounds(containerSize, containerInsets) {
     // Since the tiles are positioned absolutely it is necessary to add the height of the filler to the top insets
-    if (this.widget.virtual) {
+    if (this.widget.virtual && this.widget.$fillBefore) {
       containerInsets.top += this.widget.$fillBefore.outerHeight(true);
     }
     return super._layoutCellBounds(containerSize, containerInsets);
