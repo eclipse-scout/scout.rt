@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.clientnotification;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
