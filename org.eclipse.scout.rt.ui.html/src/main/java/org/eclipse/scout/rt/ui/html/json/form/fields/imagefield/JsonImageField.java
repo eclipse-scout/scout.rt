@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.imagefield;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.ui.IIconIdPrefix;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
@@ -158,7 +159,7 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
     if (StringUtility.isNullOrEmpty(imageId)) {
       return false;
     }
-    return imageId.startsWith("font:");
+    return imageId.startsWith(IIconIdPrefix.FONT);
   }
 
   // When an adapter has multiple images, it must deal itself with that case. For instance it could
