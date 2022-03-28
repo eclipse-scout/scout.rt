@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,10 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .mode {
-  border: @mode-border-width solid @control-border-color;
+  --padding-x: @mode-padding-x;
+  --padding-y: @mode-padding-y;
+  --border-width: @mode-border-width;
+
+  border: var(--border-width) solid @control-border-color;
   border-radius: 0;
   flex: 1 1 0;
-  padding: @mode-padding-y @mode-padding-x;
+  padding: var(--padding-y) var(--padding-x);
   #scout.overflow-ellipsis();
 
   &.first {
@@ -29,12 +33,12 @@
 
   &:not(.last):not(.selected) {
     border-right: none;
-    padding-right: @mode-padding-x + @mode-border-width; /* account for the missing border, so that text does not jump */
+    padding-right: calc(var(--padding-x) + var(--border-width)); /* account for the missing border, so that text does not jump */
   }
 
   &.after-selected {
     border-left: none;
-    padding-left: @mode-padding-x + @mode-border-width; /* account for the missing border, so that text does not jump */
+    padding-left: calc(var(--padding-x) + var(--border-width)); /* account for the missing border, so that text does not jump */
   }
 
   // override button (the selected mode cannot be clicked. therefore do not show hover and active colors)
@@ -68,21 +72,13 @@
 }
 
 .mode-selector.alternative {
-  border: @mode-alternative-border-width solid transparent;
 
   & > .mode {
+    --border-width: 0px;
+
     color: @mode-color;
-    border: none;
     background-color: transparent;
     border-radius: @button-border-radius;
-
-    &:not(.last):not(.selected) {
-      padding-right: @mode-padding-x;
-    }
-
-    &.after-selected {
-      padding-left: @mode-padding-x;
-    }
 
     &:hover {
       background-color: rgba(0, 0, 0, 0.05);
@@ -120,26 +116,8 @@
 }
 
 .dense .mode-selector {
-
   & > .mode {
-    padding: @mode-padding-dense;
-
-    &:not(.last):not(.selected) {
-      padding-right: @mode-padding-dense-x + @mode-border-width; /* account for the missing border, so that text does not jump */
-    }
-
-    &.after-selected {
-      padding-left: @mode-padding-dense-x + @mode-border-width; /* account for the missing border, so that text does not jump */
-    }
-  }
-
-  &.alternative > .mode {
-    &:not(.last):not(.selected) {
-      padding-right: @mode-padding-dense-x;
-    }
-
-    &.after-selected {
-      padding-left: @mode-padding-dense-x;
-    }
+    --padding-x: @mode-padding-dense-x;
+    --padding-y: @mode-padding-dense-y;
   }
 }
