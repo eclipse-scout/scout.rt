@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 /**
  * Row representing a result of a lookup.
  *
- * @param <ID_TYPE>
+ * @param <KEY_TYPE>
  *          type of the lookup key
  * @since Scout 4.0.0
  */
@@ -34,9 +34,6 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
    */
   String getText();
 
-  /**
-   * @param text
-   */
   ILookupRow<KEY_TYPE> withText(String text);
 
   /**
@@ -140,8 +137,7 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
   ILookupRow<KEY_TYPE> withAdditionalTableRowData(AbstractTableRowData bean);
 
   /**
-   * @param key
-   * @return This {@link ILookupRow} with given key set.
+   * @return {@link ILookupRow} with the given key.
    */
   ILookupRow<KEY_TYPE> withKey(KEY_TYPE key);
 

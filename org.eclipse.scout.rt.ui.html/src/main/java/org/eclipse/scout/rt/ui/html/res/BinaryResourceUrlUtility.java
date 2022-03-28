@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.client.ui.IIconIdPrefix;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResourceUtility;
 import org.eclipse.scout.rt.platform.util.Pair;
@@ -57,6 +58,7 @@ public final class BinaryResourceUrlUtility {
    *         <li>input: <code>"bookmark"</code>, output: <code>"icon/bookmark.png"</code> (the file extension is
    *         included to support auto-detection of the MIME type without looking at the file contents)</li>
    *         <li>input: <code>"font:X"</code>, output: <code>"font:X"</code></li>
+   *         <li>input: <code>"url:/api/create-image/foo"</code>, output: <code>"/api/create-image/foo"</code></li>
    *         </ul>
    *         The file extension is included to be able to auto-detect the MIME type based on it.
    *         <p>
@@ -66,8 +68,11 @@ public final class BinaryResourceUrlUtility {
     if (!StringUtility.hasText(iconId) || AbstractIcons.Null.equals(iconId)) {
       return null;
     }
-    if (iconId.startsWith("font:")) {
+    if (iconId.startsWith(IIconIdPrefix.FONT)) {
       return iconId;
+    }
+    if (iconId.startsWith(IIconIdPrefix.URL)) {
+      return StringUtility.removePrefixes(iconId, IIconIdPrefix.URL);
     }
     IconSpec iconSpec = IconLocator.instance().getIconSpec(iconId);
     if (iconSpec != null) {
@@ -114,10 +119,8 @@ public final class BinaryResourceUrlUtility {
   }
 
   /**
-   * @param jsonAdapter
    * @param path
    *          decoded path (non URL encoded)
-   * @return
    */
   public static String getFilenameWithFingerprint(IJsonAdapter<?> jsonAdapter, String path) {
     if (!checkDynamicAdapterResourceUrlArguments(jsonAdapter, path)) {

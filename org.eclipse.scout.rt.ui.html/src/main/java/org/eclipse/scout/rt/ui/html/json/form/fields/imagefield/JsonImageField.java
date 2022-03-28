@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.Adler32;
 
+import org.eclipse.scout.rt.client.ui.IIconIdPrefix;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
@@ -216,7 +217,7 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
     if (StringUtility.isNullOrEmpty(imageId)) {
       return false;
     }
-    return imageId.startsWith("font:");
+    return imageId.startsWith(IIconIdPrefix.FONT);
   }
 
   protected BinaryResource extractBinaryResource(Object raw) {
