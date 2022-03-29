@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.events.IListenerListWithManagement;
 import org.eclipse.scout.rt.platform.events.ISnapshotCollector;
@@ -210,9 +211,22 @@ public class BasicPropertySupport implements IListenerListWithManagement {
    * @return The value of the property with the name specified or {@code null} if the property does not exist or has the
    *         value {@code null}.
    */
-  @SuppressWarnings("unchecked")
   public <T> T getProperty(String name, Class<T> type) {
-    return (T) getProperty(name);
+    return type.cast(m_props.get(name));
+  }
+
+  /**
+   * Returns the property with given name. If the property is null, the defaultSupplier will be evaluated.
+   *
+   * @param name
+   *          The name of the property.
+   * @param defaultSupplier
+   *          The supplier if the value is null
+   * @return The value of the property with the name specified or the defaultSupplier if the property does not exist.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T getProperty(String name, Supplier<T> defaultSupplier) {
+    return (T) m_props.getOrDefault(name, defaultSupplier.get());
   }
 
   public <T> boolean setPropertyList(String name, List<T> newValue) {

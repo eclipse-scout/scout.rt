@@ -37,6 +37,17 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 @ClassId("e8dbfee4-503c-401e-8579-d0aa8618f59d")
 public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements IMenu {
 
+  private static final Set<? extends IMenuType> DEFAULT_MENU_TYPES = Set.of(
+      TableMenuType.SingleSelection,
+      TreeMenuType.SingleSelection,
+      ValueFieldMenuType.NotNull,
+      CalendarMenuType.CalendarComponent,
+      PlannerMenuType.Activity,
+      TabBoxMenuType.Header,
+      ImageFieldMenuType.Image,
+      ImageFieldMenuType.ImageId,
+      ImageFieldMenuType.ImageUrl);
+
   private Object m_ownerValue;
 
   public AbstractMenu() {
@@ -49,9 +60,9 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   /**
    * All menu types this menu should be showed with. For menus which are used in different contexts (Table, Tree,
-   * ValueField, ActivityMap) a combination of several menu type definitions can be returned. In case the menu is added
-   * on any other component (different from {@link ITable}, {@link ITree}, {@link IValueField} , {@link IActivityMap} )
-   * the menu type does not have any affect.
+   * ValueField) a combination of several menu type definitions can be returned. In case the menu is added on any other
+   * component (different from {@link ITable}, {@link ITree}, {@link IValueField} ) the menu type does not have any
+   * effect.
    * <p>
    * If multiple menu types of the same context are returned, the menu is rendered only once, using the most "specific"
    * of the types (which one depends on the context). Example: If the menu types contain TableMenuType.TableHeader and
@@ -64,16 +75,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @Order(55)
   @ConfigProperty(ConfigProperty.MENU_TYPE)
   protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-    return CollectionUtility.<IMenuType> hashSet(
-        TableMenuType.SingleSelection,
-        TreeMenuType.SingleSelection,
-        ValueFieldMenuType.NotNull,
-        CalendarMenuType.CalendarComponent,
-        PlannerMenuType.Activity,
-        TabBoxMenuType.Header,
-        ImageFieldMenuType.Image,
-        ImageFieldMenuType.ImageId,
-        ImageFieldMenuType.ImageUrl);
+    return DEFAULT_MENU_TYPES;
   }
 
   /**
@@ -206,11 +208,13 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @Override
   protected void initConfig() {
     super.initConfig();
-    setMenuTypes(getConfiguredMenuTypes());
-    setPreventDoubleClick(getConfiguredPreventDoubleClick());
-    setStackable(getConfiguredStackable());
-    setShrinkable(getConfiguredShrinkable());
-    setSubMenuVisibility(getConfiguredSubMenuVisibility());
+    if (isStoreConfigValues()) {
+      setMenuTypes(getConfiguredMenuTypes());
+      setPreventDoubleClick(getConfiguredPreventDoubleClick());
+      setStackable(getConfiguredStackable());
+      setShrinkable(getConfiguredShrinkable());
+      setSubMenuVisibility(getConfiguredSubMenuVisibility());
+    }
   }
 
   @Override
@@ -247,10 +251,9 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     // no default action
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Set<IMenuType> getMenuTypes() {
-    return CollectionUtility.hashSet((Collection<? extends IMenuType>) propertySupport.getProperty(PROP_MENU_TYPES));
+    return CollectionUtility.hashSet(propertySupport.getProperty(PROP_MENU_TYPES, this::getConfiguredMenuTypes));
   }
 
   public void setMenuTypes(Set<? extends IMenuType> menuTypes) {
@@ -259,7 +262,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   @Override
   public boolean isPreventDoubleClick() {
-    return propertySupport.getPropertyBool(PROP_PREVENT_DOUBLE_CLICK);
+    return propertySupport.getProperty(PROP_PREVENT_DOUBLE_CLICK, this::getConfiguredPreventDoubleClick);
   }
 
   @Override
@@ -269,7 +272,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   @Override
   public boolean isStackable() {
-    return propertySupport.getPropertyBool(PROP_STACKABLE);
+    return propertySupport.getProperty(PROP_STACKABLE, this::getConfiguredStackable);
   }
 
   @Override
@@ -279,7 +282,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   @Override
   public boolean isShrinkable() {
-    return propertySupport.getPropertyBool(PROP_SHRINKABLE);
+    return propertySupport.getProperty(PROP_SHRINKABLE, this::getConfiguredShrinkable);
   }
 
   @Override
@@ -289,7 +292,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   @Override
   public String getSubMenuVisibility() {
-    return propertySupport.getPropertyString(PROP_SUB_MENU_VISIBILITY);
+    return propertySupport.getProperty(PROP_SUB_MENU_VISIBILITY, this::getConfiguredSubMenuVisibility);
   }
 
   @Override
@@ -319,5 +322,4 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   protected IMenuExtension<? extends AbstractMenu> createLocalExtension() {
     return new LocalMenuExtension<>(this);
   }
-
 }
