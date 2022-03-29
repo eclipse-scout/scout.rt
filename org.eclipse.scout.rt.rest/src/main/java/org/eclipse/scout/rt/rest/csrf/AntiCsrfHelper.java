@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.rest.container.AntiCsrfContainerFilter;
 public class AntiCsrfHelper {
 
   public static final String REQUESTED_WITH_HEADER = "X-Requested-With";
-  public static final String REQUESTED_WITH_VALUE = "";
+  public static final String REQUESTED_WITH_VALUE = "XMLHttpRequest";
 
   /**
    * Adds the {@value #REQUESTED_WITH_HEADER} header to the request if necessary.
