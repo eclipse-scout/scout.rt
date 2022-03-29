@@ -396,7 +396,7 @@ export default class TileGrid extends Widget {
   }
 
   _onAnimatedTileRemove(tile) {
-    if (!tile.rendered || !tile.animateRemoval) {
+    if (!tile.removalPending) {
       return;
     }
     this.tileRemovalPendingCount++;
