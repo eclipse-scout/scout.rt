@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1049,16 +1049,17 @@ $.fn.oneAnimationEnd = function(handler) {
   if (!handler) {
     return this;
   }
-  return this.on('animationend webkitAnimationEnd', event => {
+  let oneHandler = event => {
     if (event.target !== this[0]) {
       // Ignore events that bubble up from child elements
       return;
     }
     // Unregister listener to implement "one" semantics
-    this.off(event);
+    this.off('animationend webkitAnimationEnd', oneHandler);
     // Notify actual event handler
     handler(event);
-  });
+  };
+  return this.on('animationend webkitAnimationEnd', oneHandler);
 };
 
 $.fn.hasAnimationClass = function() {
