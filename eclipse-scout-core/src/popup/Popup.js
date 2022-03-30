@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -185,18 +185,17 @@ export default class Popup extends Widget {
 
   _openWithoutParent() {
     // resolve parent for entry-point (don't change the actual property)
-    let parent = this.parent;
-    if (parent.destroyed) {
+    if (this.parent.destroyed) {
       return;
     }
-    if (parent.rendered || parent.rendering) {
-      this.open(parent.entryPoint());
+    if (this.parent.rendered || this.parent.rendering) {
+      this.open(this._getDefaultOpen$Parent());
       return;
     }
 
     // This is important for popups rendered in another (native) browser window. The DOM in the popup window
     // is rendered later, so we must wait until that window is rendered and layouted. See popup-window.html.
-    parent.one('render', () => {
+    this.parent.one('render', () => {
       this.session.layoutValidator.schedulePostValidateFunction(() => {
         if (this.destroyed || this.rendered) {
           return;
@@ -204,6 +203,14 @@ export default class Popup extends Widget {
         this.open();
       });
     });
+  }
+
+  /**
+   * Only called if parent.rendered or parent.rendering
+   * @return {$}
+   */
+  _getDefaultOpen$Parent() {
+    return this.parent.entryPoint();
   }
 
   open($parent) {
@@ -1046,7 +1053,7 @@ export default class Popup extends Widget {
 
   _handleGlassPanes() {
     let parentCoveredByGlassPane = this.session.focusManager.isElementCovertByGlassPane(this.parent.$container);
-    // if a popup is covered by a glass pane the glass pane's need to be rerendered to ensure a glass pane is also painted over the popup
+    // if a popup is covered by a glass pane the glass pane's need to be re-rendered to ensure a glass pane is also painted over the popup
     if (parentCoveredByGlassPane) {
       this.session.focusManager.rerenderGlassPanes();
     }
