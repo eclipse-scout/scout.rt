@@ -74,7 +74,7 @@
   & > .menubar {
     position: absolute;
     #scout.menubar-background-color-inherit();
-    border-bottom-color: transparent;
+    border-bottom: none;
   }
 
   & > .status {
@@ -163,6 +163,7 @@
     display: inline-block;
     vertical-align: middle;
     padding: @tab-item-title-padding-top 0 @tab-item-title-padding-bottom;
+    margin-top: @text-margin-top;
 
     .tab-area.has-sub-label > & {
       padding-bottom: @group-box-title-with-sub-label-padding-bottom;
