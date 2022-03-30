@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -352,6 +352,21 @@ export default class TileAccordion extends Accordion {
   _filter() {
     this.groups.forEach(group => {
       group.body.filter();
+
+      // If the layout has not been invalidated as part of the filtering above, it even though must be validated here.
+      // This is because groups above might have fewer visible Tiles now which makes room for this group.
+      // The revalidateLayout() with scrolling=true here ensures TileGrid._renderViewPort() is called to ensure these Tiles become visible as there is space available now.
+      // It is executed as postValidateFunction because the groups above must have completed their layouting so that
+      // TileGrid._renderViewPort() knows that there is more space available now.
+      if (group.body.htmlComp && group.body.htmlComp.valid && !group.body._accordionLayoutHandler /* skip if already registered */) {
+        group.body._accordionLayoutHandler = () => {
+          group.body.scrolling = true;
+          group.body.revalidateLayout();
+          group.body.scrolling = false;
+          group.body._accordionLayoutHandler = null;
+        };
+        this.session.layoutValidator.schedulePostValidateFunction(group.body._accordionLayoutHandler);
+      }
     });
   }
 

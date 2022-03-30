@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -89,7 +89,7 @@ describe('VirtualTileGrid', () => {
       tileGrid.setVirtual(true);
       $tiles = tileGrid.$container.children('.tile');
       expect(tileGrid.viewRangeRendered.equals(new Range(0, 2))).toBe(true);
-      expect($tiles.length).toBe(4); // Only first to rows rendered
+      expect($tiles.length).toBe(4); // Only first two rows rendered
       expect($tiles.eq(0).data('widget')).toBe(tileGrid.tiles[0]);
       expect($tiles.eq(1).data('widget')).toBe(tileGrid.tiles[1]);
       expect($tiles.eq(2).data('widget')).toBe(tileGrid.tiles[2]);
@@ -682,6 +682,63 @@ describe('VirtualTileGrid', () => {
 
       tileGrid.removeFilter(filter);
       expect(tileGrid.$container).not.toHaveClass('empty');
+    });
+
+    it('renders previously hidden virtual tiles that come to the viewport now because of filtered tiles above', () => {
+      let tileToSearchLabel = 'ToSearch';
+      let tileGrid0 = createTileGrid(4, {
+        gridColumnCount: 1,
+        viewRangeSize: 1,
+        scrollable: false
+      });
+      let tileGrid1 = createTileGrid(1, {
+        gridColumnCount: 1,
+        viewRangeSize: 1,
+        scrollable: false
+      });
+      tileGrid1.tiles[tileGrid1.tiles.length - 1].label = tileToSearchLabel;
+      let group0 = scout.create('Group', {
+        parent: session.desktop,
+        body: tileGrid0,
+        headerVisible: false
+      });
+      let group1 = scout.create('Group', {
+        parent: session.desktop,
+        body: tileGrid1,
+        headerVisible: false
+      });
+      let accordion = scout.create('TileAccordion', {
+        parent: session.desktop,
+        groups: [group0, group1],
+        tileGridLayoutConfig: {
+          columnWidth: 10,
+          rowHeight: 10
+        }
+      });
+      accordion.render();
+      accordion.$container.cssMaxHeight(10); // set height so that the accordion gets a scrollbar
+      accordion.$container.find('.scrollbar').css('position', 'absolute'); // required that the scrollbar is ignored in computing the view range
+      accordion.validateLayout();
+
+      // validate setup: two tiles from first group are rendered, no tiles from second group are rendered (as they are not visible)
+      expect(tileGrid0.tiles.length).toBe(4);
+      expect(tileGrid0.filteredTiles.length).toBe(4);
+      expect(tileGrid0.renderedTiles().length).toBe(2);
+      expect(tileGrid1.tiles.length).toBe(1);
+      expect(tileGrid1.filteredTiles.length).toBe(1);
+      expect(tileGrid1.renderedTiles().length).toBe(0);
+
+      accordion.addFilter(tile => tile.label === tileToSearchLabel);
+      accordion.validateLayout(); // required because validateLayoutTree below only validates the desktop which does not know the Accordion as child
+      accordion.validateLayoutTree(); // to run post-validate-function
+
+      // validate that the first tiles are removed and only the last, previously not rendered Tile is shown now
+      expect(tileGrid0.tiles.length).toBe(4);
+      expect(tileGrid0.filteredTiles.length).toBe(0);
+      expect(tileGrid0.renderedTiles().length).toBe(0);
+      expect(tileGrid1.tiles.length).toBe(1);
+      expect(tileGrid1.filteredTiles.length).toBe(1);
+      expect(tileGrid1.renderedTiles().length).toBe(1);
     });
 
     it('updates view port if filter changed while container was invisible and scroll parent not at y=0', () => {
