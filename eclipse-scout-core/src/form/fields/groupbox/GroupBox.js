@@ -360,14 +360,11 @@ export default class GroupBox extends CompositeField {
     this.$container.toggleClass('has-scroll-shadow-bottom', hasScrollShadowBottom);
     if ((headerVisible || hasMenubarTop) && oldHasScrollShadowTop !== hasScrollShadowTop
       || hasMenubarBottom && oldHasScrollShadowBottom !== hasScrollShadowBottom) {
-      this.invalidateLayout();
+      this.invalidateLayoutTree(false);
     }
 
     // Enlarge header line if there is a shadow, but don't do it if there is a menubar on top
     fields.adjustStatusPositionForScrollShadow(this, () => hasScrollShadowTop && headerVisible && !hasMenubarTop);
-
-    // Prevent flickering of status icon
-    this.validateLayout();
   }
 
   setMainBox(mainBox) {

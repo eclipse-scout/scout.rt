@@ -32,7 +32,6 @@ export default class TabBox extends CompositeField {
     this._addPreserveOnPropertyChangeProperties(['selectedTab']);
 
     this._tabBoxHeaderPropertyChangeHander = this._onTabBoxHeaderPropertyChange.bind(this);
-    this._selectedTabScrollTopChangeHandler = this._updateScrollShadow.bind(this);
   }
 
   /**
@@ -173,16 +172,17 @@ export default class TabBox extends CompositeField {
   _renderSelectedTab() {
     if (this.selectedTab) {
       this.selectedTab.render(this._$tabContent);
-      this.selectedTab.on('propertyChange:scrollTop', this._selectedTabScrollTopChangeHandler);
+      this.selectedTab.get$Scrollable().data('scroll-shadow-customizer', this._updateScrollShadow.bind(this));
     }
     if (this.rendered) {
+      this._updateScrollShadow();
       HtmlComponent.get(this._$tabContent).invalidateLayoutTree();
     }
   }
 
   _removeSelectedTab() {
     if (this.selectedTab) {
-      this.selectedTab.off('propertyChange:scrollTop', this._selectedTabScrollTopChangeHandler);
+      this.selectedTab.get$Scrollable().removeData('scroll-shadow-customizer');
       this.selectedTab.remove();
     }
   }
@@ -195,14 +195,11 @@ export default class TabBox extends CompositeField {
     let oldHasScrollShadowTop = this.$container.hasClass('has-scroll-shadow-top');
     this.$container.toggleClass('has-scroll-shadow-top', hasScrollShadowTop);
     if (oldHasScrollShadowTop !== hasScrollShadowTop) {
-      this.invalidateLayout();
+      this.invalidateLayoutTree(false);
     }
 
     // Enlarge header line if there is a shadow, but only if there is a header (controlled by labelVisible)
     fields.adjustStatusPositionForScrollShadow(this, () => hasScrollShadowTop && this.labelVisible);
-
-    // Prevent flickering of status icon
-    this.validateLayout();
   }
 
   setTabAreaStyle(tabAreaStyle) {
