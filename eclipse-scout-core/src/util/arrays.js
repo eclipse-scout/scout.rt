@@ -610,6 +610,17 @@ export function toMap(array, keyMapper = (el => el), valueMapper = (el => el)) {
   }, {}));
 }
 
+/**
+ * If the argument is an empty array, null is returned. Otherwise, the argument is returned unchanged.
+ *
+ * @template T
+ * @param {T[]} array
+ * @return {T[]|null}
+ */
+export function nullIfEmpty(array) {
+  return empty(array) ? null : array;
+}
+
 export default {
   $indexOf,
   $remove,
@@ -648,6 +659,7 @@ export default {
   max,
   min,
   move,
+  nullIfEmpty,
   pushAll,
   pushIfDefined,
   pushSet,

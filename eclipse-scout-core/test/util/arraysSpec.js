@@ -937,4 +937,21 @@ describe('scout.arrays', () => {
     });
   });
 
+  describe('nullIfEmpty', () => {
+
+    it('converts an empty array to null', () => {
+      expect(arrays.nullIfEmpty()).toBeNull();
+      expect(arrays.nullIfEmpty([])).toBeNull();
+      expect(arrays.nullIfEmpty('x')).toBeNull(); // not an array
+      let arr = ['test'];
+      arr.length = 0;
+      expect(arrays.nullIfEmpty(arr)).toBeNull();
+
+      expect(arrays.nullIfEmpty([undefined])).toEqual([undefined]);
+      expect(arrays.nullIfEmpty([null])).toEqual([null]);
+      expect(arrays.nullIfEmpty([1, 2, 3])).toEqual([1, 2, 3]);
+      expect(arrays.nullIfEmpty([[]])).toEqual([[]]);
+    });
+  });
+
 });
