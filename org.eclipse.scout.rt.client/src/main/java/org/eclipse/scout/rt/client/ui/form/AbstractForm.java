@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,12 +31,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -128,6 +131,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.PreferredValue;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.visitor.CollectingVisitor;
@@ -1696,33 +1700,13 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       veto.consume();
       throw veto;
     }
-    // check all fields that might be invalid
-    final List<String> invalidTexts = new ArrayList<>();
-    final List<String> mandatoryTexts = new ArrayList<>();
-    final AtomicReference<IValidateContentDescriptor> firstProblemRef = new AtomicReference<>();
-    Consumer<IFormField> v = f -> {
-      IValidateContentDescriptor desc = f.validateContent();
-      if (desc != null) {
-        String plainDesc = BEANS.get(HtmlHelper.class).toPlainText(desc.getDisplayText());
-        if (desc.getErrorStatus() != null) {
-          invalidTexts.add(plainDesc);
-        }
-        else {
-          mandatoryTexts.add(plainDesc);
-        }
-        firstProblemRef.compareAndSet(null, desc);
-      }
-    };
 
-    visit(v, IFormField.class);
-    IValidateContentDescriptor firstProblem = firstProblemRef.get();
-    if (firstProblem != null) {
-      if (LOG.isInfoEnabled()) {
-        LOG.info("there are fields with errors");
-      }
-      firstProblem.activateProblemLocation();
-      throw new VetoException().withTitle(TEXTS.get("FormValidationFailedTitle")).withHtmlMessage(createValidationMessageBoxHtml(invalidTexts, mandatoryTexts));
-    }
+    // check all fields that might be invalid
+    FormFieldErrorCollector collector = createFormFieldErrorCollector();
+    visit(collector, IFormField.class);
+    collector.firstProblem()
+        .ifPresent(firstProblem -> handleFormErrors(firstProblem, collector.messagesOfInvalidFields(), collector.messagesOfMandatoryFields()));
+
     if (!interceptValidate()) {
       VetoException veto = new VetoException("Validate " + getClass().getSimpleName());
       veto.consume();
@@ -1732,6 +1716,60 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       VetoException veto = new VetoException("Validate " + getClass().getSimpleName());
       veto.consume();
       throw veto;
+    }
+  }
+
+  protected void handleFormErrors(IValidateContentDescriptor firstProblem, List<String> messagesOfInvalidFields, List<String> messagesOfMandatoryFields) {
+    LOG.info("there are fields with errors");
+    firstProblem.activateProblemLocation();
+    throw new VetoException()
+        .withTitle(TEXTS.get("FormValidationFailedTitle"))
+        .withHtmlMessage(createValidationMessageBoxHtml(messagesOfInvalidFields, messagesOfMandatoryFields));
+  }
+
+  protected FormFieldErrorCollector createFormFieldErrorCollector() {
+    return new FormFieldErrorCollector();
+  }
+
+  public static class FormFieldErrorCollector implements Consumer<IFormField> {
+
+    private final AtomicReference<IValidateContentDescriptor> m_firstProblemRef = new AtomicReference<>();
+    private final List<String> m_invalidTexts = new ArrayList<>();
+    private final List<String> m_mandatoryTexts = new ArrayList<>();
+
+    @Override
+    public void accept(IFormField f) {
+      IValidateContentDescriptor desc = f.validateContent();
+      if (desc == null) {
+        return; // field is valid
+      }
+
+      String displayTextPlain = BEANS.get(HtmlHelper.class).toPlainText(desc.getDisplayText());
+      IStatus errorStatus = desc.getErrorStatus();
+      if (errorStatus != null) {
+        String invalidText = Stream.of(displayTextPlain, errorStatus.getMessage())
+            .filter(StringUtility::hasText)
+            .collect(Collectors.joining(": "));
+        if (StringUtility.hasText(invalidText)) {
+          m_invalidTexts.add(invalidText);
+        }
+      }
+      else if (StringUtility.hasText(displayTextPlain)) {
+        m_mandatoryTexts.add(displayTextPlain);
+      }
+      m_firstProblemRef.compareAndSet(null, desc);
+    }
+
+    public Optional<IValidateContentDescriptor> firstProblem() {
+      return Optional.ofNullable(m_firstProblemRef.get());
+    }
+
+    public List<String> messagesOfInvalidFields() {
+      return Collections.unmodifiableList(m_invalidTexts);
+    }
+
+    public List<String> messagesOfMandatoryFields() {
+      return Collections.unmodifiableList(m_mandatoryTexts);
     }
   }
 

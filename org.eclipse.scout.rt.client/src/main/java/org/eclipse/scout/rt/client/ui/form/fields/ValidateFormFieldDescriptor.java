@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ public class ValidateFormFieldDescriptor extends AbstractValidateContentDescript
   public String getDisplayText() {
     String displayText = super.getDisplayText();
     if (StringUtility.isNullOrEmpty(displayText)) {
-      return m_field.getFullyQualifiedLabel(": "); // do not set default in constructor. qualified label may change
+      return m_field.getFullyQualifiedLabel(LABEL_SEPARATOR); // do not set default in constructor. qualified label may change
     }
     return displayText;
   }
