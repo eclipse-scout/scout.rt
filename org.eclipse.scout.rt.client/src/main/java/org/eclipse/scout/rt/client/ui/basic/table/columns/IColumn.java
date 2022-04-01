@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -102,7 +102,19 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    */
   String PROP_UI_SORT_POSSIBLE = "uiSortPossible";
 
+  /**
+   * Default min width for most columns
+   */
   int MIN_WIDTH = 60;
+
+  /**
+   * Default min width for Boolean columns
+   */
+  int SMALL_MIN_WIDTH = 38;
+
+  /**
+   * Default min width for narrow columns (e.g. Icon column)
+   */
   int NARROW_MIN_WIDTH = 32;
 
   void initColumn();
@@ -143,7 +155,6 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * <p>
    * If any cell editor is active, editing is canceled and it's value rejected.
    * </p>
-   *
    */
   void setValue(ITableRow r, VALUE value);
 
@@ -154,7 +165,6 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * <p>
    * If any cell editor is active, editing is canceled and it's value rejected.
    * </p>
-   *
    */
   void setValue(int rowIndex, VALUE value);
 
