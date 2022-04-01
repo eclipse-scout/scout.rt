@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -127,9 +128,7 @@ public class RestClientProxyFactory {
     Set<Method> discouragedMethods = new HashSet<>();
 
     // collect methods of AsyncInvoker
-    for (Method method : AsyncInvoker.class.getDeclaredMethods()) {
-      discouragedMethods.add(method);
-    }
+    Collections.addAll(discouragedMethods, AsyncInvoker.class.getDeclaredMethods());
 
     // collect methods of Invocation named 'submit'
     for (Method method : Invocation.class.getDeclaredMethods()) {
@@ -149,7 +148,7 @@ public class RestClientProxyFactory {
       return false;
     }
     InvocationHandler handler = Proxy.getInvocationHandler(o);
-    return RestProxyInvcationHandler.class.isInstance(handler);
+    return handler instanceof RestProxyInvcationHandler;
   }
 
   /**
@@ -209,7 +208,7 @@ public class RestClientProxyFactory {
 
     protected void warnDiscouragedMethodUsage(Method method) {
       if (isDiscouraged(method)) {
-        LOG.warn("Discuraged method invocation (e.g. running outside a RunContext or exeption transformation not available)");
+        LOG.warn("Discouraged method invocation (e.g. running outside a RunContext or exception transformation not available)");
       }
     }
 

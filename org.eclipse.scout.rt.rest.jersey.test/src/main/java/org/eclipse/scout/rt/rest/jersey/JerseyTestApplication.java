@@ -21,7 +21,6 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.LocalHostAddressHelper;
@@ -35,11 +34,13 @@ public class JerseyTestApplication {
   private static final Logger LOG = LoggerFactory.getLogger(JerseyTestApplication.class);
 
   private volatile Server m_server = null;
+  private volatile Server m_proxyServer = null;
+
   private int m_port;
+  private int m_proxyPort;
 
   public static void main(String[] args) {
-    IPlatform platform = Platform.get();
-    platform.awaitPlatformStarted();
+    Platform.get().awaitPlatformStarted();
     BEANS.get(JerseyTestApplication.class).ensureStarted();
   }
 
@@ -58,17 +59,27 @@ public class JerseyTestApplication {
     return m_port;
   }
 
-  protected void startInternal() throws Exception {
-    m_port = getListenPort();
+  public int getProxyPort() {
+    return m_proxyPort;
+  }
 
-    final Server server = createServer(m_port);
+  protected void startInternal() throws Exception {
+    m_port = findUnusedNetworkPort();
+    m_proxyPort = findUnusedNetworkPort();
+
+    final Server server = createServer(m_port, false);
     server.start();
     m_server = server;
+
+    final Server proxyServer = createServer(m_proxyPort, true);
+    proxyServer.start();
+    m_proxyServer = proxyServer;
 
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
       sb.append("Server ready. The application is available on the following addresses:\n");
       sb.append("---------------------------------------------------------------------\n");
+      sb.append("Echo").append('\n');
       sb.append("  http://localhost:").append(m_port).append('\n');
       LocalHostAddressHelper localHostAddressHelper = BEANS.get(LocalHostAddressHelper.class);
       String hostname = localHostAddressHelper.getHostName().toLowerCase();
@@ -77,13 +88,15 @@ public class JerseyTestApplication {
       if (StringUtility.notEqualsIgnoreCase(hostname, ip)) {
         sb.append("  http://").append(ip).append(":").append(m_port).append('\n');
       }
+      sb.append("Proxy").append('\n');
+      sb.append("  http://localhost:").append(m_proxyPort).append('\n');
       sb.append("---------------------------------------------------------------------\n");
       LOG.info(sb.toString());
     }
   }
 
   @SuppressWarnings("resource")
-  protected Server createServer(final int port) {
+  protected Server createServer(final int port, boolean proxy) {
     final Server server = new Server();
 
     // Do not emit the server version (-> security)
@@ -93,7 +106,7 @@ public class JerseyTestApplication {
     connector.setPort(port);
     server.addConnector(connector);
 
-    final Handler handler = createHandler();
+    final Handler handler = createHandler(proxy);
     server.setHandler(handler);
 
     return server;
@@ -112,9 +125,12 @@ public class JerseyTestApplication {
     if (m_server != null) {
       m_server.stop();
     }
+    if (m_proxyServer != null) {
+      m_proxyServer.stop();
+    }
   }
 
-  protected int getListenPort() {
+  protected int findUnusedNetworkPort() {
     try (ServerSocket socket = new ServerSocket(0)) {
       return socket.getLocalPort();
     }
@@ -123,14 +139,18 @@ public class JerseyTestApplication {
     }
   }
 
-  protected Handler createHandler() {
+  protected Handler createHandler(boolean proxy) {
     final ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
     handler.setResourceBase(System.getProperty("java.io.tmpdir"));
     handler.setContextPath("/");
 
     handler.setDisplayName("Scout REST Integration Test");
-    handler.addServlet(RestClientTestEchoServlet.class, "/echo");
-
+    if (proxy) {
+      handler.addServlet(RestClientHttpProxyServlet.class, "/");
+    }
+    else {
+      handler.addServlet(RestClientTestEchoServlet.class, "/echo");
+    }
     return handler;
   }
 }

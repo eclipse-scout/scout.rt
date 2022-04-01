@@ -43,4 +43,14 @@ public final class EchoServletParameters {
    * (i.e. requested {@link #STATUS} &lt; 300).
    */
   public static final String LARGE_MESSAGE = "largeMessage";
+
+  /**
+   * String parameter, if available and not null, its value is added as cookie to the response.
+   */
+  public static final String COOKIE_VALUE = "cookieValue";
+
+  /**
+   * String parameter controlling whether to return a redirection to given URL.
+   */
+  public static final String REDIRECT_URL = "redirectUrl";
 }
