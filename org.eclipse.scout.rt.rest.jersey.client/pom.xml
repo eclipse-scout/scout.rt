@@ -28,16 +28,16 @@
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.rest</artifactId>
     </dependency>
+
+    <!-- Shared dependency required for ConfigurableProxySelector -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.shared</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
-    </dependency>
-
-    <!-- JAX-RS Jersey Client Apache Connector -->
-    <dependency>
-      <groupId>org.glassfish.jersey.connectors</groupId>
-      <artifactId>jersey-apache-connector</artifactId>
-      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

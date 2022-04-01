@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -89,7 +90,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
    * This default implementation delegates to {@link IRestClientConfigFactory#createClientConfig()}
    */
   protected Configuration createClientConfig() {
-    return BEANS.get(IRestClientConfigFactory.class).createClientConfig();
+    return getRestClientConfigFactory().createClientConfig();
   }
 
   /**
@@ -98,7 +99,20 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
    * This default implementation delegates to {@link IRestClientConfigFactory#buildClient(ClientBuilder)}
    */
   protected Client buildClient(ClientBuilder clientBuilder) {
-    return BEANS.get(IRestClientConfigFactory.class).buildClient(clientBuilder);
+    return getRestClientConfigFactory().buildClient(clientBuilder);
+  }
+
+  /**
+   * Returns IRestClientConfigFactory instance used to create REST client config and REST client. Override this method
+   * to provide a custom {@link IRestClientConfigFactory} implementation for a specific rest client helper
+   * implementation.
+   * <p>
+   * This default implementation delegates the lookup for {@link IRestClientConfigFactory} to the {@link IBeanManager}.
+   *
+   * @return IRestClientConfigFactory instance to use for this helper instance.
+   */
+  protected IRestClientConfigFactory getRestClientConfigFactory() {
+    return BEANS.get(IRestClientConfigFactory.class);
   }
 
   protected void initClientBuilder(ClientBuilder clientBuilder) {

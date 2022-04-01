@@ -17,10 +17,10 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.rest.client.RestClientProperties;
 import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestApplication;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
-import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyInvocation;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -42,7 +42,7 @@ public class RestClientProxyWebAppExceptionMappingTest {
     JerseyTestRestClientHelper helper = BEANS.get(JerseyTestRestClientHelper.class);
 
     // do not follow redirects (otherwise 301 check will not work)
-    helper.client().property(ClientProperties.FOLLOW_REDIRECTS, false);
+    helper.client().property(RestClientProperties.FOLLOW_REDIRECTS, false);
 
     WebTarget target = helper
         .target("echo", null); // use identity exception transformer
