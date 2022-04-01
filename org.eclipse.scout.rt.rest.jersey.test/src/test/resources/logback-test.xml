@@ -15,4 +15,7 @@
   <include resource="logback-test-scout.xml" />
 
   <logger name="org.apache.http.impl.conn" level="DEBUG" />
+
+  <!-- enable to provide detailed logging for HTTP client -->
+  <!-- <logger name="org.apache" level="TRACE" /> -->
 </configuration>
