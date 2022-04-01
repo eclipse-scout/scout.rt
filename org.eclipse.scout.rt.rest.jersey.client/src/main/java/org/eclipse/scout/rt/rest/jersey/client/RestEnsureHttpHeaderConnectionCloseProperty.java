@@ -8,15 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.glassfish.jersey.apache.connector;
+package org.eclipse.scout.rt.rest.jersey.client;
 
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 
 /**
  * Ensures the HTTP header {@code Connection} is set to {@code close} for every REST call unless the header is already
- * set. Using Connection: close establishes a new connection for every REST call. This solves several rather rare
- * issues that occurred in the HTTP client implementation when a connection was closed by the server side while it was
- * being used by the client side for the next request. Default is true.
+ * set. Using Connection: close establishes a new connection for every REST call. This solves several rather rare issues
+ * that occurred in the HTTP client implementation when a connection was closed by the server side while it was being
+ * used by the client side for the next request. Default is true.
  *
  * @since 8.0
  */

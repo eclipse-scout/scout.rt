@@ -57,8 +57,8 @@ import org.eclipse.scout.rt.rest.jersey.JerseyTestApplication;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
 import org.eclipse.scout.rt.rest.jersey.RequestSynchronizer;
 import org.eclipse.scout.rt.rest.jersey.RestClientTestEchoResponse;
+import org.eclipse.scout.rt.rest.jersey.TestingRestClientConfigFactory;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -232,6 +232,7 @@ public class RestClientProxyInvocationTest {
           .async()
           .get();
       requestSynchronizer.awaitRequest(requestId, 5);
+      //noinspection resource
       Assert.assertThrows(TimeoutException.class, () -> future.get(300, TimeUnit.MILLISECONDS));
       future.cancel(true);
     });
@@ -269,7 +270,7 @@ public class RestClientProxyInvocationTest {
    * blocked.
    */
   protected void assertConnectionReleased(IRunnable runnable) throws Exception {
-    Object manager = m_helper.client().getConfiguration().getProperty(ApacheClientProperties.CONNECTION_MANAGER);
+    Object manager = m_helper.client().getConfiguration().getProperty(TestingRestClientConfigFactory.PROP_CONNECTION_MANAGER);
     @SuppressWarnings("resource")
     PoolingHttpClientConnectionManager poolingConnectionManager = assertInstance(manager, PoolingHttpClientConnectionManager.class, "This test works with Apache HTTP client only. Adapt it for other libraries.");
     URI uri = URI.create(m_helper.getBaseUri());
@@ -689,12 +690,12 @@ public class RestClientProxyInvocationTest {
     return callback;
   }
 
-  protected static enum Execution {
-    SYNC, ASYNC;
+  protected enum Execution {
+    SYNC, ASYNC
   }
 
-  protected static enum Content {
-    DEFAULT, EMPTY_BODY, LARGE_MESSAGE;
+  protected enum Content {
+    DEFAULT, EMPTY_BODY, LARGE_MESSAGE
   }
 
   /**
