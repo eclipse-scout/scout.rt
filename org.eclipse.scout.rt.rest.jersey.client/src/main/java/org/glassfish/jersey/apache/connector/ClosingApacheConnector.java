@@ -54,6 +54,8 @@ import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.rest.client.RestClientProperties;
+import org.eclipse.scout.rt.rest.jersey.client.RestEnsureHttpHeaderConnectionCloseProperty;
+import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnector;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.ClientRequest;
 import org.glassfish.jersey.client.ClientResponse;
@@ -72,8 +74,9 @@ import org.glassfish.jersey.message.internal.Statuses;
  * @see <a href="https://github.com/eclipse-ee4j/jersey/issues/3629">Jersey Issue 3629 - ApacheConnector could throw
  *      ConnectionClosedException when using httpclient: 4.5.1+ with chunked transfer encoding</a>
  * @see <a href="https://github.com/eclipse-ee4j/jersey/pull/3861">GitHub pull request 3861</a>
+ * @deprecated will be removed with release 23.0. Use {@link ScoutApacheConnector} instead.
  */
-// TODO [9.0] abr: Refactor this class so it does not extend ApacheConnector anymore (contains too much customizations)
+@Deprecated
 class ClosingApacheConnector extends ApacheConnector {
 
   private static final Logger LOGGER = Logger.getLogger(ClosingApacheConnector.class.getName());
@@ -175,6 +178,11 @@ class ClosingApacheConnector extends ApacheConnector {
 
     if (clientRequest.getProperty(ClientProperties.REQUEST_ENTITY_PROCESSING) == null && BooleanUtility.nvl(clientRequest.resolveProperty(RestClientProperties.DISABLE_CHUNKED_TRANSFER_ENCODING, Boolean.class))) {
       clientRequest.setProperty(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
+    }
+
+    boolean suppressDefaultUserAgent = BooleanUtility.nvl(clientRequest.resolveProperty(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, false));
+    if (!suppressDefaultUserAgent && !clientRequest.getHeaders().containsKey(HttpHeaders.USER_AGENT)) {
+      clientRequest.getHeaders().add(HttpHeaders.USER_AGENT, "Generic");
     }
   }
 

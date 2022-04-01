@@ -35,6 +35,10 @@ public class RestClientTestEchoDo extends DoEntity {
     return doValue("data");
   }
 
+  public DoValue<String> body() {
+    return doValue("body");
+  }
+
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
@@ -81,5 +85,16 @@ public class RestClientTestEchoDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public String getData() {
     return data().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public RestClientTestEchoDo withBody(String body) {
+    body().set(body);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getBody() {
+    return body().get();
   }
 }

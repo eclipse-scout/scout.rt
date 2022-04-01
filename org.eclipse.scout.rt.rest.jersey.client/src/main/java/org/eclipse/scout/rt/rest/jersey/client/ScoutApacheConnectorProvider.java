@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,23 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.glassfish.jersey.apache.connector;
+package org.eclipse.scout.rt.rest.jersey.client;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Configuration;
 
-import org.eclipse.scout.rt.rest.jersey.client.ScoutApacheConnectorProvider;
+import org.eclipse.scout.rt.platform.Bean;
 import org.glassfish.jersey.client.spi.Connector;
+import org.glassfish.jersey.client.spi.ConnectorProvider;
 
-/**
- * @see ClosingApacheConnector
- * @deprecated will be removed with release 24.0. Use {@link ScoutApacheConnectorProvider} instead.
- */
-@Deprecated
-public class ClosingApacheConnectorProvider extends ApacheConnectorProvider {
+@Bean
+public class ScoutApacheConnectorProvider implements ConnectorProvider {
 
   @Override
   public Connector getConnector(Client client, Configuration runtimeConfig) {
-    return new ClosingApacheConnector(client, runtimeConfig);
+    return new ScoutApacheConnector(client, runtimeConfig);
   }
 }
