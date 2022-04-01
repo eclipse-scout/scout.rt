@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
@@ -95,11 +94,14 @@ public class UiJobs {
     LOG.warn("Timeout while waiting for model jobs to finish, cancelling running and scheduled model jobs.");
     cancelModelJobs(clientSession);
 
-    ModelJobs.schedule((IRunnable) MessageBoxes.createOk()
-        .withHeader(TEXTS.get("ui.RequestTimeout"))
-        .withBody(TEXTS.get("ui.RequestTimeoutMsg"))
-        .withSeverity(IStatus.ERROR)::show, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
-            .withName("Handling await model jobs timeout"));
+    ModelJobs.schedule(() -> {
+      MessageBoxes.createOk()
+          .withHeader(TEXTS.get("ui.RequestTimeout"))
+          .withBody(TEXTS.get("ui.RequestTimeoutMsg"))
+          .withSeverity(IStatus.ERROR)
+          .show();
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
+        .withName("Handling await model jobs timeout"));
   }
 
   /**
@@ -128,7 +130,7 @@ public class UiJobs {
    *
    * @param future
    *          the {@link IFuture} to wait until 'done' or requiring 'user interaction'.
-   * @return the job's result, or <code>null</code> if requires 'user interaction'.
+   * @return the job's result or {@code null} if {@link ModelJobs#EXECUTION_HINT_UI_INTERACTION_REQUIRED} is set.
    * @throws FutureCancelledError
    *           if the job is cancelled.
    * @throws ThreadInterruptedError
@@ -150,7 +152,7 @@ public class UiJobs {
   }
 
   /**
-   * Awaits until all jobs matching the given filter are in 'done' state, or require 'user interaction'.
+   * Waits until all jobs matching the given filter are in 'done' state, or require 'user interaction'.
    * <p>
    * The hint {@link ModelJobs#EXECUTION_HINT_UI_INTERACTION_REQUIRED} indicates, whether a job requires 'user
    * interaction'.
