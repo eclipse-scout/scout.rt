@@ -30,6 +30,20 @@ public final class RestClientProperties {
   public static final String ENABLE_COOKIES = "scout.rest.client.enableCookies";
 
   /**
+   * Standard cookie specification used by underlying http client. See {@code org.apache.http.client.config.CookieSpecs}
+   * for details.
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.String}.
+   * </p>
+   * <p>
+   * The default value is {@code "default"}.
+   * </p>
+   * <p>
+   * The name of the configuration property is <tt>{@value}</tt>.
+   */
+  public static final String COOKIE_SPEC = "scout.rest.client.cookieSpec";
+
+  /**
    * A value of {@code true} disables chunked transfer encoding.
    * <p>
    * The value MUST be an instance convertible to {@link java.lang.Boolean}.
@@ -118,4 +132,123 @@ public final class RestClientProperties {
    * The name of the configuration property is <tt>{@value}</tt>.
    */
   public static final String REQUEST_URI_ENCODER = "scout.rest.client.requestUriEncoder";
+
+  /**
+   * The property defines a URI of a HTTP proxy the client connector should use.
+   * <p>
+   * If the port component of the URI is absent then a default port of {@code 8080} is assumed. If the property absent
+   * then the default Scout ConfigurableProxySelector will be utilized.
+   * </p>
+   * <p>
+   * The value MUST be an instance of {@link String}.
+   * </p>
+   * <p>
+   * The default value is {@code null}.
+   * </p>
+   * <p>
+   * The name of the configuration property is <tt>{@value}</tt>.
+   * </p>
+   */
+  public static final String PROXY_URI = "scout.rest.client.proxy.uri";
+
+  /**
+   * The property defines a user name which will be used for HTTP proxy authentication.
+   * <p>
+   * The property is ignored if no {@link #PROXY_URI HTTP proxy URI} has been set. If the property absent then no proxy
+   * authentication will be utilized.
+   * </p>
+   * <p>
+   * The value MUST be an instance of {@link String}.
+   * </p>
+   * <p>
+   * The default value is {@code null}.
+   * </p>
+   * <p>
+   * The name of the configuration property is <tt>{@value}</tt>.
+   * </p>
+   */
+  public static final String PROXY_USERNAME = "scout.rest.client.proxy.username";
+
+  /**
+   * The property defines a user password which will be used for HTTP proxy authentication.
+   * <p>
+   * The property is ignored if no {@link #PROXY_URI HTTP proxy URI} has been set. If the property absent then no proxy
+   * authentication will be utilized.
+   * </p>
+   * <p>
+   * The value MUST be an instance of {@link String}.
+   * </p>
+   * <p>
+   * The default value is {@code null}.
+   * </p>
+   * <p>
+   * The name of the configuration property is <tt>{@value}</tt>.
+   * </p>
+   */
+  @SuppressWarnings("squid:S2068")
+  public static final String PROXY_PASSWORD = "scout.rest.client.proxy.password";
+
+  /**
+   * Automatic redirection. A value of {@code true} declares that the client will automatically redirect to the URI
+   * declared in 3xx responses.
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.Boolean}.
+   * </p>
+   * <p>
+   * The default value is {@code true}.
+   * </p>
+   * <p>
+   * The name of the configuration property is <tt>{@value}</tt>.
+   * </p>
+   */
+  public static final String FOLLOW_REDIRECTS = "scout.rest.client.followRedirects";
+
+  /**
+   * The Scout REST client adds a default user agent header with value {@code 'Generic'} unless a specific user agent
+   * header was set at request level by the invoker.<br>
+   * If this property is set to {@code true}, the default behavior is suppressed and no user agent header is added
+   * automatically by the client.
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.Boolean}.
+   * </p>
+   * <p>
+   * The default value is {@code false}.
+   * </p>
+   * <p>
+   * The name of the configuration property is <tt>{@value}</tt>.
+   * </p>
+   */
+  public static final String SUPPRESS_DEFAULT_USER_AGENT = "scout.rest.client.suppressDefaultUserAgent";
+
+  /**
+   * Connect timeout interval, in milliseconds. This property is supported either on rest client level (e.g. for all
+   * calls) or on a request level (e.g. for a single call).
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.Long}. A value of zero (0) is equivalent to an
+   * interval of infinity.
+   * </p>
+   * <p>
+   * The default value is infinity (0).
+   * </p>
+   * <p>
+   * The name of the configuration property is <tt>{@value}</tt>.
+   * </p>
+   */
+  public static final String CONNECT_TIMEOUT = "scout.rest.client.connectTimeout";
+
+  /**
+   * Read timeout interval, in milliseconds. This property is supported either on rest client level (e.g. for all calls)
+   * or on a request level (e.g. for a single call).
+   * <p>
+   * The value MUST be an instance convertible to {@link java.lang.Long}. A value of zero (0) is equivalent to an
+   * interval of infinity.
+   * </p>
+   * <p>
+   * The default value is infinity (0).
+   * </p>
+   * <p>
+   * The name of the configuration property is <tt>{@value}</tt>.
+   * </p>
+   */
+  public static final String READ_TIMEOUT = "scout.rest.client.readTimeout";
 }
