@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormTest.WrapperTestFormWithClassId.MainBox.EmbeddedField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
@@ -115,7 +116,7 @@ public class AbstractFormTest {
 
     String expectedErrorMessage = HTML.fragment(
         HTML.div(TEXTS.get("FormEmptyMandatoryFieldsMessage")),
-        HTML.ul(HTML.li(form.getStringField().getFullyQualifiedLabel(": "))))
+        HTML.ul(HTML.li(form.getStringField().getFullyQualifiedLabel(IValidateContentDescriptor.LABEL_SEPARATOR))))
         .toHtml();
 
     try {
@@ -140,7 +141,7 @@ public class AbstractFormTest {
 
     String expectedErrorMessage = HTML.fragment(
         HTML.div(TEXTS.get("FormEmptyMandatoryFieldsMessage")),
-        HTML.ul(HTML.li(form.getMainBox().getFullyQualifiedLabel(": ") + ": " + "String Field")))
+        HTML.ul(HTML.li(form.getMainBox().getFullyQualifiedLabel(IValidateContentDescriptor.LABEL_SEPARATOR) + IValidateContentDescriptor.LABEL_SEPARATOR + "String Field")))
         .toHtml();
 
     try {
