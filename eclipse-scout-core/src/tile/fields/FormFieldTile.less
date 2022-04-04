@@ -222,8 +222,16 @@
         }
       }
 
-      &.has-error > .status::before {
-        color: @palette-red-3;
+      &.has-error > .status {
+        &::before {
+          color: @tile-default-inverted-error-status-color;
+        }
+
+        &:hover::before,
+        &:active::before,
+        &.selected::before {
+          color: @tile-default-inverted-error-status-hover-color;
+        }
       }
 
       .scrollbar-thumb-handle {
