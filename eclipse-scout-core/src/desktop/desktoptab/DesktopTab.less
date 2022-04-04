@@ -10,11 +10,12 @@
  */
 .desktop-tab.simple-tab {
   width: @desktop-tab-width;
-  min-width: @desktop-tab-min-width ;
+  min-width: @desktop-tab-min-width;
   margin: @desktop-tab-margin-top @desktop-tab-margin-right 0 0;
   padding: @desktop-tab-padding @desktop-tab-padding 0 @desktop-tab-padding-left;
   border-radius: @desktop-tab-border-radius @desktop-tab-border-radius 0 0;
-  border-right-width: 0;
+  border: @desktop-tab-border-width solid @desktop-tab-border-color;
+  border-bottom-width: 0;
   background-color: @desktop-tab-background-color;
 
   & > .title-line {
@@ -79,6 +80,7 @@
   &:hover,
   &:active {
     background-color: @desktop-tab-hover-background-color;
+    border-color: transparent;
 
     & > .title-line > .title {
       color: inherit;
@@ -109,6 +111,7 @@
 
   &.selected {
     background-color: @simple-tab-selected-background-color;
+    border-color: transparent;
 
     & > .title-line {
       & > .icon-container {
