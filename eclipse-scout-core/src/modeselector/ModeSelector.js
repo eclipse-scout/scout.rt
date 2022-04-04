@@ -133,7 +133,7 @@ export default class ModeSelector extends Widget {
     let selectedModePosX = 0, selectedModeWidth = 0;
     if (this.selectedMode && this.selectedMode.$container) {
       selectedModePosX = graphics.position(this.selectedMode.$container).x;
-      selectedModeWidth = graphics.size(this.selectedMode.$container).width;
+      selectedModeWidth = graphics.size(this.selectedMode.$container, {exact: true}).width;
     }
     this.$slider.cssLeft(selectedModePosX);
     this.$slider.cssWidth(selectedModeWidth);
