@@ -702,14 +702,12 @@ describe('scout.objects', () => {
   describe('isEmpty', () => {
     it('returns true if argument is an empty object, false if it is a non-empty object, undefined if argument is not an object', () => {
       expect(objects.isEmpty({})).toBe(true);
+      expect(objects.isEmpty(undefined)).toBe(true);
+      expect(objects.isEmpty(null)).toBe(true);
 
       expect(objects.isEmpty({test: 'test'})).toBe(false);
       expect(objects.isEmpty({test: 42})).toBe(false);
 
-      expect(objects.isEmpty({})).toBe(true);
-
-      expect(objects.isEmpty(undefined)).toBe(undefined);
-      expect(objects.isEmpty(null)).toBe(undefined);
       expect(objects.isEmpty('test')).toBe(undefined);
       expect(objects.isEmpty(42)).toBe(undefined);
       expect(objects.isEmpty(['test'])).toBe(undefined);
