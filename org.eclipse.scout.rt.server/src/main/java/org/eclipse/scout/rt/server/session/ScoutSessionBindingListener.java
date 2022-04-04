@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,8 +42,8 @@ public class ScoutSessionBindingListener implements HttpSessionBindingListener, 
     try {
       BEANS.get(ServerSessionCache.class).removeHttpSession(m_scoutSessionId, event.getSession().getId() /* do not pass the session here as it is invalid already and should not be used anymore */);
     }
-    catch (RuntimeException e) {
-      // catch exceptions so that the container is not affected. Otherwise the unbound for other values may not be called (container dependent).
+    catch (Throwable e) {
+      // catch exceptions so that the container is not affected. Otherwise, the unbound for other values may not be called (container dependent).
       LOG.warn("Unable to remove http session for scout session id {}.", m_scoutSessionId, e);
     }
   }

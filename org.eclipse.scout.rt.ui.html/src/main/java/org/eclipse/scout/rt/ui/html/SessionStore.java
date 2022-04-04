@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,9 +30,11 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionStopHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
 import org.eclipse.scout.rt.ui.html.management.SessionMonitorMBean;
 import org.slf4j.Logger;
@@ -91,7 +93,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
 
   /**
    * Map of scheduled housekeeping jobs (key = clientSessionId). Using this map, scheduled but not yet executed
-   * housekeepings can be cancelled again when the client session is still to be used.
+   * housekeeping jobs can be cancelled again when the client session is still to be used.
    */
   protected final Map<String, IFuture<?>> m_housekeepingFutures = new HashMap<>();
 
@@ -227,7 +229,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     LOG.debug("Pre-register UI session with ID {}", uiSessionId);
     m_writeLock.lock();
     try {
-      Assertions.assertFalse(m_uiSessionMap.containsKey(uiSessionId), "This session store already contaions the uiSessionId '{}'", uiSessionId);
+      Assertions.assertFalse(m_uiSessionMap.containsKey(uiSessionId), "This session store already contains the uiSessionId '{}'", uiSessionId);
       m_preregisteredUiSessionMap.put(uiSessionId, uiSession);
 
       if (clientSessionId == null) {
@@ -351,7 +353,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
    * <b>Important:</b>: This method must be called from within a lock!
    */
   protected void startHousekeepingInsideWriteLock(final IClientSession clientSession) {
-    // No client session, no house keeping necessary
+    // No client session, no housekeeping necessary
     if (clientSession == null) {
       return;
     }
@@ -360,6 +362,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     LOG.debug("Session housekeeping: Schedule job for client session with ID {}", clientSession.getId());
     final IFuture<Void> future = Jobs.schedule(() -> doHousekeepingOutsideWriteLock(clientSession), Jobs.newInput()
         .withName("Performing session housekeeping for client session with ID {}", clientSession.getId())
+        .withExceptionHandling(BEANS.get(SessionHousekeepingExceptionHandler.class), true)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(CONFIG.getPropertyValue(SessionStoreHousekeepingDelayProperty.class), TimeUnit.SECONDS)));
 
@@ -456,6 +459,10 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         //this will schedule a housekeeping job that may start now or later
       }
     }
+    catch (Throwable t) {
+      // catch exceptions so that the container is not affected. Otherwise, the unbound for other values may not be called (container dependent).
+      LOG.warn("Unable to dispose ui session for http session id {}", m_httpSessionId, t);
+    }
     finally {
       m_writeLock.unlock();
       for (IClientSession clientSession : clientSessionList) {
@@ -491,6 +498,15 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     }
     catch (IllegalStateException e) { // NOSONAR
       // already invalid
+    }
+  }
+
+  public static class SessionHousekeepingExceptionHandler extends ExceptionHandler {
+    @Override
+    protected void handleInterruptedException(ThreadInterruptedError e) {
+      // use warn log level if the session housekeeping fails
+      // otherwise session shutdown issues may not be discovered
+      LOG.warn("Session housekeeping failed.", e);
     }
   }
 }
