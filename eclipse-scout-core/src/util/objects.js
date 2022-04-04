@@ -693,11 +693,14 @@ export function resolveConstProperty(object, config) {
 /**
  * @param {object} obj
  * @returns {Boolean|undefined}
- *  - true if the obj is empty
+ *  - true if the obj is empty, null or undefined
  *  - false if the obj is not empty
  *  - nothing if the obj is not an object
  */
 export function isEmpty(obj) {
+  if (isNullOrUndefined(obj)) {
+    return true;
+  }
   if (!isPlainObject(obj)) {
     return;
   }
