@@ -14,14 +14,16 @@
     border-radius: @desktop-tab-border-radius;
     margin: @desktop-tab-margin-top @desktop-tab-margin-right @desktop-tab-margin-right * 2;
     background-color: @desktop-tab-background-color;
-    border: 0;
+    border: @desktop-tab-border-width solid @desktop-tab-border-color;
 
     &:hover {
       background-color: @desktop-tab-hover-background-color;
+      border-color: transparent;
     }
 
     &.selected {
       background-color: @desktop-tab-hover-background-color;
+      border-color: transparent;
     }
   }
 }
