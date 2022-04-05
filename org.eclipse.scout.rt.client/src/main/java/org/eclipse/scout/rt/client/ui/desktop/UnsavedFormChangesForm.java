@@ -54,8 +54,10 @@ public class UnsavedFormChangesForm extends AbstractForm {
   private boolean m_isStopSession;
 
   public UnsavedFormChangesForm(List<IForm> forms, boolean isStopSession) {
+    super(false);
     m_forms = forms;
     m_isStopSession = isStopSession;
+    callInitializer();
   }
 
   @Override
@@ -338,7 +340,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
       List<ILookupRow<ArrayDeque<IForm>>> formRows = new ArrayList<>();
       for (Entry<IForm, ArrayDeque<IForm>> e : m_unsavedFormsStructured.entrySet()) {
         String text = getFormDisplayName(e.getKey());
-        formRows.add(new LookupRow<>(e.getValue(), text).withTooltipText(text));
+        formRows.add(new LookupRow<>(e.getValue(), text));
       }
       return formRows;
     }
