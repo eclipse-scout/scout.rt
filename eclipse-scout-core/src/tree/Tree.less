@@ -216,18 +216,16 @@
 
     .tree-node.lazy > & {
       font-family: @font-default-family;
-      font-size: @font-size-normal;
       content: '+';
       /* Move to left because '+' sign is not as wide as 'arrow-down' */
       margin-left: -2px;
     }
 
     .tree-node.expanded > & {
-      /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
+      /* This "imprecise" angle is a workaround for firefox to prevent shifting the div a little when the animation finishes. */
       /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
       #scout.transform(rotate(89.99deg));
     }
-
   }
 
   &:hover {

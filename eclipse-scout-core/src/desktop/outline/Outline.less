@@ -58,10 +58,6 @@
         line-height: @outline-node-control-line-height;
         color: @outline-node-control-color;
 
-        &::before {
-          font-size: @outline-node-control-size;
-        }
-
         &:hover {
           color: @highlight-color;
         }
@@ -77,6 +73,10 @@
 
         & > .tree-node-control {
           color: @outline-node-selected-control-color;
+
+          &:hover {
+            color: @highlight-color;
+          }
         }
 
         & > .font-icon {
