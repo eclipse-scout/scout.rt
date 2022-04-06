@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,7 +65,12 @@ public class CodeService implements ICodeService {
   protected ICacheBuilder<CodeTypeCacheKey, ICodeType<?, ?>> createCacheBuilder() {
     @SuppressWarnings("unchecked")
     ICacheBuilder<CodeTypeCacheKey, ICodeType<?, ?>> cacheBuilder = BEANS.get(ICacheBuilder.class);
-    return cacheBuilder.withCacheId(CODE_SERVICE_CACHE_ID).withValueResolver(createCacheValueResolver()).withShared(true).withClusterEnabled(true).withTransactional(true).withTransactionalFastForward(true);
+    return cacheBuilder.withCacheId(CODE_SERVICE_CACHE_ID).withValueResolver(createCacheValueResolver())
+        .withShared(true)
+        .withClusterEnabled(true)
+        .withTransactional(true)
+        .withTransactionalFastForward(true)
+        .withAtomicInsertion(true);
   }
 
   protected ICacheValueResolver<CodeTypeCacheKey, ICodeType<?, ?>> createCacheValueResolver() {

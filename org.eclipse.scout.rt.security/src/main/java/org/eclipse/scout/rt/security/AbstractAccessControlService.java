@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.security.PermissionCollection;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,7 +37,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
  * String and simply return as cache key the current userId in {@link #getCurrentUserCacheKey()}.
  * <p>
  * <b>Note</b> that the method {@link #execLoadPermissions(Object)} must not have a valid implementation in the client,
- * as a client will always get the value from the server. Therefore consider two implementations like
+ * as a client will always get the value from the server. Therefore, consider two implementations like
  * <tt>'CustomAccessControlService'</tt> and <tt>'CustomServerAccessControlService'</tt>.
  * <p>
  * This class caches permission collections. As default, the cache is transactional and with a time to live duration of
@@ -76,22 +77,17 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
   }
 
   /**
-   * see {@link #setUserIdSearchPatterns(Pattern...)}
+   * see {@link #setUserIdSearchPatterns(String...)}
    */
   protected void setUserIdSearchPatterns(Pattern... patterns) {
-    if (patterns == null) {
-      // m_userIdSearchPatterns never null
-      m_userIdSearchPatterns = new Pattern[]{};
-    }
-    else {
-      m_userIdSearchPatterns = patterns;
-    }
+    // m_userIdSearchPatterns never null
+    m_userIdSearchPatterns = Objects.requireNonNullElseGet(patterns, () -> new Pattern[]{});
   }
 
   /**
    * Set the pattern by which the userId is searched for in the list of jaas principal names.<br>
    * The first group of the pattern is assumed to be the username.<br>
-   * By default the following patterns are applied in this order:
+   * By default, the following patterns are applied in this order:
    * <ul>
    * <li>".*"
    * </ul>
@@ -117,6 +113,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
         .withClusterEnabled(true)
         .withTransactional(true)
         .withTransactionalFastForward(true)
+        .withAtomicInsertion(true)
         .withTimeToLive(1L, TimeUnit.HOURS, false);
   }
 
@@ -132,7 +129,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
    * Implement this method to get the cache key of the current user. Extract it from the current session or any other
    * property in the current {@link RunContext}.
    *
-   * @return cache key of the current user or null it the current context has no user assigned to it.
+   * @return cache key of the current user or null if the current context has no user assigned to it.
    */
   protected abstract K getCurrentUserCacheKey();
 

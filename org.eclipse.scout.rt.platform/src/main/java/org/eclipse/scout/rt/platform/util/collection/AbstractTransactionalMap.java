@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,13 +38,13 @@ import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
  * <p>
  * If there were concurrent modifications on the same key in different transactions only the first transaction will be
  * able to commit the change to the shared map. As a default, if a commit fails on a key, the entry is completely
- * removed from the shared map ({@link AbstractMapTransactionMember#changesCommited(Collection, Collection)}).
+ * removed from the shared map ({@link AbstractMapTransactionMember#changesCommited}).
  * <p>
  * In order to use this map safely one must conform to the following behavior: <b>If the current transaction changed the
  * value of a key in the transactional source, this maps {@link #remove(Object)} to that key must be called
  * <em>before</em> the value is fetched from that source again.</b> If one fails doing so, there are no guarantees, that
  * values in the shared map reflect values in the transactional source. Note that this behavior is given when using
- * {@link ICache}. See also {@link AbstractMapTransactionMember#changesCommited(Collection, Collection)}.
+ * {@link ICache}. See also {@link AbstractMapTransactionMember#changesCommited}.
  * <p>
  * If the <tt>fastForward</tt> property is set to true, a newly inserted value is directly committed to the shared map
  * if it is consider as a save commit.
@@ -244,10 +244,6 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
      * <p>
      * As a default, entries from the shared map are removed for any failed commit. Therefore, if map is used as a lazy
      * loaded shared cache, the item will be reloaded.
-     *
-     * @param successfulCommitedChanges
-     * @param failedCommitedChanges
-     * @param sharedMap
      */
     protected void changesCommited(Map<K, V> newSharedMap, Collection<K> successfulCommitedChanges, Collection<K> failedCommitedChanges) {
       for (K key : failedCommitedChanges) {
