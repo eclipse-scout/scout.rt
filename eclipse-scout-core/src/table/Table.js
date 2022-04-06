@@ -4676,7 +4676,9 @@ export default class Table extends Widget {
     this.$container.toggleClass('checkable', scout.isOneOf(this.checkableStyle, Table.CheckableStyle.TABLE_ROW, Table.CheckableStyle.CHECKBOX_TABLE_ROW));
     this.$container.toggleClass('table-row-check', this.checkableStyle === Table.CheckableStyle.TABLE_ROW);
     if (this._isDataRendered()) {
+      this._updateRowWidth();
       this._redraw();
+      this.invalidateLayoutTree();
     }
   }
 
