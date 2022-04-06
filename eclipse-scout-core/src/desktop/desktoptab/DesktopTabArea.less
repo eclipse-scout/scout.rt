@@ -11,8 +11,10 @@
 .desktop-tab-area {
 
   & > .simple-overflow-tab-item {
-    border-radius: @desktop-tab-border-radius;
-    margin: @desktop-tab-margin-top @desktop-tab-margin-right @desktop-tab-margin-right * 2;
+    @desktop-overflow-tab-margin-bottom: @desktop-tab-margin-right * 2;
+
+    border-radius: @view-tab-border-radius; // Use smaller border radius, so it fits nicely into the inverted border radius of the last tab if it is selected
+    margin: @desktop-tab-margin-top + @desktop-overflow-tab-margin-bottom @desktop-tab-margin-right @desktop-overflow-tab-margin-bottom;
     background-color: @desktop-tab-background-color;
     border: 0;
 
