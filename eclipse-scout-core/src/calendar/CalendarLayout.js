@@ -17,6 +17,7 @@ export default class CalendarLayout extends AbstractLayout {
     this.calendar = calendar;
     this.stacked = false;
     this.compacted = false;
+    this.compactWidth = 550;
   }
 
   layout($container) {
@@ -34,7 +35,8 @@ export default class CalendarLayout extends AbstractLayout {
     if ($header[0].scrollWidth > $container.width()) {
       this.stack();
     }
-    if ($header[0].scrollWidth > $container.width()) {
+    if ($container.width() < this.compactWidth || $header[0].scrollWidth > $container.width()) {
+      // Title may take a lot of space, make it always compact for small devices so it won't toggle when changing display mode or view range
       this.compact();
     }
 
