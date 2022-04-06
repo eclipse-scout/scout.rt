@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -73,7 +74,7 @@ public class NlsFileWatcher {
     String fileName = resourceBundleName.replace('.', '/') + '.' + TEXT_RESOURCE_EXTENSION;
     URL resource = cl.getResource(fileName);
 
-    if (resource == null || !resource.getProtocol().equals("file")) {
+    if (resource == null || !"file".equals(resource.getProtocol())) {
       LOG.debug("Resource bundle {} not found or inside a jar. Files will not be watched.", resourceBundleName);
       return;
     }
@@ -87,7 +88,7 @@ public class NlsFileWatcher {
       return;
     }
 
-    if (directory == null || !directory.toFile().exists()) {
+    if (directory == null || !Files.isDirectory(directory)) {
       LOG.debug("Resource bundle directory {} does not exist. Files will not be watched.", directory);
       return;
     }
@@ -96,8 +97,9 @@ public class NlsFileWatcher {
       m_watchReadWriteLock.writeLock().lock();
       ensureStarted();
       registerDirectory(directory);
-      List<NlsFileChangeHandler> handlers = m_handlers.computeIfAbsent(directory, (key) -> new ArrayList<>());
-      handlers.add(new NlsFileChangeHandler(resourceBundleName, onFileChangeConsumer));
+      m_handlers
+          .computeIfAbsent(directory, (key) -> new ArrayList<>())
+          .add(new NlsFileChangeHandler(resourceBundleName, onFileChangeConsumer));
     }
     finally {
       m_watchReadWriteLock.writeLock().unlock();
