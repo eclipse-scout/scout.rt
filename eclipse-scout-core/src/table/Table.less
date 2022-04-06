@@ -49,25 +49,40 @@
   /* Used for scout.Table.CheckableStyle.TABLE_ROW */
 
   &.table-row-check {
+    & > .table-data {
+      & > .table-row {
+        &.selected {
+          /* Don't draw selection */
+          background-color: transparent;
 
-    & > .table-data > .table-row {
+          &::after {
+            display: none;
+          }
+        }
 
-      &.selected {
-        /* Don't draw selection */
-        background-color: transparent;
+        &:hover {
+          background-color: @hover-background-color;
+        }
 
-        &::after {
-          display: none;
+        &:active, &.active {
+          background-color: @active-background-color;
         }
       }
 
-      &.checked,
-      &.checked.selected {
-        /* Mark checked rows with a background color */
-        background-color: @table-row-checked-background-color;
+      & > .table-row.disabled,
+      &.disabled > .table-row {
+        background-color: transparent;
+      }
 
-        & > .table-cell {
-          color: @table-row-checked-color;
+      & > .table-row {
+        &.checked,
+        &.checked.selected {
+          /* Mark checked rows with a background color */
+          background-color: @table-row-checked-background-color;
+
+          & > .table-cell {
+            color: @table-row-checked-color;
+          }
         }
       }
     }
