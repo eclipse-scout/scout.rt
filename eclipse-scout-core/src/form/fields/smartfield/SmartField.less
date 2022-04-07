@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -266,13 +266,23 @@
     & > .table-data {
       padding: @proposal-chooser-padding-y @proposal-chooser-padding-x;
 
-      & > .table-row.first {
-        border-top: 1px solid @table-row-border-color;
+      & > .table-row {
+        &.first {
+          border-top: 1px solid @table-row-border-color;
 
-        &.selected::after {
-          // If header is invisible, selection of first row starts at 0
-          // Since we now have a top border we can move it to -1px again to cover the border
-          top: -1px;
+          &.selected::after {
+            // If header is invisible, selection of first row starts at 0
+            // Since we now have a top border we can move it to -1px again to cover the border
+            top: -1px;
+          }
+        }
+
+        &.inactive {
+          font-style: italic;
+
+          & > .table-cell.last > .text::after {
+            content: ' (' var(--inactive-lookup-row-suffix-text) ')';
+          }
         }
       }
 
@@ -286,9 +296,12 @@
     & > .tree-data {
       padding: @proposal-chooser-padding-y @proposal-chooser-padding-x;
 
-      & > .tree-node {
-        &.inactive {
-          font-style: italic;
+      & > .tree-node.inactive,
+      & > .animation-wrapper > .tree-node.inactive {
+        font-style: italic;
+
+        & > .text::after {
+          content: ' (' var(--inactive-lookup-row-suffix-text) ')';
         }
       }
     }

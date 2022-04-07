@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -17,7 +17,6 @@ describe('TreeProposalChooser', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.textMap.add('InactiveState', 'inactive');
     jasmine.clock().install();
   });
 
@@ -37,7 +36,7 @@ describe('TreeProposalChooser', () => {
 
   describe('ProposalTreeNode', () => {
 
-    it('displays inactive state correctly', () => {
+    it('sets inactive class correctly', () => {
       // dummy smart field
       let smartField = scout.create('SmartField', {
         parent: session.desktop
@@ -60,9 +59,9 @@ describe('TreeProposalChooser', () => {
       });
       chooser.render();
 
-      // Node must have inactive class and suffix ' (inactive)'
+      // nodeB must have inactive class, find by .inactive and check text
       let $nodeB = chooser.$container.find('.inactive');
-      expect($nodeB.text()).toBe('nodeB (inactive)');
+      expect($nodeB.text()).toBe('nodeB');
     });
 
     it('does not get messed up with null keys', () => {
@@ -115,7 +114,6 @@ describe('TreeProposalChooser', () => {
     });
 
     it('clears the field if a lookup row with key null is selected', () => {
-      let lookupCall = new StaticLookupCall();
       let smartField = scout.create('SmartField', {
         parent: session.desktop,
         browseHierarchy: true,
@@ -144,7 +142,6 @@ describe('TreeProposalChooser', () => {
     });
 
     it('allows selecting lookup row with null key by typing', () => {
-      let lookupCall = new StaticLookupCall();
       let smartField = scout.create('SmartField', {
         parent: session.desktop,
         browseHierarchy: true,
