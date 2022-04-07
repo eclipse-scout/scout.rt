@@ -63,10 +63,6 @@
         &:hover {
           background-color: @hover-background-color;
         }
-
-        &:active, &.active {
-          background-color: @active-background-color;
-        }
       }
 
       & > .table-row.disabled,
@@ -83,6 +79,18 @@
           & > .table-cell {
             color: @table-row-checked-color;
           }
+
+          &:hover {
+            background-color: @selected-hover-background-color;
+          }
+        }
+      }
+
+      & > .table-row.disabled,
+      &.disabled > .table-row {
+        &.checked,
+        &.checked.selected {
+          background-color: @selected-disabled-background-color;
         }
       }
     }
