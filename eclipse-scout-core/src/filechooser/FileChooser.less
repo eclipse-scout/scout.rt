@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -100,14 +100,15 @@
 
 @media (max-width: @filechooser-max-width) {
   .file-chooser {
-    /* reduce message box width on small screens */
-    max-width: 330px;
-    /* no need to have a margin on small screens */
-    margin: 0;
+    margin: 0; /* no need to have a margin on small screens */
 
-    & > .box-buttons > .box-button {
-      margin-right: 4px;
-      min-width: 70px; /* less min width for buttons on small screens */
+    & > .box-buttons {
+      padding: 0 13px 26px 13px; /* use less x-padding for buttons so that more text can be shown */
+
+      & > .box-button {
+        margin-right: 4px;
+        min-width: 70px; /* less min width for buttons on small screens */
+      }
     }
   }
 }

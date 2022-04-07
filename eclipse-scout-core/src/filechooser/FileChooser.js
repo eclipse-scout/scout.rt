@@ -118,7 +118,7 @@ export default class FileChooser extends Widget {
     this.$container.addClass('calc-helper');
     let windowSize = this.$container.windowSize();
     // Use css width, but ensure that it is not larger than the window (mobile)
-    let w = Math.min(this.$container.width(), windowSize.width - 20);
+    let w = Math.min(this.$container.width(), windowSize.width);
     this.$container.css('min-width', w);
     this.$container.css('max-width', w);
     this.$container.removeClass('calc-helper');
