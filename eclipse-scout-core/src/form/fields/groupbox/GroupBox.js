@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Button, ButtonAdapterMenu, CompositeField, fields, Form, FormField, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, HAlign, HtmlComponent, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, WrappedFormField} from '../../../index';
+import {arrays, Button, ButtonAdapterMenu, CompositeField, fields, Form, FormField, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, HAlign, HtmlComponent, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, MenuBar, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, WrappedFormField} from '../../../index';
 import $ from 'jquery';
 
 export default class GroupBox extends CompositeField {
@@ -779,9 +779,12 @@ export default class GroupBox extends CompositeField {
   }
 
   _onControlClick(event) {
+    if (!this.expandable) {
+      return;
+    }
     const target = scout.widget(event.target);
-    if (!this.expandable || target instanceof Menu) {
-      // 311831 if the position of the menubar is set to title and a menu has been clicked, then the event must not be handled
+    if (this.menuBarPosition === GroupBox.MenuBarPosition.TITLE && this.menuBar.has(target)) {
+      // If the position of the menubar is set to title and a menu has been clicked, then the event must not be handled
       return;
     }
 
