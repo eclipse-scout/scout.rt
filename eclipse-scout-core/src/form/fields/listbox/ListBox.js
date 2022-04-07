@@ -33,8 +33,10 @@ export default class ListBox extends LookupBox {
     }
 
     // align checkableColumn in table with checkboxes of tree fields
-    this.table.checkableColumn.minWidth = 28;
-    this.table.checkableColumn.width = this.table.checkableColumn.minWidth; // do not use setWidth here
+    if (this.table.checkableColumn) { // may be null if a non-default list-box-table with checkable=false is used
+      this.table.checkableColumn.minWidth = 28;
+      this.table.checkableColumn.width = this.table.checkableColumn.minWidth; // do not use setWidth here
+    }
   }
 
   _render() {
