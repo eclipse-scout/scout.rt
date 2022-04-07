@@ -12,6 +12,8 @@
  * Used for static pages like login, logout, unsupported-browser and noscript section.
  * Note: This box must not depend on javascript because it is used for the noscript section as well.
  */
+@box-responsive-width: @box-width + 40px;
+
 .box {
   display: table;
   position: absolute;
@@ -39,7 +41,7 @@
     text-align: center;
 
     & > .logo {
-      margin-top: 5px;
+      margin-top: 4px;
       margin-bottom: 40px;
       max-height: 30px;
     }
@@ -64,13 +66,14 @@
   }
 }
 
-@media (max-width: (@box-width + 40px)) {
+@media (max-width: @box-responsive-width) {
   .box-content {
     & > .header > .logo {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+      margin-top: 0;
     }
 
-    padding: 20px;
+    padding: 40px;
     margin-left: 10px;
     margin-right: 10px;
   }
@@ -80,10 +83,11 @@
   .box-content {
     & > .header > .logo {
       margin-bottom: 20px;
+      margin-top: 0;
     }
 
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 25px;
+    padding-bottom: 25px;
   }
 }
 

@@ -19,6 +19,7 @@
 
   & > .button {
     margin-top: 16px;
+    margin-bottom: 0;
   }
 
   & > input.alternative:-webkit-autofill {
@@ -91,5 +92,16 @@
 .logout-body {
   & > .box-background-elements.box-background-elements-fadeout {
     #scout.animation(nop 0.05s);
+  }
+}
+
+@media (max-width: @box-responsive-width) {
+  .login-box-content > form {
+    & > input,
+    & > .button {
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+    }
   }
 }
