@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.listbox.ListBoxChain
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTableRowBuilder;
@@ -59,11 +58,9 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
-import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -962,6 +959,18 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       return CheckableStyle.CHECKBOX_TABLE_ROW;
     }
 
+    @Override
+    protected void execDecorateRow(ITableRow row) {
+      super.execDecorateRow(row);
+      // hint for inactive codes
+      if (!getActiveColumn().getValue(row)) {
+        row.setCssClass("inactive");
+      }
+      else {
+        row.setCssClass(null);
+      }
+    }
+
     @SuppressWarnings("unchecked")
     public KeyColumn getKeyColumn() {
       return getColumnSet().getColumnByClass(KeyColumn.class);
@@ -1031,14 +1040,6 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       // enable/disabled row
       tableRow.setEnabled(dataRow.isEnabled());
 
-      Cell cell = tableRow.getCellForUpdate(1);
-      // hint for inactive codes
-      if (!dataRow.isActive()) {
-        if (cell.getFont() == null) {
-          cell.setFont(FontSpec.parse("italic"));
-        }
-        getTextColumnInternal().setValue(tableRow, dataRow.getText() + " (" + TEXTS.get("InactiveState") + ")");
-      }
       return tableRow;
     }
   }

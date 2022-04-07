@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -17,8 +17,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
-import org.eclipse.scout.rt.platform.text.TEXTS;
-import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -85,10 +83,7 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
     cell.setFont(lookupRow.getFont());
     // hint for inactive codes
     if (!lookupRow.isActive()) {
-      if (cell.getFont() == null) {
-        cell.setFont(FontSpec.parse("italic"));
-      }
-      cell.setText(lookupRow.getText() + " (" + TEXTS.get("InactiveState") + ")");
+      cell.addCssClass("inactive");
     }
     return treeNode;
   }
