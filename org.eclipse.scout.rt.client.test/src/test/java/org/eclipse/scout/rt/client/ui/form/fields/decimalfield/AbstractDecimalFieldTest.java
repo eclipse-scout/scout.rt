@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -288,7 +288,7 @@ public class AbstractDecimalFieldTest extends AbstractDecimalField<BigDecimal> {
 
     setPercent(true);
     assertTrue("expected tracker to be notified, when value changed", formatTracker.m_notified);
-    assertEquals("expected getter to return new setting", true, isPercent());
+    assertTrue("expected getter to return new setting", isPercent());
     assertEquals("expected new setting in property change notification", dfPercent.getPositiveSuffix(), ((DecimalFormat) formatTracker.m_cachedProperty).getPositiveSuffix());
     assertEquals("expected new setting in property change notification", dfPercent.getNegativeSuffix(), ((DecimalFormat) formatTracker.m_cachedProperty).getNegativeSuffix());
 

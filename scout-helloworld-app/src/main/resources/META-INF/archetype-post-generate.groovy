@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * https://www.eclipse.org/legal/epl-v10.html
+ * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -118,18 +118,18 @@ def generateKeyPairSafe() {
  * @return A string array of length=2 containing the base64 encoded private key at index zero and the base64 encoded public key at index 1.
  */
 static def generateKeyPair() {
-    KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC", "SunEC")
-    AlgorithmParameterSpec spec = new ECGenParameterSpec("secp256k1")
-    keyGen.initialize(spec, new SecureRandom())
-    KeyPair keyPair = keyGen.generateKeyPair()
+  KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC")
+  AlgorithmParameterSpec spec = new ECGenParameterSpec("secp256r1")
+  keyGen.initialize(spec, new SecureRandom())
+  KeyPair keyPair = keyGen.generateKeyPair()
 
-    EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyPair.getPublic().getEncoded())
-    EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyPair.getPrivate().getEncoded())
+  EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyPair.getPublic().getEncoded())
+  EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyPair.getPrivate().getEncoded())
 
-    Base64.Encoder base64Encoder = Base64.getEncoder()
+  Base64.Encoder base64Encoder = Base64.getEncoder()
 
-    String[] result = new String[2]
-    result[0] = base64Encoder.encodeToString(pkcs8EncodedKeySpec.getEncoded()) // private key
+  String[] result = new String[2]
+  result[0] = base64Encoder.encodeToString(pkcs8EncodedKeySpec.getEncoded()) // private key
     result[1] = base64Encoder.encodeToString(x509EncodedKeySpec.getEncoded()) // public key
     return result
 }

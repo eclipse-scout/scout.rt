@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -297,8 +297,8 @@ public class SecurityUtilityTest {
   @Test
   public void testSignatureApiStability() {
     final byte[] data = "myTestData".getBytes(ENCODING);
-    final byte[] sig = Base64Utility.decode("MEUCIE+t3/ngQ65qql7bTFCPPGVbj2z0BIiwNzjaC6wMV93VAiEAxBTA6FWTCBVDSAMvk7FXZcUeF/i4lNc/fW4a2G63O64=");
-    final byte[] pubKey = Base64Utility.decode("MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEJX6uq87Qz1Xyk85+8NG5dnYDV1ZBSt/W3/H4nvY7h4o7JNM0AYxgX5/4Dizb5iD9iVX2uuv1BO7J9H/hze7Cag==");
+    final byte[] sig = Base64Utility.decode("MEUCIDZoyslIxALDkonxJKwMnk6v7uyu8T50cch+cU1EPnL/AiEAuGLvbW+CvUKTKYY7t5j75TTkjUfLevOXg7C53GoT/Sg=");
+    final byte[] pubKey = Base64Utility.decode("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7KTCxVbBVVqNWELFCR33K8LUrfmp6psbH1AXwD/ezzhad7mMcTEd23ZUmxT4RZ75DYmGFRGImpqhpdwWNrbCPg==");
     Assert.assertTrue(SecurityUtility.verifySignature(pubKey, data, sig));
   }
 

@@ -269,7 +269,8 @@ public class SunSecurityProvider implements ISecurityProvider {
       return sig.sign();
     }
     catch (NoSuchProviderException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | IOException e) {
-      throw new ProcessingException("unable to create signature.", e);
+      throw new ProcessingException("Unable to create signature. If the curve is not supported (see cause below), consider creating a new key-pair"
+          + " by running '{}' on the command line and configure the properties (e.g. 'scout.auth.publicKey' and 'scout.auth.privateKey') with the new values.", SecurityUtility.class.getName(), e);
     }
   }
 
@@ -358,6 +359,10 @@ public class SunSecurityProvider implements ISecurityProvider {
    * @return The algorithm for digital signatures.
    */
   protected String getSignatureAlgorithm() {
+    // Use ECDSA for compatibility with Java 11.
+    // EdDSA with Curve25519 may be used in Java >= 15
+    // Also consider XMSS in future releases if available by JDK
+
     // The Elliptic Curve Digital Signature Algorithm as defined in ANSI X9.62.
     return "SHA512withECDSA";
   }
@@ -384,8 +389,7 @@ public class SunSecurityProvider implements ISecurityProvider {
    * @see #getKeyPairGenerationAlgorithm()
    */
   protected String getEllipticCurveName() {
-    // Koblitz curve secp256k1 as recommended by <a href="http://www.secg.org/sec2-v2.pdf">Standards for Efficient Cryptography Group</a>.
-    return "secp256k1";
+    return "secp256r1"; // aka 'prime256v1', aka 'NIST P-256'
   }
 
   /**
@@ -451,8 +455,7 @@ public class SunSecurityProvider implements ISecurityProvider {
    * @return the padding algorithm to use for encryption/decryption cipher.
    */
   protected String getCipherAlgorithmPadding() {
-    // PKCS5 padding scheme (as defined in <a href="http://tools.ietf.org/html/rfc2898">PKCS #5</a>).
-    return "PKCS5Padding";
+    return "NoPadding ";
   }
 
   @Override

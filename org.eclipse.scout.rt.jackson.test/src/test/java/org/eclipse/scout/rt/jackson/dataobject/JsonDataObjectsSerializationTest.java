@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -143,7 +143,6 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 /**
  * Various test cases serializing and deserializing Scout data objects from/to JSON
@@ -2768,7 +2767,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestOptionalDo.json", json);
 
     // currently not deserializable using Scout Jackson implementation
-    assertThrows(UnrecognizedPropertyException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
   }
 
   @Test

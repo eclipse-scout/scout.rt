@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.testing.shared;
 
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -77,18 +78,13 @@ public final class TestingUtility {
 
   /**
    * Create a string representing a number using locale specific minus, decimalSeparator and percent symbols
-   *
-   * @param minus
-   * @param integerPart
-   * @param fractionPart
-   * @param percentSuffix
-   * @return
    */
   public static String createLocaleSpecificNumberString(Locale loc, boolean minus, String integerPart, String fractionPart, NumberStringPercentSuffix percentSuffix) {
-    DecimalFormatSymbols symbols = (BEANS.get(NumberFormatProvider.class).getPercentInstance(loc)).getDecimalFormatSymbols();
+    DecimalFormat df = BEANS.get(NumberFormatProvider.class).getPercentInstance(loc);
+    DecimalFormatSymbols symbols = df.getDecimalFormatSymbols();
     StringBuilder sb = new StringBuilder();
     if (minus) {
-      sb.append(symbols.getMinusSign());
+      sb.append(df.getNegativePrefix().replace("%", ""));
     }
     sb.append(integerPart);
     if (fractionPart != null) {
