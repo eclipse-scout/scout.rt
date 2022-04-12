@@ -621,9 +621,29 @@ export function nullIfEmpty(array) {
   return empty(array) ? null : array;
 }
 
+/**
+ * Clears the content of an array <i>in-place</i>. All elements are removed from the array and the
+ * length will be set to 0. If the given argument is not an array, nothing happens.
+ *
+ * This is a more readable version of `array.splice(0, a.length)`.
+ *
+ * The return value is an array of all deleted elements (never null).
+ *
+ * @template T
+ * @param {T[]} array
+ * @return {T[]}
+ */
+export function clear(array) {
+  if (Array.isArray(array)) {
+    return array.splice(0, array.length);
+  }
+  return [];
+}
+
 export default {
   $indexOf,
   $remove,
+  clear,
   contains,
   containsAll,
   containsAny,

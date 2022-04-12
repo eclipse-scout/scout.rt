@@ -954,4 +954,22 @@ describe('scout.arrays', () => {
     });
   });
 
+  describe('clear', () => {
+
+    it('converts an empty array to null', () => {
+      let a1 = [1, 2, 3];
+      let a2 = a1;
+      let a3 = [1, 2, 3];
+      let a4 = [];
+      let a5 = 'test';
+
+      expect(arrays.clear()).toEqual([]);
+      expect(arrays.clear(a1)).toEqual([1, 2, 3]);
+      expect(arrays.clear(a2)).toEqual([]);
+      expect(arrays.clear(a3)).not.toBe(a3);
+      expect(arrays.clear(a4)).toEqual([]);
+      expect(arrays.clear(a5)).toEqual([]);
+    });
+  });
+
 });
