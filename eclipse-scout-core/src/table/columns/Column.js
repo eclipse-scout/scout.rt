@@ -71,7 +71,7 @@ export default class Column {
 
   static DEFAULT_MIN_WIDTH = 60;
   static SMALL_MIN_WIDTH = 38;
-  static NARROW_MIN_WIDTH = 32;
+  static NARROW_MIN_WIDTH = 34;
 
   init(model) {
     this.session = model.session;
