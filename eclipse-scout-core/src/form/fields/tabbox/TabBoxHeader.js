@@ -89,6 +89,10 @@ export default class TabBoxHeader extends Widget {
     this.tabArea.focusTabItem(tabItem);
   }
 
+  getTabForItem(tabItem) {
+    return this.tabArea.getTabForItem(tabItem);
+  }
+
   _onTabBoxPropertyChange(event) {
     if (event.propertyName === 'menus') {
       this.menuBar.setMenuItems(this.tabBox.menus);
