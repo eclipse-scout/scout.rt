@@ -74,4 +74,8 @@ export default class TabItem extends GroupBox {
       this.parent.setSelectedTab(this);
     }
   }
+
+  getTab() {
+    return this.parent.getTabForItem(this);
+  }
 }

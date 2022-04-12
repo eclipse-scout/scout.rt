@@ -42,6 +42,7 @@ export default class GroupBox extends CompositeField {
     this.processButtons = [];
     this.processMenus = [];
     this.staticMenus = [];
+    this.selectionKeystroke = null;
     this.responsive = null;
 
     this.$header = null;

@@ -19,15 +19,18 @@ export default class TabItemKeyStroke extends KeyStroke {
 
     this.renderingHints.offset = 16;
     this.renderingHints.hAlign = HAlign.RIGHT;
-    this.renderingHints.$drawingArea = ($drawingArea, event) => {
-      return this.field.$tabContainer;
+    this.renderingHints.render = () => {
+      let tab = this.field.getTab();
+      return tab && tab.rendered;
     };
+    this.renderingHints.$drawingArea = ($drawingArea, event) => this.field.getTab().$container;
+    this.inheritAccessibility = false;
   }
 
   /**
-   * @override KeyStroke.js
+   * @override
    */
   handle(event) {
-    this.field.parent.setSelectedTab(this.field);
+    this.field.select();
   }
 }

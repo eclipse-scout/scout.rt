@@ -290,6 +290,10 @@ export default class TabBox extends CompositeField {
     this.header.focusTabItem(tabItem);
   }
 
+  getTabForItem(tabItem) {
+    return this.header.getTabForItem(tabItem);
+  }
+
   _onTabBoxHeaderPropertyChange(event) {
     if (event.propertyName === 'selectedTabItem') {
       this.setSelectedTab(event.newValue);
