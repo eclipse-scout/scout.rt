@@ -173,7 +173,7 @@
 @desktop-tab-border-radius: @view-tab-selected-border-radius;
 @desktop-tab-margin-top: @view-tab-selected-margin-top;
 @desktop-tool-box-item-border-radius: @view-tab-border-radius;
-@desktop-tool-box-item-font-size: 14px;
+@desktop-tool-box-item-font-size: @font-size-icon-small;
 @desktop-tool-box-item-margin: 3px;
 @desktop-tool-box-item-margin-top: @view-tab-margin-top;
 @detail-table-border-radius: 4px;
@@ -236,7 +236,7 @@
 @outline-node-control-padding-left: @outline-title-padding-left;
 @outline-node-control-padding-y: @outline-node-padding-y;
 @outline-node-control-line-height: @tree-node-control-line-height;
-@outline-node-font-icon-line-height: 14px;
+@outline-node-font-icon-line-height: @tree-node-font-icon-line-height;
 @outline-node-font-icon-size: 16px;
 @outline-node-padding-left: 37px;
 @outline-node-padding-right: 8px;
@@ -294,6 +294,8 @@
 @table-cell-padding-left: 10px;
 @table-cell-padding-right: @table-cell-padding-left;
 @table-cell-padding-right-last: @scrollbar-size;
+@table-cell-font-icon-size: @tree-node-font-icon-size;
+@table-cell-font-icon-line-height: @tree-node-font-icon-line-height;
 @table-control-content-padding: 10px;
 @table-control-container-height: 364px;
 @table-control-container-height-dense: 320px;
@@ -349,9 +351,10 @@
 @tree-node-checkbox-margin-top: -2px;
 @tree-node-control-checkbox-size: 20px + @tree-node-control-size;
 @tree-node-control-size: 16px;
-@tree-node-control-line-height: 14px;
+@tree-node-control-line-height: @font-icon-line-height;
 @tree-node-control-padding-left: 13px;
-@tree-node-font-icon-line-height: 15px;
+@tree-node-font-icon-line-height: @font-icon-line-height;
+@tree-node-font-icon-size: @font-size-icon-small;
 @tree-node-padding-left: 28px;
 @tree-node-padding-right: 7px;
 @tree-node-padding-y: 7px;

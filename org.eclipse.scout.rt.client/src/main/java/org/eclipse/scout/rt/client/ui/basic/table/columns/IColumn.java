@@ -115,7 +115,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   /**
    * Default min width for narrow columns (e.g. Icon column)
    */
-  int NARROW_MIN_WIDTH = 32;
+  int NARROW_MIN_WIDTH = 34;
 
   void initColumn();
 

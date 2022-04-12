@@ -33,6 +33,7 @@ Try these to switch between fonts:
 @font-size-large: 16px;
 @font-size-extra-large: 32px;
 
+@font-size-icon-small: 14px;
 @font-size-icon: 16px;
 @font-size-icon-large: 24px;
 
@@ -43,8 +44,11 @@ Try these to switch between fonts:
 // or are often placed to the side of widgets with icons
 @text-margin-top: 1px;
 
-@icon-font-weight-light: 300;
+// Icons aligned with line-height may use this variable.
+// It should have the same size as regular text (not the font-size, the actual size)
+@font-icon-line-height: 15px;
 
+@icon-font-weight-light: 300;
 @tooltip-font-weight: @font-weight-normal;
 
 @font-face {
