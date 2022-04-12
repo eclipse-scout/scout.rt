@@ -10,13 +10,12 @@
  */
 import {keys, KeyStroke} from '../index';
 
-export default class TableHeaderMenuButtonKeyStroke extends KeyStroke {
+export default class ActionExecKeyStroke extends KeyStroke {
 
-  constructor(field) {
+  constructor(menu) {
     super();
-    this.field = field;
-    this.which = [keys.ENTER, keys.SPACE];
-    this.renderingHints.render = true;
+    this.field = menu;
+    this.which = [keys.SPACE, keys.ENTER];
     this.stopPropagation = true;
   }
 

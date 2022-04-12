@@ -8,26 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../index';
+import {ActionExecKeyStroke} from '../index';
 
-export default class MenuExecKeyStroke extends KeyStroke {
+export default class MenuExecKeyStroke extends ActionExecKeyStroke {
 
   constructor(menu) {
-    super();
-    this.field = menu;
-    this.which = [keys.SPACE, keys.ENTER];
-    this.stopPropagation = true;
-
+    super(menu);
     this.renderingHints.offset = 16;
-    this.renderingHints.$drawingArea = ($drawingArea, event) => {
-      return this.field.$container;
-    };
-  }
-
-  /**
-   * @override KeyStroke.js
-   */
-  handle(event) {
-    this.field.doAction();
   }
 }

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, TableHeaderMenuButtonKeyStroke} from '../index';
+import {Action, ActionExecKeyStroke} from '../index';
 
 export default class TableHeaderMenuButton extends Action {
 
@@ -24,7 +24,7 @@ export default class TableHeaderMenuButton extends Action {
   _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    this.keyStrokeContext.registerKeyStroke([new TableHeaderMenuButtonKeyStroke(this)]);
+    this.keyStrokeContext.registerKeyStroke([new ActionExecKeyStroke(this)]);
   }
 
   _render() {
