@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,22 @@
 
   &.full-height.full-width {
     border-radius: 0;
+  }
+
+  &.full-width {
+    & > .messagebox-buttons {
+      padding-left: 10px;
+      padding-right: 10px;
+
+      & > .box-button {
+        min-width: 70px; /* less min width for buttons on small screens */
+        margin-right: 8px;
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
   }
 
   .severity-button(@color, @hover-color: darken(@color, 6%), @active-color: darken(@color, 13%), @focus-color: @focus-box-shadow-color) {
@@ -225,23 +241,7 @@
 
 @media (max-width: @messagebox-max-width) {
   .messagebox {
-    /* reduce message box width on small screens */
-    max-width: 330px;
     /* no need to have a margin on small screens */
     margin: 0;
-
-    & > .messagebox-buttons {
-      padding-left: 10px;
-      padding-right: 10px;
-
-      & > .box-button {
-        min-width: 70px; /* less min width for buttons on small screens */
-        margin-right: 8px;
-
-        &:last-child {
-          margin-right: 0;
-        }
-      }
-    }
   }
 }
