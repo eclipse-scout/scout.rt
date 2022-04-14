@@ -182,8 +182,7 @@ function logWebpack(err, stats, statsConfig) {
   }
   statsConfig = statsConfig || {};
   if (typeof statsConfig === 'string') {
-    const webpack = require('webpack');
-    statsConfig = webpack.Stats.presetToOptions(statsConfig);
+    statsConfig = stats.compilation.createStatsOptions(statsConfig);
   }
   statsConfig.colors = true;
   console.log(stats.toString(statsConfig) + '\n\n');
