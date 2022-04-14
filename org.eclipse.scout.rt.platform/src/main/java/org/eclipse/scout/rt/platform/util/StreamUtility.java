@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -263,5 +264,21 @@ public final class StreamUtility {
    */
   public static <T> BinaryOperator<T> replacingMerger() {
     return (u, v) -> v;
+  }
+
+  /**
+   * Creates and returns a lazily concatenated stream whose elements are all the elements of the first stream followed
+   * by all the elements of the second stream and so on. The {@link Stream#concat(Stream, Stream)} function is used to
+   * concatenate the streams.
+   *
+   * @implNote Use caution when concatenating a large number of streams as repeated concatenation will result in a
+   *           perfectly unbalanced tree of streams result in deep call chains, or even StackOverflowError. see
+   *           {@link Stream#concat(Stream, Stream)} for more details
+   */
+  @SafeVarargs
+  public static <T> Stream<T> concat(Stream<T>... streams) {
+    return Arrays.stream(streams)
+        .reduce(Stream::concat)
+        .orElse(Stream.empty());
   }
 }
