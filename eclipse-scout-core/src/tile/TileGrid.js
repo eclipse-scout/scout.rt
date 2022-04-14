@@ -198,7 +198,11 @@ export default class TileGrid extends Widget {
   }
 
   _updateTabbable() {
-    this.$container.setTabbableOrFocusable(this.enabledComputed && (this.textFilterEnabled || this.selectable));
+    if (!this.textFilterEnabled && !this.selectable) {
+      this.$container.setTabbable(false);
+    } else {
+      this.$container.setTabbableOrFocusable(this.enabledComputed);
+    }
   }
 
   insertTile(tile) {
