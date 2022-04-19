@@ -64,6 +64,13 @@
     & > .animation-wrapper > .tree-node {
       cursor: pointer;
     }
+
+    &.disabled > .tree-node,
+    &.disabled > .animation-wrapper > .tree-node,
+    & > .tree-node.disabled,
+    & > .animation-wrapper > .tree-node.disabled {
+      cursor: default;
+    }
   }
 }
 
