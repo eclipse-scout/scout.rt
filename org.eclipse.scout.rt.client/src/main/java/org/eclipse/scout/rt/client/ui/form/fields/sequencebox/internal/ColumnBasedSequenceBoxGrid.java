@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.matrix.Horiz
 /**
  * Alternative sequence box grid that behaves in the same way as {@link HorizontalGroupBoxBodyGrid}. <br>
  * Compared to the default SequenceBoxGrid, there is no special treatment for {@link IButton} regarding weightX and
- * useUiWidth. You can set the button's weightX to 0 manually but consider that it will effect every field in the same
+ * useUiWidth. You can set the button's weightX to 0 manually but consider that it will affect every field in the same
  * column. <br>
  * Also you need to make sure the height will be correct, e.g. by setting useUiHeight to true (which is done by a
  * {@link IGroupBox} by default).
