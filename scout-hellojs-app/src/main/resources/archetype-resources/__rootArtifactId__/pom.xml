@@ -23,7 +23,7 @@
     <jdk.source.version>${javaVersion}</jdk.source.version>
     <org.eclipse.scout.rt.version>22.0-SNAPSHOT</org.eclipse.scout.rt.version>
     <org.glassfish.jersey.version>2.35</org.glassfish.jersey.version>
-    <org.jooq.version>3.15.2</org.jooq.version>
+    <org.jooq.version>3.15.9</org.jooq.version>
     <derby.version>10.15.2.0</derby.version>
     <master_npm_release_dependency_mapping>--mapping.0.regex=@eclipse-scout --mapping.0.version=${org.eclipse.scout.rt.version}</master_npm_release_dependency_mapping>
   </properties>
