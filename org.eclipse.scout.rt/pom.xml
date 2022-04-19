@@ -102,8 +102,8 @@
     <jetty.version>9.4.43.v20210629</jetty.version>
     <slf4j.version>1.7.30</slf4j.version>
     <logback.version>1.2.10</logback.version>
-    <jackson.version>2.13.2</jackson.version>
-    <jackson-databind.version>2.13.2</jackson-databind.version>
+    <jackson.version>2.11.4</jackson.version>
+    <jackson-databind.version>2.11.4</jackson-databind.version>
     <io.netty-version>4.1.76.Final</io.netty-version>
     <io.netty-tcnative-version>2.0.51.Final</io.netty-tcnative-version>
     <batik.version>1.14</batik.version>
