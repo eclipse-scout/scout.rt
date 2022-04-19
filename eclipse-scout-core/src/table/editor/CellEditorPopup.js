@@ -243,17 +243,24 @@ export default class CellEditorPopup extends Popup {
   }
 
   _onKeyStroke(event) {
-    if (!this.session.keyStrokeManager.invokeAcceptInputOnActiveValueField(event.keyStroke, event.keyStrokeContext)) {
-      return;
-    }
-    if (this.$container.isOrHas(event.keyStrokeContext.$getScopeTarget())) {
-      // Don't interfere with key strokes of the popup or children of the popup (otherwise pressing enter would close both the popup and the form at once)
+    if (!this._invokeCompleteEditBeforeKeyStroke(event)) {
       return;
     }
     // Make sure completeEdit is called immediately after calling acceptInput.
     // Otherwise the key stroke will be executed before completing the edit which prevents the input from being saved
     // noinspection JSIgnoredPromiseFromCall
     this.completeEdit(false);
+  }
+
+  _invokeCompleteEditBeforeKeyStroke(event) {
+    if (!this.session.keyStrokeManager.invokeAcceptInputOnActiveValueField(event.keyStroke, event.keyStrokeContext)) {
+      return false;
+    }
+    if (this.$container.isOrHas(event.keyStrokeContext.$getScopeTarget())) {
+      // Don't interfere with key strokes of the popup or children of the popup (otherwise pressing enter would close both the popup and the form at once)
+      return false;
+    }
+    return true;
   }
 
   waitForCompleteCellEdit() {

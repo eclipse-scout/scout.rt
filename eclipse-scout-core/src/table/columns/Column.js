@@ -394,16 +394,19 @@ export default class Column {
     cell.field = field;
     // Override field alignment with the cell's alignment
     cell.field.gridData.horizontalAlignment = cell.horizontalAlignment;
+    popup = this._createEditorPopup(row, cell);
+    popup.$anchor = $cell;
+    popup.open(this.table.$data);
+    return popup;
+  }
 
-    popup = scout.create('CellEditorPopup', {
+  _createEditorPopup(row, cell) {
+    return scout.create('CellEditorPopup', {
       parent: this.table,
       column: this,
       row: row,
       cell: cell
     });
-    popup.$anchor = $cell;
-    popup.open(this.table.$data);
-    return popup;
   }
 
   /**
