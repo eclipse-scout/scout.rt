@@ -8,29 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  DateFormat,
-  DatePickerPopup,
-  DatePredictionFailedStatus,
-  dates,
-  DateTimeCompositeLayout,
-  Device,
-  fields,
-  focusUtils,
-  FormField,
-  HtmlComponent,
-  InputFieldKeyStrokeContext,
-  keys,
-  objects,
-  ParsingFailedStatus,
-  scout,
-  Status,
-  strings,
-  styles,
-  TimePickerPopup,
-  ValueField
-} from '../../../index';
+import {arrays, DateFormat, DatePickerPopup, DatePredictionFailedStatus, dates, DateTimeCompositeLayout, Device, fields, focusUtils, FormField, HtmlComponent, InputFieldKeyStrokeContext, keys, objects, ParsingFailedStatus, scout, Status, strings, styles, TimePickerPopup, ValueField} from '../../../index';
 import $ from 'jquery';
 
 export default class DateField extends ValueField {
@@ -1192,21 +1170,19 @@ export default class DateField extends ValueField {
   }
 
   _onDatePickerDateSelect(event) {
-    this._setDateValid(true);
-    this._setTimeValid(true);
-    let newValue = this._newTimestampAsDate(event.date, this.value);
-    this.setValue(newValue);
-    this.closePopup();
-    this._triggerAcceptInput();
+    this._setNewDateTimeValue(this._newTimestampAsDate(event.date, this.value));
   }
 
   _onTimePickerTimeSelect(event) {
+    this._setNewDateTimeValue(this._newTimestampAsDate(this.value, event.time));
+  }
+
+  _setNewDateTimeValue(newValue) {
     this._setDateValid(true);
     this._setTimeValid(true);
-    let newValue = this._newTimestampAsDate(this.value, event.time);
     this.setValue(newValue);
-    this.closePopup();
     this._triggerAcceptInput();
+    this.closePopup();
   }
 
   _createPredictionField($inputField) {
