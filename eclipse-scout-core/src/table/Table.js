@@ -1867,7 +1867,7 @@ export default class Table extends Widget {
     }
 
     this._destroyTooltipsForRow(row);
-    this._removeCellEditorForRow(row);
+    this._destroyCellEditorForRow(row);
 
     // Do not remove rows which are removed using an animation
     if (!$row.hasClass('hiding')) {
@@ -2983,7 +2983,7 @@ export default class Table extends Widget {
       oldRow.$row.replaceWith($updatedRow);
       Table.linkRowToDiv(row, $updatedRow);
       this._destroyTooltipsForRow(row);
-      this._removeCellEditorForRow(row);
+      this._destroyCellEditorForRow(row);
       this._installRow(row);
       if (oldRow.$row.hasClass('showing') && oldRow.$row.outerHeight() < row.$row.outerHeight() / 3) {
         // If the row was being shown by an animation, start the animation again for the new row, otherwise row would immediately appear without animation.
@@ -3053,9 +3053,9 @@ export default class Table extends Widget {
     }
   }
 
-  _removeCellEditorForRow(row) {
+  _destroyCellEditorForRow(row) {
     if (this.cellEditorPopup && this.cellEditorPopup.rendered && this.cellEditorPopup.row.id === row.id) {
-      this.cellEditorPopup.remove();
+      this.cellEditorPopup.destroy();
     }
   }
 
@@ -5404,7 +5404,6 @@ export default class Table extends Widget {
     if (promise.state() === 'resolved') {
       // Do it immediately if promise has already been resolved.
       // This makes sure updateRow does not immediately reopen the editor after closing.
-      // At least for Scout JS, for Scout Classic it prevents flickering (endCellEdit comes after updateRows, but updateRows does not know whether the editor is closing so it will reopen it)
       destroyEditor();
     } else {
       promise.then(destroyEditor);
