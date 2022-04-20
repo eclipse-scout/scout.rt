@@ -747,6 +747,7 @@ describe('CellEditor', () => {
       expect(table.cellEditorPopup.row).toBe(row0);
       expect(table.cellEditorPopup.$anchor[0]).toBe($cell0_0[0]);
 
+      let oldPopup = table.cellEditorPopup;
       let updatedRows = helper.createModelRows(2, 1);
       updatedRows[0].id = row0.id;
       table.updateRows(updatedRows);
@@ -758,6 +759,7 @@ describe('CellEditor', () => {
       expect($findPopup().length).toBe(1);
       expect(table.cellEditorPopup.row).toBe(row0);
       expect(table.cellEditorPopup.$anchor[0]).toBe($cell0_0[0]);
+      expect(oldPopup.destroyed).toBe(true);
     });
 
     it('closes popup if row gets deleted', () => {

@@ -1987,6 +1987,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     TableEvent tableEvent = new TableEvent(this, TableEvent.TYPE_END_CELL_EDIT);
     tableEvent.setCellEditor(m_editContext.getFormField());
     fireTableEventInternal(tableEvent);
+  }
+
+  protected void disposeCellEditor() {
+    if (m_editContext == null) {
+      return;
+    }
     m_editContext.getFormField().dispose();
     m_editContext = null;
   }
@@ -1996,8 +2002,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     if (m_editContext == null) {
       return;
     }
-    m_editContext.getColumn().completeEdit(m_editContext.getRow(), m_editContext.getFormField());
     endCellEdit();
+    m_editContext.getColumn().completeEdit(m_editContext.getRow(), m_editContext.getFormField());
+    disposeCellEditor();
   }
 
   @Override
@@ -2005,15 +2012,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     if (m_editContext == null) {
       return;
     }
-    cancelCellEditInternal();
     endCellEdit();
-  }
-
-  protected void cancelCellEditInternal() {
-    if (m_editContext == null) {
-      return;
-    }
-    m_editContext.getFormField().dispose();
+    disposeCellEditor();
   }
 
   @Override
@@ -4892,10 +4892,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       try {
         pushUIProcessor();
         //
-        if (m_editContext != null) {
-          cancelCellEditInternal();
-          m_editContext = null;
-        }
+        disposeCellEditor();
         row = resolveRow(row);
         if (row != null && col != null) {
           // ensure the editable row to be selected.
