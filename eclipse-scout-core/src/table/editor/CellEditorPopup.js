@@ -181,7 +181,8 @@ export default class CellEditorPopup extends Popup {
     }
 
     this._pendingCompleteCellEdit.then(() => {
-      this._pendingCompleteCellEdit = null;
+      // Ensure complete will never be called more than once
+      this._pendingCompleteCellEdit = $.resolvedPromise();
     });
 
     return this._pendingCompleteCellEdit;
