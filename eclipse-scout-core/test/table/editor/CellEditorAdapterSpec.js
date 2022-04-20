@@ -106,13 +106,12 @@ describe('CellEditorAdapter', () => {
       let table = popup.table;
       popup.completeEdit();
       table.detach();
-      // Server sends updateRows before endCell edit -> updateRows will start a new editor but since it is detached, the action is postponed
+      let field = popup.cell.field;
+      session._processSuccessResponse({events: [createEndCellEditEvent(popup.table, field.id)]});
       table.updateRows([{
         id: table.rows[0].id,
         cells: ['Adjusted text']
       }]);
-      let field = popup.cell.field;
-      session._processSuccessResponse({events: [createEndCellEditEvent(popup.table, field.id)]});
       jasmine.clock().tick(0);
       expect(field.destroyed).toBe(true);
       expect(table.cellEditorPopup).toBe(null);
