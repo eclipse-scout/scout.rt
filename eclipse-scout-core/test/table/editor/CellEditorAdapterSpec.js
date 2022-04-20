@@ -129,9 +129,7 @@ describe('CellEditorAdapter', () => {
       popup.completeEdit()
         .then(() => {
           sendQueuedAjaxCalls();
-          let event = new RemoteEvent(popup.table.id, 'completeCellEdit', {
-            fieldId: popup.cell.field.id
-          });
+          let event = new RemoteEvent(popup.table.id, 'completeCellEdit');
           expect(mostRecentJsonRequest()).toContainEvents(event);
           done();
         });
@@ -145,9 +143,7 @@ describe('CellEditorAdapter', () => {
 
         expect(jasmine.Ajax.requests.count()).toBe(1);
         expect(mostRecentJsonRequest().events.length).toBe(1);
-        let event = new RemoteEvent(popup.table.id, 'completeCellEdit', {
-          fieldId: popup.cell.field.id
-        });
+        let event = new RemoteEvent(popup.table.id, 'completeCellEdit', );
         expect(mostRecentJsonRequest()).toContainEvents(event);
         done();
       };
@@ -175,9 +171,7 @@ describe('CellEditorAdapter', () => {
       popup.cancelEdit();
       sendQueuedAjaxCalls();
 
-      let event = new RemoteEvent(popup.table.id, 'cancelCellEdit', {
-        fieldId: popup.cell.field.id
-      });
+      let event = new RemoteEvent(popup.table.id, 'cancelCellEdit');
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
