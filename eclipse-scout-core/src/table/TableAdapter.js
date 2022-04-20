@@ -187,26 +187,20 @@ export default class TableAdapter extends ModelAdapter {
 
   _onWidgetCompleteCellEdit(event) {
     event.preventDefault();
-    this._sendCompleteCellEdit(event.field);
+    this._sendCompleteCellEdit();
   }
 
-  _sendCompleteCellEdit(field) {
-    let data = {
-      fieldId: field.id
-    };
-    this._send('completeCellEdit', data);
+  _sendCompleteCellEdit() {
+    this._send('completeCellEdit');
   }
 
   _onWidgetCancelCellEdit(event) {
     event.preventDefault();
-    this._sendCancelCellEdit(event.field);
+    this._sendCancelCellEdit();
   }
 
-  _sendCancelCellEdit(field) {
-    let data = {
-      fieldId: field.id
-    };
-    this._send('cancelCellEdit', data);
+  _sendCancelCellEdit() {
+    this._send('cancelCellEdit');
   }
 
   _onWidgetRowsChecked(event) {
@@ -507,6 +501,9 @@ export default class TableAdapter extends ModelAdapter {
 
   _onEndCellEdit(fieldId) {
     let field = this.session.getModelAdapter(fieldId);
+    if (!field) {
+      throw new Error('Field adapter could not be resolved. Id: ' + fieldId);
+    }
     this.widget.endCellEdit(field.widget);
   }
 

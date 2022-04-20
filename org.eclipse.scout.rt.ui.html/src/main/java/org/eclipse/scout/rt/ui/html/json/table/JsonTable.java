@@ -914,7 +914,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     json.put("columnId", getColumnId(column));
     json.put("rowId", getTableRowId(row));
     json.put("fieldId", jsonField.getId());
-    addActionEvent(EVENT_START_CELL_EDIT, json).protect();
+    addActionEvent(EVENT_START_CELL_EDIT, jsonField, json).protect();
   }
 
   protected void handleUiCompleteCellEdit(JsonEvent event) {
@@ -936,7 +936,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     // (It is not possible to dispose the adapter on the gui before sending complete or cancelCellEdit, because the field may send property change events back)
     JSONObject json = new JSONObject();
     json.put("fieldId", jsonField.getId());
-    addActionEvent(EVENT_END_CELL_EDIT, json).protect();
+    addActionEvent(EVENT_END_CELL_EDIT, jsonField, json).protect();
 
     jsonField.dispose();
   }
