@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -607,15 +607,8 @@ export default class Table extends Widget {
   }
 
   _onRowMouseUp(event) {
-    let $row, $mouseUpRow, column, $appLink,
-      mouseButton = event.which;
-
-    if (this._doubleClickSupport.doubleClicked()) {
-      // Don't execute on double click events
-      return;
-    }
-
-    $mouseUpRow = $(event.currentTarget);
+    let $row, column, $appLink, mouseButton = event.which;
+    let $mouseUpRow = $(event.currentTarget);
     this.selectionHandler.onMouseUp(event, $mouseUpRow);
 
     if (!this._$mouseDownRow || this._mouseDownRowId !== $mouseUpRow.data('row').id) {
@@ -629,6 +622,11 @@ export default class Table extends Widget {
       // Don't execute click / appLinks when the mouse gets pressed and moved outside of a cell
       return;
     }
+    if (column && column.executeRowActionOnDoubleClick($row, event) && this._doubleClickSupport.doubleClicked()) {
+      // The column would like to execute the row action: prevent double clicks for row actions
+      return;
+    }
+
     let $target = $(event.target);
     if (this._isRowControl($target)) {
       // Don't start cell editor or trigger click if row control was clicked (expansion itself is handled by the mouse down handler)
@@ -647,8 +645,10 @@ export default class Table extends Widget {
   }
 
   _onRowDoubleClick(event) {
-    let $row = $(event.currentTarget),
-      column = this._columnAtX(event.pageX);
+    let $row = $(event.currentTarget), column = this._columnAtX(event.pageX);
+    if (column && !column.executeRowActionOnDoubleClick($row, event)) {
+      return; // no row action for double clicks
+    }
 
     this.doRowAction($row.data('row'), column);
   }

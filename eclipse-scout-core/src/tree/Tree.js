@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -2555,10 +2555,6 @@ export default class Tree extends Widget {
 
   _onNodeMouseDown(event) {
     this._doubleClickSupport.mousedown(event);
-    if (this._doubleClickSupport.doubleClicked()) {
-      // don't execute on double click events
-      return false;
-    }
 
     let $node = $(event.currentTarget);
     let node = $node.data('node');
@@ -2566,6 +2562,13 @@ export default class Tree extends Widget {
       // if node does not belong to this tree, do nothing (may happen if another tree is embedded inside the node)
       return;
     }
+
+    let isCheckboxClicked = this._isCheckboxClicked(event, node);
+    if (!isCheckboxClicked && this._doubleClickSupport.doubleClicked()) {
+      // don't execute on double click events
+      return false; // also prevents the second mouseUp event on a double click
+    }
+
     this._$mouseDownNode = $node;
     $node.window().one('mouseup', () => {
       this._$mouseDownNode = null;
@@ -2573,7 +2576,7 @@ export default class Tree extends Widget {
 
     this.selectNodes(node);
 
-    if (this.checkable && node.enabled && this._isCheckboxClicked(event)) {
+    if (isCheckboxClicked) {
       if (Device.get().loosesFocusIfPseudoElementIsRemoved()) {
         this.focusAndPreventDefault(event);
       }
@@ -2583,25 +2586,23 @@ export default class Tree extends Widget {
   }
 
   _onNodeMouseUp(event) {
-    if (this._doubleClickSupport.doubleClicked()) {
-      // don't execute on double click events
-      return false;
-    }
-
     let $node = $(event.currentTarget);
     let node = $node.data('node');
     if (!this._$mouseDownNode || this._$mouseDownNode[0] !== $node[0]) {
       // Don't accept if mouse up happens on another node than mouse down, or mousedown didn't happen on a node at all
       return;
     }
-
     this.trigger('nodeClick', {
       node: node
     });
     return true;
   }
 
-  _isCheckboxClicked(event) {
+  _isCheckboxClicked(event, node) {
+    if (!this.checkable || !node || !node.enabled) {
+      return false;
+    }
+
     // with CheckableStyle.CHECKBOX_TREE_NODE a click anywhere on the node should trigger the check
     if (this.isTreeNodeCheckEnabled()) {
       return true;
@@ -3083,9 +3084,11 @@ export default class Tree extends Widget {
     if (this.isBreadcrumbStyleActive()) {
       return;
     }
-
     let $node = $(event.currentTarget);
     let node = $node.data('node');
+    if (this._isCheckboxClicked(event, node)) {
+      return;
+    }
     let expanded = !$node.hasClass('expanded');
     this.doNodeAction(node, expanded);
   }
