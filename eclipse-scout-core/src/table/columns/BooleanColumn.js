@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -110,11 +110,15 @@ export default class BooleanColumn extends Column {
   onMouseUp(event, $row) {
     let row = $row.data('row'),
       cell = this.cell(row);
-    if (this.table.checkableColumn === this) {
+    if (this._isCheckableColumn()) {
       this.table.checkRow(row, !row.checked);
     } else if (this.isCellEditable(row, cell, event)) {
       this._toggleCellValue(row, cell);
     }
+  }
+
+  _isCheckableColumn() {
+    return this.table.checkableColumn === this;
   }
 
   /**
@@ -164,5 +168,21 @@ export default class BooleanColumn extends Column {
     }
     this.triStateEnabled = triStateEnabled;
     this.table.rows.forEach(row => this._updateCellText(row, this.cell(row)));
+  }
+
+  /**
+   * @override
+   */
+  executeRowActionOnDoubleClick($row, event) {
+    if (this._isCheckableColumn()) {
+      return false;
+    }
+
+    let row = $row.data('row');
+    let cell = this.cell(row);
+    if (!row || !cell || !event) {
+      return true;
+    }
+    return !this.isCellEditable(row, cell, event);
   }
 }
