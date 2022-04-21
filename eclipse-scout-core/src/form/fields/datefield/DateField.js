@@ -1398,10 +1398,12 @@ export default class DateField extends ValueField {
     this.popup = this.createDatePopup();
     this.popup.open();
     this.$dateField.addClass('focused');
-    this.popup.on('remove', event => {
-      this._onPopupRemove(event);
-      this.popup = null;
+    this.popup.one('destroy', event => {
+      // Removing the class must happen before _onPopupDestroy() is called, otherwise the date field no longer exists,
+      // because in touch mode _onPopupDestroy() destroys the date field.
       this.$dateField.removeClass('focused');
+      this._onPopupDestroy(event);
+      this.popup = null;
     });
     this.getDatePicker().on('dateSelect', this._onDatePickerDateSelect.bind(this));
   }
@@ -1429,10 +1431,12 @@ export default class DateField extends ValueField {
     this.popup = this.createTimePopup();
     this.popup.open();
     this.$timeField.addClass('focused');
-    this.popup.on('remove', event => {
-      this._onPopupRemove(event);
-      this.popup = null;
+    this.popup.one('destroy', event => {
+      // Removing the class must happen before _onPopupDestroy() is called, otherwise the date field no longer exists,
+      // because in touch mode _onPopupDestroy() destroys the date field.
       this.$timeField.removeClass('focused');
+      this._onPopupDestroy(event);
+      this.popup = null;
     });
     this.getTimePicker().on('timeSelect', this._onTimePickerTimeSelect.bind(this));
   }
@@ -1699,7 +1703,7 @@ export default class DateField extends ValueField {
     }
   }
 
-  _onPopupRemove(event) {
+  _onPopupDestroy(event) {
     if (!this.touchMode || !this._cellEditorPopup) {
       return;
     }
