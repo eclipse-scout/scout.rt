@@ -57,4 +57,12 @@ export default class TimePickerTouchPopup extends TouchPopup {
     }
     this._touchField._triggerAcceptInput();
   }
+
+  /**
+   * @override
+   */
+  _acceptInput() {
+    this._field.acceptTime();
+    this.close();
+  }
 }
