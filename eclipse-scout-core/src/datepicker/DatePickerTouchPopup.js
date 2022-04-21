@@ -63,4 +63,12 @@ export default class DatePickerTouchPopup extends TouchPopup {
     }
     this._touchField._triggerAcceptInput();
   }
+
+  /**
+   * @override
+   */
+  _acceptInput() {
+    this._field.acceptDate();
+    this.close();
+  }
 }
