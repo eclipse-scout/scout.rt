@@ -1,27 +1,31 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.util.HexUtility;
-import org.eclipse.scout.rt.platform.util.HexUtility.HexOutputStream;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +35,13 @@ import org.slf4j.LoggerFactory;
  */
 @Bean
 public class DefaultAuthToken {
-
   private static final Logger LOG = LoggerFactory.getLogger(DefaultAuthToken.class);
+  private static final Set<Integer> DIRECT_WRITE_BYTES =
+      IntStream
+          .range(0, 128)
+          .filter(i -> (i >= 'a' && i <= 'z') || (i >= 'A' && i <= 'Z') || (i >= '0' && i <= '9') || i == '+' || i == '-' || i == '_' || i == '.' || i == '/')
+          .boxed()
+          .collect(Collectors.toSet());
 
   private String m_userId;
   private long m_validUntil;
@@ -105,6 +114,40 @@ public class DefaultAuthToken {
   }
 
   /**
+   * All bytes a-z A-Z 0-9 and +-_./ are written directly, other bytes are escaped using 3 bytes '%nn' where nn is the
+   * hex byte value
+   */
+  protected void writeByte(ByteArrayOutputStream out, byte b) {
+    int i = ((int) b) & 0xff;
+    if (DIRECT_WRITE_BYTES.contains(i)) {
+      out.write(i);
+    }
+    else {
+      int hi = (i / 0x10);
+      int lo = (i % 0x10);
+      out.write('$');
+      out.write((char) (hi <= 9 ? '0' + hi : 'a' + (hi - 10)));
+      out.write((char) (lo <= 9 ? '0' + lo : 'a' + (lo - 10)));
+    }
+  }
+
+  protected int readByte(ByteArrayInputStream in) {
+    int b = in.read();
+    if (b != '$' || b < 0) {
+      return b;
+    }
+    int hi = in.read() - '0';
+    int lo = in.read() - '0';
+    if (hi > 9) {
+      hi = hi + '0' - 'a' + 10;
+    }
+    if (lo > 9) {
+      lo = lo + '0' - 'a' + 10;
+    }
+    return (hi << 4) | lo;
+  }
+
+  /**
    * @param token
    *          possible null token to be parsed
    * @return this
@@ -117,20 +160,32 @@ public class DefaultAuthToken {
     if (parts == null || parts.length < 3) {
       return this;
     }
-
+    Function<String, byte[]> bytesDecoder = s -> {
+      ByteArrayInputStream in = new ByteArrayInputStream(s.getBytes(StandardCharsets.US_ASCII));
+      ByteArrayOutputStream buf = new ByteArrayOutputStream();
+      int b;
+      while (true) {
+        b = readByte(in);
+        if (b < 0) {
+          break;
+        }
+        buf.write(b);
+      }
+      return buf.toByteArray();
+    };
     try {
-      withUserId(new String(HexUtility.decode(parts[0]), StandardCharsets.UTF_8));
+      withUserId(new String(bytesDecoder.apply(parts[0]), StandardCharsets.UTF_8));
       withValidUntil(Long.parseLong(parts[1], 16));
       if (parts.length > 3) {
         int numberOfCustomArgs = parts.length - 1;
         List<String> customArgs = new ArrayList<>(numberOfCustomArgs);
         for (int i = 2; i < numberOfCustomArgs; i++) {
-          customArgs.add(new String(HexUtility.decode(parts[i]), StandardCharsets.UTF_8));
+          customArgs.add(new String(bytesDecoder.apply(parts[i]), StandardCharsets.UTF_8));
         }
         withCustomArgs(customArgs);
       }
       try { // NOSONAR
-        withSignature(HexUtility.decode(parts[parts.length - 1]));
+        withSignature(bytesDecoder.apply(parts[parts.length - 1]));
       }
       catch (RuntimeException e) {
         LOG.debug("Could not decode hex string", e);
@@ -142,24 +197,33 @@ public class DefaultAuthToken {
     return this;
   }
 
+  /**
+   * @return a text representation. The token text is first UTF-8 byte encoded, then all bytes are written with
+   *         {@link #writeByte(ByteArrayOutputStream, byte)}
+   */
   public String write(boolean withSignature) {
-    char partsDelimiter = partsDelimiter();
-    try (ByteArrayOutputStream bytes = new ByteArrayOutputStream(); HexOutputStream hex = new HexOutputStream(bytes)) {
-      hex.write(getUserIdOrAnonymous().getBytes(StandardCharsets.UTF_8));
-      bytes.write(partsDelimiter);
-      bytes.write(Long.toHexString(getValidUntil()).getBytes());
+    byte partsDelimiter = (byte) partsDelimiter();
+    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+      Consumer<byte[]> bytesEncoder = bytes -> {
+        for (byte b : bytes) {
+          writeByte(out, b);
+        }
+      };
+      bytesEncoder.accept(getUserIdOrAnonymous().getBytes(StandardCharsets.UTF_8));
+      out.write(partsDelimiter);
+      out.write(Long.toHexString(getValidUntil()).getBytes());
       if (getCustomArgs() != null) {
         for (String arg : getCustomArgs()) {
-          bytes.write(partsDelimiter);
-          hex.write(arg.getBytes(StandardCharsets.UTF_8));
+          out.write(partsDelimiter);
+          bytesEncoder.accept(arg.getBytes(StandardCharsets.UTF_8));
         }
       }
       byte[] signature = getSignature();
       if (withSignature && signature != null && signature.length > 0) {
-        bytes.write(partsDelimiter);
-        hex.write(signature);
+        out.write(partsDelimiter);
+        bytesEncoder.accept(signature);
       }
-      return bytes.toString(StandardCharsets.UTF_8.name());
+      return out.toString(StandardCharsets.US_ASCII);
     }
     catch (IOException ex) {
       throw new PlatformException("unexpected behaviour", ex);
