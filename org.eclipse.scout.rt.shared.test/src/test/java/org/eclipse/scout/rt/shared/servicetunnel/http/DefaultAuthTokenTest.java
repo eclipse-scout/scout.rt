@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -15,6 +15,8 @@ import static org.junit.Assert.assertTrue;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -133,17 +135,37 @@ public class DefaultAuthTokenTest {
   }
 
   @Test
+  public void testTokenEncoding() {
+    String userId = IntStream.range(0, 2048).mapToObj(i -> String.valueOf((char) i)).collect(Collectors.joining());
+
+    DefaultAuthToken t1 = BEANS.get(DefaultAuthTokenSigner.class).sign(BEANS.get(DefaultAuthToken.class).withUserId(userId));
+    String header = t1.toString();
+    System.out.println("Token: " + header);
+    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class).read(header);
+    Assert.assertTrue(BEANS.get(DefaultAuthTokenVerifier.class).verify(t2));
+    Assert.assertEquals(userId, t2.getUserId());
+  }
+
+  @Test
   public void testWithCustomArgsOfJwtPrincipal() {
-    DefaultAuthToken t1 = BEANS.get(DefaultAuthTokenSigner.class).sign(BEANS.get(DefaultAuthToken.class).withUserId("foo").withCustomArgs("jwt", "bar", "secret", "refresh"));
-    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class).read(t1.toString());
+    String idToken = IntStream.range(0, 1227).mapToObj(i -> "a").collect(Collectors.joining());
+    String accessToken = IntStream.range(0, 2100).mapToObj(i -> "b").collect(Collectors.joining());
+    String refreshToken = IntStream.range(0, 1094).mapToObj(i -> "c").collect(Collectors.joining());
+
+    DefaultAuthToken t1 = BEANS.get(DefaultAuthTokenSigner.class).sign(BEANS.get(DefaultAuthToken.class).withUserId("foo").withCustomArgs("jwt", idToken, accessToken, refreshToken));
+    String header = t1.toString();
+    System.out.println("Token: " + header);
+    DefaultAuthToken t2 = BEANS.get(DefaultAuthToken.class).read(header);
     Assert.assertTrue(BEANS.get(DefaultAuthTokenVerifier.class).verify(t2));
     Principal principal = BEANS.get(DefaultAuthTokenPrincipalProducer.class).produce(t2.getUserId(), t2.getCustomArgs());
     Assert.assertTrue(principal instanceof JwtPrincipal);
     JwtPrincipal jwt = (JwtPrincipal) principal;
     Assert.assertEquals("foo", jwt.getName());
-    Assert.assertEquals("bar", jwt.getJwtTokenString());
-    Assert.assertEquals("secret", jwt.getAccessToken());
-    Assert.assertEquals("refresh", jwt.getRefreshToken());
+    Assert.assertEquals(idToken, jwt.getJwtTokenString());
+    Assert.assertEquals(accessToken, jwt.getAccessToken());
+    Assert.assertEquals(refreshToken, jwt.getRefreshToken());
+    //check that token export is not larger than max http header 8192
+    Assert.assertTrue(header.length() < 8192);
   }
 
   @Test
