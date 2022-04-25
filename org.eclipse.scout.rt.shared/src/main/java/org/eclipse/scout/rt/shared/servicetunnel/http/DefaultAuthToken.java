@@ -223,7 +223,7 @@ public class DefaultAuthToken {
         out.write(partsDelimiter);
         bytesEncoder.accept(signature);
       }
-      return out.toString(StandardCharsets.US_ASCII);
+      return out.toString(StandardCharsets.US_ASCII.name());
     }
     catch (IOException ex) {
       throw new PlatformException("unexpected behaviour", ex);
