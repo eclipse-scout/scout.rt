@@ -1532,7 +1532,8 @@ export default class Planner extends Widget {
       this._renderViewRange();
       this._rerenderActivities();
       this._renderSelectedActivity();
-      this.validateLayoutTree();
+      this.validateLayoutTree(); // Layouting is required for adjusting the scroll position
+      this._reconcileScrollPos();
     }
   }
 
