@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.util.date;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -69,4 +71,15 @@ public class DateProvider implements IDateProvider {
   public Calendar currentCalendar() {
     return Calendar.getInstance();
   }
+
+  @Override
+  public LocalDate currentLocalDate() {
+    return LocalDate.now();
+  }
+
+  @Override
+  public LocalDateTime currentLocalDateTime() {
+    return LocalDateTime.now();
+  }
 }
+  

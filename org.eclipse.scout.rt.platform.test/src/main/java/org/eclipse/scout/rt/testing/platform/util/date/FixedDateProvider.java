@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.testing.platform.util.date;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -17,6 +19,7 @@ import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.date.DateProvider;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 
 /**
  * A date / time provider for testing whose methods return the same date and time when called repeatedly. This provider
@@ -26,7 +29,7 @@ import org.eclipse.scout.rt.platform.util.date.DateProvider;
  */
 @IgnoreBean
 public class FixedDateProvider extends DateProvider {
-  private volatile Date m_date;
+  private volatile LocalDateTime m_date;
 
   /**
    * Default constructor.<br/>
@@ -43,6 +46,26 @@ public class FixedDateProvider extends DateProvider {
    *          Date to return in subsequent invocations of the provider methods
    */
   public FixedDateProvider(Date date) {
+    this(DateUtility.toLocalDateTime(date));
+  }
+
+  /**
+   * Constructor to provide a date.
+   *
+   * @param date
+   *          Date to return in subsequent invocations of the provider methods
+   */
+  public FixedDateProvider(LocalDate date) {
+    this(date.atStartOfDay());
+  }
+
+  /**
+   * Constructor to provide a date.
+   *
+   * @param date
+   *          Date to return in subsequent invocations of the provider methods
+   */
+  public FixedDateProvider(LocalDateTime date) {
     m_date = date;
   }
 
@@ -64,7 +87,7 @@ public class FixedDateProvider extends DateProvider {
    */
   @Override
   public Date getDate() {
-    return m_date;
+    return DateUtility.toUtilDate(m_date);
   }
 
   /**
@@ -74,6 +97,26 @@ public class FixedDateProvider extends DateProvider {
    *          new date and time to return as provider value
    */
   public void setDate(Date newDate) {
+    m_date = DateUtility.toLocalDateTime(newDate);
+  }
+
+  /**
+   * Change the date and time returned by the provider
+   *
+   * @param newDate
+   *          new date to return as provider value
+   */
+  public void setDate(LocalDate newDate) {
+    m_date = newDate.atStartOfDay();
+  }
+
+  /**
+   * Change the date and time returned by the provider
+   *
+   * @param newDate
+   *          new date and time to return as provider value
+   */
+  public void setDate(LocalDateTime newDate) {
     m_date = newDate;
   }
 
@@ -85,7 +128,17 @@ public class FixedDateProvider extends DateProvider {
   @Override
   public Calendar currentCalendar() {
     Calendar currentCalendar = super.currentCalendar();
-    currentCalendar.setTime(m_date);
+    currentCalendar.setTime(DateUtility.toUtilDate(m_date));
     return currentCalendar;
+  }
+
+  @Override
+  public LocalDate currentLocalDate() {
+    return m_date.toLocalDate();
+  }
+
+  @Override
+  public LocalDateTime currentLocalDateTime() {
+    return m_date;
   }
 }
