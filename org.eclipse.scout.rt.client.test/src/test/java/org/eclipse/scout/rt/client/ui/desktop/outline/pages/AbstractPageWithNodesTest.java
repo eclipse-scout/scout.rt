@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -54,6 +55,23 @@ public class AbstractPageWithNodesTest {
     desktop.activateFirstPage();
     ITreeNode parentPageNode = desktop.getOutline().getSelectedNode();
     assertEquals("Parent page", parentPageNode.getCell().getText());
+  }
+
+  @Test
+  public void testInitPage() {
+    IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
+    desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithNodeOutline()));
+    desktop.setOutline(PageWithNodeOutline.class);
+    desktop.activateFirstPage();
+
+    IPage<?> parentPageNode = desktop.getOutline().getActivePage();
+    assertEquals("Parent page", parentPageNode.getCell().getText());
+
+    List<IPage<?>> childPages = parentPageNode.getChildPages();
+    assertEquals(1, childPages.size());
+    assertEquals(ItemNodePage.class, CollectionUtility.firstElement(childPages).getClass());
+    ItemNodePage childPage = (ItemNodePage) CollectionUtility.firstElement(childPages);
+    assertEquals(1, childPage.getAndResetInitPageCounter());
   }
 
   @Test
@@ -168,6 +186,11 @@ public class AbstractPageWithNodesTest {
     }
 
     @Override
+    protected boolean getConfiguredExpanded() {
+      return true;
+    }
+
+    @Override
     protected String getConfiguredTitle() {
       return "Parent page";
     }
@@ -191,10 +214,21 @@ public class AbstractPageWithNodesTest {
   }
 
   public static class ItemNodePage extends AbstractPageWithNodes {
+    private final AtomicInteger m_initPageCounter = new AtomicInteger();
 
     @Override
     protected String getConfiguredTitle() {
       return "Child page";
+    }
+
+    @Override
+    public void initPage() {
+      m_initPageCounter.incrementAndGet();
+      super.initPage();
+    }
+
+    public int getAndResetInitPageCounter() {
+      return m_initPageCounter.getAndSet(0);
     }
   }
 }

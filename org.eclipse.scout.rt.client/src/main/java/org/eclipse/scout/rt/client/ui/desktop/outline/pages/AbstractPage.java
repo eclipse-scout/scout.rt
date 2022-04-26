@@ -95,6 +95,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private static final String PAGE_MENUS_ADDED = "PAGE_MENUS_ADDED";
   private static final String PAGE_ACTIVE = "PAGE_ACTIVE";
   private static final String PAGE_ACTIVATED = "PAGE_ACTIVATED";
+  private static final String PAGE_INITIALIZED = "PAGE_INITIALIZED";
   static final String SEARCH_REQUIRED = "SEARCH_REQUIRED";
   static final String SEARCH_ACTIVE = "SEARCH_ACTIVE";
   static final String LIMITED_RESULT = "LIMITED_RESULT";
@@ -102,7 +103,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(TABLE_VISIBLE, DETAIL_FORM_VISIBLE, PAGE_MENUS_ADDED,
       LIMITED_RESULT, ALWAYS_CREATE_CHILD_PAGE, SEARCH_ACTIVE, SEARCH_REQUIRED, PAGE_ACTIVE);
-  static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PAGE_ACTIVATED, SHOW_TILE_OVERVIEW, NAVIGATE_BUTTONS_VISIBLE);
+  static final NamedBitMaskHelper FLAGS2_BIT_HELPER = new NamedBitMaskHelper(PAGE_ACTIVATED, SHOW_TILE_OVERVIEW, NAVIGATE_BUTTONS_VISIBLE, PAGE_INITIALIZED);
   private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = menuType -> {
     if (menuType == TreeMenuType.SingleSelection) {
       return TableMenuType.EmptySpace;
@@ -770,10 +771,17 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     return childPages;
   }
 
+  public boolean isPageInitialized() {
+    return FLAGS2_BIT_HELPER.isBitSet(PAGE_INITIALIZED, m_flags2);
+  }
+
   @Override
   public void nodeAddedNotify() {
-    try {
+    if (isPageInitialized()) {
+      return;
+    }
 
+    try {
       // do also set initializing even though it is also set in initPage().
       // This ensures the page is also initializing if initPage has been overwritten.
       setInitializing(true);
@@ -783,6 +791,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       finally {
         setInitializing(false);
       }
+      m_flags2 = FLAGS2_BIT_HELPER.setBit(PAGE_INITIALIZED, m_flags2);
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(e);
