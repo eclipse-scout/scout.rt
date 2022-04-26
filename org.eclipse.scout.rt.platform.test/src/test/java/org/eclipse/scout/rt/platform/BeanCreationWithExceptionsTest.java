@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
@@ -53,7 +55,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testSuccessfulConstruction() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(false, false);
+    state.reset(false, false, false);
     BEANS.get(TestBean.class);
     state.assertInvocations(1, 1);
   }
@@ -61,7 +63,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testExceptionInConstructor() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(true, false);
+    state.reset(true, false, false);
     try {
       BEANS.get(TestBean.class);
       fail("expecting exception");
@@ -75,7 +77,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testExceptionInPostConstruct() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(false, true);
+    state.reset(false, true, false);
     try {
       BEANS.get(TestBean.class);
       fail("expecting exception");
@@ -89,7 +91,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testExceptionInConstructorThenOk() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(true, false);
+    state.reset(true, false, false);
     try {
       BEANS.get(TestBean.class);
       fail("expecting exception");
@@ -108,7 +110,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testExceptionInPostConstructThenOk() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(false, true);
+    state.reset(false, true, false);
     try {
       BEANS.get(TestBean.class);
       fail("expecting exception");
@@ -127,7 +129,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testExceptionInConstructorThenInPostConstructThenOk() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(true, false);
+    state.reset(true, false, false);
     try {
       BEANS.get(TestBean.class);
       fail("expecting exception");
@@ -158,7 +160,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testConcurrentSuccessfulConstruction() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(false, false);
+    state.reset(false, false, true);
     state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
@@ -171,7 +173,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testConcurrentExceptionInConstructor() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(true, false);
+    state.reset(true, false, true);
     state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
@@ -196,7 +198,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testConcurrentExceptionInPostConstruct() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(false, true);
+    state.reset(false, true, true);
     state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
@@ -221,7 +223,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testConcurrentExceptionInConstructorThenOk() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(true, false);
+    state.reset(true, false, true);
     state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
@@ -251,7 +253,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testConcurrentExceptionInPostConstructThenOk() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(false, true);
+    state.reset(false, true, true);
     state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
@@ -281,7 +283,7 @@ public class BeanCreationWithExceptionsTest {
   @Test
   public void testConcurrentExceptionInConstructorThenInPostConstructThenOk() {
     TestBeanState state = BEANS.get(TestBeanState.class);
-    state.reset(true, false);
+    state.reset(true, false, true);
     state.armLatch(true);
     IFuture<TestBean> f1 = scheduleGetBean();
     IFuture<TestBean> f2 = scheduleGetBean();
@@ -368,16 +370,18 @@ public class BeanCreationWithExceptionsTest {
     CountDownLatch constructorLatch;
     boolean throwExceptionInConstructor;
     boolean throwExceptionInPostConstruct;
+    boolean concurrencyTest;
     int numConstructorInvocations;
     int numPostConstructInvocations;
 
     public TestBeanState() {
     }
 
-    void reset(boolean throwInConstructor, boolean throwInPostConstruct) {
+    void reset(boolean throwInConstructor, boolean throwInPostConstruct, boolean concurrent) {
       constructorLatch = new CountDownLatch(0);
       throwExceptionInConstructor = throwInConstructor;
       throwExceptionInPostConstruct = throwInPostConstruct;
+      concurrencyTest = concurrent;
       numConstructorInvocations = 0;
       numPostConstructInvocations = 0;
     }
@@ -401,6 +405,11 @@ public class BeanCreationWithExceptionsTest {
     public TestBean() {
       TestBeanState state = BEANS.get(TestBeanState.class);
       await(state.constructorLatch);
+      if (state.concurrencyTest) {
+        // increase chance that bean is requested concurrently
+        // unfortunately, there is no deterministic way to ensure that multiple calls are really executed in parallel
+        SleepUtil.sleepSafe(500, TimeUnit.MILLISECONDS);
+      }
       if (state.throwExceptionInConstructor) {
         throw new TestBeanException(true);
       }
