@@ -94,12 +94,10 @@ export default class CellEditorPopup extends Popup {
       cssClass: cssClass
     });
 
-    this._alignWithSelection();
-
     // Make sure cell content is not visible while the editor is open (especially necessary for transparent editors like checkboxes)
     this.$anchor.css('visibility', 'hidden');
 
-    this._rowOrderChangedFunc = function(event) {
+    this._rowOrderChangedFunc = event => {
       if (event.animating) {
         // row is only set while animating
         if (event.row === this.row) {
@@ -108,7 +106,7 @@ export default class CellEditorPopup extends Popup {
       } else {
         this.position();
       }
-    }.bind(this);
+    };
     this.table.on('rowOrderChanged', this._rowOrderChangedFunc);
     // Set table style to focused, so that it looks as it still has the focus.
     // This prevents flickering if the cell editor gets opened, especially when tabbing to the next cell editor.
@@ -168,14 +166,15 @@ export default class CellEditorPopup extends Popup {
   }
 
   position() {
-    let cellBounds, rowBounds,
-      $tableData = this.table.$data,
+    let $tableData = this.table.$data,
       $row = this.row.$row,
       $cell = this.$anchor,
       insetsLeft = $tableData.cssPaddingLeft() + $row.cssMarginLeft() + $row.cssBorderLeftWidth();
 
-    cellBounds = graphics.bounds($cell);
-    rowBounds = graphics.bounds($row);
+    this._alignWithSelection();
+
+    let cellBounds = graphics.bounds($cell);
+    let rowBounds = graphics.bounds($row);
     this.setLocation(new Point(insetsLeft + cellBounds.x, $tableData.scrollTop() + rowBounds.y));
   }
 
