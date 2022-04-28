@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -29,6 +29,7 @@ public class JwtPrincipal implements Principal, Serializable {
   private final String m_jwtTokenString;
   private String m_accessToken;
   private String m_refreshToken;
+  private String m_oid;
 
   /**
    * @param name
@@ -100,6 +101,14 @@ public class JwtPrincipal implements Principal, Serializable {
     return m_refreshToken;
   }
 
+  public String getOid() {
+    return m_oid;
+  }
+
+  public void setOid(String oid) {
+    m_oid = oid;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -112,7 +121,8 @@ public class JwtPrincipal implements Principal, Serializable {
     return m_name.equals(that.m_name) &&
         Objects.equals(m_jwtTokenString, that.m_jwtTokenString) &&
         Objects.equals(m_accessToken, that.m_accessToken) &&
-        Objects.equals(m_refreshToken, that.m_refreshToken);
+        Objects.equals(m_refreshToken, that.m_refreshToken) &&
+        Objects.equals(m_oid, that.m_oid);
   }
 
   @Override

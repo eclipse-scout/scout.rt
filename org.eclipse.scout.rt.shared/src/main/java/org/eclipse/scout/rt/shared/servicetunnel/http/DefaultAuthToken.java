@@ -180,7 +180,11 @@ public class DefaultAuthToken {
         int numberOfCustomArgs = parts.length - 1;
         List<String> customArgs = new ArrayList<>(numberOfCustomArgs);
         for (int i = 2; i < numberOfCustomArgs; i++) {
-          customArgs.add(new String(bytesDecoder.apply(parts[i]), StandardCharsets.UTF_8));
+          String arg = new String(bytesDecoder.apply(parts[i]), StandardCharsets.UTF_8);
+          if (arg.isEmpty()) {
+            arg = null;
+          }
+          customArgs.add(arg);
         }
         withCustomArgs(customArgs);
       }
@@ -215,7 +219,9 @@ public class DefaultAuthToken {
       if (getCustomArgs() != null) {
         for (String arg : getCustomArgs()) {
           out.write(partsDelimiter);
-          bytesEncoder.accept(arg.getBytes(StandardCharsets.UTF_8));
+          if (arg != null) {
+            bytesEncoder.accept(arg.getBytes(StandardCharsets.UTF_8));
+          }
         }
       }
       byte[] signature = getSignature();
