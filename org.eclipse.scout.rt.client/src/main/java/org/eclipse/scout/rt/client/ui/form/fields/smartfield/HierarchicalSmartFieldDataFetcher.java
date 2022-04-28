@@ -100,6 +100,9 @@ public class HierarchicalSmartFieldDataFetcher<LOOKUP_KEY> extends AbstractSmart
     else if (query.is(QueryBy.ALL)) {
       return getSmartField().callBrowseLookupInBackground(true);
     }
+    else if (query.is(QueryBy.KEY)) {
+      return getSmartField().callKeyLookupInBackground(query.getKey(), true);
+    }
     else {
       throw new IllegalStateException();
     }

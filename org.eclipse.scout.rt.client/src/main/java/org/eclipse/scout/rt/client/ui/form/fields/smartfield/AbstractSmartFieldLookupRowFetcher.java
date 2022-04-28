@@ -26,7 +26,6 @@ public abstract class AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> implements 
   }
 
   /**
-   * @param listener
    * @see BasicPropertySupport#addPropertyChangeListener(PropertyChangeListener)
    */
   @Override
@@ -35,7 +34,6 @@ public abstract class AbstractSmartFieldLookupRowFetcher<LOOKUP_KEY> implements 
   }
 
   /**
-   * @param listener
    * @see BasicPropertySupport#removePropertyChangeListener(PropertyChangeListener)
    */
   @Override
