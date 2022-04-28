@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -90,8 +90,8 @@ public class DefaultAuthTokenSigner {
     Principal principal = selectUserPrincipal();
     if (principal instanceof JwtPrincipal) {
       JwtPrincipal jwt = (JwtPrincipal) principal;
-      List<String> args = CollectionUtility.arrayList(JWT_IDENTIFIER, jwt.getJwtTokenString(), jwt.getAccessToken(), jwt.getRefreshToken());
-      token.withCustomArgs(CollectionUtility.arrayListWithoutNullElements(args));
+      List<String> args = CollectionUtility.arrayList(JWT_IDENTIFIER, jwt.getJwtTokenString(), jwt.getAccessToken(), jwt.getRefreshToken(), jwt.getOid());
+      token.withCustomArgs(args);
     }
     else if (principal instanceof SamlPrincipal) {
       SamlPrincipal saml = (SamlPrincipal) principal;

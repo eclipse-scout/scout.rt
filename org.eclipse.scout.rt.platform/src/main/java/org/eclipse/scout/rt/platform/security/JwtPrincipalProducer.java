@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -31,7 +31,9 @@ public class JwtPrincipalProducer implements IPrincipalProducer, IPrincipalProdu
    * @param params
    *          <br/>
    *          [0] = id_token resp. jwtTokenString<br/>
-   *          [1] = access_token, Optional [2] = refresh_token, Optional
+   *          [1] = access_token, Optional<br/>
+   *          [2] = refresh_token, Optional<br/>
+   *          [3] = oid, Optional
    * @return the new {@link Principal}
    */
   @Override
@@ -39,7 +41,12 @@ public class JwtPrincipalProducer implements IPrincipalProducer, IPrincipalProdu
     String jwtTokenString = params != null && params.size() > 0 ? params.get(0) : null;
     String accessToken = params != null && params.size() > 1 ? params.get(1) : null;
     String refreshToken = params != null && params.size() > 2 ? params.get(2) : null;
-    return produceJwt(username, jwtTokenString, accessToken, refreshToken);
+    String oid = params != null && params.size() > 3 ? params.get(3) : null;
+    return produceJwt(username, jwtTokenString, accessToken, refreshToken, oid);
+  }
+
+  public JwtPrincipal produceJwt(String username, String jwtTokenString, String accessToken, String refreshToken) {
+    return produceJwt(username, jwtTokenString, accessToken, refreshToken, null);
   }
 
   /**
@@ -51,12 +58,15 @@ public class JwtPrincipalProducer implements IPrincipalProducer, IPrincipalProdu
    *          access_token
    * @param refreshToken
    *          refresh_token
+   * @param oid
+   *          unique object id, UUID
    * @return a new {@link JwtPrincipal}
    */
-  public JwtPrincipal produceJwt(String username, String jwtTokenString, String accessToken, String refreshToken) {
+  public JwtPrincipal produceJwt(String username, String jwtTokenString, String accessToken, String refreshToken, String oid) {
     JwtPrincipal principal = new JwtPrincipal(username, jwtTokenString);
     principal.setAccessToken(accessToken);
     principal.setRefreshToken(refreshToken);
+    principal.setOid(oid);
     return principal;
   }
 }
