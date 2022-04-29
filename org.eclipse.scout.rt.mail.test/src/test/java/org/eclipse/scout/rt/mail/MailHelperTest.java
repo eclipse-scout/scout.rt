@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -57,8 +57,9 @@ import org.junit.Test;
 public class MailHelperTest {
 
   /**
-   * Very rare, unknown character set. Currently UTF-7, by default Oracle JDK does not support it.
+   * Very rare, unknown character set. Currently, UTF-7, by default Oracle JDK does not support it.
    */
+  @SuppressWarnings("InjectedReferences")
   private static final String RARE_UNKNOWN_CHARSET = "unicode-1-1-utf-7";
 
   /**
@@ -441,7 +442,7 @@ public class MailHelperTest {
   @Test(expected = UnsupportedCharsetException.class)
   public void testUnknownCharsetIsStillUnknown() {
     // pre-condition, charset is really (still) unknown
-    Assert.assertEquals(null, Charset.forName(RARE_UNKNOWN_CHARSET));
+    assertNull(Charset.forName(RARE_UNKNOWN_CHARSET));
   }
 
   protected MimeMessage createMimeMessageUsingUnknownEncoding() throws IOException, MessagingException {
@@ -704,7 +705,7 @@ public class MailHelperTest {
     assertEquals("html", mailHelper.guessAttachmentFileExtension("text/html; charset=\"UTF-8\""));
     assertEquals("docx", mailHelper.guessAttachmentFileExtension("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
     assertEquals("pdf", mailHelper.guessAttachmentFileExtension("application/pdf"));
-    assertEquals(null, mailHelper.guessAttachmentFileExtension("lorem/ipsum")); // unknown
+    assertNull(mailHelper.guessAttachmentFileExtension("lorem/ipsum")); // unknown
   }
 
   @Test
@@ -768,8 +769,6 @@ public class MailHelperTest {
    * @param attachmentFilenames
    *          Filenames of attachments (use {@link MimeUtility#encodeText(String)} in case the filename has
    *          non-supported chars)
-   * @throws IOException
-   * @throws MessagingException
    */
   protected static void verifyMimeMessage(MimeMessage message, String plainText, String htmlText, String... attachmentFilenames) throws IOException, MessagingException {
     if (plainText != null) {
@@ -790,7 +789,7 @@ public class MailHelperTest {
     if (plainText != null) {
       assertNotNull("no plain text part found", plainTextPart);
       assertTrue("plain text part content is not string", plainTextPart.getContent() instanceof String);
-      assertEquals("wrong plain text", plainText, (String) plainTextPart.getContent());
+      assertEquals("wrong plain text", plainText, plainTextPart.getContent());
     }
     else {
       assertNull("plain text part found", plainTextPart);
@@ -800,7 +799,7 @@ public class MailHelperTest {
     if (htmlText != null) {
       assertNotNull("no html part found", htmlPart);
       assertTrue("html part content is not string", htmlPart.getContent() instanceof String);
-      assertEquals("wrong html text", htmlText, (String) htmlPart.getContent());
+      assertEquals("wrong html text", htmlText, htmlPart.getContent());
     }
     else {
       assertNull("html part found", htmlPart);
