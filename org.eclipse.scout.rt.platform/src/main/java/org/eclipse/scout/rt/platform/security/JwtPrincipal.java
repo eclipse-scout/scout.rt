@@ -127,6 +127,6 @@ public class JwtPrincipal implements Principal, Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_name, m_jwtTokenString, m_accessToken, m_refreshToken);
+    return Objects.hash(m_name, m_jwtTokenString, m_accessToken, m_refreshToken, m_oid);
   }
 }
