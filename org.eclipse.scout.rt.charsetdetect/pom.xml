@@ -19,21 +19,39 @@
     <relativePath>../org.eclipse.scout.rt</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.rt.mail</artifactId>
+  <artifactId>org.eclipse.scout.rt.charsetdetect</artifactId>
 
   <dependencies>
-    <!-- Build Dependencies -->
+    <!-- Runtime dependencies -->
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.charsetdetect</artifactId>
+      <artifactId>org.eclipse.scout.rt.platform</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sun.mail</groupId>
-      <artifactId>jakarta.mail</artifactId>
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-parser-text-module</artifactId>
+    </dependency>
+
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.platform.test</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.sun.activation</groupId>
-      <artifactId>jakarta.activation</artifactId>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

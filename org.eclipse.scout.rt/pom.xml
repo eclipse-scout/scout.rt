@@ -50,6 +50,8 @@
     <module>../org.eclipse.scout.rt.mom.jms</module>
     <module>../org.eclipse.scout.rt.mom.jms.test</module>
 
+    <module>../org.eclipse.scout.rt.charsetdetect</module>
+
     <module>../org.eclipse.scout.rt.mail</module>
     <module>../org.eclipse.scout.rt.mail.test</module>
 
@@ -114,6 +116,7 @@
     <logback.version>1.2.10</logback.version>
     <jackson.version>2.13.2</jackson.version>
     <io.netty-version>4.1.76.Final</io.netty-version>
+    <apache.tika-version>2.4.0</apache.tika-version>
     <batik.version>1.14</batik.version>
     <activemq.version>5.16.3</activemq.version>
     <artemis.version>2.20.0</artemis.version>
@@ -134,7 +137,7 @@
       **/node_modules/**
     </sonar.coverage.exclusions>
 
-    <scout.excludeTestCategories/> <!-- may be set as a system property to disable test with test category (defined in platform.test) -->
+    <scout.excludeTestCategories /> <!-- may be set as a system property to disable test with test category (defined in platform.test) -->
   </properties>
 
   <dependencyManagement>
@@ -495,6 +498,11 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.charsetdetect</artifactId>
+        <version>22.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.chart.client</artifactId>
         <version>22.0-SNAPSHOT</version>
       </dependency>
@@ -838,6 +846,25 @@
       </dependency>
 
       <dependency>
+        <!-- do not import tika-bom as its maven-parent includes lots of dependency-management with partly overwrites some scout versions (e.g. jetty) -->
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parser-text-module</artifactId>
+        <version>${apache.tika-version}</version>
+        <exclusions>
+          <!-- org.apache.tika.parser.txt.UniversalEncodingDetector is currently not used -->
+          <exclusion>
+            <groupId>com.googlecode.juniversalchardet</groupId>
+            <artifactId>juniversalchardet</artifactId>
+          </exclusion>
+          <!-- org.apache.tika.parser.csv.TextAndCSVParser is currently not used -->
+          <exclusion>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
         <version>${org.apache.httpcomponents.version}</version>
@@ -933,7 +960,7 @@
         <reportSets>
           <reportSet>
             <id>dual-report</id>
-            <reports/><!-- Empty tag necessary with maven 3.6.1 because of bug https://issues.apache.org/jira/browse/MNG-6636 -->
+            <reports /><!-- Empty tag necessary with maven 3.6.1 because of bug https://issues.apache.org/jira/browse/MNG-6636 -->
             <configuration>
               <displayFileDetailUrl>https://github.com/eclipse-scout/scout.rt/blob/releases/22.0/%FILE%</displayFileDetailUrl>
               <displayFileRevDetailUrl>https://github.com/eclipse-scout/scout.rt/blob/%REV%/%FILE%</displayFileRevDetailUrl>

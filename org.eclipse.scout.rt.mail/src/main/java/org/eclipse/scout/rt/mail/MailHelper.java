@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -21,8 +21,8 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.IDN;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +52,9 @@ import javax.mail.internet.MimeUtility;
 import javax.mail.internet.ParseException;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.eclipse.scout.rt.charsetdetect.CharsetDetector;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.MimeType;
@@ -60,14 +62,13 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utility class handles MimeMessages and MailMessages. A MimeMessage is a physical representation of an mail. It
- * represents most likely a 'rfc822' message. A MailMessage represents the logical representation of an mail.
+ * Utility class handles MimeMessages and MailMessages. A MimeMessage is a physical representation of an email. It
+ * represents most likely a 'rfc822' message. A MailMessage represents the logical representation of an email.
  *
  * <pre>
  * Example:
@@ -140,8 +141,8 @@ public class MailHelper {
       return;
     }
     try {
-      String disp = getDispositionSafely(part);
-      if (disp != null && disp.equalsIgnoreCase(Part.ATTACHMENT)) {
+      String disposition = getDispositionSafely(part);
+      if (disposition != null && disposition.equalsIgnoreCase(Part.ATTACHMENT)) {
         if (attachmentCollector != null) {
           attachmentCollector.add(part);
         }
@@ -149,18 +150,16 @@ public class MailHelper {
       else {
         Object content = null;
         try { // NOSONAR
-          autoFixCharset(part);
-
           // getContent might throw a MessagingException for legitimate parts (e.g. some images end up in a javax.imageio.IIOException for example).
-          content = part.getContent();
+          content = getPartContent(part);
         }
         catch (MessagingException | IOException e) {
-          //noinspection PlaceholderCountMatchesArgumentCount
-          LOG.info("Unable to get mime part content due to {}: {}", e.getClass().getSimpleName(), e.getMessage(), LOG.isDebugEnabled() ? e : null);
+          Exception exceptionForLog = LOG.isDebugEnabled() ? e : null;
+          LOG.info("Unable to get mime part content due to {}: {}", e.getClass().getSimpleName(), e.getMessage(), exceptionForLog);
         }
 
         if (content instanceof Multipart) {
-          Multipart multiPart = (Multipart) part.getContent();
+          Multipart multiPart = (Multipart) content;
           for (int i = 0; i < multiPart.getCount(); i++) {
             collectMailParts(multiPart.getBodyPart(i), bodyCollector, attachmentCollector, inlineAttachmentCollector);
           }
@@ -176,10 +175,10 @@ public class MailHelper {
               bodyCollector.add(part);
             }
           }
-          else if (part.isMimeType(CONTENT_TYPE_MESSAGE_RFC822) && part.getContent() instanceof MimeMessage) {
-            // its a MIME message in rfc822 format as attachment therefore we have to set the filename for the attachment correctly.
+          else if (part.isMimeType(CONTENT_TYPE_MESSAGE_RFC822) && content instanceof MimeMessage) {
+            // it's a MIME message in rfc822 format as attachment therefore we have to set the filename for the attachment correctly.
             if (attachmentCollector != null) {
-              String fileName = getFilenameFromRefc822Attachment(part);
+              String fileName = getFilenameFromRfc822Attachment(part);
               if (StringUtility.isNullOrEmpty(fileName)) {
                 fileName = "originalMessage.eml";
               }
@@ -187,7 +186,7 @@ public class MailHelper {
               attachmentCollector.add(wrapperPart);
             }
           }
-          else if (disp != null && disp.equals(Part.INLINE)) {
+          else if (disposition != null && disposition.equals(Part.INLINE)) {
             if (inlineAttachmentCollector != null) {
               inlineAttachmentCollector.add(part);
             }
@@ -222,9 +221,20 @@ public class MailHelper {
     }
     catch (MessagingException e) {
       // Rare cases where content disposition header is set but empty, assuming no disposition at all.
-      LOG.info("Unable to get disposition", e);
+      LOG.info("Unable to get disposition", LOG.isDebugEnabled() ? e : null);
       return null;
     }
+  }
+
+  protected Object getPartContent(Part part) throws MessagingException, IOException {
+    if (part == null) {
+      return null;
+    }
+    if (part instanceof MimePart) {
+      autoFixEncoding((MimePart) part);
+    }
+    autoFixCharset(part);
+    return part.getContent();
   }
 
   /**
@@ -239,32 +249,82 @@ public class MailHelper {
    * replaced with {@link StandardCharsets#UTF_8} even though this may lead to display errors.
    * </p>
    */
-  protected void autoFixCharset(Part part) throws MessagingException {
-    String charset = getPartCharsetInternal(part);
-    if (charset == null) {
-      return;
-    }
-
+  protected void autoFixCharset(Part part) {
+    String charset = null;
     try {
-      Charset.forName(charset);
-      return;
-    }
-    catch (UnsupportedCharsetException e) {
-      LOG.trace("autoFixCharset: UnsupportedCharsetException has occurred.", e); // explicitly trace
-    }
-
-    try {
+      charset = getPartCharsetInternal(part);
+      if (charset == null || Charset.isSupported(charset)) {
+        return;
+      }
       part.getContent();
     }
-    catch (NullPointerException e) { // NOSONAR
-      LOG.info("Mail part seems to use an unsupported character set {}, use UTF-8 as fallback.", charset, e);
+    catch (NullPointerException | UnsupportedEncodingException e) { // NOSONAR
+      String msgId = null;
+      if (part instanceof MimeMessage) {
+        msgId = getMessageIdSafely((MimeMessage) part);
+      }
+      Exception exceptionForLog = LOG.isDebugEnabled() ? e : null;
+      LOG.info("Mail part '{}' uses an unsupported character set '{}'. Use UTF-8 as fallback.", msgId, charset, exceptionForLog);
       // Update charset of content type so that when accessing part.getContent() again no NPE is thrown
       // (UnsupportedEncodingException might still be thrown when part.getContent() didn't result in an NPE).
-      String contentType = part.getContentType(); // cannot be null because otherwise charset would have been null already
-      part.setHeader(CONTENT_TYPE_ID, contentType.replace(charset, StandardCharsets.UTF_8.name()));
+      if (charset == null) {
+        return; // cannot fix
+      }
+      try {
+        String contentType = part.getContentType(); // cannot be null because otherwise charset would have been null already
+        part.setHeader(CONTENT_TYPE_ID, contentType.replace(charset, StandardCharsets.UTF_8.name()));
+      }
+      catch (Exception ex) {
+        LOG.info("Unable to switch to default character set for message with ID '{}'.", msgId);
+      }
     }
-    catch (IOException e) { // includes UnsupportedEncodingException
-      LOG.trace("autoFixCharset: IOException has occurred.", e); // explicitly trace
+    catch (Exception e) {
+      LOG.trace("autoFixCharset: Exception has occurred.", e); // explicitly trace
+    }
+  }
+
+  /**
+   * Some parts use an invalid encoding (not to be confused with the charset!) which is not supported. If this is
+   * detected, remove it and try with the default encoding.<br>
+   * Supported encodings are listed in {@link MimeUtility#decode(InputStream, String)} If this fix is not applied, a
+   * MessagingException would be thrown on {@link Part#getContent()}
+   */
+  protected void autoFixEncoding(MimePart part) {
+    if (part == null) {
+      return;
+    }
+    String encoding = null;
+    try {
+      encoding = part.getEncoding();
+      if (encoding == null) {
+        return; // no encoding present. No need to test it
+      }
+      part.getContent(); // triggers the decode
+    }
+    catch (Exception e) {
+      // use exception message as indicator because no list of supported encodings exists to be checked against
+      String exMsg = e.getMessage();
+      String identifier = "Unknown encoding";
+      String msgId = null;
+      if (part instanceof MimeMessage) {
+        msgId = getMessageIdSafely((MimeMessage) part);
+      }
+      if (exMsg != null && exMsg.regionMatches(true, 0, identifier, 0, identifier.length())) {
+        // Supplied encoding is not supported.
+        // Remove it as otherwise MimeUtility#decode fails with MessagingException
+        // If no header is supplied the data will be read as is (no special decoding)
+        Exception exceptionForLog = LOG.isDebugEnabled() ? e : null;
+        LOG.info("Mail part '{}' uses an unsupported Content-Transfer-Encoding '{}' . Use default encoding as fallback.", msgId, encoding, exceptionForLog);
+        try {
+          part.removeHeader("Content-Transfer-Encoding");
+        }
+        catch (Exception ex) {
+          LOG.info("Unable to switch to default encoding for message with ID '{}'.", msgId);
+        }
+      }
+      else {
+        LOG.trace("autoFixTransferEncoding: Exception has occurred for message with ID '{}'.", msgId, e); // explicitly trace
+      }
     }
   }
 
@@ -301,9 +361,10 @@ public class MailHelper {
     }
 
     try {
-      Charset charset = ObjectUtility.nvl(getPartCharset(part), StandardCharsets.UTF_8); // default, a good guess
+      getPartContent(part); // to apply auto-fixes
+      String charset = getPartCharsetSafely(part).name();
       try (InputStream in = part.getInputStream()) {
-        return in == null ? null : IOUtility.readString(in, charset.name());
+        return in == null ? null : IOUtility.readString(in, charset);
       }
     }
     catch (IOException | MessagingException e) {
@@ -424,14 +485,14 @@ public class MailHelper {
           relatedPart.addBodyPart(plainHtmlPart);
 
           for (MailAttachment attachment : inlineAttachments) {
-            relatedPart.addBodyPart(createAttachmentPart(attachment, true, m.getEncoding()));
+            relatedPart.addBodyPart(createAttachmentPart(attachment, true, m.getCharset()));
           }
 
           m.setContent(relatedPart);
         }
 
         if (attachments.isEmpty()) {
-          // No attachments inline attachments were available, thus related part is set
+          // No inline attachments were available, thus related part is set
           Assertions.assertNotNull(relatedPart, "Invalid state because related part is null");
           m.setContent(relatedPart);
         }
@@ -451,7 +512,7 @@ public class MailHelper {
           }
 
           for (MailAttachment attachment : attachments) {
-            multiPart.addBodyPart(createAttachmentPart(attachment, false, m.getEncoding()));
+            multiPart.addBodyPart(createAttachmentPart(attachment, false, m.getCharset()));
           }
 
           m.setContent(multiPart);
@@ -459,9 +520,9 @@ public class MailHelper {
       }
 
       if (mailMessage.getSender() != null && StringUtility.hasText(mailMessage.getSender().getEmail())) {
-        InternetAddress addrSender = createInternetAddress(mailMessage.getSender());
-        m.setFrom(addrSender);
-        m.setSender(addrSender);
+        InternetAddress addressSender = createInternetAddress(mailMessage.getSender());
+        m.setFrom(addressSender);
+        m.setSender(addressSender);
       }
       if (!CollectionUtility.isEmpty(mailMessage.getReplyTos())) {
         m.setReplyTo(createInternetAddresses(mailMessage.getReplyTos()));
@@ -492,15 +553,15 @@ public class MailHelper {
    * @param inline
    *          <code>true</code> if it's an inline attachment, <code>false</code> otherwise.
    */
-  protected MimeBodyPart createAttachmentPart(MailAttachment attachment, boolean inline, String encoding) throws MessagingException {
+  protected MimeBodyPart createAttachmentPart(MailAttachment attachment, boolean inline, String charset) throws MessagingException {
     MimeBodyPart part = new MimeBodyPart();
     DataHandler handler = new DataHandler(attachment.getDataSource());
     part.setDataHandler(handler);
     if (StringUtility.hasText(attachment.getDataSource().getName())) {
-      part.setFileName(encodeAttachmentFilename(attachment.getDataSource().getName(), encoding, null));
+      part.setFileName(encodeAttachmentFilename(attachment.getDataSource().getName(), charset));
     }
     else {
-      // part.setFilename would implicitly set disposition to attachment, but filename is null and therefore can not be set (would result in an npe)
+      // part.setFilename would implicitly set disposition to attachment, but filename is null and therefore can not be set (would result in a npe)
       // this case is used to create MimeMessages for unit tests
       part.setDisposition(MimeBodyPart.ATTACHMENT);
     }
@@ -574,9 +635,9 @@ public class MailHelper {
    */
   public byte[] getMessageAsBytes(MimeMessage mimeMessage) {
     try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      mimeMessage.writeTo(baos);
-      return baos.toByteArray();
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      mimeMessage.writeTo(out);
+      return out.toByteArray();
     }
     catch (MessagingException | IOException e) {
       throw new ProcessingException("Unexpected: ", e);
@@ -601,12 +662,12 @@ public class MailHelper {
 
     try {
       Multipart multiPart = prepareMessageForAttachments(msg);
+      String charset = getPartCharsetSafely(msg).name();
 
       for (File attachment : attachments) {
         MimeBodyPart bodyPart = new MimeBodyPart();
-        DataSource source = new FileDataSource(attachment);
-        bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(encodeAttachmentFilename(attachment.getName(), msg.getEncoding(), null));
+        bodyPart.setDataHandler(new DataHandler(new FileDataSource(attachment)));
+        bodyPart.setFileName(encodeAttachmentFilename(attachment.getName(), charset));
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();
@@ -634,12 +695,12 @@ public class MailHelper {
 
     try {
       Multipart multiPart = prepareMessageForAttachments(msg);
+      String charset = getPartCharsetSafely(msg).name();
 
       for (BinaryResource attachment : attachments) {
         MimeBodyPart bodyPart = new MimeBodyPart();
-        DataSource source = new BinaryResourceDataSource(attachment);
-        bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(encodeAttachmentFilename(attachment.getFilename(), msg.getEncoding(), null));
+        bodyPart.setDataHandler(new DataHandler(new BinaryResourceDataSource(attachment)));
+        bodyPart.setFileName(encodeAttachmentFilename(attachment.getFilename(), charset));
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();
@@ -657,9 +718,9 @@ public class MailHelper {
    * @return Multipart to which attachments can be added
    */
   protected Multipart prepareMessageForAttachments(MimeMessage msg) throws IOException, MessagingException {
-    Object messageContent = msg.getContent();
+    Object messageContent = getPartContent(msg);
 
-    Multipart multiPart = null;
+    Multipart multiPart;
     if (messageContent instanceof Multipart && StringUtility.containsStringIgnoreCase(((Multipart) messageContent).getContentType(), "multipart/mixed")) {
       // already contains attachments
       // use the existing multipart
@@ -734,7 +795,7 @@ public class MailHelper {
   /**
    * Creates an Internet address for the given mail participant allowing usage of an internationalized domain name.
    *
-   * @return {@link InternetAddress} instance or {@code null} if no or empty email is provided
+   * @return {@link InternetAddress} instance or {@code null} if no email or an empty email is provided
    */
   public InternetAddress createInternetAddress(String email) {
     return createInternetAddress(email, null);
@@ -743,7 +804,7 @@ public class MailHelper {
   /**
    * Creates an Internet address for the given mail participant allowing usage of an internationalized domain name.
    *
-   * @return {@link InternetAddress} instance or {@code null} if no or empty email is provided
+   * @return {@link InternetAddress} instance or {@code null} if no email or an empty email is provided
    */
   public InternetAddress createInternetAddress(String email, String name) {
     if (StringUtility.isNullOrEmpty(email)) {
@@ -770,11 +831,11 @@ public class MailHelper {
    *
    * @return array of parsed {@link InternetAddress} instances
    */
-  public InternetAddress[] parseInternetAddressList(String addresslist) {
-    String[] addressListSplitted = StringUtility.split(addresslist, ",");
-    InternetAddress[] result = new InternetAddress[addressListSplitted.length];
-    for (int i = 0; i < addressListSplitted.length; i++) {
-      result[i] = createInternetAddress(addressListSplitted[i]);
+  public InternetAddress[] parseInternetAddressList(String addressList) {
+    String[] addressListSplit = StringUtility.split(addressList, ",");
+    InternetAddress[] result = new InternetAddress[addressListSplit.length];
+    for (int i = 0; i < addressListSplit.length; i++) {
+      result[i] = createInternetAddress(addressListSplit[i]);
     }
     return result;
   }
@@ -790,31 +851,80 @@ public class MailHelper {
     if (CollectionUtility.isEmpty(participants)) {
       return null;
     }
-    ArrayList<InternetAddress> addrList = new ArrayList<>();
+    ArrayList<InternetAddress> addressList = new ArrayList<>();
     for (MailParticipant participant : participants) {
       InternetAddress internetAddress = createInternetAddress(participant);
       if (internetAddress != null) {
-        addrList.add(internetAddress);
+        addressList.add(internetAddress);
       }
     }
-    return addrList.toArray(new InternetAddress[0]);
+    return addressList.toArray(new InternetAddress[0]);
   }
 
   /**
-   * Detects the charset of the given part. If none or and invalid charset is found, <code>null</code> is returned.
+   * Parses the {@link Charset} for the given {@link Part}.<br>
+   * If the {@link Part} declares a {@link Charset}, this charset is used if supported by the system.<br>
+   * Otherwise, the best matching charset is detected based on the content of the {@link Part}. If it cannot be
+   * detected, UTF-8 is used.
+   *
+   * @param part
+   *          The part for which the {@link Charset} should be parsed. May be {@code null}.
+   * @return The best {@link Charset} to read the content of the {@link Part} given.
+   * @throws MessagingException
+   *           if the content-type of the {@link Part} cannot be retrieved.
    */
-  @SuppressWarnings("squid:S1166") // catch of UnsupportedCharsetException without a rethrow
-  public Charset getPartCharset(Part part) throws MessagingException {
-    String charset = getPartCharsetInternal(part);
-
-    try {
-      return charset == null ? null : Charset.forName(charset);
+  protected Charset getPartCharsetSafely(Part part) throws MessagingException {
+    // 1. try to use charset declared in part (if present)
+    Charset charset = getPartCharset(part);
+    if (charset != null) {
+      return charset;
     }
-    catch (UnsupportedCharsetException e) {
-      // ignore exception itself (use trace log)
-      LOG.trace("Part has an invalid charset '{}'", charset);
+
+    // 2. charset not specified in part or not supported: try to detect the charset based on content
+    charset = guessPartCharset(part);
+    if (charset != null) {
+      return charset;
+    }
+
+    // 3. default if also detection fails
+    return StandardCharsets.UTF_8;
+  }
+
+  protected Charset guessPartCharset(Part part) {
+    if (part == null) {
       return null;
     }
+
+    try (InputStream in = part.getInputStream()) {
+      return BEANS.get(CharsetDetector.class).guessCharset(in, false /* not needed as the stream is not reused */);
+    }
+    catch (Exception e) {
+      Exception exceptionForLog = LOG.isDebugEnabled() ? e : null;
+      LOG.info("Part charset could not be detected for '{}'.", part, exceptionForLog);
+    }
+    return null;
+  }
+
+  /**
+   * Parses the charset declared in the given part. If none or and invalid charset is found, {@code null} is returned.
+   */
+  @SuppressWarnings("squid:S1166") // catch of IllegalCharsetNameException without a rethrow
+  public Charset getPartCharset(Part part) throws MessagingException {
+    String charset = getPartCharsetInternal(part);
+    if (charset == null) {
+      return null;
+    }
+
+    try {
+      if (Charset.isSupported(charset)) {
+        return Charset.forName(charset);
+      }
+    }
+    catch (IllegalCharsetNameException e) {
+      // ignore exception itself (use trace log)
+      LOG.trace("Part has an invalid charset '{}'", charset, e);
+    }
+    return null;
   }
 
   /**
@@ -830,16 +940,13 @@ public class MailHelper {
       return null;
     }
 
-    String charset;
     try {
-      charset = new ContentType(contentType).getParameter("charset");
+      return new ContentType(contentType).getParameter("charset");
     }
     catch (ParseException e) {
-      LOG.trace("Failed to parse content type '{}'", contentType);
+      LOG.trace("Failed to parse content type '{}'", contentType, e);
       return null;
     }
-
-    return charset;
   }
 
   /**
@@ -881,9 +988,9 @@ public class MailHelper {
   }
 
   /**
-   * Prepends the subject prefix to the existing subject if the subject doesn't already starts with the subject prefix.
+   * Prepends the subject prefix to the existing subject if the subject doesn't already start with the subject prefix.
    * <p>
-   * If the subject prefix has not text, nothing is added. If there is no subject yet, the new subject is the subject
+   * If the subject prefix has no text, nothing is added. If there is no subject yet, the new subject is the subject
    * prefix.
    *
    * @param message
@@ -922,22 +1029,22 @@ public class MailHelper {
       replyToHeaders = mimeMessage.getHeader(HEADER_IN_REPLY_TO);
     }
     catch (MessagingException e1) {
-      LOG.warn("Could not parse headers for message with id: {}", getMessageIdSafely(mimeMessage), e1);
+      Exception exceptionForLog = LOG.isDebugEnabled() ? e1 : null;
+      LOG.info("Could not parse headers for message with id: {}", getMessageIdSafely(mimeMessage), exceptionForLog);
       return Collections.emptyList();
     }
 
     if (replyToHeaders == null || replyToHeaders.length == 0) {
       try {
-        Object object = mimeMessage.getContent();
+        Object object = getPartContent(mimeMessage);
         if (object instanceof Multipart) {
           Multipart content = (Multipart) object;
           if (content.getCount() >= 3) {
             // Try third part of the message, contains details of the DSN (https://tools.ietf.org/html/rfc3461#section-6.2).
             BodyPart part = content.getBodyPart(2);
-            String charset = ObjectUtility.nvl(getPartCharset(part), StandardCharsets.UTF_8).name(); // default, a good guess in Europe
-            try (InputStreamReader in = new InputStreamReader(part.getInputStream(), charset);
-                BufferedReader reader = new BufferedReader(in)) {
-              String s = null;
+            Charset charset = getPartCharsetSafely(part);
+            try (InputStreamReader in = new InputStreamReader(part.getInputStream(), charset); BufferedReader reader = new BufferedReader(in)) {
+              String s;
               while ((s = reader.readLine()) != null) {
                 s = s.trim();
                 if (s.startsWith("Message-ID:")) {
@@ -950,13 +1057,14 @@ public class MailHelper {
         }
       }
       catch (IOException | MessagingException e) {
-        LOG.warn("Unable to get third part of dsn-message for message with id: {}", getMessageIdSafely(mimeMessage), e);
+        Exception exceptionForLog = LOG.isDebugEnabled() ? e : null;
+        LOG.info("Unable to get third part of dsn-message for message with id: {}", getMessageIdSafely(mimeMessage), exceptionForLog);
         return Collections.emptyList();
       }
     }
 
     if (replyToHeaders == null || replyToHeaders.length == 0) {
-      LOG.debug("Message IDs coulnd't be extracted because it does not have an 'In-Reply-To' header or other DSN information to with original Message-ID. Id: {}", getMessageIdSafely(mimeMessage));
+      LOG.debug("Message IDs couldn't be extracted because it does not have an 'In-Reply-To' header or other DSN information to with original Message-ID. Id: {}", getMessageIdSafely(mimeMessage));
       return Collections.emptyList();
     }
 
@@ -968,7 +1076,7 @@ public class MailHelper {
    *
    * @param mimeMessage
    *          message
-   * @return Message-Id or <code>null</code>
+   * @return Message-Id or {@code null}
    */
   public String getMessageIdSafely(MimeMessage mimeMessage) {
     if (mimeMessage == null) {
@@ -979,15 +1087,15 @@ public class MailHelper {
       return mimeMessage.getMessageID();
     }
     catch (MessagingException e) {
-      LOG.warn("Could not retrieve message id", e);
+      LOG.info("Could not retrieve message id", LOG.isDebugEnabled() ? e : null);
       return null;
     }
   }
 
   /**
-   * Returns the decoded and normalized filename from {@link Part#getFileName()} if available. Otherwise guesses the
+   * Returns the decoded and normalized filename from {@link Part#getFileName()} if available. Otherwise, guesses the
    * file extension via content type ({@link Part#getContentType()}) and calls the default filename function with the
-   * file extension (or <code>null</code> if none could be guessed).
+   * file extension (or {@code null} if none could be guessed).
    *
    * @param part
    *          Attachment part
@@ -1008,16 +1116,20 @@ public class MailHelper {
       return defaultFilenameFunction.apply(fileExtension);
     }
     catch (MessagingException e) {
-      LOG.warn("Failed to get attachment filename", e);
+      LOG.info("Failed to get attachment filename", LOG.isDebugEnabled() ? e : null);
       return null;
     }
   }
 
-  public String getFilenameFromRefc822Attachment(Part part) throws MessagingException, IOException {
-    if (part.getContent() == null) {
+  public String getFilenameFromRfc822Attachment(Part part) throws MessagingException, IOException {
+    if (part == null) {
       return null;
     }
-    String subject = ((MimeMessage) part.getContent()).getSubject();
+    Object content = getPartContent(part);
+    if (!(content instanceof MimeMessage)) {
+      return null;
+    }
+    String subject = ((MimeMessage) content).getSubject();
     if (StringUtility.hasText(subject)) {
       String name = FileUtility.toValidFilename(subject);
       if (StringUtility.hasText(name)) {
@@ -1045,7 +1157,7 @@ public class MailHelper {
       return Normalizer.normalize(decoded, Normalizer.Form.NFC);
     }
     catch (Exception e) {
-      LOG.warn("Failed to clean attachment filename", e);
+      LOG.info("Failed to clean attachment filename", LOG.isDebugEnabled() ? e : null);
       return filename;
     }
   }
@@ -1053,18 +1165,18 @@ public class MailHelper {
   /**
    * Encodes an attachment filename.
    */
-  protected String encodeAttachmentFilename(String filename, String charset, String encoding) {
+  protected String encodeAttachmentFilename(String filename, String charset) {
     if (filename == null) {
       return null;
     }
     if (StringUtility.isNullOrEmpty(charset)) {
-      charset = "UTF-8";
+      charset = StandardCharsets.UTF_8.name();
     }
     try {
-      return MimeUtility.encodeText(filename, charset, encoding);
+      return MimeUtility.encodeText(filename, MimeUtility.mimeCharset(charset), null);
     }
     catch (UnsupportedEncodingException e) {
-      LOG.warn("Failed to encode attachment filename", e);
+      LOG.info("Failed to encode attachment filename", LOG.isDebugEnabled() ? e : null);
       return filename;
     }
   }
@@ -1076,7 +1188,7 @@ public class MailHelper {
    *
    * @param contentType
    *          Content type as provided by {@link Part#getContentType()}.
-   * @return File extension for content type (e.g. txt, eml, ...) if one is found, <code>null</code> otherwise.
+   * @return File extension for content type (e.g. txt, eml, ...) if one is found, {@code null} otherwise.
    */
   protected String guessAttachmentFileExtension(String contentType) {
     if (contentType == null) {
@@ -1088,7 +1200,8 @@ public class MailHelper {
       ct = new ContentType(contentType);
     }
     catch (ParseException e) {
-      LOG.warn("Failed to parse content type '{}'", contentType);
+      Exception exceptionForLog = LOG.isDebugEnabled() ? e : null;
+      LOG.info("Failed to parse content type '{}'", contentType, exceptionForLog);
       return null;
     }
 

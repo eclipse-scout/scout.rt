@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.Bean;
 
 /**
  * Class representing a mail message that is used to create a mime message with
- * {@link MailUtility#createMimeMessage(MailMessage)}.
+ * {@link MailHelper#createMimeMessage(MailMessage)}.
  */
 @Bean
 public class MailMessage {
@@ -174,7 +174,7 @@ public class MailMessage {
   }
 
   /**
-   * @return an unmodifiable list of reply TO's.
+   * @return an unmodifiable list of reply TOs.
    */
   public List<MailParticipant> getReplyTos() {
     return Collections.unmodifiableList(m_replyTos);
@@ -205,7 +205,7 @@ public class MailMessage {
   }
 
   /**
-   * Clears the list of the reply TO's.
+   * Clears the list of the reply TOs.
    */
   public MailMessage clearReplyTos() {
     m_replyTos.clear();
@@ -248,8 +248,6 @@ public class MailMessage {
 
   /**
    * Adds the attachment.
-   *
-   * @param attachment
    */
   public MailMessage withAttachment(MailAttachment attachment) {
     m_attachments.add(attachment);
@@ -258,8 +256,6 @@ public class MailMessage {
 
   /**
    * Adds the attachments.
-   *
-   * @param attachments
    */
   public MailMessage withAttachments(Collection<MailAttachment> attachments) {
     m_attachments.addAll(attachments);
@@ -283,8 +279,6 @@ public class MailMessage {
 
   /**
    * Adds the attachment.
-   *
-   * @param inlineAttachment
    */
   public MailMessage withInlineAttachment(MailAttachment inlineAttachment) {
     m_inlineAttachments.add(inlineAttachment);
@@ -293,8 +287,6 @@ public class MailMessage {
 
   /**
    * Adds the inline attachments.
-   *
-   * @param inlineAttachments
    */
   public MailMessage withInlineAttachments(Collection<MailAttachment> inlineAttachments) {
     m_inlineAttachments.addAll(inlineAttachments);
