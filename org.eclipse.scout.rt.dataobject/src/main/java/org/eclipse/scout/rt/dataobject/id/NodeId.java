@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.context.NodeIdentifier;
  *
  * @see NodeIdentifier
  */
+@IdTypeName("scout.NodeId")
 public final class NodeId extends AbstractStringId {
   private static final long serialVersionUID = 1L;
 
