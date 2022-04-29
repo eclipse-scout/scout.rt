@@ -28,6 +28,7 @@ export default class ValueField extends FormField {
     this.value = null;
     this.validators = [];
     this.validators.push(this._validateValue.bind(this));
+    this._updateDisplayTextPending = false;
 
     this.$clearIcon = null;
 
@@ -517,16 +518,24 @@ export default class ValueField extends FormField {
     }
     value = scout.nvl(value, this.value);
     let returned = this.formatValue(value);
-    if (returned && $.isFunction(returned.promise)) {
+    if (objects.isPromise(returned)) {
+      this._updateDisplayTextPending = true;
       // Promise is returned -> set display text later
       returned
         .done(this.setDisplayText.bind(this))
         .fail(() => {
-          this.setDisplayText('');
+          // If display text was updated in the meantime, don't override the text with an empty string
+          if (this._updateDisplayTextPending) {
+            this.setDisplayText('');
+          }
           $.log.isInfoEnabled() && $.log.info('Could not resolve display text for value: ' + value);
+        })
+        .always(() => {
+          this._updateDisplayTextPending = false;
         });
     } else {
       this.setDisplayText(returned);
+      this._updateDisplayTextPending = false;
     }
   }
 
