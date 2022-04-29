@@ -20,6 +20,7 @@ export {default as TestBeanField} from './form/fields/beanfield/TestBeanField';
 export {default as TabBoxSpecHelper} from './form/fields/tabbox/TabBoxSpecHelper';
 export {default as OutlineSpecHelper} from './desktop/outline/OutlineSpecHelper';
 export {default as DummyLookupCall} from './lookup/DummyLookupCall';
+export {default as AbortableMicrotaskStaticLookupCall} from './lookup/AbortableMicrotaskStaticLookupCall';
 export {default as ActiveDummyLookupCall} from './lookup/ActiveDummyLookupCall';
 export {default as ColumnDescriptorDummyLookupCall} from './lookup/ColumnDescriptorDummyLookupCall';
 export {default as LanguageDummyLookupCall} from './lookup/LanguageDummyLookupCall';

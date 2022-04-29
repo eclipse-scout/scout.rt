@@ -121,6 +121,29 @@ describe('SmartField', () => {
       expect(field.activeFilter).toEqual('FALSE');
     });
 
+    it('updates display text correctly even after consecutive setValue calls', done => {
+      jasmine.clock().uninstall();
+      field = createFieldWithLookupCall({}, {
+        objectType: 'AbortableMicrotaskStaticLookupCall',
+        data: [[1, 'Foo'], [2, 'Bar', 1]]
+      });
+      field.setValue(1);
+      expect(field.value).toBe(1);
+      expect(field.displayText).toBe(''); // Not updated yet
+
+      field.setValue(2);
+      expect(field.value).toBe(2);
+      expect(field.displayText).toBe(''); // Not updated yet
+
+      // Double setTimeout is necessary to ensure the expectations are checked at the end after every other task
+      setTimeout(() => {
+        setTimeout(() => {
+          expect(field.value).toBe(2);
+          expect(field.displayText).toBe('Bar'); // Updated to latest setValue call
+          done();
+        });
+      });
+    });
   });
 
   describe('clear', () => {
