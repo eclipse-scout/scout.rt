@@ -27,7 +27,8 @@ export default class FocusManager {
       // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
       active: !Device.get().supportsOnlyTouch(),
       // Preventing blur is bad on touch devices because every touch on a non input field is supposed to close the keyboard which does not happen if preventDefault is used on mouse down
-      restrictedFocusGain: !Device.get().supportsOnlyTouch()
+      restrictedFocusGain: !Device.get().supportsOnlyTouch(),
+      session: null
     };
     $.extend(this, defaults, options);
 
@@ -251,15 +252,33 @@ export default class FocusManager {
   }
 
   requestFocusIfReady(element, filter) {
-    return this.requestFocus(element, filter, true);
+    return this.requestFocus(element, filter, {
+      onlyIfReady: true
+    });
   }
 
   /**
    * Requests the focus for the given element, but only if being a valid focus location.
    *
+   * @param {HTMLElement|$} [element]
+   *        the element to focus, or null to focus the context's first focusable element matching the given filter.
+   * @param {function} [filter]
+   *        filter that controls which element should be focused, or null to accept all focusable candidates.
+   * @param {object|boolean} [options]
+   *        Use object, boolean is deprecated
+   * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
+   * @param {boolean} [options.onlyIfReady] prevents focusing if not ready
    * @return {boolean} true if focus was gained, false otherwise.
    */
-  requestFocus(element, filter, onlyIfReady) {
+  requestFocus(element, filter, options) {
+    // backward compatibility
+    if (typeof options === 'boolean') {
+      options = {
+        onlyIfReady: options
+      };
+    } else {
+      options = options || {};
+    }
     element = element instanceof $ ? element[0] : element;
     if (!element) {
       return false;
@@ -267,10 +286,10 @@ export default class FocusManager {
 
     let context = this._findFocusContextFor(element);
     if (context) {
-      if (onlyIfReady && !context.prepared) {
+      if (scout.nvl(options.onlyIfReady, false) && !context.prepared) {
         return false;
       }
-      context.validateAndSetFocus(element, filter);
+      context.validateAndSetFocus(element, filter, options);
     }
 
     return focusUtils.isActiveElement(element);

@@ -121,7 +121,7 @@ export default class FocusContext {
     this.focusedElement = event.target;
 
     // Do not update current focus context nor validate focus if target is $entryPoint.
-    // That is because focusing the $entryPoint is done whenever no control is currently focusable, e.g. due to glasspanes.
+    // That is because focusing the $entryPoint is done whenever no control is currently focusable, e.g. due to glass panes.
     if (event.target === this.$container.entryPoint(true)) {
       return;
     }
@@ -166,12 +166,12 @@ export default class FocusContext {
   /**
    * Focuses the given element if being a child of this context's container and matches the given filter (if provided).
    *
-   * @param element
-   *        the element to gain focus, or null to focus the context's first focusable element matching the given filter.
-   * @param filter
-   *        filter to control which element to gain focus, or null to accept all focusable candidates.
+   * @param {HTMLElement|$} [element]
+   *        the element to focus, or null to focus the context's first focusable element matching the given filter.
+   * @param {function} [filter]
+   *        filter that controls which element should be focused, or null to accept all focusable candidates.
    * @param {object} [options]
-   * @param {boolean} [options.preventScroll] a boolean whether to prevent scrolling to focused element or not (defaults to false)
+   * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
    */
   validateAndSetFocus(element, filter, options) {
     // Ensure the element to be a child element, or set it to null otherwise.
@@ -213,8 +213,11 @@ export default class FocusContext {
 
   /**
    * Focuses the requested element.
+   *
+   * @param {HTMLElement} element
+   *        the element to focus, or null to focus the context's first focusable element matching the given filter.
    * @param {object} [options]
-   * @param {boolean} [options.preventScroll] a boolean whether to prevent scrolling to focused element or not (defaults to false)
+   * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
    */
   _focus(elementToFocus, options) {
     options = options || {};
@@ -237,7 +240,7 @@ export default class FocusContext {
       elementToFocus = null;
     }
 
-    // Focus $entryPoint if current focus is to be blured.
+    // Focus $entryPoint if current focus is to be blurred.
     // Otherwise, the HTML body would be focused which makes global keystrokes (like backspace) not to work anymore.
     elementToFocus = elementToFocus || this.$container.entryPoint(true);
 
