@@ -166,12 +166,12 @@ export default class FocusContext {
   /**
    * Focuses the given element if being a child of this context's container and matches the given filter (if provided).
    *
-   * @param element
-   *        the element to gain focus, or null to focus the context's first focusable element matching the given filter.
-   * @param filter
-   *        filter to control which element to gain focus, or null to accept all focusable candidates.
+   * @param {HTMLElement|$} [element]
+   *        the element to focus, or null to focus the context's first focusable element matching the given filter.
+   * @param {function} [filter]
+   *        filter that controls which element should be focused, or null to accept all focusable candidates.
    * @param {object} [options]
-   * @param {boolean} [options.preventScroll] a boolean whether to prevent scrolling to focused element or not (defaults to false)
+   * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
    */
   validateAndSetFocus(element, filter, options) {
     // Ensure the element to be a child element, or set it to null otherwise.
@@ -213,8 +213,11 @@ export default class FocusContext {
 
   /**
    * Focuses the requested element.
+   *
+   * @param {HTMLElement} element
+   *        the element to focus, or null to focus the context's first focusable element matching the given filter.
    * @param {object} [options]
-   * @param {boolean} [options.preventScroll] a boolean whether to prevent scrolling to focused element or not (defaults to false)
+   * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
    */
   _focus(elementToFocus, options) {
     options = options || {};

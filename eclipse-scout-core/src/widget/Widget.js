@@ -2070,15 +2070,17 @@ export default class Widget {
    * Tries to set the focus on the widget.
    * <p>
    * By default the focus is set on the container but this may vary from widget to widget.
+   *
+   * @param {object} [options]
+   * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
    * @returns {boolean} true if the element could be focused, false if not
    */
-  focus() {
+  focus(options) {
     if (!this.rendered) {
-      this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
+      this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this, options));
       return false;
     }
-
-    return this.session.focusManager.requestFocus(this.getFocusableElement());
+    return this.session.focusManager.requestFocus(this.getFocusableElement(), null, options);
   }
 
   /**
