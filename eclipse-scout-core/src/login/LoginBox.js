@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -56,6 +56,7 @@ export default class LoginBox extends Box {
     if (this.messageKey) {
       this.$message = $('<div>')
         .attr('id', 'message-box')
+        .addClass('message-box')
         .html(strings.nl2br(this.texts.get(this.messageKey)))
         .appendTo(this.$form);
     }
