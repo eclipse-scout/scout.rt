@@ -1,18 +1,16 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.server.session;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertEqual;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNullOrEmpty;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -50,7 +48,7 @@ public class ServerSessionLifecycleHandler implements IServerSessionLifecycleHan
 
     assertEqual(session.getId(), getId()); // ensure mapping between the actual session and the id used in the caches matches
     if (m_clientNodeId != null) {
-      BEANS.get(IClientNotificationService.class).registerSession(m_clientNodeId, session.getId(), session.getUserId());
+      BEANS.get(IClientNotificationService.class).registerNode(m_clientNodeId);
     }
     return session;
   }
@@ -58,13 +56,6 @@ public class ServerSessionLifecycleHandler implements IServerSessionLifecycleHan
   @Override
   public void destroy(IServerSession session) {
     LOG.debug("Destroying scout server scoutSessionId={}", session.getId());
-    try {
-      session.stop();
-    }
-    finally {
-      if (m_clientNodeId != null) {
-        BEANS.get(IClientNotificationService.class).unregisterSession(m_clientNodeId, session.getId(), session.getUserId());
-      }
-    }
+    session.stop();
   }
 }

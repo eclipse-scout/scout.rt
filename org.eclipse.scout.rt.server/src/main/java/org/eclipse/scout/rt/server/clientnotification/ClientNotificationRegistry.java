@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class ClientNotificationRegistry {
   private static final Logger LOG = LoggerFactory.getLogger(ClientNotificationRegistry.class);
-  private final Map<String /*notificationNodeId*/, ClientNotificationNodeQueue> m_notificationQueues = new HashMap<>();
+  private final Map<String /* nodeId */, ClientNotificationNodeQueue> m_notificationQueues = new HashMap<>();
 
   /**
    * If no message is consumed for a certain amount of time [ms], queues are removed to avoid overflows. This may
@@ -63,32 +63,16 @@ public class ClientNotificationRegistry {
   }
 
   /**
-   * Register a session with corresponding user for a given node
+   * This method should only be accessed from {@link ClientNotificationService}
    */
-  protected void registerSession(String nodeId, String sessionId, String userId) {
-    synchronized (m_notificationQueues) {
-      getQueue(nodeId).registerSession(sessionId, userId);
-    }
-  }
-
-  /**
-   * Unregister a session with the corresponding user for a specific node. No notifications are consumed anymore for
-   * this session.
-   */
-  void unregisterSession(String nodeId, String sessionId, String userId) {
-    synchronized (m_notificationQueues) {
-      ClientNotificationNodeQueue queue = getQueue(nodeId);
-      queue.unregisterSession(sessionId, userId);
-      if (queue.getAllSessionIds().isEmpty()) {
-        m_notificationQueues.remove(nodeId);
-      }
-    }
+  protected void registerNode(String nodeId) {
+    getOrCreateQueue(nodeId);
   }
 
   /**
    * This method should only be accessed from {@link ClientNotificationService}
    */
-  void unregisterNode(String nodeId) {
+  protected void unregisterNode(String nodeId) {
     synchronized (m_notificationQueues) {
       m_notificationQueues.remove(nodeId);
     }
@@ -104,41 +88,26 @@ public class ClientNotificationRegistry {
    * @param unit
    *          time unit for maxWaitTime
    */
-  List<ClientNotificationMessage> consume(String notificationNodeId, int maxAmount, int maxWaitTime, TimeUnit unit) {
-    ClientNotificationNodeQueue queue = getQueue(notificationNodeId);
+  protected List<ClientNotificationMessage> consume(String notificationNodeId, int maxAmount, int maxWaitTime, TimeUnit unit) {
+    ClientNotificationNodeQueue queue = getOrCreateQueue(notificationNodeId);
     return queue.consume(maxAmount, maxWaitTime, unit);
   }
 
-  private ClientNotificationNodeQueue getQueue(String nodeId) {
+  protected ClientNotificationNodeQueue getOrCreateQueue(String nodeId) {
     Assertions.assertNotNull(nodeId);
     synchronized (m_notificationQueues) {
-      ClientNotificationNodeQueue queue = m_notificationQueues.get(nodeId);
-      if (queue == null) {
-        // create new
-        queue = BEANS.get(ClientNotificationNodeQueue.class);
-        queue.setNodeId(nodeId);
-        m_notificationQueues.put(nodeId, queue);
-      }
-      return queue;
+      return m_notificationQueues.computeIfAbsent(nodeId, this::createNewQueue);
     }
   }
 
-  /**
-   * To access all session id's having to whom notifications will be provided by this server node.
-   */
-  public Set<String> getRegisteredSessionIds() {
-    Set<String> allSessionIds = new HashSet<>();
-    synchronized (m_notificationQueues) {
-      for (ClientNotificationNodeQueue queue : m_notificationQueues.values()) {
-
-        allSessionIds.addAll(queue.getAllSessionIds());
-      }
-    }
-    return allSessionIds;
+  protected ClientNotificationNodeQueue createNewQueue(String nodeId) {
+    ClientNotificationNodeQueue queue = BEANS.get(ClientNotificationNodeQueue.class);
+    queue.setNodeId(nodeId);
+    return queue;
   }
 
   /**
-   * Nodes that have been registered with {@link #registerSession(String, String, String)}
+   * Nodes that have been registered with {@link #registerNode(String)}
    */
   public Set<String> getRegisteredNodeIds() {
     synchronized (m_notificationQueues) {
@@ -252,9 +221,9 @@ public class ClientNotificationRegistry {
    */
   public void publishWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages, String excludedUiNodeId) {
     synchronized (m_notificationQueues) {
-      final Iterator<ClientNotificationNodeQueue> iter = m_notificationQueues.values().iterator();
+      Iterator<ClientNotificationNodeQueue> iter = m_notificationQueues.values().iterator();
       while (iter.hasNext()) {
-        final ClientNotificationNodeQueue queue = iter.next();
+        ClientNotificationNodeQueue queue = iter.next();
         if (!queue.getNodeId().equals(excludedUiNodeId)) {
           queue.put(messages);
           if (isQueueExpired(queue)) {
@@ -266,7 +235,7 @@ public class ClientNotificationRegistry {
     }
   }
 
-  private boolean isQueueExpired(ClientNotificationNodeQueue queue) {
+  protected boolean isQueueExpired(ClientNotificationNodeQueue queue) {
     long now = System.currentTimeMillis();
     long lastAccess = queue.getLastConsumeAccess();
     return (now - lastAccess) > m_queueExpireTime;
@@ -383,7 +352,7 @@ public class ClientNotificationRegistry {
   /**
    * Publish messages to other cluster nodes. Message not foreseen for cluster distributions are filtered.
    */
-  private void publishClusterInternal(Collection<? extends ClientNotificationMessage> messages) {
+  protected void publishClusterInternal(Collection<? extends ClientNotificationMessage> messages) {
     Collection<ClientNotificationMessage> filteredMessages = new LinkedList<>();
     for (ClientNotificationMessage message : messages) {
       if (message.isDistributeOverCluster()) {
@@ -402,5 +371,4 @@ public class ClientNotificationRegistry {
       LOG.error("Failed to publish client notification", e);
     }
   }
-
 }

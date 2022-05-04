@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -29,24 +29,8 @@ public interface IClientNotificationService {
    *
    * @param nodeId
    *          unique id of the client node
-   * @param sessionId
-   *          unique id of the client session
-   * @param userId
-   *          unique id of the user
    */
-  void registerSession(String nodeId, String sessionId, String userId);
-
-  /**
-   * Unregister a session with the corresponding user and client node
-   *
-   * @param nodeId
-   *          unique id of the client node
-   * @param sessionId
-   *          unique id of the client session
-   * @param userId
-   *          unique id of the user
-   */
-  void unregisterSession(String nodeId, String sessionId, String userId);
+  void registerNode(String nodeId);
 
   /**
    * Receive new notifications relevant for the given node
