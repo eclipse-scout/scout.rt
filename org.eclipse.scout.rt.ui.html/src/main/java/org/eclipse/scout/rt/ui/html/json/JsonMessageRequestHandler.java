@@ -239,8 +239,11 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   protected void handleLogRequest(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonRequest) throws IOException {
     String message = jsonRequest.getMessage();
     JSONObject event = jsonRequest.getEvent();
-
-    String header = "JavaScript exception occurred";
+    String level = ObjectUtility.nvl(jsonRequest.getRequestObject().optString("level"), "error").toLowerCase();
+    String header = "JavaScript log message";
+    if ("error".equals(level)) {
+      header = "JavaScript exception occurred";
+    }
     if (event != null) {
       String target = event.getString("target");
       String type = event.getString("type");
@@ -251,7 +254,23 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       // Truncate the message to prevent log inflation by malicious log requests
       message = message.substring(0, 10000) + "...";
     }
-    LOG.error(message);
+    switch (level) {
+      case "trace":
+        LOG.trace(message);
+        break;
+      case "debug":
+        LOG.debug(message);
+        break;
+      case "info":
+        LOG.info(message);
+        break;
+      case "warn":
+        LOG.warn(message);
+        break;
+      default:
+        LOG.error(message);
+        break;
+    }
     writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse());
   }
 

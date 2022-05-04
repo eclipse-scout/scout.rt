@@ -12,9 +12,16 @@ import {NullLogger, scout, URL} from '../index';
 import $ from 'jquery';
 import strings from '../util/strings';
 
-/* global log4javascript */
+const Level = {
+  TRACE: 'trace',
+  DEBUG: 'debug',
+  INFO: 'info',
+  WARN: 'warn',
+  ERROR: 'error',
+  FATAL: 'fatal'
+};
 
-const DEFAULT_LEVEL = 'trace';
+const DEFAULT_LEVEL = Level.TRACE;
 let initialized = false;
 let _appendersToAdd = [];
 let showStackTraces = true;
@@ -85,17 +92,17 @@ export function parseLevel(level) {
   }
   level = level.toLowerCase();
   switch (level) {
-    case 'trace':
+    case Level.TRACE:
       return log4javascript.Level.TRACE;
-    case 'debug':
+    case Level.DEBUG:
       return log4javascript.Level.DEBUG;
-    case 'info':
+    case Level.INFO:
       return log4javascript.Level.INFO;
-    case 'warn':
+    case Level.WARN:
       return log4javascript.Level.WARN;
-    case 'error':
+    case Level.ERROR:
       return log4javascript.Level.ERROR;
-    case 'fatal':
+    case Level.FATAL:
       return log4javascript.Level.FATAL;
   }
 }
@@ -115,6 +122,7 @@ export function addAppender(factoryName, options) {
 
 export default {
   DEFAULT_LEVEL,
+  Level,
   addAppender,
   bootstrap,
   initLog4Javascript,
