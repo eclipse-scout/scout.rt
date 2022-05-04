@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -14,26 +14,19 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.NodeQueueCapacity;
@@ -53,10 +46,6 @@ public class ClientNotificationNodeQueue {
 
   private final int m_capacity;
   private final BlockingDeque<ClientNotificationMessage> m_notifications;
-
-  private final ReentrantReadWriteLock m_sessionUserCacheLock = new ReentrantReadWriteLock();
-  private final Set<String /*sessionId*/> m_sessions = new HashSet<>();
-  private final Map<String /*userId*/, Set<String /*sessionId*/>> m_userToSessions = new HashMap<>();
   private final AtomicLong m_lastConsumeAccess;
 
   public ClientNotificationNodeQueue() {
@@ -82,43 +71,6 @@ public class ClientNotificationNodeQueue {
    */
   public int getCapacity() {
     return m_capacity;
-  }
-
-  public void registerSession(String sessionId, String userId) {
-    Assertions.assertNotNull(sessionId);
-    Assertions.assertNotNull(userId);
-    m_sessionUserCacheLock.writeLock().lock();
-    try {
-      LOG.debug("Register session [sessionId={}, userId={}, clientNodeId={}]", sessionId, userId, getNodeId());
-      m_sessions.add(sessionId);
-      Set<String> userSessions = m_userToSessions.computeIfAbsent(userId, k -> new HashSet<>());
-      userSessions.add(sessionId);
-    }
-    finally {
-      m_sessionUserCacheLock.writeLock().unlock();
-    }
-  }
-
-  public void unregisterSession(String sessionId, String userId) {
-    Assertions.assertNotNull(sessionId);
-    Assertions.assertNotNull(userId);
-    m_sessionUserCacheLock.writeLock().lock();
-    try {
-      LOG.debug("Unregister session [sessionId={}, userId={}, clientNodeId={}]", sessionId, userId, getNodeId());
-      m_sessions.remove(sessionId);
-      Iterator<Entry<String, Set<String>>> iterator = m_userToSessions.entrySet().iterator();
-      while (iterator.hasNext()) {
-        Entry<String, Set<String>> entry = iterator.next();
-        Set<String> sessions = entry.getValue();
-        sessions.remove(sessionId);
-        if (sessions.isEmpty()) {
-          iterator.remove();
-        }
-      }
-    }
-    finally {
-      m_sessionUserCacheLock.writeLock().unlock();
-    }
   }
 
   public void put(ClientNotificationMessage notification) {
@@ -219,27 +171,7 @@ public class ClientNotificationNodeQueue {
   public boolean isRelevant(IClientNotificationAddress address) {
     return address.isNotifyAllSessions()
         || address.isNotifyAllNodes()
-        || CollectionUtility.hasElements(address.getSessionIds()) // do not filter with getAllSessionIds() as on the UI server there might be more sessions than here on the backend (if backend sessions expire before ui sessions)
-        || CollectionUtility.hasElements(address.getUserIds()); // do not filter with getAllUserIds() as on the UI server there might be more userIds than here on the backend (if backend sessions expire before ui sessions)
-  }
-
-  public Set<String /*sessionId*/> getAllSessionIds() {
-    m_sessionUserCacheLock.readLock().lock();
-    try {
-      return new HashSet<>(m_sessions);
-    }
-    finally {
-      m_sessionUserCacheLock.readLock().unlock();
-    }
-  }
-
-  public Set<String> getAllUserIds() {
-    m_sessionUserCacheLock.readLock().lock();
-    try {
-      return new HashSet<>(m_userToSessions.keySet());
-    }
-    finally {
-      m_sessionUserCacheLock.readLock().unlock();
-    }
+        || CollectionUtility.hasElements(address.getSessionIds())
+        || CollectionUtility.hasElements(address.getUserIds());
   }
 }
