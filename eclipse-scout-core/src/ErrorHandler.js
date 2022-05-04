@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxError, App, arrays, icons, NullLogger, scout, strings} from './index';
+import {AjaxError, App, arrays, icons, logging, NullLogger, scout, strings} from './index';
 import $ from 'jquery';
 import sourcemappedStacktrace from 'sourcemapped-stacktrace';
 
@@ -37,23 +37,39 @@ export default class ErrorHandler {
   // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
   _onWindowError(errorMessage, fileName, lineNumber, columnNumber, error) {
     try {
+      if (this._isIgnorableScriptError(errorMessage, fileName, lineNumber, columnNumber, error)) {
+        this.handleErrorInfo({
+          log: `Ignoring error. Message: ${errorMessage}`,
+          level: logging.Level.INFO
+        });
+        return;
+      }
       if (error instanceof Error) {
         this.handle(error)
           .catch(error => {
             console.error('Error in global JavaScript error handler', error);
           });
-      } else {
-        let code = 'J00';
-        let log = errorMessage + ' at ' + fileName + ':' + lineNumber + '\n(' + 'Code ' + code + ')';
-        this.handleErrorInfo({
-          code: code,
-          message: errorMessage,
-          log: log
-        });
+        return;
       }
+      let code = 'J00';
+      let log = errorMessage + ' at ' + fileName + ':' + lineNumber + '\n(' + 'Code ' + code + ')';
+      this.handleErrorInfo({
+        code: code,
+        message: errorMessage,
+        log: log
+      });
     } catch (err) {
       throw new Error('Error in global JavaScript error handler: ' + err.message + ' (original error: ' + errorMessage + ' at ' + fileName + ':' + lineNumber + ')');
     }
+  }
+
+  _isIgnorableScriptError(message, fileName, lineNumber, columnNumber, error) {
+    // Ignore errors caused by scripts from a different origin.
+    // Example: Firefox on iOS throws an error, probably caused by an internal Firefox script.
+    // The error does not affect the application and cannot be prevented by the app either since we don't know what script it is and what it does.
+    // In that case the error must no be shown to the user, instead just log it silently.
+    // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
+    return message && message.toLowerCase().indexOf('script error') > -1 && !fileName && !lineNumber && !columnNumber && !error;
   }
 
   /**
@@ -240,22 +256,9 @@ export default class ErrorHandler {
    * - If there is a scout session and the flag "sendError" is set, the error is sent to the UI server.
    */
   handleErrorInfo(errorInfo) {
+    errorInfo.level = scout.nvl(errorInfo.level, logging.Level.ERROR);
     if (this.logError && errorInfo.log) {
-      $.log.error(errorInfo.log);
-
-      // Note: when the null-logger is active it has already written the error to the console
-      // when the $.log.error function has been called above, so we don't have to log again here.
-      let writeToConsole = ErrorHandler.CONSOLE_OUTPUT;
-      if ($.log instanceof NullLogger) {
-        writeToConsole = false;
-      }
-      if (writeToConsole && window && window.console) {
-        if (window.console.error) {
-          window.console.error(errorInfo.log);
-        } else if (window.console.log) {
-          window.console.log(errorInfo.log);
-        }
-      }
+      this._logErrorInfo(errorInfo);
     }
 
     // Note: The error handler is installed globally and we cannot tell in which scout session the error happened.
@@ -263,14 +266,49 @@ export default class ErrorHandler {
     // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
     if (App.get().sessions.length > 0) {
       let session = App.get().sessions[0];
-      if (this.displayError) {
+      if (this.displayError && errorInfo.level === logging.Level.ERROR) {
         this._showMessageBox(session, errorInfo.message, errorInfo.code, errorInfo.log);
       }
       if (this.sendError) {
-        this._sendErrorMessage(session, errorInfo.log);
+        this._sendErrorMessage(session, errorInfo.log, errorInfo.level);
       }
     }
     return errorInfo;
+  }
+
+  _logErrorInfo(errorInfo) {
+    switch (errorInfo.level) {
+      case logging.Level.TRACE:
+        $.log.trace(errorInfo.log);
+        break;
+      case logging.Level.DEBUG:
+        $.log.debug(errorInfo.log);
+        break;
+      case logging.Level.INFO:
+        $.log.info(errorInfo.log);
+        break;
+      case logging.Level.WARN:
+        $.log.warn(errorInfo.log);
+        break;
+      default:
+        $.log.error(errorInfo.log);
+    }
+
+    // Note: when the null-logger is active it has already written the error to the console
+    // when the $.log.error function has been called above, so we don't have to log again here.
+    let writeToConsole = ErrorHandler.CONSOLE_OUTPUT;
+    if ($.log instanceof NullLogger) {
+      writeToConsole = false;
+    }
+    if (writeToConsole && window && window.console) {
+      if (errorInfo.level === logging.Level.ERROR && window.console.error) {
+        window.console.error(errorInfo.log);
+      } else if (errorInfo.level === logging.Level.WARN && window.console.warn) {
+        window.console.warn(errorInfo.log);
+      } else if (window.console.log) {
+        window.console.log(errorInfo.log);
+      }
+    }
   }
 
   /**
@@ -325,7 +363,7 @@ export default class ErrorHandler {
     session.showFatalMessage(options, errorCode);
   }
 
-  _sendErrorMessage(session, logMessage) {
-    session.sendLogRequest(logMessage);
+  _sendErrorMessage(session, logMessage, logLevel) {
+    session.sendLogRequest(logMessage, logLevel);
   }
 }
