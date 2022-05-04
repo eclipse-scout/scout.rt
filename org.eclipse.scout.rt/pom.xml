@@ -109,7 +109,7 @@
     <scout.base.version>22.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
-    <jetty.version>10.0.7</jetty.version>
+    <jetty.version>10.0.9</jetty.version>
     <slf4j.version>1.7.32</slf4j.version>
     <logback.version>1.2.10</logback.version>
     <jackson.version>2.13.2</jackson.version>
@@ -685,24 +685,12 @@
       <!-- Dev Dependencies -->
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-webapp</artifactId>
+        <artifactId>jetty-bom</artifactId>
         <version>${jetty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-annotations</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-plus</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-server</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
+      <!-- This dependency only exists to specify the exclusion. -->
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-servlet</artifactId>
