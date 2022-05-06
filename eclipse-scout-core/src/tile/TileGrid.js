@@ -764,16 +764,10 @@ export default class TileGrid extends Widget {
     if ($scrollables.length === 0) {
       return;
     }
-    let oldScrollTopArr = $scrollables.map((i, $elem) => {
-      return $elem.scrollTop();
-    }).toArray();
     // Make sure the tile grid has the focus when focusing a tile
-    if (this.focus()) {
-      // Restore old scroll to prevent scrolling by the browser due to the focus() call
-      oldScrollTopArr.forEach((val, idx) => {
-        $scrollables[idx].scrollTop(val);
-      }, this);
-    }
+    this.focus({
+      preventScroll: true
+    });
   }
 
   setSelectable(selectable) {
@@ -1386,7 +1380,7 @@ export default class TileGrid extends Widget {
   }
 
   _removeTileByFilter(tile) {
-    // In virtual mode, filtered tiles are not rendered. In normal mode, the filter animation is triggerd by _renderVisible of the tile.
+    // In virtual mode, filtered tiles are not rendered. In normal mode, the filter animation is triggered by _renderVisible of the tile.
     // Since the tile is removed immediately, the invisible animation would not start, so we use the remove animation instead.
     // But because the delete animation is a different one to the filter animation, the removeClass needs to be swapped
     // Remove class first to make sure animation won't be finished before the animationend listener is attached in Widget._removeAnimated (which may happen because a setTimeout is used there)
