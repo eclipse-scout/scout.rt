@@ -673,7 +673,7 @@ export default class DateField extends ValueField {
   }
 
   _renderDateClearable() {
-    if (this.hasDate || this.isClearable()) {
+    if (this.hasDate && this.isClearable()) {
       if (!this.$dateClearIcon) {
         // date clear icon
         this.$dateClearIcon = this.$field.appendSpan('icon date-clear unfocusable text-field-icon action')
@@ -689,14 +689,18 @@ export default class DateField extends ValueField {
   }
 
   _renderTimeClearable() {
-    if (this.hasTime && this.isClearable() && !this.$timeClearIcon) {
-      // date clear icon
-      this.$timeClearIcon = this.$field.appendSpan('icon time-clear unfocusable text-field-icon action')
-        .on('mousedown', this._onTimeClearIconMouseDown.bind(this));
-    } else if ((!this.hasTime || !this.isClearable()) && this.$timeClearIcon) {
-      // Remove $dateField
-      this.$timeClearIcon.remove();
-      this.$timeClearIcon = null;
+    if (this.hasTime && this.isClearable()) {
+      if (!this.$timeClearIcon) {
+        // time clear icon
+        this.$timeClearIcon = this.$field.appendSpan('icon time-clear unfocusable text-field-icon action')
+          .on('mousedown', this._onTimeClearIconMouseDown.bind(this));
+      }
+    } else {
+      if (this.$timeClearIcon) {
+        // Remove clear icon
+        this.$timeClearIcon.remove();
+        this.$timeClearIcon = null;
+      }
     }
   }
 
