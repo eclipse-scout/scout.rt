@@ -764,16 +764,10 @@ export default class TileGrid extends Widget {
     if ($scrollables.length === 0) {
       return;
     }
-    let oldScrollTopArr = $scrollables.map((i, $elem) => {
-      return $elem.scrollTop();
-    }).toArray();
     // Make sure the tile grid has the focus when focusing a tile
-    if (this.focus()) {
-      // Restore old scroll to prevent scrolling by the browser due to the focus() call
-      oldScrollTopArr.forEach((val, idx) => {
-        $scrollables[idx].scrollTop(val);
-      }, this);
-    }
+    this.focus({
+      preventScroll: true
+    });
   }
 
   setSelectable(selectable) {
