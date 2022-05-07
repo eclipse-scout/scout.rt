@@ -24,7 +24,7 @@ export default class TreeCollapseAllKeyStroke extends AbstractTreeNavigationKeyS
   }
 
   handle(event) {
-    this.field.collapseAll();
+    // this.field.collapseAll();
     if (this.field.visibleNodesFlat.length > 0) {
       this.selectNodesAndReveal(this.field.visibleNodesFlat[0]);
     }

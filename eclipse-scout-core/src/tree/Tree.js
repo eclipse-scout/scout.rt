@@ -63,8 +63,6 @@ export default class Tree extends Widget {
     this._addWidgetProperties(['menus', 'keyStrokes']);
     this._additionalContainerClasses = ''; // may be used by subclasses to set additional CSS classes
     this._doubleClickSupport = new DoubleClickSupport();
-    this._$animationWrapper = null; // used by _renderExpansion()
-    this._$expandAnimationWrappers = [];
     this._filterMenusHandler = this._filterMenus.bind(this);
     this._popupOpenHandler = this._onDesktopPopupOpen.bind(this);
 
@@ -72,20 +70,6 @@ export default class Tree extends Widget {
     this._inSelectionPathList = {};
     this.viewRangeRendered = new Range(0, 0);
     this.viewRangeSize = 20;
-
-    this.startAnimationFunc = function() {
-      this.runningAnimations++;
-    }.bind(this);
-    this.runningAnimations = 0;
-    this.runningAnimationsFinishFunc = function() {
-      this.runningAnimations--;
-      if (this.runningAnimations <= 0) {
-        this.runningAnimations = 0;
-        this._renderViewportBlocked = false;
-        this.invalidateLayoutTree();
-      }
-    }.bind(this);
-
     this.nodeHeight = 0;
     this.nodeWidth = 0;
     this.maxNodeWidth = 0;
@@ -156,7 +140,7 @@ export default class Tree extends Widget {
     }
     this._updateSelectionPath();
     nodes.forEach(node => this.applyFiltersForNode(node));
-    Tree.visitNodes((node, parentNode) => this._addToVisibleFlatList(node, false), nodes, parentNode);
+    this._updateVisibleNodes(); // FIXME init vs insert
   }
 
   /**
@@ -290,12 +274,12 @@ export default class Tree extends Widget {
   _destroy() {
     super._destroy();
     this.visitNodes(this._destroyTreeNode.bind(this));
-    this.nodes = []; // finally, clear array with root tree-nodes
+    this.nodes = [];
+    this.visibleNodesFlat = [];
   }
 
   _destroyTreeNode(node) {
     delete this.nodesMap[node.id];
-    this._removeFromFlatList(node, false); // ensure node is not longer in visible nodes list.
     node.destroy();
 
     // noinspection JSUnresolvedVariable
@@ -336,6 +320,8 @@ export default class Tree extends Widget {
       .on('mouseup', '.tree-node-control', this._onNodeControlMouseUp.bind(this))
       .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this));
     HtmlComponent.install(this.$data, this.session);
+    this.$fillBefore = this.$data.prependDiv('tree-data-fill');
+    this.$fillAfter = this.$data.appendDiv('tree-data-fill');
 
     if (this.isHorizontalScrollingEnabled()) {
       this.$data.toggleClass('scrollable-tree', true);
@@ -365,10 +351,6 @@ export default class Tree extends Widget {
     this.session.desktop.off('popupOpen', this._popupOpenHandler);
     this.filterSupport.remove();
 
-    // stop all animations
-    if (this._$animationWrapper) {
-      this._$animationWrapper.stop(false, true);
-    }
     // Detach nodes from jQuery objects (because those will be removed)
     this.visitNodes(this._resetTreeNode.bind(this));
 
@@ -411,7 +393,7 @@ export default class Tree extends Widget {
    */
   setScrollTop(scrollTop) {
     this.setProperty('scrollTop', scrollTop);
-    // call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
+    // call _renderViewport to make sure nodes are rendered immediately. The bnodeser fires the scroll event handled by onDataScroll delayed
     if (this.rendered) {
       this._renderViewport();
       // Render scroll top again to make sure the data really is at the expected position
@@ -442,7 +424,7 @@ export default class Tree extends Widget {
   }
 
   _renderViewport() {
-    if (this.runningAnimations > 0 || this._renderViewportBlocked) {
+    if (this._renderViewportBlocked) {
       // animation pending do not render view port because finishing should rerenderViewport
       return;
     }
@@ -517,33 +499,50 @@ export default class Tree extends Widget {
     }
     let newRange = this.viewRangeRendered.union(range);
     if (newRange.length === 2) {
-      throw new Error('Can only prepend or append rows to the existing range. Existing: ' + this.viewRangeRendered + '. New: ' + newRange);
+      throw new Error('Can only prepend or append nodes to the existing range. Existing: ' + this.viewRangeRendered + '. New: ' + newRange);
     }
     this.viewRangeRendered = newRange[0];
 
-    let numNodesRendered = this.ensureRangeVisible(range);
+    let numNodesRendered = this.ensureRangeVisible(range, prepend);
 
     $.log.isTraceEnabled() && $.log.trace(numNodesRendered + ' new nodes rendered from ' + range);
   }
 
-  ensureRangeVisible(range) {
+  ensureRangeVisible(range, prepend) {
     let nodes = this.visibleNodesFlat;
-    let nodesToInsert = [];
-    for (let r = range.from; r < range.to; r++) {
-      let node = nodes[r];
-      if (!node.attached) {
-        nodesToInsert.push(node);
+    let insertedNodes = [];
+    if (prepend) {
+      for (let r = range.to - 1; r >= range.from; r--) {
+        attachNode.call(this, nodes[r]);
+      }
+    } else {
+      for (let r = range.from; r < range.to; r++) {
+        attachNode.call(this, nodes[r]);
       }
     }
-    this._insertNodesInDOM(nodesToInsert);
-    return nodesToInsert.length;
+    this._installNodes(insertedNodes);
+    return insertedNodes.length;
+
+    function attachNode(node) {
+      if (!node.rendered) {
+        this._renderNode(node);
+      }
+      if (prepend) {
+        node.$node.insertAfter(this.$fillBefore);
+      } else {
+        node.$node.insertBefore(this.$fillAfter);
+      }
+      node._decorate();
+      if (this.prevSelectedNode === node) {
+        this._highlightPrevSelectedNode();
+      }
+      node.rendered = true;
+      node.attached = true;
+      insertedNodes.push(node);
+    }
   }
 
   _renderFiller() {
-    if (!this.$fillBefore) {
-      this.$fillBefore = this.$data.prependDiv('tree-data-fill');
-    }
-
     let fillBeforeDimensions = this._calculateFillerDimension(new Range(0, this.viewRangeRendered.from));
     this.$fillBefore.cssHeight(fillBeforeDimensions.height);
     if (this.isHorizontalScrollingEnabled()) {
@@ -551,10 +550,6 @@ export default class Tree extends Widget {
       this.maxNodeWidth = Math.max(fillBeforeDimensions.width, this.maxNodeWidth);
     }
     $.log.isTraceEnabled() && $.log.trace('FillBefore height: ' + fillBeforeDimensions.height);
-
-    if (!this.$fillAfter) {
-      this.$fillAfter = this.$data.appendDiv('tree-data-fill');
-    }
 
     let fillAfterDimensions = {
       height: 0,
@@ -630,7 +625,7 @@ export default class Tree extends Widget {
   }
 
   /**
-   * Renders the rows visible in the viewport and removes the other rows
+   * Renders the nodes visible in the viewport and removes the other nodes
    */
   _renderViewRange(viewRange) {
     if (viewRange.from === this.viewRangeRendered.from && viewRange.to === this.viewRangeRendered.to && !this.viewRangeDirty) {
@@ -644,38 +639,20 @@ export default class Tree extends Widget {
       // Range already rendered -> do nothing
       return;
     }
-    if (!this.viewRangeDirty) {
-      let rangesToRender = viewRange.subtract(this.viewRangeRendered);
-      let rangesToRemove = this.viewRangeRendered.subtract(viewRange);
-      let maxRange = new Range(0, this.visibleNodesFlat.length);
+    let rangesToRender = viewRange.subtract(this.viewRangeRendered);
+    let rangesToRemove = this.viewRangeRendered.subtract(viewRange);
 
-      rangesToRemove.forEach(range => {
-        this._removeNodesInRange(range);
-        if (maxRange.to < range.to) {
-          this.viewRangeRendered = viewRange;
-        }
-      });
-      rangesToRender.forEach(range => {
-        this._renderNodesInRange(range);
-      });
-    } else {
-      // expansion changed
-      this.viewRangeRendered = viewRange;
-      this.ensureRangeVisible(viewRange);
-    }
-
-    // check if at least last and first row in range got correctly rendered
+    rangesToRemove.forEach(range => {
+      this._removeNodesInRange(range);
+    });
+    rangesToRender.forEach(range => {
+      this._renderNodesInRange(range);
+    });
+    // check if at least last and first node in range got correctly rendered
     if (this.viewRangeRendered.size() > 0) {
       let nodes = this.visibleNodesFlat;
       let firstNode = nodes[this.viewRangeRendered.from];
       let lastNode = nodes[this.viewRangeRendered.to - 1];
-      if (this.viewRangeDirty) {
-        // cleanup nodes before range and after
-        let $nodesBeforeFirstNode = firstNode.$node.prevAll('.tree-node');
-        let $nodesAfterLastNode = lastNode.$node.nextAll('.tree-node');
-        this._cleanupNodes($nodesBeforeFirstNode);
-        this._cleanupNodes($nodesAfterLastNode);
-      }
       if (!firstNode.attached || !lastNode.attached) {
         throw new Error('Nodes not rendered as expected. ' + this.viewRangeRendered +
           '. First: ' + graphics.debugOutput(firstNode.$node) +
@@ -800,7 +777,7 @@ export default class Tree extends Widget {
    * will cause errors on inserting nodes at the right position. See #262890.
    */
   calculateViewRangeSize() {
-    // Make sure row height is up to date (row height may be different after zooming)
+    // Make sure node height is up to date (node height may be different after zooming)
     this._updateNodeDimensions();
     if (this.nodeHeight === 0) {
       throw new Error('Cannot calculate view range with nodeHeight = 0');
@@ -828,7 +805,7 @@ export default class Tree extends Widget {
       let oldNodeWidth = this.nodeWidth;
       this.nodeWidth = $node.outerWidth(true);
       if (oldNodeWidth !== this.nodeWidth) {
-        this.viewRangeDirty = true;
+        // this.viewRangeDirty = true; // FIXME why?
       }
     }
     emptyNode.reset();
@@ -847,10 +824,6 @@ export default class Tree extends Widget {
     });
   }
 
-  removeAllNodes() {
-    this._removeNodes(this.nodes);
-  }
-
   /**
    * @param parentNode
    *          Optional. If provided, this node's state will be updated (e.g. it will be collapsed
@@ -863,14 +836,10 @@ export default class Tree extends Widget {
     }
 
     nodes.forEach(function(node) {
-      this._removeFromFlatList(node, true);
       if (node.childNodes.length > 0) {
         this._removeNodes(node.childNodes, node);
       }
       if (node.$node) {
-        if (this._$animationWrapper && this._$animationWrapper.find(node.$node).length > 0) {
-          this._$animationWrapper.stop(false, true);
-        }
         node.reset();
       }
     }, this);
@@ -883,7 +852,7 @@ export default class Tree extends Widget {
       }
     });
     if (this.rendered) {
-      this.viewRangeDirty = true;
+      // this._renderViewport(); // FIXME tables does it, do it here as well?
       this.invalidateLayoutTree();
     }
   }
@@ -1378,33 +1347,33 @@ export default class Tree extends Widget {
         lazy = false;
       }
     }
-    let renderAnimated = scout.nvl(opts.renderAnimated, true);
+    // let renderAnimated = scout.nvl(opts.renderAnimated, true);
 
     // Never do lazy expansion if it is disabled on the tree
     if (!this.lazyExpandingEnabled) {
       lazy = false;
     }
 
-    if (this.isBreadcrumbStyleActive()) {
-      // Do not allow to collapse a selected node
-      if (!expanded && this.selectedNodes.indexOf(node) > -1) {
-        this.setNodeExpanded(node, true, opts);
-        return;
-      }
-    }
-
-    // Optionally collapse all children (recursively)
-    if (opts.collapseChildNodes) {
-      // Suppress render expansion
-      let childOpts = objects.valueCopy(opts);
-      childOpts.renderExpansion = false;
-
-      node.childNodes.forEach(childNode => {
-        if (childNode.expanded) {
-          this.collapseNode(childNode, childOpts);
-        }
-      });
-    }
+    // if (this.isBreadcrumbStyleActive()) {
+    //   // Do not allow to collapse a selected node
+    //   if (!expanded && this.selectedNodes.indexOf(node) > -1) {
+    //     this.setNodeExpanded(node, true, opts);
+    //     return;
+    //   }
+    // }
+    //
+    // // Optionally collapse all children (recursively)
+    // if (opts.collapseChildNodes) {
+    //   // Suppress render expansion
+    //   let childOpts = objects.valueCopy(opts);
+    //   childOpts.renderExpansion = false;
+    //
+    //   node.childNodes.forEach(childNode => {
+    //     if (childNode.expanded) {
+    //       this.collapseNode(childNode, childOpts);
+    //     }
+    //   });
+    // }
     let renderExpansionOpts = {
       expansionChanged: false,
       expandLazyChanged: false
@@ -1417,34 +1386,19 @@ export default class Tree extends Widget {
       node.expanded = expanded;
       node.expandedLazy = lazy;
 
-      if (renderExpansionOpts.expansionChanged) {
-        if (node.parentNode) {
-          // ensure node is visible under the parent node if there is a parent.
-          this._rebuildParent(node.parentNode, opts);
-        } else if (node.filterAccepted) {
-          this._addToVisibleFlatList(node, false);
-        } else {
-          this._removeFromFlatList(node, false);
-        }
-      } else if (renderExpansionOpts.expandLazyChanged) {
-        this.applyFiltersForNode(node, false, renderAnimated);
-      }
+      this._updateVisibleNodes();
+      this._renderNodeDelta();
 
       if (this.groupedNodes[node.id]) {
         this._updateItemPath(false, node);
       }
 
-      if (node.expanded) {
-        node.ensureLoadChildren().done(this._addChildrenToFlatList.bind(this, node, null, renderAnimated, null, true /* required that ctrl+shift+add expands all rows of a table-page */));
-      } else {
-        this._removeChildrenFromFlatList(node, renderAnimated);
-      }
       this.trigger('nodeExpanded', {
         node: node,
         expanded: expanded,
         expandedLazy: lazy
       });
-      this.viewRangeDirty = true;
+      // this.viewRangeDirty = true;
     }
 
     // Render expansion
@@ -1463,315 +1417,6 @@ export default class Tree extends Widget {
     }, nodes);
   }
 
-  _rebuildParent(node, opts) {
-    if (this.rebuildSuppressed) {
-      return;
-    }
-    if (node.expanded || node.expandedLazy) {
-      this._addChildrenToFlatList(node, null, true, null, true /* required so that double clicking a table-page-row expands the clicked child row */);
-    } else {
-      this._removeChildrenFromFlatList(node, false);
-    }
-    // Render expansion
-    if (this.rendered && scout.nvl(opts.renderExpansion, true)) {
-      let renderExpansionOpts = {
-        expansionChanged: true
-      };
-      this._renderExpansion(node, renderExpansionOpts);
-    }
-  }
-
-  _removeChildrenFromFlatList(parentNode, animatedRemove) {
-    // Only if a parent is available the children are available.
-    if (this.visibleNodesMap[parentNode.id]) {
-      let parentIndex = this.visibleNodesFlat.indexOf(parentNode);
-      let elementsToDelete = 0;
-      let parentLevel = parentNode.level;
-      let removedNodes = [];
-      animatedRemove = animatedRemove && this.rendered;
-      if (this._$animationWrapper) {
-        // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
-        // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
-        // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
-        // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
-        this._$animationWrapper.stop(false, true);
-      }
-      this._$expandAnimationWrappers.forEach($wrapper => {
-        $wrapper.stop(false, true);
-      });
-      for (let i = parentIndex + 1; i < this.visibleNodesFlat.length; i++) {
-        if (this.visibleNodesFlat[i].level > parentLevel) {
-          let node = this.visibleNodesFlat[i];
-          if (this.isHorizontalScrollingEnabled()) {
-            // if node is the node which defines the widest width then recalculate width for render
-            if (node.width === this.maxNodeWidth) {
-              this.maxNodeWidth = 0;
-              this.nodeWidthDirty = true;
-            }
-          }
-          delete this.visibleNodesMap[this.visibleNodesFlat[i].id];
-          if (node.attached && animatedRemove) {
-            if (!this._$animationWrapper) {
-              this._$animationWrapper = $('<div class="animation-wrapper">').insertBefore(node.$node);
-              this._$animationWrapper.data('parentNode', parentNode);
-            }
-            if (node.isDescendantOf(this._$animationWrapper.data('parentNode'))) {
-              this._$animationWrapper.append(node.$node);
-            }
-            node.attached = false;
-            node.displayBackup = node.$node.css('display');
-            removedNodes.push(node);
-          } else if (node.attached && !animatedRemove) {
-            this.hideNode(node, false, false);
-          }
-          elementsToDelete++;
-        } else {
-          break;
-        }
-      }
-
-      this.visibleNodesFlat.splice(parentIndex + 1, elementsToDelete);
-      // animate closing
-      if (animatedRemove) { // don't animate while rendering (not necessary, or may even lead to timing issues)
-        this._renderViewportBlocked = true;
-        if (removedNodes.length > 0) {
-          this._$animationWrapper.animate({
-            height: 0
-          }, {
-            start: this.startAnimationFunc,
-            complete: onAnimationComplete.bind(this, removedNodes),
-            step: this.revalidateLayoutTree.bind(this),
-            duration: 200,
-            queue: false
-          });
-        } else if (this._$animationWrapper) {
-          this._$animationWrapper.remove();
-          this._$animationWrapper = null;
-          onAnimationComplete.call(this, removedNodes);
-        } else {
-          this._renderViewportBlocked = false;
-        }
-      }
-      return removedNodes;
-    }
-
-    // ----- Helper functions -----
-    function onAnimationComplete(affectedNodes) {
-      affectedNodes.forEach(node => {
-        node.$node.detach();
-        node.$node.css('display', node.displayBackup);
-        node.displayBackup = null;
-      });
-      if (this._$animationWrapper) {
-        this._$animationWrapper.remove();
-        this._$animationWrapper = null;
-      }
-      this.runningAnimationsFinishFunc();
-    }
-  }
-
-  _removeFromFlatList(node, animatedRemove) {
-    if (this.visibleNodesMap[node.id]) {
-      let index = this.visibleNodesFlat.indexOf(node);
-      this._removeChildrenFromFlatList(node, false);
-      if (this.isHorizontalScrollingEnabled()) {
-        // if node is the node which defines the widest width then recalculate width for render
-        if (node.width === this.maxNodeWidth) {
-          this.maxNodeWidth = 0;
-          this.nodeWidthDirty = true;
-        }
-      }
-      this.visibleNodesFlat.splice(index, 1);
-      delete this.visibleNodesMap[node.id];
-      this.hideNode(node, animatedRemove);
-    }
-  }
-
-  /**
-   * @returns {boolean} whether or not the function added a node to the flat list
-   */
-  _addToVisibleFlatList(node, renderingAnimated) {
-    // if node already is in visible list don't do anything. If no parentNode is available this node is on toplevel, if a parent is available
-    // it has to be in visible list and also be expanded
-    if (!this.visibleNodesMap[node.id] && node.filterAccepted
-      && (!node.parentNode || node.parentNode.expanded && this.visibleNodesMap[node.parentNode.id])) {
-      if (this.initialTraversing) {
-        // for faster index calculation
-        this._addToVisibleFlatListNoCheck(node, this.visibleNodesFlat.length, renderingAnimated);
-      } else {
-        let insertIndex = this._findInsertPositionInFlatList(node);
-        this._addToVisibleFlatListNoCheck(node, insertIndex, renderingAnimated);
-      }
-    }
-  }
-
-  // TODO [7.0] CGU applies to all the add/remove to/from flat list methods:
-  // Is it really necessary to update dom on every operation? why not just update the list and renderViewport at the end?
-  // The update of the flat list is currently implemented quite complicated -> it should be simplified.
-  // And: because add to flat list renders all the children the rendered node count is greater than the viewRangeSize until
-  // the layout renders the viewport again -> this must not happen (can be seen when a node gets expanded)
-  _addChildrenToFlatList(parentNode, parentIndex, animatedRendering, insertBatch, forceFilter) {
-    // add nodes recursively
-    if (!this.visibleNodesMap[parentNode.id]) {
-      return 0;
-    }
-
-    let isSubAdding = Boolean(insertBatch);
-    parentIndex = parentIndex ? parentIndex : this.visibleNodesFlat.indexOf(parentNode);
-    animatedRendering = animatedRendering && this.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
-    if (this._$animationWrapper && !isSubAdding) {
-      // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
-      // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
-      // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
-      // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
-      this._$animationWrapper.stop(false, true);
-    }
-
-    if (insertBatch) {
-      insertBatch.setInsertAt(parentIndex);
-    } else {
-      insertBatch = this.newInsertBatch(parentIndex + 1);
-    }
-
-    parentNode.childNodes.forEach((node, index) => {
-      if (!node.initialized || !node.isFilterAccepted(forceFilter)) {
-        return;
-      }
-
-      let insertIndex, isAlreadyAdded = this.visibleNodesMap[node.id];
-      if (isAlreadyAdded) {
-        this.insertBatchInVisibleNodes(insertBatch, this._showNodes(insertBatch), animatedRendering);
-        // Animate rendering is always false because it would generate a bunch of animation wrappers which stay forever without really starting an animation...
-        this.checkAndHandleBatchAnimationWrapper(parentNode, false, insertBatch);
-        insertBatch = this.newInsertBatch(insertBatch.nextBatchInsertIndex());
-        insertBatch = this._addChildrenToFlatListIfExpanded(1, node, insertIndex, animatedRendering, insertBatch, forceFilter);
-      } else {
-        insertBatch.insertNodes.push(node);
-        this.visibleNodesMap[node.id] = true;
-        insertBatch = this.checkAndHandleBatch(insertBatch, parentNode, animatedRendering);
-        insertBatch = this._addChildrenToFlatListIfExpanded(0, node, insertIndex, animatedRendering, insertBatch, forceFilter);
-      }
-    });
-
-    if (!isSubAdding) {
-      // animation is not done yet and all added nodes are in visible range
-      this.insertBatchInVisibleNodes(insertBatch, this._showNodes(insertBatch), animatedRendering);
-      this.invalidateLayoutTree();
-    }
-
-    return insertBatch;
-  }
-
-  /**
-   * Checks if the given node is expanded, and if that's the case determine the insert index of the node and add its children to the flat list.
-   *
-   * @param {number} indexOffset either 0 or 1, offset is added to the insert index
-   */
-  _addChildrenToFlatListIfExpanded(indexOffset, node, insertIndex, animatedRendering, insertBatch, forceFilter) {
-    if (node.expanded && node.childNodes.length) {
-      if (insertBatch.containsNode(node.parentNode) || insertBatch.length() > 1) {
-        // if parent node is already in the batch, do not change the insertIndex,
-        // only append child nodes below that parent node
-        // Also, if the batch is not empty (i.e. contains more nodes than the current node),
-        // the insert index was already calculated previously and must not be changed.
-        insertIndex = insertBatch.insertAt();
-      } else {
-        insertIndex = this._findInsertPositionInFlatList(node);
-      }
-      insertIndex += indexOffset;
-      insertBatch = this._addChildrenToFlatList(node, insertIndex, animatedRendering, insertBatch, forceFilter);
-    }
-
-    return insertBatch;
-  }
-
-  _showNodes(insertBatch) {
-    return this.viewRangeRendered.from + this.viewRangeSize >= insertBatch.lastBatchInsertIndex() &&
-      this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex();
-  }
-
-  /**
-   * This function tries to find the correct insert position within the flat list for the given node.
-   * The function must consider the order of child nodes in the original tree structure and then check
-   * where in the flat list this position is.
-   */
-  _findInsertPositionInFlatList(node) {
-    let childNodes,
-      parentNode = node.parentNode;
-
-    // use root nodes as nodes when no other parent node is available (root case)
-    if (parentNode) {
-      childNodes = parentNode.childNodes;
-    } else {
-      childNodes = this.nodes;
-    }
-
-    // find all visible siblings for our node (incl. our own node, which is probably not yet
-    // in the visible nodes map)
-    let thatNode = node;
-    let siblings = childNodes.filter(node => {
-      return Boolean(this.visibleNodesMap[node.id]) || node === thatNode;
-    });
-
-    // when there are no visible siblings, insert below the parent node
-    if (siblings.length === 0) {
-      return this._findPositionInFlatList(parentNode) + 1;
-    }
-
-    let nodePos = siblings.indexOf(node);
-
-    // when there are no prev. siblings in the flat list, insert below the parent node
-    if (nodePos === 0) {
-      return this._findPositionInFlatList(parentNode) + 1;
-    }
-
-    let prevSiblingNode = siblings[nodePos - 1];
-    let prevSiblingPos = this._findPositionInFlatList(prevSiblingNode);
-
-    // when the prev. sibling is not in the flat list, insert below the parent node
-    if (prevSiblingPos === -1) {
-      return this._findPositionInFlatList(parentNode) + 1;
-    }
-
-    // find the index of the last child element of our prev. sibling node
-    // that's where we want to insert the new node. We go down the flat list
-    // starting from the prev. sibling node, until we hit a node that does not
-    // belong to the sub tree of the prev. sibling node.
-    let i, checkNode;
-    for (i = prevSiblingPos; i < this.visibleNodesFlat.length; i++) {
-      checkNode = this.visibleNodesFlat[i];
-      if (!this._isInSameSubTree(prevSiblingNode, checkNode)) {
-        return i;
-      }
-    }
-
-    // insert at the end of the list
-    return this.visibleNodesFlat.length;
-  }
-
-  _findPositionInFlatList(node) {
-    return this.visibleNodesFlat.indexOf(node);
-  }
-
-  /**
-   * Checks whether the given checkNode belongs to the same sub tree (or is) the given node.
-   * The function goes up all parentNodes of the checkNode.
-   *
-   * @param {TreeNode} node which is used to for the sub tree comparison
-   * @param {TreeNode} checkNode node which is checked against the given node
-   * @returns {boolean}
-   */
-  _isInSameSubTree(node, checkNode) {
-    do {
-      if (checkNode === node || checkNode.parentNode === node) {
-        return true;
-      }
-      checkNode = checkNode.parentNode;
-    } while (checkNode);
-
-    return false;
-  }
-
   /**
    * Returns true if the given node is a child of one of the selected nodes.
    * The functions goes up the parent node hierarchy.
@@ -1787,137 +1432,6 @@ export default class Tree extends Widget {
       node = node.parentNode;
     }
     return false;
-  }
-
-  /**
-   * Info: the object created here is a bit weird: the array 'insertNodes' is used as function arguments to the Array#splice function at some point.
-   * The signature of that function is: array.splice(index, deleteCount[, element1[,  element2 [, ...]]])
-   * So the first two elements are numbers and all the following elements are TreeNodes or Pages.
-   * @returns {*}
-   */
-  newInsertBatch(insertIndex) {
-    return {
-      insertNodes: [insertIndex, 0], // second element is always 0 (used as argument for deleteCount in Array#splice)
-      $animationWrapper: null,
-      lastBatchInsertIndex: function() {
-        if (this.isEmpty()) {
-          return this.insertAt();
-        }
-        return this.insertAt() + this.insertNodes.length - 3;
-      },
-      nextBatchInsertIndex: function() {
-        // only NBU knows what this means
-        return this.lastBatchInsertIndex() + (this.isEmpty() ? 1 : 2);
-      },
-      isEmpty: function() {
-        return this.insertNodes.length === 2;
-      },
-      length: function() {
-        return this.insertNodes.length - 2;
-      },
-      insertAt: function() {
-        return this.insertNodes[0];
-      },
-      setInsertAt: function(insertAt) {
-        this.insertNodes[0] = insertAt;
-      },
-      containsNode: function(node) {
-        return this.insertNodes.indexOf(node) !== -1;
-      }
-    };
-  }
-
-  checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch) {
-    if (animatedRendering && this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex() && this.viewRangeRendered.to >= insertBatch.lastBatchInsertIndex() && !insertBatch.$animationWrapper) {
-      // we are in visible area so we need a animation wrapper
-      // if parent is in visible area insert after parent else insert before first node.
-      let lastNodeIndex = insertBatch.lastBatchInsertIndex() - 1,
-        nodeBefore = this.viewRangeRendered.from === insertBatch.lastBatchInsertIndex() ? null : this.visibleNodesFlat[lastNodeIndex];
-      if (nodeBefore && lastNodeIndex >= this.viewRangeRendered.from && lastNodeIndex < this.viewRangeRendered.to && !nodeBefore.attached) {
-        // ensure node before is visible
-        this.showNode(nodeBefore, false, lastNodeIndex);
-      }
-      if (nodeBefore && nodeBefore.attached) {
-        insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertAfter(nodeBefore.$node);
-      } else if (parentNode.attached) {
-        insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertAfter(parentNode.$node);
-      } else if (this.$fillBefore) {
-        insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertAfter(this.$fillBefore);
-      } else {
-        let nodeAfter = this.visibleNodesFlat[insertBatch.lastBatchInsertIndex()];
-        insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertBefore(nodeAfter.$node);
-      }
-      insertBatch.animationCompleteFunc = onAnimationComplete;
-      this._$expandAnimationWrappers.push(insertBatch.$animationWrapper);
-    }
-
-    // ----- Helper functions ----- //
-
-    function onAnimationComplete() {
-      insertBatch.$animationWrapper.replaceWith(insertBatch.$animationWrapper.contents());
-      arrays.remove(this._$expandAnimationWrappers, insertBatch.$animationWrapper);
-      insertBatch.$animationWrapper = null;
-      this.runningAnimationsFinishFunc();
-    }
-  }
-
-  checkAndHandleBatch(insertBatch, parentNode, animatedRendering) {
-    if (this.viewRangeRendered.from - 1 === insertBatch.lastBatchInsertIndex()) {
-      // do immediate rendering because list could be longer
-      this.insertBatchInVisibleNodes(insertBatch, false, false);
-      insertBatch = this.newInsertBatch(insertBatch.lastBatchInsertIndex() + 1);
-    }
-    this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
-
-    if (this.viewRangeRendered.from + this.viewRangeSize - 1 === insertBatch.lastBatchInsertIndex()) {
-      // do immediate rendering because list could be longer
-      this.insertBatchInVisibleNodes(insertBatch, true, animatedRendering);
-      insertBatch = this.newInsertBatch(insertBatch.lastBatchInsertIndex() + 1);
-    }
-    return insertBatch;
-  }
-
-  insertBatchInVisibleNodes(insertBatch, showNodes, animate) {
-    if (insertBatch.isEmpty()) {
-      // nothing to add
-      return;
-    }
-    this.visibleNodesFlat.splice(...insertBatch.insertNodes);
-    if (showNodes) {
-      let indexHint = insertBatch.insertAt();
-      for (let i = 2; i < insertBatch.insertNodes.length; i++) {
-        let node = insertBatch.insertNodes[i];
-        this.showNode(node, false, indexHint);
-        if (insertBatch.$animationWrapper) {
-          insertBatch.$animationWrapper.append(node.$node);
-        }
-        indexHint++;
-      }
-      if (insertBatch.$animationWrapper) {
-        let h = insertBatch.$animationWrapper.outerHeight();
-        insertBatch.$animationWrapper
-          .css('height', 0)
-          .animate({
-            height: h
-          }, {
-            start: this.startAnimationFunc,
-            complete: insertBatch.animationCompleteFunc.bind(this),
-            step: this.revalidateLayoutTree.bind(this),
-            duration: 200,
-            queue: false
-          });
-      }
-    } else if (insertBatch.$animationWrapper && insertBatch.animationCompleteFunc) {
-      insertBatch.animationCompleteFunc.call(this);
-    }
-  }
-
-  _addToVisibleFlatListNoCheck(node, insertIndex, animatedRendering) {
-    arrays.insert(this.visibleNodesFlat, node, insertIndex);
-    this.visibleNodesMap[node.id] = true;
-    if (this.rendered) {
-      this.showNode(node, animatedRendering, insertIndex);
-    }
   }
 
   scrollTo(node, options) {
@@ -1952,7 +1466,7 @@ export default class Tree extends Widget {
   }
 
   ensureExpansionVisible(node) {
-    // only scroll if treenode is in dom and the current node is selected (user triggered expansion change)
+    // only scroll if tree node is in dom and the current node is selected (user triggered expansion change)
     if (!node || !node.$node || this.selectedNodes[0] !== node) {
       return;
     }
@@ -2122,22 +1636,17 @@ export default class Tree extends Widget {
     let nodesToInsert = [];
     while (currNode.parentNode) {
       parentNodes.push(currNode.parentNode);
-      if (!this.visibleNodesMap[currNode.id]) {
+      if (!node.rendered && !node.expanded) {
         nodesToInsert.push(currNode);
       }
       currNode = currNode.parentNode;
     }
 
     for (i = parentNodes.length - 1; i >= 0; i--) {
-      if (nodesToInsert.indexOf(parentNodes[i]) !== -1) {
-        this._addToVisibleFlatList(parentNodes[i], false);
-      }
-      if (!parentNodes[i].expanded) {
-        this.expandNode(parentNodes[i], {
-          renderExpansion: false,
-          renderAnimated: false
-        });
-      }
+      this.expandNode(parentNodes[i], {
+        renderExpansion: false,
+        renderAnimated: false
+      });
     }
     if (this.rendered && nodesToInsert.length > 0) {
       this._rerenderViewport();
@@ -2152,6 +1661,199 @@ export default class Tree extends Widget {
     for (let i = scout.nvl(startIndex, 0); i < nodes.length; i++) {
       nodes[i].childNodeIndex = i;
     }
+  }
+
+  _updateFilteredNodes(applyFilters, changed) {
+    changed = Boolean(changed);
+    applyFilters = scout.nvl(applyFilters, true);
+    this._filteredNodes = this.nodes.filter(function(node) {
+      if (applyFilters) {
+        changed = this._applyFiltersForNode(node) || changed;
+      }
+      return node.filterAccepted;
+    }, this);
+
+    if (changed) {
+      this._triggerFilter();
+    }
+  }
+
+  _updateVisibleNodes() {
+    this.visibleNodesFlat = this._computeVisibleNodes();
+    // rebuild the nodes by id map of visible nodes
+    this.visibleNodesMap = this.visibleNodesFlat.reduce((map, node) => {
+      map[node.id] = node;
+      return map;
+    }, {});
+
+    // FIXME probably done outside
+    // if (this.initialized) {
+    //   // deselect not visible nodes
+    //   this.deselectNodes(this.selectedNodes.filter(function(selectedNode) {
+    //     return !this.visibleNodesMap[selectedNode.id];
+    //   }, this));
+    // }
+  }
+
+  _computeVisibleNodes(nodes) {
+    let visibleNodes = [];
+    nodes = nodes || this.nodes;
+    nodes.forEach(node => {
+      let visibleChildNodes = this._computeVisibleNodes(node.childNodes);
+      if (node.filterAccepted) {
+        visibleNodes.push(node);
+      } else if (visibleChildNodes.length > 0) {
+        visibleNodes.push(node);
+      }
+      if (node.expanded) {
+        visibleNodes = visibleNodes.concat(visibleChildNodes);
+      }
+    });
+    return visibleNodes;
+  }
+
+  visibleChildNodes(node) {
+    return node.childNodes.filter(child => {
+      return Boolean(this.visibleNodesMap[child.id]);
+    });
+  }
+
+  _renderNodeDelta() {
+    if (!this.rendered) {
+      return;
+    }
+    let renderedNodes = [];
+    let nodesToHide = [];
+    this.$nodes().each((i, elem) => {
+      let $node = $(elem),
+        node = $node.data('node');
+      if (this.visibleNodesFlat.indexOf(node) < 0) {
+        // remember for remove animated
+        node.$node.detach();
+        nodesToHide.push(node);
+      } else {
+        renderedNodes.push(node);
+      }
+    });
+// FIXME zuklappen einer node weit unten springt, war das vorher schon?
+    this._rerenderViewport();
+    // insert nodes to remove animated
+    nodesToHide.forEach(function(node) {
+      node.$node.insertAfter(this.$fillBefore);
+    }, this);
+    // Nodes removed by an animation are still there, new nodes were appended -> reset correct node order
+    this._order$Nodes().insertAfter(this.$fillBefore);
+
+    nodesToHide.forEach(function(node) {
+      // remove animated
+      this._hideNode(node);
+    }, this);
+
+    this.$nodes().each((i, elem) => {
+      let $node = $(elem),
+        node = $node.data('node');
+      if ($node.hasClass('hiding')) {
+        // Do not remove nodes which are removed using an animation
+        // node.$node may already point to a new node -> don't call removeNode to not accidentally remove the new node
+        return;
+      }
+      if (renderedNodes.indexOf(node) < 0) {
+        this._showNode(node);
+      }
+    });
+    this._renderScrollTop();
+  }
+
+  /**
+   * Sorts the given $nodes according to the node index
+   */
+  _order$Nodes($nodes) {
+    let nodes = [];
+    this.visitNodes(node => {
+      nodes.push(node);
+      return false;
+    });
+
+    // Find nodes using jquery because
+    // this.filteredNodes() may be empty but there may be $nodes which are getting removed by animation
+    $nodes = $nodes || this.$nodes();
+    return $nodes.sort((elem1, elem2) => {
+      let $node1 = $(elem1),
+        $node2 = $(elem2),
+        node1 = $node1.data('node'),
+        node2 = $node2.data('node');
+
+      return nodes.indexOf(node1) - nodes.indexOf(node2);
+    });
+  }
+
+  _pathIndex(node) {
+    let indices = '';
+    while (node) {
+      indices += node.childNodeIndex;
+      node = node.parentNode;
+    }
+    return parseInt(indices);
+  }
+
+  /**
+   * Animates the rendering of a node by setting it to invisible before doing a slideDown animation. The node needs to already be rendered.
+   */
+  _showNode(node) {
+    let $node = node.$node;
+    if (!$node) {
+      return;
+    }
+    if ($node.is('.showing')) {
+      return;
+    }
+
+    $node.hide(); // intentionally don't use setVisible(false) here
+    $node.addClass('showing');
+    $node.removeClass('hiding');
+    $node.stop().slideDown({
+      duration: 250,
+      complete: () => {
+        $node.removeClass('showing');
+        this.updateScrollbars();
+      }
+    });
+  }
+
+  /**
+   * Animates the removal of a node by doing a slideUp animation. The node will be removed after the animation finishes.
+   */
+  _hideNode(node) {
+    let $node = node.$node;
+    if (!$node) {
+      return;
+    }
+    if ($node.is('.hiding')) {
+      return;
+    }
+
+    $node.addClass('hiding');
+    $node.removeClass('showing');
+    $node.stop().slideUp({
+      duration: 250,
+      complete: () => {
+        if (!node.attached) {
+          // ignore already removed nodes
+          return;
+        }
+        // JQuery sets display to none which we don't need because node will be detached.
+        // If node is added using another method than slideDown (used by show node), it would be invisible.
+        // Example: parent is collapsed while nodes are hiding -> remove filter, expand parent -> invisible nodes
+        $node.css('display', '');
+        $node.detach();
+        if ($node[0] === node.$node[0]) {
+          // Only set to null if node still is linked to to original $node
+          // If node got rendered again while the animation is still running, node.$node points to the new $node
+          node.attached = false; // FIXME possible?
+        }
+        this.updateScrollbars();
+      }
+    });
   }
 
   insertNode(node, parentNode) {
@@ -2333,6 +2035,7 @@ export default class Tree extends Widget {
       // remove children from node map
       Tree.visitNodes(this._destroyTreeNode.bind(this), node.childNodes);
     }, this);
+    this._updateVisibleNodes();
 
     // update child node indices
     parentNodesToReindex.forEach(p => this._updateChildNodeIndex(p.childNodes));
@@ -2374,7 +2077,7 @@ export default class Tree extends Widget {
       this.nodes = [];
     }
     Tree.visitNodes(updateNodeMap.bind(this), nodes);
-
+    this._updateVisibleNodes();
     this.deselectNodes(nodes, {collectChildren: true});
     this.uncheckNodes(nodes, {collectChildren: true});
 
@@ -2406,24 +2109,14 @@ export default class Tree extends Widget {
       }
       // Make a copy so that original array stays untouched
       parentNode.childNodes = childNodes.slice();
-      this._removeChildrenFromFlatList(parentNode, false);
-      if (parentNode.expanded) {
-        this._addChildrenToFlatList(parentNode, null, false);
-      }
     } else {
       if (this.nodes.length !== childNodes.length) {
         throw new Error('Node order may not be updated because lengths of the arrays differ.');
       }
       // Make a copy so that original array stays untouched
       this.nodes = childNodes.slice();
-      this.nodes.forEach(function(node) {
-        this._removeFromFlatList(node, false);
-        this._addToVisibleFlatList(node, false);
-        if (node.expanded) {
-          this._addChildrenToFlatList(node, null, false);
-        }
-      }, this);
     }
+    this._updateVisibleNodes();
 
     this.trigger('childNodeOrderChanged', {
       parentNode: parentNode
@@ -2446,7 +2139,7 @@ export default class Tree extends Widget {
     };
     $.extend(opts, options);
     let updatedNodes = [];
-    // use enabled computed because when the parent of the table is disabled, it should not be allowed to check rows
+    // use enabled computed because when the parent of the table is disabled, it should not be allowed to check nodes
     if (!this.checkable || !this.enabledComputed && opts.checkOnlyEnabled) {
       return;
     }
@@ -2748,8 +2441,8 @@ export default class Tree extends Widget {
         .filter(it => it.filterAccepted)
         .forEach(node => this._expandAllParentNodes(node));
     }
-    result.newlyShown.forEach(node => this._addToVisibleFlatList(node, this.filterAnimated));
-    result.newlyHidden.forEach(node => this._removeFromFlatList(node, this.filterAnimated));
+    this._renderNodeDelta();
+    this.revealSelection();
     this.filteredElementsDirty = false;
   }
 
@@ -2764,10 +2457,12 @@ export default class Tree extends Widget {
         if (!node.isFilterAccepted()) {
           newlyHidden.push(...result.newlyHidden);
         }
-        this.viewRangeDirty = true;
+        // this.viewRangeDirty = true;
       }
     }
-    newlyHidden.forEach(h => this._removeFromFlatList(h, animated));
+    // FIXME visualize?
+    // newlyHidden.forEach(h => this._removeFromFlatList(h, animated));
+    this._updateVisibleNodes();
     this._nodesFiltered(newlyHidden);
   }
 
@@ -2790,10 +2485,10 @@ export default class Tree extends Widget {
     }
     this._nodesFiltered(result.newlyHidden);
 
-    if (applyNewHiddenShownNodes) {
-      result.newlyShown.forEach(node => this._addToVisibleFlatList(node, animated));
-      result.newlyHidden.forEach(node => this._removeFromFlatList(node, animated));
-    }
+    // if (applyNewHiddenShownNodes) {
+    //   result.newlyShown.forEach(node => this._addToVisibleFlatList(node, animated));
+    //   result.newlyHidden.forEach(node => this._removeFromFlatList(node, animated));
+    // }
     return result;
   }
 
@@ -2830,7 +2525,7 @@ export default class Tree extends Widget {
       pushTo.unshift(node);
 
       if (this.rendered) {
-        this.viewRangeDirty = true;
+        // this.viewRangeDirty = true; // FIXME why?
       }
     }
 
@@ -2875,34 +2570,6 @@ export default class Tree extends Widget {
     this.filterSupport.renderFilterField();
   }
 
-  /**
-   * Just insert node in DOM. NO check if in viewRange
-   */
-  _insertNodesInDOM(nodes, indexHint) {
-    if (!this.rendered && !this.rendering) {
-      return;
-    }
-    nodes = nodes.filter(function(node) {
-      let index = indexHint === undefined ? this.visibleNodesFlat.indexOf(node) : indexHint;
-      if (index === -1 || !(this.viewRangeRendered.from + this.viewRangeSize >= index && this.viewRangeRendered.from <= index && this.viewRangeSize > 0) || node.attached) {
-        // node is not visible
-        return false;
-      }
-      if (!node.rendered) {
-        this._renderNode(node);
-      }
-      node._decorate();
-      this._insertNodeInDOMAtPlace(node, index);
-      if (this.prevSelectedNode === node) {
-        this._highlightPrevSelectedNode();
-      }
-      node.rendered = true;
-      node.attached = true;
-      return true;
-    }, this);
-    this._installNodes(nodes);
-  }
-
   _installNodes(nodes) {
     // The measuring is separated into 3 blocks for performance reasons -> separates reading and setting of styles
     // 1. Prepare style for measuring
@@ -2939,125 +2606,6 @@ export default class Tree extends Widget {
         }
         node.$node.css('display', '');
       }, this);
-    }
-  }
-
-  /**
-   * Attaches node to DOM, if it is visible and in view range
-   * */
-  _ensureNodeInDOM(node, useAnimation, indexHint) {
-    if (node && !node.attached && node === this.visibleNodesFlat[indexHint] && indexHint >= this.viewRangeRendered.from && indexHint < this.viewRangeRendered.to) {
-      this.showNode(node, useAnimation, indexHint);
-    }
-  }
-
-  _insertNodeInDOMAtPlace(node, index) {
-    let $node = node.$node;
-
-    if (index === 0) {
-      if (this.$fillBefore) {
-        $node.insertAfter(this.$fillBefore);
-      } else {
-        this.$data.prepend($node);
-      }
-      return;
-    }
-
-    // append after index
-    let nodeBefore = this.visibleNodesFlat[index - 1];
-    this._ensureNodeInDOM(nodeBefore, false, index - 1);
-    if (nodeBefore.attached) {
-      $node.insertAfter(nodeBefore.$node);
-      return;
-    }
-
-    if (index + 1 < this.visibleNodesFlat.length) {
-      let nodeAfter = this.visibleNodesFlat[index + 1];
-      if (nodeAfter.attached) {
-        $node.insertBefore(nodeAfter.$node);
-        return;
-      }
-    }
-
-    // used when the tree is scrolled
-    if (this.$fillBefore) {
-      $node.insertAfter(this.$fillBefore);
-    } else {
-      this.$data.prepend($node);
-    }
-  }
-
-  showNode(node, useAnimation, indexHint) {
-    if (!this.rendered || (node.attached && !node.$node.hasClass('hiding'))) {
-      return;
-    }
-    if (!node.attached) {
-      this._ensureNodeInDOM(node.parentNode, useAnimation, indexHint - 1);
-      this._insertNodesInDOM([node], indexHint);
-    }
-    if (!node.rendered) {
-      return;
-    }
-    let $node = node.$node;
-    if ($node.is('.showing')) {
-      return;
-    }
-    $node.removeClass('hiding');
-    let that = this;
-    if (useAnimation) {
-      $node.addClass('showing');
-      // hide node first and then make it appear using slideDown (setVisible(false) won't work because it would stay invisible during the animation)
-      $node.hide();
-      $node.stop(false, true).slideDown({
-        duration: 250,
-        start: that.startAnimationFunc,
-        complete: () => {
-          that.runningAnimationsFinishFunc();
-          $node.removeClass('showing');
-        }
-      });
-    }
-  }
-
-  hideNode(node, useAnimation, suppressDetachHandling) {
-    if (!node.attached) {
-      return;
-    }
-    this.viewRangeDirty = true;
-    let that = this,
-      $node = node.$node;
-    if (!$node) {
-      // node is not rendered
-      return;
-    }
-
-    if ($node.is('.hiding')) {
-      return;
-    }
-    $node.removeClass('showing');
-    if (useAnimation) {
-      $node.addClass('hiding');
-      this._renderViewportBlocked = true;
-      $node.stop(false, true).slideUp({
-        duration: 250,
-        start: that.startAnimationFunc,
-        complete: () => {
-          that.runningAnimationsFinishFunc();
-          $node.removeClass('hiding');
-          if (!$node.hasClass('showing')) {
-            // JQuery sets display to none which we don't need because node will be detached.
-            // If node is added using another method than slideDown (used by show node), it would be invisible.
-            // Example: parent is collapsed while nodes are hiding -> remove filter, expand parent -> invisible nodes
-            $node.css('display', '');
-            $node.detach();
-            node.attached = false;
-          }
-        }
-      });
-    } else if (!suppressDetachHandling) {
-      $node.detach();
-      node.attached = false;
-      that.invalidateLayoutTree();
     }
   }
 
@@ -3132,7 +2680,7 @@ export default class Tree extends Widget {
         return false;
       }
     }
-    // Because we suppress handling by browser we have to set focus manually
+    // Because we suppress handling by bnodeser we have to set focus manually
     if (this.requestFocusOnNodeControlMouseDown) {
       this.focus();
     }
