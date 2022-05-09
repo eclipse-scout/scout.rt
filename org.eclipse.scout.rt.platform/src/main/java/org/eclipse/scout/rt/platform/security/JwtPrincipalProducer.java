@@ -45,10 +45,6 @@ public class JwtPrincipalProducer implements IPrincipalProducer, IPrincipalProdu
     return produceJwt(username, jwtTokenString, accessToken, refreshToken, oid);
   }
 
-  public JwtPrincipal produceJwt(String username, String jwtTokenString, String accessToken, String refreshToken) {
-    return produceJwt(username, jwtTokenString, accessToken, refreshToken, null);
-  }
-
   /**
    * @param username
    *          or userId
