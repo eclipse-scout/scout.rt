@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -2452,7 +2452,7 @@ export default class Tree extends Widget {
     }
     nodes = arrays.ensure(nodes);
     nodes.forEach(function(node) {
-      if (!node.enabled && opts.checkOnlyEnabled || node.checked === opts.checked) {
+      if (!node.enabled && opts.checkOnlyEnabled || node.checked === opts.checked || !node.filterAccepted) {
         if (opts.checkChildren) {
           this.checkNodes(node.childNodes, opts);
         }
