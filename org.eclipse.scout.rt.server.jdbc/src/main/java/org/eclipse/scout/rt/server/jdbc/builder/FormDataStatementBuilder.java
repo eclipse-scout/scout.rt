@@ -797,9 +797,9 @@ public class FormDataStatementBuilder implements DataModelConstants {
       if (subContrib.getWhereParts().size() + subContrib.getHavingParts().size() > 0) {
         if (count > 0) {
           buf.append(" OR ");
-          if (node.isNegative()) {
-            buf.append(" NOT ");
-          }
+        }
+        if (node.isNegative()) {
+          buf.append(" NOT ");
         }
         buf.append("(");
         // remove possible outer join signs (+) in where / having constraint
