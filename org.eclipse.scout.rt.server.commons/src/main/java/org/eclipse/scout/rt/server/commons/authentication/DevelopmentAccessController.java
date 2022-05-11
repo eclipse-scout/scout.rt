@@ -51,7 +51,7 @@ public class DevelopmentAccessController implements IAccessController {
   public DevelopmentAccessController init(final DevelopmentAuthConfig config) {
     AnonymousAuthConfig anonymousAuthConfig = m_config
         .withEnabled(config.isEnabled() && Platform.get().inDevelopmentMode())
-        .withUsername(System.getProperty("user.name"))
+        .withUsername(BEANS.get(DevUsernameProvider.class).getUsername())
         .withPutPrincipalOnSession(config.isPutPrincipalOnSession());
     if (config.getPrincipalProducer() != null) {
       anonymousAuthConfig.withPrincipalProducer(config.getPrincipalProducer());
