@@ -59,7 +59,7 @@ public interface IDoStructureMigrationHandler {
    * @param ctx
    *          Context
    * @param doEntity
-   *          Do entity according to {@link #getTypeNames()}.
+   *          Do entity to apply migration, according to {@link #getTypeNames()} (non-<code>null</code>)
    * @return <code>true</code> if data object was changed in any way (including type version update only),
    *         <code>false</code> otherwise.
    */

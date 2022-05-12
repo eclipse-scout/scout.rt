@@ -43,12 +43,16 @@ public abstract class AbstractDoStructureMigrationHandler implements IDoStructur
   }
 
   /**
-   * For convience. Same as {@link #applyMigration(DoStructureMigrationContext, IDoEntity)} except that the type version
-   * of the data object itself must not be updated, the caller of this method takes care of handling type version
-   * updates.
+   * For convenience. Same as {@link #applyMigration(DoStructureMigrationContext, IDoEntity)} except that the type
+   * version of the data object itself must not be updated, the caller of this method takes care of handling type
+   * version updates.
    * <p>
    * If special type version update handling is required, override {@link #updateTypeVersion(IDoEntity)}
    *
+   * @param ctx
+   *          Context
+   * @param doEntity
+   *          Do entity to apply migration, according to {@link #getTypeNames()} (non-<code>null</code>)
    * @return <code>true</code> if data object was changed in any way, <code>false</code> otherwise.
    */
   protected abstract boolean migrate(DoStructureMigrationContext ctx, IDoEntity doEntity);
