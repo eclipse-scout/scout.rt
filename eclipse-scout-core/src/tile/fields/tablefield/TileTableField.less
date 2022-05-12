@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -52,6 +52,23 @@
 
       & > .table-header-item {
         color: @tile-table-default-color;
+
+        &.sorted,
+        &.grouped,
+        &.filtered {
+          padding-right: @table-header-item-padding-right;
+
+          &.halign-right,
+          &.halign-center {
+            padding-right: @table-header-item-padding-left;
+          }
+
+          &.last.halign-left,
+          &.last.halign-center,
+          &.last.halign-right {
+            padding-right: @table-header-item-padding-right-last;
+          }
+        }
 
         & > .table-header-item-state {
           display: none;
