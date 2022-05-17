@@ -104,6 +104,12 @@ export default class TableLayout extends AbstractLayout {
       // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
       this.table._renderViewport();
 
+      // Render scroll top again to make sure the data is really at the correct position after rendering viewport.
+      // Somehow table.$data[0].scrollTop changes during _renderViewport sometimes (e.g. when there are aggregate rows)
+      if (!htmlContainer.layouted) {
+        this.table._renderScrollTop();
+      }
+
       // Make sure tooltips and editor popup are at correct position after layouting (e.g after window resizing)
       this.table.tooltips.forEach(tooltip => {
         if (tooltip.rendered) {
