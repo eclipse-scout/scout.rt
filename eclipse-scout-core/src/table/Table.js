@@ -555,7 +555,7 @@ export default class Table extends Widget {
       return; // row was removed while loading the image
     }
     let oldRowHeight = row.height;
-    row.height = $row.outerHeight(true);
+    row.height = this._measureRowHeight($row);
     if (oldRowHeight !== row.height) {
       this.invalidateLayoutTree();
     }
@@ -1528,12 +1528,12 @@ export default class Table extends Widget {
 
   _updateRowHeight() {
     let $emptyRow = this.$data.appendDiv('table-row');
-    let $emptyAggrRow = this.$data.appendDiv('table-aggregate-row');
+    let $emptyAggrRow = this._build$AggregateRow().appendTo(this.$data);
 
     $emptyRow.appendDiv('table-cell').html('&nbsp;');
-    $emptyAggrRow.appendDiv('table-cell').html('&nbsp;');
-    this.rowHeight = $emptyRow.outerHeight(true);
-    this.aggregateRowHeight = $emptyAggrRow.outerHeight(true);
+    $emptyAggrRow.appendDiv('table-cell table-aggregate-cell').appendSpan('text').html('&nbsp;');
+    this.rowHeight = this._measureRowHeight($emptyRow);
+    this.aggregateRowHeight = this._measureRowHeight($emptyAggrRow);
     $emptyRow.remove();
     $emptyAggrRow.remove();
   }
@@ -1546,14 +1546,14 @@ export default class Table extends Widget {
       if (!row.$row) {
         row.height = null;
       } else {
-        row.height = row.$row.outerHeight(true);
+        row.height = this._measureRowHeight(row.$row);
       }
     });
     this._aggregateRows.forEach(aggregateRow => {
       if (!aggregateRow.$row) {
         aggregateRow.height = null;
       } else {
-        aggregateRow.height = aggregateRow.$row.outerHeight(true);
+        aggregateRow.height = this._measureRowHeight(aggregateRow.$row);
       }
     });
   }
@@ -1937,7 +1937,7 @@ export default class Table extends Widget {
    * is expected to be linked with the corresponding '$row' (row.$row and $row.data('row')).
    */
   _installRow(row) {
-    row.height = row.$row.outerHeight(true);
+    row.height = this._measureRowHeight(row.$row);
 
     if (row.hasError) {
       this._showCellErrorForRow(row);
@@ -2397,14 +2397,14 @@ export default class Table extends Widget {
         return;
       }
 
-      let $aggregateRow = this._buildAggregateRowDiv(aggregateRow);
+      let $aggregateRow = this._build$AggregateRow(aggregateRow);
       $aggregateRow[insertFunc](refRow.$row).width(this.rowWidth);
 
       this.visibleColumns()
         .map(column => $(column.buildCellForAggregateRow(aggregateRow)).appendTo($aggregateRow))
         .forEach($c => this._resizeAggregateCell($c));
 
-      aggregateRow.height = $aggregateRow.outerHeight(true);
+      aggregateRow.height = this._measureRowHeight($aggregateRow);
       aggregateRow.$row = $aggregateRow;
       if (animate) {
         this._showRow(aggregateRow);
@@ -2412,7 +2412,7 @@ export default class Table extends Widget {
     }, this);
   }
 
-  _buildAggregateRowDiv(aggregateRow) {
+  _build$AggregateRow(aggregateRow) {
     let onTop = this.groupingStyle === Table.GroupingStyle.TOP;
     let $aggregateRow = this.$container
       .makeDiv('table-aggregate-row')
@@ -4996,8 +4996,11 @@ export default class Table extends Widget {
   }
 
   _heightForRow(row) {
-    let height = 0,
+    let height = 0;
+    let aggregateRow = row.aggregateRowBefore;
+    if (this.groupingStyle === Table.GroupingStyle.BOTTOM) {
       aggregateRow = row.aggregateRowAfter;
+    }
 
     if (row.height) {
       height = row.height;
@@ -5015,6 +5018,10 @@ export default class Table extends Widget {
     }
 
     return height;
+  }
+
+  _measureRowHeight($row) {
+    return graphics.size($row, {includeMargin: true, exact: true}).height;
   }
 
   /**
