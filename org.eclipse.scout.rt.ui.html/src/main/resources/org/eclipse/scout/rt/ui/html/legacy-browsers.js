@@ -30,9 +30,9 @@ var xmlHttp = new XMLHttpRequest();
 xmlHttp.onreadystatechange = function() {
   if (xmlHttp.readyState == 4 && xmlHttp.status >= 200 && xmlHttp.status < 300) {
     root.innerHTML = xmlHttp.responseText;
-    var buttons = document.getElementsByClassName('button');
-    for (var i = 0; i < buttons.length; i++) {
-      buttons[i].classList.add('hidden');
+    var buttonBar = document.getElementsByClassName('button-bar');
+    for (var i = 0; i < buttonBar.length; i++) {
+      buttonBar[i].classList.add('hidden');
     }
   }
 };
