@@ -469,15 +469,12 @@
   overflow: hidden;
   padding-left: var(--table-row-margin-x);
   padding-right: var(--table-row-margin-x);
+  font-size: @table-aggregate-row-font-size;
 
   & > .table-cell {
     padding: var(--table-row-padding-y) @table-cell-padding-right 0 @table-cell-padding-left;
     border-bottom: 0;
     height: 100%;
-
-    & > .font-icon {
-      margin-top: 1px;
-    }
   }
 }
 
@@ -489,7 +486,7 @@
   margin-top: -1px; // top border should cover bottom border of the previous row
   padding-left: var(--table-row-margin-x);
   padding-right: var(--table-row-margin-x);
-  font-size: 12px;
+  font-size: @table-aggregate-row-font-size;
 
   & > .table-cell {
     border-bottom: 0;
@@ -521,10 +518,17 @@
     display: inline-block;
     color: @text-color;
     vertical-align: middle;
+    line-height: @table-aggregate-cell-font-icon-line-height;
   }
 
-  &.sum > .table-cell-icon, &.avg > .table-cell-icon {
-    font-size: @font-size-extra-small;
+  &.sum > .table-cell-icon,
+  &.avg > .table-cell-icon {
+    font-size: @table-aggregate-sum-avg-font-icon-size;
+  }
+
+  &.min > .table-cell-icon,
+  &.max > .table-cell-icon {
+    font-size: @table-aggregate-min-max-font-icon-size;
   }
 
   /* if aggregation is based on selected rows */
