@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ExternalBaseUrlProperty;
+import org.eclipse.scout.rt.shared.ui.IUiEngineType;
 import org.eclipse.scout.rt.shared.ui.UiEngineType;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
@@ -124,7 +125,8 @@ public class HtmlFileLoader extends AbstractResourceLoader {
   }
 
   public boolean isBrowserSupported() {
-    return !UiEngineType.IE.equals(UserAgentUtility.getCurrentUserAgent().getUiEngineType());
+    IUiEngineType uiEngineType = UserAgentUtility.getCurrentUserAgent().getUiEngineType();
+    return !UiEngineType.IE.equals(uiEngineType) && !UiEngineType.EDGE.equals(uiEngineType);
   }
 
   public HtmlDocumentParserParameters createHtmlDocumentParserParameters(String htmlPath) {
