@@ -164,7 +164,9 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
   @Override
   public BinaryResourceHolder provideBinaryResource(String filenameWithFingerprint) {
     BinaryResourceHolder holder = BinaryResourceUrlUtility.provideBinaryResource(filenameWithFingerprint, getModel().getUIFacade()::requestBinaryResourceFromUI);
-    holder.addHttpResponseInterceptor(new BrowserFieldContentHttpResponseInterceptor(getUiSession()));
+    if (holder != null) {
+      holder.addHttpResponseInterceptor(new BrowserFieldContentHttpResponseInterceptor(getUiSession()));
+    }
     return holder;
   }
 

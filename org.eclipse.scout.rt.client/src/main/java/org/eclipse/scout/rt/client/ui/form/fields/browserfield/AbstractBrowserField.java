@@ -397,7 +397,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
         }
       }
     }
-    LOG.warn("Could not resolve binary resource for filename: {}", filename);
+    LOG.warn("Could not resolve binary resource for filename: {}. Origin: {}", filename, getClass());
     return null;
   }
 
