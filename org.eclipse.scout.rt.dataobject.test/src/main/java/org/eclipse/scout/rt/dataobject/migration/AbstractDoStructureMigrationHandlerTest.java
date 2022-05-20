@@ -69,11 +69,11 @@ public abstract class AbstractDoStructureMigrationHandlerTest {
    * @param toVersionClass
    *          To version is required to determine the file to load that contains the expected data object (target)
    */
-  public void testMigration(String filenamePrefix, Class<? extends ITypeVersion> fromVersionClass, Class<? extends ITypeVersion> toVersionClass) throws IOException {
-    testMigration(filenamePrefix, BEANS.get(fromVersionClass).getVersion().unwrap(), toVersionClass);
+  public void testMigration(String filenamePrefix, Class<? extends ITypeVersion> fromVersionClass, Class<? extends ITypeVersion> toVersionClass, IDoStructureMigrationLocalContextData... initialLocalContextData) throws IOException {
+    testMigration(filenamePrefix, BEANS.get(fromVersionClass).getVersion().unwrap(), toVersionClass, initialLocalContextData);
   }
 
-  public void testMigration(String filenamePrefix, String fromVersionText, Class<? extends ITypeVersion> toVersionClass) throws IOException {
+  public void testMigration(String filenamePrefix, String fromVersionText, Class<? extends ITypeVersion> toVersionClass, IDoStructureMigrationLocalContextData... initialLocalContextData) throws IOException {
     NamespaceVersion toVersion = BEANS.get(toVersionClass).getVersion();
     IPrettyPrintDataObjectMapper dataObjectMapper = BEANS.get(IPrettyPrintDataObjectMapper.class);
 
@@ -84,7 +84,7 @@ public abstract class AbstractDoStructureMigrationHandlerTest {
     }
 
     DoStructureMigrationContext ctx = BEANS.get(DoStructureMigrationContext.class);
-    boolean changed = BEANS.get(DoStructureMigrator.class).migrateDataObject(ctx, actual, toVersion);
+    boolean changed = BEANS.get(DoStructureMigrator.class).migrateDataObject(ctx, actual, toVersion, initialLocalContextData);
 
     assertTrue("Data object was not changed by migration", changed);
 
