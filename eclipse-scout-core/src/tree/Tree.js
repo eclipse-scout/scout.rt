@@ -2926,6 +2926,10 @@ export default class Tree extends Widget {
       } else if (newWidth > this.maxNodeWidth) {
         this.maxNodeWidth = newWidth;
         this.nodeWidthDirty = true;
+      } else if (newWidth === oldWidth && newWidth === 0) {
+        // newWidth and oldWidth are 0: this might be because the tree is invisible while a node is added:
+        // Mark as dirty to update the width later during layouting (when the tree gets visible and the width is available)
+        this.nodeWidthDirty = true;
       }
       node.width = newWidth;
     }, this);
