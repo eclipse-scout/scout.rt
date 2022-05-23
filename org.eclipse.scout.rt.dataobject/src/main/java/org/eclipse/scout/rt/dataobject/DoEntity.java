@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,7 +21,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StreamUtility;
 
 /**
@@ -50,7 +51,7 @@ public class DoEntity implements IDoEntity {
   /**
    * @return Node of attribute {@code attributeName} or {@code null}, if attribute is not available.
    *         <p>
-   *         The attribute node is either a {@link DoValue<T>} or a {@link DoList<T>} wrapper object.
+   *         The attribute node is either a {@link DoValue} or a {@link DoList} wrapper object.
    */
   @Override
   public DoNode<?> getNode(String attributeName) {
@@ -76,20 +77,34 @@ public class DoEntity implements IDoEntity {
   }
 
   /**
-   * Adds new value to attribute map. The value is wrapped within a {@link DoValue}.
+   * Associates the specified value with the specified attribute name in this entity. If the entity previously contained
+   * a mapping for the attribute name, the old value is replaced by the specified value wrapped within a
+   * {@link DoValue}.
    */
   @Override
   public void put(String attributeName, Object value) {
-    doValue(attributeName).set(value);
+    if (has(attributeName)) {
+      getValueNode(attributeName).set(value);
+    }
+    else {
+      newValueNode(attributeName, value).create();
+    }
   }
 
   /**
-   * Adds new list value to attribute map. The value is wrapped within a {@link DoList}.
+   * Associates the specified list value with the specified attribute name in this entity. If the entity previously
+   * contained a mapping for the attribute name, the old list value is replaced by the specified value wrapped within a
+   * {@link DoList}.
    */
   @Override
   public <V> void putList(String attributeName, List<V> value) {
-    DoList<V> doList = doList(attributeName);
-    doList.set(value);
+    if (has(attributeName)) {
+      DoList<V> list = getListNode(attributeName);
+      list.set(value);
+    }
+    else {
+      newListNode(attributeName, value).create();
+    }
   }
 
   /**
@@ -128,33 +143,63 @@ public class DoEntity implements IDoEntity {
   }
 
   /**
-   * Creates a new {@link DoValue} value attribute node wrapping a value of type {@code V}
+   * Returns the {@link DoValue} attribute node wrapping a value of type {@code V}. A new node is created, if this
+   * entity does not already contain a node for the given {@code attributName}.
    */
   protected <V> DoValue<V> doValue(String attributeName) {
-    Assertions.assertNotNull(attributeName, "attribute name cannot be null");
-    DoNode<?> node = getNode(attributeName);
-    if (node != null) {
-      Assertions.assertInstance(node, DoValue.class, "Existing node {} is not of type {}, cannot change the node type!", node, DoValue.class);
-      @SuppressWarnings("unchecked")
-      DoValue<V> valueNode = (DoValue<V>) node;
-      return valueNode;
+    if (has(attributeName)) {
+      return getValueNode(attributeName);
     }
-    return new DoValue<>(attributeName, attribute -> putNode(attributeName, attribute));
+    return newValueNode(attributeName, null);
   }
 
   /**
-   * Creates a new {@link DoList} list value attribute node wrapping a list of type {@code List<V>}
+   * Returns the {@link DoValue} attribute node wrapping a value of type {@code V}.
+   */
+  <V> DoValue<V> getValueNode(String attributeName) {
+    assertNotNull(attributeName, "attribute name cannot be null");
+    DoNode<?> node = getNode(attributeName);
+    assertInstance(node, DoValue.class, "Existing node {} is null or not of type {}", node, DoValue.class);
+    @SuppressWarnings("unchecked")
+    DoValue<V> valueNode = (DoValue<V>) node;
+    return valueNode;
+  }
+
+  /**
+   * Creates a new {@code DoValue} node using the given {@code initialValue}.
+   */
+  <V> DoValue<V> newValueNode(String attributeName, V initialValue) {
+    return new DoValue<>(attributeName, attribute -> putNode(attributeName, attribute), initialValue);
+  }
+
+  /**
+   * Returns the {@link DoList} attribute node wrapping a value of type {@code List<V>}. A new node is created, if this
+   * entity does not already contain a node for the given {@code attributName}.
    */
   protected <V> DoList<V> doList(String attributeName) {
-    Assertions.assertNotNull(attributeName, "attribute name cannot be null");
-    DoNode<?> node = getNode(attributeName);
-    if (node != null) {
-      Assertions.assertInstance(node, DoList.class, "Existing node {} is not of type {}, cannot change the node type!", node, DoList.class);
-      @SuppressWarnings("unchecked")
-      DoList<V> listNode = (DoList<V>) node;
-      return listNode;
+    if (has(attributeName)) {
+      return getListNode(attributeName);
     }
-    return new DoList<>(attributeName, attribute -> putNode(attributeName, attribute));
+    return newListNode(attributeName, null);
+  }
+
+  /**
+   * Returns the {@link DoList} attribute node wrapping a value of type {@code List<V>}.
+   */
+  <V> DoList<V> getListNode(String attributeName) {
+    assertNotNull(attributeName, "attribute name cannot be null");
+    DoNode<?> node = getNode(attributeName);
+    assertInstance(node, DoList.class, "Existing node {} is null or not of type {}", node, DoList.class);
+    @SuppressWarnings("unchecked")
+    DoList<V> listNode = (DoList<V>) node;
+    return listNode;
+  }
+
+  /**
+   * Creates a new {@code DoList} node using the given {@code initialValue}.
+   */
+  <V> DoList<V> newListNode(String attributeName, List<V> initialValue) {
+    return new DoList<>(attributeName, attribute -> putNode(attributeName, attribute), initialValue);
   }
 
   @Override

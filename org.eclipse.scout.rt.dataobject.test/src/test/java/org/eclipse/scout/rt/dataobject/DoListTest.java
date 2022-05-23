@@ -10,17 +10,13 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -29,9 +25,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.rt.dataobject.DoList;
-import org.eclipse.scout.rt.dataobject.DoNode;
-import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +48,27 @@ public class DoListTest {
   public void testDoListConstructor() {
     DoList<String> list = new DoList<>();
     assertTrue(list.exists());
+    assertNotNull(list.get());
+    assertTrue(list.get() instanceof ArrayList);
+  }
+
+  @Test
+  public void testDoListDetailedConstructor() {
+    ArrayList<String> list = new ArrayList<>();
+    list.add("one");
+    DoList<String> doList = new DoList<>("attributeName", m_lazyCreate, list);
+    assertFalse(doList.exists());
+    assertNotNull(doList.get());
+    assertTrue(doList.get() instanceof ArrayList);
+    assertSame(list, doList.get());
+  }
+
+  @Test
+  public void testDoListDetailedConstructorNullInitialValue() {
+    DoList<String> doList = new DoList<>("attributeName", m_lazyCreate, null);
+    assertFalse(doList.exists());
+    assertNotNull(doList.get());
+    assertTrue(doList.get() instanceof ArrayList);
   }
 
   protected Consumer<DoNode<List<String>>> m_lazyCreate = attribute -> {
@@ -62,17 +76,17 @@ public class DoListTest {
 
   @Test
   public void testCreateExists() {
-    DoList<String> list = new DoList<>(null, m_lazyCreate);
+    DoList<String> list = new DoList<>(null, m_lazyCreate, null);
     assertFalse(list.exists());
     list.create();
     assertTrue(list.exists());
 
-    list = new DoList<>(null, m_lazyCreate);
+    list = new DoList<>(null, m_lazyCreate, null);
     assertFalse(list.exists());
     list.set(Arrays.asList("foo", "bar"));
     assertTrue(list.exists());
 
-    list = new DoList<>(null, m_lazyCreate);
+    list = new DoList<>(null, m_lazyCreate, null);
     assertFalse(list.exists());
     list.get();
     assertTrue(list.exists());
@@ -80,10 +94,12 @@ public class DoListTest {
 
   @Test
   public void testOf() {
-    DoList<String> list = DoList.of(Arrays.asList("foo", "bar"));
-    assertTrue(list.exists());
-    assertEquals("foo", list.get(0));
-    assertEquals("bar", list.get(1));
+    List<String> list = Arrays.asList("foo", "bar");
+    DoList<String> doList = DoList.of(list);
+    assertTrue(doList.exists());
+    assertEquals("foo", doList.get(0));
+    assertEquals("bar", doList.get(1));
+    assertSame(list, doList.get());
   }
 
   @Test
@@ -101,8 +117,10 @@ public class DoListTest {
 
   @Test
   public void testSet() {
-    m_testDoList.set(Arrays.asList("foo"));
+    List<String> values = Arrays.asList("foo");
+    m_testDoList.set(values);
     assertEquals(Arrays.asList("foo"), m_testDoList.get());
+    assertSame(values, m_testDoList.get());
 
     m_testDoList.set(Collections.emptyList());
     assertEquals(Collections.emptyList(), m_testDoList.get());
@@ -399,10 +417,10 @@ public class DoListTest {
 
   @Test
   public void testSort() {
-    m_testDoList.sort((left, right) -> left.compareTo(right));
+    m_testDoList.sort(Comparator.naturalOrder());
     assertEquals(Arrays.asList("bar", "baz", "foo"), m_testDoList.get());
 
-    m_testDoList.sort((left, right) -> right.compareTo(left));
+    m_testDoList.sort(Comparator.reverseOrder());
     assertEquals(Arrays.asList("foo", "baz", "bar"), m_testDoList.get());
   }
 
@@ -430,21 +448,21 @@ public class DoListTest {
 
   @Test
   public void testFindFirst() {
-    assertEquals("bar", m_testDoList.findFirst((input) -> input.equals("bar")));
-    assertEquals(null, m_testDoList.findFirst((input) -> input.equals("myCustomSearchTerm")));
+    assertEquals("bar", m_testDoList.findFirst((input) -> "bar".equals(input)));
+    assertNull(m_testDoList.findFirst((input) -> "myCustomSearchTerm".equals(input)));
   }
 
   @Test
   public void testFind() {
-    assertEquals(Arrays.asList("bar"), m_testDoList.find((input) -> input.equals("bar")));
-    assertEquals(Arrays.asList("bar", "baz"), m_testDoList.find((input) -> input.equals("bar") || input.equals("baz")));
+    assertEquals(Arrays.asList("bar"), m_testDoList.find((input) -> "bar".equals(input)));
+    assertEquals(Arrays.asList("bar", "baz"), m_testDoList.find((input) -> "bar".equals(input) || "baz".equals(input)));
   }
 
   @Test
   public void testAttributeName() {
     assertNull(new DoList<>().getAttributeName());
     assertNull(DoList.of(Collections.emptyList()).getAttributeName());
-    assertEquals("foo", new DoList<>("foo", null).getAttributeName());
+    assertEquals("foo", new DoList<>("foo", null, null).getAttributeName());
   }
 
   @Test
@@ -467,7 +485,7 @@ public class DoListTest {
     assertEquals(list1, list2);
     assertEquals(list1.hashCode(), list2.hashCode());
 
-    assertFalse(list1.equals(null));
-    assertFalse(list1.equals(new Object()));
+    assertNotEquals(null, list1);
+    assertNotEquals(list1, new Object());
   }
 }
