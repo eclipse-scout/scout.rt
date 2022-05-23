@@ -177,6 +177,8 @@ public class DoEntityTest {
     entity.put("foo", "value1");
     DoNode<?> attribute = entity.getNode("foo");
     assertEquals("value1", entity.get("foo"));
+
+    // update existing node value
     entity.put("foo", "value2");
     assertEquals("value2", entity.get("foo"));
     assertSame(attribute, entity.getNode("foo"));
@@ -185,9 +187,14 @@ public class DoEntityTest {
   @Test
   public void testPutListAttribute() {
     DoEntity entity = BEANS.get(DoEntity.class);
-    entity.putList("foo", Arrays.asList("value1"));
+    List<String> values = Arrays.asList("value1");
+    entity.putList("foo", values);
+    assertSame(values, entity.getList("foo"));
+
     DoNode<?> attribute = entity.getNode("foo");
     assertEquals("value1", entity.getList("foo", String.class).get(0));
+
+    // update existing node value
     entity.putList("foo", Arrays.asList("value2"));
     assertEquals("value2", entity.getList("foo", String.class).get(0));
     assertSame(attribute, entity.getNode("foo"));
@@ -640,6 +647,9 @@ public class DoEntityTest {
     entity2.putList("attribute3", Arrays.asList("l1", "l2"));
     assertEquals(entity1, entity2);
     assertEquals(entity1.hashCode(), entity2.hashCode());
+
+    //noinspection SimplifiableJUnitAssertion
+    assertFalse(entity1.equals(null));
   }
 
   @Test
@@ -708,5 +718,49 @@ public class DoEntityTest {
     actual.putListIf("listAttribute3", CollectionUtility.arrayList(4, 5, 6), v -> !v.isEmpty());
 
     assertEqualsWithComparisonFailure(expected, actual);
+  }
+
+  @Test
+  public void testDoValue() {
+    DoEntity entity = BEANS.get(DoEntity.class);
+    DoValue<String> foo = entity.doValue("foo");
+    assertNull(foo.get());
+
+    String value = "value";
+    foo.set(value);
+    assertEquals(value, entity.get("foo"));
+  }
+
+  @Test
+  public void testValueNode() {
+    DoEntity entity = BEANS.get(DoEntity.class);
+    assertThrows(AssertionException.class, () -> entity.getValueNode("foo"));
+
+    entity.put("foo", "value");
+    assertEquals("value", entity.get("foo"));
+
+    assertThrows(AssertionException.class, () -> entity.getListNode("foo"));
+  }
+
+  @Test
+  public void testDoList() {
+    DoEntity entity = BEANS.get(DoEntity.class);
+    DoList<String> foo = entity.doList("foo");
+    assertEquals(CollectionUtility.emptyArrayList(), foo.get());
+
+    List<String> values = Arrays.asList("value");
+    foo.set(values);
+    assertEquals(values, entity.get("foo"));
+  }
+
+  @Test
+  public void testListNode() {
+    DoEntity entity = BEANS.get(DoEntity.class);
+    assertThrows(AssertionException.class, () -> entity.getListNode("foo"));
+
+    entity.putList("foo", Arrays.asList("value"));
+    assertEquals("value", entity.getList("foo").get(0));
+
+    assertThrows(AssertionException.class, () -> entity.getValueNode("foo"));
   }
 }

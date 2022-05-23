@@ -31,17 +31,19 @@ import java.util.stream.Stream;
 public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Iterable<V> {
 
   public DoList() {
-    this(null, null);
+    this(null, null, null);
   }
 
-  DoList(String attributeName, Consumer<DoNode<List<V>>> lazyCreate) {
-    super(attributeName, lazyCreate, new ArrayList<>());
+  DoList(String attributeName, Consumer<DoNode<List<V>>> lazyCreate, List<V> initialValue) {
+    super(attributeName, lazyCreate, emptyListIfNull(initialValue));
   }
 
   public static <V> DoList<V> of(List<V> list) {
-    DoList<V> doList = new DoList<>();
-    doList.set(list);
-    return doList;
+    return new DoList<>(null, null, list);
+  }
+
+  static <V> List<V> emptyListIfNull(List<V> list) {
+    return list != null ? list : new ArrayList<>();
   }
 
   /**
@@ -61,7 +63,7 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
    */
   @Override
   public void set(List<V> newValue) {
-    super.set(newValue != null ? newValue : new ArrayList<>());
+    super.set(emptyListIfNull(newValue));
   }
 
   /**
@@ -136,7 +138,8 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
    *
    * @return {@code true} if this list changed as a result of the call
    */
-  public boolean removeAll(@SuppressWarnings("unchecked") V... items) {
+  @SafeVarargs
+  public final boolean removeAll(@SuppressWarnings("unchecked") V... items) {
     if (items != null) {
       return removeAll(Arrays.asList(items));
     }
@@ -156,7 +159,8 @@ public final class DoList<V> extends DoNode<List<V>> implements IDataObject, Ite
    * Replaces all items in this list with the given array of new {@code items}. If {@code items} is {@code null}, the
    * list is cleared without adding any items.
    */
-  public void updateAll(@SuppressWarnings("unchecked") V... items) {
+  @SafeVarargs
+  public final void updateAll(@SuppressWarnings("unchecked") V... items) {
     clear();
     addAll(items);
   }

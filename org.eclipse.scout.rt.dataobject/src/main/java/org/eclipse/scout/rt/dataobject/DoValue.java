@@ -20,17 +20,15 @@ import java.util.function.Consumer;
 public final class DoValue<V> extends DoNode<V> {
 
   public DoValue() {
-    this(null, null);
+    this(null, null, null);
   }
 
-  protected DoValue(String attributeName, Consumer<DoNode<V>> lazyCreate) {
-    super(attributeName, lazyCreate, null);
+  DoValue(String attributeName, Consumer<DoNode<V>> lazyCreate, V initialValue) {
+    super(attributeName, lazyCreate, initialValue);
   }
 
   public static <V> DoValue<V> of(V value) {
-    DoValue<V> doValue = new DoValue<>();
-    doValue.set(value);
-    return doValue;
+    return new DoValue<>(null, null, value);
   }
 
   @Override
