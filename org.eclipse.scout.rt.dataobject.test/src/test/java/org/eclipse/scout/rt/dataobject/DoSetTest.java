@@ -47,22 +47,33 @@ public class DoSetTest {
     assertTrue(set.exists());
   }
 
+  @Test
+  public void testDoSetDetailedConstructor() {
+    Set<String> set = new HashSet<>();
+    set.add("one");
+    DoSet<String> doSet = new DoSet<>("attributeName", m_lazyCreate, set);
+    assertFalse(doSet.exists());
+    assertNotNull(doSet.get());
+    assertTrue(doSet.get() instanceof HashSet);
+    assertSame(set, doSet.get());
+  }
+
   protected Consumer<DoNode<Set<String>>> m_lazyCreate = attribute -> {
     /* nop */ };
 
   @Test
   public void testCreateExists() {
-    DoSet<String> set = new DoSet<>(null, m_lazyCreate);
+    DoSet<String> set = new DoSet<>(null, m_lazyCreate, null);
     assertFalse(set.exists());
     set.create();
     assertTrue(set.exists());
 
-    set = new DoSet<>(null, m_lazyCreate);
+    set = new DoSet<>(null, m_lazyCreate, null);
     assertFalse(set.exists());
     set.set(CollectionUtility.hashSet("foo", "bar"));
     assertTrue(set.exists());
 
-    set = new DoSet<>(null, m_lazyCreate);
+    set = new DoSet<>(null, m_lazyCreate, null);
     assertFalse(set.exists());
     set.get();
     assertTrue(set.exists());
@@ -334,7 +345,7 @@ public class DoSetTest {
    */
   @Test
   public void testIdempotentMethodCalls() {
-    DoSet<String> set = new DoSet<>(null, m_lazyCreate);
+    DoSet<String> set = new DoSet<>(null, m_lazyCreate, null);
     assertFalse(set.exists());
 
     assertNotNull(set.toString());
@@ -345,7 +356,7 @@ public class DoSetTest {
   public void testAttributeName() {
     assertNull(new DoSet<>().getAttributeName());
     assertNull(DoSet.of(Collections.emptySet()).getAttributeName());
-    assertEquals("foo", new DoSet<>("foo", null).getAttributeName());
+    assertEquals("foo", new DoSet<>("foo", null, null).getAttributeName());
   }
 
   @Test

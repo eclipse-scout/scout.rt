@@ -26,17 +26,19 @@ import java.util.function.Consumer;
 public final class DoList<V> extends AbstractDoCollection<V, List<V>> implements IDataObject {
 
   public DoList() {
-    this(null, null);
+    this(null, null, null);
   }
 
-  DoList(String attributeName, Consumer<DoNode<List<V>>> lazyCreate) {
-    super(attributeName, lazyCreate, new ArrayList<>());
+  DoList(String attributeName, Consumer<DoNode<List<V>>> lazyCreate, List<V> initialValue) {
+    super(attributeName, lazyCreate, emptyListIfNull(initialValue));
   }
 
   public static <V> DoList<V> of(List<V> list) {
-    DoList<V> doList = new DoList<>();
-    doList.set(list);
-    return doList;
+    return new DoList<>(null, null, list);
+  }
+
+  static <V> List<V> emptyListIfNull(List<V> list) {
+    return list != null ? list : new ArrayList<>();
   }
 
   /**
@@ -47,7 +49,7 @@ public final class DoList<V> extends AbstractDoCollection<V, List<V>> implements
    */
   @Override
   public void set(List<V> newValue) {
-    super.set(newValue != null ? newValue : new ArrayList<>());
+    super.set(emptyListIfNull(newValue));
   }
 
   /**
