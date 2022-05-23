@@ -49,22 +49,33 @@ public class DoCollectionTest {
     assertTrue(collection.exists());
   }
 
+  @Test
+  public void testDoCollectionDetailedConstructor() {
+    Collection<String> collection = new ArrayList<>();
+    collection.add("one");
+    DoCollection<String> doCollection = new DoCollection<>("attributeName", m_lazyCreate, collection);
+    assertFalse(doCollection.exists());
+    assertNotNull(doCollection.get());
+    assertTrue(doCollection.get() instanceof ArrayList);
+    assertSame(collection, doCollection.get());
+  }
+
   protected Consumer<DoNode<Collection<String>>> m_lazyCreate = attribute -> {
     /* nop */ };
 
   @Test
   public void testCreateExists() {
-    DoCollection<String> collection = new DoCollection<>(null, m_lazyCreate);
+    DoCollection<String> collection = new DoCollection<>(null, m_lazyCreate, null);
     assertFalse(collection.exists());
     collection.create();
     assertTrue(collection.exists());
 
-    collection = new DoCollection<>(null, m_lazyCreate);
+    collection = new DoCollection<>(null, m_lazyCreate, null);
     assertFalse(collection.exists());
     collection.set(Arrays.asList("foo", "bar"));
     assertTrue(collection.exists());
 
-    collection = new DoCollection<>(null, m_lazyCreate);
+    collection = new DoCollection<>(null, m_lazyCreate, null);
     assertFalse(collection.exists());
     collection.get();
     assertTrue(collection.exists());
@@ -326,7 +337,7 @@ public class DoCollectionTest {
    */
   @Test
   public void testIdempotentMethodCalls() {
-    DoCollection<String> collection = new DoCollection<>(null, m_lazyCreate);
+    DoCollection<String> collection = new DoCollection<>(null, m_lazyCreate, null);
     assertFalse(collection.exists());
 
     assertFalse(collection.contains("value"));
@@ -387,7 +398,7 @@ public class DoCollectionTest {
     collection.valueHashCode();
     assertFalse(collection.exists());
 
-    DoCollection<String> otherCollection = new DoCollection<>(null, m_lazyCreate);
+    DoCollection<String> otherCollection = new DoCollection<>(null, m_lazyCreate, null);
     assertFalse(otherCollection.exists());
     assertTrue(collection.valueEquals(otherCollection));
     assertFalse(collection.exists());
@@ -408,7 +419,7 @@ public class DoCollectionTest {
   public void testAttributeName() {
     assertNull(new DoCollection<>().getAttributeName());
     assertNull(DoCollection.of(Collections.emptyList()).getAttributeName());
-    assertEquals("foo", new DoCollection<>("foo", null).getAttributeName());
+    assertEquals("foo", new DoCollection<>("foo", null, null).getAttributeName());
   }
 
   @Test

@@ -10,15 +10,10 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.function.Consumer;
 
-import org.eclipse.scout.rt.dataobject.DoNode;
-import org.eclipse.scout.rt.dataobject.DoValue;
 import org.junit.Test;
 
 /**
@@ -32,17 +27,25 @@ public class DoValueTest {
     assertTrue(value.exists());
   }
 
+  @Test
+  public void testDoValueDetailedConstructor() {
+    String value = "foo";
+    DoValue<String> doValue = new DoValue<>("attributeName", m_lazyCreate, value);
+    assertFalse(doValue.exists());
+    assertSame(value, doValue.get());
+  }
+
   protected Consumer<DoNode<String>> m_lazyCreate = attribute -> {
     /* nop */ };
 
   @Test
   public void testCreateExists() {
-    DoValue<String> value = new DoValue<>(null, m_lazyCreate);
+    DoValue<String> value = new DoValue<>(null, m_lazyCreate, null);
     assertFalse(value.exists());
     value.create();
     assertTrue(value.exists());
 
-    value = new DoValue<>(null, m_lazyCreate);
+    value = new DoValue<>(null, m_lazyCreate, null);
     assertFalse(value.exists());
     value.set("foo");
     assertTrue(value.exists());
@@ -60,9 +63,11 @@ public class DoValueTest {
 
   @Test
   public void testOf() {
-    DoValue<String> value = DoValue.of("foo");
-    assertTrue(value.exists());
-    assertEquals("foo", value.get());
+    String value = "foo";
+    DoValue<String> doValue = DoValue.of("foo");
+    assertTrue(doValue.exists());
+    assertEquals("foo", doValue.get());
+    assertSame(value, doValue.get());
   }
 
   @Test
@@ -76,6 +81,6 @@ public class DoValueTest {
   public void testAttributeName() {
     assertNull(new DoValue<>().getAttributeName());
     assertNull(DoValue.of("").getAttributeName());
-    assertEquals("foo", new DoValue<>("foo", null).getAttributeName());
+    assertEquals("foo", new DoValue<>("foo", null, null).getAttributeName());
   }
 }

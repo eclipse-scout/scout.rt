@@ -48,6 +48,27 @@ public class DoListTest {
   public void testDoListConstructor() {
     DoList<String> list = new DoList<>();
     assertTrue(list.exists());
+    assertNotNull(list.get());
+    assertTrue(list.get() instanceof ArrayList);
+  }
+
+  @Test
+  public void testDoListDetailedConstructor() {
+    ArrayList<String> list = new ArrayList<>();
+    list.add("one");
+    DoList<String> doList = new DoList<>("attributeName", m_lazyCreate, list);
+    assertFalse(doList.exists());
+    assertNotNull(doList.get());
+    assertTrue(doList.get() instanceof ArrayList);
+    assertSame(list, doList.get());
+  }
+
+  @Test
+  public void testDoListDetailedConstructorNullInitialValue() {
+    DoList<String> doList = new DoList<>("attributeName", m_lazyCreate, null);
+    assertFalse(doList.exists());
+    assertNotNull(doList.get());
+    assertTrue(doList.get() instanceof ArrayList);
   }
 
   protected Consumer<DoNode<List<String>>> m_lazyCreate = attribute -> {
@@ -55,17 +76,17 @@ public class DoListTest {
 
   @Test
   public void testCreateExists() {
-    DoList<String> list = new DoList<>(null, m_lazyCreate);
+    DoList<String> list = new DoList<>(null, m_lazyCreate, null);
     assertFalse(list.exists());
     list.create();
     assertTrue(list.exists());
 
-    list = new DoList<>(null, m_lazyCreate);
+    list = new DoList<>(null, m_lazyCreate, null);
     assertFalse(list.exists());
     list.set(Arrays.asList("foo", "bar"));
     assertTrue(list.exists());
 
-    list = new DoList<>(null, m_lazyCreate);
+    list = new DoList<>(null, m_lazyCreate, null);
     assertFalse(list.exists());
     list.get();
     assertTrue(list.exists());
@@ -73,10 +94,12 @@ public class DoListTest {
 
   @Test
   public void testOf() {
-    DoList<String> list = DoList.of(Arrays.asList("foo", "bar"));
-    assertTrue(list.exists());
-    assertEquals("foo", list.get(0));
-    assertEquals("bar", list.get(1));
+    List<String> list = Arrays.asList("foo", "bar");
+    DoList<String> doList = DoList.of(list);
+    assertTrue(doList.exists());
+    assertEquals("foo", doList.get(0));
+    assertEquals("bar", doList.get(1));
+    assertSame(list, doList.get());
   }
 
   @Test
@@ -94,8 +117,10 @@ public class DoListTest {
 
   @Test
   public void testSet() {
-    m_testDoList.set(Arrays.asList("foo"));
+    List<String> values = Arrays.asList("foo");
+    m_testDoList.set(values);
     assertEquals(Arrays.asList("foo"), m_testDoList.get());
+    assertSame(values, m_testDoList.get());
 
     m_testDoList.set(Collections.emptyList());
     assertEquals(Collections.emptyList(), m_testDoList.get());
@@ -446,7 +471,7 @@ public class DoListTest {
    */
   @Test
   public void testIdempotentMethodCalls() {
-    DoList<String> list = new DoList<>(null, m_lazyCreate);
+    DoList<String> list = new DoList<>(null, m_lazyCreate, null);
     assertFalse(list.exists());
 
     assertThrows(IndexOutOfBoundsException.class, () -> list.get(0));
@@ -475,7 +500,7 @@ public class DoListTest {
   public void testAttributeName() {
     assertNull(new DoList<>().getAttributeName());
     assertNull(DoList.of(Collections.emptyList()).getAttributeName());
-    assertEquals("foo", new DoList<>("foo", null).getAttributeName());
+    assertEquals("foo", new DoList<>("foo", null, null).getAttributeName());
   }
 
   @Test
@@ -498,6 +523,8 @@ public class DoListTest {
     assertEquals(list1, list2);
     assertEquals(list1.hashCode(), list2.hashCode());
 
+    assertNotEquals(null, list1);
+    assertNotEquals(list1, new Object());
     assertNotEquals(null, list1);
     assertNotEquals(list1, new Object());
 

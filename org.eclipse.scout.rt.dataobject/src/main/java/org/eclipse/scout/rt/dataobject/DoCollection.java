@@ -31,17 +31,19 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 public final class DoCollection<V> extends AbstractDoCollection<V, Collection<V>> {
 
   public DoCollection() {
-    this(null, null);
+    this(null, null, null);
   }
 
-  DoCollection(String attributeName, Consumer<DoNode<Collection<V>>> lazyCreate) {
-    super(attributeName, lazyCreate, new ArrayList<>());
+  DoCollection(String attributeName, Consumer<DoNode<Collection<V>>> lazyCreate, Collection<V> initialValue) {
+    super(attributeName, lazyCreate, emptyCollectionIfNull(initialValue));
   }
 
   public static <V> DoCollection<V> of(Collection<V> collection) {
-    DoCollection<V> doCollection = new DoCollection<>();
-    doCollection.set(collection);
-    return doCollection;
+    return new DoCollection<>(null, null, collection);
+  }
+
+  static <V> Collection<V> emptyCollectionIfNull(Collection<V> list) {
+    return list != null ? list : new ArrayList<>();
   }
 
   /**
@@ -53,7 +55,7 @@ public final class DoCollection<V> extends AbstractDoCollection<V, Collection<V>
    */
   @Override
   public void set(Collection<V> newValue) {
-    super.set(newValue != null ? newValue : new ArrayList<>());
+    super.set(emptyCollectionIfNull(newValue));
   }
 
   @Override

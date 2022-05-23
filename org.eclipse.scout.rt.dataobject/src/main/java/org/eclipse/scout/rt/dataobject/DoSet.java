@@ -27,18 +27,20 @@ import java.util.function.Consumer;
 public final class DoSet<V> extends AbstractDoCollection<V, Set<V>> {
 
   public DoSet() {
-    this(null, null);
+    this(null, null, null);
   }
 
-  DoSet(String attributeName, Consumer<DoNode<Set<V>>> lazyCreate) {
+  DoSet(String attributeName, Consumer<DoNode<Set<V>>> lazyCreate, Set<V> initialValue) {
     // Even if the order within a set is not relevant, using a LinkedHashSet here to have a deterministic behavior by default.
-    super(attributeName, lazyCreate, new LinkedHashSet<>());
+    super(attributeName, lazyCreate, emptySetIfNull(initialValue));
   }
 
   public static <V> DoSet<V> of(Set<V> set) {
-    DoSet<V> doSet = new DoSet<>();
-    doSet.set(set);
-    return doSet;
+    return new DoSet<>(null, null, set);
+  }
+
+  static <V> Set<V> emptySetIfNull(Set<V> set) {
+    return set != null ? set : new LinkedHashSet<>();
   }
 
   /**
@@ -49,7 +51,7 @@ public final class DoSet<V> extends AbstractDoCollection<V, Set<V>> {
    */
   @Override
   public void set(Set<V> newValue) {
-    super.set(newValue != null ? newValue : new LinkedHashSet<>());
+    super.set(emptySetIfNull(newValue));
   }
 
   // LinkedHashSet already implemented hashCode/equals without considering element position, thus no need to override valueHashCode/valueEquals.
