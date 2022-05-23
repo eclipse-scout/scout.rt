@@ -23,6 +23,14 @@
     <dependency>
       <groupId>${groupId}</groupId>
       <artifactId>${rootArtifactId}.persistence</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- jooq from persistence module still brings javax.xml.bind:jaxb-api
+           while the api module brings the newer jakarta.xml.bind:jakarta.xml.bind-api -->
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>
