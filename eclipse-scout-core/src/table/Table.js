@@ -5271,15 +5271,14 @@ export default class Table extends Widget {
 
     for (i = 0; i < columns.length; i++) {
       column = columns[i];
-      currentPosition = this.columns.indexOf(column);
+      currentPosition = arrays.findIndex(this.columns, element => element.id === column.id);
       if (currentPosition < 0) {
         throw new Error('Column with id ' + column.id + 'not found.');
       }
 
       if (currentPosition !== i) {
         // Update model
-        arrays.remove(this.columns, column);
-        arrays.insert(this.columns, column, i);
+        arrays.move(this.columns, currentPosition, i);
       }
     }
 
