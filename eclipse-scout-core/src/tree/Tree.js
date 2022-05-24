@@ -670,6 +670,9 @@ export default class Tree extends Widget {
       let firstNode = nodes[this.viewRangeRendered.from];
       let lastNode = nodes[this.viewRangeRendered.to - 1];
       if (this.viewRangeDirty) {
+        if (!firstNode.$node || !lastNode.$node) {
+          throw new Error('Nodes not rendered as expected before cleanup. ' + this._viewRangeErrorOutput(firstNode, lastNode));
+        }
         // cleanup nodes before range and after
         let $nodesBeforeFirstNode = firstNode.$node.prevAll('.tree-node');
         let $nodesAfterLastNode = lastNode.$node.nextAll('.tree-node');
@@ -677,15 +680,43 @@ export default class Tree extends Widget {
         this._cleanupNodes($nodesAfterLastNode);
       }
       if (!firstNode.attached || !lastNode.attached) {
-        throw new Error('Nodes not rendered as expected. ' + this.viewRangeRendered +
-          '. First: ' + graphics.debugOutput(firstNode.$node) +
-          '. Last: ' + graphics.debugOutput(lastNode.$node) +
-          '. Length: visibleNodesFlat=' + this.visibleNodesFlat.length + ' nodes=' + this.nodes.length + ' nodesMap=' + Object.keys(this.nodesMap).length);
+        throw new Error('Nodes not rendered as expected. ' + this._viewRangeErrorOutput(firstNode, lastNode));
       }
     }
 
     this._postRenderViewRange();
     this.viewRangeDirty = false;
+  }
+
+  _viewRangeErrorOutput(firstNode, lastNode) {
+    let firstNodeText = this._debugNodeTextPath(firstNode);
+    let lastNodeText = this._debugNodeTextPath(lastNode);
+    return `
+ViewRangeRendered: ${this.viewRangeRendered}.
+FirstNode: ${firstNodeText} ${graphics.debugOutput(firstNode.$node)}.
+LastNode: ${lastNodeText} ${graphics.debugOutput(lastNode.$node)}.
+Length: visibleNodesFlat=${this.visibleNodesFlat.length}, nodes=${this.nodes.length}, nodesMap=${Object.keys(this.nodesMap).length}`;
+  }
+
+  /**
+   * Concatenates the texts of the given node and its parent nodes for debug purposes. Replaces the middle with ... if the texts exceeds maxLength.
+   */
+  _debugNodeTextPath(node, maxLength) {
+    let text = '';
+    while (node) {
+      text = node.text + text;
+      node = node.parentNode;
+      if (node) {
+        text = ' / ' + text;
+      }
+    }
+    maxLength = scout.nvl(maxLength, 150);
+    if (text.length > maxLength) {
+      let textLength = text.length;
+      let half = maxLength / 2;
+      text = text.substring(0, Math.floor(half)) + '...' + text.substring(textLength - Math.ceil(maxLength / 2), textLength);
+    }
+    return text;
   }
 
   _postRenderViewRange() {
