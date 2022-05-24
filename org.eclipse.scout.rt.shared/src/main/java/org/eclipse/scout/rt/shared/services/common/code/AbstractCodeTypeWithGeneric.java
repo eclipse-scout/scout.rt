@@ -392,7 +392,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
 
   protected void rebuildCodeIndexMap() {
     m_codeIndexMap = new HashMap<>();
-    ICodeVisitor<ICode<CODE_ID>> v = new ICodeVisitor<ICode<CODE_ID>>() {
+    ICodeVisitor<ICode<CODE_ID>> v = new ICodeVisitor<>() {
       private int m_index = 0;
 
       @Override
@@ -443,11 +443,12 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     // 1a add configured codes
     List<? extends CODE> createdList = interceptCreateCodes();
     if (createdList != null) {
-      for (CODE code : createdList) {
+      visit(createdList, (CODE code, int treeLevel) -> {
         allCodesOrdered.add(code);
         idToCodeMap.put(code.getId(), code);
-        codeToParentCodeMap.put(code, null);
-      }
+        codeToParentCodeMap.put(code, code.getParentCode() != null ? idToCodeMap.get(code.getParentCode().getId()) : null);
+        return true;
+      }, false);
     }
     // 1b add dynamic codes
     List<? extends ICodeRow<CODE_ID>> result = interceptLoadCodes(getConfiguredCodeRowType());
@@ -585,10 +586,14 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     return visit(visitor, true);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public <T extends ICode<CODE_ID>> boolean visit(ICodeVisitor<T> visitor, boolean activeOnly) {
-    for (CODE code : getCodes(activeOnly)) {
+    return visit(getCodes(activeOnly), visitor, activeOnly);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <T extends ICode<CODE_ID>> boolean visit(List<? extends CODE> codes, ICodeVisitor<T> visitor, boolean activeOnly) {
+    for (CODE code : codes) {
       if (!visitor.visit((T) code, 0)) {
         return false;
       }
