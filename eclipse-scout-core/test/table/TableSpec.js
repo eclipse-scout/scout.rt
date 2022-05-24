@@ -2337,6 +2337,14 @@ describe('Table', () => {
       expect(table.columns[2]).toBe(column1);
     });
 
+    it('reorders the model columns by using only their id', () => {
+      table.updateColumnOrder([{id: column2.id}, {id: column0.id}, {id: column1.id}]);
+      expect(table.columns.length).toBe(3);
+      expect(table.columns[0]).toBe(column2);
+      expect(table.columns[1]).toBe(column0);
+      expect(table.columns[2]).toBe(column1);
+    });
+
     it('reorders the html nodes', () => {
       table.render();
 
