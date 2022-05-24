@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.Order;
@@ -95,30 +96,65 @@ public class CodeTypeTest {
     public static final double DYNAMIC_VALUE = 10d;
     public static final long DYNAMIC_PARTITION_ID = 0L;
 
+    private List<String> m_overwrittenCodes;
+
     @Override
     public String getId() {
       return ID;
     }
 
+    public List<String> getOverwrittenCodes() {
+      return m_overwrittenCodes;
+    }
+
     @Override
     protected List<ICodeRow<String>> execLoadCodes(Class<? extends ICodeRow<String>> codeRowType) {
-      List<ICodeRow<String>> codeRows = new ArrayList<>();
-      codeRows.add(new CodeRow<>(
-          Test1Code.ID,
-          DYNAMIC_TEXT,
-          null, // icon
-          null, // tooltip
-          null, // background color
-          null, // foreground color
-          null, // font
-          null, // css class
-          DYNAMIC_ENABLED,
-          DYNAMIC_PARENT_KEY,
-          DYNAMIC_ACTIVE,
-          null, // ext key
-          null, // value
-          DYNAMIC_PARTITION_ID));
-      codeRows.add(
+      return Arrays.asList(
+          new CodeRow<>(
+              RootCode.ID,
+              "Root",
+              null, // icon
+              null, // tooltip
+              null, // background color
+              null, // foreground color
+              null, // font
+              null, // css class
+              DYNAMIC_ENABLED,
+              null,
+              DYNAMIC_ACTIVE,
+              null, // ext key
+              null, // value
+              DYNAMIC_PARTITION_ID),
+          new CodeRow<>(
+              RootCode.ChildCode.ID,
+              "Child",
+              null, // icon
+              null, // tooltip
+              null, // background color
+              null, // foreground color
+              null, // font
+              null, // css class
+              DYNAMIC_ENABLED,
+              DYNAMIC_PARENT_KEY,
+              DYNAMIC_ACTIVE,
+              null, // ext key
+              null, // value
+              DYNAMIC_PARTITION_ID),
+          new CodeRow<>(
+              Test1Code.ID,
+              DYNAMIC_TEXT,
+              null, // icon
+              null, // tooltip
+              null, // background color
+              null, // foreground color
+              null, // font
+              null, // css class
+              DYNAMIC_ENABLED,
+              DYNAMIC_PARENT_KEY,
+              DYNAMIC_ACTIVE,
+              null, // ext key
+              null, // value
+              DYNAMIC_PARTITION_ID),
           new CodeRow<>(
               Test2Code.ID,
               DYNAMIC_TEXT,
@@ -134,7 +170,20 @@ public class CodeTypeTest {
               DYNAMIC_EXT_KEY,
               DYNAMIC_VALUE,
               DYNAMIC_PARTITION_ID));
-      return codeRows;
+    }
+
+    @Override
+    protected void execOverwriteCode(ICodeRow<String> oldCode, ICodeRow<String> newCode) {
+      if (oldCode != null) {
+        m_overwrittenCodes.add(oldCode.getKey());
+      }
+      super.execOverwriteCode(oldCode, newCode);
+    }
+
+    @Override
+    protected void loadCodes() {
+      m_overwrittenCodes = new ArrayList<>();
+      super.loadCodes();
     }
 
     @Order(10)
@@ -152,6 +201,21 @@ public class CodeTypeTest {
         return "Root";
       }
 
+      @Order(10)
+      public class ChildCode extends AbstractCode<String> {
+        private static final long serialVersionUID = 1L;
+        public static final String ID = "75b3ede5-065a-4869-a4a7-c477af43abce";
+
+        @Override
+        public String getId() {
+          return ID;
+        }
+
+        @Override
+        protected String getConfiguredText() {
+          return "Child";
+        }
+      }
     }
 
     @Order(10)
@@ -218,7 +282,6 @@ public class CodeTypeTest {
       protected Double getConfiguredValue() {
         return CONFIGURED_VALUE;
       }
-
     }
 
     @Order(20)
@@ -281,5 +344,22 @@ public class CodeTypeTest {
         return CONFIGURED_VALUE;
       }
     }
+  }
+
+  /**
+   * If a code is defined by {@link AbstractCodeTypeWithGeneric#execCreateCodes()} and overwritten by
+   * {@link AbstractCodeTypeWithGeneric#execLoadCodes(Class)} the method
+   * {@link AbstractCodeTypeWithGeneric#execOverwriteCode(ICodeRow, ICodeRow)} must be called also for the code as well
+   * (root and child codes).
+   */
+  @Test
+  public void testExecOverwriteWasForRootAndChildCodes() {
+    TestCodeType ct = new TestCodeType();
+    List<String> overwrittenCodes = ct.getOverwrittenCodes();
+    assertEquals(4, overwrittenCodes.size());
+    assertTrue(overwrittenCodes.contains(TestCodeType.RootCode.ID));
+    assertTrue(overwrittenCodes.contains(TestCodeType.RootCode.ChildCode.ID));
+    assertTrue(overwrittenCodes.contains(TestCodeType.Test1Code.ID));
+    assertTrue(overwrittenCodes.contains(TestCodeType.Test2Code.ID));
   }
 }
