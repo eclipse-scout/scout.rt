@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -23,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
@@ -32,6 +35,8 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
+import org.eclipse.scout.rt.shared.prefs.CustomClientPreferenceId;
+import org.eclipse.scout.rt.shared.prefs.ICustomClientPreferenceDo;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.shared.services.common.prefs.Preferences;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
@@ -1025,6 +1030,42 @@ public class ClientUIPreferences {
       }
       setPropertyIntArray(DESKTOP_COLUMN_SPLITS, a);
     }
+  }
+
+  /**
+   * Sets a custom client preference data object for the given custom client preference ID.
+   *
+   * @param customClientPreferenceId
+   *          Required ID
+   * @param customClientPreference
+   *          Might be <code>null</code> to remove an already stored custom client preference data object.
+   */
+  public void setCustomClientPreference(CustomClientPreferenceId customClientPreferenceId, ICustomClientPreferenceDo customClientPreference) {
+    assertNotNull(customClientPreferenceId, "customClientPreferenceId is required");
+    if (m_prefs == null) {
+      return;
+    }
+
+    if (customClientPreference == null) {
+      m_prefs.remove(customClientPreferenceId.unwrapAsString());
+    }
+    else {
+      m_prefs.put(customClientPreferenceId.unwrapAsString(), BEANS.get(IDataObjectMapper.class).writeValue(customClientPreference));
+    }
+    flush();
+  }
+
+  /**
+   * @return A custom client preference data object for the given custom client preference ID, or <code>null</code> if
+   *         no custom client preference is available for the given ID.
+   */
+  public <T extends ICustomClientPreferenceDo> T getCustomClientPreference(CustomClientPreferenceId customClientPreferenceId, Class<T> customClientPreferenceClass) {
+    if (m_prefs == null) {
+      return null;
+    }
+
+    String customClientPreferenceJson = m_prefs.get(customClientPreferenceId.unwrapAsString(), null);
+    return customClientPreferenceId == null ? null : BEANS.get(IDataObjectMapper.class).readValue(customClientPreferenceJson, customClientPreferenceClass);
   }
 
   public static IPreferences getClientPreferences(IClientSession session) {

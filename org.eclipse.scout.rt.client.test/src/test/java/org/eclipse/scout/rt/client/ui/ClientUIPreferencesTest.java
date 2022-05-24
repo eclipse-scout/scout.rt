@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Set;
 
@@ -22,9 +21,12 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.fixture.TestCustomClientPreferenceFixtureDo;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.shared.prefs.CustomClientPreferenceId;
 import org.eclipse.scout.rt.shared.services.common.prefs.AbstractUserPreferencesStorageService;
 import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
@@ -151,6 +153,33 @@ public class ClientUIPreferencesTest {
     assertEquals(renamedConfigCount, config2CountAfterRename);
   }
 
+  @Test
+  public void testCustomClientPreference() {
+    ClientUIPreferences prefs = ClientUIPreferences.getInstance();
+
+    CustomClientPreferenceId id1 = CustomClientPreferenceId.of("scoutTestFixture.Test1");
+    CustomClientPreferenceId id2 = CustomClientPreferenceId.of("scoutTestFixture.Test2");
+
+    assertNull(prefs.getCustomClientPreference(id1, TestCustomClientPreferenceFixtureDo.class));
+    assertNull(prefs.getCustomClientPreference(id2, TestCustomClientPreferenceFixtureDo.class));
+
+    prefs.setCustomClientPreference(id1, BEANS.get(TestCustomClientPreferenceFixtureDo.class).withName("one"));
+    assertEquals("one", prefs.getCustomClientPreference(id1, TestCustomClientPreferenceFixtureDo.class).getName());
+    assertNull(prefs.getCustomClientPreference(id2, TestCustomClientPreferenceFixtureDo.class));
+
+    prefs.setCustomClientPreference(id2, BEANS.get(TestCustomClientPreferenceFixtureDo.class).withName("two"));
+    assertEquals("one", prefs.getCustomClientPreference(id1, TestCustomClientPreferenceFixtureDo.class).getName());
+    assertEquals("two", prefs.getCustomClientPreference(id2, TestCustomClientPreferenceFixtureDo.class).getName());
+
+    prefs.setCustomClientPreference(id1, null);
+    assertNull(prefs.getCustomClientPreference(id1, TestCustomClientPreferenceFixtureDo.class));
+    assertEquals("two", prefs.getCustomClientPreference(id2, TestCustomClientPreferenceFixtureDo.class).getName());
+
+    prefs.setCustomClientPreference(id2, null);
+    assertNull(prefs.getCustomClientPreference(id1, TestCustomClientPreferenceFixtureDo.class));
+    assertNull(prefs.getCustomClientPreference(id2, TestCustomClientPreferenceFixtureDo.class));
+  }
+
   public static void printOut(IPreferences prefs) {
     for (String key : prefs.keys()) {
       System.out.println(key + "=" + prefs.get(key, ""));
@@ -177,7 +206,6 @@ public class ClientUIPreferencesTest {
         return INumberColumn.BackgroundEffect.COLOR_GRADIENT_2;
       }
     }
-
   }
 
   private static final class TestingUserPreferencesStorageService extends AbstractUserPreferencesStorageService {
