@@ -147,7 +147,7 @@ export default class ColumnOptimalWidthMeasurer {
   _build$CellForAggregateRow(row) {
     let columns = this.table.visibleColumns();
     let colIndex = columns.indexOf(this.column);
-    let $row = this.table._buildAggregateRowDiv(row);
+    let $row = this.table._build$AggregateRow(row);
 
     $row.appendTo(this.table.$data);
     columns
