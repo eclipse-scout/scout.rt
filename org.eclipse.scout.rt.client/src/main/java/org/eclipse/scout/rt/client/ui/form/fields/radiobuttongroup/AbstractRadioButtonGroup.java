@@ -275,7 +275,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    * <code>null</code>!
    */
   protected IRadioButton<T> createEmptyRadioButtonForLookupRow() {
-    return new RadioButton();
+    return new P_RadioButton();
   }
 
   /**
@@ -682,7 +682,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
   @ClassId("7fb44a3d-b3e5-4cae-bb93-0fa435802466")
   @SuppressWarnings("bsiRulesDefinition:orderMissing")
-  private final class RadioButton extends AbstractRadioButton<T> {
+  public final class P_RadioButton extends AbstractRadioButton<T> {
   }
 
   protected final void interceptPrepareLookup(ILookupCall<T> call) {
