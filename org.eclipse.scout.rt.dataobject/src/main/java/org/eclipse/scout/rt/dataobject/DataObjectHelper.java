@@ -11,23 +11,30 @@
 package org.eclipse.scout.rt.dataobject;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class dealing with {@link IDoEntity} and its attributes.
@@ -35,9 +42,11 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 @ApplicationScoped
 public class DataObjectHelper {
 
-  protected IDataObjectMapper getDataObjectMapper() {
-    return BEANS.get(IDataObjectMapper.class);
-  }
+  private static final Logger LOG = LoggerFactory.getLogger(DataObjectHelper.class);
+
+  protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
+
+  protected final LazyValue<IDataObjectMapper> m_dataObjectMapper = new LazyValue<>(IDataObjectMapper.class);
 
   /**
    * Returns attribute {@code attributeName} converted to a {@link Integer} value.
@@ -128,7 +137,7 @@ public class DataObjectHelper {
     }
     @SuppressWarnings("unchecked")
     Class<T> valueType = (Class<T>) value.getClass();
-    IDataObjectMapper mapper = getDataObjectMapper();
+    IDataObjectMapper mapper = m_dataObjectMapper.get();
     String clone = mapper.writeValue(value);
     return mapper.readValue(clone, valueType);
   }
@@ -145,7 +154,7 @@ public class DataObjectHelper {
     if (value == null) {
       return null;
     }
-    IDataObjectMapper mapper = getDataObjectMapper();
+    IDataObjectMapper mapper = m_dataObjectMapper.get();
     String clone = mapper.writeValue(value);
     return (IDoEntity) mapper.readValueRaw(clone);
   }
@@ -157,7 +166,7 @@ public class DataObjectHelper {
     if (entity == null) {
       return Objects.toString(entity);
     }
-    return getDataObjectMapper().writeValue(entity);
+    return m_dataObjectMapper.get().writeValue(entity);
   }
 
   /**
@@ -168,7 +177,7 @@ public class DataObjectHelper {
       return new byte[0];
     }
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    getDataObjectMapper().writeValue(out, entity);
+    m_dataObjectMapper.get().writeValue(out, entity);
     return out.toByteArray();
   }
 
@@ -262,6 +271,135 @@ public class DataObjectHelper {
 
       collection.clear();
       collection.addAll(list); // replace
+    }
+  }
+
+  /**
+   * Cleans the data object, i.e. removes all {@link DoValue} nodes with value {@code null} and all
+   * {@link IDoCollection} nodes containing an empty collection. This is useful to have a minimal data object.
+   *
+   * @param dataObject
+   *          Data object to clean.
+   */
+  public void clean(IDataObject dataObject) {
+    new P_CleanDataObjectVisitor().clean(dataObject);
+  }
+
+  protected static class P_CleanDataObjectVisitor extends AbstractDataObjectVisitor {
+
+    public void clean(IDataObject dataObject) {
+      visit(dataObject);
+    }
+
+    @Override
+    protected void caseDoEntity(IDoEntity entity) {
+      // (1) clean all nodes of entity
+      Set<DoNode<?>> emptyNodes = new HashSet<>();
+      for (DoNode<?> node : entity.allNodes().values()) {
+        // (1a) clean null values
+        if (node instanceof DoValue && node.get() == null) {
+          emptyNodes.add(node);
+        }
+        // (1b) clean empty collections (i.e. DoCollection, DoList, DoSet)
+        else if (node instanceof IDoCollection && ((IDoCollection) node).isEmpty()) {
+          emptyNodes.add(node);
+        }
+        // (1c) clean nested DoEntities
+        else {
+          caseDoEntityNode(node);
+        }
+      }
+      entity.removeIf(emptyNodes::contains);
+
+      // (2) clean all contributions (i.e. itself implementations of DoEntity)
+      caseDoEntityContributions(entity.getContributions());
+    }
+  }
+
+  /**
+   * Truncates the given {@link String}-typed {@link DoValue} if it exists, not {@code null} and longer than the
+   * requested {@code maxLength}.
+   */
+  public void truncateStringValue(DoValue<String> doValue, int maxLength) {
+    Assertions.assertGreater(maxLength, 0, "maxLength must be greater than 0");
+    if (doValue == null || !doValue.exists() || StringUtility.length(doValue.get()) <= maxLength) {
+      return;
+    }
+    doValue.set(doValue.get().substring(0, maxLength));
+  }
+
+  /**
+   * Sets the content of the given {@link DoValue} to the given {@code value} if the current value is {@code null}.
+   */
+  public <V> void ensureValue(DoValue<V> doValue, V value) {
+    if (doValue != null && doValue.get() == null) {
+      doValue.set(value);
+    }
+  }
+
+  /**
+   * Sets the content of the given {@code DoValue} to the result of the given {@code valueSupplier} if the current value
+   * is {@code null}.
+   */
+  public <V> void supplyValue(DoValue<V> doValue, Supplier<V> valueSupplier) {
+    if (doValue != null && valueSupplier != null && doValue.get() == null) {
+      doValue.set(valueSupplier.get());
+    }
+  }
+
+  /**
+   * Ensures that the given data object contains all declared nodes, e.g. all {@link DoValue} nodes are set to
+   * {@code null} and all {@link DoList}, {@link DoSet} and {@link DoCollection} nodes are set to an empty value.
+   */
+  public <E extends IDoEntity> E ensureDeclaredNodes(E entity) {
+    m_dataObjectInventory.get().getAttributesDescription(entity.getClass())
+        .values()
+        .forEach(desc -> ensureNodeValue(entity, desc.getName(), desc.getType().getRawType(), null));
+    return entity;
+  }
+
+  /**
+   * Extends the {@code target} entity by adding those attributes from the {@code template} entity that are not already
+   * available. The operation is not recursive.
+   *
+   * @param target
+   *          target entity that is extended with attributes from the {@code template}. Must not be {@code null}.
+   * @param template
+   *          entity missing attributes are taken from. It is not modified and can be {@code null}.
+   * @return the {@code target} object that was potentially modified
+   */
+  public <E extends IDoEntity> E extend(E target, IDoEntity template) {
+    Assertions.assertNotNull(target, "target is required");
+    if (template == null) {
+      return target;
+    }
+    template.allNodes().forEach((name, node) -> ensureNodeValue(target, name, node.getClass(), node.get()));
+    return target;
+  }
+
+  /**
+   * Ensures that the given data object node exists. If the node did not exist before, its value is set to the given
+   * {@code value} otherwise the value is unchanged.
+   */
+  protected void ensureNodeValue(IDoEntity entity, String attributeName, Type nodeType, Object value) {
+    if (entity.has(attributeName)) {
+      return;
+    }
+
+    if (nodeType == DoValue.class) {
+      entity.put(attributeName, value);
+    }
+    else if (nodeType == DoList.class) {
+      entity.putList(attributeName, (List<?>) value);
+    }
+    else if (nodeType == DoSet.class) {
+      entity.putSet(attributeName, (Set<?>) value);
+    }
+    else if (nodeType == DoCollection.class) {
+      entity.putCollection(attributeName, (Collection<?>) value);
+    }
+    else {
+      Assertions.fail("unexpected DoNode of type [{}]", nodeType.getTypeName());
     }
   }
 }
