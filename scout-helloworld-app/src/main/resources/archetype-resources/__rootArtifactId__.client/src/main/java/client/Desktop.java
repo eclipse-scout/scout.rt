@@ -4,11 +4,7 @@
 package ${package}.client;
 
 import java.beans.PropertyChangeEvent;
-import java.security.AccessController;
-import java.security.Principal;
 import java.util.List;
-
-import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -19,10 +15,12 @@ import org.eclipse.scout.rt.client.ui.desktop.notification.NativeNotificationDef
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.security.IAccessControlService;
 
 import ${package}.client.Desktop.UserProfileMenu.ThemeMenu.DarkThemeMenu;
 import ${package}.client.Desktop.UserProfileMenu.ThemeMenu.DefaultThemeMenu;
@@ -57,8 +55,8 @@ public class Desktop extends AbstractDesktop {
 
   @Override
   protected List<Class<? extends IOutline>> getConfiguredOutlines() {
-    return CollectionUtility.<Class<? extends IOutline>>arrayList(WorkOutline.class, SearchOutline.class,
-        SettingsOutline.class);
+    return CollectionUtility.<Class<? extends IOutline>>arrayList(
+      WorkOutline.class, SearchOutline.class, SettingsOutline.class);
   }
 
   @Override
@@ -103,9 +101,8 @@ public class Desktop extends AbstractDesktop {
 
     @Override
     protected String getConfiguredText() {
-      Subject subject = Subject.getSubject(AccessController.getContext());
-      Principal firstPrincipal = CollectionUtility.firstElement(subject.getPrincipals());
-      return StringUtility.uppercaseFirst(firstPrincipal.getName());
+      String userId = BEANS.get(IAccessControlService.class).getUserIdOfCurrentSubject();
+      return StringUtility.uppercaseFirst(userId);
     }
 
     @Order(1000)
