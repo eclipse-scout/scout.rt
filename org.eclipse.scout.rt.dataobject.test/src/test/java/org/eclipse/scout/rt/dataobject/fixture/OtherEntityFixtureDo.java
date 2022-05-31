@@ -10,9 +10,13 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
+import java.util.Collection;
+import java.util.List;
+
 import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
@@ -28,6 +32,10 @@ public class OtherEntityFixtureDo extends DoEntity implements IInterfaceFixtureD
 
   public DoValue<Boolean> active() {
     return doValue("active");
+  }
+
+  public DoList<String> items() {
+    return doList("items");
   }
 
   public DoValue<OtherEntityFixtureDo> nestedOtherEntity() {
@@ -63,6 +71,23 @@ public class OtherEntityFixtureDo extends DoEntity implements IInterfaceFixtureD
   @Generated("DoConvenienceMethodsGenerator")
   public boolean isActive() {
     return nvl(getActive());
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public OtherEntityFixtureDo withItems(Collection<? extends String> items) {
+    items().updateAll(items);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public OtherEntityFixtureDo withItems(String... items) {
+    items().updateAll(items);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<String> getItems() {
+    return items().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

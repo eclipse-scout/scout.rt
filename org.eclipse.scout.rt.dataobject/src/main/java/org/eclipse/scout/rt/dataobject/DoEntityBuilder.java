@@ -71,7 +71,8 @@ public class DoEntityBuilder {
    * <p>
    * If {@code value} is null, an empty list is added.
    */
-  public <V> DoEntityBuilder putList(String attributeName, @SuppressWarnings("unchecked") V... values) {
+  @SafeVarargs
+  public final <V> DoEntityBuilder putList(String attributeName, @SuppressWarnings("unchecked") V... values) {
     m_entity.putList(attributeName, CollectionUtility.arrayList(values));
     return this;
   }

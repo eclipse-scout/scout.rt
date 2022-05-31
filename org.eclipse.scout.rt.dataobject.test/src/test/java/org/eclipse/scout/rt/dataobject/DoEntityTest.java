@@ -803,6 +803,34 @@ public class DoEntityTest {
   }
 
   @Test
+  public void testPutSetIf() {
+    DoEntity expected = BEANS.get(DoEntity.class);
+    expected.putSet("setAttribute1", CollectionUtility.hashSet(1, 2, 3));
+    expected.putSet("setAttribute3", CollectionUtility.hashSet(4, 5, 6));
+
+    DoEntity actual = BEANS.get(DoEntity.class);
+    actual.putSetIf("setAttribute1", CollectionUtility.hashSet(1, 2, 3), v -> !v.isEmpty());
+    actual.putSetIf("setAttribute2", CollectionUtility.emptyHashSet(), v -> !v.isEmpty());
+    actual.putSetIf("setAttribute3", CollectionUtility.hashSet(4, 5, 6), v -> !v.isEmpty());
+
+    assertEqualsWithComparisonFailure(expected, actual);
+  }
+
+  @Test
+  public void testPutCollectionIf() {
+    DoEntity expected = BEANS.get(DoEntity.class);
+    expected.putCollection("collectionAttribute1", CollectionUtility.arrayList(1, 2, 3));
+    expected.putCollection("collectionAttribute3", CollectionUtility.arrayList(4, 5, 6));
+
+    DoEntity actual = BEANS.get(DoEntity.class);
+    actual.putCollectionIf("collectionAttribute1", CollectionUtility.arrayList(1, 2, 3), v -> !v.isEmpty());
+    actual.putCollectionIf("collectionAttribute2", CollectionUtility.emptyArrayList(), v -> !v.isEmpty());
+    actual.putCollectionIf("collectionAttribute3", CollectionUtility.arrayList(4, 5, 6), v -> !v.isEmpty());
+
+    assertEqualsWithComparisonFailure(expected, actual);
+  }
+
+  @Test
   public void testDoValue() {
     DoEntity entity = BEANS.get(DoEntity.class);
     DoValue<String> doValue = entity.doValue("attribute");

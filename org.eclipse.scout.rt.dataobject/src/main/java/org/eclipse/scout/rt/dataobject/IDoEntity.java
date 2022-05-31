@@ -79,6 +79,24 @@ public interface IDoEntity extends IDataObject {
   }
 
   /**
+   * Adds new set value to attribute map of entity if the value satisfies the given {@code predicate}.
+   */
+  default <V> void putSetIf(String attributeName, Set<V> value, Predicate<? super Set<V>> predicate) {
+    if (predicate.test(value)) {
+      putSet(attributeName, value);
+    }
+  }
+
+  /**
+   * Adds new collection value to attribute map of entity if the value satisfies the given {@code predicate}.
+   */
+  default <V> void putCollectionIf(String attributeName, Collection<V> value, Predicate<? super Collection<V>> predicate) {
+    if (predicate.test(value)) {
+      putCollection(attributeName, value);
+    }
+  }
+
+  /**
    * @return {@code true} if attribute with name {@code attributeName} exists (attribute value could be null), otherwise
    *         {@code false}
    */
