@@ -925,7 +925,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   @Override
   public void setNotificationBadgeText(String notificationBadgeText) {
     getNotificationBadgeStatus().ifPresent(notificationBadgeStatus -> removeStatus(notificationBadgeStatus));
-    addStatus(new NotificationBadgeStatus(notificationBadgeText));
+    if (notificationBadgeText != null) {
+      addStatus(new NotificationBadgeStatus(notificationBadgeText));
+    }
   }
 
   protected Optional<NotificationBadgeStatus> getNotificationBadgeStatus() {

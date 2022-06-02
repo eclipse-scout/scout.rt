@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.status;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
@@ -167,25 +168,14 @@ public class Status implements IStatus, Serializable {
 
   @Override
   public int compareTo(IStatus o) {
-    if (o.getSeverity() - getSeverity() != 0) {
-      return o.getSeverity() - getSeverity();
-    }
-    else if (o.getOrder() - getOrder() != 0) {
-      return (int) ((getOrder() - o.getOrder()));
-    }
-    else if (getMessage() != null && o.getMessage() != null) {
-      return getMessage().compareTo(o.getMessage());
-    }
-    else if (getCssClass() != null && o.getCssClass() != null) {
-      return getCssClass().compareTo(o.getCssClass());
-    }
-    else if (getMessage() != null) {
-      return -1;
-    }
-    else if (getCssClass() != null) {
-      return -1;
-    }
-    return 0;
+    return Comparator
+        .comparing(IStatus::getSeverity, Comparator.reverseOrder())
+        .thenComparing(IStatus::getOrder)
+        .thenComparing(IStatus::getMessage,Comparator.nullsLast(Comparator.naturalOrder()))
+        .thenComparing(IStatus::getIconId,Comparator.nullsLast(Comparator.naturalOrder()))
+        .thenComparing(IStatus::getCode)
+        .thenComparing(IStatus::getCssClass,Comparator.nullsLast(Comparator.naturalOrder()))
+        .compare(this, o);
   }
 
   @Override
