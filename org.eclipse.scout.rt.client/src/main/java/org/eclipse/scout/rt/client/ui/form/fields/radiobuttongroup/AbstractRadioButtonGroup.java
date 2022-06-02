@@ -66,6 +66,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> implements IRadioButtonGroup<T> {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractRadioButtonGroup.class);
 
+  // make private class name externally available
+  public static final String RADIO_BUTTON_CLASS_NAME = AbstractRadioButtonGroup.RadioButton.class.getName();
+
   private boolean m_valueAndSelectionMediatorActive;
   private ILookupCall<T> m_lookupCall;
   private Class<? extends ICodeType<?, T>> m_codeTypeClass;
