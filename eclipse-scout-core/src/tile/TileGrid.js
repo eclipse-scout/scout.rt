@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -42,8 +42,6 @@ export default class TileGrid extends Widget {
     this.selectedTiles = [];
     this.selectionHandler = new TileGridSelectionHandler(this);
     this.scrollable = true;
-    this.scrolling = false;
-    this.scrollTopDirty = false;
     this.startupAnimationDone = false;
     this.startupAnimationEnabled = false;
     this.tiles = [];
@@ -594,18 +592,14 @@ export default class TileGrid extends Widget {
     let scrollTop = this.$container[0].scrollTop;
     let scrollLeft = this.$container[0].scrollLeft;
     if (this.scrollTop !== scrollTop && this.virtual) {
-      this.scrolling = true;
-      this.revalidateLayout();
-      this.scrolling = false;
+      this.htmlComp.layout.updateViewPort();
     }
     this.scrollTop = scrollTop;
     this.scrollLeft = scrollLeft;
   }
 
   _onScrollParentScroll(event) {
-    this.scrolling = true;
-    this.revalidateLayoutTree(false);
-    this.scrolling = false;
+    this.htmlComp.layout.updateViewPort();
   }
 
   setWithPlaceholders(withPlaceholders) {
@@ -961,12 +955,8 @@ export default class TileGrid extends Widget {
     this.ensureTileRendered(tile);
     // If tile was not rendered it is not yet positioned correctly -> make sure layout is valid before trying to scroll
     // Layout must not render the viewport because scroll position is not correct yet -> just make sure tiles are at the correct position
-    this.scrolling = true;
-    this.scrollTopDirty = true;
-    this.validateLayoutTree();
-    this.scrolling = false;
+    this.htmlComp.layout.updateViewPort(true);
     tile.reveal(options);
-    this.scrollTopDirty = false;
   }
 
   revealSelection() {

@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -44,18 +44,28 @@ export default class TileGridLayout extends LogicalGridLayout {
     this.maxWidth = -1;
   }
 
-  layout($container) {
-    let htmlComp = this.widget.htmlComp;
-    if (this.widget.scrolling) {
-      // Try to layout only as much as needed while scrolling in virtual mode
-      // Scroll top may be dirty when layout is validated before scrolling to a specific tile (see tileGrid.scrollTo)
-      if (!this.widget.scrollTopDirty) {
-        this.widget._renderViewPort();
-      }
-      this._layout($container);
-      this.widget.trigger('layoutAnimationDone');
+  /**
+   *
+   * @param {boolean} [scrollTopDirty] If the scroll top position should be considered dirty while updating the view port.
+   * If true, the view port is not rendered, as the scroll positions are not reliable anyway. Then only the layout of the TileGrid is updated.
+   */
+  updateViewPort(scrollTopDirty) {
+    let tileGrid = this.widget;
+    if (!tileGrid.rendered) {
       return;
     }
+
+    // Try to layout only as much as needed while scrolling in virtual mode
+    // Scroll top may be dirty when layout is validated before scrolling to a specific tile (see tileGrid.scrollTo)
+    if (!scout.nvl(scrollTopDirty, false)) {
+      tileGrid._renderViewPort();
+    }
+    this._layout(tileGrid.$container);
+    tileGrid.trigger('layoutAnimationDone');
+  }
+
+  layout($container) {
+    let htmlComp = this.widget.htmlComp;
 
     // Animate only once on startup (if enabled) but animate every time on resize
     let animated = htmlComp.layouted || (this.widget.startupAnimationEnabled && !this.widget.startupAnimationDone) || this.widget.renderAnimationEnabled;
