@@ -117,4 +117,11 @@ public interface IStatus extends Comparable<IStatus> {
    */
   String getIconId();
 
+  /**
+   * The cssClass string can be set optionally and is appended to the css classes which are used by default and added depending on the severity.
+   * Multiple cssClasses can be set space separated.
+   * @return The optional cssClass string.
+   */
+  String getCssClass();
+
 }

@@ -33,6 +33,7 @@ public class Status implements IStatus, Serializable {
   private int m_code;
   private String m_iconId;
   private final double m_order;
+  private String m_cssClass;
 
   /**
    * @param severity
@@ -140,6 +141,16 @@ public class Status implements IStatus, Serializable {
   }
 
   @Override
+  public String getCssClass() {
+    return m_cssClass;
+  }
+
+  public Status withCssClass(String cssClass) {
+    m_cssClass = cssClass;
+    return this;
+  }
+
+  @Override
   public boolean isOK() {
     return getSeverity() == OK;
   }
@@ -165,7 +176,13 @@ public class Status implements IStatus, Serializable {
     else if (getMessage() != null && o.getMessage() != null) {
       return getMessage().compareTo(o.getMessage());
     }
+    else if (getCssClass() != null && o.getCssClass() != null) {
+      return getCssClass().compareTo(o.getCssClass());
+    }
     else if (getMessage() != null) {
+      return -1;
+    }
+    else if (getCssClass() != null) {
       return -1;
     }
     return 0;
@@ -173,7 +190,7 @@ public class Status implements IStatus, Serializable {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " [" + "severity=" + getSeverityName() + ", message=" + m_message + "]";
+    return getClass().getSimpleName() + " [" + "severity=" + getSeverityName() + ", message=" + m_message + ", cssClass=" + m_cssClass + "]";
   }
 
   /**
@@ -209,6 +226,7 @@ public class Status implements IStatus, Serializable {
     result = prime * result + m_code;
     result = prime * result + ((m_iconId == null) ? 0 : m_iconId.hashCode());
     result = prime * result + ((m_message == null) ? 0 : m_message.hashCode());
+    result = prime * result + ((m_cssClass == null) ? 0 : m_cssClass.hashCode());
     long temp;
     temp = Double.doubleToLongBits(m_order);
     result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -251,6 +269,14 @@ public class Status implements IStatus, Serializable {
       return false;
     }
     if (m_severity != other.m_severity) {
+      return false;
+    }
+    if (m_cssClass == null) {
+      if (other.m_cssClass != null) {
+        return false;
+      }
+    }
+    else if (!m_cssClass.equals(other.m_cssClass)) {
       return false;
     }
     return true;

@@ -17,6 +17,7 @@ export default class Status {
     this.message = null;
     this.severity = Status.Severity.ERROR;
     this.code = 0;
+    this.statusCssClass = null;
     this.children = null;
     this.deletable = true;
     $.extend(this, model);
@@ -43,7 +44,7 @@ export default class Status {
   static SEVERITY_CSS_CLASSES = 'error warning info ok';
 
   cssClass() {
-    return Status.cssClassForSeverity(this.severity);
+    return strings.join(' ', Status.cssClassForSeverity(this.severity), this.statusCssClass);
   }
 
   /**
@@ -92,7 +93,7 @@ export default class Status {
     if (!objects.equalsRecursive(this.children, o.children)) {
       return false;
     }
-    return objects.propertiesEquals(this, o, ['severity', 'message', 'invalidDate', 'invalidTime']);
+    return objects.propertiesEquals(this, o, ['severity', 'message', 'invalidDate', 'invalidTime', 'cssClassInternal']);
   }
 
   /**
@@ -153,6 +154,7 @@ export default class Status {
       this.message = null;
       this.severity = Status.Severity.OK;
       this.code = 0;
+      this.statusCssClass = null;
       return;
     }
 
@@ -172,6 +174,7 @@ export default class Status {
     this.message = firstStatus.message;
     this.severity = firstStatus.severity;
     this.code = firstStatus.code;
+    this.statusCssClass = firstStatus.statusCssClass;
   }
 
   /**
