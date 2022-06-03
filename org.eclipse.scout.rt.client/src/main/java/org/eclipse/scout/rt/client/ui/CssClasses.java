@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui;
 
+import org.eclipse.scout.rt.client.extension.ui.NotificationBadgeStatus;
 import org.eclipse.scout.rt.client.ui.action.menu.form.fields.AbstractFormFieldMenu;
 
 /**
@@ -56,4 +57,10 @@ public interface CssClasses {
    * align a field with the label of the radio button.
    */
   String RADIOBUTTON_INDENTATION = "radiobutton-indentation";
+
+  /**
+   * Class that renders the status as notification badge (e.g. number of unread messages etc.)
+   * This class is used with the special status class {@link NotificationBadgeStatus}
+   */
+  String NOTIFICATION_BADGE_STATUS = "notification-badge";
 }

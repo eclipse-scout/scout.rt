@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -44,6 +45,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
+import org.eclipse.scout.rt.client.extension.ui.NotificationBadgeStatus;
 import org.eclipse.scout.rt.client.extension.ui.form.AbstractFormExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
@@ -122,6 +124,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.MultiStatus;
+import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
@@ -491,6 +494,17 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
+   * If set, the text will be rendered as notification badge in the right upper corner of the view.
+   *
+   * @return the text to be display in the notification badge of the form.
+   */
+  @ConfigProperty(ConfigProperty.TEXT)
+  @Order(210)
+  protected String getConfiguredNotificationBadgeText() {
+    return null;
+  }
+
+  /**
    * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
    * handler only once. Obviously this behavior can only be used for view forms.
    *
@@ -753,6 +767,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     setDisplayViewId(getConfiguredDisplayViewId());
     setClosable(getConfiguredClosable());
     setSaveNeededVisible(getConfiguredSaveNeededVisible());
+    setNotificationBadgeText(getConfiguredNotificationBadgeText());
 
     // visit all system buttons and attach observer
     m_systemButtonListener = new P_SystemButtonListener();// is auto-detaching
@@ -900,6 +915,28 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       ms.add(s);
     }
     return ms;
+  }
+
+  @Override
+  public String getNotificationBadgeText() {
+    return getNotificationBadgeStatus().map(Status::getMessage).orElse(null);
+  }
+
+  @Override
+  public void setNotificationBadgeText(String notificationBadgeText) {
+    getNotificationBadgeStatus().ifPresent(notificationBadgeStatus -> removeStatus(notificationBadgeStatus));
+    addStatus(new NotificationBadgeStatus(notificationBadgeText));
+  }
+
+  protected Optional<NotificationBadgeStatus> getNotificationBadgeStatus() {
+    final MultiStatus ms = getStatusInternal();
+    if (ms == null || !ms.containsStatus(NotificationBadgeStatus.class)) {
+      return Optional.empty();
+    }
+    return ms.getChildren().stream()
+        .filter(NotificationBadgeStatus.class::isInstance)
+        .map(status -> (NotificationBadgeStatus) status)
+        .findAny();
   }
 
   @Override

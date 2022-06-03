@@ -83,4 +83,9 @@ public class CustomProcessingStatus implements IProcessingStatus {
     return 0;
   }
 
+  @Override
+  public String getCssClass() {
+    return null;
+  }
+
 }
