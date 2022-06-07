@@ -205,6 +205,7 @@ export default class DateField extends ValueField {
       this.htmlDateTimeComposite.invalidateLayoutTree();
     }
     this._renderDateClearable();
+    this.$container.toggleClass('has-date', this.hasDate);
   }
 
   setHasTime(hasTime) {
@@ -257,6 +258,7 @@ export default class DateField extends ValueField {
       this.htmlDateTimeComposite.invalidateLayoutTree();
     }
     this._renderTimeClearable();
+    this.$container.toggleClass('has-time', this.hasTime);
   }
 
   setTimePickerResolution(timePickerResolution) {
