@@ -458,7 +458,7 @@ public final class DateUtility {
   }
 
   /**
-   * truncate the calendar to half year (i.e. jan 1, apr 1, jul 1 or oct 1 of the given year)
+   * truncate the calendar to quarter year (i.e. jan 1, apr 1, jul 1 or oct 1 of the given year)
    *
    * @since 4.2
    */
