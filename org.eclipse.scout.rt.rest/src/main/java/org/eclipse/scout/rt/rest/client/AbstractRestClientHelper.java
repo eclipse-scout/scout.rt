@@ -29,6 +29,7 @@ import javax.ws.rs.ext.ContextResolver;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
+import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.UriBuilder;
 import org.eclipse.scout.rt.rest.client.proxy.IRestClientExceptionTransformer;
@@ -47,7 +48,7 @@ import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
  */
 public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
-  private final Supplier<Client> m_clientSupplier = createClientSupplier();
+  private LazyValue<Supplier<Client>> m_lazyClientSupplier = new LazyValue<>(() -> createClientSupplier());
 
   /**
    * @return a supplier of {@link Client} instances used for {@link #target(String)}. The default implementation returns
@@ -62,7 +63,8 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
    * @return the unproxied {@link Client}.
    */
   protected Client internalClient() {
-    return m_clientSupplier.get();
+    Supplier<Client> clientSupplier = m_lazyClientSupplier.get();
+    return clientSupplier.get();
   }
 
   /**
@@ -162,7 +164,8 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
    *         {@code null}-transformer returns the passed exception unchanged.
    */
   public Client client(IRestClientExceptionTransformer exceptionTransformer) {
-    return getProxyFactory().createClientProxy(m_clientSupplier.get(), exceptionTransformer);
+    Supplier<Client> clientSupplier = m_lazyClientSupplier.get();
+    return getProxyFactory().createClientProxy(clientSupplier.get(), exceptionTransformer);
   }
 
   @Override
