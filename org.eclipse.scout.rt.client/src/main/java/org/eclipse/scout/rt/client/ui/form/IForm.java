@@ -202,6 +202,15 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   void removeStatus(IStatus status);
 
   /**
+   * If set, the text will be rendered as notification badge in the right upper corner of the view.
+   *
+   * @return the text to be display in the notification badge of the form.
+   */
+  String getNotificationBadgeText();
+
+  void setNotificationBadgeText(String notificationBadgeText);
+
+  /**
    * @return the {@link IWizard} that contains the step that started this form using startWizardStep
    */
   IWizard getWizard();

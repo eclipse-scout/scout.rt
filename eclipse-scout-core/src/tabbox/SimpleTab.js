@@ -37,7 +37,7 @@ export default class SimpleTab extends Widget {
     this.$statusContainer = null;
 
     this._statusContainerUsageCounter = 0;
-    this._statusIconDivs = [];
+    this._statusIconSpans = [];
 
     this._viewPropertyChangeListener = this._onViewPropertyChange.bind(this);
     this._viewRemoveListener = this._onViewRemove.bind(this);
@@ -311,27 +311,36 @@ export default class SimpleTab extends Widget {
   }
 
   _renderStatus() {
-    this._statusContainerUsageCounter -= (this._statusIconDivs.length === 0 ? 0 : 1);
+    this._statusContainerUsageCounter -= (this._statusIconSpans.length === 0 ? 0 : 1);
 
-    this._statusIconDivs.forEach($statusIcon => {
+    this._statusIconSpans.forEach($statusIcon => {
       $statusIcon.remove();
     });
-    this._statusIconDivs = [];
+    this._statusIconSpans = [];
 
     if (this.status) {
       this.status.asFlatList().forEach(status => {
-        if (!status || !status.iconId) {
+        if (!status || (!status.iconId && !status.message)) {
           return;
         }
-        let $statusIcon = this._getOrCreate$StatusContainer().appendIcon(status.iconId, 'status');
-        if (status.cssClass()) {
-          $statusIcon.addClass(status.cssClass());
+        if (status.iconId) {
+          let $statusIcon = this._getOrCreate$StatusContainer().appendIcon(status.iconId, 'status');
+          if (status.cssClass()) {
+            $statusIcon.addClass(status.cssClass());
+          }
+          this._statusIconSpans.push($statusIcon);
         }
-        this._statusIconDivs.push($statusIcon);
+        if (status.message) {
+          let $statusMessage = this._getOrCreate$StatusContainer().appendSpan('status message', status.message);
+          if (status.cssClass()) {
+            $statusMessage.addClass(status.cssClass());
+          }
+          this._statusIconSpans.push($statusMessage);
+        }
       });
     }
 
-    this._statusContainerUsageCounter += (this._statusIconDivs.length === 0 ? 0 : 1);
+    this._statusContainerUsageCounter += (this._statusIconSpans.length === 0 ? 0 : 1);
     if (this._statusContainerUsageCounter === 0) {
       this._remove$StatusContainer();
     }

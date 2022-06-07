@@ -39,6 +39,7 @@ public class JsonStatus implements IJsonObject {
     json.put("severity", m_status.getSeverity());
     json.put("iconId", m_status.getIconId());
     json.put("code", m_status.getCode());
+    json.put("statusCssClass", m_status.getCssClass());
     if (m_status.isMultiStatus()) {
       for (IStatus cs : ((IMultiStatus) m_status).getChildren()) {
         json.append("children", MainJsonObjectFactory.get().createJsonObject(cs).toJson());
@@ -63,12 +64,16 @@ public class JsonStatus implements IJsonObject {
     int severity = jsonStatus.getInt("severity");
     String iconId = jsonStatus.optString("iconId");
     Integer code = jsonStatus.optInt("code");
+    String cssClass = jsonStatus.optString("statusCssClass");
     Status status = new Status(message, severity);
     if (iconId != null) {
       status.withIconId(iconId);
     }
     if (code != null) {
       status.withCode(code);
+    }
+    if (cssClass != null) {
+      status.withCssClass(cssClass);
     }
     return status;
   }
