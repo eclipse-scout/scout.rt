@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -80,6 +80,13 @@ public class HttpServletControl implements Serializable {
    * Every servlet should call this method to make sure the defaults are applied
    * <p>
    * This includes setting default security response headers, parsing default request attributes etc.
+   *
+   * @param servlet
+   *          might be {@code null}
+   * @param req
+   *          must not be {@code null}
+   * @param resp
+   *          must not be {@code null}
    */
   public void doDefaults(HttpServlet servlet, HttpServletRequest req, HttpServletResponse resp) {
     parseRequest(servlet, req, resp);
@@ -91,12 +98,13 @@ public class HttpServletControl implements Serializable {
   }
 
   protected void setResponseHeaders(HttpServlet servlet, HttpServletRequest req, HttpServletResponse resp) {
+    resp.setHeader(HTTP_HEADER_X_CONTENT_TYPE_OPTIONS, CONTENT_TYPE_OPTION_NO_SNIFF); // apply no-sniff header for all http-methods
+
     if (!"GET".equals(req.getMethod())) {
       return;
     }
     resp.setHeader(HTTP_HEADER_X_FRAME_OPTIONS, SAMEORIGIN);
     resp.setHeader(HTTP_HEADER_X_XSS_PROTECTION, XSS_MODE_BLOCK);
-    resp.setHeader(HTTP_HEADER_X_CONTENT_TYPE_OPTIONS, CONTENT_TYPE_OPTION_NO_SNIFF);
 
     if (isCspEnabled(req)) {
       if (HttpClientInfo.get(req).isMshtml()) {

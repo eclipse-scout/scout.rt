@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 
 /**
  * Authenticator for Form-based authentication. This authenticator is designed to collaborate with
@@ -51,7 +52,7 @@ public class FormBasedAccessController implements IAccessController {
 
   protected FormBasedAuthConfig m_config;
 
-  public FormBasedAccessController init(final FormBasedAuthConfig config) {
+  public FormBasedAccessController init(FormBasedAuthConfig config) {
     m_config = config;
     Assertions.assertNotNull(m_config.getCredentialVerifier(), "CredentialVerifier must not be null");
     Assertions.assertNotNull(m_config.getPrincipalProducer(), "PrincipalProducer must not be null");
@@ -59,7 +60,7 @@ public class FormBasedAccessController implements IAccessController {
   }
 
   @Override
-  public boolean handle(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws IOException, ServletException {
+  public boolean handle(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
     if (!m_config.isEnabled()) {
       return false;
     }
@@ -86,19 +87,22 @@ public class FormBasedAccessController implements IAccessController {
    *         was done (caller should continue by invoking subsequent authenticators).
    */
   @SuppressWarnings({"squid:RedundantThrowsDeclarationCheck", "DuplicatedCode"}) // required so that overriding subclasses can throw ServletExceptions
-  protected boolean handleAuthRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
+  protected boolean handleAuthRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     // Never cache authentication requests.
     response.setHeader("Cache-Control", "private, no-store, no-cache, max-age=0"); // HTTP 1.1
     response.setHeader("Pragma", "no-cache"); // HTTP 1.0
     response.setDateHeader("Expires", 0); // prevents caching at the proxy server
 
-    final Pair<String, char[]> credentials = readCredentials(request);
+    // requests on /auth should have the default headers as this might also be called using GET which returns a 404 html page (container dependent)
+    BEANS.get(HttpServletControl.class).doDefaults(null, request, response);
+
+    Pair<String, char[]> credentials = readCredentials(request);
     if (credentials == null) {
       handleForbidden(ICredentialVerifier.AUTH_CREDENTIALS_REQUIRED, response);
       return true;
     }
 
-    final int status = m_config.getCredentialVerifier().verify(credentials.getLeft(), credentials.getRight());
+    int status = m_config.getCredentialVerifier().verify(credentials.getLeft(), credentials.getRight());
     if (status != ICredentialVerifier.AUTH_OK) {
       handleForbidden(status, response);
       return true;
@@ -109,7 +113,7 @@ public class FormBasedAccessController implements IAccessController {
     helper.invalidateSessionAfterLogin(request);
 
     // Put authenticated principal onto (new) HTTP session
-    final Principal principal = m_config.getPrincipalProducer().produce(credentials.getLeft());
+    Principal principal = m_config.getPrincipalProducer().produce(credentials.getLeft());
     helper.putPrincipalOnSession(request, principal);
     return true;
   }
@@ -121,7 +125,7 @@ public class FormBasedAccessController implements IAccessController {
    * @param status
    *          is a {@link ICredentialVerifier} AUTH_* constant
    */
-  protected void handleForbidden(final int status, final HttpServletResponse response) throws IOException {
+  protected void handleForbidden(int status, HttpServletResponse response) throws IOException {
     if (m_config.getStatus403WaitMillis() > 0L) {
       SleepUtil.sleepSafe(m_config.getStatus403WaitMillis(), TimeUnit.MILLISECONDS);
     }
@@ -131,13 +135,13 @@ public class FormBasedAccessController implements IAccessController {
   /**
    * Reads the credentials sent by 'login.js' from request parameters.
    */
-  protected Pair<String, char[]> readCredentials(final HttpServletRequest request) {
-    final String user = request.getParameter("user");
+  protected Pair<String, char[]> readCredentials(HttpServletRequest request) {
+    String user = request.getParameter("user");
     if (StringUtility.isNullOrEmpty(user)) {
       return null;
     }
 
-    final String password = request.getParameter("password");
+    String password = request.getParameter("password");
     if (StringUtility.isNullOrEmpty(password)) {
       return null;
     }
@@ -165,7 +169,7 @@ public class FormBasedAccessController implements IAccessController {
       return m_enabled;
     }
 
-    public FormBasedAuthConfig withEnabled(final boolean enabled) {
+    public FormBasedAuthConfig withEnabled(boolean enabled) {
       m_enabled = enabled;
       return this;
     }
@@ -177,7 +181,7 @@ public class FormBasedAccessController implements IAccessController {
     /**
      * Sets the {@link ICredentialVerifier} to verify user's credentials.
      */
-    public FormBasedAuthConfig withCredentialVerifier(final ICredentialVerifier credentialVerifier) {
+    public FormBasedAuthConfig withCredentialVerifier(ICredentialVerifier credentialVerifier) {
       m_credentialVerifier = credentialVerifier;
       return this;
     }
@@ -190,7 +194,7 @@ public class FormBasedAccessController implements IAccessController {
      * Sets the {@link IPrincipalProducer} to produce a {@link Principal} for authenticated users. By default,
      * {@link SimplePrincipalProducer} is used.
      */
-    public FormBasedAuthConfig withPrincipalProducer(final IPrincipalProducer principalProducer) {
+    public FormBasedAuthConfig withPrincipalProducer(IPrincipalProducer principalProducer) {
       m_principalProducer = principalProducer;
       return this;
     }
@@ -203,7 +207,7 @@ public class FormBasedAccessController implements IAccessController {
      * Sets the time to wait to respond with a 403 response code. That is a simple mechanism to address brute-force
      * attacks, but may have a negative effect on DoS attacks. By default, this authenticator waits for 500ms.
      */
-    public FormBasedAuthConfig withStatus403WaitMillis(final long waitMillis) {
+    public FormBasedAuthConfig withStatus403WaitMillis(long waitMillis) {
       m_status403WaitMillis = waitMillis;
       return this;
     }
