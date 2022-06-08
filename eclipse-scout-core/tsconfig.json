@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "allowJs": true,
+    "target": "es5",
+    "moduleResolution": "node",
+    "module": "esnext",
+    "declaration": true,
+    "skipLibCheck": true,
+//    "noEmit": false,
+//    "emitDeclarationOnly": true,
+    "sourceMap": true,
+    "declarationMap": true,
+    "lib": ["dom", "ES2016"]
+  },
+  "include": ["./src/**/*"]
+}

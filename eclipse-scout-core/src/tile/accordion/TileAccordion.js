@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Accordion, arrays, EventDelegator, FilterSupport, Group, KeyStrokeContext, objects, scout, TileAccordionLayout, TileAccordionSelectionHandler, TileTextFilter} from '../../index';
+import {Filter, Tile, Accordion, arrays, EventDelegator, FilterSupport, Group, KeyStrokeContext, objects, scout, TileAccordionLayout, TileAccordionSelectionHandler, TileTextFilter} from '../../index';
 
 export default class TileAccordion extends Accordion {
   constructor() {

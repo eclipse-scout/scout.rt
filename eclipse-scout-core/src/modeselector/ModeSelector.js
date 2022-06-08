@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, events, graphics, HtmlComponent, ModeSelectorLayout, Widget} from '../index';
+import {SwipeCallbackEvent, arrays, events, graphics, HtmlComponent, ModeSelectorLayout, Widget} from '../index';
 
 export default class ModeSelector extends Widget {
 

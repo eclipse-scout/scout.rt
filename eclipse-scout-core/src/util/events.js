@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, events, objects, strings} from '../index';
+import {SwipeCallbackEvent, arrays, Device, events, objects, strings} from '../index';
 
 /**
  * @returns {number} the x coordinate where the event happened, works for touch events as well.
@@ -178,15 +178,6 @@ export function addPropagationListener(source, target, types, filter) {
     });
   });
 }
-
-/**
- * @typedef {Object} SwipeCallbackEvent
- * @property {MouseEvent|TouchEvent} originalEvent The original event received from the browser.
- * @property {number} originalLeft The left position of the element at the moment the swipe was started.
- * @property {number} deltaX The horizontal delta the swipe has already moved (negative values mean to the left of the original left position).
- * @property {number} newLeft The current left position of the element.
- * @property {number} direction -1 if the move is to the left, 1 if the move is to the right, 0 or -0 if it is not moved yet
- */
 
 /**
  * Adds swipe event listeners to the element given.

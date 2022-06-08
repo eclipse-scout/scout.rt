@@ -94,7 +94,7 @@ export default class DragAndDropHandler {
    *
    * @param {File[]} files
    * @private
-   * @throws {dropValidationErrorMessage} validationErrorMessage
+   // * @throws {dropValidationErrorMessage} validationErrorMessage // TODO use type
    */
   _validateFiles(files) {
     if (!this.dropMaximumSize) {
@@ -110,7 +110,7 @@ export default class DragAndDropHandler {
   }
 
   /**
-   * @param {dropValidationErrorMessage} error
+   // * @param {dropValidationErrorMessage} error // TODO use type
    */
   _validationFailed(error) {
     $.log.isDebugEnabled() && $.log.debug('File validation failed', error);

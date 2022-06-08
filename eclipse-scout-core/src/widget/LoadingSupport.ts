@@ -9,19 +9,25 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, scout} from '../index';
-import WidgetSupport from './WidgetSupport';
+import WidgetSupport, {WidgetSupportOptions} from './WidgetSupport';
 
-export default class LoadingSupport extends WidgetSupport {
+export interface LoadingSupportOptions extends WidgetSupportOptions {
 
   /**
-   * @typedef {WidgetSupportOptions} LoadingSupportOptions
-   * @property {number} [loadingIndicatorDelay] if not set: 250 ms
+   * If not set: 250 ms
    */
+  loadingIndicatorDelay: number
+}
+
+export default class LoadingSupport extends WidgetSupport {
+  private loadingIndicatorDelay: number;
+  private _$loadingIndicator: JQuery;
+  private _loadingIndicatorTimeoutId: number;
 
   /**
    * @param {LoadingSupportOptions} options a mandatory options object
    */
-  constructor(options) {
+  constructor(options: LoadingSupportOptions) {
     super(options);
     this.loadingIndicatorDelay = scout.nvl(options.loadingIndicatorDelay, 250); // ms
 
@@ -36,7 +42,7 @@ export default class LoadingSupport extends WidgetSupport {
   _ensure$Container() {
     if (objects.isFunction(this.options$Container)) {
       // resolve function provided by options.$container that returns a jQuery element
-      this.$container = this.options$Container();
+      this.$container = (this.options$Container as Function)();
     } else if (this.options$Container) {
       // use jQuery element provided by options.$container
       this.$container = this.options$Container;
@@ -54,7 +60,7 @@ export default class LoadingSupport extends WidgetSupport {
     if (this.widget.isLoading()) {
       // add loading indicator
       if (this.loadingIndicatorDelay && !this.widget.rendering) {
-        this._loadingIndicatorTimeoutId = setTimeout(
+        this._loadingIndicatorTimeoutId = window.setTimeout(
           this._renderLoadingIndicator.bind(this), this.loadingIndicatorDelay);
       } else {
         this._renderLoadingIndicator();

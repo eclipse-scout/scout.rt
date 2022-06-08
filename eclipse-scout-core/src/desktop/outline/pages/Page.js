@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventSupport, Form, icons, inspector, MenuBar, scout, TileOutlineOverview, TileOverviewForm, TreeNode, Widget} from '../../../index';
+import {Table, Outline, TableRow, Event, EventSupport, Form, icons, inspector, MenuBar, scout, TileOutlineOverview, TileOverviewForm, TreeNode, Widget} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -17,9 +17,6 @@ import $ from 'jquery';
  * between pages with tables and pages with nodes in some cases. In the JS only case, Page is an abstract
  * class and is never instantiated directly, instead we always use subclasses of PageWithTable or PageWithNodes.
  * Implementations of these classes contain code which loads table data or child nodes.
- *
- * @class
- * @extends TreeNode
  */
 export default class Page extends TreeNode {
 

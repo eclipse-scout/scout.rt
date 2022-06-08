@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import objects from '../util/objects';
+import {objects} from '../index';
 
 export default class LookupRow {
 

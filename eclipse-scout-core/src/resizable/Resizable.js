@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, Insets, Rectangle, scout} from '../index';
+import {arrays, graphics, Insets, Rectangle, scout} from '../index';
 import $ from 'jquery';
-import arrays from '../util/arrays';
 
 /**
  * Resizable makes a DOM element resizable by adding resize handlers to all edges of the given model.$container. This is primarily used for (modal) dialogs.

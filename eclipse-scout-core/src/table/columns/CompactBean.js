@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import strings from '../../util/strings';
+import {strings, CompactLine} from '../../index';
 
 export default class CompactBean {
 

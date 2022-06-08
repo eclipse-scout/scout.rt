@@ -26,6 +26,10 @@
     "src"
   ],
   "scripts": {
+    "tsc": "tsc",
+    "api:gen:memory": "node --max_old_space_size=16384 node_modules/@microsoft/api-extractor/bin/api-extractor run",
+    "api:gen": "api-extractor run --diagnostics",
+    "tsc:api:gen": "tsc && api-extractor run",
     "testserver:start": "scout-scripts test-server:start",
     "testserver:stop": "scout-scripts test-server:stop",
     "test:ci": "scout-scripts test:ci",
@@ -45,10 +49,13 @@
     "jasmine-core": "3.10.1",
     "jasmine-ajax": "4.0.0",
     "jasmine-jquery": "2.1.1",
-    "karma": "6.3.9"
+    "karma": "6.3.9",
+    "@microsoft/api-extractor": "^7.25.0",
+    "@types/jquery": "3.5.14"
   },
   "dependencies": {
     "jquery": "3.6.0",
-    "sourcemapped-stacktrace": "1.1.11"
+    "sourcemapped-stacktrace": "1.1.11",
+    "typescript": "^4.7.2"
   }
 }

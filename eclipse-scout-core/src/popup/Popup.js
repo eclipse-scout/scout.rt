@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CloseKeyStroke, DialogLayout, Dimension, Event, FocusRule, GlassPaneRenderer, graphics, HtmlComponent, Insets, KeyStrokeContext, Point, PopupLayout, Rectangle, scout, scrollbars, strings, Widget, widgets} from '../index';
+import {AbstractLayout, CloseKeyStroke, DialogLayout, Dimension, Event, FocusRule, GlassPaneRenderer, graphics, HtmlComponent, Insets, KeyStrokeContext, Point, PopupLayout, Rectangle, scout, scrollbars, strings, Widget, widgets} from '../index';
 import $ from 'jquery';
 
 export default class Popup extends Widget {

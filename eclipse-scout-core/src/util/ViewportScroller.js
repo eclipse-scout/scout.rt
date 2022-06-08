@@ -8,6 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Point} from '../index'
 
 export default class ViewportScroller {
 

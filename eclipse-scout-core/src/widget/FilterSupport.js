@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, FormField, HAlign, keys, KeyStroke, objects, scout, strings, styles, ValueField, WidgetSupport} from '../index';
-import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
+import {Filter, FocusFilterFieldKeyStroke, SetFiltersResult, arrays, FormField, HAlign, keys, KeyStroke, objects, scout, strings, styles, ValueField, WidgetSupport} from '../index';
+import {WidgetSupportOptions} from './WidgetSupport';
 
 export default class FilterSupport extends WidgetSupport {
   /**
@@ -19,23 +19,6 @@ export default class FilterSupport extends WidgetSupport {
    * @property {function} getElementText Get text of an element.
    * @property {function} createTextFilter Create a text filter.
    * @property {function} updateTextFilterText Update the text on the filter, this is mandatory if createTextFilter is set.
-   */
-
-  /**
-   * @typedef Filter
-   * @property {function} accept A function that returns true or false, whether the filter accepts the element or not.
-   */
-
-  /**
-   * @typedef FilterResult
-   * @property {object[]} newlyHidden An array of the newly hidden elements.
-   * @property {object[]} newlyShown An array of the newly shown elements.
-   */
-
-  /**
-   * @typedef SetFiltersResult
-   * @property {Filter[]} filtersAdded An array of the filters added.
-   * @property {Filter[]} filtersRemoved An array of the filters removed.
    */
 
   /**

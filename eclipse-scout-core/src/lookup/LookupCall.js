@@ -345,19 +345,4 @@ export default class LookupCall {
     }
     return result.lookupRows[0];
   }
-
-  /**
-   * @typedef LookupResult
-   * @property {LookupRow[]} lookupRows
-   * @property {string} queryBy a value of the QueryBy object
-   * @property {boolean} byAll
-   * @property {boolean} byText
-   * @property {boolean} byKey
-   * @property {boolean} byKeys
-   * @property {boolean} byRec
-   * @property {boolean} rec
-   * @property {boolean} appendResult
-   * @property {boolean} uniqueMatch
-   * @property {number} seqNo
-   */
 }

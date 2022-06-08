@@ -58,7 +58,7 @@ export function updateFirstLastMarker(widgets) {
  * @param {Widget[]} widgets the widgets to check.
  * @param {Widget} [container] if specified, the function returns null if the container is not visible or not rendered. This allows for an early return without the need to check every given widget.
  * @param {boolean} [checkTabbable=true] if true, the resulting widget has to be tabbable, not only focusable.
- * @returns {Widget} the first widget of the given list which is focusable (and tabbable, unless checkTabbable is set to false).
+ * @returns {import("@eclipse-scout/core").Widget} the first widget of the given list which is focusable (and tabbable, unless checkTabbable is set to false).
  */
 export function findFirstFocusableWidget(widgets, container, checkTabbable) {
   if (container && (!container.rendered || !container.visible)) {

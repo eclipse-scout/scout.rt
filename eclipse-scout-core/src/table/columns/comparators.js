@@ -18,7 +18,7 @@ import $ from 'jquery';
 const TEXT = {
   collator: null,
   installed: false,
-  install: function(session) {
+  install: session => {
     if (this.installed) {
       return !!this.collator;
     }
@@ -110,7 +110,7 @@ const NUMERIC = {
 const ALPHANUMERIC = {
   collator: null,
   installed: false,
-  install: function(session) {
+  install: session => {
     TEXT.install(session);
     this.collator = TEXT.collator;
     return !!this.collator && NUMERIC.install(session);

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import Device from '../util/Device';
+import {Device} from '../index';
 
 const keys = {
   BACKSPACE: 8,

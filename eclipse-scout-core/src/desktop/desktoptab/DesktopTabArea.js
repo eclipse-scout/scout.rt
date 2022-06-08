@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SimpleTabArea} from '../../index';
-import DesktopTabAreaLayout from './DesktopTabAreaLayout';
+import {SimpleTabArea, DesktopTabAreaLayout} from '../../index';
 
 export default class DesktopTabArea extends SimpleTabArea {
   constructor() {

@@ -21,6 +21,9 @@ export {default as SimpleLoadingSupport} from './widget/SimpleLoadingSupport';
 export {default as KeyStroke} from './keystroke/KeyStroke';
 export {default as FocusFilterFieldKeyStroke} from './keystroke/FocusFilterFieldKeyStroke';
 export {default as FilterSupport} from './widget/FilterSupport';
+export {default as Filter} from './widget/Filter';
+export {FilterResult} from './widget/Filter';
+export {SetFiltersResult} from './widget/Filter';
 export {default as ModelAdapter} from './session/ModelAdapter';
 export {default as Widget} from './widget/Widget';
 export {default as widgets} from './widget/widgets';
@@ -35,6 +38,7 @@ export {default as EventDelegator} from './util/EventDelegator';
 export {default as dates} from './util/dates';
 export {default as defaultValues} from './util/defaultValues';
 export {default as events} from './util/events';
+export {default as SwipeCallbackEvent} from './util/SwipeCallbackEvent';
 export {default as files} from './util/files';
 export {default as Device} from './util/Device';
 export {default as DoubleClickSupport} from './util/DoubleClickSupport';
@@ -79,6 +83,7 @@ export {default as AjaxCall} from './ajax/AjaxCall';
 export {default as AjaxError} from './ajax/AjaxError';
 export {default as LookupCall} from './lookup/LookupCall';
 export {default as LookupRow} from './lookup/LookupRow';
+export {default as LookupResult} from './lookup/LookupResult';
 export {default as RestLookupCall} from './lookup/RestLookupCall';
 export {default as RemoteLookupCall} from './lookup/RemoteLookupCall';
 export {default as RemoteLookupRequest} from './lookup/RemoteLookupRequest';
@@ -637,6 +642,7 @@ export {default as ShrinkNavigationKeyStroke} from './desktop/navigation/ShrinkN
 export {default as EnlargeNavigationKeyStroke} from './desktop/navigation/EnlargeNavigationKeyStroke';
 export {default as DesktopNotification} from './desktop/notification/DesktopNotification';
 export {default as DesktopNotificationAdapter} from './desktop/notification/DesktopNotificationAdapter';
+export {default as NativeNotificationDefaults} from './desktop/notification/NativeNotificationDefaults';
 export {default as OfflineDesktopNotification} from './desktop/notification/OfflineDesktopNotification';
 export {default as PopupBlockerHandler} from './desktop/popupblocker/PopupBlockerHandler';
 export {default as PopupBlockerDesktopNotification} from './desktop/popupblocker/PopupBlockerDesktopNotification';
@@ -693,6 +699,8 @@ export {default as BreadcrumbBarLayout} from './breadcrumbbar/BreadcrumbBarLayou
 export {default as BreadcrumbBarAdapter} from './breadcrumbbar/BreadcrumbBarAdapter';
 export {default as BreadcrumbBarField} from './form/fields/breadcrumbbarfield/BreadcrumbBarField';
 export {default as BreadcrumbBarFieldAdapter} from './form/fields/breadcrumbbarfield/BreadcrumbBarFieldAdapter';
+export {default as ValidationResult} from './form/fields/ValidationResult'
+export {default as AnyWidget} from './AnyWidget'
 
 // The following files don't export anything but they need to be imported so they participate on the webpack build
 // noinspection ES6UnusedImports
@@ -703,19 +711,9 @@ import * as jqs from './jquery/jquery-scout';
 import * as jqss from './jquery/jquery-scout-selectors';
 
 import * as scout from './scout';
-import * as self from './index.js';
+// import * as self from './index.js'; // TODO creates endless loop, how is it done at @azure?
 
-export default self;
-
-/**
- * @typedef {Form|TileOverviewForm|UnsavedFormChangesForm|FieldStatus|StatusMenuMapping|FormField|CompositeField|ValueField|WidgetField|Button|WizardProgressField|CarouselField|TileField|TreeField|ImageField|TableField
- * |PlaceholderField|WrappedFormField|PlannerField|CalendarField|AccordionField|BreadcrumbBarField|OutlineTileField|TabArea|TabBoxHeader|Tab|ProposalChooser|TableProposalChooser|TreeProposalChooser|MenuBarBox|MenuBar|MenuBox
- * |DesktopToolBox|Tile|BeanTile|CompositeTile|WidgetTile|PlaceholderTile|HtmlTile|TileGrid|PageTileGrid|Tree|CompactTree|Outline|Group|Image|Icon|Label|Popup|TagChooserPopup|SmartFieldPopup|ContextMenuPopup|TouchPopup|
- * |WidgetPopup|TableHeaderMenu|CellEditorPopup|DatePickerPopup|TimePickerPopup|PopupManager|TableFooter|TableHeader|TableRowTileMapping|TableRowDetail|Table|TableTileGridMediator|TableHeaderMenuGroup|Action|Menu|TableHeaderMenuButton
- * |TableControl|ViewButton|Mode|BreadcrumbItem|IFrame|Slider|Switch|SimpleTab|DesktopTab|SimpleTabArea|DesktopTabArea|SimpleTabBox|TagBar|Composite|NullWidget|Desktop|DesktopLogo|BenchColumn|DesktopBench|DesktopHeader|OutlineOverview
- * |TileOutlineOverview|DesktopNavigation|ViewButtonBox|ViewMenuTab|Planner|PlannerHeader|BusyIndicator|Tooltip|TableInfoSelectionTooltip|TableTooltip|TableInfoLoadTooltip|TableInfoFilterTooltip|WidgetTooltip|CalendarComponent|Calendar
- * |YearPanel|Carousel|Splitter|Accordion|TileAccordion|GlassPane|Scrollbar|DatePicker|MessageBox|TimePicker|FileInput|FileChooser|ModeSelector|Notification|BreadcrumbBar|CollapseHandle|DesktopNavigationHandle|any} AnyWidget
- */
+// export default self; // TODO
 
 // Add all functions from the scout object to the scout object on the window
 // Note: the scout object on the window still needs its own scout object (window.scout.scout).

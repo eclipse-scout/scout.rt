@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {codes, Column, LookupCall, LookupRow, scout, SmartField, strings} from '../../index';
-import objects from '../../util/objects';
+import {objects, codes, Column, LookupCall, LookupRow, scout, SmartField, strings} from '../../index';
 
 /**
  * Column where each cell fetches its value using a lookup call.

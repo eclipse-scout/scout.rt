@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormLayout, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
+import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormLayout, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField, ValidationResult} from '../index';
 import $ from 'jquery';
 
 export default class Form extends Widget {
@@ -261,7 +261,7 @@ export default class Form extends Widget {
   /**
    * Lifecycle handle function registered for 'load'.
    *
-   * @returns {Promise<T | void>|void}
+   * @returns {Promise}
    */
   _onLifecycleLoad() {
     try {

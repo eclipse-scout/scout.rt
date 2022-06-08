@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NullLogger, scout, URL} from '../index';
+import {strings, NullLogger, scout, URL} from '../index';
 import $ from 'jquery';
-import strings from '../util/strings';
 
 const Level = {
   TRACE: 'trace',

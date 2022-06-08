@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BooleanColumn, CompactBean, CompactLine, objects} from '../index';
+import {Column, TableRow, BooleanColumn, CompactBean, CompactLine, objects} from '../index';
 
 export default class TableCompactHandler {
 

@@ -1370,7 +1370,7 @@ export default class Session {
    * Sends a request containing the log message for logging purpose.
    * The request is sent immediately (does not await pending requests).
    * @param {string} message the log message
-   * @param {logging.Level} [level] the log level used to log the message. Default is {@link logging.Level.ERROR}.
+   * @param {import('logging').Level} [level] the log level used to log the message. Default is {@link logging.Level.ERROR}.
    */
   sendLogRequest(message, level) {
     let request = this._newRequest({

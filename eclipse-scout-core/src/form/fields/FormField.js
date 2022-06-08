@@ -9,6 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
+  AbstractLayout,
+  TreeVisitResult,
+  ValidationResult,
   arrays,
   clipboard,
   Device,
@@ -1429,16 +1432,6 @@ export default class FormField extends Widget {
   computeRequiresSave() {
     return false;
   }
-
-  /**
-   * @typedef ValidationResult
-   * @property {boolean} valid
-   * @property {boolean} validByErrorStatus
-   * @property {boolean} validByMandatory
-   * @property {FormField} field
-   * @property {String} label
-   * @property {function} reveal
-   */
 
   /**
    * @returns {ValidationResult}

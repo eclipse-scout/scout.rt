@@ -214,7 +214,7 @@ export default {
 // ----------------- TYPEDEF -----------------
 
 /**
- * @typedef {Widget} DragAndDropTarget
+ * @typedef {import("@eclipse-scout/core").Widget} DragAndDropTarget
  * @property {number} [dropMaximumSize] default drop maximum size used in {@link DragAndDropOptions.dropMaximumSize}. If the target object contains a different field or function to retrieve this value override the supplier.
  * @property {boolean} [enabledComputed]  default install/uninstall criteria used in {@link DragAndDropOptions.doInstall}. If the target object contains a different field or function to retrieve this value override the supplier.
  * @property {$} [$container] default container used in {@link DragAndDropOptions.container}. If the target object contains a different field or function to retrieve this value override the supplier.

@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, scout, Status, strings, Table, TableFooterLayout, TableTextUserFilter, Widget} from '../index';
+import {FocusFilterFieldKeyStroke, fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, scout, Status, strings, Table, TableFooterLayout, TableTextUserFilter, Widget} from '../index';
 import $ from 'jquery';
-import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
 
 export default class TableFooter extends Widget {
 

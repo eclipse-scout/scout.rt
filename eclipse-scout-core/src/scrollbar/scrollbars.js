@@ -78,7 +78,7 @@ export function removeScrollable(session, $container) {
  *        </ul>
  * @param {function} [options.scrollShadowCustomizer] function to customize the scroll shadow
  * @param {Session} [options.session]
- * @param {Widget} [options.parent]
+ * @param {import("@eclipse-scout/core").Widget} [options.parent]
  */
 export function install($container, options) {
   options = _createDefaultScrollToOptions(options);

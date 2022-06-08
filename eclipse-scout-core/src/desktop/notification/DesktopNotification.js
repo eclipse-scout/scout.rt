@@ -47,6 +47,7 @@ export default class DesktopNotification extends ScoutNotification {
   static INFINITE = -1;
 
   /**
+   * @global
    * @typedef NativeNotificationDefaults
    * @property {string} title
    * @property {string} iconId

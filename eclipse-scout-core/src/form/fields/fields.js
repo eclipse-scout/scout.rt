@@ -94,7 +94,7 @@ export function handleOnClick(field) {
 /**
  * Calls activate() on the first focusable field of the given fields. Does nothing if the widget is disabled or not rendered.
  *
- * @param {Widget} field
+ * @param {import("@eclipse-scout/core").Widget} field
  * @param {FormField[]} fields
  */
 export function activateFirstField(widget, fields) {

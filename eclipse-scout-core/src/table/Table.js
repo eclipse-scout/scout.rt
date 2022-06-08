@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, clipboard, Column, ContextMenuKeyStroke, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, Event, FilterSupport, graphics, HtmlComponent, Insets, KeyStrokeContext, LoadingSupport, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn, objects, Range, scout, scrollbars, Status, strings, styles, TableCopyKeyStroke, TableLayout, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableToggleRowKeyStroke, TableUpdateBuffer, TableUserFilter, tooltips as tooltips_1, Widget} from '../index';
+import {Cell, Filter, AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, clipboard, Column, ContextMenuKeyStroke, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, Event, FilterSupport, graphics, HtmlComponent, Insets, KeyStrokeContext, LoadingSupport, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn, objects, Range, scout, scrollbars, Status, strings, styles, TableCopyKeyStroke, TableLayout, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableToggleRowKeyStroke, TableUpdateBuffer, TableUserFilter, tooltips as tooltips_1, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Table extends Widget {
@@ -3813,7 +3813,7 @@ export default class Table extends Widget {
   }
 
   /**
-   * @param {Filter|function|(Filter|function)[]} filter The new filters.
+   * @param {Filter|function|(Filter|function)[]} filters The new filters.
    * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
   setFilters(filters, applyFilter = true) {

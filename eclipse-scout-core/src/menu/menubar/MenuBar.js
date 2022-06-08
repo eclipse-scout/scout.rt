@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStrokeContext, Menu, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarRightKeyStroke, MenuDestinations, menus, scout, Widget, widgets} from '../../index';
-import ComboMenu from '../ComboMenu';
+import {arrays, ComboMenu, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStrokeContext, Menu, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarRightKeyStroke, MenuDestinations, menus, scout, Widget, widgets} from '../../index';
 
 export default class MenuBar extends Widget {
 

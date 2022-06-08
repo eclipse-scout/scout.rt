@@ -8,22 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, scout} from '../index';
+import {objects, scout, Widget} from '../index';
 
-export default class WidgetSupport {
+
+export interface WidgetSupportOptions {
+  /**
+   * Widget that created the support
+   */
+  widget: Widget,
 
   /**
-   * @typedef WidgetSupportOptions
-   * @property {Widget} widget Widget that created the support
-   * @property {$|function} [$container] jQuery element that will be used for the visualization.
+   * jQuery element that will be used for the visualization.
    *  It may be a function to resolve the container later.
    *  If this property is not set the $container of the widget is used by default.
    */
+  $container?: JQuery | Function
+}
+
+export default class WidgetSupport {
+  public widget: Widget;
+  protected readonly options$Container: JQuery | Function;
+  public $container: any;
 
   /**
    * @param {WidgetSupportOptions} options a mandatory options object
    */
-  constructor(options) {
+  constructor(options:WidgetSupportOptions) {
     scout.assertParameter('widget', options.widget);
 
     this.widget = options.widget;
@@ -33,7 +43,7 @@ export default class WidgetSupport {
   _ensure$Container() {
     if (objects.isFunction(this.options$Container)) {
       // resolve function provided by options.$container that returns a jQuery element
-      this.$container = this.options$Container();
+      this.$container = (this.options$Container as Function)();
     } else if (this.options$Container) {
       // use jQuery element provided by options.$container
       this.$container = this.options$Container;
