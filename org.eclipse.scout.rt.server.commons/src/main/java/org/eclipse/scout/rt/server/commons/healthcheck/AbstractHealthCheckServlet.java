@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
+import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +33,8 @@ import org.slf4j.LoggerFactory;
  * application status. If the application status is OK, the servlet returns HTTP 200. In case any
  * <code>IHealthChecker</code> fails, the servlet returns HTTP 503.
  * <p>
- * This servlet can be used in combination with load balancers or reverse proxies that use a HTTP-GET or HTTP-HEAD check
- * method to determine the availability of the application.
+ * This servlet can be used in combination with load balancers or reverse proxies that use an HTTP-GET or HTTP-HEAD
+ * check method to determine the availability of the application.
  *
  * @since 6.1
  * @see AbstractHealthChecker
@@ -48,6 +49,7 @@ public abstract class AbstractHealthCheckServlet extends AbstractHttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     disableCaching(req, resp);
+    BEANS.get(HttpServletControl.class).doDefaults(this, req, resp);
 
     RunContext context;
     try {

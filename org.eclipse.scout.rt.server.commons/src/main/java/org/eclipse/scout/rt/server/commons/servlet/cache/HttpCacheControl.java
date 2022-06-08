@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * In production it makes heavy use of the max-age concept.
  * <p>
- * Make sure to call {@link #checkAndSetCacheHeaders(HttpServletRequest, HttpServletResponse, String, HttpCacheObject)}
- * in every servlet.
+ * Make sure to call {@link #checkAndSetCacheHeaders(HttpServletRequest, HttpServletResponse, HttpCacheObject)} in every
+ * servlet.
  */
 @ApplicationScoped
 public class HttpCacheControl {
@@ -65,15 +65,13 @@ public class HttpCacheControl {
    * Does nothing if this request is a forward such as
    * {@link RequestDispatcher#forward(javax.servlet.ServletRequest, javax.servlet.ServletResponse)}
    *
-   * @param req
-   * @param resp
    * @param obj
    *          is the cache object that decides if cache is to be used or not, may be null to disable caching
    * @return true if the obj hasn't changed in the meantime. The {@link HttpServletResponse#SC_NOT_MODIFIED} response is
    *         sent to the http response by this method and the caller should end its processing of this request.
    *         <p>
    *         false if the obj again needs to be fully returned, Etag, IfModifiedSince and MaxAge headers were set if
-   *         appropriate. If no caching is desired then the disable headers were set.
+   *         appropriate. If no caching is desired then the necessary headers were set.
    */
   public boolean checkAndSetCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheObject obj) {
     if (!UrlHints.isCacheHint(req)) {
