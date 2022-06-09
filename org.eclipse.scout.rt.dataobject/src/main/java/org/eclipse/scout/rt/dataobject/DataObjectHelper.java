@@ -33,16 +33,12 @@ import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Helper class dealing with {@link IDoEntity} and its attributes.
  */
 @ApplicationScoped
 public class DataObjectHelper {
-
-  private static final Logger LOG = LoggerFactory.getLogger(DataObjectHelper.class);
 
   protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
