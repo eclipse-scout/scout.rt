@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -347,6 +347,28 @@ public final class PlatformConfigProperties {
     @Override
     public String description() {
       return "Path to a malware scanner checked directory. The default value is null which means the system temp path is used.";
+    }
+  }
+
+  /**
+   * @since 2022, issue with some realtime scanners that have a delay until the file is scanned or are blocking the file
+   *        until scanned. For these cases this delay can be set (issue 322661).
+   */
+  public static class MalwareScannerDelayProperty extends AbstractIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.malwareScanner.delay";
+    }
+
+    @Override
+    public String description() {
+      return "Delay in milliseconds to wait after writing the file to the temp directory. This lets the scanner some time for checking. Default is 500ms.";
+    }
+
+    @Override
+    public Integer getDefaultValue() {
+      return 500;
     }
   }
 }
