@@ -16,7 +16,7 @@ export interface LoadingSupportOptions extends WidgetSupportOptions {
   /**
    * If not set: 250 ms
    */
-  loadingIndicatorDelay: number
+  loadingIndicatorDelay?: number
 }
 
 export default class LoadingSupport extends WidgetSupport {

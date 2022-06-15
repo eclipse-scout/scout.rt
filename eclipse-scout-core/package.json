@@ -20,6 +20,7 @@
     "scout core runtime"
   ],
   "main": "./src/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "res",
@@ -50,11 +51,11 @@
     "jasmine-ajax": "4.0.0",
     "jasmine-jquery": "2.1.1",
     "karma": "6.3.9",
-    "@microsoft/api-extractor": "^7.25.0",
-    "@types/jquery": "3.5.14"
+    "@microsoft/api-extractor": "^7.25.0"
   },
   "dependencies": {
     "jquery": "3.6.0",
+    "@types/jquery": "3.5.14",
     "sourcemapped-stacktrace": "1.1.11",
     "typescript": "^4.7.2"
   }
