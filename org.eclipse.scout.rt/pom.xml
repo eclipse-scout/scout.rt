@@ -245,17 +245,7 @@
       <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-java</artifactId>
-        <version>3.141.59</version>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>4.2.2</version>
       </dependency>
 
       <dependency>

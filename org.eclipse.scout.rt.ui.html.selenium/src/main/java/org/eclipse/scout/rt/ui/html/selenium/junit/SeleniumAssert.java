@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -24,13 +24,12 @@ public final class SeleniumAssert {
   }
 
   /**
-   * Fails when the given element does not contain all of the given CSS classes.
+   * Fails when the given element does not contain all the given CSS classes.
    *
-   * @param element
    * @param expectedCssClass
    *          A single CSS class-name or multiple CSS class-names separated by space. Example: <code>'menu-item'</code>
    *          or <code>'menu-item selected'</code>. If multiple CSS class-names are given, the given element must have
-   *          all of these classes, otherwise the assert will fail.
+   *          all of these classes, otherwise the assertion will fail.
    */
   public static void assertCssClass(AbstractSeleniumTest test, WebElement element, String expectedCssClass) {
     test.waitUntil(SeleniumExpectedConditions.elementToHaveCssClass(element, expectedCssClass));
@@ -38,9 +37,6 @@ public final class SeleniumAssert {
 
   /**
    * Fails when the given element contains at least one of the given CSS classes.
-   *
-   * @param element
-   * @param expectedCssClass
    */
   public static void assertCssClassNotExists(AbstractSeleniumTest test, WebElement element, String expectedCssClass) {
     test.waitUntil(SeleniumExpectedConditions.elementNotToHaveCssClass(element, expectedCssClass));

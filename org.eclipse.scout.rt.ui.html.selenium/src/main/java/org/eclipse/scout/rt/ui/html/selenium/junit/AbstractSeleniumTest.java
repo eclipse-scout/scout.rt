@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.selenium.junit;
 
 import static org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil.shortPause;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -431,7 +432,7 @@ public abstract class AbstractSeleniumTest {
   }
 
   protected <V> V waitUntil(Function<WebDriver, V> condition, int timeoutInSeconds) {
-    return new WebDriverWait(s_driver, timeoutInSeconds).until(condition);
+    return new WebDriverWait(s_driver, Duration.ofSeconds(timeoutInSeconds)).until(condition);
   }
 
   public void resetWaitUntilTimeout() {
@@ -585,16 +586,16 @@ public abstract class AbstractSeleniumTest {
 
   /**
    * Used as a replacement for WebElement#clear. Google changed the way clear() works in ChromeDriver > 2.43 and the
-   * method now causes the field to loose focus, which triggers a lot of focus-out handlers that haven't called before
-   * version 2.43. Thus this method works with 'select all' and backspace. Additionally it also triggers key/up down
-   * events which is also a desired side-effect of this method (clear() does not trigger key events).
+   * method now causes the field to lose focus, which triggers a lot of focus-out handlers that haven't called before
+   * version 2.43. Thus, this method works with 'select all' and backspace. Additionally, it also triggers key/up down
+   * events which is also a desired side effect of this method (clear() does not trigger key events).
    * <p>
    * Note: you can still use WebElement#clear if focus loss doesn't matter. But for a lot of widgets, especially
    * SmartFields it makes a difference.
    *
    * @param withPause
-   *          whether or not a short pause should be made after the field has been cleared, this may be necessary for
-   *          some SmartFields
+   *          whether a short pause should be made after the field has been cleared, this may be necessary for some
+   *          SmartFields
    */
   public void clearInput(WebElement input, boolean withPause) {
     selectAll(input);
@@ -605,12 +606,12 @@ public abstract class AbstractSeleniumTest {
   }
 
   /**
-   * Fails when the given element does not contain all of the given CSS classes.
+   * Fails when the given element does not contain all the given CSS classes.
    *
    * @param expectedCssClass
    *          A single CSS class-name or multiple CSS class-names separated by space. Example: <code>'menu-item'</code>
    *          or <code>'menu-item selected'</code>. If multiple CSS class-names are given, the given element must have
-   *          all of these classes, otherwise the assert will fail.
+   *          all of these classes, otherwise the assertion will fail.
    */
   public void assertCssClass(WebElement element, String expectedCssClass) {
     waitUntil(SeleniumExpectedConditions.elementToHaveCssClass(element, expectedCssClass));

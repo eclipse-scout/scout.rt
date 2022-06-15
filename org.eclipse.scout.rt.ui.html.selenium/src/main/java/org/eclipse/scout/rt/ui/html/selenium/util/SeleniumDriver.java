@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,17 +13,17 @@ package org.eclipse.scout.rt.ui.html.selenium.util;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import org.apache.commons.exec.OS;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.json.JSONObject;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -31,11 +31,9 @@ import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
-import org.openqa.selenium.chrome.ChromeDriverService.Builder;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.Command;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -69,7 +67,10 @@ public final class SeleniumDriver {
       }
     }
     if (!StringUtility.matches(webdriverChromeDriver, ".+\\.exe", Pattern.CASE_INSENSITIVE) && chromeDriver.exists() && !chromeDriver.canExecute()) {
-      chromeDriver.setExecutable(true);
+      boolean success = chromeDriver.setExecutable(true);
+      if (!success) {
+        throw new PlatformException("Error making '{}' executable.", chromeDriver);
+      }
     }
 
     System.setProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY, webdriverChromeDriver);
@@ -97,13 +98,13 @@ public final class SeleniumDriver {
     // Set logging preferences (see BrowserLogRule)
     LoggingPreferences logPrefs = new LoggingPreferences();
     logPrefs.enable(LogType.BROWSER, Level.ALL);
-    options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+    options.setCapability(ChromeOptions.LOGGING_PREFS, logPrefs);
 
     // Add command line arguments
     options.addArguments("--lang=en");
     options.addArguments("--verbose");
     // With ChromeDriver v75 W3C mode was introduced. This breaks several existing tests, because of two reasons:
-    // 1. all offsets are now calculated from the center of an element, and not from the upper-left corner anymore
+    // 1. all offsets are now calculated from the center of an element, and not from the upper-left corner
     // 2. copy command (CTRL + C) does not work anymore. This may be related to a bug in ChromeDriver, but the bugfix
     //    mentioned here does not seem to solve the problem (note: document.execCommand('copy') doesn't work either)
     //    See: https://bugs.chromium.org/p/chromedriver/issues/detail?id=2975
@@ -114,21 +115,9 @@ public final class SeleniumDriver {
     options.setExperimentalOption("useAutomationExtension", false);
     options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
 
-    // TODO [7.0] bsh: Remove workaround, when Chrome bug is fixed
-    // <WORKAROUND> https://bugs.chromium.org/p/chromedriver/issues/detail?id=1552
-    Map<String, String> env = new HashMap<>();
-    env.put("LANG", "en_US.UTF-8");
-    System.out.println("Using custom environment variables for driver: " + new JSONObject(env).toString(2));
     try {
-      RemoteWebDriver driver = new ChromeDriver(
-        new Builder()
-          .usingAnyFreePort()
-          .withEnvironment(env) // <--
-          .build(),
-        options);
-      // RemoteWebDriver driver = new ChromeDriver(options)
-      // </WORKAROUND>
-      driver.manage().timeouts().setScriptTimeout(10000, TimeUnit.SECONDS);
+      RemoteWebDriver driver = new ChromeDriver(options);
+      driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10000));
       // Set window size roughly to the minimal supported screen size
       // (1280x1024 minus some borders for browser toolbar and windows taskbar)
       driver.manage().window().setPosition(new Point(0, 0));
@@ -142,14 +131,15 @@ public final class SeleniumDriver {
 
       Capabilities caps = driver.getCapabilities();
       System.out.println("Selenium driver configured with driver=" + driver.getClass().getName()
-        + " browser.name=" + caps.getBrowserName()
-        + " browser.version=" + caps.getVersion());
+          + " browser.name=" + caps.getBrowserName()
+          + " browser.version=" + caps.getBrowserVersion());
       return driver;
 
-    } catch (SessionNotCreatedException e) {
+    }
+    catch (SessionNotCreatedException e) {
       System.out.println("* Most likely your Chrome browser version is not supported by the ChromeDriver version configured in the pom.xml.");
       System.out.println("* Update the properties 'chromedriver_base_url' and 'chromedriver_hash_*' in your local pom.xml to run Selenium tests in your browser, but don't commit that change.");
-      System.out.println("* Look for a suitable ChromeDriver version here: http://chromedriver.storage.googleapis.com/index.html");
+      System.out.println("* Look for a suitable ChromeDriver version here: https://chromedriver.storage.googleapis.com/index.html");
       throw new RuntimeException(e);
     }
   }
@@ -170,7 +160,7 @@ public final class SeleniumDriver {
       executor.execute(new Command(driver.getSessionId(), "setNetworkConditions", Collections.singletonMap("network_conditions", map)));
     }
     catch (IOException e) {
-      System.err.println(e);
+      e.printStackTrace();
     }
   }
 }

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -97,7 +97,7 @@ public final class SeleniumJavaScript {
    * Simulates we have a touch device by calling <code>scout.selenium.setSupportsTouch(boolean)</code>.
    */
   public static void setSupportsTouch(AbstractSeleniumTest test, boolean supportsTouch) {
-    executeScript(test, "scout.selenium.setSupportsTouch(" + Boolean.toString(supportsTouch) + ")");
+    executeScript(test, "scout.selenium.setSupportsTouch(" + supportsTouch + ")");
   }
 
   /**
