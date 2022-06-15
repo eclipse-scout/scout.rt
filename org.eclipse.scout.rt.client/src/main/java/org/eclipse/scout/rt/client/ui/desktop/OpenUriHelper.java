@@ -72,7 +72,10 @@ public class OpenUriHelper {
   }
 
   protected IOpenUriAction getOpenUriActionHtmlPage() {
-    return OpenUriAction.NEW_WINDOW;
+    // HTML files must not be opened directly because it could
+    // contain malicious JavaScript which will be executed in the context
+    // of the current http session -> always download
+    return OpenUriAction.DOWNLOAD;
   }
 
   protected boolean isZipArchive(BinaryResource resource) {
