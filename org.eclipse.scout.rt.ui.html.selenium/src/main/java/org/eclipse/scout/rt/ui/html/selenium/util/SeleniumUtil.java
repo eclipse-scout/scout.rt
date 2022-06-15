@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -32,7 +32,7 @@ public final class SeleniumUtil {
   private static final String DEFAULT_QUERY_PARAMS = "debug=true"; // /&logging=1
 
   /**
-   * DOM attribute as used by Scout widgets to identify the Scout Java model class.
+   * DOM attribute used by Scout widgets to identify the Scout Java model class.
    */
   private static final String ATTR_DATA_MODELCLASS = "data-modelclass";
 
@@ -78,8 +78,8 @@ public final class SeleniumUtil {
   /**
    * Returns an XPath selector that matches an element with the given CSS class and containing the given text.
    * <p>
-   * Info: we use normalize-space to find text in elements that contain new-line <code>\n</code> characters. Also we use
-   * the dot locator (=current element) instead of the <code>text()</code> function.
+   * Info: we use normalize-space to find text in elements that contain new-line <code>\n</code> characters. Also, we
+   * use the dot locator (=current element) instead of the <code>text()</code> function.
    */
   private static By byCssClassAndText(String cssClass, String findFunction, String text) {
     return By.xpath("//*[" + cssClassQuery(cssClass) + " and " + findFunction + "(normalize-space(.), '" + text + "')]");
@@ -87,11 +87,8 @@ public final class SeleniumUtil {
 
   /**
    * This query solves the problem that we don't want to find partial matches for a CSS class-name when we query 'class'
-   * attribute in the DOM.
-   *
-   * @param className
-   * @see https://stackoverflow.com/questions/1604471/how-can-i-find-an-element-by-css-class-with-xpath
-   * @return
+   * attribute in the DOM. See
+   * https://stackoverflow.com/questions/1604471/how-can-i-find-an-element-by-css-class-with-xpath
    */
   private static String cssClassQuery(String cssClass) {
     return "contains(concat(' ', normalize-space(@class), ' '), ' " + cssClass + " ')";
@@ -101,7 +98,6 @@ public final class SeleniumUtil {
    * Returns an XPath selector that matches a tree node element has exactly the given text. Since the XPath query
    * matches the SPAN element, you should request the parent element to get to the tree node.
    *
-   * @param text
    * @return The SPAN element which contains the given text.
    */
   public static By byTreeNodeWithText(String text) {
@@ -165,7 +161,7 @@ public final class SeleniumUtil {
   }
 
   /**
-   * @return a CSS selector for the given model class, with double quoted strings. Example:<br>
+   * @return a CSS selector for the given model class, with double-quoted strings. Example:<br>
    *         <code>data-modelclass="com.bsiag.widgets.FooBar$MainBox"</code>
    */
   public static String getModelClassCssSelector(Class<?> modelClass) {
@@ -189,7 +185,7 @@ public final class SeleniumUtil {
   }
 
   /**
-   * Creates an Xpath expression that matches an element with the given model-class and an attribute that does NOT
+   * Creates a Xpath expression that matches an element with the given model-class and an attribute that does NOT
    * contain the given value.
    */
   public static By byModelClassAttributeContainsNot(Class<?> modelClass, String attribute, String value) {
@@ -298,7 +294,7 @@ public final class SeleniumUtil {
   }
 
   /**
-   * @return Whether or not the VM runs on Windows 8.x.
+   * @return Whether the VM runs on Windows 8.x.
    */
   public static boolean isWindows8() {
     return StringUtility.containsString(System.getProperty("os.name"), "Windows 8");

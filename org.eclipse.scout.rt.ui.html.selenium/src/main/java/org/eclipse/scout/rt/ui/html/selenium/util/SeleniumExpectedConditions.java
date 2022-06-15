@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -54,7 +54,7 @@ public final class SeleniumExpectedConditions {
    * Used to wait until the given element is focused.
    */
   public static ExpectedCondition<Boolean> elementToBeFocused(final WebElement element) {
-    return new ExpectedCondition<Boolean>() {
+    return new ExpectedCondition<>() {
       @Override
       public Boolean apply(WebDriver driver) {
         try {
@@ -77,7 +77,7 @@ public final class SeleniumExpectedConditions {
    * Used to wait until the given element is <em>not</em> focused anymore.
    */
   public static ExpectedCondition<Boolean> elementNotToBeFocused(final WebElement element) {
-    return new ExpectedCondition<Boolean>() {
+    return new ExpectedCondition<>() {
       @Override
       public Boolean apply(WebDriver driver) {
         try {
@@ -156,7 +156,7 @@ public final class SeleniumExpectedConditions {
   }
 
   private static ExpectedCondition<Boolean> attributeToCompareValue(final TextComparator comparator, final WebElement element, final String attributeName, final String value) {
-    return new ExpectedCondition<Boolean>() {
+    return new ExpectedCondition<>() {
       private String m_actualValue = null;
 
       @Override
@@ -187,7 +187,7 @@ public final class SeleniumExpectedConditions {
    * Waits until the given element has the requested CSS class.
    */
   public static ExpectedCondition<Boolean> elementToHaveCssClass(final WebElement element, final String cssClass) {
-    return new ExpectedCondition<Boolean>() {
+    return new ExpectedCondition<>() {
       private String m_actualValue = null;
 
       @Override
@@ -216,7 +216,7 @@ public final class SeleniumExpectedConditions {
    * Waits until the given element doesn't have the requested CSS class.
    */
   public static ExpectedCondition<Boolean> elementNotToHaveCssClass(final WebElement element, final String cssClass) {
-    return new ExpectedCondition<Boolean>() {
+    return new ExpectedCondition<>() {
       private String m_actualValue = null;
 
       @Override
@@ -272,7 +272,7 @@ public final class SeleniumExpectedConditions {
    * @return Number of child divs found by the expected condition
    */
   public static ExpectedCondition<List<WebElement>> containerToHaveNumberOfChildDivs(final WebElement parentElement, final String divClass, final int numDivs) {
-    return new ExpectedCondition<List<WebElement>>() {
+    return new ExpectedCondition<>() {
       @Override
       public List<WebElement> apply(WebDriver driver) {
         try {
@@ -315,7 +315,7 @@ public final class SeleniumExpectedConditions {
    * @return The table-rows found by the expected condition
    */
   public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfRows(final WebElement parentElement, final String rowText, final int numRows) {
-    return new ExpectedCondition<List<WebElement>>() {
+    return new ExpectedCondition<>() {
       @Override
       public List<WebElement> apply(WebDriver driver) {
         try {
@@ -349,7 +349,7 @@ public final class SeleniumExpectedConditions {
   }
 
   public static ExpectedCondition<Boolean> scriptToReturnTrue(final String script, final Object... args) {
-    return new ExpectedCondition<Boolean>() {
+    return new ExpectedCondition<>() {
       @Override
       public Boolean apply(WebDriver driver) {
         if (!(driver instanceof JavascriptExecutor)) {

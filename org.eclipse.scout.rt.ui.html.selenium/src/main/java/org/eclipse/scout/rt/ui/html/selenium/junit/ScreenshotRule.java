@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil;
 import org.junit.rules.TestRule;
@@ -65,7 +66,10 @@ public class ScreenshotRule implements TestRule {
   public void captureScreenshot(Description description) {
     try {
       File screenshotDir = new File("target/surefire-reports/");
-      screenshotDir.mkdirs(); // Ensure directory is there
+      boolean success = screenshotDir.mkdirs(); // Ensure directory is there
+      if (!success) {
+        throw new PlatformException("Error creating screenshot directories '{}'.", screenshotDir);
+      }
       String timestamp = DateUtility.format(new Date(), "yyyyMMddhhmmss");
       String className = description.getClassName();
       String methodName = description.getMethodName();
