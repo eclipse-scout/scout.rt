@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -42,6 +43,11 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
   protected final SubscribeInput m_subscribeInput;
   protected final IMarshaller m_marshaller;
   protected final long m_receiveTimeoutMillis;
+  /**
+   * Semaphore controlling number of message being consumed concurrently.
+   * It is nonfair, but for this usecase we only have 1 thread trying to acquire.
+   */
+  protected final Semaphore m_semaphore;
 
   /**
    * @param mom
@@ -68,6 +74,13 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
     m_subscribeInput = input;
     m_marshaller = mom.resolveMarshaller(destination);
     m_receiveTimeoutMillis = receiveTimeoutMillis;
+    if (input.getMaxConcurrentConsumerJobs() > 0) {
+      m_semaphore = new Semaphore(input.getMaxConcurrentConsumerJobs());
+    }
+    else {
+      // unlimited concurrent jobs allowed
+      m_semaphore = null;
+    }
   }
 
   protected boolean isSingleThreaded() {
@@ -90,6 +103,9 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
       final Message message;
       try {
         transactedSession = m_sessionProvider.getSession();
+        if (m_semaphore != null) {
+          m_semaphore.acquire();
+        }
         message = m_sessionProvider.receive(m_subscribeInput, m_receiveTimeoutMillis);
         if (message == null) {
           // consumer closed or connection failure, go to start of while loop
@@ -152,4 +168,10 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
   }
 
   protected abstract void onJmsMessage(Message jmsMessage) throws JMSException;
+
+  protected void onMessageConsumptionComplete() {
+    if (m_semaphore != null) {
+      m_semaphore.release();
+    }
+  }
 }
