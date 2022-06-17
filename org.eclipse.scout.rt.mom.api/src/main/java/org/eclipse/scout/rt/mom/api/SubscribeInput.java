@@ -55,6 +55,7 @@ public class SubscribeInput {
   private String m_selector;
   private boolean m_localReceipt = true;
   private String m_durableSubscriptionName;
+  private int m_maxConcurrentConsumerJobs = -1;
 
   public int getAcknowledgementMode() {
     return m_acknowledgementMode;
@@ -144,6 +145,24 @@ public class SubscribeInput {
    */
   public SubscribeInput withDurableSubscription(String durableSubscriptionName) {
     m_durableSubscriptionName = durableSubscriptionName;
+    return this;
+  }
+
+  /**
+   * @return the maximum number of concurrently running scout jobs consuming messages. Any values lower or equals to 0 means there is no limit.
+   * @see {@link #withMaxConcurrentConsumerJobs(int)}
+   */
+  public int getMaxConcurrentConsumerJobs() {
+    return m_maxConcurrentConsumerJobs;
+  }
+
+  /**
+   * Specifies how many messages are at most concurrently processed.
+   * <p>
+   * This only makes sense for {@link #ACKNOWLEDGE_AUTO}
+   */
+  public SubscribeInput withMaxConcurrentConsumerJobs(int maxConcurrentConsumerJobs) {
+    m_maxConcurrentConsumerJobs = maxConcurrentConsumerJobs;
     return this;
   }
 }
