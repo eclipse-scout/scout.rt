@@ -33,5 +33,6 @@ public class RequestCancellationMessageConsumerJob<DTO> extends AbstractMessageC
     Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(jmsMessage.getStringProperty(JMS_PROP_REPLY_ID))
         .toFilter(), true);
+    onMessageConsumptionComplete();
   }
 }
