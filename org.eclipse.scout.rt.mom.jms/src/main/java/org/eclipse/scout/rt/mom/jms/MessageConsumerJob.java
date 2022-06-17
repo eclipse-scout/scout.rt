@@ -58,6 +58,8 @@ public class MessageConsumerJob<DTO> extends AbstractMessageConsumerJob<DTO> {
           catch (Exception e) {
             throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
                 .withContextInfo("correlationId", correlationId);
+          } finally {
+            onMessageConsumptionComplete();
           }
         });
   }
