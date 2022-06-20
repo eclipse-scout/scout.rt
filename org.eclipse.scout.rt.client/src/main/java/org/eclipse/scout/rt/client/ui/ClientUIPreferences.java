@@ -1065,7 +1065,7 @@ public class ClientUIPreferences {
     }
 
     String customClientPreferenceJson = m_prefs.get(customClientPreferenceId.unwrapAsString(), null);
-    return customClientPreferenceId == null ? null : BEANS.get(IDataObjectMapper.class).readValue(customClientPreferenceJson, customClientPreferenceClass);
+    return BEANS.get(IDataObjectMapper.class).readValue(customClientPreferenceJson, customClientPreferenceClass);
   }
 
   public static IPreferences getClientPreferences(IClientSession session) {
