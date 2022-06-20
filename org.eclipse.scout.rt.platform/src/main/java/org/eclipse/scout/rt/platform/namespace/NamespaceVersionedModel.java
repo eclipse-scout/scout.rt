@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -38,7 +38,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.Assertions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -198,7 +197,7 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
 
       // add all items which depend on previous item with same name (except itself)
       Optional<T> previousItem = getPrevious(item.getVersion());
-      if (!previousItem.isPresent()) {
+      if (previousItem.isEmpty()) {
         continue;
       }
       for (Entry<T, Set<T>> entry : itemDependencies.entrySet()) {
@@ -241,11 +240,11 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
   }
 
   protected List<T> getItems(NamespaceVersion fromVersion, NamespaceVersion toVersion) {
-    assertTrue(compareVersion(fromVersion, toVersion) < 0);
+    assertTrue(toVersion == null || compareVersion(fromVersion, toVersion) < 0);
     List<T> items = getItemsInternal(fromVersion.getNamespace());
     List<T> result = new ArrayList<>();
     for (T item : items) {
-      if (compareVersion(item.getVersion(), toVersion) > 0) {
+      if (toVersion != null && compareVersion(item.getVersion(), toVersion) > 0) {
         break;
       }
       else if (compareVersion(item.getVersion(), fromVersion) > 0) {
@@ -258,19 +257,18 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
   protected Set<T> getItemsUnordered(Collection<NamespaceVersion> fromVersions, Collection<NamespaceVersion> toVersions) {
     validateFromToVersions(fromVersions, toVersions);
 
+    // if fromVersion did not (yet) exists, it is assumed no item is required; see also orderByDependencies
     Set<T> items = null; // lazy allocated - if versions valid should not allocate resources
-    for (NamespaceVersion toVersion : toVersions) {
-      if (toVersion != null) {
-        Optional<NamespaceVersion> fromVersion = fromVersions.stream().filter(toVersion::namespaceEquals).findFirst();
-        // if fromVersion did not (yet) exists, it is assumed no item is required; see also orderByDependencies
-        if (fromVersion.isPresent() && compareVersion(fromVersion.get(), toVersion) < 0) {
-          if (items == null) {
-            items = new HashSet<>();
-          }
-          items.addAll(getItems(fromVersion.get(), toVersion));
+    for (NamespaceVersion fromVersion : fromVersions) {
+      NamespaceVersion toVersion = toVersions.stream().filter(fromVersion::namespaceEquals).findFirst().orElse(null);
+      if (toVersion == null || compareVersion(fromVersion, toVersion) < 0) {
+        if (items == null) {
+          items = new HashSet<>();
         }
+        items.addAll(getItems(fromVersion, toVersion));
       }
     }
+
     return items != null ? items : Collections.emptySet();
   }
 
@@ -302,7 +300,7 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
   /**
    * This method retrieves all items. The items are ordered according to their dependencies.
    *
-   * @return non null {@link VersionedItems}
+   * @return non-null {@link VersionedItems}
    */
   public VersionedItems<T> getItems() {
     Set<T> allItemsUnordered = m_items.values().stream().flatMap(List::stream).collect(Collectors.toSet());
@@ -313,17 +311,21 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
    * This method retrieves all items which are in the given version range. The items are ordered according to their
    * dependencies. Even if the from- and to-versions are not equal, no item at all might be returned.
    * <p>
-   * Any name which is contained only in {@code toVersions} is ignored as it is assumed that in such a case nothing has
-   * to be migrated (as not yet used).
+   * Any namespace which is contained only in {@code toVersions} is ignored. (It is assumed that in such a case nothing
+   * has to be migrated (as not yet used)).
+   * <p>
+   * For any namespace in {@code fromVersions} which is missing in {@code toVersions} all items from this namespace with
+   * a higher version is returned. (It is assumed that in such a case this namespace was deleted and the last migration
+   * contains migration code for the old namespace.)
    * <p>
    * The versions in {@code toVersions} might be <em>incompatible</em>. In such a case the unsatisfiable items are also
    * returned.
    *
    * @param fromVersions
-   *          not null
+   *          not null without null elements
    * @param toVersions
-   *          not null
-   * @return non null {@link VersionedItems}
+   *          not null without null elements
+   * @return non-null {@link VersionedItems}
    */
   public VersionedItems<T> getItems(Collection<NamespaceVersion> fromVersions, Collection<NamespaceVersion> toVersions) {
     return sort(getItemsUnordered(fromVersions, toVersions), fromVersions);
@@ -331,8 +333,8 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
 
   /**
    * @param name
-   *          non null valid version name
-   * @return non null modifiable list with all items for the given version name.
+   *          non-null valid version name
+   * @return non-null modifiable list with all items for the given version name.
    */
   public List<T> getAllItems(String name) {
     return new ArrayList<>(getItemsInternal(name));

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -101,6 +101,18 @@ public class NamespaceVersionedModelTest {
     assertFalse(items.isValid());
     assertItems(Arrays.asList(item("bravo-15"), item("charlie-8"), item("charlie-9"), item("charlie-10")), items.getItems());
     assertItemsUnordered(Arrays.asList(item("bravo-18")), items.getUnsatisfiedDependencies());
+  }
+
+  @Test
+  public void testMissingNamespaceInToVersions() {
+    NamespaceVersionedModel<INamespaceVersioned> inventory = createInventory(Arrays.asList("alfa", "bravo", "charlie"), Arrays.asList(
+        item("alfa-4"),
+        item("alfa-5"), // scenario 'migration' 'alfa-5' migrates to namespace alfa to charlie
+        item("bravo-15", dep("alfa-4"))));
+
+    assertItems(
+        Arrays.asList(item("alfa-4"), item("bravo-15"), item("alfa-5")),
+        inventory.getItems(versions(version("alfa-3"), version("bravo-14")), versions(version("bravo-18"), version("charlie-1"))));
   }
 
   @Test
