@@ -1,4 +1,5 @@
 packages:
+  - '.'
   - 'eclipse-scout-cli'
   - 'eclipse-scout-core'
   - 'eclipse-scout-chart'

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <excludeFromCompile>
+      <directory url="file://$PROJECT_DIR$/scout-helloworld-app/src/main/resources/archetype-resources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/scout-hellojs-app/src/main/resources/archetype-resources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/scout-jaxws-module/src/main/resources/archetype-resources" includeSubdirectories="true" />
+    </excludeFromCompile>
+    <annotationProcessing>
+      <profile name="Annotation profile for root" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="consoleLog" value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/org.eclipse.scout.jaxws.apt/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/org/glassfish/jaxb/codemodel/3.0.2/codemodel-3.0.2.jar" />
+          <entry name="$PROJECT_DIR$/org.eclipse.scout.rt.platform/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/org/jboss/jandex/2.4.0.Final/jandex-2.4.0.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.32/slf4j-api-1.7.32.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/1.3.5/jakarta.annotation-api-1.3.5.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/quartz-scheduler/quartz/2.3.2/quartz-2.3.2.jar" />
+          <entry name="$PROJECT_DIR$/org.eclipse.scout.rt.server.jaxws/target/classes" />
+          <entry name="$PROJECT_DIR$/org.eclipse.scout.rt.server/target/classes" />
+          <entry name="$PROJECT_DIR$/org.eclipse.scout.rt.mom.api/target/classes" />
+          <entry name="$PROJECT_DIR$/org.eclipse.scout.rt.dataobject/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/xml/ws/jakarta.xml.ws-api/2.3.3/jakarta.xml.ws-api-2.3.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/xml/bind/jakarta.xml.bind-api/2.3.3/jakarta.xml.bind-api-2.3.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/xml/soap/jakarta.xml.soap-api/1.4.2/jakarta.xml.soap-api-1.4.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/sun/activation/jakarta.activation/1.2.2/jakarta.activation-1.2.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/jws/jakarta.jws-api/2.1.0/jakarta.jws-api-2.1.0.jar" />
+          <entry name="$PROJECT_DIR$/org.eclipse.scout.rt.server.commons/target/classes" />
+          <entry name="$PROJECT_DIR$/org.eclipse.scout.rt.shared/target/classes" />
+          <entry name="$PROJECT_DIR$/org.eclipse.scout.rt.security/target/classes" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/http-client/google-http-client-apache-v2/1.40.1/google-http-client-apache-v2-1.40.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/http-client/google-http-client/1.40.1/google-http-client-1.40.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/guava/guava/30.1.1-jre/guava-30.1.1-jre.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/checkerframework/checker-qual/3.8.0/checker-qual-3.8.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/errorprone/error_prone_annotations/2.5.1/error_prone_annotations-2.5.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/opencensus/opencensus-api/0.28.0/opencensus-api-0.28.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/grpc/grpc-context/1.27.2/grpc-context-1.27.2.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/opencensus/opencensus-contrib-http-util/0.28.0/opencensus-contrib-http-util-0.28.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpcore/4.4.14/httpcore-4.4.14.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpclient/4.5.13/httpclient-4.5.13.jar" />
+          <entry name="$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.15/commons-codec-1.15.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/jcl-over-slf4j/1.7.32/jcl-over-slf4j-1.7.32.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/servlet/jakarta.servlet-api/4.0.4/jakarta.servlet-api-4.0.4.jar" />
+        </processorPath>
+        <module name="org.eclipse.scout.rt.server.jaxws.test" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>
