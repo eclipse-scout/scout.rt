@@ -53,6 +53,8 @@ import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureHierarchicalLookupRowDo;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.lookup.LookupResponse;
+import org.eclipse.scout.rt.dataobject.value.DateValueDo;
+import org.eclipse.scout.rt.dataobject.value.IntegerValueDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.DoubleContributionFixtureDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBigIntegerDo;
@@ -143,6 +145,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 /**
  * Various test cases serializing and deserializing Scout data objects from/to JSON
@@ -1450,7 +1453,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_CollectionsIDoEntityDo() throws  Exception {
+  public void testSerializeDeserialize_CollectionsIDoEntityDo() throws Exception {
     Collection<IDoEntity> coll = new ArrayList<>();
     coll.add(createTestItemDo("collection", "1"));
     coll.add(createTestItemDo("collection", "2"));
@@ -2145,6 +2148,18 @@ public class JsonDataObjectsSerializationTest {
     s_dataObjectMapper.readValue("[", DoEntity.class);
   }
 
+  @Test
+  public void testInvalidAttributeJsonMappingException() {
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue("{\"value\": \"abc\"}", IntegerValueDo.class));
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue("{\"value\": 42}", DateValueDo.class));
+  }
+
+  @Test
+  public void testInvalidAttributeJsonMappingExceptionMessage() {
+    JsonMappingException exception = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue("{\"value\": \"abc\"}", IntegerValueDo.class));
+    assertTrue(exception.getMessage().startsWith("Failed to deserialize attribute 'value' of entity org.eclipse.scout.rt.dataobject.value.IntegerValueDo, value was abc"));
+  }
+
   // ------------------------------------ performance tests ------------------------------------
 
   @Test
@@ -2767,7 +2782,8 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestOptionalDo.json", json);
 
     // currently not deserializable using Scout Jackson implementation
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
+    JsonMappingException exception = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
+    assertTrue(exception.getCause() instanceof UnrecognizedPropertyException);
   }
 
   @Test

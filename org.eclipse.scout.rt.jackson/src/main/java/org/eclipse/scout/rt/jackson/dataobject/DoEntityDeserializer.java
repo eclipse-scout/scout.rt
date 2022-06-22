@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.MessageFormatter;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -32,6 +33,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.TokenBuffer;
@@ -141,7 +143,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       p.nextToken(); // let current token point to the value
       AttributeType attributeType = findResolvedAttributeType(entity, attributeName, p.currentToken());
       if (attributeType.isDoCollection()) {
-        DoNode<?> nodeValue = p.getCodec().readValue(p, attributeType.getJavaType());
+        DoNode<?> nodeValue = readAttributeValue(p, attributeType, attributeName);
 
         // check if reading the 'contributions' property
         if (m_moduleContext.getContributionsAttributeName().equals(attributeName)) {
@@ -153,7 +155,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
         }
       }
       else {
-        Object value = p.getCodec().readValue(p, attributeType.getJavaType());
+        Object value = readAttributeValue(p, attributeType, attributeName);
 
         if (value instanceof IDoCollection) {
           // special case: Java collections referenced by a DoValue are handled as DoList, so that nested elements are
@@ -172,6 +174,24 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       }
     }
     return entity;
+  }
+
+  protected <T> T readAttributeValue(JsonParser p, AttributeType attributeType, String attributeName) throws IOException {
+    try {
+      return p.getCodec().readValue(p, attributeType.getJavaType());
+    }
+    catch (InvalidFormatException e) {
+      // capture exception containing the deserialized value to throw a specific exception message with attribute name and entity class
+      String msg = MessageFormatter.arrayFormat("Failed to deserialize attribute '{}' of entity {}, value was {}", new Object[]{attributeName, handledType().getName(), e.getValue()}).getMessage();
+      InvalidFormatException ife = InvalidFormatException.from(p, msg, e.getValue(), e.getTargetType());
+      ife.addSuppressed(e);
+      throw ife;
+    }
+    catch (IOException e) {
+      // capture generic exception to add at least the attribute name and entity class to the exception message
+      String msg = MessageFormatter.format("Failed to deserialize attribute '{}' of entity {}", attributeName, handledType().getName()).getMessage();
+      throw JsonMappingException.from(p, msg, e);
+    }
   }
 
   protected void deserializeDoEntityVersionAttribute(IDoEntity entity, String attributeName, Object version) {
