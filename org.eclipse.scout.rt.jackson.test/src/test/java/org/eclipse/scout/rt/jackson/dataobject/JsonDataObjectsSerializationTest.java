@@ -14,6 +14,7 @@ import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqual
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -42,6 +43,8 @@ import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
+import org.eclipse.scout.rt.dataobject.value.DateValueDo;
+import org.eclipse.scout.rt.dataobject.value.IntegerValueDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBigIntegerDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBinaryDo;
@@ -1772,6 +1775,18 @@ public class JsonDataObjectsSerializationTest {
     s_dataObjectMapper.readValue("[", DoEntity.class);
   }
 
+  @Test
+  public void testInvalidAttributeJsonMappingException() {
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue("{\"value\": \"abc\"}", IntegerValueDo.class));
+    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue("{\"value\": 42}", DateValueDo.class));
+  }
+
+  @Test
+  public void testInvalidAttributeJsonMappingExceptionMessage() {
+    JsonMappingException exception = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue("{\"value\": \"abc\"}", IntegerValueDo.class));
+    assertTrue(exception.getMessage().startsWith("Failed to deserialize attribute 'value' of entity org.eclipse.scout.rt.dataobject.value.IntegerValueDo, value was abc"));
+  }
+
   // ------------------------------------ performance tests ------------------------------------
 
   @Test
@@ -2346,7 +2361,8 @@ public class JsonDataObjectsSerializationTest {
     }
 
     // currently not deserializable using Scout Jackson implementation
-    assertThrows(UnrecognizedPropertyException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
+    JsonMappingException exception = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
+    assertTrue(exception.getCause() instanceof UnrecognizedPropertyException);
   }
 
   // ------------------------------------ common test helper methods ------------------------------------
