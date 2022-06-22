@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Device, objects} from '../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * Text comparator, used to compare strings with support for internationalization (i18n).

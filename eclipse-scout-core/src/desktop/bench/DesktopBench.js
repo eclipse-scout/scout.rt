@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, BenchColumn, DesktopTabSelectKeyStroke, FlexboxLayout, FlexboxLayoutData, HtmlComponent, KeyStrokeContext, scout, Splitter, styles, Table, Widget, widgets} from '../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class DesktopBench extends Widget {
 

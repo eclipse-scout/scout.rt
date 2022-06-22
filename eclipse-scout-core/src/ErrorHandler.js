@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AjaxError, App, arrays, icons, logging, NullLogger, scout, strings} from './index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 import sourcemappedStacktrace from 'sourcemapped-stacktrace';
 
 export default class ErrorHandler {

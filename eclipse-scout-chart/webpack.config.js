@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-const baseConfig = require('@eclipse-scout/cli/scripts/webpack-defaults');
+const baseConfig = require('@eclipse-scout/cli/scripts/webpack-lib-defaults');
 module.exports = (env, args) => {
   args.resDirArray = [];
   const config = baseConfig(env, args);
 
-  // This build creates resources that can directly be included in a html file without needing a build stack (webpack, babel etc.).
+  // This build creates resources that can directly be included in a html file without needing a build stack (webpack).
   // The resources are available by a CDN that provides npm modules (e.g. https://www.jsdelivr.com/package/npm/@eclipse-scout/chart)
   config.entry = {
     'eclipse-scout-chart': './src/index.js',
@@ -25,12 +25,23 @@ module.exports = (env, args) => {
     // Dependencies should not be included in the resulting js file.
     // The consumer has to include them by himself which gives him more control (maybe his site has already added jQuery or he wants to use another version)
     // Left side is the import name, right side the name of the global variable added by the plugin (e.g. window.jQuery)
-    'jquery': 'jQuery',
-    '@eclipse-scout/core': 'scout',
-    'chart.js': 'Chart',
-    'chartjs-plugin-datalabels': 'ChartDataLabels'
+    jquery: {
+      module: 'jquery',
+      root: 'jQuery'
+    },
+    '@eclipse-scout/core': {
+      module: '@eclipse-scout/core',
+      root: 'scout'
+    },
+    'chart.js': {
+      module: 'chart.js',
+      root: 'Chart'
+    },
+    'chartjs-plugin-datalabels': {
+      module: 'chartjs-plugin-datalabels',
+      root: 'ChartDataLabels'
+    }
   });
-  config.optimization.splitChunks = undefined; // disable splitting
 
   return config;
 };

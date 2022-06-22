@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Filter, arrays, ContextMenuPopup, defaultValues, Device, DoubleClickSupport, dragAndDrop, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, MenuBar, MenuDestinations, MenuItemsOrder, menus as menus_1, objects, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeSpaceKeyStroke, Widget} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * @class

@@ -11,7 +11,7 @@
 /**
  * jQuery plugin with scout extensions
  */
-import $ from 'jquery';
+import * as $ from 'jquery';
 import {arrays, Device, Dimension, events, IconDesc, icons, objects, scout, strings} from '../index';
 
 /**

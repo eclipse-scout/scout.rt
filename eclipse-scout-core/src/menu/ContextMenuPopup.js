@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Action, arrays, ContextMenuPopupLayout, graphics, HtmlComponent, MenuDestinations, menuNavigationKeyStrokes, Popup, Rectangle, RowLayout} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class ContextMenuPopup extends Popup {
 

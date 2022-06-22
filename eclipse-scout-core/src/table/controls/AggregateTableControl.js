@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Device, graphics, icons, TableControl, tooltips} from '../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class AggregateTableControl extends TableControl {
 

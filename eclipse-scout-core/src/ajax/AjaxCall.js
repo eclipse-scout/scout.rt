@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AjaxError, Call, URL} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class AjaxCall extends Call {
 

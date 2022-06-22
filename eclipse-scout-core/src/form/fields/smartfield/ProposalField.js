@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, scout, SmartField, strings} from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class ProposalField extends SmartField {
 

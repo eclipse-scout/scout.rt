@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, Device, EventSupport, FileInput, files as fileUtil, FocusManager, fonts, icons, LayoutValidator, Locale, logging, MessageBox, ModelAdapter, NullWidget, ObjectFactory, objects, Reconnector, RemoteEvent, ResponseQueue, scout, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class Session {
   constructor() {

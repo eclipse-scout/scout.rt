@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Dimension, graphics, Insets, NullLayout, scout} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * Wrapper for a JQuery selector. Used as replacement for javax.swing.JComponent.

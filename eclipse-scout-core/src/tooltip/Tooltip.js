@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Form, graphics, keys, scout, scrollbars, Status, strings, Widget} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class Tooltip extends Widget {
 

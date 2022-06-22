@@ -1,17 +1,15 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
+    "outDir": "./dist/d.ts",
     "allowJs": true,
-    "target": "es5",
+    "target": "ES6",
     "moduleResolution": "node",
-    "module": "esnext",
+    "module": "ES6",
     "declaration": true,
     "skipLibCheck": true,
-//    "noEmit": false,
-//    "emitDeclarationOnly": true,
     "sourceMap": true,
     "declarationMap": true,
-    "lib": ["dom", "ES2016"]
+    "lib": ["dom", "ES6"]
   },
   "include": ["./src/**/*"]
 }

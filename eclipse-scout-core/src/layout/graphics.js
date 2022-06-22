@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Device, Dimension, Insets, Point, Rectangle, scout, scrollbars} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * This file contains helpers for graphical operations

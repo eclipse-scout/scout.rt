@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Device, graphics, HtmlComponent, Insets, objects, scout} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * Static function to install a scrollbar on a container.

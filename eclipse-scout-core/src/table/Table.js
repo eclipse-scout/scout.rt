@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Cell, Filter, AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, clipboard, Column, ContextMenuKeyStroke, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, Event, FilterSupport, graphics, HtmlComponent, Insets, KeyStrokeContext, LoadingSupport, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn, objects, Range, scout, scrollbars, Status, strings, styles, TableCopyKeyStroke, TableLayout, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableToggleRowKeyStroke, TableUpdateBuffer, TableUserFilter, tooltips as tooltips_1, Widget} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class Table extends Widget {
   constructor() {

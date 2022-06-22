@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {icons, NavigateButton, Page} from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class NavigateDownButton extends NavigateButton {
 

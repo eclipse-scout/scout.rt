@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, strings, TypeDescriptor} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * map of "objectType" -> { defaultValuesObject }

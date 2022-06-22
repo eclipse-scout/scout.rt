@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, dragAndDrop, files as fileUtil, MessageBoxes, Status} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class DragAndDropHandler {
 

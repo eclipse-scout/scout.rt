@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AppLinkKeyStroke, scrollbars, ValueField} from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class HtmlField extends ValueField {
 

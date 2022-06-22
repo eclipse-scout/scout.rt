@@ -46,7 +46,7 @@ module.exports = (env, args) => {
     mode: args.mode,
     // In dev mode 'inline-source-map' is used (devtool is false because we use SourceMapDevToolPlugin)
     // Other source map types may increase build performance but decrease debugging experience
-    // (e.g. wrong this in arrow functions with inline-cheap-module-source-map or not having original source code at all (code after babel transpilation instead of before) with eval types).
+    // (e.g. wrong this in arrow functions with inline-cheap-module-source-map or not having original source code at all (code after transpile instead of before) with eval types).
     // In production mode create external source maps without source code to map stack traces.
     // Otherwise stack traces would point to the minified source code which makes it quite impossible to analyze productive issues.
     devtool: devMode ? false : 'nosources-source-map',
@@ -77,7 +77,8 @@ module.exports = (env, args) => {
         util: false,
         vm: false,
         zlib: false
-      }
+      },
+      extensions: ['.ts', '.js', '.json', '.wasm']
     },
     // expect these apis in the browser
     externals: {
@@ -88,6 +89,10 @@ module.exports = (env, args) => {
       'https': 'https',
       'url': 'url',
       'zlib': 'zlib'
+    },
+    externalsType: 'module',
+    experiments: {
+      outputModule: true
     },
     output: {
       filename: jsFilename,
@@ -136,30 +141,12 @@ module.exports = (env, args) => {
           }
         }]
       }, {
-        // # Babel
-        test: /\.m?js$/,
-        exclude: [],
-        use: {
-          loader: require.resolve('babel-loader'),
-          options: {
-            compact: false,
-            cacheDirectory: true,
-            cacheCompression: false,
-            plugins: [
-              require.resolve('@babel/plugin-transform-object-assign'),
-              require.resolve('@babel/plugin-proposal-class-properties')],
-            presets: [
-              [require.resolve('@babel/preset-env'), {
-                debug: false,
-                targets: {
-                  firefox: '69',
-                  chrome: '71',
-                  safari: '12.1'
-                }
-              }]
-            ]
-          }
-        }
+        // # Typescript
+        test: /\.[t|j]sx?$/,
+        exclude: /node_modules/,
+        use: [{
+          loader: require.resolve('ts-loader')
+        }],
       }, {
         // to support css imports (currently not used by Scout but might be used by included 3rd party libs)
         test: /\.css$/i,

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AppLinkKeyStroke, HtmlComponent, KeyStrokeContext, strings, Widget} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class Label extends Widget {
 

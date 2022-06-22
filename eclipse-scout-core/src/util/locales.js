@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Locale, objects, scout, texts} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 let localesMap = {};
 

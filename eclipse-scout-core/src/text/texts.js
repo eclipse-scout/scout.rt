@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, TextMap} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 const TEXT_KEY_REGEX = /\${textKey:([^}]*)}/;
 

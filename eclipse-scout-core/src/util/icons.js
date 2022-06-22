@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {IconDesc, strings} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /* These icon ids can either be used directly using JavaScript.
  * Or in a JSON based model file using the syntax ${iconId:ID}. */

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Device, fields, FormField, InputFieldKeyStrokeContext, keys, LookupCall, objects, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldLayout, Status, strings, ValueField} from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class SmartField extends ValueField {
 

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AggregateTableControl, arrays, objects, scout, Widget} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * Delegates events between the Table and it's internal TileGrid.

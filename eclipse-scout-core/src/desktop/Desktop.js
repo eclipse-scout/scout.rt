@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {DesktopNotification, NativeNotificationDefaults, arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopLayout, DesktopNavigation, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, Event, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStrokeContext, MessageBoxController, objects, Outline, Popup, scout, SimpleTabArea, strings, styles, Tree, URL, webstorage, Widget, widgets} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class Desktop extends Widget {
 

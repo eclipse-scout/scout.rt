@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {strings, NullLogger, scout, URL} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 const Level = {
   TRACE: 'trace',

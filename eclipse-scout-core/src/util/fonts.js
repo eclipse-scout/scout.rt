@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {graphics, scout, strings} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 let _deferred = $.Deferred();
 

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormLayout, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField, ValidationResult} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class Form extends Widget {
   constructor() {

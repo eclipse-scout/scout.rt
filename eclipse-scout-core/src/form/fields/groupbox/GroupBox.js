@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Button, ButtonAdapterMenu, CompositeField, fields, Form, FormField, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, HAlign, HtmlComponent, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, MenuBar, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, WrappedFormField} from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class GroupBox extends CompositeField {
 

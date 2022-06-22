@@ -26,7 +26,7 @@ import {
   TreeVisitResult,
   ValueField
 } from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class RadioButtonGroup extends ValueField {
 

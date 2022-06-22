@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Dimension, HtmlComponent, LayoutConstants, LogicalGridData, Rectangle, TreeSet} from '../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayoutInfo.

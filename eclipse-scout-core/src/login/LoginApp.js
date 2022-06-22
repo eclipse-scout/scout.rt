@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {App, LoginBox, ObjectFactory, scout, texts} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class LoginApp extends App {
 

@@ -22,7 +22,7 @@ import {
   SplitBoxLayout,
   SplitBoxSecondCollapseKeyStroke
 } from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class SplitBox extends CompositeField {
 

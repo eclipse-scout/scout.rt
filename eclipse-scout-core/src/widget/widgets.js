@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 let uniqueIdSeqNo = 0;
 

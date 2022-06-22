@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Device, dragAndDrop, files as fileUtil, InputFieldKeyStrokeContext, strings, URL, Widget} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class FileInput extends Widget {
 

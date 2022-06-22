@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {EventSupport, router, strings} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 let routes = []; // array with Routes
 let events = new EventSupport();

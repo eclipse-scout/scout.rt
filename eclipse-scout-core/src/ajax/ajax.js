@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AjaxCall, AjaxError, scout} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * Utility to perform Ajax requests in an easy way.<br>

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Device, TooltipSupport} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 const DEFAULT_TOOLTIP_DELAY = 600; // ms
 

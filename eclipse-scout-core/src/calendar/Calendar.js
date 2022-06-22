@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, Device, events, GroupBox, HtmlComponent, KeyStrokeContext, menus, numbers, objects, Point, Range, scout, scrollbars, strings, Widget} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class Calendar extends Widget {
 

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {HtmlComponent, scout, Status, strings, texts, Widget} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class Notification extends Widget {
 

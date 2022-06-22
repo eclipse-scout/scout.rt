@@ -31,7 +31,7 @@ import {
   TooltipSupport,
   Widget
 } from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class Planner extends Widget {
 

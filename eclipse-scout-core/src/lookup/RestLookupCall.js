@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, LookupCall, objects, scout} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * A lookup call that can load lookup rows from a REST service.

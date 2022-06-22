@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorTabKeyStroke, events, FormField, graphics, Point, Popup, Rectangle, scout} from '../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class CellEditorPopup extends Popup {
 

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, scout, strings} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * Represents a robust "call" that, when it fails, is retried automatically for a specific

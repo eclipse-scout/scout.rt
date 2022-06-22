@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * Used for static pages like login, logout, unsupported-browser and noscript section.

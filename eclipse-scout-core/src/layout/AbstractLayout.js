@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Dimension, graphics, HtmlComponent} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * Abstract layout class with functions used by all layout algorithms.

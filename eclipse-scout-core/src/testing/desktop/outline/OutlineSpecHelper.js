@@ -10,7 +10,7 @@
  */
 import {Outline, OutlineAdapter} from '../../../index';
 import {FormSpecHelper, TableSpecHelper} from '../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class OutlineSpecHelper {
   constructor(session) {

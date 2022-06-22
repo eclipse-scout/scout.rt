@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, LookupCall, QueryBy, scout, strings} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class PrepopulatedLookupCall extends LookupCall {
 

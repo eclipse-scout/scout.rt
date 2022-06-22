@@ -10,7 +10,7 @@
  */
 import {arrays, comparators, DecimalFormat, ObjectFactory, objects, RemoteEvent, scout, Table, TableAdapter, TextColumnUserFilter} from '../../index';
 import {MenuSpecHelper} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class TableSpecHelper {
   constructor(session) {

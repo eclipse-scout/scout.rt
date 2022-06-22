@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {colorSchemes, GridData, HtmlComponent, LoadingSupport, scrollbars, SingleLayout, Widget} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class Tile extends Widget {
 

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Box, Device, strings, TextMap} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class LoginBox extends Box {
 

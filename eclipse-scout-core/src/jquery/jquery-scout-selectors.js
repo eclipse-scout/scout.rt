@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * This file extends jQuery with custom selectors required in Scout.

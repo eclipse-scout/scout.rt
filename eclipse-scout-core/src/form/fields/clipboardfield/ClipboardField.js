@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Device, InputFieldKeyStrokeContext, keys, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class ClipboardField extends ValueField {
 

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Filter, Tile, arrays, ContextMenuKeyStroke, DoubleClickSupport, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGridData, MenuDestinations, menus as menus_1, numbers, objects, PlaceholderTile, Range, scout, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, VirtualScrolling, Widget} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * Only select top-level tile elements. Do not select elements with a 'tile' class deeper in the tree.

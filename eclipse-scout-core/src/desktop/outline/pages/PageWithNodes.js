@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {MenuBar, Page, scout} from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * @class

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {TableRow, arrays, defaultValues, Desktop, DetailTableTreeFilter, Device, FileChooserController, Form, GroupBoxMenuItemsOrder, HtmlComponent, keyStrokeModifier, MenuBar, menus as menuUtil, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineKeyStrokeContext, OutlineLayout, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, scout, TableControlAdapterMenu, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke} from '../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * @extends {Tree}

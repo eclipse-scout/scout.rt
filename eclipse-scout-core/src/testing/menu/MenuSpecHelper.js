@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import $ from 'jquery';
+import * as $ from 'jquery';
 import {scout} from '../../index';
 
 export default class MenuSpecHelper {
@@ -35,4 +35,3 @@ export default class MenuSpecHelper {
     return scout.create('Menu', model);
   }
 }
-

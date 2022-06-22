@@ -33,7 +33,7 @@ import {
   tooltips,
   Widget
 } from '../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * Base class for all form-fields.

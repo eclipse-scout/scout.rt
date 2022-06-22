@@ -35,13 +35,8 @@
     "version:release": "releng-scripts version:release"
   },
   "dependencies": {
-    "@babel/cli": "7.16.0",
-    "@babel/core": "7.16.5",
-    "@babel/plugin-proposal-class-properties": "7.16.5",
-    "@babel/plugin-proposal-object-rest-spread": "7.16.5",
-    "@babel/plugin-transform-object-assign": "7.16.5",
-    "@babel/preset-env": "7.16.5",
-    "babel-loader": "8.2.3",
+    "ts-loader": "9.3.1",
+    "typescript": "4.7.4",
     "copy-webpack-plugin": "10.2.0",
     "style-loader": "3.3.1",
     "css-loader": "6.5.1",

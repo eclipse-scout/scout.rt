@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Table, Outline, TableRow, Event, EventSupport, Form, icons, inspector, MenuBar, scout, TileOutlineOverview, TileOverviewForm, TreeNode, Widget} from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * This class is used differently in online and JS-only case. In the online case we only have instances

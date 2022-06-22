@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {aggregation, Column, comparators, DecimalFormat, numbers, objects, scout, strings, styles} from '../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class NumberColumn extends Column {
 

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Dimension, EventSupport, HtmlComponent, Rectangle, scout, SingleLayout} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class PopupWindow {
 

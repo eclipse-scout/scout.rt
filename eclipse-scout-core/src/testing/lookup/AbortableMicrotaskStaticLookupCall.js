@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {StaticLookupCall} from '../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class AbortableMicrotaskStaticLookupCall extends StaticLookupCall {
   constructor() {

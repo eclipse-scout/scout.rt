@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, DateFormat, DatePickerPopup, DatePredictionFailedStatus, dates, DateTimeCompositeLayout, Device, fields, focusUtils, FormField, HtmlComponent, InputFieldKeyStrokeContext, keys, objects, ParsingFailedStatus, scout, Status, strings, styles, TimePickerPopup, ValueField} from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class DateField extends ValueField {
 

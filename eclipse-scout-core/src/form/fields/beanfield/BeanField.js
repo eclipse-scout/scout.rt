@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AppLinkKeyStroke, ValueField} from '../../../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 /**
  * Base class for fields where the value should be visualized.

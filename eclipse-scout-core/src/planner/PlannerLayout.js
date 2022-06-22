@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractLayout, graphics, HtmlComponent, MenuBarLayout, Planner, scout, scrollbars} from '../index';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 export default class PlannerLayout extends AbstractLayout {
 
