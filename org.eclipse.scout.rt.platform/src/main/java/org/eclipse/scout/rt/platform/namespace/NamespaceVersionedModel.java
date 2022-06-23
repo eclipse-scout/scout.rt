@@ -220,7 +220,7 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
   }
 
   protected List<T> getItemsInternal(String name) {
-    return assertNotNull(m_items.get(name), "Name {} unknown", name);
+    return m_items.getOrDefault(name, Collections.emptyList());
   }
 
   protected Optional<T> findLastMatching(String name, Predicate<T> predicate) {
