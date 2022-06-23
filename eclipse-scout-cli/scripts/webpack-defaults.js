@@ -11,6 +11,7 @@
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const path = require('path');
 const scoutBuildConstants = require('./constants');
@@ -163,6 +164,16 @@ module.exports = (env, args) => {
       }]
     },
     plugins: [
+      new ForkTsCheckerWebpackPlugin({
+        typescript: {
+          build: true,
+          mode: 'write-dts'
+        }
+      }),
+      new webpack.WatchIgnorePlugin({
+        paths:[
+          /\.d\.ts$/
+      ]}),
       // see: extracts css into separate files
       new MiniCssExtractPlugin({filename: cssFilename}),
       // run post-build script hook
