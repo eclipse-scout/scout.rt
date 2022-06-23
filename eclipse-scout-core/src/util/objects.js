@@ -127,6 +127,9 @@ export function someProperties(obj, properties) {
   });
 }
 
+/**
+ * @return {*}
+ */
 export function valueCopy(obj) {
   // Nothing to be done for immutable things
   if (obj === undefined || obj === null || typeof obj !== 'object') {
@@ -220,7 +223,7 @@ export function findChildObjectByKey(parentObj, property, propertyValue) {
  * @return Object Returns the selected object.
  * @throws Throws an error, if the provided parameters are malformed, or a property could not be found/a id property filter does not find any elements.
  */
-function getByPath(object, path) {
+export function getByPath(object, path) {
   scout.assertParameter('object', object, Object);
   scout.assertParameter('path', path);
 
