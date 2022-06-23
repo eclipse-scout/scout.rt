@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -50,7 +50,7 @@ export default class OpenUriHandler {
       } else {
         this.openUriAsNewWindow(uri);
       }
-    } else if (Device.get().browser === Device.Browser.CHROME) {
+    } else if (Device.get().browser === Device.Browser.CHROME && this.isUriWithExternallyHandledProtocol(uri)) {
       // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
       this.openUriInSameWindow(uri);
     } else {
@@ -59,7 +59,7 @@ export default class OpenUriHandler {
   }
 
   isUriWithExternallyHandledProtocol(uri) {
-    return /^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|tel|google.navigation):/.test(uri);
+    return /^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|tel|google.navigation|sms|msteams):/.test(uri);
   }
 
   handleUriActionOpen(uri) {
@@ -69,7 +69,7 @@ export default class OpenUriHandler {
       // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
       this.openUriInSameWindow(uri);
     } else if (this.isUriWithExternallyHandledProtocol(uri)) {
-      if (Device.get().browser === Device.Browser.CHROME) {
+      if (Device.get().browser === Device.Browser.CHROME || Device.get().isAndroid()) {
         // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
         this.openUriInSameWindow(uri);
       } else {
