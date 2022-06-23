@@ -66,9 +66,11 @@ public class ScreenshotRule implements TestRule {
   public void captureScreenshot(Description description) {
     try {
       File screenshotDir = new File("target/surefire-reports/");
-      boolean success = screenshotDir.mkdirs(); // Ensure directory is there
-      if (!success) {
-        throw new PlatformException("Error creating screenshot directories '{}'.", screenshotDir);
+      if (!screenshotDir.exists()) { // Ensure directory is there
+        boolean success = screenshotDir.mkdirs();
+        if (!success) {
+          throw new PlatformException("Error creating screenshot directories '{}'.", screenshotDir);
+        }
       }
       String timestamp = DateUtility.format(new Date(), "yyyyMMddhhmmss");
       String className = description.getClassName();
