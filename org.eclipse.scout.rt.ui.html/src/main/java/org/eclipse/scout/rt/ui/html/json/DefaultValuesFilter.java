@@ -375,6 +375,9 @@ public class DefaultValuesFilter {
      * @return a combined string from all property names on the stack (separated by ".")
      */
     public String getCurrentProperty() {
+      if (m_propertyStack.size() == 1) {
+        return m_propertyStack.peek();
+      }
       StringBuilder sb = new StringBuilder();
       for (Iterator<String> it = m_propertyStack.descendingIterator(); it.hasNext();) {
         if (sb.length() > 0) {
