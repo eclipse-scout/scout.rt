@@ -8,14 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+const path = require('path');
+const scoutBuildConstants = require('./constants');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-
-const path = require('path');
-const scoutBuildConstants = require('./constants');
-const webpack = require('webpack');
+const { SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin } = require('webpack');
 
 /**
  * @param {string} args.mode development or production
@@ -25,11 +23,12 @@ const webpack = require('webpack');
  * @param {[]} args.resDirArray an array containing directories which should be copied to dist/res
  */
 module.exports = (env, args) => {
-  const {devMode, outSubDir, cssFilename, jsFilename} = scoutBuildConstants.getConstantsForMode(args.mode);
+  const buildMode = args.mode;
+  const {devMode, cssFilename, jsFilename} = scoutBuildConstants.getConstantsForMode(buildMode);
   const isMavenModule = scoutBuildConstants.isMavenModule();
-  const outDir = getOutputDir(isMavenModule, outSubDir);
+  const outDir = scoutBuildConstants.getOutputDir(buildMode);
   const resDirArray = args.resDirArray || ['res'];
-  console.log(`Webpack mode: ${args.mode}`);
+  console.log(`Webpack mode: ${buildMode}`);
 
   // # Copy static web-resources delivered by the modules
   const copyPluginConfig = [];
@@ -42,17 +41,28 @@ module.exports = (env, args) => {
       });
   }
 
+  const babelOptions = {
+      compact: false,
+      cacheDirectory: true,
+      cacheCompression: false,
+      presets: [
+        [require.resolve('@babel/preset-env'), {
+          debug: false,
+          targets: {
+            firefox: '69',
+            chrome: '71',
+            safari: '12.1'
+          }
+        }]
+      ]
+  };
+
   const config = {
     target: 'web',
-    mode: args.mode,
-    // In dev mode 'inline-source-map' is used (devtool is false because we use SourceMapDevToolPlugin)
-    // Other source map types may increase build performance but decrease debugging experience
-    // (e.g. wrong this in arrow functions with inline-cheap-module-source-map or not having original source code at all (code after transpile instead of before) with eval types).
-    // In production mode create external source maps without source code to map stack traces.
-    // Otherwise stack traces would point to the minified source code which makes it quite impossible to analyze productive issues.
-    devtool: devMode ? false : 'nosources-source-map',
+    mode: buildMode,
+    devtool: false, // disabled because SourceMapDevToolPlugin is used (see below)
+    ignoreWarnings: [(webpackError, compilation) => isWarningIgnored(devMode, webpackError, compilation)],
     resolve: {
-
       // no automatic polyfills. clients must add the desired polyfills themselves.
       fallback: {
         assert: false,
@@ -79,7 +89,7 @@ module.exports = (env, args) => {
         vm: false,
         zlib: false
       },
-      extensions: ['.ts', '.js', '.json', '.wasm']
+      extensions: ['.ts', '.js', '.json', '.wasm', '.tsx', '.jsx']
     },
     // expect these apis in the browser
     externals: {
@@ -98,7 +108,6 @@ module.exports = (env, args) => {
     output: {
       filename: jsFilename,
       path: outDir,
-      devtoolModuleFilenameTemplate: devMode ? undefined : prodDevtoolModuleFilenameTemplate,
       clean: nvl(args.clean, true)
     },
     performance: {
@@ -106,8 +115,8 @@ module.exports = (env, args) => {
     },
     profile: args.profile,
     module: {
-      // LESS
       rules: [{
+        // LESS
         test: /\.less$/,
         use: [{
           // Extracts CSS into separate files. It creates a CSS file per JS file which contains CSS.
@@ -142,12 +151,27 @@ module.exports = (env, args) => {
           }
         }]
       }, {
-        // # Typescript
-        test: /\.[t|j]sx?$/,
+        test: /\.tsx?$/,
         exclude: /node_modules/,
         use: [{
-          loader: require.resolve('ts-loader')
-        }],
+            loader: require.resolve('babel-loader'),
+            options: babelOptions
+          },{
+            loader: require.resolve('ts-loader')
+          }]
+      }, {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: [{
+            loader: require.resolve('babel-loader'),
+            options: babelOptions
+        }]
+      }, {
+        test: /\.jsx?$/,
+        enforce: 'pre',
+        use: [{
+          loader: require.resolve('source-map-loader')
+        }]
       }, {
         // to support css imports (currently not used by Scout but might be used by included 3rd party libs)
         test: /\.css$/i,
@@ -164,20 +188,23 @@ module.exports = (env, args) => {
       }]
     },
     plugins: [
-      new ForkTsCheckerWebpackPlugin({
-        typescript: {
-          build: true,
-          mode: 'write-dts'
-        }
-      }),
-      new webpack.WatchIgnorePlugin({
+      new WatchIgnorePlugin({
         paths:[
           /\.d\.ts$/
       ]}),
       // see: extracts css into separate files
       new MiniCssExtractPlugin({filename: cssFilename}),
       // run post-build script hook
-      new AfterEmitWebpackPlugin({outDir: outDir})
+      new AfterEmitWebpackPlugin({outDir: outDir}),
+      new SourceMapDevToolPlugin({
+        // Use external source maps in all modes because the browser is very slow in displaying a file containing large lines which is the case if source maps are inlined
+        filename: '[file].map',
+
+        // In production mode create external source maps without source code to map stack traces.
+        // Otherwise, stack traces would point to the minified source code which makes it quite impossible to analyze productive issues.
+        noSources: !devMode,
+        moduleFilenameTemplate: devMode ? undefined : prodDevtoolModuleFilenameTemplate
+      })
     ],
     optimization: {
       splitChunks: {
@@ -187,16 +214,14 @@ module.exports = (env, args) => {
     }
   };
 
-  // # Copy resources
+  // Copy resources only add the plugin if there are resources to copy. Otherwise, the plugin fails.
   if (copyPluginConfig.length > 0) {
-    // only add the plugin if there are resources to copy. Otherwise the plugin fails.
     config.plugins.push(new CopyPlugin({patterns: copyPluginConfig}));
   }
 
+  // Shows progress information in the console in dev mode
   if (nvl(args.progress, true)) {
-    // Shows progress information in the console in dev mode
-    const webpack = require('webpack');
-    config.plugins.push(new webpack.ProgressPlugin({profile: args.profile}));
+    config.plugins.push(new ProgressPlugin({profile: args.profile}));
   }
 
   if (!devMode) {
@@ -215,16 +240,10 @@ module.exports = (env, args) => {
       // minify js
       new TerserPlugin({
         test: /\.js(\?.*)?$/i,
+        exclude: /node_modules/,
         parallel: 4
       })
     ];
-  }
-
-  if (devMode) {
-    // Use external source maps also in dev mode because the browser is very slow in displaying a file containing large lines which is the case if source maps are inlined
-    config.plugins.push(new webpack.SourceMapDevToolPlugin({
-      filename: '[file].map'
-    }));
   }
 
   return config;
@@ -262,13 +281,6 @@ function addThemes(entry, options = {}) {
   });
 }
 
-function getOutputDir(isMavenModule, outSubDir) {
-  if (isMavenModule) {
-    return path.resolve(scoutBuildConstants.outDir.target, scoutBuildConstants.outDir.dist, outSubDir);
-  }
-  return path.resolve(scoutBuildConstants.outDir.dist);
-}
-
 function computeChunkName(module, chunks, cacheGroupKey) {
   const entryPointDelim = '~';
   const allChunksNames = chunks
@@ -294,6 +306,7 @@ function computeChunkName(module, chunks, cacheGroupKey) {
 
 function computeModuleId(module) {
   const nodeModules = 'node_modules';
+  // noinspection JSUnresolvedVariable
   let id = module.userRequest;
   const nodeModulesPos = id.lastIndexOf(nodeModules);
   if (nodeModulesPos < 0) {
@@ -336,6 +349,13 @@ function nvl(arg, defaultValue) {
     return defaultValue;
   }
   return arg;
+}
+
+function isWarningIgnored(devMode, webpackError) {
+  if(devMode || !webpackError || !webpackError.warning || !webpackError.warning.message) {
+    return false;
+  }
+  return webpackError.warning.message.startsWith('Failed to parse source map');
 }
 
 /**

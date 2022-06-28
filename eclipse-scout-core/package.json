@@ -19,7 +19,14 @@
     "eclipse-scout",
     "scout core runtime"
   ],
-  "main": "./dist/eclipse-scout-core.js",
+  "exports": {
+    "production": {
+      "import": "./dist/eclipse-scout-core-esm.min.js",
+      "default": "./dist/eclipse-scout-core-browser-todo.min.js"
+    },
+    "import": "./dist/eclipse-scout-core-esm.js",
+    "default": "./dist/eclipse-scout-core-browser-todo.js"
+  },
   "types": "./dist/d.ts/index.d.ts",
   "files": [
     "dist",

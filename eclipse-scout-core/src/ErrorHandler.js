@@ -10,7 +10,7 @@
  */
 import {AjaxError, App, arrays, icons, logging, NullLogger, scout, strings} from './index';
 import * as $ from 'jquery';
-import sourcemappedStacktrace from 'sourcemapped-stacktrace';
+import * as sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
 export default class ErrorHandler {
 
@@ -82,7 +82,8 @@ export default class ErrorHandler {
    *   2. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(jqXHR, textStatus, errorThrown); }
    *   3. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(arguments); } // <-- recommended
    *
-   * @param {object|arguments|[]} error or array or array-like object containing the error and other arguments
+   * @param {object|arguments|[]} errorOrArgs or array or array-like object containing the error and other arguments
+   * @param args arguments
    * @return {Promise} the analyzed errorInfo
    */
   handle(errorOrArgs, ...args) {
@@ -239,7 +240,7 @@ export default class ErrorHandler {
   mapStack(stack) {
     let deferred = $.Deferred();
     try {
-      sourcemappedStacktrace.mapStackTrace(stack, mappedStack => {
+      sourceMappedStackTrace.mapStackTrace(stack, mappedStack => {
         deferred.resolve(arrays.format(mappedStack, '\n'));
       });
     } catch (e) {

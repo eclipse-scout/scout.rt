@@ -136,7 +136,7 @@ function runWebpack(args) {
 }
 
 function readWebpackConfig() {
-  let configFilePath = null;
+  let configFilePath;
   const devConfigFilePath = path.resolve(webpackCustomConfigFileName);
   if (fs.existsSync(devConfigFilePath)) {
     console.log(`Reading config from ${webpackCustomConfigFileName}`);

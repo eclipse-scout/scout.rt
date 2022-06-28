@@ -2,6 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist/d.ts",
     "allowJs": true,
+//    "checkJs": true,
     "target": "ES6",
     "moduleResolution": "node",
     "module": "ES6",

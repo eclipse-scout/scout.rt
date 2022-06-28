@@ -8,7 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+const scoutBuildConstants = require('./constants');
 const baseConfig = require('./webpack-defaults');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = (env, args) => {
     const defaultConfig = baseConfig(env, args);
@@ -17,5 +19,24 @@ module.exports = (env, args) => {
     defaultConfig.output.library = {
         type: 'module'
     };
+    delete defaultConfig.optimization.splitChunks;
+
+    // No hash for a library to ensure stable name (required for package.json).
+    // Furthermore, there is no need for a hash anyway as the lib is not delivered to a browser.
+    const hashSuffix = scoutBuildConstants.contentHashSuffix;
+    if (defaultConfig.output.filename) {
+        defaultConfig.output.filename = defaultConfig.output.filename.replace(hashSuffix, '');
+    }
+    defaultConfig.plugins
+        .filter(plugin => plugin instanceof MiniCssExtractPlugin)
+        .forEach(cssExtractPlugin => {
+            if (cssExtractPlugin.options.filename) {
+                cssExtractPlugin.options.filename = cssExtractPlugin.options.filename.replace(hashSuffix, '');
+            }
+            if (cssExtractPlugin.options.chunkFilename) {
+                cssExtractPlugin.options.chunkFilename = cssExtractPlugin.options.chunkFilename.replace(hashSuffix, '');
+            }
+        });
+
     return defaultConfig;
 };

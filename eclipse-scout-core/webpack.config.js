@@ -17,7 +17,7 @@ module.exports = (env, args) => {
   // This build creates resources that can directly be included in a html file without needing a build stack (webpack).
   // The resources are available by a CDN that provides npm modules (e.g. https://www.jsdelivr.com/package/npm/@eclipse-scout/core)
   config.entry = {
-    'eclipse-scout-core': './src/index.js',
+    'eclipse-scout-core-esm': './src/index.js',
     'eclipse-scout-core-theme': './src/index.less',
     'eclipse-scout-core-theme-dark': './src/index-dark.less'
   };
