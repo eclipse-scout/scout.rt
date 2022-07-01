@@ -41,6 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Mockito;
 
 /**
  * Tests the lookup in {@link AbstractSmartField} <br>
@@ -70,10 +71,10 @@ public class SmartFieldLookupTest {
     inactiveRows.add(new LookupRow<>(2L, "B"));
     inactiveRows.add(null);
 
-    when(m_mockService.getDataByRec(argThat(hasRec(1L)))).thenReturn(childRows);
-    when(m_mockService.getDataByRec(argThat(isInactive()))).thenReturn(inactiveRows);
-    when(m_mockService.getDataByRec(argThat(hasMaxRowCount(2)))).thenReturn(inactiveRows);
-    when(m_mockService.getDataByRec(argThat(hasMaster(testMasterValue)))).thenReturn(inactiveRows);
+    Mockito.doReturn(childRows).when(m_mockService).getDataByRec(argThat(hasRec(1L)));
+    Mockito.doReturn(inactiveRows).when(m_mockService).getDataByRec(argThat(isInactive()));
+    Mockito.doReturn(inactiveRows).when(m_mockService).getDataByRec(argThat(hasMaxRowCount(2)));
+    Mockito.doReturn(inactiveRows).when(m_mockService).getDataByRec(argThat(hasMaster(testMasterValue)));
   }
 
   /**
