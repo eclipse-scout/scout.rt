@@ -11,21 +11,21 @@
 /**
  * Controls how the tree visiting should continue.
  */
-const TreeVisitResult = {
+enum TreeVisitResult {
   /**
    * Normally continue visiting. Nothing will be skipped.
    */
-  CONTINUE: 'continue',
+  CONTINUE = 'continue',
 
   /**
    * Abort the whole visiting. May be used if the visitor finishes the operation before all elements have been visited.
    */
-  TERMINATE: 'terminate',
+  TERMINATE = 'terminate',
 
   /**
    * Continue without visiting the child elements of the current element.
    */
-  SKIP_SUBTREE: 'skip_subtree'
-};
+  SKIP_SUBTREE = 'skip_subtree'
+}
 
 export default TreeVisitResult;

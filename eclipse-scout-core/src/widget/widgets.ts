@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays} from '../index';
+import {arrays, Widget} from '../index';
 import * as $ from 'jquery';
 
 let uniqueIdSeqNo = 0;
@@ -60,7 +60,7 @@ export function updateFirstLastMarker(widgets) {
  * @param {boolean} [checkTabbable=true] if true, the resulting widget has to be tabbable, not only focusable.
  * @returns {import("@eclipse-scout/core").Widget} the first widget of the given list which is focusable (and tabbable, unless checkTabbable is set to false).
  */
-export function findFirstFocusableWidget(widgets, container, checkTabbable) {
+export function findFirstFocusableWidget(widgets: Widget[], container?: Widget, checkTabbable?: boolean) {
   if (container && (!container.rendered || !container.visible)) {
     return null;
   }
@@ -75,7 +75,7 @@ export function findFirstFocusableWidget(widgets, container, checkTabbable) {
  * @param {object} preserver
  * @param {string} preserverName
  */
-export function preserveAndSetProperty(setter, getter, preserver, preserverName) {
+export function preserveAndSetProperty(setter: Function, getter: Function, preserver: object, preserverName: string) {
   if (preserver[preserverName] === null) {
     preserver[preserverName] = getter();
   }
@@ -88,7 +88,7 @@ export function preserveAndSetProperty(setter, getter, preserver, preserverName)
  * @param {object} preserver
  * @param {string} preserverName
  */
-export function resetProperty(setter, preserver, preserverName) {
+export function resetProperty(setter: Function, preserver: object, preserverName: string) {
   if (preserver[preserverName] != null) {
     setter(preserver[preserverName]);
     preserver[preserverName] = null;

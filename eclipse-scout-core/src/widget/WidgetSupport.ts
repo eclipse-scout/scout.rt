@@ -12,44 +12,44 @@ import {scout, Widget} from '../index';
 
 
 export interface WidgetSupportOptions {
-    /**
-     * Widget that created the support
-     */
-    widget: Widget,
+  /**
+   * Widget that created the support
+   */
+  widget: Widget,
 
-    /**
-     * jQuery element that will be used for the visualization.
-     *  It may be a function to resolve the container later.
-     *  If this property is not set the $container of the widget is used by default.
-     */
-    $container?: JQuery | Function
+  /**
+   * jQuery element that will be used for the visualization.
+   *  It may be a function to resolve the container later.
+   *  If this property is not set the $container of the widget is used by default.
+   */
+  $container?: JQuery | Function
 }
 
 export default class WidgetSupport {
-    widget: Widget;
-    protected readonly options$Container: JQuery | Function;
-    $container: JQuery;
+  widget: Widget;
+  protected readonly options$Container: JQuery | Function;
+  $container: JQuery;
 
-    /**
-     * @param {WidgetSupportOptions} options a mandatory options object
-     */
-    constructor(options: WidgetSupportOptions) {
-        scout.assertParameter('widget', options.widget);
+  /**
+   * @param {WidgetSupportOptions} options a mandatory options object
+   */
+  constructor(options: WidgetSupportOptions) {
+    scout.assertParameter('widget', options.widget);
 
-        this.widget = options.widget;
-        this.options$Container = options.$container;
+    this.widget = options.widget;
+    this.options$Container = options.$container;
+  }
+
+  _ensure$Container() {
+    if (typeof this.options$Container === 'function') {
+      // resolve function provided by options.$container that returns a jQuery element
+      this.$container = this.options$Container();
+    } else if (this.options$Container) {
+      // use jQuery element provided by options.$container
+      this.$container = this.options$Container;
+    } else {
+      // default: when no options.$container is not set, use jQuery element of widget
+      this.$container = this.widget.$container;
     }
-
-    _ensure$Container() {
-        if (typeof this.options$Container === 'function') {
-            // resolve function provided by options.$container that returns a jQuery element
-            this.$container = this.options$Container();
-        } else if (this.options$Container) {
-            // use jQuery element provided by options.$container
-            this.$container = this.options$Container;
-        } else {
-            // default: when no options.$container is not set, use jQuery element of widget
-            this.$container = this.widget.$container;
-        }
-    }
+  }
 }

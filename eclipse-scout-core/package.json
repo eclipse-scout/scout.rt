@@ -35,7 +35,7 @@
   ],
   "scripts": {
     "tsc": "tsc",
-    "tsm": "ts-migrate.js",
+    "tsm": "node ts-migrate.mjs",
     "api:gen": "api-extractor run --diagnostics",
     "tsc:api:gen": "tsc && api-extractor run",
     "testserver:start": "scout-scripts test-server:start",

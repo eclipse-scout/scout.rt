@@ -11,6 +11,11 @@
 import {HtmlComponent, Widget} from '../index';
 
 export default class Composite extends Widget {
+  $container: any;
+  $parent: any;
+  htmlComp: any;
+  session: any;
+  widgets: any;
 
   constructor() {
     super();

@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AnyWidget, KeyStrokeContext, HtmlComponent, LoadingSupport, arrays, DeferredGlassPaneTarget, Desktop, Device, Event, EventDelegator, EventSupport, filters, focusUtils, Form, graphics, icons, inspector, objects, scout, scrollbars, strings, texts, TreeVisitResult} from '../index';
+import {arrays, DeferredGlassPaneTarget, Desktop, Device, Event, EventDelegator, EventSupport, filters, focusUtils, Form, graphics, icons, inspector, objects, scout, scrollbars, strings, texts, TreeVisitResult} from '../index';
+import WidgetModel from './WidgetModel';
 import * as $ from 'jquery';
 
 export default class Widget {
@@ -70,9 +71,7 @@ export default class Widget {
     this.scrollTop = null;
     this.scrollLeft = null;
 
-    /** @type {$} */
     this.$parent = null;
-    /** @type {JQuery} */
     this.$container = null;
 
     /**
@@ -124,17 +123,64 @@ export default class Widget {
     READ_ONLY: 1
   };
 
+  $container: JQuery;
+  $parent: JQuery;
+  _$lastFocusedElement: any;
+  _cloneProperties: any;
+  _focusInListener: any;
+  _glassPaneContributions: any;
+  _parentDestroyHandler: any;
+  _parentRemovingWhileAnimatingHandler: any;
+  _postRenderActions: any;
+  _preserveOnPropertyChangeProperties: any;
+  _rendered: any;
+  _scrollHandler: any;
+  _storedFocusedWidget: any;
+  _widgetProperties: any;
+  animateRemoval: any;
+  animateRemovalClass: any;
+  attached: any;
+  children: any;
+  cloneOf: any;
+  cssClass: any;
+  destroyed: any;
+  destroying: any;
+  disabledStyle: any;
+  enabled: any;
+  enabledComputed: any;
+  eventDelegators: any;
+  events: any;
+  focused: any;
+  htmlComp: any;
+  id: any;
+  inheritAccessibility: any;
+  initialized: any;
+  keyStrokeContext: any;
+  loading: any;
+  loadingSupport: any;
+  logicalGrid: any;
+  objectType: any;
+  owner: any;
+  parent: any;
+  removalPending: any;
+  removing: any;
+  rendering: any;
+  scrollLeft: any;
+  scrollTop: any;
+  session: any;
+  trackFocus: any;
+  visible: any;
+
   /**
    * Initializes the widget instance. All properties of the model parameter (object) are set as properties on the widget instance.
    * Calls {@link Widget#_init} and triggers an <em>init</em> event when initialization has been completed.
-   *
-   * @param {object} model
    */
-  init(model) {
+  init(model: WidgetModel) {
     let staticModel = this._jsonModel();
     if (staticModel) {
       model = $.extend({}, staticModel, model);
     }
+    // @ts-ignore
     model = model || {};
     model = this._prepareModel(model);
     this._init(model);
@@ -149,7 +195,7 @@ export default class Widget {
    * may override this method to alter the JSON model before the widgets
    * are created out of the widgetProperties in the model.
    */
-  _prepareModel(model) {
+  _prepareModel(model: WidgetModel) {
     return model;
   }
 
@@ -161,7 +207,8 @@ export default class Widget {
    *   <li>parent (required): parent widget</li>
    *   <li>session (optional): If not specified, session of parent widget is used</li></ul>
    */
-  _init(model) {
+  _init(model: WidgetModel) {
+    // @ts-ignore
     if (!model.parent) {
       throw new Error('Parent expected: ' + this);
     }
@@ -201,7 +248,8 @@ export default class Widget {
    * Default implementation simply returns undefined. A Subclass
    * may override this method to load or extend a JSON model with models.getModel or models.extend.
    */
-  _jsonModel() {
+  _jsonModel(): object {
+    return null;
   }
 
   /**
@@ -230,7 +278,7 @@ export default class Widget {
    * @param model {Object|Widget}
    * @returns {AnyWidget}
    */
-  _createChild(model) {
+  _createChild(model: WidgetModel | Widget) {
     if (model instanceof Widget) {
       return model;
     }
@@ -243,7 +291,7 @@ export default class Widget {
       return existingWidget;
     }
     model.parent = this;
-    return scout.create(model);
+    return scout.create(model as { objectType: string });
   }
 
   _initKeyStrokeContext() {
@@ -298,7 +346,7 @@ export default class Widget {
   /**
    * @param {Widget[]|Widget} widgets may be an object or array of objects
    */
-  _destroyChildren(widgets) {
+  _destroyChildren(widgets: Widget[] | Widget) {
     if (!widgets) {
       return;
     }
@@ -756,7 +804,7 @@ export default class Widget {
    *          (optional) If true the enabled property of all child form fields (recursive)
    *          are updated to same value as well. Default is false.
    */
-  setEnabled(enabled, updateParents, updateChildren) {
+  setEnabled(enabled: boolean, updateParents?: boolean, updateChildren?: boolean) {
     this.setProperty('enabled', enabled);
 
     if (enabled && updateParents && this.parent) {
@@ -764,8 +812,8 @@ export default class Widget {
     }
 
     if (updateChildren) {
-      this.visitChildren(field => {
-        field.setEnabled(enabled);
+      this.visitChildren(widget => {
+        widget.setEnabled(enabled);
       });
     }
   }
@@ -777,7 +825,7 @@ export default class Widget {
     }
   }
 
-  recomputeEnabled(parentEnabled) {
+  recomputeEnabled(parentEnabled?: boolean) {
     if (parentEnabled === undefined) {
       parentEnabled = true;
       if (this.parent && this.parent.initialized && this.parent.enabledComputed !== undefined) {
@@ -789,7 +837,7 @@ export default class Widget {
     this._updateEnabledComputed(enabledComputed);
   }
 
-  _updateEnabledComputed(enabledComputed, enabledComputedForChildren) {
+  _updateEnabledComputed(enabledComputed, enabledComputedForChildren?: boolean) {
     if (this.enabledComputed === enabledComputed && enabledComputedForChildren === undefined) {
       // no change for this instance. there is no need to propagate to children
       // exception: the enabledComputed for the children differs from the one for me. In this case the propagation is necessary.
@@ -868,7 +916,7 @@ export default class Widget {
   /**
    * @param {boolean} visible true, to make the widget visible, false to hide it
    */
-  setVisible(visible) {
+  setVisible(visible: boolean) {
     this.setProperty('visible', visible);
   }
 
@@ -956,14 +1004,14 @@ export default class Widget {
       }
       cssClasses.push(newCssClass);
     }, this);
-    this.setProperty('cssClass', arrays.format(cssClasses, ' '));
+    this.setProperty('cssClass', arrays.format(cssClasses as [], ' '));
   }
 
   removeCssClass(cssClass) {
     let cssClasses = this.cssClassAsArray();
     let cssClassesToRemove = Widget.cssClassAsArray(cssClass);
     if (arrays.removeAll(cssClasses, cssClassesToRemove)) {
-      this.setProperty('cssClass', arrays.format(cssClasses, ' '));
+      this.setProperty('cssClass', arrays.format(cssClasses as [], ' '));
     }
   }
 
@@ -975,7 +1023,7 @@ export default class Widget {
     }
   }
 
-  cssClassAsArray() {
+  cssClassAsArray(): string[] {
     return Widget.cssClassAsArray(this.cssClass);
   }
 
@@ -1047,7 +1095,7 @@ export default class Widget {
   /**
    * @param [invalidateParents] optional, default is true
    */
-  invalidateLayoutTree(invalidateParents) {
+  invalidateLayoutTree(invalidateParents?: boolean) {
     if (!this.rendered || this.removing) {
       return;
     }
@@ -1110,7 +1158,7 @@ export default class Widget {
    * Does nothing, if there is no logical grid.
    * @param {boolean} [invalidateLayout] true, to invalidate the layout afterwards, false if not. Default is true.
    */
-  invalidateLogicalGrid(invalidateLayout) {
+  invalidateLogicalGrid(invalidateLayout?: boolean) {
     if (!this.initialized) {
       return;
     }
@@ -1127,7 +1175,7 @@ export default class Widget {
    * Invalidates the logical grid of the parent widget. Typically done when the visibility of the widget changes.
    * @param {boolean} [invalidateLayout] true, to invalidate the layout of the parent of this.htmlComp, false if not. Default is true.
    */
-  invalidateParentLogicalGrid(invalidateLayout) {
+  invalidateParentLogicalGrid(invalidateLayout?: boolean) {
     this.parent.invalidateLogicalGrid(false);
     if (!this.rendered || !this.htmlComp) {
       return;
@@ -1165,7 +1213,7 @@ export default class Widget {
     return new EventSupport();
   }
 
-  trigger(type, event) {
+  trigger(type, event?) {
     event = event || {};
     event.source = this;
     this.events.trigger(type, event);
@@ -1178,7 +1226,7 @@ export default class Widget {
    * @param {string} type One or more event names separated by space.
    * @param {function} handler Event handler executed when the event is triggered. An event object is passed to the function as first parameter
    */
-  one(type, handler) {
+  one(type: string, handler: Function) {
     this.events.one(type, handler);
   }
 
@@ -1188,7 +1236,7 @@ export default class Widget {
    * @param {string} type One or more event names separated by space.
    * @param {function} handler Event handler executed when the event is triggered. An event object is passed to the function as first parameter.
    **/
-  on(type, handler) {
+  on(type: string, handler: Function) {
     return this.events.on(type, handler);
   }
 
@@ -1200,7 +1248,7 @@ export default class Widget {
    * @param {function} [handler] The exact same event handler that was used for registration using {@link on} or {@link one}.
    *      If no handler is specified, all handlers are de-registered for the given type.
    */
-  off(type, handler) {
+  off(type: string, handler?: Function) {
     this.events.off(type, handler);
   }
 
@@ -1317,7 +1365,7 @@ export default class Widget {
 
     this._beforeDetach();
     this._onDetach();
-    this._triggerChildrenOnDetach(this);
+    this._triggerChildrenOnDetach();
     this._detach();
     this.attached = false;
   }
@@ -1326,12 +1374,12 @@ export default class Widget {
    * This function is called before a widget gets detached. The function is only called on the detached widget and NOT on
    * any of its children.
    */
-  _beforeDetach(parent) {
+  _beforeDetach(parent?) {
     if (!this.$container) {
       return;
     }
 
-    let activeElement = this.$container.document(true).activeElement;
+    let activeElement = (this.$container.document(true) as Document).activeElement;
     let isFocused = this.$container.isOrHas(activeElement);
     let focusManager = this.session.focusManager;
 
@@ -1346,7 +1394,7 @@ export default class Widget {
   _triggerChildrenOnDetach() {
     this.children.forEach(child => {
       child._onDetach();
-      child._triggerChildrenOnDetach(parent);
+      child._triggerChildrenOnDetach();
     });
   }
 
@@ -1370,6 +1418,7 @@ export default class Widget {
    * implementation sets this.attached to false.
    */
   _detach() {
+    // NOP
   }
 
   _uninstallFocusContext() {
@@ -1546,7 +1595,7 @@ export default class Widget {
    *
    * @param {Widget[]|Widget} widgets may be a widget or array of widgets
    */
-  link(widgets) {
+  link(widgets: Widget[] | Widget) {
     if (!widgets) {
       return;
     }
@@ -1566,7 +1615,7 @@ export default class Widget {
    * @param {Widget} element widget that requested a glass pane
    * @returns [$]|[DeferredGlassPaneTarget]
    */
-  glassPaneTargets(element) {
+  glassPaneTargets(element: Widget) {
     let resolveGlassPanes = element => {
       // contributions
       let targets = arrays.flatMap(this._glassPaneContributions, cont => {
@@ -1590,7 +1639,7 @@ export default class Widget {
    * @param {Widget} element widget that requested a glass pane
    * @returns [$]
    */
-  _glassPaneTargets(element) {
+  _glassPaneTargets(element: Widget) {
     // since popups are rendered outside the DOM of the widget parent-child hierarchy, get glassPaneTargets of popups belonging to this widget separately.
     return [this.$container].concat(
       this.session.desktop.getPopupsFor(this)
@@ -1630,7 +1679,7 @@ export default class Widget {
    * Returns the ancestors as string delimited by '\n'.
    * @param {number} [count] the number of ancestors to be processed. Default is -1 which means all.
    */
-  ancestorsToString(count) {
+  ancestorsToString(count?: number) {
     let str = '',
       ancestors = this.ancestors();
 
@@ -1760,6 +1809,7 @@ export default class Widget {
    * @returns {AnyWidget} the original widget from which this one was cloned. If it is not a clone, itself is returned.
    */
   original() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let original = this;
     while (original.cloneOf) {
       original = original.cloneOf;
@@ -1781,7 +1831,14 @@ export default class Widget {
    * @param {boolean} [options.delegateAllPropertiesToClone] True to delegate all property changes from the original to the clone. Default is false.
    * @param {boolean} [options.delegateAllPropertiesToOriginal] True to delegate all property changes from the clone to the original. Default is false.
    */
-  clone(model, options) {
+  clone(model, options?: {
+    delegatePropertiesToClone?: [string];
+    delegatePropertiesToOriginal?: [string];
+    excludePropertiesToOriginal?: [string];
+    delegateEventsToOriginal?: [string];
+    delegateAllPropertiesToClone?: boolean;
+    delegateAllPropertiesToOriginal?: boolean;
+  }) {
     let clone, cloneModel;
     model = model || {};
     options = options || {};
@@ -1842,7 +1899,7 @@ export default class Widget {
    * If no target is set it works only if this widget is a clone.
    * @param {object} [options]
    */
-  mirror(options, target) {
+  mirror(options?: object, target?) {
     target = target || this.cloneOf;
     if (!target) {
       throw new Error('No target for mirroring.');
@@ -1852,6 +1909,7 @@ export default class Widget {
 
   _mirror(clone, options) {
     let eventDelegator = arrays.find(this.eventDelegators, eventDelegator => {
+      // @ts-ignore
       return eventDelegator.clone === clone;
     });
     if (eventDelegator) {
@@ -1887,6 +1945,7 @@ export default class Widget {
 
   _unmirror(target) {
     let eventDelegatorIndex = arrays.findIndex(this.eventDelegators, eventDelegator => {
+        // @ts-ignore
         return eventDelegator.clone === target;
       }),
       eventDelegator = eventDelegatorIndex > -1 ? this.eventDelegators.splice(eventDelegatorIndex, 1)[0] : null;
@@ -1924,9 +1983,8 @@ export default class Widget {
    * Returns the widget with the requested ID or null if no widget has been found.
    *
    * @param {string} widgetId
-   * @returns {AnyWidget} the found widget for the given id
    */
-  widget(widgetId) {
+  widget(widgetId: string): Widget {
     if (predicate(this)) {
       return this;
     }
@@ -1978,7 +2036,7 @@ export default class Widget {
    *          If true, the entire tree is traversed.
    * @return {Widget} the first found widget, or null if no widget was found.
    */
-  nearestWidget(widgetId, deep) {
+  nearestWidget(widgetId: string, deep?: boolean) {
     if (this.id === widgetId) {
       return this;
     }
@@ -2017,7 +2075,7 @@ export default class Widget {
   /**
    * @returns {AnyWidget} the first child for which the given function returns true.
    */
-  findChild(predicate) {
+  findChild(predicate): Widget {
     let foundChild = null;
     this.visitChildren(child => {
       if (predicate(child)) {
@@ -2061,6 +2119,7 @@ export default class Widget {
       return;
     }
     let $target = $(event.target);
+    // @ts-ignore // TODO CGU does it event work with a JQuery element?
     if (this.$container.has($target)) {
       this._$lastFocusedElement = $target;
     }
@@ -2075,7 +2134,9 @@ export default class Widget {
    * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
    * @returns {boolean} true if the element could be focused, false if not
    */
-  focus(options) {
+  focus(options?: {
+    preventScroll?: boolean;
+  }) {
     if (!this.rendered) {
       this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this, options));
       return false;
@@ -2107,7 +2168,7 @@ export default class Widget {
    * @param {boolean} [checkTabbable=true] if true, the widget has to be tabbable, not only focusable.
    * @return {boolean} true if the element is focusable (and tabbable, unless checkTabbable is set to false), false if not.
    */
-  isFocusable(checkTabbable) {
+  isFocusable(checkTabbable?: boolean) {
     if (!this.rendered || !this.visible) {
       return false;
     }
@@ -2139,7 +2200,7 @@ export default class Widget {
   /**
    * @param {object} [options]
    */
-  _installScrollbars(options) {
+  _installScrollbars(options?: object) {
     let $scrollable = this.get$Scrollable();
     if (!$scrollable) {
       throw new Error('Scrollable is not defined, cannot install scrollbars');
@@ -2234,7 +2295,7 @@ export default class Widget {
    * If the widget is mainly a wrapper for a scrollable widget and does not have a scrollable element by itself, you can use @{link #getDelegateScrollable} instead.
    * @return {$}
    */
-  get$Scrollable() {
+  get$Scrollable(): JQuery {
     return this.$container;
   }
 
@@ -2298,6 +2359,7 @@ export default class Widget {
     scrollbars.scrollTo($scrollParent, this.$container, options);
   }
 
+  // @ts-ignore
   /**
    * Visits every child of this widget in pre-order (top-down).<br>
    * This widget itself is not visited! Only child widgets are visited recursively.
@@ -2311,7 +2373,7 @@ export default class Widget {
    * @param {function(AnyWidget):boolean|TreeVisitResult|null} visitor
    * @returns {boolean} true if the visitor aborted the visiting, false if the visiting completed without aborting
    */
-  visitChildren(visitor) {
+  visitChildren(visitor: (widget: Widget) => boolean | TreeVisitResult | void) {
     for (let i = 0; i < this.children.length; i++) {
       let child = this.children[i];
       if (child.parent === this) {

@@ -100,6 +100,7 @@ export default class TreeNode {
   }
 
   _jsonModel() {
+    return null;
   }
 
   reset() {

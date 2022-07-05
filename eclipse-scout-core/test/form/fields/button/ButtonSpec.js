@@ -20,7 +20,7 @@ describe('Button', () => {
 
   describe('setLabel', () => {
     it('toggles the class with-label on the icon', () => {
-      let button = scout.create('Button', {
+      let button = scout.create(Button, {
         parent: session.desktop,
         label: 'label',
         iconId: icons.ANGLE_DOWN

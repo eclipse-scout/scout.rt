@@ -8,23 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Filter, FocusFilterFieldKeyStroke, SetFiltersResult, arrays, FormField, HAlign, keys, KeyStroke, objects, scout, strings, styles, ValueField, WidgetSupport} from '../index';
-import {WidgetSupportOptions} from './WidgetSupport';
+import {arrays, Filter, FocusFilterFieldKeyStroke, FormField, HAlign, keys, KeyStroke, objects, scout, SetFiltersResult, strings, styles, ValueField, Widget, WidgetSupport} from '../index';
+import FilterSupportOptions from './FilterSupportOptions';
+import Filterable from './Filterable';
 
 export default class FilterSupport extends WidgetSupport {
-  /**
-   * @typedef {WidgetSupportOptions} FilterSupportOptions
-   * @property {function} filterElements Filter all elements.
-   * @property {function} getElementsForFiltering Get all elements to which the filters should be applied.
-   * @property {function} getElementText Get text of an element.
-   * @property {function} createTextFilter Create a text filter.
-   * @property {function} updateTextFilterText Update the text on the filter, this is mandatory if createTextFilter is set.
-   */
+  _cancelFilterFieldKeyStroke: any;
+  _createTextFilter: any;
+  _exitFilterFieldKeyStroke: any;
+  _filterElements: any;
+  _filterField: any;
+  _filterFieldDisplayTextChangedHandler: any;
+  _focusFilterFieldKeyStroke: any;
+  _focusInHandler: any;
+  _focusOutHandler: any;
+  _getElementText: any;
+  _getElementsForFiltering: any;
+  _textFilter: any;
+  _updateTextFilterText: any;
+  widget: Widget & Filterable;
 
   /**
    * @param {FilterSupportOptions} options a mandatory options object
    */
-  constructor(options) {
+  constructor(options: FilterSupportOptions) {
     super(options);
 
     if (options.filterElements) {
@@ -215,7 +222,7 @@ export default class FilterSupport extends WidgetSupport {
    * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    * @return {Filter[]} Returns the added filters.
    */
-  addFilter(filter, applyFilter = true) {
+  addFilter(filter: Filter | Function | (Filter | Function)[], applyFilter: boolean = true) {
     let filtersToAdd = arrays.ensure(filter);
     let filters = this._getFilters().slice(),
       oldFilters = filters.slice();
@@ -241,7 +248,7 @@ export default class FilterSupport extends WidgetSupport {
    * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    * @return {Filter[]} Returns the removed filters.
    */
-  removeFilter(filter, applyFilter = true) {
+  removeFilter(filter: Filter | Function | (Filter | Function)[], applyFilter: boolean = true) {
     let filtersToRemove = arrays.ensure(filter);
     let filters = this._getFilters().slice(),
       oldFilters = filters.slice();
@@ -268,7 +275,7 @@ export default class FilterSupport extends WidgetSupport {
    * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    * @return {SetFiltersResult}
    */
-  setFilters(filters, applyFilter = true) {
+  setFilters(filters, applyFilter: boolean = true) {
     filters = arrays.ensure(filters);
     this._addSyntheticFilters(filters);
 
@@ -318,7 +325,7 @@ export default class FilterSupport extends WidgetSupport {
     filters.push(syntheticFilter);
   }
 
-  _getFilters() {
+  _getFilters(): Filter[] {
     return this.widget.filters;
   }
 
@@ -329,7 +336,7 @@ export default class FilterSupport extends WidgetSupport {
     return arrays.find(filters, f => objects.equals(f, filter));
   }
 
-  _getFilterCreatedByFunction(filters, filterFunc) {
+  _getFilterCreatedByFunction(filters: Filter[], filterFunc) {
     return arrays.find(filters, filter => filter.createdByFunction && filter.accept === filterFunc);
   }
 
@@ -353,6 +360,7 @@ export default class FilterSupport extends WidgetSupport {
 
       let opts = {};
       if (this._filterField) {
+        // @ts-ignore
         opts.textFilterText = this._filterField.displayText;
       }
       this.widget.updateFilteredElements(result, opts);

@@ -526,9 +526,9 @@ export function reset($scrollable) {
 /**
  * Scrolls the $scrollable to the given $element (must be a child of $scrollable)
  *
- * @param {$} $scrollable
+ * @param {JQuery} $scrollable
  *          the scrollable object
- * @param {$} $element
+ * @param {JQuery} $element
  *          the element to scroll to
  * @param {object|string} [options]
  *          an optional options object. Short-hand version: If a string is passed instead
@@ -645,7 +645,7 @@ export function scrollHorizontalTo($scrollable, $element, options) {
 }
 
 /**
- * @param {$} $scrollable the scrollable object
+ * @param {JQuery} $scrollable the scrollable object
  * @param {number} scrollTop the new scroll position
  * @param {object} [options]
  * @param {boolean} [options.animate] whether the scrolling should be animated. Default is false.
@@ -681,7 +681,7 @@ export function scrollTop($scrollable, scrollTop, options) {
 }
 
 /**
- * @param {$} $scrollable the scrollable object
+ * @param {JQuery} $scrollable the scrollable object
  * @param {number} scrollLeft the new scroll position
  * @param {object} [options]
  * @param {boolean} [options.animate] whether the scrolling should be animated. Default is false.

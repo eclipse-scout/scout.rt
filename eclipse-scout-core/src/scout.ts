@@ -40,7 +40,7 @@ export function nvl(...args) {
  * @param {*} [type] if this optional parameter is set, the given value must be of this type (instanceof check)
  * @return {T} the value
  */
-export function assertParameter(parameterName, value, type) {
+export function assertParameter(parameterName, value, type?) {
   if (objects.isNullOrUndefined(value)) {
     throw new Error('Missing required parameter \'' + parameterName + '\'');
   }
@@ -115,15 +115,15 @@ export function isOneOf(value, ...args) {
 }
 
 /**
- * Creates a new object instance.<p> Delegates the create call to scout.ObjectFactory#create.
+ * Creates a new object instance.<p> Delegates the create call to ObjectFactory#create.
  * @returns {object}
  */
-export function create(objectType, model, options) {
+export function create<T>(objectType: { new(): T } | string | { objectType:string }, model?: object, options?): T {
   return ObjectFactory.get().create(objectType, model, options);
 }
 
 /**
- * Prepares the DOM for scout in the given document. This should be called once while initializing scout.
+ * Prepares the DOM for scout in the given document. This should be called once while initializing
  * If the target document is not specified, the global "document" variable is used instead.
  *
  * This is used by apps (App, LoginApp, LogoutApp)
@@ -131,7 +131,7 @@ export function create(objectType, model, options) {
  * Currently it does the following:
  * - Remove the <noscript> tag (obviously there is no need for it).
  * - Remove <scout-text> tags (they must have been processed before, see texts.readFromDOM())
- * - Remove <scout-version> tag (it must have been processed before, see scout.App._initVersion())
+ * - Remove <scout-version> tag (it must have been processed before, see App._initVersion())
  * - Add a device / browser class to the body tag to allow for device specific CSS rules.
  * - If the browser is Google Chrome, add a special meta header to prevent automatic translation.
  */
@@ -207,14 +207,14 @@ export function installSyntheticActiveStateHandler(myDocument) {
  *          argument is a widget ID). If omitted, the first session is used.
  * @returns {AnyWidget} the widget for the given element or id
  */
-export function widget(widgetIdOrElement, partId) {
+export function widget(widgetIdOrElement, partId?: string) {
   if (objects.isNullOrUndefined(widgetIdOrElement)) {
     return null;
   }
   let $elem = widgetIdOrElement;
   if (typeof widgetIdOrElement === 'string' || typeof widgetIdOrElement === 'number') {
     // Find widget for ID
-    let session = scout.getSession(partId);
+    let session = getSession(partId);
     if (session) {
       widgetIdOrElement = strings.asString(widgetIdOrElement);
       return session.root.widget(widgetIdOrElement);
@@ -233,7 +233,7 @@ export function adapter(adapterId, partId) {
   if (objects.isNullOrUndefined(adapterId)) {
     return null;
   }
-  let session = scout.getSession(partId);
+  let session = getSession(partId);
   if (session && session.modelAdapterRegistry) {
     return session.modelAdapterRegistry[adapterId];
   }
@@ -264,12 +264,12 @@ export function getSession(partId) {
  * This method can only be called through the browser JavaScript console.
  * Here's an example of how to call the method:
  *
- * JSON.stringify(scout.exportAdapter(4))
+ * JSON.stringify(exportAdapter(4))
  *
  * @param adapterId
  */
 export function exportAdapter(adapterId, partId) {
-  let session = scout.getSession(partId);
+  let session = getSession(partId);
   if (session && session.modelAdapterRegistry) {
     let adapter = session.getModelAdapter(adapterId);
     if (!adapter) {

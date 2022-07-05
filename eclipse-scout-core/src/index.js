@@ -699,14 +699,15 @@ export {default as BreadcrumbBarLayout} from './breadcrumbbar/BreadcrumbBarLayou
 export {default as BreadcrumbBarAdapter} from './breadcrumbbar/BreadcrumbBarAdapter';
 export {default as BreadcrumbBarField} from './form/fields/breadcrumbbarfield/BreadcrumbBarField';
 export {default as BreadcrumbBarFieldAdapter} from './form/fields/breadcrumbbarfield/BreadcrumbBarFieldAdapter';
-export {default as ValidationResult} from './form/fields/ValidationResult'
-export {default as AnyWidget} from './AnyWidget'
+export {default as ValidationResult} from './form/fields/ValidationResult';
+export {default as AnyWidget} from './AnyWidget';
 
 // The following files don't export anything but they need to be imported so they participate on the webpack build
 // noinspection ES6UnusedImports
 import * as objectFactories from './objectFactories';
 // noinspection ES6UnusedImports
 import * as jqs from './jquery/jquery-scout';
+
 // noinspection ES6UnusedImports
 import * as jqss from './jquery/jquery-scout-selectors';
 

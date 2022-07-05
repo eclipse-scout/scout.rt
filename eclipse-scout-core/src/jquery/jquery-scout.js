@@ -14,12 +14,13 @@
 import * as $ from 'jquery';
 import {arrays, Device, Dimension, events, IconDesc, icons, objects, scout, strings} from '../index';
 
-/**
- * By using $ in jsdoc all the functions is this file are recognized as part of $.
- * By additionally defining $ as jQuery all default jQuery functions are recognized as well.
- * "JQuery" (with a capital J) refers to the the type definitions "@types/jquery".
- * @typedef {JQuery|jQuery} $
- */
+// TODO cgu delete?
+// /**
+//  * By using $ in jsdoc all the functions is this file are recognized as part of $.
+//  * By additionally defining $ as jQuery all default jQuery functions are recognized as well.
+//  * "JQuery" (with a capital J) refers to the the type definitions "@types/jquery".
+//  * @typedef {JQuery|jQuery} $
+//  */
 
 // === internal methods ===
 
