@@ -13,7 +13,7 @@ import {App, Device, ObjectFactory, objects, strings, ValueField, widgets} from 
 import * as $ from 'jquery';
 
 let $activeElements = null;
-let objectFactories = {};
+let objectFactories = new Map();
 
 /**
  * Returns the first of the given arguments that is not null or undefined. If no such element
@@ -356,7 +356,13 @@ export function reloadPage(options) {
 }
 
 export function addObjectFactories(factories) {
-  objectFactories = $.extend(objectFactories, factories);
+  for (let [objectType, factory] of Object.entries(factories)) {
+    objectFactories.set(objectType, factory);
+  }
+}
+
+export function addObjectFactory(objectType: { new(): object }, factory: Function) {
+  objectFactories.set(objectType, factory);
 }
 
 export function cloneShallow(template, properties, createUniqueId) {
@@ -397,6 +403,7 @@ export default {
   exportAdapter,
   reloadPage,
   addObjectFactories,
+  addObjectFactory,
   objectFactories,
   cloneShallow
 };

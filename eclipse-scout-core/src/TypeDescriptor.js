@@ -27,7 +27,7 @@ export default class TypeDescriptor {
     this.modelVariant = modelVariant;
   }
 
-  createInstance(options) {
+  resolve(options) {
     let i, namespaces, className,
       namespace = window.scout; // default namespace
 
@@ -52,12 +52,19 @@ export default class TypeDescriptor {
     if (!namespace[className]) { // Try without variant if variantLenient is true
       if (options.variantLenient && this.modelVariant) {
         let infoWithoutVariant = new TypeDescriptor(this.typeDescriptor, this.objectType, null);
-        return infoWithoutVariant.createInstance(options);
+        return infoWithoutVariant.resolve(options);
       }
       throw this.error('Could not find "' + className + '" in namespace "' + namespaces.join('.') + '"');
     }
 
-    return new namespace[className](options.model);
+    return namespace[className];
+  }
+
+  createInstance(options) {
+    let Class = this.resolve(options);
+    if (Class) {
+      return new Class();
+    }
   }
 
   error(details) {
@@ -67,6 +74,11 @@ export default class TypeDescriptor {
   static newInstance(typeDescriptor, options) {
     let info = TypeDescriptor.parse(typeDescriptor);
     return info.createInstance(options);
+  }
+
+  static resolveType(typeDescriptor, options) {
+    let info = TypeDescriptor.parse(typeDescriptor);
+    return info.resolve(options);
   }
 
   /**

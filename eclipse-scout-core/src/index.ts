@@ -706,7 +706,12 @@ export {default as AnyWidget} from './AnyWidget';
 
 // The following files don't export anything but they need to be imported so they participate on the webpack build
 // noinspection ES6UnusedImports
-import * as objectFactories from './objectFactories';
+// import * as objectFactories from './objectFactories';
+
+// TODO Call doIt to ensure factories are available in Tests (ButtonSpec). Why are they not available? Is it normal?
+import {doIt} from './objectFactories';
+doIt();
+
 // noinspection ES6UnusedImports
 import * as jqs from './jquery/jquery-scout';
 

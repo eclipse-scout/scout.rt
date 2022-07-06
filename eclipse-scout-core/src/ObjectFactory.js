@@ -20,7 +20,7 @@ export default class ObjectFactory {
   constructor() {
     // use createUniqueId() to generate a new ID
     this.uniqueIdSeqNo = 0;
-    this._registry = {};
+    this._registry = new Map();
   }
 
   static NAMESPACE_SEPARATOR = '.';
@@ -62,19 +62,32 @@ export default class ObjectFactory {
    * the variant to the type ("VariantType"). If no such type can be found and the option "variantLenient"
    * is set to true, a second attempt is made without the variant.
    *
-   * @param {string} objectType (mandatory) String describing the type of the object to be created.
+   * @param {string|function} objectType (mandatory) String describing the type of the object to be created.
    * @param {object} [options]  (optional)  Options object, currently supporting the following two options:
    *                               - model = Model object to be passed to the constructor or create function
    *                               - variantLenient = Flag to allow a second attempt to resolve the class
    *                                 without variant (see description above).
    */
   _createObjectByType(objectType, options) {
-    if (typeof objectType !== 'string') {
+    if (typeof objectType !== 'string' && typeof objectType !== 'function') {
       throw new Error('missing or invalid object type');
     }
     options = options || {};
 
-    let createFunc = this._registry[objectType];
+    let Class = null;
+    let objectTypeAsStr = null;
+    if (typeof objectType === 'string') {
+      Class = TypeDescriptor.resolveType(objectType, options);
+      objectTypeAsStr = objectType;
+    } else if (typeof objectType === 'function') {
+      Class = objectType;
+    }
+
+    let createFunc = this._registry.get(Class);
+    if (!createFunc && objectTypeAsStr) {
+      // Legacy support
+      createFunc = this._registry.get(objectTypeAsStr);
+    }
     if (createFunc) {
       // 1. - Use factory function registered for the given objectType
       let scoutObject = createFunc(options.model);
@@ -83,8 +96,8 @@ export default class ObjectFactory {
       }
       return scoutObject;
     }
-    // 2. - Resolve class by name
-    return TypeDescriptor.newInstance(objectType, options);
+
+    return new Class(options.model);
   }
 
   /**
@@ -112,7 +125,7 @@ export default class ObjectFactory {
    */
   create(objectType, model, options) {
     // Normalize arguments
-    if (typeof objectType === 'string') {
+    if (typeof objectType === 'string' || typeof objectType === 'function') { // TODO cgu better way to detect class / constructor function?
       options = options || {};
     } else if (objects.isPlainObject(objectType)) {
       options = model || {};
@@ -134,6 +147,8 @@ export default class ObjectFactory {
         if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
           model.id = this.createUniqueId();
         }
+        // TODO CGU what if objectType is a function? Is it used to clone an obj?
+        // Creating a string based type from a class seems not possible because namespace would be missing. Necessary or just store class ref? Maybe always store class ref?
         model.objectType = objectType;
       }
       // Initialize object
@@ -161,16 +176,16 @@ export default class ObjectFactory {
 
   register(objectType, createFunc) {
     $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) registered create-function for objectType ' + objectType);
-    this._registry[objectType] = createFunc;
+    this._registry.set(objectType, createFunc);
   }
 
   unregister(objectType) {
     $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) unregistered objectType ' + objectType);
-    delete this._registry[objectType];
+    this._registry.delete(objectType);
   }
 
   get(objectType) {
-    return this._registry[objectType];
+    return this._registry.get(objectType);
   }
 
   /**
@@ -178,10 +193,8 @@ export default class ObjectFactory {
    * That's why we call this method in the scout._init method.
    */
   init() {
-    for (let objectType in scout.objectFactories) {
-      if (scout.objectFactories.hasOwnProperty(objectType)) {
-        this.register(objectType, scout.objectFactories[objectType]);
-      }
+    for (let [objectType, factory] of scout.objectFactories) {
+      this.register(objectType, factory);
     }
   }
 
