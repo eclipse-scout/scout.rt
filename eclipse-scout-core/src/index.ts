@@ -1,3 +1,5 @@
+/// <reference path="./jquery/jquery-extensions.ts" />
+
 /*
  * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -712,14 +714,20 @@ import * as jqs from './jquery/jquery-scout';
 import * as jqss from './jquery/jquery-scout-selectors';
 
 import * as scout from './scout';
-import * as self from './index.js'; // TODO creates endless loop, how is it done at @azure?
+import * as self from './index'; // TODO creates endless loop with api-extractor, how is it done at @azure?
 
-export default self; // TODO
+export default self;
 
 // Add all functions from the scout object to the scout object on the window
 // Note: the scout object on the window still needs its own scout object (window.scout.scout).
 // It is required when the eclipse-core/scout is mapped as external webpack library to window.scout
 let windowScout = {jqs, jqss, ...self, ...scout};
 
-// Add the scout object to the window
+declare global {
+  interface Window {
+    scout
+  }
+}
+
+// // Add the scout object to the window
 window.scout = Object.assign(window.scout || {}, windowScout);

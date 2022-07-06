@@ -8,6 +8,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/ban-types': 'warn',
     '@typescript-eslint/no-inferrable-types': 'warn',
-    '@typescript-eslint/ban-ts-comment': 'off'
+    '@typescript-eslint/ban-ts-comment': 'off',
+    'spaced-comment': ['error', 'always', {'exceptions': ['*'], 'markers': ['/']}]
   }
-}
+};

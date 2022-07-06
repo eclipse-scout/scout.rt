@@ -17,7 +17,7 @@ module.exports = (env, args) => {
   // This build creates resources that can directly be included in a html file without needing a build stack (webpack).
   // The resources are available by a CDN that provides npm modules (e.g. https://www.jsdelivr.com/package/npm/@eclipse-scout/core)
   config.entry = {
-    'eclipse-scout-core-esm': './src/index.js',
+    'eclipse-scout-core-esm': './src/index.ts',
     'eclipse-scout-core-theme': './src/index.less',
     'eclipse-scout-core-theme-dark': './src/index-dark.less'
   };
@@ -25,7 +25,7 @@ module.exports = (env, args) => {
     // Dependencies should not be included in the resulting js file.
     // The consumer has to include them by himself which gives him more control (maybe his site has already added jQuery or he wants to use another version)
     // Left side is the import name, right side the name of the global variable added by the plugin (e.g. window.jQuery)
-    jquery: {
+    'jquery': {
       module: 'jquery',
       root: 'jQuery'
     },

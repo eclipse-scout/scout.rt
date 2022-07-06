@@ -14,14 +14,6 @@
 import * as $ from 'jquery';
 import {arrays, Device, Dimension, events, IconDesc, icons, objects, scout, strings} from '../index';
 
-// TODO cgu delete?
-// /**
-//  * By using $ in jsdoc all the functions is this file are recognized as part of $.
-//  * By additionally defining $ as jQuery all default jQuery functions are recognized as well.
-//  * "JQuery" (with a capital J) refers to the the type definitions "@types/jquery".
-//  * @typedef {JQuery|jQuery} $
-//  */
-
 // === internal methods ===
 
 /**
@@ -431,13 +423,7 @@ $.resolvedDeferred = (...args) => {
   return deferred;
 };
 
-/**
- * Use this function as shorthand of this:
- * <code>$.Deferred().resolve([arguments]).promise();</code>
- *
- * @param {...*} [args] of this function are passed to the resolve function of the deferred
- * @returns {Promise} a promise for an already resolved jQuery.Deferred object.
- */
+
 $.resolvedPromise = (...args) => {
   let deferred = $.Deferred();
   deferred.resolve(...args);
