@@ -194,7 +194,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
   /**
    * @return the value of the HTTP header <code>X-Scout-#ACK</code> as {@link Long}, or <code>null</code> if value is
-   *         not set or not a number.
+   * not set or not a number.
    */
   protected Long getAckSequenceNo(HttpServletRequest req) {
     String ackSeqNoStr = req.getHeader("X-Scout-#ACK");
@@ -218,7 +218,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     ServletFileUpload upload = new ServletFileUpload();
     upload.setHeaderEncoding(StandardCharsets.UTF_8.name());
     upload.setSizeMax(uploadable.getMaximumUploadSize());
-    for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
+    for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext(); ) {
       FileItemStream item = it.next();
       String filename = item.getName();
       if (StringUtility.hasText(filename)) {
@@ -229,7 +229,10 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         filename = null;
       }
       if (StringUtility.hasText(filename)) {
-        String ext = FileUtility.getFileExtension(filename).toLowerCase(Locale.ROOT);
+        String ext = FileUtility.getFileExtension(filename);
+        if (ext != null) {
+          ext = ext.toLowerCase(Locale.ROOT);
+        }
         verifyFileName(validFileExtensions, filename, ext);
       }
       byte[] content;
@@ -238,7 +241,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       }
       BinaryResource res = BinaryResources.create()
           .withFilename(filename)
-          .withContentType(detectContentType(filename, content))
+          .withContentType(detectContentType(filename, item, content))
           .withContent(content)
           .build();
       verifyFileSafety(res);
@@ -261,18 +264,26 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   }
 
   /**
-   * Override this method for custom content-type detection logic. Default implementation returns <code>null</code> and
-   * the content-type is detected from the file-extension in the constructor of {@link BinaryResource}
+   * Detects the content type for an uploaded file.
+   * <p>
+   * The default implementation returns <code>null</code> if a filename is provided. In that case
+   * the content-type will be derived from the file-extension in the constructor of {@link BinaryResource}.
+   * Otherwise, the content type sent with the uploaded file is used.
+   * <p>
+   * The content is passed as well to allow for a custom content type detection logic.
    */
-  protected String detectContentType(String filename, byte[] content) throws IOException {
-    return null;
+  protected String detectContentType(String filename, FileItemStream item, byte[] content) {
+    if (filename != null) {
+      return null;
+    }
+    return item.getContentType();
   }
 
   /**
    * @param uploadable
-   *          is the JsonAdapter that triggers the upload
+   *     is the JsonAdapter that triggers the upload
    * @return the set of accepted lowercase file extensions or media types for that uploadable. If the set contains '*'
-   *         then all files are accepted.
+   * then all files are accepted.
    * @since 10.x
    */
   protected Set<String> getValidFileExtensionsFor(IUploadable uploadable, Map<String, String> uploadProperties) {
@@ -332,7 +343,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
   /**
    * @throws RejectedResourceException
-   *           when filename extension is not accepted
+   *     when filename extension is not accepted
    */
   protected void verifyFileName(Set<String> validFileExtensions, String filename, String ext) {
     if (!validFileExtensions.isEmpty() && !validFileExtensions.contains("*") && !validFileExtensions.contains(ext)) {
@@ -344,7 +355,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
    * Checks the resource to be upload for malware
    *
    * @throws UnsafeResourceException
-   *           when unsafe
+   *     when unsafe
    */
   protected void verifyFileSafety(BinaryResource res) {
     //do malware scan and log issues
@@ -353,7 +364,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
   /**
    * @throws RejectedResourceException
-   *           when not compliant
+   *     when not compliant
    */
   protected void verifyFileIntegrity(BinaryResource res) {
     if (!MimeTypes.verifyMagic(res)) {
