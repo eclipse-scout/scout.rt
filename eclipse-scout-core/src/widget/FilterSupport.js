@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -125,13 +125,11 @@ export default class FilterSupport extends WidgetSupport {
 
     this._filterField.$field.attr('tabIndex', -1);
 
-    let color = styles.getFirstOpaqueBackgroundColor(this._filterField.$container),
-      colorRgba = $.extend(true, {red: 0, green: 0, blue: 0, alpha: 1}, styles.rgb(color)),
-      transparent50Color = 'rgba(' + colorRgba.red + ', ' + colorRgba.green + ', ' + colorRgba.blue + ', ' + 0.5 + ')',
-      transparent80Color = 'rgba(' + colorRgba.red + ', ' + colorRgba.green + ', ' + colorRgba.blue + ', ' + 0.8 + ')';
-    this._filterField.$container.css('--filter-field-background-color', color);
-    this._filterField.$container.css('--filter-field-transparent-50-background-color', transparent50Color);
-    this._filterField.$container.css('--filter-field-transparent-80-background-color', transparent80Color);
+    if (!this.widget.rendered) {
+      this.widget.session.layoutValidator.schedulePostValidateFunction(this._updateFilterFieldBackgroundColor.bind(this));
+    } else {
+      this._updateFilterFieldBackgroundColor();
+    }
 
     this._textFilter = this._createTextFilter();
     this._textFilter.synthetic = true;
@@ -162,6 +160,19 @@ export default class FilterSupport extends WidgetSupport {
     this._exitFilterFieldKeyStroke.handle = this._exitFilterField.bind(this);
 
     this._filterField.keyStrokeContext.registerKeyStroke(this._exitFilterFieldKeyStroke);
+  }
+
+  _updateFilterFieldBackgroundColor() {
+    if (!this._filterField || !this._filterField.rendered) {
+      return;
+    }
+    let color = styles.getFirstOpaqueBackgroundColor(this._filterField.$container),
+      colorRgba = $.extend(true, {red: 0, green: 0, blue: 0, alpha: 1}, styles.rgb(color)),
+      transparent50Color = 'rgba(' + colorRgba.red + ', ' + colorRgba.green + ', ' + colorRgba.blue + ', ' + 0.5 + ')',
+      transparent80Color = 'rgba(' + colorRgba.red + ', ' + colorRgba.green + ', ' + colorRgba.blue + ', ' + 0.8 + ')';
+    this._filterField.$container.css('--filter-field-background-color', color);
+    this._filterField.$container.css('--filter-field-transparent-50-background-color', transparent50Color);
+    this._filterField.$container.css('--filter-field-transparent-80-background-color', transparent80Color);
   }
 
   _onFilterFieldDisplayTextChanged(event) {
