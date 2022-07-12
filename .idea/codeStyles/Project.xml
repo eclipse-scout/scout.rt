@@ -54,6 +54,7 @@
     </Properties>
     <TypeScriptCodeStyleSettings version="0">
       <option name="SPACE_BEFORE_FUNCTION_LEFT_PARENTH" value="false" />
+      <option name="USE_DOUBLE_QUOTES" value="false" />
     </TypeScriptCodeStyleSettings>
     <XML>
       <option name="XML_SPACE_INSIDE_EMPTY_TAG" value="true" />
