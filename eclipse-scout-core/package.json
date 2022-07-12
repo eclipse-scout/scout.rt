@@ -35,7 +35,7 @@
   ],
   "scripts": {
     "tsc": "tsc",
-    "tsm": "node ts-migrate.mjs",
+    "tsm": "ts-migrate rename . --sources src/action --sources src/keystroke &&  node ts-migrate.mjs --sources src/action/**/*.ts --sources src/keystroke/**/*.ts",
     "api:gen": "api-extractor run --diagnostics",
     "tsc:api:gen": "tsc && api-extractor run",
     "testserver:start": "scout-scripts test-server:start",
@@ -63,7 +63,8 @@
     "@types/jquery": "3.5.14",
     "ts-migrate": "^0.1.30",
     "ts-migrate-plugins": "^0.1.30",
-    "ts-migrate-server": "^0.1.29"
+    "ts-migrate-server": "^0.1.29",
+    "yargs-parser": "^21.0.1"
   },
   "dependencies": {
     "jquery": "3.6.0",

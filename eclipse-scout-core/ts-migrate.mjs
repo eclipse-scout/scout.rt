@@ -17,6 +17,9 @@ import {
     eslintFixPlugin} from 'ts-migrate-plugins';
 import { migrate, MigrateConfig } from 'ts-migrate-server';
 
+import parser from 'yargs-parser';
+const args = parser(process.argv);
+
 // const path = require("path");
 // const eslintFixPlugin = require("ts-migrate-plugins/build/src/plugins/eslint-fix")
 // const memberAccessibilityPlugin = require("ts-migrate-plugins/build/src/plugins/member-accessibility")
@@ -29,14 +32,13 @@ const protectedRegex = "_";
 const publicRegex = undefined;
 const anyAlias = undefined;
 const rootDir = path.resolve(process.cwd());
-const sources = 'src/widget/**';
+const sources = args.sources;
 const typeMap = {
     function: {
         tsName: 'Function',
         acceptsTypeParameters: false,
     },
 };
-
 
 const config = new MigrateConfig()
     // .addPlugin(stripTSIgnorePlugin, {})
