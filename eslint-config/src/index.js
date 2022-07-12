@@ -17,7 +17,7 @@ module.exports = {
     jquery: true,
     jasmine: true
   },
-  extends: ['eslint:recommended', 'google'],
+  extends: ['eslint:recommended', 'google', './common'],
   parserOptions: {
     ecmaVersion: 6,
     sourceType: 'module'
@@ -77,9 +77,6 @@ module.exports = {
     'one-var': 'off',
     'padded-blocks': 'off',
     'prefer-arrow-callback': 'warn',
-    'prefer-const': 'off',
-    'prefer-rest-params': 'warn',
-    'prefer-spread': 'warn',
     'prefer-template': 'off',
     'template-curly-spacing': ['error', 'never'],
     'linebreak-style': ['error', 'unix'],

@@ -1,14 +1,18 @@
 module.exports = {
   extends: [
-    // 'plugin:@typescript-eslint/recommended',
-    '@eclipse-scout'
+    '@eclipse-scout',
+    'plugin:@typescript-eslint/recommended',
+    './common' // @typescript-eslint/recommended imports @typescript-eslint/eslint-recommended which overrides some rules of scout -> re override them again by importing common
   ],
   plugins: ['@typescript-eslint'],
   parser: '@typescript-eslint/parser',
   rules: {
-    '@typescript-eslint/ban-types': 'warn',
-    '@typescript-eslint/no-inferrable-types': 'warn',
-    '@typescript-eslint/ban-ts-comment': 'off',
-    'spaced-comment': ['error', 'always', {'exceptions': ['*'], 'markers': ['/']}]
+    '@typescript-eslint/ban-types': 'warn', // Change from error to warn
+    '@typescript-eslint/no-inferrable-types': 'warn', // Change from error to warn
+    '@typescript-eslint/ban-ts-comment': 'off', // Allow ts-ignore
+    '@typescript-eslint/no-unused-vars': 'off', // Allow unused parameters
+    'spaced-comment': ['error', 'always', {'exceptions': ['*'], 'markers': ['/']}], // Allow triple slash directives
+    'semi': 'off', // Disable because it will be replaced by typescript rule below to avoid conflicting rules with semicolon in interfaces
+    '@typescript-eslint/semi': ['error']
   }
 };
