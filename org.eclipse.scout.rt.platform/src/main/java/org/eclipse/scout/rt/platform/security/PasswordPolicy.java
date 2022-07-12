@@ -51,7 +51,7 @@ public class PasswordPolicy {
 
   public void check(String userName, char[] newPassword, int historyIndex) {
     if (newPassword == null || newPassword.length < MIN_PASSWORD_LENGTH) {
-      throw new VetoException(TEXTS.get("PasswordMin8Chars"));
+      throw new VetoException(TEXTS.get("PasswordMinLength"));
     }
     if (historyIndex >= 0) {
       throw new VetoException(TEXTS.get("PasswordNotSameAsLasts"));
