@@ -21,6 +21,8 @@ export {default as WidgetSupport} from './widget/WidgetSupport';
 export {default as LoadingSupport} from './widget/LoadingSupport';
 export {default as SimpleLoadingSupport} from './widget/SimpleLoadingSupport';
 export {default as KeyStroke} from './keystroke/KeyStroke';
+export {default as KeyStrokeFirePolicy} from './keystroke/KeyStrokeFirePolicy';
+export {default as KeyStrokeFirePolicyExt} from './action/KeyStrokeFirePolicyExt';
 export {default as FocusFilterFieldKeyStroke} from './keystroke/FocusFilterFieldKeyStroke';
 export {default as FilterSupport} from './widget/FilterSupport';
 export {default as Filter} from './widget/Filter';
@@ -36,6 +38,7 @@ export {default as arrays} from './util/arrays';
 export {default as Call} from './util/Call';
 export {default as clipboard} from './util/clipboard';
 export {default as colorSchemes} from './util/colorSchemes';
+export {default as EventEmitter} from './util/EventEmitter';
 export {default as EventDelegator} from './util/EventDelegator';
 export {default as dates} from './util/dates';
 export {default as defaultValues} from './util/defaultValues';
@@ -190,6 +193,7 @@ export {default as Action} from './action/Action';
 export {default as ActionAdapter} from './action/ActionAdapter';
 export {default as ActionExecKeyStroke} from './action/ActionExecKeyStroke';
 export {default as ActionKeyStroke} from './action/ActionKeyStroke';
+export {default as ActionExt} from './action/ActionExt';
 export {default as Box} from './box/Box';
 export {default as Label} from './label/Label';
 export {default as LabelAdapter} from './label/LabelAdapter';
@@ -710,8 +714,6 @@ export {default as AnyWidget} from './AnyWidget';
 
 // TODO Call doIt to ensure factories are available in Tests (ButtonSpec). Why are they not available? Is it normal?
 import {doIt} from './objectFactories';
-doIt();
-
 // noinspection ES6UnusedImports
 import * as jqs from './jquery/jquery-scout';
 
@@ -720,6 +722,7 @@ import * as jqss from './jquery/jquery-scout-selectors';
 
 import * as scout from './scout';
 import * as self from './index'; // TODO creates endless loop with api-extractor, how is it done at @azure?
+doIt();
 
 export default self;
 

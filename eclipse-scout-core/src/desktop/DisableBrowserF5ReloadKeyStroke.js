@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, keys, KeyStroke} from '../index';
+import {keys, KeyStroke, KeyStrokeFirePolicy} from '../index';
 
 /**
  * Global key stroke on the desktop that prevents 'leaking' of the F5 keystroke to the browser.
@@ -31,7 +31,7 @@ export default class DisableBrowserF5ReloadKeyStroke extends KeyStroke {
 
     this.which = [keys.F5];
     this.preventDefault = true;
-    this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ALWAYS; // ignore glass panes
+    this.keyStrokeFirePolicy = KeyStrokeFirePolicy.ALWAYS; // ignore glass panes
     this.renderingHints.render = false;
     this.inheritAccessibility = false;
   }

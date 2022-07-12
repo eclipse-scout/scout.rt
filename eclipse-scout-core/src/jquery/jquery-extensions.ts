@@ -1,46 +1,58 @@
-interface JQuery {
-  oneAnimationEnd(handler: () => void): JQuery;
+import {IconDesc} from '../index';
 
-  appendDiv(cssClass?: string, text?: string): JQuery;
+declare global {
 
-  isDisplayNone(): boolean;
+  interface JQuery {
+    oneAnimationEnd(handler: () => void): JQuery;
 
-  isVisible(): boolean;
+    appendDiv(cssClass?: string, text?: string): JQuery;
 
-  setVisible(visible: boolean): void;
+    appendSpan(cssClass?: string, text?: string): JQuery;
 
-  isEveryParentVisible(): boolean;
+    appendIcon(iconId: IconDesc | string, cssClass?: string);
 
-  isAttached(): boolean;
+    isDisplayNone(): boolean;
 
-  setEnabled(enabled: boolean): void;
+    isVisible(): boolean;
 
-  window(domElement: boolean): JQuery | Window;
+    setVisible(visible: boolean): void;
 
-  document(domElement: boolean): JQuery | Document;
+    isEveryParentVisible(): boolean;
 
-  isOrHas(JQuery): boolean;
+    isAttached(): boolean;
 
-  scrollParent(): JQuery;
+    setEnabled(enabled: boolean): void;
 
-  addDeviceClass(): void;
-}
+    window(domElement: boolean): JQuery | Window;
 
-interface JQueryStatic {
-  log: Logger; // Importing this function will break extension, why? Module must not have any imports and exports, why?
+    document(domElement: boolean): JQuery | Document;
 
-  ensure(elem: JQuery | HTMLElement);
+    isOrHas(JQuery): boolean;
 
-  abc(): void;
+    scrollParent(): JQuery;
 
-  /**
-   * Use this function as shorthand of this:
-   * <code>$.Deferred().resolve([arguments]).promise();</code>
-   *
-   * @param args of this function are passed to the resolve function of the deferred
-   * @returns a promise for an already resolved jQuery.Deferred object.
-   */
-  resolvedPromise(...args): JQuery.Promise<any>;
+    addDeviceClass(): void;
+
+    setTabbable(tabbable: boolean)
+  }
+
+  interface JQueryStatic {
+    log: Logger; // Importing this function will break extension, why? Module must not have any imports and exports, why?
+
+    ensure(elem: JQuery | HTMLElement);
+
+    abc(): void;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().resolve([arguments]).promise();</code>
+     *
+     * @param args of this function are passed to the resolve function of the deferred
+     * @returns a promise for an already resolved jQuery.Deferred object.
+     */
+    resolvedPromise(...args): JQuery.Promise<any>;
+  }
+
 }
 
 interface Logger {

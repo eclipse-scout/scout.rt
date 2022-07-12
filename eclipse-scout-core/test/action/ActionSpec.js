@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, keys, scout} from '../../src/index';
+import {Action, Icon, keys, scout, TableRow, Widget} from '../../src/index';
 
 describe('Action', () => {
   let $sandbox, session;
@@ -50,15 +50,39 @@ describe('Action', () => {
   describe('key stroke', () => {
 
     it('triggers action', () => {
-      let action = scout.create('Action', {
+      let action = scout.create(Action, {
         parent: session.desktop,
         keyStroke: 'ctrl-x'
       });
       session.desktop.keyStrokeContext.registerKeyStroke(action);
       action.render();
       let executed = 0;
-      action.on('action', event => {
+      action.onV1('action', event => {
         executed++;
+      });
+
+      // action.onV1('action', event => {
+      //   // nop
+      // });
+
+      let a = scout.create(Action, {
+        iconId: 'adf',
+        b: 'a'
+      });
+
+      action.on('action', event => {
+        // nop
+      });
+
+      const htmlElem = action.$container[0];
+      htmlElem.addEventListener('mousedown', ev => {
+        console.log(ev.x);
+      });
+
+      let icon = scout.create(Icon, {
+        parent: this,
+        iconDesc: 'aaa',
+        prepend: true
       });
 
       expect(executed).toBe(0);

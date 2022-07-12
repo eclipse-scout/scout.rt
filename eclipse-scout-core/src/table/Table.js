@@ -223,7 +223,7 @@ export default class Table extends Widget {
   _initRow(row) {
     if (!(row instanceof TableRow)) {
       row.parent = this;
-      row = scout.create('TableRow', row);
+      row = scout.create(TableRow, row);
     }
     this.rowsMap[row.id] = row;
     this.trigger('rowInit', {

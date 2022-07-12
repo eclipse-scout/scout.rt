@@ -8,12 +8,70 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DeferredGlassPaneTarget, Desktop, Device, Event, EventDelegator, EventSupport, filters, focusUtils, Form, graphics, icons, inspector, objects, scout, scrollbars, strings, texts, TreeVisitResult} from '../index';
+import {arrays, DeferredGlassPaneTarget, Desktop, Device, Event, EventDelegator, filters, focusUtils, Form, graphics, icons, inspector, objects, scout, scrollbars, Session, strings, texts, TreeVisitResult} from '../index';
 import WidgetModel from './WidgetModel';
 import * as $ from 'jquery';
+import {WidgetEventMap} from './WidgetEventMap';
+import EventEmitter, {EventHandler} from '../util/EventEmitter';
+import {EventTypeModel} from '../util/EventMap';
 
-export default class Widget {
+export type WidgetEventType = 'init' | 'render' | 'remove' | 'removing' | 'destroy' | `propertyChange:${Exclude<keyof WidgetModel, WidgetPropertyChangeExclude>}`;
+export type WidgetPropertyChangeExclude = 'owner' | 'objectType';
+
+export default class Widget extends EventEmitter {
+  readonly model: WidgetModel;
+  $container: JQuery;
+  $parent: JQuery;
+  _$lastFocusedElement: JQuery;
+  _cloneProperties: string[];
+  _focusInListener: any;
+  _glassPaneContributions: any;
+  _parentDestroyHandler: any;
+  _parentRemovingWhileAnimatingHandler: any;
+  _postRenderActions: any;
+  _preserveOnPropertyChangeProperties: any;
+  _rendered: any;
+  _scrollHandler: any;
+  _storedFocusedWidget: any;
+  _widgetProperties: string[];
+  _modelProperties: string[];
+  animateRemoval: boolean;
+  animateRemovalClass: any;
+  attached: boolean;
+  children: any;
+  cloneOf: any;
+  cssClass: any;
+  destroyed: boolean;
+  destroying: boolean;
+  disabledStyle: any;
+  enabled: boolean;
+  enabledComputed: boolean;
+  eventDelegators: any;
+  events: any;
+  focused: boolean;
+  htmlComp: any;
+  id: any;
+  inheritAccessibility: boolean;
+  initialized: boolean;
+  keyStrokeContext: any;
+  loading: boolean;
+  loadingSupport: any;
+  logicalGrid: any;
+  objectType: any;
+  owner: Widget;
+  parent: Widget;
+  removalPending: boolean;
+  removing: boolean;
+  rendering: boolean;
+  scrollLeft: any;
+  scrollTop: any;
+  session: Session;
+  trackFocus: any;
+  visible: boolean;
+
   constructor() {
+    super();
+    this.model = {} as WidgetModel;
     this.id = null;
     this.objectType = null;
     this.session = null;
@@ -89,6 +147,7 @@ export default class Widget {
     this.animateRemoval = false;
     this.animateRemovalClass = 'animate-remove';
 
+    this._modelProperties = [];
     this._widgetProperties = [];
     this._cloneProperties = ['visible', 'enabled', 'inheritAccessibility', 'cssClass'];
     this.eventDelegators = [];
@@ -123,54 +182,6 @@ export default class Widget {
     READ_ONLY: 1
   };
 
-  $container: JQuery;
-  $parent: JQuery;
-  _$lastFocusedElement: any;
-  _cloneProperties: any;
-  _focusInListener: any;
-  _glassPaneContributions: any;
-  _parentDestroyHandler: any;
-  _parentRemovingWhileAnimatingHandler: any;
-  _postRenderActions: any;
-  _preserveOnPropertyChangeProperties: any;
-  _rendered: any;
-  _scrollHandler: any;
-  _storedFocusedWidget: any;
-  _widgetProperties: any;
-  animateRemoval: any;
-  animateRemovalClass: any;
-  attached: any;
-  children: any;
-  cloneOf: any;
-  cssClass: any;
-  destroyed: any;
-  destroying: any;
-  disabledStyle: any;
-  enabled: any;
-  enabledComputed: any;
-  eventDelegators: any;
-  events: any;
-  focused: any;
-  htmlComp: any;
-  id: any;
-  inheritAccessibility: any;
-  initialized: any;
-  keyStrokeContext: any;
-  loading: any;
-  loadingSupport: any;
-  logicalGrid: any;
-  objectType: any;
-  owner: any;
-  parent: any;
-  removalPending: any;
-  removing: any;
-  rendering: any;
-  scrollLeft: any;
-  scrollTop: any;
-  session: any;
-  trackFocus: any;
-  visible: any;
-
   /**
    * Initializes the widget instance. All properties of the model parameter (object) are set as properties on the widget instance.
    * Calls {@link Widget#_init} and triggers an <em>init</em> event when initialization has been completed.
@@ -202,10 +213,6 @@ export default class Widget {
   /**
    * Initializes the widget instance. All properties of the model parameter (object) are set as properties on the widget instance.
    * Override this function to initialize widget specific properties in sub-classes.
-   *
-   * @param {object} model Properties:<ul>
-   *   <li>parent (required): parent widget</li>
-   *   <li>session (optional): If not specified, session of parent widget is used</li></ul>
    */
   _init(model: WidgetModel) {
     // @ts-ignore
@@ -241,7 +248,11 @@ export default class Widget {
    * For instance you could not simply set the property value, but extend an already existing value.
    */
   _initProperty(propertyName, value) {
-    this[propertyName] = value;
+    if (this._isModelProperty(propertyName)) {
+      this.model[propertyName] = value;
+    } else {
+      this[propertyName] = value;
+    }
   }
 
   /**
@@ -369,7 +380,7 @@ export default class Widget {
    * It will be put onto the widget and is therefore accessible as this.$parent in the {@link _render} method.
    * If not specified, the {@link Widget.$container} of the parent is used.
    */
-  render($parent) {
+  render($parent?: JQuery) {
     $.log.isTraceEnabled() && $.log.trace('Rendering widget: ' + this);
     if (!this.initialized) {
       throw new Error('Not initialized: ' + this);
@@ -674,7 +685,7 @@ export default class Widget {
     this.owner._addChild(this);
   }
 
-  setParent(parent) {
+  setParent(parent: Widget) {
     scout.assertParameter('parent', parent);
     if (parent === this.parent) {
       return;
@@ -1208,26 +1219,12 @@ export default class Widget {
     this.invalidateLogicalGrid();
   }
 
-  // --- Event handling methods ---
-  _createEventSupport() {
-    return new EventSupport();
+  trigger<K extends string & keyof WidgetEventMap>(type: K, eventOrModel?: Event | EventTypeModel<WidgetEventMap[K]>) {
+    super.trigger(type, eventOrModel);
   }
 
-  trigger(type, event?) {
-    event = event || {};
-    event.source = this;
-    this.events.trigger(type, event);
-  }
-
-  /**
-   * Registers the given event handler for the event specified by the type param.
-   * The function will only be called once. After that it is automatically de-registered using {@link off}.
-   *
-   * @param {string} type One or more event names separated by space.
-   * @param {function} handler Event handler executed when the event is triggered. An event object is passed to the function as first parameter
-   */
-  one(type: string, handler: Function) {
-    this.events.one(type, handler);
+  on<K extends string & keyof WidgetEventMap>(type: K, handler: EventHandler<WidgetEventMap[K]>) {
+    return super.on(type, handler);
   }
 
   /**
@@ -1236,37 +1233,8 @@ export default class Widget {
    * @param {string} type One or more event names separated by space.
    * @param {function} handler Event handler executed when the event is triggered. An event object is passed to the function as first parameter.
    **/
-  on(type: string, handler: Function) {
+  onV1(type: WidgetEventType, handler: Function) {
     return this.events.on(type, handler);
-  }
-
-  /**
-   * De-registers the given event handler for the event specified by the type param.
-   *
-   * @param {string} type One or more event names separated by space.<br/>
-   *      Important: the string must be equal to the one used for {@link on} or {@link one}. This also applies if a string containing multiple types separated by space was used.
-   * @param {function} [handler] The exact same event handler that was used for registration using {@link on} or {@link one}.
-   *      If no handler is specified, all handlers are de-registered for the given type.
-   */
-  off(type: string, handler?: Function) {
-    this.events.off(type, handler);
-  }
-
-  addListener(listener) {
-    this.events.addListener(listener);
-  }
-
-  removeListener(listener) {
-    this.events.removeListener(listener);
-  }
-
-  /**
-   * Adds an event handler using {@link one} and returns a promise.
-   * The promise is resolved as soon as the event is triggered.
-   * @returns {Promise}
-   */
-  when(type) {
-    return this.events.when(type);
   }
 
   /**
@@ -1470,15 +1438,23 @@ export default class Widget {
    */
   _setProperty(propertyName, newValue) {
     scout.assertParameter('propertyName', propertyName);
-    let oldValue = this[propertyName];
+    let oldValue = this.getProperty(propertyName);
     if (objects.equals(oldValue, newValue)) {
       return false;
     }
-    this[propertyName] = newValue;
+    if (this._isModelProperty(propertyName)) {
+      this.model[propertyName] = newValue;
+    } else {
+      this[propertyName] = newValue;
+    }
     let event = this.triggerPropertyChange(propertyName, oldValue, newValue);
     if (event.defaultPrevented) {
       // Revert to old value if property change should be prevented
-      this[propertyName] = oldValue;
+      if (this._isModelProperty(propertyName)) {
+        this.model[propertyName] = oldValue;
+      } else {
+        this[propertyName] = oldValue;
+      }
       return false; // not changed
     }
     return true;
@@ -1496,7 +1472,7 @@ export default class Widget {
    * @return {boolean} true if the property was changed, false if not.
    */
   setProperty(propertyName, value) {
-    if (objects.equals(this[propertyName], value)) {
+    if (objects.equals(this.getProperty(propertyName), value)) {
       return false;
     }
 
@@ -1511,6 +1487,17 @@ export default class Widget {
     return true;
   }
 
+  _isModelProperty(propertyName) {
+    return this._modelProperties.includes(propertyName);
+  }
+
+  getProperty(propertyName) {
+    if (this._isModelProperty(propertyName)) {
+      return this.model[propertyName];
+    }
+    return this[propertyName];
+  }
+
   _prepareProperty(propertyName, value) {
     if (!this.isWidgetProperty(propertyName)) {
       return value;
@@ -1522,7 +1509,7 @@ export default class Widget {
     // Create new child widget(s)
     widgets = this._createChildren(widgets);
 
-    let oldWidgets = this[propertyName];
+    let oldWidgets = this.getProperty(propertyName);
     if (oldWidgets && Array.isArray(widgets)) {
       // If new value is an array, old value has to be one as well
       // Only destroy those which are not in the new array
@@ -1551,7 +1538,7 @@ export default class Widget {
     if (this.isPreserveOnPropertyChangeProperty(propertyName)) {
       return;
     }
-    let widgets = this[propertyName];
+    let widgets = this.getProperty(propertyName);
     if (!widgets) {
       return;
     }
@@ -1757,10 +1744,10 @@ export default class Widget {
   _addProperties(propertyName, properties) {
     properties = arrays.ensure(properties);
     properties.forEach(function(property) {
-      if (this[propertyName].indexOf(property) > -1) {
+      if (this.getProperty(propertyName).indexOf(property) > -1) {
         throw new Error(propertyName + ' already contains the property ' + property);
       }
-      this[propertyName].push(property);
+      this.getProperty(propertyName).push(property);
     }, this);
   }
 

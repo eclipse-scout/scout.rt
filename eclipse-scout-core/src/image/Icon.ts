@@ -9,25 +9,28 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {HtmlComponent, IconDesc, Image, scout, Widget} from '../index';
+import {IconModel} from './IconModel';
 
 /**
  * Widget representing an icon. It may be a font icon or an image icon. Depending on the type, either a span or an img tag will be rendered.
  * <p>
  * See also jquery-scout.icon/appendIcon. Main difference to these implementations is that the image loading will invalidate the layout by using {@link Image}.
  */
-export default class Icon extends Widget {
+export default class Icon extends Widget implements IconModel {
+  readonly model: IconModel;
+  autoFit: boolean;
+  /**
+   * Is set if the icon is rendered and an image, it is not set if it is a font icon
+   */
+  image: Image;
+  prepend: boolean;
 
   constructor() {
     super();
 
+    this._modelProperties.push('iconDesc');
     this.autoFit = false;
-    /** @type {IconDesc} */
-    this.iconDesc = null;
-
-    /**
-     * Is set if the icon is rendered and an image, it is not set if it is a font icon
-     * @type Image
-     */
+    this.model.iconDesc = null;
     this.image = null;
     this.prepend = false;
   }
@@ -40,6 +43,16 @@ export default class Icon extends Widget {
   _render() {
     this._renderIconDesc(); // Must not be in _renderProperties because it creates $container -> properties like visible etc. need to be rendered afterwards
   }
+
+
+  get iconDesc(): IconDesc {
+    return this.model.iconDesc as IconDesc;
+  }
+
+  // TODO CGU still use setter or migrate? if no setter is used, default values need to be initialized like this.model.xy = in constructor
+  // set iconDesc(iconDesc: IconDesc | string) {
+  //   this.setIconDesc(iconDesc);
+  // }
 
   /**
    * Accepts either an iconId as string or an {@link IconDesc}.
@@ -95,7 +108,7 @@ export default class Icon extends Widget {
       cssClass: 'icon image-icon',
       autoFit: this.autoFit,
       prepend: this.prepend
-    });
+    } as any);
     this.image.render(this.$parent);
     this.image.one('destroy', () => {
       this.image = null;

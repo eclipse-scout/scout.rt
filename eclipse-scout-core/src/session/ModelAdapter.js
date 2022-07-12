@@ -192,8 +192,8 @@ export default class ModelAdapter {
    *   method.
    *
    * @param type of event
-   * @param data of event
-   * @param options (optional) options according to the following table:
+   * @param [data] of event
+   * @param [options] (optional) options according to the following table:
    *
    * Option name         Default value   Description
    * -----------------------------------------------------------------------------------------

@@ -8,21 +8,88 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionKeyStroke, Device, DoubleClickSupport, HtmlComponent, Icon, KeyStrokeContext, NullLayout, scout, tooltips, Widget} from '../index';
+// eslint-disable-next-line max-classes-per-file
+import {ActionKeyStroke, Device, DoubleClickSupport, HtmlComponent, Icon, KeyStroke, KeyStrokeContext, KeyStrokeFirePolicy, NullLayout, scout, tooltips, Widget} from '../index';
 import * as $ from 'jquery';
+import {ActionModel} from './ActionModel';
+// import {WidgetEventType, WidgetPropertyChangeExclude} from '../widget/Widget';
+import {ActionEventMap} from './ActionEventMap';
+import {EventHandler} from '../util/EventEmitter';
 
-export default class Action extends Widget {
+// export type ActionEventType = WidgetEventType | 'action' | `propertyChange:${Exclude<keyof ActionModel, ActionPropertyChangeExclude>}`;
+// export type ActionPropertyChangeExclude = WidgetPropertyChangeExclude | 'showTooltipWhenSelected';
+
+export enum ActionStyleEnum {
+  /**
+   * regular menu-look, also used in overflow menus
+   */
+  DEFAULT = 0,
+  /**
+   * menu looks like a button
+   */
+  BUTTON = 1
+}
+
+export interface IActionStyle {
+  /**
+   * regular menu-look, also used in overflow menus
+   */
+  DEFAULT: 0,
+  /**
+   * menu looks like a button
+   */
+  BUTTON: 1
+}
+
+export type EnumType<ENUM> = {
+  [Property in keyof ENUM]: ENUM[Property]
+};
+
+export type EnumObject<TYPE> = TYPE[keyof TYPE];
+
+export type TActionStyle = EnumObject<typeof Action.ActionStyle>;
+
+export default class Action extends Widget implements ActionModel {
+  model: ActionModel;
+  $text: JQuery;
+  _doubleClickSupport: DoubleClickSupport;
+  actionKeyStroke: KeyStroke;
+  actionStyle: EnumObject<typeof Action.ActionStyle>;
+  actionStyle2: TActionStyle;
+  actionStyleInterface: EnumType<IActionStyle>[keyof EnumType<IActionStyle>];
+  actionStyleEnum: ActionStyleEnum;
+  compact: boolean;
+  horizontalAlignment: number;
+  htmlEnabled: boolean;
+  icon: Icon;
+  keyStroke: string;
+  keyStrokeFirePolicy: KeyStrokeFirePolicy;
+  preventDoubleClick: boolean;
+  selected: boolean;
+  showTooltipWhenSelected: boolean;
+  tabbable: boolean;
+  textPosition: typeof Action.TextPosition[keyof typeof Action.TextPosition];
+  textVisible: boolean;
+  toggleAction: boolean;
+  tooltipPosition: any;
+  tooltipText: string;
+  literal: 1 | 2;
 
   // noinspection DuplicatedCode
   constructor() {
     super();
 
+    this._modelProperties.push('iconId', 'text');
+
     this.actionStyle = Action.ActionStyle.DEFAULT;
+    this.actionStyle2 = Action.ActionStyle.DEFAULT;
+    this.actionStyleInterface = Action.IActionStyleVar.DEFAULT;
+    this.actionStyleEnum = ActionStyleEnum.DEFAULT;
     this.compact = false;
     this.iconId = null;
     this.horizontalAlignment = -1;
     this.keyStroke = null;
-    this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
+    this.keyStrokeFirePolicy = KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
     this.selected = false;
     this.preventDoubleClick = false;
     /**
@@ -50,6 +117,11 @@ export default class Action extends Widget {
      * menu looks like a button
      */
     BUTTON: 1
+  } as const;
+
+  static IActionStyleVar: IActionStyle = {
+    DEFAULT: 0,
+    BUTTON: 1
   };
 
   static TextPosition = {
@@ -58,12 +130,7 @@ export default class Action extends Widget {
      * The text will be positioned below the icon. It has no effect if no icon is set.
      */
     BOTTOM: 'bottom'
-  };
-
-  static KeyStrokeFirePolicy = {
-    ACCESSIBLE_ONLY: 0,
-    ALWAYS: 1
-  };
+  } as const;
 
   /**
    * @override
@@ -72,7 +139,7 @@ export default class Action extends Widget {
     return new KeyStrokeContext();
   }
 
-  _init(model) {
+  _init(model: ActionModel) {
     super._init(model);
     this.actionKeyStroke = this._createActionKeyStroke();
     this.resolveConsts([{
@@ -83,8 +150,9 @@ export default class Action extends Widget {
       constType: Action.TextPosition
     }, {
       property: 'keyStrokeFirePolicy',
-      constType: Action.KeyStrokeFirePolicy
+      constType: KeyStrokeFirePolicy
     }]);
+
     this.resolveTextKeys(['text', 'tooltipText']);
     this.resolveIconIds(['iconId']);
     this._setKeyStroke(this.keyStroke);
@@ -121,7 +189,11 @@ export default class Action extends Widget {
     super._remove();
   }
 
-  setText(text) {
+  get text() {
+    return this.model.text;
+  }
+
+  set text(text) {
     this.setProperty('text', text);
   }
 
@@ -168,7 +240,11 @@ export default class Action extends Widget {
     this._renderText();
   }
 
-  setIconId(iconId) {
+  get iconId() {
+    return this.model.iconId;
+  }
+
+  set iconId(iconId) {
     this.setProperty('iconId', iconId);
   }
 
@@ -183,7 +259,7 @@ export default class Action extends Widget {
       this.icon.setIconDesc(iconId);
       return;
     }
-    this.icon = scout.create('Icon', {
+    this.icon = scout.create(Icon, {
       parent: this,
       iconDesc: iconId,
       prepend: true
@@ -258,7 +334,7 @@ export default class Action extends Widget {
     this.setProperty('tooltipPosition', position);
   }
 
-  _configureTooltip() {
+  _configureTooltip(): object {
     return {
       parent: this,
       text: this.tooltipText,
@@ -405,7 +481,15 @@ export default class Action extends Widget {
     this.doAction();
   }
 
-  setActionStyle(actionStyle) {
+  setActionStyle(actionStyle: EnumObject<typeof Action.ActionStyle>) {
     this.setProperty('actionStyle', actionStyle);
+  }
+
+  // onV1(type: ActionEventType | `${ActionEventType} ${ActionEventType}`, handler: Function): any {
+  //   return super.onV1(type as WidgetEventType, handler);
+  // }
+
+  on<K extends string & keyof ActionEventMap>(type: K, handler: EventHandler<ActionEventMap[K]>): any {
+    return super.on(type, handler);
   }
 }

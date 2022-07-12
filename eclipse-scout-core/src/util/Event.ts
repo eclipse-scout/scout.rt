@@ -9,10 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import * as $ from 'jquery';
+import EventEmitter from './EventEmitter';
 
 export default class Event {
+  source: EventEmitter;
+  defaultPrevented: boolean;
+  type: string;
 
-  constructor(model) {
+  constructor(model?) {
     this.defaultPrevented = false;
     $.extend(this, model);
   }

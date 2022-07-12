@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, EventSupport, filters as filters_1, keys, KeyStroke, ValueField, VirtualKeyStrokeEvent} from '../index';
+import {arrays, EventSupport, filters as filters_1, keys, KeyStroke, KeyStrokeFirePolicy, ValueField, VirtualKeyStrokeEvent} from '../index';
 import * as $ from 'jquery';
 
 export default class KeyStrokeManager {
@@ -237,7 +237,7 @@ export default class KeyStrokeManager {
     if (this.session.focusManager.isElementCovertByGlassPane(keyStrokeContext.$getScopeTarget())) {
       // check if any action with 'keyStrokeFirePolicy=IAction.KeyStrokeFirePolicy.ALWAYS' is in keyStrokeContext
       let keyStrokeFirePolicyAlways = $.grep(keyStrokeContext.keyStrokes, k => { // (will at least return an empty array)
-        return k.keyStrokeFirePolicy === Action.KeyStrokeFirePolicy.ALWAYS;
+        return k.keyStrokeFirePolicy === KeyStrokeFirePolicy.ALWAYS;
       });
       if (keyStrokeFirePolicyAlways.length === 0) {
         return;

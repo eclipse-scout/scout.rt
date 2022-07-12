@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, HAlign, Key, keys, scout} from '../index';
+import {Action, HAlign, Key, keys, KeyStrokeFirePolicy, scout} from '../index';
 import * as $ from 'jquery';
 
 export default class KeyStroke {
@@ -27,7 +27,7 @@ export default class KeyStroke {
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
     this.repeatable = false; // whether or not the handle method is called multiple times while a key is pressed
     this._handleExecuted = false; // internal flag to remember whether or not the handle method has been executed (reset on keyup)
-    this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
+    this.keyStrokeFirePolicy = KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
     this.enabledByFilter = true;
 
     // Hints to control rendering of the key(s).

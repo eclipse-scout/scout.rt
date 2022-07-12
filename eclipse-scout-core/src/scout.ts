@@ -114,11 +114,13 @@ export function isOneOf(value, ...args) {
   return argsToCheck.indexOf(value) !== -1;
 }
 
+export function create<T>(model: { objectType: string }, options?): T;
+export function create<T>(objectType: { new(): T } | string, model?: T extends { model: object } ? T['model'] : object, options?): T;
+
 /**
  * Creates a new object instance.<p> Delegates the create call to ObjectFactory#create.
- * @returns {object}
  */
-export function create<T>(objectType: { new(): T } | string | { objectType:string }, model?: object, options?): T {
+export function create<T>(objectType: { new(): T } | string | { objectType: string }, model?: T extends { model: object } ? T['model'] : object, options?): T {
   return ObjectFactory.get().create(objectType, model, options);
 }
 
