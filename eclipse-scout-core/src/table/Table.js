@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -620,6 +620,11 @@ export default class Table extends Widget {
 
     if (!this._$mouseDownRow || this._mouseDownRowId !== $mouseUpRow.data('row').id) {
       // Don't accept if mouse up happens on another row than mouse down, or mousedown didn't happen on a row at all
+      return;
+    }
+
+    if (mouseButton === 3 && this.contextMenu && this.contextMenu.rendered) {
+      // Don't accept if it is a right click and the contextMenu is already rendered
       return;
     }
 
