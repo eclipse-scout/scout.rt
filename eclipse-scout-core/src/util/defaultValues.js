@@ -88,6 +88,9 @@ export function applyTo(object, objectType) {
   } else if (typeof object === 'object') {
     objectType = objectType || object.objectType;
     if (objectType) {
+      if (typeof objectType !== 'string') {
+        throw new Error('objectType has to be a string but is a ' + typeof objectType + ' ObjectType: ' + objectType.toString().substring(0, 80));
+      }
       _applyToInternal(object, objectType);
     }
   }

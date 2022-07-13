@@ -627,6 +627,19 @@ export default class TableAdapter extends ModelAdapter {
     return adapterData;
   }
 
+  _initRowModel(rowModel) {
+    rowModel = $.extend({objectType: 'TableRow'}, rowModel);
+    defaultValues.applyTo(rowModel);
+    return rowModel;
+  }
+
+  static _createRowRemote(rowModel) {
+    if (this.modelAdapter) {
+      rowModel = this.modelAdapter._initRowModel(rowModel);
+    }
+    return this._createRowOrig(rowModel);
+  }
+
   /**
    * Static method to modify the prototype of Table.
    */
@@ -634,6 +647,8 @@ export default class TableAdapter extends ModelAdapter {
     if (!App.get().remote) {
       return;
     }
+
+    objects.replacePrototypeFunction(Table, '_createRow', TableAdapter._createRowRemote, true);
 
     // _sortAfterInsert
     objects.replacePrototypeFunction(Table, '_sortAfterInsert', function(wasEmpty) {
@@ -703,7 +718,7 @@ export default class TableAdapter extends ModelAdapter {
 
     // init
     objects.replacePrototypeFunction(Column, 'init', function(model) {
-      if (model.table && model.table.modelAdapter) {
+      if (model.table && model.table.modelAdapter && !model.guiOnly) {
         // Fill in the missing default values only in remote case, don't do it JS case to not accidentally set undefined properties (e.g. uiSortEnabled)
         model = $.extend({}, model);
         defaultValues.applyTo(model);

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ContextMenuPopup, defaultValues, Device, DoubleClickSupport, dragAndDrop, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, MenuBar, MenuDestinations, MenuItemsOrder, menus as menus_1, objects, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeSpaceKeyStroke, Widget} from '../index';
+import {arrays, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, MenuBar, MenuDestinations, MenuItemsOrder, menus as menus_1, objects, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeSpaceKeyStroke, Widget} from '../index';
 import $ from 'jquery';
 
 /**
@@ -180,9 +180,9 @@ export default class Tree extends Widget {
   }
 
   _createTreeNode(nodeModel) {
-    nodeModel = scout.nvl(nodeModel, {});
+    nodeModel = $.extend({objectType: 'TreeNode'}, nodeModel);
     nodeModel.parent = this;
-    return scout.create('TreeNode', nodeModel);
+    return scout.create(nodeModel);
   }
 
   /**
@@ -275,16 +275,12 @@ export default class Tree extends Widget {
     node.initialized = true;
   }
 
-  _applyNodeDefaultValues(node) {
-    defaultValues.applyTo(node, 'TreeNode');
-  }
-
   /**
    * Override this function if you want a custom node init before filtering.
-   * The default impl. applies default values to the given node.
+   * The default implementation does nothing.
    */
   _initTreeNodeInternal(node, parentNode) {
-    this._applyNodeDefaultValues(node);
+    // nop
   }
 
   _destroy() {
@@ -2241,7 +2237,6 @@ export default class Tree extends Widget {
       if (updatedNode === oldNode) {
         propertiesChanged = true;
       } else {
-        this._applyNodeDefaultValues(updatedNode);
         propertiesChanged = this._applyUpdatedNodeProperties(oldNode, updatedNode);
       }
 

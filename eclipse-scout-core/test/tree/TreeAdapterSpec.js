@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteEvent} from '../../src/index';
+import {defaultValues, RemoteEvent} from '../../src/index';
 import {TreeSpecHelper} from '../../src/testing/index';
 
 describe('TreeAdapter', () => {
@@ -30,6 +30,22 @@ describe('TreeAdapter', () => {
     jasmine.clock().uninstall();
     $.fx.off = false;
   });
+
+  let defaults = {
+    'defaults': {
+      'Tree': {
+        'a': 123
+      },
+      'TreeNode': {
+        'b': 234
+      }
+    },
+    'objectTypeHierarchy': {
+      'Widget': {
+        'Tree': null
+      }
+    }
+  };
 
   describe('node click', () => {
     it('sends selection and click events in one call in this order', () => {
@@ -93,7 +109,7 @@ describe('TreeAdapter', () => {
       let model = helper.createModelFixture(1);
       let adapter = helper.createTreeAdapter(model);
       let tree = adapter.createWidget(model, session.desktop);
-      let $div = session.$entryPoint.makeDiv().cssHeight(10).cssWidth(10);
+      session.$entryPoint.makeDiv().cssHeight(10).cssWidth(10);
       tree.render();
 
       let $node0 = tree.nodes[0].$node;
@@ -256,7 +272,6 @@ describe('TreeAdapter', () => {
 
   describe('collapseAll', () => {
     it('sends nodeExpanded for every collapsed node', () => {
-      let i;
       let model = helper.createModelFixture(3, 2, true);
       let adapter = helper.createTreeAdapter(model);
       let tree = adapter.createWidget(model, session.desktop);
@@ -302,6 +317,21 @@ describe('TreeAdapter', () => {
         expect(tree.insertNodes).toHaveBeenCalledWith([newNode0Child3], tree.nodes[0]);
       });
 
+      it('applies defaultValues to nodes', () => {
+        defaultValues.init(defaults);
+        model = helper.createModelFixture(3, 1, true);
+        adapter = helper.createTreeAdapter(model);
+        tree = adapter.createWidget(model, session.desktop);
+        expect(tree.a).toBe(123);
+        expect(tree.nodes[0].b).toBe(234);
+        expect(tree.nodes[0].childNodes[3]).toBe(undefined);
+
+        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        let event = helper.createNodesInsertedEvent(model, [newNode0Child3], node0.id);
+        adapter.onModelAction(event);
+        expect(tree.a).toBe(123);
+        expect(tree.nodes[0].childNodes[3].b).toBe(234);
+      });
     });
 
     describe('nodesDeleted event', () => {
@@ -327,7 +357,6 @@ describe('TreeAdapter', () => {
         spyOn(tree, 'deleteNodes');
 
         let node2Child0 = node2.childNodes[0];
-        let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         let event = helper.createNodesDeletedEvent(model, [node2Child0.id], node2.id);
         adapter.onModelAction(event);
         expect(tree.deleteNodes).toHaveBeenCalledWith([node2Child0], node2);

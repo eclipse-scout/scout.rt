@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteEvent} from '../../src/index';
+import {defaultValues, RemoteEvent} from '../../src/index';
 import {LocaleSpecHelper, TableSpecHelper} from '../../src/testing/index';
 
-/* global removePopups */
 describe('TableAdapter', () => {
   let session, helper;
 
@@ -32,6 +31,22 @@ describe('TableAdapter', () => {
     helper.resetIntlCollator();
     $.fx.off = false;
   });
+
+  let defaults = {
+    'defaults': {
+      'Table': {
+        'a': 123
+      },
+      'TableRow': {
+        'b': 234
+      }
+    },
+    'objectTypeHierarchy': {
+      'Widget': {
+        'Table': null
+      }
+    }
+  };
 
   describe('selectRows', () => {
 
@@ -358,6 +373,26 @@ describe('TableAdapter', () => {
         expect(table.rows[0].cells[1].value).toBe('text 1');
         expect(table.rows[0].cells[1].text).toBe('text 1');
       });
+
+      it('applies defaultValues to rows', () => {
+        defaultValues.init(defaults);
+        model = helper.createModelFixture(2, 1);
+        adapter = helper.createTableAdapter(model);
+        table = adapter.createWidget(model, session.desktop);
+        expect(table.a).toBe(123);
+        expect(table.rows[0].b).toBe(234);
+
+        table.deleteAllRows();
+        expect(table.rows.length).toBe(0);
+
+        let row = {
+          cells: ['a text 0', 'a text 1']
+        };
+        let event = createRowsInsertedEvent(model, [row]);
+        adapter.onModelAction(event);
+        expect(table.a).toBe(123);
+        expect(table.rows[0].b).toBe(234);
+      });
     });
 
     describe('rowOrderChanged event', () => {
@@ -455,6 +490,21 @@ describe('TableAdapter', () => {
         expect(table.updateRows).toHaveBeenCalledWith([row]);
       });
 
+      it('applies defaultValues to rows', () => {
+        defaultValues.init(defaults);
+        model = helper.createModelFixture(2, 1);
+        adapter = helper.createTableAdapter(model);
+        table = adapter.createWidget(model, session.desktop);
+        expect(table.rows[0].b).toBe(234);
+
+        table.rows[0].b = 999;
+        let row = {
+          id: table.rows[0].id
+        };
+        let event = createRowsUpdatedEvent(model, [row]);
+        adapter.onModelAction(event);
+        expect(table.rows[0].b).toBe(234);
+      });
     });
 
     describe('columnStructureChanged event', () => {
@@ -675,7 +725,7 @@ describe('TableAdapter', () => {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       let rows = [table.rows[2]];
-      let event = new scout.RemoteEvent(table.id, 'filter', {
+      let event = new RemoteEvent(table.id, 'filter', {
         rowIds: helper.getRowIds(rows),
         showBusyIndicator: false
       });

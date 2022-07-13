@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {OutlineSpecHelper, TableSpecHelper} from '../../../src/testing';
+import {OutlineSpecHelper, TableSpecHelper, TreeSpecHelper} from '../../../src/testing';
+import {defaultValues} from '../../../src';
 
 describe('OutlineAdapter', () => {
   let session, helper, tableHelper;
@@ -32,10 +33,31 @@ describe('OutlineAdapter', () => {
     $.fx.off = false;
   });
 
+  let defaults = {
+    'defaults': {
+      'Outline': {
+        'a': 123
+      },
+      'Page': {
+        'b': 234
+      }
+    },
+    'objectTypeHierarchy': {
+      'Widget': {
+        'Tree': {
+          'Outline': null
+        }
+      },
+      'TreeNode': {
+        'Page': null
+      }
+    }
+  };
+
   function createOutlineWithDetailTable() {
     let model = helper.createModelFixture();
-    let outline = helper.createOutline(model);
-    linkWidgetAndAdapter(outline, 'OutlineAdapter');
+    let adapter = helper.createOutlineAdapter(model);
+    let outline = adapter.createWidget(model, session.desktop);
     let table = tableHelper.createTable(tableHelper.createModelFixture(2, 0));
     linkWidgetAndAdapter(table, 'TableAdapter');
 
@@ -230,5 +252,21 @@ describe('OutlineAdapter', () => {
     expect(table._filterCount()).toBe(0);
     expect(table.$rows().length).toBe(2);
     expect(outline.$nodes().length).toBe(3);
+  });
+
+  it('applies defaultValues to pages', () => {
+    defaultValues.init(defaults);
+    let outline = createOutlineWithDetailTable();
+    let node0 = outline.nodes[0];
+    expect(outline.a).toBe(123);
+    expect(outline.nodes[0].b).toBe(234);
+    expect(outline.nodes[0].childNodes[0]).toBe(undefined);
+
+    let newChildNode = helper.createModelNode('0_1', 'newChildNode', 3);
+    let treeHelper = new TreeSpecHelper(session);
+    let event = treeHelper.createNodesInsertedEvent(outline, [newChildNode], node0.id);
+    outline.modelAdapter.onModelAction(event);
+    expect(outline.a).toBe(123);
+    expect(outline.nodes[0].childNodes[0].b).toBe(234);
   });
 });
