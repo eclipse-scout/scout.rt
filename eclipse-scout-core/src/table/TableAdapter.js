@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, BooleanColumn, Column, ColumnUserFilter, defaultValues, ModelAdapter, objects, scout, Table, TableUserFilter} from '../index';
+import {App, arrays, BooleanColumn, Column, ColumnUserFilter, defaultValues, ModelAdapter, objects, scout, Table, TableUserFilter, Tree} from '../index';
 import * as $ from 'jquery';
 
 export default class TableAdapter extends ModelAdapter {
@@ -627,6 +627,20 @@ export default class TableAdapter extends ModelAdapter {
     return adapterData;
   }
 
+  _initRowModel(rowModel) {
+    rowModel = $.extend({
+      objectType: 'TableRow' // Use default in case server does not send an objectType
+    }, rowModel);
+    defaultValues.applyTo(rowModel);
+  }
+
+  static _createRowRemote(rowModel) {
+    if (this.modelAdapter) {
+      this.modelAdapter._initRowModel(rowModel);
+    }
+    return this._createRowOrig(rowModel);
+  }
+
   /**
    * Static method to modify the prototype of Table.
    */
@@ -634,6 +648,8 @@ export default class TableAdapter extends ModelAdapter {
     if (!App.get().remote) {
       return;
     }
+
+    objects.replacePrototypeFunction(Table, '_createRow', TableAdapter._createRowRemote, true);
 
     // _sortAfterInsert
     objects.replacePrototypeFunction(Table, '_sortAfterInsert', function(wasEmpty) {

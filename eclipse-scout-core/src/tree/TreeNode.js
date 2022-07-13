@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {defaultValues, icons, objects, scout, styles, texts, Tree} from '../index';
+import {icons, objects, scout, styles, texts, Tree} from '../index';
 import * as $ from 'jquery';
 
 /**
@@ -88,7 +88,6 @@ export default class TreeNode {
     this.session = model.session || model.parent.session;
 
     $.extend(this, model);
-    defaultValues.applyTo(this);
 
     texts.resolveTextProperty(this, 'text');
     icons.resolveIconProperty(this, 'iconId');

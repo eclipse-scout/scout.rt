@@ -54,7 +54,8 @@ export default class TypeDescriptor {
         let infoWithoutVariant = new TypeDescriptor(this.typeDescriptor, this.objectType, null);
         return infoWithoutVariant.resolve(options);
       }
-      throw this.error('Could not find "' + className + '" in namespace "' + namespaces.join('.') + '"');
+      // TODO CGU variantLenient behavior here or after registry lookup or both? -> write specs
+      // throw this.error('Could not find "' + className + '" in namespace "' + namespaces.join('.') + '"');
     }
 
     return namespace[className];

@@ -132,7 +132,7 @@ export default class ViewMenuTab extends Widget {
     viewButton._cloneProperties.forEach(property => clone.callSetter(property, viewButton[property]));
 
     // Use default icon if outline does not define one.
-    clone.setIconId(viewButton.iconId || this.defaultIconId);
+    clone.iconId = viewButton.iconId || this.defaultIconId;
 
     // Mirror the events and property changes
     viewButton.mirror({

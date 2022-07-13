@@ -222,14 +222,21 @@ export default class Table extends Widget {
 
   _initRow(row) {
     if (!(row instanceof TableRow)) {
-      row.parent = this;
-      row = scout.create(TableRow, row);
+      row =  this._createRow(row);
     }
     this.rowsMap[row.id] = row;
     this.trigger('rowInit', {
       row: row
     });
     return row;
+  }
+
+  _createRow(rowModel) {
+    rowModel = $.extend({
+      objectType: 'TableRow'
+    }, rowModel);
+    rowModel.parent = this;
+    return scout.create(rowModel);
   }
 
   _initColumns() {

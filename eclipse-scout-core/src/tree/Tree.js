@@ -180,9 +180,11 @@ export default class Tree extends Widget {
   }
 
   _createTreeNode(nodeModel) {
-    nodeModel = scout.nvl(nodeModel, {});
+    nodeModel = $.extend({
+      objectType: 'TreeNode'
+    }, nodeModel);
     nodeModel.parent = this;
-    return scout.create('TreeNode', nodeModel);
+    return scout.create(nodeModel);
   }
 
   /**
@@ -275,16 +277,12 @@ export default class Tree extends Widget {
     node.initialized = true;
   }
 
-  _applyNodeDefaultValues(node) {
-    defaultValues.applyTo(node, 'TreeNode');
-  }
-
   /**
    * Override this function if you want a custom node init before filtering.
    * The default impl. applies default values to the given node.
    */
   _initTreeNodeInternal(node, parentNode) {
-    this._applyNodeDefaultValues(node);
+    // nop
   }
 
   _destroy() {

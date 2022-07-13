@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, objects, Outline, scout, TreeAdapter} from '../../index';
+import {App, defaultValues, objects, Outline, scout, TreeAdapter} from '../../index';
+import * as $ from 'jquery';
 
 export default class OutlineAdapter extends TreeAdapter {
 
@@ -143,6 +144,13 @@ export default class OutlineAdapter extends TreeAdapter {
     delete this._nodeIdToRowMap[page.id];
   }
 
+  _initNodeModel(nodeModel) {
+    nodeModel = $.extend({
+      objectType: 'Page'
+    }, nodeModel);
+    defaultValues.applyTo(nodeModel);
+  }
+
   /**
    * Static method to modify the prototype of Outline.
    */
@@ -154,6 +162,7 @@ export default class OutlineAdapter extends TreeAdapter {
     objects.replacePrototypeFunction(Outline, '_computeDetailContent', OutlineAdapter._computeDetailContentRemote, true);
     objects.replacePrototypeFunction(Outline, 'updateDetailMenus', OutlineAdapter.updateDetailMenusRemote, true);
     objects.replacePrototypeFunction(Outline, '_initTreeNodeInternal', OutlineAdapter._initTreeNodeInternalRemote, true);
+    objects.replacePrototypeFunction(Outline, '_createTreeNode', OutlineAdapter._createTreeNodeRemote, true);
   }
 
   /**

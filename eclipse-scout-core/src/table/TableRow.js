@@ -49,7 +49,6 @@ export default class TableRow {
       throw new Error('missing property \'parent\'');
     }
     $.extend(this, model);
-    defaultValues.applyTo(this);
     this._initCells();
   }
 
