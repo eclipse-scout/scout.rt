@@ -627,6 +627,19 @@ export default class TableAdapter extends ModelAdapter {
     return adapterData;
   }
 
+  _initRowModel(rowModel) {
+    rowModel = $.extend({objectType: 'TableRow'}, rowModel);
+    defaultValues.applyTo(rowModel);
+    return rowModel;
+  }
+
+  static _createRowRemote(rowModel) {
+    if (this.modelAdapter) {
+      rowModel = this.modelAdapter._initRowModel(rowModel);
+    }
+    return this._createRowOrig(rowModel);
+  }
+
   /**
    * Static method to modify the prototype of Table.
    */
@@ -634,6 +647,8 @@ export default class TableAdapter extends ModelAdapter {
     if (!App.get().remote) {
       return;
     }
+
+    objects.replacePrototypeFunction(Table, '_createRow', TableAdapter._createRowRemote, true);
 
     // _sortAfterInsert
     objects.replacePrototypeFunction(Table, '_sortAfterInsert', function(wasEmpty) {

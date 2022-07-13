@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateRange, dates, ModelAdapter} from '../index';
+import {App, DateRange, dates, defaultValues, ModelAdapter, objects, Planner} from '../index';
 
 export default class PlannerAdapter extends ModelAdapter {
 
@@ -113,4 +113,29 @@ export default class PlannerAdapter extends ModelAdapter {
       super.onModelAction(event);
     }
   }
+
+  static _initResourceRemote(resource) {
+    if (this.modelAdapter) {
+      defaultValues.applyTo(resource, 'Resource');
+    }
+    return this._initResourceOrig(resource);
+  }
+
+  static _initActivityRemote(activity) {
+    if (this.modelAdapter) {
+      defaultValues.applyTo(activity, 'Activity');
+    }
+    return this._initActivityOrig(activity);
+  }
+
+  static modifyPlannerPrototype() {
+    if (!App.get().remote) {
+      return;
+    }
+
+    objects.replacePrototypeFunction(Planner, '_initResource', PlannerAdapter._initResourceRemote, true);
+    objects.replacePrototypeFunction(Planner, '_initActivity', PlannerAdapter._initActivityRemote, true);
+  }
 }
+
+App.addListener('bootstrap', PlannerAdapter.modifyPlannerPrototype);
