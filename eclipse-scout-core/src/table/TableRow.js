@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {defaultValues} from '../index';
 import $ from 'jquery';
 
 export default class TableRow {
@@ -49,7 +48,6 @@ export default class TableRow {
       throw new Error('missing property \'parent\'');
     }
     $.extend(this, model);
-    defaultValues.applyTo(this);
     this._initCells();
   }
 

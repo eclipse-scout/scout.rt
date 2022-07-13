@@ -222,14 +222,19 @@ export default class Table extends Widget {
 
   _initRow(row) {
     if (!(row instanceof TableRow)) {
-      row.parent = this;
-      row = scout.create('TableRow', row);
+      row = this._createRow(row);
     }
     this.rowsMap[row.id] = row;
     this.trigger('rowInit', {
       row: row
     });
     return row;
+  }
+
+  _createRow(rowModel) {
+    rowModel = $.extend({objectType: 'TableRow'}, rowModel);
+    rowModel.parent = this;
+    return scout.create(rowModel);
   }
 
   _initColumns() {
@@ -5262,16 +5267,15 @@ export default class Table extends Widget {
   }
 
   updateColumnOrder(columns) {
-    let i, column, currentPosition, oldColumnOrder;
     if (columns.length !== this.columns.length) {
       throw new Error('Column order may not be updated because lengths of the arrays differ.');
     }
 
-    oldColumnOrder = this.columns.slice();
+    let oldColumnOrder = this.columns.slice();
 
-    for (i = 0; i < columns.length; i++) {
-      column = columns[i];
-      currentPosition = arrays.findIndex(this.columns, element => element.id === column.id);
+    for (let i = 0; i < columns.length; i++) {
+      let column = columns[i];
+      let currentPosition = arrays.findIndex(this.columns, element => element.id === column.id);
       if (currentPosition < 0) {
         throw new Error('Column with id ' + column.id + 'not found.');
       }

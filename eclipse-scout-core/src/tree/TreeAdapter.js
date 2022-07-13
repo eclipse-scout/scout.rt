@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, defaultValues, ModelAdapter, objects, Tree} from '../index';
+import {App, arrays, defaultValues, ModelAdapter, objects, Tree} from '../index';
+import $ from 'jquery';
 
 export default class TreeAdapter extends ModelAdapter {
 
@@ -260,4 +261,34 @@ export default class TreeAdapter extends ModelAdapter {
   _onScrollToSelection() {
     this.widget.revealSelection();
   }
+
+  _initNodeModel(nodeModel) {
+    nodeModel = $.extend({objectType: this._getDefaultNodeObjectType()}, nodeModel);
+    defaultValues.applyTo(nodeModel);
+    return nodeModel;
+  }
+
+  _getDefaultNodeObjectType() {
+    return 'TreeNode';
+  }
+
+  static _createTreeNodeRemote(nodeModel) {
+    if (this.modelAdapter) {
+      nodeModel = this.modelAdapter._initNodeModel(nodeModel);
+    }
+    return this._createTreeNodeOrig(nodeModel);
+  }
+
+  /**
+   * Static method to modify the prototype of Tree.
+   */
+  static modifyTreePrototype() {
+    if (!App.get().remote) {
+      return;
+    }
+
+    objects.replacePrototypeFunction(Tree, '_createTreeNode', TreeAdapter._createTreeNodeRemote, true);
+  }
 }
+
+App.addListener('bootstrap', TreeAdapter.modifyTreePrototype);

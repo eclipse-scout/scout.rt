@@ -8,29 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  DateFormat,
-  DateRange,
-  dates,
-  defaultValues,
-  graphics,
-  HtmlComponent,
-  KeyStrokeContext,
-  MenuBar,
-  menus as menus_1,
-  objects,
-  PlannerLayout,
-  PlannerMenuItemsOrder,
-  Range,
-  scout,
-  scrollbars,
-  strings,
-  styles,
-  tooltips,
-  TooltipSupport,
-  Widget
-} from '../index';
+import {arrays, DateFormat, DateRange, dates, graphics, HtmlComponent, KeyStrokeContext, MenuBar, menus as menus_1, objects, PlannerLayout, PlannerMenuItemsOrder, Range, scout, scrollbars, strings, styles, tooltips, TooltipSupport, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Planner extends Widget {
@@ -146,17 +124,13 @@ export default class Planner extends Widget {
   }
 
   _initResource(resource) {
-    defaultValues.applyTo(resource, 'Resource');
-    resource.activities.forEach(function(activity) {
-      this._initActivity(activity);
-    }, this);
+    resource.activities.forEach(activity => this._initActivity(activity));
     this.resourceMap[resource.id] = resource;
   }
 
   _initActivity(activity) {
     activity.beginTime = dates.parseJsonDate(activity.beginTime);
     activity.endTime = dates.parseJsonDate(activity.endTime);
-    defaultValues.applyTo(activity, 'Activity');
     this.activityMap[activity.id] = activity;
   }
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, defaultValues, Desktop, DetailTableTreeFilter, Device, FileChooserController, Form, GroupBoxMenuItemsOrder, HtmlComponent, keyStrokeModifier, MenuBar, menus as menuUtil, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineKeyStrokeContext, OutlineLayout, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, scout, TableControlAdapterMenu, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke} from '../../index';
+import {arrays, Desktop, DetailTableTreeFilter, Device, FileChooserController, Form, GroupBoxMenuItemsOrder, HtmlComponent, keyStrokeModifier, MenuBar, menus as menuUtil, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineKeyStrokeContext, OutlineLayout, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, scout, TableControlAdapterMenu, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke} from '../../index';
 import $ from 'jquery';
 
 /**
@@ -126,16 +126,12 @@ export default class Outline extends Tree {
     return this._createChild(model);
   }
 
-  _applyNodeDefaultValues(node) {
-    defaultValues.applyTo(node, 'Page');
-  }
-
   _createKeyStrokeContext() {
     return new OutlineKeyStrokeContext(this);
   }
 
   _filterMenus(menus, destination, onlyVisible, enableDisableKeyStroke) {
-    // show no contextmenues
+    // show no context menus
     return [];
   }
 

@@ -31,8 +31,8 @@ export default class OutlineSpecHelper {
 
   createModelNode(id, text) {
     return {
-      'id': id,
-      'text': text
+      id: id,
+      text: text
     };
   }
 
