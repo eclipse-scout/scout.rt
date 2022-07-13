@@ -47,7 +47,10 @@ export type EnumType<ENUM> = {
 
 export type EnumObject<TYPE> = TYPE[keyof TYPE];
 
-export type TActionStyle = EnumObject<typeof Action.ActionStyle>;
+export type ActionStyle = EnumObject<typeof Action.ActionStyle>;
+
+type ActionTextPositionKey = keyof typeof Action.TextPosition;
+export type ActionTextPosition = typeof Action.TextPosition[ActionTextPositionKey];
 
 export default class Action extends Widget implements ActionModel {
   model: ActionModel;
@@ -55,7 +58,7 @@ export default class Action extends Widget implements ActionModel {
   _doubleClickSupport: DoubleClickSupport;
   actionKeyStroke: KeyStroke;
   actionStyle: EnumObject<typeof Action.ActionStyle>;
-  actionStyle2: TActionStyle;
+  actionStyle2: ActionStyle;
   actionStyleInterface: EnumType<IActionStyle>[keyof EnumType<IActionStyle>];
   actionStyleEnum: ActionStyleEnum;
   compact: boolean;
@@ -68,7 +71,7 @@ export default class Action extends Widget implements ActionModel {
   selected: boolean;
   showTooltipWhenSelected: boolean;
   tabbable: boolean;
-  textPosition: typeof Action.TextPosition[keyof typeof Action.TextPosition];
+  textPosition: ActionTextPosition;
   textVisible: boolean;
   toggleAction: boolean;
   tooltipPosition: any;
@@ -481,7 +484,7 @@ export default class Action extends Widget implements ActionModel {
     this.doAction();
   }
 
-  setActionStyle(actionStyle: EnumObject<typeof Action.ActionStyle>) {
+  setActionStyle(actionStyle: ActionStyle) {
     this.setProperty('actionStyle', actionStyle);
   }
 

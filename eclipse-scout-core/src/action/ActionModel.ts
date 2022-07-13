@@ -1,7 +1,9 @@
 import WidgetModel from '../widget/WidgetModel';
+import {ActionStyle} from './Action';
 
 export interface ActionModel extends WidgetModel {
-  iconId?: string,
-  text?: string,
-  showTooltipWhenSelected?: boolean
+  actionStyle?: ActionStyle;
+  iconId?: string;
+  text?: string;
+  showTooltipWhenSelected?: boolean;
 }

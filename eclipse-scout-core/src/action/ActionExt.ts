@@ -2,6 +2,7 @@
 import {Action, Form, GroupBox, Icon, icons, KeyStrokeFirePolicyExt, Menu, scout} from '../index';
 import {ActionStyleEnum, EnumObject, EnumType, IActionStyle} from './Action';
 import {ActionModel} from './ActionModel';
+import {ActionExtModel} from './ActionExtModel';
 
 enum ActionStyleEnumExt {
   NEW_STYLE = 10
@@ -11,9 +12,17 @@ interface IActionStyleExt extends IActionStyle {
   NEW_STYLE: 10
 }
 
+export type ActionStyleExt = EnumObject<typeof ActionExt.ActionStyle>;
+
+type ActionTextPositionKey = keyof typeof ActionExt.TextPosition;
+export type ActionTextPositionExt = typeof ActionExt.TextPosition[ActionTextPositionKey];
+
 export default class ActionExt extends Action {
   // @ts-ignore
-  actionStyle: EnumObject<typeof ActionExt.ActionStyle>;
+  model: ActionExtModel;
+
+  // @ts-ignore
+  actionStyle: ActionStyleExt;
   // @ts-ignore
   actionStyleEnum: ActionStyleEnum | ActionStyleEnumExt;
 
@@ -24,7 +33,7 @@ export default class ActionExt extends Action {
   literal: 1 | 2 | 3;
 
   // @ts-ignore
-  textPosition: typeof ActionExt.TextPosition[keyof typeof ActionExt.TextPosition];
+  textPosition: ActionTextPositionExt;
 
   keyStrokeFirePolicy: KeyStrokeFirePolicyExt;
 
@@ -39,7 +48,7 @@ export default class ActionExt extends Action {
 
   static ActionStyle = {
     ...Action.ActionStyle,
-    NEW_POSITION: 'abc'
+    NEW_POSITION: 10
   } as const;
 
   static TextPosition = {
@@ -57,6 +66,11 @@ export default class ActionExt extends Action {
     this.setProperty('iconId', iconId);
   }
 
+  setActionStyle(actionStyle: ActionStyleExt) {
+    // @ts-ignore
+    super.setActionStyle(actionStyle);
+  }
+
   _init(model: ActionModel) {
     super._init(model);
     console.log('ActionStyle:' + this.actionStyle);
@@ -72,6 +86,9 @@ export default class ActionExt extends Action {
 
     icon.model.iconDesc = 'asdf';
     // icon.model = {parent: this};
+
+    this.actionStyle2 = Action.ActionStyle.BUTTON;
+    this.textPosition = ActionExt.TextPosition.NEW_POSITION;
   }
 
   _doAction() {
@@ -96,7 +113,8 @@ export default class ActionExt extends Action {
     form.open();
 
     let actionExt = scout.create(ActionExt, {
-      parent: this
+      parent: this,
+      actionStyle: ActionExt.ActionStyle.NEW_POSITION
     });
   }
 }

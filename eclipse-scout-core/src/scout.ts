@@ -114,8 +114,9 @@ export function isOneOf(value, ...args) {
   return argsToCheck.indexOf(value) !== -1;
 }
 
-export function create<T>(model: { objectType: string }, options?): T;
-export function create<T>(objectType: { new(): T } | string, model?: T extends { model: object } ? T['model'] : object, options?): T;
+// TODO CGU overloads create confusing error messages when a wrong model property is used with scout.create -> don't use it
+// export function create<T>(model: { objectType: string }, options?): T;
+// export function create<T>(objectType: { new(): T } | string, model?: T extends { model: object } ? T['model'] : object, options?): T;
 
 /**
  * Creates a new object instance.<p> Delegates the create call to ObjectFactory#create.
