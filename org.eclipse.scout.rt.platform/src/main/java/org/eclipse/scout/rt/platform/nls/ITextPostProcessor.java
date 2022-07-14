@@ -13,26 +13,30 @@ package org.eclipse.scout.rt.platform.nls;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.text.NlsKey;
 
 /**
- * Represents a ext post processor.<br>
- * Use {@link NlsUtility#postProcessText(String)} or one of its overloads to post process a text.
+ * Represents a text post processor.<br>
+ * Use {@link NlsUtility#postProcessText(String, String, String...)} or one of its overloads to post process a text.
  *
- * @see NlsUtility#postProcessText(String)
+ * @see NlsUtility#postProcessText(String, String, String...)
  * @since 22.0
  */
 @ApplicationScoped
 public interface ITextPostProcessor {
 
   /**
-   * Applies the post processing to the text given.
+   * Applies the post-processing to the text given.
    *
    * @param textLocale
-   *          The {@link Locale} of the text given. May be {@code null}.
+   *     The {@link Locale} of the text given. May be {@code null}.
+   * @param textKey
+   *     The text key of the text to post-process. May be {@code null}.
    * @param text
-   *          The text to post process. May be {@code null}.
+   *     The text to post process. May be {@code null}.
+   * @param messageArguments
+   *     Values of possible placeholders, as used in {@link NlsUtility#bindText}.
    * @return The processed text.
    */
-  String apply(Locale textLocale, String text);
-
+  String apply(Locale textLocale, @NlsKey String textKey, String text, String... messageArguments);
 }

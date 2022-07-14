@@ -10,15 +10,18 @@
  */
 package org.eclipse.scout.rt.platform.nls;
 
-import static java.util.Collections.unmodifiableList;
-import static org.eclipse.scout.rt.platform.util.CollectionUtility.arrayListWithoutNullElements;
+import static java.util.Collections.unmodifiableSet;
+import static org.eclipse.scout.rt.platform.util.CollectionUtility.orderedHashSetWithoutNullElements;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.Bean;
@@ -27,11 +30,11 @@ import org.eclipse.scout.rt.platform.Bean;
 public class DynamicNls {
 
   private final List<NlsResourceBundleCache> m_resourceBundles;
-  private final List<ITextPostProcessor> m_textPostProcessors;
+  private final Set<ITextPostProcessor> m_textPostProcessors;
 
   public DynamicNls() {
     m_resourceBundles = new ArrayList<>();
-    m_textPostProcessors = new ArrayList<>();
+    m_textPostProcessors = new LinkedHashSet<>();
   }
 
   public void registerResourceBundle(String resourceBundleName, Class<?> wrapperClass) {
@@ -63,7 +66,7 @@ public class DynamicNls {
   public DynamicNls withTextPostProcessors(Collection<? extends ITextPostProcessor> processors) {
     clearTextPostProcessors();
     if (processors != null && !processors.isEmpty()) {
-      m_textPostProcessors.addAll(arrayListWithoutNullElements(processors));
+      m_textPostProcessors.addAll(orderedHashSetWithoutNullElements(processors));
     }
     return this;
   }
@@ -108,11 +111,11 @@ public class DynamicNls {
   }
 
   /**
-   * @return An unmodifiable {@link List} of all {@link ITextPostProcessor} instances registered. Never returns
-   *         {@code null}.
+   * @return An unmodifiable {@link Set} of all {@link ITextPostProcessor} instances registered. Never returns
+   *         {@code null}. {@link Collections#unmodifiableSet(Set)} preservers the given order.
    */
-  public List<ITextPostProcessor> getTextPostProcessors() {
-    return unmodifiableList(m_textPostProcessors);
+  public Collection<ITextPostProcessor> getTextPostProcessors() {
+    return unmodifiableSet(m_textPostProcessors);
   }
 
   /**
@@ -130,6 +133,9 @@ public class DynamicNls {
   }
 
   /**
+   * Resolves the given {@code key} and returns its assigned text. Applies all internally cached
+   * {@link ITextPostProcessor text post processors}.
+   *
    * @param locale
    *          the locale of the text
    * @param key
@@ -150,7 +156,7 @@ public class DynamicNls {
     }
     String text = getTextInternal(locale, key);
     text = NlsUtility.bindText(text, messageArguments);
-    return NlsUtility.postProcessText(locale, text, getTextPostProcessors());
+    return NlsUtility.postProcessText(locale, key, text, getTextPostProcessors(), messageArguments);
   }
 
   protected String getTextInternal(Locale locale, String key) {

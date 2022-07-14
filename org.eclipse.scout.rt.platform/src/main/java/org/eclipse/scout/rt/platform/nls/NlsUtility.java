@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBeanManager;
+import org.eclipse.scout.rt.platform.text.NlsKey;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public final class NlsUtility {
 
@@ -70,30 +72,17 @@ public final class NlsUtility {
    * Applies all {@link ITextPostProcessor text post processors} registered in the {@link IBeanManager} to the text
    * given. It is assumed that the given text uses the {@link NlsLocale}.
    *
+   * @param textKey
+   *          The text key of the text to post-process. May be {@code null}.
    * @param text
    *          The text to post-process. May be {@code null}.
+   * @param messageArguments
+   *          Values of possible placeholders, as used in {@link #bindText}.
    * @return The text with all post-processing applied.
-   * @see #postProcessText(Locale, String)
-   * @see #postProcessText(Locale, String, Collection)
+   * @see #postProcessText(Locale, String, String, Collection, String...)
    */
-  public static String postProcessText(String text) {
-    return postProcessText(NlsLocale.get(), text);
-  }
-
-  /**
-   * Applies the {@link ITextPostProcessor text post processors} given to the text given. It is assumed that the given
-   * text uses the {@link NlsLocale}.
-   *
-   * @param text
-   *          The text to post-process. May be {@code null}.
-   * @param postProcessors
-   *          The post processors to execute. May be {@code null}.
-   * @return The text with all post-processing applied.
-   * @see #postProcessText(Locale, String)
-   * @see #postProcessText(Locale, String, Collection)
-   */
-  public static String postProcessText(String text, Collection<? extends ITextPostProcessor> postProcessors) {
-    return postProcessText(NlsLocale.get(), text, postProcessors);
+  public static String postProcessText(@NlsKey String textKey, String text, String... messageArguments) {
+    return postProcessText(NlsLocale.get(), textKey, text, BEANS.all(ITextPostProcessor.class), messageArguments);
   }
 
   /**
@@ -102,14 +91,34 @@ public final class NlsUtility {
    *
    * @param textLocale
    *          The locale of the text given. May be {@code null}.
+   * @param textKey
+   *          The text key of the text to post-process. May be {@code null}.
    * @param text
    *          The text to post-process. May be {@code null}.
    * @return The text with all post-processing applied.
-   * @see #postProcessText(String)
-   * @see #postProcessText(Locale, String, Collection)
+   * @see #postProcessText(Locale, String, String, Collection, String...)
    */
-  public static String postProcessText(Locale textLocale, String text) {
-    return postProcessText(textLocale, text, BEANS.all(ITextPostProcessor.class));
+  public static String postProcessText(Locale textLocale, @NlsKey String textKey, String text, String... messageArguments) {
+    return postProcessText(textLocale, textKey, text, BEANS.all(ITextPostProcessor.class), messageArguments);
+  }
+
+  /**
+   * Applies given {@link ITextPostProcessor text post processors} to the text given. It is assumed that the given text
+   * uses the {@link NlsLocale}.
+   *
+   * @param textKey
+   *          The text key of the text to post-process. May be {@code null}.
+   * @param text
+   *          The text to post-process. May be {@code null}.
+   * @param postProcessors
+   *          The post processors to execute. May be {@code null}.
+   * @param messageArguments
+   *          Values of possible placeholders, as used in {@link #bindText}.
+   * @return The text with all post-processing applied.
+   * @see #postProcessText(Locale, String, String, Collection, String...)
+   */
+  public static String postProcessText(@NlsKey String textKey, String text, Collection<? extends ITextPostProcessor> postProcessors, String... messageArguments) {
+    return postProcessText(NlsLocale.get(), textKey, text, postProcessors, messageArguments);
   }
 
   /**
@@ -117,16 +126,18 @@ public final class NlsUtility {
    *
    * @param textLocale
    *          The locale of the text given. May be {@code null}.
+   * @param textKey
+   *          The text key of the text to post-process. May be {@code null}.
    * @param text
    *          The text to post-process. May be {@code null}.
    * @param postProcessors
    *          The post processors to execute. May be {@code null}.
+   * @param messageArguments
+   *          Values of possible placeholders, as used in {@link #bindText}.
    * @return The text with all post-processing applied.
-   * @see #postProcessText(Locale, String)
-   * @see #postProcessText(String)
    */
-  public static String postProcessText(Locale textLocale, String text, Collection<? extends ITextPostProcessor> postProcessors) {
-    if (text == null || postProcessors == null || postProcessors.isEmpty()) {
+  public static String postProcessText(Locale textLocale, @NlsKey String textKey, String text, Collection<? extends ITextPostProcessor> postProcessors, String... messageArguments) {
+    if (text == null && textKey == null || CollectionUtility.isEmpty(postProcessors)) {
       return text;
     }
 
@@ -135,7 +146,7 @@ public final class NlsUtility {
       if (postProcessor == null) {
         continue;
       }
-      result = postProcessor.apply(textLocale, result);
+      result = postProcessor.apply(textLocale, textKey, result, messageArguments);
     }
     return result;
   }
