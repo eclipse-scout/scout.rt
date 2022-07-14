@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -21,6 +21,7 @@ export default class Form extends Widget {
     this.askIfNeedSave = true;
     this.askIfNeedSaveText = null; // if not set, a default text is used (see Lifecycle.js)
     this.data = {};
+    this.displayViewId = null;
     this.displayHint = Form.DisplayHint.DIALOG;
     this.displayParent = null; // only relevant if form is opened, not relevant if form is just rendered into another widget (not managed by a form controller)
     this.maximized = false;
@@ -44,6 +45,7 @@ export default class Form extends Widget {
     this.messageBoxController = null;
     this.fileChooserController = null;
     this.closeKeyStroke = null;
+    this.showOnOpen = true;
     this._glassPaneRenderer = null;
     this._preMaximizedBounds = null;
     this._resizeHandler = this._onResize.bind(this);
@@ -239,7 +241,9 @@ export default class Form extends Widget {
           // If form has been closed right after it was opened don't try to show it
           return;
         }
-        this.show();
+        if (this.showOnOpen) {
+          this.show();
+        }
       });
   }
 
@@ -754,6 +758,10 @@ export default class Form extends Widget {
     }
   }
 
+  setDisplayViewId(displayViewId) {
+    this.setProperty('displayViewId', displayViewId);
+  }
+
   setDisplayHint(displayHint) {
     this.setProperty('displayHint', displayHint);
   }
@@ -818,6 +826,10 @@ export default class Form extends Widget {
       return $statusIcon;
     }
     return $prevIcon;
+  }
+
+  setShowOnOpen(showOnOpen) {
+    this.setProperty('showOnOpen', showOnOpen);
   }
 
   _updateTitleForWindow() {
