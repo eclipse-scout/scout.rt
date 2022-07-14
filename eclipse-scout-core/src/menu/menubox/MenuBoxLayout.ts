@@ -11,6 +11,10 @@
 import {AbstractLayout, graphics, menus as menuUtil} from '../../index';
 
 export default class MenuBoxLayout extends AbstractLayout {
+  _ellipsis: any;
+  firstMenu: any;
+  lastMenu: any;
+  menuBox: any;
 
   constructor(menuBox) {
     super();
@@ -245,7 +249,7 @@ export default class MenuBoxLayout extends AbstractLayout {
     menus.forEach(menu => menuUtil.removeMenuFromEllipsis(menu, this.menuBox.$container));
   }
 
-  actualPrefSize(menus) {
+  actualPrefSize(menus?) {
     menus = menus || this.visibleMenus();
     let menusWidth = this._menusWidth(menus);
     let prefSize = graphics.prefSize(this.menuBox.$container);

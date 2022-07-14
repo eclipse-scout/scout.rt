@@ -11,6 +11,11 @@
 import {menus, scout} from '../index';
 
 export default class MenuItemsOrder {
+  emptySpaceTypes: any;
+  menuBar: any;
+  objectType: any;
+  selectionTypes: any;
+  session: any;
 
   constructor(session, objectType) {
     this.session = session;

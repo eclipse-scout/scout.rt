@@ -8,9 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, arrays, Dimension, graphics, HtmlComponent, MenuBar, scout} from '../../index';
+import {AbstractLayout, arrays, Dimension, EllipsisMenu, graphics, HtmlComponent, Menu, MenuBar, scout} from '../../index';
 
 export default class MenuBarLayout extends AbstractLayout {
+  _ellipsis: any;
+  _menuBar: any;
+  _overflowMenuItems: any;
+  collapsed: any;
 
   constructor(menuBar) {
     super();
@@ -25,7 +29,8 @@ export default class MenuBarLayout extends AbstractLayout {
     let menuItems = this._menuBar.orderedMenuItems.left.concat(this._menuBar.orderedMenuItems.right);
     let visibleMenuItems = this.visibleMenuItems();
     let htmlContainer = HtmlComponent.get($container);
-    let ellipsis = arrays.find(menuItems, menuItem => menuItem.ellipsis);
+    // @ts-ignore
+    let ellipsis = arrays.find(menuItems, menuItem => menuItem.ellipsis) as EllipsisMenu;
 
     this._setFirstLastMenuMarker(visibleMenuItems); // is required to determine available size correctly
     this.preferredLayoutSize($container, {
@@ -144,7 +149,7 @@ export default class MenuBarLayout extends AbstractLayout {
     return this._prefSize(minVisibleMenuItems, true);
   }
 
-  _prefSize(menuItems, considerEllipsis) {
+  _prefSize(menuItems, considerEllipsis?) {
     let prefSize = new Dimension(0, 0);
     considerEllipsis = scout.nvl(considerEllipsis, this._overflowMenuItems.length > 0);
     this._setFirstLastMenuMarker(menuItems, considerEllipsis);
@@ -179,7 +184,7 @@ export default class MenuBarLayout extends AbstractLayout {
     return prefSize;
   }
 
-  _setFirstLastMenuMarker(visibleMenuItems, considerEllipsis) {
+  _setFirstLastMenuMarker(visibleMenuItems, considerEllipsis?) {
     let menuItems = visibleMenuItems;
     considerEllipsis = scout.nvl(considerEllipsis, this._overflowMenuItems.length > 0);
 

@@ -11,7 +11,6 @@
 import {Action, arrays, ContextMenuPopup, Event, HtmlComponent, icons, MenuExecKeyStroke, MenuKeyStroke, scout, strings, tooltips, TreeVisitResult} from '../index';
 
 export default class Menu extends Action {
-
   constructor() {
     super();
 
@@ -72,6 +71,26 @@ export default class Menu extends Action {
      */
     NEVER: 'never'
   };
+
+  $subMenuBody: any;
+  $submenuIcon: any;
+  childActions: any;
+  defaultMenu: any;
+  excludedByFilter: any;
+  menuFilter: any;
+  menuStyle: any;
+  menuTypes: any;
+  overflowMenu: any;
+  overflown: any;
+  parentMenu: any;
+  popup: any;
+  popupHorizontalAlignment: any;
+  popupVerticalAlignment: any;
+  separator: any;
+  shrinkable: any;
+  stackable: any;
+  subMenuVisibility: any;
+  uiCssClass: any;
 
   _init(options) {
     super._init(options);
@@ -218,13 +237,6 @@ export default class Menu extends Action {
     return false;
   }
 
-  _getSubMenuLevel() {
-    if (this.parent instanceof ContextMenuPopup) {
-      return 0;
-    }
-    return super._getSubMenuLevel() + 1;
-  }
-
   _onMouseEvent(event) {
     if (event.type === 'mousedown') {
       this._doubleClickSupport.mousedown(event);
@@ -279,7 +291,7 @@ export default class Menu extends Action {
           visible = this._hasText();
           break;
         case Menu.SubMenuVisibility.TEXT_OR_ICON:
-          visible = this._hasText() || this.iconId;
+          visible = this._hasText() || !!this.iconId;
           break;
         case Menu.SubMenuVisibility.ALWAYS:
           visible = true;
@@ -350,7 +362,7 @@ export default class Menu extends Action {
   /**
    * @override Widget.js
    */
-  recomputeEnabled(parentEnabled) {
+  recomputeEnabled(parentEnabled?) {
     if (parentEnabled === undefined) {
       parentEnabled = this._getInheritedAccessibility();
     }
@@ -508,7 +520,7 @@ export default class Menu extends Action {
     }
   }
 
-  _createPopup(event) {
+  _createPopup() {
     let options = {
       parent: this,
       menu: this,

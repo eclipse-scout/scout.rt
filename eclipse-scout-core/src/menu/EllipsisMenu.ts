@@ -11,6 +11,11 @@
 import {icons, Menu} from '../index';
 
 export default class EllipsisMenu extends Menu {
+  childActions: any;
+  ellipsis: any;
+  hidden: any;
+  rightAligned: any;
+  stackable: any;
 
   constructor() {
     super();

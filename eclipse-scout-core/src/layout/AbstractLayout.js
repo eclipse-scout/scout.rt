@@ -29,7 +29,7 @@ export default class AbstractLayout {
    *
    * May be implemented by sub-class.
    */
-  invalidate() { //
+  invalidate(htmlSource) { //
   }
 
   /**

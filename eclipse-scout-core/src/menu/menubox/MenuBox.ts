@@ -11,6 +11,9 @@
 import {HtmlComponent, MenuBoxLayout, Widget} from '../../index';
 
 export default class MenuBox extends Widget {
+  compact: any;
+  menus: any;
+  uiMenuCssClass: any;
 
   constructor(menuBar) {
     super();

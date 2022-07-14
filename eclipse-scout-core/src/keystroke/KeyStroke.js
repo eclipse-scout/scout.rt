@@ -31,6 +31,9 @@ export default class KeyStroke {
     this.enabledByFilter = true;
 
     // Hints to control rendering of the key(s).
+    /**
+     * @type {{hAlign: string, offset: number, gap: number, $drawingArea: (function(*, *): *), text: null, render: boolean | ((function(): (*|boolean))|*)}}
+     */
     this.renderingHints = {
       render: () => {
         if (this.field && this.field.rendered !== undefined) {

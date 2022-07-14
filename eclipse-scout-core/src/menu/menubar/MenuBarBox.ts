@@ -11,6 +11,8 @@
 import {arrays, HtmlComponent, MenuBar, MenuBarBoxLayout, Widget} from '../../index';
 
 export default class MenuBarBox extends Widget {
+  menuItems: any;
+  tooltipPosition: any;
 
   constructor() {
     super();

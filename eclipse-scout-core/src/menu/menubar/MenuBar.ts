@@ -11,7 +11,6 @@
 import {arrays, ComboMenu, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStrokeContext, Menu, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarRightKeyStroke, MenuDestinations, menus, scout, Widget, widgets} from '../../index';
 
 export default class MenuBar extends Widget {
-
   constructor() {
     super();
 
@@ -45,6 +44,22 @@ export default class MenuBar extends Widget {
     TOP: 'top',
     BOTTOM: 'bottom'
   };
+
+  _ellipsis: any;
+  _focusHandler: any;
+  _menuItemPropertyChangeHandler: any;
+  defaultMenu: any;
+  ellipsisPosition: any;
+  hiddenByUi: any;
+  menuFilter: any;
+  menuItems: any;
+  menuSorter: any;
+  menuboxLeft: any;
+  menuboxRight: any;
+  orderedMenuItems: any;
+  position: any;
+  tabbable: any;
+  tabbableMenu: any;
 
   _init(options) {
     super._init(options);
@@ -177,7 +192,7 @@ export default class MenuBar extends Widget {
     this.setProperty('menuItems', menuItems);
   }
 
-  _setMenuItems(menuItems, rightFirst) {
+  _setMenuItems(menuItems, rightFirst?) {
     // remove property listeners of old menu items.
     this._detachMenuHandlers();
     this.orderedMenuItems = this._createOrderedMenus(menuItems);
@@ -310,7 +325,7 @@ export default class MenuBar extends Widget {
    *
    * @param {boolean} hiddenByUi
    */
-  setHiddenByUi(hiddenByUi) {
+  setHiddenByUi(hiddenByUi: boolean) {
     this.setProperty('hiddenByUi', hiddenByUi);
   }
 
@@ -327,7 +342,7 @@ export default class MenuBar extends Widget {
    *
    * @param {boolean} [updateTabbableMenu] if true (default), the "tabbable menu" is updated at the end of this method.
    */
-  updateDefaultMenu(updateTabbableMenu) {
+  updateDefaultMenu(updateTabbableMenu?: boolean) {
     let defaultMenu = null;
     for (let i = 0; i < this.orderedMenuItems.all.length; i++) {
       let item = this.orderedMenuItems.all[i];
@@ -443,7 +458,7 @@ export default class MenuBar extends Widget {
     this.setTabbableMenu(event.source);
   }
 
-  reorderMenus(rightFirst) {
+  reorderMenus(rightFirst?) {
     let menuItems = this.menuItems;
     this._setMenuItems(menuItems, rightFirst);
     if (this.rendered) {
@@ -459,5 +474,4 @@ export default class MenuBar extends Widget {
       return [item];
     });
   }
-
 }

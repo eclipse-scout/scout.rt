@@ -11,6 +11,11 @@
 import {Action, Button, Menu} from '../index';
 
 export default class ButtonAdapterMenu extends Menu {
+  _buttonDestroyHandler: any;
+  _buttonPropertyChangeHandler: any;
+  button: any;
+  childActions: any;
+  menubar: any;
   constructor() {
     super();
     this._removeWidgetProperties('childActions'); // managed by button
@@ -109,7 +114,7 @@ export default class ButtonAdapterMenu extends Menu {
   /**
    * @memberOf ButtonAdapterMenu
    */
-  static adaptButtonProperties(buttonProperties, menuProperties) {
+  static adaptButtonProperties(buttonProperties, menuProperties?) {
     menuProperties = menuProperties || {};
 
     // Plain properties: simply copy, no translation required

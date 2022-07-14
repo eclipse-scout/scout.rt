@@ -435,8 +435,8 @@ export function uninstall($container, session) {
 
 /**
  * Recalculates the scrollbar size and position.
- * @param $scrollable JQuery element that has .data('scrollbars'), when $scrollable is falsy the function returns immediately
- * @param immediate set to true to immediately update the scrollbar, If set to false,
+ * @param $scrollable {JQuery} JQuery element that has .data('scrollbars'), when $scrollable is falsy the function returns immediately
+ * @param [immediate] set to true to immediately update the scrollbar, If set to false,
  *        it will be queued in order to prevent unnecessary updates.
  */
 export function update($scrollable, immediate) {

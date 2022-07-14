@@ -11,6 +11,7 @@
 import {HAlign, keys, MenuNavigationExecKeyStroke, menuNavigationKeyStrokes} from '../index';
 
 export default class MenuExecByNumberKeyStroke extends MenuNavigationExecKeyStroke {
+  _menuItemClass: any;
 
   constructor(popup, menuItemClass) {
     super(popup, menuItemClass);

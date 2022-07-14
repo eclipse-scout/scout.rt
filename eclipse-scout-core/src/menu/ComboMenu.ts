@@ -11,6 +11,9 @@
 import {HtmlComponent, Menu, widgets} from '../index';
 
 export default class ComboMenu extends Menu {
+  _childVisibleChangeHandler: any;
+  childActions: any;
+  uiCssClass: any;
 
   constructor() {
     super();

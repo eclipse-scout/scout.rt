@@ -512,11 +512,6 @@ $.fn.nvl = function($element) {
   return $element;
 };
 
-/**
- * @param element string. Example = &lt;input&gt;
- * @param cssClass (optional) class attribute
- * @param text (optional) adds a child text-node with given text (no HTML content)
- */
 $.fn.makeElement = function(element, cssClass, text) {
   let myDocument = this.document(true);
   if (myDocument === undefined || element === undefined) {
@@ -532,12 +527,6 @@ $.fn.makeElement = function(element, cssClass, text) {
   return $element;
 };
 
-/**
- * Creates a DIV element in the current document.
- *
- * @param cssClass (optional) string added to the 'class' attribute
- * @param text (optional) string used as inner text
- */
 $.fn.makeDiv = function(cssClass, text) {
   return this.makeElement('<div>', cssClass, text);
 };
@@ -1129,15 +1118,15 @@ $.fn.cssTopAnimated = function(from, to, opts) {
   return this;
 };
 
-$.fn.cssAnimated = function(fromVals, toVals, opts) {
+$.fn.cssAnimated = function(fromValues, toValues, opts) {
   opts = opts || {};
   opts.duration = scout.nvl(opts.duration, 300);
 
   // Reset to from first
-  this.css(fromVals);
+  this.css(fromValues);
 
   // Then animate to new pos
-  this.animate(toVals, opts);
+  this.animate(toValues, opts);
   return this;
 };
 

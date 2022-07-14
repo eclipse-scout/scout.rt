@@ -47,7 +47,7 @@ import * as $ from 'jquery';
  *
  * @param $elem
  *          the jQuery element to measure
- * @param options
+ * @param [options]
  *          an optional options object (see table above). Short-hand version: If a boolean is passed instead
  *          of an object, the value is automatically converted to the option "includeMargin".
  */
@@ -356,7 +356,7 @@ export function location($comp) {
  *
  * @param $elem
  *          the jQuery element to measure
- * @param options
+ * @param [options]
  *          an optional options object (see table above). Short-hand version: If a boolean is passed instead
  *          of an object, the value is automatically converted to the option "includeMargin".
  */

@@ -11,6 +11,7 @@
 import {keys, MenuNavigationKeyStroke, menuNavigationKeyStrokes} from '../index';
 
 export default class MenuNavigationExecKeyStroke extends MenuNavigationKeyStroke {
+  _menuItemClass: any;
 
   constructor(popup, menuItemClass) {
     super(popup);

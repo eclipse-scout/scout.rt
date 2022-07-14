@@ -11,6 +11,7 @@
 import {ColumnLayout, GridData, HtmlComponent, LogicalGridData, Menu} from '../../../index';
 
 export default class FormFieldMenu extends Menu {
+  field: any;
 
   constructor() {
     super();
@@ -37,8 +38,8 @@ export default class FormFieldMenu extends Menu {
   /**
    * Override
    */
-  _renderText(text) {
-    super._renderText(text);
+  _renderText() {
+    super._renderText();
     if (this.field && this.field.rendered && this.$text) {
       this.field.$container.insertAfter(this.$text);
     }

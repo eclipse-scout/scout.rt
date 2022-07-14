@@ -8,10 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, ContextMenuPopupLayout, graphics, HtmlComponent, MenuDestinations, menuNavigationKeyStrokes, Popup, Rectangle, RowLayout} from '../index';
+import {Action, arrays, ContextMenuPopupLayout, graphics, HtmlComponent, MenuDestinations, menuNavigationKeyStrokes, Popup, Rectangle, RowLayout, scout} from '../index';
 import * as $ from 'jquery';
 
 export default class ContextMenuPopup extends Popup {
+  $body: any;
+  _toggleSubMenuQueue: any;
+  animationDuration: any;
+  bodyAnimating: any;
+  cloneMenuItems: any;
+  initialSubMenusToRender: any;
+  menuFilter: any;
+  menuItems: any;
 
   constructor() {
     super();
@@ -78,7 +86,7 @@ export default class ContextMenuPopup extends Popup {
     htmlBody.setLayout(this._createBodyLayout());
   }
 
-  _installScrollbars(options) {
+  _installScrollbars(options?) {
     super._installScrollbars({
       axis: 'y',
       scrollShadow: 'none'
@@ -217,7 +225,7 @@ export default class ContextMenuPopup extends Popup {
     return true;
   }
 
-  renderSubMenuItems(parentMenu, menus, animated, initialSubMenuRendering) {
+  renderSubMenuItems(parentMenu, menus, animated?, initialSubMenuRendering?) {
     if (!this._checkRenderSubMenuItemsPossible(parentMenu, menus, animated, initialSubMenuRendering)) {
       return false;
     }
@@ -337,7 +345,7 @@ export default class ContextMenuPopup extends Popup {
       .cssHeightAnimated(popupBounds.height, targetBounds.height, options);
   }
 
-  _animateTextOffset($body, textOffset, targetOffset) {
+  _animateTextOffset($body, textOffset, targetOffset?) {
     targetOffset = scout.nvl(targetOffset, this.$body.data('text-offset'));
     let $menuItems = this.$visibleMenuItems($body);
     $menuItems.each((index, menuItem) => {
@@ -349,7 +357,7 @@ export default class ContextMenuPopup extends Popup {
     });
   }
 
-  _renderMenuItems(menus, initialSubMenuRendering) {
+  _renderMenuItems(menus?, initialSubMenuRendering?) {
     menus = menus ? menus : this._getMenuItems();
     if (this.menuFilter) {
       menus = this.menuFilter(menus, MenuDestinations.CONTEXT_MENU);
@@ -457,7 +465,7 @@ export default class ContextMenuPopup extends Popup {
     return this.$body.children('.menu-item');
   }
 
-  $visibleMenuItems($body) {
+  $visibleMenuItems($body?) {
     $body = $body || this.$body;
     return $body.children('.menu-item:visible');
   }
@@ -466,7 +474,7 @@ export default class ContextMenuPopup extends Popup {
    * Updates the first and last visible menu items with the according css classes.
    * Necessary because invisible menu-items are rendered.
    */
-  _updateFirstLastClass(event) {
+  _updateFirstLastClass() {
     let $firstMenuItem, $lastMenuItem;
 
     this.$body.children('.menu-item').each(function() {
@@ -488,7 +496,7 @@ export default class ContextMenuPopup extends Popup {
     }
   }
 
-  updateNextToSelected(menuItemClass, $selectedItem) {
+  updateNextToSelected(menuItemClass?, $selectedItem?) {
     menuItemClass = menuItemClass ? menuItemClass : 'menu-item';
     let $all = this.$body.find('.' + menuItemClass);
     $selectedItem = $selectedItem ? $selectedItem : this.$body.find('.' + menuItemClass + '.selected');
@@ -532,7 +540,7 @@ export default class ContextMenuPopup extends Popup {
     }, this);
   }
 
-  _adjustTextAlignment($body) {
+  _adjustTextAlignment($body?) {
     $body = $body || this.$body;
     let $menuItems = this.$visibleMenuItems($body);
     let textOffset = this._calcTextOffset($menuItems);

@@ -11,6 +11,7 @@
 import {AbstractLayout, Dimension} from '../../index';
 
 export default class MenuBarBoxLayout extends AbstractLayout {
+  menubox: any;
 
   constructor(menubox) {
     super();

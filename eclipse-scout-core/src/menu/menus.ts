@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, MenuDestinations, scout} from '../index';
+import {arrays, EllipsisMenu, MenuDestinations, scout} from '../index';
 
 export function filterAccordingToSelection(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
   let allowedTypes = [];
@@ -46,7 +46,7 @@ export function filterAccordingToSelection(prefix, selectionLength, menus, desti
  * menu-bar DOM (invisible, however). They may change their visible state later. If there are any types in notAllowedTypes each menu is checked also against
  * these types and if they are matching the menu is filtered.
  */
-export function filter(menus, types, onlyVisible, enableDisableKeyStrokes, notAllowedTypes) {
+export function filter(menus, types, onlyVisible?, enableDisableKeyStrokes?, notAllowedTypes?) {
   if (!menus) {
     return;
   }
@@ -162,7 +162,7 @@ export function _checkType(menu, types) {
 }
 
 export function createEllipsisMenu(options) {
-  return scout.create('EllipsisMenu', options);
+  return scout.create(EllipsisMenu, options);
 }
 
 export function moveMenuIntoEllipsis(menu, ellipsis) {

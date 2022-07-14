@@ -1,9 +1,40 @@
 import {IconDesc} from '../index';
+import * as $ from "jquery";
 
 declare global {
 
   interface JQuery {
+    nvl($element: JQuery);
+
+    /**
+     * Creates a new HTMLElement based on the given html snippet and creates a new JQuery object.
+     * The element is created using the current document.
+     *
+     * @param element HTML snippet, example = &lt;input&gt;
+     * @param cssClass class attribute
+     * @param text adds a child text-node with given text (no HTML content)
+     */
+    makeElement(element: string, cssClass?: string, text?: string);
+
+    /**
+     * Creates a new DIV element using the current document.
+     *
+     * @param cssClass string added to the 'class' attribute
+     * @param text string used as inner text
+     */
+    makeDiv(cssClass?: string, text?: string);
+
+    /**
+     * Creates a new SPAN element using the current document.
+     *
+     * @param cssClass string added to the 'class' attribute
+     * @param text string used as inner text
+     */
+    makeSpan(cssClass?: string, text?: string);
+
     oneAnimationEnd(handler: () => void): JQuery;
+
+    cssAnimated(fromValues, toValues, opts);
 
     appendDiv(cssClass?: string, text?: string): JQuery;
 
@@ -33,7 +64,9 @@ declare global {
 
     addDeviceClass(): void;
 
-    setTabbable(tabbable: boolean)
+    setTabbable(tabbable: boolean);
+
+    unfocusable();
   }
 
   interface JQueryStatic {
