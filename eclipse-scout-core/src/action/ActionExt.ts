@@ -3,13 +3,15 @@ import {Action, Form, GroupBox, Icon, icons, KeyStrokeFirePolicyExt, Menu, scout
 import {ActionStyleEnum, EnumObject, EnumType, IActionStyle} from './Action';
 import {ActionModel} from './ActionModel';
 import {ActionExtModel} from './ActionExtModel';
+import TableMenuType from '../table/TableMenuType';
+import MenuModel from '../menu/MenuModel';
 
 enum ActionStyleEnumExt {
   NEW_STYLE = 10
 }
 
 interface IActionStyleExt extends IActionStyle {
-  NEW_STYLE: 10
+  NEW_STYLE: 10;
 }
 
 export type ActionStyleExt = EnumObject<typeof ActionExt.ActionStyle>;
@@ -56,7 +58,7 @@ export default class ActionExt extends Action {
     NEW_POSITION: 'abc'
   } as const;
 
-  static ActionStyleVar:IActionStyleExt = {
+  static ActionStyleVar: IActionStyleExt = {
     NEW_STYLE: 10,
     DEFAULT: 0,
     BUTTON: 1
@@ -115,6 +117,26 @@ export default class ActionExt extends Action {
     let actionExt = scout.create(ActionExt, {
       parent: this,
       actionStyle: ActionExt.ActionStyle.NEW_POSITION
+    });
+
+    let menu2 = scout.create(Menu, {
+      parent: this,
+      text: 'Other menu'
+    });
+
+    let icon = scout.create(Icon, {
+      parent: this,
+      iconDesc: icons.AVG
+    });
+
+    let menu = scout.create(Menu, {
+      parent: this,
+      menuTypes: [TableMenuType.SingleSelection],
+      childActions: [
+        menu2, {
+          objectType: Menu
+        }
+      ]
     });
   }
 }

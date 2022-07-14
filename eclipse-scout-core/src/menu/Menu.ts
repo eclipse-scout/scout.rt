@@ -9,8 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Action, arrays, ContextMenuPopup, Event, HtmlComponent, icons, MenuExecKeyStroke, MenuKeyStroke, scout, strings, tooltips, TreeVisitResult} from '../index';
+import MenuModel from './MenuModel';
 
-export default class Menu extends Action {
+export default class Menu extends Action implements MenuModel {
   constructor() {
     super();
 
@@ -72,6 +73,8 @@ export default class Menu extends Action {
     NEVER: 'never'
   };
 
+  model: MenuModel;
+  objectType: string | { new(): Menu };
   $subMenuBody: any;
   $submenuIcon: any;
   childActions: any;
@@ -79,7 +82,7 @@ export default class Menu extends Action {
   excludedByFilter: any;
   menuFilter: any;
   menuStyle: any;
-  menuTypes: any;
+  menuTypes: string[];
   overflowMenu: any;
   overflown: any;
   parentMenu: any;

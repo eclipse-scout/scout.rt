@@ -18,7 +18,7 @@ import {EventTypeModel} from '../util/EventMap';
 export type WidgetEventType = 'init' | 'render' | 'remove' | 'removing' | 'destroy' | `propertyChange:${Exclude<keyof WidgetModel, WidgetPropertyChangeExclude>}`;
 export type WidgetPropertyChangeExclude = 'owner' | 'objectType';
 
-export default class Widget extends EventEmitter {
+export default class Widget extends EventEmitter implements WidgetModel {
   readonly model: WidgetModel;
   $container: JQuery;
   $parent: JQuery;
@@ -57,7 +57,7 @@ export default class Widget extends EventEmitter {
   loading: boolean;
   loadingSupport: any;
   logicalGrid: any;
-  objectType: any;
+  objectType: string | { new(): Widget };
   owner: Widget;
   parent: Widget;
   removalPending: boolean;
