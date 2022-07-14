@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.nls;
 
 import java.util.Locale;
 
+import org.eclipse.scout.rt.platform.text.NlsKey;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public class DefaultTextPostProcessor implements ITextPostProcessor {
@@ -19,7 +20,7 @@ public class DefaultTextPostProcessor implements ITextPostProcessor {
   protected static final Locale DE_CH = new Locale("de", "CH");
 
   @Override
-  public String apply(Locale textLocale, String text) {
+  public String apply(Locale textLocale, @NlsKey String textKey, String text, String... messageArguments) {
     if (textLocale == null || StringUtility.isNullOrEmpty(text)) {
       return text;
     }
