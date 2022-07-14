@@ -38,7 +38,7 @@ public interface ITextProviderService extends IService {
    *          <li>getText("MissingFile3", fileName, dir); with MissingFile3="The File {0} in Folder {1} could not be
    *          found."</li>
    *          </ul>
-   * @return
+   * @return the resolved, translated text
    */
   String getText(Locale locale, @NlsKey String key, String... messageArguments);
 
