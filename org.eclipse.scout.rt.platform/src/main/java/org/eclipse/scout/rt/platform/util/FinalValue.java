@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.util;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -124,5 +125,13 @@ public class FinalValue<VALUE> {
    */
   public boolean isSet() {
     return m_value.get() != NULL_VALUE;
+  }
+
+  @SuppressWarnings("unchecked")
+  public void ifSet(Consumer<? super VALUE> action) {
+    Object value = m_value.get();
+    if (value != NULL_VALUE) {
+      action.accept((VALUE) value);
+    }
   }
 }

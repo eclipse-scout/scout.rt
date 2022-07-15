@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class FinalValueTest {
   }
 
   @Test
-  public void testDupplicateSet() {
+  public void testDuplicateSet() {
     FinalValue<String> s = new FinalValue<>();
     s.set(TEST_VALUE);
     try {
@@ -102,6 +103,20 @@ public class FinalValueTest {
     FinalValue<String> s = new FinalValue<>();
     s.setIfAbsentAndGet((String) null);
     Assert.assertNull(s.setIfAbsentAndGet("should not matter"));
+  }
+
+  @Test
+  public void testIfSet() {
+    BooleanHolder hasBeenCalled = new BooleanHolder(false);
+    FinalValue<String> s = new FinalValue<>();
+
+    assertFalse(hasBeenCalled.getValue());
+    s.ifSet(x -> hasBeenCalled.setValue(true));
+    assertFalse(hasBeenCalled.getValue());
+
+    s.set("42");
+    s.ifSet(x -> hasBeenCalled.setValue(true));
+    assertTrue(hasBeenCalled.getValue());
   }
 
   @Test(timeout = 2000)
