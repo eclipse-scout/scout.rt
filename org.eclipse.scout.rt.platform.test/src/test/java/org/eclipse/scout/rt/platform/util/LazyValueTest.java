@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.junit.Test;
 
 /**
@@ -104,5 +105,19 @@ public class LazyValueTest {
 
   private class P_MyRuntimException extends RuntimeException {
     private static final long serialVersionUID = 1L;
+  }
+
+  @Test
+  public void testIfSet() {
+    BooleanHolder hasBeenCalled = new BooleanHolder(false);
+    LazyValue<String> s = new LazyValue<>(() -> "42");
+
+    assertFalse(hasBeenCalled.getValue());
+    s.ifSet(x -> hasBeenCalled.setValue(true));
+    assertFalse(hasBeenCalled.getValue());
+
+    assertNotNull(s.get());
+    s.ifSet(x -> hasBeenCalled.setValue(true));
+    assertTrue(hasBeenCalled.getValue());
   }
 }

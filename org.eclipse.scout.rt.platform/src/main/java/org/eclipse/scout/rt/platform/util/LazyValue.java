@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.util;
 
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.platform.BEANS;
 
@@ -60,5 +61,9 @@ public class LazyValue<T> {
 
   public boolean isSet() {
     return m_value.isSet();
+  }
+
+  public void ifSet(Consumer<? super T> action) {
+    m_value.ifSet(action);
   }
 }
