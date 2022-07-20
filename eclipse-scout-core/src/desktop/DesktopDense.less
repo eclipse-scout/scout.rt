@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -50,7 +50,8 @@
 
   .menubar:not(.main-menubar) {
     & > .menubar-box {
-      & > .menu-item {
+      & > .menu-item,
+      & > .combo-menu > .menu-item {
         padding-top: 3px; /* @menubar-item-padding-y; */
         padding-bottom: 3px; /* @menubar-item-padding-y; */
 
@@ -58,9 +59,21 @@
         min-height: @logical-grid-row-height-dense; /* @logical-grid-row-height; */
       }
 
-      & > .menu-button {
+      & > .menu-button,
+      & > .combo-menu > .menu-button {
         padding-top: 2px;
         padding-bottom: 2px;
+      }
+
+      & > .combo-menu {
+        padding: 0;
+      }
+
+      & > .form-field-menu {
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
       }
     }
   }
@@ -155,13 +168,17 @@
     }
   }
 
-
   /* ContextMenuPopup.less */
 
   .context-menu {
-    & > .menu-item {
+    & > .menu-item,
+    & > .combo-menu > .menu-item {
       padding-top: 6px; /* padding: 11px 15px; */
       padding-bottom: 6px;
+    }
+
+    & > .combo-menu {
+      padding: 0;
     }
   }
 
@@ -279,6 +296,7 @@
   }
 
   /* BreadcrumbItem.less */
+
   .breadcrumb-item {
     font-size: @font-size-normal;
   }
