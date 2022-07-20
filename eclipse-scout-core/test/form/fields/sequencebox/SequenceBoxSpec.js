@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, scout, SequenceBoxGridConfig, Status} from '../../../../src/index';
+import {dates, FormField, scout, SequenceBoxGridConfig, Status} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '../../../../src/testing/index';
 
 describe('SequenceBox', () => {
@@ -84,6 +84,38 @@ describe('SequenceBox', () => {
       expect(field.errorStatus.message).toBe('foo');
       expect(field.fields[1].$status.isVisible()).toBe(false);
       expect(field.fields[1].errorStatus.message).toBe('foo');
+    });
+
+    it('suppressStatus of the last field does not change', () => {
+      let field = createField({
+        statusVisible: false
+      });
+      field.render();
+
+      let innerField0 = field.fields[0],
+        innerField1 = field.fields[1];
+
+      expect(innerField0.suppressStatus).toBeNull();
+      innerField0.setSuppressStatus(FormField.SuppressStatus.ALL);
+      expect(innerField0.suppressStatus).toBe(FormField.SuppressStatus.ALL);
+      innerField0.setSuppressStatus(null);
+      expect(innerField0.suppressStatus).toBeNull();
+
+      innerField1.setVisible(false);
+
+      expect(innerField0.suppressStatus).toBe(FormField.SuppressStatus.ICON);
+      innerField0.setSuppressStatus(FormField.SuppressStatus.ALL);
+      expect(innerField0.suppressStatus).toBe(FormField.SuppressStatus.ICON);
+      innerField0.setSuppressStatus(null);
+      expect(innerField0.suppressStatus).toBe(FormField.SuppressStatus.ICON);
+
+      innerField1.setVisible(true);
+
+      expect(innerField0.suppressStatus).toBeNull();
+      innerField0.setSuppressStatus(FormField.SuppressStatus.ALL);
+      expect(innerField0.suppressStatus).toBe(FormField.SuppressStatus.ALL);
+      innerField0.setSuppressStatus(null);
+      expect(innerField0.suppressStatus).toBeNull();
     });
 
     it('moves the tooltip of the last field to the seq box', () => {
