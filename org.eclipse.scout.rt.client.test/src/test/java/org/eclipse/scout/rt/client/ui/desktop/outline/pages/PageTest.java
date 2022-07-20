@@ -169,8 +169,8 @@ public class PageTest {
       super();
     }
 
-    public P_Outline(boolean callInitialzier) {
-      super(callInitialzier);
+    public P_Outline(boolean callInitializer) {
+      super(callInitializer);
     }
 
     public static P_Outline createMock() {
