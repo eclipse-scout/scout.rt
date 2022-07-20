@@ -100,8 +100,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     super();
   }
 
-  public AbstractOutline(boolean callInitialzier) {
-    super(callInitialzier);
+  public AbstractOutline(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override
@@ -150,9 +150,10 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * Configures the default detail form to be used with this page. The form is shown when no page is selected.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
+   * <p>
+   * See {@link #startDefaultDetailForm()} for details on how the form gets started.
    *
    * @return a form type token
-   * @see {@link #startDefaultDetailForm()} for details how the form gets started
    */
   @ConfigProperty(ConfigProperty.FORM)
   @Order(130)
@@ -370,7 +371,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   public void refreshPages(final List<Class<? extends IPage<?>>> pageTypes) {
     final List<IPage<?>> candidates = new ArrayList<>();
-    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
       @Override
       public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
         IPage<?> page = (IPage) element;
@@ -403,7 +404,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       }
     }
     preservationSet.add(getRootNode());
-    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
       @Override
       public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
         IPage<?> page = (IPage) element;
@@ -454,7 +455,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   public <T extends IPage> T findPage(final Class<T> pageType, IPage rootPage) {
     final Holder<T> result = new Holder<>(pageType, null);
-    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
       @Override
       @SuppressWarnings("unchecked")
       public TreeVisitResult preVisit(ITreeNode element, int level, int index) {
