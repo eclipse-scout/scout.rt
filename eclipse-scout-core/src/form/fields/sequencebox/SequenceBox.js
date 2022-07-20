@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,8 @@ export default class SequenceBox extends CompositeField {
     this.logicalGrid = scout.create('scout.HorizontalGrid');
     this.layoutConfig = null;
     this.fields = [];
+    this._fieldPropertyChangeHandler = this._onFieldPropertyChange.bind(this);
+    this._lastVisibleFieldSuppressStatusHandler = this._onLastVisibleFieldSuppressStatusChange.bind(this);
   }
 
   _init(model) {
@@ -65,7 +67,7 @@ export default class SequenceBox extends CompositeField {
     for (i = 0; i < this.fields.length; i++) {
       field = this.fields[i];
       field.labelUseUiWidth = true;
-      field.on('propertyChange', this._onFieldPropertyChange.bind(this));
+      field.on('propertyChange', this._fieldPropertyChangeHandler);
       field.render(this.$field);
       this._modifyLabel(field);
 
@@ -81,6 +83,12 @@ export default class SequenceBox extends CompositeField {
 
   _createBodyLayout() {
     return new SequenceBoxLayout(this, this.layoutConfig);
+  }
+
+  _remove() {
+    this.fields.forEach(f => f.off('propertyChange', this._fieldPropertyChangeHandler));
+    this._lastVisibleField.off('propertyChange:suppressStatus', this._lastVisibleFieldSuppressStatusHandler);
+    super._remove();
   }
 
   /**
@@ -137,6 +145,7 @@ export default class SequenceBox extends CompositeField {
   _handleStatus(visibilityChanged) {
     if (visibilityChanged && this._lastVisibleField) {
       // if there is a new last visible field, make sure the status is shown on the previously last one
+      this._lastVisibleField.off('propertyChange:suppressStatus', this._lastVisibleFieldSuppressStatusHandler);
       this._lastVisibleField.setSuppressStatus(null);
       if (this._lastVisibleField.rendered) {
         this._lastVisibleField._renderErrorStatus();
@@ -183,6 +192,7 @@ export default class SequenceBox extends CompositeField {
 
     // Make sure the last field won't display a status (but shows status CSS class)
     this._lastVisibleField.setSuppressStatus(FormField.SuppressStatus.ICON);
+    this._lastVisibleField.on('propertyChange:suppressStatus', this._lastVisibleFieldSuppressStatusHandler);
     if (visibilityChanged) {
       // If the last field got invisible, make sure the new last field does not display a status anymore (now done by the seq box)
       if (this._lastVisibleField.rendered) {
@@ -191,6 +201,11 @@ export default class SequenceBox extends CompositeField {
         this._lastVisibleField._renderMenus();
       }
     }
+  }
+
+  _onLastVisibleFieldSuppressStatusChange(e) {
+    // do not change suppressStatus
+    e.preventDefault();
   }
 
   setErrorStatus(errorStatus) {
