@@ -12,6 +12,10 @@ import {objects, strings} from '../index';
 
 /**
  * Ensures the given parameter is an array
+ *
+ * @template T
+ * @param {T[]|T|null} array
+ * @return T[]
  */
 export function ensure(array) {
   if (array === undefined || array === null) {
