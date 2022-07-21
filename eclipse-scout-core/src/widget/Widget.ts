@@ -33,8 +33,8 @@ export default class Widget extends EventEmitter implements WidgetModel {
   _rendered: any;
   _scrollHandler: any;
   _storedFocusedWidget: any;
-  _widgetProperties: string[];
   _modelProperties: string[];
+  _widgetProperties: string[];
   animateRemoval: boolean;
   animateRemovalClass: any;
   attached: boolean;
@@ -147,8 +147,10 @@ export default class Widget extends EventEmitter implements WidgetModel {
     this.animateRemoval = false;
     this.animateRemovalClass = 'animate-remove';
 
-    this._modelProperties = [];
-    this._widgetProperties = [];
+    // TODO CGU @WidgetProperty would create them, could be removed if widget uses annotation by itself
+    this._widgetProperties = this._widgetProperties || [];
+    this._modelProperties = this._modelProperties || [];
+
     this._cloneProperties = ['visible', 'enabled', 'inheritAccessibility', 'cssClass'];
     this.eventDelegators = [];
     this._preserveOnPropertyChangeProperties = [];

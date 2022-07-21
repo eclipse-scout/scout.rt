@@ -10,7 +10,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "declarationMap": true,
-    "lib": ["dom", "ES6"]
+    "lib": ["dom", "ES6"],
+    "experimentalDecorators": true
   },
   "include": ["./src/**/*"]
 }

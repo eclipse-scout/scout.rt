@@ -13,7 +13,7 @@ const scoutBuildConstants = require('./constants');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
-const { SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin } = require('webpack');
+const {SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('webpack');
 
 /**
  * @param {string} args.mode development or production
@@ -42,19 +42,22 @@ module.exports = (env, args) => {
   }
 
   const babelOptions = {
-      compact: false,
-      cacheDirectory: true,
-      cacheCompression: false,
-      presets: [
-        [require.resolve('@babel/preset-env'), {
-          debug: false,
-          targets: {
-            firefox: '69',
-            chrome: '71',
-            safari: '12.1'
-          }
-        }]
-      ]
+    compact: false,
+    cacheDirectory: true,
+    cacheCompression: false,
+    plugins: [
+      ['@babel/plugin-proposal-decorators', {version: '2021-12'}]
+    ],
+    presets: [
+      [require.resolve('@babel/preset-env'), {
+        debug: false,
+        targets: {
+          firefox: '69',
+          chrome: '71',
+          safari: '12.1'
+        }
+      }]
+    ]
   };
 
   const config = {
@@ -154,17 +157,17 @@ module.exports = (env, args) => {
         test: /\.tsx?$/,
         exclude: /node_modules/,
         use: [{
-            loader: require.resolve('babel-loader'),
-            options: babelOptions
-          },{
-            loader: require.resolve('ts-loader')
-          }]
+          loader: require.resolve('babel-loader'),
+          options: babelOptions
+        }, {
+          loader: require.resolve('ts-loader')
+        }]
       }, {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         use: [{
-            loader: require.resolve('babel-loader'),
-            options: babelOptions
+          loader: require.resolve('babel-loader'),
+          options: babelOptions
         }]
       }, {
         test: /\.jsx?$/,
@@ -189,9 +192,10 @@ module.exports = (env, args) => {
     },
     plugins: [
       new WatchIgnorePlugin({
-        paths:[
+        paths: [
           /\.d\.ts$/
-      ]}),
+        ]
+      }),
       // see: extracts css into separate files
       new MiniCssExtractPlugin({filename: cssFilename}),
       // run post-build script hook
@@ -352,7 +356,7 @@ function nvl(arg, defaultValue) {
 }
 
 function isWarningIgnored(devMode, webpackError) {
-  if(devMode || !webpackError || !webpackError.warning || !webpackError.warning.message) {
+  if (devMode || !webpackError || !webpackError.warning || !webpackError.warning.message) {
     return false;
   }
   return webpackError.warning.message.startsWith('Failed to parse source map');

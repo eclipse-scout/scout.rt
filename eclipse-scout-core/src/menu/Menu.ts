@@ -10,10 +10,12 @@
  */
 import {Action, arrays, ContextMenuPopup, Event, HtmlComponent, icons, MenuExecKeyStroke, MenuKeyStroke, scout, strings, tooltips, TreeVisitResult} from '../index';
 import MenuModel from './MenuModel';
+import WidgetProperty from '../widget/WidgetProperty';
 
 export default class Menu extends Action implements MenuModel {
   model: MenuModel;
   objectType: { new(): Menu };
+  @WidgetProperty
   childActions: Menu[];
   $subMenuBody: any;
   $submenuIcon: any;
@@ -63,7 +65,7 @@ export default class Menu extends Action implements MenuModel {
     this.$submenuIcon = null;
     this.$subMenuBody = null;
     this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator', 'shrinkable', 'parentMenu', 'menuFilter', 'subMenuVisibility']);
-    this._addWidgetProperties('childActions');
+    // this._addWidgetProperties('childActions');
   }
 
   static SUBMENU_ICON = icons.ANGLE_DOWN_BOLD;

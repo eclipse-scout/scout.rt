@@ -144,7 +144,7 @@ export default class ObjectFactory {
     let scoutObject = this._createObjectByType(objectType, options);
     if (objects.isFunction(scoutObject.init)) {
       if (model) {
-        if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
+        if (model.id === undefined && model.ensureUniqueId !== false && scout.nvl(options.ensureUniqueId, true)) {
           model.id = this.createUniqueId();
         }
         // TODO CGU what if objectType is a function? Is it used to clone an obj?
@@ -155,7 +155,7 @@ export default class ObjectFactory {
       scoutObject.init(model);
     }
 
-    if (scoutObject.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
+    if (scoutObject.id === undefined && scoutObject.ensureUniqueId !== false && scout.nvl(options.ensureUniqueId, true)) {
       scoutObject.id = this.createUniqueId();
     }
     if (scoutObject.objectType === undefined) {
