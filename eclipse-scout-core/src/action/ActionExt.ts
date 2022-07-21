@@ -134,9 +134,12 @@ export default class ActionExt extends Action {
       menuTypes: [TableMenuType.SingleSelection],
       childActions: [
         menu2, {
-          objectType: Menu
+          objectType: Menu,
+          text: 'hi there'
         }
       ]
     });
+    console.log(menu.objectType);
+    console.log(menu.childActions);
   }
 }

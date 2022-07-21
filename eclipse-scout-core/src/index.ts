@@ -733,7 +733,7 @@ let windowScout = {jqs, jqss, ...self, ...scout};
 
 declare global {
   interface Window {
-    scout
+    scout;
   }
 }
 

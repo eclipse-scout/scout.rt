@@ -57,7 +57,7 @@ export default class Widget extends EventEmitter implements WidgetModel {
   loading: boolean;
   loadingSupport: any;
   logicalGrid: any;
-  objectType: string | { new(): Widget };
+  objectType: { new(): Widget };
   owner: Widget;
   parent: Widget;
   removalPending: boolean;

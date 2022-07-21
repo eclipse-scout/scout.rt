@@ -12,6 +12,28 @@ import {Action, arrays, ContextMenuPopup, Event, HtmlComponent, icons, MenuExecK
 import MenuModel from './MenuModel';
 
 export default class Menu extends Action implements MenuModel {
+  model: MenuModel;
+  objectType: { new(): Menu };
+  childActions: Menu[];
+  $subMenuBody: any;
+  $submenuIcon: any;
+  defaultMenu: any;
+  excludedByFilter: any;
+  menuFilter: any;
+  menuStyle: any;
+  menuTypes: string[];
+  overflowMenu: any;
+  overflown: any;
+  parentMenu: any;
+  popup: any;
+  popupHorizontalAlignment: any;
+  popupVerticalAlignment: any;
+  separator: any;
+  shrinkable: any;
+  stackable: any;
+  subMenuVisibility: any;
+  uiCssClass: any;
+
   constructor() {
     super();
 
@@ -72,28 +94,6 @@ export default class Menu extends Action implements MenuModel {
      */
     NEVER: 'never'
   };
-
-  model: MenuModel;
-  objectType: string | { new(): Menu };
-  $subMenuBody: any;
-  $submenuIcon: any;
-  childActions: any;
-  defaultMenu: any;
-  excludedByFilter: any;
-  menuFilter: any;
-  menuStyle: any;
-  menuTypes: string[];
-  overflowMenu: any;
-  overflown: any;
-  parentMenu: any;
-  popup: any;
-  popupHorizontalAlignment: any;
-  popupVerticalAlignment: any;
-  separator: any;
-  shrinkable: any;
-  stackable: any;
-  subMenuVisibility: any;
-  uiCssClass: any;
 
   _init(options) {
     super._init(options);

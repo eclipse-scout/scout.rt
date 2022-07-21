@@ -54,6 +54,7 @@ export type ActionTextPosition = typeof Action.TextPosition[ActionTextPositionKe
 
 export default class Action extends Widget implements ActionModel {
   model: ActionModel;
+  objectType: { new(): Action };
   $text: JQuery;
   _doubleClickSupport: DoubleClickSupport;
   actionKeyStroke: KeyStroke;

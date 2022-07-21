@@ -12,8 +12,9 @@ export interface HierarchyChangeEvent extends WidgetEvent {
 }
 
 export interface WidgetEventMap extends EventMap{
-  'render': WidgetEvent,
-  'remove': WidgetEvent,
-  'hierarchyChange': HierarchyChangeEvent,
-  'propertyChange:enabled': PropertyChangeEvent<Widget, boolean>
+  'render': WidgetEvent;
+  'remove': WidgetEvent;
+  'hierarchyChange': HierarchyChangeEvent;
+  'propertyChange': PropertyChangeEvent<Widget, any>;
+  'propertyChange:enabled': PropertyChangeEvent<Widget, boolean>;
 }
