@@ -159,6 +159,8 @@ export default class Column {
 
       // value may be set but may have the wrong type (e.g. text instead of date) -> ensure type
       cell.value = this._parseValue(cell.value);
+    } else if (objects.isPlainObject(vararg) && vararg.objectType === 'Cell') {
+      cell = scout.create(vararg);
     } else {
       // in this case 'vararg' is only a scalar value, typically a string
       cell = scout.create('Cell', {

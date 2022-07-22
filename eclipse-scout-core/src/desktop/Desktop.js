@@ -972,6 +972,7 @@ export default class Desktop extends Widget {
    * === Method required for objects that act as 'displayParent' ===
    *
    * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box, file-chooser or wait-dialog is showed with the Desktop as its 'displayParent'.
+   * @returns JQuery<HTMLElement>[]|HTMLElement[]
    */
   _glassPaneTargets(element) {
     // Do not return $container, because this is the parent of all forms and message boxes. Otherwise, no form could gain focus, even the form requested desktop modality.
@@ -1547,5 +1548,10 @@ export default class Desktop extends Widget {
     let $target = $(event.target);
     let focusedElement = scout.widget($target);
     this.setProperty('focusedElement', focusedElement);
+  }
+
+  storeInSessionStorage() {
+    let model = this.extractModel();
+    webstorage.setItemToSessionStorage('desktop', JSON.stringify(model));
   }
 }

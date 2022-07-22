@@ -39,6 +39,7 @@ export default class App {
     this.initialized = false;
     this.sessions = [];
     this._loadingTimeoutId = null;
+    this.stateRestored = false;
 
     // register the listeners which were added to scout before the app is created
     listeners.forEach(function(listener) {
@@ -434,6 +435,18 @@ export default class App {
   }
 
   _createDesktop(parent) {
+    let desktop = webstorage.getItemFromSessionStorage('desktop');
+    if (desktop) {
+      ObjectFactory.get().uniqueIdSeqNo = 1000; // TODO CGU Don't conflict with ids from model. Maybe auto generated model ids should be renamed on export
+      let model = JSON.parse(desktop);
+      let selectedNodes = model.outline.selectedNodes;
+      model.outline.selectedNodes = [];
+      model.parent = parent;
+      this.stateRestored = true;
+      desktop = scout.create(model);
+      desktop.outline.selectNodes(desktop.outline._nodesByIds((selectedNodes))); // TODO CGU workaround because tree._setSelectedNodes is not called initially -> detailTable is null
+      return desktop;
+    }
     return scout.create('Desktop', {
       parent: parent
     });

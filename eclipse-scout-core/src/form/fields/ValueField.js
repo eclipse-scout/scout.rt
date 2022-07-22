@@ -32,7 +32,7 @@ export default class ValueField extends FormField {
 
     this.$clearIcon = null;
 
-    this._addCloneProperties(['value', 'displayText', 'clearable']);
+    this._addCloneProperties(['initialValue', 'value', 'displayText', 'clearable']);
   }
 
   static Clearable = {

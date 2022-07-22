@@ -8,7 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DeferredGlassPaneTarget, Desktop, Device, Event, EventDelegator, filters, focusUtils, Form, graphics, icons, inspector, objects, scout, scrollbars, Session, strings, texts, TreeVisitResult} from '../index';
+import {
+  arrays,
+  DeferredGlassPaneTarget,
+  Desktop,
+  Device,
+  Event,
+  EventDelegator,
+  filters,
+  focusUtils,
+  Form,
+  graphics,
+  icons,
+  inspector,
+  Menu,
+  objects, Page,
+  scout,
+  scrollbars,
+  Session,
+  strings,
+  Table,
+  texts,
+  Tree,
+  TreeVisitResult
+} from '../index';
 import WidgetModel from './WidgetModel';
 import * as $ from 'jquery';
 import {WidgetEventMap} from './WidgetEventMap';
@@ -150,7 +173,6 @@ export default class Widget extends EventEmitter implements WidgetModel {
     // TODO CGU @WidgetProperty would create them, could be removed if widget uses annotation by itself
     this._widgetProperties = this._widgetProperties || [];
     this._modelProperties = this._modelProperties || [];
-
     this._cloneProperties = ['visible', 'enabled', 'inheritAccessibility', 'cssClass'];
     this.eventDelegators = [];
     this._preserveOnPropertyChangeProperties = [];
@@ -189,9 +211,11 @@ export default class Widget extends EventEmitter implements WidgetModel {
    * Calls {@link Widget#_init} and triggers an <em>init</em> event when initialization has been completed.
    */
   init(model: WidgetModel) {
-    let staticModel = this._jsonModel();
-    if (staticModel) {
-      model = $.extend({}, staticModel, model);
+    if (model.loadJsonModel !== false) {
+      let staticModel = this._jsonModel();
+      if (staticModel) {
+        model = $.extend({}, staticModel, model);
+      }
     }
     // @ts-ignore
     model = model || {};
@@ -1602,7 +1626,7 @@ export default class Widget extends EventEmitter implements WidgetModel {
    * If the widget is not rendered yet, a scout.DeferredGlassPaneTarget is returned.<br>
    * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
    * @param {Widget} element widget that requested a glass pane
-   * @returns [$]|[DeferredGlassPaneTarget]
+   * @returns [JQuery]|[DeferredGlassPaneTarget]
    */
   glassPaneTargets(element: Widget) {
     let resolveGlassPanes = element => {
@@ -1626,9 +1650,8 @@ export default class Widget extends EventEmitter implements WidgetModel {
   /**
    *
    * @param {Widget} element widget that requested a glass pane
-   * @returns [$]
    */
-  _glassPaneTargets(element: Widget) {
+  _glassPaneTargets(element: Widget): JQuery<HTMLElement>[] | HTMLElement[] {
     // since popups are rendered outside the DOM of the widget parent-child hierarchy, get glassPaneTargets of popups belonging to this widget separately.
     return [this.$container].concat(
       this.session.desktop.getPopupsFor(this)
@@ -2378,6 +2401,101 @@ export default class Widget extends EventEmitter implements WidgetModel {
         }
       }
     }
+  }
+
+  extractModel() {
+    let extractChildWidget = (childWidget, property) => {
+      if (this._preserveOnPropertyChangeProperties.includes(property)) {
+        return childWidget.id;
+      }
+      return childWidget.extractModel();
+    };
+
+    let resolveObjectType = objectType => {
+      if (typeof objectType !== 'function') {
+        return objectType;
+      }
+      let className = objectType.name;
+      if (window.scout[className]) {
+        return className;
+      }
+      // TODO CGU modules would have to register their namespaces for reverse lookup
+      // @ts-ignore
+      if (window.js[className]) {
+        // @ts-ignore
+        return 'js.' + className;
+      }
+      new Error('ObjectType could not be resolved');
+    };
+
+    let excludedProperties = [];
+    if (this instanceof Menu) {
+      excludedProperties.push('parentMenu');
+    }
+    if (this instanceof Table) {
+      excludedProperties.push('staticMenus');
+    }
+
+    let props = this._cloneProperties.slice();
+    arrays.removeAll(props, excludedProperties);
+    let model = objects.extractProperties(this, {}, props);
+    model.objectType = resolveObjectType(this.objectType);
+    model.id = this.id;
+    model.loadJsonModel = false; // TODO CGU should be set recursively when model is used to create the widget, not here
+
+    let widgetProps = this._widgetProperties;
+    arrays.removeAll(widgetProps, excludedProperties);
+
+    for (let property of widgetProps) {
+      let value = this[property];
+      if (!value) {
+        continue;
+      }
+      if (Array.isArray(value)) {
+        model[property] = [];
+        for (let childWidget of value) {
+          let widget = extractChildWidget(childWidget, property);
+          if (widget) {
+            model[property].push(widget);
+          }
+        }
+      } else {
+        model[property] = extractChildWidget(value, property);
+      }
+    }
+
+    if (this instanceof Tree) {
+      model.selectedNodes = this.selectedNodes.map(row => row.id);
+      model.nodes = this.nodes.map(node => {
+        let nodeModel = objects.extractProperties(node, {}, ['id', 'text', 'icon', 'objectType', 'expanded']);
+        nodeModel.objectType = resolveObjectType(nodeModel.objectType);
+        if (node instanceof Page) {
+          if (node.detailTable) {
+            nodeModel.detailTable = node.detailTable.extractModel();
+          }
+          if (node.detailForm) {
+            nodeModel.detailForm = node.detailForm.extractModel();
+          }
+          nodeModel.loadJsonModel = false;
+        }
+        return nodeModel;
+      });
+    }
+    if (this instanceof Table) {
+      model.selectedRows = this.selectedRows.map(row => row.id);
+      model.rows = this.rows.map(row => {
+        let rowModel = objects.extractProperties(row, {}, ['id', 'cells', 'objectType']);
+        rowModel.objectType = resolveObjectType(rowModel.objectType);
+        return rowModel;
+      });
+      model.columns = this.columns.map(col => {
+        let colModel = objects.extractProperties(col, {}, ['id', 'objectType', 'text', 'width', 'displayable', 'visible']);
+        colModel.objectType = resolveObjectType(colModel.objectType);
+        return colModel;
+      });
+    }
+
+    return model;
   }
 
   /**

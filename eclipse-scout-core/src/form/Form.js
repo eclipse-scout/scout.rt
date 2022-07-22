@@ -16,6 +16,7 @@ export default class Form extends Widget {
     super();
     this._addWidgetProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
     this._addPreserveOnPropertyChangeProperties(['initialFocus']);
+    this._addCloneProperties(['displayHint', 'modal', 'data', 'saveNeeded', 'title']);
 
     this.animateOpening = true;
     this.askIfNeedSave = true;

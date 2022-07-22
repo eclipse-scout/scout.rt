@@ -54,7 +54,7 @@ export default class TreeNode {
 
   init(model) {
     let staticModel = this._jsonModel();
-    if (staticModel) {
+    if (staticModel && model.loadJsonModel !== false) {
       model = $.extend({}, staticModel, model);
     }
     this._init(model);
