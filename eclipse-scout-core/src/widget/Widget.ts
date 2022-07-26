@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
+  AnyWidget,
   arrays,
   DeferredGlassPaneTarget,
   Desktop,
@@ -1990,16 +1991,22 @@ export default class Widget extends EventEmitter implements WidgetModel {
     }
   }
 
+  widget<T extends Widget>(widgetId: string, type: new() => T): T;
+
+  widget(widgetId: string): AnyWidget;
+
   /**
    * Traverses the object-tree (children) of this widget and searches for a widget with the given ID.
    * Returns the widget with the requested ID or null if no widget has been found.
    *
    * @param {string} widgetId
    */
-  widget(widgetId: string): Widget {
+  widget<T extends Widget>(widgetId: string, type?: new() => T): T {
     if (predicate(this)) {
+      // @ts-ignore
       return this;
     }
+    // @ts-ignore
     return this.findChild(predicate);
 
     function predicate(widget) {
@@ -2415,6 +2422,7 @@ export default class Widget extends EventEmitter implements WidgetModel {
       if (typeof objectType !== 'function') {
         return objectType;
       }
+      // TODO CGU objectType.name won't work if code is minified -> We would have to loop through the values, e.g.: Object.entries(window.js).find(entry => objectType === entry[1])
       let className = objectType.name;
       if (window.scout[className]) {
         return className;
