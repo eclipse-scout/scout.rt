@@ -470,7 +470,8 @@ public class JsonDataObjectsSerializationTest {
 
   protected void runTestDeserializeTestDateDo(String resource) throws Exception {
     String expectedJson = readResourceAsString(resource);
-    TestDateDo marshalled = s_dataObjectMapper.readValue(expectedJson, TestDateDo.class);
+    DoEntity marshalled0 = s_dataObjectMapper.readValue(expectedJson, DoEntity.class);
+    TestDateDo marshalled = (TestDateDo) marshalled0;
     assertEquals(DATE, marshalled.dateDefault().get());
     assertEquals(DATE_TRUNCATED, marshalled.dateOnly().get());
     assertEquals(DateUtility.truncDateToMonth(DATE_TRUNCATED), marshalled.getDateYearMonth());
