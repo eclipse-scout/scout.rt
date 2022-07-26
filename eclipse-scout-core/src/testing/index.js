@@ -8,8 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+
+// /////////////////////////////////////////////////////////////////
+// TEST SUPPORT - DO NOT USE IN PRODUCTION CODE
+// /////////////////////////////////////////////////////////////////
+
 export {default as TestingApp} from './TestingApp';
 export {default as JasmineScout} from './JasmineScout';
+export {JasmineScoutUtil} from './JasmineScoutUtil';
 export {default as LocaleSpecHelper} from './text/LocaleSpecHelper';
 export {default as MenuSpecHelper} from './menu/MenuSpecHelper';
 export {default as TreeSpecHelper} from './tree/TreeSpecHelper';
@@ -31,6 +37,4 @@ export {default as GroupBoxSpecHelper} from './form/fields/groupbox/GroupBoxSpec
 import * as self from './index.js';
 
 export default self;
-if (window) {
-  window.scout = Object.assign(window.scout || {}, self);
-}
+window.scout = Object.assign(window.scout || {}, self);
