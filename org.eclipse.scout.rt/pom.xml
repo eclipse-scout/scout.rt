@@ -16,7 +16,7 @@
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
     <version>22.0.2</version>
-    <relativePath/>
+    <relativePath />
   </parent>
 
   <groupId>org.eclipse.scout.rt</groupId>
@@ -111,7 +111,7 @@
     <scout.base.version>22.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
-    <jetty.version>10.0.11</jetty.version>
+    <jetty.version>10.0.9</jetty.version>
     <slf4j.version>1.7.32</slf4j.version>
     <logback.version>1.2.10</logback.version>
     <jackson.version>2.13.3</jackson.version>
