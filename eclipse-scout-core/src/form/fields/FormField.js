@@ -1134,7 +1134,7 @@ export default class FormField extends Widget {
     if (!this.fieldStatus) {
       return;
     }
-    this.fieldStatus.remove();
+    this.fieldStatus.destroy();
     this.$status = null;
     this.fieldStatus = null;
   }
