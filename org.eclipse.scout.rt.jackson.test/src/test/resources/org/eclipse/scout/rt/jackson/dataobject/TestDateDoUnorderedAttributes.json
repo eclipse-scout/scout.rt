@@ -1,5 +1,8 @@
 {
   "foo": {},
  	"aenderungAm": "2022-07-11T08:49:42.654Z",
-  "_type" : "TestDate"
+  "_type" : "TestDate",
+  "dateDefault" : "2017-11-30 17:29:12.583",
+  "dateOnly" : "1990-10-20",
+  "dateYearMonth" : "90-10"
 }

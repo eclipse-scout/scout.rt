@@ -108,6 +108,10 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
           p = JsonParserSequence.createFlattened(false, tb.asParser(p), p);
         }
         p.nextToken(); // skip type field value
+
+        // FIXME PBZ SEEMS TO FIX THE ISSUE
+        p.setCurrentValue(entity); // set current entity object as current value on parser before parser is merged with token buffer holding cached fields
+
         return deserializeDoEntityAttributes(p, ctxt, entity);
       }
 
