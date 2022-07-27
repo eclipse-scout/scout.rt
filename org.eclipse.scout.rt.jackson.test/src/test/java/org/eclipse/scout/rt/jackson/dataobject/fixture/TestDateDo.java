@@ -78,6 +78,12 @@ public class TestDateDo extends DoEntity {
     return doValue("customDateFormatCustomAttributeName");
   }
 
+  @AttributeName("aenderungAm")
+  @ValueFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+  public DoValue<Date> aenderungAm() {
+    return doValue("aenderungAm");
+  }
+
   @ValueFormat(pattern = "yyyyMMddHHmm")
   public DoList<Date> customDateDoList() {
     return doList("customDateDoList");
@@ -89,6 +95,14 @@ public class TestDateDo extends DoEntity {
 
   public DoValue<Set<String>> zDummySet() {
     return doValue("zDummySet");
+  }
+
+  public DoValue<TestItemDo> itemAttribute() {
+    return doValue("itemAttribute");
+  }
+
+  public DoValue<List<TestItemDo>> itemsAttribute() {
+    return doValue("itemsAttribute");
   }
 
   /* **************************************************************************
@@ -212,6 +226,17 @@ public class TestDateDo extends DoEntity {
   }
 
   @Generated("DoConvenienceMethodsGenerator")
+  public TestDateDo withAenderungAm(Date aenderungAm) {
+    aenderungAm().set(aenderungAm);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Date getAenderungAm() {
+    return aenderungAm().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
   public TestDateDo withCustomDateDoList(Collection<? extends Date> customDateDoList) {
     customDateDoList().updateAll(customDateDoList);
     return this;
@@ -248,5 +273,27 @@ public class TestDateDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Set<String> getZDummySet() {
     return zDummySet().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestDateDo withItemAttribute(TestItemDo itemAttribute) {
+    itemAttribute().set(itemAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestItemDo getItemAttribute() {
+    return itemAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestDateDo withItemsAttribute(List<TestItemDo> itemsAttribute) {
+    itemsAttribute().set(itemsAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<TestItemDo> getItemsAttribute() {
+    return itemsAttribute().get();
   }
 }

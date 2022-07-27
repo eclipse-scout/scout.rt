@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.dataobject.value.DateValueDo;
 import org.eclipse.scout.rt.dataobject.value.IntegerValueDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.DoubleContributionFixtureDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.PartnerBasisV1Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBigIntegerDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBinaryDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBinaryResourceDo;
@@ -475,6 +476,15 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(DATE, marshalled.dateDefault().get());
     assertEquals(DATE_TRUNCATED, marshalled.dateOnly().get());
     assertEquals(DateUtility.truncDateToMonth(DATE_TRUNCATED), marshalled.getDateYearMonth());
+  }
+
+  @Test
+  public void foo() throws Exception {
+    String expectedJson = readResourceAsString("Demo.json");
+    DoEntity doEntity = s_dataObjectMapper.readValue(expectedJson, DoEntity.class);
+    PartnerBasisV1Do partner = (PartnerBasisV1Do) doEntity;
+    System.out.println(partner.getStichdatum());
+    System.out.println(partner.getAenderungAm());
   }
 
   @Test
@@ -2709,7 +2719,7 @@ public class JsonDataObjectsSerializationTest {
     testDo.withADummySet(CollectionUtility.hashSet("1", "2"))
         .withDateWithTimestamp(DATE)
         .withDateOnly(DATE_TRUNCATED);
-
+    testDo.withZDummySet(CollectionUtility.hashSet("3", "4"));
     String json = s_dataObjectMapper.writeValueAsString(testDo);
 
     // deserialize and check
