@@ -35,7 +35,11 @@ public interface IBrowserField extends IFormField {
     AllowSameOrigin("allow-same-origin"),
     AllowScripts("allow-scripts"),
     AllowTopNavigation("allow-top-navigation"),
-    AllowPresentation("allow-presentation");
+    AllowPresentation("allow-presentation"),
+    AllowDownloads("allow-downloads"),
+    AllowModals("allow-modals"),
+    AllowOrientationLock("allow-orientation-lock"),
+    AllowTopNavigationByUserActivation("allow-top-navigation-by-user-activation");
 
     private final String m_attribute;
 
