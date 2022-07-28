@@ -87,7 +87,9 @@ export default class SequenceBox extends CompositeField {
 
   _remove() {
     this.fields.forEach(f => f.off('propertyChange', this._fieldPropertyChangeHandler));
-    this._lastVisibleField.off('propertyChange:suppressStatus', this._lastVisibleFieldSuppressStatusHandler);
+    if (this._lastVisibleField) {
+      this._lastVisibleField.off('propertyChange:suppressStatus', this._lastVisibleFieldSuppressStatusHandler);
+    }
     super._remove();
   }
 
