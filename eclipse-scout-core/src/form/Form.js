@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -44,6 +44,7 @@ export default class Form extends Widget {
     this.messageBoxController = null;
     this.fileChooserController = null;
     this.closeKeyStroke = null;
+    this.showOnOpen = true;
     this._glassPaneRenderer = null;
     this._preMaximizedBounds = null;
     this._resizeHandler = this._onResize.bind(this);
@@ -239,7 +240,9 @@ export default class Form extends Widget {
           // If form has been closed right after it was opened don't try to show it
           return;
         }
-        this.show();
+        if (this.showOnOpen) {
+          this.show();
+        }
       });
   }
 

@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -294,6 +294,7 @@ export {default as GroupBoxResponsiveHandler} from './form/GroupBoxResponsiveHan
 export {default as DesktopResponsiveHandler} from './form/DesktopResponsiveHandler';
 export {default as TileOverviewForm} from './form/TileOverviewForm';
 export {default as TileOverviewFormAdapter} from './form/TileOverviewFormAdapter';
+export {default as JsFormAdapter} from './form/js/JsFormAdapter';
 export {default as Table} from './table/Table';
 export {default as TableAdapter} from './table/TableAdapter';
 export {default as TableCompactHandler} from './table/TableCompactHandler';
