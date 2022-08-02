@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -17,7 +17,7 @@ module.exports = {
     jquery: true,
     jasmine: true
   },
-  extends: ['eslint:recommended', 'google'],
+  extends: ['eslint:recommended', 'google', './common'],
   parserOptions: {
     ecmaVersion: 6,
     sourceType: 'module'
@@ -77,9 +77,6 @@ module.exports = {
     'one-var': 'off',
     'padded-blocks': 'off',
     'prefer-arrow-callback': 'warn',
-    'prefer-const': 'off',
-    'prefer-rest-params': 'warn',
-    'prefer-spread': 'warn',
     'prefer-template': 'off',
     'template-curly-spacing': ['error', 'never'],
     'linebreak-style': ['error', 'unix'],
