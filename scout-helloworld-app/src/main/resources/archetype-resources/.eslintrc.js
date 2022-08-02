@@ -1,11 +1,6 @@
 module.exports = {
-  extends: '@eclipse-scout',
-  plugins: ['@babel'],
-  parser: '@babel/eslint-parser',
+  extends: '@eclipse-scout/eslint-config/src/typescript',
   parserOptions: {
     requireConfigFile: false
-  },
-  rules: {
-    'linebreak-style': 'off'
   }
 };

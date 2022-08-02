@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "ES6",
+    "moduleResolution": "node",
+    "module": "ES6",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "lib": [
+      "dom",
+      "ES6"
+    ]
+  },
+  "include": [
+    "./src/**/*"
+  ]
+}
