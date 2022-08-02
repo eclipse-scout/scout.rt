@@ -26,16 +26,23 @@ import org.junit.runners.model.Statement;
 public class MockConfigPropertyRule<DATA_TYPE> implements TestRule {
 
   private final Class<? extends IConfigProperty<DATA_TYPE>> m_configPropertyClazz;
+  private DATA_TYPE m_initialValue;
+  private DATA_TYPE m_value;
   private final IConfigProperty<DATA_TYPE> m_mock;
 
   private List<IBean<?>> m_temporaryBeans;
 
-  public MockConfigPropertyRule(Class<? extends IConfigProperty<DATA_TYPE>> configPropertyClazz, DATA_TYPE value) {
+  /**
+   * @param defaultValue
+   *          the initial value, this value is always restored before each test
+   */
+  public MockConfigPropertyRule(Class<? extends IConfigProperty<DATA_TYPE>> configPropertyClazz, DATA_TYPE defaultValue) {
     m_configPropertyClazz = configPropertyClazz;
-
+    m_initialValue = defaultValue;
     m_mock = mock(m_configPropertyClazz);
-    when(m_mock.getValue()).thenReturn(value);
-    when(m_mock.getValue(nullable(String.class))).thenReturn(value);
+
+    when(m_mock.getValue()).thenAnswer(i -> m_value);
+    when(m_mock.getValue(nullable(String.class))).thenAnswer(i -> m_value);
   }
 
   public void registerProperty() {
@@ -56,6 +63,7 @@ public class MockConfigPropertyRule<DATA_TYPE> implements TestRule {
       @Override
       public void evaluate() throws Throwable {
         try {
+          m_value = m_initialValue;
           registerProperty();
           base.evaluate();
         }
@@ -66,4 +74,7 @@ public class MockConfigPropertyRule<DATA_TYPE> implements TestRule {
     };
   }
 
+  public void setValue(DATA_TYPE value) {
+    m_value = value;
+  }
 }
