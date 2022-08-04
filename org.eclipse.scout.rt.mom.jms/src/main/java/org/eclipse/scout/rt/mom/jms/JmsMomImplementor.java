@@ -81,7 +81,6 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.platform.util.Assertions.*;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
@@ -128,6 +127,18 @@ public class JmsMomImplementor implements IMomImplementor {
    */
   public static final String JMS_REQUEST_CANCELLATION_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT = "scout.mom.jms.requestCancellationMessageConsumerJobReceiveTimeout";
 
+  /**
+   * Key to set {@link #m_subscriptionAwaitStartedSeconds}, if value is not set {@link #WAIT_TIME_INFINITE} is used as a
+   * default to wait infinitely (the {@link #WAIT_TIME_INFINITE} value may also be used to configure an infinite wait
+   * time)
+   */
+  public static final String JMS_SUBSCRIPTION_AWAIT_STARTED_TIMEOUT = "scout.mom.jms.subscriptionAwaitStartedTimeout";
+
+  /**
+   * Constant for {@link #JMS_SUBSCRIPTION_AWAIT_STARTED_TIMEOUT} to indicate an infinite wait time.
+   */
+  public static final int WAIT_TIME_INFINITE = -1;
+
   protected final String m_momUid = UUID.randomUUID().toString();
 
   // init -> thread-safety: only set in init method
@@ -145,7 +156,7 @@ public class JmsMomImplementor implements IMomImplementor {
   // end init
 
   protected ISubscription m_requestCancellationSubscription;
-  protected int m_subscriptionAwaitStartedSeconds = 30;
+  protected int m_subscriptionAwaitStartedSeconds = WAIT_TIME_INFINITE;
 
   protected final Map<IDestination, Destination> m_jmsDestinations = new ConcurrentHashMap<>();
   protected final Map<IDestination, IMarshaller> m_marshallers = new ConcurrentHashMap<>();
@@ -164,6 +175,7 @@ public class JmsMomImplementor implements IMomImplementor {
       m_messageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
       m_replyMessageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_REPLY_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
       m_requestCancellationMessageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_REQUEST_CANCELLATION_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
+      m_subscriptionAwaitStartedSeconds = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_SUBSCRIPTION_AWAIT_STARTED_TIMEOUT), Integer.class), WAIT_TIME_INFINITE);
       m_contextEnvironment = createContextEnvironment(properties);
       m_connectionFactory = createConnectionFactory(properties);
       m_clientId = computeClientId(properties);
