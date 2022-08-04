@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, FormField, GroupBox, scout, SmartField, ValueField} from '../index';
+import {arrays, FormField, GroupBox, PlaceholderField, scout, SmartField, TileTableHeaderGroupByLookupCall, TileTableHeaderSortByLookupCall, ValueField} from '../index';
 
 export default class TileTableHeaderBox extends GroupBox {
 
@@ -48,7 +48,7 @@ export default class TileTableHeaderBox extends GroupBox {
     this.table = this.parent;
     this._installListeners();
 
-    this.insertField(scout.create('PlaceholderField', {
+    this.insertField(scout.create(PlaceholderField, {
       id: 'PlaceholderField',
       parent: this,
       gridDataHints: {
@@ -57,7 +57,7 @@ export default class TileTableHeaderBox extends GroupBox {
     }));
 
     // Group By Field
-    this.groupByField = scout.create('SmartField', {
+    this.groupByField = scout.create(SmartField, {
       id: 'GroupByField',
       parent: this,
       label: this.session.text('GroupBy'),
@@ -73,7 +73,7 @@ export default class TileTableHeaderBox extends GroupBox {
     this.insertField(this.groupByField);
 
     // Sort By Field
-    this.sortByField = scout.create('SmartField', {
+    this.sortByField = scout.create(SmartField, {
       id: 'SortByField',
       parent: this,
       label: this.session.text('SortBy'),
@@ -101,14 +101,14 @@ export default class TileTableHeaderBox extends GroupBox {
   }
 
   _createGroupByLookupCall() {
-    return scout.create('TileTableHeaderGroupByLookupCall', {
+    return scout.create(TileTableHeaderGroupByLookupCall, {
       session: this.session,
       table: this.table
     });
   }
 
   _createSortByLookupCall() {
-    return scout.create('TileTableHeaderSortByLookupCall', {
+    return scout.create(TileTableHeaderSortByLookupCall, {
       session: this.session,
       table: this.table
     });

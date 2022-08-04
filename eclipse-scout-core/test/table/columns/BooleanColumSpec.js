@@ -83,7 +83,7 @@ describe('BooleanColumn', () => {
 
     it('displays the cell value as checkbox', () => {
       let model = helper.createModelFixture(2, 2);
-      model.columns[0].objectType = 'BooleanColumn';
+      model.columns[0].objectType = BooleanColumn;
       model.rows[0].cells[0].value = true;
       model.rows[1].cells[0].value = false;
       let table = helper.createTable(model);

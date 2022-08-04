@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, scout} from '../index';
+import {objects, scout, SimpleTab, SimpleTabArea} from '../index';
 import $ from 'jquery';
 
 /**
@@ -69,7 +69,7 @@ export default class SimpleTabBoxController {
   }
 
   createTabArea() {
-    return scout.create('SimpleTabArea', {
+    return scout.create(SimpleTabArea, {
       parent: this.tabBox
     });
   }
@@ -128,7 +128,7 @@ export default class SimpleTabBoxController {
   }
 
   _createTab(view) {
-    return scout.create('SimpleTab', {
+    return scout.create(SimpleTab, {
       parent: this.tabArea,
       view: view
     });

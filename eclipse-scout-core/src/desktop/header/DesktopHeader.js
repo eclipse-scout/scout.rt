@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, DesktopHeaderLayout, Form, HtmlComponent, scout, Widget} from '../../index';
+import {Desktop, DesktopHeaderLayout, DesktopLogo, DesktopTabArea, DesktopToolBox, Form, HtmlComponent, scout, ViewButtonBox, Widget} from '../../index';
 
 export default class DesktopHeader extends Widget {
 
@@ -35,7 +35,7 @@ export default class DesktopHeader extends Widget {
   }
 
   _createTabArea() {
-    return scout.create('DesktopTabArea', $.extend({
+    return scout.create(DesktopTabArea, $.extend({
       parent: this
     }, this.tabArea));
   }
@@ -80,7 +80,7 @@ export default class DesktopHeader extends Widget {
   }
 
   _createToolBox() {
-    return scout.create('DesktopToolBox', {
+    return scout.create(DesktopToolBox, {
       parent: this,
       menus: this.desktop.menus
     });
@@ -126,7 +126,7 @@ export default class DesktopHeader extends Widget {
   }
 
   _createLogo() {
-    return scout.create('DesktopLogo', {
+    return scout.create(DesktopLogo, {
       parent: this,
       url: this.logoUrl
     });
@@ -152,7 +152,7 @@ export default class DesktopHeader extends Widget {
   }
 
   _createViewButtonBox() {
-    return scout.create('ViewButtonBox', {
+    return scout.create(ViewButtonBox, {
       parent: this,
       viewButtons: this.desktop.viewButtons,
       selectedMenuButtonAlwaysVisible: true

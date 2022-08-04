@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Button, FormField, GridData, GroupBoxGridConfig, HorizontalGrid, scout, VerticalSmartGrid} from '../../../src/index';
+import {Button, FormField, GridData, GroupBox, GroupBoxGridConfig, HorizontalGrid, scout, VerticalSmartGrid} from '../../../src/index';
 import {GroupBoxSpecHelper} from '../../../src/testing/index';
 
 /**
@@ -50,18 +50,18 @@ describe('AbstractGrid11', () => {
     session = sandboxSession();
 
     this.fields = [];
-    this.groupBox = scout.create('GroupBox', {
+    this.groupBox = scout.create(GroupBox, {
       parent: session.desktop,
       gridColumnCount: 2
     });
-    this.fields.push(scout.create('GroupBox', {
+    this.fields.push(scout.create(GroupBox, {
       parent: this.groupBox,
       label: 'Field 01',
       gridDataHints: new GridData({
         w: FormField.FULL_WIDTH
       })
     }));
-    this.fields.push(scout.create('GroupBox', {
+    this.fields.push(scout.create(GroupBox, {
       parent: this.groupBox,
       label: 'Field 02',
       gridColumnCount: 1,
@@ -69,7 +69,7 @@ describe('AbstractGrid11', () => {
         w: 1
       })
     }));
-    this.fields.push(scout.create('GroupBox', {
+    this.fields.push(scout.create(GroupBox, {
       parent: this.groupBox,
       label: 'Field 03',
       gridColumnCount: 1,
@@ -77,19 +77,19 @@ describe('AbstractGrid11', () => {
         w: 1
       })
     }));
-    this.fields.push(scout.create('GroupBox', {
+    this.fields.push(scout.create(GroupBox, {
       parent: this.groupBox,
       label: 'Field 04',
       gridDataHints: new GridData({
         w: 2
       })
     }));
-    this.fields.push(scout.create('Button', {
+    this.fields.push(scout.create(Button, {
       parent: this.groupBox,
       label: 'Ok',
       systemType: Button.SystemType.OK
     }));
-    this.fields.push(scout.create('Button', {
+    this.fields.push(scout.create(Button, {
       parent: this.groupBox,
       label: 'Cancel',
       systemType: Button.SystemType.CANCEL

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, BooleanColumn, Column, ColumnUserFilter, defaultValues, ModelAdapter, objects, scout, Table, TableUserFilter} from '../index';
+import {App, arrays, BooleanColumn, Cell, Column, ColumnUserFilter, defaultValues, ModelAdapter, objects, scout, Table, TableUserFilter} from '../index';
 import $ from 'jquery';
 
 export default class TableAdapter extends ModelAdapter {
@@ -757,7 +757,7 @@ export default class TableAdapter extends ModelAdapter {
           };
         }
         defaultValues.applyTo(model, 'Cell');
-        return scout.create('Cell', model);
+        return scout.create(Cell, model);
       }
       return this._ensureCellOrig(vararg);
     }, true);

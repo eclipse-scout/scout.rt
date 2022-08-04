@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteEvent, scout, TableControlAdapter} from '../../../src/index';
+import {RemoteEvent, scout, TableControl, TableControlAdapter} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
 
 describe('TableControl', () => {
@@ -37,7 +37,7 @@ describe('TableControl', () => {
   }
 
   function createAction(model) {
-    return scout.create('TableControl', model);
+    return scout.create(TableControl, model);
   }
 
   function createTableControlAdapter(model) {

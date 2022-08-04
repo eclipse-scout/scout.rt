@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupCall, objects, scout} from '../index';
+import {AjaxCall, arrays, LookupCall, LookupRow, objects, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -150,7 +150,7 @@ export default class RestLookupCall extends LookupCall {
       }
     }
 
-    return scout.create('LookupRow', clonedLookupRowDo, {ensureUniqueId: false});
+    return scout.create(LookupRow, clonedLookupRowDo, {ensureUniqueId: false});
   }
 
   _call() {
@@ -240,7 +240,7 @@ export default class RestLookupCall extends LookupCall {
       url: url,
       timeout: 0
     };
-    return scout.create('AjaxCall', {
+    return scout.create(AjaxCall, {
       ajaxOptions: ajaxOptions,
       name: 'RestLookupCall',
       retryIntervals: [100, 500, 500, 500]

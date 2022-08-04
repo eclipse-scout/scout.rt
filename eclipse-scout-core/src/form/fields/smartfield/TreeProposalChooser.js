@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, objects, ProposalChooser, scout, Tree} from '../../../index';
+import {arrays, objects, ProposalChooser, ProposalTreeNode, scout, Tree, TreeLayoutResetter} from '../../../index';
 
 export default class TreeProposalChooser extends ProposalChooser {
 
@@ -16,8 +16,11 @@ export default class TreeProposalChooser extends ProposalChooser {
     super();
   }
 
+  /**
+   * @returns {Tree}
+   */
   _createModel() {
-    let tree = scout.create('Tree', {
+    let tree = scout.create(Tree, {
       parent: this,
       requestFocusOnNodeControlMouseDown: false,
       scrollToSelection: true,
@@ -25,6 +28,10 @@ export default class TreeProposalChooser extends ProposalChooser {
     });
     tree.on('nodeClick', this._onNodeClick.bind(this));
     return tree;
+  }
+
+  _createLayoutResetter() {
+    return scout.create(TreeLayoutResetter, this.model);
   }
 
   _onNodeClick(event) {
@@ -150,7 +157,7 @@ export default class TreeProposalChooser extends ProposalChooser {
       initialLeaf = false;
     }
 
-    return scout.create('ProposalTreeNode', {
+    return scout.create(ProposalTreeNode, {
       parent: this.model,
       proposalChooser: this,
       childNodeIndex: 0,

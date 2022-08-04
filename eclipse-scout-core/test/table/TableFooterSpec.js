@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, Status} from '../../src/index';
+import {scout, Status, TableControl} from '../../src/index';
 import {TableSpecHelper} from '../../src/testing/index';
 
 describe('TableFooterSpec', () => {
@@ -30,10 +30,9 @@ describe('TableFooterSpec', () => {
   });
 
   function createTableControl() {
-    let control = scout.create('TableControl', {
+    return scout.create(TableControl, {
       parent: session.desktop
     });
-    return control;
   }
 
   describe('render', () => {

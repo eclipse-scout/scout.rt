@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, Status} from '../../../../src/index';
+import {LookupRow, ProposalField, scout, Status} from '../../../../src/index';
 
 describe('ProposalField', () => {
 
@@ -17,11 +17,11 @@ describe('ProposalField', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
-    field = scout.create('ProposalField', {
+    field = scout.create(ProposalField, {
       parent: session.desktop,
       lookupCall: 'DummyLookupCall'
     });
-    lookupRow = scout.create('LookupRow', {
+    lookupRow = scout.create(LookupRow, {
       key: 123,
       text: 'Foo'
     });

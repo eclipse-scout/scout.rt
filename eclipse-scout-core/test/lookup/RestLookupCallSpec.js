@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../src/index';
+import {RestLookupCall, scout} from '../../src/index';
 
 describe('RestLookupCall', () => {
 
@@ -20,7 +20,7 @@ describe('RestLookupCall', () => {
   });
 
   it('applies custom restriction only to the clone', () => {
-    const lookupCall = scout.create('RestLookupCall', {
+    const lookupCall = scout.create(RestLookupCall, {
       session: session,
       resourceUrl: 'test-api/dummy',
       maxRowCount: 777
@@ -104,7 +104,7 @@ describe('RestLookupCall', () => {
     // 3. Restrictions applied to clones programmatically, e.g. during a 'prepareLookupCall' event.
     // 4. Hard-coded properties that are fundamental to the respective queryBy mode (cannot be overridden).
 
-    const lookupCall = scout.create('RestLookupCall', {
+    const lookupCall = scout.create(RestLookupCall, {
       session: session,
       resourceUrl: 'test-api/dummy',
       maxRowCount: 777, // will be overwritten
@@ -208,7 +208,7 @@ describe('RestLookupCall', () => {
   });
 
   it('evaluates function restriction values', () => {
-    const lookupCall = scout.create('RestLookupCall', {
+    const lookupCall = scout.create(RestLookupCall, {
       session: session,
       resourceUrl: 'test-api/dummy',
       restriction: {

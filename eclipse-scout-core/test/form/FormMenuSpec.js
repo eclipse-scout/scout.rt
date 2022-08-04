@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper} from '../../src/testing/index';
-import {FormMenu, menus, scout} from '../../src/index';
+import {ContextMenuPopup, FormMenu, MenuBar, menus, scout} from '../../src/index';
 
 describe('FormMenu', () => {
   let session, desktop, helper;
@@ -27,7 +27,7 @@ describe('FormMenu', () => {
   });
 
   function createMenu(model) {
-    return scout.create('FormMenu', $.extend({
+    return scout.create(FormMenu, $.extend({
       parent: desktop,
       text: 'Menu',
       form: helper.createFormWithOneField()
@@ -127,7 +127,7 @@ describe('FormMenu', () => {
       expect($popup).toBeVisible();
       expect(menu.popup.isRemovalPending()).toBe(true);
 
-      let contextMenu = scout.create('ContextMenuPopup', {
+      let contextMenu = scout.create(ContextMenuPopup, {
         parent: session.desktop,
         menuItems: [menu] // will be cloned, but form won't
       });
@@ -163,7 +163,7 @@ describe('FormMenu', () => {
       expect($popup).toBeVisible();
       expect(menu.popup.isRemovalPending()).toBe(true);
 
-      let contextMenu = scout.create('ContextMenuPopup', {
+      let contextMenu = scout.create(ContextMenuPopup, {
         parent: session.desktop,
         menuItems: [menu] // will be cloned, but form won't
       });
@@ -178,7 +178,7 @@ describe('FormMenu', () => {
 
     it('closes immediately when opened in a context menu and another menu is opened during remove animation', () => {
       let menu = createMenu();
-      let contextMenu = scout.create('ContextMenuPopup', {
+      let contextMenu = scout.create(ContextMenuPopup, {
         parent: session.desktop,
         menuItems: [menu]
       });
@@ -200,7 +200,7 @@ describe('FormMenu', () => {
 
     it('closes immediately when opened in a context menu and another form is opened in another context menu during remove animation', () => {
       let menu = createMenu();
-      let contextMenu = scout.create('ContextMenuPopup', {
+      let contextMenu = scout.create(ContextMenuPopup, {
         parent: session.desktop,
         menuItems: [menu]
       });
@@ -210,7 +210,7 @@ describe('FormMenu', () => {
       expect(menuInContextMenu.popup.$container).toBeVisible();
       expect(contextMenu.rendered).toBe(true);
 
-      let contextMenu2 = scout.create('ContextMenuPopup', {
+      let contextMenu2 = scout.create(ContextMenuPopup, {
         parent: session.desktop,
         menuItems: [menu]
       });
@@ -287,7 +287,7 @@ describe('FormMenu', () => {
 
   describe('detach', () => {
     it('does not fail if a parent is detached', () => {
-      let menuBar = scout.create('MenuBar', {parent: session.desktop});
+      let menuBar = scout.create(MenuBar, {parent: session.desktop});
       let menu = createMenu();
       // Link menu with the menu bar
       menuBar.setMenuItems([menu]);

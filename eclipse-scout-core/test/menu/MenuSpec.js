@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Menu, scout, tooltips} from '../../src/index';
+import {Action, EllipsisMenu, Menu, scout, tooltips} from '../../src/index';
 import {MenuSpecHelper} from '../../src/testing/index';
 
 describe('Menu', () => {
@@ -197,7 +197,7 @@ describe('Menu', () => {
       });
       let parent = menu.parent;
 
-      let childMenu = scout.create('Menu', {
+      let childMenu = scout.create(Menu, {
         text: 'child',
         inheritAccessibility: false,
         session: parent.session,
@@ -501,7 +501,7 @@ describe('Menu', () => {
     });
 
     function testEnabledInEllipsis(inheritAccessibility) {
-      let ellipsis = scout.create('EllipsisMenu', {
+      let ellipsis = scout.create(EllipsisMenu, {
         parent: session.desktop
       });
       ellipsis.render();
@@ -578,7 +578,7 @@ describe('Menu', () => {
 
   describe('submenuIcon', () => {
     it('is moved into text if text position is bottom', () => {
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: session.desktop,
         text: 'text',
         iconId: 'iconId',
@@ -593,7 +593,7 @@ describe('Menu', () => {
     });
 
     it('is moved into text if text position is bottom and text set later', () => {
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: session.desktop,
         iconId: 'iconId',
         childActions: [{objectType: 'Menu'}]
@@ -606,7 +606,7 @@ describe('Menu', () => {
     });
 
     it('is moved into text if text position is bottom and icon set later', () => {
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: session.desktop,
         text: 'text',
         childActions: [{objectType: 'Menu'}]
@@ -619,7 +619,7 @@ describe('Menu', () => {
     });
 
     it('is moved into text if text position is bottom and subMenuIVisibility set later', () => {
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: session.desktop,
         iconId: 'iconId',
         text: 'asdf',

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Button, GridData, GroupBoxGridConfig, HorizontalGrid, scout, VerticalSmartGrid} from '../../../src/index';
+import {Button, GridData, GroupBox, GroupBoxGridConfig, HorizontalGrid, scout, StringField, VerticalSmartGrid} from '../../../src/index';
 import {GroupBoxSpecHelper} from '../../../src/testing/index';
 
 /**
@@ -47,26 +47,26 @@ describe('AbstractGrid03', () => {
     session = sandboxSession();
 
     this.fields = [];
-    this.groupBox = scout.create('GroupBox', {
+    this.groupBox = scout.create(GroupBox, {
       parent: session.desktop,
       gridColumnCount: 2
     });
-    this.fields.push(scout.create('StringField', {
+    this.fields.push(scout.create(StringField, {
       parent: this.groupBox,
       label: 'Field 01',
       gridDataHints: new GridData({
         w: 3
       })
     }));
-    this.fields.push(scout.create('StringField', {
+    this.fields.push(scout.create(StringField, {
       parent: this.groupBox,
       label: 'Field 02'
     }));
-    this.fields.push(scout.create('StringField', {
+    this.fields.push(scout.create(StringField, {
       parent: this.groupBox,
       label: 'Field 03'
     }));
-    this.fields.push(scout.create('Button', {
+    this.fields.push(scout.create(Button, {
       parent: this.groupBox,
       label: 'Close',
       systemType: Button.SystemType.CLOSE

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DatePickerTouchPopupLayout, ParsingFailedStatus, scout, TouchPopup} from '../index';
+import {DatePicker, DatePickerTouchPopupLayout, ParsingFailedStatus, scout, TouchPopup} from '../index';
 
 export default class DatePickerTouchPopup extends TouchPopup {
 
@@ -26,7 +26,7 @@ export default class DatePickerTouchPopup extends TouchPopup {
    * @override TouchPopup.js
    */
   _initWidget(options) {
-    this._widget = scout.create('DatePicker', {
+    this._widget = scout.create(DatePicker, {
       parent: this,
       dateFormat: options.dateFormat,
       allowedDates: options.allowedDates

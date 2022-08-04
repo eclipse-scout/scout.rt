@@ -435,7 +435,7 @@ describe('ValueField', () => {
   describe('validator', () => {
 
     it('may be set initially', () => {
-      let field = scout.create('StringField', {
+      let field = scout.create(StringField, {
         parent: session.desktop,
         value: 'hi',
         validator: (value, defaultValidator) => {
@@ -541,7 +541,7 @@ describe('ValueField', () => {
 
   describe('parser', () => {
     it('may be set initially', () => {
-      let field = scout.create('StringField', {
+      let field = scout.create(StringField, {
         parent: session.desktop,
         parser: (displayText, defaultParser) => {
           if (displayText) {
@@ -577,7 +577,7 @@ describe('ValueField', () => {
 
   describe('formatter', () => {
     it('may be set initially', () => {
-      let field = scout.create('StringField', {
+      let field = scout.create(StringField, {
         parent: session.desktop,
         value: '1234123412341234',
         formatter: (value, defaultFormatter) => {

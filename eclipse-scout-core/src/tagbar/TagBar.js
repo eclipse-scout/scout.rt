@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, FormField, HtmlComponent, scout, TagBarLayout, tooltips, Widget} from '../index';
+import {arrays, Device, FormField, HtmlComponent, scout, TagBarLayout, TagBarOverflowPopup, tooltips, Widget} from '../index';
 import $ from 'jquery';
 
 export default class TagBar extends Widget {
@@ -143,7 +143,7 @@ export default class TagBar extends Widget {
   }
 
   _createOverflowPopup() {
-    return scout.create('TagBarOverflowPopup', {
+    return scout.create(TagBarOverflowPopup, {
       parent: this,
       closeOnAnchorMouseDown: false,
       focusableContainer: true,

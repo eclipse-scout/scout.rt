@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxField, CompositeField, DateField, dates, FormField, HtmlComponent, LogicalGridData, LogicalGridLayoutConfig, scout, SequenceBoxGridConfig, SequenceBoxLayout} from '../../../index';
+import {CheckBoxField, CompositeField, DateField, dates, FormField, HorizontalGrid, HtmlComponent, LogicalGridData, LogicalGridLayoutConfig, scout, SequenceBoxGridConfig, SequenceBoxLayout} from '../../../index';
 
 export default class SequenceBox extends CompositeField {
 
@@ -16,7 +16,7 @@ export default class SequenceBox extends CompositeField {
     super();
     this._addWidgetProperties('fields');
     this._addCloneProperties(['layoutConfig']);
-    this.logicalGrid = scout.create('scout.HorizontalGrid');
+    this.logicalGrid = scout.create(HorizontalGrid);
     this.layoutConfig = null;
     this.fields = [];
     this._fieldPropertyChangeHandler = this._onFieldPropertyChange.bind(this);

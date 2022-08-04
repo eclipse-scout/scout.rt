@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, comparators, DecimalFormat, ObjectFactory, objects, RemoteEvent, scout, Table, TableAdapter, TextColumnUserFilter} from '../../index';
+import {arrays, Cell, comparators, DecimalFormat, ObjectFactory, objects, RemoteEvent, scout, Table, TableAdapter, TableTextUserFilter, TextColumnUserFilter} from '../../index';
 import {MenuSpecHelper} from '../index';
 import $ from 'jquery';
 
@@ -90,7 +90,7 @@ export default class TableSpecHelper {
     if (value !== undefined) {
       cell.value = value;
     }
-    return scout.create('Cell', cell);
+    return scout.create(Cell, cell);
   }
 
   createMenuModel(text, icon) {
@@ -233,7 +233,7 @@ export default class TableSpecHelper {
 
 
   createTableTextFilter(table, text) {
-    return scout.create('TableTextUserFilter', {
+    return scout.create(TableTextUserFilter, {
       session: this.session,
       table: table,
       text: text
@@ -241,7 +241,7 @@ export default class TableSpecHelper {
   }
 
   createTextColumnFilter(table, column, text) {
-    return scout.create('TextColumnUserFilter', {
+    return scout.create(TextColumnUserFilter, {
       session: this.session,
       table: table,
       column: column,

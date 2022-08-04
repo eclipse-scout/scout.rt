@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {scout} from '../../../../index';
+import {scout, TabBox, TabItem} from '../../../../index';
 
 export default class TabBoxSpecHelper {
 
@@ -20,10 +20,10 @@ export default class TabBoxSpecHelper {
   createTabBoxWith2Tabs(model) {
     model = $.extend({
       tabItems: [{
-        objectType: 'TabItem',
+        objectType: TabItem,
         label: 'first'
       }, {
-        objectType: 'TabItem',
+        objectType: TabItem,
         label: 'second'
       }]
     }, model);
@@ -43,14 +43,14 @@ export default class TabBoxSpecHelper {
       parent: this.session.desktop
     }, model);
 
-    return scout.create('TabBox', model);
+    return scout.create(TabBox, model);
   }
 
   createTabItem(model) {
     model = $.extend({
       parent: this.session.desktop
     }, model);
-    return scout.create('TabItem', model);
+    return scout.create(TabItem, model);
   }
 
 }

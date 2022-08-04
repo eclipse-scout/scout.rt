@@ -70,6 +70,6 @@ App.addListener('prepare', () => {
     // if the environment was created before the app itself, use it instead of creating a new one
     return;
   }
-  instance = scout.create('HtmlEnvironment');
+  instance = scout.create(HtmlEnvironment);
   instance.init();
 });

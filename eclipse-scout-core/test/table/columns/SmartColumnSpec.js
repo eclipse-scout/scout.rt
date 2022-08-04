@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {TableSpecHelper} from '../../../src/testing/index';
-import {arrays, Cell, objects} from '../../../src';
+import {arrays, Cell, LookupCall, objects} from '../../../src';
 
 describe('SmartColumn', () => {
   let session, helper;
@@ -32,7 +32,7 @@ describe('SmartColumn', () => {
       }]
     });
 
-    const lookupCall = scout.create('LookupCall', {session: session, batch: true});
+    const lookupCall = scout.create(LookupCall, {session: session, batch: true});
     table.columns[0].setLookupCall(lookupCall);
 
     const key1 = {a: 1, b: 1};
@@ -142,7 +142,7 @@ describe('SmartColumn', () => {
       }]
     });
 
-    const lookupCall = scout.create('LookupCall', {session: session, batch: true});
+    const lookupCall = scout.create(LookupCall, {session: session, batch: true});
     table.columns[0].setLookupCall(lookupCall);
 
     const valueMap = {key1: 'Value 1', key2: 'Value 2', key3: 'Value 3'};
@@ -196,7 +196,7 @@ describe('SmartColumn', () => {
     });
     let column = table.columns[0];
 
-    let lookupCall = scout.create('LookupCall', {session: session, batch: true});
+    let lookupCall = scout.create(LookupCall, {session: session, batch: true});
     column.setLookupCall(lookupCall);
 
     let cell0 = new Cell();
@@ -239,7 +239,7 @@ describe('SmartColumn', () => {
       }]
     });
 
-    let lookupCall = scout.create('LookupCall', {session: session, batch: true});
+    let lookupCall = scout.create(LookupCall, {session: session, batch: true});
     table.columns[0].setLookupCall(lookupCall);
 
     let counter = 0;

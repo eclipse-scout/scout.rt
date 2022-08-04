@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {codes, Device, EventSupport, fonts, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage} from './index';
+import {codes, Desktop, Device, ErrorHandler, EventSupport, fonts, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage} from './index';
 import $ from 'jquery';
 
 let instance = null;
@@ -342,7 +342,7 @@ export default class App {
   }
 
   _createErrorHandler() {
-    return scout.create('ErrorHandler');
+    return scout.create(ErrorHandler);
   }
 
   /**
@@ -428,13 +428,13 @@ export default class App {
   }
 
   _createSession(options) {
-    return scout.create('Session', options, {
+    return scout.create(Session, options, {
       ensureUniqueId: false
     });
   }
 
   _createDesktop(parent) {
-    return scout.create('Desktop', {
+    return scout.create(Desktop, {
       parent: parent
     });
   }

@@ -29,7 +29,7 @@ export default class SimpleTabBox extends Widget {
 
     if (!this.controller) {
       // default controller
-      this.controller = scout.create('SimpleTabBoxController');
+      this.controller = scout.create(SimpleTabBoxController);
     }
     // link
     this.controller.install(this, this.tabArea);

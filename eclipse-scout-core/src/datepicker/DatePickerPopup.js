@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DatePickerPopupLayout, FormField, HtmlComponent, Popup, scout} from '../index';
+import {DatePicker, DatePickerPopupLayout, FormField, HtmlComponent, Popup, scout} from '../index';
 
 export default class DatePickerPopup extends Popup {
 
@@ -23,7 +23,7 @@ export default class DatePickerPopup extends Popup {
     options.withFocusContext = false;
     super._init(options);
 
-    this.picker = scout.create('DatePicker', {
+    this.picker = scout.create(DatePicker, {
       parent: this,
       dateFormat: options.dateFormat,
       allowedDates: options.allowedDates

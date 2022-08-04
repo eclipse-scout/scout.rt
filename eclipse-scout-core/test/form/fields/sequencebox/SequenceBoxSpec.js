@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, FormField, scout, SequenceBoxGridConfig, Status} from '../../../../src/index';
+import {dates, FormField, scout, SequenceBox, SequenceBoxGridConfig, Status} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '../../../../src/testing/index';
 
 describe('SequenceBox', () => {
@@ -549,7 +549,7 @@ describe('SequenceBox', () => {
   describe('clone', () => {
     it('considers the clone properties and deep clones fields', () => {
       let cloneHelper = new CloneSpecHelper();
-      let seqBox = scout.create('SequenceBox', {
+      let seqBox = scout.create(SequenceBox, {
         parent: session.desktop,
         id: 'seq01',
         label: 'abc',
@@ -585,7 +585,7 @@ describe('SequenceBox', () => {
 
   describe('focus', () => {
     it('focuses the first field', () => {
-      let box = scout.create('SequenceBox', {
+      let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'StringField'
@@ -601,7 +601,7 @@ describe('SequenceBox', () => {
     });
 
     it('focuses the second field if the first is disabled', () => {
-      let box = scout.create('SequenceBox', {
+      let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'StringField',
@@ -619,7 +619,7 @@ describe('SequenceBox', () => {
     });
 
     it('focuses the second field if the first is not focusable', () => {
-      let box = scout.create('SequenceBox', {
+      let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'LabelField'
@@ -637,7 +637,7 @@ describe('SequenceBox', () => {
 
   describe('autoDate on datefields', () => {
     it('is set on following date fields if the date changes in a date field', () => {
-      let box = scout.create('SequenceBox', {
+      let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField'
@@ -659,7 +659,7 @@ describe('SequenceBox', () => {
     });
 
     it('is set only on following fields in the sequence box', () => {
-      let box = scout.create('SequenceBox', {
+      let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField'
@@ -695,7 +695,7 @@ describe('SequenceBox', () => {
     });
 
     it('is correctly removed again after a date field value is removed', () => {
-      let box = scout.create('SequenceBox', {
+      let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField'
@@ -733,7 +733,7 @@ describe('SequenceBox', () => {
     });
 
     it('is correctly set within sequence boxes containing other fields as well', () => {
-      let box = scout.create('SequenceBox', {
+      let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField'
@@ -759,7 +759,7 @@ describe('SequenceBox', () => {
 
     it('works correctly with values already set on the datefield model', () => {
       let date = dates.create('2017-05-23 12:30:00.000');
-      let box = scout.create('SequenceBox', {
+      let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField',
@@ -776,7 +776,7 @@ describe('SequenceBox', () => {
     it('dont conflict with already set/programmed autoDates', () => {
       let date = dates.create('2017-05-23 12:30:00.000');
       let date2 = dates.create('2017-05-27 12:30:00.000');
-      let box = scout.create('SequenceBox', {
+      let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'DateField',

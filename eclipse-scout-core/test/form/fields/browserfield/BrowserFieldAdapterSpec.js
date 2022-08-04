@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteEvent, scout} from '../../../../src/index';
+import {BrowserFieldAdapter, RemoteEvent, scout} from '../../../../src/index';
 
 describe('BrowserFieldAdapter', () => {
 
@@ -28,7 +28,7 @@ describe('BrowserFieldAdapter', () => {
 
   it('sends postMessage on message', () => {
     let model = createSimpleModel('BrowserField', session, 'foo');
-    let adapter = scout.create('BrowserFieldAdapter', createAdapterModel(model));
+    let adapter = scout.create(BrowserFieldAdapter, createAdapterModel(model));
     let browserField = adapter.createWidget(model, session.desktop);
     browserField.render();
 

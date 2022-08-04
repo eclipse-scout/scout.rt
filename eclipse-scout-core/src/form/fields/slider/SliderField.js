@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, ValueField} from '../../../index';
+import {scout, Slider, ValueField} from '../../../index';
 import $ from 'jquery';
 
 export default class SliderField extends ValueField {
@@ -23,7 +23,7 @@ export default class SliderField extends ValueField {
     let sliderOptions = $.extend({
       parent: this
     }, model);
-    this.slider = scout.create('Slider', sliderOptions);
+    this.slider = scout.create(Slider, sliderOptions);
   }
 
   _render() {

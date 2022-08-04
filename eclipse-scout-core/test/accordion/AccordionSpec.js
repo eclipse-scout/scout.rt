@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../src/index';
+import {Accordion, Group, scout} from '../../src/index';
 
 describe('Accordion', () => {
   let session;
@@ -31,7 +31,7 @@ describe('Accordion', () => {
       groups: groups
     };
     model = $.extend({}, defaults, model);
-    return scout.create('Accordion', model);
+    return scout.create(Accordion, model);
   }
 
   function createGroup(model) {
@@ -39,7 +39,7 @@ describe('Accordion', () => {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create('Group', model);
+    return scout.create(Group, model);
   }
 
   describe('insertGroups', () => {

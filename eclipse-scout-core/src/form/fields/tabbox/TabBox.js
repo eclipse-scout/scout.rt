@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompositeField, fields, FormField, HtmlComponent, scout, SingleLayout, TabArea, TabBoxLayout} from '../../../index';
+import {arrays, CompositeField, fields, FormField, HtmlComponent, scout, SingleLayout, TabArea, TabBoxHeader, TabBoxLayout} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -39,7 +39,7 @@ export default class TabBox extends CompositeField {
    */
   _init(model) {
     super._init(model);
-    this.header = scout.create('TabBoxHeader', {
+    this.header = scout.create(TabBoxHeader, {
       parent: this,
       tabBox: this
     });

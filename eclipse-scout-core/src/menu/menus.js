@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, MenuDestinations, scout} from '../index';
+import {arrays, EllipsisMenu, MenuDestinations, scout} from '../index';
 
 export function filterAccordingToSelection(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
   let allowedTypes = [];
@@ -162,7 +162,7 @@ export function _checkType(menu, types) {
 }
 
 export function createEllipsisMenu(options) {
-  return scout.create('EllipsisMenu', options);
+  return scout.create(EllipsisMenu, options);
 }
 
 export function moveMenuIntoEllipsis(menu, ellipsis) {

@@ -89,7 +89,7 @@ export default class Icon extends Widget {
     if (this.image) {
       return;
     }
-    this.image = scout.create('Image', {
+    this.image = scout.create(Image, {
       parent: this,
       imageUrl: this.iconDesc.iconUrl,
       cssClass: 'icon image-icon',

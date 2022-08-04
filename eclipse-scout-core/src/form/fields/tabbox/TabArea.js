@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HtmlComponent, KeyStrokeContext, scout, strings, TabAreaLayout, TabAreaLeftKeyStroke, TabAreaRightKeyStroke, Widget} from '../../../index';
+import {arrays, EllipsisMenu, HtmlComponent, KeyStrokeContext, scout, strings, Tab, TabAreaLayout, TabAreaLeftKeyStroke, TabAreaRightKeyStroke, Widget} from '../../../index';
 
 export default class TabArea extends Widget {
 
@@ -36,7 +36,7 @@ export default class TabArea extends Widget {
     super._init(options);
     this.tabBox = options.tabBox;
 
-    this.ellipsis = scout.create('EllipsisMenu', {
+    this.ellipsis = scout.create(EllipsisMenu, {
       parent: this,
       cssClass: 'overflow-tab-item unfocusable',
       iconId: null,
@@ -142,7 +142,7 @@ export default class TabArea extends Widget {
       tabs = tabItems.map(tabItem => {
         let tab = this.getTabForItem(tabItem);
         if (!tab) {
-          tab = scout.create('Tab', {
+          tab = scout.create(Tab, {
             parent: this,
             tabItem: tabItem
           });

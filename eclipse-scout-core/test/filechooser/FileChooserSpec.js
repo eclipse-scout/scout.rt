@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, scout} from '../../src/index';
+import {Device, FileChooser, scout} from '../../src/index';
 
 describe('FileChooser', () => {
   let session;
@@ -20,7 +20,7 @@ describe('FileChooser', () => {
 
   describe('open', () => {
     it('opens the chooser', () => {
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: session.desktop
       });
       fileChooser.open();
@@ -32,7 +32,7 @@ describe('FileChooser', () => {
 
   describe('close', () => {
     it('closes the chooser', () => {
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: session.desktop
       });
       fileChooser.open();
@@ -47,7 +47,7 @@ describe('FileChooser', () => {
       if (!Device.get().supportsFileConstructor()) {
         return;
       }
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: session.desktop,
         multiSelect: true
       });
@@ -68,7 +68,7 @@ describe('FileChooser', () => {
       if (!Device.get().supportsFileConstructor()) {
         return;
       }
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: session.desktop,
         multiSelect: false
       });
@@ -97,7 +97,7 @@ describe('FileChooser', () => {
       let file1 = new File([''], 'file 1');
       let file2 = new File([''], 'file 2');
       let file3 = new File([''], 'file 3');
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: session.desktop,
         multiSelect: true,
         files: [file1, file2, file3]

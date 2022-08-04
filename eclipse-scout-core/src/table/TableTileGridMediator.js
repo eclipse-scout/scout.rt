@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AggregateTableControl, arrays, objects, scout, Widget} from '../index';
+import {AggregateTableControl, arrays, Group, objects, scout, TileAccordion, TileGrid, TileTableHierarchyFilter, Widget} from '../index';
 import $ from 'jquery';
 
 /**
@@ -258,7 +258,7 @@ export default class TableTileGridMediator extends Widget {
   }
 
   _createTileAccordion() {
-    return scout.create('TileAccordion', {
+    return scout.create(TileAccordion, {
       parent: this.table,
       virtual: true,
       selectable: true,
@@ -278,7 +278,7 @@ export default class TableTileGridMediator extends Widget {
       title = cell.text;
       iconId = cell.iconId;
     }
-    return scout.create('Group', {
+    return scout.create(Group, {
       parent: this.tileAccordion,
       id: groupId,
       headerVisible: groupId !== 'default',
@@ -286,7 +286,7 @@ export default class TableTileGridMediator extends Widget {
       titleHtmlEnabled: htmlEnabled,
       iconId: iconId,
       body: {
-        objectType: 'TileGrid',
+        objectType: TileGrid,
         scrollable: false
       }
     });
@@ -323,7 +323,7 @@ export default class TableTileGridMediator extends Widget {
 
     if (hasHierarchy) {
       // add the hierarchyFilter since the tileMode doesn't support hierarchy
-      this._tableHierarchyFilter = scout.create('TileTableHierarchyFilter', {
+      this._tableHierarchyFilter = scout.create(TileTableHierarchyFilter, {
         table: this.table
       });
       this.table.addFilter(this._tableHierarchyFilter);

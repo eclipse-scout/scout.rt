@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, FlexboxLayout, FlexboxLayoutData, HtmlComponent, scout, SimpleTabBox, Splitter, strings, Widget, widgets} from '../../index';
+import {arrays, DesktopTabBoxController, FlexboxLayout, FlexboxLayoutData, HtmlComponent, scout, SimpleTabBox, Splitter, strings, Widget, widgets} from '../../index';
 
 export default class BenchColumn extends Widget {
 
@@ -160,10 +160,10 @@ export default class BenchColumn extends Widget {
       rowLayoutDatas = this.layoutData.getRows();
     }
     for (let i = 0; i < 3; i++) {
-      let tabBox = scout.create('SimpleTabBox', {
+      let tabBox = scout.create(SimpleTabBox, {
         parent: this,
         cssClass: strings.join(' ', 'view-tab-box', BenchColumn.TAB_BOX_CLASSES[i]),
-        controller: scout.create('DesktopTabBoxController')
+        controller: scout.create(DesktopTabBoxController)
       });
       tabBox.setLayoutData(rowLayoutDatas[i]);
       tabBox.on('viewAdd', this._viewAddHandler);
@@ -187,7 +187,7 @@ export default class BenchColumn extends Widget {
       .reduce((arr, col) => {
         if (arr.length > 0) {
           // add sep
-          let splitter = scout.create('Splitter', {
+          let splitter = scout.create(Splitter, {
             parent: this,
             $anchor: arr[arr.length - 1].$container,
             $root: this.$container,

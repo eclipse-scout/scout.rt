@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, keys, scout, StaticLookupCall, Status, TableRow, Widget} from '../../../src/index';
+import {Cell, keys, scout, StaticLookupCall, Status, StringField, TableRow, Widget} from '../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../src/testing/index';
 
 describe('CellEditor', () => {
@@ -49,7 +49,7 @@ describe('CellEditor', () => {
   }
 
   function createStringField() {
-    return scout.create('StringField', {
+    return scout.create(StringField, {
       parent: session.desktop
     });
   }

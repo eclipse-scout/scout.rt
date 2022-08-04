@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../src/index';
+import {IFrame, scout} from '../../src/index';
 
 describe('IFrame', () => {
   let session;
@@ -20,7 +20,7 @@ describe('IFrame', () => {
 
   describe('setLocation', () => {
     it('sets the location of the iframe', () => {
-      let iframe = scout.create('IFrame', {
+      let iframe = scout.create(IFrame, {
         parent: session.desktop
       });
       iframe.render();
@@ -33,7 +33,7 @@ describe('IFrame', () => {
     });
 
     it('sets the location to about:blank if location is empty', () => {
-      let iframe = scout.create('IFrame', {
+      let iframe = scout.create(IFrame, {
         parent: session.desktop,
         location: 'http://www.bing.com'
       });

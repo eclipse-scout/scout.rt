@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ButtonKeyStroke, ButtonLayout, Device, DoubleClickSupport, FormField, icons, KeyStrokeContext, LoadingSupport, scout, styles, tooltips} from '../../../index';
+import {ButtonKeyStroke, ButtonLayout, ContextMenuPopup, Device, DoubleClickSupport, FormField, icons, KeyStrokeContext, LoadingSupport, scout, styles, tooltips} from '../../../index';
 
 export default class Button extends FormField {
 
@@ -239,7 +239,7 @@ export default class Button extends FormField {
   }
 
   _openPopup() {
-    let popup = scout.create('ContextMenuPopup', {
+    let popup = scout.create(ContextMenuPopup, {
       parent: this,
       menuItems: this.menus,
       cloneMenuItems: false,

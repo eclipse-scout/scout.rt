@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, scout} from '../../index';
+import {FormField, scout, TileOutlineOverview} from '../../index';
 
 export default class OutlineTileField extends FormField {
 
@@ -35,7 +35,7 @@ export default class OutlineTileField extends FormField {
       return;
     }
     let outline = this.outline ? this.session.getWidget(this.outline) : null;
-    this.tileOutlineOverview = scout.create('TileOutlineOverview', {
+    this.tileOutlineOverview = scout.create(TileOutlineOverview, {
       parent: this,
       outline: outline
     });

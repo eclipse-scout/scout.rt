@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ClickActiveElementKeyStroke, CloseKeyStroke, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget} from '../index';
+import {BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget} from '../index';
 
 export default class BusyIndicator extends Widget {
 
@@ -60,7 +60,7 @@ export default class BusyIndicator extends Widget {
     super._init(model);
     this.label = scout.nvl(this.label, this.session.text('ui.PleaseWait_'));
     if (this.cancellable) {
-      this.boxButtons = scout.create('BoxButtons', {parent: this});
+      this.boxButtons = scout.create(BoxButtons, {parent: this});
       this.cancelButton = this.boxButtons.addButton({text: this.session.text('Cancel')});
       this.cancelButton.one('action', event => this._onCancelClick(event));
     }

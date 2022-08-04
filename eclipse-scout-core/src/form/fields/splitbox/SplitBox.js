@@ -8,20 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  CollapseHandle,
-  CompositeField,
-  graphics,
-  GroupBox,
-  HtmlComponent,
-  HtmlEnvironment,
-  KeyStroke,
-  scout,
-  SplitBoxCollapseKeyStroke,
-  SplitBoxFirstCollapseKeyStroke,
-  SplitBoxLayout,
-  SplitBoxSecondCollapseKeyStroke
-} from '../../../index';
+import {CollapseHandle, CompositeField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, KeyStroke, scout, SplitBoxCollapseKeyStroke, SplitBoxFirstCollapseKeyStroke, SplitBoxLayout, SplitBoxSecondCollapseKeyStroke} from '../../../index';
 import $ from 'jquery';
 
 export default class SplitBox extends CompositeField {
@@ -415,7 +402,7 @@ export default class SplitBox extends CompositeField {
 
       if (!this._collapseHandle) {
         // create new collapse handle
-        this._collapseHandle = scout.create('CollapseHandle', {
+        this._collapseHandle = scout.create(CollapseHandle, {
           parent: this,
           horizontalAlignment: horizontalAlignment
         });

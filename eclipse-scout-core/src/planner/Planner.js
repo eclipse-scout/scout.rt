@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DateFormat, DateRange, dates, graphics, HtmlComponent, KeyStrokeContext, MenuBar, menus as menus_1, objects, PlannerLayout, PlannerMenuItemsOrder, Range, scout, scrollbars, strings, styles, tooltips, TooltipSupport, Widget} from '../index';
+import {arrays, ContextMenuPopup, DateFormat, DateRange, dates, graphics, HtmlComponent, KeyStrokeContext, MenuBar, menus as menus_1, objects, PlannerHeader, PlannerLayout, PlannerMenuItemsOrder, Range, scout, scrollbars, strings, styles, tooltips, TooltipSupport, Widget, YearPanel} from '../index';
 import $ from 'jquery';
 
 export default class Planner extends Widget {
@@ -86,12 +86,12 @@ export default class Planner extends Widget {
 
   _init(model) {
     super._init(model);
-    this._yearPanel = scout.create('YearPanel', {
+    this._yearPanel = scout.create(YearPanel, {
       parent: this,
       alwaysSelectFirstDay: true
     });
     this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
-    this._header = scout.create('PlannerHeader', {
+    this._header = scout.create(PlannerHeader, {
       parent: this
     });
     this._header.on('todayClick', this._onTodayClick.bind(this));
@@ -99,7 +99,7 @@ export default class Planner extends Widget {
     this._header.on('previousClick', this._onPreviousClick.bind(this));
     this._header.on('nextClick', this._onNextClick.bind(this));
     this._header.on('displayModeClick', this._onDisplayModeClick.bind(this));
-    this.menuBar = scout.create('MenuBar', {
+    this.menuBar = scout.create(MenuBar, {
       parent: this,
       position: MenuBar.Position.BOTTOM,
       menuOrder: new PlannerMenuItemsOrder(this.session, 'Planner'),
@@ -299,7 +299,7 @@ export default class Planner extends Widget {
       if (filteredMenus.length === 0) {
         return; // at least one menu item must be visible
       }
-      let popup = scout.create('ContextMenuPopup', {
+      let popup = scout.create(ContextMenuPopup, {
         parent: this,
         menuItems: filteredMenus,
         location: {

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, defaultValues, scout} from './index';
+import {App, defaultValues, ErrorHandler, scout} from './index';
 import $ from 'jquery';
 
 export default class RemoteApp extends App {
@@ -32,7 +32,7 @@ export default class RemoteApp extends App {
   }
 
   _createErrorHandler() {
-    return scout.create('ErrorHandler', {
+    return scout.create(ErrorHandler, {
       sendError: true
     });
   }

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Widget} from '../index';
+import {HtmlComponent, Image, Widget} from '../index';
 
 export default class DesktopLogo extends Widget {
 
@@ -26,7 +26,7 @@ export default class DesktopLogo extends Widget {
     this.desktop = this.session.desktop;
     this.clickable = this.desktop.logoActionEnabled;
     this.url = model.url;
-    this.image = scout.create('Image', {
+    this.image = scout.create(Image, {
       parent: this,
       imageUrl: this.url
     });

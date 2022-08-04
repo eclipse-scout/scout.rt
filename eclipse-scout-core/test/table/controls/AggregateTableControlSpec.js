@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LocaleSpecHelper, TableSpecHelper} from '../../../src/testing/index';
-import {DecimalFormat, scout} from '../../../src/index';
+import {AggregateTableControl, DecimalFormat, scout} from '../../../src/index';
 
 describe('AggregateTableControl', () => {
   let session;
@@ -38,7 +38,7 @@ describe('AggregateTableControl', () => {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create('AggregateTableControl', model);
+    return scout.create(AggregateTableControl, model);
   }
 
   function $aggregateRow(tableControl) {

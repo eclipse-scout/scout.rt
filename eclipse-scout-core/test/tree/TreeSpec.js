@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, objects, Page, Range, scout, scrollbars, strings, Tree} from '../../src/index';
+import {graphics, objects, Page, Range, scout, scrollbars, strings, Tree, TreeField} from '../../src/index';
 import {TreeSpecHelper} from '../../src/testing/index';
 
 describe('Tree', () => {
@@ -2862,7 +2862,7 @@ describe('Tree', () => {
   describe('invisible', () => {
 
     it('does not try to read node width when invisible', () => {
-      let treeField = scout.create('TreeField', {
+      let treeField = scout.create(TreeField, {
         parent: session.desktop,
         visible: false
       });

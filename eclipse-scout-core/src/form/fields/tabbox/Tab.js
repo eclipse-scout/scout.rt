@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, FormField, HtmlComponent, HtmlEnvironment, scout, Status, strings, tooltips, Widget} from '../../../index';
+import {Device, FieldStatus, FormField, HtmlComponent, HtmlEnvironment, scout, Status, strings, tooltips, Widget} from '../../../index';
 
 export default class Tab extends Widget {
 
@@ -38,7 +38,7 @@ export default class Tab extends Widget {
     this.errorStatus = this.tabItem.errorStatus;
     this.tooltipText = this.tabItem.tooltipText;
 
-    this.fieldStatus = scout.create('FieldStatus', {
+    this.fieldStatus = scout.create(FieldStatus, {
       parent: this,
       visible: false
     });
@@ -150,7 +150,7 @@ export default class Tab extends Widget {
       autoRemove = !status.isError();
       initialShow = true;
     } else {
-      status = scout.create('Status', {
+      status = scout.create(Status, {
         message: this.tooltipText,
         severity: Status.Severity.INFO
       });

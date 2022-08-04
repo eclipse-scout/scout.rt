@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, StaticLookupCall} from '../../../../src/index';
+import {LookupRow, scout, SmartField, StaticLookupCall, TreeProposalChooser} from '../../../../src/index';
 
 describe('TreeProposalChooser', () => {
 
@@ -38,11 +38,11 @@ describe('TreeProposalChooser', () => {
 
     it('sets inactive class correctly', () => {
       // dummy smart field
-      let smartField = scout.create('SmartField', {
+      let smartField = scout.create(SmartField, {
         parent: session.desktop
       });
 
-      let chooser = scout.create('TreeProposalChooser', {
+      let chooser = scout.create(TreeProposalChooser, {
         parent: session.desktop,
         smartField: smartField
       });
@@ -66,33 +66,33 @@ describe('TreeProposalChooser', () => {
 
     it('does not get messed up with null keys', () => {
       // dummy smart field
-      let smartField = scout.create('SmartField', {
+      let smartField = scout.create(SmartField, {
         parent: session.desktop
       });
 
-      let chooser = scout.create('TreeProposalChooser', {
+      let chooser = scout.create(TreeProposalChooser, {
         parent: session.desktop,
         smartField: smartField
       });
 
       let lookupRows = [
-        scout.create('LookupRow', {
+        scout.create(LookupRow, {
           text: 'No Key, No Parent'
         }),
-        scout.create('LookupRow', {
+        scout.create(LookupRow, {
           key: null,
           text: 'Explicit null Key, No Parent'
         }),
-        scout.create('LookupRow', {
+        scout.create(LookupRow, {
           key: 1,
           text: 'No Parent'
         }),
-        scout.create('LookupRow', {
+        scout.create(LookupRow, {
           key: 2,
           text: 'Explicit null Parent',
           parentKey: null
         }),
-        scout.create('LookupRow', {
+        scout.create(LookupRow, {
           key: 3,
           parentKey: 2,
           text: 'Child'
@@ -114,7 +114,7 @@ describe('TreeProposalChooser', () => {
     });
 
     it('clears the field if a lookup row with key null is selected', () => {
-      let smartField = scout.create('SmartField', {
+      let smartField = scout.create(SmartField, {
         parent: session.desktop,
         browseHierarchy: true,
         lookupCall: {
@@ -142,7 +142,7 @@ describe('TreeProposalChooser', () => {
     });
 
     it('allows selecting lookup row with null key by typing', () => {
-      let smartField = scout.create('SmartField', {
+      let smartField = scout.create(SmartField, {
         parent: session.desktop,
         browseHierarchy: true,
         lookupCall: {

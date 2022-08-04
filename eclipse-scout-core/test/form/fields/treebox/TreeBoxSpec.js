@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {QueryBy, scout, Status, TreeBox} from '../../../../src/index';
+import {LookupRow, QueryBy, scout, Status, TreeBox} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
 
 describe('TreeBox', () => {
@@ -35,7 +35,7 @@ describe('TreeBox', () => {
       parent: session.desktop,
       lookupCall: lookupCallModel
     }, model);
-    let box = scout.create('TreeBox', model);
+    let box = scout.create(TreeBox, model);
     box.render();
     return box;
   }
@@ -53,7 +53,7 @@ describe('TreeBox', () => {
     });
 
     it('LookupCall can be prepared if value is set explicitly', done => {
-      let box = scout.create('TreeBox', {
+      let box = scout.create(TreeBox, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
@@ -64,7 +64,7 @@ describe('TreeBox', () => {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
       })
         .catch(fail)
         .always(done);
@@ -72,7 +72,7 @@ describe('TreeBox', () => {
     });
 
     it('LookupCall can be prepared if value is configured', done => {
-      let box = scout.create('TreeBox', {
+      let box = scout.create(TreeBox, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall',
         value: 3
@@ -84,7 +84,7 @@ describe('TreeBox', () => {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
         expect(box.getCheckedLookupRows().length).toBe(1);
       })
         .catch(fail)
@@ -195,7 +195,7 @@ describe('TreeBox', () => {
       expect(field.tree.visibleNodesFlat.length).toBe(5);
       expect(field.tree.checkedNodes.length).toBe(2);
 
-      let newLookupCall = scout.create('DummyLookupCall', {
+      let newLookupCall = scout.create(DummyLookupCall, {
         session: session
       });
       field.setLookupCall(newLookupCall);
@@ -216,7 +216,7 @@ describe('TreeBox', () => {
       let field = createFieldWithLookupCall({}, {
         customProperty: templatePropertyValue,
         _dataToLookupRow: function(data) { // overwrite mapping function to use the custom property
-          return scout.create('LookupRow', {
+          return scout.create(LookupRow, {
             key: data[0],
             text: data[1] + this.customProperty
           });
@@ -317,7 +317,7 @@ describe('TreeBox', () => {
     let lookupCall;
 
     beforeEach(() => {
-      lookupCall = scout.create('DummyLookupCall', {
+      lookupCall = scout.create(DummyLookupCall, {
         session: session
       });
     });
@@ -326,7 +326,7 @@ describe('TreeBox', () => {
       let model = helper.createFieldModel('TreeBox', session.desktop, {
         lookupCall: lookupCall
       });
-      let treeBox = scout.create('TreeBox', model);
+      let treeBox = scout.create(TreeBox, model);
       expect(treeBox.displayText).toBe('');
       treeBox.setValue([1]);
       jasmine.clock().tick(300);
@@ -342,7 +342,7 @@ describe('TreeBox', () => {
       let model = helper.createFieldModel('TreeBox', session.desktop, {
         lookupCall: lookupCall
       });
-      let treeBox = scout.create('TreeBox', model);
+      let treeBox = scout.create(TreeBox, model);
       expect(treeBox.displayText).toBe('');
 
       treeBox.setValue(null);
@@ -360,7 +360,7 @@ describe('TreeBox', () => {
       let model = helper.createFieldModel('TreeBox', session.desktop, {
         lookupCall: lookupCall
       });
-      let treeBox = scout.create('TreeBox', model);
+      let treeBox = scout.create(TreeBox, model);
       treeBox.tree.autoCheckChildren = true;
 
       // Checking nodes by model should not auto-check child nodes
@@ -375,7 +375,7 @@ describe('TreeBox', () => {
   describe('label', () => {
 
     it('is linked with the field', () => {
-      let treeBox = scout.create('TreeBox', {
+      let treeBox = scout.create(TreeBox, {
         parent: session.desktop
       });
       treeBox.render();

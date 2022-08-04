@@ -101,7 +101,7 @@ export default class MessageBoxes {
       options.html = options.body;
       delete options.body;
     }
-    return scout.create('MessageBox', options);
+    return scout.create(MessageBox, options);
   }
 
   /**
@@ -124,7 +124,7 @@ export default class MessageBoxes {
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
   static create(parent) {
-    return scout.create('MessageBoxes', {
+    return scout.create(MessageBoxes, {
       parent: parent
     });
   }

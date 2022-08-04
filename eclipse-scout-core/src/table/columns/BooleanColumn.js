@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, comparators, scout} from '../../index';
+import {CheckBoxField, Column, comparators, scout} from '../../index';
 
 /**
  * May be an ordinary boolean column or the table's checkable column (table.checkableColumn)
@@ -139,7 +139,7 @@ export default class BooleanColumn extends Column {
    * @override
    */
   _createEditor(row) {
-    return scout.create('CheckBoxField', {
+    return scout.create(CheckBoxField, {
       parent: this.table,
       triStateEnabled: this.triStateEnabled
     });

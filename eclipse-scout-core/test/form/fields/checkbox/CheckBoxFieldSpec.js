@@ -59,7 +59,7 @@ describe('CheckBoxField', () => {
   describe('label', () => {
 
     it('is linked with the field', () => {
-      let field = scout.create('CheckBoxField', {
+      let field = scout.create(CheckBoxField, {
         parent: session.desktop,
         label: 'label'
       });
@@ -75,7 +75,7 @@ describe('CheckBoxField', () => {
   describe('keyStroke', () => {
 
     it('toggles the value', () => {
-      let field = scout.create('CheckBoxField', {
+      let field = scout.create(CheckBoxField, {
         parent: session.desktop,
         keyStroke: 'ctrl-b'
       });

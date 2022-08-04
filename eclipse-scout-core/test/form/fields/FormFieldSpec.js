@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, GridData, RadioButtonGroup, scout, Status, StringField, TreeVisitResult, Widget} from '../../../src/index';
+import {FormField, GridData, GroupBox, Menu, RadioButtonGroup, scout, Status, StringField, TreeVisitResult, Widget} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
 
 describe('FormField', () => {
@@ -224,7 +224,7 @@ describe('FormField', () => {
     });
 
     it('ensures this.menus is not null', () => {
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: formField
       });
       formField.setMenus([menu]);
@@ -237,7 +237,7 @@ describe('FormField', () => {
     });
 
     it('adds class has-menus if there are menus', () => {
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: formField
       });
       formField.setMenusVisible(true);
@@ -250,7 +250,7 @@ describe('FormField', () => {
     });
 
     it('adds class has-menus has-tooltip if there are menus and a tooltip', () => {
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: formField
       });
       formField.setMenusVisible(true);
@@ -267,7 +267,7 @@ describe('FormField', () => {
     });
 
     it('toggles has-menus class when visibility changes', () => {
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: formField
       });
       formField.setMenus([menu]);
@@ -287,7 +287,7 @@ describe('FormField', () => {
       formField.setMenusVisible(true);
       expect(formField.$container).not.toHaveClass('has-menus');
 
-      let menu2 = scout.create('Menu', {
+      let menu2 = scout.create(Menu, {
         parent: formField
       });
       formField.setMenus([menu, menu2]);
@@ -301,10 +301,10 @@ describe('FormField', () => {
     });
 
     it('updates menus on status when visibility changes', () => {
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: formField
       });
-      let menu2 = scout.create('Menu', {
+      let menu2 = scout.create(Menu, {
         parent: formField,
         visible: false
       });
@@ -451,7 +451,7 @@ describe('FormField', () => {
   });
 
   function createVisitStructure() {
-    return scout.create('GroupBox', {
+    return scout.create(GroupBox, {
       parent: session.desktop,
       fields: [{
         objectType: 'StringField'

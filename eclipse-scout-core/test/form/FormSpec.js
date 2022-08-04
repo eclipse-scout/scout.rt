@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
-import {Dimension, fields, Form, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
+import {Dimension, fields, Form, NullWidget, Popup, Rectangle, scout, Status, webstorage} from '../../src/index';
 
 describe('Form', () => {
   let session, helper, outlineHelper;
@@ -36,7 +36,7 @@ describe('Form', () => {
 
   describe('init', () => {
     it('marks the root group box as main box', () => {
-      let form = scout.create('Form', {
+      let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox',
@@ -259,7 +259,7 @@ describe('Form', () => {
   describe('abort', () => {
 
     it('closes the form if there is a close button', done => {
-      let form = scout.create('Form', {
+      let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox',
@@ -282,7 +282,7 @@ describe('Form', () => {
     });
 
     it('closes the form even if opening is still pending', done => {
-      let form = scout.create('Form', {
+      let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox',
@@ -307,7 +307,7 @@ describe('Form', () => {
     });
 
     it('closes the form by using cancel if there is no close button', done => {
-      let form = scout.create('Form', {
+      let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox'
@@ -600,7 +600,7 @@ describe('Form', () => {
       let dialog = helper.createFormWithOneField({
         modal: true
       });
-      let popup = scout.create('Popup', {
+      let popup = scout.create(Popup, {
         parent: dialog,
         withGlassPane: true
       });
@@ -634,7 +634,7 @@ describe('Form', () => {
         modal: true,
         displayParent: view
       });
-      let popup = scout.create('Popup', {
+      let popup = scout.create(Popup, {
         parent: dialog,
         withGlassPane: true
       });
@@ -665,7 +665,7 @@ describe('Form', () => {
 
   describe('rootGroupBox.gridData', () => {
     it('is created using gridDataHints when the logical grid is validated', () => {
-      let form = scout.create('Form', {
+      let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox',
@@ -685,7 +685,7 @@ describe('Form', () => {
 
   describe('initialFocus', () => {
     it('references the widget which should gain focus after the form is displayed', () => {
-      let form = scout.create('Form', {
+      let form = scout.create(Form, {
         parent: session.desktop,
         initialFocus: 'tabItem1',
         rootGroupBox: {
@@ -797,7 +797,7 @@ describe('Form', () => {
 
   describe('disabled form', () => {
     it('can be closed although it is disabled', done => {
-      let form = scout.create('Form', {
+      let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
           id: 'mainbox',

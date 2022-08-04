@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, graphics, HtmlComponent, NumberColumn, Point, Popup, RowLayout, scout, scrollbars, Table, TableHeaderMenuGroup, TableHeaderMenuLayout} from '../index';
+import {arrays, Cell, Column, Device, FilterFieldsGroupBox, graphics, HtmlComponent, NumberColumn, Point, Popup, RowLayout, scout, scrollbars, Table, TableHeaderMenuButton, TableHeaderMenuGroup, TableHeaderMenuLayout} from '../index';
 
 export default class TableHeaderMenu extends Popup {
 
@@ -261,12 +261,12 @@ export default class TableHeaderMenu extends Popup {
       column = this.column,
       pos = table.visibleColumns().indexOf(column);
 
-    this.moveGroup = scout.create('TableHeaderMenuGroup', {
+    this.moveGroup = scout.create(TableHeaderMenuGroup, {
       parent: this,
       textKey: 'ui.Move',
       cssClass: 'first'
     });
-    this.toBeginButton = scout.create('TableHeaderMenuButton', {
+    this.toBeginButton = scout.create(TableHeaderMenuButton, {
       parent: this.moveGroup,
       text: '${textKey:ui.toBegin}',
       cssClass: 'move move-top'
@@ -276,7 +276,7 @@ export default class TableHeaderMenu extends Popup {
       pos = table.visibleColumns().indexOf(column);
     });
 
-    this.forwardButton = scout.create('TableHeaderMenuButton', {
+    this.forwardButton = scout.create(TableHeaderMenuButton, {
       parent: this.moveGroup,
       text: '${textKey:ui.forward}',
       cssClass: 'move move-up'
@@ -286,7 +286,7 @@ export default class TableHeaderMenu extends Popup {
       pos = table.visibleColumns().indexOf(column);
     });
 
-    this.backwardButton = scout.create('TableHeaderMenuButton', {
+    this.backwardButton = scout.create(TableHeaderMenuButton, {
       parent: this.moveGroup,
       text: '${textKey:ui.backward}',
       cssClass: 'move move-down'
@@ -296,7 +296,7 @@ export default class TableHeaderMenu extends Popup {
       pos = table.visibleColumns().indexOf(column);
     });
 
-    this.toEndButton = scout.create('TableHeaderMenuButton', {
+    this.toEndButton = scout.create(TableHeaderMenuButton, {
       parent: this.moveGroup,
       text: '${textKey:ui.toEnd}',
       cssClass: 'move move-bottom'
@@ -338,12 +338,12 @@ export default class TableHeaderMenu extends Popup {
     let column = this.column,
       menuPopup = this;
 
-    this.columnActionsGroup = scout.create('TableHeaderMenuGroup', {
+    this.columnActionsGroup = scout.create(TableHeaderMenuGroup, {
       parent: this,
       textKey: 'ui.Column'
     });
 
-    this.addColumnButton = scout.create('TableHeaderMenuButton', {
+    this.addColumnButton = scout.create(TableHeaderMenuButton, {
       parent: this.columnActionsGroup,
       text: '${textKey:ui.addColumn}',
       cssClass: 'add-column',
@@ -351,7 +351,7 @@ export default class TableHeaderMenu extends Popup {
     });
     this.addColumnButton.on('action', onClick.bind(this, 'add'));
 
-    this.removeColumnButton = scout.create('TableHeaderMenuButton', {
+    this.removeColumnButton = scout.create(TableHeaderMenuButton, {
       parent: this.columnActionsGroup,
       text: '${textKey:ui.removeColumn}',
       cssClass: 'remove-column',
@@ -359,7 +359,7 @@ export default class TableHeaderMenu extends Popup {
     });
     this.removeColumnButton.on('action', onClick.bind(this, 'remove'));
 
-    this.modifyColumnButton = scout.create('TableHeaderMenuButton', {
+    this.modifyColumnButton = scout.create(TableHeaderMenuButton, {
       parent: this.columnActionsGroup,
       text: '${textKey:ui.changeColumn}',
       cssClass: 'change-column',
@@ -394,13 +394,13 @@ export default class TableHeaderMenu extends Popup {
       column = this.column,
       menuPopup = this;
 
-    this.sortingGroup = scout.create('TableHeaderMenuGroup', {
+    this.sortingGroup = scout.create(TableHeaderMenuGroup, {
       parent: this,
       textKey: 'ColumnSorting'
     });
 
     if (!table.hasPermanentHeadOrTailSortColumns()) {
-      this.sortAscButton = scout.create('TableHeaderMenuButton', {
+      this.sortAscButton = scout.create(TableHeaderMenuButton, {
         parent: this.sortingGroup,
         text: '${textKey:ui.ascending}',
         cssClass: 'sort sort-asc',
@@ -409,7 +409,7 @@ export default class TableHeaderMenu extends Popup {
       });
       this.sortAscButton.on('action', onSortClick.bind(this.sortAscButton));
 
-      this.sortDescButton = scout.create('TableHeaderMenuButton', {
+      this.sortDescButton = scout.create(TableHeaderMenuButton, {
         parent: this.sortingGroup,
         text: '${textKey:ui.descending}',
         cssClass: 'sort sort-desc',
@@ -419,7 +419,7 @@ export default class TableHeaderMenu extends Popup {
       this.sortDescButton.on('action', onSortClick.bind(this.sortDescButton));
     }
 
-    this.sortAscAddButton = scout.create('TableHeaderMenuButton', {
+    this.sortAscAddButton = scout.create(TableHeaderMenuButton, {
       parent: this.sortingGroup,
       text: '${textKey:ui.ascendingAdditionally}',
       cssClass: 'sort sort-asc-add',
@@ -428,7 +428,7 @@ export default class TableHeaderMenu extends Popup {
     });
     this.sortAscAddButton.on('action', onSortAdditionalClick.bind(this.sortAscAddButton));
 
-    this.sortDescAddButton = scout.create('TableHeaderMenuButton', {
+    this.sortDescAddButton = scout.create(TableHeaderMenuButton, {
       parent: this.sortingGroup,
       text: '${textKey:ui.descendingAdditionally}',
       cssClass: 'sort sort-desc-add',
@@ -504,12 +504,12 @@ export default class TableHeaderMenu extends Popup {
       column = this.column,
       groupCount = this._groupColumnCount();
 
-    let group = scout.create('TableHeaderMenuGroup', {
+    let group = scout.create(TableHeaderMenuGroup, {
       parent: this,
       textKey: 'ui.Grouping'
     });
 
-    this.groupButton = scout.create('TableHeaderMenuButton', {
+    this.groupButton = scout.create(TableHeaderMenuButton, {
       parent: group,
       text: '${textKey:ui.groupingApply}',
       cssClass: 'group',
@@ -518,7 +518,7 @@ export default class TableHeaderMenu extends Popup {
     });
     this.groupButton.on('action', groupColumn.bind(this.groupButton));
 
-    this.groupAddButton = scout.create('TableHeaderMenuButton', {
+    this.groupAddButton = scout.create(TableHeaderMenuButton, {
       parent: group,
       text: '${textKey:ui.additionally}',
       cssClass: 'group-add',
@@ -564,13 +564,13 @@ export default class TableHeaderMenu extends Popup {
   _renderHierarchyGruop() {
     let table = this.table,
       menuPopup = this;
-    this.hierarchyGroup = scout.create('TableHeaderMenuGroup', {
+    this.hierarchyGroup = scout.create(TableHeaderMenuGroup, {
       parent: this,
       textKey: 'ui.Hierarchy',
       visible: this.table.isTableNodeColumn(this.column)
     });
 
-    let collapseAllButton = scout.create('TableHeaderMenuButton', {
+    let collapseAllButton = scout.create(TableHeaderMenuButton, {
       parent: this.hierarchyGroup,
       text: '${textKey:ui.CollapseAll}',
       cssClass: 'hierarchy-collapse-all',
@@ -583,7 +583,7 @@ export default class TableHeaderMenu extends Popup {
       table.collapseAll();
     });
 
-    let expandAllButton = scout.create('TableHeaderMenuButton', {
+    let expandAllButton = scout.create(TableHeaderMenuButton, {
       parent: this.hierarchyGroup,
       text: '${textKey:ui.ExpandAll}',
       cssClass: 'hierarchy-expand-all',
@@ -605,7 +605,7 @@ export default class TableHeaderMenu extends Popup {
       column = this.column,
       aggregation = column.aggregationFunction,
       menuPopup = this,
-      group = scout.create('TableHeaderMenuGroup', {
+      group = scout.create(TableHeaderMenuGroup, {
         parent: this,
         textKey: 'ui.Aggregation'
       }),
@@ -625,7 +625,7 @@ export default class TableHeaderMenu extends Popup {
 
     function createHeaderMenuButtonForAggregationFunction(text, aggregation) {
       if (allowedAggregationFunctions.indexOf(aggregation) !== -1) {
-        let aggrButton = scout.create('TableHeaderMenuButton', {
+        let aggrButton = scout.create(TableHeaderMenuButton, {
           parent: group,
           text: text,
           cssClass: 'aggregation-function ' + aggregation,
@@ -647,12 +647,12 @@ export default class TableHeaderMenu extends Popup {
       column = this.column,
       menuPopup = this,
       backgroundEffect = column.backgroundEffect,
-      group = scout.create('TableHeaderMenuGroup', {
+      group = scout.create(TableHeaderMenuGroup, {
         parent: this,
         textKey: 'ui.Coloring'
       });
 
-    this.colorGradient1Button = scout.create('TableHeaderMenuButton', {
+    this.colorGradient1Button = scout.create(TableHeaderMenuButton, {
       parent: group,
       text: '${textKey:ui.fromRedToGreen}',
       cssClass: 'color color-gradient1',
@@ -661,7 +661,7 @@ export default class TableHeaderMenu extends Popup {
     });
     this.colorGradient1Button.on('action', onClick.bind(this.colorGradient1Button));
 
-    this.colorGradient2Button = scout.create('TableHeaderMenuButton', {
+    this.colorGradient2Button = scout.create(TableHeaderMenuButton, {
       parent: group,
       text: '${textKey:ui.fromGreenToRed}',
       cssClass: 'color color-gradient2',
@@ -671,7 +671,7 @@ export default class TableHeaderMenu extends Popup {
     this.colorGradient2Button.on('action', onClick.bind(this.colorGradient2Button));
 
     if (Device.get().supportsCssGradient()) {
-      this.barChartButton = scout.create('TableHeaderMenuButton', {
+      this.barChartButton = scout.create(TableHeaderMenuButton, {
         parent: group,
         text: '${textKey:ui.withBarChart}',
         cssClass: 'color color-bar-chart',
@@ -725,9 +725,9 @@ export default class TableHeaderMenu extends Popup {
     this.filter.availableValues.forEach(function(filterValue) {
       tableRow = {
         cells: [
-          scout.create('Cell', {
-            text: (this.filter.column.objectType === 'NumberColumn') ? filterValue.text : null,
-            value: (this.filter.column.objectType === 'NumberColumn') ? filterValue.key : filterValue.text,
+          scout.create(Cell, {
+            text: (this.filter.column instanceof NumberColumn) ? filterValue.text : null,
+            value: (this.filter.column instanceof NumberColumn) ? filterValue.key : filterValue.text,
             iconId: filterValue.iconId,
             htmlEnabled: filterValue.htmlEnabled,
             cssClass: filterValue.cssClass
@@ -752,12 +752,12 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _createFilterTable() {
-    let objectType = 'Column';
-    if (this.column.objectType === 'NumberColumn') {
-      objectType = this.column.objectType;
+    let objectType = Column;
+    if (this.column instanceof NumberColumn) {
+      objectType = NumberColumn;
     }
 
-    return scout.create('Table', {
+    return scout.create(Table, {
       parent: this,
       headerVisible: false,
       multiSelect: false,
@@ -774,14 +774,14 @@ export default class TableHeaderMenu extends Popup {
         sortIndex: 1,
         horizontalAlignment: -1
       }, {
-        objectType: 'NumberColumn',
+        objectType: NumberColumn,
         text: 'aggregate-count',
         cssClass: 'table-header-menu-filter-number-column',
         width: 50,
         minWidth: 32,
         autoOptimizeWidth: true
       }, {
-        objectType: 'NumberColumn',
+        objectType: NumberColumn,
         displayable: false,
         sortActive: true,
         sortIndex: 0
@@ -855,7 +855,7 @@ export default class TableHeaderMenu extends Popup {
   }
 
   _renderFilterFields() {
-    this.filterFieldsGroupBox = scout.create('GroupBox:FilterFields', {
+    this.filterFieldsGroupBox = scout.create(FilterFieldsGroupBox, {
       parent: this,
       column: this.column,
       filter: this.filter

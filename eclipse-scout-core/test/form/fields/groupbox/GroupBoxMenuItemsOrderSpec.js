@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, GroupBoxMenuItemsOrder, NullWidget, scout} from '../../../../src/index';
+import {Action, GroupBoxMenuItemsOrder, Menu, NullWidget, scout} from '../../../../src/index';
 
 describe('GroupBoxMenuItemsOrder', () => {
 
@@ -17,7 +17,7 @@ describe('GroupBoxMenuItemsOrder', () => {
   });
 
   function createMenu(label, horizontalAlignment, isButton) {
-    return scout.create('Menu', {
+    return scout.create(Menu, {
       parent: new NullWidget(),
       session: sandboxSession(),
       text: label,

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../../../src/index';
+import {scout, TableFieldAdapter} from '../../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
 describe('TableFieldAdapter', () => {
@@ -38,7 +38,7 @@ describe('TableFieldAdapter', () => {
   }
 
   function createTableFieldAdapter(model) {
-    return scout.create('TableFieldAdapter', createAdapterModel(model));
+    return scout.create(TableFieldAdapter, createAdapterModel(model));
   }
 
   function createTableFieldModel(tableModel) {

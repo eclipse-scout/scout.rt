@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, keys, scout} from '../../../src/index';
+import {arrays, keys, scout, TileGrid} from '../../../src/index';
 
 describe('TileGridKeyStrokes', () => {
   let session;
@@ -38,7 +38,7 @@ describe('TileGridKeyStrokes', () => {
       tiles: tiles
     };
     model = $.extend({}, defaults, model);
-    return scout.create('TileGrid', model);
+    return scout.create(TileGrid, model);
   }
 
   describe('ctrl + a', () => {

@@ -30,7 +30,7 @@ export default class FileChooser extends Widget {
     this._setDisplayParent(this.displayParent);
     this._glassPaneRenderer = new GlassPaneRenderer(this);
 
-    this.fileInput = scout.create('FileInput', {
+    this.fileInput = scout.create(FileInput, {
       parent: this,
       acceptTypes: this.acceptTypes,
       maximumUploadSize: this.maximumUploadSize,
@@ -39,7 +39,7 @@ export default class FileChooser extends Widget {
     });
     this.fileInput.on('change', this._onFileChange.bind(this));
 
-    this.boxButtons = scout.create('BoxButtons', {parent: this});
+    this.boxButtons = scout.create(BoxButtons, {parent: this});
     if (!this.fileInput.legacy) {
       let addFileButton = this.boxButtons.addButton({text: this.session.text('ui.Browse')});
       addFileButton.on('action', event => this._onAddFileButtonClicked(event));

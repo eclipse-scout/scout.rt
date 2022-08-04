@@ -23,7 +23,7 @@ describe('IntegerField', () => {
   });
 
   it('_parseValue', () => {
-    let field = scout.create('IntegerField', {
+    let field = scout.create(IntegerField, {
       parent: session.desktop
     });
 
@@ -47,7 +47,7 @@ describe('IntegerField', () => {
   });
 
   it('Test user input', () => {
-    let field = scout.create('IntegerField', {
+    let field = scout.create(IntegerField, {
       parent: session.desktop
     });
     field.render();
@@ -57,7 +57,7 @@ describe('IntegerField', () => {
   });
 
   it('Test min/max values', () => {
-    let field = scout.create('IntegerField', {
+    let field = scout.create(IntegerField, {
       parent: session.desktop,
       minValue: 0,
       maxValue: 99
@@ -82,7 +82,7 @@ describe('IntegerField', () => {
 
   describe('errorStatus', () => {
     it('parse, validate and custom-error', () => {
-      let field = scout.create('IntegerField', {
+      let field = scout.create(IntegerField, {
         parent: session.desktop
       });
 

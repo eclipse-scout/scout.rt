@@ -1,7 +1,6 @@
-import {PageWithTable, MessageBoxes, MessageBox, models, scout} from '@eclipse-scout/core';
-import {Person, PersonRepository} from '../index';
+import {MessageBox, MessageBoxes, models, PageWithTable, scout} from '@eclipse-scout/core';
+import {Person, PersonForm, PersonRepository, PersonRestriction} from '../index';
 import PersonTablePageModel from './PersonTablePageModel';
-import * as $ from 'jquery';
 
 export default class PersonTablePage extends PageWithTable {
 
@@ -54,7 +53,7 @@ export default class PersonTablePage extends PageWithTable {
   }
 
   _loadTableData(searchFilter) {
-    let restriction = scout.create('${simpleArtifactName}.PersonRestriction', searchFilter, {
+    let restriction = scout.create(PersonRestriction, searchFilter, {
       ensureUniqueId: false
     });
     return PersonRepository.get().list(restriction);
@@ -86,7 +85,7 @@ export default class PersonTablePage extends PageWithTable {
 
   _createPersonForm() {
     let outline = this.getOutline();
-    return scout.create('${simpleArtifactName}.PersonForm', {
+    return scout.create(PersonForm, {
       parent: outline
     });
   }
@@ -116,7 +115,7 @@ export default class PersonTablePage extends PageWithTable {
 
   _onCreatePersonMenuAction(event) {
     let personForm = this._createPersonForm();
-    let emptyPerson = scout.create('${simpleArtifactName}.Person', {}, {
+    let emptyPerson = scout.create(Person, {}, {
       ensureUniqueId: false
     });
     personForm.setData(emptyPerson);

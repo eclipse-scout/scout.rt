@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormLayout, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
+import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormController, FormGrid, FormLayout, FormLifecycle, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
 import $ from 'jquery';
 
 export default class Form extends Widget {
@@ -27,7 +27,7 @@ export default class Form extends Widget {
     this.maximized = false;
     this.headerVisible = null;
     this.modal = true;
-    this.logicalGrid = scout.create('FormGrid');
+    this.logicalGrid = scout.create(FormGrid);
     this.dialogs = [];
     this.views = [];
     this.messageBoxes = [];
@@ -79,7 +79,7 @@ export default class Form extends Widget {
     this.resolveIconIds(['iconId']);
     this._setDisplayParent(this.displayParent);
     this._setViews(this.views);
-    this.formController = scout.create('FormController', {
+    this.formController = scout.create(FormController, {
       displayParent: this,
       session: this.session
     });
@@ -215,7 +215,7 @@ export default class Form extends Widget {
   }
 
   _createLifecycle() {
-    return scout.create('FormLifecycle', {
+    return scout.create(FormLifecycle, {
       widget: this,
       askIfNeedSave: this.askIfNeedSave,
       askIfNeedSaveText: this.askIfNeedSaveText

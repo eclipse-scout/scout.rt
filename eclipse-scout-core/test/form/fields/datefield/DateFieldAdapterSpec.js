@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, keys, RemoteEvent, scout} from '../../../../src/index';
+import {DateField, dates, keys, RemoteEvent, scout} from '../../../../src/index';
 
 describe('DateFieldAdapter', () => {
   let session;
-  let helper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -35,7 +34,7 @@ describe('DateFieldAdapter', () => {
     model = $.extend({
       parent: session.desktop
     }, model);
-    let field = scout.create('DateField', model);
+    let field = scout.create(DateField, model);
     linkWidgetAndAdapter(field, 'DateFieldAdapter');
     return field;
   }

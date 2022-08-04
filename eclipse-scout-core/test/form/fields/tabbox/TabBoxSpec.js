@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, scout} from '../../../../src/index';
+import {keys, scout, TabBox} from '../../../../src/index';
 import {TabBoxSpecHelper} from '../../../../src/testing/index';
 
 describe('TabBox', () => {
@@ -45,7 +45,7 @@ describe('TabBox', () => {
   describe('remove', () => {
 
     it('does not fail if there was no selected tab', () => {
-      let tabBox = scout.create('TabBox', {parent: session.desktop});
+      let tabBox = scout.create(TabBox, {parent: session.desktop});
       tabBox.render();
       tabBox.remove();
       expect().nothing();
@@ -107,7 +107,7 @@ describe('TabBox', () => {
     let tabBox;
 
     beforeEach(() => {
-      tabBox = scout.create('TabBox', {
+      tabBox = scout.create(TabBox, {
         parent: session.desktop,
         tabItems: [{
           objectType: 'TabItem',
@@ -131,7 +131,7 @@ describe('TabBox', () => {
     });
 
     it('is added to the first visible tab item', () => {
-      tabBox = scout.create('TabBox', {
+      tabBox = scout.create(TabBox, {
         parent: session.desktop,
         tabItems: [{
           objectType: 'TabItem',

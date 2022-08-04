@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../src/index';
+import {scout, Splitter} from '../../src/index';
 
 describe('Splitter', () => {
   let session;
@@ -20,7 +20,7 @@ describe('Splitter', () => {
   });
 
   it('renders the splitter at the given position', () => {
-    let splitter = scout.create('Splitter', {
+    let splitter = scout.create(Splitter, {
       parent: session.desktop,
       position: 100
     });
@@ -30,7 +30,7 @@ describe('Splitter', () => {
   });
 
   it('renders can handle position changes while not visible', () => {
-    let splitter = scout.create('Splitter', {
+    let splitter = scout.create(Splitter, {
       parent: session.desktop,
       position: 123,
       cssClass: 'with-padding',

@@ -8,31 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  HtmlComponent,
-  LoadingSupport,
-  LogicalGridData,
-  LogicalGridLayoutConfig,
-  LookupCall,
-  objects,
-  RadioButton,
-  RadioButtonGroupGridConfig,
-  RadioButtonGroupLayout,
-  RadioButtonGroupLeftOrUpKeyStroke,
-  RadioButtonGroupRightOrDownKeyStroke,
-  scout,
-  Status,
-  TreeVisitResult,
-  ValueField
-} from '../../../index';
+import {arrays, HorizontalGrid, HtmlComponent, LoadingSupport, LogicalGridData, LogicalGridLayoutConfig, LookupCall, objects, RadioButton, RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupRightOrDownKeyStroke, scout, Status, TreeVisitResult, ValueField} from '../../../index';
 import $ from 'jquery';
 
 export default class RadioButtonGroup extends ValueField {
 
   constructor() {
     super();
-    this.logicalGrid = scout.create('scout.HorizontalGrid');
+    this.logicalGrid = scout.create(HorizontalGrid);
     this.layoutConfig = null;
     this.fields = [];
     this.radioButtons = [];
@@ -588,7 +571,7 @@ export default class RadioButtonGroup extends ValueField {
       button.cssClass = lookupRow.cssClass;
     }
 
-    return scout.create('RadioButton', button);
+    return scout.create(RadioButton, button);
   }
 
   clone(model, options) {

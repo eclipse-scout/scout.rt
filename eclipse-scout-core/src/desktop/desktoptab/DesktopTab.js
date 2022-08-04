@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HAlign, scout, SimpleTab} from '../../index';
+import {arrays, ContextMenuPopup, HAlign, Menu, scout, SimpleTab} from '../../index';
 
 export default class DesktopTab extends SimpleTab {
 
@@ -36,20 +36,20 @@ export default class DesktopTab extends SimpleTab {
   }
 
   _onContextMenu(event) {
-    let menuCloseAllTabs = scout.create('Menu', {
+    let menuCloseAllTabs = scout.create(Menu, {
       parent: this,
       text: this.session.text('ui.CloseAllTabs')
     });
     menuCloseAllTabs.on('action', this._onCloseAll.bind(this));
 
-    let menuCloseOtherTabs = scout.create('Menu', {
+    let menuCloseOtherTabs = scout.create(Menu, {
       parent: this,
       text: this.session.text('ui.CloseOtherTabs'),
       enabled: this.parent.tabs.length > 1
     });
     menuCloseOtherTabs.on('action', this._onCloseOther.bind(this));
 
-    let popup = scout.create('ContextMenuPopup', {
+    let popup = scout.create(ContextMenuPopup, {
       parent: this,
       menuItems: [menuCloseAllTabs, menuCloseOtherTabs],
       cloneMenuItems: false,

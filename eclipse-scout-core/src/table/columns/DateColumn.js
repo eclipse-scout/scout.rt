@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, comparators, DateFormat, dates, scout} from '../../index';
+import {Column, comparators, DateField, DateFormat, dates, scout} from '../../index';
 
 export default class DateColumn extends Column {
 
   constructor() {
     super();
-    this.format;
+    this.format = null;
     this.groupFormat = 'yyyy';
     this.hasDate = true;
     this.hasTime = false;
@@ -104,8 +104,8 @@ export default class DateColumn extends Column {
   /**
    * @override Column.js
    */
-  _createEditor() {
-    return scout.create('DateField', {
+  _createEditor(row) {
+    return scout.create(DateField, {
       parent: this.table,
       hasDate: this.hasDate,
       hasTime: this.hasTime

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, keys, KeyStrokeContext, MessageBoxLayout, objects, scout, Status, strings, Widget} from '../index';
+import {AbortKeyStroke, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, Icon, keys, KeyStrokeContext, MessageBoxLayout, objects, scout, Status, strings, Widget} from '../index';
 
 export default class MessageBox extends Widget {
 
@@ -53,7 +53,7 @@ export default class MessageBox extends Widget {
     this._setDisplayParent(this.displayParent);
     this._setIconId(this.iconId);
 
-    this.boxButtons = scout.create('BoxButtons', {parent: this});
+    this.boxButtons = scout.create(BoxButtons, {parent: this});
     this.yesButton = this._createMessageBoxButton(this.yesButtonText, MessageBox.Buttons.YES);
     this.noButton = this._createMessageBoxButton(this.noButtonText, MessageBox.Buttons.NO);
     this.cancelButton = this._createMessageBoxButton(this.cancelButtonText, MessageBox.Buttons.CANCEL);
@@ -288,7 +288,7 @@ export default class MessageBox extends Widget {
       if (this._icon) {
         this._icon.setIconDesc(iconId);
       } else {
-        this._icon = scout.create('Icon', {
+        this._icon = scout.create(Icon, {
           parent: this,
           iconDesc: iconId,
           prepend: true

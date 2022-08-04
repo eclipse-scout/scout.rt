@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ParsingFailedStatus, scout, TouchPopup} from '../index';
+import {ParsingFailedStatus, scout, TimePicker, TouchPopup} from '../index';
 
 export default class TimePickerTouchPopup extends TouchPopup {
 
@@ -26,7 +26,7 @@ export default class TimePickerTouchPopup extends TouchPopup {
    * @override TouchPopup.js
    */
   _initWidget(options) {
-    this._widget = scout.create('TimePicker', {
+    this._widget = scout.create(TimePicker, {
       parent: this,
       timeResolution: options.timeResolution
     });

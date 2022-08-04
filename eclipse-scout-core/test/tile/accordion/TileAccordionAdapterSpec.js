@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../../src/index';
+import {RemoteTileFilter, scout} from '../../../src/index';
 
 describe('TileAccordionAdapter', () => {
   let session;
@@ -40,7 +40,7 @@ describe('TileAccordionAdapter', () => {
   describe('initProperties', () => {
 
     it('does not take filters from tile grid in remote case', () => {
-      let filter = scout.create('RemoteTileFilter');
+      let filter = scout.create(RemoteTileFilter);
       let accordion = createTileAccordion({
         groups: [{
           objectType: 'Group',

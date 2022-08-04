@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CollapseHandle, Desktop, DesktopNavigationLayout, HtmlComponent, scout, SingleLayout, styles, Tree, Widget} from '../../index';
+import {CollapseHandle, Desktop, DesktopNavigationHandle, DesktopNavigationLayout, DesktopToolBox, HtmlComponent, scout, SingleLayout, styles, Tree, ViewButtonBox, Widget} from '../../index';
 
 export default class DesktopNavigation extends Widget {
 
@@ -18,6 +18,7 @@ export default class DesktopNavigation extends Widget {
     this.layoutData = {};
     this.toolBoxVisible = false;
     this.viewButtonBox = null;
+    this.handleVisible = true;
     this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
     this._viewButtonBoxPropertyChangeHandler = this._onViewButtonBoxPropertyChange.bind(this);
@@ -35,7 +36,7 @@ export default class DesktopNavigation extends Widget {
     this.desktop = this.parent;
     this.updateHandleVisibility();
     this._setOutline(model.outline);
-    this.viewButtonBox = scout.create('ViewButtonBox', {
+    this.viewButtonBox = scout.create(ViewButtonBox, {
       parent: this,
       viewButtons: this.desktop.viewButtons
     });
@@ -181,7 +182,7 @@ export default class DesktopNavigation extends Widget {
     if (this.toolBox) {
       return;
     }
-    this.toolBox = scout.create('DesktopToolBox', {
+    this.toolBox = scout.create(DesktopToolBox, {
       parent: this,
       menus: this.desktop.menus
     });
@@ -205,7 +206,7 @@ export default class DesktopNavigation extends Widget {
   }
 
   _createHandle() {
-    return scout.create('DesktopNavigationHandle', {
+    return scout.create(DesktopNavigationHandle, {
       parent: this,
       rightVisible: false,
       horizontalAlignment: CollapseHandle.HorizontalAlignment.RIGHT

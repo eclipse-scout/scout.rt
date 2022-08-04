@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupFieldAdapter, scout, strings} from '../../../index';
+import {LookupFieldAdapter, RemoteLookupCall, scout, strings} from '../../../index';
 
 export default class SmartFieldAdapter extends LookupFieldAdapter {
 
@@ -29,7 +29,7 @@ export default class SmartFieldAdapter extends LookupFieldAdapter {
 
   _postCreateWidget() {
     super._postCreateWidget();
-    this.widget.lookupCall = scout.create('RemoteLookupCall', this);
+    this.widget.lookupCall = scout.create(RemoteLookupCall, this);
   }
 
   _syncResult(result) {

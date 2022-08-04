@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Desktop, HtmlComponent, icons, KeyStrokeContext, scout, ViewMenuOpenKeyStroke, Widget} from '../../index';
+import {Action, arrays, Desktop, HtmlComponent, icons, KeyStrokeContext, OutlineViewButton, scout, ViewMenuOpenKeyStroke, ViewMenuPopup, Widget} from '../../index';
 
 /**
  * Shows a list of view buttons with displayStyle=MENU
@@ -32,7 +32,7 @@ export default class ViewMenuTab extends Widget {
 
   _init(model) {
     super._init(model);
-    this.dropdown = scout.create('Action', {
+    this.dropdown = scout.create(Action, {
       parent: this,
       iconId: icons.ANGLE_DOWN,
       tabbable: false,
@@ -118,7 +118,7 @@ export default class ViewMenuTab extends Widget {
     // This is important to not break the CSS transition (e.g. when desktop is in background and another view selected using ViewMenuPopup).
     let clone = this.selectedButton;
     if (!clone) {
-      clone = scout.create('OutlineViewButton', {
+      clone = scout.create(OutlineViewButton, {
         parent: this,
         displayStyle: 'TAB'
       });
@@ -200,7 +200,7 @@ export default class ViewMenuTab extends Widget {
       // already open
       return;
     }
-    this.popup = scout.create('ViewMenuPopup', {
+    this.popup = scout.create(ViewMenuPopup, {
       parent: this,
       viewMenus: this.viewButtons,
       defaultIconId: this.defaultIconId,

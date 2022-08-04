@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Button, GridData, GroupBoxGridConfig, HorizontalGrid, scout, VerticalSmartGrid} from '../../../src/index';
+import {Button, GridData, GroupBox, GroupBoxGridConfig, HorizontalGrid, scout, TableField, VerticalSmartGrid} from '../../../src/index';
 import {GroupBoxSpecHelper} from '../../../src/testing/index';
 
 /**
@@ -54,81 +54,81 @@ describe('AbstractGrid08', () => {
     session = sandboxSession();
 
     this.fields = [];
-    this.groupBox = scout.create('GroupBox', {
+    this.groupBox = scout.create(GroupBox, {
       parent: session.desktop,
       gridColumnCount: 4
     });
-    this.fields.push(scout.create('GroupBox', {
+    this.fields.push(scout.create(GroupBox, {
       parent: this.groupBox,
       label: 'Field 01',
       gridDataHints: new GridData({
         w: 2
       })
     }));
-    this.fields[this.fields.length - 1].fields = [scout.create('TableField', {
+    this.fields[this.fields.length - 1].fields = [scout.create(TableField, {
       parent: this.fields[this.fields.length - 1]
     })];
-    this.fields.push(scout.create('GroupBox', {
+    this.fields.push(scout.create(GroupBox, {
       parent: this.groupBox,
       label: 'Field 02',
       gridDataHints: new GridData({
         w: 2
       })
     }));
-    this.fields[this.fields.length - 1].fields = [scout.create('TableField', {
+    this.fields[this.fields.length - 1].fields = [scout.create(TableField, {
       parent: this.fields[this.fields.length - 1]
     })];
-    this.fields.push(scout.create('GroupBox', {
+    this.fields.push(scout.create(GroupBox, {
       parent: this.groupBox,
       label: 'Field 03',
       gridDataHints: new GridData({
         w: 2
       })
     }));
-    this.fields[this.fields.length - 1].fields = [scout.create('TableField', {
+    this.fields[this.fields.length - 1].fields = [scout.create(TableField, {
       parent: this.fields[this.fields.length - 1]
     })];
-    this.fields.push(scout.create('GroupBox', {
+    this.fields.push(scout.create(GroupBox, {
       parent: this.groupBox,
       label: 'Field 04',
       gridDataHints: new GridData({
         w: 2
       })
     }));
-    this.fields[this.fields.length - 1].fields = [scout.create('TableField', {
+    this.fields[this.fields.length - 1].fields = [scout.create(TableField, {
       parent: this.fields[this.fields.length - 1]
     })];
-    this.fields.push(scout.create('GroupBox', {
+    this.fields.push(scout.create(GroupBox, {
       parent: this.groupBox,
       label: 'Field 05',
       gridDataHints: new GridData({
         w: 2
       })
     }));
-    this.fields[this.fields.length - 1].fields = [scout.create('TableField', {
+    this.fields[this.fields.length - 1].fields = [scout.create(TableField, {
       parent: this.fields[this.fields.length - 1]
     })];
-    this.fields.push(scout.create('GroupBox', {
+    this.fields.push(scout.create(GroupBox, {
       parent: this.groupBox,
       label: 'Field 06',
       gridDataHints: new GridData({
         w: 1
       })
     }));
-    this.fields[this.fields.length - 1].fields = [scout.create('TableField', {
+    this.fields[this.fields.length - 1].fields = [scout.create(TableField, {
       parent: this.fields[this.fields.length - 1]
     })];
-    this.fields.push(scout.create('GroupBox', {
+    this.fields.push(scout.create(GroupBox, {
       parent: this.groupBox,
       label: 'Field 07',
       gridDataHints: new GridData({
         w: 2
       })
     }));
-    this.fields[this.fields.length - 1].fields = [scout.create('TableField', {
+    this.fields[this.fields.length - 1].fields = [scout.create(TableField, {
       parent: this.fields[this.fields.length - 1]
     })];
-    this.fields.push(scout.create('Button', {
+    this.fields.push(scout.create(Button, {
       parent: this.groupBox,
       label: 'Close',
       systemType: Button.SystemType.CLOSE

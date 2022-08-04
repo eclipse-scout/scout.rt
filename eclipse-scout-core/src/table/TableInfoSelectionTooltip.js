@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tooltip} from '../index';
+import {Menu, Tooltip} from '../index';
 
 export default class TableInfoSelectionTooltip extends Tooltip {
 
@@ -19,12 +19,12 @@ export default class TableInfoSelectionTooltip extends Tooltip {
   _init(options) {
     super._init(options);
     this.tableFooter = options.tableFooter;
-    let selectNoneMenu = scout.create('Menu', {
+    let selectNoneMenu = scout.create(Menu, {
       parent: this,
       text: this.session.text('ui.SelectNone')
     });
     selectNoneMenu.on('action', this._onSelectNoneClick.bind(this));
-    let selectAllMenu = scout.create('Menu', {
+    let selectAllMenu = scout.create(Menu, {
       parent: this,
       text: this.session.text('ui.SelectAll')
     });

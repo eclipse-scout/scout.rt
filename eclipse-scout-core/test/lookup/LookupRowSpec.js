@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../src/index';
+import {LookupRow, scout} from '../../src/index';
 
 describe('LookupRow', () => {
 
@@ -16,7 +16,7 @@ describe('LookupRow', () => {
    * on the created instance otherwise the equals test would fail.
    */
   function createLookupRow() {
-    return scout.create('LookupRow', {
+    return scout.create(LookupRow, {
       key: 123,
       text: 'Foo',
       enabled: false,
@@ -25,7 +25,7 @@ describe('LookupRow', () => {
   }
 
   it('constructor', () => {
-    let lookupRow = scout.create('LookupRow');
+    let lookupRow = scout.create(LookupRow);
     expect(lookupRow.key).toBe(null);
     expect(lookupRow.text).toBe(null);
     expect(lookupRow.enabled).toBe(true);
@@ -33,7 +33,7 @@ describe('LookupRow', () => {
   });
 
   it('sets defaults when created with a plain object', () => {
-    let lookupRow = scout.create('LookupRow', {
+    let lookupRow = scout.create(LookupRow, {
       key: 123,
       text: 'Foo'
     });

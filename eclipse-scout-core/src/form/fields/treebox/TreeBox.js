@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupBox, objects, scout, TreeBoxLayout} from '../../../index';
+import {arrays, LookupBox, objects, scout, Tree, TreeBoxLayout, TreeNode} from '../../../index';
 
 export default class TreeBox extends LookupBox {
 
@@ -168,7 +168,7 @@ export default class TreeBox extends LookupBox {
 
   _createNode(lookupRow) {
     let
-      node = scout.create('TreeNode', {
+      node = scout.create(TreeNode, {
         parent: this.tree,
         id: lookupRow.key,
         text: lookupRow.text,
@@ -205,7 +205,7 @@ export default class TreeBox extends LookupBox {
   }
 
   _createDefaultTreeBoxTree() {
-    return scout.create('Tree', {
+    return scout.create(Tree, {
       parent: this,
       checkable: true
     });

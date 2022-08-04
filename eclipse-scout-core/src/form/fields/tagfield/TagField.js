@@ -8,23 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  fields,
-  HtmlComponent,
-  InputFieldKeyStrokeContext,
-  keys,
-  LookupCall,
-  scout,
-  strings,
-  TagFieldContainerLayout,
-  TagFieldDeleteKeyStroke,
-  TagFieldEnterKeyStroke,
-  TagFieldLayout,
-  TagFieldNavigationKeyStroke,
-  TagFieldOpenPopupKeyStroke,
-  ValueField
-} from '../../../index';
+import {arrays, fields, HtmlComponent, InputFieldKeyStrokeContext, keys, LookupCall, MaxLengthHandler, scout, strings, TagBar, TagChooserPopup, TagFieldContainerLayout, TagFieldDeleteKeyStroke, TagFieldEnterKeyStroke, TagFieldLayout, TagFieldNavigationKeyStroke, TagFieldOpenPopupKeyStroke, ValueField} from '../../../index';
 
 export default class TagField extends ValueField {
 
@@ -38,13 +22,13 @@ export default class TagField extends ValueField {
     this._currentLookupCall = null;
     this.tagBar = null;
     this.maxLength = 500;
-    this.maxLengthHandler = scout.create('MaxLengthHandler', {target: this});
+    this.maxLengthHandler = scout.create(MaxLengthHandler, {target: this});
   }
 
   _init(model) {
     super._init(model);
 
-    this.tagBar = scout.create('TagBar', {
+    this.tagBar = scout.create(TagBar, {
       parent: this,
       tags: this.value,
       clickable: model.clickable
@@ -334,7 +318,7 @@ export default class TagField extends ValueField {
     if (this.popup) {
       return;
     }
-    this.popup = scout.create('TagChooserPopup', {
+    this.popup = scout.create(TagChooserPopup, {
       parent: this,
       $anchor: this.$field,
       boundToAnchor: true,

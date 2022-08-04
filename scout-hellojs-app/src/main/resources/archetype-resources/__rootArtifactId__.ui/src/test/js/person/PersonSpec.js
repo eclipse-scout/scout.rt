@@ -1,9 +1,10 @@
 import {scout} from '@eclipse-scout/core';
+import {Person} from '../../../main/js';
 
 describe('Person', () => {
 
   it('stores values correctly', () => {
-    let person = scout.create('${simpleArtifactName}.Person');
+    let person = scout.create(Person);
     let values = ['first', 'last', 'id'];
     person.setFirstName(values[0]);
     person.setLastName(values[1]);
@@ -22,7 +23,7 @@ describe('Person', () => {
       firstName: values[0],
       lastName: values[1]
     };
-    let person = scout.create('${simpleArtifactName}.Person', model);
+    let person = scout.create(Person, model);
 
     expect(person.firstName).toBe(values[0]);
     expect(person.lastName).toBe(values[1]);

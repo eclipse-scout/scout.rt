@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Button, ButtonAdapterMenu, Dimension, GroupBoxMenuItemsOrder, HtmlComponent, MenuBar, MenuItemsOrder, scout} from '../../src/index';
+import {Action, Button, ButtonAdapterMenu, Dimension, GroupBoxMenuItemsOrder, HtmlComponent, Menu, MenuBar, MenuItemsOrder, scout} from '../../src/index';
 import {MenuSpecHelper} from '../../src/testing/index';
 
 describe('MenuBar', () => {
@@ -34,7 +34,7 @@ describe('MenuBar', () => {
   }
 
   function createMenuBar(menuOrder) {
-    return scout.create('MenuBar', {
+    return scout.create(MenuBar, {
       parent: session.desktop,
       menuOrder: scout.nvl(menuOrder, new MenuItemsOrder(session, 'Table'))
     });
@@ -680,11 +680,11 @@ describe('MenuBar', () => {
 
   describe('reorderMenus', () => {
     it('updates left-of-button correctly', () => {
-      let button1 = scout.create('Menu', {
+      let button1 = scout.create(Menu, {
           parent: session.desktop,
           actionStyle: Action.ActionStyle.BUTTON
         }),
-        button2 = scout.create('Menu', {
+        button2 = scout.create(Menu, {
           parent: session.desktop,
           actionStyle: Action.ActionStyle.BUTTON
         }),
@@ -702,11 +702,11 @@ describe('MenuBar', () => {
     });
 
     it('updates last correctly', () => {
-      let button1 = scout.create('Menu', {
+      let button1 = scout.create(Menu, {
           parent: session.desktop,
           actionStyle: Action.ActionStyle.BUTTON
         }),
-        button2 = scout.create('Menu', {
+        button2 = scout.create(Menu, {
           parent: session.desktop,
           actionStyle: Action.ActionStyle.BUTTON
         }),

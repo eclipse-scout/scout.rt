@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStrokeContext, PageTileGridSelectKeyStroke, scout, TileGrid, TileGridLayoutConfig} from '../../../index';
+import {ButtonTile, KeyStrokeContext, PageTileButton, PageTileGridSelectKeyStroke, scout, TileGrid, TileGridLayoutConfig} from '../../../index';
 
 export default class PageTileGrid extends TileGrid {
 
@@ -126,12 +126,12 @@ export default class PageTileGrid extends TileGrid {
   }
 
   _createPageTile(page) {
-    let button = scout.create('PageTileButton', {
+    let button = scout.create(PageTileButton, {
       parent: this,
       outline: this.outline,
       page: page
     });
-    let tile = scout.create('ButtonTile', {
+    let tile = scout.create(ButtonTile, {
       parent: this,
       cssClass: this.compact ? 'compact' : null,
       tileWidget: button

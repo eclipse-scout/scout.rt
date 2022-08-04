@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ObjectFactory, scout} from '../index';
+import {arrays, Desktop, ObjectFactory, scout, Session} from '../index';
 import {LocaleSpecHelper, TestingApp} from './index';
 
 window.sandboxSession = options => {
@@ -23,7 +23,7 @@ window.sandboxSession = options => {
   options.remote = true; // required so adapters will be registered in the adapter registry
   options.$entryPoint = $sandbox;
 
-  let session = scout.create('Session', options, {
+  let session = scout.create(Session, options, {
     ensureUniqueId: false
   });
 
@@ -43,7 +43,7 @@ window.sandboxSession = options => {
   desktop.headerVisible = scout.nvl(desktop.headerVisible, false);
   desktop.benchVisible = scout.nvl(desktop.benchVisible, false);
   desktop.parent = scout.nvl(desktop.parent, session.root);
-  session.desktop = scout.create('Desktop', desktop);
+  session.desktop = scout.create(Desktop, desktop);
   if (options.renderDesktop) {
     session._renderDesktop();
   }

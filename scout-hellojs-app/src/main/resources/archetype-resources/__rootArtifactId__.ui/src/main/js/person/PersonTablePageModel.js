@@ -1,41 +1,42 @@
-import {icons} from '@eclipse-scout/core';
+import {AggregateTableControl, BooleanColumn, Column, FormTableControl, icons, Menu, NumberColumn, PageWithTable, Table} from '@eclipse-scout/core';
+import {PersonSearchForm} from '../index';
 
 export default () => ({
   id: '${simpleArtifactName}.PersonTablePage',
-  objectType: 'PageWithTable',
+  objectType: PageWithTable,
   leaf: true,
   text: '${symbol_dollar}{textKey:Persons}',
   detailTable: {
     id: '${simpleArtifactName}.PersonTablePage.Table',
-    objectType: 'Table',
+    objectType: Table,
     autoResizeColumns: true,
     columns: [
       {
         id: 'PersonIdColumn',
-        objectType: 'Column',
+        objectType: Column,
         visible: false
       },
       {
         id: 'FirstNameColumn',
-        objectType: 'Column',
+        objectType: Column,
         text: '${symbol_dollar}{textKey:FirstName}',
         width: 300
       },
       {
         id: 'LastNameColumn',
-        objectType: 'Column',
+        objectType: Column,
         text: '${symbol_dollar}{textKey:LastName}',
         width: 300
       },
       {
         id: 'SalaryColumn',
-        objectType: 'NumberColumn',
+        objectType: NumberColumn,
         text: '${symbol_dollar}{textKey:Salary}',
         width: 200
       },
       {
         id: 'ExternColumn',
-        objectType: 'BooleanColumn',
+        objectType: BooleanColumn,
         text: '${symbol_dollar}{textKey:External}',
         width: 150
       }
@@ -43,7 +44,7 @@ export default () => ({
     menus: [
       {
         id: 'EditPersonMenu',
-        objectType: 'Menu',
+        objectType: Menu,
         text: '${symbol_dollar}{textKey:EditPerson}',
         iconId: icons.PENCIL,
         menuTypes: [
@@ -52,7 +53,7 @@ export default () => ({
       },
       {
         id: 'CreatePersonMenu',
-        objectType: 'Menu',
+        objectType: Menu,
         text: '${symbol_dollar}{textKey:CreatePerson}',
         iconId: icons.PLUS,
         menuTypes: [
@@ -61,7 +62,7 @@ export default () => ({
       },
       {
         id: 'DeletePersonMenu',
-        objectType: 'Menu',
+        objectType: Menu,
         text: '${symbol_dollar}{textKey:DeletePerson}',
         iconId: icons.REMOVE,
         menuTypes: [
@@ -72,16 +73,16 @@ export default () => ({
     tableControls: [
       {
         id: 'SearchFormTableControl',
-        objectType: 'FormTableControl',
+        objectType: FormTableControl,
         iconId: icons.SEARCH,
         form: {
           id: 'SearchForm',
-          objectType: '${simpleArtifactName}.PersonSearchForm'
+          objectType: PersonSearchForm
         }
       },
       {
         id: 'AggregateTableControl',
-        objectType: 'AggregateTableControl'
+        objectType: AggregateTableControl
       }
     ]
   }

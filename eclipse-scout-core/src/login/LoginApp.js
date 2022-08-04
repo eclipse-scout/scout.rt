@@ -56,7 +56,7 @@ export default class LoginApp extends App {
     options.texts = $.extend({}, texts.readFromDOM(), options.texts);
     this._prepareDOM();
 
-    let loginBox = scout.create('LoginBox', options);
+    let loginBox = scout.create(LoginBox, options);
     loginBox.render($('body').addClass('login-body'));
   }
 }

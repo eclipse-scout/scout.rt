@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilter, scout, strings} from '../../index';
+import {ColumnUserFilter, scout, StringField, strings} from '../../index';
 import $ from 'jquery';
 
 export default class TextColumnUserFilter extends ColumnUserFilter {
@@ -57,7 +57,7 @@ export default class TextColumnUserFilter extends ColumnUserFilter {
    * @override ColumnUserFilter.js
    */
   addFilterFields(groupBox) {
-    this.freeTextField = scout.create('StringField', {
+    this.freeTextField = scout.create(StringField, {
       parent: groupBox,
       labelVisible: false,
       statusVisible: false,

@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FocusManagerSpecHelper, FormSpecHelper, TableSpecHelper, TreeSpecHelper} from '../../src/testing/index';
-import {Device, FocusRule, focusUtils, scout} from '../../src/index';
+import {FocusManagerSpecHelper, FormSpecHelper} from '../../src/testing/index';
+import {FocusRule, focusUtils, GlassPane, scout} from '../../src/index';
 
 /* global FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
@@ -201,7 +201,7 @@ describe('scout.FocusManager', () => {
       expect(focusManager._findActiveContext().$container[0]).toBe($container1[0]);
 
       // Container2 is covered by a glass pane -> requesting focus on a covered element should do nothing
-      let glassPane = scout.create('GlassPane', {
+      let glassPane = scout.create(GlassPane, {
         parent: session.desktop
       });
       glassPane.render($container2);
@@ -249,7 +249,7 @@ describe('scout.FocusManager', () => {
       expect(focusManager._findActiveContext().$container[0]).toBe($container1[0]);
 
       // GlassPane will cover the active element -> blur it and focus desktop
-      let glassPane = scout.create('GlassPane', {
+      let glassPane = scout.create(GlassPane, {
         parent: session.desktop
       });
       glassPane.render($container1);

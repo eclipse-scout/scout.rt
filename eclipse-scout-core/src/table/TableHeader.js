@@ -29,7 +29,7 @@ export default class TableHeader extends Widget {
   _init(options) {
     super._init(options);
 
-    this.menuBar = scout.create('MenuBar', {
+    this.menuBar = scout.create(MenuBar, {
       parent: this,
       tabbable: false,
       position: MenuBar.Position.BOTTOM,

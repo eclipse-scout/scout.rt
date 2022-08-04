@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Column, lookupField, objects, ProposalChooser, scout} from '../../../index';
+import {arrays, Column, lookupField, objects, ProposalChooser, scout, Table, TableLayoutResetter} from '../../../index';
 
 export default class TableProposalChooser extends ProposalChooser {
 
@@ -16,6 +16,9 @@ export default class TableProposalChooser extends ProposalChooser {
     super();
   }
 
+  /**
+   * @returns {Table}
+   */
   _createModel() {
     let headerVisible = false,
       columns = [],
@@ -36,8 +39,12 @@ export default class TableProposalChooser extends ProposalChooser {
     return table;
   }
 
+  _createLayoutResetter() {
+    return scout.create(TableLayoutResetter, this.model);
+  }
+
   _createColumn() {
-    return scout.create('Column', {
+    return scout.create(Column, {
       session: this.session,
       width: Column.NARROW_MIN_WIDTH,
       horizontalAlignment: this.smartField.gridData.horizontalAlignment
@@ -49,7 +56,7 @@ export default class TableProposalChooser extends ProposalChooser {
     if (descriptor.width && descriptor.width > 0) { // 0 = default
       width = descriptor.width;
     }
-    return scout.create('Column', {
+    return scout.create(Column, {
       session: this.session,
       text: descriptor.text,
       cssClass: scout.nvl(descriptor.cssClass, null),
@@ -64,7 +71,7 @@ export default class TableProposalChooser extends ProposalChooser {
   }
 
   _createTable(columns, headerVisible) {
-    return scout.create('Table', {
+    return scout.create(Table, {
       parent: this,
       headerVisible: headerVisible,
       autoResizeColumns: true,

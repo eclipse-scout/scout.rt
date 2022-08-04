@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, HtmlComponent, scout, TabArea} from '../../../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent, Menu, scout, TabArea} from '../../../index';
 import $ from 'jquery';
 
 export default class TabAreaLayout extends AbstractLayout {
@@ -63,7 +63,7 @@ export default class TabAreaLayout extends AbstractLayout {
     this.overflowTabs.forEach(tabItem => tabItem.setOverflown(true));
 
     ellipsis.setChildActions(this.overflowTabs.map(tab => {
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: ellipsis,
         text: tab.label,
         tab: tab,

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {aggregation, Column, comparators, DecimalFormat, numbers, objects, scout, strings, styles} from '../../index';
+import {aggregation, Cell, Column, comparators, DecimalFormat, NumberField, numbers, objects, scout, strings, styles} from '../../index';
 import $ from 'jquery';
 
 export default class NumberColumn extends Column {
@@ -110,7 +110,7 @@ export default class NumberColumn extends Column {
 
   createAggrValueCell(value) {
     let formattedValue = this._formatValue(value);
-    return scout.create('Cell', {
+    return scout.create(Cell, {
       text: formattedValue,
       iconId: (formattedValue ? this.aggrSymbol : null),
       horizontalAlignment: this.horizontalAlignment,
@@ -275,8 +275,8 @@ export default class NumberColumn extends Column {
   /**
    * @override Column.js
    */
-  _createEditor() {
-    return scout.create('NumberField', {
+  _createEditor(row) {
+    return scout.create(NumberField, {
       parent: this.table,
       maxValue: this.maxValue,
       minValue: this.minValue,

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, Device, EventSupport, FileInput, files as fileUtil, FocusManager, fonts, icons, LayoutValidator, Locale, logging, MessageBox, ModelAdapter, NullWidget, ObjectFactory, objects, Reconnector, RemoteEvent, ResponseQueue, scout, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage} from '../index';
+import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Device, EventSupport, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale, logging, MessageBox, ModelAdapter, NullWidget, ObjectFactory, objects, Reconnector, RemoteEvent, ResponseQueue, scout, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage} from '../index';
 import $ from 'jquery';
 
 export default class Session {
@@ -175,7 +175,7 @@ export default class Session {
       session: this,
       active: options.focusManagerActive
     });
-    this.keyStrokeManager = scout.create('KeyStrokeManager', {
+    this.keyStrokeManager = scout.create(KeyStrokeManager, {
       session: this
     });
   }
@@ -686,7 +686,7 @@ export default class Session {
     let defaultOptions = {
       retryIntervals: [100, 500, 500, 500]
     };
-    let ajaxCall = scout.create('AjaxCall', $.extend(defaultOptions, callOptions, this.ajaxCallOptions), {
+    let ajaxCall = scout.create(AjaxCall, $.extend(defaultOptions, callOptions, this.ajaxCallOptions), {
       ensureUniqueId: false
     });
     this.registerAjaxCall(ajaxCall);
@@ -1089,7 +1089,7 @@ export default class Session {
         noButtonText: options.noButtonText,
         cancelButtonText: options.cancelButtonText
       },
-      messageBox = scout.create('MessageBox', model),
+      messageBox = scout.create(MessageBox, model),
       $entryPoint = options.entryPoint || this.$entryPoint;
 
     messageBox.on('action', event => {
@@ -1323,7 +1323,7 @@ export default class Session {
       if (!this.desktop || !this.desktop.rendered) {
         return; // No busy indicator without desktop (e.g. during shutdown)
       }
-      this._busyIndicator = scout.create('BusyIndicator', {
+      this._busyIndicator = scout.create(BusyIndicator, {
         parent: this.desktop
       });
       this._busyIndicator.on('cancel', this._onCancelProcessing.bind(this));

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, keys, scout, TagChooserPopup, TagField} from '../../../../src/index';
+import {arrays, keys, LookupRow, scout, TagChooserPopup, TagField} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
 
 describe('TagField', () => {
@@ -20,7 +20,7 @@ describe('TagField', () => {
     session = sandboxSession();
     field = new TagField();
     field.session = session;
-    lookupRow = scout.create('LookupRow', {
+    lookupRow = scout.create(LookupRow, {
       key: 123,
       data: 'Foo'
     });
@@ -62,7 +62,7 @@ describe('TagField', () => {
   describe('rendering', () => {
 
     it('should render tags (=value)', () => {
-      field = scout.create('TagField', {
+      field = scout.create(TagField, {
         parent: session.desktop
       });
 
@@ -90,7 +90,7 @@ describe('TagField', () => {
   describe('key-strokes', () => {
 
     it('ENTER', () => {
-      field = scout.create('TagField', {
+      field = scout.create(TagField, {
         parent: session.desktop,
         lookupCall: {
           objectType: 'DummyLookupCall'
@@ -130,7 +130,7 @@ describe('TagField', () => {
     it('start and prepare a lookup call clone when typing', () => {
       let templatePropertyValue = 11;
       let eventCounter = 0;
-      field = scout.create('TagField', {
+      field = scout.create(TagField, {
         parent: session.desktop,
         lookupCall: {
           objectType: 'DummyLookupCall',

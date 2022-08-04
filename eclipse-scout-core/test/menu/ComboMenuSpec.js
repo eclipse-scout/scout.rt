@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, scout} from '../../src/index';
+import {ComboMenu, EllipsisMenu, Menu, scout} from '../../src/index';
 
 describe('ComboMenu', () => {
 
@@ -21,7 +21,7 @@ describe('ComboMenu', () => {
   });
 
   function createComboMenu() {
-    return scout.create('ComboMenu', {
+    return scout.create(ComboMenu, {
       parent: session.desktop,
       childActions: [{
         id: 'ComboMenuChild1',
@@ -79,7 +79,7 @@ describe('ComboMenu', () => {
     });
 
     it('returns false for children if combo menu is in ellipsis', () => {
-      let ellipsis = scout.create('EllipsisMenu', {
+      let ellipsis = scout.create(EllipsisMenu, {
         parent: session.desktop
       });
       ellipsis.render();
@@ -103,7 +103,7 @@ describe('ComboMenu', () => {
   describe('ContextMenu', () => {
 
     it('combo menu sub menu can be opened in context menu, even multiple times', () => {
-      let ellipsis = scout.create('EllipsisMenu', {
+      let ellipsis = scout.create(EllipsisMenu, {
         parent: session.desktop
       });
       ellipsis.render();

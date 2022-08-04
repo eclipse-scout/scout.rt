@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ListBoxLayout, LookupBox, scout, Table} from '../../../index';
+import {arrays, Cell, Column, ListBoxLayout, LookupBox, scout, Table} from '../../../index';
 
 export default class ListBox extends LookupBox {
 
@@ -152,7 +152,7 @@ export default class ListBox extends LookupBox {
 
   _createTableRow(lookupRow) {
     let
-      cell = scout.create('Cell', {
+      cell = scout.create(Cell, {
         text: lookupRow.text
       }),
       cells = [cell],
@@ -191,7 +191,7 @@ export default class ListBox extends LookupBox {
   }
 
   _createDefaultListBoxTable() {
-    return scout.create('Table', {
+    return scout.create(Table, {
       parent: this,
       autoResizeColumns: true,
       checkable: true,
@@ -199,7 +199,7 @@ export default class ListBox extends LookupBox {
       headerVisible: false,
       footerVisible: false,
       columns: [{
-        objectType: 'Column'
+        objectType: Column
       }]
     });
   }

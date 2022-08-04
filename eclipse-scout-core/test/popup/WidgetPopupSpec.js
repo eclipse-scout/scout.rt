@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Form, scout} from '../../src/index';
+import {Form, scout, StringField, WidgetPopup} from '../../src/index';
 
 describe('WidgetPopup', () => {
   let session;
@@ -20,7 +20,7 @@ describe('WidgetPopup', () => {
   });
 
   function createPopupWithFormAnd2Fields(initialFocus) {
-    return scout.create('WidgetPopup', {
+    return scout.create(WidgetPopup, {
       parent: session.desktop,
       widget: {
         objectType: 'Form',
@@ -57,11 +57,11 @@ describe('WidgetPopup', () => {
     });
 
     it('reverts focus correctly when popup is closed', () => {
-      let field1 = scout.create('StringField', {
+      let field1 = scout.create(StringField, {
         parent: session.desktop
       });
       field1.render();
-      let field2 = scout.create('StringField', {
+      let field2 = scout.create(StringField, {
         parent: session.desktop
       });
       field2.render();

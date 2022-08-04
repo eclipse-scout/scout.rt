@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {QueryBy, scout} from '../../../../src/index';
+import {QueryBy, scout, SmartFieldMultiline} from '../../../../src/index';
 
 describe('SmartFieldMultiline', () => {
 
@@ -29,7 +29,7 @@ describe('SmartFieldMultiline', () => {
       parent: session.desktop,
       lookupCall: 'DummyLookupCall'
     }, model);
-    return scout.create('SmartFieldMultiline', model);
+    return scout.create(SmartFieldMultiline, model);
   }
 
   describe('display text', () => {

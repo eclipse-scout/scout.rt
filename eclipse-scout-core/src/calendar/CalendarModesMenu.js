@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Calendar, Menu, scout} from '../index';
+import {arrays, Calendar, CalendarModeMenu, Menu, scout} from '../index';
 
 export default class CalendarModesMenu extends Menu {
 
@@ -22,22 +22,22 @@ export default class CalendarModesMenu extends Menu {
     super._init(model);
     this.calendar = this.parent;
     let menusToAdd = [];
-    menusToAdd.push(scout.create('CalendarModeMenu', {
+    menusToAdd.push(scout.create(CalendarModeMenu, {
       parent: this,
       displayMode: Calendar.DisplayMode.DAY,
       text: this.session.text('ui.CalendarDay')
     }));
-    menusToAdd.push(scout.create('CalendarModeMenu', {
+    menusToAdd.push(scout.create(CalendarModeMenu, {
       parent: this,
       displayMode: Calendar.DisplayMode.WORK_WEEK,
       text: this.session.text('ui.CalendarWorkWeek')
     }));
-    menusToAdd.push(scout.create('CalendarModeMenu', {
+    menusToAdd.push(scout.create(CalendarModeMenu, {
       parent: this,
       displayMode: Calendar.DisplayMode.WEEK,
       text: this.session.text('ui.CalendarWeek')
     }));
-    menusToAdd.push(scout.create('CalendarModeMenu', {
+    menusToAdd.push(scout.create(CalendarModeMenu, {
       parent: this,
       displayMode: Calendar.DisplayMode.MONTH,
       text: this.session.text('ui.CalendarMonth')

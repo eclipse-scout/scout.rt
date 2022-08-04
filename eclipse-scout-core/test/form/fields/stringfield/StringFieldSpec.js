@@ -279,7 +279,7 @@ describe('StringField', () => {
   describe('label', () => {
 
     it('is linked with the field', () => {
-      let field = scout.create('StringField', {
+      let field = scout.create(StringField, {
         parent: session.desktop,
         label: 'label'
       });
@@ -289,7 +289,7 @@ describe('StringField', () => {
     });
 
     it('focuses the field when clicked', () => {
-      let field = scout.create('StringField', {
+      let field = scout.create(StringField, {
         parent: session.desktop,
         label: 'label'
       });

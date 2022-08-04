@@ -124,6 +124,6 @@ export default class CodeType {
     if (codeType instanceof CodeType) {
       return codeType;
     }
-    return scout.create('CodeType', codeType);
+    return scout.create(CodeType, codeType);
   }
 }

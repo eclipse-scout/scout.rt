@@ -45,7 +45,7 @@ const jasmineScoutCloneMatchers = {
         if (originalWidget.objectType !== clonedWidget.objectType) {
           return {
             pass: false,
-            message: 'widgetProperty \'' + property + '\' has not same object type of clone and orignal. [original.objectType: \'' + originalWidget.objectType + '\', clonedWidget.objectType: \'' + clonedWidget.objectType + '\'].'
+            message: 'widgetProperty \'' + property + '\' has not same object type of clone and original. [original.objectType: \'' + originalWidget.objectType + '\', clonedWidget.objectType: \'' + clonedWidget.objectType + '\'].'
           };
         }
         if (clonedWidget.parent !== clone) {

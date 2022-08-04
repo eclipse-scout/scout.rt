@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DialogLayout, FormField, GroupBox, HorizontalGrid, scout, VerticalSmartGrid} from '../../../../src/index';
+import {DialogLayout, Form, FormField, GroupBox, HorizontalGrid, scout, StringField, VerticalSmartGrid} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 
 describe('GroupBox', () => {
@@ -113,7 +113,7 @@ describe('GroupBox', () => {
 
   describe('focus', () => {
     it('focuses the first field', () => {
-      let box = scout.create('GroupBox', {
+      let box = scout.create(GroupBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'StringField'
@@ -129,7 +129,7 @@ describe('GroupBox', () => {
     });
 
     it('focuses the second field if the first is disabled', () => {
-      let box = scout.create('GroupBox', {
+      let box = scout.create(GroupBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'StringField',
@@ -147,7 +147,7 @@ describe('GroupBox', () => {
     });
 
     it('focuses the second field if the first not focusable', () => {
-      let box = scout.create('GroupBox', {
+      let box = scout.create(GroupBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'LabelField'
@@ -163,7 +163,7 @@ describe('GroupBox', () => {
     });
 
     it('considers child group boxes', () => {
-      let box = scout.create('GroupBox', {
+      let box = scout.create(GroupBox, {
         parent: session.desktop,
         fields: [{
           objectType: 'GroupBox',
@@ -230,7 +230,7 @@ describe('GroupBox', () => {
 
   describe('logical grid', () => {
     it('is validated automatically by the logical grid layout', () => {
-      let groupBox = scout.create('GroupBox', {
+      let groupBox = scout.create(GroupBox, {
         parent: session.desktop,
         gridColumnCount: 2,
         fields: [
@@ -264,7 +264,7 @@ describe('GroupBox', () => {
     });
 
     it('will get dirty if a field gets invisible', () => {
-      let groupBox = scout.create('GroupBox', {
+      let groupBox = scout.create(GroupBox, {
         parent: session.desktop,
         gridColumnCount: 2,
         fields: [
@@ -293,21 +293,21 @@ describe('GroupBox', () => {
     });
 
     it('may be specified using the object type', () => {
-      let groupBox = scout.create('GroupBox', {
+      let groupBox = scout.create(GroupBox, {
         parent: session.desktop,
         logicalGrid: 'HorizontalGrid'
       });
       expect(groupBox.logicalGrid instanceof HorizontalGrid).toBe(true);
 
-      groupBox = scout.create('GroupBox', {
+      groupBox = scout.create(GroupBox, {
         parent: session.desktop,
         logicalGrid: 'VerticalSmartGrid'
       });
       expect(groupBox.logicalGrid instanceof VerticalSmartGrid).toBe(true);
 
-      groupBox = scout.create('GroupBox', {
+      groupBox = scout.create(GroupBox, {
         parent: session.desktop,
-        logicalGrid: scout.create('HorizontalGrid')
+        logicalGrid: scout.create(HorizontalGrid)
       });
       expect(groupBox.logicalGrid instanceof HorizontalGrid).toBe(true);
     });
@@ -321,7 +321,7 @@ describe('GroupBox', () => {
         return containerSize;
       });
 
-      let form = scout.create('Form', {
+      let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
           objectType: 'GroupBox',
@@ -345,20 +345,20 @@ describe('GroupBox', () => {
 
   describe('scrollable', () => {
     it('null by default', () => {
-      let groupBox = scout.create('GroupBox', {
+      let groupBox = scout.create(GroupBox, {
         parent: session.desktop
       });
       expect(groupBox.scrollable).toBe(null);
     });
 
     it('is set to true if it is a mainbox', () => {
-      let groupBox = scout.create('GroupBox', {
+      let groupBox = scout.create(GroupBox, {
         parent: session.desktop,
         mainBox: true
       });
       expect(groupBox.scrollable).toBe(true);
 
-      groupBox = scout.create('GroupBox', {
+      groupBox = scout.create(GroupBox, {
         parent: session.desktop
       });
       expect(groupBox.scrollable).toBe(null);
@@ -368,14 +368,14 @@ describe('GroupBox', () => {
     });
 
     it('is not set to true if it is a mainbox but explicitly set to false', () => {
-      let groupBox = scout.create('GroupBox', {
+      let groupBox = scout.create(GroupBox, {
         parent: session.desktop,
         mainBox: true,
         scrollable: false
       });
       expect(groupBox.scrollable).toBe(false);
 
-      groupBox = scout.create('GroupBox', {
+      groupBox = scout.create(GroupBox, {
         parent: session.desktop,
         mainBox: true
       });
@@ -384,7 +384,7 @@ describe('GroupBox', () => {
       groupBox.setScrollable(false);
       expect(groupBox.scrollable).toBe(false);
 
-      groupBox = scout.create('GroupBox', {
+      groupBox = scout.create(GroupBox, {
         parent: session.desktop
       });
       expect(groupBox.scrollable).toBe(null);
@@ -403,7 +403,7 @@ describe('GroupBox', () => {
       expect(groupBox.fields.length).toBe(2);
       expect(groupBox.controls.length).toBe(2);
 
-      let newField = scout.create('StringField', {parent: groupBox});
+      let newField = scout.create(StringField, {parent: groupBox});
       groupBox.insertField(newField, 1);
       expect(groupBox.fields.length).toBe(3);
       expect(groupBox.controls.length).toBe(3);
@@ -411,7 +411,7 @@ describe('GroupBox', () => {
       expect(groupBox.controls[1]).toBe(newField);
 
       // At the beginning
-      let newField2 = scout.create('StringField', {parent: groupBox});
+      let newField2 = scout.create(StringField, {parent: groupBox});
       groupBox.insertField(newField2, 0);
       expect(groupBox.fields.length).toBe(4);
       expect(groupBox.controls.length).toBe(4);
@@ -419,7 +419,7 @@ describe('GroupBox', () => {
       expect(groupBox.controls[0]).toBe(newField2);
 
       // At the end
-      let newField3 = scout.create('StringField', {parent: groupBox});
+      let newField3 = scout.create(StringField, {parent: groupBox});
       groupBox.insertField(newField3, 4);
       expect(groupBox.fields.length).toBe(5);
       expect(groupBox.controls.length).toBe(5);
@@ -432,7 +432,7 @@ describe('GroupBox', () => {
       expect(groupBox.fields.length).toBe(2);
       expect(groupBox.controls.length).toBe(2);
 
-      let newField = scout.create('StringField', {parent: groupBox});
+      let newField = scout.create(StringField, {parent: groupBox});
       groupBox.insertField(newField);
       expect(groupBox.fields.length).toBe(3);
       expect(groupBox.controls.length).toBe(3);
@@ -447,7 +447,7 @@ describe('GroupBox', () => {
       expect(groupBox.fields.length).toBe(2);
       expect(groupBox.controls.length).toBe(2);
 
-      let newField = scout.create('StringField', {parent: groupBox});
+      let newField = scout.create(StringField, {parent: groupBox});
       let sibling = groupBox.fields[1];
       groupBox.insertFieldBefore(newField, sibling);
       expect(groupBox.fields.length).toBe(3);
@@ -458,7 +458,7 @@ describe('GroupBox', () => {
       expect(groupBox.controls[2]).toBe(sibling);
 
       // At the beginning
-      let newField2 = scout.create('StringField', {parent: groupBox});
+      let newField2 = scout.create(StringField, {parent: groupBox});
       sibling = groupBox.fields[0];
       groupBox.insertFieldBefore(newField2, sibling);
       expect(groupBox.fields.length).toBe(4);
@@ -476,7 +476,7 @@ describe('GroupBox', () => {
       expect(groupBox.fields.length).toBe(2);
       expect(groupBox.controls.length).toBe(2);
 
-      let newField = scout.create('StringField', {parent: groupBox});
+      let newField = scout.create(StringField, {parent: groupBox});
       let sibling = groupBox.fields[1];
       groupBox.insertFieldAfter(newField, sibling);
       expect(groupBox.fields.length).toBe(3);
@@ -487,7 +487,6 @@ describe('GroupBox', () => {
       expect(groupBox.controls[1]).toBe(sibling);
 
       // At the end
-      let newField3 = scout.create('StringField', {parent: groupBox});
       sibling = groupBox.fields[2];
       groupBox.insertFieldAfter(newField, sibling);
       expect(groupBox.fields.length).toBe(4);

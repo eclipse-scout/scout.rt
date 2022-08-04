@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, scout, Status, strings, texts, Widget} from '../index';
+import {HtmlComponent, Icon, scout, Status, strings, texts, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Notification extends Widget {
@@ -123,7 +123,7 @@ export default class Notification extends Widget {
       return;
     }
 
-    this._icon = scout.create('Icon', {
+    this._icon = scout.create(Icon, {
       parent: this,
       iconDesc: this.status.iconId,
       prepend: true

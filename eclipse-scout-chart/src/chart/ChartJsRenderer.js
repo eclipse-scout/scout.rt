@@ -10,7 +10,7 @@
  */
 import {AbstractChartRenderer, Chart} from '../index';
 import ChartJs from 'chart.js/auto';
-import {arrays, colorSchemes, Event, graphics, numbers, objects, scout, strings, styles, tooltips} from '@eclipse-scout/core';
+import {arrays, colorSchemes, Event, graphics, numbers, objects, scout, strings, styles, Tooltip, tooltips} from '@eclipse-scout/core';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import $ from 'jquery';
 
@@ -965,7 +965,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     origin.height = 0;
 
     this._tooltip = scout.create({
-      objectType: 'Tooltip',
+      objectType: Tooltip,
       parent: this.chart,
       $anchor: this.$canvas,
       text: tooltipText,

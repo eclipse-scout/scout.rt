@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper} from '../../../src/testing/index';
-import {scout, Status} from '../../../src';
+import {FormLifecycle, scout, Status} from '../../../src';
 
 describe('FormLifecycle', () => {
 
@@ -25,7 +25,7 @@ describe('FormLifecycle', () => {
     helper = new FormSpecHelper(session);
 
     form = helper.createFormWithOneField();
-    form.lifecycle = scout.create('FormLifecycle', {widget: form});
+    form.lifecycle = scout.create(FormLifecycle, {widget: form});
     field = form.rootGroupBox.fields[0];
     form.render();
     jasmine.clock().install();
@@ -86,7 +86,7 @@ describe('FormLifecycle', () => {
 
     it('stops lifecycle if severity is ERROR', () => {
       let form2 = helper.createFormWithOneField();
-      form2.lifecycle = scout.create('FormLifecycle', {
+      form2.lifecycle = scout.create(FormLifecycle, {
         widget: form
       });
       form2.lifecycle._validate = () => $.resolvedPromise(Status.error({
@@ -97,7 +97,7 @@ describe('FormLifecycle', () => {
 
     it('continues lifecycle if severity is WARNING', () => {
       let form2 = helper.createFormWithOneField();
-      form2.lifecycle = scout.create('FormLifecycle', {
+      form2.lifecycle = scout.create(FormLifecycle, {
         widget: form
       });
       form2.lifecycle._validate = () => $.resolvedPromise(Status.warning({
@@ -125,7 +125,7 @@ describe('FormLifecycle', () => {
     it('should call _validate function on form', () => {
       // validate should always be called, even when there is not a single touched field in the form
       let form2 = helper.createFormWithOneField();
-      form2.lifecycle = scout.create('FormLifecycle', {
+      form2.lifecycle = scout.create(FormLifecycle, {
         widget: form2
       });
       let validateCalled = false;
@@ -147,7 +147,7 @@ describe('FormLifecycle', () => {
 
     it('should focus first invalid element', () => {
       let formWithFieldsAndTabBoxes = helper.createFormWithFieldsAndTabBoxes();
-      formWithFieldsAndTabBoxes.lifecycle = scout.create('FormLifecycle', {
+      formWithFieldsAndTabBoxes.lifecycle = scout.create(FormLifecycle, {
         widget: formWithFieldsAndTabBoxes
       });
 

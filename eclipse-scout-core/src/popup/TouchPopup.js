@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, HtmlComponent, Point, Popup, scout, SingleLayout, TouchPopupLayout, ValueField} from '../index';
+import {FormField, HtmlComponent, Menu, Point, Popup, scout, SingleLayout, TouchPopupLayout, ValueField} from '../index';
 import RowLayout from '../layout/RowLayout';
 
 export default class TouchPopup extends Popup {
@@ -45,7 +45,7 @@ export default class TouchPopup extends Popup {
     this._field = this._touchField.clone(this._fieldOverrides());
     this._touchField.on('propertyChange', this._touchFieldPropertyChangeListener);
     this._initWidget(options);
-    this.doneAction = scout.create('Menu', {
+    this.doneAction = scout.create(Menu, {
       parent: this,
       text: this.session.text('ui.Done')
     });

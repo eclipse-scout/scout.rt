@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, scout, SimpleTabArea, styles, widgets} from '../index';
+import {AbstractLayout, ContextMenuPopup, Dimension, graphics, Menu, scout, SimpleTabArea, styles, widgets} from '../index';
 import $ from 'jquery';
 
 export default class SimpleTabAreaLayout extends AbstractLayout {
@@ -154,7 +154,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
     }
     this._overflowTabsIndizes.forEach(i => {
       let tab = this.tabArea.getTabs()[i];
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: this.tabArea,
         text: tab.getMenuText(),
         tab: tab
@@ -166,7 +166,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
       overflowMenus.push(menu);
     });
 
-    let popup = scout.create('ContextMenuPopup', {
+    let popup = scout.create(ContextMenuPopup, {
       parent: this.tabArea,
       menuItems: overflowMenus,
       cloneMenuItems: false,

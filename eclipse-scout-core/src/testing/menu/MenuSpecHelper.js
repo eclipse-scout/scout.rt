@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {scout} from '../../index';
+import {Menu, scout} from '../../index';
 
 export default class MenuSpecHelper {
   constructor(session) {
@@ -29,10 +29,10 @@ export default class MenuSpecHelper {
 
   createMenu(model) {
     model = model || {};
-    model.objectType = model.objectType || 'Menu';
+    model.objectType = model.objectType || Menu;
     model.session = this.session;
     model.parent = this.session.desktop;
-    return scout.create('Menu', model);
+    return scout.create(Menu, model);
   }
 }
 

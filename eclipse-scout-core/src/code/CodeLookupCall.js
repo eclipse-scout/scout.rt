@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {codes, scout, StaticLookupCall, strings} from '../index';
+import {codes, LookupRow, scout, StaticLookupCall, strings} from '../index';
 
 export default class CodeLookupCall extends StaticLookupCall {
 
@@ -61,7 +61,7 @@ export default class CodeLookupCall extends StaticLookupCall {
     if (!code) {
       return null;
     }
-    return scout.create('LookupRow', {
+    return scout.create(LookupRow, {
       key: code.id,
       text: code.text(this.session.locale),
       parentKey: code.parent && code.parent.id

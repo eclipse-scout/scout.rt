@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {codes, Column, LookupCall, LookupRow, scout, SmartField, strings} from '../../index';
+import {CodeLookupCall, codes, Column, LookupCall, LookupRow, scout, SmartField, strings} from '../../index';
 import objects from '../../util/objects';
 
 /**
@@ -85,7 +85,7 @@ export default class SmartColumn extends Column {
     if (!codeType) {
       return;
     }
-    this.lookupCall = scout.create('CodeLookupCall', {
+    this.lookupCall = scout.create(CodeLookupCall, {
       session: this.session,
       codeType: codeType
     });
@@ -189,7 +189,7 @@ export default class SmartColumn extends Column {
   }
 
   _createEditor(row) {
-    let field = scout.create('SmartField', {
+    let field = scout.create(SmartField, {
       parent: this.table,
       codeType: this.codeType,
       lookupCall: this.lookupCall ? this.lookupCall.clone() : null,
