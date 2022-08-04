@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, FormField, HtmlComponent, scout, Status, strings, Widget} from '../../index';
+import {arrays, ContextMenuPopup, Event, FormField, HtmlComponent, scout, Status, strings, Tooltip, Widget} from '../../index';
 
 export default class FieldStatus extends Widget {
 
@@ -171,7 +171,7 @@ export default class FieldStatus extends Widget {
       this.tooltip.setSeverity(this.status.severity);
       this.tooltip.setMenus(this.menus);
     } else {
-      this.tooltip = scout.create('Tooltip', {
+      this.tooltip = scout.create(Tooltip, {
         parent: this,
         $anchor: this.$container,
         text: this.status.message,
@@ -209,7 +209,7 @@ export default class FieldStatus extends Widget {
       this.contextMenu.removeImmediately();
     }
 
-    this.contextMenu = scout.create('ContextMenuPopup', {
+    this.contextMenu = scout.create(ContextMenuPopup, {
       parent: this,
       $anchor: this.$container,
       menuItems: this.menus,

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../../src/index';
+import {BooleanColumn, Cell, scout} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
 
 describe('Column', () => {
@@ -126,7 +126,7 @@ describe('Column', () => {
   it('considers custom css class of a column, as well for checkbox columns', () => {
     let model = helper.createModelFixture(3, 2);
     model.columns[0].cssClass = 'abc';
-    model.columns[0].objectType = 'BooleanColumn';
+    model.columns[0].objectType = BooleanColumn;
 
     let table = helper.createTable(model);
     table.render();
@@ -316,7 +316,7 @@ describe('Column', () => {
     it('calls formatValue to format the text, also for cell objects', () => {
       table.columns[0]._formatValue = value => value.toUpperCase();
       table.insertRows([{
-        cells: [scout.create('Cell', {
+        cells: [scout.create(Cell, {
           value: 'cell 1'
         })]
       }]);
@@ -328,7 +328,7 @@ describe('Column', () => {
     it('does not format the value if a text is provided', () => {
       table.columns[0]._formatValue = value => value.toUpperCase();
       table.insertRows([{
-        cells: [scout.create('Cell', {
+        cells: [scout.create(Cell, {
           value: 'cell 1',
           text: 'cell text 1'
         })]
@@ -341,7 +341,7 @@ describe('Column', () => {
     it('sets the value to null if only text is provided', () => {
       table.columns[0]._formatValue = value => value.toUpperCase();
       table.insertRows([{
-        cells: [scout.create('Cell', {
+        cells: [scout.create(Cell, {
           text: 'cell text 1'
         })]
       }]);

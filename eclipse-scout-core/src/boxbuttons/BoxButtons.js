@@ -67,7 +67,7 @@ export default class BoxButtons extends Widget {
     model.tabbable = true;
     model.actionStyle = Action.ActionStyle.BUTTON;
     model.preventDoubleClick = true;
-    let button = scout.create('Action', model, options);
+    let button = scout.create(Action, model, options);
     this.buttons.push(button);
     return button;
   }

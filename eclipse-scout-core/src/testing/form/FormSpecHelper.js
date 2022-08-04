@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Form, scout} from '../../index';
+import {arrays, Column, Form, GroupBox, Mode, ModeSelector, RadioButton, RadioButtonGroup, scout, StringField, TabBox, TabItem, Table, TableField} from '../../index';
 import $ from 'jquery';
 
 export default class FormSpecHelper {
@@ -37,7 +37,7 @@ export default class FormSpecHelper {
       parent: this.session.desktop
     };
     model = $.extend({}, defaults, model);
-    let form = scout.create('Form', model);
+    let form = scout.create(Form, model);
     let rootGroupBox = this.createGroupBoxWithFields(form, 1);
     form._setRootGroupBox(rootGroupBox);
     return form;
@@ -46,34 +46,34 @@ export default class FormSpecHelper {
   createFormWithFieldsAndTabBoxes(model) {
     let fieldModelPart = (id, mandatory) => ({
         id: id,
-        objectType: 'StringField',
+        objectType: StringField,
         label: id,
         mandatory: mandatory
       }),
       tabBoxModelPart = (id, tabItems) => ({
         id: id,
-        objectType: 'TabBox',
+        objectType: TabBox,
         tabItems: tabItems
       }),
       tabItemModelPart = (id, fields) => ({
         id: id,
-        objectType: 'TabItem',
+        objectType: TabItem,
         label: 'id',
         fields: fields
       }),
       tableFieldModelPart = (id, columns) => ({
         id: id,
-        objectType: 'TableField',
+        objectType: TableField,
         label: id,
         table: {
           id: id + 'Table',
-          objectType: 'Table',
+          objectType: Table,
           columns: columns
         }
       }),
       columnModelPart = (id, mandatory) => ({
         id: id,
-        objectType: 'Column',
+        objectType: Column,
         text: id,
         editable: true,
         mandatory: mandatory
@@ -85,7 +85,7 @@ export default class FormSpecHelper {
       title: 'Form',
       rootGroupBox: {
         id: 'RootGroupBox',
-        objectType: 'GroupBox',
+        objectType: GroupBox,
         fields: [
           fieldModelPart('Field1', false),
           fieldModelPart('Field2', false),
@@ -126,7 +126,7 @@ export default class FormSpecHelper {
     };
 
     model = $.extend({}, defaults, model);
-    let form = scout.create('Form', model);
+    let form = scout.create(Form, model);
     form.widget('TableFieldB5').table.insertRows([{cells: arrays.init(2)}, {cells: arrays.init(2)}]);
     return form;
   }
@@ -140,11 +140,11 @@ export default class FormSpecHelper {
     numFields = scout.nvl(numFields, 1);
     let
       fields = [],
-      groupBox = scout.create('GroupBox', {
+      groupBox = scout.create(GroupBox, {
         parent: parent
       });
     for (let i = 0; i < numFields; i++) {
-      fields.push(scout.create('StringField', {
+      fields.push(scout.create(StringField, {
         parent: groupBox
       }));
     }
@@ -158,10 +158,10 @@ export default class FormSpecHelper {
     let fields = [];
     for (let i = 0; i < numRadioButtons; i++) {
       fields.push({
-        objectType: 'RadioButton'
+        objectType: RadioButton
       });
     }
-    return scout.create('RadioButtonGroup', {
+    return scout.create(RadioButtonGroup, {
       parent: parent,
       fields: fields
     });
@@ -169,7 +169,7 @@ export default class FormSpecHelper {
 
   createFormWithFields(parent, isModal, numFields) {
     parent = scout.nvl(parent, this.session.desktop);
-    let form = scout.create('Form', {
+    let form = scout.create(Form, {
       parent: parent,
       displayHint: isModal ? 'dialog' : 'view'
     });
@@ -199,10 +199,10 @@ export default class FormSpecHelper {
     let modes = [];
     for (let i = 0; i < numModes; i++) {
       modes.push({
-        objectType: 'Mode'
+        objectType: Mode
       });
     }
-    return scout.create('ModeSelector', {
+    return scout.create(ModeSelector, {
       parent: parent,
       modes: modes
     });

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormat, DatePickerTouchPopup, dates, keys, RemoteEvent, scout, Status, TimePickerTouchPopup, ValidationFailedStatus} from '../../../../src/index';
+import {DateField, DateFormat, DatePickerTouchPopup, dates, keys, RemoteEvent, scout, Status, TimePickerTouchPopup, ValidationFailedStatus} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 
 describe('DateField', () => {
@@ -64,12 +64,6 @@ describe('DateField', () => {
     dateField.$dateField.focus();
     jasmine.clock().tick(101);
     expect(dateField.$dateField).toBeFocused();
-  }
-
-  function focusTime(dateField) {
-    dateField.$timeField.focus();
-    jasmine.clock().tick(101);
-    expect(dateField.$timeField).toBeFocused();
   }
 
   function openDatePicker(dateField) {
@@ -128,7 +122,7 @@ describe('DateField', () => {
   describe('displayText', () => {
 
     it('is shown correctly after rendering', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         displayText: '14.04.2016\n12:28',
         hasDate: true,
@@ -143,7 +137,7 @@ describe('DateField', () => {
     });
 
     it('is removed properly when setting to \'\'', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         displayText: '14.04.2016\n12:28',
         hasDate: true,
@@ -163,7 +157,7 @@ describe('DateField', () => {
   describe('parseAndSetValue', () => {
 
     it('parses and sets the value', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         hasDate: true,
         hasTime: true
@@ -180,7 +174,7 @@ describe('DateField', () => {
   describe('init', () => {
 
     it('sets display text using formatValue if value is set initially', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         value: '2014-10-01 05:00:00.000',
         hasTime: true
@@ -198,7 +192,7 @@ describe('DateField', () => {
   describe('setValue', () => {
 
     it('sets the value, formats it and sets the display text', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         hasTime: true
       });
@@ -211,7 +205,7 @@ describe('DateField', () => {
     });
 
     it('does not set the value but the error status and display text if the validation fails', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         hasTime: true
       });
@@ -225,7 +219,7 @@ describe('DateField', () => {
     });
 
     it('deletes the error status if value is valid', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         hasTime: true
       });
@@ -254,7 +248,7 @@ describe('DateField', () => {
   describe('acceptInput', () => {
 
     it('validate again if a new date was typed and reverted', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         hasTime: true
       });
@@ -291,7 +285,7 @@ describe('DateField', () => {
 
   describe('acceptDate', () => {
     it('removes time as well if date was deleted', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         value: '2014-10-01 05:00:00.000',
         hasTime: true
@@ -319,7 +313,7 @@ describe('DateField', () => {
 
   describe('acceptTime', () => {
     it('removes date as well if time was deleted', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         value: '2014-10-01 05:00:00.000',
         hasTime: true
@@ -348,7 +342,7 @@ describe('DateField', () => {
   describe('click', () => {
 
     it('opens the datepicker', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop
       });
       dateField.render();
@@ -359,7 +353,7 @@ describe('DateField', () => {
     });
 
     it('opens the picker and preselects the current date but not the previous date if it was cleared before', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop
       });
       dateField.render();
@@ -412,7 +406,7 @@ describe('DateField', () => {
     });
 
     it('updates the model with the selected value', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         value: '2014-10-01'
       });
@@ -505,7 +499,7 @@ describe('DateField', () => {
   describe('picker', () => {
 
     it('sets selected date as field value when a date was selected', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         autoDate: '2016-02-05'
       });
@@ -519,7 +513,7 @@ describe('DateField', () => {
     });
 
     it('unselects the date if the field\'s text was removed', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         autoDate: '2016-02-05'
       });
@@ -536,7 +530,7 @@ describe('DateField', () => {
     });
 
     it('sets selected date as field value when a date was selected even if another date was typed', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         value: '2016-02-01'
       });
@@ -579,8 +573,7 @@ describe('DateField', () => {
     describe('ENTER', () => {
 
       it('updates the model with the selected value and closes picker', () => {
-        let model = createModel();
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           value: '2014-10-01'
         });
@@ -612,7 +605,7 @@ describe('DateField', () => {
       });
 
       it('opens the picker and selects the current date and time', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           hasTime: true
         });
@@ -632,7 +625,7 @@ describe('DateField', () => {
       });
 
       it('selects the current date if picker is open and no date is selected', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop
         });
         dateField.render();
@@ -658,7 +651,7 @@ describe('DateField', () => {
       });
 
       it('removes the error status if the date was invalid before opening the picker', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           displayText: 'asdf'
         });
@@ -718,7 +711,7 @@ describe('DateField', () => {
       });
 
       it('increases minutes to the next 30 if pressed in time field', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           hasTime: true,
           value: dates.create('2017-04-14 12:18:00.000')
@@ -790,7 +783,7 @@ describe('DateField', () => {
   describe('date validation and prediction', () => {
 
     it('can validate inputs', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop
       });
 
@@ -825,7 +818,7 @@ describe('DateField', () => {
     });
 
     it('can predict dates', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop
       });
       let now = new Date();
@@ -872,7 +865,7 @@ describe('DateField', () => {
   describe('allowed dates', () => {
 
     it('_referenceDate returns only allowed date - only one date', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         allowedDates: ['2016-04-15']
       });
@@ -882,7 +875,7 @@ describe('DateField', () => {
     });
 
     it('_referenceDate returns only allowed date - choose nearest date in the future', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         allowedDates: ['2016-03-14', '2016-04-16', '2016-04-17'],
         autoDate: '2016-04-15'
@@ -892,7 +885,7 @@ describe('DateField', () => {
     });
 
     it('_referenceDate returns only allowed date - when no date in future is available, choose nearest date in past', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         allowedDates: ['2016-02-14', '2016-03-16', '2016-04-03'],
         autoDate: '2016-04-15'
@@ -902,7 +895,7 @@ describe('DateField', () => {
     });
 
     it('_setAllowedDates must convert date strings into Dates', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop
       });
       dateField._setAllowedDates(['2016-02-14']);
@@ -916,7 +909,7 @@ describe('DateField', () => {
     describe('date picker touch popup', () => {
 
       it('is opened if datefield is touched', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true
         });
@@ -931,7 +924,7 @@ describe('DateField', () => {
       });
 
       it('is closed when date in picker is selected', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true
         });
@@ -940,12 +933,12 @@ describe('DateField', () => {
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
 
-        let selectedDate = selectFirstDayInPicker(dateField.popup._widget.currentMonth.$container);
+        selectFirstDayInPicker(dateField.popup._widget.currentMonth.$container);
         expect(dateField.popup).toBe(null);
       });
 
       it('unregisters clone after close', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true
         });
@@ -963,7 +956,7 @@ describe('DateField', () => {
       });
 
       it('updates displayText and value of datefield if date in picker is selected', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true
         });
@@ -980,7 +973,7 @@ describe('DateField', () => {
       });
 
       it('updates displayText and value of datefield if date in picker is entered', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true
         });
@@ -998,7 +991,7 @@ describe('DateField', () => {
       });
 
       it('updates displayText and value of datefield if date and time in picker are entered', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true,
           hasTime: true
@@ -1027,7 +1020,7 @@ describe('DateField', () => {
       });
 
       it('shows datefield with same date as clicked datefield', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true,
           value: '2012-07-01',
@@ -1044,7 +1037,7 @@ describe('DateField', () => {
       });
 
       it('shows datefield with same date as clicked datefield, if field empty initially', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true
         });
@@ -1069,7 +1062,7 @@ describe('DateField', () => {
       });
 
       it('clears displayText and value of datefield if date in picker was removed', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true,
           value: '2012-07-01',
@@ -1090,7 +1083,7 @@ describe('DateField', () => {
       });
 
       it('shows datefield with same date as clicked datefield, even if value was deleted before', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true,
           value: '2012-07-01',
@@ -1128,7 +1121,7 @@ describe('DateField', () => {
       });
 
       it('does not remove time if date was cleared but another date selected ', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true,
           hasTime: true,
@@ -1162,7 +1155,7 @@ describe('DateField', () => {
 
     describe('time picker touch popup', () => {
       it('is opened if datefield is touched', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true,
           hasDate: false,
@@ -1179,7 +1172,7 @@ describe('DateField', () => {
       });
 
       it('is closed when time in picker is selected', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true,
           hasDate: false,
@@ -1190,12 +1183,12 @@ describe('DateField', () => {
         dateField.$timeField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
 
-        let selectedDate = selectFirstTimeInPicker(dateField.popup._widget.$container);
+        selectFirstTimeInPicker(dateField.popup._widget.$container);
         expect(dateField.popup).toBe(null);
       });
 
       it('updates displayText and value of datefield if date in picker is selected', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true,
           hasDate: false,
@@ -1214,7 +1207,7 @@ describe('DateField', () => {
       });
 
       it('updates displayText and value of datefield if date in picker is entered', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true,
           hasDate: false,
@@ -1234,7 +1227,7 @@ describe('DateField', () => {
       });
 
       it('does not remove date if time was cleared but another time selected ', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true,
           hasTime: true,
@@ -1268,7 +1261,7 @@ describe('DateField', () => {
 
     describe('clear', () => {
       it('removes the display text and sets the value to null', () => {
-        let dateField = scout.create('DateField', {
+        let dateField = scout.create(DateField, {
           parent: session.desktop,
           touchMode: true,
           hasTime: true,
@@ -1290,7 +1283,7 @@ describe('DateField', () => {
   describe('hasDate', () => {
 
     it('renders date field if set to true', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         hasDate: true
       });
@@ -1299,7 +1292,7 @@ describe('DateField', () => {
     });
 
     it('renders before time field even if set later', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         hasDate: false,
         hasTime: true
@@ -1313,7 +1306,7 @@ describe('DateField', () => {
     });
 
     it('does not loose date if hasDate is toggled', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         value: '2017-05-01 05:50:00.000',
         hasDate: true,
@@ -1345,7 +1338,7 @@ describe('DateField', () => {
     });
 
     it('sets enabled property correctly if hasDate is toggled', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         value: '2017-05-01 05:50:00.000',
         hasDate: true,
@@ -1380,7 +1373,7 @@ describe('DateField', () => {
   describe('hasTime', () => {
 
     it('renders time field if set to true', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         hasTime: true
       });
@@ -1389,7 +1382,7 @@ describe('DateField', () => {
     });
 
     it('renders after date field even if set later', () => {
-      let dateField = scout.create('DateField', {
+      let dateField = scout.create(DateField, {
         parent: session.desktop,
         hasDate: true
       });
@@ -1402,7 +1395,7 @@ describe('DateField', () => {
     });
 
     it('does not loose time if hasTime is toggled', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         value: '2017-05-01 05:50:00.000',
         hasDate: true,
@@ -1434,7 +1427,7 @@ describe('DateField', () => {
     });
 
     it('sets enabled property correctly if hasTime is toggled', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         value: '2017-05-01 05:50:00.000',
         hasDate: true,
@@ -1469,7 +1462,7 @@ describe('DateField', () => {
   describe('label', () => {
 
     it('is linked with the date and time fields', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         label: 'label',
         hasTime: true
@@ -1482,7 +1475,7 @@ describe('DateField', () => {
     });
 
     it('focuses the date field when clicked', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         label: 'label'
       });
@@ -1495,7 +1488,7 @@ describe('DateField', () => {
     });
 
     it('focuses the time field when clicked if hasDate is false and hasTime is true', () => {
-      let field = scout.create('DateField', {
+      let field = scout.create(DateField, {
         parent: session.desktop,
         label: 'label',
         hasDate: false,

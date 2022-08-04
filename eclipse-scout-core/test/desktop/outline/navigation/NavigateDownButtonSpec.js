@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NullWidget, scout} from '../../../../src/index';
+import {NavigateDownButton, NullWidget, Outline, Page, scout, Table, TableRow} from '../../../../src/index';
 
 describe('NavigateDownButton', () => {
 
@@ -17,13 +17,13 @@ describe('NavigateDownButton', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
-    outline = scout.create('Outline', {
+    outline = scout.create(Outline, {
       parent: session.desktop
     });
-    node = scout.create('Page', {
+    node = scout.create(Page, {
       parent: outline
     });
-    menu = scout.create('NavigateDownButton', {
+    menu = scout.create(NavigateDownButton, {
       parent: session.desktop,
       outline: outline,
       node: node
@@ -39,7 +39,7 @@ describe('NavigateDownButton', () => {
     node.detailForm = {};
     node.detailFormVisible = true;
     node.detailFormVisibleByUi = true;
-    node.detailTable = scout.create('Table', {
+    node.detailTable = scout.create(Table, {
       parent: new NullWidget(),
       session: session
     });
@@ -54,7 +54,7 @@ describe('NavigateDownButton', () => {
     // false when detailTable is absent, even when if detailTableVisible=true
     delete node.detailTable;
     expect(menu._isDetail()).toBe(false);
-    node.detailTable = scout.create('Table', {
+    node.detailTable = scout.create(Table, {
       parent: new NullWidget(),
       session: session
     });
@@ -92,7 +92,7 @@ describe('NavigateDownButton', () => {
       menu._isDetail = () => { // currently we're not displaying the detail-form
         return false;
       };
-      node.detailTable = scout.create('Table', {
+      node.detailTable = scout.create(Table, {
         parent: new NullWidget(),
         session: session
       });
@@ -110,7 +110,7 @@ describe('NavigateDownButton', () => {
       menu._isDetail = () => { // currently we're not displaying the detail-form
         return false;
       };
-      node.detailTable = scout.create('Table', {
+      node.detailTable = scout.create(Table, {
         parent: new NullWidget(),
         session: session
       });
@@ -131,18 +131,18 @@ describe('NavigateDownButton', () => {
       menu._isDetail = () => { // currently we're not displaying the detail-form
         return false;
       };
-      node.detailTable = scout.create('Table', {
+      node.detailTable = scout.create(Table, {
         parent: new NullWidget(),
         session: session
       });
       outline.insertNode(node);
       expect(menu._buttonEnabled()).toBe(false);
 
-      let page = scout.create('Page', {
+      let page = scout.create(Page, {
         parent: outline,
         parentNode: node
       });
-      let row = scout.create('TableRow', {
+      let row = scout.create(TableRow, {
         parent: node.detailTable,
         nodeId: page.id
       });
@@ -156,7 +156,7 @@ describe('NavigateDownButton', () => {
   });
 
   it('_drill drills down to first selected row in the detail table', () => {
-    node.detailTable = scout.create('Table', {
+    node.detailTable = scout.create(Table, {
       parent: new NullWidget(),
       session: session,
       rows: [{
@@ -164,7 +164,7 @@ describe('NavigateDownButton', () => {
         nodeId: '123'
       }]
     });
-    let drillNode = scout.create('Page', {
+    let drillNode = scout.create(Page, {
       parent: outline
     });
     let firstRow = node.detailTable.rows[0];

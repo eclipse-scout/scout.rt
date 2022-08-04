@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {arrays, HtmlComponent, Widget, scout, BreadcrumbBarLayout} from '../index';
+import {arrays, BreadcrumbBarLayout, BreadcrumbItem, HtmlComponent, scout, Widget} from '../index';
 
 export default class BreadcrumbBar extends Widget {
 
@@ -65,7 +65,7 @@ export default class BreadcrumbBar extends Widget {
       return;
     }
 
-    this._ellipsisBreadcrumbItem = scout.create('BreadcrumbItem', {
+    this._ellipsisBreadcrumbItem = scout.create(BreadcrumbItem, {
       parent: this,
       text: '...',
       enabled: false

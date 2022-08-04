@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FieldStatus, scout, Status, StringField} from '../../../src/index';
+import {FieldStatus, GroupBox, scout, Status, StringField} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
 
 describe('FieldStatus', () => {
@@ -57,7 +57,7 @@ describe('FieldStatus', () => {
      * This test relies on a property change event for the 'parent' property, triggered by Widget.js.
      */
     it('must update listeners when one of its parent changes', () => {
-      let groupBox = scout.create('GroupBox', {
+      let groupBox = scout.create(GroupBox, {
         parent: session.desktop
       });
       groupBox.render();

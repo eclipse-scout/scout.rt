@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicFieldAdapter, RemoteEvent, scout} from '../../../src/index';
+import {BasicFieldAdapter, RemoteEvent, scout, StringField} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
 
 describe('BasicField', () => {
@@ -251,7 +251,7 @@ describe('BasicField', () => {
 
     it('removes the text and accepts input also with updateDisplayTextOnAnyKey set to true', () => {
       // Behavior should be similar to ctrl+A
-      let field = scout.create('StringField', {
+      let field = scout.create(StringField, {
         parent: session.desktop,
         updateDisplayTextOnAnyKey: true
       });

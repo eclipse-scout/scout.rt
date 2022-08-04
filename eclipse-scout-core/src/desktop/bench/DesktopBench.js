@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, BenchColumn, DesktopTabSelectKeyStroke, FlexboxLayout, FlexboxLayoutData, HtmlComponent, KeyStrokeContext, scout, Splitter, styles, Table, Widget, widgets} from '../../index';
+import {arrays, BenchColumn, DesktopNavigationHandle, DesktopTabSelectKeyStroke, FlexboxLayout, FlexboxLayoutData, HeaderTabBoxController, HtmlComponent, KeyStrokeContext, scout, Splitter, styles, Table, Widget, widgets} from '../../index';
 import $ from 'jquery';
 
 export default class DesktopBench extends Widget {
@@ -68,7 +68,7 @@ export default class DesktopBench extends Widget {
     this.headerTabArea = model.headerTabArea;
     // controller for headerTabArea
     if (this.headerTabArea) {
-      this.headerTabAreaController = scout.create('HeaderTabBoxController');
+      this.headerTabAreaController = scout.create(HeaderTabBoxController);
       this.headerTabAreaController.install(this, this.headerTabArea);
     }
     this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
@@ -109,7 +109,7 @@ export default class DesktopBench extends Widget {
       if (cacheKey.length > 0) {
         cacheKey.push('column' + i);
       }
-      let column = scout.create('BenchColumn', {
+      let column = scout.create(BenchColumn, {
         parent: this,
         layoutData: columnLayoutData[i],
         cacheKey: cacheKey,
@@ -214,7 +214,7 @@ export default class DesktopBench extends Widget {
   }
 
   _createNavigationHandle() {
-    return scout.create('DesktopNavigationHandle', {
+    return scout.create(DesktopNavigationHandle, {
       parent: this,
       leftVisible: false
     });
@@ -528,7 +528,7 @@ export default class DesktopBench extends Widget {
       .reduce((arr, col) => {
         if (arr.length > 0) {
           // add sep
-          let splitter = scout.create('Splitter', {
+          let splitter = scout.create(Splitter, {
             parent: this,
             $anchor: arr[arr.length - 1].$container,
             $root: this.$container,

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, OutlineOverview, RowLayout, scout} from '../../../index';
+import {HtmlComponent, OutlineOverview, PageTileGrid, RowLayout, scout} from '../../../index';
 
 export default class TileOutlineOverview extends OutlineOverview {
 
@@ -68,7 +68,7 @@ export default class TileOutlineOverview extends OutlineOverview {
         nodes = page.childNodes;
       }
     }
-    return scout.create('PageTileGrid', {
+    return scout.create(PageTileGrid, {
       parent: this,
       outline: this.outline,
       compact: this.outline.compact,

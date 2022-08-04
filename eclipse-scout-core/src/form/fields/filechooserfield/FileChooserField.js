@@ -40,7 +40,7 @@ export default class FileChooserField extends ValueField {
    * This cannot be done in _init because the value field would call _setValue first
    */
   _initValue(value) {
-    this.fileInput = scout.create('FileInput', {
+    this.fileInput = scout.create(FileInput, {
       parent: this,
       acceptTypes: this.acceptTypes,
       text: this.displayText,

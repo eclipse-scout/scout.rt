@@ -44,7 +44,7 @@ describe('SpeedoChartRenderer', () => {
 
   describe('click handling', () => {
     it('should handle click', () => {
-      let chart = scout.create('Chart', {
+      let chart = scout.create(Chart, {
         parent: session.desktop,
         data: {
           axes: [],

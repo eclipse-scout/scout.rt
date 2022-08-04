@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../../../src/index';
+import {scout, SequenceBoxAdapter} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '../../../../src/testing/index';
 
 describe('SequenceBoxAdapter', () => {
@@ -40,7 +40,7 @@ describe('SequenceBoxAdapter', () => {
           objectType: 'DateField'
         }]
       };
-      let adapter = scout.create('SequenceBoxAdapter', createAdapterModel(model));
+      let adapter = scout.create(SequenceBoxAdapter, createAdapterModel(model));
       let seqBox = adapter.createWidget(model, session.desktop);
       linkWidgetAndAdapter(seqBox.fields[0], 'StringFieldAdapter');
       linkWidgetAndAdapter(seqBox.fields[1], 'DateFieldAdapter');

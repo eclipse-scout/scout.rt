@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../../src/index';
+import {Menu, scout} from '../../../src/index';
 import {FormSpecHelper, OutlineSpecHelper} from '../../../src/testing/index';
 
 describe('DesktopHeader', () => {
@@ -43,13 +43,13 @@ describe('DesktopHeader', () => {
       node0 = outline.nodes[0];
       node0.detailForm = formHelper.createFormWithOneField();
       node0.detailFormVisible = true;
-      node0.detailForm.rootGroupBox.menuBar.setMenuItems(scout.create('Menu', {
+      node0.detailForm.rootGroupBox.menuBar.setMenuItems(scout.create(Menu, {
         parent: node0.detailForm
       }));
       node1 = outline.nodes[1];
       node1.detailForm = formHelper.createFormWithOneField();
       node1.detailFormVisible = true;
-      node1.detailForm.rootGroupBox.menuBar.setMenuItems(scout.create('Menu', {
+      node1.detailForm.rootGroupBox.menuBar.setMenuItems(scout.create(Menu, {
         parent: node1.detailForm
       }));
       bench = desktop.bench;

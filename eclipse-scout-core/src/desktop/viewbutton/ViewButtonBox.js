@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, OutlineViewButton, scout, Widget, widgets} from '../../index';
+import {HtmlComponent, OutlineViewButton, scout, ViewMenuTab, Widget, widgets} from '../../index';
 
 export default class ViewButtonBox extends Widget {
 
@@ -27,7 +27,7 @@ export default class ViewButtonBox extends Widget {
   _init(model) {
     super._init(model);
     this.desktop = this.session.desktop;
-    this.viewMenuTab = scout.create('ViewMenuTab', {
+    this.viewMenuTab = scout.create(ViewMenuTab, {
       parent: this
     });
     this._setViewButtons(this.viewButtons);

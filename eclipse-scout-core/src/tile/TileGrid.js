@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ContextMenuKeyStroke, DoubleClickSupport, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGridData, MenuDestinations, menus as menus_1, numbers, objects, PlaceholderTile, Range, scout, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, VirtualScrolling, Widget} from '../index';
+import {arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGridData, MenuDestinations, menus as menus_1, numbers, objects, PlaceholderTile, Range, scout, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, VirtualScrolling, Widget} from '../index';
 import $ from 'jquery';
 
 /**
@@ -33,7 +33,7 @@ export default class TileGrid extends Widget {
     // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
     this.gridColumnCount = 4;
     this.prefGridColumnCount = this.gridColumnCount;
-    this.logicalGrid = scout.create('scout.HorizontalGrid');
+    this.logicalGrid = scout.create(HorizontalGrid);
     this.layoutConfig = null;
     this.menus = [];
     this.multiSelect = true;
@@ -550,7 +550,7 @@ export default class TileGrid extends Widget {
     if (this.contextMenu) {
       this.contextMenu.close();
     }
-    this.contextMenu = scout.create('ContextMenuPopup', {
+    this.contextMenu = scout.create(ContextMenuPopup, {
       parent: this,
       menuItems: menuItems,
       location: {
@@ -655,7 +655,7 @@ export default class TileGrid extends Widget {
   }
 
   _createPlaceholder() {
-    return scout.create('PlaceholderTile', {
+    return scout.create(PlaceholderTile, {
       parent: this
     });
   }

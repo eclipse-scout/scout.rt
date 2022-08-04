@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../../index';
+import {Cell, scout} from '../../../index';
 
 /**
  * Creates a table-row for the given lookup-row.
@@ -44,7 +44,7 @@ export function createTableRow(lookupRow, multipleColumns) {
  * Creates a table cell for a descriptor. If no descriptor is provided, the default lookupRow cell is created.
  */
 export function createTableCell(lookupRow, desc, tableRowData) {
-  let cell = scout.create('Cell');
+  let cell = scout.create(Cell);
 
   // default column descriptor (first column) has propertyName null
   if (!(desc && desc.propertyName)) {

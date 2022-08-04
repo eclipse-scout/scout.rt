@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, scout} from '../../src/index';
+import {DatePicker, dates, scout} from '../../src/index';
 
 describe('DatePicker', () => {
   let session;
@@ -21,7 +21,7 @@ describe('DatePicker', () => {
   describe('showDate', () => {
 
     it('shows the month specified by the given date', () => {
-      let picker = scout.create('DatePicker', {
+      let picker = scout.create(DatePicker, {
         parent: session.desktop
       });
       picker.render();

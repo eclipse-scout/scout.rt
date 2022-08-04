@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStrokeContext, Menu, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarRightKeyStroke, MenuDestinations, menus, scout, Widget, widgets} from '../../index';
+import {arrays, EllipsisMenu, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStrokeContext, Menu, MenuBarBox, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarRightKeyStroke, MenuDestinations, menus, scout, Widget, widgets} from '../../index';
 import ComboMenu from '../ComboMenu';
 
 export default class MenuBar extends Widget {
@@ -56,12 +56,12 @@ export default class MenuBar extends Widget {
       this.menuFilter = (menus, destination, onlyVisible, enableDisableKeyStroke) => options.menuFilter(menus, MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
     }
 
-    this.menuboxLeft = scout.create('MenuBarBox', {
+    this.menuboxLeft = scout.create(MenuBarBox, {
       parent: this,
       cssClass: 'left',
       tooltipPosition: this._oppositePosition()
     });
-    this.menuboxRight = scout.create('MenuBarBox', {
+    this.menuboxRight = scout.create(MenuBarBox, {
       parent: this,
       cssClass: 'right',
       tooltipPosition: this._oppositePosition()
@@ -226,7 +226,7 @@ export default class MenuBar extends Widget {
         this._ellipsis.setChildActions([]);
         this._ellipsis.destroy();
       }
-      ellipsis = scout.create('EllipsisMenu', {
+      ellipsis = scout.create(EllipsisMenu, {
         parent: this,
         cssClass: 'overflow-menu-item'
       });

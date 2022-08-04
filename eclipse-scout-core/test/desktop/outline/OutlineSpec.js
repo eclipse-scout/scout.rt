@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ObjectFactory, objects, OutlineOverview, scout, Status, TileOutlineOverview, Tree} from '../../../src/index';
+import {MessageBox, ObjectFactory, objects, OutlineOverview, scout, Status, TileOutlineOverview, Tree} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from '../../../src/testing/index';
 
 describe('Outline', () => {
@@ -40,7 +40,7 @@ describe('Outline', () => {
         parent: session.desktop,
         severity: Status.Severity.ERROR
       };
-      let messageBox = scout.create('MessageBox', model);
+      let messageBox = scout.create(MessageBox, model);
 
       // This collapses the registered outline
       session.desktop.setNavigationVisible(false);
@@ -551,7 +551,7 @@ describe('Outline', () => {
       expect(outline.outlineOverview instanceof OutlineOverview).toBe(true);
       expect(outline.outlineOverview instanceof TileOutlineOverview).toBe(false);
 
-      let outlineOverview = scout.create('TileOutlineOverview', {parent: outline});
+      let outlineOverview = scout.create(TileOutlineOverview, {parent: outline});
       outline.setOutlineOverview(outlineOverview);
       expect(outline.outlineOverview instanceof TileOutlineOverview).toBe(true);
       expect(outline.outlineOverview).toBe(outlineOverview);

@@ -615,7 +615,7 @@ App.addListener('prepare', () => {
     // if the device was created before the app itself, use it instead of creating a new one
     return;
   }
-  instance = scout.create('Device', {
+  instance = scout.create(Device, {
     userAgent: navigator.userAgent
   });
 });

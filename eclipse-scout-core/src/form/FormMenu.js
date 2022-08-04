@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ContextMenuPopup, Device, Form, FormMenuActionKeyStroke, GroupBox, Menu, scout, WidgetPopup} from '../index';
+import {ContextMenuPopup, Device, Form, FormMenuActionKeyStroke, GroupBox, Menu, MobilePopup, scout, WidgetPopup} from '../index';
 
 export default class FormMenu extends Menu {
 
@@ -178,14 +178,14 @@ export default class FormMenu extends Menu {
     this.form.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
 
     if (this.popupStyle === FormMenu.PopupStyle.MOBILE) {
-      return scout.create('MobilePopup', {
+      return scout.create(MobilePopup, {
         parent: this.session.desktop, // use desktop to make _handleSelectedInEllipsis work (if parent is this and this were not rendered, popup.entryPoint would not work)
         widget: this.form,
         title: this.form.title
       });
     }
 
-    return scout.create('WidgetPopup', {
+    return scout.create(WidgetPopup, {
       parent: this,
       widget: this.form,
       anchor: this,

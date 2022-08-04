@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, objects, scout, Status} from '../index';
+import {arrays, DesktopNotification, objects, scout, Status} from '../index';
 import $ from 'jquery';
 import {assertValue} from '../scout';
 
@@ -20,6 +20,7 @@ export default class MaxLengthHandler {
 
     this.$textInputField = null;
     this.onInputFieldPaste = this._onInputFieldPaste.bind(this);
+    this.target = null;
     $.extend(this, options);
   }
 
@@ -110,7 +111,7 @@ export default class MaxLengthHandler {
   }
 
   _showNotification(textKey) {
-    scout.create('DesktopNotification', {
+    scout.create(DesktopNotification, {
       parent: this.target,
       severity: Status.Severity.WARNING,
       message: this.target.session.text(textKey)

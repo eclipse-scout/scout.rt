@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, scout} from '../../../../src/index';
+import {keys, RadioButton, scout} from '../../../../src/index';
 
 describe('RadioButton', () => {
   let session;
@@ -21,7 +21,7 @@ describe('RadioButton', () => {
   describe('label', () => {
 
     it('is linked with the field', () => {
-      let field = scout.create('RadioButton', {
+      let field = scout.create(RadioButton, {
         parent: session.desktop,
         label: 'label'
       });
@@ -35,7 +35,7 @@ describe('RadioButton', () => {
   describe('keyStroke', () => {
 
     it('selects the button', () => {
-      let field = scout.create('RadioButton', {
+      let field = scout.create(RadioButton, {
         parent: session.desktop,
         keyStroke: 'ctrl-b'
       });
@@ -65,7 +65,7 @@ describe('RadioButton', () => {
     });
 
     it('does not focus the button', () => {
-      let field = scout.create('RadioButton', {
+      let field = scout.create(RadioButton, {
         parent: session.desktop,
         keyStroke: 'ctrl-b'
       });

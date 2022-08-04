@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Button, ButtonAdapterMenu, CompositeField, fields, Form, FormField, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, HAlign, HtmlComponent, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, MenuBar, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, WrappedFormField} from '../../../index';
+import {arrays, Button, ButtonAdapterMenu, CompositeField, fields, Form, FormField, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, GroupBoxResponsiveHandler, HAlign, HtmlComponent, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, MenuBar, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, VerticalSmartGrid, WrappedFormField} from '../../../index';
 import $ from 'jquery';
 
 export default class GroupBox extends CompositeField {
@@ -32,7 +32,7 @@ export default class GroupBox extends CompositeField {
     this.scrollable = null;
     this.expandable = false;
     this.expanded = true;
-    this.logicalGrid = scout.create('scout.VerticalSmartGrid');
+    this.logicalGrid = scout.create(VerticalSmartGrid);
     this.gridColumnCount = 2;
     this.gridDataHints.useUiHeight = true;
     this.gridDataHints.w = FormField.FULL_WIDTH;
@@ -72,7 +72,7 @@ export default class GroupBox extends CompositeField {
       constType: GroupBox.MenuBarPosition
     }]);
     this._setBodyLayoutConfig(this.bodyLayoutConfig);
-    this.menuBar = scout.create('MenuBar', {
+    this.menuBar = scout.create(MenuBar, {
       parent: this,
       menuOrder: new GroupBoxMenuItemsOrder(),
       ellipsisPosition: this.menuBarEllipsisPosition
@@ -82,7 +82,7 @@ export default class GroupBox extends CompositeField {
     this._setMainBox(this.mainBox);
     this._updateMenuBar();
 
-    ResponsiveManager.get().registerHandler(this, scout.create('GroupBoxResponsiveHandler', {
+    ResponsiveManager.get().registerHandler(this, scout.create(GroupBoxResponsiveHandler, {
       widget: this
     }));
 
@@ -476,7 +476,7 @@ export default class GroupBox extends CompositeField {
 
     // Create menu for each process button
     this.processMenus = this.processButtons.map(function(button) {
-      return scout.create('ButtonAdapterMenu',
+      return scout.create(ButtonAdapterMenu,
         ButtonAdapterMenu.adaptButtonProperties(button, {
           parent: this,
           menubar: this.menuBar,

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Form, scout, Status} from '../../index';
+import {arrays, CancelMenu, Form, GroupBox, ListBox, Menu, OkMenu, scout, Status, UnsavedFormsLookupCall} from '../../index';
 
 export default class UnsavedFormChangesForm extends Form {
 
@@ -21,28 +21,28 @@ export default class UnsavedFormChangesForm extends Form {
   _jsonModel() {
     return {
       id: 'scout.UnsavedFormChangesForm',
-      objectType: 'Form',
+      objectType: Form,
       type: 'model',
       title: '${textKey:SaveChangesOfSelectedItems}',
       askIfNeedSave: false,
       rootGroupBox: {
         id: 'MainBox',
-        objectType: 'GroupBox',
+        objectType: GroupBox,
         menus: [{
           id: 'OkMenu',
-          objectType: 'OkMenu'
+          objectType: OkMenu
         }, {
           id: 'CancelMenu',
-          objectType: 'CancelMenu'
+          objectType: CancelMenu
         }],
         fields: [{
           id: 'UnsavedChangesBox',
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           labelVisible: false,
           gridColumnCount: 1,
           fields: [{
             id: 'OpenFormsField',
-            objectType: 'ListBox',
+            objectType: ListBox,
             gridDataHints: {
               h: 5
             },
@@ -57,7 +57,7 @@ export default class UnsavedFormChangesForm extends Form {
     super._init(model);
 
     this.openFormsField = this.widget('OpenFormsField');
-    this.openFormsField.setLookupCall(scout.create('scout.UnsavedFormsLookupCall', {
+    this.openFormsField.setLookupCall(scout.create(UnsavedFormsLookupCall, {
       session: this.session,
       unsavedForms: this.unsavedForms
     }));
@@ -66,7 +66,7 @@ export default class UnsavedFormChangesForm extends Form {
       event.source.checkAll(true);
     });
 
-    let checkAllMenu = scout.create('Menu', {
+    let checkAllMenu = scout.create(Menu, {
       parent: this.openFormsField.table,
       id: 'CheckAllMenu',
       menuTypes: ['Table.EmptySpace'],
@@ -77,7 +77,7 @@ export default class UnsavedFormChangesForm extends Form {
       this.openFormsField.table.checkAll(true);
     });
 
-    let uncheckAllMenu = scout.create('Menu', {
+    let uncheckAllMenu = scout.create(Menu, {
       parent: this.openFormsField.table,
       id: 'UncheckAllMenu',
       menuTypes: ['Table.EmptySpace'],

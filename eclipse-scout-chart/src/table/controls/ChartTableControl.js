@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DateColumn, icons, NumberColumn, objects, scout, scrollbars, strings, styles, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
+import {arrays, DateColumn, Icon, icons, NumberColumn, objects, scout, scrollbars, strings, styles, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
 import {Chart, ChartTableControlLayout, ChartTableUserFilter} from '../../index';
 import $ from 'jquery';
 
@@ -47,7 +47,7 @@ export default class ChartTableControl extends TableControl {
     super._init(model);
     this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
 
-    this.chart = scout.create('Chart', {
+    this.chart = scout.create(Chart, {
       parent: this
     });
   }
@@ -160,7 +160,7 @@ export default class ChartTableControl extends TableControl {
   }
 
   _renderChartSelect(cssClass, chartType, iconId) {
-    let icon = scout.create('Icon', {
+    let icon = scout.create(Icon, {
       parent: this,
       iconDesc: iconId,
       cssClass: cssClass
@@ -1130,7 +1130,7 @@ export default class ChartTableControl extends TableControl {
 
     //  filter function
     if (filters.length) {
-      let filter = scout.create('ChartTableUserFilter', {
+      let filter = scout.create(ChartTableUserFilter, {
         session: this.session,
         table: this.table,
         text: this.tooltipText,

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, clipboard, Column, ContextMenuKeyStroke, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, Event, FilterSupport, graphics, HtmlComponent, Insets, KeyStrokeContext, LoadingSupport, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn, objects, Range, scout, scrollbars, Status, strings, styles, TableCopyKeyStroke, TableLayout, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableToggleRowKeyStroke, TableUpdateBuffer, TableUserFilter, tooltips as tooltips_1, Widget} from '../index';
+import {AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, Cell, clipboard, Column, CompactColumn, ContextMenuKeyStroke, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, Event, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStrokeContext, LoadingSupport, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn, objects, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableCopyKeyStroke, TableFooter, TableHeader, TableLayout, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TileTableHeaderBox, tooltips, Widget} from '../index';
 import $ from 'jquery';
 
 export default class Table extends Widget {
@@ -25,7 +25,7 @@ export default class Table extends Widget {
     this.checkableStyle = Table.CheckableStyle.CHECKBOX;
     this.cellEditorPopup = null;
     this.compact = false;
-    this.compactHandler = scout.create('TableCompactHandler', {table: this});
+    this.compactHandler = scout.create(TableCompactHandler, {table: this});
     this.compactColumn = null;
     this.dropType = 0;
     this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
@@ -232,7 +232,7 @@ export default class Table extends Widget {
   }
 
   _createRow(rowModel) {
-    rowModel = $.extend({objectType: 'TableRow'}, rowModel);
+    rowModel = $.extend({objectType: TableRow}, rowModel);
     rowModel.parent = this;
     return scout.create(rowModel);
   }
@@ -371,7 +371,7 @@ export default class Table extends Widget {
     if (this.checkableStyle === Table.CheckableStyle.TABLE_ROW) {
       return;
     }
-    let column = scout.create('BooleanColumn', {
+    let column = scout.create(BooleanColumn, {
       session: this.session,
       fixedWidth: true,
       fixedPosition: true,
@@ -389,7 +389,7 @@ export default class Table extends Widget {
 
   _insertRowIconColumn() {
     let position = 0,
-      column = scout.create('IconColumn', {
+      column = scout.create(IconColumn, {
         session: this.session,
         fixedWidth: true,
         fixedPosition: true,
@@ -696,7 +696,7 @@ export default class Table extends Widget {
     if (this.contextMenu) {
       this.contextMenu.close();
     }
-    this.contextMenu = scout.create('ContextMenuPopup', {
+    this.contextMenu = scout.create(ContextMenuPopup, {
       parent: this,
       menuItems: menuItems,
       location: {
@@ -770,7 +770,7 @@ export default class Table extends Widget {
   }
 
   _createHeader() {
-    return scout.create('TableHeader', {
+    return scout.create(TableHeader, {
       parent: this,
       table: this,
       enabled: this.headerEnabled,
@@ -779,14 +779,14 @@ export default class Table extends Widget {
   }
 
   _createFooter() {
-    return scout.create('TableFooter', {
+    return scout.create(TableFooter, {
       parent: this,
       table: this
     });
   }
 
   _installCellTooltipSupport() {
-    tooltips_1.install(this.$data, {
+    tooltips.install(this.$data, {
       parent: this,
       selector: '.table-cell',
       text: this._cellTooltipText.bind(this),
@@ -798,7 +798,7 @@ export default class Table extends Widget {
   }
 
   _uninstallCellTooltipSupport() {
-    tooltips_1.uninstall(this.$data);
+    tooltips.uninstall(this.$data);
   }
 
   _cellTooltipText($cell) {
@@ -1985,7 +1985,7 @@ export default class Table extends Widget {
       $anchor: $cell,
       table: this
     };
-    tooltip = scout.create('TableTooltip', opts);
+    tooltip = scout.create(TableTooltip, opts);
     tooltip.render();
     // link to be able to remove it when row gets deleted
     tooltip.row = row;
@@ -2127,14 +2127,14 @@ export default class Table extends Widget {
    */
   cell(column, row) {
     if (column === this.rowIconColumn) {
-      return scout.create('Cell', {
+      return scout.create(Cell, {
         iconId: row.iconId,
         cssClass: strings.join(' ', 'row-icon-cell', row.cssClass)
       });
     }
 
     if (column === this.checkableColumn) {
-      return scout.create('Cell', {
+      return scout.create(Cell, {
         value: row.checked,
         editable: true,
         cssClass: row.cssClass
@@ -2142,7 +2142,7 @@ export default class Table extends Widget {
     }
 
     if (column === this.compactColumn) {
-      return scout.create('Cell', {
+      return scout.create(Cell, {
         text: row.compactValue,
         htmlEnabled: true
       });
@@ -3864,7 +3864,7 @@ export default class Table extends Widget {
       widget: this,
       $container: () => this.$container,
       getElementsForFiltering: () => this.rows,
-      createTextFilter: () => scout.create('TableTextUserFilter', {
+      createTextFilter: () => scout.create(TableTextUserFilter, {
         session: this.session,
         table: this
       }),
@@ -4370,7 +4370,7 @@ export default class Table extends Widget {
 
   _ensureMediator() {
     if (!this.tableTileGridMediator) {
-      this.tableTileGridMediator = scout.create('TableTileGridMediator', {
+      this.tableTileGridMediator = scout.create(TableTileGridMediator, {
         parent: this,
         gridColumnCount: 6
       });
@@ -4410,7 +4410,7 @@ export default class Table extends Widget {
   }
 
   _createTileTableHeader() {
-    return scout.create('TileTableHeaderBox', {
+    return scout.create(TileTableHeaderBox, {
       parent: this
     });
   }
@@ -4517,7 +4517,7 @@ export default class Table extends Widget {
   }
 
   _createMenuBar() {
-    return scout.create('MenuBar', {
+    return scout.create(MenuBar, {
       parent: this,
       position: MenuBar.Position.BOTTOM,
       menuOrder: new MenuItemsOrder(this.session, 'Table'),
@@ -4718,7 +4718,7 @@ export default class Table extends Widget {
   }
 
   _insertCompactColumn() {
-    let column = scout.create('CompactColumn', {
+    let column = scout.create(CompactColumn, {
       session: this.session,
       table: this,
       guiOnly: true,

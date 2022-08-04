@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {TableSpecHelper} from '../../src/testing/index';
-import {scout} from '../../src';
+import {HtmlTile, scout} from '../../src';
 
 describe('TableTileModeSpec', () => {
   let session;
@@ -30,7 +30,7 @@ describe('TableTileModeSpec', () => {
         parent: table,
         content: '<p>' + row.id + '</p>'
       };
-      return scout.create('HtmlTile', model);
+      return scout.create(HtmlTile, model);
     };
     table.render();
   });

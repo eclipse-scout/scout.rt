@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../src/index';
+import {GroupBox, scout, SimpleTabBox} from '../../src/index';
 
 describe('SimpleTabArea', () => {
   let session;
@@ -19,18 +19,18 @@ describe('SimpleTabArea', () => {
   });
 
   it('renders the tabs in the correct order', () => {
-    let tabBox = scout.create('SimpleTabBox', {
+    let tabBox = scout.create(SimpleTabBox, {
       parent: session.desktop
     });
-    let view1 = scout.create('GroupBox', {
+    let view1 = scout.create(GroupBox, {
       parent: tabBox,
       title: 'One'
     });
-    let view2 = scout.create('GroupBox', {
+    let view2 = scout.create(GroupBox, {
       parent: tabBox,
       title: 'Two'
     });
-    let view3 = scout.create('GroupBox', {
+    let view3 = scout.create(GroupBox, {
       parent: tabBox,
       title: 'Three'
     });

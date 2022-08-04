@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicField, fields, InputFieldKeyStrokeContext, objects, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldLayout, strings, texts} from '../../../index';
+import {BasicField, DesktopNotification, fields, InputFieldKeyStrokeContext, MaxLengthHandler, objects, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldLayout, strings, texts} from '../../../index';
 
 export default class StringField extends BasicField {
   constructor() {
@@ -19,7 +19,7 @@ export default class StringField extends BasicField {
     this.inputMasked = false;
     this.inputObfuscated = false;
     this.maxLength = 4000;
-    this.maxLengthHandler = scout.create('MaxLengthHandler', {target: this});
+    this.maxLengthHandler = scout.create(MaxLengthHandler, {target: this});
     this.multilineText = false;
     this.selectionStart = 0;
     this.selectionEnd = 0;
@@ -548,7 +548,7 @@ export default class StringField extends BasicField {
   }
 
   _showNotification(textKey) {
-    scout.create('DesktopNotification', {
+    scout.create(DesktopNotification, {
       parent: this,
       severity: Status.Severity.WARNING,
       message: this.session.text(textKey)

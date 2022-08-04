@@ -94,7 +94,7 @@ describe('Extension', () => {
 
     beforeEach(() => {
       let model = createSimpleModel('StringField', session);
-      myStringField = scout.create('scout.MyStringField', model);
+      myStringField = scout.create(MyStringField, model);
     });
 
     it('should extend _init method', () => {

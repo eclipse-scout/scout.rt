@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BeanColumn, Column, Device, graphics, IconColumn, icons, MenuDestinations, Range, RemoteEvent, scout, scrollbars, Table, TableRow} from '../../src/index';
+import {BeanColumn, Column, Device, graphics, IconColumn, icons, Menu, MenuDestinations, Range, RemoteEvent, scout, scrollbars, Table, TableField, TableRow} from '../../src/index';
 import {LocaleSpecHelper, TableSpecHelper} from '../../src/testing/index';
 
 /* global removePopups */
@@ -1879,23 +1879,23 @@ describe('Table', () => {
       let model = helper.createModelFixture(2, 2);
       table = helper.createTable(model);
 
-      menuBarMenu = scout.create('Menu', {
+      menuBarMenu = scout.create(Menu, {
         parent: table,
         menuTypes: ['Table.EmptySpace']
       });
-      singleSelMenu = scout.create('Menu', {
+      singleSelMenu = scout.create(Menu, {
         parent: table,
         menuTypes: ['Table.SingleSelection']
       });
-      singleMultiSelMenu = scout.create('Menu', {
+      singleMultiSelMenu = scout.create(Menu, {
         parent: table,
         menuTypes: ['Table.SingleSelection', 'Table.MultiSelection']
       });
-      multiSelMenu = scout.create('Menu', {
+      multiSelMenu = scout.create(Menu, {
         parent: table,
         menuTypes: ['Table.MultiSelection']
       });
-      emptySpaceMenu = scout.create('Menu', {
+      emptySpaceMenu = scout.create(Menu, {
         parent: table,
         menuTypes: ['Table.EmptySpace']
       });
@@ -1945,11 +1945,11 @@ describe('Table', () => {
     it('updates the menubar with the relevant menus', () => {
       let table = helper.createTable(helper.createModelFixture(2, 2));
       let menus = [
-        scout.create('Menu', {
+        scout.create(Menu, {
           parent: table,
           menuTypes: ['Table.EmptySpace']
         }),
-        scout.create('Menu', {
+        scout.create(Menu, {
           parent: table,
           menuTypes: ['Table.EmptySpace']
         })
@@ -1971,7 +1971,7 @@ describe('Table', () => {
       expect(menus[1].parent).toBe(table.menuBar.menuboxLeft);
 
       // Create a new menu which is not part of the menu bar -> the menu items of the menu bar are still the same
-      menus = menus.concat([scout.create('Menu', {
+      menus = menus.concat([scout.create(Menu, {
         parent: table,
         menuTypes: ['Table.Header']
       })]);
@@ -2223,7 +2223,7 @@ describe('Table', () => {
   describe('initColumns', () => {
 
     it('table is available in _init', () => {
-      scout.create('Table', {
+      scout.create(Table, {
         parent: session.desktop,
         columns: [{
           objectType: 'TestBeanColumn'
@@ -2233,7 +2233,7 @@ describe('Table', () => {
     });
 
     it('sets the column indices if not already set', () => {
-      let table = scout.create('Table', {
+      let table = scout.create(Table, {
         parent: session.desktop,
         columns: [{
           objectType: 'Column'
@@ -2249,7 +2249,7 @@ describe('Table', () => {
     });
 
     it('does not set the column indices if already set', () => {
-      let table = scout.create('Table', {
+      let table = scout.create(Table, {
         parent: session.desktop,
         columns: [{
           objectType: 'Column',
@@ -3069,7 +3069,7 @@ describe('Table', () => {
 
   describe('invisible', () => {
     it('does not try to read row height when invisible', () => {
-      let tableField = scout.create('TableField', {
+      let tableField = scout.create(TableField, {
         parent: session.desktop,
         visible: false
       });

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, FileInput, FormField, HtmlComponent, ImageFieldLayout, scout, scrollbars, SingleLayout} from '../../../index';
+import {arrays, Device, FileInput, FormField, HtmlComponent, Icon, ImageFieldLayout, scout, scrollbars, SingleLayout} from '../../../index';
 import $ from 'jquery';
 
 export default class ImageField extends FormField {
@@ -30,7 +30,7 @@ export default class ImageField extends FormField {
     super._init(model);
 
     this.resolveIconIds(['imageUrl']);
-    this.icon = scout.create('Icon', {
+    this.icon = scout.create(Icon, {
       parent: this,
       iconDesc: this.imageUrl,
       autoFit: this.autoFit,
@@ -168,7 +168,7 @@ export default class ImageField extends FormField {
         this.$fieldContainer.on('click', this._clickHandler);
       }
       if (!this.fileInput) {
-        this.fileInput = scout.create('FileInput', {
+        this.fileInput = scout.create(FileInput, {
           parent: this,
           acceptTypes: this.acceptTypes,
           text: this.displayText,

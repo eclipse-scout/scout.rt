@@ -32,7 +32,7 @@ export default class LogicalGrid {
 
   _setGridConfig(gridConfig) {
     if (gridConfig && !(gridConfig instanceof LogicalGridConfig)) {
-      gridConfig = scout.create('LogicalGridConfig', gridConfig);
+      gridConfig = scout.create(LogicalGridConfig, gridConfig);
     }
     this.gridConfig = gridConfig;
   }

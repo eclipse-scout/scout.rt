@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopLayout, DesktopNavigation, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, Event, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStrokeContext, MessageBoxController, objects, Outline, Popup, scout, SimpleTabArea, strings, styles, Tree, URL, webstorage, Widget, widgets} from '../index';
+import {arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopFormController, DesktopHeader, DesktopLayout, DesktopNavigation, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, Event, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStrokeContext, MessageBoxController, objects, OfflineDesktopNotification, OpenUriHandler, Outline, Popup, scout, SimpleTabArea, Splitter, strings, styles, Tree, UnsavedFormChangesForm, URL, webstorage, Widget, widgets} from '../index';
 import $ from 'jquery';
 
 export default class Desktop extends Widget {
@@ -66,6 +66,8 @@ export default class Desktop extends Widget {
 
     this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm', 'focusedElement']);
     this._addPreserveOnPropertyChangeProperties(['focusedElement']);
+
+    this.$notifications = null;
 
     // event listeners
     this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
@@ -145,7 +147,7 @@ export default class Desktop extends Widget {
     super._init(model);
     this.url = new URL();
     this._initTheme();
-    this.formController = scout.create('DesktopFormController', {
+    this.formController = scout.create(DesktopFormController, {
       displayParent: this,
       session: this.session
     });
@@ -162,7 +164,7 @@ export default class Desktop extends Widget {
     this._setBenchLayoutData(this.benchLayoutData);
     this._setDisplayStyle(this.displayStyle);
     this._setDense(this.dense);
-    this.openUriHandler = scout.create('OpenUriHandler', {
+    this.openUriHandler = scout.create(OpenUriHandler, {
       session: this.session
     });
     this._glassPaneTargetFilters.push((targetElem, element) => {
@@ -394,7 +396,7 @@ export default class Desktop extends Widget {
   }
 
   _createBench() {
-    return scout.create('DesktopBench', {
+    return scout.create(DesktopBench, {
       parent: this,
       animateRemoval: true,
       headerTabArea: this.header ? this.header.tabArea : undefined,
@@ -436,7 +438,7 @@ export default class Desktop extends Widget {
   }
 
   _createNavigation() {
-    return scout.create('DesktopNavigation', {
+    return scout.create(DesktopNavigation, {
       parent: this,
       outline: this.outline,
       toolBoxVisible: this.displayStyle === Desktop.DisplayStyle.COMPACT,
@@ -490,7 +492,7 @@ export default class Desktop extends Widget {
 
   _createHeader() {
     let compact = this.displayStyle === Desktop.DisplayStyle.COMPACT;
-    return scout.create('DesktopHeader', {
+    return scout.create(DesktopHeader, {
       parent: this,
       logoUrl: this.logoUrl,
       animateRemoval: compact,
@@ -538,7 +540,7 @@ export default class Desktop extends Widget {
     if (this.splitter || !this.navigation) {
       return;
     }
-    this.splitter = scout.create('Splitter', {
+    this.splitter = scout.create(Splitter, {
       parent: this,
       $anchor: this.navigation.$container,
       $root: this.$container
@@ -799,7 +801,7 @@ export default class Desktop extends Widget {
     }
     this.offline = true;
     this._removeOfflineNotification();
-    this._offlineNotification = scout.create('DesktopNotification:Offline', {
+    this._offlineNotification = scout.create(OfflineDesktopNotification, {
       parent: this
     });
     this._offlineNotification.show();
@@ -1262,7 +1264,7 @@ export default class Desktop extends Widget {
     // initialize with a resolved promise in case there are no unsaved forms.
     let waitFor = $.resolvedPromise();
     if (unsavedForms.length > 0) {
-      let unsavedFormChangesForm = scout.create('scout.UnsavedFormChangesForm', {
+      let unsavedFormChangesForm = scout.create(UnsavedFormChangesForm, {
         parent: this,
         session: this.session,
         displayParent: this,

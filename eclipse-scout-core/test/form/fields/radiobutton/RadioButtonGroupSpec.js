@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RadioButtonGroup, scout} from '../../../../src/index';
-import {FormSpecHelper} from '../../../../src/testing/index';
+import {RadioButton, RadioButtonGroup, scout} from '../../../../src/index';
+import {DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
 
 describe('RadioButtonGroup', () => {
   let session;
@@ -83,7 +83,7 @@ describe('RadioButtonGroup', () => {
 
   describe('init', () => {
     it('sets the value if it is provided', () => {
-      let radioButtonGroup = scout.create('RadioButtonGroup', {
+      let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         value: 1,
         fields: [{
@@ -101,7 +101,7 @@ describe('RadioButtonGroup', () => {
     });
 
     it('selects the correct button if it is selected', () => {
-      let radioButtonGroup = scout.create('RadioButtonGroup', {
+      let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton'
@@ -118,7 +118,7 @@ describe('RadioButtonGroup', () => {
     });
 
     it('syncs this.radioButtons with this.fields', () => {
-      let radioButtonGroup = scout.create('RadioButtonGroup', {
+      let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton'
@@ -138,7 +138,7 @@ describe('RadioButtonGroup', () => {
   describe('lookupCall', () => {
 
     it('can be prepared with initial value', done => {
-      let group = scout.create('RadioButtonGroup', {
+      let group = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall',
         value: 2
@@ -150,7 +150,7 @@ describe('RadioButtonGroup', () => {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
         expect(group.radioButtons.length).toBe(3);
       })
         .catch(fail)
@@ -159,7 +159,7 @@ describe('RadioButtonGroup', () => {
     });
 
     it('can be prepared with explicit value', done => {
-      let group = scout.create('RadioButtonGroup', {
+      let group = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
@@ -170,7 +170,7 @@ describe('RadioButtonGroup', () => {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
         expect(group.radioButtons.length).toBe(3);
       })
         .catch(fail)
@@ -179,7 +179,7 @@ describe('RadioButtonGroup', () => {
     });
 
     it('creates a radio button for each lookup row', () => {
-      let radioButtonGroup = scout.create('RadioButtonGroup', {
+      let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
@@ -191,7 +191,7 @@ describe('RadioButtonGroup', () => {
     });
 
     it('selects correct radio button', () => {
-      let radioButtonGroup = scout.create('RadioButtonGroup', {
+      let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall',
         value: 1
@@ -218,7 +218,7 @@ describe('RadioButtonGroup', () => {
     });
 
     it('lookupRow lives on the radioButton', () => {
-      let radioButtonGroup = scout.create('RadioButtonGroup', {
+      let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
@@ -236,7 +236,7 @@ describe('RadioButtonGroup', () => {
 
   describe('setValue', () => {
     it('updates the currently selected button', () => {
-      let radioButtonGroup = scout.create('RadioButtonGroup', {
+      let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton',
@@ -266,7 +266,7 @@ describe('RadioButtonGroup', () => {
     });
 
     it('does nothing if radio buttons have no radioValue', () => {
-      let radioButtonGroup = scout.create('RadioButtonGroup', {
+      let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton'
@@ -289,7 +289,7 @@ describe('RadioButtonGroup', () => {
     });
 
     it('unselects every button when setting it to null', () => {
-      let radioButtonGroup = scout.create('RadioButtonGroup', {
+      let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton',
@@ -436,7 +436,7 @@ describe('RadioButtonGroup', () => {
     });
 
     it('makes sure only one button is selected even if multiple buttons are selected during init', () => {
-      let radioButtonGroup = scout.create('RadioButtonGroup', {
+      let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
           objectType: 'RadioButton',
@@ -459,7 +459,7 @@ describe('RadioButtonGroup', () => {
       expect(radioButtonGroup.fields.length).toBe(2);
       expect(radioButtonGroup.radioButtons.length).toBe(2);
 
-      let button = scout.create('RadioButton', {
+      let button = scout.create(RadioButton, {
         parent: radioButtonGroup,
         selected: true
       });
@@ -470,7 +470,7 @@ describe('RadioButtonGroup', () => {
       expect(radioButtonGroup.radioButtons[2]).toBe(button);
       expect(radioButtonGroup.selectedButton).toBe(button);
 
-      let button2 = scout.create('RadioButton', {
+      let button2 = scout.create(RadioButton, {
         parent: radioButtonGroup,
         selected: true
       });

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, keys, scout} from '../../../src/index';
+import {arrays, keys, scout, Tile, TileAccordion} from '../../../src/index';
 
 describe('TileAccordionKeyStrokes', () => {
   let session;
@@ -48,7 +48,7 @@ describe('TileAccordionKeyStrokes', () => {
       groups: groups
     };
     model = $.extend({}, defaults, model);
-    return scout.create('TileAccordion', model);
+    return scout.create(TileAccordion, model);
   }
 
   function createTile(model) {
@@ -56,7 +56,7 @@ describe('TileAccordionKeyStrokes', () => {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create('Tile', model);
+    return scout.create(Tile, model);
   }
 
   function createTiles(numTiles, model) {

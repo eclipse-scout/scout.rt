@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, scout} from '../../../src/index';
+import {Device, PageWithTable, scout, TableTextUserFilter} from '../../../src/index';
 import {OutlineSpecHelper, TableSpecHelper} from '../../../src/testing/index';
 
 describe('OutlineMediator', () => {
@@ -33,7 +33,7 @@ describe('OutlineMediator', () => {
     tableModel = tableHelper.createModelFixture(1, 0);
     detailTable = tableHelper.createTable(tableModel);
     firstColumn = detailTable.columns[0];
-    page = scout.create('PageWithTable', {
+    page = scout.create(PageWithTable, {
       childrenLoaded: true, // <-- this flag is important, otherwise this page would try to load children on doRowAction
       alwaysCreateChildPage: true,
       parent: outline,
@@ -110,7 +110,7 @@ describe('OutlineMediator', () => {
     outline.expandNode(page);
 
     expect(page.childNodes.length).toBe(2);
-    let filter = scout.create('TableTextUserFilter', {
+    let filter = scout.create(TableTextUserFilter, {
       session: session,
       table: detailTable,
       text: 'bar'

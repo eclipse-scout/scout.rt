@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FocusRule, scout, Status} from '../index';
+import {DesktopNotification, FocusRule, scout, Status} from '../index';
 import $ from 'jquery';
 
 /**
@@ -131,7 +131,7 @@ export function _failedStatus(session) {
  */
 export function showNotification(parent, status) {
   scout.assertParameter('parent', parent);
-  let notification = scout.create('DesktopNotification', {
+  let notification = scout.create(DesktopNotification, {
     parent: parent,
     closable: false,
     duration: 1234,

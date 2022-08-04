@@ -55,10 +55,9 @@ export default class RemoteLookupCall extends LookupCall {
       return;
     }
 
-    let lookupRows = arrays.ensure(lookupResult.lookupRows).map(lookupRowObject => {
-      return scout.create('LookupRow', lookupRowObject);
+    lookupResult.lookupRows = arrays.ensure(lookupResult.lookupRows).map(lookupRowObject => {
+      return scout.create(LookupRow, lookupRowObject);
     });
-    lookupResult.lookupRows = lookupRows;
     this.deferred.resolve(lookupResult);
   }
 

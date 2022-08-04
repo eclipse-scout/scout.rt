@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxCall, AjaxError, scout} from '../index';
+import {AjaxCall, scout} from '../index';
 import $ from 'jquery';
 
 /**
@@ -200,7 +200,7 @@ export function createCall(options) {
     cache: false
   }, options);
 
-  return scout.create('AjaxCall', {
+  return scout.create(AjaxCall, {
     ajaxOptions: opts
   }, {
     ensureUniqueId: false

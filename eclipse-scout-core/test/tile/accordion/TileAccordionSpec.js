@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, TileGridLayoutConfig} from '../../../src/index';
+import {Group, scout, Tile, TileAccordion, TileGridLayoutConfig} from '../../../src/index';
 
 describe('TileAccordion', () => {
   let session;
@@ -40,7 +40,7 @@ describe('TileAccordion', () => {
       groups: groups
     };
     model = $.extend({}, defaults, model);
-    return scout.create('TileAccordion', model);
+    return scout.create(TileAccordion, model);
   }
 
   function createGroup(model) {
@@ -52,7 +52,7 @@ describe('TileAccordion', () => {
       }
     };
     model = $.extend({}, defaults, model);
-    return scout.create('Group', model);
+    return scout.create(Group, model);
   }
 
   function createTile(model) {
@@ -60,7 +60,7 @@ describe('TileAccordion', () => {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create('Tile', model);
+    return scout.create(Tile, model);
   }
 
   describe('init', () => {

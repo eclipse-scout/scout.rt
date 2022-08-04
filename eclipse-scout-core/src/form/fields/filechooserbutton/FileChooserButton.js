@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, FileInput, HtmlComponent, scout, SingleLayout, strings, ValueField} from '../../../index';
+import {arrays, Button, Device, FileInput, HtmlComponent, scout, SingleLayout, strings, ValueField} from '../../../index';
 
 export default class FileChooserButton extends ValueField {
 
@@ -25,7 +25,7 @@ export default class FileChooserButton extends ValueField {
   _init(model) {
     super._init(model);
 
-    this.button = scout.create('Button', {
+    this.button = scout.create(Button, {
       parent: this,
       label: this._buttonLabel(),
       iconId: this.iconId,
@@ -48,7 +48,7 @@ export default class FileChooserButton extends ValueField {
    * This cannot be done in _init because the value field would call _setValue first
    */
   _initValue(value) {
-    this.fileInput = scout.create('FileInput', {
+    this.fileInput = scout.create(FileInput, {
       parent: this,
       acceptTypes: this.acceptTypes,
       text: this.displayText,

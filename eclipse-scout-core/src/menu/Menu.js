@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, ContextMenuPopup, Event, HtmlComponent, icons, MenuExecKeyStroke, MenuKeyStroke, scout, strings, tooltips, TreeVisitResult} from '../index';
+import {Action, arrays, ContextMenuPopup, Event, HtmlComponent, icons, MenuBarPopup, MenuExecKeyStroke, MenuKeyStroke, scout, strings, tooltips, TreeVisitResult} from '../index';
 
 export default class Menu extends Action {
 
@@ -517,7 +517,7 @@ export default class Menu extends Action {
       verticalAlignment: this.popupVerticalAlignment
     };
 
-    return scout.create('MenuBarPopup', options);
+    return scout.create(MenuBarPopup, options);
   }
 
   _createActionKeyStroke() {

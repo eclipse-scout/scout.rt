@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BeanColumn, NullWidget, ObjectFactory, scout} from '../../../src/index';
+import {BeanColumn, NullWidget, ObjectFactory, scout, Table, TableTextUserFilter} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
 
 describe('TableTextUserFilter', () => {
@@ -30,7 +30,7 @@ describe('TableTextUserFilter', () => {
   });
 
   function createFilter(table) {
-    return scout.create('TableTextUserFilter', {
+    return scout.create(TableTextUserFilter, {
       session: session,
       table: table
     });
@@ -119,11 +119,11 @@ describe('TableTextUserFilter', () => {
     });
 
     it('works with bean columns', () => {
-      let table = scout.create('Table', {
+      let table = scout.create(Table, {
         parent: new NullWidget(),
         session: session,
         columns: [
-          scout.create('ASpecBeanColumn', {
+          scout.create(ASpecBeanColumn, {
             session: session,
             width: 100
           })

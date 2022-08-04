@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, Tree} from '../../../src/index';
+import {scout, Tree, ViewButton} from '../../../src/index';
 import {OutlineSpecHelper} from '../../../src/testing/index';
 
 describe('DesktopNavigation', () => {
@@ -30,12 +30,12 @@ describe('DesktopNavigation', () => {
 
     it('is visible when there are more than one ViewButtons', () => {
       desktop.viewButtons = [
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: desktop,
           text: 'Button1',
           displayStyle: 'TAB'
         }),
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: desktop,
           text: 'Button2',
           displayStyle: 'TAB'
@@ -52,7 +52,7 @@ describe('DesktopNavigation', () => {
     });
 
     it('is not visible when there is only one ViewButton', () => {
-      desktop.viewButtons = [scout.create('ViewButton', {
+      desktop.viewButtons = [scout.create(ViewButton, {
         parent: desktop,
         displayStyle: 'MENU'
       })];
@@ -62,12 +62,12 @@ describe('DesktopNavigation', () => {
 
     it('has only one ViewButtonMenu if all buttons are displayType menu', () => {
       desktop.viewButtons = [
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: desktop,
           text: 'VB1',
           displayStyle: 'MENU'
         }),
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: desktop,
           text: 'VB2',
           displayStyle: 'MENU'
@@ -82,7 +82,7 @@ describe('DesktopNavigation', () => {
   describe('outline', () => {
 
     it('collapses and expands in two steps when breadcrumb toggling enabled', () => {
-      let outline = _setupOutline(outlineHelper, desktop, true);
+      _setupOutline(outlineHelper, desktop, true);
 
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.outline.displayStyle).toBe(Tree.DisplayStyle.DEFAULT);
@@ -116,7 +116,7 @@ describe('DesktopNavigation', () => {
     });
 
     it('collapses and expands in one step when breadcrumb toggling disabled', () => {
-      let outline = _setupOutline(outlineHelper, desktop, false);
+      _setupOutline(outlineHelper, desktop, false);
 
       expect(desktop.navigation.handle.leftVisible).toBe(true);
       expect(desktop.navigation.handle.rightVisible).toBe(false);

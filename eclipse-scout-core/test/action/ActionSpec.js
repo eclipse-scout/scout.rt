@@ -50,7 +50,7 @@ describe('Action', () => {
   describe('key stroke', () => {
 
     it('triggers action', () => {
-      let action = scout.create('Action', {
+      let action = scout.create(Action, {
         parent: session.desktop,
         keyStroke: 'ctrl-x'
       });
@@ -67,7 +67,7 @@ describe('Action', () => {
     });
 
     it('is not triggered if another action with the same key stroke handled it first', () => {
-      let action = scout.create('Action', {
+      let action = scout.create(Action, {
         parent: session.desktop,
         keyStroke: 'ctrl-x'
       });
@@ -78,7 +78,7 @@ describe('Action', () => {
       });
       action.render();
 
-      let action2 = scout.create('Action', {
+      let action2 = scout.create(Action, {
         parent: session.desktop,
         keyStroke: 'ctrl-x'
       });
@@ -101,7 +101,7 @@ describe('Action', () => {
   describe('action event', () => {
 
     it('is triggered when doAction is called', () => {
-      let action = scout.create('Action', {
+      let action = scout.create(Action, {
         parent: session.desktop
       });
       let executed = 0;
@@ -115,7 +115,7 @@ describe('Action', () => {
     });
 
     it('is fired when doAction is called even if it is a toggle action', () => {
-      let action = scout.create('Action', {
+      let action = scout.create(Action, {
         parent: session.desktop,
         toggleAction: true
       });

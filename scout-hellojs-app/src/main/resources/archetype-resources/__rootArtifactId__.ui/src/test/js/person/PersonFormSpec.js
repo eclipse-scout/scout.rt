@@ -1,4 +1,5 @@
 import {scout} from '@eclipse-scout/core';
+import {Person, PersonForm} from '../../../main/js';
 
 describe('PersonForm', () => {
   let session;
@@ -17,11 +18,11 @@ describe('PersonForm', () => {
   describe('open with person', () => {
 
     it('shows firstName and LastName', done => {
-      let personForm = scout.create('${simpleArtifactName}.PersonForm', {
+      let personForm = scout.create(PersonForm, {
         parent: session.desktop
       });
 
-      let person = scout.create('${simpleArtifactName}.Person', {
+      let person = scout.create(Person, {
         firstName: 'first',
         lastName: 'last'
       });

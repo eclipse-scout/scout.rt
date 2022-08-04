@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Desktop, DetailTableTreeFilter, Device, FileChooserController, Form, GroupBoxMenuItemsOrder, HtmlComponent, keyStrokeModifier, MenuBar, menus as menuUtil, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineKeyStrokeContext, OutlineLayout, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, scout, TableControlAdapterMenu, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke} from '../../index';
+import {arrays, Desktop, DetailTableTreeFilter, Device, FileChooserController, Form, FormController, GroupBoxMenuItemsOrder, HtmlComponent, Icon, keyStrokeModifier, MenuBar, menus as menuUtil, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, scout, TableControlAdapterMenu, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke} from '../../index';
 import $ from 'jquery';
 
 /**
@@ -75,7 +75,7 @@ export default class Outline extends Tree {
     super._init(model);
 
     this.mediator = this._createMediator();
-    this.formController = scout.create('FormController', {
+    this.formController = scout.create(FormController, {
       displayParent: this,
       session: this.session
     });
@@ -84,16 +84,16 @@ export default class Outline extends Tree {
     this.resolveTextKeys(['title']);
 
     // menu bars
-    this.titleMenuBar = scout.create('MenuBar', {
+    this.titleMenuBar = scout.create(MenuBar, {
       parent: this,
       menuOrder: new GroupBoxMenuItemsOrder()
     });
-    this.nodeMenuBar = scout.create('MenuBar', {
+    this.nodeMenuBar = scout.create(MenuBar, {
       parent: this,
       position: MenuBar.Position.BOTTOM,
       menuOrder: new GroupBoxMenuItemsOrder()
     });
-    this.detailMenuBar = scout.create('MenuBar', {
+    this.detailMenuBar = scout.create(MenuBar, {
       parent: this,
       position: MenuBar.Position.BOTTOM,
       menuOrder: new GroupBoxMenuItemsOrder()
@@ -113,7 +113,7 @@ export default class Outline extends Tree {
    * return a null instance here, because mediation is done server-side.
    */
   _createMediator() {
-    return scout.create('OutlineMediator');
+    return scout.create(OutlineMediator);
   }
 
   /**
@@ -121,7 +121,7 @@ export default class Outline extends Tree {
    */
   _createTreeNode(nodeModel) {
     let model = $.extend({
-      objectType: 'Page'
+      objectType: Page
     }, nodeModel);
     return this._createChild(model);
   }
@@ -239,7 +239,7 @@ export default class Outline extends Tree {
         this.icon.setIconDesc(this.iconId);
         return;
       }
-      this.icon = scout.create('Icon', {
+      this.icon = scout.create(Icon, {
         parent: this,
         iconDesc: this.iconId,
         prepend: true
@@ -328,7 +328,7 @@ export default class Outline extends Tree {
   _createNavigateButtons(node, parent) {
     let menus = arrays.ensure(parent.staticMenus);
     if (!this._hasMenu(menus, NavigateUpButton)) {
-      let upButton = scout.create('NavigateUpButton', {
+      let upButton = scout.create(NavigateUpButton, {
         parent: parent,
         altKeyStrokeContext: parent.keyStrokeContext,
         outline: this,
@@ -337,7 +337,7 @@ export default class Outline extends Tree {
       menus.push(upButton);
     }
     if (!this._hasMenu(menus, NavigateDownButton)) {
-      let downButton = scout.create('NavigateDownButton', {
+      let downButton = scout.create(NavigateDownButton, {
         parent: parent,
         altKeyStrokeContext: parent.keyStrokeContext,
         outline: this,
@@ -531,7 +531,7 @@ export default class Outline extends Tree {
   }
 
   _createOutlineOverview() {
-    return scout.create('TileOutlineOverview', {
+    return scout.create(TileOutlineOverview, {
       parent: this,
       outline: this,
       page: this.compact ? this.compactRootNode() : null
@@ -820,7 +820,7 @@ export default class Outline extends Tree {
     if (selectedPage.row && selectedPage.parentNode.nodeType === Page.NodeType.TABLE) {
       // otherwise show the content of the table row
       // but never if parent is a node page -> the table contains only one column with no essential information
-      return scout.create('TableRowDetail', {
+      return scout.create(TableRowDetail, {
         parent: this,
         table: selectedPage.parentNode.detailTable,
         page: selectedPage
@@ -893,7 +893,7 @@ export default class Outline extends Tree {
     let oldMenus = this.nodeMenuBar.menuItems.filter(menu => menu instanceof TableControlAdapterMenu);
     oldMenus.forEach(oldMenu => oldMenu.destroy());
     tableControls.forEach(function(tableControl) {
-      let menu = scout.create('TableControlAdapterMenu',
+      let menu = scout.create(TableControlAdapterMenu,
         TableControlAdapterMenu.adaptTableControlProperties(tableControl, {
           parent: this,
           tableControl: tableControl,

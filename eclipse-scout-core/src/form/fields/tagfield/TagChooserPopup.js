@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {lookupField, Popup, scout, TagChooserPopupLayout} from '../../../index';
+import {Column, lookupField, Popup, scout, Table, TagChooserPopupLayout} from '../../../index';
 
 export default class TagChooserPopup extends Popup {
 
@@ -23,14 +23,14 @@ export default class TagChooserPopup extends Popup {
   _init(model) {
     super._init(model);
 
-    let column = scout.create('Column', {
+    let column = scout.create(Column, {
       index: 0,
       session: this.session,
       text: 'Tag',
       autoOptimizeWidth: false
     });
 
-    this.table = scout.create('Table', {
+    this.table = scout.create(Table, {
       parent: this,
       headerVisible: false,
       autoResizeColumns: true,

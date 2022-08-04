@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, icons, MobilePopupLayout, Point, scout, WidgetPopup} from '../index';
+import {Action, HtmlComponent, icons, MobilePopupLayout, Point, scout, WidgetPopup} from '../index';
 
 export default class MobilePopup extends WidgetPopup {
 
@@ -25,7 +25,7 @@ export default class MobilePopup extends WidgetPopup {
   }
 
   _createCloseAction() {
-    return scout.create('Action', {
+    return scout.create(Action, {
       parent: this,
       cssClass: 'closer',
       iconId: icons.REMOVE_BOLD

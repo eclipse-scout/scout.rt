@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, objects, ProposalChooserLayout, ProposalField, scout, SmartField, Status, Table, Widget} from '../../../index';
+import {HtmlComponent, objects, ProposalChooserLayout, ProposalField, RadioButton, RadioButtonGroup, scout, SmartField, Status, Table, Widget} from '../../../index';
 import $ from 'jquery';
 
 export default class ProposalChooser extends Widget {
@@ -40,6 +40,13 @@ export default class ProposalChooser extends Widget {
 
   _createModel($parent) {
     throw new Error('_createModel() not implemented');
+  }
+
+  /**
+   * Creates a layout resetter that is used by the {@link ProposalChooserLayout}.
+   */
+  _createLayoutResetter() {
+    throw new Error('_createLayoutResetter() not implemented');
   }
 
   setLookupResult(result) {
@@ -84,7 +91,7 @@ export default class ProposalChooser extends Widget {
       .appendDiv('proposal-chooser')
       .toggleClass('touch', this.touch);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
-    this.htmlComp.setLayout(new ProposalChooserLayout(this));
+    this.htmlComp.setLayout(new ProposalChooserLayout(this, this._createLayoutResetter()));
 
     this._renderModel();
 
@@ -95,7 +102,7 @@ export default class ProposalChooser extends Widget {
 
     // active filter
     if (this.smartField.activeFilterEnabled) {
-      this.activeFilterGroup = scout.create('RadioButtonGroup', {
+      this.activeFilterGroup = scout.create(RadioButtonGroup, {
         parent: this,
         labelVisible: false,
         statusVisible: false,
@@ -203,7 +210,7 @@ export default class ProposalChooser extends Widget {
   }
 
   _insertActiveFilterButton(value, index) {
-    let radio = scout.create('RadioButton', {
+    let radio = scout.create(RadioButton, {
       parent: this.activeFilterGroup,
       label: this._activeFilterLabel(index),
       radioValue: SmartField.ACTIVE_FILTER_VALUES[index],

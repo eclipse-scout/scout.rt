@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupLayout, scout} from '../../../index';
+import {PopupLayout, scout, TableLayoutResetter} from '../../../index';
 
 export default class TagChooserPopupLayout extends PopupLayout {
 
@@ -32,7 +32,7 @@ export default class TagChooserPopupLayout extends PopupLayout {
    * @override AbstractLayout.js
    */
   preferredLayoutSize($container) {
-    let tableHandler = scout.create('TableLayoutResetter', this.popup.table);
+    let tableHandler = scout.create(TableLayoutResetter, this.popup.table);
     tableHandler.modifyDom();
     let prefSize = super.preferredLayoutSize($container);
     tableHandler.restoreDom();

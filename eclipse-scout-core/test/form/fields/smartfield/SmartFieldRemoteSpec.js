@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {QueryBy, RemoteEvent, scout, SmartField, Status} from '../../../../src/index';
+import {LookupRow, QueryBy, RemoteEvent, scout, SmartField, SmartFieldPopup, Status} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 
 /* global linkWidgetAndAdapter */
@@ -42,16 +42,12 @@ describe('SmartFieldRemote', () => {
   }
 
   describe('openPopup', () => {
-    let events = [null],
-      smartField;
+    let smartField;
 
     beforeEach(() => {
       smartField = createSmartFieldWithAdapter();
       smartField.render();
       smartField.$field.val('foo');
-      smartField.remoteHandler = (event, delay) => {
-        events[0] = event;
-      };
     });
 
     it('must "browse all" when field is valid and browse parameter is true', () => {
@@ -125,7 +121,7 @@ describe('SmartFieldRemote', () => {
     });
 
     it('send acceptInput event when lookup row is set and display-text has not changed', () => {
-      let lookupRow = scout.create('LookupRow', {
+      let lookupRow = scout.create(LookupRow, {
         key: 123,
         text: 'foo'
       }, {
@@ -135,7 +131,7 @@ describe('SmartFieldRemote', () => {
       smartField._lastSearchText = 'foo';
       smartField.render();
       smartField.$field.val('foo');
-      smartField.popup = scout.create('SmartFieldPopup', {
+      smartField.popup = scout.create(SmartFieldPopup, {
         parent: smartField,
         lookupResult: {
           seqNo: 0, // must match smartField.lookupSeqNo
@@ -199,7 +195,7 @@ describe('SmartFieldRemote', () => {
     function resolveLookupCall(lookupCall) {
       lookupCall.resolveLookup({
         queryBy: QueryBy.ALL,
-        lookupRows: [scout.create('LookupRow', {
+        lookupRows: [scout.create(LookupRow, {
           key: 123,
           text: 'foo'
         })]

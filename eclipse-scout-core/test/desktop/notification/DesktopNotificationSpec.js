@@ -22,7 +22,7 @@ describe('DesktopNotification', () => {
   });
 
   it('will fade in, be added to the desktop and be rendered upon show() ', () => {
-    let notification = scout.create('DesktopNotification', {
+    let notification = scout.create(DesktopNotification, {
       parent: parent
     });
     spyOn(notification, 'fadeIn').and.callThrough();
@@ -33,7 +33,7 @@ describe('DesktopNotification', () => {
   });
 
   it('will fade out and be removed from the desktop upon hide()', () => {
-    let notification = scout.create('DesktopNotification', {
+    let notification = scout.create(DesktopNotification, {
       parent: parent
     });
     spyOn(notification, 'fadeOut').and.callThrough();
@@ -63,7 +63,7 @@ describe('DesktopNotification', () => {
   });
 
   it('has close-icon when notification is closable', () => {
-    let notification = scout.create('DesktopNotification', {
+    let notification = scout.create(DesktopNotification, {
       parent: parent,
       closable: true,
       status: {
@@ -94,7 +94,7 @@ describe('DesktopNotification', () => {
       });
 
       it('background: shows native notification only when document is hidden', done => {
-        let notification = scout.create('DesktopNotification', {
+        let notification = scout.create(DesktopNotification, {
           parent: parent,
           nativeNotificationVisibility: 'background',
           message: 'bar'
@@ -112,7 +112,7 @@ describe('DesktopNotification', () => {
       });
 
       it('background: dont show native notification when document is not hidden', () => {
-        let notification = scout.create('DesktopNotification', {
+        let notification = scout.create(DesktopNotification, {
           parent: parent,
           nativeNotificationVisibility: 'background',
           message: 'bar'
@@ -129,7 +129,7 @@ describe('DesktopNotification', () => {
       });
 
       it('always: shows native notification even when document is focused', done => {
-        let notification = scout.create('DesktopNotification', {
+        let notification = scout.create(DesktopNotification, {
           parent: parent,
           nativeNotificationVisibility: 'always',
           message: 'bar'
@@ -146,7 +146,7 @@ describe('DesktopNotification', () => {
       });
 
       it('none: never shows native notification', () => {
-        let notification = scout.create('DesktopNotification', {
+        let notification = scout.create(DesktopNotification, {
           parent: parent,
           nativeNotificationVisibility: 'none',
           message: 'bar'
@@ -170,7 +170,7 @@ describe('DesktopNotification', () => {
       });
 
       it('true shows only the native notification', done => {
-        let notification = scout.create('DesktopNotification', {
+        let notification = scout.create(DesktopNotification, {
           parent: parent,
           nativeOnly: true,
           nativeNotificationVisibility: 'always',
@@ -188,7 +188,7 @@ describe('DesktopNotification', () => {
       });
 
       it('false shows both, the desktop and the native notification', done => {
-        let notification = scout.create('DesktopNotification', {
+        let notification = scout.create(DesktopNotification, {
           parent: parent,
           nativeOnly: false,
           nativeNotificationVisibility: 'always',
@@ -214,7 +214,7 @@ describe('DesktopNotification', () => {
       });
 
       it('destroying the notification also destroys the native one', done => {
-        let notification = scout.create('DesktopNotification', {
+        let notification = scout.create(DesktopNotification, {
           parent: parent,
           nativeNotificationVisibility: 'always',
           message: 'bar'
@@ -243,7 +243,7 @@ describe('DesktopNotification', () => {
       });
 
       it('native notification is destroyed later if duration is > 0, along with the regular notification', done => {
-        let notification = scout.create('DesktopNotification', {
+        let notification = scout.create(DesktopNotification, {
           parent: parent,
           duration: 100,
           nativeOnly: true,
@@ -271,7 +271,7 @@ describe('DesktopNotification', () => {
     });
 
     it('shows no native notification if permission is denied', done => {
-      let notification = scout.create('DesktopNotification', {
+      let notification = scout.create(DesktopNotification, {
         parent: parent,
         nativeNotificationVisibility: 'always',
         message: 'bar'

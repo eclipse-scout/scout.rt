@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {fields, keys, QueryBy, scout, SmartField, Status, strings} from '../../../../src/index';
+import {fields, keys, LookupRow, QueryBy, scout, SmartField, SmartFieldMultiline, Status, strings} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
 
 describe('SmartField', () => {
@@ -19,7 +19,7 @@ describe('SmartField', () => {
     setFixtures(sandbox());
     session = sandboxSession();
     field = new SmartField();
-    lookupRow = scout.create('LookupRow', {
+    lookupRow = scout.create(LookupRow, {
       key: 123,
       text: 'Foo'
     });
@@ -42,7 +42,7 @@ describe('SmartField', () => {
       parent: session.desktop,
       lookupCall: lookupCallModel
     }, model);
-    return scout.create('SmartField', model);
+    return scout.create(SmartField, model);
   }
 
   function findTableProposals() {
@@ -441,7 +441,7 @@ describe('SmartField', () => {
       let field = createFieldWithLookupCall({}, {
         customProperty: templatePropertyValue,
         _dataToLookupRow: function(data) { // overwrite mapping function to use the custom property
-          return scout.create('LookupRow', {
+          return scout.create(LookupRow, {
             key: data[0],
             text: data[1] + this.customProperty
           });
@@ -575,7 +575,7 @@ describe('SmartField', () => {
       let embeddedField = touchField.clone({
         parent: session.desktop
       });
-      embeddedField.setLookupRow(scout.create('LookupRow', {
+      embeddedField.setLookupRow(scout.create(LookupRow, {
         key: 123,
         text: 'baz'
       }));
@@ -815,7 +815,7 @@ describe('SmartField', () => {
     });
 
     it('should return text from lookup-row for last search-text', () => {
-      field.setLookupRow(scout.create('LookupRow', {
+      field.setLookupRow(scout.create(LookupRow, {
         text: 'Foo'
       }));
       expect(field._getLastSearchText()).toBe('Foo');
@@ -827,7 +827,7 @@ describe('SmartField', () => {
     let lookupCall;
 
     beforeEach(() => {
-      lookupCall = scout.create('DummyLookupCall', {
+      lookupCall = scout.create(DummyLookupCall, {
         session: session
       });
     });
@@ -836,7 +836,7 @@ describe('SmartField', () => {
       let model = helper.createFieldModel('SmartField', session.desktop, {
         lookupCall: lookupCall
       });
-      let smartField = scout.create('SmartField', model);
+      let smartField = scout.create(SmartField, model);
       expect(smartField.displayText).toBe('');
       smartField.setValue(1);
       jasmine.clock().tick(300);
@@ -852,7 +852,7 @@ describe('SmartField', () => {
       let model = helper.createFieldModel('SmartField', session.desktop, {
         lookupCall: lookupCall
       });
-      let smartField = scout.create('SmartField', model);
+      let smartField = scout.create(SmartField, model);
       expect(smartField.displayText).toBe('');
       smartField.setValue(null);
       jasmine.clock().tick(300);
@@ -871,7 +871,7 @@ describe('SmartField', () => {
     let lookupCall;
 
     beforeEach(() => {
-      lookupCall = scout.create('DummyLookupCall', {
+      lookupCall = scout.create(DummyLookupCall, {
         session: session,
         multiline: true
       });
@@ -882,7 +882,7 @@ describe('SmartField', () => {
         lookupCall: lookupCall,
         value: 1
       });
-      let smartField = scout.create('SmartField', model);
+      let smartField = scout.create(SmartField, model);
       jasmine.clock().tick(300);
       smartField.render();
       expect(smartField._readDisplayText()).toEqual('1:Foo');
@@ -899,7 +899,7 @@ describe('SmartField', () => {
         lookupCall: lookupCall,
         value: 1
       });
-      let smartField = scout.create('SmartField', model);
+      let smartField = scout.create(SmartField, model);
       jasmine.clock().tick(300);
       smartField.render();
       expect(smartField.value).toBe(1);
@@ -913,7 +913,7 @@ describe('SmartField', () => {
         lookupCall: lookupCall,
         value: 1
       });
-      let smartFieldMultiline = scout.create('SmartFieldMultiline', model);
+      let smartFieldMultiline = scout.create(SmartFieldMultiline, model);
       jasmine.clock().tick(300);
       smartFieldMultiline.render();
       expect(smartFieldMultiline.value).toBe(1);
@@ -925,7 +925,7 @@ describe('SmartField', () => {
   describe('label', () => {
 
     it('is linked with the field', () => {
-      let smartField = scout.create('SmartField', {
+      let smartField = scout.create(SmartField, {
         parent: session.desktop
       });
       smartField.render();
@@ -934,7 +934,7 @@ describe('SmartField', () => {
     });
 
     it('focuses the field when clicked', () => {
-      let smartField = scout.create('SmartField', {
+      let smartField = scout.create(SmartField, {
         parent: session.desktop,
         label: 'label',
         lookupCall: 'DummyLookupCall'
@@ -948,7 +948,7 @@ describe('SmartField', () => {
     });
 
     it('is linked with the field (also in multiline mode)', () => {
-      let smartField = scout.create('SmartFieldMultiline', {
+      let smartField = scout.create(SmartFieldMultiline, {
         parent: session.desktop,
         label: 'label'
       });
@@ -958,7 +958,7 @@ describe('SmartField', () => {
     });
 
     it('focuses the field when clicked (also in multiline mode)', () => {
-      let smartField = scout.create('SmartFieldMultiline', {
+      let smartField = scout.create(SmartFieldMultiline, {
         parent: session.desktop,
         label: 'label',
         lookupCall: 'DummyLookupCall'

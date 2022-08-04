@@ -42,8 +42,8 @@ describe('Page', () => {
   it('detailTable and detailForm are initialized when passed as widget', () => {
     // if form or table is directly provided as widget: it is available right from the start
     let page = createAndInsertPage(
-      scout.create('Table', {parent: outline}),
-      scout.create('Form', {parent: outline}));
+      scout.create(Table, {parent: outline}),
+      scout.create(Form, {parent: outline}));
     expect(page.detailTable).toBeInstanceOf(Table);
     expect(page.detailForm).toBeInstanceOf(Widget);
     expectListenersToBeExecuted(2, page); // both listeners already executed without selecting the page
@@ -60,13 +60,13 @@ describe('Page', () => {
     expect(page.detailForm).toBeInstanceOf(Widget);
 
     let oldForm = page.detailForm;
-    let newForm = scout.create('Form', {parent: outline});
+    let newForm = scout.create(Form, {parent: outline});
     page.setDetailForm(newForm);
     expect(oldForm.destroyed).toBe(true);
     expect(newForm.destroyed).toBe(false);
 
     let oldTable = page.detailTable;
-    let newTable = scout.create('Table', {parent: outline});
+    let newTable = scout.create(Table, {parent: outline});
     page.setDetailTable(newTable);
     expect(oldTable.destroyed).toBe(true);
     expect(newTable.destroyed).toBe(false);

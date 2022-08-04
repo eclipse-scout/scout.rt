@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, scout} from '../../src/index';
+import {HtmlComponent, scout, StringField} from '../../src/index';
 
 describe('LayoutValidator', () => {
   let session;
@@ -134,7 +134,7 @@ describe('LayoutValidator', () => {
   describe('cleanupInvalidObjects', () => {
 
     it('removes the widget from invalid components when a widget gets removed', () => {
-      let widget = scout.create('StringField', {
+      let widget = scout.create(StringField, {
         parent: session.desktop
       });
       widget.render();

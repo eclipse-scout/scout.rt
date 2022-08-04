@@ -1,4 +1,4 @@
-import {Desktop as ScoutDesktop, models, scout, icons, App} from '@eclipse-scout/core';
+import {App, Desktop as ScoutDesktop, icons, models, scout} from '@eclipse-scout/core';
 import DesktopModel from './DesktopModel';
 
 export default class Desktop extends ScoutDesktop {
@@ -39,15 +39,15 @@ export default class Desktop extends ScoutDesktop {
   }
 
   _onAboutMenuAction(event) {
-    let form = scout.create('Form', {
+    let form = scout.create(Form, {
       parent: this,
       resizable: false,
       title: this.session.text('ApplicationTitle'),
       rootGroupBox: {
-        objectType: 'GroupBox',
+        objectType: GroupBox,
         borderDecoration: 'empty',
         fields: [{
-          objectType: 'LabelField',
+          objectType: LabelField,
           value: this.session.text('AboutText', this.session.text('ApplicationTitle'), App.get().version),
           labelVisible: false,
           wrapText: true,

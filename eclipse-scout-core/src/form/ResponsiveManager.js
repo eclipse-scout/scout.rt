@@ -120,6 +120,6 @@ App.addListener('prepare', () => {
     // if it was created before the app itself, use it instead of creating a new one
     return;
   }
-  instance = scout.create('ResponsiveManager');
+  instance = scout.create(ResponsiveManager);
   instance.init();
 });

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Page, scout, Status} from '../../../index';
+import {arrays, AutoLeafPageWithNodes, Page, scout, Status} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -123,7 +123,7 @@ export default class PageWithTable extends Page {
   }
 
   createDefaultChildPage(row) {
-    return scout.create('AutoLeafPageWithNodes', {
+    return scout.create(AutoLeafPageWithNodes, {
       parent: this.getOutline(),
       row: row
     });

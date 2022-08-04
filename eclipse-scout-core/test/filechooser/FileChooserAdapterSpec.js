@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteEvent, scout} from '../../src/index';
+import {FileChooser, RemoteEvent, scout} from '../../src/index';
 
 describe('FileChooserAdapter', () => {
   let session;
@@ -27,7 +27,7 @@ describe('FileChooserAdapter', () => {
 
   describe('cancel', () => {
     it('does not close the chooser but sends a cancel event', () => {
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: session.desktop
       });
       linkWidgetAndAdapter(fileChooser, 'FileChooserAdapter');

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, GroupBox, HtmlEnvironment, ResponsiveManager, scout} from '../../../../src/index';
+import {FormField, GroupBox, HtmlEnvironment, ResponsiveManager, scout, StringField} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 
 describe('GroupBoxResponsiveHandler', () => {
@@ -41,7 +41,7 @@ describe('GroupBoxResponsiveHandler', () => {
         objectType: 'StringField'
       }]
     }];
-    return scout.create('GroupBox', {
+    return scout.create(GroupBox, {
       parent: session.desktop,
       fields: fields,
       responsive: true
@@ -198,7 +198,7 @@ describe('GroupBoxResponsiveHandler', () => {
       groupBox.validateLayout();
       expectCondensed(groupBox);
 
-      let dynamicField = scout.create('StringField', {
+      let dynamicField = scout.create(StringField, {
         parent: session.desktop,
         labelPosition: FormField.LabelPosition.DEFAULT
       });

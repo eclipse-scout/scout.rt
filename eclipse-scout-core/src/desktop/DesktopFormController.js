@@ -80,7 +80,7 @@ export default class DesktopFormController extends FormController {
     // See: https://developer.mozilla.org/en-US/docs/Web/API/Window/open#Position_and_size_features
     windowSpecs += ',location=no,toolbar=no,menubar=no,resizable=yes';
 
-    let popupBlockerHandler = scout.create('PopupBlockerHandler', {session: this.session, preserveOpener: true /* no external untrusted URI: Can keep the opener for callback. */});
+    let popupBlockerHandler = scout.create(PopupBlockerHandler, {session: this.session, preserveOpener: true /* no external untrusted URI: Can keep the opener for callback. */});
     // form ID in URL is required for 'reload window' support
     let url = 'popup-window.html?formId=' + form.id;
 

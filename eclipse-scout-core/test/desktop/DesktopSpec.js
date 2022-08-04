@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
-import {arrays, Desktop, Device, Form, MessageBoxes, RemoteEvent, scout, Status, strings, Widget} from '../../src/index';
+import {arrays, BusyIndicator, Desktop, DesktopNotification, Device, FileChooser, Form, FormMenu, MessageBox, MessageBoxes, RemoteEvent, scout, Status, strings, UnsavedFormChangesForm, Widget, WidgetPopup} from '../../src/index';
 
 describe('Desktop', () => {
   let session, desktop, outlineHelper, formHelper;
@@ -36,7 +36,7 @@ describe('Desktop', () => {
 
     beforeEach(() => {
       parent.session = session;
-      ntfc = scout.create('DesktopNotification', {
+      ntfc = scout.create(DesktopNotification, {
         id: 'theID',
         parent: desktop,
         status: {}
@@ -63,7 +63,7 @@ describe('Desktop', () => {
     });
 
     it('schedules addNotification when desktop is not rendered', () => {
-      scout.create('DesktopNotification', {
+      scout.create(DesktopNotification, {
         parent: desktop,
         status: {
           severity: Status.Severity.OK,
@@ -269,12 +269,12 @@ describe('Desktop', () => {
       session._renderDesktop();
       let outline = outlineHelper.createOutline();
       desktop.setOutline(outline);
-      let msgBox = scout.create('MessageBox', {
+      let msgBox = scout.create(MessageBox, {
         parent: outline,
         displayParent: outline
       });
       msgBox.open();
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: outline,
         displayParent: outline
       });
@@ -338,7 +338,7 @@ describe('Desktop', () => {
       let outline = outlineHelper.createOutline();
       desktop.setOutline(outline);
 
-      let msgBox = scout.create('MessageBox', {
+      let msgBox = scout.create(MessageBox, {
         parent: outline,
         displayParent: outline
       });
@@ -375,7 +375,7 @@ describe('Desktop', () => {
       session._renderDesktop();
       let outline = outlineHelper.createOutline();
       desktop.setOutline(outline);
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: outline,
         displayParent: outline
       });
@@ -981,7 +981,7 @@ describe('Desktop', () => {
       });
       desktop.showForm(dialog2);
 
-      let messagebox = scout.create('MessageBox', {
+      let messagebox = scout.create(MessageBox, {
         parent: dialog2,
         displayParent: dialog2,
         header: 'Title',
@@ -1019,7 +1019,7 @@ describe('Desktop', () => {
       });
       desktop.showForm(dialog0);
 
-      let messagebox = scout.create('MessageBox', {
+      let messagebox = scout.create(MessageBox, {
         parent: dialog0,
         displayParent: dialog0,
         header: 'Title',
@@ -1067,7 +1067,7 @@ describe('Desktop', () => {
       });
       desktop.showForm(dialog2);
 
-      let messagebox = scout.create('MessageBox', {
+      let messagebox = scout.create(MessageBox, {
         parent: desktop,
         displayParent: desktop,
         header: 'Title',
@@ -1115,7 +1115,7 @@ describe('Desktop', () => {
       });
       desktop.showForm(dialog2);
 
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: dialog2,
         displayParent: dialog2
       });
@@ -1149,7 +1149,7 @@ describe('Desktop', () => {
       });
       desktop.showForm(dialog0);
 
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: dialog0,
         displayParent: dialog0
       });
@@ -1193,7 +1193,7 @@ describe('Desktop', () => {
       });
       desktop.showForm(dialog2);
 
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: desktop,
         displayParent: desktop
       });
@@ -1542,7 +1542,7 @@ describe('Desktop', () => {
       it('does not bring activateForm to fail for fake views', () => {
         let form = formHelper.createFormWithOneField();
         form.displayHint = Form.DisplayHint.VIEW;
-        scout.create('FormMenu', {
+        scout.create(FormMenu, {
           parent: desktop,
           form: form
         });
@@ -1666,7 +1666,7 @@ describe('Desktop', () => {
 
       // UnsavedFormChangesForm should be the last child
       let unsavedFormChangesForm = arrays.last(desktop.children);
-      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
@@ -1691,7 +1691,7 @@ describe('Desktop', () => {
       desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
       let unsavedFormChangesForm = arrays.last(desktop.children);
-      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       unsavedFormChangesForm.whenPostLoad().then(() => {
         unsavedFormChangesForm.close();
       });
@@ -1713,7 +1713,7 @@ describe('Desktop', () => {
 
       // UnsavedFormChangesForm should be the last child
       let unsavedFormChangesForm = arrays.last(desktop.children);
-      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
@@ -1735,7 +1735,7 @@ describe('Desktop', () => {
     });
 
     it('close tabs when one tab has an open message box', () => {
-      let msgBox = scout.create('MessageBox', {
+      let msgBox = scout.create(MessageBox, {
         parent: view3,
         displayParent: view3
       });
@@ -1760,7 +1760,7 @@ describe('Desktop', () => {
       desktop.showForm(view2);
       view2.rootGroupBox.fields[0].setValue('Foo');
 
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: view2,
         displayParent: view2
       });
@@ -1776,7 +1776,7 @@ describe('Desktop', () => {
 
       // UnsavedFormChangesForm should be the last child
       let unsavedFormChangesForm = arrays.last(desktop.children);
-      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
@@ -1819,7 +1819,7 @@ describe('Desktop', () => {
 
       // UnsavedFormChangesForm should be the last child
       let unsavedFormChangesForm = arrays.last(desktop.children);
-      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
@@ -1886,7 +1886,7 @@ describe('Desktop', () => {
 
       // UnsavedFormChangesForm should be the last child
       let unsavedFormChangesForm = arrays.last(desktop.children);
-      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
@@ -1940,7 +1940,7 @@ describe('Desktop', () => {
       desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
       let unsavedFormChangesForm = arrays.last(desktop.children);
-      expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
+      expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
@@ -2018,7 +2018,7 @@ describe('Desktop', () => {
     });
 
     it('of a wrapped form', () => {
-      let form = scout.create('Form', {
+      let form = scout.create(Form, {
         parent: session.desktop,
         id: 'outerForm',
         displayHint: Form.DisplayHint.VIEW,
@@ -2075,7 +2075,7 @@ describe('Desktop', () => {
     it('modal dialog should not be clickable when desktop-modal message-box is opened', () => {
       let desktop = session.desktop;
       desktop.render(session.$entryPoint);
-      let modalDialog = scout.create('Form', {
+      let modalDialog = scout.create(Form, {
         parent: desktop,
         displayHint: Form.DisplayHint.DIALOG,
         modal: true,
@@ -2093,7 +2093,7 @@ describe('Desktop', () => {
       messageBox.close();
 
       // Test with file-chooser
-      let fileChooser = scout.create('FileChooser', {
+      let fileChooser = scout.create(FileChooser, {
         parent: desktop
       });
       fileChooser.open();
@@ -2102,7 +2102,7 @@ describe('Desktop', () => {
       fileChooser.close();
 
       // Test with busy-indicator
-      let busyIndicator = scout.create('BusyIndicator', {
+      let busyIndicator = scout.create(BusyIndicator, {
         parent: desktop
       });
       busyIndicator.render();
@@ -2118,7 +2118,7 @@ describe('Desktop', () => {
     it('message-box in modal-view should be clickable (have no glass-pane)', () => {
       let desktop = session.desktop;
       desktop.render(session.$entryPoint);
-      let viewA = scout.create('Form', {
+      let viewA = scout.create(Form, {
         parent: desktop,
         displayHint: Form.DisplayHint.VIEW,
         modal: true,
@@ -2126,7 +2126,7 @@ describe('Desktop', () => {
           objectType: 'GroupBox'
         }
       });
-      let viewB = scout.create('Form', {
+      let viewB = scout.create(Form, {
         parent: desktop,
         displayHint: Form.DisplayHint.VIEW,
         modal: true,
@@ -2148,7 +2148,7 @@ describe('Desktop', () => {
 
       // Additionally to the case in the ticket, open a popup which makes use of the
       // glass-pane filter: should not have an effect on modality.
-      let helpPopup = scout.create('WidgetPopup', {
+      let helpPopup = scout.create(WidgetPopup, {
         parent: viewB,
         widget: {
           objectType: 'StringField'

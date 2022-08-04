@@ -1,35 +1,38 @@
+import {Menu} from '@eclipse-scout/core';
+import {DataOutline, Desktop} from '../index';
+
 export default () => ({
   id: '${simpleArtifactName}.Desktop',
   title: '${symbol_dollar}{textKey:ApplicationTitle}',
-  objectType: 'Desktop',
+  objectType: Desktop,
   logoUrl: 'img/eclipse_scout_logo.svg',
   nativeNotificationDefaults: {
     iconId: 'img/eclipse_scout_logo.png'
   },
   outline: {
-    objectType: '${simpleArtifactName}.DataOutline'
+    objectType: DataOutline
   },
   menus: [
     {
       id: 'ThemeMenu',
-      objectType: 'Menu',
+      objectType: Menu,
       text: '${symbol_dollar}{textKey:Theme}',
       childActions: [
         {
           id: 'DefaultThemeMenu',
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'Default'
         },
         {
           id: 'DarkThemeMenu',
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'Dark'
         }
       ]
     },
     {
       id: 'AboutMenu',
-      objectType: 'Menu',
+      objectType: Menu,
       text: '${symbol_dollar}{textKey:About}',
       cssClass: 'about-menu'
     }

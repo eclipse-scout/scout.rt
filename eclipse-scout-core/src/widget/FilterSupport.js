@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, FormField, HAlign, keys, KeyStroke, objects, scout, strings, styles, ValueField, WidgetSupport} from '../index';
+import {arrays, FormField, HAlign, keys, KeyStroke, objects, scout, StringField, strings, styles, ValueField, WidgetSupport} from '../index';
 import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
 
 export default class FilterSupport extends WidgetSupport {
@@ -109,7 +109,7 @@ export default class FilterSupport extends WidgetSupport {
 
   _renderFilterField() {
     this._ensure$Container();
-    this._filterField = scout.create('StringField', {
+    this._filterField = scout.create(StringField, {
       parent: this.widget,
       label: this.widget.session.text('ui.Filter'),
       labelVisible: false,

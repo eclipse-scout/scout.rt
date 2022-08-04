@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {HtmlComponent, NullWidget, scout, TreeVisitResult, Widget} from '../../src/index';
+import {Form, HtmlComponent, NullWidget, scout, TreeVisitResult, Widget} from '../../src/index';
 
 describe('Widget', () => {
 
@@ -435,7 +435,7 @@ describe('Widget', () => {
 
     it('recomputeEnabled should be called for all widgets at least once', () => {
 
-      let widget = scout.create('Form', {
+      let widget = scout.create(Form, {
         session: session,
         parent: parent,
         rootGroupBox: {
@@ -1510,7 +1510,7 @@ describe('Widget', () => {
         }],
         selectedItem: 'TI2'
       };
-      let ctw1 = scout.create('testns.ComplexTestWidget', model1);
+      let ctw1 = scout.create(testns.ComplexTestWidget, model1);
       expect(ctw1.items.length).toBe(2);
       expect(ctw1.items[1].name).toBe('Item #2');
       expect(ctw1.selectedItem).toBe(ctw1.items[1]);
@@ -1553,11 +1553,11 @@ describe('Widget', () => {
         }]
       };
       expect(() => {
-        scout.create('testns.ComplexTestWidget', model3);
+        scout.create(testns.ComplexTestWidget, model3);
       }).toThrow(new Error('Referenced widget not found: TI2'));
       // fix it
       delete model3.items[0].linkedItem;
-      let ctw3 = scout.create('testns.ComplexTestWidget', model3);
+      let ctw3 = scout.create(testns.ComplexTestWidget, model3);
       ctw3.items[0].setProperty('linkedItem', ctw3.items[1]);
     });
   });

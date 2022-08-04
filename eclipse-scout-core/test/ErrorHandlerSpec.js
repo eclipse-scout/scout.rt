@@ -8,19 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../src/index';
+import {ErrorHandler, scout} from '../src/index';
 
 describe('ErrorHandler', () => {
 
   let errorHandler;
 
   beforeEach(() => {
-    errorHandler = scout.create('ErrorHandler');
+    errorHandler = scout.create(ErrorHandler);
   });
 
   describe('handle', () => {
     it('accepts individually passed arguments', done => {
-      errorHandler = scout.create('ErrorHandler');
+      errorHandler = scout.create(ErrorHandler);
       spyOn(errorHandler, 'analyzeError').and.callThrough();
 
       let deferred = $.Deferred();
@@ -37,7 +37,7 @@ describe('ErrorHandler', () => {
     });
 
     it('accepts argument like object as first param', done => {
-      errorHandler = scout.create('ErrorHandler');
+      errorHandler = scout.create(ErrorHandler);
       spyOn(errorHandler, 'analyzeError').and.callThrough();
 
       let deferred = $.Deferred();
@@ -54,7 +54,7 @@ describe('ErrorHandler', () => {
     });
 
     it('accepts array as first param', done => {
-      errorHandler = scout.create('ErrorHandler');
+      errorHandler = scout.create(ErrorHandler);
       spyOn(errorHandler, 'analyzeError').and.callThrough();
 
       let deferred = $.Deferred();

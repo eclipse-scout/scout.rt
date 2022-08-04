@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Status, fields, dates, scout} from '../../src/index';
+import {DateField, DatePickerTouchPopup, dates, fields, scout, Status} from '../../src/index';
 
 describe('DatePickerTouchPopup', () => {
 
@@ -21,7 +21,7 @@ describe('DatePickerTouchPopup', () => {
   });
 
   function createDatePickerTouchPopup(touchField) {
-    return scout.create('DatePickerTouchPopup', {
+    return scout.create(DatePickerTouchPopup, {
       parent: session.desktop,
       field: touchField
     });
@@ -34,7 +34,7 @@ describe('DatePickerTouchPopup', () => {
      * #277301
      */
     it('Sets the value on the field, even if the field has a (model) error', () => {
-      let dateTimeField = scout.create('DateField', {
+      let dateTimeField = scout.create(DateField, {
         parent: session.desktop,
         hasTime: true,
         hasDate: true

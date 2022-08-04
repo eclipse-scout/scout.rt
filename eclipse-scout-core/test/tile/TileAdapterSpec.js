@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../src/index';
+import {scout, Tile} from '../../src/index';
 
 describe('TileGridAdapter', () => {
   let session;
@@ -42,7 +42,7 @@ describe('TileGridAdapter', () => {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    let tile = scout.create('Tile', model);
+    let tile = scout.create(Tile, model);
     linkWidgetAndAdapter(tile, 'TileAdapter');
     return tile;
   }

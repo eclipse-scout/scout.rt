@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons, scout, StaticLookupCall} from '../index';
+import {icons, LookupRow, scout, StaticLookupCall} from '../index';
 
 export default class TileTableHeaderSortByLookupCall extends StaticLookupCall {
 
@@ -47,7 +47,7 @@ export default class TileTableHeaderSortByLookupCall extends StaticLookupCall {
   }
 
   _dataToLookupRow(data) {
-    return scout.create('LookupRow', {
+    return scout.create(LookupRow, {
       key: data[0],
       text: data[1],
       iconId: data[2]

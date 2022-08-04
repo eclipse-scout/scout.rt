@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, scout, Status, strings, Table, TableFooterLayout, TableTextUserFilter, Widget} from '../index';
+import {fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, scout, Status, strings, Table, TableFooterLayout, TableTextUserFilter, Tooltip, Widget} from '../index';
 import $ from 'jquery';
 import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
 
@@ -636,7 +636,7 @@ export default class TableFooter extends Widget {
       autoRemove: !tableStatus.isError(),
       $anchor: this._$infoTableStatusIcon
     };
-    this._tableStatusTooltip = scout.create('Tooltip', opts);
+    this._tableStatusTooltip = scout.create(Tooltip, opts);
     this._tableStatusTooltip.one('destroy', () => {
       this._tableStatusTooltip = null;
     });
@@ -717,7 +717,7 @@ export default class TableFooter extends Widget {
     if (this.filterText !== filterText) {
       this.filterText = filterText;
       if (filterText) {
-        filter = scout.create('TableTextUserFilter', {
+        filter = scout.create(TableTextUserFilter, {
           session: this.session,
           table: this.table
         });

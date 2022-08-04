@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tile, ViewMenuPopupEnterKeyStroke, WidgetPopup} from '../../index';
+import {CompositeTile, Icon, Label, scout, Tile, TileGrid, ViewMenuPopupEnterKeyStroke, WidgetPopup} from '../../index';
 
 /**
  * Popup menu to switch between outlines.
@@ -27,7 +27,7 @@ export default class ViewMenuPopup extends WidgetPopup {
     super._init(options);
     let tiles = this._createTiles();
     let noIcons = tiles.every(tile => !tile.widgets[0].visible);
-    this.widget = scout.create('TileGrid', {
+    this.widget = scout.create(TileGrid, {
       parent: this,
       tiles: tiles,
       cssClass: noIcons ? 'no-icons' : '',
@@ -59,7 +59,7 @@ export default class ViewMenuPopup extends WidgetPopup {
 
   _createTiles() {
     return this.viewMenus.map(menu => ({
-      objectType: 'CompositeTile',
+      objectType: CompositeTile,
       displayStyle: Tile.DisplayStyle.PLAIN,
       cssClass: scout.nvl(menu.cssClass, '') + ' view-menu-tile ' + (menu.selected ? 'checked ' : '') + (!menu.iconId ? 'text-only' : ''),
       modelClass: menu.modelClass,
@@ -71,13 +71,13 @@ export default class ViewMenuPopup extends WidgetPopup {
       },
       widgets: [
         {
-          objectType: 'Icon',
+          objectType: Icon,
           iconDesc: menu.iconId,
           visible: !!menu.iconId,
           prepend: true
         },
         {
-          objectType: 'Label',
+          objectType: Label,
           value: menu.text,
           cssClass: 'label'
         }

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Button, icons, scout} from '../../../../src/index';
+import {Button, Form, icons, scout} from '../../../../src/index';
 
 describe('Button', () => {
   let session;
@@ -20,7 +20,7 @@ describe('Button', () => {
 
   describe('setLabel', () => {
     it('toggles the class with-label on the icon', () => {
-      let button = scout.create('Button', {
+      let button = scout.create(Button, {
         parent: session.desktop,
         label: 'label',
         iconId: icons.ANGLE_DOWN
@@ -38,7 +38,7 @@ describe('Button', () => {
 
   describe('setIconId', () => {
     it('toggles the class with-label on the icon', () => {
-      let button = scout.create('Button', {
+      let button = scout.create(Button, {
         parent: session.desktop,
         label: 'label',
         iconId: icons.ANGLE_DOWN
@@ -56,7 +56,7 @@ describe('Button', () => {
 
   describe('setting legacy styles', () => {
     it('sets style attributes', () => {
-      let button = scout.create('Button', {
+      let button = scout.create(Button, {
         parent: session.desktop,
         label: 'label',
         foregroundColor: 'red',
@@ -123,7 +123,7 @@ describe('Button', () => {
 
   describe('keyStrokeScope', () => {
     it('may be an id of a form field and will be resolved when initialized', () => {
-      let form = scout.create('Form', {
+      let form = scout.create(Form, {
         id: 'myForm',
         parent: session.desktop,
         rootGroupBox: {
@@ -142,7 +142,7 @@ describe('Button', () => {
     });
 
     it('may be an an outer form', () => {
-      let form = scout.create('Form', {
+      let form = scout.create(Form, {
         parent: session.desktop,
         id: 'outerForm',
         rootGroupBox: {
@@ -173,7 +173,7 @@ describe('Button', () => {
   describe('click event', () => {
 
     it('is triggered when doAction is called', () => {
-      let button = scout.create('Button', {
+      let button = scout.create(Button, {
         parent: session.desktop
       });
       let executed = 0;
@@ -187,7 +187,7 @@ describe('Button', () => {
     });
 
     it('is fired when doAction is called even if it is a toggle button', () => {
-      let button = scout.create('Button', {
+      let button = scout.create(Button, {
         parent: session.desktop,
         displayStyle: Button.DisplayStyle.TOGGLE
       });

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BrowserFieldLayout, numbers, PopupBlockerHandler, Rectangle, scout, strings, ValueField} from '../../../index';
+import {BrowserFieldLayout, IFrame, numbers, PopupBlockerHandler, Rectangle, scout, strings, ValueField} from '../../../index';
 import $ from 'jquery';
 
 export default class BrowserField extends ValueField {
@@ -40,7 +40,7 @@ export default class BrowserField extends ValueField {
   _init(model) {
     super._init(model);
 
-    this.iframe = scout.create('IFrame', {
+    this.iframe = scout.create(IFrame, {
       parent: this,
       location: this.location,
       sandboxEnabled: this.sandboxEnabled,
@@ -215,7 +215,7 @@ export default class BrowserField extends ValueField {
     }
 
     if (!this._popupWindow || (reopenIfClosed && this._popupWindow.closed)) {
-      let popupBlockerHandler = scout.create('PopupBlockerHandler', {session: this.session});
+      let popupBlockerHandler = scout.create(PopupBlockerHandler, {session: this.session});
       let popupBounds = this._calcPopupBounds();
       // (b) window specifications
       let windowSpecs = strings.join(',',

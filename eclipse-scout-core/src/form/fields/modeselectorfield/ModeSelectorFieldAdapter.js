@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueFieldAdapter} from '../../../index';
+import {ModeSelector, ValueFieldAdapter} from '../../../index';
 
 export default class ModeSelectorFieldAdapter extends ValueFieldAdapter {
 
@@ -23,7 +23,7 @@ export default class ModeSelectorFieldAdapter extends ValueFieldAdapter {
 
   _addModeSelector(model) {
     model.modeSelector = {
-      objectType: 'ModeSelector'
+      objectType: ModeSelector
     };
   }
 

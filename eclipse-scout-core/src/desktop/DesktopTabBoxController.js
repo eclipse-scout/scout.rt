@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, SimpleTabBoxController} from '../index';
+import {DesktopTab, DesktopTabArea, scout, SimpleTabBoxController} from '../index';
 
 export default class DesktopTabBoxController extends SimpleTabBoxController {
 
@@ -17,13 +17,13 @@ export default class DesktopTabBoxController extends SimpleTabBoxController {
   }
 
   createTabArea() {
-    return scout.create('DesktopTabArea', {
+    return scout.create(DesktopTabArea, {
       parent: this.tabBox
     });
   }
 
   _createTab(view) {
-    return scout.create('DesktopTab', {
+    return scout.create(DesktopTab, {
       parent: this.tabArea,
       view: view
     });

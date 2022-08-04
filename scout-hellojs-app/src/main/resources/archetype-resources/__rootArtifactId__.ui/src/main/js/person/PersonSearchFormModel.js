@@ -1,25 +1,25 @@
-import {Action} from '@eclipse-scout/core';
+import {Action, GroupBox, Menu, ResetMenu, StringField} from '@eclipse-scout/core';
 
 export default () => ({
   id: '${simpleArtifactName}.PersonSearchForm',
   rootGroupBox: {
     id: 'MainBox',
-    objectType: 'GroupBox',
+    objectType: GroupBox,
     fields: [
       {
         id: 'DetailBox',
-        objectType: 'GroupBox',
+        objectType: GroupBox,
         gridColumnCount: 2,
         fields: [
           {
             id: 'FirstNameField',
-            objectType: 'StringField',
+            objectType: StringField,
             maxLength: 200,
             label: '${symbol_dollar}{textKey:FirstName}'
           },
           {
             id: 'LastNameField',
-            objectType: 'StringField',
+            objectType: StringField,
             maxLength: 200,
             label: '${symbol_dollar}{textKey:LastName}'
           }
@@ -29,14 +29,14 @@ export default () => ({
     menus: [
       {
         id: 'SearchButton',
-        objectType: 'Menu',
+        objectType: Menu,
         actionStyle: Action.ActionStyle.BUTTON,
         text: '${symbol_dollar}{textKey:Search}',
         keyStroke: 'ENTER'
       },
       {
         id: 'ResetMenu',
-        objectType: 'ResetMenu'
+        objectType: ResetMenu
       }
     ]
   }

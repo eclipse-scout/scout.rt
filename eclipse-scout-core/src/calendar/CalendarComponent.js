@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, Popup, Range, scout, strings, Widget} from '../index';
+import {dates, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
 import $ from 'jquery';
 
 export default class CalendarComponent extends Widget {
@@ -269,7 +269,7 @@ export default class CalendarComponent extends Widget {
     this.updateSelectedComponent($part, false);
 
     if (event.button === 0) {
-      let popup = scout.create('WidgetPopup', {
+      let popup = scout.create(WidgetPopup, {
         parent: this.parent,
         $anchor: $part,
         closeOnAnchorMouseDown: true,
@@ -288,7 +288,7 @@ export default class CalendarComponent extends Widget {
           y: event.originalEvent.clientY
         },
         widget: {
-          objectType: 'Label',
+          objectType: Label,
           htmlEnabled: true,
           cssClass: 'tooltip-content',
           value: this._description()

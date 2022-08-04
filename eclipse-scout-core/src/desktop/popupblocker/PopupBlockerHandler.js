@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MessageBoxes, scout, Status} from '../../index';
+import {ErrorHandler, MessageBoxes, PopupBlockerDesktopNotification, scout, Status} from '../../index';
 import $ from 'jquery';
 
 export default class PopupBlockerHandler {
@@ -70,7 +70,7 @@ export default class PopupBlockerHandler {
       linkUrl = vararg;
     }
 
-    notification = scout.create('DesktopNotification:PopupBlocker', {
+    notification = scout.create(PopupBlockerDesktopNotification, {
       parent: desktop,
       linkUrl: linkUrl,
       preserveOpener: this.preserveOpener
@@ -84,7 +84,7 @@ export default class PopupBlockerHandler {
 
   _handleInvalidUri(uri, popup, err) {
     // Log
-    scout.create('ErrorHandler', {
+    scout.create(ErrorHandler, {
       logError: true,
       displayError: false,
       sendError: false

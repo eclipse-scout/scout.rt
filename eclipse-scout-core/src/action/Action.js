@@ -183,7 +183,7 @@ export default class Action extends Widget {
       this.icon.setIconDesc(iconId);
       return;
     }
-    this.icon = scout.create('Icon', {
+    this.icon = scout.create(Icon, {
       parent: this,
       iconDesc: iconId,
       prepend: true

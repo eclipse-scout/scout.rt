@@ -110,12 +110,12 @@ export default class OpenUriHandler {
   }
 
   openUriAsNewWindow(uri) {
-    let popupBlockerHandler = scout.create('PopupBlockerHandler', {session: this.session});
+    let popupBlockerHandler = scout.create(PopupBlockerHandler, {session: this.session});
     popupBlockerHandler.openWindow(uri);
   }
 
   openUriAsPopupWindow(uri) {
-    let popupBlockerHandler = scout.create('PopupBlockerHandler', {session: this.session});
+    let popupBlockerHandler = scout.create(PopupBlockerHandler, {session: this.session});
     popupBlockerHandler.openWindow(uri, null, 'location=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes');
   }
 }

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../src/index';
+import {ContextMenuPopup, scout} from '../../src/index';
 import {MenuSpecHelper} from '../../src/testing/index';
 
 describe('ContextMenuPopup', () => {
@@ -51,7 +51,7 @@ describe('ContextMenuPopup', () => {
       it('clones the given menus and renders the clones', () => {
         let menuItems = [menu];
         menu.render();
-        popup = scout.create('ContextMenuPopup', {
+        popup = scout.create(ContextMenuPopup, {
           parent: session.desktop,
           session: session,
           menuItems: menuItems,
@@ -75,7 +75,7 @@ describe('ContextMenuPopup', () => {
         let menuItems = [menu];
         menu.render();
 
-        popup = scout.create('ContextMenuPopup', {
+        popup = scout.create(ContextMenuPopup, {
           parent: session.desktop,
           session: session,
           menuItems: menuItems,
@@ -102,7 +102,7 @@ describe('ContextMenuPopup', () => {
 
       it('renders the original menus', () => {
         let menuItems = [menu];
-        popup = scout.create('ContextMenuPopup', {
+        popup = scout.create(ContextMenuPopup, {
           parent: session.desktop,
           session: session,
           menuItems: menuItems,
@@ -121,7 +121,7 @@ describe('ContextMenuPopup', () => {
 
       it('removes but does not destroy the menus on popup close', () => {
         let menuItems = [menu];
-        popup = scout.create('ContextMenuPopup', {
+        popup = scout.create(ContextMenuPopup, {
           parent: session.desktop,
           session: session,
           menuItems: menuItems,
@@ -143,7 +143,7 @@ describe('ContextMenuPopup', () => {
         expect(childMenu.destroyed).toBe(false);
 
         // render again -> must not fail
-        popup = scout.create('ContextMenuPopup', {
+        popup = scout.create(ContextMenuPopup, {
           parent: session.desktop,
           session: session,
           menuItems: menuItems,
@@ -167,7 +167,7 @@ describe('ContextMenuPopup', () => {
     it('renders invisible menus', () => {
       let menuItems = [menu0, menu1, menu2];
       menu2.visible = false;
-      popup = scout.create('ContextMenuPopup', {
+      popup = scout.create(ContextMenuPopup, {
         parent: session.desktop,
         session: session,
         menuItems: menuItems
@@ -185,7 +185,7 @@ describe('ContextMenuPopup', () => {
 
     it('adds last and first classes', () => {
       let menuItems = [menu0, menu1, menu2];
-      popup = scout.create('ContextMenuPopup', {
+      popup = scout.create(ContextMenuPopup, {
         parent: session.desktop,
         session: session,
         menuItems: menuItems
@@ -202,7 +202,7 @@ describe('ContextMenuPopup', () => {
     it('considers visibility when adding last and first classes', () => {
       let menuItems = [menu0, menu1, menu2];
       menu2.visible = false;
-      popup = scout.create('ContextMenuPopup', {
+      popup = scout.create(ContextMenuPopup, {
         parent: session.desktop,
         session: session,
         menuItems: menuItems
@@ -221,7 +221,7 @@ describe('ContextMenuPopup', () => {
     it('makes cloned menus non-tabbable', () => {
       menu0.tabbable = true; // <-- !
       let menuItems = [menu0, menu1, menu2];
-      popup = scout.create('ContextMenuPopup', {
+      popup = scout.create(ContextMenuPopup, {
         parent: session.desktop,
         session: session,
         menuItems: menuItems

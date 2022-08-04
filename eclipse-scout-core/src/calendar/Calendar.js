@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CalendarComponent, CalendarLayout, CalendarListComponent, DateRange, dates, Device, events, GroupBox, HtmlComponent, KeyStrokeContext, menus, numbers, objects, Point, Range, scout, scrollbars, strings, Widget} from '../index';
+import {CalendarComponent, CalendarLayout, CalendarListComponent, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, events, GroupBox, HtmlComponent, KeyStrokeContext, menus, numbers, objects, Point, Range, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel} from '../index';
 import $ from 'jquery';
 
 export default class Calendar extends Widget {
@@ -137,11 +137,11 @@ export default class Calendar extends Widget {
 
   _init(model) {
     super._init(model);
-    this._yearPanel = scout.create('YearPanel', {
+    this._yearPanel = scout.create(YearPanel, {
       parent: this
     });
     this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
-    this.modesMenu = scout.create('CalendarModesMenu', {
+    this.modesMenu = scout.create(CalendarModesMenu, {
       parent: this,
       visible: false,
       displayMode: this.displayMode
@@ -1088,7 +1088,7 @@ export default class Calendar extends Widget {
       if (filteredMenus.length === 0) {
         return;
       }
-      let popup = scout.create('ContextMenuPopup', {
+      let popup = scout.create(ContextMenuPopup, {
         parent: this,
         menuItems: filteredMenus,
         location: {
@@ -1344,7 +1344,7 @@ export default class Calendar extends Widget {
     }
 
     if (!this._moveData.viewportScroller) {
-      this._moveData.viewportScroller = scout.create('ViewportScroller', $.extend({
+      this._moveData.viewportScroller = scout.create(ViewportScroller, $.extend({
         viewportWidth: this.$grid.width(),
         viewportHeight: this.$grid.height(),
         active: () => !!this._moveData,

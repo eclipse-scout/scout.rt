@@ -130,7 +130,7 @@ export default class Tree extends Widget {
     this._ensureTreeNodes(this.nodes);
     this._initNodes(this.nodes);
     this.initialTraversing = false;
-    this.menuBar = scout.create('MenuBar', {
+    this.menuBar = scout.create(MenuBar, {
       parent: this,
       position: MenuBar.Position.BOTTOM,
       menuOrder: new MenuItemsOrder(this.session, 'Tree'),
@@ -180,7 +180,7 @@ export default class Tree extends Widget {
   }
 
   _createTreeNode(nodeModel) {
-    nodeModel = $.extend({objectType: 'TreeNode'}, nodeModel);
+    nodeModel = $.extend({objectType: TreeNode}, nodeModel);
     nodeModel.parent = this;
     return scout.create(nodeModel);
   }
@@ -2532,7 +2532,7 @@ export default class Tree extends Widget {
       if (this.contextMenu) {
         this.contextMenu.close();
       }
-      this.contextMenu = scout.create('ContextMenuPopup', {
+      this.contextMenu = scout.create(ContextMenuPopup, {
         parent: this,
         menuItems: filteredMenus,
         location: {

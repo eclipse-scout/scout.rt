@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper} from '../../src/testing/index';
-import {scout} from '../../src/index';
+import {Mode, ModeSelector, scout} from '../../src/index';
 
 describe('ModeSelector', () => {
   let session;
@@ -52,11 +52,11 @@ describe('ModeSelector', () => {
 
   describe('init', () => {
     it('sets the selectedMode if it is provided', () => {
-      let mode1 = scout.create('Mode', {
+      let mode1 = scout.create(Mode, {
         parent: session.desktop,
         ref: 1
       });
-      let modeSelector = scout.create('ModeSelector', {
+      let modeSelector = scout.create(ModeSelector, {
         objectType: 'ModeSelector',
         parent: session.desktop,
         selectedMode: mode1,
@@ -72,7 +72,7 @@ describe('ModeSelector', () => {
     });
 
     it('selects the correct mode if it is selected', () => {
-      let modeSelector = scout.create('ModeSelector', {
+      let modeSelector = scout.create(ModeSelector, {
         parent: session.desktop,
         modes: [{
           objectType: 'Mode'
@@ -89,7 +89,7 @@ describe('ModeSelector', () => {
 
   describe('selectModeByRef', () => {
     it('updates the currently selected mode', () => {
-      let modeSelector = scout.create('ModeSelector', {
+      let modeSelector = scout.create(ModeSelector, {
         parent: session.desktop,
         modes: [{
           objectType: 'Mode',
@@ -115,7 +115,7 @@ describe('ModeSelector', () => {
 
   describe('selectModeById', () => {
     it('updates the currently selected mode', () => {
-      let modeSelector = scout.create('ModeSelector', {
+      let modeSelector = scout.create(ModeSelector, {
         parent: session.desktop,
         modes: [{
           objectType: 'Mode',
@@ -141,7 +141,7 @@ describe('ModeSelector', () => {
 
   describe('setSelectedMode', () => {
     it('unselects every mode when setting it to null', () => {
-      let modeSelector = scout.create('ModeSelector', {
+      let modeSelector = scout.create(ModeSelector, {
         parent: session.desktop,
         modes: [{
           objectType: 'Mode',
@@ -219,7 +219,7 @@ describe('ModeSelector', () => {
     });
 
     it('makes sure only one mode is selected even if multiple modes are selected during init', () => {
-      let modeSelector = scout.create('ModeSelector', {
+      let modeSelector = scout.create(ModeSelector, {
         parent: session.desktop,
         modes: [{
           objectType: 'Mode',

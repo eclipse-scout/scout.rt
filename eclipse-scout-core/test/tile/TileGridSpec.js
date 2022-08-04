@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../src/index';
+import {RemoteTileFilter, scout, Tile, TileGrid} from '../../src/index';
 
 describe('TileGrid', () => {
   let session;
@@ -36,7 +36,7 @@ describe('TileGrid', () => {
       tiles: tiles
     };
     model = $.extend({}, defaults, model);
-    return scout.create('TileGrid', model);
+    return scout.create(TileGrid, model);
   }
 
   function createTile(model) {
@@ -44,7 +44,7 @@ describe('TileGrid', () => {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create('Tile', model);
+    return scout.create(Tile, model);
   }
 
   describe('selectTiles', () => {
@@ -1136,7 +1136,7 @@ describe('TileGrid', () => {
       };
       let group = scout.create(model);
       let tileGrid = group.body;
-      let tileFilter = scout.create('RemoteTileFilter');
+      let tileFilter = scout.create(RemoteTileFilter);
       tileFilter.setTileIds([4, 5, 6]);
       tileGrid.addFilter(tileFilter);
       group.render();

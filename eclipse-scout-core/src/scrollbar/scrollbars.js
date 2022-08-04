@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, graphics, HtmlComponent, Insets, objects, scout} from '../index';
+import {arrays, Device, graphics, HtmlComponent, Insets, objects, scout, Scrollbar} from '../index';
 import $ from 'jquery';
 
 /**
@@ -386,15 +386,15 @@ export function _installJs($container, options) {
   if (options.axis === 'both') {
     let scrollOptions = $.extend({}, options);
     scrollOptions.axis = 'y';
-    scrollbar = scout.create('Scrollbar', $.extend({}, scrollOptions));
+    scrollbar = scout.create(Scrollbar, $.extend({}, scrollOptions));
     scrollbars.push(scrollbar);
 
     scrollOptions.axis = 'x';
     scrollOptions.mouseWheelNeedsShift = true;
-    scrollbar = scout.create('Scrollbar', $.extend({}, scrollOptions));
+    scrollbar = scout.create(Scrollbar, $.extend({}, scrollOptions));
     scrollbars.push(scrollbar);
   } else {
-    scrollbar = scout.create('Scrollbar', $.extend({}, options));
+    scrollbar = scout.create(Scrollbar, $.extend({}, options));
     scrollbars.push(scrollbar);
   }
   $container.data('scrollbars', scrollbars);

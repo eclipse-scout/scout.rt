@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, ColumnOptimalWidthMeasurer, comparators, EventSupport, FormField, GridData, icons, objects, scout, Status, strings, styles, Table, TableRow, texts} from '../../index';
+import {Cell, CellEditorPopup, ColumnOptimalWidthMeasurer, comparators, EventSupport, FormField, GridData, icons, objects, scout, Status, StringField, strings, styles, Table, TableHeaderMenu, TableRow, texts} from '../../index';
 import $ from 'jquery';
 
 export default class Column {
@@ -161,7 +161,7 @@ export default class Column {
       cell.value = this._parseValue(cell.value);
     } else {
       // in this case 'vararg' is only a scalar value, typically a string
-      cell = scout.create('Cell', {
+      cell = scout.create(Cell, {
         value: this._parseValue(vararg)
       });
     }
@@ -401,7 +401,7 @@ export default class Column {
   }
 
   _createEditorPopup(row, cell) {
-    return scout.create('CellEditorPopup', {
+    return scout.create(CellEditorPopup, {
       parent: this.table,
       column: this,
       row: row,
@@ -421,7 +421,7 @@ export default class Column {
    * @returns {Cell}
    */
   headerCell() {
-    return scout.create('Cell', {
+    return scout.create(Cell, {
       value: this.text,
       text: this.text,
       iconId: this.headerIconId,
@@ -683,7 +683,7 @@ export default class Column {
 
   createAggrGroupCell(row) {
     let cell = this.cell(row);
-    return this.initCell(scout.create('Cell', {
+    return this.initCell(scout.create(Cell, {
       // value necessary for value based columns (e.g. checkbox column)
       value: cell.value,
       text: this.cellTextForGrouping(row),
@@ -701,7 +701,7 @@ export default class Column {
   }
 
   createAggrEmptyCell() {
-    return this.initCell(scout.create('Cell', {
+    return this.initCell(scout.create(Cell, {
       empty: true,
       cssClass: 'table-aggregate-cell'
     }));
@@ -728,7 +728,7 @@ export default class Column {
    */
   createTableHeaderMenu(tableHeader) {
     let $header = this.$header;
-    return scout.create('TableHeaderMenu', {
+    return scout.create(TableHeaderMenu, {
       parent: tableHeader,
       column: $header.data('column'),
       tableHeader: tableHeader,
@@ -772,8 +772,12 @@ export default class Column {
     field.setDisplayText(cell.text);
   }
 
-  _createEditor() {
-    return scout.create('StringField', {
+  /**
+   * @param {TableRow} row
+   * @returns {FormField}
+   */
+  _createEditor(row) {
+    return scout.create(StringField, {
       parent: this.table,
       maxLength: this.maxLength,
       multilineText: this.table.multilineText,

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Form, HtmlComponent, RowLayout} from '../index';
+import {Form, HtmlComponent, PageTileGrid, RowLayout} from '../index';
 
 export default class TileOverviewForm extends Form {
   constructor() {
@@ -71,7 +71,7 @@ export default class TileOverviewForm extends Form {
   }
 
   _createPageTileGrid() {
-    return scout.create('PageTileGrid', {
+    return scout.create(PageTileGrid, {
       parent: this,
       outline: this.outline,
       nodes: this.nodes

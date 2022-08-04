@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../../src/index';
+import {scout, ViewButton, ViewButtonBox} from '../../../src/index';
 
 describe('ViewButtonBox', () => {
   let session;
@@ -22,9 +22,9 @@ describe('ViewButtonBox', () => {
     let viewButtonBox;
 
     beforeEach(() => {
-      viewButtonBox = scout.create('ViewButtonBox', {
+      viewButtonBox = scout.create(ViewButtonBox, {
         parent: session.desktop,
-        viewButtons: [scout.create('ViewButton', {
+        viewButtons: [scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
           displayStyle: 'MENU',
@@ -35,13 +35,13 @@ describe('ViewButtonBox', () => {
 
     it('is only visible if there are at least 2 visible view buttons with displayStyle == "MENU"', () => {
       let viewButtons = [
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
           displayStyle: 'MENU',
           visible: true
         }),
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button2',
           displayStyle: 'MENU',
@@ -82,14 +82,14 @@ describe('ViewButtonBox', () => {
     let viewButtonBox;
 
     beforeEach(() => {
-      viewButtonBox = scout.create('ViewButtonBox', {
+      viewButtonBox = scout.create(ViewButtonBox, {
         parent: session.desktop
       });
     });
 
     it('will be rendered as view tab when only one button with displayStyle == "MENU"', () => {
       let viewButtons = [
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
           displayStyle: 'MENU',
@@ -109,13 +109,13 @@ describe('ViewButtonBox', () => {
      */
     it('will be rendered as menuButtons when two button with displayStyle == "MENU"', () => {
       let viewButtons = [
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
           displayStyle: 'MENU',
           visible: true
         }),
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button2',
           displayStyle: 'MENU',
@@ -131,13 +131,13 @@ describe('ViewButtonBox', () => {
 
     it('will be rendered correctly when displayStyle changes dynamically.', () => {
       let viewButtons = [
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
           displayStyle: 'MENU',
           visible: true
         }),
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button2',
           displayStyle: 'MENU',
@@ -158,13 +158,13 @@ describe('ViewButtonBox', () => {
 
     it('will be rendered correctly when visibility changes dynamically.', () => {
       let viewButtons = [
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
           displayStyle: 'MENU',
           visible: true
         }),
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button2',
           displayStyle: 'MENU',
@@ -185,18 +185,18 @@ describe('ViewButtonBox', () => {
 
     it('will remember the current view button when selecting another tab', () => {
       let viewButtons = [
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button1',
           displayStyle: 'MENU',
           selected: true
         }),
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button2',
           displayStyle: 'MENU'
         }),
-        scout.create('ViewButton', {
+        scout.create(ViewButton, {
           parent: session.desktop,
           text: 'Button3',
           displayStyle: 'TAB'

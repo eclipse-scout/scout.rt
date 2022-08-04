@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, scout, Status} from '../../../../src/index';
+import {Device, FileChooserField, scout, Status} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 
 describe('FileChooserField', () => {
@@ -110,7 +110,7 @@ describe('FileChooserField', () => {
   describe('label', () => {
 
     it('is linked with the field', () => {
-      let field = scout.create('FileChooserField', {
+      let field = scout.create(FileChooserField, {
         parent: session.desktop,
         label: 'label'
       });
@@ -120,7 +120,7 @@ describe('FileChooserField', () => {
     });
 
     it('focuses the field when clicked', () => {
-      let field = scout.create('FileChooserField', {
+      let field = scout.create(FileChooserField, {
         parent: session.desktop,
         label: 'label'
       });

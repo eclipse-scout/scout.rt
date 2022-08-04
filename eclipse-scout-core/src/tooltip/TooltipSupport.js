@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, tooltips} from '../index';
+import {scout, Tooltip, tooltips} from '../index';
 import $ from 'jquery';
 
 export default class TooltipSupport {
@@ -124,7 +124,7 @@ export default class TooltipSupport {
         text: text,
         htmlEnabled: htmlEnabled
       });
-      this._tooltip = scout.create('Tooltip', options);
+      this._tooltip = scout.create(Tooltip, options);
       this._tooltip.render(options.$parent);
     }
   }

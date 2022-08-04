@@ -23,30 +23,10 @@ describe('GroupBox', () => {
     cloneHelper = new CloneSpecHelper();
   });
 
-  function createField(model, parent) {
-    let field = new GroupBox();
-    model.session = session;
-    model.parent = parent || session.desktop;
-    field.init(model);
-    return field;
-  }
-
-  function expectEnabled(field, expectedEnabled, expectedEnabledComputed, hasClass) {
-    expect(field.enabled).toBe(expectedEnabled);
-    expect(field.enabledComputed).toBe(expectedEnabledComputed);
-    if (hasClass) {
-      if (field.$field) {
-        expect(field.$field).toHaveClass(hasClass);
-      } else {
-        expect(field.$container).toHaveClass(hasClass);
-      }
-    }
-  }
-
   describe('clone', () => {
 
     it('considers the clone properties and deep clones fields and menus', () => {
-      let groupBox = scout.create('GroupBox', {
+      let groupBox = scout.create(GroupBox, {
         parent: session.desktop,
         id: 'gb01',
         subLabel: 'abc',
@@ -86,7 +66,7 @@ describe('GroupBox', () => {
 
     it('does not render the cloned box', () => {
       let clone,
-        groupBox = scout.create('GroupBox', {
+        groupBox = scout.create(GroupBox, {
           parent: session.desktop,
           id: 'gb01',
           subLabel: 'abc',

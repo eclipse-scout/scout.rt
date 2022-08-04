@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Range, scout} from '../../src/index';
+import {Group, Range, scout, Tile, TileAccordion, TileGrid} from '../../src/index';
 
 describe('VirtualTileGrid', () => {
   let session;
@@ -33,7 +33,7 @@ describe('VirtualTileGrid', () => {
       gridColumnCount: 2
     };
     model = $.extend({}, defaults, model);
-    return scout.create('TileGrid', model);
+    return scout.create(TileGrid, model);
   }
 
   function createTile(model) {
@@ -41,7 +41,7 @@ describe('VirtualTileGrid', () => {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create('Tile', model);
+    return scout.create(Tile, model);
   }
 
   describe('virtual', () => {
@@ -697,17 +697,17 @@ describe('VirtualTileGrid', () => {
         scrollable: false
       });
       tileGrid1.tiles[tileGrid1.tiles.length - 1].label = tileToSearchLabel;
-      let group0 = scout.create('Group', {
+      let group0 = scout.create(Group, {
         parent: session.desktop,
         body: tileGrid0,
         headerVisible: false
       });
-      let group1 = scout.create('Group', {
+      let group1 = scout.create(Group, {
         parent: session.desktop,
         body: tileGrid1,
         headerVisible: false
       });
-      let accordion = scout.create('TileAccordion', {
+      let accordion = scout.create(TileAccordion, {
         parent: session.desktop,
         groups: [group0, group1],
         tileGridLayoutConfig: {
@@ -747,11 +747,11 @@ describe('VirtualTileGrid', () => {
         viewRangeSize: 1,
         scrollable: false
       });
-      let group = scout.create('Group', {
+      let group = scout.create(Group, {
         parent: session.desktop,
         body: tileGrid
       });
-      let accordion = scout.create('TileAccordion', {
+      let accordion = scout.create(TileAccordion, {
         parent: session.desktop,
         groups: [group]
       });

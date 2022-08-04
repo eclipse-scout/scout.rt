@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper} from '../../src/testing/index';
-import {scout, StringField} from '../../src/index';
+import {scout, StringField, WidgetTooltip} from '../../src/index';
 
 describe('scout.WidgetTooltipSpec', () => {
 
@@ -31,7 +31,7 @@ describe('scout.WidgetTooltipSpec', () => {
   });
 
   it('can create and hold a widget', () => {
-    let tooltip = scout.create('WidgetTooltip', {
+    let tooltip = scout.create(WidgetTooltip, {
       parent: session.desktop,
       $anchor: session.desktop.$container,
       widget: {

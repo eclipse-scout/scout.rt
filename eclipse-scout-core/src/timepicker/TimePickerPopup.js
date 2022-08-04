@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, HtmlComponent, Popup, scout, TimePickerPopupLayout} from '../index';
+import {FormField, HtmlComponent, Popup, scout, TimePicker, TimePickerPopupLayout} from '../index';
 
 export default class TimePickerPopup extends Popup {
 
@@ -23,7 +23,7 @@ export default class TimePickerPopup extends Popup {
     options.withFocusContext = false;
     super._init(options);
 
-    this.picker = scout.create('TimePicker', {
+    this.picker = scout.create(TimePicker, {
       parent: this,
       timeResolution: options.timeResolution
     });

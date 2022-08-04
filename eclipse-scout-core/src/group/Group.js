@@ -142,7 +142,7 @@ export default class Group extends Widget {
       this._updateIconStyle();
       return;
     }
-    this.icon = scout.create('Icon', {
+    this.icon = scout.create(Icon, {
       parent: this,
       iconDesc: iconId,
       prepend: true
@@ -232,7 +232,7 @@ export default class Group extends Widget {
   _setBody(body) {
     if (!body) {
       // Create empty body if no body was provided
-      body = scout.create('Widget', {
+      body = scout.create(Widget, {
         parent: this,
         _render: function() {
           this.$container = this.$parent.appendDiv('group');

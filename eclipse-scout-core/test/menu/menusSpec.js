@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {menus, scout} from '../../src/index';
+import {Menu, menus, scout} from '../../src/index';
 import {MenuSpecHelper} from '../../src/testing/index';
 
 describe('menus', () => {
@@ -109,11 +109,11 @@ describe('menus', () => {
 
   describe('updateSeparatorVisibility', () => {
     it('makes leading separators invisible', () => {
-      let menu1 = scout.create('Menu', {
+      let menu1 = scout.create(Menu, {
         parent: session.desktop,
         separator: true
       });
-      let menu2 = scout.create('Menu', {
+      let menu2 = scout.create(Menu, {
         parent: session.desktop
       });
       let items = [menu1, menu2];
@@ -123,10 +123,10 @@ describe('menus', () => {
     });
 
     it('makes trailing separators invisible', () => {
-      let menu1 = scout.create('Menu', {
+      let menu1 = scout.create(Menu, {
         parent: session.desktop
       });
-      let menu2 = scout.create('Menu', {
+      let menu2 = scout.create(Menu, {
         parent: session.desktop,
         separator: true
       });
@@ -137,18 +137,18 @@ describe('menus', () => {
     });
 
     it('makes duplicate separators invisible', () => {
-      let menu0 = scout.create('Menu', {
+      let menu0 = scout.create(Menu, {
         parent: session.desktop
       });
-      let menu1 = scout.create('Menu', {
+      let menu1 = scout.create(Menu, {
         parent: session.desktop,
         separator: true
       });
-      let menu2 = scout.create('Menu', {
+      let menu2 = scout.create(Menu, {
         parent: session.desktop,
         separator: true
       });
-      let menu3 = scout.create('Menu', {
+      let menu3 = scout.create(Menu, {
         parent: session.desktop
       });
       let items = [menu0, menu1, menu2, menu3];
@@ -160,11 +160,11 @@ describe('menus', () => {
     });
 
     it('makes all separators invisible if there are no other visible menus', () => {
-      let menu0 = scout.create('Menu', {
+      let menu0 = scout.create(Menu, {
         parent: session.desktop,
         separator: true
       });
-      let menu1 = scout.create('Menu', {
+      let menu1 = scout.create(Menu, {
         parent: session.desktop,
         separator: true
       });
@@ -175,15 +175,15 @@ describe('menus', () => {
     });
 
     it('reverts to old state if sibling menus get visible', () => {
-      let menu0 = scout.create('Menu', {
+      let menu0 = scout.create(Menu, {
         parent: session.desktop,
         visible: false
       });
-      let menu1 = scout.create('Menu', {
+      let menu1 = scout.create(Menu, {
         parent: session.desktop,
         separator: true
       });
-      let menu2 = scout.create('Menu', {
+      let menu2 = scout.create(Menu, {
         parent: session.desktop
       });
       let items = [menu0, menu1, menu2];
@@ -200,33 +200,33 @@ describe('menus', () => {
     });
 
     it('considers all rules', () => {
-      let menu0 = scout.create('Menu', {
+      let menu0 = scout.create(Menu, {
         parent: session.desktop,
         visible: false
       });
-      let menu1 = scout.create('Menu', {
+      let menu1 = scout.create(Menu, {
         parent: session.desktop,
         separator: true
       });
-      let menu2 = scout.create('Menu', {
+      let menu2 = scout.create(Menu, {
         parent: session.desktop,
         separator: true
       });
-      let menu3 = scout.create('Menu', {
+      let menu3 = scout.create(Menu, {
         parent: session.desktop
       });
-      let menu4 = scout.create('Menu', {
+      let menu4 = scout.create(Menu, {
         parent: session.desktop,
         separator: true
       });
-      let menu5 = scout.create('Menu', {
+      let menu5 = scout.create(Menu, {
         parent: session.desktop
       });
-      let menu6 = scout.create('Menu', {
+      let menu6 = scout.create(Menu, {
         parent: session.desktop,
         separator: true
       });
-      let menu7 = scout.create('Menu', {
+      let menu7 = scout.create(Menu, {
         parent: session.desktop,
         visible: false
       });

@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {TableSpecHelper} from '../../src/testing/index';
+import {Menu} from '../../src';
 
 describe('TableHeaderSpec', () => {
   let session;
@@ -48,7 +49,7 @@ describe('TableHeaderSpec', () => {
 
   it('hiddenByUi', () => {
     let table = helper.createTableWithOneColumn();
-    table.setMenus([scout.create('Menu', { // fake header menu required to properly calculate visibility
+    table.setMenus([scout.create(Menu, { // fake header menu required to properly calculate visibility
       parent: table,
       text: 'Foo',
       menuTypes: ['Table.Header']

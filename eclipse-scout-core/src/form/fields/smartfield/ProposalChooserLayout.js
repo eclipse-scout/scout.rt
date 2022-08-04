@@ -8,29 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, HtmlComponent, scout, scrollbars} from '../../../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent, scrollbars} from '../../../index';
 
 export default class ProposalChooserLayout extends AbstractLayout {
 
-  constructor(proposalChooser) {
+  constructor(proposalChooser, layoutResetter) {
     super();
     this._proposalChooser = proposalChooser;
-    this._typeHandler = this._createTypeHandler(proposalChooser);
-  }
-
-  /**
-   * This factory creates type handlers for the various proposal types. By default we support Table and Tree.
-   * If one must support other types, a LayoutResetter class must be implemented for that type.
-   */
-  _createTypeHandler(proposalChooser) {
-    let handlerObjectType = proposalChooser.model.objectType + 'LayoutResetter';
-    return scout.create(handlerObjectType, proposalChooser.model);
+    this._layoutResetter = layoutResetter;
   }
 
   layout($container) {
     let filterPrefSize,
       htmlContainer = HtmlComponent.get($container),
-      htmlComp = HtmlComponent.get($container.children(this._typeHandler.cssSelector)),
+      htmlComp = HtmlComponent.get($container.children(this._layoutResetter.cssSelector)),
       size = htmlContainer.size().subtract(htmlContainer.insets()),
       $status = this._proposalChooser.$status,
       hasStatus = $status && $status.isVisible(),
@@ -72,7 +63,7 @@ export default class ProposalChooserLayout extends AbstractLayout {
     pcHeight = $container.css('height');
 
     $container.detach();
-    this._typeHandler.modifyDom();
+    this._layoutResetter.modifyDom();
     $container
       .css('display', 'inline-block')
       .css('width', 'auto')
@@ -83,7 +74,7 @@ export default class ProposalChooserLayout extends AbstractLayout {
     }).width;
 
     $container.detach();
-    this._typeHandler.restoreDom();
+    this._layoutResetter.restoreDom();
     $container
       .css('display', 'block')
       .css('width', pcWidth)

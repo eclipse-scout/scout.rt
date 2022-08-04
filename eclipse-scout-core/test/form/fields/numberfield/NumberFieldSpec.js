@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, LocaleSpecHelper} from '../../../../src/testing/index';
-import {DecimalFormat, scout, Status} from '../../../../src/index';
+import {DecimalFormat, NumberField, scout, Status} from '../../../../src/index';
 
 describe('NumberField', () => {
   let session;
@@ -549,7 +549,7 @@ describe('NumberField', () => {
   describe('label', () => {
 
     it('is linked with the field', () => {
-      let field = scout.create('NumberField', {
+      let field = scout.create(NumberField, {
         parent: session.desktop,
         label: 'label'
       });
@@ -559,7 +559,7 @@ describe('NumberField', () => {
     });
 
     it('focuses the field when clicked', () => {
-      let field = scout.create('NumberField', {
+      let field = scout.create(NumberField, {
         parent: session.desktop,
         label: 'label'
       });

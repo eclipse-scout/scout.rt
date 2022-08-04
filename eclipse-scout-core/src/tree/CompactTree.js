@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompactTreeDownKeyStroke, CompactTreeLeftKeyStroke, CompactTreeRightKeyStroke, CompactTreeUpKeyStroke, HtmlComponent, MenuItemsOrder, Range, scout, Tree, TreeLayout} from '../index';
+import {arrays, CompactTreeDownKeyStroke, CompactTreeLeftKeyStroke, CompactTreeNode, CompactTreeRightKeyStroke, CompactTreeUpKeyStroke, HtmlComponent, MenuBar, MenuItemsOrder, Range, scout, Tree, TreeLayout} from '../index';
 
 export default class CompactTree extends Tree {
 
@@ -33,7 +33,7 @@ export default class CompactTree extends Tree {
   _createTreeNode(nodeModel) {
     nodeModel = scout.nvl(nodeModel, {});
     nodeModel.parent = this;
-    return scout.create('CompactTreeNode', nodeModel);
+    return scout.create(CompactTreeNode, nodeModel);
   }
 
   _render() {
@@ -47,7 +47,7 @@ export default class CompactTree extends Tree {
     this._installScrollbars({
       borderless: true
     });
-    this.menuBar = scout.create('MenuBar', {
+    this.menuBar = scout.create(MenuBar, {
       parent: this,
       menuOrder: new MenuItemsOrder(this.session, 'Tree')
     });

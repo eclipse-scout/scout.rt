@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {codes, scout} from '../../src/index';
+import {CodeLookupCall, codes, CodeType, scout} from '../../src/index';
 
 describe('CodeLookupCall', () => {
   let session, codeType123;
@@ -17,7 +17,7 @@ describe('CodeLookupCall', () => {
     setFixtures(sandbox());
     session = sandboxSession();
     codes.registry = {};
-    codeType123 = scout.create('CodeType', {
+    codeType123 = scout.create(CodeType, {
       id: 'codeType.123',
       codes: [{
         id: 'code.1',
@@ -41,7 +41,7 @@ describe('CodeLookupCall', () => {
   });
 
   function createLookupCall(codeType) {
-    return scout.create('CodeLookupCall', {
+    return scout.create(CodeLookupCall, {
       session: session,
       codeType: codeType.id
     });

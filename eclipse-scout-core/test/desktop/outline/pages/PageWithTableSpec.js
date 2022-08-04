@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {arrays, Outline, PageWithTable, scout, StaticLookupCall} from '../../../../src/index';
+import {arrays, Page, PageWithTable, scout, StaticLookupCall} from '../../../../src/index';
 import {OutlineSpecHelper} from '../../../../src/testing/index';
 
 describe('PageWithTable', () => {
@@ -27,7 +27,7 @@ describe('PageWithTable', () => {
     helper = new OutlineSpecHelper(session);
     outline = helper.createOutline();
 
-    page = scout.create('PageWithTable', {
+    page = scout.create(PageWithTable, {
       parent: outline,
       detailTable: {
         objectType: 'Table'
@@ -88,7 +88,7 @@ describe('PageWithTable', () => {
 
     class SamplePageWithTable extends PageWithTable {
       createChildPage(row) {
-        return scout.create('Page', {
+        return scout.create(Page, {
           parent: this.getOutline()
         });
       }

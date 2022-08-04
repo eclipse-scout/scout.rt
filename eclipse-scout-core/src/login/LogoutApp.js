@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, ObjectFactory, scout, texts} from '../index';
+import {App, LogoutBox, ObjectFactory, scout, texts} from '../index';
 import $ from 'jquery';
 
 export default class LogoutApp extends App {
@@ -49,7 +49,7 @@ export default class LogoutApp extends App {
     options.texts = $.extend({}, texts.readFromDOM(), options.texts);
     this._prepareDOM();
 
-    let logoutBox = scout.create('LogoutBox', options);
+    let logoutBox = scout.create(LogoutBox, options);
     logoutBox.render($('body').addClass('logout-body'));
   }
 }

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModelAdapter, objects, scout} from '../index';
+import {ModelAdapter, objects, RemoteTileFilter, scout} from '../index';
 
 export default class TileGridAdapter extends ModelAdapter {
 
@@ -33,7 +33,7 @@ export default class TileGridAdapter extends ModelAdapter {
     super._initProperties(model);
     if (!objects.isNullOrUndefined(model.filteredTiles)) {
       // If filteredTiles is set a server side filter is active -> add a tile filter on JS side as well
-      this.tileFilter = scout.create('RemoteTileFilter', {
+      this.tileFilter = scout.create(RemoteTileFilter, {
         tileIds: model.filteredTiles
       });
       model.filters = [this.tileFilter];
@@ -48,7 +48,7 @@ export default class TileGridAdapter extends ModelAdapter {
     // -> If filteredTiles is an empty array, the server side filter rejects every tile
     if (!objects.isNullOrUndefined(tileIds)) {
       if (!this.tileFilter) {
-        this.tileFilter = scout.create('RemoteTileFilter');
+        this.tileFilter = scout.create(RemoteTileFilter);
         this.widget.addFilter(this.tileFilter, false);
       }
       this.tileFilter.setTileIds(tileIds);

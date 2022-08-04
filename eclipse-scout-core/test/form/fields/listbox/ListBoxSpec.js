@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ListBox, QueryBy, scout, Status} from '../../../../src/index';
+import {ListBox, LookupRow, QueryBy, scout, Status} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
 
 describe('ListBox', () => {
@@ -35,17 +35,9 @@ describe('ListBox', () => {
       parent: session.desktop,
       lookupCall: lookupCallModel
     }, model);
-    let box = scout.create('ListBox', model);
+    let box = scout.create(ListBox, model);
     box.render();
     return box;
-  }
-
-  function createListBoxWithAdapter() {
-    let model = helper.createFieldModel('ListBox');
-    let listBox = new ListBox();
-    listBox.init(model);
-    linkWidgetAndAdapter(listBox, 'ListBoxAdapter');
-    return listBox;
   }
 
   describe('general behavior', () => {
@@ -61,7 +53,7 @@ describe('ListBox', () => {
     });
 
     it('LookupCall can be prepared if value is set explicitly', done => {
-      let box = scout.create('ListBox', {
+      let box = scout.create(ListBox, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
@@ -72,7 +64,7 @@ describe('ListBox', () => {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
       })
         .catch(fail)
         .always(done);
@@ -80,7 +72,7 @@ describe('ListBox', () => {
     });
 
     it('LookupCall can be prepared if value is configured', done => {
-      let box = scout.create('ListBox', {
+      let box = scout.create(ListBox, {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall',
         value: 3
@@ -92,7 +84,7 @@ describe('ListBox', () => {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(event => {
-        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+        expect(event.lookupCall instanceof DummyLookupCall).toBe(true);
         expect(box.getCheckedLookupRows().length).toBe(1);
       })
         .catch(fail)
@@ -202,7 +194,7 @@ describe('ListBox', () => {
       expect(field.table.rows.length).toBe(5);
       expect(field.table.checkedRows().length).toBe(2);
 
-      let newLookupCall = scout.create('DummyLookupCall', {
+      let newLookupCall = scout.create(DummyLookupCall, {
         session: session
       });
       field.setLookupCall(newLookupCall);
@@ -221,7 +213,7 @@ describe('ListBox', () => {
       let field = createFieldWithLookupCall({}, {
         customProperty: templatePropertyValue,
         _dataToLookupRow: function(data) { // overwrite mapping function to use the custom property
-          return scout.create('LookupRow', {
+          return scout.create(LookupRow, {
             key: data[0],
             text: data[1] + this.customProperty
           });
@@ -321,7 +313,7 @@ describe('ListBox', () => {
     let lookupCall;
 
     beforeEach(() => {
-      lookupCall = scout.create('DummyLookupCall', {
+      lookupCall = scout.create(DummyLookupCall, {
         session: session
       });
     });
@@ -330,7 +322,7 @@ describe('ListBox', () => {
       let model = helper.createFieldModel('ListBox', session.desktop, {
         lookupCall: lookupCall
       });
-      let listBox = scout.create('ListBox', model);
+      let listBox = scout.create(ListBox, model);
       expect(listBox.displayText).toBe('');
       listBox.setValue([1]);
       jasmine.clock().tick(300);
@@ -346,7 +338,7 @@ describe('ListBox', () => {
       let model = helper.createFieldModel('ListBox', session.desktop, {
         lookupCall: lookupCall
       });
-      let listBox = scout.create('ListBox', model);
+      let listBox = scout.create(ListBox, model);
       expect(listBox.displayText).toBe('');
 
       listBox.setValue(null);
@@ -365,7 +357,7 @@ describe('ListBox', () => {
   describe('label', () => {
 
     it('is linked with the field', () => {
-      let listBox = scout.create('ListBox', {
+      let listBox = scout.create(ListBox, {
         parent: session.desktop
       });
       listBox.render();

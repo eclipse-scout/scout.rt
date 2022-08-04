@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {menus, scout} from '../index';
+import {Menu, menus, scout} from '../index';
 
 export default class MenuItemsOrder {
 
@@ -75,7 +75,7 @@ export default class MenuItemsOrder {
    * The createdBy property is added to the model to find and destroy items added by the UI later.
    */
   _createSeparator() {
-    return scout.create('Menu', {
+    return scout.create(Menu, {
       parent: this.menuBar,
       createdBy: this,
       separator: true

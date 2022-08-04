@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tooltip} from '../index';
+import {Menu, Tooltip} from '../index';
 
 export default class TableInfoLoadTooltip extends Tooltip {
 
@@ -19,7 +19,7 @@ export default class TableInfoLoadTooltip extends Tooltip {
   _init(options) {
     super._init(options);
     this.tableFooter = options.tableFooter;
-    let reloadDataMenu = scout.create('Menu', {
+    let reloadDataMenu = scout.create(Menu, {
       parent: this,
       text: this.session.text('ui.ReloadData')
     });

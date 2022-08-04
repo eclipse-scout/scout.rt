@@ -12,7 +12,7 @@
  * jQuery plugin with scout extensions
  */
 import $ from 'jquery';
-import {arrays, Device, Dimension, events, IconDesc, icons, objects, scout, strings} from '../index';
+import {arrays, Device, Dimension, events, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
 
 /**
  * By using $ in jsdoc all the functions is this file are recognized as part of $.
@@ -1451,7 +1451,7 @@ $.fn.resizable = function(model) {
     // Already resizable
     return this;
   }
-  resizable = scout.create('Resizable', $.extend(model, {$container: $this}));
+  resizable = scout.create(Resizable, $.extend(model, {$container: $this}));
   $this.data('resizable', resizable);
   return this;
 };

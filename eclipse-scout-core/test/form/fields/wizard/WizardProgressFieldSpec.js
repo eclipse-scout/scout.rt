@@ -25,7 +25,7 @@ describe('WizardProgressField', () => {
   describe('rendering', () => {
 
     it('must evaluate activeStepIndex for action-enabled class', () => {
-      field = scout.create('WizardProgressField', {
+      field = scout.create(WizardProgressField, {
         parent: session.desktop
       });
       spyOn(field, '_onStepClick').and.callThrough();

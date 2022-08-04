@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons, scout} from '../../src/index';
+import {Icon, icons, scout} from '../../src/index';
 
 describe('Icon', () => {
 
@@ -22,7 +22,7 @@ describe('Icon', () => {
   describe('render', () => {
 
     it('creates a span if it is a font icon', () => {
-      let icon = scout.create('Icon', {
+      let icon = scout.create(Icon, {
         parent: session.desktop,
         iconDesc: icons.INFO
       });
@@ -31,7 +31,7 @@ describe('Icon', () => {
     });
 
     it('creates an img if it is an image icon', () => {
-      let icon = scout.create('Icon', {
+      let icon = scout.create(Icon, {
         parent: session.desktop,
         iconDesc: 'icon/image.png'
       });
@@ -44,7 +44,7 @@ describe('Icon', () => {
   describe('setIconDesc', () => {
 
     it('accepts a string representing the iconId', () => {
-      let icon = scout.create('Icon', {
+      let icon = scout.create(Icon, {
         parent: session.desktop,
         iconDesc: 'icon/image.png'
       });
@@ -55,7 +55,7 @@ describe('Icon', () => {
     });
 
     it('accepts a scout.IconDesc', () => {
-      let icon = scout.create('Icon', {
+      let icon = scout.create(Icon, {
         parent: session.desktop,
         iconDesc: icons.parseIconId('icon/image.png')
       });

@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {scout} from '../../src/index';
+import {ActiveDummyLookupCall} from '../../src/testing';
 
 describe('StaticLookupCall', () => {
 
@@ -27,7 +28,7 @@ describe('StaticLookupCall', () => {
   });
 
   it('filter: active only (default)', done => {
-    let lookupCall = scout.create('ActiveDummyLookupCall', {
+    let lookupCall = scout.create(ActiveDummyLookupCall, {
       session: session
     });
 
@@ -44,7 +45,7 @@ describe('StaticLookupCall', () => {
   });
 
   it('filter: inactive only', done => {
-    let lookupCall = scout.create('ActiveDummyLookupCall', {
+    let lookupCall = scout.create(ActiveDummyLookupCall, {
       session: session,
       active: false
     });
@@ -58,7 +59,7 @@ describe('StaticLookupCall', () => {
   });
 
   it('filter: all', done => {
-    let lookupCall = scout.create('ActiveDummyLookupCall', {
+    let lookupCall = scout.create(ActiveDummyLookupCall, {
       session: session,
       active: null // = all
     });

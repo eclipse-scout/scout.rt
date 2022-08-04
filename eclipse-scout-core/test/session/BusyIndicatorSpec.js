@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../src/index';
+import {BusyIndicator, scout} from '../../src/index';
 
 describe('BusyIndicator', () => {
-  let helper, session;
+  let session;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -20,7 +20,7 @@ describe('BusyIndicator', () => {
 
   describe('render', () => {
     it('uses entry point as parent if no $parent is provided', () => {
-      let busyIndicator = scout.create('BusyIndicator', {
+      let busyIndicator = scout.create(BusyIndicator, {
         parent: session.desktop,
         showTimeout: 0
       });
@@ -31,7 +31,7 @@ describe('BusyIndicator', () => {
 
     it('uses $parent as parent if provided', () => {
       let $parent = session.$entryPoint.appendDiv();
-      let busyIndicator = scout.create('BusyIndicator', {
+      let busyIndicator = scout.create(BusyIndicator, {
         parent: session.desktop,
         showTimeout: 0
       });

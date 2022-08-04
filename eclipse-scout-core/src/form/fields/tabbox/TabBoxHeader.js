@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GroupBoxMenuItemsOrder, HtmlComponent, scout, TabBoxHeaderLayout, Widget} from '../../../index';
+import {GroupBoxMenuItemsOrder, HtmlComponent, MenuBar, scout, TabArea, TabBoxHeaderLayout, Widget} from '../../../index';
 
 export default class TabBoxHeader extends Widget {
 
@@ -28,13 +28,13 @@ export default class TabBoxHeader extends Widget {
   _init(options) {
     super._init(options);
 
-    this.tabArea = scout.create('TabArea', {
+    this.tabArea = scout.create(TabArea, {
       parent: this,
       tabBox: this.tabBox
     });
     this.tabArea.on('propertyChange', this._tabAreaPropertyChangeHandler);
 
-    this.menuBar = scout.create('MenuBar', {
+    this.menuBar = scout.create(MenuBar, {
       parent: this,
       menuOrder: new GroupBoxMenuItemsOrder()
     });

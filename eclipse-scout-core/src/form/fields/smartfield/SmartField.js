@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, fields, FormField, InputFieldKeyStrokeContext, keys, LookupCall, objects, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldLayout, Status, strings, ValueField} from '../../../index';
+import {arrays, CodeLookupCall, Device, fields, FormField, InputFieldKeyStrokeContext, keys, LookupCall, MaxLengthHandler, objects, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldLayout, Status, strings, TreeProposalChooser, ValueField} from '../../../index';
 import $ from 'jquery';
 
 export default class SmartField extends ValueField {
@@ -47,7 +47,7 @@ export default class SmartField extends ValueField {
     this.initActiveFilter = null;
     this.disabledCopyOverlay = true;
     this.maxLength = 500;
-    this.maxLengthHandler = scout.create('MaxLengthHandler', {target: this});
+    this.maxLengthHandler = scout.create(MaxLengthHandler, {target: this});
 
     this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
       'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors',
@@ -485,7 +485,7 @@ export default class SmartField extends ValueField {
 
     if (this.browseHierarchy) {
       // tree (hierarchical)
-      let proposalChooser = scout.create('TreeProposalChooser', {
+      let proposalChooser = scout.create(TreeProposalChooser, {
         parent: this,
         smartField: this
       });
@@ -607,7 +607,7 @@ export default class SmartField extends ValueField {
     if (!codeType) {
       return;
     }
-    let lookupCall = scout.create('CodeLookupCall', {
+    let lookupCall = scout.create(CodeLookupCall, {
       session: this.session,
       codeType: codeType
     });

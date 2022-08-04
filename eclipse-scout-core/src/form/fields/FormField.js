@@ -8,28 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  arrays,
-  clipboard,
-  Device,
-  dragAndDrop,
-  Event,
-  fields,
-  FormFieldLayout,
-  GridData,
-  GroupBox,
-  HtmlComponent,
-  KeyStrokeContext,
-  LoadingSupport,
-  menus as menuUtil,
-  objects,
-  scout,
-  Status,
-  strings,
-  styles,
-  tooltips,
-  Widget
-} from '../../index';
+import {arrays, clipboard, ContextMenuPopup, Device, dragAndDrop, Event, fields, FieldStatus, FormFieldLayout, GridData, GroupBox, HtmlComponent, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, objects, scout, Status, strings, styles, tooltips, Widget} from '../../index';
 import $ from 'jquery';
 
 /**
@@ -634,7 +613,7 @@ export default class FormField extends Widget {
       autoRemove = !status.isError();
       menus = this._getMenusForStatus(errorStatus);
     } else if (this.hasStatusTooltip()) {
-      status = scout.create('Status', {
+      status = scout.create(Status, {
         message: this.tooltipText,
         severity: Status.Severity.INFO
       });
@@ -1119,7 +1098,7 @@ export default class FormField extends Widget {
     if (this.fieldStatus) {
       return;
     }
-    this.fieldStatus = scout.create('FieldStatus', {
+    this.fieldStatus = scout.create(FieldStatus, {
       parent: this,
       position: this.statusPosition,
       // This will be done by _updateFieldStatus again, but doing it here prevents unnecessary layout invalidations later on
@@ -1356,7 +1335,7 @@ export default class FormField extends Widget {
       return;
     }
 
-    let menu = scout.create('Menu', {
+    let menu = scout.create(Menu, {
       parent: this,
       text: this.session.text('ui.Copy'),
       inheritAccessibility: false
@@ -1365,7 +1344,7 @@ export default class FormField extends Widget {
       this.exportToClipboard();
     });
 
-    let popup = scout.create('ContextMenuPopup', {
+    let popup = scout.create(ContextMenuPopup, {
       parent: this,
       menuItems: [menu],
       cloneMenuItems: false,

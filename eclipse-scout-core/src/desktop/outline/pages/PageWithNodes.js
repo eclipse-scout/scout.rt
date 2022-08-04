@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuBar, Page, scout} from '../../../index';
+import {Column, MenuBar, Page, scout, Table, TableRow} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -27,11 +27,11 @@ export default class PageWithNodes extends Page {
    * @override Page.js
    */
   _createDetailTable() {
-    let nodeColumn = scout.create('Column', {
+    let nodeColumn = scout.create(Column, {
       id: 'NodeColumn',
       session: this.session
     });
-    let table = scout.create('Table', {
+    let table = scout.create(Table, {
       parent: this.parent,
       id: 'PageWithNodesTable',
       autoResizeColumns: true,
@@ -68,7 +68,7 @@ export default class PageWithNodes extends Page {
 
   _createTableRowsForChildPages(childPages) {
     return childPages.map(function(childPage) {
-      let row = scout.create('TableRow', {
+      let row = scout.create(TableRow, {
         parent: this.detailTable,
         cells: [childPage.text]
       });
