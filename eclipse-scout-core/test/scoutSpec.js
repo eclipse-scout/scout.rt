@@ -158,12 +158,47 @@ describe('main', () => {
 
   describe('create', () => {
 
-    it('accepts string or object as first argument', () => {
+    it('accepts string as first argument', () => {
+      let menu = scout.create('Menu', {
+        parent: new NullWidget(),
+        session: session
+      });
+      expect(menu instanceof Menu).toBe(true);
+    });
+
+    it('accepts class reference as first argument', () => {
+      let menu = scout.create(Menu, {
+        parent: new NullWidget(),
+        session: session
+      });
+      expect(menu instanceof Menu).toBe(true);
+    });
+
+    it('accepts object with objectType as first argument', () => {
+      let menu = scout.create({
+        parent: new NullWidget(),
+        session: session,
+        objectType: 'Menu'
+      });
+      expect(menu instanceof Menu).toBe(true);
+    });
+
+    it('accepts object with objectType as class reference as first argument', () => {
+      let menu = scout.create({
+        parent: new NullWidget(),
+        session: session,
+        objectType: Menu
+      });
+      expect(menu instanceof Menu).toBe(true);
+    });
+
+    it('throws when first argument is invalid', () => {
       // must fail
       expect(() => {
         scout.create(1);
       }).toThrow();
       expect(() => {
+        // noinspection JSCheckFunctionSignatures
         scout.create();
       }).toThrow();
       expect(() => {
@@ -173,19 +208,6 @@ describe('main', () => {
         scout.create(() => {
         });
       }).toThrow();
-
-      let menu = scout.create('Menu', {
-        parent: new NullWidget(),
-        session: session
-      });
-      expect(menu instanceof Menu).toBe(true);
-
-      menu = scout.create({
-        parent: new NullWidget(),
-        session: session,
-        objectType: 'Menu'
-      });
-      expect(menu instanceof Menu).toBe(true);
     });
 
     it('creates a new initialized widget with parent and session set', () => {
@@ -200,7 +222,7 @@ describe('main', () => {
       expect(widget.session).toBe(session);
     });
 
-    describe('creates local object if first parameter is the objectType', () => {
+    describe('local object', () => {
 
       it('sets property \'id\' correctly when no ID is provided', () => {
         let expectedSeqNo = ObjectFactory.get().uniqueIdSeqNo + 1,
@@ -221,20 +243,6 @@ describe('main', () => {
         expect(menu.session === session).toBe(true);
         expect(objects.countOwnProperties(session.modelAdapterRegistry)).toBe(oldNumProperties);
       });
-
     });
-
-    it('creates local object if first parameter of type object and contains objectType property', () => {
-      let expectedSeqNo = ObjectFactory.get().uniqueIdSeqNo + 1,
-        menu = scout.create({
-          parent: new NullWidget(),
-          session: session,
-          objectType: 'Menu'
-        });
-      expect(menu.id).toBe('ui' + expectedSeqNo.toString());
-      expect(ObjectFactory.get().uniqueIdSeqNo).toBe(expectedSeqNo);
-    });
-
   });
-
 });

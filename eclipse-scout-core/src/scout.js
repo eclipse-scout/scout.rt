@@ -13,7 +13,7 @@ import {App, Device, ObjectFactory, objects, strings, ValueField, widgets} from 
 import $ from 'jquery';
 
 let $activeElements = null;
-let objectFactories = {};
+let objectFactories = new Map();
 
 /**
  * Returns the first of the given arguments that is not null or undefined. If no such element
@@ -115,8 +115,12 @@ export function isOneOf(value, ...args) {
 }
 
 /**
- * Creates a new object instance.<p> Delegates the create call to scout.ObjectFactory#create.
- * @returns {object}
+ * Creates a new object instance. Delegates the call to {@link ObjectFactory#create}.
+ * @template T
+ * @param {{new(): T} | string | { objectType:string | {new(): T}}} objectType
+ * @param {object} [model]
+ * @param [options]
+ * @returns {T}
  */
 export function create(objectType, model, options) {
   return ObjectFactory.get().create(objectType, model, options);
@@ -131,7 +135,7 @@ export function create(objectType, model, options) {
  * Currently it does the following:
  * - Remove the <noscript> tag (obviously there is no need for it).
  * - Remove <scout-text> tags (they must have been processed before, see texts.readFromDOM())
- * - Remove <scout-version> tag (it must have been processed before, see scout.App._initVersion())
+ * - Remove <scout-version> tag (it must have been processed before, see App._initVersion())
  * - Add a device / browser class to the body tag to allow for device specific CSS rules.
  * - If the browser is Google Chrome, add a special meta header to prevent automatic translation.
  */
@@ -214,7 +218,7 @@ export function widget(widgetIdOrElement, partId) {
   let $elem = widgetIdOrElement;
   if (typeof widgetIdOrElement === 'string' || typeof widgetIdOrElement === 'number') {
     // Find widget for ID
-    let session = scout.getSession(partId);
+    let session = getSession(partId);
     if (session) {
       widgetIdOrElement = strings.asString(widgetIdOrElement);
       return session.root.widget(widgetIdOrElement);
@@ -233,7 +237,7 @@ export function adapter(adapterId, partId) {
   if (objects.isNullOrUndefined(adapterId)) {
     return null;
   }
-  let session = scout.getSession(partId);
+  let session = getSession(partId);
   if (session && session.modelAdapterRegistry) {
     return session.modelAdapterRegistry[adapterId];
   }
@@ -264,12 +268,12 @@ export function getSession(partId) {
  * This method can only be called through the browser JavaScript console.
  * Here's an example of how to call the method:
  *
- * JSON.stringify(scout.exportAdapter(4))
+ * JSON.stringify(exportAdapter(4))
  *
  * @param adapterId
  */
 export function exportAdapter(adapterId, partId) {
-  let session = scout.getSession(partId);
+  let session = getSession(partId);
   if (session && session.modelAdapterRegistry) {
     let adapter = session.getModelAdapter(adapterId);
     if (!adapter) {
@@ -355,8 +359,25 @@ export function reloadPage(options) {
   }
 }
 
+/**
+ * @param {object} factories Object that contains the object type as key and the function that constructs the object as value.
+ * <p>
+ * If you prefer using a class reference as object type rather than a string, please use {@link addObjectFactory} to register your factory.
+ * @see create
+ */
 export function addObjectFactories(factories) {
-  objectFactories = $.extend(objectFactories, factories);
+  for (let [objectType, factory] of Object.entries(factories)) {
+    addObjectFactory(objectType, factory);
+  }
+}
+
+/**
+ * @param {string|{new(): object}} objectType ObjectType to register the factory for.
+ * @param {Function} factory Function that constructs the object.
+ * @see create
+ */
+export function addObjectFactory(objectType, factory) {
+  objectFactories.set(objectType, factory);
 }
 
 export function cloneShallow(template, properties, createUniqueId) {
@@ -397,6 +418,7 @@ export default {
   exportAdapter,
   reloadPage,
   addObjectFactories,
+  addObjectFactory,
   objectFactories,
   cloneShallow
 };

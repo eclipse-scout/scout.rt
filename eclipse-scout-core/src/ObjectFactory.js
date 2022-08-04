@@ -20,7 +20,7 @@ export default class ObjectFactory {
   constructor() {
     // use createUniqueId() to generate a new ID
     this.uniqueIdSeqNo = 0;
-    this._registry = {};
+    this._registry = new Map();
   }
 
   static NAMESPACE_SEPARATOR = '.';
@@ -31,7 +31,7 @@ export default class ObjectFactory {
    *
    * OBJECT TYPE:
    *
-   * An object type may consist of three parts: [name.space.]Class[:Variant]
+   * A string based object type may consist of three parts: [name.space.]Class[:Variant]
    * 1. Name spaces (optional)
    *    All name space parts have to end with a dot ('.') character. If this part is omitted, the default
    *    name space "scout." is assumed.
@@ -54,45 +54,62 @@ export default class ObjectFactory {
    *
    * RESOLVING THE CONSTRUCTOR:
    *
-   * When scout.objectFactories contains a create function for the given objectType, this function is called.
+   * When the object factory contains a create function for the given objectType, this function is called.
    *
-   * Otherwise it tries to find the constructor function by the following logic:
+   * Otherwise, it tries to find the constructor function by the following logic:
    * If the objectType provides a name space, it is used. Otherwise it takes the default "scout" name space.
    * If the object type provides a variant ("Type:Variant"), the final object type is built by prepending
    * the variant to the type ("VariantType"). If no such type can be found and the option "variantLenient"
    * is set to true, a second attempt is made without the variant.
    *
-   * @param {string} objectType (mandatory) String describing the type of the object to be created.
+   * @param {string|{new(): object}} objectType (mandatory) A class reference to the object to be created. Or a string describing the type of the object to be created.
    * @param {object} [options]  (optional)  Options object, currently supporting the following two options:
    *                               - model = Model object to be passed to the constructor or create function
    *                               - variantLenient = Flag to allow a second attempt to resolve the class
    *                                 without variant (see description above).
    */
   _createObjectByType(objectType, options) {
-    if (typeof objectType !== 'string') {
+    if (typeof objectType !== 'string' && typeof objectType !== 'function') {
       throw new Error('missing or invalid object type');
     }
     options = options || {};
 
-    let createFunc = this._registry[objectType];
+    let Class = null;
+    let typeDescriptor = null;
+    if (typeof objectType === 'string') {
+      typeDescriptor = TypeDescriptor.parse(objectType);
+      Class = typeDescriptor.resolve(options);
+    } else if (typeof objectType === 'function') {
+      Class = objectType;
+    } else {
+      throw new Error('Invalid objectType ' + objectType);
+    }
+
+    // Check if there is a factory registered for the Class. If yes, use the factory to create the instance.
+    // The class may be null if the type could not be resolved. In that case the registry needs to contain a factory for the given objectType, otherwise no instance can be created.
+    let createFunc = this.get(Class || objectType);
     if (createFunc) {
-      // 1. - Use factory function registered for the given objectType
+      // Use factory function registered for the given objectType
       let scoutObject = createFunc(options.model);
       if (!scoutObject) {
         throw new Error('Failed to create object for objectType "' + objectType + '": Factory function did not return a valid object');
       }
       return scoutObject;
     }
-    // 2. - Resolve class by name
-    return TypeDescriptor.newInstance(objectType, options);
+
+    if (!Class && typeDescriptor) {
+      throw typeDescriptor.notFoundError();
+    }
+
+    return new Class(options.model);
   }
 
   /**
    * Creates and initializes a new Scout object. When the created object has an init function, the
    * model object is passed to that function. Otherwise the init call is omitted.
    *
-   * @param {string|object} objectType A string with the requested objectType. This argument is optional, but if it
-   *        is omitted, the argument "model" becomes mandatory and MUST contain a
+   * @param {string|object|{new(): object}} objectType A class reference to the object to be created. Or a string with the requested objectType.
+   *        This argument is optional, but if it is omitted, the argument "model" becomes mandatory and MUST contain a
    *        property named "objectType". If both, objectType and model, are set, the
    *        objectType parameter always wins before the model.objectType property.
    * @param {object} [model] The model object passed to the constructor function and to the init() method.
@@ -112,7 +129,7 @@ export default class ObjectFactory {
    */
   create(objectType, model, options) {
     // Normalize arguments
-    if (typeof objectType === 'string') {
+    if (typeof objectType === 'string' || typeof objectType === 'function') {
       options = options || {};
     } else if (objects.isPlainObject(objectType)) {
       options = model || {};
@@ -159,18 +176,33 @@ export default class ObjectFactory {
     return 'ui' + (++this.uniqueIdSeqNo).toString();
   }
 
+  resolveTypedObjectType(objectType) {
+    if (typeof objectType !== 'string') {
+      return objectType;
+    }
+    let Class = TypeDescriptor.resolveType(objectType);
+    if (Class) {
+      return Class;
+    }
+    // No typed object available -> return string
+    return objectType;
+  }
+
   register(objectType, createFunc) {
+    objectType = this.resolveTypedObjectType(objectType);
+    this._registry.set(objectType, createFunc);
     $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) registered create-function for objectType ' + objectType);
-    this._registry[objectType] = createFunc;
   }
 
   unregister(objectType) {
+    objectType = this.resolveTypedObjectType(objectType);
+    this._registry.delete(objectType);
     $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) unregistered objectType ' + objectType);
-    delete this._registry[objectType];
   }
 
   get(objectType) {
-    return this._registry[objectType];
+    objectType = this.resolveTypedObjectType(objectType);
+    return this._registry.get(objectType);
   }
 
   /**
@@ -178,10 +210,8 @@ export default class ObjectFactory {
    * That's why we call this method in the scout._init method.
    */
   init() {
-    for (let objectType in scout.objectFactories) {
-      if (scout.objectFactories.hasOwnProperty(objectType)) {
-        this.register(objectType, scout.objectFactories[objectType]);
-      }
+    for (let [objectType, factory] of scout.objectFactories) {
+      this.register(objectType, factory);
     }
   }
 

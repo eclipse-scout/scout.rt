@@ -9,7 +9,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ObjectFactory, scout, StringField} from '../src/index';
+import {Action, Button, ObjectFactory, scout, StringField} from '../src/index';
 import {LocaleSpecHelper} from '../src/testing/index';
 
 describe('ObjectFactory', () => {
@@ -29,73 +29,15 @@ describe('ObjectFactory', () => {
     jasmine.clock().uninstall();
   });
 
-  /**
-   * This function is used to create a special-model when a model-adapter requires one.
-   * Normally a generic model with id and objectType is sufficient, but some adapters require a more complex
-   * model in order to make this test succeed. Remember you must add the additional adapter models to the
-   * adapterDataCache of the Session.
-   */
-  function createModel(session, id, objectType) {
-    let model = createSimpleModel(objectType, session, id);
-    if ('Menu.NavigateUp' === objectType || 'Menu.NavigateDown' === objectType) {
-      let outlineId = 'outline' + id;
-      model.outline = outlineId;
-      session._adapterDataCache[outlineId] = {
-        id: outlineId,
-        objectType: 'Outline'
-      };
-    } else if ('Calendar' === objectType) {
-      model.displayMode = 3;
-      model.selectedDate = '2015-04-06 00:00:00.000';
-    } else if ('Form' === objectType) {
-      model.displayHint = 'view';
-    } else if ('TextColumnUserFilter' === objectType) {
-      model.table = {};
-      model.column = {};
-      model.calculate = () => {
-      };
-    } else if ('AggregateTableControl' === objectType) {
-      model.table = {
-        columns: [],
-        on: () => {
-        }
-      };
-    } else if ('TabBox' === objectType) {
-      let tabItemId = 'tabItem' + id;
-      model.selectedTab = 0;
-
-      model.tabItems = [tabItemId];
-      session._adapterDataCache[tabItemId] = {
-        id: tabItemId,
-        objectType: 'TabItem',
-        getForm: () => createSimpleModel('Form', session)
-      };
-    } else if ('ButtonAdapterMenu' === objectType) {
-      model.button = {
-        on: () => {
-        }
-      };
-    } else if ('GroupBox' === objectType || 'TabItem' === objectType) {
-      model.getForm = () => createSimpleModel('Form', session);
-    }
-
-    return model;
-  }
-
-  it('creates objects which are registered in scout.objectFactories', () => {
+  it('creates objects which are registered in objectFactories', () => {
     session.init({
       $entryPoint: $('#sandbox')
     });
-    // When this test fails with a message like 'TypeError: scout.[ObjectType] is not a constructor...'
-    // you should check if the required .js File is registered in SpecRunnerMaven.html.
-    let i, model, object, modelAdapter, objectType;
-    for (objectType in scout.objectFactories) {
-      model = createModel(session, i, objectType);
-      object = scout.objectFactories[objectType]();
-      object.init(model);
-      session.registerModelAdapter(object);
-      modelAdapter = session.getModelAdapter(model.id);
-      expect(modelAdapter).toBe(object);
+    let registry = ObjectFactory.get()._registry;
+    for (let objectType of registry.keys()) {
+      let model = createSimpleModel(objectType, session);
+      let obj = scout.create(model);
+      expect(obj).toBeTruthy();
     }
   });
 
@@ -136,8 +78,15 @@ describe('ObjectFactory', () => {
     }).toThrow();
   });
 
+  it('throws an error if no object could be found', () => {
+    expect(() => {
+      ObjectFactory.get().create('UnknownObject');
+    }).toThrow();
+  });
+
   it('throws an error if argument list is wrong', () => {
     expect(() => {
+      // noinspection JSCheckFunctionSignatures
       ObjectFactory.get().create();
     }).toThrow();
     expect(() => {
@@ -152,10 +101,122 @@ describe('ObjectFactory', () => {
       ObjectFactory.get().create('', {});
     }).toThrow();
     expect(() => {
+      // noinspection JSCheckFunctionSignatures
       ObjectFactory.get().create('', {}, {
         objectType: 'StringField'
       });
     }).toThrow();
+  });
+
+  describe('uses the registered factory to create the object', () => {
+    class ReplacedButton extends Button {
+
+    }
+
+    let factory;
+
+    beforeEach(() => {
+      factory = new ObjectFactory();
+    });
+
+    it('works with objectType as class reference', () => {
+      factory.register(Button, () => new ReplacedButton());
+      let button = factory.create(Button, {parent: session.desktop});
+      expect(button instanceof ReplacedButton).toBe(true);
+
+      let button2 = factory.create('Button', {parent: session.desktop});
+      expect(button2 instanceof ReplacedButton).toBe(true);
+    });
+
+    it('works with objectType as string', () => {
+      factory.register('Button', () => new ReplacedButton());
+      let button = factory.create(Button, {parent: session.desktop});
+      expect(button instanceof ReplacedButton).toBe(true);
+
+      let button2 = factory.create('Button', {parent: session.desktop});
+      expect(button2 instanceof ReplacedButton).toBe(true);
+    });
+
+    it('works with objectTypes that don\'t reference a class', () => {
+      // Use Case: Scout maps KeyStrokeAdapter to ActionAdapter in its objectFactory since KeyStrokeAdapter does not exist.
+      factory.register('CustomType', () => new Action());
+      let action = factory.create('CustomType', {parent: session.desktop});
+      expect(action instanceof Action).toBe(true);
+    });
+
+    it('works with objectTypes containing a namespace', () => {
+      window.my = {};
+      let my = window.my;
+      my.CustomField = class CustomField {
+        constructor() {
+        }
+      };
+
+      my.CustomFieldExt = class CustomFieldExt extends my.CustomField {
+        constructor() {
+          super();
+        }
+      };
+
+      factory.register('my.CustomField', () => new my.CustomFieldExt());
+      let object = factory.create('my.CustomField', {parent: session.desktop});
+      expect(object instanceof my.CustomFieldExt).toBe(true);
+
+      let object2 = factory.create(my.CustomField, {parent: session.desktop});
+      expect(object2 instanceof my.CustomFieldExt).toBe(true);
+
+      let object3 = factory.create(my.CustomFieldExt, {parent: session.desktop});
+      expect(object3 instanceof my.CustomFieldExt).toBe(true);
+    });
+
+    it('works with objectTypes containing a variant', () => {
+      window.my = {};
+      let my = window.my;
+      my.VarStringField = class VarStringField extends StringField {
+        constructor(model, abc) {
+          super();
+          this.abc = abc;
+        }
+      };
+
+      let object = factory.create('StringField:my.Var', {parent: session.desktop});
+      expect(object instanceof my.VarStringField).toBe(true);
+      expect(object.abc).toBeUndefined();
+
+      let object2 = factory.create(my.VarStringField, {parent: session.desktop});
+      expect(object2 instanceof my.VarStringField).toBe(true);
+      expect(object2.abc).toBeUndefined();
+
+      // Should create the same result if the VarStringField is registered explicitly
+      factory.register(my.VarStringField, model => new my.VarStringField(model, 'hi there'));
+      let object3 = factory.create('StringField:my.Var', {parent: session.desktop});
+      expect(object3 instanceof my.VarStringField).toBe(true);
+      expect(object3.abc).toBe('hi there');
+
+      let object4 = factory.create(my.VarStringField, {parent: session.desktop});
+      expect(object4 instanceof my.VarStringField).toBe(true);
+      expect(object4.abc).toBe('hi there');
+    });
+
+    it('works with objectTypes as string including a variant', () => {
+      window.my = {};
+      let my = window.my;
+      my.VarStringField = class VarStringField extends StringField {
+        constructor(abc) {
+          super();
+          this.abc = abc;
+        }
+      };
+
+      factory.register('StringField:my.Var', () => new my.VarStringField('hi there'));
+      let object = factory.create('StringField:my.Var', {parent: session.desktop});
+      expect(object instanceof my.VarStringField).toBe(true);
+      expect(object.abc).toBe('hi there');
+
+      let object2 = factory.create(my.VarStringField, {parent: session.desktop});
+      expect(object2 instanceof my.VarStringField).toBe(true);
+      expect(object2.abc).toBe('hi there');
+    });
   });
 
   describe('finds the correct constructor function if no factory is defined', () => {
@@ -172,8 +233,11 @@ describe('ObjectFactory', () => {
         constructor() {
         }
       };
-      let object = ObjectFactory.get()._createObjectByType('my.StringField');
+      let object = ObjectFactory.get().create('my.StringField');
       expect(object instanceof my.StringField).toBe(true);
+
+      let object2 = ObjectFactory.get().create(my.StringField);
+      expect(object2 instanceof my.StringField).toBe(true);
     });
 
     it('considers variants', () => {
@@ -182,9 +246,12 @@ describe('ObjectFactory', () => {
         constructor() {
         }
       };
-      let object = ObjectFactory.get()._createObjectByType('test.StringField:Variant');
+      let object = ObjectFactory.get().create('test.StringField:Variant');
       expect(object).not.toBe(null);
-      delete window.scout.VariantStringField;
+
+      let object2 = ObjectFactory.get().create(window.test.VariantStringField);
+      expect(object2).not.toBe(null);
+      delete window.test;
     });
 
     // in this case namespace from objectType is also used as namespace for variant
@@ -195,8 +262,11 @@ describe('ObjectFactory', () => {
         constructor() {
         }
       };
-      let object = ObjectFactory.get()._createObjectByType('my.StringField:Variant');
+      let object = ObjectFactory.get().create('my.StringField:Variant');
       expect(object instanceof my.VariantStringField).toBe(true); // objectType is 'my.StringField'
+
+      let object2 = ObjectFactory.get().create(my.VariantStringField);
+      expect(object2 instanceof my.VariantStringField).toBe(true);
     });
 
     it('considers variants also within a custom namespace for variant', () => {
@@ -206,7 +276,7 @@ describe('ObjectFactory', () => {
         constructor() {
         }
       };
-      let object = ObjectFactory.get()._createObjectByType('StringField:my.Variant');
+      let object = ObjectFactory.get().create('StringField:my.Variant');
       expect(object instanceof my.VariantStringField).toBe(true); // objectType is '[scout.]StringField'
     });
 
@@ -217,7 +287,7 @@ describe('ObjectFactory', () => {
         constructor() {
         }
       };
-      let object = ObjectFactory.get()._createObjectByType('my.StringField:your.Variant');
+      let object = ObjectFactory.get().create('my.StringField:your.Variant');
       expect(object instanceof your.VariantStringField).toBe(true); // objectType is 'my.StringField'
     });
 
@@ -228,7 +298,7 @@ describe('ObjectFactory', () => {
         constructor() {
         }
       };
-      let object = ObjectFactory.get()._createObjectByType('my.StringField:Variant:Foo');
+      let object = ObjectFactory.get().create('my.StringField:Variant:Foo');
       expect(object instanceof my.VariantStringField).toBe(true);
     });
 
@@ -243,7 +313,7 @@ describe('ObjectFactory', () => {
         constructor() {
         }
       };
-      let object = ObjectFactory.get()._createObjectByType('my.inner.space.StringField');
+      let object = ObjectFactory.get().create('my.inner.space.StringField');
       expect(object instanceof my.inner.space.StringField).toBe(true);
     });
 
@@ -254,16 +324,16 @@ describe('ObjectFactory', () => {
         }
       };
       expect(() => {
-        ObjectFactory.get()._createObjectByType('my.StringField:NotExistingVariant');
+        ObjectFactory.get().create('my.StringField:NotExistingVariant');
       }).toThrow();
     });
 
     describe('variantLenient', () => {
       it('tries to create an object without variant if with variant fails', () => {
-        let model = {
+        let options = {
           variantLenient: true
         };
-        let object = ObjectFactory.get()._createObjectByType('StringField:Variant', model);
+        let object = ObjectFactory.get()._createObjectByType('StringField:Variant', options);
         expect(object instanceof StringField).toBe(true);
       });
 
@@ -274,10 +344,10 @@ describe('ObjectFactory', () => {
           constructor() {
           }
         };
-        let model = {
+        let options = {
           variantLenient: true
         };
-        let object = ObjectFactory.get()._createObjectByType('my.StringField:Variant', model);
+        let object = ObjectFactory.get()._createObjectByType('my.StringField:Variant', options);
         expect(object instanceof my.StringField).toBe(true);
       });
     });
