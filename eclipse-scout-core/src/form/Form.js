@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormController, FormGrid, FormLayout, FormLifecycle, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStrokeContext, MessageBoxController, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
+import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormController, FormGrid, FormLayout, FormLifecycle, GlassPaneRenderer, HtmlComponent, KeyStrokeContext, MessageBoxController, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
 import $ from 'jquery';
 
 export default class Form extends Widget {
@@ -717,10 +717,6 @@ export default class Form extends Widget {
     this._setProperty('rootGroupBox', rootGroupBox);
     if (this.rootGroupBox) {
       this.rootGroupBox.setMainBox(true);
-
-      if (this.isDialog() || this.parent instanceof WrappedFormField) {
-        this.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
-      }
     }
   }
 

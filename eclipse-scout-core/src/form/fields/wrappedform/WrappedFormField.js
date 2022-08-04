@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, FormField} from '../../../index';
+import {Form, FormField, GroupBox} from '../../../index';
 
 export default class WrappedFormField extends FormField {
 
@@ -63,6 +63,9 @@ export default class WrappedFormField extends FormField {
     this.innerForm.setModal(false); // by definition, an inner form is not modal.
     this.innerForm.setClosable(false); // Disable close key stroke
     this.innerForm.renderInitialFocusEnabled = this.initialFocusEnabled; // do not render initial focus of form if disabled.
+    if (this.innerForm.rootGroupBox) {
+      this.innerForm.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
+    }
 
     this.innerForm.render();
 
