@@ -711,6 +711,41 @@ public class DateUtilityTest {
   }
 
   @Test
+  public void testMinutesBetween() {
+    Calendar cal = Calendar.getInstance();
+    Date d1, d2;
+
+    assertEquals(-1, DateUtility.getMinutesBetween(null, null));
+    assertEquals(-1, DateUtility.getMinutesBetween(cal.getTime(), null));
+    assertEquals(-1, DateUtility.getMinutesBetween(null, cal.getTime()));
+
+    cal.set(2000, Calendar.JANUARY, 1, 0, 0);
+    d1 = cal.getTime();
+    cal.set(2000, Calendar.JANUARY, 2, 0, 0);
+    d2 = cal.getTime();
+    assertEquals(1440, DateUtility.getMinutesBetween(d1, d2));
+    assertEquals(1440, DateUtility.getMinutesBetween(d2, d1));
+
+    cal.set(2000, Calendar.JANUARY, 1, 23, 59);
+    d1 = cal.getTime();
+    cal.set(2000, Calendar.JANUARY, 2, 0, 0);
+    d2 = cal.getTime();
+    assertEquals(1, DateUtility.getMinutesBetween(d1, d2));
+    assertEquals(1, DateUtility.getMinutesBetween(d2, d1));
+
+    assertEquals(0, DateUtility.getMinutesBetween(d1, d1));
+
+    // Assert examples from JavaDoc
+    final String PATTERN = "yyyy-MM-dd HH:mm:ss";
+    assertEquals(1, DateUtility.getMinutesBetween(
+        DateUtility.parse("2020-01-01 15:02:03", PATTERN),
+        DateUtility.parse("2020-01-01 15:01:05", PATTERN)));
+    assertEquals(1, DateUtility.getMinutesBetween(
+        DateUtility.parse("2020-01-01 15:01:05", PATTERN),
+        DateUtility.parse("2020-01-01 15:02:03", PATTERN)));
+  }
+
+  @Test
   public void testIsWeekend() {
     Calendar todayCalendar = Calendar.getInstance();
 
@@ -897,6 +932,23 @@ public class DateUtilityTest {
     cal = calendarOf("2015-01-01 23:59:59.999");
     DateUtility.truncCalendarToHour(cal);
     assertCalendarEquals("2015-01-01 23:00:00.000", cal);
+  }
+
+  @Test
+  public void testTruncCalendarToMinute() {
+    DateUtility.truncCalendarToMinute(null);
+
+    Calendar cal = calendarOf("2015-01-01 00:00:00.000");
+    DateUtility.truncCalendarToMinute(cal);
+    assertCalendarEquals("2015-01-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-01-01 18:17:25.831");
+    DateUtility.truncCalendarToMinute(cal);
+    assertCalendarEquals("2015-01-01 18:17:00.000", cal);
+
+    cal = calendarOf("2015-01-01 23:59:59.999");
+    DateUtility.truncCalendarToMinute(cal);
+    assertCalendarEquals("2015-01-01 23:59:00.000", cal);
   }
 
   @Test
