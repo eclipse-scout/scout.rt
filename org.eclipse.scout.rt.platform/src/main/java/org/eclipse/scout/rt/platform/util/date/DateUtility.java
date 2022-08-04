@@ -35,7 +35,8 @@ public final class DateUtility {
   private DateUtility() {
   }
 
-  public static final long HOUR_MILLIS = 3600L * 1000L;
+  public static final long MINUTE_MILLIS = 60L * 1000L;
+  public static final long HOUR_MILLIS = 60L * MINUTE_MILLIS;
   public static final long DAY_MILLIS = 24L * HOUR_MILLIS;
 
   private static final Logger LOG = LoggerFactory.getLogger(DateUtility.class);
@@ -506,6 +507,17 @@ public final class DateUtility {
   }
 
   /**
+   * truncate the calendar to minute
+   */
+  public static void truncCalendarToMinute(Calendar c) {
+    if (c == null) {
+      return;
+    }
+    c.set(Calendar.SECOND, 0);
+    c.set(Calendar.MILLISECOND, 0);
+  }
+
+  /**
    * @return true if d is in the range [minDate,maxDate]
    */
   public static boolean isInRange(Date minDate, Date d, Date maxDate) {
@@ -891,5 +903,35 @@ public final class DateUtility {
     long startL = startDate.getTimeInMillis() + startDate.getTimeZone().getOffset(startDate.getTimeInMillis());
     int numHours = (int) ((endL - startL) / HOUR_MILLIS);
     return Math.abs(numHours);
+  }
+
+  /**
+   * Returns the absolute value of minutes between <code>start</code> and <code>end</code>. Both input values are first
+   * truncated to minutes, i.e. any minutes fractions (seconds, millis) will be ignored.
+   * <p>
+   * <b>Examples:</b>
+   * <li>start = 2020-01-01 15:02:03, end = 2020-01-01 15:01:05, result = 1
+   * <li>start = 2020-01-01 15:01:05, end = 2020-01-01 15:02:03, result = 1
+   * </ul>
+   *
+   * @param start
+   *          the start date, inclusive
+   * @param end
+   *          the end date, exclusive
+   * @return <code>-1</code> in case of an error (e.g. parameter is null)
+   */
+  public static int getMinutesBetween(Date start, Date end) {
+    if (start == null || end == null) {
+      return -1;
+    }
+    Calendar startDate = DateUtility.convertDate(start);
+    DateUtility.truncCalendarToMinute(startDate);
+    Calendar endDate = DateUtility.convertDate(end);
+    DateUtility.truncCalendarToMinute(endDate);
+
+    long endL = endDate.getTimeInMillis() + endDate.getTimeZone().getOffset(endDate.getTimeInMillis());
+    long startL = startDate.getTimeInMillis() + startDate.getTimeZone().getOffset(startDate.getTimeInMillis());
+    int numMinutes = (int) ((endL - startL) / (MINUTE_MILLIS));
+    return Math.abs(numMinutes);
   }
 }
