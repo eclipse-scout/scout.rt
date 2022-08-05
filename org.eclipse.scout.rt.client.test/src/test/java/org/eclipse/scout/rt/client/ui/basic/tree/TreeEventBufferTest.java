@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -307,9 +307,9 @@ public class TreeEventBufferTest {
     m_testBuffer.add(e1);
 
     // Simulate nodes deleted from inner to outer node
-    installChildNodes(nodeC, new ITreeNode[0]);
-    installChildNodes(nodeB, new ITreeNode[0]);
-    installChildNodes(nodeA, new ITreeNode[0]);
+    installChildNodes(nodeC);
+    installChildNodes(nodeB);
+    installChildNodes(nodeA);
     final int eventType = useTypeAllChildNodesDeleted ? TreeEvent.TYPE_ALL_CHILD_NODES_DELETED : TreeEvent.TYPE_NODES_DELETED;
     TreeEvent e2 = mockEvent(nodeC, eventType, nodeD);
     TreeEvent e3 = mockEvent(nodeB, eventType, nodeC);
@@ -348,7 +348,7 @@ public class TreeEventBufferTest {
     installChildNodes(nodeC, nodeG);
 
     // simulate "all child nodes deleted"
-    installChildNodes(nodeB, new ITreeNode[0]);
+    installChildNodes(nodeB);
 
     // --- Test case 1: ALL_CHILD_NODES_DELETED ----------------------
 
@@ -640,7 +640,6 @@ public class TreeEventBufferTest {
    * insert event. This problem was caused in the removeObsolete() method, because it also removed the node from the
    * second delete event - this has been corrected in the removeNodesFromPreviousEvents() method.
    * </p>
-   *
    */
   @Test
   public void testDeleteInsertCoalesce() {
@@ -992,7 +991,7 @@ public class TreeEventBufferTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testTreeEventMergerNullInitilaEvent() {
+  public void testTreeEventMergerNullInitialEvent() {
     new TreeEventBuffer.TreeEventMerger(null);
   }
 
@@ -1029,6 +1028,91 @@ public class TreeEventBufferTest {
   }
 
   @Test
+  public void testTreeEventMergerCommonParentNode() {
+    ITreeNode nodeA = mockNode("a");
+    ITreeNode nodeB = mockNode("b");
+    ITreeNode nodeC = mockNode("c");
+
+    ITreeNode nodeParent = mockNode("parent");
+
+    ITreeNode nodeAWithParent = mockNode("aWithParent", nodeParent);
+    ITreeNode nodeBWithParent = mockNode("bWithParent", nodeParent);
+    ITreeNode nodeCWithParent = mockNode("cWithParent", nodeParent);
+
+    // [a, b] & c
+
+    TreeEvent initialEvent = mockEvent(TreeEvent.TYPE_NODE_CHANGED, nodeA, nodeB);
+    TreeEventBuffer.TreeEventMerger eventMerger = new TreeEventBuffer.TreeEventMerger(initialEvent);
+
+    TreeEvent e1 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, nodeC);
+    eventMerger.merge(e1);
+
+    eventMerger.complete();
+    assertEquals(Arrays.asList(nodeC, nodeA, nodeB), initialEvent.getNodes());
+    assertNull(initialEvent.getCommonParentNode());
+
+    // [aWithParent, bWithParent] & cWithParent
+
+    initialEvent = mockEvent(TreeEvent.TYPE_NODE_CHANGED, nodeAWithParent, nodeBWithParent);
+    eventMerger = new TreeEventBuffer.TreeEventMerger(initialEvent);
+
+    e1 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, nodeCWithParent);
+    eventMerger.merge(e1);
+
+    eventMerger.complete();
+    assertEquals(Arrays.asList(nodeCWithParent, nodeAWithParent, nodeBWithParent), initialEvent.getNodes());
+    assertEquals(nodeParent, initialEvent.getCommonParentNode());
+
+    // [aWithParent, bWithParent] & c
+
+    initialEvent = mockEvent(TreeEvent.TYPE_NODE_CHANGED, nodeAWithParent, nodeBWithParent);
+    eventMerger = new TreeEventBuffer.TreeEventMerger(initialEvent);
+
+    e1 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, nodeC);
+    eventMerger.merge(e1);
+
+    eventMerger.complete();
+    assertEquals(Arrays.asList(nodeC, nodeAWithParent, nodeBWithParent), initialEvent.getNodes());
+    assertNull(initialEvent.getCommonParentNode());
+
+    // [aWithParent, bWithParent] & c + parent
+
+    initialEvent = mockEvent(TreeEvent.TYPE_NODE_CHANGED, nodeAWithParent, nodeBWithParent);
+    eventMerger = new TreeEventBuffer.TreeEventMerger(initialEvent);
+
+    e1 = mockEvent(nodeParent, TreeEvent.TYPE_NODE_CHANGED, nodeC);
+    eventMerger.merge(e1);
+
+    eventMerger.complete();
+    assertEquals(Arrays.asList(nodeC, nodeAWithParent, nodeBWithParent), initialEvent.getNodes());
+    assertEquals(nodeParent, initialEvent.getCommonParentNode());
+
+    // [a, b] + parent & c + parent
+
+    initialEvent = mockEvent(nodeParent, TreeEvent.TYPE_NODE_CHANGED, nodeA, nodeB);
+    eventMerger = new TreeEventBuffer.TreeEventMerger(initialEvent);
+
+    e1 = mockEvent(nodeParent, TreeEvent.TYPE_NODE_CHANGED, nodeC);
+    eventMerger.merge(e1);
+
+    eventMerger.complete();
+    assertEquals(Arrays.asList(nodeC, nodeA, nodeB), initialEvent.getNodes());
+    assertEquals(nodeParent, initialEvent.getCommonParentNode());
+
+    // [a, b] + parent & c
+
+    initialEvent = mockEvent(nodeParent, TreeEvent.TYPE_NODE_CHANGED, nodeA, nodeB);
+    eventMerger = new TreeEventBuffer.TreeEventMerger(initialEvent);
+
+    e1 = mockEvent(TreeEvent.TYPE_NODE_CHANGED, nodeC);
+    eventMerger.merge(e1);
+
+    eventMerger.complete();
+    assertEquals(Arrays.asList(nodeC, nodeA, nodeB), initialEvent.getNodes());
+    assertNull(initialEvent.getCommonParentNode());
+  }
+
+  @Test
   public void testTreeEventMergerCompleteWithoutMerge() {
     ITreeNode nodeA = mockNode("a");
     ITreeNode nodeB = mockNode("b");
@@ -1052,7 +1136,8 @@ public class TreeEventBufferTest {
       eventMerger.merge(e1);
       fail("merge after complete must throw an " + IllegalStateException.class.getSimpleName());
     }
-    catch (IllegalStateException epxected) {
+    catch (IllegalStateException expected) {
+      // expected
     }
   }
 
@@ -1131,15 +1216,14 @@ public class TreeEventBufferTest {
     doAnswer((Answer<Void>) invocation -> {
       Set<ITreeNode> collector = invocation.getArgument(0);
       collector.addAll(childNodeList);
-      Boolean argument = invocation.getArgument(1);
-      boolean recursive = Boolean.valueOf(argument);
+      boolean recursive = invocation.getArgument(1);
       if (recursive) {
         for (ITreeNode childNode : childNodeList) {
           childNode.collectChildNodes(collector, recursive);
         }
       }
       return null;
-    }).when(node).collectChildNodes(ArgumentMatchers.<ITreeNode> anySet(), ArgumentMatchers.anyBoolean());
+    }).when(node).collectChildNodes(ArgumentMatchers.anySet(), ArgumentMatchers.anyBoolean());
     for (ITreeNode childNode : childNodeList) {
       when(childNode.getParentNode()).thenReturn(node);
     }
