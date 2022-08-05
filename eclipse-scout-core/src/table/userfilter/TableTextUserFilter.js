@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableUserFilter} from '../../index';
+import {scout, TableUserFilter} from '../../index';
 
 export default class TableTextUserFilter extends TableUserFilter {
 

@@ -92,7 +92,7 @@ export default class Rectangle {
    * @returns {Rectangle}
    */
   subtractFromDimension(insets) {
-    return new scout.Rectangle(
+    return new Rectangle(
       this.x,
       this.y,
       this.width - insets.horizontal(),

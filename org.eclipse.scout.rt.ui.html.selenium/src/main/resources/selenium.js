@@ -1,3 +1,5 @@
+// noinspection JSUnresolvedVariable
+
 /*
  * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -11,6 +13,7 @@
 /**
  * Utility functions that are used in the Selenium test suite (see SeleniumJavaScript.java).
  */
+
 scout.selenium = {
 
   origSendCancelRequest: scout.Session.prototype._sendCancelRequest,

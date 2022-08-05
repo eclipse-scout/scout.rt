@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {ObjectFactory} from '@eclipse-scout/core';
+import * as self from './index.js';
+
 export {default as SvgField} from './svg/SvgField';
 export {default as SvgFieldAdapter} from './svg/SvgFieldAdapter';
 
-import * as self from './index.js';
-
 export default self;
-window.scout = Object.assign(window.scout || {}, self);
+ObjectFactory.get().registerNamespace('scout', self);

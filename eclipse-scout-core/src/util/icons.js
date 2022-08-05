@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {IconDesc, strings} from '../index';
+import {IconDesc, icons, strings} from '../index';
 import $ from 'jquery';
 
 /* These icon ids can either be used directly using JavaScript.
@@ -152,7 +152,7 @@ export function resolveIconId(value) {
     tmp = iconId.split('.');
     if (tmp.length === 1) {
       // look for icon in [0]
-      value = scout.icons[tmp];
+      value = icons[tmp];
     } else if (tmp.length === 2) {
       // look for icon in global object [0].icons.[1]
       value = window[tmp[0]].icons[tmp[1]];

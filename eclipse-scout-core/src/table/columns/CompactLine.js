@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, CompactLineBlock} from '../../index';
+import {Cell, CompactLineBlock, scout} from '../../index';
 
 export default class CompactLine {
 

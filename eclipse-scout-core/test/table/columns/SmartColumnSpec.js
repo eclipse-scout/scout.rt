@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {TableSpecHelper} from '../../../src/testing/index';
-import {arrays, Cell, LookupCall, objects} from '../../../src';
+import {arrays, Cell, LookupCall, objects, scout} from '../../../src';
 
 describe('SmartColumn', () => {
   let session, helper;

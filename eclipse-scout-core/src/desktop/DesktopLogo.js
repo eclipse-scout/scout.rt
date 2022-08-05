@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Image, Widget} from '../index';
+import {HtmlComponent, Image, scout, Widget} from '../index';
 
 export default class DesktopLogo extends Widget {
 

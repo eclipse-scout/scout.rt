@@ -10,7 +10,7 @@
  */
 import {IconDesc, icons} from '../../src/index';
 
-describe('scout.icons', () => {
+describe('icons', () => {
 
   let icon;
 

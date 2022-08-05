@@ -12,6 +12,8 @@
 // /////////////////////////////////////////////////////////////////
 // TEST SUPPORT - DO NOT USE IN PRODUCTION CODE
 // /////////////////////////////////////////////////////////////////
+import {ObjectFactory} from '../index';
+import * as self from './index.js';
 
 export {default as TestingApp} from './TestingApp';
 export {default as JasmineScout} from './JasmineScout';
@@ -34,7 +36,5 @@ export {default as CalendarSpecHelper} from './calendar/CalendarSpecHelper';
 export {default as FocusManagerSpecHelper} from './focus/FocusManagerSpecHelper';
 export {default as GroupBoxSpecHelper} from './form/fields/groupbox/GroupBoxSpecHelper';
 
-import * as self from './index.js';
-
 export default self;
-window.scout = Object.assign(window.scout || {}, self);
+ObjectFactory.get().registerNamespace('scout', self);

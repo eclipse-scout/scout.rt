@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {filters, focusUtils, graphics, keys, Point, scrollbars} from '../index';
+import {filters, focusUtils, graphics, keys, Point, scout, scrollbars} from '../index';
 import $ from 'jquery';
 
 /**

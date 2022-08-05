@@ -100,7 +100,7 @@ describe('DecimalFormat', () => {
     });
 
     it('is lenient with grouping separators', () => {
-      let decimalFormat = new scout.DecimalFormat(locale, {
+      let decimalFormat = new DecimalFormat(locale, {
         pattern: '#,##0.00'
       });
 

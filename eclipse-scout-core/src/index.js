@@ -8,13 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import ObjectFactory from './ObjectFactory';
+
 export {default as scout} from './scout';
 export {default as App} from './App';
 export {default as ErrorHandler} from './ErrorHandler';
 export {default as RemoteApp} from './RemoteApp';
 export {default as Extension} from './Extension';
 export {default as TypeDescriptor} from './TypeDescriptor';
-export {default as ObjectFactory} from './ObjectFactory';
+export {ObjectFactory};
 export {default as WidgetSupport} from './widget/WidgetSupport';
 export {default as LoadingSupport} from './widget/LoadingSupport';
 export {default as SimpleLoadingSupport} from './widget/SimpleLoadingSupport';
@@ -724,4 +726,4 @@ export default self;
 let windowScout = {...self, ...scout};
 
 // Add the scout object to the window
-window.scout = Object.assign(window.scout || {}, windowScout);
+ObjectFactory.get().registerNamespace('scout', windowScout);
