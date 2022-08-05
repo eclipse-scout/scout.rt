@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -485,10 +485,12 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     private Collection<ITreeNode> m_targetNodes;
     private Set<ITreeNode> m_targetNodeSet;
     private List<ITreeNode> m_mergedNodes;
+    private ITreeNode m_mergedCommonParentNode;
 
     public TreeEventMerger(TreeEvent targetEvent) {
       m_targetEvent = assertNotNull(targetEvent, "targetEvent must not be null");
       m_mergedNodes = new LinkedList<>();
+      m_mergedCommonParentNode = m_targetEvent.getCommonParentNode();
     }
 
     /**
@@ -503,6 +505,9 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       }
       ensureInitialized();
       mergeCollections(event.getNodes(), m_mergedNodes, m_targetNodeSet);
+      if (event.getCommonParentNode() != m_mergedCommonParentNode) {
+        m_mergedCommonParentNode = null;
+      }
     }
 
     protected void ensureInitialized() {
@@ -517,6 +522,11 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
      * Completes the merge process. Subsequent invocations of this method does not have any effects.
      */
     public void complete() {
+      completeMergedNodes();
+      completeMergedCommonParentNode();
+    }
+
+    protected void completeMergedNodes() {
       if (m_mergedNodes == null) {
         return;
       }
@@ -525,6 +535,15 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         m_targetEvent.setNodes(m_mergedNodes);
       }
       m_mergedNodes = null;
+
+    }
+
+    protected void completeMergedCommonParentNode() {
+      if (m_mergedCommonParentNode == null) {
+        return;
+      }
+      m_targetEvent.setCommonParentNode(m_mergedCommonParentNode);
+      m_mergedCommonParentNode = null;
     }
 
     /**
