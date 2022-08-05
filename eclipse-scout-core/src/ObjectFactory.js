@@ -21,6 +21,7 @@ export default class ObjectFactory {
     // use createUniqueId() to generate a new ID
     this.uniqueIdSeqNo = 0;
     this._registry = new Map();
+    this._objectTypeMap = new Map();
   }
 
   static NAMESPACE_SEPARATOR = '.';
@@ -151,7 +152,7 @@ export default class ObjectFactory {
         if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
           model.id = this.createUniqueId();
         }
-        model.objectType = objectType;
+        model.objectType = this.getObjectType(objectType);
       }
       // Initialize object
       scoutObject.init(model);
@@ -161,7 +162,7 @@ export default class ObjectFactory {
       scoutObject.id = this.createUniqueId();
     }
     if (scoutObject.objectType === undefined) {
-      scoutObject.objectType = objectType;
+      scoutObject.objectType = this.getObjectType(objectType);
     }
 
     return scoutObject;
@@ -206,12 +207,73 @@ export default class ObjectFactory {
   }
 
   /**
+   * Returns the object type as string for the given class.
+   * @param Class
+   * @returns {string}
+   */
+  getObjectType(Class) {
+    if (typeof Class === 'string') {
+      return Class;
+    }
+    return this._objectTypeMap.get(Class);
+  }
+
+  /**
    * Cannot init ObjectFactory until Log4Javascript is initialized.
    * That's why we call this method in the scout._init method.
    */
   init() {
     for (let [objectType, factory] of scout.objectFactories) {
       this.register(objectType, factory);
+    }
+  }
+
+  /**
+   * The namespace is an object on the window containing object names as keys and object references as values.
+   * The type of the object is not restricted, mostly it is a class but may also be a function or a plain object used as enum.
+   * <p>
+   * Registering classes enables creating an instance of the class by its name using the ObjectFactory (e.g. scout.create('Button', {}) ).
+   * This is necessary to import string based models, e.g. if the model is delivered by a server (Scout Classic).
+   * Registering objects in general is also necessary, if the application does not use EcmaScript imports or the imports are treated as externals and transpiled to a window lookup (see Webpack root external for details).
+   * <p>
+   * Registering the namespace also makes it possible to resolve the name of a class including its namespace for any registered class, even if the code is minified.
+   * This is used by the ObjectFactory to store the objectType as string on the created object, which maintains backwards compatibility.
+   *
+   * @param {string} namespace the name of the object on the window
+   * @param {object} objects the objects to be put on the namespace
+   * @param {object} [options]
+   * @param {string[]} [options.allowedReplacements] List of object names that are allowed to be replaced, see the description for the thrown error.
+   * @throws Error if the object is already registered on the namespace to avoid accidental replacements.
+   *                Such replacements would not work if the object is created using a class reference because in that case the namespace is not used.
+   *                If you want to force a replacement, you can allow it by using the option allowedReplacements.
+   */
+  registerNamespace(namespace, objects, options) {
+    options = $.extend({allowedReplacements: []}, options);
+
+    // Ensure namespace object exists on window
+    window[namespace] = window[namespace] || {};
+
+    let prefix = namespace === 'scout' ? '' : namespace + '.';
+    for (let [name, object] of Object.entries(objects)) {
+      if (name === 'default') {
+        // Do not register module itself, only imported files
+        continue;
+      }
+      if (window[namespace][name] && !options.allowedReplacements.includes(name)) {
+        throw new Error(`${name} is already registered on namespace ${namespace || 'scout'}. Use objectFactories if you want to replace the existing obj.`);
+      }
+
+      // Register the new objects on the namespace
+      window[namespace][name] = object;
+
+      if (!object.prototype || name[0].toUpperCase() !== name[0]) {
+        // Ignore elements that are not Classes, because they can't be created with scout.create anyway and therefore just waste space in the map.
+        // Since there is no official way to detect a class, we make use of our naming convention that says classes have to start with an uppercase letter.
+        continue;
+      }
+
+      // Register the new objects for the object type lookup
+      this._objectTypeMap.set(object, prefix + name);
     }
   }
 

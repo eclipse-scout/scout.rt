@@ -36,7 +36,7 @@ export default class PopupManager extends Widget {
     this._setProperty('popups', popups);
     // re-parent popups, since PopupManager is not a real widget but only used to sync data
     this.popups.forEach(popup => {
-      if (popup.parent instanceof scout.PopupManager) {
+      if (popup.parent instanceof PopupManager) {
         popup.setParent(this.session.desktop);
       }
     });

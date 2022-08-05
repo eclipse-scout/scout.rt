@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Form, HtmlComponent, PageTileGrid, RowLayout} from '../index';
+import {Form, HtmlComponent, PageTileGrid, RowLayout, scout} from '../index';
 
 export default class TileOverviewForm extends Form {
   constructor() {

@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {ObjectFactory} from '@eclipse-scout/core';
+import * as self from './index.js';
+
 export {default as Chart} from './chart/Chart';
 export {default as ChartAdapter} from './chart/ChartAdapter';
 export {default as ChartLayout} from './chart/ChartLayout';
@@ -30,7 +33,5 @@ export {default as ChartTableUserFilter} from './table/controls/ChartTableUserFi
 export {default as ChartTableControlAdapter} from './table/controls/ChartTableControlAdapter';
 export {default as ChartTableControlLayout} from './table/controls/ChartTableControlLayout';
 
-import * as self from './index.js';
-
 export default self;
-window.scout = Object.assign(window.scout || {}, self);
+ObjectFactory.get().registerNamespace('scout', self);

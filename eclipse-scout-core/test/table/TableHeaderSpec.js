@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {TableSpecHelper} from '../../src/testing/index';
-import {Menu} from '../../src';
+import {Menu, scout} from '../../src';
 
 describe('TableHeaderSpec', () => {
   let session;

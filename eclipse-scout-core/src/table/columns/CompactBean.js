@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import strings from '../../util/strings';
+
+import {scout, strings} from '../../index';
 
 export default class CompactBean {
 

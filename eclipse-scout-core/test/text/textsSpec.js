@@ -12,7 +12,7 @@ import * as texts from '../../src/text/texts';
 import TextMap from '../../src/text/TextMap';
 
 /* jshint sub:true */
-describe('scout.texts', () => {
+describe('texts', () => {
 
   let model = {
     'default': {

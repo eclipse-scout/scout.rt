@@ -175,7 +175,7 @@ describe('CodeLookupCall', () => {
     });
   });
 
-  describe('scout.codes.remove', () => {
+  describe('codes.remove', () => {
 
     it('makes, that existing lookup calls don\'t return a result anymore', done => {
       codes.add(codeType123);
@@ -200,7 +200,7 @@ describe('CodeLookupCall', () => {
     });
   });
 
-  describe('scout.codes.add', () => {
+  describe('codes.add', () => {
 
     it('makes, that existing lookups consider the new code type', done => {
       codes.add(codeType123);

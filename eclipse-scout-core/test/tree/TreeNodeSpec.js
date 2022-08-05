@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Tree, TreeNode} from '../../src/index';
+import {scout, Tree, TreeNode} from '../../src/index';
 
 describe('TreeNode', () => {
   let session;

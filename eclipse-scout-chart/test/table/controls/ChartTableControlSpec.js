@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {ChartTableControl} from '../../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/core/src/testing';
 
 /* global sandboxSession, createSimpleModel*/
 describe('ChartTableControl', () => {
@@ -19,7 +20,7 @@ describe('ChartTableControl', () => {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
-    helper = new scout.TableSpecHelper(session);
+    helper = new TableSpecHelper(session);
     jasmine.clock().install();
   });
 

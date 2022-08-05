@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, Tooltip} from '../index';
+import {Menu, scout, Tooltip} from '../index';
 
 export default class TableInfoLoadTooltip extends Tooltip {
 

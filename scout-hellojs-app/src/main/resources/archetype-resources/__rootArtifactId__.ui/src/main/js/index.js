@@ -1,3 +1,6 @@
+import {ObjectFactory} from '@eclipse-scout/core';
+import * as self from './index.js';
+
 export {default as App} from './App';
 export * from './objectFactories';
 export {default as Repository} from './repository/Repository';
@@ -10,7 +13,5 @@ export {default as PersonRestriction} from './person/PersonRestriction';
 export {default as PersonSearchForm} from './person/PersonSearchForm';
 export {default as PersonTablePage} from './person/PersonTablePage';
 
-import * as self from './index.js';
-
 export default self;
-window.${simpleArtifactName} = Object.assign(window.${simpleArtifactName} || {}, self);
+ObjectFactory.get().registerNamespace('${simpleArtifactName}', self);

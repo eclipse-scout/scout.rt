@@ -10,7 +10,7 @@
  */
 import {Code, codes, CodeType} from '../../src/index';
 
-describe('scout.codes', () => {
+describe('codes', () => {
 
   let CODE_TYPE = 12345;
   let CODE = 12346;
@@ -58,7 +58,7 @@ describe('scout.codes', () => {
   });
 
   it('throws an error when code type is not found', () => {
-    let func = codes.codeType.bind(scout.codes, 'DoesNotExist');
+    let func = codes.codeType.bind(codes, 'DoesNotExist');
     expect(func).toThrowError();
   });
 
