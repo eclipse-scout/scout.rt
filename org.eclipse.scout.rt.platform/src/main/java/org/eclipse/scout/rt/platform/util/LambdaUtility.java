@@ -14,6 +14,7 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 public final class LambdaUtility {
@@ -30,11 +31,22 @@ public final class LambdaUtility {
   }
 
   public static <T> T invokeSafely(Callable<T> supplier) {
+    return invokeSafely(supplier, BEANS.get(DefaultRuntimeExceptionTranslator.class));
+  }
+
+  public static void invokeSafely(IRunnable runnable, IExceptionTranslator<RuntimeException> translator) {
+    invokeSafely(() -> {
+      runnable.run();
+      return null;
+    }, translator);
+  }
+
+  public static <T> T invokeSafely(Callable<T> supplier, IExceptionTranslator<RuntimeException> translator) {
     try {
       return supplier.call();
     }
     catch (Exception e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
+      throw translator.translate(e);
     }
   }
 }
