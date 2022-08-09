@@ -152,7 +152,7 @@ export function installScrollShadow($container, session, options) {
   $container.data('scroll-shadow', $shadow);
   $container.data('scroll-shadow-style', scrollShadowStyle);
   $container.data('scroll-shadow-customizer', options.scrollShadowCustomizer);
-  let handler = () => updateScrollShadow($container);
+  let handler = () => updateScrollShadowWhileScrolling($container);
   $container.data('scroll-shadow-handler', handler);
   $container.on('scroll', handler);
   updateScrollShadow($container);
@@ -234,6 +234,17 @@ function _computeScrollShadowStyle(options) {
   }
   arrays.removeAll(scrollShadow, ['all', 'y', 'x', 'auto', 'none']);
   return scrollShadow;
+}
+
+export function updateScrollShadowWhileScrolling($container) {
+  let $animatingParent = $container.findUp($elem => $elem.hasAnimationClass());
+  if ($animatingParent.length > 0) {
+    // If the container is scrolled while being animated, the shadow will likely get the wrong size and/or position if the animation changes the bounds.
+    // The scroll event is mostly probably not triggered by the user directly but by the scrollable container itself, e.g. to reveal a focused / selected / checked element.
+    $animatingParent.oneAnimationEnd(() => updateScrollShadow($container));
+    return;
+  }
+  updateScrollShadow($container);
 }
 
 export function updateScrollShadow($container) {
