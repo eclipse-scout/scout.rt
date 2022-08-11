@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGridData, MenuDestinations, menus as menus_1, numbers, objects, PlaceholderTile, Range, scout, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, VirtualScrolling, Widget} from '../index';
+import {arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGridData, MenuDestinations, menus as menuUtil, numbers, objects, PlaceholderTile, Range, scout, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, VirtualScrolling, Widget} from '../index';
 import $ from 'jquery';
 
 /**
@@ -498,8 +498,8 @@ export default class TileGrid extends Widget {
     this._setProperty('menus', menus);
   }
 
-  _filterMenus(menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
-    return menus_1.filterAccordingToSelection('TileGrid', this.selectedTiles.length, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
+  _filterMenus(menus, destination, onlyVisible, enableDisableKeyStrokes, notAllowedTypes) {
+    return menuUtil.filterAccordingToSelection('TileGrid', this.selectedTiles.length, menus, destination, {onlyVisible, enableDisableKeyStrokes, notAllowedTypes});
   }
 
   showContextMenu(options) {

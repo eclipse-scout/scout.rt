@@ -40,7 +40,7 @@ export default class FormField extends Widget {
     this.statusMenuMappings = [];
     this.menus = [];
     this.menusVisible = true;
-    this.currentMenuTypes = [];
+    this.defaultMenuTypes = [];
     this.preventInitialFocus = false;
     this.requiresSave = false;
     this.statusPosition = FormField.StatusPosition.DEFAULT;
@@ -849,8 +849,9 @@ export default class FormField extends Widget {
   }
 
   getContextMenuItems(onlyVisible = true) {
-    if (this.currentMenuTypes.length) {
-      return menuUtil.filter(this.menus, this.currentMenuTypes, onlyVisible);
+    let currentMenuTypes = this._getCurrentMenuTypes();
+    if (currentMenuTypes.length) {
+      return menuUtil.filter(this.menus, currentMenuTypes, {onlyVisible, defaultMenuTypes: this.defaultMenuTypes});
     } else if (onlyVisible) {
       return this.menus.filter(menu => menu.visible);
     }
@@ -875,6 +876,9 @@ export default class FormField extends Widget {
   }
 
   _updateMenus() {
+    if (!this.rendered && !this.rendering) {
+      return;
+    }
     this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
     this._updateFieldStatus();
   }
@@ -902,13 +906,8 @@ export default class FormField extends Widget {
     this._updateMenus();
   }
 
-  setCurrentMenuTypes(currentMenuTypes) {
-    this.setProperty('currentMenuTypes', currentMenuTypes);
-  }
-
-  _renderCurrentMenuTypes() {
-    // If a tooltip is shown, update it with the new menus
-    this._updateFieldStatus();
+  _getCurrentMenuTypes() {
+    return [];
   }
 
   _setKeyStrokes(keyStrokes) {

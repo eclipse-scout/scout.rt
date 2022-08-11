@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -18,6 +18,9 @@ export default class ValueField extends FormField {
 
   constructor() {
     super();
+
+    this.defaultMenuTypes = [...this.defaultMenuTypes, ValueField.MenuTypes.NotNull, ValueField.MenuTypes.Null];
+
     this.clearable = ValueField.Clearable.FOCUSED;
     this.displayText = null;
     this.formatter = this._formatValue.bind(this);
@@ -48,6 +51,11 @@ export default class ValueField extends FormField {
      * Never show the clear icon.
      */
     NEVER: 'never'
+  };
+
+  static MenuTypes = {
+    Null: 'ValueField.Null',
+    NotNull: 'ValueField.NotNull'
   };
 
   _init(model) {
@@ -373,6 +381,7 @@ export default class ValueField extends FormField {
     }
 
     this._valueChanged();
+    this._updateMenus();
     this._updateTouched();
     this._updateEmpty();
     this.triggerPropertyChange('value', oldValue, this.value);
@@ -387,6 +396,13 @@ export default class ValueField extends FormField {
    */
   _valueChanged() {
     // NOP
+  }
+
+  _getCurrentMenuTypes() {
+    if (this.value) {
+      return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.NotNull];
+    }
+    return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.Null];
   }
 
   /**

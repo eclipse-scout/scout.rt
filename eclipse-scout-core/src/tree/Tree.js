@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, MenuBar, MenuDestinations, MenuItemsOrder, menus as menus_1, objects, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeSpaceKeyStroke, Widget} from '../index';
+import {arrays, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, objects, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeSpaceKeyStroke, Widget} from '../index';
 import $ from 'jquery';
 
 /**
@@ -895,8 +895,8 @@ export default class Tree extends Widget {
     // menubar takes care about removal
   }
 
-  _filterMenus(argMenus, destination, onlyVisible, enableDisableKeyStroke) {
-    return menus_1.filterAccordingToSelection('Tree', this.selectedNodes.length, argMenus, destination, onlyVisible, enableDisableKeyStroke);
+  _filterMenus(argMenus, destination, onlyVisible, enableDisableKeyStrokes) {
+    return menuUtil.filterAccordingToSelection('Tree', this.selectedNodes.length, argMenus, destination, {onlyVisible, enableDisableKeyStrokes});
   }
 
   /**

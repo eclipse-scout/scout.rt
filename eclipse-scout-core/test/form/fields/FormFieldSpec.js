@@ -9,16 +9,18 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormField, GridData, GroupBox, Menu, RadioButtonGroup, scout, Status, StringField, TreeVisitResult, Widget} from '../../../src/index';
-import {FormSpecHelper} from '../../../src/testing/index';
+import {FormSpecHelper, MenuSpecHelper} from '../../../src/testing/index';
 
 describe('FormField', () => {
   let session;
   let helper;
+  let menuHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
+    menuHelper = new MenuSpecHelper(session);
   });
 
   function createFormField(model) {
@@ -324,6 +326,34 @@ describe('FormField', () => {
       formField.fieldStatus.showContextMenu();
       expect(formField.fieldStatus.contextMenu.$visibleMenuItems().length).toBe(2);
       formField.fieldStatus.hideContextMenu();
+    });
+
+    it('is filtered by currentMenuTypes and defaultMenuTypes', () => {
+      let menu1 = menuHelper.createMenu(menuHelper.createModel('menu1', null, ['test.MenuType1', 'test.MenuType2'])),
+        menu2 = menuHelper.createMenu(menuHelper.createModel('menu2', null, ['test.MenuType1'])),
+        menu3 = menuHelper.createMenu(menuHelper.createModel('menu3')),
+        currentMenuTypes = [];
+
+      formField._getCurrentMenuTypes = () => currentMenuTypes;
+
+      formField.setMenus([menu1, menu2, menu3]);
+      formField.render();
+      expect(formField.getContextMenuItems()).toEqual([menu1, menu2, menu3]);
+
+      currentMenuTypes = ['test.MenuType1'];
+      expect(formField.getContextMenuItems()).toEqual([menu1, menu2]);
+
+      currentMenuTypes = ['test.MenuType2'];
+      expect(formField.getContextMenuItems()).toEqual([menu1]);
+
+      formField.defaultMenuTypes = ['test.MenuType1', 'test.MenuType2'];
+      expect(formField.getContextMenuItems()).toEqual([menu1, menu3]);
+
+      currentMenuTypes = ['test.MenuType1'];
+      expect(formField.getContextMenuItems()).toEqual([menu1, menu2, menu3]);
+
+      currentMenuTypes = [];
+      expect(formField.getContextMenuItems()).toEqual([menu1, menu2, menu3]);
     });
   });
 
