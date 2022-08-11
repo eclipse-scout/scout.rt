@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -723,32 +723,36 @@ describe('ValueField', () => {
     });
 
     it('context menu only shows visible menus', () => {
-      let menuModel1 = menuHelper.createModel('menu'),
-        menu1 = menuHelper.createMenu(menuModel1),
-        menuModel2 = menuHelper.createModel('menu'),
-        menu2 = menuHelper.createMenu(menuModel2);
+      let menu1 = menuHelper.createMenu(menuHelper.createModel('menu')),
+        menu2 = menuHelper.createMenu(menuHelper.createModel('menu'));
       menu2.visible = false;
       formField.menus = [menu1, menu2];
       formField.render();
 
-      formField.$status.triggerContextMenu();
+      formField.fieldStatus.showContextMenu();
 
       let $menu = $('body').find('.context-menu');
+      expect($menu.find('.menu-item').length).toBe(1);
+      expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
+
+      formField.fieldStatus.hideContextMenu();
+
+      // open again and change current menu types
+      formField.setValue('abc');
+      formField.fieldStatus.showContextMenu();
+
+      // menus without menuTypes are not affected by the changing the value and therefore changing the currentMenuType due to the defaultMenuTypes
+      $menu = $('body').find('.context-menu');
       expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
 
     it('context menu only shows menus of specific type', () => {
-      let menuModel1 = menuHelper.createModel('menu'),
-        menu1 = menuHelper.createMenu(menuModel1),
-        menuModel2 = menuHelper.createModel('menu'),
-        menu2 = menuHelper.createMenu(menuModel2);
-      menu1.menuTypes = ['ValueField.Null', 'ValueField.NotNull'];
-      menu2.menuTypes = ['ValueField.Null'];
+      let menu1 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ValueField.MenuTypes.Null, ValueField.MenuTypes.NotNull])),
+        menu2 = menuHelper.createMenu(menuHelper.createModel('menu', null, [ValueField.MenuTypes.Null]));
       formField.setMenus([menu1, menu2]);
       formField.render();
 
-      formField.setCurrentMenuTypes(['ValueField.Null']);
       formField.fieldStatus.showContextMenu();
 
       let $menu = $('body').find('.context-menu');
@@ -760,7 +764,6 @@ describe('ValueField', () => {
 
       // open again and change current menu types
       formField.setValue('abc');
-      formField.setCurrentMenuTypes(['ValueField.NotNull']);
       formField.fieldStatus.showContextMenu();
 
       $menu = $('body').find('.context-menu');

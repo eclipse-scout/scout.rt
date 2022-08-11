@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -2032,8 +2032,8 @@ export default class Table extends Widget {
     return null;
   }
 
-  _filterMenus(menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
-    return menus.filterAccordingToSelection('Table', this.selectedRows.length, menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
+  _filterMenus(menuItems, destination, onlyVisible, enableDisableKeyStrokes, notAllowedTypes) {
+    return menus.filterAccordingToSelection('Table', this.selectedRows.length, menuItems, destination, {onlyVisible, enableDisableKeyStrokes, notAllowedTypes});
   }
 
   _filterMenusForContextMenu() {

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -872,7 +872,10 @@ export default class Outline extends Tree {
       // DetailContent can be null or it is the tableRowDetail. Don't show menus on OutlineOverview.
       if (selectedPage.detailTable) {
         detailTable = selectedPage.detailTable;
-        menuItems = menuUtil.filter(detailTable.menus, ['Table.EmptySpace'], false, true);
+        menuItems = menuUtil.filter(detailTable.menus, ['Table.EmptySpace'], {
+          onlyVisible: false,
+          enableDisableKeyStrokes: true
+        });
         tableControls = detailTable.tableControls;
         detailTable.setMenuBarVisible(false);
         this._attachDetailMenusListener(detailTable);
@@ -881,7 +884,10 @@ export default class Outline extends Tree {
       let parentPage = selectedPage.parentNode;
       if (parentPage && parentPage.detailTable) {
         detailTable = parentPage.detailTable;
-        menuItems = menuItems.concat(menuUtil.filter(detailTable.menus, ['Table.SingleSelection'], false, true));
+        menuItems = menuItems.concat(menuUtil.filter(detailTable.menus, ['Table.SingleSelection'], {
+          onlyVisible: false,
+          enableDisableKeyStrokes: true
+        }));
         detailTable.setMenuBarVisible(false);
         this._attachDetailMenusListener(detailTable);
       }

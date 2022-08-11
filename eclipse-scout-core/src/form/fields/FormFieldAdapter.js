@@ -1,14 +1,19 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModelAdapter} from '../../index';
+import {App, arrays, FormField, ModelAdapter, objects} from '../../index';
+
+/**
+ * @typedef FormFieldModel
+ * @property {string[]} currentMenuTypes
+ */
 
 export default class FormFieldAdapter extends ModelAdapter {
 
@@ -20,6 +25,21 @@ export default class FormFieldAdapter extends ModelAdapter {
      * By default the field will be disabled.
      */
     this.enabledWhenOffline = false;
+    this._currentMenuTypes = [];
+  }
+
+  /**
+   * @param {FormFieldModel} model
+   */
+  _initProperties(model) {
+    super._initProperties(model);
+    this._currentMenuTypes = arrays.ensure(model.currentMenuTypes);
+    delete model.currentMenuTypes;
+  }
+
+  _syncCurrentMenuTypes(currentMenuTypes) {
+    this._currentMenuTypes = arrays.ensure(currentMenuTypes);
+    this.widget._updateMenus();
   }
 
   _goOffline() {
@@ -44,4 +64,27 @@ export default class FormFieldAdapter extends ModelAdapter {
       super._onWidgetEvent(event);
     }
   }
+
+  /**
+   * Static method to modify the prototype of FormField.
+   */
+  static modifyFormFieldPrototype() {
+    if (!App.get().remote) {
+      return;
+    }
+
+    objects.replacePrototypeFunction(FormField, '_getCurrentMenuTypes', FormFieldAdapter._getCurrentMenuTypes, true);
+  }
+
+  static _getCurrentMenuTypes() {
+    let currentMenuTypes = this._getCurrentMenuTypesOrig();
+
+    if (this.modelAdapter) {
+      currentMenuTypes = [...currentMenuTypes, ...this.modelAdapter._currentMenuTypes];
+    }
+
+    return currentMenuTypes;
+  }
 }
+
+App.addListener('bootstrap', FormFieldAdapter.modifyFormFieldPrototype);

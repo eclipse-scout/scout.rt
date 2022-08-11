@@ -1,17 +1,30 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, EllipsisMenu, MenuDestinations, scout} from '../index';
+import $ from 'jquery';
 
-export function filterAccordingToSelection(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
-  let allowedTypes = [];
+/**
+ * @typedef MenuFilterOptions
+ * @property {boolean?} onlyVisible
+ * @property {boolean?} enableDisableKeyStrokes
+ * @property {string[]?} notAllowedTypes
+ * @property {string[]?} defaultMenuTypes
+ */
+
+/**
+ * @param {MenuFilterOptions?} options
+ */
+export function filterAccordingToSelection(prefix, selectionLength, menus, destination, options) {
+  let allowedTypes = [],
+    {notAllowedTypes} = options || {};
 
   if (destination === MenuDestinations.MENU_BAR) {
     allowedTypes = [prefix + '.EmptySpace', prefix + '.SingleSelection', prefix + '.MultiSelection'];
@@ -37,7 +50,7 @@ export function filterAccordingToSelection(prefix, selectionLength, menus, desti
     }
     fixedNotAllowedTypes.push(type);
   }, this);
-  return filter(menus, allowedTypes, onlyVisible, enableDisableKeyStroke, fixedNotAllowedTypes);
+  return filter(menus, allowedTypes, $.extend({}, options, {notAllowedTypes: fixedNotAllowedTypes}));
 }
 
 /**
@@ -45,13 +58,17 @@ export function filterAccordingToSelection(prefix, selectionLength, menus, desti
  * from this method. The visible state is only checked if the parameter onlyVisible is set to true. Otherwise invisible items are returned and added to the
  * menu-bar DOM (invisible, however). They may change their visible state later. If there are any types in notAllowedTypes each menu is checked also against
  * these types and if they are matching the menu is filtered.
+ *
+ * @param {MenuFilterOptions?} options
  */
-export function filter(menus, types, onlyVisible, enableDisableKeyStrokes, notAllowedTypes) {
+export function filter(menus, types, options) {
   if (!menus) {
     return;
   }
   types = arrays.ensure(types);
+  let {onlyVisible, enableDisableKeyStrokes, notAllowedTypes, defaultMenuTypes} = options || {};
   notAllowedTypes = arrays.ensure(notAllowedTypes);
+  defaultMenuTypes = arrays.ensure(defaultMenuTypes);
 
   let filteredMenus = [],
     separatorCount = 0;
@@ -59,12 +76,12 @@ export function filter(menus, types, onlyVisible, enableDisableKeyStrokes, notAl
   menus.forEach(menu => {
     let childMenus = menu.childActions;
     if (childMenus.length > 0) {
-      childMenus = filter(childMenus, types, onlyVisible, enableDisableKeyStrokes, notAllowedTypes);
+      childMenus = filter(childMenus, types, options);
       if (childMenus.length === 0) {
         _enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
         return;
       }
-    } else if (!_checkType(menu, types) || (notAllowedTypes.length !== 0 && _checkType(menu, notAllowedTypes))) {
+    } else if (!_checkType(menu, types, defaultMenuTypes) || (notAllowedTypes.length !== 0 && _checkType(menu, notAllowedTypes, defaultMenuTypes))) {
       // Don't check the menu type for a group
       _enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
       return;
@@ -128,13 +145,13 @@ export function updateSeparatorVisibility(menus) {
   });
 }
 
-export function checkType(menu, types) {
+export function checkType(menu, types, defaultMenuTypes = []) {
   types = arrays.ensure(types);
   if (menu.childActions.length > 0) {
     let childMenus = filter(menu.childActions, types);
     return (childMenus.length > 0);
   }
-  return _checkType(menu, types);
+  return _checkType(menu, types, defaultMenuTypes);
 }
 
 export function _enableDisableMenuKeyStroke(menu, activated, exclude) {
@@ -147,15 +164,17 @@ export function _enableDisableMenuKeyStroke(menu, activated, exclude) {
  * Checks the type of a menu. Don't use this for menu groups.
  */
 
-export function _checkType(menu, types) {
+export function _checkType(menu, types, defaultMenuTypes = []) {
   if (!types || types.length === 0) {
     return false;
   }
-  if (!menu.menuTypes) {
-    return false;
+  let menuTypes = arrays.ensure(menu.menuTypes);
+  defaultMenuTypes = arrays.ensure(defaultMenuTypes);
+  if (menuTypes.length === 0) {
+    menuTypes = defaultMenuTypes;
   }
   for (let j = 0; j < types.length; j++) {
-    if (menu.menuTypes.indexOf(types[j]) > -1) {
+    if (menuTypes.indexOf(types[j]) > -1) {
       return true;
     }
   }

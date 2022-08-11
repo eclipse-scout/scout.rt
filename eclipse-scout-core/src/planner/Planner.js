@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ContextMenuPopup, DateFormat, DateRange, dates, graphics, HtmlComponent, KeyStrokeContext, MenuBar, menus as menus_1, objects, PlannerHeader, PlannerLayout, PlannerMenuItemsOrder, Range, scout, scrollbars, strings, styles, tooltips, TooltipSupport, Widget, YearPanel} from '../index';
+import {arrays, ContextMenuPopup, DateFormat, DateRange, dates, graphics, HtmlComponent, KeyStrokeContext, MenuBar, menus as menuUtil, objects, PlannerHeader, PlannerLayout, PlannerMenuItemsOrder, Range, scout, scrollbars, strings, styles, tooltips, TooltipSupport, Widget, YearPanel} from '../index';
 import $ from 'jquery';
 
 export default class Planner extends Widget {
@@ -1250,7 +1250,7 @@ export default class Planner extends Widget {
     // menubar takes care about removal
   }
 
-  _filterMenus(allowedTypes, onlyVisible, enableDisableKeyStroke) {
+  _filterMenus(allowedTypes, onlyVisible, enableDisableKeyStrokes) {
     allowedTypes = allowedTypes || [];
     if (allowedTypes.indexOf('Planner.Resource') > -1 && this.selectedResources.length === 0) {
       arrays.remove(allowedTypes, 'Planner.Resource');
@@ -1261,7 +1261,7 @@ export default class Planner extends Widget {
     if (allowedTypes.indexOf('Planner.Range') > -1 && !this.selectionRange.from && !this.selectionRange.to) {
       arrays.remove(allowedTypes, 'Planner.Range');
     }
-    return menus_1.filter(this.menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
+    return menuUtil.filter(this.menus, allowedTypes, {onlyVisible, enableDisableKeyStrokes});
   }
 
   setDisplayModeOptions(displayModeOptions) {
