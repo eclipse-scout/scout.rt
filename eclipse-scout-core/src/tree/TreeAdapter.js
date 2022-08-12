@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, defaultValues, ModelAdapter, objects, Tree} from '../index';
-import $ from 'jquery';
+import {App, arrays, defaultValues, ModelAdapter, objects, scout, Tree} from '../index';
 
 export default class TreeAdapter extends ModelAdapter {
 
@@ -263,7 +262,8 @@ export default class TreeAdapter extends ModelAdapter {
   }
 
   _initNodeModel(nodeModel) {
-    nodeModel = $.extend({objectType: this._getDefaultNodeObjectType()}, nodeModel);
+    nodeModel = nodeModel || {};
+    nodeModel.objectType = scout.nvl(nodeModel.objectType, this._getDefaultNodeObjectType());
     defaultValues.applyTo(nodeModel);
     return nodeModel;
   }

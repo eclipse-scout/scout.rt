@@ -180,7 +180,8 @@ export default class Tree extends Widget {
   }
 
   _createTreeNode(nodeModel) {
-    nodeModel = $.extend({objectType: TreeNode}, nodeModel);
+    nodeModel = nodeModel || {};
+    nodeModel.objectType = scout.nvl(nodeModel.objectType, TreeNode);
     nodeModel.parent = this;
     return scout.create(nodeModel);
   }

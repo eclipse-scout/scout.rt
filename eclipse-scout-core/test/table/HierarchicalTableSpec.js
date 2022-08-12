@@ -143,7 +143,7 @@ describe('HierarchicalTableSpec', () => {
 
     });
 
-    it('a child row to a row which is already a parent row (by TableRow)', () => {
+    it('a child row to a row which is already a parent row (by pseudo row)', () => {
       let newRow = helper.createModelRow(33, ['newRow']),
         pseudoParentRow = {
           id: '0'
@@ -166,7 +166,7 @@ describe('HierarchicalTableSpec', () => {
       expectRowIds(getUiRows(table), expectedRowIds);
     });
 
-    it('a child row to a row which is already a parent row (by pseudo row)', () => {
+    it('a child row to a row which is already a parent row (by TableRow)', () => {
       let newRow = helper.createModelRow(33, ['newRow']),
         parentRow = table.rows[0];
 
@@ -186,6 +186,21 @@ describe('HierarchicalTableSpec', () => {
       expectRowIds(table._filteredRows, expectedRowIds);
       expectRowIds(table.visibleRows, expectedRowIds);
       expectRowIds(getUiRows(table), expectedRowIds);
+    });
+
+    it('a child row to a model row that was inserted before', () => {
+      let parentRow = {cells: ['newRow'], expanded: true};
+      let childRow = {cells: ['childRow'], parentRow: parentRow};
+
+      table.deleteAllRows();
+      table.insertRows([parentRow, childRow]);
+      expect(table.rows.length).toBe(2);
+      expect(table._filteredRows.length).toBe(2);
+      expect(table.visibleRows.length).toBe(2);
+      expect(table.rootRows.length).toBe(1);
+      expect(table.rowsMap[parentRow.id].childRows.length).toBe(1);
+      expect(table.rowsMap[parentRow.id].childRows[0]).toBe(table.rows[1]);
+      expect(table.rowsMap[childRow.id].parentRow).toBe(table.rows[0]);
     });
 
     it('a child row to a row which is leaf', () => {
