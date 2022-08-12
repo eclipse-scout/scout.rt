@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.PlatformEvent;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -55,12 +56,8 @@ public class ClientNotificationPoller {
     // ensure the poller starts only once.
     Assertions.assertNull(m_pollerFuture);
     if (BEANS.get(IServiceTunnel.class).isActive()) {
-
       m_pollerFuture = Jobs.schedule(new P_NotificationPoller(), Jobs.newInput()
-          .withRunContext(ClientRunContexts.empty()
-              .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
-              .withUserAgent(UserAgents.createDefault())
-              .withSession(null, false))
+          .withRunContext(createRunContext())
           .withName(ClientNotificationPoller.class.getSimpleName()));
     }
     else {
@@ -76,6 +73,13 @@ public class ClientNotificationPoller {
     LOG.debug("Stopping client notification poller [clientNodeId={}].", INode.ID);
     m_pollerFuture.cancel(true);
     m_pollerFuture = null;
+  }
+
+  protected RunContext createRunContext() {
+    return ClientRunContexts.empty()
+        .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
+        .withUserAgent(UserAgents.createDefault())
+        .withSession(null, false);
   }
 
   protected static void handleMessagesReceived(List<ClientNotificationMessage> notifications) {
@@ -135,7 +139,9 @@ public class ClientNotificationPoller {
     @Override
     public void stateChanged(final PlatformEvent event) {
       if (event.getState() == State.PlatformStopping) {
-        BEANS.get(ClientNotificationPoller.class).stop();
+        ClientNotificationPoller poller = BEANS.get(ClientNotificationPoller.class);
+        poller.stop();
+        poller.createRunContext().run(() -> BEANS.get(IClientNotificationService.class).unregisterNode(INode.ID));
       }
     }
   }

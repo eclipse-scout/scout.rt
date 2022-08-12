@@ -33,6 +33,14 @@ public interface IClientNotificationService {
   void registerNode(String nodeId);
 
   /**
+   * Unregister a node with all its registered session and users.
+   *
+   * @param nodeId
+   *          unique id of the client node
+   */
+  void unregisterNode(String nodeId);
+
+  /**
    * Receive new notifications relevant for the given node
    *
    * @param nodeId
@@ -40,5 +48,4 @@ public interface IClientNotificationService {
    * @return list of new notification messages never <code>null</code>
    */
   List<ClientNotificationMessage> getNotifications(String nodeId);
-
 }
