@@ -90,6 +90,7 @@ public class ClientNotificationRegistry {
    */
   void unregisterNode(String nodeId) {
     synchronized (m_notificationQueues) {
+      LOG.info("Removing queue of unregistered node [clientNodeId={}]", nodeId);
       m_notificationQueues.remove(nodeId);
     }
   }
@@ -258,7 +259,7 @@ public class ClientNotificationRegistry {
         if (!queue.getNodeId().equals(excludedUiNodeId)) {
           queue.put(messages);
           if (isQueueExpired(queue)) {
-            LOG.debug("Removing expired queue {}", queue.getNodeId());
+            LOG.info("Removing expired queue [clientNodeId={}, lastConsumeAccess={}]", queue.getNodeId(), queue.getLastConsumeAccessFormatted());
             iter.remove();
           }
         }
@@ -402,5 +403,4 @@ public class ClientNotificationRegistry {
       LOG.error("Failed to publish client notification", e);
     }
   }
-
 }

@@ -41,8 +41,12 @@ public class ClientNotificationService implements IClientNotificationService {
   }
 
   @Override
+  public void unregisterNode(String nodeId) {
+    BEANS.get(ClientNotificationRegistry.class).unregisterNode(nodeId);
+  }
+
+  @Override
   public List<ClientNotificationMessage> getNotifications(String nodeId) {
     return BEANS.get(ClientNotificationRegistry.class).consume(nodeId, m_maxNotifications, m_blockingTimeout, TimeUnit.MILLISECONDS);
   }
-
 }

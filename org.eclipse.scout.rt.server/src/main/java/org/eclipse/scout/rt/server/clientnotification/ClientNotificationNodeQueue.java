@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,6 +37,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FinalValue;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.NodeQueueCapacity;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
@@ -155,8 +157,8 @@ public class ClientNotificationNodeQueue {
             .map(e -> e.getKey() + " (" + e.getValue() + "x)")
             .collect(Collectors.joining(", ", "[", "]"));
 
-        LOG.warn("Notification queue capacity reached. Added {}, removed oldest {} notification messages. [clientNodeId={}, newNotifications={}, droppedNotifications={}]",
-            notifications.size(), droppedNotifications.size(), getNodeId(), infoExtractor.apply(notifications.stream()), infoExtractor.apply(droppedNotifications.stream()));
+        LOG.warn("Notification queue capacity reached. Added {}, removed oldest {} notification messages. [clientNodeId={}, lastConsumeAccess={}, newNotifications={}, droppedNotifications={}]",
+            notifications.size(), droppedNotifications.size(), getNodeId(), getLastConsumeAccessFormatted(), infoExtractor.apply(notifications.stream()), infoExtractor.apply(droppedNotifications.stream()));
       }
       if (LOG.isDebugEnabled()) {
         Function<Stream<? extends ClientNotificationMessage>, String> infoExtractor = s -> s
@@ -175,6 +177,10 @@ public class ClientNotificationNodeQueue {
    */
   public long getLastConsumeAccess() {
     return m_lastConsumeAccess.get();
+  }
+
+  public String getLastConsumeAccessFormatted() {
+    return DateUtility.format(new Date(getLastConsumeAccess()), "yyyy-MM-dd HH:mm:ss.SSS");
   }
 
   public List<ClientNotificationMessage> consume(int maxAmount, long maxWaitTime, TimeUnit unit) {
