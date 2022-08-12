@@ -232,7 +232,8 @@ export default class Table extends Widget {
   }
 
   _createRow(rowModel) {
-    rowModel = $.extend({objectType: TableRow}, rowModel);
+    rowModel = rowModel || {};
+    rowModel.objectType = scout.nvl(rowModel.objectType, TableRow);
     rowModel.parent = this;
     return scout.create(rowModel);
   }

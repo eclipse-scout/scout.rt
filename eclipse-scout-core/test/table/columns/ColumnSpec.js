@@ -544,7 +544,7 @@ describe('Column', () => {
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
         spyOn(table, 'resizeToFit').and.callThrough();
 
-        table.insertRow(['a', 'b', 'c']);
+        table.insertRow({cells: ['a', 'b', 'c']});
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(true);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
         table.validateLayout();

@@ -628,7 +628,8 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   _initRowModel(rowModel) {
-    rowModel = $.extend({objectType: 'TableRow'}, rowModel);
+    rowModel = rowModel || {};
+    rowModel.objectType = scout.nvl(rowModel.objectType, 'TableRow');
     defaultValues.applyTo(rowModel);
     return rowModel;
   }

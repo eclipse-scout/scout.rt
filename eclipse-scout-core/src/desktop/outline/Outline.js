@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Desktop, DetailTableTreeFilter, Device, FileChooserController, Form, FormController, GroupBoxMenuItemsOrder, HtmlComponent, Icon, keyStrokeModifier, MenuBar, menus as menuUtil, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, scout, TableControlAdapterMenu, TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke} from '../../index';
-import $ from 'jquery';
 
 /**
  * @extends {Tree}
@@ -120,10 +119,9 @@ export default class Outline extends Tree {
    * @override Tree.js
    */
   _createTreeNode(nodeModel) {
-    let model = $.extend({
-      objectType: Page
-    }, nodeModel);
-    return this._createChild(model);
+    nodeModel = nodeModel || {};
+    nodeModel.objectType = scout.nvl(nodeModel.objectType, Page);
+    return this._createChild(nodeModel);
   }
 
   _createKeyStrokeContext() {
