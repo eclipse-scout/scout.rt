@@ -54,6 +54,7 @@ export default class Table extends Widget {
     this.tableTileGridMediator = null;
     this.tileMode = false;
     this.tileTableHeader = null;
+    this.tileProducer = null;
     this.footer = null;
     this.footerVisible = false;
     this.filters = [];
@@ -4400,7 +4401,17 @@ export default class Table extends Widget {
   }
 
   createTileForRow(row) {
-    throw new Error('Not implemented');
+    if (this.tileProducer) {
+      return this.tileProducer(row);
+    }
+    throw new Error('Cannot create a tile without a producer.');
+  }
+
+  /**
+   * @param {Function} tileProducer
+   */
+  setTileProducer(tileProducer) {
+    this.setProperty('tileProducer', tileProducer);
   }
 
   _setTileTableHeader(tileTableHeader) {
