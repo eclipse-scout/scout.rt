@@ -11,6 +11,11 @@
 import ObjectFactory from './ObjectFactory';
 
 export {default as scout} from './scout';
+export {default as Event} from './events/Event';
+export {default as EventEmitter} from './events/EventEmitter';
+export {default as PropertyEventEmitter} from './events/PropertyEventEmitter';
+export {default as EventSupport} from './events/EventSupport';
+export {default as EventDelegator} from './events/EventDelegator';
 export {default as App} from './App';
 export {default as ErrorHandler} from './ErrorHandler';
 export {default as RemoteApp} from './RemoteApp';
@@ -33,7 +38,6 @@ export {default as arrays} from './util/arrays';
 export {default as Call} from './util/Call';
 export {default as clipboard} from './util/clipboard';
 export {default as colorSchemes} from './util/colorSchemes';
-export {default as EventDelegator} from './util/EventDelegator';
 export {default as dates} from './util/dates';
 export {default as defaultValues} from './util/defaultValues';
 export {default as events} from './util/events';
@@ -42,8 +46,6 @@ export {default as Device} from './util/Device';
 export {default as DoubleClickSupport} from './util/DoubleClickSupport';
 export {default as DragAndDropHandler} from './util/DragAndDropHandler';
 export {default as dragAndDrop} from './util/dragAndDrop';
-export {default as Event} from './util/Event';
-export {default as EventSupport} from './util/EventSupport';
 export {default as fonts} from './util/fonts';
 export {default as icons} from './util/icons';
 export {default as inspector} from './util/inspector';

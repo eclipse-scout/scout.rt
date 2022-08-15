@@ -8,15 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, EventSupport, scout, styles} from '../index';
+import {App, EventEmitter, scout, styles} from '../index';
 
 let instance;
 /**
  * @singleton
  */
-export default class HtmlEnvironment {
+export default class HtmlEnvironment extends EventEmitter {
 
   constructor() {
+    super();
+
     // -------------------------------
     // The values for these properties are defined using CSS (sizes.less).
     // The following values are default values in case the CSS values are not available.
@@ -29,7 +31,6 @@ export default class HtmlEnvironment {
     this.fieldLabelWidth = 140;
     this.fieldMandatoryIndicatorWidth = 8;
     this.fieldStatusWidth = 20;
-    this.events = new EventSupport();
   }
 
   init(additionalClass) {
@@ -46,15 +47,7 @@ export default class HtmlEnvironment {
     let event = {
       source: this
     };
-    this.events.trigger('propertyChange', event);
-  }
-
-  on(type, func) {
-    return this.events.on(type, func);
-  }
-
-  off(type, func) {
-    return this.events.off(type, func);
+    this.trigger('propertyChange', event);
   }
 
   /**

@@ -11,28 +11,21 @@
 import {arrays, objects, scout} from '../index';
 
 /**
- * Helper to support clone property and event handling between original and clone.
- *
- * OPTION                   DEFAULT VALUE   DESCRIPTION
- * --------------------------------------------------------------------------------------------------------
- * delegateProperties       []              An array of all properties to be delegated from the source
- *                                          to the to the target when changed on the source.
- *
- * excludeProperties        []              An array of all properties to be excluded from delegating to the
- *                                          in all cases.
- *
- * delegateEvents           []              An array of all events to be delegated from the source to
- *                                          the target when fired on the source.
- *
- * delegateAllProperties    false           True to delegate all property changes from the source to
- *                                          the target.
- *
- * delegateAllEvents        false           True to delegate all events from the source to
- *                                          the target.
- *
+ * Delegates events between two {@link EventEmitter}s.
  */
 export default class EventDelegator {
 
+  /**
+   * @param {EventEmitter} source
+   * @param {EventEmitter} target
+   * @param {object} [options]
+   * @param {boolean} [options.callSetter] True, to call the setter on the target on a property change event.
+   * @param {string[]} [options.delegateProperties] An array of all properties to be delegated from the source to the target when changed on the source. Default is [];
+   * @param {string[]} [options.excludeProperties] An array of all properties to be excluded from delegating to the target in all cases. Default is [].
+   * @param {string[]} [options.delegateEvents] An array of all events to be delegated from the source to the target when triggered on the source. Default is [].
+   * @param {string[]} [options.delegateAllProperties] True, to delegate all property changes from the source to the target. Default is false.
+   * @param {string[]} [options.delegateAllEvents] True, to delegate all events from the source to the target. Default is false.
+   */
   constructor(source, target, options) {
     options = options || {};
     this.source = source;
@@ -95,7 +88,7 @@ export default class EventDelegator {
         return;
       }
       if (this.callSetter) {
-        this.target.callSetter(event.propertyName, event.newValue);
+        (/** @type {PropertyEventEmitter} */ this.target).callSetter(event.propertyName, event.newValue);
       } else {
         this.target.trigger(event.type, event);
       }

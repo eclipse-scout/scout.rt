@@ -9,13 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {codes, Desktop, Device, ErrorHandler, EventSupport, fonts, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage} from './index';
+import {codes, Desktop, Device, ErrorHandler, EventEmitter, fonts, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage} from './index';
 import $ from 'jquery';
 
 let instance = null;
 let listeners = [];
 
-export default class App {
+export default class App extends EventEmitter {
 
   static addListener(type, func) {
     let listener = {
@@ -35,7 +35,7 @@ export default class App {
   }
 
   constructor() {
-    this.events = this._createEventSupport();
+    super();
     this.initialized = false;
     this.sessions = [];
     this._loadingTimeoutId = null;
@@ -481,49 +481,4 @@ export default class App {
   _installExtensions() {
     // NOP
   }
-
-  // --- Event handling methods ---
-  _createEventSupport() {
-    return new EventSupport();
-  }
-
-  trigger(type, event) {
-    event = event || {};
-    event.source = this;
-    this.events.trigger(type, event);
-  }
-
-  one(type, func) {
-    this.events.one(type, func);
-  }
-
-  on(type, func) {
-    return this.events.on(type, func);
-  }
-
-  off(type, func) {
-    this.events.off(type, func);
-  }
-
-  addListener(listener) {
-    this.events.addListener(listener);
-  }
-
-  removeListener(listener) {
-    this.events.removeListener(listener);
-  }
-
-  when(type) {
-    return this.events.when(type);
-  }
 }
-/*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- */

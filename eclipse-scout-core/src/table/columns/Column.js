@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, CellEditorPopup, ColumnOptimalWidthMeasurer, comparators, EventSupport, FormField, GridData, icons, objects, scout, Status, StringField, strings, styles, Table, TableHeaderMenu, TableRow, texts} from '../../index';
+import {Cell, CellEditorPopup, ColumnOptimalWidthMeasurer, comparators, FormField, GridData, icons, objects, PropertyEventEmitter, scout, Status, StringField, strings, styles, Table, TableHeaderMenu, TableRow, texts} from '../../index';
 import $ from 'jquery';
 
-export default class Column {
+export default class Column extends PropertyEventEmitter {
 
   constructor() {
+    super();
     this.autoOptimizeWidth = false;
     this.autoOptimizeWidthRequired = false; // true if content of the column changed and width has to be optimized
     this.autoOptimizeMaxWidth = -1;
@@ -59,8 +60,6 @@ export default class Column {
     this.tableNodeLevel0CellPadding = 28;
     this.expandableIconLevel0CellPadding = 13;
     this.nodeColumnCandidate = true;
-
-    this.events = this._createEventSupport();
 
     this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
     // Contains the width the cells of the column really have (only set in Chrome due to a Chrome bug, see Table._updateRealColumnWidths)
@@ -617,14 +616,14 @@ export default class Column {
     }
   }
 
-  setHorizontalAlignment(hAlign) {
-    if (this.horizontalAlignment === hAlign) {
+  setHorizontalAlignment(horizontalAlignment) {
+    let changed = this.setProperty('horizontalAlignment', horizontalAlignment);
+    if (!changed) {
       return;
     }
-    this.horizontalAlignment = hAlign;
 
     this.table.rows.forEach(row => {
-      this.cell(row).setHorizontalAlignment(hAlign);
+      this.cell(row).setHorizontalAlignment(horizontalAlignment);
     });
 
     this.table.updateRows(this.table.rows);
@@ -635,10 +634,10 @@ export default class Column {
   }
 
   setEditable(editable) {
-    if (this.editable === editable) {
+    let changed = this.setProperty('editable', editable);
+    if (!changed) {
       return;
     }
-    this.editable = editable;
 
     this.table.rows.forEach(row => {
       this.cell(row).setEditable(editable);
@@ -648,10 +647,10 @@ export default class Column {
   }
 
   setMandatory(mandatory) {
-    if (this.mandatory === mandatory) {
+    let changed = this.setProperty('mandatory', mandatory);
+    if (!changed) {
       return;
     }
-    this.mandatory = mandatory;
 
     this.table.rows.forEach(row => {
       this.cell(row).setMandatory(mandatory);
@@ -661,21 +660,21 @@ export default class Column {
   }
 
   setCssClass(cssClass) {
-    if (this.cssClass === cssClass) {
+    let changed = this.setProperty('cssClass', cssClass);
+    if (!changed) {
       return;
     }
 
-    this.cssClass = cssClass;
-
-    this.table.rows.forEach(function(row) {
+    this.table.rows.forEach(row => {
       this.cell(row).setCssClass(cssClass);
-    }, this);
+    });
 
     this.table.updateRows(this.table.rows);
   }
 
   setWidth(width) {
-    if (this.width === width) {
+    let changed = this.setProperty('width', width);
+    if (!changed) {
       return;
     }
     this.table.resizeColumn(this, width);
@@ -854,7 +853,7 @@ export default class Column {
   }
 
   _setVisible(visible, redraw) {
-    this.visible = visible;
+    this._setProperty('visible', visible);
     if (scout.nvl(redraw, this.initialized)) {
       this.table.onColumnVisibilityChanged();
     }
@@ -874,7 +873,7 @@ export default class Column {
   }
 
   _setDisplayable(displayable, redraw) {
-    this.displayable = displayable;
+    this._setProperty('displayable', displayable);
     if (scout.nvl(redraw, this.initialized)) {
       this.table.onColumnVisibilityChanged();
     }
@@ -894,21 +893,18 @@ export default class Column {
   }
 
   _setCompacted(compacted, redraw) {
-    this.compacted = compacted;
+    this._setProperty('compacted', compacted);
     if (scout.nvl(redraw, this.initialized)) {
       this.table.onColumnVisibilityChanged();
     }
   }
 
   setAutoOptimizeWidth(autoOptimizeWidth) {
-    if (this.autoOptimizeWidth === autoOptimizeWidth) {
-      return;
-    }
-    this._setAutoOptimizeWidth(autoOptimizeWidth);
+    this.setProperty('autoOptimizeWidth', autoOptimizeWidth);
   }
 
   _setAutoOptimizeWidth(autoOptimizeWidth) {
-    this.autoOptimizeWidth = autoOptimizeWidth;
+    this._setProperty('autoOptimizeWidth', autoOptimizeWidth);
     this.autoOptimizeWidthRequired = autoOptimizeWidth;
     if (this.initialized) {
       this.table.columnLayoutDirty = true;
@@ -917,68 +913,52 @@ export default class Column {
   }
 
   setMaxLength(maxLength) {
-    this.maxLength = maxLength;
+    this.setProperty('maxLength', maxLength);
   }
 
   setText(text) {
-    if (this.text === text) {
-      return;
-    }
-    this.text = text;
-    if (this.table.header) {
+    let changed = this.setProperty('text', text);
+    if (changed && this.table.header) {
       this.table.header.updateHeader(this);
     }
   }
 
   setHeaderIconId(headerIconId) {
-    if (this.headerIconId === headerIconId) {
-      return;
-    }
-    this.headerIconId = headerIconId;
-    if (this.table.header) {
+    let changed = this.setProperty('headerIconId', headerIconId);
+    if (changed && this.table.header) {
       this.table.header.updateHeader(this);
     }
   }
 
   setHeaderCssClass(headerCssClass) {
-    if (this.headerCssClass === headerCssClass) {
-      return;
-    }
     let oldState = $.extend({}, this);
-    this.headerCssClass = headerCssClass;
-    if (this.table.header) {
+    let changed = this.setProperty('headerCssClass', headerCssClass);
+    if (changed && this.table.header) {
       this.table.header.updateHeader(this, oldState);
     }
   }
 
   setHeaderHtmlEnabled(headerHtmlEnabled) {
-    if (this.headerHtmlEnabled === headerHtmlEnabled) {
-      return;
-    }
-    this.headerHtmlEnabled = headerHtmlEnabled;
-    if (this.table.header) {
+    let changed = this.setProperty('headerHtmlEnabled', headerHtmlEnabled);
+    if (changed && this.table.header) {
       this.table.header.updateHeader(this);
     }
   }
 
   setHeaderTooltipText(headerTooltipText) {
-    this.headerTooltipText = headerTooltipText;
+    this.setProperty('headerTooltipText', headerTooltipText);
   }
 
   setHeaderTooltipHtmlEnabled(headerTooltipHtmlEnabled) {
-    this.headerTooltipHtmlEnabled = headerTooltipHtmlEnabled;
+    this.setProperty('headerTooltipHtmlEnabled', headerTooltipHtmlEnabled);
   }
 
   setTextWrap(textWrap) {
-    if (this.textWrap === textWrap) {
-      return;
-    }
-    this.textWrap = textWrap;
-    if (this.table.rendered && this.table.multilineText) { // If multilineText is disabled toggling textWrap has no effect
+    let changed = this.setProperty('textWrap', textWrap);
+    if (changed && this.table.rendered && this.table.multilineText) { // If multilineText is disabled toggling textWrap has no effect
       // See also table._renderMultilineText(), requires similar operations
       this.autoOptimizeWidthRequired = true;
-      this.table._redraw();
-      this.table.invalidateLayoutTree();
+      this.table.redraw();
     }
   }
 
@@ -1009,44 +989,5 @@ export default class Column {
 
   _realWidthIfAvailable() {
     return this._realWidth || this.width;
-  }
-
-  // --- Event handling methods ---
-  _createEventSupport() {
-    return new EventSupport();
-  }
-
-  trigger(type, event) {
-    event = event || {};
-    event.source = this;
-    this.events.trigger(type, event);
-  }
-
-  one(type, func) {
-    this.events.one(type, func);
-  }
-
-  on(type, func) {
-    return this.events.on(type, func);
-  }
-
-  off(type, func) {
-    this.events.off(type, func);
-  }
-
-  addListener(listener) {
-    this.events.addListener(listener);
-  }
-
-  removeListener(listener) {
-    this.events.removeListener(listener);
-  }
-
-  /**
-   * Adds an event handler using {@link #one()} and returns a promise.
-   * The promise is resolved as soon as the event is triggered.
-   */
-  when(type) {
-    return this.events.when(type);
   }
 }

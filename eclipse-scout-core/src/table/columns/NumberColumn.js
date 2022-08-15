@@ -35,27 +35,25 @@ export default class NumberColumn extends Column {
   _init(model) {
     super._init(model);
     this._setDecimalFormat(this.decimalFormat);
-    this.setAggregationFunction(this.aggregationFunction);
+    this._setAggregationFunction(this.aggregationFunction);
   }
 
   setDecimalFormat(decimalFormat) {
-    if (this.decimalFormat === decimalFormat) {
-      return;
+    this.setProperty('decimalFormat', decimalFormat);
+  }
+
+  _setDecimalFormat(decimalFormat) {
+    if (!decimalFormat) {
+      decimalFormat = this._getDefaultFormat(this.session.locale);
     }
-    this._setDecimalFormat(decimalFormat);
+    decimalFormat = DecimalFormat.ensure(this.session.locale, decimalFormat);
+    this._setProperty('decimalFormat', decimalFormat);
     if (this.initialized) {
       // if format changes on the fly, just update the cell text
       this.table.rows.forEach(row => {
         this._updateCellText(row, this.cell(row));
       });
     }
-  }
-
-  _setDecimalFormat(format) {
-    if (!format) {
-      format = this._getDefaultFormat(this.session.locale);
-    }
-    this.decimalFormat = DecimalFormat.ensure(this.session.locale, format);
   }
 
   _getDefaultFormat(locale) {
@@ -77,8 +75,12 @@ export default class NumberColumn extends Column {
     return numbers.ensure(value);
   }
 
-  setAggregationFunction(func) {
-    this.aggregationFunction = func;
+  setAggregationFunction(aggregationFunction) {
+    this.setProperty('aggregationFunction', aggregationFunction);
+  }
+
+  _setAggregationFunction(func) {
+    this._setProperty('aggregationFunction', func);
     if (func === 'sum') {
       this.aggrStart = aggregation.sumStart;
       this.aggrStep = aggregation.sumStep;
@@ -144,12 +146,11 @@ export default class NumberColumn extends Column {
     return this.decimalFormat.round(value);
   }
 
-  setBackgroundEffect(effect) {
-    if (this.backgroundEffect === effect) {
+  setBackgroundEffect(backgroundEffect) {
+    let changed = this.setProperty('backgroundEffect', backgroundEffect);
+    if (!changed) {
       return;
     }
-
-    this.backgroundEffect = effect;
     this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
 
     this.table.trigger('columnBackgroundEffectChanged', {

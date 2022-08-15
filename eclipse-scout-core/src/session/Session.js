@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Device, EventSupport, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale, logging, MessageBox, ModelAdapter, NullWidget, ObjectFactory, objects, Reconnector, RemoteEvent, ResponseQueue, scout, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage} from '../index';
+import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Device, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale, logging, MessageBox, ModelAdapter, NullWidget, ObjectFactory, objects, Reconnector, RemoteEvent, ResponseQueue, scout, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage} from '../index';
 import $ from 'jquery';
 
-export default class Session {
+export default class Session extends EventEmitter {
   constructor() {
+    super();
     this.$entryPoint = null;
     this.partId = 0;
 
@@ -83,7 +84,6 @@ export default class Session {
       id: '1',
       objectType: 'NullWidget'
     }, rootParent);
-    this.events = this._createEventSupport();
   }
 
   // Corresponds to constants in JsonResponse
@@ -1612,40 +1612,5 @@ export default class Session {
 
   textExists(textKey) {
     return this.textMap.exists(textKey);
-  }
-
-  // --- Event handling methods ---
-  _createEventSupport() {
-    return new EventSupport();
-  }
-
-  trigger(type, event) {
-    event = event || {};
-    event.source = this;
-    this.events.trigger(type, event);
-  }
-
-  one(type, func) {
-    this.events.one(type, func);
-  }
-
-  on(type, func) {
-    return this.events.on(type, func);
-  }
-
-  off(type, func) {
-    this.events.off(type, func);
-  }
-
-  addListener(listener) {
-    this.events.addListener(listener);
-  }
-
-  removeListener(listener) {
-    this.events.removeListener(listener);
-  }
-
-  when(type) {
-    return this.events.when(type);
   }
 }

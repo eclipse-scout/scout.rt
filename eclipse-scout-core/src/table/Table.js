@@ -733,8 +733,7 @@ export default class Table extends Widget {
     this.trigger('columnStructureChanged');
     if (this._isDataRendered()) {
       this._updateRowWidth();
-      this._redraw();
-      this.invalidateLayoutTree();
+      this.redraw();
     }
   }
 
@@ -3906,17 +3905,15 @@ export default class Table extends Widget {
   /**
    * Resizes the given column to the new size.
    *
-   * @param column
-   *          column to resize
-   * @param width
-   *          new column size
+   * @param {Column} column column to resize
+   * @param {number} width new column size
    */
   resizeColumn(column, width) {
     if (column.fixedWidth) {
       return;
     }
     width = Math.floor(width);
-    column.width = width;
+    column.setWidth(width);
 
     let visibleColumnIndex = this.visibleColumns().indexOf(column);
     if (visibleColumnIndex !== -1) {
@@ -4450,8 +4447,7 @@ export default class Table extends Widget {
   _renderRowIconVisible() {
     this.columnLayoutDirty = true;
     this._updateRowWidth();
-    this._redraw();
-    this.invalidateLayoutTree();
+    this.redraw();
   }
 
   _renderRowIconColumnWidth() {
@@ -4676,8 +4672,7 @@ export default class Table extends Widget {
   _renderCheckable() {
     this.columnLayoutDirty = true;
     this._updateRowWidth();
-    this._redraw();
-    this.invalidateLayoutTree();
+    this.redraw();
   }
 
   setCheckableStyle(checkableStyle) {
@@ -4694,8 +4689,7 @@ export default class Table extends Widget {
     this.$container.toggleClass('table-row-check', this.checkableStyle === Table.CheckableStyle.TABLE_ROW);
     if (this._isDataRendered()) {
       this._updateRowWidth();
-      this._redraw();
-      this.invalidateLayoutTree();
+      this.redraw();
     }
   }
 
@@ -4743,8 +4737,7 @@ export default class Table extends Widget {
   _renderCompact() {
     this.columnLayoutDirty = true;
     this._updateRowWidth();
-    this._redraw();
-    this.invalidateLayoutTree();
+    this.redraw();
   }
 
   setGroupingStyle(groupingStyle) {
@@ -4760,11 +4753,13 @@ export default class Table extends Widget {
     this._rerenderViewport();
   }
 
-  _redraw() {
-    if (this._isDataRendered()) {
-      this._rerenderHeaderColumns();
-      this._rerenderViewport();
+  redraw() {
+    if (!this._isDataRendered()) {
+      return;
     }
+    this._rerenderHeaderColumns();
+    this._rerenderViewport();
+    this.invalidateLayoutTree();
   }
 
   _rerenderHeaderColumns() {
@@ -4902,8 +4897,7 @@ export default class Table extends Widget {
 
   _renderMultilineText() {
     this._markAutoOptimizeWidthColumnsAsDirty();
-    this._redraw();
-    this.invalidateLayoutTree();
+    this.redraw();
   }
 
   setDropType(dropType) {

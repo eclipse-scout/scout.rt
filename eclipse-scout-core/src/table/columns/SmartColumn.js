@@ -61,54 +61,52 @@ export default class SmartColumn extends Column {
   }
 
   setLookupCall(lookupCall) {
-    if (this.lookupCall === lookupCall) {
-      return;
-    }
-    this._setLookupCall(lookupCall);
-    this._updateAllCellSortCodes();
+    this.setProperty('lookupCall', lookupCall);
   }
 
   _setLookupCall(lookupCall) {
-    this.lookupCall = LookupCall.ensure(lookupCall, this.session);
+    lookupCall = LookupCall.ensure(lookupCall, this.session);
+    this._setProperty('lookupCall', lookupCall);
+    if (this.initialized) {
+      this._updateAllCellSortCodes();
+    }
   }
 
   setCodeType(codeType) {
-    if (this.codeType === codeType) {
-      return;
-    }
-    this._setCodeType(codeType);
-    this._updateAllCellSortCodes();
+    this.setProperty('codeType', codeType);
   }
 
   _setCodeType(codeType) {
-    this.codeType = codeType;
-    if (!codeType) {
-      return;
+    this._setProperty('codeType', codeType);
+    if (codeType) {
+      this.lookupCall = scout.create(CodeLookupCall, {
+        session: this.session,
+        codeType: codeType
+      });
     }
-    this.lookupCall = scout.create(CodeLookupCall, {
-      session: this.session,
-      codeType: codeType
-    });
+    if (this.initialized) {
+      this._updateAllCellSortCodes();
+    }
   }
 
   setBrowseHierarchy(browseHierarchy) {
-    this.browseHierarchy = browseHierarchy;
+    this.setProperty('browseHierarchy', browseHierarchy);
   }
 
   setBrowseMaxRowCount(browseMaxRowCount) {
-    this.browseMaxRowCount = browseMaxRowCount;
+    this.setProperty('browseMaxRowCount', browseMaxRowCount);
   }
 
   setBrowseAutoExpandAll(browseAutoExpandAll) {
-    this.browseAutoExpandAll = browseAutoExpandAll;
+    this.setProperty('browseAutoExpandAll', browseAutoExpandAll);
   }
 
   setBrowseLoadIncremental(browseLoadIncremental) {
-    this.browseLoadIncremental = browseLoadIncremental;
+    this.setProperty('browseLoadIncremental', browseLoadIncremental);
   }
 
   setActiveFilterEnabled(activeFilterEnabled) {
-    this.activeFilterEnabled = activeFilterEnabled;
+    this.setProperty('activeFilterEnabled', activeFilterEnabled);
   }
 
   _formatValue(value, row) {

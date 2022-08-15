@@ -8,18 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, EventSupport, filters as filters_1, keys, KeyStroke, ValueField, VirtualKeyStrokeEvent} from '../index';
+import {Action, arrays, EventEmitter, filters as filters_1, keys, KeyStroke, ValueField, VirtualKeyStrokeEvent} from '../index';
 import $ from 'jquery';
 
-export default class KeyStrokeManager {
+export default class KeyStrokeManager extends EventEmitter {
 
   constructor() {
+    super();
     this.session = null;
     this.helpKeyStroke = KeyStroke.parseKeyStroke('F1');
     this.swallowF1 = true;
     this._helpRendered = false;
     this._renderedKeys = [];
-    this.events = this._createEventSupport();
     this.filters = [];
   }
 
@@ -265,36 +265,5 @@ export default class KeyStrokeManager {
 
   removeFilter(filter) {
     arrays.remove(this.filters, filter);
-  }
-
-  // --- Event handling methods ---
-  _createEventSupport() {
-    return new EventSupport();
-  }
-
-  trigger(type, event) {
-    event = event || {};
-    event.source = this;
-    this.events.trigger(type, event);
-  }
-
-  one(type, func) {
-    this.events.one(type, func);
-  }
-
-  on(type, func) {
-    return this.events.on(type, func);
-  }
-
-  off(type, func) {
-    this.events.off(type, func);
-  }
-
-  addListener(listener) {
-    this.events.addListener(listener);
-  }
-
-  removeListener(listener) {
-    this.events.removeListener(listener);
   }
 }

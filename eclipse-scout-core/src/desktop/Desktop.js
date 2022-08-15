@@ -1447,7 +1447,7 @@ export default class Desktop extends Widget {
   }
 
   dataChange(dataType) {
-    this.events.trigger('dataChange', dataType);
+    this.trigger('dataChange', dataType);
   }
 
   _activeTheme() {

@@ -31,16 +31,7 @@ export default class DateColumn extends Column {
   }
 
   setFormat(format) {
-    if (this.format === format) {
-      return;
-    }
-    this._setFormat(format);
-    if (this.initialized) {
-      // if format changes on the fly, just update the cell text
-      this.table.rows.forEach(row => {
-        this._updateCellText(row, this.cell(row));
-      });
-    }
+    this.setProperty('format', format);
   }
 
   _setFormat(format) {
@@ -48,14 +39,7 @@ export default class DateColumn extends Column {
       format = this._getDefaultFormat(this.session.locale);
     }
     format = DateFormat.ensure(this.session.locale, format);
-    this.format = format;
-  }
-
-  setGroupFormat(format) {
-    if (this.groupFormat === format) {
-      return;
-    }
-    this._setGroupFormat(format);
+    this._setProperty('format', format);
     if (this.initialized) {
       // if format changes on the fly, just update the cell text
       this.table.rows.forEach(row => {
@@ -64,12 +48,19 @@ export default class DateColumn extends Column {
     }
   }
 
+  setGroupFormat(groupFormat) {
+    this.setProperty('groupFormat', groupFormat);
+  }
+
   _setGroupFormat(format) {
     if (!format) {
       format = this._getDefaultFormat(this.session.locale);
     }
     format = DateFormat.ensure(this.session.locale, format);
-    this.groupFormat = format;
+    this._setProperty('groupFormat', format);
+    if (this.initialized) {
+      this.table._group();
+    }
   }
 
   /**
