@@ -8,16 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, EventSupport, HtmlComponent, Rectangle, scout, SingleLayout} from '../index';
+import {Dimension, EventEmitter, HtmlComponent, Rectangle, scout, SingleLayout} from '../index';
 import $ from 'jquery';
 
-export default class PopupWindow {
+export default class PopupWindow extends EventEmitter {
 
   constructor(myWindow, form) { // use 'myWindow' in place of 'window' to prevent confusion with global window variable
+    super();
+
     this.myWindow = myWindow;
     this.form = form;
     this.session = form.session;
-    this.events = new EventSupport();
     this.initialized = false;
     this.$container = null;
     this.htmlComp = null;
@@ -38,7 +39,7 @@ export default class PopupWindow {
     if (this.form.destroyed) {
       $.log.isDebugEnabled() && $.log.debug('form ID ' + this.form.id + ' is already destroyed - don\'t trigger unload event');
     } else {
-      this.events.trigger('popupWindowUnload', this);
+      this.trigger('popupWindowUnload', this);
     }
   }
 
@@ -95,7 +96,7 @@ export default class PopupWindow {
 
     // Finally set initialized flag to true, at this point the PopupWindow is fully initialized
     this.initialized = true;
-    this.events.trigger('init');
+    this.trigger('init');
   }
 
   // Note: currently _onResize is only called when the window is resized, but not when the position of the window changes.
@@ -116,10 +117,6 @@ export default class PopupWindow {
 
   isClosed() {
     return this.myWindow.closed;
-  }
-
-  one(type, func) {
-    this.events.one(type, func);
   }
 
   close() {

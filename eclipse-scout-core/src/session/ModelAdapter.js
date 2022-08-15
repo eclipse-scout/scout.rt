@@ -8,15 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, comparators, defaultValues, EventSupport, objects, PropertyChangeEventFilter, RemoteEvent, scout, strings, Widget, WidgetEventTypeFilter} from '../index';
+import {App, arrays, comparators, defaultValues, EventEmitter, objects, PropertyChangeEventFilter, RemoteEvent, scout, strings, Widget, WidgetEventTypeFilter} from '../index';
 import $ from 'jquery';
 
 /**
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
  * It also sends events to the server whenever an action happens on the widget.
  */
-export default class ModelAdapter {
+export default class ModelAdapter extends EventEmitter {
   constructor() {
+    super();
+
     this.id = null;
     this.objectType = null;
     this.initialized = false;
@@ -33,7 +35,6 @@ export default class ModelAdapter {
 
     this._propertyChangeEventFilter = new PropertyChangeEventFilter();
     this._widgetEventTypeFilter = new WidgetEventTypeFilter();
-    this.events = new EventSupport();
     this.session = null;
   }
 
@@ -123,7 +124,7 @@ export default class ModelAdapter {
     };
     this.widget.addListener(this._widgetListener);
     this.attached = true;
-    this.events.trigger('attach');
+    this.trigger('attach');
   }
 
   _detachWidget() {
@@ -133,7 +134,7 @@ export default class ModelAdapter {
     this.widget.removeListener(this._widgetListener);
     this._widgetListener = null;
     this.attached = false;
-    this.events.trigger('detach');
+    this.trigger('detach');
   }
 
   goOffline() {

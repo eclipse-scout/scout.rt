@@ -8,11 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DeferredGlassPaneTarget, Desktop, Device, Event, EventDelegator, EventSupport, filters, focusUtils, Form, graphics, icons, inspector, objects, scout, scrollbars, strings, texts, TreeVisitResult} from '../index';
+import {arrays, DeferredGlassPaneTarget, Desktop, Device, EventDelegator, filters, focusUtils, Form, graphics, icons, inspector, objects, PropertyEventEmitter, scout, scrollbars, strings, texts, TreeVisitResult} from '../index';
 import $ from 'jquery';
 
-export default class Widget {
+export default class Widget extends PropertyEventEmitter {
   constructor() {
+    super();
+
     this.id = null;
     this.objectType = null;
     this.session = null;
@@ -99,10 +101,6 @@ export default class Widget {
     this._parentDestroyHandler = this._onParentDestroy.bind(this);
     this._parentRemovingWhileAnimatingHandler = this._onParentRemovingWhileAnimating.bind(this);
     this._scrollHandler = this._onScroll.bind(this);
-    this.events = this._createEventSupport();
-    this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => {
-      return event.propertyName === propertyName;
-    });
     this.loadingSupport = this._createLoadingSupport();
     this.keyStrokeContext = this._createKeyStrokeContext();
     // Widgets using LogicalGridLayout may have a grid to calculate the grid data of the children
@@ -1160,67 +1158,6 @@ export default class Widget {
     this.invalidateLogicalGrid();
   }
 
-  // --- Event handling methods ---
-  _createEventSupport() {
-    return new EventSupport();
-  }
-
-  trigger(type, event) {
-    event = event || {};
-    event.source = this;
-    this.events.trigger(type, event);
-  }
-
-  /**
-   * Registers the given event handler for the event specified by the type param.
-   * The function will only be called once. After that it is automatically de-registered using {@link off}.
-   *
-   * @param {string} type One or more event names separated by space.
-   * @param {function} handler Event handler executed when the event is triggered. An event object is passed to the function as first parameter
-   */
-  one(type, handler) {
-    this.events.one(type, handler);
-  }
-
-  /**
-   * Registers the given event handler for the event specified by the type param.
-   *
-   * @param {string} type One or more event names separated by space.
-   * @param {function} handler Event handler executed when the event is triggered. An event object is passed to the function as first parameter.
-   **/
-  on(type, handler) {
-    return this.events.on(type, handler);
-  }
-
-  /**
-   * De-registers the given event handler for the event specified by the type param.
-   *
-   * @param {string} type One or more event names separated by space.<br/>
-   *      Important: the string must be equal to the one used for {@link on} or {@link one}. This also applies if a string containing multiple types separated by space was used.
-   * @param {function} [handler] The exact same event handler that was used for registration using {@link on} or {@link one}.
-   *      If no handler is specified, all handlers are de-registered for the given type.
-   */
-  off(type, handler) {
-    this.events.off(type, handler);
-  }
-
-  addListener(listener) {
-    this.events.addListener(listener);
-  }
-
-  removeListener(listener) {
-    this.events.removeListener(listener);
-  }
-
-  /**
-   * Adds an event handler using {@link one} and returns a promise.
-   * The promise is resolved as soon as the event is triggered.
-   * @returns {Promise}
-   */
-  when(type) {
-    return this.events.when(type);
-  }
-
   /**
    * @returns {$} the entry-point for this Widget or its parent. If the widget is part of the main-window it returns this.session.$entryPoint,
    * for popup-window this function will return the body of the document in the popup window.
@@ -1402,49 +1339,15 @@ export default class Widget {
   }
 
   /**
-   * Triggers a property change for a single property.
-   */
-  triggerPropertyChange(propertyName, oldValue, newValue) {
-    scout.assertParameter('propertyName', propertyName);
-    let event = new Event({
-      propertyName: propertyName,
-      oldValue: oldValue,
-      newValue: newValue
-    });
-    this.trigger('propertyChange', event);
-    return event;
-  }
-
-  /**
-   * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
-   * @return {boolean} true if the property was changed, false if not.
-   */
-  _setProperty(propertyName, newValue) {
-    scout.assertParameter('propertyName', propertyName);
-    let oldValue = this[propertyName];
-    if (objects.equals(oldValue, newValue)) {
-      return false;
-    }
-    this[propertyName] = newValue;
-    let event = this.triggerPropertyChange(propertyName, oldValue, newValue);
-    if (event.defaultPrevented) {
-      // Revert to old value if property change should be prevented
-      this[propertyName] = oldValue;
-      return false; // not changed
-    }
-    return true;
-  }
-
-  /**
    * Sets a new value for a specific property. If the new value is the same value as the old one, nothing is performed.
    * Otherwise the following phases are executed:
    * <p>
-   * 1. Preparation: If the property is a widget property, several actions are performed in _prepareWidgetProperty().
-   * 2. DOM removal: If the property is a widget property and the widget is rendered, the changed widget(s) are removed unless the property should not be preserved (see _preserveOnPropertyChangeProperties).
-   *    If there is a custom remove function (e.g. _removeXY where XY is the property name), it will be called instead of removing the widgets directly.
-   * 3. Model update: If there is a custom set function (e.g. _setXY where XY is the property name), it will be called. Otherwise the default set function _setProperty is called.
-   * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called. Otherwise nothing happens.
-   * @return {boolean} true if the property was changed, false if not.
+   * 1. Preparation: If the property is a widget property, several actions are performed in \_prepareWidgetProperty().
+   * 2. DOM removal: If the property is a widget property and the widget is rendered, the changed widget(s) are removed unless the property should not be preserved (see {@link _preserveOnPropertyChangeProperties}).
+   *    If there is a custom remove function (e.g. \_removeXY where XY is the property name), it will be called instead of removing the widgets directly.
+   * 3. Model update: If there is a custom set function (e.g. \_setXY where XY is the property name), it will be called. Otherwise the default set function {@link _setProperty} is called.
+   * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. \_renderXY where XY is the property name), it will be called. Otherwise nothing happens.
+   * @return {boolean} true, if the property was changed, false if not.
    */
   setProperty(propertyName, value) {
     if (objects.equals(this[propertyName], value)) {
@@ -1522,15 +1425,6 @@ export default class Widget {
     widgets.forEach(widget => {
       widget.remove();
     });
-  }
-
-  _callSetProperty(propertyName, value) {
-    let setFuncName = '_set' + strings.toUpperCaseFirstLetter(propertyName);
-    if (this[setFuncName]) {
-      this[setFuncName](value);
-    } else {
-      this._setProperty(propertyName, value);
-    }
   }
 
   _callRenderProperty(propertyName) {
@@ -1908,15 +1802,6 @@ export default class Widget {
     // If the parent is destroyed but the widget not make sure it gets a new parent
     // This ensures the old one may be properly garbage collected
     this.setParent(this.owner);
-  }
-
-  callSetter(propertyName, value) {
-    let setterFuncName = 'set' + strings.toUpperCaseFirstLetter(propertyName);
-    if (this[setterFuncName]) {
-      this[setterFuncName](value);
-    } else {
-      this.setProperty(propertyName, value);
-    }
   }
 
   /**

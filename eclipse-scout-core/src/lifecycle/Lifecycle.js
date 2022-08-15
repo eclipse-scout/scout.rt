@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EventSupport, MessageBox, MessageBoxes, objects, scout, Status} from '../index';
+import {arrays, EventEmitter, MessageBox, MessageBoxes, objects, scout, Status} from '../index';
 import $ from 'jquery';
 
 /**
@@ -22,9 +22,11 @@ import $ from 'jquery';
  * @constructor
  * @abstract
  */
-export default class Lifecycle {
+export default class Lifecycle extends EventEmitter {
 
   constructor() {
+    super();
+
     this.widget = null;
     this.validationFailedTextKey = null;
     this.validationFailedText = null;
@@ -39,7 +41,6 @@ export default class Lifecycle {
     this.askIfNeedSave = true;
     this.askIfNeedSaveText = null; // Java: cancelVerificationText
 
-    this.events = new EventSupport();
     this.handlers = {
       'load': this._defaultLoad.bind(this),
       'save': this._defaultSave.bind(this)
@@ -68,7 +69,7 @@ export default class Lifecycle {
   load() {
     return this._load().then(() => {
       this.markAsSaved();
-      this.events.trigger('postLoad');
+      this.trigger('postLoad');
     });
   }
 
@@ -78,7 +79,7 @@ export default class Lifecycle {
   _load() {
     return this.handlers.load()
       .then(status => {
-        this.events.trigger('load');
+        this.trigger('load');
       });
   }
 
@@ -140,7 +141,7 @@ export default class Lifecycle {
 
     // reload the state
     return this.load().then(() => {
-      this.events.trigger('reset');
+      this.trigger('reset');
     });
   }
 
@@ -155,7 +156,7 @@ export default class Lifecycle {
    * @returns {Promise}
    */
   _close() {
-    this.events.trigger('close');
+    this.trigger('close');
     return $.resolvedPromise();
   }
 
@@ -190,7 +191,7 @@ export default class Lifecycle {
   _save() {
     return this.handlers.save()
       .then(status => {
-        this.events.trigger('save');
+        this.trigger('save');
         return status;
       });
   }
@@ -410,18 +411,5 @@ export default class Lifecycle {
       throw new Error('Cannot register handler for unsupported type \'' + type + '\'');
     }
     this.handlers[type] = func;
-  }
-
-  /**
-   * Register an event handler for the given type.
-   * Event handlers don't have a return value. They do not have any influence on the lifecycle flow. There can be multiple event
-   * handler for each type.
-   */
-  on(type, func) {
-    return this.events.on(type, func);
-  }
-
-  off(type, func) {
-    return this.events.off(type, func);
   }
 }
