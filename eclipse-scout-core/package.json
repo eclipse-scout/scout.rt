@@ -26,6 +26,8 @@
     "src"
   ],
   "scripts": {
+    "ts-migrate": "ts-migrate --sources src/**/*",
+    "ts-count": "ts-migrate --rename false --count-only --sources src/**/*.ts",
     "testserver:start": "scout-scripts test-server:start",
     "testserver:stop": "scout-scripts test-server:stop",
     "test:ci": "scout-scripts test:ci",
@@ -45,7 +47,9 @@
     "jasmine-core": "3.10.1",
     "jasmine-ajax": "4.0.0",
     "jasmine-jquery": "2.1.1",
-    "karma": "6.4.0"
+    "@types/jquery": "3.5.14",
+    "karma": "6.4.0",
+    "@eclipse-scout/ts-migrate": ">=23.1.0-snapshot <23.1.0"
   },
   "dependencies": {
     "jquery": "3.6.0",
