@@ -92,6 +92,7 @@
     <module>../eclipse-scout-cli</module>
     <module>../eclipse-scout-core</module>
     <module>../karma-jasmine-scout</module>
+    <module>../eclipse-scout-ts-migrate</module>
     <module>../eslint-config</module>
 
     <!-- chart -->
