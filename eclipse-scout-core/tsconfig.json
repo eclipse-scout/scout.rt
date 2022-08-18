@@ -6,10 +6,14 @@
     "module": "ES6",
     "skipLibCheck": true,
     "sourceMap": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    // For jquery imports, see https://www.typescriptlang.org/tsconfig#allowSyntheticDefaultImports
     "lib": [
       "dom",
       "ES6"
-    ]
+    ],
+    "outDir": "dist/d.ts"
   },
   "include": [
     "./src/**/*"
