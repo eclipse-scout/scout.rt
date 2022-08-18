@@ -14,13 +14,6 @@
 import $ from 'jquery';
 import {arrays, Device, Dimension, events, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
 
-/**
- * By using $ in jsdoc all the functions is this file are recognized as part of $.
- * By additionally defining $ as jQuery all default jQuery functions are recognized as well.
- * "JQuery" (with a capital J) refers to the the type definitions "@types/jquery".
- * @typedef {JQuery|jQuery} $
- */
-
 // === internal methods ===
 
 /**
@@ -135,21 +128,13 @@ $.cleanData = elems => {
   __origCleanData(elems);
 };
 
-/**
- * Used by some animate functions.
- */
-$.removeThis = function() {
-  $(this).remove();
+$.ensure = $elem => {
+  if ($elem instanceof $) {
+    return $elem;
+  }
+  return $($elem);
 };
 
-/**
- * Convenience function that can be used as an jQuery event handler, when this
- * event should be "swallowed". Technically, this function calls preventDefault(),
- * stopPropagation() and stopImmediatePropagation() on the event.
- *
- * Note: "return false" is equal to preventDefault() and stopPropagation(), but
- * not stopImmediatePropagation().
- */
 $.suppressEvent = event => {
   if (event) {
     event.preventDefault();
@@ -158,44 +143,6 @@ $.suppressEvent = event => {
   }
 };
 
-/**
- * If the event target is disabled (according to $.fn.isEnabled()), the event is suppressed
- * and the method returns true. Otherwise, false is returned.
- */
-$.suppressEventIfDisabled = (event, $target) => {
-  $target = $target || $(event.target);
-  if (!$target.isEnabled()) {
-    $.suppressEvent(event);
-    return true;
-  }
-  return false;
-};
-
-/**
- * Implements the 'debounce' pattern. The given function fx is executed after a certain delay
- * (in milliseconds), but if the same function is called a second time within the waiting time,
- * depending on the 'reschedule' option, the timer is reset or the second call is ignored.
- * The default value for the 'delay' option is 250 ms.
- *
- * The resulting function has a function member 'cancel' that can be used to clear any scheduled
- * calls to the original function. If no such call was scheduled, cancel() returns false,
- * otherwise true.
- *
- * OPTION         DEFAULT VALUE   DESCRIPTION
- * ------------------------------------------------------------------------------------
- * delay          250             Waiting time in milliseconds before the function is executed.
- *
- * reschedule     true            Defines whether subsequent call to the debounced function
- *                                within the waiting time cause the timer to be reset or not.
- *                                If the reschedule option is 'false', subsequent calls within
- *                                the waiting time will just be ignored.
- *
- * @param fx
- *          the function to wrap
- * @param [options]
- *          an optional options object (see table above). Short-hand version: If a number is passed instead
- *          of an object, the value is automatically converted to the option 'delay'.
- */
 $.debounce = (fx, options) => {
   if (typeof options === 'number') {
     options = {
@@ -235,11 +182,6 @@ $.debounce = (fx, options) => {
   return fn;
 };
 
-/**
- * Executes the given function. Further calls to the same function are delayed by the given delay
- * (default 250ms). This is similar to $.debounce() but ensures that function is called at least
- * every 'delay' milliseconds. Can be useful to prevent too many function calls, e.g. from UI events.
- */
 $.throttle = (fx, delay) => {
   delay = (delay !== undefined) ? delay : 250;
   let timeoutId = null;
@@ -262,55 +204,11 @@ $.throttle = (fx, delay) => {
   };
 };
 
-/**
- * Returns a function which negates the return value of the given function when called.
- */
+
 $.negate = fx => function(...args) {
   return !fx.apply(this, args);
 };
 
-/**
- * color calculation
- */
-$.colorOpacity = (hex, opacity) => {
-  // validate hex string
-  hex = String(hex).replace(/[^0-9a-f]/gi, '');
-  if (hex.length < 6) {
-    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-  }
-  opacity = opacity || 0;
-
-  // convert to decimal and change luminosity
-  let rgb = '#';
-  for (let i = 0; i < 3; i++) {
-    let c = parseInt(hex.substr(i * 2, 2), 16);
-    c = Math.round(Math.min(Math.max(0, 255 - (255 - c) * opacity), 255)).toString(16);
-    rgb += ('00' + c).substr(c.length);
-  }
-
-  return rgb;
-};
-
-/**
- * CSP-safe method to dynamically load and execute a script from server.
- *
- * A new <script> tag is added to the document's head element. The methods returns
- * a promise which can be used to execute code after the loading has been completed.
- * A jQuery object referring to the new script tag is passed to the promise's
- * callback functions.
- *
- *   $.injectScript('http://server/path/script.js')
- *     .done(function($scriptTag) { ... });
- *
- * Options (optional):
- *
- * NAME              DEFAULT             DESCRIPTION
- * --------------------------------------------------------------------------------------------
- * document          window.document     Which document to inject the script to.
- *
- * removeTag         false               Whether to remove the script tag again from the DOM
- *                                       after the script has been loaded.
- */
 $.injectScript = (url, options) => {
   options = options || {};
   let deferred = $.Deferred();
@@ -338,23 +236,6 @@ $.injectScript = (url, options) => {
   return deferred.promise();
 };
 
-/**
- * CSP-safe method to dynamically load a style sheet from server.
- *
- * A new <link> tag is added to the document's head element. The methods returns
- * a promise which can be used to execute code after the loading has been completed.
- * A jQuery object referring to the new link tag is passed to the promise's
- * callback functions.
- *
- *   $.injectStyleSheet('http://server/path/style.css')
- *     .done(function($linkTag) { ... });
- *
- * Options (optional):
- *
- * NAME              DEFAULT             DESCRIPTION
- * --------------------------------------------------------------------------------------------
- * document          window.document     Which document to inject the style sheet to.
- */
 $.injectStyleSheet = (url, options) => {
   options = options || {};
   let deferred = $.Deferred();
@@ -380,20 +261,6 @@ $.injectStyleSheet = (url, options) => {
   return deferred.promise();
 };
 
-/**
- * Dynamically adds styles to the document.
- *
- * A new <style> tag is added to the document's head element. The methods returns
- * a jQuery object referring to the new style tag.
- *
- *   $styleTag = $.injectStyle('p { text-color: orange; }');
- *
- * Options (optional):
- *
- * NAME              DEFAULT             DESCRIPTION
- * --------------------------------------------------------------------------------------------
- * document          window.document     Which document to inject the style to.
- */
 $.injectStyle = (data, options) => {
   options = options || {};
 
@@ -417,51 +284,24 @@ $.pxToNumber = pixel => {
   return parseFloat(pixel);
 };
 
-/**
- * Use this function as shorthand of this:
- * <code>$.Deferred().resolve([arguments]);</code>
- *
- * @param {object[]} [args] of this function are passed to the resolve function of the deferred
- * @returns {$.Deferred} a deferred for an already resolved jQuery.Deferred object.
- */
 $.resolvedDeferred = (...args) => {
   let deferred = $.Deferred();
   deferred.resolve(...args);
   return deferred;
 };
 
-/**
- * Use this function as shorthand of this:
- * <code>$.Deferred().resolve([arguments]).promise();</code>
- *
- * @param {...*} [args] of this function are passed to the resolve function of the deferred
- * @returns {Promise} a promise for an already resolved jQuery.Deferred object.
- */
 $.resolvedPromise = (...args) => {
   let deferred = $.Deferred();
   deferred.resolve(...args);
   return deferred.promise();
 };
 
-/**
- * Use this function as shorthand of this:
- * <code>$.Deferred().reject([arguments]).promise();</code>
- *
- * @param {object[]} [arguments] of this function are passed to the reject function of the deferred
- * @returns {Promise} a promise for an already rejected jQuery.Deferred object.
- */
 $.rejectedPromise = (...args) => {
   let deferred = $.Deferred();
   deferred.reject(...args);
   return deferred.promise();
 };
 
-/**
- * Creates a new promise which resolves when all promises resolve and fails when the first promise fails.
- *
- * @param {boolean} [asArray] (optional) when set to true, the resolve function will transform the
- *    flat arguments list containing the results into an array. The arguments of the reject function won't be touched. Default is false.
- */
 $.promiseAll = (promises, asArray) => {
   asArray = scout.nvl(asArray, false);
   promises = arrays.ensure(promises);
@@ -478,13 +318,6 @@ $.promiseAll = (promises, asArray) => {
   return deferred.promise();
 };
 
-/**
- * Shorthand for an AJAX request for a JSON file with UTF8 encoding.
- * Errors are caught and converted to a rejected promise with the following
- * arguments: jqXHR, textStatus, errorThrown, requestOptions.
- *
- * @returns a promise from JQuery function $.ajax
- */
 $.ajaxJson = url => $.ajax({
   url: url,
   dataType: 'json',
@@ -496,24 +329,6 @@ $.ajaxJson = url => $.ajax({
   return $.rejectedPromise(...args);
 });
 
-/**
- * Ensures the given parameter is a jQuery object.<p>
- * If it is a jQuery object, it will be returned as it is.
- * If it isn't, it will be passed to $() in order to create one.
- * <p>
- * Just using $() on an existing jQuery object would clone it which would work but is unnecessary.
- * @returns $
- */
-$.ensure = $elem => {
-  if ($elem instanceof $) {
-    return $elem;
-  }
-  return $($elem);
-};
-
-/**
- * Helper function to determine if an object is of type "jqXHR" (http://api.jquery.com/jQuery.ajax/#jqXHR)
- */
 $.isJqXHR = obj => (typeof obj === 'object' && obj.hasOwnProperty('readyState') && obj.hasOwnProperty('status') && obj.hasOwnProperty('statusText'));
 
 // === $.prototype extensions ===
@@ -525,11 +340,6 @@ $.fn.nvl = function($element) {
   return $element;
 };
 
-/**
- * @param element string. Example = &lt;input&gt;
- * @param cssClass (optional) class attribute
- * @param text (optional) adds a child text-node with given text (no HTML content)
- */
 $.fn.makeElement = function(element, cssClass, text) {
   let myDocument = this.document(true);
   if (myDocument === undefined || element === undefined) {
@@ -545,12 +355,6 @@ $.fn.makeElement = function(element, cssClass, text) {
   return $element;
 };
 
-/**
- * Creates a DIV element in the current document.
- *
- * @param cssClass (optional) string added to the 'class' attribute
- * @param text (optional) string used as inner text
- */
 $.fn.makeDiv = function(cssClass, text) {
   return this.makeElement('<div>', cssClass, text);
 };
@@ -559,64 +363,38 @@ $.fn.makeSpan = function(cssClass, text) {
   return this.makeElement('<span>', cssClass, text);
 };
 
-/**
- * @param {boolean} [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
- * @returns {Document} document reference (ownerDocument) of the HTML element.
- */
 $.fn.document = function(domElement) {
   let myDocument = this.length ? (this[0] instanceof Document ? this[0] : this[0].ownerDocument) : null;
   return domElement ? myDocument : $(myDocument);
 };
 
-/**
- * @param {boolean} [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
- * @returns {Window|$} window reference (defaultView) of the HTML element
- */
 $.fn.window = function(domElement) {
   let myDocument = this.document(true),
     myWindow = myDocument ? myDocument.defaultView : null;
   return domElement ? myWindow : $(myWindow);
 };
 
-/**
- * @param {boolean} [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
- * @returns {$|HTMLElement} the active element of the current document
- */
 $.fn.activeElement = function(domElement) {
   let myDocument = this.document(true),
     activeElement = myDocument ? myDocument.activeElement : null;
   return domElement ? activeElement : $(activeElement);
 };
 
-/**
- * @param {boolean} [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
- * @returns {$|HTMLElement} the BODY element of the HTML document in which the current HTML element is placed.
- */
 $.fn.body = function(domElement) {
   let $body = $('body', this.document(true));
   return domElement ? $body[0] : $body;
 };
 
-/**
- * @param {boolean} [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
- * @returns {$|HTMLElement} the closest DOM element that has the 'scout' class.
- */
 $.fn.entryPoint = function(domElement) {
   let $element = this.closest('.scout');
   return domElement ? $element[0] : $element;
 };
 
-/**
- * @returns {Dimension} size of the window (width and height)
- */
 $.fn.windowSize = function() {
   let $window = this.window();
   return new Dimension($window.width(), $window.height());
 };
 
-/**
- * Returns the element at the given point considering only child elements and elements matching the selector, if specified.
- */
 $.fn.elementFromPoint = function(x, y, selector) {
   let $container = $(this),
     doc = $container.document(true),
@@ -665,12 +443,10 @@ $.fn.elementFromPoint = function(x, y, selector) {
   return $element;
 };
 
-// prepend - and return new div for chaining
 $.fn.prependDiv = function(cssClass, text) {
   return this.makeDiv(cssClass, text).prependTo(this);
 };
 
-// append - and return new div for chaining
 $.fn.appendDiv = function(cssClass, text) {
   return this.makeDiv(cssClass, text).appendTo(this);
 };
@@ -683,12 +459,10 @@ $.fn.appendElement = function(element, cssClass, text) {
   return this.makeElement(element, cssClass, text).appendTo(this);
 };
 
-// insert after - and return new div for chaining
 $.fn.afterDiv = function(cssClass, text) {
   return this.makeDiv(cssClass, text).insertAfter(this);
 };
 
-// insert before - and return new div for chaining
 $.fn.beforeDiv = function(cssClass, text) {
   return this.makeDiv(cssClass, text).insertBefore(this);
 };
@@ -701,13 +475,42 @@ $.fn.appendBr = function(cssClass) {
   return this.makeElement('<br>', cssClass).appendTo(this);
 };
 
+$.fn.appendTable = function(cssClass) {
+  return this.appendElement('<table>', cssClass);
+};
+
+$.fn.appendColgroup = function(cssClass) {
+  return this.appendElement('<colgroup>', cssClass);
+};
+
+$.fn.appendCol = function(cssClass) {
+  return this.appendElement('<col>', cssClass);
+};
+
+$.fn.appendTr = function(cssClass) {
+  return this.appendElement('<tr>', cssClass);
+};
+
+$.fn.appendTd = function(cssClass, text) {
+  return this.appendElement('<td>', cssClass, text);
+};
+
+$.fn.appendTh = function(cssClass, text) {
+  return this.appendElement('<th>', cssClass, text);
+};
+
+$.fn.appendUl = function(cssClass) {
+  return this.appendElement('<ul>', cssClass);
+};
+
+$.fn.appendLi = function(cssClass, text) {
+  return this.appendElement('<li>', cssClass, text);
+};
+
 $.fn.appendTextNode = function(text) {
   return $(this.document(true).createTextNode(text)).appendTo(this);
 };
 
-/**
- * @param {IconDesc|string} iconId
- */
 $.fn.appendIcon = function(iconId, cssClass) {
   if (!iconId) {
     return this.appendSpan(cssClass)
@@ -737,6 +540,54 @@ $.fn.appendImg = function(imageSrc, cssClass) {
   return $icon;
 };
 
+$.fn.icon = function(iconId, addToDomFunc) {
+  let icon, $icon = this.data('$icon');
+  if (iconId) {
+    icon = icons.parseIconId(iconId);
+    if (icon.isFontIcon()) {
+      getOrCreateIconElement.call(this, $icon, '<span>', addToDomFunc)
+        .addClass('icon')
+        .addClass(icon.appendCssClass('font-icon'))
+        .text(icon.iconCharacter);
+    } else {
+      getOrCreateIconElement.call(this, $icon, '<img>', addToDomFunc)
+        .attr('src', icon.iconUrl)
+        .addClass('icon image-icon');
+    }
+  } else {
+    removeIconElement.call(this, $icon);
+  }
+  return this;
+
+  // ----- Helper functions -----
+
+  function getOrCreateIconElement($icon, newElement, addToDomFunc) {
+    // If element type does not match existing element, remove the existing element (e.g. when changing from font-icon to picture icon)
+    if ($icon && !$icon.is(newElement.replace(/[<>]/g, ''))) {
+      removeIconElement.call(this, $icon);
+      $icon = null;
+    }
+    // Create new element if necessary
+    if (!$icon) {
+      $icon = $(newElement);
+      this.data('$icon', $icon);
+      if (!addToDomFunc) {
+        this.prepend($icon);
+      } else {
+        addToDomFunc.call(this, $icon);
+      }
+    }
+    return $icon;
+  }
+
+  function removeIconElement($icon) {
+    if ($icon) {
+      $icon.remove();
+    }
+    this.removeData('$icon');
+  }
+};
+
 $.fn.makeSVG = function(type, cssClass, text, id) {
   let myDocument = this.document(true);
   if (myDocument === undefined || type === undefined) {
@@ -755,7 +606,6 @@ $.fn.makeSVG = function(type, cssClass, text, id) {
   return $svg;
 };
 
-// append SVG
 $.fn.appendSVG = function(type, cssClass, text, id) {
   return this.makeSVG(type, cssClass, text, id).appendTo(this);
 };
@@ -771,6 +621,37 @@ $.fn.attrXLINK = function(attributeName, value) {
   return this.each(function() {
     this.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:' + attributeName, value);
   });
+};
+
+$.fn.appendAppLink = function(appLinkBean, func) {
+  return this.appendSpan().appLink(appLinkBean, func);
+};
+
+$.fn.appLink = function(appLinkBean, func) {
+  if (!func) {
+    func = function(event) {
+      let widget = scout.widget(this);
+      if (widget && widget._onAppLinkAction) {
+        widget._onAppLinkAction(event);
+      }
+    }.bind(this);
+  } else if (typeof func === 'object' && func._onAppLinkAction) {
+    func = func._onAppLinkAction.bind(func);
+  }
+
+  this.addClass('app-link')
+    .attr('tabindex', '0')
+    .unfocusable()
+    .on('click', func);
+
+  if (typeof appLinkBean === 'string') {
+    this.attr('data-ref', appLinkBean);
+  } else {
+    this
+      .text(appLinkBean.name)
+      .attr('data-ref', appLinkBean.ref);
+  }
+  return this;
 };
 
 /**
@@ -830,89 +711,6 @@ $.fn.setVisible = function(visible) {
   return this;
 };
 
-$.fn.isDisplayNone = function() {
-  return this.css('display') === 'none';
-};
-
-/**
- * @param {boolean} tabbable true, to make the component tabbable. False, to make it neither tabbable nor focusable.
- * @returns {$}
- */
-$.fn.setTabbable = function(tabbable) {
-  return this.attr('tabIndex', tabbable ? 0 : null);
-};
-
-/**
- * @param {boolean} tabbable true, to make the component tabbable. False, to make it not tabbable but focusable, so the user can focus it with the mouse but not with the keyboard.
- * @returns {$}
- */
-$.fn.setTabbableOrFocusable = function(tabbable) {
-  return this.attr('tabIndex', tabbable ? 0 : -1);
-};
-
-$.fn.isTabbable = function() {
-  return this.attr('tabIndex') >= 0;
-};
-
-/**
- * @param {string} iconId
- * @param {function} [addToDomFunc] optional function which is used to add the new icon element to the DOM
- *     When not set, this.prepend($icon) is called.
- * @returns {$}
- * @see Icon as an alternative
- */
-$.fn.icon = function(iconId, addToDomFunc) {
-  let icon, $icon = this.data('$icon');
-  if (iconId) {
-    icon = icons.parseIconId(iconId);
-    if (icon.isFontIcon()) {
-      getOrCreateIconElement.call(this, $icon, '<span>', addToDomFunc)
-        .addClass('icon')
-        .addClass(icon.appendCssClass('font-icon'))
-        .text(icon.iconCharacter);
-    } else {
-      getOrCreateIconElement.call(this, $icon, '<img>', addToDomFunc)
-        .attr('src', icon.iconUrl)
-        .addClass('icon image-icon');
-    }
-  } else {
-    removeIconElement.call(this, $icon);
-  }
-  return this;
-
-  // ----- Helper functions -----
-
-  function getOrCreateIconElement($icon, newElement, addToDomFunc) {
-    // If element type does not match existing element, remove the existing element (e.g. when changing from font-icon to picture icon)
-    if ($icon && !$icon.is(newElement.replace(/[<>]/g, ''))) {
-      removeIconElement.call(this, $icon);
-      $icon = null;
-    }
-    // Create new element if necessary
-    if (!$icon) {
-      $icon = $(newElement);
-      this.data('$icon', $icon);
-      if (!addToDomFunc) {
-        this.prepend($icon);
-      } else {
-        addToDomFunc.call(this, $icon);
-      }
-    }
-    return $icon;
-  }
-
-  function removeIconElement($icon) {
-    if ($icon) {
-      $icon.remove();
-    }
-    this.removeData('$icon');
-  }
-};
-
-$.fn.placeholder = function(placeholder) {
-  return this.toggleAttr('placeholder', !!placeholder, placeholder);
-};
-
 $.fn.isVisible = function() {
   if (this.hasClass('hidden')) {
     return false;
@@ -931,16 +729,30 @@ $.fn.isEveryParentVisible = function() {
   return everyParentVisible;
 };
 
-/**
- * @return {boolean} true if the element is attached (= is in the dom tree), false if not
- */
+$.fn.isDisplayNone = function() {
+  return this.css('display') === 'none';
+};
+
+$.fn.setTabbable = function(tabbable) {
+  return this.attr('tabIndex', tabbable ? 0 : null);
+};
+
+$.fn.setTabbableOrFocusable = function(tabbable) {
+  return this.attr('tabIndex', tabbable ? 0 : -1);
+};
+
+$.fn.isTabbable = function() {
+  return this.attr('tabIndex') >= 0;
+};
+
+$.fn.placeholder = function(placeholder) {
+  return this.toggleAttr('placeholder', !!placeholder, placeholder);
+};
+
 $.fn.isAttached = function() {
   return $.contains(this.document(true).documentElement, this[0]);
 };
 
-/**
- * @returns {$} the current element if it is scrollable, otherwise the first parent which is scrollable
- */
 $.fn.scrollParent = function() {
   let $elem = this;
   while ($elem.length > 0) {
@@ -952,9 +764,6 @@ $.fn.scrollParent = function() {
   return $();
 };
 
-/**
- * Returns every parent which is scrollable
- */
 $.fn.scrollParents = function() {
   let $scrollParents = $(),
     $elem = this;
@@ -968,12 +777,6 @@ $.fn.scrollParents = function() {
   return $scrollParents;
 };
 
-/**
- * Similar to closest() but with a predicate function and the ability to stop at a given element.
- * @param {function} predicate the search predicate
- * @param {$} [$stop] If provided, the search is done until this element is reached.
- * @returns {$}
- */
 $.fn.findUp = function(predicate, $stop) {
   let $elem = $(this);
   while ($elem.length > 0) {
@@ -988,7 +791,13 @@ $.fn.findUp = function(predicate, $stop) {
   return $();
 };
 
-// most used animate
+$.fn.isOrHas = function(elem) {
+  if (elem instanceof $) {
+    elem = elem[0];
+  }
+  return this[0] === elem || this.has(elem).length > 0;
+};
+
 $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
   let properties = {};
   let options = {};
@@ -1009,32 +818,6 @@ $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
   return this;
 };
 
-// SVG animate, array contains attr, endValue + startValue
-$.fn.animateSVG = function(attr, endValue, duration, complete, withoutTabIndex) {
-  return this.each(function() {
-    let startValue = parseFloat($(this).attr(attr));
-    if (withoutTabIndex) {
-      let oldComplete = complete;
-      complete = function() {
-        if (oldComplete) {
-          oldComplete.call(this);
-        }
-        $(this).removeAttr('tabindex');
-      };
-    }
-    $(this).animate({
-      tabIndex: 0
-    }, {
-      step: function(now, fx) {
-        this.setAttribute(attr, startValue + (endValue - startValue) * fx.pos);
-      },
-      duration: duration,
-      complete: complete,
-      queue: false
-    });
-  });
-};
-
 $.fn.addClassForAnimation = function(className, options) {
   let defaultOptions = {
     classesToRemove: className
@@ -1042,8 +825,6 @@ $.fn.addClassForAnimation = function(className, options) {
   options = $.extend({}, defaultOptions, options);
   this.addClass(className);
   this.oneAnimationEnd(event => {
-    // remove class, otherwise animation will be executed each time the element changes it's visibility (attach/rerender),
-    // and even each time when the css classes change
     this.removeClass(options.classesToRemove);
   });
   return this;
@@ -1079,9 +860,6 @@ $.fn.hasAnimationClass = function() {
   return /(^|\s)animate-/.test(this.attr('class'));
 };
 
-/**
- * Animates from old to new width
- */
 $.fn.cssWidthAnimated = function(oldWidth, newWidth, opts) {
   opts = opts || {};
   opts.duration = scout.nvl(opts.duration, 300);
@@ -1154,8 +932,7 @@ $.fn.cssAnimated = function(fromVals, toVals, opts) {
   return this;
 };
 
-// over engineered animate
-$.fn.widthToContent = function(opts) {
+$.fn.cssWidthToContentAnimated = function(opts) {
   let oldW = this.outerWidth(),
     newW = this.css('width', 'auto').outerWidth();
 
@@ -1163,10 +940,7 @@ $.fn.widthToContent = function(opts) {
   return this;
 };
 
-/**
- * Offset to a specific ancestor and not to the document as offset() would do.
- * Not the same as position() which returns the position relative to the offset parent.
- */
+
 $.fn.offsetTo = function($to) {
   let toOffset = $to.offset(),
     offset = this.offset();
@@ -1190,10 +964,12 @@ $.fn.cssPxValue = function(prop, value) {
   return this.css(prop, value + 'px');
 };
 
+// noinspection JSValidateTypes
 $.fn.cssLeft = function(position) {
   return this.cssPxValue('left', position);
 };
 
+// noinspection JSValidateTypes
 $.fn.cssTop = function(position) {
   return this.cssPxValue('top', position);
 };
@@ -1207,14 +983,17 @@ $.fn.cssPosition = function(point) {
   return this.cssLeft(point.x).cssTop(point.y);
 };
 
+// noinspection JSValidateTypes
 $.fn.cssBottom = function(position) {
   return this.cssPxValue('bottom', position);
 };
 
+// noinspection JSValidateTypes
 $.fn.cssRight = function(position) {
   return this.cssPxValue('right', position);
 };
 
+// noinspection JSValidateTypes
 $.fn.cssWidth = function(width) {
   return this.cssPxValue('width', width);
 };
@@ -1230,9 +1009,6 @@ $.fn.cssMinWidth = function(minWidth) {
   return this.cssPxValue('min-width', minWidth);
 };
 
-/**
- * @returns {number} the max-width as number. If max-width is not set (resp. defaults to 'none') Number.MAX_VALUE is returned.
- */
 $.fn.cssMaxWidth = function(maxWidth) {
   if (maxWidth === undefined) {
     let value = this.css('max-width');
@@ -1244,6 +1020,7 @@ $.fn.cssMaxWidth = function(maxWidth) {
   return this.cssPxValue('max-width', maxWidth);
 };
 
+// noinspection JSValidateTypes
 $.fn.cssHeight = function(height) {
   return this.cssPxValue('height', height);
 };
@@ -1259,9 +1036,6 @@ $.fn.cssMinHeight = function(minHeight) {
   return this.cssPxValue('min-height', minHeight);
 };
 
-/**
- * @returns {number} the max-height as number. If max-height is not set (resp. defaults to 'none') Number.MAX_VALUE is returned.
- */
 $.fn.cssMaxHeight = function(maxHeight) {
   if (maxHeight === undefined) {
     let value = this.css('max-height');
@@ -1311,18 +1085,22 @@ $.fn.cssMarginY = function(value) {
   return this;
 };
 
+// noinspection JSValidateTypes
 $.fn.cssPaddingTop = function(value) {
   return this.cssPxValue('padding-top', value);
 };
 
+// noinspection JSValidateTypes
 $.fn.cssPaddingRight = function(value) {
   return this.cssPxValue('padding-right', value);
 };
 
+// noinspection JSValidateTypes
 $.fn.cssPaddingBottom = function(value) {
   return this.cssPxValue('padding-bottom', value);
 };
 
+// noinspection JSValidateTypes
 $.fn.cssPaddingLeft = function(value) {
   return this.cssPxValue('padding-left', value);
 };
@@ -1345,18 +1123,22 @@ $.fn.cssPaddingY = function(value) {
   return this;
 };
 
+// noinspection JSValidateTypes
 $.fn.cssBorderBottomWidth = function(value) {
   return this.cssPxValue('border-bottom-width', value);
 };
 
+// noinspection JSValidateTypes
 $.fn.cssBorderLeftWidth = function(value) {
   return this.cssPxValue('border-left-width', value);
 };
 
+// noinspection JSValidateTypes
 $.fn.cssBorderRightWidth = function(value) {
   return this.cssPxValue('border-right-width', value);
 };
 
+// noinspection JSValidateTypes
 $.fn.cssBorderTopWidth = function(value) {
   return this.cssPxValue('border-top-width', value);
 };
@@ -1377,16 +1159,10 @@ $.fn.cssBorderWidthX = function(value) {
   return this.cssBorderRightWidth(value);
 };
 
-/**
- * Bottom of a html element without margin and border relative to offset parent. Expects border-box model.
- */
 $.fn.innerBottom = function() {
   return this.position().top + this.outerHeight(true) - this.cssMarginBottom() - this.cssBorderBottomWidth();
 };
 
-/**
- * Right of a html element without margin and border relative to offset parent. Expects border-box model.
- */
 $.fn.innerRight = function() {
   return this.position().left + this.outerWidth(true) - this.cssMarginRight() - this.cssBorderRightWidth();
 };
@@ -1397,20 +1173,6 @@ $.fn.copyCss = function($origin, props) {
   properties = explodeShorthandProperties(properties);
   properties.forEach(prop => {
     $this.css(prop, $origin.css(prop));
-  });
-  return $this;
-};
-
-$.fn.copyCssIfGreater = function($origin, props) {
-  let properties = props.split(' ');
-  let $this = this;
-  properties = explodeShorthandProperties(properties);
-  properties.forEach(prop => {
-    let originValue = $.pxToNumber($origin.css(prop));
-    let thisValue = $.pxToNumber($this.css(prop));
-    if (originValue > thisValue) {
-      $this.css(prop, originValue + 'px');
-    }
   });
   return $this;
 };
@@ -1430,20 +1192,6 @@ $.fn.disableSpellcheck = function() {
   return this.attr('spellcheck', false);
 };
 
-/**
- * Returns whether the current element is the given element or has a child which is the given element.
- */
-$.fn.isOrHas = function(elem) {
-  if (elem instanceof $) {
-    elem = elem[0];
-  }
-  return this[0] === elem || this.has(elem).length > 0;
-};
-
-/**
- * Makes the current element resizable, which means DIVs for resize-handling are added to the DOM
- * in the E, SE and S of the element. This is primarily useful for (modal) dialogs.
- */
 $.fn.resizable = function(model) {
   let $this = $(this);
   let resizable = $this.data('resizable');
@@ -1456,9 +1204,6 @@ $.fn.resizable = function(model) {
   return this;
 };
 
-/**
- * Removes the resize handles and event handlers in order to make the element un resizable again.
- */
 $.fn.unresizable = function() {
   let $this = $(this);
   let resizable = $this.data('resizable');
@@ -1469,14 +1214,6 @@ $.fn.unresizable = function() {
   return this;
 };
 
-/**
- * Makes any element movable with the mouse. If the argument '$handle' is missing, the entire
- * element can be used as a handle.
- *
- * A callback function can be passed as second argument (optional). The function is called for
- * every change of the draggable's position with an object as argument:
- * { top: (top pixels), left: (left pixels) }
- */
 $.fn.draggable = function($handle, callback) {
   let $draggable = this;
   $handle = $handle || $draggable;
@@ -1511,20 +1248,12 @@ $.fn.draggable = function($handle, callback) {
   });
 };
 
-/**
- *
- * Removes the mouse down handler which was added by draggable() in order to make it un draggable again.
- */
 $.fn.undraggable = function($handle) {
   let $draggable = this;
   $handle = $handle || $draggable;
   return $handle.off('mousedown.draggable');
 };
 
-/**
- * Calls jQuery.fadeOut() and then removes the element from the DOM.
- * Default fade-out duration is 150 ms.
- */
 $.fn.fadeOutAndRemove = function(duration, callback) {
   if (callback === undefined && typeof duration === 'function') {
     callback = duration;
@@ -1591,30 +1320,14 @@ $.fn.outerHeight = function(...args) {
   return _ceilNumber(__origOuterHeight.apply(this, args));
 };
 
-/**
- * Sets the given 'text' as text to the jQuery element, using the text() function (i.e. HTML is encoded automatically).
- * If the text does not contain any non-space characters, the text '&nbsp;' is set instead (using the html() function).
- * If an 'emptyCssClass' is provided, this CSS class is removed in the former and added in the later case.
- */
 $.fn.textOrNbsp = function(text, emptyCssClass) {
   return this.contentOrNbsp(false, text, emptyCssClass);
 };
 
-/**
- * Same as "textOrNbsp", but with html (caller is responsible for encoding).
- */
 $.fn.htmlOrNbsp = function(html, emptyCssClass) {
   return this.contentOrNbsp(true, html, emptyCssClass);
 };
 
-/**
- * Renders the given content as plain-text or HTML depending on the given htmlEnabled flag.
- *
- * @param {boolean} htmlEnabled
- * @param {string} content
- * @param {string} emptyCssClass
- * @returns {$}
- */
 $.fn.contentOrNbsp = function(htmlEnabled, content, emptyCssClass) {
   let func = htmlEnabled ? this.html : this.text;
   if (strings.hasText(content)) {
@@ -1631,19 +1344,6 @@ $.fn.contentOrNbsp = function(htmlEnabled, content, emptyCssClass) {
   return this;
 };
 
-/**
- * Like toggleClass(), this toggles a HTML attribute on a set of jquery elements.
- *
- * @param attr
- *          Name of the attribute to toggle.
- * @param state
- *          Specifies if the attribute should be added or removed (based on whether the argument is truthy or falsy).
- *          If this argument is not defined, the attribute is added when it exists, and vice-versa. If this behavior
- *          is not desired, explicitly cast the argument to a boolean using "!!".
- * @param value
- *          Value to use when adding the attribute.
- *          If this argument is not specified, 'attr' is used as value.
- */
 $.fn.toggleAttr = function(attr, state, value) {
   if (!attr) {
     return this;
@@ -1667,29 +1367,6 @@ $.fn.toggleAttr = function(attr, state, value) {
   });
 };
 
-$.fn.backupSelection = function() {
-  let field = this[0];
-  if (field && field === this.activeElement(true)) {
-    return {
-      selectionStart: field.selectionStart,
-      selectionEnd: field.selectionEnd,
-      selectionDirection: field.selectionDirection
-    };
-  }
-  return null;
-};
-
-$.fn.restoreSelection = function(selection) {
-  let field = this[0];
-  if (field && field === this.activeElement(true) && selection) {
-    field.setSelectionRange(selection.selectionStart, selection.selectionEnd, selection.selectionDirection);
-  }
-  return this;
-};
-
-/**
- * If the given value is "truthy", it is set as attribute on the target. Otherwise, the attribute is removed.
- */
 $.fn.attrOrRemove = function(attributeName, value) {
   if (value) {
     this.attr(attributeName, value);
@@ -1699,64 +1376,10 @@ $.fn.attrOrRemove = function(attributeName, value) {
   return this;
 };
 
-$.fn.appendAppLink = function(appLinkBean, func) {
-  return this.appendSpan().appLink(appLinkBean, func);
-};
-
-/**
- * @param appLinkBean
- *          Either
- *           - an AppLinkBean with both (1) a ref attribute which will be mapped to the
- *             data-ref attribute of the element and (2) a text attribute which will be
- *             set as the text of the element.
- *           - or just a ref, which will be mapped to the data-ref attribute of the
- *             element.
- * @param func
- *          Optional. Either
- *           - a function to be called when the app link has been clicked
- *           - or an object with a method named _onAppLinkAction (e.g. an instance of
- *             BeanField)
- *          If func is not set, the _onAppLinkAction of the inner most widget relative to
- *          this element (if any) will be called when the app link has been clicked.
- */
-$.fn.appLink = function(appLinkBean, func) {
-  if (!func) {
-    func = function(event) {
-      let widget = scout.widget(this);
-      if (widget && widget._onAppLinkAction) {
-        widget._onAppLinkAction(event);
-      }
-    }.bind(this);
-  } else if (typeof func === 'object' && func._onAppLinkAction) {
-    func = func._onAppLinkAction.bind(func);
-  }
-
-  this.addClass('app-link')
-    .attr('tabindex', '0')
-    .unfocusable()
-    .on('click', func);
-
-  if (typeof appLinkBean === 'string') {
-    this.attr('data-ref', appLinkBean);
-  } else {
-    this
-      .text(appLinkBean.name)
-      .attr('data-ref', appLinkBean.ref);
-  }
-  return this;
-};
-
-/**
- * Adds the class 'unfocusable' to current result set. The class is not used for styling purposes
- * but has a meaning to the FocusManager.
- */
 $.fn.unfocusable = function() {
   return this.addClass('unfocusable');
 };
 
-/**
- * Select all text within an element, e.g. within a content editable div element.
- */
 $.fn.selectAllText = function() {
   let range,
     myDocument = this.document(true),
@@ -1836,44 +1459,9 @@ $.fn._getClientAndScrollWidthReliable = function() {
   };
 };
 
-/**
- * Checks if content is truncated.
- *
- * @return {boolean}
- */
 $.fn.isContentTruncated = function() {
   let widths = this._getClientAndScrollWidthReliable();
-  if (widths.scrollWidth > widths.clientWidth) {
-    return true;
-  }
-  return false;
-};
-
-/**
- * This function is used to distinct between single and double clicks.
- * Instead of executing a handler immediately when the first click occurs,
- * we wait for a given timeout (or by default 300 ms) to check if it is followed by a second click.
- * This will delay the execution of a single click a bit, so you should use this function wisely.
- */
-$.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout) {
-  return this.each(function() {
-    let that = this;
-    let numClicks = 0;
-    let timeout = scout.nvl(timeout, 300);
-    $(this).on('click', event => {
-      numClicks++;
-      if (numClicks === 1) {
-        setTimeout(() => {
-          if (numClicks === 1) {
-            singleClickFunc.call(that, event);
-          } else {
-            doubleClickFunc.call(that, event);
-          }
-          numClicks = 0;
-        }, timeout);
-      }
-    });
-  });
+  return widths.scrollWidth > widths.clientWidth;
 };
 
 $.fn.onPassive = function(eventType, handler) {
@@ -1886,40 +1474,6 @@ $.fn.offPassive = function(eventType, handler) {
   let options = events.passiveOptions();
   this[0].removeEventListener(eventType, handler, options);
   return this;
-};
-
-// ------------------------------------------------------------------
-
-$.fn.appendTable = function(cssClass) {
-  return this.appendElement('<table>', cssClass);
-};
-
-$.fn.appendColgroup = function(cssClass) {
-  return this.appendElement('<colgroup>', cssClass);
-};
-
-$.fn.appendCol = function(cssClass) {
-  return this.appendElement('<col>', cssClass);
-};
-
-$.fn.appendTr = function(cssClass) {
-  return this.appendElement('<tr>', cssClass);
-};
-
-$.fn.appendTd = function(cssClass, text) {
-  return this.appendElement('<td>', cssClass, text);
-};
-
-$.fn.appendTh = function(cssClass, text) {
-  return this.appendElement('<th>', cssClass, text);
-};
-
-$.fn.appendUl = function(cssClass) {
-  return this.appendElement('<ul>', cssClass);
-};
-
-$.fn.appendLi = function(cssClass, text) {
-  return this.appendElement('<li>', cssClass, text);
 };
 
 // === $.easing extensions ===
