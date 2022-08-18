@@ -422,7 +422,7 @@ export default class TableFooter extends Widget {
       if ($info[0].style.width === '') {
         $info.cssWidth(0);
       }
-      $info.stop().removeClass('hiding').setVisible(true).widthToContent(animationOpts);
+      $info.stop().removeClass('hiding').setVisible(true).cssWidthToContentAnimated(animationOpts);
     } else {
       // Mark element as hiding so that the layout does not try to resize it
       $info.addClass('hiding');
