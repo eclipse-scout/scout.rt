@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -19,7 +19,7 @@ const CONST_REGEX = /\${const:([^}]*)}/;
  * Not using the literal has the advantage that the object does not contain any inherited properties like `toString` so it is not necessary to use `o.hasOwnProperty(p)`
  * instead of `p in o` to check for the existence.
  *
- * @param [object] properties optional initial properties to be set on the new created object
+ * @param {object} [properties] optional initial properties to be set on the new created object
  */
 export function createMap(properties) {
   let map = Object.create(null);

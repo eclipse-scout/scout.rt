@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -185,7 +185,7 @@ export function resolveText(value, languageTag) {
 /**
  * Utility function to easily replace an object property which contains a text key like '${textKey:AKey}'.
  *
- * @param {object} object object having a text property which contains a text-key
+ * @param {{ session?: Session }} object object having a text property which contains a text-key
  * @param {string} [textProperty] name of the property where a text-key should be replaced by a text. By default 'text' is used as property name.
  * @param {Session} [session] can be undefined when given 'object' has a session property, otherwise mandatory
  */

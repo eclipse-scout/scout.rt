@@ -35,7 +35,6 @@ export default class BenchRowLayoutData extends FlexboxLayoutData {
   updateVisibilities(rows) {
     rows.forEach((row, index) => {
       this.rows[index].visible = row.rendered;
-
     });
   }
 }
