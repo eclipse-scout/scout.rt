@@ -537,9 +537,9 @@ export function reset($scrollable) {
 /**
  * Scrolls the $scrollable to the given $element (must be a child of $scrollable)
  *
- * @param {$} $scrollable
+ * @param {JQuery} $scrollable
  *          the scrollable object
- * @param {$} $element
+ * @param {JQuery} $element
  *          the element to scroll to
  * @param {object|string} [options]
  *          an optional options object. Short-hand version: If a string is passed instead
@@ -656,7 +656,7 @@ export function scrollHorizontalTo($scrollable, $element, options) {
 }
 
 /**
- * @param {$} $scrollable the scrollable object
+ * @param {JQuery} $scrollable the scrollable object
  * @param {number} scrollTop the new scroll position
  * @param {object} [options]
  * @param {boolean} [options.animate] whether the scrolling should be animated. Default is false.
@@ -692,7 +692,7 @@ export function scrollTop($scrollable, scrollTop, options) {
 }
 
 /**
- * @param {$} $scrollable the scrollable object
+ * @param {JQuery} $scrollable the scrollable object
  * @param {number} scrollLeft the new scroll position
  * @param {object} [options]
  * @param {boolean} [options.animate] whether the scrolling should be animated. Default is false.
@@ -842,7 +842,7 @@ export function _unfix($elem) {
 
 /**
  * Stores the position of all scrollables that belong to an optional session.
- * @param session (optional) when no session is given, scrollables from all sessions are stored
+ * @param [session] (optional) when no session is given, scrollables from all sessions are stored
  */
 export function storeScrollPositions($container, session) {
   let $scrollables = getScrollables(session);
@@ -864,7 +864,7 @@ export function storeScrollPositions($container, session) {
 
 /**
  * Restores the position of all scrollables that belong to an optional session.
- * @param session (optional) when no session is given, scrollables from all sessions are restored
+ * @param [session] (optional) when no session is given, scrollables from all sessions are restored
  */
 export function restoreScrollPositions($container, session) {
   let $scrollables = getScrollables(session);

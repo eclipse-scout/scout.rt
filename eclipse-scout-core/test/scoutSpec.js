@@ -206,6 +206,7 @@ describe('main', () => {
       }).toThrow();
       expect(() => {
         scout.create(() => {
+          // nop
         });
       }).toThrow();
     });

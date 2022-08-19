@@ -343,7 +343,7 @@ $.fn.nvl = function($element) {
 $.fn.makeElement = function(element, cssClass, text) {
   let myDocument = this.document(true);
   if (myDocument === undefined || element === undefined) {
-    return new Error('missing arguments: document, element');
+    throw new Error('missing arguments: document, element');
   }
   let $element = $(element, myDocument);
   if (cssClass) {
@@ -356,11 +356,11 @@ $.fn.makeElement = function(element, cssClass, text) {
 };
 
 $.fn.makeDiv = function(cssClass, text) {
-  return this.makeElement('<div>', cssClass, text);
+  return /** @type JQuery<HTMLDivElement> */ this.makeElement('<div>', cssClass, text);
 };
 
 $.fn.makeSpan = function(cssClass, text) {
-  return this.makeElement('<span>', cssClass, text);
+  return /** @type JQuery<HTMLSpanElement> */ this.makeElement('<span>', cssClass, text);
 };
 
 $.fn.document = function(domElement) {
@@ -539,7 +539,7 @@ $.fn.appendImg = function(imageSrc, cssClass) {
   }
   return $icon;
 };
-
+// FIXME TS how to solve these issues?
 $.fn.icon = function(iconId, addToDomFunc) {
   let icon, $icon = this.data('$icon');
   if (iconId) {
@@ -830,14 +830,6 @@ $.fn.addClassForAnimation = function(className, options) {
   return this;
 };
 
-/**
- * Adds a handler that is executed when a CSS animation ends on the current element. It will be executed
- * only once when the 'animationend' event is triggered on the current element. Bubbling events from child
- * elements are ignored.
- *
- * @param {function} handler - A function to execute when the 'animationend' event is triggered
- * @return {$}
- */
 $.fn.oneAnimationEnd = function(handler) {
   if (!handler) {
     return this;
@@ -1557,6 +1549,7 @@ $.ajaxTransport('+binary', (options, originalOptions, jqXHR) => {
         xhr.send(data);
       },
       abort: () => {
+        // nop
       }
     };
   }

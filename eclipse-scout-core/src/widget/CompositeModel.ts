@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Widget, WidgetModel} from '../index';
+import {RefWidgetModel} from './WidgetModel';
 
-export type Predicate<T> = (obj: T) => boolean;
-
-// Type that makes some properties optional and some required.
-export type PartialAndRequired<T, OPTIONAL extends keyof T, REQUIRED extends keyof T> = Omit<T, OPTIONAL | REQUIRED> & Partial<Pick<T, OPTIONAL>> & Required<Pick<T, REQUIRED>>;
-
-export type EnumObject<TYPE> = TYPE[keyof TYPE];
+export default interface CompositeModel extends WidgetModel {
+  widgets: Widget[] | RefWidgetModel<Widget>[];
+}
