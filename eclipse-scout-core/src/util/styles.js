@@ -125,7 +125,7 @@ export function get(cssClass, properties, styleProperties) {
 
 /**
  * Traverses the parents of the given $elem and returns the first opaque background color.
- * @param {jQuery} $elem
+ * @param {JQuery} $elem
  */
 export function getFirstOpaqueBackgroundColor($elem) {
   if (!$elem) {
