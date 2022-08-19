@@ -8,10 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import $ from 'jquery';
+import {EventEmitter} from '../index';
 
-export type Predicate<T> = (obj: T) => boolean;
+export default class Event {
+  source: EventEmitter;
+  defaultPrevented: boolean;
+  type: string;
 
-// Type that makes some properties optional and some required.
-export type PartialAndRequired<T, OPTIONAL extends keyof T, REQUIRED extends keyof T> = Omit<T, OPTIONAL | REQUIRED> & Partial<Pick<T, OPTIONAL>> & Required<Pick<T, REQUIRED>>;
+  constructor(model?) {
+    this.defaultPrevented = false;
+    $.extend(this, model);
+  }
 
-export type EnumObject<TYPE> = TYPE[keyof TYPE];
+  preventDefault() {
+    this.defaultPrevented = true;
+  }
+}
+

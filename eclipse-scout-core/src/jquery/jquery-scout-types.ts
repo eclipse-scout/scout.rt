@@ -1,4 +1,4 @@
-import {Dimension, IconDesc, Point} from '../index';
+import {Dimension, IconDesc, Point, Predicate} from '../index';
 import $ from 'jquery';
 import Deferred = JQuery.Deferred;
 
@@ -224,19 +224,19 @@ declare global {
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
      * @returns window reference (defaultView) of the HTML element
      */
-    window<T extends boolean>(domElement?: T): T extends true ? Document : JQuery<Window>;
+    window<T extends boolean>(domElement?: T): T extends true ? Window : JQuery<Window>;
 
     /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
      * @returns the BODY element of the HTML document in which the current HTML element is placed.
      */
-    body<T extends boolean>(domElement?: T): T extends true ? Document : JQuery<Body>;
+    body<T extends boolean>(domElement?: T): T extends true ? Body : JQuery<Body>;
 
     /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
      * @returns the closest DOM element that has the 'scout' class.
      */
-    entryPoint<T extends boolean>(domElement?: T): T extends true ? Document : JQuery;
+    entryPoint<T extends boolean>(domElement?: T): T extends true ? JQuery : JQuery;
 
     /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
@@ -492,7 +492,7 @@ declare global {
     /**
      * @returns whether the current element is the given element or has a child which is the given element.
      */
-    isOrHas(elem: JQuery | HTMLElement): boolean;
+    isOrHas(elem: JQuery | Element): boolean;
 
     animateAVCSD(attr: string, value, complete?: (elem: JQuery) => void, step?: (elem: JQuery) => void, duration?: number): this;
 

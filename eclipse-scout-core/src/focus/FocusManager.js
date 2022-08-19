@@ -260,7 +260,7 @@ export default class FocusManager {
   /**
    * Requests the focus for the given element, but only if being a valid focus location.
    *
-   * @param {HTMLElement|$} [element]
+   * @param {HTMLElement|JQuery} [element]
    *        the element to focus, or null to focus the context's first focusable element matching the given filter.
    * @param {function} [filter]
    *        filter that controls which element should be focused, or null to accept all focusable candidates.
