@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.clientnotification;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceWithoutAuthorization;
@@ -30,7 +31,7 @@ public interface IClientNotificationService {
    * @param nodeId
    *          unique id of the client node
    */
-  void registerNode(String nodeId);
+  void registerNode(NodeId nodeId);
 
   /**
    * Unregister a node with all its registered session and users.
@@ -38,7 +39,7 @@ public interface IClientNotificationService {
    * @param nodeId
    *          unique id of the client node
    */
-  void unregisterNode(String nodeId);
+  void unregisterNode(NodeId nodeId);
 
   /**
    * Receive new notifications relevant for the given node
@@ -47,5 +48,5 @@ public interface IClientNotificationService {
    *          unique id of the client node
    * @return list of new notification messages never <code>null</code>
    */
-  List<ClientNotificationMessage> getNotifications(String nodeId);
+  List<ClientNotificationMessage> getNotifications(NodeId nodeId);
 }

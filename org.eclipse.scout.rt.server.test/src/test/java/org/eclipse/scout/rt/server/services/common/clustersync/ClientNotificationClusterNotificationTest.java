@@ -16,6 +16,7 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.mom.api.ClusterMom;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
@@ -47,7 +48,7 @@ import org.junit.runner.RunWith;
 @RunWithServerSession(TestServerSession.class)
 @RunWithSubject("default")
 public class ClientNotificationClusterNotificationTest {
-  private static final String TEST_NODE = "node";
+  private static final NodeId TEST_NODE = NodeId.of("node");
   private static final String TEST_USER = "user";
 
   private IMomImplementor m_nullMomImplementorSpy;
@@ -98,7 +99,7 @@ public class ClientNotificationClusterNotificationTest {
 
   public class ClientNotificationTestRegistry extends ClientNotificationRegistry {
     @Override
-    public void registerNode(String nodeId) {
+    public void registerNode(NodeId nodeId) {
       super.registerNode(nodeId);
     }
   }

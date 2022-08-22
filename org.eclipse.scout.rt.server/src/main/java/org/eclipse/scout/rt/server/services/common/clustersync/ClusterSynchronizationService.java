@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.mom.api.ClusterMom;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMessageListener;
@@ -31,7 +32,6 @@ import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.context.NodeIdentifier;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
@@ -62,7 +62,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   private volatile ISubscription m_subscription;
   private final Object m_subscriptionLock = new Object();
 
-  private final String m_nodeId = BEANS.get(NodeIdentifier.class).get();
+  private final NodeId m_nodeId = NodeId.current();
 
   public ClusterSynchronizationService() {
     m_subject = new Subject();
@@ -84,7 +84,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     return m_messageStatusMap.get(messageType);
   }
 
-  public String getNodeId() {
+  public NodeId getNodeId() {
     return m_nodeId;
   }
 
@@ -191,7 +191,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     final IClusterNotificationMessage notificationMessage = message.getTransferObject();
     if (isEnabled()) {
       //Do not progress notifications sent by node itself
-      String originNode = notificationMessage.getProperties().getOriginNode();
+      NodeId originNode = notificationMessage.getProperties().getOriginNode();
 
       if (m_nodeId.equals(originNode)) {
         return;

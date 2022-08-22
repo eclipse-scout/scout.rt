@@ -10,11 +10,10 @@
  */
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
 import org.junit.Before;
@@ -24,7 +23,7 @@ import org.junit.Test;
  * Tests for {@link ClusterNodeStatusInfo}
  */
 public class ClusterNodeStatusInfoTest {
-  private static final String TEST_NODE = "node";
+  private static final NodeId TEST_NODE = NodeId.of("node");
   private static final String TEST_USER = "user";
   private ClusterNotificationMessage m_message;
 

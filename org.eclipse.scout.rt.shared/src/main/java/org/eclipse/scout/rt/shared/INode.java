@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.shared;
 
 import java.util.UUID;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
+
 /**
  * Represents a server or client node
  *
@@ -22,5 +24,5 @@ public interface INode {
   /**
    * Unique ID to identify this node.
    */
-  String ID = UUID.randomUUID().toString();
+  NodeId ID = NodeId.of(UUID.randomUUID().toString());
 }

@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -36,7 +37,7 @@ public class ClientNotificationNodeQueueTest {
   @Before
   public void setup() {
     m_queue = new ClientNotificationNodeQueue(MAX_TEST_CAPACITY);
-    m_queue.setNodeId("testNodeId");
+    m_queue.setNodeId(NodeId.of("testNodeId"));
   }
 
   @Test

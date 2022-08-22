@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.clientnotification;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -31,17 +32,17 @@ public class ClientNotificationService implements IClientNotificationService {
   }
 
   @Override
-  public void registerNode(String nodeId) {
+  public void registerNode(NodeId nodeId) {
     BEANS.get(ClientNotificationRegistry.class).registerNode(nodeId);
   }
 
   @Override
-  public void unregisterNode(String nodeId) {
+  public void unregisterNode(NodeId nodeId) {
     BEANS.get(ClientNotificationRegistry.class).unregisterNode(nodeId);
   }
 
   @Override
-  public List<ClientNotificationMessage> getNotifications(String nodeId) {
+  public List<ClientNotificationMessage> getNotifications(NodeId nodeId) {
     return BEANS.get(ClientNotificationRegistry.class).consume(nodeId, m_maxNotifications, m_blockingTimeout, TimeUnit.MILLISECONDS);
   }
 }

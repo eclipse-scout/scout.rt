@@ -39,6 +39,8 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.eclipse.scout.rt.dataobject.id.IIds;
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.mom.api.DestinationConfigPropertyParser;
 import org.eclipse.scout.rt.mom.api.IBiDestination;
 import org.eclipse.scout.rt.mom.api.IDestination;
@@ -62,7 +64,6 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
-import org.eclipse.scout.rt.platform.context.NodeIdentifier;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -815,8 +816,8 @@ public class JmsMomImplementor implements IMomImplementor {
     if (clientId != null) {
       return clientId;
     }
-    final String nodeId = BEANS.get(NodeIdentifier.class).get();
-    return StringUtility.join(" ", m_symbolicName, StringUtility.box("(", nodeId, ")"));
+    final NodeId nodeId = NodeId.current();
+    return StringUtility.join(" ", m_symbolicName, StringUtility.box("(", IIds.toString(nodeId), ")"));
   }
 
   /**

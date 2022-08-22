@@ -14,6 +14,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
@@ -41,7 +42,7 @@ public class PiggyBackClientNotificationTest {
 
   @Before
   public void before() {
-    BEANS.get(IClientNotificationService.class).registerNode("test");
+    BEANS.get(IClientNotificationService.class).registerNode(NodeId.of("test"));
     when(m_pingSvc.ping(any(String.class))).thenAnswer((Answer<String>) invocation -> {
       BEANS.get(ClientNotificationRegistry.class).putTransactionalForAllSessions("testNotification");
       return "pong";
@@ -54,7 +55,7 @@ public class PiggyBackClientNotificationTest {
     Class[] parameterTypes = new Class[]{String.class};
     Object[] args = new Object[]{"test"};
     ServiceTunnelRequest req = new ServiceTunnelRequest(IPingService.class.getName(), "ping", parameterTypes, args);
-    req.setClientNodeId("testNodeId");
+    req.setClientNodeId(NodeId.of("testNodeId"));
     ServiceTunnelResponse res = s.doPost(req);
     assertEquals("pong", res.getData());
     assertNull(res.getException());
