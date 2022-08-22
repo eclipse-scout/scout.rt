@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.testing.server.runner.statement;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
@@ -26,12 +27,12 @@ import org.junit.runners.model.Statement;
 public class ClientNotificationsStatement extends Statement {
 
   private final Statement m_next;
-  private final String m_clientNodeId;
+  private final NodeId m_clientNodeId;
   private final ClientNotificationCollector m_collector;
 
   public ClientNotificationsStatement(final Statement next, final RunWithClientNotifications annotation) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
-    m_clientNodeId = (annotation != null ? annotation.clientNodeId() : null);
+    m_clientNodeId = (annotation != null ? NodeId.of(annotation.clientNodeId()) : null);
     m_collector = new ClientNotificationCollector();
   }
 

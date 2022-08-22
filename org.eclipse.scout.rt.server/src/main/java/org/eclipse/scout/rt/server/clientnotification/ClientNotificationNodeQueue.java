@@ -26,6 +26,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -44,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class ClientNotificationNodeQueue {
   private static final Logger LOG = LoggerFactory.getLogger(ClientNotificationNodeQueue.class);
 
-  private final FinalValue<String> m_nodeId = new FinalValue<>();
+  private final FinalValue<NodeId> m_nodeId = new FinalValue<>();
 
   private final int m_capacity;
   private final BlockingDeque<ClientNotificationMessage> m_notifications;
@@ -60,11 +61,11 @@ public class ClientNotificationNodeQueue {
     m_lastConsumeAccess = new AtomicLong(System.currentTimeMillis());
   }
 
-  public void setNodeId(String nodeId) {
+  public void setNodeId(NodeId nodeId) {
     m_nodeId.set(nodeId);
   }
 
-  public String getNodeId() {
+  public NodeId getNodeId() {
     return m_nodeId.get();
   }
 

@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.server.clientnotification;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 
 /**
@@ -25,5 +26,5 @@ public interface IClientNodeId {
   /**
    * The client node id which is currently associated with the current thread.
    */
-  ThreadLocal<String> CURRENT = new ThreadLocal<>();
+  ThreadLocal<NodeId> CURRENT = new ThreadLocal<>();
 }

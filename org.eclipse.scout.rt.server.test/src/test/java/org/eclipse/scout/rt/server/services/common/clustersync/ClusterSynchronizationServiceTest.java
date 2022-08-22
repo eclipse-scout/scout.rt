@@ -17,6 +17,7 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.mom.api.ClusterMom;
 import org.eclipse.scout.rt.mom.api.IMessage;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
@@ -30,7 +31,6 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.cache.AllCacheEntryFilter;
 import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
-import org.eclipse.scout.rt.platform.context.NodeIdentifier;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.mom.IClusterMomDestinations;
@@ -55,7 +55,7 @@ import org.mockito.ArgumentCaptor;
 @RunWithServerSession(TestServerSession.class)
 @RunWithSubject("default")
 public class ClusterSynchronizationServiceTest {
-  private static final String TEST_NODE = "node";
+  private static final NodeId TEST_NODE = NodeId.of("node");
   private static final String TEST_USER = "user";
 
   private ClusterNotificationMessage m_message;
@@ -203,15 +203,15 @@ public class ClusterSynchronizationServiceTest {
     IClusterNodeStatusInfo statusInfo = m_svc.getStatusInfo();
     assertEquals(0, statusInfo.getReceivedMessageCount());
     assertEquals(1, statusInfo.getSentMessageCount());
-    assertEquals(BEANS.get(NodeIdentifier.class).get(), statusInfo.getLastChangedOriginNodeId());
+    assertEquals(NodeId.current(), statusInfo.getLastChangedOriginNodeId());
     assertEquals("default", statusInfo.getLastChangedUserId());
   }
 
   private void assertEmptyNodeInfo(IClusterNodeStatusInfo status) {
     assertEquals(0, status.getReceivedMessageCount());
     assertEquals(0, status.getSentMessageCount());
-    assertEquals(null, status.getLastChangedOriginNodeId());
-    assertEquals(null, status.getLastChangedUserId());
+    assertNull(status.getLastChangedOriginNodeId());
+    assertNull(status.getLastChangedUserId());
   }
 
   class TestCodeType extends AbstractCodeType<Long, Long> {

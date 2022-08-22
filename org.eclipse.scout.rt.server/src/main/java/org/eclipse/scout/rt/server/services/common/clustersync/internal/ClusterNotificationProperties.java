@@ -10,20 +10,21 @@
  */
 package org.eclipse.scout.rt.server.services.common.clustersync.internal;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationProperties;
 
 public class ClusterNotificationProperties implements IClusterNotificationProperties {
   private static final long serialVersionUID = 245680805887844037L;
-  private final String m_originNode;
+  private final NodeId m_originNode;
   private final String m_originUser;
 
-  public ClusterNotificationProperties(String originNode, String originUser) {
+  public ClusterNotificationProperties(NodeId originNode, String originUser) {
     m_originNode = originNode;
     m_originUser = originUser;
   }
 
   @Override
-  public String getOriginNode() {
+  public NodeId getOriginNode() {
     return m_originNode;
   }
 

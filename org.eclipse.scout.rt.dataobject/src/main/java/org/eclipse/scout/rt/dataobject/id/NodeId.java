@@ -39,6 +39,7 @@ public final class NodeId extends AbstractStringId {
    * @see NodeIdentifier
    */
   public static NodeId current() {
+    //noinspection deprecation
     return NodeId.of(BEANS.get(NodeIdentifier.class).get());
   }
 }

@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
@@ -35,7 +36,7 @@ public class ServiceTunnelRequest implements Serializable {
   private final Object[] m_args;
   private final Locale m_locale;
   private String m_userAgent;
-  private String m_clientNodeId;
+  private NodeId m_clientNodeId;
 
   public ServiceTunnelRequest(String serviceInterfaceName, String op, Class[] parameterTypes, Object[] args) {
     m_serviceInterfaceClassName = serviceInterfaceName;
@@ -115,14 +116,14 @@ public class ServiceTunnelRequest implements Serializable {
   /**
    * Returns the unique ID of the client node which triggered this service request.
    */
-  public String getClientNodeId() {
+  public NodeId getClientNodeId() {
     return m_clientNodeId;
   }
 
   /**
    * Sets the unique ID of the client node which triggered this service request.
    */
-  public void setClientNodeId(String notificationNodeId) {
+  public void setClientNodeId(NodeId notificationNodeId) {
     m_clientNodeId = notificationNodeId;
   }
 

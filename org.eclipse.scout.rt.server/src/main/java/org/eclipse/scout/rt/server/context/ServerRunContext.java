@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -55,7 +56,7 @@ public class ServerRunContext extends RunContext {
 
   protected IServerSession m_session;
   protected UserAgent m_userAgent;
-  protected String m_clientNodeId;
+  protected NodeId m_clientNodeId;
   protected ClientNotificationCollector m_clientNotificationCollector = new ClientNotificationCollector();
 
   @Override
@@ -192,9 +193,9 @@ public class ServerRunContext extends RunContext {
   }
 
   /**
-   * @see #withClientNodeId(String)
+   * @see #withClientNodeId(NodeId)
    */
-  public String getClientNodeId() {
+  public NodeId getClientNodeId() {
     return m_clientNodeId;
   }
 
@@ -211,7 +212,7 @@ public class ServerRunContext extends RunContext {
    * <p>
    * Typically, this node ID is set by {@link ServiceTunnelServlet} for the processing of a service request.
    */
-  public ServerRunContext withClientNodeId(final String clientNodeId) {
+  public ServerRunContext withClientNodeId(final NodeId clientNodeId) {
     m_clientNodeId = clientNodeId;
     return this;
   }
@@ -229,7 +230,7 @@ public class ServerRunContext extends RunContext {
    * <p>
    * That collector is used to collect all transactional client notifications, which are to be published upon successful
    * commit of the associated transaction, and which are addressed to the client node which triggered processing (see
-   * {@link #withClientNodeId(String)}). That way, transactional client notifications are not published immediately upon
+   * {@link #withClientNodeId(NodeId)}). That way, transactional client notifications are not published immediately upon
    * successful commit, but included in the client's response instead (piggyback).
    * <p>
    * Typically, that collector is set by {@link ServiceTunnelServlet} for the processing of a service request.

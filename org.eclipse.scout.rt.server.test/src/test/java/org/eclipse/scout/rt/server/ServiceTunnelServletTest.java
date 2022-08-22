@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -98,8 +99,8 @@ public class ServiceTunnelServletTest {
   @Test
   public void testNewSessionCreatedOnLookupHttpSession() {
     createServletRunContext(m_requestMock, m_responseMock).run(() -> {
-      final ServerRunContext runcontext = ServerRunContexts.copyCurrent().withClientNodeId("testNodeId");
-      IServerSession session = BEANS.get(HttpServerRunContextProducer.class).getOrCreateScoutSession(m_requestMock, runcontext, "testid");
+      final ServerRunContext runContext = ServerRunContexts.copyCurrent().withClientNodeId(NodeId.of("testNodeId"));
+      IServerSession session = BEANS.get(HttpServerRunContextProducer.class).getOrCreateScoutSession(m_requestMock, runContext, "testid");
       assertNotNull(session);
     });
   }
@@ -223,7 +224,7 @@ public class ServiceTunnelServletTest {
     @Override
     public IServerSession call() {
       return createServletRunContext(m_request, m_response).call(() -> BEANS.get(HttpServerRunContextProducer.class)
-          .getOrCreateScoutSession(m_request, ServerRunContexts.empty().withClientNodeId("testNodeId"), "testSessionId"));
+          .getOrCreateScoutSession(m_request, ServerRunContexts.empty().withClientNodeId(NodeId.of("testNodeId")), "testSessionId"));
     }
   }
 

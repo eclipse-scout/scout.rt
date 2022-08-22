@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IThrowableWithContextInfo;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.shared.INode;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
@@ -90,7 +90,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
     if (session != null) {
       request.setSessionId(session.getId());
     }
-    request.setClientNodeId(INode.ID);
+    request.setClientNodeId(NodeId.current());
   }
 
   /**
@@ -140,7 +140,6 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
    *
    * @param t0
    *          System time before the request has been started (may be used for performance analyzing).
-   * @param serviceResponse
    */
   protected void afterTunnel(long t0, ServiceTunnelResponse serviceResponse) {
   }

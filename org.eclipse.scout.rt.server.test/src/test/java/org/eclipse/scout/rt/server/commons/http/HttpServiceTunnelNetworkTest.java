@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
@@ -33,7 +34,6 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.ISocketReadInterceptor;
 import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.ISocketWriteInterceptor;
-import org.eclipse.scout.rt.shared.INode;
 import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.BinaryServiceTunnelContentHandler;
@@ -269,7 +269,7 @@ public class HttpServiceTunnelNetworkTest {
       protected void interceptRequest(ServiceTunnelRequest request) {
         request.setUserAgent(UserAgents.createDefault().createIdentifier());
         request.setSessionId("testSession123");
-        request.setClientNodeId(INode.ID);
+        request.setClientNodeId(NodeId.current());
       }
     };
     //emulate interrupted exception while reading the object
@@ -314,7 +314,6 @@ public class HttpServiceTunnelNetworkTest {
       }
       else {
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unit test: unknown service op '" + op + "'");
-        return;
       }
     });
 

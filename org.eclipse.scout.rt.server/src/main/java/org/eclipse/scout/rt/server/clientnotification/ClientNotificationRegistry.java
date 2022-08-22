@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -46,7 +47,7 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class ClientNotificationRegistry {
   private static final Logger LOG = LoggerFactory.getLogger(ClientNotificationRegistry.class);
-  private final Map<String /* nodeId */, ClientNotificationNodeQueue> m_notificationQueues = new HashMap<>();
+  private final Map<NodeId, ClientNotificationNodeQueue> m_notificationQueues = new HashMap<>();
 
   /**
    * If no message is consumed for a certain amount of time [ms], queues are removed to avoid overflows. This may
@@ -65,14 +66,14 @@ public class ClientNotificationRegistry {
   /**
    * This method should only be accessed from {@link ClientNotificationService}
    */
-  protected void registerNode(String nodeId) {
+  protected void registerNode(NodeId nodeId) {
     getOrCreateQueue(nodeId);
   }
 
   /**
    * This method should only be accessed from {@link ClientNotificationService}
    */
-  protected void unregisterNode(String nodeId) {
+  protected void unregisterNode(NodeId nodeId) {
     synchronized (m_notificationQueues) {
       LOG.info("Removing queue of unregistered node [clientNodeId={}]", nodeId);
       m_notificationQueues.remove(nodeId);
@@ -89,28 +90,28 @@ public class ClientNotificationRegistry {
    * @param unit
    *          time unit for maxWaitTime
    */
-  protected List<ClientNotificationMessage> consume(String notificationNodeId, int maxAmount, int maxWaitTime, TimeUnit unit) {
+  protected List<ClientNotificationMessage> consume(NodeId notificationNodeId, int maxAmount, int maxWaitTime, TimeUnit unit) {
     ClientNotificationNodeQueue queue = getOrCreateQueue(notificationNodeId);
     return queue.consume(maxAmount, maxWaitTime, unit);
   }
 
-  protected ClientNotificationNodeQueue getOrCreateQueue(String nodeId) {
+  protected ClientNotificationNodeQueue getOrCreateQueue(NodeId nodeId) {
     Assertions.assertNotNull(nodeId);
     synchronized (m_notificationQueues) {
       return m_notificationQueues.computeIfAbsent(nodeId, this::createNewQueue);
     }
   }
 
-  protected ClientNotificationNodeQueue createNewQueue(String nodeId) {
+  protected ClientNotificationNodeQueue createNewQueue(NodeId nodeId) {
     ClientNotificationNodeQueue queue = BEANS.get(ClientNotificationNodeQueue.class);
     queue.setNodeId(nodeId);
     return queue;
   }
 
   /**
-   * Nodes that have been registered with {@link #registerNode(String)}
+   * Nodes that have been registered with {@link #registerNode(NodeId)}
    */
-  public Set<String> getRegisteredNodeIds() {
+  public Set<NodeId> getRegisteredNodeIds() {
     synchronized (m_notificationQueues) {
       return new HashSet<>(m_notificationQueues.keySet());
     }
@@ -202,7 +203,7 @@ public class ClientNotificationRegistry {
     publishClusterInternal(messages);
   }
 
-  public void publish(Collection<? extends ClientNotificationMessage> messages, String excludedUiNodeId) {
+  public void publish(Collection<? extends ClientNotificationMessage> messages, NodeId excludedUiNodeId) {
     publishWithoutClusterNotification(messages, excludedUiNodeId);
     publishClusterInternal(messages);
   }
@@ -220,7 +221,7 @@ public class ClientNotificationRegistry {
    * @param excludedUiNodeId
    *          may be <code>null</code>
    */
-  public void publishWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages, String excludedUiNodeId) {
+  public void publishWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages, NodeId excludedUiNodeId) {
     synchronized (m_notificationQueues) {
       Iterator<ClientNotificationNodeQueue> iter = m_notificationQueues.values().iterator();
       while (iter.hasNext()) {
