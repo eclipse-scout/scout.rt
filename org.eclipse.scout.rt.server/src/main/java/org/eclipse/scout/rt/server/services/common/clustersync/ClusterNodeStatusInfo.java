@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.server.services.common.clustersync;
 
 import java.util.Date;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
+
 /**
  * Cluster sync status info for the current server node
  * <p>
@@ -60,7 +62,7 @@ public class ClusterNodeStatusInfo {
   /**
    * Updates last changed node information
    */
-  public void updateLastChanged(String userId, String originNode) {
+  public void updateLastChanged(String userId, NodeId originNode) {
     synchronized (m_lock) {
       m_info.setLastChangedDate(new Date());
       m_info.setLastChangedUserId(userId);
@@ -80,7 +82,7 @@ public class ClusterNodeStatusInfo {
 
     private Date m_lastChangedDate;
     private String m_lastChangedUserId;
-    private String m_lastChangedOriginNodeId;
+    private NodeId m_lastChangedOriginNodeId;
 
     public ClusterNodeStatusBean() {
       super();
@@ -131,11 +133,11 @@ public class ClusterNodeStatusInfo {
     }
 
     @Override
-    public String getLastChangedOriginNodeId() {
+    public NodeId getLastChangedOriginNodeId() {
       return m_lastChangedOriginNodeId;
     }
 
-    public void setLastChangedOriginNodeId(String lastChangedOriginNodeId) {
+    public void setLastChangedOriginNodeId(NodeId lastChangedOriginNodeId) {
       m_lastChangedOriginNodeId = lastChangedOriginNodeId;
     }
 

@@ -12,12 +12,14 @@ package org.eclipse.scout.rt.server.services.common.clustersync;
 
 import java.io.Serializable;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
+
 /**
  * Additional info about the cluster notification
  */
 public interface IClusterNotificationProperties extends Serializable {
 
-  String getOriginNode();
+  NodeId getOriginNode();
 
   String getOriginUser();
 }

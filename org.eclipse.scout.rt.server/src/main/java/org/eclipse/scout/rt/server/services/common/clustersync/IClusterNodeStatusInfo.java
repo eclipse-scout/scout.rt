@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.server.services.common.clustersync;
 
 import java.util.Date;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
+
 /**
  * Some information about current status of the cluster sync.
  */
@@ -30,7 +32,7 @@ public interface IClusterNodeStatusInfo {
   /**
    * @return node that last updated the status
    */
-  String getLastChangedOriginNodeId();
+  NodeId getLastChangedOriginNodeId();
 
   /**
    * @return number of sent messages

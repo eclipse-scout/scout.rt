@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.session;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -24,7 +25,7 @@ public class ServerSessionLifecycleHandler implements IServerSessionLifecycleHan
   private static final Logger LOG = LoggerFactory.getLogger(ServerSessionLifecycleHandler.class);
 
   private final String m_scoutSessionId;
-  private final String m_clientNodeId; // may be null
+  private final NodeId m_clientNodeId; // may be null
   private final ServerRunContext m_serverRunContextForSessionStart;
 
   public ServerSessionLifecycleHandler(String scoutSessionId, ServerRunContext serverRunContextForSessionStart) {

@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -67,7 +68,7 @@ public class AccessControlServiceTest {
 
     //register test session
     final IClientNotificationService registry = BEANS.get(IClientNotificationService.class);
-    registry.registerNode("testNode");
+    registry.registerNode(NodeId.of("testNode"));
   }
 
   @After
@@ -110,7 +111,7 @@ public class AccessControlServiceTest {
   }
 
   private List<ClientNotificationMessage> getNotifications() {
-    return BEANS.get(IClientNotificationService.class).getNotifications("testNode");
+    return BEANS.get(IClientNotificationService.class).getNotifications(NodeId.of("testNode"));
   }
 
   /**

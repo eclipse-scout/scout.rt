@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.dataobject.id.NodeId;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
@@ -34,7 +35,7 @@ import org.mockito.Mockito;
  */
 @RunWith(PlatformTestRunner.class)
 public class ClientNotificationRegistryTest {
-  private static final String TEST_NODE = "Node1";
+  private static final NodeId TEST_NODE = NodeId.of("Node1");
   private static final String TEST_NOTIFICATION = "testNotification";
   private static final String TEST_USER = "User1";
   private static final int TEST_QUEUE_EXPIRE_TIMEOUT = 10 + 60 * 1000;
@@ -45,11 +46,11 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testNotificationsForAllNodes() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerNode("testNodeId");
-    reg.registerNode("testNodeId2");
+    reg.registerNode(NodeId.of("testNodeId"));
+    reg.registerNode(NodeId.of("testNodeId2"));
     reg.putForAllNodes(TEST_NOTIFICATION);
-    List<ClientNotificationMessage> notificationsNode1 = consumeNoWait(reg, "testNodeId");
-    List<ClientNotificationMessage> notificationsNode2 = consumeNoWait(reg, "testNodeId2");
+    List<ClientNotificationMessage> notificationsNode1 = consumeNoWait(reg, NodeId.of("testNodeId"));
+    List<ClientNotificationMessage> notificationsNode2 = consumeNoWait(reg, NodeId.of("testNodeId2"));
     assertSingleTestNotification(notificationsNode1);
     assertSingleTestNotification(notificationsNode2);
   }
@@ -60,9 +61,9 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testNotificationsUnregisteredSingleSession() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerNode("testNodeId");
+    reg.registerNode(NodeId.of("testNodeId"));
     reg.putForUser(TEST_USER, TEST_NOTIFICATION);
-    List<ClientNotificationMessage> notificationsNode = consumeNoWait(reg, "testNodeId");
+    List<ClientNotificationMessage> notificationsNode = consumeNoWait(reg, NodeId.of("testNodeId"));
     assertEquals(1, notificationsNode.size());
   }
 
@@ -85,9 +86,9 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testNotificationsForAllSessions() {
     ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-    reg.registerNode("testNodeId");
+    reg.registerNode(NodeId.of("testNodeId"));
     reg.putForAllSessions(TEST_NOTIFICATION);
-    List<ClientNotificationMessage> notificationsNode = consumeNoWait(reg, "testNodeId");
+    List<ClientNotificationMessage> notificationsNode = consumeNoWait(reg, NodeId.of("testNodeId"));
     assertEquals(1, notificationsNode.size());
   }
 
@@ -102,9 +103,9 @@ public class ClientNotificationRegistryTest {
         .withApplicationScoped(true));
     try {
       ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-      reg.registerNode("testNodeId");
+      reg.registerNode(NodeId.of("testNodeId"));
       reg.publish(Collections.emptySet());
-      assertEquals(Collections.emptyList(), consumeNoWait(reg, "testNodeId"));
+      assertEquals(Collections.emptyList(), consumeNoWait(reg, NodeId.of("testNodeId")));
       Mockito.verifyNoInteractions(mockClusterSyncService);
     }
     finally {
@@ -123,11 +124,11 @@ public class ClientNotificationRegistryTest {
         .withApplicationScoped(true));
     try {
       ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-      reg.registerNode("testNodeId");
-      reg.registerNode("testNodeId2");
+      reg.registerNode(NodeId.of("testNodeId"));
+      reg.registerNode(NodeId.of("testNodeId2"));
       reg.putForAllNodes(TEST_NOTIFICATION, false);
-      List<ClientNotificationMessage> notificationsNode1 = consumeNoWait(reg, "testNodeId");
-      List<ClientNotificationMessage> notificationsNode2 = consumeNoWait(reg, "testNodeId2");
+      List<ClientNotificationMessage> notificationsNode1 = consumeNoWait(reg, NodeId.of("testNodeId"));
+      List<ClientNotificationMessage> notificationsNode2 = consumeNoWait(reg, NodeId.of("testNodeId2"));
       assertSingleTestNotification(notificationsNode1);
       assertSingleTestNotification(notificationsNode2);
       Mockito.verifyNoInteractions(mockClusterSyncService);
@@ -210,8 +211,8 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testTransactionalWithPiggyBack() {
     try {
-      final String currentNode = TEST_NODE;
-      final String otherNode = "Node2";
+      final NodeId currentNode = TEST_NODE;
+      final NodeId otherNode = NodeId.of("Node2");
 
       ClientNotificationCollector collector = new ClientNotificationCollector();
 
@@ -246,8 +247,8 @@ public class ClientNotificationRegistryTest {
    */
   @Test
   public void testTransactionalNoPiggyBack() {
-    final String currentNode = TEST_NODE;
-    final String otherNode = "Node2";
+    final NodeId currentNode = TEST_NODE;
+    final NodeId otherNode = NodeId.of("Node2");
 
     ClientNotificationCollector collector = new ClientNotificationCollector();
     collector.consume();
@@ -272,7 +273,7 @@ public class ClientNotificationRegistryTest {
     ITransaction.CURRENT.get().commitPhase2();
   }
 
-  private List<ClientNotificationMessage> consumeNoWait(ClientNotificationRegistry reg, String nodeId) {
+  private List<ClientNotificationMessage> consumeNoWait(ClientNotificationRegistry reg, NodeId nodeId) {
     return reg.consume(nodeId, 1, 1, TimeUnit.MILLISECONDS);
   }
 
