@@ -85,11 +85,10 @@ export function assertValue(value, msg) {
 /**
  * Throws an error if the given value is not an instance of the given type. Otherwise, the value is returned.
  *
- * @template T
- * @param {T} value - value to check
+ * @param {*} value - value to check
  * @param {*} type - type to check against with "instanceof"
  * @param {string} [msg] - optional error message when the assertion fails
- * @return {T}
+ * @return {*}
  */
 export function assertInstance(value, type, msg) {
   if (!(value instanceof type)) {
