@@ -86,11 +86,20 @@ export default class DateFormat {
     //   (e.g. MMMM) to short (e.g. M).
     this._patternDefinitions = [
       // --- Year ---
+      // This definition can _format_ dates with years with 4 or more digits.
+      // See: http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
+      //      chapter 'Date and Time Patterns', paragraph 'Year'
+      // We do not allow to _parse_ a date with 5 or more digits. We could allow that in a
+      // future release, but it could have an impact on backend logic, databases, etc.
       new DateFormatPatternDefinition({
         type: DateFormatPatternType.YEAR,
-        terms: ['yyyy'],
+        terms: ['yyyy'], // meaning: any number of digits is allowed
         dateFormat: this,
-        formatFunction: (formatContext, acceptedTerm) => strings.padZeroLeft(formatContext.inputDate.getFullYear(), 4).slice(-4),
+        formatFunction: (formatContext, acceptedTerm) => {
+          let year = formatContext.inputDate.getFullYear();
+          let numDigits = Math.max(4, year.toString().length); // min. digits = 4
+          return strings.padZeroLeft(formatContext.inputDate.getFullYear(), numDigits).slice(-numDigits);
+        },
         parseRegExp: /^(\d{4})(.*)$/,
         applyMatchFunction: (parseContext, match, acceptedTerm) => {
           parseContext.matchInfo.year = match;
