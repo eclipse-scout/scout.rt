@@ -36,6 +36,7 @@ describe('DateFormat', () => {
       pattern = 'dd.MM.yyyy';
       dateFormat = new DateFormat(locale, pattern);
       expect(dateFormat.format(dates.create('2014-03-21'))).toBe('21.03.2014');
+      expect(dateFormat.format(dates.create('20144-03-21'))).toBe('21.03.20144');
 
       pattern = 'd.M.y';
       dateFormat = new DateFormat(locale, pattern);

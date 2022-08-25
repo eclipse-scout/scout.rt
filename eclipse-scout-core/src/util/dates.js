@@ -181,6 +181,8 @@ export function compareDays(date1, date2) {
  * are guaranteed to be digits. If the date argument is omitted, the current date is
  * used. The returned string in in UTC if the argument 'utc' is true, otherwise the
  * result is in local time (default).
+ *
+ * @deprecated this function will be deleted in release 23.1. Use DateFormat.js instead
  */
 export function timestamp(date, utc) {
   // (note: month is 0-indexed)
@@ -307,7 +309,7 @@ export function parseJsonDate(jsonDate) {
     utc = false;
 
   // Date + Time
-  let matches = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d{3})(Z?)$/.exec(jsonDate);
+  let matches = /^\+?(\d{4,5})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d{3})(Z?)$/.exec(jsonDate);
   if (matches !== null) {
     year = matches[1];
     month = matches[2];
@@ -319,7 +321,7 @@ export function parseJsonDate(jsonDate) {
     utc = matches[8] === 'Z';
   } else {
     // Date only
-    matches = /^(\d{4})-(\d{2})-(\d{2})(Z?)$/.exec(jsonDate);
+    matches = /^\+?(\d{4,5})-(\d{2})-(\d{2})(Z?)$/.exec(jsonDate);
     if (matches !== null) {
       year = matches[1];
       month = matches[2];
@@ -378,7 +380,7 @@ export function toJsonDate(date, utc, includeDate, includeTime) {
   let datePart, timePart, utcPart;
   if (utc) {
     // (note: month is 0-indexed)
-    datePart = strings.padZeroLeft(date.getUTCFullYear(), 4) + '-' +
+    datePart = getYearPart(date) + '-' +
       strings.padZeroLeft(date.getUTCMonth() + 1, 2) + '-' +
       strings.padZeroLeft(date.getUTCDate(), 2);
     timePart = strings.padZeroLeft(date.getUTCHours(), 2) + ':' +
@@ -388,7 +390,7 @@ export function toJsonDate(date, utc, includeDate, includeTime) {
     utcPart = 'Z';
   } else {
     // (note: month is 0-indexed)
-    datePart = strings.padZeroLeft(date.getFullYear(), 4) + '-' +
+    datePart = getYearPart(date) + '-' +
       strings.padZeroLeft(date.getMonth() + 1, 2) + '-' +
       strings.padZeroLeft(date.getDate(), 2);
     timePart = strings.padZeroLeft(date.getHours(), 2) + ':' +
@@ -409,6 +411,14 @@ export function toJsonDate(date, utc, includeDate, includeTime) {
   }
   result += utcPart;
   return result;
+
+  function getYearPart(date) {
+    let year = date.getFullYear();
+    if (year > 9999) {
+      return '+' + year;
+    }
+    return strings.padZeroLeft(year, 4);
+  }
 }
 
 export function toJsonDateRange(range) {
@@ -424,7 +434,7 @@ export function toJsonDateRange(range) {
  *
  * The format is as follows:
  *
- * [Year#4]-[Month#2]-[Day#2] [Hours#2]:[Minutes#2]:[Seconds#2].[Milliseconds#3][Z]
+ * [Year#4|5]-[Month#2]-[Day#2] [Hours#2]:[Minutes#2]:[Seconds#2].[Milliseconds#3][Z]
  *
  * The year component is mandatory, but all others are optional (starting from the beginning).
  * The date is constructed using the local time zone. If the last character is 'Z', then
@@ -432,7 +442,7 @@ export function toJsonDateRange(range) {
  */
 export function create(dateString) {
   if (dateString) {
-    let matches = /^(\d{4})(?:-(\d{2})(?:-(\d{2})(?: (\d{2})(?::(\d{2})(?::(\d{2})(?:\.(\d{3}))?(Z?))?)?)?)?)?/.exec(dateString);
+    let matches = /^(\d{4,5})(?:-(\d{2})(?:-(\d{2})(?: (\d{2})(?::(\d{2})(?::(\d{2})(?:\.(\d{3}))?(Z?))?)?)?)?)?/.exec(dateString);
     if (matches === null) {
       throw new Error('Unparsable date: ' + dateString);
     }
