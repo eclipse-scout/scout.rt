@@ -399,6 +399,12 @@ describe('scout.dates', () => {
       // Date only
       date = dates.parseJsonDate('0025-11-21Z');
       expect(date.toISOString()).toBe('0025-11-21T00:00:00.000Z');
+
+      // Test 4 - year > 9999, see: https://en.wikipedia.org/wiki/ISO_8601#Years
+      date = dates.parseJsonDate('+20222-11-21 00:00:00.000Z');
+      expect(date.getFullYear()).toBe(20222);
+      jsonDate = dates.toJsonDate(date, true);
+      expect(jsonDate).toBe('+20222-11-21 00:00:00.000Z');
     });
 
   });
@@ -422,6 +428,10 @@ describe('scout.dates', () => {
       expect(dates.create('2014-10-31 23:59:58.882Z').toISOString()).toBe(dates.create('2014-10-31 23:59:58.882Z').toISOString());
     });
 
+    it('works with 5-digits years', () => {
+      let date = dates.create('20144-10-31 23:59:58.882Z');
+      expect(date.getFullYear()).toBe(20144);
+    });
   });
 
   describe('weekInYear', () => {
