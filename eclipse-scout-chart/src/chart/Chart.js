@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -62,7 +62,8 @@ export default class Chart extends Widget {
     DOUGHNUT: 'doughnut',
     POLAR_AREA: 'polarArea',
     RADAR: 'radar',
-    BUBBLE: 'bubble'
+    BUBBLE: 'bubble',
+    SCATTER: 'scatter'
   };
 
   static Position = {
@@ -364,6 +365,7 @@ export default class Chart extends Widget {
       case Chart.Type.POLAR_AREA:
       case Chart.Type.RADAR:
       case Chart.Type.BUBBLE:
+      case Chart.Type.SCATTER:
         return new ChartJsRenderer(this);
     }
     return null;

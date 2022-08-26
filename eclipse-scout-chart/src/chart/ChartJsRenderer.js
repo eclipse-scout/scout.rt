@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -99,6 +99,13 @@ $.extend(true, ChartJs.overrides, {
         borderWidth: 2
       }
     }
+  },
+  scatter: {
+    elements: {
+      point: {
+        radius: 3
+      }
+    }
   }
 });
 
@@ -178,6 +185,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     this._resizeHandler = this._onResize.bind(this);
 
     this._tooltipTitleGenerator = this._generateTooltipTitle.bind(this);
+    this._tooltipItemsGenerator = this._generateTooltipItems.bind(this);
     this._tooltipLabelGenerator = this._generateTooltipLabel.bind(this);
     this._tooltipLabelValueGenerator = this._generateTooltipLabelValue.bind(this);
     this._tooltipLabelColorGenerator = this._generateTooltipLabelColor.bind(this);
@@ -772,7 +780,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
 
-    if (config.type === Chart.Type.BUBBLE) {
+    if (scout.isOneOf(config.type, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
       this.onlyIntegers = config.data.datasets.every(dataset => dataset.data.every(data => numbers.isInteger(data.x) && numbers.isInteger(data.y)));
     } else {
       this.onlyIntegers = config.data.datasets.every(dataset => dataset.data.every(data => numbers.isInteger(data)));
@@ -789,6 +797,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         tooltip: {
           callbacks: {
             title: this._tooltipTitleGenerator,
+            items: this._tooltipItemsGenerator,
             label: this._tooltipLabelGenerator,
             labelValue: this._tooltipLabelValueGenerator,
             labelColor: this._tooltipLabelColorGenerator
@@ -816,26 +825,97 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config = chart.config,
       dataset = tooltipItem.dataset,
       title = [];
-    if (config.type === Chart.Type.BUBBLE) {
+    if (scout.isOneOf(config.type, Chart.Type.BUBBLE)) {
       let xAxis = config.options.scales.x,
         yAxis = config.options.scales.y,
-        xAxisLabel = xAxis.title.text,
-        yAxisLabel = yAxis.title.text;
-      xAxisLabel = xAxisLabel ? strings.encode(xAxisLabel) : ChartJsRenderer.ARROW_LEFT_RIGHT;
-      yAxisLabel = yAxisLabel ? strings.encode(yAxisLabel) : '&nbsp;' + ChartJsRenderer.ARROW_UP_DOWN + '&nbsp;';
+        axisLabels = this._getAxisLabels(config);
       let xTickLabel = xAxis.ticks.callback(dataset.data[tooltipItem.dataIndex].x);
       if (xTickLabel) {
-        title.push(this._createTooltipAttribute(xAxisLabel, strings.encode(xTickLabel), true));
+        title.push(this._createTooltipAttribute(axisLabels.x, strings.encode(xTickLabel), true));
       }
       let yTickLabel = yAxis.ticks.callback(dataset.data[tooltipItem.dataIndex].y);
       if (yTickLabel) {
-        title.push(this._createTooltipAttribute(yAxisLabel, strings.encode(yTickLabel), true));
+        title.push(this._createTooltipAttribute(axisLabels.y, strings.encode(yTickLabel), true));
       }
+    } else if (scout.isOneOf(config.type, Chart.Type.SCATTER)) {
+      // nop, scatter has the title in the items table
     } else {
       let label = chart.data.labels[tooltipItem.dataIndex];
       title.push(this._createTooltipAttribute(config.options.reformatLabels ? this._formatLabel(label) : label, '', true));
     }
     return title;
+  }
+
+  _getAxisLabels(config) {
+    let xAxisLabel = config.options.scales.x.title.text,
+      yAxisLabel = config.options.scales.y.title.text;
+    xAxisLabel = this._resolveAxisLabel(xAxisLabel, ChartJsRenderer.ARROW_LEFT_RIGHT);
+    yAxisLabel = this._resolveAxisLabel(yAxisLabel, '&nbsp;' + ChartJsRenderer.ARROW_UP_DOWN + '&nbsp;');
+
+    return {x: xAxisLabel, y: yAxisLabel};
+  }
+
+  _resolveAxisLabel(axisLabel, defaultLabel = '') {
+    if (objects.isFunction(axisLabel)) {
+      axisLabel = axisLabel();
+      axisLabel = objects.isString(axisLabel) ? axisLabel : '';
+    }
+    return axisLabel ? strings.encode(axisLabel) : defaultLabel;
+  }
+
+  _generateTooltipItems(tooltipItems, tooltipLabel, tooltipLabelValue, tooltipColor) {
+    if (!tooltipItems || !tooltipItems.length) {
+      return '';
+    }
+    let tooltipItem = tooltipItems[0],
+      chart = tooltipItem.chart,
+      config = chart.config,
+      xAxisValues = false,
+      yAxisValues = false,
+      itemsText = '';
+
+    tooltipItems.forEach(tooltipItem => {
+      let {label, labelValue, labelColor} = this._getItemDetails(tooltipItem, tooltipLabel, tooltipLabelValue, tooltipColor);
+      if (scout.isOneOf(config.type, Chart.Type.SCATTER)) {
+        xAxisValues |= objects.isString(labelValue.x);
+        yAxisValues |= objects.isString(labelValue.y);
+        itemsText += this._createTooltipScatterAttribute(label, labelValue.x, labelValue.y, false, labelColor);
+      } else {
+        itemsText += this._createTooltipAttribute(label, labelValue, false, labelColor);
+      }
+    });
+
+    // tabular representation for scatter tooltip needs an additional header and footer
+    if (scout.isOneOf(config.type, Chart.Type.SCATTER)) {
+      let tableHeader = '<table><tbody>';
+      let axisLabels = this._getAxisLabels(config);
+      tableHeader += this._createTooltipScatterAttribute('',
+        xAxisValues ? axisLabels.x : '', // do not show axis label if no values are shown
+        yAxisValues ? axisLabels.y : '', // do not show axis label if no values are shown
+        true,
+        null);
+      let tableFooter = '</tbody></table>';
+      itemsText = strings.box(tableHeader, itemsText, tableFooter);
+    }
+
+    return itemsText;
+  }
+
+  _getItemDetails(tooltipItem, tooltipLabel, tooltipLabelValue, tooltipColor) {
+    let label, labelValue, labelColor;
+    if (objects.isFunction(tooltipLabel)) {
+      label = tooltipLabel(tooltipItem);
+      label = objects.isString(label) ? label : '';
+    }
+    if (objects.isFunction(tooltipLabelValue)) {
+      labelValue = tooltipLabelValue(tooltipItem);
+      labelValue = objects.isString(labelValue) || objects.isPlainObject(labelValue) ? labelValue : '';
+    }
+    if (objects.isFunction(tooltipColor)) {
+      labelColor = tooltipColor(tooltipItem);
+      labelColor = objects.isPlainObject(labelColor) ? (labelColor.backgroundColor || '') : '';
+    }
+    return {label, labelValue, labelColor};
   }
 
   _generateTooltipLabel(tooltipItem) {
@@ -847,6 +927,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       dataset = tooltipItem.dataset;
     if (config.type === Chart.Type.BUBBLE) {
       return strings.encode(this._formatLabel(dataset.data[tooltipItem.dataIndex].z));
+    } else if (config.type === Chart.Type.SCATTER) {
+      return {
+        x: strings.encode(this._formatLabel(dataset.data[tooltipItem.dataIndex].x)),
+        y: strings.encode(this._formatLabel(dataset.data[tooltipItem.dataIndex].y))
+      };
     }
     return strings.encode(this._formatLabel(dataset.data[tooltipItem.dataIndex]));
   }
@@ -855,7 +940,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let config = tooltipItem.chart.config,
       dataset = tooltipItem.dataset,
       legendColor, backgroundColor, borderColor, index;
-    if (scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
+    if (scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
       borderColor = dataset.borderColor;
       legendColor = dataset.legendColor;
       index = tooltipItem.datasetIndex;
@@ -893,6 +978,18 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       '</div>';
   }
 
+  _createTooltipScatterAttribute(label, xValue, yValue, isTitle, color) {
+    let cssClass = isTitle ? 'attribute title' : 'attribute';
+    return '<tr class="' + cssClass + '">' +
+      '<td class="color-cell">' +
+      (color ? '<div class="color" style="background-color:' + color + '"></div>' : '') +
+      '</td>' +
+      '<td class="label">' + label + '</td>' +
+      (xValue ? '<td class="value">' + xValue + '</td>' : '') +
+      (yValue ? '<td class="value">' + yValue + '</td>' : '') +
+      '</tr>';
+  }
+
   _renderTooltip(context) {
     let isHideTooltip = context.tooltip.opacity === 0 || context.tooltip._tooltipItems.length < 1;
     if (isHideTooltip) {
@@ -920,8 +1017,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       return;
     }
     let tooltip = context.tooltip,
-      tooltipItems = tooltip._tooltipItems;
-    if (tooltipItems.length < 1) {
+      dataPoints = tooltip.dataPoints;
+    if (dataPoints.length < 1) {
       return;
     }
     if (this._tooltip) {
@@ -932,32 +1029,20 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let tooltipOptions = tooltip.options || {},
       tooltipCallbacks = tooltipOptions.callbacks || {},
       tooltipTitle = tooltipCallbacks.title,
+      tooltipItems = tooltipCallbacks.items,
       tooltipLabel = tooltipCallbacks.label,
       tooltipLabelValue = tooltipCallbacks.labelValue,
       tooltipColor = tooltipCallbacks.labelColor,
       tooltipText = '';
 
     if (objects.isFunction(tooltipTitle)) {
-      tooltipText += arrays.ensure(tooltipTitle(tooltipItems)).join('');
+      tooltipText += arrays.ensure(tooltipTitle(dataPoints)).join('');
     }
-    tooltipItems.forEach(tooltipItem => {
-      let label, labelValue, labelColor;
-      if (objects.isFunction(tooltipLabel)) {
-        label = tooltipLabel(tooltipItem);
-        label = objects.isString(label) ? label : '';
-      }
-      if (objects.isFunction(tooltipLabelValue)) {
-        labelValue = tooltipLabelValue(tooltipItem);
-        labelValue = objects.isString(labelValue) ? labelValue : '';
-      }
-      if (objects.isFunction(tooltipColor)) {
-        labelColor = tooltipColor(tooltipItem);
-        labelColor = objects.isPlainObject(labelColor) ? (labelColor.backgroundColor || '') : '';
-      }
-      tooltipText += this._createTooltipAttribute(label, labelValue, false, labelColor);
-    });
+    if (objects.isFunction(tooltipItems)) {
+      tooltipText += arrays.ensure(tooltipItems(dataPoints, tooltipLabel, tooltipLabelValue, tooltipColor)).join('');
+    }
 
-    let positionAndOffset = this._computeTooltipPositionAndOffset(tooltipItems[0]),
+    let positionAndOffset = this._computeTooltipPositionAndOffset(dataPoints[0]),
       origin = graphics.offsetBounds(this.$canvas);
     origin.x += tooltip.caretX + positionAndOffset.offsetX;
     origin.y += tooltip.caretY + positionAndOffset.offsetY;
@@ -1039,7 +1124,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       let angle = element.angle;
       tooltipPosition = (0 <= angle && angle < Math.PI) ? 'bottom' : 'top';
       tooltipDirection = (-Math.PI / 2 <= angle && angle < Math.PI / 2) ? 'right' : 'left';
-    } else if (config.type === Chart.Type.BUBBLE) {
+    } else if (scout.isOneOf(config.type, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
       let element = chart.getDatasetMeta(datasetIndex).data[dataIndex];
       let chartArea = chart.chartArea,
         mid = chartArea.left + (chartArea.width / 2);
@@ -1061,7 +1146,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
       offsetY = -height / 2;
       offsetX = tooltipDirection === 'left' ? b : -b;
-    } else if (scout.isOneOf(config.type, Chart.Type.LINE, Chart.Type.BUBBLE, Chart.Type.RADAR) || dataset.type === Chart.Type.LINE) {
+    } else if (scout.isOneOf(config.type, Chart.Type.LINE, Chart.Type.BUBBLE, Chart.Type.SCATTER, Chart.Type.RADAR) || dataset.type === Chart.Type.LINE) {
       // noinspection JSValidateTypes
       /**
        * @type PointElement
@@ -1159,6 +1244,23 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
           }
         }
       }, config.options);
+    } else if (scout.isOneOf(config.type, Chart.Type.SCATTER)) {
+      config.options = $.extend(true, {}, {
+        scales: {
+          x: {
+            minSpaceBetweenTicks: 35,
+            ticks: {
+              padding: 10
+            }
+          },
+          y: {
+            minSpaceBetweenTicks: 35,
+            ticks: {
+              padding: 10
+            }
+          }
+        }
+      }, config.options);
     }
 
     this._adjustXAxis(config);
@@ -1173,7 +1275,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let type = config.type,
       scales = config.options.scales;
 
-    if (this._isHorizontalBar(config) || type === Chart.Type.BUBBLE) {
+    if (this._isHorizontalBar(config) || scout.isOneOf(type, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
       scales.x = $.extend(true, {}, {
         beginAtZero: this._isHorizontalBar(config),
         offset: type === Chart.Type.BUBBLE,
@@ -1194,7 +1296,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         }
       }, scales.x);
     }
-    if (this._isHorizontalBar(config) || type === Chart.Type.BUBBLE || config.options.reformatLabels) {
+    if (this._isHorizontalBar(config) || scout.isOneOf(type, Chart.Type.BUBBLE, Chart.Type.SCATTER) || config.options.reformatLabels) {
       scales.x = $.extend(true, {}, {
         ticks: {
           callback: this._xLabelFormatter
@@ -1221,7 +1323,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }, scales.y);
     } else {
       scales.y = $.extend(true, {}, {
-        beginAtZero: type !== Chart.Type.BUBBLE,
+        beginAtZero: !scout.isOneOf(type, Chart.Type.BUBBLE, Chart.Type.SCATTER),
         grid: {
           drawBorder: false,
           drawTicks: false
@@ -1313,6 +1415,15 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         borderRadius: 3
       }, plugins.datalabels);
       plugins.datalabels.display = 'auto';
+    } else if (scout.isOneOf(config.type, Chart.Type.SCATTER)) {
+      plugins.datalabels = $.extend(true, {}, {
+        backgroundColor: this._datalabelBackgroundColorHandler,
+        borderRadius: 3,
+        anchor: 'end',
+        align: 'top',
+        offset: 3
+      }, plugins.datalabels);
+      plugins.datalabels.display = 'auto';
     }
     if (config.options.reformatLabels) {
       let handleFormatter = formatter => {
@@ -1401,7 +1512,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         this.chart.session.text('ui.Tri'),
         this.chart.session.text('ui.Trd')];
       for (let i = 0; i < abbreviations.length; i++) {
-        if (abs >= 1000000) {
+        if (abs >= 1000) {
           abs = abs / 1000;
           abbreviation = ' ' + abbreviations[i];
         } else {
@@ -1533,6 +1644,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   _formatDatalabels(value, context) {
     if (context.chart.config.type === Chart.Type.BUBBLE) {
       return this._formatLabel(value.z);
+    } else if (context.chart.config.type === Chart.Type.SCATTER) {
+      return strings.join(' / ', this._formatLabel(value.x), this._formatLabel(value.y));
     }
     return this._formatLabel(value);
   }
@@ -1608,7 +1721,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }
       if (checkable) {
         let datasetLength = elem.data.length;
-        if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.BUBBLE) || (type === Chart.Type.BAR && (elem.type || Chart.Type.BAR) === Chart.Type.BAR)) {
+        if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.BUBBLE, Chart.Type.SCATTER) || (type === Chart.Type.BAR && (elem.type || Chart.Type.BAR) === Chart.Type.BAR)) {
           let uncheckedBackgroundColor = (multipleColorsPerDataset ? colors.backgroundColors : arrays.init(datasetLength, colors.backgroundColors[idx])),
             uncheckedHoverBackgroundColor = (multipleColorsPerDataset ? colors.hoverBackgroundColors : arrays.init(datasetLength, colors.hoverBackgroundColors[idx])),
 
@@ -1816,7 +1929,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         checkedBackgroundOpacity = 0.2;
         checkedHoverBackgroundOpacity = 0.35;
         checkedHoverBackgroundDarker = 0;
-      } else if (type === Chart.Type.BUBBLE) {
+      } else if (scout.isOneOf(type, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
         backgroundOpacity = 0.2;
         hoverBackgroundOpacity = 0.35;
         hoverBackgroundDarker = 0;
@@ -1922,7 +2035,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       elem.text = strings.truncateText(elem.text, horizontalSpace, measureText);
       let dataset = data.datasets[idx],
         legendColor, borderColor, backgroundColor;
-      if (dataset && scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
+      if (dataset && scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.RADAR, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
         legendColor = dataset.legendColor;
         borderColor = this._adjustColorOpacity(dataset.borderColor, 1);
       } else if (data.datasets.length && scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
@@ -2086,7 +2199,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         datasetIndex: datasetIndex,
         dataIndex: itemIndex
       };
-    if (this.chartJs.config.type === Chart.Type.BUBBLE) {
+    if (scout.isOneOf(this.chartJs.config.type, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
       let data = this.chartJs.config.data.datasets[datasetIndex].data[itemIndex];
       clickObject.xIndex = data.x;
       clickObject.yIndex = data.y;
@@ -2285,7 +2398,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       datasets = config.data.datasets,
       dataset = datasets ? datasets[datasetIndex] : null,
       datasetType = dataset ? dataset.type : null;
-    if (scout.isOneOf(type, Chart.Type.LINE, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA) || datasetType === Chart.Type.LINE) {
+    if (scout.isOneOf(type, Chart.Type.LINE, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA, Chart.Type.SCATTER) || datasetType === Chart.Type.LINE) {
       mode = 'point';
     } else {
       mode = 'dataset';
@@ -2342,7 +2455,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         data.r = Math.sqrt(data.z);
       }
     }));
-    let maxMinR = this._computeMaxMinValue(datasets, 'r', true),
+    let maxMinR = this._computeMaxMinValue(config, datasets, 'r', true),
       maxR = maxMinR.maxValue,
       minR = maxMinR.minValue,
       // Compute a scalingFactor and an offset to get the new radius newR = r * scalingFactor + offset.
@@ -2396,29 +2509,35 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }));
   }
 
-  _computeMaxMinValue(datasets, identifier, exact, boundRange, padding, space) {
+  _computeMaxMinValue(config, datasets, identifier, exact, boundRange, padding, space) {
     if (!datasets) {
       return;
     }
 
     let maxValue, minValue;
-    for (let i = 0; i < datasets.length; i++) {
-      for (let j = 0; j < datasets[i].data.length; j++) {
-        let value;
-        if (identifier) {
-          value = datasets[i].data[j][identifier];
-        } else {
-          value = datasets[i].data[j];
-        }
-        if (isNaN(maxValue)) {
-          maxValue = value;
-        } else {
-          maxValue = Math.max(value, maxValue);
-        }
-        if (isNaN(minValue)) {
-          minValue = value;
-        } else {
-          minValue = Math.min(value, minValue);
+    if (config.type === Chart.Type.SCATTER && identifier === 'r') {
+      // do not move the grid boundaries because of the radii of the points (would look weird)
+      maxValue = 0;
+      minValue = 0;
+    } else {
+      for (let i = 0; i < datasets.length; i++) {
+        for (let j = 0; j < datasets[i].data.length; j++) {
+          let value;
+          if (identifier) {
+            value = datasets[i].data[j][identifier];
+          } else {
+            value = datasets[i].data[j];
+          }
+          if (isNaN(maxValue)) {
+            maxValue = value;
+          } else {
+            maxValue = Math.max(value, maxValue);
+          }
+          if (isNaN(minValue)) {
+            minValue = value;
+          } else {
+            minValue = Math.min(value, minValue);
+          }
         }
       }
     }
@@ -2503,7 +2622,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     let type = config.type;
-    if (!scout.isOneOf(type, Chart.Type.BAR, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE)) {
+    if (!scout.isOneOf(type, Chart.Type.BAR, Chart.Type.LINE, Chart.Type.POLAR_AREA, Chart.Type.RADAR, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
       return;
     }
 
@@ -2542,16 +2661,16 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       this._adjustAxisMaxMin(yAxis, maxYTicks, yBoundary);
     }
 
-    if (type !== Chart.Type.BUBBLE) {
+    if (!scout.isOneOf(type, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
       return;
     }
 
-    let xBoundary = this._computeXBoundaryBubble(config, width);
+    let xBoundary = this._computeXBoundaryPointElement(config, width);
     this._adjustAxisMaxMin(xAxis, maxXTicks, xBoundary);
   }
 
-  _computeBoundaryBubble(config, identifier, space) {
-    if (!config || !config.type || config.type !== Chart.Type.BUBBLE || !config.data || !config.options || !config.options.scales || !(identifier === 'x' || identifier === 'y') || !space) {
+  _computeBoundaryPointElement(config, identifier, space) {
+    if (!config || !config.type || !scout.isOneOf(config.type, Chart.Type.BUBBLE, Chart.Type.SCATTER) || !config.data || !config.options || !config.options.scales || !(identifier === 'x' || identifier === 'y') || !space) {
       return;
     }
 
@@ -2561,16 +2680,16 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       labelMap = config.options[identifier + 'LabelMap'],
       boundary;
 
-    let maxR = this._computeMaxMinValue(datasets, 'r', true).maxValue,
+    let maxR = this._computeMaxMinValue(config, datasets, 'r', true).maxValue,
       padding = maxR;
     if (config.options.elements && config.options.elements.point && config.options.elements.point.hoverRadius) {
       padding = padding + config.options.elements.point.hoverRadius;
     }
 
     if (offset) {
-      boundary = this._computeMaxMinValue(datasets, identifier, labelMap, true);
+      boundary = this._computeMaxMinValue(config, datasets, identifier, labelMap, true);
     } else {
-      boundary = this._computeMaxMinValue(datasets, identifier, labelMap, true, padding, space);
+      boundary = this._computeMaxMinValue(config, datasets, identifier, labelMap, true, padding, space);
     }
     if (labelMap) {
       boundary.maxValue = Math.ceil(boundary.maxValue);
@@ -2579,12 +2698,12 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     return boundary;
   }
 
-  _computeXBoundaryBubble(config, width) {
-    return this._computeBoundaryBubble(config, 'x', width);
+  _computeXBoundaryPointElement(config, width) {
+    return this._computeBoundaryPointElement(config, 'x', width);
   }
 
-  _computeYBoundaryBubble(config, height) {
-    return this._computeBoundaryBubble(config, 'y', height);
+  _computeYBoundaryPointElement(config, height) {
+    return this._computeBoundaryPointElement(config, 'y', height);
   }
 
   _computeYBoundaries(config, height) {
@@ -2596,8 +2715,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       yBoundary,
       yBoundaryDiffType;
 
-    if (type === Chart.Type.BUBBLE) {
-      yBoundary = this._computeYBoundaryBubble(config, height);
+    if (scout.isOneOf(type, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
+      yBoundary = this._computeYBoundaryPointElement(config, height);
     } else {
       let datasets = [],
         datasetsDiffType = [];
@@ -2611,10 +2730,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         });
       }
 
-      yBoundary = this._computeMaxMinValue(datasets);
+      yBoundary = this._computeMaxMinValue(config, datasets);
 
       if (datasets.length && datasetsDiffType.length) {
-        yBoundaryDiffType = this._computeMaxMinValue(datasetsDiffType);
+        yBoundaryDiffType = this._computeMaxMinValue(config, datasetsDiffType);
         let yBoundaryRange = yBoundary.maxValue - yBoundary.minValue,
           yBoundaryRangeDiffType = yBoundaryDiffType.maxValue - yBoundaryDiffType.minValue;
         if (yBoundaryRange && yBoundaryRangeDiffType && (yBoundaryRange / yBoundaryRangeDiffType > 10 || yBoundaryRangeDiffType / yBoundaryRange > 10)) {
