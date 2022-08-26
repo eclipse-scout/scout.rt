@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -510,7 +510,8 @@
   }
 }
 
-.bubble-chart {
+.bubble-chart,
+.scatter-chart {
   min-width: @chart-min-width;
 
   & > .elements {
@@ -822,6 +823,8 @@ text.venn-legend {
 
 /*** chart tooltip ***/
 .tooltip.chart-tooltip {
+  max-width: 400px;
+
   --chart-tooltip-font-family: @font-default-family;
   --chart-tooltip-label-width: 70px;
 
@@ -884,6 +887,59 @@ text.venn-legend {
 
     &.title > .value {
       text-align: left;
+    }
+  }
+
+  & > .tooltip-content > table > tbody > .attribute {
+    padding-top: 2px;
+    padding-bottom: 2px;
+
+    &:first-child {
+      padding-top: 0;
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    & .color-cell {
+      & > .color {
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        margin-right: 5px;
+      }
+    }
+
+    & > .label {
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 10px;
+      white-space: nowrap;
+      font-size: @field-label-font-size;
+      padding-top: @font-size-normal - @field-label-font-size;
+    }
+
+    & > .value {
+      white-space: nowrap;
+      text-align: right;
+      font-size: @font-size-normal;
+      font-weight: @font-weight-normal;
+      font-family: var(--chart-tooltip-font-family);
+      padding-right: 10px;
+
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+
+    &.title > .value {
+      text-align: left;
+      max-width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
