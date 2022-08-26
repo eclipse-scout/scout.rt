@@ -175,36 +175,6 @@ export function compareDays(date1, date2) {
   return (trunc(date1) - trunc(date2) - (date1.getTimezoneOffset() - date2.getTimezoneOffset()) * 60000) / (3600000 * 24);
 }
 
-/**
- * Returns the time (with milliseconds) for the given date as a string in the format
- * [year#4][month#2][day#2][hour#2][minute#2][second#2][#millisecond#3]. All characters
- * are guaranteed to be digits. If the date argument is omitted, the current date is
- * used. The returned string in in UTC if the argument 'utc' is true, otherwise the
- * result is in local time (default).
- *
- * @deprecated this function will be deleted in release 23.1. Use DateFormat.js instead
- */
-export function timestamp(date, utc) {
-  // (note: month is 0-indexed)
-  let d = date || new Date();
-  if (utc) {
-    return strings.padZeroLeft(d.getUTCFullYear(), 4) +
-      strings.padZeroLeft(d.getUTCMonth() + 1, 2) +
-      strings.padZeroLeft(d.getUTCDate(), 2) +
-      strings.padZeroLeft(d.getUTCHours(), 2) +
-      strings.padZeroLeft(d.getUTCMinutes(), 2) +
-      strings.padZeroLeft(d.getUTCSeconds(), 2) +
-      strings.padZeroLeft(d.getUTCMilliseconds(), 3);
-  }
-  return strings.padZeroLeft(d.getFullYear(), 4) +
-    strings.padZeroLeft(d.getMonth() + 1, 2) +
-    strings.padZeroLeft(d.getDate(), 2) +
-    strings.padZeroLeft(d.getHours(), 2) +
-    strings.padZeroLeft(d.getMinutes(), 2) +
-    strings.padZeroLeft(d.getSeconds(), 2) +
-    strings.padZeroLeft(d.getMilliseconds(), 3);
-}
-
 export function orderWeekdays(weekdays, firstDayOfWeekArg) {
   let weekdaysOrdered = [];
   for (let i = 0; i < 7; i++) {
@@ -642,7 +612,6 @@ export default {
   shiftToNextOrPrevDayOfType,
   shiftToNextOrPrevMonday,
   shiftToPreviousDayOfType,
-  timestamp,
   toJsonDate,
   toJsonDateRange,
   trunc,

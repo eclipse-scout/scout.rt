@@ -318,20 +318,6 @@ describe('scout.dates', () => {
 
   });
 
-  describe('timestamp', () => {
-
-    it('returns a string of the expected length withonly digits', () => {
-      let ts = dates.timestamp();
-      expect(typeof ts).toBe('string');
-      expect(ts.length).toBe(17);
-      expect(/^\d+$/.test(ts)).toBe(true);
-
-      let date = dates.create('2014-11-21 00:33:00.000Z');
-      expect(dates.timestamp(date, true)).toBe('20141121003300000');
-    });
-
-  });
-
   describe('orderWeekdays', () => {
 
     it('orders weekdays', () => {
