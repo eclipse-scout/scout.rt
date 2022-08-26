@@ -430,13 +430,6 @@ export default class Form extends Widget {
   }
 
   /**
-   * @returns {Promise} promise which is resolved when the form is cancelled, respectively when the 'cancel' event is triggered'.
-   */
-  whenCancel() {
-    return this.when('cancel');
-  }
-
-  /**
    * Closes the form and discards any unsaved changes.
    * @returns {Promise}.
    */
