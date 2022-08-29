@@ -54,13 +54,13 @@ public abstract class AbstractIdStructureTest {
         .map(c -> c.asSubclass(IId.class));
   }
 
-  private final Class<? extends IId<?>> m_idClass;
+  private final Class<? extends IId> m_idClass;
 
-  protected Class<? extends IId<?>> getIdClass() {
+  protected Class<? extends IId> getIdClass() {
     return m_idClass;
   }
 
-  public AbstractIdStructureTest(Class<? extends IId<?>> idClass) {
+  public AbstractIdStructureTest(Class<? extends IId> idClass) {
     m_idClass = idClass;
   }
 
@@ -88,7 +88,7 @@ public abstract class AbstractIdStructureTest {
     assertEquals(getIdClass(), of.getReturnType());
 
     // invoke method with null
-    IId<?> id = (IId<?>) of.invoke(null, (Object) null);
+    IId id = (IId) of.invoke(null, (Object) null);
     assertNull("of(null) must return null", id);
   }
 

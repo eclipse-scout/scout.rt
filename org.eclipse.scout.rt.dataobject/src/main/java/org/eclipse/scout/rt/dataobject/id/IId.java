@@ -21,24 +21,17 @@ import java.io.Serializable;
  * <code>null</code> if the given {@link String} is <code>null</code>, otherwise the wrapped value.
  * </ul>
  * <p>
- * This interface implements {@link Comparable} by comparing the wrapped value, without considering the id types. Hence
- * every {@link IId} is comparable to any other {@link IId}.
  */
-public interface IId<WRAPPED_TYPE extends Comparable<WRAPPED_TYPE>> extends Comparable<IId<WRAPPED_TYPE>>, Serializable {
+public interface IId extends Serializable {
 
   /**
    * @return the raw id. Use this method carefully. The value of the id should only be used by serialization and
    *         persistence layers.
    */
-  WRAPPED_TYPE unwrap();
+  Object unwrap();
 
+  /**
+   * @return the raw id formatted as string.
+   */
   String unwrapAsString();
-
-  @Override
-  default int compareTo(IId<WRAPPED_TYPE> o) {
-    if (o == null) {
-      return 1;
-    }
-    return unwrap().compareTo(o.unwrap());
-  }
 }

@@ -33,8 +33,8 @@ public class IdExternalFormatter {
 
   protected final LazyValue<IdFactory> m_idFactory = new LazyValue<>(IdFactory.class);
 
-  protected final Map<String, Class<? extends IId<?>>> m_nameToClassMap = new HashMap<>();
-  protected final Map<Class<? extends IId<?>>, String> m_classToNameMap = new HashMap<>();
+  protected final Map<String, Class<? extends IId>> m_nameToClassMap = new HashMap<>();
+  protected final Map<Class<? extends IId>, String> m_classToNameMap = new HashMap<>();
 
   @PostConstruct
   protected void createClassCache() {
@@ -42,9 +42,8 @@ public class IdExternalFormatter {
       String typeName = (String) classInfo.getAnnotationValue(IdTypeName.class, "value");
       Assertions.assertNotNullOrEmpty(typeName, "Invalid value for @{} on {} (must not be null or empty)", IdTypeName.class.getSimpleName(), classInfo.resolveClass().getName());
       try {
-        @SuppressWarnings("unchecked")
-        Class<? extends IId<?>> idClass = (Class<? extends IId<?>>) classInfo.resolveClass().asSubclass(IId.class);
-        Class<? extends IId<?>> registeredIdClass = m_nameToClassMap.put(typeName, idClass);
+        Class<? extends IId> idClass = classInfo.resolveClass().asSubclass(IId.class);
+        Class<? extends IId> registeredIdClass = m_nameToClassMap.put(typeName, idClass);
         String registeredTypeName = m_classToNameMap.put(idClass, typeName);
         checkDuplicateIdTypeNames(idClass, typeName, registeredIdClass, registeredTypeName);
       }
@@ -70,7 +69,7 @@ public class IdExternalFormatter {
    * <li><b>raw-id</b> is the unwrapped id (see {@link IId#unwrapAsString()}).
    * </ul>
    */
-  public <ID extends IId<?>> String toExternalForm(ID id) {
+  public <ID extends IId> String toExternalForm(ID id) {
     String typeName = Assertions.assertNotNull(getTypeName(id), "Missing @{} in class {}", IdTypeName.class.getSimpleName(), id.getClass().getName());
     String rawId = id.unwrapAsString();
     return typeName + ":" + rawId;
@@ -84,7 +83,7 @@ public class IdExternalFormatter {
    * @throws ProcessingException
    *           If the referenced class is not found
    */
-  public IId<?> fromExternalForm(String externalForm) {
+  public IId fromExternalForm(String externalForm) {
     if (externalForm == null) {
       return null;
     }
@@ -93,7 +92,7 @@ public class IdExternalFormatter {
       throw new IllegalArgumentException("externalForm '" + externalForm + "' is invalid");
     }
     String typeName = tmp[0];
-    Class<? extends IId<?>> idClass = m_nameToClassMap.get(typeName);
+    Class<? extends IId> idClass = m_nameToClassMap.get(typeName);
     if (idClass == null) {
       throw new ProcessingException("No class found for type name '{}'", typeName);
     }
@@ -104,7 +103,7 @@ public class IdExternalFormatter {
    * Parses a string in the format <code>"[type-name]:[raw-id]"</code>. If {@code externalForm} has not the expected
    * format or there is no type {@code null} is returned.
    */
-  public IId<?> fromExternalFormLenient(String externalForm) {
+  public IId fromExternalFormLenient(String externalForm) {
     if (externalForm == null) {
       return null;
     }
@@ -113,7 +112,7 @@ public class IdExternalFormatter {
       return null;
     }
     String typeName = tmp[0];
-    Class<? extends IId<?>> idClass = m_nameToClassMap.get(typeName);
+    Class<? extends IId> idClass = m_nameToClassMap.get(typeName);
     if (idClass == null) {
       return null;
     }
@@ -124,14 +123,14 @@ public class IdExternalFormatter {
    * @return the type name of the id class as defined by the {@link IdTypeName} annotation or <code>null</code> if the
    *         annotation is not present.
    */
-  public String getTypeName(Class<? extends IId<?>> idClass) {
+  public String getTypeName(Class<? extends IId> idClass) {
     return m_classToNameMap.get(idClass);
   }
 
   /**
    * @return id class which declares {@link IdTypeName} with {@code typeName}
    */
-  public Class<? extends IId<?>> getIdClass(String typeName) {
+  public Class<? extends IId> getIdClass(String typeName) {
     return m_nameToClassMap.get(typeName);
   }
 
@@ -139,8 +138,7 @@ public class IdExternalFormatter {
    * @return the type name of the {@link IId} as defined by the {@link IdTypeName} annotation or <code>null</code> if
    *         the annotation is not present.
    */
-  @SuppressWarnings("unchecked")
-  public String getTypeName(IId<?> id) {
-    return getTypeName((Class<? extends IId<?>>) id.getClass());
+  public String getTypeName(IId id) {
+    return getTypeName(id.getClass());
   }
 }

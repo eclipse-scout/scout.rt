@@ -34,38 +34,38 @@ public class IdExternalFormatterTest {
   public void testToExternalForm() {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
     String ext1 = BEANS.get(IdExternalFormatter.class).toExternalForm(id1);
-    assertEquals("scout.FixtureUuId:" + TEST_UUID.toString(), ext1);
+    assertEquals("scout.FixtureUuId:" + TEST_UUID, ext1);
   }
 
   @Test
   public void testFromExternalForm() {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
-    IId<?> id2 = BEANS.get(IdExternalFormatter.class).fromExternalForm("scout.FixtureUuId:" + TEST_UUID.toString());
+    IId id2 = BEANS.get(IdExternalFormatter.class).fromExternalForm("scout.FixtureUuId:" + TEST_UUID);
     assertEquals(id1, id2);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testFromExternalForm_InvalidType() {
-    IId<?> id = BEANS.get(IdExternalFormatter.class).fromExternalForm("scout.FixtureUuId:Other:" + TEST_UUID.toString());
+    IId id = BEANS.get(IdExternalFormatter.class).fromExternalForm("scout.FixtureUuId:Other:" + TEST_UUID);
     assertEquals(id, id);
   }
 
   @Test(expected = ProcessingException.class)
   public void testFromExternalForm_UnknownType() {
-    IId<?> id = BEANS.get(IdExternalFormatter.class).fromExternalForm("DoesNotExist:" + TEST_UUID.toString());
+    IId id = BEANS.get(IdExternalFormatter.class).fromExternalForm("DoesNotExist:" + TEST_UUID);
     assertEquals(id, id);
   }
 
   @Test
   public void testFromExternalFormLenient() {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
-    IId<?> id2 = BEANS.get(IdExternalFormatter.class).fromExternalFormLenient("scout.FixtureUuId:" + TEST_UUID.toString());
+    IId id2 = BEANS.get(IdExternalFormatter.class).fromExternalFormLenient("scout.FixtureUuId:" + TEST_UUID);
     assertEquals(id1, id2);
   }
 
   @Test
   public void testFromExternalFormLenient_UnknownType() {
-    IId<?> id = BEANS.get(IdExternalFormatter.class).fromExternalFormLenient("DoesNotExist:" + TEST_UUID.toString());
+    IId id = BEANS.get(IdExternalFormatter.class).fromExternalFormLenient("DoesNotExist:" + TEST_UUID);
     assertNull(id);
   }
 
@@ -80,6 +80,6 @@ public class IdExternalFormatterTest {
   public void testGetTypeName() {
     assertEquals("scout.FixtureUuId", BEANS.get(IdExternalFormatter.class).getTypeName(FixtureUuId.class));
     assertNull(BEANS.get(IdExternalFormatter.class).getTypeName(FixtureLongId.class));
-    assertNull(BEANS.get(IdExternalFormatter.class).getTypeName((Class<? extends IId<?>>) null));
+    assertNull(BEANS.get(IdExternalFormatter.class).getTypeName((Class<? extends IId>) null));
   }
 }

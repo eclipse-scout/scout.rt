@@ -418,7 +418,7 @@ public class DataObjectSignatureGenerator {
 
     if (IId.class.isAssignableFrom(clazz)) {
       @SuppressWarnings("unchecked")
-      Class<? extends IId<?>> idClass = (Class<? extends IId<?>>) clazz;
+      Class<? extends IId> idClass = (Class<? extends IId>) clazz;
       return processAttributeTypeId(idClass, containingEntityClass, containingAttributeName);
     }
 
@@ -457,7 +457,7 @@ public class DataObjectSignatureGenerator {
     return box(VALUE_TYPE_ENUM_PREFIX, enumName);
   }
 
-  protected String processAttributeTypeId(Class<? extends IId<?>> idClass, Class<? extends IDoEntity> containingEntityClass, String containingAttributeName) {
+  protected String processAttributeTypeId(Class<? extends IId> idClass, Class<? extends IDoEntity> containingEntityClass, String containingAttributeName) {
     String idTypeName = BEANS.get(IdExternalFormatter.class).getTypeName(idClass);
     if (idTypeName == null) {
       m_errors.add(String.format("IId class '%s' is missing id type name (referenced in '%s')", idClass.getName(), getContextText(containingEntityClass, containingAttributeName)));

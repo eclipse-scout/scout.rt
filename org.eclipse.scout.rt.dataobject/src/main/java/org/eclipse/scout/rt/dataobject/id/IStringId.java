@@ -19,7 +19,18 @@ package org.eclipse.scout.rt.dataobject.id;
  * <code>null</code> if the given {@link String} is <code>null</code>, otherwise the wrapped {@link String}.
  * </ul>
  * This interface implements {@link Comparable} by comparing the wrapped {@link String} value, without considering the
- * id types. Hence every {@link IStringId} is comparable to any other {@link IStringId}.
+ * id types. Hence, every {@link IStringId} is comparable to any other {@link IStringId}.
  */
-public interface IStringId extends IId<String> {
+public interface IStringId extends IId, Comparable<IStringId> {
+
+  @Override
+  String unwrap();
+
+  @Override
+  default int compareTo(IStringId o) {
+    if (o == null) {
+      return 1;
+    }
+    return unwrap().compareTo(o.unwrap());
+  }
 }
