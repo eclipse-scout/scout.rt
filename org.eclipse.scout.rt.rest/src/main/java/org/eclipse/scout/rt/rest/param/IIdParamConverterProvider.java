@@ -40,13 +40,13 @@ import org.eclipse.scout.rt.platform.BEANS;
 @ApplicationScoped
 public class IIdParamConverterProvider implements ParamConverterProvider {
 
-  private final ConcurrentMap<Class<? extends IId<?>>, IIdParamConverter> m_idParamConverters = new ConcurrentHashMap<>();
+  private final ConcurrentMap<Class<? extends IId>, IIdParamConverter> m_idParamConverters = new ConcurrentHashMap<>();
 
   @Override
   @SuppressWarnings("unchecked")
   public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations) {
     if (IId.class.isAssignableFrom(rawType)) {
-      return (ParamConverter<T>) m_idParamConverters.computeIfAbsent((Class<? extends IId<?>>) rawType.asSubclass(IId.class), IIdParamConverter::new);
+      return (ParamConverter<T>) m_idParamConverters.computeIfAbsent(rawType.asSubclass(IId.class), IIdParamConverter::new);
     }
     return null;
   }
@@ -54,16 +54,16 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
   /**
    * {@link ParamConverter} handling {@link IId}.
    */
-  public static class IIdParamConverter implements ParamConverter<IId<?>> {
+  public static class IIdParamConverter implements ParamConverter<IId> {
 
-    protected final Class<? extends IId<?>> m_idType;
+    protected final Class<? extends IId> m_idType;
 
-    public IIdParamConverter(Class<? extends IId<?>> idType) {
+    public IIdParamConverter(Class<? extends IId> idType) {
       m_idType = idType;
     }
 
     @Override
-    public IId<?> fromString(String value) {
+    public IId fromString(String value) {
       if (value == null) {
         return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
       }
@@ -71,7 +71,7 @@ public class IIdParamConverterProvider implements ParamConverterProvider {
     }
 
     @Override
-    public String toString(IId<?> value) {
+    public String toString(IId value) {
       if (value == null) {
         return null; // always use null as default value, see JavaDoc on IIdParamConverterProvider
       }

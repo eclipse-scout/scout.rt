@@ -58,7 +58,7 @@ public class DataObjectMapKeyDeserializers implements KeyDeserializers {
     }
     if (IId.class.isAssignableFrom(rawClass)) {
       @SuppressWarnings("unchecked")
-      Class<? extends IId<?>> idClass = (Class<? extends IId<?>>) rawClass.asSubclass(IId.class);
+      Class<? extends IId> idClass = rawClass.asSubclass(IId.class);
       return new IIdMapKeyDeserializer(idClass);
     }
     else if (IEnum.class.isAssignableFrom(rawClass)) {

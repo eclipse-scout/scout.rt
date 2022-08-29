@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.dataobject.id;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -29,20 +28,20 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 @ApplicationScoped
 public class IdFactory {
 
-  protected final ConcurrentMap<Class<? extends IId<?>>, Method> m_ofMethodsByIdType = new ConcurrentHashMap<>();
-  protected final ConcurrentMap<Class<? extends IId<?>>, Method> m_ofMethodsByString = new ConcurrentHashMap<>();
+  protected final ConcurrentMap<Class<? extends IId>, Method> m_ofMethodsByIdType = new ConcurrentHashMap<>();
+  protected final ConcurrentMap<Class<? extends IId>, Method> m_ofMethodsByString = new ConcurrentHashMap<>();
 
   /**
    * Creates a new wrapped {@link IId} by calling the <code>of(value)</code> method of the given id class.
    * <p>
    * <b>WARNING!</b> This internal method does not prevent type mismatches between the id type and the given object.
    * This may lead to ClassCastExceptions and other unexpected errors. Consider using the type-safe utility function
-   * {@link IIds#create(Class, UUID)} instead.
+   * {@link IIds#create(Class, Comparable)} instead.
    *
    * @throws PlatformException
    *           if an exception occurred while creating the id
    */
-  public <ID extends IId<?>> ID createInternal(Class<ID> idClass, Object value) {
+  public <ID extends IId> ID createInternal(Class<ID> idClass, Object value) {
     try {
       Method createMethod = m_ofMethodsByIdType.computeIfAbsent(idClass, this::findOfByTypeMethod);
       return idClass.cast(createMethod.invoke(null, value));
@@ -62,7 +61,7 @@ public class IdFactory {
    * @throws PlatformException
    *           if an exception occurred while creating the id
    */
-  public <ID extends IId<?>> ID createFromString(Class<ID> idClass, String string) {
+  public <ID extends IId> ID createFromString(Class<ID> idClass, String string) {
     try {
       Method createMethod = m_ofMethodsByString.computeIfAbsent(idClass, this::findOfByStringMethod);
       return idClass.cast(createMethod.invoke(null, string));
@@ -74,16 +73,16 @@ public class IdFactory {
     }
   }
 
-  protected Method findOfByTypeMethod(Class<? extends IId<?>> idClass) {
+  protected Method findOfByTypeMethod(Class<? extends IId> idClass) {
     Class<?> parameterType = TypeCastUtility.getGenericsParameterClass(idClass, IId.class);
     return findOfMethod(idClass, parameterType);
   }
 
-  protected Method findOfByStringMethod(Class<? extends IId<?>> idClass) {
+  protected Method findOfByStringMethod(Class<? extends IId> idClass) {
     return findOfMethod(idClass, String.class);
   }
 
-  protected Method findOfMethod(Class<? extends IId<?>> idClass, Class<?> parameterType) {
+  protected Method findOfMethod(Class<? extends IId> idClass, Class<?> parameterType) {
     try {
       Method m = idClass.getMethod("of", parameterType);
       Assertions.assertTrue(Modifier.isStatic(m.getModifiers()), "method 'of({})' is expected to be static [method={}]", parameterType.getName(), m);

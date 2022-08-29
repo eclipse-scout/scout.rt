@@ -19,13 +19,13 @@ import org.junit.runners.Parameterized.Parameters;
 public class IdStructureTest extends AbstractIdStructureTest {
 
   @Parameters(name = "{0}")
-  public static Iterable<? extends Object> parameters() {
+  public static Iterable<?> parameters() {
     return streamIdClasses("org.eclipse.scout.rt.dataobject")
         .filter(c -> c.getDeclaringClass() != IdFactoryTest.class)
         .collect(Collectors.toList());
   }
 
-  public IdStructureTest(Class<? extends IId<?>> idClass) {
+  public IdStructureTest(Class<? extends IId> idClass) {
     super(idClass);
   }
 }

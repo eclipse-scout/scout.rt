@@ -24,12 +24,12 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  * Custom serializer for {@link IId} instances - like {@link TypedIdSerializer} it uses {@link IdExternalFormatter} for
  * serialization. It may be used as a replacement for {@link IIdMapKeySerializer}.
  */
-public class QualifiedIIdMapKeySerializer extends JsonSerializer<IId<?>> {
+public class QualifiedIIdMapKeySerializer extends JsonSerializer<IId> {
 
   protected final LazyValue<IdExternalFormatter> m_idExternalFormatter = new LazyValue<>(IdExternalFormatter.class);
 
   @Override
-  public void serialize(IId<?> value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+  public void serialize(IId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
     gen.writeFieldName(m_idExternalFormatter.get().toExternalForm(value));
   }
 }

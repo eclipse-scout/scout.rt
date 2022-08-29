@@ -25,7 +25,7 @@ public final class IIds {
   /**
    * Null-safe version of {@link IId#unwrapAsString()}.
    */
-  public static String toString(IId<?> id) {
+  public static String toString(IId id) {
     if (id == null) {
       return null;
     }
@@ -35,14 +35,14 @@ public final class IIds {
   /**
    * Creates a new wrapped {@link IId} by calling the <code>of(value)</code> method of the given id class.
    */
-  public static <ID extends IId<WT>, WT extends Comparable<WT>> ID create(Class<ID> idClass, WT value) {
+  public static <ID extends IId, WT extends Comparable<WT>> ID create(Class<ID> idClass, WT value) {
     return BEANS.get(IdFactory.class).createInternal(idClass, value);
   }
 
   /**
    * Returns a function to create new {@link IId} of the provided type. Bean lookup to {@link IdFactory} is cached.
    */
-  public static <ID extends IId<WT>, WT extends Comparable<WT>> Function<WT, ID> factory(Class<ID> idClass) {
+  public static <ID extends IId, WT extends Comparable<WT>> Function<WT, ID> factory(Class<ID> idClass) {
     IdFactory idFactory = BEANS.get(IdFactory.class);
     return value -> idFactory.createInternal(idClass, value);
   }

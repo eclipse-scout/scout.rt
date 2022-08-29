@@ -24,10 +24,10 @@ import com.fasterxml.jackson.databind.KeyDeserializer;
  */
 public class IIdMapKeyDeserializer extends KeyDeserializer {
 
-  private final Class<? extends IId<?>> m_idClass;
+  private final Class<? extends IId> m_idClass;
   protected final LazyValue<IdFactory> m_idFactory = new LazyValue<>(IdFactory.class);
 
-  public IIdMapKeyDeserializer(Class<? extends IId<?>> idClass) {
+  public IIdMapKeyDeserializer(Class<? extends IId> idClass) {
     m_idClass = idClass;
   }
 

@@ -21,10 +21,10 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 /**
  * Custom serializer used for map keys of type {@link IId}.
  */
-public class IIdMapKeySerializer extends JsonSerializer<IId<?>> {
+public class IIdMapKeySerializer extends JsonSerializer<IId> {
 
   @Override
-  public void serialize(IId<?> value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+  public void serialize(IId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
     gen.writeFieldName(value.unwrapAsString());
   }
 }

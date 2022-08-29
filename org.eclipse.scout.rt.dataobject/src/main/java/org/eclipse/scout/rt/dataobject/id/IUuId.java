@@ -25,7 +25,18 @@ import java.util.UUID;
  * <code>null</code> if the given {@link String} is <code>null</code>, otherwise the wrapped {@link UUID}.
  * </ul>
  * This interface implements {@link Comparable} by comparing the wrapped {@link UUID} value, without considering the id
- * types. Hence every {@link IUuId} is comparable to any other {@link IUuId}.
+ * types. Hence, every {@link IUuId} is comparable to any other {@link IUuId}.
  */
-public interface IUuId extends IId<UUID> {
+public interface IUuId extends IId, Comparable<IUuId> {
+
+  @Override
+  UUID unwrap();
+
+  @Override
+  default int compareTo(IUuId o) {
+    if (o == null) {
+      return 1;
+    }
+    return unwrap().compareTo(o.unwrap());
+  }
 }

@@ -104,7 +104,7 @@ public class DataObjectDeserializers extends Deserializers.Base {
     }
     else if (IId.class.isAssignableFrom(rawClass)) {
       @SuppressWarnings("unchecked")
-      Class<? extends IId<?>> idClass = (Class<? extends IId<?>>) rawClass;
+      Class<? extends IId> idClass = (Class<? extends IId>) rawClass;
       return new IIdDeserializer(idClass);
     }
     else if (TypedId.class.isAssignableFrom(rawClass)) {

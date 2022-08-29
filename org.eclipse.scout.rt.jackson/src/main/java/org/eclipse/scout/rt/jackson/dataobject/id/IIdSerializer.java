@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 /**
  * Custom serializer for all {@link IId} instances.
  */
-public class IIdSerializer extends StdSerializer<IId<?>> {
+public class IIdSerializer extends StdSerializer<IId> {
   private static final long serialVersionUID = 1L;
 
   public IIdSerializer(JavaType type) {
@@ -30,7 +30,7 @@ public class IIdSerializer extends StdSerializer<IId<?>> {
   }
 
   @Override
-  public void serialize(IId<?> value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  public void serialize(IId value, JsonGenerator gen, SerializerProvider provider) throws IOException {
     gen.writeObject(value.unwrap());
   }
 }
