@@ -15,6 +15,7 @@
       "inheritAccessibility": true
     },
     "FormField": {
+      "currentMenuTypes": [],
       "disabledStyle": 0,
       "fieldStyle": "alternative",
       "visible": true,
@@ -23,6 +24,7 @@
       "labelPosition": 0,
       "labelWidthInPixel": 0,
       "labelHtmlEnabled": false,
+      "labelUseUiWidth": false,
       "mandatory": false,
       "statusVisible": true,
       "statusPosition": "default",
@@ -53,6 +55,9 @@
     },
     "ValueField": {
       "clearable": "focused",
+      "currentMenuTypes": [
+        "ValueField.Null"
+      ],
       "displayText": "",
       "statusMenuMappings": []
     },
