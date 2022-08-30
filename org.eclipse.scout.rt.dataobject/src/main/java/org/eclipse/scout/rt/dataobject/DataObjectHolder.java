@@ -28,7 +28,7 @@ public class DataObjectHolder<T extends IDataObject> implements IHolder<T>, Seri
 
   private static final long serialVersionUID = 1L;
 
-  private transient T m_value;
+  private T m_value;
   private final Class<T> m_clazz;
 
   public DataObjectHolder() {
