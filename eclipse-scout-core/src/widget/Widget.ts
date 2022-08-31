@@ -293,9 +293,9 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     }
 
     let widgets = [];
-    models.forEach(function(model, i) {
+    models.forEach((model, i) => {
       widgets[i] = this._createChild(model);
-    }, this);
+    });
     return widgets;
   }
 
@@ -1479,7 +1479,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
    * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. \_renderXY where XY is the property name), it will be called. Otherwise nothing happens.
    * @returns true, if the property was changed, false if not.
    */
-  setProperty(propertyName, value): boolean {
+  override setProperty(propertyName, value): boolean {
     if (objects.equals(this[propertyName], value)) {
       return false;
     }
@@ -1639,7 +1639,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     });
   }
 
-  toString() {
+  override toString() {
     let attrs = '';
     attrs += 'id=' + this.id;
     attrs += ' objectType=' + this.objectType;
