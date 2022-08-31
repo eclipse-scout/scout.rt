@@ -135,7 +135,6 @@ class Class1 {
 }`);
   });
 
-
   it('adds missing imports for types based on names', async () => {
     let text = `
 class Class1 {
@@ -165,6 +164,86 @@ class Class1 {
   constructor() {
     this.menu = null;
     this.htmlComp = null;
+  }
+}`);
+  });
+
+  it('pulls comment up and converts it to jsdoc', async () => {
+    let text = `
+class Class1 {
+  constructor() {
+    // line 1
+    // line 2
+    this.member1 = null;
+    this.member2 = null; // beside comment
+
+    /**
+     * jsdoc comment
+     */
+    this.member3 = null;
+
+     /*
+       block comment
+     */
+    this.member4 = null;
+
+     /*
+       block 1
+       block 2
+     */
+    this.member5 = null;
+  }
+}`;
+
+    text = lfToCrlf(text);
+    const diagnosticFor = str => mockDiagnostic(text, str, {code: 2339});
+    let result = await declareMissingClassPropertiesPlugin.run(
+      mockPluginParams({
+        text,
+        semanticDiagnostics: [
+          diagnosticFor('member1'),
+          diagnosticFor('member2'),
+          diagnosticFor('member3'),
+          diagnosticFor('member4'),
+          diagnosticFor('member5')
+        ]
+      })
+    );
+    result = crlfToLf(result);
+    expect(result).toBe(`
+class Class1 {
+  /**
+   * line 1
+   * line 2
+  */
+  member1: any;
+
+  /** beside comment */
+  member2: any;
+
+  /**
+   * jsdoc comment
+   */
+  member3: any;
+
+  /** block comment */
+  member4: any;
+
+  /**
+   * block 1
+   * block 2
+  */
+  member5: any;
+
+  constructor() {
+    this.member1 = null;
+    this.member2 = null;
+
+    this.member3 = null;
+
+     this.member4 = null;
+
+     this.member5 = null;
   }
 }`);
   });
