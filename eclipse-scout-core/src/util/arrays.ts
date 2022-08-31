@@ -346,7 +346,7 @@ export function eachSibling<T>(arr: T[], element: T, func: (elem: T, index: numb
  *
  * @param optional "this" binding for predicate function
  */
-export function findIndex<T>(arr: T[], predicate: (arg0: T) => boolean, thisArg?: any): number {
+export function findIndex<T>(arr: T[], predicate: (arg0: T, index: number, arr: T[]) => boolean, thisArg?: any): number {
   if (!arr || !predicate) {
     return -1;
   }

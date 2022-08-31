@@ -20,12 +20,12 @@ export default class Composite extends Widget implements CompositeModel {
     this._addWidgetProperties(['widgets']);
   }
 
-  protected _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 
-  protected _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderWidgets();
   }
