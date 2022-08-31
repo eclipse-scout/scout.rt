@@ -14,7 +14,7 @@ import WidgetSupport from './WidgetSupport';
 export default class LoadingSupport extends WidgetSupport {
   loadingIndicatorDelay: number;
   protected _$loadingIndicator: JQuery;
-  protected _loadingIndicatorTimeoutId: string;
+  protected _loadingIndicatorTimeoutId: number;
 
   /**
    * @param options a mandatory options object
@@ -31,7 +31,7 @@ export default class LoadingSupport extends WidgetSupport {
     this.loadingIndicatorDelay = loadingIndicatorDelay;
   }
 
-  protected _ensure$Container() {
+  protected override _ensure$Container() {
     if (typeof this.options$Container === 'function') {
       // resolve function provided by options.$container that returns a jQuery element
       this.$container = this.options$Container();
@@ -52,7 +52,6 @@ export default class LoadingSupport extends WidgetSupport {
     if (this.widget.isLoading()) {
       // add loading indicator
       if (this.loadingIndicatorDelay && !this.widget.rendering) {
-        // @ts-ignore // FIXME TS how to not take NodeJs timeout function?
         this._loadingIndicatorTimeoutId = setTimeout(
           this._renderLoadingIndicator.bind(this), this.loadingIndicatorDelay);
       } else {

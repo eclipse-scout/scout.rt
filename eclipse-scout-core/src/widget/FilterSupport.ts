@@ -16,7 +16,7 @@ type FilterFunction<TElem extends FilterElement> = ((elem) => boolean);
 type FilterOrFunction<TElem extends FilterElement> = Filter<TElem> | FilterFunction<TElem>;
 
 export default class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
-  widget: Widget & Filterable<TElem>;
+  declare widget: Widget & Filterable<TElem>;
   protected _cancelFilterFieldKeyStroke: KeyStroke;
   protected _createTextFilter: () => TextFilter<TElem>;
   protected _exitFilterFieldKeyStroke: KeyStroke;

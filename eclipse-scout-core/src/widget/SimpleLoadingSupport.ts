@@ -20,13 +20,13 @@ export default class SimpleLoadingSupport extends LoadingSupport {
     super(options);
   }
 
-  protected _renderLoadingIndicator() {
+  protected override _renderLoadingIndicator() {
     if (this.widget.rendered || this.widget.rendering) {
       this.$container.addClass('loading');
     }
   }
 
-  protected _removeLoadingIndicator() {
+  protected override _removeLoadingIndicator() {
     if (this.widget.rendered || this.widget.rendering) {
       this.$container.removeClass('loading');
     }
