@@ -5,7 +5,7 @@
 import jscodeshift from 'jscodeshift';
 import {validateAnyAliasOptions} from 'ts-migrate-plugins/build/src/utils/validateOptions.js';
 import {isDiagnosticWithLinePosition} from 'ts-migrate-plugins/build/src/utils/type-guards.js';
-import {defaultModuleMap, defaultParamTypeMap, defaultRecastOptions, findIndex, findParentClassBody, findParentPath, getTypeFor, inConstructor, insertMissingImportsForTypes} from './common.js';
+import {defaultModuleMap, defaultParamTypeMap, defaultRecastOptions, findIndex, findParentClassBody, findParentPath, getTypeFor, inConstructor, insertMissingImportsForTypes, transformCommentLinesToJsDoc} from './common.js';
 
 const j = jscodeshift.withParser('ts');
 let root;
@@ -61,25 +61,34 @@ const declareMissingClassPropertiesPlugin = {
         )
         .forEach(path => {
           const classBody = findParentClassBody(path);
-          if (classBody) {
-            let item = toAdd.find(cur => cur.classBody === classBody);
-            if (!item) {
-              item = {classBody, propertyNames: new Map()};
-              toAdd.push(item);
-            }
-
-            let assignment = findParentPath(path, parentPath => parentPath.node.type === 'AssignmentExpression');
-            let typeDesc = getTypeFor(j, path.node.name, assignment.node.right, Object.values(typeMap));
-            if (typeDesc && typeDesc.module) {
-              referencedTypes.add(typeDesc);
-            }
-            item.propertyNames.set(path.node.name, typeDesc.type);
+          if (!classBody) {
+            return;
           }
+          let item = toAdd.find(cur => cur.classBody === classBody);
+          if (!item) {
+            item = {classBody, propertyNames: new Map()};
+            toAdd.push(item);
+          }
+
+          let assignment = findParentPath(path, parentPath => parentPath.node.type === 'AssignmentExpression');
+          let typeDesc = getTypeFor(j, path.node.name, assignment.node.right, Object.values(typeMap));
+          if (typeDesc && typeDesc.module) {
+            referencedTypes.add(typeDesc);
+          }
+          let property = {
+            type: typeDesc.type
+          };
+          if (assignment.parentPath.node.comments) {
+            property.comments = assignment.parentPath.node.comments;
+            // Remove comment from property assignment
+            assignment.parentPath.node.comments = null;
+          }
+          item.propertyNames.set(path.node.name, property);
         });
     });
 
-    toAdd.forEach(({classBody, propertyNames: propertyNameMap}) => {
-      const /** @type {string[]}*/ propertyNames = Array.from(propertyNameMap.keys())
+    toAdd.forEach(({classBody, propertyNames: properties}) => {
+      const /** @type {string[]}*/ propertyNames = Array.from(properties.keys())
         .filter(propertyName => {
           const existingProperty = classBody.node.body.find(
             n =>
@@ -99,13 +108,19 @@ const declareMissingClassPropertiesPlugin = {
       classBody.node.body.splice(
         index,
         0,
-        ...propertyNames.map(propertyName =>
-          j.classProperty(
+        ...propertyNames.map(propertyName => {
+          let propertyDesc = properties.get(propertyName);
+          let prop = j.classProperty(
             j.identifier(propertyName),
             null,
-            j.tsTypeAnnotation(propertyNameMap.get(propertyName))
-          )
-        )
+            j.tsTypeAnnotation(propertyDesc.type)
+          );
+          let comments = transformCommentLinesToJsDoc(j, propertyDesc.comments);
+          if (comments) {
+            prop.comments = comments;
+          }
+          return prop;
+        })
       );
     });
 
