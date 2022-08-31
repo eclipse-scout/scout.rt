@@ -1,18 +1,22 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "target": "ES6",
+    "target": "ESNext",
     "moduleResolution": "node",
     "module": "ES6",
     "skipLibCheck": true,
     "sourceMap": true,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true,
+    "alwaysStrict": true,
+    "strictBindCallApply": true,
+    "noImplicitOverride": true,
+    "useDefineForClassFields": true,
     // For jquery imports, see https://www.typescriptlang.org/tsconfig#allowSyntheticDefaultImports
+    "allowSyntheticDefaultImports": true,
     "lib": [
       "dom",
-      "ES6"
+      "ES2019"
     ],
+    "types": [],
     "outDir": "dist/d.ts"
   },
   "include": [

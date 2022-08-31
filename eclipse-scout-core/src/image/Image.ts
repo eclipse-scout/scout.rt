@@ -23,11 +23,11 @@ export default class Image extends Widget implements ImageModel {
     this.prepend = false;
   }
 
-  init(model: ImageModel) { // FIXME TS better use generic?
+  override init(model: ImageModel) { // FIXME TS better use generic?
     super.init(model);
   }
 
-  protected _render() {
+  protected override _render() {
     this.$container = this.$parent.makeElement('<img>', 'image')
       .addDeviceClass()
       .on('load', this._onImageLoad.bind(this))
@@ -44,13 +44,13 @@ export default class Image extends Widget implements ImageModel {
     this.htmlComp.pixelBasedSizing = false;
   }
 
-  protected _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderImageUrl();
     this._renderAutoFit();
   }
 
-  protected _remove() {
+  protected override _remove() {
     super._remove();
     this.htmlComp = null;
   }
