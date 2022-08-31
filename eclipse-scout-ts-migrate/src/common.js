@@ -289,6 +289,32 @@ function getTypeName(type) {
   }
   return type.typeName.name;
 }
+export function transformCommentLinesToJsDoc(j, comments) {
+  if (!comments) {
+    return null;
+  }
+  let commentTexts = [];
+  if (comments[0].type === 'CommentBlock') {
+    if (comments[0].value.startsWith('*')) {
+      // Already js doc
+      return comments;
+    }
+    // Convert regular block to lines first
+    commentTexts = comments[0].value.trim().split('\r\n').map(comment => ' ' + comment.trim());
+  } else {
+    commentTexts = comments.map(comment => comment.value);
+  }
+  let str = '';
+  if (commentTexts.length === 1) {
+    str += `*${commentTexts[0]} `;
+  } else {
+    str = '*\r\n';
+    for (let comment of commentTexts) {
+      str += ` *${comment}\r\n`;
+    }
+  }
+  return [j.commentBlock(str)];
+}
 
 export const defaultParamTypeMap = {
   number: {
