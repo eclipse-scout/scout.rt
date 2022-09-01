@@ -8,21 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {LogicalGridWidget} from './LogicalGridData';
+import {Widget} from '../../index';
+
+export interface LogicalGridContainer extends Widget {
+  gridColumnCount?: number;
+  widgets?: LogicalGridWidget[];
+}
+
 export default class LogicalGridConfig {
+  widget: LogicalGridContainer;
 
   constructor() {
     this.widget = null;
   }
 
-  setWidget(widget) {
+  setWidget(widget: LogicalGridContainer) {
     this.widget = widget;
   }
 
-  getGridColumnCount() {
+  getGridColumnCount(): number {
     return this.widget.gridColumnCount;
   }
 
-  getGridWidgets() {
+  getGridWidgets(): LogicalGridWidget[] {
     return this.widget.widgets;
   }
 }

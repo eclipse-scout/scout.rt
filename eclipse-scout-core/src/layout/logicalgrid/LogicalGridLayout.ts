@@ -8,8 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, HtmlComponent, HtmlEnvironment, LayoutConstants, LogicalGridLayoutConfig, LogicalGridLayoutInfo} from '../../index';
+import {AbstractLayout, Dimension, EventHandler, HtmlComponent, HtmlEnvironment, Insets, LayoutConstants, LogicalGridData, LogicalGridLayoutConfig, LogicalGridLayoutInfo, Rectangle, Widget} from '../../index';
 import $ from 'jquery';
+import {HtmlCompPrefSizeOptions} from '../HtmlComponent';
+import {LogicalGridLayoutConfigOptions} from './LogicalGridLayoutConfig';
 
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayout.
@@ -18,8 +20,19 @@ import $ from 'jquery';
  *
  */
 export default class LogicalGridLayout extends AbstractLayout {
+  validityBasedOnContainerSize: Dimension;
+  valid: boolean;
+  widget: Widget;
+  info: LogicalGridLayoutInfo;
+  layoutConfig: LogicalGridLayoutConfig;
+  htmlPropertyChangeHandler: EventHandler;
+  hgap: number;
+  vgap: number;
+  columnWidth: number;
+  rowHeight: number;
+  minWidth: number;
 
-  constructor(widget, layoutConfig) {
+  constructor(widget: Widget, layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigOptions) {
     super();
     this.cssClass = 'logical-grid-layout';
     this.validityBasedOnContainerSize = new Dimension();
@@ -28,7 +41,7 @@ export default class LogicalGridLayout extends AbstractLayout {
     this.info = null;
 
     this._initDefaults();
-    this.layoutConfig = LogicalGridLayoutConfig.ensure(layoutConfig || {});
+    this.layoutConfig = LogicalGridLayoutConfig.ensure(layoutConfig || {} as LogicalGridLayoutConfigOptions);
     this.layoutConfig.applyToLayout(this);
 
     this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
@@ -36,10 +49,9 @@ export default class LogicalGridLayout extends AbstractLayout {
     this.widget.one('remove', () => {
       HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
     });
-
   }
 
-  _initDefaults() {
+  protected _initDefaults() {
     let env = HtmlEnvironment.get();
     this.hgap = env.formColumnGap;
     this.vgap = env.formRowGap;
@@ -48,14 +60,14 @@ export default class LogicalGridLayout extends AbstractLayout {
     this.minWidth = 0;
   }
 
-  _onHtmlEnvironmentPropertyChange() {
+  protected _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this.layoutConfig.applyToLayout(this);
     this.widget.invalidateLayoutTree();
     this.widget.invalidateLogicalGrid();
   }
 
-  validateLayout($container, options) {
+  validateLayout($container: JQuery, options: HtmlCompPrefSizeOptions) {
     let visibleComps = [],
       visibleCons = [];
 
@@ -109,23 +121,23 @@ export default class LogicalGridLayout extends AbstractLayout {
     $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#validateLayout) $container=' + HtmlComponent.get($container).debug());
   }
 
-  _validateGridData(htmlComp) {
+  protected _validateGridData(htmlComp: HtmlComponent): boolean {
     let $comp = htmlComp.$comp;
     let widget = $comp.data('widget');
     // Prefer the visibility state of the widget, if there is one.
     // This allows for transitions, because the $component may still be in the process of being made invisible
     let visible = widget ? widget.isVisible() : $comp.isVisible();
     if (visible) {
-      htmlComp.layoutData.validate();
+      (<LogicalGridData>htmlComp.layoutData).validate();
       return true;
     }
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     this._layout($container);
   }
 
-  _layout($container) {
+  protected _layout($container: JQuery) {
     let htmlContainer = HtmlComponent.get($container),
       containerSize = htmlContainer.availableSize(),
       containerInsets = htmlContainer.insets();
@@ -193,11 +205,11 @@ export default class LogicalGridLayout extends AbstractLayout {
     }
   }
 
-  _layoutCellBounds(containerSize, containerInsets) {
+  protected _layoutCellBounds(containerSize: Dimension, containerInsets: Insets): Rectangle[][] {
     return this.info.layoutCellBounds(containerSize, containerInsets);
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options): Dimension {
     // widthHint and heightHint are already adjusted by HtmlComponent, no need to remove insets here
     this.validateLayout($container, options);
 

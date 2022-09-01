@@ -8,14 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default class LogicalGridMatrixCell {
+import {LogicalGridWidget} from '../LogicalGridData';
+import {GridData} from '../../../index';
 
-  constructor(widget, data) {
+export default class LogicalGridMatrixCell {
+  widget: LogicalGridWidget;
+  data: GridData;
+
+  constructor(widget?: LogicalGridWidget, data?) {
     this.widget = widget;
     this.data = data;
   }
 
-  isEmpty() {
+  isEmpty(): boolean {
     return !this.widget;
   }
 }

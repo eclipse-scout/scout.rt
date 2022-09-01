@@ -1,3 +1,5 @@
+// noinspection DuplicatedCode
+
 /*
  * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -8,25 +10,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractGrid, LogicalGridMatrix, LogicalGridMatrixCell, LogicalGridMatrixCursor} from '../../../index';
+import {AbstractGrid, GridData, LogicalGridMatrix, LogicalGridMatrixCell, LogicalGridMatrixCursor, Point, Widget} from '../../../index';
 
 export default class VerticalGridMatrix extends LogicalGridMatrix {
+  protected _widgets: Widget[];
+  protected _widgetGridDatas: GridData[];
+  protected _widgetIndexes: number[];
 
-  constructor(columnCount, rowCount, x, y) {
-    super(new LogicalGridMatrixCursor(x || 0, y || 0, columnCount, rowCount, LogicalGridMatrixCursor.VERTICAL));
+  constructor(columnCount: number, rowCount: number, x?: number, y?: number) {
+    super(new LogicalGridMatrixCursor(x || 0, y || 0, columnCount, rowCount, LogicalGridMatrixCursor.Orientation.VERTICAL));
 
     this._widgets = [];
     this._widgetGridDatas = [];
+    this._widgetIndexes = [];
   }
 
-  resetAll(columnCount, rowCount) {
+  resetAll(columnCount: number, rowCount: number) {
     this._widgetGridDatas = [];
     this._assignedCells = [];
     this._widgetIndexes = [];
-    this._cursor = new LogicalGridMatrixCursor(this._cursor.startX, this._cursor.startY, columnCount, rowCount, LogicalGridMatrixCursor.VERTICAL);
+    this._cursor = new LogicalGridMatrixCursor(this._cursor.startX, this._cursor.startY, columnCount, rowCount, LogicalGridMatrixCursor.Orientation.VERTICAL);
   }
 
-  computeGridData(widgets) {
+  computeGridData(widgets: Widget[]): boolean {
     this._widgets = widgets;
     return widgets.every((f, i) => {
       this._widgetGridDatas[i] = AbstractGrid.getGridDataFromHints(f, this._cursor.columnCount);
@@ -34,30 +40,27 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
     });
   }
 
-  getGridData(f) {
+  getGridData(f: Widget): GridData {
     return this._widgetGridDatas[this._widgets.indexOf(f)];
   }
 
-  _addAssignedCells(cells) {
+  protected _addAssignedCells(cells: LogicalGridMatrixCell[][]) {
     cells.forEach((v, i) => {
       if (v) {
         v.forEach((w, j) => {
           if (w) {
-            this._setAssignedCell({
-              x: i,
-              y: j
-            }, w);
+            this._setAssignedCell(new Point(i, j), w);
           }
         });
       }
     });
   }
 
-  _getAssignedCells() {
+  protected _getAssignedCells(): LogicalGridMatrixCell[][] {
     return this._assignedCells;
   }
 
-  _add(f, gd) {
+  protected _add(f, gd: GridData): boolean {
     let idx = this._cursor.currentIndex();
     if (gd.w > 1) {
       // try to reorganize widgets above
@@ -80,16 +83,13 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
     // add widget
     for (let xx = idx.x; xx < idx.x + gd.w; xx++) {
       for (let yy = idx.y; yy < idx.y + gd.h; yy++) {
-        this._setAssignedCell({
-          x: xx,
-          y: yy
-        }, new LogicalGridMatrixCell(f, gd));
+        this._setAssignedCell(new Point(xx, yy), new LogicalGridMatrixCell(f, gd));
       }
     }
     return true;
   }
 
-  _reorganizeGridAbove(x, y, w) {
+  protected _reorganizeGridAbove(x: number, y: number, w) {
     let widgetsToReorganize = [];
     let addWidgetToReorganize = f => {
       if (widgetsToReorganize.indexOf(f) === -1) {
@@ -115,10 +115,7 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
     let continueLoop = true;
     for (let yi = y; yi >= 0 && continueLoop; yi--) {
       for (let xi = x; xi < x + w && continueLoop; xi++) {
-        let idx = {
-          x: xi,
-          y: yi
-        };
+        let idx = new Point(xi, yi);
         let cell = this._getAssignedCell(idx);
         if (cell && !cell.isEmpty()) {
           let gd = cell.data;
@@ -159,11 +156,11 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
     });
   }
 
-  _horizontalMatchesOrOverlaps(bounds, gd) {
+  protected _horizontalMatchesOrOverlaps(bounds: { x: number; y: number; w: number; h: number }, gd: GridData) {
     return bounds.x >= gd.x && bounds.x + bounds.w <= gd.x + gd.w;
   }
 
-  _horizontalOverlapsOnSide(bounds, gd) {
+  protected _horizontalOverlapsOnSide(bounds: { x: number; y: number; w: number; h: number }, gd: GridData) {
     return bounds.x > gd.x || bounds.x + bounds.w < gd.x + gd.w;
   }
 }

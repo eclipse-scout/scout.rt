@@ -36,12 +36,12 @@ export interface PrefSizeOptions {
    * If useCssSize is false, this value is used as width (in pixels) instead of 'auto'.
    * Useful to get the preferred height for a given width.
    */
-  widthHint?: string;
+  widthHint?: number;
 
   /**
    * Same as 'widthHint' but for the height.
    */
-  heightHint?: string;
+  heightHint?: number;
 
   /**
    * By default, the $elem's scrolling position is saved and restored during the execution of this method (because applying
@@ -57,47 +57,6 @@ export interface PrefSizeOptions {
   animateClasses?: string[];
 }
 
-export interface SizeOptions {
-  /**
-   * When set to true the returned dimensions may contain fractional digits, otherwise the sizes are rounded up. Default is false.
-   */
-  exact?: boolean;
-
-  /**
-   * Whether to include the margins in the returned size. Default is false.
-   */
-  includeMargin?: boolean;
-}
-
-export interface BoundsOptions {
-  /**
-   * When set to true the returned size may contain fractional digits, otherwise the sizes are rounded up. X and Y are not affected by this option. Default is false.
-   */
-  exact?: boolean;
-
-  /**
-   * Whether to include the margins in the returned size. X and Y are not affected by this option. Default is false.
-   */
-  includeMargin?: boolean;
-}
-
-export interface InsetsOptions {
-  /**
-   * Whether to include the margins in the returned insets. Default is false.
-   */
-  includeMargin?: boolean;
-
-  /**
-   * Whether to include the paddings in the returned insets. Default is true.
-   */
-  includePadding?: boolean;
-
-  /**
-   * Whether to include the borders in the returned insets. Default is true.
-   */
-  includeBorder?: boolean;
-}
-
 /**
  * Returns the preferred size of $elem.
  * Precondition: $elem and it's parents must not be hidden (display: none. Visibility: hidden would be ok
@@ -109,7 +68,7 @@ export interface InsetsOptions {
  *          an optional options object. Short-hand version: If a boolean is passed instead
  *          of an object, the value is automatically converted to the option "includeMargin".
  */
-export function prefSize($elem: JQuery, options: PrefSizeOptions | boolean): Dimension {
+export function prefSize($elem: JQuery, options?: PrefSizeOptions | boolean): Dimension {
   // Return 0/0 if element is not displayed (display: none).
   // We don't use isVisible by purpose because isVisible returns false for elements with visibility: hidden which is wrong here (we would like to be able to measure hidden elements)
   if (!$elem[0] || $elem.isDisplayNone()) {
@@ -241,6 +200,18 @@ export function prefSizeWithoutAnimation($elem: JQuery, options: PrefSizeOptions
  * in favor of width/height() functions.
  */
 
+export interface SizeOptions {
+  /**
+   * When set to true the returned dimensions may contain fractional digits, otherwise the sizes are rounded up. Default is false.
+   */
+  exact?: boolean;
+
+  /**
+   * Whether to include the margins in the returned size. Default is false.
+   */
+  includeMargin?: boolean;
+}
+
 /**
  * Returns the size of the element, insets included. The sizes are rounded up, unless the option 'exact' is set to true.
  *
@@ -310,6 +281,23 @@ export function setSize($comp: JQuery, widthOrSize: Dimension | number, height?:
     .cssHeight(size.height);
 }
 
+export interface InsetsOptions {
+  /**
+   * Whether to include the margins in the returned insets. Default is false.
+   */
+  includeMargin?: boolean;
+
+  /**
+   * Whether to include the paddings in the returned insets. Default is true.
+   */
+  includePadding?: boolean;
+
+  /**
+   * Whether to include the borders in the returned insets. Default is true.
+   */
+  includeBorder?: boolean;
+}
+
 /**
  * Returns the inset-dimensions of the component (padding, margin, border).
  *
@@ -319,7 +307,7 @@ export function setSize($comp: JQuery, widthOrSize: Dimension | number, height?:
  *          an optional options object. Short-hand version: If a boolean is passed instead
  *          of an object, the value is automatically converted to the option "includeMargin".
  */
-export function insets($comp: JQuery, options: InsetsOptions): Insets {
+export function insets($comp: JQuery, options?: InsetsOptions): Insets {
   if (typeof options === 'boolean') {
     options = {
       includeMargin: options
@@ -401,6 +389,18 @@ export function setLocation($comp: JQuery, xOrPoint: number | Point, y?: number)
  */
 export function location($comp: JQuery): Point {
   return new Point($comp.cssLeft(), $comp.cssTop());
+}
+
+export interface BoundsOptions {
+  /**
+   * When set to true the returned size may contain fractional digits, otherwise the sizes are rounded up. X and Y are not affected by this option. Default is false.
+   */
+  exact?: boolean;
+
+  /**
+   * Whether to include the margins in the returned size. X and Y are not affected by this option. Default is false.
+   */
+  includeMargin?: boolean;
 }
 
 /**

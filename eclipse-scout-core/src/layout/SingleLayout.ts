@@ -11,20 +11,27 @@
 import {AbstractLayout, Dimension, graphics, HtmlComponent, scout} from '../index';
 import $ from 'jquery';
 
+export interface SingleLayoutOptions {
+  /** True to use the exact size including fractional digits of the container. See also {@link HtmlComponent.availableSize}. Default is false. */
+  exact: boolean;
+}
+
 /**
  * Resizes the child so it has the same size as the container.<br>
  * If no child is provided, the first child in the container is used.
  */
-export default class SingleLayout extends AbstractLayout {
+export default class SingleLayout extends AbstractLayout implements SingleLayoutOptions {
+  exact: boolean;
+  protected _htmlChild: HtmlComponent;
 
-  constructor(htmlChild, options) {
+  constructor(htmlChild: HtmlComponent, options?: SingleLayoutOptions) {
     super();
     this._htmlChild = htmlChild;
-    options = options || {};
+    options = options || {} as SingleLayoutOptions;
     this.exact = scout.nvl(options.exact, false);
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let htmlContainer = HtmlComponent.get($container);
     let childSize = htmlContainer.availableSize({exact: this.exact})
         .subtract(htmlContainer.insets()),
@@ -38,7 +45,7 @@ export default class SingleLayout extends AbstractLayout {
     }
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options): Dimension {
     let htmlChild = this._htmlChild;
     if (!htmlChild) {
       htmlChild = this._getHtmlSingleChild($container);
@@ -50,9 +57,9 @@ export default class SingleLayout extends AbstractLayout {
   }
 
   /**
-   * @returns {HtmlComponent} the first child html component of the given container or null if the container has no child with a html component or no children at all.
+   * @returns the first child html component of the given container or null if the container has no child with a html component or no children at all.
    */
-  _getHtmlSingleChild($container) {
+  protected _getHtmlSingleChild($container: JQuery): HtmlComponent {
     let htmlComp = null;
     $container.children().each((i, child) => {
       let htmlChild = HtmlComponent.optGet($(child));

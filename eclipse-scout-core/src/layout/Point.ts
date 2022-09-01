@@ -9,49 +9,57 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-/**
- * JavaScript port from java.awt.Point.
- */
 export default class Point {
+  x: number;
+  y: number;
 
-  constructor(vararg, y) {
-    if (vararg instanceof Point) {
-      this.x = vararg.x;
-      this.y = vararg.y;
+  /**
+   * If no parameters are passed, all members are initialized with 0.
+   */
+  constructor(xOrPoint?: number | Point, y?: number) {
+    if (xOrPoint instanceof Point) {
+      this.x = xOrPoint.x;
+      this.y = xOrPoint.y;
     } else {
-      this.x = vararg || 0;
+      this.x = xOrPoint || 0;
       this.y = y || 0;
     }
   }
 
-  toString() {
+  toString(): string {
     return 'Point[x=' + this.x + ' y=' + this.y + ']';
   }
 
-  equals(o) {
+  equals(o: Point): boolean {
     if (!o) {
       return false;
     }
     return (this.x === o.x && this.y === o.y);
   }
 
-  clone() {
+  clone(): Point {
     return new Point(this.x, this.y);
   }
 
-  add(point) {
+  add(point: Point): Point {
     return new Point(this.x + point.x, this.y + point.y);
   }
 
-  subtract(point) {
+  subtract(point: Point): Point {
     return new Point(this.x - point.x, this.y - point.y);
   }
 
-  floor() {
+  /**
+   * Creates a copy and calls Math.floor() on each property.
+   */
+  floor(): Point {
     return new Point(Math.floor(this.x), Math.floor(this.y));
   }
 
-  ceil() {
+  /**
+   * Creates a copy and calls Math.ceil() on each property.
+   */
+  ceil(): Point {
     return new Point(Math.ceil(this.x), Math.ceil(this.y));
   }
 }

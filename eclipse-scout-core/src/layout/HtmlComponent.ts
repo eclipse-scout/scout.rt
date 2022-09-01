@@ -10,29 +10,34 @@
  */
 import {AbstractLayout, Dimension, graphics, Insets, LayoutData, NullLayout, Point, Rectangle, scout, Session} from '../index';
 import $ from 'jquery';
-import {BoundsOptions, InsetsOptions, SizeOptions} from './graphics';
+import {BoundsOptions, InsetsOptions, PrefSizeOptions, SizeOptions} from './graphics';
 
-export interface HtmlCompPrefSizeOptions {
+export interface HtmlCompPrefSizeOptions extends PrefSizeOptions {
   /**
    * Whether to include the margin in the returned size. Default is false.
    */
   includeMargin?: boolean;
+
   /**
    *  When set, horizontal padding, border and margin are removed from it so that the actual layout does not need to take care of it. Default is null.
    */
   widthHint?: number;
+
   /**
    * When set, vertical padding, border and margin are removed from it so that the actual layout does not need to take care of it. Default is null.
    */
   heightHint?: number;
+
   /**
    * Whether or not to automatically remove the margin from the hints. Default is true.
    */
   removeMarginFromHints?: boolean;
+
   /**
    * Whether or not to automatically remove the insets (padding and border) from the hints. Default is true.
    */
   removeInsetsFromHints?: boolean;
+
   /**
    * If true, only the preferred width should be calculated. Whether this has an effect depends on the used layout. Default is false.
    */
@@ -40,7 +45,14 @@ export interface HtmlCompPrefSizeOptions {
 }
 
 /**
- * Wrapper for a JQuery selector. Used as replacement for javax.swing.JComponent.
+ * A HTMLComponent wraps a {@link JQuery} object and provides a possibility to layout its children using {@link AbstractLayout}.
+ * A layout is necessary if it is not sufficient to use CSS for layouting, e.g. for elements that need to be positioned and sized dynamically and exactly.
+ * <p>
+ * Every component is responsible to layout its child components using the specified {@link layout}. The layout calculates and updates the sizes and/or positions for the children using {@link setSize} or {@link setBounds}.
+ * If the size or bounds change, the child components get invalid and need to layout their children as well. So the layouting happens top-down.
+ * <p>
+ * If a child component is modified, e.g. changes its visibility or another attribute that impacts the size or position, it needs to be invalidated. Since this not only affects the parent component but possibly every ancestor,
+ * the whole ancestor component tree needs to be invalidated. This is done by using {@link invalidateLayoutTree}. So the invalidation happens bottom-up.
  */
 export default class HtmlComponent {
   $comp: JQuery;
