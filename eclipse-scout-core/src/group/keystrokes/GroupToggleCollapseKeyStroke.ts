@@ -8,17 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../index';
+import {Group, keys, KeyStroke} from '../../index';
 
 export default class GroupToggleCollapseKeyStroke extends KeyStroke {
+  declare field: Group;
 
-  constructor(group) {
-    super(group);
+  constructor(group: Group) {
+    super();
     this.field = group;
     this.which = [keys.SPACE];
   }
 
-  handle(event) {
+  override handle(event) {
     this.field.toggleCollapse();
   }
 }

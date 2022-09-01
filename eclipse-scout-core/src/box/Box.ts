@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -16,12 +16,31 @@ import $ from 'jquery';
  * Note: It does not extend from Widget because widget has too many dependencies which are not needed for this simple use case (login-module does not include these dependencies)
  */
 export default class Box {
+  rendered: boolean;
+  logoUrl: string;
+
+  $parent: JQuery;
+  $container: JQuery;
+  $backgroundElements: JQuery;
+  $wrapper: JQuery;
+  $content: JQuery;
+  $header: JQuery;
+  $logo: JQuery;
 
   constructor() {
+    this.rendered = false;
+    this.logoUrl = null;
+
     this.$parent = null;
+    this.$container = null;
+    this.$backgroundElements = null;
+    this.$wrapper = null;
+    this.$content = null;
+    this.$header = null;
+    this.$logo = null;
   }
 
-  render($parent) {
+  render($parent: JQuery) {
     this.$parent = $parent;
     this._render();
     this.rendered = true;
@@ -33,7 +52,7 @@ export default class Box {
     this.rendered = false;
   }
 
-  _render() {
+  protected _render() {
     // add background-elements which can be styled individually
     this.$backgroundElements = $('<div>')
       .addClass('box-background-elements')

@@ -1,15 +1,23 @@
 /*
- * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CodeLookupCall, codes, Column, LookupCall, LookupRow, scout, SmartField, strings} from '../../index';
+import {Cell, CodeLookupCall, codes, Column, Event, LookupCall, LookupRow, scout, SmartColumnEventMap, SmartColumnModel, SmartField, strings, TableRow} from '../../index';
 import objects from '../../util/objects';
+import LookupCallModel from '../../lookup/LookupCallModel';
+import {ObjectType} from '../../ObjectFactory';
+import {EventMapOf, EventModel} from '../../events/EventEmitter';
+
+export type SmartColumnBatchContext = {
+  keySet: Set<any>;
+  result: JQuery.Promise<Record<string, string>>;
+};
 
 /**
  * Column where each cell fetches its value using a lookup call.
@@ -19,7 +27,19 @@ import objects from '../../util/objects';
  * It should be used instead of the property selectedRows from Table.js which must not be used here.
  * 'row' can be null or undefined in some cases. Hence some care is needed when listening to this event.
  */
-export default class SmartColumn extends Column {
+export default class SmartColumn extends Column implements SmartColumnModel {
+  declare model: SmartColumnModel;
+  declare eventMap: SmartColumnEventMap;
+
+  codeType: string;
+  lookupCall: LookupCall<any>;
+  browseHierarchy: boolean;
+  browseMaxRowCount: number;
+  browseAutoExpandAll: boolean;
+  browseLoadIncremental: boolean;
+  activeFilterEnabled: boolean;
+
+  protected _lookupCallBatchContext: SmartColumnBatchContext;
 
   constructor() {
     super();
@@ -33,22 +53,19 @@ export default class SmartColumn extends Column {
     this._lookupCallBatchContext = null;
   }
 
-  /**
-   * @override
-   */
-  _init(model) {
+  protected override _init(model: SmartColumnModel) {
     super._init(model);
     this._setLookupCall(this.lookupCall);
     this._setCodeType(this.codeType);
   }
 
-  _initCell(cell) {
+  protected override _initCell(cell: Cell): Cell {
     super._initCell(cell);
     cell.sortCode = this._calculateCellSortCode(cell);
     return cell;
   }
 
-  _calculateCellSortCode(cell) {
+  protected _calculateCellSortCode(cell: Cell): number {
     if (!this.codeType) {
       return null;
     }
@@ -56,27 +73,27 @@ export default class SmartColumn extends Column {
     return code ? code.sortCode : null;
   }
 
-  _updateAllCellSortCodes() {
+  protected _updateAllCellSortCodes() {
     this.table.rows.map(row => this.cell(row)).forEach(cell => cell.setSortCode(this._calculateCellSortCode(cell)));
   }
 
-  setLookupCall(lookupCall) {
+  setLookupCall(lookupCall: LookupCall<any> | LookupCallModel<any> & { objectType: ObjectType<LookupCall<any>> } | string) {
     this.setProperty('lookupCall', lookupCall);
   }
 
-  _setLookupCall(lookupCall) {
-    lookupCall = LookupCall.ensure(lookupCall, this.session);
-    this._setProperty('lookupCall', lookupCall);
+  protected _setLookupCall(lookupCall: LookupCall<any> | LookupCallModel<any> & { objectType: ObjectType<LookupCall<any>> } | string) {
+    let call = LookupCall.ensure(lookupCall, this.session);
+    this._setProperty('lookupCall', call);
     if (this.initialized) {
       this._updateAllCellSortCodes();
     }
   }
 
-  setCodeType(codeType) {
+  setCodeType(codeType: string) {
     this.setProperty('codeType', codeType);
   }
 
-  _setCodeType(codeType) {
+  protected _setCodeType(codeType: string) {
     this._setProperty('codeType', codeType);
     if (codeType) {
       this.lookupCall = scout.create(CodeLookupCall, {
@@ -89,27 +106,27 @@ export default class SmartColumn extends Column {
     }
   }
 
-  setBrowseHierarchy(browseHierarchy) {
+  setBrowseHierarchy(browseHierarchy: boolean) {
     this.setProperty('browseHierarchy', browseHierarchy);
   }
 
-  setBrowseMaxRowCount(browseMaxRowCount) {
+  setBrowseMaxRowCount(browseMaxRowCount: number) {
     this.setProperty('browseMaxRowCount', browseMaxRowCount);
   }
 
-  setBrowseAutoExpandAll(browseAutoExpandAll) {
+  setBrowseAutoExpandAll(browseAutoExpandAll: boolean) {
     this.setProperty('browseAutoExpandAll', browseAutoExpandAll);
   }
 
-  setBrowseLoadIncremental(browseLoadIncremental) {
+  setBrowseLoadIncremental(browseLoadIncremental: boolean) {
     this.setProperty('browseLoadIncremental', browseLoadIncremental);
   }
 
-  setActiveFilterEnabled(activeFilterEnabled) {
+  setActiveFilterEnabled(activeFilterEnabled: boolean) {
     this.setProperty('activeFilterEnabled', activeFilterEnabled);
   }
 
-  _formatValue(value, row) {
+  protected override _formatValue(value: any, row?: TableRow): string | JQuery.Promise<string> {
     if (!this.lookupCall) {
       return strings.nvl(value) + '';
     }
@@ -131,7 +148,7 @@ export default class SmartColumn extends Column {
    * Defers all invocations of the lookup call for the duration of the current event handler.
    * Once the current event handler completes, all lookup calls are resolved in a single batch.
    */
-  _batchFormatValue(key) {
+  protected _batchFormatValue(key: any): JQuery.Promise<string> {
     if (objects.isNullOrUndefined(key)) {
       return $.resolvedPromise('');
     }
@@ -174,7 +191,7 @@ export default class SmartColumn extends Column {
    * which is not necessary, since the cell already contains text and value. This also avoids a problem
    * with multiple lookups running at once, see ticket 236960.
    */
-  _updateEditorFromValidCell(field, cell) {
+  protected override _updateEditorFromValidCell(field: SmartField, cell: Cell) {
     if (objects.isNullOrUndefined(cell.value)) {
       field.setValue(null);
       return;
@@ -186,7 +203,7 @@ export default class SmartColumn extends Column {
     field.setLookupRow(lookupRow);
   }
 
-  _createEditor(row) {
+  protected override _createEditor(row: TableRow): SmartField {
     let field = scout.create(SmartField, {
       parent: this.table,
       codeType: this.codeType,
@@ -198,14 +215,18 @@ export default class SmartColumn extends Column {
       activeFilterEnabled: this.activeFilterEnabled
     });
 
+    // FIXME TS: add correct events as soon as SmartField has been migrated.
     field.on('prepareLookupCall', event => {
       this.trigger('prepareLookupCall', {
+        // @ts-ignore
         lookupCall: event.lookupCall,
         row: row
       });
     });
+    // FIXME TS: add correct events as soon as SmartField has been migrated.
     field.on('lookupCallDone', event => {
       this.trigger('lookupCallDone', {
+        // @ts-ignore
         result: event.result
       });
     });
@@ -213,7 +234,7 @@ export default class SmartColumn extends Column {
     return field;
   }
 
-  _updateCellFromValidEditor(row, field) {
+  protected override _updateCellFromValidEditor(row: TableRow, field: SmartField) {
     // The following code is only necessary to prevent flickering because the text is updated async.
     // Instead of only calling setCellValue which itself would update the display text, we set the text manually before calling setCellValue.
     // This works because in most of the cases the text computed by the column will be the same as the one computed by the editor field.
@@ -245,7 +266,7 @@ export default class SmartColumn extends Column {
   /**
    * Since we don't know the type of the key from the lookup-row we must deal with numeric and string types here.
    */
-  _hasCellValue(cell) {
+  protected override _hasCellValue(cell: Cell): boolean {
     let value = cell.value;
     if (objects.isNumber(value)) {
       return !objects.isNullOrUndefined(value); // Zero (0) is valid too
@@ -253,8 +274,12 @@ export default class SmartColumn extends Column {
     return !!value;
   }
 
-  _setCellValue(row, value, cell) {
+  protected override _setCellValue(row: TableRow, value: any, cell: Cell) {
     super._setCellValue(row, value, cell);
     cell.setSortCode(this._calculateCellSortCode(cell));
+  }
+
+  override trigger<K extends string & keyof EventMapOf<SmartColumn>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<SmartColumn>[K]>): EventMapOf<SmartColumn>[K] {
+    return super.trigger(type, eventOrModel);
   }
 }

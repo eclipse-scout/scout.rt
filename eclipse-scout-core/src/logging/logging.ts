@@ -1,43 +1,80 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NullLogger, scout, URL} from '../index';
+import {NullLogger, scout, strings, URL} from '../index';
 import $ from 'jquery';
-import strings from '../util/strings';
+import {ObjectType} from '../ObjectFactory';
 
-const Level = {
-  TRACE: 'trace',
-  DEBUG: 'debug',
-  INFO: 'info',
-  WARN: 'warn',
-  ERROR: 'error',
-  FATAL: 'fatal'
-};
+declare global {
+  let log4javascript: any;
+}
 
-const DEFAULT_LEVEL = Level.TRACE;
+export interface Logger {
+  trace(...logArgs: any[]): void;
+
+  debug(...logArgs: any[]): void;
+
+  info(...logArgs: any[]): void;
+
+  warn(...logArgs: any[]): void;
+
+  error(...logArgs: any[]): void;
+
+  fatal(...logArgs: any[]): void;
+
+  isEnabledFor(): boolean;
+
+  isTraceEnabled(): boolean;
+
+  isDebugEnabled(): boolean;
+
+  isInfoEnabled(): boolean;
+
+  isWarnEnabled(): boolean;
+
+  isErrorEnabled(): boolean;
+
+  isFatalEnabled(): boolean;
+
+  addAppender?(appender: LogAppender);
+
+  removeAppender?(appender: LogAppender);
+}
+
+export enum LogLevel {
+  TRACE = 'trace',
+  DEBUG = 'debug',
+  INFO = 'info',
+  WARN = 'warn',
+  ERROR = 'error',
+  FATAL = 'fatal'
+}
+
+export interface LoggingOptions {
+  enabled?: boolean;
+  showPopup?: boolean;
+  resourceUrl?: string;
+}
+
+const DEFAULT_LEVEL = LogLevel.TRACE;
 let initialized = false;
-let _appendersToAdd = [];
+let _appendersToAdd: { factoryName: { new(model?: object) } | string; options?: object }[] = [];
 let showStackTraces = true;
 
 /***
  * Loads log4javascript.min.js if logging is enabled.
- * @param [options] options
- * @param {boolean} options.enabled
- * @param {boolean} options.showPopup
- * @param options.resourceUrl
- * @returns {Promise}
  */
-export function bootstrap(options) {
+export function bootstrap(options?: LoggingOptions): JQuery.Promise<JQuery> {
   let location = new URL(),
     logging = location.getParameter('logging'),
-    logLevel = location.getParameter('logLevel');
+    logLevel = location.getParameter('logLevel') as string;
 
   options = scout.nvl(options, {});
 
@@ -49,7 +86,7 @@ export function bootstrap(options) {
   if (!enabled) {
     return $.resolvedPromise();
   }
-  if (window.log4javascript) {
+  if (log4javascript) {
     initLog4Javascript(logLevel, showPopup);
     return $.resolvedPromise();
   }
@@ -59,7 +96,7 @@ export function bootstrap(options) {
     .done(initLog4Javascript.bind(this, logLevel, showPopup));
 }
 
-export function initLog4Javascript(logLevel, showPopup) {
+export function initLog4Javascript(logLevel?: string, showPopup?: boolean) {
   logLevel = scout.nvl(logLevel, DEFAULT_LEVEL);
   log4javascript.setShowStackTraces(showStackTraces);
   let defaultLogger = log4javascript.getDefaultLogger();
@@ -82,32 +119,32 @@ export function initLog4Javascript(logLevel, showPopup) {
   // Add appenders later
   _appendersToAdd.forEach(obj => {
     addAppender(obj.factoryName, obj.options);
-  }, this);
+  });
   _appendersToAdd = [];
 }
 
-export function parseLevel(level) {
+export function parseLevel(level: string): LogLevel {
   if (!level) {
     return;
   }
   level = level.toLowerCase();
   switch (level) {
-    case Level.TRACE:
+    case LogLevel.TRACE:
       return log4javascript.Level.TRACE;
-    case Level.DEBUG:
+    case LogLevel.DEBUG:
       return log4javascript.Level.DEBUG;
-    case Level.INFO:
+    case LogLevel.INFO:
       return log4javascript.Level.INFO;
-    case Level.WARN:
+    case LogLevel.WARN:
       return log4javascript.Level.WARN;
-    case Level.ERROR:
+    case LogLevel.ERROR:
       return log4javascript.Level.ERROR;
-    case Level.FATAL:
+    case LogLevel.FATAL:
       return log4javascript.Level.FATAL;
   }
 }
 
-export function addAppender(factoryName, options) {
+export function addAppender(factoryName: ObjectType<any>, options?: object) {
   if (!initialized) {
     _appendersToAdd.push({
       factoryName: factoryName,
@@ -120,9 +157,29 @@ export function addAppender(factoryName, options) {
   $.log.addAppender(factory.create());
 }
 
+export interface LogAppender {
+  append(loggingEvent: LoggingEvent);
+}
+
+export interface LoggingEvent {
+  logger: Logger;
+  timeStamp: Date;
+  timeStampInMilliseconds: number;
+  timeStampInSeconds: number;
+  milliseconds: number;
+  level: LogLevel;
+  messages: string[];
+  exception: any[];
+
+  getThrowableStrRep(): string;
+
+  getCombinedMessages(): string;
+
+  toString(): string;
+}
+
 export default {
   DEFAULT_LEVEL,
-  Level,
   addAppender,
   bootstrap,
   initLog4Javascript,

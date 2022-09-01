@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, Button, DialogLayout, DisabledStyle, DisplayParent, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormField, FormGrid, FormLayout, FormLifecycle, FormModel, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, Point, PopupWindow, Rectangle, scout, Status, StatusModel, strings, tooltips, TreeVisitResult, webstorage, Widget, WrappedFormField} from '../index';
+import {
+  AbortKeyStroke, Button, DialogLayout, DisabledStyle, DisplayParent, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormField, FormGrid, FormLayout, FormLifecycle, FormModel,
+  GlassPaneRenderer, GroupBox, HtmlComponent, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, Point, PopupWindow, Rectangle, scout, Status, StatusModel, strings, tooltips, TreeVisitResult, webstorage, Widget, WrappedFormField
+} from '../index';
 import $ from 'jquery';
 import {FormRevealInvalidFieldEvent} from './FormEventMap';
 import {EventMapOf, EventModel} from '../events/EventEmitter';

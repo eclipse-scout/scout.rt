@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, strings} from '../index';
+import {Logger, LogLevel, objects, strings} from '../index';
 
 /**
  * A NullLogger instance is installed when Log4Javascript is not active (the popup
@@ -16,10 +16,7 @@ import {objects, strings} from '../index';
  * because otherwise some errors are hard to track. This is true especially for errors
  * that occur in a Promise. A developer should at least log these errors.
  */
-export default class NullLogger {
-
-  constructor() {
-  }
+export default class NullLogger implements Logger {
 
   trace() {
     // NOP - don't log trace, we don't want to spam the browser console
@@ -29,51 +26,51 @@ export default class NullLogger {
     // NOP - don't log debug, we don't want to spam the browser console
   }
 
-  info(...logArgs) {
-    this._log('info', logArgs);
+  info(...logArgs: any[]) {
+    this._log(LogLevel.INFO, logArgs);
   }
 
-  warn(...logArgs) {
-    this._log('warn', logArgs);
+  warn(...logArgs: any[]) {
+    this._log(LogLevel.WARN, logArgs);
   }
 
-  error(...logArgs) {
-    this._log('error', logArgs);
+  error(...logArgs: any[]) {
+    this._log(LogLevel.ERROR, logArgs);
   }
 
-  fatal(...logArgs) {
-    this._log('fatal', logArgs);
+  fatal(...logArgs: any[]) {
+    this._log(LogLevel.FATAL, logArgs);
   }
 
-  isEnabledFor() {
+  isEnabledFor(): boolean {
     return false;
   }
 
-  isTraceEnabled() {
+  isTraceEnabled(): boolean {
     return false;
   }
 
-  isDebugEnabled() {
+  isDebugEnabled(): boolean {
     return false;
   }
 
-  isInfoEnabled() {
+  isInfoEnabled(): boolean {
     return false;
   }
 
-  isWarnEnabled() {
+  isWarnEnabled(): boolean {
     return false;
   }
 
-  isErrorEnabled() {
+  isErrorEnabled(): boolean {
     return false;
   }
 
-  isFatalEnabled() {
+  isFatalEnabled(): boolean {
     return false;
   }
 
-  _log(level, logArgs) {
+  protected _log(level: LogLevel, logArgs: any[]) {
     // check if console is available
     let myConsole = objects.optProperty(window, 'console');
     if (!myConsole) {
@@ -82,7 +79,7 @@ export default class NullLogger {
 
     // map level to log function
     let funcName;
-    if ('fatal' === level) {
+    if (LogLevel.FATAL === level) {
       funcName = 'error';
     } else {
       funcName = level;
@@ -107,7 +104,7 @@ export default class NullLogger {
     }
   }
 
-  _formatTime() {
+  protected _formatTime(): string {
     let date = new Date();
     return strings.padZeroLeft(date.getHours(), 2) + ':' +
       strings.padZeroLeft(date.getMinutes(), 2) + ':' +

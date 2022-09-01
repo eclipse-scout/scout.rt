@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Mode, ModeModel, WidgetModel} from '../index';
-import {RefWidgetModel} from '../widget/WidgetModel';
+import {RefModel} from '../types';
 
 export default interface ModeSelectorModel<T> extends WidgetModel {
   /**

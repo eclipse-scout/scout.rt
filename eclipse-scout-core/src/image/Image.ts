@@ -1,17 +1,21 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, HtmlComponent, ImageLayout, Widget} from '../index';
+import {Device, Event, HtmlComponent, ImageLayout, Widget} from '../index';
 import ImageModel from './ImageModel';
+import ImageEventMap from './ImageEventMap';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export default class Image extends Widget implements ImageModel {
+  declare model: ImageModel;
+  declare eventMap: ImageEventMap;
   autoFit: boolean;
   imageUrl: string;
   prepend: boolean;
@@ -110,5 +114,9 @@ export default class Image extends Widget implements ImageModel {
     this.$container.addClass('empty broken');
     this.invalidateLayoutTree();
     this.trigger('error');
+  }
+
+  override trigger<K extends string & keyof EventMapOf<Image>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Image>[K]>): EventMapOf<Image>[K] {
+    return super.trigger(type, eventOrModel);
   }
 }

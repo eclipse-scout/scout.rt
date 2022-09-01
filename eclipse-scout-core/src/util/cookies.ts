@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {scout} from '../index';
 
-export function get(name, doc) {
+export function get(name: string, doc: Document): string {
   doc = doc || document;
   let prefix = name + '=';
   let cookies = doc.cookie.split(';');
@@ -28,7 +28,7 @@ export function get(name, doc) {
  *
  * @param maxAge If specified the cookie will be persistent, otherwise it will be a session cookie.
  */
-export function set(name, value, maxAge, path) {
+export function set(name: string, value: string, maxAge: number, path: string) {
   value = scout.nvl(value, '');
   maxAge = scout.nvl(maxAge, -1);
 

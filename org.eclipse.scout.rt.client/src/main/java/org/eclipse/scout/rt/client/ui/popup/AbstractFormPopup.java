@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -39,28 +39,28 @@ public abstract class AbstractFormPopup<T extends IForm> extends AbstractWidgetP
    * @return the newly created form.
    */
   @Override
-  protected T createWidget() {
+  protected T createContent() {
     return createForm();
   }
 
   @Override
-  public void setWidget(T widget) {
-    super.setWidget(widget);
-    if (widget != null) {
-      decorateForm(widget);
+  public void setContent(T content) {
+    super.setContent(content);
+    if (content != null) {
+      decorateForm(content);
     }
   }
 
   /**
-   * Creates a new instance of the form specified by {@link #getConfiguredWidget()}. Can be overridden to create the new
+   * Creates a new instance of the form specified by {@link #getConfiguredContent()}. Can be overridden to create the new
    * instance manually.
    *
    * @return a new form instance.
    */
   protected T createForm() {
-    Class<T> configuredWidget = getConfiguredWidget();
-    if (configuredWidget != null) {
-      return ConfigurationUtility.newInnerInstance(this, configuredWidget);
+    Class<T> configuredContent = getConfiguredContent();
+    if (configuredContent != null) {
+      return ConfigurationUtility.newInnerInstance(this, configuredContent);
     }
     return null;
   }
@@ -72,7 +72,7 @@ public abstract class AbstractFormPopup<T extends IForm> extends AbstractWidgetP
   }
 
   public void ensureFormStarted() {
-    if (getWidget() == null || !getWidget().isFormStartable()) {
+    if (getContent() == null || !getContent().isFormStartable()) {
       return;
     }
     startForm();
@@ -81,7 +81,7 @@ public abstract class AbstractFormPopup<T extends IForm> extends AbstractWidgetP
         close();
       }
     };
-    getWidget().addFormListener(listener);
+    getContent().addFormListener(listener);
   }
 
   /**
@@ -91,7 +91,7 @@ public abstract class AbstractFormPopup<T extends IForm> extends AbstractWidgetP
    * a custom start method.
    */
   protected void startForm() {
-    getWidget().start();
+    getContent().start();
   }
 
   protected void decorateForm(IForm form) {
@@ -101,19 +101,19 @@ public abstract class AbstractFormPopup<T extends IForm> extends AbstractWidgetP
 
   @Override
   protected void disposeChildren(List<? extends IWidget> widgetsToDispose) {
-    widgetsToDispose.remove(getWidget()); // form is closed in disposeInternal
+    widgetsToDispose.remove(getContent()); // form is closed in disposeInternal
     super.disposeChildren(widgetsToDispose);
   }
 
   @Override
   protected void initChildren(List<? extends IWidget> widgets) {
-    widgets.remove(getWidget()); // is initialized on first use
+    widgets.remove(getContent()); // is initialized on first use
     super.initChildren(widgets);
   }
 
   @Override
   protected void disposeInternal() {
-    IForm form = getWidget();
+    IForm form = getContent();
     if (form != null && !form.isFormClosed()) {
       form.doClose();
     }

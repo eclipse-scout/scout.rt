@@ -8,9 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, Device} from '../index';
+import {App, arrays, Device, HtmlComponent} from '../index';
 
 export default class LayoutValidator {
+  protected _invalidComponents: HtmlComponent[];
+  protected _validateTimeoutId: number | boolean;
+  protected _postValidateFunctions: (() => void)[];
+  protected _suppressValidate: boolean;
 
   constructor() {
     this._invalidComponents = [];
@@ -19,7 +23,7 @@ export default class LayoutValidator {
     this._suppressValidate = false;
   }
 
-  invalidateTree(htmlComp) {
+  invalidateTree(htmlComp: HtmlComponent) {
     let validateRoot,
       htmlParent = htmlComp,
       htmlSource = htmlComp;
@@ -42,7 +46,7 @@ export default class LayoutValidator {
     this.invalidate(validateRoot);
   }
 
-  invalidate(htmlComp) {
+  invalidate(htmlComp: HtmlComponent) {
     let position = 0;
     // Don't insert if already inserted...
     // Info: when component is already in list but no one triggers validation,
@@ -67,7 +71,7 @@ export default class LayoutValidator {
     this._scheduleValidation();
   }
 
-  _scheduleValidation() {
+  protected _scheduleValidation() {
     if (this._validateTimeoutId !== null) {
       // Task already scheduled
       return;
@@ -91,25 +95,25 @@ export default class LayoutValidator {
   }
 
   /**
-   * Layouts all invalid components (as long as they haven't been removed).
+   * Layouts all invalid components (unless they have been removed).
    */
   validate() {
     if (!Device.get().supportsMicrotask()) {
-      clearTimeout(this._validateTimeoutId);
+      clearTimeout(this._validateTimeoutId as number);
     }
     this._validateTimeoutId = null;
     if (this._suppressValidate) {
       return;
     }
-    this._invalidComponents.slice().forEach(function(comp) {
+    this._invalidComponents.slice().forEach(comp => {
       if (comp.validateLayout()) {
         arrays.remove(this._invalidComponents, comp);
       }
-    }, this);
-    this._postValidateFunctions.slice().forEach(function(func) {
+    });
+    this._postValidateFunctions.slice().forEach(func => {
       func();
       arrays.remove(this._postValidateFunctions, func);
-    }, this);
+    });
   }
 
   /**
@@ -129,18 +133,18 @@ export default class LayoutValidator {
    * Removes those components from this._invalidComponents which have the given container as ancestor.
    * The idea is to remove all components whose ancestor is about to be removed from the DOM.
    */
-  cleanupInvalidComponents($parentContainer) {
-    this._invalidComponents.slice().forEach(function(comp) {
+  cleanupInvalidComponents($parentContainer: JQuery) {
+    this._invalidComponents.slice().forEach(comp => {
       if (comp.$comp.closest($parentContainer).length > 0) {
         arrays.remove(this._invalidComponents, comp);
       }
-    }, this);
+    });
   }
 
   /**
-   * Runs the given function at the end of validate().
+   * Runs the given function at the end of {@link validate}.
    */
-  schedulePostValidateFunction(func) {
+  schedulePostValidateFunction(func: () => void) {
     if (func) {
       this._postValidateFunctions.push(func);
     }

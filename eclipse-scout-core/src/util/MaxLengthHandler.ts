@@ -1,24 +1,34 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DesktopNotification, objects, scout, Status} from '../index';
+import {arrays, DesktopNotification, objects, scout, Status, Widget} from '../index';
 import $ from 'jquery';
 import {assertValue} from '../scout';
 
-export default class MaxLengthHandler {
-  onInputFieldPaste: any;
-  target: any;
-  $textInputField: JQuery;
+export type MaxLengthHandlerTarget = Widget & {
+  maxLength: number;
+  _readDisplayText: () => string;
+  parseAndSetValue: (value: string) => void;
+};
 
-  constructor(options) {
-    options = options || {};
+export interface MaxLengthHandlerOptions {
+  target: MaxLengthHandlerTarget;
+}
+
+export default class MaxLengthHandler {
+  onInputFieldPaste: (event: JQuery.TriggeredEvent<HTMLInputElement, undefined, HTMLInputElement, HTMLInputElement>) => void;
+  target: MaxLengthHandlerTarget;
+  $textInputField: JQuery<HTMLInputElement>;
+
+  constructor(options: MaxLengthHandlerOptions) {
+    options = options || {target: null};
     assertValue(options.target, 'target is mandatory');
 
     this.$textInputField = null;
@@ -27,7 +37,7 @@ export default class MaxLengthHandler {
     $.extend(this, options);
   }
 
-  install($textInputField: JQuery) {
+  install($textInputField: JQuery<HTMLInputElement>) {
     this.uninstall();
     if (!$textInputField || (!$textInputField.is('input:text') && !$textInputField.is('textarea'))) {
       return;
@@ -51,7 +61,7 @@ export default class MaxLengthHandler {
     this.$textInputField.attr('maxlength', this.target.maxLength);
 
     // Make sure current text does not exceed max length
-    let text = this.$textInputField.val();
+    let text = this.$textInputField.val() as string;
     if (text.length > this.target.maxLength) {
       this.$textInputField.val(text.slice(0, this.target.maxLength));
     }
@@ -60,12 +70,13 @@ export default class MaxLengthHandler {
     }
   }
 
-  protected _onInputFieldPaste(event) {
+  protected _onInputFieldPaste(event: JQuery.TriggeredEvent<HTMLInputElement, undefined, HTMLInputElement, HTMLInputElement>) {
     if (!this.$textInputField || objects.isNullOrUndefined(this.target.maxLength)) {
       return;
     }
     // must read out the text and selection size now because when the callback is executed, the clipboard content has already been applied to the input field
-    let textSize = this.$textInputField.val().length - this._getSelectionSize();
+    let text = this.$textInputField.val() as string;
+    let textSize = text.length - this._getSelectionSize();
 
     this._getClipboardData(event, pastedText => {
       if (!pastedText) {
@@ -77,7 +88,7 @@ export default class MaxLengthHandler {
     });
   }
 
-  protected _getSelectionSize() {
+  protected _getSelectionSize(): number {
     let start = scout.nvl(this.$textInputField[0].selectionStart, null);
     let end = scout.nvl(this.$textInputField[0].selectionEnd, null);
     if (start === null || end === null) {
@@ -90,12 +101,13 @@ export default class MaxLengthHandler {
    * Get clipboard data, different strategies for browsers.
    * Must use a callback because this is required by Chrome's clipboard API.
    */
-  protected _getClipboardData(event, doneHandler) {
-    let data = event.originalEvent.clipboardData || this.target.$container.window(true).clipboardData;
+  protected _getClipboardData(event: JQuery.TriggeredEvent<HTMLInputElement, undefined, HTMLInputElement, HTMLInputElement>, doneHandler: (pastedText: string) => void) {
+    // @ts-ignore
+    let data: DataTransfer = event.originalEvent.clipboardData || this.target.$container.window(true).clipboardData;
     if (data) {
       // Chrome, Firefox
       if (data.items && data.items.length) {
-        let item = arrays.find(data.items, item => {
+        let item = arrays.find(data.items, (item: DataTransferItem) => {
           return item.type === 'text/plain';
         });
         if (item) {
@@ -113,7 +125,7 @@ export default class MaxLengthHandler {
     // Can't access clipboard -> don't call done handler
   }
 
-  protected _showNotification(textKey) {
+  protected _showNotification(textKey: string) {
     scout.create(DesktopNotification, {
       parent: this.target,
       severity: Status.Severity.WARNING,

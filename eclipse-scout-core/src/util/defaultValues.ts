@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -21,7 +21,11 @@ let _defaults = {};
  */
 let _objectTypeHierarchyFlat = {};
 
-export function bootstrap(options) {
+export interface DefaultValuesBootstrapOptions {
+  url?: string;
+}
+
+export function bootstrap(options?: DefaultValuesBootstrapOptions): JQuery.Promise<any> {
   options = options || {};
   let defaultOptions = {
     url: 'defaultValues'
@@ -32,7 +36,7 @@ export function bootstrap(options) {
     .done(init.bind(this));
 }
 
-export function init(data) {
+export function init(data: any) {
   // Store defaults
   _objectTypeHierarchyFlat = {};
   _defaults = data.defaults || {};
@@ -46,10 +50,10 @@ export function init(data) {
     if (!_objectTypeHierarchyFlat[objectType]) {
       _objectTypeHierarchyFlat[objectType] = [objectType];
     }
-  }, this);
+  });
 }
 
-export function _generateObjectTypeHierarchyRec(json, currentParentObjectTypes, targetMap) {
+export function _generateObjectTypeHierarchyRec(json: any, currentParentObjectTypes: any, targetMap: any) {
   if (!json) {
     return;
   }
@@ -80,7 +84,7 @@ export function _generateObjectTypeHierarchyRec(json, currentParentObjectTypes, 
  * if the object has a property of the same name. If the object is an array,
  * the defaults are applied to each of the elements.
  */
-export function applyTo(object, objectType) {
+export function applyTo(object: Record<string, any> | Record<string, any>[], objectType?: string) {
   if (Array.isArray(object)) {
     for (let i = 0; i < object.length; i++) {
       applyTo(object[i], objectType);
@@ -89,14 +93,15 @@ export function applyTo(object, objectType) {
     objectType = objectType || object.objectType;
     if (objectType) {
       if (typeof objectType !== 'string') {
-        throw new Error('objectType has to be a string but is a ' + typeof objectType + ' ObjectType: ' + objectType.toString().substring(0, 80));
+        let objectTypeShort = (objectType + '').substring(0, 80);
+        throw new Error('objectType has to be a string but is a ' + typeof objectType + ' ObjectType: ' + objectTypeShort);
       }
       _applyToInternal(object, objectType);
     }
   }
 }
 
-export function _applyToInternal(object, objectType) {
+export function _applyToInternal(object: Record<string, any>, objectType: string) {
   let objectTypeHierarchy = _objectTypeHierarchyFlat[objectType];
   if (!objectTypeHierarchy) {
     // Remove model variant and try again
@@ -115,7 +120,7 @@ export function _applyToInternal(object, objectType) {
   }
 }
 
-export function _extendWithDefaults(object, defaults) {
+export function _extendWithDefaults(object: Record<string, any>, defaults: Record<string, any>) {
   if (object === undefined || defaults === undefined) {
     return;
   }

@@ -1,16 +1,33 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, FormField, GroupBox, PlaceholderField, scout, SmartField, TileTableHeaderGroupByLookupCall, TileTableHeaderSortByLookupCall, ValueField} from '../index';
+import {
+  arrays, Column, EventHandler, FormField, GroupBox, LookupCall, LookupRow, PlaceholderField, PropertyChangeEvent, scout, SmartField, Table, TileTableHeaderBoxModel, TileTableHeaderGroupByLookupCall, TileTableHeaderSortByLookupCall,
+  ValueField
+} from '../index';
+import {TileTableHeaderSortKey} from './TileTableHeaderSortByLookupCall';
+import StaticLookupCall from '../lookup/StaticLookupCall';
+import {TableGroupEvent, TableSortEvent} from './TableEventMap';
 
-export default class TileTableHeaderBox extends GroupBox {
+export default class TileTableHeaderBox extends GroupBox implements TileTableHeaderBoxModel {
+  declare model: TileTableHeaderBoxModel;
+  declare parent: Table;
+
+  table: Table;
+  groupByField: SmartField;
+  sortByField: SmartField;
+  isGrouping: boolean;
+  isSorting: boolean;
+  protected _tableGroupHandler: EventHandler<TableGroupEvent>;
+  protected _tableSortHandler: EventHandler<TableSortEvent>;
+  protected _destroyHandler: () => void;
 
   constructor() {
     super();
@@ -31,18 +48,18 @@ export default class TileTableHeaderBox extends GroupBox {
     this._destroyHandler = this._uninstallListeners.bind(this);
   }
 
-  _installListeners() {
+  protected _installListeners() {
     this.table.on('group', this._tableGroupHandler);
     this.table.on('sort', this._tableSortHandler);
     this.table.one('destroy', this._destroyHandler);
   }
 
-  _uninstallListeners() {
+  protected _uninstallListeners() {
     this.table.off('group', this._tableGroupHandler);
     this.table.off('sort', this._tableSortHandler);
   }
 
-  _init(model) {
+  protected override _init(model: TileTableHeaderBoxModel) {
     super._init(model);
 
     this.table = this.parent;
@@ -92,79 +109,71 @@ export default class TileTableHeaderBox extends GroupBox {
     this._syncSortingGroupingFields();
   }
 
-  _findSortByLookupRowForKey(key) {
-    return this.sortByField.lookupCall.data.map(lookupRow => {
-      return lookupRow[0];
-    }).find(rowKey => {
-      return rowKey.column === key.column && rowKey.asc === key.asc;
-    }, this);
+  protected _findSortByLookupRowForKey(key: TileTableHeaderSortKey): TileTableHeaderSortKey {
+    let lookupCall = this.sortByField.lookupCall as StaticLookupCall<TileTableHeaderSortKey>;
+    return lookupCall.data
+      .map((lookupRow: LookupRow<TileTableHeaderSortKey>) => lookupRow[0] as TileTableHeaderSortKey)
+      .find(rowKey => rowKey.column === key.column && rowKey.asc === key.asc);
   }
 
-  _createGroupByLookupCall() {
+  protected _createGroupByLookupCall(): LookupCall<Column> {
     return scout.create(TileTableHeaderGroupByLookupCall, {
       session: this.session,
       table: this.table
     });
   }
 
-  _createSortByLookupCall() {
+  protected _createSortByLookupCall(): StaticLookupCall<TileTableHeaderSortKey> {
     return scout.create(TileTableHeaderSortByLookupCall, {
       session: this.session,
       table: this.table
     });
   }
 
-  _onGroupingChange(event) {
+  protected _onGroupingChange(event: PropertyChangeEvent<any, SmartField>) {
     if (!this.table.tileMode) {
       return;
     }
     if (event.propertyName === 'value') {
       this.isGrouping = true;
-      let column;
       if (event.newValue !== null) {
-        column = event.newValue;
-        let direction = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
+        let column = event.newValue as Column;
+        let direction: 'asc' | 'desc' = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
         this.table.groupColumn(column, false, direction, false);
       } else {
-        column = event.oldValue;
+        let column = event.oldValue as Column;
         this.table.groupColumn(column, false, null, true);
       }
       this.isGrouping = false;
     }
   }
 
-  _onSortingChange(event) {
+  protected _onSortingChange(event: PropertyChangeEvent<any, SmartField>) {
     if (!this.table.tileMode) {
       return;
     }
     if (event.propertyName === 'value') {
       this.isSorting = true;
-      let column, sortInfo;
       if (event.newValue !== null) {
-        sortInfo = event.newValue.column;
-        column = event.newValue.column;
-        this.table.sort(event.newValue.column, event.newValue.asc ? 'asc' : 'desc', false, false);
+        let newValue = event.newValue as TileTableHeaderSortKey;
+        this.table.sort(newValue.column, newValue.asc ? 'asc' : 'desc', false, false);
       } else {
-        this.table.sort(event.oldValue, null, false, true);
+        let oldValue = event.oldValue as TileTableHeaderSortKey;
+        this.table.sort(oldValue.column, null, false, true);
       }
       this.isSorting = false;
     }
   }
 
-  _syncSortingGroupingFields() {
-    let primaryGroupingColumn = arrays.find(this.table.visibleColumns(), column => {
-      return column.grouped && column.sortIndex === 0;
-    });
+  protected _syncSortingGroupingFields() {
+    let primaryGroupingColumn = arrays.find(this.table.visibleColumns(), column => column.grouped && column.sortIndex === 0);
     if (primaryGroupingColumn) {
       this.groupByField.setValue(primaryGroupingColumn);
     } else {
       this.groupByField.setValue(null);
     }
 
-    let primarySortingColumn = arrays.find(this.table.visibleColumns(), column => {
-      return column.sortActive && column.sortIndex === 0;
-    });
-
+    let primarySortingColumn = arrays.find(this.table.visibleColumns(), column => column.sortActive && column.sortIndex === 0);
     if (primarySortingColumn) {
       this.sortByField.setValue(this._findSortByLookupRowForKey({
         column: primarySortingColumn,
@@ -175,13 +184,13 @@ export default class TileTableHeaderBox extends GroupBox {
     }
   }
 
-  _onTableGroup(event) {
+  protected _onTableGroup(event: TableGroupEvent) {
     if (!this.isGrouping) {
       this._syncSortingGroupingFields();
     }
   }
 
-  _onTableSort(event) {
+  protected _onTableSort(event: TableSortEvent) {
     if (!this.isSorting) {
       this._syncSortingGroupingFields();
     }

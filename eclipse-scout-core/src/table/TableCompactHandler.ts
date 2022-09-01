@@ -1,18 +1,26 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BooleanColumn, CompactBean, CompactLine, objects} from '../index';
+import {BooleanColumn, Cell, Column, CompactBean, CompactLine, Event, EventHandler, objects, Table, TableCompactHandlerModel, TableRow} from '../index';
+import {TableRowsInsertedEvent, TableRowsUpdatedEvent} from './TableEventMap';
 
-export default class TableCompactHandler {
+export default class TableCompactHandler implements TableCompactHandlerModel {
+  declare model: TableCompactHandlerModel;
 
-  constructor(table) {
+  table: Table;
+  useOnlyVisibleColumns: boolean;
+  maxContentLines: number;
+  protected _oldStates: Record<string, any>;
+  protected _updateHandler: EventHandler<TableRowsInsertedEvent | TableRowsUpdatedEvent | Event<Table>>;
+
+  constructor() {
     this.table = null;
     this.useOnlyVisibleColumns = true;
     this.maxContentLines = 3;
@@ -20,19 +28,19 @@ export default class TableCompactHandler {
     this._updateHandler = null;
   }
 
-  init(model) {
+  init(model: TableCompactHandlerModel) {
     $.extend(this, model);
   }
 
-  setUseOnlyVisibleColumns(useOnlyVisibleColumns) {
+  setUseOnlyVisibleColumns(useOnlyVisibleColumns: boolean) {
     this.useOnlyVisibleColumns = useOnlyVisibleColumns;
   }
 
-  setMaxContentLines(maxContentLines) {
+  setMaxContentLines(maxContentLines: number) {
     this.maxContentLines = maxContentLines;
   }
 
-  handle(compact) {
+  handle(compact: boolean) {
     if (compact) {
       this._compactColumns(true);
       this._attachTableHandler();
@@ -46,7 +54,7 @@ export default class TableCompactHandler {
     }
   }
 
-  _adjustTable(compact) {
+  protected _adjustTable(compact: boolean) {
     if (compact) {
       this._cacheAndSetProperty('headerVisible', () => this.table.headerVisible, () => this.table.setHeaderVisible(false));
       this._cacheAndSetProperty('autoResizeColumns', () => this.table.autoResizeColumns, () => this.table.setAutoResizeColumns(true));
@@ -56,40 +64,41 @@ export default class TableCompactHandler {
     }
   }
 
-  _cacheAndSetProperty(propertyName, getter, setter) {
+  protected _cacheAndSetProperty(propertyName: string, getter: () => any, setter: () => void) {
     if (objects.isNullOrUndefined(this._oldStates[propertyName])) {
       this._oldStates[propertyName] = getter();
     }
     setter();
   }
 
-  _resetProperty(propertyName, setter) {
-    if (!objects.isNullOrUndefined(this._oldStates[propertyName])) {
-      setter(this._oldStates[propertyName]);
+  protected _resetProperty(propertyName: string, setter: (oldValue: any) => void) {
+    let oldState = this._oldStates[propertyName];
+    if (!objects.isNullOrUndefined(oldState)) {
+      setter(oldState);
       delete this._oldStates[propertyName];
     }
   }
 
-  _compactColumns(compact) {
+  protected _compactColumns(compact: boolean) {
     this.table.displayableColumns(false).forEach(column => column.setCompacted(compact, false));
     this.table.onColumnVisibilityChanged();
   }
 
-  _attachTableHandler() {
+  protected _attachTableHandler() {
     if (this._updateHandler == null) {
       this._updateHandler = this._onTableEvent.bind(this);
       this.table.on('rowsInserted rowsUpdated columnStructureChanged', this._updateHandler);
     }
   }
 
-  _detachTableHandler() {
+  protected _detachTableHandler() {
     if (this._updateHandler != null) {
       this.table.off('rowsInserted rowsUpdated columnStructureChanged', this._updateHandler);
       this._updateHandler = null;
     }
   }
 
-  updateValues(rows) {
+  updateValues(rows: TableRow[]) {
     if (rows.length === 0) {
       return;
     }
@@ -97,48 +106,48 @@ export default class TableCompactHandler {
     rows.forEach(row => this._updateValue(columns, row));
   }
 
-  _updateValue(columns, row) {
+  protected _updateValue(columns: Column[], row: TableRow) {
     row.setCompactValue(this.buildValue(columns, row));
   }
 
-  buildValue(columns, row) {
+  buildValue(columns: Column[], row: TableRow): string {
     return this._buildValue(this._createBean(columns, row));
   }
 
-  _createBean(columns, row) {
+  protected _createBean(columns: Column[], row: TableRow): CompactBean {
     let bean = new CompactBean();
     this._processColumns(columns, row, bean);
     this._postProcessBean(bean);
     return bean;
   }
 
-  _processColumns(columns, row, bean) {
+  protected _processColumns(columns: Column[], row: TableRow, bean: CompactBean) {
     columns.forEach((column, i) => this._processColumn(column, i, row, bean));
   }
 
-  _getColumns() {
+  protected _getColumns(): Column[] {
     return this.table.filterColumns(column => this._acceptColumn(column));
   }
 
-  _acceptColumn(column) {
+  protected _acceptColumn(column: Column): boolean {
     return !column.guiOnly && (!this.useOnlyVisibleColumns || (column.visible && column.displayable));
   }
 
-  _processColumn(column, index, row, bean) {
+  protected _processColumn(column: Column, index: number, row: TableRow, bean: CompactBean) {
     this._updateBean(bean, column, index, row);
   }
 
   /**
-   * @param {CompactBean} bean
+   * @param bean
    *          the bean for the current row
-   * @param {Column} column
+   * @param column
    *          the currently processed column
    * @param index
    *          visible column index of the currently processed column
-   * @param {TableRow} row
+   * @param row
    *          the current row
    */
-  _updateBean(bean, column, index, row) {
+  protected _updateBean(bean: CompactBean, column: Column, index: number, row: TableRow) {
     if (this._acceptColumnForTitle(column, index)) {
       bean.setTitleLine(this._createCompactLine(column, index, row));
     } else if (this._acceptColumnForTitleSuffix(column, index)) {
@@ -150,20 +159,20 @@ export default class TableCompactHandler {
     }
   }
 
-  _acceptColumnForTitle(column, index) {
+  protected _acceptColumnForTitle(column: Column, index: number): boolean {
     return index === 0;
   }
 
-  _acceptColumnForSubtitle(column, index) {
+  protected _acceptColumnForSubtitle(column: Column, index: number): boolean {
     return index === 1;
   }
 
-  _acceptColumnForTitleSuffix(column, index) {
+  protected _acceptColumnForTitleSuffix(column: Column, index: number): boolean {
     return false;
   }
 
-  _createCompactLine(column, index, row) {
-    let headerCell;
+  protected _createCompactLine(column: Column, index: number, row: TableRow): CompactLine {
+    let headerCell: Cell;
     if (this._showLabel(column, index, row)) {
       headerCell = column.headerCell();
     }
@@ -173,14 +182,14 @@ export default class TableCompactHandler {
     return line;
   }
 
-  _showLabel(column, index, row) {
+  protected _showLabel(column: Column, index: number, row: TableRow): boolean {
     return !this._acceptColumnForTitle(column, index) && !this._acceptColumnForSubtitle(column, index) && !this._acceptColumnForTitleSuffix(column, index);
   }
 
-  _adaptCompactLine(line, column, headerCell, cell) {
+  protected _adaptCompactLine(line: CompactLine, column: Column, headerCell: Cell, cell: Cell) {
     if (column instanceof BooleanColumn) {
       let text = '';
-      let value = cell.value;
+      let value = cell.value as boolean;
       if (value) {
         text = 'X';
       } else if (value === null) {
@@ -190,10 +199,7 @@ export default class TableCompactHandler {
     }
   }
 
-  /**
-   * @param {CompactBean} bean
-   */
-  _postProcessBean(bean) {
+  protected _postProcessBean(bean: CompactBean) {
     bean.transform({maxContentLines: this.maxContentLines});
 
     // If only title is set move it to content. A title without content does not look good.
@@ -203,8 +209,8 @@ export default class TableCompactHandler {
     }
   }
 
-  _buildValue(bean) {
-    let hasHeader = (bean.title + bean.titleSuffix + bean.subTitle) ? ' has-header' : '';
+  protected _buildValue(bean: CompactBean): string {
+    let hasHeader = (bean.title + bean.titleSuffix + bean.subtitle) ? ' has-header' : '';
     let moreLink = bean.moreContent ? `<div class="compact-cell-more"><span class="more-link link">${this.table.session.text('More')}</span></div>` : '';
 
     return `
@@ -220,8 +226,9 @@ export default class TableCompactHandler {
   ${moreLink}`;
   }
 
-  _onTableEvent(event) {
-    let rows = event.rows;
+  protected _onTableEvent(event: TableRowsInsertedEvent | TableRowsUpdatedEvent | Event<Table>) {
+    // @ts-ignore
+    let rows: TableRow[] = event.rows;
     if (event.type === 'columnStructureChanged') {
       rows = this.table.rows;
     }

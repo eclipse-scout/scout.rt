@@ -1,29 +1,31 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, EventHandler, KeyStroke, keyStrokeModifier, scout} from '../index';
+import {Action, arrays, EventHandler, KeyStroke, keyStrokeModifier, scout, ScoutKeyboardEvent} from '../index';
 import $ from 'jquery';
 import KeyStrokeContextOptions from './KeyStrokeContextOptions';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class KeyStrokeContext implements KeyStrokeContextOptions {
   invokeAcceptInputOnActiveValueField: boolean;
   keyStrokes: KeyStroke[];
-  stopPropagationInterceptors: EventHandler[];
+  stopPropagationInterceptors: ((event: ScoutKeyboardEvent) => void)[];
   $bindTarget: JQuery | (() => JQuery);
   $scopeTarget: JQuery | (() => JQuery);
   /**
    * Arrays with combinations of keys to prevent from bubbling up in the DOM tree.
    */
-  protected _stopPropagationKeys: { [bitMask: number]: number[] };
+  protected _stopPropagationKeys: Record<number, number[]>;
+  protected _handler: ((event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) => boolean) & { $target?: JQuery };
 
-  constructor(options: KeyStrokeContextOptions) {
+  constructor(options?: KeyStrokeContextOptions) {
     this.$bindTarget = null;
     this.$scopeTarget = null;
     this.keyStrokes = [];
@@ -41,7 +43,7 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
    * @param modifierBitMask bitwise OR'ing together modifier constants to match a keystroke event. (KeyStrokeModifier.js)
    * @param keys the keys to match a keystroke event.
    */
-  registerStopPropagationKeys(modifierBitMask: number, keys: [number]) {
+  registerStopPropagationKeys(modifierBitMask: number, keys: number[]) {
     this._stopPropagationKeys[modifierBitMask] = this._stopPropagationKeys[modifierBitMask] || [];
     arrays.pushAll(this._stopPropagationKeys[modifierBitMask], keys);
   }
@@ -52,7 +54,7 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
    * @param modifierBitMask bitwise OR'ing together modifier constants to match a keystroke event. (KeyStrokeModifier.js)
    * @param keys the keys to match a keystroke event.
    */
-  unregisterStopPropagationKeys(modifierBitMask: number, keys: [number]) {
+  unregisterStopPropagationKeys(modifierBitMask: number, keys: number[]) {
     if (!this._stopPropagationKeys[modifierBitMask]) {
       return;
     }
@@ -62,14 +64,14 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
   /**
    * Use this method to register an interceptor to set propagation flags on context level.
    */
-  registerStopPropagationInterceptor(interceptor: EventHandler) {
+  registerStopPropagationInterceptor(interceptor: (event: ScoutKeyboardEvent) => void) {
     this.stopPropagationInterceptors.push(interceptor);
   }
 
   /**
    * Returns true if this event is handled by this context, and if so sets the propagation flags accordingly.
    */
-  accept(event: KeyboardEvent): boolean {
+  accept(event: ScoutKeyboardEvent): boolean {
     // Check whether this event is accepted.
     if (!this._accept(event)) {
       return false;
@@ -84,7 +86,7 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
   /**
    * Sets the propagation flags to the given event.
    */
-  protected _applyPropagationFlags(event) {
+  protected _applyPropagationFlags(event: ScoutKeyboardEvent) {
     let modifierBitMask = keyStrokeModifier.toModifierBitMask(event);
     let keys = this._stopPropagationKeys[modifierBitMask];
 
@@ -93,28 +95,24 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
     }
 
     // Let registered interceptors participate.
-    this.stopPropagationInterceptors.forEach(interceptor => {
-      interceptor(event);
-    }, this);
+    this.stopPropagationInterceptors.forEach(interceptor => interceptor(event));
   }
 
-  protected _accept(event): boolean {
+  protected _accept(event: ScoutKeyboardEvent): boolean {
     return true;
   }
 
-  registerKeyStroke(keyStroke: KeyStroke) {
+  registerKeyStroke(keyStroke: KeyStroke | Action) {
     this.registerKeyStrokes(keyStroke);
   }
 
   /**
    * Registers the given keystroke(s) if not installed yet.
    */
-  registerKeyStrokes(keyStrokes: KeyStroke | KeyStroke[]) {
+  registerKeyStrokes(keyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
     arrays.ensure(keyStrokes)
       .map(this._resolveKeyStroke, this)
-      .filter(ks => {
-        return this.keyStrokes.indexOf(ks) === -1; // must not be registered yet
-      })
+      .filter(ks => this.keyStrokes.indexOf(ks) === -1) // must not be registered yet
       .forEach(keystroke => {
         this.keyStrokes.push(keystroke);
         let ks: KeyStroke & { destroyListener: EventHandler };
@@ -135,14 +133,14 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
   /**
    * Uninstalls the given keystroke. Has no effect if not installed.
    */
-  unregisterKeyStroke(keyStroke: KeyStroke) {
+  unregisterKeyStroke(keyStroke: KeyStroke | Action) {
     this.unregisterKeyStrokes(keyStroke);
   }
 
-  unregisterKeyStrokes(keyStrokes: KeyStroke | KeyStroke[]) {
+  unregisterKeyStrokes(keyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
     arrays.ensure(keyStrokes)
       .map(this._resolveKeyStroke, this)
-      .forEach(function(keystroke) {
+      .forEach(keystroke => {
         let ks: KeyStroke & { destroyListener: EventHandler };
         // FIXME TS what is our pattern for such stuff?
         // @ts-ignore
@@ -151,10 +149,10 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
           ks.field.off('destroy', ks.destroyListener);
           ks.destroyListener = null;
         }
-      }, this);
+      });
   }
 
-  protected _resolveKeyStroke(keyStroke: KeyStroke | Action) {
+  protected _resolveKeyStroke(keyStroke: KeyStroke | Action): KeyStroke {
     if (keyStroke instanceof KeyStroke) {
       return keyStroke;
     }

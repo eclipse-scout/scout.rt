@@ -8,11 +8,51 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, scout, Status, strings, Table, TableFooterLayout, TableTextUserFilter, Tooltip, Widget} from '../index';
+import {
+  Event, EventHandler, fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, PropertyChangeEvent, scout, Status, strings, Table, TableControl, TableFooterLayout, TableFooterModel, TableTextUserFilter, Tooltip, Widget
+} from '../index';
 import $ from 'jquery';
 import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
+import {TableFilterAddedEvent, TableFilterRemovedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent} from './TableEventMap';
 
-export default class TableFooter extends Widget {
+export default class TableFooter extends Widget implements TableFooterModel {
+  declare model: TableFooterModel;
+
+  table: Table;
+  filterText: string;
+
+  animating: boolean;
+  open: boolean;
+  resizing: boolean;
+  selectedControl: TableControl;
+  searchFieldKeyStrokeContext: InputFieldKeyStrokeContext;
+  $controlContent: JQuery<HTMLDivElement>;
+  $controlContainer: JQuery<HTMLDivElement>;
+  $resizer: JQuery<HTMLDivElement>;
+  $clearIcon: JQuery<HTMLSpanElement>;
+
+  protected _compactStyle: boolean;
+  protected _tableRowsChangedHandler: EventHandler<TableRowsInsertedEvent>;
+  protected _tableFilterHandler: EventHandler<Event<Table>>;
+  protected _tableFilterAddedHandler: EventHandler<TableFilterAddedEvent>;
+  protected _tableFilterRemovedHandler: EventHandler<TableFilterRemovedEvent>;
+  protected _tableRowsSelectedHandler: EventHandler<TableRowsSelectedEvent>;
+  protected _tableStatusChangedHandler: EventHandler<Event<Table>>;
+  protected _tablePropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Table>>;
+  protected _focusFilterFieldKeyStroke: FocusFilterFieldKeyStroke;
+  protected _tableInfoTooltip: Tooltip;
+  protected _tableStatusTooltip: Tooltip;
+  protected _autoHideTableStatusTooltipTimeoutId: number;
+  protected _$window: JQuery<Window>;
+  protected _$body: JQuery<Body>;
+  protected _$controls: JQuery<HTMLDivElement>;
+  protected _$infoLoad: JQuery<HTMLDivElement>;
+  protected _$infoFilter: JQuery<HTMLDivElement>;
+  protected _$infoSelection: JQuery<HTMLDivElement>;
+  protected _$infoTableStatus: JQuery<HTMLDivElement>;
+  protected _$infoTableStatusIcon: JQuery<HTMLSpanElement>;
+  protected _$info: JQuery<HTMLDivElement>;
+  protected _$textFilter: JQuery<HTMLInputElement>;
 
   constructor() {
     super();
@@ -31,22 +71,17 @@ export default class TableFooter extends Widget {
     this._tablePropertyChangeHandler = this._onTablePropertyChange.bind(this);
   }
 
-  _init(options) {
+  protected override _init(options: TableFooterModel) {
     super._init(options);
 
     // Keystroke context for the search field.
     this.searchFieldKeyStrokeContext = new InputFieldKeyStrokeContext();
-    this.searchFieldKeyStrokeContext.$bindTarget = function() {
-      return this._$textFilter;
-    }.bind(this);
-    this.searchFieldKeyStrokeContext.$scopeTarget = function() {
-      return this._$textFilter;
-    }.bind(this);
-
+    this.searchFieldKeyStrokeContext.$bindTarget = () => this._$textFilter;
+    this.searchFieldKeyStrokeContext.$scopeTarget = () => this._$textFilter;
     this._focusFilterFieldKeyStroke = null;
   }
 
-  _render() {
+  protected override _render() {
     let filter, $filter;
 
     this.$container = this.$parent.appendDiv('table-footer');
@@ -125,15 +160,15 @@ export default class TableFooter extends Widget {
     this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
   }
 
-  getFocusableElement() {
+  override getFocusableElement(): JQuery {
     return this._$textFilter;
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     this._updateHasFilterText();
   }
 
-  _remove() {
+  protected override _remove() {
     this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
     this._hideTableStatusTooltip();
     this.$resizer = null;
@@ -157,7 +192,7 @@ export default class TableFooter extends Widget {
     super._remove();
   }
 
-  _renderResizerVisible() {
+  protected _renderResizerVisible() {
     if (this.selectedControl.resizerVisible) {
       this._renderResizer();
       this.$controlContainer.addClass('has-resizer');
@@ -168,16 +203,16 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _renderResizer() {
+  protected _renderResizer() {
     if (this.$resizer) {
       return;
     }
     this.$resizer = this.$controlContainer.prependDiv('table-control-resize')
       .on('mousedown', '', resize.bind(this));
 
-    function resize(event) {
+    function resize(event: JQuery.MouseDownEvent) {
       // Remember current height and start position
-      let startHeight = this.$controlContainer.height(),
+      let startHeight: number = this.$controlContainer.height(),
         startX = Math.floor(event.pageY);
       this._$window
         .on('mousemove.tablefooter', resizeMove.bind(this))
@@ -185,7 +220,7 @@ export default class TableFooter extends Widget {
       this._$body.addClass('row-resize');
       this.resizing = true;
 
-      function resizeMove(event) {
+      function resizeMove(event: JQuery.MouseMoveEvent) {
         if (!this.rendered) {
           // footer may be removed in the meantime
           return;
@@ -217,7 +252,7 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _renderControls() {
+  protected _renderControls() {
     let controls = this.table.tableControls;
     if (controls) {
       controls.forEach(control => {
@@ -229,14 +264,14 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _renderInfo() {
+  protected _renderInfo() {
     this._renderInfoLoad();
     this._renderInfoTableStatus();
     this._renderInfoFilter();
     this._renderInfoSelection();
   }
 
-  _renderInfoLoad() {
+  protected _renderInfoLoad() {
     let $info = this._$infoLoad,
       numRows = this.table.rows.length,
       estRows = this.table.estimatedRowCount,
@@ -277,7 +312,7 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _renderInfoFilter() {
+  protected _renderInfoFilter() {
     let $info = this._$infoFilter;
     let numRowsFiltered = this.table.filteredRows().length;
     let filteredBy = this.table.filteredBy().join(', '); // filteredBy() returns an array
@@ -314,7 +349,7 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _renderInfoSelection() {
+  protected _renderInfoSelection() {
     let $info = this._$infoSelection,
       numRows = this.table.filteredRows().length,
       numRowsSelected = this.table.selectedRows.length,
@@ -342,7 +377,7 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _renderInfoTableStatus() {
+  protected _renderInfoTableStatus() {
     let $info = this._$infoTableStatus;
     let tableStatus = this.table.tableStatus;
     $info.removeClass(Status.SEVERITY_CSS_CLASSES);
@@ -355,23 +390,23 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _updateInfoVisibility() {
+  protected _updateInfoVisibility() {
     this._updateInfoFilterVisibility();
     this._updateInfoSelectionVisibility();
     this._updateInfoTableStatusVisibility();
   }
 
-  _updateInfoFilterVisibility() {
+  protected _updateInfoFilterVisibility() {
     let visible = this.table.filteredBy().length > 0;
     this._setInfoVisible(this._$infoFilter, visible);
   }
 
-  _updateInfoSelectionVisibility() {
+  protected _updateInfoSelectionVisibility() {
     let visible = this.table.multiSelect;
     this._setInfoVisible(this._$infoSelection, visible);
   }
 
-  _updateInfoTableStatusVisibility() {
+  protected _updateInfoTableStatusVisibility() {
     let visible = this.table.tableStatus;
     if (visible) {
       // If the uiState of the tableStatus was not set to hidden (either manually by the
@@ -395,7 +430,7 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _setInfoVisible($info, visible, complete) {
+  protected _setInfoVisible($info: JQuery, visible: boolean, complete?: () => void) {
     if ($info.isVisible() === visible && !(visible && $info.hasClass('hiding'))) {
       if (complete) {
         complete();
@@ -438,7 +473,7 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _toggleTableInfoTooltip($info, tooltipType) {
+  protected _toggleTableInfoTooltip($info: JQuery, tooltipType: string) {
     if (this._tableInfoTooltip) {
       this._tableInfoTooltip.destroy();
     } else {
@@ -456,9 +491,12 @@ export default class TableFooter extends Widget {
     }
   }
 
-  // n: row count
-  // m: total count, optional. Meaning is '3 of 10 rows'
-  computeCountInfo(n, m) {
+  /**
+   * Meaning is '3 of 10 rows'
+   * @param n row count
+   * @param m total count, optional.
+   */
+  computeCountInfo(n: number, m?: number): string {
     n = scout.nvl(n, 0);
     if (m) {
       return this.session.text('ui.TableRowCount',
@@ -469,28 +507,26 @@ export default class TableFooter extends Widget {
 
     if (n === 0) {
       if (this._compactStyle) {
-        return this.session.text('ui.TableRowCount', 0);
+        return this.session.text('ui.TableRowCount', this.session.locale.decimalFormat.format(0));
       }
       return this.session.text('ui.TableRowCount0');
-
     } else if (n === 1) {
       return this.session.text('ui.TableRowCount1');
     }
     return this.session.text('ui.TableRowCount', this.session.locale.decimalFormat.format(n));
-
   }
 
   /* open, close and resize of the container */
 
-  _revalidateTableLayout() {
+  protected _revalidateTableLayout() {
     this.table.htmlComp.revalidateLayoutTree();
   }
 
-  openControlContainer(control) {
+  openControlContainer(control: TableControl) {
     if (this.open) {
       // Calling open again may resize the container -> don't return
     }
-    let currentControl = this.$controlContent.data('control');
+    let currentControl = this.$controlContent.data('control') as TableControl;
     if (this.animating && currentControl !== control) {
       // Make sure the existing content is removed if the close animation was aborted and another control selected while the container is still closing
       // (The done callback won't be executed when calling stop(true))
@@ -528,7 +564,7 @@ export default class TableFooter extends Widget {
     });
   }
 
-  closeControlContainer(control, options) {
+  closeControlContainer(control: TableControl, options?: { animate?: boolean }) {
     if (!this.open) {
       return;
     }
@@ -555,11 +591,10 @@ export default class TableFooter extends Widget {
     }
   }
 
-  computeControlContainerHeight(table, control, growControl) {
+  computeControlContainerHeight(table: Table, control: TableControl, growControl?: boolean): number {
     let menuBarHeight = 0,
       footerHeight = 0,
       containerHeight = graphics.size(table.$container).height,
-      maxControlHeight,
       controlContainerHeight = 0,
       dataMargins = graphics.margins(scout.nvl(table.$data, table.$container)),
       dataMarginsHeight = dataMargins.top + dataMargins.bottom,
@@ -595,20 +630,20 @@ export default class TableFooter extends Widget {
     }
     // Crop control height (don't do it if table does not have the correct size yet)
     if (this.table.htmlComp.layouted) {
-      maxControlHeight = containerHeight - (dataMarginsHeight + menuBarHeight + footerHeight);
+      let maxControlHeight = containerHeight - (dataMarginsHeight + menuBarHeight + footerHeight);
       controlContainerHeight = Math.min(controlContainerHeight, maxControlHeight);
     }
     return controlContainerHeight;
   }
 
-  _hideTableStatusTooltip() {
+  protected _hideTableStatusTooltip() {
     clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
     if (this._tableStatusTooltip) {
       this._tableStatusTooltip.destroy();
     }
   }
 
-  _showTableStatusTooltip() {
+  protected _showTableStatusTooltip() {
     // Remove existing tooltip (might have the wrong css class)
     if (this._tableStatusTooltip) {
       this._tableStatusTooltip.destroy();
@@ -629,14 +664,13 @@ export default class TableFooter extends Widget {
     }
 
     // Create new tooltip
-    let opts = {
+    this._tableStatusTooltip = scout.create(Tooltip, {
       parent: this,
       text: text,
       severity: tableStatus.severity,
       autoRemove: !tableStatus.isError(),
       $anchor: this._$infoTableStatusIcon
-    };
-    this._tableStatusTooltip = scout.create(Tooltip, opts);
+    });
     this._tableStatusTooltip.one('destroy', () => {
       this._tableStatusTooltip = null;
     });
@@ -660,17 +694,15 @@ export default class TableFooter extends Widget {
     if (!tableStatus.isError() && !tableStatus.isWarning() && !tableStatus.uiState) {
       // Already set status to 'auto-hidden', in case the user changes outline before timeout elapses
       this.table.tableStatus.uiState = 'auto-hidden';
-      this._autoHideTableStatusTooltipTimeoutId = setTimeout(() => {
-        this._hideTableStatusTooltip();
-      }, 5000);
+      this._autoHideTableStatusTooltipTimeoutId = setTimeout(() => this._hideTableStatusTooltip(), 5000);
     }
   }
 
-  _updateHasFilterText() {
+  protected _updateHasFilterText() {
     this._$textFilter.toggleClass('has-text', !!this._$textFilter.val());
   }
 
-  onControlSelected(control) {
+  onControlSelected(control: TableControl) {
     let previousControl = this.selectedControl;
     this.selectedControl = control;
 
@@ -682,7 +714,7 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _onStatusMouseDown(event) {
+  protected _onStatusMouseDown(event: JQuery.MouseDownEvent) {
     // Toggle tooltip
     if (this._tableStatusTooltip) {
       this._hideTableStatusTooltip();
@@ -695,7 +727,7 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _createOnFilterFieldInputFunction() {
+  protected _createOnFilterFieldInputFunction(): (event: JQuery.TriggeredEvent) => void {
     let debounceFunction = $.debounce(this._applyFilter.bind(this));
     return function(event) {
       this._updateHasFilterText();
@@ -704,20 +736,19 @@ export default class TableFooter extends Widget {
     };
   }
 
-  _onDeleteFilterMouseDown(event) {
+  protected _onDeleteFilterMouseDown(event: JQuery.MouseDownEvent) {
     this._$textFilter.val('');
     this._updateHasFilterText();
     this._applyFilter();
     event.preventDefault();
   }
 
-  _applyFilter(event) {
-    let filter,
-      filterText = this._$textFilter.val();
+  protected _applyFilter() {
+    let filterText = this._$textFilter.val() as string;
     if (this.filterText !== filterText) {
       this.filterText = filterText;
       if (filterText) {
-        filter = scout.create(TableTextUserFilter, {
+        let filter = scout.create(TableTextUserFilter, {
           session: this.session,
           table: this.table
         });
@@ -730,7 +761,7 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _onInfoLoadClick() {
+  protected _onInfoLoadClick() {
     if (!this._$infoLoad.isEnabled()) {
       return;
     }
@@ -748,7 +779,7 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _onInfoFilterClick() {
+  protected _onInfoFilterClick() {
     if (this._compactStyle) {
       this._toggleTableInfoTooltip(this._$infoFilter, 'TableInfoFilterTooltip');
     } else {
@@ -756,7 +787,7 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _onInfoSelectionClick() {
+  protected _onInfoSelectionClick() {
     if (this._compactStyle) {
       this._toggleTableInfoTooltip(this._$infoSelection, 'TableInfoSelectionTooltip');
     } else {
@@ -764,32 +795,33 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _onTableRowsChanged(event) {
+  protected _onTableRowsChanged(event: TableRowsInsertedEvent) {
     this._renderInfoLoad();
   }
 
-  _onTableFilter(event) {
+  protected _onTableFilter(event: Event<Table>) {
     this._renderInfoFilter();
     this._updateInfoFilterVisibility();
     this._renderInfoSelection();
   }
 
-  _onTableFilterAdded(event) {
+  protected _onTableFilterAdded(event: TableFilterAddedEvent) {
     this._renderInfoFilter();
     this._updateInfoFilterVisibility();
     if (event.filter.filterType === TableTextUserFilter.TYPE) {
       // Do not update the content when the value does not change. This is the case when typing text in
       // the UI. If we would call val() unconditionally, the current cursor position will get lost.
+      let textFilter = event.filter as TableTextUserFilter;
       let currentText = this._$textFilter.val();
-      if (currentText !== event.filter.text) {
-        this._$textFilter.val(event.filter.text);
+      if (currentText !== textFilter.text) {
+        this._$textFilter.val(textFilter.text);
         this._updateHasFilterText();
         this._applyFilter();
       }
     }
   }
 
-  _onTableFilterRemoved(event) {
+  protected _onTableFilterRemoved(event: TableFilterRemovedEvent) {
     this._renderInfoFilter();
     this._updateInfoFilterVisibility();
     if (event.filter.filterType === TableTextUserFilter.TYPE) {
@@ -799,16 +831,16 @@ export default class TableFooter extends Widget {
     }
   }
 
-  _onTableRowsSelected(event) {
+  protected _onTableRowsSelected(event: TableRowsSelectedEvent) {
     this._renderInfoSelection();
   }
 
-  _onTableStatusChanged(event) {
+  protected _onTableStatusChanged(event: Event<Table>) {
     this._renderInfoTableStatus();
     this._updateInfoTableStatusVisibility();
   }
 
-  _onTablePropertyChange(event) {
+  protected _onTablePropertyChange(event: PropertyChangeEvent<any, Table>) {
     if (event.propertyName === 'multiSelect') {
       this._updateInfoSelectionVisibility();
     }

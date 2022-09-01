@@ -1,16 +1,18 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, DateRange, dates, defaultValues, ModelAdapter, objects, Planner} from '../index';
+import {App, DateRange, dates, defaultValues, Event, ModelAdapter, objects, Planner} from '../index';
+import {PlannerResourcesSelectedEvent} from './PlannerEventMap';
+import {PlannerActivity, PlannerResource} from './Planner';
 
-export default class PlannerAdapter extends ModelAdapter {
+export default class PlannerAdapter<P extends Planner = Planner> extends ModelAdapter<P> {
 
   constructor() {
     super();
@@ -19,18 +21,18 @@ export default class PlannerAdapter extends ModelAdapter {
 
   static PROPERTIES_ORDER = ['displayMode', 'viewRange'];
 
-  _orderPropertyNamesOnSync(newProperties) {
+  protected override _orderPropertyNamesOnSync(newProperties: Record<string, any>): string[] {
     return Object.keys(newProperties).sort(this._createPropertySortFunc(PlannerAdapter.PROPERTIES_ORDER));
   }
 
-  _sendViewRange(viewRange) {
+  protected _sendViewRange(viewRange: DateRange) {
     this._send('property', {
       viewRange: dates.toJsonDateRange(viewRange)
     });
   }
 
-  _sendSelectedActivity() {
-    let activityId = null;
+  protected _sendSelectedActivity() {
+    let activityId: string = null;
     if (this.widget.selectedActivity) {
       activityId = this.widget.selectedActivity.id;
     }
@@ -39,39 +41,38 @@ export default class PlannerAdapter extends ModelAdapter {
     });
   }
 
-  _sendSelectionRange() {
+  protected _sendSelectionRange() {
     let selectionRange = dates.toJsonDateRange(this.widget.selectionRange);
     this._send('property', {
       selectionRange: selectionRange
     });
   }
 
-  _onWidgetResourcesSelected(event) {
+  protected _onWidgetResourcesSelected(event: PlannerResourcesSelectedEvent) {
     this._sendResourcesSelected();
   }
 
-  _sendResourcesSelected() {
-    let resourceIds = this.widget.selectedResources.map(r => {
-      return r.id;
-    });
+  protected _sendResourcesSelected() {
+    let resourceIds = this.widget.selectedResources.map(r => r.id);
     this._send('resourcesSelected', {
       resourceIds: resourceIds
     });
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<P>) {
     if (event.type === 'resourcesSelected') {
-      this._onWidgetResourcesSelected(event);
+      this._onWidgetResourcesSelected(event as PlannerResourcesSelectedEvent<P>);
     } else {
       super._onWidgetEvent(event);
     }
   }
 
-  _onResourcesInserted(resources) {
+  protected _onResourcesInserted(resources: PlannerResource[]) {
     this.widget.insertResources(resources);
   }
 
-  _onResourcesDeleted(resourceIds) {
+  protected _onResourcesDeleted(resourceIds: string[]) {
+    // @ts-ignore
     let resources = this.widget._resourcesByIds(resourceIds);
     this.addFilterForWidgetEventType('resourcesSelected');
     this.addFilterForProperties({
@@ -80,7 +81,7 @@ export default class PlannerAdapter extends ModelAdapter {
     this.widget.deleteResources(resources);
   }
 
-  _onAllResourcesDeleted() {
+  protected _onAllResourcesDeleted() {
     this.addFilterForWidgetEventType('resourcesSelected');
     this.addFilterForProperties({
       selectionRange: new DateRange()
@@ -88,17 +89,18 @@ export default class PlannerAdapter extends ModelAdapter {
     this.widget.deleteAllResources();
   }
 
-  _onResourcesSelected(resourceIds) {
+  protected _onResourcesSelected(resourceIds: string[]) {
+    // @ts-ignore
     let resources = this.widget._resourcesByIds(resourceIds);
     this.addFilterForWidgetEventType('resourcesSelected');
-    this.widget.selectResources(resources, false);
+    this.widget.selectResources(resources);
   }
 
-  _onResourcesUpdated(resources) {
+  protected _onResourcesUpdated(resources: PlannerResource[]) {
     this.widget.updateResources(resources);
   }
 
-  onModelAction(event) {
+  override onModelAction(event) {
     if (event.type === 'resourcesInserted') {
       this._onResourcesInserted(event.resources);
     } else if (event.type === 'resourcesDeleted') {
@@ -114,17 +116,21 @@ export default class PlannerAdapter extends ModelAdapter {
     }
   }
 
-  static _initResourceRemote(resource) {
+  protected static _initResourceRemote(resource: PlannerResource) {
+    // @ts-ignore
     if (this.modelAdapter) {
       defaultValues.applyTo(resource, 'Resource');
     }
+    // @ts-ignore
     return this._initResourceOrig(resource);
   }
 
-  static _initActivityRemote(activity) {
+  protected static _initActivityRemote(activity: PlannerActivity) {
+    // @ts-ignore
     if (this.modelAdapter) {
       defaultValues.applyTo(activity, 'Activity');
     }
+    // @ts-ignore
     return this._initActivityOrig(activity);
   }
 

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,30 +11,41 @@
 import {AbstractLayout, Dimension, HtmlComponent, scout} from '../index';
 import $ from 'jquery';
 
-export default class RowLayout extends AbstractLayout {
+export interface RowLayoutOptions {
+  /** If true, all elements will be as width as the container. Default is true. */
+  stretch?: boolean;
 
-  constructor(options) {
+  /** If false, the layout won't change the size of the elements and just calls {@link HtmlComponent.validateLayout}. Default is true. */
+  pixelBasedSizing?: boolean;
+}
+
+/**
+ * RowLayout = each child element represents a row
+ * +-----------------+
+ * |                 |
+ * +-----------------+
+ * |                 |
+ * |                 |
+ * +-----------------+
+ * |                 |
+ * +-----------------+
+ */
+export default class RowLayout extends AbstractLayout implements RowLayoutOptions {
+  stretch: boolean;
+  pixelBasedSizing: boolean;
+
+  constructor(options?: RowLayoutOptions) {
     super();
-    options = options || {};
+    options = options || {} as RowLayoutOptions;
     this.pixelBasedSizing = scout.nvl(options.pixelBasedSizing, true);
     this.stretch = scout.nvl(options.stretch, true);
-
-    // RowLayout = each child element represents a row
-    // +-----------------+
-    // |                 |
-    // +-----------------+
-    // |                 |
-    // |                 |
-    // +-----------------+
-    // |                 |
-    // +-----------------+
   }
 
-  _getChildren($container) {
+  protected _getChildren($container: JQuery): JQuery {
     return $container.children();
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let htmlComp = HtmlComponent.get($container);
     let containerSize = htmlComp.availableSize()
       .subtract(htmlComp.insets());
@@ -62,7 +73,7 @@ export default class RowLayout extends AbstractLayout {
     });
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options): Dimension {
     let prefSize = new Dimension(),
       htmlContainer = HtmlComponent.get($container),
       maxWidth = 0;

@@ -1,47 +1,63 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CarouselLayout, events, GridData, HtmlComponent, SingleLayout, Widget} from '../index';
+import {arrays, CarouselLayout, CarouselModel, events, GridData, HtmlComponent, SingleLayout, Widget} from '../index';
 
-export default class Carousel extends Widget {
+export default class Carousel extends Widget implements CarouselModel {
+  declare model: CarouselModel;
+
+  statusEnabled: boolean;
+  statusItemHtml: string;
+  gridData: GridData;
+  moveThreshold: number;
+  widgets: Widget[];
+  currentItem: number;
+
+  /**
+   * last translation position
+   */
+  positionX: number;
+  $carouselItems: JQuery<HTMLDivElement>[];
+  $carouselStatusItems: JQuery<HTMLDivElement>[];
+  $carouselFilmstrip: JQuery<HTMLDivElement>;
+  /**
+   * carousel status bar (containing current position)
+   */
+  $carouselStatus: JQuery;
+  htmlCompFilmstrip: HtmlComponent;
+  htmlCompStatus: HtmlComponent;
 
   constructor() {
     super();
-    this._addWidgetProperties(['widgets']);
-
-    // default values
     this.statusEnabled = true;
     this.statusItemHtml = '&bull;';
-    this.currentItem = 0; // current item
-    this.moveThreshold = 0.25; // threshold
-    this.widgets = []; // widgets
-
-    this.$carouselFilmstrip; // carousel filmstrip
-    this.$carouselItems = []; // carousel items
-    this.$carouselStatus; // carousel status bar (containing current position)
-    this.$carouselStatusItems = []; // carousel status items
-
-    this.positionX = 0; // last translation position
+    this.currentItem = 0;
+    this.moveThreshold = 0.25;
+    this.widgets = [];
+    this.$carouselItems = [];
+    this.$carouselStatusItems = [];
+    this.positionX = 0;
+    this._addWidgetProperties(['widgets']);
   }
 
-  _init(model) {
+  protected override _init(model: CarouselModel) {
     super._init(model);
     this._setGridData(this.gridData);
     this.widgets = arrays.ensure(this.widgets);
   }
 
-  _setGridData(gridData) {
+  protected _setGridData(gridData: GridData) {
     this._setProperty('gridData', new GridData(gridData));
   }
 
-  _render() {
+  protected override _render() {
     // add container
     this.$container = this.$parent.appendDiv('carousel');
 
@@ -54,12 +70,12 @@ export default class Carousel extends Widget {
     this.htmlCompFilmstrip = HtmlComponent.install(this.$carouselFilmstrip, this.session);
   }
 
-  _remove() {
+  protected override _remove() {
     this._removeStatus();
     super._remove();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
 
     this._renderWidgets();
@@ -67,11 +83,11 @@ export default class Carousel extends Widget {
     this._renderStatusEnabled();
   }
 
-  setStatusEnabled(statusEnabled) {
+  setStatusEnabled(statusEnabled: boolean) {
     this.setProperty('statusEnabled', statusEnabled);
   }
 
-  _renderStatusEnabled() {
+  protected _renderStatusEnabled() {
     if (this.statusEnabled) {
       this._renderStatus();
       this._renderStatusItems();
@@ -82,21 +98,21 @@ export default class Carousel extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _renderStatus() {
+  protected _renderStatus() {
     if (!this.$carouselStatus) {
       this.$carouselStatus = this.$container.appendDiv('carousel-status');
       this.htmlCompStatus = HtmlComponent.install(this.$carouselStatus, this.session);
     }
   }
 
-  _removeStatus() {
+  protected _removeStatus() {
     if (this.$carouselStatus) {
       this.$carouselStatus.remove();
       this.$carouselStatus = null;
     }
   }
 
-  _renderStatusItems() {
+  protected _renderStatusItems() {
     if (!this.$carouselStatus) {
       return;
     }
@@ -109,11 +125,11 @@ export default class Carousel extends Widget {
     });
   }
 
-  _renderCurrentStatusItem() {
+  protected _renderCurrentStatusItem() {
     if (!this.$carouselStatus) {
       return;
     }
-    this.$carouselStatusItems.forEach((e, i) => {
+    this.$carouselStatusItems.forEach((e: JQuery<HTMLDivElement>, i: number) => {
       e.toggleClass('current-item', i === this.currentItem);
     });
   }
@@ -125,24 +141,24 @@ export default class Carousel extends Widget {
     });
   }
 
-  setCurrentItem(currentItem) {
+  setCurrentItem(currentItem: number) {
     this.setProperty('currentItem', currentItem);
   }
 
-  _renderCurrentItem() {
+  protected _renderCurrentItem() {
     this._renderItemsInternal(undefined, false);
     this._renderCurrentStatusItem();
     this.invalidateLayoutTree();
   }
 
-  _renderItemsInternal(item, skipRemove) {
+  protected _renderItemsInternal(item: number, skipRemove: boolean) {
     item = item || this.currentItem;
     if (!skipRemove) {
       this.widgets.forEach((w, j) => {
         if (w.rendered && (j < item - 1 || j > item + 1)) {
           w.remove();
         }
-      }, this);
+      });
     }
     for (let i = Math.max(item - 1, 0); i < Math.min(item + 2, this.widgets.length); i++) {
       let widget = this.widgets[i];
@@ -153,13 +169,13 @@ export default class Carousel extends Widget {
     }
   }
 
-  setWidgets(widgets) {
+  setWidgets(widgets: Widget[]) {
     this.setProperty('widgets', widgets);
   }
 
-  _renderWidgets() {
+  protected _renderWidgets() {
     this.$carouselFilmstrip.empty();
-    this.$carouselItems = this.widgets.map(function(widget) {
+    this.$carouselItems = this.widgets.map(widget => {
       let $carouselItem = this.$carouselFilmstrip.appendDiv('carousel-item');
       let htmlComp = HtmlComponent.install($carouselItem, this.session);
       htmlComp.setLayout(new SingleLayout());
@@ -167,12 +183,9 @@ export default class Carousel extends Widget {
       // Add the CSS classes of the widget to be able to style the carousel items.
       // Use a suffix to prevent conflicts
       let cssClasses = widget.cssClassAsArray();
-      cssClasses.forEach(cssClass => {
-        $carouselItem.addClass(cssClass + '-carousel-item');
-      });
-
+      cssClasses.forEach(cssClass => $carouselItem.addClass(cssClass + '-carousel-item'));
       return $carouselItem;
-    }, this);
+    });
 
     this._renderStatusItems();
 
@@ -180,7 +193,7 @@ export default class Carousel extends Widget {
     this.setCurrentItem(0);
   }
 
-  _registerCarouselFilmstripEventListeners() {
+  protected _registerCarouselFilmstripEventListeners() {
     let $window = this.$carouselFilmstrip.window();
     this.$carouselFilmstrip.on('mousedown touchstart', event => {
       let origPageX = events.pageX(event);

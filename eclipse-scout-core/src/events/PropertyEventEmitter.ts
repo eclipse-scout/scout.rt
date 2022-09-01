@@ -8,14 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventEmitter, objects, scout, strings} from '../index';
+import {EventEmitter, objects, PropertyChangeEvent, scout, strings} from '../index';
+import PropertyEventMap from './PropertyEventMap';
 
 export default class PropertyEventEmitter extends EventEmitter {
+  declare eventMap: PropertyEventMap;
+
   constructor() {
     super();
-    this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => {
-      return event.propertyName === propertyName;
-    });
+    this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => event.propertyName === propertyName);
   }
 
   /**
@@ -28,7 +29,7 @@ export default class PropertyEventEmitter extends EventEmitter {
    * @param newValue the new value the property should get
    * @return true if the property has been changed, false if not.
    */
-  setProperty(propertyName: string, value): boolean {
+  setProperty(propertyName: string, value: any): boolean {
     if (objects.equals(this[propertyName], value)) {
       return false;
     }
@@ -36,7 +37,7 @@ export default class PropertyEventEmitter extends EventEmitter {
     return true;
   }
 
-  protected _callSetProperty(propertyName: string, value) {
+  protected _callSetProperty(propertyName: string, value: any) {
     let setFuncName = '_set' + strings.toUpperCaseFirstLetter(propertyName);
     if (this[setFuncName]) {
       this[setFuncName](value);
@@ -54,7 +55,7 @@ export default class PropertyEventEmitter extends EventEmitter {
    * @param newValue the new value the property should get
    * @return true if the property has been changed, false if not.
    */
-  protected _setProperty(propertyName: string, newValue): boolean {
+  protected _setProperty(propertyName: string, newValue: any): boolean {
     scout.assertParameter('propertyName', propertyName);
     let oldValue = this[propertyName];
     if (objects.equals(oldValue, newValue)) {
@@ -73,22 +74,20 @@ export default class PropertyEventEmitter extends EventEmitter {
   /**
    * Triggers a property change for a single property.
    */
-  triggerPropertyChange(propertyName: string, oldValue, newValue): Event {
+  triggerPropertyChange(propertyName: string, oldValue, newValue: any): PropertyChangeEvent<any, this> {
     scout.assertParameter('propertyName', propertyName);
-    let event = new Event({
+    return this.trigger('propertyChange', {
       propertyName: propertyName,
       oldValue: oldValue,
       newValue: newValue
-    });
-    this.trigger('propertyChange', event);
-    return event;
+    }) as PropertyChangeEvent<any, this>;
   }
 
   /**
    * Calls the setter of the given property name if it exists. A setter has to be named setXy, where Xy is the property name.
    * If there is no setter for the property name, {@link setProperty} is called.
    */
-  callSetter(propertyName: string, value) {
+  callSetter(propertyName: string, value: any) {
     let setterFuncName = 'set' + strings.toUpperCaseFirstLetter(propertyName);
     if (this[setterFuncName]) {
       this[setterFuncName](value);

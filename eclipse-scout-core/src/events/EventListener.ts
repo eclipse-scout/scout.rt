@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventHandler} from '../index';
+import {EventHandler} from '../index';
 
 export default interface EventListener {
-  func: EventHandler<Event>;
+  func: EventHandler;
   type?: string;
-  origFunc?: EventHandler<Event>;
+  origFunc?: EventHandler;
 }

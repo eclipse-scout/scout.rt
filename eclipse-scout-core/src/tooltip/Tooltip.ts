@@ -1,24 +1,55 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Form, graphics, keys, scout, scrollbars, Status, strings, Widget} from '../index';
+import {arrays, Form, graphics, keys, Menu, Rectangle, scout, scrollbars, Status, strings, TooltipEventMap, TooltipModel, Widget} from '../index';
 import $ from 'jquery';
+import {StatusSeverity} from '../status/Status';
+import KeyDownEvent = JQuery.KeyDownEvent;
 
-export default class Tooltip extends Widget {
+export type TooltipPosition = 'top' | 'bottom';
+export type TooltipDirection = 'right' | 'left';
+export type TooltipScrollType = 'position' | 'remove';
+
+export default class Tooltip extends Widget implements TooltipModel {
+  declare model: TooltipModel;
+  declare eventMap: TooltipEventMap;
+
+  text: string;
+  severity: StatusSeverity;
+  arrowPosition: number;
+  arrowPositionUnit: string;
+  windowPaddingX: number;
+  windowPaddingY: number;
+  origin: Rectangle;
+  originRelativeToParent: boolean;
+  autoRemove: boolean;
+  tooltipPosition: TooltipPosition;
+  tooltipDirection: TooltipDirection;
+  scrollType: TooltipScrollType;
+  htmlEnabled: boolean;
+  dialog: Form;
+  menus: Menu[];
+  $anchor: JQuery;
+  $arrow: JQuery;
+  $content: JQuery;
+  $menus: JQuery<HTMLDivElement>;
+
+  protected _openLater: boolean;
+  protected _mouseDownHandler: (event: MouseEvent) => boolean;
+  protected _keydownHandler: (event: KeyDownEvent) => void;
+  protected _anchorScrollHandler: (event: JQuery.ScrollEvent<HTMLElement>) => void;
+  protected _moveHandler: () => void;
 
   constructor() {
     super();
 
-    /**
-     * Either a String or a function which returns a String
-     */
     this.text = null;
     this.severity = Status.Severity.INFO;
     this.arrowPosition = 16;
@@ -26,29 +57,22 @@ export default class Tooltip extends Widget {
     this.windowPaddingX = 10;
     this.windowPaddingY = 5;
     this.origin = null;
-
-    /**
-     * When the origin point is calculated using $element.offset(),
-     * the result is absolute to the window. When positioning the tooltip, the $parent's offset must
-     * be subtracted. When the given origin is already relative to the parent, set this option to
-     * "true" to disable this additional calculation.
-     */
     this.originRelativeToParent = false;
-    this.$anchor = null;
     this.autoRemove = true;
     this.tooltipPosition = 'top';
     this.tooltipDirection = 'right';
     this.scrollType = 'position';
     this.htmlEnabled = false;
+    this.menus = [];
+    this.$anchor = null;
     this.$arrow = null;
     this.$content = null;
-    this.menus = [];
     this._addWidgetProperties(['menus']);
 
     this._openLater = false;
   }
 
-  render($parent) {
+  override render($parent?: JQuery) {
     // Use entry point by default
     let $tooltipParent = $parent || this.entryPoint();
     // when the parent is detached it is not possible to render the popup -> do it later
@@ -60,7 +84,7 @@ export default class Tooltip extends Widget {
     super.render($tooltipParent);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent
       .appendDiv('tooltip')
       .data('tooltip', this);
@@ -82,8 +106,7 @@ export default class Tooltip extends Widget {
       this.$container.document(true).addEventListener('mousedown', this._mouseDownHandler, true); // true=the event handler is executed in the capturing phase
 
       this._keydownHandler = this._onDocumentKeyDown.bind(this);
-      this.$container.document()
-        .on('keydown', this._keydownHandler);
+      this.$container.document().on('keydown', this._keydownHandler);
     }
 
     if (this.$anchor && this.scrollType) {
@@ -109,12 +132,12 @@ export default class Tooltip extends Widget {
     }
   }
 
-  _postRender() {
+  protected override _postRender() {
     super._postRender();
     this.position();
   }
 
-  _remove() {
+  protected override _remove() {
     if (this._mouseDownHandler) {
       this.$container.document(true).removeEventListener('mousedown', this._mouseDownHandler, true);
       this._mouseDownHandler = null;
@@ -138,18 +161,18 @@ export default class Tooltip extends Widget {
     super._remove();
   }
 
-  _destroy() {
+  override _destroy() {
     super._destroy();
     this.menus.forEach(menu => {
       // ContextMenu will only be removed not closed if it has a different owner.
-      // Unfortunately it cannot be rerendered again so the menu will look selected the next time the tooltip is opened -> ensure popup will be closed
+      // Unfortunately it cannot be re-rendered again so the menu will look selected the next time the tooltip is opened -> ensure popup will be closed
       if (menu.popup) {
         menu.popup.close();
       }
     });
   }
 
-  _onAttach() {
+  protected override _onAttach() {
     super._onAttach();
     if (this._openLater && !this.rendered) {
       this._openLater = false;
@@ -157,27 +180,27 @@ export default class Tooltip extends Widget {
     }
   }
 
-  _renderOnDetach() {
+  protected override _renderOnDetach() {
     this._openLater = true;
     this.remove();
     super._onDetach();
   }
 
-  _isRemovalPrevented() {
+  protected override _isRemovalPrevented(): boolean {
     // If removal of a parent is pending due to an animation then don't return true to make sure tooltips are closed before the parent animation starts.
     // However, if the tooltip itself is removed by an animation, removal should be prevented to ensure remove() won't run multiple times.
     return this.removalPending;
   }
 
-  setText(text) {
+  setText(text: string) {
     this.setProperty('text', text);
   }
 
-  setSeverity(severity) {
+  setSeverity(severity: StatusSeverity) {
     this.setProperty('severity', severity);
   }
 
-  _renderText() {
+  protected _renderText() {
     let text = this.text || '';
     if (this.htmlEnabled) {
       this.$content.html(text);
@@ -192,17 +215,17 @@ export default class Tooltip extends Widget {
     }
   }
 
-  _renderSeverity() {
+  protected _renderSeverity() {
     this.$container.removeClass(Status.SEVERITY_CSS_CLASSES);
     this.$container.addClass(Status.cssClassForSeverity(this.severity));
   }
 
-  setMenus(menus) {
+  setMenus(menus: Menu | Menu[]) {
     menus = arrays.ensure(menus);
     this.setProperty('menus', menus);
   }
 
-  _renderMenus() {
+  protected _renderMenus() {
     let maxIconWidth = 0,
       menus = this.menus;
 
@@ -214,14 +237,14 @@ export default class Tooltip extends Widget {
     }
 
     // Render menus
-    menus.forEach(function(menu) {
+    menus.forEach(menu => {
       let iconWidth = 0;
       menu.render(this.$menus);
       if (menu.iconId) {
         iconWidth = menu.get$Icon().outerWidth(true);
         maxIconWidth = Math.max(iconWidth, maxIconWidth);
       }
-    }, this);
+    });
 
     // Align menus if there is one with an icon
     if (maxIconWidth > 0) {
@@ -231,7 +254,7 @@ export default class Tooltip extends Widget {
         } else {
           menu.$text.cssPaddingLeft(maxIconWidth - menu.get$Icon().outerWidth(true));
         }
-      }, this);
+      });
     }
 
     this.$container.toggleClass('has-menus', menus.length > 0);
@@ -328,7 +351,7 @@ export default class Tooltip extends Widget {
     }, this);
   }
 
-  _onAnchorScroll(event) {
+  protected _onAnchorScroll(event: JQuery.ScrollEvent<HTMLElement>) {
     if (!this.rendered) {
       // Scroll events may be fired delayed, even if scroll listener are already removed.
       return;
@@ -340,7 +363,7 @@ export default class Tooltip extends Widget {
     }
   }
 
-  _onDocumentMouseDown(event) {
+  protected _onDocumentMouseDown(event: MouseEvent): boolean {
     if (!this.rendered) {
       return false;
     }
@@ -349,8 +372,9 @@ export default class Tooltip extends Widget {
     }
   }
 
-  _isMouseDownOutside(event) {
-    let $target = $(event.target),
+  protected _isMouseDownOutside(event: MouseEvent): boolean {
+    let target = event.target as HTMLElement;
+    let $target = $(target),
       targetWidget = scout.widget($target);
 
     // Only remove the tooltip if the click is outside of the container or the $anchor (= status icon)
@@ -363,11 +387,11 @@ export default class Tooltip extends Widget {
   /**
    * Method invoked once a mouse down event occurs outside the tooltip.
    */
-  _onMouseDownOutside() {
+  protected _onMouseDownOutside(event: MouseEvent) {
     this.destroy();
   }
 
-  _onDocumentKeyDown(event) {
+  protected _onDocumentKeyDown(event: KeyDownEvent) {
     if (scout.isOneOf(event.which,
       keys.CTRL, keys.SHIFT, keys.ALT,
       keys.NUM_LOCK, keys.CAPS_LOCK, keys.SCROLL_LOCK,

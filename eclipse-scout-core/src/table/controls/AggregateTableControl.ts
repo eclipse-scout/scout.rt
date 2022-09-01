@@ -1,17 +1,27 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, graphics, icons, TableControl, tooltips} from '../../index';
+import {arrays, Device, EventHandler, graphics, icons, TableControl, TableControlModel, TableRow, tooltips} from '../../index';
 import $ from 'jquery';
+import {TableColumnMovedEvent} from '../TableEventMap';
 
 export default class AggregateTableControl extends TableControl {
+
+  aggregateRow: any[] & { selection?: boolean };
+
+  protected _tableDataScrollHandler: () => void;
+  protected _tableColumnResizedHandler: () => void;
+  protected _tableColumnMovedHandler: EventHandler<TableColumnMovedEvent>;
+  protected _tableColumnStructureChangedHandler: () => void;
+  protected _tableChangedHandler: () => void;
+  protected _aggregationFunctionChangedHandler: () => void;
 
   constructor() {
     super();
@@ -25,33 +35,33 @@ export default class AggregateTableControl extends TableControl {
     this.animateDuration = AggregateTableControl.CONTAINER_ANIMATE_DURATION;
     this.aggregateRow = [];
     this.cssClass = 'aggregate';
-    this.height = 0; // Will be as height as a row
+    this.height = 0;
     this.iconId = icons.SUM;
     this.tooltipText = '${textKey:ui.Total}';
     this.resizerVisible = false;
   }
 
-  static CONTAINER_ANIMATE_DURATION = 200;
+  static override CONTAINER_ANIMATE_DURATION = 200;
 
-  _init(model) {
+  protected override _init(model: TableControlModel) {
     super._init(model);
     this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
     this.table.on('aggregationFunctionChanged', this._aggregationFunctionChangedHandler);
   }
 
-  _destroy() {
+  protected override _destroy() {
     super._destroy();
     this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
     this.table.off('aggregationFunctionChanged', this._aggregationFunctionChangedHandler);
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this._updateEnabledAndSelectedState();
     this.height = this.table.rowHeight + graphics.insets(this.table.footer.$controlContainer).vertical();
   }
 
-  _renderContent($parent) {
+  protected override _renderContent($parent: JQuery) {
     this.$contentContainer = $parent.appendDiv('table-aggregate');
 
     this._aggregate();
@@ -64,7 +74,7 @@ export default class AggregateTableControl extends TableControl {
     this.table.on('rowsSelected rowsInserted rowsUpdated rowsDeleted filter group allRowsDeleted', this._tableChangedHandler);
   }
 
-  _removeContent() {
+  protected override _removeContent() {
     this.$contentContainer.remove();
 
     this.table.$data.off('scroll', this._tableDataScrollHandler);
@@ -73,9 +83,9 @@ export default class AggregateTableControl extends TableControl {
     this.table.off('rowsSelected rowsInserted rowsUpdated rowsDeleted filter group allRowsDeleted', this._tableChangedHandler);
   }
 
-  _renderAggregate() {
-    let aggregateCells = [];
-    this.table.visibleColumns().forEach(function(column, c) {
+  protected _renderAggregate() {
+    let aggregateCells: JQuery[] = [];
+    this.table.visibleColumns().forEach((column, c) => {
       let aggregateValue, cell, $cell;
 
       aggregateValue = this.aggregateRow[c];
@@ -100,24 +110,26 @@ export default class AggregateTableControl extends TableControl {
       }
 
       $cell.appendTo(this.$contentContainer);
-    }, this);
+    });
 
     if (this.aggregateRow.selection) {
       this.$contentContainer.addClass('selection');
     }
 
+    // @ts-ignore
     aggregateCells.forEach($c => this.table._resizeAggregateCell($c));
   }
 
-  _rerenderAggregate() {
+  protected _rerenderAggregate() {
     this.$contentContainer.empty();
     this._renderAggregate();
     this._reconcileScrollPos();
   }
 
-  _installCellTooltip($cell) {
+  protected _installCellTooltip($cell: JQuery) {
     tooltips.install($cell, {
       parent: this,
+      // @ts-ignore
       text: this.table._cellTooltipText.bind(this.table),
       htmlEnabled: true,
       arrowPosition: 50,
@@ -126,9 +138,9 @@ export default class AggregateTableControl extends TableControl {
     });
   }
 
-  _aggregate() {
-    let rows,
-      aggregateRow = [],
+  protected _aggregate() {
+    let rows: TableRow[],
+      aggregateRow: any[] & { selection?: boolean } = [],
       selectedRows = this.table.selectedRows;
 
     if (selectedRows.length > 1) {
@@ -138,10 +150,11 @@ export default class AggregateTableControl extends TableControl {
       rows = this.table.filteredRows();
     }
 
+    // @ts-ignore
     this.table._forEachVisibleColumn('aggrStart', aggregateRow);
-    rows.forEach(function(row) {
-      this.table._forEachVisibleColumn('aggrStep', aggregateRow, row);
-    }, this);
+    // @ts-ignore
+    rows.forEach(row => this.table._forEachVisibleColumn('aggrStep', aggregateRow, row));
+    // @ts-ignore
     this.table._forEachVisibleColumn('aggrFinish', aggregateRow);
 
     this.aggregateRow = aggregateRow;
@@ -150,13 +163,13 @@ export default class AggregateTableControl extends TableControl {
     }
   }
 
-  _reconcileScrollPos() {
+  protected _reconcileScrollPos() {
     // When scrolling horizontally scroll aggregate content as well
     let scrollLeft = this.table.$data.scrollLeft();
     this.$contentContainer.scrollLeft(scrollLeft);
   }
 
-  _updateEnabledAndSelectedState(aggregationFunctionChanged) {
+  protected _updateEnabledAndSelectedState(aggregationFunctionChanged?: boolean) {
     if (!this.initialized) {
       // During init the columns are not resolved yet -> containsAggregatedNumberColumn won't return a correct value
       return;
@@ -175,46 +188,45 @@ export default class AggregateTableControl extends TableControl {
     this.setEnabled(enabled);
   }
 
-  _setEnabled(enabled) {
+  protected override _setEnabled(enabled: boolean) {
     super._setEnabled(enabled);
     this._updateEnabledAndSelectedState();
   }
 
-  _setSelected(selected) {
+  protected override _setSelected(selected: boolean) {
     this._setProperty('selected', selected);
     this._updateEnabledAndSelectedState();
   }
 
-  _onTableDataScroll() {
+  protected _onTableDataScroll() {
     this._reconcileScrollPos();
   }
 
   /**
    * Generic handler for various events
-   * @private
    */
-  _onTableChanged() {
+  protected _onTableChanged() {
     this._aggregate();
   }
 
-  _onAggregationFunctionChanged() {
+  protected _onAggregationFunctionChanged() {
     this._updateEnabledAndSelectedState(true);
     if (this.contentRendered && this.selected) {
       this._aggregate();
     }
   }
 
-  _onTableColumnResized() {
+  protected _onTableColumnResized() {
     this._rerenderAggregate();
   }
 
-  _onTableColumnMoved(event) {
+  protected _onTableColumnMoved(event: TableColumnMovedEvent) {
     // move aggregated value in aggregateRow
     arrays.move(this.aggregateRow, event.oldPos, event.newPos);
     this._rerenderAggregate();
   }
 
-  _onTableColumnStructureChanged() {
+  protected _onTableColumnStructureChanged() {
     this._updateEnabledAndSelectedState();
     if (this.contentRendered && this.selected) {
       this._aggregate();

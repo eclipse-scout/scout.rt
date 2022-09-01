@@ -1,21 +1,43 @@
 /*
- * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../index';
+import {Status, strings, ValueField} from '../index';
 import $ from 'jquery';
+import CellModel from './CellModel';
 
 /**
- * @class
- * @constructor
+ * -1 for left, 0 for center and 1 for right.
  */
-export default class Cell {
+export type HorizontalAlignment = -1 | 0 | 1;
+
+export default class Cell implements CellModel {
+  declare model: CellModel;
+
+  cssClass: string;
+  editable: boolean;
+  errorStatus: Status;
+  horizontalAlignment: HorizontalAlignment;
+  htmlEnabled: boolean;
+  iconId: string;
+  mandatory: boolean;
+  text: string;
+  flowsLeft: boolean;
+  empty: boolean;
+  value: any;
+  tooltipText: string;
+  foregroundColor: string;
+  backgroundColor: string;
+  font: string;
+  sortCode: number;
+  field: ValueField;
+  protected _cachedEncodedText: string;
 
   constructor() {
     this.cssClass = null;
@@ -32,40 +54,40 @@ export default class Cell {
     this.sortCode = null;
   }
 
-  init(model) {
+  init(model: CellModel) {
     this._init(model);
   }
 
-  _init(model) {
+  protected _init(model: CellModel) {
     $.extend(this, model);
   }
 
-  update(model) {
+  update(model: CellModel) {
     this.setText(model.text);
     $.extend(this, model);
   }
 
-  setEditable(editable) {
+  setEditable(editable: boolean) {
     this.editable = editable;
   }
 
-  setMandatory(mandatory) {
+  setMandatory(mandatory: boolean) {
     this.mandatory = mandatory;
   }
 
-  setHorizontalAlignment(hAlign) {
+  setHorizontalAlignment(hAlign: HorizontalAlignment) {
     this.horizontalAlignment = hAlign;
   }
 
-  setValue(value) {
+  setValue(value: any) {
     this.value = value;
   }
 
-  setErrorStatus(errorStatus) {
+  setErrorStatus(errorStatus: Status) {
     this.errorStatus = errorStatus;
   }
 
-  setText(text) {
+  setText(text: string) {
     let oldText = this.text;
     this.text = text;
 
@@ -76,7 +98,7 @@ export default class Cell {
     }
   }
 
-  setIconId(iconId) {
+  setIconId(iconId: string) {
     this.iconId = iconId;
   }
 
@@ -88,11 +110,11 @@ export default class Cell {
     return this._cachedEncodedText;
   }
 
-  setCssClass(cssClass) {
+  setCssClass(cssClass: string) {
     this.cssClass = cssClass;
   }
 
-  setSortCode(sortCode) {
+  setSortCode(sortCode: number) {
     this.sortCode = sortCode;
   }
 }

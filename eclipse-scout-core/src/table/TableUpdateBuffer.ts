@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, objects, Table} from '../index';
+import {arrays, objects, Table, TableRow} from '../index';
 
 export default class TableUpdateBuffer {
+  promises: JQuery.Promise<any>[];
+  table: Table;
+  protected _rowMap: Record<string, TableRow>;
 
-  constructor(table) {
+  constructor(table: Table) {
     this._rowMap = {};
     this.promises = [];
     this.table = table;
@@ -21,11 +24,12 @@ export default class TableUpdateBuffer {
   /**
    * The buffer is active if it contains at least one promise. When all promises resolve the buffer will be processed.
    */
-  pushPromise(promise) {
+  pushPromise(promise: JQuery.Promise<any>) {
     this.promises.push(promise);
 
     // Also make sure viewport is not rendered as long as update events are buffered
     // Otherwise the other cells might already be visible during buffering
+    // @ts-ignore
     this.table._renderViewportBlocked = true;
     this.table.setLoading(true);
 
@@ -41,21 +45,21 @@ export default class TableUpdateBuffer {
     promise.then(handler, handler);
   }
 
-  isBuffering() {
+  isBuffering(): boolean {
     return this.promises.length > 0;
   }
 
-  buffer(rows) {
+  buffer(rows: TableRow | TableRow[]) {
     rows = arrays.ensure(rows);
 
     // Don't buffer duplicate rows
-    rows.forEach(function(row) {
+    rows.forEach(row => {
       this._rowMap[row.id] = row;
-    }, this);
+    });
   }
 
   /**
-   * Calls {@link Table.prototype.updateRows} with the buffered rows and renders the viewport if the rendering was blocked.
+   * Calls {@link Table.updateRows} with the buffered rows and renders the viewport if the rendering was blocked.
    */
   process() {
     if (this.table.destroyed) {
@@ -68,8 +72,11 @@ export default class TableUpdateBuffer {
 
     // Update the viewport as well if rendering was blocked
     this.table.setLoading(false);
+    // @ts-ignore
     this.table._renderViewportBlocked = false;
+    // @ts-ignore
     if (this.table._isDataRendered()) {
+      // @ts-ignore
       this.table._renderViewport();
     }
   }

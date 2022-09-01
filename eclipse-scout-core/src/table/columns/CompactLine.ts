@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -12,10 +12,11 @@ import {Cell, CompactLineBlock, scout} from '../../index';
 
 export default class CompactLine {
 
-  constructor(labelOrHeaderCell, textOrCell) {
-    /** @type {CompactLineBlock} */
+  labelBlock: CompactLineBlock;
+  textBlock: CompactLineBlock;
+
+  constructor(labelOrHeaderCell: Cell | string, textOrCell: Cell | string) {
     this.labelBlock = null;
-    /** @type {CompactLineBlock} */
     this.textBlock = null;
     if (labelOrHeaderCell instanceof Cell) {
       this.setLabelBlock(this.convertHeaderCellToBlock(labelOrHeaderCell));
@@ -29,11 +30,11 @@ export default class CompactLine {
     }
   }
 
-  convertHeaderCellToBlock(cell) {
+  convertHeaderCellToBlock(cell: Cell): CompactLineBlock {
     return this.convertCellToBlock(cell);
   }
 
-  convertCellToBlock(cell) {
+  convertCellToBlock(cell: Cell): CompactLineBlock {
     let block = new CompactLineBlock();
     if (cell != null) {
       block.setText(cell.text);
@@ -43,17 +44,17 @@ export default class CompactLine {
     return block;
   }
 
-  setLabelBlock(block) {
+  setLabelBlock(block: CompactLineBlock) {
     scout.assertParameter('block', block);
     this.labelBlock = block;
   }
 
-  setTextBlock(block) {
+  setTextBlock(block: CompactLineBlock) {
     scout.assertParameter('block', block);
     this.textBlock = block;
   }
 
-  build() {
+  build(): string {
     let label = this.labelBlock.build();
     if (label) {
       label += ': ';

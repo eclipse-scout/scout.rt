@@ -1,17 +1,22 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilter, scout, StringField, strings} from '../../index';
+import {ColumnUserFilter, FilterFieldsGroupBox, scout, StringField, strings, TableRow, TextColumnUserFilterModel} from '../../index';
 import $ from 'jquery';
+import {TableUserFilterAddedEventData} from './TableUserFilter';
 
 export default class TextColumnUserFilter extends ColumnUserFilter {
+  declare model: TextColumnUserFilterModel;
+
+  freeText: string;
+  freeTextField: StringField;
 
   constructor() {
     super();
@@ -21,42 +26,27 @@ export default class TextColumnUserFilter extends ColumnUserFilter {
     this.hasFilterFields = true;
   }
 
-  /**
-   * @override ColumnUserFilter.js
-   */
-  createFilterAddedEventData() {
+  override createFilterAddedEventData(): TableUserFilterAddedEventData {
     let data = super.createFilterAddedEventData();
     data.freeText = this.freeText;
     return data;
   }
 
-  /**
-   * @override ColumnUserFilter.js
-   */
-  fieldsFilterActive() {
+  override fieldsFilterActive(): boolean {
     return strings.hasText(this.freeText);
   }
 
-  /**
-   * @override ColumnUserFilter.js
-   */
-  acceptByFields(key, normKey, row) {
+  override acceptByFields(key: any, normKey: number | string, row: TableRow): boolean {
     let filterFieldText = strings.nvl(this.freeText).toLowerCase(),
       rowText = strings.nvl(this.column.cellTextForTextFilter(row)).toLowerCase();
     return rowText.indexOf(filterFieldText) > -1;
   }
 
-  /**
-   * @override
-   */
-  filterFieldsTitle() {
+  override filterFieldsTitle(): string {
     return this.session.text('ui.FreeText');
   }
 
-  /**
-   * @override ColumnUserFilter.js
-   */
-  addFilterFields(groupBox) {
+  override addFilterFields(groupBox: FilterFieldsGroupBox) {
     this.freeTextField = scout.create(StringField, {
       parent: groupBox,
       labelVisible: false,
@@ -69,16 +59,13 @@ export default class TextColumnUserFilter extends ColumnUserFilter {
     groupBox.addField0(this.freeTextField);
   }
 
-  _onAcceptInput(event) {
+  protected _onAcceptInput(event) { // FIXME TS: add event type as soon as StringField has been migrated.
     this.freeText = this.freeTextField.$field.val().trim();
     $.log.isDebugEnabled() && $.log.debug('(TextColumnUserFilter#_onAcceptInput) freeText=' + this.freeText);
-    this.triggerFilterFieldsChanged(event);
+    this.triggerFilterFieldsChanged();
   }
 
-  /**
-   * @override ColumnUserFilter.js
-   */
-  modifyFilterFields() {
+  override modifyFilterFields() {
     this.freeTextField.removeMandatoryIndicator();
   }
 }

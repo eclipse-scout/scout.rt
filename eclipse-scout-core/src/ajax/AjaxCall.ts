@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxError, Call, URL} from '../index';
+import {AjaxError, Call, CallModel, URL} from '../index';
 import $ from 'jquery';
 
-export default class AjaxCall extends Call {
-  ajaxOptions: any;
+export default class AjaxCall extends Call implements AjaxCallModel {
+
+  declare model: AjaxCallModel;
+  declare pendingCall: JQuery.jqXHR;
+  ajaxOptions: JQuery.AjaxSettings;
 
   constructor() {
     super();
@@ -20,7 +23,7 @@ export default class AjaxCall extends Call {
     this.ajaxOptions = null;
   }
 
-  init(model) {
+  override init(model: AjaxCallModel) {
     if (!model) {
       throw new Error('Missing argument "model"');
     }
@@ -35,10 +38,10 @@ export default class AjaxCall extends Call {
 
   // ==================================================================================
 
-  protected _callImpl() {
+  protected override _callImpl(): JQuery.jqXHR {
     // Mark retries by adding an URL parameter
     if (this.callCounter !== 1) {
-      this.ajaxOptions.url = new URL(this.ajaxOptions.url).setParameter('retry', this.callCounter - 1).toString({
+      this.ajaxOptions.url = new URL(this.ajaxOptions.url).setParameter('retry', (this.callCounter - 1) + '').toString({
         alwaysLast: ['retry']
       });
     }
@@ -47,7 +50,7 @@ export default class AjaxCall extends Call {
     return $.ajax(this.ajaxOptions);
   }
 
-  protected _setResultFail(jqXHR, textStatus, errorThrown) {
+  protected override _setResultFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
     // Store result as single object to make rethrowing the error easier for callers of AjaxCall
     this._setResult(new AjaxError({
       jqXHR: jqXHR,
@@ -57,18 +60,18 @@ export default class AjaxCall extends Call {
     }));
   }
 
-  protected _onCallDone(data, textStatus, jqXHR) {
+  protected override _onCallDone(data: any, textStatus: JQuery.Ajax.SuccessTextStatus, jqXHR: JQuery.jqXHR) {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX success');
     super._onCallDone(data, textStatus, jqXHR);
   }
 
-  protected _onCallFail(jqXHR, textStatus, errorThrown) {
+  protected override _onCallFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX fail: type=' + textStatus + ', httpStatus=' + jqXHR.status + (errorThrown ? ' "' + errorThrown + '"' : ''));
     super._onCallFail(jqXHR, textStatus, errorThrown);
   }
 
-  protected _nextRetryImpl(jqXHR, textStatus, errorThrown) {
-    let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown, this.request);
+  protected override _nextRetryImpl(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+    let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown);
     if (!offlineError) {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Unexpected HTTP error');
       return false;
@@ -78,7 +81,7 @@ export default class AjaxCall extends Call {
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
-  static isOfflineError(jqXHR, textStatus, errorThrown, request) {
+  static isOfflineError(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string): boolean {
     // noinspection UnnecessaryLocalVariableJS
     let offline = (
       // Status code = 0 -> no connection
@@ -102,9 +105,16 @@ export default class AjaxCall extends Call {
     return offline;
   }
 
-  protected _abortImpl() {
+  protected override _abortImpl() {
     if (this.pendingCall && typeof this.pendingCall.abort === 'function') {
       this.pendingCall.abort();
     }
   }
+}
+
+export interface AjaxCallModel extends CallModel {
+  /**
+   * Options for the jquery ajax call. At least the {@link CallModel.url} is required.
+   */
+  ajaxOptions: JQuery.AjaxSettings;
 }

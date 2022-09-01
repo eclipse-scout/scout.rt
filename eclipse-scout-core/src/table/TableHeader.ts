@@ -1,17 +1,41 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Column, ColumnUserFilter, Device, graphics, GroupBoxMenuItemsOrder, inspector, MenuBar, MenuDestinations, objects, scout, scrollbars, strings, styles, Table, tooltips, Widget} from '../index';
+import {
+  arrays, Column, ColumnModel, ColumnUserFilter, Device, EventHandler, graphics, GroupBoxMenuItemsOrder, inspector, MenuBar, MenuDestinations, objects, PropertyChangeEvent, scout, scrollbars, strings, styles, Table, TableHeaderEventMap,
+  TableHeaderMenu, TableHeaderModel, tooltips, Widget
+} from '../index';
 import $ from 'jquery';
+import {TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent} from './TableEventMap';
 
-export default class TableHeader extends Widget {
+export default class TableHeader extends Widget implements TableHeaderModel {
+  declare model: TableHeaderModel;
+  declare eventMap: TableHeaderEventMap;
+
+  headerMenusEnabled: boolean;
+  table: Table;
+  dragging: boolean;
+  columnMoved: boolean;
+  menuBar: MenuBar;
+  tableHeaderMenu: TableHeaderMenu;
+  $menuBarContainer: JQuery<HTMLDivElement>;
+  $filler: JQuery<HTMLDivElement>;
+
+  protected _tableDataScrollHandler: () => void;
+  protected _tableAddFilterRemovedHandler: EventHandler<TableFilterAddedEvent | TableFilterRemovedEvent>;
+  protected _tableColumnResizedHandler: EventHandler<TableColumnResizedEvent>;
+  protected _tableColumnMovedHandler: EventHandler<TableColumnMovedEvent>;
+  protected _renderedColumns: Column[];
+  protected _$window: JQuery<Window>;
+  protected _$body: JQuery<Body>;
+  protected _fixTimeout: number;
 
   constructor() {
     super();
@@ -26,7 +50,7 @@ export default class TableHeader extends Widget {
     this._renderedColumns = [];
   }
 
-  _init(options) {
+  protected override _init(options: TableHeaderModel) {
     super._init(options);
 
     this.menuBar = scout.create(MenuBar, {
@@ -39,7 +63,7 @@ export default class TableHeader extends Widget {
     this.updateMenuBar();
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.table.$data.beforeDiv('table-header')
       .cssBorderLeftWidth(this.table.rowBorders.left || '');
 
@@ -64,7 +88,7 @@ export default class TableHeader extends Widget {
     this.table.on('columnMoved', this._tableColumnMovedHandler);
   }
 
-  _remove() {
+  protected override _remove() {
     this.table.$data.off('scroll', this._tableDataScrollHandler);
     this.table.off('filterAdded', this._tableAddFilterRemovedHandler);
     this.table.off('filterRemoved', this._tableAddFilterRemovedHandler);
@@ -81,7 +105,7 @@ export default class TableHeader extends Widget {
     this._renderColumns();
   }
 
-  _renderColumns() {
+  protected _renderColumns() {
     let visibleColumns = this._visibleColumns();
     visibleColumns.forEach(this._renderColumn, this);
     if (visibleColumns.length === 0) {
@@ -91,8 +115,8 @@ export default class TableHeader extends Widget {
     this._reconcileScrollPos();
   }
 
-  _renderColumn(column, index) {
-    let columnWidth = column._realWidthIfAvailable(),
+  protected _renderColumn(column: Column, index: number) {
+    let columnWidth = column.realWidthIfAvailable(),
       visibleColumns = this._visibleColumns(),
       isFirstColumn = (index === 0),
       isLastColumn = (index === visibleColumns.length - 1);
@@ -146,11 +170,11 @@ export default class TableHeader extends Widget {
     this._renderedColumns.push(column);
   }
 
-  _removeColumns() {
+  protected _removeColumns() {
     this._renderedColumns.slice().forEach(this._removeColumn, this);
   }
 
-  _removeColumn(column) {
+  protected _removeColumn(column: Column) {
     if (column.$header) {
       column.$header.remove();
       column.$header = null;
@@ -162,7 +186,7 @@ export default class TableHeader extends Widget {
     arrays.remove(this._renderedColumns, column);
   }
 
-  resizeHeaderItem(column) {
+  resizeHeaderItem(column: Column) {
     if (!column) {
       // May be undefined if there are no columns
       return;
@@ -172,9 +196,8 @@ export default class TableHeader extends Widget {
       return;
     }
 
-    let remainingHeaderSpace, adjustment,
-      $header = column.$header,
-      columnWidth = column._realWidthIfAvailable(),
+    let $header = column.$header,
+      columnWidth = column.realWidthIfAvailable(),
       margins = graphics.margins($header),
       menuBarWidth = (this.menuBar.visible ? this.$menuBarContainer.outerWidth(true) : 0),
       visibleColumns = this._visibleColumns(),
@@ -184,10 +207,10 @@ export default class TableHeader extends Widget {
     columnWidth -= margins.horizontal();
 
     if (isLastColumn && menuBarWidth > 0) {
-      remainingHeaderSpace = this.$container.width() - this.table.rowWidth + graphics.insets(this.$container).right;
+      let remainingHeaderSpace = this.$container.width() - this.table.rowWidth + graphics.insets(this.$container).right;
 
       if (remainingHeaderSpace < menuBarWidth) {
-        adjustment = menuBarWidth;
+        let adjustment = menuBarWidth;
         if (column.$separator) {
           adjustment += column.$separator.width();
         }
@@ -213,7 +236,7 @@ export default class TableHeader extends Widget {
     this._visibleColumns().forEach(this.resizeHeaderItem.bind(this));
   }
 
-  _reconcileScrollPos() {
+  protected _reconcileScrollPos() {
     // When scrolling horizontally scroll header as well
     let
       scrollLeft = this.table.get$Scrollable().scrollLeft(),
@@ -224,7 +247,7 @@ export default class TableHeader extends Widget {
     this.$menuBarContainer.cssRight(-1 * scrollLeft);
   }
 
-  _arrangeHeaderItems($headers) {
+  protected _arrangeHeaderItems($headers: JQuery) {
     let that = this;
     $headers.each(function() {
       // move to old position and then animate
@@ -249,7 +272,7 @@ export default class TableHeader extends Widget {
     });
   }
 
-  _installHeaderItemTooltip(column) {
+  protected _installHeaderItemTooltip(column: Column) {
     tooltips.install(column.$header, {
       parent: this,
       text: this._headerItemTooltipText.bind(this),
@@ -260,28 +283,26 @@ export default class TableHeader extends Widget {
     });
   }
 
-  _installHeaderItemTooltips() {
+  protected _installHeaderItemTooltips() {
     this._visibleColumns().forEach(this._installHeaderItemTooltip, this);
   }
 
-  _uninstallHeaderItemTooltip(column) {
+  protected _uninstallHeaderItemTooltip(column: Column) {
     tooltips.uninstall(column.$header);
   }
 
-  _uninstallHeaderItemTooltips() {
+  protected _uninstallHeaderItemTooltips() {
     this._visibleColumns().forEach(this._uninstallHeaderItemTooltip, this);
   }
 
-  _headerItemTooltipText($col) {
-    let column = $col.data('column');
+  protected _headerItemTooltipText($col: JQuery): string {
+    let column = $col.data('column') as Column;
     if (column && strings.hasText(column.headerTooltipText)) {
       return column.headerTooltipText;
     }
     let $text = $col.children('.table-header-item-text');
     if ($text.isContentTruncated() || ($col.width() + $col.position().left) > $col.parent().width()) {
-      let text = strings.plainText($text.html(), {
-        trim: true
-      });
+      let text = strings.plainText($text.html(), {trim: true});
       if (strings.hasText(text)) {
         return text;
       }
@@ -289,22 +310,20 @@ export default class TableHeader extends Widget {
     return null;
   }
 
-  _headerItemTooltipHtmlEnabled($col) {
-    let column = $col.data('column');
+  protected _headerItemTooltipHtmlEnabled($col: JQuery): boolean {
+    let column = $col.data('column') as Column;
     return column.headerTooltipHtmlEnabled;
   }
 
-  setHeaderMenusEnabled(headerMenusEnabled) {
+  setHeaderMenusEnabled(headerMenusEnabled: boolean) {
     this.setProperty('headerMenusEnabled', headerMenusEnabled);
   }
 
-  _renderHeaderMenusEnabled() {
-    this._visibleColumns().forEach(function(column) {
-      this._decorateHeader(column);
-    }, this);
+  protected _renderHeaderMenusEnabled() {
+    this._visibleColumns().forEach(column => this._decorateHeader(column));
   }
 
-  openHeaderMenu(column) {
+  openHeaderMenu(column: Column) {
     if (this.tableHeaderMenu) {
       // Make sure existing header menu is closed first
       this.closeHeaderMenu();
@@ -329,28 +348,22 @@ export default class TableHeader extends Widget {
     this.tableHeaderMenu = null;
   }
 
-  onColumnActionsChanged(event) {
-    if (this.tableHeaderMenu) {
-      this.tableHeaderMenu.onColumnActionsChanged(event);
-    }
-  }
-
-  findHeaderItems() {
+  findHeaderItems(): JQuery {
     return this.$container.find('.table-header-item:not(.filler)');
   }
 
   /**
    * Updates the column headers visualization of the text, sorting and styling state
-   * @param [oldColumnState] only necessary when the css class was updated
+   * @param oldColumnState only necessary when the css class was updated
    */
-  updateHeader(column, oldColumnState) {
+  updateHeader(column: Column, oldColumnState?: ColumnModel) {
     if (!column.isVisible()) {
       return;
     }
     this._decorateHeader(column, oldColumnState);
   }
 
-  _decorateHeader(column, oldColumnState) {
+  protected _decorateHeader(column: Column, oldColumnState?: ColumnModel) {
     this._renderColumnCssClass(column, oldColumnState);
     this._renderColumnText(column);
     this._renderColumnIconId(column);
@@ -360,7 +373,7 @@ export default class TableHeader extends Widget {
     this._renderColumnHorizontalAlignment(column);
   }
 
-  _renderColumnCssClass(column, oldColumnState) {
+  protected _renderColumnCssClass(column: Column, oldColumnState?: ColumnModel) {
     let $header = column.$header;
     if (oldColumnState) {
       $header.removeClass(oldColumnState.headerCssClass);
@@ -368,7 +381,7 @@ export default class TableHeader extends Widget {
     $header.addClass(column.headerCssClass);
   }
 
-  _renderColumnText(column) {
+  protected _renderColumnText(column: Column) {
     let text = column.text,
       $header = column.$header,
       $headerText = $header.children('.table-header-item-text');
@@ -381,17 +394,17 @@ export default class TableHeader extends Widget {
     this._updateColumnIconAndTextStyle(column);
   }
 
-  _renderColumnIconId(column) {
+  protected _renderColumnIconId(column: Column) {
     column.$header.icon(column.headerIconId);
     this._updateColumnIconAndTextStyle(column);
   }
 
-  _renderColumnHorizontalAlignment(column) {
+  protected _renderColumnHorizontalAlignment(column: Column) {
     column.$header.removeClass('halign-left halign-center halign-right');
     column.$header.addClass('halign-' + Table.parseHorizontalAlignment(column.horizontalAlignment));
   }
 
-  _updateColumnIconAndTextStyle(column) {
+  protected _updateColumnIconAndTextStyle(column: Column) {
     let $icon = column.$header.data('$icon'),
       $text = column.$header.children('.table-header-item-text');
 
@@ -404,27 +417,26 @@ export default class TableHeader extends Widget {
     column.$header.toggleClass('table-header-item-icon-only', !!(column.headerIconId && !column.text));
   }
 
-  _renderColumnLegacyStyle(column) {
+  protected _renderColumnLegacyStyle(column: Column) {
     styles.legacyStyle(column, column.$header, 'header');
   }
 
-  _renderColumnHeaderMenuEnabled(column) {
+  protected _renderColumnHeaderMenuEnabled(column: Column) {
     column.$header.toggleClass('disabled', !this._isHeaderMenuEnabled(column) || !this.enabled); // enabledComputed not used on purpose
   }
 
-  _renderColumnState(column) {
-    let sortDirection, $state,
-      $header = column.$header,
+  protected _renderColumnState(column: Column) {
+    let $header = column.$header,
       filtered = this.table.getFilter(column.id);
 
     $header.children('.table-header-item-state').remove();
-    $state = $header.appendSpan('table-header-item-state');
+    let $state = $header.appendSpan('table-header-item-state');
     $state.empty();
     $header.removeClass('sort-asc sort-desc sorted group-asc group-desc grouped filtered');
     $state.removeClass('sort-asc sort-desc sorted group-asc group-desc grouped filtered');
 
     if (column.sortActive) {
-      sortDirection = column.sortAscending ? 'asc' : 'desc';
+      let sortDirection = column.sortAscending ? 'asc' : 'desc';
       if (column.grouped) {
         $header.addClass('group-' + sortDirection);
       }
@@ -455,7 +467,7 @@ export default class TableHeader extends Widget {
   /**
    * Makes sure state is fully visible by adjusting width (happens if column.minWidth is < DEFAULT_MIN_WIDTH)
    */
-  _adjustColumnMinWidth(column) {
+  protected _adjustColumnMinWidth(column: Column & { __minWidthWithoutState?: number; __widthWithoutState?: number }) {
     let filtered = this.table.getFilter(column.id);
     if (column.sortActive || column.grouped || filtered) {
       if (column.minWidth < Column.DEFAULT_MIN_WIDTH) {
@@ -481,12 +493,13 @@ export default class TableHeader extends Widget {
   }
 
   updateMenuBar() {
+    // @ts-ignore
     let menuItems = this.table._filterMenus(this.table.menus, MenuDestinations.HEADER);
     this.menuBar.setHiddenByUi(!this.enabled); // enabledComputed not used on purpose
     this.menuBar.setMenuItems(menuItems);
   }
 
-  _onTableColumnResized(event) {
+  protected _onTableColumnResized(event: TableColumnResizedEvent) {
     let column = event.column,
       lastColumn = this._lastVisibleColumn();
     this.resizeHeaderItem(column);
@@ -499,7 +512,7 @@ export default class TableHeader extends Widget {
     this._visibleColumns().forEach(this._renderColumnState, this);
   }
 
-  _onTableColumnMoved(event) {
+  protected _onTableColumnMoved(event: TableColumnMovedEvent) {
     let
       column = event.column,
       oldPos = event.oldPos,
@@ -539,9 +552,7 @@ export default class TableHeader extends Widget {
 
     // Update header size due to header menu items if moved from or to last position
     if (oldPos === lastColumnPos || newPos === lastColumnPos) {
-      visibleColumns.forEach(column => {
-        this.resizeHeaderItem(column);
-      });
+      visibleColumns.forEach(column => this.resizeHeaderItem(column));
     }
 
     // move to old position and then animate
@@ -554,16 +565,15 @@ export default class TableHeader extends Widget {
     }
   }
 
-  _visibleColumns() {
+  protected _visibleColumns(): Column[] {
     return this.table.visibleColumns();
   }
 
-  _lastVisibleColumn() {
+  protected _lastVisibleColumn(): Column {
     return arrays.last(this._visibleColumns());
   }
 
-  onOrderChanged(oldColumnOrder) {
-    let $header, $headerResize;
+  onOrderChanged(oldColumnOrder: Column[]) {
     let $headers = this.findHeaderItems();
 
     // store old position of headers
@@ -572,13 +582,13 @@ export default class TableHeader extends Widget {
     });
 
     // change order in dom of header
-    this._visibleColumns().forEach(function(column) {
-      $header = column.$header;
-      $headerResize = $header.next('.table-header-resize');
+    this._visibleColumns().forEach(column => {
+      let $header = column.$header;
+      let $headerResize = $header.next('.table-header-resize');
 
       this.$container.append($header);
       this.$container.append($headerResize);
-    }, this);
+    });
 
     // ensure filler is at the end
     this.$container.append(this.$filler);
@@ -589,19 +599,19 @@ export default class TableHeader extends Widget {
   /**
    * Header menus are enabled when property is enabled on the header itself and on the column too.
    */
-  _isHeaderMenuEnabled(column) {
+  protected _isHeaderMenuEnabled(column: Column): boolean {
     return !!(column.headerMenuEnabled && this.headerMenusEnabled);
   }
 
-  _onHeaderItemClick(event) {
+  protected _onHeaderItemClick(event: JQuery.ClickEvent): boolean {
     let $headerItem = $(event.currentTarget),
-      column = $headerItem.data('column');
+      column = $headerItem.data('column') as Column;
 
     if (this.dragging || this.columnMoved) {
       this.dragging = false;
       this.columnMoved = false;
     } else if (this.table.sortEnabled && (event.shiftKey || event.ctrlKey || !this._isHeaderMenuEnabled(column))) {
-      this.table.removeColumnGrouping();
+      this.table.removeColumnGrouping(column);
       this.table.sort(column, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
     } else if (this.tableHeaderMenu && this.tableHeaderMenu.isOpenFor($headerItem)) {
       this.closeHeaderMenu();
@@ -612,7 +622,7 @@ export default class TableHeader extends Widget {
     return false;
   }
 
-  _onHeaderItemMouseDown(event) {
+  protected _onHeaderItemMouseDown(event: JQuery.MouseDownEvent) {
     if (event.button > 0) {
       return; // ignore buttons other than the main (left) mouse button
     }
@@ -621,7 +631,7 @@ export default class TableHeader extends Widget {
       that = this,
       startX = Math.floor(event.pageX),
       $header = $(event.currentTarget),
-      column = $header.data('column'),
+      column = $header.data('column') as Column,
       oldPos = this._visibleColumns().indexOf(column),
       newPos = oldPos,
       move = $header.outerWidth(),
@@ -633,7 +643,7 @@ export default class TableHeader extends Widget {
     }
 
     this.dragging = false;
-    // firefox fires a click action after a column has been droped at the new location, chrome doesn't -> we need a hint to avoid menu gets opened after drop
+    // firefox fires a click action after a column has been dropped at the new location, chrome doesn't -> we need a hint to avoid menu gets opened after drop
     this.columnMoved = false;
 
     // start drag & drop events
@@ -641,7 +651,7 @@ export default class TableHeader extends Widget {
       .on('mousemove.tableheader', '', dragMove)
       .one('mouseup', '', dragEnd);
 
-    function dragMove(event) {
+    function dragMove(event: JQuery.MouseMoveEvent) {
       diff = Math.floor(event.pageX) - startX;
       if (-2 < diff && diff < 2) {
         // Don't move if it was no movement or just a very small one
@@ -681,7 +691,7 @@ export default class TableHeader extends Widget {
       that.rendered && that._uninstallHeaderItemTooltips();
     }
 
-    function realWidth($div) {
+    function realWidth($div: JQuery): number {
       let html = $div.html(),
         width = $div.html('<span>' + html + '</span>').find('span:first').width();
 
@@ -690,16 +700,16 @@ export default class TableHeader extends Widget {
     }
 
     /**
-     * @return {number} the middle of the text (not the middle of the whole header item)
+     * @return the middle of the text (not the middle of the whole header item)
      */
-    function realMiddle($div) {
+    function realMiddle($div: JQuery): number {
       if ($div.hasClass('halign-right')) {
         return $div.offset().left + $div.outerWidth() - realWidth($div) / 2;
       }
       return $div.offset().left + realWidth($div) / 2;
     }
 
-    function dragEnd(event) {
+    function dragEnd(event: JQuery.MouseUpEvent): boolean {
       that._$window && that._$window.off('mousemove.tableheader');
 
       // in case of no movement: return
@@ -742,7 +752,7 @@ export default class TableHeader extends Widget {
     }
   }
 
-  _onSeparatorDblclick(event) {
+  protected _onSeparatorDblclick(event: JQuery.DoubleClickEvent) {
     if (event.button > 0) {
       return; // ignore buttons other than the main (left) mouse button
     }
@@ -760,14 +770,14 @@ export default class TableHeader extends Widget {
     }
   }
 
-  _onSeparatorMouseDown(event) {
+  protected _onSeparatorMouseDown(event: JQuery.MouseDownEvent) {
     if (event.button > 0) {
       return; // ignore buttons other than the main (left) mouse button
     }
 
     let startX = Math.floor(event.pageX),
       $header = $(event.target).prev(),
-      column = $header.data('column'),
+      column = $header.data('column') as Column,
       that = this,
       headerWidth = column.width;
 
@@ -789,7 +799,7 @@ export default class TableHeader extends Widget {
     // Prevent text selection in a form, don't stop propagation to allow others (e.g. cell editor) to react
     event.preventDefault();
 
-    function resizeMove(event) {
+    function resizeMove(event: JQuery.MouseMoveEvent) {
       let diff = Math.floor(event.pageX) - startX,
         wHeader = headerWidth + diff;
 
@@ -799,7 +809,7 @@ export default class TableHeader extends Widget {
       }
     }
 
-    function resizeEnd(event) {
+    function resizeEnd(event: JQuery.MouseUpEvent) {
       // Remove resize helpers
       $headerColumnResizedHelper.remove();
       $dataColumnResizedHelper.remove();
@@ -813,19 +823,19 @@ export default class TableHeader extends Widget {
     }
   }
 
-  _onTableDataScroll() {
+  protected _onTableDataScroll() {
     scrollbars.fix(this.$menuBarContainer);
     this._reconcileScrollPos();
     this._fixTimeout = scrollbars.unfix(this.$menuBarContainer, this._fixTimeout);
   }
 
-  _onMenuBarPropertyChange(event) {
+  protected _onMenuBarPropertyChange(event: PropertyChangeEvent<any, MenuBar>) {
     if (this.rendered && event.propertyName === 'visible') {
       this.$menuBarContainer.setVisible(event.newValue);
     }
   }
 
-  _onTableAddFilterRemoved(event) {
+  protected _onTableAddFilterRemoved(event: TableFilterAddedEvent | TableFilterRemovedEvent) {
     let column = event.filter.column;
     // Check for column.$header because column may have been removed in the mean time due to a structure changed event -> don't try to render state
     if (event.filter.filterType === ColumnUserFilter.TYPE && column.$header) {

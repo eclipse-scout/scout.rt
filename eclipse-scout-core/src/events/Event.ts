@@ -11,12 +11,12 @@
 import $ from 'jquery';
 import {EventEmitter} from '../index';
 
-export default class Event {
-  source: EventEmitter;
+export default class Event<T extends EventEmitter = EventEmitter> {
+  source: T;
   defaultPrevented: boolean;
   type: string;
 
-  constructor(model?) {
+  constructor(model?: any) {
     this.defaultPrevented = false;
     $.extend(this, model);
   }
@@ -25,4 +25,3 @@ export default class Event {
     this.defaultPrevented = true;
   }
 }
-

@@ -24,6 +24,7 @@ module.exports = {
     'spaced-comment': ['error', 'always', {'exceptions': ['*'], 'markers': ['/']}], // Allow triple slash directives
     'semi': 'off', // Disable because it will be replaced by typescript rule below to avoid conflicting rules with semicolon in interfaces
     '@typescript-eslint/semi': ['error'],
+    '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/member-delimiter-style': 'warn', // Enforce semicolon for interface members for consistency,
     '@typescript-eslint/no-this-alias': 'off', // Allow assigment of this to a variable, e.g. for better readability. 'That' and 'self' are not used often anymore.
     'indent': 'off', // Disable because it will be replaced by the following ts rule

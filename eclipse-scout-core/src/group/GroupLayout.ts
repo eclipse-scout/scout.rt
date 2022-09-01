@@ -1,23 +1,24 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension} from '../index';
+import {AbstractLayout, Dimension, Group, HtmlComponent, HtmlCompPrefSizeOptions} from '../index';
 
 export default class GroupLayout extends AbstractLayout {
+  group: Group;
 
-  constructor(group) {
+  constructor(group: Group) {
     super();
     this.group = group;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let htmlComp = this.group.htmlComp;
     let containerSize = htmlComp.availableSize()
       .subtract(htmlComp.insets());
@@ -58,7 +59,7 @@ export default class GroupLayout extends AbstractLayout {
     htmlBody.setSize(bodySize);
   }
 
-  invalidate(htmlSource) {
+  override invalidate(htmlSource: HtmlComponent) {
     let htmlBody = this.group.body.htmlComp;
     // If a child triggers a layout invalidation, the animation should be stopped and restarted because the body will likely have another height.
     // This will happen for sure if a child is an image which will be loaded during the animation.
@@ -71,7 +72,7 @@ export default class GroupLayout extends AbstractLayout {
     }
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     options = options || {};
     let prefSize;
     let htmlComp = this.group.htmlComp;

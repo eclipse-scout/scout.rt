@@ -3,28 +3,35 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, objects, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEvent, WidgetModel} from '../index';
+import {
+  Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, Event, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext,
+  LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+} from '../index';
 import * as $ from 'jquery';
-import {RefWidgetModel} from './WidgetModel';
+import {ObjectType} from '../ObjectFactory';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {ScrollbarInstallOptions, ScrollOptions, ScrollToOptions} from '../scrollbar/scrollbars';
+import {Optional, RefModel} from '../types';
 
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
-export type GlassPaneContribution = JQuery | DeferredGlassPaneTarget;
+export type GlassPaneContribution = (widget: Widget) => JQuery | JQuery[];
 export type WidgetOrModel = Widget | WidgetModel;
+export type TreeVisitor<T> = (element: T) => boolean | TreeVisitResult | void;
 
 export interface CloneOptions {
   /** An array of all properties to be delegated from the original to the clone when changed on the original widget. Default is []. */
-  delegatePropertiesToClone?: [string];
+  delegatePropertiesToClone?: string[];
   /** An array of all properties to be delegated from the clone to the original when changed on the clone widget. Default is []. */
-  delegatePropertiesToOriginal?: [string];
+  delegatePropertiesToOriginal?: string[];
   /** An array of all properties to be excluded from delegating from the clone to the original in any cases. Default is []. */
-  excludePropertiesToOriginal?: [string];
+  excludePropertiesToOriginal?: string[];
   /** An array of all events to be delegated from the clone to the original when fired on the clone widget. Default is []. */
-  delegateEventsToOriginal?: [string];
+  delegateEventsToOriginal?: string[];
   /** True to delegate all property changes from the original to the clone. Default is false. */
   delegateAllPropertiesToClone?: boolean;
   /** True to delegate all property changes from the clone to the original. Default is false. */
@@ -37,7 +44,9 @@ interface EventDelegatorForCloning {
   cloneToOriginal: EventDelegator;
 }
 
-export default class Widget extends PropertyEventEmitter implements WidgetModel {
+export default class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType {
+  declare model: WidgetModel;
+  declare eventMap: WidgetEventMap;
   animateRemoval: boolean;
   animateRemovalClass: string;
   attached: boolean;
@@ -72,18 +81,20 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
   session: Session;
   trackFocus: boolean;
   visible: boolean;
+  modelAdapter: ModelAdapter;
+  displayParent: DisplayParent;
   $container: JQuery;
   $parent: JQuery;
   protected _$lastFocusedElement: JQuery;
   protected _cloneProperties: string[];
   protected _focusInListener: JQuery.EventHandler<HTMLElement>;
   protected _glassPaneContributions: GlassPaneContribution[];
-  protected _parentDestroyHandler: EventHandler<WidgetEvent>;
-  protected _parentRemovingWhileAnimatingHandler: EventHandler<WidgetEvent>;
+  protected _parentDestroyHandler: EventHandler;
+  protected _parentRemovingWhileAnimatingHandler: EventHandler;
   protected _postRenderActions: (() => void)[];
   protected _preserveOnPropertyChangeProperties: string[];
   protected _rendered: boolean;
-  protected _scrollHandler: JQuery.EventHandler<HTMLElement>;
+  protected _scrollHandler: (event: JQuery.ScrollEvent<HTMLElement>) => void;
   protected _storedFocusedWidget: Widget;
   protected _widgetProperties: string[];
 
@@ -272,7 +283,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
    * Default implementation simply returns undefined. A Subclass
    * may override this method to load or extend a JSON model with models.getModel or models.extend.
    */
-  protected _jsonModel(): RefWidgetModel<WidgetModel> {
+  protected _jsonModel(): RefModel<WidgetModel> {
     return null;
   }
 
@@ -315,7 +326,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
       return existingWidget;
     }
     model.parent = this;
-    return scout.create(model as { objectType: string });
+    return scout.create(model as WidgetModel & { objectType: ObjectType<Widget> });
   }
 
   protected _initKeyStrokeContext() {
@@ -626,7 +637,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     this.session.desktop.removePopupsFor(this);
 
     this.removalPending = true;
-    // Don't execute immediately to make sure nothing interferes with the animation (e.g. layouting) which could make it laggy
+    // Don't execute immediately to make sure nothing interferes with the animation (e.g. layouting) which could make it lag
     setTimeout(() => {
       // check if the container has been removed in the meantime
       if (!this._rendered) {
@@ -902,7 +913,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     });
   }
 
-  protected _childrenForEnabledComputed() {
+  protected _childrenForEnabledComputed(): Widget[] {
     return this.children;
   }
 
@@ -941,7 +952,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     this._renderDisabledStyleInternal(this.$container);
   }
 
-  protected _renderDisabledStyleInternal($element: JQuery) {
+  protected _renderDisabledStyleInternal($element: JQuery<HTMLElement>) {
     if (!$element) {
       return;
     }
@@ -1080,7 +1091,6 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
 
   /**
    * Creates nothing by default. If a widget needs loading support, override this method and return a loading support.
-   * @returns {LoadingSupport}
    */
   protected _createLoadingSupport(): LoadingSupport {
     return null;
@@ -1364,7 +1374,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
   /**
    * Detaches the element and all its children from the DOM.<br>
    * Compared to {@link remove}, the state of the HTML elements are preserved, so they can be attached again without the need to render them again from scratch.
-   * {@link attach}/{@link detach} is faster in general than {@link render}/{@link remove}, but it is much more error prone and should therefor only be used very carefully. Rule of thumb: Don't use it, use {@link remove} instead.<br>
+   * {@link attach}/{@link detach} is faster in general than {@link render}/{@link remove}, but it is much more error prone and should therefore only be used very carefully. Rule of thumb: Don't use it, use {@link remove} instead.<br>
    * The main problem with attach/detach is that a widget can change its model anytime. If this happens for a removed widget, only the model will change, and when rendered again, the recent model is used to create the HTML elements.
    * If the same happens when a widget is detached, the widget is still considered rendered and the model applied to the currently detached elements.
    * This may or may not work because a detached element for example does not have a size or a position.
@@ -1455,16 +1465,16 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     return null;
   }
 
-  updateKeyStrokes(newKeyStrokes: KeyStroke[], oldKeyStrokes: KeyStroke[]) {
+  updateKeyStrokes(newKeyStrokes: KeyStroke | KeyStroke[] | Action | Action[], oldKeyStrokes?: KeyStroke | KeyStroke[] | Action | Action[]) {
     this.unregisterKeyStrokes(oldKeyStrokes);
     this.registerKeyStrokes(newKeyStrokes);
   }
 
-  registerKeyStrokes(keyStrokes: KeyStroke[]) {
+  registerKeyStrokes(keyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
     this.keyStrokeContext.registerKeyStrokes(keyStrokes);
   }
 
-  unregisterKeyStrokes(keyStrokes: KeyStroke[]) {
+  unregisterKeyStrokes(keyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
     this.keyStrokeContext.unregisterKeyStrokes(keyStrokes);
   }
 
@@ -1587,13 +1597,12 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
    * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is shown with this widget as its 'displayParent'.<br>
    * If the widget is not rendered yet, a scout.DeferredGlassPaneTarget is returned.<br>
    * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
-   * @param {Widget} element widget that requested a glass pane
-   * @returns [$]|[DeferredGlassPaneTarget]
+   * @param element widget that requested a glass pane
    */
-  glassPaneTargets(element: Widget) {
-    let resolveGlassPanes = element => {
+  glassPaneTargets(element: Widget): (JQuery | DeferredGlassPaneTarget)[] {
+    let resolveGlassPanes: (element: Widget) => JQuery[] = element => {
       // contributions
-      let targets = arrays.flatMap(this._glassPaneContributions, cont => {
+      let targets = arrays.flatMap(this._glassPaneContributions, (cont: GlassPaneContribution) => {
         let $elements = cont(element);
         if ($elements) {
           return arrays.ensure($elements);
@@ -1610,11 +1619,9 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
   }
 
   /**
-   *
-   * @param {Widget} element widget that requested a glass pane
-   * @returns [$]
+   * @param element widget that requested a glass pane
    */
-  protected _glassPaneTargets(element: Widget) {
+  protected _glassPaneTargets(element: Widget): JQuery[] {
     // since popups are rendered outside the DOM of the widget parent-child hierarchy, get glassPaneTargets of popups belonging to this widget separately.
     return [this.$container].concat(
       this.session.desktop.getPopupsFor(this)
@@ -1630,7 +1637,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
   }
 
   /**
-   * @param [contribution] a function which returns glass pane targets (jQuery elements)
+   * @param contribution a function which returns glass pane targets (jQuery elements)
    */
   removeGlassPaneContribution(contribution: GlassPaneContribution) {
     arrays.remove(this._glassPaneContributions, contribution);
@@ -1639,7 +1646,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     });
   }
 
-  override toString() {
+  override toString(): string {
     let attrs = '';
     attrs += 'id=' + this.id;
     attrs += ' objectType=' + this.objectType;
@@ -1684,10 +1691,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     });
   }
 
-  resolveConsts(configs: { property: string; constType: string }[]) {
-    configs.forEach(config => {
-      objects.resolveConstProperty(this, config);
-    });
+  resolveConsts(configs: { property: string; constType: any }[]) {
+    configs.forEach(config => objects.resolveConstProperty(this, config));
   }
 
   /**
@@ -1698,7 +1703,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
    * <p>
    * If only the resolve operations without the lifecycle actions should be performed, you need to add the property to the list _preserveOnPropertyChangeProperties as well.
    */
-  protected _addWidgetProperties(properties: string[]) {
+  protected _addWidgetProperties(properties: string | string[]) {
     this._addProperties('_widgetProperties', properties);
   }
 
@@ -1706,11 +1711,11 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     return this._widgetProperties.indexOf(propertyName) > -1;
   }
 
-  protected _addCloneProperties(properties: string[]) {
+  protected _addCloneProperties(properties: string | string[]) {
     this._addProperties('_cloneProperties', properties);
   }
 
-  isCloneProperty(propertyName: string) {
+  isCloneProperty(propertyName: string): boolean {
     return this._cloneProperties.indexOf(propertyName) > -1;
   }
 
@@ -1721,15 +1726,15 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
    * <p>
    * The typical use case for such properties is referencing another widget without taking care of that widget.
    */
-  protected _addPreserveOnPropertyChangeProperties(properties: string[]) {
+  protected _addPreserveOnPropertyChangeProperties(properties: string | string[]) {
     this._addProperties('_preserveOnPropertyChangeProperties', properties);
   }
 
-  isPreserveOnPropertyChangeProperty(propertyName: string) {
+  isPreserveOnPropertyChangeProperty(propertyName: string): boolean {
     return this._preserveOnPropertyChangeProperties.indexOf(propertyName) > -1;
   }
 
-  protected _addProperties(propertyName: string, properties: string[]) {
+  protected _addProperties(propertyName: string, properties: string | string[]) {
     properties = arrays.ensure(properties);
     properties.forEach(property => {
       if (this[propertyName].indexOf(property) > -1) {
@@ -1763,7 +1768,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     }
   }
 
-  protected _removeWidgetProperties(properties: string[]) {
+  protected _removeWidgetProperties(properties: string | string[]) {
     if (Array.isArray(properties)) {
       arrays.removeAll(this._widgetProperties, properties);
     } else {
@@ -1822,7 +1827,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     return clone;
   }
 
-  protected _deepCloneProperties(clone: Widget, properties: string[], options: CloneOptions) {
+  protected _deepCloneProperties(clone: Widget, properties: string | string[], options: CloneOptions) {
     if (!properties) {
       return clone;
     }
@@ -2087,9 +2092,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
    * @param options.preventScroll prevents scrolling to new focused element (defaults to false)
    * @returns true if the element could be focused, false if not
    */
-  focus(options?: {
-    preventScroll?: boolean;
-  }): boolean {
+  focus(options?: { preventScroll?: boolean }): boolean {
     if (!this.rendered) {
       this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this, options));
       return false;
@@ -2100,7 +2103,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
   /**
    * Calls {@link focus()} and prevents the default behavior of the event if the focusing was successful.
    */
-  focusAndPreventDefault(event) {
+  focusAndPreventDefault(event: JQuery.Event): boolean {
     if (this.focus()) {
       // Preventing blur is bad for touch devices because it prevents that the keyboard can close.
       // In that case focus() will return false because focus manager is disabled.
@@ -2140,17 +2143,17 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
   }
 
   /**
-   * This method returns the HtmlElement to be used when {@link focus} is called.
+   * This method returns the {@link HTMLElement} to be used when {@link focus} is called.
    * It can be overridden, in case the widget needs to return something other than this.$container[0].
    */
-  getFocusableElement(): HTMLElement {
+  getFocusableElement(): HTMLElement | JQuery {
     if (this.rendered && this.$container) {
       return this.$container[0];
     }
     return null;
   }
 
-  protected _installScrollbars(options?: object) { // FIXME TS define options
+  protected _installScrollbars(options?: Optional<ScrollbarInstallOptions, 'parent'>) {
     let $scrollable = this.get$Scrollable();
     if (!$scrollable) {
       throw new Error('Scrollable is not defined, cannot install scrollbars');
@@ -2159,12 +2162,12 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
       // already installed
       return;
     }
-    options = options || {};
+    options = options || {parent: this};
     let defaults = {
       parent: this
     };
-    options = $.extend({}, defaults, options);
-    scrollbars.install($scrollable, options);
+    let opts = $.extend({}, defaults, options);
+    scrollbars.install($scrollable, opts);
     $scrollable.on('scroll', this._scrollHandler);
   }
 
@@ -2187,7 +2190,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     }
   }
 
-  protected _onScroll() {
+  protected _onScroll(event: JQuery.ScrollEvent<HTMLElement>) {
     let $scrollable = this.get$Scrollable();
     this._setProperty('scrollTop', $scrollable[0].scrollTop);
     this._setProperty('scrollLeft', $scrollable[0].scrollLeft);
@@ -2240,15 +2243,15 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
   }
 
   /**
-   * Returns the jQuery element which is supposed to be scrollable. This element will be used by the scroll functions like {@link #_installScrollbars}, {@link #setScrollTop}, {@link #setScrollLeft}, {@link #scrollToBottom} etc..
-   * The element won't be used unless {@link #_installScrollbars} is called.
+   * Returns the jQuery element which is supposed to be scrollable. This element will be used by the scroll functions like {@link _installScrollbars}, {@link setScrollTop}, {@link setScrollLeft}, {@link scrollToBottom} etc..
+   * The element won't be used unless {@link _installScrollbars} is called.
    * If the widget is mainly a wrapper for a scrollable widget and does not have a scrollable element by itself, you can use @{link #getDelegateScrollable} instead.
    */
   get$Scrollable(): JQuery {
     return this.$container;
   }
 
-  hasScrollShadow(position) { // FIXME TS define available positions
+  hasScrollShadow(position: string): boolean { // FIXME TS define available positions
     return scrollbars.hasScrollShadow(this.get$Scrollable(), position);
   }
 
@@ -2260,7 +2263,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     return null;
   }
 
-  scrollToTop(options?) { // FIXME TS define options
+  scrollToTop(options?: ScrollOptions) {
     if (this.getDelegateScrollable()) {
       this.getDelegateScrollable().scrollToTop();
       return;
@@ -2276,7 +2279,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
     scrollbars.scrollTop($scrollable, 0, options);
   }
 
-  scrollToBottom(options?) { // FIXME TS define options
+  scrollToBottom(options?: ScrollOptions) {
     if (this.getDelegateScrollable()) {
       this.getDelegateScrollable().scrollToBottom();
       return;
@@ -2295,7 +2298,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
   /**
    * Brings the widget into view by scrolling the first scrollable parent.
    */
-  reveal(options) { // FIXME TS define options
+  reveal(options: ScrollToOptions | string) {
     if (!this.rendered) {
       return;
     }
@@ -2319,7 +2322,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
    *
    * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
    */
-  visitChildren(visitor: (widget: Widget) => boolean | TreeVisitResult | void): boolean | TreeVisitResult {
+  visitChildren(visitor: TreeVisitor<Widget>): boolean | TreeVisitResult {
     for (let i = 0; i < this.children.length; i++) {
       let child = this.children[i];
       if (child.parent === this) {
@@ -2342,6 +2345,10 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
    */
   isAttachedAndRendered(): boolean {
     return (this.rendered || this.rendering) && this.$container.isAttached();
+  }
+
+  override trigger<K extends string & keyof EventMapOf<Widget>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Widget>[K]>): EventMapOf<Widget>[K] {
+    return super.trigger(type, eventOrModel);
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */

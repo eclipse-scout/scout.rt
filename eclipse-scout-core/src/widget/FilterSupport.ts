@@ -8,12 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EventHandler, Filter, Filterable, FilterResult, FilterSupportOptions, FormField, HAlign, keys, KeyStroke, objects, scout, SetFiltersResult, StringField, strings, styles, UpdateFilteredElementsOptions, ValueField, Widget, WidgetSupport} from '../index';
+import {
+  arrays, EventHandler, Filter, Filterable, FilterResult, FilterSupportOptions, FormField, HAlign, keys, KeyStroke, objects, scout, SetFiltersResult, StringField, strings, styles, UpdateFilteredElementsOptions, ValueField, Widget,
+  WidgetSupport
+} from '../index';
 import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
 import {FilterElement, TextFilter} from './Filter';
 
-type FilterFunction<TElem extends FilterElement> = ((elem) => boolean);
-type FilterOrFunction<TElem extends FilterElement> = Filter<TElem> | FilterFunction<TElem>;
+export type FilterFunction<TElem extends FilterElement> = (elem: TElem) => boolean;
+export type FilterOrFunction<TElem extends FilterElement> = Filter<TElem> | FilterFunction<TElem>;
 
 export default class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
   declare widget: Widget & Filterable<TElem>;
@@ -168,7 +171,7 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
     this._filterField.$container.css('--filter-field-transparent-80-background-color', transparent80Color);
   }
 
-  protected _onFilterFieldDisplayTextChanged(event) { // FIXME TS DisplayTextChangedEvent
+  protected _onFilterFieldDisplayTextChanged(event) { // FIXME TS: DisplayTextChangedEvent as soon as StringField has been migrated
     if (this._filterField && this._filterField.rendered) {
       this._filterField.$container.toggleClass('empty', !event.newValue);
     }
@@ -234,7 +237,7 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
   /**
    * @param filter The filters to add.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
-   * @return {Filter[]} Returns the added filters.
+   * @returns the added filters.
    */
   addFilter(filter: FilterOrFunction<TElem> | FilterOrFunction<TElem>[], applyFilter = true): Filter<TElem>[] {
     let filtersToAdd = arrays.ensure(filter);

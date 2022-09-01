@@ -8,12 +8,143 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, Cell, clipboard, Column, CompactColumn, ContextMenuKeyStroke, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, Event, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStrokeContext, LoadingSupport, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn, objects, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableCopyKeyStroke, TableFooter, TableHeader, TableLayout, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUpdateBuffer, TableUserFilter, TileTableHeaderBox, tooltips, Widget} from '../index';
+import {
+  Action, AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, ContextMenuKeyStroke, ContextMenuPopup, Desktop, Device, DoubleClickSupport, dragAndDrop,
+  DragAndDropHandler, EnumObject, Event, EventHandler, Filter, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStroke, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus,
+  NumberColumn, objects, Popup, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFilter, TableFilterModel, TableFooter,
+  TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke,
+  TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator,
+  TableToggleRowKeyStroke, TableTooltip, TableTooltipModel, TableUpdateBuffer, TableUserFilter, Tile, TileTableHeaderBox, tooltips, UpdateFilteredElementsOptions, ValueField, Widget
+} from '../index';
 import $ from 'jquery';
+import {ScrollToOptions} from '../scrollbar/scrollbars';
+import {NumberColumnAggregationFunction, NumberColumnBackgroundEffect} from './columns/NumberColumn';
+import {TableRowData} from './TableRowModel';
+import {Comparator, RefModel} from '../types';
+import {StatusOrModel} from '../status/Status';
+import {HorizontalAlignment} from '../cell/Cell';
+import {DragAndDropType} from '../util/dragAndDrop';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
-export default class Table extends Widget {
+export default class Table extends Widget implements TableModel {
+  declare model: TableModel;
+  declare eventMap: TableEventMap;
+
+  autoResizeColumns: boolean;
+  columnAddable: boolean;
+  columnLayoutDirty: boolean;
+  columns: Column[];
+  contextColumn: Column;
+  checkable: boolean;
+  checkableStyle: TableCheckableStyle;
+  cellEditorPopup: CellEditorPopup;
+  compact: boolean;
+  openFieldPopupOnCellEdit: boolean;
+  compactHandler: TableCompactHandler;
+  compactColumn: CompactColumn;
+  dropType: DragAndDropType;
+  dropMaximumSize: number;
+  dragAndDropHandler: DragAndDropHandler;
+  groupingStyle: TableGroupingStyle;
+  header: TableHeader;
+  tableStatus: Status;
+  rowBorders: Insets;
+  headerEnabled: boolean;
+  headerVisible: boolean;
+  headerMenusEnabled: boolean;
+  hasReloadHandler: boolean;
+  hierarchical: boolean;
+  hierarchicalStyle: TableHierarchicalStyle;
+  keyStrokes: KeyStroke[];
+  menus: Menu[];
+  menuBar: MenuBar;
+  menuBarVisible: boolean;
+  contextMenu: ContextMenuPopup;
+  multiCheck: boolean;
+  multiSelect: boolean;
+  multilineText: boolean;
+  scrollToSelection: boolean;
+  selectedRows: TableRow[];
+  sortEnabled: boolean;
+  tableControls: TableControl[];
+  tableStatusVisible: boolean;
+  tableTileGridMediator: TableTileGridMediator;
+  tileMode: boolean;
+  tileTableHeader: TileTableHeaderBox;
+  tileProducer: (row: TableRow) => Tile;
+  footer: TableFooter;
+  footerVisible: boolean;
+  filters: TableFilter[];
+  rows: TableRow[];
+  rootRows: TableRow[];
+  visibleRows: TableRow[];
+  estimatedRowCount: number;
+  maxRowCount: number;
+  aggregateRowHeight: number;
+  truncatedCellTooltipEnabled: boolean;
+  checkableColumn: BooleanColumn;
+  rowIconColumn: IconColumn;
+  uiCssClass: string;
+  /** visible rows by id */
+  visibleRowsMap: Record<string, TableRow>;
+  rowLevelPadding: number;
+  /** rows by id */
+  rowsMap: Record<string, TableRow>;
+  rowHeight: number;
+  rowWidth: number;
+  /** read-only, set by _calculateRowInsets(), also used in TableHeader.js */
+  rowInsets: Insets;
+  /** read-only, set by _calculateRowInsets(), also used in TableLayout.js */
+  rowMargins: Insets;
+  rowIconVisible: boolean;
+  rowIconColumnWidth: number;
+  staticMenus: Menu[];
+  selectionHandler: TableSelectionHandler;
+  tooltips: TableTooltip[];
+  tableNodeColumn: Column;
+  updateBuffer: TableUpdateBuffer;
+  /**
+   * Initial value must be > 0 to make prefSize work (if it is 0, no filler will be generated).
+   * If rows have a variable height, prefSize is only correct for 10 rows.
+   * Layout will adjust this value depending on the view port size.
+   */
+  viewRangeSize: number;
+  viewRangeDirty: boolean;
+  viewRangeRendered: Range;
+  virtual: boolean;
+  textFilterEnabled: boolean;
+  filterSupport: FilterSupport<TableRow>;
+  filteredElementsDirty: boolean;
+
+  $data: JQuery<HTMLDivElement>;
+  $emptyData: JQuery;
+  $fillBefore: JQuery;
+  $fillAfter: JQuery;
+
+  protected _filteredRows: TableRow[];
+  protected _maxLevel: number;
+  protected _aggregateRows: AggregateTableRow[];
+  protected _animationRowLimit: number;
+  protected _blockLoadThreshold: number;
+  protected _doubleClickSupport: DoubleClickSupport;
+  protected _permanentHeadSortColumns: Column[];
+  protected _permanentTailSortColumns: Column[];
+  protected _filterMenusHandler: (menuItems: Menu[], destination: MenuDestinations) => Menu[];
+  protected _popupOpenHandler: EventHandler<Event<Desktop>>; // FIXME TS: replace with DesktopPopupOpenEvent as soon as Desktop has been migrated.
+  protected _rerenderViewPortAfterAttach: boolean;
+  protected _renderViewportBlocked: boolean;
+  protected _renderViewPortAfterAttach: boolean;
+  protected _triggerRowsSelectedPending: boolean;
+  protected _animateAggregateRows: boolean;
+  protected _postAttachActions: (() => void)[];
+  protected _desktopPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Desktop>>;
+  protected _imageLoadListener: (event: ErrorEvent) => void;
+  protected _insertedRows: TableRow[];
+  protected _$mouseDownRow: JQuery;
+  protected _mouseDownRowId: string;
+  protected _mouseDownColumn: Column;
+
   constructor() {
-
     super();
 
     this.autoResizeColumns = false;
@@ -64,13 +195,13 @@ export default class Table extends Widget {
     this.estimatedRowCount = 0;
     this.maxRowCount = 0;
     this.truncatedCellTooltipEnabled = null;
-    this.visibleRowsMap = {}; // visible rows by id
+    this.visibleRowsMap = {};
     this.rowLevelPadding = 0;
-    this.rowsMap = {}; // rows by id
+    this.rowsMap = {};
     this.rowHeight = 0;
     this.rowWidth = 0;
-    this.rowInsets = new Insets(); // read-only, set by _calculateRowInsets(), also used in TableHeader.js
-    this.rowMargins = new Insets(); // read-only, set by _calculateRowInsets(), also used in TableLayout.js
+    this.rowInsets = new Insets();
+    this.rowMargins = new Insets();
     this.rowIconVisible = false;
     this.rowIconColumnWidth = Column.NARROW_MIN_WIDTH;
     this.staticMenus = [];
@@ -83,14 +214,10 @@ export default class Table extends Widget {
     this._animationRowLimit = 25;
     this._blockLoadThreshold = 25;
     this.updateBuffer = new TableUpdateBuffer(this);
-    // Initial value must be > 0 to make prefSize work (if it is 0, no filler will be generated).
-    // If rows have a variable height, prefSize is only correct for 10 rows.
-    // Layout will adjust this value depending on the view port size.
     this.viewRangeSize = 10;
     this.viewRangeDirty = false;
     this.viewRangeRendered = new Range(0, 0);
     this.virtual = true;
-
     this.textFilterEnabled = true;
     this.filterSupport = this._createFilterSupport();
     this.filteredElementsDirty = false;
@@ -117,7 +244,7 @@ export default class Table extends Widget {
   static HierarchicalStyle = {
     DEFAULT: 'default',
     STRUCTURED: 'structured'
-  };
+  } as const;
 
   static GroupingStyle = {
     /**
@@ -128,7 +255,7 @@ export default class Table extends Widget {
      * Aggregate row is rendered on the bottom of the row-group (default).
      */
     BOTTOM: 'bottom'
-  };
+  } as const;
 
   static CheckableStyle = {
     /**
@@ -144,7 +271,7 @@ export default class Table extends Widget {
      * Like the CHECKBOX Style but a click anywhere on the row triggers the check.
      */
     CHECKBOX_TABLE_ROW: 'checkbox_table_row'
-  };
+  } as const;
 
   /**
    * This enum defines the reload reasons for a table reload operation
@@ -180,11 +307,11 @@ export default class Table extends Widget {
      * Any call to IPage#dataChanged
      */
     DATA_CHANGED_TRIGGER: 'dataChangedTrigger'
-  };
+  } as const;
 
   static SELECTION_CLASSES = 'select-middle select-top select-bottom select-single selected';
 
-  _init(model) {
+  protected override _init(model: TableModel) {
     super._init(model);
     this.resolveConsts([{
       property: 'hierarchicalStyle',
@@ -198,9 +325,9 @@ export default class Table extends Widget {
     }]);
     this._initColumns();
 
-    this.rows.forEach(function(row, i) {
+    this.rows.forEach((row, i) => {
       this.rows[i] = this._initRow(row);
-    }, this);
+    });
 
     this.setFilters(this.filters);
 
@@ -221,33 +348,40 @@ export default class Table extends Widget {
     this._setTileTableHeader(this.tileTableHeader);
   }
 
-  _initRow(row) {
-    if (!(row instanceof TableRow)) {
-      row = this._createRow(row);
+  protected _initRow(row: TableRowData | TableRow): TableRow {
+    let tableRow: TableRow;
+    if (row instanceof TableRow) {
+      tableRow = row;
+    } else {
+      tableRow = this._createRow(row);
     }
-    this.rowsMap[row.id] = row;
+    this.rowsMap[tableRow.id] = tableRow;
     this.trigger('rowInit', {
-      row: row
+      row: tableRow
     });
-    return row;
+    return tableRow;
   }
 
-  _createRow(rowModel) {
-    rowModel = rowModel || {};
-    rowModel.objectType = scout.nvl(rowModel.objectType, TableRow);
-    rowModel.parent = this;
-    return scout.create(rowModel);
+  protected _createRow(rowModel: TableRowData): TableRow {
+    let model = (rowModel || {}) as TableRowModel;
+    model.objectType = scout.nvl(model.objectType, TableRow);
+    model.parent = this;
+    return scout.create(model as TableRowModel & RefModel<TableRowModel>);
   }
 
-  _initColumns() {
-    this.columns = this.columns.map(function(colModel, index) {
-      let column = colModel;
-      column.session = this.session;
-      if (column instanceof Column) {
+  protected _initColumns() {
+    let cols = this.columns as (Column | RefModel<ColumnModel>)[];
+    this.columns = cols.map((colModel, index) => {
+      let column: Column;
+      let columnOrModel = colModel;
+      columnOrModel.session = this.session;
+      if (columnOrModel instanceof Column) {
+        column = columnOrModel;
+        // @ts-ignore
         column._setTable(this);
       } else {
-        column.table = this;
-        column = scout.create(column);
+        columnOrModel.table = this;
+        column = scout.create(columnOrModel);
       }
 
       if (column.index < 0) {
@@ -255,10 +389,10 @@ export default class Table extends Widget {
       }
       if (column.checkable) {
         // set checkable column if this column is the checkable one
-        this.checkableColumn = column;
+        this.checkableColumn = column as BooleanColumn;
       }
-      return column;
-    }, this);
+      return column as Column;
+    });
 
     // Add gui only checkbox column at the beginning
     this._setCheckable(this.checkable);
@@ -276,33 +410,31 @@ export default class Table extends Widget {
     this.columnLayoutDirty = true;
   }
 
-  _destroy() {
+  protected override _destroy() {
     this._destroyColumns();
     super._destroy();
   }
 
-  _destroyColumns() {
-    this.columns.forEach(column => {
-      column.destroy();
-    });
+  protected _destroyColumns() {
+    this.columns.forEach(column => column.destroy());
     this.checkableColumn = null;
     this.compactColumn = null;
     this.rowIconColumn = null;
     this.columns = [];
   }
 
-  _calculateTableNodeColumn() {
-    let candidateColumns = this.visibleColumns().filter(column => {
-      return column.nodeColumnCandidate;
-    });
+  protected _calculateTableNodeColumn() {
+    let candidateColumns = this.visibleColumns().filter(column => column.nodeColumnCandidate);
 
     let tableNodeColumn = arrays.first(candidateColumns);
     if (this.tableNodeColumn && this.tableNodeColumn !== tableNodeColumn) {
       // restore
+      // @ts-ignore
       this.tableNodeColumn.minWidth = this.tableNodeColumn._initialMinWidth;
     }
     this.tableNodeColumn = tableNodeColumn;
     if (this.tableNodeColumn) {
+      // @ts-ignore
       this.tableNodeColumn._initialMinWidth = this.tableNodeColumn.minWidth;
       this.tableNodeColumn.minWidth = this.rowLevelPadding * this._maxLevel + this.tableNodeColumn.tableNodeLevel0CellPadding + 8;
 
@@ -316,10 +448,7 @@ export default class Table extends Widget {
     }
   }
 
-  /**
-   * @override
-   */
-  _createLoadingSupport() {
+  protected override _createLoadingSupport(): LoadingSupport {
     // noinspection JSCheckFunctionSignatures
     return new LoadingSupport({
       widget: this,
@@ -332,24 +461,17 @@ export default class Table extends Widget {
     });
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
-
     this._initTableKeyStrokeContext();
   }
 
-  _initTableKeyStrokeContext() {
-    this.keyStrokeContext.registerKeyStroke([
+  protected _initTableKeyStrokeContext() {
+    this.keyStrokeContext.registerKeyStrokes([
       new TableNavigationUpKeyStroke(this),
       new TableNavigationDownKeyStroke(this),
       new TableNavigationPageUpKeyStroke(this),
@@ -368,7 +490,7 @@ export default class Table extends Widget {
     ]);
   }
 
-  _insertBooleanColumn() {
+  protected _insertBooleanColumn() {
     // don't add checkbox column when we're in checkableStyle mode
     if (this.checkableStyle === Table.CheckableStyle.TABLE_ROW) {
       return;
@@ -389,7 +511,7 @@ export default class Table extends Widget {
     this.checkableColumn = column;
   }
 
-  _insertRowIconColumn() {
+  protected _insertRowIconColumn() {
     let position = 0,
       column = scout.create(IconColumn, {
         session: this.session,
@@ -409,18 +531,18 @@ export default class Table extends Widget {
     this.rowIconColumn = column;
   }
 
-  handleAppLinkAction(event) {
+  handleAppLinkAction(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     let $appLink = $(event.target);
     let column = this._columnAtX($appLink.offset().left);
-    let row = $appLink.findUp($elem => $elem.hasClass('table-row'), this.$container).data('row');
+    let row = $appLink.findUp($elem => $elem.hasClass('table-row'), this.$container).data('row') as TableRow;
     this._triggerAppLinkAction(column, row, $appLink.data('ref'), $appLink);
   }
 
-  _isDataRendered() {
+  protected _isDataRendered(): boolean {
     return this.rendered && this.$data !== null;
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('table').addDeviceClass();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new TableLayout(this));
@@ -439,14 +561,12 @@ export default class Table extends Widget {
     this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   }
 
-  _renderData() {
+  protected _renderData() {
     this.$data = this.$container.appendDiv('table-data');
     this.$data.on('mousedown', '.table-row', this._onRowMouseDown.bind(this))
       .on('mouseup', '.table-row', this._onRowMouseUp.bind(this))
       .on('dblclick', '.table-row', this._onRowDoubleClick.bind(this))
-      .on('contextmenu', event => {
-        event.preventDefault();
-      });
+      .on('contextmenu', event => event.preventDefault());
     this._installScrollbars({
       axis: 'both'
     });
@@ -461,7 +581,7 @@ export default class Table extends Widget {
     }
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderTableHeader();
     this._renderMenuBarVisible();
@@ -471,19 +591,18 @@ export default class Table extends Widget {
     this._renderTextFilterEnabled();
   }
 
-  _setCssClass(cssClass) {
+  protected override _setCssClass(cssClass: string) {
     super._setCssClass(cssClass);
     // calculate row level padding
     let paddingClasses = ['table-row-level-padding'];
     if (this.cssClass) {
       paddingClasses.push(this.cssClass);
     }
-    this.setRowLevelPadding(styles.getSize(paddingClasses.reduce((acc, cssClass) => {
-      return acc + ' ' + cssClass;
-    }, ''), 'width', 'width', 15));
+    let classes = paddingClasses.reduce((acc, cssClass) => acc + ' ' + cssClass, '');
+    this.setRowLevelPadding(styles.getSize(classes, 'width', 'width', 15));
   }
 
-  _removeData() {
+  protected _removeData() {
     this._removeAggregateRows();
     this._uninstallImageListeners();
     this._uninstallCellTooltipSupport();
@@ -496,7 +615,7 @@ export default class Table extends Widget {
     this.$emptyData = null;
   }
 
-  _remove() {
+  protected override _remove() {
     this.session.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
     this.session.desktop.off('popupOpen', this._popupOpenHandler);
     dragAndDrop.uninstallDragAndDropHandler(this);
@@ -509,25 +628,26 @@ export default class Table extends Widget {
     super._remove();
   }
 
-  setRowLevelPadding(rowLevelPadding) {
+  setRowLevelPadding(rowLevelPadding: number) {
     this.setProperty('rowLevelPadding', rowLevelPadding);
   }
 
-  _renderRowLevelPadding() {
+  protected _renderRowLevelPadding() {
     this._rerenderViewport();
   }
 
-  setTableControls(controls) {
+  setTableControls(controls: TableControl[]) {
     this.setProperty('tableControls', controls);
   }
 
-  _renderTableControls() {
+  protected _renderTableControls() {
     if (this.footer) {
+      // @ts-ignore
       this.footer._renderControls();
     }
   }
 
-  _setTableControls(controls) {
+  protected _setTableControls(controls: TableControl[]) {
     let i;
     for (i = 0; i < this.tableControls.length; i++) {
       this.keyStrokeContext.unregisterKeyStroke(this.tableControls[i]);
@@ -537,17 +657,17 @@ export default class Table extends Widget {
       this.keyStrokeContext.registerKeyStroke(this.tableControls[i]);
     }
     this._updateFooterVisibility();
-    this.tableControls.forEach(function(control) {
+    this.tableControls.forEach(control => {
       control.tableFooter = this.footer;
-    }, this);
+    });
   }
 
   /**
    * When an IMG has been loaded we must update the stored height in the model-row.
    * Note: we don't change the width of the row or table.
    */
-  _onImageLoadOrError(event) {
-    let $target = $(event.target);
+  protected _onImageLoadOrError(event: ErrorEvent) {
+    let $target = $(event.target) as JQuery;
     if ($target.data('measure') === 'in-progress') {
       // Ignore events created by autoOptimizeWidth measurement (see ColumnOptimalWidthMeasurer)
       // Using event.stopPropagation() is not possible because the image load event does not bubble
@@ -557,7 +677,7 @@ export default class Table extends Widget {
     $target.toggleClass('broken', event.type === 'error');
 
     let $row = $target.closest('.table-row');
-    let row = $row.data('row');
+    let row = $row.data('row') as TableRow;
     if (!row) {
       return; // row was removed while loading the image
     }
@@ -568,7 +688,7 @@ export default class Table extends Widget {
     }
   }
 
-  _onRowMouseDown(event) {
+  protected _onRowMouseDown(event: JQuery.MouseDownEvent) {
     this._doubleClickSupport.mousedown(event);
     this._$mouseDownRow = $(event.currentTarget);
     this._mouseDownRowId = this._$mouseDownRow.data('row').id;
@@ -581,7 +701,7 @@ export default class Table extends Widget {
     this.setContextColumn(this._columnAtX(event.pageX));
     this.selectionHandler.onMouseDown(event);
     let isRightClick = event.which === 3;
-    let row = this._$mouseDownRow.data('row');
+    let row = this._$mouseDownRow.data('row') as TableRow;
 
     let $target = $(event.target);
     // handle expansion
@@ -609,29 +729,28 @@ export default class Table extends Widget {
     }
   }
 
-  _isRowControl($target) {
+  protected _isRowControl($target: JQuery): boolean {
     return $target.hasClass('table-row-control') || $target.parent().hasClass('table-row-control');
   }
 
-  _onRowMouseUp(event) {
-    let $row, $mouseUpRow, column, $appLink,
-      mouseButton = event.which;
+  protected _onRowMouseUp(event: JQuery.MouseUpEvent) {
+    let $appLink: JQuery, mouseButton = event.which;
 
     if (this._doubleClickSupport.doubleClicked()) {
       // Don't execute on double click events
       return;
     }
 
-    $mouseUpRow = $(event.currentTarget);
-    this.selectionHandler.onMouseUp(event, $mouseUpRow);
+    let $mouseUpRow = $(event.currentTarget);
+    this.selectionHandler.onMouseUp(event);
 
     if (!this._$mouseDownRow || this._mouseDownRowId !== $mouseUpRow.data('row').id) {
       // Don't accept if mouse up happens on another row than mouse down, or mousedown didn't happen on a row at all
       return;
     }
 
-    $row = $mouseUpRow;
-    column = this._columnAtX(event.pageX);
+    let $row = $mouseUpRow;
+    let column = this._columnAtX(event.pageX);
     if (column !== this._mouseDownColumn) {
       // Don't execute click / appLinks when the mouse gets pressed and moved outside of a cell
       return;
@@ -641,7 +760,7 @@ export default class Table extends Widget {
       // Don't start cell editor or trigger click if row control was clicked (expansion itself is handled by the mouse down handler)
       return;
     }
-    let row = $row.data('row'); // read row before the $row potentially could be replaced by the column specific logic on mouse up
+    let row = $row.data('row') as TableRow; // read row before the $row potentially could be replaced by the column specific logic on mouse up
     if (mouseButton === 1) {
       column.onMouseUp(event, $row);
       $appLink = this._find$AppLink(event);
@@ -653,18 +772,19 @@ export default class Table extends Widget {
     }
   }
 
-  _onRowDoubleClick(event) {
+  protected _onRowDoubleClick(event: JQuery.DoubleClickEvent) {
     let $row = $(event.currentTarget),
       column = this._columnAtX(event.pageX);
 
     this.doRowAction($row.data('row'), column);
   }
 
-  showContextMenu(options) {
+  showContextMenu(options: { pageX?: number; pageY?: number }) {
     this.session.onRequestsDone(this._showContextMenu.bind(this, options));
   }
 
-  _showContextMenu(options) {
+  protected _showContextMenu(options: { pageX?: number; pageY?: number }) {
+    // @ts-ignore
     options = options || {};
     if (!this._isDataRendered() || !this.attached) { // check needed because function is called asynchronously
       return;
@@ -676,8 +796,8 @@ export default class Table extends Widget {
     if (menuItems.length === 0) {
       return;
     }
-    let pageX = scout.nvl(options.pageX, null);
-    let pageY = scout.nvl(options.pageY, null);
+    let pageX: number = scout.nvl(options.pageX, null);
+    let pageY: number = scout.nvl(options.pageY, null);
     if (pageX === null || pageY === null) {
       let rowToDisplay = this.isRowSelectedAndVisible(this.selectionHandler.lastActionRow) ? this.selectionHandler.lastActionRow : this.getLastSelectedAndVisibleRow();
       if (rowToDisplay !== null) {
@@ -711,14 +831,14 @@ export default class Table extends Widget {
     this.contextMenu.open();
   }
 
-  isRowSelectedAndVisible(row) {
+  isRowSelectedAndVisible(row: TableRow): boolean {
     if (!this.isRowSelected(row) || !row.$row) {
       return false;
     }
     return graphics.offsetBounds(row.$row).intersects(graphics.offsetBounds(this.$data));
   }
 
-  getLastSelectedAndVisibleRow() {
+  getLastSelectedAndVisibleRow(): TableRow {
     for (let i = this.viewRangeRendered.to; i >= this.viewRangeRendered.from; i--) {
       if (this.isRowSelectedAndVisible(this.rows[i])) {
         return this.rows[i];
@@ -737,10 +857,7 @@ export default class Table extends Widget {
     }
   }
 
-  /**
-   * @override
-   */
-  _onScroll() {
+  protected override _onScroll() {
     let scrollTop = this.$data[0].scrollTop;
     let scrollLeft = this.$data[0].scrollLeft;
     if (this.scrollTop !== scrollTop) {
@@ -750,27 +867,23 @@ export default class Table extends Widget {
     this.scrollLeft = scrollLeft;
   }
 
-  _renderTableStatus() {
+  protected _renderTableStatus() {
     this.trigger('statusChanged');
   }
 
-  setContextColumn(contextColumn) {
+  setContextColumn(contextColumn: Column) {
     this.setProperty('contextColumn', contextColumn);
   }
 
-  _hasVisibleTableControls() {
-    return this.tableControls.some(control => {
-      return control.visible;
-    });
+  protected _hasVisibleTableControls(): boolean {
+    return this.tableControls.some(control => control.visible);
   }
 
-  hasAggregateTableControl() {
-    return this.tableControls.some(control => {
-      return control instanceof AggregateTableControl;
-    });
+  hasAggregateTableControl(): boolean {
+    return this.tableControls.some(control => control instanceof AggregateTableControl);
   }
 
-  _createHeader() {
+  protected _createHeader() {
     return scout.create(TableHeader, {
       parent: this,
       table: this,
@@ -779,14 +892,14 @@ export default class Table extends Widget {
     });
   }
 
-  _createFooter() {
+  protected _createFooter() {
     return scout.create(TableFooter, {
       parent: this,
       table: this
     });
   }
 
-  _installCellTooltipSupport() {
+  protected _installCellTooltipSupport() {
     tooltips.install(this.$data, {
       parent: this,
       selector: '.table-cell',
@@ -798,15 +911,15 @@ export default class Table extends Widget {
     });
   }
 
-  _uninstallCellTooltipSupport() {
+  protected _uninstallCellTooltipSupport() {
     tooltips.uninstall(this.$data);
   }
 
-  _cellTooltipText($cell) {
-    let cell, tooltipText,
+  protected _cellTooltipText($cell: JQuery): string {
+    let cell: Cell, tooltipText: string,
       $row = $cell.parent(),
       column = this.columnFor$Cell($cell, $row),
-      row = $row.data('row');
+      row = $row.data('row') as TableRow;
 
     if (row) {
       cell = this.cell(column, row);
@@ -824,6 +937,8 @@ export default class Table extends Widget {
         let $clone = $cell.clone();
         $clone.children('.table-cell-icon').setVisible(true);
         if ($cell.css('direction') === 'rtl') {
+          // @ts-ignore
+          // noinspection JSVoidFunctionReturnValueUsed
           return strings.join('', $clone.children().get().map(c => c.outerHTML).reverse());
         }
         return $clone.html();
@@ -837,14 +952,14 @@ export default class Table extends Widget {
     }
   }
 
-  setTruncatedCellTooltipEnabled(truncatedCellTooltipEnabled) {
+  setTruncatedCellTooltipEnabled(truncatedCellTooltipEnabled: boolean) {
     this.setProperty('truncatedCellTooltipEnabled', truncatedCellTooltipEnabled);
   }
 
   /**
    * Decides if a cell tooltip should be shown for a truncated cell.
    */
-  _isTruncatedCellTooltipEnabled(column) {
+  protected _isTruncatedCellTooltipEnabled(column: Column): boolean {
     if (this.truncatedCellTooltipEnabled === null) {
       // Show cell tooltip only if it is not possible to resize the column.
       return !this.headerVisible || !this.headerEnabled || column.fixedWidth;
@@ -852,13 +967,13 @@ export default class Table extends Widget {
     return this.truncatedCellTooltipEnabled;
   }
 
-  _isAggregatedTooltip($cell) {
+  protected _isAggregatedTooltip($cell: JQuery): boolean {
     let $row = $cell.parent();
     return $row.data('aggregateRow') /* row in the table */
       || $row.hasClass('table-aggregate'); /* aggregate table control */
   }
 
-  reload(reloadReason) {
+  reload(reloadReason?: string) {
     if (!this.hasReloadHandler) {
       return;
     }
@@ -870,10 +985,7 @@ export default class Table extends Widget {
     this._triggerReload(reloadReason);
   }
 
-  /**
-   * @override
-   */
-  setLoading(loading) {
+  override setLoading(loading: boolean) {
     if (!loading && this.updateBuffer.isBuffering()) {
       // Don't abort loading while buffering, the buffer will do it at the end
       return;
@@ -888,14 +1000,14 @@ export default class Table extends Widget {
   /**
    * JS implementation of AbstractTable.execCopy(rows)
    */
-  _exportToClipboard() {
+  protected _exportToClipboard() {
     clipboard.copyText({
       parent: this,
       text: this._selectedRowsToText()
     });
   }
 
-  _selectedRowsToText() {
+  protected _selectedRowsToText(): string {
     let columns = this.visibleColumns();
     return this.selectedRows.map(row => {
       return columns.map(column => {
@@ -914,7 +1026,7 @@ export default class Table extends Widget {
     }).join('\n');
   }
 
-  _unwrapText(text) {
+  protected _unwrapText(text: string): string {
     // Same implementation as in AbstractTable#unwrapText(String)
     return strings.nvl(text)
       .split(/[\n\r]/)
@@ -924,7 +1036,7 @@ export default class Table extends Widget {
       .join(' ');
   }
 
-  setMultiSelect(multiSelect) {
+  setMultiSelect(multiSelect: boolean) {
     this.setProperty('multiSelect', multiSelect);
   }
 
@@ -944,14 +1056,14 @@ export default class Table extends Widget {
     this.selectRows([]);
   }
 
-  checkAll(checked, options) {
-    let opts = $.extend(options, {
+  checkAll(checked: boolean, options?: TableRowCheckOptions) {
+    let opts: TableRowCheckOptions = $.extend(options, {
       checked: checked
     });
     this.checkRows(this.visibleRows, opts);
   }
 
-  uncheckAll(options) {
+  uncheckAll(options?: TableRowCheckOptions) {
     this.checkAll(false, options);
   }
 
@@ -959,7 +1071,7 @@ export default class Table extends Widget {
     scrollbars.update(this.$data);
   }
 
-  _sort(animateAggregateRows) {
+  protected _sort(animateAggregateRows?: boolean): boolean {
     let sortColumns = this._sortColumns();
 
     // Initialize comparators
@@ -981,7 +1093,7 @@ export default class Table extends Widget {
       this._renderRowOrderChanges();
     }
 
-    // Do it after row order has been rendered, because renderRowOrderChanges rerenders the whole viewport which would destroy the animation
+    // Do it after row order has been rendered, because renderRowOrderChanges re-renders the whole viewport which would destroy the animation
     this._group(animateAggregateRows);
 
     // Sort was possible -> return true
@@ -991,13 +1103,11 @@ export default class Table extends Widget {
   /**
    * @returns whether or not sorting is possible. Asks each column to answer this question by calling Column#isSortingPossible.
    */
-  _isSortingPossible(sortColumns) {
-    return sortColumns.every(column => {
-      return column.isSortingPossible();
-    });
+  protected _isSortingPossible(sortColumns: Column[]): boolean {
+    return sortColumns.every(column => column.isSortingPossible());
   }
 
-  _sortColumns() {
+  protected _sortColumns(): Column[] {
     let sortColumns = [];
     for (let c = 0; c < this.columns.length; c++) {
       let column = this.columns[c];
@@ -1009,8 +1119,8 @@ export default class Table extends Widget {
     return sortColumns;
   }
 
-  _sortImpl(sortColumns) {
-    let sortFunction = (row1, row2) => {
+  protected _sortImpl(sortColumns: Column[]) {
+    let sortFunction: Comparator<TableRow> = (row1, row2) => {
       for (let s = 0; s < sortColumns.length; s++) {
         let column = sortColumns[s];
         let result = column.compare(row1, row2);
@@ -1029,10 +1139,8 @@ export default class Table extends Widget {
     if (this.hierarchical) {
       // sort tree and set flat row array afterwards.
       this._sortHierarchical(sortFunction);
-      let sortedFlatRows = [];
-      this.visitRows(row => {
-        sortedFlatRows.push(row);
-      });
+      let sortedFlatRows: TableRow[] = [];
+      this.visitRows(row => sortedFlatRows.push(row));
       this.rows = sortedFlatRows;
     } else {
       // sort the flat rows and set the rootRows afterwards.
@@ -1050,27 +1158,25 @@ export default class Table extends Widget {
   /**
    * Pre-order (top-down) traversal of all rows in this table (if hierarchical).
    */
-  visitRows(visitFunc, rows, level) {
+  visitRows(visitFunc: (row: TableRow, level: number) => void, rows?: TableRow[], level?: number) {
     level = scout.nvl(level, 0);
     rows = rows || this.rootRows;
-    rows.forEach(function(row) {
+    rows.forEach(row => {
       visitFunc(row, level);
       this.visitRows(visitFunc, row.childRows, level + 1);
-    }, this);
+    });
   }
 
-  _sortHierarchical(sortFunc, rows) {
+  protected _sortHierarchical(sortFunc: Comparator<TableRow>, rows?: TableRow[]) {
     rows = rows || this.rootRows;
     rows.sort(sortFunc);
-    rows.forEach(function(row) {
-      this._sortHierarchical(sortFunc, row.childRows);
-    }, this);
+    rows.forEach(row => this._sortHierarchical(sortFunc, row.childRows));
   }
 
-  _renderRowOrderChanges() {
-    let animate,
+  protected _renderRowOrderChanges() {
+    let animate: boolean,
       $rows = this.$rows(),
-      oldRowPositions = {};
+      oldRowPositions: Record<string, number> = {};
 
     // store old position
     // animate only if every row is rendered, otherwise some rows would be animated and some not
@@ -1078,7 +1184,7 @@ export default class Table extends Widget {
       $rows.each((index, elem) => {
         let rowWasInserted = false,
           $row = $(elem),
-          row = $row.data('row');
+          row = $row.data('row') as TableRow;
 
         // Prevent the order animation for newly inserted rows (to not confuse the user)
         if (this._insertedRows) {
@@ -1112,7 +1218,7 @@ export default class Table extends Widget {
       $rows = this.$rows();
       $rows.each((index, elem) => {
         let $row = $(elem),
-          row = $row.data('row'),
+          row = $row.data('row') as TableRow,
           oldTop = oldRowPositions[row.id];
 
         if (oldTop !== undefined) {
@@ -1129,22 +1235,21 @@ export default class Table extends Widget {
     }
   }
 
-  setSortEnabled(sortEnabled) {
+  setSortEnabled(sortEnabled: boolean) {
     this.setProperty('sortEnabled', sortEnabled);
   }
 
   /**
-   * @param {Column} column the column to sort by.
-   * @param {string} [direction] the sorting direction. Either 'asc' or 'desc'. If not specified the direction specified by the column is used {@link Column.sortAscending}.
-   * @param {boolean} [multiSort] true to add the column to the list of sorted columns. False to use this column exclusively as sort column (reset other columns). Default is true.
-   * @param {boolean} [remove] true to remove the column from the sort columns. Default is false.
+   * @param column the column to sort by.
+   * @param direction the sorting direction. Either 'asc' or 'desc'. If not specified the direction specified by the column is used {@link Column.sortAscending}.
+   * @param multiSort true to add the column to the list of sorted columns. False to use this column exclusively as sort column (reset other columns). Default is false.
+   * @param remove true to remove the column from the sort columns. Default is false.
    */
-  sort(column, direction, multiSort, remove) {
-    let data, sorted, animateAggregateRows;
+  sort(column: Column, direction?: 'asc' | 'desc', multiSort?: boolean, remove?: boolean) {
     multiSort = scout.nvl(multiSort, false);
     remove = scout.nvl(remove, false);
     // Animate if sort removes aggregate rows
-    animateAggregateRows = !multiSort;
+    let animateAggregateRows = !multiSort;
     if (remove) {
       this._removeSortColumn(column);
     } else {
@@ -1153,9 +1258,8 @@ export default class Table extends Widget {
     if (this.header) {
       this.header.onSortingChanged();
     }
-    sorted = this._sort(animateAggregateRows);
-
-    data = {
+    let sorted = this._sort(animateAggregateRows);
+    let data: any = {
       column: column,
       sortAscending: column.sortAscending
     };
@@ -1174,8 +1278,7 @@ export default class Table extends Widget {
     this.trigger('sort', data);
   }
 
-  _addSortColumn(column, direction, multiSort) {
-    let groupColCount, sortColCount;
+  protected _addSortColumn(column: Column, direction?: 'asc' | 'desc', multiSort?: boolean) {
     direction = scout.nvl(direction, column.sortAscending ? 'asc' : 'desc');
     multiSort = scout.nvl(multiSort, true);
 
@@ -1183,8 +1286,8 @@ export default class Table extends Widget {
 
     // Reset grouped flag if column should be sorted exclusively
     if (!multiSort) {
-      groupColCount = this._groupedColumns().length;
-      sortColCount = this._sortColumns().length;
+      let groupColCount = this._groupedColumns().length;
+      let sortColCount = this._sortColumns().length;
       if (sortColCount === 1 && groupColCount === 1) {
         // special case: if it is the only sort column and also grouped, do not remove grouped property.
       } else {
@@ -1200,16 +1303,12 @@ export default class Table extends Widget {
    * Intended to be called for new sort columns.
    * Sets the sortIndex of the given column and its siblings.
    */
-  _updateSortIndexForColumn(column, multiSort) {
-    let deviation,
-      sortIndex = -1;
-
+  protected _updateSortIndexForColumn(column: Column, multiSort: boolean) {
+    let sortIndex = -1;
     if (multiSort) {
       // if not already sorted set the appropriate sort index (check for sortIndex necessary if called by _onColumnHeadersUpdated)
       if (!column.sortActive || column.sortIndex === -1) {
-        sortIndex = Math.max(-1, arrays.max(this.columns.map(c => {
-          return c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd ? -1 : c.sortIndex;
-        })));
+        sortIndex = Math.max(-1, arrays.max(this.columns.map(c => c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd ? -1 : c.sortIndex)));
         column.sortIndex = sortIndex + 1;
 
         // increase sortIndex for all permanent tail columns (a column has been added in front of them)
@@ -1231,14 +1330,14 @@ export default class Table extends Widget {
       });
 
       // set correct sort index for all permanent tail sort columns
-      deviation = column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd ? 0 : 1;
-      this._permanentTailSortColumns.forEach(function(c, index) {
+      let deviation = column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd ? 0 : 1;
+      this._permanentTailSortColumns.forEach((c, index) => {
         c.sortIndex = this._permanentHeadSortColumns.length + deviation + index;
-      }, this);
+      });
     }
   }
 
-  _removeSortColumn(column) {
+  protected _removeSortColumn(column: Column) {
     if (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) {
       return;
     }
@@ -1251,7 +1350,7 @@ export default class Table extends Widget {
     this._removeSortColumnInternal(column);
   }
 
-  _removeSortColumnInternal(column) {
+  protected _removeSortColumnInternal(column: Column) {
     if (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) {
       return;
     }
@@ -1260,7 +1359,7 @@ export default class Table extends Widget {
     column.sortIndex = -1;
   }
 
-  isGroupingPossible(column) {
+  isGroupingPossible(column: Column): boolean {
     let possible = true;
 
     if (this.hierarchical) {
@@ -1299,7 +1398,7 @@ export default class Table extends Widget {
     return possible;
   }
 
-  isAggregationPossible(column) {
+  isAggregationPossible(column: Column): boolean {
     if (!(column instanceof NumberColumn)) {
       return false;
     }
@@ -1318,23 +1417,23 @@ export default class Table extends Widget {
     return this.isGrouped() || this.hasAggregateTableControl();
   }
 
-  changeAggregation(column, func) {
+  changeAggregation(column: NumberColumn, func: NumberColumnAggregationFunction) {
     this.changeAggregations([column], [func]);
   }
 
-  changeAggregations(columns, functions) {
-    columns.forEach(function(column, i) {
+  changeAggregations(columns: NumberColumn[], functions: NumberColumnAggregationFunction[]) {
+    columns.forEach((column, i) => {
       let func = functions[i];
       if (column.aggregationFunction !== func) {
         column.setAggregationFunction(func);
         this._triggerAggregationFunctionChanged(column);
       }
-    }, this);
+    });
 
     this._group();
   }
 
-  _addGroupColumn(column, direction, multiGroup) {
+  protected _addGroupColumn(column: Column, direction?: 'asc' | 'desc', multiGroup?: boolean) {
     let sortIndex = -1;
 
     if (!this.isGroupingPossible(column)) {
@@ -1346,9 +1445,7 @@ export default class Table extends Widget {
     if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
       // do not update sort index for permanent head/tail sort columns, their order is fixed (see ColumnSet.java)
       if (multiGroup) {
-        sortIndex = Math.max(-1, arrays.max(this.columns.map(c => {
-          return c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd || !c.grouped ? -1 : c.sortIndex;
-        })));
+        sortIndex = Math.max(-1, arrays.max(this.columns.map(c => c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd || !c.grouped ? -1 : c.sortIndex)));
 
         if (!column.sortActive) {
           // column was not yet present: insert at determined position
@@ -1367,7 +1464,7 @@ export default class Table extends Widget {
           });
         } else {
           // column already sorted, update position:
-          // move all sort columns between the newly determined sortindex and the old sortindex by one.
+          // move all sort columns between the newly determined sort-index and the old sort-index by one.
           arrays.eachSibling(this.columns, column, siblingColumn => {
             if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
               siblingColumn.sortIndex > sortIndex &&
@@ -1378,12 +1475,12 @@ export default class Table extends Widget {
           column.sortIndex = sortIndex + 1;
         }
       } else {
-        // no multigroup:
+        // no multi-group:
         sortIndex = this._permanentHeadSortColumns.length;
 
         if (column.sortActive) {
           // column already sorted, update position:
-          // move all sort columns between the newly determined sortindex and the old sortindex by one.
+          // move all sort columns between the newly determined sort-index and the old sort-index by one.
           arrays.eachSibling(this.columns, column, siblingColumn => {
             if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
               siblingColumn.sortIndex >= sortIndex &&
@@ -1425,7 +1522,7 @@ export default class Table extends Widget {
     column.grouped = true;
   }
 
-  _removeGroupColumn(column) {
+  protected _removeGroupColumn(column: Column) {
     column.grouped = false;
 
     if (column.initialAlwaysIncludeSortAtBegin) {
@@ -1440,7 +1537,7 @@ export default class Table extends Widget {
     this._removeSortColumn(column);
   }
 
-  _buildRowDiv(row) {
+  protected _buildRowDiv(row: TableRow): string {
     let rowWidth = this.rowWidth;
     let rowClass = 'table-row';
     if (row.cssClass) {
@@ -1460,10 +1557,9 @@ export default class Table extends Widget {
       rowClass += ' leaf';
     }
 
-    let i, column,
-      rowDiv = '<div class="' + rowClass + '" style="width: ' + rowWidth + 'px">';
-    for (i = 0; i < this.columns.length; i++) {
-      column = this.columns[i];
+    let rowDiv = '<div class="' + rowClass + '" style="width: ' + rowWidth + 'px">';
+    for (let i = 0; i < this.columns.length; i++) {
+      let column = this.columns[i];
       if (column.isVisible()) {
         rowDiv += column.buildCellForRow(row);
       }
@@ -1473,14 +1569,14 @@ export default class Table extends Widget {
     return rowDiv;
   }
 
-  _calculateRowInsets() {
+  protected _calculateRowInsets() {
     let $tableRowDummy = this.$data.appendDiv('table-row');
     this.rowMargins = graphics.margins($tableRowDummy);
     this.rowBorders = graphics.borders($tableRowDummy);
     $tableRowDummy.remove();
   }
 
-  _updateRowWidth() {
+  protected _updateRowWidth() {
     this.rowWidth = this.visibleColumns().reduce((sum, column) => {
       if (this.autoResizeColumns) {
         return sum + column.width;
@@ -1488,7 +1584,7 @@ export default class Table extends Widget {
       // Ensure the row is as long as all cells. Only necessary to use the _realWidth if the device.hasTableCellZoomBug().
       // If autoResizeColumns is enabled, it is not possible to do a proper calculation with this bug
       // -> Use regular width and live with the consequence that the last cell of a table with many columns is not fully visible
-      return sum + column._realWidthIfAvailable();
+      return sum + column.realWidthIfAvailable();
     }, this.rowBorders.horizontal());
   }
 
@@ -1500,39 +1596,43 @@ export default class Table extends Widget {
    * This method reads the real width and stores it on the column so that the header can use it when setting the header item's size.
    * It is also necessary to update the row width accordingly otherwise it would be cut at the very right.
    */
-  _updateRealColumnWidths($row) {
+  protected _updateRealColumnWidths($row?: JQuery): boolean {
     if (!Device.get().hasTableCellZoomBug()) {
       return false;
     }
     let changed = false;
     $row = $row || this.$rows().eq(0);
-    this.visibleColumns().forEach(function(column, colIndex) {
+    this.visibleColumns().forEach((column, colIndex) => {
       if (this._updateRealColumnWidth(column, colIndex, $row)) {
         changed = true;
       }
-    }, this);
+    });
     return changed;
   }
 
-  _updateRealColumnWidth(column, colIndex, $row) {
+  protected _updateRealColumnWidth(column: Column, colIndex?: number, $row?: JQuery): boolean {
     if (!Device.get().hasTableCellZoomBug()) {
       return false;
     }
     $row = $row || this.$rows().eq(0);
     let $cell = this.$cell(scout.nvl(colIndex, column), $row);
+    // @ts-ignore
     if ($cell.length === 0 && column._realWidth !== null) {
+      // @ts-ignore
       column._realWidth = null;
       return true;
     }
     let realWidth = graphics.size($cell, {exact: true}).width;
+    // @ts-ignore
     if (realWidth !== column._realWidth) {
+      // @ts-ignore
       column._realWidth = realWidth;
       return true;
     }
     return false;
   }
 
-  _updateRowHeight() {
+  protected _updateRowHeight() {
     let $emptyRow = this.$data.appendDiv('table-row');
     let $emptyAggrRow = this._build$AggregateRow().appendTo(this.$data);
 
@@ -1547,7 +1647,7 @@ export default class Table extends Widget {
   /**
    * Updates the row heights for every visible row and aggregate row and clears the height of the others
    */
-  _updateRowHeights() {
+  protected _updateRowHeights() {
     this.rows.forEach(row => {
       if (!row.$row) {
         row.height = null;
@@ -1564,9 +1664,8 @@ export default class Table extends Widget {
     });
   }
 
-  _renderRowsInRange(range) {
-    let $rows,
-      rowString = '',
+  protected _renderRowsInRange(range: Range) {
+    let rowString = '',
       numRowsRendered = 0,
       prepend = false;
 
@@ -1598,7 +1697,7 @@ export default class Table extends Widget {
     }
 
     // append block of rows
-    $rows = this.$data.makeElement(rowString);
+    let $rows = this.$data.makeElement(rowString);
     if (prepend) {
       if (this.$fillBefore) {
         $rows = $rows.insertAfter(this.$fillBefore);
@@ -1635,7 +1734,7 @@ export default class Table extends Widget {
     }
   }
 
-  _rowsRenderedInfo() {
+  protected _rowsRenderedInfo(): string {
     let numRenderedRows = this.$rows().length,
       renderedRowsRange = '(' + this.viewRangeRendered + ')';
     return numRenderedRows + ' rows rendered ' + renderedRowsRange;
@@ -1644,7 +1743,7 @@ export default class Table extends Widget {
   /**
    * Moves the row to the top.
    */
-  moveRowToTop(row) {
+  moveRowToTop(row: TableRow) {
     let rowIndex = this.rows.indexOf(row);
     this.moveRow(rowIndex, 0);
   }
@@ -1652,7 +1751,7 @@ export default class Table extends Widget {
   /**
    * Moves the row to the bottom.
    */
-  moveRowToBottom(row) {
+  moveRowToBottom(row: TableRow) {
     let rowIndex = this.rows.indexOf(row);
     this.moveRow(rowIndex, this.rows.length - 1);
   }
@@ -1660,14 +1759,12 @@ export default class Table extends Widget {
   /**
    * Moves the row one up, disregarding filtered rows.
    */
-  moveRowUp(row) {
+  moveRowUp(row: TableRow) {
     let rowIndex = this.rows.indexOf(row),
       targetIndex = rowIndex - 1;
     if (this.hierarchical) {
       // find index with same parent
-      let siblings = this.rows.filter(candidate => {
-          return row.parentRow === candidate.parentRow;
-        }, this),
+      let siblings = this.rows.filter(candidate => row.parentRow === candidate.parentRow),
         rowIndexSiblings = siblings.indexOf(row),
         sibling = siblings[rowIndexSiblings - 1];
       if (sibling) {
@@ -1683,14 +1780,12 @@ export default class Table extends Widget {
   /**
    * Moves the row one down, disregarding filtered rows.
    */
-  moveRowDown(row) {
+  moveRowDown(row: TableRow) {
     let rowIndex = this.rows.indexOf(row),
       targetIndex = rowIndex + 1;
     if (this.hierarchical) {
       // find index with same parent
-      let siblings = this.rows.filter(candidate => {
-          return row.parentRow === candidate.parentRow;
-        }, this),
+      let siblings = this.rows.filter(candidate => row.parentRow === candidate.parentRow),
         rowIndexSiblings = siblings.indexOf(row),
         sibling = siblings[rowIndexSiblings + 1];
       if (sibling) {
@@ -1702,16 +1797,14 @@ export default class Table extends Widget {
     this.moveRow(rowIndex, targetIndex);
   }
 
-  moveVisibleRowUp(row) {
+  moveVisibleRowUp(row: TableRow) {
     let rowIndex = this.rows.indexOf(row),
       visibleIndex = this.visibleRows.indexOf(row),
-      sibling,
-      targetIndex;
+      sibling: TableRow,
+      targetIndex: number;
 
     if (this.hierarchical) {
-      let siblings = this.visibleRows.filter(candidate => {
-        return row.parentRow === candidate.parentRow;
-      }, this);
+      let siblings = this.visibleRows.filter(candidate => row.parentRow === candidate.parentRow);
       sibling = siblings[siblings.indexOf(row) - 1];
       if (sibling) {
         targetIndex = this.rows.indexOf(sibling);
@@ -1730,16 +1823,14 @@ export default class Table extends Widget {
     this.moveRow(rowIndex, targetIndex);
   }
 
-  moveVisibleRowDown(row) {
+  moveVisibleRowDown(row: TableRow) {
     let rowIndex = this.rows.indexOf(row),
       visibleIndex = this.visibleRows.indexOf(row),
-      sibling,
-      targetIndex;
+      sibling: TableRow,
+      targetIndex: number;
 
     if (this.hierarchical) {
-      let siblings = this.visibleRows.filter(candidate => {
-        return row.parentRow === candidate.parentRow;
-      }, this);
+      let siblings = this.visibleRows.filter(candidate => row.parentRow === candidate.parentRow);
       sibling = siblings[siblings.indexOf(row) + 1];
       if (sibling) {
         targetIndex = this.rows.indexOf(sibling);
@@ -1758,7 +1849,7 @@ export default class Table extends Widget {
     this.moveRow(rowIndex, targetIndex);
   }
 
-  moveRow(sourceIndex, targetIndex) {
+  moveRow(sourceIndex: number, targetIndex: number) {
     let rowCount = this.rows.length;
     sourceIndex = Math.max(sourceIndex, 0);
     sourceIndex = Math.min(sourceIndex, rowCount - 1);
@@ -1773,9 +1864,8 @@ export default class Table extends Widget {
     this.updateRowOrder(this.rows);
   }
 
-  _removeRowsInRange(range) {
-    let row, i,
-      numRowsRemoved = 0,
+  protected _removeRowsInRange(range: Range) {
+    let numRowsRemoved = 0,
       rows = this.visibleRows;
 
     let maxRange = new Range(0, rows.length);
@@ -1787,8 +1877,8 @@ export default class Table extends Widget {
     }
     this.viewRangeRendered = newRange[0];
 
-    for (i = range.from; i < range.to; i++) {
-      row = rows[i];
+    for (let i = range.from; i < range.to; i++) {
+      let row = rows[i];
       this._removeRow(row);
       numRowsRemoved++;
     }
@@ -1803,7 +1893,7 @@ export default class Table extends Widget {
     if (this._isDataRendered()) {
       this.$rows().each((i, elem) => {
         let $row = $(elem),
-          row = $row.data('row');
+          row = $row.data('row') as TableRow;
         if ($row.hasClass('hiding')) {
           // Do not remove rows which are removed using an animation
           // row.$row may already point to a new row -> don't call removeRow to not accidentally remove the new row
@@ -1819,7 +1909,7 @@ export default class Table extends Widget {
    *
    * @param rows if undefined, all rows are removed
    */
-  _removeRows(rows) {
+  protected _removeRows(rows?: TableRow | TableRow[]) {
     if (!rows) {
       this.removeAllRows();
       return;
@@ -1866,7 +1956,7 @@ export default class Table extends Widget {
   /**
    * Just removes the row, does NOT adjust this.viewRangeRendered
    */
-  _removeRow(row) {
+  protected _removeRow(row: TableRow | AggregateTableRow) {
     let $row = row.$row;
     if (!$row) {
       return;
@@ -1885,7 +1975,7 @@ export default class Table extends Widget {
   /**
    * Animates the rendering of a row by setting it to invisible before doing a slideDown animation. The row needs to already be rendered.
    */
-  _showRow(row) {
+  protected _showRow(row: TableRow | AggregateTableRow) {
     let $row = row.$row;
     if (!$row) {
       return;
@@ -1909,7 +1999,7 @@ export default class Table extends Widget {
   /**
    * Animates the removal of a row by doing a slideUp animation. The row will be removed after the animation finishes.
    */
-  _hideRow(row) {
+  protected _hideRow(row: TableRow | AggregateTableRow) {
     let $row = row.$row;
     if (!$row) {
       return;
@@ -1942,7 +2032,7 @@ export default class Table extends Widget {
    * This method should be used after a row is added to the DOM (new rows, updated rows). The 'row'
    * is expected to be linked with the corresponding '$row' (row.$row and $row.data('row')).
    */
-  _installRow(row) {
+  protected _installRow(row: TableRow) {
     row.height = this._measureRowHeight(row.$row);
 
     if (row.hasError) {
@@ -1955,14 +2045,14 @@ export default class Table extends Widget {
     }
   }
 
-  _calcRowLevelPadding(row) {
+  protected _calcRowLevelPadding(row: TableRow): number {
     if (!row) {
       return -this.rowLevelPadding;
     }
     return this._calcRowLevelPadding(row.parentRow) + this.rowLevelPadding;
   }
 
-  _showCellErrorForRow(row) {
+  protected _showCellErrorForRow(row: TableRow) {
     let $cells = this.$cellsForRow(row.$row),
       that = this;
 
@@ -1975,18 +2065,17 @@ export default class Table extends Widget {
     });
   }
 
-  _showCellError(row, $cell, errorStatus) {
-    let tooltip, opts,
-      text = errorStatus.message;
+  protected _showCellError(row: TableRow, $cell: JQuery, errorStatus: Status) {
+    let text = errorStatus.message;
 
-    opts = {
+    let opts: TableTooltipModel = {
       parent: this,
       text: text,
       autoRemove: false,
       $anchor: $cell,
       table: this
     };
-    tooltip = scout.create(TableTooltip, opts);
+    let tooltip = scout.create(TableTooltip, opts);
     tooltip.render();
     // link to be able to remove it when row gets deleted
     tooltip.row = row;
@@ -1994,9 +2083,9 @@ export default class Table extends Widget {
   }
 
   /**
-   * @returns {Column} the column at position x (e.g. from event.pageX)
+   * @returns the column at position x (e.g. from event.pageX)
    */
-  _columnAtX(x) {
+  protected _columnAtX(x: number): Column {
     let columnOffsetRight = 0,
       columnOffsetLeft = this.$data.offset().left + this.rowBorders.left + this.rowMargins.left,
       scrollLeft = this.$data.scrollLeft();
@@ -2022,7 +2111,7 @@ export default class Table extends Widget {
     return column;
   }
 
-  _find$AppLink(event) {
+  protected _find$AppLink(event: JQuery.MouseUpEvent): JQuery {
     let $start = $(event.target);
     let $stop = $(event.delegateTarget);
     let $appLink = $start.findUp($elem => $elem.hasClass('app-link'), $stop);
@@ -2032,20 +2121,20 @@ export default class Table extends Widget {
     return null;
   }
 
-  _filterMenus(menuItems, destination, onlyVisible, enableDisableKeyStrokes, notAllowedTypes) {
+  protected _filterMenus(menuItems: Menu[], destination: MenuDestinations, onlyVisible?: boolean, enableDisableKeyStrokes?: boolean, notAllowedTypes?: string | string[]): Menu[] {
     return menus.filterAccordingToSelection('Table', this.selectedRows.length, menuItems, destination, {onlyVisible, enableDisableKeyStrokes, notAllowedTypes});
   }
 
-  _filterMenusForContextMenu() {
+  protected _filterMenusForContextMenu(): Menu[] {
     return this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
   }
 
-  setStaticMenus(staticMenus) {
+  setStaticMenus(staticMenus: Menu[]) {
     this.setProperty('staticMenus', staticMenus);
     this._updateMenuBar();
   }
 
-  _removeMenus() {
+  protected _removeMenus() {
     // menubar takes care about removal
   }
 
@@ -2057,7 +2146,7 @@ export default class Table extends Widget {
     this.session.onRequestsDone(this._updateMenuBar.bind(this));
   }
 
-  _triggerRowClick(originalEvent, row, mouseButton, column) {
+  protected _triggerRowClick(originalEvent: JQuery.MouseUpEvent, row: TableRow, mouseButton: number, column: Column) {
     let event = {
       originalEvent: originalEvent,
       row: row,
@@ -2067,7 +2156,7 @@ export default class Table extends Widget {
     this.trigger('rowClick', event);
   }
 
-  _triggerRowAction(row, column) {
+  protected _triggerRowAction(row: TableRow, column: Column) {
     this.trigger('rowAction', {
       row: row,
       column: column
@@ -2078,7 +2167,7 @@ export default class Table extends Widget {
    * Starts cell editing for the cell at the given column and row, but only if editing is allowed.
    * @see prepareCellEdit
    */
-  focusCell(column, row) {
+  focusCell(column: Column, row: TableRow) {
     let cell = this.cell(column, row);
     if (this.enabledComputed && row.enabled && cell.editable) {
       this.prepareCellEdit(column, row);
@@ -2090,12 +2179,12 @@ export default class Table extends Widget {
    * to {@link #startCellEdit} which starts the editing by rendering the editor in a {@link CellEditorPopup}.<br>
    * If the completion of a previous cell edit is still in progress, the preparation is delayed until the completion is finished.
    *
-   * @param {boolean} [openFieldPopupOnCellEdit] true to instruct the editor to open its control popup when the editor is rendered.
+   * @param openFieldPopupOnCellEdit true to instruct the editor to open its control popup when the editor is rendered.
    *    This only has an effect if the editor has a popup (e.g. SmartField or DateField).
    * @returns Promise the promise will be resolved when the preparation has been finished.
    */
-  prepareCellEdit(column, row, openFieldPopupOnCellEdit) {
-    let promise = $.resolvedPromise();
+  prepareCellEdit(column: Column, row: TableRow, openFieldPopupOnCellEdit?: boolean): JQuery.Promise<void> {
+    let promise: JQuery.Promise<void> = $.resolvedPromise();
     if (this.cellEditorPopup) {
       promise = this.cellEditorPopup.waitForCompleteCellEdit();
     }
@@ -2103,18 +2192,17 @@ export default class Table extends Widget {
   }
 
   /**
-   * @param {boolean} [openFieldPopupOnCellEdit] when this parameter is set to true, the CellEditorPopup sets an
+   * @param openFieldPopupOnCellEdit when this parameter is set to true, the CellEditorPopup sets an
    *    additional property 'cellEditor' on the editor-field. The field instance may use this property
    *    to decide whether or not it should open a popup immediately after it is rendered. This is used
    *    for Smart- and DateFields. Default is false.
    */
-  prepareCellEditInternal(column, row, openFieldPopupOnCellEdit) {
-    let event = new Event({
+  prepareCellEditInternal(column: Column, row: TableRow, openFieldPopupOnCellEdit?: boolean) {
+    this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
+    let event = this.trigger('prepareCellEdit', {
       column: column,
       row: row
     });
-    this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
-    this.trigger('prepareCellEdit', event);
 
     if (!event.defaultPrevented) {
       this.selectRow(row);
@@ -2124,9 +2212,9 @@ export default class Table extends Widget {
   }
 
   /**
-   * @returns {Cell} a cell for the given column and row. Row Icon column and cell icon column don't not have cells --> generate one.
+   * @returns a cell for the given column and row. Row Icon column and cell icon column don't not have cells --> generate one.
    */
-  cell(column, row) {
+  cell(column: Column, row: TableRow): Cell {
     if (column === this.rowIconColumn) {
       return scout.create(Cell, {
         iconId: row.iconId,
@@ -2152,11 +2240,11 @@ export default class Table extends Widget {
     return row.cells[column.index];
   }
 
-  cellByCellIndex(cellIndex, row) {
+  cellByCellIndex(cellIndex: number, row: TableRow): Cell {
     return this.cell(this.columns[cellIndex], row);
   }
 
-  cellValue(column, row) {
+  cellValue(column: Column, row: TableRow): any {
     let cell = this.cell(column, row);
     if (!cell) {
       return cell;
@@ -2167,7 +2255,7 @@ export default class Table extends Widget {
     return '';
   }
 
-  cellText(column, row) {
+  cellText(column: Column, row: TableRow): string {
     let cell = this.cell(column, row);
     if (!cell) {
       return '';
@@ -2177,23 +2265,21 @@ export default class Table extends Widget {
 
   /**
    *
-   * @returns {object} the next editable position in the table, starting from the cell at (currentColumn / currentRow).
+   * @returns the next editable position in the table, starting from the cell at (currentColumn / currentRow).
    * A position is an object containing row and column (cell has no reference to a row or column due to memory reasons).
    */
-  nextEditableCellPos(currentColumn, currentRow, reverse) {
-    let pos, startColumnIndex, rowIndex, startRowIndex, predicate,
-      colIndex = this.columns.indexOf(currentColumn);
-
-    startColumnIndex = colIndex + 1;
+  nextEditableCellPos(currentColumn: Column, currentRow: TableRow, reverse: boolean): TableCellPosition {
+    let colIndex = this.columns.indexOf(currentColumn);
+    let startColumnIndex = colIndex + 1;
     if (reverse) {
       startColumnIndex = colIndex - 1;
     }
-    pos = this.nextEditableCellPosForRow(startColumnIndex, currentRow, reverse);
+    let pos = this.nextEditableCellPosForRow(startColumnIndex, currentRow, reverse);
     if (pos) {
       return pos;
     }
 
-    predicate = function(row) {
+    let predicate: Predicate<TableRow> = row => {
       if (!row.$row) {
         return false;
       }
@@ -2206,10 +2292,10 @@ export default class Table extends Widget {
       if (pos) {
         return true;
       }
-    }.bind(this);
+    };
 
-    rowIndex = this.rows.indexOf(currentRow);
-    startRowIndex = rowIndex + 1;
+    let rowIndex = this.rows.indexOf(currentRow);
+    let startRowIndex = rowIndex + 1;
     if (reverse) {
       startRowIndex = rowIndex - 1;
     }
@@ -2218,19 +2304,17 @@ export default class Table extends Widget {
     return pos;
   }
 
-  nextEditableCellPosForRow(startColumnIndex, row, reverse) {
-    let cell, column, predicate;
-
-    predicate = function(column) {
+  nextEditableCellPosForRow(startColumnIndex: number, row: TableRow, reverse?: boolean): TableCellPosition {
+    let predicate: Predicate<Column> = column => {
       if (!column.isVisible() || column.guiOnly) {
         // does not support tabbing
         return false;
       }
-      cell = this.cell(column, row);
+      let cell = this.cell(column, row);
       return this.enabledComputed && row.enabled && cell.editable;
-    }.bind(this);
+    };
 
-    column = arrays.findFrom(this.columns, startColumnIndex, predicate, reverse);
+    let column = arrays.findFrom(this.columns, startColumnIndex, predicate, reverse);
     if (column) {
       return {
         column: column,
@@ -2239,7 +2323,7 @@ export default class Table extends Widget {
     }
   }
 
-  clearAggregateRows(animate) {
+  clearAggregateRows(animate?: boolean) {
     // Remove "hasAggregateRow" markers from real rows
     this._aggregateRows.forEach(aggregateRow => {
       if (aggregateRow.prevRow) {
@@ -2248,7 +2332,7 @@ export default class Table extends Widget {
       if (aggregateRow.nextRow) {
         aggregateRow.nextRow.aggregateRowBefore = null;
       }
-    }, this);
+    });
 
     if (this._isDataRendered()) {
       this._removeAggregateRows(animate);
@@ -2264,7 +2348,7 @@ export default class Table extends Widget {
    * @param states is a reference to an Array containing the results for each column.
    * @param row (optional) if set, an additional cell-value parameter is passed to the aggregate function
    */
-  _forEachVisibleColumn(funcName, states, row) {
+  protected _forEachVisibleColumn(funcName: string, states: object[], row?: TableRow) {
     let value;
     this.visibleColumns().forEach((column, i) => {
       if (column[funcName]) {
@@ -2278,8 +2362,8 @@ export default class Table extends Widget {
     });
   }
 
-  _group(animate) {
-    let rows, nextRow, newGroup, firstRow, lastRow,
+  protected _group(animate?: boolean) {
+    let firstRow: TableRow, lastRow: TableRow,
       groupColumns = this._groupedColumns(),
       onTop = this.groupingStyle === Table.GroupingStyle.TOP,
       states = [];
@@ -2289,7 +2373,7 @@ export default class Table extends Widget {
       return;
     }
 
-    rows = this.visibleRows;
+    let rows = this.visibleRows;
     this._forEachVisibleColumn('aggrStart', states);
 
     rows.forEach((row, r) => {
@@ -2298,9 +2382,9 @@ export default class Table extends Widget {
       }
       this._forEachVisibleColumn('aggrStep', states, row);
       // test if sum should be shown, if yes: reset sum-array
-      nextRow = rows[r + 1];
+      let nextRow = rows[r + 1];
       // test if group is finished
-      newGroup = r === rows.length - 1 || this._isNewGroup(groupColumns, row, nextRow);
+      let newGroup = r === rows.length - 1 || this._isNewGroup(groupColumns, row, nextRow);
       // if group is finished: add group row
       if (newGroup) {
         // finish aggregation
@@ -2322,17 +2406,15 @@ export default class Table extends Widget {
     }
   }
 
-  _isNewGroup(groupedColumns, row, nextRow) {
-    let i, col, newRow = false,
-      hasCellTextForGroupingFunction;
-
+  protected _isNewGroup(groupedColumns: Column[], row: TableRow, nextRow: TableRow): boolean {
+    let newRow = false;
     if (!nextRow) {
       return true; // row is last row
     }
 
-    for (i = 0; i < groupedColumns.length; i++) {
-      col = groupedColumns[i];
-      hasCellTextForGroupingFunction = col && col.cellTextForGrouping && typeof col.cellTextForGrouping === 'function';
+    for (let i = 0; i < groupedColumns.length; i++) {
+      let col = groupedColumns[i];
+      let hasCellTextForGroupingFunction = col && col.cellTextForGrouping && typeof col.cellTextForGrouping === 'function';
       newRow = newRow || hasCellTextForGroupingFunction && col.cellTextForGrouping(row) !== col.cellTextForGrouping(nextRow); // NOSONAR
       newRow = newRow || !hasCellTextForGroupingFunction && this.cellText(col, row) !== this.cellText(col, nextRow);
       if (newRow) {
@@ -2342,10 +2424,8 @@ export default class Table extends Widget {
     return false;
   }
 
-  _groupedColumns() {
-    return this.columns.filter(col => {
-      return col.grouped;
-    });
+  protected _groupedColumns(): Column[] {
+    return this.columns.filter(col => col.grouped);
   }
 
   /**
@@ -2355,8 +2435,8 @@ export default class Table extends Widget {
    * @param prevRow row _before_ the new aggregate row
    * @param nextRow row _after_ the new aggregate row
    */
-  _addAggregateRow(contents, prevRow, nextRow) {
-    let aggregateRow = {
+  protected _addAggregateRow(contents: any[], prevRow: TableRow, nextRow: TableRow) {
+    let aggregateRow: AggregateTableRow = {
       contents: contents.slice(),
       prevRow: prevRow,
       nextRow: nextRow
@@ -2370,29 +2450,25 @@ export default class Table extends Widget {
     }
   }
 
-  _removeAggregateRows(animate) {
+  protected _removeAggregateRows(animate?: boolean) {
     if (this._aggregateRows.length === 0) {
       return;
     }
     animate = scout.nvl(animate, false);
     if (!animate) {
-      this._aggregateRows.forEach(function(aggregateRow) {
-        this._removeRow(aggregateRow);
-      }, this);
+      this._aggregateRows.forEach(aggregateRow => this._removeRow(aggregateRow));
       this.updateScrollbars();
     } else {
-      this._aggregateRows.forEach(function(aggregateRow, i) {
-        this._hideRow(aggregateRow);
-      }, this);
+      this._aggregateRows.forEach(aggregateRow => this._hideRow(aggregateRow));
     }
   }
 
-  _renderAggregateRows(animate) {
+  protected _renderAggregateRows(animate?: boolean) {
     let onTop = this.groupingStyle === Table.GroupingStyle.TOP,
       insertFunc = onTop ? 'insertBefore' : 'insertAfter';
     animate = scout.nvl(animate, false);
 
-    this._aggregateRows.forEach(function(aggregateRow, r) {
+    this._aggregateRows.forEach(aggregateRow => {
       if (aggregateRow.$row) {
         // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (e.g. in insertRows -> renderRows)
         return;
@@ -2415,10 +2491,10 @@ export default class Table extends Widget {
       if (animate) {
         this._showRow(aggregateRow);
       }
-    }, this);
+    });
   }
 
-  _build$AggregateRow(aggregateRow) {
+  protected _build$AggregateRow(aggregateRow?: AggregateTableRow): JQuery {
     let onTop = this.groupingStyle === Table.GroupingStyle.TOP;
     let $aggregateRow = this.$container
       .makeDiv('table-aggregate-row')
@@ -2428,8 +2504,7 @@ export default class Table extends Widget {
     return $aggregateRow;
   }
 
-  groupColumn(column, multiGroup, direction, remove) {
-    let data, sorted;
+  groupColumn(column: Column, multiGroup?: boolean, direction?: 'asc' | 'desc', remove?: boolean) {
     multiGroup = scout.nvl(multiGroup, false);
     remove = scout.nvl(remove, false);
     if (remove) {
@@ -2445,9 +2520,9 @@ export default class Table extends Widget {
     if (this.header) {
       this.header.onSortingChanged();
     }
-    sorted = this._sort(true);
+    let sorted = this._sort(true);
 
-    data = {
+    let data: any = {
       column: column,
       groupAscending: column.sortAscending
     };
@@ -2467,7 +2542,7 @@ export default class Table extends Widget {
     this.trigger('group', data);
   }
 
-  removeColumnGrouping(column) {
+  removeColumnGrouping(column: Column) {
     if (column) {
       this.groupColumn(column, false, 'asc', true);
     }
@@ -2475,22 +2550,18 @@ export default class Table extends Widget {
 
   removeAllColumnGroupings() {
     this.columns
-      .filter(column => {
-        return column.grouped;
-      })
+      .filter(column => column.grouped)
       .forEach(this.removeColumnGrouping.bind(this));
   }
 
   /**
-   * @returns {boolean} true if at least one column has grouped=true
+   * @returns true if at least one column has grouped=true
    */
-  isGrouped() {
-    return this.columns.some(column => {
-      return column.grouped;
-    });
+  isGrouped(): boolean {
+    return this.columns.some(column => column.grouped);
   }
 
-  setColumnBackgroundEffect(column, effect) {
+  setColumnBackgroundEffect(column: NumberColumn, effect: NumberColumnBackgroundEffect) {
     column.setBackgroundEffect(effect);
   }
 
@@ -2498,37 +2569,40 @@ export default class Table extends Widget {
    * Updates the background effect of every column, if column.backgroundEffect is set.
    * Meaning: Recalculates the min / max values and renders the background effect again.
    */
-  _updateBackgroundEffect() {
+  protected _updateBackgroundEffect() {
     this.columns.forEach(column => {
-      if (!column.backgroundEffect) {
+      // @ts-ignore
+      if (!column.updateBackgroundEffect) {
         return;
       }
+      // @ts-ignore
       column.updateBackgroundEffect();
-    }, this);
+    });
   }
 
   /**
    * Recalculates the values necessary for the background effect of every column, if column.backgroundEffect is set
    */
-  _calculateValuesForBackgroundEffect() {
+  protected _calculateValuesForBackgroundEffect() {
     this.columns.forEach(column => {
-      if (!column.backgroundEffect) {
+      // @ts-ignore
+      if (!column.calculateMinMaxValues) {
         return;
       }
+      // @ts-ignore
       column.calculateMinMaxValues();
-    }, this);
+    });
   }
 
-  _markAutoOptimizeWidthColumnsAsDirty() {
+  protected _markAutoOptimizeWidthColumnsAsDirty() {
     this.columns.forEach(column => {
       column.autoOptimizeWidthRequired = true;
     });
   }
 
-  _markAutoOptimizeWidthColumnsAsDirtyIfNeeded(autoOptimizeWidthColumns, oldRow, newRow) {
-    let i,
-      marked = false;
-    for (i = autoOptimizeWidthColumns.length - 1; i >= 0; i--) {
+  protected _markAutoOptimizeWidthColumnsAsDirtyIfNeeded(autoOptimizeWidthColumns: Column[], oldRow: TableRow, newRow: TableRow): boolean {
+    let marked = false;
+    for (let i = autoOptimizeWidthColumns.length - 1; i >= 0; i--) {
       let column = autoOptimizeWidthColumns[i];
       if (this.cellValue(column, oldRow) !== this.cellValue(column, newRow)) {
         column.autoOptimizeWidthRequired = true;
@@ -2540,35 +2614,33 @@ export default class Table extends Widget {
     return marked;
   }
 
-  setMultiCheck(multiCheck) {
+  setMultiCheck(multiCheck: boolean) {
     this.setProperty('multiCheck', multiCheck);
   }
 
-  checkedRows() {
-    return this.rows.filter(row => {
-      return row.checked;
-    });
+  checkedRows(): TableRow[] {
+    return this.rows.filter(row => row.checked);
   }
 
-  checkRow(row, checked, options) {
+  checkRow(row: TableRow, checked: boolean, options?: TableRowCheckOptions) {
     let opts = $.extend(options, {
       checked: checked
     });
     this.checkRows([row], opts);
   }
 
-  checkRows(rows, options) {
-    let opts = $.extend({
+  checkRows(rows: TableRow | TableRow[], options?: TableRowCheckOptions) {
+    let opts: TableRowCheckOptions = $.extend({
       checked: true,
       checkOnlyEnabled: true
     }, options);
-    let checkedRows = [];
+    let checkedRows: TableRow[] = [];
     // use enabled computed because when the parent of the table is disabled, it should not be allowed to check rows
     if (!this.checkable || !this.enabledComputed && opts.checkOnlyEnabled) {
       return;
     }
     rows = arrays.ensure(rows);
-    rows.forEach(function(row) {
+    rows.forEach(row => {
       if (!row.enabled && opts.checkOnlyEnabled || row.checked === opts.checked) {
         return;
       }
@@ -2582,32 +2654,30 @@ export default class Table extends Widget {
       }
       row.checked = opts.checked;
       checkedRows.push(row);
-    }, this);
+    });
 
     if (this._isDataRendered()) {
-      checkedRows.forEach(function(row) {
-        this._renderRowChecked(row);
-      }, this);
+      checkedRows.forEach(row => this._renderRowChecked(row));
     }
     this._triggerRowsChecked(checkedRows);
   }
 
-  uncheckRow(row, options) {
+  uncheckRow(row: TableRow, options?: TableRowCheckOptions) {
     this.uncheckRows([row], options);
   }
 
-  uncheckRows(rows, options) {
+  uncheckRows(rows: TableRow | TableRow[], options?: TableRowCheckOptions) {
     let opts = $.extend({
       checked: false
     }, options);
     this.checkRows(rows, opts);
   }
 
-  isTableNodeColumn(column) {
+  isTableNodeColumn(column: Column): boolean {
     return this.hierarchical && this.tableNodeColumn === column;
   }
 
-  collapseRow(row) {
+  collapseRow(row: TableRow) {
     this.collapseRows(arrays.ensure(row));
   }
 
@@ -2619,21 +2689,25 @@ export default class Table extends Widget {
     this.expandRowsInternal(this.rootRows, true, true);
   }
 
-  collapseRows(rows, recursive) {
+  collapseRows(rows: TableRow[], recursive?: boolean) {
     this.expandRowsInternal(rows, false, recursive);
   }
 
-  expandRow(row, recursive) {
-    this.expandRows(arrays.ensure(row));
+  expandRow(row: TableRow, recursive?: boolean) {
+    this.expandRows(arrays.ensure(row), recursive);
   }
 
-  expandRows(rows, recursive) {
+  expandRows(rows: TableRow[], recursive?: boolean) {
     this.expandRowsInternal(rows, true, recursive);
   }
 
-  expandRowsInternal(rows, expanded, recursive) {
-    let changedRows = [],
-      rowsForAnimation = [];
+  /**
+   * @param rows {@link rootRows} are used if not specified.
+   * @param expanded Default is true.
+   * @param recursive Default is false.
+   */
+  expandRowsInternal(rows?: TableRow[], expanded?: boolean, recursive?: boolean) {
+    let changedRows: TableRow[] = [], rowsForAnimation: TableRow[] = [];
     rows = rows || this.rootRows;
     expanded = scout.nvl(expanded, true);
     recursive = scout.nvl(recursive, false);
@@ -2669,10 +2743,7 @@ export default class Table extends Widget {
 
     if (this._isDataRendered()) {
       this._renderRowDelta();
-      rowsForAnimation.forEach(row => {
-        row.animateExpansion();
-      });
-
+      rowsForAnimation.forEach(row => row.animateExpansion());
       if (rows[0].$row) {
         scrollbars.ensureExpansionVisible({
           element: rows[0],
@@ -2686,7 +2757,7 @@ export default class Table extends Widget {
     }
   }
 
-  doRowAction(row, column) {
+  doRowAction(row: TableRow, column?: Column) {
     if (this.selectedRows.length !== 1 || this.selectedRows[0] !== row) {
       // Only allow row action if the selected row was double clicked because the handler of the event expects a selected row.
       // This may happen if the user modifies the selection using ctrl or shift while double clicking.
@@ -2700,27 +2771,28 @@ export default class Table extends Widget {
     this._triggerRowAction(row, column);
   }
 
-  insertRow(row) {
+  insertRow(row: TableRowData | TableRow) {
     this.insertRows([row]);
   }
 
-  insertRows(rows) {
-    rows = arrays.ensure(rows);
-    if (rows.length === 0) {
+  insertRows(rows: TableRowData | TableRowData[] | TableRow | TableRow[]) {
+    let rowsArr = arrays.ensure(rows);
+    if (rowsArr.length === 0) {
       return;
     }
     let wasEmpty = this.rows.length === 0;
 
     // Update model
-    rows.forEach(function(row, i) {
-      row = this._initRow(row);
+    rowsArr.forEach((rowData, i) => {
+      let row = this._initRow(rowData);
       row.status = TableRow.Status.INSERTED;
-      rows[i] = row;
+      rowsArr[i] = row;
       // Always insert new rows at the end, if the order is wrong a rowOrderChanged event will follow
       this.rows.push(row);
-    }, this);
+    });
+    let newRows = rowsArr as TableRow[];
 
-    this.filterSupport.applyFilters(rows);
+    this.filterSupport.applyFilters(newRows);
     this._updateRowStructure({
       updateTree: true,
       filteredRows: true,
@@ -2728,7 +2800,7 @@ export default class Table extends Widget {
       visibleRows: true
     });
     // Notify changed filter if there are user filters and at least one of the new rows is accepted by them
-    if (this._filterCount() > 0 && rows.some(row => row.filterAccepted)) {
+    if (this._filterCount() > 0 && newRows.some(row => row.filterAccepted)) {
       this._triggerFilter();
     }
 
@@ -2736,7 +2808,7 @@ export default class Table extends Widget {
     this._markAutoOptimizeWidthColumnsAsDirty();
 
     // this event should be triggered before the rowOrderChanged event (triggered by the _sort function).
-    this._triggerRowsInserted(rows);
+    this._triggerRowsInserted(newRows);
     this._sortAfterInsert(wasEmpty);
 
     // Update HTML
@@ -2746,12 +2818,12 @@ export default class Table extends Widget {
       }
       // Remember inserted rows for future events like rowOrderChanged
       if (!this._insertedRows) {
-        this._insertedRows = rows;
+        this._insertedRows = newRows;
         setTimeout(() => {
           this._insertedRows = null;
         }, 0);
       } else {
-        arrays.pushAll(this._insertedRows, rows);
+        arrays.pushAll(this._insertedRows, newRows);
       }
 
       this.viewRangeDirty = true;
@@ -2760,22 +2832,22 @@ export default class Table extends Widget {
     }
   }
 
-  _sortAfterInsert(wasEmpty) {
+  protected _sortAfterInsert(wasEmpty: boolean) {
     this._sort();
   }
 
-  deleteRow(row) {
+  deleteRow(row: TableRow) {
     this.deleteRows([row]);
   }
 
-  deleteRows(rows) {
+  deleteRows(rows: TableRow | TableRow[]) {
     rows = arrays.ensure(rows);
     if (rows.length === 0) {
       return;
     }
-    let invalidate,
-      filterChanged,
-      removedRows = [];
+    let invalidate: boolean,
+      filterChanged: boolean,
+      removedRows: TableRow[] = [];
 
     this.visitRows(row => {
       if (!this.rowsMap[row.id]) {
@@ -2878,11 +2950,11 @@ export default class Table extends Widget {
     }
   }
 
-  updateRow(row) {
+  updateRow(row: TableRow) {
     this.updateRows([row]);
   }
 
-  updateRows(rows) {
+  updateRows(rows: TableRow | TableRow[]) {
     rows = arrays.ensure(rows);
     if (rows.length === 0) {
       return;
@@ -2891,20 +2963,18 @@ export default class Table extends Widget {
       this.updateBuffer.buffer(rows);
       return;
     }
-    let filterChanged, expansionChanged, autoOptimizeWidthColumnsDirty;
-    let autoOptimizeWidthColumns = this.columns.filter(column => {
-      return column.autoOptimizeWidth && !column.autoOptimizeWidthRequired;
-    });
+    let filterChanged: boolean, expansionChanged: boolean, autoOptimizeWidthColumnsDirty: boolean;
+    let autoOptimizeWidthColumns = this.columns.filter(column => column.autoOptimizeWidth && !column.autoOptimizeWidthRequired);
 
-    let rowsToIndex = {};
+    let rowsToIndex: Record<string, number> = {};
     this.rows.forEach((row, index) => {
       rowsToIndex[row.id] = index;
-    }, this);
+    });
 
-    let oldRowsMap = {};
+    let oldRowsMap: Record<string, TableRow> = {};
     let structureChanged = false;
-    rows = rows.map(function(row) {
-      let parentRowId = row.parentRow,
+    rows = rows.map(row => {
+      let parentRowId: any = row.parentRow,
         oldRow = this.rowsMap[row.id];
       // collect old rows
       oldRowsMap[row.id] = oldRow;
@@ -2915,6 +2985,7 @@ export default class Table extends Widget {
       if (row.parentRow && !objects.isNullOrUndefined(row.parentRow.id)) {
         parentRowId = row.parentRow.id;
       }
+      // @ts-ignore
       structureChanged = structureChanged || (scout.nvl(oldRow._parentRowId, null) !== scout.nvl(parentRowId, null));
       expansionChanged = expansionChanged || (oldRow.expanded !== scout.nvl(row.expanded, false));
       row = this._initRow(row);
@@ -2944,7 +3015,7 @@ export default class Table extends Widget {
       // Check if cell content changed and if yes mark auto optimize width column as dirty
       autoOptimizeWidthColumnsDirty = this._markAutoOptimizeWidthColumnsAsDirtyIfNeeded(autoOptimizeWidthColumns, oldRow, row);
       return row;
-    }, this);
+    });
 
     this._updateRowStructure({
       updateTree: true,
@@ -2974,17 +3045,16 @@ export default class Table extends Widget {
     this.invalidateLayoutTree(); // this will also update the scroll-bars
   }
 
-  _renderUpdateRows(rows, oldRowsMap) {
+  protected _renderUpdateRows(rows: TableRow[], oldRowsMap: Record<string, TableRow>) {
     // render row and replace div in DOM
-    rows.forEach(function(row) {
-      let oldRow = oldRowsMap[row.id],
-        $updatedRow;
+    rows.forEach(row => {
+      let oldRow = oldRowsMap[row.id];
       if (!oldRow.$row || oldRow.$row.hasClass('hiding')) {
         // If row is not rendered or being removed by an animation, don't try to update it.
         // If it were updated during animated removal, the new row would immediately be inserted again, so the removal would not work.
         return;
       }
-      $updatedRow = $(this._buildRowDiv(row));
+      let $updatedRow = $(this._buildRowDiv(row));
       $updatedRow.copyCssClasses(oldRow.$row, Table.SELECTION_CLASSES + ' first last');
       oldRow.$row.replaceWith($updatedRow);
       Table.linkRowToDiv(row, $updatedRow);
@@ -2997,18 +3067,18 @@ export default class Table extends Widget {
         // Goal: if the update happens immediately after the animation started, the new row will be animated nicely. If the update happens later, don't start the animation again from the start.
         this._showRow(row);
       }
-    }, this);
+    });
   }
 
-  _sortAfterUpdate() {
+  protected _sortAfterUpdate() {
     this._sort();
   }
 
-  isHierarchical() {
+  isHierarchical(): boolean {
     return this.hierarchical;
   }
 
-  _setHierarchical(hierarchical) {
+  protected _setHierarchical(hierarchical: boolean) {
     if (this.hierarchical === hierarchical) {
       return;
     }
@@ -3024,9 +3094,8 @@ export default class Table extends Widget {
 
   /**
    * The given rows must be rows of this table in desired order.
-   * @param {TableRow[]} rows
    */
-  updateRowOrder(rows) {
+  updateRowOrder(rows: TableRow | TableRow[]) {
     rows = arrays.ensure(rows);
     if (rows.length !== this.rows.length) {
       throw new Error('Row order may not be updated because lengths of the arrays differ.');
@@ -3050,7 +3119,7 @@ export default class Table extends Widget {
     this._animateAggregateRows = false;
   }
 
-  _destroyTooltipsForRow(row) {
+  protected _destroyTooltipsForRow(row: TableRow | AggregateTableRow) {
     for (let i = this.tooltips.length - 1; i >= 0; i--) {
       if (this.tooltips[i].row.id === row.id) {
         this.tooltips[i].destroy();
@@ -3059,13 +3128,13 @@ export default class Table extends Widget {
     }
   }
 
-  _destroyCellEditorForRow(row) {
+  protected _destroyCellEditorForRow(row: TableRow | AggregateTableRow) {
     if (this.cellEditorPopup && this.cellEditorPopup.rendered && this.cellEditorPopup.row.id === row.id) {
       this.cellEditorPopup.destroy();
     }
   }
 
-  startCellEdit(column, row, field) {
+  startCellEdit(column: Column, row: TableRow, field: ValueField): CellEditorPopup {
     if (field.destroyed) {
       // May happen if the action was postponed and the field destroyed in the meantime using endCellEdit.
       return;
@@ -3094,9 +3163,9 @@ export default class Table extends Widget {
   /**
    * @param saveEditorValue when this parameter is set to true, the value of the editor field is set as
    *    new value on the edited cell. In remote case this parameter is always false, because the cell
-   *    value is updated by an updateRow event instead.
+   *    value is updated by an updateRow event instead. Default is false.
    */
-  endCellEdit(field, saveEditorValue) {
+  endCellEdit(field: ValueField, saveEditorValue?: boolean) {
     if (!this.cellEditorPopup) {
       // the cellEditorPopup could already be removed by scrolling (out of view range) or be removed by update rows
       field.destroy();
@@ -3111,7 +3180,7 @@ export default class Table extends Widget {
     this._destroyCellEditorPopup(this._updateCellFromEditor.bind(this, this.cellEditorPopup, field, saveEditorValue));
   }
 
-  _updateCellFromEditor(cellEditorPopup, field, saveEditorValue) {
+  protected _updateCellFromEditor(cellEditorPopup: CellEditorPopup, field: ValueField, saveEditorValue?: boolean) {
     saveEditorValue = scout.nvl(saveEditorValue, false);
     if (saveEditorValue) {
       let column = cellEditorPopup.column;
@@ -3122,13 +3191,12 @@ export default class Table extends Widget {
 
   completeCellEdit() {
     let field = this.cellEditorPopup.cell.field;
-    let event = new Event({
+    let event = this.trigger('completeCellEdit', {
       field: field,
       row: this.cellEditorPopup.row,
       column: this.cellEditorPopup.column,
       cell: this.cellEditorPopup.cell
     });
-    this.trigger('completeCellEdit', event);
 
     if (!event.defaultPrevented) {
       return this.endCellEdit(field, true);
@@ -3137,20 +3205,19 @@ export default class Table extends Widget {
 
   cancelCellEdit() {
     let field = this.cellEditorPopup.cell.field;
-    let event = new Event({
+    let event = this.trigger('cancelCellEdit', {
       field: field,
       row: this.cellEditorPopup.row,
       column: this.cellEditorPopup.column,
       cell: this.cellEditorPopup.cell
     });
-    this.trigger('cancelCellEdit', event);
 
     if (!event.defaultPrevented) {
       this.endCellEdit(field);
     }
   }
 
-  scrollTo(row, options) {
+  scrollTo(row: TableRow, options?: ScrollToOptions | string) {
     if (this.viewRangeRendered.size() === 0) {
       // Cannot scroll to a row no row is rendered
       return;
@@ -3173,10 +3240,7 @@ export default class Table extends Widget {
     this.setScrollTop(newScrollTop);
   }
 
-  /**
-   * @override
-   */
-  setScrollTop(scrollTop) {
+  override setScrollTop(scrollTop: number) {
     this.setProperty('scrollTop', scrollTop);
     // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
     if (this._isDataRendered()) {
@@ -3184,10 +3248,7 @@ export default class Table extends Widget {
     }
   }
 
-  /**
-   * @override
-   */
-  _renderScrollTop() {
+  protected override _renderScrollTop() {
     if (this.rendering) {
       // Not necessary to do it while rendering since it will be done by the layout
       return;
@@ -3195,17 +3256,14 @@ export default class Table extends Widget {
     scrollbars.scrollTop(this.get$Scrollable(), this.scrollTop);
   }
 
-  /**
-   * @override
-   */
-  get$Scrollable() {
+  override get$Scrollable(): JQuery {
     if (this.$data) {
       return this.$data;
     }
     return this.$container;
   }
 
-  setScrollToSelection(scrollToSelection) {
+  setScrollToSelection(scrollToSelection: boolean) {
     this.setProperty('scrollToSelection', scrollToSelection);
   }
 
@@ -3222,32 +3280,28 @@ export default class Table extends Widget {
   }
 
   revealChecked() {
-    let firstCheckedRow = arrays.find(this.rows, row => {
-      return row.checked === true;
-    });
+    let firstCheckedRow = arrays.find(this.rows, row => row.checked);
     if (firstCheckedRow) {
       this.scrollTo(firstCheckedRow);
     }
   }
 
-  _rowById(id) {
+  protected _rowById(id: string): TableRow {
     return this.rowsMap[id];
   }
 
-  _rowsByIds(ids) {
+  protected _rowsByIds(ids: string[]): TableRow[] {
     return ids.map(this._rowById.bind(this));
   }
 
-  _rowsToIds(rows) {
-    return rows.map(row => {
-      return row.id;
-    });
+  protected _rowsToIds(rows: TableRow[]): string[] {
+    return rows.map(row => row.id);
   }
 
   /**
    * Checks whether the given row is contained in the table. Uses the id of the row for the lookup.
    */
-  hasRow(row) {
+  hasRow(row: TableRow): boolean {
     return Boolean(this.rowsMap[row.id]);
   }
 
@@ -3255,20 +3309,20 @@ export default class Table extends Widget {
    * render borders and selection of row. default select if no argument or false is passed in deselect
    * model has to be updated before calling this method.
    */
-  _renderSelection(rows) {
+  protected _renderSelection(rows?: TableRow | TableRow[]) {
     rows = arrays.ensure(rows || this.selectedRows);
 
-    // helper function adds/removes a class for a row only if necessary, return true if classes have been changed
-    let addOrRemoveClassIfNeededFunc = ($row, condition, classname) => {
+    // helper function adds/removes a class for a row only if necessary, return 1 if classes have been changed
+    let addOrRemoveClassIfNeededFunc = ($row: JQuery, condition: boolean, classname: string): number => {
       let hasClass = $row.hasClass(classname);
       if (condition && !hasClass) {
         $row.addClass(classname);
-        return true;
+        return 1;
       } else if (!condition && hasClass) {
         $row.removeClass(classname);
-        return true;
+        return 1;
       }
-      return false;
+      return 0;
     };
     this._renderNoRowsSelectedMarker();
 
@@ -3293,20 +3347,17 @@ export default class Table extends Widget {
         followingRowSelected = false;
       }
 
-      // Note: We deliberately use the '+' operator on booleans here! That way, _all_ methods are executed (boolean
-      // operators might stop in between) and the variable classChanged contains a number > 1 (which is truthy) when
-      // at least one method call returned true.
-      let classChanged = 0 +
+      let classChanged =
         addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected, 'selected') +
         addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && !previousRowSelected && followingRowSelected, 'select-top') +
         addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && previousRowSelected && !followingRowSelected, 'select-bottom') +
         addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && !previousRowSelected && !followingRowSelected, 'select-single') +
         addOrRemoveClassIfNeededFunc(row.$row, thisRowSelected && previousRowSelected && followingRowSelected, 'select-middle');
 
-      if (classChanged && previousRowSelected && rows.indexOf(visibleRows[previousIndex]) === -1) {
+      if (classChanged > 0 && previousRowSelected && rows.indexOf(visibleRows[previousIndex]) === -1) {
         rows.push(visibleRows[previousIndex]);
       }
-      if (classChanged && followingRowSelected && rows.indexOf(visibleRows[followingIndex]) === -1) {
+      if (classChanged > 0 && followingRowSelected && rows.indexOf(visibleRows[followingIndex]) === -1) {
         rows.push(visibleRows[followingIndex]);
       }
     }
@@ -3318,7 +3369,7 @@ export default class Table extends Widget {
     }
   }
 
-  _removeSelection() {
+  protected _removeSelection() {
     this.$container.addClass('no-rows-selected');
     this.selectedRows.forEach(row => {
       if (!row.$row) {
@@ -3326,14 +3377,14 @@ export default class Table extends Widget {
       }
       row.$row.select(false);
       row.$row.toggleClass(Table.SELECTION_CLASSES, false);
-    }, this);
+    });
   }
 
-  _renderNoRowsSelectedMarker() {
+  protected _renderNoRowsSelectedMarker() {
     this.$container.toggleClass('no-rows-selected', this.selectedRows.length === 0);
   }
 
-  addRowToSelection(row, ongoingSelection) {
+  addRowToSelection(row: TableRow, ongoingSelection?: boolean) {
     if (this.selectedRows.indexOf(row) > -1) {
       return;
     }
@@ -3354,7 +3405,7 @@ export default class Table extends Widget {
     }
   }
 
-  removeRowFromSelection(row, ongoingSelection) {
+  removeRowFromSelection(row: TableRow, ongoingSelection?: boolean) {
     ongoingSelection = ongoingSelection !== undefined ? ongoingSelection : true;
     if (arrays.remove(this.selectedRows, row)) {
       if (this._isDataRendered()) {
@@ -3368,15 +3419,13 @@ export default class Table extends Widget {
     }
   }
 
-  selectRow(row, debounceSend) {
+  selectRow(row: TableRow, debounceSend?: boolean) {
     this.selectRows(row, debounceSend);
   }
 
-  selectRows(rows, debounceSend) {
+  selectRows(rows: TableRow | TableRow[], debounceSend?: boolean) {
     // Exclude rows that are currently not visible because of a filter (they cannot be selected)
-    rows = arrays.ensure(rows).filter(function(row) {
-      return Boolean(this.visibleRowsMap[row.id]);
-    }, this);
+    rows = arrays.ensure(rows).filter(row => Boolean(this.visibleRowsMap[row.id]));
 
     let selectedEqualRows = arrays.equalsIgnoreOrder(rows, this.selectedRows);
     // TODO [7.0] cgu: maybe make sure selectedRows are in correct order, this would make logic in AbstractTableNavigationKeyStroke or renderSelection easier
@@ -3405,11 +3454,11 @@ export default class Table extends Widget {
     }
   }
 
-  deselectRow(row) {
+  deselectRow(row: TableRow) {
     this.deselectRows(row);
   }
 
-  deselectRows(rows) {
+  deselectRows(rows: TableRow | TableRow[]) {
     rows = arrays.ensure(rows);
     let selectedRows = this.selectedRows.slice(); // copy
     if (arrays.removeAll(selectedRows, rows)) {
@@ -3417,19 +3466,19 @@ export default class Table extends Widget {
     }
   }
 
-  isRowSelected(row) {
+  isRowSelected(row: TableRow): boolean {
     return this.selectedRows.indexOf(row) > -1;
   }
 
-  _filterCount() {
+  protected _filterCount(): number {
     return this.filters.length;
   }
 
-  filteredRows() {
+  filteredRows(): TableRow[] {
     return this._filteredRows;
   }
 
-  $rows(includeAggrRows) {
+  $rows(includeAggrRows?: boolean): JQuery {
     let selector = '.table-row';
     if (includeAggrRows) {
       selector += ', .table-aggregate-row';
@@ -3437,28 +3486,28 @@ export default class Table extends Widget {
     return this.$data.find(selector);
   }
 
-  $aggregateRows() {
+  $aggregateRows(): JQuery {
     return this.$data.find('.table-aggregate-row');
   }
 
   /**
-   * @returns {TableRow} the first selected row of this table or null when no row is selected
+   * @returns the first selected row of this table or null when no row is selected
    */
-  selectedRow() {
+  selectedRow(): TableRow {
     if (this.selectedRows.length > 0) {
       return this.selectedRows[0];
     }
     return null;
   }
 
-  $selectedRows() {
+  $selectedRows(): JQuery {
     if (!this.$data) {
       return $();
     }
     return this.$data.find('.selected');
   }
 
-  $cellsForColIndex(colIndex, includeAggrRows) {
+  $cellsForColIndex(colIndex: number, includeAggrRows: boolean): JQuery {
     let selector = '.table-row > div:nth-of-type(' + colIndex + ')';
     if (includeAggrRows) {
       selector += ', .table-aggregate-row > div:nth-of-type(' + colIndex + ')';
@@ -3466,48 +3515,47 @@ export default class Table extends Widget {
     return this.$data.find(selector);
   }
 
-  $cellsForRow($row) {
+  $cellsForRow($row: JQuery): JQuery {
     return $row.children('.table-cell');
   }
 
   /**
-   * @param {Column|number} column or columnIndex
-   * @returns {$}
+   * @param column or columnIndex
    */
-  $cell(column, $row) {
-    let columnIndex = column;
+  $cell(column: Column | number, $row: JQuery): JQuery {
+    let columnIndex: number;
     if (typeof column !== 'number') {
       columnIndex = this.visibleColumns().indexOf(column);
+    } else {
+      columnIndex = column;
     }
     return $row.children('.table-cell').eq(columnIndex);
   }
 
-  columnById(columnId) {
-    return arrays.find(this.columns, column => {
-      return column.id === columnId;
-    });
+  columnById(columnId: string): Column {
+    return arrays.find(this.columns, column => column.id === columnId);
   }
 
   /**
-   * @param {$} $cell the $cell to get the column for
-   * @param {$} [$row] the $row which contains the $cell. If not passed it will be determined automatically
-   * @returns {Column} the column for the given $cell
+   * @param $cell the $cell to get the column for
+   * @param $row the $row which contains the $cell. If not passed it will be determined automatically
+   * @returns the column for the given $cell
    */
-  columnFor$Cell($cell, $row) {
+  columnFor$Cell($cell: JQuery, $row?: JQuery): Column {
     $row = $row || $cell.parent();
     let cellIndex = this.$cellsForRow($row).index($cell);
     return this.visibleColumns()[cellIndex];
   }
 
-  columnsByIds(columnIds) {
+  columnsByIds(columnIds: string[]): Column[] {
     return columnIds.map(this.columnById.bind(this));
   }
 
-  getVisibleRows() {
+  getVisibleRows(): TableRow[] {
     return this.visibleRows;
   }
 
-  _updateRowStructure(options) {
+  protected _updateRowStructure(options: UpdateTableRowStructureOptions) {
     let updateTree = scout.nvl(options.updateTree, false),
       updateFilteredRows = scout.nvl(options.filteredRows, updateTree),
       applyFilters = scout.nvl(options.applyFilters, updateFilteredRows),
@@ -3524,12 +3572,12 @@ export default class Table extends Widget {
     }
   }
 
-  _rebuildTreeStructure() {
+  protected _rebuildTreeStructure() {
     let hierarchical = false;
     this.rows.forEach(row => {
       row.childRows = [];
       hierarchical = hierarchical || !objects.isNullOrUndefined(row.parentRow);
-    }, this);
+    });
     if (!hierarchical) {
       this.rootRows = this.rows;
       this._setHierarchical(hierarchical);
@@ -3538,11 +3586,12 @@ export default class Table extends Widget {
 
     this._setHierarchical(hierarchical);
     this.rootRows = [];
-    this.rows.forEach(function(row) {
-      let parentRow;
+    this.rows.forEach(row => {
+      let parentRow: TableRow;
       if (objects.isNullOrUndefined(row.parentRow)) {
         // root row
         row.parentRow = null;
+        // @ts-ignore
         row._parentRowId = null;
         this.rootRows.push(row);
         return;
@@ -3551,17 +3600,19 @@ export default class Table extends Widget {
         parentRow = this.rowsMap[row.parentRow.id];
       } else {
         // expect id
-        parentRow = this.rowsMap[row.parentRow];
+        let parentRowId = (row.parentRow as unknown) as string;
+        parentRow = this.rowsMap[parentRowId];
       }
       if (parentRow) {
         row.parentRow = parentRow;
+        // @ts-ignore
         row._parentRowId = parentRow.id;
         parentRow.childRows.push(row);
       } else {
         // do not allow unresolvable parent rows.
         throw new Error('Parent row of ' + row + ' can not be resolved.');
       }
-    }, this);
+    });
 
     // traverse row tree to have minimal order of rows.
     this._maxLevel = 0;
@@ -3575,22 +3626,22 @@ export default class Table extends Widget {
     this._calculateTableNodeColumn();
   }
 
-  _updateFilteredRows(applyFilters, changed) {
+  protected _updateFilteredRows(applyFilters?: boolean, changed?: boolean) {
     changed = Boolean(changed);
     applyFilters = scout.nvl(applyFilters, true);
-    this._filteredRows = this.rows.filter(function(row) {
+    this._filteredRows = this.rows.filter(row => {
       if (applyFilters) {
         changed = this._applyFiltersForRow(row) || changed;
       }
       return row.filterAccepted;
-    }, this);
+    });
 
     if (changed) {
       this._triggerFilter();
     }
   }
 
-  _updateVisibleRows() {
+  protected _updateVisibleRows() {
     this.visibleRows = this._computeVisibleRows();
     // rebuild the rows by id map of visible rows
     this.visibleRowsMap = this.visibleRows.reduce((map, row) => {
@@ -3600,45 +3651,43 @@ export default class Table extends Widget {
 
     if (this.initialized) {
       // deselect not visible rows
-      this.deselectRows(this.selectedRows.filter(function(selectedRow) {
-        return !this.visibleRowsMap[selectedRow.id];
-      }, this));
+      let notVisibleRows = this.selectedRows.filter(selectedRow => !this.visibleRowsMap[selectedRow.id]);
+      this.deselectRows(notVisibleRows);
     }
   }
 
-  _computeVisibleRows(rows) {
-    let visibleRows = [];
+  protected _computeVisibleRows(rows?: TableRow[]): TableRow[] {
+    let visibleRows: TableRow[] = [];
     rows = rows || this.rootRows;
-    rows.forEach(function(row) {
+    rows.forEach(row => {
       let visibleChildRows = this._computeVisibleRows(row.childRows);
       if (row.filterAccepted) {
         visibleRows.push(row);
       } else if (visibleChildRows.length > 0) {
         visibleRows.push(row);
       }
+      // @ts-ignore
       row._expandable = visibleChildRows.length > 0;
       if (row.expanded) {
         visibleRows = visibleRows.concat(visibleChildRows);
       }
-    }, this);
+    });
     return visibleRows;
   }
 
-  visibleChildRows(row) {
-    return row.childRows.filter(function(child) {
-      return Boolean(this.visibleRowsMap[child.id]);
-    }, this);
+  visibleChildRows(row: TableRow): TableRow[] {
+    return row.childRows.filter(child => Boolean(this.visibleRowsMap[child.id]));
   }
 
-  _renderRowDelta() {
+  protected _renderRowDelta() {
     if (!this._isDataRendered()) {
       return;
     }
-    let renderedRows = [];
-    let rowsToHide = [];
+    let renderedRows: TableRow[] = [];
+    let rowsToHide: TableRow[] = [];
     this.$rows().each((i, elem) => {
       let $row = $(elem),
-        row = $row.data('row');
+        row = $row.data('row') as TableRow;
       if (this.visibleRows.indexOf(row) < 0) {
         // remember for remove animated
         row.$row.detach();
@@ -3650,22 +3699,18 @@ export default class Table extends Widget {
 
     this._rerenderViewport();
     // insert rows to remove animated
-    rowsToHide.forEach(function(row) {
-      row.$row.insertAfter(this.$fillBefore);
-    }, this);
+    rowsToHide.forEach(row => row.$row.insertAfter(this.$fillBefore));
     // Rows removed by an animation are still there, new rows were appended -> reset correct row order
     this._order$Rows().insertAfter(this.$fillBefore);
     // Also make sure aggregate rows are at the correct position (_renderAggregateRows does nothing because they are already rendered)
     this._order$AggregateRows();
 
-    rowsToHide.forEach(function(row) {
-      // remove animated
-      this._hideRow(row);
-    }, this);
+    // remove animated
+    rowsToHide.forEach(row => this._hideRow(row));
 
     this.$rows().each((i, elem) => {
       let $row = $(elem),
-        row = $row.data('row');
+        row = $row.data('row') as TableRow;
       if ($row.hasClass('hiding')) {
         // Do not remove rows which are removed using an animation
         // row.$row may already point to a new row -> don't call removeRow to not accidentally remove the new row
@@ -3682,27 +3727,26 @@ export default class Table extends Widget {
   /**
    * Sorts the given $rows according to the row index
    */
-  _order$Rows($rows) {
-    // Find rows using jquery because
-    // this.filteredRows() may be empty but there may be $rows which are getting removed by animation
+  protected _order$Rows($rows?: JQuery): JQuery {
+    // Find rows using jquery because this.filteredRows() may be empty but there may be $rows which are getting removed by animation
     $rows = $rows || this.$rows();
     return $rows.sort((elem1, elem2) => {
       let $row1 = $(elem1),
         $row2 = $(elem2),
-        row1 = $row1.data('row'),
-        row2 = $row2.data('row');
+        row1 = $row1.data('row') as TableRow,
+        row2 = $row2.data('row') as TableRow;
 
       return this.rows.indexOf(row1) - this.rows.indexOf(row2);
     });
   }
 
-  _order$AggregateRows($rows) {
+  protected _order$AggregateRows($rows?: JQuery) {
     // Find aggregate rows using jquery because
     // this._aggregateRows may be empty but there may be $aggregateRows which are getting removed by animation
     $rows = $rows || this.$aggregateRows();
     $rows.each((i, elem) => {
       let $aggrRow = $(elem),
-        aggregateRow = $aggrRow.data('aggregateRow');
+        aggregateRow = $aggrRow.data('aggregateRow') as AggregateTableRow;
       if (!aggregateRow || !aggregateRow.prevRow) {
         return;
       }
@@ -3711,20 +3755,22 @@ export default class Table extends Widget {
   }
 
   /**
-   * @returns {Boolean} true if row state has changed, false if not
+   * @returns true if row state has changed, false if not
    */
-  _applyFiltersForRow(row) {
+  protected _applyFiltersForRow(row: TableRow): boolean {
     return this.filterSupport.applyFiltersForElement(row);
   }
 
   /**
-   * @returns {String[]} labels of the currently active Filters that provide a createLabel() function
+   * @returns labels of the currently active Filters that provide a createLabel() function
    */
-  filteredBy() {
-    let filteredBy = [];
+  filteredBy(): string[] {
+    let filteredBy: string[] = [];
     this.filters.forEach(filter => {
       // check if filter supports label
+      // @ts-ignore
       if (typeof filter.createLabel === 'function') {
+        // @ts-ignore
         filteredBy.push(filter.createLabel());
       }
     });
@@ -3738,15 +3784,13 @@ export default class Table extends Widget {
     this._triggerFilterReset();
   }
 
-  hasUserFilter() {
+  hasUserFilter(): boolean {
     return this.filters
-      .filter(filter => {
-        return filter instanceof TableUserFilter;
-      })
+      .filter(filter => filter instanceof TableUserFilter)
       .length > 0;
   }
 
-  resizeToFit(column, maxWidth) {
+  resizeToFit(column: Column, maxWidth?: number) {
     if (column.fixedWidth) {
       return;
     }
@@ -3759,7 +3803,7 @@ export default class Table extends Widget {
     }
   }
 
-  _resizeToFit(column, maxWidth, calculatedSize) {
+  protected _resizeToFit(column: Column, maxWidth?: number, calculatedSize?: number) {
     if (calculatedSize === -1) {
       // Calculation has been aborted -> don't resize
       return;
@@ -3775,16 +3819,16 @@ export default class Table extends Widget {
   }
 
   /**
-   * @param {Filter|function|(Filter|function)[]} filter The filters to add.
-   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   * @param filter The filters to add.
+   * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  addFilter(filter, applyFilter = true) {
+  addFilter(filter: TableFilter | TableFilter[], applyFilter = true) {
     if (filter instanceof TableUserFilter) {
       let previousFilter = this.getFilter(filter.createKey());
       this.filterSupport.removeFilter(previousFilter, false);
     }
 
-    let added = this.filterSupport.addFilter(filter, applyFilter);
+    let added = this.filterSupport.addFilter(filter, applyFilter) as TableFilter[];
     if (added && added.length) {
       this.trigger('filterAdded', {
         filter: added[0]
@@ -3793,11 +3837,11 @@ export default class Table extends Widget {
   }
 
   /**
-   * @param {Filter|function|(Filter|function)[]} filter The filters to remove.
-   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   * @param filter The filters to remove.
+   * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  removeFilter(filter, applyFilter = true) {
-    let removed = this.filterSupport.removeFilter(filter, applyFilter);
+  removeFilter(filter: TableFilter | TableFilter[], applyFilter = true) {
+    let removed = this.filterSupport.removeFilter(filter, applyFilter) as TableFilter[];
     if (removed && removed.length) {
       this.trigger('filterRemoved', {
         filter: removed[0]
@@ -3805,11 +3849,11 @@ export default class Table extends Widget {
     }
   }
 
-  removeFilterByKey(key, applyFilter = true) {
+  removeFilterByKey(key: string, applyFilter = true) {
     this.removeFilter(this.getFilter(key), applyFilter);
   }
 
-  getFilter(key) {
+  getFilter(key: string): TableFilter {
     return arrays.find(this.filters, f => {
       if (!(f instanceof TableUserFilter)) {
         return false;
@@ -3819,48 +3863,50 @@ export default class Table extends Widget {
   }
 
   /**
-   * @param {Filter|function|(Filter|function)[]} filter The new filters.
-   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   * @param filter The new filters.
+   * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  setFilters(filters, applyFilter = true) {
+  setFilters(filters: (TableFilter | TableFilterModel | Filter<TableRow>)[], applyFilter = true) {
     this.resetUserFilter(false);
-    filters = filters.map(filter => this._ensureFilter(filter));
-    let result = this.filterSupport.setFilters(filters, applyFilter);
-    result.filtersAdded.forEach(filter => this.trigger('filterAdded', {
+    let tableFilters = filters.map(filter => this._ensureFilter(filter));
+    let result = this.filterSupport.setFilters(tableFilters, applyFilter);
+    let filtersAdded = result.filtersAdded as TableFilter[];
+    let filtersRemoved = result.filtersRemoved as TableFilter[];
+    filtersAdded.forEach(filter => this.trigger('filterAdded', {
       filter: filter
     }));
-    result.filtersRemoved.forEach(filter => this.trigger('filtersRemoved', {
+    filtersRemoved.forEach(filter => this.trigger('filtersRemoved', {
       filter: filter
     }));
   }
 
-  _ensureFilter(filter) {
+  protected _ensureFilter<T extends TableFilter>(filter: TableFilter | TableFilterModel | Filter<TableRow>): TableFilter {
+    // @ts-ignore
     if (filter instanceof TableUserFilter || !filter.objectType) {
-      return filter;
+      return filter as TableFilter;
     }
-    if (filter.column) {
-      filter.column = this.columnById(filter.column);
+
+    let filterModel = filter as RefModel<TableFilterModel>;
+    if (filterModel.column) {
+      filterModel.column = this.columnById(filterModel.column as string);
     }
-    filter.table = this;
-    filter.session = this.session;
-    return scout.create(filter);
+    filterModel.table = this;
+    filterModel.session = this.session;
+    return scout.create(filterModel);
   }
 
   filter() {
     this.filterSupport.filter();
   }
 
-  _filter(options) {
+  protected _filter(options?: UpdateTableRowStructureOptions) {
     this._updateRowStructure($.extend({}, options, {filteredRows: true}));
     this._renderRowDelta();
     this._group();
     this.revealSelection();
   }
 
-  /**
-   * @returns {FilterSupport}
-   */
-  _createFilterSupport() {
+  protected _createFilterSupport(): FilterSupport<TableRow> {
     return new FilterSupport({
       widget: this,
       $container: () => this.$container,
@@ -3870,28 +3916,28 @@ export default class Table extends Widget {
         table: this
       }),
       updateTextFilterText: (filter, text) => {
-        if (objects.equals(filter.text, text)) {
+        if (objects.equals(filter.acceptedText, text)) {
           return false;
         }
-        filter.text = text;
+        filter.acceptedText = text;
         return true;
       }
     });
   }
 
-  setTextFilterEnabled(textFilterEnabled) {
+  setTextFilterEnabled(textFilterEnabled: boolean) {
     this.setProperty('textFilterEnabled', textFilterEnabled);
   }
 
-  isTextFilterFieldVisible() {
+  isTextFilterFieldVisible(): boolean {
     return this.textFilterEnabled && !this.footerVisible;
   }
 
-  _renderTextFilterEnabled() {
+  protected _renderTextFilterEnabled() {
     this.filterSupport.renderFilterField();
   }
 
-  updateFilteredElements(result, opts) {
+  updateFilteredElements(result: FilterResult<TableRow>, opts: UpdateFilteredElementsOptions) {
     if (this.filteredElementsDirty) {
       this._filter({
         filteredRows: true,
@@ -3905,10 +3951,10 @@ export default class Table extends Widget {
   /**
    * Resizes the given column to the new size.
    *
-   * @param {Column} column column to resize
-   * @param {number} width new column size
+   * @param column column to resize
+   * @param width new column size
    */
-  resizeColumn(column, width) {
+  resizeColumn(column: Column, width: number) {
     if (column.fixedWidth) {
       return;
     }
@@ -3940,12 +3986,12 @@ export default class Table extends Widget {
       if (aggregateRow.$row) {
         this._resizeAggregateCell(this.$cell(column, aggregateRow.$row));
       }
-    }, this);
+    });
 
     this._triggerColumnResized(column);
   }
 
-  _resizeAggregateCell($cell) {
+  protected _resizeAggregateCell($cell: JQuery) {
     // A resize of aggregate columns might also be necessary if the current resize column itself does not contain any content.
     // E.g. when having 3 columns: first and last have content, middle column is empty. While resizing the middle column,
     // it might happen that the overlapping content from the first and the last collide. Therefore always update aggregate columns
@@ -3959,12 +4005,17 @@ export default class Table extends Widget {
 
   /**
    * Gets the aggregation cell range. this is the range from one aggregation cell with content to the next (or the table end).
-   * @param {$} $cell The cell to get the surrounding range
-   * @returns {$[]} All cells of the range to which the given cell belongs
+   * @param $cell The cell to get the surrounding range
+   * @returns All cells of the range to which the given cell belongs
    */
-  _getAggrCellRange($cell) {
-    let $cells = [], $row = $cell.parent(), visibleColumns = this.visibleColumns(), $start = $cell, direction;
-    let hasContent = $c => !$c.hasClass('empty');
+  protected _getAggrCellRange($cell: JQuery): JQuery[] {
+    let $cells: JQuery[] = [],
+      $row = $cell.parent(),
+      visibleColumns = this.visibleColumns(),
+      $start = $cell,
+      direction: number;
+
+    let hasContent = ($c: JQuery) => !$c.hasClass('empty');
     if (hasContent($cell)) {
       direction = $cell.hasClass('halign-right') ? -1 : 1; // do not use column.horizontalAlignment here because it might be different in the aggregation row (e.g. when the first column is a number column).
     } else {
@@ -3992,9 +4043,9 @@ export default class Table extends Widget {
 
   /**
    * Updates the width and icon visibility of an aggregate cell in groupingStyle=title
-   * @param {$} $cell The aggregation cell that should be updated.
+   * @param $cell The aggregation cell that should be updated.
    */
-  _updateAggrCell($cell) {
+  protected _updateAggrCell($cell: JQuery) {
     let $cellText = $cell.children('.text');
     if (!$cellText || !$cellText.length || $cell.hasClass('empty')) {
       return; // nothing to update (empty cell)
@@ -4006,13 +4057,13 @@ export default class Table extends Widget {
     $cellText.cssMaxWidth(cellWidth);
   }
 
-  _getWidthWithMarginCached($element) {
+  protected _getWidthWithMarginCached($element: JQuery): number {
     if (!$element || !$element.length) {
       return 0;
     }
 
     let widthKey = 'widthWithMargin';
-    let precomputed = $element.data(widthKey);
+    let precomputed = $element.data(widthKey) as number;
     if (precomputed) {
       return precomputed;
     }
@@ -4032,11 +4083,11 @@ export default class Table extends Widget {
   /**
    * Gets the computed space that is available to the content of the cell.
    *
-   * @param {$} $cell The aggregation cell for which the info should be computed
-   * @param {$} $icon The icon of the cell. May be null.
-   * @returns {number} The unused space available into flow direction of the cell til the end of the table or the next cell with content.
+   * @param $cell The aggregation cell for which the info should be computed
+   * @param $icon The icon of the cell. May be null.
+   * @returns The unused space available into flow direction of the cell til the end of the table or the next cell with content.
    */
-  _getAggrCellWidth($cell, $icon) {
+  protected _getAggrCellWidth($cell: JQuery, $icon: JQuery): number {
     let cellSpaceForText = $cell.cssMaxWidth() - $cell.cssPaddingX();
     if ($icon && $icon.length && $icon.isVisible()) {
       cellSpaceForText -= this._getWidthWithMarginCached($icon);
@@ -4051,7 +4102,7 @@ export default class Table extends Widget {
         cellSpaceForText += $aggrCell.cssMaxWidth();
       } else {
         // first neighbour with content found
-        let growsTowardsEachOthers = $cell.hasClass('halign-right') ^ $aggrCell.hasClass('halign-right');
+        let growsTowardsEachOthers = $cell.hasClass('halign-right') !== $aggrCell.hasClass('halign-right');
         if (growsTowardsEachOthers) {
           // cells grow towards each other: use the free space of the cell
           let cellWidth = $aggrCell.cssMaxWidth();
@@ -4080,12 +4131,12 @@ export default class Table extends Widget {
    * If the available space is big enough to hold the content of the cell text and the icon, the icon will become visible. Otherwise the icon will be hidden.
    * This way no ellipsis will be shown as long as there is enough space for the text only.
    *
-   * @param {$} $icon The icon for which the visibility should be changed
-   * @param {$} $cellText The element holding the text of the cell. Required to compute if there is still enough space for text and icon or not
-   * @param {number} spaceAvailableForText The newly computed space available for the cell text.
-   * @returns {number} The new space available for the text. If the visibility of the icon changed, more or less space might become available.
+   * @param $icon The icon for which the visibility should be changed
+   * @param $cellText The element holding the text of the cell. Required to compute if there is still enough space for text and icon or not
+   * @param spaceAvailableForText The newly computed space available for the cell text.
+   * @returns The new space available for the text. If the visibility of the icon changed, more or less space might become available.
    */
-  _updateAggrIconVisibility($icon, $cellText, spaceAvailableForText) {
+  protected _updateAggrIconVisibility($icon: JQuery, $cellText: JQuery, spaceAvailableForText: number): number {
     if (!$icon || !$icon.length) {
       return spaceAvailableForText;
     }
@@ -4102,7 +4153,7 @@ export default class Table extends Widget {
     return spaceAvailableForText + (newIsIconVisible ? -iconWidth : iconWidth);
   }
 
-  moveColumn(column, visibleOldPos, visibleNewPos, dragged) {
+  moveColumn(column: Column, visibleOldPos: number, visibleNewPos: number, dragged?: boolean) {
     // If there are fixed columns, don't allow moving the column onto the other side of the fixed columns
     visibleNewPos = this._considerFixedPositionColumns(visibleOldPos, visibleNewPos);
 
@@ -4121,9 +4172,7 @@ export default class Table extends Widget {
     this._triggerColumnMoved(column, visibleOldPos, visibleNewPos, dragged);
 
     // move aggregated rows
-    this._aggregateRows.forEach(aggregateRow => {
-      arrays.move(aggregateRow.contents, visibleOldPos, visibleNewPos);
-    });
+    this._aggregateRows.forEach(aggregateRow => arrays.move(aggregateRow.contents, visibleOldPos, visibleNewPos));
 
     // move cells
     if (this._isDataRendered()) {
@@ -4134,21 +4183,17 @@ export default class Table extends Widget {
   /**
    * Ensures the given newPos does not pass a fixed column boundary (necessary when moving columns)
    */
-  _considerFixedPositionColumns(visibleOldPos, visibleNewPos) {
+  protected _considerFixedPositionColumns(visibleOldPos: number, visibleNewPos: number): number {
     let fixedColumnIndex = -1;
     if (visibleNewPos > visibleOldPos) {
       // move to right
-      fixedColumnIndex = arrays.findIndexFrom(this.visibleColumns(), visibleOldPos, col => {
-        return col.fixedPosition;
-      });
+      fixedColumnIndex = arrays.findIndexFrom(this.visibleColumns(), visibleOldPos, col => col.fixedPosition);
       if (fixedColumnIndex > -1) {
         visibleNewPos = Math.min(visibleNewPos, fixedColumnIndex - 1);
       }
     } else {
       // move to left
-      fixedColumnIndex = arrays.findIndexFromReverse(this.visibleColumns(), visibleOldPos, col => {
-        return col.fixedPosition;
-      });
+      fixedColumnIndex = arrays.findIndexFromReverse(this.visibleColumns(), visibleOldPos, col => col.fixedPosition);
       if (fixedColumnIndex > -1) {
         visibleNewPos = Math.max(visibleNewPos, fixedColumnIndex + 1);
       }
@@ -4156,9 +4201,8 @@ export default class Table extends Widget {
     return visibleNewPos;
   }
 
-  _renderColumnOrderChanges(oldColumnOrder) {
-    let column, i, j, $orderedCells, $cell, $cells, that = this,
-      $row;
+  protected _renderColumnOrderChanges(oldColumnOrder: Column[]) {
+    let $cell: HTMLElement, that = this;
 
     if (this.header) {
       this.header.onOrderChanged(oldColumnOrder);
@@ -4166,14 +4210,14 @@ export default class Table extends Widget {
 
     // move cells
     this.$rows(true).each(function() {
-      $row = $(this);
-      $orderedCells = $();
-      $cells = $row.children();
-      for (i = 0; i < that.columns.length; i++) {
-        column = that.columns[i];
+      let $row = $(this);
+      let $orderedCells = $();
+      let $cells = $row.children();
+      for (let i = 0; i < that.columns.length; i++) {
+        let column = that.columns[i];
 
         // Find $cell for given column
-        for (j = 0; j < oldColumnOrder.length; j++) {
+        for (let j = 0; j < oldColumnOrder.length; j++) {
           if (oldColumnOrder[j] === column) {
             $cell = $cells[j];
             break;
@@ -4185,57 +4229,57 @@ export default class Table extends Widget {
     });
   }
 
-  _triggerRowsInserted(rows) {
+  protected _triggerRowsInserted(rows: TableRow[]) {
     this.trigger('rowsInserted', {
       rows: rows
     });
   }
 
-  _triggerRowsDeleted(rows) {
+  protected _triggerRowsDeleted(rows: TableRow[]) {
     this.trigger('rowsDeleted', {
       rows: rows
     });
   }
 
-  _triggerRowsUpdated(rows) {
+  protected _triggerRowsUpdated(rows: TableRow[]) {
     this.trigger('rowsUpdated', {
       rows: rows
     });
   }
 
-  _triggerAllRowsDeleted(rows) {
+  protected _triggerAllRowsDeleted(rows: TableRow[]) {
     this.trigger('allRowsDeleted', {
       rows: rows
     });
   }
 
-  _triggerRowsSelected(debounce) {
+  protected _triggerRowsSelected(debounce?: boolean) {
     this.trigger('rowsSelected', {
       debounce: debounce
     });
   }
 
-  _triggerRowsChecked(rows) {
+  protected _triggerRowsChecked(rows: TableRow[]) {
     this.trigger('rowsChecked', {
       rows: rows
     });
   }
 
-  _triggerRowsExpanded(rows) {
+  protected _triggerRowsExpanded(rows: TableRow[]) {
     this.trigger('rowsExpanded', {
       rows: rows
     });
   }
 
-  _triggerFilter() {
+  protected _triggerFilter() {
     this.trigger('filter');
   }
 
-  _triggerFilterReset() {
+  protected _triggerFilterReset() {
     this.trigger('filterReset');
   }
 
-  _triggerAppLinkAction(column, row, ref, $appLink) {
+  protected _triggerAppLinkAction(column: Column, row: TableRow, ref: string, $appLink: JQuery) {
     this.trigger('appLinkAction', {
       column: column,
       row: row,
@@ -4244,21 +4288,20 @@ export default class Table extends Widget {
     });
   }
 
-  _triggerReload(reloadReason) {
+  protected _triggerReload(reloadReason?: string) {
     this.trigger('reload', {
       reloadReason: reloadReason
     });
   }
 
-  _triggerClipboardExport() {
-    let event = new Event();
-    this.trigger('clipboardExport', event);
+  protected _triggerClipboardExport() {
+    let event = this.trigger('clipboardExport');
     if (!event.defaultPrevented) {
       this._exportToClipboard();
     }
   }
 
-  _triggerRowOrderChanged(row, animating) {
+  protected _triggerRowOrderChanged(row?: TableRow, animating?: boolean) {
     let event = {
       row: row,
       animating: animating
@@ -4266,21 +4309,21 @@ export default class Table extends Widget {
     this.trigger('rowOrderChanged', event);
   }
 
-  _triggerColumnResized(column) {
+  protected _triggerColumnResized(column: Column) {
     let event = {
       column: column
     };
     this.trigger('columnResized', event);
   }
 
-  _triggerColumnResizedToFit(column) {
+  protected _triggerColumnResizedToFit(column: Column) {
     let event = {
       column: column
     };
     this.trigger('columnResizedToFit', event);
   }
 
-  _triggerColumnMoved(column, oldPos, newPos, dragged) {
+  protected _triggerColumnMoved(column: Column, oldPos: number, newPos: number, dragged?: boolean) {
     let event = {
       column: column,
       oldPos: oldPos,
@@ -4290,68 +4333,64 @@ export default class Table extends Widget {
     this.trigger('columnMoved', event);
   }
 
-  _triggerAggregationFunctionChanged(column) {
+  protected _triggerAggregationFunctionChanged(column: NumberColumn) {
     let event = {
       column: column
     };
     this.trigger('aggregationFunctionChanged', event);
   }
 
-  setHeaderVisible(visible) {
+  setHeaderVisible(visible: boolean) {
     this.setProperty('headerVisible', visible);
   }
 
-  _renderHeaderVisible() {
+  protected _renderHeaderVisible() {
     this._renderTableHeader();
   }
 
-  setHeaderEnabled(headerEnabled) {
+  setHeaderEnabled(headerEnabled: boolean) {
     this.setProperty('headerEnabled', headerEnabled);
   }
 
-  _renderHeaderEnabled() {
+  protected _renderHeaderEnabled() {
     // Rebuild the table header when this property changes
     this._removeTableHeader();
     this._renderTableHeader();
   }
 
-  setHeaderMenusEnabled(headerMenusEnabled) {
+  setHeaderMenusEnabled(headerMenusEnabled: boolean) {
     this.setProperty('headerMenusEnabled', headerMenusEnabled);
     if (this.header) {
       this.header.setHeaderMenusEnabled(this.headerMenusEnabled);
     }
   }
 
-  hasPermanentHeadOrTailSortColumns() {
+  hasPermanentHeadOrTailSortColumns(): boolean {
     return this._permanentHeadSortColumns.length !== 0 || this._permanentTailSortColumns.length !== 0;
   }
 
-  _setHeadAndTailSortColumns() {
+  protected _setHeadAndTailSortColumns() {
     // find all sort columns (head and tail sort columns should always be included)
-    let sortColumns = this.columns.filter(c => {
-      return c.sortIndex >= 0;
-    });
-    sortColumns.sort((a, b) => {
-      return a.sortIndex - b.sortIndex;
-    });
+    let sortColumns = this.columns.filter(c => c.sortIndex >= 0);
+    sortColumns.sort((a, b) => a.sortIndex - b.sortIndex);
 
     this._permanentHeadSortColumns = [];
     this._permanentTailSortColumns = [];
 
-    sortColumns.forEach(function(c) {
+    sortColumns.forEach(c => {
       if (c.initialAlwaysIncludeSortAtBegin) {
         this._permanentHeadSortColumns.push(c);
       } else if (c.initialAlwaysIncludeSortAtEnd) {
         this._permanentTailSortColumns.push(c);
       }
-    }, this);
+    });
   }
 
-  setTileMode(tileMode) {
+  setTileMode(tileMode: boolean) {
     this.setProperty('tileMode', tileMode);
   }
 
-  _setTileMode(tileMode) {
+  protected _setTileMode(tileMode: boolean) {
     if (tileMode) {
       this._ensureMediator();
       if (!this.tileTableHeader) {
@@ -4367,7 +4406,7 @@ export default class Table extends Widget {
     }
   }
 
-  _ensureMediator() {
+  protected _ensureMediator() {
     if (!this.tableTileGridMediator) {
       this.tableTileGridMediator = scout.create(TableTileGridMediator, {
         parent: this,
@@ -4376,59 +4415,58 @@ export default class Table extends Widget {
     }
   }
 
-  _renderTileMode() {
+  protected _renderTileMode() {
     if (this.tableTileGridMediator) {
       this.tableTileGridMediator.renderTileMode();
     }
   }
 
-  createTiles(rows) {
-    return rows.map(function(row) {
+  createTiles(rows: TableRow[]): Tile[] {
+    return rows.map(row => {
       let tile = this.createTileForRow(row);
       this._adaptTile(tile);
       tile.rowId = row.id;
       return tile;
-    }, this);
+    });
   }
 
-  _adaptTile(tile) {
+  protected _adaptTile(tile: Tile) {
+    // FIXME TS: remove comment as soon as Tile and GridData has been migrated
+    // @ts-ignore
     tile.gridDataHints = {
       weightX: 0
     };
   }
 
-  createTileForRow(row) {
+  createTileForRow(row: TableRow): Tile {
     if (this.tileProducer) {
       return this.tileProducer(row);
     }
     throw new Error('Cannot create a tile without a producer.');
   }
 
-  /**
-   * @param {Function} tileProducer
-   */
-  setTileProducer(tileProducer) {
+  setTileProducer(tileProducer: (row: TableRow) => Tile) {
     this.setProperty('tileProducer', tileProducer);
   }
 
-  _setTileTableHeader(tileTableHeader) {
+  protected _setTileTableHeader(tileTableHeader: TileTableHeaderBox) {
     if (tileTableHeader) {
       tileTableHeader.addCssClass('tile-table-header');
     }
     this._setProperty('tileTableHeader', tileTableHeader);
   }
 
-  _createTileTableHeader() {
+  protected _createTileTableHeader(): TileTableHeaderBox {
     return scout.create(TileTableHeaderBox, {
       parent: this
     });
   }
 
-  setRowIconVisible(rowIconVisible) {
+  setRowIconVisible(rowIconVisible: boolean) {
     this.setProperty('rowIconVisible', rowIconVisible);
   }
 
-  _setRowIconVisible(rowIconVisible) {
+  protected _setRowIconVisible(rowIconVisible: boolean) {
     this._setProperty('rowIconVisible', rowIconVisible);
     let column = this.rowIconColumn;
     if (this.rowIconVisible && !column) {
@@ -4444,24 +4482,24 @@ export default class Table extends Widget {
     }
   }
 
-  _renderRowIconVisible() {
+  protected _renderRowIconVisible() {
     this.columnLayoutDirty = true;
     this._updateRowWidth();
     this.redraw();
   }
 
-  _renderRowIconColumnWidth() {
+  protected _renderRowIconColumnWidth() {
     if (!this.rowIconVisible) {
       return;
     }
     this._renderRowIconVisible();
   }
 
-  setRowIconColumnWidth(width) {
+  setRowIconColumnWidth(width: number) {
     this.setProperty('rowIconColumnWidth', width);
   }
 
-  _setRowIconColumnWidth(width) {
+  protected _setRowIconColumnWidth(width: number) {
     this._setProperty('rowIconColumnWidth', width);
     let column = this.rowIconColumn;
     if (column) {
@@ -4469,18 +4507,18 @@ export default class Table extends Widget {
     }
   }
 
-  _setSelectedRows(selectedRows) {
+  protected _setSelectedRows(selectedRows: TableRow[] | string[]) {
     if (typeof selectedRows[0] === 'string') {
-      selectedRows = this._rowsByIds(selectedRows);
+      selectedRows = this._rowsByIds(selectedRows as string[]);
     }
     this._setProperty('selectedRows', selectedRows);
   }
 
-  setMenus(menus) {
+  setMenus(menus: Menu[]) {
     this.setProperty('menus', menus);
   }
 
-  _setMenus(menus, oldMenus) {
+  protected _setMenus(menus: Menu[], oldMenus?: Menu[]) {
     this.updateKeyStrokes(menus, oldMenus);
     this._setProperty('menus', menus);
     this._updateMenuBar();
@@ -4490,16 +4528,16 @@ export default class Table extends Widget {
     }
   }
 
-  setMenuBarVisible(visible) {
+  setMenuBarVisible(visible: boolean) {
     this.setProperty('menuBarVisible', visible);
   }
 
-  _setMenuBarVisible(visible) {
+  protected _setMenuBarVisible(visible: boolean) {
     this._setProperty('menuBarVisible', visible);
     this._updateMenuBar();
   }
 
-  _renderMenuBarVisible() {
+  protected _renderMenuBarVisible() {
     if (this.menuBarVisible) {
       this.menuBar.render();
       this._refreshMenuBarPosition();
@@ -4510,7 +4548,7 @@ export default class Table extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _refreshMenuBarPosition() {
+  protected _refreshMenuBarPosition() {
     this.$container.removeClass('menubar-top');
     this.$container.removeClass('menubar-bottom');
     if (this.menuBarVisible && this.menuBar.rendered) {
@@ -4524,7 +4562,7 @@ export default class Table extends Widget {
     }
   }
 
-  _createMenuBar() {
+  protected _createMenuBar(): MenuBar {
     return scout.create(MenuBar, {
       parent: this,
       position: MenuBar.Position.BOTTOM,
@@ -4534,7 +4572,7 @@ export default class Table extends Widget {
     });
   }
 
-  _updateMenuBar() {
+  protected _updateMenuBar() {
     if (this.menuBarVisible) {
       // Do not update menuBar while it is invisible, the menus may now be managed by another widget.
       // -> this makes sure the parent is not accidentally set to the table, the other widget should remain responsible
@@ -4552,7 +4590,7 @@ export default class Table extends Widget {
     }
   }
 
-  _refreshMenuBarClasses() {
+  protected _refreshMenuBarClasses() {
     if (!this.$container) {
       return;
     }
@@ -4562,47 +4600,47 @@ export default class Table extends Widget {
 
   }
 
-  _setKeyStrokes(keyStrokes) {
+  protected _setKeyStrokes(keyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
     this.updateKeyStrokes(keyStrokes, this.keyStrokes);
     this._setProperty('keyStrokes', keyStrokes);
   }
 
-  setTableStatus(status) {
+  setTableStatus(status: StatusOrModel) {
     this.setProperty('tableStatus', status);
   }
 
-  _setTableStatus(status) {
+  protected _setTableStatus(status: StatusOrModel) {
     status = Status.ensure(status);
     this._setProperty('tableStatus', status);
   }
 
-  setTableStatusVisible(visible) {
+  setTableStatusVisible(visible: boolean) {
     this.setProperty('tableStatusVisible', visible);
     this._updateFooterVisibility();
   }
 
-  _updateFooterVisibility() {
+  protected _updateFooterVisibility() {
     this.setFooterVisible(this.tableStatusVisible || this._hasVisibleTableControls());
   }
 
-  setHierarchicalStyle(style) {
+  setHierarchicalStyle(style: TableHierarchicalStyle) {
     this.setProperty('hierarchicalStyle', style);
   }
 
-  _renderHierarchicalStyle() {
+  protected _renderHierarchicalStyle() {
     this.$container.toggleClass('structured', Table.HierarchicalStyle.STRUCTURED === this.hierarchicalStyle);
   }
 
-  setFooterVisible(visible) {
+  setFooterVisible(visible: boolean) {
     this._setProperty('footerVisible', visible);
     if (visible && !this.footer) {
       this.footer = this._createFooter();
     }
 
     // relink table controls to new footer
-    this.tableControls.forEach(function(control) {
+    this.tableControls.forEach(control => {
       control.tableFooter = this.footer;
-    }, this);
+    });
 
     if (this.rendered) {
       this._renderFooterVisible();
@@ -4616,23 +4654,25 @@ export default class Table extends Widget {
   /**
    * Renders the background effect of every column, if column.backgroundEffect is set
    */
-  _renderBackgroundEffect() {
+  protected _renderBackgroundEffect() {
     this.columns.forEach(column => {
-      if (!column.backgroundEffect) {
+      // @ts-ignore
+      if (!column._renderBackgroundEffect) {
         return;
       }
+      // @ts-ignore
       column._renderBackgroundEffect();
-    }, this);
+    });
   }
 
-  _renderRowChecked(row) {
+  protected _renderRowChecked(row: TableRow) {
     if (!this.checkable) {
       return;
     }
     if (!row.$row) {
       return;
     }
-    let $styleElem;
+    let $styleElem: JQuery;
     if (this.checkableStyle === Table.CheckableStyle.TABLE_ROW) {
       $styleElem = row.$row;
     } else {
@@ -4644,16 +4684,16 @@ export default class Table extends Widget {
     $styleElem.toggleClass('checked', row.checked);
   }
 
-  setCheckable(checkable) {
+  setCheckable(checkable: boolean) {
     this.setProperty('checkable', checkable);
   }
 
-  _setCheckable(checkable) {
+  protected _setCheckable(checkable: boolean) {
     this._setProperty('checkable', checkable);
     this._updateCheckableColumn();
   }
 
-  _updateCheckableColumn() {
+  protected _updateCheckableColumn() {
     let column = this.checkableColumn;
     let showCheckBoxes = this.checkable && scout.isOneOf(this.checkableStyle, Table.CheckableStyle.CHECKBOX, Table.CheckableStyle.CHECKBOX_TABLE_ROW);
     if (showCheckBoxes && !column) {
@@ -4669,22 +4709,22 @@ export default class Table extends Widget {
     }
   }
 
-  _renderCheckable() {
+  protected _renderCheckable() {
     this.columnLayoutDirty = true;
     this._updateRowWidth();
     this.redraw();
   }
 
-  setCheckableStyle(checkableStyle) {
+  setCheckableStyle(checkableStyle: TableCheckableStyle) {
     this.setProperty('checkableStyle', checkableStyle);
   }
 
-  _setCheckableStyle(checkableStyle) {
+  protected _setCheckableStyle(checkableStyle: TableCheckableStyle) {
     this._setProperty('checkableStyle', checkableStyle);
     this._updateCheckableColumn();
   }
 
-  _renderCheckableStyle() {
+  protected _renderCheckableStyle() {
     this.$container.toggleClass('checkable', scout.isOneOf(this.checkableStyle, Table.CheckableStyle.TABLE_ROW, Table.CheckableStyle.CHECKBOX_TABLE_ROW));
     this.$container.toggleClass('table-row-check', this.checkableStyle === Table.CheckableStyle.TABLE_ROW);
     if (this._isDataRendered()) {
@@ -4693,14 +4733,11 @@ export default class Table extends Widget {
     }
   }
 
-  /**
-   * @param {boolean} compact
-   */
-  setCompact(compact) {
+  setCompact(compact: boolean) {
     this.setProperty('compact', compact);
   }
 
-  _setCompact(compact) {
+  protected _setCompact(compact: boolean) {
     this._setProperty('compact', compact);
     this._updateCompactColumn();
     if (this.compactHandler) {
@@ -4708,7 +4745,7 @@ export default class Table extends Widget {
     }
   }
 
-  _updateCompactColumn() {
+  protected _updateCompactColumn(): boolean {
     let column = this.compactColumn;
     if (this.compact && !column) {
       this._insertCompactColumn();
@@ -4723,7 +4760,7 @@ export default class Table extends Widget {
     return false;
   }
 
-  _insertCompactColumn() {
+  protected _insertCompactColumn() {
     let column = scout.create(CompactColumn, {
       session: this.session,
       table: this,
@@ -4734,22 +4771,22 @@ export default class Table extends Widget {
     this.compactColumn = column;
   }
 
-  _renderCompact() {
+  protected _renderCompact() {
     this.columnLayoutDirty = true;
     this._updateRowWidth();
     this.redraw();
   }
 
-  setGroupingStyle(groupingStyle) {
+  setGroupingStyle(groupingStyle: TableGroupingStyle) {
     this.setProperty('groupingStyle', groupingStyle);
   }
 
-  _setGroupingStyle(groupingStyle) {
+  protected _setGroupingStyle(groupingStyle: TableGroupingStyle) {
     this._setProperty('groupingStyle', groupingStyle);
     this._group();
   }
 
-  _renderGroupingStyle() {
+  protected _renderGroupingStyle() {
     this._rerenderViewport();
   }
 
@@ -4762,14 +4799,14 @@ export default class Table extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _rerenderHeaderColumns() {
+  protected _rerenderHeaderColumns() {
     if (this.header) {
       this.header.rerenderColumns();
       this.invalidateLayoutTree();
     }
   }
 
-  _renderTableHeader() {
+  protected _renderTableHeader() {
     if (this.tileMode) {
       return;
     }
@@ -4790,7 +4827,7 @@ export default class Table extends Widget {
     }
   }
 
-  _removeTableHeader() {
+  protected _removeTableHeader() {
     if (this.header) {
       this.header.destroy();
       this.header = null;
@@ -4800,7 +4837,7 @@ export default class Table extends Widget {
   /**
    * @param width optional width of emptyData, if omitted the width is set to the header's scrollWidth.
    */
-  _renderEmptyData() {
+  protected _renderEmptyData() {
     if (!this.header || this.visibleRows.length > 0) {
       return;
     }
@@ -4813,7 +4850,7 @@ export default class Table extends Widget {
     this.updateScrollbars();
   }
 
-  _removeEmptyData() {
+  protected _removeEmptyData() {
     if (this.header && this.visibleRows.length === 0) {
       return;
     }
@@ -4824,7 +4861,7 @@ export default class Table extends Widget {
     }
   }
 
-  _renderFooterVisible() {
+  protected _renderFooterVisible() {
     if (!this.footer) {
       return;
     }
@@ -4838,7 +4875,7 @@ export default class Table extends Widget {
     this.filterSupport.renderFilterField();
   }
 
-  _renderFooter() {
+  protected _renderFooter() {
     if (this.footer.rendered) {
       return;
     }
@@ -4846,17 +4883,14 @@ export default class Table extends Widget {
     this.footer.render();
   }
 
-  _removeFooter() {
+  protected _removeFooter() {
     if (!this.footer.rendered) {
       return;
     }
     this.footer.remove();
   }
 
-  /**
-   * @override Widget.js
-   */
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
 
     this._installOrUninstallDragAndDropHandler();
@@ -4868,22 +4902,20 @@ export default class Table extends Widget {
     this.$container.setTabbableOrFocusable(enabled);
   }
 
-  /**
-   * @override Widget.js
-   */
-  _renderDisabledStyle() {
+  protected override _renderDisabledStyle() {
     super._renderDisabledStyle();
     this._renderDisabledStyleInternal(this.$data);
   }
 
-  setAutoResizeColumns(autoResizeColumns) {
+  setAutoResizeColumns(autoResizeColumns: boolean) {
     this.setProperty('autoResizeColumns', autoResizeColumns);
   }
 
-  _renderAutoResizeColumns() {
+  protected _renderAutoResizeColumns() {
     if (!this.autoResizeColumns && Device.get().hasTableCellZoomBug()) {
       // Clear real width so that row width is updated correctly by the table layout if autoResizeColumns is disabled on the fly
       this.visibleColumns().forEach((column, colIndex) => {
+        // @ts-ignore
         column._realWidth = null;
       });
     }
@@ -4891,28 +4923,28 @@ export default class Table extends Widget {
     this.invalidateLayoutTree();
   }
 
-  setMultilineText(multilineText) {
+  setMultilineText(multilineText: boolean) {
     this.setProperty('multilineText', multilineText);
   }
 
-  _renderMultilineText() {
+  protected _renderMultilineText() {
     this._markAutoOptimizeWidthColumnsAsDirty();
     this.redraw();
   }
 
-  setDropType(dropType) {
+  setDropType(dropType: DragAndDropType) {
     this.setProperty('dropType', dropType);
   }
 
-  _renderDropType() {
+  protected _renderDropType() {
     this._installOrUninstallDragAndDropHandler();
   }
 
-  setDropMaximumSize(dropMaximumSize) {
+  setDropMaximumSize(dropMaximumSize: number) {
     this.setProperty('dropMaximumSize', dropMaximumSize);
   }
 
-  _installOrUninstallDragAndDropHandler() {
+  protected _installOrUninstallDragAndDropHandler() {
     dragAndDrop.installOrUninstallDragAndDropHandler(
       {
         target: this,
@@ -4926,7 +4958,7 @@ export default class Table extends Widget {
             rowId: ''
           };
           if ($target.hasClass('table-row')) {
-            let row = $target.data('row');
+            let row = $target.data('row') as TableRow;
             properties.rowId = row.id;
           }
           return properties;
@@ -4937,14 +4969,14 @@ export default class Table extends Widget {
   /**
    * This listener is used to invalidate table layout when an image icon has been loaded (which happens async in the browser).
    */
-  _installImageListeners() {
+  protected _installImageListeners() {
     this._imageLoadListener = this._onImageLoadOrError.bind(this);
     // Image events don't bubble -> use capture phase instead
     this.$data[0].addEventListener('load', this._imageLoadListener, true);
     this.$data[0].addEventListener('error', this._imageLoadListener, true);
   }
 
-  _uninstallImageListeners() {
+  protected _uninstallImageListeners() {
     this.$data[0].removeEventListener('load', this._imageLoadListener, true);
     this.$data[0].removeEventListener('error', this._imageLoadListener, true);
   }
@@ -4954,7 +4986,7 @@ export default class Table extends Widget {
    * It uses the default row height to estimate how many rows fit in the view port.
    * The view range size is this value * 2.
    */
-  calculateViewRangeSize() {
+  calculateViewRangeSize(): number {
     // Make sure row height is up to date (row height may be different after zooming)
     this._updateRowHeight();
 
@@ -4964,7 +4996,7 @@ export default class Table extends Widget {
     return Math.ceil(this.$data.outerHeight() / this.rowHeight) * 2;
   }
 
-  setViewRangeSize(viewRangeSize) {
+  setViewRangeSize(viewRangeSize: number) {
     if (this.viewRangeSize === viewRangeSize) {
       return;
     }
@@ -4974,8 +5006,8 @@ export default class Table extends Widget {
     }
   }
 
-  _calculateCurrentViewRange() {
-    let rowIndex,
+  protected _calculateCurrentViewRange(): Range {
+    let rowIndex: number,
       scrollTop = this.$data[0].scrollTop,
       maxScrollTop = this.$data[0].scrollHeight - this.$data[0].clientHeight;
 
@@ -4992,7 +5024,7 @@ export default class Table extends Widget {
   /**
    * Returns the index of the row which is at position scrollTop.
    */
-  _rowIndexAtScrollTop(scrollTop) {
+  protected _rowIndexAtScrollTop(scrollTop: number): number {
     let height = 0,
       index = -1;
     this.visibleRows.some((row, i) => {
@@ -5006,7 +5038,7 @@ export default class Table extends Widget {
     return index;
   }
 
-  _heightForRow(row) {
+  protected _heightForRow(row: TableRow): number {
     let height = 0;
     let aggregateRow = row.aggregateRowBefore;
     if (this.groupingStyle === Table.GroupingStyle.BOTTOM) {
@@ -5031,7 +5063,7 @@ export default class Table extends Widget {
     return height;
   }
 
-  _measureRowHeight($row) {
+  protected _measureRowHeight($row: JQuery): number {
     return graphics.size($row, {includeMargin: true, exact: true}).height;
   }
 
@@ -5040,21 +5072,20 @@ export default class Table extends Widget {
    * -> 1/4 of the rows are before the viewport 2/4 in the viewport 1/4 after the viewport,
    * assuming viewRangeSize is 2*number of possible rows in the viewport (see calculateViewRangeSize).
    */
-  _calculateViewRangeForRowIndex(rowIndex) {
+  protected _calculateViewRangeForRowIndex(rowIndex: number): Range {
     // regular / non-virtual scrolling? -> all rows are already rendered in the DOM
     if (!this.virtual) {
       return new Range(0, this.visibleRows.length);
     }
 
     let viewRange = new Range(),
-      quarterRange = Math.floor(this.viewRangeSize / 4),
-      diff;
+      quarterRange = Math.floor(this.viewRangeSize / 4);
 
     viewRange.from = Math.max(rowIndex - quarterRange, 0);
     viewRange.to = Math.min(viewRange.from + this.viewRangeSize, this.visibleRows.length);
 
     // Try to use the whole viewRangeSize (extend from if necessary)
-    diff = this.viewRangeSize - viewRange.size();
+    let diff = this.viewRangeSize - viewRange.size();
     if (diff > 0) {
       viewRange.from = Math.max(viewRange.to - this.viewRangeSize, 0);
     }
@@ -5064,7 +5095,7 @@ export default class Table extends Widget {
   /**
    * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
    */
-  _renderViewport() {
+  protected _renderViewport() {
     if (!this.isAttachedAndRendered()) {
       // if table is not attached the correct viewPort can not be evaluated. Mark for render after attach.
       this._renderViewPortAfterAttach = true;
@@ -5088,7 +5119,7 @@ export default class Table extends Widget {
     this._renderNoRowsSelectedMarker(); // Necessary to call it here if there are no rows at all
   }
 
-  _rerenderViewport() {
+  protected _rerenderViewport() {
     if (!this.isAttachedAndRendered()) {
       // if table is not attached the correct viewPort can not be evaluated. Mark for rerender after attach.
       this._rerenderViewPortAfterAttach = true;
@@ -5100,7 +5131,7 @@ export default class Table extends Widget {
     this._renderViewport();
   }
 
-  _renderViewRangeForRowIndex(rowIndex) {
+  protected _renderViewRangeForRowIndex(rowIndex: number) {
     let viewRange = this._calculateViewRangeForRowIndex(rowIndex);
     this._renderViewRange(viewRange);
   }
@@ -5108,7 +5139,7 @@ export default class Table extends Widget {
   /**
    * Renders the rows visible in the viewport and removes the other rows
    */
-  _renderViewRange(viewRange) {
+  protected _renderViewRange(viewRange: Range) {
     if (viewRange.from === this.viewRangeRendered.from && viewRange.to === this.viewRangeRendered.to && !this.viewRangeDirty) {
       // Range already rendered -> do nothing
       return;
@@ -5116,12 +5147,8 @@ export default class Table extends Widget {
     this._removeRangeMarkers();
     let rangesToRender = viewRange.subtract(this.viewRangeRendered);
     let rangesToRemove = this.viewRangeRendered.subtract(viewRange);
-    rangesToRemove.forEach(range => {
-      this._removeRowsInRange(range);
-    });
-    rangesToRender.forEach(range => {
-      this._renderRowsInRange(range);
-    });
+    rangesToRemove.forEach(range => this._removeRowsInRange(range));
+    rangesToRender.forEach(range => this._renderRowsInRange(range));
 
     // check if at least last and first row in range got correctly rendered
     if (this.viewRangeRendered.size() > 0) {
@@ -5146,7 +5173,7 @@ export default class Table extends Widget {
     this.viewRangeDirty = false;
   }
 
-  _renderLastRowAtBottomMarker() {
+  protected _renderLastRowAtBottomMarker() {
     if (this.$rows().is(':animated')) {
       // Don't change state if rows are animated (e.g. by filtering) because the last row may temporarily be at the end but will be moved up by animation.
       // State will be updated before the animation runs.
@@ -5161,19 +5188,19 @@ export default class Table extends Widget {
     }
   }
 
-  _lastVisibleRow() {
+  protected _lastVisibleRow(): TableRow {
     return this.visibleRows[this.visibleRows.length - 1];
   }
 
-  _removeRangeMarkers() {
+  protected _removeRangeMarkers() {
     this._modifyRangeMarkers('removeClass');
   }
 
-  _renderRangeMarkers() {
+  protected _renderRangeMarkers() {
     this._modifyRangeMarkers('addClass');
   }
 
-  _modifyRangeMarkers(funcName) {
+  protected _modifyRangeMarkers(funcName: string) {
     if (this.viewRangeRendered.size() === 0) {
       return;
     }
@@ -5181,7 +5208,7 @@ export default class Table extends Widget {
     modifyRangeMarker(visibleRows[this.viewRangeRendered.from], 'first');
     modifyRangeMarker(visibleRows[this.viewRangeRendered.to - 1], 'last');
 
-    function modifyRangeMarker(row, cssClass) {
+    function modifyRangeMarker(row: TableRow, cssClass: string) {
       if (row && row.$row) {
         row.$row[funcName](cssClass);
       }
@@ -5191,9 +5218,8 @@ export default class Table extends Widget {
   /**
    * Renders the view range that contains the given row.<br>
    * Does nothing if the row is already rendered or not visible (e.g. due to filtering).
-   * @param {TableRow} row
    */
-  ensureRowRendered(row) {
+  ensureRowRendered(row: TableRow) {
     if (row.$row) {
       return;
     }
@@ -5204,7 +5230,7 @@ export default class Table extends Widget {
     this._renderViewRangeForRowIndex(rowIndex);
   }
 
-  _renderFiller() {
+  protected _renderFiller() {
     if (!this.$fillBefore) {
       this.$fillBefore = this.$data.prependDiv('table-data-fill');
       this._applyFillerStyle(this.$fillBefore);
@@ -5226,7 +5252,7 @@ export default class Table extends Widget {
     $.log.isTraceEnabled() && $.log.trace('FillAfter height: ' + fillAfterHeight);
   }
 
-  _applyFillerStyle($filler) {
+  protected _applyFillerStyle($filler: JQuery) {
     let lineColor = $filler.css('background-color');
     // In order to get a 1px border we need to get the right value in percentage for the linear gradient
     let lineWidth = ((1 - 1 / this.rowHeight) * 100).toFixed(2) + '%';
@@ -5237,7 +5263,7 @@ export default class Table extends Widget {
     });
   }
 
-  _calculateFillerHeight(range) {
+  protected _calculateFillerHeight(range: Range): number {
     let totalHeight = 0;
     for (let i = range.from; i < range.to; i++) {
       let row = this.visibleRows[i];
@@ -5250,16 +5276,14 @@ export default class Table extends Widget {
     if (!this.initialized) {
       return false;
     }
-    return this.visibleColumns().some(column => {
-      return column instanceof NumberColumn && column.aggregationFunction !== 'none';
-    });
+    return this.visibleColumns().some(column => column instanceof NumberColumn && column.aggregationFunction !== 'none');
   }
 
   /**
    * Rebuilds the header.<br>
    * Does not modify the rows, it expects a deleteAll and insert operation to follow which will do the job.
    */
-  updateColumnStructure(columns) {
+  updateColumnStructure(columns: Column[]) {
     this._destroyColumns();
     this.columns = columns;
     this._initColumns();
@@ -5272,7 +5296,7 @@ export default class Table extends Widget {
     }
   }
 
-  updateColumnOrder(columns) {
+  updateColumnOrder(columns: Column[]) {
     if (columns.length !== this.columns.length) {
       throw new Error('Column order may not be updated because lengths of the arrays differ.');
     }
@@ -5300,12 +5324,12 @@ export default class Table extends Widget {
   /**
    * @param columns array of columns which were updated.
    */
-  updateColumnHeaders(columns) {
-    let column, oldColumnState;
+  updateColumnHeaders(columns: Column[]) {
+    let oldColumnState: ColumnModel;
 
     // Update model columns
     for (let i = 0; i < columns.length; i++) {
-      column = this.columnById(columns[i].id);
+      let column = this.columnById(columns[i].id);
       oldColumnState = $.extend(oldColumnState, column);
       column.text = columns[i].text;
       column.headerTooltipText = columns[i].headerTooltipText;
@@ -5340,26 +5364,22 @@ export default class Table extends Widget {
     }
   }
 
-  _attach() {
+  protected override _attach() {
     this.$parent.append(this.$container);
     super._attach();
   }
 
   /**
    * Method invoked when this is a 'detailTable' and the outline content is displayed.
-   * @override Widget.js
    */
-  _postAttach() {
+  protected override _postAttach() {
     this._rerenderViewportAfterAttach();
     let htmlParent = this.htmlComp.getParent();
     this.htmlComp.setSize(htmlParent.size());
     super._postAttach();
   }
 
-  /**
-   * @override Widget.js
-   */
-  _renderOnAttach() {
+  protected override _renderOnAttach() {
     super._renderOnAttach();
     this._rerenderViewportAfterAttach();
     this._renderViewportAfterAttach();
@@ -5368,7 +5388,7 @@ export default class Table extends Widget {
     actions.forEach(action => action());
   }
 
-  _rerenderViewportAfterAttach() {
+  protected _rerenderViewportAfterAttach() {
     if (this._rerenderViewPortAfterAttach) {
       this._rerenderViewport();
       this._rerenderViewPortAfterAttach = false;
@@ -5376,7 +5396,7 @@ export default class Table extends Widget {
     }
   }
 
-  _renderViewportAfterAttach() {
+  protected _renderViewportAfterAttach() {
     if (this._renderViewPortAfterAttach) {
       this._renderViewport();
       this._renderViewPortAfterAttach = false;
@@ -5385,9 +5405,8 @@ export default class Table extends Widget {
 
   /**
    * Method invoked when this is a 'detailTable' and the outline content is not displayed anymore.
-   * @override Widget.js
    */
-  _detach() {
+  protected override _detach() {
     this.$container.detach();
     // Detach helper stores the current scroll pos and restores in attach.
     // To make it work scrollTop needs to be reset here otherwise viewport won't be rendered by _onDataScroll
@@ -5395,9 +5414,9 @@ export default class Table extends Widget {
   }
 
   /**
-   * @param {function} [callback] function to be called right after the popup is destroyed
+   * @param callback function to be called right after the popup is destroyed
    */
-  _destroyCellEditorPopup(callback) {
+  protected _destroyCellEditorPopup(callback?: () => void) {
     // When a cell editor popup is open and table is detached, we close the popup immediately
     // and don't wait for the model event 'endCellEdit'. By doing this we can avoid problems
     // with invalid focus contexts.
@@ -5426,38 +5445,39 @@ export default class Table extends Widget {
     }
   }
 
-  setVirtual(virtual) {
+  setVirtual(virtual: boolean) {
     this._setProperty('virtual', virtual);
   }
 
-  setCellValue(column, row, value) {
+  setCellValue(column: Column, row: TableRow, value: any) {
     column.setCellValue(row, value);
   }
 
-  setCellText(column, row, displayText) {
+  setCellText(column: Column, row: TableRow, displayText: string) {
     column.setCellText(row, displayText);
   }
 
-  setCellErrorStatus(column, row, errorStatus) {
+  setCellErrorStatus(column: Column, row: TableRow, errorStatus: Status) {
     column.setCellErrorStatus(row, errorStatus);
   }
 
-  visibleColumns(includeGuiColumns) {
+  visibleColumns(includeGuiColumns?: boolean): Column[] {
     return this.filterColumns(column => column.isVisible(), includeGuiColumns);
   }
 
-  displayableColumns(includeGuiColumns) {
+  displayableColumns(includeGuiColumns?: boolean) {
     return this.filterColumns(column => column.displayable, includeGuiColumns);
   }
 
-  filterColumns(filter, includeGuiColumns) {
+  filterColumns(filter: Predicate<Column>, includeGuiColumns?: boolean): Column[] {
     includeGuiColumns = scout.nvl(includeGuiColumns, true);
     return this.columns.filter(column => filter(column) && (includeGuiColumns || !column.guiOnly));
   }
 
   // same as on Tree.prototype._onDesktopPopupOpen
-  _onDesktopPopupOpen(event) {
-    let popup = event.popup;
+  protected _onDesktopPopupOpen(event: Event<Desktop>) { // FIXME TS: replace with DesktopPopupOpenEvent as soon as Desktop has been migrated and remove ts-ignore and cast.
+    // @ts-ignore
+    let popup = event.popup as Popup;
     if (!this.isFocusable(false)) {
       return;
     }
@@ -5472,22 +5492,26 @@ export default class Table extends Widget {
     }
   }
 
-  _onDesktopPropertyChange(event) {
+  protected _onDesktopPropertyChange(event: PropertyChangeEvent<any, Desktop>) {
     // The height of the menuBar changes by css when switching to or from the dense mode
     if (event.propertyName === 'dense') {
       this.menuBar.invalidateLayoutTree();
     }
   }
 
-  markRowsAsNonChanged(rows) {
+  markRowsAsNonChanged(rows?: TableRow | TableRow[]) {
     arrays.ensure(rows || this.rows).forEach(row => {
       row.status = TableRow.Status.NON_CHANGED;
     });
   }
 
+  override trigger<K extends string & keyof EventMapOf<Table>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Table>[K]>): EventMapOf<Table>[K] {
+    return super.trigger(type, eventOrModel);
+  }
+
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
-  static parseHorizontalAlignment(alignment) {
+  static parseHorizontalAlignment(alignment: HorizontalAlignment): string {
     if (alignment > 0) {
       return 'right';
     }
@@ -5497,7 +5521,7 @@ export default class Table extends Widget {
     return 'left';
   }
 
-  static linkRowToDiv(row, $row) {
+  static linkRowToDiv(row: TableRow, $row: JQuery) {
     if (row) {
       row.$row = $row;
     }
@@ -5506,3 +5530,50 @@ export default class Table extends Widget {
     }
   }
 }
+
+export type TableHierarchicalStyle = EnumObject<typeof Table.HierarchicalStyle>;
+export type TableCheckableStyle = EnumObject<typeof Table.CheckableStyle>;
+export type TableGroupingStyle = EnumObject<typeof Table.GroupingStyle>;
+export type TableReloadReason = EnumObject<typeof Table.ReloadReason>;
+
+export type UpdateTableRowStructureOptions = {
+  /**
+   * Default is false.
+   */
+  updateTree?: boolean;
+  /**
+   * Default is the value of {@link updateTree}.
+   */
+  filteredRows?: boolean;
+  /**
+   * Default is the value of {@link filteredRows}.
+   */
+  applyFilters?: boolean;
+  /**
+   * Default is false.
+   */
+  filtersChanged?: boolean;
+  /**
+   * Default is the value of {@link filteredRows}.
+   */
+  visibleRows?: boolean;
+};
+
+export type TableCellPosition = {
+  column: Column;
+  row: TableRow;
+};
+
+export type TableRowCheckOptions = {
+  checked?: boolean;
+  checkOnlyEnabled?: boolean;
+};
+
+export type AggregateTableRow = {
+  id?: string;
+  contents: any[];
+  prevRow: TableRow;
+  nextRow: TableRow;
+  $row?: JQuery;
+  height?: number;
+};

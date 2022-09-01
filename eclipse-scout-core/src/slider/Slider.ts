@@ -1,17 +1,25 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, objects, scout, SliderLayout, Widget} from '../index';
-import Device from '../util/Device';
+import {Device, HtmlComponent, objects, scout, SliderEventMap, SliderLayout, SliderModel, Widget} from '../index';
 
-export default class Slider extends Widget {
+export default class Slider extends Widget implements SliderModel {
+  declare model: SliderModel;
+  declare eventMap: SliderEventMap;
+
+  value: number;
+  minValue: number;
+  maxValue: number;
+  step: number;
+  $sliderInput: JQuery<HTMLInputElement>;
+  $sliderValue: JQuery<HTMLSpanElement>;
 
   constructor() {
     super();
@@ -25,7 +33,7 @@ export default class Slider extends Widget {
     this.$sliderValue = null;
   }
 
-  _init(options) {
+  protected override _init(options: SliderModel) {
     super._init(options);
     this.value = options.value;
     this.minValue = options.minValue;
@@ -33,20 +41,20 @@ export default class Slider extends Widget {
     this.step = options.step;
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('slider');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new SliderLayout(this));
     this.$sliderInput = this.$container.appendElement('<input>', 'slider-input')
       .attr('type', 'range')
       .on('change', this._onValueChange.bind(this))
-      .addClass(Device.get().cssClassForEdge());
+      .addClass(Device.get().cssClassForEdge()) as JQuery<HTMLInputElement>;
 
     this.$sliderValue = this.$container
-      .appendSpan('slider-value', this.value);
+      .appendSpan('slider-value', this.value + '');
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderValue();
     this._renderMinValue();
@@ -54,19 +62,19 @@ export default class Slider extends Widget {
     this._renderStep();
   }
 
-  _remove() {
+  protected override _remove() {
     super._remove();
     this.$sliderInput = null;
     this.$sliderValue = null;
   }
 
-  _renderValue() {
+  protected _renderValue() {
     let value = scout.nvl(this.value, 0);
     this.$sliderInput.val(value);
     this.$sliderValue.text(value);
   }
 
-  _renderMinValue() {
+  protected _renderMinValue() {
     if (this.minValue) {
       this.$sliderInput.attr('min', this.minValue);
     } else {
@@ -74,7 +82,7 @@ export default class Slider extends Widget {
     }
   }
 
-  _renderMaxValue() {
+  protected _renderMaxValue() {
     if (this.maxValue) {
       this.$sliderInput.attr('max', this.maxValue);
     } else {
@@ -82,7 +90,7 @@ export default class Slider extends Widget {
     }
   }
 
-  _renderStep() {
+  protected _renderStep() {
     if (this.step) {
       this.$sliderInput.attr('step', this.step);
     } else {
@@ -90,7 +98,7 @@ export default class Slider extends Widget {
     }
   }
 
-  _onValueChange(event) {
+  protected _onValueChange(event: JQuery.ChangeEvent) {
     let n = Number(this.$sliderInput.val());
     // Ensure valid number
     if (!objects.isNumber(n)) {
@@ -99,7 +107,7 @@ export default class Slider extends Widget {
     this.setValue(n);
   }
 
-  setValue(value) {
+  setValue(value: number) {
     this.setProperty('value', value);
   }
 }

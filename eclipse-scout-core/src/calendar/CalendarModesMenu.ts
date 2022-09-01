@@ -1,27 +1,34 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Calendar, CalendarModeMenu, Menu, scout} from '../index';
+import {arrays, Calendar, CalendarModeMenu, CalendarModesMenuEventMap, CalendarModesMenuModel, Menu, PropertyChangeEvent, scout} from '../index';
+import {CalendarDisplayMode} from './Calendar';
 
-export default class CalendarModesMenu extends Menu {
+export default class CalendarModesMenu extends Menu implements CalendarModesMenuModel {
+  declare model: CalendarModesMenuModel;
+  declare eventMap: CalendarModesMenuEventMap;
+  declare parent: Calendar;
+  declare childActions: CalendarModeMenu[];
+
+  calendar: Calendar;
+  displayMode: CalendarDisplayMode;
 
   constructor() {
     super();
     this.cssClass = 'calendar-mode-menu';
-    this.displayMode;
   }
 
-  _init(model) {
+  protected override _init(model: CalendarModesMenuModel) {
     super._init(model);
     this.calendar = this.parent;
-    let menusToAdd = [];
+    let menusToAdd: CalendarModeMenu[] = [];
     menusToAdd.push(scout.create(CalendarModeMenu, {
       parent: this,
       displayMode: Calendar.DisplayMode.DAY,
@@ -42,46 +49,44 @@ export default class CalendarModesMenu extends Menu {
       displayMode: Calendar.DisplayMode.MONTH,
       text: this.session.text('ui.CalendarMonth')
     }));
-    this.addChildActions(menusToAdd);
+    this.insertChildActions(menusToAdd);
 
-    this.childActions.forEach(function(menu) {
-      menu.on('propertyChange', this._onMenuPropertyChange.bind(this));
-    }, this);
+    this.childActions.forEach(menu => menu.on('propertyChange', this._onMenuPropertyChange.bind(this)));
 
     this._setDisplayMode(this.displayMode);
   }
 
-  setDisplayMode(displayMode) {
+  setDisplayMode(displayMode: CalendarDisplayMode) {
     this.setProperty('displayMode', displayMode);
   }
 
-  _setDisplayMode(displayMode) {
+  protected _setDisplayMode(displayMode: CalendarDisplayMode) {
     this._setProperty('displayMode', displayMode);
     let menu = this.getMenuForMode(this.displayMode);
     menu.setSelected(true);
     this.setText(menu.text);
   }
 
-  getMenuForMode(displayMode) {
-    return arrays.find(this.childActions, menu => {
-      return menu.displayMode === displayMode;
-    });
+  getMenuForMode(displayMode: CalendarDisplayMode): CalendarModeMenu {
+    return arrays.find(this.childActions, menu => menu.displayMode === displayMode);
   }
 
-  _onMenuPropertyChange(event) {
+  protected _onMenuPropertyChange(event: PropertyChangeEvent) {
     if (event.propertyName === 'selected') {
-      let selected = event.newValue;
+      let selectedEvent = event as PropertyChangeEvent<boolean>;
+      let selected = selectedEvent.newValue;
       if (selected) {
-        let displayMode = event.source.displayMode;
+        let source = selectedEvent.source as CalendarModeMenu;
+        let displayMode = source.displayMode;
         this.setDisplayMode(displayMode);
         this.calendar.setDisplayMode(displayMode);
 
         // unselect other menu items
         this.childActions.forEach(menu => {
-          if (menu !== event.source) {
+          if (menu !== source) {
             menu.setSelected(false);
           }
-        }, this);
+        });
       }
     }
   }

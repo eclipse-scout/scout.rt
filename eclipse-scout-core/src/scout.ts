@@ -1,25 +1,28 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {AnyWidget, App, Device, ModelAdapter, ObjectFactory, objects, Session, strings, ValueField, widgets} from './index';
+import {AnyWidget, App, Device, ObjectFactory, objects, Session, strings, ValueField, widgets} from './index';
 import $ from 'jquery';
+import {ObjectCreator, ObjectFactoryOptions, ObjectType} from './ObjectFactory';
+import {ModelAdapterLike} from './session/ModelAdapter';
+import {AdapterData} from './session/Session';
 
 let $activeElements = null;
-let objectFactories = new Map();
+let objectFactories: Map<string | { new(): object }, ObjectCreator> = new Map();
 
 /**
  * Returns the first of the given arguments that is not null or undefined. If no such element
  * is present, the last argument is returned. If no arguments are given, undefined is returned.
  */
-export function nvl(...args) {
+export function nvl(...args: any[]): any {
   let result;
   for (let i = 0; i < args.length; i++) {
     result = args[i];
@@ -106,12 +109,29 @@ export function isOneOf(value, ...args): boolean {
   return argsToCheck.indexOf(value) !== -1;
 }
 
+export interface ObjectWithType {
+  objectType: string;
+}
+
+export interface ObjectModel<T = object> {
+  objectType?: ObjectType<T>;
+  id?: string;
+}
+
+export type ModelOf<T> = T extends { model: infer Model } ? Model : object;
+
+export function create<T>(objectType: new() => T, model?: ModelOf<T>, options?: ObjectFactoryOptions): T;
+export function create<T>(model: ModelOf<T> & { objectType: new () => T }, options?: ObjectFactoryOptions): T;
+export function create(objectType: string, model?: object, options?: ObjectFactoryOptions): any;
+export function create(model: { objectType: string; [key: string]: any }, options?: ObjectFactoryOptions): any;
+export function create<T>(objectType: ObjectType<T> | ModelOf<T> & { objectType: ObjectType<T> }, model?: ModelOf<T>, options?: ObjectFactoryOptions): T;
+
 /**
  * Creates a new object instance.
- * <p>
+ *
  * Delegates the create call to {@link ObjectFactory.create}.
  */
-export function create<T>(objectType: { new(): T } | string | { objectType: string }, model?: T extends { model: object } ? T['model'] : object, options?): T {
+export function create<T extends object>(objectType: ObjectType<T> | ModelOf<T> & { objectType: ObjectType<T> }, model?: ModelOf<T>, options?: ObjectFactoryOptions): T {
   return ObjectFactory.get().create(objectType, model, options);
 }
 
@@ -222,7 +242,7 @@ export function widget(widgetIdOrElement: string | number | HTMLElement | JQuery
  * to be queried. If not specified explicitly, the first session is used. If the session or
  * the adapter could not be found, null is returned.
  */
-export function adapter(adapterId: string, partId: string): ModelAdapter {
+export function adapter(adapterId: string, partId: string): ModelAdapterLike {
   if (objects.isNullOrUndefined(adapterId)) {
     return null;
   }
@@ -246,6 +266,7 @@ export function getSession(partId: string): Session {
   }
   for (let i = 0; i < sessions.length; i++) {
     let session = sessions[i];
+    // @ts-ignore
     // eslint-disable-next-line eqeqeq
     if (session.partId == partId) { // <-- compare with '==' is intentional! (NOSONAR)
       return session;
@@ -262,7 +283,7 @@ export function getSession(partId: string): Session {
  *
  * JSON.stringify(exportAdapter(4))
  */
-export function exportAdapter(adapterId: string, partId: string) { // FIXME TS add return value
+export function exportAdapter(adapterId: string, partId: string): AdapterData {
   let session = getSession(partId);
   if (session && session.modelAdapterRegistry) {
     let adapter = session.getModelAdapter(adapterId);
@@ -271,45 +292,48 @@ export function exportAdapter(adapterId: string, partId: string) { // FIXME TS a
     }
     let adapterData = cloneAdapterData(adapterId);
     resolveAdapterReferences(adapter, adapterData);
-    adapterData.type = 'model'; // property 'type' is required for models.js
+    adapterData.type = 'model'; // property 'type' is required for models.ts
     return adapterData;
   }
 
   // ----- Helper functions -----
 
-  function cloneAdapterData(adapterId) {
+  function cloneAdapterData(adapterId: string): AdapterData {
     let adapterData = session.getAdapterData(adapterId);
     adapterData = $.extend(true, {}, adapterData);
     return adapterData;
   }
 
-  function resolveAdapterReferences(adapter, adapterData) {
-    let tmpAdapter, tmpAdapterData;
-    adapter.widget._widgetProperties.forEach(WidgetPropertyName => {
-      let WidgetPropertyValue = adapterData[WidgetPropertyName];
-      if (!WidgetPropertyValue) {
+  function resolveAdapterReferences(adapter: ModelAdapterLike, adapterData: AdapterData) {
+    let tmpAdapter: ModelAdapterLike, tmpAdapterData: AdapterData;
+    // @ts-ignore
+    adapter.widget._widgetProperties.forEach(widgetPropertyName => {
+      let widgetPropertyValue = adapterData[widgetPropertyName];
+      if (!widgetPropertyValue) {
         return; // nothing to do when property is null
       }
-      if (Array.isArray(WidgetPropertyValue)) {
+      if (Array.isArray(widgetPropertyValue)) {
         // value is an array of adapter IDs
         let adapterDataArray = [];
-        WidgetPropertyValue.forEach(adapterId => {
+        widgetPropertyValue.forEach(adapterId => {
           tmpAdapter = session.getModelAdapter(adapterId);
           tmpAdapterData = cloneAdapterData(adapterId);
           resolveAdapterReferences(tmpAdapter, tmpAdapterData);
           adapterDataArray.push(tmpAdapterData);
         });
-        adapterData[WidgetPropertyName] = adapterDataArray;
+        adapterData[widgetPropertyName] = adapterDataArray;
       } else {
         // value is an adapter ID
-        tmpAdapter = session.getModelAdapter(WidgetPropertyValue);
-        tmpAdapterData = cloneAdapterData(WidgetPropertyValue);
+        tmpAdapter = session.getModelAdapter(widgetPropertyValue);
+        tmpAdapterData = cloneAdapterData(widgetPropertyValue);
         resolveAdapterReferences(tmpAdapter, tmpAdapterData);
-        adapterData[WidgetPropertyName] = tmpAdapterData;
+        adapterData[widgetPropertyName] = tmpAdapterData;
       }
     });
     adapterData = adapter.exportAdapterData(adapterData);
   }
+
+  return null;
 }
 
 export interface ReloadPageOptions {
@@ -317,22 +341,22 @@ export interface ReloadPageOptions {
    * If true, the page reload is not executed in the current thread but scheduled using setTimeout().
    * This is useful if the caller wants to execute some other code before the reload. The default is false.
    */
-  schedule: boolean;
+  schedule?: boolean;
   /**
    * If true, the body is cleared first before the reload is performed. This is useful to prevent
    * showing "old" content in the browser until the new content arrives. The default is true.
    */
-  clearBody: boolean;
+  clearBody?: boolean;
   /**
    * The new URL to load. If not specified, the current location is used (window.location).
    */
-  redirectUrl: string;
+  redirectUrl?: string;
 }
 
 /**
  * Reloads the entire browser window.
  */
-export function reloadPage(options: ReloadPageOptions) {
+export function reloadPage(options?: ReloadPageOptions) {
   options = options || {} as ReloadPageOptions;
   if (options.schedule) {
     setTimeout(reloadPageImpl);
@@ -358,11 +382,10 @@ export function reloadPage(options: ReloadPageOptions) {
 
 /**
  * @param factories Object that contains the object type as key and the function that constructs the object as value.
- * <p>
- * If you prefer using a class reference as object type rather than a string, please use {@link addObjectFactory} to register your factory.
+ *          If you prefer using a class reference as object type rather than a string, please use {@link addObjectFactory} to register your factory.
  * @see create
  */
-export function addObjectFactories(factories: { [objectType: string]: (model?) => any }) {
+export function addObjectFactories(factories: Record<string, ObjectCreator>) {
   for (let [objectType, factory] of Object.entries(factories)) {
     addObjectFactory(objectType, factory);
   }
@@ -373,7 +396,7 @@ export function addObjectFactories(factories: { [objectType: string]: (model?) =
  * @param factory Function that constructs the object.
  * @see create
  */
-export function addObjectFactory(objectType: string | { new (): object }, factory: (model?) => any) {
+export function addObjectFactory(objectType: ObjectType, factory: ObjectCreator) {
   objectFactories.set(objectType, factory);
 }
 

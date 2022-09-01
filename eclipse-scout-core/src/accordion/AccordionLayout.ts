@@ -12,11 +12,11 @@ import {RowLayout, scrollbars} from '../index';
 
 export default class AccordionLayout extends RowLayout {
 
-  _getChildren($container) {
+  protected override _getChildren($container: JQuery): JQuery {
     return $container.children('.group');
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     super.layout($container);
     scrollbars.update($container, true); // update immediately to prevent flickering when scrollbars become visible
   }

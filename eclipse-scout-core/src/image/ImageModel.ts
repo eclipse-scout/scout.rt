@@ -11,7 +11,7 @@
 import {WidgetModel} from '../index';
 
 export default interface ImageModel extends WidgetModel {
-  autoFit: boolean;
-  imageUrl: string;
-  prepend: boolean;
+  autoFit?: boolean;
+  imageUrl?: string;
+  prepend?: boolean;
 }

@@ -1,26 +1,35 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {codes, scout, texts, TreeVisitResult} from '../index';
+import {codes, Locale, scout, texts, TreeVisitResult} from '../index';
+import CodeModel from './CodeModel';
+import {TreeVisitor} from '../widget/Widget';
 
 export default class Code {
 
+  declare model: CodeModel;
+
+  active: boolean;
+  id: string;
+  parent?: Code;
+  children: Code[];
+  sortCode: number;
+  modelClass: string;
+
+  protected _text: string; // e.g. "${textKey:key}"
+
   constructor() {
-    this.active;
-    this.id;
-    this.parent;
     this.children = [];
-    this.sortCode;
   }
 
-  init(model) {
+  init(model: CodeModel) {
     scout.assertParameter('id', model.id);
 
     this.active = model.active;
@@ -41,17 +50,16 @@ export default class Code {
   }
 
   /**
-   * @param vararg the language tag or the locale (object with a property languageTag) to load the text for.
+   * @param vararg The language tag or the {@link Locale} to load the text for.
    */
-  text(vararg) {
-    let languageTag = vararg;
+  text(vararg: string | Locale) {
     if (typeof vararg === 'object') {
-      languageTag = vararg.languageTag;
+      return texts.resolveText(this._text, vararg.languageTag);
     }
-    return texts.resolveText(this._text, languageTag);
+    return texts.resolveText(this._text, vararg);
   }
 
-  visitChildren(visitor) {
+  visitChildren(visitor: TreeVisitor<Code>): boolean | TreeVisitResult {
     for (let i = 0; i < this.children.length; i++) {
       let child = this.children[i];
       let visitResult = visitor(child);

@@ -1,23 +1,24 @@
 /*
- * Copyright (c) 2014-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Menu, widgets} from '../index';
+import {EventHandler, HtmlComponent, Menu, PropertyChangeEvent, widgets} from '../index';
 
 export default class ComboMenu extends Menu {
+  protected _childVisibleChangeHandler: EventHandler<PropertyChangeEvent<boolean>>;
 
   constructor() {
     super();
     this._childVisibleChangeHandler = this._onChildVisibleChange.bind(this);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('menu-item combo-menu');
     if (this.uiCssClass) {
       this.$container.addClass(this.uiCssClass);
@@ -26,18 +27,18 @@ export default class ComboMenu extends Menu {
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderChildActions();
   }
 
-  _setChildActions(childActions) {
+  protected override _setChildActions(childActions: Menu[]) {
     this.childActions.forEach(child => child.off('propertyChange:visible', this._childVisibleChangeHandler));
     super._setChildActions(childActions);
     this.childActions.forEach(child => child.on('propertyChange:visible', this._childVisibleChangeHandler));
   }
 
-  _renderChildActions() {
+  protected override _renderChildActions() {
     super._renderChildActions();
 
     this.childActions.forEach(childAction => {
@@ -47,26 +48,25 @@ export default class ComboMenu extends Menu {
     widgets.updateFirstLastMarker(this.childActions);
   }
 
-  // @override
-  _togglesSubMenu() {
+  protected override _togglesSubMenu(): boolean {
     return false;
   }
 
-  _onChildVisibleChange(event) {
+  protected _onChildVisibleChange(event: PropertyChangeEvent<boolean>) {
     if (this.rendered) {
       widgets.updateFirstLastMarker(this.childActions);
     }
   }
 
-  _doActionTogglesPopup() {
+  protected override _doActionTogglesPopup(): boolean {
     return false;
   }
 
-  isToggleAction() {
+  override isToggleAction(): boolean {
     return false;
   }
 
-  isTabTarget() {
+  override isTabTarget(): boolean {
     // To make children tabbable, combo menu must never be a tab target, even if its a default menu
     return false;
   }

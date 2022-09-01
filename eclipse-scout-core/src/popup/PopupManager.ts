@@ -1,16 +1,17 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Widget} from '../index';
+import {arrays, Popup, PopupManagerModel, Widget} from '../index';
 
-export default class PopupManager extends Widget {
+export default class PopupManager extends Widget implements PopupManagerModel {
+  popups: Popup[];
 
   constructor() {
     super();
@@ -19,18 +20,18 @@ export default class PopupManager extends Widget {
     this._addPreserveOnPropertyChangeProperties(['popups']);
   }
 
-  _init(model) {
+  protected override _init(model: PopupManagerModel) {
     super._init(model);
     this.session.layoutValidator.schedulePostValidateFunction(() => {
       this._openPopups(this.popups);
     });
   }
 
-  setPopups(popups) {
+  setPopups(popups: Popup[]) {
     this.setProperty('popups', popups);
   }
 
-  _setPopups(popups) {
+  protected _setPopups(popups: Popup[]) {
     this._openPopups(arrays.diff(popups, this.popups));
     this._destroyPopups(arrays.diff(this.popups, popups));
     this._setProperty('popups', popups);
@@ -42,15 +43,13 @@ export default class PopupManager extends Widget {
     });
   }
 
-  _openPopups(popups) {
+  protected _openPopups(popups: Popup[]) {
     popups.forEach(popup => {
       popup.open(); // Let the popup itself determine the entry point (important for popup windows)
     });
   }
 
-  _destroyPopups(popups) {
-    popups.forEach(popup => {
-      popup.destroy();
-    });
+  protected _destroyPopups(popups: Popup[]) {
+    popups.forEach(popup => popup.destroy());
   }
 }

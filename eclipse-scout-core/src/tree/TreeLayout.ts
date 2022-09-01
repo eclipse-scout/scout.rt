@@ -1,44 +1,42 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, graphics, MenuBarLayout, scrollbars} from '../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, MenuBarLayout, scrollbars, Tree} from '../index';
 
 export default class TreeLayout extends AbstractLayout {
+  tree: Tree;
+  nodeDimensionsDirty: boolean;
 
-  constructor(tree) {
+  constructor(tree: Tree) {
     super();
     this.tree = tree;
     this.nodeDimensionsDirty = false;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     this._layout($container);
     scrollbars.update(this.tree.$data);
   }
 
-  _layout($container) {
-    let menuBarSize, containerSize, heightOffset,
-      menuBar = this.tree.menuBar,
+  protected _layout($container: JQuery) {
+    let menuBar = this.tree.menuBar,
       htmlMenuBar = menuBar.htmlComp,
       htmlContainer = this.tree.htmlComp;
 
-    containerSize = htmlContainer.availableSize({
-      exact: true
-    })
-      .subtract(htmlContainer.insets());
-
+    let containerSize = htmlContainer.availableSize({exact: true}).subtract(htmlContainer.insets());
     if (this.tree.toggleBreadcrumbStyleEnabled && this._sizeChanged(htmlContainer)) {
       this.tree.setBreadcrumbStyleActive(Math.floor(containerSize.width) <= this.tree.breadcrumbTogglingThreshold);
     }
 
-    heightOffset = 0;
+    let heightOffset = 0;
+    let menuBarSize: Dimension;
     if (menuBar.$container.isVisible()) {
       menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
       htmlMenuBar.setSize(menuBarSize);
@@ -62,40 +60,44 @@ export default class TreeLayout extends AbstractLayout {
       } else {
         // Nodes may contain wrapped text (with breadcrumb style-or if nodes contain html) -> update heights
         this.tree.updateNodeHeights();
+        // @ts-ignore
         this.tree._renderViewport(); // Ensure viewRangeRendered is up to date and matches visibleNodesFlat (can diverge after filtering)
+        // @ts-ignore
         this.tree._renderFiller();
       }
     }
 
     if (!htmlContainer.layouted) {
+      // @ts-ignore
       this.tree._renderScrollTop();
     }
 
     // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
+    // @ts-ignore
     this.tree._renderViewport();
 
     // Render scroll top again to make sure the data is really at the correct position after rendering viewport, see tree.setScrollTop for details
     if (!htmlContainer.layouted) {
+      // @ts-ignore
       this.tree._renderScrollTop();
     }
   }
 
-  _sizeChanged(htmlContainer) {
+  protected _sizeChanged(htmlContainer: HtmlComponent): boolean {
     // Ceil because sizeCached is exact but .size() is not)
     return htmlContainer.sizeCached && Math.ceil(htmlContainer.sizeCached.width) !== Math.ceil(htmlContainer.size().width);
   }
 
-  _setDataHeight(heightOffset) {
+  protected _setDataHeight(heightOffset: number) {
     let $data = this.tree.$data;
-
     heightOffset += $data.cssMarginTop() + $data.cssMarginBottom();
-
     $data.css('height', (heightOffset === 0 ? '100%' : 'calc(100% - ' + heightOffset + 'px)'));
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     // Make sure viewport is up to date before calculating pref size.
     // This is necessary because the tree does not render the view port on any change (like insert or delete nodes). Instead it just invalidates the layout.
+    // @ts-ignore
     this.tree._renderViewport();
 
     // Node dimensions were fixed when calling _renderViewport using the current size, but that size might change during layout

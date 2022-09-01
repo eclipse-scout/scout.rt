@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Dimension, Insets, Point, Rectangle, scout, scrollbars} from '../index';
+import {arrays, Dimension, Insets, objects, Point, Rectangle, scout, scrollbars} from '../index';
 import $ from 'jquery';
 
 /**
@@ -36,12 +36,19 @@ export interface PrefSizeOptions {
    * If useCssSize is false, this value is used as width (in pixels) instead of 'auto'.
    * Useful to get the preferred height for a given width.
    */
-  widthHint?: string;
+  widthHint?: number;
 
   /**
    * Same as 'widthHint' but for the height.
    */
-  heightHint?: string;
+  heightHint?: number;
+
+  /**
+   * Sets min/max-width/height in addition to with width/height if widthHint resp. heightHint is set.
+   * The browser sometimes makes the element smaller or larger than specified by width/height, especially in a flex container.
+   * To prevent that, set this option to true. Default is false, but may change in the future.
+   */
+  enforceSizeHints?: boolean;
 
   /**
    * By default, the $elem's scrolling position is saved and restored during the execution of this method (because applying
@@ -57,47 +64,6 @@ export interface PrefSizeOptions {
   animateClasses?: string[];
 }
 
-export interface SizeOptions {
-  /**
-   * When set to true the returned dimensions may contain fractional digits, otherwise the sizes are rounded up. Default is false.
-   */
-  exact?: boolean;
-
-  /**
-   * Whether to include the margins in the returned size. Default is false.
-   */
-  includeMargin?: boolean;
-}
-
-export interface BoundsOptions {
-  /**
-   * When set to true the returned size may contain fractional digits, otherwise the sizes are rounded up. X and Y are not affected by this option. Default is false.
-   */
-  exact?: boolean;
-
-  /**
-   * Whether to include the margins in the returned size. X and Y are not affected by this option. Default is false.
-   */
-  includeMargin?: boolean;
-}
-
-export interface InsetsOptions {
-  /**
-   * Whether to include the margins in the returned insets. Default is false.
-   */
-  includeMargin?: boolean;
-
-  /**
-   * Whether to include the paddings in the returned insets. Default is true.
-   */
-  includePadding?: boolean;
-
-  /**
-   * Whether to include the borders in the returned insets. Default is true.
-   */
-  includeBorder?: boolean;
-}
-
 /**
  * Returns the preferred size of $elem.
  * Precondition: $elem and it's parents must not be hidden (display: none. Visibility: hidden would be ok
@@ -109,7 +75,7 @@ export interface InsetsOptions {
  *          an optional options object. Short-hand version: If a boolean is passed instead
  *          of an object, the value is automatically converted to the option "includeMargin".
  */
-export function prefSize($elem: JQuery, options: PrefSizeOptions | boolean): Dimension {
+export function prefSize($elem: JQuery, options?: PrefSizeOptions | boolean): Dimension {
   // Return 0/0 if element is not displayed (display: none).
   // We don't use isVisible by purpose because isVisible returns false for elements with visibility: hidden which is wrong here (we would like to be able to measure hidden elements)
   if (!$elem[0] || $elem.isDisplayNone()) {
@@ -241,6 +207,18 @@ export function prefSizeWithoutAnimation($elem: JQuery, options: PrefSizeOptions
  * in favor of width/height() functions.
  */
 
+export interface SizeOptions {
+  /**
+   * When set to true the returned dimensions may contain fractional digits, otherwise the sizes are rounded up. Default is false.
+   */
+  exact?: boolean;
+
+  /**
+   * Whether to include the margins in the returned size. Default is false.
+   */
+  includeMargin?: boolean;
+}
+
 /**
  * Returns the size of the element, insets included. The sizes are rounded up, unless the option 'exact' is set to true.
  *
@@ -310,6 +288,23 @@ export function setSize($comp: JQuery, widthOrSize: Dimension | number, height?:
     .cssHeight(size.height);
 }
 
+export interface InsetsOptions {
+  /**
+   * Whether to include the margins in the returned insets. Default is false.
+   */
+  includeMargin?: boolean;
+
+  /**
+   * Whether to include the paddings in the returned insets. Default is true.
+   */
+  includePadding?: boolean;
+
+  /**
+   * Whether to include the borders in the returned insets. Default is true.
+   */
+  includeBorder?: boolean;
+}
+
 /**
  * Returns the inset-dimensions of the component (padding, margin, border).
  *
@@ -319,7 +314,7 @@ export function setSize($comp: JQuery, widthOrSize: Dimension | number, height?:
  *          an optional options object. Short-hand version: If a boolean is passed instead
  *          of an object, the value is automatically converted to the option "includeMargin".
  */
-export function insets($comp: JQuery, options: InsetsOptions): Insets {
+export function insets($comp: JQuery, options?: InsetsOptions): Insets {
   if (typeof options === 'boolean') {
     options = {
       includeMargin: options
@@ -403,6 +398,18 @@ export function location($comp: JQuery): Point {
   return new Point($comp.cssLeft(), $comp.cssTop());
 }
 
+export interface BoundsOptions {
+  /**
+   * When set to true the returned size may contain fractional digits, otherwise the sizes are rounded up. X and Y are not affected by this option. Default is false.
+   */
+  exact?: boolean;
+
+  /**
+   * Whether to include the margins in the returned size. X and Y are not affected by this option. Default is false.
+   */
+  includeMargin?: boolean;
+}
+
 /**
  * Returns the bounds of the element relative to the offset parent, insets included.
  * The sizes are rounded up, unless the option 'exact' is set to true.
@@ -471,7 +478,7 @@ export function cssBounds($elem: JQuery): Rectangle {
   return new Rectangle($elem.cssLeft(), $elem.cssTop(), $elem.cssWidth(), $elem.cssHeight());
 }
 
-export function debugOutput($comp: JQuery): string {
+export function debugOutput($comp: JQuery | HTMLElement): string {
   if (!$comp) {
     return '$comp is undefined';
   }

@@ -1,55 +1,47 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, LogoutBox, ObjectFactory, scout, texts} from '../index';
+import {App, LogoutAppOptions, LogoutBox, ObjectFactory, scout, texts} from '../index';
 import $ from 'jquery';
+import {AppBootstrapOptions} from '../App';
 
 export default class LogoutApp extends App {
+
+  declare model: LogoutAppOptions;
 
   constructor() {
     super();
   }
 
-  /**
-   * @inheritDoc
-   * @param {{bootstrap?: {textsUrl?, localesUrl?, codesUrl?}}} [options] see {@link App.init}
-   * @param {string} [options.logoUrl] the url to the logo. Default is 'logo.png'.
-   * @param {string} [options.loginUrl] the url to use by the login again button. Default is './';
-   * @param {object} [options.texts] texts to be used in the logout box. By default the texts provided by the <scout-texts> tags are used, see {@link texts.readFromDOM}.
-   * Otherwise the texts will only be in English.
-   */
-  init(options) {
+  override init(options?: LogoutAppOptions) {
     return super.init(options);
   }
 
-  /**
-   * @override
-   */
-  _prepareEssentials(options) {
+  protected override _prepareEssentials(options: LogoutAppOptions) {
     ObjectFactory.get().init();
   }
 
   /**
    * No bootstrapping required
-   * @override
    */
-  _doBootstrap(options) {
+  protected override _doBootstrap(options: AppBootstrapOptions): Array<JQuery.Promise<any>> {
     return [];
   }
 
-  _init(options) {
+  protected override _init(options: LogoutAppOptions): JQuery.Promise<any> {
     options = options || {};
     options.texts = $.extend({}, texts.readFromDOM(), options.texts);
     this._prepareDOM();
 
     let logoutBox = scout.create(LogoutBox, options);
     logoutBox.render($('body').addClass('logout-body'));
+    return $.resolvedPromise();
   }
 }

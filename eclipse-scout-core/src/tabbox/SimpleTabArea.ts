@@ -1,21 +1,31 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, SimpleTabAreaLayout, Widget, widgets} from '../index';
+import {AbstractLayout, EnumObject, Event, EventHandler, HtmlComponent, SimpleTab, SimpleTabAreaEventMap, SimpleTabAreaLayout, SimpleTabAreaModel, Widget, widgets} from '../index';
 
-export default class SimpleTabArea extends Widget {
+export type SimpleTabAreaDisplayStyle = EnumObject<typeof SimpleTabArea.DisplayStyle>;
+
+export default class SimpleTabArea extends Widget implements SimpleTabAreaModel {
+  declare model: SimpleTabAreaModel;
+  declare eventMap: SimpleTabAreaEventMap;
 
   static DisplayStyle = {
     DEFAULT: 'default',
     SPREAD_EVEN: 'spreadEven'
-  };
+  } as const;
+
+  displayStyle: SimpleTabAreaDisplayStyle;
+  tabs: SimpleTab[];
+
+  protected _selectedViewTab: SimpleTab;
+  protected _tabClickHandler: EventHandler<Event<SimpleTab>>;
 
   constructor() {
     super();
@@ -24,65 +34,62 @@ export default class SimpleTabArea extends Widget {
     this._selectedViewTab = null;
   }
 
-  _init(model) {
+  protected override _init(model: SimpleTabAreaModel) {
     super._init(model);
 
     this._tabClickHandler = this._onTabClick.bind(this);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('simple-tab-area');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(this._createLayout());
   }
 
-  _createLayout() {
+  protected _createLayout(): AbstractLayout {
     return new SimpleTabAreaLayout(this);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderDisplayStyle();
     this._renderTabs();
   }
 
-  setDisplayStyle(displayStyle) {
+  setDisplayStyle(displayStyle: SimpleTabAreaDisplayStyle) {
     this.setProperty('displayStyle', displayStyle);
   }
 
-  _renderDisplayStyle() {
+  protected _renderDisplayStyle() {
     this.$container.toggleClass('spread-even', this.displayStyle === SimpleTabArea.DisplayStyle.SPREAD_EVEN);
     this.invalidateLayoutTree();
   }
 
-  _renderTabs() {
+  protected _renderTabs() {
     // reverse since tab.renderAfter() called without sibling=true argument (see _renderTab)
     // will _prepend_ themselves into the container.
-    this.tabs.slice().reverse()
-      .forEach(tab => {
-        this._renderTab(tab);
-      });
+    this.tabs.slice().reverse().forEach(tab => this._renderTab(tab));
     widgets.updateFirstLastMarker(this.tabs);
   }
 
-  _renderTab(tab) {
+  protected _renderTab(tab: SimpleTab) {
     tab.renderAfter(this.$container);
   }
 
-  _renderVisible() {
+  protected override _renderVisible() {
     this.$container.setVisible(this.visible && this.tabs.length > 0);
     this.invalidateLayoutTree();
   }
 
-  _onTabClick(event) {
+  protected _onTabClick(event: Event<SimpleTab>) {
     this.selectTab(event.source);
   }
 
-  getTabs() {
+  getTabs(): SimpleTab[] {
     return this.tabs;
   }
 
-  getVisibleTabs() {
+  getVisibleTabs(): SimpleTab[] {
     return this.tabs.filter(tab => {
       // Layout operates on dom elements directly -> check dom visibility
       if (tab.$container) {
@@ -92,7 +99,7 @@ export default class SimpleTabArea extends Widget {
     });
   }
 
-  selectTab(viewTab) {
+  selectTab(viewTab: SimpleTab) {
     if (this._selectedViewTab === viewTab) {
       return;
     }
@@ -110,7 +117,7 @@ export default class SimpleTabArea extends Widget {
     }
   }
 
-  deselectTab(viewTab) {
+  deselectTab(viewTab: SimpleTab) {
     if (!viewTab) {
       return;
     }
@@ -120,11 +127,11 @@ export default class SimpleTabArea extends Widget {
     this._selectedViewTab.deselect();
   }
 
-  getSelectedTab() {
+  getSelectedTab(): SimpleTab {
     return this._selectedViewTab;
   }
 
-  addTab(tab, sibling) {
+  addTab(tab: SimpleTab, sibling?: SimpleTab) {
     let insertPosition = -1;
     if (sibling) {
       insertPosition = this.tabs.indexOf(sibling);
@@ -139,7 +146,7 @@ export default class SimpleTabArea extends Widget {
     }
   }
 
-  destroyTab(tab) {
+  destroyTab(tab: SimpleTab) {
     let index = this.tabs.indexOf(tab);
     if (index > -1) {
       this.tabs.splice(index, 1);

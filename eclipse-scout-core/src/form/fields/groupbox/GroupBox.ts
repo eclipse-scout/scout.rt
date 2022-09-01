@@ -65,6 +65,9 @@ export default class GroupBox extends CompositeField {
     TITLE: 'title'
   };
 
+  /**
+   * @protected
+   */
   _init(model) {
     super._init(model);
     this.resolveConsts([{
@@ -213,6 +216,9 @@ export default class GroupBox extends CompositeField {
     super._remove();
   }
 
+  /**
+   * @protected
+   */
   _renderProperties() {
     this._renderScrollable(); // Need to be before renderExpanded in order to have the scrollbars when the fields are rendered. The status tooltips require a scrollable parent to move when scrolling.
     this._renderExpanded(); // Need to be before renderVisible is executed, otherwise controls might be rendered if group box is invisible which breaks some widgets (e.g. Tree and Table)

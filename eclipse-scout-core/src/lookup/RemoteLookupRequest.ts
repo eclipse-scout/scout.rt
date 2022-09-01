@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -16,13 +16,12 @@ import {objects, QueryBy} from '../index';
  * stored in this class so we can easily compare the parameters from the latest request
  * with the parameters from the result. If the parameters don't match, we simply ignore the
  * result, because it is out-dated.
- *
- * @param {QueryBy} requestType
- * @param {object} requestData
  */
-export default class RemoteLookupRequest {
+export default class RemoteLookupRequest<DATA> {
+  requestType: QueryBy;
+  requestData: DATA;
 
-  constructor(requestType, requestData) {
+  constructor(requestType: QueryBy, requestData?: DATA) {
     if (!QueryBy.hasOwnProperty(requestType)) {
       throw new Error('Invalid enum value');
     }
@@ -30,7 +29,7 @@ export default class RemoteLookupRequest {
     this.requestData = requestData;
   }
 
-  equals(o) {
+  equals(o: any): boolean {
     if (!o || !(o instanceof RemoteLookupRequest)) {
       return false;
     }

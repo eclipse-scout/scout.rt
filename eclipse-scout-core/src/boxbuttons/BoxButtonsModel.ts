@@ -9,13 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Action, ActionModel, WidgetModel} from '../index';
-import {RefWidgetModel} from '../widget/WidgetModel';
+import {RefModel} from '../types';
 
 export default interface BoxButtonsModel extends WidgetModel {
   /**
    * Default is [].
    */
-  buttons?: Action[] | RefWidgetModel<ActionModel>[];
+  buttons?: Action[] | RefModel<ActionModel>[];
   /**
    * Default is 0.
    */

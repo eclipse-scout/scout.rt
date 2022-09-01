@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -19,7 +19,7 @@ export default class CompactColumn extends Column {
     this.textWrap = true;
   }
 
-  _onMoreLinkAction($row, $moreLink) {
+  protected _onMoreLinkAction($row: JQuery, $moreLink: JQuery) {
     let $cell = this.table.$cell(this, $row);
     let $moreContent = $cell.find('.compact-cell-more-content');
     let contentVisible = !$moreContent.isVisible();
@@ -28,10 +28,7 @@ export default class CompactColumn extends Column {
     this.table.invalidateLayoutTree();
   }
 
-  /**
-   * @override
-   */
-  onMouseUp(event, $row) {
+  override onMouseUp(event: JQuery.MouseUpEvent, $row: JQuery) {
     // The more-link is not a regular app-link to not trigger the app link action when clicking on the more-link
     // (could interfere with other regular app-links)
     let $start = $(event.target);

@@ -1,15 +1,17 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EventEmitter, MessageBox, MessageBoxes, objects, scout, Status} from '../index';
+import {arrays, Event, EventEmitter, LifecycleModel, MessageBox, MessageBoxes, objects, scout, Session, Status, Widget} from '../index';
 import $ from 'jquery';
+import LifecycleEventMap from './LifecycleEventMap';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 /**
  * Abstract base class for validation lifecycles as used for forms.
@@ -17,10 +19,6 @@ import $ from 'jquery';
  * - emptyMandatoryElementsTextKey
  * - invalidElementsTextKey
  * - saveChangesQuestionTextKey
- *
- * @class
- * @constructor
- * @abstract
  */
 export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter implements LifecycleModel {
   declare model: LifecycleModel;
@@ -44,17 +42,13 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
     this.widget = null;
     this.validationFailedTextKey = null;
     this.validationFailedText = null;
-
     this.emptyMandatoryElementsTextKey = null;
     this.emptyMandatoryElementsText = null;
-
     this.invalidElementsTextKey = null;
     this.invalidElementsText = null;
-
     this.saveChangesQuestionTextKey = null;
     this.askIfNeedSave = true;
-    this.askIfNeedSaveText = null; // Java: cancelVerificationText
-
+    this.askIfNeedSaveText = null;
     this.handlers = {
       'load': this._defaultLoad.bind(this),
       'save': this._defaultSave.bind(this)
@@ -63,7 +57,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
 
   // Info: doExportXml, doImportXml, doSaveWithoutMarkerChange is not supported in Html UI
 
-  init(model) {
+  init(model: LifecycleModel) {
     scout.assertParameter('widget', model.widget);
     $.extend(this, model);
     if (objects.isNullOrUndefined(this.validationFailedText)) {
@@ -80,7 +74,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
     }
   }
 
-  load() {
+  load(): JQuery.Promise<void> {
     return this._load().then(() => {
       this.markAsSaved();
       this.trigger('postLoad');
@@ -98,17 +92,11 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
       });
   }
 
-  /**
-   * @returns {Promise}
-   */
-  _defaultLoad() {
+  protected _defaultLoad(): JQuery.Promise<Status> {
     return $.resolvedPromise();
   }
 
-  /**
-   * @returns {Promise}
-   */
-  ok() {
+  ok(): JQuery.Promise<void> {
     // 1.) validate form
     return this._whenInvalid(this._validate)
       .then(invalid => {
@@ -134,10 +122,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
       });
   }
 
-  /**
-   * @returns {Promise}
-   */
-  cancel() {
+  cancel(): JQuery.Promise<void> {
     let showMessageBox = this.requiresSave() && this.askIfNeedSave;
     if (showMessageBox) {
       return this._showYesNoCancelMessageBox(
@@ -148,37 +133,23 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
     return this.close();
   }
 
-  /**
-   * @returns {Promise}
-   */
-  reset() {
-    this._reset();
-
+  reset(): JQuery.Promise<void> {
     // reload the state
     return this.load().then(() => {
       this.trigger('reset');
     });
   }
 
-  /**
-   * @returns {Promise}
-   */
-  close() {
+  close(): JQuery.Promise<void> {
     return this._close();
   }
 
-  /**
-   * @returns {Promise}
-   */
-  _close() {
+  protected _close(): JQuery.Promise<void> {
     this.trigger('close');
     return $.resolvedPromise();
   }
 
-  /**
-   * @returns {Promise}
-   */
-  save() {
+  save(): JQuery.Promise<void> {
     // 1.) validate form
     return this._whenInvalid(this._validate)
       .then(invalid => {
@@ -200,10 +171,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
       });
   }
 
-  /**
-   * @returns {Promise}
-   */
-  _save() {
+  protected _save(): JQuery.Promise<Status> {
     return this.handlers.save()
       .then(status => {
         this.trigger('save');
@@ -211,10 +179,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
       });
   }
 
-  /**
-   * @returns {Promise}
-   */
-  _defaultSave() {
+  protected _defaultSave(): JQuery.Promise<Status> {
     return $.resolvedPromise();
   }
 
@@ -224,13 +189,12 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
 
   /**
    * Override this function to check if any data has changed and saving is required.
-   * @returns {boolean}
    */
-  requiresSave() {
+  requiresSave(): boolean {
     return false;
   }
 
-  setAskIfNeedSave(askIfNeedSave) {
+  setAskIfNeedSave(askIfNeedSave: boolean) {
     this.askIfNeedSave = askIfNeedSave;
   }
 
@@ -238,12 +202,12 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
    * Helper function to deal with functions that return a Status object.
    * Makes it easier to return early when that function returns an invalid status (= less code to write).
    *
-   * @returns {Promise} If the resulting promise is resolved with "true", the life cycle is considered invalid.
+   * @returns If the resulting promise is resolved with "true", the life cycle is considered invalid.
    *                    Otherwise, the life cycle is considered valid and the store/save operation continues.
    *                    If the status returned by 'func' is absent or Status.Severity.OK, a promise resolved with
    *                    "false" is returned. Otherwise, the promise returned by _showStatusMessageBox() is returned.
    */
-  _whenInvalid(func) {
+  protected _whenInvalid(func: () => JQuery.Promise<Status>): JQuery.Promise<boolean> {
     return func.call(this)
       .then(status => {
         if (!status || status.severity === Status.Severity.OK) {
@@ -251,12 +215,10 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
         }
         return this._showStatusMessageBox(status);
       })
-      .catch(error => {
-        return this._showStatusMessageBox(errorToStatus(error));
-      });
+      .catch(error => this._showStatusMessageBox(errorToStatus(error)));
 
     // See ValueField#_createInvalidValueStatus, has similar code to transform error to status
-    function errorToStatus(error) {
+    function errorToStatus(error: Status | string | { message: string }): Status {
       if (error instanceof Status) {
         return error;
       }
@@ -271,7 +233,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
     }
   }
 
-  _showYesNoCancelMessageBox(message, yesAction, noAction) {
+  protected _showYesNoCancelMessageBox(message: string, yesAction: () => JQuery.Promise<void>, noAction: () => JQuery.Promise<void>): JQuery.Promise<void> {
     return MessageBoxes.createYesNoCancel(this.widget)
       .withHeader(message)
       .buildAndOpen()
@@ -286,12 +248,11 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
   }
 
   /**
-   * @param status
-   * @returns {Promise} If the resulting promise is resolved with "true", the life cycle is considered invalid.
+   * @returns If the resulting promise is resolved with "true", the life cycle is considered invalid.
    *                    Otherwise, the life cycle is considered valid and the store/save operation continues.
    *                    By default, a promise that is resolved with "true" is returned.
    */
-  _showStatusMessageBox(status) {
+  protected _showStatusMessageBox(status: Status): JQuery.Promise<boolean> {
     return MessageBoxes.createOk(this.widget)
       .withSeverity(status.severity)
       .withHeader(this.validationFailedText)
@@ -303,10 +264,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
       });
   }
 
-  /**
-   * @returns {Promise}
-   */
-  _validate() {
+  protected _validate(): JQuery.Promise<Status> {
     let status = this._validateElements();
     if (status.isValid()) {
       status = this._validateWidget();
@@ -316,10 +274,8 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
 
   /**
    * Validates all elements (i.e form-fields) covered by the lifecycle and checks for missing or invalid elements.
-   *
-   * @return Status
    */
-  _validateElements() {
+  protected _validateElements(): Status {
     let elements = this._invalidElements();
     let status = new Status();
     if (elements.missingElements.length === 0 && elements.invalidElements.length === 0) {
@@ -341,20 +297,14 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
    * no missing or invalid elements. It is used to implement an overall-validate logic which has nothing to do
    * with a specific element or field. For instance you could validate if an internal member variable of a Lifecycle
    * or Form is set.
-   *
-   * @return Status
    */
-  _validateWidget() {
+  protected _validateWidget(): Status {
     return Status.ok();
   }
 
   /**
    * Override this function to check for invalid elements on the parent which prevent
    * saving of the parent.(eg. check if all mandatory elements contain a value)
-   *
-   * @returns Object with
-   * missingElements: Elements which should have a value
-   * invalidElements: Elements which have an invalid value
    */
   protected _invalidElements(): { missingElements: VALIDATION_RESULT[]; invalidElements: VALIDATION_RESULT[] } {
     return {
@@ -386,16 +336,14 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
     function appendTitleAndList($div: JQuery, title: string, elements: VALIDATION_RESULT[], elementTextFunc: (element: VALIDATION_RESULT) => string) {
       $div.appendDiv().text(title);
       let $ul = $div.appendElement('<ul>');
-      elements.forEach(function(element) {
+      elements.forEach(element => {
         $ul.appendElement('<li>').text(elementTextFunc.call(this, element));
-      }, this);
+      });
     }
   }
 
   /**
    * Override this function to retrieve the text of an invalid element
-   * @param element
-   * @returns {String}
    */
   protected _invalidElementText(element: VALIDATION_RESULT): string {
     return '';
@@ -403,14 +351,12 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
 
   /**
    * Override this function to retrieve the text of an missing mandatory element
-   * @param element
-   * @returns {String}
    */
   protected _missingElementText(element: VALIDATION_RESULT): string {
     return '';
   }
 
-  session() {
+  session(): Session {
     return this.widget.session;
   }
 
@@ -420,7 +366,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
    * Note: in contrast to events, handlers can control the flow of the lifecycle. They also have a return value where events have none.
    *   Only one handler can be registered for each type.
    */
-  handle(type, func) {
+  handle(type: 'load' | 'save', func: () => JQuery.Promise<Status>) {
     let supportedTypes = ['load', 'save'];
     if (supportedTypes.indexOf(type) === -1) {
       throw new Error('Cannot register handler for unsupported type \'' + type + '\'');

@@ -1,22 +1,23 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractTreeNavigationKeyStroke, keys} from '../../index';
+import {AbstractTreeNavigationKeyStroke, keys, ScoutKeyboardEvent, Tree, TreeNode} from '../../index';
+import {TreeEventCurrentNode} from './AbstractTreeNavigationKeyStroke';
 
 export default class TreeNavigationDownKeyStroke extends AbstractTreeNavigationKeyStroke {
 
-  constructor(tree, modifierBitMask) {
+  constructor(tree: Tree, modifierBitMask: number) {
     super(tree, modifierBitMask);
     this.which = [keys.DOWN];
     this.renderingHints.text = '↓';
-    this.renderingHints.$drawingArea = ($drawingArea, event) => {
+    this.renderingHints.$drawingArea = ($drawingArea: JQuery, event: ScoutKeyboardEvent & TreeEventCurrentNode) => {
       let newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
       if (newSelectedNode) {
         return newSelectedNode.$node;
@@ -24,7 +25,7 @@ export default class TreeNavigationDownKeyStroke extends AbstractTreeNavigationK
     };
   }
 
-  _computeNewSelection(currentNode) {
+  protected override _computeNewSelection(currentNode: TreeNode): TreeNode {
     let nodes = this.field.visibleNodesFlat;
     if (nodes.length === 0) {
       return;

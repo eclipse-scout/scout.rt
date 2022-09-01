@@ -1,29 +1,29 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, graphics} from '../index';
+import {AbstractLayout, graphics, TableFooter} from '../index';
 import $ from 'jquery';
 
 export default class TableFooterLayout extends AbstractLayout {
+  protected _tableFooter: TableFooter;
 
-  constructor(tableFooter) {
+  constructor(tableFooter: TableFooter) {
     super();
     this._tableFooter = tableFooter;
   }
 
-  /**
-   * @override
-   */
-  layout($container) {
+  override layout($container: JQuery) {
     let contentFits,
+      // @ts-ignore
       $controls = this._tableFooter._$controls,
+      // @ts-ignore
       $info = this._tableFooter._$info,
       $infoItems = $info.find('.table-info-item'),
       containerWidth = graphics.size($container).width;
@@ -43,14 +43,19 @@ export default class TableFooterLayout extends AbstractLayout {
     $info.css('max-width', '');
 
     // Always try to use max space first
+    // @ts-ignore
     if (this._tableFooter._compactStyle) {
+      // @ts-ignore
       this._tableFooter._compactStyle = false;
+      // @ts-ignore
       this._tableFooter._renderInfo();
     }
     infoWidth = graphics.size($info, true).width;
     if (controlsWidth + infoWidth <= containerWidth) {
       // Make sure table info tooltip is not shown anymore (only available in compact style)
+      // @ts-ignore
       if (this._tableFooter._tableInfoTooltip) {
+        // @ts-ignore
         this._tableFooter._tableInfoTooltip.destroy();
       }
       contentFits = true;
@@ -58,7 +63,9 @@ export default class TableFooterLayout extends AbstractLayout {
 
     if (!contentFits) {
       // If elements don't fit, try to minimize table-info
+      // @ts-ignore
       this._tableFooter._compactStyle = true;
+      // @ts-ignore
       this._tableFooter._renderInfo();
 
       infoWidth = graphics.size($info, true).width;
@@ -73,20 +80,22 @@ export default class TableFooterLayout extends AbstractLayout {
     let animated = this._tableFooter.htmlComp.layouted;
     this._setInfoItemsSize($infoItems, animated);
 
-    if (this._tableFooter._tableStatusTooltip && this._tableFooter._tableStatusTooltip.rendered) {
-      this._tableFooter._tableStatusTooltip.position();
+    // @ts-ignore
+    let tableStatusTooltip = this._tableFooter._tableStatusTooltip;
+    if (tableStatusTooltip && tableStatusTooltip.rendered) {
+      tableStatusTooltip.position();
     }
+    // @ts-ignore
     if (this._tableFooter._tableInfoTooltip && this._tableFooter._tableInfoTooltip.rendered) {
+      // @ts-ignore
       this._tableFooter._tableInfoTooltip.position();
     }
 
     // Let table controls update their content according to the new footer size
-    this._tableFooter.table.tableControls.forEach(control => {
-      control.revalidateLayout();
-    });
+    this._tableFooter.table.tableControls.forEach(control => control.revalidateLayout());
   }
 
-  _setInfoItemsSize($infoItems, animated) {
+  protected _setInfoItemsSize($infoItems: JQuery, animated: boolean) {
     $infoItems.each(function() {
       let $item = $(this);
       if ($item.isVisible() && !$item.hasClass('hiding')) {

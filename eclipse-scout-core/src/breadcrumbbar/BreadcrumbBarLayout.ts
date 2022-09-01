@@ -1,26 +1,26 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, arrays, graphics} from '../index';
+import {AbstractLayout, arrays, BreadcrumbBar, BreadcrumbItem, Dimension, graphics, HtmlCompPrefSizeOptions} from '../index';
 
 export default class BreadcrumbBarLayout extends AbstractLayout {
+  protected _breadcrumbBar: BreadcrumbBar;
 
-  constructor(breadcrumbBar) {
+  constructor(breadcrumbBar: BreadcrumbBar) {
     super();
-
     this._breadcrumbBar = breadcrumbBar;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     // 1) undo all shrinking etc.
-    this._undoCollapse(this._breadcrumbBar.breadcrumbItems);
+    this._undoCollapse();
 
     const breadcrumbItems = this._visibleBreadcrumbItems();
 
@@ -28,23 +28,18 @@ export default class BreadcrumbBarLayout extends AbstractLayout {
     const containerSize = htmlContainer.size();
     const breadcrumbItemsWidth = this._actualPrefSize(breadcrumbItems, false).width;
     if (breadcrumbItemsWidth <= containerSize.width) {
-      this._applyToEllipsis(ell => {
-        ell.setVisible(false);
-      });
+      this._applyToEllipsis(ell => ell.setVisible(false));
       // OK, every breadcrumbItems fits into container
       return;
     }
-    this._applyToEllipsis(ell => {
-      ell.setVisible(true);
-    });
+    this._applyToEllipsis(ell => ell.setVisible(true));
 
     // breadcrumbItems don't fit
-
     // Third approach: Create ellipsis and move overflown menus into it
-    this._collapse(breadcrumbItems, containerSize);
+    this._collapse(containerSize);
   }
 
-  _collapse($container, containerSize) {
+  protected _collapse(containerSize: Dimension) {
     let currentIndex = 1;
     const visibleBreadcrumbItems = this._visibleBreadcrumbItems();
     let prefSize = this._actualPrefSize(visibleBreadcrumbItems, true);
@@ -53,54 +48,35 @@ export default class BreadcrumbBarLayout extends AbstractLayout {
       // remove breadcrumbItems until size fits or only 2 breadcrumbItems are visible
       const crumb = visibleBreadcrumbItems[currentIndex];
       crumb.$container.hide();
-      crumb._layHidden = true;
       visibleBreadcrumbItems.splice(currentIndex, 1);
       prefSize = this._actualPrefSize(visibleBreadcrumbItems, true);
     }
   }
 
-  _applyToEllipsis(fun) {
+  protected _applyToEllipsis(fun: (ellipsisBreadcrumbItem: BreadcrumbItem) => void) {
+    // @ts-ignore
     if (this._breadcrumbBar._ellipsisBreadcrumbItem) {
+      // @ts-ignore
       fun(this._breadcrumbBar._ellipsisBreadcrumbItem);
     }
   }
 
-  _undoCollapse() {
+  protected _undoCollapse() {
     arrays.ensure(this._breadcrumbBar.breadcrumbItems).forEach(crumb => {
       crumb.$container.show();
-      crumb._layHidden = false;
     });
   }
 
-  preferredLayoutSize($container) {
-    const breadcrumbItems = this._visibleBreadcrumbItems();
-
-    this._undoCollapse(breadcrumbItems);
-
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
+    this._undoCollapse();
     return this._actualPrefSize();
   }
 
-  _breadcrumbSize(breadcrumbItem) {
-    const classList = breadcrumbItem.$container.attr('class');
-    breadcrumbItem.$container.removeClass('hidden');
-
-    breadcrumbItem.htmlComp.invalidateLayout();
-    const prefSize = breadcrumbItem.htmlComp.prefSize({
-      useCssSize: true,
-      exact: true
-    }).add(graphics.margins(breadcrumbItem.$container));
-
-    breadcrumbItem.$container.attrOrRemove('class', classList);
-    return prefSize;
+  protected _visibleBreadcrumbItems(): BreadcrumbItem[] {
+    return this._breadcrumbBar.breadcrumbItems.filter(breadcrumb => breadcrumb.visible);
   }
 
-  _visibleBreadcrumbItems() {
-    return this._breadcrumbBar.breadcrumbItems.filter(breadcrumb => {
-      return breadcrumb.visible;
-    }, this);
-  }
-
-  _actualPrefSize(breadcrumbItems, considerEllipsis) {
+  protected _actualPrefSize(breadcrumbItems?: BreadcrumbItem[], considerEllipsis?: boolean): Dimension {
     breadcrumbItems = breadcrumbItems || this._visibleBreadcrumbItems();
 
     const breadcrumbItemsWidth = this._breadcrumbItemsWidth(breadcrumbItems, considerEllipsis);
@@ -114,18 +90,20 @@ export default class BreadcrumbBarLayout extends AbstractLayout {
   }
 
   /**
-   * @return {number} the preferred width of all breadcrumbItems (plus ellipsis breadcrumb)
+   * @returns the preferred width of all breadcrumbItems (plus ellipsis breadcrumb)
    */
-  _breadcrumbItemsWidth(breadcrumbItems, considerEllipsis) {
+  protected _breadcrumbItemsWidth(breadcrumbItems?: BreadcrumbItem[], considerEllipsis?: boolean): number {
     let breadcrumbsWidth = 0;
     breadcrumbItems = breadcrumbItems || this._visibleBreadcrumbItems();
     breadcrumbItems.forEach(breadcrumbItem => {
       if (breadcrumbItem.rendered) {
         breadcrumbsWidth += breadcrumbItem.$container.outerWidth(true);
       }
-    }, this);
+    });
 
+    // @ts-ignore
     if (considerEllipsis && this._breadcrumbBar._ellipsisBreadcrumbItem && this._breadcrumbBar._ellipsisBreadcrumbItem.rendered) {
+      // @ts-ignore
       breadcrumbsWidth += this._breadcrumbBar._ellipsisBreadcrumbItem.$container.outerWidth(true);
     }
     return breadcrumbsWidth;

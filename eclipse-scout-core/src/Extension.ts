@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -36,9 +36,11 @@ import {scout} from './index';
  *
  *   extended: is the extended or original object.
  */
-export default class Extension {
+export default class Extension<E> {
+  extended: E;
+  next: (...args: any[]) => any;
 
-  extend(extended, funcName) {
+  extend(extended: E, funcName: string) {
     let origFunc = extended[funcName];
     let extension = this;
     extended[funcName] = function(...args) {
@@ -49,12 +51,11 @@ export default class Extension {
   }
 
   /**
-   * Calls scout.create for each extension class in the given extensions array.
+   * Calls {@link scout.create} for each extension class in the given extensions array.
    *
-   * @param {[string]} extensions an array of strings containing extension class names
-   * @static
+   * @param extensions an array of strings containing extension class names
    */
-  static install(extensions) {
+  static install(extensions: string[]) {
     extensions.forEach(ext => {
       scout.create(ext);
     });

@@ -1,5 +1,16 @@
-import {Dimension, IconDesc, Point, Predicate} from '../index';
+/*
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+import {Dimension, IconDesc, Logger, Point, Predicate, ResizableModel} from '../index';
 import $ from 'jquery';
+import {OldWheelEvent} from '../types';
 import Deferred = JQuery.Deferred;
 
 interface InjectOptions {
@@ -11,14 +22,16 @@ interface InjectOptions {
 
 interface InjectScriptOptions extends InjectOptions {
   /**
-   * Whether to remove the script tag again from the DOMafter the script has been loaded. Default is false.
+   * Whether to remove the script tag again from the DOM after the script has been loaded. Default is false.
    */
   removeTag: boolean;
 }
 
-type AppLinkBeanArgument = { ref: string; name: string } | string;
+export type AppLinkBeanArgument = { ref: string; name: string } | string;
 
-type AppLinkFuncArgument<T> = JQuery.TypeEventHandler<T, undefined, T, T, 'click'> | { _onAppLinkAction: JQuery.TypeEventHandler<T, undefined, T, T, 'click'> };
+export type AppLinkFuncArgument<T> = JQuery.TypeEventHandler<T, undefined, T, T, 'click'> | { _onAppLinkAction: JQuery.TypeEventHandler<T, undefined, T, T, 'click'> };
+
+export type JQueryMouseWheelEvent<TDelegateTarget = any, TData = any, TCurrentTarget = any, TTarget = any> = JQuery.TriggeredEvent<TDelegateTarget, TData, TCurrentTarget, TTarget> & { originalEvent: OldWheelEvent };
 
 declare global {
 
@@ -55,7 +68,7 @@ declare global {
      * Note: "return false" is equal to preventDefault() and stopPropagation(), but
      * not stopImmediatePropagation().
      */
-    suppressEvent(): void;
+    suppressEvent(event: JQuery.Event): void;
 
     /**
      * Implements the 'debounce' pattern. The given function fx is executed after a certain delay
@@ -71,7 +84,7 @@ declare global {
      * @param [options] an optional options object. Short-hand version: If a number is passed instead
      *          of an object, the value is automatically converted to the option 'delay'.
      */
-    debounce(fx: (...args) => unknown, options?: DebounceOptions | number): void;
+    debounce(fx: (...args: any[]) => void, options?: DebounceOptions | number): ((...args: any[]) => void) & { cancel(): boolean };
 
     /**
      * Executes the given function. Further calls to the same function are delayed by the given delay.
@@ -80,12 +93,12 @@ declare global {
      * @param fx the function to wrap
      * @param delay how much the function calls should be delayed. Default is 250.
      */
-    throttle(fx: (...args) => unknown, delay?: number): void;
+    throttle(fx: (...args: any[]) => unknown, delay?: number): (...args: any[]) => unknown;
 
     /**
      * Returns a function which negates the return value of the given function when called.
      */
-    negate(fx: (...args) => unknown): ((...args) => boolean);
+    negate(fx: (...args: any[]) => unknown): ((...args: any[]) => boolean);
 
     /**
      * CSP-safe method to dynamically load and execute a script from server.
@@ -132,30 +145,123 @@ declare global {
 
     /**
      * Use this function as shorthand of this:
-     * <code>$.Deferred().resolve([arguments]);</code>
+     * <code>$.Deferred().resolve(...args);</code>
      *
-     * @param args arguments of this function are passed to the resolve function of the deferred
-     * @returns a deferred for an already resolved {@link Deferred} object.
+     * @param args arguments of this function are passed to the resolve function of the {@link Deferred}.
+     * @returns an already resolved {@link Deferred}.
      */
-    resolvedDeferred(...args): Deferred<any>;
+    resolvedDeferred(...args: any[]): Deferred<any>;
 
     /**
      * Use this function as shorthand of this:
-     * <code>$.Deferred().resolve([arguments]).promise();</code>
+     * <code>$.Deferred().resolve(arg);</code>
      *
-     * @param args arguments of this function are passed to the resolve function of the deferred
-     * @returns a promise for an already resolved {@link Deferred} object.
+     * @param arg the argument to pass to the resolve function of the {@link Deferred}.
+     * @returns an already resolved {@link Deferred}.
      */
-    resolvedPromise(...args): JQuery.Promise<any>;
+    resolvedDeferred<TR>(arg: TR): Deferred<TR, never, never>;
 
     /**
      * Use this function as shorthand of this:
-     * <code>$.Deferred().reject([arguments]).promise();</code>
+     * <code>$.Deferred().resolve(arg).promise();</code>
      *
-     * @param args arguments of this function are passed to the reject function of the deferred
-     * @returns a promise for an already rejected jQuery.Deferred object.
+     * @param arg passed to the resolve function of the deferred
+     * @returns a {@link JQuery.Promise} for an already resolved {@link Deferred} object.
      */
-    rejectedPromise(...args): JQuery.Promise<any>;
+    resolvedPromise<TR>(arg: TR): JQuery.Promise<TR, never, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().resolve(arg1, arg2).promise();</code>
+     *
+     * @param arg1 passed to the resolve function of the deferred
+     * @param arg2 passed to the resolve function of the deferred
+     * @returns a {@link JQuery.Promise} for an already resolved {@link Deferred} object.
+     */
+    resolvedPromise<TR, UR>(arg1: TR, arg2: UR): JQuery.Promise2<TR, never, never, UR, never, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().resolve(arg1, arg2, arg3).promise();</code>
+     *
+     * @param arg1 passed to the resolve function of the deferred
+     * @param arg2 passed to the resolve function of the deferred
+     * @param arg3 passed to the resolve function of the deferred
+     * @returns a {@link JQuery.Promise} for an already resolved {@link Deferred} object.
+     */
+    resolvedPromise<TR, UR, VR>(arg1: TR, arg2: UR, arg3: VR): JQuery.Promise3<TR, never, never, UR, never, never, VR, never, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().resolve(arg1, arg2, arg3, ...args).promise();</code>
+     *
+     * @param arg1 passed to the resolve function of the deferred
+     * @param arg2 passed to the resolve function of the deferred
+     * @param arg3 passed to the resolve function of the deferred
+     * @param args remaining arguments passed to the resolve function of the deferred
+     * @returns a {@link JQuery.Promise} for an already resolved {@link Deferred} object.
+     */
+    resolvedPromise<TR, UR, VR, SR>(arg1: TR, arg2: UR, arg3: VR, ...args: SR[]): JQuery.PromiseBase<TR, never, never, UR, never, never, VR, never, never, SR, never, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().resolve(...args).promise();</code>
+     *
+     * @param args arguments passed to the resolve function of the deferred
+     * @returns a {@link JQuery.Promise} for an already resolved {@link Deferred} object.
+     */
+    resolvedPromise(...args: any[]): JQuery.Promise<any, never, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().reject(arg).promise();</code>
+     *
+     * @param arg passed to the reject function of the {@link Deferred}.
+     * @returns a {@link JQuery.Promise} for an already rejected {@link Deferred}.
+     */
+    rejectedPromise<TJ>(arg: TJ): JQuery.Promise<never, TJ, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().reject(arg1, arg2).promise();</code>
+     *
+     * @param arg1 passed to the reject function of the {@link Deferred}.
+     * @param arg2 passed to the reject function of the {@link Deferred}.
+     * @returns a {@link JQuery.Promise} for an already rejected {@link Deferred}.
+     */
+    rejectedPromise<TJ, UJ>(arg1: TJ, arg2: UJ): JQuery.Promise2<never, TJ, never, never, UJ, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().reject(arg1, arg2, arg3).promise();</code>
+     *
+     * @param arg1 passed to the reject function of the {@link Deferred}.
+     * @param arg2 passed to the reject function of the {@link Deferred}.
+     * @param arg3 passed to the reject function of the {@link Deferred}.
+     * @returns a {@link JQuery.Promise} for an already rejected {@link Deferred}.
+     */
+    rejectedPromise<TJ, UJ, VJ>(arg1: TJ, arg2: UJ, arg3: VJ): JQuery.Promise3<never, TJ, never, never, UJ, never, never, VJ, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().reject(arg1, arg2, arg3, ...args).promise();</code>
+     *
+     * @param arg1 passed to the reject function of the {@link Deferred}.
+     * @param arg2 passed to the reject function of the {@link Deferred}.
+     * @param arg3 passed to the reject function of the {@link Deferred}.
+     * @param args remaining arguments passed to the reject function of the {@link Deferred}.
+     * @returns a {@link JQuery.Promise} for an already rejected {@link Deferred}.
+     */
+    rejectedPromise<TJ, UJ, VJ, SJ>(arg1: TJ, arg2: UJ, arg3: VJ, ...args: SJ[]): JQuery.PromiseBase<never, TJ, never, never, UJ, never, never, VJ, never, never, SJ, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().reject(...args).promise();</code>
+     *
+     * @param args arguments passed to the reject function of the {@link Deferred}.
+     * @returns a {@link JQuery.Promise} for an already rejected {@link Deferred}.
+     */
+    rejectedPromise(...args: any[]): JQuery.Promise<any>;
 
     /**
      * Creates a new promise which resolves when all promises resolve and fails when the first promise fails.
@@ -164,7 +270,7 @@ declare global {
      * @param asArray when set to true, the resolve function will transform the
      *    flat arguments list containing the results into an array. The arguments of the reject function won't be touched. Default is false.
      */
-    promiseAll(promises: Promise<any>[], asArray?: boolean): JQuery.Promise<any>;
+    promiseAll(promises: JQuery.Promise<any>[], asArray?: boolean): JQuery.Promise<any>;
 
     /**
      * Shorthand for an AJAX request for a JSON file with UTF8 encoding.
@@ -178,10 +284,10 @@ declare global {
     /**
      * Helper function to determine if an object is of type "jqXHR" (http://api.jquery.com/jQuery.ajax/#jqXHR)
      */
-    isJqXHR(obj: unknown): boolean;
+    isJqXHR(obj: unknown): obj is JQuery.jqXHR;
   }
 
-  interface JQuery<TElement = HTMLElement> {
+  interface JQuery<TElement = HTMLElement> extends Array<TElement> {
     /**
      * @param $element returns the given element if the current jquery object does not contain any elements.
      * Otherwise returns the current jquery object.
@@ -215,10 +321,20 @@ declare global {
     makeSpan(cssClass?: string, text?: string): JQuery<HTMLSpanElement>;
 
     /**
+     * @returns document reference (ownerDocument) of the HTML element.
+     */
+    document(): JQuery<Document>;
+
+    /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
      * @returns document reference (ownerDocument) of the HTML element.
      */
     document<T extends boolean>(domElement?: T): T extends true ? Document : JQuery<Document>;
+
+    /**
+     * @returns window reference (defaultView) of the HTML element
+     */
+    window(): JQuery<Window>;
 
     /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
@@ -227,22 +343,37 @@ declare global {
     window<T extends boolean>(domElement?: T): T extends true ? Window : JQuery<Window>;
 
     /**
+     * @returns the BODY element of the HTML document in which the current HTML element is placed.
+     */
+    body(): JQuery<Body>;
+
+    /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
      * @returns the BODY element of the HTML document in which the current HTML element is placed.
      */
     body<T extends boolean>(domElement?: T): T extends true ? Body : JQuery<Body>;
 
     /**
+     * @returns the closest DOM element that has the 'scout' class.
+     */
+    entryPoint(): JQuery;
+
+    /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
      * @returns the closest DOM element that has the 'scout' class.
      */
-    entryPoint<T extends boolean>(domElement?: T): T extends true ? JQuery : JQuery;
+    entryPoint<T extends boolean>(domElement?: T): T extends true ? HTMLElement : JQuery;
+
+    /**
+     * @returns the active element of the current document
+     */
+    activeElement(): JQuery;
 
     /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
      * @returns the active element of the current document
      */
-    activeElement<T extends boolean>(domElement?: T): T extends true ? Document : JQuery;
+    activeElement<T extends boolean>(domElement?: T): T extends true ? HTMLElement : JQuery;
 
     /**
      * @returns size of the window (width and height)
@@ -257,12 +388,12 @@ declare global {
     /**
      * Creates a new HTML element and prepends it to the current element.
      */
-    prependElement(cssClass?: string, text?: string): JQuery;
+    prependElement(element: string, cssClass?: string, text?: string): JQuery;
 
     /**
      * Creates a new HTML element and appends it to the current element.
      */
-    appendElement(cssClass?: string, text?: string): JQuery;
+    appendElement(element: string, cssClass?: string, text?: string): JQuery;
 
     /**
      * Creates a new DIV and prepends it to the current element.
@@ -302,7 +433,7 @@ declare global {
     /**
      * Creates a new COLGROUP and appends it to the current element.
      */
-    appendColgroup(cssClass?: string): JQuery
+    appendColgroup(cssClass?: string): JQuery;
 
     /**
      * Creates a new COL and appends it to the current element.
@@ -951,7 +1082,7 @@ declare global {
      * Makes the current element resizable, which means DIVs for resize-handling are added to the DOM
      * in the E, SE and S of the element. This is primarily useful for (modal) dialogs.
      */
-    resizable(model): this; // TODO ts define ResizeableModel
+    resizable(model?: ResizableModel): this;
 
     /**
      * Removes the resize handles and event handlers in order to make the element un resizable again.
@@ -1047,32 +1178,4 @@ declare global {
 
     offPassive<TType extends string>(eventType: TType, handler: JQuery.TypeEventHandler<TElement, undefined, TElement, TElement, TType>): this;
   }
-}
-
-interface Logger {
-  trace(...logArgs): void
-
-  debug(...logArgs): void
-
-  info(...logArgs): void
-
-  warn(...logArgs): void
-
-  error(...logArgs): void
-
-  fatal(...logArgs): void
-
-  isEnabledFor(): boolean
-
-  isTraceEnabled(): boolean
-
-  isDebugEnabled(): boolean
-
-  isInfoEnabled(): boolean
-
-  isWarnEnabled(): boolean
-
-  isErrorEnabled(): boolean
-
-  isFatalEnabled(): boolean
 }

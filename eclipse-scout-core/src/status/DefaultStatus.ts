@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status} from '../index';
+import {Status, StatusModel} from '../index';
 
 /**
  * The DefaultStatus class is used add programmatic Status triggered by business logic
@@ -16,29 +16,28 @@ import {Status} from '../index';
  */
 export default class DefaultStatus extends Status {
 
-  constructor(model) {
+  constructor(model: StatusModel) {
     super(model);
   }
 
   /**
-   * @returns {DefaultStatus} a DefaultStatus object with severity ERROR.
+   * @returns a {@link DefaultStatus} object with severity ERROR.
    */
-  static error(model) {
+  static override error(model: StatusModel | string): DefaultStatus {
     return new DefaultStatus(Status.ensureModel(model, Status.Severity.ERROR));
   }
 
   /**
-   * @returns {DefaultStatus} a DefaultStatus object with severity WARNING.
+   * @returns a {@link DefaultStatus} object with severity WARNING.
    */
-  static warning(model) {
+  static override warning(model: StatusModel | string): DefaultStatus {
     return new DefaultStatus(Status.ensureModel(model, Status.Severity.WARNING));
   }
 
   /**
-   * @returns {DefaultStatus} a DefaultStatus object with severity INFO.
+   * @returns a {@link DefaultStatus} object with severity INFO.
    */
-  static info(model) {
+  static override info(model: StatusModel | string): DefaultStatus {
     return new DefaultStatus(Status.ensureModel(model, Status.Severity.INFO));
   }
-
 }

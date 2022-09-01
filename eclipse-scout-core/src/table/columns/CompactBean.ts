@@ -1,17 +1,29 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {scout, strings} from '../../index';
+import {CompactLine, scout, strings} from '../../index';
 
 export default class CompactBean {
+  title: string;
+  titleLine: CompactLine;
+
+  titleSuffix: string;
+  titleSuffixLine: CompactLine;
+
+  subtitle: string;
+  subtitleLine: CompactLine;
+
+  contentLines: CompactLine[];
+  content: string;
+  moreContent: string;
 
   constructor() {
     this.title = '';
@@ -22,77 +34,49 @@ export default class CompactBean {
     this.contentLines = [];
   }
 
-  /**
-   * @param {string} title
-   */
-  setTitle(title) {
+  setTitle(title: string) {
     this.title = scout.nvl(title, '');
   }
 
-  /**
-   * @param {CompactLine} titleLine
-   */
-  setTitleLine(titleLine) {
+  setTitleLine(titleLine: CompactLine) {
     this.titleLine = titleLine;
   }
 
-  /**
-   * @param {string} titleSuffix
-   */
-  setTitleSuffix(titleSuffix) {
+  setTitleSuffix(titleSuffix: string) {
     this.titleSuffix = scout.nvl(titleSuffix, '');
   }
 
-  /**
-   * @param {CompactLine} titleSuffixLine
-   */
-  setTitleSuffixLine(titleSuffixLine) {
+  setTitleSuffixLine(titleSuffixLine: CompactLine) {
     this.titleSuffixLine = titleSuffixLine;
   }
 
-  /**
-   * @param {string} subtitle
-   */
-  setSubtitle(subtitle) {
+  setSubtitle(subtitle: string) {
     this.subtitle = scout.nvl(subtitle, '');
   }
 
-  /**
-   * @param {CompactLine} subtitleLine
-   */
-  setSubtitleLine(subtitleLine) {
+  setSubtitleLine(subtitleLine: CompactLine) {
     this.subtitleLine = subtitleLine;
   }
 
-  /**
-   * @param {CompactLine} line
-   */
-  addContentLine(line) {
+  addContentLine(line: CompactLine) {
     this.contentLines.push(line);
   }
 
-  /**
-   * @param {string} content
-   */
-  setContent(content) {
+  setContent(content: string) {
     this.content = scout.nvl(content, '');
   }
 
-  /**
-   * @param {string} moreContent
-   */
-  setMoreContent(moreContent) {
+  setMoreContent(moreContent: string) {
     this.moreContent = scout.nvl(moreContent, '');
   }
 
   /**
-   * Converts the compact lines into strings and fills the responding properties (title, subtitle, content, more
-   * content).
-   * @param {object} [options]
-   * @param {boolean} [options.removeEmptyContentLines default true
-   * @param {number} [options.maxContentLines default 1000
+   * Converts the compact lines into strings and fills the responding properties (title, subtitle, content, moreContent).
+   *
+   * @param options.removeEmptyContentLines default true
+   * @param options.maxContentLines default 1000
    */
-  transform(options) {
+  transform(options?: { removeEmptyContentLines?: boolean; maxContentLines?: number }) {
     let removeEmptyContentLines = scout.nvl(options.removeEmptyContentLines, true);
     let maxContentLines = scout.nvl(options.maxContentLines, 1000);
     if (this.titleLine) {

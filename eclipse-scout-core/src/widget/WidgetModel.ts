@@ -1,5 +1,15 @@
-import {Session, Widget} from '../index';
-import {PartialAndRequired} from '../types';
+/*
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+import {DisabledStyle, LogicalGrid, Session, Widget} from '../index';
+import {ObjectType} from '../ObjectFactory';
 
 export default interface WidgetModel {
   /**
@@ -11,9 +21,17 @@ export default interface WidgetModel {
    * If not specified, the session of the parent widget is used
    */
   session?: Session;
-  objectType?: string | { new(): Widget };
-  // FIXME TS add missing properties
+  objectType?: ObjectType<Widget>;
+  enabled?: boolean;
+  trackFocus?: boolean;
+  scrollTop?: number;
+  scrollLeft?: number;
+  inheritAccessibility?: boolean;
+  disabledStyle?: DisabledStyle;
+  visible?: boolean;
+  cssClass?: string;
+  loading?: boolean;
+  logicalGrid?: LogicalGrid;
+
   [property: string]: any; // FIXME TS necessary for variable model properties, required?
 }
-
-export type RefWidgetModel<T extends WidgetModel> = PartialAndRequired<T, 'parent', 'objectType'>;

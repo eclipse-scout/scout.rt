@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -16,9 +16,8 @@ import $ from 'jquery';
  * promise is created and executed.
  *
  * @param {PromiseCreator} promiseCreator this function
- * @returns {Promise}
  */
-export function oneByOne(promiseCreator: PromiseCreator): Promise<any> {
+export function oneByOne(promiseCreator: PromiseCreator): JQuery.Promise<any> {
   let deferred = $.Deferred();
   _repeat(promiseCreator);
   return deferred.promise();
@@ -48,12 +47,8 @@ export function oneByOne(promiseCreator: PromiseCreator): Promise<any> {
 /**
  * Use a promise creator to create a group of promises and wait until the whole group has been executed
  * before creating and executing promises for the next group.
- *
- * @param groupSize
- * @param promiseCreator
- * @returns {Promise}
  */
-export function groupwise(groupSize, promiseCreator): Promise<any> {
+export function groupwise(groupSize, promiseCreator): JQuery.Promise<any> {
   let deferred = $.Deferred();
   _repeat(promiseCreator);
   return deferred.promise();
@@ -92,9 +87,8 @@ export function groupwise(groupSize, promiseCreator): Promise<any> {
  * @param maxPoolSize defines how many promises should be created and executed at most in parallel.
  * @param promiseCreator
  * @param timeout specifies a timeout to wait for until the next promise will be started.
- * @returns {Promise}
  */
-export function parallel(maxPoolSize, promiseCreator, timeout): Promise<any> {
+export function parallel(maxPoolSize, promiseCreator, timeout): JQuery.Promise<any> {
   timeout = timeout || 0;
   let deferred = $.Deferred();
   let poolSize = 0;
@@ -132,4 +126,3 @@ export default {
   oneByOne,
   parallel
 };
-

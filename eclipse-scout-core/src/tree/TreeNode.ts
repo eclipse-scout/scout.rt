@@ -3,18 +3,62 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons, objects, scout, styles, texts, Tree} from '../index';
+import {icons, objects, scout, Session, styles, texts, Tree, TreeNodeModel} from '../index';
 import $ from 'jquery';
 
 /**
  * @class
  */
-export default class TreeNode {
+export default class TreeNode implements TreeNodeModel {
+  declare model: TreeNodeModel;
+
+  checked: boolean;
+  childNodes: TreeNode[];
+  cssClass: string;
+  enabled: boolean;
+  expanded: boolean;
+  expandedLazy: boolean;
+  htmlEnabled: boolean;
+  iconId: string;
+  id: string;
+  initialExpanded: boolean;
+  lazyExpandingEnabled: boolean;
+  leaf: boolean;
+  level: number;
+  parent: Tree;
+  parentNode: TreeNode;
+  session: Session;
+  text: string;
+  tooltipText: string;
+  foregroundColor: string;
+  backgroundColor: string;
+  font: string;
+
+  initialized: boolean;
+  rendered: boolean;
+  attached: boolean;
+  destroyed: boolean;
+  filterAccepted: boolean;
+  filterDirty: boolean;
+  childrenLoaded: boolean;
+  childrenChecked: boolean;
+  height: number;
+  width: number;
+  displayBackup: string;
+  prevSelectionAnimationDone: boolean;
+  $node: JQuery<HTMLDivElement>;
+  $text: JQuery<HTMLSpanElement>;
+  childNodeIndex: number; // set by the Tree or from the UI server
+
+  /**
+   * This internal variable stores the promise which is used when a loadChildren() operation is in progress.
+   */
+  protected _loadChildrenPromise: JQuery.Promise<any>;
 
   constructor() {
     this.$node = null;
@@ -46,13 +90,10 @@ export default class TreeNode {
     this.session = null;
     this.text = null;
 
-    /**
-     * This internal variable stores the promise which is used when a loadChildren() operation is in progress.
-     */
-    this._loadChildrenPromise = false;
+    this._loadChildrenPromise = null;
   }
 
-  init(model) {
+  init(model: TreeNodeModel) {
     let staticModel = this._jsonModel();
     if (staticModel) {
       model = $.extend({}, staticModel, model);
@@ -75,15 +116,15 @@ export default class TreeNode {
   /**
    * Override this method to do something when TreeNode gets destroyed. The default impl. does nothing.
    */
-  _destroy() {
+  protected _destroy() {
     // NOP
   }
 
-  getTree() {
+  getTree(): Tree {
     return this.parent;
   }
 
-  _init(model) {
+  protected _init(model: TreeNodeModel) {
     scout.assertParameter('parent', model.parent, Tree);
     this.session = model.session || model.parent.session;
 
@@ -94,11 +135,13 @@ export default class TreeNode {
 
     // make sure all child nodes are TreeNodes too
     if (this.hasChildNodes()) {
+      // @ts-ignore
       this.getTree()._ensureTreeNodes(this.childNodes);
     }
   }
 
-  _jsonModel() {
+  protected _jsonModel(): Record<string, any> {
+    return null;
   }
 
   reset() {
@@ -110,14 +153,14 @@ export default class TreeNode {
     this.attached = false;
   }
 
-  hasChildNodes() {
+  hasChildNodes(): boolean {
     return this.childNodes.length > 0;
   }
 
   /**
-   * @returns {boolean} true, if the node is an ancestor of the given node
+   * @returns true, if this node is an ancestor of the given node
    */
-  isAncestorOf(node) {
+  isAncestorOf(node: TreeNode): boolean {
     while (node) {
       if (node.parentNode === this) {
         return true;
@@ -128,9 +171,9 @@ export default class TreeNode {
   }
 
   /**
-   * @returns {boolean} true, if the node is a descendant of the given node
+   * @returns true, if the node is a descendant of the given node
    */
-  isDescendantOf(node) {
+  isDescendantOf(node: TreeNode): boolean {
     if (node === this.parentNode) {
       return true;
     }
@@ -140,11 +183,11 @@ export default class TreeNode {
     return this.parentNode.isDescendantOf(node);
   }
 
-  setFilterAccepted(filterAccepted) {
+  setFilterAccepted(filterAccepted: boolean) {
     this.filterAccepted = filterAccepted;
   }
 
-  isFilterAccepted(forceFilter) {
+  isFilterAccepted(forceFilter?: boolean): boolean {
     if (this.filterDirty || forceFilter) {
       this.getTree().applyFiltersForNode(this);
     }
@@ -155,19 +198,18 @@ export default class TreeNode {
    * This method loads the child nodes of this node and returns a jQuery.Deferred to register callbacks
    * when loading is done or has failed. This method should only be called when childrenLoaded is false.
    *
-   * @return {$.Deferred} or null when TreeNode cannot load children (which is the case for all
-   *     TreeNodes in the remote case). The default impl. return null.
+   * @returns a Deferred or null when TreeNode cannot load children (which is the case for all
+   *     TreeNodes in the remote case). The default impl. returns a resolved deferred.
    */
-  loadChildren() {
+  loadChildren(): JQuery.Deferred<any> {
     return $.resolvedDeferred();
   }
 
   /**
    * This method calls loadChildren() but does nothing when children are already loaded or when loadChildren()
    * is already in progress.
-   * @returns {Promise}
    */
-  ensureLoadChildren() {
+  ensureLoadChildren(): JQuery.Promise<any> {
     // when children are already loaded we return an already resolved promise so the caller can continue immediately
     if (this.childrenLoaded) {
       return $.resolvedPromise();
@@ -189,21 +231,21 @@ export default class TreeNode {
     return promise; // we must always return a promise, never null - otherwise caller would throw an error
   }
 
-  _onLoadChildrenDone() {
+  protected _onLoadChildrenDone() {
     this._loadChildrenPromise = null;
   }
 
-  setText(text) {
+  setText(text: string) {
     this.text = text;
   }
 
   /**
    * This functions renders sets the $node and $text properties.
    *
-   * @param {jQuery} $parent the tree DOM
-   * @param {number} paddingLeft calculated by tree
+   * @param $parent the tree DOM
+   * @param paddingLeft calculated by tree
    */
-  render($parent, paddingLeft) {
+  render($parent: JQuery, paddingLeft: number) {
     this.$node = $parent.makeDiv('tree-node')
       .data('node', this)
       .attr('data-nodeid', this.id)
@@ -221,7 +263,7 @@ export default class TreeNode {
     this._renderIcon();
   }
 
-  _renderText() {
+  protected _renderText() {
     if (this.htmlEnabled) {
       this.$text.html(this.text);
     } else {
@@ -229,7 +271,7 @@ export default class TreeNode {
     }
   }
 
-  _renderChecked() {
+  protected _renderChecked() {
     // if node is not rendered, do nothing
     if (!this.rendered) {
       return;
@@ -241,28 +283,29 @@ export default class TreeNode {
       .toggleClass('checked', this.checked);
   }
 
-  _renderIcon() {
+  protected _renderIcon() {
     this.$node.toggleClass('has-icon', !!this.iconId);
     this.$node.icon(this.iconId, $icon => $icon.insertBefore(this.$text));
   }
 
-  $icon() {
+  $icon(): JQuery<HTMLElement> {
     return this.$node.children('.icon');
   }
 
-  _renderControl() {
+  protected _renderControl() {
     let $control = this.$node.prependDiv('tree-node-control');
     this._updateControl($control);
   }
 
-  _updateControl($control) {
+  protected _updateControl($control: JQuery) {
     let tree = this.getTree();
     $control.toggleClass('checkable', tree.checkable);
+    // @ts-ignore
     $control.cssPaddingLeft(tree._computeNodeControlPaddingLeft(this));
     $control.setVisible(!this.leaf);
   }
 
-  _renderCheckbox() {
+  protected _renderCheckbox() {
     let $checkboxContainer = this.$node.prependDiv('tree-node-checkbox');
     let $checkbox = $checkboxContainer
       .appendDiv('check-box')
@@ -271,7 +314,7 @@ export default class TreeNode {
     $checkbox.toggleClass('children-checked', !!this.childrenChecked);
   }
 
-  _decorate() {
+  protected _decorate() {
     // This node is not yet rendered, nothing to do
     if (!this.$node) {
       return;
@@ -293,7 +336,9 @@ export default class TreeNode {
       .children('.check-box')
       .toggleClass('disabled', !this.enabled);
 
+
     if (!this.parentNode && tree.selectedNodes.length === 0 || // root nodes have class child-of-selected if no node is selected
+      // @ts-ignore
       tree._isChildOfSelectedNodes(this)) {
       $node.addClass('child-of-selected');
     }
@@ -304,9 +349,7 @@ export default class TreeNode {
 
     // If parent node is marked as 'lazy', check if any visible child nodes remain.
     if (this.parentNode && this.parentNode.expandedLazy) {
-      let hasVisibleNodes = this.parentNode.childNodes.some(childNode => {
-        return !!tree.visibleNodesMap[childNode.id];
-      });
+      let hasVisibleNodes = this.parentNode.childNodes.some(childNode => !!tree.visibleNodesMap[childNode.id]);
       if (!hasVisibleNodes && this.parentNode.$node) {
         // Remove 'lazy' from parent
         this.parentNode.$node.removeClass('lazy');
@@ -315,10 +358,10 @@ export default class TreeNode {
   }
 
   /**
-   * @return {object} The object that has the properties used for styles (colors, fonts, etc.)
+   * @returns The object that has the properties used for styles (colors, fonts, etc.)
    *     The default impl. returns "this". Override this function to return another object.
    */
-  _getStyles() {
+  protected _getStyles(): object {
     return this;
   }
 
@@ -327,7 +370,7 @@ export default class TreeNode {
    * The classes depend on the tree hierarchy or the selection and thus cannot determined
    * by the node itself.
    */
-  _preserveCssClasses($node) {
+  protected _preserveCssClasses($node: JQuery): string {
     let cssClass = 'tree-node';
     if ($node.isSelected()) {
       cssClass += ' selected';

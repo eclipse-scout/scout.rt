@@ -147,9 +147,6 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       // Request was already processed and adapter does not exist anymore
       return;
     }
-    if (httpServletRequest.getParameter("legacy") != null) {
-      httpServletResponse.setContentType("text/plain");
-    }
 
     // Read uploaded data
     // GUI requests for the same session must be processed consecutively
