@@ -289,6 +289,7 @@ function getTypeName(type) {
   }
   return type.typeName.name;
 }
+
 export function transformCommentLinesToJsDoc(j, comments) {
   if (!comments) {
     return null;
@@ -349,7 +350,7 @@ export const defaultParamTypeMap = {
     type: 'JQuery'
   },
   HtmlComponent: {
-    predicate: name => isOneOf(name, 'htmlComp', 'htmlContainer', 'htmlBody'),
+    predicate: name => isOneOf(name, 'htmlComp', 'htmlContainer', 'htmlBody', 'htmlChild'),
     type: 'scout.HtmlComponent'
   },
   Session: {
@@ -520,12 +521,20 @@ export const defaultReturnTypeMap = {
     type: 'JQuery'
   },
   Dimension: {
-    predicate: name => isOneOf('prefSize', 'preferredLayoutSize'),
+    predicate: name => isOneOf(name, 'prefSize', 'preferredLayoutSize'),
     type: 'scout.Dimension'
   },
   KeyStrokeContext: {
     predicate: name => name === '_createKeyStrokeContext',
     type: 'scout.KeyStrokeContext'
+  },
+  boolean: {
+    predicate: name => isOneOf(name, 'equals') || name.match(/^is[A-Z]/) || name.match(/^has[A-Z]/),
+    type: 'boolean'
+  },
+  string: {
+    predicate: name => isOneOf(name, 'toString'),
+    type: 'string'
   }
 };
 
