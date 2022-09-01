@@ -8,14 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, HtmlComponent} from '../index';
+import {Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions} from '../index';
 import $ from 'jquery';
 
 /**
- * Abstract layout class with functions used by all layout algorithms.
- * Subclasses of AbstractLayout.js must implement the following functions:
- * - layout
- * - preferredLayoutSize
+ * A layout is responsible to layout the children of a container and is able to return its preferred size.
  */
 export default class AbstractLayout {
   animateClasses: string[];
@@ -26,10 +23,9 @@ export default class AbstractLayout {
   }
 
   /**
-   * Called when layout is invalidated. An implementation should delete cached layout-information
-   * when it is invalidated.
+   * Called when layout is invalidated. An implementation should delete cached layout-information when it is invalidated.
    *
-   * May be implemented by sub-class.
+   * May be implemented by a sub-class.
    *
    * @param htmlSource The component the invalidation originated from.
    *        Is always set if the invalidation is triggered by using {@link HtmlComponent.invalidateLayoutTree}, may be undefined otherwise.
@@ -40,9 +36,7 @@ export default class AbstractLayout {
 
   /**
    * Layouts children of the given $container, according to the implemented layout algorithm.
-   * The implementation should call setSize or setBounds on its children.
-   *
-   * Must be implemented by sub-class.
+   * The implementation should call {@link HtmlComponent.setSize} or {@link HtmlComponent.setBounds} on its children which will validate their layout.
    */
   layout($container: JQuery) {
     // nop
@@ -52,7 +46,7 @@ export default class AbstractLayout {
    * Reverts the adjustments made by {@link HtmlComponent#_adjustSizeHintsForPrefSize} without the margin.
    * More concrete: it adds border and padding to the hints again.
    */
-  protected _revertSizeHintsAdjustments($container: JQuery, options) {
+  protected _revertSizeHintsAdjustments($container: JQuery, options: HtmlCompPrefSizeOptions) {
     let htmlContainer = HtmlComponent.get($container);
     if (options.widthHint) {
       options.widthHint += htmlContainer.insets().horizontal();
@@ -64,10 +58,8 @@ export default class AbstractLayout {
 
   /**
    * Returns the preferred size of the given $container.
-   *
-   * @return Dimension preferred size
    */
-  preferredLayoutSize($container: JQuery, options) {
+  preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     options = $.extend({}, options);
     if (this.animateClasses.length > 0) {
       options.animateClasses = this.animateClasses;

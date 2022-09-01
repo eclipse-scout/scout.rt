@@ -9,14 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractGrid, HorizontalGridMatrix} from '../../index';
+import {LogicalGridWidget} from './LogicalGridData';
 
 export default class HorizontalGrid extends AbstractGrid {
 
-  constructor(options) {
-    super(options);
-  }
-
-  layoutAllDynamic(widgets) {
+  override layoutAllDynamic(widgets: LogicalGridWidget[]) {
     let matrix = new HorizontalGridMatrix(this.getGridColumnCount());
     matrix.computeGridData(widgets);
     this.gridRows = matrix.getRowCount();

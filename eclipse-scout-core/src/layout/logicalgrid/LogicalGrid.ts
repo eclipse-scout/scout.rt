@@ -8,7 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridConfig, scout, Widget} from '../../index';
+import {LogicalGridConfig, LogicalGridContainer, scout} from '../../index';
+
+export interface LogicalGridOptions {
+  gridConfig: LogicalGrid | object;
+}
 
 /**
  * Base class for every logical grid. The concrete grids should implement {@link _validate}.
@@ -18,7 +22,7 @@ export default abstract class LogicalGrid {
   gridConfig: LogicalGridConfig;
   objectType: string;
 
-  constructor(options: { gridConfig: LogicalGrid | object }) {
+  constructor(options?: LogicalGridOptions) {
     options = scout.nvl(options, {});
     this.dirty = true;
     this._setGridConfig(options.gridConfig || null);
@@ -42,7 +46,7 @@ export default abstract class LogicalGrid {
   /**
    * Calls {@link _validate} if the grid is dirty. Sets dirty to false afterwards.
    */
-  validate(gridContainer: Widget) {
+  validate(gridContainer: LogicalGridContainer) {
     if (!this.dirty) {
       return;
     }
@@ -50,5 +54,5 @@ export default abstract class LogicalGrid {
     this.setDirty(false);
   }
 
-  abstract _validate(gridContainer: Widget);
+  protected abstract _validate(gridContainer: LogicalGridContainer);
 }

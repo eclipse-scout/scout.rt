@@ -9,14 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractGrid, VerticalGridMatrix} from '../../index';
+import {LogicalGridWidget} from './LogicalGridData';
 
 export default class VerticalSmartGrid extends AbstractGrid {
 
-  constructor(options) {
-    super(options);
-  }
-
-  layoutAllDynamic(widgets) {
+  override layoutAllDynamic(widgets: LogicalGridWidget[]) {
     let cellCount = 0;
     widgets.forEach(f => {
       let hints = AbstractGrid.getGridDataFromHints(f, this.getGridColumnCount());

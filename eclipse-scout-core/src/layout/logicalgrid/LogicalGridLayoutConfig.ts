@@ -8,13 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default class LogicalGridLayoutConfig {
+import {LogicalGridLayout} from '../../index';
 
-  constructor(options) {
+export interface LogicalGridLayoutConfigOptions {
+  hgap: number;
+  vgap: number;
+  columnWidth: number;
+  rowHeight: number;
+  minWidth: number;
+}
+
+export default class LogicalGridLayoutConfig implements LogicalGridLayoutConfigOptions {
+  hgap: number;
+  vgap: number;
+  columnWidth: number;
+  rowHeight: number;
+  minWidth: number;
+
+  constructor(options: LogicalGridLayoutConfigOptions) {
     this._extend(options);
   }
 
-  _extend(options) {
+  protected _extend(options) {
     // -1 means use the UI defaults
     options = options || {};
     if (options.hgap > -1) {
@@ -34,11 +49,11 @@ export default class LogicalGridLayoutConfig {
     }
   }
 
-  clone() {
+  clone(): LogicalGridLayoutConfig {
     return new LogicalGridLayoutConfig(this);
   }
 
-  applyToLayout(layout) {
+  applyToLayout(layout: LogicalGridLayout) {
     layout.layoutConfig = this;
     if (this.hgap !== null && this.hgap !== undefined) {
       layout.hgap = this.hgap;
@@ -57,9 +72,9 @@ export default class LogicalGridLayoutConfig {
     }
   }
 
-  static ensure(layoutConfig) {
+  static ensure(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigOptions): LogicalGridLayoutConfig {
     if (!layoutConfig) {
-      return layoutConfig;
+      return null;
     }
     if (layoutConfig instanceof LogicalGridLayoutConfig) {
       return layoutConfig;

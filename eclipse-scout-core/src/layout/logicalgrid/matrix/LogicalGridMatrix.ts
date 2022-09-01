@@ -8,38 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridMatrixCell, LogicalGridMatrixCursor} from '../../../index';
+import {LogicalGridMatrixCell, LogicalGridMatrixCursor, Point} from '../../../index';
 
 export default class LogicalGridMatrix {
+  protected _cursor: LogicalGridMatrixCursor;
+  protected _assignedCells: LogicalGridMatrixCell[][];
 
-  constructor(cursor) {
+  constructor(cursor: LogicalGridMatrixCursor) {
     this._cursor = cursor;
     this._assignedCells = [];
   }
 
-  getColumnCount() {
+  getColumnCount(): number {
     return this._cursor.columnCount;
   }
 
-  getRowCount() {
+  getRowCount(): number {
     return this._cursor.rowCount;
   }
 
-  _setAssignedCell(index, val) {
+  protected _setAssignedCell(index: Point, val: LogicalGridMatrixCell) {
     if (!this._assignedCells[index.x]) {
       this._assignedCells[index.x] = [];
     }
     this._assignedCells[index.x][index.y] = val;
   }
 
-  _getAssignedCell(index) {
+  protected _getAssignedCell(index: Point): LogicalGridMatrixCell {
     if (!this._assignedCells[index.x]) {
       return null;
     }
     return this._assignedCells[index.x][index.y];
   }
 
-  _nextFree(w, h) {
+  protected _nextFree(w: number, h: number): boolean {
     if (!this._cursor.increment()) {
       return false;
     }
@@ -53,7 +55,7 @@ export default class LogicalGridMatrix {
     return true;
   }
 
-  _isAllCellFree(x, y, w, h) {
+  protected _isAllCellFree(x: number, y: number, w, h): boolean {
     if (x + w > this._cursor.startX + this._cursor.columnCount || y + h > this._cursor.startY + this._cursor.rowCount) {
       return false;
     }
@@ -64,7 +66,7 @@ export default class LogicalGridMatrix {
     });
   }
 
-  toString() {
+  toString(): string {
     let ret = '----Group Box Grid Matrix [orientation=' + this._cursor.orientation + ', columnCount=' + this.getColumnCount() + ', rowCount=' + this.getRowCount() + ']--------------\n';
     let tempCursor = new LogicalGridMatrixCursor(0, 0, this.getColumnCount(), this.getRowCount(), this._cursor.orientation);
     while (tempCursor.increment()) {

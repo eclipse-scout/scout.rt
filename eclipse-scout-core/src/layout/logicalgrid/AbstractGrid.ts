@@ -8,14 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GridData, LogicalGrid} from '../../index';
+import {GridData, LogicalGrid, LogicalGridContainer, Widget} from '../../index';
+import {LogicalGridOptions} from './LogicalGrid';
+import {LogicalGridWidget} from './LogicalGridData';
 
 /**
  * @abstract
  */
 export default class AbstractGrid extends LogicalGrid {
+  gridRows: number;
+  gridColumns: number;
 
-  constructor(options) {
+  constructor(options?: LogicalGridOptions) {
     super(options);
     this.gridRows = 0;
     this.gridColumns = 0;
@@ -23,9 +27,8 @@ export default class AbstractGrid extends LogicalGrid {
 
   /**
    * Expects this.gridConfig to be set
-   * @override
    */
-  _validate(gridContainer) {
+  protected _validate(gridContainer: LogicalGridContainer) {
     // reset old state
     this.gridRows = 0;
     this.gridConfig.setWidget(gridContainer);
@@ -45,8 +48,7 @@ export default class AbstractGrid extends LogicalGrid {
           notContainingGridXYCount++;
         }
       } else {
-        let gd = GridData.createFromHints(widget, 1);
-        widget.gridData = gd;
+        widget.gridData = GridData.createFromHints(widget, 1);
       }
     });
     if (containingGridXYCount > 0 && notContainingGridXYCount === 0) {
@@ -56,7 +58,7 @@ export default class AbstractGrid extends LogicalGrid {
     }
   }
 
-  layoutAllStatic(widgets) {
+  layoutAllStatic(widgets: LogicalGridWidget[]) {
     let hints = [];
     widgets.forEach(v => {
       hints.push(GridData.createFromHints(v, 1));
@@ -76,22 +78,22 @@ export default class AbstractGrid extends LogicalGrid {
     this.gridColumns = totalGridW;
   }
 
-  layoutAllDynamic(widgets) {
+  layoutAllDynamic(widgets: LogicalGridWidget[]) {
     // abstract, must be implemented by sub classes
   }
 
-  getGridColumnCount() {
+  getGridColumnCount(): number {
     return this.gridColumns;
   }
 
-  getGridRowCount() {
+  getGridRowCount(): number {
     return this.gridRows;
   }
 
   /**
    * If grid w is greater than column count, grid w will be set to the column count.
    */
-  static getGridDataFromHints(widget, groupBoxColumnCount) {
+  static getGridDataFromHints(widget: Widget, groupBoxColumnCount: number): GridData {
     let data = GridData.createFromHints(widget, groupBoxColumnCount);
     data.w = Math.min(groupBoxColumnCount, data.w);
     return data;
