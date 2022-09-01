@@ -13,7 +13,8 @@ package org.eclipse.scout.rt.dataobject.id;
 import java.io.Serializable;
 
 /**
- * An interface to represent an id. The raw (wrapped) id is of the generic type <code>WRAPPED_TYPE</code>.
+ * An interface to represent an arbitrary id. The type of the raw (wrapped) id is not further specified. See various
+ * sub-interfaces for commonly used wrapped id types.
  * <p>
  * Subclasses must provide the following static factory methods:
  * <ul>
@@ -21,6 +22,8 @@ import java.io.Serializable;
  * <code>null</code> if the given {@link String} is <code>null</code>, otherwise the wrapped value.
  * </ul>
  * <p>
+ * @see IUuId
+ * @see IStringId
  */
 public interface IId extends Serializable {
 
