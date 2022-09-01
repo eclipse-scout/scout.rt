@@ -11,25 +11,40 @@
 import {AbstractLayout, Dimension, HtmlComponent, scout} from '../index';
 import $ from 'jquery';
 
-export default class ColumnLayout extends AbstractLayout {
+export interface ColumnLayoutData {
+  widthHint?: number;
+}
 
-  constructor(options) {
+export interface ColumnLayoutOptions {
+  /** If true, all elements will be as height as the container. Default is true. */
+  stretch: boolean;
+
+  /** If true, the layout won't change the width of the elements because they depend on the width set by the stylesheet. Default is false. */
+  useCssWidth: number;
+}
+
+/**
+ * ColumnLayout = each child element represents a column
+ * +------+---+------+
+ * |      |   |      |
+ * +------+---+------+
+ */
+export default class ColumnLayout extends AbstractLayout implements ColumnLayoutOptions {
+  stretch: boolean;
+  useCssWidth: number;
+
+  constructor(options?: ColumnLayoutOptions) {
     super();
-    options = options || {};
+    options = options || {} as ColumnLayoutOptions;
     this.stretch = scout.nvl(options.stretch, true);
     this.useCssWidth = scout.nvl(options.useCssWidth, false);
-
-    // ColumnLayout = each child element represents a column
-    // +------+---+------+
-    // |      |   |      |
-    // +------+---+------+
   }
 
-  _getChildren($container) {
+  protected _getChildren($container: JQuery): JQuery {
     return $container.children();
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let htmlComp = HtmlComponent.get($container);
     let containerSize = htmlComp.availableSize()
       .subtract(htmlComp.insets());
@@ -51,8 +66,8 @@ export default class ColumnLayout extends AbstractLayout {
       }
 
       // Use layout data width if set
-      if (htmlChild.layoutData && htmlChild.layoutData.widthHint) {
-        childPrefSize.width = htmlChild.layoutData.widthHint;
+      if (htmlChild.layoutData && (<ColumnLayoutData>htmlChild.layoutData).widthHint) {
+        childPrefSize.width = (<ColumnLayoutData>htmlChild.layoutData).widthHint;
       }
       if (this.useCssWidth) {
         htmlChild.$comp.cssHeight(childPrefSize.height);
@@ -63,7 +78,7 @@ export default class ColumnLayout extends AbstractLayout {
     });
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options): Dimension {
     let prefSize = new Dimension(),
       htmlContainer = HtmlComponent.get($container),
       childOptions = {
@@ -79,8 +94,8 @@ export default class ColumnLayout extends AbstractLayout {
 
       let childPrefSize = htmlChild.prefSize(childOptions);
       // Use layout data width if set
-      if (htmlChild.layoutData && htmlChild.layoutData.widthHint) {
-        childPrefSize.width = htmlChild.layoutData.widthHint;
+      if (htmlChild.layoutData && (<ColumnLayoutData>htmlChild.layoutData).widthHint) {
+        childPrefSize.width = (<ColumnLayoutData>htmlChild.layoutData).widthHint;
       }
       childPrefSize = childPrefSize.add(htmlChild.margins());
       prefSize.width = prefSize.width + childPrefSize.width;

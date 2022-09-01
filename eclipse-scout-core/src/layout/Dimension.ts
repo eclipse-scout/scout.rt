@@ -9,55 +9,63 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-/**
- * JavaScript port from java.awt.Dimension.
- * @param {number|Dimension} vararg width (number) or otherDimension (Dimension)
- * @param {number} [height] number or undefined (when vararg is Dimension)
- */
-export default class Dimension {
+import {Insets} from '../index';
 
-  constructor(vararg, height) {
-    if (vararg instanceof Dimension) {
-      this.width = vararg.width;
-      this.height = vararg.height;
+export default class Dimension {
+  width: number;
+  height: number;
+
+  /**
+   * If no parameters are passed, all members are initialized with 0.
+   */
+  constructor(widthOrDimension?: number | Dimension, height?: number) {
+    if (widthOrDimension instanceof Dimension) {
+      this.width = widthOrDimension.width;
+      this.height = widthOrDimension.height;
     } else {
-      this.width = vararg || 0;
+      this.width = widthOrDimension || 0;
       this.height = height || 0;
     }
   }
 
-  toString() {
+  toString(): string {
     return 'Dimension[width=' + this.width + ' height=' + this.height + ']';
   }
 
-  equals(o) {
+  equals(o: Dimension): boolean {
     if (!o) {
       return false;
     }
     return (this.width === o.width && this.height === o.height);
   }
 
-  clone() {
+  clone(): Dimension {
     return new Dimension(this.width, this.height);
   }
 
-  subtract(insets) {
+  subtract(insets: Insets): Dimension {
     return new Dimension(
       this.width - insets.horizontal(),
       this.height - insets.vertical());
   }
 
-  add(insets) {
+  add(insets: Insets): Dimension {
     return new Dimension(
       this.width + insets.horizontal(),
       this.height + insets.vertical());
   }
 
-  floor() {
+  /**
+   * Creates a copy and calls Math.floor() on each property.
+   */
+  floor(): Dimension {
     return new Dimension(Math.floor(this.width), Math.floor(this.height));
   }
 
-  ceil() {
+  /**
+   * Creates a copy and calls Math.ceil() on each property.
+   */
+  ceil(): Dimension {
     return new Dimension(Math.ceil(this.width), Math.ceil(this.height));
   }
 }

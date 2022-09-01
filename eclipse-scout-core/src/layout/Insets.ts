@@ -9,53 +9,63 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-/**
- * JavaScript port from java.awt.Insets.
- */
 export default class Insets {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
 
-  constructor(vararg, right, bottom, left) {
-    if (vararg instanceof Insets) {
-      this.top = vararg.top;
-      this.right = vararg.right;
-      this.bottom = vararg.bottom;
-      this.left = vararg.left;
+  /**
+   * If no parameters are passed, all members are initialized with 0.
+   */
+  constructor(leftOrInsets?: number | Insets, right?: number, bottom?: number, left?: number) {
+    if (leftOrInsets instanceof Insets) {
+      this.top = leftOrInsets.top;
+      this.right = leftOrInsets.right;
+      this.bottom = leftOrInsets.bottom;
+      this.left = leftOrInsets.left;
     } else {
-      this.top = vararg || 0;
+      this.top = leftOrInsets || 0;
       this.right = right || 0;
       this.bottom = bottom || 0;
       this.left = left || 0;
     }
   }
 
-  toString() {
+  toString(): string {
     return 'Insets[top=' + this.top + ' right=' + this.right + ' bottom=' + this.bottom + ' left=' + this.left + ']';
   }
 
-  equals(o) {
+  equals(o: Insets): boolean {
     return this.top === o.top &&
       this.right === o.right &&
       this.bottom === o.bottom &&
       this.left === o.left;
   }
 
-  clone() {
+  clone(): Insets {
     return new Insets(this.top, this.right, this.bottom, this.left);
   }
 
-  horizontal() {
+  horizontal(): number {
     return this.right + this.left;
   }
 
-  vertical() {
+  vertical(): number {
     return this.top + this.bottom;
   }
 
-  floor() {
+  /**
+   * Creates a copy and calls Math.floor() on each property.
+   */
+  floor(): Insets {
     return new Insets(Math.floor(this.top), Math.floor(this.right), Math.floor(this.bottom), Math.floor(this.left));
   }
 
-  ceil() {
+  /**
+   * Creates a copy and calls Math.ceil() on each property.
+   */
+  ceil(): Insets {
     return new Insets(Math.ceil(this.top), Math.ceil(this.right), Math.ceil(this.bottom), Math.ceil(this.left));
   }
 }

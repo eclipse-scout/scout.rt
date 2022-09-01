@@ -1,3 +1,5 @@
+// noinspection DuplicatedCode
+
 /*
  * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -8,13 +10,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Dimension, HtmlComponent, LayoutConstants, LogicalGridData, Rectangle, TreeSet} from '../../index';
+import {arrays, Dimension, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LayoutConstants, LogicalGridData, Rectangle, TreeSet} from '../../index';
 import $ from 'jquery';
 
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayoutInfo.
  */
 export default class LogicalGridLayoutInfo {
+  gridDatas: LogicalGridData[];
+  cons: LogicalGridData[];
+  cols: number;
+  compSize: Dimension[];
+  rows: number;
+  width: number[][];
+  widthHints: number[];
+  height: number[][];
+  weightX: number[];
+  weightY: number[];
+  hgap: number;
+  vgap: number;
+  rowHeight: number;
+  columnWidth: number;
+  cellBounds: Rectangle[][];
+  widthHint: number;
+  widthOnly: boolean;
+  $components: JQuery[];
 
   constructor(model) {
     this.gridDatas = [];
@@ -96,7 +116,6 @@ export default class LogicalGridLayoutInfo {
         }
       }
     }
-    //
     this.cols = usedCols.size();
     this.rows = usedRows.size();
 
@@ -104,7 +123,7 @@ export default class LogicalGridLayoutInfo {
     this._initializeInfo();
   }
 
-  _initializeInfo() {
+  protected _initializeInfo() {
     let compCount = this.$components.length;
     let uiHeightElements = [];
     for (let i = 0; i < compCount; i++) {
@@ -146,7 +165,7 @@ export default class LogicalGridLayoutInfo {
         // Calculate preferred width otherwise
         // This size is needed by _initializeColumns
         // But only if really needed by the logical grid layout (because it is expensive)
-        size = this.uiSizeInPixel($comp, cons);
+        size = this.uiSizeInPixel($comp);
       }
       if (cons.heightHint > 0) {
         // Use explicit height hint, if set
@@ -184,7 +203,7 @@ export default class LogicalGridLayoutInfo {
       if (!cons.fillHorizontal) {
         widthHint = Math.min(widthHint, this.compSize[elem.index].width);
       }
-      this.compSize[elem.index] = this.uiSizeInPixel($comp, cons, {
+      this.compSize[elem.index] = this.uiSizeInPixel($comp, {
         widthHint: widthHint
       });
     }, this);
@@ -193,7 +212,7 @@ export default class LogicalGridLayoutInfo {
     this._initializeRows();
   }
 
-  _initializeColumns() {
+  protected _initializeColumns() {
     let compSize = this.compSize;
     let compCount = compSize.length;
     let prefWidths = arrays.init(this.cols, 0);
@@ -301,7 +320,7 @@ export default class LogicalGridLayoutInfo {
     }
   }
 
-  _initializeRows() {
+  protected _initializeRows() {
     let compSize = this.compSize;
     let compCount = compSize.length;
     let prefHeights = arrays.init(this.rows, 0);
@@ -408,7 +427,7 @@ export default class LogicalGridLayoutInfo {
     }
   }
 
-  layoutCellBounds(size, insets) {
+  layoutCellBounds(size: Dimension, insets: Insets): Rectangle[][] {
     let w = this.layoutSizes(size.width - insets.horizontal() - Math.max(0, (this.cols - 1) * this.hgap), this.width, this.weightX);
     let h = this.layoutSizes(size.height - insets.vertical() - Math.max(0, (this.rows - 1) * this.vgap), this.height, this.weightY);
     this.cellBounds = arrays.init(this.rows, null);
@@ -428,11 +447,10 @@ export default class LogicalGridLayoutInfo {
     return this.cellBounds;
   }
 
-  layoutSizes(targetSize, sizes, weights) {
-    let i;
+  layoutSizes(targetSize: number, sizes: number[][], weights: number[]): number[] {
     let outSizes = arrays.init(sizes.length, 0);
     if (targetSize <= 0) {
-      for (i = 0; i < sizes.length; i++) {
+      for (let i = 0; i < sizes.length; i++) {
         outSizes[i] = sizes[i][LayoutConstants.MIN];
       }
       return outSizes;
@@ -440,7 +458,7 @@ export default class LogicalGridLayoutInfo {
     let sumSize = 0;
     let tmpWeight = arrays.init(weights.length, 0.0);
     let sumWeight = 0;
-    for (i = 0; i < sizes.length; i++) {
+    for (let i = 0; i < sizes.length; i++) {
       outSizes[i] = sizes[i][LayoutConstants.PREF];
       sumSize += outSizes[i];
       tmpWeight[i] = weights[i];
@@ -459,7 +477,7 @@ export default class LogicalGridLayoutInfo {
     }
     // normalize weights
     if (sumWeight > 0) {
-      for (i = 0; i < tmpWeight.length; i++) {
+      for (let i = 0; i < tmpWeight.length; i++) {
         tmpWeight[i] = tmpWeight[i] / sumWeight;
       }
     }
@@ -475,7 +493,7 @@ export default class LogicalGridLayoutInfo {
         hasTargets = true;
         while (deltaInt > 0 && hasTargets) {
           hasTargets = false;
-          for (i = 0; i < outSizes.length && deltaInt > 0; i++) {
+          for (let i = 0; i < outSizes.length && deltaInt > 0; i++) {
             if (tmpWeight[i] > 0 && outSizes[i] < sizes[i][LayoutConstants.MAX]) {
               hasTargets = true;
               accWeight[i] += tmpWeight[i];
@@ -492,7 +510,7 @@ export default class LogicalGridLayoutInfo {
         hasTargets = true;
         while (deltaInt < 0 && hasTargets) {
           hasTargets = false;
-          for (i = 0; i < outSizes.length && deltaInt < 0; i++) {
+          for (let i = 0; i < outSizes.length && deltaInt < 0; i++) {
             if (tmpWeight[i] > 0 && outSizes[i] > sizes[i][LayoutConstants.MIN]) {
               hasTargets = true;
               accWeight[i] += tmpWeight[i];
@@ -509,26 +527,26 @@ export default class LogicalGridLayoutInfo {
     return outSizes;
   }
 
-  logicalWidthInPixel(cons) {
+  logicalWidthInPixel(cons: LogicalGridData): number {
     let gridW = cons.gridw;
     return (this.columnWidth * gridW) + (this.hgap * Math.max(0, gridW - 1));
   }
 
-  logicalHeightInPixel(cons) {
-    let gridH = cons.gridh,
-      addition = cons.logicalRowHeightAddition || 0;
+  logicalHeightInPixel(cons: LogicalGridData): number {
+    let gridH = cons.gridh;
+    let addition = cons.logicalRowHeightAddition || 0;
     return (this.rowHeight * gridH) + (this.vgap * Math.max(0, gridH - 1)) + addition;
   }
 
-  uiSizeInPixel($comp, cons, options) {
+  uiSizeInPixel($comp: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let htmlComp = HtmlComponent.get($comp);
     return htmlComp.prefSize(options).add(htmlComp.margins());
   }
 
   /**
-   * @returns {number|null} the width hint for the given gridData
+   * @returns the width hint for the given gridData
    */
-  widthHintForGridData(gridData) {
+  widthHintForGridData(gridData: LogicalGridData): number | null {
     if (this.widthHints.length === 0) {
       return null;
     }

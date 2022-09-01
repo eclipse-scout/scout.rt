@@ -12,9 +12,11 @@ import {CompositeField, FormField, graphics, GridData, LayoutData, objects, Widg
 
 export interface LogicalGridWidget extends Widget {
   gridData: GridData;
+  gridDataHints?: GridData;
+  label?: string;
   labelVisible?: boolean;
-  $label: JQuery;
-  labelPosition: number; // FIXME TS use FormField.LabelPosition
+  $label?: JQuery;
+  labelPosition?: number; // FIXME TS use FormField.LabelPosition
 }
 
 function isLogicalGridWidget(widget): widget is LogicalGridWidget {

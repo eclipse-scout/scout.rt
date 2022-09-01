@@ -19,6 +19,7 @@ export default class FlexboxLayoutData implements LayoutData {
   shrink: number;
   sizePx: number;
   initialPx: number;
+  diff: number;
 
   constructor(model?: FlexboxLayoutData) {
     this._prepare();
@@ -32,6 +33,7 @@ export default class FlexboxLayoutData implements LayoutData {
     // ui properties
     this.sizePx = null; // current display size in pixel
     this.initialPx = null; // initial in pixel
+    this.diff = null;
   }
 
   protected _prepare() {

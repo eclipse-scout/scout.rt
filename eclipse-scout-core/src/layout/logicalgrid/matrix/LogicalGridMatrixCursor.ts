@@ -8,9 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default class LogicalGridMatrixCursor {
+import {EnumObject, Point} from '../../../index';
 
-  constructor(x, y, columnCount, rowCount, orientation) {
+export type LogicalGridMatrixOrientation = EnumObject<typeof LogicalGridMatrixCursor.Orientation>;
+
+export default class LogicalGridMatrixCursor {
+  startX: number;
+  startY: number;
+  columnCount: number;
+  rowCount: number;
+  orientation: LogicalGridMatrixOrientation;
+  protected _currentIndex: Point;
+
+  constructor(x: number, y: number, columnCount: number, rowCount: number, orientation: LogicalGridMatrixOrientation) {
     this.startX = x;
     this.startY = y;
     this.columnCount = columnCount;
@@ -20,29 +30,25 @@ export default class LogicalGridMatrixCursor {
     this.reset();
   }
 
-  static HORIZONTAL = 0;
-  static VERTICAL = 1;
+  static Orientation = {
+    HORIZONTAL: 0,
+    VERTICAL: 1
+  } as const;
 
   reset() {
-    this._currentIndex = {
-      x: -1,
-      y: -1
-    };
+    this._currentIndex = new Point(-1, -1);
   }
 
-  currentIndex() {
-    return {
-      x: this._currentIndex.x,
-      y: this._currentIndex.y
-    };
+  currentIndex(): Point {
+    return new Point(this._currentIndex.x, this._currentIndex.y);
   }
 
-  increment() {
+  increment(): boolean {
     if (this._currentIndex.x < 0 || this._currentIndex.y < 0) {
       // initial
       this._currentIndex.x = this.startX;
       this._currentIndex.y = this.startY;
-    } else if (this.orientation === LogicalGridMatrixCursor.HORIZONTAL) {
+    } else if (this.orientation === LogicalGridMatrixCursor.Orientation.HORIZONTAL) {
       this._currentIndex.x++;
       if (this._currentIndex.x >= this.startX + this.columnCount) {
         this._currentIndex.x = this.startX;
@@ -62,13 +68,13 @@ export default class LogicalGridMatrixCursor {
     return true;
   }
 
-  decrement() {
+  decrement(): boolean {
     if (this._currentIndex.x < 0 || this._currentIndex.y < 0) {
       return false;
     } else if (this._currentIndex.x >= this.startX + this.columnCount || this._currentIndex.y >= this.startY + this.rowCount) {
       this._currentIndex.x = this.startX + this.columnCount - 1;
       this._currentIndex.y = this.startY + this.rowCount - 1;
-    } else if (this.orientation === LogicalGridMatrixCursor.HORIZONTAL) {
+    } else if (this.orientation === LogicalGridMatrixCursor.Orientation.HORIZONTAL) {
       this._currentIndex.x--;
       if (this._currentIndex.x < this.startX) {
         this._currentIndex.x = this.startX + this.columnCount - 1;
@@ -88,7 +94,7 @@ export default class LogicalGridMatrixCursor {
     return true;
   }
 
-  toString() {
+  toString(): string {
     let builder = [];
     builder.push('MatrixCursor [');
     builder.push('orientation=' + this.orientation);
