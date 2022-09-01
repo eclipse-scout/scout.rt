@@ -8,55 +8,59 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, Point} from '../index';
+import {Dimension, Insets, Point} from '../index';
 
-/**
- * JavaScript port from java.awt.Rectangle.
- */
 export default class Rectangle {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 
-  constructor(vararg, y, width, height) {
-    if (vararg instanceof Rectangle) {
-      this.x = vararg.x;
-      this.y = vararg.y;
-      this.width = vararg.width;
-      this.height = vararg.height;
+  /**
+   * If no parameters are passed, all members are initialized with 0.
+   */
+  constructor(xOrRectangle?: number | Rectangle, y?: number, width?: number, height?: number) {
+    if (xOrRectangle instanceof Rectangle) {
+      this.x = xOrRectangle.x;
+      this.y = xOrRectangle.y;
+      this.width = xOrRectangle.width;
+      this.height = xOrRectangle.height;
     } else {
-      this.x = vararg || 0;
+      this.x = xOrRectangle || 0;
       this.y = y || 0;
       this.width = width || 0;
       this.height = height || 0;
     }
   }
 
-  toString() {
+  toString(): string {
     return 'Rectangle[x=' + this.x + ' y=' + this.y + ' width=' + this.width + ' height=' + this.height + ']';
   }
 
-  equals(o) {
+  equals(o: Rectangle): boolean {
     if (!o) {
       return false;
     }
     return (this.x === o.x && this.y === o.y && this.width === o.width && this.height === o.height);
   }
 
-  clone() {
+  clone(): Rectangle {
     return new Rectangle(this.x, this.y, this.width, this.height);
   }
 
-  center() {
+  center(): Point {
     return new Point(this.x + this.width / 2, this.y + this.height / 2);
   }
 
-  right() {
+  right(): number {
     return this.x + this.width;
   }
 
-  bottom() {
+  bottom(): number {
     return this.y + this.height;
   }
 
-  contains(x, y) {
+  contains(x: number, y: number): boolean {
     return y >= this.y && y < this.y + this.height && x >= this.x && x < this.x + this.width;
   }
 
@@ -65,9 +69,9 @@ export default class Rectangle {
    * This means the two rectangles share at least one internal point.
    *
    * @param r the rectangle to test against
-   * @return {boolean} true if the specified rectangle intersects this one
+   * @return true if the specified rectangle intersects this one
    */
-  intersects(r) {
+  intersects(r: Rectangle): boolean {
     if (!r) {
       return false;
     }
@@ -77,9 +81,9 @@ export default class Rectangle {
   }
 
   /**
-   * @returns {Rectangle}
+   * Subtracts the given insets from the rectangle.
    */
-  subtract(insets) {
+  subtract(insets: Insets): Rectangle {
     return new Rectangle(
       this.x + insets.left,
       this.y + insets.top,
@@ -89,9 +93,8 @@ export default class Rectangle {
 
   /**
    * Subtracts the insets only from the dimension properties (width and height)
-   * @returns {Rectangle}
    */
-  subtractFromDimension(insets) {
+  subtractFromDimension(insets: Insets): Rectangle {
     return new Rectangle(
       this.x,
       this.y,
@@ -105,7 +108,7 @@ export default class Rectangle {
    * @param dx the distance to move the rectangle along the x axis.
    * @param dy the distance to move the rectangle along the y axis.
    */
-  translate(dx, dy) {
+  translate(dx: number, dy: number): Rectangle {
     return new Rectangle(
       this.x + dx,
       this.y + dy,
@@ -114,20 +117,20 @@ export default class Rectangle {
   }
 
   /**
-   * @returns {Point} property x and y of this instance as new Point instance
+   * @returns property x and y of this instance as new {@link Point} instance.
    */
-  point() {
+  point(): Point {
     return new Point(this.x, this.y);
   }
 
   /**
-   * @returns {Dimension} property width and height of this instance as new Dimension instance
+   * @returns property width and height of this instance as new {@link Dimension} instance.
    */
-  dimension() {
+  dimension(): Dimension {
     return new Dimension(this.width, this.height);
   }
 
-  union(r) {
+  union(r: Rectangle): Rectangle {
     let tx2 = this.width;
     let ty2 = this.height;
     if (tx2 < 0 || ty2 < 0) {
@@ -178,11 +181,17 @@ export default class Rectangle {
     return new Rectangle(tx1, ty1, tx2, ty2);
   }
 
-  floor() {
+  /**
+   * Creates a copy and calls Math.floor() on each property.
+   */
+  floor(): Rectangle {
     return new Rectangle(Math.floor(this.x), Math.floor(this.y), Math.floor(this.width), Math.floor(this.height));
   }
 
-  ceil() {
+  /**
+   * Creates a copy and calls Math.ceil() on each property.
+   */
+  ceil(): Rectangle {
     return new Rectangle(Math.ceil(this.x), Math.ceil(this.y), Math.ceil(this.width), Math.ceil(this.height));
   }
 }

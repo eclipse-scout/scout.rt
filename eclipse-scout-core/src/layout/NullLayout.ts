@@ -11,16 +11,9 @@
 import {AbstractLayout, HtmlComponent} from '../index';
 import $ from 'jquery';
 
-/**
- * Null Layout.
- */
 export default class NullLayout extends AbstractLayout {
 
-  constructor() {
-    super();
-  }
-
-  layout($container) {
+  override layout($container: JQuery) {
     $container.children().each(function() {
       let htmlComp = HtmlComponent.optGet($(this));
       if (htmlComp) {

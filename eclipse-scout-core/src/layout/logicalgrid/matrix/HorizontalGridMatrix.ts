@@ -8,17 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GridData, LogicalGridMatrix, LogicalGridMatrixCell, LogicalGridMatrixCursor} from '../../../index';
+import {GridData, LogicalGridMatrix, LogicalGridMatrixCell, LogicalGridMatrixCursor, Point} from '../../../index';
+import {LogicalGridWidget} from '../LogicalGridData';
 
 export default class HorizontalGridMatrix extends LogicalGridMatrix {
+  rowCount: number;
 
-  constructor(columnCount) {
-    super(new LogicalGridMatrixCursor(0, 0, columnCount, Number.MAX_SAFE_INTEGER, LogicalGridMatrixCursor.HORIZONTAL));
+  constructor(columnCount: number) {
+    super(new LogicalGridMatrixCursor(0, 0, columnCount, Number.MAX_SAFE_INTEGER, LogicalGridMatrixCursor.Orientation.HORIZONTAL));
 
     this.rowCount = 0;
   }
 
-  computeGridData(widgets) {
+  computeGridData(widgets: LogicalGridWidget[]): boolean {
     widgets.forEach(widget => {
       let hints = GridData.createFromHints(widget, this.getColumnCount());
       let gridData = new GridData(hints);
@@ -30,7 +32,7 @@ export default class HorizontalGridMatrix extends LogicalGridMatrix {
     return true;
   }
 
-  _add(widget, hints, data) {
+  protected _add(widget: LogicalGridWidget, hints: GridData, data: GridData) {
     this._nextFree(data.w, data.h);
     let currentIndex = this._cursor.currentIndex();
     if (data.w <= (this.getColumnCount() - currentIndex.x)) {
@@ -39,10 +41,7 @@ export default class HorizontalGridMatrix extends LogicalGridMatrix {
       // add widget
       for (let xx = currentIndex.x; xx < currentIndex.x + data.w; xx++) {
         for (let yy = currentIndex.y; yy < currentIndex.y + data.h; yy++) {
-          this._setAssignedCell({
-            x: xx,
-            y: yy
-          }, new LogicalGridMatrixCell(widget, data));
+          this._setAssignedCell(new Point(xx, yy), new LogicalGridMatrixCell(widget, data));
         }
       }
       this.rowCount = currentIndex.y + data.h;

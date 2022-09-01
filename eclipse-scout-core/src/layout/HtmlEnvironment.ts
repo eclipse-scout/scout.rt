@@ -15,10 +15,21 @@ let instance;
  * @singleton
  */
 export default class HtmlEnvironment extends EventEmitter {
+  formRowHeight: number;
+
+  formRowGap: number;
+  formColumnWidth: number;
+
+  /** 40 pixel actual form gap - fieldMandatoryIndicatorWidth */
+  formColumnGap: number;
+
+  smallColumnGap: number;
+  fieldLabelWidth: number;
+  fieldMandatoryIndicatorWidth: number;
+  fieldStatusWidth: number;
 
   constructor() {
     super();
-
     // -------------------------------
     // The values for these properties are defined using CSS (sizes.less).
     // The following values are default values in case the CSS values are not available.
@@ -26,14 +37,14 @@ export default class HtmlEnvironment extends EventEmitter {
     this.formRowHeight = 30;
     this.formRowGap = 10;
     this.formColumnWidth = 420;
-    this.formColumnGap = 32; // 40 pixel actual form gap - fieldMandatoryIndicatorWidth
+    this.formColumnGap = 32;
     this.smallColumnGap = 4;
     this.fieldLabelWidth = 140;
     this.fieldMandatoryIndicatorWidth = 8;
     this.fieldStatusWidth = 20;
   }
 
-  init(additionalClass) {
+  init(additionalClass?: string) {
     additionalClass = additionalClass ? ' ' + additionalClass : '';
     this.formRowHeight = styles.getSize('html-env-logical-grid-row' + additionalClass, 'height', 'height', this.formRowHeight);
     this.formRowGap = styles.getSize('html-env-logical-grid-row' + additionalClass, 'margin-bottom', 'marginBottom', this.formRowGap);
@@ -50,10 +61,7 @@ export default class HtmlEnvironment extends EventEmitter {
     this.trigger('propertyChange', event);
   }
 
-  /**
-   * @returns {HtmlEnvironment}
-   */
-  static get() {
+  static get(): HtmlEnvironment {
     return instance;
   }
 }
