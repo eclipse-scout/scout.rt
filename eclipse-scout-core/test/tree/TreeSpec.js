@@ -2785,16 +2785,11 @@ describe('Tree', () => {
     });
   });
 
-  describe('destroy tree nodes', () => {
-
-    let tree;
-
-    beforeEach(() => {
-      let model = helper.createModelFixture(2, 1, false);
-      tree = helper.createTree(model);
-    });
+  describe('destroy', () => {
 
     it('should destroy all tree nodes and set destroyed flag', () => {
+      let model = helper.createModelFixture(2, 1, false);
+      let tree = helper.createTree(model);
       let nodesMapCopy = $.extend({}, tree.nodesMap);
       objects.values(nodesMapCopy).forEach(node => {
         expect(node.destroyed).toBe(false);
@@ -2807,6 +2802,36 @@ describe('Tree', () => {
       expect(tree.nodes.length).toBe(0);
     });
 
+    it('with animateRemoval should prevent upcoming dom modifications', () => {
+      $('<style>' +
+        '.tree-node {height: 30px; }' +
+        '.tree {height: 50px; overflow: hidden;}' +
+        '.tree-data.scrollable-tree {height: 50px; overflow: hidden;}' +
+        '</style>').appendTo($('#sandbox'));
+      let model = helper.createModelFixture(10, 1, false);
+      let tree = helper.createTree(model);
+      tree.render();
+      tree.scrollToBottom();
+      tree._onScroll();
+
+      // Don't remove tree immediately after destroying
+      tree.animateRemoval = true;
+      tree.destroy();
+      expect(tree.$nodes().length).toBe(10);
+      expect(tree.viewRangeRendered.size()).toBe(10);
+
+      // Delete and insert must not modify dom when tree is being removed
+      tree.deleteAllNodes();
+      tree.insertNodes(helper.createModelNodes(15));
+      expect(tree.$nodes().length).toBe(10);
+      expect(tree.viewRangeRendered.size()).toBe(10);
+
+      tree.$data[0].scrollTop = 0; // Ensure onScroll will try to render the viewport because scrollTop has changed
+      tree._onScroll();
+      expect(tree.$nodes().length).toBe(10);
+      expect(tree.viewRangeRendered.size()).toBe(10);
+      // Must not throw exception
+    });
   });
 
   describe('ensureExpansionVisible', () => {
