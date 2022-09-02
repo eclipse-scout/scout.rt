@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -106,12 +106,18 @@ export function isOneOf(value, ...args): boolean {
   return argsToCheck.indexOf(value) !== -1;
 }
 
+export interface ObjectWithType {
+  objectType: string;
+}
+
+export type ModelOf<T> = T extends { model: object } ? T['model'] : object;
+
 /**
  * Creates a new object instance.
  * <p>
  * Delegates the create call to {@link ObjectFactory.create}.
  */
-export function create<T>(objectType: { new(): T } | string | { objectType: string }, model?: T extends { model: object } ? T['model'] : object, options?): T {
+export function create<T>(objectType: { new(model?: ModelOf<T>): T } | string | ObjectWithType, model?: ModelOf<T>, options?): T {
   return ObjectFactory.get().create(objectType, model, options);
 }
 
@@ -373,7 +379,7 @@ export function addObjectFactories(factories: { [objectType: string]: (model?) =
  * @param factory Function that constructs the object.
  * @see create
  */
-export function addObjectFactory(objectType: string | { new (): object }, factory: (model?) => any) {
+export function addObjectFactory(objectType: string | { new(): object }, factory: (model?) => any) {
   objectFactories.set(objectType, factory);
 }
 

@@ -1,84 +1,95 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
+import {DateFormatPatternTypes} from './DateFormatPatternType';
+import {DateFormat} from '../index';
+import {DateFormatContext, DateFormatParseContext} from './DateFormat';
+
+export interface DateFormatPatternDefinitionOptions {
+  /**
+   * The "group" where the pattern definition belongs to. E.g. "dd" and "d" belong to the same group "day".
+   * This is used during analysis to find other definitions for the same type. Use one of the constants defined in {@link DateFormatPatternType}.
+   */
+  type?: DateFormatPatternTypes;
+
+  /**
+   * An array consisting of all pattern terms that this particular definition can handle.
+   * Multiple terms with the same meaning may be accepted (e.g. "yyy", "yy" and "y" can be all used for a 2-digit year formatting, but different parsing rules may apply).
+   */
+  terms?: string[];
+
+  /**
+   * Reference to the corresponding dateFormat object.
+   */
+  dateFormat?: DateFormat;
+
+  /**
+   * An optional function that is used to format this particular term.
+   *   @param formatContext
+   *            See documentation at _createFormatContext().
+   *   @param acceptedTerm
+   *            The term that was accepted for this definition. This argument is usually only relevant,
+   *            if a definition can accept more than one term.
+   *   @return
+   *            The function may return a string as result. If a string is returned, it is appended
+   *            to the formatContext.formattedString automatically. If the formatFunction already did
+   *            this, it should return "undefined".
+   */
+  formatFunction?: (formatContext: DateFormatContext, acceptedTerm: string) => string;
+
+  /**
+   * A optional JavaScript RegExp object that is applied to the input string to extract this definition's term.
+   * The expression _must_ use exactly two capturing groups:
+   *   [1] = matched part of the input
+   *   [2] = remaining input (will be parsed later by other definitions)
+   * Example: /^(\d{4})(.*)$/
+   */
+  parseRegExp?: RegExp;
+
+  /**
+   * If 'parseRegExp' is set and found a match, and this function is defined, it is called to apply the matched part to the parseContext.
+   *   @param parseContext
+   *            See documentation at _createParseContext().
+   *   @param match
+   *            The first match from the reg exp.
+   *   @param acceptedTerm
+   *            The term that was accepted for this definition. This argument is usually only relevant, if a definition can accept more than one term.
+   */
+  applyMatchFunction?: (parseContext: DateFormatParseContext, match: string, acceptedTerm: string) => void;
+
+  /**
+   * If parsing is not possible with a regular expression, this function may be defined to execute more complex parse logic.
+   *   @param parseContext
+   *            See documentation at _createParseContext().
+   *   @param acceptedTerm
+   *            The term that was accepted for this definition. This argument is usually only relevant, if a definition can accept more than one term.
+   *   @return
+   *            A string with the matched part of the input, or null if it did not match.
+   */
+  parseFunction?: (parseContext: DateFormatParseContext, acceptedTerm: string) => string;
+}
+
 /**
  * Definition of a date format pattern.
- *
- * A definition provides the following properties (most of which can be set with the 'options' argument):
- *
- * type:
- *   The "group" where the pattern definition belongs to. E.g. "dd" and "d" belong to the same group "day".
- *   This is used during analysis to find other definitions for the same type. Use one of the constants
- *   defined in DateFormatPatternType.
- *
- * terms:
- *   An array consisting of all pattern terms that this particular definition can handle. Multiple
- *   terms with the same meaning may be accepted (e.g. "yyy", "yy" and "y" can be all used for a
- *   2-digit year formatting, but different parsing rules may apply).
- *
- * dateFormat:
- *   Reference to the corresponding dateFormat object.
- *
- * formatFunction:
- *   An optional function that is used to format this particular term.
- *   @param formatContext
- *            See documentation at _createFormatContext().
- *   @param acceptedTerm
- *            The term that was accepted for this definition. This argument is usually only relevant,
- *            if a definition can accept more than one term.
- *   @return
- *            The function may return a string as result. If a string is returned, it is appended
- *            to the formatContext.formattedString automatically. If the formatFunction already did
- *            this, it should return "undefined".
- *
- * parseRegExp:
- *   A optional JavaScript RegExp object that is applied to the input string to extract this
- *   definition's term. The expression _must_ use exactly two capturing groups:
- *   [1] = matched part of the input
- *   [2] = remaining input (will be parsed later by other definitions)
- *   Example: /^(\d{4})(.*)$/
- *
- * applyMatchFunction:
- *   If 'parseRegExp' is set and found a match, and this function is defined, it is called
- *   to apply the matched part to the parseContext.
- *   @param parseContext
- *            See documentation at _createParseContext().
- *   @param match
- *            The first match from the reg exp.
- *   @param acceptedTerm
- *            The term that was accepted for this definition. This argument is usually only relevant,
- *            if a definition can accept more than one term.
- *   @return
- *            No return value.
- *
- * parseFunction:
- *   If parsing is not possible with a regular expression, this function may be defined to execute
- *   more complex parse logic.
- *   @param parseContext
- *            See documentation at _createParseContext().
- *   @param acceptedTerm
- *            The term that was accepted for this definition. This argument is usually only relevant,
- *            if a definition can accept more than one term.
- *   @return
- *            A string with the matched part of the input, or null if it did not match.
  */
-export default class DateFormatPatternDefinition {
-  type: any;
-  terms: any;
-  dateFormat: any;
-  formatFunction: any;
-  parseRegExp: any;
-  applyMatchFunction: any;
-  parseFunction: any;
-  constructor(options) { // NOSONAR
+export default class DateFormatPatternDefinition implements DateFormatPatternDefinitionOptions {
+  type: DateFormatPatternTypes;
+  terms: string[];
+  dateFormat: DateFormat;
+  formatFunction: (formatContext: DateFormatContext, acceptedTerm: string) => string;
+  parseRegExp: RegExp;
+  applyMatchFunction: (parseContext: DateFormatParseContext, match: string, acceptedTerm: string) => void;
+  parseFunction: (parseContext: DateFormatParseContext, acceptedTerm: string) => string;
+
+  constructor(options: DateFormatPatternDefinitionOptions) {
     options = options || {};
     this.type = options.type;
     this.terms = options.terms;
@@ -89,8 +100,8 @@ export default class DateFormatPatternDefinition {
     this.parseFunction = options.parseFunction && options.parseFunction.bind(this);
   }
 
-  createFormatFunction(acceptedTerm) {
-    return function(formatContext) {
+  createFormatFunction(acceptedTerm: string): (formatContext: DateFormatContext) => void {
+    return function(formatContext: DateFormatContext) {
       if (this.formatFunction) {
         let result = this.formatFunction(formatContext, acceptedTerm);
         if (result !== undefined) { // convenience
@@ -100,9 +111,9 @@ export default class DateFormatPatternDefinition {
     }.bind(this);
   }
 
-  createParseFunction(acceptedTerm) {
-    return function(parseContext) {
-      let m, parsedTerm, match;
+  createParseFunction(acceptedTerm: string): (parseContext: DateFormatParseContext) => boolean {
+    return function(parseContext: DateFormatParseContext) {
+      let m: RegExpExecArray, parsedTerm, match;
 
       let success = false;
       if (this.parseRegExp) {
@@ -146,9 +157,9 @@ export default class DateFormatPatternDefinition {
   }
 
   /**
-   * @return {string|null} the accepted term (if is accepted) or null (if it is not accepted)
+   * @return the accepted term (if is accepted) or null (if it is not accepted)
    */
-  accept(term): string | null {
+  accept(term: string): string {
     if (term) {
       // Check if one of the terms matches
       for (let i = 0; i < this.terms.length; i++) {

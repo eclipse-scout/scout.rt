@@ -19,9 +19,9 @@ const CONST_REGEX = /\${const:([^}]*)}/;
  * Not using the literal has the advantage that the object does not contain any inherited properties like `toString` so it is not necessary to use `o.hasOwnProperty(p)`
  * instead of `p in o` to check for the existence.
  *
- * @param {object} [properties] optional initial properties to be set on the new created object
+ * @param [properties] optional initial properties to be set on the new created object
  */
-export function createMap(properties?: object) {
+export function createMap(properties?: any): any {
   let map = Object.create(null);
   if (properties) {
     $.extend(map, properties);
@@ -31,10 +31,10 @@ export function createMap(properties?: object) {
 
 /**
  * Copies all the properties (including the ones from the prototype.) from dest to source
- * @param {[]} [filter] an array of property names.
- * @returns {object} the destination object (the destination parameter will be modified as well)
+ * @param [filter] an array of property names.
+ * @returns the destination object (the destination parameter will be modified as well)
  */
-export function copyProperties(source, dest, filter?: []): object {
+export function copyProperties<D>(source: any, dest: D, filter?: string[] | string): D {
   let propertyName;
   filter = arrays.ensure(filter);
   for (propertyName in source) {
@@ -46,12 +46,12 @@ export function copyProperties(source, dest, filter?: []): object {
 }
 
 /**
- * Copies the own properties (excluding the ones from the prototype) from dest to source.
+ * Copies the own properties (excluding the ones from the prototype) from source to dest.
  * If a filter is specified, only the properties matching the ones in the filter are copied.
- * @param {[]} [filter] an array of property names.
- * @returns {object} the destination object (the destination parameter will be modified as well)
+ * @param [filter] an array of property names.
+ * @returns the destination object (the destination parameter will be modified as well)
  */
-export function copyOwnProperties(source, dest, filter?: []): object {
+export function copyOwnProperties<D>(source: any, dest: D, filter?: string[] | string): D {
   let propertyName;
   filter = arrays.ensure(filter);
   for (propertyName in source) {
@@ -65,7 +65,7 @@ export function copyOwnProperties(source, dest, filter?: []): object {
 /**
  * Counts and returns the properties of a given object or map (see #createMap).
  */
-export function countOwnProperties(obj) {
+export function countOwnProperties(obj: any): number {
   // map objects don't have a prototype
   if (!Object.getPrototypeOf(obj)) {
     return Object.keys(obj).length;
@@ -86,7 +86,7 @@ export function countOwnProperties(obj) {
  * Copies the specified properties (including the ones from the prototype) from source to dest.
  * Properties that already exist on dest are NOT overwritten.
  */
-export function extractProperties(source, dest, properties) {
+export function extractProperties<D>(source: any, dest: D, properties: string[]): D {
   properties.forEach(propertyName => {
     if (dest[propertyName] === undefined) {
       dest[propertyName] = source[propertyName];
@@ -99,12 +99,8 @@ export function extractProperties(source, dest, properties) {
  * returns
  *  - true if the obj has at least one of the given properties.
  *  - false if the obj has none of the given properties.
- *
- * @param obj
- * @param properties a single property or an array of properties
- * @returns {Boolean}
  */
-export function someOwnProperties(obj, properties): boolean {
+export function someOwnProperties(obj: object, properties: string[] | string): boolean {
   let propArr = arrays.ensure(properties);
   return propArr.some(prop => {
     return Object.prototype.hasOwnProperty.call(obj, prop);
@@ -115,22 +111,15 @@ export function someOwnProperties(obj, properties): boolean {
  * returns
  *  - true if the obj or its prototypes have at least one of the given properties.
  *  - false if the obj or its prototypes have none of the given properties.
- *
- * @param obj
- * @param properties a single property or an array of properties
- * @returns {Boolean}
  */
-export function someProperties(obj, properties): boolean {
+export function someProperties(obj: object, properties: string[] | string): boolean {
   let propArr = arrays.ensure(properties);
   return propArr.some(prop => {
     return prop in obj;
   });
 }
 
-/**
- * @return {*}
- */
-export function valueCopy(obj): any {
+export function valueCopy<T>(obj: T): T {
   // Nothing to be done for immutable things
   if (obj === undefined || obj === null || typeof obj !== 'object') {
     return obj;
@@ -156,12 +145,10 @@ export function valueCopy(obj): any {
 
 /**
  * Returns the first object with the given property and propertyValue or null if there is no such object within parentObj.
- * @param parentObj
  * @param property property to search for
  * @param propertyValue value of the property
- * @returns {Object}
  */
-export function findChildObjectByKey(parentObj, property, propertyValue): object {
+export function findChildObjectByKey(parentObj: any, property: string, propertyValue: any): any {
   if (parentObj === undefined || parentObj === null || typeof parentObj !== 'object') {
     return null;
   }
@@ -223,7 +210,7 @@ export function findChildObjectByKey(parentObj, property, propertyValue): object
  * @return Object Returns the selected object.
  * @throws Throws an error, if the provided parameters are malformed, or a property could not be found/a id property filter does not find any elements.
  */
-export function getByPath(object, path) {
+export function getByPath(object: any, path: string): any {
   scout.assertParameter('object', object, Object);
   scout.assertParameter('path', path);
 
@@ -294,16 +281,17 @@ export function getByPath(object, path) {
 }
 
 /**
- * Returns true if the given object is an object, _not_ an array and not null or undefined.
+ * @returns true if the given object is an object, _not_ an array and not null or undefined.
  */
-export function isPlainObject(obj) {
+export function isPlainObject(obj: any): boolean {
   return typeof obj === 'object' &&
     !isNullOrUndefined(obj) &&
     !Array.isArray(obj);
 }
 
 /**
- * Null-safe access the property of an objects. Examples:
+ * Null-safe access the property of objects. Instead of using this function consider using conditional chaining with the elvis operator: obj?.foo?.bar.
+ * Examples:
  * <ul>
  * <li><code>optProperty(obj, 'value');</code> try to access and return obj.value</li>
  * <li><code>optProperty(obj, 'foo', 'bar');</code> try to access and return obj.foo.bar</li>
@@ -311,7 +299,7 @@ export function isPlainObject(obj) {
  *
  * @returns {*} the value of the requested property or undefined if the property does not exist on the object
  */
-export function optProperty(obj, ...properties): any {
+export function optProperty(obj: any, ...properties: string[]): any {
   if (!obj) {
     return null;
   }
@@ -344,34 +332,31 @@ export function optProperty(obj, ...properties): any {
  *
  * Because when myNumber === 0 would also resolve to false. In that case use instead:
  *   if (isNumber(myNumber)) { ...
- *
- * @param obj
- * @returns {Boolean}
  */
-export function isNumber(obj): boolean {
+export function isNumber(obj: any): boolean {
   return obj !== null && !isNaN(obj) && isFinite(obj) && !isNaN(parseFloat(obj));
 }
 
-export function isString(obj) {
+export function isString(obj: any): boolean {
   return typeof obj === 'string' || obj instanceof String;
 }
 
-export function isNullOrUndefined(obj) {
+export function isNullOrUndefined(obj: any): boolean {
   return obj === null || obj === undefined;
 }
 
-export function isFunction(obj) {
+export function isFunction(obj: any): boolean {
   return $.isFunction(obj);
 }
 
-export function isArray(obj) {
+export function isArray(obj: any): boolean {
   return Array.isArray(obj);
 }
 
 /**
  * Checks whether the provided value is a promise or not.
- * @param {any} value The value to check.
- * @return {boolean} Returns true, in case the provided value is a thenable, false otherwise.
+ * @param value The value to check.
+ * @return true, in case the provided value is a thenable, false otherwise.
  *
  * Note: This method checks whether the provided value is a "thenable" (see https://promisesaplus.com/#terminology).
  *       Checking for promise would require to check the behavior which is not possible. So you could provide an object
@@ -384,11 +369,11 @@ export function isPromise(value: any): boolean {
 /**
  * Returns values from the given (map) object. By default only values of 'own' properties are returned.
  *
- * @returns {Array} an Array with values
- * @param {Object} obj
- * @param {boolean} [all] can be set to true to return all properties instead of own properties
+ * @param obj
+ * @param [all] can be set to true to return all properties instead of own properties
+ * @returns an Array with values
  */
-export function values(obj: object, all?: boolean): Array<any> {
+export function values(obj: object, all?: boolean): any[] {
   let values = [];
   if (obj) {
     if (typeof obj.hasOwnProperty !== 'function') {
@@ -404,9 +389,9 @@ export function values(obj: object, all?: boolean): Array<any> {
 }
 
 /**
- * @returns {string} the key / name of a property
+ * @returns the key / name of a property with given value
  */
-export function keyByValue(obj, value): string {
+export function keyByValue(obj: any, value: any): string {
   return Object.keys(obj)[values(obj).indexOf(value)];
 }
 
@@ -414,9 +399,9 @@ export function keyByValue(obj, value): string {
  * Java-like equals method. Compares the given objects by checking with ===, if that fails, the function
  * checks if both objects have an equals function and use the equals function to compare the two objects
  * by value.
- * @returns {boolean} true if both objects are equals by reference or by value
+ * @returns true if both objects are equals by reference or by value
  */
-export function equals(objA, objB): boolean {
+export function equals(objA: any, objB: any): boolean {
   if (objA === objB) {
     return true;
   }
@@ -429,9 +414,9 @@ export function equals(objA, objB): boolean {
 
 /**
  * Compare two objects and all its child elements recursively.
- * @returns {boolean} true if both objects and all child elements are equals by value or implemented equals method
+ * @returns true if both objects and all child elements are equals by value or implemented equals method
  */
-export function equalsRecursive(objA, objB): boolean {
+export function equalsRecursive(objA: any, objB: any): boolean {
   let i;
   if (isPlainObject(objA) && isPlainObject(objB)) {
     if (isFunction(objA.equals) && isFunction(objB.equals)) {
@@ -466,7 +451,7 @@ export function equalsRecursive(objA, objB): boolean {
 /**
  * Compares a list of properties of two objects by using the equals method for each property.
  */
-export function propertiesEquals(objA, objB, properties) {
+export function propertiesEquals(objA: any, objB: any, properties: string[]): boolean {
   let i, property;
   for (i = 0; i < properties.length; i++) {
     property = properties[i];
@@ -478,11 +463,11 @@ export function propertiesEquals(objA, objB, properties) {
 }
 
 /**
- * @returns {function} the function identified by funcName from the given object. The function will return an error
+ * @returns the function identified by funcName from the given object. The function will return an error
  *     if that function does not exist. Use this function if you modify an existing framework function
- *     to find problems after refactorings / renamings as soon as possible.
+ *     to find problems after refactoring / renaming as soon as possible.
  */
-export function mandatoryFunction(obj, funcName): Function {
+export function mandatoryFunction(obj: any, funcName: string): Function {
   let func = obj[funcName];
   if (!func || typeof func !== 'function') {
     throw new Error('Function \'' + funcName + '\' does not exist on object. Check if it has been renamed or moved. Object: ' + obj);
@@ -494,7 +479,7 @@ export function mandatoryFunction(obj, funcName): Function {
  * Use this method to replace a function on a prototype of an object. It checks if that function exists
  * by calling <code>mandatoryFunction</code>.
  */
-export function replacePrototypeFunction(obj, funcName, func, rememberOrig) {
+export function replacePrototypeFunction(obj: any, funcName: string, func: Function, rememberOrig: boolean) {
   let proto = obj.prototype;
   mandatoryFunction(proto, funcName);
   if (rememberOrig) {
@@ -506,14 +491,14 @@ export function replacePrototypeFunction(obj, funcName, func, rememberOrig) {
 /**
  * @returns a real Array for the pseudo-array 'arguments'.
  */
-export function argumentsToArray(args) {
+export function argumentsToArray(args: IArguments): any[] {
   return args ? Array.prototype.slice.call(args) : [];
 }
 
 /**
  * Used to loop over 'arguments' pseudo-array with forEach.
  */
-export function forEachArgument(args, func) {
+export function forEachArgument(args: IArguments, func: (value: any, index: number, args: any[]) => void) {
   return argumentsToArray(args).forEach(func);
 }
 
@@ -655,10 +640,10 @@ export function checkFunctionOverrides() {
 }
 
 /**
- * @param {string} value text which contains a constant reference like '${const:FormField.LabelPosition.RIGHT}'.
- * @return {any} the resolved constant value or the unchanged input value if the constant could not be resolved.
+ * @param value text which contains a constant reference like '${const:FormField.LabelPosition.RIGHT}'.
+ * @return the resolved constant value or the unchanged input value if the constant could not be resolved.
  */
-export function resolveConst(value: string, constType): any {
+export function resolveConst(value: string, constType: any): any {
   if (!isString(value)) {
     return value;
   }
@@ -680,10 +665,7 @@ export function resolveConst(value: string, constType): any {
   return value;
 }
 
-/**
- * @param object config An object with 2 properties: property, constType
- */
-export function resolveConstProperty(object, config) {
+export function resolveConstProperty(object: any, config: { property: string; constType: any }) {
   scout.assertProperty(config, 'property');
   scout.assertProperty(config, 'constType');
   let value = object[config.property];
@@ -694,13 +676,12 @@ export function resolveConstProperty(object, config) {
 }
 
 /**
- * @param {object} obj
- * @returns {Boolean|undefined}
+ * @returns
  *  - true if the obj is empty, null or undefined
  *  - false if the obj is not empty
- *  - nothing if the obj is not an object
+ *  - undefined if the obj is not an object
  */
-export function isEmpty(obj: object): boolean | undefined {
+export function isEmpty(obj: any): boolean | undefined {
   if (isNullOrUndefined(obj)) {
     return true;
   }
@@ -715,7 +696,7 @@ export function isEmpty(obj: object): boolean | undefined {
  * Complex objects are converted to their JSON representation (instead of returning something
  * non-descriptive such as '[Object object]').
  */
-export function ensureValidKey(key) {
+export function ensureValidKey(key: any): string {
   if (key === undefined) {
     return 'undefined';
   }

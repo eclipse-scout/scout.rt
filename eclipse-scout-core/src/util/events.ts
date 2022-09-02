@@ -1,48 +1,50 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, events, objects, strings} from '../index';
+import {arrays, Device, events, objects, Predicate, strings} from '../index';
 
 /**
- * @returns {number} the x coordinate where the event happened, works for touch events as well.
+ * @returns the x coordinate where the event happened, works for touch events as well.
  */
-export function pageX(event): number {
+export function pageX(event: JQuery.TriggeredEvent): number {
   if (!objects.isNullOrUndefined(event.pageX)) {
     return event.pageX;
   }
+  // @ts-ignore
   return event.originalEvent.touches[0].pageX;
 }
 
 /**
- * @returns {number} the y coordinate where the event happened, works for touch events as well.
+ * @returns the y coordinate where the event happened, works for touch events as well.
  */
-export function pageY(event): number {
+export function pageY(event: JQuery.TriggeredEvent): number {
   if (!objects.isNullOrUndefined(event.pageY)) {
     return event.pageY;
   }
+  // @ts-ignore
   return event.originalEvent.touches[0].pageY;
 }
 
-export function touchdown(touch, suffix) {
+export function touchdown(touch: boolean, suffix?: string): string {
   return touchOrMouse(touch, 'touchstart', 'mousedown', suffix);
 }
 
-export function touchmove(touch, suffix) {
+export function touchmove(touch: boolean, suffix?: string): string {
   return touchOrMouse(touch, 'touchmove', 'mousemove', suffix);
 }
 
-export function touchendcancel(touch, suffix) {
+export function touchendcancel(touch: boolean, suffix?: string): string {
   return touchOrMouse(touch, 'touchend touchcancel', 'mouseup', suffix);
 }
 
-export function touchOrMouse(touch, touchevent, mouseevent, suffix) {
+export function touchOrMouse(touch: boolean, touchevent: string, mouseevent: string, suffix?: string): string {
   suffix = suffix || '';
   if (suffix) {
     suffix = '.' + suffix;
@@ -53,11 +55,11 @@ export function touchOrMouse(touch, touchevent, mouseevent, suffix) {
   return mouseevent + suffix;
 }
 
-export function isTouchEvent(event) {
+export function isTouchEvent(event: JQuery.Event): boolean {
   return event && strings.startsWith(event.type, 'touch');
 }
 
-export function fixTouchEvent(event) {
+export function fixTouchEvent(event: JQuery.TouchEventBase) {
   if (isTouchEvent(event)) {
     let touches = event.touches || (event.originalEvent ? event.originalEvent.touches : null);
     let touch = touches ? touches[0] : null;
@@ -65,8 +67,8 @@ export function fixTouchEvent(event) {
       // Touch events may contain fractional values, while mouse events should not
       // - https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/pageX
       // - https://www.chromestatus.com/features/6169687914184704
-      event.pageX = Math.round(touch.pageX);
-      event.pageY = Math.round(touch.pageY);
+      event.pageX = Math.round(touch.pageX) as undefined;
+      event.pageY = Math.round(touch.pageY) as undefined;
     }
   }
 }
@@ -74,8 +76,8 @@ export function fixTouchEvent(event) {
 /**
  * @returns an object containing passive: true if the browser supports passive event listeners, otherwise returns false.
  */
-export function passiveOptions() {
-  let options = false;
+export function passiveOptions(): boolean | { passive: boolean } {
+  let options: boolean | { passive: boolean } = false;
   if (Device.get().supportsPassiveEventListener()) {
     options = {
       passive: true
@@ -88,7 +90,7 @@ export function passiveOptions() {
  * Listens for scroll events and executes startHandler on first event. It then regularly checks for further scroll events and executes endHandler if no event has fired since a certain amount of time and the user has released his finger.
  * If he does not release his finger the endHandler won't be called even if the pane has stopped scrolling.
  */
-export function onScrollStartEndDuringTouch($elem: JQuery, startHandler, endHandler) {
+export function onScrollStartEndDuringTouch($elem: JQuery, startHandler: () => void, endHandler: () => void) {
   let scrollTimeout;
   let started = false;
   let touchend = false;
@@ -123,12 +125,12 @@ export function onScrollStartEndDuringTouch($elem: JQuery, startHandler, endHand
 
   function removeHandlers() {
     $elem.off('scroll', scrollHandler);
-    $elem.document().off('touchend touchcancel', touchEndHandler);
+    $elem.document(false).off('touchend touchcancel', touchEndHandler);
   }
 
   $elem.on('scroll', scrollHandler);
   // Make sure handler is executed and scroll listener removed if no scroll event occurs
-  $elem.document().one('touchend touchcancel', touchEndHandler);
+  $elem.document(false).one('touchend touchcancel', touchEndHandler);
 }
 
 /**
@@ -141,13 +143,14 @@ export function onScrollStartEndDuringTouch($elem: JQuery, startHandler, endHand
  * This function only works in browsers supporting the Event constructor (e.g. KeyboardEvent: https://developer.mozilla.org/de/docs/Web/API/KeyboardEvent/KeyboardEvent).
  * </p>
  *
- * @param target {HTMLElement} the element which should receive the event
- * @param event {Event} the original event which should be propagated
+ * @param target the element which should receive the event
+ * @param event the original event which should be propagated
  */
 export function propagateEvent(target: HTMLElement, event: Event) {
   if (typeof (Event) !== 'function') {
     return;
   }
+  // @ts-ignore
   let newEvent = new event.constructor(event.type, event);
   if (!target.dispatchEvent(newEvent)) {
     event.preventDefault();
@@ -162,12 +165,12 @@ export function propagateEvent(target: HTMLElement, event: Event) {
  * This function only works in browsers supporting the Event constructor (e.g. KeyboardEvent: https://developer.mozilla.org/de/docs/Web/API/KeyboardEvent/KeyboardEvent).
  * </p>
  *
- * @param source {HTMLElement} the element for which the event listener should be added.
- * @param target {HTMLElement} the element which should receive the event.
- * @param types {string[]} an array of event types.
- * @param {function} [filter] an optional filter function which can return false if the event should not be propagated.
+ * @param source the element for which the event listener should be added.
+ * @param target the element which should receive the event.
+ * @param types an array of event types.
+ * @param an optional filter function which can return false if the event should not be propagated.
  */
-export function addPropagationListener(source: HTMLElement, target: HTMLElement, types: string[], filter?: Function) {
+export function addPropagationListener(source: HTMLElement, target: HTMLElement, types: string[], filter?: Predicate<Event>) {
   types = arrays.ensure(types);
   types.forEach(type => {
     source.addEventListener(type, event => {
@@ -179,26 +182,44 @@ export function addPropagationListener(source: HTMLElement, target: HTMLElement,
   });
 }
 
-/**
- * @typedef {Object} SwipeCallbackEvent
- * @property {MouseEvent|TouchEvent} originalEvent The original event received from the browser.
- * @property {number} originalLeft The left position of the element at the moment the swipe was started.
- * @property {number} deltaX The horizontal delta the swipe has already moved (negative values mean to the left of the original left position).
- * @property {number} newLeft The current left position of the element.
- * @property {number} direction -1 if the move is to the left, 1 if the move is to the right, 0 or -0 if it is not moved yet
- */
+export interface SwipeCallbackEvent {
+  /**
+   * The original event received from the browser.
+   */
+  originalEvent: JQuery.TriggeredEvent;
+
+  /**
+   * The left position of the element at the moment the swipe was started.
+   */
+  originalLeft: number;
+
+  /**
+   * The horizontal delta the swipe has already moved (negative values mean to the left of the original left position).
+   */
+  deltaX: number;
+
+  /**
+   * The current left position of the element.
+   */
+  newLeft: number;
+
+  /**
+   * -1 if the move is to the left, 1 if the move is to the right, 0 or -0 if it is not moved yet
+   */
+  direction: number;
+}
 
 /**
  * Adds swipe event listeners to the element given.
  *
- * @param {jQuery} $element The element on which the listeners should be attached.
- * @param {string} id An event listener id used to be registered on the window object.
- * @param {function(SwipeCallbackEvent)} [onDown] Callback to be invoked when the swipe is started (mouse or touch down).
- * @param {function(SwipeCallbackEvent)} [onMove] Callback to be invoked when mouse (or finger if touch) is moved (while being down).
- * @param {function(SwipeCallbackEvent)} [onUp] Callback to be invoked when the swipe is ended (mouse or finger released).
+ * @param $element The element on which the listeners should be attached.
+ * @param id An event listener id used to be registered on the window object.
+ * @param [onDown] Callback to be invoked when the swipe is started (mouse or touch down).
+ * @param [onMove] Callback to be invoked when mouse (or finger if touch) is moved (while being down).
+ * @param [onUp] Callback to be invoked when the swipe is ended (mouse or finger released).
  */
-export function onSwipe($element: jQuery, id: string, onDown?: (arg0: SwipeCallbackEvent) => any, onMove?: (arg0: SwipeCallbackEvent) => any, onUp?: (arg0: SwipeCallbackEvent) => any) {
-  let $window = $element.window();
+export function onSwipe($element: JQuery, id: string, onDown?: (event: SwipeCallbackEvent) => boolean, onMove?: (event: SwipeCallbackEvent) => number, onUp?: (event: SwipeCallbackEvent) => void) {
+  let $window = $element.window(false);
   let touch = Device.get().supportsOnlyTouch();
 
   $element.on('touchmove', event => event.preventDefault()); // prevent scrolling the background when swiping (iOS)

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,16 +11,34 @@
 
 import {CachedElement, strings} from '../index';
 
+export interface PlainTextEncoderOptions {
+  /**
+   * Multiple consecutive empty lines are reduced to a single empty line. Default is false.
+   */
+  compact?: boolean;
+
+  /**
+   * Calls string.trim(). White space at the beginning and the end of the text gets removed.. Default is false.
+   */
+  trim?: boolean;
+
+  /**
+   * Removes font icons. Default is false.
+   */
+  removeFontIcons?: boolean;
+}
+
 /**
  * Replaces character HTML entities (e.g. &amp;nbsp;, &amp;gt;, etc.).
  */
 export default class PlainTextEncoder {
   cache: CachedElement;
+
   constructor() {
     this.cache = new CachedElement('textarea');
   }
 
-  encode(text: string, options) {
+  encode(text: string, options: PlainTextEncoderOptions): string {
     options = options || {};
     if (!text) {
       return text;
