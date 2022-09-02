@@ -26,7 +26,8 @@
     "src"
   ],
   "scripts": {
-    "ts-migrate": "ts-migrate --sources src/**/*",
+    "ts-rename": "ts-migrate --rename-only --sources src/layout/**/*",
+    "ts-migrate": "ts-migrate --rename false --sources src/layout/**/*",
     "ts-count": "ts-migrate --rename false --count-only --sources src/**/*.ts",
     "testserver:start": "scout-scripts test-server:start",
     "testserver:stop": "scout-scripts test-server:stop",
