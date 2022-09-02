@@ -10,11 +10,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import ObjectFactory from './ObjectFactory';
-
-export {default as scout} from './scout';
+export {default as scout, ObjectWithType} from './scout';
 export {default as Event} from './events/Event';
-export {default as EventEmitter} from './events/EventEmitter';
-export {EventHandler, EventTypeModel} from './events/EventEmitter';
+export {default as EventEmitter, EventHandler, EventTypeModel} from './events/EventEmitter';
 export {default as PropertyEventEmitter} from './events/PropertyEventEmitter';
 export {default as EventSupport} from './events/EventSupport';
 export {default as EventDelegator} from './events/EventDelegator';
@@ -52,6 +50,7 @@ export {default as CompositeModel} from './widget/CompositeModel';
 export {default as NullWidget} from './widget/NullWidget';
 export {default as NullWidgetAdapter} from './widget/NullWidgetAdapter';
 export {default as arrays} from './util/arrays';
+export {default as CallModel} from './util/CallModel';
 export {default as Call} from './util/Call';
 export {default as clipboard} from './util/clipboard';
 export {default as colorSchemes} from './util/colorSchemes';
@@ -95,6 +94,7 @@ export {default as aggregation} from './util/aggregation';
 export {default as webstorage} from './util/webstorage';
 export {default as cookies} from './util/cookies';
 export {default as ViewportScroller} from './util/ViewportScroller';
+export {default as ViewportScrollerModel} from './util/ViewportScrollerModel';
 export {default as ajax} from './ajax/ajax';
 export {default as AjaxCall} from './ajax/AjaxCall';
 export {default as AjaxError} from './ajax/AjaxError';
@@ -116,6 +116,7 @@ export {default as BackgroundJobPollingSupport} from './session/BackgroundJobPol
 export {default as BusyIndicator} from './session/BusyIndicator';
 export {default as RemoteEvent} from './session/RemoteEvent';
 export {default as Locale} from './session/Locale';
+export {default as LocaleModel} from './session/LocaleModel';
 export {default as PropertyChangeEventFilter} from './session/PropertyChangeEventFilter';
 export {default as Reconnector} from './session/Reconnector';
 export {default as ResponseQueue} from './session/ResponseQueue';

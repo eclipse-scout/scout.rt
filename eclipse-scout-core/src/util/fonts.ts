@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, scout, strings} from '../index';
+import {arrays, graphics, scout, strings} from '../index';
 import $ from 'jquery';
 
 let _deferred = $.Deferred();
@@ -27,7 +27,7 @@ let loadingComplete = true;
  * @param fonts (optional) array of fonts
  * @return promise that is resolved when all fonts are loaded
  */
-export function bootstrap(fonts) {
+export function bootstrap(fonts: FontSpec[]): JQuery.Promise<void> {
   fonts = fonts || autoDetectFonts();
 
   if (fonts.length === 0) {
@@ -61,7 +61,7 @@ export function bootstrap(fonts) {
  *          loadingComplete first! Do not wait for the promise when loadingComplete
  *          is true, because the promise will never be resolved.
  */
-export function preloader() {
+export function preloader(): JQuery.Promise<void> {
   return _deferred.promise();
 }
 
@@ -84,37 +84,50 @@ const TEST_STRING = 'ABC abc 123 .,_ LlIi1 oO0 !#@ \uE000\uE001\uE002 \uF118';
  */
 const TEST_TIMEOUT = 12 * 1000; // 12 sec
 
+export interface FontSpec {
+  family: string;
+  style?: string;
+  testString?: string;
+  testFonts?: string;
+}
+
+export interface FontPreloadOptions {
+  /**
+   * A single string or object (or an array of them) specifying which fonts should be preloaded.
+   * A string is interpreted as font-family.
+   * If the style is relevant too, an object with the properties 'family' and 'style' should be provided.
+   * Alternatively, the style can be specified in the string after the font name, separated by a pipe character ('|').
+   * The property {@link testString} (or a third component in a '|' separated string) may be specified to set the characters to measure for this specific font (can be useful for icon fonts).
+   */
+  fonts: string | string[] | FontSpec | FontSpec[];
+
+  /**
+   * Mandatory function to be called when all of the specified fonts have been loaded or if a timeout occurs. If this option is omitted, the call to this method returns immediately.
+   * @param success indicate whether loading was completed successfully or execution was interrupted by a timeout.
+   * @param badFonts The bad fonts
+   */
+  onComplete?: (success: boolean, badFonts: string[]) => void;
+
+  /**
+   * Optional timeout in milliseconds. If fonts could not be loaded within this time, loading is stopped and the {@link onComplete} method is called with argument 'false'.
+   * Defaults to {@link TEST_TIMEOUT}.
+   */
+  timeout?: number;
+
+  /**
+   * Optional. Test fonts (string separated by commas) to used as baseline when checking if the specified fonts have been loaded. Defaults to {@link TEST_FONTS}.
+   */
+  testFonts?: string;
+
+  /**
+   * Optional. The test string to use when checking if the specified fonts have been loaded. Should not be empty, because the empty string has always the width 0.
+   * The default is {@link TEST_STRING}. The test string may also be specified individually per font.
+   */
+  testString?: string;
+}
+
 /**
  * Loads the specified fonts in a hidden div, forcing the browser to load them.
- *
- * Options:
- *   [fonts]
- *     A single string or object (or an array of them) specifying which fonts should
- *     be preloaded. A string is interpreted as font-family. If the style is relevant,
- *     too, an object with the properties 'family' and 'style' should be provided.
- *     Alternatively, the style can be specified in the string after the font name,
- *     separated by a pipe character ('|').
- *     The property 'testString' (or a third component in a '|' separated string) may
- *     be specified to set the characters to measure for this specific font (can be
- *     useful for icon fonts).
- *   [onComplete]
- *     Mandatory function to be called when all of the specified fonts have been
- *     loaded or if a timeout occurs. An argument 'success' is given to indicate
- *     whether loading was completed successfully or execution was interrupted by
- *     a timeout. If this option is omitted, the call to this method returns immediately.
- *   [timeout]
- *     Optional timeout in milliseconds. If fonts could not be loaded within this time,
- *     loading is stopped and the onComplete method is called with argument 'false'.
- *     Defaults to TEST_TIMEOUT.
- *   [testFonts]
- *     Optional. Test fonts (string separated by commas) to used as baseline when checking
- *     if the specified fonts have been loaded. Defaults to TEST_FONTS.
- *   [testString]
- *     Optional. The test string to use when checking if the specified fonts have been
- *     loaded. Should not be empty, because the empty string has always the width 0.
- *     The default is TEST_STRING. The test string may also be specified
- *     individually per font.
- *
  * Examples:
  *   preload({fonts: 'Sauna Pro'});
  *   preload({fonts: 'Sauna Pro|font-style:italic'});
@@ -127,12 +140,9 @@ const TEST_TIMEOUT = 12 * 1000; // 12 sec
  *
  * Inspired by Zenfonts (https://github.com/zengabor/zenfonts, public domain).
  */
-export function preload(options) {
-  options = options || {};
-  let fonts = options.fonts || [];
-  if (!Array.isArray(fonts)) {
-    fonts = [fonts];
-  }
+export function preload(options?: FontPreloadOptions) {
+  options = options || {fonts: null};
+  let fonts = arrays.ensure(options.fonts);
   if (!options.onComplete) {
     // preloading is not useful, because there is no callback on success
     return;
@@ -256,7 +266,7 @@ export function preload(options) {
   }
 }
 
-export function measureSize($div: JQuery) {
+export function measureSize($div: JQuery): string {
   let size = graphics.size($div, {
     exact: true
   });
@@ -267,7 +277,7 @@ export function measureSize($div: JQuery) {
  * Reads all "@font-face" CSS rules from the current document and returns an array of
  * font definition objects, suitable for passing to the preload() function (see above).
  */
-export function autoDetectFonts() {
+export function autoDetectFonts(): FontSpec[] {
   let fonts = [];
   // Implementation note: "styleSheets" and "cssRules" are not arrays (they only look like arrays)
   let styleSheets = document.styleSheets;
@@ -286,6 +296,7 @@ export function autoDetectFonts() {
     for (let j = 0; j < styleSheet.cssRules.length; j++) {
       let cssRule = styleSheet.cssRules[j];
       if (cssRule.type === window.CSSRule.FONT_FACE_RULE) {
+        // @ts-ignore
         let style = cssRule.style;
         let ff = style.getPropertyValue('font-family');
         let fw = style.getPropertyValue('font-weight');
@@ -307,7 +318,7 @@ export function autoDetectFonts() {
           if (ft && ft !== 'normal') {
             s.push('font-stretch:' + ft);
           }
-          let font = {
+          let font: FontSpec = {
             family: ff
           };
           if (s.length) {

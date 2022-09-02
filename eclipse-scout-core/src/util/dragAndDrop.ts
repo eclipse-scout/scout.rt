@@ -1,21 +1,23 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, dragAndDrop, DragAndDropHandler} from '../index';
+import {arrays, dragAndDrop, DragAndDropHandler, EnumObject, Widget} from '../index';
 
 const SCOUT_TYPES = {
   FILE_TRANSFER: 1 << 0, // IDNDSupport.TYPE_FILE_TRANSFER (NOSONAR)
   JAVA_ELEMENT_TRANSFER: 1 << 1, // IDNDSupport.TYPE_JAVA_ELEMENT_TRANSFER (NOSONAR)
   TEXT_TRANSFER: 1 << 2, // IDNDSupport.TYPE_TEXT_TRANSFER (NOSONAR)
   IMAGE_TRANSFER: 1 << 3 // IDNDSupport.TYPE_IMAGE_TRANSFER (NOSONAR)
-};
+} as const;
+
+export type DragAndDropType = EnumObject<typeof SCOUT_TYPES>;
 
 const DEFAULT_DROP_MAXIMUM_SIZE = 50 * 1024 * 1024; // 50 MB
 
@@ -23,9 +25,8 @@ const DEFAULT_DROP_MAXIMUM_SIZE = 50 * 1024 * 1024; // 50 MB
  * Mapping function from scout drag types to browser drag types.
  *
  * @param scoutTypesArray array of SCOUT_TYPES
- * @returns {Array} return array
  */
-export function scoutTypeToDragTypeMapping(scoutTypesArray): Array<any> {
+export function scoutTypeToDragTypeMapping(scoutTypesArray: DragAndDropType | DragAndDropType[]): Array<string> {
   scoutTypesArray = arrays.ensure(scoutTypesArray);
   let ret = [];
   if (scoutTypesArray.indexOf(SCOUT_TYPES.FILE_TRANSFER) >= 0) {
@@ -41,7 +42,7 @@ export function scoutTypeToDragTypeMapping(scoutTypesArray): Array<any> {
  * @param fieldAllowedTypes allowed types on field (integer, bitwise comparison used)
  * @param scoutTypeArray e.g. FILE_TRANSFER
  */
-export function verifyDataTransferTypesScoutTypes(event, scoutTypeArray, fieldAllowedTypes) {
+export function verifyDataTransferTypesScoutTypes(event: JQuery.DragEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>, scoutTypeArray: DragAndDropType | DragAndDropType[], fieldAllowedTypes: number) {
   scoutTypeArray = arrays.ensure(scoutTypeArray);
   let dragTypeArray = [];
 
@@ -67,7 +68,7 @@ export function verifyDataTransferTypesScoutTypes(event, scoutTypeArray, fieldAl
  * @param dataTransfer dataTransfer object (not dataTransfer.types)
  * @param needleArray e.g. 'Files'
  */
-export function verifyDataTransferTypes(event, needleArray) {
+export function verifyDataTransferTypes(event: JQuery.DragEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>, needleArray: string | string[]): boolean {
   let dataTransfer = event.originalEvent.dataTransfer;
 
   if (dataTransferTypesContains(dataTransfer, needleArray)) {
@@ -86,7 +87,7 @@ export function verifyDataTransferTypes(event, needleArray) {
  * @param dataTransfer dataTransfer object (not dataTransfer.types)
  * @param scoutTypesArray e.g. FILE_TRANSFER
  */
-export function dataTransferTypesContainsScoutTypes(dataTransfer, scoutTypesArray) {
+export function dataTransferTypesContainsScoutTypes(dataTransfer: DataTransfer, scoutTypesArray: DragAndDropType | DragAndDropType[]): boolean {
   scoutTypesArray = arrays.ensure(scoutTypesArray);
   let dragTypesArray = scoutTypeToDragTypeMapping(scoutTypesArray);
   return dataTransferTypesContains(dataTransfer, dragTypesArray);
@@ -100,15 +101,19 @@ export function dataTransferTypesContainsScoutTypes(dataTransfer, scoutTypesArra
  * @param dataTransfer dataTransfer object (not dataTransfer.types)
  * @param needleArray e.g. 'Files'
  */
-export function dataTransferTypesContains(dataTransfer, needleArray) {
+export function dataTransferTypesContains(dataTransfer: DataTransfer, needleArray: string | string[]): boolean {
   needleArray = arrays.ensure(needleArray);
   if (dataTransfer && dataTransfer.types) {
     if (Array.isArray(dataTransfer.types) && arrays.containsAny(dataTransfer.types, needleArray)) {
       // Array: indexOf function
       return true;
-    } else if (dataTransfer.types.contains) {
+    }
+
+    // @ts-ignore
+    if (dataTransfer.types.contains) {
       // DOMStringList: contains function
       return needleArray.some(element => {
+        // @ts-ignore
         return dataTransfer.types.contains(element);
       });
     }
@@ -116,12 +121,7 @@ export function dataTransferTypesContains(dataTransfer, needleArray) {
   return false;
 }
 
-/**
- *
- * @param {DragAndDropOptions} options
- * @return {null|DragAndDropHandler}
- */
-export function handler(options: DragAndDropOptions): null | DragAndDropHandler {
+export function handler(options: DragAndDropOptions): DragAndDropHandler {
   if (!options || !options.target) {
     return null;
   }
@@ -130,8 +130,6 @@ export function handler(options: DragAndDropOptions): null | DragAndDropHandler 
 
 /**
  * installs or uninstalls a {@link DragAndDropHandler} on the target.
- *
- * @param {DragAndDropOptions} options
  */
 export function installOrUninstallDragAndDropHandler(options: DragAndDropOptions) {
   if (!options.target) {
@@ -145,11 +143,6 @@ export function installOrUninstallDragAndDropHandler(options: DragAndDropOptions
   }
 }
 
-/**
- *
- * @param {DragAndDropOptions} options
- * @private
- */
 export function _installDragAndDropHandler(options: DragAndDropOptions) {
   if (options.target.dragAndDropHandler) {
     return;
@@ -165,22 +158,19 @@ export function _installDragAndDropHandler(options: DragAndDropOptions) {
   options.target.dragAndDropHandler.install($container, options.selector);
 }
 
-/**
- *
- * @param {DragAndDropTarget} target
- * @private
- */
-export function _createDragAndDropHandlerOptions(target: DragAndDropTarget) {
+export function _createDragAndDropHandlerOptions(target: DragAndDropTarget): DragAndDropOptions {
   return {
     target: target,
     supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
     validateFiles: (files, defaultValidator) => defaultValidator(files),
-    onDrop: files => {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onDrop: event => {
     },
     dropType: () => dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
     dropMaximumSize: () => target.dropMaximumSize,
     doInstall: () => target.enabledComputed,
     container: () => target.$container,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     additionalDropProperties: event => {
     }
   };
@@ -188,7 +178,6 @@ export function _createDragAndDropHandlerOptions(target: DragAndDropTarget) {
 
 /**
  * uninstalls a {@link DragAndDropHandler} from the target. If no handler is installed, this function does nothing.
- * @param {DragAndDropTarget} target the target widget.
  */
 export function uninstallDragAndDropHandler(target: DragAndDropTarget) {
   if (!target || !target.dragAndDropHandler) {
@@ -211,65 +200,92 @@ export default {
   verifyDataTransferTypesScoutTypes
 };
 
-// ----------------- TYPEDEF -----------------
+export type DragAndDropTarget = Widget & {
+  /**
+   * default drop maximum size used in {@link DragAndDropOptions.dropMaximumSize}. If the target object contains a different field or function to retrieve this value override the supplier.
+   */
+  dropMaximumSize: number;
 
-/**
- * @typedef {Widget} DragAndDropTarget
- * @property {number} [dropMaximumSize] default drop maximum size used in {@link DragAndDropOptions.dropMaximumSize}. If the target object contains a different field or function to retrieve this value override the supplier.
- * @property {boolean} [enabledComputed]  default install/uninstall criteria used in {@link DragAndDropOptions.doInstall}. If the target object contains a different field or function to retrieve this value override the supplier.
- * @property {$} [$container] default container used in {@link DragAndDropOptions.container}. If the target object contains a different field or function to retrieve this value override the supplier.
- * @property {DragAndDropHandler} [dragAndDropHandler] installed drag & drop handler. Will be managed through {@link DragAndDropHandler}
- */
+  /**
+   * default install/uninstall criteria used in {@link DragAndDropOptions.doInstall}. If the target object contains a different field or function to retrieve this value override the supplier.
+   */
+  enabledComputed: boolean;
 
-/**
- * @callback validateFiles
- * @param {File[]} files
- * @param {DragAndDropHandler._validateFiles} defaultValidator
- * @throws {dropValidationErrorMessage} validationErrorMessage
- */
+  /**
+   * default container used in {@link DragAndDropOptions.container}. If the target object contains a different field or function to retrieve this value override the supplier.
+   */
+  $container: JQuery;
 
-/**
- * @callback onDrop
- * @param {File[]} files
- */
+  /**
+   * installed drag & drop handler. Will be managed through {@link DragAndDropHandler}
+   */
+  dragAndDropHandler: DragAndDropHandler;
+};
 
-/**
- * @callback additionalDropProperties
- * @param {Event} event
- * @returns {Object}
- */
+export interface DropValidationErrorMessage {
+  title: string;
+  message: string;
+}
 
-/**
- * @callback doInstall
- * @returns {boolean}
- */
+export interface FileDropEvent {
+  originalEvent: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>;
+  files: File[];
+}
 
-/**
- * @callback container
- * @returns {$}
- */
+export interface DragAndDropOptions {
+  /**
+   * the target widget where the handler shall be installed.
+   */
+  target: DragAndDropTarget;
+  /**
+   * Will be called when a valid element has been dropped.
+   */
+  onDrop?: (event: FileDropEvent) => void;
 
-/**
- * @callback dropType
- * @returns {dragAndDrop.SCOUT_TYPES.FILE_TRANSFER | number}
- */
+  /**
+   * Determines if the drag & drop handler should be installed or uninstalled. Default implementation is checking {@link Widget.enabledComputed}
+   */
+  doInstall?: () => boolean;
 
-/**
- * @callback dropMaximumSize
- * @returns {number}
- */
+  /**
+   * Returns the dom container providing the necessary drag & drop events. Default is {@link Widget.$container}
+   */
+  container?: () => JQuery;
 
-/**
- * @typedef {Object} DragAndDropOptions
- * @property {DragAndDropTarget} target the target object where the handler shall be installed.
- * @property {onDrop} onDrop Will be called when a valid element has been dropped.
- * @property {doInstall} [doInstall] Determines if the drag & drop handler should be installed or uninstalled. Default implementation is checking {@link DragAndDropTarget.enabledComputed}
- * @property {container} [container] Returns the dom container providing the necessary drag & drop events. Default is {@link DragAndDropTarget.$container}
- * @property {SCOUT_TYPES} [supportedScoutTypes] The scout type which will be allowed to drop into the target. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
- * @property {String} [selector] CSS selector which will be added to the event source.
- * @property {dropType} [dropType] Returns the allowed drop type during a drop event. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
- * @property {dropMaximumSize} [dropMaximumSize] Returns the maximum allowed size of a dropped object. Default is {@link DragAndDropTarget.dropMaximumSize}
- * @property {validateFiles} [validateFiles] An optional function to add a custom file validation logic. Throw a {@link dropValidationErrorMessage} to indicate a failed validation.
- *           If no custom validator is installed, the default maximum file size validator is invoked.
- * @property {additionalDropProperties} [additionalDropProperties] Returns additional drop properties to be used in {@link DragAndDropHandler.uploadFiles} as uploadProperties
- */
+  /**
+   * The scout type which will be allowed to drop into the target. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
+   */
+  supportedScoutTypes?: DragAndDropType | DragAndDropType[];
+
+  /**
+   * Allowed mime types.
+   */
+  allowedTypes?: () => string[];
+
+  /**
+   * CSS selector which will be added to the event source.
+   */
+  selector?: JQuery.Selector;
+
+  /**
+   * Returns the allowed drop type during a drop event. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
+   */
+  dropType?: () => number;
+
+  /**
+   * Returns the maximum allowed size of a dropped object. Default is {@link Widget.dropMaximumSize}
+   */
+  dropMaximumSize?: () => number;
+
+  /**
+   * An optional function to add a custom file validation logic. Throw a {@link DropValidationErrorMessage} to indicate a failed validation.
+   * If no custom validator is installed, the default maximum file size validator is invoked.
+   * @throws DropValidationErrorMessage
+   */
+  validateFiles?: (files: File[], defaultValidator: (f: File[]) => void) => void;
+
+  /**
+   * Returns additional drop properties to be used in {@link DragAndDropHandler.uploadFiles} as uploadProperties
+   */
+  additionalDropProperties?: (event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => any;
+}

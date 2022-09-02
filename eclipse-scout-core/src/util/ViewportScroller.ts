@@ -1,15 +1,17 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-export default class ViewportScroller {
+import {Point, ViewportScrollerModel} from '../index';
+
+export default class ViewportScroller implements ViewportScrollerModel {
   static SPEED_FACTOR_SLOW = 1 / 20;
   static SPEED_FACTOR_MEDIUM = 1 / 10;
   static SPEED_FACTOR_FAST = 1 / 5;
@@ -17,37 +19,25 @@ export default class ViewportScroller {
   viewportWidth: number;
   viewportHeight: number;
   e: number;
-  f: any;
+  f: number;
   initialDelay: number;
-  active: boolean;
-  scroll: any;
+  active: () => boolean;
+  scroll: (dx: number, dy: number) => void;
+
   dx: number;
   dy: number;
   started: boolean;
   moved: boolean;
-  protected _timeoutId: any;
+  protected _timeoutId: number;
 
-  constructor(model) {
+  constructor(model?: ViewportScrollerModel) {
     this.viewportWidth = 0;
     this.viewportHeight = 0;
-    /** distance from the viewport edge (in pixel) where we start to scroll automatically */
     this.e = 30;
-    /** position of "fast scroll" area. Same dimension as e. Negative values are outside the viewport. */
     this.f = -30;
-    /** milliseconds */
     this.initialDelay = 500;
-
-    /**
-     * Function that returns "false", if the scrolling should no longer be active (e.g. because the
-     * elements were removed from the DOM) or "true" otherwise.
-     * @return {boolean}
-     */
-    this.active = (): boolean => true;
-    /**
-     * Function that receives the computed delta scroll positions (positive or negative) when automatic scrolling is active.
-     * @param {number} dx
-     * @param {number} dy
-     */
+    this.active = () => true;
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     this.scroll = (dx: number, dy: number) => {
     };
 
@@ -100,8 +90,6 @@ export default class ViewportScroller {
   /**
    * This method is intended to be called with the current mouse position (viewport-relative coordinates in pixel)
    * on every mouse move event. It automatically computes the required delta scroll positions in both directions.
-   *
-   * @param {Point} mouse
    */
   update(mouse: Point) {
     let e = this.e;

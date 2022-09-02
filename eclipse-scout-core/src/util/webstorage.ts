@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -15,7 +15,7 @@ import $ from 'jquery';
  * Errors can occur e.g. in "private mode" on Safari.
  */
 
-export function getItem(storage, key) {
+export function getItem(storage: Storage, key: string): string {
   if (!storage) {
     return;
   }
@@ -26,7 +26,7 @@ export function getItem(storage, key) {
   }
 }
 
-export function getItemFromSessionStorage(key) {
+export function getItemFromSessionStorage(key: string): string {
   try {
     return getItem(sessionStorage, key);
   } catch (err) {
@@ -34,7 +34,7 @@ export function getItemFromSessionStorage(key) {
   }
 }
 
-export function getItemFromLocalStorage(key) {
+export function getItemFromLocalStorage(key: string): string {
   try {
     return getItem(localStorage, key);
   } catch (err) {
@@ -42,7 +42,7 @@ export function getItemFromLocalStorage(key) {
   }
 }
 
-export function setItem(storage, key, value) {
+export function setItem(storage: Storage, key: string, value: string) {
   if (!storage) {
     return;
   }
@@ -53,7 +53,7 @@ export function setItem(storage, key, value) {
   }
 }
 
-export function setItemToSessionStorage(key, value) {
+export function setItemToSessionStorage(key: string, value: string) {
   try {
     return setItem(sessionStorage, key, value);
   } catch (err) {
@@ -61,7 +61,7 @@ export function setItemToSessionStorage(key, value) {
   }
 }
 
-export function setItemToLocalStorage(key, value) {
+export function setItemToLocalStorage(key: string, value: string) {
   try {
     return setItem(localStorage, key, value);
   } catch (err) {
@@ -69,7 +69,7 @@ export function setItemToLocalStorage(key, value) {
   }
 }
 
-export function removeItem(storage, key) {
+export function removeItem(storage: Storage, key: string) {
   if (!storage) {
     return;
   }
@@ -80,7 +80,7 @@ export function removeItem(storage, key) {
   }
 }
 
-export function removeItemFromSessionStorage(key) {
+export function removeItemFromSessionStorage(key: string) {
   try {
     return removeItem(sessionStorage, key);
   } catch (err) {
@@ -88,7 +88,7 @@ export function removeItemFromSessionStorage(key) {
   }
 }
 
-export function removeItemFromLocalStorage(key) {
+export function removeItemFromLocalStorage(key: string) {
   try {
     return removeItem(localStorage, key);
   } catch (err) {
@@ -96,7 +96,7 @@ export function removeItemFromLocalStorage(key) {
   }
 }
 
-export function clear(storage) {
+export function clear(storage: Storage) {
   if (!storage) {
     return;
   }

@@ -1,36 +1,43 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, dragAndDrop, files as fileUtil, MessageBoxes, Status} from '../index';
+import {arrays, dragAndDrop, files as fileUtil, MessageBoxes, Status, Widget} from '../index';
 import $ from 'jquery';
+import {DragAndDropType, DropValidationErrorMessage, FileDropEvent} from './dragAndDrop';
 
 export default class DragAndDropHandler {
-  additionalDropProperties: any;
-  allowedTypes: any;
-  dropMaximumSize: any;
-  target: any;
-  onDrop: any;
-  validateFiles: any;
-  supportedScoutTypes: any;
-  protected _onDragEnterHandler: any;
-  protected _onDragOverHandler: any;
-  protected _onDropHandler: any;
+  additionalDropProperties: (event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => any;
+  allowedTypes: () => string[];
+  dropType: () => number;
+  dropMaximumSize: () => number;
+  target: Widget;
+  onDrop: (data: FileDropEvent) => void;
+  validateFiles: (files: File[], defaultValidator: (f: File[]) => void) => void;
+  supportedScoutTypes: DragAndDropType[];
+  $element: JQuery;
+  selector: JQuery.Selector;
+  protected _onDragEnterHandler: (event: JQuery.DragEnterEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;
+  protected _onDragOverHandler: (event: JQuery.DragOverEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;
+  protected _onDropHandler: (event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;
 
   constructor(options) {
     options = options || {};
     this.additionalDropProperties = null;
     this.allowedTypes = null;
+    this.dropType = null;
     this.dropMaximumSize = null;
     this.target = null;
     this.onDrop = null;
     this.validateFiles = null;
+    this.selector = null;
+    this.$element = null;
 
     $.extend(this, options);
     this.supportedScoutTypes = arrays.ensure(options.supportedScoutTypes);
@@ -39,7 +46,7 @@ export default class DragAndDropHandler {
     this._onDropHandler = this._onDrop.bind(this);
   }
 
-  install($element: JQuery, selector) {
+  install($element: JQuery, selector: JQuery.Selector) {
     if (this.$element) {
       throw new Error('Already installed.');
     }
@@ -58,22 +65,22 @@ export default class DragAndDropHandler {
     this.selector = null;
   }
 
-  protected _onDragEnter(event) {
+  protected _onDragEnter(event: JQuery.DragEnterEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     this._onDragEnterOrOver(event);
   }
 
-  protected _onDragOver(event) {
+  protected _onDragOver(event: JQuery.DragOverEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     this._onDragEnterOrOver(event);
   }
 
-  protected _onDragEnterOrOver(event) {
+  protected _onDragEnterOrOver(event: JQuery.DragEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     // set dropEffect to copy. otherwise outlook will move dropped mails into the deleted files folder.
     // see: https://bugs.chromium.org/p/chromium/issues/detail?id=322605#c33
     event.originalEvent.dataTransfer.dropEffect = 'copy';
     dragAndDrop.verifyDataTransferTypesScoutTypes(event, this.supportedScoutTypes, this.dropType());
   }
 
-  protected _onDrop(event) {
+  protected _onDrop(event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     if (this.supportedScoutTypes.indexOf(dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
       (this.dropType() & dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) === dragAndDrop.SCOUT_TYPES.FILE_TRANSFER && // NOSONAR
       dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
@@ -101,10 +108,7 @@ export default class DragAndDropHandler {
   }
 
   /**
-   *
-   * @param {File[]} files
-   * @private
-   * @throws {dropValidationErrorMessage} validationErrorMessage
+   * @throws {DropValidationErrorMessage} validationErrorMessage
    */
   private _validateFiles(files: File[]) {
     if (!this.dropMaximumSize) {
@@ -119,10 +123,7 @@ export default class DragAndDropHandler {
     }
   }
 
-  /**
-   * @param {dropValidationErrorMessage} error
-   */
-  protected _validationFailed(error: dropValidationErrorMessage) {
+  protected _validationFailed(error: DropValidationErrorMessage): Promise<string> {
     $.log.isDebugEnabled() && $.log.debug('File validation failed', error);
     let title = '';
     let message = 'Invalid files';
@@ -137,7 +138,7 @@ export default class DragAndDropHandler {
       .buildAndOpen();
   }
 
-  uploadFiles(event) {
+  uploadFiles(event: FileDropEvent) {
     if (event && event.originalEvent && event.files.length >= 1) {
       this.target.session.uploadFiles(this.target, event.files,
         this.additionalDropProperties ? this.additionalDropProperties(event.originalEvent) : undefined,
@@ -145,12 +146,4 @@ export default class DragAndDropHandler {
         this.allowedTypes ? this.allowedTypes() : undefined);
     }
   }
-
-  // ----------------- TYPEDEF -----------------
-
-  /**
-   * @typedef dropValidationErrorMessage
-   * @property {string} title
-   * @property {string} message
-   */
 }

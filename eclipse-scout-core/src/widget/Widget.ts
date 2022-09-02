@@ -3,12 +3,12 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, objects, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEvent, WidgetModel} from '../index';
+import {AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEvent, WidgetModel} from '../index';
 import * as $ from 'jquery';
 import {RefWidgetModel} from './WidgetModel';
 
@@ -37,7 +37,9 @@ interface EventDelegatorForCloning {
   cloneToOriginal: EventDelegator;
 }
 
-export default class Widget extends PropertyEventEmitter implements WidgetModel {
+
+export default class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType {
+  declare model: WidgetModel;
   animateRemoval: boolean;
   animateRemovalClass: string;
   attached: boolean;
@@ -315,7 +317,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel 
       return existingWidget;
     }
     model.parent = this;
-    return scout.create(model as { objectType: string });
+    return scout.create(model as ObjectWithType);
   }
 
   protected _initKeyStrokeContext() {
