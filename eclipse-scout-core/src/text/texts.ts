@@ -8,32 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, TextMap} from '../index';
+import {arrays, Session, TextMap} from '../index';
 import $ from 'jquery';
 
 const TEXT_KEY_REGEX = /\${textKey:([^}]*)}/;
 
-let textsByLocale = {};
+export type TextMapType = { [languageTag: string]: TextMap };
 
-export function bootstrap(url) {
+let textsByLocale: TextMapType = {};
+
+export function bootstrap(url: string | string[]): JQuery.Promise<any> {
   if (!url) {
     return $.resolvedPromise({});
   }
   let promises = [];
   let urls = arrays.ensure(url);
   urls.forEach(url => promises.push(
+    // @ts-ignore
     $.ajaxJson(url).then(_preInit.bind(this, url)))
   );
   return $.promiseAll(promises);
 }
 
 // private
-export function _setTextsByLocale(val) {
+export function _setTextsByLocale(val: TextMapType) {
   textsByLocale = val;
 }
 
 // private
-export function _preInit(url, data) {
+export function _preInit(url: string | string[], data: any) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
     throw {
@@ -44,17 +47,15 @@ export function _preInit(url, data) {
   init(data);
 }
 
-export function init(model) {
-  let languageTags = Object.keys(model);
-  languageTags.forEach(languageTag => {
-    get(languageTag).addAll(model[languageTag]);
-  }, this);
+export function init(model: { [languageTag: string]: { [textKey: string]: string } }) {
+  Object.keys(model)
+    .forEach(languageTag => get(languageTag).addAll(model[languageTag]), this);
 }
 
 /**
  * Links the texts of the given languageTag to make parent lookup possible (e.g. look first in de-CH, then in de, then in default)
  */
-export function link(languageTag) {
+export function link(languageTag: string) {
   let tags = createOrderedLanguageTags(languageTag);
   let child;
   tags.forEach(tag => {
@@ -79,7 +80,7 @@ export function link(languageTag) {
  * - 'de' generates the array: ['de', 'default']
  * - 'default' generates the array: ['default']
  */
-export function createOrderedLanguageTags(languageTag) {
+export function createOrderedLanguageTags(languageTag: string): string[] {
   let tags = [],
     i = languageTag.lastIndexOf('-');
 
@@ -100,7 +101,7 @@ export function createOrderedLanguageTags(languageTag) {
 /**
  * Returns the (modifiable) TextMap for the given language tag.
  */
-export function get(languageTag) {
+export function get(languageTag: string): TextMap {
   let texts = _get(languageTag);
   if (texts) {
     return texts;
@@ -115,17 +116,15 @@ export function get(languageTag) {
 }
 
 // private
-export function _get(languageTag) {
+export function _get(languageTag: string): TextMap {
   return textsByLocale[languageTag];
 }
 
 /**
  * Registers the text map for the given locale.
  * If there already is a text map registered for that locale, it will be replaced, meaning existing texts for that locale are deleted.
- *
- * @param {TextMap} textMap
  */
-export function put(languageTag, textMap: TextMap) {
+export function put(languageTag: string, textMap: TextMap) {
   textsByLocale[languageTag] = textMap;
 }
 
@@ -137,7 +136,7 @@ export function put(languageTag, textMap: TextMap) {
  * This method returns a map with all found texts. It must be called before scout.prepareDOM()
  * is called, as that method removes all <scout-text> tags.
  */
-export function readFromDOM() {
+export function readFromDOM(): { [textKey: string]: string } {
   let textMap = {};
   $('scout-text').each(function() {
     // No need to unescape strings (the browser did this already)
@@ -150,16 +149,16 @@ export function readFromDOM() {
 }
 
 /**
- * @param {string} key to convert into a string with the form '${textKey:AKey}'.
- * @return {string} text containing the text key like like '${textKey:AKey}'.
+ * @param key to convert into a string with the form '${textKey:AKey}'.
+ * @return text containing the text key like like '${textKey:AKey}'.
  */
 export function buildKey(key: string): string {
   return '${textKey:' + key + '}';
 }
 
 /**
- * @param {string} value text which contains a text key like '${textKey:AKey}'.
- * @return {string} the resolved key or the unchanged value if the text key could not be extracted.
+ * @param value text which contains a text key like '${textKey:AKey}'.
+ * @return the resolved key or the unchanged value if the text key could not be extracted.
  */
 export function resolveKey(value: string): string {
   let result = TEXT_KEY_REGEX.exec(value);
@@ -170,9 +169,9 @@ export function resolveKey(value: string): string {
 }
 
 /**
- * @param {string} value text which contains a text key like '${textKey:AKey}'.
- * @param {string} languageTag the languageTag to use for the text lookup with the resolved key.
- * @return {string} the resolved text in the language of the given session or the unchanged text if the text key could not be extracted.
+ * @param value text which contains a text key like '${textKey:AKey}'.
+ * @param languageTag the languageTag to use for the text lookup with the resolved key.
+ * @return the resolved text in the language of the given session or the unchanged text if the text key could not be extracted.
  */
 export function resolveText(value: string, languageTag: string): string {
   let key = resolveKey(value);
@@ -185,9 +184,9 @@ export function resolveText(value: string, languageTag: string): string {
 /**
  * Utility function to easily replace an object property which contains a text key like '${textKey:AKey}'.
  *
- * @param {{ session?: Session }} object object having a text property which contains a text-key
- * @param {string} [textProperty] name of the property where a text-key should be replaced by a text. By default 'text' is used as property name.
- * @param {Session} [session] can be undefined when given 'object' has a session property, otherwise mandatory
+ * @param object object having a text property which contains a text-key
+ * @param [textProperty] name of the property where a text-key should be replaced by a text. By default 'text' is used as property name.
+ * @param [session] can be undefined when given 'object' has a session property, otherwise mandatory
  */
 export function resolveTextProperty(object: { session?: Session }, textProperty?: string, session?: Session) {
   textProperty = textProperty || 'text';

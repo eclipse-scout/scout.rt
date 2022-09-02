@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,9 +11,11 @@
 import {objects} from '../index';
 
 export default class TextMap {
-  map: any;
 
-  constructor(textMap) {
+  map: { [textKey: string]: string };
+  parent: TextMap;
+
+  constructor(textMap?: { [textKey: string]: string }) {
     this.map = textMap || {};
   }
 
@@ -26,7 +28,7 @@ export default class TextMap {
    * @param textKey key to lookup the text
    * @param vararg texts to replace the placeholders specified by {0}, {1}, etc.
    */
-  get(textKey, ...vararg) {
+  get(textKey: string, ...vararg: string[]): string {
     if (!this._exists(textKey)) {
       if (this.parent) {
         return this.parent.get(textKey, ...vararg);
@@ -46,7 +48,7 @@ export default class TextMap {
     return text;
   }
 
-  optGet(textKey, defaultValue, ...vararg) {
+  optGet(textKey: string, defaultValue: string, ...vararg: string[]): string {
     if (!this._exists(textKey)) {
       if (this.parent) {
         return this.parent.optGet(textKey, defaultValue, ...vararg);
@@ -56,7 +58,7 @@ export default class TextMap {
     return this.get(textKey, ...vararg);
   }
 
-  exists(textKey) {
+  exists(textKey: string): boolean {
     if (this._exists(textKey)) {
       return true;
     }
@@ -66,19 +68,19 @@ export default class TextMap {
     return false;
   }
 
-  protected _exists(textKey) {
+  protected _exists(textKey: string): boolean {
     return this.map.hasOwnProperty(textKey);
   }
 
-  add(textKey, text: string) {
+  add(textKey: string, text: string) {
     this.map[textKey] = text;
   }
 
   /**
    * Adds all texts from the given textMap to this textMap
-   * @param {Object|TextMap} textMap either a plain object or a {@link TextMap}
+   * @param textMap either a plain object or a {@link TextMap}
    */
-  addAll(textMap: object | TextMap) {
+  addAll(textMap: { [textKey: string]: string } | TextMap) {
     if (!textMap) {
       return;
     }
@@ -88,11 +90,11 @@ export default class TextMap {
     objects.copyOwnProperties(textMap, this.map);
   }
 
-  setParent(parent) {
+  setParent(parent: TextMap) {
     this.parent = parent;
   }
 
-  remove(textKey) {
+  remove(textKey: string) {
     delete this.map[textKey];
   }
 }

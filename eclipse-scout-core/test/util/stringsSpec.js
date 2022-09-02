@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -283,34 +283,6 @@ describe('strings', () => {
       expect(strings.toLowerCaseFirstLetter('Abc Def')).toBe('abc Def');
       expect(strings.toLowerCaseFirstLetter('$TEST')).toBe('$TEST');
       expect(strings.toLowerCaseFirstLetter('ÄÖÜ sind Umlaute')).toBe('äÖÜ sind Umlaute');
-    });
-
-  });
-
-  describe('lowercaseFirstLetter', () => {
-
-    it('converts first letter to lowercase', () => {
-      expect(strings.lowercaseFirstLetter()).toBe(undefined);
-      expect(strings.lowercaseFirstLetter(null)).toBe(null);
-      expect(strings.lowercaseFirstLetter(0)).toBe('0');
-      expect(strings.lowercaseFirstLetter('0')).toBe('0');
-      expect(strings.lowercaseFirstLetter('hans müller')).toBe('hans müller');
-      expect(strings.lowercaseFirstLetter('Hans Müller')).toBe('hans Müller');
-      expect(strings.lowercaseFirstLetter('ÄÖÜ sind Umlaute')).toBe('äÖÜ sind Umlaute');
-    });
-
-  });
-
-  describe('uppercaseFirstLetter', () => {
-
-    it('converts first letter to uppercase', () => {
-      expect(strings.uppercaseFirstLetter()).toBe(undefined);
-      expect(strings.uppercaseFirstLetter(null)).toBe(null);
-      expect(strings.uppercaseFirstLetter(0)).toBe('0');
-      expect(strings.uppercaseFirstLetter('0')).toBe('0');
-      expect(strings.uppercaseFirstLetter('hans müller')).toBe('Hans müller');
-      expect(strings.uppercaseFirstLetter('Hans Müller')).toBe('Hans Müller');
-      expect(strings.uppercaseFirstLetter('äöü sind Umlaute')).toBe('Äöü sind Umlaute');
     });
 
   });

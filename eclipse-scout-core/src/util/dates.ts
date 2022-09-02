@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormat, scout, strings} from '../index';
+import {DateFormat, DateRange, Locale, objects, scout, strings} from '../index';
 
-export function shift(date, years, months, days) {
+export function shift(date: Date, years: number, months: number, days: number): Date {
   let newDate = new Date(date.getTime());
   if (years) {
     newDate.setFullYear(date.getFullYear() + years);
@@ -34,7 +34,7 @@ export function shift(date, years, months, days) {
   return newDate;
 }
 
-export function shiftTime(date, hours, minutes, seconds, milliseconds) {
+export function shiftTime(date: Date, hours: number, minutes: number, seconds: number, milliseconds: number): Date {
   let newDate = new Date(date.getTime());
   if (hours) {
     newDate.setHours(date.getHours() + hours);
@@ -51,7 +51,7 @@ export function shiftTime(date, hours, minutes, seconds, milliseconds) {
   return newDate;
 }
 
-export function shiftToNextDayOfType(date, day) {
+export function shiftToNextDayOfType(date: Date, day: number): Date {
   let diff = day - date.getDay();
 
   if (diff <= 0) {
@@ -63,10 +63,9 @@ export function shiftToNextDayOfType(date, day) {
 /**
  * Finds the next date (based on the given date) that matches the given day in week and date.
  *
- * @param {Date} date Start date
- * @param {number} dayInWeek 0-6
- * @param {number} dayInMonth 1-31
- * @returns {Date}
+ * @param date Start date
+ * @param dayInWeek 0-6
+ * @param dayInMonth 1-31
  */
 export function shiftToNextDayAndDate(date: Date, dayInWeek: number, dayInMonth: number): Date {
   let tmpDate = new Date(date.getTime());
@@ -81,7 +80,7 @@ export function shiftToNextDayAndDate(date: Date, dayInWeek: number, dayInMonth:
   return tmpDate;
 }
 
-export function shiftToPreviousDayOfType(date, day) {
+export function shiftToPreviousDayOfType(date: Date, day: number): Date {
   let diff = day - date.getDay();
 
   if (diff >= 0) {
@@ -90,14 +89,14 @@ export function shiftToPreviousDayOfType(date, day) {
   return shift(date, 0, 0, diff);
 }
 
-export function shiftToNextOrPrevDayOfType(date, day, direction) {
+export function shiftToNextOrPrevDayOfType(date: Date, day: number, direction: number): Date {
   if (direction > 0) {
     return shiftToNextDayOfType(date, day);
   }
   return shiftToPreviousDayOfType(date, day);
 }
 
-export function shiftToNextOrPrevMonday(date, direction) {
+export function shiftToNextOrPrevMonday(date: Date, direction: number): Date {
   return shiftToNextOrPrevDayOfType(date, 1, direction);
 }
 
@@ -107,11 +106,11 @@ export function shiftToNextOrPrevMonday(date, direction) {
  * If it already is a date, the date will be returned.
  * Otherwise parseJsonDate is used to create a Date.
  *
- * @param {Date|string} date may be of type date or string.
+ * @param date may be of type date or string.
  */
-export function ensure(date: Date | string) {
-  if (!date) {
-    return date;
+export function ensure(date: Date | string): Date {
+  if (objects.isNullOrUndefined(date)) {
+    return date as Date;
   }
   if (date instanceof Date) {
     return date;
@@ -119,14 +118,14 @@ export function ensure(date: Date | string) {
   return parseJsonDate(date);
 }
 
-export function ensureMonday(date, direction) {
+export function ensureMonday(date: Date, direction: number): Date {
   if (date.getDay() === 1) {
     return date;
   }
   return shiftToNextOrPrevMonday(date, direction);
 }
 
-export function isSameTime(date, date2) {
+export function isSameTime(date: Date, date2: Date): boolean {
   if (!date || !date2) {
     return false;
   }
@@ -135,7 +134,7 @@ export function isSameTime(date, date2) {
     date.getSeconds() === date2.getSeconds();
 }
 
-export function isSameDay(date, date2) {
+export function isSameDay(date: Date, date2: Date): boolean {
   if (!date || !date2) {
     return false;
   }
@@ -144,7 +143,7 @@ export function isSameDay(date, date2) {
     date.getDate() === date2.getDate();
 }
 
-export function isSameMonth(date, date2) {
+export function isSameMonth(date: Date, date2: Date): boolean {
   if (!date || !date2) {
     return false;
   }
@@ -153,9 +152,8 @@ export function isSameMonth(date, date2) {
 
 /**
  * Returns the difference of the two dates in number of months.
- * @returns {number}
  */
-export function compareMonths(date1, date2): number {
+export function compareMonths(date1: Date, date2: Date): number {
   let d1Month = date1.getMonth(),
     d2Month = date2.getMonth(),
     d1Year = date1.getFullYear(),
@@ -169,14 +167,13 @@ export function compareMonths(date1, date2): number {
 
 /**
  * Returns the difference of the two dates in number of days.
- * @returns {number}
  */
-export function compareDays(date1, date2): number {
-  return (trunc(date1) - trunc(date2) - (date1.getTimezoneOffset() - date2.getTimezoneOffset()) * 60000) / (3600000 * 24);
+export function compareDays(date1: Date, date2: Date): number {
+  return (trunc(date1).getTime() - trunc(date2).getTime() - (date1.getTimezoneOffset() - date2.getTimezoneOffset()) * 60000) / (3600000 * 24);
 }
 
-export function orderWeekdays(weekdays, firstDayOfWeekArg) {
-  let weekdaysOrdered = [];
+export function orderWeekdays(weekdays: string[], firstDayOfWeekArg: number): string[] {
+  let weekdaysOrdered: string[] = [];
   for (let i = 0; i < 7; i++) {
     weekdaysOrdered[i] = weekdays[(i + firstDayOfWeekArg) % 7];
   }
@@ -194,19 +191,15 @@ export function orderWeekdays(weekdays, firstDayOfWeekArg) {
  * not ISO 8601 compliant anymore, but can be more appropriate for display in a calendar. The
  * argument can be a number, a 'scout.Locale' or a 'scout.DateFormat' object.
  */
-export function weekInYear(date, option) {
+export function weekInYear(date: Date, option?: number | Locale | DateFormat): number {
   if (!date) {
     return undefined;
   }
   let firstDayOfWeekArg = 1;
-  if (typeof option === 'object') {
-    // DateFormat
-    if (option.symbols !== undefined && option.symbols.firstDayOfWeek !== undefined) {
-      firstDayOfWeekArg = option.symbols.firstDayOfWeek;
-    } else if (option.decimalFormatSymbols !== undefined && option.decimalFormatSymbols.firstDayOfWeek !== undefined) {
-      // Locale
-      firstDayOfWeekArg = option.decimalFormatSymbols.firstDayOfWeek;
-    }
+  if (option instanceof DateFormat) {
+    firstDayOfWeekArg = option.symbols.firstDayOfWeek;
+  } else if (option instanceof Locale) {
+    firstDayOfWeekArg = option.dateFormatSymbols.firstDayOfWeek;
   } else if (typeof option === 'number') {
     firstDayOfWeekArg = option;
   }
@@ -231,7 +224,7 @@ export function weekInYear(date, option) {
   return 1 + Math.round(diffInDays / 7);
 }
 
-export function _thursdayOfWeek(date, firstDayOfWeekArg) {
+export function _thursdayOfWeek(date: Date, firstDayOfWeekArg: number): Date {
   if (!date || typeof firstDayOfWeekArg !== 'number') {
     return undefined;
   }
@@ -247,7 +240,7 @@ export function _thursdayOfWeek(date, firstDayOfWeekArg) {
   return thursday;
 }
 
-export function firstDayOfWeek(date, firstDayOfWeekArg) {
+export function firstDayOfWeek(date: Date, firstDayOfWeekArg: number): Date {
   if (!date || typeof firstDayOfWeekArg !== 'number') {
     return undefined;
   }
@@ -264,47 +257,47 @@ export function firstDayOfWeek(date, firstDayOfWeekArg) {
  *
  * @see JsonDate.java
  */
-export function parseJsonDate(jsonDate: Date) {
+export function parseJsonDate(jsonDate: string): Date {
   if (!jsonDate) {
     return null;
   }
 
-  let year = '1970',
-    month = '01',
-    day = '01',
-    hours = '00',
-    minutes = '00',
-    seconds = '00',
-    milliseconds = '000',
+  let year = 1970,
+    month = 1,
+    day = 1,
+    hours = 0,
+    minutes = 0,
+    seconds = 0,
+    milliseconds = 0,
     utc = false;
 
   // Date + Time
   let matches = /^\+?(\d{4,5})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d{3})(Z?)$/.exec(jsonDate);
   if (matches !== null) {
-    year = matches[1];
-    month = matches[2];
-    day = matches[3];
-    hours = matches[4];
-    minutes = matches[5];
-    seconds = matches[6];
-    milliseconds = matches[7];
+    year = parseInt(matches[1], 10);
+    month = parseInt(matches[2], 10);
+    day = parseInt(matches[3], 10);
+    hours = parseInt(matches[4], 10);
+    minutes = parseInt(matches[5], 10);
+    seconds = parseInt(matches[6], 10);
+    milliseconds = parseInt(matches[7], 10);
     utc = matches[8] === 'Z';
   } else {
     // Date only
     matches = /^\+?(\d{4,5})-(\d{2})-(\d{2})(Z?)$/.exec(jsonDate);
     if (matches !== null) {
-      year = matches[1];
-      month = matches[2];
-      day = matches[3];
+      year = parseInt(matches[1], 10);
+      month = parseInt(matches[2], 10);
+      day = parseInt(matches[3], 10);
       utc = matches[4] === 'Z';
     } else {
       // Time only
       matches = /^(\d{2}):(\d{2}):(\d{2})\.(\d{3})(Z?)$/.exec(jsonDate);
       if (matches !== null) {
-        hours = matches[1];
-        minutes = matches[2];
-        seconds = matches[3];
-        milliseconds = matches[4];
+        hours = parseInt(matches[1], 10);
+        minutes = parseInt(matches[2], 10);
+        seconds = parseInt(matches[3], 10);
+        milliseconds = parseInt(matches[4], 10);
         utc = matches[5] === 'Z';
       } else {
         throw new Error('Unparsable date: ' + jsonDate);
@@ -337,7 +330,7 @@ export function parseJsonDate(jsonDate: Date) {
  *
  * @see JsonDate.java
  */
-export function toJsonDate(date, utc, includeDate: Date, includeTime: Date) {
+export function toJsonDate(date: Date, utc?: boolean, includeDate?: boolean, includeTime?: boolean): string {
   if (!date) {
     return null;
   }
@@ -391,7 +384,12 @@ export function toJsonDate(date, utc, includeDate: Date, includeTime: Date) {
   }
 }
 
-export function toJsonDateRange(range) {
+export interface JsonDateRange {
+  from: string;
+  to: string;
+}
+
+export function toJsonDateRange(range: DateRange): JsonDateRange {
   return {
     from: toJsonDate(range.from),
     to: toJsonDate(range.to)
@@ -410,7 +408,7 @@ export function toJsonDateRange(range) {
  * The date is constructed using the local time zone. If the last character is 'Z', then
  * the values are interpreted as UTC date.
  */
-export function create(dateString) {
+export function create(dateString: string): Date {
   if (dateString) {
     let matches = /^(\d{4,5})(?:-(\d{2})(?:-(\d{2})(?: (\d{2})(?::(\d{2})(?::(\d{2})(?:\.(\d{3}))?(Z?))?)?)?)?)?/.exec(dateString);
     if (matches === null) {
@@ -419,23 +417,23 @@ export function create(dateString) {
     let date;
     if (matches[8] === 'Z') {
       date = new Date(Date.UTC(
-        matches[1], // fullYear
-        (matches[2] || 1) - 1, // month (0-indexed)
-        matches[3] || 1, // day of month
-        matches[4] || 0, // hours
-        matches[5] || 0, // minutes
-        matches[6] || 0, // seconds
-        matches[7] || 0 // milliseconds
+        parseInt(matches[1], 10), // fullYear
+        (parseInt(matches[2], 10) || 1) - 1, // month (0-indexed)
+        parseInt(matches[3], 10) || 1, // day of month
+        parseInt(matches[4], 10) || 0, // hours
+        parseInt(matches[5], 10) || 0, // minutes
+        parseInt(matches[6], 10) || 0, // seconds
+        parseInt(matches[7], 10) || 0 // milliseconds
       ));
     } else {
       date = new Date(
-        matches[1], // fullYear
-        (matches[2] || 1) - 1, // month (0-indexed)
-        matches[3] || 1, // day of month
-        matches[4] || 0, // hours
-        matches[5] || 0, // minutes
-        matches[6] || 0, // seconds
-        matches[7] || 0 // milliseconds
+        parseInt(matches[1], 10), // fullYear
+        (parseInt(matches[2], 10) || 1) - 1, // month (0-indexed)
+        parseInt(matches[3], 10) || 1, // day of month
+        parseInt(matches[4], 10) || 0, // hours
+        parseInt(matches[5], 10) || 0, // minutes
+        parseInt(matches[6], 10) || 0, // seconds
+        parseInt(matches[7], 10) || 0 // milliseconds
       );
     }
     return date;
@@ -448,14 +446,12 @@ export function create(dateString) {
  * when you want to provide a fixed date instead of the system time/date for unit tests. In your unit test
  * you can replace this function with a function that provides a fixed date. Don't forget to restore the
  * original function when you cleanup/tear-down the test.
- *
- * @returns {Date}
  */
 export function newDate(): Date {
   return new Date();
 }
 
-export function format(date, locale, pattern) {
+export function format(date: Date, locale: Locale, pattern: string): string {
   let dateFormat = new DateFormat(locale, pattern);
   return dateFormat.format(date);
 }
@@ -463,12 +459,12 @@ export function format(date, locale, pattern) {
 /**
  * Uses the default date and time format patterns from the locale to format the given date.
  */
-export function formatDateTime(date, locale) {
+export function formatDateTime(date: Date, locale: Locale): string {
   let dateFormat = new DateFormat(locale, locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault);
   return dateFormat.format(date);
 }
 
-export function compare(a, b) {
+export function compare(a: Date, b: Date): number {
   if (!a && !b) {
     return 0;
   }
@@ -488,7 +484,7 @@ export function compare(a, b) {
   return diff;
 }
 
-export function equals(a, b) {
+export function equals(a: Date, b: Date): boolean {
   return compare(a, b) === 0;
 }
 
@@ -498,7 +494,7 @@ export function equals(a, b) {
  * If time is omitted, 00:00:00 is used as time part.<br>
  * If date is omitted, 1970-01-01 is used as date part independent of the time zone, means it is 1970-01-01 in every time zone.
  */
-export function combineDateTime(date, time) {
+export function combineDateTime(date: Date, time: Date): Date {
   let newDate = new Date();
   newDate.setHours(0, 0, 0, 0); // set time part to zero in local time!
   newDate.setFullYear(1970, 0, 1); // make sure local time has no effect on date (if date is omitted it has to be 1970-01-01)
@@ -517,7 +513,7 @@ export function combineDateTime(date, time) {
 /**
  * Returns <code>true</code> if the given year is a leap year, i.e if february 29 exists in that year.
  */
-export function isLeapYear(year) {
+export function isLeapYear(year: number): boolean {
   if (year === undefined || year === null) {
     return false;
   }
@@ -528,14 +524,14 @@ export function isLeapYear(year) {
 /**
  * Returns the given date with time set to midnight (hours, minutes, seconds, milliseconds = 0).
  *
- * @param {Date} date (required)
+ * @param date (required)
  *          The date to truncate.
- * @param {boolean} [createCopy] (optional)
+ * @param [createCopy] (optional)
  *          If this flag is true, a copy of the given date is returned (the input date is not
  *          altered). If the flag is false, the given object is changed and then returned.
  *          The default value for this flag is "true".
  */
-export function trunc(date: Date, createCopy?: boolean) {
+export function trunc(date: Date, createCopy?: boolean): Date {
   if (date) {
     if (scout.nvl(createCopy, true)) {
       date = new Date(date.getTime());
@@ -548,21 +544,19 @@ export function trunc(date: Date, createCopy?: boolean) {
 /**
  * Returns the given date with time set to midnight (hours, minutes, seconds, milliseconds = 0).
  *
- * @param {Date} date
+ * @param date
  *          The date to truncate.
- * @param {number} [minutesResolution] default is 30
- *          The amount of minutes added to every full hour XX:00 until > XX+1:00. The given date will ceiled to the next valid time.
+ * @param [minutesResolution] default is 30
+ *          The amount of minutes added to every full hour XX:00 until > XX+1:00. The given date will rounded up to the next valid time.
  *          e.g. time:15:05, resolution 40  -> 15:40
  *               time: 15:41 resolution 40 -> 16:00
- * @param {boolean} [createCopy]
+ * @param [createCopy]
  *          If this flag is true, a copy of the given date is returned (the input date is not
  *          altered). If the flag is false, the given object is changed and then returned.
  *          The default value for this flag is "true".
  */
-export function ceil(date: Date, minutesResolution?: number, createCopy?: boolean) {
-  let h,
-    m,
-    mResulution = scout.nvl(minutesResolution, 30);
+export function ceil(date: Date, minutesResolution?: number, createCopy?: boolean): Date {
+  let h, m, minResolution = scout.nvl(minutesResolution, 30);
   if (date) {
     if (scout.nvl(createCopy, true)) {
       date = new Date(date.getTime());
@@ -570,7 +564,7 @@ export function ceil(date: Date, minutesResolution?: number, createCopy?: boolea
 
     date.setSeconds(0, 0); // clear seconds and millis
 
-    m = parseInt((date.getMinutes() + mResulution) / mResulution) * mResulution;
+    m = ((date.getMinutes() + minResolution) / minResolution) * minResolution;
     h = date.getHours();
     if (m >= 60) {
       h++;

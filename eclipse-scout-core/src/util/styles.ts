@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,30 +13,28 @@ import $ from 'jquery';
 
 let styleMap = {};
 
-let element = null;
+let element: HTMLDivElement = null;
 
-/**
- * @typedef StyleMap
- * @property {string} [minHeight]
- * @property {string} [minWidth]
- * @property {string} [fill]
- * @property {string} [stroke]
- * @property {string} [fontFamily]
- * @property {string} [backgroundColor]
- * @property {string} [borderColor]
- */
+export interface StyleMap {
+  minHeight: string;
+  minWidth: string;
+  fill: string;
+  stroke: string;
+  fontFamily: string;
+  backgroundColor: string;
+  borderColor: string;
+}
 
 /**
  * Generates an invisible div and appends it to the body, only once. The same div will be reused on subsequent calls.
  * Adds the given css class to that element and returns a style object containing the values for every given property.
  * The style is cached. Subsequent calls with the same css class will return the same style object.
  *
- * @param {object} styleProperties in the form {backgroundColor: 'black'}
- * @return {StyleMap} style
+ * @param styleProperties in the form {backgroundColor: 'black'}
  */
-export function get(cssClass: string, properties, styleProperties: object): StyleMap {
+export function get(cssClass: string | string[], properties: string | string[], styleProperties?: { [key: string]: string }): StyleMap {
   // create invisible div
-  let elem = element;
+  let elem: HTMLDivElement = element;
   if (!elem) {
     elem = window.document.createElement('div');
     elem.style.display = 'none';
@@ -63,29 +61,24 @@ export function get(cssClass: string, properties, styleProperties: object): Styl
   let cssClassArray = arrays.ensure(cssClass),
     mapKey = keyCssText ? [...cssClassArray, keyCssText] : cssClassArray;
 
-  let style = styleMap[mapKey];
+  let style = styleMap[mapKey.toString()];
   // ensure array
   properties = arrays.ensure(properties);
-  properties = properties.map(prop => {
+  let propertyNames = properties.map(prop => {
     return {
       name: prop,
       // replace property names like 'max-width' in 'maxWidth'
-      nameCamelCase: prop.replace(/-(.)/g,
-        (match, p1) => {
-          return p1.toUpperCase();
-        })
+      nameCamelCase: prop.replace(/-(.)/g, (match, p1) => p1.toUpperCase())
     };
   });
 
   // ensure style
   if (!style) {
     style = {};
-    put(mapKey, style);
+    put(mapKey.toString(), style);
   }
 
-  let notResolvedProperties = properties.filter(prop => {
-    return !(prop.nameCamelCase in style);
-  });
+  let notResolvedProperties = propertyNames.filter(prop => !(prop.nameCamelCase in style));
   if (notResolvedProperties.length === 0) {
     return style;
   }
@@ -93,7 +86,7 @@ export function get(cssClass: string, properties, styleProperties: object): Styl
   // resolve missing properties
   elem.className = cssClassArray[0];
   for (let i = 1; i < cssClassArray.length; i++) {
-    let childElem = elem.children[0];
+    let childElem: HTMLDivElement = elem.children[0] as HTMLDivElement;
     if (!childElem) {
       childElem = window.document.createElement('div');
       childElem.style.display = 'none';
@@ -116,7 +109,7 @@ export function get(cssClass: string, properties, styleProperties: object): Styl
 
   do {
     elem.className = '';
-    elem = elem.children[0];
+    elem = elem.children[0] as HTMLDivElement;
   }
   while (elem);
 
@@ -125,14 +118,14 @@ export function get(cssClass: string, properties, styleProperties: object): Styl
 
 /**
  * Traverses the parents of the given $elem and returns the first opaque background color.
- * @param {JQuery} $elem
  */
-export function getFirstOpaqueBackgroundColor($elem: JQuery) {
+export function getFirstOpaqueBackgroundColor($elem: JQuery): string {
   if (!$elem) {
     return;
   }
 
   let document = $elem.document(true);
+  // @ts-ignore
   while ($elem && $elem.length && document !== $elem[0]) {
     let rgbString = $elem.css('background-color'),
       rgba = rgb(rgbString);
@@ -143,7 +136,7 @@ export function getFirstOpaqueBackgroundColor($elem: JQuery) {
   }
 }
 
-export function getSize(cssClass: string, cssProperty, property, defaultSize) {
+export function getSize(cssClass: string | string[], cssProperty: string | string[], property: string, defaultSize: number): number {
   let size = get(cssClass, cssProperty)[property];
   if ('auto' === size) {
     return defaultSize;
@@ -151,7 +144,7 @@ export function getSize(cssClass: string, cssProperty, property, defaultSize) {
   return $.pxToNumber(size);
 }
 
-export function put(cssClass: string, style) {
+export function put(cssClass: string, style: StyleMap) {
   styleMap[cssClass] = style;
 }
 
@@ -159,23 +152,30 @@ export function clearCache() {
   styleMap = {};
 }
 
-const RGB_BLACK = {
+export interface Rgba {
+  red: number;
+  green: number;
+  blue: number;
+  alpha?: number;
+}
+
+const RGB_BLACK: Rgba = {
   red: 0,
   green: 0,
   blue: 0
-};
+} as const;
 
-const RGB_WHITE = {
+const RGB_WHITE: Rgba = {
   red: 255,
   green: 255,
   blue: 255
-};
+} as const;
 
 /**
  * Creates an rgb object based on the given rgb string with the format rgb(0, 0, 0).
  * If the input string cannot be parsed, undefined is returned.
  */
-export function rgb(rgbString) {
+export function rgb(rgbString: string): Rgba {
   if (!rgbString) {
     return undefined;
   }
@@ -194,7 +194,7 @@ export function rgb(rgbString) {
 /**
  * Converts the given hex string to a rgb string.
  */
-export function hexToRgb(hexString) {
+export function hexToRgb(hexString: string): string {
   if (!hexString) {
     return;
   }
@@ -205,20 +205,20 @@ export function hexToRgb(hexString) {
     a = 255;
 
   if (hexString.length === 4 || hexString.length === 5) {
-    r = '0x' + hexString[1] + hexString[1];
-    g = '0x' + hexString[2] + hexString[2];
-    b = '0x' + hexString[3] + hexString[3];
+    r = parseInt('0x' + hexString[1] + hexString[1]);
+    g = parseInt('0x' + hexString[2] + hexString[2]);
+    b = parseInt('0x' + hexString[3] + hexString[3]);
     if (hexString.length === 5) {
-      a = '0x' + hexString[4] + hexString[4];
+      a = parseInt('0x' + hexString[4] + hexString[4]);
     }
   }
 
   if (hexString.length === 7 || hexString.length === 9) {
-    r = '0x' + hexString[1] + hexString[2];
-    g = '0x' + hexString[3] + hexString[4];
-    b = '0x' + hexString[5] + hexString[6];
+    r = parseInt('0x' + hexString[1] + hexString[2]);
+    g = parseInt('0x' + hexString[3] + hexString[4]);
+    b = parseInt('0x' + hexString[5] + hexString[6]);
     if (hexString.length === 9) {
-      a = '0x' + hexString[7] + hexString[8];
+      a = parseInt('0x' + hexString[7] + hexString[8]);
     }
   }
 
@@ -238,7 +238,7 @@ export function hexToRgb(hexString) {
  *          to the given color (0.0 = only 'color', 1.0 = only black).
  *          Default is 0.2.
  */
-export function darkerColor(color, ratio) {
+export function darkerColor(color: string, ratio?: number): string {
   let rgbVal = rgb(color);
   if (!rgbVal) {
     return undefined;
@@ -258,7 +258,7 @@ export function darkerColor(color, ratio) {
  *          to the given color (0.0 = only 'color', 1.0 = only white).
  *          Default is 0.2.
  */
-export function lighterColor(color, ratio) {
+export function lighterColor(color: string, ratio?: number): string {
   let rgbVal = rgb(color);
   if (!rgbVal) {
     return undefined;
@@ -275,7 +275,7 @@ export function lighterColor(color, ratio) {
  *
  * All arguments are mandatory.
  */
-export function mergeRgbColors(color1, ratio1, color2, ratio2) {
+export function mergeRgbColors(color1: string | Rgba, ratio1: number, color2: string | Rgba, ratio2: number): string {
   if (typeof color1 === 'string') {
     color1 = rgb(color1);
   }
@@ -305,11 +305,18 @@ export function mergeRgbColors(color1, ratio1, color2, ratio2) {
     ')';
 }
 
+export interface FontSpec {
+  name?: string;
+  size?: number;
+  bold?: boolean;
+  italic?: boolean;
+}
+
 /**
  * Example: Dialog-PLAIN-12
  */
-export function parseFontSpec(pattern) {
-  let fontSpec = {};
+export function parseFontSpec(pattern: string): FontSpec {
+  let fontSpec: FontSpec = {};
   if (strings.hasText(pattern)) {
     let tokens = pattern.split(/[-_,/.;]/);
     for (let i = 0; i < tokens.length; i++) {
@@ -326,7 +333,7 @@ export function parseFontSpec(pattern) {
       } else {
         // size or name
         if (/^\d+$/.test(token)) {
-          fontSpec.size = token;
+          fontSpec.size = parseInt(token);
         } else if (token !== 'NULL') {
           fontSpec.name = tokens[i];
         }
@@ -336,7 +343,7 @@ export function parseFontSpec(pattern) {
   return fontSpec;
 }
 
-export function modelToCssColor(color) {
+export function modelToCssColor(color: string): string {
   if (!color) { // prevent conversion from null to 'null' by regex
     return '';
   }
@@ -361,7 +368,7 @@ export function modelToCssColor(color) {
  * 'label' the properties labelFont, labelBackgroundColor and labelForegroundColor are used instead of
  * just font, backgroundColor and foregroundColor.
  */
-export function legacyStyle(obj, $element: JQuery, propertyPrefix) {
+export function legacyStyle(obj: object, $element?: JQuery, propertyPrefix?: string): string {
   let style = '';
   style += legacyForegroundColor(obj, $element, propertyPrefix);
   style += legacyBackgroundColor(obj, $element, propertyPrefix);
@@ -369,7 +376,7 @@ export function legacyStyle(obj, $element: JQuery, propertyPrefix) {
   return style;
 }
 
-export function legacyForegroundColor(obj, $element: JQuery, propertyPrefix) {
+export function legacyForegroundColor(obj: object, $element?: JQuery, propertyPrefix?: string): string {
   propertyPrefix = propertyPrefix || '';
 
   let cssColor = '';
@@ -387,7 +394,7 @@ export function legacyForegroundColor(obj, $element: JQuery, propertyPrefix) {
   return style;
 }
 
-export function legacyBackgroundColor(obj, $element: JQuery, propertyPrefix) {
+export function legacyBackgroundColor(obj: object, $element?: JQuery, propertyPrefix?: string): string {
   propertyPrefix = propertyPrefix || '';
 
   let cssBackgroundColor = '';
@@ -405,7 +412,7 @@ export function legacyBackgroundColor(obj, $element: JQuery, propertyPrefix) {
   return style;
 }
 
-export function legacyFont(obj, $element: JQuery, propertyPrefix) {
+export function legacyFont(obj: object, $element?: JQuery, propertyPrefix?: string): string {
   propertyPrefix = propertyPrefix || '';
 
   let cssFontWeight = '';
@@ -451,7 +458,7 @@ export function legacyFont(obj, $element: JQuery, propertyPrefix) {
   return style;
 }
 
-export function _getElement() {
+export function _getElement(): HTMLDivElement {
   return element;
 }
 

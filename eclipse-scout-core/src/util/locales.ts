@@ -1,24 +1,25 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Locale, objects, scout, texts} from '../index';
 import $ from 'jquery';
+import LocaleModel from '../session/LocaleModel';
 
 let localesMap = {};
 
-export function bootstrap(url) {
+export function bootstrap(url: string): JQuery.Promise<void> {
   let promise = url ? $.ajaxJson(url) : $.resolvedPromise([]);
   return promise.then(_preInit.bind(this, url));
 }
 
-export function _preInit(url, data) {
+export function _preInit(url: string, data: any) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
     throw {
@@ -29,13 +30,13 @@ export function _preInit(url, data) {
   init(data);
 }
 
-export function init(data) {
+export function init(data: LocaleModel[]) {
   data.forEach(locale => {
     localesMap[locale.languageTag] = new Locale(locale);
   }, this);
 }
 
-export function _get(languageTag) {
+export function _get(languageTag: string): Locale {
   return localesMap[languageTag];
 }
 
@@ -44,7 +45,7 @@ export function _get(languageTag) {
  * @param explicit if true, the country code is considered, meaning if languageTag is 'de-CH'
  *   and there is a locale for 'de' but not for 'de-CH', true will be returned nonetheless. Default false (consistent to #get).
  */
-export function has(languageTag, explicit) {
+export function has(languageTag: string, explicit?: boolean): boolean {
   explicit = scout.nvl(explicit, false);
   if (explicit) {
     return !!_get(languageTag);
@@ -53,11 +54,11 @@ export function has(languageTag, explicit) {
 }
 
 /**
- * @returns {Locale} the locale for the given languageTag.
+ * @returns the locale for the given languageTag.
  * If there is no locale found for the given tag, it tries to load the locale without the country code.
  * If there is still no locale found, null is returned.
  */
-export function get(languageTag): Locale {
+export function get(languageTag: string): Locale {
   let locale,
     tags = texts.createOrderedLanguageTags(languageTag);
 
@@ -73,12 +74,13 @@ export function get(languageTag): Locale {
   return locale;
 }
 
-export function getNavigatorLanguage() {
+export function getNavigatorLanguage(): string {
+  // @ts-ignore
   return navigator.language || navigator.userLanguage;
 }
 
 /**
- * @returns {Locale} for the language returned by the navigator.
+ * @returns for the language returned by the navigator.
  * If no locale is found, the first locale with the language of the navigator is returned.
  * (e.g. if browser returns 'de' and there is no locale for 'de', check if there is one for 'de-CH', 'de-DE' etc. and take the first.)
  * If still no locale is found, the default locale {@link Locale.DEFAULT} is returned.
@@ -110,11 +112,11 @@ export function getNavigatorLocale(): Locale {
   return new Locale();
 }
 
-export function getAll() {
+export function getAll(): Locale[] {
   return objects.values(localesMap);
 }
 
-export function getAllLanguageTags() {
+export function getAllLanguageTags(): string[] {
   return Object.keys(localesMap);
 }
 
@@ -122,19 +124,15 @@ export function getAllLanguageTags() {
  * Returns the first locale for the given language.
  * @param language a language without country code (e.g. en or de)
  */
-export function findFirstForLanguage(language) {
+export function findFirstForLanguage(language: string): Locale {
   scout.assertParameter('language', language);
-  return arrays.find(getAll(), locale => {
-    if (locale.language === language) {
-      return locale;
-    }
-  }, this);
+  return arrays.find(getAll(), locale => locale.language === language, this);
 }
 
 /**
  * Splits the language tag and returns an array containing the language and the country.
  */
-export function splitLanguageTag(languageTag) {
+export function splitLanguageTag(languageTag: string): string[] {
   if (!languageTag) {
     return [];
   }

@@ -1,20 +1,21 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, RoundingMode, strings} from '../index';
+import {RoundingModeType} from './RoundingMode';
 
 /**
  * Converts the given decimal number to base-62 (i.e. the same value, but
  * represented by [a-zA-Z0-9] instead of only [0-9].
  */
-export function toBase62(number) {
+export function toBase62(number: number): string {
   if (number === undefined) {
     return undefined;
   }
@@ -34,7 +35,7 @@ export function toBase62(number) {
  * Returns a random sequence of characters out of the set [a-zA-Z0-9] with the
  * given length. The default length is 8.
  */
-export function randomId(length: number) {
+export function randomId(length: number): string {
   length = length || 8;
   let alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
@@ -67,7 +68,7 @@ let _correlationCounter = 1;
  * To further reduce the risk of collisions, a monotonically increasing counter is added
  * at the end of the result string (separated by "/").
  */
-export function correlationId(length: number) {
+export function correlationId(length: number): string {
   length = length || 11;
   let letters = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
   let digits = '23456789';
@@ -93,7 +94,7 @@ export function correlationId(length: number) {
  * If decimalPlaces is omitted, the number will be rounded to integer by default.
  * Rounding mode {@link RoundingMode.HALF_UP} is used as default.
  */
-export function round(number, roundingMode, decimalPlaces) {
+export function round(number: number, roundingMode?: RoundingModeType, decimalPlaces?: number): number {
   if (number === null || number === undefined) {
     return number;
   }
@@ -156,7 +157,7 @@ export function round(number, roundingMode, decimalPlaces) {
  *   > 0 = move to right   (1.57 --> 15.7)
  *   < 0 = move to left    (1.57 --> 0.157)
  */
-export function shiftDecimalPoint(number, move) {
+export function shiftDecimalPoint(number: number, move: number): number {
   if (number === null || number === undefined || !move) {
     return number;
   }
@@ -198,11 +199,11 @@ export function shiftDecimalPoint(number, move) {
  * If it already is a number, the number will be returned.
  * Otherwise a Number is created.
  *
- * @param {number|string} number may be of type number or string.
+ * @param number may be of type number or string.
  */
-export function ensure(number: number | string) {
+export function ensure(number: number | string): number {
   if (objects.isNullOrUndefined(number)) {
-    return number;
+    return number as number;
   }
   return Number(number);
 }
@@ -210,18 +211,18 @@ export function ensure(number: number | string) {
 /**
  * Returns true if the given number is of type number but not NaN.
  */
-export function isNumber(number) {
+export function isNumber(number: any): boolean {
   return typeof number === 'number' && !isNaN(number);
 }
 
 /**
  * Returns true if the given number is an integer.
  */
-export function isInteger(number) {
+export function isInteger(number: any): boolean {
   return isNumber(number) && isFinite(number) && Math.floor(number) === number;
 }
 
-export function _setCorrelationCounter(val) {
+export function _setCorrelationCounter(val: number) {
   _correlationCounter = val;
 }
 

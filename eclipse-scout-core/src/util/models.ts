@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,19 +13,17 @@ import $ from 'jquery';
 
 let modelMap = {};
 
-export function init(data) {
+export function init(data: any) {
   modelMap = data;
 }
 
 /**
  * Returns a new instance of a model supplied by the given model func
  *
- * @param {Function} modelFunc A function that returns the model instance.
- * @param {Object} [parent]
- *          Optional parent that is set on the returned object.
- * @returns {Object}
+ * @param modelFunc A function that returns the model instance.
+ * @param [parent] Optional parent that is set on the returned object.
  */
-export function get(modelFunc: Function, parent?: object): object {
+export function get(modelFunc: () => { parent: object }, parent?: object): object {
   let model = modelFunc();
   if (parent) {
     model.parent = parent;
@@ -36,25 +34,20 @@ export function get(modelFunc: Function, parent?: object): object {
 /**
  * Returns a new instance of of an extension from the global modelMap.
  *
- * @param {string} extensionId
- *          The id of the extension.
- * @returns {Object}
+ * @param extensionId The id of the extension.
  */
-export function getExtension(extensionId: string): object {
+export function getExtension(extensionId: string): Extension {
   return _get(extensionId, 'extension');
 }
 
 /**
  * Returns a copy of the object in the global modelMap.
  *
- * @param id
- *          ID of the requested object (model or extension)
- * @param type
- *          Expected type of the requested object ('model' or 'extension')
- * @returns {Object}
+ * @param id ID of the requested object (model or extension)
+ * @param type Expected type of the requested object ('model' or 'extension')
  */
 
-export function _get(id, type): object {
+export function _get(id: string, type: string): Extension {
   let model = modelMap[id];
   if (!model) {
     throw new Error('No model map entry found for id \'' + id + '\'');
@@ -63,6 +56,41 @@ export function _get(id, type): object {
     throw new Error('Model \'' + id + '\' is not of type \'' + type + '\'');
   }
   return $.extend(true, {}, model);
+}
+
+export interface AppendToTarget {
+  id: string;
+  root: boolean;
+}
+
+export interface InsertTarget {
+  id: string;
+  root: boolean;
+  property: string;
+  before?: string;
+  after?: string;
+  index?: number;
+  groupWithTarget?: boolean;
+}
+
+export interface AppendToAction {
+  operation: 'appendTo';
+  target: AppendToTarget;
+  extension: object;
+}
+
+export interface InsertAction {
+  operation: 'insert';
+  target: InsertTarget;
+  extension: object;
+}
+
+export type ExtensionAction = AppendToAction | InsertAction;
+
+export interface Extension {
+  id: string;
+  type: 'extension';
+  extensions: ExtensionAction[];
 }
 
 /**
@@ -131,23 +159,22 @@ export function _get(id, type): object {
  *
  * The extension property can be an object or an array of objects.
  *
- * @param extension {Object|string|function}
- *          extension to the parentModel.
- * @param parentModel {Object}
- *          object which contains id's as properties
+ * @param extension extension to the parentModel.
+ * @param parentModel object which contains id's as properties
  * @returns parentModel extended by extension
  */
-export function extend(extension: object | string | Function, parentModel: object) {
+export function extend(extension: Extension | string | (() => Extension), parentModel: object) {
+  let extensionObject: Extension;
   if (typeof extension === 'string') {
-    extension = getExtension(extension);
+    extensionObject = getExtension(extension);
+  } else if (typeof extension === 'function') {
+    extensionObject = extension();
+  } else {
+    extensionObject = extension;
   }
 
-  if (typeof extension === 'function') {
-    extension = extension();
-  }
-
-  scout.assertParameter('extensions', extension.extensions);
-  extension.extensions.forEach(extensionConfig => {
+  scout.assertParameter('extensions', extensionObject.extensions);
+  extensionObject.extensions.forEach(extensionConfig => {
     let operation = scout.assertParameter('operation', extensionConfig.operation);
     let target = scout.assertParameter('target', extensionConfig.target);
 
@@ -158,17 +185,18 @@ export function extend(extension: object | string | Function, parentModel: objec
       targetObject = objects.findChildObjectByKey(parentModel, 'id', target.id);
     }
     if (!targetObject) {
-      throw new Error('Extension target not found: [extension: ' + extension.id + ', target: ' + target.id + ']');
+      throw new Error('Extension target not found: [extension: ' + extensionObject.id + ', target: ' + target.id + ']');
     }
 
     if (operation === 'appendTo') {
       $.extend(targetObject, extensionConfig.extension);
     } else if (operation === 'insert') {
-      targetObject[target.property] = targetObject[target.property] || [];
-      let targetArray = targetObject[target.property];
+      let insertTarget = target as InsertTarget;
+      targetObject[insertTarget.property] = targetObject[insertTarget.property] || [];
+      let targetArray = targetObject[insertTarget.property];
       let extensionArray = arrays.ensure(extensionConfig.extension);
-      _bindExtensionsToBeforeOrAfter(target, extensionArray);
-      let insertAt = _findExtensionIndex(target, targetArray);
+      _bindExtensionsToBeforeOrAfter(insertTarget, extensionArray);
+      let insertAt = _findExtensionIndex(insertTarget, targetArray);
       arrays.insertAll(targetArray, extensionArray, insertAt);
     }
   });
@@ -185,8 +213,7 @@ export function extend(extension: object | string | Function, parentModel: objec
  *          array to search the extension index in.
  * @returns extension index between 0 and targetArray.length or targetArray.length if no index is found.
  */
-
-export function _findExtensionIndex(target, targetArray) {
+export function _findExtensionIndex(target: InsertTarget, targetArray: { id?: string; groupedWith?: string }[]): number {
   let insertAt = targetArray.length;
   if (target.before) {
     insertAt = arrays.findIndex(targetArray, element => {
@@ -219,8 +246,7 @@ export function _findExtensionIndex(target, targetArray) {
  * @param extensionsArray
  *          extensions to bind
  */
-
-export function _bindExtensionsToBeforeOrAfter(target, extensionsArray) {
+export function _bindExtensionsToBeforeOrAfter(target: InsertTarget, extensionsArray: { groupedWith?: string }[]) {
   let beforeOrAfter = target.before || target.after;
   if (beforeOrAfter && target.groupWithTarget) {
     extensionsArray.forEach(element => {

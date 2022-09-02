@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -15,12 +15,12 @@ import {arrays} from '../index';
  * If no URL is passed, 'window.location.href' is used as input.
  */
 export default class URL {
-  baseUrlRaw: any;
-  queryPartRaw: any;
-  hashPartRaw: any;
-  parameterMap: any;
+  baseUrlRaw: string;
+  queryPartRaw: string;
+  hashPartRaw: string;
+  parameterMap: { [parameterName: string]: string | string[] };
 
-  constructor(url) {
+  constructor(url?: string) {
     if (url === undefined) {
       url = window.location.href;
     }
@@ -35,15 +35,12 @@ export default class URL {
 
   /**
    * Checks if the given parameter exists, even if value is null or an empty string.
-   *
-   * @param param
-   * @return {boolean}
    */
-  hasParameter(param): boolean {
+  hasParameter(param: string): boolean {
     return this.parameterMap.hasOwnProperty(param);
   }
 
-  getParameter(param) {
+  getParameter(param: string): string | string[] {
     if (typeof param !== 'string') {
       throw new Error('Illegal argument type: ' + param);
     }
@@ -54,7 +51,7 @@ export default class URL {
     return value;
   }
 
-  removeParameter(param) {
+  removeParameter(param: string): URL {
     if (typeof param !== 'string') {
       throw new Error('Illegal argument type: ' + param);
     }
@@ -62,7 +59,7 @@ export default class URL {
     return this;
   }
 
-  setParameter(param, value) {
+  setParameter(param: string, value: string | string[]): URL {
     if (typeof param !== 'string') {
       throw new Error('Illegal argument type: ' + param);
     }
@@ -73,7 +70,7 @@ export default class URL {
     return this;
   }
 
-  addParameter(param, value) {
+  addParameter(param: string, value: string): URL {
     if (typeof param !== 'string') {
       throw new Error('Illegal argument type: ' + param);
     }
@@ -84,23 +81,7 @@ export default class URL {
     return this;
   }
 
-  /**
-   * Options:
-   *
-   *   sorter:
-   *     a function to be used instead of the default lexical ordering
-   *     based function
-   *
-   *   alwaysFirst:
-   *     an array of parameter names that should always be first in the
-   *     resulting string. Among those parameters, the order in the passed
-   *     array is respected.
-   *
-   *   alwaysLast:
-   *     similar to alwaysFirst, but puts the parameters at the end of
-   *     the resulting string.
-   */
-  toString(options) {
+  toString(options?: UrlToStringOptions): string {
     let result = this.baseUrlRaw;
 
     if (Object.keys(this.parameterMap).length) {
@@ -156,7 +137,7 @@ export default class URL {
     return result;
   }
 
-  clone() {
+  clone(): URL {
     return new URL(this.toString());
   }
 
@@ -164,20 +145,15 @@ export default class URL {
 
   /**
    * Helper function to sort arrays alphabetically, nulls in front
-   *
-   * @memberOf URL
    */
-  protected static _sorter(a, b) {
+  protected static _sorter(a: string, b: string): number {
     return a === null ? -1 : b === null ? 1 : a.toString().localeCompare(b);
   }
 
   /**
    * Helper function to build a query parameter with value
-   *
-   * @memberOf URL
    */
-  //
-  protected static _formatQueryParam(key, value) {
+  protected static _formatQueryParam(key: string, value: string): string {
     let s = encodeURIComponent(key);
     if (value !== undefined && value !== null) {
       s += '=' + encodeURIComponent(value);
@@ -191,7 +167,7 @@ export default class URL {
    *
    * @memberOf URL
    */
-  protected static _addToMap(map, key, value) {
+  protected static _addToMap(map: { [parameterName: string]: string | string[] }, key: string, value: string) {
     if (map === undefined) {
       throw new Error('Argument \'map\' must not be null');
     }
@@ -216,7 +192,7 @@ export default class URL {
    *
    * @memberOf URL
    */
-  protected static _parse(queryPart) {
+  protected static _parse(queryPart: string): { [parameterName: string]: string | string[] } {
     let queryString = (queryPart || '').replace(/\+/g, ' '),
       pattern = /([^&=]+)(=?)([^&]*)/g,
       map = {},
@@ -232,4 +208,20 @@ export default class URL {
     }
     return map;
   }
+}
+
+export interface UrlToStringOptions {
+  /**
+   * a function to be used instead of the default lexical ordering based function
+   */
+  sorter?: (a: string, b: string) => number;
+  /**
+   * an array of parameter names that should always be first in the resulting string. Among those parameters, the order in the passed array is respected.
+   */
+  alwaysFirst?: string | string[];
+
+  /**
+   * similar to alwaysFirst, but puts the parameters at the end of the resulting string.
+   */
+  alwaysLast?: string | string[];
 }

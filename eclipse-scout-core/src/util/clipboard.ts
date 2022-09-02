@@ -1,48 +1,46 @@
 /*
- * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopNotification, FocusRule, scout, Session, Status} from '../index';
+import {DesktopNotification, FocusRule, scout, Session, Status, Widget} from '../index';
 import $ from 'jquery';
+
+export interface ClipboardTextCopyOptions {
+  /**
+   * The text to write to the clipboard.
+   */
+  text: string;
+  /**
+   * Widget that wants to copy the text. Recommended.
+   * Used to retrieve the session and the document.
+   */
+  parent?: Widget;
+  /**
+   * Scout session object, used to resolve texts and access the focus manager. Only required when "parent" is not set.
+   */
+  session?: Session;
+  /**
+   * If true, a desktop notification is shown when copying has been completed. Requires the "parent" option to be present.
+   * If this is true, the {@link copyText} method returns null. Otherwise, it returns a promise that is resolved or rejected when the copying is complete.
+   */
+  showNotification?: boolean;
+}
 
 /**
  * Copies the given text to the clipboard. To make this work, the method must be called inside
  * a "user action" (i.e. mouse or keyboard event handler). For security reasons, the access to
  * the clipboard is blocked by the browser in other contexts (e.g. asynchronous callbacks).
  *
- * OPTION                   DEFAULT VALUE   DESCRIPTION
- * ------------------------------------------------------------------------------------------------------
- * text                     -               The text to write to the clipboard.
- *
- * parent                   -               Widget that wants to copy the text. Recommended.
- *                                          Used to retrieve the session and the document.
- *
- * session                  -               Scout session object, used to resolve texts and access the
- *                                          focus manager. Only required when "parent" is not set.
- *
- * document                 -               The DOM node for the current document. Used to copy to the
- *                                          clipboard in older browsers. Only required when "parent" is
- *                                          not set. If this option is missing, the global "document"
- *                                          object is used, which might cause security exceptions when
- *                                          called from a different document (especially in IE).
- *
- * showNotification         true            If true, a desktop notification is shown when copying has
- *                                          been completed. Requires the "parent" option to be present.
- *                                          If this is true, the method returns null. Otherwise, it
- *                                          returns a promise that is resolved or rejected when the
- *                                          copying is complete.
- *
- * @param options
- *          mandatory, see table above for valid attributes
- * @return a promise or null, see description of "showNotification" option
+ * @param options mandatory
+ * @return a promise or null if {@link options.showNotification} is true.
  */
-export function copyText(options) {
+export function copyText(options: ClipboardTextCopyOptions): JQuery.Promise<void> {
   scout.assertParameter('options', options);
   if (options.parent && !options.session) {
     options.session = options.parent.session;
@@ -58,11 +56,16 @@ export function copyText(options) {
   return promise;
 }
 
-export function _copyText(options) {
+export function _copyText(options: ClipboardTextCopyOptions): JQuery.Promise<void> {
+  let deferred = $.Deferred();
+
   // Modern clipboard API
   // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
   if (navigator.clipboard) {
-    return navigator.clipboard.writeText(options.text);
+    navigator.clipboard.writeText(options.text)
+      .then((...args) => deferred.resolve(...args))
+      .catch((...args) => deferred.reject(...args));
+    return deferred.promise();
   }
 
   // Fallback for browsers that don't support the modern clipboard API (IE, Safari, Chrome < 66, Firefox < 63)
@@ -78,7 +81,6 @@ export function _copyText(options) {
   options.session.focusManager.installFocusContext($f, FocusRule.AUTO);
   f.select(); // cannot use jquery select(), because that is overridden by jquery-scout
 
-  let deferred = $.Deferred();
   try {
     let successful = doc.execCommand('copy');
     if (successful) {
@@ -96,7 +98,7 @@ export function _copyText(options) {
   return deferred.promise();
 }
 
-export function _showNotification(options, promise) {
+export function _showNotification(options: ClipboardTextCopyOptions, promise: JQuery.Promise<void>) {
   let status = _successStatus(options.parent.session);
   promise
     .catch(() => {
@@ -107,14 +109,14 @@ export function _showNotification(options, promise) {
     });
 }
 
-export function _successStatus(session: Session) {
+export function _successStatus(session: Session): Status {
   return new Status({
     message: session.text('ui.CopyToClipboardSuccessStatus'),
     severity: Status.Severity.INFO
   });
 }
 
-export function _failedStatus(session: Session) {
+export function _failedStatus(session: Session): Status {
   return new Status({
     message: session.text('ui.CopyToClipboardFailedStatus'),
     severity: Status.Severity.WARNING
@@ -129,7 +131,7 @@ export function _failedStatus(session: Session) {
  * @param parent
  *          Widget that wants show the notification. Mandatory. Required for NLS texts.
  */
-export function showNotification(parent, status) {
+export function showNotification(parent: Widget, status: Status) {
   scout.assertParameter('parent', parent);
   let notification = scout.create(DesktopNotification, {
     parent: parent,

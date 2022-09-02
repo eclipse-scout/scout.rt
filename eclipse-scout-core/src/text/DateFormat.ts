@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateFormatPatternDefinition, DateFormatPatternType, dates, numbers, objects, scout, strings} from '../index';
+import {DateFormatPatternDefinition, DateFormatPatternType, dates, Locale, numbers, objects, scout, strings} from '../index';
+import {DateFormatSymbols} from '../session/LocaleModel';
 
 /**
  * Custom JavaScript Date Format
@@ -32,63 +33,34 @@ import {DateFormatPatternDefinition, DateFormatPatternType, dates, numbers, obje
  * @see http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
  */
 export default class DateFormat {
-  /** jshint sub:true */
-  locale: any;
-
-  pattern: any;
-  symbols: any;
-
-  /**
-   * Relevant during analyze(). When this is true (default), terms of the same "pattern type" (e.g. "d" and "dd") will
-   * also be considered. Otherwise, analyze() behaves like parse(), i.g. the pattern must match exactly.
-   * Example: "2.10" will match the pattern "dd.MM.yyy" when lenient=true. If lenient is false, it won't match.
-  */
-  lenient: any;
+  locale: Locale;
+  pattern: string;
+  symbols: DateFormatSymbols;
+  lenient: boolean;
 
   /**
    * List of terms, e.g. split up parts of this.pattern. The length of this array is equal
    * to the length of this._formatFunctions, this._parseFunctions and this._analyzeFunctions.
-  */
-  protected _terms: any[];
-
+   */
+  protected _terms: string[];
   /**
    * List of format function to be called _in that exact order_ to convert this.pattern
    * to a formatted date string (by sequentially replacing all terms with real values).
-  */
-  protected _formatFunctions: any[];
-
+   */
+  protected _formatFunctions: ((formatContext: DateFormatContext) => void)[];
   /**
    * List of parse functions to be called _in that exact order_ to convert an input
    * string to a valid JavaScript Date object. This order matches the recognized terms
    * in the pattern. Unrecognized terms are represented by a "constant" function that
    * matches the string itself (e.g. separator characters or spaces).
-  */
-  protected _parseFunctions: any[];
-
+   */
+  protected _parseFunctions: ((parseContext: DateFormatParseContext) => boolean)[];
   /** Array of arrays, same order as _parseFunctions, but term functions are a list of term functions (to support lenient parsing) */
-  protected _analyzeFunctions: any[];
-
-  /**
-   * Build a list of all pattern definitions. This list is then used to build the list of
-   * format, parse and analyze functions according to this.pattern.
-   *
-   * !!! PLEASE NOTE !!!
-   * The order of these definitions is important! For each term in the pattern, the list
-   * is scanned from the beginning until a definition accepts the term. If the wrong
-   * definition was picked, results would be unpredictable.
-   *
-   * Following the following rules ensures that the algorithm can pick the best matching
-   * pattern format definition for each term in the pattern:
-   * - Sort definitions by time span, from large (year) to small (milliseconds).
-   * - Two definitions of the same type should be sorted by term length, from long
-   *   (e.g. MMMM) to short (e.g. M).
-  */
+  protected _analyzeFunctions: ((parseContext: DateFormatParseContext) => boolean)[][];
   protected _patternDefinitions: DateFormatPatternDefinition[];
+  protected _patternLibrary: { [type: string]: DateFormatPatternDefinition[] };
 
-  /** Build a map of pattern definitions by pattern type */
-  protected _patternLibrary: any;
-
-  constructor(locale, pattern, options) { // NOSONAR
+  constructor(locale: Locale, pattern: string, options?: DateFormatOptions) {
     options = options || {};
 
     this.locale = locale;
@@ -100,19 +72,25 @@ export default class DateFormat {
     this.symbols.firstDayOfWeek = 1; // monday // TODO [7.0] cgu: deliver from server
     this.symbols.weekdaysOrdered = dates.orderWeekdays(this.symbols.weekdays, this.symbols.firstDayOfWeek);
     this.symbols.weekdaysShortOrdered = dates.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
-    this.symbols.monthsToNumber;
-    this.symbols.monthsShortToNumber;
-
     this.lenient = scout.nvl(options.lenient, true);
-
     this._terms = [];
-
     this._formatFunctions = [];
-
     this._parseFunctions = [];
-
     this._analyzeFunctions = [];
 
+    // Build a list of all pattern definitions. This list is then used to build the list of
+    // format, parse and analyze functions according to this.pattern.
+    //
+    // !!! PLEASE NOTE !!!
+    // The order of these definitions is important! For each term in the pattern, the list
+    // is scanned from the beginning until a definition accepts the term. If the wrong
+    // definition was picked, results would be unpredictable.
+    //
+    // Following the following rules ensures that the algorithm can pick the best matching
+    // pattern format definition for each term in the pattern:
+    // - Sort definitions by time span, from large (year) to small (milliseconds).
+    // - Two definitions of the same type should be sorted by term length, from long
+    //   (e.g. MMMM) to short (e.g. M).
     this._patternDefinitions = [
       // --- Year ---
       // This definition can _format_ dates with years with 4 or more digits.
@@ -673,6 +651,7 @@ export default class DateFormat {
       })
     ];
 
+    // Build a map of pattern definitions by pattern type
     this._patternLibrary = {};
     for (let i = 0; i < this._patternDefinitions.length; i++) {
       let patternDefinition = this._patternDefinitions[i];
@@ -689,7 +668,7 @@ export default class DateFormat {
   }
 
   protected _compile() {
-    let i, j, patternDefinitions, patternDefinition, re, m, term, termAccepted, analyseFunctions;
+    let i, j, patternDefinitions, patternDefinition, re: RegExp, m, term, termAccepted, analyseFunctions;
 
     // Build format, parse and analyze functions for all terms in the DateFormat's pattern.
     // A term is a continuous sequence of the same character.
@@ -741,10 +720,9 @@ export default class DateFormat {
   }
 
   /**
-   * Returns a format function for constant terms (e.g. all parts of a pattern that don't
-   * have a DateFormatPatternDefinition).
+   * Returns a format function for constant terms (e.g. all parts of a pattern that don't have a {@link DateFormatPatternDefinition}).
    */
-  protected _createConstantStringFormatFunction(term) {
+  protected _createConstantStringFormatFunction(term: string): (formatContext: DateFormatContext) => void {
     return formatContext => {
       formatContext.formattedString += term;
     };
@@ -754,7 +732,7 @@ export default class DateFormat {
    * Returns a parse function for constant terms (e.g. all parts of a pattern that don't
    * have a DateFormatPatternDefinition).
    */
-  protected _createConstantStringParseFunction(term) {
+  protected _createConstantStringParseFunction(term: string): (parseContext: DateFormatParseContext) => boolean {
     return parseContext => {
       if (strings.startsWith(parseContext.inputString, term)) {
         parseContext.inputString = parseContext.inputString.substr(term.length);
@@ -770,13 +748,13 @@ export default class DateFormat {
    * Formats the given date according to the date pattern. If the date is missing, the
    * empty string is returned.
    *
-   * @param {boolean} [exactLength]
+   * @param [exactLength]
    *          May be set to true to force the patterns to use the exact length. For example,
    *          the year pattern 'yyy' would normally format the year using 2 digits. If
    *          the parameter is true, 3 are used. This is mainly useful, when an "analyzed"
    *          date should be formatted again using the "parsedPattern".
    */
-  format(date, exactLength?: boolean) {
+  format(date: Date, exactLength?: boolean): string {
     if (!date) {
       return '';
     }
@@ -795,51 +773,8 @@ export default class DateFormat {
   /**
    * Analyzes the given string and returns an information object with all recognized information
    * for the current date format.
-   *
-   * The result object contains the following properties:
-   *
-   * inputString:
-   *   The original input for the analysis.
-   *
-   * dateInfo:
-   *   An object with all numeric date parts that could be parsed from the input string. Unrecognized
-   *   parts are undefined, all others are converted to numbers. Those values may be directly
-   *   used in the JavaScript Date() type (month is zero-based!).
-   *   Valid properties:
-   *   - year, month, day, hours, minutes, seconds, milliseconds, timezone
-   *
-   * matchInfo:
-   *   Similar to dateInfo, but the parts are defined as strings as they were parsed from the input.
-   *   While dateInfo may contain the year 1995, the matchInfo may contain "95". Also note that
-   *   the month is "one-based", as opposed to dateInfo.month!
-   *   Valid properties:
-   *   - year, month, week, day, weekday, hours, ampm, minutes, seconds, milliseconds, timezone
-   *
-   * hints:
-   *   An object that contains further recognized date parts that are not needed to define the exact time.
-   *   Valid properties:
-   *   - am [true / false]
-   *   - pm [true / false]
-   *   - weekday [number 0-6; 0=sun, 1=mon, etc.]
-   *   - weekInYear [number 1-53]
-   *
-   * parsedPattern:
-   *   The pattern that was used to parse the input. This may differ from the date format's pattern.
-   *   Example: dateFormat="dd.MM.YYYY", inputString="5.7.2015" --> parsedPattern="d.M.yyyy"
-   *
-   * matchedPattern:
-   *   The pattern that was recognized in the input. Unlike "parsedPattern", this may not be a full pattern.
-   *   Example: dateFormat="dd.MM.YYYY", inputString="5.7." --> parsedPattern="d.M.yyyy", matchedPattern="d.M."
-   *
-   * predictedDate:
-   *   The date that could be predicted from the recognized inputs. If the second method argument
-   *   'startDate' is set, this date is used as basis for this predicted date. Otherwise, 'today' is used.
-   *
-   * error:
-   *   Boolean that indicates if analyzing the input was successful (e.g. if the pattern could be parsed
-   *   and a date could be predicted).
    */
-  analyze(text: string, startDate: Date) {
+  analyze(text: string, startDate: Date): DateFormatAnalyzeInfo {
     let analyzeInfo = this._createAnalyzeInfo(text);
     if (!text) {
       return analyzeInfo;
@@ -851,11 +786,11 @@ export default class DateFormat {
     let matchedPattern = '';
     for (let i = 0; i < this._terms.length; i++) {
       if (parseContext.inputString.length > 0) {
-        let parseFunctions = this._analyzeFunctions[i];
+        let analyzeFunctions = this._analyzeFunctions[i];
         let parsed = false;
-        for (let j = 0; j < parseFunctions.length; j++) {
-          let parseFunction = parseFunctions[j];
-          if (parseFunction(parseContext)) {
+        for (let j = 0; j < analyzeFunctions.length; j++) {
+          let analyzeFunction = analyzeFunctions[j];
+          if (analyzeFunction(parseContext)) {
             parsed = true;
             break;
           }
@@ -912,7 +847,7 @@ export default class DateFormat {
    * The argument 'startDate' is optional. It may set the date where parsed information should
    * be applied to (e.g. relevant for 2-digit years).
    */
-  parse(text: string, startDate: Date) {
+  parse(text: string, startDate?: Date): Date {
     if (!text) {
       return null;
     }
@@ -950,14 +885,7 @@ export default class DateFormat {
     return date;
   }
 
-  /**
-   * @param {Object} dateInfo
-   * @param {Date} [startDate]
-   * @param {Object} [hints]
-   * @returns {null|Date}
-   * @private
-   */
-  private _dateInfoToDate(dateInfo: object, startDate?: Date, hints?: object): null | Date {
+  private _dateInfoToDate(dateInfo: DateFormatDateInfo, startDate?: Date, hints?: DateFormatHints): Date {
     if (!dateInfo) {
       return null;
     }
@@ -978,8 +906,8 @@ export default class DateFormat {
     if (dateInfo.day && !dateInfo.month) {
       // If day "31" does not exist in the proposed month, use the next month
       if (dateInfo.day === 31) {
-        let monthsWithThirthyOneDays = [0, 2, 4, 6, 7, 9, 11];
-        if (!scout.isOneOf(validMonth, monthsWithThirthyOneDays)) {
+        let monthsWithThirtyOneDays = [0, 2, 4, 6, 7, 9, 11];
+        if (!scout.isOneOf(validMonth, monthsWithThirtyOneDays)) {
           validMonth = validMonth + 1;
         }
       } else if (dateInfo.day >= 29 && validMonth === 1) {
@@ -1033,7 +961,7 @@ export default class DateFormat {
     if (!isValid(result.getMilliseconds(), dateInfo.milliseconds)) {
       return null;
     }
-    if (!isValid(result.getDay(), objects.optProperty(hints, 'weekday'))) {
+    if (!isValid(result.getDay(), hints?.weekday)) {
       return null;
     }
 
@@ -1067,23 +995,8 @@ export default class DateFormat {
    * Returns the "format context", an object that is initially filled with the input date and is then
    * passed through the various formatting functions. As the formatting progresses, the format context object
    * is updated accordingly. At the end of the process, the object contains the result.
-   *
-   * The format context contains the following properties:
-   *
-   * inputDate:
-   *   The date to be formatted.
-   *
-   * formattedString:
-   *   The result of the formatting. The string is initially empty. During the format process, the
-   *   formatted parts will be appended to the string until the final string is complete.
-   *
-   * exactLength:
-   *   Flag to force the format functions to use the exact length of the accepted term. The default
-   *   is false, which will use the canonical length. For example, the year pattern 'yyy' will
-   *   format the year using 2 digits by default. If the parameter is true, 3 are used. This is mainly
-   *   useful, when an "analyzed" date should be formatted again using the "parsedPattern".
    */
-  protected _createFormatContext(inputDate: Date) {
+  protected _createFormatContext(inputDate: Date): DateFormatContext {
     return {
       inputDate: inputDate,
       formattedString: '',
@@ -1095,45 +1008,8 @@ export default class DateFormat {
    * Returns the "parse context", an object that is initially filled with the input string and is then
    * passed through the various parsing functions. As the parsing progresses, the parse context object
    * is updated accordingly. At the end of the process, the object contains the result.
-   *
-   * The parse context contains the following properties:
-   *
-   * inputString:
-   *   The original input for the parsing. This string will be consumed during the parse process,
-   *   and will be empty at the end.
-   *
-   * dateInfo:
-   *   An object with all numeric date parts that could be parsed from the input string. Unrecognized
-   *   parts are undefined, all others are converted to numbers. Those values may be directly
-   *   used in the JavaScript Date() type (month is zero-based!).
-   *   Valid properties:
-   *   - year, month, day, hours, minutes, seconds, milliseconds
-   *
-   * matchInfo:
-   *   Similar to dateInfo, but the parts are defined as strings as they were parsed from the input.
-   *   While dateInfo may contain the year 1995, the matchInfo may contain "95". Also note that
-   *   the month is "one-based", as opposed to dateInfo.month!
-   *   Valid properties:
-   *   - year, month, week, day, weekday, hours, ampm, minutes, seconds, milliseconds
-   *
-   * hints:
-   *   An object that contains further recognized date parts that are not needed to define the exact time.
-   *   Valid properties:
-   *   - am [true / false]
-   *   - pm [true / false]
-   *   - weekday [number 0-6; 0=sun, 1=mon, etc.]
-   *   - weekInYear [number 1-53]
-   *
-   * analyze:
-   *   A flag that indicates if the "analyze mode" is on. This is true when analyze() was called, and
-   *   false when parse() was called. It may alter the behavior of the parse functions, i.e. they will
-   *   not fail in analyze mode when the pattern does not match exactly.
-   *
-   * startDate:
-   *   A date to be used as reference for date calculations. Is used for example when mapping a 2-digit
-   *   year to a 4-digit year.
    */
-  protected _createParseContext(inputText: string) {
+  protected _createParseContext(inputText: string): DateFormatParseContext {
     return {
       inputString: inputText,
       dateInfo: {},
@@ -1145,10 +1021,7 @@ export default class DateFormat {
     };
   }
 
-  /**
-   * @see analyze()
-   */
-  protected _createAnalyzeInfo(inputText: string) {
+  protected _createAnalyzeInfo(inputText: string): DateFormatAnalyzeInfo {
     return {
       inputString: inputText,
       dateInfo: {},
@@ -1161,7 +1034,7 @@ export default class DateFormat {
     };
   }
 
-  static ensure(locale, format) {
+  static ensure(locale: Locale, format: string | DateFormat) {
     if (!format) {
       return format;
     }
@@ -1170,4 +1043,154 @@ export default class DateFormat {
     }
     return new DateFormat(locale, format);
   }
+}
+
+export interface DateFormatOptions {
+  /**
+   * Relevant during analyze(). When this is true (default), terms of the same "pattern type" (e.g. "d" and "dd") will
+   * also be considered. Otherwise, analyze() behaves like parse(), i.g. the pattern must match exactly.
+   * Example: "2.10" will match the pattern "dd.MM.yyy" when lenient=true. If lenient is false, it won't match.
+   */
+  lenient?: boolean;
+}
+
+export interface DateFormatMatchInfo {
+  year?: string;
+  month?: string;
+  week?: string;
+  day?: string;
+  weekday?: number;
+  hours?: string;
+  ampm?: string;
+  minutes?: string;
+  seconds?: string;
+  milliseconds?: string;
+  timezone?: string;
+}
+
+export interface DateFormatDateInfo {
+  year?: number;
+  month?: number;
+  day?: number;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+  milliseconds?: number;
+  timezone?: number;
+}
+
+export interface DateFormatParseContext {
+  /**
+   * The original input for the parsing. This string will be consumed during the parse process, and will be empty at the end.
+   */
+  inputString: string;
+
+  /**
+   * An object with all numeric date parts that could be parsed from the input string.
+   * Unrecognized parts are undefined, all others are converted to numbers.
+   * Those values may be directly used in the JavaScript Date() type (month is zero-based!).
+   */
+  dateInfo: DateFormatDateInfo;
+
+  /**
+   * Similar to dateInfo, but the parts are defined as strings as they were parsed from the input.
+   * While dateInfo may contain the year 1995, the matchInfo may contain "95". Also note that the month is "one-based", as opposed to dateInfo.month!
+   */
+  matchInfo: DateFormatMatchInfo;
+
+  /**
+   * An object that contains further recognized date parts that are not needed to define the exact time.
+   */
+  hints: DateFormatHints;
+  parsedPattern: string;
+
+  /**
+   * A flag that indicates if the "analyze mode" is on. This is true when analyze() was called, and false when parse() was called.
+   * It may alter the behavior of the parse functions, i.e. they will not fail in analyze mode when the pattern does not match exactly.
+   */
+  analyze: boolean;
+
+  /**
+   * A date to be used as reference for date calculations. Is used for example when mapping a 2-digit year to a 4-digit year.
+   */
+  startDate: Date;
+}
+
+export interface DateFormatHints {
+  am?: boolean;
+  pm?: boolean;
+  /**
+   * number 0-6; 0=sun, 1=mon, etc.
+   */
+  weekday?: number;
+  /**
+   * number 1-53
+   */
+  weekInYear?: number;
+}
+
+export interface DateFormatContext {
+  /**
+   * The date to be formatted.
+   */
+  inputDate: Date;
+
+  /**
+   * The result of the formatting. The string is initially empty. During the format process, the formatted parts will be appended to the string until the final string is complete.
+   */
+  formattedString: string;
+
+  /**
+   * Flag to force the format functions to use the exact length of the accepted term. The default is false, which will use the canonical length.
+   * For example, the year pattern 'yyy' will format the year using 2 digits by default. If the parameter is true, 3 are used.
+   * This is mainly useful, when an "analyzed" date should be formatted again using the "parsedPattern".
+   */
+  exactLength: boolean;
+}
+
+export interface DateFormatAnalyzeInfo {
+  /**
+   * The original input for the analysis.
+   */
+  inputString: string;
+
+  /**
+   * An object with all numeric date parts that could be parsed from the input string. Unrecognized parts are undefined, all others are converted to numbers.
+   * Those values may be directly used in the JavaScript Date() type (month is zero-based!).
+   */
+  dateInfo: DateFormatDateInfo;
+
+  /**
+   * Similar to dateInfo, but the parts are defined as strings as they were parsed from the input.
+   * While dateInfo may contain the year 1995, the matchInfo may contain "95". Also note that the month is "one-based", as opposed to dateInfo.month!
+   */
+  matchInfo: DateFormatMatchInfo;
+
+  /**
+   * An object that contains further recognized date parts that are not needed to define the exact time.
+   */
+  hints: DateFormatHints;
+
+  /**
+   * The pattern that was used to parse the input. This may differ from the date format's pattern.
+   * Example: dateFormat="dd.MM.YYYY", inputString="5.7.2015" --> parsedPattern="d.M.yyyy"
+   */
+  parsedPattern: string;
+
+  /**
+   * The pattern that was recognized in the input. Unlike "parsedPattern", this may not be a full pattern.
+   * Example: dateFormat="dd.MM.YYYY", inputString="5.7." --> parsedPattern="d.M.yyyy", matchedPattern="d.M."
+   */
+  matchedPattern: string;
+
+  /**
+   * The date that could be predicted from the recognized inputs.
+   * If the second method argument 'startDate' is set, this date is used as basis for this predicted date. Otherwise, 'today' is used.
+   */
+  predictedDate: Date;
+
+  /**
+   * Boolean that indicates if analyzing the input was successful (e.g. if the pattern could be parsed and a date could be predicted).
+   */
+  error: boolean;
 }

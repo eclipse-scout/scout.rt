@@ -3,15 +3,24 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, objects, scout} from '../index';
+import {App, EnumObject, objects, Predicate, scout} from '../index';
 import $ from 'jquery';
+import TypeOrArray = JQuery.TypeOrArray;
 
-let instance;
+let instance: Device;
+
+interface DeviceModel {
+  userAgent: string;
+}
+
+export type DeviceSystem = EnumObject<typeof Device.System>;
+export type DeviceType = EnumObject<typeof Device.Type>;
+export type DeviceBrowser = EnumObject<typeof Device.Browser>;
 
 /**
  * Provides information about the device and its supported features.<p>
@@ -19,16 +28,18 @@ let instance;
  *
  * @singleton
  */
-export default class Device {
-  userAgent: any;
-  features: any;
-  system: any;
-  type: any;
-  browser: any;
+export default class Device implements DeviceModel {
+  declare model: DeviceModel;
+  userAgent: string;
+  features: { [property: string]: boolean };
+  system: DeviceSystem;
+  type: DeviceType;
+  browser: DeviceBrowser;
   browserVersion: number;
+  systemVersion: number;
   scrollbarWidth: number;
 
-  constructor(model) {
+  constructor(model?: DeviceModel) {
     // user agent string from browser
     this.userAgent = model.userAgent;
     this.features = {};
@@ -46,7 +57,7 @@ export default class Device {
     }
   }
 
-  static VENDOR_PREFIXES = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
+  static VENDOR_PREFIXES = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'] as const;
 
   static Browser = {
     UNKNOWN: 'Unknown',
@@ -61,20 +72,20 @@ export default class Device {
      */
     EDGE: 'Edge',
     SAFARI: 'Safari'
-  };
+  } as const;
 
   static System = {
     UNKNOWN: 'Unknown',
     IOS: 'IOS',
     ANDROID: 'ANDROID',
     WINDOWS: 'WINDOWS'
-  };
+  } as const;
 
   static Type = {
     DESKTOP: 'DESKTOP',
     TABLET: 'TABLET',
     MOBILE: 'MOBILE'
-  };
+  } as const;
 
   /**
    * Called during bootstrap by index.html before the session startup.<p>
@@ -82,7 +93,7 @@ export default class Device {
    * in a static way (and prevent many repeating function calls within loops).<p>
    * Also loads device specific scripts (e.g. fast click for ios devices)
    */
-  bootstrap() {
+  bootstrap(): JQuery.Promise<any>[] {
     let promises = [];
 
     // Pre-calculate value and store in a simple property, to prevent many function calls inside loops
@@ -100,7 +111,7 @@ export default class Device {
     return promises;
   }
 
-  protected _loadScriptDeferred(scriptUrl, doneFunc) {
+  protected _loadScriptDeferred(scriptUrl: string, doneFunc: TypeOrArray<JQuery.Deferred.Callback<JQuery>>): JQuery.Promise<JQuery> {
     return $
       .injectScript(scriptUrl)
       .done(doneFunc);
@@ -112,11 +123,12 @@ export default class Device {
    * To fix this we would have to work with a custom active class which will be toggled on touchstart/end
    */
   protected _installActiveHandler() {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     document.addEventListener('touchstart', () => {
     }, false);
   }
 
-  protected _needsIPhoneRotationHack() {
+  protected _needsIPhoneRotationHack(): boolean {
     $.log.isDebugEnabled() && $.log.debug('Activating iPhone rotation workaround.');
     // iPad does not automatically switch to minimal-ui mode on rotation.
     // Also the hack is not necessary if the body is scrollable (which can be achieved with a custom desktop).
@@ -162,14 +174,14 @@ export default class Device {
     }
   }
 
-  orientation() {
+  orientation(): 'portrait' | 'landscape' {
     if (window.innerHeight > window.innerWidth) {
       return 'portrait';
     }
     return 'landscape';
   }
 
-  hasOnScreenKeyboard() {
+  hasOnScreenKeyboard(): boolean {
     return this.supportsFeature('_onScreenKeyboard', () => {
       return this.isIos() || this.isAndroid() || this.isWindowsTabletMode();
     });
@@ -180,58 +192,57 @@ export default class Device {
    * Such a browser increases the scrollWidth only if the text-content exceeds the space <i>including</i> the right-padding.
    * This means the scrollWidth is equal to the clientWidth until the right-padding-space is consumed as well.
    */
-  isScrollWidthIncludingPadding() {
+  isScrollWidthIncludingPadding(): boolean {
     return this.isInternetExplorer() || this.isFirefox() || this.isEdge();
   }
 
   /**
    * Safari shows a tooltip if ellipsis are displayed due to text truncation. This is fine but, unfortunately, it cannot be prevented.
    * Because showing two tooltips at the same time (native and custom) is bad, the custom tooltip cannot be displayed.
-   * @returns {Boolean}
    */
   isCustomEllipsisTooltipPossible(): boolean {
     return this.browser !== Device.Browser.SAFARI;
   }
 
   /**
-   * @returns {boolean} true if the current device is an iPhone. This is more specific than the <code>isIos</code> function
+   * @returns true if the current device is an iPhone. This is more specific than the <code>isIos</code> function
    * which also includes iPads and iPods.
    */
   isIos(): boolean {
     return Device.System.IOS === this.system;
   }
 
-  isEdge() {
+  isEdge(): boolean {
     return Device.Browser.EDGE === this.browser;
   }
 
   /**
-   * @returns {string} 'ms-edge' if the current browser is Microsoft Edge
+   * @returns 'ms-edge' if the current browser is Microsoft Edge
    */
-  cssClassForEdge(): string {
+  cssClassForEdge(): 'ms-edge' | '' {
     return this.isEdge() ? 'ms-edge' : '';
   }
 
   /**
-   * @returns {string} 'iphone' if the current device is an iPhone
+   * @returns 'iphone' if the current device is an iPhone
    */
-  cssClassForIphone(): string {
+  cssClassForIphone(): 'iphone' | '' {
     return this.isIphone() ? 'iphone' : '';
   }
 
-  isIphone() {
+  isIphone(): boolean {
     return this.userAgent.indexOf('iPhone') > -1;
   }
 
-  isInternetExplorer() {
+  isInternetExplorer(): boolean {
     return Device.Browser.INTERNET_EXPLORER === this.browser;
   }
 
-  isFirefox() {
+  isFirefox(): boolean {
     return Device.Browser.FIREFOX === this.browser;
   }
 
-  isChrome() {
+  isChrome(): boolean {
     return Device.Browser.CHROME === this.browser;
   }
 
@@ -239,13 +250,13 @@ export default class Device {
    * Compared to isIos() this function uses navigator.platform instead of navigator.userAgent to check whether the app runs on iOS.
    * Most of the time isIos() is the way to go.
    * This function was mainly introduced to detect whether it is a real iOS or an emulated one (e.g. using chrome emulator).
-   * @returns {boolean} true if the platform is iOS, false if not (e.g. if chrome emulator is running)
+   * @returns true if the platform is iOS, false if not (e.g. if chrome emulator is running)
    */
   isIosPlatform(): boolean {
     return /iPad|iPhone|iPod/.test(navigator.platform);
   }
 
-  isAndroid() {
+  isAndroid(): boolean {
     return Device.System.ANDROID === this.system;
   }
 
@@ -253,14 +264,15 @@ export default class Device {
    * The best way we have to detect a Microsoft Surface Tablet in table mode is to check if
    * the scrollbar width is 0 pixel. In desktop mode the scrollbar width is > 0 pixel.
    */
-  isWindowsTabletMode() {
+  isWindowsTabletMode(): boolean {
     return Device.System.WINDOWS === this.system && this.systemVersion >= 10 && this.scrollbarWidth === 0;
   }
 
   /**
-   * @returns {boolean} true if navigator.standalone is true which is the case for iOS home screen mode
+   * @returns true if navigator.standalone is true which is the case for iOS home screen mode
    */
   isStandalone(): boolean {
+    // @ts-ignore
     return !!window.navigator.standalone;
   }
 
@@ -268,7 +280,7 @@ export default class Device {
    * This method returns false for all browsers that are known to be unsupported, all others (e.g. unknown engines) are allowed by default.
    * The supported browser versions are mainly determined by the features needed by Scout (e.g. class syntax, Array.flatMap, IntersectionObserver, Custom CSS Properties, CSS flex-box, queueMicrotask).
    */
-  isSupportedBrowser(browser, version) {
+  isSupportedBrowser(browser: DeviceBrowser, version: number): boolean {
     browser = scout.nvl(browser, this.browser);
     version = scout.nvl(version, this.browserVersion);
     let browsers = Device.Browser;
@@ -280,7 +292,7 @@ export default class Device {
   /**
    * Can not detect type until DOM is ready because we must create a DIV to measure the scrollbars.
    */
-  protected _detectType(userAgent) {
+  protected _detectType(userAgent: string): DeviceType {
     if (Device.System.ANDROID === this.system) {
       if (userAgent.indexOf('Mobile') > -1) {
         return Device.Type.MOBILE;
@@ -386,14 +398,14 @@ export default class Device {
     }
   }
 
-  protected _parseVersion(userAgent, versionRegex) {
+  protected _parseVersion(userAgent: string, versionRegex: RegExp): number {
     let matches = versionRegex.exec(userAgent);
     if (Array.isArray(matches) && matches.length === 2) {
       return parseFloat(matches[1]);
     }
   }
 
-  supportsFeature(property, checkFunc) {
+  supportsFeature(property: string, checkFunc: Predicate<string>): boolean {
     if (this.features[property] === undefined) {
       this.features[property] = checkFunc(property);
     }
@@ -409,7 +421,7 @@ export default class Device {
    * Currently this method returns the same as hasOnScreenKeyboard(). Maybe the implementation here will be
    * different in the future.
    */
-  supportsOnlyTouch() {
+  supportsOnlyTouch(): boolean {
     return this.supportsFeature('_onlyTouch', this.hasOnScreenKeyboard.bind(this));
   }
 
@@ -417,24 +429,25 @@ export default class Device {
    * @see http://www.stucox.com/blog/you-cant-detect-a-touchscreen/
    * @see https://codeburst.io/the-only-way-to-detect-touch-with-javascript-7791a3346685
    */
-  supportsTouch() {
+  supportsTouch(): boolean {
     return this.supportsFeature('_touch', property => {
-      return (('ontouchstart' in window) || window.TouchEvent || window.DocumentTouch && document instanceof window.DocumentTouch);
+      // @ts-ignore
+      return (('ontouchstart' in window) || window.TouchEvent || window.DocumentTouch && document instanceof window.DocumentTouch) as boolean;
     });
   }
 
-  supportsFile() {
+  supportsFile(): boolean {
     return !!window.File;
   }
 
   /**
    * Some browsers support the file API but don't support the File constructor (new File()).
    */
-  supportsFileConstructor() {
+  supportsFileConstructor(): boolean {
     return typeof File === 'function';
   }
 
-  supportsCssAnimation() {
+  supportsCssAnimation(): boolean {
     return this.supportsCssProperty('animation');
   }
 
@@ -443,18 +456,18 @@ export default class Device {
    * Note that IE9 only partially supports the API, pushState and replaceState functions are missing.
    * @see: https://developer.mozilla.org/de/docs/Web/API/Window/history
    */
-  supportsHistoryApi() {
+  supportsHistoryApi(): boolean {
     return !!(window.history && window.history.pushState);
   }
 
-  supportsCssGradient() {
+  supportsCssGradient(): boolean {
     let testValue = 'linear-gradient(to left, #000 0%, #000 50%, transparent 50%, transparent 100% )';
     return this.supportsFeature('gradient', this.checkCssValue.bind(this, 'backgroundImage', testValue, actualValue => {
       return (actualValue + '').indexOf('gradient') > 0;
     }));
   }
 
-  supportsInternationalization() {
+  supportsInternationalization(): boolean {
     return window.Intl && typeof window.Intl === 'object';
   }
 
@@ -463,39 +476,39 @@ export default class Device {
    * With "download" we mean: change <code>window.location.href</code> to the URL of the resource to download. Some browsers don't
    * support this behavior and require the resource to be opened in a new window with <code>window.open</code>.
    */
-  supportsDownloadInSameWindow() {
+  supportsDownloadInSameWindow(): boolean {
     return Device.Browser.FIREFOX !== this.browser;
   }
 
-  supportsWebcam() {
+  supportsWebcam(): boolean {
     return this.supportsFeature('_webcam', property => {
       let getUserMedia = objects.optProperty(navigator, 'mediaDevices', 'getUserMedia');
       return objects.isFunction(getUserMedia);
     });
   }
 
-  supportsMicrotask() {
+  supportsMicrotask(): boolean {
     return typeof queueMicrotask === 'function';
   }
 
-  supportsIntersectionObserver() {
+  supportsIntersectionObserver(): boolean {
     return typeof IntersectionObserver === 'function';
   }
 
-  hasPrettyScrollbars() {
+  hasPrettyScrollbars(): boolean {
     return this.supportsFeature('_prettyScrollbars', property => {
       return this.scrollbarWidth === 0;
     });
   }
 
-  canHideScrollbars() {
+  canHideScrollbars(): boolean {
     return this.supportsFeature('_canHideScrollbars', property => {
       // Check if scrollbar is vanished if class hybrid-scrollable is applied which hides the scrollbar, see also scrollbars.js and Scrollbar.less
       return this._detectScrollbarWidth('hybrid-scrollable') === 0;
     });
   }
 
-  supportsCopyFromDisabledInputFields() {
+  supportsCopyFromDisabledInputFields(): boolean {
     return Device.Browser.FIREFOX !== this.browser;
   }
 
@@ -503,11 +516,11 @@ export default class Device {
    * If the mouse down on an element with a pseudo element removes the pseudo element (e.g. check box toggling),
    * the firefox cannot focus the element anymore and instead focuses the body. In that case manual focus handling is necessary.
    */
-  loosesFocusIfPseudoElementIsRemoved() {
+  loosesFocusIfPseudoElementIsRemoved(): boolean {
     return Device.Browser.FIREFOX === this.browser;
   }
 
-  supportsCssProperty(property) {
+  supportsCssProperty(property: string): boolean {
     return this.supportsFeature(property, property => {
       if (document.body.style[property] !== undefined) {
         return true;
@@ -523,7 +536,7 @@ export default class Device {
     });
   }
 
-  supportsGeolocation() {
+  supportsGeolocation(): boolean {
     return !!navigator.geolocation;
   }
 
@@ -534,11 +547,11 @@ export default class Device {
    *
    * https://bugzilla.mozilla.org/show_bug.cgi?id=771241#c7
    */
-  requiresSyntheticActiveState() {
+  requiresSyntheticActiveState(): boolean {
     return this.isFirefox();
   }
 
-  supportsPassiveEventListener() {
+  supportsPassiveEventListener(): boolean {
     return this.supportsFeature('_passiveEventListener', property => {
       // Code from MDN https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
       let passiveSupported = false;
@@ -549,7 +562,9 @@ export default class Device {
             return false;
           }
         });
+        // @ts-ignore
         window.addEventListener('test', options, options);
+        // @ts-ignore
         window.removeEventListener('test', options, options);
       } catch (err) {
         passiveSupported = false;
@@ -558,7 +573,7 @@ export default class Device {
     });
   }
 
-  checkCssValue(property, value, checkFunc) {
+  checkCssValue(property: string, value: string, checkFunc: Predicate<string>): boolean {
     // Check if property is supported at all, otherwise div.style[property] would just add it and checkFunc would always return true
     if (document.body.style[property] === undefined) {
       return false;
@@ -585,11 +600,11 @@ export default class Device {
   /**
    *  https://bugs.chromium.org/p/chromium/issues/detail?id=740502
    */
-  hasTableCellZoomBug() {
+  hasTableCellZoomBug(): boolean {
     return this.browser === Device.Browser.CHROME;
   }
 
-  protected _detectScrollbarWidth(cssClass: string) {
+  protected _detectScrollbarWidth(cssClass?: string): number {
     let $measure = $('body')
         .appendDiv(cssClass)
         .attr('id', 'MeasureScrollbar')
@@ -602,7 +617,7 @@ export default class Device {
     return scrollbarWidth;
   }
 
-  toString() {
+  toString(): string {
     return 'scout.Device[' +
       'system=' + this.system +
       ' browser=' + this.browser +
@@ -612,7 +627,7 @@ export default class Device {
       ' features=' + JSON.stringify(this.features) + ']';
   }
 
-  static get() {
+  static get(): Device {
     return instance;
   }
 }
