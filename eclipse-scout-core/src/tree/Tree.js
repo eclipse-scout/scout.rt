@@ -395,7 +395,7 @@ export default class Tree extends Widget {
     this.scrollToSelection = false;
     let scrollTop = this.$data[0].scrollTop;
     let scrollLeft = this.$data[0].scrollLeft;
-    if (this.scrollTop !== scrollTop) {
+    if (this.scrollTop !== scrollTop && this.rendered) {
       this._renderViewport();
     }
     this.scrollTop = scrollTop;
@@ -1912,9 +1912,7 @@ export default class Tree extends Widget {
   _addToVisibleFlatListNoCheck(node, insertIndex, animatedRendering) {
     arrays.insert(this.visibleNodesFlat, node, insertIndex);
     this.visibleNodesMap[node.id] = true;
-    if (this.rendered) {
-      this.showNode(node, animatedRendering, insertIndex);
-    }
+    this.showNode(node, animatedRendering, insertIndex);
   }
 
   scrollTo(node, options) {
@@ -2151,10 +2149,16 @@ export default class Tree extends Widget {
     }
   }
 
+  /**
+   * @param {TreeNode} [parentNode]
+   */
   insertNode(node, parentNode) {
     this.insertNodes([node], parentNode);
   }
 
+  /**
+   * @param {TreeNode} [parentNode]
+   */
   insertNodes(nodes, parentNode) {
     nodes = arrays.ensure(nodes).slice();
     if (nodes.length === 0) {
@@ -3019,7 +3023,7 @@ export default class Tree extends Widget {
   }
 
   hideNode(node, useAnimation, suppressDetachHandling) {
-    if (!node.attached) {
+    if (!this.rendered || !node.attached) {
       return;
     }
     this.viewRangeDirty = true;
