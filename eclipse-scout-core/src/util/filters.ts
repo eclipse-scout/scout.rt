@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,41 +11,26 @@
 import $ from 'jquery';
 
 /**
- * Ensures the given parameter is an array
- */
-export function ensure(array) {
-  if (!array) {
-    return [];
-  }
-  if (!Array.isArray(array)) {
-    return [array];
-  }
-  return array;
-}
-
-/**
  * Returns a function that always evaluates to 'true'.
  */
-export function returnTrue() {
+export function returnTrue(): boolean {
   return true;
 }
 
 /**
  * Returns a function that always evaluates to 'false'.
  */
-export function returnFalse() {
+export function returnFalse(): boolean {
   return false;
 }
 
 /**
  * Returns a filter to accept only elements which are located outside the given container, meaning not the container itself nor one of its children.
- *
- * @param DOM or jQuery container.
  */
-export function outsideFilter(container) {
-  container = container instanceof $ ? container[0] : container;
+export function outsideFilter(container: JQuery | Element): () => boolean {
+  let c: Element = container instanceof $ ? container[0] : container;
   return function() {
-    return this !== container && !$.contains(container, this);
+    return this !== c && !$.contains(c, this);
   };
 }
 
@@ -54,15 +39,14 @@ export function outsideFilter(container) {
  *
  * @param DOM or jQuery element.
  */
-export function notSameFilter(element) {
-  element = element instanceof $ ? element[0] : element;
+export function notSameFilter(element: JQuery | Element): () => boolean {
+  let e: Element = element instanceof $ ? element[0] : element;
   return function() {
-    return this !== element;
+    return this !== e;
   };
 }
 
 export default {
-  ensure,
   notSameFilter,
   outsideFilter,
   returnFalse,

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,22 +11,22 @@
 import {arrays} from '../index';
 
 export default class Range {
-  from: any;
-  to: any;
+  from: number;
+  to: number;
 
-  constructor(from, to) {
+  constructor(from: number, to: number) {
     this.from = from;
     this.to = to;
   }
 
-  equals(other) {
+  equals(other: Range): boolean {
     return this.from === other.from && this.to === other.to;
   }
 
   /**
    * Subtracts the given range and returns an array of the remaining ranges.
    */
-  subtract(other) {
+  subtract(other: Range): Range[] {
     // other is empty
     if (other.size() === 0) {
       return [new Range(this.from, this.to)];
@@ -62,9 +62,9 @@ export default class Range {
   /**
    * Subtracts every given range and returns an array of the remaining ranges.
    */
-  subtractAll(others) {
+  subtractAll(others: Range[]): Range[] {
     let other = others.shift();
-    let remains = [this];
+    let remains: Range[] = [this];
     let newRemains = [];
     // Subtract every other element from the remains of every subtraction
     while (other) {
@@ -89,7 +89,7 @@ export default class Range {
     return remains;
   }
 
-  shrink(other) {
+  shrink(other: Range): Range {
     // other is empty
     if (other.size() === 0) {
       return new Range(this.from, this.to);
@@ -117,7 +117,7 @@ export default class Range {
     return new Range(this.from, this.to);
   }
 
-  union(other) {
+  union(other: Range): Range[] {
     if (this.to < other.from || other.to < this.from) {
       let range1 = new Range(this.from, this.to);
       let range2 = new Range(other.from, other.to);
@@ -132,7 +132,7 @@ export default class Range {
     return [new Range(Math.min(this.from, other.from), Math.max(this.to, other.to))];
   }
 
-  add(other) {
+  add(other: Range): Range {
     if (this.to < other.from || other.to < this.from) {
       let range1 = new Range(this.from, this.to);
       let range2 = new Range(other.from, other.to);
@@ -147,22 +147,22 @@ export default class Range {
     return new Range(Math.min(this.from, other.from), Math.max(this.to, other.to));
   }
 
-  intersect(other) {
+  intersect(other: Range): Range {
     if (this.to <= other.from || other.to <= this.from) {
       return new Range(0, 0);
     }
     return new Range(Math.max(this.from, other.from), Math.min(this.to, other.to));
   }
 
-  size() {
+  size(): number {
     return this.to - this.from;
   }
 
-  contains(value) {
+  contains(value: number): boolean {
     return this.from <= value && value < this.to;
   }
 
-  toString() {
+  toString(): string {
     return 'scout.Range[' +
       'from=' + (this.from === null ? 'null' : this.from) +
       ' to=' + (this.to === null ? 'null' : this.to) + ']';

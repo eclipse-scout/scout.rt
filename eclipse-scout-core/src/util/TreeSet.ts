@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,10 +13,10 @@ import {comparators, objects} from '../index';
 /**
  * JavaScript port from java.util.TreeSet.
  */
-export default class TreeSet {
-  array: any[];
-  properties: any;
-  comparator: any;
+export default class TreeSet<T extends string | number> {
+  array: T[];
+  properties: { [key: string | number]: boolean };
+  comparator: { compare: (a: T, b: T) => number };
 
   constructor() {
     this.array = [];
@@ -24,7 +24,7 @@ export default class TreeSet {
     this.comparator = comparators.ALPHANUMERIC;
   }
 
-  add(value) {
+  add(value: T) {
     if (!this.contains(value)) {
       this.array.push(value);
       this.array.sort((a, b) => this.comparator.compare(a, b));
@@ -32,15 +32,15 @@ export default class TreeSet {
     }
   }
 
-  size() {
+  size(): number {
     return this.array.length;
   }
 
-  contains(value) {
+  contains(value: T): boolean {
     return (value in this.properties);
   }
 
-  last() {
+  last(): T {
     return this.array[this.array.length - 1];
   }
 }

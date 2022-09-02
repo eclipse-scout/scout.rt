@@ -1,14 +1,29 @@
 /*
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {scout} from '../index';
+import MouseDownEvent = JQuery.MouseDownEvent;
+
+export interface DoubleClickSupportOptions {
+  /**
+   * Maximum time in milliseconds between two consecutive mousedown events to consider as a double
+   * click event. If the interval is larger than this value, doubleClicked() will return false. Default is 500.
+   */
+  maxDoubleClickInterval?: number;
+
+  /**
+   * Maximum distance (in all directions in pixels) between two consecutive mousedown events to consider as
+   * a double click event. If the distance is larger than this value, doubleClicked() will return false. Default is 10.
+   */
+  maxDoubleClickDistance?: number;
+}
 
 /**
  * Simple helper to determine if two consecutive 'mousedown' events should be considered as a double click.
@@ -18,44 +33,28 @@ import {scout} from '../index';
  * 2. The method doubleClicked() returns true if the two last added events happened so fast after
  *    each other that hey should be considered a 'double click'. If the distance or interval between
  *    the last two events is too large, false is returned.
- *
- * Options:
- * [maxDoubleClickInterval, default=500]
- *   Maximum time in milliseconds between two consecutive mousedown events to consider as a double
- *   click event. If the interval is larger than this value, doubleClicked() will return false.
- * [maxDoubleClickDistance, default=10]
- *   Maximum distance (in both directions) between two consecutive mousedown events to consider as
- *   a double click event. If the distance is larger than this value, doubleClicked() will return false.
  */
 export default class DoubleClickSupport {
-  protected _lastPosX: any;
-  protected _lastPosY: any;
-  protected _lastTimestamp: any;
-  protected _maxDoubleClickInterval: any;
-  protected _maxDoubleClickDistance: any;
+  protected _lastPosX: number;
+  protected _lastPosY: number;
+  protected _lastTimestamp: number;
+  protected _maxDoubleClickInterval: number;
+  protected _maxDoubleClickDistance: number;
   protected _doubleClicked: boolean;
 
-  /**
-   * @param {object} [options]
-   * @param options.maxDoubleClickInterval default 500ms
-   * @param options.maxDoubleClickDistance default 10px
-   */
-  constructor(options?: {
-    maxDoubleClickInterval: any;
-    maxDoubleClickDistance: any;
-  }) {
+  constructor(options?: DoubleClickSupportOptions) {
     options = options || {};
 
     this._lastPosX = null;
     this._lastPosY = null;
     this._lastTimestamp = null;
 
-    this._maxDoubleClickInterval = options.maxDoubleClickInterval || 500; // ms
-    this._maxDoubleClickDistance = options.maxDoubleClickDistance || 10; // px
+    this._maxDoubleClickInterval = options.maxDoubleClickInterval || 500;
+    this._maxDoubleClickDistance = options.maxDoubleClickDistance || 10;
     this._doubleClicked = false;
   }
 
-  mousedown(event) {
+  mousedown(event: MouseDownEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     if (event && event.type === 'mousedown') {
       let posX = scout.nvl(event.pageX, 0);
       let posY = scout.nvl(event.pageY, 0);
@@ -78,7 +77,7 @@ export default class DoubleClickSupport {
     }
   }
 
-  doubleClicked() {
+  doubleClicked(): boolean {
     return this._doubleClicked;
   }
 }

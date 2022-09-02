@@ -1,14 +1,19 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, Predicate, strings} from '../index';
+
+type ArrayLikeType<T> = {
+  [index: number]: T;
+  length: number;
+};
 
 /**
  * Ensures the given parameter is an array.
@@ -214,14 +219,14 @@ export function last<T>(arr: T[]): T {
 /**
  * @returns true if the given argument is an array and has a length > 0, false in any other case.
  */
-export function hasElements(arr: any[]): boolean {
+export function hasElements<T>(arr: any): boolean {
   return !empty(arr);
 }
 
 /**
  * @returns true if the given argument is not an array or the length of the array is 0, false in any other case.
  */
-export function empty<T>(arr: T[]): boolean {
+export function empty<T>(arr: any): boolean {
   if (Array.isArray(arr)) {
     return arr.length === 0;
   }
@@ -231,7 +236,7 @@ export function empty<T>(arr: T[]): boolean {
 /**
  * @returns the size of the array, or 0 if the argument is not an array
  */
-export function length(arr: any[]): number {
+export function length<T>(arr: any): number {
   if (Array.isArray(arr)) {
     return arr.length;
   }
@@ -293,7 +298,7 @@ export function equalsIgnoreOrder(arr: any[], arr2: any[]): boolean {
   return containsAll(arr, arr2);
 }
 
-export function equals(arr: any[], arr2: any[]): boolean {
+export function equals(arr: ArrayLikeType<any>, arr2: ArrayLikeType<any>): boolean {
   // noinspection DuplicatedCode
   if (arr === arr2) {
     return true;
@@ -328,7 +333,7 @@ export function greater(arr: [], arr2: []): boolean {
   return arrLength > arr2Length;
 }
 
-export function eachSibling<T>(arr: T[], element: T, func: (elem: T, index: number) => void) {
+export function eachSibling<T>(arr: ArrayLikeType<T>, element: T, func: (elem: T, index: number) => void) {
   if (!arr || !func) {
     return;
   }
@@ -346,7 +351,7 @@ export function eachSibling<T>(arr: T[], element: T, func: (elem: T, index: numb
  *
  * @param optional "this" binding for predicate function
  */
-export function findIndex<T>(arr: T[], predicate: (arg0: T, index: number, arr: T[]) => boolean, thisArg?: any): number {
+export function findIndex<T>(arr: ArrayLikeType<T>, predicate: (arg0: T, index: number, arr: T[]) => boolean, thisArg?: any): number {
   if (!arr || !predicate) {
     return -1;
   }
@@ -362,7 +367,7 @@ export function findIndex<T>(arr: T[], predicate: (arg0: T, index: number, arr: 
  *
  * @param optional "this" binding for predicate function
  */
-export function find<T>(arr: T[], predicate: Predicate<T>, thisArg?: any): T {
+export function find<T>(arr: ArrayLikeType<T>, predicate: Predicate<T>, thisArg?: any): T {
   let index = findIndex(arr, predicate, thisArg);
   if (index === -1) {
     return null;
@@ -370,21 +375,21 @@ export function find<T>(arr: T[], predicate: Predicate<T>, thisArg?: any): T {
   return arr[index];
 }
 
-export function findFrom<T>(arr: T[], startIndex: number, predicate: Predicate<T>, reverse?: boolean): T {
+export function findFrom<T>(arr: ArrayLikeType<T>, startIndex: number, predicate: Predicate<T>, reverse?: boolean): T {
   if (reverse) {
     return findFromReverse(arr, startIndex, predicate);
   }
   return findFromForward(arr, startIndex, predicate);
 }
 
-export function findIndexFrom<T>(arr: T[], startIndex: number, predicate: Predicate<T>, reverse?: boolean): number {
+export function findIndexFrom<T>(arr: ArrayLikeType<T>, startIndex: number, predicate: Predicate<T>, reverse?: boolean): number {
   if (reverse) {
     return findIndexFromReverse(arr, startIndex, predicate);
   }
   return findIndexFromForward(arr, startIndex, predicate);
 }
 
-export function findFromForward<T>(arr: T[], startIndex: number, predicate: Predicate<T>): T {
+export function findFromForward<T>(arr: ArrayLikeType<T>, startIndex: number, predicate: Predicate<T>): T {
   let index = findIndexFromForward(arr, startIndex, predicate);
   if (index === -1) {
     return null;
@@ -392,7 +397,7 @@ export function findFromForward<T>(arr: T[], startIndex: number, predicate: Pred
   return arr[index];
 }
 
-export function findIndexFromForward<T>(arr: T[], startIndex: number, predicate: (elem: T, index: number) => boolean): number {
+export function findIndexFromForward<T>(arr: ArrayLikeType<T>, startIndex: number, predicate: (elem: T, index: number) => boolean): number {
   if (!arr || !predicate || startIndex >= arr.length) {
     return -1;
   }
@@ -408,7 +413,7 @@ export function findIndexFromForward<T>(arr: T[], startIndex: number, predicate:
   return -1;
 }
 
-export function findFromReverse<T>(arr: T[], startIndex: number, predicate: Predicate<T>): T {
+export function findFromReverse<T>(arr: ArrayLikeType<T>, startIndex: number, predicate: Predicate<T>): T {
   let index = findIndexFromReverse(arr, startIndex, predicate);
   if (index === -1) {
     return null;
@@ -416,7 +421,7 @@ export function findFromReverse<T>(arr: T[], startIndex: number, predicate: Pred
   return arr[index];
 }
 
-export function findIndexFromReverse<T>(arr: T[], startIndex: number, predicate: (elem: T, index: number) => boolean): number {
+export function findIndexFromReverse<T>(arr: ArrayLikeType<T>, startIndex: number, predicate: (elem: T, index: number) => boolean): number {
   if (!arr || !predicate || startIndex < 0) {
     return -1;
   }
@@ -455,7 +460,7 @@ export function pushSet<T>(arr: T[], element: T) {
  * Creates a string containing all elements in the array separated by the given delimiter.
  * @param encodeHtml true to encode the elements, false if not. Default is false
  */
-export function format(arr: string[], delimiter?: string, encodeHtml?: boolean) {
+export function format(arr: ArrayLikeType<string>, delimiter?: string, encodeHtml?: boolean) {
   if (!arr || arr.length === 0) {
     return '';
   }
@@ -474,7 +479,7 @@ export function format(arr: string[], delimiter?: string, encodeHtml?: boolean) 
   return output;
 }
 
-export function formatEncoded(arr: string[], delimiter?: string) {
+export function formatEncoded(arr: ArrayLikeType<string>, delimiter?: string) {
   return format(arr, delimiter, true);
 }
 

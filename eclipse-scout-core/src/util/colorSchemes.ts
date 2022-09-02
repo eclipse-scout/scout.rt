@@ -1,26 +1,32 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {colorSchemes, objects, strings, Tile} from '../index';
 
+export interface ColorScheme {
+  scheme?: string;
+  inverted?: boolean;
+  tile?: Tile;
+}
+
 const ColorSchemeId = {
   DEFAULT: 'default',
   ALTERNATIVE: 'alternative',
   RAINBOW: 'rainbow'
-};
+} as const;
 
 /**
  * Converts the given colorScheme that may be a string into an object.
  */
-export function ensureColorScheme(colorScheme, tile: Tile) {
-  let colorSchemeObj = {};
+export function ensureColorScheme(colorScheme: ColorScheme | string, tile?: Tile): ColorScheme {
+  let colorSchemeObj: ColorScheme = {};
   if (colorScheme && typeof colorScheme === 'object') {
     colorSchemeObj = colorScheme;
   } else if (typeof colorScheme === 'string') {
@@ -48,7 +54,7 @@ export function ensureColorScheme(colorScheme, tile: Tile) {
  *
  * @param {$} $container
  */
-export function toggleColorSchemeClasses($container: JQuery, colorScheme) {
+export function toggleColorSchemeClasses($container: JQuery, colorScheme: ColorScheme) {
   if (!$container || !colorScheme) {
     return;
   }
@@ -62,8 +68,8 @@ export function toggleColorSchemeClasses($container: JQuery, colorScheme) {
 /**
  * Get the css classes of the given colorScheme.
  */
-export function getCssClasses(colorScheme) {
-  let cssClasses = [];
+export function getCssClasses(colorScheme): string[] {
+  let cssClasses: string[] = [];
   if (!colorScheme) {
     return cssClasses;
   }
