@@ -10,17 +10,12 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
-import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -46,7 +41,8 @@ public class AbstractRowDataColumnTest {
     row = table.addRow(row);
 
     assertEquals("newValue", table.getRowDataColumn().getValue(0));
-    assertEquals(null, table.getRowDataColumn().getDisplayText(table.getRow(0)));
+    assertNull(table.getRowDataColumn().getDisplayText(table.getRow(0)));
+
     assertEquals("newValue", table.getStringTestColumn().getValue(0));
     assertEquals("newValue", table.getStringTestColumn().getDisplayText(table.getRow(0)));
   }
@@ -62,10 +58,32 @@ public class AbstractRowDataColumnTest {
 
     table.importFromTableBeanData(tableBean);
     assertEquals("newValue", table.getRowDataColumn().getValue(0));
-    assertEquals(null, table.getRowDataColumn().getDisplayText(table.getRow(0)));
+    assertNull(table.getRowDataColumn().getDisplayText(table.getRow(0)));
+
     assertEquals("newValue", table.getStringTestColumn().getValue(0));
     assertEquals("newValue", table.getStringTestColumn().getDisplayText(table.getRow(0)));
     assertEquals(ITableRow.STATUS_NON_CHANGED, table.getRow(0).getStatus());
+  }
+
+  @Test
+  public void testSetValueTwice() {
+    TestTable table = new TestTable();
+    table.init();
+
+    ITableRow row = table.createRow();
+    row = table.addRow(row);
+
+    // set value initial
+    table.getRowDataColumn().setValue(row, "foo");
+    assertEquals("foo", table.getRowDataColumn().getValue(row));
+    assertEquals("foo", table.getStringTestColumn().getValue(row));
+
+    // reset value
+    table.getStringTestColumn().setValue(row, null);
+    // set same value again
+    table.getRowDataColumn().setValue(row, "foo");
+    assertEquals("foo", table.getRowDataColumn().getValue(row));
+    assertEquals("foo", table.getStringTestColumn().getValue(row));
   }
 
   public class TestTable extends AbstractTable {
@@ -83,7 +101,7 @@ public class AbstractRowDataColumnTest {
     }
 
     @Order(20)
-    public class RowDataColumn extends AbstractTestRowDataColumn<String> {
+    public class RowDataColumn extends AbstractRowDataColumn<String> {
 
       @Override
       protected void updateTableColumns(ITableRow r, String newValue) {
@@ -158,61 +176,4 @@ class TestTableBean extends AbstractTableFieldBeanData {
     }
 
   }
-
-}
-
-abstract class AbstractTestRowDataColumn<T> extends AbstractColumn<T> {
-
-  private TableListener m_updateTableRowListener;
-
-  @Override
-  public void initColumn() {
-    super.initColumn();
-    if (getTable() != null) {
-      if (m_updateTableRowListener != null) {
-        getTable().removeTableListener(m_updateTableRowListener);
-      }
-      AbstractTestRowDataColumn<T> self = this;
-      m_updateTableRowListener = e -> {
-        try {
-          getTable().setTableChanging(true);
-          for (ITableRow row : e.getRows()) {
-            // Trigger "updateTableColumn" when a row was inserted, or the value of this column is changed.
-            // Do _not_ trigger the method when other columns change their values (this might lead to loops).
-            if (e.getType() == TableEvent.TYPE_ROWS_INSERTED || e.getUpdatedColumns(row).contains(self)) {
-              final int origStatus = row.getStatus();
-              updateTableColumns(row, getValue(row));
-              row.setStatus(origStatus);
-            }
-          }
-        }
-        catch (ProcessingException ex) {
-          BEANS.get(ExceptionHandler.class).handle(ex);
-        }
-        finally {
-          getTable().setTableChanging(false);
-        }
-      };
-      getTable().addTableListener(
-          m_updateTableRowListener,
-          TableEvent.TYPE_ROWS_INSERTED,
-          TableEvent.TYPE_ROWS_UPDATED);
-    }
-  }
-
-  @Override
-  public void disposeColumn() {
-    super.disposeColumn();
-    if (getTable() != null) {
-      if (m_updateTableRowListener != null) {
-        getTable().removeTableListener(m_updateTableRowListener);
-      }
-    }
-    m_updateTableRowListener = null;
-  }
-
-  /**
-   * Updates all other columns based on this column's value.
-   */
-  protected abstract void updateTableColumns(ITableRow r, T newValue);
 }
