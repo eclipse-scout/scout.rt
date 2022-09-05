@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
+import static org.junit.Assert.*;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Before;
@@ -79,6 +81,28 @@ public class AbstractTableFieldTest extends AbstractTableField<AbstractTableFiel
       sb.append(separator);
     }
     return sb.toString();
+  }
+
+  @Test
+  public void testIsEmpty() {
+    // completely filled row
+    assertFalse(isEmptyRow(getTable().getRow(0)));
+
+    // new empty row
+    ITableRow row = getTable().createRow();
+    assertTrue(isEmptyRow(row));
+
+    getTable().getIntegerColumn().setValue(row, 100);
+    assertFalse(isEmptyRow(row));
+    assertTrue(isEmptyRow(row, CollectionUtility.hashSet(getTable().getIntegerColumn().getColumnIndex())));
+
+    getTable().getString1Column().setValue(row, "foo");
+    assertFalse(isEmptyRow(row));
+    assertTrue(isEmptyRow(row, CollectionUtility.hashSet(getTable().getIntegerColumn().getColumnIndex(), getTable().getString1Column().getColumnIndex())));
+
+    getTable().getIntegerColumn().setValue(row, null);
+    getTable().getString1Column().setValue(row, null);
+    assertTrue(isEmptyRow(row));
   }
 
   /**

@@ -555,6 +555,29 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     interceptReloadTableData();
   }
 
+  /**
+   * @return {@code true} if all cells of given row contains value {@code null}, otherwise {@code false}.
+   */
+  public boolean isEmptyRow(ITableRow row) {
+    return isEmptyRow(row, null);
+  }
+
+  /**
+   * @return {@code true} if all cells of given row contains value {@code null}, otherwise {@code false}. The cells
+   *         given by {@code columnIndexesToIgnore} are excluded in this check.
+   */
+  public boolean isEmptyRow(ITableRow row, Set<Integer> columnIndexesToIgnore) {
+    for (int i = 0; i < row.getCellCount(); i++) {
+      if (CollectionUtility.contains(columnIndexesToIgnore, i)) {
+        continue;
+      }
+      if (row.getCellValue(i) != null) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   protected static class LocalTableFieldExtension<T extends ITable, OWNER extends AbstractTableField<T>> extends LocalFormFieldExtension<OWNER> implements ITableFieldExtension<T, OWNER> {
 
     public LocalTableFieldExtension(OWNER owner) {
