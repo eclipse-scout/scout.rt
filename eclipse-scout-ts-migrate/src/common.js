@@ -357,6 +357,10 @@ export const defaultParamTypeMap = {
     predicate: name => name === 'session',
     type: 'scout.Session'
   },
+  Desktop: {
+    predicate: name => name === 'desktop',
+    type: 'scout.Desktop'
+  },
   Actions: {
     predicate: name => isOneOf(name, 'actions'),
     type: 'scout.Action[]'
