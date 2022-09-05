@@ -91,6 +91,10 @@ public final class NamespaceVersion {
     return m_namespace;
   }
 
+  public String getVersionText() {
+    return m_versionText;
+  }
+
   /**
    * Method may only be called if instance is created by either {{@link #of(String)}} or {@link #of(String, String)}
    * (version text is available).
