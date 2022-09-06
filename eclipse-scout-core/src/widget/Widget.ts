@@ -37,7 +37,6 @@ interface EventDelegatorForCloning {
   cloneToOriginal: EventDelegator;
 }
 
-
 export default class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType {
   declare model: WidgetModel;
   animateRemoval: boolean;
