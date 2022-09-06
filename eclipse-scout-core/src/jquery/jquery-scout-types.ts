@@ -1,4 +1,4 @@
-import {Dimension, IconDesc, Point, Predicate} from '../index';
+import {Dimension, IconDesc, Logger, Point, Predicate} from '../index';
 import $ from 'jquery';
 import Deferred = JQuery.Deferred;
 
@@ -178,7 +178,7 @@ declare global {
     /**
      * Helper function to determine if an object is of type "jqXHR" (http://api.jquery.com/jQuery.ajax/#jqXHR)
      */
-    isJqXHR(obj: unknown): boolean;
+    isJqXHR(obj: unknown): obj is JQuery.jqXHR;
   }
 
   interface JQuery<TElement = HTMLElement> {
@@ -1047,32 +1047,4 @@ declare global {
 
     offPassive<TType extends string>(eventType: TType, handler: JQuery.TypeEventHandler<TElement, undefined, TElement, TElement, TType>): this;
   }
-}
-
-interface Logger {
-  trace(...logArgs): void
-
-  debug(...logArgs): void
-
-  info(...logArgs): void
-
-  warn(...logArgs): void
-
-  error(...logArgs): void
-
-  fatal(...logArgs): void
-
-  isEnabledFor(): boolean
-
-  isTraceEnabled(): boolean
-
-  isDebugEnabled(): boolean
-
-  isInfoEnabled(): boolean
-
-  isWarnEnabled(): boolean
-
-  isErrorEnabled(): boolean
-
-  isFatalEnabled(): boolean
 }

@@ -37,6 +37,8 @@ import {scout} from './index';
  *   extended: is the extended or original object.
  */
 export default class Extension {
+  extended: object;
+  next: (...args) => any;
 
   extend(extended, funcName) {
     let origFunc = extended[funcName];
@@ -49,12 +51,11 @@ export default class Extension {
   }
 
   /**
-   * Calls scout.create for each extension class in the given extensions array.
+   * Calls {@link scout.create} for each extension class in the given extensions array.
    *
-   * @param {[string]} extensions an array of strings containing extension class names
-   * @static
+   * @param extensions an array of strings containing extension class names
    */
-  static install(extensions) {
+  static install(extensions: [string]) {
     extensions.forEach(ext => {
       scout.create(ext);
     });

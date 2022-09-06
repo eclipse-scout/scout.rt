@@ -12,35 +12,30 @@ import {App, defaultValues, ErrorHandler, scout} from './index';
 import $ from 'jquery';
 
 export default class RemoteApp extends App {
+  remote: boolean;
 
   constructor() {
     super();
     this.remote = true;
   }
 
-  /**
-   * @override
-   */
-  _doBootstrap(options) {
+  protected override _doBootstrap(options) {
     return super._doBootstrap(options).concat([
       this._doBootstrapDefaultValues()
     ]);
   }
 
-  _doBootstrapDefaultValues() {
-    defaultValues.bootstrap();
+  protected _doBootstrapDefaultValues(): JQuery.Promise<void> {
+    return defaultValues.bootstrap();
   }
 
-  _createErrorHandler() {
+  protected override _createErrorHandler() {
     return scout.create(ErrorHandler, {
       sendError: true
     });
   }
 
-  /**
-   * @override
-   */
-  _loadSession($entryPoint, options) {
+  protected override _loadSession($entryPoint: JQuery, options) {
     options = options || {};
     options.$entryPoint = $entryPoint;
     let session = this._createSession(options);
@@ -48,7 +43,7 @@ export default class RemoteApp extends App {
     return session.start();
   }
 
-  _fail(options, error, ...args) {
+  protected override _fail(options, error, ...args) {
     $.log.error('App initialization failed', error);
     this.setLoading(false);
     // Session.js already handled the error -> don't show a message here

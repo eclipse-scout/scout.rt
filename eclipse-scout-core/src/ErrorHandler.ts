@@ -8,11 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxError, App, arrays, icons, logging, NullLogger, scout, strings} from './index';
+import {AjaxError, App, arrays, icons, LogLevel, NullLogger, scout, Session, strings} from './index';
 import $ from 'jquery';
 import sourcemappedStacktrace from 'sourcemapped-stacktrace';
 
-export default class ErrorHandler {
+export interface ErrorHandlerOptions {
+  logError: boolean;
+  displayError: boolean;
+  sendError: boolean;
+}
+
+export interface ErrorInfo {
+  log: string;
+  level?: LogLevel;
+  error?: any; // May be Error, AjaxError or any other type like string, number etc. since the any object can be thrown.
+  mappingError?: string;
+  code?: string;
+  message?: string;
+  stack?: string;
+  mappedStack?: string;
+  debugInfo?: string;
+}
+
+export default class ErrorHandler implements ErrorHandlerOptions {
+  logError: boolean;
+  displayError: boolean;
+  sendError: boolean;
+  windowErrorHandler: OnErrorEventHandlerNonNull;
 
   constructor() {
     this.logError = true;
@@ -29,18 +51,18 @@ export default class ErrorHandler {
    */
   static CONSOLE_OUTPUT = true;
 
-  init(options) {
+  init(options?: ErrorHandlerOptions) {
     $.extend(this, options);
   }
 
   // Signature matches the "window.onerror" event handler
   // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
-  _onWindowError(errorMessage, fileName, lineNumber, columnNumber, error) {
+  protected _onWindowError(errorMessage: string, fileName?: string, lineNumber?: number, columnNumber?: number, error?: Error) {
     try {
       if (this._isIgnorableScriptError(errorMessage, fileName, lineNumber, columnNumber, error)) {
         this.handleErrorInfo({
           log: `Ignoring error. Message: ${errorMessage}`,
-          level: logging.Level.INFO
+          level: LogLevel.INFO
         });
         return;
       }
@@ -63,7 +85,7 @@ export default class ErrorHandler {
     }
   }
 
-  _isIgnorableScriptError(message, fileName, lineNumber, columnNumber, error) {
+  protected _isIgnorableScriptError(message: string, fileName?: string, lineNumber?: number, columnNumber?: number, error?: Error): boolean {
     // Ignore errors caused by scripts from a different origin.
     // Example: Firefox on iOS throws an error, probably caused by an internal Firefox script.
     // The error does not affect the application and cannot be prevented by the app either since we don't know what script it is and what it does.
@@ -82,10 +104,10 @@ export default class ErrorHandler {
    *   2. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(jqXHR, textStatus, errorThrown); }
    *   3. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(arguments); } // <-- recommended
    *
-   * @param {object|arguments|[]} error or array or array-like object containing the error and other arguments
-   * @return {Promise} the analyzed errorInfo
+   * @param errorOrArgs error or array or array-like object containing the error and other arguments
+   * @returns the analyzed errorInfo
    */
-  handle(errorOrArgs, ...args) {
+  handle(errorOrArgs: any | IArguments | [], ...args): JQuery.Promise<any> {
     let error = errorOrArgs;
     if (errorOrArgs && args.length === 0) {
       if ((String(errorOrArgs) === '[object Arguments]')) {
@@ -106,9 +128,8 @@ export default class ErrorHandler {
    * 2. jQuery AJAX errors      (code: 'X' + HTTP status code)
    * 3. Nothing                 (code: 'P3')
    * 4. Everything else         (code: 'P4')
-   * @returns {Promise}
    */
-  analyzeError(error, ...args) {
+  analyzeError(error: any, ...args): JQuery.Promise<any> {
     let errorInfo = {
       code: null,
       message: null,
@@ -122,7 +143,7 @@ export default class ErrorHandler {
     return this._analyzeError(errorInfo, ...args);
   }
 
-  _analyzeError(errorInfo, ...args) {
+  protected _analyzeError(errorInfo: ErrorInfo, ...args): JQuery.Promise<ErrorInfo> {
     let error = errorInfo.error;
     // 1. Regular errors
     if (error instanceof Error) {
@@ -156,14 +177,16 @@ export default class ErrorHandler {
     return $.resolvedPromise(errorInfo);
   }
 
-  _analyzeRegularError(errorInfo) {
-    let error = errorInfo.error;
+  protected _analyzeRegularError(errorInfo: ErrorInfo) {
+    let error = errorInfo.error as Error;
     errorInfo.code = this.getJsErrorCode(error);
     errorInfo.message = String(error.message || error);
     if (error.stack) {
       errorInfo.stack = String(error.stack);
     }
+    // @ts-ignore
     if (error.debugInfo) { // scout extension
+      // @ts-ignore
       errorInfo.debugInfo = error.debugInfo;
     }
     let stack = errorInfo.mappedStack || errorInfo.stack;
@@ -185,7 +208,7 @@ export default class ErrorHandler {
     errorInfo.log = arrays.format(log, '\n');
   }
 
-  _analyzeAjaxError(errorInfo, ...args) {
+  protected _analyzeAjaxError(errorInfo: ErrorInfo, ...args) {
     let error = errorInfo.error;
     let jqXHR, errorThrown, requestOptions;
     if (error instanceof AjaxError) {
@@ -214,7 +237,7 @@ export default class ErrorHandler {
     }
   }
 
-  _analyzeOtherError(errorInfo) {
+  protected _analyzeOtherError(errorInfo: ErrorInfo) {
     let error = errorInfo.error;
     // Everything else (e.g. when strings are thrown)
     let s = (typeof error === 'string' || typeof error === 'number') ? String(error) : null;
@@ -230,13 +253,13 @@ export default class ErrorHandler {
     errorInfo.log = 'Unexpected error: ' + s;
   }
 
-  _analyzeNoError(errorInfo) {
+  protected _analyzeNoError(errorInfo: ErrorInfo) {
     errorInfo.code = 'P3';
     errorInfo.message = 'Unknown error';
     errorInfo.log = 'Unexpected error (no reason provided)';
   }
 
-  mapStack(stack) {
+  mapStack(stack: string): JQuery.Promise<string, { message: string; error: Error }> {
     let deferred = $.Deferred();
     try {
       sourcemappedStacktrace.mapStackTrace(stack, mappedStack => {
@@ -250,13 +273,13 @@ export default class ErrorHandler {
   }
 
   /**
-   * Expects an object as returned by analyzeError() and handles it:
+   * Expects an object as returned by {@link analyzeError} and handles it:
    * - If the flag "logError" is set, the log message is printed to the console
    * - If there is a scout session and the flag "displayError" is set, the error is shown in a a message box.
    * - If there is a scout session and the flag "sendError" is set, the error is sent to the UI server.
    */
-  handleErrorInfo(errorInfo) {
-    errorInfo.level = scout.nvl(errorInfo.level, logging.Level.ERROR);
+  handleErrorInfo(errorInfo: ErrorInfo): ErrorInfo {
+    errorInfo.level = scout.nvl(errorInfo.level, LogLevel.ERROR);
     if (this.logError && errorInfo.log) {
       this._logErrorInfo(errorInfo);
     }
@@ -266,7 +289,7 @@ export default class ErrorHandler {
     // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
     if (App.get().sessions.length > 0) {
       let session = App.get().sessions[0];
-      if (this.displayError && errorInfo.level === logging.Level.ERROR) {
+      if (this.displayError && errorInfo.level === LogLevel.ERROR) {
         this._showMessageBox(session, errorInfo.message, errorInfo.code, errorInfo.log);
       }
       if (this.sendError) {
@@ -276,18 +299,18 @@ export default class ErrorHandler {
     return errorInfo;
   }
 
-  _logErrorInfo(errorInfo) {
+  protected _logErrorInfo(errorInfo: ErrorInfo) {
     switch (errorInfo.level) {
-      case logging.Level.TRACE:
+      case LogLevel.TRACE:
         $.log.trace(errorInfo.log);
         break;
-      case logging.Level.DEBUG:
+      case LogLevel.DEBUG:
         $.log.debug(errorInfo.log);
         break;
-      case logging.Level.INFO:
+      case LogLevel.INFO:
         $.log.info(errorInfo.log);
         break;
-      case logging.Level.WARN:
+      case LogLevel.WARN:
         $.log.warn(errorInfo.log);
         break;
       default:
@@ -301,9 +324,9 @@ export default class ErrorHandler {
       writeToConsole = false;
     }
     if (writeToConsole && window && window.console) {
-      if (errorInfo.level === logging.Level.ERROR && window.console.error) {
+      if (errorInfo.level === LogLevel.ERROR && window.console.error) {
         window.console.error(errorInfo.log);
-      } else if (errorInfo.level === logging.Level.WARN && window.console.warn) {
+      } else if (errorInfo.level === LogLevel.WARN && window.console.warn) {
         window.console.warn(errorInfo.log);
       } else if (window.console.log) {
         window.console.log(errorInfo.log);
@@ -317,7 +340,7 @@ export default class ErrorHandler {
    * that a JS runtime error has occurred. (In contrast, fatal errors from
    * the server have numeric error codes.)
    */
-  getJsErrorCode(error) {
+  getJsErrorCode(error: Error): string {
     if (error) {
       if (error.name === 'EvalError') {
         return 'E1';
@@ -344,7 +367,7 @@ export default class ErrorHandler {
     return 'J0';
   }
 
-  _showMessageBox(session, errorMessage, errorCode, logMessage) {
+  protected _showMessageBox(session: Session, errorMessage, errorCode, logMessage) {
     let options = {
       header: session.optText('ui.UnexpectedProblem', 'Internal UI Error'),
       body: strings.join('\n\n',
@@ -352,6 +375,7 @@ export default class ErrorHandler {
         session.optText('ui.UiInconsistentMsg', '')),
       yesButtonText: session.optText('ui.Reload', 'Reload'),
       yesButtonAction: scout.reloadPage,
+      noButtonText: undefined,
       hiddenText: logMessage,
       iconId: icons.SLIPPERY
     };
@@ -363,7 +387,7 @@ export default class ErrorHandler {
     session.showFatalMessage(options, errorCode);
   }
 
-  _sendErrorMessage(session, logMessage, logLevel) {
+  protected _sendErrorMessage(session: Session, logMessage, logLevel) {
     session.sendLogRequest(logMessage, logLevel);
   }
 }

@@ -68,7 +68,7 @@ let _correlationCounter = 1;
  * To further reduce the risk of collisions, a monotonically increasing counter is added
  * at the end of the result string (separated by "/").
  */
-export function correlationId(length: number): string {
+export function correlationId(length?: number): string {
   length = length || 11;
   let letters = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
   let digits = '23456789';
