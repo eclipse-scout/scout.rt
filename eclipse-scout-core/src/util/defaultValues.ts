@@ -26,7 +26,7 @@ export interface DefaultValuesBootstrapOptions {
   url?: string;
 }
 
-export function bootstrap(options: DefaultValuesBootstrapOptions): JQuery.Promise<any> {
+export function bootstrap(options?: DefaultValuesBootstrapOptions): JQuery.Promise<any> {
   options = options || {};
   let defaultOptions = {
     url: 'defaultValues'
@@ -51,7 +51,7 @@ export function init(data: any) {
     if (!_objectTypeHierarchyFlat[objectType]) {
       _objectTypeHierarchyFlat[objectType] = [objectType];
     }
-  }, this);
+  });
 }
 
 export function _generateObjectTypeHierarchyRec(json: any, currentParentObjectTypes: any, targetMap: any) {

@@ -280,7 +280,7 @@ export default class Device implements DeviceModel {
    * This method returns false for all browsers that are known to be unsupported, all others (e.g. unknown engines) are allowed by default.
    * The supported browser versions are mainly determined by the features needed by Scout (e.g. class syntax, Array.flatMap, IntersectionObserver, Custom CSS Properties, CSS flex-box, queueMicrotask).
    */
-  isSupportedBrowser(browser: DeviceBrowser, version: number): boolean {
+  isSupportedBrowser(browser?: DeviceBrowser, version?: number): boolean {
     browser = scout.nvl(browser, this.browser);
     version = scout.nvl(version, this.browserVersion);
     let browsers = Device.Browser;

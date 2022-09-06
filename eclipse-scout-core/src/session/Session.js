@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Device, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale, logging, MessageBox, ModelAdapter, NullWidget, ObjectFactory, objects, Reconnector, RemoteEvent, ResponseQueue, scout, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage} from '../index';
+import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Device, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale, logging, LogLevel, MessageBox, ModelAdapter, NullWidget, ObjectFactory, objects, Reconnector, RemoteEvent, ResponseQueue, scout, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage} from '../index';
 import $ from 'jquery';
 
 export default class Session extends EventEmitter {
@@ -1370,13 +1370,13 @@ export default class Session extends EventEmitter {
    * Sends a request containing the log message for logging purpose.
    * The request is sent immediately (does not await pending requests).
    * @param {string} message the log message
-   * @param {logging.Level} [level] the log level used to log the message. Default is {@link logging.Level.ERROR}.
+   * @param {LogLevel} [level] the log level used to log the message. Default is {@link logging.Level.ERROR}.
    */
   sendLogRequest(message, level) {
     let request = this._newRequest({
       log: true,
       message: message,
-      level: scout.nvl(level, logging.Level.ERROR)
+      level: scout.nvl(level, LogLevel.ERROR)
     });
     if (this.currentEvent) {
       request.event = {

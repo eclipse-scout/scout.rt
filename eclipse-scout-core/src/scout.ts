@@ -11,9 +11,10 @@
 
 import {AnyWidget, App, Device, ModelAdapter, ObjectFactory, objects, Session, strings, ValueField, widgets} from './index';
 import $ from 'jquery';
+import {ObjectCreator, ObjectFactoryOptions, ObjectType} from './ObjectFactory';
 
 let $activeElements = null;
-let objectFactories = new Map();
+let objectFactories: Map<string | { new(): object }, ObjectCreator> = new Map();
 
 /**
  * Returns the first of the given arguments that is not null or undefined. If no such element
@@ -110,14 +111,18 @@ export interface ObjectWithType {
   objectType: string;
 }
 
+export interface ObjectWithTypeAndId extends ObjectWithType {
+  id?: string;
+}
+
 export type ModelOf<T> = T extends { model: object } ? T['model'] : object;
 
 /**
  * Creates a new object instance.
- * <p>
+ *
  * Delegates the create call to {@link ObjectFactory.create}.
  */
-export function create<T>(objectType: { new(model?: ModelOf<T>): T } | string | ObjectWithType, model?: ModelOf<T>, options?): T {
+export function create<T>(objectType: ObjectType<T, ModelOf<T>> | ObjectWithType, model?: ModelOf<T>, options?: ObjectFactoryOptions): T {
   return ObjectFactory.get().create(objectType, model, options);
 }
 
@@ -338,7 +343,7 @@ export interface ReloadPageOptions {
 /**
  * Reloads the entire browser window.
  */
-export function reloadPage(options: ReloadPageOptions) {
+export function reloadPage(options?: ReloadPageOptions) {
   options = options || {} as ReloadPageOptions;
   if (options.schedule) {
     setTimeout(reloadPageImpl);
@@ -364,11 +369,10 @@ export function reloadPage(options: ReloadPageOptions) {
 
 /**
  * @param factories Object that contains the object type as key and the function that constructs the object as value.
- * <p>
- * If you prefer using a class reference as object type rather than a string, please use {@link addObjectFactory} to register your factory.
+ *          If you prefer using a class reference as object type rather than a string, please use {@link addObjectFactory} to register your factory.
  * @see create
  */
-export function addObjectFactories(factories: { [objectType: string]: (model?) => any }) {
+export function addObjectFactories(factories: { [objectType: string]: ObjectCreator }) {
   for (let [objectType, factory] of Object.entries(factories)) {
     addObjectFactory(objectType, factory);
   }
@@ -379,7 +383,7 @@ export function addObjectFactories(factories: { [objectType: string]: (model?) =
  * @param factory Function that constructs the object.
  * @see create
  */
-export function addObjectFactory(objectType: string | { new(): object }, factory: (model?) => any) {
+export function addObjectFactory(objectType: ObjectType, factory: ObjectCreator) {
   objectFactories.set(objectType, factory);
 }
 

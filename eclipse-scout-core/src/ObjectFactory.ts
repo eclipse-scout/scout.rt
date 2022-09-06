@@ -9,16 +9,45 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, scout, TypeDescriptor} from './index';
-
 import $ from 'jquery';
+import {ObjectWithTypeAndId} from './scout';
+import {TypeDescriptorOptions} from './TypeDescriptor';
+
+export type ObjectCreator = (model?: any) => object;
+export type ObjectType<T = object, M = object> = string | (new(model?: M) => T);
+
+export interface ObjectFactoryOptions extends TypeDescriptorOptions {
+  /**
+   * Model object to be passed to the constructor or create function.
+   */
+  model?: object;
+
+  /**
+   * Controls if the resulting object should be assigned the attribute "id" if it is not defined.
+   * If the created object has an init() function, we also set the property 'id' on the model object to allow the init() function to copy the attribute from the model to the scoutObject.
+   * Default is true.
+   */
+  ensureUniqueId?: boolean;
+}
+
+export interface RegisterNamespaceOptions {
+  /**
+   * List of object names that are allowed to be replaced, see the description for the thrown error. Default is an empty array.
+   */
+  allowedReplacements?: string[];
+}
 
 /**
  * @singleton
  */
 export default class ObjectFactory {
+  /** use {@link createUniqueId} to generate a new ID */
+  uniqueIdSeqNo: number;
+
+  protected _registry: Map<ObjectType, ObjectCreator>;
+  protected _objectTypeMap: Map<new() => object, string>;
 
   constructor() {
-    // use createUniqueId() to generate a new ID
     this.uniqueIdSeqNo = 0;
     this._registry = new Map();
     this._objectTypeMap = new Map();
@@ -63,20 +92,16 @@ export default class ObjectFactory {
    * the variant to the type ("VariantType"). If no such type can be found and the option "variantLenient"
    * is set to true, a second attempt is made without the variant.
    *
-   * @param {string|{new(): object}} objectType (mandatory) A class reference to the object to be created. Or a string describing the type of the object to be created.
-   * @param {object} [options]  (optional)  Options object, currently supporting the following two options:
-   *                               - model = Model object to be passed to the constructor or create function
-   *                               - variantLenient = Flag to allow a second attempt to resolve the class
-   *                                 without variant (see description above).
+   * @param objectType A class reference to the object to be created. Or a string describing the type of the object to be created.
    */
-  _createObjectByType(objectType, options) {
+  protected _createObjectByType<T>(objectType: ObjectType<T>, options?: ObjectFactoryOptions): any {
     if (typeof objectType !== 'string' && typeof objectType !== 'function') {
       throw new Error('missing or invalid object type');
     }
     options = options || {};
 
     let Class = null;
-    let typeDescriptor = null;
+    let typeDescriptor: TypeDescriptor = null;
     if (typeof objectType === 'string') {
       typeDescriptor = TypeDescriptor.parse(objectType);
       Class = typeDescriptor.resolve(options);
@@ -109,32 +134,27 @@ export default class ObjectFactory {
    * Creates and initializes a new Scout object. When the created object has an init function, the
    * model object is passed to that function. Otherwise the init call is omitted.
    *
-   * @param {string|object|{new(): object}} objectType A class reference to the object to be created. Or a string with the requested objectType.
+   * @param objectTypeOrModel A class reference to the object to be created. Or a string with the requested objectType.
    *        This argument is optional, but if it is omitted, the argument "model" becomes mandatory and MUST contain a
    *        property named "objectType". If both, objectType and model, are set, the
    *        objectType parameter always wins before the model.objectType property.
-   * @param {object} [model] The model object passed to the constructor function and to the init() method.
+   * @param modelOrOptions The model object passed to the constructor function and to the init() method.
    *        This argument is mandatory if it is the first argument, otherwise it is
    *        optional (see above). This function may set/overwrite the properties 'id' and
    *        'objectType' on the model object.
-   * @param {object} [options] Options object, see table below. This argument is optional.
-   * @param {boolean} [options.variantLenient] Controls if the object factory may try to resolve the
-   *        scoutClass without the model variant part if the initial objectType could not be resolved. Default is false.
-   * @param {boolean} [options.ensureUniqueId] Controls if the resulting object should be assigned the
-   *        attribute "id" if it is not defined. If the created object has an
-   *        init() function, we also set the property 'id' on the model object
-   *        to allow the init() function to copy the attribute from the model
-   *        to the scoutObject.
-   *        Default is true.
    * @throws Error if the argument list does not match the definition.
    */
-  create(objectType, model, options) {
+  create<T>(objectTypeOrModel: ObjectType<T> | ObjectWithTypeAndId, modelOrOptions?: ObjectWithTypeAndId | ObjectFactoryOptions, options?: ObjectFactoryOptions): T {
     // Normalize arguments
-    if (typeof objectType === 'string' || typeof objectType === 'function') {
+    let objectType: ObjectType;
+    let model: ObjectWithTypeAndId;
+    if (typeof objectTypeOrModel === 'string' || typeof objectTypeOrModel === 'function') {
       options = options || {};
-    } else if (objects.isPlainObject(objectType)) {
-      options = model || {};
-      model = objectType;
+      model = modelOrOptions as ObjectWithTypeAndId;
+      objectType = objectTypeOrModel as ObjectType;
+    } else if (objects.isPlainObject(objectTypeOrModel)) {
+      options = modelOrOptions as ObjectFactoryOptions || {};
+      model = objectTypeOrModel;
       if (!model.objectType) {
         throw new Error('Missing mandatory property "objectType" on model');
       }
@@ -171,13 +191,13 @@ export default class ObjectFactory {
   /**
    * Returns a new unique ID to be used for Widgets/Adapters created by the UI
    * without a model delivered by the server-side client.
-   * @return {string} ID with prefix 'ui'
+   * @returns ID with prefix 'ui'
    */
-  createUniqueId() {
+  createUniqueId(): string {
     return 'ui' + (++this.uniqueIdSeqNo).toString();
   }
 
-  resolveTypedObjectType(objectType) {
+  resolveTypedObjectType(objectType: ObjectType): ObjectType {
     if (typeof objectType !== 'string') {
       return objectType;
     }
@@ -189,29 +209,27 @@ export default class ObjectFactory {
     return objectType;
   }
 
-  register(objectType, createFunc) {
+  register(objectType: ObjectType, createFunc: ObjectCreator) {
     objectType = this.resolveTypedObjectType(objectType);
     this._registry.set(objectType, createFunc);
     $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) registered create-function for objectType ' + objectType);
   }
 
-  unregister(objectType) {
+  unregister(objectType: ObjectType) {
     objectType = this.resolveTypedObjectType(objectType);
     this._registry.delete(objectType);
     $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) unregistered objectType ' + objectType);
   }
 
-  get(objectType) {
+  get(objectType: ObjectType): ObjectCreator {
     objectType = this.resolveTypedObjectType(objectType);
     return this._registry.get(objectType);
   }
 
   /**
    * Returns the object type as string for the given class.
-   * @param Class
-   * @returns {string}
    */
-  getObjectType(Class) {
+  getObjectType(Class: ObjectType): string {
     if (typeof Class === 'string') {
       return Class;
     }
@@ -239,15 +257,13 @@ export default class ObjectFactory {
    * Registering the namespace also makes it possible to resolve the name of a class including its namespace for any registered class, even if the code is minified.
    * This is used by the ObjectFactory to store the objectType as string on the created object, which maintains backwards compatibility.
    *
-   * @param {string} namespace the name of the object on the window
-   * @param {object} objects the objects to be put on the namespace
-   * @param {object} [options]
-   * @param {string[]} [options.allowedReplacements] List of object names that are allowed to be replaced, see the description for the thrown error.
+   * @param namespace the name of the object on the window
+   * @param objects the objects to be put on the namespace
    * @throws Error if the object is already registered on the namespace to avoid accidental replacements.
-   *                Such replacements would not work if the object is created using a class reference because in that case the namespace is not used.
-   *                If you want to force a replacement, you can allow it by using the option allowedReplacements.
+   *               Such replacements would not work if the object is created using a class reference because in that case the namespace is not used.
+   *               If you want to force a replacement, you can allow it by using the option allowedReplacements.
    */
-  registerNamespace(namespace, objects, options) {
+  registerNamespace(namespace: string, objects: object, options?: RegisterNamespaceOptions) {
     options = $.extend({allowedReplacements: []}, options);
 
     // Ensure namespace object exists on window
@@ -281,7 +297,7 @@ export default class ObjectFactory {
     return objectFactory;
   }
 
-  static _set(newFactory) {
+  protected static _set(newFactory) {
     objectFactory = newFactory;
   }
 }
