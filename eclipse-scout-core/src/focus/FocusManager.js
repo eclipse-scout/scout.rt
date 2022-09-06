@@ -241,7 +241,7 @@ export default class FocusManager {
   /**
    * Enforces proper focus on the currently active focus context.
    *
-   * @param filter
+   * @param [filter]
    *        Filter to exclude elements to gain focus.
    */
   validateFocus(filter) {

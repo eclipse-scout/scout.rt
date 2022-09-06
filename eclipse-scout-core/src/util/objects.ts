@@ -21,7 +21,7 @@ const CONST_REGEX = /\${const:([^}]*)}/;
  *
  * @param [properties] optional initial properties to be set on the new created object
  */
-export function createMap(properties?: any): any {
+export function createMap(properties?: object): any {
   let map = Object.create(null);
   if (properties) {
     $.extend(map, properties);
@@ -34,7 +34,7 @@ export function createMap(properties?: any): any {
  * @param [filter] an array of property names.
  * @returns the destination object (the destination parameter will be modified as well)
  */
-export function copyProperties<D>(source: any, dest: D, filter?: string[] | string): D {
+export function copyProperties<D>(source: object, dest: D, filter?: string[] | string): D {
   let propertyName;
   filter = arrays.ensure(filter);
   for (propertyName in source) {
@@ -51,7 +51,7 @@ export function copyProperties<D>(source: any, dest: D, filter?: string[] | stri
  * @param [filter] an array of property names.
  * @returns the destination object (the destination parameter will be modified as well)
  */
-export function copyOwnProperties<D>(source: any, dest: D, filter?: string[] | string): D {
+export function copyOwnProperties<D>(source: object, dest: D, filter?: string[] | string): D {
   let propertyName;
   filter = arrays.ensure(filter);
   for (propertyName in source) {
@@ -65,7 +65,7 @@ export function copyOwnProperties<D>(source: any, dest: D, filter?: string[] | s
 /**
  * Counts and returns the properties of a given object or map (see #createMap).
  */
-export function countOwnProperties(obj: any): number {
+export function countOwnProperties(obj: object): number {
   // map objects don't have a prototype
   if (!Object.getPrototypeOf(obj)) {
     return Object.keys(obj).length;
@@ -86,7 +86,7 @@ export function countOwnProperties(obj: any): number {
  * Copies the specified properties (including the ones from the prototype) from source to dest.
  * Properties that already exist on dest are NOT overwritten.
  */
-export function extractProperties<D>(source: any, dest: D, properties: string[]): D {
+export function extractProperties<D>(source: object, dest: D, properties: string[]): D {
   properties.forEach(propertyName => {
     if (dest[propertyName] === undefined) {
       dest[propertyName] = source[propertyName];
@@ -210,7 +210,7 @@ export function findChildObjectByKey(parentObj: any, property: string, propertyV
  * @return Object Returns the selected object.
  * @throws Throws an error, if the provided parameters are malformed, or a property could not be found/a id property filter does not find any elements.
  */
-export function getByPath(object: any, path: string): any {
+export function getByPath(object: object, path: string): any {
   scout.assertParameter('object', object, Object);
   scout.assertParameter('path', path);
 
@@ -297,9 +297,9 @@ export function isPlainObject(obj: any): boolean {
  * <li><code>optProperty(obj, 'foo', 'bar');</code> try to access and return obj.foo.bar</li>
  * </ul>
  *
- * @returns {*} the value of the requested property or undefined if the property does not exist on the object
+ * @returns the value of the requested property or undefined if the property does not exist on the object
  */
-export function optProperty(obj: any, ...properties: string[]): any {
+export function optProperty(obj: object, ...properties: string[]): any {
   if (!obj) {
     return null;
   }
@@ -333,23 +333,24 @@ export function optProperty(obj: any, ...properties: string[]): any {
  * Because when myNumber === 0 would also resolve to false. In that case use instead:
  *   if (isNumber(myNumber)) { ...
  */
-export function isNumber(obj: any): boolean {
+export function isNumber(obj: any): obj is number {
   return obj !== null && !isNaN(obj) && isFinite(obj) && !isNaN(parseFloat(obj));
 }
 
-export function isString(obj: any): boolean {
+export function isString(obj: any): obj is string {
   return typeof obj === 'string' || obj instanceof String;
 }
 
-export function isNullOrUndefined(obj: any): boolean {
+export function isNullOrUndefined(obj: any): obj is null | undefined {
   return obj === null || obj === undefined;
 }
 
-export function isFunction(obj: any): boolean {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function isFunction(obj: any): obj is Function {
   return $.isFunction(obj);
 }
 
-export function isArray(obj: any): boolean {
+export function isArray(obj: any): obj is Array<any> {
   return Array.isArray(obj);
 }
 
@@ -362,7 +363,7 @@ export function isArray(obj: any): boolean {
  *       Checking for promise would require to check the behavior which is not possible. So you could provide an object
  *       with a "then" function that does not conform to the Promises/A+ spec but this method would still return true.
  */
-export function isPromise(value: any): boolean {
+export function isPromise(value: any): value is PromiseLike<any> {
   return !!value && typeof value === 'object' && typeof value.then === 'function';
 }
 
@@ -391,7 +392,7 @@ export function values(obj: object, all?: boolean): any[] {
 /**
  * @returns the key / name of a property with given value
  */
-export function keyByValue(obj: any, value: any): string {
+export function keyByValue(obj: object, value: any): string {
   return Object.keys(obj)[values(obj).indexOf(value)];
 }
 
@@ -451,7 +452,7 @@ export function equalsRecursive(objA: any, objB: any): boolean {
 /**
  * Compares a list of properties of two objects by using the equals method for each property.
  */
-export function propertiesEquals(objA: any, objB: any, properties: string[]): boolean {
+export function propertiesEquals(objA: object, objB: object, properties: string[]): boolean {
   let i, property;
   for (i = 0; i < properties.length; i++) {
     property = properties[i];
@@ -467,7 +468,7 @@ export function propertiesEquals(objA: any, objB: any, properties: string[]): bo
  *     if that function does not exist. Use this function if you modify an existing framework function
  *     to find problems after refactoring / renaming as soon as possible.
  */
-export function mandatoryFunction(obj: any, funcName: string): Function {
+export function mandatoryFunction(obj: object, funcName: string): Function {
   let func = obj[funcName];
   if (!func || typeof func !== 'function') {
     throw new Error('Function \'' + funcName + '\' does not exist on object. Check if it has been renamed or moved. Object: ' + obj);
@@ -665,7 +666,7 @@ export function resolveConst(value: string, constType: any): any {
   return value;
 }
 
-export function resolveConstProperty(object: any, config: { property: string; constType: any }) {
+export function resolveConstProperty(object: object, config: { property: string; constType: any }) {
   scout.assertProperty(config, 'property');
   scout.assertProperty(config, 'constType');
   let value = object[config.property];

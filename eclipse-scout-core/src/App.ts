@@ -9,14 +9,54 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {codes, Desktop, Device, ErrorHandler, EventEmitter, fonts, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage} from './index';
+import {codes, Desktop, Device, ErrorHandler, EventEmitter, fonts, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage, Widget} from './index';
 import $ from 'jquery';
+import {FontSpec} from './util/fonts';
 
 let instance = null;
 let listeners = [];
 
-export default class App extends EventEmitter {
+export interface AppOptions {
+  /**
+   * Object to configure the session, see {@link Session.init} for the available options.
+   */
+  session?: object;// FIXME TS SessionModel
 
+  bootstrap?: AppBootstrapOptions;
+
+  /**
+   * True, to check whether the browser fulfills all requirements to run the application. If the check fails, a notification is shown to warn the user about his old browser. Default is true.
+   */
+  checkBrowserCompatibility?: boolean;
+
+  version?: string;
+}
+
+export interface AppBootstrapOptions {
+  /**
+   * Fonts that should be preloaded, which means the initialization will not continue until the fonts are loaded.
+   * If no fonts are specified, the list of fonts to preload is automatically calculated from the available CSS "@font-face" definitions. This is the default.<br>
+   * To disable preloading entirely, set fonts to an empty array.
+   */
+  fonts?: FontSpec[];
+
+  /**
+   *  URL or multiple URLs pointing to a json resource containing texts that will be available through {@link texts}.
+   */
+  textsUrl?: string | string[];
+
+  /**
+   * URL pointing to a json resource containing locale information processed by {@link locales}.
+   */
+  localesUrl?: string;
+
+  /**
+   *  URL pointing to a json resources containing codes that will be available through {@link codes}.
+   */
+  codesUrl?: string;
+}
+
+export default class App extends EventEmitter {
   static addListener(type, func) {
     let listener = {
       type: type,
@@ -34,6 +74,12 @@ export default class App extends EventEmitter {
     return instance;
   }
 
+  initialized: boolean;
+  sessions: Session[];
+  errorHandler: ErrorHandler;
+  version: string;
+  protected _loadingTimeoutId: number;
+
   constructor() {
     super();
     this.initialized = false;
@@ -41,9 +87,9 @@ export default class App extends EventEmitter {
     this._loadingTimeoutId = null;
 
     // register the listeners which were added to scout before the app is created
-    listeners.forEach(function(listener) {
+    listeners.forEach(listener => {
       this.addListener(listener);
-    }, this);
+    });
     listeners = [];
 
     instance = this;
@@ -51,20 +97,14 @@ export default class App extends EventEmitter {
   }
 
   /**
-   * Main initialization function.<p>
+   * Main initialization function.
    *
-   * Calls this._prepare, this._bootstrap and this._init.<p>
+   * Calls {@link _prepare}, {@link _bootstrap} and {@link _init}.<br>
    * At the initial phase the essential objects are initialized, those which are required for the next phases like logging and the object factory.<br>
    * During the bootstrap phase additional scripts may get loaded required for a successful session startup.<br>
    * The actual initialization does not get started before these bootstrap scripts are loaded.
-   *
-   * @param {object} [options]
-   * @param {string|string[]} [options.bootstrap.textsUrl] URL or multiple URLs pointing to a json resource containing texts that will be available through texts.js.
-   * @param {string} [options.bootstrap.localesUrl] URL pointing to a json resource containing locale information processed by locales.js
-   * @param {string} [options.bootstrap.codesUrl] URL pointing to a json resources containing codes that will be available through codes.js
-   * @param {object} [options.session] Object to configure the session, see {@link Session.init} for the available options.
    */
-  init(options) {
+  init(options?: AppOptions): JQuery.Promise<any> {
     options = options || {};
     return this._prepare(options)
       .then(this._bootstrap.bind(this, options.bootstrap))
@@ -77,7 +117,7 @@ export default class App extends EventEmitter {
    * Initializes the logging framework and the object factory.
    * This happens at the prepare phase because all these things should be available from the beginning.
    */
-  _prepare(options) {
+  protected _prepare(options: AppOptions): JQuery.Promise<any> {
     return this._prepareLogging(options)
       .done(() => {
         this._prepareEssentials(options);
@@ -85,28 +125,29 @@ export default class App extends EventEmitter {
       });
   }
 
-  _prepareEssentials(options) {
+  protected _prepareEssentials(options: AppOptions) {
     ObjectFactory.get().init();
   }
 
-  _prepareDone(options) {
+  protected _prepareDone(options: AppOptions) {
     this.trigger('prepare', {
       options: options
     });
     $.log.isDebugEnabled() && $.log.debug('App prepared');
   }
 
-  _prepareLogging(options) {
+  protected _prepareLogging(options: AppOptions): JQuery.Promise<JQuery> {
     return logging.bootstrap();
   }
 
   /**
-   * Executes the default bootstrap functions and returns an array of promises.<p>
+   * Executes the default bootstrap functions and returns an array of promises.
+   *
    * The actual session startup begins only when every of these promises are completed.
    * This gives the possibility to dynamically load additional scripts or files which are mandatory for a successful session startup.
    * The individual bootstrap functions may return null or undefined, a single promise or multiple promises as an array.
    */
-  _bootstrap(options) {
+  protected _bootstrap(options: AppBootstrapOptions): JQuery.Promise<any> {
     options = options || {};
 
     let promises = [];
@@ -123,7 +164,7 @@ export default class App extends EventEmitter {
       .catch(this._bootstrapFail.bind(this, options));
   }
 
-  _doBootstrap(options) {
+  protected _doBootstrap(options: AppBootstrapOptions): Array<JQuery.Promise<any> | JQuery.Promise<any>[]> {
     return [
       Device.get().bootstrap(),
       fonts.bootstrap(options.fonts),
@@ -133,7 +174,7 @@ export default class App extends EventEmitter {
     ];
   }
 
-  _bootstrapDone(options) {
+  protected _bootstrapDone(options: AppBootstrapOptions) {
     webstorage.removeItemFromSessionStorage('scout:timeoutPageReload');
     this.trigger('bootstrap', {
       options: options
@@ -141,7 +182,7 @@ export default class App extends EventEmitter {
     $.log.isDebugEnabled() && $.log.debug('App bootstrapped');
   }
 
-  _bootstrapFail(options, vararg, textStatus, errorThrown, requestOptions) {
+  protected _bootstrapFail(options: AppBootstrapOptions, vararg, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: JQuery.AjaxSettings) {
     $.log.isInfoEnabled() && $.log.info('App bootstrap failed');
 
     // If one of the bootstrap ajax call fails due to a session timeout, the index.html is probably loaded from cache without asking the server for its validity.
@@ -174,11 +215,11 @@ export default class App extends EventEmitter {
     return $.rejectedPromise(...args);
   }
 
-  _isSessionTimeoutStatus(httpStatus) {
+  protected _isSessionTimeoutStatus(httpStatus: number): boolean {
     return httpStatus === 401;
   }
 
-  _handleBootstrapTimeoutError(error, url) {
+  protected _handleBootstrapTimeoutError(error, url: string) { // FIXME TS use type from session for error? or should it be any?
     $.log.isInfoEnabled() && $.log.info('Timeout error for resource ' + url + '. Reloading page...');
     if (webstorage.getItemFromSessionStorage('scout:timeoutPageReload')) {
       // Prevent loop in case a reload did not solve the problem
@@ -186,7 +227,7 @@ export default class App extends EventEmitter {
       webstorage.removeItemFromSessionStorage('scout:timeoutPageReload');
       throw new Error('Resource ' + url + ' could not be loaded due to a session timeout, even after a page reload');
     }
-    webstorage.setItemToSessionStorage('scout:timeoutPageReload', true);
+    webstorage.setItemToSessionStorage('scout:timeoutPageReload', true + '');
 
     // See comment in _bootstrapFail for the reasons why to reload here
     scout.reloadPage();
@@ -195,7 +236,7 @@ export default class App extends EventEmitter {
   /**
    * Initializes a session for each html element with class '.scout' and stores them in scout.sessions.
    */
-  _init(options) {
+  protected _init(options: AppOptions): JQuery.Promise<any> {
     options = options || {};
     this.setLoading(true);
     let compatibilityPromise = this._checkBrowserCompatibility(options);
@@ -217,13 +258,13 @@ export default class App extends EventEmitter {
 
   /**
    * Maybe implemented to load data from a server before the desktop is created.
-   * @returns {Promise} promise which is resolved after the loading is complete
+   * @returns promise which is resolved after the loading is complete
    */
-  _load(options) {
+  protected _load(options): JQuery.Promise<any> {
     return $.resolvedPromise();
   }
 
-  _checkBrowserCompatibility(options) {
+  protected _checkBrowserCompatibility(options): JQuery.Promise<AppOptions> | null {
     let device = Device.get();
     $.log.isInfoEnabled() && $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
     if (!scout.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
@@ -248,7 +289,7 @@ export default class App extends EventEmitter {
     return deferred.promise();
   }
 
-  setLoading(loading) {
+  setLoading(loading: boolean) {
     if (loading) {
       this._loadingTimeoutId = setTimeout(() => {
         // Don't start loading if a desktop is already rendered to prevent flickering when the loading will be set to false after app initialization finishes
@@ -263,7 +304,7 @@ export default class App extends EventEmitter {
     }
   }
 
-  _renderLoading() {
+  protected _renderLoading() {
     let $body = $('body'),
       $loadingRoot = $body.children('.application-loading-root');
     if (!$loadingRoot.length) {
@@ -276,7 +317,7 @@ export default class App extends EventEmitter {
     this._renderLoadingElement($loadingRoot, 'application-loading03');
   }
 
-  _renderLoadingElement($loadingRoot, cssClass) {
+  protected _renderLoadingElement($loadingRoot: JQuery, cssClass: string) {
     if ($loadingRoot.children('.' + cssClass).length) {
       return;
     }
@@ -285,7 +326,7 @@ export default class App extends EventEmitter {
       .fadeIn();
   }
 
-  _removeLoading() {
+  protected _removeLoading() {
     let $loadingRoot = $('body').children('.application-loading-root');
     // the fadeout animation only contains a to-value and no from-value
     // therefore set the current value to the elements style
@@ -303,37 +344,37 @@ export default class App extends EventEmitter {
     }
   }
 
-  _initVersion(options) {
+  protected _initVersion(options: AppOptions) {
     this.version = scout.nvl(
       this.version,
       options.version,
       $('scout-version').data('value'));
   }
 
-  _prepareDOM() {
+  protected _prepareDOM() {
     scout.prepareDOM(document);
   }
 
-  _installGlobalMouseDownInterceptor() {
+  protected _installGlobalMouseDownInterceptor() {
     scout.installGlobalMouseDownInterceptor(document);
   }
 
-  _installSyntheticActiveStateHandler() {
+  protected _installSyntheticActiveStateHandler() {
     scout.installSyntheticActiveStateHandler(document);
   }
 
   /**
    * Installs a global error handler.
-   * <p>
+   *
    * Note: we do not install an error handler on popup-windows because everything is controlled by the main-window
    * so exceptions will also occur in that window. This also means, the fatal message-box will be displayed in the
    * main-window, even when a popup-window is opened and active.
-   * <p>
+   *
    * Caution: The error.stack doesn't look the same in different browsers. Chrome for instance puts the error message
    * on the first line of the stack. Firefox does only contain the stack lines, without the message, but in return
    * the stack trace is much longer :)
    */
-  _installErrorHandler() {
+  protected _installErrorHandler() {
     window.onerror = this.errorHandler.windowErrorHandler;
     // FIXME bsh, cgu: use ErrorHandler to handle unhandled promise rejections. Just replacing jQuery.Deferred.exceptionHook(error, stack) does not work
     // because it is called on every exception and not only on unhandled.
@@ -341,14 +382,14 @@ export default class App extends EventEmitter {
     // Bluebird has a polyfill -> can it be ported to jQuery?
   }
 
-  _createErrorHandler() {
+  protected _createErrorHandler(): ErrorHandler {
     return scout.create(ErrorHandler);
   }
 
   /**
-   * Uses the object returned by {@link #_ajaxDefaults} to setup ajax. The values in that object are used as default values for every ajax call.
+   * Uses the object returned by {@link _ajaxDefaults} to setup ajax. The values in that object are used as default values for every ajax call.
    */
-  _ajaxSetup() {
+  protected _ajaxSetup() {
     let ajaxDefaults = this._ajaxDefaults();
     if (ajaxDefaults) {
       $.ajaxSetup(ajaxDefaults);
@@ -357,11 +398,11 @@ export default class App extends EventEmitter {
 
   /**
    * Returns the defaults for every ajax call. You may override it to set custom defaults.
-   * By default _beforeAjaxCall is assigned to the beforeSend method.
-   * <p>
+   * By default {@link _beforeAjaxCall} is assigned to the beforeSend method.
+   *
    * Note: This will affect every ajax call, so use it with care! See also the advice on https://api.jquery.com/jquery.ajaxsetup/.
    */
-  _ajaxDefaults() {
+  protected _ajaxDefaults(): JQuery.AjaxSettings {
     return {
       beforeSend: this._beforeAjaxCall.bind(this)
     };
@@ -369,15 +410,15 @@ export default class App extends EventEmitter {
 
   /**
    * Called before every ajax call. Sets the header X-Scout-Correlation-Id.
-   * <p>
+   *
    * Maybe overridden to set custom headers or to execute other code which should run before an ajax call.
    */
-  _beforeAjaxCall(request) {
+  protected _beforeAjaxCall(request: JQuery.jqXHR, settings: JQuery.AjaxSettings) {
     request.setRequestHeader('X-Scout-Correlation-Id', numbers.correlationId());
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // explicitly add here because jQuery only adds it automatically if it is no crossDomain request
   }
 
-  _loadSessions(options) {
+  protected _loadSessions(options) { // FIXME TS session options type
     options = options || {};
     let promises = [];
     $('.scout').each((i, elem) => {
@@ -390,9 +431,9 @@ export default class App extends EventEmitter {
   }
 
   /**
-   * @returns {Promise} promise which is resolved when the session is ready
+   * @returns promise which is resolved when the session is ready
    */
-  _loadSession($entryPoint, options) {
+  protected _loadSession($entryPoint: JQuery, options): JQuery.Promise<any> {
     options.locale = options.locale || this._loadLocale();
     options.$entryPoint = $entryPoint;
     let session = this._createSession(options);
@@ -415,38 +456,38 @@ export default class App extends EventEmitter {
     return $.resolvedPromise();
   }
 
-  _triggerDesktopReady(desktop) {
+  protected _triggerDesktopReady(desktop: Desktop) {
     this.trigger('desktopReady', {
       desktop: desktop
     });
   }
 
-  _triggerSessionReady(session) {
+  protected _triggerSessionReady(session: Session) {
     this.trigger('sessionReady', {
       session: session
     });
   }
 
-  _createSession(options) {
+  protected _createSession(options): Session { // FIXME TS session model
     return scout.create(Session, options, {
       ensureUniqueId: false
     });
   }
 
-  _createDesktop(parent) {
+  protected _createDesktop(parent: Widget): Desktop {
     return scout.create(Desktop, {
       parent: parent
     });
   }
 
   /**
-   * @returns {Locale} the locale to be used when no locale is provided as app option. By default the navigators locale is used.
+   * @returns the locale to be used when no locale is provided as session option. By default the navigators locale is used.
    */
-  _loadLocale() {
+  protected _loadLocale(): Locale {
     return locales.getNavigatorLocale();
   }
 
-  _initDone(options) {
+  protected _initDone(options: AppOptions) {
     this.initialized = true;
     this.setLoading(false);
     this.trigger('init', {
@@ -455,7 +496,7 @@ export default class App extends EventEmitter {
     $.log.isInfoEnabled() && $.log.info('App initialized');
   }
 
-  _fail(options, error, ...args) {
+  protected _fail(options: AppOptions, error: any, ...args): JQuery.Promise<any> {
     $.log.error('App initialization failed.');
     this.setLoading(false);
 
@@ -478,7 +519,7 @@ export default class App extends EventEmitter {
    *
    * The default implementation does nothing.
    */
-  _installExtensions() {
+  protected _installExtensions() {
     // NOP
   }
 }

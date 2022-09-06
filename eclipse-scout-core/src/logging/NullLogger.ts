@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, strings} from '../index';
+import {Logger, objects, strings} from '../index';
 
 /**
  * A NullLogger instance is installed when Log4Javascript is not active (the popup
@@ -16,10 +16,7 @@ import {objects, strings} from '../index';
  * because otherwise some errors are hard to track. This is true especially for errors
  * that occur in a Promise. A developer should at least log these errors.
  */
-export default class NullLogger {
-
-  constructor() {
-  }
+export default class NullLogger implements Logger {
 
   trace() {
     // NOP - don't log trace, we don't want to spam the browser console

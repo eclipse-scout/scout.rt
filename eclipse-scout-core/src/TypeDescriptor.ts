@@ -10,18 +10,32 @@
  */
 import {arrays, ObjectFactory, scout, strings} from './index';
 
+interface ObjectTypePart {
+  name: string;
+  namespaces?: string[];
+}
+
+export interface TypeDescriptorOptions {
+  /**
+   * Controls if the type may be resolved without the model variant part if the initial objectType could not be resolved. Default is false.
+   */
+  variantLenient?: boolean;
+}
+
 /**
  * This class contains a structured type description for a Scout class.
- * The model variant is optional.
- *
- * @param {string} typeDescriptor a string in the format '[namespace(s).]objectType[[:namespace(s).]modelVariant]'
- * @param {object} objectType
- * @param {object} [modelVariant]
- * @constructor
  */
 export default class TypeDescriptor {
+  typeDescriptor: string;
+  objectType: ObjectTypePart;
+  modelVariant: ObjectTypePart;
+  className: string;
+  namespaces: string[];
 
-  constructor(typeDescriptor, objectType, modelVariant) {
+  /**
+   * @param typeDescriptor a string in the format '[namespace(s).]objectType[[:namespace(s).]modelVariant]'
+   */
+  constructor(typeDescriptor: string, objectType: ObjectTypePart, modelVariant?: ObjectTypePart) {
     this.typeDescriptor = typeDescriptor;
     this.objectType = objectType;
     this.modelVariant = modelVariant;
@@ -35,9 +49,10 @@ export default class TypeDescriptor {
     }
   }
 
-  resolve(options) {
+  resolve(options: TypeDescriptorOptions): new() => object {
+    // @ts-ignore
     let namespace = window.scout; // default namespace
-    options = options || {};
+    options = options || {} as TypeDescriptorOptions;
 
     if (this.namespaces.length) {
       namespace = window;
@@ -60,25 +75,20 @@ export default class TypeDescriptor {
     return namespace[this.className];
   }
 
-  error(details) {
+  error(details: string): Error {
     return new Error('Failed to create object for objectType "' + this.typeDescriptor + '": ' + details);
   }
 
-  notFoundError() {
+  notFoundError(): Error {
     return this.error('Could not find "' + this.className + '" in namespace "' + this.namespaces.join('.') + '"');
   }
 
-  static resolveType(typeDescriptor, options) {
+  static resolveType(typeDescriptor: string, options?: TypeDescriptorOptions): new() => object {
     let info = TypeDescriptor.parse(typeDescriptor);
     return info.resolve(options);
   }
 
-  /**
-   * @param {string} typeDescriptor
-   * @returns {TypeDescriptor}
-   * @static
-   */
-  static parse(typeDescriptor) {
+  static parse(typeDescriptor: string): TypeDescriptor {
     let typePart = null,
       variantPart = null;
 
@@ -97,19 +107,19 @@ export default class TypeDescriptor {
 
     return new TypeDescriptor(typeDescriptor, typePart, variantPart);
 
-    function createInfo(name, namespaces) {
+    function createInfo(name: string, namespaces?: string[]) {
       return {
         name: name,
         namespaces: scout.nvl(namespaces, []),
         toString: () => {
           let parts = namespaces.slice();
           parts.push(name);
-          return strings.join(ObjectFactory.NAMESPACE_SEPARATOR, parts);
+          return strings.join(ObjectFactory.NAMESPACE_SEPARATOR, ...parts);
         }
       };
     }
 
-    function parseDescriptorPart(descriptorPart) {
+    function parseDescriptorPart(descriptorPart: string) {
       let namespaces = [];
 
       if (strings.contains(descriptorPart, ObjectFactory.NAMESPACE_SEPARATOR)) {

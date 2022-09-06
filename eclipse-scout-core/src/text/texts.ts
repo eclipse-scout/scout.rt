@@ -30,12 +30,10 @@ export function bootstrap(url: string | string[]): JQuery.Promise<any> {
   return $.promiseAll(promises);
 }
 
-// private
 export function _setTextsByLocale(val: TextMapType) {
   textsByLocale = val;
 }
 
-// private
 export function _preInit(url: string | string[], data: any) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
