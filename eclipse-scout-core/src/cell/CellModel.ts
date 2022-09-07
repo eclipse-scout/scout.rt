@@ -8,12 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Status} from '../index';
 
-export type Predicate<T> = (obj: T) => boolean;
-
-// Type that makes some properties optional and some required.
-export type PartialAndRequired<T, OPTIONAL extends keyof T, REQUIRED extends keyof T> = Omit<T, OPTIONAL | REQUIRED> & Partial<Pick<T, OPTIONAL>> & Required<Pick<T, REQUIRED>>;
-
-export type EnumObject<TYPE> = TYPE[keyof TYPE];
-
-export type Primitive = number | string | boolean | symbol | bigint;
+export default interface CellModel {
+  cssClass?: string;
+  editable?: boolean;
+  errorStatus?: Status;
+  horizontalAlignment?: -1 | 0 | 1;
+  htmlEnabled?: boolean;
+  iconId?: string;
+  mandatory?: boolean;
+  text?: string;
+  value?: any;
+  tooltipText?: string;
+  sortCode?: number;
+}

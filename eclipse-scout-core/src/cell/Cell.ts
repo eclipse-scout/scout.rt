@@ -8,14 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../index';
+import {Status, strings} from '../index';
 import $ from 'jquery';
+import CellModel from './CellModel';
 
 /**
  * @class
  * @constructor
  */
-export default class Cell {
+export default class Cell implements CellModel {
+  declare model: CellModel;
+
+  cssClass: string;
+  editable: boolean;
+  errorStatus: Status;
+  horizontalAlignment: -1 | 0 | 1;
+  htmlEnabled: boolean;
+  iconId: string;
+  mandatory: boolean;
+  text: string;
+  value: any;
+  tooltipText: string;
+  sortCode: number;
+  protected _cachedEncodedText: string;
 
   constructor() {
     this.cssClass = null;
@@ -32,40 +47,40 @@ export default class Cell {
     this.sortCode = null;
   }
 
-  init(model) {
+  init(model: CellModel) {
     this._init(model);
   }
 
-  _init(model) {
+  protected _init(model: CellModel) {
     $.extend(this, model);
   }
 
-  update(model) {
+  update(model: CellModel) {
     this.setText(model.text);
     $.extend(this, model);
   }
 
-  setEditable(editable) {
+  setEditable(editable: boolean) {
     this.editable = editable;
   }
 
-  setMandatory(mandatory) {
+  setMandatory(mandatory: boolean) {
     this.mandatory = mandatory;
   }
 
-  setHorizontalAlignment(hAlign) {
+  setHorizontalAlignment(hAlign: -1 | 0 | 1) {
     this.horizontalAlignment = hAlign;
   }
 
-  setValue(value) {
+  setValue(value: any) {
     this.value = value;
   }
 
-  setErrorStatus(errorStatus) {
+  setErrorStatus(errorStatus: Status) {
     this.errorStatus = errorStatus;
   }
 
-  setText(text) {
+  setText(text: string) {
     let oldText = this.text;
     this.text = text;
 
@@ -76,7 +91,7 @@ export default class Cell {
     }
   }
 
-  setIconId(iconId) {
+  setIconId(iconId: string) {
     this.iconId = iconId;
   }
 
@@ -88,11 +103,11 @@ export default class Cell {
     return this._cachedEncodedText;
   }
 
-  setCssClass(cssClass) {
+  setCssClass(cssClass: string) {
     this.cssClass = cssClass;
   }
 
-  setSortCode(sortCode) {
+  setSortCode(sortCode: number) {
     this.sortCode = sortCode;
   }
 }

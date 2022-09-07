@@ -8,17 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, TreeVisitResult} from '../index';
+import {Code, scout, TreeVisitResult} from '../index';
+import CodeTypeModel from './CodeTypeModel';
+import CodeModel from './CodeModel';
 
 export default class CodeType {
 
+  declare model: CodeTypeModel;
+
+  id: string;
+  modelClass: string;
+  codes: Code[];
+  codeMap: { [codeId: string]: Code };
+
   constructor() {
-    this.id;
     this.codes = [];
     this.codeMap = {};
   }
 
-  init(model) {
+  init(model: CodeTypeModel) {
     scout.assertParameter('id', model.id);
     this.id = model.id;
     this.modelClass = model.modelClass;
@@ -30,8 +38,8 @@ export default class CodeType {
     }
   }
 
-  _initCode(modelCode, parent) {
-    let code = scout.create(modelCode);
+  protected _initCode(modelCode: CodeModel, parent?: Code) {
+    let code = scout.create(modelCode) as Code;
     this.add(code, parent);
     if (modelCode.children) {
       for (let i = 0; i < modelCode.children.length; i++) {
@@ -40,7 +48,7 @@ export default class CodeType {
     }
   }
 
-  add(code, parent) {
+  add(code: Code, parent?: Code) {
     this.codes.push(code);
     this.codeMap[code.id] = code;
     if (parent) {
@@ -50,11 +58,9 @@ export default class CodeType {
   }
 
   /**
-   * @param codeId
-   * @returns {Code}
-   * @throw {Error) if code does not exist
+   * @throw Error if code does not exist
    */
-  get(codeId) {
+  get(codeId: string): Code {
     let code = this.optGet(codeId);
     if (!code) {
       throw new Error('No code found for id=' + codeId);
@@ -63,20 +69,15 @@ export default class CodeType {
   }
 
   /**
-   * Same as <code>get</code>, but does not throw an error if the code does not exist.
+   * Same as {@link get}, but does not throw an error if the code does not exist.
    *
-   * @param codeId
-   * @returns {Code} code for the given codeId or undefined if code does not exist
+   * @returns code for the given codeId or undefined if code does not exist
    */
-  optGet(codeId) {
+  optGet(codeId: string): Code {
     return this.codeMap[codeId];
   }
 
-  /**
-   * @param {boolean} rootOnly
-   * @returns {Array<string>}
-   */
-  getCodes(rootOnly) {
+  getCodes(rootOnly: boolean): Code[] {
     if (rootOnly) {
       let rootCodes = [];
       for (let i = 0; i < this.codes.length; i++) {
@@ -90,20 +91,16 @@ export default class CodeType {
   }
 
   /**
-   * Visits all codes and theirs children.
+   * Visits all codes and their children.
    * <p>
    * In order to abort visiting, the visitor can return true or TreeVisitResult.TERMINATE.
    * To only abort the visiting of a sub tree, the visitor can return SKIP_SUBTREE.
    * </p>
-   * @returns {boolean} true if the visitor aborted the visiting, false if the visiting completed without aborting
    */
-  visit(visitor) {
-    let codes = this.codes.filter(code => {
-      // Only consider root codes
-      return !code.parent;
-    });
-    for (let i = 0; i < codes.length; i++) {
-      let code = codes[i];
+  visitChildren(visitor: (code: Code) => boolean | TreeVisitResult | void): boolean | TreeVisitResult {
+    let rootCodes = this.getCodes(true);
+    for (let i = 0; i < rootCodes.length; i++) {
+      let code = rootCodes[i];
       let visitResult = visitor(code);
       if (visitResult === true || visitResult === TreeVisitResult.TERMINATE) {
         return TreeVisitResult.TERMINATE;
@@ -117,9 +114,9 @@ export default class CodeType {
     }
   }
 
-  static ensure(codeType) {
+  static ensure(codeType: CodeType | CodeTypeModel): CodeType {
     if (!codeType) {
-      return codeType;
+      return codeType as CodeType;
     }
     if (codeType instanceof CodeType) {
       return codeType;
