@@ -10,6 +10,7 @@
  */
 import {arrays, scout, strings} from '../index';
 import $ from 'jquery';
+import {Primitive} from '../types';
 
 const CONST_REGEX = /\${const:([^}]*)}/;
 
@@ -281,9 +282,9 @@ export function getByPath(object: object, path: string): any {
 }
 
 /**
- * @returns true if the given object is an object, _not_ an array and not null or undefined.
+ * @returns true if the given object is an object: no primitive type (number, string, boolean, bigint, symbol), no array, not null and not undefined.
  */
-export function isPlainObject(obj: any): boolean {
+export function isPlainObject<T>(obj: T): obj is Exclude<typeof obj, Primitive | undefined | null | T[]> {
   return typeof obj === 'object' &&
     !isNullOrUndefined(obj) &&
     !Array.isArray(obj);

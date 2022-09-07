@@ -8,22 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CodeType, objects, scout, texts} from '../index';
+import {arrays, Code, CodeType, objects, scout, texts} from '../index';
 import $ from 'jquery';
+import CodeTypeModel from './CodeTypeModel';
 
 /**
  * This default language is used whenever a code registers its texts in scout.texts.
  */
 let defaultLanguage = 'en';
 
-let registry = {};
+let registry: { [codeTypeId: string]: CodeType } = {};
 
-export function bootstrap(url) {
+export function bootstrap(url: string): JQuery.Promise<any> {
   let promise = url ? $.ajaxJson(url) : $.resolvedPromise({});
   return promise.then(_preInit.bind(this, url));
 }
 
-export function _preInit(url, data) {
+export function _preInit(url: string, data: any) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
     throw {
@@ -36,18 +37,13 @@ export function _preInit(url, data) {
 
 export function init(data) {
   data = data || {};
-  Object.keys(data).forEach(codeTypeId => {
-    add(data[codeTypeId]);
-  }, this);
+  Object.keys(data).forEach(codeTypeId => add(data[codeTypeId]));
 }
 
-/**
- * @param codes one or more codeTypes, maybe an object or an array
- */
-export function add(codeTypes) {
+export function add(codeTypes: CodeTypeModel | CodeTypeModel[]) {
   codeTypes = arrays.ensure(codeTypes);
-  codeTypes.forEach(codeType => {
-    codeType = CodeType.ensure(codeType);
+  codeTypes.forEach(codeTypeModel => {
+    let codeType = CodeType.ensure(codeTypeModel);
     registry[codeType.id] = codeType;
   }, this);
 }
@@ -55,7 +51,7 @@ export function add(codeTypes) {
 /**
  * @param codeTypes code types or code type ids to remove
  */
-export function remove(codeTypes) {
+export function remove(codeTypes: (string | CodeType)[]) {
   codeTypes = arrays.ensure(codeTypes);
   codeTypes.forEach(codeType => {
     let id;
@@ -86,12 +82,12 @@ export function remove(codeTypes) {
  * You can also call this function with two arguments. In that case the first argument
  * is the codeTypeId and the second is the codeId.
  *
- * @param {string} vararg either only "[CodeType.id]" or "[CodeType.id] [Code.id]"
- * @param {string} [codeId]
- * @returns {Code} a code for the given codeId
- * @throw {Error} if code does not exist
+ * @param vararg either only "[CodeType.id]" or "[CodeType.id] [Code.id]"
+ * @param codeId
+ * @returns a code for the given codeId
+ * @throw Error if code does not exist
  */
-export function get(vararg, codeId) {
+export function get(vararg: string, codeId?: string): Code {
   // eslint-disable-next-line prefer-rest-params
   return _get('get', objects.argumentsToArray(arguments));
 }
@@ -102,14 +98,14 @@ export function get(vararg, codeId) {
  *
  * @param vararg
  * @param codeId
- * @returns {Code} code for the given codeId or undefined if code does not exist
+ * @returns code for the given codeId or undefined if code does not exist
  */
-export function optGet(vararg, codeId) {
+export function optGet(vararg: string, codeId?: string): Code {
   // eslint-disable-next-line prefer-rest-params
   return _get('optGet', objects.argumentsToArray(arguments));
 }
 
-export function _get(funcName, funcArgs) {
+export function _get(funcName: string, funcArgs: string[]): Code {
   let codeTypeId, codeId;
   if (funcArgs.length === 2) {
     codeTypeId = funcArgs[0];
@@ -127,7 +123,7 @@ export function _get(funcName, funcArgs) {
   return codeType(codeTypeId)[funcName](codeId);
 }
 
-export function codeType(codeTypeId, optional) {
+export function codeType(codeTypeId: string, optional?: boolean): CodeType {
   let codeType = registry[codeTypeId];
   if (!optional && !codeType) {
     throw new Error('No CodeType found for id=' + codeTypeId);
@@ -135,7 +131,7 @@ export function codeType(codeTypeId, optional) {
   return codeType;
 }
 
-export function generateTextKey(code) {
+export function generateTextKey(code: Code): string {
   // Use __ as prefix to reduce the possibility of overriding 'real' keys
   return '__code.' + code.id;
 }
@@ -146,9 +142,9 @@ export function generateTextKey(code) {
  *
  * @param code the code to register the text for
  * @param textsArg an object with the languageTag as key and the translated text as value
- * @return {string} the generated text key
+ * @return the generated text key
  */
-export function registerTexts(code, textsArg) {
+export function registerTexts(code: Code, textsArg: { [languageTag: string]: string }): string {
   let key = generateTextKey(code);
 
   // In case of changed defaultLanguage clear the 'default' entry

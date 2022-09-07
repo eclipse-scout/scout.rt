@@ -132,30 +132,123 @@ declare global {
 
     /**
      * Use this function as shorthand of this:
-     * <code>$.Deferred().resolve([arguments]);</code>
+     * <code>$.Deferred().resolve(...args);</code>
      *
-     * @param args arguments of this function are passed to the resolve function of the deferred
-     * @returns a deferred for an already resolved {@link Deferred} object.
+     * @param args arguments of this function are passed to the resolve function of the {@link Deferred}.
+     * @returns an already resolved {@link Deferred}.
      */
-    resolvedDeferred(...args): Deferred<any>;
+    resolvedDeferred(...args: any[]): Deferred<any>;
 
     /**
      * Use this function as shorthand of this:
-     * <code>$.Deferred().resolve([arguments]).promise();</code>
+     * <code>$.Deferred().resolve(arg);</code>
      *
-     * @param args arguments of this function are passed to the resolve function of the deferred
-     * @returns a promise for an already resolved {@link Deferred} object.
+     * @param arg the argument to pass to the resolve function of the {@link Deferred}.
+     * @returns an already resolved {@link Deferred}.
      */
-    resolvedPromise(...args): JQuery.Promise<any>;
+    resolvedDeferred<TR>(arg: TR): Deferred<TR, never, never>;
 
     /**
      * Use this function as shorthand of this:
-     * <code>$.Deferred().reject([arguments]).promise();</code>
+     * <code>$.Deferred().resolve(arg).promise();</code>
      *
-     * @param args arguments of this function are passed to the reject function of the deferred
-     * @returns a promise for an already rejected jQuery.Deferred object.
+     * @param arg passed to the resolve function of the deferred
+     * @returns a {@link JQuery.Promise} for an already resolved {@link Deferred} object.
      */
-    rejectedPromise(...args): JQuery.Promise<any>;
+    resolvedPromise<TR>(arg: TR): JQuery.Promise<TR, never, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().resolve(arg1, arg2).promise();</code>
+     *
+     * @param arg1 passed to the resolve function of the deferred
+     * @param arg2 passed to the resolve function of the deferred
+     * @returns a {@link JQuery.Promise} for an already resolved {@link Deferred} object.
+     */
+    resolvedPromise<TR, UR>(arg1: TR, arg2: UR): JQuery.Promise2<TR, never, never, UR, never, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().resolve(arg1, arg2, arg3).promise();</code>
+     *
+     * @param arg1 passed to the resolve function of the deferred
+     * @param arg2 passed to the resolve function of the deferred
+     * @param arg3 passed to the resolve function of the deferred
+     * @returns a {@link JQuery.Promise} for an already resolved {@link Deferred} object.
+     */
+    resolvedPromise<TR, UR, VR>(arg1: TR, arg2: UR, arg3: VR): JQuery.Promise3<TR, never, never, UR, never, never, VR, never, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().resolve(arg1, arg2, arg3, ...args).promise();</code>
+     *
+     * @param arg1 passed to the resolve function of the deferred
+     * @param arg2 passed to the resolve function of the deferred
+     * @param arg3 passed to the resolve function of the deferred
+     * @param args remaining arguments passed to the resolve function of the deferred
+     * @returns a {@link JQuery.Promise} for an already resolved {@link Deferred} object.
+     */
+    resolvedPromise<TR, UR, VR, SR>(arg1: TR, arg2: UR, arg3: VR, ...args: SR[]): JQuery.PromiseBase<TR, never, never, UR, never, never, VR, never, never, SR, never, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().resolve(...args).promise();</code>
+     *
+     * @param args arguments passed to the resolve function of the deferred
+     * @returns a {@link JQuery.Promise} for an already resolved {@link Deferred} object.
+     */
+    resolvedPromise(...args: any[]): JQuery.Promise<any, never, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().reject(arg).promise();</code>
+     *
+     * @param arg passed to the reject function of the {@link Deferred}.
+     * @returns a {@link JQuery.Promise} for an already rejected {@link Deferred}.
+     */
+    rejectedPromise<TJ>(arg: TJ): JQuery.Promise<never, TJ, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().reject(arg1, arg2).promise();</code>
+     *
+     * @param arg1 passed to the reject function of the {@link Deferred}.
+     * @param arg2 passed to the reject function of the {@link Deferred}.
+     * @returns a {@link JQuery.Promise} for an already rejected {@link Deferred}.
+     */
+    rejectedPromise<TJ, UJ>(arg1: TJ, arg2: UJ): JQuery.Promise2<never, TJ, never, never, UJ, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().reject(arg1, arg2, arg3).promise();</code>
+     *
+     * @param arg1 passed to the reject function of the {@link Deferred}.
+     * @param arg2 passed to the reject function of the {@link Deferred}.
+     * @param arg3 passed to the reject function of the {@link Deferred}.
+     * @returns a {@link JQuery.Promise} for an already rejected {@link Deferred}.
+     */
+    rejectedPromise<TJ, UJ, VJ>(arg1: TJ, arg2: UJ, arg3: VJ): JQuery.Promise3<never, TJ, never, never, UJ, never, never, VJ, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().reject(arg1, arg2, arg3, ...args).promise();</code>
+     *
+     * @param arg1 passed to the reject function of the {@link Deferred}.
+     * @param arg2 passed to the reject function of the {@link Deferred}.
+     * @param arg3 passed to the reject function of the {@link Deferred}.
+     * @param args remaining arguments passed to the reject function of the {@link Deferred}.
+     * @returns a {@link JQuery.Promise} for an already rejected {@link Deferred}.
+     */
+    rejectedPromise<TJ, UJ, VJ, SJ>(arg1: TJ, arg2: UJ, arg3: VJ, ...args: SJ[]): JQuery.PromiseBase<never, TJ, never, never, UJ, never, never, VJ, never, never, SJ, never>;
+
+    /**
+     * Use this function as shorthand of this:
+     * <code>$.Deferred().reject(...args).promise();</code>
+     *
+     * @param args arguments passed to the reject function of the {@link Deferred}.
+     * @returns a {@link JQuery.Promise} for an already rejected {@link Deferred}.
+     */
+    rejectedPromise(...args: any[]): JQuery.Promise<any>;
 
     /**
      * Creates a new promise which resolves when all promises resolve and fails when the first promise fails.
@@ -164,7 +257,7 @@ declare global {
      * @param asArray when set to true, the resolve function will transform the
      *    flat arguments list containing the results into an array. The arguments of the reject function won't be touched. Default is false.
      */
-    promiseAll(promises: Promise<any>[], asArray?: boolean): JQuery.Promise<any>;
+    promiseAll(promises: JQuery.Promise<any>[], asArray?: boolean): JQuery.Promise<any>;
 
     /**
      * Shorthand for an AJAX request for a JSON file with UTF8 encoding.

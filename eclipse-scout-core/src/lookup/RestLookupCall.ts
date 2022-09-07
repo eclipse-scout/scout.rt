@@ -8,8 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxCall, arrays, LookupCall, LookupRow, objects, scout} from '../index';
+import {AjaxCall, arrays, LookupCall, LookupRow, LookupRowModel, objects, scout} from '../index';
 import $ from 'jquery';
+import LookupResult from './LookupResult';
+import Deferred = JQuery.Deferred;
 
 /**
  * A lookup call that can load lookup rows from a REST service.
@@ -40,7 +42,15 @@ import $ from 'jquery';
  * 4. Hard-coded properties that are fundamental to the respective queryBy mode (cannot be overridden).
  *    These are: 'ids' (KEY, KEYS) and 'text' (TEXT)
  */
-export default class RestLookupCall extends LookupCall {
+export default class RestLookupCall<Key> extends LookupCall<Key> {
+
+  resourceUrl: string;
+  maxTextLength: number;
+  restriction: { [key: string]: any };
+
+  protected _restriction: { [key: string]: any };
+  protected _ajaxCall: AjaxCall;
+  protected _deferred: Deferred<LookupResult<Key>, { canceled: boolean }>;
 
   constructor() {
     super();
@@ -64,7 +74,7 @@ export default class RestLookupCall extends LookupCall {
    * Use this function with caution! Added restrictions will be shared among cloned instances
    * and the current instance if this function was also called before cloning!
    */
-  addRestriction(key, value) {
+  addRestriction(key: string, value: any) {
     if (!this._restriction) {
       this._restriction = {};
     }
@@ -76,60 +86,62 @@ export default class RestLookupCall extends LookupCall {
    * value for this key in 'this.restriction'. This prevents unintentional overriding of
    * user-defined model restrictions.
    */
-  _addRestrictionIfAbsent(key, value) {
+  protected _addRestrictionIfAbsent(key: string, value: any) {
     if (!this.restriction || objects.isNullOrUndefined(this.restriction[key])) {
       this.addRestriction(key, value);
     }
   }
 
-  _getAll() {
+  override _getAll(): JQuery.Promise<LookupResult<Key>> {
     return this._call();
   }
 
-  _getByText(text) {
+  override _getByText(text: string): JQuery.Promise<LookupResult<Key>> {
     this.addRestriction('text', text);
     return this._call();
   }
 
-  _getByKey(key) {
+  override _getByKey(key: Key): JQuery.Promise<LookupResult<Key>> {
     this.addRestriction('ids', arrays.ensure(key));
     return this._call();
   }
 
-  _getByKeys(keys) {
+  override _getByKeys(keys: Key[]): JQuery.Promise<LookupResult<Key>> {
     this.addRestriction('ids', arrays.ensure(keys));
     return this._call();
   }
 
-  cloneForAll() {
-    let clone = super.cloneForAll();
+  override cloneForAll(): RestLookupCall<Key> {
+    let clone = super.cloneForAll() as RestLookupCall<Key>;
     clone._addRestrictionIfAbsent('active', true);
     clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
     return clone;
   }
 
-  cloneForText(text) {
-    let clone = super.cloneForText(text);
+  override cloneForText(text: string): RestLookupCall<Key> {
+    let clone = super.cloneForText(text) as RestLookupCall<Key>;
     clone._addRestrictionIfAbsent('active', true);
     clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
     return clone;
   }
 
-  cloneForRec(parentKey) {
-    let clone = super.cloneForRec(parentKey);
+  override cloneForRec(parentKey: Key): RestLookupCall<Key> {
+    let clone = super.cloneForRec(parentKey) as RestLookupCall<Key>;
     clone._addRestrictionIfAbsent('active', true);
     clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
     return clone;
   }
 
-  _acceptLookupRow(lookupRowDo) {
+  protected _acceptLookupRow(lookupRowDo) {
     return true;
   }
 
-  _createLookupRowFromDo(lookupRowDo) {
-    // propagate all properties from lookup row do to scout lookup row (there might be custom ones on specific lookup row dos)
-    let clonedLookupRowDo = $.extend({}, lookupRowDo);
-    // text, enabled and active are the same for Scout LookupRow and Studio LookupRowDo
+  protected _createLookupRowFromDo(lookupRowDo: LookupRowDo<Key>): LookupRow<Key> {
+    // propagate all properties from lookup row DO to scout lookup row (there might be custom ones on specific lookup row DOs)
+    let clonedLookupRowDo = $.extend({}, lookupRowDo) as LookupRowDo<Key> & LookupRowModel<Key>;
+
+    // [text, enabled, active, iconId, cssClass, tooltipText, additionalTableRowData] are the same for LookupRow.ts and LookupRowDo.java
+    // [backgroundColor, foregroundColor, font] currently not supported by LookupRowDo.java
 
     // id -> key
     clonedLookupRowDo.key = clonedLookupRowDo.id;
@@ -150,10 +162,10 @@ export default class RestLookupCall extends LookupCall {
       }
     }
 
-    return scout.create(LookupRow, clonedLookupRowDo, {ensureUniqueId: false});
+    return scout.create(LookupRow, clonedLookupRowDo, {ensureUniqueId: false}) as LookupRow<Key>;
   }
 
-  _call() {
+  protected _call(): JQuery.Promise<LookupResult<Key>> {
     this._deferred = $.Deferred();
     this._ajaxCall = this._createAjaxCall();
 
@@ -182,7 +194,7 @@ export default class RestLookupCall extends LookupCall {
     return this._deferred.promise();
   }
 
-  abort() {
+  override abort() {
     this._deferred.reject({
       canceled: true
     });
@@ -190,11 +202,11 @@ export default class RestLookupCall extends LookupCall {
     super.abort();
   }
 
-  _getCallUrl() {
+  protected _getCallUrl(): string {
     return this.resourceUrl;
   }
 
-  _getRestrictionForAjaxCall() {
+  protected _getRestrictionForAjaxCall(): { [key: string]: any } {
     if (!this.restriction && !this._restriction) {
       return null;
     }
@@ -227,7 +239,7 @@ export default class RestLookupCall extends LookupCall {
     return resolvedRestriction;
   }
 
-  _createAjaxCall() {
+  protected _createAjaxCall(): AjaxCall {
     let url = this._getCallUrl();
     let restriction = this._getRestrictionForAjaxCall();
     let data = restriction ? JSON.stringify(restriction) : null;
@@ -248,4 +260,20 @@ export default class RestLookupCall extends LookupCall {
       ensureUniqueId: false
     });
   }
+}
+
+/**
+ * @see AbstractLookupRowDo.java
+ */
+export interface LookupRowDo<Key> {
+  _type: string;
+  id: Key;
+  parentId: Key;
+  text: string;
+  tooltipText: string;
+  enabled: boolean;
+  active: boolean;
+  iconId: string;
+  cssClass: string;
+  additionalTableRowData: any;
 }

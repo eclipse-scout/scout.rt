@@ -20,10 +20,10 @@ import $ from 'jquery';
  * Performs a HTTP GET request.
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {Promise} a promise which is resolved when the request succeeds.
+ * @returns a promise which is resolved when the request succeeds.
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
-export function get(url, options) {
+export function get(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
   let opts = $.extend({}, {
     url: url,
     type: 'GET'
@@ -36,10 +36,10 @@ export function get(url, options) {
  * @param data the data to be sent.
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {Promise} a promise which is resolved when the request succeeds.
+ * @returns a promise which is resolved when the request succeeds.
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
-export function post(url, data, options) {
+export function post(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
   let opts = $.extend({}, {
     url: url,
     type: 'POST',
@@ -53,10 +53,10 @@ export function post(url, data, options) {
  * @param data the data to be sent.
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {Promise} a promise which is resolved when the request succeeds.
+ * @returns a promise which is resolved when the request succeeds.
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
-export function put(url, data, options) {
+export function put(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
   let opts = $.extend({}, {
     url: url,
     type: 'PUT',
@@ -69,10 +69,10 @@ export function put(url, data, options) {
  * Performs a HTTP DELETE request.
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {Promise} a promise which is resolved when the request succeeds.
+ * @returns a promise which is resolved when the request succeeds.
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
-export function remove(url, options) {
+export function remove(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
   let opts = $.extend({}, {
     url: url,
     type: 'DELETE'
@@ -84,10 +84,10 @@ export function remove(url, options) {
  * Performs a HTTP GET request using JSON as format for the request and the response.
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {Promise} a promise which is resolved when the request succeeds.
+ * @returns a promise which is resolved when the request succeeds.
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
-export function getJson(url, options) {
+export function getJson(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
   let opts = $.extend({}, {
     url: url,
     type: 'GET'
@@ -97,13 +97,13 @@ export function getJson(url, options) {
 
 /**
  * Performs a HTTP POST request using JSON as format for the request and the response.
- * @param data {(object|string)} the data to be sent. If the data is not a string it will be converted to a string using JSON.stringify().
+ * @param data the data to be sent. If the data is not a string it will be converted to a string using JSON.stringify().
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {Promise} a promise which is resolved when the request succeeds.
+ * @returns a promise which is resolved when the request succeeds.
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
-export function postJson(url, data, options) {
+export function postJson(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
   if (data && typeof data !== 'string') {
     data = JSON.stringify(data);
   }
@@ -117,13 +117,13 @@ export function postJson(url, data, options) {
 
 /**
  * Performs a HTTP PUT request using JSON as format for the request and the response.
- * @param data {(object|string)} the data to be sent. If the data is not a string it will be converted to a string using JSON.stringify().
+ * @param data the data to be sent. If the data is not a string it will be converted to a string using JSON.stringify().
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {Promise} a promise which is resolved when the request succeeds.
+ * @returns a promise which is resolved when the request succeeds.
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
-export function putJson(url, data, options) {
+export function putJson(url: string, data: any, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
   if (data && typeof data !== 'string') {
     data = JSON.stringify(data);
   }
@@ -139,10 +139,10 @@ export function putJson(url, data, options) {
  * Performs a HTTP DELETE request using JSON as format for the request and the response.
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {Promise} a promise which is resolved when the request succeeds.
+ * @returns a promise which is resolved when the request succeeds.
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
-export function removeJson(url, options) {
+export function removeJson(url: string, options?: JQuery.AjaxSettings): JQuery.Promise<any> {
   let opts = $.extend({}, {
     url: url,
     type: 'DELETE'
@@ -155,10 +155,10 @@ export function removeJson(url, options) {
  * The default HTTP method is POST.
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {Promise} a promise which is resolved when the request succeeds.
+ * @returns a promise which is resolved when the request succeeds.
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
-export function callJson(options) {
+export function callJson(options?: JQuery.AjaxSettings): JQuery.Promise<any> {
   return createCallJson(options).call();
 }
 
@@ -166,10 +166,10 @@ export function callJson(options) {
  * Performs an Ajax request.
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {Promise} a promise which is resolved when the request succeeds.
+ * @returns a promise which is resolved when the request succeeds.
  *          In case of an error the promise is rejected with an {@link AjaxError} as argument.
  */
-export function call(options) {
+export function call(options?: JQuery.AjaxSettings): JQuery.Promise<any> {
   return createCall(options).call();
 }
 
@@ -178,9 +178,9 @@ export function call(options) {
  * but does not execute it yet. The default HTTP method is POST.
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {AjaxCall} the prepared Ajax call object. Execute it with the call() function.
+ * @returns the prepared Ajax call object. Execute it with the call() function.
  */
-export function createCallJson(options) {
+export function createCallJson(options?: JQuery.AjaxSettings): AjaxCall {
   let opts = $.extend({}, {
     type: 'POST',
     dataType: 'json',
@@ -193,9 +193,9 @@ export function createCallJson(options) {
  * Prepares an Ajax call, but does not execute it yet.
  * @param [options] additional settings for the request.
  *        Since jQuery is used to perform the request, all the jQuery Ajax settings are accepted.
- * @returns {AjaxCall} the prepared Ajax call object. Execute it with the call() function.
+ * @returns the prepared Ajax call object. Execute it with the call() function.
  */
-export function createCall(options) {
+export function createCall(options?: JQuery.AjaxSettings): AjaxCall {
   let opts = $.extend({}, {
     cache: false
   }, options);
