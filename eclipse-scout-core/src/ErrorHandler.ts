@@ -13,9 +13,21 @@ import $ from 'jquery';
 import sourcemappedStacktrace from 'sourcemapped-stacktrace';
 
 export interface ErrorHandlerOptions {
-  logError: boolean;
-  displayError: boolean;
-  sendError: boolean;
+  /**
+   * Default is true
+   */
+  logError?: boolean;
+
+  /**
+   * Default is true
+   */
+  displayError?: boolean;
+
+  /**
+   * Default is false
+   */
+  sendError?: boolean;
+
   session?: Session;
 }
 
@@ -32,6 +44,7 @@ export interface ErrorInfo {
 }
 
 export default class ErrorHandler implements ErrorHandlerOptions {
+  declare model: ErrorHandlerOptions;
   logError: boolean;
   displayError: boolean;
   sendError: boolean;
@@ -110,7 +123,7 @@ export default class ErrorHandler implements ErrorHandlerOptions {
    * @param errorOrArgs error or array or array-like object containing the error and other arguments
    * @returns the analyzed errorInfo
    */
-  handle(errorOrArgs: any | IArguments | [], ...args): JQuery.Promise<any> {
+  handle(errorOrArgs: any | IArguments | any[], ...args: any[]): JQuery.Promise<any> {
     let error = errorOrArgs;
     if (errorOrArgs && args.length === 0) {
       if ((String(errorOrArgs) === '[object Arguments]')) {
@@ -132,7 +145,7 @@ export default class ErrorHandler implements ErrorHandlerOptions {
    * 3. Nothing                 (code: 'P3')
    * 4. Everything else         (code: 'P4')
    */
-  analyzeError(error: any, ...args): JQuery.Promise<any> {
+  analyzeError(error: any, ...args: any[]): JQuery.Promise<any> {
     let errorInfo = {
       code: null,
       message: null,
@@ -146,7 +159,7 @@ export default class ErrorHandler implements ErrorHandlerOptions {
     return this._analyzeError(errorInfo, ...args);
   }
 
-  protected _analyzeError(errorInfo: ErrorInfo, ...args): JQuery.Promise<ErrorInfo> {
+  protected _analyzeError(errorInfo: ErrorInfo, ...args: any[]): JQuery.Promise<ErrorInfo> {
     let error = errorInfo.error;
     // 1. Regular errors
     if (error instanceof Error) {
@@ -211,7 +224,7 @@ export default class ErrorHandler implements ErrorHandlerOptions {
     errorInfo.log = arrays.format(log, '\n');
   }
 
-  protected _analyzeAjaxError(errorInfo: ErrorInfo, ...args) {
+  protected _analyzeAjaxError(errorInfo: ErrorInfo, ...args: any[]) {
     let error = errorInfo.error;
     let jqXHR, errorThrown, requestOptions;
     if (error instanceof AjaxError) {
@@ -370,7 +383,7 @@ export default class ErrorHandler implements ErrorHandlerOptions {
     return 'J0';
   }
 
-  protected _showMessageBox(session: Session, errorMessage, errorCode, logMessage) {
+  protected _showMessageBox(session: Session, errorMessage: string, errorCode: string, logMessage: string) {
     let options = {
       header: session.optText('ui.UnexpectedProblem', 'Internal UI Error'),
       body: strings.join('\n\n',
@@ -390,7 +403,7 @@ export default class ErrorHandler implements ErrorHandlerOptions {
     session.showFatalMessage(options, errorCode);
   }
 
-  protected _sendErrorMessage(session: Session, logMessage, logLevel) {
+  protected _sendErrorMessage(session: Session, logMessage: string, logLevel: LogLevel) {
     session.sendLogRequest(logMessage, logLevel);
   }
 }

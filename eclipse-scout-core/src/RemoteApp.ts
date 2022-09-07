@@ -10,6 +10,7 @@
  */
 import {App, defaultValues, ErrorHandler} from './index';
 import $ from 'jquery';
+import {AppBootstrapOptions} from './App';
 import {ErrorHandlerOptions} from './ErrorHandler';
 
 export default class RemoteApp extends App {
@@ -20,7 +21,7 @@ export default class RemoteApp extends App {
     this.remote = true;
   }
 
-  protected override _doBootstrap(options) {
+  protected override _doBootstrap(options: AppBootstrapOptions): Array<JQuery.Promise<any> | JQuery.Promise<any>[]> {
     return super._doBootstrap(options).concat([
       this._doBootstrapDefaultValues()
     ]);
@@ -37,7 +38,7 @@ export default class RemoteApp extends App {
     return super._createErrorHandler(opts);
   }
 
-  protected override _loadSession($entryPoint: JQuery, options) {
+  protected override _loadSession($entryPoint: JQuery, options): JQuery.Promise<any> {
     options = options || {};
     options.$entryPoint = $entryPoint;
     let session = this._createSession(options);
