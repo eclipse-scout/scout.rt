@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -16,17 +16,17 @@ declare global {
 }
 
 export interface Logger {
-  trace(...logArgs): void;
+  trace(...logArgs: any[]): void;
 
-  debug(...logArgs): void;
+  debug(...logArgs: any[]): void;
 
-  info(...logArgs): void;
+  info(...logArgs: any[]): void;
 
-  warn(...logArgs): void;
+  warn(...logArgs: any[]): void;
 
-  error(...logArgs): void;
+  error(...logArgs: any[]): void;
 
-  fatal(...logArgs): void;
+  fatal(...logArgs: any[]): void;
 
   isEnabledFor(): boolean;
 
@@ -42,9 +42,9 @@ export interface Logger {
 
   isFatalEnabled(): boolean;
 
-  addAppender?(appender);
+  addAppender?(appender: LogAppender);
 
-  removeAppender?(appender);
+  removeAppender?(appender: LogAppender);
 }
 
 export enum LogLevel {
@@ -64,7 +64,7 @@ export interface LoggingOptions {
 
 const DEFAULT_LEVEL = LogLevel.TRACE;
 let initialized = false;
-let _appendersToAdd = [];
+let _appendersToAdd: { factoryName: { new(model?: object) } | string, options?: object }[] = [];
 let showStackTraces = true;
 
 /***
@@ -154,6 +154,27 @@ export function addAppender(factoryName: { new(model?: object) } | string, optio
 
   let factory = scout.create(factoryName, options);
   $.log.addAppender(factory.create());
+}
+
+export interface LogAppender {
+  append(loggingEvent: LoggingEvent);
+}
+
+export interface LoggingEvent {
+  logger: Logger;
+  timeStamp: Date;
+  timeStampInMilliseconds: number;
+  timeStampInSeconds: number;
+  milliseconds: number;
+  level: LogLevel;
+  messages: string[];
+  exception: any[];
+
+  getThrowableStrRep(): string;
+
+  getCombinedMessages(): string;
+
+  toString(): string;
 }
 
 export default {

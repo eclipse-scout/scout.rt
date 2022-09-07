@@ -257,6 +257,7 @@ export function getSession(partId: string): Session {
   }
   for (let i = 0; i < sessions.length; i++) {
     let session = sessions[i];
+    // @ts-ignore
     // eslint-disable-next-line eqeqeq
     if (session.partId == partId) { // <-- compare with '==' is intentional! (NOSONAR)
       return session;
