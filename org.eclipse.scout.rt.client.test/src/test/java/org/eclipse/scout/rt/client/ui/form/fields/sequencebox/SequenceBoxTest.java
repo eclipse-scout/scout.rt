@@ -19,6 +19,7 @@ import java.util.Locale;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractTimeField;
@@ -62,8 +63,7 @@ public class SequenceBoxTest {
 
   /**
    * Test method for
-   * {@link org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox#execCheckFromTo(org.eclipse.scout.rt.
-   * client.ui.form.fields.IValueField<T>[], int)}.
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox#execCheckFromTo(IValueField[], int)} <T>[], int)}.
    */
   @Test
   public void testExecCheckFromTo() {
