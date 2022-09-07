@@ -10,8 +10,23 @@
  */
 import $ from 'jquery';
 import objects from '../util/objects';
+import LookupRowModel from './LookupRowModel';
 
-export default class LookupRow {
+export default class LookupRow<Key> implements LookupRowModel<Key> {
+  declare model: LookupRowModel<Key>;
+
+  key: Key;
+  text: string;
+  parentKey: Key;
+  enabled: boolean;
+  active: boolean;
+  additionalTableRowData: any;
+  cssClass: string;
+  iconId: string;
+  tooltipText: string;
+  backgroundColor: string;
+  foregroundColor: string;
+  font: string;
 
   constructor() {
     this.key = null;
@@ -28,55 +43,55 @@ export default class LookupRow {
     this.font = null;
   }
 
-  init(model) {
+  init(model?: LookupRowModel<Key>) {
     $.extend(this, model);
   }
 
-  setKey(key) {
+  setKey(key: Key) {
     this.key = key;
   }
 
-  setText(text) {
+  setText(text: string) {
     this.text = text;
   }
 
-  setParentKey(parentKey) {
+  setParentKey(parentKey: Key) {
     this.parentKey = parentKey;
   }
 
-  setCssClass(cssClass) {
+  setCssClass(cssClass: string) {
     this.cssClass = cssClass;
   }
 
-  setAdditionalTableRowData(additionalTableRowData) {
+  setAdditionalTableRowData(additionalTableRowData: any) {
     this.additionalTableRowData = additionalTableRowData;
   }
 
-  setIconId(iconId) {
+  setIconId(iconId: string) {
     this.iconId = iconId;
   }
 
-  setTooltipText(tooltipText) {
+  setTooltipText(tooltipText: string) {
     this.tooltipText = tooltipText;
   }
 
-  setBackgroundColor(backgroundColor) {
+  setBackgroundColor(backgroundColor: string) {
     this.backgroundColor = backgroundColor;
   }
 
-  setForegroundColor(foregroundColor) {
+  setForegroundColor(foregroundColor: string) {
     this.foregroundColor = foregroundColor;
   }
 
-  setFont(font) {
+  setFont(font: string) {
     this.font = font;
   }
 
-  equals(other) {
+  equals(other: any): boolean {
     return objects.propertiesEquals(this, other, Object.keys(this));
   }
 
-  toString() {
+  toString(): string {
     return 'scout.LookupRow[key=' + this.key + ' text=' + this.text + ']';
   }
 }

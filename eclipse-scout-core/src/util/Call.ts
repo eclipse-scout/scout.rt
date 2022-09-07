@@ -17,6 +17,8 @@ import $ from 'jquery';
  * by a subclass by overriding the _callImpl() method.
  */
 export default abstract class Call implements CallModel {
+  declare model: CallModel;
+
   retryIntervals: number[];
   minCallDuration: number;
   callCounter: number;

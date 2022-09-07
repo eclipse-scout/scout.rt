@@ -8,12 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-
-export type Predicate<T> = (obj: T) => boolean;
-
-// Type that makes some properties optional and some required.
-export type PartialAndRequired<T, OPTIONAL extends keyof T, REQUIRED extends keyof T> = Omit<T, OPTIONAL | REQUIRED> & Partial<Pick<T, OPTIONAL>> & Required<Pick<T, REQUIRED>>;
-
-export type EnumObject<TYPE> = TYPE[keyof TYPE];
-
-export type Primitive = number | string | boolean | symbol | bigint;
+export default interface LookupRowModel<Key> {
+  key: Key;
+  text: string;
+  parentKey?: Key;
+  enabled?: boolean;
+  active?: boolean;
+  additionalTableRowData?: any;
+  cssClass?: string;
+  iconId?: string;
+  tooltipText?: string;
+  backgroundColor?: string;
+  foregroundColor?: string;
+  font?: string;
+}
