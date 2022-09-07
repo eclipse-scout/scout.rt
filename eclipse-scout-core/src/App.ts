@@ -3,18 +3,18 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {codes, Desktop, Device, ErrorHandler, EventEmitter, fonts, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage, Widget} from './index';
+import {codes, Desktop, Device, ErrorHandler, EventEmitter, EventHandler, EventListener, fonts, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage, Widget} from './index';
 import $ from 'jquery';
 import {FontSpec} from './util/fonts';
 
-let instance = null;
-let listeners = [];
+let instance: App = null;
+let listeners: EventListener[] = [];
 
 export interface AppOptions {
   /**
@@ -31,6 +31,11 @@ export interface AppOptions {
 
   version?: string;
 }
+
+export type JsonErrorResponse = {
+  code: number;
+  message: string;
+};
 
 export interface AppBootstrapOptions {
   /**
@@ -57,7 +62,7 @@ export interface AppBootstrapOptions {
 }
 
 export default class App extends EventEmitter {
-  static addListener(type, func) {
+  static addListener(type: string, func: EventHandler): EventListener {
     let listener = {
       type: type,
       func: func
@@ -70,7 +75,7 @@ export default class App extends EventEmitter {
     return listener;
   }
 
-  static get() {
+  static get(): App {
     return instance;
   }
 
@@ -182,7 +187,8 @@ export default class App extends EventEmitter {
     $.log.isDebugEnabled() && $.log.debug('App bootstrapped');
   }
 
-  protected _bootstrapFail(options: AppBootstrapOptions, vararg, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: JQuery.AjaxSettings) {
+  protected _bootstrapFail(options: AppBootstrapOptions, vararg: JQuery.jqXHR | { url?: string; error?: JsonErrorResponse }, textStatus?: JQuery.Ajax.ErrorTextStatus, errorThrown?: string, requestOptions?: JQuery.AjaxSettings)
+    : JQuery.Promise<any> | void {
     $.log.isInfoEnabled() && $.log.info('App bootstrap failed');
 
     // If one of the bootstrap ajax call fails due to a session timeout, the index.html is probably loaded from cache without asking the server for its validity.
@@ -219,7 +225,7 @@ export default class App extends EventEmitter {
     return httpStatus === 401;
   }
 
-  protected _handleBootstrapTimeoutError(error, url: string) { // FIXME TS use type from session for error? or should it be any?
+  protected _handleBootstrapTimeoutError(error: JQuery.jqXHR | JsonErrorResponse, url: string) {
     $.log.isInfoEnabled() && $.log.info('Timeout error for resource ' + url + '. Reloading page...');
     if (webstorage.getItemFromSessionStorage('scout:timeoutPageReload')) {
       // Prevent loop in case a reload did not solve the problem
@@ -260,11 +266,11 @@ export default class App extends EventEmitter {
    * Maybe implemented to load data from a server before the desktop is created.
    * @returns promise which is resolved after the loading is complete
    */
-  protected _load(options): JQuery.Promise<any> {
+  protected _load(options: AppOptions): JQuery.Promise<any> {
     return $.resolvedPromise();
   }
 
-  protected _checkBrowserCompatibility(options): JQuery.Promise<AppOptions> | null {
+  protected _checkBrowserCompatibility(options: AppOptions): JQuery.Promise<AppOptions> | null {
     let device = Device.get();
     $.log.isInfoEnabled() && $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
     if (!scout.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
@@ -418,7 +424,7 @@ export default class App extends EventEmitter {
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // explicitly add here because jQuery only adds it automatically if it is no crossDomain request
   }
 
-  protected _loadSessions(options) { // FIXME TS session options type
+  protected _loadSessions(options): JQuery.Promise<any> { // FIXME TS session options type
     options = options || {};
     let promises = [];
     $('.scout').each((i, elem) => {
@@ -496,7 +502,7 @@ export default class App extends EventEmitter {
     $.log.isInfoEnabled() && $.log.info('App initialized');
   }
 
-  protected _fail(options: AppOptions, error: any, ...args): JQuery.Promise<any> {
+  protected _fail(options: AppOptions, error: any, ...args: any[]): JQuery.Promise<any> {
     $.log.error('App initialization failed.');
     this.setLoading(false);
 
