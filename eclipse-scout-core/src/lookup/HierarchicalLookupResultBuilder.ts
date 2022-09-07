@@ -8,36 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupCall, objects, scout} from '../index';
+import {LookupCall, LookupRow, objects, scout} from '../index';
 import $ from 'jquery';
 
-export default class HierarchicalLookupResultBuilder {
-  constructor(lookupCall) {
+export default class HierarchicalLookupResultBuilder<Key extends PropertyKey> {
+
+  lookupCall: LookupCall<Key>;
+  protected _lookupRowMap: { [key: PropertyKey]: LookupRow<Key> };
+
+  constructor(lookupCall: LookupCall<Key>) {
     scout.assertParameter('lookupCall', lookupCall);
     this.lookupCall = lookupCall;
-
     this._lookupRowMap = {};
   }
 
   /**
    * Load all parent nodes of the given lookup rows up to the root.
-   *
-   * @returns {Promise} a promise resolved to an array of {LookupRow}s
    */
-  addParentLookupRows(lookupRows) {
+  addParentLookupRows(lookupRows: LookupRow<Key>[]): JQuery.Promise<LookupRow<Key>[]> {
     this._fillMap(lookupRows);
 
     let promises = lookupRows.map(this._addParent.bind(this));
     return $.promiseAll(promises)
-      .then(() => {
-        return objects.values(this._lookupRowMap);
-      });
+      .then(() => objects.values(this._lookupRowMap));
   }
 
-  /**
-   * @returns {Promise}
-   */
-  _addParent(lookupRow) {
+  protected _addParent(lookupRow: LookupRow<Key>): JQuery.Promise<void> {
     let key = lookupRow.parentKey;
 
     if (!key) {
@@ -61,7 +57,7 @@ export default class HierarchicalLookupResultBuilder {
       });
   }
 
-  _fillMap(lookupRows) {
+  protected _fillMap(lookupRows: LookupRow<Key>[]) {
     lookupRows.forEach(lookupRow => {
       this._lookupRowMap[lookupRow.key] = lookupRow;
     });
@@ -69,23 +65,16 @@ export default class HierarchicalLookupResultBuilder {
 
   /**
    * Load all parent child of the given lookup rows.
-   *
-   * @returns {Promise} a promise resolved to an array of {LookupRow}s
    */
-  addChildLookupRows(lookupRows) {
+  addChildLookupRows(lookupRows: LookupRow<Key>[]): JQuery.Promise<LookupRow<Key>[]> {
     this._fillMap(lookupRows);
 
     let promises = lookupRows.map(this._addChildren.bind(this));
     return $.promiseAll(promises)
-      .then(() => {
-        return objects.values(this._lookupRowMap);
-      });
+      .then(() => objects.values(this._lookupRowMap));
   }
 
-  /**
-   * @returns {Promise}
-   */
-  _addChildren(lookupRow) {
+  protected _addChildren(lookupRow: LookupRow<Key>): JQuery.Promise<LookupRow<Key>[]> {
     return this.lookupCall
       .cloneForRec(lookupRow.key)
       .execute()

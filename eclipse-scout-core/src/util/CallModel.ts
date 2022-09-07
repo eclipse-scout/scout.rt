@@ -11,27 +11,27 @@
 export default interface CallModel {
   /**
    * Delays in ms between retries (from left to right). The call eventually fails when this list gets empty.
-   * Example: [100, 500, 500, 500]
+   * Example: [100, 500, 500, 500].
    */
-  retryIntervals: number[];
+  retryIntervals?: number[];
   /**
    * Maximum number of retries to perform with default interval. Alternatively use {@link retryIntervals} to specify specific intervals for each retry.
    */
-  maxRetries: number;
+  maxRetries?: number;
   /**
    * Minimal assumed call duration (throttles consecutive calls) in milliseconds
    */
-  minCallDuration: number;
+  minCallDuration?: number;
   /**
    * Identifier for the type of call (default is 'call'), used to build the uniqueName
    */
-  type: string;
+  type?: string;
   /**
    * Identifier for the call, used to build the uniqueName
    */
-  name: string;
+  name?: string;
   /**
    * All log messages are prefixed with this string. It contains the uniqueName and the current state (e.g. callCounter)
    */
-  logPrefix: string;
+  logPrefix?: string;
 }

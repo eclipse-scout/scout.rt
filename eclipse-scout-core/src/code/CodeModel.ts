@@ -8,12 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {ObjectWithType} from '../scout';
 
-export type Predicate<T> = (obj: T) => boolean;
+export default interface CodeModel extends ObjectWithType {
 
-// Type that makes some properties optional and some required.
-export type PartialAndRequired<T, OPTIONAL extends keyof T, REQUIRED extends keyof T> = Omit<T, OPTIONAL | REQUIRED> & Partial<Pick<T, OPTIONAL>> & Required<Pick<T, REQUIRED>>;
+  objectType: string;
+  id: string;
+  active?: boolean;
+  sortCode?: number;
+  modelClass?: string;
 
-export type EnumObject<TYPE> = TYPE[keyof TYPE];
+  text?: string;
+  texts?: { [languageTag: string]: string };
 
-export type Primitive = number | string | boolean | symbol | bigint;
+  children?: CodeModel[];
+}

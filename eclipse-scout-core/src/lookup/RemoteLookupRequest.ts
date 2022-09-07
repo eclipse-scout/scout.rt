@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, QueryBy} from '../index';
+import {QueryByType} from './QueryBy';
 
 /**
  * This class is used to remember what lookup is called (=request) and to compare that
@@ -16,13 +17,12 @@ import {objects, QueryBy} from '../index';
  * stored in this class so we can easily compare the parameters from the latest request
  * with the parameters from the result. If the parameters don't match, we simply ignore the
  * result, because it is out-dated.
- *
- * @param {QueryBy} requestType
- * @param {object} requestData
  */
-export default class RemoteLookupRequest {
+export default class RemoteLookupRequest<DATA> {
+  requestType: QueryByType;
+  requestData: DATA;
 
-  constructor(requestType, requestData) {
+  constructor(requestType: QueryByType, requestData?: DATA) {
     if (!QueryBy.hasOwnProperty(requestType)) {
       throw new Error('Invalid enum value');
     }
@@ -30,7 +30,7 @@ export default class RemoteLookupRequest {
     this.requestData = requestData;
   }
 
-  equals(o) {
+  equals(o: any): boolean {
     if (!o || !(o instanceof RemoteLookupRequest)) {
       return false;
     }

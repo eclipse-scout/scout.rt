@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
+import {EnumObject} from '../types';
+
 /**
  * @see: org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy
  */
@@ -18,6 +20,8 @@ const QueryBy = {
   KEY: 'KEY',
   KEYS: 'KEYS',
   REC: 'REC'
-};
+} as const;
+
+export type QueryByType = EnumObject<typeof QueryBy>;
 
 export default QueryBy;

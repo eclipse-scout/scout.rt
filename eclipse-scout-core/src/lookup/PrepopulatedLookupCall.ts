@@ -8,40 +8,44 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupCall, QueryBy, scout, strings} from '../index';
+import {arrays, LookupCall, LookupRow, QueryBy, scout, strings} from '../index';
 import $ from 'jquery';
+import LookupResult from './LookupResult';
+import Deferred = JQuery.Deferred;
 
-export default class PrepopulatedLookupCall extends LookupCall {
+export default class PrepopulatedLookupCall<Key> extends LookupCall<Key> {
+
+  lookupRows: LookupRow<Key>[];
 
   constructor() {
     super();
     this.lookupRows = [];
   }
 
-  setLookupRows(lookupRows) {
+  setLookupRows(lookupRows: LookupRow<Key>[] | LookupRow<Key>) {
     this.lookupRows = arrays.ensure(lookupRows);
   }
 
-  _filterActiveLookupRow(lookupRow) {
+  protected _filterActiveLookupRow(lookupRow: LookupRow<Key>): boolean {
     return !!scout.nvl(lookupRow.active, true);
   }
 
   // --- ALL ---
 
-  _getAll() {
+  override _getAll(): JQuery.Promise<LookupResult<Key>> {
     let deferred = $.Deferred();
     setTimeout(this._queryByAll.bind(this, deferred));
     return deferred.promise();
   }
 
-  _queryByAll(deferred) {
+  protected _queryByAll(deferred: Deferred<LookupResult<Key>>) {
     deferred.resolve({
       queryBy: QueryBy.ALL,
       lookupRows: this._lookupRowsByAll()
     });
   }
 
-  _lookupRowsByAll() {
+  protected _lookupRowsByAll() {
     return this.lookupRows
       .filter(this._filterActiveLookupRow, this)
       .slice(0, this.maxRowCount);
@@ -49,13 +53,13 @@ export default class PrepopulatedLookupCall extends LookupCall {
 
   // --- TEXT ---
 
-  _getByText(text) {
+  override _getByText(text: string): JQuery.Promise<LookupResult<Key>> {
     let deferred = $.Deferred();
     setTimeout(this._queryByText.bind(this, deferred, text));
     return deferred.promise();
   }
 
-  _queryByText(deferred, text) {
+  protected _queryByText(deferred: Deferred<LookupResult<Key>>, text: string) {
     deferred.resolve({
       queryBy: QueryBy.TEXT,
       text: text,
@@ -63,25 +67,23 @@ export default class PrepopulatedLookupCall extends LookupCall {
     });
   }
 
-  _lookupRowsByText(text) {
+  protected _lookupRowsByText(text: string): LookupRow<Key>[] {
     let filterText = String(scout.nvl(text, '')).trim().toLowerCase();
     return this.lookupRows
-      .filter(lookupRow => {
-        return strings.startsWith(scout.nvl(lookupRow.text, '').toLowerCase(), filterText);
-      })
+      .filter(lookupRow => strings.startsWith(scout.nvl(lookupRow.text, '').toLowerCase(), filterText))
       .filter(this._filterActiveLookupRow, this)
       .slice(0, this.maxRowCount);
   }
 
   // --- KEY ---
 
-  _getByKey(key) {
+  override _getByKey(key: Key): JQuery.Promise<LookupResult<Key>> {
     let deferred = $.Deferred();
     setTimeout(this._queryByKey.bind(this, deferred, key));
     return deferred.promise();
   }
 
-  _queryByKey(deferred, key) {
+  protected _queryByKey(deferred: Deferred<LookupResult<Key>>, key: Key) {
     let lookupRow = this._lookupRowByKey(key);
     if (lookupRow) {
       deferred.resolve({
@@ -93,21 +95,19 @@ export default class PrepopulatedLookupCall extends LookupCall {
     }
   }
 
-  _lookupRowByKey(key) {
-    return arrays.find(this.lookupRows, lookupRow => {
-      return lookupRow.key === key;
-    });
+  protected _lookupRowByKey(key: Key): LookupRow<Key> {
+    return arrays.find(this.lookupRows, lookupRow => lookupRow.key === key);
   }
 
   // --- REC ---
 
-  _getByRec(rec) {
+  override _getByRec(rec: Key): JQuery.Promise<LookupResult<Key>> {
     let deferred = $.Deferred();
     setTimeout(this._queryByRec.bind(this, deferred, rec));
     return deferred.promise();
   }
 
-  _queryByRec(deferred, rec) {
+  protected _queryByRec(deferred: Deferred<LookupResult<Key>>, rec: Key) {
     deferred.resolve({
       queryBy: QueryBy.REC,
       rec: rec,
@@ -115,7 +115,7 @@ export default class PrepopulatedLookupCall extends LookupCall {
     });
   }
 
-  _lookupRowsByRec(rec) {
+  protected _lookupRowsByRec(rec: Key): LookupRow<Key>[] {
     return this.lookupRows
       .reduce((aggr, lookupRow) => {
         if (lookupRow.parentKey === rec) {

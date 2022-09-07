@@ -13,6 +13,7 @@ import $ from 'jquery';
 
 export default class AjaxCall extends Call implements AjaxCallModel {
 
+  declare model: AjaxCallModel;
   declare pendingCall: JQuery.jqXHR;
   ajaxOptions: JQuery.AjaxSettings;
 
@@ -113,7 +114,7 @@ export default class AjaxCall extends Call implements AjaxCallModel {
 
 export interface AjaxCallModel extends CallModel {
   /**
-   * Options for the jquery ajax call. At least the {@link ajaxOptions.url} is required.
+   * Options for the jquery ajax call. At least the {@link CallModel.url} is required.
    */
   ajaxOptions: JQuery.AjaxSettings;
 }

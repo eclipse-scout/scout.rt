@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, QueryBy, strings, ValueFieldAdapter} from '../../../index';
+import {objects, strings, ValueFieldAdapter} from '../../../index';
+import {QueryByType} from '../../../lookup/QueryBy';
 
 /**
  * Use this base class for field-adapters that work with lookup-calls like SmartField and TagField.
@@ -20,10 +21,9 @@ export default class LookupFieldAdapter extends ValueFieldAdapter {
   }
 
   /**
-   * @param {QueryBy} queryBy
-   * @param {object} [queryData] optional data (text, key, rec)
+   * @param queryData optional data (text, key, rec)
    */
-  sendLookup(queryBy, queryData) {
+  sendLookup(queryBy: QueryByType, queryData?: any) {
     let propertyName = queryBy.toLowerCase(),
       requestType = 'lookupBy' + strings.toUpperCaseFirstLetter(propertyName),
       requestData = {
