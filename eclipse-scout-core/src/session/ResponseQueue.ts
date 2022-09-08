@@ -1,30 +1,39 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '../index';
+import {Session, strings} from '../index';
+import {Request, Response} from './Session';
 
 export default class ResponseQueue {
+  session: Session;
+  queue: Response[];
+  lastProcessedSequenceNo: number;
+  nextExpectedSequenceNo: number;
+  force: boolean;
+  forceTimeoutId: number;
 
-  constructor(session) {
+  constructor(session: Session) {
     this.session = session;
     this.queue = [];
     this.lastProcessedSequenceNo = 0;
     this.nextExpectedSequenceNo = 1;
-
     this.force = false;
     this.forceTimeoutId = null;
   }
 
-  static FORCE_TIMEOUT = 10 * 1000; // in ms
+  /**
+   * in milliseconds
+   */
+  static FORCE_TIMEOUT = 10 * 1000;
 
-  add(response) {
+  add(response?: Response) {
     let sequenceNo = response && response['#'];
 
     // Ignore responses that were already processed (duplicate detection)
@@ -67,7 +76,7 @@ export default class ResponseQueue {
     }
   }
 
-  process(response) {
+  process(response?: Response): boolean {
     if (response) {
       this.add(response);
     }
@@ -113,11 +122,11 @@ export default class ResponseQueue {
     return responseSuccess;
   }
 
-  size() {
+  size(): number {
     return this.queue.length;
   }
 
-  _checkTimeout() {
+  protected _checkTimeout() {
     // If there are non-processed elements, schedule a job that forces the processing of those
     // elements after a certain timeout to prevent the "blocked forever syndrome" if a response
     // was lost on the network.
@@ -132,7 +141,7 @@ export default class ResponseQueue {
             if (i > 0) {
               s += ', ';
             }
-            s += (strings.box('#', this.queue[i]['#']) || '<none>');
+            s += (strings.box('#', this.queue[i]['#'] + '') || '<none>');
           }
           s += ']';
           this.session.sendLogRequest('Expected response #' + this.nextExpectedSequenceNo + ' still missing after ' +
@@ -151,12 +160,12 @@ export default class ResponseQueue {
     }
   }
 
-  prepareRequest(request) {
+  prepareRequest(request: Request) {
     request['#ACK'] = this.lastProcessedSequenceNo;
   }
 
-  prepareHttpRequest(ajaxOptions) {
+  prepareHttpRequest(ajaxOptions: JQuery.AjaxSettings) {
     ajaxOptions.headers = ajaxOptions.headers || {};
-    ajaxOptions.headers['X-Scout-#ACK'] = this.lastProcessedSequenceNo;
+    ajaxOptions.headers['X-Scout-#ACK'] = this.lastProcessedSequenceNo + '';
   }
 }

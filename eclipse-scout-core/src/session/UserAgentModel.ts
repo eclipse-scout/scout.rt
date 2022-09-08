@@ -8,14 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EnumObject} from '../types';
+import {DeviceType} from '../util/Device';
 
-const BackgroundJobPollingStatus = {
-  STOPPED: 'stopped',
-  RUNNING: 'running',
-  FAILURE: 'failure'
-} as const;
-
-export type BackgroundJobPollingStatusType = EnumObject<typeof BackgroundJobPollingStatus>;
-
-export default BackgroundJobPollingStatus;
+export default interface UserAgentModel {
+  deviceType: DeviceType;
+  /**
+   * Default is false.
+   */
+  touch?: boolean;
+  /**
+   * Default is false.
+   */
+  standalone?: boolean;
+}

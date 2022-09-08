@@ -8,14 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EnumObject} from '../types';
+import {Session, Widget} from '../index';
 
-const BackgroundJobPollingStatus = {
-  STOPPED: 'stopped',
-  RUNNING: 'running',
-  FAILURE: 'failure'
-} as const;
-
-export type BackgroundJobPollingStatusType = EnumObject<typeof BackgroundJobPollingStatus>;
-
-export default BackgroundJobPollingStatus;
+export default interface ModelAdapterModel<W extends Widget = Widget> {
+  id: string;
+  objectType?: string;
+  initialized?: boolean;
+  attached?: boolean;
+  destroyed?: boolean;
+  widget?: W;
+  session: Session;
+}

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, Event, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel} from '../index';
+import {AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, Event, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel} from '../index';
 import * as $ from 'jquery';
 import {RefWidgetModel} from './WidgetModel';
 import {ObjectType} from '../ObjectFactory';
@@ -76,6 +76,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   session: Session;
   trackFocus: boolean;
   visible: boolean;
+  modelAdapter: ModelAdapter;
   $container: JQuery;
   $parent: JQuery;
   protected _$lastFocusedElement: JQuery;
