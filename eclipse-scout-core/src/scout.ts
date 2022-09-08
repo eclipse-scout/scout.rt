@@ -9,9 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {AnyWidget, App, Device, ModelAdapter, ObjectFactory, objects, Session, strings, ValueField, widgets} from './index';
+import {AnyWidget, App, Device, ObjectFactory, objects, Session, strings, ValueField, widgets} from './index';
 import $ from 'jquery';
 import {ObjectCreator, ObjectFactoryOptions, ObjectType} from './ObjectFactory';
+import {ModelAdapterLike} from './session/ModelAdapter';
+import {AdapterData} from './session/Session';
 
 let $activeElements = null;
 let objectFactories: Map<string | { new(): object }, ObjectCreator> = new Map();
@@ -240,7 +242,7 @@ export function widget(widgetIdOrElement: string | number | HTMLElement | JQuery
  * to be queried. If not specified explicitly, the first session is used. If the session or
  * the adapter could not be found, null is returned.
  */
-export function adapter(adapterId: string, partId: string): ModelAdapter {
+export function adapter(adapterId: string, partId: string): ModelAdapterLike {
   if (objects.isNullOrUndefined(adapterId)) {
     return null;
   }
@@ -281,7 +283,7 @@ export function getSession(partId: string): Session {
  *
  * JSON.stringify(exportAdapter(4))
  */
-export function exportAdapter(adapterId: string, partId: string) { // FIXME TS add return value
+export function exportAdapter(adapterId: string, partId: string): AdapterData {
   let session = getSession(partId);
   if (session && session.modelAdapterRegistry) {
     let adapter = session.getModelAdapter(adapterId);
@@ -290,45 +292,48 @@ export function exportAdapter(adapterId: string, partId: string) { // FIXME TS a
     }
     let adapterData = cloneAdapterData(adapterId);
     resolveAdapterReferences(adapter, adapterData);
-    adapterData.type = 'model'; // property 'type' is required for models.js
+    adapterData.type = 'model'; // property 'type' is required for models.ts
     return adapterData;
   }
 
   // ----- Helper functions -----
 
-  function cloneAdapterData(adapterId) {
+  function cloneAdapterData(adapterId: string): AdapterData {
     let adapterData = session.getAdapterData(adapterId);
     adapterData = $.extend(true, {}, adapterData);
     return adapterData;
   }
 
-  function resolveAdapterReferences(adapter, adapterData) {
-    let tmpAdapter, tmpAdapterData;
-    adapter.widget._widgetProperties.forEach(WidgetPropertyName => {
-      let WidgetPropertyValue = adapterData[WidgetPropertyName];
-      if (!WidgetPropertyValue) {
+  function resolveAdapterReferences(adapter: ModelAdapterLike, adapterData: AdapterData) {
+    let tmpAdapter: ModelAdapterLike, tmpAdapterData: AdapterData;
+    // @ts-ignore
+    adapter.widget._widgetProperties.forEach(widgetPropertyName => {
+      let widgetPropertyValue = adapterData[widgetPropertyName];
+      if (!widgetPropertyValue) {
         return; // nothing to do when property is null
       }
-      if (Array.isArray(WidgetPropertyValue)) {
+      if (Array.isArray(widgetPropertyValue)) {
         // value is an array of adapter IDs
         let adapterDataArray = [];
-        WidgetPropertyValue.forEach(adapterId => {
+        widgetPropertyValue.forEach(adapterId => {
           tmpAdapter = session.getModelAdapter(adapterId);
           tmpAdapterData = cloneAdapterData(adapterId);
           resolveAdapterReferences(tmpAdapter, tmpAdapterData);
           adapterDataArray.push(tmpAdapterData);
         });
-        adapterData[WidgetPropertyName] = adapterDataArray;
+        adapterData[widgetPropertyName] = adapterDataArray;
       } else {
         // value is an adapter ID
-        tmpAdapter = session.getModelAdapter(WidgetPropertyValue);
-        tmpAdapterData = cloneAdapterData(WidgetPropertyValue);
+        tmpAdapter = session.getModelAdapter(widgetPropertyValue);
+        tmpAdapterData = cloneAdapterData(widgetPropertyValue);
         resolveAdapterReferences(tmpAdapter, tmpAdapterData);
-        adapterData[WidgetPropertyName] = tmpAdapterData;
+        adapterData[widgetPropertyName] = tmpAdapterData;
       }
     });
     adapterData = adapter.exportAdapterData(adapterData);
   }
+
+  return null;
 }
 
 export interface ReloadPageOptions {
@@ -336,16 +341,16 @@ export interface ReloadPageOptions {
    * If true, the page reload is not executed in the current thread but scheduled using setTimeout().
    * This is useful if the caller wants to execute some other code before the reload. The default is false.
    */
-  schedule: boolean;
+  schedule?: boolean;
   /**
    * If true, the body is cleared first before the reload is performed. This is useful to prevent
    * showing "old" content in the browser until the new content arrives. The default is true.
    */
-  clearBody: boolean;
+  clearBody?: boolean;
   /**
    * The new URL to load. If not specified, the current location is used (window.location).
    */
-  redirectUrl: string;
+  redirectUrl?: string;
 }
 
 /**

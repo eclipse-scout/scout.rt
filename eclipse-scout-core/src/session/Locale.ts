@@ -51,9 +51,9 @@ export default class Locale {
     }
   }
 
-  static ensure(locale: any): Locale {
+  static ensure(locale?: Locale | LocaleModel): Locale {
     if (!locale) {
-      return locale;
+      return locale as Locale;
     }
     if (locale instanceof Locale) {
       return locale;

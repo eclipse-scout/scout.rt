@@ -13,7 +13,7 @@ import $ from 'jquery';
 import {DragAndDropType, DropValidationErrorMessage, FileDropEvent} from './dragAndDrop';
 
 export default class DragAndDropHandler {
-  additionalDropProperties: (event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => any;
+  additionalDropProperties: (event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => Record<string, string | Blob>;
   allowedTypes: () => string[];
   dropType: () => number;
   dropMaximumSize: () => number;
@@ -118,7 +118,7 @@ export default class DragAndDropHandler {
     if (!fileUtil.validateMaximumUploadSize(files, dropMaximumSize)) {
       throw {
         title: this.target.session.text('ui.FileSizeLimitTitle'),
-        message: this.target.session.text('ui.FileSizeLimit', (dropMaximumSize / 1024 / 1024))
+        message: this.target.session.text('ui.FileSizeLimit', (dropMaximumSize / 1024 / 1024) + '')
       };
     }
   }

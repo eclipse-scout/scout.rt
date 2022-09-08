@@ -89,7 +89,7 @@ export default class PropertyEventEmitter extends EventEmitter {
    * Calls the setter of the given property name if it exists. A setter has to be named setXy, where Xy is the property name.
    * If there is no setter for the property name, {@link setProperty} is called.
    */
-  callSetter(propertyName: string, value) {
+  callSetter(propertyName: string, value: any) {
     let setterFuncName = 'set' + strings.toUpperCaseFirstLetter(propertyName);
     if (this[setterFuncName]) {
       this[setterFuncName](value);

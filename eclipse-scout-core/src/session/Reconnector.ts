@@ -1,27 +1,43 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
+import {Session} from '../index';
 
 export default class Reconnector {
+  session: Session;
+  started: boolean;
 
-  constructor(session) {
+  /**
+   * Delay before first ping in ms. Default is 1000.
+   */
+  initialDelay: number;
+
+  /**
+   * Interval to be used between pings (indefinite retries) in ms. Default is 3000.
+   */
+  interval: number;
+
+  /**
+   * Minimal assumed ping duration (to prevent flickering of the reconnect notification when AJAX call fails very fast) in ms. Default is 1000.
+   */
+  minPingDuration: number;
+
+  pingStartTimestamp: number;
+
+  constructor(session: Session) {
     this.session = session;
     this.started = false;
-
-    // Delay before first ping
-    this.initialDelay = 1000; // ms
-    // Interval to be used between pings (indefinite retries).
-    this.interval = 3000; // ms
-    // Minimal assumed ping duration (to prevent flickering of the reconnect notification when AJAX call fails very fast)
-    this.minPingDuration = 1000; // ms
+    this.initialDelay = 1000;
+    this.interval = 3000;
+    this.minPingDuration = 1000;
   }
 
   start() {
@@ -38,7 +54,7 @@ export default class Reconnector {
     this.started = false;
   }
 
-  _schedulePing(delay) {
+  protected _schedulePing(delay: number) {
     $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] schedule ping() in ' + delay + ' ms');
     setTimeout(this._ping.bind(this), delay);
   }
@@ -54,12 +70,13 @@ export default class Reconnector {
   //      |                   |
   //      +-------------------+
   //
-  _ping() {
+  protected _ping() {
     this.session.onReconnecting();
 
-    let pingAjaxOptions = this.session.defaultAjaxOptions({
+    // @ts-ignore
+    let pingAjaxOptions = this.session.defaultAjaxOptions(this.session._newRequest({
       ping: true
-    });
+    }));
 
     $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ' + pingAjaxOptions.type + ' "' + pingAjaxOptions.url + '"');
     this.pingStartTimestamp = Date.now();
@@ -68,13 +85,13 @@ export default class Reconnector {
       .fail(this._onPingFail.bind(this));
   }
 
-  _onPingDone(data, textStatus, jqXHR) {
+  protected _onPingDone(data: any, textStatus: JQuery.Ajax.SuccessTextStatus, jqXHR: JQuery.jqXHR) {
     $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping success -> connection re-established!');
     this.session.onReconnectingSucceeded();
     this.stop();
   }
 
-  _onPingFail(jqXHR, textStatus, errorThrown) {
+  protected _onPingFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
     let handleFailedPing = function handleFailedPing() {
       $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping failed');
       this.session.onReconnectingFailed();
