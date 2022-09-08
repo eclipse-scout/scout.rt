@@ -23,16 +23,27 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.resource.MimeType;
 
 /**
@@ -42,6 +53,9 @@ import org.eclipse.scout.rt.platform.resource.MimeType;
  */
 @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
 public final class FileUtility {
+
+  public static final String ZIP_PATH_SEPARATOR = "/";
+
   private static final int KILO_BYTE = 1024;
 
   private FileUtility() {
@@ -75,7 +89,6 @@ public final class FileUtility {
           if (file.getTime() >= 0) {
             f.setLastModified(file.getTime());
           }
-          continue;
         }
         else {
           f.getParentFile().mkdirs();
@@ -386,24 +399,6 @@ public final class FileUtility {
     return MimeType.APPLICATION_OCTET_STREAM.getType();
   }
 
-  /**
-   * @return Returns <code>true</code> if the given file is a zip file.
-   */
-  public static boolean isZipFile(File file) {
-    if (file == null || file.isDirectory() || !file.canRead() || file.length() < 4) {
-      return false;
-    }
-    try (
-        @SuppressWarnings("squid:S2095")
-        DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
-      int test = in.readInt();
-      return test == 0x504b0304; // magic number of a zip file
-    }
-    catch (IOException e) { // NOSONAR
-    }
-    return false;
-  }
-
   public static byte[] removeByteOrderMark(File f) {
     return IOUtility.removeByteOrderMark(IOUtility.getContent(f.getAbsolutePath()));
   }
@@ -537,7 +532,6 @@ public final class FileUtility {
    * <p>
    * Uses {@link #toValidFilename(String)} to check
    *
-   * @param filename
    * @return <tt>false</tt> if <tt>filename</tt> is not a valid filename<br/>
    *         <tt>true</tt> if <tt>filename</tt> is a valid filename
    */
@@ -545,4 +539,198 @@ public final class FileUtility {
     return toValidFilename(filename).equals(filename);
   }
 
+  /**
+   * @return Returns <code>true</code> if the given file is a zip file, otherwise <code>false</code>.
+   */
+  public static boolean isZipFile(File file) {
+    if (file == null || file.isDirectory() || !file.canRead() || file.length() < 4) {
+      return false;
+    }
+    try (
+        @SuppressWarnings("squid:S2095")
+        DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+      int test = in.readInt();
+      return test == 0x504b0304; // magic number of a zip file
+    }
+    catch (IOException e) { // NOSONAR
+    }
+    return false;
+  }
+
+  /**
+   * Creates a BinaryResource representing a zip file containing the provided BinaryResources.
+   *
+   * @param zipFilename
+   *          Name of zip file.
+   * @param resources
+   *          BinaryResources to put in zip archive.
+   * @return BinaryResource representing a zip archive.
+   */
+  public static BinaryResource zip(String zipFilename, Collection<BinaryResource> resources) {
+    return zip(zipFilename, resources, false);
+  }
+
+  /**
+   * Creates a BinaryResource representing a zip file containing the provided BinaryResources.
+   *
+   * @param zipFilename
+   *          Name of zip file.
+   * @param resources
+   *          BinaryResources to put in zip archive.
+   * @param avoidFileNameConflicts
+   *          If set to <tt>true</tt>, unique file names will be used to avoid {@link IOException} due to file name
+   *          conflicts. It may cause differences in file names and order between <tt>resources</tt> and the resulting
+   *          zip file.
+   * @return BinaryResource representing a zip archive.
+   */
+  public static BinaryResource zip(String zipFilename, Collection<BinaryResource> resources, boolean avoidFileNameConflicts) {
+    File tempFile = IOUtility.createTempFile("tmp", ".zip", null);
+    try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(tempFile))) {
+      Collection<BinaryResource> resourcesToZip = avoidFileNameConflicts ? getBinaryResourcesWithUniqueFileNames(resources) : resources;
+
+      for (BinaryResource res : resourcesToZip) {
+        if (res == null) {
+          continue;
+        }
+        // make sure that filename within zip are valid filenames
+        String validatedFilename = validateZipFilename(res.getFilename());
+
+        zos.putNextEntry(new ZipEntry(validatedFilename));
+        if (res.getContent() != null) {
+          zos.write(res.getContent()); //TODO imo: extend BinaryResource to support .write(OutputStream)
+        }
+        zos.closeEntry();
+      }
+      zos.flush();
+
+      zos.close(); // reading the bytes requires the zip output stream to be closed
+      byte[] zipContent = IOUtility.getContent(tempFile);
+
+      //TODO imo: BinaryResource extend to support a constructor with InputStream
+      return BinaryResources.create()
+          .withFilename(zipFilename)
+          .withContentType("application/zip")
+          .withContent(zipContent)
+          .withLastModifiedNow()
+          .build();
+    }
+    catch (IOException e) {
+      throw new ProcessingException("could not create zip file", e);
+    }
+    finally {
+      // delete no longer required temp file to free up disk space (318690)
+      //noinspection ResultOfMethodCallIgnored
+      tempFile.delete();
+    }
+  }
+
+  /**
+   * Unzips the given ZIP archive. Delegates to {@link IOUtility#unzip(byte[], Pattern)}.
+   *
+   * @see IOUtility#unzip(byte[], Pattern)
+   */
+  public static Collection<BinaryResource> unzip(BinaryResource zipArchive, Pattern filterPattern) {
+    // TODO imo: BinaryResource create a .getInputStream(), also allow to pass an
+    // InputStream to the constructor/builder of the BinaryResource.
+    try {
+      return IOUtility.unzip(zipArchive.getContent(), filterPattern);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Could not unzip archive", e);
+    }
+  }
+
+  /**
+   * Unzips the given ZIP archive.
+   *
+   * @return array of files contained in ZIP archive
+   */
+  public static File[] unzipArchive(File zipArchive) {
+    List<File> files = new LinkedList<>();
+    File tempDir = IOUtility.createTempDirectory("");
+    try {
+      FileUtility.extractArchive(zipArchive, tempDir);
+      File[] list = tempDir.listFiles();
+      if (list != null && list.length > 0) {
+        Collections.addAll(files, list);
+      }
+      return files.toArray(new File[0]);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Could not unzip archive", e);
+    }
+  }
+
+  /**
+   * Validates filename and removes illegal characters for file names within a zip archive.
+   *
+   * @see #toValidFilename(String) for details
+   */
+  public static String validateZipFilename(String origFilename) {
+    String[] tokens = StringUtility.split(origFilename, ZIP_PATH_SEPARATOR);
+    return Arrays.stream(tokens).map(FileUtility::toValidFilename).collect(Collectors.joining(ZIP_PATH_SEPARATOR));
+  }
+
+  /**
+   * Creates a new list with BinaryResources with unique file names. The order won't be preserved.</br>
+   * <p>
+   * For BinaryResources with non-unique file names a new BinaryResource is created with a counting suffix: '(x)'.
+   *
+   * @param resources
+   *          BinaryResources to put in zip archive.
+   * @return BinaryResources with unique file names
+   */
+  public static Collection<BinaryResource> getBinaryResourcesWithUniqueFileNames(Collection<BinaryResource> resources) {
+    List<BinaryResource> result = CollectionUtility.arrayList(resources);
+    boolean hasDuplicates = true;
+    while (hasDuplicates) {
+      hasDuplicates = false;
+      Map<String, List<BinaryResource>> nameMap = CollectionUtility.emptyHashMap();
+      // group BinaryResources by file name
+      for (BinaryResource binaryResource : result) {
+        String filenameLowerCase = binaryResource.getFilename().toLowerCase();
+        if (nameMap.containsKey(filenameLowerCase)) {
+          nameMap.get(filenameLowerCase).add(binaryResource);
+          hasDuplicates = true;
+        }
+        else {
+          nameMap.put(filenameLowerCase, CollectionUtility.arrayList(binaryResource));
+        }
+      }
+      result.clear();
+      // add suffix for non-unique file names and add BinaryResources to result list
+      for (Entry<String, List<BinaryResource>> entry : nameMap.entrySet()) {
+        int elementCount = CollectionUtility.size(entry.getValue());
+        if (elementCount > 1) {
+          for (int i = 1; i <= elementCount; i++) {
+            BinaryResource binaryResource = entry.getValue().get(i - 1);
+            result.add(binaryResource.createAliasWithSameExtension(
+                StringUtility.concatenateTokens(getFileName(binaryResource.getFilename(), false), "(", StringUtility.valueOf(i), ")")));
+          }
+        }
+        else {
+          result.addAll(entry.getValue());
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @return the name of the file only, optionally with included file extension
+   */
+  public static String getFileName(String filename, boolean includeFileExtension) {
+    if (StringUtility.isNullOrEmpty(filename)) {
+      return null;
+    }
+
+    String s = IOUtility.getFileName(filename);
+    if (includeFileExtension) {
+      return s;
+    }
+    if (s.lastIndexOf('.') != -1) {
+      s = s.substring(0, s.lastIndexOf('.'));
+    }
+    return s;
+  }
 }
