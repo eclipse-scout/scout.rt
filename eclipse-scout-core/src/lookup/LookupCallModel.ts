@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ObjectWithType, Session} from '../index';
+import {Session} from '../index';
 import {QueryByType} from './QueryBy';
 
-export default interface LookupCallModel<Key> extends ObjectWithType {
+export default interface LookupCallModel<Key> {
   session: Session;
   hierarchical?: boolean;
   loadIncremental?: boolean;

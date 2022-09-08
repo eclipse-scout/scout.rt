@@ -55,10 +55,7 @@ export default class HtmlEnvironment extends EventEmitter {
     this.fieldMandatoryIndicatorWidth = styles.getSize('html-env-field-mandatory-indicator' + additionalClass, 'width', 'width', this.fieldMandatoryIndicatorWidth);
     this.fieldStatusWidth = styles.getSize('html-env-field-status' + additionalClass, 'width', 'width', this.fieldStatusWidth);
 
-    let event = {
-      source: this
-    };
-    this.trigger('propertyChange', event);
+    this.trigger('propertyChange');
   }
 
   static get(): HtmlEnvironment {

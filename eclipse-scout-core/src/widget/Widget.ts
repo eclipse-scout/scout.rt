@@ -8,9 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEvent, WidgetModel} from '../index';
+import {AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, Event, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel} from '../index';
 import * as $ from 'jquery';
 import {RefWidgetModel} from './WidgetModel';
+import {ObjectType} from '../ObjectFactory';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
 export type GlassPaneContribution = JQuery | DeferredGlassPaneTarget;
@@ -39,6 +41,7 @@ interface EventDelegatorForCloning {
 
 export default class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType {
   declare model: WidgetModel;
+  declare eventMap: WidgetEventMap;
   animateRemoval: boolean;
   animateRemovalClass: string;
   attached: boolean;
@@ -79,8 +82,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   protected _cloneProperties: string[];
   protected _focusInListener: JQuery.EventHandler<HTMLElement>;
   protected _glassPaneContributions: GlassPaneContribution[];
-  protected _parentDestroyHandler: EventHandler<WidgetEvent>;
-  protected _parentRemovingWhileAnimatingHandler: EventHandler<WidgetEvent>;
+  protected _parentDestroyHandler: EventHandler;
+  protected _parentRemovingWhileAnimatingHandler: EventHandler;
   protected _postRenderActions: (() => void)[];
   protected _preserveOnPropertyChangeProperties: string[];
   protected _rendered: boolean;
@@ -316,7 +319,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
       return existingWidget;
     }
     model.parent = this;
-    return scout.create(model as ObjectWithType);
+    return scout.create(model as WidgetModel & { objectType: ObjectType<Widget> });
   }
 
   protected _initKeyStrokeContext() {
@@ -2343,6 +2346,10 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    */
   isAttachedAndRendered(): boolean {
     return (this.rendered || this.rendering) && this.$container.isAttached();
+  }
+
+  override trigger<K extends string & keyof EventMapOf<Widget>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Widget>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */

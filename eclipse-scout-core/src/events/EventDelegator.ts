@@ -72,13 +72,13 @@ export default class EventDelegator {
 
   protected _onSourceEvent(event: Event) {
     if (event.type === 'propertyChange') {
-      this._onSourcePropertyChange(event as PropertyChangeEvent<PropertyEventEmitter, any>);
+      this._onSourcePropertyChange(event as PropertyChangeEvent<any>);
     } else if (this.delegateAllEvents || this.delegateEvents.indexOf(event.type) > -1) {
       this.target.trigger(event.type, event);
     }
   }
 
-  protected _onSourcePropertyChange(event: PropertyChangeEvent<PropertyEventEmitter, any>) {
+  protected _onSourcePropertyChange(event: PropertyChangeEvent<any>) {
     if (this.excludeProperties.indexOf(event.propertyName) > -1) {
       return;
     }

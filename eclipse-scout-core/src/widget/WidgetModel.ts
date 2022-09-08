@@ -1,5 +1,6 @@
-import {Session, Widget} from '../index';
+import {DisabledStyle, LogicalGrid, Session, Widget} from '../index';
 import {PartialAndRequired} from '../types';
+import {ObjectType} from '../ObjectFactory';
 
 export default interface WidgetModel {
   /**
@@ -11,8 +12,18 @@ export default interface WidgetModel {
    * If not specified, the session of the parent widget is used
    */
   session?: Session;
-  objectType?: string | { new(): Widget };
-  // FIXME TS add missing properties
+  objectType?: ObjectType<Widget>;
+  enabled?: boolean;
+  trackFocus?: boolean;
+  scrollTop?: number;
+  scrollLeft?: number;
+  inheritAccessibility?: boolean;
+  disabledStyle?: DisabledStyle;
+  visible?: boolean;
+  cssClass?: string;
+  loading?: boolean;
+  logicalGrid?: LogicalGrid;
+
   [property: string]: any; // FIXME TS necessary for variable model properties, required?
 }
 
