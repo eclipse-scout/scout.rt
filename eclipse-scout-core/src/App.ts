@@ -9,9 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {codes, Desktop, Device, ErrorHandler, EventEmitter, EventHandler, EventListener, fonts, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage, Widget} from './index';
+import {AppEventMap, codes, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, fonts, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage, Widget} from './index';
 import $ from 'jquery';
 import {FontSpec} from './util/fonts';
+import {EventMapOf, EventModel} from './events/EventEmitter';
 
 let instance: App = null;
 let listeners: EventListener[] = [];
@@ -62,10 +63,10 @@ export interface AppBootstrapOptions {
 }
 
 export default class App extends EventEmitter {
-  static addListener(type: string, func: EventHandler): EventListener {
+  static addListener<K extends string & keyof EventMapOf<App>>(type: K, handler: EventHandler<(EventMapOf<App>)[K] & Event<App>>) {
     let listener = {
       type: type,
-      func: func
+      func: handler
     };
     if (instance) {
       instance.events.addListener(listener);
@@ -79,6 +80,7 @@ export default class App extends EventEmitter {
     return instance;
   }
 
+  declare eventMap: AppEventMap;
   initialized: boolean;
   sessions: Session[];
   errorHandler: ErrorHandler;
@@ -528,4 +530,9 @@ export default class App extends EventEmitter {
   protected _installExtensions() {
     // NOP
   }
+
+  override trigger<K extends string & keyof EventMapOf<App>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<App>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
 }
+

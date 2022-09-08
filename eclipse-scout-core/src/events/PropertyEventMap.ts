@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {WidgetModel} from '../index';
+import {EventMap, PropertyChangeEvent} from '../index';
 
-export default interface ImageModel extends WidgetModel {
-  autoFit?: boolean;
-  imageUrl?: string;
-  prepend?: boolean;
+export default interface PropertyEventMap extends EventMap {
+  'propertyChange': PropertyChangeEvent<any>;
 }
