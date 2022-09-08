@@ -196,7 +196,7 @@ export function join(separator: string, ...args: string[]): string {
  * If the given 'string' has text, it is returned with the 'prefix' and 'suffix'
  * prepended and appended, respectively. Otherwise, the empty string is returned.
  */
-export function box(prefix: string, string: string, suffix: string): string {
+export function box(prefix: string, string: string, suffix?: string): string {
   prefix = asString(prefix);
   string = asString(string);
   suffix = asString(suffix);

@@ -1,4 +1,3 @@
-/// <reference path="./jquery/jquery-scout-types.ts" />
 /*
  * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -9,6 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+
+/// <reference path="./jquery/jquery-scout-types.ts" />
 import ObjectFactory from './ObjectFactory';
 export {default as scout, ObjectWithType} from './scout';
 export {default as Event} from './events/Event';
@@ -40,6 +41,7 @@ export {SetFiltersResult, FilterResult, TextFilter, FilterElement, Filterable, U
 export {default as FilterSupport} from './widget/FilterSupport';
 export {default as FilterSupportOptions} from './widget/FilterSupportOptions';
 export {default as ModelAdapter} from './session/ModelAdapter';
+export {default as ModelAdapterModel} from './session/ModelAdapterModel';
 export {default as Widget} from './widget/Widget';
 export {DisabledStyle, GlassPaneContribution} from './widget/Widget';
 export {default as WidgetModel} from './widget/WidgetModel';
@@ -127,7 +129,9 @@ export {default as PropertyChangeEventFilter} from './session/PropertyChangeEven
 export {default as Reconnector} from './session/Reconnector';
 export {default as ResponseQueue} from './session/ResponseQueue';
 export {default as Session} from './session/Session';
+export {default as SessionModel} from './session/SessionModel';
 export {default as UserAgent} from './session/UserAgent';
+export {default as UserAgentModel} from './session/UserAgentModel';
 export {default as WidgetEventTypeFilter} from './session/WidgetEventTypeFilter';
 export {default as Dimension} from './layout/Dimension';
 export {default as Insets} from './layout/Insets';

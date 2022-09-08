@@ -8,15 +8,168 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Device, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale, logging, LogLevel, MessageBox, ModelAdapter, NullWidget, ObjectFactory, objects, Reconnector, RemoteEvent, ResponseQueue, scout, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage} from '../index';
+import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Desktop, Device, Event, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, NullWidget, ObjectFactory, objects, ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage, Widget} from '../index';
 import $ from 'jquery';
+import SessionModel from './SessionModel';
+import {AjaxCallModel} from '../ajax/AjaxCall';
+import ModelAdapterModel from './ModelAdapterModel';
+import {ObjectFactoryOptions} from '../ObjectFactory';
+import {JsonErrorResponse} from '../App';
+import {ModelAdapterLike} from './ModelAdapter';
+import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
 
-export default class Session extends EventEmitter {
+export interface Request extends RequestData {
+  uiSessionId: string;
+  '#'?: number;
+  '#ACK'?: number;
+  event: {
+    target: string;
+    type: string;
+  };
+}
+
+export interface RequestData {
+  events?: RemoteEvent[];
+  clientSessionId?: string;
+  syncResponseQueue?: boolean;
+  log?: boolean;
+  message?: string;
+  level?: LogLevel;
+  startup?: boolean;
+  unload?: boolean;
+  cancel?: boolean;
+  ping?: boolean;
+  partId?: number;
+  version?: string;
+  userAgent?: UserAgent;
+  sessionStartupParams?: SessionStartupParams;
+  showBusyIndicator?: boolean;
+  pollForBackgroundJobs?: boolean;
+}
+
+export interface AdapterData extends ObjectWithType {
+  [name: string]: any;
+}
+
+export interface Response {
+  '#'?: number;
+  adapterData?: Record<string, AdapterData>;
+  events?: RemoteEvent[];
+  error?: JsonErrorResponse;
+  redirectUrl?: string;
+  sessionTerminated?: boolean;
+  combined?: boolean;
+}
+
+export interface SessionStartupResponse extends Response {
+  startupData?: {
+    uiSessionId?: string;
+    clientSessionId?: string;
+    clientSession?: string;
+    reloadPage?: boolean;
+    pollingInterval?: number;
+    persistent?: boolean;
+    inDevelopmentMode?: boolean;
+    inspector?: boolean;
+    locale?: LocaleModel;
+    textMap?: TextMap;
+  };
+}
+
+export interface SessionStartupParams {
+  url?: string;
+  geolocationServiceAvailable?: boolean;
+
+  [p: string]: any; // all URL parameters
+}
+
+export interface FatalMessageOptions {
+  header?: string;
+  body?: string;
+  severity?: number;
+  iconId?: string;
+  entryPoint?: JQuery;
+
+  hiddenText?: string;
+  yesButtonText?: string;
+  yesButtonAction?: () => void;
+
+  noButtonText?: string;
+  noButtonAction?: () => void;
+
+  cancelButtonText?: string;
+  cancelButtonAction?: () => void;
+}
+
+export default class Session extends EventEmitter implements ModelAdapterLike {
+  declare model: SessionModel;
+  partId: number;
+  url: URL;
+  userAgent: UserAgent;
+  locale: Locale;
+  textMap: TextMap;
+  /** true after desktop has been completely rendered */
+  ready: boolean;
+  /** true when 'beforeOnload' event has been triggered */
+  unloading: boolean;
+  /** true after unload event has been received from the window */
+  unloaded: boolean;
+  loggedOut: boolean;
+  inspector: boolean;
+  persistent: boolean;
+  offline: boolean;
+  inDevelopmentMode: boolean;
+  desktop: Desktop;
+  layoutValidator: LayoutValidator;
+  focusManager: FocusManager;
+  keyStrokeManager: KeyStrokeManager;
+  /** assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern). */
+  uiSessionId: string;
+  clientSessionId: string;
+  forceNewClientSession: boolean;
+  remoteUrl: string;
+  unloadUrl: string;
+  modelAdapterRegistry: Record<string, ModelAdapterLike>;
+  ajaxCalls: AjaxCall[];
+  asyncEvents: RemoteEvent[];
+  currentEvent: RemoteEvent;
+  responseQueue: ResponseQueue;
+  requestsPendingCounter: number;
+  suppressErrors: boolean;
+  /** ms */
+  requestTimeoutCancel: number;
+  /** ms, depends on polling interval, will therefore be initialized on startup */
+  requestTimeoutPoll: number;
+  /** ms */
+  requestTimeoutPing: number;
+  backgroundJobPollingSupport: BackgroundJobPollingSupport;
+  reconnector: Reconnector;
+  processingEvents: boolean;
+  /** This property is enabled by URL parameter &adapterExportEnabled=1. Default is false */
+  adapterExportEnabled: boolean;
+  requestSequenceNo: number;
+  ajaxCallOptions: AjaxCallModel;
+  rootAdapter: ModelAdapter;
+  root: Widget;
+  widget: Widget; // same as root
+  $entryPoint: JQuery;
+
+  protected _adapterDataCache: Record<string, AdapterData>;
+  protected _busy: boolean;
+  protected _busyIndicator: BusyIndicator;
+  protected _busyIndicatorTimeoutId: number;
+  protected _deferredEventTypes: string[];
+  protected _deferred: JQuery.Deferred<string[], never, never>;
+  protected _fatalMessagesOnScreen: Record<string, boolean>;
+  protected _retryRequest: any;
+  protected _queuedRequest: Request;
+  protected _asyncDelay: number;
+  protected _sendTimeoutId: number;
+
   constructor() {
     super();
     this.$entryPoint = null;
     this.partId = 0;
-
     this.url = new URL();
     this.userAgent = new UserAgent({
       deviceType: Device.get().type,
@@ -25,20 +178,19 @@ export default class Session extends EventEmitter {
     });
     this.locale = new Locale(); // Ensure there is always a locale even if not passed and startup request fails
     this.textMap = new TextMap();
-
-    this.ready = false; // true after desktop has been completely rendered
-    this.unloading = false; // true when 'beforeOnload' event has been triggered
-    this.unloaded = false; // true after unload event has been received from the window
+    this.ready = false;
+    this.unloading = false;
+    this.unloaded = false;
     this.loggedOut = false;
     this.inspector = false;
     this.persistent = false;
+    this.offline = false;
     this.inDevelopmentMode = false;
     this.desktop = null;
     this.layoutValidator = new LayoutValidator();
     this.focusManager = null;
     this.keyStrokeManager = null;
-
-    this.uiSessionId = null; // assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
+    this.uiSessionId = null;
     this.clientSessionId = this._getClientSessionIdFromStorage();
     this.forceNewClientSession = false;
     this.remoteUrl = 'json';
@@ -46,17 +198,16 @@ export default class Session extends EventEmitter {
     this.modelAdapterRegistry = {};
     this.ajaxCalls = [];
     this.asyncEvents = [];
+    this.currentEvent = null;
     this.responseQueue = new ResponseQueue(this);
     this.requestsPendingCounter = 0;
     this.suppressErrors = false;
-    this.requestTimeoutCancel = 5000; // ms
-    this.requestTimeoutPoll = 75000; // ms, depends on polling interval, will therefore be initialized on startup
-    this.requestTimeoutPing = 5000; // ms
+    this.requestTimeoutCancel = 5000;
+    this.requestTimeoutPoll = 75000;
+    this.requestTimeoutPing = 5000;
     this.backgroundJobPollingSupport = new BackgroundJobPollingSupport(true);
     this.reconnector = new Reconnector(this);
     this.processingEvents = false;
-
-    // This property is enabled by URL parameter &adapterExportEnabled=1. Default is false
     this.adapterExportEnabled = false;
     this._adapterDataCache = {};
     this._busy = false;
@@ -67,8 +218,8 @@ export default class Session extends EventEmitter {
     this._retryRequest = null;
     this._queuedRequest = null;
     this.requestSequenceNo = 0;
-
     this.rootAdapter = new ModelAdapter();
+    this.ajaxCallOptions = null;
     this.rootAdapter.init({
       session: this,
       id: '1',
@@ -78,12 +229,12 @@ export default class Session extends EventEmitter {
     let rootParent = new NullWidget();
     rootParent.session = this;
     rootParent.initialized = true;
-
     this.root = this.rootAdapter.createWidget({
       session: this,
       id: '1',
       objectType: 'NullWidget'
     }, rootParent);
+    this.widget = this.root;
   }
 
   // Corresponds to constants in JsonResponse
@@ -94,48 +245,14 @@ export default class Session extends EventEmitter {
     UNSAFE_UPLOAD: 30,
     REJECTED_UPLOAD: 31,
     VERSION_MISMATCH: 40
-  };
+  } as const;
 
   // Placeholder string for an empty filename
   static EMPTY_UPLOAD_FILENAME = '*empty*';
 
-  /**
-   * @param {$} model.$entryPoint
-   *     The HTML element that is used by the {@link Desktop} to render its content.
-   * @param {string} [model.portletPartId]
-   *     Necessary when multiple UI sessions are managed by the same window (portlet support).
-   *     Each session's partId must be unique. Default is 0.
-   * @param {string} [model.clientSessionId]
-   *     Identifies the 'client instance' on the UI server. If the property is not set
-   *     (which is the default case), the clientSessionId is taken from the browser's
-   *     session storage (per browser window, survives F5 refresh of page). If no
-   *     clientSessionId can be found, a new one is generated on the server.
-   * @param {boolean} [model.forceNewClientSession]
-   *     If set to true, the stored or passed clientSessionId will be ignored
-   *     and a new one generated by the server.
-   * @param {UserAgent} [model.userAgent]
-   *     By default the user agent for the running platform is used. Use this option if you want to set a custom one.
-   * @param {Locale|object} [model.locale]
-   *     If not specified, {@link Locale.DEFAULT} is used.
-   * @param {boolean} [model.backgroundJobPollingEnabled]
-   *     Unless websockets is used, this property turns on (default) or off background
-   *     polling using an async ajax call together with setTimeout()
-   * @param {boolean} [model.suppressErrors]
-   *     Basically added because of Jasmine-tests. When working with async tests that
-   *     use setTimeout(), sometimes the Jasmine-Maven plug-in fails and aborts the
-   *     build because there were console errors. These errors always happen in this
-   *     class. That's why we can skip suppress error handling with this flag.
-   * @param {boolean} [model.focusManagerActive]
-   *     Forces the focus manager to be active or not. If undefined, the value is
-   *     auto detected by Device.js.
-   * @param {object} [model.reconnectorOptions]
-   *     Properties of this object are copied to the Session's reconnector
-   *     instance (see {@link Reconnector}).
-   * @param {object} [model.ajaxCallOptions]
-   *     Properties of this object are copied to all instances of {@link AjaxCall}.
-   */
-  init(model) {
-    let options = model || {};
+
+  init(model: SessionModel) {
+    let options = model || {} as SessionModel;
 
     if (!options.$entryPoint) {
       throw new Error('$entryPoint is not defined');
@@ -180,28 +297,28 @@ export default class Session extends EventEmitter {
     });
   }
 
-  _throwError(message) {
+  protected _throwError(message?: string) {
     if (!this.suppressErrors) {
       throw new Error(message);
     }
   }
 
-  unregisterModelAdapter(modelAdapter) {
+  unregisterModelAdapter(modelAdapter: ModelAdapter) {
     delete this.modelAdapterRegistry[modelAdapter.id];
   }
 
-  registerModelAdapter(modelAdapter) {
+  registerModelAdapter(modelAdapter: ModelAdapter) {
     if (modelAdapter.id === undefined) {
       throw new Error('modelAdapter.id must be defined');
     }
     this.modelAdapterRegistry[modelAdapter.id] = modelAdapter;
   }
 
-  getModelAdapter(id) {
+  getModelAdapter(id: string): ModelAdapterLike {
     return this.modelAdapterRegistry[id];
   }
 
-  getWidget(adapterId) {
+  getWidget(adapterId: string): Widget {
     if (!adapterId) {
       return null;
     }
@@ -215,7 +332,7 @@ export default class Session extends EventEmitter {
     return adapter.widget;
   }
 
-  getOrCreateWidget(adapterId, parent, strict) {
+  getOrCreateWidget(adapterId: string, parent: Widget, strict?: boolean): Widget {
     if (!adapterId) {
       return null;
     }
@@ -237,9 +354,9 @@ export default class Session extends EventEmitter {
     return adapter.createWidget(adapterData, parent);
   }
 
-  createModelAdapter(adapterData) {
+  createModelAdapter(adapterData: AdapterData): ModelAdapter {
     let objectType = adapterData.objectType;
-    let createOpts = {};
+    let createOpts = {} as ObjectFactoryOptions;
 
     let objectInfo = TypeDescriptor.parse(objectType);
     if (objectInfo.modelVariant) {
@@ -252,11 +369,11 @@ export default class Session extends EventEmitter {
     }
 
     // TODO [7.0] bsh, cgu: Add classId/modelClass? Think about if IDs should be different for widgets (maybe prefix with 'w')
-    let adapterModel = {
+    let adapterModel: ModelAdapterModel = {
       id: adapterData.id,
       session: this
     };
-    let adapter = scout.create(objectType, adapterModel, createOpts);
+    let adapter = scout.create(objectType, adapterModel, createOpts) as ModelAdapter;
     $.log.isTraceEnabled() && $.log.trace('created new adapter ' + adapter);
     return adapter;
   }
@@ -267,7 +384,7 @@ export default class Session extends EventEmitter {
    * during the same user interaction, the events are collected and sent in one
    * request at the end of the user interaction
    */
-  sendEvent(event, delay) {
+  sendEvent(event: RemoteEvent, delay?: number) {
     delay = delay || 0;
 
     this.asyncEvents = this._coalesceEvents(this.asyncEvents, event);
@@ -288,7 +405,7 @@ export default class Session extends EventEmitter {
     }, this._asyncDelay);
   }
 
-  _sendStartupRequest() {
+  protected _sendStartupRequest(): JQuery.Promise<any> {
     // Build startup request (see JavaDoc for JsonStartupRequest.java for details)
     let request = this._newRequest({
       startup: true
@@ -314,14 +431,14 @@ export default class Session extends EventEmitter {
 
     // ----- Helper methods -----
 
-    function onAjaxDone(data) {
+    function onAjaxDone(data: SessionStartupResponse): void | JQuery.Promise<any> {
       this._processStartupResponse(data);
       if (data.error) {
         return $.rejectedPromise(data);
       }
     }
 
-    function onAjaxFail(jqXHR, textStatus, errorThrown, ...args) {
+    function onAjaxFail(jqXHR: JQuery.jqXHR, textStatus: ErrorTextStatus, errorThrown: string, ...args: any[]): JQuery.Promise<any> {
       this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
       return $.rejectedPromise(jqXHR, textStatus, errorThrown, ...args);
     }
@@ -338,7 +455,7 @@ export default class Session extends EventEmitter {
    *
    * Additionally, all query parameters from the URL are put in the resulting object.
    */
-  _createSessionStartupParams() {
+  protected _createSessionStartupParams(): SessionStartupParams {
     let params = {
       url: this.url.baseUrlRaw,
       geolocationServiceAvailable: Device.get().supportsGeolocation()
@@ -352,19 +469,7 @@ export default class Session extends EventEmitter {
     return params;
   }
 
-  /**
-   * @param {[]} data.adapterData
-   * @param {[]} data.events
-   * @param data.startupData
-   * @param data.startupData.clientSession
-   * @param data.startupData.clientSessionId
-   * @param data.startupData.pollingInterval
-   * @param data.startupData.persistent
-   * @param data.startupData.inDevelopmentMode
-   * @param data.error
-   * @param data.sessionTerminated
-   */
-  _processStartupResponse(data) {
+  protected _processStartupResponse(data: SessionStartupResponse) {
     // Handle errors from server
     if (data.error) {
       this._processErrorJsonResponse(data.error);
@@ -410,7 +515,7 @@ export default class Session extends EventEmitter {
     this.requestTimeoutPoll = (data.startupData.pollingInterval + 15) * 1000;
 
     // Register UI session
-    this.modelAdapterRegistry[this.uiSessionId] = this; // TODO [7.0] cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
+    this.modelAdapterRegistry[this.uiSessionId] = this; // TODO [7.0] cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have root adapter as parent, see 406
 
     // Store adapters to adapter data cache
     if (data.adapterData) {
@@ -424,7 +529,8 @@ export default class Session extends EventEmitter {
     // Create the desktop
     // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
     let clientSessionData = this._getAdapterData(data.startupData.clientSession);
-    this.desktop = this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter.widget);
+    this.desktop = (this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter.widget) as unknown) as Desktop;
+    // @ts-ignore
     App.get()._triggerDesktopReady(this.desktop);
 
     let renderDesktopImpl = function() {
@@ -448,6 +554,7 @@ export default class Session extends EventEmitter {
       this._resumeBackgroundJobPolling();
 
       this.ready = true;
+      // @ts-ignore
       App.get()._triggerSessionReady(this);
 
       $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + Device.get());
@@ -460,7 +567,7 @@ export default class Session extends EventEmitter {
     this.render(renderDesktopImpl);
   }
 
-  _storeClientSessionIdInStorage(clientSessionId) {
+  protected _storeClientSessionIdInStorage(clientSessionId: string) {
     let key = 'scout:clientSessionId';
     webstorage.removeItemFromSessionStorage(key);
     webstorage.removeItemFromLocalStorage(key);
@@ -471,7 +578,7 @@ export default class Session extends EventEmitter {
     }
   }
 
-  _getClientSessionIdFromStorage() {
+  protected _getClientSessionIdFromStorage(): string {
     let key = 'scout:clientSessionId';
     let id = webstorage.getItemFromSessionStorage(key);
     if (!id) {
@@ -481,7 +588,7 @@ export default class Session extends EventEmitter {
     return id;
   }
 
-  render(renderFunc) {
+  render(renderFunc: () => void) {
     // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
     if (fonts.loadingComplete) {
       renderFunc();
@@ -490,7 +597,7 @@ export default class Session extends EventEmitter {
     }
   }
 
-  _sendUnloadRequest() {
+  protected _sendUnloadRequest() {
     let request = this._newRequest({
       unload: true,
       showBusyIndicator: false
@@ -499,14 +606,14 @@ export default class Session extends EventEmitter {
     this._sendRequest(request);
   }
 
-  _sendNow() {
+  protected _sendNow() {
     if (this.asyncEvents.length === 0) {
       // Nothing to send -> return
       return;
     }
     // If an event requires a new request, only the previous events are sent now.
     // The next requests are send the next time _sendNow is called (-> when the response to the current request arrives)
-    let events = [];
+    let events: RemoteEvent[] = [];
     this.asyncEvents.some((event, i) => {
       if (event.newRequest && events.length > 0) {
         return true;
@@ -518,9 +625,7 @@ export default class Session extends EventEmitter {
       events: events
     });
     // Busy indicator required when at least one event requests it
-    request.showBusyIndicator = request.events.some(event => {
-      return scout.nvl(event.showBusyIndicator, true);
-    });
+    request.showBusyIndicator = request.events.some(event => scout.nvl(event.showBusyIndicator, true));
     this.responseQueue.prepareRequest(request);
     // Send request
     this._sendRequest(request);
@@ -528,7 +633,7 @@ export default class Session extends EventEmitter {
     this.asyncEvents = this.asyncEvents.slice(events.length);
   }
 
-  _coalesceEvents(previousEvents, event) {
+  protected _coalesceEvents(previousEvents: RemoteEvent[], event: RemoteEvent): RemoteEvent[] {
     if (!event.coalesce) {
       return previousEvents;
     }
@@ -536,7 +641,7 @@ export default class Session extends EventEmitter {
     return previousEvents.filter(filter);
   }
 
-  _sendRequest(request) {
+  protected _sendRequest(request: Request) {
     if (!request) {
       return; // nothing to send
     }
@@ -576,7 +681,7 @@ export default class Session extends EventEmitter {
     this._performUserAjaxRequest(ajaxOptions, busyHandling, request);
   }
 
-  _handleSendWhenOffline(request) {
+  protected _handleSendWhenOffline(request: Request) {
     // No need to queue the request when request does not contain events (e.g. log request, unload request)
     if (!request.events) {
       return;
@@ -600,11 +705,11 @@ export default class Session extends EventEmitter {
     this.layoutValidator.validate();
   }
 
-  defaultAjaxOptions(request) {
+  defaultAjaxOptions(request: Request): JQuery.AjaxSettings {
     request = request || this._newRequest();
     let url = this._decorateUrl(this.remoteUrl, request);
 
-    let ajaxOptions = {
+    let ajaxOptions: JQuery.AjaxSettings = {
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json; charset=UTF-8',
@@ -629,7 +734,7 @@ export default class Session extends EventEmitter {
     return ajaxOptions;
   }
 
-  _decorateUrl(url, request) {
+  protected _decorateUrl(url: string, request: Request): string {
     let urlHint = null;
     // Add dummy URL parameter as marker (for debugging purposes)
     if (request.unload) {
@@ -646,13 +751,12 @@ export default class Session extends EventEmitter {
       urlHint = 'sync';
     }
     if (urlHint) {
-      url = new URL(url).addParameter(urlHint)
-        .toString();
+      url = new URL(url).addParameter(urlHint, '').toString();
     }
     return url;
   }
 
-  _getRequestName(request, defaultName) {
+  protected _getRequestName(request: Request, defaultName: string): string {
     if (request) {
       if (request.unload) {
         return 'unload';
@@ -671,8 +775,8 @@ export default class Session extends EventEmitter {
     return defaultName;
   }
 
-  _requestToJson(request) {
-    return JSON.stringify(request, function(key, value) {
+  protected _requestToJson(request: Request): string {
+    return JSON.stringify(request, function(key: string, value: any) {
       // Replacer function that filter certain properties from the resulting JSON string.
       // See https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
       let ignore =
@@ -682,7 +786,7 @@ export default class Session extends EventEmitter {
     });
   }
 
-  _callAjax(callOptions) {
+  protected _callAjax(callOptions?: AjaxCallModel) {
     let defaultOptions = {
       retryIntervals: [100, 500, 500, 500]
     };
@@ -694,7 +798,7 @@ export default class Session extends EventEmitter {
       .always(this.unregisterAjaxCall.bind(this, ajaxCall));
   }
 
-  _performUserAjaxRequest(ajaxOptions, busyHandling, request) {
+  protected _performUserAjaxRequest(ajaxOptions: JQuery.AjaxSettings, busyHandling: boolean, request?: Request) {
     if (busyHandling) {
       this.setBusy(true);
     }
@@ -705,7 +809,6 @@ export default class Session extends EventEmitter {
 
     this._callAjax({
       ajaxOptions: ajaxOptions,
-      request: request,
       name: this._getRequestName(request, 'user request')
     })
       .done(onAjaxDone.bind(this))
@@ -714,7 +817,7 @@ export default class Session extends EventEmitter {
 
     // ----- Helper methods -----
 
-    function onAjaxDone(data) {
+    function onAjaxDone(data: Response) {
       try {
         // Busy handling is remove _before_ processing the response, otherwise the focus cannot be set
         // correctly, because the glasspane of the busy indicator is still visible.
@@ -729,7 +832,7 @@ export default class Session extends EventEmitter {
       }
     }
 
-    function onAjaxFail(ajaxError) {
+    function onAjaxFail(ajaxError: { jqXHR: JQuery.jqXHR; textStatus: ErrorTextStatus; errorThrown: string }) {
       try {
         if (busyHandling) {
           this.setBusy(false);
@@ -743,7 +846,7 @@ export default class Session extends EventEmitter {
     // Variable arguments:
     // "done" --> data, textStatus, jqXHR
     // "fail" --> jqXHR, textStatus, errorThrown
-    function onAjaxAlways(data, textStatus, errorThrown) {
+    function onAjaxAlways(data: Response | JQuery.jqXHR, textStatus: JQuery.Ajax.TextStatus, errorThrown: string | JQuery.jqXHR) {
       this.setRequestPending(false);
 
       // "success" is false when either
@@ -788,35 +891,31 @@ export default class Session extends EventEmitter {
     }
   }
 
-  registerAjaxCall(ajaxCall) {
+  registerAjaxCall(ajaxCall: AjaxCall) {
     this.ajaxCalls.push(ajaxCall);
   }
 
-  unregisterAjaxCall(ajaxCall) {
+  unregisterAjaxCall(ajaxCall: AjaxCall) {
     arrays.remove(this.ajaxCalls, ajaxCall);
   }
 
   interruptAllAjaxCalls() {
     // Because the error handlers alter the "this.ajaxCalls" array,
     // the loop must operate on a copy of the original array!
-    this.ajaxCalls.slice().forEach(ajaxCall => {
-      ajaxCall.pendingCall && ajaxCall.pendingCall.abort();
-    });
+    this.ajaxCalls.slice().forEach(ajaxCall => ajaxCall.pendingCall && ajaxCall.pendingCall.abort());
   }
 
   abortAllAjaxCalls() {
     // Because the error handlers alter the "this.ajaxCalls" array,
     // the loop must operate on a copy of the original array!
-    this.ajaxCalls.slice().forEach(ajaxCall => {
-      ajaxCall.abort();
-    });
+    this.ajaxCalls.slice().forEach(ajaxCall => ajaxCall.abort());
   }
 
   /**
    * (Re-)starts background job polling when not started yet or when an error occurred while polling.
    * In the latter case, polling is resumed when a user-initiated request has been successful.
    */
-  _resumeBackgroundJobPolling() {
+  protected _resumeBackgroundJobPolling() {
     if (this.backgroundJobPollingSupport.enabled && this.backgroundJobPollingSupport.status !== BackgroundJobPollingStatus.RUNNING) {
       $.log.isInfoEnabled() && $.log.info('Resume background jobs polling request, status was=' + this.backgroundJobPollingSupport.status);
       this._pollForBackgroundJobs();
@@ -829,7 +928,7 @@ export default class Session extends EventEmitter {
    * the server doesn't return until either a time-out occurs or there's something in the response when
    * a model job is done and no request initiated by a user is running.
    */
-  _pollForBackgroundJobs() {
+  protected _pollForBackgroundJobs() {
     this.backgroundJobPollingSupport.setRunning();
 
     let request = this._newRequest({
@@ -841,7 +940,6 @@ export default class Session extends EventEmitter {
 
     this._callAjax({
       ajaxOptions: ajaxOptions,
-      request: request,
       name: this._getRequestName(request, 'request')
     })
       .done(onAjaxDone.bind(this))
@@ -849,7 +947,7 @@ export default class Session extends EventEmitter {
 
     // --- Helper methods ---
 
-    function onAjaxDone(data) {
+    function onAjaxDone(data: Response) {
       if (data.error) {
         // Don't schedule a new polling request, when an error occurs
         // when the next user-initiated request succeeds, we re-enable polling
@@ -890,7 +988,7 @@ export default class Session extends EventEmitter {
       }
     }
 
-    function onAjaxFail(ajaxError) {
+    function onAjaxFail(ajaxError: { jqXHR: JQuery.jqXHR; textStatus: ErrorTextStatus; errorThrown: string }) {
       this.backgroundJobPollingSupport.setFailed();
       this._processErrorResponse(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown, request);
     }
@@ -903,7 +1001,7 @@ export default class Session extends EventEmitter {
    *
    * Otherwise, the response queue's expected sequence number will get out of sync.
    */
-  processJsonResponseInternal(data) {
+  processJsonResponseInternal(data: Response) {
     let success = false;
     if (data.error) {
       this._processErrorJsonResponse(data.error);
@@ -914,7 +1012,7 @@ export default class Session extends EventEmitter {
     return success;
   }
 
-  _processSuccessResponse(message) {
+  protected _processSuccessResponse(message: Response) {
     if (message.adapterData) {
       this._copyAdapterData(message.adapterData);
     }
@@ -936,7 +1034,7 @@ export default class Session extends EventEmitter {
     }
   }
 
-  _copyAdapterData(adapterData) {
+  protected _copyAdapterData(adapterData: Record<string, AdapterData>) {
     let count = 0;
     let prop;
 
@@ -949,13 +1047,10 @@ export default class Session extends EventEmitter {
     }
   }
 
-  /**
-   * @param textStatus 'timeout', 'abort', 'error' or 'parseerror' (see http://api.jquery.com/jquery.ajax/)
-   */
-  _processErrorResponse(jqXHR, textStatus, errorThrown, request) {
+  protected _processErrorResponse(jqXHR: JQuery.jqXHR, textStatus: ErrorTextStatus, errorThrown: string, request: Request) {
     $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
-    let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown, request);
+    let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown);
     if (offlineError) {
       if (this.ready) {
         this.goOffline();
@@ -971,7 +1066,7 @@ export default class Session extends EventEmitter {
     // Show error message
     let boxOptions = {
       header: this.optText('ui.NetworkError', 'Network error'),
-      body: strings.join(' ', jqXHR.status || '', errorThrown),
+      body: strings.join(' ', (jqXHR.status + '') || '', errorThrown),
       yesButtonText: this.optText('ui.Reload', 'Reload'),
       yesButtonAction: () => scout.reloadPage(),
       iconId: icons.SLIPPERY
@@ -979,7 +1074,7 @@ export default class Session extends EventEmitter {
     this.showFatalMessage(boxOptions, jqXHR.status + '.net');
   }
 
-  _processErrorJsonResponse(jsonError) {
+  protected _processErrorJsonResponse(jsonError: JsonErrorResponse) {
     if (jsonError.code === Session.JsonResponseError.VERSION_MISMATCH) {
       let loopDetection = webstorage.getItemFromSessionStorage('scout:versionMismatch');
       if (!loopDetection) {
@@ -999,13 +1094,13 @@ export default class Session extends EventEmitter {
 
     // Default values for fatal message boxes
     let boxOptions = {
-      header: this.optText('ui.ServerError', 'Server error') + ' (' + this.optText('ui.ErrorCodeX', 'Code ' + jsonError.code, jsonError.code) + ')',
+      header: this.optText('ui.ServerError', 'Server error') + ' (' + this.optText('ui.ErrorCodeX', 'Code ' + jsonError.code, jsonError.code + '') + ')',
       body: jsonError.message,
       yesButtonText: this.optText('ui.Reload', 'Reload'),
       yesButtonAction: () => {
         scout.reloadPage();
       }
-    };
+    } as FatalMessageOptions;
 
     // Customize for specific error codes
     if (jsonError.code === Session.JsonResponseError.STARTUP_FAILED) {
@@ -1031,19 +1126,15 @@ export default class Session extends EventEmitter {
       boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
-      boxOptions.yesButtonAction = () => {
-      };
     } else if (jsonError.code === Session.JsonResponseError.REJECTED_UPLOAD) {
       boxOptions.header = this.optText('ui.RejectedUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.RejectedUploadMsg', boxOptions.body);
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
-      boxOptions.yesButtonAction = () => {
-      };
     }
-    this.showFatalMessage(boxOptions, jsonError.code);
+    this.showFatalMessage(boxOptions, jsonError.code + '');
   }
 
-  _fireRequestFinished(message) {
+  protected _fireRequestFinished(message: Response) {
     if (!this._deferred) {
       return;
     }
@@ -1068,7 +1159,7 @@ export default class Session extends EventEmitter {
    *          If defined, a second call to this method with the same errorCode will
    *          do nothing. Can be used to prevent double messages for the same error.
    */
-  showFatalMessage(options, errorCode) {
+  showFatalMessage(options: FatalMessageOptions, errorCode?: string) {
     if (!errorCode) {
       errorCode = App.get().errorHandler.getJsErrorCode();
     }
@@ -1080,7 +1171,7 @@ export default class Session extends EventEmitter {
     options = options || {};
     let model = {
         session: this,
-        parent: this.desktop || new NullWidget(),
+        parent: (this.desktop || new NullWidget()) as Widget,
         iconId: options.iconId,
         severity: scout.nvl(options.severity, Status.Severity.ERROR),
         header: options.header,
@@ -1096,7 +1187,8 @@ export default class Session extends EventEmitter {
     messageBox.on('action', event => {
       delete this._fatalMessagesOnScreen[errorCode];
       messageBox.destroy();
-      let option = event.option;
+      // @ts-ignore
+      let option = event.option; // FIXME TS: migrate as soon as MessageBoxEventMap has been created
       if (option === 'yes' && options.yesButtonAction) {
         options.yesButtonAction.apply(this);
       } else if (option === 'no' && options.noButtonAction) {
@@ -1108,13 +1200,13 @@ export default class Session extends EventEmitter {
     messageBox.render($entryPoint);
   }
 
-  isFatalMessageShown() {
+  isFatalMessageShown(): boolean {
     return Object.keys(this._fatalMessagesOnScreen).length > 0;
   }
 
-  uploadFiles(target, files, uploadProperties, maxTotalSize, allowedTypes) {
+  uploadFiles(target: Widget, files: (File & { scoutName?: string })[], uploadProperties?: Record<string, string | Blob>, maxTotalSize?: number, allowedTypes?: string[]): boolean {
     let formData = new FormData(),
-      acceptedFiles = [];
+      acceptedFiles: File[] = [];
 
     if (uploadProperties) {
       $.each(uploadProperties, (key, value) => {
@@ -1140,9 +1232,9 @@ export default class Session extends EventEmitter {
 
     // very large files must not be sent to server otherwise the whole system might crash (for all users).
     if (!fileUtil.validateMaximumUploadSize(acceptedFiles, maxTotalSize)) {
-      let boxOptions = {
+      let boxOptions: FatalMessageOptions = {
         header: this.text('ui.FileSizeLimitTitle'),
-        body: this.text('ui.FileSizeLimit', maxTotalSize / 1024 / 1024),
+        body: this.text('ui.FileSizeLimit', (maxTotalSize / 1024 / 1024) + ''),
         yesButtonText: this.optText('Ok', 'Ok')
       };
 
@@ -1150,7 +1242,7 @@ export default class Session extends EventEmitter {
       return false;
     }
 
-    let uploadAjaxOptions = {
+    let uploadAjaxOptions: JQuery.AjaxSettings = {
       type: 'POST',
       url: 'upload/' + this.uiSessionId + '/' + target.id,
       cache: false,
@@ -1160,10 +1252,6 @@ export default class Session extends EventEmitter {
       contentType: false,
       data: formData
     };
-    // Special handling for FormData polyfill
-    if (formData.polyfill) {
-      formData.applyToAjaxOptions(uploadAjaxOptions);
-    }
     this.responseQueue.prepareHttpRequest(uploadAjaxOptions);
 
     let busyHandling = !this.areRequestsPending();
@@ -1225,7 +1313,7 @@ export default class Session extends EventEmitter {
     }
   }
 
-  listen() {
+  listen(): JQuery.Deferred<string[], never, never> {
     if (!this._deferred) {
       this._deferred = $.Deferred();
       this._deferredEventTypes = [];
@@ -1238,7 +1326,7 @@ export default class Session extends EventEmitter {
    * @param func callback function
    * @param vararg arguments to pass to the callback function
    */
-  onRequestsDone(func, ...vararg) {
+  onRequestsDone(func: (...args: any[]) => void, ...vararg: any[]) {
     if (this.areRequestsPending() || this.areEventsQueued()) {
       this.listen().done(onEventsProcessed);
     } else {
@@ -1255,7 +1343,7 @@ export default class Session extends EventEmitter {
    * @param func callback function
    * @param vararg arguments to pass to the callback function
    */
-  onEventsProcessed(func, ...vararg) {
+  onEventsProcessed(func: (...args: any[]) => void, ...vararg: any[]) {
     if (this.processingEvents) {
       this.one('eventsProcessed', execFunc);
     } else {
@@ -1267,25 +1355,23 @@ export default class Session extends EventEmitter {
     }
   }
 
-  areEventsQueued() {
+  areEventsQueued(): boolean {
     return this.asyncEvents.length > 0;
   }
 
-  areBusyIndicatedEventsQueued() {
-    return this.asyncEvents.some(event => {
-      return scout.nvl(event.showBusyIndicator, true);
-    });
+  areBusyIndicatedEventsQueued(): boolean {
+    return this.asyncEvents.some(event => scout.nvl(event.showBusyIndicator, true));
   }
 
-  areResponsesQueued() {
+  areResponsesQueued(): boolean {
     return this.responseQueue.size() > 0;
   }
 
-  areRequestsPending() {
+  areRequestsPending(): boolean {
     return this.requestsPendingCounter > 0;
   }
 
-  setRequestPending(pending) {
+  setRequestPending(pending: boolean) {
     if (pending) {
       this.requestsPendingCounter++;
     } else {
@@ -1299,7 +1385,7 @@ export default class Session extends EventEmitter {
     }
   }
 
-  setBusy(busy) {
+  setBusy(busy: boolean) {
     if (busy) {
       if (!this._busy) {
         this._renderBusy();
@@ -1313,7 +1399,7 @@ export default class Session extends EventEmitter {
     }
   }
 
-  _renderBusy() {
+  protected _renderBusy() {
     if (this._busyIndicatorTimeoutId !== null && this._busyIndicatorTimeoutId !== undefined) {
       // Do not schedule it twice
       return;
@@ -1329,6 +1415,7 @@ export default class Session extends EventEmitter {
         return; // No busy indicator without desktop (e.g. during shutdown)
       }
       this._busyIndicator = scout.create(BusyIndicator, {
+        // @ts-ignore
         parent: this.desktop
       });
       this._busyIndicator.on('cancel', this._onCancelProcessing.bind(this));
@@ -1336,7 +1423,7 @@ export default class Session extends EventEmitter {
     }, 500);
   }
 
-  _removeBusy() {
+  protected _removeBusy() {
     // Clear pending timer
     clearTimeout(this._busyIndicatorTimeoutId);
     this._busyIndicatorTimeoutId = null;
@@ -1348,7 +1435,7 @@ export default class Session extends EventEmitter {
     }
   }
 
-  _onCancelProcessing(event) {
+  protected _onCancelProcessing(event: Event) {
     let busyIndicator = this._busyIndicator;
     if (!busyIndicator) {
       return; // removed in the mean time
@@ -1363,7 +1450,7 @@ export default class Session extends EventEmitter {
     this._sendCancelRequest();
   }
 
-  _sendCancelRequest() {
+  protected _sendCancelRequest() {
     let request = this._newRequest({
       cancel: true,
       showBusyIndicator: false
@@ -1374,10 +1461,10 @@ export default class Session extends EventEmitter {
   /**
    * Sends a request containing the log message for logging purpose.
    * The request is sent immediately (does not await pending requests).
-   * @param {string} message the log message
-   * @param {LogLevel} [level] the log level used to log the message. Default is {@link logging.Level.ERROR}.
+   * @param message the log message
+   * @param level the log level used to log the message. Default is {@link LogLevel.ERROR}.
    */
-  sendLogRequest(message, level) {
+  sendLogRequest(message: string, level?: LogLevel) {
     let request = this._newRequest({
       log: true,
       message: message,
@@ -1394,10 +1481,10 @@ export default class Session extends EventEmitter {
     $.ajax(this.defaultAjaxOptions(request));
   }
 
-  _newRequest(requestData) {
+  protected _newRequest(requestData?: RequestData): Request {
     let request = $.extend({
       uiSessionId: this.uiSessionId
-    }, requestData);
+    }, requestData) as Request;
 
     // Certain requests do not require a sequence number
     if (!request.log && !request.syncResponseQueue) {
@@ -1406,7 +1493,7 @@ export default class Session extends EventEmitter {
     return request;
   }
 
-  _processEvents(events) {
+  protected _processEvents(events: RemoteEvent[]) {
     let i = 0;
     while (i < events.length) {
       let event = events[i];
@@ -1446,14 +1533,14 @@ export default class Session extends EventEmitter {
     this.trigger('eventsProcessed');
   }
 
-  start() {
+  start(): JQuery.Promise<any> {
     $.log.isInfoEnabled() && $.log.info('Session starting...');
 
     // Send startup request
     return this._sendStartupRequest();
   }
 
-  onModelEvent(event) {
+  onModelEvent(event: RemoteEvent) {
     if (event.type === 'localeChanged') {
       this._onLocaleChanged(event);
     } else if (event.type === 'logout') {
@@ -1471,17 +1558,25 @@ export default class Session extends EventEmitter {
     // NOP
   }
 
-  _onLocaleChanged(event) {
+  destroy() {
+    // NOP
+  }
+
+  exportAdapterData(adapterData: AdapterData): AdapterData {
+    return adapterData;
+  }
+
+  protected _onLocaleChanged(event: RemoteEvent & { locale?: LocaleModel; textMap?: Record<string, string> }) {
     let locale = new Locale(event.locale);
     let textMap = new TextMap(event.textMap);
     this.switchLocale(locale, textMap);
   }
 
   /**
-   * @param {Locale} the new locale
-   * @param {TextMap} [textMap] the new textMap. If not defined, the corresponding textMap for the new locale is used.
+   * @param locale the new locale
+   * @param textMap the new textMap. If not defined, the corresponding textMap for the new locale is used.
    */
-  switchLocale(locale, textMap) {
+  switchLocale(locale: Locale, textMap?: TextMap) {
     scout.assertParameter('locale', locale, Locale);
     this.locale = locale;
     this.textMap = texts.get(locale.languageTag);
@@ -1495,22 +1590,22 @@ export default class Session extends EventEmitter {
     });
   }
 
-  _renderDesktop() {
+  protected _renderDesktop() {
     this.desktop.render(this.$entryPoint);
     this.desktop.invalidateLayoutTree(false);
   }
 
-  _onLogout(event) {
+  protected _onLogout(event: RemoteEvent & { redirectUrl?: string }) {
     this.logout(event.redirectUrl);
   }
 
-  logout(logoutUrl) {
+  logout(logoutUrl: string) {
     this.loggedOut = true;
     // TODO [7.0] bsh: Check if there is a better solution (e.g. send a flag from server "action" = [ "redirect" | "closeWindow" ])
     if (this.forceNewClientSession) {
       this.desktop.$container.window(true).close();
     } else {
-      // remember current url to not lose query parameters (such as debug; however, ignore deeplinks)
+      // remember current url to not lose query parameters (such as debug; however, ignore deep links)
       let url = new URL();
       url.removeParameter('dl'); // deeplink
       url.removeParameter('i'); // deeplink info
@@ -1524,7 +1619,7 @@ export default class Session extends EventEmitter {
     }
   }
 
-  _onDisposeAdapter(event) {
+  protected _onDisposeAdapter(event: RemoteEvent & { adapter?: string }) {
     // Model adapter was disposed on server -> dispose it on the UI, too
     let adapter = this.getModelAdapter(event.adapter);
     if (adapter) { // adapter may be null if it was never sent to the UI, e.g. a form that was opened and closed in the same request
@@ -1532,7 +1627,7 @@ export default class Session extends EventEmitter {
     }
   }
 
-  _onReloadPage(event) {
+  protected _onReloadPage(event: RemoteEvent) {
     // Don't clear the body, because other events might be processed before the reload and
     // it could cause errors when all DOM elements are already removed.
     scout.reloadPage({
@@ -1540,7 +1635,7 @@ export default class Session extends EventEmitter {
     });
   }
 
-  _onWindowBeforeUnload() {
+  protected _onWindowBeforeUnload(evt: BeforeUnloadEvent) {
     $.log.isInfoEnabled() && $.log.info('Session before unloading...');
     // TODO [7.0] bsh: Cancel pending requests
 
@@ -1554,7 +1649,7 @@ export default class Session extends EventEmitter {
     }, 200);
   }
 
-  _onWindowUnload() {
+  protected _onWindowUnload() {
     $.log.isInfoEnabled() && $.log.info('Session unloading...');
     this.unloaded = true;
 
@@ -1579,7 +1674,7 @@ export default class Session extends EventEmitter {
    * you've requested an element from this cache an adapter for that ID is created and stored in the adapter
    * registry which too exists on this session object.
    */
-  _getAdapterData(id) {
+  protected _getAdapterData(id: string): AdapterData {
     let adapterData = this._adapterDataCache[id];
     let deleteAdapterData = !this.adapterExportEnabled;
     if (deleteAdapterData) {
@@ -1588,7 +1683,7 @@ export default class Session extends EventEmitter {
     return adapterData;
   }
 
-  getAdapterData(id) {
+  getAdapterData(id: string): AdapterData {
     return this._adapterDataCache[id];
   }
 
@@ -1597,9 +1692,8 @@ export default class Session extends EventEmitter {
    *
    * @param textKey key to lookup the text
    * @param args texts to replace the placeholders specified by {0}, {1}, etc.
-   * @returns {string}
    */
-  text(textKey, ...args) {
+  text(textKey: string, ...args: string[]): string {
     return this.textMap.get(textKey, ...args);
   }
 
@@ -1609,13 +1703,12 @@ export default class Session extends EventEmitter {
    * @param textKey key to lookup the text
    * @param defaultValue the text to return if the key has not been found.
    * @param args texts to replace the placeholders specified by {0}, {1}, etc.
-   * @returns {string}
    */
-  optText(textKey, defaultValue, ...args) {
+  optText(textKey: string, defaultValue: string, ...args: string[]): string {
     return this.textMap.optGet(textKey, defaultValue, ...args);
   }
 
-  textExists(textKey) {
+  textExists(textKey: string): boolean {
     return this.textMap.exists(textKey);
   }
 }

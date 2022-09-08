@@ -3,14 +3,36 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget} from '../index';
+import {Action, BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget, WidgetModel} from '../index';
 
-export default class BusyIndicator extends Widget {
+export interface BusyIndicatorModel extends WidgetModel {
+  cancellable?: boolean;
+  showTimeout?: number;
+  label?: string;
+  details?: string;
+}
+
+export default class BusyIndicator extends Widget implements BusyIndicatorModel {
+  declare model: BusyIndicatorModel;
+
+  cancellable: boolean;
+  showTimeout: number;
+  label: string;
+  details: string;
+
+  cancelButton: Action;
+  boxButtons: BoxButtons;
+  protected _glassPaneRenderer: GlassPaneRenderer;
+  $content: JQuery<HTMLDivElement>;
+  $buttons: JQuery;
+  $label: JQuery<HTMLDivElement>;
+  $details: JQuery<HTMLDivElement>;
+  protected _busyIndicatorTimeoutId: number;
 
   constructor() {
     super();
@@ -20,33 +42,28 @@ export default class BusyIndicator extends Widget {
     this.details = null;
     this.cancelButton = null;
     this.boxButtons = null;
+    this._glassPaneRenderer = null;
     this.inheritAccessibility = false; // do not inherit enabled-state. BusyIndicator must always be enabled even if parent is disabled
 
     this.$content = null;
     this.$buttons = null;
     this.$label = null;
     this.$details = null;
+    this._busyIndicatorTimeoutId = 0;
 
     this._addWidgetProperties(['boxButtons', 'cancelButton']);
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    this.keyStrokeContext.registerKeyStroke([
-      new ClickActiveElementKeyStroke(this, [
-        keys.SPACE, keys.ENTER
-      ]),
+    this.keyStrokeContext.registerKeyStrokes([
+      new ClickActiveElementKeyStroke(this, [keys.SPACE, keys.ENTER]),
+      // @ts-ignore FIXME TS remove ts-ignore when KeyStroke is migrated
       new CloseKeyStroke(this, (() => {
         if (!this.cancelButton) {
           return null;
@@ -56,7 +73,7 @@ export default class BusyIndicator extends Widget {
     ]);
   }
 
-  _init(model) {
+  override _init(model: BusyIndicatorModel) {
     super._init(model);
     this.label = scout.nvl(this.label, this.session.text('ui.PleaseWait_'));
     if (this.cancellable) {
@@ -66,13 +83,13 @@ export default class BusyIndicator extends Widget {
     }
   }
 
-  render($parent) {
+  override render($parent: JQuery) {
     // Use entry point by default
     $parent = $parent || this.entryPoint();
     super.render($parent);
   }
 
-  _render() {
+  override _render() {
     // Render busy indicator (still hidden by CSS, will be shown later in setTimeout.
     // But don't use .hidden, otherwise the box' size cannot be calculated correctly!)
     this.$container = this.$parent.appendDiv('busyindicator invisible');
@@ -114,49 +131,45 @@ export default class BusyIndicator extends Widget {
     // Render modality glass-panes
     this._glassPaneRenderer = new GlassPaneRenderer(this);
     this._glassPaneRenderer.renderGlassPanes();
-    this._glassPaneRenderer.eachGlassPane($glassPane => {
-      $glassPane.addClass('busy');
-    });
+    this._glassPaneRenderer.eachGlassPane($glassPane => $glassPane.addClass('busy'));
   }
 
-  _postRender() {
+  override _postRender() {
     super._postRender();
     this.session.focusManager.installFocusContext(this.$container, FocusRule.AUTO);
   }
 
-  _remove() {
+  override _remove() {
     // Remove busy box (cancel timer in case it was not fired yet)
     clearTimeout(this._busyIndicatorTimeoutId);
 
     // Remove glasspane
-    this._glassPaneRenderer.eachGlassPane($glassPane => {
-      $glassPane.removeClass('busy');
-    });
+    this._glassPaneRenderer.eachGlassPane($glassPane => $glassPane.removeClass('busy'));
     this._glassPaneRenderer.removeGlassPanes();
     this.session.focusManager.uninstallFocusContext(this.$container);
 
     super._remove();
   }
 
-  setLabel(label) {
+  setLabel(label: string) {
     this.setProperty('label', label);
   }
 
-  _renderLabel() {
+  protected _renderLabel() {
     this.$label.text(this.label || '');
   }
 
-  setDetails(details) {
+  setDetails(details: string) {
     this.setProperty('details', details);
   }
 
-  _renderDetails() {
+  protected _renderDetails() {
     this.$details
       .html(strings.nl2br(this.details))
       .setVisible(!!this.details);
   }
 
-  _position() {
+  protected _position() {
     this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
   }
 
@@ -170,8 +183,8 @@ export default class BusyIndicator extends Widget {
     }
   }
 
-  _onCancelClick(event) {
-    this.trigger('cancel', event);
+  protected _onCancelClick(event) { // FIXME TS use correct event type as soon as Action has been migrated
+    this.trigger('cancel', event); // FIXME TS add event map for cancel event using the Button event model
   }
 
   /**

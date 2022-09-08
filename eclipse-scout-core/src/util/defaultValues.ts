@@ -85,7 +85,7 @@ export function _generateObjectTypeHierarchyRec(json: any, currentParentObjectTy
  * if the object has a property of the same name. If the object is an array,
  * the defaults are applied to each of the elements.
  */
-export function applyTo(object: ObjectWithType | ObjectWithType[], objectType: string) {
+export function applyTo(object: ObjectWithType | ObjectWithType[], objectType?: string) {
   if (Array.isArray(object)) {
     for (let i = 0; i < object.length; i++) {
       applyTo(object[i], objectType);

@@ -74,7 +74,7 @@ export default class PlainTextEncoder {
       text = text.trim();
     }
 
-    let textarea = this.cache.get();
+    let textarea = this.cache.get() as HTMLTextAreaElement;
     textarea.innerHTML = text;
     return textarea.value;
   }

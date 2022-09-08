@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {AppEventMap, codes, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, fonts, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session, texts, webstorage, Widget} from './index';
+import {AppEventMap, codes, Desktop, Device, ErrorHandler, Event, EventEmitter, EventHandler, EventListener, fonts, Locale, locales, logging, numbers, ObjectFactory, objects, scout, Session, SessionModel, texts, webstorage, Widget} from './index';
 import $ from 'jquery';
 import {FontSpec} from './util/fonts';
 import {EventMapOf, EventModel} from './events/EventEmitter';
@@ -22,7 +22,7 @@ export interface AppOptions {
   /**
    * Object to configure the session, see {@link Session.init} for the available options.
    */
-  session?: object;// FIXME TS SessionModel
+  session?: SessionModel;
 
   bootstrap?: AppBootstrapOptions;
 
@@ -428,7 +428,7 @@ export default class App extends EventEmitter {
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // explicitly add here because jQuery only adds it automatically if it is no crossDomain request
   }
 
-  protected _loadSessions(options): JQuery.Promise<any> { // FIXME TS session options type
+  protected _loadSessions(options: Omit<SessionModel, '$entryPoint'>): JQuery.Promise<any> {
     options = options || {};
     let promises = [];
     $('.scout').each((i, elem) => {
@@ -443,9 +443,9 @@ export default class App extends EventEmitter {
   /**
    * @returns promise which is resolved when the session is ready
    */
-  protected _loadSession($entryPoint: JQuery, options): JQuery.Promise<any> {
+  protected _loadSession($entryPoint: JQuery, model: Omit<SessionModel, '$entryPoint'>): JQuery.Promise<any> {
+    let options = $.extend({}, model, {$entryPoint: $entryPoint}) as SessionModel;
     options.locale = options.locale || this._loadLocale();
-    options.$entryPoint = $entryPoint;
     let session = this._createSession(options);
     this.sessions.push(session);
 
@@ -453,6 +453,7 @@ export default class App extends EventEmitter {
     let desktop = this._createDesktop(session.root);
     this._triggerDesktopReady(desktop);
     session.render(() => {
+      // @ts-ignore
       session._renderDesktop();
 
       // Ensure layout is valid (explicitly layout immediately and don't wait for setTimeout to run to make layouting invisible to the user)
@@ -478,7 +479,7 @@ export default class App extends EventEmitter {
     });
   }
 
-  protected _createSession(options): Session { // FIXME TS session model
+  protected _createSession(options: SessionModel): Session {
     return scout.create(Session, options, {
       ensureUniqueId: false
     });
@@ -554,4 +555,3 @@ export default class App extends EventEmitter {
     return super.trigger(type, eventOrModel);
   }
 }
-

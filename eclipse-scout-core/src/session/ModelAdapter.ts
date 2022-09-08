@@ -1,21 +1,80 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, comparators, defaultValues, EventEmitter, objects, PropertyChangeEventFilter, RemoteEvent, scout, strings, Widget, WidgetEventTypeFilter} from '../index';
+import {App, arrays, comparators, defaultValues, Event, EventEmitter, objects, ObjectWithType, Predicate, PropertyChangeEvent, PropertyChangeEventFilter, RemoteEvent, scout, Session, strings, Widget, WidgetEventTypeFilter} from '../index';
 import $ from 'jquery';
+import EventListener from '../events/EventListener';
+import ModelAdapterModel from './ModelAdapterModel';
+import WidgetModel from '../widget/WidgetModel';
+import {AdapterData} from './Session';
+
+export interface ModelAdapterLike {
+  widget: Widget;
+
+  onModelEvent(event: RemoteEvent): void;
+
+  resetEventFilters(): void;
+
+  destroy(): void;
+
+  exportAdapterData(adapterData: AdapterData): AdapterData;
+}
+
+export interface ModelAdapterSendOptions {
+
+  /**
+   * Delay in milliseconds before the event is sent. Default is 0.
+   */
+  delay?: number;
+
+  /**
+   * Coalesce function added to event-object. Default: none.
+   */
+  coalesce?: Predicate<RemoteEvent>;
+
+  /**
+   * Whether sending the event should block the UI after a certain delay.
+   * The default value 'undefined' means that the default value ('true') is determined in the {@link Session}.
+   * We don't write it explicitly to the event here because that would break many Jasmine tests.
+   */
+  showBusyIndicator?: boolean;
+
+  /**
+   * Default is false.
+   */
+  newRequest?: boolean;
+}
 
 /**
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
  * It also sends events to the server whenever an action happens on the widget.
  */
-export default class ModelAdapter extends EventEmitter {
+export default class ModelAdapter<W extends Widget = Widget> extends EventEmitter implements ModelAdapterModel<W>, ModelAdapterLike {
+  declare model: ModelAdapterModel;
+  id: string;
+  objectType: string;
+  initialized: boolean;
+  attached: boolean;
+  destroyed: boolean;
+  widget: W;
+  session: Session;
+
+  protected _enabledBeforeOffline: boolean;
+  /**
+   * Widget properties which should be sent to server on property change.
+   */
+  protected _remoteProperties: string[];
+  protected _widgetListener: EventListener;
+  protected _propertyChangeEventFilter: PropertyChangeEventFilter;
+  protected _widgetEventTypeFilter: WidgetEventTypeFilter;
+
   constructor() {
     super();
 
@@ -26,27 +85,19 @@ export default class ModelAdapter extends EventEmitter {
     this.destroyed = false;
     this.widget = null;
     this._enabledBeforeOffline = true;
-
-    /**
-     * Widget properties which should be sent to server on property change.
-     */
     this._remoteProperties = [];
     this._widgetListener = null;
-
     this._propertyChangeEventFilter = new PropertyChangeEventFilter();
     this._widgetEventTypeFilter = new WidgetEventTypeFilter();
     this.session = null;
   }
 
-  init(model) {
+  init(model: ModelAdapterModel) {
     this._init(model);
     this.initialized = true;
   }
 
-  /**
-   * @param model expects a plain-object with properties: id, session
-   */
-  _init(model) {
+  protected _init(model: ModelAdapterModel) {
     scout.assertParameter('id', model.id);
     scout.assertParameter('session', model.session);
     $.extend(this, model);
@@ -61,7 +112,7 @@ export default class ModelAdapter extends EventEmitter {
     this.destroyed = true;
   }
 
-  createWidget(adapterData, parent) {
+  createWidget(adapterData: Omit<WidgetModel, 'parent'> & ObjectWithType, parent: Widget): W {
     let model = this._initModel(adapterData, parent);
     this.widget = this._createWidget(model);
     this._attachWidget();
@@ -73,14 +124,14 @@ export default class ModelAdapter extends EventEmitter {
    * Override this method to do something right after the widget has been created and has been
    * attached to the remote adapter. The default impl. does nothing.
    */
-  _postCreateWidget() {
+  protected _postCreateWidget() {
     // NOP
   }
 
-  _initModel(model, parent) {
+  protected _initModel(m: Omit<WidgetModel, 'parent'> & ObjectWithType, parent: Widget): WidgetModel & ObjectWithType {
     // Make a copy to prevent a modification of the given model
     let deepCopy = this.session.adapterExportEnabled;
-    model = $.extend(deepCopy, {}, model);
+    let model: any = $.extend(deepCopy, {}, m);
 
     // Fill in the missing default values
     defaultValues.applyTo(model);
@@ -102,20 +153,21 @@ export default class ModelAdapter extends EventEmitter {
   /**
    * Override this method to call _sync* methods of the ModelAdapter _before_ the widget is created.
    */
-  _initProperties(model) {
+  protected _initProperties(model: WidgetModel) {
     // NOP
   }
 
   /**
    * @returns A new widget instance. The default impl. uses calls scout.create() with property objectType from given model.
    */
-  _createWidget(model) {
-    let widget = scout.create(model);
+  protected _createWidget(model: WidgetModel & ObjectWithType): W {
+    let widget = scout.create(model) as W;
+    // @ts-ignore
     widget._addCloneProperties(['modelClass', 'classId']);
     return widget;
   }
 
-  _attachWidget() {
+  protected _attachWidget() {
     if (this._widgetListener) {
       return;
     }
@@ -127,7 +179,7 @@ export default class ModelAdapter extends EventEmitter {
     this.trigger('attach');
   }
 
-  _detachWidget() {
+  protected _detachWidget() {
     if (!this._widgetListener) {
       return;
     }
@@ -145,7 +197,7 @@ export default class ModelAdapter extends EventEmitter {
     });
   }
 
-  _goOffline() {
+  protected _goOffline() {
     // NOP may be implemented by subclasses
   }
 
@@ -157,23 +209,23 @@ export default class ModelAdapter extends EventEmitter {
     });
   }
 
-  _goOnline() {
+  protected _goOnline() {
     // NOP may be implemented by subclasses
   }
 
-  isRemoteProperty(propertyName) {
+  isRemoteProperty(propertyName: string): boolean {
     return this._remoteProperties.indexOf(propertyName) > -1;
   }
 
-  _addRemoteProperties(properties) {
+  protected _addRemoteProperties(properties: string[] | string) {
     this._addProperties('_remoteProperties', properties);
   }
 
-  _removeRemoteProperties(properties) {
+  protected _removeRemoteProperties(properties: string[] | string) {
     this._removeProperties('_remoteProperties', properties);
   }
 
-  _addProperties(propertyName, properties) {
+  protected _addProperties(propertyName: string, properties: string[] | string) {
     if (Array.isArray(properties)) {
       this[propertyName] = this[propertyName].concat(properties);
     } else {
@@ -181,7 +233,7 @@ export default class ModelAdapter extends EventEmitter {
     }
   }
 
-  _removeProperties(propertyName, properties) {
+  protected _removeProperties(propertyName: string, properties: string[] | string) {
     properties = arrays.ensure(properties);
     arrays.removeAll(this[propertyName], properties);
   }
@@ -194,24 +246,10 @@ export default class ModelAdapter extends EventEmitter {
    *
    * @param type of event
    * @param data of event
-   * @param [options] (optional) options according to the following table:
-   *
-   * Option name         Default value   Description
-   * -----------------------------------------------------------------------------------------
-   * delay               0               Delay in milliseconds before the event is sent.
-   *
-   * coalesce            undefined       Coalesce function added to event-object.
-   *
-   * showBusyIndicator   undefined       Whether sending the event should block the UI
-   *                     (true*)         after a certain delay.
-   *                                     * The default value 'undefined' means that the
-   *                                       default value ('true') is determined in Session.js.
-   *                                       We don't write it explicitly to the event here
-   *                                       because that would break many Jasmine tests.
    */
-  _send(type, data, options) {
+  protected _send(type: string, data: object, options?: ModelAdapterSendOptions) {
     // Legacy fallback with all options as arguments
-    let opts = {};
+    let opts = {} as ModelAdapterSendOptions;
     if (arguments.length > 2) {
       if (options !== null && typeof options === 'object') {
         opts = options;
@@ -244,7 +282,7 @@ export default class ModelAdapter extends EventEmitter {
   /**
    * Sends the given value as property event to the server.
    */
-  _sendProperty(propertyName, value) {
+  protected _sendProperty(propertyName: string, value: any) {
     let data = {};
     data[propertyName] = value;
     this._send('property', data);
@@ -253,32 +291,32 @@ export default class ModelAdapter extends EventEmitter {
   /**
    * Adds a custom filter for events.
    */
-  addFilterForWidgetEvent(filter) {
+  addFilterForWidgetEvent(filter: Predicate<Event>) {
     this._widgetEventTypeFilter.addFilter(filter);
   }
 
   /**
    * Adds a filter which only checks the type of the event.
    */
-  addFilterForWidgetEventType(eventType) {
+  addFilterForWidgetEventType(eventType: string) {
     this._widgetEventTypeFilter.addFilterForEventType(eventType);
   }
 
   /**
-   * Adds a filter which checks the name and value of every property in the given properties array.
+   * Adds a filter which checks the name and value of every property in the given properties.
    */
-  addFilterForProperties(properties) {
+  addFilterForProperties(properties: Record<string, any>) {
     this._propertyChangeEventFilter.addFilterForProperties(properties);
   }
 
   /**
    * Adds a filter which only checks the property name and ignores the value.
    */
-  addFilterForPropertyName(propertyName) {
+  addFilterForPropertyName(propertyName: string) {
     this._propertyChangeEventFilter.addFilterForPropertyName(propertyName);
   }
 
-  _isPropertyChangeEventFiltered(propertyName, value) {
+  protected _isPropertyChangeEventFiltered(propertyName: string, value: any): boolean {
     if (value instanceof Widget) {
       // In case of a remote widget property use the id, otherwise it would always return false
       value = value.id;
@@ -286,7 +324,7 @@ export default class ModelAdapter extends EventEmitter {
     return this._propertyChangeEventFilter.filter(propertyName, value);
   }
 
-  _isWidgetEventFiltered(event) {
+  protected _isWidgetEventFiltered(event: Event): boolean {
     return this._widgetEventTypeFilter.filter(event);
   }
 
@@ -295,7 +333,7 @@ export default class ModelAdapter extends EventEmitter {
     this._widgetEventTypeFilter.reset();
   }
 
-  _onWidgetPropertyChange(event) {
+  protected _onWidgetPropertyChange(event: PropertyChangeEvent<any>) {
     let propertyName = event.propertyName;
     let value = event.newValue;
 
@@ -312,7 +350,7 @@ export default class ModelAdapter extends EventEmitter {
     }
   }
 
-  _prepareRemoteProperty(propertyName, value) {
+  protected _prepareRemoteProperty(propertyName: string, value: any): any {
     if (!value || !this.widget.isWidgetProperty(propertyName)) {
       return value;
     }
@@ -326,7 +364,7 @@ export default class ModelAdapter extends EventEmitter {
     });
   }
 
-  _callSendProperty(propertyName, value) {
+  protected _callSendProperty(propertyName: string, value: any) {
     let sendFuncName = '_send' + strings.toUpperCaseFirstLetter(propertyName);
     if (this[sendFuncName]) {
       this[sendFuncName](value);
@@ -335,30 +373,30 @@ export default class ModelAdapter extends EventEmitter {
     }
   }
 
-  _onWidgetDestroy() {
+  protected _onWidgetDestroy(event: Event) {
     this.destroy();
   }
 
   /**
    * Do not override this method. Widget event filtering is done here, before _onWidgetEvent is called.
    */
-  _onWidgetEventInternal(event) {
+  protected _onWidgetEventInternal(event: Event) {
     if (!this._isWidgetEventFiltered(event)) {
       this._onWidgetEvent(event);
     }
   }
 
-  _onWidgetEvent(event) {
+  protected _onWidgetEvent(event: Event) {
     if (event.type === 'destroy') {
       this._onWidgetDestroy(event);
     } else if (event.type === 'propertyChange') {
-      this._onWidgetPropertyChange(event);
+      this._onWidgetPropertyChange(event as PropertyChangeEvent<any>);
     }
   }
 
-  _syncPropertiesOnPropertyChange(newProperties) {
+  protected _syncPropertiesOnPropertyChange(newProperties: Record<string, any>) {
     let orderedPropertyNames = this._orderPropertyNamesOnSync(newProperties);
-    orderedPropertyNames.forEach(function(propertyName) {
+    orderedPropertyNames.forEach(propertyName => {
       let value = newProperties[propertyName];
       let syncFuncName = '_sync' + strings.toUpperCaseFirstLetter(propertyName);
       if (this[syncFuncName]) {
@@ -366,17 +404,17 @@ export default class ModelAdapter extends EventEmitter {
       } else {
         this.widget.callSetter(propertyName, value);
       }
-    }, this);
+    });
   }
 
   /**
    * May be overridden to return a custom order of how the properties will be set.
    */
-  _orderPropertyNamesOnSync(newProperties) {
+  protected _orderPropertyNamesOnSync(newProperties: Record<string, any>): string[] {
     return Object.keys(newProperties);
   }
 
-  _createPropertySortFunc(order) {
+  protected _createPropertySortFunc(order: string[]): (a: string, b: string) => number {
     return (a, b) => {
       let ia = order.indexOf(a);
       let ib = order.indexOf(b);
@@ -394,9 +432,9 @@ export default class ModelAdapter extends EventEmitter {
   }
 
   /**
-   * Called by Session.js for every event from the model
+   * Called by {@link Session} for every event from the model
    */
-  onModelEvent(event) {
+  onModelEvent(event: RemoteEvent) {
     if (!event) {
       return;
     }
@@ -410,15 +448,12 @@ export default class ModelAdapter extends EventEmitter {
   /**
    * Processes the JSON event from the server and calls the corresponding setter of the widget for each property.
    */
-  onModelPropertyChange(event) {
+  onModelPropertyChange(event: RemoteEvent) {
     this.addFilterForProperties(event.properties);
     this._syncPropertiesOnPropertyChange(event.properties);
   }
 
-  /**
-   * The default impl. only logs a warning that the event is not supported.
-   */
-  onModelAction(event) {
+  onModelAction(event: any) {
     if (event.type === 'scrollToTop') {
       this.widget.scrollToTop({animate: event.animate});
     } else if (event.type === 'reveal') {
@@ -428,14 +463,14 @@ export default class ModelAdapter extends EventEmitter {
     }
   }
 
-  toString() {
+  override toString(): string {
     return 'ModelAdapter[objectType=' + this.objectType + ' id=' + this.id + ']';
   }
 
   /**
    * This method is used to modify adapterData before the data is exported (as used for JSON export).
    */
-  exportAdapterData(adapterData) {
+  exportAdapterData(adapterData: AdapterData): AdapterData {
     // use last part of class-name as ID (because that's better than having only a number as ID)
     let modelClass = adapterData.modelClass;
     if (modelClass) {
@@ -453,7 +488,8 @@ export default class ModelAdapter extends EventEmitter {
   /**
    * Static method to modify the prototype of Widget.
    */
-  static modifyWidgetPrototype() {
+  static modifyWidgetPrototype(event: Event) {
+    // @ts-ignore
     if (!App.get().remote) {
       return;
     }
