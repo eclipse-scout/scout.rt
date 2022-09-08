@@ -111,18 +111,25 @@ export interface ObjectWithType {
   objectType: string;
 }
 
-export interface ObjectWithTypeAndId extends ObjectWithType {
+export interface ObjectModel<T = object> {
+  objectType?: ObjectType<T>;
   id?: string;
 }
 
-export type ModelOf<T> = T extends { model: object } ? T['model'] : object;
+export type ModelOf<T> = T extends { model: infer Model } ? Model : object;
+
+export function create<T>(objectType: new() => T, model?: ModelOf<T>, options?: ObjectFactoryOptions): T;
+export function create<T>(model: ModelOf<T> & { objectType: new () => T }, options?: ObjectFactoryOptions): T;
+export function create(objectType: string, model?: object, options?: ObjectFactoryOptions): any;
+export function create(model: { objectType: string; [key: string]: any }, options?: ObjectFactoryOptions): any;
+export function create<T>(objectType: ObjectType<T> | ModelOf<T> & { objectType: ObjectType<T> }, model?: ModelOf<T>, options?: ObjectFactoryOptions): T;
 
 /**
  * Creates a new object instance.
  *
  * Delegates the create call to {@link ObjectFactory.create}.
  */
-export function create<T>(objectType: ObjectType<T, ModelOf<T>> | ObjectWithType, model?: ModelOf<T>, options?: ObjectFactoryOptions): T {
+export function create<T extends object>(objectType: ObjectType<T> | ModelOf<T> & { objectType: ObjectType<T> }, model?: ModelOf<T>, options?: ObjectFactoryOptions): T {
   return ObjectFactory.get().create(objectType, model, options);
 }
 

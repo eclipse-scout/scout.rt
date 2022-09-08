@@ -9,8 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Event, EventEmitter, objects, scout, strings} from '../index';
+import PropertyEventMap from './PropertyEventMap';
 
 export default class PropertyEventEmitter extends EventEmitter {
+  declare eventMap: PropertyEventMap;
+
   constructor() {
     super();
     this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => {
@@ -73,15 +76,13 @@ export default class PropertyEventEmitter extends EventEmitter {
   /**
    * Triggers a property change for a single property.
    */
-  triggerPropertyChange(propertyName: string, oldValue, newValue): Event {
+  triggerPropertyChange(propertyName: string, oldValue, newValue): Event<this> {
     scout.assertParameter('propertyName', propertyName);
-    let event = new Event({
+    return this.trigger('propertyChange', {
       propertyName: propertyName,
       oldValue: oldValue,
       newValue: newValue
     });
-    this.trigger('propertyChange', event);
-    return event;
   }
 
   /**
