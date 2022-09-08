@@ -17,7 +17,10 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
- * {@link AbstractSequenceBox} implementation for two fields: 'from' and 'to'.
+ * {@link AbstractSequenceBox} implementation for two fields: 'from' and 'to'. The fields are grouped within this
+ * sequence box and do not need to have own labels. The error status message uses generic field names for from and to.
+ *
+ * @see SequenceValidationHelper to validate a pair of from/to fields without grouping them within a sequence box.
  */
 @ClassId("4a0d8a5e-45d5-4ba3-a2d8-f456bb92132c")
 public abstract class AbstractFromToSequenceBox extends AbstractSequenceBox {
