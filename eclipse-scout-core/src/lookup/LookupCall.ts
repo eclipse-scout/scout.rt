@@ -13,6 +13,7 @@ import $ from 'jquery';
 import {QueryByType} from './QueryBy';
 import LookupCallModel from './LookupCallModel';
 import LookupResult from './LookupResult';
+import {ObjectType} from '../ObjectFactory';
 
 /**
  * Base class for lookup calls. A concrete implementation of LookupCall.js which uses resources over a network
@@ -324,7 +325,7 @@ export default class LookupCall<Key> implements LookupCallModel<Key> {
 
   // ---- static helpers ----
 
-  static ensure<K>(lookupCall: LookupCall<K> | LookupCallModel<K> | string, session: Session): LookupCall<K> {
+  static ensure<K>(lookupCall: LookupCall<K> | LookupCallModel<K> & { objectType: ObjectType<LookupCall<K>> } | string, session: Session): LookupCall<K> {
     if (lookupCall instanceof LookupCall) {
       return lookupCall;
     }

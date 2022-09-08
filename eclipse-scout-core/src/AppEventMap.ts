@@ -8,26 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, Desktop, Event, EventMap, Session} from './index';
+import {Desktop, Event, EventMap, Session} from './index';
 import {AppBootstrapOptions, AppOptions} from './App';
 
-export interface AppEvent extends Event {
-  source: App;
-}
-
-export interface AppInitEvent extends AppEvent {
+export interface AppInitEvent extends Event {
   options: AppOptions;
 }
 
-export interface AppBootstrapEvent extends AppEvent {
+export interface AppBootstrapEvent extends Event {
   options: AppBootstrapOptions;
 }
 
-export interface AppDesktopReadyEvent extends AppEvent {
+export interface AppDesktopReadyEvent extends Event {
   desktop: Desktop;
 }
 
-export interface AppSessionReadyEvent extends AppEvent {
+export interface AppSessionReadyEvent extends Event {
   session: Session;
 }
 

@@ -12,7 +12,7 @@
 import ObjectFactory from './ObjectFactory';
 export {default as scout, ObjectWithType} from './scout';
 export {default as Event} from './events/Event';
-export {default as EventEmitter, EventHandler, EventTypeModel} from './events/EventEmitter';
+export {default as EventEmitter, EventHandler} from './events/EventEmitter';
 export {default as PropertyEventEmitter} from './events/PropertyEventEmitter';
 export {default as EventSupport} from './events/EventSupport';
 export {default as EventDelegator} from './events/EventDelegator';
@@ -44,7 +44,7 @@ export {default as Widget} from './widget/Widget';
 export {DisabledStyle, GlassPaneContribution} from './widget/Widget';
 export {default as WidgetModel} from './widget/WidgetModel';
 export {default as WidgetEventMap} from './widget/WidgetEventMap';
-export {WidgetEvent, HierarchyChangeEvent, GlassPaneContributionEvent} from './widget/WidgetEventMap';
+export {HierarchyChangeEvent, GlassPaneContributionEvent} from './widget/WidgetEventMap';
 export {default as widgets} from './widget/widgets';
 export {default as Composite} from './widget/Composite';
 export {default as CompositeModel} from './widget/CompositeModel';

@@ -10,6 +10,7 @@
  */
 import {NullLogger, scout, strings, URL} from '../index';
 import $ from 'jquery';
+import {ObjectType} from '../ObjectFactory';
 
 declare global {
   let log4javascript: any;
@@ -143,7 +144,7 @@ export function parseLevel(level: string): LogLevel {
   }
 }
 
-export function addAppender(factoryName: { new(model?: object) } | string, options?: object) {
+export function addAppender(factoryName: ObjectType<any>, options?: object) {
   if (!initialized) {
     _appendersToAdd.push({
       factoryName: factoryName,

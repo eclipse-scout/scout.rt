@@ -16,4 +16,6 @@ export type PartialAndRequired<T, OPTIONAL extends keyof T, REQUIRED extends key
 
 export type EnumObject<TYPE> = TYPE[keyof TYPE];
 
+export type EmptyObject = Record<string, never>;
+
 export type Primitive = number | string | boolean | symbol | bigint;
