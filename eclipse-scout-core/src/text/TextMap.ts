@@ -12,7 +12,7 @@ import {objects} from '../index';
 
 export default class TextMap {
 
-  map: { [textKey: string]: string };
+  map: Record<string, string>;
   parent: TextMap;
 
   constructor(textMap?: { [textKey: string]: string }) {
