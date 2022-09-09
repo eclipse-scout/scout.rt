@@ -31,7 +31,7 @@ export default class PageLayout extends AbstractLayout {
       detailMenuBarHeight = 0,
       textWidth = 0;
 
-    containerSize = htmlContainer.availableSize()
+    containerSize = htmlContainer.availableSize({exact: true}) // exact is important to calculate text width correctly and to prevent node menubar from wrapping
       .subtract(htmlContainer.insets());
     textWidth = containerSize.width;
 
