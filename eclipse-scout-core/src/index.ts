@@ -82,6 +82,7 @@ export {default as PromiseCreator} from './util/PromiseCreator';
 export {default as promises} from './util/promises';
 export {default as Range} from './util/Range';
 export {default as Status} from './status/Status';
+export {default as StatusModel} from './status/StatusModel';
 export {default as DefaultStatus} from './status/DefaultStatus';
 export {default as ParsingFailedStatus} from './status/ParsingFailedStatus';
 export {default as ValidationFailedStatus} from './status/ValidationFailedStatus';
