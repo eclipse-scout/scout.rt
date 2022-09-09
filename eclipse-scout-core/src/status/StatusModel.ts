@@ -8,11 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status, StatusModel} from '../index';
+import {StatusSeverity, StatusSeverityNames} from './Status';
+import {Status} from '../index';
 
-export default class ValidationFailedStatus extends Status {
-
-  constructor(model: StatusModel) {
-    super(model);
-  }
+export default interface StatusModel {
+  message?: string;
+  severity?: StatusSeverity | StatusSeverityNames;
+  iconId?: string;
+  code?: number;
+  children?: Status[];
+  deletable?: boolean;
 }

@@ -3,17 +3,27 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DefaultStatus, ObjectFactory, objects, ParsingFailedStatus, strings, ValidationFailedStatus} from '../index';
+import {arrays, DefaultStatus, EnumObject, ObjectFactory, objects, ParsingFailedStatus, Predicate, StatusModel, strings, ValidationFailedStatus} from '../index';
 import $ from 'jquery';
 
-export default class Status {
+export type StatusSeverity = EnumObject<typeof Status.Severity>;
+export type StatusSeverityNames = keyof typeof Status.Severity;
 
-  constructor(model) {
+export default class Status {
+  declare model: StatusModel;
+  message: string;
+  severity: StatusSeverity;
+  iconId: string;
+  code: number;
+  children: Status[];
+  deletable: boolean;
+
+  constructor(model: StatusModel) {
     this.message = null;
     this.severity = Status.Severity.ERROR;
     this.iconId = null;
@@ -24,13 +34,12 @@ export default class Status {
 
     // severity may be a string (e.g. if set in a model json file) -> convert to real severity
     if (typeof this.severity === 'string') {
-      this.severity = Status.Severity[this.severity.toUpperCase()];
+      let currentSeverity = this.severity as string;
+      this.severity = Status.Severity[currentSeverity.toUpperCase()];
     }
     // children
     if (model && model.children && Array.isArray(model.children)) {
-      this.children = model.children.map(child => {
-        return Status.ensure(child);
-      });
+      this.children = model.children.map(child => Status.ensure(child));
     }
   }
 
@@ -39,54 +48,54 @@ export default class Status {
     INFO: 0x100,
     WARNING: 0x10000,
     ERROR: 0x1000000
-  };
+  } as const;
 
   static SEVERITY_CSS_CLASSES = 'error warning info ok';
 
-  cssClass() {
+  cssClass(): string {
     return Status.cssClassForSeverity(this.severity);
   }
 
   /**
-   * @returns {boolean} true if severity is OK or INFO, false if severity is WARNING or ERROR.
+   * @returns true if severity is OK or INFO, false if severity is WARNING or ERROR.
    */
-  isValid() {
+  isValid(): boolean {
     return this.severity === Status.Severity.OK ||
       this.severity === Status.Severity.INFO;
   }
 
-  isError() {
+  isError(): boolean {
     return this.severity === Status.Severity.ERROR;
   }
 
-  isWarning() {
+  isWarning(): boolean {
     return this.severity === Status.Severity.WARNING;
   }
 
-  isInfo() {
+  isInfo(): boolean {
     return this.severity === Status.Severity.INFO;
   }
 
-  isOk() {
+  isOk(): boolean {
     return this.severity === Status.Severity.OK;
   }
 
   /**
-   * @returns {Status[]} status including children as flat list.
+   * @returns status including all children recursively as flat array.
    */
-  asFlatList() {
+  asFlatList(): Status[] {
     return Status.asFlatList(this);
   }
 
   /**
-   * @return {Status} a clone of this Status instance.
+   * @returns a clone of this Status instance.
    */
-  clone() {
+  clone(): Status {
     let modelClone = $.extend({}, this);
     return new Status(modelClone);
   }
 
-  equals(o) {
+  equals(o: any): boolean {
     if (!(o instanceof Status)) {
       return false;
     }
@@ -100,20 +109,17 @@ export default class Status {
    * Note: we cannot 'overload' this function, because predicates and status-types are both functions,
    * thus we cannot distinct them by type or instanceof.
    *
-   * @param {object} statusType
-   * @return {boolean} whether or not this status contains a child with the give type
+   * @returns whether or not this status contains a child with the give type
    */
-  containsStatus(statusType) {
-    return this.containsStatusByPredicate(status => {
-      return status instanceof statusType;
-    });
+  containsStatus(statusType: new() => Status): boolean {
+    return this.containsStatusByPredicate(status => status instanceof statusType);
   }
 
-  containsStatusByPredicate(predicate) {
+  containsStatusByPredicate(predicate: Predicate<Status>): boolean {
     return this.asFlatList().some(predicate);
   }
 
-  addStatus(status) {
+  addStatus(status: Status) {
     if (this.hasChildren()) {
       this.children.push(status);
     } else {
@@ -124,16 +130,12 @@ export default class Status {
 
   /**
    * Removes all children of the given type from this status. The type is checked by inheritance.
-   *
-   * @param {object} statusType
    */
-  removeAllStatus(statusType) {
-    this.removeAllStatusByPredicate(status => {
-      return status instanceof statusType;
-    });
+  removeAllStatus(statusType: new() => Status) {
+    this.removeAllStatusByPredicate(status => status instanceof statusType);
   }
 
-  removeAllStatusByPredicate(predicate) {
+  removeAllStatusByPredicate(predicate: Predicate<Status>) {
     if (this.hasChildren()) {
       this.children.forEach(status => {
         status.removeAllStatusByPredicate(predicate);
@@ -149,7 +151,7 @@ export default class Status {
     }
   }
 
-  _updateProperties() {
+  protected _updateProperties() {
     if (!this.hasChildren()) {
       this.message = null;
       this.severity = Status.Severity.OK;
@@ -176,20 +178,17 @@ export default class Status {
   }
 
   /**
-   * @return {boolean} whether this status has children (= multi status)
+   * @returns whether this status has children (= multi status)
    */
-  hasChildren() {
+  hasChildren(): boolean {
     return !!(this.children && this.children.length > 0);
   }
 
   /**
    * In some cases we need to transform an error status without children to a multi-status with children.
-   * If the instance already has children, this function returns a clone of the instance.
-   * If the instance is not yet a multi-status, we return a new instance with the current instance as first child.
-   *
-   * @returns {Status}
+   * @returns If this instance already has children, a clone of the instance. Otherwise, a new instance with the current instance as first child.
    */
-  ensureChildren() {
+  ensureChildren(): Status {
     if (objects.isArray(this.children)) {
       return this.clone();
     }
@@ -205,16 +204,11 @@ export default class Status {
   /**
    * Null-safe static clone method.
    */
-  static clone(original) {
+  static clone(original: Status): Status {
     return original ? original.clone() : null;
   }
 
-  /**
-   * @param {number} severity
-   * @returns {string}
-   * @static
-   */
-  static cssClassForSeverity(severity) {
+  static cssClassForSeverity(severity: StatusSeverity): string {
     let cssSeverity,
       Severity = Status.Severity;
 
@@ -235,7 +229,7 @@ export default class Status {
     return cssSeverity;
   }
 
-  static animateStatusMessage($status, message) {
+  static animateStatusMessage($status: JQuery, message: string) {
     if (strings.endsWith(message, '...')) {
       let $ellipsis = $status.makeSpan('ellipsis');
       for (let i = 0; i < 3; i++) {
@@ -248,7 +242,7 @@ export default class Status {
     }
   }
 
-  static ensure(status) {
+  static ensure(status: any): Status {
     if (!status) {
       return status;
     }
@@ -263,37 +257,34 @@ export default class Status {
   }
 
   /**
-   * @returns {Status} a Status object with severity OK.
+   * @returns a {@link Status} object with severity OK.
    */
-  static ok(model) {
+  static ok(model: StatusModel | string): Status {
     return new Status(Status.ensureModel(model, Status.Severity.OK));
   }
 
   /**
-   * @returns {Status} a Status object with severity INFO.
+   * @returns a {@link Status} object with severity INFO.
    */
-  static info(model) {
+  static info(model: StatusModel | string): Status {
     return new Status(Status.ensureModel(model, Status.Severity.INFO));
   }
 
   /**
-   * @returns {Status} a Status object with severity WARNING.
+   * @returns a {@link Status} object with severity WARNING.
    */
-  static warning(model) {
+  static warning(model: StatusModel | string): Status {
     return new Status(Status.ensureModel(model, Status.Severity.WARNING));
   }
 
   /**
-   * @returns {Status} a Status object with severity ERROR.
+   * @returns a {@link Status} object with severity ERROR.
    */
-  static error(model) {
+  static error(model: StatusModel | string): Status {
     return new Status(Status.ensureModel(model, Status.Severity.ERROR));
   }
 
-  /**
-   * @returns {object}
-   */
-  static ensureModel(model, severity) {
+  static ensureModel(model: StatusModel | string, severity: StatusSeverity | StatusSeverityNames): StatusModel {
     if (typeof model === 'string') {
       model = {
         message: model
@@ -307,9 +298,9 @@ export default class Status {
   }
 
   /**
-   * @returns {Status[]} all Status objects as flat list (goes through the status hierarchy)
+   * @returns all {@link  Status} objects as flat array (recursively goes through the status hierarchy)
    */
-  static asFlatList(status) {
+  static asFlatList(status: Status): Status[] {
     if (!status) {
       return [];
     }
@@ -326,17 +317,10 @@ export default class Status {
 
   /**
    * Returns a constructor function for the given class-name.
-   * <p>
-   * The key of this map is a string which is equals to the objectType string, the value is a reference to the constructor function.
-   * This map is required because in JavaScript we don't have the class-name at runtime.
-   * <p>
-   * Note: we cannot initialize this map as static variable, because webpack dependencies are not resolved in the moment the variable
-   * is initialized.
    *
-   * @param {string} className
-   * @returns {function} Status constructor
+   * @returns Status constructor
    */
-  static classForName(className) {
+  static classForName(className: 'Status' | 'DefaultStatus' | 'ParsingFailedStatus' | 'ValidationFailedStatus'): new(model: StatusModel) => Status {
     return {
       Status: Status,
       DefaultStatus: DefaultStatus,
