@@ -1642,8 +1642,8 @@ export default class SmartField extends ValueField {
   }
 
   setLookupStatus(lookupStatus) {
-    this.setProperty('lookupStatus', lookupStatus);
-    if (this.rendered) {
+    let changed = this.setProperty('lookupStatus', lookupStatus);
+    if (changed && this.rendered) {
       this._renderErrorStatus();
     }
   }
