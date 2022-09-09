@@ -23,7 +23,7 @@ export default class OutlineLayout extends TreeLayout {
 
     super._layout($container);
 
-    containerSize = htmlContainer.availableSize()
+    containerSize = htmlContainer.availableSize({exact: true})
       .subtract(htmlContainer.insets());
 
     if (this.outline.embedDetailContent) {
