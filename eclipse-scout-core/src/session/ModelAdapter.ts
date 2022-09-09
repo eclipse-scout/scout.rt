@@ -8,49 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, comparators, defaultValues, Event, EventEmitter, objects, ObjectWithType, Predicate, PropertyChangeEvent, PropertyChangeEventFilter, RemoteEvent, scout, Session, strings, Widget, WidgetEventTypeFilter} from '../index';
+import {App, arrays, comparators, defaultValues, Event, EventEmitter, ModelAdapterEventMap, ModelAdapterModel, objects, ObjectWithType, Predicate, PropertyChangeEvent, PropertyChangeEventFilter, RemoteEvent, scout, Session, strings, Widget, WidgetEventTypeFilter} from '../index';
 import $ from 'jquery';
 import EventListener from '../events/EventListener';
-import ModelAdapterModel from './ModelAdapterModel';
 import WidgetModel from '../widget/WidgetModel';
 import {AdapterData} from './Session';
-
-export interface ModelAdapterLike {
-  widget: Widget;
-
-  onModelEvent(event: RemoteEvent): void;
-
-  resetEventFilters(): void;
-
-  destroy(): void;
-
-  exportAdapterData(adapterData: AdapterData): AdapterData;
-}
-
-export interface ModelAdapterSendOptions {
-
-  /**
-   * Delay in milliseconds before the event is sent. Default is 0.
-   */
-  delay?: number;
-
-  /**
-   * Coalesce function added to event-object. Default: none.
-   */
-  coalesce?: Predicate<RemoteEvent>;
-
-  /**
-   * Whether sending the event should block the UI after a certain delay.
-   * The default value 'undefined' means that the default value ('true') is determined in the {@link Session}.
-   * We don't write it explicitly to the event here because that would break many Jasmine tests.
-   */
-  showBusyIndicator?: boolean;
-
-  /**
-   * Default is false.
-   */
-  newRequest?: boolean;
-}
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 /**
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
@@ -58,6 +21,7 @@ export interface ModelAdapterSendOptions {
  */
 export default class ModelAdapter<W extends Widget = Widget> extends EventEmitter implements ModelAdapterModel<W>, ModelAdapterLike {
   declare model: ModelAdapterModel;
+  declare eventMap: ModelAdapterEventMap;
   id: string;
   objectType: string;
   initialized: boolean;
@@ -485,6 +449,10 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
     return adapterData;
   }
 
+  override trigger<K extends string & keyof EventMapOf<ModelAdapter>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<ModelAdapter>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
+
   /**
    * Static method to modify the prototype of Widget.
    */
@@ -515,3 +483,41 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
 }
 
 App.addListener('bootstrap', ModelAdapter.modifyWidgetPrototype);
+
+
+export interface ModelAdapterLike {
+  widget: Widget;
+
+  onModelEvent(event: RemoteEvent): void;
+
+  resetEventFilters(): void;
+
+  destroy(): void;
+
+  exportAdapterData(adapterData: AdapterData): AdapterData;
+}
+
+export interface ModelAdapterSendOptions {
+
+  /**
+   * Delay in milliseconds before the event is sent. Default is 0.
+   */
+  delay?: number;
+
+  /**
+   * Coalesce function added to event-object. Default: none.
+   */
+  coalesce?: Predicate<RemoteEvent>;
+
+  /**
+   * Whether sending the event should block the UI after a certain delay.
+   * The default value 'undefined' means that the default value ('true') is determined in the {@link Session}.
+   * We don't write it explicitly to the event here because that would break many Jasmine tests.
+   */
+  showBusyIndicator?: boolean;
+
+  /**
+   * Default is false.
+   */
+  newRequest?: boolean;
+}
