@@ -8,101 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Desktop, Device, Event, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, NullWidget, ObjectFactory, objects, ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage, Widget} from '../index';
+import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Desktop, Device, Event, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterModel, NullWidget, ObjectFactory, objects, ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, SessionEventMap, SessionModel, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage, Widget} from '../index';
 import $ from 'jquery';
-import SessionModel from './SessionModel';
 import {AjaxCallModel} from '../ajax/AjaxCall';
-import ModelAdapterModel from './ModelAdapterModel';
 import {ObjectFactoryOptions} from '../ObjectFactory';
 import {JsonErrorResponse} from '../App';
 import {ModelAdapterLike} from './ModelAdapter';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
-
-export interface Request extends RequestData {
-  uiSessionId: string;
-  '#'?: number;
-  '#ACK'?: number;
-  event: {
-    target: string;
-    type: string;
-  };
-}
-
-export interface RequestData {
-  events?: RemoteEvent[];
-  clientSessionId?: string;
-  syncResponseQueue?: boolean;
-  log?: boolean;
-  message?: string;
-  level?: LogLevel;
-  startup?: boolean;
-  unload?: boolean;
-  cancel?: boolean;
-  ping?: boolean;
-  partId?: number;
-  version?: string;
-  userAgent?: UserAgent;
-  sessionStartupParams?: SessionStartupParams;
-  showBusyIndicator?: boolean;
-  pollForBackgroundJobs?: boolean;
-}
-
-export interface AdapterData extends ObjectWithType {
-  [name: string]: any;
-}
-
-export interface Response {
-  '#'?: number;
-  adapterData?: Record<string, AdapterData>;
-  events?: RemoteEvent[];
-  error?: JsonErrorResponse;
-  redirectUrl?: string;
-  sessionTerminated?: boolean;
-  combined?: boolean;
-}
-
-export interface SessionStartupResponse extends Response {
-  startupData?: {
-    uiSessionId?: string;
-    clientSessionId?: string;
-    clientSession?: string;
-    reloadPage?: boolean;
-    pollingInterval?: number;
-    persistent?: boolean;
-    inDevelopmentMode?: boolean;
-    inspector?: boolean;
-    locale?: LocaleModel;
-    textMap?: TextMap;
-  };
-}
-
-export interface SessionStartupParams {
-  url?: string;
-  geolocationServiceAvailable?: boolean;
-
-  [p: string]: any; // all URL parameters
-}
-
-export interface FatalMessageOptions {
-  header?: string;
-  body?: string;
-  severity?: number;
-  iconId?: string;
-  entryPoint?: JQuery;
-
-  hiddenText?: string;
-  yesButtonText?: string;
-  yesButtonAction?: () => void;
-
-  noButtonText?: string;
-  noButtonAction?: () => void;
-
-  cancelButtonText?: string;
-  cancelButtonAction?: () => void;
-}
 
 export default class Session extends EventEmitter implements ModelAdapterLike {
   declare model: SessionModel;
+  declare eventMap: SessionEventMap;
   partId: number;
   url: URL;
   userAgent: UserAgent;
@@ -161,7 +78,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
   protected _deferredEventTypes: string[];
   protected _deferred: JQuery.Deferred<string[], never, never>;
   protected _fatalMessagesOnScreen: Record<string, boolean>;
-  protected _retryRequest: any;
+  protected _retryRequest: Request;
   protected _queuedRequest: Request;
   protected _asyncDelay: number;
   protected _sendTimeoutId: number;
@@ -1566,6 +1483,10 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     return adapterData;
   }
 
+  override trigger<K extends string & keyof EventMapOf<Session>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Session>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
+
   protected _onLocaleChanged(event: RemoteEvent & { locale?: LocaleModel; textMap?: Record<string, string> }) {
     let locale = new Locale(event.locale);
     let textMap = new TextMap(event.textMap);
@@ -1711,4 +1632,88 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
   textExists(textKey: string): boolean {
     return this.textMap.exists(textKey);
   }
+}
+
+
+export interface Request extends RequestData {
+  uiSessionId: string;
+  '#'?: number;
+  '#ACK'?: number;
+  event: {
+    target: string;
+    type: string;
+  };
+}
+
+export interface RequestData {
+  events?: RemoteEvent[];
+  clientSessionId?: string;
+  syncResponseQueue?: boolean;
+  log?: boolean;
+  message?: string;
+  level?: LogLevel;
+  startup?: boolean;
+  unload?: boolean;
+  cancel?: boolean;
+  ping?: boolean;
+  partId?: number;
+  version?: string;
+  userAgent?: UserAgent;
+  sessionStartupParams?: SessionStartupParams;
+  showBusyIndicator?: boolean;
+  pollForBackgroundJobs?: boolean;
+}
+
+export interface AdapterData extends ObjectWithType {
+  [name: string]: any;
+}
+
+export interface Response {
+  '#'?: number;
+  adapterData?: Record<string, AdapterData>;
+  events?: RemoteEvent[];
+  error?: JsonErrorResponse;
+  redirectUrl?: string;
+  sessionTerminated?: boolean;
+  combined?: boolean;
+}
+
+export interface SessionStartupResponse extends Response {
+  startupData?: {
+    uiSessionId?: string;
+    clientSessionId?: string;
+    clientSession?: string;
+    reloadPage?: boolean;
+    pollingInterval?: number;
+    persistent?: boolean;
+    inDevelopmentMode?: boolean;
+    inspector?: boolean;
+    locale?: LocaleModel;
+    textMap?: TextMap;
+  };
+}
+
+export interface SessionStartupParams {
+  url?: string;
+  geolocationServiceAvailable?: boolean;
+
+  [p: string]: any; // all URL parameters
+}
+
+export interface FatalMessageOptions {
+  header?: string;
+  body?: string;
+  severity?: number;
+  iconId?: string;
+  entryPoint?: JQuery;
+
+  hiddenText?: string;
+  yesButtonText?: string;
+  yesButtonAction?: () => void;
+
+  noButtonText?: string;
+  noButtonAction?: () => void;
+
+  cancelButtonText?: string;
+  cancelButtonAction?: () => void;
 }
