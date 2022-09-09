@@ -292,7 +292,6 @@ describe('SmartField', () => {
     });
 
     it('removes tooltip from original field on open and displays it again when closed', () => {
-      // Use case: Click on touch smart field, select inactive radio button, clear the text in the field -> smart field has to stay open
       let field = createFieldWithLookupCall({
         touchMode: true,
         errorStatus: Status.error({
@@ -303,7 +302,7 @@ describe('SmartField', () => {
       jasmine.clock().tick(500);
       field.$field.triggerClick();
       jasmine.clock().tick(500);
-      expect(field._tooltip()).toBeNull();
+      expect(field._tooltip().rendered).toBe(false);
       expect(field.popup._field._tooltip().rendered).toBe(true);
 
       field.popup.close();
@@ -313,7 +312,6 @@ describe('SmartField', () => {
     });
 
     it('does not draw glass pane over tooltip', () => {
-      // Use case: Click on touch smart field, select inactive radio button, clear the text in the field -> smart field has to stay open
       let field = createFieldWithLookupCall({
         touchMode: true,
         errorStatus: Status.error({

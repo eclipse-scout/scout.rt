@@ -242,6 +242,10 @@ export default class Popup extends Widget {
       }
       this.$container.removeClass('before-animate-open');
       this.validateFocus(); // Need to be done after popup is visible again because focus cannot be set on invisible elements.
+      if (!this.rendered) {
+        // Validate again, focus change could have removed the popup
+        return;
+      }
       this.$container.addClassForAnimation('animate-open');
     });
   }

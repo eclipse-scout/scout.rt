@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FieldStatus, GroupBox, scout, Status, StringField} from '../../../src/index';
+import {FieldStatus, GroupBox, Menu, scout, SmartField, Status, StringField} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
 
 describe('FieldStatus', () => {
@@ -49,7 +49,7 @@ describe('FieldStatus', () => {
       // show desktop again -> tooltip must be rendered again
       // happens in a timeout, thus we must let the clock tick
       formField.parent.setVisible(true);
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       expect(formField.fieldStatus.tooltip.rendered).toBe(true);
     });
 
@@ -70,7 +70,7 @@ describe('FieldStatus', () => {
       // show groupBox again -> tooltip must be rendered again
       // happens in a timeout, thus we must let the clock tick
       groupBox.setVisible(true);
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       expect(formField.fieldStatus.tooltip.rendered).toBe(true);
     });
 
@@ -114,4 +114,50 @@ describe('FieldStatus', () => {
     expect(session.desktop.$container.find('.tooltip').length).toBe(0);
   });
 
+  it('must not close tooltip if a tooltip submenu is opened', () => {
+    let formField = scout.create(SmartField, {parent: session.desktop});
+    formField.render();
+    formField.focus();
+    formField.setMenus({
+      objectType: Menu,
+      childActions: [{objectType: Menu}]
+    });
+    formField.setTooltipText('hi there');
+    formField.fieldStatus.togglePopup();
+    let tooltip = formField.fieldStatus.tooltip;
+    tooltip.menus[0].setSelected(true);
+    let popup = tooltip.menus[0].popup;
+    expect(tooltip.rendered).toBeTrue();
+    expect(popup.rendered).toBeTrue();
+
+    // Focus will be set to menu after popup has been opened -> simulate this
+    formField.fieldStatus.tooltip.menus[0].popup.validateFocus();
+    formField._onFieldBlur();
+    expect(tooltip.rendered).toBeTrue();
+    expect(popup.rendered).toBeTrue();
+  });
+
+  it('closes submenus of tooltip if tooltip is destroyed ', () => {
+    let formField = scout.create(StringField, {parent: session.desktop});
+    formField.setTooltipText('hi there');
+    formField.setMenus({
+      objectType: Menu,
+      childActions: [{objectType: Menu}]
+    });
+    let $outside = session.$entryPoint.appendDiv();
+    formField.render();
+
+    formField.fieldStatus.togglePopup();
+    let tooltip = formField.fieldStatus.tooltip;
+    tooltip.menus[0].setSelected(true);
+    let popup = tooltip.menus[0].popup;
+    expect(tooltip.rendered).toBeTrue();
+    expect(popup.rendered).toBeTrue();
+
+    $outside.triggerMouseDownCapture();
+    expect(tooltip.rendered).toBeFalse();
+    expect(popup.rendered).toBeFalse();
+    expect(popup.destroyed).toBe(true);
+    expect(tooltip.menus[0].selected).toBe(false);
+  });
 });
