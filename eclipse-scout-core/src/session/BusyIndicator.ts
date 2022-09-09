@@ -184,7 +184,7 @@ export default class BusyIndicator extends Widget implements BusyIndicatorModel 
   }
 
   protected _onCancelClick(event) { // FIXME TS use correct event type as soon as Action has been migrated
-    this.trigger('cancel', event); // FIXME TS add event map for cancel event using the Button event model
+    this.trigger('cancel', event); // FIXME TS add event map for cancel event using the 'action' Event from the ActionEventModel as soon as it has been migrated.
   }
 
   /**
