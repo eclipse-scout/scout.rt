@@ -1,19 +1,49 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionKeyStroke, Device, DoubleClickSupport, HtmlComponent, Icon, KeyStrokeContext, NullLayout, scout, tooltips, Widget} from '../index';
+import {ActionEventMap, ActionKeyStroke, ActionModel, Device, DoubleClickSupport, EnumObject, Event, HtmlComponent, Icon, KeyStrokeContext, NullLayout, scout, tooltips, Widget} from '../index';
 import $ from 'jquery';
+import AbstractLayout from '../layout/AbstractLayout';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
-export default class Action extends Widget {
+export type ActionStyleType = EnumObject<typeof Action.ActionStyle>;
+export type KeyStrokeFirePolicyType = EnumObject<typeof Action.KeyStrokeFirePolicy>;
+export type ActionTextPositionType = EnumObject<typeof Action.TextPosition>;
 
-  // noinspection DuplicatedCode
+export default class Action extends Widget implements ActionModel {
+  declare model: ActionModel;
+  declare eventMap: ActionEventMap;
+
+  actionStyle: ActionStyleType;
+  compact: boolean;
+  iconId: string;
+  horizontalAlignment: -1 | 0 | 1;
+  keyStroke: string;
+  keyStrokeFirePolicy: KeyStrokeFirePolicyType;
+  selected: boolean;
+  preventDoubleClick: boolean;
+  tabbable: boolean;
+  actionKeyStroke: ActionKeyStroke;
+  text: string;
+  textPosition: ActionTextPositionType;
+  htmlEnabled: boolean;
+  textVisible: boolean;
+  toggleAction: boolean;
+  tooltipText: string;
+  showTooltipWhenSelected: boolean;
+  tooltipPosition: string; // FIXME TS: add enum as soon as tooltips have been migrated
+  icon: Icon;
+  $text: JQuery;
+
+  protected _doubleClickSupport: DoubleClickSupport;
+
   constructor() {
     super();
 
@@ -25,9 +55,6 @@ export default class Action extends Widget {
     this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
     this.selected = false;
     this.preventDoubleClick = false;
-    /**
-     * This property decides whether or not the tabindex attribute is set in the DOM.
-     */
     this.tabbable = false;
     this.text = null;
     this.textPosition = Action.TextPosition.DEFAULT;
@@ -50,7 +77,7 @@ export default class Action extends Widget {
      * menu looks like a button
      */
     BUTTON: 1
-  };
+  } as const;
 
   static TextPosition = {
     DEFAULT: 'default',
@@ -58,21 +85,18 @@ export default class Action extends Widget {
      * The text will be positioned below the icon. It has no effect if no icon is set.
      */
     BOTTOM: 'bottom'
-  };
+  } as const;
 
   static KeyStrokeFirePolicy = {
     ACCESSIBLE_ONLY: 0,
     ALWAYS: 1
-  };
+  } as const;
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  _init(model) {
+  protected override _init(model: ActionModel) {
     super._init(model);
     this.actionKeyStroke = this._createActionKeyStroke();
     this.resolveConsts([{
@@ -90,7 +114,7 @@ export default class Action extends Widget {
     this._setKeyStroke(this.keyStroke);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('action')
       .on('mousedown', event => this._doubleClickSupport.mousedown(event))
       .on('click', this._onClick.bind(this));
@@ -98,11 +122,11 @@ export default class Action extends Widget {
     this.htmlComp.setLayout(this._createLayout());
   }
 
-  _createLayout() {
+  protected _createLayout(): AbstractLayout {
     return new NullLayout();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
 
     this._renderText();
@@ -115,17 +139,17 @@ export default class Action extends Widget {
     this._renderCompact();
   }
 
-  _remove() {
+  protected override _remove() {
     this._removeText();
     this._removeIconId();
     super._remove();
   }
 
-  setText(text) {
+  setText(text: string) {
     this.setProperty('text', text);
   }
 
-  _renderText() {
+  protected _renderText() {
     let text = this.text || '';
     if (text && this.textVisible) {
       if (!this.$text) {
@@ -143,36 +167,36 @@ export default class Action extends Widget {
     }
   }
 
-  _removeText() {
+  protected _removeText() {
     if (this.$text) {
       this.$text.remove();
       this.$text = null;
     }
   }
 
-  setTextPosition(textPosition) {
+  setTextPosition(textPosition: ActionTextPositionType) {
     this.setProperty('textPosition', textPosition);
   }
 
-  _renderTextPosition() {
+  protected _renderTextPosition() {
     this.$container.toggleClass('bottom-text', this.textPosition === Action.TextPosition.BOTTOM);
     this.invalidateLayoutTree();
   }
 
-  setHtmlEnabled(htmlEnabled) {
+  setHtmlEnabled(htmlEnabled: boolean) {
     this.setProperty('htmlEnabled', htmlEnabled);
   }
 
-  _renderHtmlEnabled() {
+  protected _renderHtmlEnabled() {
     // Render the text again when html enabled changes dynamically
     this._renderText();
   }
 
-  setIconId(iconId) {
+  setIconId(iconId: string) {
     this.setProperty('iconId', iconId);
   }
 
-  _renderIconId() {
+  protected _renderIconId() {
     let iconId = this.iconId || '';
     // If the icon is an image (and not a font icon), the Icon class will invalidate the layout when the image has loaded
     if (!iconId) {
@@ -194,23 +218,20 @@ export default class Action extends Widget {
     this.icon.render();
   }
 
-  get$Icon() {
+  get$Icon(): JQuery {
     if (this.icon) {
       return this.icon.$container;
     }
     return $();
   }
 
-  _removeIconId() {
+  protected _removeIconId() {
     if (this.icon) {
       this.icon.destroy();
     }
   }
 
-  /**
-   * @override
-   */
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     if (this.rendered) { // No need to do this during initial rendering
       this._updateTooltip();
@@ -218,18 +239,18 @@ export default class Action extends Widget {
     }
   }
 
-  setTooltipText(tooltipText) {
+  setTooltipText(tooltipText: string) {
     this.setProperty('tooltipText', tooltipText);
   }
 
-  _renderTooltipText() {
+  protected _renderTooltipText() {
     this._updateTooltip();
   }
 
   /**
    * Installs or uninstalls tooltip based on tooltipText, selected and enabledComputed.
    */
-  _updateTooltip() {
+  protected _updateTooltip() {
     if (this._shouldInstallTooltip()) {
       tooltips.install(this.$container, this._configureTooltip());
     } else {
@@ -237,7 +258,7 @@ export default class Action extends Widget {
     }
   }
 
-  _shouldInstallTooltip() {
+  protected _shouldInstallTooltip(): boolean {
     let show = this.tooltipText && this.enabledComputed;
     if (!this.showTooltipWhenSelected && this.selected) {
       show = false;
@@ -245,20 +266,20 @@ export default class Action extends Widget {
     return show;
   }
 
-  _renderTabbable() {
+  protected _renderTabbable() {
     this.$container.setTabbable(this.tabbable && this.enabledComputed && !Device.get().supportsOnlyTouch());
   }
 
-  _renderCompact() {
+  protected _renderCompact() {
     this.$container.toggleClass('compact', this.compact);
     this.invalidateLayoutTree();
   }
 
-  setTooltipPosition(position) {
+  setTooltipPosition(position: string) { // FIXME TS: add tooltip position enum as soon as available
     this.setProperty('tooltipPosition', position);
   }
 
-  _configureTooltip() {
+  protected _configureTooltip(): object { // FIXME TS: return tooltip model as soon as available
     return {
       parent: this,
       text: this.tooltipText,
@@ -270,15 +291,12 @@ export default class Action extends Widget {
   }
 
   /**
-   * @return {Boolean}
-   *          <code>true</code> if the action has been performed or <code>false</code> if it
-   *          has not been performed (e.g. when the button is not enabledComputed).
+   * @returns true if the action has been performed or false if it has not been performed (e.g. when the button is not enabledComputed).
    */
-  doAction() {
+  doAction(): boolean {
     if (!this.prepareDoAction()) {
       return false;
     }
-
     if (this.isToggleAction()) {
       this.setSelected(!this.selected);
     }
@@ -292,50 +310,53 @@ export default class Action extends Widget {
     }
   }
 
-  setToggleAction(toggleAction) {
+  setToggleAction(toggleAction: boolean) {
     this.setProperty('toggleAction', toggleAction);
   }
 
-  isToggleAction() {
+  isToggleAction(): boolean {
     return this.toggleAction;
   }
 
   /**
-   * @returns {Boolean} <code>true</code> if the action may be executed, <code>false</code> if it should be ignored.
+   * @returns true if the action may be executed, false if it should be ignored.
    */
-  prepareDoAction() {
+  prepareDoAction(): boolean {
     if (!this.enabledComputed || !this.visible) {
       return false;
     }
-
     return true;
   }
 
-  _doAction() {
+  override trigger<K extends string & keyof EventMapOf<Action>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Action>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
+
+  protected _doAction() {
     this.trigger('action');
   }
 
-  setSelected(selected) {
+  setSelected(selected: boolean) {
     this.setProperty('selected', selected);
   }
 
-  _renderSelected() {
+  protected _renderSelected() {
     this.$container.toggleClass('selected', this.selected);
     if (this.rendered) { // prevent unnecessary tooltip updates during initial rendering
       this._updateTooltip();
     }
   }
 
-  setKeyStroke(keyStroke) {
+  setKeyStroke(keyStroke: string) {
     this.setProperty('keyStroke', keyStroke);
   }
 
-  _setKeyStroke(keyStroke) {
+  protected _setKeyStroke(keyStroke: string) {
     this.actionKeyStroke.parseAndSetKeyStroke(keyStroke);
     this._setProperty('keyStroke', keyStroke);
   }
 
-  _renderKeyStroke() {
+  protected _renderKeyStroke() {
     let keyStroke = this.keyStroke;
     if (keyStroke === undefined) {
       this.$container.removeAttr('data-shortcut');
@@ -344,11 +365,11 @@ export default class Action extends Widget {
     }
   }
 
-  setTabbable(tabbable) {
+  setTabbable(tabbable: boolean) {
     this.setProperty('tabbable', tabbable);
   }
 
-  setTextVisible(textVisible) {
+  setTextVisible(textVisible: boolean) {
     if (this.textVisible === textVisible) {
       return;
     }
@@ -358,7 +379,7 @@ export default class Action extends Widget {
     }
   }
 
-  setCompact(compact) {
+  setCompact(compact: boolean) {
     if (this.compact === compact) {
       return;
     }
@@ -368,22 +389,19 @@ export default class Action extends Widget {
     }
   }
 
-  setHorizontalAlignment(horizontalAlignment) {
+  setHorizontalAlignment(horizontalAlignment: -1 | 0 | 1) {
     this.setProperty('horizontalAlignment', horizontalAlignment);
   }
 
-  /**
-   * @return {ActionKeyStroke}
-   */
-  _createActionKeyStroke() {
+  protected _createActionKeyStroke(): ActionKeyStroke {
     return new ActionKeyStroke(this);
   }
 
-  setPreventDoubleClick(preventDoubleClick) {
+  setPreventDoubleClick(preventDoubleClick: boolean) {
     this.setProperty('preventDoubleClick', preventDoubleClick);
   }
 
-  _allowMouseEvent(event) {
+  protected _allowMouseEvent(event: JQuery.ClickEvent<HTMLDivElement, undefined, HTMLDivElement, HTMLDivElement>): boolean {
     if (event.which !== 1) {
       return false; // Other button than left mouse button --> nop
     }
@@ -393,7 +411,7 @@ export default class Action extends Widget {
     return true;
   }
 
-  _onClick(event) {
+  protected _onClick(event: JQuery.ClickEvent<HTMLDivElement, undefined, HTMLDivElement, HTMLDivElement>) {
     if (!this._allowMouseEvent(event)) {
       return;
     }
@@ -405,7 +423,7 @@ export default class Action extends Widget {
     this.doAction();
   }
 
-  setActionStyle(actionStyle) {
+  setActionStyle(actionStyle: ActionStyleType) {
     this.setProperty('actionStyle', actionStyle);
   }
 }

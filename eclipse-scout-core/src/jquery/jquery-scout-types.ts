@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 import {Dimension, IconDesc, Logger, Point, Predicate} from '../index';
 import $ from 'jquery';
 import Deferred = JQuery.Deferred;
@@ -335,7 +345,7 @@ declare global {
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
      * @returns the active element of the current document
      */
-    activeElement<T extends boolean>(domElement?: T): T extends true ? Document : JQuery;
+    activeElement<T extends boolean>(domElement?: T): T extends true ? HTMLElement : JQuery;
 
     /**
      * @returns size of the window (width and height)

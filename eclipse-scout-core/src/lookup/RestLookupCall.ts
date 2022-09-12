@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -92,21 +92,21 @@ export default class RestLookupCall<Key> extends LookupCall<Key> {
     }
   }
 
-  override _getAll(): JQuery.Promise<LookupResult<Key>> {
+  protected override _getAll(): JQuery.Promise<LookupResult<Key>> {
     return this._call();
   }
 
-  override _getByText(text: string): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByText(text: string): JQuery.Promise<LookupResult<Key>> {
     this.addRestriction('text', text);
     return this._call();
   }
 
-  override _getByKey(key: Key): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByKey(key: Key): JQuery.Promise<LookupResult<Key>> {
     this.addRestriction('ids', arrays.ensure(key));
     return this._call();
   }
 
-  override _getByKeys(keys: Key[]): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByKeys(keys: Key[]): JQuery.Promise<LookupResult<Key>> {
     this.addRestriction('ids', arrays.ensure(keys));
     return this._call();
   }

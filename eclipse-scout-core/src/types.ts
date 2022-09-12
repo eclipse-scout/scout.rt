@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
+import Widget from './widget/Widget';
+
 export type Predicate<T> = (obj: T) => boolean;
 
 // Type that makes some properties optional and some required.
@@ -19,3 +21,7 @@ export type EnumObject<TYPE> = TYPE[keyof TYPE];
 export type EmptyObject = Record<string, never>;
 
 export type Primitive = number | string | boolean | symbol | bigint;
+
+export type Closeable = Widget & { close(): void };
+
+export type Abortable = Closeable & { abort(): void };
