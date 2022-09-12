@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventHandler, KeyStroke} from '../index';
+import {KeyStroke, ScoutKeyboardEvent} from '../index';
 
 export default interface KeyStrokeContextOptions {
   /**
@@ -22,7 +22,7 @@ export default interface KeyStrokeContextOptions {
   /**
    * Array of interceptors to participate in setting 'stop propagation' flags.
    */
-  stopPropagationInterceptors: EventHandler[];
+  stopPropagationInterceptors: ((event: ScoutKeyboardEvent) => void)[];
   /**
    * Holds the target where to bind this context as keydown listener.
    * This can either be a static value or a function to resolve the target.

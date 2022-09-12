@@ -38,7 +38,7 @@ export default class AjaxCall extends Call implements AjaxCallModel {
 
   // ==================================================================================
 
-  override _callImpl(): JQuery.jqXHR {
+  protected override _callImpl(): JQuery.jqXHR {
     // Mark retries by adding an URL parameter
     if (this.callCounter !== 1) {
       this.ajaxOptions.url = new URL(this.ajaxOptions.url).setParameter('retry', (this.callCounter - 1) + '').toString({
@@ -50,7 +50,7 @@ export default class AjaxCall extends Call implements AjaxCallModel {
     return $.ajax(this.ajaxOptions);
   }
 
-  override _setResultFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+  protected override _setResultFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
     // Store result as single object to make rethrowing the error easier for callers of AjaxCall
     this._setResult(new AjaxError({
       jqXHR: jqXHR,
@@ -60,17 +60,17 @@ export default class AjaxCall extends Call implements AjaxCallModel {
     }));
   }
 
-  override _onCallDone(data: any, textStatus: JQuery.Ajax.SuccessTextStatus, jqXHR: JQuery.jqXHR) {
+  protected override _onCallDone(data: any, textStatus: JQuery.Ajax.SuccessTextStatus, jqXHR: JQuery.jqXHR) {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX success');
     super._onCallDone(data, textStatus, jqXHR);
   }
 
-  override _onCallFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+  protected override _onCallFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX fail: type=' + textStatus + ', httpStatus=' + jqXHR.status + (errorThrown ? ' "' + errorThrown + '"' : ''));
     super._onCallFail(jqXHR, textStatus, errorThrown);
   }
 
-  override _nextRetryImpl(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+  protected override _nextRetryImpl(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
     let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown);
     if (!offlineError) {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Unexpected HTTP error');
@@ -105,7 +105,7 @@ export default class AjaxCall extends Call implements AjaxCallModel {
     return offline;
   }
 
-  override _abortImpl() {
+  protected override _abortImpl() {
     if (this.pendingCall && typeof this.pendingCall.abort === 'function') {
       this.pendingCall.abort();
     }

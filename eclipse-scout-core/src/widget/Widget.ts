@@ -1689,10 +1689,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     });
   }
 
-  resolveConsts(configs: { property: string; constType: string }[]) {
-    configs.forEach(config => {
-      objects.resolveConstProperty(this, config);
-    });
+  resolveConsts(configs: { property: string; constType: any }[]) {
+    configs.forEach(config => objects.resolveConstProperty(this, config));
   }
 
   /**
@@ -2092,9 +2090,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * @param options.preventScroll prevents scrolling to new focused element (defaults to false)
    * @returns true if the element could be focused, false if not
    */
-  focus(options?: {
-    preventScroll?: boolean;
-  }): boolean {
+  focus(options?: { preventScroll?: boolean; }): boolean {
     if (!this.rendered) {
       this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this, options));
       return false;

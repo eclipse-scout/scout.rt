@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStrokeContext, keyStrokeModifier} from '../index';
+import {keys, KeyStrokeContext, keyStrokeModifier, ScoutKeyboardEvent} from '../index';
 import $ from 'jquery';
 
 /**
@@ -16,7 +16,7 @@ import $ from 'jquery';
  */
 export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
 
-  constructor(multiline) {
+  constructor(multiline: boolean) {
     super();
 
     this.invokeAcceptInputOnActiveValueField = true;
@@ -70,7 +70,7 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
     this.setMultiline(multiline);
   }
 
-  setMultiline(multiline) {
+  setMultiline(multiline: boolean) {
     let multilineNavigationKeys = [
       keys.UP,
       keys.DOWN
@@ -88,7 +88,7 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
     }
   }
 
-  _applyPropagationFlags(event) {
+  protected override _applyPropagationFlags(event: ScoutKeyboardEvent) {
     super._applyPropagationFlags(event);
 
     if (event.isPropagationStopped()) {
@@ -100,7 +100,7 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
     }
   }
 
-  _isInputField(element) {
+  protected _isInputField(element: HTMLElement): boolean {
     if (element && element.isContentEditable) {
       return true;
     }
@@ -108,11 +108,11 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
     return $element.is('input:text') || $element.is('input:file') || $element.is('textarea');
   }
 
-  _isNumberKeyStroke(event) {
+  protected _isNumberKeyStroke(event: ScoutKeyboardEvent): boolean {
     return !event.ctrlKey && event.which >= keys[0] && event.which <= keys[9];
   }
 
-  _isLetterKeyStroke(event) {
+  protected _isLetterKeyStroke(event: ScoutKeyboardEvent): boolean {
     return !event.ctrlKey && event.which >= keys.A && event.which <= keys.Z;
   }
 }

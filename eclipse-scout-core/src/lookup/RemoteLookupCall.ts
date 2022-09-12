@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -22,25 +22,25 @@ export default class RemoteLookupCall<Key> extends LookupCall<Key> {
     this.deferred = null;
   }
 
-  override _getAll(): JQuery.Promise<LookupResult<Key>> {
+  protected override _getAll(): JQuery.Promise<LookupResult<Key>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.ALL));
     this.adapter.sendLookup(QueryBy.ALL);
     return this.deferred.promise();
   }
 
-  override _getByText(text: string): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByText(text: string): JQuery.Promise<LookupResult<Key>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.TEXT, text));
     this.adapter.sendLookup(QueryBy.TEXT, text);
     return this.deferred.promise();
   }
 
-  override _getByKey(key: Key): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByKey(key: Key): JQuery.Promise<LookupResult<Key>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.KEY, key));
     this.adapter.sendLookup(QueryBy.KEY, key);
     return this.deferred.promise();
   }
 
-  override _getByRec(rec: Key): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByRec(rec: Key): JQuery.Promise<LookupResult<Key>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.REC, rec));
     this.adapter.sendLookup(QueryBy.REC, rec);
     return this.deferred.promise();
