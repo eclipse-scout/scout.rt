@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, Dimension, Insets, Point, Rectangle, scout, scrollbars} from '../index';
+import {arrays, Dimension, Insets, objects, Point, Rectangle, scout, scrollbars} from '../index';
 import $ from 'jquery';
 
 /**
@@ -34,6 +34,10 @@ import $ from 'jquery';
  *                                          given width.
  *
  * heightHint               undefined       Same as 'widthHint' but for the height.
+ *
+ * enforceSizeHints         false           Sets min/max-width/height in addition to with width/height if widthHint resp. heightHint is set.
+ *                                          The browser sometimes makes the element smaller or larger than specified by width/height, especially in a flex container.
+ *                                          To prevent that, set this option to true. Default is false, but may change in the future.
  *
  * restoreScrollPositions   true            By default, the $elem's scrolling position is saved and restored
  *                                          during the execution of this method (because applying
@@ -96,6 +100,16 @@ export function prefSize($elem, options) {
     'width': newWidth,
     'height': newHeight
   };
+  if (scout.nvl(options.enforceSizeHints, false)) {
+    if (objects.isNumber(newWidth)) {
+      cssProperties['max-width'] = newWidth;
+      cssProperties['min-width'] = newWidth;
+    }
+    if (objects.isNumber(newHeight)) {
+      cssProperties['max-height'] = newHeight;
+      cssProperties['min-height'] = newHeight;
+    }
+  }
 
   // modify properties which prevent reading the preferred size
   $elem.css(cssProperties);

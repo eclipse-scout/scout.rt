@@ -93,7 +93,8 @@ export default class PageLayout extends AbstractLayout {
     // needs a width to be able to calculate the pref height
     textHeight = graphics.prefSize($text, {
       includeMargin: true,
-      widthHint: textWidth
+      widthHint: textWidth,
+      enforceSizeHints: true
     }).height;
 
     if ($icon.length > 0) {
@@ -106,6 +107,7 @@ export default class PageLayout extends AbstractLayout {
     }
     if (this.outline.detailContent) {
       let htmlDetailContent = this.outline.detailContent.htmlComp;
+      options = $.extend({}, options, {enforceSizeHints: true});
       detailContentPrefSize = htmlDetailContent.prefSize(options).add(htmlDetailContent.margins());
     }
 
