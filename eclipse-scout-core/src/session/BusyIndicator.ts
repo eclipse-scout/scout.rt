@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget, WidgetModel} from '../index';
+import {Action, BoxButtons, BusyIndicatorEventMap, ClickActiveElementKeyStroke, CloseKeyStroke, Event, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget, WidgetModel} from '../index';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export interface BusyIndicatorModel extends WidgetModel {
   cancellable?: boolean;
@@ -19,6 +20,7 @@ export interface BusyIndicatorModel extends WidgetModel {
 
 export default class BusyIndicator extends Widget implements BusyIndicatorModel {
   declare model: BusyIndicatorModel;
+  declare eventMap: BusyIndicatorEventMap;
 
   cancellable: boolean;
   showTimeout: number;
@@ -54,16 +56,15 @@ export default class BusyIndicator extends Widget implements BusyIndicatorModel 
     this._addWidgetProperties(['boxButtons', 'cancelButton']);
   }
 
-  override _createKeyStrokeContext(): KeyStrokeContext {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  override _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     this.keyStrokeContext.registerKeyStrokes([
       new ClickActiveElementKeyStroke(this, [keys.SPACE, keys.ENTER]),
-      // @ts-ignore FIXME TS remove ts-ignore when KeyStroke is migrated
       new CloseKeyStroke(this, (() => {
         if (!this.cancelButton) {
           return null;
@@ -73,7 +74,7 @@ export default class BusyIndicator extends Widget implements BusyIndicatorModel 
     ]);
   }
 
-  override _init(model: BusyIndicatorModel) {
+  protected override _init(model: BusyIndicatorModel) {
     super._init(model);
     this.label = scout.nvl(this.label, this.session.text('ui.PleaseWait_'));
     if (this.cancellable) {
@@ -89,7 +90,7 @@ export default class BusyIndicator extends Widget implements BusyIndicatorModel 
     super.render($parent);
   }
 
-  override _render() {
+  protected override _render() {
     // Render busy indicator (still hidden by CSS, will be shown later in setTimeout.
     // But don't use .hidden, otherwise the box' size cannot be calculated correctly!)
     this.$container = this.$parent.appendDiv('busyindicator invisible');
@@ -134,12 +135,12 @@ export default class BusyIndicator extends Widget implements BusyIndicatorModel 
     this._glassPaneRenderer.eachGlassPane($glassPane => $glassPane.addClass('busy'));
   }
 
-  override _postRender() {
+  protected override _postRender() {
     super._postRender();
     this.session.focusManager.installFocusContext(this.$container, FocusRule.AUTO);
   }
 
-  override _remove() {
+  protected override _remove() {
     // Remove busy box (cancel timer in case it was not fired yet)
     clearTimeout(this._busyIndicatorTimeoutId);
 
@@ -183,8 +184,12 @@ export default class BusyIndicator extends Widget implements BusyIndicatorModel 
     }
   }
 
-  protected _onCancelClick(event) { // FIXME TS use correct event type as soon as Action has been migrated
-    this.trigger('cancel', event); // FIXME TS add event map for cancel event using the 'action' Event from the ActionEventModel as soon as it has been migrated.
+  protected _onCancelClick(event: Event) {
+    this.trigger('cancel', event);
+  }
+
+  override trigger<K extends string & keyof EventMapOf<BusyIndicator>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<BusyIndicator>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
   }
 
   /**

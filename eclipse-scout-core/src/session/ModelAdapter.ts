@@ -211,7 +211,7 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
    * @param type of event
    * @param data of event
    */
-  protected _send(type: string, data: object, options?: ModelAdapterSendOptions) {
+  protected _send(type: string, data?: object, options?: ModelAdapterSendOptions) {
     // Legacy fallback with all options as arguments
     let opts = {} as ModelAdapterSendOptions;
     if (arguments.length > 2) {
