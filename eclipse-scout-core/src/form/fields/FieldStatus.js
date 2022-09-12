@@ -128,14 +128,11 @@ export default class FieldStatus extends Widget {
   _updatePopup(showStatus) {
     if (!this._requiresTooltip()) {
       this.hideTooltip();
+    } else if (showStatus) {
+      this.showTooltip();
     }
     if (arrays.empty(this.menus)) {
       this.hideContextMenu();
-    }
-    if (showStatus === true) {
-      this.showTooltip();
-    } else if (showStatus === false) {
-      this.hideTooltip();
     }
   }
 
