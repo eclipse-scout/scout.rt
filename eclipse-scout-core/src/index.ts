@@ -207,8 +207,10 @@ export {default as DeferredGlassPaneTarget} from './glasspane/DeferredGlassPaneT
 export {default as GlassPaneRenderer} from './glasspane/GlassPaneRenderer';
 export {default as IFrame} from './iframe/IFrame';
 export {default as Scrollbar} from './scrollbar/Scrollbar';
+export {default as ScrollbarEventMap} from './scrollbar/ScrollbarEventMap';
 export {default as scrollbars} from './scrollbar/scrollbars';
 export {default as VirtualScrolling} from './scrollbar/VirtualScrolling';
+export {default as VirtualScrollingOptions} from './scrollbar/VirtualScrollingOptions';
 export {default as Splitter} from './splitter/Splitter';
 export {default as DateFormatPatternType} from './text/DateFormatPatternType';
 export {default as DateFormatPatternDefinition} from './text/DateFormatPatternDefinition';
