@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -26,7 +26,7 @@ export default class CodeLookupCall extends StaticLookupCall<string> {
     this.codeType = null;
   }
 
-  override _lookupRowByKey(key: string): LookupRow<string> {
+  protected override _lookupRowByKey(key: string): LookupRow<string> {
     let codeType = codes.codeType(this.codeType, true);
     if (!codeType) {
       return null;
@@ -34,18 +34,18 @@ export default class CodeLookupCall extends StaticLookupCall<string> {
     return this._createLookupRow(codeType.optGet(key));
   }
 
-  override _lookupRowsByAll(): LookupRow<string>[] {
+  protected override _lookupRowsByAll(): LookupRow<string>[] {
     return this._collectLookupRows();
   }
 
-  override _lookupRowsByText(text: string): LookupRow<string>[] {
+  protected override _lookupRowsByText(text: string): LookupRow<string>[] {
     return this._collectLookupRows(lookupRow => {
       let lookupRowText = lookupRow.text || '';
       return strings.startsWith(lookupRowText.toLowerCase(), text.toLowerCase());
     });
   }
 
-  override _lookupRowsByRec(rec: string): LookupRow<string>[] {
+  protected override _lookupRowsByRec(rec: string): LookupRow<string>[] {
     return this._collectLookupRows(lookupRow => lookupRow.parentKey === rec);
   }
 

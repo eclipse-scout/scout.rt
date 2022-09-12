@@ -1,18 +1,20 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../index';
+import {keys, KeyStroke, Session, Widget} from '../index';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class FocusAdjacentElementKeyStroke extends KeyStroke {
+  session: Session;
 
-  constructor(session, field) {
+  constructor(session: Session, field: Widget) {
     super();
     this.session = session;
     this.field = field;
@@ -22,7 +24,7 @@ export default class FocusAdjacentElementKeyStroke extends KeyStroke {
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
 
-  handle(event) {
+  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     let activeElement = this.field.$container.activeElement(true),
       $focusableElements = this.field.$container.find(':focusable');
 
@@ -36,7 +38,7 @@ export default class FocusAdjacentElementKeyStroke extends KeyStroke {
     }
   }
 
-  _handleNext(activeElement, $focusableElements) {
+  protected _handleNext(activeElement: HTMLElement, $focusableElements: JQuery) {
     let $newFocusElement;
     if (activeElement === $focusableElements.last()[0]) {
       $newFocusElement = $focusableElements.first();
@@ -47,7 +49,7 @@ export default class FocusAdjacentElementKeyStroke extends KeyStroke {
     $newFocusElement.addClass('keyboard-navigation');
   }
 
-  _handlePrevious(activeElement, $focusableElements) {
+  protected _handlePrevious(activeElement: HTMLElement, $focusableElements: JQuery) {
     let $newFocusElement;
     if (activeElement === $focusableElements.first()[0]) {
       $newFocusElement = $focusableElements.last();

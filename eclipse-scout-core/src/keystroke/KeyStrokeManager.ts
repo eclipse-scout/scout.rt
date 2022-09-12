@@ -1,17 +1,28 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, EventEmitter, filters as filters_1, keys, KeyStroke, ValueField, VirtualKeyStrokeEvent} from '../index';
+import {Action, arrays, Event, EventEmitter, filters, Key, keys, KeyStroke, KeyStrokeContext, KeyStrokeManagerEventMap, KeyStrokeModel, Session, ValueField, VirtualKeyStrokeEvent} from '../index';
 import $ from 'jquery';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
 
-export default class KeyStrokeManager extends EventEmitter {
+export default class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerModel {
+  declare model: KeyStrokeManagerModel;
+  declare eventMap: KeyStrokeManagerEventMap;
+
+  session: Session;
+  helpKeyStroke: KeyStrokeModel;
+  swallowF1: boolean;
+  filters: ({ filter(keyStroke: KeyStroke): boolean })[];
+  protected _helpRendered: boolean;
+  protected _renderedKeys: Key[];
 
   constructor() {
     super();
@@ -23,12 +34,12 @@ export default class KeyStrokeManager extends EventEmitter {
     this.filters = [];
   }
 
-  init(model) {
+  init(model: KeyStrokeManagerModel) {
     this.session = model.session;
     this.installTopLevelKeyStrokeHandlers(this.session.$entryPoint);
   }
 
-  installTopLevelKeyStrokeHandlers($container) {
+  installTopLevelKeyStrokeHandlers($container: JQuery) {
     let
       myWindow = $container.window(true),
       // Swallow F1 (online help) key stroke
@@ -46,19 +57,22 @@ export default class KeyStrokeManager extends EventEmitter {
       .keyup(backspaceHandler);
 
     if ('onhelp' in myWindow) {
-      myWindow.onhelp = filters_1.returnFalse;
+      // @ts-ignore
+      myWindow.onhelp = filters.returnFalse;
     }
   }
 
   /**
    * Installs the given keystroke context. This method has no effect if the context is null, or already installed.
    */
-  installKeyStrokeContext(keyStrokeContext) {
+  installKeyStrokeContext(keyStrokeContext: KeyStrokeContext) {
     if (!keyStrokeContext) {
       return;
     }
 
-    if (keyStrokeContext._handler) {
+    // @ts-ignore
+    let handler = keyStrokeContext._handler;
+    if (handler) {
       return; // context already installed
     }
 
@@ -66,33 +80,40 @@ export default class KeyStrokeManager extends EventEmitter {
       throw new Error('missing bind-target for KeyStrokeContext: ' + keyStrokeContext);
     }
 
-    keyStrokeContext._handler = this._onKeyEvent.bind(this, keyStrokeContext);
-    keyStrokeContext._handler.$target = keyStrokeContext.$getBindTarget();
-    keyStrokeContext._handler.$target.on('keydown', keyStrokeContext._handler);
-    keyStrokeContext._handler.$target.on('keyup', keyStrokeContext._handler);
+    handler = this._onKeyEvent.bind(this, keyStrokeContext);
+    handler.$target = keyStrokeContext.$getBindTarget();
+    handler.$target.on('keydown', handler);
+    handler.$target.on('keyup', handler);
+
+    // @ts-ignore
+    keyStrokeContext._handler = handler;
   }
 
   /**
    * Uninstalls the given keystroke context. This method has no effect if the context is null, or not installed.
    */
-  uninstallKeyStrokeContext(keyStrokeContext) {
+  uninstallKeyStrokeContext(keyStrokeContext: KeyStrokeContext) {
     if (!keyStrokeContext) {
       return;
     }
-    if (!keyStrokeContext._handler) {
+    // @ts-ignore
+    let handler = keyStrokeContext._handler;
+    if (!handler) {
       return; // context not installed
     }
 
-    keyStrokeContext._handler.$target.off('keydown', keyStrokeContext._handler);
-    keyStrokeContext._handler.$target.off('keyup', keyStrokeContext._handler);
-    keyStrokeContext._handler.$target = null;
+    handler.$target.off('keydown', handler);
+    handler.$target.off('keyup', handler);
+    handler.$target = null;
+
+    // @ts-ignore
     keyStrokeContext._handler = null;
   }
 
   /**
    * Visualizes the keys supported by the given keyStrokeContext.
    */
-  _renderKeys(keyStrokeContext, event) {
+  protected _renderKeys(keyStrokeContext: KeyStrokeContext, event: KeyboardEventWithMetaData) {
     let descendantContexts = event.originalEvent.keyStrokeContexts || [];
     let immediatePropagationStoppedKeys = [];
 
@@ -101,11 +122,11 @@ export default class KeyStrokeManager extends EventEmitter {
         let render = keyStroke.renderingHints.render;
         return (typeof render === 'function' ? render.call(keyStroke) : render);
       })
-      .forEach(function(keyStroke) {
+      .forEach(keyStroke => {
         keyStroke.enabledByFilter = this._filter(keyStroke);
         let $drawingArea = (keyStroke.field ? keyStroke.field.$container : null) || keyStrokeContext.$getScopeTarget(); // Precedence: keystroke's field container, or the scope target otherwise.
         let keys = keyStroke.keys(); // Get all keys which are handled by the keystroke. Typically, this is a single key.
-        keys.forEach(function(key) {
+        keys.forEach(key => {
           let virtualKeyStrokeEvent = new VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, event.target);
 
           if (immediatePropagationStoppedKeys.indexOf(key.toKeyStrokeString()) < 0 && keyStrokeContext.accept(virtualKeyStrokeEvent) &&
@@ -118,18 +139,18 @@ export default class KeyStrokeManager extends EventEmitter {
               immediatePropagationStoppedKeys.push(key.toKeyStrokeString());
             }
           }
-        }, this);
-      }, this);
+        });
+      });
 
     descendantContexts.push(keyStrokeContext); // Register this keyStrokeContext within the event, so that superior keyStrokeContexts can validate their keys (e.g. not swallowed by a descendant keyStrokeContext).
     event.originalEvent.keyStrokeContexts = descendantContexts;
   }
 
-  _isPreventedByDescendantContext(key, target, descendantContexts) {
+  protected _isPreventedByDescendantContext(key: Key, target: HTMLElement, descendantContexts: KeyStrokeContext[]): boolean {
     let virtualKeyStrokeEvent = new VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, target);
 
     // Check whether any descendant keyStrokeContext prevents this keystroke from execution.
-    return descendantContexts.some(function(descendantContext) {
+    return descendantContexts.some(descendantContext => {
       // Ask descendant keyStrokeContext whether this event is swallowed.
       descendantContext.accept(virtualKeyStrokeEvent);
       if (virtualKeyStrokeEvent.isAnyPropagationStopped()) {
@@ -140,14 +161,14 @@ export default class KeyStrokeManager extends EventEmitter {
       return descendantContext.keyStrokes.some(descendantKeyStroke => {
         descendantKeyStroke.accept(virtualKeyStrokeEvent);
         return virtualKeyStrokeEvent.isAnyPropagationStopped();
-      }, this);
-    }, this);
+      });
+    });
   }
 
   /**
    * Handles the keystroke event by the keyStrokeContext's keystroke handlers, but returns immediately once a keystroke requests immediate stop of propagation.
    */
-  _handleKeyStrokeEvent(keyStrokeContext, event) {
+  protected _handleKeyStrokeEvent(keyStrokeContext: KeyStrokeContext, event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     if (!keyStrokeContext.accept(event)) {
       return;
     }
@@ -166,7 +187,7 @@ export default class KeyStrokeManager extends EventEmitter {
     // anymore. However: creating a copy can be dangerous too, because the handle function must deal with
     // the situation that the widget to which the keystroke belongs, is suddenly destroyed.
     let keyStrokesCopy = keyStrokeContext.keyStrokes.slice();
-    keyStrokesCopy.some(function(keyStroke) {
+    keyStrokesCopy.some(keyStroke => {
       if (!keyStroke.accept(event)) {
         return false;
       }
@@ -190,10 +211,14 @@ export default class KeyStrokeManager extends EventEmitter {
 
       // Break on 'stopImmediate'.
       return event.isImmediatePropagationStopped(); // 'some-loop' breaks on true
-    }, this);
+    });
   }
 
-  _filter(keyStroke) {
+  override trigger<K extends string & keyof EventMapOf<KeyStrokeManager>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<KeyStrokeManager>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
+
+  protected _filter(keyStroke: KeyStroke): boolean {
     for (let i = 0; i < this.filters.length; i++) {
       if (!this.filters[i].filter(keyStroke)) {
         return false;
@@ -202,27 +227,25 @@ export default class KeyStrokeManager extends EventEmitter {
     return true;
   }
 
-  invokeAcceptInputOnActiveValueField(keyStroke, keyStrokeContext) {
+  invokeAcceptInputOnActiveValueField(keyStroke: KeyStroke, keyStrokeContext: KeyStrokeContext) {
     return !keyStroke.preventInvokeAcceptInputOnActiveValueField && (keyStroke.invokeAcceptInputOnActiveValueField || keyStrokeContext.invokeAcceptInputOnActiveValueField);
   }
 
-  _isHelpKeyStroke(event) {
+  protected _isHelpKeyStroke(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>): boolean {
     return KeyStroke.acceptEvent(this.helpKeyStroke, event);
   }
 
-  _installHelpDisposeListener(event) {
+  protected _installHelpDisposeListener(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>): boolean {
     let helpDisposeHandler,
       $currentTarget = $(event.currentTarget),
-      $myWindow = $currentTarget.window(),
+      $myWindow = $currentTarget.window() as JQuery<Window>,
       $topLevelContainer = $currentTarget.entryPoint();
 
     helpDisposeHandler = function() {
       $topLevelContainer.off('keyup', helpDisposeHandler);
       $myWindow.off('blur', helpDisposeHandler);
       this._helpRendered = false;
-      this._renderedKeys.forEach(key => {
-        key.remove();
-      });
+      this._renderedKeys.forEach(key => key.remove());
       this._renderedKeys = [];
     }.bind(this);
 
@@ -232,13 +255,11 @@ export default class KeyStrokeManager extends EventEmitter {
     return false;
   }
 
-  _onKeyEvent(keyStrokeContext, event) {
+  protected _onKeyEvent(keyStrokeContext: KeyStrokeContext, event: KeyboardEventWithMetaData): boolean {
     // check if scopeTarget is covered by glass pane
     if (this.session.focusManager.isElementCovertByGlassPane(keyStrokeContext.$getScopeTarget())) {
       // check if any action with 'keyStrokeFirePolicy=IAction.KeyStrokeFirePolicy.ALWAYS' is in keyStrokeContext
-      let keyStrokeFirePolicyAlways = $.grep(keyStrokeContext.keyStrokes, k => { // (will at least return an empty array)
-        return k.keyStrokeFirePolicy === Action.KeyStrokeFirePolicy.ALWAYS;
-      });
+      let keyStrokeFirePolicyAlways = $.grep(keyStrokeContext.keyStrokes, k => k.keyStrokeFirePolicy === Action.KeyStrokeFirePolicy.ALWAYS); // (will at least return an empty array)
       if (keyStrokeFirePolicyAlways.length === 0) {
         return;
       }
@@ -259,11 +280,19 @@ export default class KeyStrokeManager extends EventEmitter {
     }
   }
 
-  addFilter(filter) {
+  addFilter(filter: { filter(keyStroke: KeyStroke): boolean }) {
     arrays.pushSet(this.filters, filter);
   }
 
-  removeFilter(filter) {
+  removeFilter(filter: { filter(keyStroke: KeyStroke): boolean }) {
     arrays.remove(this.filters, filter);
   }
+}
+
+export interface KeyStrokeManagerModel {
+  session: Session;
+}
+
+export interface KeyboardEventWithMetaData extends KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> {
+  originalEvent?: KeyboardEvent & { renderingHelp?: boolean; keyStrokeContexts?: KeyStrokeContext[] };
 }

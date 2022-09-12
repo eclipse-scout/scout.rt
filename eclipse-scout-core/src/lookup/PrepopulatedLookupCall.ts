@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -32,7 +32,7 @@ export default class PrepopulatedLookupCall<Key> extends LookupCall<Key> {
 
   // --- ALL ---
 
-  override _getAll(): JQuery.Promise<LookupResult<Key>> {
+  protected override _getAll(): JQuery.Promise<LookupResult<Key>> {
     let deferred = $.Deferred();
     setTimeout(this._queryByAll.bind(this, deferred));
     return deferred.promise();
@@ -53,7 +53,7 @@ export default class PrepopulatedLookupCall<Key> extends LookupCall<Key> {
 
   // --- TEXT ---
 
-  override _getByText(text: string): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByText(text: string): JQuery.Promise<LookupResult<Key>> {
     let deferred = $.Deferred();
     setTimeout(this._queryByText.bind(this, deferred, text));
     return deferred.promise();
@@ -77,7 +77,7 @@ export default class PrepopulatedLookupCall<Key> extends LookupCall<Key> {
 
   // --- KEY ---
 
-  override _getByKey(key: Key): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByKey(key: Key): JQuery.Promise<LookupResult<Key>> {
     let deferred = $.Deferred();
     setTimeout(this._queryByKey.bind(this, deferred, key));
     return deferred.promise();
@@ -101,7 +101,7 @@ export default class PrepopulatedLookupCall<Key> extends LookupCall<Key> {
 
   // --- REC ---
 
-  override _getByRec(rec: Key): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByRec(rec: Key): JQuery.Promise<LookupResult<Key>> {
     let deferred = $.Deferred();
     setTimeout(this._queryByRec.bind(this, deferred, rec));
     return deferred.promise();

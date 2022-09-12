@@ -1,16 +1,29 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default class VirtualKeyStrokeEvent {
+import {KeyStrokeMode} from './KeyStroke';
+import {ScoutKeyboardEvent} from '../index';
 
-  constructor(which, ctrl, alt, shift, keyStrokeMode, target) {
+export default class VirtualKeyStrokeEvent implements ScoutKeyboardEvent {
+  which: number;
+  ctrlKey: boolean;
+  metaKey: boolean;
+  altKey: boolean;
+  shiftKey: boolean;
+  target: HTMLElement;
+  type: KeyStrokeMode;
+  protected _propagationStopped: boolean;
+  protected _immediatePropagationStopped: boolean;
+  protected _defaultPrevented: boolean;
+
+  constructor(which: number, ctrl: boolean, alt: boolean, shift: boolean, keyStrokeMode: KeyStrokeMode, target: HTMLElement) {
     this.which = which;
     this.ctrlKey = ctrl;
     this.metaKey = false;
@@ -36,19 +49,19 @@ export default class VirtualKeyStrokeEvent {
     this._defaultPrevented = true;
   }
 
-  isPropagationStopped() {
+  isPropagationStopped(): boolean {
     return this._propagationStopped;
   }
 
-  isImmediatePropagationStopped() {
+  isImmediatePropagationStopped(): boolean {
     return this._immediatePropagationStopped;
   }
 
-  isDefaultPrevented() {
+  isDefaultPrevented(): boolean {
     return this._defaultPrevented;
   }
 
-  isAnyPropagationStopped() {
+  isAnyPropagationStopped(): boolean {
     return this._propagationStopped || this._immediatePropagationStopped;
   }
 }

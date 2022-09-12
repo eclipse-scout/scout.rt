@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -239,21 +239,16 @@ const keys = {
   /**
    * If a browser has a non-standard key-code for one of the keys defined in this file this function returns the correct key code for that browser.
    *
-   * @param {number} keyCode
-   * @param {string} [modifier] some key codes change when a modifier is pressed
-   * @returns {number}
+   * @param [modifier] some key codes change when a modifier is pressed
    */
-  forBrowser: (keyCode, modifier) => keys.mapKey(keys.browserMap, keyCode, modifier),
+  forBrowser: (keyCode: number, modifier?: PropertyKey): number => keys.mapKey(keys.browserMap, keyCode, modifier),
 
   /**
    * If a browser has a non-standard key-code for one of the keys defined in this file this function returns the original key for that browser.
-   *
-   * @param {number} keyCode
-   * @returns {number}
    */
-  fromBrowser: keyCode => keys.mapKey(keys.browserMapReverse, keyCode),
+  fromBrowser: (keyCode: number): number => keys.mapKey(keys.browserMapReverse, keyCode),
 
-  mapKey: (map, keyCode, modifier) => {
+  mapKey: (map: { [browser: string]: object }, keyCode: number, modifier?: PropertyKey): number => {
     let browserMap = map[Device.get().browser];
     if (browserMap && modifier) {
       browserMap = browserMap[modifier];
