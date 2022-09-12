@@ -3,12 +3,12 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, graphics, HtmlComponent, Insets, objects, scout, Scrollbar} from '../index';
+import {arrays, Device, graphics, HtmlComponent, Insets, objects, scout, Scrollbar, Session, WidgetModel} from '../index';
 import $ from 'jquery';
 
 /**
@@ -19,44 +19,46 @@ import $ from 'jquery';
  * must set some additional CSS styles.
  */
 
-let _$scrollables = {};
-let mutationObserver;
-let intersectionObserver;
+let _$scrollables: Record<string, JQuery[]> = {};
+let mutationObserver: MutationObserver;
+let intersectionObserver: IntersectionObserver;
 
-export function getScrollables(session) {
+export function getScrollables(session?: Session): JQuery[] {
   // return scrollables for given session
   if (session) {
-    return _$scrollables[session] || [];
+    return _$scrollables[session + ''] || [];
   }
 
   // return all scrollables, no matter to which session they belong
-  let $scrollables = [];
-  objects.values(_$scrollables).forEach($scrollablesPerSession => {
+  let $scrollables: JQuery[] = [];
+  objects.values(_$scrollables).forEach(($scrollablesPerSession: JQuery[]) => {
     arrays.pushAll($scrollables, $scrollablesPerSession);
   });
   return $scrollables;
 }
 
-export function pushScrollable(session, $container) {
-  if (_$scrollables[session]) {
-    if (_$scrollables[session].indexOf($container) > -1) {
+export function pushScrollable(session: Session, $container: JQuery) {
+  let key = session + '';
+  if (_$scrollables[key]) {
+    if (_$scrollables[key].indexOf($container) > -1) {
       // already pushed
       return;
     }
-    _$scrollables[session].push($container);
+    _$scrollables[key].push($container);
   } else {
-    _$scrollables[session] = [$container];
+    _$scrollables[key] = [$container];
   }
-  $.log.isTraceEnabled() && $.log.trace('Scrollable added: ' + $container.attr('class') + '. New length: ' + _$scrollables[session].length);
+  $.log.isTraceEnabled() && $.log.trace('Scrollable added: ' + $container.attr('class') + '. New length: ' + _$scrollables[key].length);
 }
 
-export function removeScrollable(session, $container) {
+export function removeScrollable(session: Session, $container: JQuery) {
   let initLength = 0;
-  if (_$scrollables[session]) {
-    initLength = _$scrollables[session].length;
-    arrays.$remove(_$scrollables[session], $container);
-    $.log.isTraceEnabled() && $.log.trace('Scrollable removed: ' + $container.attr('class') + '. New length: ' + _$scrollables[session].length);
-    if (initLength === _$scrollables[session].length) {
+  let key = session + '';
+  if (_$scrollables[key]) {
+    initLength = _$scrollables[key].length;
+    arrays.$remove(_$scrollables[key], $container);
+    $.log.isTraceEnabled() && $.log.trace('Scrollable removed: ' + $container.attr('class') + '. New length: ' + _$scrollables[key].length);
+    if (initLength === _$scrollables[key].length) {
       throw new Error('scrollable could not be removed. Potential memory leak. ' + $container.attr('class'));
     }
   } else {
@@ -64,24 +66,35 @@ export function removeScrollable(session, $container) {
   }
 }
 
-/**
- * @param [options]
- * @param {string} [options.axis] x, y or both. Default is both.
- * @param {boolean} [options.nativeScrollbars]
- * @param {boolean} [options.hybridScrollbars]
- * @param {string|[string]} [options.scrollShadow] controls the scroll shadow behavior.
- *        <ul>
- *          <li>To define where the shadow should appear, use one of the following values: x, y, top, right, bottom, left. Multiple values can be separated by space.
- *          <li>If no positioning value is provided, it is automatically determined based on the axis.</li>
- *          <li>To adjust the style, add one of the following values: large or gradient.</li>
- *          <li>To disable the scroll shadow completely, set the value to none.</li>
- *        </ul>
- * @param {function} [options.scrollShadowCustomizer] function to customize the scroll shadow
- * @param {Session} [options.session]
- * @param {Widget} [options.parent]
- */
-export function install($container, options) {
-  options = _createDefaultScrollToOptions(options);
+export interface ScrollbarInstallOptions extends WidgetModel {
+  /**
+   * Default is both
+   */
+  axis?: 'x' | 'y' | 'both';
+
+  nativeScrollbars?: boolean;
+
+  hybridScrollbars?: boolean;
+
+  /**
+   * controls the scroll shadow behavior:
+   * <ul>
+   *   <li>To define where the shadow should appear, use one of the following values: x, y, top, right, bottom, left. Multiple values can be separated by space.
+   *   <li>If no positioning value is provided, it is automatically determined based on the axis.</li>
+   *   <li>To adjust the style, add one of the following values: large or gradient.</li>
+   *   <li>To disable the scroll shadow completely, set the value to none.</li>
+   * </ul>
+   */
+  scrollShadow?: string | string[];
+
+  /**
+   * function to customize the scroll shadow
+   */
+  scrollShadowCustomizer?($container: JQuery, $shadow: JQuery): void;
+}
+
+export function install($container: JQuery, options?: ScrollbarInstallOptions): JQuery {
+  options = options || {parent: undefined};
   options.axis = options.axis || 'both';
   options.scrollShadow = options.scrollShadow || 'auto';
 
@@ -111,7 +124,7 @@ export function install($container, options) {
   return $container;
 }
 
-export function _installNative($container, options) {
+export function _installNative($container: JQuery, options: ScrollbarInstallOptions) {
   if (Device.get().isIos()) {
     // On ios, container sometimes is not scrollable when installing too early
     // Happens often with nested scrollable containers (e.g. scrollable table inside a form inside a scrollable tree data)
@@ -121,7 +134,7 @@ export function _installNative($container, options) {
   }
 }
 
-export function _installNativeInternal($container, options) {
+export function _installNativeInternal($container: JQuery, options: ScrollbarInstallOptions) {
   $.log.isTraceEnabled() && $.log.trace('use native scrollbars for container ' + graphics.debugOutput($container));
   if (options.axis === 'x') {
     $container
@@ -137,7 +150,7 @@ export function _installNativeInternal($container, options) {
   $container.css('-webkit-overflow-scrolling', 'touch');
 }
 
-export function installScrollShadow($container, session, options) {
+export function installScrollShadow($container: JQuery, session: Session, options: ScrollbarInstallOptions) {
   if (!Device.get().supportsIntersectionObserver()) {
     return;
   }
@@ -172,7 +185,7 @@ export function installScrollShadow($container, session, options) {
   $container.on('hide show', visibleListener);
 }
 
-export function uninstallScrollShadow($container, session) {
+export function uninstallScrollShadow($container: JQuery, session: Session) {
   let $shadow = $container.data('scroll-shadow');
   if ($shadow) {
     $shadow.remove();
@@ -192,18 +205,14 @@ export function uninstallScrollShadow($container, session) {
   if (visibleListener) {
     $container.off('hide show', visibleListener);
   }
-  let $scrollables = _$scrollables[session];
+  let $scrollables = _$scrollables[session + ''];
   if (!$scrollables || !$scrollables.some($scrollable => $scrollable.data('scroll-shadow'))) {
     _uninstallMutationObserver();
     _uninstallIntersectionObserver();
   }
 }
 
-/**
- * @param options
- * @return {[string]}
- */
-function _computeScrollShadowStyle(options) {
+function _computeScrollShadowStyle(options: ScrollbarInstallOptions): string[] {
   let scrollShadow = options.scrollShadow;
   if (!scrollShadow) {
     return [];
@@ -236,7 +245,7 @@ function _computeScrollShadowStyle(options) {
   return scrollShadow;
 }
 
-export function updateScrollShadowWhileScrolling($container) {
+export function updateScrollShadowWhileScrolling($container: JQuery) {
   let $animatingParent = $container.findUp($elem => $elem.hasAnimationClass());
   if ($animatingParent.length > 0) {
     // If the container is scrolled while being animated, the shadow will likely get the wrong size and/or position if the animation changes the bounds.
@@ -247,7 +256,7 @@ export function updateScrollShadowWhileScrolling($container) {
   updateScrollShadow($container);
 }
 
-export function updateScrollShadow($container) {
+export function updateScrollShadow($container: JQuery) {
   let $shadow = $container.data('scroll-shadow');
   if (!$shadow) {
     return;
@@ -272,15 +281,15 @@ export function updateScrollShadow($container) {
     customizer($container, $shadow);
   }
 
-  function atStart(scrollPos) {
+  function atStart(scrollPos: number): boolean {
     return scrollPos === 0;
   }
 
-  function atEnd(scrollPos, scrollSize, offsetSize) {
+  function atEnd(scrollPos: number, scrollSize: number, offsetSize: number): boolean {
     return scrollPos + 1 >= scrollSize - offsetSize;
   }
 
-  function insets($shadow) {
+  function insets($shadow: JQuery): Insets {
     return new Insets($shadow.cssPxValue('--scroll-shadow-inset-top'),
       $shadow.cssPxValue('--scroll-shadow-inset-right'),
       $shadow.cssPxValue('--scroll-shadow-inset-bottom'),
@@ -291,7 +300,7 @@ export function updateScrollShadow($container) {
 /**
  * Installs a dom mutation observer that tracks all scrollables in order to move the scroll shadow along with the scrollable.
  */
-function _installMutationObserver(session) {
+function _installMutationObserver(session: Session) {
   if (mutationObserver) {
     return;
   }
@@ -302,11 +311,11 @@ function _installMutationObserver(session) {
   });
 }
 
-function _onDomMutation(mutationList, observer) {
+function _onDomMutation(mutationList: MutationRecord[], observer: MutationObserver) {
   mutationList.forEach(_processDomMutation);
 }
 
-export function _processDomMutation(mutation) {
+export function _processDomMutation(mutation: MutationRecord) {
   // addedNodes if of type NodeList and therefore does not support array functions
   for (let i = 0; i < mutation.addedNodes.length; i++) {
     let elem = mutation.addedNodes[i];
@@ -336,10 +345,8 @@ function _installIntersectionObserver() {
   if (intersectionObserver) {
     return;
   }
-  intersectionObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      _onScrollableVisibleChange(entry.target, entry.intersectionRatio > 0);
-    });
+  intersectionObserver = new IntersectionObserver((entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
+    entries.forEach(entry => _onScrollableVisibleChange(entry.target, entry.intersectionRatio > 0));
   });
 }
 
@@ -351,7 +358,7 @@ function _uninstallIntersectionObserver() {
   intersectionObserver = null;
 }
 
-export function _onScrollableVisibleChange(element, visible) {
+export function _onScrollableVisibleChange(element: Element, visible: boolean) {
   let $element = $(element);
   let $shadow = $element.data('scroll-shadow');
   if (!$shadow) {
@@ -360,7 +367,7 @@ export function _onScrollableVisibleChange(element, visible) {
   $shadow.setVisible($element.isVisible());
 }
 
-export function hasScrollShadow($container, position) {
+export function hasScrollShadow($container: JQuery, position: string): boolean {
   if (!$container) {
     return false;
   }
@@ -374,19 +381,19 @@ export function hasScrollShadow($container, position) {
   return $scrollShadow.hasClass(position);
 }
 
-export function isHybridScrolling($scrollable) {
+export function isHybridScrolling($scrollable: JQuery): boolean {
   return $scrollable.hasClass('hybrid-scrollable');
 }
 
-export function isNativeScrolling($scrollable) {
+export function isNativeScrolling($scrollable: JQuery): boolean {
   return scout.isOneOf('auto', $scrollable.css('overflow'), $scrollable.css('overflow-x'), $scrollable.css('overflow-y'));
 }
 
-export function isJsScrolling($scrollable) {
+export function isJsScrolling($scrollable: JQuery): boolean {
   return !!$scrollable.data('scrollbars');
 }
 
-export function _installJs($container, options) {
+export function _installJs($container: JQuery, options: ScrollbarInstallOptions) {
   $.log.isTraceEnabled() && $.log.trace('installing JS-scrollbars for container ' + graphics.debugOutput($container));
   let scrollbars = arrays.ensure($container.data('scrollbars'));
   scrollbars.forEach(scrollbar => {
@@ -419,7 +426,7 @@ export function _installJs($container, options) {
 /**
  * Removes the js scrollbars for the $container, if there are any.<p>
  */
-export function uninstall($container, session) {
+export function uninstall($container: JQuery, session: Session) {
   if (!$container.data('scrollable')) {
     // was not installed previously -> uninstalling not necessary
     return;
@@ -447,15 +454,14 @@ export function uninstall($container, session) {
 /**
  * Recalculates the scrollbar size and position.
  * @param $scrollable JQuery element that has .data('scrollbars'), when $scrollable is falsy the function returns immediately
- * @param immediate set to true to immediately update the scrollbar, If set to false,
- *        it will be queued in order to prevent unnecessary updates.
+ * @param immediate set to true to immediately update the scrollbar. If set to false, it will be queued in order to prevent unnecessary updates.
  */
-export function update($scrollable, immediate) {
+export function update($scrollable: JQuery, immediate?: boolean) {
   if (!$scrollable || !$scrollable.data('scrollable')) {
     return;
   }
   updateScrollShadow($scrollable);
-  let scrollbars = $scrollable.data('scrollbars');
+  let scrollbars: Scrollbar[] = $scrollable.data('scrollbars');
   if (!scrollbars) {
     if (Device.get().isIos()) {
       _handleIosPaintBug($scrollable);
@@ -477,7 +483,7 @@ export function update($scrollable, immediate) {
   $scrollable.data('scrollbarUpdatePending', true);
 }
 
-export function _update(scrollbars) {
+export function _update(scrollbars: Scrollbar[]) {
   // Reset the scrollbars first to make sure they don't extend the scrollSize
   scrollbars.forEach(scrollbar => {
     if (scrollbar.rendered) {
@@ -501,7 +507,7 @@ export function _update(scrollbars) {
  * To workaround this bug the flag -webkit-overflow-scrolling will be removed if the scrollable component won't display any scrollbars
  */
 
-export function _handleIosPaintBug($scrollable) {
+export function _handleIosPaintBug($scrollable: JQuery) {
   if ($scrollable.data('scrollbarUpdatePending')) {
     return;
   }
@@ -524,45 +530,55 @@ export function _handleIosPaintBug($scrollable) {
   }
 }
 
-export function reset($scrollable) {
-  let scrollbars = $scrollable.data('scrollbars');
+export function reset($scrollable: JQuery) {
+  let scrollbars: Scrollbar[] = $scrollable.data('scrollbars');
   if (!scrollbars) {
     return;
   }
-  scrollbars.forEach(scrollbar => {
-    scrollbar.reset();
-  });
+  scrollbars.forEach(scrollbar => scrollbar.reset());
+}
+
+export interface ScrollToOptions extends ScrollOptions {
+  /**
+   * Specifies where the element should be positioned in the view port. Can either be 'top', 'center' or 'bottom'.
+   * If unspecified, the following rules apply:
+   *   - If the element is above the visible area it will be aligned to top.
+   *   - If the element is below the visible area it will be aligned to bottom.
+   *   - If the element is already in the visible area no scrolling is done.
+   * Default is undefined.
+   */
+  align?: string;
+
+  /**
+   * If true, all running animations are stopped before executing the current scroll request. Default is true.
+   */
+  stop?: boolean;
+
+  /**
+   * Additional margin to assume at the top of the target element (independent from any actual CSS margin).
+   * Useful when elements are positioned outside of their boundaries (e.g. focus border). Default is 4.
+   */
+  scrollOffsetUp?: number;
+
+  /**
+   * Additional margin to assume at the bottom of the target element (independent from any actual CSS margin).
+   * Useful when elements are positioned outside of their boundaries (e.g. focus border). Default is 8.
+   */
+  scrollOffsetDown?: number;
 }
 
 /**
  * Scrolls the $scrollable to the given $element (must be a child of $scrollable)
  *
- * @param {JQuery} $scrollable
+ * @param $scrollable
  *          the scrollable object
- * @param {JQuery} $element
+ * @param $element
  *          the element to scroll to
- * @param {object|string} [options]
+ * @param [options]
  *          an optional options object. Short-hand version: If a string is passed instead
  *          of an object, the value is automatically converted to the option "align".
- * @param {string} [options.align]
- *          Specifies where the element should be positioned in the view port. Can either be 'top', 'center' or 'bottom'.
- *          If unspecified, the following rules apply:
- *          - If the element is above the visible area it will be aligned to top.
- *          - If the element is below the visible area it will be aligned to bottom.
- *          - If the element is already in the visible area no scrolling is done.
- *          Default is undefined.
- * @param {boolean} [options.animate]
- *          If true, the scroll position will be animated so that the element moves smoothly to its new position. Default is false.
- * @param {boolean} [options.stop]
- *          If true, all running animations are stopped before executing the current scroll request. Default is true.
- * @param {number} [options.scrollOffsetUp]
- *          Additional margin to assume at the top of the target element (independent from any actual CSS margin).
- *          Useful when elements are positioned outside of their boundaries (e.g. focus border). Default is 4.
- * @param {number} [options.scrollOffsetDown]
- *          Additional margin to assume at the bottom of the target element (independent from any actual CSS margin).
- *          Useful when elements are positioned outside of their boundaries (e.g. focus border). Default is 8.
  */
-export function scrollTo($scrollable, $element, options) {
+export function scrollTo($scrollable: JQuery, $element: JQuery, options?: ScrollToOptions | string) {
   if (typeof options === 'string') {
     options = {
       align: options
@@ -628,8 +644,8 @@ export function scrollTo($scrollable, $element, options) {
   }
 }
 
-export function _createDefaultScrollToOptions(options) {
-  let defaults = {
+export function _createDefaultScrollToOptions(options?: ScrollToOptions): ScrollToOptions {
+  let defaults: ScrollToOptions = {
     animate: false,
     stop: true
   };
@@ -639,7 +655,7 @@ export function _createDefaultScrollToOptions(options) {
 /**
  * Horizontally scrolls the $scrollable to the given $element (must be a child of $scrollable)
  */
-export function scrollHorizontalTo($scrollable, $element, options) {
+export function scrollHorizontalTo($scrollable: JQuery, $element: JQuery, options: ScrollOptions) {
   let scrollTo,
     scrollableW = $scrollable.width(),
     elementBounds = graphics.bounds($element, true),
@@ -656,13 +672,10 @@ export function scrollHorizontalTo($scrollable, $element, options) {
 }
 
 /**
- * @param {JQuery} $scrollable the scrollable object
- * @param {number} scrollTop the new scroll position
- * @param {object} [options]
- * @param {boolean} [options.animate] whether the scrolling should be animated. Default is false.
- * @param {boolean} [options.stop] whether the animation should be stopped. Default is false.
+ * @param $scrollable the scrollable object
+ * @param scrollTop the new scroll position
  */
-export function scrollTop($scrollable, scrollTop, options) {
+export function scrollTop($scrollable: JQuery, scrollTop: number, options?: ScrollOptions) {
   options = _createDefaultScrollToOptions(options);
   let scrollbarElement = scrollbar($scrollable, 'y');
   if (scrollbarElement) {
@@ -691,14 +704,22 @@ export function scrollTop($scrollable, scrollTop, options) {
   });
 }
 
+export interface ScrollOptions {
+  /**
+   * If true, the scroll position will be animated so that the element moves smoothly to its new position. Default is false.
+   */
+  animate?: boolean;
+  /**
+   * whether the animation should be stopped. Default is false.
+   */
+  stop?: boolean;
+}
+
 /**
- * @param {JQuery} $scrollable the scrollable object
- * @param {number} scrollLeft the new scroll position
- * @param {object} [options]
- * @param {boolean} [options.animate] whether the scrolling should be animated. Default is false.
- * @param {boolean} [options.stop] whether the animation should be stopped. Default is false.
+ * @param $scrollable the scrollable object
+ * @param scrollLeft the new scroll position
  */
-export function scrollLeft($scrollable, scrollLeft, options) {
+export function scrollLeft($scrollable: JQuery, scrollLeft: number, options?: ScrollOptions) {
   options = _createDefaultScrollToOptions(options);
   let scrollbarElement = scrollbar($scrollable, 'x');
   if (scrollbarElement) {
@@ -727,7 +748,7 @@ export function scrollLeft($scrollable, scrollLeft, options) {
   });
 }
 
-function animateScrollTop($scrollable, scrollTop) {
+function animateScrollTop($scrollable: JQuery, scrollTop: number) {
   $scrollable.animate({
     scrollTop: scrollTop
   }, {
@@ -736,7 +757,7 @@ function animateScrollTop($scrollable, scrollTop) {
     .dequeue('scroll');
 }
 
-function animateScrollLeft($scrollable, scrollLeft) {
+function animateScrollLeft($scrollable: JQuery, scrollLeft: number) {
   $scrollable.animate({
     scrollLeft: scrollLeft
   }, {
@@ -745,23 +766,20 @@ function animateScrollLeft($scrollable, scrollLeft) {
     .dequeue('scroll');
 }
 
-export function scrollbar($scrollable, axis) {
-  let scrollbars = $scrollable.data('scrollbars') || [];
-  return arrays.find(scrollbars, scrollbar => {
-    return scrollbar.axis === axis;
-  });
+export function scrollbar($scrollable: JQuery, axis: 'x' | 'y'): Scrollbar {
+  let scrollbars: Scrollbar[] = $scrollable.data('scrollbars') || [];
+  return arrays.find(scrollbars, scrollbar => scrollbar.axis === axis);
 }
 
-export function scrollToBottom($scrollable, options) {
+export function scrollToBottom($scrollable: JQuery, options?: ScrollOptions) {
   scrollTop($scrollable, $scrollable[0].scrollHeight - $scrollable[0].offsetHeight, options);
 }
 
 /**
- * @param location object with x and y properties
  * @param $scrollables one or more scrollables to check against
- * @returns {boolean} true if the location is visible in the current viewport of all the $scrollables, or if $scrollables is null
+ * @returns true if the location is visible in the current viewport of all the $scrollables, or if $scrollables is null
  */
-export function isLocationInView(location, $scrollables) {
+export function isLocationInView(location: { x: number; y: number }, $scrollables: JQuery): boolean {
   if (!$scrollables || $scrollables.length === 0) {
     return true;
   }
@@ -772,20 +790,23 @@ export function isLocationInView(location, $scrollables) {
 }
 
 /**
- * Attaches the given handler to each scrollable parent, including $anchor if it is scrollable as well.<p>
+ * Attaches the given handler to each scrollable parent, including $anchor if it is scrollable as well.
  * Make sure you remove the handlers when not needed anymore using offScroll.
  */
-export function onScroll($anchor, handler) {
+export function onScroll($anchor: JQuery, handler: (event: JQuery.ScrollEvent<HTMLElement>) => boolean) {
+  // @ts-ignore
   handler.$scrollParents = [];
   $anchor.scrollParents().each(function() {
     let $scrollParent = $(this);
     $scrollParent.on('scroll', handler);
+    // @ts-ignore
     handler.$scrollParents.push($scrollParent);
   });
 }
 
-export function offScroll(handler) {
-  let $scrollParents = handler.$scrollParents;
+export function offScroll(handler: (event: JQuery.ScrollEvent<HTMLElement>) => boolean) {
+  // @ts-ignore
+  let $scrollParents: JQuery[] = handler.$scrollParents;
   if (!$scrollParents) {
     throw new Error('$scrollParents are not defined');
   }
@@ -799,7 +820,7 @@ export function offScroll(handler) {
  * Sets the position to fixed and updates left and top position.
  * This is necessary to prevent flickering in IE.
  */
-export function fix($elem) {
+export function fix($elem: JQuery) {
   if (!$elem.isVisible() || $elem.css('position') === 'fixed') {
     return;
   }
@@ -819,7 +840,7 @@ export function fix($elem) {
 /**
  * Reverts the changes made by fix().
  */
-export function unfix($elem, timeoutId, immediate) {
+export function unfix($elem: JQuery, timeoutId: number, immediate: boolean) {
   clearTimeout(timeoutId);
   if (immediate) {
     _unfix($elem);
@@ -830,7 +851,7 @@ export function unfix($elem, timeoutId, immediate) {
   }, 50);
 }
 
-export function _unfix($elem) {
+export function _unfix($elem: JQuery) {
   $elem.css({
     position: 'absolute',
     left: '',
@@ -842,9 +863,9 @@ export function _unfix($elem) {
 
 /**
  * Stores the position of all scrollables that belong to an optional session.
- * @param [session] (optional) when no session is given, scrollables from all sessions are stored
+ * @param [session] when no session is given, scrollables from all sessions are stored
  */
-export function storeScrollPositions($container, session) {
+export function storeScrollPositions($container: JQuery, session?: Session) {
   let $scrollables = getScrollables(session);
   if (!$scrollables) {
     return;
@@ -864,9 +885,9 @@ export function storeScrollPositions($container, session) {
 
 /**
  * Restores the position of all scrollables that belong to an optional session.
- * @param [session] (optional) when no session is given, scrollables from all sessions are restored
+ * @param [session] when no session is given, scrollables from all sessions are restored
  */
-export function restoreScrollPositions($container, session) {
+export function restoreScrollPositions($container: JQuery, session?: Session) {
   let $scrollables = getScrollables(session);
   if (!$scrollables) {
     return;
@@ -895,7 +916,7 @@ export function restoreScrollPositions($container, session) {
   });
 }
 
-export function setVisible($scrollable, visible) {
+export function setVisible($scrollable: JQuery, visible: boolean) {
   if (!$scrollable || !$scrollable.data('scrollable')) {
     return;
   }
@@ -910,7 +931,7 @@ export function setVisible($scrollable, visible) {
   });
 }
 
-export function opacity($scrollable, opacity) {
+export function opacity($scrollable: JQuery, opacity: number) {
   if (!$scrollable || !$scrollable.data('scrollable')) {
     return;
   }
@@ -925,7 +946,7 @@ export function opacity($scrollable, opacity) {
   });
 }
 
-export function _getCompleteChildRowsHeightRecursive(children, getChildren, isExpanded, defaultChildHeight) {
+export function _getCompleteChildRowsHeightRecursive(children: ExpandableElement[], getChildren: (element: ExpandableElement) => ExpandableElement[], isExpanded: (element: ExpandableElement) => boolean, defaultChildHeight: number): number {
   let height = 0;
   children.forEach(child => {
     if (child.height) {
@@ -941,7 +962,21 @@ export function _getCompleteChildRowsHeightRecursive(children, getChildren, isEx
   return height;
 }
 
-export function ensureExpansionVisible(parent) {
+export interface ExpandableElement {
+  element: ExpandableElement;
+  $element: JQuery;
+  $scrollable: JQuery;
+  height: number;
+  defaultChildHeight: number;
+  level: number;
+  nodePaddingLevel: number;
+
+  isExpanded(element: ExpandableElement): boolean;
+
+  getChildren(element: ExpandableElement): ExpandableElement[];
+}
+
+export function ensureExpansionVisible(parent: ExpandableElement) {
   let isParentExpanded = parent.isExpanded(parent.element);
   let children = parent.getChildren(parent.element);
   let parentPositionTop = parent.$element.position().top;

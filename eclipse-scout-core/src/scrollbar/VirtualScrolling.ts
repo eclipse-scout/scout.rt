@@ -1,41 +1,47 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {numbers, Range, scout} from '../index';
+import {numbers, Range, scout, VirtualScrollingOptions, Widget} from '../index';
 import $ from 'jquery';
 
-export default class VirtualScrolling {
+export default class VirtualScrolling implements VirtualScrollingOptions {
+  declare model: VirtualScrollingOptions;
 
-  constructor(options) {
+  enabled: boolean;
+  minRowHeight: number;
+  viewRangeSize: number;
+  widget: Widget;
+  $scrollable: JQuery;
+
+  constructor(options: VirtualScrollingOptions) {
     this.enabled = true;
     this.minRowHeight = 0;
-    this.scrollHandler = null;
-    this.viewRangeSize = new Range();
+    this.viewRangeSize = 0;
     this.widget = null;
     this.$scrollable = null;
 
     $.extend(this, options);
   }
 
-  setEnabled(enabled) {
+  setEnabled(enabled: boolean) {
     this.enabled = enabled;
   }
 
-  set$Scrollable($scrollable) {
+  set$Scrollable($scrollable: JQuery) {
     if (this.$scrollable === $scrollable) {
       return;
     }
     this.$scrollable = $scrollable;
   }
 
-  setMinRowHeight(minRowHeight) {
+  setMinRowHeight(minRowHeight: number) {
     if (this.minRowHeight === minRowHeight) {
       return;
     }
@@ -48,7 +54,7 @@ export default class VirtualScrolling {
     }
   }
 
-  setViewRangeSize(viewRangeSize, updateViewPort) {
+  setViewRangeSize(viewRangeSize: number, updateViewPort?: boolean) {
     if (this.viewRangeSize === viewRangeSize) {
       return;
     }
@@ -63,7 +69,7 @@ export default class VirtualScrolling {
    * It uses the default row height to estimate how many rows fit in the view port.
    * The view range size is this value * 2.
    */
-  calculateViewRangeSize() {
+  calculateViewRangeSize(): number {
     if (!this.enabled || this.$scrollable.length === 0) {
       return this.rowCount();
     }
@@ -73,7 +79,7 @@ export default class VirtualScrolling {
     return Math.ceil(this.$scrollable.height() / this.minRowHeight) * 2;
   }
 
-  calculateCurrentViewRange() {
+  calculateCurrentViewRange(): Range {
     if (!this.enabled) {
       return this.maxViewRange();
     }
@@ -105,7 +111,7 @@ export default class VirtualScrolling {
     return this.calculateViewRangeForRowIndex(rowIndex);
   }
 
-  maxViewRange() {
+  maxViewRange(): Range {
     return new Range(0, this.rowCount());
   }
 
@@ -114,7 +120,7 @@ export default class VirtualScrolling {
    * -> 1/4 of the rows are before the viewport 2/4 in the viewport 1/4 after the viewport,
    * assuming viewRangeSize is 2*number of possible rows in the viewport (see calculateViewRangeSize).
    */
-  calculateViewRangeForRowIndex(rowIndex) {
+  calculateViewRangeForRowIndex(rowIndex: number): Range {
     if (!this.enabled) {
       return this.maxViewRange();
     }
@@ -137,7 +143,7 @@ export default class VirtualScrolling {
   /**
    * Returns the index of the row which is at position scrollTop.
    */
-  _rowIndexAtScrollTop(scrollTop) {
+  protected _rowIndexAtScrollTop(scrollTop: number): number {
     let height = 0,
       rowCount = this.rowCount(),
       index = rowCount - 1;
@@ -157,26 +163,23 @@ export default class VirtualScrolling {
     return index;
   }
 
-  rowHeight(row) {
+  rowHeight(row: number): number {
     throw new Error('Function has to be provided by widget');
   }
 
-  /**
-   * @returns {number}
-   */
-  rowCount() {
+  rowCount(): number {
     throw new Error('Function has to be provided by widget');
   }
 
   /**
    * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
    */
-  _renderViewPort() {
+  protected _renderViewPort() {
     let viewRange = this.calculateCurrentViewRange();
     this._renderViewRange(viewRange);
   }
 
-  _renderViewRangeForRowIndex(rowIndex) {
+  protected _renderViewRangeForRowIndex(rowIndex: number) {
     let viewRange = this.calculateViewRangeForRowIndex(rowIndex);
     this._renderViewRange(viewRange);
   }
@@ -184,7 +187,7 @@ export default class VirtualScrolling {
   /**
    * Renders the rows visible in the viewport and removes the other rows
    */
-  _renderViewRange(viewRange) {
+  _renderViewRange(viewRange: Range) {
     throw new Error('Function has to be provided by widget');
   }
 }
