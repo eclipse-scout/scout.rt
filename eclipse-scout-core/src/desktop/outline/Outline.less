@@ -322,6 +322,7 @@
       &.selected {
         display: flex;
         flex-wrap: wrap; // Move detail menubar to next line
+        background-clip: content-box; // selection background shines through on the bottom of the node sometimes when zoomed -> makes it slightly better
       }
 
       &.child-of-selected.animate-prev-selected {
