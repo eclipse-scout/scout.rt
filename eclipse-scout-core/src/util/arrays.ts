@@ -360,7 +360,7 @@ export function findIndex<T>(arr: ArrayLike<T>, predicate: (arg0: T, index: numb
 
 /**
  *
- * @param optional "this" binding for predicate function
+ * @param thisArg optional "this" binding for predicate function
  */
 export function find<T>(arr: ArrayLike<T>, predicate: Predicate<T>, thisArg?: any): T {
   let index = findIndex(arr, predicate, thisArg);
