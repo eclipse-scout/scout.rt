@@ -1,43 +1,65 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {events, graphics, Insets, scout, scrollbars, Widget} from '../index';
+import {Event, events, graphics, Insets, scout, scrollbars, Widget} from '../index';
 import $ from 'jquery';
+import ScrollbarEventMap from './ScrollbarEventMap';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export default class Scrollbar extends Widget {
+  declare eventMap: ScrollbarEventMap;
+
+  axis: 'x' | 'y';
+  borderless: boolean;
+  mouseWheelNeedsShift: boolean;
+  /** thumb body for layout purposes */
+  $thumb: JQuery<HTMLDivElement>;
+  /** thumb handle */
+  $thumbHandle: JQuery<HTMLDivElement>;
+
+  protected _scrollSize: number;
+  protected _offsetSize: number;
+  protected _dim: 'Width' | 'Height';
+  protected _dir: 'left' | 'top';
+  protected _dirReverse: 'right' | 'bottom';
+  protected _scrollDir: 'scrollLeft' | 'scrollTop';
+  protected _thumbClipping: Insets;
+  protected _onScrollHandler: (event: JQuery.ScrollEvent<HTMLDivElement>) => void;
+  protected _onScrollWheelHandler: (event: JQuery.TriggeredEvent<HTMLDivElement>) => boolean;
+  protected _onScrollbarMouseDownHandler: (event: JQuery.MouseDownEvent<HTMLDivElement>) => void;
+  protected _onTouchStartHandler: (event: JQuery.TouchStartEvent<HTMLDivElement>) => void;
+  protected _onThumbMouseDownHandler: (event: JQuery.MouseDownEvent<HTMLDivElement>) => boolean;
+  protected _onDocumentMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
+  protected _onDocumentMouseUpHandler: (event: JQuery.MouseUpEvent<Document>) => boolean;
+  protected _onAncestorScrollOrResizeHandler: (event: JQuery.TriggeredEvent<HTMLDivElement>) => void;
+  protected _fixScrollbarHandler: () => void;
+  protected _unfixScrollbarHandler: () => void;
+  protected _$thumb: JQuery<HTMLDivElement>;
+  protected _$thumbHandle: JQuery<HTMLDivElement>;
+  protected _$ancestors: JQuery<HTMLDivElement>;
 
   constructor() {
     super();
-
-    // jQuery Elements
-    this.$container = null; // Scrollbar <div>
-    this.$thumb = null; // thumb body for layout purposes <div>
-    this.$thumbHandle = null; // thumb handle <div>
-
-    // Defaults
+    this.$container = null;
+    this.$thumb = null;
+    this.$thumbHandle = null;
     this.axis = 'y';
     this.borderless = false;
     this.mouseWheelNeedsShift = false;
-
-    // Varaibles for calculation
     this._scrollSize = null;
     this._offsetSize = null;
-
-    // Axis based helper variables (y)
-    this._dim = 'Height'; // x: 'Width'
-    this._dir = 'top'; // x: 'left'
-    this._dirReverse = 'bottom'; // x: 'right'
-    this._scrollDir = 'scrollTop'; // x: 'scrollLeft
+    this._dim = 'Height';
+    this._dir = 'top';
+    this._dirReverse = 'bottom';
+    this._scrollDir = 'scrollTop';
     this._thumbClipping = new Insets(0, 0, 0, 0);
-
-    // Event Handling
     this._onScrollHandler = this._onScroll.bind(this);
     this._onScrollWheelHandler = this._onScrollWheel.bind(this);
     this._onScrollbarMouseDownHandler = this._onScrollbarMouseDown.bind(this);
@@ -46,13 +68,11 @@ export default class Scrollbar extends Widget {
     this._onDocumentMousemoveHandler = this._onDocumentMousemove.bind(this);
     this._onDocumentMouseUpHandler = this._onDocumentMouseUp.bind(this);
     this._onAncestorScrollOrResizeHandler = this.update.bind(this);
-
-    // Fix Scrollbar
     this._fixScrollbarHandler = this._fixScrollbar.bind(this);
     this._unfixScrollbarHandler = this._unfixScrollbar.bind(this);
   }
 
-  _render() {
+  protected override _render() {
     this._ensureParentPosition();
 
     // Create scrollbar and thumb
@@ -97,7 +117,7 @@ export default class Scrollbar extends Widget {
       .on('scroll resize', this._onAncestorScrollOrResizeHandler);
   }
 
-  _remove() {
+  protected override _remove() {
     // Uninstall listeners
     let scrollbars = this.$parent.data('scrollbars');
     this.$parent
@@ -116,12 +136,12 @@ export default class Scrollbar extends Widget {
     super._remove();
   }
 
-  _renderOnAttach() {
+  protected override _renderOnAttach() {
     super._renderOnAttach();
     this._ensureParentPosition();
   }
 
-  _ensureParentPosition() {
+  protected _ensureParentPosition() {
     // Container with JS scrollbars must have either relative or absolute position
     // otherwise we cannot determine the correct dimension of the scrollbars
     if (this.$parent && this.$parent.isAttached()) {
@@ -135,7 +155,7 @@ export default class Scrollbar extends Widget {
   /**
    * scroll by "diff" in px (positive and negative)
    */
-  scroll(diff) {
+  scroll(diff: number) {
     let posOld = Math.max(0, this.$parent[this._scrollDir]());
     this._scrollToAbsolutePoint(posOld + diff);
   }
@@ -143,7 +163,7 @@ export default class Scrollbar extends Widget {
   /**
    * scroll to absolute point (expressed as absolute point in px)
    */
-  _scrollToAbsolutePoint(absolutePoint) {
+  protected _scrollToAbsolutePoint(absolutePoint: number) {
     let scrollPos = Math.min(
       (this._scrollSize - this._offsetSize + 1), // scrollPos can't be larger than the start of last page. Add +1 because at least chrome has issues to scroll to the very bottom if scrollTop is fractional
       Math.max(0, Math.round(absolutePoint))); // scrollPos can't be negative
@@ -206,7 +226,7 @@ export default class Scrollbar extends Widget {
     this.$container.cssBottom(-1 * scrollTop);
   }
 
-  _resetClipping() {
+  protected _resetClipping() {
     // Only reset dimension and position for the secondary axis,
     // for the scroll-axis these properties are set during update()
     if (this.axis === 'y') {
@@ -225,7 +245,7 @@ export default class Scrollbar extends Widget {
   /**
    * Make sure scrollbar does not appear outside an ancestor when fixed
    */
-  _clipWhenOverlappingAncestor() {
+  protected _clipWhenOverlappingAncestor() {
     this._resetClipping();
 
     // Clipping is only needed when scrollbar has a fixed position.
@@ -324,11 +344,11 @@ export default class Scrollbar extends Widget {
    * EVENT HANDLING
    */
 
-  _onScroll(event) {
+  protected override _onScroll(event: JQuery.ScrollEvent<HTMLDivElement>) {
     this.update();
   }
 
-  _onTouchStart(event) {
+  protected _onTouchStart(event: JQuery.TouchStartEvent<HTMLDivElement>) {
     // In hybrid mode scroll bar is moved by the scroll event.
     // On a mobile device scroll events are fired delayed so the update will be delayed as well.
     // This will lead to flickering and could be prevented by calling fixScrollbar. But unfortunately calling fix will stop the scroll pane from scrolling immediately, at least in Edge.
@@ -346,7 +366,7 @@ export default class Scrollbar extends Widget {
     });
   }
 
-  _onScrollWheel(event) {
+  protected _onScrollWheel(event: JQuery.TriggeredEvent<HTMLDivElement> & { wheelDelta?: number }): boolean {
     if (!this.$container.isVisible()) {
       return true; // ignore scroll wheel event if there is no scroll bar visible
     }
@@ -356,6 +376,7 @@ export default class Scrollbar extends Widget {
     if (this.mouseWheelNeedsShift !== event.shiftKey) {
       return true; // only scroll if shift modifier matches
     }
+    // @ts-ignore
     event = event.originalEvent || this.$container.window(true).event.originalEvent;
     let w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
 
@@ -366,7 +387,7 @@ export default class Scrollbar extends Widget {
     return false;
   }
 
-  _onScrollbarMouseDown(event) {
+  protected _onScrollbarMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>) {
     this.notifyBeforeScroll();
 
     let clickableAreaSize = this.$container[this._dim.toLowerCase()]();
@@ -393,7 +414,7 @@ export default class Scrollbar extends Widget {
     this.notifyAfterScroll();
   }
 
-  _onThumbMouseDown(event) {
+  protected _onThumbMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>): boolean {
     // ignore event if container is too small for thumb movement
     if (this._isContainerTooSmallForThumb()) {
       return true; // let _onScrollbarMouseDown handle the click event
@@ -405,26 +426,24 @@ export default class Scrollbar extends Widget {
     let thumbClippingOffset = (this.axis === 'x' ? this._thumbClipping.left : this._thumbClipping.top);
     let thumbCenter = this._$thumb.offset()[this._dir] + Math.floor(thumbSize / 2) - thumbClippingOffset;
     let thumbCenterOffset = Math.round((this.axis === 'x' ? event.pageX : event.pageY) - thumbCenter);
+    let doc = this._$thumb.document() as JQuery<Document>;
 
     this._$thumb.addClass('scrollbar-thumb-move');
-    this._$thumb
-      .document()
-      .on('mousemove', {
-        'thumbCenterOffset': thumbCenterOffset
-      }, this._onDocumentMousemoveHandler)
+    doc
+      .on('mousemove', {thumbCenterOffset: thumbCenterOffset}, this._onDocumentMousemoveHandler)
       .one('mouseup', this._onDocumentMouseUpHandler);
 
     return false;
   }
 
-  _onDocumentMousemove(event) {
+  protected _onDocumentMousemove(event: JQuery.MouseMoveEvent<Document>) {
     // Scrollbar may be removed in the meantime
     if (!this.rendered) {
       return;
     }
 
     // represents offset in px of clicked point in thumb to the center of the thumb (positive and negative)
-    let thumbCenterOffset = event.data.thumbCenterOffset;
+    let thumbCenterOffset = event.data.thumbCenterOffset as number;
 
     let clipped = (this.axis === 'x' ? this._thumbClipping.horizontal() : this._thumbClipping.vertical());
     let thumbSize = clipped + this._$thumb['outer' + this._dim](true); // including border, margin and padding
@@ -443,7 +462,7 @@ export default class Scrollbar extends Widget {
     this._scrollToAbsolutePoint(posNew);
   }
 
-  _onDocumentMouseUp(event) {
+  protected _onDocumentMouseUp(event: JQuery.MouseUpEvent<Document>): boolean {
     let $document = $(event.currentTarget);
     $document.off('mousemove', this._onDocumentMousemoveHandler);
     if (this.rendered) {
@@ -461,6 +480,10 @@ export default class Scrollbar extends Widget {
     this.trigger('scrollEnd');
   }
 
+  override trigger<K extends string & keyof EventMapOf<Scrollbar>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Scrollbar>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
+
   /*
    * Fix Scrollbar
    */
@@ -469,7 +492,7 @@ export default class Scrollbar extends Widget {
    * Sets the position to fixed and updates left and top position
    * (This is necessary to prevent flickering in IE)
    */
-  _fixScrollbar() {
+  protected _fixScrollbar() {
     scrollbars.fix(this.$container);
     this.update();
   }
@@ -477,7 +500,7 @@ export default class Scrollbar extends Widget {
   /**
    * Reverts the changes made by _fixScrollbar
    */
-  _unfixScrollbar() {
+  protected _unfixScrollbar() {
     // true = do it immediately without a timeout.
     // This is important because scrollTop may be set during layout but before the element is positioned correctly (e.g. popup)
     // which could have the effect that the scroll bar is drown outside the widget
@@ -492,9 +515,9 @@ export default class Scrollbar extends Widget {
   /**
    * If the thumb gets bigger than its container this method will return true, otherwise false
    */
-  _isContainerTooSmallForThumb() {
-    let thumbSize = this._$thumb['outer' + this._dim](true);
-    let thumbMovableAreaSize = this.$container[this._dim.toLowerCase()]();
+  protected _isContainerTooSmallForThumb(): boolean {
+    let thumbSize: number = this._$thumb['outer' + this._dim](true);
+    let thumbMovableAreaSize: number = this.$container[this._dim.toLowerCase()]();
     return thumbSize >= thumbMovableAreaSize;
   }
 }

@@ -13,6 +13,7 @@ import * as $ from 'jquery';
 import {RefWidgetModel} from './WidgetModel';
 import {ObjectType} from '../ObjectFactory';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {ScrollbarInstallOptions, ScrollOptions} from '../scrollbar/scrollbars';
 
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
 export type GlassPaneContribution = JQuery | DeferredGlassPaneTarget;
@@ -88,7 +89,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   protected _postRenderActions: (() => void)[];
   protected _preserveOnPropertyChangeProperties: string[];
   protected _rendered: boolean;
-  protected _scrollHandler: JQuery.EventHandler<HTMLElement>;
+  protected _scrollHandler: (event: JQuery.ScrollEvent<HTMLElement>) => void;
   protected _storedFocusedWidget: Widget;
   protected _widgetProperties: string[];
 
@@ -2090,7 +2091,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * @param options.preventScroll prevents scrolling to new focused element (defaults to false)
    * @returns true if the element could be focused, false if not
    */
-  focus(options?: { preventScroll?: boolean; }): boolean {
+  focus(options?: { preventScroll?: boolean }): boolean {
     if (!this.rendered) {
       this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this, options));
       return false;
@@ -2151,7 +2152,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return null;
   }
 
-  protected _installScrollbars(options?: object) { // FIXME TS define options
+  protected _installScrollbars(options?: ScrollbarInstallOptions) {
     let $scrollable = this.get$Scrollable();
     if (!$scrollable) {
       throw new Error('Scrollable is not defined, cannot install scrollbars');
@@ -2160,7 +2161,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
       // already installed
       return;
     }
-    options = options || {};
+    options = options || {parent: this};
     let defaults = {
       parent: this
     };
@@ -2188,7 +2189,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     }
   }
 
-  protected _onScroll() {
+  protected _onScroll(event: JQuery.ScrollEvent<HTMLElement>) {
     let $scrollable = this.get$Scrollable();
     this._setProperty('scrollTop', $scrollable[0].scrollTop);
     this._setProperty('scrollLeft', $scrollable[0].scrollLeft);
@@ -2249,7 +2250,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return this.$container;
   }
 
-  hasScrollShadow(position) { // FIXME TS define available positions
+  hasScrollShadow(position: string) { // FIXME TS define available positions
     return scrollbars.hasScrollShadow(this.get$Scrollable(), position);
   }
 
@@ -2261,7 +2262,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return null;
   }
 
-  scrollToTop(options?) { // FIXME TS define options
+  scrollToTop(options?: ScrollOptions) {
     if (this.getDelegateScrollable()) {
       this.getDelegateScrollable().scrollToTop();
       return;
@@ -2277,7 +2278,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     scrollbars.scrollTop($scrollable, 0, options);
   }
 
-  scrollToBottom(options?) { // FIXME TS define options
+  scrollToBottom(options?: ScrollOptions) {
     if (this.getDelegateScrollable()) {
       this.getDelegateScrollable().scrollToBottom();
       return;
@@ -2296,7 +2297,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Brings the widget into view by scrolling the first scrollable parent.
    */
-  reveal(options) { // FIXME TS define options
+  reveal(options: ScrollOptions | string) {
     if (!this.rendered) {
       return;
     }
