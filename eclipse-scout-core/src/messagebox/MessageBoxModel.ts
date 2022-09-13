@@ -8,9 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventMap, ModelAdapter} from '../index';
+import {WidgetModel} from '../index';
+import {StatusSeverity} from '../status/Status';
 
-export default interface ModelAdapterEventMap extends EventMap {
-  'attach': Event<ModelAdapter>;
-  'detach': Event<ModelAdapter>;
+export default interface MessageBoxModel extends WidgetModel {
+  header: string;
+  body: string;
+  severity: StatusSeverity;
+  iconId?: string;
+  hiddenText?: string;
+  html?: string;
+  yesButtonText?: string;
+  noButtonText?: string;
+  cancelButtonText?: string;
 }

@@ -1104,13 +1104,12 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     messageBox.on('action', event => {
       delete this._fatalMessagesOnScreen[errorCode];
       messageBox.destroy();
-      // @ts-ignore
-      let option = event.option; // FIXME TS: migrate as soon as MessageBoxEventMap has been created
-      if (option === 'yes' && options.yesButtonAction) {
+      let option = event.option;
+      if (option === MessageBox.Buttons.YES && options.yesButtonAction) {
         options.yesButtonAction.apply(this);
-      } else if (option === 'no' && options.noButtonAction) {
+      } else if (option === MessageBox.Buttons.NO && options.noButtonAction) {
         options.noButtonAction.apply(this);
-      } else if (option === 'cancel' && options.cancelButtonAction) {
+      } else if (option === MessageBox.Buttons.CANCEL && options.cancelButtonAction) {
         options.cancelButtonAction.apply(this);
       }
     });

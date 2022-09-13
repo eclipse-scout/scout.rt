@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, WidgetEventMap} from '../index';
+import {BusyIndicator, Event, WidgetEventMap} from '../index';
 
 export default interface BusyIndicatorEventMap extends WidgetEventMap {
-  'cancel': Event;
+  'cancel': Event<BusyIndicator>;
 }

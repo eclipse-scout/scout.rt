@@ -8,9 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventMap, ModelAdapter} from '../index';
+import {Event, EventMap, Lifecycle} from '../index';
 
-export default interface ModelAdapterEventMap extends EventMap {
-  'attach': Event<ModelAdapter>;
-  'detach': Event<ModelAdapter>;
+export default interface LifecycleEventMap extends EventMap {
+  'load': Event<Lifecycle>;
+  'postLoad': Event<Lifecycle>;
+  'save': Event<Lifecycle>;
+  'close': Event<Lifecycle>;
+  'reset': Event<Lifecycle>;
 }

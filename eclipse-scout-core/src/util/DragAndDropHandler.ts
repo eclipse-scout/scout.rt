@@ -11,6 +11,7 @@
 import {arrays, dragAndDrop, files as fileUtil, MessageBoxes, Status, Widget} from '../index';
 import $ from 'jquery';
 import {DragAndDropType, DropValidationErrorMessage, FileDropEvent} from './dragAndDrop';
+import {MessageBoxOption} from '../messagebox/MessageBox';
 
 export default class DragAndDropHandler {
   additionalDropProperties: (event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => Record<string, string | Blob>;
@@ -123,7 +124,7 @@ export default class DragAndDropHandler {
     }
   }
 
-  protected _validationFailed(error: DropValidationErrorMessage): Promise<string> {
+  protected _validationFailed(error: DropValidationErrorMessage): JQuery.Promise<MessageBoxOption> {
     $.log.isDebugEnabled() && $.log.debug('File validation failed', error);
     let title = '';
     let message = 'Invalid files';

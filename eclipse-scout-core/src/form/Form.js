@@ -54,6 +54,7 @@ export default class Form extends Widget {
      * Whether this form should render its initial focus
      */
     this.renderInitialFocusEnabled = true;
+    this.popupWindow = null; // set by PopupWindow if this Form has displayHint=Form.DisplayHint.POPUP_WINDOW
 
     this.$statusIcons = [];
     this.$header = null;

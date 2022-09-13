@@ -23,7 +23,7 @@ export default class Status {
   children: Status[];
   deletable: boolean;
 
-  constructor(model: StatusModel) {
+  constructor(model?: StatusModel) {
     this.message = null;
     this.severity = Status.Severity.ERROR;
     this.iconId = null;
@@ -259,28 +259,28 @@ export default class Status {
   /**
    * @returns a {@link Status} object with severity OK.
    */
-  static ok(model: StatusModel | string): Status {
+  static ok(model?: StatusModel | string): Status {
     return new Status(Status.ensureModel(model, Status.Severity.OK));
   }
 
   /**
    * @returns a {@link Status} object with severity INFO.
    */
-  static info(model: StatusModel | string): Status {
+  static info(model?: StatusModel | string): Status {
     return new Status(Status.ensureModel(model, Status.Severity.INFO));
   }
 
   /**
    * @returns a {@link Status} object with severity WARNING.
    */
-  static warning(model: StatusModel | string): Status {
+  static warning(model?: StatusModel | string): Status {
     return new Status(Status.ensureModel(model, Status.Severity.WARNING));
   }
 
   /**
    * @returns a {@link Status} object with severity ERROR.
    */
-  static error(model: StatusModel | string): Status {
+  static error(model?: StatusModel | string): Status {
     return new Status(Status.ensureModel(model, Status.Severity.ERROR));
   }
 

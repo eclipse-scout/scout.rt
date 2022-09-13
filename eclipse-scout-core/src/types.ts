@@ -16,6 +16,8 @@ export type Predicate<T> = (obj: T) => boolean;
 // Type that makes some properties optional and some required.
 export type PartialAndRequired<T, OPTIONAL extends keyof T, REQUIRED extends keyof T> = Omit<T, OPTIONAL | REQUIRED> & Partial<Pick<T, OPTIONAL>> & Required<Pick<T, REQUIRED>>;
 
+export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+
 export type EnumObject<TYPE> = TYPE[keyof TYPE];
 
 export type EmptyObject = Record<string, never>;
@@ -23,5 +25,7 @@ export type EmptyObject = Record<string, never>;
 export type Primitive = number | string | boolean | symbol | bigint;
 
 export type Closeable = Widget & { close(): void };
+
+export type Copyable = Widget & { copy(): void };
 
 export type Abortable = Closeable & { abort(): void };
