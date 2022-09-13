@@ -3,14 +3,56 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, Icon, keys, KeyStrokeContext, MessageBoxLayout, objects, scout, Status, strings, Widget} from '../index';
+import {AbortKeyStroke, Action, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, EnumObject, Event, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, Icon, keys, KeyStrokeContext, MessageBoxController, MessageBoxLayout, objects, scout, Status, strings, Widget} from '../index';
+import {StatusSeverity} from '../status/Status';
+import MessageBoxModel from './MessageBoxModel';
+import MessageBoxEventMap from './MessageBoxEventMap';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
+import TriggeredEvent = JQuery.TriggeredEvent;
+
+export type MessageBoxOption = EnumObject<typeof MessageBox.Buttons>;
+export type MessageBoxDisplayParent = Widget & {
+  messageBoxController: MessageBoxController;
+  messageBoxes: MessageBox[];
+  acceptView?(view: MessageBox): boolean;
+  inFront(): boolean;
+};
 
 export default class MessageBox extends Widget {
+  declare model: MessageBoxModel;
+  declare eventMap: MessageBoxEventMap;
+
+  severity: StatusSeverity;
+  body: string;
+  iconId: string;
+  header: string;
+  hiddenText: string;
+  html: string;
+  yesButtonText: string;
+  noButtonText: string;
+  cancelButtonText: string;
+  displayParent: MessageBoxDisplayParent;
+  buttons: Action[];
+  boxButtons: BoxButtons;
+  yesButton: Action;
+  noButton: Action;
+  cancelButton: Action;
+  /** button to be executed when abort() is called, e.g. when ESCAPE is pressed. points to the last (most right) button in the list (one of yes, no or cancel) */
+  abortButton: Action;
+  $content: JQuery<HTMLDivElement>;
+  $header: JQuery<HTMLDivElement>;
+  $body: JQuery<HTMLDivElement>;
+  $html: JQuery<HTMLDivElement>;
+  $hiddenText: JQuery;
+  $buttons: JQuery;
+
+  protected _icon: Icon;
+  protected _glassPaneRenderer: GlassPaneRenderer;
 
   constructor() {
     super();
@@ -31,12 +73,14 @@ export default class MessageBox extends Widget {
     this.yesButton = null;
     this.noButton = null;
     this.cancelButton = null;
-    this.abortButton = null; // button to be executed when abort() is called, e.g. when ESCAPE is pressed. points to the last (most right) button in the list (one of yes, no or cancel)
+    this.abortButton = null;
     this.inheritAccessibility = false; // do not inherit enabled-state by default. Otherwise the MessageBox cannot be closed anymore
     this.$content = null;
     this.$header = null;
     this.$body = null;
+    this.$hiddenText = null;
     this.$buttons = null;
+    this.$html = null;
     this._icon = null;
 
     this._addWidgetProperties(['buttons', 'boxButtons', 'yesButton', 'noButton', 'cancelButton', 'abortButton']);
@@ -46,9 +90,9 @@ export default class MessageBox extends Widget {
     YES: 'yes',
     NO: 'no',
     CANCEL: 'cancel'
-  };
+  } as const;
 
-  _init(model) {
+  protected override _init(model: MessageBoxModel) {
     super._init(model);
     this._setDisplayParent(this.displayParent);
     this._setIconId(this.iconId);
@@ -59,20 +103,14 @@ export default class MessageBox extends Widget {
     this.cancelButton = this._createMessageBoxButton(this.cancelButtonText, MessageBox.Buttons.CANCEL);
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    this.keyStrokeContext.registerKeyStroke([
+    this.keyStrokeContext.registerKeyStrokes([
       new CopyKeyStroke(this),
       new FocusAdjacentElementKeyStroke(this.session, this),
       new ClickActiveElementKeyStroke(this, [
@@ -87,7 +125,7 @@ export default class MessageBox extends Widget {
     ]);
   }
 
-  _createMessageBoxButton(text, option) {
+  protected _createMessageBoxButton(text: string, option: MessageBoxOption): Action {
     if (!text) {
       return null;
     }
@@ -98,7 +136,7 @@ export default class MessageBox extends Widget {
     return button;
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('messagebox')
       .on('mousedown', this._onMouseDown.bind(this))
       .on('copy', this._onCopy.bind(this));
@@ -140,30 +178,30 @@ export default class MessageBox extends Widget {
     this._glassPaneRenderer.renderGlassPanes();
   }
 
-  get$Scrollable() {
+  override get$Scrollable(): JQuery {
     return this.$content;
   }
 
-  _postRender() {
+  protected override _postRender() {
     super._postRender();
     this._installFocusContext();
   }
 
-  _remove() {
+  protected override _remove() {
     this._glassPaneRenderer.removeGlassPanes();
     this._uninstallFocusContext();
     super._remove();
   }
 
-  _installFocusContext() {
+  protected override _installFocusContext() {
     this.session.focusManager.installFocusContext(this.$container, FocusRule.AUTO);
   }
 
-  _uninstallFocusContext() {
+  protected override _uninstallFocusContext() {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
 
-  _renderIconId() {
+  protected _renderIconId() {
     let hasIcon = !!this._icon;
     this.$container.toggleClass('has-icon', hasIcon);
     this.$container.toggleClass('no-icon', !hasIcon);
@@ -173,33 +211,33 @@ export default class MessageBox extends Widget {
     }
   }
 
-  _renderSeverity() {
+  protected _renderSeverity() {
     this.$container.removeClass(Status.SEVERITY_CSS_CLASSES);
     this.$container.addClass(Status.cssClassForSeverity(this.severity));
   }
 
-  _renderHeader() {
+  protected _renderHeader() {
     this.$header.html(strings.nl2br(this.header));
-    this.$header.setVisible(this.header || this.iconId);
+    this.$header.setVisible(!!this.header || !!this.iconId);
     this.$header.toggleClass('has-text', strings.hasText(this.header));
   }
 
-  _renderBody() {
+  protected _renderBody() {
     this.$body.html(strings.nl2br(this.body));
     this.$body.setVisible(!!this.body);
     this.$content.toggleClass('has-body', !!this.body);
   }
 
-  _renderHtml() {
+  protected _renderHtml() {
     this.$html.html(this.html);
-    this.$html.setVisible(this.html);
+    this.$html.setVisible(!!this.html);
     // Don't change focus when a link is clicked by mouse
     this.$html.find('a, .app-link')
       .attr('tabindex', '0')
       .unfocusable();
   }
 
-  _renderHiddenText() {
+  protected _renderHiddenText() {
     if (this.$hiddenText) {
       this.$hiddenText.remove();
     }
@@ -208,17 +246,15 @@ export default class MessageBox extends Widget {
     }
   }
 
-  _onMouseDown() {
+  protected _onMouseDown() {
     // If there is a dialog in the parent-hierarchy activate it in order to bring it on top of other dialogs.
-    let parent = this.findParent(p => {
-      return p instanceof Form && p.isDialog();
-    });
+    let parent = this.findParent(p => p instanceof Form && p.isDialog()) as Form;
     if (parent) {
       parent.activate();
     }
   }
 
-  _setCopyable(copyable) {
+  protected _setCopyable(copyable: boolean) {
     this.$header.toggleClass('copyable', copyable);
     this.$body.toggleClass('copyable', copyable);
     this.$html.toggleClass('copyable', copyable);
@@ -235,8 +271,8 @@ export default class MessageBox extends Widget {
     myDocument.execCommand('copy');
   }
 
-  _onCopy(event) {
-    let clipboardData = objects.optProperty(event, 'originalEvent', 'clipboardData');
+  protected _onCopy(event: TriggeredEvent<HTMLDivElement>) {
+    let clipboardData = objects.optProperty(event, 'originalEvent', 'clipboardData') as DataTransfer;
 
     if (clipboardData) {
       let htmlText = strings.join('<br/>',
@@ -261,28 +297,32 @@ export default class MessageBox extends Widget {
     // else: do default
   }
 
-  _onButtonClick(event, option) {
+  protected _onButtonClick(event: Event<Action>, option: MessageBoxOption) {
     this.trigger('action', {
       option: option
     });
   }
 
-  setDisplayParent(displayParent) {
+  override trigger<K extends string & keyof EventMapOf<MessageBox>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<MessageBox>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
+
+  setDisplayParent(displayParent: MessageBoxDisplayParent) {
     this.setProperty('displayParent', displayParent);
   }
 
-  _setDisplayParent(displayParent) {
+  protected _setDisplayParent(displayParent: MessageBoxDisplayParent) {
     this._setProperty('displayParent', displayParent);
     if (displayParent) {
       this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
     }
   }
 
-  setIconId(iconId) {
+  setIconId(iconId: string) {
     this.setProperty('iconId', iconId);
   }
 
-  _setIconId(iconId) {
+  protected _setIconId(iconId: string) {
     this._setProperty('iconId', iconId);
     if (iconId) {
       if (this._icon) {
@@ -329,18 +369,12 @@ export default class MessageBox extends Widget {
     }
   }
 
-  /**
-   * @override Widget.js
-   */
-  _attach() {
+  protected override _attach() {
     this.$parent.append(this.$container);
     super._attach();
   }
 
-  /**
-   * @override Widget.js
-   */
-  _detach() {
+  protected override _detach() {
     this.$container.detach();
     super._detach();
   }

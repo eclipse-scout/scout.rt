@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, WidgetEventMap} from '../index';
+import {Event, Scrollbar, WidgetEventMap} from '../index';
 
 export default interface ScrollbarEventMap extends WidgetEventMap {
-  'scrollStart': Event;
-  'scrollEnd': Event;
+  'scrollStart': Event<Scrollbar>;
+  'scrollEnd': Event<Scrollbar>;
 }

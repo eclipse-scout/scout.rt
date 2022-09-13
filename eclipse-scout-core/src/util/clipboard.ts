@@ -131,7 +131,7 @@ export function _failedStatus(session: Session): Status {
  * @param parent
  *          Widget that wants show the notification. Mandatory. Required for NLS texts.
  */
-export function showNotification(parent: Widget, status: Status) {
+export function showNotification(parent: Widget, status?: Status) {
   scout.assertParameter('parent', parent);
   let notification = scout.create(DesktopNotification, {
     parent: parent,
