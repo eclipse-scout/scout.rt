@@ -14,6 +14,7 @@ import {RefWidgetModel} from './WidgetModel';
 import {ObjectType} from '../ObjectFactory';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {ScrollbarInstallOptions, ScrollOptions} from '../scrollbar/scrollbars';
+import {Optional} from '../types';
 
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
 export type GlassPaneContribution = JQuery | DeferredGlassPaneTarget;
@@ -1616,11 +1617,9 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   }
 
   /**
-   *
-   * @param {Widget} element widget that requested a glass pane
-   * @returns [$]
+   * @param element widget that requested a glass pane
    */
-  protected _glassPaneTargets(element: Widget) {
+  protected _glassPaneTargets(element: Widget): JQuery[] {
     // since popups are rendered outside the DOM of the widget parent-child hierarchy, get glassPaneTargets of popups belonging to this widget separately.
     return [this.$container].concat(
       this.session.desktop.getPopupsFor(this)
@@ -2152,7 +2151,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return null;
   }
 
-  protected _installScrollbars(options?: ScrollbarInstallOptions) {
+  protected _installScrollbars(options?: Optional<ScrollbarInstallOptions, 'parent'>) {
     let $scrollable = this.get$Scrollable();
     if (!$scrollable) {
       throw new Error('Scrollable is not defined, cannot install scrollbars');
@@ -2165,8 +2164,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     let defaults = {
       parent: this
     };
-    options = $.extend({}, defaults, options);
-    scrollbars.install($scrollable, options);
+    let opts = $.extend({}, defaults, options);
+    scrollbars.install($scrollable, opts);
     $scrollable.on('scroll', this._scrollHandler);
   }
 

@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventMap, Locale} from '../index';
+import {Event, EventMap, Locale, Session} from '../index';
 
-export interface LocaleSwitchEvent extends Event {
+export interface LocaleSwitchEvent<T extends Session = Session> extends Event<T> {
   locale: Locale;
 }
 
 export default interface SessionEventMap extends EventMap {
-  'eventsProcessed': Event;
+  'eventsProcessed': Event<Session>;
   'localeSwitch': LocaleSwitchEvent;
 }

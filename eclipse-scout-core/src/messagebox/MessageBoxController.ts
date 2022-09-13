@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Form, scout} from '../index';
+import {arrays, Form, MessageBox, scout, Session} from '../index';
+import {MessageBoxDisplayParent} from './MessageBox';
 
 /**
  * Controller with functionality to register and render message boxes.
@@ -16,8 +17,10 @@ import {arrays, Form, scout} from '../index';
  * The message boxes are put into the list 'messageBoxes' contained in 'displayParent'.
  */
 export default class MessageBoxController {
+  displayParent: MessageBoxDisplayParent;
+  session: Session;
 
-  constructor(displayParent, session) {
+  constructor(displayParent: MessageBoxDisplayParent, session: Session) {
     this.displayParent = displayParent;
     this.session = session;
   }
@@ -25,7 +28,7 @@ export default class MessageBoxController {
   /**
    * Adds the given message box to this controller and renders it.
    */
-  registerAndRender(messageBox) {
+  registerAndRender(messageBox: MessageBox) {
     scout.assertProperty(messageBox, 'displayParent');
     this.displayParent.messageBoxes.push(messageBox);
     this._render(messageBox);
@@ -34,7 +37,7 @@ export default class MessageBoxController {
   /**
    * Removes the given message box from this controller and DOM. However, the message box's adapter is not destroyed. That only happens once the message box is closed.
    */
-  unregisterAndRemove(messageBox) {
+  unregisterAndRemove(messageBox: MessageBox) {
     if (messageBox) {
       arrays.remove(this.displayParent.messageBoxes, messageBox);
       this._remove(messageBox);
@@ -58,9 +61,10 @@ export default class MessageBoxController {
     });
   }
 
-  _render(messageBox) {
+  protected _render(messageBox: MessageBox) {
     // missing displayParent (when render is called by reload), use displayParent of MessageBoxController
     if (!messageBox.displayParent) {
+      // @ts-ignore
       messageBox._setProperty('displayParent', this.displayParent);
     }
     // Use parent's function or (if not implemented) our own.
@@ -79,7 +83,7 @@ export default class MessageBoxController {
     // Open all message boxes in the center of the desktop, except message-boxes that belong to a popup-window
     // Since the message box doesn't have a DOM element as parent when render is called, we must find the
     // entryPoint by using the model.
-    let $mbParent;
+    let $mbParent: JQuery;
     if (this.displayParent instanceof Form && this.displayParent.isPopupWindow()) {
       $mbParent = this.displayParent.popupWindow.$container;
     } else {
@@ -95,7 +99,7 @@ export default class MessageBoxController {
     }
   }
 
-  _remove(messageBox) {
+  protected _remove(messageBox: MessageBox) {
     messageBox.remove();
   }
 
@@ -106,9 +110,7 @@ export default class MessageBoxController {
    * This method has no effect if already attached.
    */
   attach() {
-    this.displayParent.messageBoxes.forEach(messageBox => {
-      messageBox.attach();
-    }, this);
+    this.displayParent.messageBoxes.forEach(messageBox => messageBox.attach());
   }
 
   /**
@@ -118,12 +120,10 @@ export default class MessageBoxController {
    * This method has no effect if already detached.
    */
   detach() {
-    this.displayParent.messageBoxes.forEach(messageBox => {
-      messageBox.detach();
-    }, this);
+    this.displayParent.messageBoxes.forEach(messageBox => messageBox.detach());
   }
 
-  acceptView(view) {
+  acceptView(view: MessageBox): boolean {
     return this.displayParent.rendered;
   }
 }

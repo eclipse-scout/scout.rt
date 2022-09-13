@@ -8,9 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventMap, ModelAdapter} from '../index';
+import {Event, MessageBox, WidgetEventMap} from '../index';
+import {MessageBoxOption} from './MessageBox';
 
-export default interface ModelAdapterEventMap extends EventMap {
-  'attach': Event<ModelAdapter>;
-  'detach': Event<ModelAdapter>;
+export interface MessageBoxActionEvent<T extends MessageBox = MessageBox> extends Event<T> {
+  option: MessageBoxOption;
+}
+
+export default interface MessageBoxEventMap extends WidgetEventMap {
+  'action': MessageBoxActionEvent;
 }
