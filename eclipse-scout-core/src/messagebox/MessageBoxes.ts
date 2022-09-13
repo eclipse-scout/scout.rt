@@ -1,21 +1,34 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MessageBox, scout, Status, strings} from '../index';
+import {MessageBox, MessageBoxesOptions, scout, Status, strings, Widget} from '../index';
 import $ from 'jquery';
+import {StatusSeverity} from '../status/Status';
+import MessageBoxModel from './MessageBoxModel';
+import {MessageBoxOption} from './MessageBox';
 
 /**
  * This class is a convenient builder for creating message boxes. Use the static functions to
  * create and open simple and often used message boxes.
  */
-export default class MessageBoxes {
+export default class MessageBoxes implements MessageBoxesOptions {
+  parent: Widget;
+  yesText: string;
+  noText: string;
+  cancelText: string;
+  bodyText: string;
+  severity: StatusSeverity;
+  headerText: string;
+  iconId: string;
+  closeOnClick: boolean;
+  html: boolean;
 
   constructor() {
     this.parent = null;
@@ -31,54 +44,52 @@ export default class MessageBoxes {
     this.html = false;
   }
 
-  init(options) {
+  init(options: MessageBoxesOptions) {
     scout.assertParameter('parent', options.parent);
     $.extend(this, options);
   }
 
-  withHeader(headerText) {
+  withHeader(headerText: string): this {
     this.headerText = headerText;
     return this;
   }
 
   /**
-   * @param bodyText
-   * @param {boolean} [html] Set to true if body must contain HTML, default is false
-   * @returns {MessageBoxes}
+   * @param html Set to true if body must contain HTML, default is false
    */
-  withBody(bodyText, html) {
+  withBody(bodyText: string, html?: boolean): this {
     this.bodyText = bodyText;
     this.html = scout.nvl(html, false);
     return this;
   }
 
-  withIconId(iconId) {
+  withIconId(iconId: string): this {
     this.iconId = iconId;
     return this;
   }
 
-  withSeverity(severity) {
+  withSeverity(severity?: StatusSeverity): this {
     this.severity = scout.nvl(severity, Status.Severity.INFO);
     return this;
   }
 
-  withYes(yesText) {
+  withYes(yesText?: string): this {
     this.yesText = scout.nvl(yesText, this.parent.session.text('Yes'));
     return this;
   }
 
-  withNo(noText) {
+  withNo(noText?: string): this {
     this.noText = scout.nvl(noText, this.parent.session.text('No'));
     return this;
   }
 
-  withCancel(cancelText) {
+  withCancel(cancelText?: string): this {
     this.cancelText = scout.nvl(cancelText, this.parent.session.text('Cancel'));
     return this;
   }
 
   build() {
-    let options = {
+    let options: MessageBoxModel = {
       parent: this.parent,
       header: this.headerText,
       body: this.bodyText,
@@ -105,10 +116,10 @@ export default class MessageBoxes {
   }
 
   /**
-   * @returns {Promise} resolved to selected button / option
+   * @returns promise resolved to selected {@link MessageBoxOption}.
    * @see MessageBox.Buttons
    */
-  buildAndOpen() {
+  buildAndOpen(): JQuery.Promise<MessageBoxOption> {
     let def = $.Deferred();
     let messageBox = this.build();
     messageBox.on('action', event => {
@@ -123,34 +134,31 @@ export default class MessageBoxes {
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
-  static create(parent) {
+  static create(parent: Widget) {
     return scout.create(MessageBoxes, {
       parent: parent
     });
   }
 
-  static createOk(parent) {
+  static createOk(parent: Widget) {
     return this.create(parent).withYes(parent.session.text('Ok'));
   }
 
-  static createYesNo(parent) {
+  static createYesNo(parent: Widget) {
     return this.create(parent).withYes().withNo();
   }
 
-  static createYesNoCancel(parent) {
+  static createYesNoCancel(parent: Widget) {
     return this.create(parent).withYes().withNo().withCancel();
   }
 
   /**
    * Opens a message box with an Ok button.
    *
-   * @returns {Promise} resolved to clicked button
-   * @param {Object} parent
-   * @param {string} bodyText
-   * @param {number} [severity] default is <code>Status.Severity.INFO</code>
-   * @static
+   * @param severity default is {@link Status.Severity.INFO}
+   * @returns promise resolved to clicked button
    */
-  static openOk(parent, bodyText, severity) {
+  static openOk(parent: Widget, bodyText: string, severity?: StatusSeverity): JQuery.Promise<MessageBoxOption> {
     return this.createOk(parent)
       .withBody(bodyText)
       .withSeverity(severity)
@@ -160,13 +168,10 @@ export default class MessageBoxes {
   /**
    * Opens a message box with a yes and a no button.
    *
-   * @returns {Promise} resolved to clicked button
-   * @param {Object} parent
-   * @param {string} bodyText
-   * @param {number} [severity] default is <code>Status.Severity.INFO</code>
-   * @static
+   * @param severity default is {@link Status.Severity.INFO}
+   * @returns promise resolved to clicked button
    */
-  static openYesNo(parent, bodyText, severity) {
+  static openYesNo(parent: Widget, bodyText: string, severity?: StatusSeverity): JQuery.Promise<MessageBoxOption> {
     return this.createYesNo(parent)
       .withBody(bodyText)
       .withSeverity(severity)

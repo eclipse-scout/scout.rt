@@ -9,8 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Event, EventMap, KeyStroke, KeyStrokeContext} from '../index';
+import KeyStrokeManager from './KeyStrokeManager';
 
-export interface KeyStrokeManagerKeyStrokeEvent extends Event {
+export interface KeyStrokeManagerKeyStrokeEvent<T extends KeyStrokeManager = KeyStrokeManager> extends Event<T> {
   keyStroke: KeyStroke;
   keyStrokeContext: KeyStrokeContext;
 }

@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, WidgetEventMap} from '../index';
+import {Action, Event, WidgetEventMap} from '../index';
 
 export default interface ActionEventMap extends WidgetEventMap {
-  'action': Event;
+  'action': Event<Action>;
 }
