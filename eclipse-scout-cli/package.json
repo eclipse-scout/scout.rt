@@ -35,10 +35,10 @@
     "version:release": "releng-scripts version:release"
   },
   "dependencies": {
-    "@babel/core": "7.18.10",
-    "@babel/preset-env": "7.18.10",
+    "@babel/core": "7.19.0",
+    "@babel/preset-env": "7.19.0",
     "babel-loader": "8.2.5",
-    "typescript": "4.7.4",
+    "typescript": "4.8.3",
     "ts-loader": "9.3.1",
     "source-map-loader": "4.0.0",
     "copy-webpack-plugin": "11.0.0",
@@ -59,10 +59,10 @@
     "less": "4.1.3",
     "less-loader": "11.0.0",
     "mini-css-extract-plugin": "2.6.1",
-    "css-minimizer-webpack-plugin": "4.0.0",
-    "terser-webpack-plugin": "5.3.3",
+    "css-minimizer-webpack-plugin": "4.1.0",
+    "terser-webpack-plugin": "5.3.6",
     "webpack": "5.74.0",
-    "yargs-parser": "21.0.1"
+    "yargs-parser": "21.1.1"
   },
   "devDependencies": {
     "@eclipse-scout/releng": "^22.0.0"
