@@ -731,6 +731,7 @@ export {default as TileOutlineOverview} from './desktop/outline/overview/TileOut
 export {default as DesktopFormController} from './desktop/DesktopFormController';
 export {default as FilterFieldsGroupBox} from './table/FilterFieldsGroupBox';
 export {default as Resizable} from './resizable/Resizable';
+export {default as ResizableModel} from './resizable/ResizableModel';
 export {default as UnsavedFormChangesForm} from './desktop/unsavedchanges/UnsavedFormChangesForm';
 export {default as UnsavedFormsLookupCall} from './desktop/unsavedchanges/UnsavedFormsLookupCall';
 export {default as TileTableHeaderBox} from './table/TileTableHeaderBox';
