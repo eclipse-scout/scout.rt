@@ -1,77 +1,81 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FocusRule, keys, KeyStrokeContext, scout, Tooltip} from '../index';
+import {FocusRule, keys, KeyStrokeContext, scout, ScoutKeyboardEvent, Tooltip, Widget, WidgetTooltipModel} from '../index';
+import {FocusRuleType} from '../focus/FocusRule';
 
-export default class WidgetTooltip extends Tooltip {
+export default class WidgetTooltip extends Tooltip implements WidgetTooltipModel {
+  declare model: WidgetTooltipModel;
+
+  keyStrokeStopPropagationInterceptor: (event: ScoutKeyboardEvent) => void;
+  withFocusContext: boolean;
+  initialFocus: () => FocusRuleType;
+  focusableContainer: boolean;
+  content: Widget;
+  $widgetContainer: JQuery;
 
   constructor() {
     super();
 
     this.$widgetContainer = null;
-    this.widget = null;
-    this._addWidgetProperties(['widget']);
-
-    // Default interceptor that stops the propagation for all key strokes except ESCAPE and ENTER.
-    // Otherwise, the tooltip would be destroyed for all key strokes that bubble up to the
-    // root (see global document listener in Tooltip.js).
+    this.content = null;
+    this._addWidgetProperties(['content']);
     this.keyStrokeStopPropagationInterceptor = event => {
       if (scout.isOneOf(event.which, keys.ESC, keys.ENTER)) {
         return;
       }
       event.stopPropagation();
     };
-
     this.withFocusContext = true;
     this.initialFocus = () => FocusRule.AUTO;
     this.focusableContainer = false;
   }
 
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
     if (this.keyStrokeStopPropagationInterceptor) {
       this.keyStrokeContext.registerStopPropagationInterceptor(this.keyStrokeStopPropagationInterceptor);
     }
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this.$container.addClass('widget-tooltip');
     this.$widgetContainer = this.$container.appendDiv('tooltip-widget-container');
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
-    this._renderWidget();
+    this._renderContent();
   }
 
-  _remove() {
-    this._removeWidget();
+  protected override _remove() {
+    this._removeContent();
     super._remove();
   }
 
-  setWidget(widget) {
-    this.setProperty('widget', widget);
+  setContent(content: Widget) {
+    this.setProperty('content', content);
   }
 
-  _renderWidget() {
-    if (this.widget) {
-      this.widget.render(this.$widgetContainer);
-      this.widget.$container.addClass('widget');
-      this.widget.pack();
+  protected _renderContent() {
+    if (this.content) {
+      this.content.render(this.$widgetContainer);
+      this.content.$container.addClass('widget');
+      this.content.pack();
     }
-    this.$widgetContainer.setVisible(!!this.widget);
+    this.$widgetContainer.setVisible(!!this.content);
     if (!this.rendering) {
       this.position();
     }
@@ -80,15 +84,15 @@ export default class WidgetTooltip extends Tooltip {
     // It is important that this happens after layouting and positioning, otherwise we'd focus an element
     // that is currently not on the screen. Which would cause the whole desktop to
     // be shifted for a few pixels.
-    if (this.withFocusContext && this.widget) {
+    if (this.withFocusContext && this.content) {
       this.session.focusManager.installFocusContext(this.$widgetContainer, this.initialFocus());
     }
   }
 
-  _removeWidget() {
-    if (this.widget) {
+  protected _removeContent() {
+    if (this.content) {
       this.session.focusManager.uninstallFocusContext(this.$widgetContainer);
-      this.widget.remove();
+      this.content.remove();
     }
   }
 }

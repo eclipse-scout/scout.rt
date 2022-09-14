@@ -238,7 +238,7 @@ export default class KeyStrokeManager extends EventEmitter implements KeyStrokeM
   protected _installHelpDisposeListener(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>): boolean {
     let helpDisposeHandler,
       $currentTarget = $(event.currentTarget),
-      $myWindow = $currentTarget.window() as JQuery<Window>,
+      $myWindow = $currentTarget.window(),
       $topLevelContainer = $currentTarget.entryPoint();
 
     helpDisposeHandler = function() {
