@@ -1,30 +1,45 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {filters, focusUtils, graphics, keys, Point, scout, scrollbars} from '../index';
+import {filters, FocusManager, focusUtils, graphics, keys, Point, scout, scrollbars} from '../index';
 import $ from 'jquery';
+import KeyDownEvent = JQuery.KeyDownEvent;
+import FocusInEvent = JQuery.FocusInEvent;
+import FocusOutEvent = JQuery.FocusOutEvent;
+import TriggeredEvent = JQuery.TriggeredEvent;
 
 /**
  * A focus context is associated with a $container, and controls how to focus elements within that $container.
  */
 export default class FocusContext {
+  focusManager: FocusManager;
 
-  constructor($container, focusManager) {
+  /** variable to store the last valid focus position; used to restore focus once being re-activated. */
+  lastValidFocusedElement: HTMLElement;
+  focusedElement: HTMLElement;
+  prepared: boolean;
+  $container: JQuery;
+
+  /** Notice: every listener is installed on $container and not on $field level, except 'remove' listener because it does not bubble. */
+  protected _keyDownListener: (e: KeyDownEvent<HTMLElement>) => void;
+  protected _focusInListener: (e: FocusInEvent<HTMLElement>) => void;
+  protected _focusOutListener: (e: FocusOutEvent<HTMLElement>) => void;
+  protected _unfocusableListener: (e: TriggeredEvent<HTMLElement>) => void;
+  protected _removeListener: (e: TriggeredEvent<HTMLElement>) => void;
+
+  constructor($container: JQuery, focusManager: FocusManager) {
     this.$container = $container;
     this.focusManager = focusManager;
-
-    this.lastValidFocusedElement = null; // variable to store the last valid focus position; used to restore focus once being re-activated.
+    this.lastValidFocusedElement = null;
     this.focusedElement = null;
     this.prepared = false;
-
-    // Notice: every listener is installed on $container and not on $field level, except 'remove' listener because it does not bubble.
     this._keyDownListener = this._onKeyDown.bind(this);
     this._focusInListener = this._onFocusIn.bind(this);
     this._focusOutListener = this._onFocusOut.bind(this);
@@ -65,7 +80,7 @@ export default class FocusContext {
   /**
    * Method invoked once a 'keydown' event is fired to control proper tab cycle.
    */
-  _onKeyDown(event) {
+  protected _onKeyDown(event: KeyDownEvent<HTMLElement>) {
     if (event.which === keys.TAB) {
       let activeElement = this.$container.activeElement(true),
         $focusableElements = this.$container.find(':tabbable:visible'),
@@ -115,7 +130,7 @@ export default class FocusContext {
   /**
    * Method invoked once a 'focusin' event is fired by this context's $container or one of its child controls.
    */
-  _onFocusIn(event) {
+  protected _onFocusIn(event: FocusInEvent<HTMLElement>) {
     let $target = $(event.target);
     $target.on('remove', this._removeListener);
     this.focusedElement = event.target;
@@ -127,6 +142,7 @@ export default class FocusContext {
     }
 
     // Make this context the active context (nothing done if already active) and validate the focus event.
+    // @ts-ignore
     this.focusManager._pushIfAbsendElseMoveTop(this);
     this.validateAndSetFocus(event.target);
     event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event. Otherwise, that 'parent context' would be activated as well.
@@ -135,7 +151,7 @@ export default class FocusContext {
   /**
    * Method invoked once a 'focusout' event is fired by this context's $container or one of its child controls.
    */
-  _onFocusOut(event) {
+  protected _onFocusOut(event: FocusOutEvent<HTMLElement>) {
     $(event.target).off('remove', this._removeListener);
     $(this.focusedElement).removeClass('keyboard-navigation');
     this.focusedElement = null;
@@ -145,7 +161,7 @@ export default class FocusContext {
   /**
    * Method invoked once a child element of this context's $container is removed.
    */
-  _onRemove(event) {
+  protected _onRemove(event: TriggeredEvent<HTMLElement>) {
     // This listener is installed on the focused element only.
     this.validateAndSetFocus(null, filters.notSameFilter(event.target));
     event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
@@ -156,7 +172,7 @@ export default class FocusContext {
    * and it cannot have the focus anymore. In that case we need to look for a new focusable
    * element.
    */
-  _onUnfocusable(event) {
+  protected _onUnfocusable(event: TriggeredEvent<HTMLElement>) {
     if ($(event.target).isOrHas(this.lastValidFocusedElement)) {
       this.validateAndSetFocus(null, filters.notSameFilter(event.target));
       event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
@@ -166,14 +182,13 @@ export default class FocusContext {
   /**
    * Focuses the given element if being a child of this context's container and matches the given filter (if provided).
    *
-   * @param {HTMLElement|$} [element]
+   * @param element
    *        the element to focus, or null to focus the context's first focusable element matching the given filter.
-   * @param {function} [filter]
+   * @param filter
    *        filter that controls which element should be focused, or null to accept all focusable candidates.
-   * @param {object} [options]
-   * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
+   * @param options prevents scrolling to new focused element (default is false)
    */
-  validateAndSetFocus(element, filter, options) {
+  validateAndSetFocus(element?: HTMLElement, filter?: () => boolean, options?: { preventScroll?: boolean }) {
     // Ensure the element to be a child element, or set it to null otherwise.
     if (element && !$.contains(this.$container[0], element)) {
       element = null;
@@ -198,7 +213,7 @@ export default class FocusContext {
   /**
    * Calls {@link #validateAndSetFocus} with {@link #lastValidFocusedElement}.
    */
-  validateFocus(filter) {
+  validateFocus(filter?: () => boolean) {
     this.validateAndSetFocus(this.lastValidFocusedElement, filter);
   }
 
@@ -214,12 +229,10 @@ export default class FocusContext {
   /**
    * Focuses the requested element.
    *
-   * @param {HTMLElement} element
-   *        the element to focus, or null to focus the context's first focusable element matching the given filter.
-   * @param {object} [options]
-   * @param {boolean} [options.preventScroll] prevents scrolling to new focused element (defaults to false)
+   * @param element the element to focus, or null to focus the context's first focusable element matching the given filter.
+   * @param options prevents scrolling to new focused element (default is false)
    */
-  _focus(elementToFocus, options) {
+  protected _focus(elementToFocus: HTMLElement, options?: { preventScroll?: boolean }) {
     options = options || {};
     // Only focus element if focus manager is active
     if (!this.focusManager.active) {

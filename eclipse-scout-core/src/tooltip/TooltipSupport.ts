@@ -1,19 +1,45 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {scout, Tooltip, tooltips} from '../index';
 import $ from 'jquery';
+import TooltipModel from './TooltipModel';
+import MouseEnterEvent = JQuery.MouseEnterEvent;
+import MouseLeaveEvent = JQuery.MouseLeaveEvent;
+
+export interface TooltipSupportOptions extends TooltipModel {
+  /**
+   * Default is no selector
+   */
+  selector?: JQuery.Selector;
+  /**
+   * Default is {@link tooltips.DEFAULT_TOOLTIP_DELAY}
+   */
+  delay?: number;
+
+  /**
+   * Default is false.
+   */
+  nativeTooltip?: boolean;
+
+  $anchor?: JQuery;
+}
 
 export default class TooltipSupport {
+  protected _options: TooltipSupportOptions;
+  protected _mouseEnterHandler: (event: MouseEnterEvent<HTMLElement>) => void;
+  protected _mouseLeaveHandler: (event: MouseLeaveEvent<HTMLElement>) => void;
+  protected _tooltip: Tooltip;
+  protected _tooltipTimeoutId: number;
 
-  constructor(options) {
+  constructor(options: TooltipSupportOptions) {
     let defaultOptions = {
       selector: null,
       delay: tooltips.DEFAULT_TOOLTIP_DELAY,
@@ -28,7 +54,7 @@ export default class TooltipSupport {
     this._tooltipTimeoutId = null;
   }
 
-  install($comp) {
+  install($comp: JQuery) {
     // prevent multiple installation of tooltip support
     if (!$comp.data('tooltipSupport')) {
       $comp
@@ -38,7 +64,7 @@ export default class TooltipSupport {
     }
   }
 
-  uninstall($comp) {
+  uninstall($comp: JQuery) {
     $comp
       .removeData('tooltipSupport')
       .off('mouseleave', this._options.selector, this._mouseLeaveHandler)
@@ -46,14 +72,14 @@ export default class TooltipSupport {
     this._destroyTooltip();
   }
 
-  update($comp, options) {
+  update($comp: JQuery, options: TooltipSupportOptions) {
     $.extend(this._options, options);
     if (this._tooltip) {
       this._showTooltip($comp);
     }
   }
 
-  cancel($comp) {
+  cancel($comp: JQuery) {
     clearTimeout(this._tooltipTimeoutId);
   }
 
@@ -61,7 +87,7 @@ export default class TooltipSupport {
     this._destroyTooltip();
   }
 
-  _onMouseEnter(event) {
+  protected _onMouseEnter(event: MouseEnterEvent<HTMLElement>) {
     let $comp = $(event.currentTarget);
 
     if (this._options.nativeTooltip) {
@@ -73,11 +99,11 @@ export default class TooltipSupport {
     }
   }
 
-  _onMouseLeave(event) {
+  protected _onMouseLeave(event: MouseLeaveEvent<HTMLElement>) {
     this._destroyTooltip();
   }
 
-  _destroyTooltip() {
+  protected _destroyTooltip() {
     clearTimeout(this._tooltipTimeoutId);
     if (this._tooltip) {
       this._tooltip.destroy();
@@ -85,7 +111,7 @@ export default class TooltipSupport {
     }
   }
 
-  _text($comp) {
+  protected _text($comp: JQuery): string {
     let text = this._options.text || $comp.data('tooltipText');
     if ($.isFunction(text)) {
       text = text($comp);
@@ -93,7 +119,7 @@ export default class TooltipSupport {
     return text;
   }
 
-  _htmlEnabled($comp) {
+  protected _htmlEnabled($comp: JQuery): boolean {
     let htmlEnabled = this._options.htmlEnabled || $comp.data('htmlEnabled');
     if ($.isFunction(htmlEnabled)) {
       htmlEnabled = htmlEnabled($comp);
@@ -101,7 +127,7 @@ export default class TooltipSupport {
     return scout.nvl(htmlEnabled, false);
   }
 
-  _showTooltip($comp) {
+  protected _showTooltip($comp: JQuery) {
     if (!$comp || !$comp.isAttached()) {
       return; // removed in the meantime (this method is called using setTimeout)
     }

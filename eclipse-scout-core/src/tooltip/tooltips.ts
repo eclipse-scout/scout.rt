@@ -1,23 +1,24 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, TooltipSupport} from '../index';
+import {Device, Tooltip, TooltipSupport} from '../index';
 import $ from 'jquery';
+import {TooltipSupportOptions} from './TooltipSupport';
 
 const DEFAULT_TOOLTIP_DELAY = 600; // ms
 
 // Quite long tooltip delay for cases where the normal delay would be annoying
 const LONG_TOOLTIP_DELAY = 1000; // ms
 
-export function install($comp, options) {
-  let support = $comp.data('tooltipSupport');
+export function install($comp: JQuery, options: TooltipSupportOptions) {
+  let support = $comp.data('tooltipSupport') as TooltipSupport;
   if (!support) {
     support = new TooltipSupport(options);
     support.install($comp);
@@ -26,8 +27,8 @@ export function install($comp, options) {
   }
 }
 
-export function uninstall($comp) {
-  let support = $comp.data('tooltipSupport');
+export function uninstall($comp: JQuery) {
+  let support = $comp.data('tooltipSupport') as TooltipSupport;
   if (support) {
     support.uninstall($comp);
   }
@@ -37,15 +38,15 @@ export function uninstall($comp) {
  * If the tooltip is currently showing, its contents are updated immediately.
  * Otherwise, nothing happens.
  */
-export function update($comp, options) {
-  let support = $comp.data('tooltipSupport');
+export function update($comp: JQuery, options: TooltipSupportOptions) {
+  let support = $comp.data('tooltipSupport') as TooltipSupport;
   if (support) {
     support.update($comp, options);
   }
 }
 
-export function close($comp) {
-  let support = $comp.data('tooltipSupport');
+export function close($comp: JQuery) {
+  let support = $comp.data('tooltipSupport') as TooltipSupport;
   if (support) {
     support.close();
   }
@@ -54,8 +55,8 @@ export function close($comp) {
 /**
  * Cancels the scheduled task to show the tooltip.
  */
-export function cancel($comp) {
-  let support = $comp.data('tooltipSupport');
+export function cancel($comp: JQuery) {
+  let support = $comp.data('tooltipSupport') as TooltipSupport;
   if (support) {
     support.cancel($comp);
   }
@@ -64,7 +65,7 @@ export function cancel($comp) {
 /**
  * Convenient function to install tooltip support for ellipsis only.
  */
-export function installForEllipsis($comp, options) {
+export function installForEllipsis($comp: JQuery, options: TooltipSupportOptions) {
   let defaultOptions = {
     text: $label => {
       if ($label.isContentTruncated()) {
@@ -80,9 +81,8 @@ export function installForEllipsis($comp, options) {
 /**
  * Finds every tooltip whose $anchor belongs to $context.
  */
-export function find($context) {
-  let $tooltips, i, tooltip,
-    tooltips = [];
+export function find($context: JQuery): Tooltip[] {
+  let $tooltips, i, tooltip, tooltips = [];
   $tooltips = $('.tooltip', $context.document(true));
 
   for (i = 0; i < $tooltips.length; i++) {

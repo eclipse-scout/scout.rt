@@ -793,7 +793,7 @@ export function isLocationInView(location: { x: number; y: number }, $scrollable
  * Attaches the given handler to each scrollable parent, including $anchor if it is scrollable as well.
  * Make sure you remove the handlers when not needed anymore using offScroll.
  */
-export function onScroll($anchor: JQuery, handler: (event: JQuery.ScrollEvent<HTMLElement>) => boolean) {
+export function onScroll($anchor: JQuery, handler: (event: JQuery.ScrollEvent<HTMLElement>) => void) {
   // @ts-ignore
   handler.$scrollParents = [];
   $anchor.scrollParents().each(function() {
@@ -804,7 +804,7 @@ export function onScroll($anchor: JQuery, handler: (event: JQuery.ScrollEvent<HT
   });
 }
 
-export function offScroll(handler: (event: JQuery.ScrollEvent<HTMLElement>) => boolean) {
+export function offScroll(handler: (event: JQuery.ScrollEvent<HTMLElement>) => void) {
   // @ts-ignore
   let $scrollParents: JQuery[] = handler.$scrollParents;
   if (!$scrollParents) {

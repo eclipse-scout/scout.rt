@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -34,7 +34,7 @@ describe('WidgetTooltipSpec', () => {
     let tooltip = scout.create(WidgetTooltip, {
       parent: session.desktop,
       $anchor: session.desktop.$container,
-      widget: {
+      content: {
         objectType: 'StringField',
         value: 'Test1'
       },
@@ -43,25 +43,25 @@ describe('WidgetTooltipSpec', () => {
     tooltip.render();
 
     expect(tooltip.rendered).toBe(true);
-    expect(tooltip.widget instanceof StringField).toBe(true);
-    expect(tooltip.widget.rendered).toBe(true);
-    expect(tooltip.widget.$field.val()).toBe('Test1');
+    expect(tooltip.content instanceof StringField).toBe(true);
+    expect(tooltip.content.rendered).toBe(true);
+    expect(tooltip.content.$field.val()).toBe('Test1');
     expect(tooltip.$container).toHaveClass('special-tooltip');
 
     tooltip.remove();
     expect(tooltip.rendered).toBe(false);
-    expect(tooltip.widget.rendered).toBe(false);
+    expect(tooltip.content.rendered).toBe(false);
 
     tooltip.render();
-    tooltip.widget.$field.val('Test2');
+    tooltip.content.$field.val('Test2');
 
     expect(tooltip.rendered).toBe(true);
-    expect(tooltip.widget.rendered).toBe(true);
+    expect(tooltip.content.rendered).toBe(true);
 
     tooltip.destroy();
     expect(tooltip.destroyed).toBe(true);
-    expect(tooltip.widget.destroyed).toBe(true);
-    expect(tooltip.widget.value).toBe('Test2');
+    expect(tooltip.content.destroyed).toBe(true);
+    expect(tooltip.content.value).toBe('Test2');
   });
 
 });
