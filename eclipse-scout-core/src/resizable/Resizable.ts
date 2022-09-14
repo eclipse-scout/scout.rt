@@ -1,23 +1,57 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, Insets, Rectangle, scout} from '../index';
+import {EnumObject, graphics, Insets, Rectangle, ResizableModel, scout} from '../index';
 import $ from 'jquery';
 import arrays from '../util/arrays';
+import MouseDownEvent = JQuery.MouseDownEvent;
+import MouseUpEvent = JQuery.MouseUpEvent;
+import MouseMoveEvent = JQuery.MouseMoveEvent;
+
+export interface ResizableContext {
+  initialBounds: Rectangle;
+  minBounds: Rectangle;
+  maxBounds: Rectangle;
+  distance: number[];
+  edge: string;
+  mousedownEvent: MouseDownEvent;
+}
+
+export type ResizableMode = EnumObject<typeof Resizable.MODES>;
 
 /**
  * Resizable makes a DOM element resizable by adding resize handlers to all edges of the given model.$container. This is primarily used for (modal) dialogs.
  */
-export default class Resizable {
+export default class Resizable implements ResizableModel {
+  declare model: ResizableModel;
 
-  constructor(model) {
+  modes: ResizableMode[];
+  boundaries: Insets;
+  $container: JQuery;
+  $window: JQuery<Window>;
+  $resizableS: JQuery<HTMLDivElement>;
+  $resizableE: JQuery<HTMLDivElement>;
+  $resizableSE: JQuery<HTMLDivElement>;
+  $resizableW: JQuery<HTMLDivElement>;
+  $resizableSW: JQuery<HTMLDivElement>;
+  $resizableN: JQuery<HTMLDivElement>;
+  $resizableNW: JQuery<HTMLDivElement>;
+  $resizableNE: JQuery<HTMLDivElement>;
+
+  protected _context: ResizableContext;
+  protected _mouseDownHandler: (event: MouseDownEvent) => void;
+  protected _mouseUpHandler: (event: MouseUpEvent) => void;
+  protected _mousemoveHandler: (event: MouseMoveEvent) => void;
+  protected _resizeHandler: (newBounds: Rectangle) => void;
+
+  constructor(model: ResizableModel) {
     scout.assertParameter('model', model);
     scout.assertParameter('$container', model.$container);
     this.$container = model.$container;
@@ -45,7 +79,7 @@ export default class Resizable {
     EAST: 'e',
     WEST: 'w',
     NORTH: 'n'
-  };
+  } as const;
 
   /**
    * 15 fps seems to be a good value for slower browsers like firefox,
@@ -53,7 +87,7 @@ export default class Resizable {
    */
   static FPS = 1000 / 15;
 
-  setModes(modes) {
+  setModes(modes?: ResizableMode[]) {
     let ensuredModes = modes || [Resizable.MODES.SOUTH, Resizable.MODES.EAST, Resizable.MODES.WEST, Resizable.MODES.NORTH];
     if (arrays.equals(ensuredModes, this.modes)) {
       return;
@@ -62,7 +96,7 @@ export default class Resizable {
     this._calculateResizeHandlersVisibility();
   }
 
-  setBoundaries(boundaries) {
+  setBoundaries(boundaries?: Insets) {
     this.boundaries = $.extend(new Insets(), boundaries);
     if (this._boundaryValueSet(this.boundaries.left)) {
       this.boundaries.left -= this.$container.cssMarginLeft();
@@ -78,7 +112,7 @@ export default class Resizable {
     }
   }
 
-  _appendResizeHandles() {
+  protected _appendResizeHandles() {
     this.$resizableS = this.$container.appendDiv('resizable-handle resizable-s')
       .data('edge', 's')
       .on('mousedown.resizable', this._mouseDownHandler);
@@ -106,7 +140,7 @@ export default class Resizable {
     this._calculateResizeHandlersVisibility();
   }
 
-  _calculateResizeHandlersVisibility() {
+  protected _calculateResizeHandlersVisibility() {
     if (this.$resizableS) {
       this.$resizableS.setVisible(this._hasMode(Resizable.MODES.SOUTH));
     }
@@ -133,7 +167,7 @@ export default class Resizable {
     }
   }
 
-  _hasMode(mode) {
+  protected _hasMode(mode: ResizableMode): boolean {
     return this.modes.some(m => m === mode);
   }
 
@@ -143,7 +177,7 @@ export default class Resizable {
     this._installRemoveHandler();
   }
 
-  _installRemoveHandler() {
+  protected _installRemoveHandler() {
     this.$container.on('remove', this.destroy.bind(this));
   }
 
@@ -188,7 +222,7 @@ export default class Resizable {
       .off('mousemove.resizable', this._mousemoveHandler);
   }
 
-  _onMouseDown(event) {
+  protected _onMouseDown(event: MouseDownEvent) {
     let $resizable = this.$container,
       $myWindow = $resizable.window(),
       $handle = $(event.target),
@@ -226,7 +260,7 @@ export default class Resizable {
     $('iframe').addClass('dragging-in-progress');
   }
 
-  _onMouseUp(event) {
+  protected _onMouseUp(event: MouseUpEvent) {
     this.$container.removeClass('resizable-resizing');
     this.$window
       .off('mouseup.resizable', this._mouseUpHandler)
@@ -235,7 +269,7 @@ export default class Resizable {
     this._context = null;
   }
 
-  _onMousemove(event) {
+  protected _onMousemove(event: MouseMoveEvent) {
     let ctx = this._context,
       newBounds = ctx.initialBounds.clone(),
       distance = this._calcDistance(ctx.mousedownEvent, event);
@@ -261,7 +295,7 @@ export default class Resizable {
     $.throttle(this._resizeHandler, Resizable.FPS)(newBounds);
   }
 
-  _resize(newBounds) {
+  protected _resize(newBounds: Rectangle) {
     this._cropToBoundaries(newBounds);
     graphics.setBounds(this.$container, newBounds);
     this.$container.trigger('resize', {
@@ -270,7 +304,7 @@ export default class Resizable {
     });
   }
 
-  _cropToBoundaries(newBounds) {
+  protected _cropToBoundaries(newBounds: Rectangle) {
     if (this._boundaryValueSet(this.boundaries.left) && newBounds.x > this.boundaries.left) {
       newBounds.width -= (this.boundaries.left - newBounds.x);
       newBounds.x = this.boundaries.left;
@@ -287,11 +321,11 @@ export default class Resizable {
     }
   }
 
-  _boundaryValueSet(value) {
+  protected _boundaryValueSet(value: number): boolean {
     return value > 0;
   }
 
-  _calcDistance(eventA, eventB) {
+  protected _calcDistance(eventA: MouseDownEvent, eventB: MouseMoveEvent): number[] {
     let
       distX = eventB.pageX - eventA.pageX,
       distY = eventB.pageY - eventA.pageY;
