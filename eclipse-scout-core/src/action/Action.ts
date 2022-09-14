@@ -12,6 +12,7 @@ import {ActionEventMap, ActionKeyStroke, ActionModel, Device, DoubleClickSupport
 import $ from 'jquery';
 import AbstractLayout from '../layout/AbstractLayout';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {TooltipSupportOptions} from '../tooltip/TooltipSupport';
 
 export type ActionStyleType = EnumObject<typeof Action.ActionStyle>;
 export type KeyStrokeFirePolicyType = EnumObject<typeof Action.KeyStrokeFirePolicy>;
@@ -38,7 +39,7 @@ export default class Action extends Widget implements ActionModel {
   toggleAction: boolean;
   tooltipText: string;
   showTooltipWhenSelected: boolean;
-  tooltipPosition: string; // FIXME TS: add enum as soon as tooltips have been migrated
+  tooltipPosition: 'top' | 'bottom';
   icon: Icon;
   $text: JQuery;
 
@@ -275,11 +276,11 @@ export default class Action extends Widget implements ActionModel {
     this.invalidateLayoutTree();
   }
 
-  setTooltipPosition(position: string) { // FIXME TS: add tooltip position enum as soon as available
+  setTooltipPosition(position: 'top' | 'bottom') {
     this.setProperty('tooltipPosition', position);
   }
 
-  protected _configureTooltip(): object { // FIXME TS: return tooltip model as soon as available
+  protected _configureTooltip(): TooltipSupportOptions {
     return {
       parent: this,
       text: this.tooltipText,

@@ -28,7 +28,7 @@ export default class ClickActiveElementKeyStroke extends KeyStroke {
       return false;
     }
 
-    event._$activeElement = this.field.$container.activeElement() as JQuery;
+    event._$activeElement = this.field.$container.activeElement();
     return true;
   }
 
