@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, IconDesc, Logger, Point, Predicate} from '../index';
+import {Dimension, IconDesc, Logger, Point, Predicate, ResizableModel} from '../index';
 import $ from 'jquery';
 import Deferred = JQuery.Deferred;
 
@@ -81,7 +81,7 @@ declare global {
      * @param [options] an optional options object. Short-hand version: If a number is passed instead
      *          of an object, the value is automatically converted to the option 'delay'.
      */
-    debounce(fx: (...args) => unknown, options?: DebounceOptions | number): void;
+    debounce(fx: (...args: any[]) => unknown, options?: DebounceOptions | number): void;
 
     /**
      * Executes the given function. Further calls to the same function are delayed by the given delay.
@@ -90,12 +90,12 @@ declare global {
      * @param fx the function to wrap
      * @param delay how much the function calls should be delayed. Default is 250.
      */
-    throttle(fx: (...args) => unknown, delay?: number): void;
+    throttle(fx: (...args: any[]) => unknown, delay?: number): (...args: any[]) => unknown;
 
     /**
      * Returns a function which negates the return value of the given function when called.
      */
-    negate(fx: (...args) => unknown): ((...args) => boolean);
+    negate(fx: (...args: any[]) => unknown): ((...args: any[]) => boolean);
 
     /**
      * CSP-safe method to dynamically load and execute a script from server.
@@ -1079,7 +1079,7 @@ declare global {
      * Makes the current element resizable, which means DIVs for resize-handling are added to the DOM
      * in the E, SE and S of the element. This is primarily useful for (modal) dialogs.
      */
-    resizable(model): this; // FIXME ts define ResizeableModel as soon as Resizable has been migrated
+    resizable(model?: ResizableModel): this;
 
     /**
      * Removes the resize handles and event handlers in order to make the element un resizable again.
