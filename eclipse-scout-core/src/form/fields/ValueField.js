@@ -381,9 +381,9 @@ export default class ValueField extends FormField {
     }
 
     this._valueChanged();
-    this._updateMenus();
     this._updateTouched();
     this._updateEmpty();
+    this._updateMenus();
     this.triggerPropertyChange('value', oldValue, this.value);
   }
 
@@ -399,10 +399,10 @@ export default class ValueField extends FormField {
   }
 
   _getCurrentMenuTypes() {
-    if (this.value) {
-      return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.NotNull];
+    if (this.empty) {
+      return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.Null];
     }
-    return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.Null];
+    return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.NotNull];
   }
 
   /**
