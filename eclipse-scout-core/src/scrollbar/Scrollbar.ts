@@ -426,10 +426,9 @@ export default class Scrollbar extends Widget {
     let thumbClippingOffset = (this.axis === 'x' ? this._thumbClipping.left : this._thumbClipping.top);
     let thumbCenter = this._$thumb.offset()[this._dir] + Math.floor(thumbSize / 2) - thumbClippingOffset;
     let thumbCenterOffset = Math.round((this.axis === 'x' ? event.pageX : event.pageY) - thumbCenter);
-    let doc = this._$thumb.document() as JQuery<Document>;
 
     this._$thumb.addClass('scrollbar-thumb-move');
-    doc
+    this._$thumb.document()
       .on('mousemove', {thumbCenterOffset: thumbCenterOffset}, this._onDocumentMousemoveHandler)
       .one('mouseup', this._onDocumentMouseUpHandler);
 

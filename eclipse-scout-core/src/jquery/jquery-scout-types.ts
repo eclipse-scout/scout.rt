@@ -65,7 +65,7 @@ declare global {
      * Note: "return false" is equal to preventDefault() and stopPropagation(), but
      * not stopImmediatePropagation().
      */
-    suppressEvent(): void;
+    suppressEvent(event: JQuery.Event): void;
 
     /**
      * Implements the 'debounce' pattern. The given function fx is executed after a certain delay
@@ -318,10 +318,20 @@ declare global {
     makeSpan(cssClass?: string, text?: string): JQuery<HTMLSpanElement>;
 
     /**
+     * @returns document reference (ownerDocument) of the HTML element.
+     */
+    document(): JQuery<Document>;
+
+    /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
      * @returns document reference (ownerDocument) of the HTML element.
      */
     document<T extends boolean>(domElement?: T): T extends true ? Document : JQuery<Document>;
+
+    /**
+     * @returns window reference (defaultView) of the HTML element
+     */
+    window(): JQuery<Window>;
 
     /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
@@ -330,16 +340,31 @@ declare global {
     window<T extends boolean>(domElement?: T): T extends true ? Window : JQuery<Window>;
 
     /**
+     * @returns the BODY element of the HTML document in which the current HTML element is placed.
+     */
+    body(): JQuery<Body>;
+
+    /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
      * @returns the BODY element of the HTML document in which the current HTML element is placed.
      */
     body<T extends boolean>(domElement?: T): T extends true ? Body : JQuery<Body>;
 
     /**
+     * @returns the closest DOM element that has the 'scout' class.
+     */
+    entryPoint(): JQuery;
+
+    /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
      * @returns the closest DOM element that has the 'scout' class.
      */
-    entryPoint<T extends boolean>(domElement?: T): T extends true ? JQuery : JQuery;
+    entryPoint<T extends boolean>(domElement?: T): T extends true ? HTMLElement : JQuery;
+
+    /**
+     * @returns the active element of the current document
+     */
+    activeElement(): JQuery;
 
     /**
      * @param domElement if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
@@ -405,7 +430,7 @@ declare global {
     /**
      * Creates a new COLGROUP and appends it to the current element.
      */
-    appendColgroup(cssClass?: string): JQuery
+    appendColgroup(cssClass?: string): JQuery;
 
     /**
      * Creates a new COL and appends it to the current element.
@@ -1054,7 +1079,7 @@ declare global {
      * Makes the current element resizable, which means DIVs for resize-handling are added to the DOM
      * in the E, SE and S of the element. This is primarily useful for (modal) dialogs.
      */
-    resizable(model): this; // TODO ts define ResizeableModel
+    resizable(model): this; // FIXME ts define ResizeableModel as soon as Resizable has been migrated
 
     /**
      * Removes the resize handles and event handlers in order to make the element un resizable again.
