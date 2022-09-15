@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Locale, numbers, RoundingMode, scout, strings} from '../index';
-import {RoundingModeType} from '../util/RoundingMode';
 
 /**
  * Provides formatting of numbers using java format pattern.
@@ -35,7 +34,7 @@ export default class DecimalFormat {
   allAfter: number;
   pattern: string;
   multiplier: number;
-  roundingMode: RoundingModeType;
+  roundingMode: RoundingMode;
 
   constructor(locale: Locale, options: string | DecimalFormatOptions) {
     // format function will use these (defaults)
@@ -295,5 +294,5 @@ export interface DecimalFormatOptions {
   /**
    * default is {@link RoundingMode.HALF_UP}
    */
-  roundingMode?: RoundingModeType;
+  roundingMode?: RoundingMode;
 }

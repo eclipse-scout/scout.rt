@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, RoundingMode, strings} from '../index';
-import {RoundingModeType} from './RoundingMode';
 
 /**
  * Converts the given decimal number to base-62 (i.e. the same value, but
@@ -94,7 +93,7 @@ export function correlationId(length?: number): string {
  * If decimalPlaces is omitted, the number will be rounded to integer by default.
  * Rounding mode {@link RoundingMode.HALF_UP} is used as default.
  */
-export function round(number: number, roundingMode?: RoundingModeType, decimalPlaces?: number): number {
+export function round(number: number, roundingMode?: RoundingMode, decimalPlaces?: number): number {
   if (number === null || number === undefined) {
     return number;
   }
