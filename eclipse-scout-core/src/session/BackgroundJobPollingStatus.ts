@@ -8,14 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EnumObject} from '../types';
 
-const BackgroundJobPollingStatus = {
-  STOPPED: 'stopped',
-  RUNNING: 'running',
-  FAILURE: 'failure'
-} as const;
-
-export type BackgroundJobPollingStatusType = EnumObject<typeof BackgroundJobPollingStatus>;
+enum BackgroundJobPollingStatus {
+  STOPPED = 'stopped',
+  RUNNING = 'running',
+  FAILURE = 'failure'
+}
 
 export default BackgroundJobPollingStatus;

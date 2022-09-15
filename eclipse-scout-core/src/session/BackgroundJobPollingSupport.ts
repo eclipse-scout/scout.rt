@@ -9,11 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {BackgroundJobPollingStatus} from '../index';
-import {BackgroundJobPollingStatusType} from './BackgroundJobPollingStatus';
 
 export default class BackgroundJobPollingSupport {
   enabled: boolean;
-  status: BackgroundJobPollingStatusType;
+  status: BackgroundJobPollingStatus;
 
   constructor(enabled?: boolean) {
     this.enabled = !!enabled;
