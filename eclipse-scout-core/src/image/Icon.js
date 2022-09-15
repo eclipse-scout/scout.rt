@@ -13,7 +13,7 @@ import {HtmlComponent, IconDesc, Image, scout, Widget} from '../index';
 /**
  * Widget representing an icon. It may be a font icon or an image icon. Depending on the type, either a span or an img tag will be rendered.
  * <p>
- * See also jquery-scout.icon/appendIcon. Main difference to these implementations is that the image loading will invalidate the layout by using {@link Image}.
+ * See also {@link JQuery.icon} and {@link JQuery.appendIcon}. Main difference to these implementations is that the image loading will invalidate the layout by using {@link Image}.
  */
 export default class Icon extends Widget {
 

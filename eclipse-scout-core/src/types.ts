@@ -13,6 +13,8 @@ import {Widget} from './index';
 
 export type Predicate<T> = (obj: T) => boolean;
 
+export type Comparator<T> = (a: T, b: T) => number;
+
 // Type that makes some properties optional and some required.
 export type PartialAndRequired<T, OPTIONAL extends keyof T, REQUIRED extends keyof T> = Omit<T, OPTIONAL | REQUIRED> & Partial<Pick<T, OPTIONAL>> & Required<Pick<T, REQUIRED>>;
 

@@ -65,7 +65,7 @@ export interface LoggingOptions {
 
 const DEFAULT_LEVEL = LogLevel.TRACE;
 let initialized = false;
-let _appendersToAdd: { factoryName: { new(model?: object) } | string, options?: object }[] = [];
+let _appendersToAdd: { factoryName: { new(model?: object) } | string; options?: object }[] = [];
 let showStackTraces = true;
 
 /***
