@@ -1,34 +1,40 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
+import {GlassPaneRenderer, Widget} from '../index';
+
 /**
  * Is used to render glasspane after the glasspane targets are set. This case occurs when a child is rendered before a parent is rendered-> on reload page.
  */
 export default class DeferredGlassPaneTarget {
+
+  glassPaneRenderer: GlassPaneRenderer;
+  $glassPaneTargets: JQuery[];
+
   constructor() {
     this.$glassPaneTargets = null;
     this.glassPaneRenderer = null;
   }
 
-  ready($glassPaneTargets) {
+  ready($glassPaneTargets: JQuery[]) {
     this.$glassPaneTargets = $glassPaneTargets;
     this.renderWhenReady();
   }
 
-  rendererReady(glassPaneRenderer) {
+  rendererReady(glassPaneRenderer: GlassPaneRenderer) {
     this.glassPaneRenderer = glassPaneRenderer;
     this.renderWhenReady();
   }
 
-  removeGlassPaneRenderer(glassPaneRenderer) {
+  removeGlassPaneRenderer(glassPaneRenderer: GlassPaneRenderer) {
     if (this.glassPaneRenderer === glassPaneRenderer) {
       this.glassPaneRenderer = null;
     }
@@ -36,9 +42,7 @@ export default class DeferredGlassPaneTarget {
 
   renderWhenReady() {
     if (this.glassPaneRenderer && this.$glassPaneTargets && this.$glassPaneTargets.length > 0) {
-      this.$glassPaneTargets.forEach($glassPaneTarget => {
-        this.glassPaneRenderer.renderGlassPane($glassPaneTarget);
-      });
+      this.$glassPaneTargets.forEach($glassPaneTarget => this.glassPaneRenderer.renderGlassPane($glassPaneTarget));
     }
   }
 
@@ -46,9 +50,9 @@ export default class DeferredGlassPaneTarget {
 
   /**
    * @param widget a not rendered Widget
-   * @findGlassPaneTargets function which returns the targets
+   * @param findGlassPaneTargets function which returns the targets
    */
-  static createFor(widget, findGlassPaneTargets) {
+  static createFor(widget: Widget, findGlassPaneTargets: () => JQuery[]): DeferredGlassPaneTarget[] {
     if (widget.rendered) {
       throw new Error('Don\'t call this function if widget is already rendered.');
     }

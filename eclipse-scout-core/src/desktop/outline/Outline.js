@@ -1083,7 +1083,7 @@ export default class Outline extends Tree {
     return $elements;
   }
 
-  _onGlassPaneMouseDown(glassPaneOwner, $glassPane) {
+  onGlassPaneMouseDown(glassPaneOwner, $glassPane) {
     let desktop = this.session.desktop;
     if (desktop.navigation) {
       if ($glassPane.parent()[0] === desktop.navigation.$body[0]) {

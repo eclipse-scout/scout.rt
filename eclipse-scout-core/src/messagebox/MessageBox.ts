@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, Action, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, EnumObject, Event, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, Icon, keys, KeyStrokeContext, MessageBoxController, MessageBoxLayout, objects, scout, Status, strings, Widget} from '../index';
+import {AbortKeyStroke, Action, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, DisplayParent, EnumObject, Event, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, Icon, keys, KeyStrokeContext, MessageBoxLayout, objects, scout, Status, strings, Widget} from '../index';
 import {StatusSeverity} from '../status/Status';
 import MessageBoxModel from './MessageBoxModel';
 import MessageBoxEventMap from './MessageBoxEventMap';
@@ -16,12 +16,6 @@ import {EventMapOf, EventModel} from '../events/EventEmitter';
 import TriggeredEvent = JQuery.TriggeredEvent;
 
 export type MessageBoxOption = EnumObject<typeof MessageBox.Buttons>;
-export type MessageBoxDisplayParent = Widget & {
-  messageBoxController: MessageBoxController;
-  messageBoxes: MessageBox[];
-  acceptView?(view: MessageBox): boolean;
-  inFront(): boolean;
-};
 
 export default class MessageBox extends Widget {
   declare model: MessageBoxModel;
@@ -36,7 +30,6 @@ export default class MessageBox extends Widget {
   yesButtonText: string;
   noButtonText: string;
   cancelButtonText: string;
-  displayParent: MessageBoxDisplayParent;
   buttons: Action[];
   boxButtons: BoxButtons;
   yesButton: Action;
@@ -67,7 +60,6 @@ export default class MessageBox extends Widget {
     this.noButtonText = null;
     this.cancelButtonText = null;
     this.displayParent = null;
-
     this.buttons = [];
     this.boxButtons = null;
     this.yesButton = null;
@@ -307,11 +299,11 @@ export default class MessageBox extends Widget {
     return super.trigger(type, eventOrModel);
   }
 
-  setDisplayParent(displayParent: MessageBoxDisplayParent) {
+  setDisplayParent(displayParent: DisplayParent) {
     this.setProperty('displayParent', displayParent);
   }
 
-  protected _setDisplayParent(displayParent: MessageBoxDisplayParent) {
+  protected _setDisplayParent(displayParent: DisplayParent) {
     this._setProperty('displayParent', displayParent);
     if (displayParent) {
       this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));

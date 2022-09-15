@@ -663,6 +663,7 @@ export {default as SimpleTab} from './tabbox/SimpleTab';
 export {default as SimpleTabArea} from './tabbox/SimpleTabArea';
 export {default as SimpleTabAreaLayout} from './tabbox/SimpleTabAreaLayout';
 export {default as Desktop} from './desktop/Desktop';
+export {default as DisplayParent} from './desktop/DisplayParent';
 export {default as DesktopAdapter} from './desktop/DesktopAdapter';
 export {default as DesktopLogo} from './desktop/DesktopLogo';
 export {default as DesktopLayout} from './desktop/DesktopLayout';

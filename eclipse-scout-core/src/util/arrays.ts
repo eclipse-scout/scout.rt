@@ -507,11 +507,9 @@ export function diff<T>(arr1: T[], arr2: T[]): T[] {
   return diff;
 }
 
-export function flatMap<T, R>(arr: T[], func: (T) => R = (x => x)): R[] {
+export function flatMap<T, R>(arr: T[] | T, func: (T) => R | R[] = (x => x)): R[] {
   let result = [];
-  ensure(arr).forEach(element => {
-    pushAll(result, func(element));
-  });
+  ensure(arr).forEach(element => pushAll(result, func(element)));
   return result;
 }
 
