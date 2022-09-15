@@ -9,13 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {keys, KeyStroke, ScoutKeyboardEvent} from '../index';
-import {Copyable} from '../types';
+import {CopyableWidget} from '../types';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class CopyKeyStroke extends KeyStroke {
-  declare field: Copyable;
+  declare field: CopyableWidget;
 
-  constructor(field: Copyable) {
+  constructor(field: CopyableWidget) {
     super();
     this.field = field;
     this.which = [keys.C];
