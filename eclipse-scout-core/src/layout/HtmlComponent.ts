@@ -462,9 +462,12 @@ export default class HtmlComponent {
   }
 
   /**
-   * Returns the size of the component, insets included.
+   * @param options an optional options object. Short-hand version: If a boolean is passed instead
+   *                of an object, the value is automatically converted to the option "includeMargin".
+   * @returns the size of the component, insets included.
+   * @see graphics.size
    */
-  size(options?: SizeOptions): Dimension {
+  size(options?: SizeOptions | boolean): Dimension {
     return graphics.size(this.$comp, options);
   }
 

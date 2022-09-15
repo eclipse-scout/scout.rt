@@ -318,6 +318,10 @@ export function transformCommentLinesToJsDoc(j, comments) {
 }
 
 export const defaultParamTypeMap = {
+  JQuery: {
+    predicate: name => name.startsWith('$') || name.startsWith('_$'), // check for _ explicitly to ensure no other predicate matches (e.g. FormField)
+    type: 'JQuery'
+  },
   number: {
     predicate: name => isOneOf(name, 'width', 'height', 'top', 'bottom', 'right', 'left', 'x', 'y', 'length', 'maximumUploadSize', 'viewRangeSize', 'count', 'selectionStart', 'selectionEnd',
         'sortCode', 'dense', 'delay', 'maxContentLines', 'useOnlyInVisibleColumns', 'index')
@@ -344,10 +348,6 @@ export const defaultParamTypeMap = {
   Date: {
     predicate: name => name.endsWith('Date') || name.endsWith('Time'),
     type: 'Date'
-  },
-  JQuery: {
-    predicate: name => name.startsWith('$') || name.startsWith('_$'), // check for _ explicitly to ensure no other predicate matches (e.g. FormField)
-    type: 'JQuery'
   },
   HtmlComponent: {
     predicate: name => isOneOf(name, 'htmlComp', 'htmlContainer', 'htmlBody', 'htmlChild'),
