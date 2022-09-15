@@ -3,13 +3,14 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Widget} from '../index';
 import $ from 'jquery';
+import MouseDownEvent = JQuery.MouseDownEvent;
 
 export default class GlassPane extends Widget {
 
@@ -17,7 +18,7 @@ export default class GlassPane extends Widget {
     super();
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent
       .appendDiv('glasspane')
       .on('mousedown', this._onMouseDown.bind(this));
@@ -32,13 +33,13 @@ export default class GlassPane extends Widget {
     this.session.focusManager.registerGlassPaneTarget(this.$parent);
   }
 
-  _remove() {
+  protected override _remove() {
     this.$parent.removeClass('glasspane-parent');
     this.session.focusManager.unregisterGlassPaneTarget(this.$parent);
     super._remove();
   }
 
-  _onMouseDown(event) {
+  protected _onMouseDown(event: MouseDownEvent<HTMLDivElement>) {
     // Won't be executed if pointer events is set to none. But acts as safety net if pointer events are not supported or even removed by the user
     $.suppressEvent(event);
   }

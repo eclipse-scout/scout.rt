@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, Event, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel} from '../index';
+import {AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, Event, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel} from '../index';
 import * as $ from 'jquery';
 import {RefWidgetModel} from './WidgetModel';
 import {ObjectType} from '../ObjectFactory';
@@ -17,7 +17,7 @@ import {ScrollbarInstallOptions, ScrollOptions} from '../scrollbar/scrollbars';
 import {Optional} from '../types';
 
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
-export type GlassPaneContribution = JQuery | DeferredGlassPaneTarget;
+export type GlassPaneContribution = (widget: Widget) => JQuery | JQuery[];
 export type WidgetOrModel = Widget | WidgetModel;
 
 export interface CloneOptions {
@@ -79,6 +79,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   trackFocus: boolean;
   visible: boolean;
   modelAdapter: ModelAdapter;
+  displayParent: DisplayParent;
   $container: JQuery;
   $parent: JQuery;
   protected _$lastFocusedElement: JQuery;
@@ -1594,13 +1595,12 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is shown with this widget as its 'displayParent'.<br>
    * If the widget is not rendered yet, a scout.DeferredGlassPaneTarget is returned.<br>
    * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
-   * @param {Widget} element widget that requested a glass pane
-   * @returns [$]|[DeferredGlassPaneTarget]
+   * @param element widget that requested a glass pane
    */
-  glassPaneTargets(element: Widget) {
-    let resolveGlassPanes = element => {
+  glassPaneTargets(element: Widget): (JQuery | DeferredGlassPaneTarget)[] {
+    let resolveGlassPanes: (element: Widget) => JQuery[] = element => {
       // contributions
-      let targets = arrays.flatMap(this._glassPaneContributions, cont => {
+      let targets = arrays.flatMap(this._glassPaneContributions, (cont: GlassPaneContribution) => {
         let $elements = cont(element);
         if ($elements) {
           return arrays.ensure($elements);
