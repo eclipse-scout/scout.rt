@@ -1,22 +1,36 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DeferredGlassPaneTarget, Form, scout} from '../index';
+import {arrays, DeferredGlassPaneTarget, DisplayParent, Event, EventHandler, Form, scout, Session, Widget} from '../index';
 import $ from 'jquery';
 
 /**
  * Renders glassPanes over the 'glassPaneTargets' of a widget.
  */
 export default class GlassPaneRenderer {
+  session: Session;
+  protected _widget: Widget;
+  protected _enabled: boolean;
+  protected _$glassPanes: JQuery<HTMLDivElement>[];
+  protected _deferredGlassPanes: DeferredGlassPaneTarget[];
+  protected _resolvedDisplayParent: DisplayParent;
+  protected _registeredDisplayParent: DisplayParent;
+  protected _displayParentRenderHandler: EventHandler;
+  protected _glassPaneRemoveHandler: (event: JQuery.TriggeredEvent<HTMLDivElement>) => void;
+  protected _glassPaneRendererRegistered: boolean;
 
-  constructor(widget, enabled) {
+  /**
+   * @param widget Required
+   * @param enabled Optional. Default is true
+   */
+  constructor(widget: Widget, enabled?: boolean) {
     this._widget = widget;
     this.session = widget.session;
     this._enabled = scout.nvl(enabled, true);
@@ -30,26 +44,22 @@ export default class GlassPaneRenderer {
   }
 
   renderGlassPanes() {
-    this.findGlassPaneTargets().forEach(function(glassPaneTarget) {
+    this.findGlassPaneTargets().forEach(glassPaneTarget => {
       if (glassPaneTarget instanceof DeferredGlassPaneTarget) {
         glassPaneTarget.rendererReady(this);
         this._deferredGlassPanes.push(glassPaneTarget);
       } else {
         this.renderGlassPane(glassPaneTarget);
       }
-    }, this);
+    });
     if (!this._glassPaneRendererRegistered) {
       this.session.focusManager.registerGlassPaneRenderer(this);
       this._glassPaneRendererRegistered = true;
     }
   }
 
-  /**
-   * @param {($|HTMLElement)} $glassPaneTarget
-   */
-  renderGlassPane($glassPaneTarget) {
-    $glassPaneTarget = $.ensure($glassPaneTarget);
-
+  renderGlassPane($target: JQuery | HTMLElement) {
+    let $glassPaneTarget = $.ensure($target);
     if (this._widget.$container && this._widget.$container[0] === $glassPaneTarget[0]) {
       // Don't render a glass pane on the widget itself (necessary if glass pane is added after the widget is rendered)
       return;
@@ -59,9 +69,7 @@ export default class GlassPaneRenderer {
     // May happen if a part of the display parent is removed and rendered again while covered by a glass pane
     // E.g. display parent is set to outline and navigation is made invisible but bench is still there.
     // When navigation is made visible again, renderGlassPanes is called but only the glass panes of the navigation need to be added and not the ones of the bench (because they are already there)
-    let alreadyRendered = this._$glassPanes.some($pane => {
-      return $pane.parent()[0] === $glassPaneTarget[0];
-    });
+    let alreadyRendered = this._$glassPanes.some($pane => $pane.parent()[0] === $glassPaneTarget[0]);
     if (alreadyRendered) {
       return;
     }
@@ -76,6 +84,7 @@ export default class GlassPaneRenderer {
     // Glasspanes in popup-windows must be visible, otherwise the user cannot recognize that the popup
     // is blocked, since the widget that blocks (e.g a message-box) may be opened in the main-window.
     let window = $glassPane.window(true);
+    // @ts-ignore
     if (window && window.popupWindow) {
       $glassPane.addClass('dark');
     }
@@ -90,7 +99,7 @@ export default class GlassPaneRenderer {
     this._registerDisplayParent();
   }
 
-  _adjustGlassPaneSize($glassPane, $glassPaneTarget) {
+  protected _adjustGlassPaneSize($glassPane: JQuery, $glassPaneTarget: JQuery) {
     // The glasspane must cover the border and overlapping children
     let top = -$glassPaneTarget.cssBorderTopWidth(),
       bottom = -$glassPaneTarget.cssBorderBottomWidth(),
@@ -113,14 +122,10 @@ export default class GlassPaneRenderer {
 
   removeGlassPanes() {
     // Remove glass-panes
-    this._$glassPanes.slice().forEach(function($glassPane) {
-      this._removeGlassPane($glassPane);
-    }, this);
+    this._$glassPanes.slice().forEach($glassPane => this._removeGlassPane($glassPane));
 
-    // Unregister all deferedGlassPaneTargets
-    this._deferredGlassPanes.forEach(function(glassPaneTarget) {
-      glassPaneTarget.removeGlassPaneRenderer(this);
-    }, this);
+    // Unregister all deferredGlassPaneTargets
+    this._deferredGlassPanes.forEach(glassPaneTarget => glassPaneTarget.removeGlassPaneRenderer(this));
     this._deferredGlassPanes = [];
 
     this._unregisterDisplayParent();
@@ -128,7 +133,7 @@ export default class GlassPaneRenderer {
     this._glassPaneRendererRegistered = false;
   }
 
-  _removeGlassPane($glassPane) {
+  protected _removeGlassPane($glassPane: JQuery) {
     let $glassPaneTarget = $glassPane.parent();
     $glassPane.off('remove', this._glassPaneRemoveHandler);
     $glassPane.remove();
@@ -138,13 +143,11 @@ export default class GlassPaneRenderer {
     this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
   }
 
-  eachGlassPane(func) {
-    this._$glassPanes.forEach($glassPane => {
-      func($glassPane);
-    });
+  eachGlassPane(func: ($glassPane: JQuery<HTMLDivElement>) => void) {
+    this._$glassPanes.forEach($glassPane => func($glassPane));
   }
 
-  findGlassPaneTargets() {
+  findGlassPaneTargets(): (JQuery | DeferredGlassPaneTarget)[] {
     if (!this._enabled) {
       return []; // No glasspanes to be rendered, e.g. for none-modal dialogs.
     }
@@ -157,7 +160,7 @@ export default class GlassPaneRenderer {
     return displayParent.glassPaneTargets(this._widget);
   }
 
-  _resolveDisplayParent() {
+  protected _resolveDisplayParent(): DisplayParent {
     // Note: This has to be done after rendering, because otherwise session.desktop could be undefined!
     if (!this._resolvedDisplayParent) {
       this._resolvedDisplayParent = this._widget.displayParent || this.session.desktop;
@@ -165,7 +168,7 @@ export default class GlassPaneRenderer {
     return this._resolvedDisplayParent;
   }
 
-  _registerDisplayParent() {
+  protected _registerDisplayParent() {
     // if this._resolvedDisplayParent is not yet resolved, do it now
     if (!this._resolvedDisplayParent) {
       this._resolveDisplayParent();
@@ -181,7 +184,7 @@ export default class GlassPaneRenderer {
     }
   }
 
-  _unregisterDisplayParent() {
+  protected _unregisterDisplayParent() {
     // if this._registeredDisplayParent is defined, unregister it
     if (this._registeredDisplayParent) {
       this.session.focusManager.unregisterGlassPaneDisplayParent(this._registeredDisplayParent);
@@ -190,13 +193,13 @@ export default class GlassPaneRenderer {
     }
   }
 
-  _onMouseDown(event) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>) {
     let $animationTarget = null;
 
     // notify the display parent to handle the mouse down on the glass pane.
     let displayParent = this._resolveDisplayParent();
-    if (displayParent._onGlassPaneMouseDown) {
-      displayParent._onGlassPaneMouseDown(this._widget, $(event.target));
+    if (displayParent.onGlassPaneMouseDown) {
+      displayParent.onGlassPaneMouseDown(this._widget, $(event.target));
     }
 
     if (this._widget instanceof Form && this._widget.isView()) {
@@ -231,11 +234,11 @@ export default class GlassPaneRenderer {
     $.suppressEvent(event);
   }
 
-  _onDisplayParentRender(event) {
+  protected _onDisplayParentRender(event: Event<DisplayParent>) {
     this.renderGlassPanes();
   }
 
-  _onGlassPaneRemove(event) {
+  protected _onGlassPaneRemove(event: JQuery.TriggeredEvent<HTMLDivElement>) {
     let $glassPane = $(event.target);
     this._removeGlassPane($glassPane);
   }

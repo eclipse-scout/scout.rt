@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, filters, FocusContext, FocusRule, focusUtils, GlassPaneRenderer, scout, Session, Widget} from '../index';
+import {arrays, Device, DisplayParent, filters, FocusContext, FocusRule, focusUtils, GlassPaneRenderer, scout, Session} from '../index';
 import $ from 'jquery';
 
 export interface FocusManagerOptions {
@@ -44,7 +44,7 @@ export default class FocusManager implements FocusManagerOptions {
 
   protected _focusContexts: FocusContext[];
   protected _glassPaneTargets: JQuery[];
-  protected _glassPaneDisplayParents: Widget[];
+  protected _glassPaneDisplayParents: DisplayParent[];
   protected _glassPaneRenderers: GlassPaneRenderer[];
 
   constructor(options: FocusManagerOptions) {
@@ -208,6 +208,7 @@ export default class FocusManager implements FocusManagerOptions {
       return false; // no glasspanes active.
     }
 
+    // @ts-ignore
     if (this._glassPaneDisplayParents.indexOf(scout.widget(element)) >= 0) {
       return true;
     }
@@ -224,7 +225,7 @@ export default class FocusManager implements FocusManagerOptions {
     this.validateFocus();
   }
 
-  registerGlassPaneDisplayParent(displayParent: Widget) {
+  registerGlassPaneDisplayParent(displayParent: DisplayParent) {
     this._glassPaneDisplayParents.push(displayParent);
   }
 
@@ -240,7 +241,7 @@ export default class FocusManager implements FocusManagerOptions {
     this.validateFocus();
   }
 
-  unregisterGlassPaneDisplayParent(displayParent: Widget) {
+  unregisterGlassPaneDisplayParent(displayParent: DisplayParent) {
     arrays.remove(this._glassPaneDisplayParents, displayParent);
   }
 
