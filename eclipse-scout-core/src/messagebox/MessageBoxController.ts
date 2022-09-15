@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Form, MessageBox, scout, Session} from '../index';
-import {MessageBoxDisplayParent} from './MessageBox';
+import {arrays, DisplayParent, Form, MessageBox, scout, Session} from '../index';
 
 /**
  * Controller with functionality to register and render message boxes.
@@ -17,10 +16,10 @@ import {MessageBoxDisplayParent} from './MessageBox';
  * The message boxes are put into the list 'messageBoxes' contained in 'displayParent'.
  */
 export default class MessageBoxController {
-  displayParent: MessageBoxDisplayParent;
+  displayParent: DisplayParent;
   session: Session;
 
-  constructor(displayParent: MessageBoxDisplayParent, session: Session) {
+  constructor(displayParent: DisplayParent, session: Session) {
     this.displayParent = displayParent;
     this.session = session;
   }
