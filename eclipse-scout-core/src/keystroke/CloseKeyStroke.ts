@@ -10,14 +10,14 @@
  */
 import {keys, KeyStroke} from '../index';
 import {KeystrokeRenderAreaProvider} from './KeyStroke';
-import {Closeable} from '../types';
+import {CloseableWidget} from '../types';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class CloseKeyStroke extends KeyStroke {
 
-  declare field: Closeable;
+  declare field: CloseableWidget;
 
-  constructor(field: Closeable, $drawingArea: KeystrokeRenderAreaProvider) {
+  constructor(field: CloseableWidget, $drawingArea: KeystrokeRenderAreaProvider) {
     super();
     this.field = field;
     this.which = [keys.ESC];

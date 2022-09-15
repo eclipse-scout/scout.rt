@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import Widget from './widget/Widget';
+import {Widget} from './index';
 
 export type Predicate<T> = (obj: T) => boolean;
 
@@ -24,8 +24,14 @@ export type EmptyObject = Record<string, never>;
 
 export type Primitive = number | string | boolean | symbol | bigint;
 
-export type Closeable = Widget & { close(): void };
+export type Closeable = { close(): void };
 
-export type Copyable = Widget & { copy(): void };
+export type CloseableWidget = Widget & Closeable;
+
+export type Copyable = { copy(): void };
+
+export type CopyableWidget = Widget & Copyable;
 
 export type Abortable = Closeable & { abort(): void };
+
+export type AbortableWidget = Widget & Abortable;
