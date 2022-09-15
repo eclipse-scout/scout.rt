@@ -10,7 +10,7 @@
  */
 import {Action, EnumObject, HAlign, Key, keys, KeyStrokeModel, scout, ScoutKeyboardEvent, Widget} from '../index';
 import $ from 'jquery';
-import {KeyStrokeFirePolicyType} from '../action/Action';
+import {KeyStrokeFirePolicy} from '../action/Action';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class KeyStroke implements KeyStrokeModel {
@@ -31,7 +31,7 @@ export default class KeyStroke implements KeyStrokeModel {
   /** whether or not the handle method is called multiple times while a key is pressed */
   repeatable: boolean;
 
-  keyStrokeFirePolicy: KeyStrokeFirePolicyType;
+  keyStrokeFirePolicy: KeyStrokeFirePolicy;
   enabledByFilter: boolean;
 
   /** Hints to control rendering of the key(s). */
