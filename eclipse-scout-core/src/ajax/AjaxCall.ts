@@ -81,7 +81,7 @@ export default class AjaxCall extends Call implements AjaxCallModel {
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
-  static isOfflineError(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+  static isOfflineError(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string): boolean {
     // noinspection UnnecessaryLocalVariableJS
     let offline = (
       // Status code = 0 -> no connection

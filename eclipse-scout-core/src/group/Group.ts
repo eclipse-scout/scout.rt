@@ -8,10 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, graphics, GroupLayout, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, Insets, KeyStrokeContext, LoadingSupport, scout, tooltips, Widget} from '../index';
+import {Dimension, EnumObject, graphics, GroupEventMap, GroupLayout, GroupModel, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, Insets, KeyStrokeContext, LoadingSupport, scout, tooltips, Widget} from '../index';
 import $ from 'jquery';
+import MouseDownEvent = JQuery.MouseDownEvent;
 
-export default class Group extends Widget {
+export type GroupCollapseStyle = EnumObject<typeof Group.CollapseStyle>;
+
+export default class Group extends Widget implements GroupModel {
+  declare model: GroupModel;
+  declare eventMap: GroupEventMap;
+
+  bodyAnimating: boolean;
+  collapsed: boolean;
+  collapsible: boolean;
+  title: string;
+  titleHtmlEnabled: boolean;
+  titleSuffix: string;
+  header: Widget;
+  headerFocusable: boolean;
+  headerVisible: boolean;
+  body: Widget;
+  collapseStyle: GroupCollapseStyle;
+  htmlHeader: HtmlComponent;
+  htmlFooter: HtmlComponent;
+  iconId: string;
+  icon: Icon;
+  $header: JQuery;
+  $footer: JQuery;
+  $collapseIcon: JQuery;
+  $collapseBorderLeft: JQuery;
+  $collapseBorderRight: JQuery;
+  $title: JQuery;
+  $titleSuffix: JQuery;
 
   constructor() {
     super();
@@ -46,9 +74,9 @@ export default class Group extends Widget {
     LEFT: 'left',
     RIGHT: 'right',
     BOTTOM: 'bottom'
-  };
+  } as const;
 
-  _init(model) {
+  protected override _init(model: GroupModel) {
     super._init(model);
     this.resolveTextKeys(['title', 'titleSuffix']);
     this.resolveIconIds(['iconId']);
@@ -56,29 +84,21 @@ export default class Group extends Widget {
     this._setHeader(this.header);
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     // Key stroke should only work when header is focused
-    this.keyStrokeContext.$bindTarget = function() {
-      return this.$header;
-    }.bind(this);
-    this.keyStrokeContext.registerKeyStroke([
+    this.keyStrokeContext.$bindTarget = () => this.$header;
+    this.keyStrokeContext.registerKeyStrokes([
       new GroupToggleCollapseKeyStroke(this)
     ]);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('group');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new GroupLayout(this));
@@ -93,7 +113,7 @@ export default class Group extends Widget {
     this.$footer.on('mousedown', this._onFooterMouseDown.bind(this));
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderIconId();
     this._renderTitle();
@@ -105,7 +125,7 @@ export default class Group extends Widget {
     this._renderCollapsible();
   }
 
-  _remove() {
+  protected override _remove() {
     this.$header = null;
     this.$title = null;
     this.$titleSuffix = null;
@@ -117,19 +137,20 @@ export default class Group extends Widget {
     super._remove();
   }
 
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     this.$header.setTabbable(this.enabledComputed);
   }
 
-  setIconId(iconId) {
+  /** @see GroupModel.iconId */
+  setIconId(iconId: string) {
     this.setProperty('iconId', iconId);
   }
 
   /**
    * Adds an image or font-based icon to the group header by adding either an IMG or SPAN element.
    */
-  _renderIconId() {
+  protected _renderIconId() {
     let iconId = this.iconId || '';
     // If the icon is an image (and not a font icon), the Icon class will invalidate the layout when the image has loaded
     if (!iconId) {
@@ -154,47 +175,49 @@ export default class Group extends Widget {
     this._updateIconStyle();
   }
 
-  _updateIconStyle() {
+  protected _updateIconStyle() {
     let hasTitle = !!this.title;
     this.get$Icon().toggleClass('with-title', hasTitle);
     this.get$Icon().addClass('group-icon');
     this._renderCollapseStyle();
   }
 
-  get$Icon() {
+  get$Icon(): JQuery {
     if (this.icon) {
       return this.icon.$container;
     }
     return $();
   }
 
-  _removeIconId() {
+  protected _removeIconId() {
     if (this.icon) {
       this.icon.destroy();
     }
   }
 
-  setHeader(header) {
+  /** @see GroupModel.header */
+  setHeader(header: Widget) {
     this.setProperty('header', header);
   }
 
-  _setHeader(header) {
+  protected _setHeader(header: Widget) {
     this._setProperty('header', header);
   }
 
-  setHeaderFocusable(headerFocusable) {
+  /** @see GroupModel.headerFocusable */
+  setHeaderFocusable(headerFocusable: boolean) {
     this.setProperty('headerFocusable', headerFocusable);
   }
 
-  _renderHeaderFocusable() {
+  protected _renderHeaderFocusable() {
     this.$header.toggleClass('unfocusable', !this.headerFocusable);
   }
 
-  setTitle(title) {
+  setTitle(title: string) {
     this.setProperty('title', title);
   }
 
-  _renderTitle() {
+  protected _renderTitle() {
     if (this.$title) {
       if (this.titleHtmlEnabled) {
         this.$title.htmlOrNbsp(this.title);
@@ -205,31 +228,32 @@ export default class Group extends Widget {
     }
   }
 
-  setTitleSuffix(titleSuffix) {
+  setTitleSuffix(titleSuffix: string) {
     this.setProperty('titleSuffix', titleSuffix);
   }
 
-  _renderTitleSuffix() {
+  protected _renderTitleSuffix() {
     if (this.$titleSuffix) {
       this.$titleSuffix.text(this.titleSuffix || '');
     }
   }
 
-  setHeaderVisible(headerVisible) {
+  setHeaderVisible(headerVisible: boolean) {
     this.setProperty('headerVisible', headerVisible);
   }
 
-  _renderHeaderVisible() {
+  protected _renderHeaderVisible() {
     this.$header.setVisible(this.headerVisible);
     this._renderCollapsible();
     this.invalidateLayoutTree();
   }
 
-  setBody(body) {
+  /** @see GroupModel.body */
+  setBody(body: Widget) {
     this.setProperty('body', body);
   }
 
-  _setBody(body) {
+  protected _setBody(body: Widget) {
     if (!body) {
       // Create empty body if no body was provided
       body = scout.create(Widget, {
@@ -243,16 +267,14 @@ export default class Group extends Widget {
     this._setProperty('body', body);
   }
 
-  _createLoadingSupport() {
+  protected override _createLoadingSupport(): LoadingSupport {
     return new LoadingSupport({
       widget: this,
-      $container: function() {
-        return this.$header;
-      }.bind(this)
+      $container: () => this.$header
     });
   }
 
-  _renderHeader() {
+  protected _renderHeader() {
     if (this.$header) {
       this.$header.remove();
       this._removeIconId();
@@ -285,19 +307,16 @@ export default class Group extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _renderBody() {
+  protected _renderBody() {
     this.body.render();
     this.body.$container.insertAfter(this.$header);
     this.body.$container.addClass('group-body');
     this.body.invalidateLayoutTree();
   }
 
-  /**
-   * @override
-   */
-  getFocusableElement() {
+  override getFocusableElement(): HTMLElement | JQuery {
     if (!this.rendered) {
-      return false;
+      return null;
     }
     return this.$header;
   }
@@ -306,11 +325,11 @@ export default class Group extends Widget {
     this.setCollapsed(!this.collapsed && this.collapsible);
   }
 
-  setCollapsed(collapsed) {
+  setCollapsed(collapsed: boolean) {
     this.setProperty('collapsed', collapsed);
   }
 
-  _renderCollapsed() {
+  protected _renderCollapsed() {
     this.$container.toggleClass('collapsed', this.collapsed);
     this.$collapseIcon.toggleClass('collapsed', this.collapsed);
     if (!this.collapsed && !this.bodyAnimating) {
@@ -325,11 +344,11 @@ export default class Group extends Widget {
     this.invalidateLayoutTree();
   }
 
-  setCollapsible(collapsible) {
+  setCollapsible(collapsible: boolean) {
     this.setProperty('collapsible', collapsible);
   }
 
-  _renderCollapsible() {
+  protected _renderCollapsible() {
     this.$container.toggleClass('collapsible', this.collapsible);
     this.$header.toggleClass('disabled', !this.collapsible);
     // footer is visible if collapseStyle is 'bottom' and either header is visible or has a (collapsible) body
@@ -338,11 +357,11 @@ export default class Group extends Widget {
     this.invalidateLayoutTree();
   }
 
-  setCollapseStyle(collapseStyle) {
+  setCollapseStyle(collapseStyle: GroupCollapseStyle) {
     this.setProperty('collapseStyle', collapseStyle);
   }
 
-  _renderCollapseStyle() {
+  protected _renderCollapseStyle() {
     this.$header.toggleClass('collapse-right', this.collapseStyle === Group.CollapseStyle.RIGHT);
     this.$container.toggleClass('collapse-bottom', this.collapseStyle === Group.CollapseStyle.BOTTOM);
 
@@ -360,13 +379,13 @@ export default class Group extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _onHeaderMouseDown(event) {
+  protected _onHeaderMouseDown(event: MouseDownEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     if (this.collapsible && (!this.header || this.collapseStyle !== Group.CollapseStyle.BOTTOM)) {
       this.setCollapsed(!this.collapsed && this.collapsible);
     }
   }
 
-  _onFooterMouseDown(event) {
+  protected _onFooterMouseDown(event: MouseDownEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     if (this.collapsible) {
       this.setCollapsed(!this.collapsed && this.collapsible);
     }
@@ -388,11 +407,7 @@ export default class Group extends Widget {
     });
   }
 
-  /**
-   * @param {object} [options]
-   * @returns {Promise}
-   */
-  animateToggleCollapse(options) {
+  animateToggleCollapse(): JQuery.Promise<JQuery> {
     let currentSize = graphics.cssSize(this.body.$container);
     let currentMargins = graphics.margins(this.body.$container);
     let currentPaddings = graphics.paddings(this.body.$container);
@@ -454,11 +469,11 @@ export default class Group extends Widget {
         paddingBottom: targetPaddings.bottom
       }, {
         duration: 350,
-        progress: function() {
+        progress: () => {
           this.trigger('bodyHeightChange');
           this.revalidateLayoutTree();
-        }.bind(this),
-        complete: function() {
+        },
+        complete: () => {
           this.bodyAnimating = false;
           if (this.body.rendered) {
             // Remove inline styles when finished
@@ -469,7 +484,7 @@ export default class Group extends Widget {
             this.$container.removeClass('collapsing');
           }
           this.trigger('bodyHeightChangeDone');
-        }.bind(this)
+        }
       })
       .promise();
   }

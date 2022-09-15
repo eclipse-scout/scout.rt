@@ -70,7 +70,7 @@ export default class NullLogger implements Logger {
     return false;
   }
 
-  _log(level: LogLevel, logArgs: any[]) {
+  protected _log(level: LogLevel, logArgs: any[]) {
     // check if console is available
     let myConsole = objects.optProperty(window, 'console');
     if (!myConsole) {
@@ -104,7 +104,7 @@ export default class NullLogger implements Logger {
     }
   }
 
-  _formatTime(): string {
+  protected _formatTime(): string {
     let date = new Date();
     return strings.padZeroLeft(date.getHours(), 2) + ':' +
       strings.padZeroLeft(date.getMinutes(), 2) + ':' +

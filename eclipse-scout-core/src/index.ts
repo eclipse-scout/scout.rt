@@ -190,6 +190,8 @@ export {default as CloseKeyStroke} from './keystroke/CloseKeyStroke';
 export {default as AbortKeyStroke} from './keystroke/AbortKeyStroke';
 export {default as TabItemKeyStroke} from './keystroke/TabItemKeyStroke';
 export {default as Accordion} from './accordion/Accordion';
+export {default as AccordionModel} from './accordion/AccordionModel';
+export {default as AccordionEventMap} from './accordion/AccordionEventMap';
 export {default as AccordionAdapter} from './accordion/AccordionAdapter';
 export {default as AccordionLayout} from './accordion/AccordionLayout';
 export {default as BoxButtons} from './boxbuttons/BoxButtons';
@@ -258,6 +260,8 @@ export {default as DatePickerPopupLayout} from './datepicker/DatePickerPopupLayo
 export {default as DatePickerTouchPopup} from './datepicker/DatePickerTouchPopup';
 export {default as DatePickerTouchPopupLayout} from './datepicker/DatePickerTouchPopupLayout';
 export {default as Group} from './group/Group';
+export {default as GroupModel} from './group/GroupModel';
+export {default as GroupEventMap} from './group/GroupEventMap';
 export {default as GroupAdapter} from './group/GroupAdapter';
 export {default as GroupLayout} from './group/GroupLayout';
 export {default as GroupToggleCollapseKeyStroke} from './group/keystrokes/GroupToggleCollapseKeyStroke';
