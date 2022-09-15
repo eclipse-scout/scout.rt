@@ -748,7 +748,7 @@ export default class DateFormat {
    * Formats the given date according to the date pattern. If the date is missing, the
    * empty string is returned.
    *
-   * @param [exactLength]
+   * @param exactLength
    *          May be set to true to force the patterns to use the exact length. For example,
    *          the year pattern 'yyy' would normally format the year using 2 digits. If
    *          the parameter is true, 3 are used. This is mainly useful, when an "analyzed"

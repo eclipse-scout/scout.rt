@@ -146,8 +146,7 @@ export default class DecimalFormat {
 
   /**
    * Converts the numberString into a number and applies the multiplier.
-   * @param numberString
-   * @param [evaluateNumberFunction] optional function for custom evaluation. The function gets a normalized string and has to return a Number
+   * @param evaluateNumberFunction optional function for custom evaluation. The function gets a normalized string and has to return a Number
    * @return A number for the given numberString, if the string can be converted into a number. Throws an Error otherwise
    */
   parse(numberString: string, evaluateNumberFunction?: (normalizedNumberString: string) => number): number {

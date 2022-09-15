@@ -234,7 +234,7 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
   /**
    * @param filter The filters to add.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
-   * @return {Filter[]} Returns the added filters.
+   * @returns the added filters.
    */
   addFilter(filter: FilterOrFunction<TElem> | FilterOrFunction<TElem>[], applyFilter = true): Filter<TElem>[] {
     let filtersToAdd = arrays.ensure(filter);

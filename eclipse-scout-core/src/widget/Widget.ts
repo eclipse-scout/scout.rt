@@ -1088,7 +1088,6 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
 
   /**
    * Creates nothing by default. If a widget needs loading support, override this method and return a loading support.
-   * @returns {LoadingSupport}
    */
   protected _createLoadingSupport(): LoadingSupport {
     return null;
@@ -1635,7 +1634,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   }
 
   /**
-   * @param [contribution] a function which returns glass pane targets (jQuery elements)
+   * @param contribution a function which returns glass pane targets (jQuery elements)
    */
   removeGlassPaneContribution(contribution: GlassPaneContribution) {
     arrays.remove(this._glassPaneContributions, contribution);
@@ -1644,7 +1643,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     });
   }
 
-  override toString() {
+  override toString(): string {
     let attrs = '';
     attrs += 'id=' + this.id;
     attrs += ' objectType=' + this.objectType;
@@ -1713,7 +1712,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     this._addProperties('_cloneProperties', properties);
   }
 
-  isCloneProperty(propertyName: string) {
+  isCloneProperty(propertyName: string): boolean {
     return this._cloneProperties.indexOf(propertyName) > -1;
   }
 
@@ -1728,7 +1727,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     this._addProperties('_preserveOnPropertyChangeProperties', properties);
   }
 
-  isPreserveOnPropertyChangeProperty(propertyName: string) {
+  isPreserveOnPropertyChangeProperty(propertyName: string): boolean {
     return this._preserveOnPropertyChangeProperties.indexOf(propertyName) > -1;
   }
 
@@ -2141,10 +2140,10 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   }
 
   /**
-   * This method returns the HtmlElement to be used when {@link focus} is called.
+   * This method returns the {@link HTMLElement} to be used when {@link focus} is called.
    * It can be overridden, in case the widget needs to return something other than this.$container[0].
    */
-  getFocusableElement(): HTMLElement {
+  getFocusableElement(): HTMLElement | JQuery {
     if (this.rendered && this.$container) {
       return this.$container[0];
     }
@@ -2241,15 +2240,15 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   }
 
   /**
-   * Returns the jQuery element which is supposed to be scrollable. This element will be used by the scroll functions like {@link #_installScrollbars}, {@link #setScrollTop}, {@link #setScrollLeft}, {@link #scrollToBottom} etc..
-   * The element won't be used unless {@link #_installScrollbars} is called.
+   * Returns the jQuery element which is supposed to be scrollable. This element will be used by the scroll functions like {@link _installScrollbars}, {@link setScrollTop}, {@link setScrollLeft}, {@link scrollToBottom} etc..
+   * The element won't be used unless {@link _installScrollbars} is called.
    * If the widget is mainly a wrapper for a scrollable widget and does not have a scrollable element by itself, you can use @{link #getDelegateScrollable} instead.
    */
   get$Scrollable(): JQuery {
     return this.$container;
   }
 
-  hasScrollShadow(position: string) { // FIXME TS define available positions
+  hasScrollShadow(position: string): boolean { // FIXME TS define available positions
     return scrollbars.hasScrollShadow(this.get$Scrollable(), position);
   }
 
