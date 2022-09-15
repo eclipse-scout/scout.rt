@@ -9,15 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {CloseKeyStroke} from '../index';
-import {Abortable} from '../types';
+import {AbortableWidget} from '../types';
 import {KeystrokeRenderAreaProvider} from './KeyStroke';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class AbortKeyStroke extends CloseKeyStroke {
 
-  declare field: Abortable;
+  declare field: AbortableWidget;
 
-  constructor(field: Abortable, $drawingArea: KeystrokeRenderAreaProvider) {
+  constructor(field: AbortableWidget, $drawingArea: KeystrokeRenderAreaProvider) {
     super(field, $drawingArea);
   }
 
