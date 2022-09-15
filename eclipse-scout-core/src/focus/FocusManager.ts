@@ -10,7 +10,6 @@
  */
 import {arrays, Device, filters, FocusContext, FocusRule, focusUtils, GlassPaneRenderer, scout, Session, Widget} from '../index';
 import $ from 'jquery';
-import {FocusRuleType} from './FocusRule';
 
 export interface FocusManagerOptions {
   session: Session;
@@ -113,7 +112,7 @@ export default class FocusManager implements FocusManagerOptions {
    * the given rule, or tries to gain focus for the given element.
    * @returns the installed context.
    */
-  installFocusContext($container: JQuery, focusRuleOrElement: FocusRuleType | HTMLElement): FocusContext {
+  installFocusContext($container: JQuery, focusRuleOrElement: FocusRule | HTMLElement): FocusContext {
     let elementToFocus = this.evaluateFocusRule($container, focusRuleOrElement);
 
     // Create and register the focus context.
@@ -132,7 +131,7 @@ export default class FocusManager implements FocusManagerOptions {
   /**
    * Evaluates the {@link FocusRule} or just returns the given element if focusRuleOrElement is not a focus rule.
    */
-  evaluateFocusRule($container: JQuery, focusRuleOrElement: FocusRuleType | HTMLElement): HTMLElement {
+  evaluateFocusRule($container: JQuery, focusRuleOrElement: FocusRule | HTMLElement): HTMLElement {
     let elementToFocus;
     if (!focusRuleOrElement || focusRuleOrElement === FocusRule.AUTO || focusRuleOrElement === FocusRule.PREPARE) {
       elementToFocus = this.findFirstFocusableElement($container);

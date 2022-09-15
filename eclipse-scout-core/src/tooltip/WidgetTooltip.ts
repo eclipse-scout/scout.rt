@@ -9,14 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FocusRule, keys, KeyStrokeContext, scout, ScoutKeyboardEvent, Tooltip, Widget, WidgetTooltipModel} from '../index';
-import {FocusRuleType} from '../focus/FocusRule';
 
 export default class WidgetTooltip extends Tooltip implements WidgetTooltipModel {
   declare model: WidgetTooltipModel;
 
   keyStrokeStopPropagationInterceptor: (event: ScoutKeyboardEvent) => void;
   withFocusContext: boolean;
-  initialFocus: () => FocusRuleType;
+  initialFocus: () => FocusRule;
   focusableContainer: boolean;
   content: Widget;
   $widgetContainer: JQuery;

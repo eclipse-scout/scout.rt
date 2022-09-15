@@ -14,26 +14,26 @@ import AbstractLayout from '../layout/AbstractLayout';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {TooltipSupportOptions} from '../tooltip/TooltipSupport';
 
-export type ActionStyleType = EnumObject<typeof Action.ActionStyle>;
-export type KeyStrokeFirePolicyType = EnumObject<typeof Action.KeyStrokeFirePolicy>;
-export type ActionTextPositionType = EnumObject<typeof Action.TextPosition>;
+export type ActionStyle = EnumObject<typeof Action.ActionStyle>;
+export type KeyStrokeFirePolicy = EnumObject<typeof Action.KeyStrokeFirePolicy>;
+export type ActionTextPosition = EnumObject<typeof Action.TextPosition>;
 
 export default class Action extends Widget implements ActionModel {
   declare model: ActionModel;
   declare eventMap: ActionEventMap;
 
-  actionStyle: ActionStyleType;
+  actionStyle: ActionStyle;
   compact: boolean;
   iconId: string;
   horizontalAlignment: -1 | 0 | 1;
   keyStroke: string;
-  keyStrokeFirePolicy: KeyStrokeFirePolicyType;
+  keyStrokeFirePolicy: KeyStrokeFirePolicy;
   selected: boolean;
   preventDoubleClick: boolean;
   tabbable: boolean;
   actionKeyStroke: ActionKeyStroke;
   text: string;
-  textPosition: ActionTextPositionType;
+  textPosition: ActionTextPosition;
   htmlEnabled: boolean;
   textVisible: boolean;
   toggleAction: boolean;
@@ -175,7 +175,7 @@ export default class Action extends Widget implements ActionModel {
     }
   }
 
-  setTextPosition(textPosition: ActionTextPositionType) {
+  setTextPosition(textPosition: ActionTextPosition) {
     this.setProperty('textPosition', textPosition);
   }
 
@@ -424,7 +424,7 @@ export default class Action extends Widget implements ActionModel {
     this.doAction();
   }
 
-  setActionStyle(actionStyle: ActionStyleType) {
+  setActionStyle(actionStyle: ActionStyle) {
     this.setProperty('actionStyle', actionStyle);
   }
 }

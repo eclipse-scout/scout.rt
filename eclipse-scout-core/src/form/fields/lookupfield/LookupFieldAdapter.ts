@@ -1,15 +1,14 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, strings, ValueFieldAdapter} from '../../../index';
-import {QueryByType} from '../../../lookup/QueryBy';
+import {objects, QueryBy, strings, ValueFieldAdapter} from '../../../index';
 
 /**
  * Use this base class for field-adapters that work with lookup-calls like SmartField and TagField.
@@ -23,7 +22,7 @@ export default class LookupFieldAdapter extends ValueFieldAdapter {
   /**
    * @param queryData optional data (text, key, rec)
    */
-  sendLookup(queryBy: QueryByType, queryData?: any) {
+  sendLookup(queryBy: QueryBy, queryData?: any) {
     let propertyName = queryBy.toLowerCase(),
       requestType = 'lookupBy' + strings.toUpperCaseFirstLetter(propertyName),
       requestData = {

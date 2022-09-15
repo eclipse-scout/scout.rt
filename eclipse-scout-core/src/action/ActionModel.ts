@@ -9,15 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {WidgetModel} from '../index';
-import {ActionStyleType, ActionTextPositionType, KeyStrokeFirePolicyType} from './Action';
+import {ActionStyle, ActionTextPosition, KeyStrokeFirePolicy} from './Action';
 
 export default interface ActionModel extends WidgetModel {
-  actionStyle: ActionStyleType;
+  actionStyle: ActionStyle;
   compact: boolean;
   iconId: string;
   horizontalAlignment: -1 | 0 | 1;
   keyStroke: string;
-  keyStrokeFirePolicy: KeyStrokeFirePolicyType;
+  keyStrokeFirePolicy: KeyStrokeFirePolicy;
   selected: boolean;
   preventDoubleClick: boolean;
   /**
@@ -25,7 +25,7 @@ export default interface ActionModel extends WidgetModel {
    */
   tabbable: boolean;
   text: string;
-  textPosition: ActionTextPositionType;
+  textPosition: ActionTextPosition;
   htmlEnabled: boolean;
   textVisible: boolean;
   toggleAction: boolean;

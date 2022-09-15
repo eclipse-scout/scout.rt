@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ScoutKeyboardEvent, TooltipModel, Widget, WidgetModel} from '../index';
-import {FocusRuleType} from '../focus/FocusRule';
+import {FocusRule, ScoutKeyboardEvent, TooltipModel, Widget, WidgetModel} from '../index';
 
 export default interface WidgetTooltipModel extends TooltipModel {
   /**
@@ -25,7 +24,7 @@ export default interface WidgetTooltipModel extends TooltipModel {
   /**
    * Default returns {@link FocusRule.AUTO}.
    */
-  initialFocus: () => FocusRuleType;
+  initialFocus: () => FocusRule;
   /**
    * Default is false.
    */

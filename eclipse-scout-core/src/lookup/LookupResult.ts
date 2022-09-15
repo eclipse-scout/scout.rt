@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupRow} from '../index';
-import {QueryByType} from './QueryBy';
+import {LookupRow, QueryBy} from '../index';
 
 export default interface LookupResult<Key> {
   lookupRows: LookupRow<Key>[];
-  queryBy: QueryByType;
+  queryBy: QueryBy;
 
   byAll?: boolean;
 

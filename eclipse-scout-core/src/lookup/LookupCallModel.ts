@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Session} from '../index';
-import {QueryByType} from './QueryBy';
+import {QueryBy, Session} from '../index';
 
 export default interface LookupCallModel<Key> {
   session: Session;
@@ -19,7 +18,7 @@ export default interface LookupCallModel<Key> {
   /** indicates if the lookup call implements 'getByKeys' and therefore supports 'textsByKeys' */
   batch?: boolean;
 
-  queryBy?: QueryByType;
+  queryBy?: QueryBy;
 
   /** used on QueryBy.TEXT */
   searchText?: string;

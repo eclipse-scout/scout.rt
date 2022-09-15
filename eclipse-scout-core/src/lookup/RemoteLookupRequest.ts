@@ -1,15 +1,14 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, QueryBy} from '../index';
-import {QueryByType} from './QueryBy';
 
 /**
  * This class is used to remember what lookup is called (=request) and to compare that
@@ -19,10 +18,10 @@ import {QueryByType} from './QueryBy';
  * result, because it is out-dated.
  */
 export default class RemoteLookupRequest<DATA> {
-  requestType: QueryByType;
+  requestType: QueryBy;
   requestData: DATA;
 
-  constructor(requestType: QueryByType, requestData?: DATA) {
+  constructor(requestType: QueryBy, requestData?: DATA) {
     if (!QueryBy.hasOwnProperty(requestType)) {
       throw new Error('Invalid enum value');
     }
