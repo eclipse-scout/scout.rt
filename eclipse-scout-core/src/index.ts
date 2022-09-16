@@ -753,8 +753,10 @@ export {default as UnsavedFormChangesForm} from './desktop/unsavedchanges/Unsave
 export {default as UnsavedFormsLookupCall} from './desktop/unsavedchanges/UnsavedFormsLookupCall';
 export {default as TileTableHeaderBox} from './table/TileTableHeaderBox';
 export {default as LoginApp} from './login/LoginApp';
+export {default as LoginAppOptions} from './login/LoginAppOptions';
 export {default as LoginBox} from './login/LoginBox';
 export {default as LogoutApp} from './login/LogoutApp';
+export {default as LogoutAppOptions} from './login/LogoutAppOptions';
 export {default as LogoutBox} from './login/LogoutBox';
 export {default as BreadcrumbItem} from './breadcrumbbar/BreadcrumbItem';
 export {default as BreadcrumbItemAdapter} from './breadcrumbbar/BreadcrumbItemAdapter';

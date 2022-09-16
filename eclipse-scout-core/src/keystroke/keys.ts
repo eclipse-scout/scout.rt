@@ -248,7 +248,7 @@ const keys = {
    */
   fromBrowser: (keyCode: number): number => keys.mapKey(keys.browserMapReverse, keyCode),
 
-  mapKey: (map: { [browser: string]: object }, keyCode: number, modifier?: PropertyKey): number => {
+  mapKey: (map: Record<string, object>, keyCode: number, modifier?: PropertyKey): number => {
     let browserMap = map[Device.get().browser];
     if (browserMap && modifier) {
       browserMap = browserMap[modifier];
