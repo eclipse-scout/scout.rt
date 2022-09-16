@@ -769,6 +769,14 @@ describe('ValueField', () => {
       $menu = $('body').find('.context-menu');
       expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
+
+      // 0 does not change current menu types
+      formField.setValue(0);
+      formField.fieldStatus.showContextMenu();
+
+      $menu = $('body').find('.context-menu');
+      expect($menu.find('.menu-item').length).toBe(1);
+      expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
   });
 });
