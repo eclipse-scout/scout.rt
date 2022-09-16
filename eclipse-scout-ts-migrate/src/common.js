@@ -27,6 +27,15 @@ export function findParentPath(path, predicate) {
   return undefined;
 }
 
+export function findClassProperty(classBody, propertyName) {
+  return classBody.node.body.find(
+    n =>
+      n.type === 'ClassProperty' &&
+      n.key.type === 'Identifier' &&
+      n.key.name === propertyName
+  );
+}
+
 /**
  * @typedef {object} TypeDesc
  * @property type
@@ -60,6 +69,30 @@ export function getTypeFor(j, name, value, typeMaps) {
         return typeDesc;
       }
       return {type: j.tsAnyKeyword()};
+    }
+  }
+}
+
+export function getNameForType(j, type) {
+  if (!type) {
+    return null;
+  }
+  switch (type.type) {
+    case 'TSStringKeyword':
+      return 'string';
+    case 'TSBooleanKeyword':
+      return 'boolean';
+    case 'TSNumberKeyword':
+      return 'number';
+    case 'TSAnyKeyword':
+      return 'any';
+    case 'TSTypeReference':
+      return type.typeName.name;
+    case 'TSArrayType': {
+      return getNameForType(j, type.elementType) + '[]';
+    }
+    default: {
+      return null;
     }
   }
 }
