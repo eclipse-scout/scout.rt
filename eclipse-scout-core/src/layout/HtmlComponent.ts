@@ -75,7 +75,7 @@ export default class HtmlComponent {
    * Object which stores the computed preferred size. Key is a string containing the width and height hints.
    * @see #computePrefSizeKey(options);
    */
-  prefSizeCached: { [key: string]: Dimension };
+  prefSizeCached: Record<string, Dimension>;
   scrollable: boolean;
   session: Session;
   sizeCached: Dimension;

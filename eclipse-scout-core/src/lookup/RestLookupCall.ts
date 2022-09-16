@@ -46,9 +46,9 @@ export default class RestLookupCall<Key> extends LookupCall<Key> {
 
   resourceUrl: string;
   maxTextLength: number;
-  restriction: { [key: string]: any };
+  restriction: Record<string, any>;
 
-  protected _restriction: { [key: string]: any };
+  protected _restriction: Record<string, any>;
   protected _ajaxCall: AjaxCall;
   protected _deferred: Deferred<LookupResult<Key>, { canceled: boolean }>;
 
@@ -206,7 +206,7 @@ export default class RestLookupCall<Key> extends LookupCall<Key> {
     return this.resourceUrl;
   }
 
-  protected _getRestrictionForAjaxCall(): { [key: string]: any } {
+  protected _getRestrictionForAjaxCall(): Record<string, any> {
     if (!this.restriction && !this._restriction) {
       return null;
     }

@@ -385,7 +385,7 @@ export function reloadPage(options?: ReloadPageOptions) {
  *          If you prefer using a class reference as object type rather than a string, please use {@link addObjectFactory} to register your factory.
  * @see create
  */
-export function addObjectFactories(factories: { [objectType: string]: ObjectCreator }) {
+export function addObjectFactories(factories: Record<string, ObjectCreator>) {
   for (let [objectType, factory] of Object.entries(factories)) {
     addObjectFactory(objectType, factory);
   }

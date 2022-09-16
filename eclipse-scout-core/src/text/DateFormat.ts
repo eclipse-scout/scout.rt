@@ -58,7 +58,7 @@ export default class DateFormat {
   /** Array of arrays, same order as _parseFunctions, but term functions are a list of term functions (to support lenient parsing) */
   protected _analyzeFunctions: ((parseContext: DateFormatParseContext) => boolean)[][];
   protected _patternDefinitions: DateFormatPatternDefinition[];
-  protected _patternLibrary: { [type: string]: DateFormatPatternDefinition[] };
+  protected _patternLibrary: Record<string, DateFormatPatternDefinition[]>;
 
   constructor(locale: Locale, pattern: string, options?: DateFormatOptions) {
     options = options || {};

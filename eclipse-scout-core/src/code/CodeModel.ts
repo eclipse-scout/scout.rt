@@ -19,7 +19,7 @@ export default interface CodeModel extends ObjectWithType {
   modelClass?: string;
 
   text?: string;
-  texts?: { [languageTag: string]: string };
+  texts?: Record<string, string>;
 
   children?: CodeModel[];
 }

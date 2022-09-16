@@ -18,7 +18,7 @@ export default class URL {
   baseUrlRaw: string;
   queryPartRaw: string;
   hashPartRaw: string;
-  parameterMap: { [parameterName: string]: string | string[] };
+  parameterMap: Record<string, string | string[]>;
 
   constructor(url?: string) {
     if (url === undefined) {
@@ -167,7 +167,7 @@ export default class URL {
    *
    * @memberOf URL
    */
-  protected static _addToMap(map: { [parameterName: string]: string | string[] }, key: string, value: string) {
+  protected static _addToMap(map: Record<string, string | string[]>, key: string, value: string) {
     if (map === undefined) {
       throw new Error('Argument \'map\' must not be null');
     }
@@ -192,7 +192,7 @@ export default class URL {
    *
    * @memberOf URL
    */
-  protected static _parse(queryPart: string): { [parameterName: string]: string | string[] } {
+  protected static _parse(queryPart: string): Record<string, string | string[]> {
     let queryString = (queryPart || '').replace(/\+/g, ' '),
       pattern = /([^&=]+)(=?)([^&]*)/g,
       map = {},
