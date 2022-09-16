@@ -8,13 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../index';
+import {NullWidgetEventMap, NullWidgetModel, Widget} from '../index';
 
 export default class NullWidget extends Widget {
+  declare model: NullWidgetModel;
+  declare eventMap: NullWidgetEventMap;
+
+  childWidget: Widget;
 
   constructor() {
     super();
-
+    this.childWidget = null;
     this._addWidgetProperties(['childWidget']);
   }
 

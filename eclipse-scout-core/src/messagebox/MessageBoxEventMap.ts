@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, MessageBox, WidgetEventMap} from '../index';
+import {DisplayParent, Event, MessageBox, PropertyChangeEvent, WidgetEventMap} from '../index';
 import {MessageBoxOption} from './MessageBox';
 
 export interface MessageBoxActionEvent<T extends MessageBox = MessageBox> extends Event<T> {
@@ -17,4 +17,6 @@ export interface MessageBoxActionEvent<T extends MessageBox = MessageBox> extend
 
 export default interface MessageBoxEventMap extends WidgetEventMap {
   'action': MessageBoxActionEvent;
+  'propertyChange:displayParent': PropertyChangeEvent<DisplayParent>;
+  'propertyChange:iconId': PropertyChangeEvent<string>;
 }
