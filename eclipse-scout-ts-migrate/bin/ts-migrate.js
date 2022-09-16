@@ -11,13 +11,14 @@ import convertToLFPlugin from '../src/convertToLFPlugin.js';
 import declareMissingClassPropertiesPlugin from '../src/declareMissingClassPropertiesPlugin.js';
 import methodsPlugin from '../src/methodsPlugin.js';
 import countMethodsPlugin from '../src/countMethodsPlugin.js';
+import printEventMapsPlugin from '../src/printEventMapsPlugin.js';
 
 const rename = renameModule.default; // Default imports don't work as expected when importing from cjs modules
 
 const yargsOptions = {
-  boolean: ['rename', 'renameOnly', 'countOnly'],
+  boolean: ['rename', 'migrate', 'count', 'printEventMaps'],
   array: ['sources'],
-  default: {'rename': true, 'renameOnly': false, 'countOnly': false}
+  default: {'rename': true, 'migrate': true, 'count': false, 'printEventMaps': false}
 };
 const args = parser(process.argv, yargsOptions);
 
@@ -27,7 +28,7 @@ let sources = args.sources;
 if (args.rename) {
   rename({rootDir, sources});
 }
-if (args.renameOnly) {
+if (!args.migrate && !args.count && !args.printEventMaps) {
   process.exit(-1);
 }
 
@@ -47,9 +48,7 @@ const moduleMap = {
 };
 
 const config = new MigrateConfig();
-if (args.countOnly) {
-  config.addPlugin(countMethodsPlugin, {});
-} else {
+if (args.migrate) {
   // Only consider .ts files for migration, no .less or .js files
   if (sources) {
     sources = sources.map(source => {
@@ -69,5 +68,11 @@ if (args.countOnly) {
     .addPlugin(methodsPlugin, {moduleMap})
     .addPlugin(convertToLFPlugin, {})
     .addPlugin(eslintFixPlugin, {});
+}
+if (args.count) {
+  config.addPlugin(countMethodsPlugin, {});
+}
+if (args.printEventMaps) {
+  config.addPlugin(printEventMapsPlugin, {});
 }
 migrate({rootDir, config, sources}).then(exitCode => process.exit(exitCode));
