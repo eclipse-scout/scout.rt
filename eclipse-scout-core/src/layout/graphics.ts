@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Dimension, Insets, Point, Rectangle, scout, scrollbars} from '../index';
+import {arrays, Dimension, Insets, objects, Point, Rectangle, scout, scrollbars} from '../index';
 import $ from 'jquery';
 
 /**
@@ -42,6 +42,13 @@ export interface PrefSizeOptions {
    * Same as 'widthHint' but for the height.
    */
   heightHint?: number;
+
+  /**
+   * Sets min/max-width/height in addition to with width/height if widthHint resp. heightHint is set.
+   * The browser sometimes makes the element smaller or larger than specified by width/height, especially in a flex container.
+   * To prevent that, set this option to true. Default is false, but may change in the future.
+   */
+  enforceSizeHints?: boolean;
 
   /**
    * By default, the $elem's scrolling position is saved and restored during the execution of this method (because applying
