@@ -5,7 +5,7 @@
 import jscodeshift from 'jscodeshift';
 import {validateAnyAliasOptions} from 'ts-migrate-plugins/build/src/utils/validateOptions.js';
 import {isDiagnosticWithLinePosition} from 'ts-migrate-plugins/build/src/utils/type-guards.js';
-import {defaultModuleMap, defaultParamTypeMap, defaultRecastOptions, findIndex, findParentClassBody, findParentPath, getTypeFor, inConstructor, insertMissingImportsForTypes, transformCommentLinesToJsDoc} from './common.js';
+import {defaultModuleMap, defaultParamTypeMap, defaultRecastOptions, findClassProperty, findIndex, findParentClassBody, findParentPath, getTypeFor, inConstructor, insertMissingImportsForTypes, transformCommentLinesToJsDoc} from './common.js';
 
 const j = jscodeshift.withParser('ts');
 let root;
@@ -90,12 +90,7 @@ const declareMissingClassPropertiesPlugin = {
     toAdd.forEach(({classBody, propertyNames: properties}) => {
       const /** @type {string[]}*/ propertyNames = Array.from(properties.keys())
         .filter(propertyName => {
-          const existingProperty = classBody.node.body.find(
-            n =>
-              n.type === 'ClassProperty' &&
-              n.key.type === 'Identifier' &&
-              n.key.name === propertyName
-          );
+          const existingProperty = findClassProperty(classBody, propertyName);
           return existingProperty == null;
         })
         .sort(propertyComparator);
