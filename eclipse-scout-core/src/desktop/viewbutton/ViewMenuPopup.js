@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -27,7 +27,7 @@ export default class ViewMenuPopup extends WidgetPopup {
     super._init(options);
     let tiles = this._createTiles();
     let noIcons = tiles.every(tile => !tile.widgets[0].visible);
-    this.widget = scout.create(TileGrid, {
+    this.content = scout.create(TileGrid, {
       parent: this,
       tiles: tiles,
       cssClass: noIcons ? 'no-icons' : '',
@@ -41,9 +41,9 @@ export default class ViewMenuPopup extends WidgetPopup {
         hgap: 10
       }
     });
-    let tile = this.widget.tiles.find(tile => tile.viewMenu.selected);
+    let tile = this.content.tiles.find(tile => tile.viewMenu.selected);
     if (tile) {
-      this.widget.selectTile(tile);
+      this.content.selectTile(tile);
     }
   }
 
@@ -93,9 +93,9 @@ export default class ViewMenuPopup extends WidgetPopup {
     ]);
   }
 
-  _renderWidget() {
-    super._renderWidget();
-    this.widget.$container.on('click', '.tile', event => {
+  _renderContent() {
+    super._renderContent();
+    this.content.$container.on('click', '.tile', event => {
       let target = scout.widget(event.target);
       if (!(target instanceof Tile)) {
         target = target.findParent(parent => parent instanceof Tile);

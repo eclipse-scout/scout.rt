@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupAdapter} from '../index';
+import {Popup, WidgetModel} from '../index';
 
-export default class WidgetPopupAdapter extends PopupAdapter {
-  constructor() {
-    super();
-  }
+export default interface PopupManagerModel extends WidgetModel {
+  popups: Popup[];
 }
