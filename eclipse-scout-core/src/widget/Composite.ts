@@ -8,9 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CompositeModel, HtmlComponent, Widget} from '../index';
+import {CompositeEventMap, CompositeModel, HtmlComponent, Widget} from '../index';
 
 export default class Composite extends Widget implements CompositeModel {
+  declare model: CompositeModel;
+  declare eventMap: CompositeEventMap;
   widgets: Widget[];
 
   constructor() {
