@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -180,14 +180,14 @@ export default class FormMenu extends Menu {
     if (this.popupStyle === FormMenu.PopupStyle.MOBILE) {
       return scout.create(MobilePopup, {
         parent: this.session.desktop, // use desktop to make _handleSelectedInEllipsis work (if parent is this and this were not rendered, popup.entryPoint would not work)
-        widget: this.form,
+        content: this.form,
         title: this.form.title
       });
     }
 
     return scout.create(WidgetPopup, {
       parent: this,
-      widget: this.form,
+      content: this.form,
       anchor: this,
       closeOnAnchorMouseDown: false,
       cssClass: 'form-menu-popup',

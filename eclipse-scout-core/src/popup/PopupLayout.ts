@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,19 +11,28 @@
 import {AbstractLayout, Dimension, graphics, Insets, Popup, Rectangle, scout} from '../index';
 
 export default class PopupLayout extends AbstractLayout {
+  popup: Popup;
+  /** enables popups with a height which depends on the width (= popups with wrapping content) */
+  doubleCalcPrefSize: boolean;
+  autoPosition: boolean;
+  autoSize: boolean;
+  resizeAnimationRunning: boolean;
+  resizeAnimationDuration: JQuery.Duration;
 
-  constructor(popup) {
+  protected _autoPositionOrig: boolean;
+
+  constructor(popup: Popup) {
     super();
     this.popup = popup;
-    this.doubleCalcPrefSize = true; // enables popups with a height which depends on the width (= popups with wrapping content)
+    this.doubleCalcPrefSize = true;
     this.autoPosition = true;
     this.autoSize = true;
     this.resizeAnimationRunning = false;
-    this.resizeAnimationDuration = null; // default
+    this.resizeAnimationDuration = null;
     this._autoPositionOrig = null;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     if (this.popup.isOpeningAnimationRunning()) {
       this.popup.$container.oneAnimationEnd(this.layout.bind(this, $container));
       return;
@@ -42,7 +51,7 @@ export default class PopupLayout extends AbstractLayout {
     let currentBounds = graphics.bounds(htmlComp.$comp);
     let prefSize = this.preferredLayoutSize($container, {
       exact: true,
-      onlyWidth: this.doubleCalcPrefSize
+      widthOnly: this.doubleCalcPrefSize
     });
 
     prefSize = this.adjustSize(prefSize);
@@ -61,7 +70,7 @@ export default class PopupLayout extends AbstractLayout {
     }
   }
 
-  _resizeAnimated(currentBounds, prefSize) {
+  protected _resizeAnimated(currentBounds: Rectangle, prefSize: Dimension) {
     this._position();
     let htmlComp = this.popup.htmlComp;
     let prefPosition = htmlComp.$comp.position();
@@ -97,18 +106,19 @@ export default class PopupLayout extends AbstractLayout {
       });
   }
 
-  _position(switchIfNecessary) {
+  protected _position(switchIfNecessary?: boolean) {
     if (this.autoPosition) {
       this.popup.position(switchIfNecessary);
     }
   }
 
-  _setSize(prefSize) {
+  protected _setSize(prefSize: Dimension) {
     graphics.setSize(this.popup.htmlComp.$comp, prefSize);
   }
 
-  adjustSize(prefSize) {
+  adjustSize(prefSize: Dimension): Dimension {
     // Consider CSS min/max rules
+    // @ts-ignore
     this.popup.htmlComp._adjustPrefSizeWithMinMaxSize(prefSize);
 
     // Consider window boundaries
@@ -118,7 +128,7 @@ export default class PopupLayout extends AbstractLayout {
     return this._adjustSize(prefSize);
   }
 
-  _adjustSize(prefSize) {
+  protected _adjustSize(prefSize: Dimension): Dimension {
     let popupSize = new Dimension(),
       maxSize = this._calcMaxSize();
 
@@ -132,9 +142,8 @@ export default class PopupLayout extends AbstractLayout {
   /**
    * Considers window boundaries.
    *
-   * @returns {Dimension}
    */
-  _calcMaxSize() {
+  protected _calcMaxSize(): Dimension {
     let maxWidth, maxHeight,
       htmlComp = this.popup.htmlComp,
       windowPaddingX = this.popup.windowPaddingX,
@@ -148,7 +157,7 @@ export default class PopupLayout extends AbstractLayout {
     return new Dimension(maxWidth, maxHeight);
   }
 
-  _adjustSizeWithAnchor(prefSize) {
+  protected _adjustSizeWithAnchor(prefSize: Dimension): Dimension {
     let popupSize = new Dimension(),
       maxSize = this._calcMaxSizeAroundAnchor(),
       windowSize = this._calcMaxSize(),
@@ -213,9 +222,8 @@ export default class PopupLayout extends AbstractLayout {
   /**
    * Considers window boundaries.
    *
-   * @returns {Insets}
    */
-  _calcMaxSizeAroundAnchor() {
+  protected _calcMaxSizeAroundAnchor(): Insets {
     let maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
       htmlComp = this.popup.htmlComp,
       windowPaddingX = this.popup.windowPaddingX,

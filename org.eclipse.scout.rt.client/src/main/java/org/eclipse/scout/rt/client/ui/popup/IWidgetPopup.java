@@ -19,12 +19,12 @@ import org.eclipse.scout.rt.client.ui.IWidget;
  */
 public interface IWidgetPopup<T extends IWidget> extends IPopup {
 
-  String PROP_WIDGET = "widget"; // FIXME TS: rename to "content". Also rename the JS part.
+  String PROP_CONTENT = "content";
   String PROP_CLOSABLE = "closable";
   String PROP_MOVABLE = "movable";
   String PROP_RESIZABLE = "resizable";
 
-  T getWidget();
+  T getContent();
 
   void setClosable(boolean closable);
 

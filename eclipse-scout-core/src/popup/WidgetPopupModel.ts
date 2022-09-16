@@ -8,10 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupAdapter} from '../index';
+import {PopupModel} from '../index';
+import {ResizableMode} from '../resizable/Resizable';
 
-export default class WidgetPopupAdapter extends PopupAdapter {
-  constructor() {
-    super();
-  }
+export default interface WidgetPopupModel extends PopupModel {
+  /**
+   * Default is false.
+   */
+  closable?: boolean;
+  /**
+   * Default is false.
+   */
+  movable?: boolean;
+  /**
+   * Default is false.
+   */
+  resizable?: boolean;
+  /**
+   * Default none.
+   */
+  resizeModes?: ResizableMode[];
 }

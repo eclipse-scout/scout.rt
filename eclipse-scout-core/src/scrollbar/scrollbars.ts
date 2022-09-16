@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, graphics, HtmlComponent, Insets, objects, scout, Scrollbar, Session, WidgetModel} from '../index';
+import {arrays, Device, graphics, HtmlComponent, Insets, objects, Point, scout, Scrollbar, Session, WidgetModel} from '../index';
 import $ from 'jquery';
 
 /**
@@ -779,7 +779,7 @@ export function scrollToBottom($scrollable: JQuery, options?: ScrollOptions) {
  * @param $scrollables one or more scrollables to check against
  * @returns true if the location is visible in the current viewport of all the $scrollables, or if $scrollables is null
  */
-export function isLocationInView(location: { x: number; y: number }, $scrollables: JQuery): boolean {
+export function isLocationInView(location: Point, $scrollables: JQuery): boolean {
   if (!$scrollables || $scrollables.length === 0) {
     return true;
   }
