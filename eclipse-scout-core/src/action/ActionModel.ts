@@ -12,23 +12,56 @@ import {WidgetModel} from '../index';
 import {ActionStyle, ActionTextPosition, KeyStrokeFirePolicy} from './Action';
 
 export default interface ActionModel extends WidgetModel {
-  actionStyle: ActionStyle;
-  compact: boolean;
-  iconId: string;
-  horizontalAlignment: -1 | 0 | 1;
-  keyStroke: string;
-  keyStrokeFirePolicy: KeyStrokeFirePolicy;
-  selected: boolean;
-  preventDoubleClick: boolean;
   /**
-   * This property decides whether or not the tabindex attribute is set in the DOM.
+   * Default is {@link Action.ActionStyle.DEFAULT}.
    */
-  tabbable: boolean;
-  text: string;
-  textPosition: ActionTextPosition;
-  htmlEnabled: boolean;
-  textVisible: boolean;
-  toggleAction: boolean;
-  tooltipText: string;
-  showTooltipWhenSelected: boolean;
+  actionStyle?: ActionStyle;
+  /**
+   * Default is false
+   */
+  compact?: boolean;
+  iconId?: string;
+  /**
+   * Default is -1 (left)
+   */
+  horizontalAlignment?: -1 | 0 | 1;
+  keyStroke?: string;
+  /**
+   * Default is {@link Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY}.
+   */
+  keyStrokeFirePolicy?: KeyStrokeFirePolicy;
+  /**
+   * Default is false.
+   */
+  selected?: boolean;
+  /**
+   * Default is false.
+   */
+  preventDoubleClick?: boolean;
+  /**
+   * This property decides whether or not the tabindex attribute is set in the DOM. Default is false.
+   */
+  tabbable?: boolean;
+  text?: string;
+  /**
+   * Default is {@link Action.TextPosition.DEFAULT}.
+   */
+  textPosition?: ActionTextPosition;
+  /**
+   * Default is false.
+   */
+  htmlEnabled?: boolean;
+  /**
+   * Default is true.
+   */
+  textVisible?: boolean;
+  /**
+   * Default is false.
+   */
+  toggleAction?: boolean;
+  tooltipText?: string;
+  /**
+   * Default is true.
+   */
+  showTooltipWhenSelected?: boolean;
 }

@@ -8,11 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, icons, Insets, Popup, Resizable, scout, WidgetPopupLayout} from '../index';
+import {Action, Event, graphics, icons, Insets, Point, Popup, PopupLayout, Resizable, scout, Widget, WidgetPopupEventMap, WidgetPopupLayout, WidgetPopupModel} from '../index';
 import $ from 'jquery';
-import graphics from '../layout/graphics';
+import {ResizableMode} from '../resizable/Resizable';
+import {PopupAlignment} from './Popup';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export default class WidgetPopup extends Popup {
+  declare model: WidgetPopupModel;
+  declare eventMap: WidgetPopupEventMap;
+
+  closable: boolean;
+  closeAction: Action;
+  movable: boolean;
+  resizable: boolean;
+  resizeModes: ResizableMode[];
+  $dragHandle: JQuery<HTMLDivElement>;
+  content: Widget;
+  /**
+   * Action bar on the top right corner, is used to display the close action but may also be used by popups to add custom actions.
+   * The bar will only be added automatically if the popup is closable.
+   */
+  $actions: JQuery<HTMLDivElement>;
+
+  protected _moveHandler: (position: { top: number; left: number }) => void;
+  protected _resizeHandler: (event: JQuery.ResizeEvent) => boolean;
+  protected _autoPositionOrig: boolean;
 
   constructor() {
     super();
@@ -24,67 +45,64 @@ export default class WidgetPopup extends Popup {
     this.movable = false;
     this.resizable = false;
     this.resizeModes = null;
-    this.minSize = null;
-    this.widget = null; // FIXME TS: rename to "content". Also rename the Java part.
+    this.content = null;
     this.windowPaddingX = 0;
     this.windowPaddingY = 0;
     this.windowResizeType = 'layoutAndPosition';
     this.$dragHandle = null;
-    // Action bar on the top right corner, is used to display the close action but may also be used by popups to add custom actions.
-    // The bar will only be added automatically if the popup is closable.
     this.$actions = null;
     this._moveHandler = this._onMove.bind(this);
     this._resizeHandler = this._onResize.bind(this);
     this._autoPositionOrig = null;
-    this._addWidgetProperties(['widget']);
+    this._addWidgetProperties(['content']);
   }
 
-  _createLayout() {
+  protected override _createLayout(): PopupLayout {
     return new WidgetPopupLayout(this);
   }
 
-  _init(model) {
+  protected override _init(model: WidgetPopupModel) {
     super._init(model);
     this._setClosable(this.closable);
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this.$container.addClass('widget-popup');
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
-    this._renderWidget();
+    this._renderContent();
     this._renderClosable();
     this._renderMovable();
     this._renderResizable();
   }
 
-  _remove() {
+  protected override _remove() {
     this.$dragHandle = null;
     this.$actions = null;
     super._remove();
   }
 
-  setWidget(widget) {
-    this.setProperty('widget', widget);
+  setContent(content: Widget) {
+    this.setProperty('content', content);
   }
 
-  _renderWidget() {
-    if (!this.widget) {
+  protected _renderContent() {
+    if (!this.content) {
       return;
     }
-    this.widget.render();
-    this.widget.$container.addClass('popup-widget');
+    this.content.render();
+    this.content.$container.addClass('popup-widget');
     this.invalidateLayoutTree();
   }
 
-  setClosable(closable) {
+  setClosable(closable: boolean) {
     this.setProperty('closable', closable);
   }
 
-  _setClosable(closable) {
+  protected _setClosable(closable: boolean) {
     this._setProperty('closable', closable);
     if (this.closable) {
       if (this.closeAction) {
@@ -101,7 +119,7 @@ export default class WidgetPopup extends Popup {
     }
   }
 
-  _createCloseAction() {
+  protected _createCloseAction(): Action {
     return scout.create(Action, {
       parent: this,
       cssClass: 'close-action menu-item',
@@ -109,7 +127,7 @@ export default class WidgetPopup extends Popup {
     });
   }
 
-  _renderClosable() {
+  protected _renderClosable() {
     if (this.closeAction) {
       if (!this.$actions) {
         this.$actions = this.$container.appendDiv('actions');
@@ -123,18 +141,18 @@ export default class WidgetPopup extends Popup {
     }
   }
 
-  _onCloseAction() {
+  protected _onCloseAction(event: Event<Action>) {
     this.close();
   }
 
-  setResizable(resizable) {
+  setResizable(resizable: boolean) {
     this.setProperty('resizable', resizable);
   }
 
-  _renderResizable() {
+  protected _renderResizable() {
     if (this.resizable) {
       this.$container
-        .resizable({modes: this._determineResizeModes(), $parent: this.$container, boundaries: this._calculateResizeBoundaries()})
+        .resizable({modes: this._determineResizeModes(), $container: this.$container, boundaries: this._calculateResizeBoundaries()})
         .on('resize', this._resizeHandler);
     } else {
       this.$container
@@ -144,7 +162,7 @@ export default class WidgetPopup extends Popup {
     }
   }
 
-  _calculateResizeBoundaries() {
+  protected _calculateResizeBoundaries(): Insets {
     let resizeBoundaries = new Insets();
     if (!this.$arrow) {
       return resizeBoundaries;
@@ -164,7 +182,7 @@ export default class WidgetPopup extends Popup {
     return resizeBoundaries;
   }
 
-  _determineResizeModes() {
+  protected _determineResizeModes(): ResizableMode[] {
     if (!this.$arrow || this.resizeModes) {
       return this.resizeModes;
     }
@@ -183,19 +201,17 @@ export default class WidgetPopup extends Popup {
     return this.resizeModes;
   }
 
-  _onResize(event) {
-    let autoSizeOrig = this.htmlComp.layout.autoSize;
-    this.htmlComp.layout.autoSize = false;
+  protected _onResize(event: JQuery.ResizeEvent): boolean {
+    let layout = this.htmlComp.layout as PopupLayout;
+    let autoSizeOrig = layout.autoSize;
+    layout.autoSize = false;
     this.htmlComp.revalidateLayout();
-    this.htmlComp.layout.autoSize = autoSizeOrig;
+    layout.autoSize = autoSizeOrig;
     this._updateArrowPosition();
     return false;
   }
 
-  /**
-   * @Override
-   */
-  position(switchIfNecessary) {
+  override position(switchIfNecessary?: boolean) {
     if (!this.rendered) {
       return;
     }
@@ -208,10 +224,7 @@ export default class WidgetPopup extends Popup {
     }
   }
 
-  /**
-   * @Override
-   */
-  _updateArrowClass(verticalAlignment, horizontalAlignment) {
+  protected override _updateArrowClass(verticalAlignment?: PopupAlignment, horizontalAlignment?: PopupAlignment) {
     super._updateArrowClass(verticalAlignment, horizontalAlignment);
     if (this.$arrow) {
       // make sure to remove css positioning which could have been applied in _updateArrowPosition()
@@ -221,7 +234,7 @@ export default class WidgetPopup extends Popup {
     }
   }
 
-  _updateArrowPosition() {
+  protected _updateArrowPosition() {
     if (!this.$arrow) {
       return;
     }
@@ -241,20 +254,20 @@ export default class WidgetPopup extends Popup {
     }
   }
 
-  _getAnchorMiddlePoint() {
+  protected _getAnchorMiddlePoint(): Point {
     let anchorBounds = this.getAnchorBounds();
     return anchorBounds ? anchorBounds.center() : null;
   }
 
-  _isVerticallyAligned() {
+  protected _isVerticallyAligned(): boolean {
     return scout.isOneOf(this.calculatedHorizontalAlignment, Popup.Alignment.LEFT, Popup.Alignment.RIGHT);
   }
 
-  setMovable(movable) {
+  setMovable(movable: boolean) {
     this.setProperty('movable', movable);
   }
 
-  _renderMovable() {
+  protected _renderMovable() {
     if (this.movable) {
       if (this.$dragHandle) {
         return;
@@ -268,25 +281,32 @@ export default class WidgetPopup extends Popup {
       this.$container.undraggable(this.$dragHandle);
       this.$dragHandle.remove();
       this.$dragHandle = null;
-      this.htmlComp.layout.autoPosition = this._autoPositionOrig;
+      let layout = this.htmlComp.layout as PopupLayout;
+      layout.autoPosition = this._autoPositionOrig;
       this._autoPositionOrig = null;
       this.invalidateLayoutTree(); // move popup to preferred position
     }
   }
 
-  _onMove(newOffset) {
+  protected _onMove(newOffset: { top: number; left: number }) {
     // Disable automatic positioning as soon as the user drags the popup
     if (this._autoPositionOrig === null) {
-      this._autoPositionOrig = this.htmlComp.layout.autoPosition;
-      this.htmlComp.layout.autoPosition = false;
+      let layout = this.htmlComp.layout as PopupLayout;
+      this._autoPositionOrig = layout.autoPosition;
+      layout.autoPosition = false;
     }
     this.trigger('move', newOffset);
   }
 
-  set$Anchor($anchor) {
+  override trigger<K extends string & keyof EventMapOf<WidgetPopup>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<WidgetPopup>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
+
+  override set$Anchor($anchor: JQuery) {
     if (this._autoPositionOrig && $anchor && this.$anchor !== $anchor) {
       // If a new anchor is set, the popup is positioned automatically -> reset flag to make animation work
-      this.htmlComp.layout.autoPosition = this._autoPositionOrig;
+      let layout = this.htmlComp.layout as PopupLayout;
+      layout.autoPosition = this._autoPositionOrig;
       this._autoPositionOrig = null;
     }
     super.set$Anchor($anchor);

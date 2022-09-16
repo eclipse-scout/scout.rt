@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupAdapter} from '../index';
+import {DateField, PopupModel, SmartField} from '../index';
 
-export default class WidgetPopupAdapter extends PopupAdapter {
-  constructor() {
-    super();
-  }
+export default interface TouchPopupModel extends PopupModel {
+  field: DateField | SmartField;
 }

@@ -8,10 +8,57 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CloseKeyStroke, DialogLayout, Dimension, Event, FocusRule, GlassPaneRenderer, graphics, HtmlComponent, Insets, KeyStrokeContext, Point, PopupLayout, Rectangle, scout, scrollbars, strings, Widget, widgets} from '../index';
+import {AbstractLayout, CloseKeyStroke, DialogLayout, Dimension, EnumObject, Event, EventHandler, FocusRule, GlassPaneRenderer, graphics, HtmlComponent, Insets, KeyStroke, KeyStrokeContext, Point, PopupEventMap, PopupLayout, Rectangle, scout, scrollbars, strings, Widget, widgets} from '../index';
 import $ from 'jquery';
+import PopupModel from './PopupModel';
 
-export default class Popup extends Widget {
+export type PopupAlignment = EnumObject<typeof Popup.Alignment>;
+
+export default class Popup extends Widget implements PopupModel {
+  declare model: PopupModel;
+  declare eventMap: PopupEventMap;
+
+  anchorBounds: Rectangle;
+  animateOpening: boolean;
+  animateResize: boolean;
+  anchor: Widget;
+  windowPaddingX: number;
+  windowPaddingY: number;
+  withGlassPane: boolean;
+  withFocusContext: boolean;
+  initialFocus: () => FocusRule | HTMLElement;
+  focusableContainer: boolean;
+  horizontalAlignment: PopupAlignment;
+  verticalAlignment: PopupAlignment;
+  calculatedHorizontalAlignment: PopupAlignment; // Gives the current alignment after applying horizontal and vertical switch options
+  calculatedVerticalAlignment: PopupAlignment;
+  horizontalSwitch: boolean;
+  verticalSwitch: boolean;
+  trimWidth: boolean;
+  trimHeight: boolean;
+  scrollType: 'position' | 'layoutAndPosition' | 'remove';
+  windowResizeType: 'position' | 'layoutAndPosition' | 'remove';
+  boundToAnchor: boolean;
+  withArrow: boolean;
+  closeOnAnchorMouseDown: boolean;
+  closeOnMouseDownOutside: boolean;
+  closeOnOtherPopupOpen: boolean;
+  modal: boolean;
+  $anchor: JQuery;
+  $arrow: JQuery<HTMLDivElement>;
+  $arrowOverlay: JQuery<HTMLDivElement>;
+  protected _documentMouseDownHandler: (event: MouseEvent) => void;
+  protected _anchorScrollHandler: (event: JQuery.ScrollEvent) => void;
+  protected _anchorLocationChangeHandler: EventHandler;
+  protected _popupOpenHandler: EventHandler;// FIXME TS: add PopupOpenEvent as soon as Desktop has been migrated
+  protected _glassPaneRenderer: GlassPaneRenderer;
+  protected _openLater: boolean;
+  protected _windowResizeHandler: (event: JQuery.ResizeEvent<Window>) => void;
+  protected _anchorRenderHandler: EventHandler<Event<Widget>>;
+  protected _withGlassPane: boolean;
+  protected _closeOnAnchorMouseDown: boolean;
+  protected _closeOnMouseDownOutside: boolean;
+  protected _closeOnOtherPopupOpen: boolean;
 
   constructor() {
     super();
@@ -33,55 +80,25 @@ export default class Popup extends Widget {
     this.withFocusContext = true;
     this.initialFocus = () => FocusRule.AUTO;
     this.focusableContainer = false;
-
-    // The alignment defines how the popup is positioned around the anchor.
-    // If there is no anchor or anchor bounds the alignment has no effect.
     this.horizontalAlignment = Popup.Alignment.LEFTEDGE;
     this.verticalAlignment = Popup.Alignment.BOTTOM;
-
-    // Gives the current alignment after applying horizontal and vertical switch options
     this.calculatedHorizontalAlignment = this.horizontalAlignment;
     this.calculatedVerticalAlignment = this.verticalAlignment;
-
-    // If switch is enabled, the alignment will be changed if the popup overlaps a window border.
     this.horizontalSwitch = false;
     this.verticalSwitch = true;
-
-    // Hints for the layout to control whether the size should be adjusted if the popup does not fit into the window.
-    // Before trimming is applied the popup will be switched, if the switch option is enabled.
-    // If neither switch nor trim is enabled, the popup will be moved until its right border is visible.
     this.trimWidth = false;
     this.trimHeight = true;
-
-    // Defines what should happen when the scroll parent is scrolled. It is also used if the anchor changes its location (needs to support the locationChange event)
     this.scrollType = 'remove';
     this.windowResizeType = null;
-
-    // If true, the anchor is considered when computing the position and size of the popup
     this.boundToAnchor = true;
-
-    // If true, an arrow is shown pointing to the anchor. If there is no anchor, no arrow will be visible.
-    // Please note: some alignment combinations are not supported, which are: LEFT or RIGHT + BOTTOM or TOP
     this.withArrow = false;
-
-    // If false, the attached mouse down handler will NOT close the popup if the anchor was clicked, the anchor is responsible to close it.
-    // This is necessary because the mousedown listener is attached to the capture phase and therefore executed before any other.
-    // If anchor was clicked, popup would already be closed and then opened again -> popup could never be closed by clicking the anchor
     this.closeOnAnchorMouseDown = true;
     this._closeOnAnchorMouseDown = null;
-
-    // Defines whether the popup should be closed on a mouse click outside of the popup
     this.closeOnMouseDownOutside = true;
     this._closeOnMouseDownOutside = null;
-
-    // Defines whether the popup should be closed whenever another popup opens.
     this.closeOnOtherPopupOpen = true;
     this._closeOnOtherPopupOpen = null;
-
-    // Defines whether the popup should behave like a modal form. If true, the properties closeOnAnchorMouseDown, closeOnMouseDownOutside
-    // and closeOnOtherPopupOpen ore overruled and set to false. The property withGlassPane is overruled too and set to true.
     this.modal = false;
-
     this._openLater = false;
 
     this.$arrow = null;
@@ -138,16 +155,11 @@ export default class Popup extends Widget {
      * Without arrow: The bottom edges of both the popup and the anchor are aligned vertically.
      */
     BOTTOMEDGE: 'bottomedge'
-  };
+  } as const;
 
   static SwitchRule = {};
 
-  /**
-   * @param options:
-   *          initialFocus: a function that returns the element to be focused or a <code>FocusRule</code>. Default returns <code>FocusRule.AUTO</code>
-   *          focusableContainer: a boolean whether or not the container of the Popup is focusable
-   */
-  _init(options) {
+  protected override _init(options: PopupModel) {
     super._init(options);
 
     if (options.location) {
@@ -157,17 +169,11 @@ export default class Popup extends Widget {
     this._setModal(this.modal);
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     this.keyStrokeContext.registerKeyStroke(this._createCloseKeyStroke());
@@ -176,20 +182,16 @@ export default class Popup extends Widget {
   /**
    * Override this method to provide a key stroke which closes the popup.
    * The default impl. returns a CloseKeyStroke which handles the ESC key.
-   * @return KeyStroke
    */
-  _createCloseKeyStroke() {
+  protected _createCloseKeyStroke(): KeyStroke {
     return new CloseKeyStroke(this);
   }
 
-  /**
-   * @return {PopupLayout|AbstractLayout}
-   */
-  _createLayout() {
+  protected _createLayout(): AbstractLayout {
     return new PopupLayout(this);
   }
 
-  _openWithoutParent() {
+  protected _openWithoutParent() {
     // resolve parent for entry-point (don't change the actual property)
     if (this.parent.destroyed) {
       return;
@@ -213,13 +215,12 @@ export default class Popup extends Widget {
 
   /**
    * Only called if parent.rendered or parent.rendering
-   * @return {$}
    */
-  _getDefaultOpen$Parent() {
+  protected _getDefaultOpen$Parent(): JQuery {
     return this.parent.entryPoint();
   }
 
-  open($parent) {
+  open($parent?: JQuery) {
     if (!$parent) {
       this._openWithoutParent();
       return;
@@ -268,7 +269,7 @@ export default class Popup extends Widget {
     }
   }
 
-  _requestInitialFocus() {
+  protected _requestInitialFocus() {
     let initialFocusElement = this.session.focusManager.evaluateFocusRule(this.$container, this.initialFocus());
     if (!initialFocusElement) {
       return;
@@ -276,7 +277,7 @@ export default class Popup extends Widget {
     this.session.focusManager.requestFocus(initialFocusElement);
   }
 
-  _open($parent) {
+  protected _open($parent: JQuery) {
     this.render($parent);
     if (this._openLater) {
       return;
@@ -285,7 +286,7 @@ export default class Popup extends Widget {
     this.position();
   }
 
-  render($parent) {
+  override render($parent: JQuery) {
     let $popupParent = $parent || this.entryPoint();
     // when the parent is detached it is not possible to render the popup -> do it later
     if (!$popupParent || !$popupParent.length || !$popupParent.isAttached()) {
@@ -295,7 +296,7 @@ export default class Popup extends Widget {
     super.render($popupParent);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('popup');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.validateRoot = true;
@@ -303,7 +304,7 @@ export default class Popup extends Widget {
     this.$container.window().on('resize', this._windowResizeHandler);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderAnchor();
     this._renderWithArrow();
@@ -312,7 +313,7 @@ export default class Popup extends Widget {
     this._renderModal();
   }
 
-  _postRender() {
+  protected override _postRender() {
     super._postRender();
 
     this._attachCloseHandlers();
@@ -320,7 +321,7 @@ export default class Popup extends Widget {
     this._handleGlassPanes();
   }
 
-  _onAttach() {
+  protected override _onAttach() {
     super._onAttach();
     if (this._openLater && !this.rendered) {
       this._openLater = false;
@@ -333,14 +334,14 @@ export default class Popup extends Widget {
     }
   }
 
-  _renderOnDetach() {
+  protected override _renderOnDetach() {
     this._openLater = true;
     // If parent is detached, popup should be removed immediately, otherwise animation would still be visible even though parent has already gone.
     super.removeImmediately();
     super._renderOnDetach();
   }
 
-  remove() {
+  override remove() {
     let currentAnimateRemoval = this.animateRemoval;
     if ((this.boundToAnchor && this.$anchor) && !this._isAnchorInView()) {
       this.animateRemoval = false;
@@ -349,7 +350,7 @@ export default class Popup extends Widget {
     this.animateRemoval = currentAnimateRemoval;
   }
 
-  _remove() {
+  protected override _remove() {
     this.$container.window().off('resize', this._windowResizeHandler);
     if (this._glassPaneRenderer) {
       this._glassPaneRenderer.removeGlassPanes();
@@ -373,14 +374,14 @@ export default class Popup extends Widget {
     super._remove();
   }
 
-  _destroy() {
+  protected override _destroy() {
     if (this.anchor) {
       this.anchor.off('render', this._anchorRenderHandler);
     }
     super._destroy();
   }
 
-  _renderWithFocusContext() {
+  protected _renderWithFocusContext() {
     if (!this.withFocusContext) {
       return;
     }
@@ -394,11 +395,11 @@ export default class Popup extends Widget {
     this.session.focusManager.installFocusContext(this.$container, FocusRule.PREPARE);
   }
 
-  setModal(modal) {
+  setModal(modal: boolean) {
     this.setProperty('modal', modal);
   }
 
-  _setModal(modal) {
+  protected _setModal(modal: boolean) {
     this._setProperty('modal', modal);
     if (modal) {
       widgets.preserveAndSetProperty(() => this.setProperty('withGlassPane', true), () => this.withGlassPane, this, '_withGlassPane');
@@ -413,11 +414,11 @@ export default class Popup extends Widget {
     }
   }
 
-  _renderModal() {
+  protected _renderModal() {
     this.$container.toggleClass('modal', this.modal);
   }
 
-  setWithGlassPane(withGlassPane) {
+  setWithGlassPane(withGlassPane: boolean) {
     if (!this.modal) {
       this.setProperty('withGlassPane', withGlassPane);
     } else {
@@ -425,7 +426,7 @@ export default class Popup extends Widget {
     }
   }
 
-  _renderWithGlassPane() {
+  protected _renderWithGlassPane() {
     if (this.withGlassPane && !this._glassPaneRenderer) {
       this._glassPaneRenderer = new GlassPaneRenderer(this);
       this._glassPaneRenderer.renderGlassPanes();
@@ -435,7 +436,7 @@ export default class Popup extends Widget {
     }
   }
 
-  setCloseOnMouseDownOutside(closeOnMouseDownOutside) {
+  setCloseOnMouseDownOutside(closeOnMouseDownOutside: boolean) {
     if (!this.modal) {
       this.setProperty('closeOnMouseDownOutside', closeOnMouseDownOutside);
     } else {
@@ -443,7 +444,7 @@ export default class Popup extends Widget {
     }
   }
 
-  _renderCloseOnMouseDownOutside() {
+  protected _renderCloseOnMouseDownOutside() {
     // The listener needs to be executed in the capturing phase -> prevents that _onDocumentMouseDown will be executed right after the popup gets opened using mouse down, otherwise the popup would be closed immediately
     if (this.closeOnMouseDownOutside && !this._documentMouseDownHandler) {
       this._documentMouseDownHandler = this._onDocumentMouseDown.bind(this);
@@ -454,7 +455,7 @@ export default class Popup extends Widget {
     }
   }
 
-  setCloseOnAnchorMouseDown(closeOnAnchorMouseDown) {
+  setCloseOnAnchorMouseDown(closeOnAnchorMouseDown: boolean) {
     if (!this.modal) {
       this.setProperty('closeOnAnchorMouseDown', closeOnAnchorMouseDown);
     } else {
@@ -462,7 +463,7 @@ export default class Popup extends Widget {
     }
   }
 
-  setCloseOnOtherPopupOpen(closeOnOtherPopupOpen) {
+  setCloseOnOtherPopupOpen(closeOnOtherPopupOpen: boolean) {
     if (!this.modal) {
       this.setProperty('closeOnOtherPopupOpen', closeOnOtherPopupOpen);
     } else {
@@ -470,7 +471,7 @@ export default class Popup extends Widget {
     }
   }
 
-  _renderCloseOnOtherPopupOpen() {
+  protected _renderCloseOnOtherPopupOpen() {
     if (this.closeOnOtherPopupOpen && !this._popupOpenHandler) {
       this._popupOpenHandler = this._onPopupOpen.bind(this);
       this.session.desktop.on('popupOpen', this._popupOpenHandler);
@@ -480,11 +481,11 @@ export default class Popup extends Widget {
     }
   }
 
-  setWithArrow(withArrow) {
+  setWithArrow(withArrow: boolean) {
     this.setProperty('withArrow', withArrow);
   }
 
-  _renderWithArrow() {
+  protected _renderWithArrow() {
     if (this.$arrow) {
       this.$arrow.remove();
       this.$arrow = null;
@@ -502,14 +503,14 @@ export default class Popup extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _updateArrowClass(verticalAlignment, horizontalAlignment) {
+  protected _updateArrowClass(verticalAlignment?: PopupAlignment, horizontalAlignment?: PopupAlignment) {
     if (this.$arrow) {
       this.$arrow.removeClass(this._alignClasses());
       this.$arrow.addClass(this._computeArrowPositionClass(verticalAlignment, horizontalAlignment));
     }
   }
 
-  _computeArrowPositionClass(verticalAlignment, horizontalAlignment) {
+  protected _computeArrowPositionClass(verticalAlignment?: PopupAlignment, horizontalAlignment?: PopupAlignment): string {
     let Alignment = Popup.Alignment;
     let cssClass = '';
     horizontalAlignment = horizontalAlignment || this.horizontalAlignment;
@@ -540,7 +541,7 @@ export default class Popup extends Widget {
     return cssClass;
   }
 
-  _animateRemovalWhileRemovingParent() {
+  protected override _animateRemovalWhileRemovingParent(): boolean {
     if (!this.$anchor) {
       // Allow remove animations for popups without an anchor
       return true;
@@ -549,7 +550,7 @@ export default class Popup extends Widget {
     return widgets.get(this.$anchor) !== this.parent;
   }
 
-  _isRemovalPrevented() {
+  protected override _isRemovalPrevented(): boolean {
     // If removal of a parent is pending due to an animation then don't return true to make sure popups are closed before the parent animation starts.
     // However, if the popup itself is removed by an animation, removal should be prevented to ensure remove() won't run multiple times.
     return this.removalPending;
@@ -560,8 +561,7 @@ export default class Popup extends Widget {
       // Already closed, do nothing
       return;
     }
-    let event = new Event();
-    this.trigger('close', event);
+    let event = this.trigger('close');
     if (!event.defaultPrevented) {
       this.destroy();
     }
@@ -571,14 +571,14 @@ export default class Popup extends Widget {
    * Install listeners to close the popup once clicking outside the popup,
    * or changing the anchor's scroll position, or another popup is opened.
    */
-  _attachCloseHandlers() {
+  protected _attachCloseHandlers() {
     // Install mouse close handler
     this._renderCloseOnMouseDownOutside();
     // Install popup open close handler
     this._renderCloseOnOtherPopupOpen();
   }
 
-  _attachAnchorHandlers() {
+  protected _attachAnchorHandlers() {
     if (!this.$anchor || !this.boundToAnchor || !this.scrollType) {
       return;
     }
@@ -594,7 +594,7 @@ export default class Popup extends Widget {
     }
   }
 
-  _detachAnchorHandlers() {
+  protected _detachAnchorHandlers() {
     if (this._anchorScrollHandler) {
       scrollbars.offScroll(this._anchorScrollHandler);
       this._anchorScrollHandler = null;
@@ -608,7 +608,7 @@ export default class Popup extends Widget {
     }
   }
 
-  _detachCloseHandlers() {
+  protected _detachCloseHandlers() {
     // Uninstall popup open close handler
     if (this._popupOpenHandler) {
       this.session.desktop.off('popupOpen', this._popupOpenHandler);
@@ -622,7 +622,7 @@ export default class Popup extends Widget {
     }
   }
 
-  _onDocumentMouseDown(event) {
+  protected _onDocumentMouseDown(event: MouseEvent) {
     // in some cases the mousedown handler is executed although it has been already
     // detached on the _remove() method. However, since we're in the middle of
     // processing the mousedown event, it's too late to detach the event and we must
@@ -637,8 +637,9 @@ export default class Popup extends Widget {
     }
   }
 
-  _isMouseDownOutside(event) {
-    let $target = $(event.target),
+  protected _isMouseDownOutside(event: MouseEvent): boolean {
+    let eventTarget = event.target as HTMLElement;
+    let $target = $(eventTarget),
       targetWidget;
 
     if (!this.closeOnAnchorMouseDown && this._isMouseDownOnAnchor(event)) {
@@ -656,29 +657,30 @@ export default class Popup extends Widget {
     return !this.isOrHas(targetWidget) && !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
   }
 
-  _isMouseDownOnAnchor(event) {
-    return !!this.$anchor && this.$anchor.isOrHas(event.target);
+  protected _isMouseDownOnAnchor(event: MouseEvent): boolean {
+    let eventTarget = event.target as HTMLElement;
+    return !!this.$anchor && this.$anchor.isOrHas(eventTarget);
   }
 
   /**
    * Method invoked once a mouse down event occurs outside the popup.
    */
-  _onMouseDownOutside(event) {
+  protected _onMouseDownOutside(event: MouseEvent) {
     this.close();
   }
 
   /**
    * Method invoked once the 'options.$anchor' is scrolled.
    */
-  _onAnchorScroll(event) {
+  protected _onAnchorScroll(event: JQuery.ScrollEvent) {
     if (!this.rendered) {
       // Scroll events may be fired delayed, even if scroll listeners are already removed.
       return;
     }
-    this._handleAnchorPositionChange();
+    this._handleAnchorPositionChange(event);
   }
 
-  _handleAnchorPositionChange(event) {
+  protected _handleAnchorPositionChange(event: JQuery.ScrollEvent | Event) {
     if (scout.isOneOf(this.scrollType, 'position', 'layoutAndPosition') && this.isOpeningAnimationRunning()) {
       // If the popup is opened with an animation which transforms the popup the sizes used by prefSize and position will likely be wrong.
       // In that case it is not possible to layout and position it correctly -> do nothing.
@@ -695,18 +697,18 @@ export default class Popup extends Widget {
     }
   }
 
-  isOpeningAnimationRunning() {
+  isOpeningAnimationRunning(): boolean {
     return this.rendered && this.animateOpening && this.$container.hasClass('animate-open');
   }
 
-  _onAnchorLocationChange(event) {
-    this._handleAnchorPositionChange();
+  protected _onAnchorLocationChange(event: Event) {
+    this._handleAnchorPositionChange(event);
   }
 
   /**
    * Method invoked once a popup is opened.
    */
-  _onPopupOpen(event) {
+  protected _onPopupOpen(event: Event & { popup?: Popup }) { // FIXME TS: add PopupOpenEvent as soon as Desktop has been migrated
     // Make sure child popups don't close the parent popup, we must check parent hierarchy in both directions
     // Use case: Opening of a context menu or cell editor in a form popup
     // Also, popups covered by a glass pane (a modal dialog is open) must never be closed
@@ -720,68 +722,68 @@ export default class Popup extends Widget {
     }
   }
 
-  setHorizontalAlignment(horizontalAlignment) {
+  setHorizontalAlignment(horizontalAlignment: PopupAlignment) {
     this.setProperty('horizontalAlignment', horizontalAlignment);
   }
 
-  _renderHorizontalAlignment() {
+  protected _renderHorizontalAlignment() {
     this._updateArrowClass();
     this.invalidateLayoutTree();
   }
 
-  setVerticalAlignment(verticalAlignment) {
+  setVerticalAlignment(verticalAlignment: PopupAlignment) {
     this.setProperty('verticalAlignment', verticalAlignment);
   }
 
-  _renderVerticalAlignment() {
+  protected _renderVerticalAlignment() {
     this._updateArrowClass();
     this.invalidateLayoutTree();
   }
 
-  setHorizontalSwitch(horizontalSwitch) {
+  setHorizontalSwitch(horizontalSwitch: boolean) {
     this.setProperty('horizontalSwitch', horizontalSwitch);
   }
 
-  _renderHorizontalSwitch() {
+  protected _renderHorizontalSwitch() {
     this.invalidateLayoutTree();
   }
 
-  setVerticalSwitch(verticalSwitch) {
+  setVerticalSwitch(verticalSwitch: boolean) {
     this.setProperty('verticalSwitch', verticalSwitch);
   }
 
-  _renderVerticalSwitch() {
+  protected _renderVerticalSwitch() {
     this.invalidateLayoutTree();
   }
 
-  setTrimWidth(trimWidth) {
+  setTrimWidth(trimWidth: boolean) {
     this.setProperty('trimWidth', trimWidth);
   }
 
-  _renderTrimWidth() {
+  protected _renderTrimWidth() {
     this.invalidateLayoutTree();
   }
 
-  setTrimHeight(trimHeight) {
+  setTrimHeight(trimHeight: boolean) {
     this.setProperty('trimHeight', trimHeight);
   }
 
-  _renderTrimHeight() {
+  protected _renderTrimHeight() {
     this.invalidateLayoutTree();
   }
 
-  prefLocation(verticalAlignment, horizontalAlignment) {
+  prefLocation(verticalAlignment?: PopupAlignment, horizontalAlignment?: PopupAlignment): Point {
     if (!this.boundToAnchor || (!this.anchorBounds && !this.$anchor)) {
       return this._prefLocationWithoutAnchor();
     }
     return this._prefLocationWithAnchor(verticalAlignment, horizontalAlignment);
   }
 
-  _prefLocationWithoutAnchor() {
+  protected _prefLocationWithoutAnchor(): Point {
     return DialogLayout.positionContainerInWindow(this.$container);
   }
 
-  _prefLocationWithAnchor(verticalAlignment, horizontalAlignment) {
+  protected _prefLocationWithAnchor(verticalAlignment?: PopupAlignment, horizontalAlignment?: PopupAlignment): Point {
     let $container = this.$container;
     horizontalAlignment = horizontalAlignment || this.horizontalAlignment;
     verticalAlignment = verticalAlignment || this.verticalAlignment;
@@ -856,13 +858,13 @@ export default class Popup extends Widget {
     return new Point(x, y);
   }
 
-  _alignClasses() {
+  protected _alignClasses(): string {
     let Alignment = Popup.Alignment;
     return strings.join(' ', Alignment.LEFT, Alignment.LEFTEDGE, Alignment.CENTER, Alignment.RIGHT, Alignment.RIGHTEDGE,
       Alignment.TOP, Alignment.TOPEDGE, Alignment.CENTER, Alignment.BOTTOM, Alignment.BOTTOMEDGE);
   }
 
-  getAnchorBounds() {
+  getAnchorBounds(): Rectangle {
     let anchorBounds = this.anchorBounds;
     if (!this.$anchor) {
       // Use manually set anchor bounds
@@ -895,7 +897,7 @@ export default class Popup extends Widget {
     return anchorBounds;
   }
 
-  getWindowSize() {
+  getWindowSize(): Dimension {
     let $window = this.$parent.window();
     return new Dimension($window.width(), $window.height());
   }
@@ -905,7 +907,7 @@ export default class Popup extends Widget {
    * A positive value indicates that it is overlapping the right / bottom border, a negative value indicates that it is overlapping the left / top border.
    * Prefers the right and bottom over the left and top border, meaning if a positive value is returned it does not mean that the left border is overlapping as well.
    */
-  overlap(location, includeMargin) {
+  overlap(location: Point, includeMargin?: boolean): Point {
     let $container = this.$container;
     if (!$container || !location) {
       return null;
@@ -928,7 +930,7 @@ export default class Popup extends Widget {
     return new Point(overlapX, overlapY);
   }
 
-  adjustLocation(location, switchIfNecessary) {
+  adjustLocation(location: Point, switchIfNecessary?: boolean): Point {
     this.calculatedVerticalAlignment = this.verticalAlignment;
     this.calculatedHorizontalAlignment = this.horizontalAlignment;
     let overlap = this.overlap(location);
@@ -988,7 +990,7 @@ export default class Popup extends Widget {
     return location;
   }
 
-  position(switchIfNecessary) {
+  position(switchIfNecessary?: boolean) {
     if (!this.rendered) {
       return;
     }
@@ -996,7 +998,7 @@ export default class Popup extends Widget {
     this._position(switchIfNecessary);
   }
 
-  _position(switchIfNecessary) {
+  protected _position(switchIfNecessary?: boolean) {
     let location = this.prefLocation();
     if (!location) {
       return;
@@ -1005,7 +1007,7 @@ export default class Popup extends Widget {
     this.setLocation(location);
   }
 
-  setLocation(location) {
+  setLocation(location: Point) {
     if (!this.rendered) {
       return;
     }
@@ -1018,7 +1020,7 @@ export default class Popup extends Widget {
   /**
    * Popups with an anchor must only be visible if the anchor is in view (prevents that the popup points at an invisible anchor)
    */
-  _validateVisibility() {
+  protected _validateVisibility() {
     if (!this.boundToAnchor || !this.$anchor) {
       return;
     }
@@ -1036,7 +1038,7 @@ export default class Popup extends Widget {
     }
   }
 
-  _isAnchorInView() {
+  protected _isAnchorInView(): boolean {
     if (!this.boundToAnchor || !this.$anchor) {
       return;
     }
@@ -1044,24 +1046,24 @@ export default class Popup extends Widget {
     return scrollbars.isLocationInView(anchorBounds.center(), this.$anchor.scrollParents());
   }
 
-  _triggerLocationChange() {
+  protected _triggerLocationChange() {
     this.trigger('locationChange');
   }
 
   /**
    * Fire event that this popup is about to open.
    */
-  _triggerPopupOpenEvent() {
-    this.session.desktop.trigger('popupOpen', {
+  protected _triggerPopupOpenEvent() {
+    this.session.desktop.trigger('popupOpen', { // FIXME TS: add PopupOpenEvent as soon as Desktop has been migrated
       popup: this
     });
   }
 
-  belongsTo($anchor) {
+  belongsTo($anchor: JQuery): boolean {
     return this.$anchor[0] === $anchor[0];
   }
 
-  set$Anchor($anchor) {
+  set$Anchor($anchor: JQuery) {
     if (this.$anchor) {
       this._detachAnchorHandlers();
     }
@@ -1075,7 +1077,7 @@ export default class Popup extends Widget {
     }
   }
 
-  isOpen() {
+  isOpen(): boolean {
     return this.rendered;
   }
 
@@ -1085,18 +1087,18 @@ export default class Popup extends Widget {
     }
   }
 
-  setAnchor(anchor) {
+  setAnchor(anchor: Widget) {
     this.setProperty('anchor', anchor);
   }
 
-  _setAnchor(anchor) {
+  protected _setAnchor(anchor: Widget) {
     if (anchor) {
       this.setParent(anchor);
     }
     this._setProperty('anchor', anchor);
   }
 
-  _onAnchorRender() {
+  protected _onAnchorRender(event: Event<Widget>) {
     this.session.layoutValidator.schedulePostValidateFunction(() => {
       if (this.rendered || this.destroyed) {
         return;
@@ -1113,13 +1115,13 @@ export default class Popup extends Widget {
     });
   }
 
-  _renderAnchor() {
+  protected _renderAnchor() {
     if (this.anchor) {
       this.set$Anchor(this.anchor.$container);
     }
   }
 
-  _onWindowResize() {
+  protected _onWindowResize(event: JQuery.ResizeEvent<Window>) {
     if (!this.rendered) {
       // may already be removed if a parent popup is closed during the resize event
       return;
@@ -1134,7 +1136,7 @@ export default class Popup extends Widget {
     }
   }
 
-  _handleGlassPanes() {
+  protected _handleGlassPanes() {
     let parentCoveredByGlassPane = this.session.focusManager.isElementCovertByGlassPane(this.parent.$container);
     // if a popup is covered by a glass pane the glass pane's need to be re-rendered to ensure a glass pane is also painted over the popup
     if (parentCoveredByGlassPane) {

@@ -8,10 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupAdapter} from '../index';
+import {Event, PopupEventMap, WidgetPopup} from '../index';
 
-export default class WidgetPopupAdapter extends PopupAdapter {
-  constructor() {
-    super();
-  }
+export interface WidgetPopupMoveEvent<T extends WidgetPopup = WidgetPopup> extends Event<T> {
+  top: number;
+  left: number;
+}
+
+export default interface WidgetPopupEventMap extends PopupEventMap {
+  'move': WidgetPopupMoveEvent;
 }

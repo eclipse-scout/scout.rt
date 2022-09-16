@@ -706,7 +706,7 @@ describe('Popup', () => {
           trimWidth: true,
           $anchor: $anchor,
           windowPaddingX: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.WrappingContent',
             numBlocks: 3
           }
@@ -728,7 +728,7 @@ describe('Popup', () => {
           trimWidth: true,
           $anchor: $anchor,
           windowPaddingX: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.WrappingContent',
             numBlocks: 3
           }
@@ -753,7 +753,7 @@ describe('Popup', () => {
           trimWidth: true,
           $anchor: $anchor,
           windowPaddingX: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.WrappingContent',
             numBlocks: 4
           }
@@ -779,7 +779,7 @@ describe('Popup', () => {
           trimHeight: true,
           $anchor: $anchor,
           windowPaddingY: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.LargeContent',
             numBlocks: 3
           }
@@ -800,7 +800,7 @@ describe('Popup', () => {
           trimHeight: true,
           $anchor: $anchor,
           windowPaddingY: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.LargeContent',
             numBlocks: 3
           }
@@ -821,7 +821,7 @@ describe('Popup', () => {
           trimHeight: true,
           $anchor: $anchor,
           windowPaddingY: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.LargeContent',
             numBlocks: 10
           }
@@ -844,7 +844,7 @@ describe('Popup', () => {
           verticalSwitch: false,
           $anchor: $anchor,
           windowPaddingY: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.LargeContent',
             numBlocks: 20
           }
@@ -869,7 +869,7 @@ describe('Popup', () => {
           trimHeight: true,
           $anchor: $anchor,
           windowPaddingY: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.LargeContent',
             numBlocks: 4
           }
@@ -997,7 +997,7 @@ describe('Popup', () => {
           verticalSwitch: true,
           $anchor: $anchor,
           windowPaddingY: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.LargeContent',
             numBlocks: 5
           }
@@ -1018,7 +1018,7 @@ describe('Popup', () => {
           verticalSwitch: true,
           $anchor: $anchor,
           windowPaddingY: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.LargeContent',
             numBlocks: 5
           }
@@ -1086,7 +1086,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           withArrow: true,
           scrollType: 'position',
-          widget: {
+          content: {
             objectType: 'scouttests.LargeContent',
             numBlocks: 5
           }
@@ -1113,7 +1113,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           scrollType: 'position',
           withArrow: true,
-          widget: {
+          content: {
             objectType: 'scouttests.LargeContent',
             numBlocks: 5
           }
@@ -1172,7 +1172,7 @@ describe('Popup', () => {
           horizontalSwitch: true,
           $anchor: $anchor,
           windowPaddingX: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.WrappingContent',
             numBlocks: 5
           }
@@ -1193,7 +1193,7 @@ describe('Popup', () => {
           horizontalSwitch: true,
           $anchor: $anchor,
           windowPaddingX: 0,
-          widget: {
+          content: {
             objectType: 'scouttests.WrappingContent',
             numBlocks: 5
           }
