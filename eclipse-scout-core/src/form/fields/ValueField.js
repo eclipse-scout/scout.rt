@@ -399,10 +399,10 @@ export default class ValueField extends FormField {
   }
 
   _getCurrentMenuTypes() {
-    if (this.value) {
-      return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.NotNull];
+    if (objects.isNullOrUndefined(this.value)) {
+      return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.Null];
     }
-    return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.Null];
+    return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.NotNull];
   }
 
   /**

@@ -849,7 +849,7 @@ export default class FormField extends Widget {
   }
 
   getContextMenuItems(onlyVisible = true) {
-    let currentMenuTypes = this._getCurrentMenuTypes();
+    let currentMenuTypes = this.getCurrentMenuTypes();
     if (currentMenuTypes.length) {
       return menuUtil.filter(this.menus, currentMenuTypes, {onlyVisible, defaultMenuTypes: this.defaultMenuTypes});
     } else if (onlyVisible) {
@@ -904,6 +904,10 @@ export default class FormField extends Widget {
 
   _renderMenusVisible() {
     this._updateMenus();
+  }
+
+  getCurrentMenuTypes() {
+    return this._getCurrentMenuTypes();
   }
 
   _getCurrentMenuTypes() {
