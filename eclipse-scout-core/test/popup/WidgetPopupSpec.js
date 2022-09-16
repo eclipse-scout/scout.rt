@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -22,7 +22,7 @@ describe('WidgetPopup', () => {
   function createPopupWithFormAnd2Fields(initialFocus) {
     return scout.create(WidgetPopup, {
       parent: session.desktop,
-      widget: {
+      content: {
         objectType: 'Form',
         displayHint: Form.DisplayHint.VIEW,
         modal: false,
@@ -46,14 +46,14 @@ describe('WidgetPopup', () => {
       let popup = createPopupWithFormAnd2Fields();
       popup.animateOpening = false;
       popup.open();
-      expect(popup.widget.widget('First Field').isFocused()).toBe(true);
+      expect(popup.content.widget('First Field').isFocused()).toBe(true);
     });
 
     it('focuses the element specified by an inner element', () => {
       let popup = createPopupWithFormAnd2Fields('Second Field');
       popup.animateOpening = false;
       popup.open();
-      expect(popup.widget.widget('Second Field').isFocused()).toBe(true);
+      expect(popup.content.widget('Second Field').isFocused()).toBe(true);
     });
 
     it('reverts focus correctly when popup is closed', () => {
@@ -71,7 +71,7 @@ describe('WidgetPopup', () => {
       popup.animateRemoval = false;
       popup.animateOpening = false;
       popup.open();
-      expect(popup.widget.widget('Second Field').isFocused()).toBe(true);
+      expect(popup.content.widget('Second Field').isFocused()).toBe(true);
 
       popup.close();
       expect(field2.isFocused()).toBe(true);

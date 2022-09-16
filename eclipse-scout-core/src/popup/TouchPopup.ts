@@ -1,27 +1,42 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, HtmlComponent, Menu, Point, Popup, scout, SingleLayout, TouchPopupLayout, ValueField} from '../index';
+import {AbstractLayout, Action, DateField, Event, EventHandler, FormField, HtmlComponent, Menu, Point, Popup, PropertyChangeEvent, scout, SingleLayout, SmartField, Tooltip, TouchPopupLayout, TouchPopupModel, ValueField, Widget} from '../index';
 import RowLayout from '../layout/RowLayout';
+import {PopupAlignment} from './Popup';
 
 export default class TouchPopup extends Popup {
+  declare model: TouchPopupModel;
+
+  doneAction: Action;
+  htmlBody: HtmlComponent;
+  $body: JQuery<HTMLDivElement>;
+
+  /** the original touch field from the form */
+  protected _touchField: DateField | SmartField;
+  protected _touchFieldTooltip: Tooltip;
+  /** the cloned field from the popup */
+  protected _field: DateField | SmartField;
+  /** the widget placed below the field */
+  protected _widget: Widget;
+  protected _$widgetContainer: JQuery;
+  protected _$header: JQuery<HTMLDivElement>;
+  protected _widgetContainerHtmlComp: HtmlComponent;
+  protected _touchFieldPropertyChangeListener: EventHandler<PropertyChangeEvent<any>>;
 
   constructor() {
     super();
 
-    // the original touch field from the form
     this._touchField = null;
     this._touchFieldTooltip = null;
-    // the cloned field from the popup
     this._field = null;
-    // the widget placed below the field
     this._widget = null;
     this._$widgetContainer = null;
     this._widgetContainerHtmlComp = null;
@@ -31,7 +46,7 @@ export default class TouchPopup extends Popup {
     this._touchFieldPropertyChangeListener = this._onTouchFieldPropertyChange.bind(this);
   }
 
-  _init(options) {
+  protected override _init(options: TouchPopupModel) {
     super._init(options);
     this._touchField = options.field;
     if (this._touchField._tooltip() && this._touchField._tooltip().rendered) {
@@ -52,7 +67,7 @@ export default class TouchPopup extends Popup {
     this.doneAction.on('action', this._onCloseIconClick.bind(this));
   }
 
-  _destroy() {
+  protected override _destroy() {
     this._touchField.off('propertyChange', this._touchFieldPropertyChangeListener);
     if (this._touchFieldTooltip && !this._touchFieldTooltip.destroyed) {
       // Make tooltip visible again if not destroyed in the meantime
@@ -61,7 +76,7 @@ export default class TouchPopup extends Popup {
     super._destroy();
   }
 
-  _fieldOverrides() {
+  protected _fieldOverrides(): object { // FIXME TS: add return type as soon as FormField has been migrated.
     return {
       parent: this,
       labelVisible: false,
@@ -75,25 +90,22 @@ export default class TouchPopup extends Popup {
     };
   }
 
-  _initWidget(options) {
+  protected _initWidget(options: TouchPopupModel) {
     // NOP
   }
 
-  _createLayout() {
+  protected override _createLayout(): AbstractLayout {
     return new TouchPopupLayout(this);
   }
 
-  /**
-   * @override Popup.js
-   */
-  prefLocation(verticalAlignment, horizontalAlignment) {
+  override prefLocation(verticalAlignment?: PopupAlignment, horizontalAlignment?: PopupAlignment): Point {
     let popupSize = this.htmlComp.prefSize(),
       windowWidth = this.$container.window().width(),
       x = Math.max(this.windowPaddingX, (windowWidth - popupSize.width) / 2);
     return new Point(x, 0);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('popup touch-popup');
     this.$body = this.$container.appendDiv('body');
     this.htmlBody = HtmlComponent.install(this.$body, this.session);
@@ -124,25 +136,26 @@ export default class TouchPopup extends Popup {
     this.htmlComp.setLayout(this._createLayout());
   }
 
-  _handleGlassPanes() {
+  protected override _handleGlassPanes() {
     super._handleGlassPanes();
     if (this._glassPaneRenderer) {
       this._glassPaneRenderer.eachGlassPane($pane => $pane.addClass('dark'));
     }
   }
 
-  _onTouchFieldPropertyChange(event) {
+  protected _onTouchFieldPropertyChange(event: PropertyChangeEvent<any>) {
     if (event.propertyName === 'errorStatus') {
       this._field.setErrorStatus(event.newValue);
     } else if (event.propertyName === 'lookupRow') {
-      this._field.setLookupRow(event.newValue);
+      let smartfield = this._field as SmartField;
+      smartfield.setLookupRow(event.newValue);
     }
   }
 
   /**
    * Calls accept input on the embedded field.
    */
-  _acceptInput() {
+  protected _acceptInput() {
     let promise = this._field.acceptInput();
     if (promise) {
       promise.always(this.close.bind(this));
@@ -151,7 +164,7 @@ export default class TouchPopup extends Popup {
     }
   }
 
-  _onCloseIconClick(event) {
+  protected _onCloseIconClick(event: Event<Menu>) {
     this._acceptInput();
   }
 }

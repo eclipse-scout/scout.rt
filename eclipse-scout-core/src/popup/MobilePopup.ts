@@ -1,16 +1,21 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, HtmlComponent, icons, MobilePopupLayout, Point, scout, WidgetPopup} from '../index';
+import {Action, HtmlComponent, icons, MobilePopupLayout, Point, PopupLayout, scout, WidgetPopup} from '../index';
+import {PopupAlignment} from './Popup';
 
 export default class MobilePopup extends WidgetPopup {
+
+  title: string;
+  $header: JQuery<HTMLDivElement>;
+  $title: JQuery<HTMLDivElement>;
 
   constructor() {
     super();
@@ -20,11 +25,11 @@ export default class MobilePopup extends WidgetPopup {
     this.withGlassPane = true;
   }
 
-  _createLayout() {
+  protected override _createLayout(): PopupLayout {
     return new MobilePopupLayout(this);
   }
 
-  _createCloseAction() {
+  protected override _createCloseAction(): Action {
     return scout.create(Action, {
       parent: this,
       cssClass: 'closer',
@@ -32,14 +37,14 @@ export default class MobilePopup extends WidgetPopup {
     });
   }
 
-  prefLocation(verticalAlignment, horizontalAlignment) {
+  override prefLocation(verticalAlignment?: PopupAlignment, horizontalAlignment?: PopupAlignment): Point {
     let popupSize = this.htmlComp.prefSize(),
       windowHeight = this.$container.window().height(),
       y = Math.max(windowHeight - popupSize.height, 0);
     return new Point(0, y);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('popup mobile-popup');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.validateRoot = true;
@@ -49,28 +54,28 @@ export default class MobilePopup extends WidgetPopup {
     this.$title = this.$header.appendDiv('title');
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderTitle();
   }
 
-  _renderWidget() {
-    super._renderWidget();
-    if (!this.widget) {
+  protected override _renderContent() {
+    super._renderContent();
+    if (!this.content) {
       return;
     }
-    this.widget.$container.addClass('mobile-popup-widget');
+    this.content.$container.addClass('mobile-popup-widget');
   }
 
-  _renderClosable() {
+  protected override _renderClosable() {
     if (this.closeAction) {
       this.closeAction.render(this.$header);
     }
-    this.$header.setVisible(this.title || this.closable);
+    this.$header.setVisible(!!this.title || this.closable);
   }
 
-  _renderTitle() {
+  protected _renderTitle() {
     this.$title.textOrNbsp(this.title);
-    this.$header.setVisible(this.title || this.closable);
+    this.$header.setVisible(!!this.title || this.closable);
   }
 }

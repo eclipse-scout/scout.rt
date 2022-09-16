@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -34,10 +34,10 @@ public class JsonWidgetPopup<T extends IWidgetPopup> extends JsonPopup<T> {
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<T>(IWidgetPopup.PROP_WIDGET, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<T>(IWidgetPopup.PROP_CONTENT, model, getUiSession()) {
       @Override
       protected IWidget modelValue() {
-        return getModel().getWidget();
+        return getModel().getContent();
       }
     });
     putJsonProperty(new JsonProperty<T>(IWidgetPopup.PROP_CLOSABLE, model) {

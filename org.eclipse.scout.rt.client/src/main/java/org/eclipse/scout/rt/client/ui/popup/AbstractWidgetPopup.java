@@ -1,14 +1,17 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.rt.client.ui.popup;
+
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
@@ -17,16 +20,13 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @since 9.0
  */
 @ClassId("4ec758a3-178f-4de9-bc56-a4f28f801df1")
 public abstract class AbstractWidgetPopup<T extends IWidget> extends AbstractPopup implements IWidgetPopup<T> {
 
-  private T m_widget;
+  private T m_content;
 
   public AbstractWidgetPopup() {
     this(true);
@@ -42,9 +42,9 @@ public abstract class AbstractWidgetPopup<T extends IWidget> extends AbstractPop
     setClosable(getConfiguredClosable());
     setMovable(getConfiguredMovable());
     setResizable(getConfiguredResizable());
-    setWidget(createWidget());
-    if (getWidget() instanceof ICompositeField) {
-      FormUtility.rebuildFieldGrid((ICompositeField) getWidget());
+    setContent(createContent());
+    if (getContent() instanceof ICompositeField) {
+      FormUtility.rebuildFieldGrid((ICompositeField) getContent());
     }
   }
 
@@ -90,25 +90,25 @@ public abstract class AbstractWidgetPopup<T extends IWidget> extends AbstractPop
     return propertySupport.getPropertyBool(PROP_RESIZABLE);
   }
 
-  protected Class<T> getConfiguredWidget() {
+  protected Class<T> getConfiguredContent() {
     return null;
   }
 
-  protected T createWidget() {
-    Class<T> configuredWidget = getConfiguredWidget();
-    if (configuredWidget != null) {
-      return ConfigurationUtility.newInnerInstance(this, configuredWidget);
+  protected T createContent() {
+    Class<T> configuredContent = getConfiguredContent();
+    if (configuredContent != null) {
+      return ConfigurationUtility.newInnerInstance(this, configuredContent);
     }
     return null;
   }
 
   @Override
-  public T getWidget() {
-    return m_widget;
+  public T getContent() {
+    return m_content;
   }
 
-  public void setWidget(T widget) {
-    m_widget = widget;
+  public void setContent(T content) {
+    m_content = content;
   }
 
   @Override
@@ -129,6 +129,6 @@ public abstract class AbstractWidgetPopup<T extends IWidget> extends AbstractPop
 
   @Override
   public List<? extends IWidget> getChildren() {
-    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getWidget()));
+    return CollectionUtility.flatten(super.getChildren(), Collections.singletonList(getContent()));
   }
 }

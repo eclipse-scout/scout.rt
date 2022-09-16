@@ -17,7 +17,7 @@ export default class CloseKeyStroke extends KeyStroke {
 
   declare field: CloseableWidget;
 
-  constructor(field: CloseableWidget, $drawingArea: KeystrokeRenderAreaProvider) {
+  constructor(field: CloseableWidget, $drawingArea?: KeystrokeRenderAreaProvider) {
     super();
     this.field = field;
     this.which = [keys.ESC];
