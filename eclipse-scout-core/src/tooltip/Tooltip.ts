@@ -157,11 +157,11 @@ export default class Tooltip extends Widget implements TooltipModel {
     super._remove();
   }
 
-  _destroy() {
+  override _destroy() {
     super._destroy();
     this.menus.forEach(menu => {
       // ContextMenu will only be removed not closed if it has a different owner.
-      // Unfortunately it cannot be rerendered again so the menu will look selected the next time the tooltip is opened -> ensure popup will be closed
+      // Unfortunately it cannot be re-rendered again so the menu will look selected the next time the tooltip is opened -> ensure popup will be closed
       if (menu.popup) {
         menu.popup.close();
       }
