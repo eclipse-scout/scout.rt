@@ -8,9 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, Popup, WidgetEventMap} from '../index';
+import {Event, Popup, PropertyChangeEvent, Widget, WidgetEventMap} from '../index';
+import {PopupAlignment} from './Popup';
 
 export default interface PopupEventMap extends WidgetEventMap {
   'close': Event<Popup>;
   'locationChange': Event<Popup>;
+  'propertyChange:$anchor': PropertyChangeEvent<JQuery>;
+  'propertyChange:anchor': PropertyChangeEvent<Widget>;
+  'propertyChange:horizontalAlignment': PropertyChangeEvent<PopupAlignment>;
+  'propertyChange:horizontalSwitch': PropertyChangeEvent<boolean>;
+  'propertyChange:trimHeight': PropertyChangeEvent<boolean>;
+  'propertyChange:trimWidth': PropertyChangeEvent<boolean>;
+  'propertyChange:verticalAlignment': PropertyChangeEvent<PopupAlignment>;
+  'propertyChange:verticalSwitch': PropertyChangeEvent<boolean>;
+  'propertyChange:withArrow': PropertyChangeEvent<boolean>;
 }

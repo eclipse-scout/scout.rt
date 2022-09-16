@@ -8,13 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, EventEmitter, scout, styles} from '../index';
+import {App, EventEmitter, HtmlEnvironmentEventMap, scout, styles} from '../index';
 
 let instance;
 /**
  * @singleton
  */
 export default class HtmlEnvironment extends EventEmitter {
+  declare eventMap: HtmlEnvironmentEventMap;
+
   formRowHeight: number;
 
   formRowGap: number;

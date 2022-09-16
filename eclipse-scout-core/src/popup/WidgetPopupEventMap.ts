@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, PopupEventMap, WidgetPopup} from '../index';
+import {Event, PopupEventMap, PropertyChangeEvent, Widget, WidgetPopup} from '../index';
 
 export interface WidgetPopupMoveEvent<T extends WidgetPopup = WidgetPopup> extends Event<T> {
   top: number;
@@ -17,4 +17,8 @@ export interface WidgetPopupMoveEvent<T extends WidgetPopup = WidgetPopup> exten
 
 export default interface WidgetPopupEventMap extends PopupEventMap {
   'move': WidgetPopupMoveEvent;
+  'propertyChange:closable': PropertyChangeEvent<boolean>;
+  'propertyChange:content': PropertyChangeEvent<Widget>;
+  'propertyChange:movable': PropertyChangeEvent<boolean>;
+  'propertyChange:resizable': PropertyChangeEvent<boolean>;
 }

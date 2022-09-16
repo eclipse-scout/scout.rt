@@ -8,8 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BusyIndicator, Event, WidgetEventMap} from '../index';
+import {BusyIndicator, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export default interface BusyIndicatorEventMap extends WidgetEventMap {
   'cancel': Event<BusyIndicator>;
+  'propertyChange:details': PropertyChangeEvent<string>;
+  'propertyChange:label': PropertyChangeEvent<string>;
 }
