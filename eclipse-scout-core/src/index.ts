@@ -204,6 +204,8 @@ export {default as CarouselLayout} from './carousel/CarouselLayout';
 export {default as Cell} from './cell/Cell';
 export {default as CellModel} from './cell/CellModel';
 export {default as CollapseHandle} from './collapsehandle/CollapseHandle';
+export {default as CollapseHandleModel} from './collapsehandle/CollapseHandleModel';
+export {default as CollapseHandleEventMap} from './collapsehandle/CollapseHandleEventMap';
 export {default as FocusManager} from './focus/FocusManager';
 export {default as FocusContext} from './focus/FocusContext';
 export {default as focusUtils} from './focus/focusUtils';

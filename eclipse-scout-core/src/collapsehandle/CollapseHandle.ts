@@ -1,30 +1,43 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../index';
+import {CollapseHandleEventMap, CollapseHandleModel, EnumObject, Event, Widget} from '../index';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
-export default class CollapseHandle extends Widget {
+export type CollapseHandleHorizontalAlignment = EnumObject<typeof CollapseHandle.HorizontalAlignment>;
+
+export default class CollapseHandle extends Widget implements CollapseHandleModel {
+  declare model: CollapseHandleModel;
+  declare eventMap: CollapseHandleEventMap;
+
+  leftVisible: boolean;
+  rightVisible: boolean;
+  horizontalAlignment: CollapseHandleHorizontalAlignment;
+  $left: JQuery<HTMLDivElement>;
+  $right: JQuery<HTMLDivElement>;
 
   constructor() {
     super();
     this.leftVisible = true;
     this.rightVisible = true;
     this.horizontalAlignment = CollapseHandle.HorizontalAlignment.LEFT;
+    this.$left = null;
+    this.$right = null;
   }
 
   static HorizontalAlignment = {
     LEFT: 'left',
     RIGHT: 'right'
-  };
+  } as const;
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('collapse-handle');
     this.$container.on('mousedown', this._onMouseDown.bind(this));
 
@@ -32,18 +45,18 @@ export default class CollapseHandle extends Widget {
     this.$right = this.$container.appendDiv('collapse-handle-body right');
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderLeftVisible();
     this._renderRightVisible();
     this._renderHorizontalAlignment();
   }
 
-  setHorizontalAlignment(alignment) {
+  setHorizontalAlignment(alignment: CollapseHandleHorizontalAlignment) {
     this.setProperty('horizontalAlignment', alignment);
   }
 
-  _renderHorizontalAlignment() {
+  protected _renderHorizontalAlignment() {
     this.$container.removeClass('left-aligned right-aligned');
     if (this.horizontalAlignment === CollapseHandle.HorizontalAlignment.LEFT) {
       this.$container.addClass('left-aligned');
@@ -52,25 +65,25 @@ export default class CollapseHandle extends Widget {
     }
   }
 
-  setLeftVisible(visible) {
+  setLeftVisible(visible: boolean) {
     this.setProperty('leftVisible', visible);
   }
 
-  _renderLeftVisible() {
+  protected _renderLeftVisible() {
     this.$left.setVisible(this.leftVisible);
     this._updateVisibilityClasses();
   }
 
-  setRightVisible(visible) {
+  setRightVisible(visible: boolean) {
     this.setProperty('rightVisible', visible);
   }
 
-  _renderRightVisible() {
+  protected _renderRightVisible() {
     this.$right.setVisible(this.rightVisible);
     this._updateVisibilityClasses();
   }
 
-  _updateVisibilityClasses() {
+  protected _updateVisibilityClasses() {
     let bothVisible = this.leftVisible && this.rightVisible;
     this.$container.toggleClass('both-visible', bothVisible);
     this.$left.toggleClass('both-visible', bothVisible);
@@ -78,19 +91,11 @@ export default class CollapseHandle extends Widget {
     this.$container.toggleClass('one-visible', (this.leftVisible || this.rightVisible) && !bothVisible);
   }
 
-  _onLeftMouseDown(event) {
-    this.trigger('action', {
-      left: true
-    });
+  override trigger<K extends string & keyof EventMapOf<CollapseHandle>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<CollapseHandle>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
   }
 
-  _onRightMouseDown(event) {
-    this.trigger('action', {
-      right: true
-    });
-  }
-
-  _onMouseDown(event) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     let target = event.target;
     if (this.$left.isOrHas(target)) {
       this.trigger('action', {
