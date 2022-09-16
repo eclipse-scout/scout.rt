@@ -113,7 +113,7 @@ export default class LookupCall<Key> implements LookupCallModel<Key> {
    *
    * @returns A promise which returns an object that maps every {@link LookupRow} key to the text of the resolved {@link LookupRow}.
    */
-  textsByKeys(keys: Key[]): JQuery.Promise<{ [textKey: string]: string }> {
+  textsByKeys(keys: Key[]): JQuery.Promise<Record<string, string>> {
     if (arrays.empty(keys)) {
       return $.resolvedPromise({});
     }
@@ -125,7 +125,7 @@ export default class LookupCall<Key> implements LookupCallModel<Key> {
    *
    * * @returns A promise which returns an object that maps every {@link LookupRow} key to the text of the resolved {@link LookupRow}.
    */
-  protected _textsByKeys(keys): JQuery.Promise<{ [textKey: string]: string }> {
+  protected _textsByKeys(keys): JQuery.Promise<Record<string, string>> {
     return this
       .cloneForKeys(keys)
       .execute()

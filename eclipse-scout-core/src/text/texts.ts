@@ -13,7 +13,7 @@ import $ from 'jquery';
 
 const TEXT_KEY_REGEX = /\${textKey:([^}]*)}/;
 
-export type TextMapType = { [languageTag: string]: TextMap };
+export type TextMapType = Record<string, TextMap>;
 
 let textsByLocale: TextMapType = {};
 
@@ -45,7 +45,7 @@ export function _preInit(url: string | string[], data: any) {
   init(data);
 }
 
-export function init(model: { [languageTag: string]: { [textKey: string]: string } }) {
+export function init(model: Record<string, Record<string, string>>) {
   Object.keys(model)
     .forEach(languageTag => get(languageTag).addAll(model[languageTag]), this);
 }
@@ -134,7 +134,7 @@ export function put(languageTag: string, textMap: TextMap) {
  * This method returns a map with all found texts. It must be called before scout.prepareDOM()
  * is called, as that method removes all <scout-text> tags.
  */
-export function readFromDOM(): { [textKey: string]: string } {
+export function readFromDOM(): Record<string, string> {
   let textMap = {};
   $('scout-text').each(function() {
     // No need to unescape strings (the browser did this already)

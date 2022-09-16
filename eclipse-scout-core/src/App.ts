@@ -81,6 +81,7 @@ export default class App extends EventEmitter {
     return instance;
   }
 
+  declare model: AppOptions;
   declare eventMap: AppEventMap;
   initialized: boolean;
   sessions: Session[];

@@ -15,7 +15,7 @@ export default class TextMap {
   map: Record<string, string>;
   parent: TextMap;
 
-  constructor(textMap?: { [textKey: string]: string }) {
+  constructor(textMap?: Record<string, string>) {
     this.map = textMap || {};
   }
 
@@ -80,7 +80,7 @@ export default class TextMap {
    * Adds all texts from the given textMap to this textMap
    * @param textMap either a plain object or a {@link TextMap}
    */
-  addAll(textMap: { [textKey: string]: string } | TextMap) {
+  addAll(textMap: Record<string, string> | TextMap) {
     if (!textMap) {
       return;
     }

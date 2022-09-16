@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -17,7 +17,7 @@ import CodeTypeModel from './CodeTypeModel';
  */
 let defaultLanguage = 'en';
 
-let registry: { [codeTypeId: string]: CodeType } = {};
+let registry: Record<string, CodeType> = {};
 
 export function bootstrap(url: string): JQuery.Promise<any> {
   let promise = url ? $.ajaxJson(url) : $.resolvedPromise({});
@@ -144,7 +144,7 @@ export function generateTextKey(code: Code): string {
  * @param textsArg an object with the languageTag as key and the translated text as value
  * @return the generated text key
  */
-export function registerTexts(code: Code, textsArg: { [languageTag: string]: string }): string {
+export function registerTexts(code: Code, textsArg: Record<string, string>): string {
   let key = generateTextKey(code);
 
   // In case of changed defaultLanguage clear the 'default' entry

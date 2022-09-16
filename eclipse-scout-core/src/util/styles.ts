@@ -32,7 +32,7 @@ export interface StyleMap {
  *
  * @param styleProperties in the form {backgroundColor: 'black'}
  */
-export function get(cssClass: string | string[], properties: string | string[], styleProperties?: { [key: string]: string }): StyleMap {
+export function get(cssClass: string | string[], properties: string | string[], styleProperties?: Record<string, string>): StyleMap {
   // create invisible div
   let elem: HTMLDivElement = element;
   if (!elem) {
