@@ -22,7 +22,7 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
   /**
    * Arrays with combinations of keys to prevent from bubbling up in the DOM tree.
    */
-  protected _stopPropagationKeys: { [bitMask: number]: number[] };
+  protected _stopPropagationKeys: Record<number, number[]>;
   protected _handler: ((event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) => boolean) & { $target?: JQuery };
 
   constructor(options?: KeyStrokeContextOptions) {

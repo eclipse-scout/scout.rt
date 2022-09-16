@@ -10,8 +10,26 @@
  */
 import {Box, Device, strings, TextMap} from '../index';
 import $ from 'jquery';
+import LoginAppOptions from './LoginAppOptions';
 
 export default class LoginBox extends Box {
+  declare model: LoginAppOptions;
+
+  ajaxOptions: JQuery.AjaxSettings;
+  authUrl: string;
+  onPostDoneFunc: (data: Record<string, any>) => void;
+  redirectUrl: string;
+  userDataKey: string;
+  passwordDataKey: string;
+  additionalData: Record<string, any>;
+  prepareRedirectUrlFunc: (url: string) => string;
+  messageKey: string;
+  texts: TextMap;
+  $message: JQuery;
+  $form: JQuery;
+  $user: JQuery;
+  $password: JQuery;
+  $button: JQuery;
 
   constructor() {
     super();
@@ -28,22 +46,29 @@ export default class LoginBox extends Box {
     this.additionalData = {};
     this.prepareRedirectUrlFunc = LoginBox.prepareRedirectUrl;
     this.messageKey = null;
-    this.texts = {
+    this.texts = null;
+    this.$message = null;
+    this.$form = null;
+    this.$user = null;
+    this.$password = null;
+    this.$button = null;
+  }
+
+  init(options: LoginAppOptions) {
+    options = options || {};
+    let allTexts = $.extend({
       'ui.Login': 'Login',
       'ui.LoginFailed': 'Login failed',
       'ui.User': 'Username',
       'ui.Password': 'Password'
-    };
-  }
-
-  init(options) {
-    options = options || {};
-    options.texts = new TextMap($.extend(this.texts, options.texts));
+    }, options.texts);
+    delete options.texts;
     options.ajaxOptions = $.extend(this.ajaxOptions, options.ajaxOptions);
     $.extend(this, options);
+    this.texts = new TextMap(allTexts);
   }
 
-  _render() {
+  protected override _render() {
     super._render();
 
     this.$container.addClass('login-box');
@@ -51,7 +76,7 @@ export default class LoginBox extends Box {
     this.$form = $('<form>')
       .attr('action', this.authUrl)
       .attr('method', 'post')
-      .submit(this._onLoginFormSubmit.bind(this))
+      .on('submit', this._onLoginFormSubmit.bind(this))
       .appendTo(this.$content);
     if (this.messageKey) {
       this.$message = $('<div>')
@@ -79,13 +104,13 @@ export default class LoginBox extends Box {
     this.$user.focus();
   }
 
-  _resetButtonText() {
+  protected _resetButtonText() {
     this.$button
       .text(this.texts.get('ui.Login'))
       .removeClass('login-error');
   }
 
-  data() {
+  data(): Record<string, any> {
     let data = {};
     data[this.userDataKey] = this.$user.val();
     data[this.passwordDataKey] = this.$password.val();
@@ -93,7 +118,7 @@ export default class LoginBox extends Box {
     return data;
   }
 
-  _onLoginFormSubmit(event) {
+  protected _onLoginFormSubmit(event: JQuery.SubmitEvent<HTMLElement>) {
     // Prevent default submit action
     event.preventDefault();
 
@@ -120,7 +145,7 @@ export default class LoginBox extends Box {
       .fail(this._onPostFail.bind(this));
   }
 
-  redirect(data) {
+  redirect(data: Record<string, any>) {
     this.$backgroundElements.addClass('box-background-elements-fadeout');
     if (Device.get().supportsCssAnimation()) {
       this.$backgroundElements.oneAnimationEnd(() => {
@@ -132,7 +157,7 @@ export default class LoginBox extends Box {
     }
   }
 
-  _redirect(data) {
+  protected _redirect(data: Record<string, any>) {
     // Calculate target URL
     let url = this.redirectUrl;
     if (!url) {
@@ -149,17 +174,17 @@ export default class LoginBox extends Box {
     }
   }
 
-  _onPostDone(data) {
+  protected _onPostDone(data: Record<string, any>) {
     this.remove();
     this.onPostDoneFunc.call(this, data);
   }
 
-  _onPostFail(jqXHR, textStatus, errorThrown) {
+  protected _onPostFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
     // execute delayed to make sure loading animation is visible, otherwise (if it is very fast), it flickers
     setTimeout(this._onPostFailImpl.bind(this, jqXHR, textStatus, errorThrown), 300);
   }
 
-  _onPostFailImpl(jqXHR, textStatus, errorThrown) {
+  protected _onPostFailImpl(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
     this.$button
       .setEnabled(true)
       .html('')
@@ -179,7 +204,7 @@ export default class LoginBox extends Box {
 
   // ----- Helper functions -----
 
-  static prepareRedirectUrl(url) {
+  static prepareRedirectUrl(url: string): string {
     let urlParts = /^([^?#]*)(\?[^#]*)?(#.*)?$/.exec(url || ''); // $1 = baseUrl, $2 = queryPart, $3 = hashPart
     let filteredBaseUrl = urlParts[1]
       .replace(/login.html$/, '')

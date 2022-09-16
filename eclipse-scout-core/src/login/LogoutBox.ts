@@ -1,24 +1,35 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Box, strings, TextMap, webstorage} from '../index';
+import {Box, LogoutAppOptions, strings, TextMap, webstorage} from '../index';
 import $ from 'jquery';
 
 export default class LogoutBox extends Box {
+  declare model: LogoutAppOptions;
+
+  texts: TextMap;
+  loginUrl: string;
+  options: LogoutAppOptions;
+  $buttonBar: JQuery;
 
   constructor() {
     super();
+
+    this.texts = null;
+    this.loginUrl = null;
+    this.options = null;
+    this.$buttonBar = null;
   }
 
-  init(opts) {
-    let defaultOpts = {
+  init(opts: LogoutAppOptions) {
+    let defaultOpts: LogoutAppOptions = {
       loginUrl: webstorage.getItemFromSessionStorage('scout:loginUrl') || './',
       logoUrl: 'logo.png'
     };
@@ -34,7 +45,7 @@ export default class LogoutBox extends Box {
     this.logoUrl = this.options.logoUrl;
   }
 
-  _render() {
+  protected override _render() {
     super._render();
 
     this.$content.addClass('small centered')
@@ -50,7 +61,7 @@ export default class LogoutBox extends Box {
       .appendTo(this.$buttonBar);
   }
 
-  _loginAgain() {
-    window.location = this.loginUrl;
+  protected _loginAgain() {
+    window.location.href = this.loginUrl;
   }
 }

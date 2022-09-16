@@ -31,7 +31,7 @@ export type DeviceBrowser = EnumObject<typeof Device.Browser>;
 export default class Device implements DeviceModel {
   declare model: DeviceModel;
   userAgent: string;
-  features: { [property: string]: boolean };
+  features: Record<string, boolean>;
   system: DeviceSystem;
   type: DeviceType;
   browser: DeviceBrowser;
