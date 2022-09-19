@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventMap, PropertyChangeEvent} from '../index';
+import {MenuEventMap, PropertyChangeEvent} from '../index';
 
-export default interface PropertyEventMap extends EventMap {
-  'propertyChange': PropertyChangeEvent;
+export default interface EllipsisMenuEventMap extends MenuEventMap {
+  'propertyChange:hidden': PropertyChangeEvent<boolean>;
 }

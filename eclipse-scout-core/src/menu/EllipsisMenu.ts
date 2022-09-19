@@ -8,9 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons, Menu} from '../index';
+import {EllipsisMenuEventMap, EllipsisMenuModel, icons, Menu, Widget} from '../index';
 
-export default class EllipsisMenu extends Menu {
+export default class EllipsisMenu extends Menu implements EllipsisMenuModel {
+  declare model: EllipsisMenuModel;
+  declare eventMap: EllipsisMenuEventMap;
+
+  hidden: boolean;
 
   constructor() {
     super();
@@ -20,45 +24,42 @@ export default class EllipsisMenu extends Menu {
     this.horizontalAlignment = 1;
     this.iconId = icons.ELLIPSIS_V;
     this.tabbable = false;
-    this.rightAligned = false;
     this._addPreserveOnPropertyChangeProperties(['childActions']);
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this.$container.addClass('ellipsis');
   }
 
-  setChildActions(childActions) {
+  override setChildActions(childActions: Menu[]) {
     super.setChildActions(childActions);
 
     if (childActions) {
       // close all actions that have been added to the ellipsis
-      childActions.forEach(ca => {
-        ca.setSelected(false);
-      });
+      childActions.forEach(ca => ca.setSelected(false));
     }
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderHidden();
   }
 
   // add the set hidden function to the ellipsis
-  setHidden(hidden) {
+  setHidden(hidden: boolean) {
     this.setProperty('hidden', hidden);
   }
 
-  _renderHidden() {
+  protected _renderHidden() {
     this.$container.setVisible(!this.hidden);
   }
 
-  isTabTarget() {
+  override isTabTarget(): boolean {
     return super.isTabTarget() && !this.hidden;
   }
 
-  _childrenForEnabledComputed() {
+  protected override _childrenForEnabledComputed(): Widget[] {
     return this.childActions;
   }
 }

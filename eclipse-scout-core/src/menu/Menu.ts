@@ -8,27 +8,65 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, ContextMenuPopup, Event, HtmlComponent, icons, MenuBarPopup, MenuExecKeyStroke, MenuKeyStroke, scout, strings, tooltips, TreeVisitResult} from '../index';
+import {Action, arrays, ContextMenuPopup, EnumObject, Event, HtmlComponent, icons, MenuBarPopup, MenuBarPopupModel, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, scout, strings, tooltips, TreeVisitResult} from '../index';
+import {PopupAlignment} from '../popup/Popup';
+import {CloneOptions, TreeVisitor} from '../widget/Widget';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {MenuOrder} from './MenuItemsOrder';
 
-export default class Menu extends Action {
+export type SubMenuVisibility = EnumObject<typeof Menu.SubMenuVisibility>;
+export type MenuStyle = EnumObject<typeof Menu.MenuStyle>;
+export type MenuFilter = (menus: Menu[], destination: MenuDestinations) => Menu[];
+
+export default class Menu extends Action implements MenuModel {
+  declare model: MenuModel;
+  declare eventMap: MenuEventMap;
+
+  childActions: Menu[];
+
+  /** null = determined by the menu bar */
+  defaultMenu: boolean;
+
+  excludedByFilter: boolean;
+  menuTypes: string[];
+  menuStyle: MenuStyle;
+  uiCssClass: string;
+
+  /**
+   * This property is true when the menu instance was moved into an overflow-menu
+   * when there's not enough space on the screen (see MenuBarLayout). When set to true, button style menus must be displayed as regular menus.
+   */
+  overflown: boolean;
+  overflowMenu: Menu;
+
+  /**
+   * This property is set if this is a subMenu
+   */
+  parentMenu: Menu;
+  ellipsis: boolean;
+  rightAligned: boolean;
+  popup: Popup;
+  popupHorizontalAlignment: PopupAlignment;
+  popupVerticalAlignment: PopupAlignment;
+  stackable: boolean;
+  separator: boolean;
+  shrinkable: boolean;
+  subMenuVisibility: SubMenuVisibility;
+  menuFilter: MenuFilter;
+  createdBy: MenuOrder;
+  $submenuIcon: JQuery;
+  $subMenuBody: JQuery;
+  $placeHolder: JQuery;
 
   constructor() {
     super();
 
     this.childActions = [];
-    this.defaultMenu = null; // null = determined by the menu bar
+    this.defaultMenu = null;
     this.excludedByFilter = false;
     this.menuTypes = [];
     this.menuStyle = Menu.MenuStyle.NONE;
-    /**
-     * This property is true when the menu instance was moved into a overflow-menu
-     * when there's not enough space on the screen (see MenuBarLayout.js). When set
-     * to true, button style menus must be displayed as regular menus.
-     */
     this.overflown = false;
-    /**
-     * This property is set if this is a subMenu
-     */
     this.parentMenu = null;
     this.popup = null;
     this.popupHorizontalAlignment = undefined;
@@ -36,6 +74,7 @@ export default class Menu extends Action {
     this.stackable = true;
     this.separator = false;
     this.shrinkable = false;
+    this.rightAligned = false;
     this.subMenuVisibility = Menu.SubMenuVisibility.DEFAULT;
     this.menuFilter = null;
     this.$submenuIcon = null;
@@ -52,7 +91,7 @@ export default class Menu extends Action {
   static MenuStyle = {
     NONE: 0,
     DEFAULT: 1
-  };
+  } as const;
 
   static SubMenuVisibility = {
     /**
@@ -71,23 +110,20 @@ export default class Menu extends Action {
      * Never: sub-menu icon never visible.
      */
     NEVER: 'never'
-  };
+  } as const;
 
-  _init(options) {
+  protected override _init(options: MenuModel) {
     super._init(options);
     this._setChildActions(this.childActions);
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     this.keyStrokeContext.registerKeyStroke(new MenuExecKeyStroke(this));
   }
 
-  _render() {
+  protected override _render() {
     if (this.separator) {
       this._renderSeparator();
     } else {
@@ -97,7 +133,7 @@ export default class Menu extends Action {
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderOverflown();
     this._renderMenuStyle();
@@ -105,17 +141,17 @@ export default class Menu extends Action {
     this._updateIconAndTextStyle();
   }
 
-  _remove() {
+  protected override _remove() {
     super._remove();
     this.$submenuIcon = null;
     this.$subMenuBody = null;
   }
 
-  _renderSeparator() {
+  protected _renderSeparator() {
     this.$container = this.$parent.appendDiv('menu-separator');
   }
 
-  _renderItem() {
+  protected _renderItem() {
     this.$container = this.$parent.appendDiv('menu-item');
     if (this.uiCssClass) {
       this.$container.addClass(this.uiCssClass);
@@ -130,11 +166,11 @@ export default class Menu extends Action {
     this._renderSubMenuIcon();
   }
 
-  _renderActionStyle() {
+  protected _renderActionStyle() {
     this.$container.toggleClass('menu-button', this.isButton() && !this.overflown);
   }
 
-  _renderSelected() {
+  protected override _renderSelected() {
     if (!this._doActionTogglesSubMenu()) {
       super._renderSelected();
       // Cannot be done in ContextMenuPopup,
@@ -155,22 +191,22 @@ export default class Menu extends Action {
         this._removeSubMenuItems(this);
       } else {
         this._closePopup();
-        this._closeSubMenues();
+        this._closeSubMenus();
       }
     }
     this.$container.toggleClass('has-popup', this._doActionTogglesSubMenu() || this._doActionTogglesPopup());
   }
 
-  _closeSubMenues() {
+  protected _closeSubMenus() {
     this.childActions.forEach(menu => {
       if (menu._doActionTogglesPopup()) {
-        menu._closeSubMenues();
+        menu._closeSubMenus();
         menu.setSelected(false);
       }
     });
   }
 
-  _removeSubMenuItems(parentMenu) {
+  protected _removeSubMenuItems(parentMenu: Menu) {
     if (this.parent instanceof ContextMenuPopup) {
       this.parent.removeSubMenuItems(parentMenu, true);
     } else if (this.parent instanceof Menu) {
@@ -178,12 +214,12 @@ export default class Menu extends Action {
     }
   }
 
-  _renderSubMenuItems(parentMenu, menus) {
+  protected _renderSubMenuItems(parentMenu: Menu, menus: Menu[]) {
     let parent = this.parent;
     if (parent instanceof ContextMenuPopup) {
       parent.renderSubMenuItems(parentMenu, menus, true);
       let closeHandler = event => parentMenu.setSelected(false);
-      let selectedChangeChangeHandler = event => {
+      let selectedChangeChangeHandler = (event: PropertyChangeEvent<boolean>) => {
         if (event.newValue === false) {
           parent.off('destroy', closeHandler);
           parentMenu.off('propertyChange:selected', selectedChangeChangeHandler);
@@ -199,13 +235,13 @@ export default class Menu extends Action {
   /**
    * Override this method to control the toggles sub-menu behavior when this menu instance is used as parent.
    * Some menu sub-classes like the ComboMenu need to show the popup menu instead.
-   * @see: #_doActionTogglesSubMenu
+   * @see _doActionTogglesSubMenu
    */
-  _togglesSubMenu() {
+  protected _togglesSubMenu(): boolean {
     return true;
   }
 
-  _doActionTogglesSubMenu() {
+  protected _doActionTogglesSubMenu(): boolean {
     if (!this.childActions.length) {
       return false;
     }
@@ -218,16 +254,9 @@ export default class Menu extends Action {
     return false;
   }
 
-  _getSubMenuLevel() {
-    if (this.parent instanceof ContextMenuPopup) {
-      return 0;
-    }
-    return super._getSubMenuLevel() + 1;
-  }
-
-  _onMouseEvent(event) {
+  protected _onMouseEvent(event: JQuery.MouseEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     if (event.type === 'mousedown') {
-      this._doubleClickSupport.mousedown(event);
+      this._doubleClickSupport.mousedown(event as JQuery.MouseDownEvent);
     }
     if (!this._allowMouseEvent(event)) {
       return;
@@ -250,26 +279,26 @@ export default class Menu extends Action {
   /**
    * May be overridden if the criteria to open a popup differs
    */
-  _doActionTogglesPopup() {
+  protected _doActionTogglesPopup(): boolean {
     return this.childActions.length > 0;
   }
 
-  _renderChildActions() {
+  protected _renderChildActions() {
     // Child action in a sub menu cannot be replaced dynamically, popup has to be closed first.
     if (!this.rendering) {
       this._renderSubMenuIcon();
     }
   }
 
-  setSubMenuVisibility(subMenuVisibility) {
+  setSubMenuVisibility(subMenuVisibility: SubMenuVisibility) {
     this.setProperty('subMenuVisibility', subMenuVisibility);
   }
 
-  _renderSubMenuVisibility() {
+  protected _renderSubMenuVisibility() {
     this._renderSubMenuIcon();
   }
 
-  _renderSubMenuIcon() {
+  protected _renderSubMenuIcon() {
     let visible = false;
 
     // calculate visibility of sub-menu icon
@@ -279,7 +308,7 @@ export default class Menu extends Action {
           visible = this._hasText();
           break;
         case Menu.SubMenuVisibility.TEXT_OR_ICON:
-          visible = this._hasText() || this.iconId;
+          visible = this._hasText() || !!this.iconId;
           break;
         case Menu.SubMenuVisibility.ALWAYS:
           visible = true;
@@ -311,7 +340,7 @@ export default class Menu extends Action {
     }
   }
 
-  _renderText() {
+  protected override _renderText() {
     super._renderText();
     this.$container.toggleClass('has-text', strings.hasText(this.text) && this.textVisible);
     if (!this.rendering) {
@@ -320,7 +349,7 @@ export default class Menu extends Action {
     this.invalidateLayoutTree();
   }
 
-  _renderTextPosition() {
+  protected override _renderTextPosition() {
     super._renderTextPosition();
     let $parent = this.$container;
     if (this.textPosition === Action.TextPosition.BOTTOM && this.$text && this.iconId) {
@@ -333,7 +362,7 @@ export default class Menu extends Action {
     }
   }
 
-  _renderIconId() {
+  protected override _renderIconId() {
     super._renderIconId();
     this.$container.toggleClass('has-icon', !!this.iconId);
     if (!this.rendering) {
@@ -342,15 +371,12 @@ export default class Menu extends Action {
     this.invalidateLayoutTree();
   }
 
-  isTabTarget() {
+  isTabTarget(): boolean {
     return this.enabledComputed && this.visible && !this.overflown && (this.isButton() || !this.separator)
       && (!this.parentMenu || this.parentMenu.visible && !this.parentMenu.overflown); // Necessary for ComboMenu -> must return false if ComboMenu (parentMenu) is not shown
   }
 
-  /**
-   * @override Widget.js
-   */
-  recomputeEnabled(parentEnabled) {
+  override recomputeEnabled(parentEnabled?: boolean) {
     if (parentEnabled === undefined) {
       parentEnabled = this._getInheritedAccessibility();
     }
@@ -386,8 +412,8 @@ export default class Menu extends Action {
    * The enabled state of the container must be used because the parent menu might be a menu which is only enabled because it has children with inheritAccessibility=false.
    * One exception: if a parent menu itself is inheritAccessibility=false. Then the container is not relevant anymore but this parent is taken instead.
    */
-  _getInheritedAccessibility() {
-    let menu = this;
+  protected _getInheritedAccessibility(): boolean {
+    let menu: Menu = this;
     let rootMenu = menu;
     while (menu) {
       if (!menu.inheritAccessibility) {
@@ -405,8 +431,8 @@ export default class Menu extends Action {
     return true;
   }
 
-  _findRootMenu() {
-    let menu = this;
+  protected _findRootMenu(): Menu {
+    let menu: Menu = this;
     let result;
     while (menu) {
       result = menu;
@@ -415,7 +441,7 @@ export default class Menu extends Action {
     return result;
   }
 
-  _hasAccessibleChildMenu() {
+  protected _hasAccessibleChildMenu(): boolean {
     let childFound = false;
     this.visitChildMenus(child => {
       if (!child.inheritAccessibility && child.enabled /* do not use enabledComputed here */ && child.visible) {
@@ -431,7 +457,7 @@ export default class Menu extends Action {
    * cannot use Widget#visitChildren() here because the child actions are not always part of the children collection
    * e.g. for ellipsis menus which declare childActions as 'PreserveOnPropertyChangeProperties'. this means the childActions are not automatically added to the children list even it is a widget property!
    */
-  visitChildMenus(visitor) {
+  visitChildMenus(visitor: TreeVisitor<Menu>): TreeVisitResult {
     for (let i = 0; i < this.childActions.length; i++) {
       let child = this.childActions[i];
       if (child instanceof Menu) {
@@ -441,7 +467,7 @@ export default class Menu extends Action {
           return TreeVisitResult.TERMINATE;
         } else if (treeVisitResult !== TreeVisitResult.SKIP_SUBTREE) {
           treeVisitResult = child.visitChildMenus(visitor);
-          if (treeVisitResult === true || treeVisitResult === TreeVisitResult.TERMINATE) {
+          if (treeVisitResult === TreeVisitResult.TERMINATE) {
             return TreeVisitResult.TERMINATE;
           }
         }
@@ -449,11 +475,11 @@ export default class Menu extends Action {
     }
   }
 
-  _hasText() {
+  protected _hasText(): boolean {
     return strings.hasText(this.text) && this.textVisible;
   }
 
-  _updateIconAndTextStyle() {
+  protected _updateIconAndTextStyle() {
     let hasText = this._hasText();
     let hasTextAndIcon = !!(hasText && this.iconId);
     let hasIcon = !!this.iconId;
@@ -463,13 +489,13 @@ export default class Menu extends Action {
     this.$container.toggleClass('menu-icononly', !hasText && hasOneIcon);
   }
 
-  _closePopup() {
+  protected _closePopup() {
     if (this.popup && !this.popup.isRemovalPending()) {
       this.popup.close();
     }
   }
 
-  _canOpenPopup() {
+  protected _canOpenPopup(): boolean {
     if (this.popup && this.popup.isRemovalPending()) {
       // If the popup should be opened while it is being removed, the popup needs to be removed immediately before it can be opened (the remove animation won't complete).
       // This is necessary to always have a consistent state between menu and popup (e.g. if menu is selected while the popup is removed).
@@ -489,7 +515,7 @@ export default class Menu extends Action {
     return true;
   }
 
-  _openPopup() {
+  protected _openPopup() {
     if (!this._canOpenPopup()) {
       return;
     }
@@ -499,17 +525,15 @@ export default class Menu extends Action {
       this.popup = null;
     });
     // Unselect on close which comes earlier than destroy (before the animation), to give more immediate feedback
-    this.popup.on('close', event => {
-      this.setSelected(false);
-    });
+    this.popup.on('close', event => this.setSelected(false));
 
     if (this.uiCssClass) {
       this.popup.$container.addClass(this.uiCssClass);
     }
   }
 
-  _createPopup(event) {
-    let options = {
+  protected _createPopup(): Popup {
+    let options: MenuBarPopupModel = {
       parent: this,
       menu: this,
       menuFilter: this.menuFilter,
@@ -520,31 +544,30 @@ export default class Menu extends Action {
     return scout.create(MenuBarPopup, options);
   }
 
-  _createActionKeyStroke() {
+  protected override _createActionKeyStroke(): MenuKeyStroke {
     return new MenuKeyStroke(this);
   }
 
-  isToggleAction() {
+  override isToggleAction(): boolean {
     return this.childActions.length > 0 || this.toggleAction;
   }
 
-  isButton() {
+  isButton(): boolean {
     return Action.ActionStyle.BUTTON === this.actionStyle;
   }
 
   /**
    * @deprecated use insertChildActions instead
-   * @param childActions
    */
-  addChildActions(childActions) {
+  addChildActions(childActions: Menu | Menu[]) {
     this.insertChildActions(childActions);
   }
 
-  insertChildAction(actionsToInsert) {
+  insertChildAction(actionsToInsert: Menu) {
     this.insertChildActions([actionsToInsert]);
   }
 
-  insertChildActions(actionsToInsert) {
+  insertChildActions(actionsToInsert: Menu | Menu[]) {
     actionsToInsert = arrays.ensure(actionsToInsert);
     if (actionsToInsert.length === 0) {
       return;
@@ -552,11 +575,11 @@ export default class Menu extends Action {
     this.setChildActions(this.childActions.concat(actionsToInsert));
   }
 
-  deleteChildAction(actionToDelete) {
+  deleteChildAction(actionToDelete: Menu) {
     this.deleteChildActions([actionToDelete]);
   }
 
-  deleteChildActions(actionsToDelete) {
+  deleteChildActions(actionsToDelete: Menu | Menu[]) {
     actionsToDelete = arrays.ensure(actionsToDelete);
     if (actionsToDelete.length === 0) {
       return;
@@ -566,11 +589,11 @@ export default class Menu extends Action {
     this.setChildActions(actions);
   }
 
-  setChildActions(childActions) {
+  setChildActions(childActions: Menu[]) {
     this.setProperty('childActions', childActions);
   }
 
-  _setChildActions(childActions) {
+  protected _setChildActions(childActions: Menu[]) {
     // disconnect existing
     this.childActions.forEach(childAction => {
       childAction.parentMenu = null;
@@ -588,34 +611,28 @@ export default class Menu extends Action {
     }
   }
 
-  /**
-   * @override Widget.js
-   */
-  _setInheritAccessibility(inheritAccessibility) {
+  protected override _setInheritAccessibility(inheritAccessibility: boolean) {
     let changed = this._setProperty('inheritAccessibility', inheritAccessibility);
     if (changed) {
       this._recomputeEnabledInMenuHierarchy();
     }
   }
 
-  /**
-   * @override Widget.js
-   */
-  _setEnabled(enabled) {
+  protected override _setEnabled(enabled: boolean) {
     let changed = this._setProperty('enabled', enabled);
     if (changed) {
       this._recomputeEnabledInMenuHierarchy();
     }
   }
 
-  _setVisible(visible) {
+  protected _setVisible(visible: boolean) {
     let changed = this._setProperty('visible', visible);
     if (changed) {
       this._recomputeEnabledInMenuHierarchy();
     }
   }
 
-  _recomputeEnabledInMenuHierarchy() {
+  protected _recomputeEnabledInMenuHierarchy() {
     if (!this.initialized) {
       return;
     }
@@ -627,7 +644,7 @@ export default class Menu extends Action {
     }
   }
 
-  setSelected(selected) {
+  override setSelected(selected: boolean) {
     if (selected === this.selected) {
       return;
     }
@@ -641,26 +658,26 @@ export default class Menu extends Action {
     }
   }
 
-  _handleSelectedInEllipsis() {
+  protected _handleSelectedInEllipsis() {
     // If the selection toggles a popup, open the ellipsis menu as well, otherwise the popup would not be shown
     if (this.selected) {
       this.overflowMenu.setSelected(true);
     }
   }
 
-  setStackable(stackable) {
+  setStackable(stackable: boolean) {
     this.setProperty('stackable', stackable);
   }
 
-  _renderStackable() {
+  protected _renderStackable() {
     this.invalidateLayoutTree();
   }
 
-  setShrinkable(shrinkable) {
+  setShrinkable(shrinkable: boolean) {
     this.setProperty('shrinkable', shrinkable);
   }
 
-  _renderShrinkable() {
+  protected _renderShrinkable() {
     this.invalidateLayoutTree();
   }
 
@@ -668,7 +685,7 @@ export default class Menu extends Action {
    * For internal usage only.
    * Used by the MenuBarLayout when a menu is moved to the ellipsis drop down.
    */
-  _setOverflown(overflown) {
+  protected _setOverflown(overflown: boolean) {
     if (this.overflown === overflown) {
       return;
     }
@@ -678,50 +695,48 @@ export default class Menu extends Action {
     }
   }
 
-  _renderOverflown() {
+  protected _renderOverflown() {
     this.$container.toggleClass('overflown', this.overflown);
     this._renderActionStyle();
   }
 
-  setMenuTypes(menuTypes) {
+  setMenuTypes(menuTypes: string[]) {
     this.setProperty('menuTypes', menuTypes);
   }
 
-  setMenuStyle(menuStyle) {
+  setMenuStyle(menuStyle: MenuStyle) {
     this.setProperty('menuStyle', menuStyle);
   }
 
-  _renderMenuStyle() {
+  protected _renderMenuStyle() {
     this.$container.toggleClass('default', this.menuStyle === Menu.MenuStyle.DEFAULT);
   }
 
-  setDefaultMenu(defaultMenu) {
+  setDefaultMenu(defaultMenu: boolean) {
     this.setProperty('defaultMenu', defaultMenu);
   }
 
-  setMenuFilter(menuFilter) {
+  setMenuFilter(menuFilter: MenuFilter) {
     this.setProperty('menuFilter', menuFilter);
-    this.childActions.forEach(child => {
-      child.setMenuFilter(menuFilter);
-    });
+    this.childActions.forEach(child => child.setMenuFilter(menuFilter));
   }
 
-  clone(model, options) {
+  override clone(model: MenuModel, options: CloneOptions): Menu {
     let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'childActions', options);
     clone._setChildActions(clone.childActions);
     return clone;
   }
 
-  /**
-   * @override
-   */
-  focus() {
-    let event = new Event({source: this});
-    this.trigger('focus', event);
+  override focus(): boolean {
+    let event = this.trigger('focus');
     if (!event.defaultPrevented) {
       return super.focus();
     }
     return false;
+  }
+
+  override trigger<K extends string & keyof EventMapOf<Menu>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Menu>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
   }
 }

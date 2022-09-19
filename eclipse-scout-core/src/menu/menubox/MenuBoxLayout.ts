@@ -1,29 +1,30 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, graphics, menus as menuUtil} from '../../index';
+import {AbstractLayout, Dimension, EllipsisMenu, graphics, HtmlCompPrefSizeOptions, Menu, MenuBox, menus as menuUtil} from '../../index';
 
 export default class MenuBoxLayout extends AbstractLayout {
+  menuBox: MenuBox;
+  /** References to prevent too many DOM updates */
+  firstMenu: Menu;
+  lastMenu: Menu;
+  protected _ellipsis: EllipsisMenu;
 
-  constructor(menuBox) {
+  constructor(menuBox: MenuBox) {
     super();
     this.menuBox = menuBox;
-    // References to prevent too many DOM updates
     this.firstMenu = null;
     this.lastMenu = null;
   }
 
-  /**
-   * @override AbstractLayout.js
-   */
-  layout($container) {
+  override layout($container: JQuery) {
     let htmlContainer = this.menuBox.htmlComp,
       containerSize = htmlContainer.size(),
       menus = this.visibleMenus(),
@@ -67,10 +68,10 @@ export default class MenuBoxLayout extends AbstractLayout {
     }
 
     // Third approach: Create ellipsis and move overflown menus into it
-    this.collapse(menus, containerSize, menusWidth);
+    this.collapse(containerSize, menusWidth);
   }
 
-  preferredLayoutSize($container) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let menus = this.visibleMenus();
 
     this.updateFirstAndLastMenuMarker(menus);
@@ -81,7 +82,7 @@ export default class MenuBoxLayout extends AbstractLayout {
     return this.actualPrefSize();
   }
 
-  compact(menus) {
+  compact(menus?: Menu[]) {
     if (this.menuBox.compactOrig === undefined) {
       this.menuBox.compactOrig = this.menuBox.compact;
       this.menuBox.htmlComp.suppressInvalidate = true;
@@ -92,7 +93,7 @@ export default class MenuBoxLayout extends AbstractLayout {
     this.compactMenus(menus);
   }
 
-  undoCompact(menus) {
+  undoCompact(menus?: Menu[]) {
     if (this.menuBox.compactOrig !== undefined) {
       this.menuBox.htmlComp.suppressInvalidate = true;
       this.menuBox.setCompact(this.menuBox.compactOrig);
@@ -106,7 +107,7 @@ export default class MenuBoxLayout extends AbstractLayout {
   /**
    * Sets all menus into compact mode.
    */
-  compactMenus(menus) {
+  compactMenus(menus?: Menu[]) {
     menus = menus || this.visibleMenus();
     menus.forEach(menu => {
       if (menu.compactOrig !== undefined) {
@@ -127,7 +128,7 @@ export default class MenuBoxLayout extends AbstractLayout {
   /**
    * Restores to the previous state of the compact property.
    */
-  undoCompactMenus(menus) {
+  undoCompactMenus(menus?: Menu[]) {
     menus = menus || this.visibleMenus();
     menus.forEach(menu => {
       if (menu.compactOrig === undefined) {
@@ -145,14 +146,14 @@ export default class MenuBoxLayout extends AbstractLayout {
     }
   }
 
-  shrink(menus) {
+  shrink(menus?: Menu[]) {
     this.shrinkMenus(menus);
   }
 
   /**
    * Makes the text invisible of all menus with an icon.
    */
-  shrinkMenus(menus) {
+  shrinkMenus(menus?: Menu[]) {
     menus = menus || this.visibleMenus();
     menus.forEach(menu => {
       if (menu.textVisibleOrig !== undefined) {
@@ -168,11 +169,11 @@ export default class MenuBoxLayout extends AbstractLayout {
     });
   }
 
-  undoShrink(menus) {
+  undoShrink(menus?: Menu[]) {
     this.undoShrinkMenus(menus);
   }
 
-  undoShrinkMenus(menus) {
+  undoShrinkMenus(menus?: Menu[]) {
     menus = menus || this.visibleMenus();
     menus.forEach(menu => {
       if (menu.textVisibleOrig === undefined) {
@@ -186,7 +187,7 @@ export default class MenuBoxLayout extends AbstractLayout {
     });
   }
 
-  collapse(menus, containerSize, menusWidth) {
+  collapse(containerSize: Dimension, menusWidth: number) {
     this._createAndRenderEllipsis(this.menuBox.$container);
     let collapsedMenus = this._moveOverflowMenusIntoEllipsis(containerSize, menusWidth);
     this.updateFirstAndLastMenuMarker(collapsedMenus);
@@ -195,13 +196,13 @@ export default class MenuBoxLayout extends AbstractLayout {
   /**
    * Undoes the collapsing by removing ellipsis and rendering non rendered menus.
    */
-  undoCollapse(menus) {
+  undoCollapse(menus?: Menu[]) {
     menus = menus || this.visibleMenus();
     this._destroyEllipsis();
     this._removeMenusFromEllipsis(menus);
   }
 
-  _createAndRenderEllipsis($container) {
+  protected _createAndRenderEllipsis($container: JQuery) {
     let ellipsis = menuUtil.createEllipsisMenu({
       parent: this.menuBox,
       hidden: false,
@@ -212,7 +213,7 @@ export default class MenuBoxLayout extends AbstractLayout {
     this._ellipsis = ellipsis;
   }
 
-  _destroyEllipsis() {
+  protected _destroyEllipsis() {
     if (this._ellipsis) {
       this._ellipsis.destroy();
       this._ellipsis = null;
@@ -223,8 +224,8 @@ export default class MenuBoxLayout extends AbstractLayout {
    * Moves every menu which doesn't fit into the container into the ellipsis menu.
    * Returns the list of "surviving" menus (with the ellipsis menu being the last element).
    */
-  _moveOverflowMenusIntoEllipsis(containerSize, menusWidth) {
-    let collapsedMenus = [this._ellipsis];
+  protected _moveOverflowMenusIntoEllipsis(containerSize: Dimension, menusWidth: number): Menu[] {
+    let collapsedMenus: Menu[] = [this._ellipsis];
     let ellipsisSize = graphics.size(this._ellipsis.$container, true);
     menusWidth += ellipsisSize.width;
     this.visibleMenus().slice().reverse().forEach(menu => {
@@ -240,12 +241,12 @@ export default class MenuBoxLayout extends AbstractLayout {
     return collapsedMenus;
   }
 
-  _removeMenusFromEllipsis(menus) {
+  protected _removeMenusFromEllipsis(menus?: Menu[]) {
     menus = menus || this.visibleMenus();
     menus.forEach(menu => menuUtil.removeMenuFromEllipsis(menu, this.menuBox.$container));
   }
 
-  actualPrefSize(menus) {
+  actualPrefSize(menus?: Menu[]): Dimension {
     menus = menus || this.visibleMenus();
     let menusWidth = this._menusWidth(menus);
     let prefSize = graphics.prefSize(this.menuBox.$container);
@@ -254,9 +255,9 @@ export default class MenuBoxLayout extends AbstractLayout {
   }
 
   /**
-   * @return {number} the current width of all menus incl. the ellipsis
+   * @returns the current width of all menus incl. the ellipsis
    */
-  _menusWidth(menus) {
+  protected _menusWidth(menus?: Menu[]): number {
     let menusWidth = 0;
     let size = menu => graphics.size(menu.htmlComp.$comp, {includeMargin: true, exact: true});
 
@@ -273,7 +274,7 @@ export default class MenuBoxLayout extends AbstractLayout {
     return menusWidth;
   }
 
-  compactPrefSize(menus) {
+  compactPrefSize(menus?: Menu[]): Dimension {
     menus = menus || this.visibleMenus();
 
     this.updateFirstAndLastMenuMarker(menus);
@@ -284,7 +285,7 @@ export default class MenuBoxLayout extends AbstractLayout {
     return this.actualPrefSize();
   }
 
-  shrinkPrefSize(menus) {
+  shrinkPrefSize(menus?: Menu[]): Dimension {
     menus = menus || this.visibleMenus();
 
     this.updateFirstAndLastMenuMarker(menus);
@@ -295,11 +296,11 @@ export default class MenuBoxLayout extends AbstractLayout {
     return this.actualPrefSize();
   }
 
-  visibleMenus() {
+  visibleMenus(): Menu[] {
     return this.menuBox.menus.filter(menu => menu.visible);
   }
 
-  updateFirstAndLastMenuMarker(menus) {
+  updateFirstAndLastMenuMarker(menus?: Menu[]) {
     // Find first and last rendered menu
     let firstMenu = null;
     let lastMenu = null;

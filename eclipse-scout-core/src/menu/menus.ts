@@ -8,22 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EllipsisMenu, MenuDestinations, scout} from '../index';
+import {arrays, EllipsisMenu, EllipsisMenuModel, Menu, MenuDestinations, scout} from '../index';
 import $ from 'jquery';
 
-/**
- * @typedef MenuFilterOptions
- * @property {boolean?} onlyVisible
- * @property {boolean?} enableDisableKeyStrokes
- * @property {string[]?} notAllowedTypes
- * @property {string[]?} defaultMenuTypes
- */
+export type MenuFilterOptions = {
+  onlyVisible?: boolean;
+  enableDisableKeyStrokes?: boolean;
+  notAllowedTypes?: string | string[];
+  defaultMenuTypes?: string | string[];
+};
 
-/**
- * @param {MenuFilterOptions?} options
- */
-export function filterAccordingToSelection(prefix, selectionLength, menus, destination, options) {
-  let allowedTypes = [],
+export function filterAccordingToSelection(prefix: string, selectionLength: number, menus: Menu[], destination: MenuDestinations, options?: MenuFilterOptions): Menu[] {
+  let allowedTypes: string[] = [],
     {notAllowedTypes} = options || {};
 
   if (destination === MenuDestinations.MENU_BAR) {
@@ -58,10 +54,8 @@ export function filterAccordingToSelection(prefix, selectionLength, menus, desti
  * from this method. The visible state is only checked if the parameter onlyVisible is set to true. Otherwise invisible items are returned and added to the
  * menu-bar DOM (invisible, however). They may change their visible state later. If there are any types in notAllowedTypes each menu is checked also against
  * these types and if they are matching the menu is filtered.
- *
- * @param {MenuFilterOptions?} options
  */
-export function filter(menus, types, options) {
+export function filter(menus: Menu[], types: string | string[], options?: MenuFilterOptions): Menu[] {
   if (!menus) {
     return;
   }
@@ -70,8 +64,7 @@ export function filter(menus, types, options) {
   notAllowedTypes = arrays.ensure(notAllowedTypes);
   defaultMenuTypes = arrays.ensure(defaultMenuTypes);
 
-  let filteredMenus = [],
-    separatorCount = 0;
+  let filteredMenus = [], separatorCount = 0;
 
   menus.forEach(menu => {
     let childMenus = menu.childActions;
@@ -108,20 +101,16 @@ export function filter(menus, types, options) {
 /**
  * Makes leading, trailing and duplicate separators invisible or reverts the visibility change if needed.
  */
-export function updateSeparatorVisibility(menus) {
+export function updateSeparatorVisibility(menus: Menu | Menu[]) {
   menus = arrays.ensure(menus);
-
-  menus = menus.filter(menu => {
-    return menu.visible || menu.separator;
-  });
-
+  menus = menus.filter(menu => menu.visible || menu.separator);
   if (menus.length === 0) {
     return;
   }
 
   let hasMenuBefore = false;
   let hasMenuAfter = false;
-  menus.forEach((menu, i) => {
+  menus.forEach((menu: Menu & { visibleOrig: boolean }, i: number) => {
     if (menu.ellipsis) {
       return;
     }
@@ -145,16 +134,16 @@ export function updateSeparatorVisibility(menus) {
   });
 }
 
-export function checkType(menu, types, defaultMenuTypes = []) {
+export function checkType(menu: Menu, types: string | string[], defaultMenuTypes: string | string[] = []): boolean {
   types = arrays.ensure(types);
   if (menu.childActions.length > 0) {
     let childMenus = filter(menu.childActions, types);
-    return (childMenus.length > 0);
+    return childMenus.length > 0;
   }
   return _checkType(menu, types, defaultMenuTypes);
 }
 
-export function _enableDisableMenuKeyStroke(menu, activated, exclude) {
+export function _enableDisableMenuKeyStroke(menu: Menu, activated: boolean, exclude: boolean) {
   if (activated) {
     menu.excludedByFilter = exclude;
   }
@@ -164,7 +153,7 @@ export function _enableDisableMenuKeyStroke(menu, activated, exclude) {
  * Checks the type of a menu. Don't use this for menu groups.
  */
 
-export function _checkType(menu, types, defaultMenuTypes = []) {
+export function _checkType(menu: Menu, types, defaultMenuTypes: string | string[] = []): boolean {
   if (!types || types.length === 0) {
     return false;
   }
@@ -178,14 +167,16 @@ export function _checkType(menu, types, defaultMenuTypes = []) {
       return true;
     }
   }
+  return false;
 }
 
-export function createEllipsisMenu(options) {
+export function createEllipsisMenu(options: EllipsisMenuModel): EllipsisMenu {
   return scout.create(EllipsisMenu, options);
 }
 
-export function moveMenuIntoEllipsis(menu, ellipsis) {
+export function moveMenuIntoEllipsis(menu: Menu, ellipsis: EllipsisMenu) {
   menu.remove();
+  // @ts-ignore
   menu._setOverflown(true);
   menu.overflowMenu = ellipsis;
 
@@ -194,7 +185,8 @@ export function moveMenuIntoEllipsis(menu, ellipsis) {
   ellipsis.setChildActions(menusInEllipsis);
 }
 
-export function removeMenuFromEllipsis(menu, $parent) {
+export function removeMenuFromEllipsis(menu: Menu, $parent: JQuery) {
+  // @ts-ignore
   menu._setOverflown(false);
   menu.overflowMenu = null;
   if (!menu.rendered) {

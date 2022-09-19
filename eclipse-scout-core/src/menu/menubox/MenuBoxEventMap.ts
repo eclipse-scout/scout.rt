@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventMap, PropertyChangeEvent} from '../index';
+import {Menu, PropertyChangeEvent, WidgetEventMap} from '../../index';
 
-export default interface PropertyEventMap extends EventMap {
-  'propertyChange': PropertyChangeEvent;
+export default interface MenuBoxEventMap extends WidgetEventMap {
+  'propertyChange:compact': PropertyChangeEvent<boolean>;
+  'propertyChange:menus': PropertyChangeEvent<Menu[]>;
 }

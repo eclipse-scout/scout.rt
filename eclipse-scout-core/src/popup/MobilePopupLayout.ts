@@ -39,7 +39,7 @@ export default class MobilePopupLayout extends PopupLayout {
     htmlWidget.setSize(widgetSize.subtract(htmlWidget.margins()));
   }
 
-  override preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let $window = this.popup.$container.window();
     return new Dimension($window.width(), $window.height());
   }

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,10 +13,10 @@ import $ from 'jquery';
 
 export interface RowLayoutOptions {
   /** If true, all elements will be as width as the container. Default is true. */
-  stretch: boolean;
+  stretch?: boolean;
 
   /** If false, the layout won't change the size of the elements and just calls {@link HtmlComponent.validateLayout}. Default is true. */
-  pixelBasedSizing: boolean;
+  pixelBasedSizing?: boolean;
 }
 
 /**
