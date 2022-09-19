@@ -540,7 +540,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     // add another path segment to filename to distinguish between different resources
     // with the same filename (also makes hash collisions irrelevant).
     long counter = RESOURCE_COUNTER.getAndIncrement();
-    String filenameWithCounter = counter + "/" + ObjectUtility.nvl(res.getFilename(), "binaryData");
+    String filenameWithCounter = counter + "/" + ObjectUtility.nvl(cleanFilename(res.getFilename()), "binaryData");
     BinaryResourceHolder holder = new BinaryResourceHolder(res);
     if (openUriAction == OpenUriAction.DOWNLOAD) {
       holder.addHttpResponseInterceptor(new DownloadHttpResponseInterceptor(res.getFilename()));
@@ -548,6 +548,21 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     m_downloads.put(filenameWithCounter, holder, openUriAction);
     String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, filenameWithCounter);
     handleModelOpenUri(downloadUrl, openUriAction);
+  }
+
+  /**
+   * <pre>
+   * Filenames should not include certain protected characters, not even encoded. Using protected characters like
+   * semicolon (even when encoded), can lead to trouble with reverse-proxies that may decode the URL and then interpret
+   * semicolons as path parameters.
+   *
+   * For further information see:
+   * - https://serverfault.com/questions/874726/apache-decoding-semicolon-mod-proxy
+   * - https://security.stackexchange.com/questions/251723/semicolons-relation-with-reverse-proxy
+   * </pre>
+   */
+  protected String cleanFilename(String fileName) {
+    return StringUtility.replace(fileName, ";", "");
   }
 
   @Override
