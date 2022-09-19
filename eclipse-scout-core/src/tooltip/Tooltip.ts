@@ -13,6 +13,10 @@ import $ from 'jquery';
 import {StatusSeverity} from '../status/Status';
 import KeyDownEvent = JQuery.KeyDownEvent;
 
+export type TooltipPosition = 'top' | 'bottom';
+export type TooltipDirection = 'right' | 'left';
+export type TooltipScrollType = 'position' | 'remove';
+
 export default class Tooltip extends Widget implements TooltipModel {
   declare model: TooltipModel;
   declare eventMap: TooltipEventMap;
@@ -26,9 +30,9 @@ export default class Tooltip extends Widget implements TooltipModel {
   origin: Rectangle;
   originRelativeToParent: boolean;
   autoRemove: boolean;
-  tooltipPosition: 'top' | 'bottom';
-  tooltipDirection: 'right' | 'left';
-  scrollType: 'position' | 'remove';
+  tooltipPosition: TooltipPosition;
+  tooltipDirection: TooltipDirection;
+  scrollType: TooltipScrollType;
   htmlEnabled: boolean;
   dialog: Form;
   menus: Menu[];

@@ -1,17 +1,41 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EllipsisMenu, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStrokeContext, Menu, MenuBarBox, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarRightKeyStroke, MenuDestinations, menus, scout, Widget, widgets} from '../../index';
-import ComboMenu from '../ComboMenu';
+import {arrays, ComboMenu, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel, MenuBarRightKeyStroke, MenuDestinations, menus, PropertyChangeEvent, scout, Widget, widgets} from '../../index';
+import {MenuOrder, OrderedMenuItems} from '../MenuItemsOrder';
+import {MenuFilter} from '../Menu';
+import {TooltipPosition} from '../../tooltip/Tooltip';
 
-export default class MenuBar extends Widget {
+export type MenuBarEllipsisPosition = EnumObject<typeof MenuBar.EllipsisPosition>;
+export type MenuBarPosition = EnumObject<typeof MenuBar.Position>;
+
+export default class MenuBar extends Widget implements MenuBarModel {
+  declare model: MenuBarModel;
+  declare eventMap: MenuBarEventMap;
+
+  menuSorter: MenuOrder;
+  menuFilter: MenuFilter;
+  position: MenuBarPosition;
+  tabbable: boolean;
+  menuboxLeft: MenuBarBox;
+  menuboxRight: MenuBarBox;
+  menuItems: Menu[]; // original list of menuItems that was passed to setMenuItems(), only used to check if menubar has changed
+  orderedMenuItems: OrderedMenuItems;
+  defaultMenu: Menu;
+  ellipsisPosition: MenuBarEllipsisPosition;
+  hiddenByUi: boolean;
+  tabbableMenu: Menu;
+
+  protected _menuItemPropertyChangeHandler: EventHandler<PropertyChangeEvent>;
+  protected _focusHandler: EventHandler<Event<Menu>>;
+  protected _ellipsis: EllipsisMenu;
 
   constructor() {
     super();
@@ -22,7 +46,7 @@ export default class MenuBar extends Widget {
     this.tabbable = true;
     this.menuboxLeft = null;
     this.menuboxRight = null;
-    this.menuItems = []; // original list of menuItems that was passed to setMenuItems(), only used to check if menubar has changed
+    this.menuItems = [];
     this.orderedMenuItems = {
       left: [],
       right: [],
@@ -40,20 +64,20 @@ export default class MenuBar extends Widget {
   static EllipsisPosition = {
     LEFT: 'left',
     RIGHT: 'right'
-  };
+  } as const;
 
   static Position = {
     TOP: 'top',
     BOTTOM: 'bottom'
-  };
+  } as const;
 
-  _init(options) {
+  protected override _init(options: MenuBarModel) {
     super._init(options);
 
     this.menuSorter = options.menuOrder || new GroupBoxMenuItemsOrder();
     this.menuSorter.menuBar = this;
     if (options.menuFilter) {
-      this.menuFilter = (menus, destination, onlyVisible, enableDisableKeyStroke) => options.menuFilter(menus, MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
+      this.menuFilter = (menus, destination) => options.menuFilter(menus, MenuDestinations.MENU_BAR);
     }
 
     this.menuboxLeft = scout.create(MenuBarBox, {
@@ -71,34 +95,25 @@ export default class MenuBar extends Widget {
     this.updateVisibility();
   }
 
-  _destroy() {
+  protected override _destroy() {
     super._destroy();
     this._detachMenuHandlers();
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    this.keyStrokeContext.registerKeyStroke([
+    this.keyStrokeContext.registerKeyStrokes([
       new MenuBarLeftKeyStroke(this),
       new MenuBarRightKeyStroke(this)
     ]);
   }
 
-  /**
-   * @override Widget.js
-   */
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('menubar');
 
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
@@ -108,66 +123,64 @@ export default class MenuBar extends Widget {
     this.menuboxLeft.render(this.$container);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderMenuItems();
     this._renderPosition();
   }
 
-  setPosition(position) {
+  setPosition(position: MenuBarPosition) {
     this.setProperty('position', position);
   }
 
-  _setPosition(position) {
+  protected _setPosition(position: MenuBarPosition) {
     this._setProperty('position', position);
     this.menuboxLeft.setTooltipPosition(this._oppositePosition());
     this.menuboxRight.setTooltipPosition(this._oppositePosition());
   }
 
-  _renderPosition() {
+  protected _renderPosition() {
     this.$container.toggleClass('bottom', this.position === MenuBar.Position.BOTTOM);
   }
 
-  _oppositePosition() {
+  protected _oppositePosition(): TooltipPosition {
     return this.position === MenuBar.Position.TOP ?
       MenuBar.Position.BOTTOM : MenuBar.Position.TOP;
   }
 
-  setEllipsisPosition(ellipsisPosition) {
+  setEllipsisPosition(ellipsisPosition: MenuBarEllipsisPosition) {
     this.setProperty('ellipsisPosition', ellipsisPosition);
   }
 
   /**
    * Set the filter of the menu bar to all the menu items.
    */
-  _setChildMenuFilters() {
-    this.orderedMenuItems.all.forEach(function(item) {
-      item.setMenuFilter(this.menuFilter);
-    }, this);
+  protected _setChildMenuFilters() {
+    this.orderedMenuItems.all.forEach(item => item.setMenuFilter(this.menuFilter));
   }
 
   /**
    * This function can be called multiple times. The function attaches the menu handlers only if they are not yet added.
    */
-  _attachMenuHandlers() {
-    this.orderedMenuItems.all.forEach(function(item) {
+  protected _attachMenuHandlers() {
+    this.orderedMenuItems.all.forEach(item => {
       if (item.events.count('propertyChange', this._menuItemPropertyChangeHandler) === 0) {
         item.on('propertyChange', this._menuItemPropertyChangeHandler);
       }
       if (item.events.count('focus', this._focusHandler) === 0) {
         item.on('focus', this._focusHandler);
       }
-    }, this);
+    });
   }
 
-  _detachMenuHandlers() {
+  protected _detachMenuHandlers() {
     this.orderedMenuItems.all.forEach(item => {
       item.off('propertyChange', this._menuItemPropertyChangeHandler);
       item.off('focus', this._focusHandler);
     });
   }
 
-  setMenuItems(menuItems) {
+  setMenuItems(menuItems: Menu | Menu[]) {
     menuItems = arrays.ensure(menuItems);
     if (arrays.equals(this.menuItems, menuItems)) {
       // Ensure existing menus are correctly linked even if the given menuItems are the same (see TableSpec for reasons)
@@ -178,7 +191,7 @@ export default class MenuBar extends Widget {
     this.setProperty('menuItems', menuItems);
   }
 
-  _setMenuItems(menuItems, rightFirst) {
+  protected _setMenuItems(menuItems: Menu[], rightFirst?: boolean) {
     // remove property listeners of old menu items.
     this._detachMenuHandlers();
     this.orderedMenuItems = this._createOrderedMenus(menuItems);
@@ -201,19 +214,19 @@ export default class MenuBar extends Widget {
     this._setProperty('menuItems', menuItems);
   }
 
-  _renderMenuItems() {
+  protected _renderMenuItems() {
     widgets.updateFirstLastMarker(this.menuItems);
     this.updateLeftOfButtonMarker();
     this.invalidateLayoutTree();
   }
 
-  _removeMenuItems() {
+  protected _removeMenuItems() {
     // NOP: by implementing this function we avoid the call to Widget.js#_internalRemoveWidgets
     // which would remove our menuItems, because they are defined as widget-property (see constructor).
   }
 
-  _createOrderedMenus(menuItems) {
-    let orderedMenuItems = this.menuSorter.order(menuItems, this),
+  protected _createOrderedMenus(menuItems: Menu[]): OrderedMenuItems {
+    let orderedMenuItems = this.menuSorter.order(menuItems),
       ellipsisIndex = -1,
       ellipsis;
     orderedMenuItems.right.forEach(item => {
@@ -267,20 +280,20 @@ export default class MenuBar extends Widget {
     return orderedMenuItems;
   }
 
-  _getFirstStackableIndexPosition(menuList) {
+  protected _getFirstStackableIndexPosition(menuList: Menu[]): number {
     let foundIndex = -1;
-    menuList.some((menu, index) => {
+    menuList.some((menu: Menu, index: number) => {
       if (menu.stackable && menu.visible) {
         foundIndex = index;
         return true;
       }
       return false;
-    }, this);
+    });
 
     return foundIndex;
   }
 
-  _updateTabbableMenu() {
+  protected _updateTabbableMenu() {
     // Make first valid MenuItem tabbable so that it can be focused. All other items
     // are not tabbable. But they can be selected with the arrow keys.
     if (this.tabbable) {
@@ -292,7 +305,7 @@ export default class MenuBar extends Widget {
     }
   }
 
-  setTabbableMenu(menu) {
+  setTabbableMenu(menu: Menu) {
     if (!this.tabbable || menu === this.tabbableMenu) {
       return;
     }
@@ -309,27 +322,24 @@ export default class MenuBar extends Widget {
    * Sets the property hiddenByUi. This does not automatically update the visibility of the menus.
    * We assume that #updateVisibility() is called later anyway.
    *
-   * @param {boolean} hiddenByUi
    */
-  setHiddenByUi(hiddenByUi) {
+  setHiddenByUi(hiddenByUi: boolean) {
     this.setProperty('hiddenByUi', hiddenByUi);
   }
 
   updateVisibility() {
     menus.updateSeparatorVisibility(this.orderedMenuItems.left);
     menus.updateSeparatorVisibility(this.orderedMenuItems.right);
-    this.setVisible(!this.hiddenByUi && this.orderedMenuItems.all.some(m => {
-      return m.visible && !m.ellipsis;
-    }));
+    this.setVisible(!this.hiddenByUi && this.orderedMenuItems.all.some(m => m.visible && !m.ellipsis));
   }
 
   /**
    * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
    *
-   * @param {boolean} [updateTabbableMenu] if true (default), the "tabbable menu" is updated at the end of this method.
+   * @param updateTabbableMenu if true (default), the "tabbable menu" is updated at the end of this method.
    */
-  updateDefaultMenu(updateTabbableMenu) {
-    let defaultMenu = null;
+  updateDefaultMenu(updateTabbableMenu?: boolean) {
+    let defaultMenu: Menu = null;
     for (let i = 0; i < this.orderedMenuItems.all.length; i++) {
       let item = this.orderedMenuItems.all[i];
 
@@ -353,18 +363,18 @@ export default class MenuBar extends Widget {
     }
   }
 
-  _isDefaultKeyStroke(keyStroke) {
+  protected _isDefaultKeyStroke(keyStroke: KeyStroke): boolean {
     return scout.isOneOf(keys.ENTER, keyStroke.which) &&
       !keyStroke.ctrl &&
       !keyStroke.alt &&
       !keyStroke.shift;
   }
 
-  setDefaultMenu(defaultMenu) {
+  setDefaultMenu(defaultMenu: Menu) {
     this.setProperty('defaultMenu', defaultMenu);
   }
 
-  _setDefaultMenu(defaultMenu) {
+  protected _setDefaultMenu(defaultMenu: Menu) {
     if (this.defaultMenu) {
       this.defaultMenu.setMenuStyle(Menu.MenuStyle.NONE);
     }
@@ -382,12 +392,10 @@ export default class MenuBar extends Widget {
     this._updateLeftOfButtonMarker(this.orderedMenuItems.right);
   }
 
-  _updateLeftOfButtonMarker(items) {
+  protected _updateLeftOfButtonMarker(items: Menu[]) {
     let item, previousItem;
 
-    items = items.filter(item => {
-      return item.visible && item.rendered;
-    });
+    items = items.filter(item => item.visible && item.rendered);
 
     for (let i = 0; i < items.length; i++) {
       item = items[i];
@@ -399,18 +407,19 @@ export default class MenuBar extends Widget {
     }
   }
 
-  _onMenuItemPropertyChange(event) {
+  protected _onMenuItemPropertyChange(event: PropertyChangeEvent) {
     // We do not update the items directly, because this listener may be fired many times in one
     // user request (because many menus change one or more properties). Therefore, we just invalidate
     // the MenuBarLayout. It will be updated automatically after the user request has finished,
     // because the layout calls rebuildItemsInternal().
+    let source = event.source as Menu;
     if (event.propertyName === 'overflown' || event.propertyName === 'enabledComputed' || event.propertyName === 'visible' || event.propertyName === 'hidden') {
-      if (!this.tabbableMenu || event.source === this.tabbableMenu) {
+      if (!this.tabbableMenu || source === this.tabbableMenu) {
         this._updateTabbableMenu();
       }
     }
     if (event.propertyName === 'overflown' || event.propertyName === 'hidden') {
-      if (!this.defaultMenu || event.source === this.defaultMenu) {
+      if (!this.defaultMenu || source === this.defaultMenu) {
         this.updateDefaultMenu();
       }
     }
@@ -431,7 +440,7 @@ export default class MenuBar extends Widget {
       // recalculate position of ellipsis if any menu item changed visibility.
       // separators may change visibility during reordering menu items. Since separators do not have any
       // impact of right/left order of menu items they have not to be considered to enforce a reorder.
-      if (!event.source.separator) {
+      if (!source.separator) {
         this.reorderMenus();
       }
     }
@@ -440,11 +449,11 @@ export default class MenuBar extends Widget {
     }
   }
 
-  _onMenuItemFocus(event) {
+  protected _onMenuItemFocus(event: Event<Menu>) {
     this.setTabbableMenu(event.source);
   }
 
-  reorderMenus(rightFirst) {
+  reorderMenus(rightFirst?: boolean) {
     let menuItems = this.menuItems;
     this._setMenuItems(menuItems, rightFirst);
     if (this.rendered) {
@@ -452,7 +461,7 @@ export default class MenuBar extends Widget {
     }
   }
 
-  _allMenusAsFlatList() {
+  allMenusAsFlatList(): Menu[] {
     return arrays.flatMap(this.orderedMenuItems.all, item => {
       if (item instanceof ComboMenu) {
         return item.childActions;
@@ -460,5 +469,4 @@ export default class MenuBar extends Widget {
       return [item];
     });
   }
-
 }
