@@ -27,7 +27,7 @@ export default class WidgetPopupLayout extends PopupLayout {
     htmlWidget.setSize(widgetSize.subtract(htmlWidget.margins()));
   }
 
-  override preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let htmlComp = this.popup.htmlComp;
     let htmlWidget = this.popup.content.htmlComp;
 

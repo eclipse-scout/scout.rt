@@ -10,6 +10,7 @@
  */
 import {Menu, Rectangle, WidgetModel} from '../index';
 import {StatusSeverity} from '../status/Status';
+import {TooltipDirection, TooltipPosition, TooltipScrollType} from './Tooltip';
 
 export default interface TooltipModel extends WidgetModel {
   /**
@@ -51,15 +52,15 @@ export default interface TooltipModel extends WidgetModel {
   /**
    * Default is 'top'.
    */
-  tooltipPosition?: 'top' | 'bottom';
+  tooltipPosition?: TooltipPosition;
   /**
    * Default is 'right'.
    */
-  tooltipDirection?: 'right' | 'left';
+  tooltipDirection?: TooltipDirection;
   /**
    * Default is 'position'.
    */
-  scrollType?: 'position' | 'remove';
+  scrollType?: TooltipScrollType;
   /**
    * Default is false.
    */

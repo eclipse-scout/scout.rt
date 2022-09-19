@@ -11,6 +11,7 @@
 import {Code, scout, TreeVisitResult} from '../index';
 import CodeTypeModel from './CodeTypeModel';
 import CodeModel from './CodeModel';
+import {TreeVisitor} from '../widget/Widget';
 
 export default class CodeType {
 
@@ -97,7 +98,7 @@ export default class CodeType {
    * To only abort the visiting of a sub tree, the visitor can return SKIP_SUBTREE.
    * </p>
    */
-  visitChildren(visitor: (code: Code) => boolean | TreeVisitResult | void): boolean | TreeVisitResult {
+  visitChildren(visitor: TreeVisitor<Code>): boolean | TreeVisitResult {
     let rootCodes = this.getCodes(true);
     for (let i = 0; i < rootCodes.length; i++) {
       let code = rootCodes[i];

@@ -10,6 +10,7 @@
  */
 import {Action, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
 import {ActionStyle, ActionTextPosition} from './Action';
+import {TooltipPosition} from '../tooltip/Tooltip';
 
 export default interface ActionEventMap extends WidgetEventMap {
   'action': Event<Action>;
@@ -25,6 +26,6 @@ export default interface ActionEventMap extends WidgetEventMap {
   'propertyChange:textPosition': PropertyChangeEvent<ActionTextPosition>;
   'propertyChange:textVisible': PropertyChangeEvent<boolean>;
   'propertyChange:toggleAction': PropertyChangeEvent<boolean>;
-  'propertyChange:tooltipPosition': PropertyChangeEvent<'top' | 'bottom'>;
+  'propertyChange:tooltipPosition': PropertyChangeEvent<TooltipPosition>;
   'propertyChange:tooltipText': PropertyChangeEvent<string>;
 }

@@ -13,6 +13,7 @@ import $ from 'jquery';
 import AbstractLayout from '../layout/AbstractLayout';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {TooltipSupportOptions} from '../tooltip/TooltipSupport';
+import {TooltipPosition} from '../tooltip/Tooltip';
 
 export type ActionStyle = EnumObject<typeof Action.ActionStyle>;
 export type KeyStrokeFirePolicy = EnumObject<typeof Action.KeyStrokeFirePolicy>;
@@ -24,6 +25,7 @@ export default class Action extends Widget implements ActionModel {
 
   actionStyle: ActionStyle;
   compact: boolean;
+  compactOrig: boolean;
   iconId: string;
   horizontalAlignment: -1 | 0 | 1;
   keyStroke: string;
@@ -36,10 +38,11 @@ export default class Action extends Widget implements ActionModel {
   textPosition: ActionTextPosition;
   htmlEnabled: boolean;
   textVisible: boolean;
+  textVisibleOrig: boolean;
   toggleAction: boolean;
   tooltipText: string;
   showTooltipWhenSelected: boolean;
-  tooltipPosition: 'top' | 'bottom';
+  tooltipPosition: TooltipPosition;
   icon: Icon;
   $text: JQuery;
 
@@ -276,7 +279,7 @@ export default class Action extends Widget implements ActionModel {
     this.invalidateLayoutTree();
   }
 
-  setTooltipPosition(position: 'top' | 'bottom') {
+  setTooltipPosition(position: TooltipPosition) {
     this.setProperty('tooltipPosition', position);
   }
 
@@ -402,7 +405,7 @@ export default class Action extends Widget implements ActionModel {
     this.setProperty('preventDoubleClick', preventDoubleClick);
   }
 
-  protected _allowMouseEvent(event: JQuery.ClickEvent<HTMLDivElement, undefined, HTMLDivElement, HTMLDivElement>): boolean {
+  protected _allowMouseEvent(event: JQuery.MouseEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>): boolean {
     if (event.which !== 1) {
       return false; // Other button than left mouse button --> nop
     }
@@ -412,7 +415,7 @@ export default class Action extends Widget implements ActionModel {
     return true;
   }
 
-  protected _onClick(event: JQuery.ClickEvent<HTMLDivElement, undefined, HTMLDivElement, HTMLDivElement>) {
+  protected _onClick(event: JQuery.ClickEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     if (!this._allowMouseEvent(event)) {
       return;
     }

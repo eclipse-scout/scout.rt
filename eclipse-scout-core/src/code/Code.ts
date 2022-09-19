@@ -1,15 +1,16 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {codes, Locale, scout, texts, TreeVisitResult} from '../index';
 import CodeModel from './CodeModel';
+import {TreeVisitor} from '../widget/Widget';
 
 export default class Code {
 
@@ -58,7 +59,7 @@ export default class Code {
     return texts.resolveText(this._text, vararg);
   }
 
-  visitChildren(visitor: (code: Code) => boolean | TreeVisitResult | void): boolean | TreeVisitResult {
+  visitChildren(visitor: TreeVisitor<Code>): boolean | TreeVisitResult {
     for (let i = 0; i < this.children.length; i++) {
       let child = this.children[i];
       let visitResult = visitor(child);
