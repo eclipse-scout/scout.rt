@@ -1,16 +1,25 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Button, Menu} from '../index';
+import {Action, Button, ButtonAdapterMenuModel, Event, EventHandler, Menu, MenuBar, MenuModel, PropertyChangeEvent} from '../index';
+import {ActionStyle, ActionTextPosition} from '../action/Action';
 
-export default class ButtonAdapterMenu extends Menu {
+export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenuModel {
+  declare model: ButtonAdapterMenuModel;
+
+  button: Button;
+  menubar: MenuBar;
+
+  protected _buttonPropertyChangeHandler: EventHandler<PropertyChangeEvent>;
+  protected _buttonDestroyHandler: EventHandler<Event<Button>>;
+
   constructor() {
     super();
     this._removeWidgetProperties('childActions'); // managed by button
@@ -23,10 +32,7 @@ export default class ButtonAdapterMenu extends Menu {
     this.menubar = null;
   }
 
-  /**
-   * @override Action.js
-   */
-  _init(model) {
+  protected override _init(model: ButtonAdapterMenuModel) {
     super._init(model);
     if (!this.button) {
       throw new Error('Cannot adapt to undefined button');
@@ -35,28 +41,28 @@ export default class ButtonAdapterMenu extends Menu {
     this._installListeners();
   }
 
-  _destroy() {
+  protected override _destroy() {
     super._destroy();
     delete this.button.adaptedBy;
   }
 
-  _installListeners() {
+  protected _installListeners() {
     this.button.on('propertyChange', this._buttonPropertyChangeHandler);
     this.button.on('destroy', this._buttonDestroyHandler);
   }
 
-  _uninstallListeners() {
+  protected _uninstallListeners() {
     this.button.off('propertyChange', this._buttonPropertyChangeHandler);
     this.button.off('destroy', this._buttonDestroyHandler);
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     // Convenience: Add ID of original button to DOM for debugging purposes
     this.$container.attr('data-buttonadapter', this.button.id);
   }
 
-  _onButtonPropertyChange(event) {
+  protected _onButtonPropertyChange(event: PropertyChangeEvent) {
     // Whenever a button property changes, apply the changes to the menu
     let changedProperties = {};
     changedProperties[event.propertyName] = event.newValue;
@@ -67,15 +73,12 @@ export default class ButtonAdapterMenu extends Menu {
     }
   }
 
-  _onButtonDestroy(event) {
+  protected _onButtonDestroy(event: Event<Button>) {
     this.destroy();
     this._uninstallListeners();
   }
 
-  /**
-   * @override Action.js
-   */
-  doAction() {
+  override doAction(): boolean {
     if (this.childActions.length > 0) {
       // Popup menu is handled by this menu itself
       return super.doAction();
@@ -92,10 +95,7 @@ export default class ButtonAdapterMenu extends Menu {
     return actionExecuted;
   }
 
-  /**
-   * @override
-   */
-  focus() {
+  override focus(): boolean {
     if (!this.rendered) {
       this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
       return false;
@@ -104,12 +104,8 @@ export default class ButtonAdapterMenu extends Menu {
     return this.session.focusManager.requestFocus(this.getFocusableElement());
   }
 
-  /* --- STATIC HELPERS ------------------------------------------------------------- */
-
-  /**
-   * @memberOf ButtonAdapterMenu
-   */
-  static adaptButtonProperties(buttonProperties, menuProperties) {
+  static adaptButtonProperties(buttonProperties: Record<string, any>, menuProperties?: MenuModel): MenuModel { // FIXME TS: use ButtonModel for buttonProperties
+    // @ts-ignore
     menuProperties = menuProperties || {};
 
     // Plain properties: simply copy, no translation required
@@ -140,9 +136,7 @@ export default class ButtonAdapterMenu extends Menu {
     }
     return menuProperties;
 
-    // ----- Helper functions -----
-
-    function buttonStyleToActionStyle(buttonStyle) {
+    function buttonStyleToActionStyle(buttonStyle: number): ActionStyle { // FIXME TS: use ButtonDisplayStyle
       if (buttonStyle === undefined) {
         return undefined;
       }
@@ -152,7 +146,7 @@ export default class ButtonAdapterMenu extends Menu {
       return Action.ActionStyle.BUTTON;
     }
 
-    function labelPositionToTextPosition(labelPosition) {
+    function labelPositionToTextPosition(labelPosition: number): ActionTextPosition { // FIXME TS: use ButtonLabelPosition
       if (labelPosition === undefined) {
         return undefined;
       }

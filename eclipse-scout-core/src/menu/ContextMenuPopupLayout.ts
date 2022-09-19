@@ -1,22 +1,24 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, HtmlComponent, PopupLayout, scrollbars} from '../index';
+import {Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, PopupLayout, scrollbars} from '../index';
+import ContextMenuPopup from './ContextMenuPopup';
 
 export default class ContextMenuPopupLayout extends PopupLayout {
+  declare popup: ContextMenuPopup;
 
-  constructor(popup) {
+  constructor(popup: ContextMenuPopup) {
     super(popup);
   }
 
-  _setSize(prefSize) {
+  protected override _setSize(prefSize: Dimension) {
     if (this.popup.bodyAnimating) {
       scrollbars.update(this.popup.get$Scrollable());
       return;
@@ -27,29 +29,33 @@ export default class ContextMenuPopupLayout extends PopupLayout {
     htmlBody.pack();
   }
 
-  invalidate(htmlSource) {
+  override invalidate(htmlSource: HtmlComponent) {
     // If a child triggers a layout invalidation, the popup needs to be resized.
     // This will happen for sure if a child is an image which will be loaded during the animation.
     // Ideally, the running animations would be stopped, the popup layouted, the animations adjusted to the new bounds and then continued.
     // This is currently too complicated to implement, so instead we let the animations finish and resize the popup at the end (but before other resize animations start).
     if (this.popup.bodyAnimating && htmlSource && htmlSource.isDescendantOf(this.popup.htmlComp)) {
+      // @ts-ignore
       this.popup._toggleSubMenuQueue.unshift(() => {
         if (!this.popup.rendered) {
           return;
         }
         let oldOffset = this.popup.$body.data('text-offset');
+        // @ts-ignore
         this.popup._adjustTextAlignment();
         this.popup.animateResize = true;
         this.resizeAnimationDuration = this.popup.animationDuration;
         this.popup.revalidateLayoutTree();
         this.popup.animateResize = false;
+        // @ts-ignore
         this.popup._animateTextOffset(this.popup.$body, oldOffset);
+        // @ts-ignore
         this.popup.$container.promise().done(() => this.popup._processSubMenuQueue());
       });
     }
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let htmlComp = this.popup.htmlComp;
     let htmlBody = HtmlComponent.get(this.popup.$body);
     let prefSize;

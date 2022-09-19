@@ -19,16 +19,17 @@ import {Optional} from '../types';
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
 export type GlassPaneContribution = (widget: Widget) => JQuery | JQuery[];
 export type WidgetOrModel = Widget | WidgetModel;
+export type TreeVisitor<T> = (element: T) => boolean | TreeVisitResult | void;
 
 export interface CloneOptions {
   /** An array of all properties to be delegated from the original to the clone when changed on the original widget. Default is []. */
-  delegatePropertiesToClone?: [string];
+  delegatePropertiesToClone?: string[];
   /** An array of all properties to be delegated from the clone to the original when changed on the clone widget. Default is []. */
-  delegatePropertiesToOriginal?: [string];
+  delegatePropertiesToOriginal?: string[];
   /** An array of all properties to be excluded from delegating from the clone to the original in any cases. Default is []. */
-  excludePropertiesToOriginal?: [string];
+  excludePropertiesToOriginal?: string[];
   /** An array of all events to be delegated from the clone to the original when fired on the clone widget. Default is []. */
-  delegateEventsToOriginal?: [string];
+  delegateEventsToOriginal?: string[];
   /** True to delegate all property changes from the original to the clone. Default is false. */
   delegateAllPropertiesToClone?: boolean;
   /** True to delegate all property changes from the clone to the original. Default is false. */
@@ -910,7 +911,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     });
   }
 
-  protected _childrenForEnabledComputed() {
+  protected _childrenForEnabledComputed(): Widget[] {
     return this.children;
   }
 
@@ -1700,7 +1701,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * <p>
    * If only the resolve operations without the lifecycle actions should be performed, you need to add the property to the list _preserveOnPropertyChangeProperties as well.
    */
-  protected _addWidgetProperties(properties: string[]) {
+  protected _addWidgetProperties(properties: string | string[]) {
     this._addProperties('_widgetProperties', properties);
   }
 
@@ -1708,7 +1709,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return this._widgetProperties.indexOf(propertyName) > -1;
   }
 
-  protected _addCloneProperties(properties: string[]) {
+  protected _addCloneProperties(properties: string | string[]) {
     this._addProperties('_cloneProperties', properties);
   }
 
@@ -1723,7 +1724,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * <p>
    * The typical use case for such properties is referencing another widget without taking care of that widget.
    */
-  protected _addPreserveOnPropertyChangeProperties(properties: string[]) {
+  protected _addPreserveOnPropertyChangeProperties(properties: string | string[]) {
     this._addProperties('_preserveOnPropertyChangeProperties', properties);
   }
 
@@ -1731,7 +1732,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return this._preserveOnPropertyChangeProperties.indexOf(propertyName) > -1;
   }
 
-  protected _addProperties(propertyName: string, properties: string[]) {
+  protected _addProperties(propertyName: string, properties: string | string[]) {
     properties = arrays.ensure(properties);
     properties.forEach(property => {
       if (this[propertyName].indexOf(property) > -1) {
@@ -1765,7 +1766,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     }
   }
 
-  protected _removeWidgetProperties(properties: string[]) {
+  protected _removeWidgetProperties(properties: string | string[]) {
     if (Array.isArray(properties)) {
       arrays.removeAll(this._widgetProperties, properties);
     } else {
@@ -1824,7 +1825,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return clone;
   }
 
-  protected _deepCloneProperties(clone: Widget, properties: string[], options: CloneOptions) {
+  protected _deepCloneProperties(clone: Widget, properties: string | string[], options: CloneOptions) {
     if (!properties) {
       return clone;
     }
@@ -2319,7 +2320,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    *
    * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
    */
-  visitChildren(visitor: (widget: Widget) => boolean | TreeVisitResult | void): boolean | TreeVisitResult {
+  visitChildren(visitor: TreeVisitor<Widget>): boolean | TreeVisitResult {
     for (let i = 0; i < this.children.length; i++) {
       let child = this.children[i];
       if (child.parent === this) {

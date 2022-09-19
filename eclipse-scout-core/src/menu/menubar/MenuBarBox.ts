@@ -1,61 +1,64 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HtmlComponent, MenuBar, MenuBarBoxLayout, Widget} from '../../index';
+import {arrays, HtmlComponent, Menu, MenuBarBoxEventMap, MenuBarBoxLayout, MenuBarBoxModel, Widget} from '../../index';
+import {TooltipPosition} from '../../tooltip/Tooltip';
 
-export default class MenuBarBox extends Widget {
+export default class MenuBarBox extends Widget implements MenuBarBoxModel {
+  declare model: MenuBarBoxModel;
+  declare eventMap: MenuBarBoxEventMap;
+
+  menuItems: Menu[];
+  tooltipPosition: TooltipPosition;
 
   constructor() {
     super();
     this.menuItems = [];
-    this.tooltipPosition = MenuBar.Position.TOP;
+    this.tooltipPosition = 'top';
     this._addWidgetProperties('menuItems');
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('menubar-box');
 
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new MenuBarBoxLayout(this));
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderMenuItems();
   }
 
-  /**
-   * @override Widget.js
-   */
-  _remove() {
+  protected override _remove() {
     this._removeMenuItems();
     super._remove();
   }
 
-  setMenuItems(menuItems) {
+  setMenuItems(menuItems: Menu | Menu[]) {
     menuItems = arrays.ensure(menuItems);
     if (!arrays.equals(this.menuItems, menuItems)) {
       this.setProperty('menuItems', menuItems);
     }
   }
 
-  _setMenuItems(menuItems) {
+  protected _setMenuItems(menuItems: Menu[]) {
     this._setProperty('menuItems', menuItems);
     this._updateTooltipPosition();
   }
 
-  _removeMenuItems() {
+  protected _removeMenuItems() {
     this.menuItems.forEach(item => item.remove());
   }
 
-  _renderMenuItems() {
+  protected _renderMenuItems() {
     this.menuItems.forEach(item => {
       item.render(this.$container);
       item.$container.addClass('menubar-item');
@@ -66,27 +69,21 @@ export default class MenuBarBox extends Widget {
     }
   }
 
-  _renderVisible() {
+  protected override _renderVisible() {
     super._renderVisible();
     this.revalidateLayout();
   }
 
-  _onMenuItemPropertyChange(event) {
-    if (event.propertyName === 'visible') {
-      this.setVisible(this.menuItems.some(m => m.visible && !m.ellipsis));
-    }
-  }
-
-  setTooltipPosition(position) {
+  setTooltipPosition(position: TooltipPosition) {
     this.setProperty('tooltipPosition', position);
   }
 
-  _setTooltipPosition(position) {
+  protected _setTooltipPosition(position: TooltipPosition) {
     this._setProperty('tooltipPosition', position);
     this._updateTooltipPosition();
   }
 
-  _updateTooltipPosition() {
+  protected _updateTooltipPosition() {
     this.menuItems.forEach(item => item.setTooltipPosition(this.tooltipPosition));
   }
 }

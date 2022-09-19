@@ -28,7 +28,7 @@ export default class TouchPopupLayout extends PopupLayout {
     htmlBody.setSize(bodySize.subtract(htmlBody.margins()));
   }
 
-  override preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let htmlComp = this.popup.htmlComp;
     let htmlBody = this.popup.htmlBody;
 
