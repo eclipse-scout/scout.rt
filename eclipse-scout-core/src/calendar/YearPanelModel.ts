@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, PropertyEventEmitter} from '../index';
+import {WidgetModel} from '../index';
+import {CalendarDisplayMode} from './Calendar';
 
-export default interface PropertyChangeEvent<Value = any, Source extends PropertyEventEmitter = PropertyEventEmitter> extends Event<Source> {
-  propertyName: string;
-  newValue: Value;
-  oldValue: Value;
+export default interface YearPanelModel extends WidgetModel {
+  selectedDate?: Date;
+  displayMode?: CalendarDisplayMode;
+  alwaysSelectFirstDay?: boolean;
 }

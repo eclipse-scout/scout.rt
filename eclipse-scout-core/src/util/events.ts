@@ -55,11 +55,11 @@ export function touchOrMouse(touch: boolean, touchevent: string, mouseevent: str
   return mouseevent + suffix;
 }
 
-export function isTouchEvent(event: JQuery.Event): boolean {
+export function isTouchEvent(event: JQuery.Event): event is JQuery.TouchEventBase {
   return event && strings.startsWith(event.type, 'touch');
 }
 
-export function fixTouchEvent(event: JQuery.TouchEventBase) {
+export function fixTouchEvent(event: JQuery.Event) {
   if (isTouchEvent(event)) {
     let touches = event.touches || (event.originalEvent ? event.originalEvent.touches : null);
     let touch = touches ? touches[0] : null;

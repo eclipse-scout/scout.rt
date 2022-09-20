@@ -34,7 +34,7 @@ export function shift(date: Date, years: number, months: number, days: number): 
   return newDate;
 }
 
-export function shiftTime(date: Date, hours: number, minutes: number, seconds: number, milliseconds: number): Date {
+export function shiftTime(date: Date, hours?: number, minutes?: number, seconds?: number, milliseconds?: number): Date {
   let newDate = new Date(date.getTime());
   if (hours) {
     newDate.setHours(date.getHours() + hours);
