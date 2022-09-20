@@ -12,6 +12,8 @@
 import {Point, ViewportScrollerModel} from '../index';
 
 export default class ViewportScroller implements ViewportScrollerModel {
+  declare model: ViewportScrollerModel;
+
   static SPEED_FACTOR_SLOW = 1 / 20;
   static SPEED_FACTOR_MEDIUM = 1 / 10;
   static SPEED_FACTOR_FAST = 1 / 5;

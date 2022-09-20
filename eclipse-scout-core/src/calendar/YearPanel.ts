@@ -1,29 +1,35 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Calendar, dates, Planner, scout, scrollbars, Widget} from '../index';
+import {Calendar, DateRange, dates, Event, Planner, scout, scrollbars, Widget, YearPanelEventMap, YearPanelModel} from '../index';
 import $ from 'jquery';
+import {CalendarDisplayMode} from './Calendar';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
-export default class YearPanel extends Widget {
+export default class YearPanel extends Widget implements YearPanelModel {
+  declare model: YearPanelModel;
+  declare eventMap: YearPanelEventMap;
+
+  $yearTitle: JQuery<HTMLDivElement>;
+  $yearList: JQuery<HTMLDivElement>;
+  selectedDate: Date;
+  displayMode: CalendarDisplayMode;
+  alwaysSelectFirstDay: boolean;
+  yearRendered: boolean;
+  viewRange: DateRange;
 
   constructor() {
     super();
-
-    this.$yearTitle;
-    this.$yearList;
-    this.selectedDate;
-    this.displayMode;
-    this.alwaysSelectFirstDay;
   }
 
-  _init(model) {
+  protected override _init(model: YearPanelModel) {
     super._init(model);
 
     // If true, it is only possible to select the first day of a range, depending of the selected mode
@@ -33,7 +39,7 @@ export default class YearPanel extends Widget {
     this.alwaysSelectFirstDay = model.alwaysSelectFirstDay;
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('year-panel-container');
     this.$yearTitle = this.$container.appendDiv('year-panel-title');
     this.$yearList = this.$container.appendDiv('year-panel-list');
@@ -49,7 +55,7 @@ export default class YearPanel extends Widget {
     this._colorYear();
   }
 
-  get$Scrollable() {
+  override get$Scrollable(): JQuery {
     return this.$yearList;
   }
 
@@ -59,13 +65,13 @@ export default class YearPanel extends Widget {
     this.yearRendered = false;
   }
 
-  _remove() {
+  protected override _remove() {
     this.removeContent();
     super._remove();
   }
 
-  _drawYear() {
-    let first, month, $month, d, day, $day,
+  protected _drawYear() {
+    let first: Date, month: number, $month: JQuery, day: Date, $day: JQuery,
       year = this.selectedDate.getFullYear();
 
     // append 3 years
@@ -73,21 +79,21 @@ export default class YearPanel extends Widget {
       .data('year', year)
       .empty();
 
-    this.$yearTitle.appendDiv('year-title-item', year - 1)
+    this.$yearTitle.appendDiv('year-title-item', (year - 1) + '')
       .data('year-diff', -1)
-      .click(this._onYearClick.bind(this));
+      .on('click', this._onYearClick.bind(this));
 
-    this.$yearTitle.appendDiv('year-title-item selected', year);
+    this.$yearTitle.appendDiv('year-title-item selected', year + '');
 
-    this.$yearTitle.appendDiv('year-title-item', year + 1)
+    this.$yearTitle.appendDiv('year-title-item', (year + 1) + '')
       .data('year-diff', +1)
-      .click(this._onYearClick.bind(this));
+      .on('click', this._onYearClick.bind(this));
 
     // add months and days
     for (month = 0; month < 12; month++) {
       first = new Date(year, month, 1);
       $month = this.$yearList.appendDiv('year-month').attr('data-title', this._format(first, 'MMMM'));
-      for (d = 1; d <= 31; d++) {
+      for (let d = 1; d <= 31; d++) {
         day = new Date(year, month, d);
 
         // stop if day is already out of range
@@ -96,7 +102,7 @@ export default class YearPanel extends Widget {
         }
 
         // add div per day
-        $day = $month.appendDiv('year-day', d).data('date', day);
+        $day = $month.appendDiv('year-day', d + '').data('date', day);
 
         if (day.getDay() === 0 || day.getDay() === 6) {
           $day.addClass('weekend');
@@ -111,14 +117,15 @@ export default class YearPanel extends Widget {
 
     // bind events for days divs
     $('.year-day', this.$yearList)
-      .click(this._onYearDayClick.bind(this))
-      .hover(this._onYearHoverIn.bind(this), this._onYearHoverOut.bind(this));
+      .on('click', this._onYearDayClick.bind(this))
+      .on('mouseenter', this._onYearHoverIn.bind(this))
+      .on('mouseleave', this._onYearHoverOut.bind(this));
 
     // update scrollbar
     scrollbars.update(this.$yearList);
   }
 
-  _colorYear() {
+  protected _colorYear() {
     if (!this.yearRendered) {
       return;
     }
@@ -127,17 +134,17 @@ export default class YearPanel extends Widget {
     $('.year-day.year-range, .year-day.year-range-day', this.$yearList).removeClass('year-range year-range-day');
 
     // loop all days and colorize based on range and selected
-    let that = this,
+    let yearPanel: YearPanel = this,
       $day, date;
 
     $('.year-day', this.$yearList).each(function() {
       $day = $(this);
-      date = $day.data('date');
-      if (that.displayMode !== Calendar.DisplayMode.DAY &&
-        date >= that.viewRange.from && date < that.viewRange.to) {
+      date = $day.data('date') as Date;
+      if (yearPanel.displayMode !== Calendar.DisplayMode.DAY &&
+        date >= yearPanel.viewRange.from && date < yearPanel.viewRange.to) {
         $day.addClass('year-range');
       }
-      if (dates.isSameDay(date, that.selectedDate)) {
+      if (dates.isSameDay(date, yearPanel.selectedDate)) {
         $day.addClass('year-range-day');
       }
     });
@@ -146,7 +153,7 @@ export default class YearPanel extends Widget {
     this._scrollYear();
   }
 
-  _scrollYear() {
+  protected _scrollYear() {
     let top, halfMonth, halfYear,
       $day = $('.year-range-day', this.$yearList),
       $month = $day.parent(),
@@ -162,11 +169,11 @@ export default class YearPanel extends Widget {
     this.$yearList.animateAVCSD('scrollTop', top + halfMonth - halfYear);
   }
 
-  _format(date, pattern) {
+  protected _format(date: Date, pattern: string): string {
     return dates.format(date, this.session.locale, pattern);
   }
 
-  selectDate(date) {
+  selectDate(date: Date) {
     this.selectedDate = date;
 
     if (this.rendered) {
@@ -178,7 +185,7 @@ export default class YearPanel extends Widget {
     }
   }
 
-  setDisplayMode(displayMode) {
+  setDisplayMode(displayMode: CalendarDisplayMode) {
     if (displayMode === this.displayMode) {
       return;
     }
@@ -188,7 +195,7 @@ export default class YearPanel extends Widget {
     }
   }
 
-  setViewRange(viewRange) {
+  setViewRange(viewRange: DateRange) {
     if (viewRange === this.viewRange) {
       return;
     }
@@ -200,7 +207,7 @@ export default class YearPanel extends Widget {
 
   /* -- events ---------------------------------------- */
 
-  _onYearClick(event) {
+  protected _onYearClick(event: JQuery.ClickEvent<HTMLDivElement>) {
     let
       // we must use Planner.DisplayMode (extends Calendar.DisplayMode) here
       // because YearPanel must work for calendar and planner.
@@ -235,7 +242,11 @@ export default class YearPanel extends Widget {
     });
   }
 
-  _onYearDayClick(event) {
+  override trigger<K extends string & keyof EventMapOf<YearPanel>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<YearPanel>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
+
+  protected _onYearDayClick(event: JQuery.ClickEvent<HTMLDivElement>) {
     this.selectedDate = $('.year-hover-day', this.$yearList).data('date');
     if (this.selectedDate) {
       this.trigger('dateSelect', {
@@ -244,7 +255,7 @@ export default class YearPanel extends Widget {
     }
   }
 
-  _onYearHoverIn(event) {
+  protected _onYearHoverIn(event: JQuery.MouseEnterEvent) {
     let $day = $(event.target),
       date1 = $day.data('date'),
       year = date1.getFullYear(),
@@ -301,7 +312,7 @@ export default class YearPanel extends Widget {
   }
 
   // remove all hover effects
-  _onYearHoverOut(event) {
+  protected _onYearHoverOut(event: JQuery.MouseLeaveEvent) {
     $('.year-day.year-hover, .year-day.year-hover-day', this.$yearList).removeClass('year-hover year-hover-day');
   }
 }

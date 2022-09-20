@@ -104,9 +104,11 @@ export default interface PopupModel extends WidgetModel {
   closeOnOtherPopupOpen?: boolean;
 
   location?: {
-    x: number;
-    y: number;
+    x?: number;
+    y?: number;
   };
+
+  $anchor?: JQuery;
 
   anchor?: Widget;
 }

@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupModel} from '../index';
+import {PopupModel, Widget, WidgetModel} from '../index';
 import {ResizableMode} from '../resizable/Resizable';
+import {RefWidgetModel} from '../widget/WidgetModel';
 
 export default interface WidgetPopupModel extends PopupModel {
   /**
@@ -28,4 +29,8 @@ export default interface WidgetPopupModel extends PopupModel {
    * Default none.
    */
   resizeModes?: ResizableMode[];
+  /**
+   * The content of the WidgetPopup
+   */
+  content: Widget | RefWidgetModel<WidgetModel>;
 }
