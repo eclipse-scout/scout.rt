@@ -8,17 +8,61 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
+import {Calendar, CalendarComponentEventMap, CalendarComponentModel, DateRange, dates, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
 import $ from 'jquery';
+import {JsonDateRange} from '../util/dates';
 
-export default class CalendarComponent extends Widget {
+/**
+ * See JsonCalendarItem.java
+ */
+export type CalendarItem = {
+  exists: boolean;
+  lastModified: number;
+  itemId: any;
+  owner: string;
+  cssClass: string;
+  subject: string;
+  description: string;
+  recurrencePattern: {
+    lastModified: number;
+    regenerate: boolean;
+    startTimeMinutes: number;
+    endTimeMinutes: number;
+    durationMinutes: number;
+    firstDate: Date;
+    lastDate: Date;
+    occurrences: number;
+    noEndDate: boolean;
+    /**
+     * @see RecurrencePattern.java TYPE* constants
+     */
+    type: number;
+    interval: number;
+    /**
+     * @see RecurrencePattern.java INST_* constants
+     */
+    instance: number;
+    dayOfWeekBits: number;
+    dayOfMonth: number;
+    monthOfYear: number;
+  };
+};
+
+export default class CalendarComponent extends Widget implements CalendarComponentModel {
+  declare model: CalendarComponentModel;
+  declare eventMap: CalendarComponentEventMap;
+  declare parent: Calendar;
+
+  fromDate: string;
+  toDate: string;
+  selected: boolean;
+  fullDay: boolean;
+  item: CalendarItem;
+  coveredDaysRange: DateRange;
+  protected _$parts: JQuery[];
 
   constructor() {
     super();
-
-    /**
-     * Selected is a GUI only property (the model doesn't have it)
-     */
     this.selected = false;
     this.fullDay = false;
     this.item = null;
@@ -30,30 +74,28 @@ export default class CalendarComponent extends Widget {
    */
   static MONTH_COMPACT_THRESHOLD = 100;
 
-  _init(model) {
+  protected override _init(model: CalendarComponentModel) {
     super._init(model);
 
-    this._syncCoveredDaysRange(this.coveredDaysRange);
+    this._syncCoveredDaysRange(model.coveredDaysRange as JsonDateRange);
   }
 
-  _syncCoveredDaysRange(coveredDaysRange) {
+  protected _syncCoveredDaysRange(coveredDaysRange: JsonDateRange) {
     if (coveredDaysRange) {
-      this.coveredDaysRange = new Range(
+      this.coveredDaysRange = new DateRange(
         dates.parseJsonDate(coveredDaysRange.from),
         dates.parseJsonDate(coveredDaysRange.to));
     }
   }
 
-  _remove() {
+  protected override _remove() {
     // remove $parts because they're not children of this.$container
-    this._$parts.forEach($part => {
-      $part.remove();
-    });
+    this._$parts.forEach($part => $part.remove());
     this._$parts = [];
     super._remove();
   }
 
-  _startLoopDay() {
+  protected _startLoopDay(): Date {
     // start date is either beginning of the component or beginning of viewRange
     if (dates.compare(this.coveredDaysRange.from, this.parent.viewRange.from) > 0) {
       return this.coveredDaysRange.from;
@@ -61,8 +103,8 @@ export default class CalendarComponent extends Widget {
     return this.parent.viewRange.from;
   }
 
-  _render() {
-    let partDay, $day, $part;
+  protected override _render() {
+    let partDay: Date, $day: JQuery, $part: JQuery<HTMLDivElement>;
     if (!this.coveredDaysRange) {
       // coveredDaysRange is not set on current CalendarComponent. Cannot show calendar component without from and to values.
       return;
@@ -70,7 +112,7 @@ export default class CalendarComponent extends Widget {
 
     let loopDay = this._startLoopDay();
 
-    let appointmentToDate = dates.parseJsonDate(this.toDate);
+    let appointmentToDate: Date | string = dates.parseJsonDate(this.toDate);
     let appointmentFromDate = dates.parseJsonDate(this.fromDate);
     let coveredDaysRangeTo = this.coveredDaysRange.to;
 
@@ -100,6 +142,7 @@ export default class CalendarComponent extends Widget {
         break;
       }
 
+      // @ts-ignore
       if (this.fullDay && !this.parent._isMonth()) {
         $day = this._findDayInGrid(partDay, this.parent.$topGrid);
       } else {
@@ -115,13 +158,14 @@ export default class CalendarComponent extends Widget {
         .addClass(this.item.cssClass)
         .data('component', this)
         .data('partDay', partDay)
-        .mouseup(this._onMouseUp.bind(this))
+        .on('mouseup', this._onMouseUp.bind(this))
         .on('contextmenu', this._onContextMenu.bind(this));
       $part.appendDiv('calendar-component-leftcolorborder');
       $part.appendDiv('content', this.item.subject);
 
       this._$parts.push($part);
 
+      // @ts-ignore
       if (this.parent._isMonth()) {
         let width = $day.data('new-width') || $day.width(); // prefer width from layoutSize
         $part.addClass('component-month')
@@ -163,58 +207,62 @@ export default class CalendarComponent extends Widget {
     }
   }
 
-  _getHours(date) {
+  protected _getHours(date: string): number {
     let d = dates.parseJsonDate(date);
     return d.getHours() + d.getMinutes() / 60;
   }
 
-  getLengthInHoursDecimal() {
-    let toTimestamp = dates.parseJsonDate(this.toDate, true);
-    let fromTimestamp = dates.parseJsonDate(this.fromDate, true);
+  getLengthInHoursDecimal(): number {
+    let toTimestamp = dates.parseJsonDate(this.toDate);
+    let fromTimestamp = dates.parseJsonDate(this.fromDate);
+    // FIXME TS: does this work correctly (subtracting dates):
+    // @ts-ignore
     return (toTimestamp - fromTimestamp) / (1000 * 60 * 60);
   }
 
-  _findDayInGrid(date, $grid) {
-    return $grid.find('.calendar-day').filter(
-      function(i, elem) {
-        return dates.isSameDay($(this).data('date'), date);
-      }).eq(0);
+  protected _findDayInGrid(date: Date, $grid: JQuery): JQuery {
+    return $grid.find('.calendar-day')
+      .filter((i, elem) => dates.isSameDay($(this).data('date'), date))
+      .eq(0);
   }
 
-  _isTask() {
+  protected _isTask(): boolean {
+    // @ts-ignore
     return !this.parent._isMonth() && this.fullDay;
   }
 
-  _arrangeTask(taskOffset) {
-    this._$parts.forEach($part => {
-      $part.css('top', taskOffset + 'px');
-    });
+  protected _arrangeTask(taskOffset: number) {
+    this._$parts.forEach($part => $part.css('top', taskOffset + 'px'));
   }
 
-  _isDayPart() {
+  protected _isDayPart(): boolean {
+    // @ts-ignore
     return !this.parent._isMonth() && !this.fullDay;
   }
 
-  _getHourRange(day) {
+  protected _getHourRange(day: Date): Range {
     let hourRange = new Range(this._getHours(this.fromDate), this._getHours(this.toDate));
-    let dateRange = new Range(dates.parseJsonDate(this.fromDate), dates.parseJsonDate(this.toDate));
+    let dateRange = new DateRange(dates.parseJsonDate(this.fromDate), dates.parseJsonDate(this.toDate));
 
     if (dates.isSameDay(day, dateRange.from) && dates.isSameDay(day, dateRange.to)) {
       return new Range(hourRange.from, hourRange.to);
-    } else if (dates.isSameDay(day, dateRange.from)) {
+    }
+    if (dates.isSameDay(day, dateRange.from)) {
       return new Range(hourRange.from, 24);
-    } else if (dates.isSameDay(day, dateRange.to)) {
+    }
+    if (dates.isSameDay(day, dateRange.to)) {
       return new Range(0, hourRange.to);
     }
     return new Range(0, 24);
   }
 
-  getPartDayPosition(day) {
+  getPartDayPosition(day: Date): Range {
     return this._getDisplayDayPosition(this._getHourRange(day));
   }
 
-  _getDisplayDayPosition(range) {
+  protected _getDisplayDayPosition(range: Range): Range {
     // Doesn't support minutes yet...
+    // @ts-ignore
     let preferredRange = new Range(this.parent._dayPosition(range.from, 0), this.parent._dayPosition(range.to, 0));
     // Fixed number of divisions...
     let minRangeSize = Math.round(100 * 100 / 24 / this.parent.numberOfHourDivisions) / 100; // Round to two digits
@@ -224,7 +272,7 @@ export default class CalendarComponent extends Widget {
     return preferredRange;
   }
 
-  _partPosition($part, y1, y2) {
+  protected _partPosition($part: JQuery, y1: number, y2: number): JQuery {
     // Compensate open bottom (height: square of 16px, rotated 45°, approx. 23px = sqrt(16^2 + 16^2)
     let compensateBottom = y2 === 25 ? 23 : 0;
     y2 = Math.min(24, y2);
@@ -240,27 +288,27 @@ export default class CalendarComponent extends Widget {
       .css('height', r.to - r.from - compensateBottom + '%');
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderSelected();
   }
 
-  _renderSelected() {
-    this._$parts.forEach(function($part) {
-      $part.toggleClass('comp-selected', this.selected);
-    }, this);
+  protected _renderSelected() {
+    this._$parts.forEach($part => $part.toggleClass('comp-selected', this.selected));
   }
 
-  setSelected(selected) {
+  setSelected(selected: boolean) {
     this.setProperty('selected', selected);
   }
 
-  updateSelectedComponent($part, updateScrollPosition) {
-    this.parent._selectedComponentChanged(this, $part.data('partDay'), updateScrollPosition);
+  updateSelectedComponent($part: JQuery, updateScrollPosition: boolean) {
+    // @ts-ignore
+    this.parent._selectedComponentChanged(this, $part.data('partDay') as Date, updateScrollPosition);
   }
 
-  _onMouseUp(event) {
+  protected _onMouseUp(event: JQuery.MouseUpEvent) {
     // don't show popup if dragging is in process
+    // @ts-ignore
     if (this.parent._moveData && this.parent._moveData.moving) {
       return;
     }
@@ -298,15 +346,16 @@ export default class CalendarComponent extends Widget {
     }
   }
 
-  _onContextMenu(event) {
+  protected _onContextMenu(event: JQuery.ContextMenuEvent<HTMLDivElement>) {
+    // @ts-ignore
     this.parent._showContextMenu(event, 'Calendar.CalendarComponent');
   }
 
-  _format(date, pattern) {
+  protected _format(date: Date, pattern: string): string {
     return dates.format(date, this.session.locale, pattern);
   }
 
-  _description() {
+  protected _description(): string {
     let descParts = [],
       range = null,
       text = '',
