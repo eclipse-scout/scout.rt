@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget, WidgetModel} from '../index';
-import {RefWidgetModel} from './WidgetModel';
+import {Mode, PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface CompositeModel extends WidgetModel {
-  widgets: Widget[] | RefWidgetModel<WidgetModel>[];
+export default interface ModeSelectorEventMap<T> extends WidgetEventMap {
+  'propertyChange:modes': PropertyChangeEvent<Mode<T>[]>;
+  'propertyChange:selectedMode': PropertyChangeEvent<Mode<T>>;
 }

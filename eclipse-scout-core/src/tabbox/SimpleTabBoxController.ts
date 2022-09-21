@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, scout, SimpleTab, SimpleTabArea} from '../index';
+import {EventHandler, scout, SimpleTab, SimpleTabArea, SimpleTabBox, SimpleTabBoxControllerModel} from '../index';
 import $ from 'jquery';
 
 /**
@@ -155,7 +155,10 @@ export default class SimpleTabBoxController {
 
   /* ----- static functions ----- */
 
-  static hasViewTab(view) {
-    return objects.someProperties(view, ['title', 'subTitle', 'iconId']);
+  static hasViewTab(view: any): boolean {
+    return view &&
+      (view.title !== undefined
+        || view.subTitle !== undefined
+        || view.iconId !== undefined);
   }
 }

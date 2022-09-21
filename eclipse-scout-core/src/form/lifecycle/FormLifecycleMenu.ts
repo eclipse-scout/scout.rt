@@ -8,9 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget, WidgetModel} from '../index';
-import {RefWidgetModel} from './WidgetModel';
+import {FormLifecycleMenuModel, Menu} from '../../index';
 
-export default interface CompositeModel extends WidgetModel {
-  widgets: Widget[] | RefWidgetModel<WidgetModel>[];
+export default class FormLifecycleMenu extends Menu implements FormLifecycleMenuModel {
+  declare model: FormLifecycleMenuModel;
+
+  systemType: number; // FIXME TS: SystemType (Button.SystemType)
+
+  constructor() {
+    super();
+
+    this.systemType = null;
+  }
 }

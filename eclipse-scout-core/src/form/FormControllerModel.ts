@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget, WidgetModel} from '../index';
-import {RefWidgetModel} from './WidgetModel';
+import {DisplayParent, Session} from '../index';
 
-export default interface CompositeModel extends WidgetModel {
-  widgets: Widget[] | RefWidgetModel<WidgetModel>[];
+export default interface FormControllerModel {
+  displayParent: DisplayParent;
+  session: Session;
 }

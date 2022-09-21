@@ -8,9 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget, WidgetModel} from '../index';
-import {RefWidgetModel} from './WidgetModel';
+import {Action, ActionModel, WidgetModel} from '../index';
+import {RefWidgetModel} from '../widget/WidgetModel';
 
-export default interface CompositeModel extends WidgetModel {
-  widgets: Widget[] | RefWidgetModel<WidgetModel>[];
+export default interface BoxButtonsModel extends WidgetModel {
+  /**
+   * Default is [].
+   */
+  buttons?: Action[] | RefWidgetModel<ActionModel>[];
+  /**
+   * Default is 0.
+   */
+  defaultButtonIndex?: number;
 }

@@ -8,10 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AppLinkKeyStroke, HtmlComponent, KeyStrokeContext, strings, Widget} from '../index';
+import {AppLinkKeyStroke, HtmlComponent, KeyStrokeContext, LabelEventMap, LabelModel, strings, Widget} from '../index';
 import $ from 'jquery';
 
-export default class Label extends Widget {
+export default class Label extends Widget implements LabelModel {
+  declare model: LabelModel;
+  declare eventMap: LabelEventMap;
+
+  value: string;
+  htmlEnabled: boolean;
+  scrollable: boolean;
 
   constructor() {
     super();
@@ -20,43 +26,37 @@ export default class Label extends Widget {
     this.scrollable = false;
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     this.keyStrokeContext.registerKeyStroke(new AppLinkKeyStroke(this, this._onAppLinkAction));
   }
 
-  _init(model) {
+  protected override _init(model: LabelModel) {
     super._init(model);
     this.resolveTextKeys(['value']);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderValue();
     this._renderScrollable();
   }
 
-  setValue(value) {
+  setValue(value: string) {
     this.setProperty('value', value);
   }
 
-  _renderValue() {
+  protected _renderValue() {
     let value = this.value || '';
     if (this.htmlEnabled) {
       this.$container.html(value);
@@ -81,20 +81,20 @@ export default class Label extends Widget {
     this.invalidateLayoutTree();
   }
 
-  setHtmlEnabled(htmlEnabled) {
+  setHtmlEnabled(htmlEnabled: boolean) {
     this.setProperty('htmlEnabled', htmlEnabled);
   }
 
-  _renderHtmlEnabled() {
+  protected _renderHtmlEnabled() {
     // Render the value again when html enabled changes dynamically
     this._renderValue();
   }
 
-  setScrollable(scrollable) {
+  setScrollable(scrollable: boolean) {
     this.setProperty('scrollable', scrollable);
   }
 
-  _renderScrollable() {
+  protected _renderScrollable() {
     if (this.scrollable) {
       this._installScrollbars();
     } else {
@@ -102,23 +102,23 @@ export default class Label extends Widget {
     }
   }
 
-  _onAppLinkAction(event) {
+  protected _onAppLinkAction(event: JQuery.ClickEvent | JQuery.KeyboardEventBase) {
     let $target = $(event.delegateTarget);
     let ref = $target.data('ref');
     this.triggerAppLinkAction(ref);
   }
 
-  triggerAppLinkAction(ref) {
+  triggerAppLinkAction(ref: string) {
     this.trigger('appLinkAction', {
       ref: ref
     });
   }
 
-  _onImageLoad(event) {
+  protected _onImageLoad(event: JQuery.TriggeredEvent) {
     this.invalidateLayoutTree();
   }
 
-  _onImageError(event) {
+  protected _onImageError(event: JQuery.TriggeredEvent) {
     this.invalidateLayoutTree();
   }
 }

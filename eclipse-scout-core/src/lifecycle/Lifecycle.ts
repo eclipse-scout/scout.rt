@@ -22,7 +22,21 @@ import $ from 'jquery';
  * @constructor
  * @abstract
  */
-export default class Lifecycle extends EventEmitter {
+export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter implements LifecycleModel {
+  declare model: LifecycleModel;
+  declare eventMap: LifecycleEventMap<VALIDATION_RESULT>;
+
+  widget: Widget;
+  validationFailedTextKey: string;
+  validationFailedText: string;
+  emptyMandatoryElementsTextKey: string;
+  emptyMandatoryElementsText: string;
+  invalidElementsTextKey: string;
+  invalidElementsText: string;
+  saveChangesQuestionTextKey: string;
+  askIfNeedSave: boolean;
+  askIfNeedSaveText: string;
+  handlers: Record<string, () => JQuery.Promise<Status>>;
 
   constructor() {
     super();
@@ -73,10 +87,11 @@ export default class Lifecycle extends EventEmitter {
     });
   }
 
-  /**
-   * @returns {Promise}
-   */
-  _load() {
+  override trigger<K extends string & keyof EventMapOf<Lifecycle<VALIDATION_RESULT>>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Lifecycle<VALIDATION_RESULT>>[K]>): EventMapOf<Lifecycle<VALIDATION_RESULT>>[K] {
+    return super.trigger(type, eventOrModel);
+  }
+
+  protected _load(): JQuery.Promise<void> {
     return this.handlers.load()
       .then(status => {
         this.trigger('load');
@@ -317,7 +332,7 @@ export default class Lifecycle extends EventEmitter {
     return status;
   }
 
-  _revealInvalidElement(invalidElement) {
+  protected _revealInvalidElement(invalidElement: VALIDATION_RESULT) {
     // NOP
   }
 
@@ -341,7 +356,7 @@ export default class Lifecycle extends EventEmitter {
    * missingElements: Elements which should have a value
    * invalidElements: Elements which have an invalid value
    */
-  _invalidElements() {
+  protected _invalidElements(): { missingElements: VALIDATION_RESULT[]; invalidElements: VALIDATION_RESULT[] } {
     return {
       missingElements: [],
       invalidElements: []
@@ -351,7 +366,7 @@ export default class Lifecycle extends EventEmitter {
   /**
    * Creates a HTML message used to display missing and invalid fields in a message box.
    */
-  _createInvalidElementsMessageHtml(missing, invalid) {
+  protected _createInvalidElementsMessageHtml(missing: VALIDATION_RESULT[], invalid: VALIDATION_RESULT[]): string {
     let $div = $('<div>'),
       hasMissing = missing.length > 0,
       hasInvalid = invalid.length > 0;
@@ -368,7 +383,7 @@ export default class Lifecycle extends EventEmitter {
 
     // ----- Helper function -----
 
-    function appendTitleAndList($div, title, elements, elementTextFunc) {
+    function appendTitleAndList($div: JQuery, title: string, elements: VALIDATION_RESULT[], elementTextFunc: (element: VALIDATION_RESULT) => string) {
       $div.appendDiv().text(title);
       let $ul = $div.appendElement('<ul>');
       elements.forEach(function(element) {
@@ -382,7 +397,7 @@ export default class Lifecycle extends EventEmitter {
    * @param element
    * @returns {String}
    */
-  _invalidElementText(element) {
+  protected _invalidElementText(element: VALIDATION_RESULT): string {
     return '';
   }
 
@@ -391,7 +406,7 @@ export default class Lifecycle extends EventEmitter {
    * @param element
    * @returns {String}
    */
-  _missingElementText(element) {
+  protected _missingElementText(element: VALIDATION_RESULT): string {
     return '';
   }
 

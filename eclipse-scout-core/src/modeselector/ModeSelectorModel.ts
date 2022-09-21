@@ -8,9 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget, WidgetModel} from '../index';
-import {RefWidgetModel} from './WidgetModel';
+import {Mode, ModeModel, WidgetModel} from '../index';
+import {RefWidgetModel} from '../widget/WidgetModel';
 
-export default interface CompositeModel extends WidgetModel {
-  widgets: Widget[] | RefWidgetModel<WidgetModel>[];
+export default interface ModeSelectorModel<T> extends WidgetModel {
+  /**
+   * Default is [].
+   */
+  modes?: Mode<T>[] | RefModel<ModeModel<T>>[];
+  selectedMode?: Mode<T>;
 }

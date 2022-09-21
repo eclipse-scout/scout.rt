@@ -8,9 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget, WidgetModel} from '../index';
-import {RefWidgetModel} from './WidgetModel';
+import {Event, EventMap, Lifecycle} from '../index';
 
-export default interface CompositeModel extends WidgetModel {
-  widgets: Widget[] | RefWidgetModel<WidgetModel>[];
+export default interface LifecycleEventMap<VALIDATION_RESULT> extends EventMap {
+  'load': Event<Lifecycle<VALIDATION_RESULT>>;
+  'postLoad': Event<Lifecycle<VALIDATION_RESULT>>;
+  'save': Event<Lifecycle<VALIDATION_RESULT>>;
+  'close': Event<Lifecycle<VALIDATION_RESULT>>;
+  'reset': Event<Lifecycle<VALIDATION_RESULT>>;
 }

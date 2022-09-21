@@ -8,10 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, scout} from '../index';
+import {App, EnumObject, ResponsiveHandler, scout} from '../index';
 
-let instance;
+export type ResponsiveState = EnumObject<typeof ResponsiveManager.ResponsiveState>;
+
+let instance: ResponsiveManager;
 export default class ResponsiveManager {
+  active: boolean;
+  globalState: ResponsiveState;
+  protected _responsiveHandlers: ResponsiveHandler[];
 
   constructor() {
     this.active = true;
@@ -24,9 +29,10 @@ export default class ResponsiveManager {
     NORMAL: 'normal',
     CONDENSED: 'condensed',
     COMPACT: 'compact'
-  };
+  } as const;
 
   init() {
+    // NOP
   }
 
   destroy() {
@@ -38,16 +44,14 @@ export default class ResponsiveManager {
   /**
    * Sets the responsive manager to active or inactive globally. Default is active.
    */
-  setActive(active) {
+  setActive(active: boolean) {
     this.active = active;
   }
 
   /**
    * Set a global responsive state. This state will always be set. Resizing will no longer result in a different responsive state.
-   *
-   * @param {string} responsive state (ResponsiveManager.ResponsiveState)
    */
-  setGlobalState(globalState) {
+  setGlobalState(globalState: ResponsiveState) {
     this.globalState = globalState;
   }
 
@@ -55,7 +59,7 @@ export default class ResponsiveManager {
    * Checks if the form is smaller than the preferred width of the form. If this is reached, the fields will
    * be transformed to ensure better readability.
    */
-  handleResponsive(target, width) {
+  handleResponsive(target: { responsiveHandler?: ResponsiveHandler }, width: number): boolean {
     if (!this.active) {
       return false;
     }
@@ -84,33 +88,33 @@ export default class ResponsiveManager {
     return target.responsiveHandler.transform(newState);
   }
 
-  reset(target, force) {
+  reset(target: { responsiveHandler?: ResponsiveHandler }, force?: boolean) {
     if (!this.active) {
       return;
     }
 
     if ((!target.responsiveHandler || !target.responsiveHandler.active()) && !force) {
-      return false;
+      return;
     }
 
     target.responsiveHandler.transform(ResponsiveManager.ResponsiveState.NORMAL, force);
   }
 
-  registerHandler(target, handler) {
+  registerHandler(target: { responsiveHandler?: ResponsiveHandler }, handler: ResponsiveHandler) {
     if (target.responsiveHandler) {
       target.responsiveHandler.destroy();
     }
     target.responsiveHandler = handler;
   }
 
-  unregisterHandler(target) {
+  unregisterHandler(target: { responsiveHandler?: ResponsiveHandler }) {
     if (target.responsiveHandler) {
       target.responsiveHandler.destroy();
       target.responsiveHandler = null;
     }
   }
 
-  static get() {
+  static get(): ResponsiveManager {
     return instance;
   }
 }

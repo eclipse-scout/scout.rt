@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget, WidgetModel} from '../index';
-import {RefWidgetModel} from './WidgetModel';
+import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface CompositeModel extends WidgetModel {
-  widgets: Widget[] | RefWidgetModel<WidgetModel>[];
+export default interface BoxButtonsEventMap extends WidgetEventMap {
+  'propertyChange:defaultButtonIndex': PropertyChangeEvent<number>;
 }
