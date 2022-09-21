@@ -1,60 +1,65 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, IconDesc, Image, scout, Widget} from '../index';
+import {Event, HtmlComponent, IconDesc, IconModel, Image, scout, Widget} from '../index';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
+import IconEventMap from './IconEventMap';
 
 /**
  * Widget representing an icon. It may be a font icon or an image icon. Depending on the type, either a span or an img tag will be rendered.
  * <p>
  * See also {@link JQuery.icon} and {@link JQuery.appendIcon}. Main difference to these implementations is that the image loading will invalidate the layout by using {@link Image}.
  */
-export default class Icon extends Widget {
+export default class Icon extends Widget implements IconModel {
+  declare model: IconModel;
+  declare eventMap: IconEventMap;
+
+  autoFit: boolean;
+  iconDesc: IconDesc;
+  /**
+   * Is set if the icon is rendered and an image, it is not set if it is a font icon
+   */
+  image: Image;
+  prepend: boolean;
 
   constructor() {
     super();
 
     this.autoFit = false;
-    /** @type {IconDesc} */
     this.iconDesc = null;
-
-    /**
-     * Is set if the icon is rendered and an image, it is not set if it is a font icon
-     * @type Image
-     */
     this.image = null;
     this.prepend = false;
   }
 
-  _init(model) {
+  protected override _init(model: IconModel) {
     super._init(model);
     this._setIconDesc(this.iconDesc);
   }
 
-  _render() {
+  protected override _render() {
     this._renderIconDesc(); // Must not be in _renderProperties because it creates $container -> properties like visible etc. need to be rendered afterwards
   }
 
   /**
    * Accepts either an iconId as string or an {@link IconDesc}.
-   * @param {(string|IconDesc)} icon
    */
-  setIconDesc(iconDesc) {
+  setIconDesc(iconDesc: IconDesc | string) {
     this.setProperty('iconDesc', iconDesc);
   }
 
-  _setIconDesc(iconDesc) {
+  protected _setIconDesc(iconDesc: IconDesc | string) {
     iconDesc = IconDesc.ensure(iconDesc);
     this._setProperty('iconDesc', iconDesc);
   }
 
-  _renderIconDesc() {
+  protected _renderIconDesc() {
     this._removeFontIcon();
     this._removeImageIcon();
 
@@ -69,23 +74,22 @@ export default class Icon extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _renderFontIcon() {
+  protected _renderFontIcon() {
     this.$container = this.$parent.appendIcon(this.iconDesc);
     if (this.prepend) {
       this.$container.prependTo(this.$parent);
     }
-
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 
-  _removeFontIcon() {
+  protected _removeFontIcon() {
     if (this.$container) {
       this.$container.remove();
       this.$container = null;
     }
   }
 
-  _renderImageIcon() {
+  protected _renderImageIcon() {
     if (this.image) {
       return;
     }
@@ -108,7 +112,11 @@ export default class Icon extends Widget {
     this.htmlComp = this.image.htmlComp;
   }
 
-  _removeImageIcon() {
+  override trigger<K extends string & keyof EventMapOf<Icon>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Icon>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
+
+  protected _removeImageIcon() {
     if (this.image) {
       this.image.destroy();
       this.image = null;
@@ -116,9 +124,9 @@ export default class Icon extends Widget {
   }
 
   /**
-   * Delegates to this.image.setAutoFit, but only if Icon is an image. Beside updating the autoFit property, this method has no effect if the icon is a font-icon.
+   * Delegates to {@link Image.setAutoFit}, but only if Icon is an image. Beside updating the autoFit property, this method has no effect if the icon is a font-icon.
    */
-  setAutoFit(autoFit) {
+  setAutoFit(autoFit: boolean) {
     this.setProperty('autoFit', autoFit);
     if (this.image) {
       this.image.setAutoFit(autoFit);
