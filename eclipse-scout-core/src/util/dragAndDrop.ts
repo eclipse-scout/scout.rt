@@ -204,17 +204,17 @@ export type DragAndDropTarget = Widget & {
   /**
    * default drop maximum size used in {@link DragAndDropOptions.dropMaximumSize}. If the target object contains a different field or function to retrieve this value override the supplier.
    */
-  dropMaximumSize: number;
+  dropMaximumSize?: number;
 
   /**
    * default install/uninstall criteria used in {@link DragAndDropOptions.doInstall}. If the target object contains a different field or function to retrieve this value override the supplier.
    */
-  enabledComputed: boolean;
+  enabledComputed?: boolean;
 
   /**
    * default container used in {@link DragAndDropOptions.container}. If the target object contains a different field or function to retrieve this value override the supplier.
    */
-  $container: JQuery;
+  $container?: JQuery;
 
   /**
    * installed drag & drop handler. Will be managed through {@link DragAndDropHandler}

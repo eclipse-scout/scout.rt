@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Form, scout} from '../index';
+import {arrays, DisplayParent, FileChooser, Form, scout, Session} from '../index';
 
 /**
  * Controller with functionality to register and render file choosers.
@@ -16,8 +16,10 @@ import {arrays, Form, scout} from '../index';
  * The file choosers are put into the list fileChoosers contained in 'displayParent'.
  */
 export default class FileChooserController {
+  displayParent: DisplayParent;
+  session: Session;
 
-  constructor(displayParent, session) {
+  constructor(displayParent: DisplayParent, session: Session) {
     this.displayParent = displayParent;
     this.session = session;
   }
@@ -25,7 +27,7 @@ export default class FileChooserController {
   /**
    * Adds the given file chooser to this controller and renders it.
    */
-  registerAndRender(fileChooser) {
+  registerAndRender(fileChooser: FileChooser) {
     scout.assertProperty(fileChooser, 'displayParent');
     this.displayParent.fileChoosers.push(fileChooser);
     this._render(fileChooser);
@@ -34,7 +36,7 @@ export default class FileChooserController {
   /**
    * Removes the given file chooser from this controller and DOM. However, the file chooser's adapter is not destroyed. That only happens once the file chooser is closed.
    */
-  unregisterAndRemove(fileChooser) {
+  unregisterAndRemove(fileChooser: FileChooser) {
     if (fileChooser) {
       arrays.remove(this.displayParent.fileChoosers, fileChooser);
       this._remove(fileChooser);
@@ -58,9 +60,10 @@ export default class FileChooserController {
     });
   }
 
-  _render(fileChooser) {
+  protected _render(fileChooser: FileChooser) {
     // missing displayParent (when render is called by reload), use displayParent of FileChooserController
     if (!fileChooser.displayParent) {
+      // @ts-ignore
       fileChooser._setProperty('displayParent', this.displayParent);
     }
     // Use parent's function or (if not implemented) our own.
@@ -94,7 +97,7 @@ export default class FileChooserController {
     }
   }
 
-  _remove(fileChooser) {
+  protected _remove(fileChooser: FileChooser) {
     fileChooser.remove();
   }
 
@@ -105,9 +108,7 @@ export default class FileChooserController {
    * This method has no effect if already attached.
    */
   attach() {
-    this.displayParent.fileChoosers.forEach(fileChooser => {
-      fileChooser.attach();
-    }, this);
+    this.displayParent.fileChoosers.forEach(fileChooser => fileChooser.attach());
   }
 
   /**
@@ -117,12 +118,10 @@ export default class FileChooserController {
    * This method has no effect if already detached.
    */
   detach() {
-    this.displayParent.fileChoosers.forEach(fileChooser => {
-      fileChooser.detach();
-    }, this);
+    this.displayParent.fileChoosers.forEach(fileChooser => fileChooser.detach());
   }
 
-  acceptView(view) {
+  acceptView(view: FileChooser) {
     return this.displayParent.rendered;
   }
 }
