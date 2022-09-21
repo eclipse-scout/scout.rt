@@ -12,5 +12,5 @@ import {Widget, WidgetModel} from '../index';
 import {RefWidgetModel} from './WidgetModel';
 
 export default interface NullWidgetModel extends WidgetModel {
-  childWidget: Widget | RefWidgetModel<Widget>;
+  childWidget: Widget | RefWidgetModel<WidgetModel>;
 }
