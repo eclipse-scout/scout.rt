@@ -10,6 +10,7 @@
  */
 import {Dimension, IconDesc, Logger, Point, Predicate, ResizableModel} from '../index';
 import $ from 'jquery';
+import {OldWheelEvent} from '../types';
 import Deferred = JQuery.Deferred;
 
 interface InjectOptions {
@@ -21,14 +22,16 @@ interface InjectOptions {
 
 interface InjectScriptOptions extends InjectOptions {
   /**
-   * Whether to remove the script tag again from the DOMafter the script has been loaded. Default is false.
+   * Whether to remove the script tag again from the DOM after the script has been loaded. Default is false.
    */
   removeTag: boolean;
 }
 
-type AppLinkBeanArgument = { ref: string; name: string } | string;
+export type AppLinkBeanArgument = { ref: string; name: string } | string;
 
-type AppLinkFuncArgument<T> = JQuery.TypeEventHandler<T, undefined, T, T, 'click'> | { _onAppLinkAction: JQuery.TypeEventHandler<T, undefined, T, T, 'click'> };
+export type AppLinkFuncArgument<T> = JQuery.TypeEventHandler<T, undefined, T, T, 'click'> | { _onAppLinkAction: JQuery.TypeEventHandler<T, undefined, T, T, 'click'> };
+
+export type JQueryMouseWheelEvent<TDelegateTarget = any, TData = any, TCurrentTarget = any, TTarget = any> = JQuery.TriggeredEvent<TDelegateTarget, TData, TCurrentTarget, TTarget> & { originalEvent: OldWheelEvent };
 
 declare global {
 

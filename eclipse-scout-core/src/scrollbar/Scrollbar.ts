@@ -12,6 +12,8 @@ import {Event, events, graphics, Insets, scout, scrollbars, Widget} from '../ind
 import $ from 'jquery';
 import ScrollbarEventMap from './ScrollbarEventMap';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {JQueryMouseWheelEvent} from '../jquery/jquery-scout-types';
+import {OldWheelEvent} from '../types';
 
 export default class Scrollbar extends Widget {
   declare eventMap: ScrollbarEventMap;
@@ -32,7 +34,7 @@ export default class Scrollbar extends Widget {
   protected _scrollDir: 'scrollLeft' | 'scrollTop';
   protected _thumbClipping: Insets;
   protected _onScrollHandler: (event: JQuery.ScrollEvent<HTMLDivElement>) => void;
-  protected _onScrollWheelHandler: (event: JQuery.TriggeredEvent<HTMLDivElement>) => boolean;
+  protected _onScrollWheelHandler: (event: JQueryMouseWheelEvent<HTMLDivElement>) => boolean;
   protected _onScrollbarMouseDownHandler: (event: JQuery.MouseDownEvent<HTMLDivElement>) => void;
   protected _onTouchStartHandler: (event: JQuery.TouchStartEvent<HTMLDivElement>) => void;
   protected _onThumbMouseDownHandler: (event: JQuery.MouseDownEvent<HTMLDivElement>) => boolean;
@@ -366,7 +368,7 @@ export default class Scrollbar extends Widget {
     });
   }
 
-  protected _onScrollWheel(event: JQuery.TriggeredEvent<HTMLDivElement> & { wheelDelta?: number }): boolean {
+  protected _onScrollWheel(event: JQueryMouseWheelEvent<HTMLDivElement>): boolean {
     if (!this.$container.isVisible()) {
       return true; // ignore scroll wheel event if there is no scroll bar visible
     }
@@ -377,8 +379,8 @@ export default class Scrollbar extends Widget {
       return true; // only scroll if shift modifier matches
     }
     // @ts-ignore
-    event = event.originalEvent || this.$container.window(true).event.originalEvent;
-    let w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 20;
+    let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event.originalEvent;
+    let w = originalEvent.wheelDelta ? -originalEvent.wheelDelta / 2 : originalEvent.detail * 20;
 
     this.notifyBeforeScroll();
     this.scroll(w);

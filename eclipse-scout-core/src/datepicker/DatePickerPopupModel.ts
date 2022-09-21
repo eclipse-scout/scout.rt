@@ -8,18 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DatePickerTouchPopup, TouchPopupLayout} from '../index';
+import {DateField, DateFormat, PopupModel} from '../index';
 
-export default class DatePickerTouchPopupLayout extends TouchPopupLayout {
-  declare popup: DatePickerTouchPopup;
-
-  constructor(popup: DatePickerTouchPopup) {
-    super(popup);
-  }
-
-  override layout($container: JQuery) {
-    super.layout($container);
-    // @ts-ignore
-    this.popup.getDatePicker()._layoutWeekendSeparators();
-  }
+export default interface DatePickerPopupModel extends PopupModel {
+  field: DateField;
+  dateFormat?: DateFormat;
+  allowedDates?: Date[];
 }

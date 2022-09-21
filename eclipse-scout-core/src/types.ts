@@ -37,3 +37,29 @@ export type CopyableWidget = Widget & Copyable;
 export type Abortable = Closeable & { abort(): void };
 
 export type AbortableWidget = Widget & Abortable;
+
+/**
+ * @deprecated See https://developer.mozilla.org/en-US/docs/Web/API/Element/mousewheel_event
+ */
+export type OldWheelEvent = WheelEvent & {
+  /**
+   * @deprecated Use {@link WheelEvent.deltaX} and {@link WheelEvent.deltaMode} instead. See https://developer.mozilla.org/en-US/docs/Web/API/Element/mousewheel_event
+   *
+   * Returns an integer (32-bit) representing the distance in pixels.
+   */
+  wheelDelta?: number;
+
+  /**
+   * @deprecated Use {@link WheelEvent.deltaX} and {@link WheelEvent.deltaMode} instead. See https://developer.mozilla.org/en-US/docs/Web/API/Element/mousewheel_event
+   *
+   * Returns an integer representing the horizontal scroll amount.
+   */
+  wheelDeltaX?: number;
+
+  /**
+   * @deprecated Use {@link WheelEvent.deltaY} and {@link WheelEvent.deltaMode} instead. See https://developer.mozilla.org/en-US/docs/Web/API/Element/mousewheel_event
+   *
+   * Returns an integer representing the vertical scroll amount.
+   */
+  wheelDeltaY?: number;
+};
