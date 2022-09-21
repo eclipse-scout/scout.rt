@@ -1,23 +1,24 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension} from '../index';
+import {AbstractLayout, Dimension, HtmlCompPrefSizeOptions, Image} from '../index';
 
 export default class ImageLayout extends AbstractLayout {
+  image: Image;
 
-  constructor(image) {
+  constructor(image: Image) {
     super();
     this.image = image;
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery<HTMLImageElement>, options?: HtmlCompPrefSizeOptions): Dimension {
     let img = $container[0];
     if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
       let prefHeight = img.naturalHeight;

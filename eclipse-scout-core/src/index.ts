@@ -276,6 +276,8 @@ export {default as GroupAdapter} from './group/GroupAdapter';
 export {default as GroupLayout} from './group/GroupLayout';
 export {default as GroupToggleCollapseKeyStroke} from './group/keystrokes/GroupToggleCollapseKeyStroke';
 export {default as Icon} from './image/Icon';
+export {default as IconModel} from './image/IconModel';
+export {default as IconEventMap} from './image/IconEventMap';
 export {default as IconDesc} from './image/IconDesc';
 export {default as Image} from './image/Image';
 export {default as ImageLayout} from './image/ImageLayout';
