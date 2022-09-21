@@ -1,29 +1,29 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModelAdapter} from '../index';
+import {Event, FileChooser, ModelAdapter} from '../index';
 
 export default class FileChooserAdapter extends ModelAdapter {
+  declare widget: FileChooser;
 
   constructor() {
     super();
   }
 
-  _onWidgetCancel(event) {
+  protected _onWidgetCancel(event: Event<FileChooser>) {
     // Do not close the file chooser immediately, server will send the close event
     event.preventDefault();
-
     this._send('cancel');
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<FileChooser>) {
     if (event.type === 'cancel') {
       this._onWidgetCancel(event);
     } else if (event.type === 'upload') {
@@ -33,7 +33,7 @@ export default class FileChooserAdapter extends ModelAdapter {
     }
   }
 
-  _onUpload(event) {
+  protected _onUpload(event: Event<FileChooser>) {
     if (this.widget.rendered) {
       this.widget.uploadButton.setEnabled(false);
     }
@@ -42,11 +42,7 @@ export default class FileChooserAdapter extends ModelAdapter {
       return;
     }
 
-    if (this.widget.fileInput.legacy) {
-      this.widget.fileInput.upload();
-    } else {
-      this.session.uploadFiles(this, this.widget.files, undefined, this.widget.maximumUploadSize);
-    }
+    this.session.uploadFiles(this, this.widget.files, undefined, this.widget.maximumUploadSize);
 
     this.session.listen().done(() => {
       if (this.widget && this.widget.rendered) {

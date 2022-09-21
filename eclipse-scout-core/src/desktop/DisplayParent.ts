@@ -8,12 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MessageBox, MessageBoxController, Widget} from '../index';
+import {FileChooser, FileChooserController, MessageBox, MessageBoxController, Widget} from '../index';
 
 export default interface DisplayParent extends Widget {
 
   messageBoxes: MessageBox[];
   messageBoxController: MessageBoxController;
+
+  fileChoosers: FileChooser[];
+  fileChooserController: FileChooserController;
 
   inFront(): boolean;
 

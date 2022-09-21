@@ -1120,7 +1120,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     return Object.keys(this._fatalMessagesOnScreen).length > 0;
   }
 
-  uploadFiles(target: Widget, files: (File & { scoutName?: string })[], uploadProperties?: Record<string, string | Blob>, maxTotalSize?: number, allowedTypes?: string[]): boolean {
+  uploadFiles(target: { id: string }, files: (File & { scoutName?: string })[], uploadProperties?: Record<string, string | Blob>, maxTotalSize?: number, allowedTypes?: string[]): boolean {
     let formData = new FormData(),
       acceptedFiles: File[] = [];
 

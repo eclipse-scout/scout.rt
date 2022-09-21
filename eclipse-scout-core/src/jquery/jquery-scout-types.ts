@@ -388,12 +388,12 @@ declare global {
     /**
      * Creates a new HTML element and prepends it to the current element.
      */
-    prependElement(cssClass?: string, text?: string): JQuery;
+    prependElement(element: string, cssClass?: string, text?: string): JQuery;
 
     /**
      * Creates a new HTML element and appends it to the current element.
      */
-    appendElement(cssClass?: string, text?: string): JQuery;
+    appendElement(element: string, cssClass?: string, text?: string): JQuery;
 
     /**
      * Creates a new DIV and prepends it to the current element.
