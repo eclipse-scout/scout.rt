@@ -199,6 +199,8 @@ export {default as AccordionEventMap} from './accordion/AccordionEventMap';
 export {default as AccordionAdapter} from './accordion/AccordionAdapter';
 export {default as AccordionLayout} from './accordion/AccordionLayout';
 export {default as BoxButtons} from './boxbuttons/BoxButtons';
+export {default as BoxButtonsModel} from './boxbuttons/BoxButtonsModel';
+export {default as BoxButtonsEventMap} from './boxbuttons/BoxButtonsEventMap';
 export {default as Carousel} from './carousel/Carousel';
 export {default as CarouselLayout} from './carousel/CarouselLayout';
 export {default as Cell} from './cell/Cell';

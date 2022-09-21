@@ -8,12 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, scout, Widget} from '../index';
+import {Action, ActionModel, BoxButtonsEventMap, BoxButtonsModel, scout, Widget} from '../index';
+import {ObjectFactoryOptions} from '../ObjectFactory';
 
 /**
  * Widget to render a set of Actions that look like Buttons.
  */
-export default class BoxButtons extends Widget {
+export default class BoxButtons extends Widget implements BoxButtonsModel {
+  declare model: BoxButtonsModel;
+  declare eventMap: BoxButtonsEventMap;
+
+  buttons: Action[];
+  defaultButtonIndex: number;
 
   constructor() {
     super();
@@ -25,61 +31,52 @@ export default class BoxButtons extends Widget {
     this.defaultButtonIndex = 0;
   }
 
-  /**
-   * @override
-   */
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('box-buttons');
   }
 
-  /**
-   * @override
-   */
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderButtons();
     this._renderDefaultButtonIndex();
   }
 
-  _renderButtons() {
+  protected _renderButtons() {
     this.buttons
       .filter(button => !button.rendered)
       .forEach(button => {
         button.render();
         button.$container.unfocusable().addClass('button box-button');
-      }, this);
+      });
   }
 
-  _renderDefaultButtonIndex() {
+  protected _renderDefaultButtonIndex() {
     for (let i = 0; i < this.buttons.length; i++) {
       let button = this.buttons[i];
       button.$container.toggleClass('default', button.isVisible() && button.enabledComputed && this.isDefaultButtonIndex(i));
     }
   }
 
-  isDefaultButtonIndex(index) {
+  isDefaultButtonIndex(index: number): boolean {
     return index === this.defaultButtonIndex;
   }
 
-  /**
-   * @return {Action}
-   */
-  addButton(model, options) {
+  addButton(model: Omit<ActionModel, 'parent'>, options?: ObjectFactoryOptions): Action {
     model = model || {};
     model.parent = this;
     model.tabbable = true;
     model.actionStyle = Action.ActionStyle.BUTTON;
     model.preventDoubleClick = true;
-    let button = scout.create(Action, model, options);
+    let button = scout.create(Action, model as ActionModel, options);
     this.buttons.push(button);
     return button;
   }
 
-  setDefaultButtonIndex(index) {
+  setDefaultButtonIndex(index: number) {
     this.setProperty('defaultButtonIndex', index);
   }
 
-  buttonCount() {
+  buttonCount(): number {
     return this.buttons.length;
   }
 }
