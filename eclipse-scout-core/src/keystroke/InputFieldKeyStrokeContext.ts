@@ -16,7 +16,7 @@ import $ from 'jquery';
  */
 export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
 
-  constructor(multiline: boolean) {
+  constructor(multiline?: boolean) {
     super();
 
     this.invokeAcceptInputOnActiveValueField = true;
@@ -70,7 +70,7 @@ export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
     this.setMultiline(multiline);
   }
 
-  setMultiline(multiline: boolean) {
+  setMultiline(multiline?: boolean) {
     let multilineNavigationKeys = [
       keys.UP,
       keys.DOWN

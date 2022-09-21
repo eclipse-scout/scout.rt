@@ -8,31 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-.file-chooser-field {
+import {Widget, WidgetModel} from '../index';
 
-  & > .icon {
-    cursor: pointer;
-
-    &::before {
-      content: @icon-file;
-    }
-  }
-
-  & > .file-input {
-    & > input {
-      display: none;
-    }
-
-    & > .file-input-text {
-      overflow-x: hidden;
-
-      &[placeholder]:empty::before {
-        #scout.fake-placeholder();
-      }
-
-      &[placeholder].disabled:empty::before {
-        #scout.placeholder-disabled();
-      }
-    }
-  }
+export default interface FileInputModel extends WidgetModel {
+  /**
+   * By default accept all
+   */
+  acceptTypes?: string;
+  /**
+   * Default is {@link FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE}.
+   */
+  maximumUploadSize?: number;
+  /**
+   * Default is false.
+   */
+  multiSelect?: boolean;
+  text?: string;
+  uploadController?: Widget;
 }

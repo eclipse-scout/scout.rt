@@ -1,17 +1,29 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, dragAndDrop, files as fileUtil, InputFieldKeyStrokeContext, strings, URL, Widget} from '../index';
-import $ from 'jquery';
+import {arrays, dragAndDrop, DragAndDropHandler, Event, FileInputEventMap, FileInputModel, files as fileUtil, Widget} from '../index';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
-export default class FileInput extends Widget {
+export default class FileInput extends Widget implements FileInputModel {
+  declare model: FileInputModel;
+  declare eventMap: FileInputEventMap;
+
+  acceptTypes: string;
+  maximumUploadSize: number;
+  multiSelect: boolean;
+  text: string;
+  uploadController: Widget;
+  files: File[];
+  $fileInput: JQuery<HTMLInputElement>;
+  $text: JQuery<HTMLDivElement>;
+  dragAndDropHandler: DragAndDropHandler;
 
   constructor() {
     super();
@@ -19,144 +31,75 @@ export default class FileInput extends Widget {
     this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
     this.multiSelect = false;
     this.files = [];
-    this.legacyFileUploadUrl = null;
     this.text = null;
   }
 
   static DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // 50 MB
 
-  _init(model) {
+  protected override _init(model: FileInputModel) {
     super._init(model);
     this.uploadController = model.uploadController || model.parent;
-    let url = new URL(model.legacyFileUploadUrl || 'upload/' + this.session.uiSessionId + '/' + this.uploadController.id);
-    url.setParameter('legacy', true);
-    this.legacyFileUploadUrl = url.toString();
-    this.legacy = !Device.get().supportsFile();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
-    // Need to create keystroke context here because this.legacy is not set at the time the constructor is executed
-    this.keyStrokeContext = this._createKeyStrokeContext();
-    super._initKeyStrokeContext();
-  }
-
-  _createKeyStrokeContext() {
-    if (this.legacy) {
-      // native input control is a text field -> use input field context to make sure backspace etc. does not bubble up
-      return new InputFieldKeyStrokeContext();
-    }
-  }
-
-  _render() {
+  protected override _render() {
     this.$fileInput = this.$parent.makeElement('<input>')
       .attr('type', 'file')
-      .on('change', this._onFileChange.bind(this));
-
-    if (!this.legacy) {
-      this.$container = this.$parent.appendDiv('file-input input-field');
-      this.$fileInput.appendTo(this.$container);
-      this.$container.on('mousedown', this._onMouseDown.bind(this));
-      this.$text = this.$container.appendDiv('file-input-text');
-    } else {
-      this._renderLegacyMode();
-    }
-
-    if (this.legacy) {
-      // Files may not be set into native control -> clear list in order to be sync again
-      this.clear();
-    }
+      .on('change', this._onFileChange.bind(this)) as JQuery<HTMLInputElement>;
+    this.$container = this.$parent.appendDiv('file-input input-field');
+    this.$fileInput.appendTo(this.$container);
+    this.$container.on('mousedown', this._onMouseDown.bind(this));
+    this.$text = this.$container.appendDiv('file-input-text');
   }
 
-  _renderLegacyMode() {
-    this.$legacyFormTarget = this.$fileInput.appendElement('<iframe>')
-      .attr('name', 'legacyFileUpload' + this.uploadController.id)
-      .on('load', () => {
-        // Manually handle JSON response from iframe
-        try {
-          // "onAjaxDone"
-          let text = this.$legacyFormTarget.contents().text();
-          if (strings.hasText(text)) {
-            // Manually handle JSON response
-            let json = $.parseJSON(text);
-            this.session.responseQueue.process(json);
-          }
-        } finally {
-          // "onAjaxAlways"
-          this.session.setBusy(false);
-        }
-      });
-    this.$fileInput
-      .attr('name', 'file')
-      .addClass('legacy-upload-file-input');
-    this.$legacyForm = this.$parent.appendElement('<form>', 'legacy-upload-form')
-      .attr('action', this.legacyFileUploadUrl)
-      .attr('enctype', 'multipart/form-data')
-      .attr('method', 'post')
-      .attr('target', 'legacyFileUpload' + this.uploadController.id)
-      .append(this.$fileInput);
-    this.$container = this.$legacyForm;
-  }
-
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderText();
     this._renderAcceptTypes();
     this._renderMultiSelect();
   }
 
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     this._installOrUninstallDragAndDropHandler();
-
-    if (this.legacy) {
-      this.$fileInput.setEnabled(this.enabledComputed);
-    } else {
-      this.$container.setTabbable(this.enabledComputed);
-    }
+    this.$container.setTabbable(this.enabledComputed);
   }
 
-  setText(text) {
+  setText(text: string) {
     this.setProperty('text', text);
   }
 
-  _renderText() {
-    if (this.legacy) {
-      return;
-    }
+  protected _renderText() {
     let text = this.text || '';
     this.$text.text(text);
   }
 
-  setAcceptTypes(acceptTypes) {
+  setAcceptTypes(acceptTypes: string) {
     this.setProperty('acceptTypes', acceptTypes);
   }
 
-  _renderAcceptTypes() {
+  protected _renderAcceptTypes() {
     let acceptTypes = this.acceptTypes || '';
     this.$fileInput.attr('accept', acceptTypes);
   }
 
-  setMultiSelect(multiSelect) {
+  setMultiSelect(multiSelect: boolean) {
     this.setProperty('multiSelect', multiSelect);
   }
 
-  _renderMultiSelect() {
+  protected _renderMultiSelect() {
     this.$fileInput.prop('multiple', this.multiSelect);
   }
 
-  setMaximumUploadSize(maximumUploadSize) {
+  setMaximumUploadSize(maximumUploadSize: number) {
     this.setProperty('maximumUploadSize', maximumUploadSize);
   }
 
-  _remove() {
+  protected override _remove() {
     dragAndDrop.uninstallDragAndDropHandler(this);
     super._remove();
   }
 
-  _installOrUninstallDragAndDropHandler() {
+  protected _installOrUninstallDragAndDropHandler() {
     dragAndDrop.installOrUninstallDragAndDropHandler(
       {
         target: this,
@@ -168,6 +111,7 @@ export default class FileInput extends Widget {
         dropMaximumSize: () => this.maximumUploadSize,
         // disable file validation
         validateFiles: (files, defaultValidator) => {
+          // nop
         }
       });
   }
@@ -182,78 +126,60 @@ export default class FileInput extends Widget {
     }
   }
 
-  _setFiles(files) {
+  protected _setFiles(files: FileList | File[] | File) {
+    let fileArray: File[];
     if (files instanceof FileList) {
-      files = fileUtil.fileListToArray(files);
+      fileArray = fileUtil.fileListToArray(files);
+    } else {
+      fileArray = arrays.ensure(files);
     }
-    files = arrays.ensure(files);
-    if (arrays.equals(this.files, files)) {
+    if (arrays.equals(this.files, fileArray)) {
       return;
     }
     let name = '';
-    if (files.length > 0) {
-      if (this.legacy) {
-        name = files[0];
-      } else {
-        name = files[0].name;
-      }
+    if (fileArray.length > 0) {
+      name = fileArray[0].name;
     }
-    this.files = files;
+    this.files = fileArray;
     this.setText(name);
     this.trigger('change', {
-      files: files
+      files: fileArray
     });
   }
 
-  upload() {
+  override trigger<K extends string & keyof EventMapOf<FileInput>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<FileInput>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
+
+  upload(): boolean {
     if (this.files.length === 0) {
       return true;
     }
-    if (!this.legacy) {
-      return this.session.uploadFiles(this.uploadController, this.files, undefined, this.maximumUploadSize);
-    }
-    this.session.setBusy(true);
-    this.$legacyForm[0].submit();
-    return true;
+    return this.session.uploadFiles(this.uploadController, this.files, undefined, this.maximumUploadSize);
   }
 
   browse() {
     // Trigger browser's file chooser
-    this.$fileInput.click();
+    this.$fileInput.trigger('click');
   }
 
-  _onFileChange(event) {
-    let files = [];
-
-    if (!this.legacy) {
-      files = this.$fileInput[0].files;
-    } else {
-      if (this.$fileInput[0].value) {
-        files.push(this.$fileInput[0].value);
-      }
-    }
+  protected _onFileChange(event: JQuery.ChangeEvent<HTMLInputElement>) {
+    let files = this.$fileInput[0].files;
     if (files.length) {
       this._setFiles(files);
     }
   }
 
-  _onMouseDown() {
+  protected _onMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>) {
     if (!this.enabled) {
       return;
     }
     this.browse();
   }
 
-  /**
-   * @deprecated use files.fileListToArray instead
-   */
-  static fileListToArray(fileList) {
-    return fileUtil.fileListToArray(fileList);
-  }
-
-  validateMaximumUploadSize(files) {
+  validateMaximumUploadSize(files: File[]) {
     if (!fileUtil.validateMaximumUploadSize(files, this.maximumUploadSize)) {
-      throw this.session.text('ui.FileSizeLimit', (this.maximumUploadSize / 1024 / 1024));
+      throw this.session.text('ui.FileSizeLimit', (this.maximumUploadSize / 1024 / 1024) + '');
     }
   }
 }
