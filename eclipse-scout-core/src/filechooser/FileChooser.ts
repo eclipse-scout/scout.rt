@@ -3,14 +3,34 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, Device, dragAndDrop, Event, FileInput, files as fileUtil, FocusAdjacentElementKeyStroke, FocusRule, Form, FormLayout, GlassPaneRenderer, HtmlComponent, keys, KeyStrokeContext, MessageBoxes, scout, scrollbars, Status, Widget} from '../index';
+import {Action, arrays, BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, Device, DisplayParent, dragAndDrop, DragAndDropHandler, Event, FileChooserEventMap, FileChooserModel, FileInput, files as fileUtil, FocusAdjacentElementKeyStroke, FocusRule, Form, FormLayout, GlassPaneRenderer, HtmlComponent, keys, KeyStrokeContext, MessageBoxes, scout, scrollbars, Status, Widget} from '../index';
+import {FileInputChangeEvent} from './FileInputEventMap';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
-export default class FileChooser extends Widget {
+export default class FileChooser extends Widget implements FileChooserModel {
+  declare model: FileChooserModel;
+  declare eventMap: FileChooserEventMap;
+
+  maximumUploadSize: number;
+  acceptTypes: string;
+  multiSelect: boolean;
+
+  files: File[];
+  boxButtons: BoxButtons;
+  uploadButton: Action;
+  cancelButton: Action;
+  fileInput: FileInput;
+  $content: JQuery<HTMLDivElement>;
+  $title: JQuery<HTMLDivElement>;
+  $files: JQuery<HTMLUListElement>;
+  dragAndDropHandler: DragAndDropHandler;
+
+  protected _glassPaneRenderer: GlassPaneRenderer;
 
   constructor() {
     super();
@@ -25,7 +45,7 @@ export default class FileChooser extends Widget {
     this._addWidgetProperties(['boxButtons', 'uploadButton', 'cancelButton']);
   }
 
-  _init(model) {
+  protected override _init(model: FileChooserModel) {
     super._init(model);
     this._setDisplayParent(this.displayParent);
     this._glassPaneRenderer = new GlassPaneRenderer(this);
@@ -40,10 +60,8 @@ export default class FileChooser extends Widget {
     this.fileInput.on('change', this._onFileChange.bind(this));
 
     this.boxButtons = scout.create(BoxButtons, {parent: this});
-    if (!this.fileInput.legacy) {
-      let addFileButton = this.boxButtons.addButton({text: this.session.text('ui.Browse')});
-      addFileButton.on('action', event => this._onAddFileButtonClicked(event));
-    }
+    let addFileButton = this.boxButtons.addButton({text: this.session.text('ui.Browse')});
+    addFileButton.on('action', event => this._onAddFileButtonClicked(event));
 
     this.uploadButton = this.boxButtons.addButton({
       text: this.session.text('ui.Upload'),
@@ -55,24 +73,16 @@ export default class FileChooser extends Widget {
     this.cancelButton.on('action', event => this._onCancelButtonClicked(event));
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    this.keyStrokeContext.registerKeyStroke([
+    this.keyStrokeContext.registerKeyStrokes([
       new FocusAdjacentElementKeyStroke(this.session, this),
-      new ClickActiveElementKeyStroke(this, [
-        keys.SPACE, keys.ENTER
-      ]),
+      new ClickActiveElementKeyStroke(this, [keys.SPACE, keys.ENTER]),
       new CloseKeyStroke(this, (() => {
         if (!this.cancelButton) {
           return null;
@@ -82,7 +92,7 @@ export default class FileChooser extends Widget {
     ]);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('file-chooser')
       .on('mousedown', this._onMouseDown.bind(this));
     let $handle = this.$container.appendDiv('drag-handle');
@@ -94,17 +104,13 @@ export default class FileChooser extends Widget {
 
     this.fileInput.render(this.$content);
 
-    // DnD and Multiple files are only supported with the new file api
-    if (!this.fileInput.legacy) {
+    // explanation for file chooser
+    this.$content.appendDiv('file-chooser-label')
+      .text(this.session.text('ui.FileChooserHint'));
 
-      // explanation for file chooser
-      this.$content.appendDiv('file-chooser-label')
-        .text(this.session.text('ui.FileChooserHint'));
-
-      // List of files
-      this.$files = this.$content.appendElement('<ul>', 'file-chooser-files');
-      this._installScrollbars();
-    }
+    // List of files
+    this.$files = this.$content.appendElement('<ul>', 'file-chooser-files') as JQuery<HTMLUListElement>;
+    this._installScrollbars();
 
     // Buttons
     this.boxButtons.render();
@@ -130,63 +136,56 @@ export default class FileChooser extends Widget {
     this._position();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
-    if (this.fileInput.legacy) {
-      // Files may not be set into native control -> clear list in order to be sync again
-      this.setFiles([]);
-    }
     this._renderFiles();
   }
 
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     this._installOrUninstallDragAndDropHandler();
   }
 
-  _postRender() {
+  protected override _postRender() {
     super._postRender();
     this._installFocusContext();
   }
 
-  _remove() {
+  protected override _remove() {
     this._glassPaneRenderer.removeGlassPanes();
     dragAndDrop.uninstallDragAndDropHandler(this);
     this._uninstallFocusContext();
     super._remove();
   }
 
-  _installFocusContext() {
+  protected override _installFocusContext() {
     this.session.focusManager.installFocusContext(this.$container, FocusRule.AUTO);
   }
 
-  _uninstallFocusContext() {
+  protected override _uninstallFocusContext() {
     this.session.focusManager.uninstallFocusContext(this.$container);
   }
 
-  /**
-   * @override
-   */
-  get$Scrollable() {
+  override get$Scrollable(): JQuery {
     return this.$files;
   }
 
-  _position() {
+  protected _position() {
     this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
   }
 
-  setDisplayParent(displayParent) {
+  setDisplayParent(displayParent: DisplayParent) {
     this.setProperty('displayParent', displayParent);
   }
 
-  _setDisplayParent(displayParent) {
+  protected _setDisplayParent(displayParent: DisplayParent) {
     this._setProperty('displayParent', displayParent);
     if (displayParent) {
       this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
     }
   }
 
-  setMaximumUploadSize(maximumUploadSize) {
+  setMaximumUploadSize(maximumUploadSize: number) {
     this.setProperty('maximumUploadSize', maximumUploadSize);
     this.fileInput.setMaximumUploadSize(maximumUploadSize);
   }
@@ -213,24 +212,27 @@ export default class FileChooser extends Widget {
   }
 
   cancel() {
-    let event = new Event();
-    this.trigger('cancel', event);
+    let event = this.trigger('cancel');
     if (!event.defaultPrevented) {
       this._close();
     }
   }
 
+  override trigger<K extends string & keyof EventMapOf<FileChooser>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<FileChooser>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
+  }
+
   /**
    * Destroys the file chooser and unlinks it from the display parent.
    */
-  _close() {
+  protected _close() {
     if (this.displayParent) {
       this.displayParent.fileChooserController.unregisterAndRemove(this);
     }
     this.destroy();
   }
 
-  _installOrUninstallDragAndDropHandler() {
+  protected _installOrUninstallDragAndDropHandler() {
     dragAndDrop.installOrUninstallDragAndDropHandler(
       {
         target: this,
@@ -238,6 +240,7 @@ export default class FileChooser extends Widget {
         dropMaximumSize: () => this.maximumUploadSize,
         // disable file validation
         validateFiles: (files, defaultValidator) => {
+          // nop
         }
       });
   }
@@ -246,17 +249,17 @@ export default class FileChooser extends Widget {
     this.fileInput.browse();
   }
 
-  setAcceptTypes(acceptTypes) {
+  setAcceptTypes(acceptTypes: string) {
     this.setProperty('acceptTypes', acceptTypes);
     this.fileInput.setAcceptTypes(acceptTypes);
   }
 
-  setMultiSelect(multiSelect) {
+  setMultiSelect(multiSelect: boolean) {
     this.setProperty('multiSelect', multiSelect);
     this.fileInput.setMultiSelect(multiSelect);
   }
 
-  addFiles(files) {
+  addFiles(files: FileList | File[] | File) {
     if (files instanceof FileList) {
       files = fileUtil.fileListToArray(files);
     }
@@ -264,8 +267,7 @@ export default class FileChooser extends Widget {
     if (files.length === 0) {
       return;
     }
-    if (!this.multiSelect || this.fileInput.legacy) {
-      files = [files[0]];
+    if (!this.multiSelect) {
       this.setFiles([files[0]]);
     } else {
       // copy so that parameter stays untouched
@@ -276,7 +278,7 @@ export default class FileChooser extends Widget {
     }
   }
 
-  removeFile(file) {
+  removeFile(file: File, event: JQuery.ClickEvent) {
     let files = this.files.slice();
     arrays.remove(files, file);
     this.setFiles(files);
@@ -284,7 +286,7 @@ export default class FileChooser extends Widget {
     this.fileInput.clear();
   }
 
-  setFiles(files) {
+  setFiles(files: File[] | FileList | File) {
     if (files instanceof FileList) {
       files = fileUtil.fileListToArray(files);
     }
@@ -304,64 +306,53 @@ export default class FileChooser extends Widget {
     this.setProperty('files', files);
   }
 
-  _renderFiles() {
+  protected _renderFiles() {
     let files = this.files;
-
-    if (!this.fileInput.legacy) {
-      this.$files.empty();
-      files.forEach(function(file) {
-        let $file = this.$files.appendElement('<li>', 'file', file.name);
-        // Append a space to allow the browser to break the line here when it gets too long
-        $file.append(' ');
-        let $remove = $file
-          .appendSpan('remove')
-          .on('click', this.removeFile.bind(this, file));
-        let $removeLink = $file.makeElement('<a>', 'remove-link', this.session.text('Remove'));
-        $remove.append($removeLink);
-      }, this);
-      scrollbars.update(this.$files);
-    }
+    this.$files.empty();
+    files.forEach(file => {
+      let $file = this.$files.appendElement('<li>', 'file', file.name);
+      // Append a space to allow the browser to break the line here when it gets too long
+      $file.append(' ');
+      let $remove = $file
+        .appendSpan('remove')
+        .on('click', this.removeFile.bind(this, file));
+      let $removeLink = $file.makeElement('<a>', 'remove-link', this.session.text('Remove'));
+      $remove.append($removeLink);
+    });
+    scrollbars.update(this.$files);
     this.uploadButton.setEnabled(files.length > 0);
   }
 
-  _onUploadButtonClicked(event) {
+  protected _onUploadButtonClicked(event: Event<Action>) {
     this.trigger('upload');
   }
 
-  _onCancelButtonClicked(event) {
+  protected _onCancelButtonClicked(event: Event<Action>) {
     this.cancel();
   }
 
-  _onAddFileButtonClicked(event) {
+  protected _onAddFileButtonClicked(event: Event<Action>) {
     this.browse();
   }
 
-  _onFileChange(event) {
+  protected _onFileChange(event: FileInputChangeEvent) {
     this.addFiles(event.files);
   }
 
-  _onMouseDown(event, option) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent) {
     // If there is a dialog in the parent-hierarchy activate it in order to bring it on top of other dialogs.
-    let parent = this.findParent(p => {
-      return p instanceof Form && p.isDialog();
-    });
+    let parent = this.findParent(p => p instanceof Form && p.isDialog()) as Form;
     if (parent) {
       parent.activate();
     }
   }
 
-  /**
-   * @override Widget.js
-   */
-  _attach() {
+  protected override _attach() {
     this.$parent.append(this.$container);
     super._attach();
   }
 
-  /**
-   * @override Widget.js
-   */
-  _detach() {
+  protected override _detach() {
     this.$container.detach();
     super._detach();
   }
