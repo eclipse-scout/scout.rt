@@ -1,24 +1,24 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, HtmlComponent} from '../index';
+import {AbstractLayout, Carousel, Dimension, HtmlComponent, HtmlCompPrefSizeOptions} from '../index';
 
 export default class CarouselLayout extends AbstractLayout {
+  carousel: Carousel;
 
-  constructor(carousel) {
+  constructor(carousel: Carousel) {
     super();
-
     this.carousel = carousel;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     // recalculate style transformation after layout
     this.carousel.recalcTransformation();
 
@@ -46,7 +46,7 @@ export default class CarouselLayout extends AbstractLayout {
     });
   }
 
-  preferredLayoutSize($container) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let currentIndex = this.carousel.currentItem;
     let dim = new Dimension(1, 1);
     if (currentIndex < this.carousel.$carouselItems.length && currentIndex >= 0) {

@@ -202,6 +202,8 @@ export {default as BoxButtons} from './boxbuttons/BoxButtons';
 export {default as BoxButtonsModel} from './boxbuttons/BoxButtonsModel';
 export {default as BoxButtonsEventMap} from './boxbuttons/BoxButtonsEventMap';
 export {default as Carousel} from './carousel/Carousel';
+export {default as CarouselModel} from './carousel/CarouselModel';
+export {default as CarouselEventMap} from './carousel/CarouselEventMap';
 export {default as CarouselLayout} from './carousel/CarouselLayout';
 export {default as Cell} from './cell/Cell';
 export {default as CellModel} from './cell/CellModel';
