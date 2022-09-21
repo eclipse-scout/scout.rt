@@ -12,5 +12,5 @@ import {Widget, WidgetModel} from '../index';
 import {RefWidgetModel} from './WidgetModel';
 
 export default interface CompositeModel extends WidgetModel {
-  widgets: Widget[] | RefWidgetModel<Widget>[];
+  widgets: Widget[] | RefWidgetModel<WidgetModel>[];
 }
