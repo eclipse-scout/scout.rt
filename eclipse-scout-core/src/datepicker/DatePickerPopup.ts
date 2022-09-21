@@ -1,16 +1,20 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DatePicker, DatePickerPopupLayout, FormField, HtmlComponent, Popup, scout} from '../index';
+import {AbstractLayout, DateField, DatePicker, DatePickerPopupLayout, DatePickerPopupModel, FormField, HtmlComponent, Popup, scout} from '../index';
 
 export default class DatePickerPopup extends Popup {
+  declare model: DatePickerPopupModel;
+
+  field: DateField;
+  picker: DatePicker;
 
   constructor() {
     super();
@@ -18,7 +22,7 @@ export default class DatePickerPopup extends Popup {
     this.windowPaddingY = 0;
   }
 
-  _init(options) {
+  protected override _init(options: DatePickerPopupModel) {
     options.scrollType = options.scrollType || 'layoutAndPosition';
     options.withFocusContext = false;
     super._init(options);
@@ -30,11 +34,11 @@ export default class DatePickerPopup extends Popup {
     });
   }
 
-  _createLayout() {
+  protected override _createLayout(): AbstractLayout {
     return new DatePickerPopupLayout(this);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('popup date-picker-popup');
     this.$container.toggleClass('alternative', this.field.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
@@ -43,14 +47,14 @@ export default class DatePickerPopup extends Popup {
     this.picker.render();
   }
 
-  getDatePicker() {
+  getDatePicker(): DatePicker {
     return this.picker;
   }
 
   /**
-   * @override because the icon is not in the $anchor container.
+   * override because the icon is not in the $anchor container.
    */
-  _isMouseDownOnAnchor(event) {
+  protected override _isMouseDownOnAnchor(event: MouseEvent): boolean {
     return this.field.$dateField.isOrHas(event.target) || this.field.$dateFieldIcon.isOrHas(event.target) || (this.field.$dateClearIcon && this.field.$dateClearIcon.isOrHas(event.target));
   }
 }

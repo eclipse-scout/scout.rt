@@ -1,31 +1,32 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DatePicker, DatePickerTouchPopupLayout, ParsingFailedStatus, scout, TouchPopup} from '../index';
+import {AbstractLayout, DateField, DatePicker, DatePickerTouchPopupLayout, DatePickerTouchPopupModel, ParsingFailedStatus, scout, TouchPopup} from '../index';
 
 export default class DatePickerTouchPopup extends TouchPopup {
+  declare model: DatePickerTouchPopupModel;
+  declare _widget: DatePicker;
+  declare _field: DateField;
+  declare _touchField: DateField;
 
   constructor() {
     super();
   }
 
-  _init(options) {
+  protected override _init(options: DatePickerTouchPopupModel) {
     super._init(options);
     this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
     this.addCssClass('date-picker-touch-popup');
   }
 
-  /**
-   * @override TouchPopup.js
-   */
-  _initWidget(options) {
+  protected override _initWidget(options: DatePickerTouchPopupModel) {
     this._widget = scout.create(DatePicker, {
       parent: this,
       dateFormat: options.dateFormat,
@@ -33,27 +34,24 @@ export default class DatePickerTouchPopup extends TouchPopup {
     });
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this._field.$container.addClass('date');
   }
 
-  _onMouseDownOutside() {
+  protected override _onMouseDownOutside(event: MouseEvent) {
     this._acceptInput();
   }
 
-  getDatePicker() {
+  getDatePicker(): DatePicker {
     return this._widget;
   }
 
-  /**
-   * @override
-   */
-  _createLayout() {
+  protected override _createLayout(): AbstractLayout {
     return new DatePickerTouchPopupLayout(this);
   }
 
-  _onFieldAcceptInput(event) {
+  protected _onFieldAcceptInput(event) { // FIXME TS: add event type as soon as DateField has been migrated
     // Delegate to original field
     this._touchField.setDisplayText(event.displayText);
     this._touchField.setErrorStatus(event.errorStatus);
@@ -64,10 +62,7 @@ export default class DatePickerTouchPopup extends TouchPopup {
     this._touchField._triggerAcceptInput();
   }
 
-  /**
-   * @override
-   */
-  _acceptInput() {
+  protected override _acceptInput() {
     this._field.acceptDate();
     this.close();
   }
