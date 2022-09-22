@@ -8,16 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout} from '../index';
+import {AbstractLayout, Dimension, HtmlCompPrefSizeOptions, ModeSelector} from '../index';
 
 export default class ModeSelectorLayout extends AbstractLayout {
+  modeSelector: ModeSelector<any>;
 
   constructor(modeSelector) {
     super();
     this.modeSelector = modeSelector;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     super.layout($container);
 
     if (this.modeSelector.$slider) {
@@ -25,10 +26,11 @@ export default class ModeSelectorLayout extends AbstractLayout {
       // The slider will then become visible again (if necessary) in _updateSlider()
       this.modeSelector.$slider.setVisible(false);
     }
+    // @ts-ignore
     this.modeSelector._updateSlider();
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let prefSize = super.preferredLayoutSize($container, options);
 
     let oldStyle = this.modeSelector.$container.attr('style');
