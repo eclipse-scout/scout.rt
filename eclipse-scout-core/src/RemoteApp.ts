@@ -14,7 +14,6 @@ import {AppBootstrapOptions} from './App';
 import {ErrorHandlerOptions} from './ErrorHandler';
 
 export default class RemoteApp extends App {
-  remote: boolean;
 
   constructor() {
     super();

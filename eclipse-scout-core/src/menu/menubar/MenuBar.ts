@@ -20,7 +20,7 @@ export default class MenuBar extends Widget implements MenuBarModel {
   declare model: MenuBarModel;
   declare eventMap: MenuBarEventMap;
 
-  menuSorter: MenuOrder;
+  menuSorter: MenuOrder & { menuBar?: MenuBar };
   menuFilter: MenuFilter;
   position: MenuBarPosition;
   tabbable: boolean;

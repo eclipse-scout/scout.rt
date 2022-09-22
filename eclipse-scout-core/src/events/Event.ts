@@ -16,7 +16,7 @@ export default class Event<T extends EventEmitter = EventEmitter> {
   defaultPrevented: boolean;
   type: string;
 
-  constructor(model?) {
+  constructor(model?: any) {
     this.defaultPrevented = false;
     $.extend(this, model);
   }
@@ -25,4 +25,3 @@ export default class Event<T extends EventEmitter = EventEmitter> {
     this.defaultPrevented = true;
   }
 }
-

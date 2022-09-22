@@ -8,21 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status} from '../index';
+import {Session, Tree, TreeNode} from '../index';
+import {ObjectType} from '../ObjectFactory';
+import {RefModel} from '../types';
 
-export default interface CellModel {
+export default interface TreeNodeModel {
+  parent: Tree;
+  objectType?: ObjectType<TreeNode, TreeNodeModel>;
+  checked?: boolean;
+  childNodes?: RefModel<TreeNodeModel>[] | TreeNode[];
   cssClass?: string;
-  editable?: boolean;
-  errorStatus?: Status;
-  horizontalAlignment?: -1 | 0 | 1;
+  enabled?: boolean;
+  expanded?: boolean;
+  expandedLazy?: boolean;
   htmlEnabled?: boolean;
   iconId?: string;
-  mandatory?: boolean;
+  id?: string;
+  initialExpanded?: boolean;
+  lazyExpandingEnabled?: boolean;
+  leaf?: boolean;
+  level?: number;
+  parentNode?: TreeNode;
+  session?: Session;
   text?: string;
-  value?: any;
   tooltipText?: string;
   foregroundColor?: string;
   backgroundColor?: string;
   font?: string;
-  sortCode?: number;
 }

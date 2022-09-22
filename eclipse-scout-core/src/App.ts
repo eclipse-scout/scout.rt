@@ -83,6 +83,8 @@ export default class App extends EventEmitter {
 
   declare model: AppOptions;
   declare eventMap: AppEventMap;
+
+  remote: boolean;
   initialized: boolean;
   sessions: Session[];
   errorHandler: ErrorHandler;
@@ -91,6 +93,7 @@ export default class App extends EventEmitter {
 
   constructor() {
     super();
+    this.remote = false;
     this.initialized = false;
     this.sessions = [];
     this._loadingTimeoutId = null;
