@@ -8,44 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action} from '../index';
+import {Action, ModeModel} from '../index';
 
-export default class Mode extends Action {
+export default class Mode<T> extends Action implements ModeModel<T> {
+  declare model: ModeModel<T>;
+
+  ref: T;
 
   constructor() {
     super();
 
     this.selected = false;
-    this.ref = null; // Arbitrary reference value, can be used to find and select modes (see ModeSelector.js)
+    this.ref = null;
   }
 
-  _init(model) {
+  protected override _init(model: ModeModel<T>) {
     model.owner = model.parent;
     super._init(model);
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this.$container.addClass('button mode');
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderSelected();
   }
 
-  setSelected(selected) {
-    this.setProperty('selected', selected);
-  }
-
-  _renderSelected() {
+  protected override _renderSelected() {
     this.$container.select(this.selected);
   }
 
-  /**
-   * @Override Action.js
-   */
-  doAction() {
+  override doAction(): boolean {
     if (!this.prepareDoAction()) {
       return false;
     }
@@ -57,16 +53,13 @@ export default class Mode extends Action {
     return true;
   }
 
-  /**
-   * @Override Action.js
-   */
-  toggle() {
+  override toggle() {
     if (!this.selected) {
       this.setSelected(true);
     }
   }
 
-  _renderIconId() {
+  protected override _renderIconId() {
     super._renderIconId();
 
     this._updateLabelAndIconStyle();
@@ -74,7 +67,7 @@ export default class Mode extends Action {
     this.invalidateLayoutTree();
   }
 
-  _renderText() {
+  protected override _renderText() {
     super._renderText();
 
     this._updateLabelAndIconStyle();
@@ -82,7 +75,7 @@ export default class Mode extends Action {
     this.invalidateLayoutTree();
   }
 
-  _updateLabelAndIconStyle() {
+  protected _updateLabelAndIconStyle() {
     let hasText = !!this.text;
     this.get$Icon().toggleClass('with-label', hasText);
   }

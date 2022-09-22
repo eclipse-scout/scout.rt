@@ -8,9 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, events, graphics, HtmlComponent, ModeSelectorLayout, Widget} from '../index';
+import {arrays, events, graphics, HtmlComponent, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorModel, PropertyChangeEvent, Widget} from '../index';
+import {SwipeCallbackEvent} from '../util/events';
 
-export default class ModeSelector extends Widget {
+export default class ModeSelector<T> extends Widget implements ModeSelectorModel<T> {
+  declare model: ModeSelectorModel<T>;
+  declare eventMap: ModeSelectorEventMap<T>;
+
+  modes: Mode<T>[];
+  selectedMode: Mode<T>;
+  $slider: JQuery;
+
+  /**
+   * When a new mode is set, the new one is marked as selected while the old one is deselected. This triggers the modePropertyChangeHandler.
+   * In this case the handler must not react on the selection event. Otherwise the value is first set to null (because the old is deselected) and then to the new value.
+   * Setting a new mode should not trigger two change events.
+   */
+  protected _isModeChanging: boolean;
+
+  protected _modePropertyChangeHandler: (event: PropertyChangeEvent<any>) => void;
 
   constructor() {
     super();
@@ -21,53 +37,48 @@ export default class ModeSelector extends Widget {
     this.selectedMode = null;
     this.$slider = null;
 
-    // When a new mode is set, the new one is marked as selected while the old one is deselected. This triggers the modePropertyChangeHandler.
-    // In this case the handler must not react on the selection event. Otherwise the value is first set to null (because the old is deselected) and then to the new value.
-    // Setting a new mode should not trigger two change events.
     this._isModeChanging = false;
     this._modePropertyChangeHandler = this._onModePropertyChange.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model: ModeSelectorModel<T>) {
     super._init(model);
     this._setModes(this.modes);
     this._setSelectedMode(this.selectedMode);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('mode-selector');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new ModeSelectorLayout(this));
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderSlider();
     this._renderModes();
   }
 
-  setModes(modes) {
+  setModes(modes: Mode<T>[]) {
     this.setProperty('modes', modes);
   }
 
-  _setModes(modes) {
-    this.modes.forEach(function(mode) {
-      mode.off('propertyChange', this._modePropertyChangeHandler);
-    }, this);
+  protected _setModes(modes: Mode<T>[]) {
+    this.modes.forEach(mode => mode.off('propertyChange', this._modePropertyChangeHandler));
     this._setProperty('modes', arrays.ensure(modes));
-    this.modes.forEach(function(mode) {
+    this.modes.forEach(mode => {
       mode.on('propertyChange', this._modePropertyChangeHandler);
       if (mode.selected) {
         this.setSelectedMode(mode);
       }
-    }, this);
+    });
   }
 
-  _renderSlider() {
+  protected _renderSlider() {
     this.$slider = this.$container.appendDiv('mode-slider');
   }
 
-  _renderModes() {
+  protected _renderModes() {
     this.modes.forEach(mode => {
       mode.render();
       this._registerDragHandlers(mode.$container);
@@ -75,11 +86,11 @@ export default class ModeSelector extends Widget {
     this._updateMarkers();
   }
 
-  setSelectedMode(selectedMode) {
+  setSelectedMode(selectedMode: Mode<T>) {
     this.setProperty('selectedMode', selectedMode);
   }
 
-  _setSelectedMode(selectedMode) {
+  protected _setSelectedMode(selectedMode: Mode<T>) {
     this._isModeChanging = true;
     if (this.selectedMode && this.selectedMode !== selectedMode) {
       this.selectedMode.setSelected(false);
@@ -92,7 +103,7 @@ export default class ModeSelector extends Widget {
     this._updateMarkers();
   }
 
-  _onModePropertyChange(event) {
+  protected _onModePropertyChange(event: PropertyChangeEvent<any, Mode<T>>) {
     if (event.propertyName === 'selected' && !this._isModeChanging) {
       this.setSelectedMode(event.newValue ? event.source : null);
     } else if (event.propertyName === 'visible') {
@@ -102,7 +113,7 @@ export default class ModeSelector extends Widget {
     }
   }
 
-  _updateMarkers() {
+  protected _updateMarkers() {
     let visibleModes = [];
     let selectedModeIndex = -1;
     this.modes.forEach(mode => {
@@ -126,7 +137,7 @@ export default class ModeSelector extends Widget {
     this._updateSlider();
   }
 
-  _updateSlider() {
+  protected _updateSlider() {
     if (!this.$slider) {
       return;
     }
@@ -140,10 +151,10 @@ export default class ModeSelector extends Widget {
     this.$slider.setVisible(this.selectedMode && this.selectedMode.$container && this.selectedMode.enabled);
   }
 
-  _registerDragHandlers($mode) {
+  protected _registerDragHandlers($mode: JQuery) {
     let className = 'mode-selector-dragging';
-    let onDown = /** @type {SwipeCallbackEvent} */e => this.enabledComputed && this.selectedMode && this.selectedMode.$container === $mode && this.modes.filter(m => m.isVisible() && m.enabled).length > 1;
-    let onMove = /** @type {SwipeCallbackEvent} */e => {
+    let onDown = (e: SwipeCallbackEvent) => this.enabledComputed && this.selectedMode && this.selectedMode.$container === $mode && this.modes.filter(m => m.isVisible() && m.enabled).length > 1;
+    let onMove = (e: SwipeCallbackEvent) => {
       let maxX = this.$container.width() - $mode.outerWidth();
       let minX = 0;
       let newModeLeft = Math.max(Math.min(e.newLeft, maxX), minX); // limit to the size of the ModeSelector
@@ -153,7 +164,7 @@ export default class ModeSelector extends Widget {
       }
       return newModeLeft;
     };
-    let onUp = /** @type {SwipeCallbackEvent} */e => {
+    let onUp = (e: SwipeCallbackEvent) => {
       this.$container.children().removeClass(className);
       let newSelectedMode = this._computeNewSelectedMode(e);
       if (!newSelectedMode || newSelectedMode === this.selectedMode || !newSelectedMode.enabled) {
@@ -165,11 +176,7 @@ export default class ModeSelector extends Widget {
     events.onSwipe($mode, className, onDown, onMove, onUp);
   }
 
-  /**
-   *
-   * @param {SwipeCallbackEvent} e
-   */
-  _computeNewSelectedMode(e) {
+  protected _computeNewSelectedMode(e: SwipeCallbackEvent): Mode<T> {
     if (e.direction === 0 || Math.abs(e.deltaX) <= 5) {
       // ignore if the slide is below threshold
       return this.selectedMode;
@@ -182,7 +189,7 @@ export default class ModeSelector extends Widget {
     return this._findModeByPos(e.newLeft + this.$slider.width());
   }
 
-  _findModeByPos(pos) {
+  protected _findModeByPos(pos: number): Mode<T> {
     let visibleModes = this.modes.filter(m => m.isVisible());
     for (let i = visibleModes.length - 1; i >= 0; i--) {
       let mode = visibleModes[i];
@@ -198,23 +205,19 @@ export default class ModeSelector extends Widget {
     return null;
   }
 
-  findModeById(id) {
-    return arrays.find(this.modes, mode => {
-      return mode.id === id;
-    });
+  findModeById(id: string): Mode<T> {
+    return arrays.find(this.modes, mode => mode.id === id);
   }
 
-  findModeByRef(ref) {
-    return arrays.find(this.modes, mode => {
-      return mode.ref === ref;
-    });
+  findModeByRef(ref: T): Mode<T> {
+    return arrays.find(this.modes, mode => mode.ref === ref);
   }
 
-  selectModeById(id) {
+  selectModeById(id: string) {
     this.setSelectedMode(this.findModeById(id));
   }
 
-  selectModeByRef(ref) {
+  selectModeByRef(ref: T) {
     this.setSelectedMode(this.findModeByRef(ref));
   }
 }
