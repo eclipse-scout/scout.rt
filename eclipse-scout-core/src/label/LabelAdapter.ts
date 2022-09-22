@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModelAdapter} from '../index';
+import {Event, ModelAdapter} from '../index';
+import {LabelAppLinkActionEvent} from './LabelEventMap';
 
 export default class LabelAdapter extends ModelAdapter {
 
@@ -16,15 +17,15 @@ export default class LabelAdapter extends ModelAdapter {
     super();
   }
 
-  _onWidgetAppLinkAction(event) {
+  protected _onWidgetAppLinkAction(event: LabelAppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref
     });
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event) {
     if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event);
+      this._onWidgetAppLinkAction(event as LabelAppLinkActionEvent);
     } else {
       super._onWidgetEvent(event);
     }
