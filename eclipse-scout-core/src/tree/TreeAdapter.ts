@@ -1,23 +1,24 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, defaultValues, ModelAdapter, objects, scout, Tree} from '../index';
+import {App, arrays, CellModel, defaultValues, Event, ModelAdapter, objects, RemoteEvent, scout, Tree, TreeNode, TreeNodeModel} from '../index';
+import {TreeDropEvent, TreeNodeActionEvent, TreeNodeClickEvent, TreeNodeExpandedEvent, TreeNodesCheckedEvent, TreeNodesSelectedEvent} from './TreeEventMap';
 
-export default class TreeAdapter extends ModelAdapter {
+export default class TreeAdapter<T extends Tree = Tree> extends ModelAdapter<T> {
 
   constructor() {
     super();
     this._addRemoteProperties(['displayStyle']);
   }
 
-  _sendNodesSelected(nodeIds, debounceSend) {
+  protected _sendNodesSelected(nodeIds: string[], debounceSend: boolean) {
     let eventData = {
       nodeIds: nodeIds
     };
@@ -26,30 +27,31 @@ export default class TreeAdapter extends ModelAdapter {
     // coalesce: only send the latest selection changed event for a field
     this._send('nodesSelected', eventData, {
       delay: (debounceSend ? 250 : 0),
-      coalesce: function(previous) {
+      coalesce: function(previous: RemoteEvent) {
         return this.target === previous.target && this.type === previous.type;
       }
     });
   }
 
-  _onWidgetNodeClick(event) {
+  protected _onWidgetNodeClick(event: TreeNodeClickEvent) {
     this._send('nodeClick', {
       nodeId: event.node.id
     });
   }
 
-  _onWidgetNodeAction(event) {
+  protected _onWidgetNodeAction(event: TreeNodeActionEvent) {
     this._send('nodeAction', {
       nodeId: event.node.id
     });
   }
 
-  _onWidgetNodesSelected(event) {
+  protected _onWidgetNodesSelected(event: TreeNodesSelectedEvent) {
+    // @ts-ignore
     let nodeIds = this.widget._nodesToIds(this.widget.selectedNodes);
     this._sendNodesSelected(nodeIds, event.debounce);
   }
 
-  _onWidgetNodeExpanded(event) {
+  protected _onWidgetNodeExpanded(event: TreeNodeExpandedEvent) {
     this._send('nodeExpanded', {
       nodeId: event.node.id,
       expanded: event.expanded,
@@ -57,11 +59,11 @@ export default class TreeAdapter extends ModelAdapter {
     });
   }
 
-  _onWidgetNodesChecked(event) {
+  protected _onWidgetNodesChecked(event: TreeNodesCheckedEvent) {
     this._sendNodesChecked(event.nodes);
   }
 
-  _sendNodesChecked(nodes) {
+  protected _sendNodesChecked(nodes: TreeNode[]) {
     let data = {
       nodes: []
     };
@@ -76,25 +78,25 @@ export default class TreeAdapter extends ModelAdapter {
     this._send('nodesChecked', data);
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event) {
     if (event.type === 'nodesSelected') {
-      this._onWidgetNodesSelected(event);
+      this._onWidgetNodesSelected(event as TreeNodesSelectedEvent);
     } else if (event.type === 'nodeClick') {
-      this._onWidgetNodeClick(event);
+      this._onWidgetNodeClick(event as TreeNodeClickEvent);
     } else if (event.type === 'nodeAction') {
-      this._onWidgetNodeAction(event);
+      this._onWidgetNodeAction(event as TreeNodeActionEvent);
     } else if (event.type === 'nodeExpanded') {
-      this._onWidgetNodeExpanded(event);
+      this._onWidgetNodeExpanded(event as TreeNodeExpandedEvent);
     } else if (event.type === 'nodesChecked') {
-      this._onWidgetNodesChecked(event);
+      this._onWidgetNodesChecked(event as TreeNodesCheckedEvent);
     } else if (event.type === 'drop' && this.widget.dragAndDropHandler) {
-      this.widget.dragAndDropHandler.uploadFiles(event);
+      this.widget.dragAndDropHandler.uploadFiles(event as TreeDropEvent);
     } else {
       super._onWidgetEvent(event);
     }
   }
 
-  onModelAction(event) {
+  override onModelAction(event: any) {
     if (event.type === 'nodesInserted') {
       this._onNodesInserted(event.nodes, event.commonParentNodeId);
     } else if (event.type === 'nodesUpdated') {
@@ -122,8 +124,8 @@ export default class TreeAdapter extends ModelAdapter {
     }
   }
 
-  _onNodesInserted(nodes, parentNodeId) {
-    let parentNode;
+  protected _onNodesInserted(nodes: TreeNode[] | TreeNode, parentNodeId: string) {
+    let parentNode: TreeNode;
     if (parentNodeId !== null && parentNodeId !== undefined) {
       parentNode = this.widget.nodesMap[parentNodeId];
       if (!parentNode) {
@@ -133,12 +135,13 @@ export default class TreeAdapter extends ModelAdapter {
     this.widget.insertNodes(nodes, parentNode);
   }
 
-  _onNodesUpdated(nodes) {
+  protected _onNodesUpdated(nodes: TreeNode | TreeNode[]) {
     this.widget.updateNodes(nodes);
   }
 
-  _onNodesDeleted(nodeIds, parentNodeId) {
-    let parentNode;
+  protected _onNodesDeleted(nodeIds: string[], parentNodeId: string) {
+    // noinspection DuplicatedCode
+    let parentNode: TreeNode;
     if (parentNodeId !== null && parentNodeId !== undefined) {
       parentNode = this.widget.nodesMap[parentNodeId];
       if (!parentNode) {
@@ -147,12 +150,14 @@ export default class TreeAdapter extends ModelAdapter {
     }
     this.addFilterForWidgetEventType('nodesSelected');
     this.addFilterForWidgetEventType('nodesChecked');
+    // @ts-ignore
     let nodes = this.widget._nodesByIds(nodeIds);
     this.widget.deleteNodes(nodes, parentNode);
   }
 
-  _onAllChildNodesDeleted(parentNodeId) {
-    let parentNode;
+  protected _onAllChildNodesDeleted(parentNodeId: string) {
+    // noinspection DuplicatedCode
+    let parentNode: TreeNode;
     if (parentNodeId !== null && parentNodeId !== undefined) {
       parentNode = this.widget.nodesMap[parentNodeId];
       if (!parentNode) {
@@ -164,34 +169,33 @@ export default class TreeAdapter extends ModelAdapter {
     this.widget.deleteAllChildNodes(parentNode);
   }
 
-  _onNodesSelected(nodeIds) {
-    this.addFilterForWidgetEvent(widgetEvent => {
-      return widgetEvent.type === 'nodesSelected' &&
-        arrays.equals(nodeIds, this.widget._nodesToIds(this.widget.selectedNodes));
-    });
+  protected _onNodesSelected(nodeIds: string[]) {
+    // @ts-ignore
+    this.addFilterForWidgetEvent(widgetEvent => widgetEvent.type === 'nodesSelected' && arrays.equals(nodeIds, this.widget._nodesToIds(this.widget.selectedNodes)));
+    // @ts-ignore
     let nodes = this.widget._nodesByIds(nodeIds);
     this.widget.selectNodes(nodes);
   }
 
   /**
-   * @parem event.expanded true, to expand the node
+   * @param event.expanded true, to expand the node
    * @param event.expandedLazy true, to expand the nodes lazily
    * @param event.recursive true, to expand the descendant nodes as well
    */
-  _onNodeExpanded(nodeId, event) {
+  protected _onNodeExpanded(nodeId: string, event: { expanded: boolean; expandedLazy: boolean; recursive: boolean }) {
     let node = this.widget.nodesMap[nodeId],
       options = {
         lazy: event.expandedLazy
       };
 
-    let affectedNodesMap = objects.createMap();
+    let affectedNodesMap = objects.createMap() as Record<string, boolean>;
     affectedNodesMap[nodeId] = true;
     if (event.recursive) {
       Tree.visitNodes(n => {
         affectedNodesMap[n.id] = true;
       }, node.childNodes);
     }
-    this.addFilterForWidgetEvent(widgetEvent => {
+    this.addFilterForWidgetEvent((widgetEvent: TreeNodeExpandedEvent) => {
       return widgetEvent.type === 'nodeExpanded' &&
         affectedNodesMap[widgetEvent.node.id] &&
         event.expanded === widgetEvent.expanded &&
@@ -204,8 +208,7 @@ export default class TreeAdapter extends ModelAdapter {
     }
   }
 
-  // noinspection DuplicatedCode
-  _onNodeChanged(nodeId, cell) {
+  protected _onNodeChanged(nodeId: string, cell: CellModel) {
     let node = this.widget.nodesMap[nodeId];
 
     defaultValues.applyTo(cell, 'TreeNode');
@@ -221,18 +224,19 @@ export default class TreeAdapter extends ModelAdapter {
     this.widget.changeNode(node);
   }
 
-  _onNodesChecked(nodes) {
-    let checkedNodes = [],
-      uncheckedNodes = [];
+  protected _onNodesChecked(nodes: { id: string; checked: boolean }[]) {
+    let checkedNodes: TreeNode[] = [],
+      uncheckedNodes: TreeNode[] = [];
 
-    nodes.forEach(function(nodeData) {
+    nodes.forEach(nodeData => {
+      // @ts-ignore
       let node = this.widget._nodeById(nodeData.id);
       if (nodeData.checked) {
         checkedNodes.push(node);
       } else {
         uncheckedNodes.push(node);
       }
-    }, this);
+    });
 
     this.addFilterForWidgetEventType('nodesChecked');
 
@@ -247,35 +251,44 @@ export default class TreeAdapter extends ModelAdapter {
     });
   }
 
-  _onChildNodeOrderChanged(childNodeIds, parentNodeId) {
-    let parentNode = this.widget._nodeById([parentNodeId]);
+  protected _onChildNodeOrderChanged(childNodeIds: string[], parentNodeId: string) {
+    // @ts-ignore
+    let parentNode = this.widget._nodeById(parentNodeId);
+    // @ts-ignore
     let nodes = this.widget._nodesByIds(childNodeIds);
     this.widget.updateNodeOrder(nodes, parentNode);
   }
 
-  _onRequestFocus() {
+  protected _onRequestFocus() {
     this.widget.focus();
   }
 
-  _onScrollToSelection() {
+  protected _onScrollToSelection() {
     this.widget.revealSelection();
   }
 
-  _initNodeModel(nodeModel) {
+  protected _initNodeModel(nodeModel: TreeNodeModel): TreeNodeModel {
+    // @ts-ignore
     nodeModel = nodeModel || {};
     nodeModel.objectType = scout.nvl(nodeModel.objectType, this._getDefaultNodeObjectType());
     defaultValues.applyTo(nodeModel);
     return nodeModel;
   }
 
-  _getDefaultNodeObjectType() {
+  protected _getDefaultNodeObjectType() {
     return 'TreeNode';
   }
 
-  static _createTreeNodeRemote(nodeModel) {
+  /**
+   * 'this' in this function refers to the Tree
+   */
+  protected static _createTreeNodeRemote(nodeModel: TreeNodeModel) {
+    // @ts-ignore
     if (this.modelAdapter) {
+      // @ts-ignore
       nodeModel = this.modelAdapter._initNodeModel(nodeModel);
     }
+    // @ts-ignore
     return this._createTreeNodeOrig(nodeModel);
   }
 

@@ -10,7 +10,7 @@
  */
 import {PopupModel, Widget, WidgetModel} from '../index';
 import {ResizableMode} from '../resizable/Resizable';
-import {RefWidgetModel} from '../widget/WidgetModel';
+import {RefModel} from '../types';
 
 export default interface WidgetPopupModel extends PopupModel {
   /**
@@ -32,5 +32,5 @@ export default interface WidgetPopupModel extends PopupModel {
   /**
    * The content of the WidgetPopup
    */
-  content: Widget | RefWidgetModel<WidgetModel>;
+  content: Widget | RefModel<WidgetModel>;
 }

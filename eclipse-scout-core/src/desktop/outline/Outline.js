@@ -60,7 +60,7 @@ export default class Outline extends Tree {
     this.nodePaddingLevelCheckable = 20; /* outline is not checkable. set to same value as not-checkable */
     this.nodePaddingLevelNotCheckable = 20; /* outline uses different level-paddings that normal trees */
     this.nodePaddingLevelHierarchyRow = this.nodePaddingLevelNotCheckable;
-    this._scrolldirections = 'y';
+    this._scrollDirections = 'y';
     this._addWidgetProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
   }
 
@@ -433,7 +433,7 @@ export default class Outline extends Tree {
   /**
    * @override
    */
-  _nodesSelectedInternal() {
+  _nodesSelectedInternal(nodes) {
     let activePage = this.activePage();
     // This block here is similar to what's done in Java's DefaultPageChangeStrategy
     if (activePage) {

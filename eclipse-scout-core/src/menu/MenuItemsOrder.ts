@@ -12,7 +12,6 @@ import {Menu, MenuBar, menus, scout, Session} from '../index';
 
 export type MenuOrder = {
   order(items: Menu[]): OrderedMenuItems;
-  menuBar: MenuBar;
 };
 
 export type OrderedMenuItems = { left: Menu[]; right: Menu[]; all: Menu[] };

@@ -8,13 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, Event, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel} from '../index';
+import {Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, Event, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel} from '../index';
 import * as $ from 'jquery';
-import {RefWidgetModel} from './WidgetModel';
 import {ObjectType} from '../ObjectFactory';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {ScrollbarInstallOptions, ScrollOptions} from '../scrollbar/scrollbars';
-import {Optional} from '../types';
+import {Optional, RefModel} from '../types';
 
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
 export type GlassPaneContribution = (widget: Widget) => JQuery | JQuery[];
@@ -281,7 +280,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Default implementation simply returns undefined. A Subclass
    * may override this method to load or extend a JSON model with models.getModel or models.extend.
    */
-  protected _jsonModel(): RefWidgetModel<WidgetModel> {
+  protected _jsonModel(): RefModel<WidgetModel> {
     return null;
   }
 
@@ -635,7 +634,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     this.session.desktop.removePopupsFor(this);
 
     this.removalPending = true;
-    // Don't execute immediately to make sure nothing interferes with the animation (e.g. layouting) which could make it laggy
+    // Don't execute immediately to make sure nothing interferes with the animation (e.g. layouting) which could make it lag
     setTimeout(() => {
       // check if the container has been removed in the meantime
       if (!this._rendered) {
@@ -950,7 +949,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     this._renderDisabledStyleInternal(this.$container);
   }
 
-  protected _renderDisabledStyleInternal($element: JQuery) {
+  protected _renderDisabledStyleInternal($element: JQuery<HTMLElement>) {
     if (!$element) {
       return;
     }
@@ -1372,7 +1371,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Detaches the element and all its children from the DOM.<br>
    * Compared to {@link remove}, the state of the HTML elements are preserved, so they can be attached again without the need to render them again from scratch.
-   * {@link attach}/{@link detach} is faster in general than {@link render}/{@link remove}, but it is much more error prone and should therefor only be used very carefully. Rule of thumb: Don't use it, use {@link remove} instead.<br>
+   * {@link attach}/{@link detach} is faster in general than {@link render}/{@link remove}, but it is much more error prone and should therefore only be used very carefully. Rule of thumb: Don't use it, use {@link remove} instead.<br>
    * The main problem with attach/detach is that a widget can change its model anytime. If this happens for a removed widget, only the model will change, and when rendered again, the recent model is used to create the HTML elements.
    * If the same happens when a widget is detached, the widget is still considered rendered and the model applied to the currently detached elements.
    * This may or may not work because a detached element for example does not have a size or a position.
@@ -1463,16 +1462,16 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return null;
   }
 
-  updateKeyStrokes(newKeyStrokes: KeyStroke[], oldKeyStrokes: KeyStroke[]) {
+  updateKeyStrokes(newKeyStrokes: KeyStroke | KeyStroke[] | Action | Action[], oldKeyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
     this.unregisterKeyStrokes(oldKeyStrokes);
     this.registerKeyStrokes(newKeyStrokes);
   }
 
-  registerKeyStrokes(keyStrokes: KeyStroke[]) {
+  registerKeyStrokes(keyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
     this.keyStrokeContext.registerKeyStrokes(keyStrokes);
   }
 
-  unregisterKeyStrokes(keyStrokes: KeyStroke[]) {
+  unregisterKeyStrokes(keyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
     this.keyStrokeContext.unregisterKeyStrokes(keyStrokes);
   }
 
@@ -2101,7 +2100,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Calls {@link focus()} and prevents the default behavior of the event if the focusing was successful.
    */
-  focusAndPreventDefault(event) {
+  focusAndPreventDefault(event: JQuery.Event): boolean {
     if (this.focus()) {
       // Preventing blur is bad for touch devices because it prevents that the keyboard can close.
       // In that case focus() will return false because focus manager is disabled.

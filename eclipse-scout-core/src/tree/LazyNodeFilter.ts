@@ -3,24 +3,29 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-export default class LazyNodeFilter {
+import {Tree, TreeNode} from '../index';
 
-  constructor(tree) {
+export type LazyNodeFilterTreeNode = TreeNode & { _lazyNodeFilterAccepted?: boolean };
+
+export default class LazyNodeFilter {
+  tree: Tree;
+
+  constructor(tree: Tree) {
     this.tree = tree;
   }
 
-  accept(node) {
+  accept(node: LazyNodeFilterTreeNode): boolean {
     if (node.expanded) {
       return true;
     }
     // not expanded: remove lazy expand marker (forget lazy expanded children)
-    node.childNodes.forEach(child => {
+    node.childNodes.forEach((child: LazyNodeFilterTreeNode) => {
       child._lazyNodeFilterAccepted = false;
     });
 

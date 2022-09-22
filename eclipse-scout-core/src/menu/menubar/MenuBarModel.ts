@@ -14,10 +14,10 @@ import {MenuFilter} from '../Menu';
 import {MenuBarEllipsisPosition, MenuBarPosition} from './MenuBar';
 
 export default interface MenuBarModel extends WidgetModel {
-  menuSorter?: MenuOrder;
   menuFilter?: MenuFilter;
   position?: MenuBarPosition;
   tabbable?: boolean;
   ellipsisPosition?: MenuBarEllipsisPosition;
   hiddenByUi?: boolean;
+  menuOrder?: MenuOrder;
 }

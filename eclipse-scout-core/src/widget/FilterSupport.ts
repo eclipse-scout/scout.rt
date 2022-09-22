@@ -12,8 +12,8 @@ import {arrays, EventHandler, Filter, Filterable, FilterResult, FilterSupportOpt
 import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
 import {FilterElement, TextFilter} from './Filter';
 
-type FilterFunction<TElem extends FilterElement> = ((elem) => boolean);
-type FilterOrFunction<TElem extends FilterElement> = Filter<TElem> | FilterFunction<TElem>;
+export type FilterFunction<TElem extends FilterElement> = (elem) => boolean;
+export type FilterOrFunction<TElem extends FilterElement> = Filter<TElem> | FilterFunction<TElem>;
 
 export default class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
   declare widget: Widget & Filterable<TElem>;

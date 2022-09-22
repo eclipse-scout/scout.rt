@@ -66,11 +66,13 @@ export function removeScrollable(session: Session, $container: JQuery) {
   }
 }
 
+export type ScrollDirection = 'x' | 'y' | 'both';
+
 export interface ScrollbarInstallOptions extends WidgetModel {
   /**
    * Default is both
    */
-  axis?: 'x' | 'y' | 'both';
+  axis?: ScrollDirection;
 
   nativeScrollbars?: boolean;
 
@@ -963,20 +965,23 @@ export function _getCompleteChildRowsHeightRecursive(children: ExpandableElement
 }
 
 export interface ExpandableElement {
-  element: ExpandableElement;
-  $element: JQuery;
-  $scrollable: JQuery;
   height: number;
-  defaultChildHeight: number;
   level: number;
-  nodePaddingLevel: number;
-
-  isExpanded(element: ExpandableElement): boolean;
-
-  getChildren(element: ExpandableElement): ExpandableElement[];
 }
 
-export function ensureExpansionVisible(parent: ExpandableElement) {
+export interface ExpansionParent<T extends ExpandableElement> {
+  element: T;
+  $element: JQuery;
+  $scrollable: JQuery;
+  defaultChildHeight: number;
+  nodePaddingLevel: number;
+
+  isExpanded(element: T): boolean;
+
+  getChildren(element: T): T[];
+}
+
+export function ensureExpansionVisible<T extends ExpandableElement>(parent: ExpansionParent<T>) {
   let isParentExpanded = parent.isExpanded(parent.element);
   let children = parent.getChildren(parent.element);
   let parentPositionTop = parent.$element.position().top;

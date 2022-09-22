@@ -9,13 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Mode, ModeModel, WidgetModel} from '../index';
-import {RefWidgetModel} from '../widget/WidgetModel';
+import {RefModel} from '../types';
 
 export default interface ModeSelectorModel<T> extends WidgetModel {
   /**
    * Default is [].
    */
-  modes?: Mode<T>[] | RefWidgetModel<ModeModel<T>>[];
+  modes?: Mode<T>[] | RefModel<ModeModel<T>>[];
   /**
    * Default is null.
    */

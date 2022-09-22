@@ -13,7 +13,6 @@ import $ from 'jquery';
 import {AppBootstrapOptions} from './App';
 
 export default class RemoteApp extends App {
-  remote: boolean;
 
   constructor() {
     super();

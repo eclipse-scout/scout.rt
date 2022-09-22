@@ -1,28 +1,28 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompactTreeDownKeyStroke, CompactTreeLeftKeyStroke, CompactTreeNode, CompactTreeRightKeyStroke, CompactTreeUpKeyStroke, HtmlComponent, MenuBar, MenuItemsOrder, Range, scout, Tree, TreeLayout} from '../index';
+import {arrays, CompactTreeDownKeyStroke, CompactTreeLeftKeyStroke, CompactTreeNode, CompactTreeRightKeyStroke, CompactTreeUpKeyStroke, HtmlComponent, MenuBar, MenuItemsOrder, Range, scout, Tree, TreeLayout, TreeNode, TreeNodeModel} from '../index';
+import {Optional} from '../types';
+import {TreeRenderExpansionOptions} from './Tree';
 
 export default class CompactTree extends Tree {
 
+  $nodesContainer: JQuery<HTMLDivElement>;
+
   constructor() {
     super();
-    this.$nodesContainer;
-    this._scrolldirections = 'y';
+    this._scrollDirections = 'y';
   }
 
-  /**
-   * @override Tree.js
-   */
-  _initTreeKeyStrokeContext() {
-    this.keyStrokeContext.registerKeyStroke([
+  protected override _initTreeKeyStrokeContext() {
+    this.keyStrokeContext.registerKeyStrokes([
       new CompactTreeUpKeyStroke(this),
       new CompactTreeDownKeyStroke(this),
       new CompactTreeLeftKeyStroke(this),
@@ -30,13 +30,13 @@ export default class CompactTree extends Tree {
     ]);
   }
 
-  _createTreeNode(nodeModel) {
+  protected override _createTreeNode(nodeModel?: Optional<TreeNodeModel, 'parent'>): CompactTreeNode {
     nodeModel = scout.nvl(nodeModel, {});
     nodeModel.parent = this;
-    return scout.create(CompactTreeNode, nodeModel);
+    return scout.create(CompactTreeNode, nodeModel as TreeNodeModel);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('compact-tree');
 
     let layout = new TreeLayout(this);
@@ -59,25 +59,16 @@ export default class CompactTree extends Tree {
     this.invalidateLayoutTree();
   }
 
-  /**
-   * @override
-   */
-  _calculateCurrentViewRange() {
+  protected override _calculateCurrentViewRange(): Range {
     this.viewRangeSize = this.visibleNodesFlat.length;
     return new Range(0, Math.max(this.visibleNodesFlat.length, 0));
   }
 
-  /**
-   * @override
-   */
-  calculateViewRangeSize() {
+  override calculateViewRangeSize(): number {
     return this.visibleNodesFlat.length;
   }
 
-  /**
-   * @override
-   */
-  _insertNodeInDOMAtPlace(node, index) {
+  protected override _insertNodeInDOMAtPlace(node: CompactTreeNode, index: number) {
     let visibleNodeBefore = this.visibleNodesFlat[index - 1];
     let n;
     if (!visibleNodeBefore) {
@@ -94,11 +85,8 @@ export default class CompactTree extends Tree {
     }
   }
 
-  /**
-   * @override
-   */
-  selectNodes(nodes, debounceSend) {
-    let selectedSectionNodes = [];
+  override selectNodes(nodes: CompactTreeNode | CompactTreeNode[], debounceSend?: boolean) {
+    let selectedSectionNodes: CompactTreeNode[] = [];
     nodes = arrays.ensure(nodes);
     nodes.forEach(node => {
       // If a section is selected, automatically change selection to first section-node
@@ -109,22 +97,16 @@ export default class CompactTree extends Tree {
       } else {
         selectedSectionNodes.push(node);
       }
-    }, this);
+    });
 
-    super.selectNodes(selectedSectionNodes);
+    super.selectNodes(selectedSectionNodes, debounceSend);
   }
 
-  /**
-   * @override
-   */
-  _renderExpansion(node) {
+  protected override _renderExpansion(node: TreeNode, options?: TreeRenderExpansionOptions) {
     // nop (not supported by CompactTree)
   }
 
-  /**
-   * @override
-   */
-  _updateItemPath() {
+  protected override _updateItemPath(selectionChanged: boolean, ultimate?: TreeNode) {
     // nop (not supported by CompactTree)
   }
 }
