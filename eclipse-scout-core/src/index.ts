@@ -247,6 +247,8 @@ export {default as ActionKeyStroke} from './action/ActionKeyStroke';
 export {default as Box} from './box/Box';
 export {default as Label} from './label/Label';
 export {default as LabelAdapter} from './label/LabelAdapter';
+export {default as LabelEventMap} from './label/LabelEventMap';
+export {default as LabelModel} from './label/LabelModel';
 export {default as Popup} from './popup/Popup';
 export {default as PopupModel} from './popup/PopupModel';
 export {default as PopupEventMap} from './popup/PopupEventMap';
