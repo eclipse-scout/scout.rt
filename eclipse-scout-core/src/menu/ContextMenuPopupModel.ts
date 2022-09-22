@@ -9,9 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Menu, PopupModel} from '../index';
+import {MenuFilter} from './Menu';
 
 export default interface ContextMenuPopupModel extends PopupModel {
   menuItems?: Menu[];
   cloneMenuItems?: boolean;
   animationDuration?: number;
+  menuFilter?: MenuFilter;
 }

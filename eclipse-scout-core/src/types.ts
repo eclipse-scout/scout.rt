@@ -10,6 +10,7 @@
  */
 
 import {Widget} from './index';
+import {ObjectType} from './ObjectFactory';
 
 export type Predicate<T> = (obj: T) => boolean;
 
@@ -17,6 +18,8 @@ export type Comparator<T> = (a: T, b: T) => number;
 
 // Type that makes some properties optional and some required.
 export type PartialAndRequired<T, OPTIONAL extends keyof T, REQUIRED extends keyof T> = Omit<T, OPTIONAL | REQUIRED> & Partial<Pick<T, OPTIONAL>> & Required<Pick<T, REQUIRED>>;
+
+export type RefModel<MODEL extends { parent: any; objectType?: ObjectType<any> }> = PartialAndRequired<MODEL, 'parent', 'objectType'>;
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 

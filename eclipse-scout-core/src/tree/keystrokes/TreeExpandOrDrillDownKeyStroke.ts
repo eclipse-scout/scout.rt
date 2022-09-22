@@ -1,22 +1,24 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractTreeNavigationKeyStroke, keys} from '../../index';
+import {AbstractTreeNavigationKeyStroke, keys, ScoutKeyboardEvent, Tree, TreeNode} from '../../index';
+import {TreeEventCurrentNode} from './AbstractTreeNavigationKeyStroke';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class TreeExpandOrDrillDownKeyStroke extends AbstractTreeNavigationKeyStroke {
 
-  constructor(tree, modifierBitMask) {
+  constructor(tree: Tree, modifierBitMask: number) {
     super(tree, modifierBitMask);
     this.which = [keys.ADD];
     this.renderingHints.text = '+';
-    this.renderingHints.$drawingArea = ($drawingArea, event) => {
+    this.renderingHints.$drawingArea = ($drawingArea: JQuery, event: ScoutKeyboardEvent & TreeEventCurrentNode) => {
       let currentNode = event._treeCurrentNode;
       if (this.isNodeExpandable(currentNode)) {
         return currentNode.$node;
@@ -26,17 +28,17 @@ export default class TreeExpandOrDrillDownKeyStroke extends AbstractTreeNavigati
     };
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent & TreeEventCurrentNode): boolean {
     let accepted = super._accept(event);
     let currentNode = event._treeCurrentNode;
     return accepted && currentNode && (this.isNodeExpandable(currentNode) || currentNode.childNodes.length > 0);
   }
 
-  isNodeExpandable(node) {
+  isNodeExpandable(node: TreeNode): boolean {
     return !node.expanded && !node.leaf;
   }
 
-  handle(event) {
+  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & TreeEventCurrentNode) {
     let currentNode = event._treeCurrentNode;
     if (this.isNodeExpandable(currentNode)) {
       this.field.expandNode(currentNode, {

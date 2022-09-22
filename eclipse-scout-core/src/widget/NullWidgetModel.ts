@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Widget, WidgetModel} from '../index';
-import {RefWidgetModel} from './WidgetModel';
+import {RefModel} from '../types';
 
 export default interface NullWidgetModel extends WidgetModel {
-  childWidget: Widget | RefWidgetModel<WidgetModel>;
+  childWidget: Widget | RefModel<WidgetModel>;
 }

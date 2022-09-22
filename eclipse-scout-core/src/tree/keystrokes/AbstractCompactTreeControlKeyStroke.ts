@@ -1,25 +1,31 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStroke} from '../../index';
+import {CompactTree, CompactTreeNode, KeyStroke, ScoutKeyboardEvent} from '../../index';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
+
+export type CompactTreeEventNode = {
+  _nextNode?: CompactTreeNode;
+};
 
 export default class AbstractCompactTreeControlKeyStroke extends KeyStroke {
+  declare field: CompactTree;
 
-  constructor(compactProcessTree) {
+  constructor(compactProcessTree: CompactTree) {
     super();
     this.repeatable = true;
     this.field = compactProcessTree;
     this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent & CompactTreeEventNode): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -30,7 +36,7 @@ export default class AbstractCompactTreeControlKeyStroke extends KeyStroke {
     }
 
     let $currentNode = this.field.$nodesContainer.find('.section-node.selected'),
-      currentNode = $currentNode.data('node');
+      currentNode = $currentNode.data('node') as CompactTreeNode;
 
     let nextNode = this._findNextNode($currentNode, currentNode);
     if (nextNode) {
@@ -40,12 +46,12 @@ export default class AbstractCompactTreeControlKeyStroke extends KeyStroke {
     return false;
   }
 
-  handle(event) {
+  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & CompactTreeEventNode) {
     this.field.selectNodes(event._nextNode);
     this.field.checkNode(event._nextNode, true);
   }
 
-  _findNextNode($currentNode, currentNode) {
+  protected _findNextNode($currentNode: JQuery, currentNode: CompactTreeNode): CompactTreeNode {
     throw new Error('method must be overwritten by subclass');
   }
 }

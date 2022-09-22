@@ -1,18 +1,25 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HAlign, KeyStroke, keyStrokeModifier} from '../../index';
+import {HAlign, KeyStroke, keyStrokeModifier, ScoutKeyboardEvent, Tree, TreeNode} from '../../index';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
+
+export type TreeEventCurrentNode = {
+  _treeCurrentNode?: TreeNode;
+  _$treeCurrentNode?: JQuery<HTMLDivElement>;
+};
 
 export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
+  declare field: Tree;
 
-  constructor(tree, modifierBitMask) {
+  constructor(tree: Tree, modifierBitMask: number) {
     super();
     this.field = tree;
     this.repeatable = true;
@@ -27,7 +34,7 @@ export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent & TreeEventCurrentNode): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -41,18 +48,18 @@ export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
     return true;
   }
 
-  handle(event) {
+  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & TreeEventCurrentNode) {
     let newSelection = this._computeNewSelection(event._treeCurrentNode);
     if (newSelection) {
       this.selectNodesAndReveal(newSelection, true);
     }
   }
 
-  _computeNewSelection(currentNode) {
+  protected _computeNewSelection(currentNode: TreeNode): TreeNode | TreeNode[] {
     return [];
   }
 
-  selectNodesAndReveal(newSelection, debounceSend) {
+  selectNodesAndReveal(newSelection: TreeNode | TreeNode[], debounceSend?: boolean) {
     this.field.selectNodes(newSelection, debounceSend);
     this.field.revealSelection();
     if (!this.field.isFocused()) {

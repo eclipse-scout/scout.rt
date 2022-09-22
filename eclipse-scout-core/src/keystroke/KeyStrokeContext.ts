@@ -102,14 +102,14 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
     return true;
   }
 
-  registerKeyStroke(keyStroke: KeyStroke) {
+  registerKeyStroke(keyStroke: KeyStroke | Action) {
     this.registerKeyStrokes(keyStroke);
   }
 
   /**
    * Registers the given keystroke(s) if not installed yet.
    */
-  registerKeyStrokes(keyStrokes: KeyStroke | KeyStroke[]) {
+  registerKeyStrokes(keyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
     arrays.ensure(keyStrokes)
       .map(this._resolveKeyStroke, this)
       .filter(ks => this.keyStrokes.indexOf(ks) === -1) // must not be registered yet
@@ -133,11 +133,11 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
   /**
    * Uninstalls the given keystroke. Has no effect if not installed.
    */
-  unregisterKeyStroke(keyStroke: KeyStroke) {
+  unregisterKeyStroke(keyStroke: KeyStroke | Action) {
     this.unregisterKeyStrokes(keyStroke);
   }
 
-  unregisterKeyStrokes(keyStrokes: KeyStroke | KeyStroke[]) {
+  unregisterKeyStrokes(keyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
     arrays.ensure(keyStrokes)
       .map(this._resolveKeyStroke, this)
       .forEach(keystroke => {

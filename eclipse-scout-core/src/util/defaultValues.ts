@@ -10,7 +10,6 @@
  */
 import {objects, strings, TypeDescriptor} from '../index';
 import $ from 'jquery';
-import {ObjectWithType} from '../scout';
 
 /**
  * map of "objectType" -> { defaultValuesObject }
@@ -85,7 +84,7 @@ export function _generateObjectTypeHierarchyRec(json: any, currentParentObjectTy
  * if the object has a property of the same name. If the object is an array,
  * the defaults are applied to each of the elements.
  */
-export function applyTo(object: ObjectWithType | ObjectWithType[], objectType?: string) {
+export function applyTo(object: Record<string, any> | Record<string, any>[], objectType?: string) {
   if (Array.isArray(object)) {
     for (let i = 0; i < object.length; i++) {
       applyTo(object[i], objectType);
@@ -102,7 +101,7 @@ export function applyTo(object: ObjectWithType | ObjectWithType[], objectType?: 
   }
 }
 
-export function _applyToInternal(object: ObjectWithType, objectType: string) {
+export function _applyToInternal(object: Record<string, any>, objectType: string) {
   let objectTypeHierarchy = _objectTypeHierarchyFlat[objectType];
   if (!objectTypeHierarchy) {
     // Remove model variant and try again
@@ -121,7 +120,7 @@ export function _applyToInternal(object: ObjectWithType, objectType: string) {
   }
 }
 
-export function _extendWithDefaults(object: ObjectWithType, defaults: any) {
+export function _extendWithDefaults(object: Record<string, any>, defaults: Record<string, any>) {
   if (object === undefined || defaults === undefined) {
     return;
   }
