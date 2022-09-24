@@ -692,6 +692,8 @@ export {default as Switch} from './switch/Switch';
 export {default as SwitchModel} from './switch/SwitchModel';
 export {default as SwitchEventMap} from './switch/SwitchEventMap';
 export {default as TagBar} from './tagbar/TagBar';
+export {default as TagBarModel} from './tagbar/TagBarModel';
+export {default as TagBarEventMap} from './tagbar/TagBarEventMap';
 export {default as TagBarLayout} from './tagbar/TagBarLayout';
 export {default as TagBarOverflowPopup} from './tagbar/TagBarOverflowPopup';
 export {default as TagBarOverflowPopupLayout} from './tagbar/TagBarOverflowPopupLayout';

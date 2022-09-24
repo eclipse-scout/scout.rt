@@ -1,17 +1,27 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, FormField, HtmlComponent, scout, TagBarLayout, TagBarOverflowPopup, tooltips, Widget} from '../index';
+import {arrays, Device, Event, HtmlComponent, scout, TagBarEventMap, TagBarLayout, TagBarModel, TagBarOverflowPopup, tooltips, Widget} from '../index';
 import $ from 'jquery';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
-export default class TagBar extends Widget {
+export default class TagBar extends Widget implements TagBarModel {
+  declare model: TagBarModel;
+  declare eventMap: TagBarEventMap;
+
+  overflowEnabled: boolean;
+  overflowVisible: boolean;
+  tags: string[];
+  clickable: boolean;
+  overflow: TagBarOverflowPopup;
+  $overflowIcon: JQuery;
 
   constructor() {
     super();
@@ -21,28 +31,23 @@ export default class TagBar extends Widget {
     this.overflowVisible = false;
     this.overflow = null;
     this.tags = [];
-    /**
-     * Whether or not the tag elements are clickable (even when TagBar is disabled).
-     * When the tag elements are clickable a click handler is registered and
-     * a pointer cursor appears when hovering over the element.
-     */
     this.clickable = false;
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('tag-bar');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new TagBarLayout(this));
     this._installTooltipSupport();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderTags();
     this._renderOverflowVisible();
   }
 
-  _remove() {
+  protected override _remove() {
     this.$overflowIcon = null;
     this.overflowVisible = false;
     this.closeOverflowPopup();
@@ -50,7 +55,7 @@ export default class TagBar extends Widget {
     super._remove();
   }
 
-  setTags(tags) {
+  setTags(tags: string[]) {
     this.setProperty('tags', tags);
   }
 
@@ -60,71 +65,75 @@ export default class TagBar extends Widget {
     }
   }
 
-  _renderTags() {
+  protected _renderTags() {
     let tags = arrays.ensure(this.tags);
-    this.renderTags(this.$container, tags, this.enabledComputed);
+    this.renderTags(this.$container, tags);
     this.invalidateLayoutTree();
   }
 
-  setClickable(clickable) {
+  setClickable(clickable: boolean) {
     this.setProperty('clickable', clickable);
   }
 
-  _renderClickable() {
+  protected _renderClickable() {
     this._renderTagsClickable(this.$container.children('.tag-element'));
     this.invalidateLayoutTree();
   }
 
-  _onTagClick(event) {
+  protected _onTagClick(event: JQuery.MouseDownEvent): boolean {
     let tag = TagBar.getTagData($(event.currentTarget));
     this._triggerTagClick(tag);
     return false;
   }
 
-  _triggerTagClick(tag) {
+  protected _triggerTagClick(tag: string) {
     this.trigger('tagClick', {
       tag: tag
     });
   }
 
-  _renderEnabled() {
+  override trigger<K extends string & keyof EventMapOf<TagBar>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<TagBar>[K]>): EventMapOf<TagBar>[K] {
+    return super.trigger(type, eventOrModel);
+  }
+
+  protected override _renderEnabled() {
     super._renderEnabled();
     this._renderTagsRemovable(this.$container.children('.tag-element'));
     this.invalidateLayoutTree();
   }
 
-  _onTagRemoveClick(event) {
+  protected _onTagRemoveClick(event: JQuery.ClickEvent): boolean {
     if (this.enabledComputed) {
       this.removeTagByElement($(event.currentTarget));
     }
     return false;
   }
 
-  removeTagByElement($tag) {
+  removeTagByElement($tag: JQuery) {
     let tag = TagBar.getTagData($tag);
     if (tag) {
       this._triggerTagRemove(tag, $tag);
     }
   }
 
-  _triggerTagRemove(tag, $tag) {
+  protected _triggerTagRemove(tag: string, $tag: JQuery) {
     this.trigger('tagRemove', {
       tag: tag,
       $tag: $tag
     });
   }
 
-  _onOverflowIconMousedown(event) {
+  protected _onOverflowIconMousedown(event: JQuery.MouseDownEvent): boolean {
     this.toggleOverflowPopup();
     return false;
   }
 
-  isOverflowIconFocused() {
+  isOverflowIconFocused(): boolean {
     if (!this.$overflowIcon) {
       return false;
     }
-    let ae = this.$container.activeElement();
-    return this.$overflowIcon.is(ae);
+    let $ae = this.$container.activeElement();
+    return this.$overflowIcon.is($ae);
   }
 
   openOverflowPopup() {
@@ -142,7 +151,7 @@ export default class TagBar extends Widget {
     });
   }
 
-  _createOverflowPopup() {
+  protected _createOverflowPopup(): TagBarOverflowPopup {
     return scout.create(TagBarOverflowPopup, {
       parent: this,
       closeOnAnchorMouseDown: false,
@@ -166,7 +175,7 @@ export default class TagBar extends Widget {
     }
   }
 
-  _installTooltipSupport() {
+  protected _installTooltipSupport() {
     tooltips.install(this.$container, {
       parent: this,
       selector: '.tag-text',
@@ -177,24 +186,25 @@ export default class TagBar extends Widget {
     });
   }
 
-  _uninstallTooltipSupport() {
+  protected _uninstallTooltipSupport() {
     tooltips.uninstall(this.$container);
   }
 
-  _tagTooltipText($tag) {
+  protected _tagTooltipText($tag: JQuery): string {
     return $tag.isContentTruncated() ? $tag.text() : null;
   }
 
-  _removeFocusFromTagElements() {
+  protected _removeFocusFromTagElements() {
     TagBar.findFocusableTagElements(this.$container)
       .removeClass('focused')
       .setTabbable(false);
   }
 
-  focus() {
+  override focus(options?: { preventScroll?: boolean }): boolean {
     this.$container.addClass('focused');
     this._removeFocusFromTagElements();
     this.closeOverflowPopup();
+    return false;
   }
 
   blur() {
@@ -202,18 +212,19 @@ export default class TagBar extends Widget {
 
     // when overflow popup opens it sets focus to the first tag element, this means:
     // the input field loses focus. In that case we must prevent that the overflow popup is closed.
-    let popupRequestsFocus = this.overflow && this.overflow.$container.has(event.relatedTarget);
+    let relatedTargetOfCurrentEvent = (event as FocusEvent).relatedTarget as Element;
+    let popupRequestsFocus = this.overflow && this.overflow.$container.has(relatedTargetOfCurrentEvent);
     if (popupRequestsFocus) {
       return;
     }
     this.closeOverflowPopup();
   }
 
-  setOverflowVisible(overflowVisible) {
+  setOverflowVisible(overflowVisible: boolean) {
     this.setProperty('overflowVisible', overflowVisible);
   }
 
-  _renderOverflowVisible() {
+  protected _renderOverflowVisible() {
     if (this.overflowVisible) {
       if (!this.$overflowIcon) {
         this.$overflowIcon = this.$container
@@ -228,20 +239,14 @@ export default class TagBar extends Widget {
     }
   }
 
-  _updateErrorStatusClasses(statusClass, hasStatus) {
-    super._updateErrorStatusClasses(statusClass, hasStatus);
-    this.$container.removeClass(FormField.SEVERITY_CSS_CLASSES);
-    this.$container.addClass(statusClass);
-  }
-
   /**
    * Returns the tag-texts of the tag-elements currently visible in the UI (=not hidden).
    */
-  visibleTags() {
+  visibleTags(): string[] {
     if (!this.rendered) {
       return [];
     }
-    let tags = [];
+    let tags: string[] = [];
     this.$container
       .find('.tag-element:not(.hidden)')
       .each(function() {
@@ -250,7 +255,7 @@ export default class TagBar extends Widget {
     return tags;
   }
 
-  renderTags($parent, tags) {
+  renderTags($parent: JQuery, tags: string[]) {
     $parent.find('.tag-element').remove();
     tags.forEach(tagText => this.renderTag($parent, tagText));
     let $tags = $parent.children('.tag-element');
@@ -258,7 +263,7 @@ export default class TagBar extends Widget {
     this._renderTagsRemovable($tags);
   }
 
-  renderTag($parent, tagText) {
+  renderTag($parent: JQuery, tagText: string) {
     let $tag = $parent
       .appendDiv('tag-element')
       .data('tag', tagText);
@@ -266,7 +271,7 @@ export default class TagBar extends Widget {
     return $tag;
   }
 
-  _renderTagsClickable($tags) {
+  protected _renderTagsClickable($tags: JQuery) {
     $tags.each((i, tag) => {
       let $tag = $(tag);
       let $tagText = $tag.children('.tag-text');
@@ -285,7 +290,7 @@ export default class TagBar extends Widget {
     });
   }
 
-  _renderTagsRemovable($tags) {
+  protected _renderTagsRemovable($tags: JQuery) {
     $tags.each((i, tag) => {
       let $tag = $(tag);
       let $tagRemove = $tag.children('.tag-remove-icon');
@@ -309,37 +314,37 @@ export default class TagBar extends Widget {
 
   // --- static helpers ---
 
-  static findFocusedTagElement($container) {
+  static findFocusedTagElement($container: JQuery): JQuery {
     return $container.find('.tag-element.focused');
   }
 
-  static findFocusableTagElements($container) {
+  static findFocusableTagElements($container: JQuery): JQuery {
     return $container.find('.tag-element:not(.hidden),.overflow-icon');
   }
 
-  static focusFirstTagElement($container) {
+  static focusFirstTagElement($container: JQuery) {
     this.focusTagElement(this.firstTagElement($container));
   }
 
-  static firstTagElement($container) {
+  static firstTagElement($container: JQuery): JQuery {
     return $container.find('.tag-element').first();
   }
 
-  static focusTagElement($tagElement) {
+  static focusTagElement($tagElement: JQuery) {
     $tagElement
       .setTabbable(true)
       .addClass('focused')
       .focus();
   }
 
-  static unfocusTagElement($tagElement) {
+  static unfocusTagElement($tagElement: JQuery) {
     $tagElement
       .setTabbable(false)
       .removeClass('focused');
   }
 
-  static getTagData($tag) {
-    let tagData = $tag.data('tag');
+  static getTagData($tag: JQuery): string {
+    let tagData = $tag.data('tag') as string;
     if (tagData) {
       return tagData;
     }
