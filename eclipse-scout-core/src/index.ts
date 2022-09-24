@@ -485,9 +485,13 @@ export {default as TileTableHierarchyFilter} from './table/TileTableHierarchyFil
 export {default as KeyTableFilter} from './table/KeyTableFilter';
 export {default as TextTableFilter} from './table/TextTableFilter';
 export {default as TimePicker} from './timepicker/TimePicker';
+export {default as TimePickerModel} from './timepicker/TimePickerModel';
+export {default as TimePickerEventMap} from './timepicker/TimePickerEventMap';
 export {default as TimePickerPopup} from './timepicker/TimePickerPopup';
+export {default as TimePickerPopupModel} from './timepicker/TimePickerPopupModel';
 export {default as TimePickerPopupLayout} from './timepicker/TimePickerPopupLayout';
 export {default as TimePickerTouchPopup} from './timepicker/TimePickerTouchPopup';
+export {default as TimePickerTouchPopupModel} from './timepicker/TimePickerTouchPopupModel';
 export {default as Tree} from './tree/Tree';
 export {default as TreeEventMap} from './tree/TreeEventMap';
 export {default as TreeModel} from './tree/TreeModel';
