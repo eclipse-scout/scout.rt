@@ -1,39 +1,55 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics, HtmlComponent, Widget} from '../index';
+import {Event, graphics, HtmlComponent, LayoutData, SplitterEventMap, SplitterModel, Widget} from '../index';
 import $ from 'jquery';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
-export default class Splitter extends Widget {
+export default class Splitter extends Widget implements SplitterModel {
+  declare model: SplitterModel;
+  declare eventMap: SplitterEventMap;
+
+  splitHorizontal: boolean;
+  position: number;
+  orientation: 'top' | 'right' | 'bottom' | 'left';
+  layoutData: LayoutData;
+  $anchor: JQuery;
+  $root: JQuery;
+
+  /** distance from cursor to splitter, makes resizing smoother by preventing initial 'jump' */
+  protected _cursorOffset: { left: number; top: number };
+  protected _mouseDownHandler: (event: JQuery.MouseDownEvent) => void;
+  protected _$window: JQuery<Window>;
+  protected _$body: JQuery<Body>;
 
   constructor() {
     super();
     this.splitHorizontal = true;
-    this.$anchor = null; // optional
-    this.$root = null; // optional (fallback is this.$parent)
-    this.position = null; // current splitter position in pixels, updated by updatePosition()
-    this.orientation = 'top'; // Direction set to position the splitter inside the root element ('top', 'right', 'bottom' or 'left')
+    this.$anchor = null;
+    this.$root = null;
+    this.position = null;
+    this.orientation = 'top';
     this.layoutData = null;
 
-    this._cursorOffset = 0; // distance from cursor to splitter, makes resizing smoother by preventing initial 'jump'
+    this._cursorOffset = null;
     this._mouseDownHandler = this._onMouseDown.bind(this);
     this._$window = null;
     this._$body = null;
   }
 
-  _init(model) {
+  protected override _init(model: SplitterModel) {
     super._init(model);
     this.setPosition(this.position);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('splitter')
       .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
@@ -42,12 +58,12 @@ export default class Splitter extends Widget {
     this._$body = this.$parent.body();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderPosition();
   }
 
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     if (this.enabledComputed) {
       this.$container.on('mousedown', this._mouseDownHandler);
@@ -56,19 +72,19 @@ export default class Splitter extends Widget {
     }
   }
 
-  _renderVisible() {
+  protected override _renderVisible() {
     super._renderVisible();
     if (this.initialized) {
       this._renderPosition();
     }
   }
 
-  setLayoutData(layoutData) {
+  override setLayoutData(layoutData: LayoutData) {
     super.setLayoutData(layoutData);
     this.layoutData = layoutData;
   }
 
-  getLayoutData() {
+  getLayoutData(): LayoutData {
     return this.layoutData;
   }
 
@@ -77,9 +93,9 @@ export default class Splitter extends Widget {
    * not specified, the size is calculated automatically by reading the this.$anchor
    * element's bounds.
    *
-   * @returns {number} the effective position in pixel.
+   * @returns the effective position in pixel.
    */
-  setPosition(position) {
+  setPosition(position: number): number {
     if (!$.isNumeric(position)) {
       position = this._derivePositionFromAnchor();
     }
@@ -92,7 +108,7 @@ export default class Splitter extends Widget {
   /**
    * Derives the position from $anchor element's bounds
    */
-  _derivePositionFromAnchor() {
+  protected _derivePositionFromAnchor(): number {
     if (!this.$anchor) {
       return null;
     }
@@ -105,7 +121,7 @@ export default class Splitter extends Widget {
     return anchorBounds.y + anchorBounds.height;
   }
 
-  _setPosition(position) {
+  protected _setPosition(position: number) {
     if (!$.isNumeric(position)) {
       return;
     }
@@ -113,16 +129,15 @@ export default class Splitter extends Widget {
       return;
     }
     this.position = position;
-    let event = {
+    this.trigger('positionChange', {
       position: position
-    };
-    this.trigger('positionChange', event);
+    });
     if (this.rendered) {
       this._renderPosition();
     }
   }
 
-  _renderPosition() {
+  protected _renderPosition() {
     if (this.position === null || !this.visible) {
       return;
     }
@@ -145,7 +160,7 @@ export default class Splitter extends Widget {
     }
   }
 
-  _onMouseDown(event) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent) {
     // The calculation of the offset bounds looks a bit complicated, because we cannot
     // use "scout.graphics.offsetBounds($el, true)" here. This method would only consider
     // any margins in the size, not the position.
@@ -175,7 +190,7 @@ export default class Splitter extends Widget {
     event.preventDefault();
   }
 
-  _getSplitterPosition(event) {
+  protected _getSplitterPosition(event: JQuery.MouseEventBase): number {
     let rootBounds = graphics.offsetBounds(this.$root || this.$parent);
     if (this.splitHorizontal) {
       let x = event.pageX + this._cursorOffset.left - rootBounds.x;
@@ -185,27 +200,23 @@ export default class Splitter extends Widget {
     return (this.orientation === 'bottom' ? rootBounds.height - y : y);
   }
 
-  _onMouseMove(event) {
+  protected _onMouseMove(event: JQuery.MouseMoveEvent<Window>) {
     let splitterPosition = this._getSplitterPosition(event);
     // fire event
-    let moveEvent = {
-      position: splitterPosition,
-      defaultPrevented: false,
-      preventDefault: function() {
-        this.defaultPrevented = true;
-      },
-      setPosition: function(position) {
-        this.position = position;
-      }
-    };
-    this.trigger('move', moveEvent);
+    let moveEvent = this.trigger('move', {
+      position: splitterPosition
+    });
     if (moveEvent.defaultPrevented) {
       return;
     }
     this._setPosition(moveEvent.position);
   }
 
-  _onMouseUp(event) {
+  override trigger<K extends string & keyof EventMapOf<Splitter>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Splitter>[K]>): EventMapOf<Splitter>[K] {
+    return super.trigger(type, eventOrModel);
+  }
+
+  protected _onMouseUp(event: JQuery.MouseUpEvent<Window>) {
     // Remove listeners and reset cursor
     this._$window.off('mousemove.splitter');
     this._$body.removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
