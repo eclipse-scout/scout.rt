@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, PropertyEventEmitter} from '../index';
+import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
-export default interface PropertyChangeEvent<Value = any, Source extends PropertyEventEmitter = PropertyEventEmitter> extends Event<Source> {
-  propertyName: string;
-  oldValue: Value;
-  newValue: Value;
+export default interface SliderEventMap extends WidgetEventMap {
+  'propertyChange:value': PropertyChangeEvent<number>;
 }
