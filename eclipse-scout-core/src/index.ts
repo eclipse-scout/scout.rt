@@ -224,6 +224,8 @@ export {default as scrollbars} from './scrollbar/scrollbars';
 export {default as VirtualScrolling} from './scrollbar/VirtualScrolling';
 export {default as VirtualScrollingOptions} from './scrollbar/VirtualScrollingOptions';
 export {default as Splitter} from './splitter/Splitter';
+export {default as SplitterModel} from './splitter/SplitterModel';
+export {default as SplitterEventMap} from './splitter/SplitterEventMap';
 export {default as DateFormatPatternType} from './text/DateFormatPatternType';
 export {default as DateFormatPatternDefinition} from './text/DateFormatPatternDefinition';
 export {default as DateFormat} from './text/DateFormat';
@@ -687,6 +689,8 @@ export {default as WizardProgressFieldLayout} from './form/fields/wizard/WizardP
 export {default as WrappedFormField} from './form/fields/wrappedform/WrappedFormField';
 export {default as WrappedFormFieldAdapter} from './form/fields/wrappedform/WrappedFormFieldAdapter';
 export {default as Switch} from './switch/Switch';
+export {default as SwitchModel} from './switch/SwitchModel';
+export {default as SwitchEventMap} from './switch/SwitchEventMap';
 export {default as TagBar} from './tagbar/TagBar';
 export {default as TagBarLayout} from './tagbar/TagBarLayout';
 export {default as TagBarOverflowPopup} from './tagbar/TagBarOverflowPopup';
