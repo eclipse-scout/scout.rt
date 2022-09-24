@@ -1,16 +1,21 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Popup, TagBar, TagBarOverflowPopupLayout, TagFieldDeleteKeyStroke, TagFieldNavigationKeyStroke} from '../index';
+import {AbstractLayout, arrays, EventHandler, Popup, PopupModel, PropertyChangeEvent, TagBar, TagBarOverflowPopupLayout, TagField, TagFieldDeleteKeyStroke, TagFieldNavigationKeyStroke} from '../index';
 
 export default class TagBarOverflowPopup extends Popup {
+  declare parent: TagBar;
+
+  $body: JQuery<HTMLDivElement>;
+
+  protected _tagBarPropertyChangeListener: EventHandler;
 
   constructor() {
     super();
@@ -28,13 +33,13 @@ export default class TagBarOverflowPopup extends Popup {
     };
   }
 
-  _init(options) {
+  protected override _init(options: PopupModel) {
     super._init(options);
     this._tagBarPropertyChangeListener = this._onTagBarPropertyChange.bind(this);
     this.parent.on('propertyChange', this._tagBarPropertyChangeListener);
   }
 
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
     this.keyStrokeContext.registerKeyStrokes([
       new TagFieldNavigationKeyStroke(this._createFieldAdapter()),
@@ -42,28 +47,28 @@ export default class TagBarOverflowPopup extends Popup {
     ]);
   }
 
-  _destroy() {
+  protected override _destroy() {
     this.parent.off('propertyChange', this._tagBarPropertyChangeListener);
     super._destroy();
   }
 
-  _render() {
+  protected override _render() {
     super._render();
 
     this.$container.addClass('tag-overflow-popup');
     this.$body = this.$container.appendDiv('popup-body');
   }
 
-  _createLayout() {
+  protected override _createLayout(): AbstractLayout {
     return new TagBarOverflowPopupLayout(this);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderTags();
   }
 
-  _renderTags() {
+  protected _renderTags() {
     let tagBar = this.parent;
     let visibleTags = tagBar.visibleTags();
     let allTags = arrays.ensure(tagBar.tags);
@@ -75,15 +80,11 @@ export default class TagBarOverflowPopup extends Popup {
     }
   }
 
-  _focusFirstTagElement() {
+  protected _focusFirstTagElement() {
     TagBar.focusFirstTagElement(this.$body);
   }
 
-  _onTagRemoveClick(event) {
-    this.parent._onTagRemoveClick(event);
-  }
-
-  _onTagBarPropertyChange(event) {
+  protected _onTagBarPropertyChange(event: PropertyChangeEvent) {
     if (event.propertyName === 'tags') {
       let allTags = arrays.ensure(this.parent.tags);
       let visibleTags = this.parent.visibleTags();
@@ -98,30 +99,32 @@ export default class TagBarOverflowPopup extends Popup {
     }
   }
 
-  _createFieldAdapter() {
+  protected _createFieldAdapter(): TagFieldKeyStrokeAdapter {
     return TagBarOverflowPopup.createFieldAdapter(this);
   }
 
-  static createFieldAdapter(field) {
+  static createFieldAdapter(field: TagBarOverflowPopup): TagFieldKeyStrokeAdapter {
     return {
       $container: () => field.$body,
-
       enabled: () => true,
-
       focus: () => {
+        // nop
       },
-
-      one: (p1, p2) => {
-        field.one(p1, p2);
-      },
-
-      off: (p1, p2) => {
-        field.off(p1, p2);
-      },
-
       removeTag: tag => {
-        field.parent.parent.removeTag(tag);
+        let tagField = field.parent.parent as TagField;
+        tagField.removeTag(tag);
       }
     };
   }
+}
+
+// FIXME TS: move to TagField as soon as it has been migrated
+export interface TagFieldKeyStrokeAdapter {
+  $container(): JQuery;
+
+  enabled(): boolean;
+
+  focus();
+
+  removeTag(tag: string);
 }
