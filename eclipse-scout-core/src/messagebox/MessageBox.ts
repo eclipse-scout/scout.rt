@@ -295,7 +295,7 @@ export default class MessageBox extends Widget {
     });
   }
 
-  override trigger<K extends string & keyof EventMapOf<MessageBox>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<MessageBox>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<MessageBox>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<MessageBox>[K]>): EventMapOf<MessageBox>[K] {
     return super.trigger(type, eventOrModel);
   }
 

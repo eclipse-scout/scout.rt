@@ -214,7 +214,7 @@ export default class KeyStrokeManager extends EventEmitter implements KeyStrokeM
     });
   }
 
-  override trigger<K extends string & keyof EventMapOf<KeyStrokeManager>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<KeyStrokeManager>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<KeyStrokeManager>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<KeyStrokeManager>[K]>): EventMapOf<KeyStrokeManager>[K] {
     return super.trigger(type, eventOrModel);
   }
 

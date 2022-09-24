@@ -147,7 +147,7 @@ export default class FileInput extends Widget implements FileInputModel {
     });
   }
 
-  override trigger<K extends string & keyof EventMapOf<FileInput>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<FileInput>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<FileInput>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<FileInput>[K]>): EventMapOf<FileInput>[K] {
     return super.trigger(type, eventOrModel);
   }
 

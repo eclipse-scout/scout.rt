@@ -91,7 +91,7 @@ export default class CollapseHandle extends Widget implements CollapseHandleMode
     this.$container.toggleClass('one-visible', (this.leftVisible || this.rightVisible) && !bothVisible);
   }
 
-  override trigger<K extends string & keyof EventMapOf<CollapseHandle>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<CollapseHandle>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<CollapseHandle>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<CollapseHandle>[K]>): EventMapOf<CollapseHandle>[K] {
     return super.trigger(type, eventOrModel);
   }
 

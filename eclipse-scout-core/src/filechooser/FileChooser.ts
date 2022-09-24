@@ -218,7 +218,7 @@ export default class FileChooser extends Widget implements FileChooserModel {
     }
   }
 
-  override trigger<K extends string & keyof EventMapOf<FileChooser>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<FileChooser>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<FileChooser>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<FileChooser>[K]>): EventMapOf<FileChooser>[K] {
     return super.trigger(type, eventOrModel);
   }
 
