@@ -8,10 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, PropertyEventEmitter} from '../index';
+import {WidgetModel} from '../index';
 
-export default interface PropertyChangeEvent<Value = any, Source extends PropertyEventEmitter = PropertyEventEmitter> extends Event<Source> {
-  propertyName: string;
-  oldValue: Value;
-  newValue: Value;
+export default interface SliderModel extends WidgetModel {
+  /**
+   * Default is 0.
+   */
+  value?: number;
+  /**
+   * Default is 0.
+   */
+  minValue?: number;
+  /**
+   * Default is 100.
+   */
+  maxValue?: number;
+  /**
+   * Default is 1.
+   */
+  step?: number;
 }
