@@ -1,36 +1,43 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, Device, HtmlComponent, scrollbars, TimePickerTouchPopup, Widget} from '../index';
+import {dates, Device, Event, HtmlComponent, scrollbars, TimePickerModel, TimePickerTouchPopup, Widget} from '../index';
 import $ from 'jquery';
+import {Optional} from '../types';
+import {ScrollbarInstallOptions} from '../scrollbar/scrollbars';
+import TimePickerEventMap from './TimePickerEventMap';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export default class TimePicker extends Widget {
+  declare model: TimePickerModel;
+  declare eventMap: TimePickerEventMap;
+
+  preselectedTime: Date;
+  selectedTime: Date;
+  viewDate: Date;
+  resolution: number;
 
   constructor() {
     super();
 
-    // Preselected date can only be set if selectedDate is null. The preselected date is rendered differently, but
-    // has no function otherwise. (It is used to indicate the day that will be selected when the user presses
-    // the UP or DOWN key while no date is selected.)
     this.preselectedTime = null;
     this.selectedTime = null;
     this.resolution = null;
-    this.$scrollable = null;
   }
 
-  _init(options) {
+  protected override _init(options: TimePickerModel) {
     super._init(options);
     this.resolution = options.timeResolution;
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent
       .appendDiv('time-picker')
       .toggleClass('touch-only', Device.get().supportsOnlyTouch());
@@ -41,7 +48,7 @@ export default class TimePicker extends Widget {
     this._installScrollbars();
   }
 
-  _renderTimeSelection() {
+  protected _renderTimeSelection() {
     let i,
       date = dates.trunc(new Date()),
       now = dates.ceil(new Date(), this.resolution),
@@ -80,10 +87,7 @@ export default class TimePicker extends Widget {
     return $box;
   }
 
-  /**
-   * @override
-   */
-  _installScrollbars(options) {
+  protected override _installScrollbars(options?: Optional<ScrollbarInstallOptions, 'parent'>) {
     this._uninstallScrollbars();
 
     super._installScrollbars({
@@ -91,7 +95,7 @@ export default class TimePicker extends Widget {
     });
   }
 
-  _scrollTo($scrollTo) {
+  protected _scrollTo($scrollTo: JQuery) {
     if (!$scrollTo) {
       return;
     }
@@ -107,7 +111,7 @@ export default class TimePicker extends Widget {
     }
   }
 
-  preselectTime(time) {
+  preselectTime(time: Date) {
     if (time) {
       // Clear selection when a date is preselected
       this.setSelectedTime(null);
@@ -116,14 +120,14 @@ export default class TimePicker extends Widget {
   }
 
   /**
-   * @internal, use preselectDate to preselect a date
+   * @internal, use {@link preselectDate} to preselect a date
    */
-  setPreselectedTime(preselectedTime) {
+  setPreselectedTime(preselectedTime: Date) {
     this.setProperty('preselectedTime', preselectedTime);
   }
 
-  _renderPreselectedTime() {
-    let $scrollTo;
+  protected _renderPreselectedTime() {
+    let $scrollTo: JQuery;
     this.$container.find('.cell').each((i, elem) => {
       let $time = $(elem),
         time = $time.data('time');
@@ -141,7 +145,7 @@ export default class TimePicker extends Widget {
     this._scrollTo($scrollTo);
   }
 
-  selectTime(time) {
+  selectTime(time: Date) {
     if (time) {
       // Clear selection when a date is preselected
       this.setPreselectedTime(null);
@@ -152,13 +156,12 @@ export default class TimePicker extends Widget {
   /**
    * @internal, use selectDate to select a date
    */
-  setSelectedTime(selectedTime) {
+  setSelectedTime(selectedTime: Date) {
     this.setProperty('selectedTime', selectedTime);
   }
 
-  _renderSelectedTime() {
-
-    let $scrollTo;
+  protected _renderSelectedTime() {
+    let $scrollTo: JQuery;
     this.$container.find('.cell').each((i, elem) => {
       let $time = $(elem),
         time = $time.data('time');
@@ -176,13 +179,7 @@ export default class TimePicker extends Widget {
     this._scrollTo($scrollTo);
   }
 
-  shiftViewDate(years, months, days) {
-    let date = this.viewDate;
-    date = dates.shift(date, years, months, days);
-    this.showDate(date);
-  }
-
-  shiftSelectedTime(hourUnits, minuteUnits, secondUnits) {
+  shiftSelectedTime(hourUnits: number, minuteUnits: number, secondUnits: number) {
     let time = this.preselectedTime;
     if (this.selectedTime) {
       time = dates.shiftTime(this.selectedTime, hourUnits, minuteUnits * this.resolution, secondUnits);
@@ -193,24 +190,17 @@ export default class TimePicker extends Widget {
     this.selectTime(this._snapToTimeGrid(time));
   }
 
-  _snapToTimeGrid(time) {
+  protected _snapToTimeGrid(time: Date): Date {
     if (!time) {
       return time;
     }
     let min = time.getMinutes();
-    min = (parseInt(min / this.resolution) * this.resolution);
+    min = (parseInt((min / this.resolution) + '') * this.resolution);
     time.setMinutes(min);
     return time;
-
   }
 
-  _onNavigationMouseDown(event) {
-    let $target = $(event.currentTarget);
-    let diff = $target.data('shift');
-    this.shiftViewDate(0, diff, 0);
-  }
-
-  _onTimeClick(event) {
+  protected _onTimeClick(event: JQuery.ClickEvent<HTMLDivElement>) {
     let $target = $(event.currentTarget);
     let time = new Date($target.data('time'));
     this.selectTime(time);
@@ -219,11 +209,7 @@ export default class TimePicker extends Widget {
     });
   }
 
-  _onMouseWheel(event) {
-    event = event.originalEvent || this.$container.window(true).event.originalEvent;
-    let wheelData = event.wheelDelta ? event.wheelDelta / 10 : -event.detail * 3;
-    let diff = (wheelData >= 0 ? -1 : 1);
-    this.shiftViewDate(0, diff, 0);
-    event.preventDefault();
+  override trigger<K extends string & keyof EventMapOf<TimePicker>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<TimePicker>[K]>): Event<this> {
+    return super.trigger(type, eventOrModel);
   }
 }
