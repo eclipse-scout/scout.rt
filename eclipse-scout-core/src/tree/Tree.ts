@@ -2459,7 +2459,7 @@ export default class Tree extends Widget implements TreeModel {
     }
   }
 
-  override trigger<K extends string & keyof EventMapOf<Tree>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Tree>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<Tree>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Tree>[K]>): EventMapOf<Tree>[K] {
     return super.trigger(type, eventOrModel);
   }
 

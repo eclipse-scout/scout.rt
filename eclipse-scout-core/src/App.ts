@@ -555,7 +555,7 @@ export default class App extends EventEmitter {
     // NOP
   }
 
-  override trigger<K extends string & keyof EventMapOf<App>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<App>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<App>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<App>[K]>): EventMapOf<App>[K] {
     return super.trigger(type, eventOrModel);
   }
 }

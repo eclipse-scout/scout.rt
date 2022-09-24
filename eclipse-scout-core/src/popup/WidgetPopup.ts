@@ -298,7 +298,7 @@ export default class WidgetPopup extends Popup {
     this.trigger('move', newOffset);
   }
 
-  override trigger<K extends string & keyof EventMapOf<WidgetPopup>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<WidgetPopup>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<WidgetPopup>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<WidgetPopup>[K]>): EventMapOf<WidgetPopup>[K] {
     return super.trigger(type, eventOrModel);
   }
 

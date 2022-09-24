@@ -589,7 +589,7 @@ export default class DatePicker extends Widget implements DatePickerModel {
     });
   }
 
-  override trigger<K extends string & keyof EventMapOf<DatePicker>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<DatePicker>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<DatePicker>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<DatePicker>[K]>): EventMapOf<DatePicker>[K] {
     return super.trigger(type, eventOrModel);
   }
 

@@ -1482,7 +1482,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     return adapterData;
   }
 
-  override trigger<K extends string & keyof EventMapOf<Session>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Session>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<Session>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Session>[K]>): EventMapOf<Session>[K] {
     return super.trigger(type, eventOrModel);
   }
 

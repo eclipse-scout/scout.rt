@@ -332,7 +332,7 @@ export default class Action extends Widget implements ActionModel {
     return true;
   }
 
-  override trigger<K extends string & keyof EventMapOf<Action>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Action>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<Action>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Action>[K]>): EventMapOf<Action>[K] {
     return super.trigger(type, eventOrModel);
   }
 

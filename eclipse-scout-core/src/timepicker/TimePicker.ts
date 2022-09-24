@@ -209,7 +209,7 @@ export default class TimePicker extends Widget {
     });
   }
 
-  override trigger<K extends string & keyof EventMapOf<TimePicker>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<TimePicker>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<TimePicker>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<TimePicker>[K]>): EventMapOf<TimePicker>[K] {
     return super.trigger(type, eventOrModel);
   }
 }

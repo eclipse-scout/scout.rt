@@ -1601,7 +1601,7 @@ export default class Calendar extends Widget implements CalendarModel {
     }
   }
 
-  override trigger<K extends string & keyof EventMapOf<Calendar>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Calendar>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<Calendar>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Calendar>[K]>): EventMapOf<Calendar>[K] {
     return super.trigger(type, eventOrModel);
   }
 
