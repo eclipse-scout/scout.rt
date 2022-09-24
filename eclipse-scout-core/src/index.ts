@@ -377,6 +377,8 @@ export {default as FileInputEventMap} from './filechooser/FileInputEventMap';
 export {default as Route} from './router/Route';
 export {default as router} from './router/router';
 export {default as Slider} from './slider/Slider';
+export {default as SliderModel} from './slider/SliderModel';
+export {default as SliderEventMap} from './slider/SliderEventMap';
 export {default as SliderAdapter} from './slider/SliderAdapter';
 export {default as SliderLayout} from './slider/SliderLayout';
 export {default as Mode} from './modeselector/Mode';
