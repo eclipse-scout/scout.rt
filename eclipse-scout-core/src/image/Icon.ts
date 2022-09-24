@@ -112,7 +112,7 @@ export default class Icon extends Widget implements IconModel {
     this.htmlComp = this.image.htmlComp;
   }
 
-  override trigger<K extends string & keyof EventMapOf<Icon>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Icon>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<Icon>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Icon>[K]>): EventMapOf<Icon>[K] {
     return super.trigger(type, eventOrModel);
   }
 

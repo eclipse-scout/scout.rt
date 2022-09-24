@@ -449,7 +449,7 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
     return adapterData;
   }
 
-  override trigger<K extends string & keyof EventMapOf<ModelAdapter>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<ModelAdapter>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<ModelAdapter>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<ModelAdapter>[K]>): EventMapOf<ModelAdapter>[K] {
     return super.trigger(type, eventOrModel);
   }
 

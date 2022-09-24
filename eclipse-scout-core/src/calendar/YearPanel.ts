@@ -242,7 +242,7 @@ export default class YearPanel extends Widget implements YearPanelModel {
     });
   }
 
-  override trigger<K extends string & keyof EventMapOf<YearPanel>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<YearPanel>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<YearPanel>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<YearPanel>[K]>): EventMapOf<YearPanel>[K] {
     return super.trigger(type, eventOrModel);
   }
 

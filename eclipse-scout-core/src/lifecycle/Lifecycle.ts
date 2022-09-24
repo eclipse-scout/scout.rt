@@ -81,7 +81,7 @@ export default abstract class Lifecycle extends EventEmitter implements Lifecycl
     });
   }
 
-  override trigger<K extends string & keyof EventMapOf<Lifecycle>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Lifecycle>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<Lifecycle>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Lifecycle>[K]>): EventMapOf<Lifecycle>[K] {
     return super.trigger(type, eventOrModel);
   }
 

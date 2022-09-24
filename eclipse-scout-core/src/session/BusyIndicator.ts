@@ -188,7 +188,7 @@ export default class BusyIndicator extends Widget implements BusyIndicatorModel 
     this.trigger('cancel', event);
   }
 
-  override trigger<K extends string & keyof EventMapOf<BusyIndicator>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<BusyIndicator>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<BusyIndicator>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<BusyIndicator>[K]>): EventMapOf<BusyIndicator>[K] {
     return super.trigger(type, eventOrModel);
   }
 

@@ -736,7 +736,7 @@ export default class Menu extends Action implements MenuModel {
     return false;
   }
 
-  override trigger<K extends string & keyof EventMapOf<Menu>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Menu>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<Menu>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Menu>[K]>): EventMapOf<Menu>[K] {
     return super.trigger(type, eventOrModel);
   }
 }

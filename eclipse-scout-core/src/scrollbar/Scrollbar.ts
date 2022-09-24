@@ -481,7 +481,7 @@ export default class Scrollbar extends Widget {
     this.trigger('scrollEnd');
   }
 
-  override trigger<K extends string & keyof EventMapOf<Scrollbar>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Scrollbar>[K]>): Event<this> {
+  override trigger<K extends string & keyof EventMapOf<Scrollbar>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Scrollbar>[K]>): EventMapOf<Scrollbar>[K] {
     return super.trigger(type, eventOrModel);
   }
 
