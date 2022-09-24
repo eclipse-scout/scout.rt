@@ -1,18 +1,26 @@
 /*
- * Copyright (c) 2014-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, Widget} from '../index';
-import tooltips from '../tooltip/tooltips';
-import strings from '../util/strings';
+import {strings, SwitchEventMap, SwitchModel, tooltips, Widget} from '../index';
 
-export default class Switch extends Widget {
+export default class Switch extends Widget implements SwitchModel {
+  declare model: SwitchModel;
+  declare eventMap: SwitchEventMap;
+
+  activated: boolean;
+  label: string;
+  htmlEnabled: boolean;
+  tooltipText: string;
+
+  $label: JQuery<HTMLDivElement>;
+  $button: JQuery<HTMLDivElement>;
 
   constructor() {
     super();
@@ -20,37 +28,36 @@ export default class Switch extends Widget {
     this.activated = false;
     this.label = null;
     this.htmlEnabled = false;
+    this.tooltipText = null;
 
     this.$label = null;
     this.$button = null;
-    this.tooltipText = null;
   }
 
-  _init(model) {
+  protected override _init(model: SwitchModel) {
     super._init(model);
     this.setTooltipText(model.tooltipText);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('switch');
     this.$label = this.$container.appendDiv('switch-label');
     this.$button = this.$container.appendDiv('switch-button')
       .on('click', this._onSwitchButtonClick.bind(this));
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderActivated();
     this._renderLabel();
     this._renderTooltipText();
   }
 
-  _onSwitchButtonClick() {
+  protected _onSwitchButtonClick(e: JQuery.ClickEvent<HTMLDivElement>) {
     if (!this.enabledComputed) {
       return;
     }
-    let event = new Event();
-    this.trigger('switch', event);
+    let event = this.trigger('switch');
     if (!event.defaultPrevented) {
       this.setActivated(!this.activated);
     }
@@ -59,11 +66,11 @@ export default class Switch extends Widget {
     tooltips.cancel(this.$container);
   }
 
-  setLabel(label) {
+  setLabel(label: string) {
     this.setProperty('label', label);
   }
 
-  _renderLabel() {
+  protected _renderLabel() {
     if (this.htmlEnabled) {
       this.$label.html(this.label);
     } else {
@@ -71,19 +78,19 @@ export default class Switch extends Widget {
     }
   }
 
-  setActivated(activated) {
+  setActivated(activated: boolean) {
     this.setProperty('activated', activated);
   }
 
-  _renderActivated() {
+  protected _renderActivated() {
     this.$button.toggleClass('activated', this.activated);
   }
 
-  setTooltipText(tooltipText) {
+  setTooltipText(tooltipText: string) {
     this.setProperty('tooltipText', tooltipText);
   }
 
-  _renderTooltipText() {
+  protected _renderTooltipText() {
     if (strings.hasText(this.tooltipText)) {
       tooltips.install(this.$container, {
         parent: this,
