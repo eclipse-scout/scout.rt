@@ -1,19 +1,26 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractLayout, ContextMenuPopup, Dimension, graphics, Menu, scout, SimpleTabArea, styles, widgets} from '../index';
 import $ from 'jquery';
+import {PrefSizeOptions} from '../layout/graphics';
 
 export default class SimpleTabAreaLayout extends AbstractLayout {
+  tabArea: SimpleTabArea;
+  tabWidth: number;
+  tabMinWidth: number;
+  overflowTabItemWidth: number;
+  protected _$overflowTab: JQuery;
+  protected _overflowTabsIndizes: number[];
 
-  constructor(tabArea) {
+  constructor(tabArea: SimpleTabArea) {
     super();
     this.tabArea = tabArea;
     this._$overflowTab = null;
@@ -24,10 +31,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
     this.overflowTabItemWidth = null;
   }
 
-  /**
-   * @override AbstractLayout.js
-   */
-  layout($container) {
+  override layout($container: JQuery) {
     let htmlContainer = this.tabArea.htmlComp,
       containerSize = htmlContainer.size({
         exact: true
@@ -97,13 +101,13 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
     widgets.updateFirstLastMarker(this.tabArea.getVisibleTabs());
   }
 
-  smallPrefSize(options = {}) {
+  smallPrefSize(options: PrefSizeOptions & { minTabWidth?: number } = {}): Dimension {
     this._initSizes();
     options = $.extend({minTabWidth: this.tabMinWidth}, options);
     return this.preferredLayoutSize(this.tabArea.$container, options);
   }
 
-  preferredLayoutSize($container, options = {}) {
+  override preferredLayoutSize($container: JQuery, options?: PrefSizeOptions & { minTabWidth?: number }): Dimension {
     this._initSizes();
     let minTabWidth = scout.nvl(options.minTabWidth, 0) || scout.nvl(this.tabWidth, 0);
     let numTabs = this.tabArea.getTabs().length;
@@ -120,7 +124,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
    * Reads the default sizes from CSS -> the tabs need to specify a width and a min-width.
    * The layout expects all tabs to have the same width.
    */
-  _initSizes() {
+  protected _initSizes() {
     if (this.tabWidth != null && this.tabMinWidth != null && this.overflowTabItemWidth != null) {
       return;
     }
@@ -144,7 +148,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
     }
   }
 
-  _onOverflowTabItemMouseDown(event) {
+  protected _onOverflowTabItemMouseDown(event: JQuery.MouseDownEvent) {
     let tabArea = this.tabArea;
     let overflowMenus = [];
     let $overflowTabItem = $(event.currentTarget);

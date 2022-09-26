@@ -39,6 +39,10 @@ export default class Form extends Widget {
     this.resizable = true;
     this.movable = true;
     this.rootGroupBox = null;
+    this.title = null;
+    this.subTitle = null;
+    this.iconId = null;
+    this.status = null;
     this.saveNeeded = false;
     this.saveNeededVisible = false;
     this.formController = null;
