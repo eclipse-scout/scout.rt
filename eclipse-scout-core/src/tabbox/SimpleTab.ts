@@ -1,21 +1,57 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings, tooltips, Widget} from '../index';
+import {Event, EventHandler, GlassPaneContribution, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
 
-export default class SimpleTab extends Widget {
+export type SimpleTabView = Widget & {
+  title?: string;
+  subTitle?: string;
+  iconId?: string;
+  closable?: boolean;
+  saveNeeded?: boolean;
+  saveNeededVisible?: boolean;
+  status?: Status;
+  displayViewId?: string;
+  abort();
+};
+
+export default class SimpleTab extends Widget implements SimpleTabModel {
+  declare model: SimpleTabModel;
+  declare eventMap: SimpleTabEventMap;
+
+  view: SimpleTabView;
+  title: string;
+  subTitle: string;
+  iconId: string;
+  closable: boolean;
+  saveNeeded: boolean;
+  saveNeededVisible: boolean;
+  status: Status;
+  selected: boolean;
+  $title: JQuery<HTMLDivElement>;
+  $subTitle: JQuery<HTMLDivElement>;
+  $iconContainer: JQuery<HTMLDivElement>;
+  $statusContainer: JQuery<HTMLDivElement>;
+  $close: JQuery<HTMLDivElement>;
+  $titleLine: JQuery<HTMLDivElement>;
+  $saveNeeded: JQuery<HTMLDivElement>;
+
+  protected _statusContainerUsageCounter: number;
+  protected _statusIconDivs: JQuery[];
+  protected _viewPropertyChangeListener: EventHandler<PropertyChangeEvent>;
+  protected _viewRemoveListener: EventHandler<Event<SimpleTabView>>;
+  protected _glassPaneContribution: GlassPaneContribution;
 
   constructor() {
     super();
 
-    // optional
     this.view = null;
 
     this.title = null;
@@ -48,7 +84,7 @@ export default class SimpleTab extends Widget {
     };
   }
 
-  _init(model) {
+  protected override _init(model: SimpleTabModel) {
     super._init(model);
 
     this.view = model.view;
@@ -68,14 +104,14 @@ export default class SimpleTab extends Widget {
     }
   }
 
-  renderAfter($parent, sibling) {
+  renderAfter($parent: JQuery, sibling?: Widget) {
     this.render($parent);
     if (sibling) {
       this.$container.insertAfter(sibling.$container);
     }
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.prependDiv('simple-tab');
     this.$container.on('mousedown', this._onMouseDown.bind(this));
     this.$titleLine = this.$container.appendDiv('title-line');
@@ -91,7 +127,7 @@ export default class SimpleTab extends Widget {
     });
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderTitle();
     this._renderSubTitle();
@@ -103,26 +139,26 @@ export default class SimpleTab extends Widget {
     this._renderSelected();
   }
 
-  _remove() {
+  protected override _remove() {
     this.$close = null;
     super._remove();
   }
 
-  setTitle(title) {
+  setTitle(title: string) {
     this.setProperty('title', title);
   }
 
-  _renderTitle() {
+  protected _renderTitle() {
     if (this.title || this.subTitle) { // $title is always needed if subtitle is not empty
       this.$title.textOrNbsp(this.title);
     }
   }
 
-  setSubTitle(subTitle) {
+  setSubTitle(subTitle: string) {
     this.setProperty('subTitle', subTitle);
   }
 
-  _renderSubTitle() {
+  protected _renderSubTitle() {
     if (this.subTitle) {
       if (!this.title) {
         this._renderTitle();
@@ -135,19 +171,19 @@ export default class SimpleTab extends Widget {
     }
   }
 
-  setIconId(iconId) {
+  setIconId(iconId: string) {
     this.setProperty('iconId', iconId);
   }
 
-  _renderIconId(iconId) {
+  protected _renderIconId() {
     this.$iconContainer.icon(this.iconId);
   }
 
-  setClosable(closable) {
+  setClosable(closable: boolean) {
     this.setProperty('closable', closable);
   }
 
-  _renderClosable() {
+  protected _renderClosable() {
     if (this.closable) {
       if (this.$close) {
         return;
@@ -165,7 +201,7 @@ export default class SimpleTab extends Widget {
     }
   }
 
-  setSaveNeededVisible(saveNeededVisible) {
+  setSaveNeededVisible(saveNeededVisible: boolean) {
     if (this.saveNeededVisible === saveNeededVisible) {
       return;
     }
@@ -175,7 +211,7 @@ export default class SimpleTab extends Widget {
     }
   }
 
-  setSaveNeeded(saveNeeded) {
+  setSaveNeeded(saveNeeded: boolean) {
     if (this.saveNeeded === saveNeeded) {
       return;
     }
@@ -185,7 +221,7 @@ export default class SimpleTab extends Widget {
     }
   }
 
-  _renderSaveNeeded() {
+  protected _renderSaveNeeded() {
     if (this.saveNeeded && this.saveNeededVisible) {
       this.$container.addClass('save-needed');
       if (this.$saveNeeded) {
@@ -204,16 +240,14 @@ export default class SimpleTab extends Widget {
     }
   }
 
-  setStatus(status) {
+  setStatus(status: Status) {
     this.setProperty('status', status);
   }
 
-  _renderStatus() {
+  protected _renderStatus() {
     this._statusContainerUsageCounter -= (this._statusIconDivs.length === 0 ? 0 : 1);
 
-    this._statusIconDivs.forEach($statusIcon => {
-      $statusIcon.remove();
-    });
+    this._statusIconDivs.forEach($statusIcon => $statusIcon.remove());
     this._statusIconDivs = [];
 
     if (this.status) {
@@ -240,15 +274,15 @@ export default class SimpleTab extends Widget {
     this.setSelected(false);
   }
 
-  setSelected(selected) {
+  setSelected(selected: boolean) {
     this.setProperty('selected', selected);
   }
 
-  _renderSelected() {
+  protected _renderSelected() {
     this.$container.toggleClass('selected', this.selected);
   }
 
-  _onMouseDown(event) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent) {
     if (this.$close && this.$close.isOrHas(event.target)) {
       return;
     }
@@ -267,27 +301,27 @@ export default class SimpleTab extends Widget {
     event.preventDefault();
   }
 
-  _onClose() {
+  protected _onClose(event: JQuery.ClickEvent) {
     if (this.view) {
       this.view.abort();
     }
   }
 
-  getMenuText() {
+  getMenuText(): string {
     return strings.join(' \u2013 ', this.title, this.subTitle);
   }
 
-  _installViewListeners() {
+  protected _installViewListeners() {
     this.view.on('propertyChange', this._viewPropertyChangeListener);
     this.view.on('remove', this._viewRemoveListener);
   }
 
-  _uninstallViewListeners() {
+  protected _uninstallViewListeners() {
     this.view.off('propertyChange', this._viewPropertyChangeListener);
     this.view.off('remove', this._viewRemoveListener);
   }
 
-  _onViewPropertyChange(event) {
+  protected _onViewPropertyChange(event: PropertyChangeEvent) {
     if (event.propertyName === 'title') {
       this.setTitle(this.view.title);
     } else if (event.propertyName === 'subTitle') {
@@ -312,7 +346,7 @@ export default class SimpleTab extends Widget {
    * of the this tab, because in bench-mode the tab is never rendered
    * and thus the _remove function is never called.
    */
-  _onViewRemove() {
+  protected _onViewRemove(event: Event<SimpleTabView>) {
     this._uninstallViewListeners();
     if (this.rendered) {
       this.remove();

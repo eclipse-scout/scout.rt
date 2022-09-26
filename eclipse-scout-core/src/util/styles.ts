@@ -136,7 +136,7 @@ export function getFirstOpaqueBackgroundColor($elem: JQuery): string {
   }
 }
 
-export function getSize(cssClass: string | string[], cssProperty: string | string[], property: string, defaultSize: number): number {
+export function getSize(cssClass: string | string[], cssProperty: string | string[], property: string, defaultSize?: number): number {
   let size = get(cssClass, cssProperty)[property];
   if ('auto' === size) {
     return defaultSize;
