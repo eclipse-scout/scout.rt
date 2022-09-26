@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ModelAdapter} from '../index';
+import {Action, Event, ModelAdapter} from '../index';
 
 export default class ActionAdapter<A extends Action = Action> extends ModelAdapter<A> {
 
@@ -26,14 +26,14 @@ export default class ActionAdapter<A extends Action = Action> extends ModelAdapt
     this.widget.setEnabled(this._enabledBeforeOffline);
   }
 
-  protected _onWidgetAction(event) {
+  protected _onWidgetAction(event: Event<A>) {
     if (this.widget.isToggleAction()) {
       return;
     }
     this._send('action');
   }
 
-  protected override _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<A>) {
     if (event.type === 'action') {
       this._onWidgetAction(event);
     } else {

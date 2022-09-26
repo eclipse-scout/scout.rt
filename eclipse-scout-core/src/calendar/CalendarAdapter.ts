@@ -26,7 +26,7 @@ export default class CalendarAdapter<C extends Calendar = Calendar> extends Mode
     this._sendViewRangeChange();
   }
 
-  protected override _onWidgetEvent(event: Event) {
+  protected override _onWidgetEvent(event: Event<C>) {
     if (event.type === 'viewRangeChange') {
       this._sendViewRangeChange();
     } else if (event.type === 'modelChange') {
@@ -34,7 +34,7 @@ export default class CalendarAdapter<C extends Calendar = Calendar> extends Mode
     } else if (event.type === 'selectionChange') {
       this._sendSelectionChange();
     } else if (event.type === 'componentMove') {
-      this._sendComponentMove(event as CalendarComponentMoveEvent);
+      this._sendComponentMove(event as CalendarComponentMoveEvent<C>);
     } else {
       super._onWidgetEvent(event);
     }
@@ -71,7 +71,7 @@ export default class CalendarAdapter<C extends Calendar = Calendar> extends Mode
     });
   }
 
-  protected _sendComponentMove(event: CalendarComponentMoveEvent) {
+  protected _sendComponentMove(event: CalendarComponentMoveEvent<C>) {
     this._send('componentMove', {
       componentId: event.component.id,
       fromDate: event.component.fromDate,

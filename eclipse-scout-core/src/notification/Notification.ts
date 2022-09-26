@@ -3,15 +3,27 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Icon, scout, Status, strings, texts, Widget} from '../index';
+import {HtmlComponent, Icon, NotificationEventMap, NotificationModel, scout, Status, strings, texts, Widget} from '../index';
 import $ from 'jquery';
+import {StatusOrModel} from '../status/Status';
 
-export default class Notification extends Widget {
+export default class Notification extends Widget implements NotificationModel {
+  declare model: NotificationModel;
+  declare eventMap: NotificationEventMap;
+
+  status: Status;
+  closable: boolean;
+  htmlEnabled: boolean;
+  $content: JQuery<HTMLDivElement>;
+  $messageText: JQuery<HTMLDivElement>;
+  $closer: JQuery<HTMLDivElement>;
+
+  protected _icon: Icon;
 
   constructor() {
     super();
@@ -21,7 +33,7 @@ export default class Notification extends Widget {
     this._icon = null;
   }
 
-  _init(model) {
+  protected override _init(model: NotificationModel) {
     super._init(model);
 
     // this allows to set the properties severity and message directly on the model object
@@ -38,30 +50,30 @@ export default class Notification extends Widget {
     this._setStatus(this.status);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('notification');
     this.$content = this.$container.appendDiv('notification-content');
     this.$messageText = this.$content.appendDiv('notification-message');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 
-  _remove() {
+  protected override _remove() {
     super._remove();
     this._removeCloser();
     this._removeIcon();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderStatus();
     this._renderClosable();
   }
 
-  setStatus(status) {
+  setStatus(status: StatusOrModel) {
     this.setProperty('status', status);
   }
 
-  _setStatus(status) {
+  protected _setStatus(status: StatusOrModel) {
     if (this.rendered) {
       this._removeStatus();
     }
@@ -69,13 +81,13 @@ export default class Notification extends Widget {
     this._setProperty('status', status);
   }
 
-  _removeStatus() {
+  protected _removeStatus() {
     if (this.status) {
       this.$container.removeClass(this.status.cssClass());
     }
   }
 
-  _renderStatus() {
+  protected _renderStatus() {
     if (this.status) {
       this.$container.addClass(this.status.cssClass());
       this._renderIconId();
@@ -83,7 +95,7 @@ export default class Notification extends Widget {
     this._renderMessage();
   }
 
-  _renderMessage() {
+  protected _renderMessage() {
     let message = this.status.message || '';
     if (this.htmlEnabled) {
       this.$messageText.html(message);
@@ -96,7 +108,7 @@ export default class Notification extends Widget {
     this.invalidateLayoutTree();
   }
 
-  setIconId(iconId) {
+  setIconId(iconId: string) {
     if (!this.status) {
       this.status = Status.info();
     }
@@ -106,7 +118,7 @@ export default class Notification extends Widget {
     }
   }
 
-  _renderIconId() {
+  protected _renderIconId() {
     let hasIcon = this.status && !!this.status.iconId;
     this.$container.toggleClass('has-icon', hasIcon);
     this.$container.toggleClass('no-icon', !hasIcon);
@@ -117,7 +129,7 @@ export default class Notification extends Widget {
     }
   }
 
-  _renderIcon() {
+  protected _renderIcon() {
     if (this._icon) {
       this._icon.setIconDesc(this.status.iconId);
       return;
@@ -135,17 +147,17 @@ export default class Notification extends Widget {
     this._icon.$container.addClass('notification-icon');
   }
 
-  _removeIcon() {
+  protected _removeIcon() {
     if (this._icon) {
       this._icon.destroy();
     }
   }
 
-  setClosable(closable) {
+  setClosable(closable: boolean) {
     this.setProperty('closable', closable);
   }
 
-  _renderClosable() {
+  protected _renderClosable() {
     this.$container.toggleClass('closable', this.closable);
     this.$content.toggleClass('closable', this.closable);
     if (!this.closable) {
@@ -155,7 +167,7 @@ export default class Notification extends Widget {
     }
   }
 
-  _removeCloser() {
+  protected _removeCloser() {
     if (!this.$closer) {
       return;
     }
@@ -163,7 +175,7 @@ export default class Notification extends Widget {
     this.$closer = null;
   }
 
-  _renderCloser() {
+  protected _renderCloser() {
     if (this.$closer) {
       return;
     }
@@ -172,20 +184,20 @@ export default class Notification extends Widget {
       .on('click', this._onCloseIconClick.bind(this));
   }
 
-  _onCloseIconClick() {
-    if (this._removing) {
+  protected _onCloseIconClick(event: JQuery.ClickEvent) {
+    if (this.removing) {
       return;
     }
     this.trigger('close');
   }
 
-  _onAppLinkAction(event) {
+  protected _onAppLinkAction(event: JQuery.ClickEvent) {
     let $target = $(event.delegateTarget);
-    let ref = $target.data('ref');
+    let ref = $target.data('ref') as string;
     this.triggerAppLinkAction(ref);
   }
 
-  triggerAppLinkAction(ref) {
+  triggerAppLinkAction(ref: string) {
     this.trigger('appLinkAction', {
       ref: ref
     });

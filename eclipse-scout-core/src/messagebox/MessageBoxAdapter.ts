@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, ModelAdapter} from '../index';
+import {Event, MessageBox, ModelAdapter} from '../index';
 import {MessageBoxActionEvent} from './MessageBoxEventMap';
 
 export default class MessageBoxAdapter extends ModelAdapter {
@@ -23,7 +23,7 @@ export default class MessageBoxAdapter extends ModelAdapter {
     });
   }
 
-  protected override _onWidgetEvent(event: Event) {
+  protected override _onWidgetEvent(event: Event<MessageBox>) {
     if (event.type === 'action') {
       this._onWidgetAction(event as MessageBoxActionEvent);
     } else {
