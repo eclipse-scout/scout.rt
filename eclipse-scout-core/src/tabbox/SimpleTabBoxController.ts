@@ -1,15 +1,18 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, scout, SimpleTab, SimpleTabArea} from '../index';
+import {EventHandler, objects, scout, SimpleTab, SimpleTabArea, SimpleTabBox, SimpleTabBoxControllerModel, Widget} from '../index';
 import $ from 'jquery';
+import {SimpleTabBoxViewActivateEvent, SimpleTabBoxViewAddEvent, SimpleTabBoxViewDeactivateEvent, SimpleTabBoxViewRemoveEvent} from './SimpleTabBoxEventMap';
+import {SimpleTabAreaTabSelectEvent} from './SimpleTabAreaEventMap';
+import {SimpleTabView} from './SimpleTab';
 
 /**
  * The {@link {@link SimpleTabBoxController}} is used to link a {@link {@link SimpleTabBox}} with a {@link {@link SimpleTabArea}}.
@@ -18,8 +21,19 @@ import $ from 'jquery';
  * The controller basically listens to 'viewAdd', 'viewRemove', 'viewActivate', 'viewDeactivate' on the {@link {@link SimpleTabBox}} and
  * updates the {@link {@link SimpleTabArea}}.
  */
-export default class SimpleTabBoxController {
-  constructor(tabBox, tabArea) {
+export default class SimpleTabBoxController implements SimpleTabBoxControllerModel {
+  declare model: SimpleTabBoxControllerModel;
+
+  tabBox: SimpleTabBox;
+  tabArea: SimpleTabArea;
+
+  protected _viewAddHandler: EventHandler<SimpleTabBoxViewAddEvent>;
+  protected _viewRemoveHandler: EventHandler<SimpleTabBoxViewRemoveEvent>;
+  protected _viewActivateHandler: EventHandler<SimpleTabBoxViewActivateEvent>;
+  protected _viewDeactivateHandler: EventHandler<SimpleTabBoxViewDeactivateEvent>;
+  protected _viewTabSelectHandler: EventHandler<SimpleTabAreaTabSelectEvent>;
+
+  constructor() {
     this.tabBox = null;
     this._viewAddHandler = this._onViewAdd.bind(this);
     this._viewRemoveHandler = this._onViewRemove.bind(this);
@@ -30,11 +44,11 @@ export default class SimpleTabBoxController {
     this._viewTabSelectHandler = this._onViewTabSelect.bind(this);
   }
 
-  init(model) {
+  init(model: SimpleTabBoxControllerModel) {
     $.extend(this, model);
   }
 
-  install(tabBox, tabArea) {
+  install(tabBox: SimpleTabBox, tabArea?: SimpleTabArea) {
     this.uninstall();
     this.tabBox = scout.assertParameter('tabBox', tabBox);
     this.tabArea = scout.nvl(tabArea, this.tabBox.tabArea);
@@ -48,7 +62,7 @@ export default class SimpleTabBoxController {
     this._uninstallListeners();
   }
 
-  _installListeners() {
+  protected _installListeners() {
     this.tabBox.on('viewAdd', this._viewAddHandler);
     this.tabBox.on('viewRemove', this._viewRemoveHandler);
     this.tabBox.on('viewActivate', this._viewActivateHandler);
@@ -56,7 +70,7 @@ export default class SimpleTabBoxController {
     this.tabArea.on('tabSelect', this._viewTabSelectHandler);
   }
 
-  _uninstallListeners() {
+  protected _uninstallListeners() {
     if (this.tabBox) {
       this.tabBox.off('viewAdd', this._viewAddHandler);
       this.tabBox.off('viewRemove', this._viewRemoveHandler);
@@ -68,18 +82,18 @@ export default class SimpleTabBoxController {
     }
   }
 
-  createTabArea() {
+  createTabArea(): SimpleTabArea {
     return scout.create(SimpleTabArea, {
       parent: this.tabBox
     });
   }
 
-  _onViewAdd(event) {
+  protected _onViewAdd(event: SimpleTabBoxViewAddEvent) {
     let view = event.view,
       siblingView = event.siblingView,
-      viewTab,
+      viewTab: SimpleTab,
       // the sibling to insert the tab after.
-      siblingViewTab;
+      siblingViewTab: SimpleTab;
 
     if (!SimpleTabBoxController.hasViewTab(view)) {
       return;
@@ -92,11 +106,11 @@ export default class SimpleTabBoxController {
     }
   }
 
-  _shouldCreateTabForView(view) {
+  protected _shouldCreateTabForView(view: SimpleTabView): boolean {
     return true;
   }
 
-  _onViewRemove(event) {
+  protected _onViewRemove(event: SimpleTabBoxViewRemoveEvent) {
     let view = event.view;
     if (!view) {
       return;
@@ -107,19 +121,19 @@ export default class SimpleTabBoxController {
     }
   }
 
-  _onViewActivate(event) {
+  protected _onViewActivate(event: SimpleTabBoxViewActivateEvent) {
     let viewTab = this._getTab(event.view);
     // also reset selection if no view tab of the view is found.
     this.tabArea.selectTab(viewTab);
   }
 
-  _onViewDeactivate(event) {
+  protected _onViewDeactivate(event: SimpleTabBoxViewDeactivateEvent) {
     let viewTab = this._getTab(event.view);
     // also reset selection if no view tab of the view is found.
     this.tabArea.deselectTab(viewTab);
   }
 
-  _onViewTabSelect(event) {
+  protected _onViewTabSelect(event: SimpleTabAreaTabSelectEvent) {
     if (!event.viewTab) {
       return;
     }
@@ -127,18 +141,18 @@ export default class SimpleTabBoxController {
     this.tabBox.activateView(view);
   }
 
-  _createTab(view) {
+  protected _createTab(view: SimpleTabView): SimpleTab {
     return scout.create(SimpleTab, {
       parent: this.tabArea,
       view: view
     });
   }
 
-  _getTab(view) {
+  protected _getTab(view: SimpleTabView): SimpleTab {
     if (!view) {
       return;
     }
-    let viewTab = null;
+    let viewTab: SimpleTab = null;
     this.tabArea.getTabs().some(tab => {
       if (tab.view === view) {
         viewTab = tab;
@@ -149,13 +163,13 @@ export default class SimpleTabBoxController {
     return viewTab;
   }
 
-  getTabs() {
+  getTabs(): SimpleTab[] {
     return this.tabArea.getTabs();
   }
 
   /* ----- static functions ----- */
 
-  static hasViewTab(view) {
+  static hasViewTab(view: Widget): boolean {
     return objects.someProperties(view, ['title', 'subTitle', 'iconId']);
   }
 }
