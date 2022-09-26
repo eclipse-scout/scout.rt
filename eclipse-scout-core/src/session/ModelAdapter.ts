@@ -288,7 +288,7 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
     return this._propertyChangeEventFilter.filter(propertyName, value);
   }
 
-  protected _isWidgetEventFiltered(event: Event): boolean {
+  protected _isWidgetEventFiltered(event: Event<W>): boolean {
     return this._widgetEventTypeFilter.filter(event);
   }
 
@@ -297,7 +297,7 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
     this._widgetEventTypeFilter.reset();
   }
 
-  protected _onWidgetPropertyChange(event: PropertyChangeEvent<any>) {
+  protected _onWidgetPropertyChange(event: PropertyChangeEvent<any, W>) {
     let propertyName = event.propertyName;
     let value = event.newValue;
 
@@ -337,24 +337,24 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
     }
   }
 
-  protected _onWidgetDestroy(event: Event) {
+  protected _onWidgetDestroy(event: Event<W>) {
     this.destroy();
   }
 
   /**
    * Do not override this method. Widget event filtering is done here, before _onWidgetEvent is called.
    */
-  protected _onWidgetEventInternal(event: Event) {
+  protected _onWidgetEventInternal(event: Event<W>) {
     if (!this._isWidgetEventFiltered(event)) {
       this._onWidgetEvent(event);
     }
   }
 
-  protected _onWidgetEvent(event: Event) {
+  protected _onWidgetEvent(event: Event<W>) {
     if (event.type === 'destroy') {
       this._onWidgetDestroy(event);
     } else if (event.type === 'propertyChange') {
-      this._onWidgetPropertyChange(event as PropertyChangeEvent<any>);
+      this._onWidgetPropertyChange(event as PropertyChangeEvent<any, W>);
     }
   }
 

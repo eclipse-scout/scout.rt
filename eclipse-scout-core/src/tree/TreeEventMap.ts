@@ -12,54 +12,54 @@ import {Event, KeyStroke, Menu, PropertyChangeEvent, Tree, TreeNode, WidgetEvent
 import {TreeCheckableStyle, TreeDisplayStyle} from './Tree';
 import {FileDropEvent} from '../util/dragAndDrop';
 
-export interface TreeAllChildNodesDeletedEvent extends Event<Tree> {
+export interface TreeAllChildNodesDeletedEvent<T extends Tree = Tree> extends Event<T> {
   parentNode: TreeNode;
 }
 
-export interface TreeChildNodeOrderChangedEvent extends Event<Tree> {
+export interface TreeChildNodeOrderChangedEvent<T extends Tree = Tree> extends Event<T> {
   parentNode: TreeNode;
 }
 
-export interface TreeDropEvent extends Event<Tree>, FileDropEvent {
+export interface TreeDropEvent<T extends Tree = Tree> extends Event<T>, FileDropEvent {
 }
 
-export interface TreeNodeActionEvent extends Event<Tree> {
+export interface TreeNodeActionEvent<T extends Tree = Tree> extends Event<T> {
   node: TreeNode;
 }
 
-export interface TreeNodeChangedEvent extends Event<Tree> {
+export interface TreeNodeChangedEvent<T extends Tree = Tree> extends Event<T> {
   node: TreeNode;
 }
 
-export interface TreeNodeClickEvent extends Event<Tree> {
+export interface TreeNodeClickEvent<T extends Tree = Tree> extends Event<T> {
   node: TreeNode;
 }
 
-export interface TreeNodeExpandedEvent extends Event<Tree> {
+export interface TreeNodeExpandedEvent<T extends Tree = Tree> extends Event<T> {
   node: TreeNode;
   expanded: boolean;
   expandedLazy: boolean;
 }
 
-export interface TreeNodesCheckedEvent extends Event<Tree> {
+export interface TreeNodesCheckedEvent<T extends Tree = Tree> extends Event<T> {
   nodes: TreeNode[];
 }
 
-export interface TreeNodesDeletedEvent extends Event<Tree> {
-  nodes: TreeNode[];
-  parentNode: TreeNode;
-}
-
-export interface TreeNodesInsertedEvent extends Event<Tree> {
+export interface TreeNodesDeletedEvent<T extends Tree = Tree> extends Event<T> {
   nodes: TreeNode[];
   parentNode: TreeNode;
 }
 
-export interface TreeNodesSelectedEvent extends Event<Tree> {
+export interface TreeNodesInsertedEvent<T extends Tree = Tree> extends Event<T> {
+  nodes: TreeNode[];
+  parentNode: TreeNode;
+}
+
+export interface TreeNodesSelectedEvent<T extends Tree = Tree> extends Event<T> {
   debounce: boolean;
 }
 
-export interface TreeNodesUpdatedEvent extends Event<Tree> {
+export interface TreeNodesUpdatedEvent<T extends Tree = Tree> extends Event<T> {
   nodes: TreeNode[];
 }
 

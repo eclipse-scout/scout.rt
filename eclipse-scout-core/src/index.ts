@@ -295,6 +295,8 @@ export {default as IconDesc} from './image/IconDesc';
 export {default as Image} from './image/Image';
 export {default as ImageLayout} from './image/ImageLayout';
 export {default as Notification} from './notification/Notification';
+export {default as NotificationModel} from './notification/NotificationModel';
+export {default as NotificationEventMap} from './notification/NotificationEventMap';
 export {default as NotificationAdapter} from './notification/NotificationAdapter';
 export {default as menus} from './menu/menus';
 export {default as MenuDestinations} from './menu/MenuDestinations';
