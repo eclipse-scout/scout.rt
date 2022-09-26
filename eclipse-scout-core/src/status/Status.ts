@@ -10,9 +10,12 @@
  */
 import {arrays, DefaultStatus, EnumObject, ObjectFactory, objects, ParsingFailedStatus, Predicate, StatusModel, strings, ValidationFailedStatus} from '../index';
 import $ from 'jquery';
+import {ObjectType} from '../ObjectFactory';
+import {ModelOf} from '../scout';
 
 export type StatusSeverity = EnumObject<typeof Status.Severity>;
 export type StatusSeverityNames = keyof typeof Status.Severity;
+export type StatusOrModel<T extends Status = Status> = Status | ModelOf<T> & { objectType?: ObjectType<T> };
 
 export default class Status {
   declare model: StatusModel;
@@ -242,18 +245,18 @@ export default class Status {
     }
   }
 
-  static ensure(status: any): Status {
+  static ensure<T extends Status>(status: StatusOrModel<T>): T {
     if (!status) {
-      return status;
+      return status as T;
     }
     if (status instanceof Status) {
-      return status;
+      return status as T;
     }
     // May return a specialized sub-class of Status
     if (!status.objectType) {
       status.objectType = 'Status';
     }
-    return ObjectFactory.get().create(status);
+    return ObjectFactory.get().create(status as ModelOf<T> & { objectType: ObjectType<T> }) as T;
   }
 
   /**

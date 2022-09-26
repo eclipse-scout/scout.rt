@@ -186,7 +186,7 @@ export function resolveText(value: string, languageTag: string): string {
  * @param [textProperty] name of the property where a text-key should be replaced by a text. By default 'text' is used as property name.
  * @param [session] can be undefined when given 'object' has a session property, otherwise mandatory
  */
-export function resolveTextProperty(object: { session?: Session }, textProperty?: string, session?: Session) {
+export function resolveTextProperty(object: any, textProperty?: string, session?: Session) {
   textProperty = textProperty || 'text';
   session = object.session || session;
   let value = object[textProperty];
