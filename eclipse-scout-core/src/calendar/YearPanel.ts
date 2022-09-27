@@ -10,8 +10,8 @@
  */
 import {Calendar, DateRange, dates, Event, Planner, scout, scrollbars, Widget, YearPanelEventMap, YearPanelModel} from '../index';
 import $ from 'jquery';
-import {CalendarDisplayMode} from './Calendar';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {PlannerDisplayMode} from '../planner/Planner';
 
 export default class YearPanel extends Widget implements YearPanelModel {
   declare model: YearPanelModel;
@@ -20,7 +20,7 @@ export default class YearPanel extends Widget implements YearPanelModel {
   $yearTitle: JQuery<HTMLDivElement>;
   $yearList: JQuery<HTMLDivElement>;
   selectedDate: Date;
-  displayMode: CalendarDisplayMode;
+  displayMode: PlannerDisplayMode; // we must use Planner.DisplayMode (extends Calendar.DisplayMode) here because YearPanel must work for calendar and planner.
   alwaysSelectFirstDay: boolean;
   yearRendered: boolean;
   viewRange: DateRange;
@@ -185,7 +185,7 @@ export default class YearPanel extends Widget implements YearPanelModel {
     }
   }
 
-  setDisplayMode(displayMode: CalendarDisplayMode) {
+  setDisplayMode(displayMode: PlannerDisplayMode) {
     if (displayMode === this.displayMode) {
       return;
     }
@@ -209,8 +209,6 @@ export default class YearPanel extends Widget implements YearPanelModel {
 
   protected _onYearClick(event: JQuery.ClickEvent<HTMLDivElement>) {
     let
-      // we must use Planner.DisplayMode (extends Calendar.DisplayMode) here
-      // because YearPanel must work for calendar and planner.
       displayMode = Planner.DisplayMode,
       diff = $(event.target).data('year-diff'),
       year = this.selectedDate.getFullYear(),

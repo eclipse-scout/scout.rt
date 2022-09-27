@@ -1,17 +1,25 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Planner, Widget} from '../index';
+import {Event, Planner, PlannerHeaderEventMap, Widget} from '../index';
 import $ from 'jquery';
+import {PlannerDisplayMode} from './Planner';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export default class PlannerHeader extends Widget {
+  declare eventMap: PlannerHeaderEventMap;
+
+  $range: JQuery<HTMLDivElement>;
+  $commands: JQuery<HTMLDivElement>;
+  availableDisplayModes: PlannerDisplayMode[];
+  displayMode: PlannerDisplayMode;
 
   constructor() {
     super();
@@ -19,7 +27,7 @@ export default class PlannerHeader extends Widget {
     this.availableDisplayModes = [];
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('planner-header');
     this.$range = this.$container.appendDiv('planner-range');
     this.$range.appendDiv('planner-previous').on('click', this._onPreviousClick.bind(this));
@@ -31,11 +39,11 @@ export default class PlannerHeader extends Widget {
     this._renderDisplayMode();
   }
 
-  setAvailableDisplayModes(displayModes) {
+  setAvailableDisplayModes(displayModes: PlannerDisplayMode[]) {
     this.setProperty('availableDisplayModes', displayModes);
   }
 
-  _renderAvailableDisplayModes() {
+  protected _renderAvailableDisplayModes() {
     let displayMode = Planner.DisplayMode;
     this.$commands.empty();
 
@@ -82,32 +90,36 @@ export default class PlannerHeader extends Widget {
     this.$commands.appendDiv('planner-toggle-year').on('click', this._onYearClick.bind(this));
   }
 
-  setDisplayMode(displayMode) {
+  setDisplayMode(displayMode: PlannerDisplayMode) {
     this.setProperty('displayMode', displayMode);
   }
 
-  _renderDisplayMode() {
+  protected _renderDisplayMode() {
     $('.planner-mode', this.$commands).select(false);
     $('[data-mode="' + this.displayMode + '"]', this.$commands).select(true);
   }
 
-  _onTodayClick(event) {
+  protected _onTodayClick(event: JQuery.ClickEvent<HTMLDivElement>) {
     this.trigger('todayClick');
   }
 
-  _onNextClick(event) {
+  protected _onNextClick(event: JQuery.ClickEvent<HTMLDivElement>) {
     this.trigger('nextClick');
   }
 
-  _onPreviousClick(event) {
+  protected _onPreviousClick(event: JQuery.ClickEvent<HTMLDivElement>) {
     this.trigger('previousClick');
   }
 
-  _onYearClick(event) {
+  protected _onYearClick(event: JQuery.ClickEvent<HTMLDivElement>) {
     this.trigger('yearClick');
   }
 
-  _onDisplayModeClick(event) {
+  override trigger<K extends string & keyof EventMapOf<PlannerHeader>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<PlannerHeader>[K]>): EventMapOf<PlannerHeader>[K] {
+    return super.trigger(type, eventOrModel);
+  }
+
+  protected _onDisplayModeClick(event: JQuery.ClickEvent<HTMLDivElement>) {
     let displayMode = $(event.target).data('mode');
     this.setDisplayMode(displayMode);
     this.trigger('displayModeClick', {

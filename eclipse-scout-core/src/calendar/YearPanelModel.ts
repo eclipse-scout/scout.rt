@@ -9,10 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {WidgetModel} from '../index';
-import {CalendarDisplayMode} from './Calendar';
+import {PlannerDisplayMode} from '../planner/Planner';
 
 export default interface YearPanelModel extends WidgetModel {
   selectedDate?: Date;
-  displayMode?: CalendarDisplayMode;
+  displayMode?: PlannerDisplayMode;
   alwaysSelectFirstDay?: boolean;
 }
