@@ -8,16 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Desktop, Form, Outline, scout} from '../index';
+import {arrays, Desktop, DisplayParent, Form, FormControllerModel, Outline, scout, Session} from '../index';
 
 /**
  * Controller with functionality to register and render views and dialogs.
  *
  * The forms are put into the list 'views' and 'dialogs' contained in 'displayParent'.
  */
-export default class FormController {
+export default class FormController implements FormControllerModel {
+  declare model: FormControllerModel;
 
-  constructor(model) {
+  displayParent: DisplayParent;
+  session: Session;
+
+  constructor(model: FormControllerModel) {
     this.displayParent = model.displayParent;
     this.session = model.session;
   }
@@ -26,9 +30,8 @@ export default class FormController {
    * Adds the given view or dialog to this controller and renders it.
    * position is only used if form is a view. this position determines at which position the tab is placed.
    * if select view is set the view rendered in _renderView is also selected.
-   * @param {Form} form
    */
-  registerAndRender(form, position, selectView) {
+  registerAndRender(form: Form, position: number, selectView: boolean) {
     scout.assertProperty(form, 'displayParent');
     if (form.isPopupWindow()) {
       this._renderPopupWindow(form);
@@ -39,25 +42,21 @@ export default class FormController {
     }
   }
 
-  /**
-   * @param {Form} form
-   */
-  isFormShown(form) {
+  isFormShown(form: Form): boolean {
     if (form.isView()) {
       return this.displayParent.views.indexOf(form) > -1;
     }
     return this.displayParent.dialogs.indexOf(form) > -1;
   }
 
-  _renderPopupWindow(formAdapterId, position) {
+  protected _renderPopupWindow(form: Form, position?: number) {
     throw new Error('popup window only supported by DesktopFormController');
   }
 
   /**
    * Removes the given view or dialog from this controller and DOM. However, the form's adapter is not destroyed. That only happens once the Form is closed.
-   * @param {Form} form
    */
-  unregisterAndRemove(form) {
+  unregisterAndRemove(form: Form) {
     if (!form) {
       return;
     }
@@ -71,7 +70,7 @@ export default class FormController {
     }
   }
 
-  _removePopupWindow(form) {
+  protected _removePopupWindow(form: Form) {
     throw new Error('popup window only supported by DesktopFormController');
   }
 
@@ -84,14 +83,14 @@ export default class FormController {
     this._renderDialogs();
   }
 
-  _renderViews() {
+  protected _renderViews() {
     this.displayParent.views.forEach((view, position) => {
       view.setDisplayParent(this.displayParent);
       this._renderView(view, false, position, false);
     });
   }
 
-  _renderDialogs() {
+  protected _renderDialogs() {
     this.displayParent.dialogs.forEach(dialog => {
       dialog.setDisplayParent(this.displayParent);
       this._renderDialog(dialog, false);
@@ -113,8 +112,8 @@ export default class FormController {
   /**
    * Activates the given view or dialog.
    */
-  activateForm(form) {
-    let displayParent = this.displayParent;
+  activateForm(form: Form) {
+    let displayParent: DisplayParent = this.displayParent;
     while (displayParent) {
       if (displayParent instanceof Outline) {
         this.session.desktop.setOutline(displayParent);
@@ -130,12 +129,12 @@ export default class FormController {
     }
   }
 
-  acceptView(view, register, position, selectView) {
+  acceptView(view: Form, register?: boolean, position?: number, selectView?: boolean): boolean {
     // Only render view if 'displayParent' is rendered yet; if not, the view will be rendered once 'displayParent' is rendered.
     return this.displayParent.rendered;
   }
 
-  _renderView(view, register, position, selectView) {
+  protected _renderView(view: Form, register: boolean, position: number, selectView: boolean) {
     if (register) {
       if (position !== undefined) {
         arrays.insert(this.displayParent.views, view, position);
@@ -155,9 +154,11 @@ export default class FormController {
 
     // Prevent "Already rendered" errors --> TODO [7.0] bsh: Remove this hack! Fix it on model if possible. See #162954.
     if (view.rendered) {
-      return false;
+      return;
     }
     let desktop = this.session.desktop;
+    // FIXME TS: remove as soon as Desktop has been migrated
+    // @ts-ignore
     if (desktop.displayStyle === Desktop.DisplayStyle.COMPACT && !desktop.bench) {
       // Show bench and hide navigation if this is the first view to be shown
       desktop.sendOutlineToBack();
@@ -171,12 +172,12 @@ export default class FormController {
     desktop.bench.addView(view, selectView);
   }
 
-  acceptDialog(dialog) {
+  acceptDialog(dialog: Form) {
     // Only render dialog if 'displayParent' is rendered yet; if not, the dialog will be rendered once 'displayParent' is rendered.
     return this.displayParent.rendered;
   }
 
-  _renderDialog(dialog, register) {
+  protected _renderDialog(dialog: Form, register: boolean) {
     let desktop = this.session.desktop;
     if (register) {
       this.displayParent.dialogs.push(dialog);
@@ -193,7 +194,7 @@ export default class FormController {
 
     // Prevent "Already rendered" errors --> TODO [7.0] bsh: Remove this hack! Fix it on model if possible. See #162954.
     if (dialog.rendered) {
-      return false;
+      return;
     }
 
     dialog.on('remove', () => {
@@ -221,7 +222,7 @@ export default class FormController {
     }
   }
 
-  _findFormToActivateAfterDialogRemove() {
+  protected _findFormToActivateAfterDialogRemove(): Form {
     if (this.displayParent.dialogs.length > 0) {
       return this.displayParent.dialogs[this.displayParent.dialogs.length - 1];
     }
@@ -238,7 +239,7 @@ export default class FormController {
     }
   }
 
-  _removeView(view, unregister) {
+  protected _removeView(view: Form, unregister?: boolean) {
     unregister = scout.nvl(unregister, true);
     if (unregister) {
       arrays.remove(this.displayParent.views, view);
@@ -249,7 +250,7 @@ export default class FormController {
     }
   }
 
-  _removeDialog(dialog, unregister) {
+  protected _removeDialog(dialog: Form, unregister?: boolean) {
     unregister = scout.nvl(unregister, true);
     if (unregister) {
       arrays.remove(this.displayParent.dialogs, dialog);
@@ -259,7 +260,7 @@ export default class FormController {
     }
   }
 
-  _activateView(view) {
+  protected _activateView(view: Form) {
     let bench = this.session.desktop.bench;
     if (bench) {
       // Bench may be null (e.g. in mobile mode). This may probably only happen if the form is not really a view, because otherwise the bench would already be open.
@@ -269,7 +270,7 @@ export default class FormController {
     }
   }
 
-  _activateDialog(dialog) {
+  protected _activateDialog(dialog: Form) {
     // If the display-parent is a view-form --> activate it always.
     // If it is another dialog --> activate it only if the dialog to activate is modal
     if (dialog.displayParent instanceof Form &&
@@ -286,7 +287,7 @@ export default class FormController {
 
     // Now the approach is to move all eligible siblings that are in the DOM after the given dialog.
     // It is important not to move the given dialog itself, because this would interfere with the further handling of the
-    // mousedown-DOM-event that triggerd this function.
+    // mousedown-DOM-event that triggered this function.
     let movableSiblings = siblings.filter(function(sibling) {
       // siblings of a dialog are movable if they meet the following criteria:
       // - they are forms (sibling forms of a dialog are always dialogs)
@@ -311,6 +312,8 @@ export default class FormController {
     });
     movableSiblings = movableSiblings.concat(movableSiblingsDescendants);
 
+    // FIXME TS: remove as soon as Desktop has been migrated
+    // @ts-ignore
     this.session.desktop.moveOverlaysBehindAndFocus(movableSiblings, dialog.$container);
   }
 
@@ -338,7 +341,7 @@ export default class FormController {
     }, this);
   }
 
-  _layoutDialog(dialog) {
+  protected _layoutDialog(dialog: Form) {
     dialog.htmlComp.validateLayout();
     dialog.position();
 

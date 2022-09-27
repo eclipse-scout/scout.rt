@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventMap, Lifecycle} from '../index';
+import {DisplayParent, Session} from '../index';
 
-export default interface LifecycleEventMap<VALIDATION_RESULT> extends EventMap {
-  'load': Event<Lifecycle<VALIDATION_RESULT>>;
-  'postLoad': Event<Lifecycle<VALIDATION_RESULT>>;
-  'save': Event<Lifecycle<VALIDATION_RESULT>>;
-  'close': Event<Lifecycle<VALIDATION_RESULT>>;
-  'reset': Event<Lifecycle<VALIDATION_RESULT>>;
+export default interface FormControllerModel {
+  displayParent: DisplayParent;
+  session: Session;
 }

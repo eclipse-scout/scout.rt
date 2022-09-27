@@ -8,10 +8,90 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, Button, DialogLayout, Event, FileChooserController, FocusRule, FormController, FormGrid, FormLayout, FormLifecycle, GlassPaneRenderer, HtmlComponent, KeyStrokeContext, MessageBoxController, Rectangle, scout, Status, strings, tooltips, webstorage, Widget, WrappedFormField} from '../index';
+import {AbortKeyStroke, Button, DialogLayout, DisabledStyle, DisplayParent, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormField, FormGrid, FormLayout, FormLifecycle, FormModel, GlassPaneRenderer, GroupBox, HtmlComponent, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, Point, PopupWindow, Rectangle, scout, Status, StatusModel, strings, tooltips, TreeVisitResult, webstorage, Widget, WrappedFormField} from '../index';
 import $ from 'jquery';
+import {FormRevealInvalidFieldEvent} from './FormEventMap';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
+import Promise = JQuery.Promise;
 
-export default class Form extends Widget {
+export type DisplayHint = EnumObject<typeof Form.DisplayHint>;
+
+export type ValidationResult = {
+  valid: boolean;
+  validByErrorStatus: boolean;
+  validByMandatory: boolean;
+  field: FormField;
+  label: string;
+  reveal: () => void;
+}; // FIXME TS: move to FormField
+
+export default class Form extends Widget implements FormModel {
+  declare model: FormModel;
+  declare eventMap: FormEventMap;
+
+  animateOpening: boolean;
+  askIfNeedSave: boolean;
+  askIfNeedSaveText: string;
+  data: object;
+  displayViewId: string;
+  displayHint: DisplayHint;
+  maximized: boolean;
+  headerVisible: boolean;
+  modal: boolean;
+  dialogs: Form[];
+  views: Form[];
+  messageBoxes: MessageBox[];
+  fileChoosers: FileChooser[];
+  focusedElement: Widget;
+  closable: boolean;
+  cacheBounds: boolean;
+  cacheBoundsKey: string;
+  resizable: boolean;
+  movable: boolean;
+  rootGroupBox: GroupBox;
+  saveNeeded: boolean;
+  saveNeededVisible: boolean;
+  formController: FormController;
+  messageBoxController: MessageBoxController;
+  fileChooserController: FileChooserController;
+  closeKeyStroke: KeyStroke;
+  showOnOpen: boolean;
+  initialFocus: Widget;
+  renderInitialFocusEnabled: boolean;
+  /** set by PopupWindow if this Form has displayHint=Form.DisplayHint.POPUP_WINDOW */
+  popupWindow: PopupWindow;
+
+  /**
+   * Do not initialize as e.g. {@link SimpleTabBoxController.hasViewTab} only checks existence of property and not whether its value is null or undefined or not
+   */
+  title: string;
+  /**
+   * Do not initialize as e.g. {@link SimpleTabBoxController.hasViewTab} only checks existence of property and not whether its value is null or undefined or not
+   */
+  subTitle: string;
+  /**
+   * Do not initialize as e.g. {@link SimpleTabBoxController.hasViewTab} only checks existence of property and not whether its value is null or undefined or not
+   */
+  iconId: string;
+  status: Status;
+  uiCssClass: string;
+  lifecycle: FormLifecycle;
+  detailForm: boolean;
+
+  $statusIcons: JQuery[];
+  $header: JQuery;
+  $statusContainer: JQuery;
+  $close: JQuery;
+  $saveNeeded: JQuery;
+  $icon: JQuery;
+  $title: JQuery;
+  $subTitle: JQuery;
+  $dragHandle: JQuery;
+  protected _glassPaneRenderer: GlassPaneRenderer;
+  protected _preMaximizedBounds: Rectangle;
+  protected _resizeHandler: (Event) => boolean;
+  protected _windowResizeHandler: () => void;
+
   constructor() {
     super();
     this._addWidgetProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
@@ -19,7 +99,7 @@ export default class Form extends Widget {
 
     this.animateOpening = true;
     this.askIfNeedSave = true;
-    this.askIfNeedSaveText = null; // if not set, a default text is used (see Lifecycle.js)
+    this.askIfNeedSaveText = null;
     this.data = {};
     this.displayViewId = null;
     this.displayHint = Form.DisplayHint.DIALOG;
@@ -46,15 +126,9 @@ export default class Form extends Widget {
     this.fileChooserController = null;
     this.closeKeyStroke = null;
     this.showOnOpen = true;
-    this._glassPaneRenderer = null;
-    this._preMaximizedBounds = null;
-    this._resizeHandler = this._onResize.bind(this);
-    this._windowResizeHandler = this._onWindowResize.bind(this);
-    /**
-     * Whether this form should render its initial focus
-     */
+    this.initialFocus = null;
     this.renderInitialFocusEnabled = true;
-    this.popupWindow = null; // set by PopupWindow if this Form has displayHint=Form.DisplayHint.POPUP_WINDOW
+    this.popupWindow = null;
 
     this.$statusIcons = [];
     this.$header = null;
@@ -65,15 +139,19 @@ export default class Form extends Widget {
     this.$title = null;
     this.$subTitle = null;
     this.$dragHandle = null;
+    this._glassPaneRenderer = null;
+    this._preMaximizedBounds = null;
+    this._resizeHandler = this._onResize.bind(this);
+    this._windowResizeHandler = this._onWindowResize.bind(this);
   }
 
   static DisplayHint = {
     DIALOG: 'dialog',
     POPUP_WINDOW: 'popupWindow',
     VIEW: 'view'
-  };
+  } as const;
 
-  _init(model) {
+  protected override _init(model: FormModel) {
     super._init(model);
 
     this.resolveTextKeys(['title', 'askIfNeedSaveText']);
@@ -95,18 +173,15 @@ export default class Form extends Widget {
     this._setClosable(this.closable);
   }
 
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  _render() {
+  protected override _render() {
     this._renderForm();
   }
 
-  /**
-   * @override Widget.js
-   */
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderMaximized();
     this._renderMovable();
@@ -121,7 +196,7 @@ export default class Form extends Widget {
     }
   }
 
-  _postRender() {
+  protected override _postRender() {
     super._postRender();
 
     // Render attached forms, message boxes and file choosers.
@@ -134,14 +209,14 @@ export default class Form extends Widget {
     }
   }
 
-  _destroy() {
+  protected override _destroy() {
     super._destroy();
     if (this._glassPaneRenderer) {
       this._glassPaneRenderer = null;
     }
   }
 
-  _remove() {
+  protected override _remove() {
     this.formController.remove();
     this.messageBoxController.remove();
     this.fileChooserController.remove();
@@ -156,7 +231,7 @@ export default class Form extends Widget {
     super._remove();
   }
 
-  _renderForm() {
+  protected _renderForm() {
     let layout;
 
     this.$container = this.$parent.appendDiv('form')
@@ -182,18 +257,18 @@ export default class Form extends Widget {
     this.rootGroupBox.render();
   }
 
-  _renderFocusedElement() {
+  protected _renderFocusedElement() {
     if (this.focusedElement) {
       this.focusedElement.focus();
       this.focusedElement = null;
     }
   }
 
-  setModal(modal) {
+  setModal(modal: boolean) {
     this.setProperty('modal', modal);
   }
 
-  _renderModal() {
+  protected _renderModal() {
     if (this.parent instanceof WrappedFormField) {
       return;
     }
@@ -206,7 +281,7 @@ export default class Form extends Widget {
     }
   }
 
-  _installLifecycle() {
+  protected _installLifecycle() {
     this.lifecycle = this._createLifecycle();
     this.lifecycle.handle('load', this._onLifecycleLoad.bind(this));
     this.lifecycle.handle('save', this._onLifecycleSave.bind(this));
@@ -215,12 +290,16 @@ export default class Form extends Widget {
     this.lifecycle.on('close', this._onLifecycleClose.bind(this));
   }
 
-  _createLifecycle() {
+  protected _createLifecycle(): FormLifecycle {
     return scout.create(FormLifecycle, {
       widget: this,
       askIfNeedSave: this.askIfNeedSave,
       askIfNeedSaveText: this.askIfNeedSaveText
     });
+  }
+
+  override trigger<K extends string & keyof EventMapOf<Form>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Form>[K]>): EventMapOf<Form>[K] {
+    return super.trigger(type, eventOrModel);
   }
 
   /**
@@ -232,10 +311,8 @@ export default class Form extends Widget {
    * {@link show} will be called delayed even if {@link load} does nothing but return a resolved promise.<br>
    * This is only relevant if you need to access properties which are only available when the form is rendered (e.g. $container), which is not recommended anyway.
    * <p>
-   *
-   * @returns {Promise} the promise returned by the {@link load} function.
    */
-  open() {
+  open(): Promise<void> {
     return this.load()
       .then(() => {
         if (this.destroyed) {
@@ -250,25 +327,23 @@ export default class Form extends Widget {
 
   /**
    * Initializes the life cycle and calls the {@link _load} function.
-   * @returns {Promise} promise which is resolved when the form is loaded.
+   * @returns promise which is resolved when the form is loaded.
    */
-  load() {
+  load(): Promise<void> {
     return this.lifecycle.load();
   }
 
   /**
-   * @returns {Promise} promise which is resolved when the form is loaded, respectively when the 'load' event is triggered'.
+   * @returns promise which is resolved when the form is loaded, respectively when the 'load' event is triggered'.
    */
-  whenLoad() {
+  whenLoad(): Promise<Event<Form>> {
     return this.when('load');
   }
 
   /**
    * Lifecycle handle function registered for 'load'.
-   *
-   * @returns {Promise<T | void>|void}
    */
-  _onLifecycleLoad() {
+  protected _onLifecycleLoad(): Promise<Status> {
     try {
       return this._load()
         .then(data => {
@@ -291,9 +366,8 @@ export default class Form extends Widget {
    * This function is called when an error occurs while the <code>_load</code> function is called or when the <code>_load</code> function returns with a rejected promise.
    * By default the Form is destroyed and the error re-thrown so a caller of <code>Form.load()</code> may catch the error.
    *
-   * @param {Error} error
    */
-  _handleLoadError(error) {
+  protected _handleLoadError(error: Error): Promise<Status> {
     this.destroy();
     throw error;
   }
@@ -301,35 +375,31 @@ export default class Form extends Widget {
   /**
    * Method may be implemented to load the data. <br>
    * By default, a resolved promise containing the provided this.data is returned.
-   * @returns {Promise}
    */
-  _load() {
+  protected _load(): Promise<object> {
     return $.resolvedPromise().then(() => {
       return this.data;
     });
   }
 
   /**
-   * @returns {Promise} promise which is resolved when the form is post loaded, respectively when the 'postLoad' event is triggered'.
+   * @returns promise which is resolved when the form is post loaded, respectively when the 'postLoad' event is triggered'.
    */
-  whenPostLoad() {
+  whenPostLoad(): Promise<Event<Form>> {
     return this.when('postLoad');
   }
 
-  _onLifecyclePostLoad() {
+  protected _onLifecyclePostLoad(): Promise<void> {
     return this._postLoad().then(() => {
       this.trigger('postLoad');
     });
   }
 
-  _postLoad() {
+  protected _postLoad(): Promise<void> {
     return $.resolvedPromise();
   }
 
-  /**
-   * @param {any} data
-   */
-  setData(data) {
+  setData(data: object) {
     this.setProperty('data', data);
   }
 
@@ -337,39 +407,36 @@ export default class Form extends Widget {
     // NOP
   }
 
-  /**
-   * @returns {any}
-   */
-  exportData() {
+  exportData(): object {
     return null;
   }
 
   /**
    * Saves and closes the form.
-   * @returns {Promise} promise which is resolved when the form is closed.
+   * @returns promise which is resolved when the form is closed.
    */
-  ok() {
+  ok(): Promise<void> {
     return this.lifecycle.ok();
   }
 
   /**
    * Saves the changes without closing the form.
-   * @returns {Promise} promise which is resolved when the form is saved
+   * @returns promise which is resolved when the form is saved
    *    Note: it will be resolved even if the form does not require save and therefore even if {@link @_save} is not called.
    *    If you only want to be informed when save is required and {@link @_save} executed then you could use {@link whenSave()} or {@link on('save')} instead.
    */
-  save() {
+  save(): Promise<void> {
     return this.lifecycle.save();
   }
 
   /**
-   * @returns {Promise} promise which is resolved when the form is saved, respectively when the 'save' event is triggered'.
+   * @returns promise which is resolved when the form is saved, respectively when the 'save' event is triggered'.
    */
-  whenSave() {
+  whenSave(): Promise<Event<Form>> {
     return this.when('save');
   }
 
-  _onLifecycleSave() {
+  protected _onLifecycleSave(): Promise<Status> {
     let data = this.exportData();
     return this._save(data).then(status => {
       this.setData(data);
@@ -387,9 +454,8 @@ export default class Form extends Widget {
    * <p>
    * You should return a Status object with severity ERROR in case the validation fails.
    *
-   * @return {Status}
    */
-  _validate() {
+  protected _validate(): Status {
     return Status.ok();
   }
 
@@ -397,58 +463,55 @@ export default class Form extends Widget {
    * This function is called by the lifecycle, when the 'save' function is called.<p>
    * The data given to this function is the result of {@link exportData} which was called in advance.
    *
-   * @returns {Promise} promise which may contain a Status specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
+   * @returns promise which may contain a Status specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
    */
-  _save(data) {
+  protected _save(data): Promise<Status> {
     return $.resolvedPromise();
   }
 
   /**
    * Resets the form to its initial state.
-   * @returns {Promise}.
    */
-  reset() {
-    this.lifecycle.reset();
+  reset(): Promise<void> {
+    return this.lifecycle.reset();
   }
 
   /**
-   * @returns {Promise} promise which is resolved when the form is reset, respectively when the 'reset' event is triggered'.
+   * @returns promise which is resolved when the form is reset, respectively when the 'reset' event is triggered'.
    */
-  whenReset() {
+  whenReset(): Promise<Event<Form>> {
     return this.when('reset');
   }
 
-  _onLifecycleReset() {
+  protected _onLifecycleReset() {
     this.trigger('reset');
   }
 
   /**
    * Closes the form if there are no changes made. Otherwise it shows a message box asking to save the changes.
-   * @returns {Promise}.
    */
-  cancel() {
+  cancel(): Promise<void> {
     return this.lifecycle.cancel();
   }
 
   /**
    * Closes the form and discards any unsaved changes.
-   * @returns {Promise}.
    */
-  close() {
+  close(): Promise<void> {
     return this.lifecycle.close();
   }
 
   /**
-   * @returns {Promise} promise which is resolved when the form is closed, respectively when the 'close' event is triggered'.
+   * @returns promise which is resolved when the form is closed, respectively when the 'close' event is triggered'.
    */
-  whenClose() {
+  whenClose(): Promise<Event<Form>> {
     return this.when('close');
   }
 
   /**
    * Destroys the form and removes it from the desktop.
    */
-  _onLifecycleClose() {
+  protected _onLifecycleClose() {
     let event = new Event();
     this.trigger('close', event);
     if (!event.defaultPrevented) {
@@ -456,7 +519,7 @@ export default class Form extends Widget {
     }
   }
 
-  _close() {
+  protected _close() {
     this.hide();
     this.destroy();
   }
@@ -474,16 +537,16 @@ export default class Form extends Widget {
   }
 
   /**
-   * @returns {Promise} promise which is resolved when the form is aborted, respectively when the 'abort' event is triggered'.
+   * @returns promise which is resolved when the form is aborted, respectively when the 'abort' event is triggered'.
    */
-  whenAbort() {
+  whenAbort(): Promise<Event<Form>> {
     return this.when('abort');
   }
 
   /**
    * Will call {@link #close()} if there is a close menu or button, otherwise {@link #cancel()) will be called.
    */
-  _abort() {
+  protected _abort() {
     // Search for a close button in the menus and buttons of the root group box
     let hasCloseButton = this.rootGroupBox.controls
       .concat(this.rootGroupBox.menus)
@@ -499,14 +562,16 @@ export default class Form extends Widget {
       });
 
     if (hasCloseButton) {
+      // noinspection JSIgnoredPromiseFromCall
       this.close();
     } else {
+      // noinspection JSIgnoredPromiseFromCall
       this.cancel();
     }
     this._afterAbort();
   }
 
-  _afterAbort() {
+  protected _afterAbort() {
     if (!this.destroyed && this.isShown()) {
       // If the form is still shown after an abort request, something (e.g. a validation message box) is probably open
       // -> activate the form to show the validation message
@@ -515,20 +580,14 @@ export default class Form extends Widget {
     }
   }
 
-  /**
-   * @param {ValidationResult} validationResult
-   */
-  revealInvalidField(validationResult) {
+  revealInvalidField(validationResult: ValidationResult) {
     if (!validationResult) {
       return;
     }
     this._revealInvalidField(validationResult);
   }
 
-  /**
-   * @param {ValidationResult} validationResult
-   */
-  _revealInvalidField(validationResult) {
+  protected _revealInvalidField(validationResult: ValidationResult) {
     let event = this._createRevealInvalidFieldEvent(validationResult);
     this.trigger('revealInvalidField', event);
     if (event.defaultPrevented) {
@@ -537,11 +596,8 @@ export default class Form extends Widget {
     validationResult.reveal();
   }
 
-  /**
-   * @param {ValidationResult} validationResult
-   */
-  _createRevealInvalidFieldEvent(validationResult) {
-    return new Event({validationResult: validationResult});
+  protected _createRevealInvalidFieldEvent(validationResult: ValidationResult): FormRevealInvalidFieldEvent {
+    return new Event({validationResult: validationResult}) as FormRevealInvalidFieldEvent;
   }
 
   /**
@@ -549,13 +605,12 @@ export default class Form extends Widget {
    * The default implementation returns an AbortKeyStroke which handles the ESC key and calls {@link abort}.
    * <p>
    * The key stroke is only active if {@link this.closable} is set to true.
-   * @return KeyStroke
    */
-  _createCloseKeyStroke() {
+  protected _createCloseKeyStroke(): KeyStroke {
     return new AbortKeyStroke(this, () => this.$close);
   }
 
-  _setClosable(closable) {
+  protected _setClosable(closable: boolean) {
     this._setProperty('closable', closable);
     if (this.closable) {
       this.closeKeyStroke = this._createCloseKeyStroke();
@@ -565,11 +620,11 @@ export default class Form extends Widget {
     }
   }
 
-  setClosable(closable) {
+  setClosable(closable: boolean) {
     this.setProperty('closable', closable);
   }
 
-  _renderClosable() {
+  protected _renderClosable() {
     if (!this.$header) {
       return;
     }
@@ -589,15 +644,15 @@ export default class Form extends Widget {
     }
   }
 
-  _onCloseIconClick() {
+  protected _onCloseIconClick() {
     this.abort();
   }
 
-  setResizable(resizable) {
+  setResizable(resizable: boolean) {
     this.setProperty('resizable', resizable);
   }
 
-  _renderResizable() {
+  protected _renderResizable() {
     if (this.resizable && this.isDialog() && !this.maximized) {
       this.$container
         .resizable()
@@ -609,20 +664,21 @@ export default class Form extends Widget {
     }
   }
 
-  _onResize(event) {
-    let autoSizeOld = this.htmlComp.layout.autoSize;
-    this.htmlComp.layout.autoSize = false;
+  protected _onResize(event: Event): boolean {
+    let layout = this.htmlComp.layout as DialogLayout,
+      autoSizeOld = layout.autoSize;
+    layout.autoSize = false;
     this.htmlComp.revalidateLayout();
-    this.htmlComp.layout.autoSize = autoSizeOld;
+    layout.autoSize = autoSizeOld;
     this.updateCacheBounds();
     return false;
   }
 
-  setMovable(movable) {
+  setMovable(movable: boolean) {
     this.setProperty('movable', movable);
   }
 
-  _renderMovable() {
+  protected _renderMovable() {
     if (this.movable && this.isDialog() && !this.maximized) {
       if (this.$dragHandle) {
         return;
@@ -639,7 +695,7 @@ export default class Form extends Widget {
     }
   }
 
-  _onDialogMouseDown() {
+  protected _onDialogMouseDown() {
     this.activate();
   }
 
@@ -659,14 +715,12 @@ export default class Form extends Widget {
    * Checks whether the form is shown, which means whether a form has been added to the form stack of the display parent, e.g. by using {@link showForm}.<br>
    * It does not necessarily mean the user can see the content of the form for sure,
    * e.g. if the form is opened as a view the tab may be inactive because another view is active, or in case of a dialog it may be hidden behind another dialog or shown in an inactive view.
-   *
-   * @returns {boolean}
    */
-  isShown() {
+  isShown(): boolean {
     return this.session.desktop.isFormShown(this);
   }
 
-  _renderHeader() {
+  protected _renderHeader() {
     this.$header = this.$container.prependDiv('header');
     this.$statusContainer = this.$header.appendDiv('status-container');
     this.$icon = this.$header.appendDiv('icon-container');
@@ -688,7 +742,7 @@ export default class Form extends Widget {
     this._renderSaveNeeded();
   }
 
-  _removeHeader() {
+  protected _removeHeader() {
     if (this.$title) {
       tooltips.uninstall(this.$title);
     }
@@ -707,14 +761,14 @@ export default class Form extends Widget {
     this.$saveNeeded = null;
   }
 
-  _setRootGroupBox(rootGroupBox) {
+  protected _setRootGroupBox(rootGroupBox: GroupBox) {
     this._setProperty('rootGroupBox', rootGroupBox);
     if (this.rootGroupBox) {
       this.rootGroupBox.setMainBox(true);
     }
   }
 
-  _renderSaveNeeded() {
+  protected _renderSaveNeeded() {
     if (!this.$header) {
       return;
     }
@@ -741,30 +795,30 @@ export default class Form extends Widget {
     this.invalidateLayoutTree();
   }
 
-  setAskIfNeedSave(askIfNeedSave) {
+  setAskIfNeedSave(askIfNeedSave: boolean) {
     this.setProperty('askIfNeedSave', askIfNeedSave);
     if (this.lifecycle) {
       this.lifecycle.setAskIfNeedSave(askIfNeedSave);
     }
   }
 
-  setDisplayViewId(displayViewId) {
+  setDisplayViewId(displayViewId: string) {
     this.setProperty('displayViewId', displayViewId);
   }
 
-  setDisplayHint(displayHint) {
+  setDisplayHint(displayHint: DisplayHint) {
     this.setProperty('displayHint', displayHint);
   }
 
-  setSaveNeededVisible(visible) {
+  setSaveNeededVisible(visible: boolean) {
     this.setProperty('saveNeededVisible', visible);
   }
 
-  _renderSaveNeededVisible() {
+  protected _renderSaveNeededVisible() {
     this._renderSaveNeeded();
   }
 
-  _renderCssClass(cssClass, oldCssClass) {
+  protected override _renderCssClass(cssClass?: string, oldCssClass?: string) {
     cssClass = cssClass || this.cssClass;
     this.$container.removeClass(oldCssClass);
     this.$container.addClass(cssClass);
@@ -772,16 +826,16 @@ export default class Form extends Widget {
     this.invalidateLayoutTree();
   }
 
-  setStatus(status) {
+  setStatus(status: Status | StatusModel) {
     this.setProperty('status', status);
   }
 
-  _setStatus(status) {
+  protected _setStatus(status: Status | StatusModel) {
     status = Status.ensure(status);
     this._setProperty('status', status);
   }
 
-  _renderStatus() {
+  protected _renderStatus() {
     if (!this.$header) {
       return;
     }
@@ -806,7 +860,7 @@ export default class Form extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _renderSingleStatus(status, $prevIcon) {
+  protected _renderSingleStatus(status: Status, $prevIcon: JQuery): JQuery {
     if (status && status.iconId) {
       let $statusIcon = this.$statusContainer.appendIcon(status.iconId, 'status');
       if (status.cssClass()) {
@@ -818,17 +872,17 @@ export default class Form extends Widget {
     return $prevIcon;
   }
 
-  setShowOnOpen(showOnOpen) {
+  setShowOnOpen(showOnOpen: boolean) {
     this.setProperty('showOnOpen', showOnOpen);
   }
 
-  _updateTitleForWindow() {
+  protected _updateTitleForWindow() {
     let formTitle = strings.join(' - ', this.title, this.subTitle),
       applicationTitle = this.session.desktop.title;
     this.popupWindow.title(formTitle || applicationTitle);
   }
 
-  _updateTitleForDom() {
+  protected _updateTitleForDom() {
     let titleText = this.title;
     if (!titleText && this.closable) {
       // Add '&nbsp;' to prevent title-box of a closable form from collapsing if title is empty
@@ -869,24 +923,24 @@ export default class Form extends Widget {
     }
   }
 
-  isDialog() {
+  isDialog(): boolean {
     return this.displayHint === Form.DisplayHint.DIALOG;
   }
 
-  isPopupWindow() {
+  isPopupWindow(): boolean {
     return this.displayHint === Form.DisplayHint.POPUP_WINDOW;
   }
 
-  isView() {
+  isView(): boolean {
     return this.displayHint === Form.DisplayHint.VIEW;
   }
 
-  _onMove(newOffset) {
+  protected _onMove(newOffset: { top: number; left: number }) {
     this.trigger('move', newOffset);
     this.updateCacheBounds();
   }
 
-  moveTo(position) {
+  moveTo(position: Point) {
     this.$container.cssPosition(position);
     this.trigger('move', {
       left: position.x,
@@ -912,15 +966,15 @@ export default class Form extends Widget {
     }
   }
 
-  appendTo($parent) {
+  appendTo($parent: JQuery) {
     this.$container.appendTo($parent);
   }
 
-  setHeaderVisible(headerVisible) {
+  setHeaderVisible(headerVisible: boolean) {
     this.setProperty('headerVisible', headerVisible);
   }
 
-  _renderHeaderVisible() {
+  protected _renderHeaderVisible() {
     let headerVisible = this.headerVisible === null ? this.isDialog() : this.headerVisible;
     if (headerVisible && !this.$header) {
       this._renderHeader();
@@ -933,11 +987,11 @@ export default class Form extends Widget {
     this.invalidateLayoutTree();
   }
 
-  setTitle(title) {
+  setTitle(title: string) {
     this.setProperty('title', title);
   }
 
-  _renderTitle() {
+  protected _renderTitle() {
     if (this.$header) {
       this.$title.text(this.title);
       this.$header.toggleClass('no-title', !this.title && !this.subTitle);
@@ -949,11 +1003,11 @@ export default class Form extends Widget {
     this.invalidateLayoutTree();
   }
 
-  setSubTitle(subTitle) {
+  setSubTitle(subTitle: string) {
     this.setProperty('subTitle', subTitle);
   }
 
-  _renderSubTitle() {
+  protected _renderSubTitle() {
     if (this.$header) {
       this.$subTitle.text(this.subTitle);
       this.$header.toggleClass('no-title', !this.title && !this.subTitle);
@@ -965,11 +1019,11 @@ export default class Form extends Widget {
     this.invalidateLayoutTree();
   }
 
-  setIconId(iconId) {
+  setIconId(iconId: string) {
     this.setProperty('iconId', iconId);
   }
 
-  _renderIconId() {
+  protected _renderIconId() {
     if (this.$header) {
       this.$icon.icon(this.iconId);
       // Layout could have been changed, e.g. if subtitle becomes visible
@@ -977,7 +1031,7 @@ export default class Form extends Widget {
     }
   }
 
-  _setViews(views) {
+  protected _setViews(views: Form[]) {
     if (views) {
       views.forEach(view => {
         view.setDisplayParent(this);
@@ -986,18 +1040,15 @@ export default class Form extends Widget {
     this._setProperty('views', views);
   }
 
-  /**
-   * @override Widget.js
-   */
-  setDisabledStyle(disabledStyle) {
+  override setDisabledStyle(disabledStyle: DisabledStyle) {
     this.rootGroupBox.setDisabledStyle(disabledStyle);
   }
 
-  setDisplayParent(displayParent) {
+  setDisplayParent(displayParent: DisplayParent) {
     this.setProperty('displayParent', displayParent);
   }
 
-  _setDisplayParent(displayParent) {
+  protected _setDisplayParent(displayParent: DisplayParent) {
     if (displayParent instanceof Form && displayParent.parent instanceof WrappedFormField && displayParent.isView()) {
       displayParent = Form.findNonWrappedForm(displayParent);
     }
@@ -1008,11 +1059,11 @@ export default class Form extends Widget {
     }
   }
 
-  setMaximized(maximized) {
+  setMaximized(maximized: boolean) {
     this.setProperty('maximized', maximized);
   }
 
-  _renderMaximized() {
+  protected _renderMaximized() {
     if (!this.isDialog()) {
       return;
     }
@@ -1040,24 +1091,25 @@ export default class Form extends Widget {
     }
   }
 
-  _onWindowResize() {
+  protected _onWindowResize() {
     if (this.maximized) {
       this._maximize();
     }
   }
 
-  _maximize() {
+  protected _maximize() {
     if (!this.rendered) {
       return;
     }
-    let shrinkEnabled = this.htmlComp.layout.shrinkEnabled;
-    this.htmlComp.layout.shrinkEnabled = true;
+    let layout = this.htmlComp.layout as DialogLayout,
+      shrinkEnabled = layout.shrinkEnabled;
+    layout.shrinkEnabled = true;
     this.revalidateLayoutTree();
     this.position();
-    this.htmlComp.layout.shrinkEnabled = shrinkEnabled;
+    layout.shrinkEnabled = shrinkEnabled;
   }
 
-  prefBounds() {
+  prefBounds(): Rectangle {
     if (this.maximized) {
       return null;
     }
@@ -1070,7 +1122,7 @@ export default class Form extends Widget {
     return null;
   }
 
-  _attach() {
+  protected override _attach() {
     this.$parent.append(this.$container);
 
     // If the parent was resized while this view was detached, the view has a wrong size.
@@ -1091,9 +1143,8 @@ export default class Form extends Widget {
    *  - this is a 'detailForm' and the outline content is displayed;
    *  - this is a 'view' and the view tab is selected;
    *  - this is a child 'dialog' or 'view' and its 'displayParent' is attached;
-   * @override Widget.js
    */
-  _postAttach() {
+  protected override _postAttach() {
     // Attach child dialogs, message boxes and file choosers.
     this.formController.attachDialogs();
     this.messageBoxController.attach();
@@ -1107,9 +1158,8 @@ export default class Form extends Widget {
    *  - this is a 'detailForm' and the outline content is hidden;
    *  - this is a 'view' and the view tab is deselected;
    *  - this is a child 'dialog' or 'view' and its 'displayParent' is detached;
-   * @override Widget.js
    */
-  _detach() {
+  protected override _detach() {
     // Detach child dialogs, message boxes and file choosers, not views.
     this.formController.detachDialogs();
     this.messageBoxController.detach();
@@ -1151,7 +1201,7 @@ export default class Form extends Widget {
    * we must know the $container of the adapter menu to focus the correct element. That's why we call
    * the getFocusableElement() method.
    */
-  _initialFocusElement() {
+  protected _initialFocusElement() {
     let focusElement;
     if (this.initialFocus) {
       focusElement = this.initialFocus.getFocusableElement();
@@ -1162,13 +1212,13 @@ export default class Form extends Widget {
     return focusElement;
   }
 
-  _installFocusContext() {
+  protected override _installFocusContext() {
     if (this.isDialog() || this.isPopupWindow()) {
       this.session.focusManager.installFocusContext(this.$container, FocusRule.NONE);
     }
   }
 
-  _uninstallFocusContext() {
+  protected override _uninstallFocusContext() {
     if (this.isDialog() || this.isPopupWindow()) {
       this.session.focusManager.uninstallFocusContext(this.$container);
     }
@@ -1181,16 +1231,16 @@ export default class Form extends Widget {
   /**
    * Function required for objects that act as 'displayParent'.
    *
-   * @return {boolean} 'true' if this Form is currently accessible to the user
+   * @returns 'true' if this Form is currently accessible to the user
    */
-  inFront() {
+  inFront(): boolean {
     return this.rendered && this.attached;
   }
 
   /**
    * Visits all form-fields of this form in pre-order (top-down).
    */
-  visitFields(visitor) {
+  visitFields(visitor: (FormField) => (TreeVisitResult | void)) {
     this.rootGroupBox.visitFields(visitor);
   }
 
@@ -1198,7 +1248,7 @@ export default class Form extends Widget {
    * Visits all dialogs, messageBoxes and fileChoosers of this form in pre-order (top-down).
    * filter is an optional parameter.
    */
-  visitDisplayChildren(visitor, filter) {
+  visitDisplayChildren(visitor: (child: Form | MessageBox | FileChooser) => void, filter: (child: Form | MessageBox | FileChooser) => boolean) {
     if (!filter) {
       filter = displayChild => true;
     }
@@ -1215,42 +1265,39 @@ export default class Form extends Widget {
     this.fileChoosers.filter(filter).forEach(visitorFunc, this);
   }
 
-  storeCacheBounds(bounds) {
+  storeCacheBounds(bounds: Rectangle) {
     if (this.cacheBounds) {
       let storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
       webstorage.setItemToLocalStorage(storageKey, JSON.stringify(bounds));
     }
   }
 
-  readCacheBounds() {
+  readCacheBounds(): Rectangle {
     if (!this.cacheBounds) {
       return null;
     }
 
     let storageKey = 'scout:formBounds:' + this.cacheBoundsKey;
-    let bounds = webstorage.getItemFromLocalStorage(storageKey);
+    let bounds: string | Rectangle = webstorage.getItemFromLocalStorage(storageKey);
     if (!bounds) {
       return null;
     }
-    bounds = JSON.parse(bounds);
+    bounds = JSON.parse(bounds) as Rectangle;
     return new Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
   }
 
-  /**
-   * @returns {Form} the form the widget belongs to (returns the first parent which is a {@link Form}.
-   */
-  static findForm(widget) {
+  static findForm(widget: Widget): Form {
     let parent = widget.parent;
     while (parent && !(parent instanceof Form)) {
       parent = parent.parent;
     }
-    return parent;
+    return parent as Form;
   }
 
   /**
-   * @returns {Form} the first form which is not an inner form of a wrapped form field
+   * @returns the first form which is not an inner form of a wrapped form field
    */
-  static findNonWrappedForm(widget) {
+  static findNonWrappedForm(widget: Widget): Form {
     if (!widget) {
       return null;
     }

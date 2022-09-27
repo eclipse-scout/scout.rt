@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventHandler, objects, scout, SimpleTab, SimpleTabArea, SimpleTabBox, SimpleTabBoxControllerModel, Widget} from '../index';
+import {EventHandler, scout, SimpleTab, SimpleTabArea, SimpleTabBox, SimpleTabBoxControllerModel} from '../index';
 import $ from 'jquery';
 import {SimpleTabBoxViewActivateEvent, SimpleTabBoxViewAddEvent, SimpleTabBoxViewDeactivateEvent, SimpleTabBoxViewRemoveEvent} from './SimpleTabBoxEventMap';
 import {SimpleTabAreaTabSelectEvent} from './SimpleTabAreaEventMap';
@@ -169,7 +169,10 @@ export default class SimpleTabBoxController implements SimpleTabBoxControllerMod
 
   /* ----- static functions ----- */
 
-  static hasViewTab(view: Widget): boolean {
-    return objects.someProperties(view, ['title', 'subTitle', 'iconId']);
+  static hasViewTab(view: any): boolean {
+    return view &&
+      (view.title !== undefined
+        || view.subTitle !== undefined
+        || view.iconId !== undefined);
   }
 }
