@@ -11,8 +11,8 @@
 import {CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, Event, EventHandler, events, GroupBox, HtmlComponent, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel} from '../index';
 import $ from 'jquery';
 import {YearPanelDateSelectEvent} from './YearPanelEventMap';
-import {JsonDateRange} from './DateRange';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {JsonDateRange} from '../util/dates';
 
 export type CalendarDisplayMode = EnumObject<typeof Calendar.DisplayMode>;
 export type CalendarDirection = EnumObject<typeof Calendar.Direction>;

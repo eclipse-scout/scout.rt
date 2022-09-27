@@ -8,15 +8,105 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ContextMenuPopup, DateFormat, DateRange, dates, graphics, HtmlComponent, KeyStrokeContext, MenuBar, menus as menuUtil, objects, PlannerHeader, PlannerLayout, PlannerMenuItemsOrder, Range, scout, scrollbars, strings, styles, tooltips, TooltipSupport, Widget, YearPanel} from '../index';
+import {arrays, CellModel, ContextMenuPopup, DateFormat, DateRange, dates, EnumObject, Event, graphics, HtmlComponent, KeyStrokeContext, Menu, MenuBar, menus as menuUtil, objects, PlannerHeader, PlannerLayout, PlannerMenuItemsOrder, Range, scout, scrollbars, strings, styles, tooltips, TooltipSupport, Widget, YearPanel} from '../index';
 import $ from 'jquery';
+import PlannerModel from './PlannerModel';
+import {YearPanelDateSelectEvent} from '../calendar/YearPanelEventMap';
+import {PlannerHeaderDisplayModeClickEvent} from './PlannerHeaderEventMap';
+import PlannerEventMap from './PlannerEventMap';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {JsonDateRange} from '../util/dates';
 
-export default class Planner extends Widget {
+export type PlannerDisplayMode = EnumObject<typeof Planner.DisplayMode>;
+export type PlannerDirection = EnumObject<typeof Planner.Direction>;
+export type PlannerSelectionMode = EnumObject<typeof Planner.SelectionMode>;
+
+export interface PlannerActivity {
+  id: string;
+  beginTime: string | Date;
+  endTime: string | Date;
+  text: string;
+  backgroundColor: string;
+  foregroundColor: string;
+  level: number;
+  levelColor: string;
+  tooltipText: string;
+  cssClass: string;
+  $activity?: JQuery;
+}
+
+export interface PlannerResource {
+  id: string;
+  resourceCell: CellModel;
+  activities: PlannerActivity[];
+  $resource?: JQuery;
+  $cells?: JQuery;
+}
+
+export interface PlannerDisplayModeOptions {
+  interval: number;
+  firstHourOfDay: number;
+  lastHourOfDay: number;
+  labelPeriod?: number;
+  minSelectionIntervalCount?: number;
+}
+
+export default class Planner extends Widget implements PlannerModel {
+  declare model: PlannerModel;
+  declare eventMap: PlannerEventMap;
+
+  activityMap: Record<string, PlannerActivity>;
+  activitySelectable: boolean;
+  availableDisplayModes: PlannerDisplayMode[];
+  displayMode: PlannerDisplayMode;
+  displayModeOptions: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>;
+  headerVisible: boolean;
+  label: string;
+  resources: PlannerResource[];
+  resourceMap: Record<string, PlannerResource>;
+  selectionMode: PlannerSelectionMode;
+  selectionRange: DateRange;
+  selectedResources: PlannerResource[];
+  viewRange: DateRange;
+  startRange: DateRange;
+  lastRange: DateRange;
+  beginScale: number;
+  endScale: number;
+  selectedActivity: PlannerActivity;
+  menus: Menu[];
+  startRow: PlannerResource;
+  lastRow: PlannerResource;
+  menuBar: MenuBar;
+
+  /** scale calculator */
+  transformLeft: (t: number) => number;
+  transformWidth: (t0: number, t1: number) => number;
+  yearPanelVisible: boolean;
+  $range: JQuery;
+  $modes: JQuery;
+  $selector: JQuery;
+  $grid: JQuery<HTMLDivElement>;
+  $highlight: JQuery<HTMLDivElement>;
+  $timeline: JQuery<HTMLDivElement>;
+  $timelineLarge: JQuery<HTMLDivElement>;
+  $timelineSmall: JQuery<HTMLDivElement>;
+  $scaleTitle: JQuery<HTMLDivElement>;
+  $scale: JQuery<HTMLDivElement>;
+
+  /** visual */
+  protected _resourceTitleWidth: number;
+  protected _rangeSelectionStarted: boolean;
+  protected _yearPanel: YearPanel;
+  protected _header: PlannerHeader;
+  protected _tooltipSupport: TooltipSupport;
+  protected _gridScrollHandler: (event: JQuery.ScrollEvent<HTMLDivElement>) => void;
+  protected _cellMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
+  protected _resizeMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
 
   constructor() {
     super();
 
-    this.activityMap = [];
+    this.activityMap = {};
     this.activitySelectable = false;
     this.availableDisplayModes = [];
     this.displayMode = null;
@@ -24,18 +114,17 @@ export default class Planner extends Widget {
     this.headerVisible = true;
     this.label = null;
     this.resources = [];
-    this.resourceMap = [];
+    this.resourceMap = {};
     this.selectionMode = Planner.SelectionMode.MULTI_RANGE;
     this.selectionRange = new DateRange();
     this.selectedResources = [];
-    this.viewRange = {};
+    this.viewRange = new DateRange();
     this.selectedActivity = null;
-
-    // visual
-    this._resourceTitleWidth = 20;
-    this._rangeSelectionStarted = false;
     this.startRow = null;
     this.lastRow = null;
+
+    this._resourceTitleWidth = 20;
+    this._rangeSelectionStarted = false;
 
     // main elements
     this.$container = null;
@@ -43,7 +132,6 @@ export default class Planner extends Widget {
     this.$modes = null;
     this.$grid = null;
 
-    // scale calculator
     this.transformLeft = t => t;
     this.transformWidth = (t0, t1) => (t1 - t0);
 
@@ -54,7 +142,7 @@ export default class Planner extends Widget {
   static Direction = {
     BACKWARD: -1,
     FORWARD: 1
-  };
+  } as const;
 
   /**
    * Enum providing display-modes for planner (extends calendar).
@@ -67,24 +155,21 @@ export default class Planner extends Widget {
     WORK_WEEK: 4,
     CALENDAR_WEEK: 5,
     YEAR: 6
-  };
+  } as const;
 
   static SelectionMode = {
     NONE: 0,
     SINGLE_RANGE: 1,
     MULTI_RANGE: 2
-  };
+  } as const;
 
   static RANGE_SELECTION_MOVE_THRESHOLD = 10;
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  _init(model) {
+  protected override _init(model: PlannerModel) {
     super._init(model);
     this._yearPanel = scout.create(YearPanel, {
       parent: this,
@@ -123,18 +208,18 @@ export default class Planner extends Widget {
     });
   }
 
-  _initResource(resource) {
+  protected _initResource(resource: PlannerResource) {
     resource.activities.forEach(activity => this._initActivity(activity));
     this.resourceMap[resource.id] = resource;
   }
 
-  _initActivity(activity) {
-    activity.beginTime = dates.parseJsonDate(activity.beginTime);
-    activity.endTime = dates.parseJsonDate(activity.endTime);
+  protected _initActivity(activity: PlannerActivity) {
+    activity.beginTime = dates.parseJsonDate(activity.beginTime as string);
+    activity.endTime = dates.parseJsonDate(activity.endTime as string);
     this.activityMap[activity.id] = activity;
   }
 
-  _render() {
+  protected override _render() {
     // basics, layout etc.
     this.$container = this.$parent.appendDiv('planner');
     let layout = new PlannerLayout(this);
@@ -155,12 +240,12 @@ export default class Planner extends Widget {
     tooltips.install(this.$grid, {
       parent: this,
       selector: '.planner-activity',
-      text: function($comp) {
-        if (this._activityById($comp.attr('data-id'))) {
-          return this._activityById($comp.attr('data-id')).tooltipText;
+      text: function($comp: JQuery) {
+        let activity = this._activityById($comp.attr('data-id'));
+        if (activity) {
+          return activity.tooltipText;
         }
         return undefined;
-
       }.bind(this)
     });
 
@@ -169,7 +254,7 @@ export default class Planner extends Widget {
     this.$grid.on('scroll', this._gridScrollHandler);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
 
     this._renderViewRange();
@@ -182,24 +267,21 @@ export default class Planner extends Widget {
     setTimeout(this._renderSelectionRange.bind(this));
   }
 
-  /**
-   * @override
-   */
-  get$Scrollable() {
+  override get$Scrollable(): JQuery {
     return this.$grid;
   }
 
   /* -- basics, events -------------------------------------------- */
 
-  _onPreviousClick(event) {
+  protected _onPreviousClick(event: Event<PlannerHeader>) {
     this._navigateDate(Planner.Direction.BACKWARD);
   }
 
-  _onNextClick(event) {
+  protected _onNextClick(event: Event<PlannerHeader>) {
     this._navigateDate(Planner.Direction.FORWARD);
   }
 
-  _navigateDate(direction) {
+  protected _navigateDate(direction: PlannerDirection) {
     let viewRange = new DateRange(this.viewRange.from, this.viewRange.to),
       displayMode = Planner.DisplayMode;
 
@@ -210,11 +292,7 @@ export default class Planner extends Widget {
       viewRange.from = dates.shift(this.viewRange.from, 0, 0, direction * 7);
       viewRange.from = dates.ensureMonday(viewRange.from, -1 * direction);
       viewRange.to = dates.shift(this.viewRange.to, 0, 0, direction * 7);
-    } else if (this.displayMode === displayMode.MONTH) {
-      viewRange.from = dates.shift(this.viewRange.from, 0, direction, 0);
-      viewRange.from = dates.ensureMonday(viewRange.from, -1 * direction);
-      viewRange.to = dates.shift(this.viewRange.to, 0, direction, 0);
-    } else if (this.displayMode === displayMode.CALENDAR_WEEK) {
+    } else if (scout.isOneOf(this.displayMode, displayMode.MONTH, displayMode.CALENDAR_WEEK)) {
       viewRange.from = dates.shift(this.viewRange.from, 0, direction, 0);
       viewRange.from = dates.ensureMonday(viewRange.from, -1 * direction);
       viewRange.to = dates.shift(this.viewRange.to, 0, direction, 0);
@@ -226,7 +304,7 @@ export default class Planner extends Widget {
     this.setViewRange(viewRange);
   }
 
-  _onTodayClick(event) {
+  protected _onTodayClick(event: Event<PlannerHeader>) {
     let today = this._today(),
       year = today.getFullYear(),
       month = today.getMonth(),
@@ -245,24 +323,24 @@ export default class Planner extends Widget {
     this.setViewRangeFrom(today);
   }
 
-  _today() {
+  protected _today(): Date {
     return new Date();
   }
 
-  _onDisplayModeClick(event) {
+  protected _onDisplayModeClick(event: PlannerHeaderDisplayModeClickEvent) {
     let displayMode = event.displayMode;
     this.setDisplayMode(displayMode);
   }
 
-  _onYearClick(event) {
+  protected _onYearClick(event: Event<PlannerHeader>) {
     this.setYearPanelVisible(!this.yearPanelVisible);
   }
 
-  _onYearPanelDateSelect(event) {
+  protected _onYearPanelDateSelect(event: YearPanelDateSelectEvent) {
     this.setViewRangeFrom(event.date);
   }
 
-  _onResourceTitleMouseDown(event) {
+  protected _onResourceTitleMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>) {
     let $resource = $(event.target).parent();
     if ($resource.isSelected()) {
       if (event.which === 3 || event.which === 1 && event.ctrlKey) {
@@ -270,32 +348,32 @@ export default class Planner extends Widget {
         return;
       }
     }
-    this.startRow = $resource.data('resource');
+    this.startRow = $resource.data('resource') as PlannerResource;
     this.lastRow = this.startRow;
     this._select();
   }
 
-  _onResourceTitleContextMenu(event) {
+  protected _onResourceTitleContextMenu(event: JQuery.ContextMenuEvent) {
     this._showContextMenu(event, 'Planner.Resource');
   }
 
-  _onRangeSelectorContextMenu(event) {
+  protected _onRangeSelectorContextMenu(event: JQuery.ContextMenuEvent) {
     this._showContextMenu(event, 'Planner.Range');
   }
 
-  _onActivityContextMenu(event) {
+  protected _onActivityContextMenu(event: JQuery.ContextMenuEvent) {
     this._showContextMenu(event, 'Planner.Activity');
   }
 
-  _showContextMenu(event, allowedType) {
+  protected _showContextMenu(event: JQuery.ContextMenuEvent, allowedType: string) {
     event.preventDefault();
     event.stopPropagation();
-    let func = function func(event, allowedType) {
+    let func = function func(event: JQuery.ContextMenuEvent, allowedType: string) {
       if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
         return;
       }
-      let filteredMenus = this._filterMenus([allowedType], true),
-        $part = $(event.currentTarget);
+      let filteredMenus: Menu[] = this._filterMenus([allowedType], true);
+      let $part = $(event.currentTarget);
       if (filteredMenus.length === 0) {
         return; // at least one menu item must be visible
       }
@@ -314,21 +392,21 @@ export default class Planner extends Widget {
     this.session.onRequestsDone(func, event, allowedType);
   }
 
-  _onGridScroll() {
+  protected _onGridScroll(event: JQuery.ScrollEvent<HTMLDivElement>) {
     this._reconcileScrollPos();
   }
 
-  _reconcileScrollPos() {
+  protected _reconcileScrollPos() {
     // When scrolling horizontally scroll scale as well
     let scrollLeft = this.$grid.scrollLeft();
     this.$scale.scrollLeft(scrollLeft);
   }
 
-  _renderRange() {
+  protected _renderRange() {
     if (!this.viewRange.from || !this.viewRange.to) {
       return;
     }
-    let text,
+    let text: string,
       toDate = new Date(this.viewRange.to.valueOf() - 1),
       toText = this.session.text('ui.to'),
       displayMode = Planner.DisplayMode;
@@ -356,12 +434,11 @@ export default class Planner extends Widget {
     $('.planner-select', this._header.$range).text(text);
   }
 
-  _renderScale() {
+  protected _renderScale() {
     if (!this.viewRange.from || !this.viewRange.to) {
       return;
     }
-    let width,
-      that = this,
+    let that = this,
       displayMode = Planner.DisplayMode;
 
     // empty scale
@@ -392,7 +469,7 @@ export default class Planner extends Widget {
     // set sizes and append scale lines
     let $smallScaleItems = this.$timelineSmall.children('.scale-item');
     let $largeScaleItems = this.$timelineLarge.children('.scale-item');
-    width = 100 / $smallScaleItems.length;
+    let width = 100 / $smallScaleItems.length;
     $largeScaleItems.each(function() {
       let $scaleItem = $(this);
       let $largeGridLine = that.$grid.prependDiv('planner-large-scale-item-line');
@@ -413,8 +490,10 @@ export default class Planner extends Widget {
     });
 
     // find transfer function
-    this.beginScale = this.$timelineSmall.children().first().data('date-from').valueOf();
-    this.endScale = this.$timelineSmall.children().last().data('date-to').valueOf();
+    let dateFrom = this.$timelineSmall.children().first().data('date-from') as Date;
+    this.beginScale = dateFrom.valueOf();
+    let dateTo = this.$timelineSmall.children().last().data('date-to') as Date;
+    this.endScale = dateTo.valueOf();
 
     if (scout.isOneOf(this.displayMode, displayMode.WORK_WEEK, displayMode.WEEK)) {
       let options = this.displayModeOptions[this.displayMode];
@@ -422,45 +501,43 @@ export default class Planner extends Widget {
       let firstHourOfDay = options.firstHourOfDay;
       let lastHourOfDay = options.lastHourOfDay;
 
-      this.transformLeft = ((begin, end, firstHour, lastHour, interval) => t => {
-        t = new Date(t);
+      this.transformLeft = ((begin: Date, end: Date, firstHour: number, lastHour: number, interval: number) => t => {
+        let newDate = new Date(t);
         begin = new Date(begin);
         end = new Date(end);
-        let fullRangeMillis = end - begin;
+        let fullRangeMillis = end.valueOf() - begin.valueOf();
         // remove day component from range for scaling
-        let dayDiffTBegin = dates.compareDays(t, begin);
+        let dayDiffTBegin = dates.compareDays(newDate, begin);
         let dayDIffEndBegin = dates.compareDays(end, begin);
         let dayComponentMillis = dayDiffTBegin * 3600000 * 24;
         let rangeScaling = (24 / (lastHour - firstHour + 1));
         // re-add day component
         let dayOffset = dayDiffTBegin / dayDIffEndBegin;
 
-        if (t.getHours() < firstHour) {
-          // If t is in the morning before the first hour of day, return 00:00 of this day
+        if (newDate.getHours() < firstHour) {
+          // If newDate is in the morning before the first hour of day, return 00:00 of this day
           return (rangeScaling / fullRangeMillis + dayOffset) * 100;
         }
-        if (t.getHours() > lastHour) {
-          // If t is in the evening after the last hour of day, return 00:00 of next day
+        if (newDate.getHours() > lastHour) {
+          // If newDate is in the evening after the last hour of day, return 00:00 of next day
           dayOffset = (dayDiffTBegin + 1) / dayDIffEndBegin;
           return (rangeScaling / fullRangeMillis + dayOffset) * 100;
         }
 
-        return ((t.valueOf() - (begin.valueOf() + firstHour * 3600000) - dayComponentMillis) * rangeScaling / fullRangeMillis + dayOffset) * 100;
+        return ((newDate.valueOf() - (begin.valueOf() + firstHour * 3600000) - dayComponentMillis) * rangeScaling / fullRangeMillis + dayOffset) * 100;
       })(this.viewRange.from, this.viewRange.to, firstHourOfDay, lastHourOfDay, interval);
 
-      this.transformWidth = ((begin, end, firstHour, lastHour, interval) => function(t0, t1) {
-        let fullRangeMillis = end - begin;
-        let selectionRange = new Range(new Date(t0), new Date(t1));
+      this.transformWidth = ((begin: Date, end: Date, firstHour: number, lastHour: number, interval: number) => (function(t0, t1) {
+        let fullRangeMillis = end.valueOf() - begin.valueOf();
+        let selectionRange = new Range(t0, t1);
         let hiddenRanges = this._findHiddenRangesInWeekMode();
-        let selectedRangeMillis = selectionRange.subtractAll(hiddenRanges).reduce((acc, range) => {
-          return acc + range.size();
-        }, 0);
+        let selectedRangeMillis = selectionRange.subtractAll(hiddenRanges)
+          .reduce((acc, range) => acc + range.size(), 0);
         let rangeScaling = (24 / (lastHour - firstHour + 1));
         return (selectedRangeMillis * rangeScaling) / fullRangeMillis * 100;
-      })(this.viewRange.from, this.viewRange.to, firstHourOfDay, lastHourOfDay, interval);
+      }))(this.viewRange.from, this.viewRange.to, firstHourOfDay, lastHourOfDay, interval);
     } else {
       this.transformLeft = ((begin, end) => t => (t - begin) / (end - begin) * 100)(this.beginScale, this.endScale);
-
       this.transformWidth = ((begin, end) => (t0, t1) => (t1 - t0) / (end - begin) * 100)(this.beginScale, this.endScale);
     }
   }
@@ -468,24 +545,23 @@ export default class Planner extends Widget {
   /**
    * Returns every hidden range of the view range created by first and last our of day.
    */
-  _findHiddenRangesInWeekMode() {
+  protected _findHiddenRangesInWeekMode(): Range[] {
     if (!scout.isOneOf(this.displayMode, Planner.DisplayMode.WORK_WEEK, Planner.DisplayMode.WEEK)) {
       return [];
     }
-    let ranges = [];
+    let ranges: Range[] = [];
     let options = this.displayModeOptions[this.displayMode];
     let firstHourOfDay = options.firstHourOfDay;
     let lastHourOfDay = options.lastHourOfDay;
     let currentDate = new Date(this.viewRange.from.valueOf());
-    let hiddenRange;
     while (currentDate < this.viewRange.to) {
       // Start of day range
-      hiddenRange = new Range(new Date(currentDate.valueOf()), dates.shiftTime(currentDate, firstHourOfDay));
+      let hiddenRange = new Range(new Date(currentDate.valueOf()).valueOf(), dates.shiftTime(currentDate, firstHourOfDay).valueOf());
       if (hiddenRange.size() > 0) {
         ranges.push(hiddenRange);
       }
       // End of day range
-      hiddenRange = new Range(dates.shiftTime(currentDate, lastHourOfDay + 1), dates.shiftTime(currentDate, 24));
+      hiddenRange = new Range(dates.shiftTime(currentDate, lastHourOfDay + 1).valueOf(), dates.shiftTime(currentDate, 24).valueOf());
       if (hiddenRange.size() > 0) {
         ranges.push(hiddenRange);
       }
@@ -496,9 +572,8 @@ export default class Planner extends Widget {
     return ranges;
   }
 
-  _renderDayScale() {
-    let newLargeGroup, $divLarge, $divSmall,
-      first = true;
+  protected _renderDayScale() {
+    let newLargeGroup: boolean, $divLarge: JQuery, $divSmall: JQuery, first = true;
     let loop = new Date(this.viewRange.from.valueOf());
     let options = this.displayModeOptions[this.displayMode];
     let interval = options.interval;
@@ -537,11 +612,9 @@ export default class Planner extends Widget {
     }
   }
 
-  _renderWeekScale() {
-    let newLargeGroup, $divLarge, $divSmall,
-      first = true;
+  protected _renderWeekScale() {
+    let newLargeGroup: boolean, $divLarge: JQuery, $divSmall: JQuery, first = true;
     let loop = new Date(this.viewRange.from.valueOf());
-
     let options = this.displayModeOptions[this.displayMode];
     let interval = options.interval;
     let labelPeriod = options.labelPeriod;
@@ -592,11 +665,9 @@ export default class Planner extends Widget {
     }
   }
 
-  _renderMonthScale() {
-    let newLargeGroup, $divLarge, $divSmall,
-      first = true;
+  protected _renderMonthScale() {
+    let newLargeGroup: boolean, $divLarge: JQuery, $divSmall: JQuery, first = true;
     let loop = new Date(this.viewRange.from.valueOf());
-
     let options = this.displayModeOptions[this.displayMode];
     let labelPeriod = options.labelPeriod;
 
@@ -627,11 +698,9 @@ export default class Planner extends Widget {
     }
   }
 
-  _renderCalendarWeekScale() {
-    let newLargeGroup, $divLarge, $divSmall,
-      first = true;
+  protected _renderCalendarWeekScale() {
+    let newLargeGroup: boolean, $divLarge: JQuery, $divSmall: JQuery, first: boolean | number = true;
     let loop = new Date(this.viewRange.from.valueOf());
-
     let options = this.displayModeOptions[this.displayMode];
     let labelPeriod = options.labelPeriod;
 
@@ -659,7 +728,7 @@ export default class Planner extends Widget {
       }
 
       $divSmall = this.$timelineSmall
-        .appendDiv('scale-item', dates.weekInYear(loop))
+        .appendDiv('scale-item', dates.weekInYear(loop) + '')
         .data('date-from', new Date(loop.valueOf()))
         .data('tooltipText', this._scaleTooltipText.bind(this));
       this._tooltipSupport.install($divSmall);
@@ -674,9 +743,8 @@ export default class Planner extends Widget {
     }
   }
 
-  _renderYearScale() {
-    let newLargeGroup, $divLarge, $divSmall,
-      first = true;
+  protected _renderYearScale() {
+    let newLargeGroup: boolean, $divLarge: JQuery, $divSmall: JQuery, first = true;
     let loop = new Date(this.viewRange.from.valueOf());
     let options = this.displayModeOptions[this.displayMode];
     let labelPeriod = options.labelPeriod;
@@ -704,10 +772,7 @@ export default class Planner extends Widget {
     }
   }
 
-  /**
-   * @param {Date} newDate
-   */
-  _incrementTimelineScaleItems($largeComp, $smallComp, newDate, newLargeGroup) {
+  protected _incrementTimelineScaleItems($largeComp: JQuery, $smallComp: JQuery, newDate: Date, newLargeGroup: boolean) {
     $largeComp.data('count', $largeComp.data('count') + 1);
     $smallComp.data('date-to', new Date(newDate.valueOf()))
       .data('first', newLargeGroup);
@@ -715,7 +780,7 @@ export default class Planner extends Widget {
 
   /* -- scale events --------------------------------------------------- */
 
-  _scaleTooltipText($scale) {
+  protected _scaleTooltipText($scale: JQuery): string {
     let toText = ' ' + this.session.text('ui.to') + ' ',
       from = new Date($scale.data('date-from').valueOf()),
       to = new Date($scale.data('date-to').valueOf() - 1);
@@ -730,20 +795,17 @@ export default class Planner extends Widget {
 
   /* --  render resources, activities --------------------------------- */
 
-  _removeAllResources() {
-    this.resources.forEach(resource => {
-      resource.$resource.remove();
-    });
+  protected _removeAllResources() {
+    this.resources.forEach(resource => resource.$resource.remove());
   }
 
-  _renderResources(resources) {
-    let i, resource,
-      resourcesHtml = '';
+  protected _renderResources(resources?: PlannerResource[]) {
+    let resource: PlannerResource, resourcesHtml = '';
 
     resources = resources || this.resources;
-    for (i = 0; i < resources.length; i++) {
+    for (let i = 0; i < resources.length; i++) {
       resource = resources[i];
-      resourcesHtml += this._buildResourceHtml(resource, this.$grid);
+      resourcesHtml += this._buildResourceHtml(resource);
     }
 
     // Append resources to grid
@@ -758,26 +820,26 @@ export default class Planner extends Widget {
     });
   }
 
-  _linkResource($resource, resource) {
+  protected _linkResource($resource: JQuery, resource: PlannerResource) {
     $resource.data('resource', resource);
     resource.$resource = $resource;
     resource.$cells = $resource.children('.resource-cells');
   }
 
-  _linkActivity($activity, activity) {
+  protected _linkActivity($activity: JQuery, activity: PlannerActivity) {
     $activity.data('activity', activity);
     activity.$activity = $activity;
   }
 
-  _rerenderActivities(resources) {
+  protected _rerenderActivities(resources?: PlannerResource[]) {
     resources = resources || this.resources;
-    resources.forEach(function(resource) {
+    resources.forEach(resource => {
       this._removeActivitiesForResource(resource);
-      this._renderActivititesForResource(resource);
-    }, this);
+      this._renderActivitiesForResource(resource);
+    });
   }
 
-  _buildResourceHtml(resource) {
+  protected _buildResourceHtml(resource: PlannerResource): string {
     let resourceHtml = '<div class="planner-resource" data-id="' + resource.id + '">';
     resourceHtml += '<div class="resource-title">' + strings.encode(resource.resourceCell.text || '') + '</div>';
     resourceHtml += '<div class="resource-cells">' + this._buildActivitiesHtml(resource) + '</div>';
@@ -785,12 +847,12 @@ export default class Planner extends Widget {
     return resourceHtml;
   }
 
-  _renderActivititesForResource(resource) {
+  protected _renderActivitiesForResource(resource: PlannerResource) {
     resource.$cells.html(this._buildActivitiesHtml(resource));
     this._linkActivitiesForResource(resource);
   }
 
-  _linkActivitiesForResource(resource) {
+  protected _linkActivitiesForResource(resource: PlannerResource) {
     resource.$cells.children('.planner-activity').each((index, element) => {
       let $element = $(element);
       let activity = this._activityById($element.attr('data-id'));
@@ -798,35 +860,36 @@ export default class Planner extends Widget {
     });
   }
 
-  _buildActivitiesHtml(resource) {
+  protected _buildActivitiesHtml(resource: PlannerResource): string {
     let activitiesHtml = '';
-    resource.activities.forEach(function(activity) {
-      if (activity.beginTime.valueOf() >= this.endScale ||
-        activity.endTime.valueOf() <= this.beginScale) {
+    resource.activities.forEach(activity => {
+      if (activity.beginTime.valueOf() >= this.endScale || activity.endTime.valueOf() <= this.beginScale) {
         // don't add activities which are not in the view range
         return;
       }
       activitiesHtml += this._buildActivityHtml(activity);
-    }, this);
+    });
     return activitiesHtml;
   }
 
-  _removeActivitiesForResource(resource) {
+  protected _removeActivitiesForResource(resource: PlannerResource) {
     resource.activities.forEach(activity => {
       if (activity.$activity) {
         activity.$activity.remove();
         activity.$activity = null;
       }
-    }, this);
+    });
   }
 
-  _buildActivityHtml(activity) {
+  protected _buildActivityHtml(activity: PlannerActivity): string {
     let level = 100 - Math.min(activity.level * 100, 100),
       backgroundColor = styles.modelToCssColor(activity.backgroundColor),
       foregroundColor = styles.modelToCssColor(activity.foregroundColor),
       levelColor = styles.modelToCssColor(activity.levelColor),
-      begin = activity.beginTime.valueOf(),
-      end = activity.endTime.valueOf();
+      beginTime = activity.beginTime as Date,
+      endTime = activity.endTime as Date,
+      begin = beginTime.valueOf(),
+      end = endTime.valueOf();
 
     // Make sure activity fits into scale
     begin = Math.max(begin, this.beginScale);
@@ -864,7 +927,7 @@ export default class Planner extends Widget {
 
   /* -- selector -------------------------------------------------- */
 
-  _onCellMouseDown(event) {
+  protected _onCellMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>) {
     let $activity,
       $resource,
       $target = $(event.target),
@@ -914,7 +977,7 @@ export default class Planner extends Widget {
       .one('mouseup', this._onDocumentMouseUp.bind(this));
   }
 
-  _startRangeSelection(pageX, pageY) {
+  protected _startRangeSelection(pageX: number, pageY: number) {
     // init selector
     this.startRow = this._findRow(pageY);
     this.lastRow = this.startRow;
@@ -924,14 +987,14 @@ export default class Planner extends Widget {
     this.lastRange = this.startRange;
 
     // draw
-    this._select(true);
+    this._select();
     this._rangeSelectionStarted = true;
   }
 
   /**
-   * @returns {boolean} true if the range selection may be started, false if not
+   * @returns true if the range selection may be started, false if not
    */
-  _prepareRangeSelectionByMousemove(mousedownEvent, mousemoveEvent) {
+  protected _prepareRangeSelectionByMousemove(mousedownEvent: JQuery.MouseDownEvent<HTMLDivElement>, mousemoveEvent: JQuery.MouseMoveEvent<Document>): boolean {
     let moveX = mousedownEvent.pageX - mousemoveEvent.pageX;
     let moveY = mousedownEvent.pageY - mousemoveEvent.pageY;
     let moveThreshold = Planner.RANGE_SELECTION_MOVE_THRESHOLD;
@@ -945,7 +1008,7 @@ export default class Planner extends Widget {
     return Math.abs(moveY) >= moveThreshold && this.selectionMode === Planner.SelectionMode.MULTI_RANGE && mousedownRow !== mousemoveRow;
   }
 
-  _onCellMousemove(mousedownEvent, event) {
+  protected _onCellMousemove(mousedownEvent: JQuery.MouseDownEvent<HTMLDivElement>, event: JQuery.MouseMoveEvent<Document>) {
     if (this.selectedActivity && !this._rangeSelectionStarted) {
       // If an activity was selected, switch to range selection if the user moves the mouse
       if (!this._prepareRangeSelectionByMousemove(mousedownEvent, event)) {
@@ -963,11 +1026,11 @@ export default class Planner extends Widget {
       this.lastRange = lastRange;
     }
 
-    this._select(true);
+    this._select();
   }
 
-  _onResizeMouseDown(event) {
-    let swap,
+  protected _onResizeMouseDown(event: JQuery.MouseDownEvent): boolean {
+    let swap: DateRange,
       $target = $(event.target);
 
     this.startRow = this.selectedResources[0];
@@ -994,7 +1057,7 @@ export default class Planner extends Widget {
     return false;
   }
 
-  _onResizeMousemove(event) {
+  protected _onResizeMousemove(event: JQuery.MouseMoveEvent) {
     if (!this.rendered) {
       // planner may be removed in the meantime
       return;
@@ -1003,14 +1066,14 @@ export default class Planner extends Widget {
     if (lastRange) {
       this.lastRange = lastRange;
     }
-    this._select(true);
+    this._select();
   }
 
-  _onDocumentMouseUp(event) {
+  protected _onDocumentMouseUp(event: JQuery.MouseUpEvent<Document>) {
     let $target = $(event.target);
     $target.body().removeClass('col-resize');
     if (this._cellMousemoveHandler) {
-      $target.document().off('mousemove', this._documentMousemoveHandler);
+      $target.document().off('mousemove', this._cellMousemoveHandler);
       this._cellMousemoveHandler = null;
     }
     if (this._resizeMousemoveHandler) {
@@ -1027,7 +1090,7 @@ export default class Planner extends Widget {
     }
   }
 
-  _select(whileSelecting) {
+  protected _select() {
     if (!this.startRow || !this.lastRow) {
       return;
     }
@@ -1055,23 +1118,21 @@ export default class Planner extends Widget {
       }
     }
 
-    this.selectResources(resources.map(i => {
-      return $(i).data('resource');
-    }), !whileSelecting);
+    this.selectResources(resources.map(i => $(i).data('resource')));
     this.selectActivity(null);
 
     if (rangeSelected) {
       // left and width
-      let from = Math.min(this.lastRange.from, this.startRange.from),
-        to = Math.max(this.lastRange.to, this.startRange.to);
+      let from = Math.min(this.lastRange.from.valueOf(), this.startRange.from.valueOf()),
+        to = Math.max(this.lastRange.to.valueOf(), this.startRange.to.valueOf());
 
       let selectionRange = new DateRange(new Date(from), new Date(to));
       selectionRange = this._adjustSelectionRange(selectionRange);
-      this.selectRange(selectionRange, !whileSelecting);
+      this.selectRange(selectionRange);
     }
   }
 
-  _adjustSelectionRange(range) {
+  protected _adjustSelectionRange(range: DateRange): DateRange {
     let from = range.from.getTime();
     let to = range.to.getTime();
 
@@ -1113,7 +1174,7 @@ export default class Planner extends Widget {
     return new DateRange(new Date(from), new Date(to));
   }
 
-  _findRow(y) {
+  protected _findRow(y: number): PlannerResource {
     let $row,
       gridBounds = graphics.offsetBounds(this.$grid),
       x = gridBounds.x + 10;
@@ -1126,7 +1187,7 @@ export default class Planner extends Widget {
     return null;
   }
 
-  _findScale(x) {
+  protected _findScale(x: number): DateRange {
     let $scaleItem,
       gridBounds = graphics.offsetBounds(this.$grid),
       y = this.$scale.offset().top + this.$scale.height() * 0.75;
@@ -1139,7 +1200,7 @@ export default class Planner extends Widget {
     return null;
   }
 
-  _findScaleByFromDate(from) {
+  protected _findScaleByFromDate(from: Date): DateRange {
     return this._findScaleByFunction((i, elem) => {
       let $scaleItem = $(elem);
       if ($scaleItem.data('date-from').getTime() === from.getTime()) {
@@ -1148,7 +1209,7 @@ export default class Planner extends Widget {
     });
   }
 
-  _findScaleByToDate(to) {
+  protected _findScaleByToDate(to): DateRange {
     return this._findScaleByFunction((i, elem) => {
       let $scaleItem = $(elem);
       if ($scaleItem.data('date-to').getTime() === to.getTime()) {
@@ -1157,7 +1218,7 @@ export default class Planner extends Widget {
     });
   }
 
-  _findScaleByFunction(func) {
+  protected _findScaleByFunction(func: (index: number, element: HTMLElement) => boolean): DateRange {
     let $scaleItem = this.$timelineSmall.children('.scale-item').filter(func);
     if (!$scaleItem.length) {
       return null;
@@ -1166,37 +1227,34 @@ export default class Planner extends Widget {
   }
 
   /**
-   * @returns {Range} the visible view range (the difference to this.viewRange is that first and last hourOfDay are considered).
+   * @returns the visible view range (the difference to this.viewRange is that first and last hourOfDay are considered).
    */
-  _visibleViewRange() {
+  protected _visibleViewRange(): DateRange {
     let $items = this.$timelineSmall.children('.scale-item');
-    return new Range($items.first().data('date-from'), $items.last().data('date-to'));
+    return new DateRange($items.first().data('date-from'), $items.last().data('date-to'));
   }
 
   /* -- helper ---------------------------------------------------- */
 
-  /**
-   * @param {Date} date
-   */
-  _dateFormat(date, pattern) {
+  protected _dateFormat(date: Date, pattern: string): string {
     let d = new Date(date.valueOf()),
       dateFormat = new DateFormat(this.session.locale, pattern);
 
     return dateFormat.format(d);
   }
 
-  _renderViewRange() {
+  protected _renderViewRange() {
     this._renderRange();
     this._renderScale();
     this.invalidateLayoutTree();
   }
 
-  _renderHeaderVisible() {
+  protected _renderHeaderVisible() {
     this._header.setVisible(this.headerVisible);
     this.invalidateLayoutTree();
   }
 
-  _renderYearPanelVisible(animated) {
+  protected _renderYearPanelVisible(animated: boolean) {
     let yearPanelWidth;
     if (this.yearPanelVisible) {
       this._yearPanel.renderContent();
@@ -1218,7 +1276,7 @@ export default class Planner extends Widget {
     });
   }
 
-  _onYearPanelWidthChange() {
+  protected _onYearPanelWidthChange() {
     if (!this._yearPanel.$container) {
       // If container has been removed in the meantime (e.g. user navigates away while animation is in progress)
       return;
@@ -1229,28 +1287,24 @@ export default class Planner extends Widget {
     this.revalidateLayout();
   }
 
-  _afterYearPanelWidthChange() {
+  protected _afterYearPanelWidthChange() {
     if (!this.yearPanelVisible) {
       this._yearPanel.removeContent();
     }
   }
 
-  _setMenus(menus) {
+  protected _setMenus(menus: Menu[]) {
     this.updateKeyStrokes(menus, this.menus);
     this._setProperty('menus', menus);
     this._updateMenuBar();
   }
 
-  _updateMenuBar() {
+  protected _updateMenuBar() {
     let menuItems = this._filterMenus(['Planner.EmptySpace', 'Planner.Resource', 'Planner.Activity', 'Planner.Range'], false, true);
     this.menuBar.setMenuItems(menuItems);
   }
 
-  _removeMenus() {
-    // menubar takes care about removal
-  }
-
-  _filterMenus(allowedTypes, onlyVisible, enableDisableKeyStrokes) {
+  protected _filterMenus(allowedTypes: string[], onlyVisible: boolean, enableDisableKeyStrokes?: boolean): Menu[] {
     allowedTypes = allowedTypes || [];
     if (allowedTypes.indexOf('Planner.Resource') > -1 && this.selectedResources.length === 0) {
       arrays.remove(allowedTypes, 'Planner.Resource');
@@ -1264,11 +1318,11 @@ export default class Planner extends Widget {
     return menuUtil.filter(this.menus, allowedTypes, {onlyVisible, enableDisableKeyStrokes});
   }
 
-  setDisplayModeOptions(displayModeOptions) {
+  setDisplayModeOptions(displayModeOptions: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>) {
     this.setProperty('displayModeOptions', displayModeOptions);
   }
 
-  _setDisplayModeOptions(displayModeOptions) {
+  protected _setDisplayModeOptions(displayModeOptions: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>) {
     if (displayModeOptions) {
       this._adjustHours(displayModeOptions);
     }
@@ -1278,8 +1332,8 @@ export default class Planner extends Widget {
   /**
    * Make sure configured our is between 0 and 23.
    */
-  _adjustHours(optionsMap) {
-    objects.values(optionsMap).forEach(options => {
+  protected _adjustHours(optionsMap: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>) {
+    objects.values(optionsMap).forEach((options: PlannerDisplayModeOptions) => {
       if (options.firstHourOfDay) {
         options.firstHourOfDay = validHour(options.firstHourOfDay);
       }
@@ -1288,7 +1342,7 @@ export default class Planner extends Widget {
       }
     });
 
-    function validHour(hour) {
+    function validHour(hour: number): number {
       if (hour < 0) {
         return 0;
       }
@@ -1299,7 +1353,7 @@ export default class Planner extends Widget {
     }
   }
 
-  _renderDisplayModeOptions() {
+  protected _renderDisplayModeOptions() {
     this._renderRange();
     this._renderScale();
     this._rerenderActivities(); // required in case first/lastHourOfDay changes
@@ -1307,41 +1361,41 @@ export default class Planner extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _renderAvailableDisplayModes() {
+  protected _renderAvailableDisplayModes() {
     // done by PlannerHeader.js
   }
 
-  _renderDisplayMode() {
+  protected _renderDisplayMode() {
     // done by PlannerHeader.js
   }
 
-  _setViewRange(viewRange) {
+  protected _setViewRange(viewRange: DateRange) {
     viewRange = DateRange.ensure(viewRange);
     this._setProperty('viewRange', viewRange);
     this._yearPanel.setViewRange(this.viewRange);
     this._yearPanel.selectDate(this.viewRange.from);
   }
 
-  _setDisplayMode(displayMode) {
+  protected _setDisplayMode(displayMode: PlannerDisplayMode) {
     this._setProperty('displayMode', displayMode);
     this._yearPanel.setDisplayMode(this.displayMode);
     this._header.setDisplayMode(this.displayMode);
   }
 
-  _setAvailableDisplayModes(availableDisplayModes) {
+  protected _setAvailableDisplayModes(availableDisplayModes: PlannerDisplayMode[]) {
     this._setProperty('availableDisplayModes', availableDisplayModes);
     this._header.setAvailableDisplayModes(this.availableDisplayModes);
   }
 
-  _setSelectionRange(selectionRange) {
+  protected _setSelectionRange(selectionRange: DateRange | JsonDateRange) {
     selectionRange = DateRange.ensure(selectionRange);
     this._setProperty('selectionRange', selectionRange);
     this.session.onRequestsDone(this._updateMenuBar.bind(this));
   }
 
-  _setSelectedResources(selectedResources) {
+  protected _setSelectedResources(selectedResources: PlannerResource[] | string[]) {
     if (typeof selectedResources[0] === 'string') {
-      selectedResources = this._resourcesByIds(selectedResources);
+      selectedResources = this._resourcesByIds(selectedResources as string[]);
     }
     if (this.rendered) {
       this._removeSelectedResources();
@@ -1350,25 +1404,21 @@ export default class Planner extends Widget {
     this.session.onRequestsDone(this._updateMenuBar.bind(this));
   }
 
-  _removeSelectedResources() {
-    this.selectedResources.forEach(resource => {
-      resource.$resource.select(false);
-    });
+  protected _removeSelectedResources() {
+    this.selectedResources.forEach(resource => resource.$resource.select(false));
   }
 
-  _renderSelectedResources() {
-    this.selectedResources.forEach(resource => {
-      resource.$resource.select(true);
-    });
+  protected _renderSelectedResources() {
+    this.selectedResources.forEach(resource => resource.$resource.select(true));
   }
 
-  _renderActivitySelectable() {
+  protected _renderActivitySelectable() {
     if (this.selectedActivity && this.selectedActivity.$activity) {
       this.selectedActivity.$activity.toggleClass('selected', this.activitySelectable);
     }
   }
 
-  _renderSelectionMode() {
+  protected _renderSelectionMode() {
     if (this.selectionMode === Planner.SelectionMode.NONE) {
       if (this.$selector) {
         this.$selector.remove();
@@ -1379,10 +1429,9 @@ export default class Planner extends Widget {
     }
   }
 
-  _renderSelectionRange() {
-    let $startRow, $lastRow,
-      from = this.selectionRange.from,
-      to = this.selectionRange.to,
+  protected _renderSelectionRange() {
+    let fromDate = this.selectionRange.from,
+      toDate = this.selectionRange.to,
       startRow = this.selectedResources[0],
       lastRow = this.selectedResources[this.selectedResources.length - 1];
 
@@ -1395,19 +1444,19 @@ export default class Planner extends Widget {
     if (!startRow || !lastRow || !this.selectionRange.from || !this.selectionRange.to) {
       return;
     }
-    $startRow = startRow.$resource;
-    $lastRow = lastRow.$resource;
+    let $startRow = startRow.$resource;
+    let $lastRow = lastRow.$resource;
 
     // Make sure selection fits into scale
-    from = Math.max(from, this.beginScale);
-    to = Math.min(to, this.endScale);
+    let from = Math.max(fromDate.valueOf(), this.beginScale);
+    let to = Math.min(toDate.valueOf(), this.endScale);
 
     // top and height
     let $parent = ($startRow[0].offsetTop <= $lastRow[0].offsetTop) ? $startRow : $lastRow;
     this.$selector = $parent.children('.resource-cells').appendDiv('selector');
     this.$selector.cssHeight($startRow.outerHeight() + Math.abs($lastRow[0].offsetTop - $startRow[0].offsetTop));
-    let $selectorResizeLeft = this.$selector.appendDiv('selector-resize-left').mousedown(this._onResizeMouseDown.bind(this));
-    let $selectorResizeRight = this.$selector.appendDiv('selector-resize-right').mousedown(this._onResizeMouseDown.bind(this));
+    let $selectorResizeLeft = this.$selector.appendDiv('selector-resize-left').on('mousedown', this._onResizeMouseDown.bind(this));
+    let $selectorResizeRight = this.$selector.appendDiv('selector-resize-right').on('mousedown', this._onResizeMouseDown.bind(this));
     this.$selector
       .css('left', 'calc(' + this.transformLeft(from) + '% - ' + $selectorResizeLeft.cssWidth() + 'px)')
       .css('width', 'calc(' + this.transformWidth(from, to) + '% + ' + ($selectorResizeLeft.cssWidth() + $selectorResizeRight.cssWidth()) + 'px)')
@@ -1423,7 +1472,7 @@ export default class Planner extends Widget {
       .cssWidth(width);
   }
 
-  _setSelectedActivity(selectedActivity) {
+  protected _setSelectedActivity(selectedActivity: PlannerActivity | string) {
     if (typeof selectedActivity === 'string') {
       selectedActivity = this._activityById(selectedActivity);
     }
@@ -1434,38 +1483,38 @@ export default class Planner extends Widget {
     this.session.onRequestsDone(this._updateMenuBar.bind(this));
   }
 
-  _removeSelectedActivity() {
+  protected _removeSelectedActivity() {
     if (this.selectedActivity && this.selectedActivity.$activity) {
       this.selectedActivity.$activity.removeClass('selected');
     }
   }
 
-  _renderSelectedActivity() {
+  protected _renderSelectedActivity() {
     if (this.selectedActivity && this.selectedActivity.$activity) {
       this.selectedActivity.$activity.addClass('selected');
     }
   }
 
-  _renderLabel() {
+  protected _renderLabel() {
     let label = this.label || '';
     if (this.$scaleTitle) {
       this.$scaleTitle.text(label);
     }
   }
 
-  _resourcesByIds(ids) {
+  protected _resourcesByIds(ids: string[]): PlannerResource[] {
     return ids.map(this._resourceById.bind(this));
   }
 
-  _activityById(id) {
+  protected _activityById(id: string): PlannerActivity {
     return this.activityMap[id];
   }
 
-  _resourceById(id) {
+  protected _resourceById(id: string): PlannerResource {
     return this.resourceMap[id];
   }
 
-  setDisplayMode(displayMode) {
+  setDisplayMode(displayMode: PlannerDisplayMode) {
     this.setProperty('displayMode', displayMode);
     this.startRange = null;
     this.lastRange = null;
@@ -1474,11 +1523,12 @@ export default class Planner extends Widget {
   layoutYearPanel() {
     if (this.yearPanelVisible) {
       scrollbars.update(this._yearPanel.$yearList);
+      // @ts-ignore
       this._yearPanel._scrollYear();
     }
   }
 
-  setYearPanelVisible(visible) {
+  setYearPanelVisible(visible: boolean) {
     if (this.yearPanelVisible === visible) {
       return;
     }
@@ -1488,7 +1538,7 @@ export default class Planner extends Widget {
     }
   }
 
-  setViewRangeFrom(date) {
+  setViewRangeFrom(date: Date) {
     let daysDiff = dates.compareDays(this.viewRange.to, this.viewRange.from);
     let viewRange = new DateRange(this.viewRange.from, this.viewRange.to);
 
@@ -1497,7 +1547,7 @@ export default class Planner extends Widget {
     this.setViewRange(viewRange);
   }
 
-  setViewRange(viewRange) {
+  setViewRange(viewRange: DateRange) {
     if (this.viewRange === viewRange) {
       return;
     }
@@ -1512,28 +1562,28 @@ export default class Planner extends Widget {
     }
   }
 
-  selectRange(range) {
+  selectRange(range: DateRange) {
     if (range && range.equals(this.selectionRange)) {
       return;
     }
     this.setProperty('selectionRange', range);
   }
 
-  selectActivity(activity) {
+  selectActivity(activity: PlannerActivity | string) {
     this.setProperty('selectedActivity', activity);
   }
 
-  selectResources(resources) {
-    if (arrays.equals(resources, this.selectedResources)) {
+  selectResources(resources: PlannerResource[] | PlannerResource) {
+    let resourcesArray = arrays.ensure(resources);
+    if (arrays.equals(resourcesArray, this.selectedResources)) {
       return;
     }
 
-    resources = arrays.ensure(resources);
     // Make a copy so that original array stays untouched
-    resources = resources.slice();
-    this.setProperty('selectedResources', resources);
+    resourcesArray = resourcesArray.slice();
+    this.setProperty('selectedResources', resourcesArray);
     this.trigger('resourcesSelected', {
-      resources: resources
+      resources: resourcesArray
     });
 
     if (this.rendered) {
@@ -1542,10 +1592,14 @@ export default class Planner extends Widget {
     }
   }
 
+  override trigger<K extends string & keyof EventMapOf<Planner>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Planner>[K]>): EventMapOf<Planner>[K] {
+    return super.trigger(type, eventOrModel);
+  }
+
   /**
    * Returns true if a deselection happened. False if the given resources were not selected at all.
    */
-  deselectResources(resources) {
+  deselectResources(resources: PlannerResource[] | PlannerResource): boolean {
     let deselected = false;
     resources = arrays.ensure(resources);
     let selectedResources = this.selectedResources.slice(); // copy
@@ -1556,7 +1610,7 @@ export default class Planner extends Widget {
     return deselected;
   }
 
-  insertResources(resources) {
+  insertResources(resources: PlannerResource[]) {
     // Update model
     resources.forEach(resource => {
       this._initResource(resource);
@@ -1571,7 +1625,7 @@ export default class Planner extends Widget {
     }
   }
 
-  deleteResources(resources) {
+  deleteResources(resources: PlannerResource[]) {
     if (this.deselectResources(resources)) {
       this.selectRange(new DateRange());
     }
@@ -1580,9 +1634,7 @@ export default class Planner extends Widget {
       arrays.remove(this.resources, resource);
       delete this.resourceMap[resource.id];
 
-      resource.activities.forEach(activity => {
-        delete this.activityMap[activity.id];
-      });
+      resource.activities.forEach(activity => delete this.activityMap[activity.id]);
 
       // Update HTML
       if (this.rendered) {
@@ -1609,7 +1661,7 @@ export default class Planner extends Widget {
     this.selectRange(new DateRange());
   }
 
-  updateResources(resources) {
+  updateResources(resources: PlannerResource[]) {
     resources.forEach(updatedResource => {
       let oldResource = this.resourceMap[updatedResource.id];
       if (!oldResource) {

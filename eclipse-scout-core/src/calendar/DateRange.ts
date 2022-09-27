@@ -9,13 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {dates} from '../index';
+import {JsonDateRange} from '../util/dates';
 
-export type JsonDateRange = { from: Date | string; to: Date | string };
 export default class DateRange {
   from: Date;
   to: Date;
 
-  constructor(from: Date, to: Date) {
+  constructor(from?: Date, to?: Date) {
     this.from = from;
     this.to = to;
   }
