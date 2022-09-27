@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {DateRange, Event, PropertyChangeEvent, WidgetEventMap, YearPanel} from '../index';
-import {CalendarDisplayMode} from './Calendar';
+import {PlannerDisplayMode} from '../planner/Planner';
 
 export interface YearPanelDateSelectEvent<Y extends YearPanel = YearPanel> extends Event<Y> {
   date: Date;
@@ -17,6 +17,6 @@ export interface YearPanelDateSelectEvent<Y extends YearPanel = YearPanel> exten
 
 export default interface YearPanelEventMap extends WidgetEventMap {
   'dateSelect': YearPanelDateSelectEvent;
-  'propertyChange:displayMode': PropertyChangeEvent<CalendarDisplayMode>;
+  'propertyChange:displayMode': PropertyChangeEvent<PlannerDisplayMode>;
   'propertyChange:viewRange': PropertyChangeEvent<DateRange>;
 }

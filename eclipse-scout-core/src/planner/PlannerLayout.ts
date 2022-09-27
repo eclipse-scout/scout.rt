@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -12,18 +12,21 @@ import {AbstractLayout, graphics, HtmlComponent, MenuBarLayout, Planner, scout, 
 import $ from 'jquery';
 
 export default class PlannerLayout extends AbstractLayout {
+  planner: Planner;
 
-  constructor(planner) {
+  constructor(planner: Planner) {
     super();
     this.planner = planner;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let menuBarSize,
+      // @ts-ignore
       $header = this.planner._header.$container,
       $scale = this.planner.$scale,
       $grid = this.planner.$grid,
       menuBar = this.planner.menuBar,
+      // @ts-ignore
       $yearContainer = this.planner._yearPanel.$container,
       menuBarHeight = 0,
       gridHeight = 0,
@@ -72,7 +75,7 @@ export default class PlannerLayout extends AbstractLayout {
   /**
    * Min width is necessary for horizontal scrollbar
    */
-  _updateMinWidth() {
+  protected _updateMinWidth() {
     let minWidth = this._minWidth(),
       $scaleTitle = this.planner.$scaleTitle,
       $timeline = this.planner.$timeline;
@@ -84,15 +87,13 @@ export default class PlannerLayout extends AbstractLayout {
 
     $timeline.css('min-width', minWidth);
     minWidth += $scaleTitle.outerWidth(true);
-    this.planner.resources.forEach(resource => {
-      resource.$resource.css('min-width', minWidth);
-    });
+    this.planner.resources.forEach(resource => resource.$resource.css('min-width', minWidth));
   }
 
   /**
    * Positions the scale lines and set to correct height
    */
-  _layoutScaleLines() {
+  protected _layoutScaleLines() {
     let height, $smallScaleItems, $largeScaleItems, scrollLeft,
       $timelineSmall = this.planner.$timelineSmall,
       $timelineLarge = this.planner.$timelineLarge;
@@ -138,7 +139,7 @@ export default class PlannerLayout extends AbstractLayout {
     });
   }
 
-  _minWidth() {
+  protected _minWidth(): number {
     let $scaleItemsLarge = this.planner.$timelineLarge.children('.scale-item'),
       $scaleItemsSmall = this.planner.$timelineSmall.children('.scale-item'),
       numScaleItemsLarge = $scaleItemsLarge.length,
@@ -147,7 +148,7 @@ export default class PlannerLayout extends AbstractLayout {
       cellInsets = graphics.insets($scaleItemsSmall, {
         includeBorder: false
       }),
-      minWidth = numScaleItemsSmall * cellInsets.horizontal(); // no matter what, this width must never be deceeded
+      minWidth = numScaleItemsSmall * cellInsets.horizontal(); // no matter what, this width must never be exceeded
 
     if (this.planner.displayMode === displayMode.DAY) {
       return Math.max(minWidth, numScaleItemsLarge * 52);

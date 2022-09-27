@@ -300,7 +300,7 @@ export function parseJsonDate(jsonDate: string): Date {
         milliseconds = parseInt(matches[4], 10);
         utc = matches[5] === 'Z';
       } else {
-        throw new Error('Unparsable date: ' + jsonDate);
+        throw new Error('Unparseable date: ' + jsonDate);
       }
     }
   }
