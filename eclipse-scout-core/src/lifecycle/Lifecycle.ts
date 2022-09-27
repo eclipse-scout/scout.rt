@@ -20,9 +20,9 @@ import {EventMapOf, EventModel} from '../events/EventEmitter';
  * - invalidElementsTextKey
  * - saveChangesQuestionTextKey
  */
-export default abstract class Lifecycle extends EventEmitter implements LifecycleModel {
+export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter implements LifecycleModel {
   declare model: LifecycleModel;
-  declare eventMap: LifecycleEventMap;
+  declare eventMap: LifecycleEventMap<VALIDATION_RESULT>;
 
   widget: Widget;
   validationFailedTextKey: string;
@@ -81,7 +81,7 @@ export default abstract class Lifecycle extends EventEmitter implements Lifecycl
     });
   }
 
-  override trigger<K extends string & keyof EventMapOf<Lifecycle>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Lifecycle>[K]>): EventMapOf<Lifecycle>[K] {
+  override trigger<K extends string & keyof EventMapOf<Lifecycle<VALIDATION_RESULT>>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Lifecycle<VALIDATION_RESULT>>[K]>): EventMapOf<Lifecycle<VALIDATION_RESULT>>[K] {
     return super.trigger(type, eventOrModel);
   }
 
@@ -288,7 +288,7 @@ export default abstract class Lifecycle extends EventEmitter implements Lifecycl
     return status;
   }
 
-  protected _revealInvalidElement(invalidElement: Widget) {
+  protected _revealInvalidElement(invalidElement: VALIDATION_RESULT) {
     // NOP
   }
 
@@ -306,7 +306,7 @@ export default abstract class Lifecycle extends EventEmitter implements Lifecycl
    * Override this function to check for invalid elements on the parent which prevent
    * saving of the parent.(eg. check if all mandatory elements contain a value)
    */
-  protected _invalidElements(): { missingElements: Widget[]; invalidElements: Widget[] } {
+  protected _invalidElements(): { missingElements: VALIDATION_RESULT[]; invalidElements: VALIDATION_RESULT[] } {
     return {
       missingElements: [],
       invalidElements: []
@@ -316,7 +316,7 @@ export default abstract class Lifecycle extends EventEmitter implements Lifecycl
   /**
    * Creates a HTML message used to display missing and invalid fields in a message box.
    */
-  protected _createInvalidElementsMessageHtml(missing: Widget[], invalid: Widget[]): string {
+  protected _createInvalidElementsMessageHtml(missing: VALIDATION_RESULT[], invalid: VALIDATION_RESULT[]): string {
     let $div = $('<div>'),
       hasMissing = missing.length > 0,
       hasInvalid = invalid.length > 0;
@@ -333,7 +333,7 @@ export default abstract class Lifecycle extends EventEmitter implements Lifecycl
 
     // ----- Helper function -----
 
-    function appendTitleAndList($div: JQuery, title: string, elements: Widget[], elementTextFunc: (element: Widget) => string) {
+    function appendTitleAndList($div: JQuery, title: string, elements: VALIDATION_RESULT[], elementTextFunc: (element: VALIDATION_RESULT) => string) {
       $div.appendDiv().text(title);
       let $ul = $div.appendElement('<ul>');
       elements.forEach(element => {
@@ -345,14 +345,14 @@ export default abstract class Lifecycle extends EventEmitter implements Lifecycl
   /**
    * Override this function to retrieve the text of an invalid element
    */
-  protected _invalidElementText(element: Widget): string {
+  protected _invalidElementText(element: VALIDATION_RESULT): string {
     return '';
   }
 
   /**
    * Override this function to retrieve the text of an missing mandatory element
    */
-  protected _missingElementText(element: Widget): string {
+  protected _missingElementText(element: VALIDATION_RESULT): string {
     return '';
   }
 
