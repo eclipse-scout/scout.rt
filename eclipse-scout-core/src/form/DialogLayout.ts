@@ -8,17 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, FormLayout, graphics, HtmlComponent, Point} from '../index';
+import {Dimension, Form, FormLayout, graphics, HtmlComponent, Insets, Point, Rectangle} from '../index';
 
 export default class DialogLayout extends FormLayout {
+  declare form: Form;
 
-  constructor(form) {
+  autoSize: boolean;
+  shrinkEnabled: boolean;
+
+  constructor(form: Form) {
     super(form);
     this.autoSize = true;
     this.shrinkEnabled = false;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     if (!this.autoSize) {
       super.layout($container);
       return;
@@ -60,10 +64,10 @@ export default class DialogLayout extends FormLayout {
    *          position (top-left of "margin box"), dimension excludes margins
    * @param prefBounds
    *          optional preferred bounds (same expectations as with "currentBounds")
-   * @return {Dimension}
+   * @returns
    *          adjusted size excluding margins (suitable to pass to graphics.setSize())
    */
-  _calcSize($container, currentBounds, prefBounds) {
+  protected _calcSize($container: JQuery, currentBounds: Rectangle, prefBounds?: Rectangle): Dimension {
     let dialogSize,
       htmlComp = this.form.htmlComp,
       dialogMargins = htmlComp.margins(),
@@ -103,13 +107,12 @@ export default class DialogLayout extends FormLayout {
    * Calculates the new container size and position. If the given containerSize is larger then the windowSize, the size will be adjusted.
    *
    * @param windowSize total size of the window
-   * @param containerPosition {Point} current CSS position of the container (top-left of the "margin box")
-   * @param containerSize {Dimension} preferred size of container (excluding margins)
-   * @param containerMargins {Insets} margins of the container
-   * @returns {Dimension} the new, adjusted container size (excluding margins)
-   * @static
+   * @param containerPosition current CSS position of the container (top-left of the "margin box")
+   * @param containerSize preferred size of container (excluding margins)
+   * @param containerMargins margins of the container
+   * @returns the new, adjusted container size (excluding margins)
    */
-  static fitContainerInWindow(windowSize, containerPosition, containerSize, containerMargins) {
+  static fitContainerInWindow(windowSize: Dimension, containerPosition: Point, containerSize: Dimension, containerMargins: Insets): Dimension {
     // class .dialog may specify a margin
     // currentBounds.y and x are 0 initially, but if size changes while dialog is open they are greater than 0
     // This guarantees the dialog size may not exceed the document size
@@ -128,10 +131,9 @@ export default class DialogLayout extends FormLayout {
    * Returns the coordinates to place the given container in the optical middle of the window.
    *
    * @param $container
-   * @returns {Point} new X,Y position of the container
-   * @static
+   * @returns new X,Y position of the container
    */
-  static positionContainerInWindow($container) {
+  static positionContainerInWindow($container: JQuery): Point {
     let
       windowSize = $container.windowSize(),
       containerSize = HtmlComponent.get($container).size(true),

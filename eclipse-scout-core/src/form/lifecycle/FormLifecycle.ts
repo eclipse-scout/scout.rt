@@ -8,9 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, Lifecycle, scout, strings, ValueField} from '../../index';
+import {Form, FormLifecycleModel, Lifecycle, scout, Status, strings, ValueField} from '../../index';
+import {ValidationResult} from '../Form';
 
-export default class FormLifecycle extends Lifecycle {
+export default class FormLifecycle<VALIDATION_RESULT extends ValidationResult = ValidationResult> extends Lifecycle<VALIDATION_RESULT> implements FormLifecycleModel {
+  declare model: FormLifecycleModel;
+  declare widget: Form;
 
   constructor() {
     super();
@@ -21,12 +24,12 @@ export default class FormLifecycle extends Lifecycle {
     this.saveChangesQuestionTextKey = 'FormSaveChangesQuestion';
   }
 
-  init(model) {
+  override init(model: FormLifecycleModel) {
     scout.assertParameter('widget', model.widget, Form);
     super.init(model);
   }
 
-  _reset() {
+  protected _reset() {
     this.widget.visitFields(field => {
       if (field instanceof ValueField) {
         field.resetValue();
@@ -34,7 +37,7 @@ export default class FormLifecycle extends Lifecycle {
     });
   }
 
-  _invalidElements() {
+  protected override _invalidElements(): { missingElements: VALIDATION_RESULT[]; invalidElements: VALIDATION_RESULT[] } {
     let missingFields = [];
     let invalidFields = [];
 
@@ -59,23 +62,24 @@ export default class FormLifecycle extends Lifecycle {
     };
   }
 
-  _invalidElementText(element) {
+  protected override _invalidElementText(element: VALIDATION_RESULT): string {
     return strings.plainText(element.label);
   }
 
-  _missingElementText(element) {
+  protected override _missingElementText(element: VALIDATION_RESULT): string {
     return strings.plainText(element.label);
   }
 
-  _validateWidget() {
+  protected override _validateWidget(): Status {
+    // @ts-ignore
     return this.widget._validate();
   }
 
-  _revealInvalidElement(invalidElement) {
+  protected override _revealInvalidElement(invalidElement: VALIDATION_RESULT) {
     this.widget.revealInvalidField(invalidElement);
   }
 
-  markAsSaved() {
+  override markAsSaved() {
     this.widget.visitFields(field => {
       field.markAsSaved();
     });
@@ -88,7 +92,7 @@ export default class FormLifecycle extends Lifecycle {
    *
    * @see (Java) AbstractFormField #checkSaveNeeded, #isSaveNeeded
    */
-  requiresSave() {
+  override requiresSave(): boolean {
     let requiresSave = false;
     this.widget.visitFields(field => {
       field.updateRequiresSave();

@@ -8,9 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ResponsiveHandler, ResponsiveManager} from '../index';
+import {Desktop, DesktopResponsiveHandlerModel, ResponsiveHandler, ResponsiveManager} from '../index';
 
-export default class DesktopResponsiveHandler extends ResponsiveHandler {
+export default class DesktopResponsiveHandler extends ResponsiveHandler implements DesktopResponsiveHandlerModel {
+  declare model: DesktopResponsiveHandlerModel;
+  declare widget: Desktop;
 
   constructor() {
     super();
@@ -19,7 +21,7 @@ export default class DesktopResponsiveHandler extends ResponsiveHandler {
     this.allowedStates = [ResponsiveManager.ResponsiveState.NORMAL, ResponsiveManager.ResponsiveState.COMPACT];
   }
 
-  init(model) {
+  override init(model: DesktopResponsiveHandlerModel) {
     super.init(model);
 
     this._registerTransformation('navigationVisible', this._transformNavigationVisible);
@@ -28,7 +30,7 @@ export default class DesktopResponsiveHandler extends ResponsiveHandler {
 
   /* --- TRANSFORMATIONS ------------------------------------------------------------- */
 
-  _transformNavigationVisible(widget, apply) {
+  protected _transformNavigationVisible(widget: Desktop, apply: boolean) {
     if (apply) {
       this._storeFieldProperty(widget, 'navigationVisible', widget.navigationVisible);
       widget.setNavigationVisible(false);

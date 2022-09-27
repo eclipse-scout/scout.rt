@@ -8,9 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FileChooser, FileChooserController, MessageBox, MessageBoxController, Widget} from '../index';
+import {FileChooser, FileChooserController, Form, MessageBox, MessageBoxController, Widget} from '../index';
 
 export default interface DisplayParent extends Widget {
+
+  views: Form[];
+  dialogs: Form[];
 
   messageBoxes: MessageBox[];
   messageBoxController: MessageBoxController;
@@ -21,6 +24,8 @@ export default interface DisplayParent extends Widget {
   inFront(): boolean;
 
   acceptView?(view: Widget): boolean;
+
+  acceptDialog?(dialog: Widget): boolean;
 
   onGlassPaneMouseDown?(glassPaneOwner: Widget, $glassPane: JQuery<HTMLDivElement>);
 }

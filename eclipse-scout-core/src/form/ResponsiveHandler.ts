@@ -8,10 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, objects, ResponsiveManager} from '../index';
+import {arrays, Event, objects, ResponsiveHandlerModel, ResponsiveManager, Widget} from '../index';
 import $ from 'jquery';
+import {ResponsiveState} from './ResponsiveManager';
 
-export default class ResponsiveHandler {
+export default class ResponsiveHandler implements ResponsiveHandlerModel {
+  declare model: ResponsiveHandlerModel;
+
+  widget: Widget;
+  compactThreshold: number;
+  condensedThreshold: number;
+  oldState: ResponsiveState;
+  state: ResponsiveState;
+  allowedStates: ResponsiveState[];
+  transformations: Record<string, (Widget, boolean) => void>;
+  enabledTransformations: Record<ResponsiveState, string[]>;
+
+  protected _transformationsToApply: string[];
+  protected _transformationsToReset: string[];
+  /** Event handlers */
+  protected _destroyHandler: (Event) => void;
 
   constructor() {
     this.widget = null;
@@ -25,11 +41,10 @@ export default class ResponsiveHandler {
     this.transformations = objects.createMap();
     this.enabledTransformations = objects.createMap();
 
-    // Event handlers
     this._destroyHandler = this._onDestroy.bind(this);
   }
 
-  init(model) {
+  init(model: ResponsiveHandlerModel) {
     $.extend(this, model);
 
     this.widget.one('destroy', this._destroyHandler);
@@ -39,30 +54,30 @@ export default class ResponsiveHandler {
     this.widget.off('destroy', this._destroyHandler);
   }
 
-  getCompactThreshold() {
+  getCompactThreshold(): number {
     return this.compactThreshold;
   }
 
-  getCondensedThreshold() {
+  getCondensedThreshold(): number {
     return this.condensedThreshold;
   }
 
-  active() {
+  active(): boolean {
     return true;
   }
 
-  setAllowedStates(allowedStates) {
+  setAllowedStates(allowedStates: ResponsiveState[]) {
     this.allowedStates = allowedStates;
   }
 
-  acceptState(newState) {
-    return arrays.containsAny(this.allowedStates, newState);
+  acceptState(newState: ResponsiveState): boolean {
+    return arrays.contains(this.allowedStates, newState);
   }
 
   /**
    * Register a transformation with a given transformation id. The transformation id has to be unique.
    */
-  _registerTransformation(transformationId, transformation) {
+  protected _registerTransformation(transformationId: string, transformation: (Widget, boolean) => void) {
     this.transformations[transformationId] = transformation.bind(this);
   }
 
@@ -71,7 +86,7 @@ export default class ResponsiveHandler {
    * the transformation will be applied.
    * Before a transformation can be enabled, it has to be registered first.
    */
-  _enableTransformation(state, transformationId) {
+  protected _enableTransformation(state: ResponsiveState, transformationId: string) {
     let transformationIds = this.enabledTransformations[state];
     if (!transformationIds) {
       transformationIds = [];
@@ -83,21 +98,22 @@ export default class ResponsiveHandler {
   /**
    * Disable a transformation for a given state.
    */
-  _disableTransformation(state, transformationId) {
+  protected _disableTransformation(state: ResponsiveState, transformationId: string) {
     arrays.remove(this.enabledTransformations[state], transformationId);
   }
 
   /* --- TRANSFORMATIONS ------------------------------------------------------------- */
 
-  _storeFieldProperty(widget, property, value) {
+  protected _storeFieldProperty(widget: Widget, property: string, value: any) {
+    // @ts-ignore
     widget._setProperty('responsive-' + property, value);
   }
 
-  _hasFieldProperty(widget, property) {
+  protected _hasFieldProperty(widget: Widget, property: string): boolean {
     return widget.hasOwnProperty('responsive-' + property);
   }
 
-  _getFieldProperty(widget, property) {
+  protected _getFieldProperty(widget: Widget, property: string): any {
     return widget['responsive-' + property];
   }
 
@@ -106,7 +122,7 @@ export default class ResponsiveHandler {
    * Transformations to be applied are the ones enabled for the new state, but not for the old state.
    * The ones to be reset are those enabled of the old state but not for the new state.
    */
-  transform(newState, force) {
+  transform(newState: ResponsiveState, force?: boolean): boolean {
     if (this.state === newState && !force) {
       return false;
     }
@@ -147,11 +163,11 @@ export default class ResponsiveHandler {
    * If e.g. child elements need to be transformed as well, override this method and call _transformWidget() for
    * each child as well.
    */
-  _transform() {
+  protected _transform() {
     this._transformWidget(this.widget);
   }
 
-  _transformWidget(widget) {
+  protected _transformWidget(widget: Widget) {
     this._transformationsToApply.forEach(transformationType => {
       this.transformations[transformationType](widget, true);
     });
@@ -162,7 +178,7 @@ export default class ResponsiveHandler {
   }
 
   /* --- HANDLERS ------------------------------------------------------------- */
-  _onDestroy(event) {
+  protected _onDestroy(event: Event<Widget>) {
     this.destroy();
   }
 }
