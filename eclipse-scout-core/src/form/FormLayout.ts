@@ -8,17 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, graphics, HtmlComponent} from '../index';
+import {AbstractLayout, Dimension, FileChooser, Form, graphics, HtmlComponent, HtmlCompPrefSizeOptions} from '../index';
 import $ from 'jquery';
 
 export default class FormLayout extends AbstractLayout {
+  form: Form | FileChooser;
 
-  constructor(form) {
+  constructor(form: Form | FileChooser) {
     super();
     this.form = form;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let htmlContainer = HtmlComponent.get($container),
       htmlRootGb = this._htmlRootGroupBox(),
       rootGbSize;
@@ -35,7 +36,7 @@ export default class FormLayout extends AbstractLayout {
     htmlRootGb.setSize(rootGbSize);
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     options = options || {};
     let htmlContainer = HtmlComponent.get($container),
       htmlRootGb = this._htmlRootGroupBox(),
@@ -55,14 +56,16 @@ export default class FormLayout extends AbstractLayout {
     return prefSize;
   }
 
-  _htmlRootGroupBox() {
+  protected _htmlRootGroupBox(): HtmlComponent {
     let $rootGroupBox = this.form.$container.children('.root-group-box');
     return HtmlComponent.get($rootGroupBox);
   }
 
-  _headerHeight() {
-    if (this.form.$header && this.form.$header.css('position') !== 'absolute') {
-      return graphics.prefSize(this.form.$header, true).height;
+  protected _headerHeight(): number {
+    // @ts-ignore
+    let $header: JQuery = this.form.$header;
+    if ($header && $header.css('position') !== 'absolute') {
+      return graphics.prefSize($header, true).height;
     }
     return 0;
   }

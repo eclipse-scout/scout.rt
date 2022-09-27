@@ -8,25 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModelAdapter} from '../index';
+import {Event, Form, FormField, FormModel, ModelAdapter, ObjectWithType, Widget} from '../index';
 
-export default class FormAdapter extends ModelAdapter {
+export default class FormAdapter extends ModelAdapter<Form> {
 
   constructor() {
     super();
   }
 
-  /**
-   * @override
-   */
-  _initModel(model, parent) {
-    model = super._initModel(model, parent);
+  protected override _initModel(m: Omit<FormModel, 'parent'> & ObjectWithType, parent: Widget): FormModel & ObjectWithType {
+    let model = super._initModel(m, parent);
     // Set logical grid to null -> Calculation happens on server side
     model.logicalGrid = null;
     return model;
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<Form>) {
     if (event.type === 'abort') {
       this._onWidgetAbort(event);
     } else if (event.type === 'close') {
@@ -36,7 +33,7 @@ export default class FormAdapter extends ModelAdapter {
     }
   }
 
-  _onWidgetAbort(event) {
+  protected _onWidgetAbort(event: Event<Form>) {
     // Do not close the form immediately, server will send the close event
     event.preventDefault();
 
@@ -44,16 +41,17 @@ export default class FormAdapter extends ModelAdapter {
     // Waiting for the current request to complete is necessary to be able to check whether the form is still open after the close request.
     this.session.onRequestsDone(() => {
       if (this.widget) {
+        // @ts-ignore
         this.widget._afterAbort();
       }
     });
   }
 
-  _onWidgetClose(event) {
+  protected _onWidgetClose(event: Event<Form>) {
     this._send('close');
   }
 
-  onModelAction(event) {
+  override onModelAction(event: any) {
     if (event.type === 'requestFocus') {
       this._onRequestFocus(event);
     } else if (event.type === 'requestInput') {
@@ -63,11 +61,11 @@ export default class FormAdapter extends ModelAdapter {
     }
   }
 
-  _onRequestFocus(event) {
+  protected _onRequestFocus(event: { formField: string }) {
     this.session.getOrCreateWidget(event.formField, this.widget).focus();
   }
 
-  _onRequestInput(event) {
-    this.session.getOrCreateWidget(event.formField, this.widget).requestInput();
+  protected _onRequestInput(event: { formField: string }) {
+    (this.session.getOrCreateWidget(event.formField, this.widget) as FormField).requestInput();
   }
 }

@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Button, Event, Menu, scout} from '../../index';
+import {Action, Button, Event, FormLifecycleMenu, FormLifecycleMenuModel, scout} from '../../index';
 
-export default class OkMenu extends Menu {
+export default class OkMenu extends FormLifecycleMenu {
 
   constructor() {
     super();
@@ -21,16 +21,17 @@ export default class OkMenu extends Menu {
     this.preventDoubleClick = true;
   }
 
-  _init(model) {
+  protected override _init(model: FormLifecycleMenuModel) {
     super._init(model);
     this.text = scout.nvl(this.text, this.session.text('OkButton'));
   }
 
-  _doAction() {
+  protected override _doAction() {
     let form = this.getForm();
     let event = new Event();
     this.trigger('action', event);
     if (!event.defaultPrevented) {
+      // noinspection JSIgnoredPromiseFromCall
       form.ok();
     }
   }

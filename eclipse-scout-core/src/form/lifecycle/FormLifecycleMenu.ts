@@ -8,12 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventMap, Lifecycle} from '../index';
+import {FormLifecycleMenuModel, Menu} from '../../index';
 
-export default interface LifecycleEventMap<VALIDATION_RESULT> extends EventMap {
-  'load': Event<Lifecycle<VALIDATION_RESULT>>;
-  'postLoad': Event<Lifecycle<VALIDATION_RESULT>>;
-  'save': Event<Lifecycle<VALIDATION_RESULT>>;
-  'close': Event<Lifecycle<VALIDATION_RESULT>>;
-  'reset': Event<Lifecycle<VALIDATION_RESULT>>;
+export default class FormLifecycleMenu extends Menu implements FormLifecycleMenuModel {
+  declare model: FormLifecycleMenuModel;
+
+  systemType: number; // FIXME TS: SystemType (Button.SystemType)
+
+  constructor() {
+    super();
+
+    this.systemType = null;
+  }
 }
