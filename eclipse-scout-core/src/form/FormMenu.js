@@ -29,6 +29,9 @@ export default class FormMenu extends Menu {
     MOBILE: 'mobile'
   };
 
+  /**
+   * @protected
+   */
   _init(model) {
     super._init(model);
 

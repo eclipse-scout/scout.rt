@@ -22,7 +22,7 @@ let objectFactories: Map<string | { new(): object }, ObjectCreator> = new Map();
  * Returns the first of the given arguments that is not null or undefined. If no such element
  * is present, the last argument is returned. If no arguments are given, undefined is returned.
  */
-export function nvl(...args) {
+export function nvl(...args: any[]): any {
   let result;
   for (let i = 0; i < args.length; i++) {
     result = args[i];

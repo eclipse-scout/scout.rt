@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column} from '../../index';
+import {Cell, Column, TableRow} from '../../index';
 
 export default class IconColumn extends Column {
 
@@ -19,10 +19,7 @@ export default class IconColumn extends Column {
     this.textBased = false;
   }
 
-  /**
-   * @override
-   */
-  _initCell(cell) {
+  protected override _initCell(cell: Cell): Cell {
     super._initCell(cell);
     // only display icon, no text
     cell.text = null;
@@ -30,28 +27,22 @@ export default class IconColumn extends Column {
     return cell;
   }
 
-  /**
-   * @override
-   */
-  _formatValue(value, row) {
+  protected override _formatValue(value: any, row?: TableRow): string {
     // only display icon, no text
     return null;
   }
 
-  setCellValue(row, value) {
+  override setCellValue(row: TableRow, value: string) {
     super.setCellValue(row, value);
     this.setCellIconId(row, this.cell(row).value);
   }
 
-  /**
-   * @override
-   */
-  cellTextForGrouping(row) {
+  override cellTextForGrouping(row: TableRow): string {
     let cell = this.table.cell(this, row);
     return cell.value;
   }
 
-  createAggrGroupCell(row) {
+  override createAggrGroupCell(row: TableRow): Cell {
     let cell = super.createAggrGroupCell(row);
     // Make sure only icon and no text is displayed
     cell.text = null;

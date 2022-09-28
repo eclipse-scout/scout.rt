@@ -66,4 +66,5 @@ export default interface TooltipModel extends WidgetModel {
    */
   htmlEnabled?: boolean | (($comp: JQuery) => boolean);
   menus?: Menu | Menu[];
+  $anchor?: JQuery;
 }

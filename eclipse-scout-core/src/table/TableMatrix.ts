@@ -1,18 +1,25 @@
 /*
- * Copyright (c) 2014-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, BooleanColumn, comparators, DateColumn, DateFormat, dates, IconColumn, NumberColumn, objects, scout} from '../index';
+import {arrays, BooleanColumn, Column, comparators, DateColumn, DateFormat, dates, EnumObject, IconColumn, Locale, NumberColumn, objects, scout, Session, Table, TableRow} from '../index';
 
 export default class TableMatrix {
+  session: Session;
+  locale: Locale;
 
-  constructor(table, session) {
+  protected _allData: TableMatrixDataAxis[];
+  protected _allAxis: TableMatrixKeyAxis[];
+  protected _rows: TableRow[];
+  protected _table: Table;
+
+  constructor(table: Table, session: Session) {
     this.session = session;
     this.locale = session.locale;
     this._allData = [];
@@ -27,19 +34,20 @@ export default class TableMatrix {
     MONTH: 257,
     WEEKDAY: 258,
     DATE: 259
-  };
+  } as const;
 
   static NumberGroup = {
     COUNT: -1,
     SUM: 1,
     AVG: 2
-  };
+  } as const;
 
   /**
    * add data axis
    */
-  addData(data, dataGroup) {
-    let dataAxis = [],
+  addData(data: Column, dataGroup: TableMatrixNumberGroup): TableMatrixDataAxis {
+    // @ts-ignore
+    let dataAxis: TableMatrixDataAxis = {},
       locale = this.locale;
 
     // collect all axis
@@ -62,9 +70,7 @@ export default class TableMatrix {
         }
         return parseFloat(f);
       };
-      dataAxis.group = array => array.reduce((a, b) => {
-        return a + b;
-      });
+      dataAxis.group = array => array.reduce((a, b) => a + b);
     } else if (dataGroup === TableMatrix.NumberGroup.AVG) {
       dataAxis.norm = f => {
         if (isNaN(f) || f === null || f === '') {
@@ -73,26 +79,21 @@ export default class TableMatrix {
         return parseFloat(f);
       };
       dataAxis.group = array => {
-        let sum = array.reduce((a, b) => {
-            return a + b;
-          }),
-          count = array.reduce((a, b) => {
-            return (b === null ? a : a + 1);
-          }, 0);
-
+        let sum = array.reduce((a, b) => a + b);
+        let count = array.reduce((a, b) => b === null ? a : a + 1, 0);
         if (count === 0) {
           return null;
         }
         return sum / count;
-
       };
     }
     return dataAxis;
   }
 
   // add x or y Axis
-  addAxis(axis, axisGroup) {
-    let keyAxis = [],
+  addAxis(axis: Column, axisGroup: TableMatrixNumberGroup | TableMatrixDateGroup): TableMatrixKeyAxis {
+    // @ts-ignore
+    let keyAxis: TableMatrixKeyAxis = [],
       locale = this.locale,
       session = this.session,
       getText = this.session.text.bind(this.session),
@@ -149,18 +150,14 @@ export default class TableMatrix {
       }
       return keyAxis.normTable[n];
     };
-    keyAxis.deterministicKeyToKey = deterministicKey => {
-      return keyAxis.norm(deterministicKey);
-    };
+    keyAxis.deterministicKeyToKey = deterministicKey => keyAxis.norm(deterministicKey);
     keyAxis.keyToDeterministicKey = key => {
       if (key === null) {
-        return key;
+        return null;
       }
       return keyAxis.format(key);
     };
-    keyAxis.normDeterministic = f => {
-      return keyAxis.keyToDeterministicKey(keyAxis.norm(f));
-    };
+    keyAxis.normDeterministic = f => keyAxis.keyToDeterministicKey(keyAxis.norm(f));
 
     // norm and format depends of datatype and group functionality
     if (axis instanceof DateColumn) {
@@ -170,7 +167,6 @@ export default class TableMatrix {
             return null;
           }
           return f.getTime();
-
         };
         keyAxis.format = n => {
           if (n === null) {
@@ -190,14 +186,12 @@ export default class TableMatrix {
             return null;
           }
           return f.getFullYear();
-
         };
         keyAxis.format = n => {
           if (n === null) {
             return emptyCell;
           }
           return String(n);
-
         };
       } else if (axisGroup === TableMatrix.DateGroup.MONTH) {
         keyAxis.norm = f => {
@@ -205,14 +199,12 @@ export default class TableMatrix {
             return null;
           }
           return f.getMonth();
-
         };
         keyAxis.format = n => {
           if (n === null) {
             return emptyCell;
           }
           return locale.dateFormatSymbols.months[n];
-
         };
       } else if (axisGroup === TableMatrix.DateGroup.WEEKDAY) {
         keyAxis.norm = f => {
@@ -241,15 +233,9 @@ export default class TableMatrix {
           return dates.format(new Date(n), locale, locale.dateFormatPatternDefault);
         };
       }
-      keyAxis.deterministicKeyToKey = deterministicKey => {
-        return deterministicKey;
-      };
-      keyAxis.keyToDeterministicKey = key => {
-        return key;
-      };
-      keyAxis.normDeterministic = f => {
-        return keyAxis.norm(f);
-      };
+      keyAxis.deterministicKeyToKey = (deterministicKey: number) => deterministicKey;
+      keyAxis.keyToDeterministicKey = key => key;
+      keyAxis.normDeterministic = f => keyAxis.norm(f);
     } else if (axis instanceof NumberColumn) {
       keyAxis.norm = f => {
         if (isNaN(f) || f === null || f === '') {
@@ -263,15 +249,9 @@ export default class TableMatrix {
         }
         return axis.decimalFormat.format(n);
       };
-      keyAxis.deterministicKeyToKey = deterministicKey => {
-        return deterministicKey;
-      };
-      keyAxis.keyToDeterministicKey = key => {
-        return key;
-      };
-      keyAxis.normDeterministic = f => {
-        return keyAxis.norm(f);
-      };
+      keyAxis.deterministicKeyToKey = (deterministicKey: number) => deterministicKey;
+      keyAxis.keyToDeterministicKey = key => key;
+      keyAxis.normDeterministic = f => keyAxis.norm(f);
     } else if (axis instanceof BooleanColumn) {
       keyAxis.norm = f => {
         if (axis.triStateEnabled && f === null) {
@@ -293,26 +273,14 @@ export default class TableMatrix {
           return getText('ui.BooleanColumnGroupingTrue');
         }
       };
-      keyAxis.deterministicKeyToKey = deterministicKey => {
-        return deterministicKey;
-      };
-      keyAxis.keyToDeterministicKey = key => {
-        return key;
-      };
-      keyAxis.normDeterministic = f => {
-        return keyAxis.norm(f);
-      };
+      keyAxis.deterministicKeyToKey = (deterministicKey: number) => deterministicKey;
+      keyAxis.keyToDeterministicKey = key => key;
+      keyAxis.normDeterministic = f => keyAxis.norm(f);
     } else if (axis instanceof IconColumn) {
       keyAxis.textIsIcon = true;
-      keyAxis.deterministicKeyToKey = deterministicKey => {
-        return deterministicKey;
-      };
-      keyAxis.keyToDeterministicKey = key => {
-        return key;
-      };
-      keyAxis.normDeterministic = f => {
-        return keyAxis.norm(f);
-      };
+      keyAxis.deterministicKeyToKey = (deterministicKey: number) => deterministicKey;
+      keyAxis.keyToDeterministicKey = key => key;
+      keyAxis.normDeterministic = f => keyAxis.norm(f);
     } else {
       keyAxis.reorder = () => {
         let comparator = comparators.TEXT;
@@ -342,62 +310,61 @@ export default class TableMatrix {
   /**
    * @returns a cube containing the results
    */
-  calculate() {
-    let cube = {},
-      r, v, k, data, key, normData, normKey,
-      length = 0;
+  calculate(): TableMatrixResult {
+    let cube: Record<string, Array<number[] | number>> & { length?: number; getValue?(keys: number[]): number[] } = {}, length = 0;
 
     // collect data from table
-    for (r = 0; r < this._rows.length; r++) {
+    for (let r = 0; r < this._rows.length; r++) {
       let row = this._rows[r];
       // collect keys of x, y axis from row
-      let keys = [];
-      for (k = 0; k < this._allAxis.length; k++) {
+      let keys: number[] = [];
+      for (let k = 0; k < this._allAxis.length; k++) {
         let column = this._allAxis[k].column;
-        key = column.cellValueOrTextForCalculation(row);
-        normKey = this._allAxis[k].norm(key);
+        let key = column.cellValueOrTextForCalculation(row);
+        let normKey = this._allAxis[k].norm(key);
 
         if (normKey !== undefined) {
           this._allAxis[k].add(normKey);
-          if (column.cell(row).sortCode !== null) {
-            this._allAxis[k].sortCodeMap[normKey] = column.cell(row).sortCode;
+          let cell = column.cell(row);
+          if (cell.sortCode !== null) {
+            this._allAxis[k].sortCodeMap[normKey] = cell.sortCode;
           }
           keys.push(normKey);
         }
       }
-      keys = JSON.stringify(keys);
+      let keysString = JSON.stringify(keys);
 
       // collect values of data axis from row
-      let values = [];
-      for (v = 0; v < this._allData.length; v++) {
-        data = this._table.cellValue(this._allData[v].column, row);
-        normData = this._allData[v].norm(data);
+      let values: number[] = [];
+      for (let v = 0; v < this._allData.length; v++) {
+        let data = this._table.cellValue(this._allData[v].column, row);
+        let normData = this._allData[v].norm(data);
         if (normData !== undefined) {
           values.push(normData);
         }
       }
 
       // build cube
-      if (cube[keys]) {
-        cube[keys].push(values);
+      if (cube[keysString]) {
+        cube[keysString].push(values);
       } else {
-        cube[keys] = [values];
+        cube[keysString] = [values];
         length++;
       }
     }
 
     // group values and find sum, min and max of data axis
-    for (v = 0; v < this._allData.length; v++) {
-      data = this._allData[v];
+    for (let v = 0; v < this._allData.length; v++) {
+      let data = this._allData[v];
 
       data.total = 0;
       data.min = null;
       data.max = null;
 
-      for (k in cube) {
+      for (let k in cube) {
         if (cube.hasOwnProperty(k)) {
           let allCell = cube[k],
-            subCell = [];
+            subCell: number[] = [];
 
           for (let i = 0; i < allCell.length; i++) {
             subCell.push(allCell[i][v]);
@@ -432,8 +399,8 @@ export default class TableMatrix {
     }
 
     // find dimensions and sort for x, y axis
-    for (k = 0; k < this._allAxis.length; k++) {
-      key = this._allAxis[k];
+    for (let k = 0; k < this._allAxis.length; k++) {
+      let key = this._allAxis[k];
 
       key.min = arrays.min(key);
       key.max = arrays.max(key);
@@ -448,44 +415,46 @@ export default class TableMatrix {
 
     // access function used by chart
     cube.getValue = keys => {
-      keys = JSON.stringify(keys);
-
-      if (cube.hasOwnProperty(keys)) {
-        return cube[keys];
+      let keysString = JSON.stringify(keys);
+      if (cube.hasOwnProperty(keysString)) {
+        return cube[keysString] as number[];
       }
       return null;
-
     };
 
     cube.length = length;
-    return cube;
+    return cube as TableMatrixResult; // cast necessary because in this method cube temporary contains an Array<number | number[]>. But in the end it is reduced to only number[].
   }
 
-  columnCount(filterNumberColumns) {
-    let c, column, r, row, cellValue,
-      columns = this.columns(filterNumberColumns),
-      colCount = [],
+  /**
+   *
+   * @returns Array holding an entry for each column. Each entry consists of an array with the column at index 0 and the count at index 1.
+   */
+  columnCount(filterNumberColumns?: boolean): Array<Array<Column | number>> {
+    let columns = this.columns(filterNumberColumns),
+      colCount: Array<Array<Column | any[] | number>> = [],
       count = 0;
 
-    for (c = 0; c < columns.length; c++) {
-      column = columns[c];
+    for (let c = 0; c < columns.length; c++) {
+      let column = columns[c];
       colCount.push([column, []]);
 
-      for (r = 0; r < this._rows.length; r++) {
-        row = this._rows[r];
-        cellValue = column.cellValueOrTextForCalculation(row);
-        if (colCount[count][1].indexOf(cellValue) === -1) {
-          colCount[count][1].push(cellValue);
+      let values = colCount[count][1] as any[];
+      for (let r = 0; r < this._rows.length; r++) {
+        let row = this._rows[r];
+        let cellValue = column.cellValueOrTextForCalculation(row);
+        if (values.indexOf(cellValue) === -1) {
+          values.push(cellValue);
         }
       }
 
-      colCount[count][1] = colCount[count][1].length;
+      colCount[count][1] = values.length;
       count++;
     }
-    return colCount;
+    return colCount as Array<Array<Column | number>>;
   }
 
-  isEmpty() {
+  isEmpty(): boolean {
     return this._rows.length === 0 || this.columns().length === 0;
   }
 
@@ -493,7 +462,7 @@ export default class TableMatrix {
    * @returns valid columns for table-matrix (not instance of NumberColumn and not guiOnly)
    * @param filterNumberColumns whether or not to filter NumberColumn, default is true
    */
-  columns(filterNumberColumns) {
+  columns(filterNumberColumns?: boolean): Column[] {
     filterNumberColumns = scout.nvl(filterNumberColumns, true);
     return this._table.visibleColumns().filter(column => {
       if (column.guiOnly) {
@@ -508,9 +477,40 @@ export default class TableMatrix {
 
   /**
    * Table rows and columns are not always in a consistent state.
-   * @returns {boolean} true, if table is in a valid, consistent state
-   * */
-  isMatrixValid() {
+   * @returns true, if table is in a valid, consistent state
+   */
+  isMatrixValid(): boolean {
     return this._table.rows.length === 0 || this.columns(false).length === this._table.rows[0].cells.length;
   }
 }
+
+export type TableMatrixNumberGroup = EnumObject<typeof TableMatrix.NumberGroup>;
+export type TableMatrixDateGroup = EnumObject<typeof TableMatrix.DateGroup>;
+
+export type TableMatrixKeyAxis = number[] & {
+  column: Column;
+  normTable: string[];
+  sortCodeMap: Record<number, number>;
+  textIsIcon?: boolean;
+  min: number;
+  max: number;
+  format(n: number): string;
+  keyToDeterministicKey(n: number): number | string;
+  deterministicKeyToKey(f: string | number): number;
+  normDeterministic(f: any): string | number;
+  norm(f: any): number;
+  add(k: number);
+  reorder(): void;
+};
+
+export type TableMatrixDataAxis = {
+  column: Column;
+  total: number;
+  min: number;
+  max: number;
+  format(n: number): string;
+  norm(f: any): number;
+  group(array: number[]): number;
+};
+
+export type TableMatrixResult = Record<string, number[]> & { length: number; getValue(keys: number[]): number[] };

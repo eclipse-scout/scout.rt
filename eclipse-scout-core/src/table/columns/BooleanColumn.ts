@@ -3,18 +3,19 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxField, Column, comparators, scout} from '../../index';
+import {Cell, CheckBoxField, Column, comparators, scout, TableRow} from '../../index';
 
 /**
  * May be an ordinary boolean column or the table's checkable column (table.checkableColumn)
  * Difference: the table's checkable column represents the row.checked state, other boolean columns represent their own value.
  */
 export default class BooleanColumn extends Column {
+  triStateEnabled: boolean;
 
   constructor() {
     super();
@@ -26,29 +27,21 @@ export default class BooleanColumn extends Column {
     this.textBased = false;
   }
 
-  /**
-   * @override
-   */
-  _formatValue(value, row) {
+  protected override _formatValue(value: boolean, row?: TableRow): string {
     if (this.triStateEnabled && value === null) {
       return '?';
     }
     return value ? 'X' : '';
   }
 
-  /**
-   * @override
-   */
-  buildCell(cell, row) {
-    let style,
-      content = '',
-      cssClass,
-      checkBoxCssClass,
+  override buildCell(cell: Cell, row: TableRow): string {
+    let content = '',
       enabled = row.enabled,
       tableNodeColumn = this.table.isTableNodeColumn(this),
       rowPadding = 0;
 
     if (tableNodeColumn) {
+      // @ts-ignore
       rowPadding = this.table._calcRowLevelPadding(row);
     }
 
@@ -58,13 +51,13 @@ export default class BooleanColumn extends Column {
     }
 
     enabled = enabled && cell.editable;
-    cssClass = this._cellCssClass(cell, tableNodeColumn);
-    style = this._cellStyle(cell, tableNodeColumn, rowPadding);
+    let cssClass = this._cellCssClass(cell, tableNodeColumn);
+    let style = this._cellStyle(cell, tableNodeColumn, rowPadding);
     if (!enabled) {
       cssClass += ' disabled';
     }
 
-    checkBoxCssClass = 'check-box';
+    let checkBoxCssClass = 'check-box';
     if (cell.value === true) {
       checkBoxCssClass += ' checked';
     }
@@ -75,6 +68,7 @@ export default class BooleanColumn extends Column {
       checkBoxCssClass += ' disabled';
     }
 
+    // @ts-ignore
     if (tableNodeColumn && row._expandable) {
       this.tableNodeColumn = true;
       content = this._expandIcon(row.expanded, rowPadding) + content;
@@ -87,19 +81,18 @@ export default class BooleanColumn extends Column {
     return this._buildCell(cell, content, style, cssClass);
   }
 
-  $checkBox($row) {
+  $checkBox($row: JQuery): JQuery {
     let $cell = this.table.$cell(this, $row);
     return $cell.children('.check-box');
   }
 
-  _cellCssClass(cell, tableNode) {
+  protected override _cellCssClass(cell: Cell, tableNode?: boolean): string {
     let cssClass = super._cellCssClass(cell);
     cssClass = cssClass.replace(' editable', '');
     cssClass += ' checkable';
     if (tableNode) {
       cssClass += ' table-node';
     }
-
     return cssClass;
   }
 
@@ -107,8 +100,8 @@ export default class BooleanColumn extends Column {
    * This function does intentionally _not_ call the super function (prepareCellEdit) because we don't want to
    * show an editor for BooleanColumns when user clicks on a cell.
    */
-  onMouseUp(event, $row) {
-    let row = $row.data('row'),
+  override onMouseUp(event: JQuery.MouseUpEvent, $row: JQuery) {
+    let row = $row.data('row') as TableRow,
       cell = this.cell(row);
     if (this.table.checkableColumn === this) {
       this.table.checkRow(row, !row.checked);
@@ -118,27 +111,25 @@ export default class BooleanColumn extends Column {
   }
 
   /**
-   * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
-   * @see TableAdapter.js
+   * In a remote app this function is overridden, the default implementation is the local case.
+   * @see TableAdapter
    */
-  _toggleCellValue(row, cell) {
+  protected _toggleCellValue(row: TableRow, cell: Cell) {
+    let value = cell.value as boolean;
     if (!this.triStateEnabled) {
-      this.setCellValue(row, !cell.value);
+      this.setCellValue(row, !value);
     } else {
-      if (cell.value === false) {
+      if (value === false) {
         this.setCellValue(row, true);
-      } else if (cell.value === true) {
+      } else if (value === true) {
         this.setCellValue(row, null);
-      } else if (cell.value === null) {
+      } else if (value === null) {
         this.setCellValue(row, false);
       }
     }
   }
 
-  /**
-   * @override
-   */
-  _createEditor(row) {
+  protected override _createEditor(row: TableRow): CheckBoxField {
     return scout.create(CheckBoxField, {
       parent: this.table,
       triStateEnabled: this.triStateEnabled
@@ -148,17 +139,18 @@ export default class BooleanColumn extends Column {
   /**
    * @override
    */
-  cellTextForGrouping(row) {
+  override cellTextForGrouping(row: TableRow): string {
     let cell = this.cell(row);
     if (this.triStateEnabled && cell.value === null) {
       return this.session.text('ui.BooleanColumnGroupingMixed');
-    } else if (cell.value === true) {
+    }
+    if (cell.value === true) {
       return this.session.text('ui.BooleanColumnGroupingTrue');
     }
     return this.session.text('ui.BooleanColumnGroupingFalse');
   }
 
-  setTriStateEnabled(triStateEnabled) {
+  setTriStateEnabled(triStateEnabled: boolean) {
     if (this.triStateEnabled === triStateEnabled) {
       return;
     }

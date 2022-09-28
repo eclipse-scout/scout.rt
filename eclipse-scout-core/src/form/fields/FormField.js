@@ -160,6 +160,9 @@ export default class FormField extends Widget {
     });
   }
 
+  /**
+   * @protected
+   */
   _init(model) {
     super._init(model);
     this.resolveConsts([{
@@ -218,6 +221,9 @@ export default class FormField extends Widget {
     throw new Error('sub-classes of FormField must implement a _render method');
   }
 
+  /**
+   * @protected
+   */
   _renderProperties() {
     super._renderProperties();
     this._renderMandatory();

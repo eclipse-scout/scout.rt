@@ -8,9 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, HtmlComponent, KeyStrokeContext, NullLayout, scout, styles, Table, TableControlActionKeyStroke, TableControlCloseKeyStroke} from '../../index';
+import {Action, ActionKeyStroke, HtmlComponent, KeyStrokeContext, NullLayout, scout, styles, Table, TableControlActionKeyStroke, TableControlCloseKeyStroke, TableControlModel, TableFooter} from '../../index';
+import AbstractLayout from '../../layout/AbstractLayout';
+import {TooltipSupportOptions} from '../../tooltip/TooltipSupport';
 
-export default class TableControl extends Action {
+export default abstract class TableControl extends Action implements TableControlModel {
+  declare model: TableControlModel;
+
+  tableFooter: TableFooter;
+  table: Table;
+  contentRendered: boolean;
+  height: number;
+  animateDuration: number;
+  resizerVisible: boolean;
+  denseClass: string;
+  tableControlKeyStrokeContext: KeyStrokeContext;
+  $contentContainer: JQuery;
 
   constructor() {
     super();
@@ -26,7 +39,7 @@ export default class TableControl extends Action {
   static CONTAINER_SIZE = 345; // Defined in sizes.less
   static CONTAINER_ANIMATE_DURATION = 350;
 
-  _init(model) {
+  protected override _init(model: TableControlModel) {
     this.parent = model.parent;
     this.table = this.getTable();
     super._init(model);
@@ -38,16 +51,13 @@ export default class TableControl extends Action {
     this._setSelected(this.selected);
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     this.tableControlKeyStrokeContext = this._createKeyStrokeContextForTableControl();
   }
 
-  _createKeyStrokeContextForTableControl() {
+  protected _createKeyStrokeContextForTableControl(): KeyStrokeContext {
     let keyStrokeContext = new KeyStrokeContext();
     keyStrokeContext.$scopeTarget = () => this.tableFooter.$controlContent;
     keyStrokeContext.$bindTarget = () => this.tableFooter.$controlContent;
@@ -55,11 +65,11 @@ export default class TableControl extends Action {
     return keyStrokeContext;
   }
 
-  _createLayout() {
+  protected override _createLayout(): AbstractLayout {
     return new NullLayout();
   }
 
-  _render() {
+  protected override _render() {
     let classes = 'table-control ';
     if (this.cssClass) {
       classes += this.cssClass + '-table-control';
@@ -71,16 +81,16 @@ export default class TableControl extends Action {
     this.htmlComp.setLayout(this._createLayout());
   }
 
-  remove() {
+  override remove() {
     this.removeContent();
     super.remove();
   }
 
-  _renderContent($parent) {
+  protected _renderContent($parent: JQuery) {
     // to be implemented by subclass
   }
 
-  _removeContent() {
+  protected _removeContent() {
     // to be implemented by subclass
   }
 
@@ -99,7 +109,7 @@ export default class TableControl extends Action {
   /**
    * Renders the content if not already rendered.<br>
    * Opens the container if the container is not already open.<br>
-   * Does nothing if the content is not available yet to -> don't open container if content is not rendered yet to prevent blank container or laggy opening.<br>
+   * Does nothing if the content is not available yet to -> don't open container if content is not rendered yet to prevent blank container or lags during open.<br>
    * Does nothing if the control is not selected.
    */
   renderContent() {
@@ -130,14 +140,11 @@ export default class TableControl extends Action {
     }
   }
 
-  /**
-   * @override
-   */
-  get$Scrollable() {
+  override get$Scrollable() {
     return this.$contentContainer;
   }
 
-  _renderSelected(selected, options) {
+  protected override _renderSelected(selected?: boolean, options?: { closeWhenUnselected?: boolean; animate?: boolean }) {
     selected = scout.nvl(selected, this.selected);
     options = $.extend({}, {closeWhenUnselected: true}, options);
 
@@ -150,7 +157,6 @@ export default class TableControl extends Action {
 
       // Don't modify the state initially, only on property change events
       if (this.rendered) {
-
         if (options.closeWhenUnselected && this === this.tableFooter.selectedControl) {
           // Don't remove immediately, wait for the animation to finish (handled by onControlContainerClosed)
           this.tableFooter.onControlSelected(null);
@@ -167,11 +173,11 @@ export default class TableControl extends Action {
   /**
    * Returns true if the table control may be displayed (opened).
    */
-  isContentAvailable() {
+  isContentAvailable(): boolean {
     return true;
   }
 
-  toggle() {
+  override toggle() {
     if (!this.enabledComputed) {
       return;
     }
@@ -182,7 +188,7 @@ export default class TableControl extends Action {
     }
   }
 
-  setSelected(selected, options) {
+  override setSelected(selected: boolean, options?: { closeWhenUnselected?: boolean; animate?: boolean }) {
     if (selected && !this.visible) {
       return;
     }
@@ -205,18 +211,18 @@ export default class TableControl extends Action {
     }
   }
 
-  _setSelected(selected) {
+  protected _setSelected(selected: boolean) {
     // Does not nothing more than the default but allows for extension by a subclass
     this._setProperty('selected', selected);
   }
 
-  _configureTooltip() {
+  protected override _configureTooltip(): TooltipSupportOptions {
     let options = super._configureTooltip();
     options.cssClass = 'table-control-tooltip';
     return options;
   }
 
-  _onMouseDown() {
+  protected _onMouseDown(event: JQuery.MouseDownEvent) {
     this.toggle();
   }
 
@@ -228,14 +234,11 @@ export default class TableControl extends Action {
     this.removeContent();
   }
 
-  /**
-   * @override Action.js
-   */
-  _createActionKeyStroke() {
+  protected override _createActionKeyStroke(): ActionKeyStroke {
     return new TableControlActionKeyStroke(this);
   }
 
-  getTable() {
+  getTable(): Table {
     let parent = this.parent;
     while (parent) {
       if (parent instanceof Table) {
@@ -243,7 +246,6 @@ export default class TableControl extends Action {
       }
       parent = parent.parent;
     }
-
     return null;
   }
 }

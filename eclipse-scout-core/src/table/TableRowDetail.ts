@@ -1,16 +1,25 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HtmlComponent, strings, Widget} from '../index';
+import {arrays, Column, EventHandler, HtmlComponent, Page, strings, Table, TableRow, TableRowDetailModel, Widget} from '../index';
+import {TableRowsInsertedEvent, TableRowsUpdatedEvent} from './TableEventMap';
 
-export default class TableRowDetail extends Widget {
+export default class TableRowDetail extends Widget implements TableRowDetailModel {
+  declare model: TableRowDetailModel;
+
+  table: Table;
+  page: Page;
+  row: TableRow;
+
+  protected _tableRowsUpdatedHandler: EventHandler<TableRowsUpdatedEvent>;
+  protected _tableRowsInsertedHandler: EventHandler<TableRowsInsertedEvent>;
 
   constructor() {
     super();
@@ -21,37 +30,37 @@ export default class TableRowDetail extends Widget {
     this._tableRowsInsertedHandler = this._onTableRowsInserted.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model: TableRowDetailModel) {
     super._init(model);
     this.row = this.page.row;
     this.table.on('rowsUpdated', this._tableRowsUpdatedHandler);
     this.table.on('rowsInserted', this._tableRowsInsertedHandler);
   }
 
-  _destroy() {
+  protected override _destroy() {
     this.table.off('rowsUpdated', this._tableRowsUpdatedHandler);
     this.table.off('rowsInserted', this._tableRowsInsertedHandler);
     super._destroy();
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('table-row-detail');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this._renderRow();
   }
 
-  _renderRow() {
+  protected _renderRow() {
     this.table.visibleColumns().forEach(this._renderCell.bind(this));
     this.invalidateLayoutTree();
   }
 
-  _renderCell(column) {
+  protected _renderCell(column: Column) {
     let cell = this.table.cell(column, this.row);
     if (strings.empty(cell.text) && !cell.iconId) {
       return;
     }
 
-    let headerText;
+    let headerText: string;
     if (column.headerHtmlEnabled) {
       headerText = strings.plainText(column.text);
     } else {
@@ -67,7 +76,6 @@ export default class TableRowDetail extends Widget {
     }
 
     let cellText = column.cellTextForRowDetail(this.row);
-
     let $field = this.$container.appendDiv('table-row-detail-field');
     if (!strings.empty(headerText)) {
       $field.appendSpan('table-row-detail-name').text(headerText + ': ');
@@ -76,7 +84,7 @@ export default class TableRowDetail extends Widget {
     let iconId = cell.iconId;
     let hasCellText = !strings.empty(cellText);
     if (iconId) {
-      let $icon = $field.appendIcon(iconId, 'table-row-detail-icon');
+      let $icon = $field.appendIcon(iconId, 'table-row-detail-icon') as JQuery;
       $icon.toggleClass('with-text', hasCellText);
     }
     if (hasCellText) {
@@ -84,26 +92,23 @@ export default class TableRowDetail extends Widget {
     }
   }
 
-  _refreshRow() {
+  protected _refreshRow() {
     this.$container.empty();
     this._renderRow();
   }
 
-  _onTableRowsUpdated(event) {
+  protected _onTableRowsUpdated(event: TableRowsUpdatedEvent) {
     if (!this.rendered) {
       return;
     }
 
-    let row = arrays.find(event.rows, row => {
-      return row.id === this.row.id;
-    });
-
+    let rows = event.rows;
+    let row = arrays.find(rows, row => row.id === this.row.id);
     if (!row) {
       return;
     }
 
     this.row = row;
-
     this._refreshRow();
   }
 
@@ -111,7 +116,7 @@ export default class TableRowDetail extends Widget {
    * If the table is reloaded without reloading the corresponding nodes,
    * the insert events need to be handled to refresh the table row detail.
    */
-  _onTableRowsInserted(event) {
+  protected _onTableRowsInserted(event: TableRowsInsertedEvent) {
     if (!this.rendered) {
       return;
     }

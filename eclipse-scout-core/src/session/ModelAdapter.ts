@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, comparators, defaultValues, Event, EventEmitter, ModelAdapterEventMap, ModelAdapterModel, objects, ObjectWithType, Predicate, PropertyChangeEvent, PropertyChangeEventFilter, RemoteEvent, scout, Session, strings, Widget, WidgetEventTypeFilter} from '../index';
+import {
+  App, arrays, comparators, defaultValues, Event, EventEmitter, ModelAdapterEventMap, ModelAdapterModel, objects, ObjectWithType, Predicate, PropertyChangeEvent, PropertyChangeEventFilter, RemoteEvent, scout, Session, strings, Widget,
+  WidgetEventTypeFilter
+} from '../index';
 import $ from 'jquery';
 import EventListener from '../events/EventListener';
 import WidgetModel from '../widget/WidgetModel';
@@ -211,9 +214,9 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
    * @param type of event
    * @param data of event
    */
-  protected _send(type: string, data?: object, options?: ModelAdapterSendOptions) {
+  protected _send<Data extends Record<PropertyKey, any>>(type: string, data?: Data, options?: ModelAdapterSendOptions<Data>) {
     // Legacy fallback with all options as arguments
-    let opts = {} as ModelAdapterSendOptions;
+    let opts = {} as ModelAdapterSendOptions<Data>;
     if (arguments.length > 2) {
       if (options !== null && typeof options === 'object') {
         opts = options;
@@ -497,7 +500,7 @@ export interface ModelAdapterLike {
   exportAdapterData(adapterData: AdapterData): AdapterData;
 }
 
-export interface ModelAdapterSendOptions {
+export interface ModelAdapterSendOptions<Data> {
 
   /**
    * Delay in milliseconds before the event is sent. Default is 0.
@@ -507,7 +510,7 @@ export interface ModelAdapterSendOptions {
   /**
    * Coalesce function added to event-object. Default: none.
    */
-  coalesce?: Predicate<RemoteEvent>;
+  coalesce?(this: RemoteEvent & Data, event: RemoteEvent & Data): boolean;
 
   /**
    * Whether sending the event should block the UI after a certain delay.

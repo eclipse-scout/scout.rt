@@ -1,16 +1,73 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Cell, Column, Device, FilterFieldsGroupBox, graphics, HtmlComponent, NumberColumn, Point, Popup, RowLayout, scout, scrollbars, Table, TableHeaderMenuButton, TableHeaderMenuGroup, TableHeaderMenuLayout} from '../index';
+import {
+  AbstractLayout, arrays, Cell, Column, ColumnUserFilter, Device, EnumObject, Event, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, NumberColumn, Point, Popup, RowLayout, scout, scrollbars, Table, TableHeader,
+  TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuLayout, TableHeaderMenuModel
+} from '../index';
+import {NumberColumnAggregationFunction} from './columns/NumberColumn';
+import {TableRowData} from './TableRowModel';
+import {TableRowsCheckedEvent} from './TableEventMap';
 
-export default class TableHeaderMenu extends Popup {
+export default class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
+  declare model: TableHeaderMenuModel;
+  declare eventMap: TableHeaderMenuEventMap;
+
+  column: Column;
+  tableHeader: TableHeader;
+  compact: boolean;
+  table: Table;
+  filterTable: Table;
+  filter: ColumnUserFilter;
+  filterCheckedMode: TableHeaderMenuCheckedMode;
+  filterSortMode: TableHeaderMenuSortMode;
+  hasFilterTable: boolean;
+  hasFilterFields: boolean;
+  leftGroups: TableHeaderMenuGroup[];
+  moveGroup: TableHeaderMenuGroup;
+  hierarchyGroup: TableHeaderMenuGroup;
+  toBeginButton: TableHeaderMenuButton;
+  forwardButton: TableHeaderMenuButton;
+  backwardButton: TableHeaderMenuButton;
+  toEndButton: TableHeaderMenuButton;
+  sortingGroup: TableHeaderMenuGroup;
+  sortAscButton: TableHeaderMenuButton;
+  sortDescButton: TableHeaderMenuButton;
+  sortAscAddButton: TableHeaderMenuButton;
+  sortDescAddButton: TableHeaderMenuButton;
+  columnActionsGroup: TableHeaderMenuGroup;
+  addColumnButton: TableHeaderMenuButton;
+  removeColumnButton: TableHeaderMenuButton;
+  modifyColumnButton: TableHeaderMenuButton;
+  groupButton: TableHeaderMenuButton;
+  groupAddButton: TableHeaderMenuButton;
+  barChartButton: TableHeaderMenuButton;
+  colorGradient1Button: TableHeaderMenuButton;
+  colorGradient2Button: TableHeaderMenuButton;
+  filterFieldsGroupBox: FilterFieldsGroupBox;
+
+  $rightGroups: JQuery[];
+  $headerItem: JQuery;
+  $columnActions: JQuery;
+  $columnFilters: JQuery;
+  $filterTableGroup: JQuery;
+  $filterToggleChecked: JQuery;
+  $filterTableGroupTitle: JQuery;
+  $filterSortOrder: JQuery;
+  $filterFieldsGroup: JQuery;
+  $body: JQuery;
+
+  protected _onColumnMovedHandler: () => void;
+  protected _tableFilterHandler: () => void;
+  protected _tableHeaderScrollHandler: (event: JQuery.ScrollEvent) => void;
+  protected _filterTableRowsCheckedHandler: EventHandler<TableRowsCheckedEvent>;
 
   constructor() {
     super();
@@ -74,7 +131,7 @@ export default class TableHeaderMenu extends Popup {
       checkAll: false,
       text: 'ui.SelectNoneFilter'
     }
-  };
+  } as const;
 
   static SortMode = {
     ALPHABETICALLY: {
@@ -85,9 +142,9 @@ export default class TableHeaderMenu extends Popup {
       text: 'ui.SortByAmountFilter',
       cssClass: 'table-header-menu-toggle-sort-order-amount'
     }
-  };
+  } as const;
 
-  _init(options) {
+  protected override _init(options: TableHeaderMenuModel) {
     options.scrollType = options.scrollType || 'none';
     super._init(options);
 
@@ -98,7 +155,7 @@ export default class TableHeaderMenu extends Popup {
 
     this.table.on('columnMoved', this._onColumnMovedHandler);
     // Filtering
-    this.filter = this.table.getFilter(this.column.id);
+    this.filter = this.table.getFilter(this.column.id) as ColumnUserFilter;
     if (!this.filter) {
       this.filter = this.column.createFilter();
     }
@@ -118,11 +175,11 @@ export default class TableHeaderMenu extends Popup {
     }
   }
 
-  _createLayout() {
+  protected override _createLayout(): AbstractLayout {
     return new TableHeaderMenuLayout(this);
   }
 
-  _render() {
+  protected override _render() {
     this.leftGroups = [];
     this.$rightGroups = [];
 
@@ -150,9 +207,7 @@ export default class TableHeaderMenu extends Popup {
 
     // -- Left column -- //
     // Moving
-    let movableColumns = this.table.visibleColumns().filter(column => {
-      return !column.fixedPosition;
-    });
+    let movableColumns = this.table.visibleColumns().filter(column => !column.fixedPosition);
     if (movableColumns.length > 1 && !this.column.fixedPosition) {
       this.leftGroups.push(this._renderMovingGroup());
     }
@@ -171,7 +226,7 @@ export default class TableHeaderMenu extends Popup {
     }
 
     // Expand/Collapse
-    this.leftGroups.push(this._renderHierarchyGruop());
+    this.leftGroups.push(this._renderHierarchyGroup());
 
     // Aggregation
     if (this.table.isAggregationPossible(this.column)) {
@@ -200,7 +255,7 @@ export default class TableHeaderMenu extends Popup {
     }
   }
 
-  validateFocus() {
+  override validateFocus() {
     if (this.filterFieldsGroupBox) {
       this.filterFieldsGroupBox.focus();
     }
@@ -208,36 +263,30 @@ export default class TableHeaderMenu extends Popup {
     super.validateFocus();
   }
 
-  /**
-   * @override
-   */
-  get$Scrollable() {
+  override get$Scrollable(): JQuery {
     return this.$body;
   }
 
-  _updateFirstLast() {
-    addFirstLastClass(this.leftGroups.filter(group => {
-      return group.isVisible();
-    }));
+  protected _updateFirstLast() {
+    addFirstLastClass(this.leftGroups.filter(group => group.isVisible()));
     addFirstLastClass(this.$rightGroups);
 
-    function addFirstLastClass(groups) {
+    function addFirstLastClass(groups: (JQuery | TableHeaderMenuGroup)[]) {
       groups.forEach((group, index, arr) => {
         toggleCssClass(group, 'first', index === 0);
         toggleCssClass(group, 'last', index === arr.length - 1);
-      }, this);
+      });
     }
 
     // Note: we should refactor code for filter-fields and filter-table so they could also
-    // work with a model-class (like the button menu groups). Currently this would cause
-    // to much work.
-    function toggleCssClass(group, cssClass, condition) {
+    // work with a model-class (like the button menu groups). Currently this would cause to much work.
+    function toggleCssClass(group: JQuery | TableHeaderMenuGroup, cssClass: string, condition: boolean) {
       let $container = group instanceof TableHeaderMenuGroup ? group.$container : group;
       $container.toggleClass(cssClass, condition);
     }
   }
 
-  _remove() {
+  protected override _remove() {
     if (this.filterTable) {
       this.filterTable.off('rowsChecked', this._filterTableRowsCheckedHandler);
     }
@@ -256,7 +305,7 @@ export default class TableHeaderMenu extends Popup {
     }
   }
 
-  _renderMovingGroup() {
+  protected _renderMovingGroup(): TableHeaderMenuGroup {
     let table = this.table,
       column = this.column,
       pos = table.visibleColumns().indexOf(column);
@@ -310,7 +359,7 @@ export default class TableHeaderMenu extends Popup {
     return this.moveGroup;
   }
 
-  _onColumnMoved() {
+  protected _onColumnMoved() {
     let table = this.table,
       column = this.column;
 
@@ -330,11 +379,11 @@ export default class TableHeaderMenu extends Popup {
     this._updateFirstLast();
   }
 
-  _isColumnActionsGroupVisible() {
+  protected _isColumnActionsGroupVisible(): boolean {
     return this.table.columnAddable || this.column.removable || this.column.modifiable;
   }
 
-  _renderColumnActionsGroup() {
+  protected _renderColumnActionsGroup(): TableHeaderMenuGroup {
     let column = this.column,
       menuPopup = this;
 
@@ -370,7 +419,7 @@ export default class TableHeaderMenu extends Popup {
     this.columnActionsGroup.render(this.$columnActions);
     return this.columnActionsGroup;
 
-    function onClick(action) {
+    function onClick(action: string) {
       menuPopup.close();
       this.table.trigger('columnOrganizeAction', {
         action: action,
@@ -379,17 +428,7 @@ export default class TableHeaderMenu extends Popup {
     }
   }
 
-  onColumnActionsChanged(event) {
-    this.addColumnButton.setVisible(event.addVisible);
-    this.removeColumnButton.setVisible(event.removeVisible);
-    this.modifyColumnButton.setVisible(event.modifyVisible);
-    let groupVisible = this.columnActionsGroup.children.some(button => {
-      return button.visible;
-    });
-    this.columnActionsGroup.setVisible(groupVisible);
-  }
-
-  _renderSortingGroup() {
+  protected _renderSortingGroup(): TableHeaderMenuGroup {
     let table = this.table,
       column = this.column,
       menuPopup = this;
@@ -451,24 +490,21 @@ export default class TableHeaderMenu extends Popup {
       sort(this.direction, true, !this.selected);
     }
 
-    function sort(direction, multiSort, remove) {
+    function sort(direction: 'asc' | 'desc', multiSort: boolean, remove: boolean) {
       table.sort(column, direction, multiSort, remove);
       menuPopup._updateSortingSelectedState();
     }
   }
 
-  _updateSortingSelectedState() {
+  protected _updateSortingSelectedState() {
     if (!this.table.sortEnabled) {
       return;
     }
 
-    let addIcon,
-      showAddCommands = false,
+    let showAddCommands = false,
       sortCount = this._sortColumnCount();
 
-    this.sortingGroup.children.forEach(button => {
-      button.setSelected(false);
-    });
+    this.sortingGroup.children.forEach((button: TableHeaderMenuButton) => button.setSelected(false));
 
     if (sortCount === 1 && !this.table.hasPermanentHeadOrTailSortColumns()) {
       if (this.column.sortActive) {
@@ -488,7 +524,7 @@ export default class TableHeaderMenu extends Popup {
         } else {
           this.sortDescAddButton.setSelected(true);
         }
-        addIcon = this.column.sortIndex + 1;
+        let addIcon = (this.column.sortIndex + 1) + '';
         this.sortAscAddButton.setIconId(addIcon);
         this.sortDescAddButton.setIconId(addIcon);
       }
@@ -498,7 +534,7 @@ export default class TableHeaderMenu extends Popup {
     this.sortDescAddButton.setVisible(showAddCommands);
   }
 
-  _renderGroupingGroup() {
+  protected _renderGroupingGroup(): TableHeaderMenuGroup {
     let menuPopup = this,
       table = this.table,
       column = this.column,
@@ -547,7 +583,7 @@ export default class TableHeaderMenu extends Popup {
         this.groupAddButton.setSelected(true);
       } else if (groupCount > 1) {
         this.groupAddButton.setSelected(true);
-        this.groupAddButton.setIconId(this.column.sortIndex + 1);
+        this.groupAddButton.setIconId((this.column.sortIndex + 1) + '');
       }
     }
 
@@ -555,15 +591,14 @@ export default class TableHeaderMenu extends Popup {
     return group;
 
     function groupColumn() {
-      let direction = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
+      let direction: 'asc' | 'desc' = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
       menuPopup.close();
       table.groupColumn(column, this.additional, direction, !this.selected);
     }
   }
 
-  _renderHierarchyGruop() {
-    let table = this.table,
-      menuPopup = this;
+  protected _renderHierarchyGroup(): TableHeaderMenuGroup {
+    let table = this.table, menuPopup = this;
     this.hierarchyGroup = scout.create(TableHeaderMenuGroup, {
       parent: this,
       textKey: 'ui.Hierarchy',
@@ -574,9 +609,7 @@ export default class TableHeaderMenu extends Popup {
       parent: this.hierarchyGroup,
       text: '${textKey:ui.CollapseAll}',
       cssClass: 'hierarchy-collapse-all',
-      enabled: !!arrays.find(table.rows, row => {
-        return row.expanded && !arrays.empty(row.childRows);
-      })
+      enabled: !!arrays.find(table.rows, row => row.expanded && !arrays.empty(row.childRows))
     });
     collapseAllButton.on('action', () => {
       menuPopup.close();
@@ -587,9 +620,7 @@ export default class TableHeaderMenu extends Popup {
       parent: this.hierarchyGroup,
       text: '${textKey:ui.ExpandAll}',
       cssClass: 'hierarchy-expand-all',
-      enabled: !!arrays.find(table.rows, row => {
-        return !row.expanded && !arrays.empty(row.childRows);
-      })
+      enabled: !!arrays.find(table.rows, row => !row.expanded && !arrays.empty(row.childRows))
     });
     expandAllButton.on('action', () => {
       menuPopup.close();
@@ -600,9 +631,9 @@ export default class TableHeaderMenu extends Popup {
     return this.hierarchyGroup;
   }
 
-  _renderAggregationGroup() {
+  protected _renderAggregationGroup(): TableHeaderMenuGroup {
     let table = this.table,
-      column = this.column,
+      column = this.column as NumberColumn,
       aggregation = column.aggregationFunction,
       menuPopup = this,
       group = scout.create(TableHeaderMenuGroup, {
@@ -617,13 +648,11 @@ export default class TableHeaderMenu extends Popup {
     createHeaderMenuButtonForAggregationFunction('${textKey:ui.Minimum}', 'min');
     createHeaderMenuButtonForAggregationFunction('${textKey:ui.Maximum}', 'max');
 
-    group.children.forEach(button => {
-      button.setSelected(button.aggregation === aggregation);
-    });
+    group.children.forEach((button: TableHeaderMenuButton) => button.setSelected(button.aggregation === aggregation));
     group.render(this.$columnActions);
     return group;
 
-    function createHeaderMenuButtonForAggregationFunction(text, aggregation) {
+    function createHeaderMenuButtonForAggregationFunction(text: string, aggregation: NumberColumnAggregationFunction) {
       if (allowedAggregationFunctions.indexOf(aggregation) !== -1) {
         let aggrButton = scout.create(TableHeaderMenuButton, {
           parent: group,
@@ -642,9 +671,9 @@ export default class TableHeaderMenu extends Popup {
     }
   }
 
-  _renderColoringGroup() {
+  protected _renderColoringGroup(): TableHeaderMenuGroup {
     let table = this.table,
-      column = this.column,
+      column = this.column as NumberColumn,
       menuPopup = this,
       backgroundEffect = column.backgroundEffect,
       group = scout.create(TableHeaderMenuGroup, {
@@ -681,9 +710,7 @@ export default class TableHeaderMenu extends Popup {
       this.barChartButton.on('action', onClick.bind(this.barChartButton));
     }
 
-    group.children.forEach(button => {
-      button.setSelected(button.backgroundEffect === backgroundEffect);
-    });
+    group.children.forEach((button: TableHeaderMenuButton) => button.setSelected(button.backgroundEffect === backgroundEffect));
     group.render(this.$columnActions);
     return group;
 
@@ -693,15 +720,13 @@ export default class TableHeaderMenu extends Popup {
     }
   }
 
-  _renderFilterTable() {
-    let $filterActions;
-
+  protected _renderFilterTable(): JQuery {
     this.$filterTableGroup = this.$columnFilters
       .appendDiv('table-header-menu-group first');
     let htmlComp = HtmlComponent.install(this.$filterTableGroup, this.session);
     htmlComp.setLayout(new RowLayout());
 
-    $filterActions = this.$filterTableGroup
+    let $filterActions = this.$filterTableGroup
       .appendDiv('table-header-menu-filter-actions');
 
     this.$filterSortOrder = $filterActions
@@ -721,9 +746,9 @@ export default class TableHeaderMenu extends Popup {
 
     this.filterTable = this._createFilterTable();
     this.filterTable.on('rowsChecked', this._filterTableRowsCheckedHandler);
-    let tableRow, tableRows = [];
-    this.filter.availableValues.forEach(function(filterValue) {
-      tableRow = {
+    let tableRows: TableRowData[] = [];
+    this.filter.availableValues.forEach(filterValue => {
+      let tableRow: TableRowData = {
         cells: [
           scout.create(Cell, {
             text: (this.filter.column instanceof NumberColumn) ? filterValue.text : null,
@@ -741,7 +766,7 @@ export default class TableHeaderMenu extends Popup {
         }
       };
       tableRows.push(tableRow);
-    }, this);
+    });
     this.filterTable.insertRows(tableRows);
     this.filterTable.render(this.$filterTableGroup);
 
@@ -751,7 +776,7 @@ export default class TableHeaderMenu extends Popup {
     return this.$filterTableGroup;
   }
 
-  _createFilterTable() {
+  protected _createFilterTable(): Table {
     let objectType = Column;
     if (this.column instanceof NumberColumn) {
       objectType = NumberColumn;
@@ -790,30 +815,28 @@ export default class TableHeaderMenu extends Popup {
   }
 
   /**
-   * @returns {string} the title-text used for the filter-table
+   * @returns the title-text used for the filter-table
    */
-  _filterByText() {
+  protected _filterByText(): string {
     let text = this.session.text('ui.Filter'),
       numSelected = this.filter.selectedValues.length,
       numFilters = this.filter.availableValues.length;
 
     if (numSelected && numFilters) {
-      text += ' ' + this.session.text('ui.FilterInfoXOfY', numSelected, numFilters);
+      text += ' ' + this.session.text('ui.FilterInfoXOfY', numSelected + '', numFilters + '');
     } else if (numFilters) {
-      text += ' ' + this.session.text('ui.FilterInfoCount', numFilters);
+      text += ' ' + this.session.text('ui.FilterInfoCount', numFilters + '');
     }
     return text;
   }
 
-  _onFilterCheckedModeClick() {
+  protected _onFilterCheckedModeClick() {
     let checkedMode = TableHeaderMenu.CheckedMode;
     let checkAll = this.filterCheckedMode.checkAll;
     this.filter.selectedValues = [];
     if (this.filterCheckedMode === checkedMode.ALL) {
       this.filterCheckedMode = checkedMode.NONE;
-      this.filter.availableValues.forEach(function(filterValue) {
-        this.filter.selectedValues.push(filterValue.key);
-      }, this);
+      this.filter.availableValues.forEach(filterValue => this.filter.selectedValues.push(filterValue.key));
     } else {
       this.filterCheckedMode = checkedMode.ALL;
     }
@@ -821,7 +844,7 @@ export default class TableHeaderMenu extends Popup {
     this._updateFilterTableActions();
   }
 
-  _onSortModeClick() {
+  protected _onSortModeClick() {
     let sortMode = TableHeaderMenu.SortMode;
     if (this.filterSortMode === sortMode.ALPHABETICALLY) {
       // sort by amount
@@ -836,7 +859,7 @@ export default class TableHeaderMenu extends Popup {
     this._updateFilterTableActions();
   }
 
-  _updateFilterTable() {
+  protected _updateFilterTable() {
     if (this.filter.filterActive()) {
       this.table.addFilter(this.filter);
     } else {
@@ -844,7 +867,7 @@ export default class TableHeaderMenu extends Popup {
     }
   }
 
-  _updateFilterTableActions() {
+  protected _updateFilterTableActions() {
     // checked mode
     this.$filterToggleChecked.text(this.session.text(this.filterCheckedMode.text));
     // sort mode
@@ -854,7 +877,7 @@ export default class TableHeaderMenu extends Popup {
     this.$filterSortOrder.toggleClass(sortMode.AMOUNT.cssClass, !sortAlphabetically);
   }
 
-  _renderFilterFields() {
+  protected _renderFilterFields(): JQuery {
     this.filterFieldsGroupBox = scout.create(FilterFieldsGroupBox, {
       parent: this,
       column: this.column,
@@ -871,70 +894,66 @@ export default class TableHeaderMenu extends Popup {
     return this.$filterFieldsGroup;
   }
 
-  isOpenFor($headerItem) {
+  isOpenFor($headerItem: JQuery): boolean {
     return this.rendered && this.belongsTo($headerItem);
   }
 
-  _countColumns(propertyName) {
-    return this.table.visibleColumns().reduce((sum, column) => {
-      return sum + (column[propertyName] ? 1 : 0);
-    }, 0);
+  protected _countColumns(propertyName: string): number {
+    return this.table.visibleColumns().reduce((sum, column) => sum + (column[propertyName] ? 1 : 0), 0);
   }
 
-  _sortColumnCount() {
+  protected _sortColumnCount(): number {
     return this._countColumns('sortActive');
   }
 
-  _groupColumnCount() {
+  protected _groupColumnCount(): number {
     return this._countColumns('grouped');
   }
 
-  _renderCompact() {
+  protected _renderCompact() {
     this.$body.toggleClass('compact', this.compact);
     this.invalidateLayoutTree();
   }
 
-  setCompact(compact) {
+  setCompact(compact: boolean) {
     this.setProperty('compact', compact);
   }
 
-  _onLocationChange(event) {
-    let inView, containerBounds,
-      isLocationInView = scrollbars.isLocationInView,
-      headerItemBounds = graphics.offsetBounds(this.$headerItem),
+  protected _onLocationChange(event: Event<Popup>) {
+    let headerItemBounds = graphics.offsetBounds(this.$headerItem),
       $tableHeaderContainer = this.tableHeader.$container;
 
     this.$container.setVisible(true);
-    containerBounds = graphics.offsetBounds(this.$container);
+    let containerBounds = graphics.offsetBounds(this.$container);
 
     // menu must only be visible if the header item is in view (menu gets repositioned when the table gets scrolled -> make sure it won't be displayed outside of the table)
     // check left side of the header item (necessary if header item is moved outside on the left side of the table)
-    inView = isLocationInView(new Point(headerItemBounds.x, headerItemBounds.y), $tableHeaderContainer);
+    let inView = scrollbars.isLocationInView(new Point(headerItemBounds.x, headerItemBounds.y), $tableHeaderContainer);
     if (!inView) {
       // if left side of the header is not in view, check if right side of the header and the menu, both must be visible)
       // check right side of the header item (necessary if header item is moved outside on the right side of the table)
-      inView = isLocationInView(new Point(headerItemBounds.x + headerItemBounds.width, headerItemBounds.y + headerItemBounds.height), $tableHeaderContainer);
+      inView = scrollbars.isLocationInView(new Point(headerItemBounds.x + headerItemBounds.width, headerItemBounds.y + headerItemBounds.height), $tableHeaderContainer);
       // check right side of the menu (necessary if header item is larger than menu, and if header item is moved outside on the left side of the table)
-      inView = inView && isLocationInView(new Point(containerBounds.x + containerBounds.width, containerBounds.y), $tableHeaderContainer);
+      inView = inView && scrollbars.isLocationInView(new Point(containerBounds.x + containerBounds.width, containerBounds.y), $tableHeaderContainer);
     }
     this.$container.setVisible(inView);
   }
 
-  _onAnchorScroll(event) {
+  protected override _onAnchorScroll(event: JQuery.ScrollEvent) {
     this.position();
   }
 
-  _onFilterTableRowsChecked(event) {
+  protected _onFilterTableRowsChecked(event: TableRowsCheckedEvent) {
     this.filter.selectedValues = [];
-    this.filterTable.rows.forEach(function(row) {
+    this.filterTable.rows.forEach(row => {
       if (row.checked) {
         this.filter.selectedValues.push(row.dataMap.filterValue.key);
       }
-    }, this);
+    });
     this._updateFilterTable();
   }
 
-  _onFilterTableChanged() {
+  protected _onFilterTableChanged() {
     this.$filterTableGroupTitle.text(this._filterByText());
     this._updateFilterTableCheckedMode();
     this._updateFilterTableActions();
@@ -942,7 +961,7 @@ export default class TableHeaderMenu extends Popup {
 
   // When no filter value is selected, we change the selection mode to ALL
   // since it makes no sense to choose NONE when no value is currently selected
-  _updateFilterTableCheckedMode() {
+  protected _updateFilterTableCheckedMode() {
     if (this.filter.selectedValues.length === 0) {
       this.filterCheckedMode = TableHeaderMenu.CheckedMode.ALL;
     } else {
@@ -950,11 +969,14 @@ export default class TableHeaderMenu extends Popup {
     }
   }
 
-  _onMouseDownOutside(event) {
+  protected override _onMouseDownOutside(event: MouseEvent) {
     // close popup only if source of event is not $headerItem or one of it's children.
-    if (this.$headerItem.isOrHas(event.target)) {
+    if (this.$headerItem.isOrHas(event.target as HTMLElement)) {
       return;
     }
     this.close();
   }
 }
+
+export type TableHeaderMenuCheckedMode = EnumObject<typeof TableHeaderMenu.CheckedMode>;
+export type TableHeaderMenuSortMode = EnumObject<typeof TableHeaderMenu.SortMode>;

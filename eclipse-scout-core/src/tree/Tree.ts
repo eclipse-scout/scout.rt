@@ -9,9 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, ContextMenuPopup, Desktop, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, EnumObject, Event, FilterResult, FilterSupport, graphics, HtmlComponent, KeyStroke, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu,
-  MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, objects, Popup, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeLayout,
-  TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
+  arrays, ContextMenuPopup, Desktop, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, EnumObject, Event, EventHandler, FilterResult, FilterSupport, graphics, HtmlComponent, KeyStroke, KeyStrokeContext, keyStrokeModifier,
+  LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, objects, Popup, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke,
+  TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
 } from '../index';
 import $ from 'jquery';
 import {FilterOrFunction} from '../widget/FilterSupport';
@@ -98,7 +98,7 @@ export default class Tree extends Widget implements TreeModel {
   protected _$animationWrapper: JQuery;
   protected _$expandAnimationWrappers: JQuery[];
   protected _filterMenusHandler: MenuFilter;
-  protected _popupOpenHandler: (event: Event<Desktop> & { popup: Popup }) => void; // FIXME TS: add PopupOpenEvent as soon as Desktop has been migrated
+  protected _popupOpenHandler: EventHandler<Event<Desktop> & { popup: Popup }>; // FIXME TS: add PopupOpenEvent as soon as Desktop has been migrated
   /** contains all parents of a selected node, the selected node and the first level children */
   protected _inSelectionPathList: Record<string, boolean>;
   protected _scrollDirections: ScrollDirection;

@@ -1,37 +1,39 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, FormTableControlLayout, GroupBox, TabBox, TableControl} from '../../index';
+import {Event, EventHandler, Form, FormTableControlEventMap, FormTableControlLayout, FormTableControlModel, GroupBox, TabBox, TableControl} from '../../index';
+import AbstractLayout from '../../layout/AbstractLayout';
 
-export default class FormTableControl extends TableControl {
+export default class FormTableControl extends TableControl implements FormTableControlModel {
+  declare model: FormTableControlModel;
+  declare eventMap: FormTableControlEventMap;
+
+  form: Form;
+  protected _formDestroyedHandler: EventHandler<Event<Form>>;
 
   constructor() {
     super();
     this._addWidgetProperties('form');
-
     this._formDestroyedHandler = this._onFormDestroyed.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model: FormTableControlModel) {
     super._init(model);
     this._setForm(this.form);
   }
 
-  /**
-   * @return {FormTableControlLayout}
-   */
-  _createLayout() {
+  protected override _createLayout(): AbstractLayout {
     return new FormTableControlLayout(this);
   }
 
-  _renderContent($parent) {
+  protected override _renderContent($parent: JQuery) {
     this.form.renderInitialFocusEnabled = false;
     this.form.render($parent);
 
@@ -47,28 +49,28 @@ export default class FormTableControl extends TableControl {
     this.form.htmlComp.validateLayout();
   }
 
-  _removeContent() {
+  protected override _removeContent() {
     if (this.form) {
       this.form.remove();
     }
   }
 
-  _removeForm() {
+  protected _removeForm() {
     this.removeContent();
   }
 
-  _renderForm(form) {
+  protected _renderForm(form: Form) {
     this.renderContent();
   }
 
   /**
    * Returns true if the table control may be displayed (opened).
    */
-  isContentAvailable() {
+  override isContentAvailable(): boolean {
     return !!this.form;
   }
 
-  _setForm(form) {
+  protected _setForm(form: Form) {
     if (this.form) {
       this.form.off('destroy', this._formDestroyedHandler);
     }
@@ -79,7 +81,7 @@ export default class FormTableControl extends TableControl {
     this._setProperty('form', form);
   }
 
-  _adaptForm(form) {
+  protected _adaptForm(form: Form) {
     form.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
     form.setDisplayHint(Form.DisplayHint.VIEW);
     form.setModal(false);
@@ -87,14 +89,14 @@ export default class FormTableControl extends TableControl {
     form.setClosable(false);
   }
 
-  onControlContainerOpened() {
+  override onControlContainerOpened() {
     if (!this.form || !this.form.rendered) {
       return;
     }
     this.form.renderInitialFocus();
   }
 
-  _onFormDestroyed(event) {
+  protected _onFormDestroyed(event: Event<Form>) {
     // Called when the inner form is destroyed --> unlink it from this table control
     this._removeForm();
     this._setForm(null);

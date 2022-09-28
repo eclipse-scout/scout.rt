@@ -1,19 +1,28 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {graphics} from '../../index';
+import {Column, graphics, Table, TableRow} from '../../index';
 import $ from 'jquery';
+import {AggregateTableRow} from '../Table';
 
 export default class ColumnOptimalWidthMeasurer {
+  column: Column;
+  table: Table;
+  deferred: JQuery.Deferred<number>;
+  imageCount: number;
+  completeImageCount: number;
+  $measurement: JQuery;
+  protected _imageLoadOrErrorHandler: (Event) => void;
+  protected _columnCellContents: Record<string, boolean>;
 
-  constructor(column) {
+  constructor(column: Column) {
     this.column = column;
     this.table = null;
     this.$measurement = null;
@@ -24,7 +33,7 @@ export default class ColumnOptimalWidthMeasurer {
     this._columnCellContents = {};
   }
 
-  measure(promise) {
+  measure(): number | JQuery.Promise<number> {
     $.log.isDebugEnabled() && $.log.debug('Optimal width measuring started for column ' + this.column.id);
 
     // Table is not yet available on the column in the constructor -> set it here
@@ -76,7 +85,7 @@ export default class ColumnOptimalWidthMeasurer {
     this.$measurement = null;
   }
 
-  _measure() {
+  protected _measure(): number {
     let maxWidth = this.column.minWidth;
     let maxOverlap = 0;
     // Since the measurement may be async due to image loading, the $measurement is hidden (=display: none) until the real measurement starts.
@@ -94,7 +103,7 @@ export default class ColumnOptimalWidthMeasurer {
     return maxWidth + maxOverlap;
   }
 
-  _resolve(optimalWidth) {
+  protected _resolve(optimalWidth: number) {
     this.remove();
     if (this.deferred) {
       this.deferred.resolve(optimalWidth);
@@ -102,24 +111,24 @@ export default class ColumnOptimalWidthMeasurer {
     }
   }
 
-  _appendElements() {
+  protected _appendElements() {
     this._appendHeader();
     this._appendRows();
     this._appendAggregateRows();
   }
 
-  _appendHeader() {
+  protected _appendHeader() {
     if (this.column.$header) {
       this._appendToMeasurement(this.column.$header.clone());
     }
   }
 
-  _appendRows() {
+  protected _appendRows() {
     this.table.rows.forEach(this._appendRow.bind(this));
     this._columnCellContents = {};
   }
 
-  _appendRow(row) {
+  protected _appendRow(row: TableRow) {
     let columnContent = this.column.buildCellForRow(row);
     if (this._columnCellContents[columnContent]) {
       return;
@@ -129,11 +138,12 @@ export default class ColumnOptimalWidthMeasurer {
     this._appendToMeasurement($(columnContent));
   }
 
-  _appendAggregateRows() {
+  protected _appendAggregateRows() {
+    // @ts-ignore
     this.table._aggregateRows.forEach(this._appendAggregateRow.bind(this));
   }
 
-  _appendAggregateRow(row) {
+  protected _appendAggregateRow(row: AggregateTableRow) {
     this._appendToMeasurement(this._build$CellForAggregateRow(row));
   }
 
@@ -142,11 +152,12 @@ export default class ColumnOptimalWidthMeasurer {
    * To ensure there is enough space for the content of this cell, the overlap of the neighbour must be included.
    * To have access to neighbour cells and to measure its sizes the whole aggregate row must be constructed.
    *
-   * @returns {$} The created cell
+   * @returns The created cell
    */
-  _build$CellForAggregateRow(row) {
+  protected _build$CellForAggregateRow(row: AggregateTableRow): JQuery {
     let columns = this.table.visibleColumns();
     let colIndex = columns.indexOf(this.column);
+    // @ts-ignore
     let $row = this.table._build$AggregateRow(row);
 
     $row.appendTo(this.table.$data);
@@ -166,13 +177,14 @@ export default class ColumnOptimalWidthMeasurer {
 
   /**
    * Compute how much the neighbour cell overlaps into the given cell.
-   * @param {$} $cell The cell for which the overlap should be computed
-   * @returns {number} The overlap in pixels.
+   * @param $cell The cell for which the overlap should be computed
+   * @returns The overlap in pixels.
    */
-  _getAggregateOverlap($cell) {
+  protected _getAggregateOverlap($cell: JQuery): number {
     if (!$cell || !$cell.length || $cell.hasClass('empty')) {
       return 0;
     }
+    // @ts-ignore
     let cellRange = this.table._getAggrCellRange($cell);
     if (cellRange.length < 2) {
       return 0;
@@ -198,10 +210,10 @@ export default class ColumnOptimalWidthMeasurer {
     return Math.max(0, overlap);
   }
 
-  _appendToMeasurement($calc) {
+  protected _appendToMeasurement($calc: JQuery) {
     // Count images
-    let $calcImgs = $calc.find('img');
-    $calcImgs.each((index, elem) => {
+    let $calcImages = $calc.find('img');
+    $calcImages.each((index, elem) => {
       let $img = $(elem);
       $img.data('measure', 'in-progress');
       if (elem.complete) {
@@ -218,7 +230,7 @@ export default class ColumnOptimalWidthMeasurer {
     }).appendTo(this.$measurement);
   }
 
-  _onImageLoadOrError(event) {
+  protected _onImageLoadOrError(event: Event) {
     let $img = $(event.target);
     if ($img.data('complete')) {
       // Ignore images which were already complete and therefore already incremented the _imageCompleteCount
@@ -226,6 +238,7 @@ export default class ColumnOptimalWidthMeasurer {
     }
 
     this.completeImageCount++;
+    // @ts-ignore
     $.log.isTraceEnabled() && $.log.trace('Images complete (async) ' + this.completeImageCount + '/' + this.imageCount, event.target.src);
     if (this.completeImageCount >= this.imageCount) {
       let optimalWidth = this._measure();

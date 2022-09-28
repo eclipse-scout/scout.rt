@@ -10,6 +10,7 @@
  */
 import {Widget, WidgetModel} from '../index';
 import {GroupCollapseStyle} from './Group';
+import {RefModel} from '../types';
 
 export default interface GroupModel extends WidgetModel {
   collapsed?: boolean;
@@ -38,7 +39,7 @@ export default interface GroupModel extends WidgetModel {
    * The body will be rendered when the group is expanded, so having a body is required.
    * Default is null.
    */
-  body?: Widget;
+  body?: Widget | RefModel<WidgetModel>;
 
   collapseStyle?: GroupCollapseStyle;
 

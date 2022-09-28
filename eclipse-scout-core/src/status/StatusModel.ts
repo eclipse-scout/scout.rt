@@ -18,4 +18,5 @@ export default interface StatusModel {
   code?: number;
   children?: Status[];
   deletable?: boolean;
+  uiState?: string;
 }

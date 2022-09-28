@@ -1034,9 +1034,9 @@ export default class DateFormat {
     };
   }
 
-  static ensure(locale: Locale, format: string | DateFormat) {
+  static ensure(locale: Locale, format: string | DateFormat): DateFormat {
     if (!format) {
-      return format;
+      return format as DateFormat;
     }
     if (format instanceof DateFormat) {
       return format;

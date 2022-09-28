@@ -1,16 +1,46 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
+import {AggregateTableRow} from './Table';
+import {Cell, EnumObject, LookupRow, Table, TableRowModel} from '../index';
 
-export default class TableRow {
+export type TableRowStatus = EnumObject<typeof TableRow.Status>;
+
+export default class TableRow implements TableRowModel {
+  declare model: TableRowModel;
+
+  cells: Cell[];
+  checked: boolean;
+  compactValue: string;
+  enabled: boolean;
+  filterAccepted: boolean;
+  height: number;
+  hasError: boolean;
+  id: string;
+  initialized: boolean;
+  iconId: string;
+  parentRow: TableRow;
+  parent: Table;
+  childRows: TableRow[];
+  expanded: boolean;
+  status: TableRowStatus;
+  dataMap?: Record<PropertyKey, any>;
+  hierarchyLevel: number;
+  cssClass: string;
+  aggregateRowAfter: AggregateTableRow;
+  aggregateRowBefore: AggregateTableRow;
+  lookupRow: LookupRow<any>;
+  $row: JQuery;
+
+  protected _expandable: boolean;
 
   constructor() {
     this.$row = null;
@@ -36,14 +66,14 @@ export default class TableRow {
     NON_CHANGED: 'nonChanged',
     INSERTED: 'inserted',
     UPDATED: 'updated'
-  };
+  } as const;
 
-  init(model) {
+  init(model: TableRowModel) {
     this._init(model);
     this.initialized = true;
   }
 
-  _init(model) {
+  protected _init(model: TableRowModel) {
     if (!model.parent) {
       throw new Error('missing property \'parent\'');
     }
@@ -51,23 +81,22 @@ export default class TableRow {
     this._initCells();
   }
 
-  _initCells() {
-    this.getTable().columns.forEach(function(column) {
+  protected _initCells() {
+    this.getTable().columns.forEach(column => {
       if (!column.guiOnly) {
         let cell = this.cells[column.index];
         cell = column.initCell(cell, this);
         this.cells[column.index] = cell;
       }
-    }, this);
+    });
   }
 
   animateExpansion() {
-    let $row = this.$row,
-      $rowControl;
+    let $row = this.$row;
     if (!$row) {
       return;
     }
-    $rowControl = $row.find('.table-row-control');
+    let $rowControl = $row.find('.table-row-control');
     if (this.expanded) {
       $rowControl.addClassForAnimation('expand-rotate');
     } else {
@@ -75,21 +104,19 @@ export default class TableRow {
     }
   }
 
-  hasFilterAcceptedChildren() {
-    return this.childRows.some(childRow => {
-      return childRow.filterAccepted || childRow.hasFilterAcceptedChildren();
-    });
+  hasFilterAcceptedChildren(): boolean {
+    return this.childRows.some(childRow => childRow.filterAccepted || childRow.hasFilterAcceptedChildren());
   }
 
-  getTable() {
+  getTable(): Table {
     return this.parent;
   }
 
-  setCompactValue(compactValue) {
+  setCompactValue(compactValue: string) {
     this.compactValue = compactValue;
   }
 
-  setFilterAccepted(filterAccepted) {
+  setFilterAccepted(filterAccepted: boolean) {
     this.filterAccepted = filterAccepted;
   }
 }

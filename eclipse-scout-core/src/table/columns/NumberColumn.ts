@@ -1,17 +1,47 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {aggregation, Cell, Column, comparators, DecimalFormat, NumberField, numbers, objects, scout, strings, styles} from '../../index';
+import {aggregation, Cell, Column, comparators, DecimalFormat, Locale, NumberColumnEventMap, NumberColumnModel, NumberField, numbers, objects, scout, strings, styles, TableRow} from '../../index';
 import $ from 'jquery';
+import {DecimalFormatOptions} from '../../text/DecimalFormat';
+import {AvgAggregationState} from '../../util/aggregation';
+import {Rgba} from '../../util/styles';
 
-export default class NumberColumn extends Column {
+export type NumberColumnAggregationFunction = 'sum' | 'avg' | 'min' | 'max' | 'none';
+export type NumberColumnBackgroundEffect = 'colorGradient1' | 'colorGradient2' | 'barChart';
+export type NumberColumnBackgroundStyle = { backgroundColor?: string; backgroundImage?: string };
+export type NumberColumnBackgroundEffectFunc = (value: number) => NumberColumnBackgroundStyle;
+
+export default class NumberColumn extends Column implements NumberColumnModel {
+  declare model: NumberColumnModel;
+  declare eventMap: NumberColumnEventMap;
+
+  aggregationFunction: NumberColumnAggregationFunction;
+  backgroundEffect: NumberColumnBackgroundEffect;
+  decimalFormat: DecimalFormat;
+  minValue: number;
+  maxValue: number;
+
+  /** the calculated min value of all rows */
+  calcMinValue: number;
+
+  /** the calculated max value of all rows */
+  calcMaxValue: number;
+
+  allowedAggregationFunctions: NumberColumnAggregationFunction[];
+
+  aggrStart: () => number | AvgAggregationState;
+  aggrStep: (currentState?: number | AvgAggregationState, newVal?: number) => number | AvgAggregationState;
+  aggrFinish: (currentState?: number | AvgAggregationState) => number;
+  aggrSymbol: string;
+  backgroundEffectFunc: NumberColumnBackgroundEffectFunc;
 
   constructor() {
     super();
@@ -20,8 +50,8 @@ export default class NumberColumn extends Column {
     this.decimalFormat = null;
     this.minValue = null;
     this.maxValue = null;
-    this.calcMinValue = null; // the calculated min value of all rows
-    this.calcMaxValue = null; // the calculated max value of all rows
+    this.calcMinValue = null;
+    this.calcMaxValue = null;
     this.horizontalAlignment = 1;
     this.filterType = 'NumberColumnUserFilter';
     this.comparator = comparators.NUMERIC;
@@ -29,57 +59,46 @@ export default class NumberColumn extends Column {
     this.allowedAggregationFunctions = ['sum', 'avg', 'min', 'max', 'none'];
   }
 
-  /**
-   * @override Column.js
-   */
-  _init(model) {
+  protected override _init(model: NumberColumnModel) {
     super._init(model);
     this._setDecimalFormat(this.decimalFormat);
     this._setAggregationFunction(this.aggregationFunction);
   }
 
-  setDecimalFormat(decimalFormat) {
+  setDecimalFormat(decimalFormat: DecimalFormat | string | DecimalFormatOptions) {
     this.setProperty('decimalFormat', decimalFormat);
   }
 
-  _setDecimalFormat(decimalFormat) {
+  protected _setDecimalFormat(decimalFormat: DecimalFormat | string | DecimalFormatOptions) {
     if (!decimalFormat) {
       decimalFormat = this._getDefaultFormat(this.session.locale);
     }
-    decimalFormat = DecimalFormat.ensure(this.session.locale, decimalFormat);
-    this._setProperty('decimalFormat', decimalFormat);
+    let format = DecimalFormat.ensure(this.session.locale, decimalFormat);
+    this._setProperty('decimalFormat', format);
     if (this.initialized) {
       // if format changes on the fly, just update the cell text
-      this.table.rows.forEach(row => {
-        this._updateCellText(row, this.cell(row));
-      });
+      this.table.rows.forEach(row => this._updateCellText(row, this.cell(row)));
     }
   }
 
-  _getDefaultFormat(locale) {
+  protected _getDefaultFormat(locale: Locale): string {
     return locale.decimalFormatPatternDefault;
   }
 
-  /**
-   * @override Columns.js
-   */
-  _formatValue(value, row) {
+  protected override _formatValue(value: number, row?: TableRow): string {
     return this.decimalFormat.format(value);
   }
 
-  /**
-   * @override Column.js
-   */
-  _parseValue(value) {
+  protected override _parseValue(value: number | string): number {
     // server sends cell.value only if it differs from text -> make sure cell.value is set and has the right type
     return numbers.ensure(value);
   }
 
-  setAggregationFunction(aggregationFunction) {
+  setAggregationFunction(aggregationFunction: NumberColumnAggregationFunction) {
     this.setProperty('aggregationFunction', aggregationFunction);
   }
 
-  _setAggregationFunction(func) {
+  protected _setAggregationFunction(func: NumberColumnAggregationFunction) {
     this._setProperty('aggregationFunction', func);
     if (func === 'sum') {
       this.aggrStart = aggregation.sumStart;
@@ -110,7 +129,7 @@ export default class NumberColumn extends Column {
     }
   }
 
-  createAggrValueCell(value) {
+  override createAggrValueCell(value: number): Cell {
     let formattedValue = this._formatValue(value);
     return scout.create(Cell, {
       text: formattedValue,
@@ -121,7 +140,7 @@ export default class NumberColumn extends Column {
     });
   }
 
-  _cellStyle(cell, tableNodeColumn, rowPadding) {
+  protected override _cellStyle(cell: Cell, tableNodeColumn?: boolean, rowPadding?: number): string {
     let style = super._cellStyle(cell, tableNodeColumn, rowPadding);
     if (!this.backgroundEffect || cell.value === undefined || strings.contains(cell.cssClass, 'table-aggregate-cell')) {
       return style;
@@ -139,14 +158,11 @@ export default class NumberColumn extends Column {
     return style;
   }
 
-  /**
-   * @override Column.js
-   */
-  _preprocessValueOrTextForCalculation(value) {
+  protected override _preprocessValueOrTextForCalculation(value: number, cell?: Cell): number {
     return this.decimalFormat.round(value);
   }
 
-  setBackgroundEffect(backgroundEffect) {
+  setBackgroundEffect(backgroundEffect: NumberColumnBackgroundEffect) {
     let changed = this.setProperty('backgroundEffect', backgroundEffect);
     if (!changed) {
       return;
@@ -184,7 +200,7 @@ export default class NumberColumn extends Column {
     }
   }
 
-  _resolveBackgroundEffectFunc() {
+  protected _resolveBackgroundEffectFunc(): NumberColumnBackgroundEffectFunc {
     let effect = this.backgroundEffect;
     if (effect === 'colorGradient1') {
       return this._colorGradient1.bind(this);
@@ -202,8 +218,8 @@ export default class NumberColumn extends Column {
     }
   }
 
-  _renderBackgroundEffect() {
-    this.table.visibleRows.forEach(function(row) {
+  protected _renderBackgroundEffect() {
+    this.table.visibleRows.forEach(row => {
       if (!row.$row) {
         return;
       }
@@ -213,16 +229,16 @@ export default class NumberColumn extends Column {
       if (cell.value !== undefined) {
         $cell[0].style.cssText = this._cellStyle(cell);
       }
-    }, this);
+    });
   }
 
   calculateMinMaxValues() {
-    let row, calcMinValue, calcMaxValue, value,
+    let calcMinValue: number, calcMaxValue: number,
       rows = this.table.rows;
 
     for (let i = 0; i < rows.length; i++) {
-      row = rows[i];
-      value = this.cellValueOrTextForCalculation(row);
+      let row = rows[i];
+      let value = this.cellValueOrTextForCalculation(row) as number;
 
       if (value < calcMinValue || calcMinValue === undefined) {
         calcMinValue = value;
@@ -235,7 +251,7 @@ export default class NumberColumn extends Column {
     this.calcMaxValue = scout.nvl(calcMaxValue, null);
   }
 
-  _colorGradient1(value) {
+  protected _colorGradient1(value: number): NumberColumnBackgroundStyle {
     let startStyle = styles.get('column-background-effect-gradient1-start', 'backgroundColor'),
       endStyle = styles.get('column-background-effect-gradient1-end', 'backgroundColor'),
       startColor = styles.rgb(startStyle.backgroundColor),
@@ -244,7 +260,7 @@ export default class NumberColumn extends Column {
     return this._colorGradient(value, startColor, endColor);
   }
 
-  _colorGradient2(value) {
+  protected _colorGradient2(value: number): NumberColumnBackgroundStyle {
     let startStyle = styles.get('column-background-effect-gradient2-start', 'backgroundColor'),
       endStyle = styles.get('column-background-effect-gradient2-end', 'backgroundColor'),
       startColor = styles.rgb(startStyle.backgroundColor),
@@ -253,7 +269,7 @@ export default class NumberColumn extends Column {
     return this._colorGradient(value, startColor, endColor);
   }
 
-  _colorGradient(value, startColor, endColor) {
+  protected _colorGradient(value: number, startColor: Rgba, endColor: Rgba): NumberColumnBackgroundStyle {
     let level = (value - this.calcMinValue) / (this.calcMaxValue - this.calcMinValue);
 
     let r = Math.ceil(startColor.red - level * (startColor.red - endColor.red)),
@@ -265,7 +281,7 @@ export default class NumberColumn extends Column {
     };
   }
 
-  _barChart(value) {
+  protected _barChart(value: number): NumberColumnBackgroundStyle {
     let level = Math.ceil((value - this.calcMinValue) / (this.calcMaxValue - this.calcMinValue) * 100) + '';
     let color = styles.get('column-background-effect-bar-chart', 'backgroundColor').backgroundColor;
     return {
@@ -273,10 +289,7 @@ export default class NumberColumn extends Column {
     };
   }
 
-  /**
-   * @override Column.js
-   */
-  _createEditor(row) {
+  protected override _createEditor(row: TableRow): NumberField {
     return scout.create(NumberField, {
       parent: this.table,
       maxValue: this.maxValue,
@@ -285,7 +298,7 @@ export default class NumberColumn extends Column {
     });
   }
 
-  _hasCellValue(cell) {
+  protected override _hasCellValue(cell: Cell): boolean {
     return !objects.isNullOrUndefined(cell.value); // Zero (0) is valid too
   }
 }

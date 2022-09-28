@@ -8,11 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, Event, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel} from '../index';
+import {
+  Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, Event, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext,
+  LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+} from '../index';
 import * as $ from 'jquery';
 import {ObjectType} from '../ObjectFactory';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
-import {ScrollbarInstallOptions, ScrollOptions} from '../scrollbar/scrollbars';
+import {ScrollbarInstallOptions, ScrollOptions, ScrollToOptions} from '../scrollbar/scrollbars';
 import {Optional, RefModel} from '../types';
 
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
@@ -1462,7 +1465,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return null;
   }
 
-  updateKeyStrokes(newKeyStrokes: KeyStroke | KeyStroke[] | Action | Action[], oldKeyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
+  updateKeyStrokes(newKeyStrokes: KeyStroke | KeyStroke[] | Action | Action[], oldKeyStrokes?: KeyStroke | KeyStroke[] | Action | Action[]) {
     this.unregisterKeyStrokes(oldKeyStrokes);
     this.registerKeyStrokes(newKeyStrokes);
   }
@@ -2295,7 +2298,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Brings the widget into view by scrolling the first scrollable parent.
    */
-  reveal(options: ScrollOptions | string) {
+  reveal(options: ScrollToOptions | string) {
     if (!this.rendered) {
       return;
     }

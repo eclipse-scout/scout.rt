@@ -1,31 +1,37 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, TableFilter} from '../index';
+import {arrays, Column, Session, Table, TableFilter, TableFilterModel, TableRow} from '../index';
 
-export default class KeyTableFilter extends TableFilter {
+export default class KeyTableFilter implements TableFilter {
+  declare model: TableFilterModel;
+
+  session: Session;
+  table: Table;
+  column: Column;
+  acceptedKeys: any[];
+  keySupplier: (row: TableRow) => any;
+  active: boolean;
+  alwaysAcceptedRowIds: string[];
 
   /**
-   * @param {function} [keySupplier] - An optional function that extracts the key from
-   *          a table row. The default expects the row object to have a "lookupRow"
-   *          property and returns the "key" property.
+   * @param keySupplier An optional function that extracts the key from a table row. The default expects the row object to have a "lookupRow" property and returns its "key" property.
    */
-  constructor(keySupplier) {
-    super();
+  constructor(keySupplier?: (row: TableRow) => any) {
     this.acceptedKeys = [];
     this.keySupplier = keySupplier || (row => row.lookupRow && row.lookupRow.key);
     this.active = true;
     this.alwaysAcceptedRowIds = [];
   }
 
-  accept(row) {
+  accept(row: TableRow): boolean {
     if (!this.active || arrays.empty(this.acceptedKeys) || this.alwaysAcceptedRowIds.indexOf(row.id) !== -1) {
       return true;
     }
@@ -33,15 +39,15 @@ export default class KeyTableFilter extends TableFilter {
     return this.acceptedKeys.indexOf(key) !== -1;
   }
 
-  setAcceptedKeys(...acceptedKeys) {
+  setAcceptedKeys(...acceptedKeys: any[]) {
     this.acceptedKeys = arrays.ensure(acceptedKeys);
   }
 
-  setActive(active) {
+  setActive(active: boolean) {
     this.active = active;
   }
 
-  setAlwaysAcceptedRowIds(...rowIds) {
+  setAlwaysAcceptedRowIds(...rowIds: string[]) {
     this.alwaysAcceptedRowIds = rowIds;
   }
 }

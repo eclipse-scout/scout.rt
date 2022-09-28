@@ -8,9 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status, strings} from '../index';
+import {Status, strings, ValueField} from '../index';
 import $ from 'jquery';
 import CellModel from './CellModel';
+
+/**
+ * -1 for left, 0 for center and 1 for right.
+ */
+export type HorizontalAlignment = -1 | 0 | 1;
 
 export default class Cell implements CellModel {
   declare model: CellModel;
@@ -18,17 +23,20 @@ export default class Cell implements CellModel {
   cssClass: string;
   editable: boolean;
   errorStatus: Status;
-  horizontalAlignment: -1 | 0 | 1;
+  horizontalAlignment: HorizontalAlignment;
   htmlEnabled: boolean;
   iconId: string;
   mandatory: boolean;
   text: string;
+  flowsLeft: boolean;
+  empty: boolean;
   value: any;
   tooltipText: string;
   foregroundColor: string;
   backgroundColor: string;
   font: string;
   sortCode: number;
+  field: ValueField;
   protected _cachedEncodedText: string;
 
   constructor() {
@@ -67,7 +75,7 @@ export default class Cell implements CellModel {
     this.mandatory = mandatory;
   }
 
-  setHorizontalAlignment(hAlign: -1 | 0 | 1) {
+  setHorizontalAlignment(hAlign: HorizontalAlignment) {
     this.horizontalAlignment = hAlign;
   }
 

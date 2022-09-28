@@ -3,20 +3,95 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, CellEditorPopup, ColumnOptimalWidthMeasurer, comparators, FormField, GridData, icons, objects, PropertyEventEmitter, scout, Status, StringField, strings, styles, Table, TableHeaderMenu, TableRow, texts} from '../../index';
+import {
+  Cell, CellEditorPopup, ColumnEventMap, ColumnModel, ColumnOptimalWidthMeasurer, ColumnUserFilter, comparators, Event, EventHandler, FormField, GridData, icons, objects, PropertyEventEmitter, scout, Session, Status, StringField, strings,
+  styles, Table, TableHeader, TableHeaderMenu, TableRow, texts, ValueField
+} from '../../index';
 import $ from 'jquery';
+import {HorizontalAlignment} from '../../cell/Cell';
+import {ColumnComparator} from './comparators';
+import {AggregateTableRow} from '../Table';
+import {ObjectType} from '../../ObjectFactory';
+import {TableColumnMovedEvent} from '../TableEventMap';
 
-export default class Column extends PropertyEventEmitter {
+export default class Column extends PropertyEventEmitter implements ColumnModel {
+  declare model: ColumnModel;
+  declare eventMap: ColumnEventMap;
+
+  objectType: ObjectType<Column>;
+  id: string;
+  autoOptimizeWidth: boolean;
+  /** true if content of the column changed and width has to be optimized */
+  autoOptimizeWidthRequired: boolean;
+  session: Session;
+  autoOptimizeMaxWidth: number;
+  cssClass: string;
+  compacted: boolean;
+  editable: boolean;
+  removable: boolean;
+  modifiable: boolean;
+  fixedWidth: boolean;
+  fixedPosition: boolean;
+  grouped: boolean;
+  headerCssClass: string;
+  headerIconId: string;
+  headerHtmlEnabled: boolean;
+  headerTooltipText: string;
+  headerBackgroundColor: string;
+  headerForegroundColor: string;
+  headerFont: string;
+  headerTooltipHtmlEnabled: boolean;
+  horizontalAlignment: HorizontalAlignment;
+  htmlEnabled: boolean;
+  initialAlwaysIncludeSortAtBegin: boolean;
+  initialAlwaysIncludeSortAtEnd: boolean;
+  index: number;
+  initialized: boolean;
+  guiOnly: boolean;
+  mandatory: boolean;
+  optimalWidthMeasurer: ColumnOptimalWidthMeasurer;
+  sortActive: boolean;
+  checkable: boolean;
+  sortAscending: boolean;
+  sortIndex: number;
+  summary: boolean;
+  type: string;
+  width: number;
+  initialWidth: number;
+  minWidth: number;
+  showSeparator: boolean;
+  table: Table;
+  tableNodeColumn: boolean;
+  maxLength: number;
+  text: string;
+  textWrap: boolean;
+  filterType: string;
+  comparator: ColumnComparator;
+  displayable: boolean;
+  visible: boolean;
+  textBased: boolean;
+  headerMenuEnabled: boolean;
+  tableNodeLevel0CellPadding: number;
+  expandableIconLevel0CellPadding: number;
+  nodeColumnCandidate: boolean;
+
+  /** Set by TableHeader */
+  $header: JQuery;
+  $separator: JQuery;
+
+  protected _tableColumnsChangedHandler: EventHandler<TableColumnMovedEvent | Event<Table>>;
+  /** Contains the width the cells of the column really have (only set in Chrome due to a Chrome bug, see Table._updateRealColumnWidths) */
+  protected _realWidth: number;
 
   constructor() {
     super();
     this.autoOptimizeWidth = false;
-    this.autoOptimizeWidthRequired = false; // true if content of the column changed and width has to be optimized
+    this.autoOptimizeWidthRequired = false;
     this.autoOptimizeMaxWidth = -1;
     this.cssClass = null;
     this.compacted = false;
@@ -43,8 +118,8 @@ export default class Column extends PropertyEventEmitter {
     this.summary = false;
     this.type = 'text';
     this.width = 60;
-    this.initialWidth = undefined; // the width the column initially has
-    this.minWidth = Column.DEFAULT_MIN_WIDTH; // the minimal width the column can have
+    this.initialWidth = undefined;
+    this.minWidth = Column.DEFAULT_MIN_WIDTH;
     this.showSeparator = true;
     this.table = null;
     this.tableNodeColumn = false;
@@ -62,9 +137,9 @@ export default class Column extends PropertyEventEmitter {
     this.nodeColumnCandidate = true;
 
     this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
-    // Contains the width the cells of the column really have (only set in Chrome due to a Chrome bug, see Table._updateRealColumnWidths)
     this._realWidth = null;
-    this.$header = null; // Set by TableHeader.js
+
+    this.$header = null;
     this.$separator = null;
   }
 
@@ -72,7 +147,7 @@ export default class Column extends PropertyEventEmitter {
   static SMALL_MIN_WIDTH = 38;
   static NARROW_MIN_WIDTH = 34;
 
-  init(model) {
+  init(model: ColumnModel) {
     this.session = model.session;
 
     // Copy all properties from model to this
@@ -89,7 +164,7 @@ export default class Column extends PropertyEventEmitter {
   /**
    * Override this function in order to implement custom init logic.
    */
-  _init(model) {
+  protected _init(model: ColumnModel) {
     texts.resolveTextProperty(this, 'text');
     texts.resolveTextProperty(this, 'headerTooltipText');
     icons.resolveIconProperty(this, 'headerIconId');
@@ -107,11 +182,11 @@ export default class Column extends PropertyEventEmitter {
   /**
    * Override this function in order to implement custom destroy logic.
    */
-  _destroy() {
+  protected _destroy() {
     // NOP
   }
 
-  _setTable(table) {
+  protected _setTable(table: Table) {
     if (this.table) {
       this.table.off('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
     }
@@ -129,9 +204,9 @@ export default class Column extends PropertyEventEmitter {
    * 'My Company' --> { text: 'MyCompany'; }
    *
    * @see JsonCell.java
-   * @param {Cell|string|number|object} vararg either a Cell instance or a scalar value
+   * @param vararg either a Cell instance or a scalar value
    */
-  initCell(vararg, row) {
+  initCell(vararg: any, row?: TableRow): Cell {
     let cell = this._ensureCell(vararg);
     this._initCell(cell);
 
@@ -143,15 +218,13 @@ export default class Column extends PropertyEventEmitter {
   }
 
   /**
-   * Ensures that a Cell instance is returned. When vararg is a scalar value a new Cell instance is created and
-   * the value is set as cell.value property.
+   * Ensures that a Cell instance is returned.
+   * When vararg is a scalar value a new Cell instance is created and the value is set as cell.value property.
    *
-   * @param {Cell|string|number|object} vararg either a Cell instance or a scalar value
-   * @returns {*}
-   * @private
+   * @param vararg either a Cell instance or a scalar value
    */
-  _ensureCell(vararg) {
-    let cell;
+  private _ensureCell(vararg: any): Cell {
+    let cell: Cell;
 
     if (vararg instanceof Cell) {
       cell = vararg;
@@ -171,11 +244,11 @@ export default class Column extends PropertyEventEmitter {
   /**
    * Override this method to create a value based on the given scalar value.
    */
-  _parseValue(scalar) {
+  protected _parseValue(scalar: any): any {
     return scalar;
   }
 
-  _updateCellText(row, cell) {
+  protected _updateCellText(row: TableRow, cell: Cell) {
     let value = cell.value;
     if (!row) {
       // row is omitted when creating aggregate cells
@@ -183,7 +256,7 @@ export default class Column extends PropertyEventEmitter {
     }
 
     let returned = this._formatValue(value, row);
-    if (returned && typeof returned.promise === 'function') {
+    if (objects.isPromise(returned)) {
       // Promise is returned -> set display text later
       this.setCellTextDeferred(returned, row, cell);
     } else {
@@ -191,7 +264,7 @@ export default class Column extends PropertyEventEmitter {
     }
   }
 
-  _formatValue(value, row) {
+  protected _formatValue(value: any, row?: TableRow): string | JQuery.Promise<string> {
     return scout.nvl(value, '');
   }
 
@@ -199,9 +272,8 @@ export default class Column extends PropertyEventEmitter {
    * If cell does not define properties, use column values.
    * Override this function to implement type specific init cell behavior.
    *
-   * @param {Cell} cell
    */
-  _initCell(cell) {
+  protected _initCell(cell: Cell): Cell {
     cell.cssClass = scout.nvl(cell.cssClass, this.cssClass);
     cell.editable = scout.nvl(cell.editable, this.editable);
     cell.horizontalAlignment = scout.nvl(cell.horizontalAlignment, this.horizontalAlignment);
@@ -210,13 +282,13 @@ export default class Column extends PropertyEventEmitter {
     return cell;
   }
 
-  buildCellForRow(row) {
+  buildCellForRow(row: TableRow): string {
     let cell = this.cell(row);
     return this.buildCell(cell, row);
   }
 
-  buildCellForAggregateRow(aggregateRow) {
-    let cell;
+  buildCellForAggregateRow(aggregateRow: AggregateTableRow): string {
+    let cell: Cell;
     if (this.grouped) {
       let refRow = (this.table.groupingStyle === Table.GroupingStyle.TOP ? aggregateRow.nextRow : aggregateRow.prevRow);
       cell = this.createAggrGroupCell(refRow);
@@ -227,13 +299,14 @@ export default class Column extends PropertyEventEmitter {
     return this.buildCell(cell, {});
   }
 
-  buildCell(cell, row) {
+  buildCell(cell: Cell, row: TableRow | { hasError?: boolean; expanded?: boolean }): string {
     scout.assertParameter('cell', cell, Cell);
 
     let tableNodeColumn = this.table.isTableNodeColumn(this),
       rowPadding = 0;
 
     if (tableNodeColumn) {
+      // @ts-ignore
       rowPadding = this.table._calcRowLevelPadding(row);
     }
 
@@ -246,7 +319,7 @@ export default class Column extends PropertyEventEmitter {
       row.hasError = true;
     }
 
-    let content;
+    let content: string;
     if (!text && !icon) {
       // If every cell of a row is empty the row would collapse, using nbsp makes sure the row is as height as the others even if it is empty
       content = '&nbsp;';
@@ -259,6 +332,7 @@ export default class Column extends PropertyEventEmitter {
       }
     }
 
+    // @ts-ignore
     if (tableNodeColumn && row._expandable) {
       this.tableNodeColumn = true;
       content = this._expandIcon(row.expanded, rowPadding) + content;
@@ -270,11 +344,11 @@ export default class Column extends PropertyEventEmitter {
     return this._buildCell(cell, content, style, cssClass);
   }
 
-  _buildCell(cell, content, style, cssClass) {
+  protected _buildCell(cell: Cell, content: string, style: string, cssClass: string): string {
     return '<div class="' + cssClass + '" style="' + style + '">' + content + '</div>';
   }
 
-  _expandIcon(expanded, rowPadding) {
+  protected _expandIcon(expanded: boolean, rowPadding: number): string {
     let style = 'padding-left: ' + (rowPadding + this.expandableIconLevel0CellPadding) + 'px';
     let cssClasses = 'table-row-control';
     if (expanded) {
@@ -283,7 +357,7 @@ export default class Column extends PropertyEventEmitter {
     return '<div class="' + cssClasses + '" style="' + style + '"></div>';
   }
 
-  _icon(iconId, hasText) {
+  protected _icon(iconId: string, hasText: boolean): string {
     let cssClass, icon;
     if (!iconId) {
       return;
@@ -301,7 +375,7 @@ export default class Column extends PropertyEventEmitter {
     return '<img class="' + cssClass + '" src="' + icon.iconUrl + '">';
   }
 
-  _text(cell) {
+  protected _text(cell: Cell): string {
     let text = cell.text || '';
 
     if (!cell.htmlEnabled) {
@@ -319,7 +393,7 @@ export default class Column extends PropertyEventEmitter {
     return text;
   }
 
-  _cellCssClass(cell, tableNode) {
+  protected _cellCssClass(cell: Cell, tableNode?: boolean): string {
     let cssClass = 'table-cell';
     if (cell.mandatory) {
       cssClass += ' mandatory';
@@ -355,7 +429,7 @@ export default class Column extends PropertyEventEmitter {
     return cssClass;
   }
 
-  _cellStyle(cell, tableNodeColumn, rowPadding) {
+  protected _cellStyle(cell: Cell, tableNodeColumn?: boolean, rowPadding?: number): string {
     let style,
       width = this.width;
 
@@ -371,8 +445,8 @@ export default class Column extends PropertyEventEmitter {
     return style;
   }
 
-  onMouseUp(event, $row) {
-    let row = $row.data('row'),
+  onMouseUp(event: JQuery.MouseUpEvent, $row: JQuery) {
+    let row = $row.data('row') as TableRow,
       cell = this.cell(row);
 
     if (this.isCellEditable(row, cell, event)) {
@@ -380,26 +454,25 @@ export default class Column extends PropertyEventEmitter {
     }
   }
 
-  isCellEditable(row, cell, event) {
+  isCellEditable(row: TableRow, cell: Cell, event: JQuery.MouseUpEvent): boolean {
     return this.table.enabledComputed && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey;
   }
 
-  startCellEdit(row, field) {
-    let popup,
-      $row = row.$row,
+  startCellEdit(row: TableRow, field: ValueField): CellEditorPopup {
+    let $row = row.$row,
       cell = this.cell(row),
       $cell = this.table.$cell(this, $row);
 
     cell.field = field;
     // Override field alignment with the cell's alignment
     cell.field.gridData.horizontalAlignment = cell.horizontalAlignment;
-    popup = this._createEditorPopup(row, cell);
+    let popup = this._createEditorPopup(row, cell);
     popup.$anchor = $cell;
     popup.open(this.table.$data);
     return popup;
   }
 
-  _createEditorPopup(row, cell) {
+  protected _createEditorPopup(row: TableRow, cell: Cell): CellEditorPopup {
     return scout.create(CellEditorPopup, {
       parent: this.table,
       column: this,
@@ -409,17 +482,16 @@ export default class Column extends PropertyEventEmitter {
   }
 
   /**
-   * @returns {Cell} the cell object for this column from the given row.
+   * @returns the cell object for this column from the given row.
    */
-  cell(row) {
+  cell(row: TableRow): Cell {
     return this.table.cell(this, row);
   }
 
   /**
    * Creates an artificial cell from the properties relevant for the column header.
-   * @returns {Cell}
    */
-  headerCell() {
+  headerCell(): Cell {
     return scout.create(Cell, {
       value: this.text,
       text: this.text,
@@ -431,36 +503,35 @@ export default class Column extends PropertyEventEmitter {
   }
 
   /**
-   * @returns {Cell} the cell object for this column from the first selected row in the table.
+   * @returns the cell object for this column from the first selected row in the table.
    */
-  selectedCell() {
+  selectedCell(): Cell {
     let selectedRow = this.table.selectedRow();
     return this.table.cell(this, selectedRow);
   }
 
   /**
-   * @param row
-   * @returns {string|*} the text of the cell if {@link Column.textBased} is true, otherwise the value of the cell.
+   * @returns the value of the cell. If it is text based as string otherwise the raw value.
    */
-  cellValueOrText(row) {
+  cellValueOrText(row: TableRow): any {
     if (this.textBased) {
       return this.table.cellText(this, row);
     }
     return this.table.cellValue(this, row);
   }
 
-  cellValue(row) {
+  cellValue(row: TableRow): any {
     return this.table.cellValue(this, row);
   }
 
-  cellText(row) {
+  cellText(row: TableRow): string {
     return this.table.cellText(this, row);
   }
 
   /**
-   * @returns {*} the cell value to be used for grouping and filtering (chart, column filter).
+   * @returns the cell value to be used for grouping and filtering (chart, column filter).
    */
-  cellValueOrTextForCalculation(row) {
+  cellValueOrTextForCalculation(row: TableRow): any {
     let cell = this.cell(row);
     let value = this.cellValueOrText(row);
     if (objects.isNullOrUndefined(value)) {
@@ -469,15 +540,15 @@ export default class Column extends PropertyEventEmitter {
     return this._preprocessValueOrTextForCalculation(value, cell);
   }
 
-  _preprocessValueOrTextForCalculation(value, cell) {
+  protected _preprocessValueOrTextForCalculation(value: any, cell?: Cell): any {
     if (typeof value === 'string') {
       // In case of string columns, value and text are equal -> use _preprocessStringForCalculation to handle html tags and new lines correctly
-      return this._preprocessTextForCalculation(value, cell.htmlEnabled);
+      return this._preprocessTextForCalculation(value, cell?.htmlEnabled);
     }
     return value;
   }
 
-  _preprocessTextForCalculation(text, htmlEnabled) {
+  protected _preprocessTextForCalculation(text: string, htmlEnabled?: boolean): string {
     return this._preprocessText(text, {
       removeHtmlTags: htmlEnabled,
       removeNewlines: true,
@@ -486,14 +557,14 @@ export default class Column extends PropertyEventEmitter {
   }
 
   /**
-   * @returns {string} the cell text to be used for table grouping
+   * @returns the cell text to be used for table grouping
    */
-  cellTextForGrouping(row) {
+  cellTextForGrouping(row: TableRow): string {
     let cell = this.cell(row);
     return this._preprocessTextForGrouping(cell.text, cell.htmlEnabled);
   }
 
-  _preprocessTextForGrouping(text, htmlEnabled) {
+  protected _preprocessTextForGrouping(text: string, htmlEnabled?: boolean): string {
     return this._preprocessText(text, {
       removeHtmlTags: htmlEnabled,
       trim: true
@@ -501,23 +572,23 @@ export default class Column extends PropertyEventEmitter {
   }
 
   /**
-   * @returns {string} the cell text to be used for the text filter
+   * @returns the cell text to be used for the text filter
    */
-  cellTextForTextFilter(row) {
+  cellTextForTextFilter(row: TableRow): string {
     let cell = this.cell(row);
     return this._preprocessTextForTextFilter(cell.text, cell.htmlEnabled);
   }
 
-  _preprocessTextForTextFilter(text, htmlEnabled) {
+  protected _preprocessTextForTextFilter(text: string, htmlEnabled?: boolean): string {
     return this._preprocessText(text, {
       removeHtmlTags: htmlEnabled
     });
   }
 
   /**
-   * @returns {string} the cell text to be used for the table row detail.
+   * @returns the cell text to be used for the table row detail.
    */
-  cellTextForRowDetail(row) {
+  cellTextForRowDetail(row: TableRow): string {
     let cell = this.cell(row);
 
     return this._preprocessText(this._text(cell), {
@@ -528,7 +599,7 @@ export default class Column extends PropertyEventEmitter {
   /**
    * Removes html tags, converts to single line, removes leading and trailing whitespaces.
    */
-  _preprocessText(text, options) {
+  protected _preprocessText(text: string, options: { removeHtmlTags?: boolean; removeNewlines?: boolean; trim?: boolean }): string {
     if (text === null || text === undefined) {
       return text;
     }
@@ -545,13 +616,13 @@ export default class Column extends PropertyEventEmitter {
     return text;
   }
 
-  setCellValue(row, value) {
+  setCellValue(row: TableRow, value: any) {
     let cell = this.cell(row);
     this._setCellValue(row, value, cell);
     this._updateCellText(row, cell);
   }
 
-  _setCellValue(row, value, cell) {
+  protected _setCellValue(row: TableRow, value: any, cell: Cell) {
     // value may have the wrong type (e.g. text instead of date) -> ensure type
     value = this._parseValue(value);
 
@@ -565,11 +636,9 @@ export default class Column extends PropertyEventEmitter {
     cell.setValue(value);
   }
 
-  setCellTextDeferred(promise, row, cell) {
+  setCellTextDeferred(promise: JQuery.Promise<string>, row: TableRow, cell: Cell) {
     promise
-      .done(text => {
-        this.setCellText(row, text, cell);
-      })
+      .done(text => this.setCellText(row, text, cell))
       .fail(error => {
         this.setCellText(row, '', cell);
         $.log.error('Could not resolve cell text for value ' + cell.value, error);
@@ -580,7 +649,7 @@ export default class Column extends PropertyEventEmitter {
     this.table.updateBuffer.pushPromise(promise);
   }
 
-  setCellText(row, text, cell) {
+  setCellText(row: TableRow, text: string, cell?: Cell) {
     if (!cell) {
       cell = this.cell(row);
     }
@@ -598,14 +667,14 @@ export default class Column extends PropertyEventEmitter {
     }
   }
 
-  setCellErrorStatus(row, errorStatus, cell) {
+  setCellErrorStatus(row: TableRow, errorStatus: Status, cell?: Cell) {
     if (!cell) {
       cell = this.cell(row);
     }
     cell.setErrorStatus(errorStatus);
   }
 
-  setCellIconId(row, iconId) {
+  setCellIconId(row: TableRow, iconId: string) {
     let cell = this.cell(row);
     if (cell.iconId === iconId) {
       return;
@@ -616,16 +685,13 @@ export default class Column extends PropertyEventEmitter {
     }
   }
 
-  setHorizontalAlignment(horizontalAlignment) {
+  setHorizontalAlignment(horizontalAlignment: HorizontalAlignment) {
     let changed = this.setProperty('horizontalAlignment', horizontalAlignment);
     if (!changed) {
       return;
     }
 
-    this.table.rows.forEach(row => {
-      this.cell(row).setHorizontalAlignment(horizontalAlignment);
-    });
-
+    this.table.rows.forEach(row => this.cell(row).setHorizontalAlignment(horizontalAlignment));
     this.table.updateRows(this.table.rows);
 
     if (this.table.header) {
@@ -633,46 +699,37 @@ export default class Column extends PropertyEventEmitter {
     }
   }
 
-  setEditable(editable) {
+  setEditable(editable: boolean) {
     let changed = this.setProperty('editable', editable);
     if (!changed) {
       return;
     }
 
-    this.table.rows.forEach(row => {
-      this.cell(row).setEditable(editable);
-    });
-
+    this.table.rows.forEach(row => this.cell(row).setEditable(editable));
     this.table.updateRows(this.table.rows);
   }
 
-  setMandatory(mandatory) {
+  setMandatory(mandatory: boolean) {
     let changed = this.setProperty('mandatory', mandatory);
     if (!changed) {
       return;
     }
 
-    this.table.rows.forEach(row => {
-      this.cell(row).setMandatory(mandatory);
-    });
-
+    this.table.rows.forEach(row => this.cell(row).setMandatory(mandatory));
     this.table.updateRows(this.table.rows);
   }
 
-  setCssClass(cssClass) {
+  setCssClass(cssClass: string) {
     let changed = this.setProperty('cssClass', cssClass);
     if (!changed) {
       return;
     }
 
-    this.table.rows.forEach(row => {
-      this.cell(row).setCssClass(cssClass);
-    });
-
+    this.table.rows.forEach(row => this.cell(row).setCssClass(cssClass));
     this.table.updateRows(this.table.rows);
   }
 
-  setWidth(width) {
+  setWidth(width: number) {
     let changed = this.setProperty('width', width);
     if (!changed) {
       return;
@@ -680,7 +737,7 @@ export default class Column extends PropertyEventEmitter {
     this.table.resizeColumn(this, width);
   }
 
-  createAggrGroupCell(row) {
+  createAggrGroupCell(row: TableRow): Cell {
     let cell = this.cell(row);
     return this.initCell(scout.create(Cell, {
       // value necessary for value based columns (e.g. checkbox column)
@@ -695,18 +752,18 @@ export default class Column extends PropertyEventEmitter {
     }));
   }
 
-  createAggrValueCell(value) {
+  createAggrValueCell(value: any): Cell {
     return this.createAggrEmptyCell();
   }
 
-  createAggrEmptyCell() {
+  createAggrEmptyCell(): Cell {
     return this.initCell(scout.create(Cell, {
       empty: true,
       cssClass: 'table-aggregate-cell'
     }));
   }
 
-  calculateOptimalWidth() {
+  calculateOptimalWidth(): number | JQuery.Promise<number> {
     return this.optimalWidthMeasurer.measure();
   }
 
@@ -714,7 +771,7 @@ export default class Column extends PropertyEventEmitter {
    * Returns a type specific column user-filter. The default impl. returns a ColumnUserFilter.
    * Sub-classes that must return another type, must simply change the value of the 'filterType' property.
    */
-  createFilter(model) {
+  createFilter(): ColumnUserFilter {
     return scout.create(this.filterType, {
       session: this.session,
       table: this.table,
@@ -725,7 +782,7 @@ export default class Column extends PropertyEventEmitter {
   /**
    * Returns a table header menu. Sub-classes can override this method to create a column specific table header menu.
    */
-  createTableHeaderMenu(tableHeader) {
+  createTableHeaderMenu(tableHeader: TableHeader): TableHeaderMenu {
     let $header = this.$header;
     return scout.create(TableHeaderMenu, {
       parent: tableHeader,
@@ -738,7 +795,7 @@ export default class Column extends PropertyEventEmitter {
   /**
    * @returns a field instance used as editor when a cell of this column is in edit mode.
    */
-  createEditor(row) {
+  createEditor(row: TableRow): ValueField {
     let field = this._createEditor(row);
     let cell = this.cell(row);
     this._initEditorField(field, cell);
@@ -754,7 +811,7 @@ export default class Column extends PropertyEventEmitter {
    * Depending on the type of column the editor may need to be initialized differently.
    * The default implementation either copies the value to the field if the field has no error or copies the text and error status if it has an error.
    */
-  _initEditorField(field, cell) {
+  protected _initEditorField(field: ValueField, cell: Cell) {
     if (cell.errorStatus) {
       this._updateEditorFromInvalidCell(field, cell);
     } else {
@@ -762,20 +819,16 @@ export default class Column extends PropertyEventEmitter {
     }
   }
 
-  _updateEditorFromValidCell(field, cell) {
+  protected _updateEditorFromValidCell(field: ValueField, cell: Cell) {
     field.setValue(cell.value);
   }
 
-  _updateEditorFromInvalidCell(field, cell) {
+  protected _updateEditorFromInvalidCell(field: ValueField, cell: Cell) {
     field.setErrorStatus(cell.errorStatus);
     field.setDisplayText(cell.text);
   }
 
-  /**
-   * @param {TableRow} row
-   * @returns {FormField}
-   */
-  _createEditor(row) {
+  protected _createEditor(row: TableRow): ValueField {
     return scout.create(StringField, {
       parent: this.table,
       maxLength: this.maxLength,
@@ -784,7 +837,7 @@ export default class Column extends PropertyEventEmitter {
     });
   }
 
-  updateCellFromEditor(row, field) {
+  updateCellFromEditor(row: TableRow, field: ValueField) {
     if (field.errorStatus) {
       this._updateCellFromInvalidEditor(row, field);
     } else {
@@ -792,12 +845,12 @@ export default class Column extends PropertyEventEmitter {
     }
   }
 
-  _updateCellFromInvalidEditor(row, field) {
+  protected _updateCellFromInvalidEditor(row: TableRow, field: ValueField) {
     this.setCellErrorStatus(row, field.errorStatus);
     this.setCellText(row, field.displayText);
   }
 
-  _updateCellFromValidEditor(row, field) {
+  protected _updateCellFromValidEditor(row: TableRow, field: ValueField) {
     this.setCellErrorStatus(row, null);
     this.setCellValue(row, field.value);
   }
@@ -808,21 +861,20 @@ export default class Column extends PropertyEventEmitter {
    *
    * @returns whether or not it was possible to install a compare function. If not, client side sorting is disabled.
    */
-  installComparator() {
+  installComparator(): boolean {
     return this.comparator.install(this.session);
   }
 
   /**
-   * @returns {boolean} whether or not it is possible to sort this column.
-   * As a side effect a comparator is installed.
+   * @returns whether or not it is possible to sort this column. As a side effect a comparator is installed.
    */
-  isSortingPossible() {
+  isSortingPossible(): boolean {
     // If installation fails sorting is still possible (in case of the text comparator just without a collator)
     this.installComparator();
     return true;
   }
 
-  compare(row1, row2) {
+  compare(row1: TableRow, row2: TableRow): number {
     let cell1 = this.table.cell(this, row1),
       cell2 = this.table.cell(this, row2);
 
@@ -835,24 +887,21 @@ export default class Column extends PropertyEventEmitter {
     return this.comparator.compare(valueA, valueB);
   }
 
-  isVisible() {
+  isVisible(): boolean {
     return this.displayable && this.visible && !this.compacted;
   }
 
   /**
-   *
-   * @param {boolean} visible
-   * @param {boolean} [redraw] true, to redraw the table immediately, false if not.
-   * When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}. Default is true.
+   * @param redraw true, to redraw the table immediately, false if not. Default is {@link initialized}. When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}.
    */
-  setVisible(visible, redraw) {
+  setVisible(visible: boolean, redraw?: boolean) {
     if (this.visible === visible) {
       return;
     }
     this._setVisible(visible, redraw);
   }
 
-  _setVisible(visible, redraw) {
+  protected _setVisible(visible: boolean, redraw?: boolean) {
     this._setProperty('visible', visible);
     if (scout.nvl(redraw, this.initialized)) {
       this.table.onColumnVisibilityChanged();
@@ -860,19 +909,16 @@ export default class Column extends PropertyEventEmitter {
   }
 
   /**
-   *
-   * @param {boolean} displayable
-   * @param {boolean} [redraw] true, to redraw the table immediately, false if not.
-   * When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}. Default is true.
+   * @param redraw true, to redraw the table immediately, false if not. Default is {@link initialized}. When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}.
    */
-  setDisplayable(displayable, redraw) {
+  setDisplayable(displayable: boolean, redraw?: boolean) {
     if (this.displayable === displayable) {
       return;
     }
     this._setDisplayable(displayable, redraw);
   }
 
-  _setDisplayable(displayable, redraw) {
+  protected _setDisplayable(displayable: boolean, redraw?: boolean) {
     this._setProperty('displayable', displayable);
     if (scout.nvl(redraw, this.initialized)) {
       this.table.onColumnVisibilityChanged();
@@ -880,30 +926,27 @@ export default class Column extends PropertyEventEmitter {
   }
 
   /**
-   *
-   * @param {boolean} compacted
-   * @param {boolean} [redraw] true, to redraw the table immediately, false if not.
-   * When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}. Default is true.
+   * @param redraw true, to redraw the table immediately, false if not. Default is {@link initialized}. When false is used, the redraw needs to be triggered manually using {@link Table.onColumnVisibilityChanged}.
    */
-  setCompacted(compacted, redraw) {
+  setCompacted(compacted: boolean, redraw?: boolean) {
     if (this.compacted === compacted) {
       return;
     }
     this._setCompacted(compacted, redraw);
   }
 
-  _setCompacted(compacted, redraw) {
+  protected _setCompacted(compacted: boolean, redraw?: boolean) {
     this._setProperty('compacted', compacted);
     if (scout.nvl(redraw, this.initialized)) {
       this.table.onColumnVisibilityChanged();
     }
   }
 
-  setAutoOptimizeWidth(autoOptimizeWidth) {
+  setAutoOptimizeWidth(autoOptimizeWidth: boolean) {
     this.setProperty('autoOptimizeWidth', autoOptimizeWidth);
   }
 
-  _setAutoOptimizeWidth(autoOptimizeWidth) {
+  protected _setAutoOptimizeWidth(autoOptimizeWidth: boolean) {
     this._setProperty('autoOptimizeWidth', autoOptimizeWidth);
     this.autoOptimizeWidthRequired = autoOptimizeWidth;
     if (this.initialized) {
@@ -912,25 +955,25 @@ export default class Column extends PropertyEventEmitter {
     }
   }
 
-  setMaxLength(maxLength) {
+  setMaxLength(maxLength: number) {
     this.setProperty('maxLength', maxLength);
   }
 
-  setText(text) {
+  setText(text: string) {
     let changed = this.setProperty('text', text);
     if (changed && this.table.header) {
       this.table.header.updateHeader(this);
     }
   }
 
-  setHeaderIconId(headerIconId) {
+  setHeaderIconId(headerIconId: string) {
     let changed = this.setProperty('headerIconId', headerIconId);
     if (changed && this.table.header) {
       this.table.header.updateHeader(this);
     }
   }
 
-  setHeaderCssClass(headerCssClass) {
+  setHeaderCssClass(headerCssClass: string) {
     let oldState = $.extend({}, this);
     let changed = this.setProperty('headerCssClass', headerCssClass);
     if (changed && this.table.header) {
@@ -938,22 +981,22 @@ export default class Column extends PropertyEventEmitter {
     }
   }
 
-  setHeaderHtmlEnabled(headerHtmlEnabled) {
+  setHeaderHtmlEnabled(headerHtmlEnabled: boolean) {
     let changed = this.setProperty('headerHtmlEnabled', headerHtmlEnabled);
     if (changed && this.table.header) {
       this.table.header.updateHeader(this);
     }
   }
 
-  setHeaderTooltipText(headerTooltipText) {
+  setHeaderTooltipText(headerTooltipText: string) {
     this.setProperty('headerTooltipText', headerTooltipText);
   }
 
-  setHeaderTooltipHtmlEnabled(headerTooltipHtmlEnabled) {
+  setHeaderTooltipHtmlEnabled(headerTooltipHtmlEnabled: boolean) {
     this.setProperty('headerTooltipHtmlEnabled', headerTooltipHtmlEnabled);
   }
 
-  setTextWrap(textWrap) {
+  setTextWrap(textWrap: boolean) {
     let changed = this.setProperty('textWrap', textWrap);
     if (changed && this.table.rendered && this.table.multilineText) { // If multilineText is disabled toggling textWrap has no effect
       // See also table._renderMultilineText(), requires similar operations
@@ -962,7 +1005,7 @@ export default class Column extends PropertyEventEmitter {
     }
   }
 
-  isContentValid(row) {
+  isContentValid(row: TableRow): { valid: boolean; validByErrorStatus: boolean; validByMandatory: boolean } {
     let cell = this.cell(row);
     let validByErrorStatus = !cell.errorStatus || cell.errorStatus.severity !== Status.Severity.ERROR;
     let validByMandatory = !cell.mandatory || this._hasCellValue(cell);
@@ -973,11 +1016,11 @@ export default class Column extends PropertyEventEmitter {
     };
   }
 
-  _hasCellValue(cell) {
+  protected _hasCellValue(cell: Cell): boolean {
     return !!cell.value;
   }
 
-  _onTableColumnsChanged(event) {
+  protected _onTableColumnsChanged(event: TableColumnMovedEvent | Event<Table>) {
     if (this.table.visibleColumns().indexOf(this) === 0) {
       this.tableNodeLevel0CellPadding = 28;
       this.expandableIconLevel0CellPadding = 13;
@@ -987,7 +1030,7 @@ export default class Column extends PropertyEventEmitter {
     }
   }
 
-  _realWidthIfAvailable() {
+  realWidthIfAvailable(): number {
     return this._realWidth || this.width;
   }
 }

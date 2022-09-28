@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {scout} from '../index';
+import {scout, Table, TableRow} from '../index';
 
 /**
  * Enhances the table with selection behaviour.<p>
@@ -18,8 +18,23 @@ import {scout} from '../index';
  *
  */
 export default class TableSelectionHandler {
+  table: Table;
+  mouseMoveSelectionEnabled: boolean;
+  lastActionRow: TableRow;
+  mouseOverHandler: (event: JQuery.MouseOverEvent) => void;
+  select: boolean;
+  counterDebug: number;
+  fromIndex: number;
+  toIndex: number;
+  protected _mouseDown: boolean;
 
-  constructor(table) {
+  /** Index of the row that got a 'mouseover' event previously (needed to determine if the user is going up or down) */
+  protected _prevSelectedRowIndex: number;
+
+  /** The index of the selected row with the greatest distance to fromIndex (needed to efficiently clear the selection) */
+  protected _maxSelectedRowIndex: number;
+
+  constructor(table: Table) {
     this.table = table;
     this.mouseMoveSelectionEnabled = true;
     this._mouseDown = false;
@@ -27,12 +42,9 @@ export default class TableSelectionHandler {
     this.mouseOverHandler = null;
     this.select = true;
     this.counterDebug = 0;
-
     this.fromIndex = -1;
     this.toIndex = -1;
-    // Index of the row that got a 'mouseover' event previously (needed to determine if the user is going up or down)
     this._prevSelectedRowIndex = -1;
-    // The index of the selected row with the greatest distance to fromIndex (needed to efficiently clear the selection)
     this._maxSelectedRowIndex = -1;
   }
 
@@ -41,9 +53,9 @@ export default class TableSelectionHandler {
   }
 
   // TODO [7.0] bsh: Table Selection | Try to merge this with TableKeystrokeContext
-  onMouseDown(event) {
-    let $row = $(event.currentTarget);
-    let row = $row.data('row');
+  onMouseDown(event: JQuery.MouseDownEvent) {
+    let $row = $(event.currentTarget) as JQuery;
+    let row = $row.data('row') as TableRow;
     let oldSelectedState = $row.isSelected();
     let rows = this.table.visibleRows;
 
@@ -81,6 +93,7 @@ export default class TableSelectionHandler {
       // Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
       // Right click on already selected rows must not clear the selection
       if (!oldSelectedState || (this.table.selectedRows.length > 1 && event.which !== 3)) {
+        // @ts-ignore
         this.table._removeSelection();
         this.table.selectedRows = [];
       }
@@ -107,9 +120,9 @@ export default class TableSelectionHandler {
     this.lastActionRow = row;
   }
 
-  onMouseOver(event) {
-    let $row = $(event.currentTarget);
-    let row = $row.data('row');
+  onMouseOver(event: JQuery.MouseOverEvent) {
+    let $row = $(event.currentTarget) as JQuery;
+    let row = $row.data('row') as TableRow;
     let rows = this.table.visibleRows;
 
     this.toIndex = rows.indexOf(row);
@@ -117,8 +130,8 @@ export default class TableSelectionHandler {
     this.lastActionRow = row;
   }
 
-  handleSelection(event) {
-    let rowsToUnselect;
+  handleSelection(event: JQuery.MouseEventBase) {
+    let rowsToUnselect: TableRow[];
     let rows = this.table.visibleRows;
     if (this.table.multiSelect) {
       // Multi-selection -> expand/shrink selection
@@ -128,7 +141,7 @@ export default class TableSelectionHandler {
       let beforeFromSelection = (this._prevSelectedRowIndex < this.fromIndex);
       let afterFromSelection = (this._prevSelectedRowIndex > this.fromIndex);
 
-      // In 'ctrlKey' mode, the unselection is done via 'select=false'
+      // In 'ctrlKey' mode, the un-selection is done via 'select=false'
       // Also prevent unselect in shiftKey mode, because otherwise we'd could
       // possibly have unwanted gaps within the selection block (see #172929).
       if (!event.ctrlKey) {
@@ -154,9 +167,7 @@ export default class TableSelectionHandler {
         }
 
         if (rowsToUnselect) {
-          rowsToUnselect.forEach(function(row) {
-            this.table.removeRowFromSelection(row, true);
-          }, this);
+          rowsToUnselect.forEach(row => this.table.removeRowFromSelection(row, true));
         }
       }
       // Adjust the indexes
@@ -165,6 +176,7 @@ export default class TableSelectionHandler {
     } else {
       // Single selection -> unselect previously selected row
       if (this.select) {
+        // @ts-ignore
         this.table._removeSelection();
         this.table.selectedRows = [];
       }
@@ -177,7 +189,7 @@ export default class TableSelectionHandler {
     this._selectRange(this.fromIndex, this.toIndex, this.select);
   }
 
-  _selectRange(fromIndex, toIndex, select) {
+  protected _selectRange(fromIndex: number, toIndex: number, select: boolean) {
     let rows = this.table.visibleRows;
     let startIndex = Math.min(fromIndex, toIndex);
     let endIndex = Math.max(fromIndex, toIndex) + 1;
@@ -185,17 +197,13 @@ export default class TableSelectionHandler {
 
     // set/remove selection
     if (select) {
-      actionRows.forEach(function(row) {
-        this.table.addRowToSelection(row, true);
-      }, this);
+      actionRows.forEach(row => this.table.addRowToSelection(row, true));
     } else {
-      actionRows.forEach(function(row) {
-        this.table.removeRowFromSelection(row, true);
-      }, this);
+      actionRows.forEach(row => this.table.removeRowFromSelection(row, true));
     }
   }
 
-  getMinMaxSelectionIndizes() {
+  getMinMaxSelectionIndizes(): number[] {
     let
       selectedRows = this.table.selectedRows,
       allRows = this.table.visibleRows;
@@ -204,8 +212,7 @@ export default class TableSelectionHandler {
       return [-1, -1];
     }
 
-    let min = -1,
-      max = -1;
+    let min = -1, max = -1;
     selectedRows.forEach(row => {
       let index = allRows.indexOf(row);
       if (min === -1 || index < min) {
@@ -218,7 +225,7 @@ export default class TableSelectionHandler {
     return [min, max];
   }
 
-  onMouseUp(event) {
+  onMouseUp(event: JQuery.MouseUpEvent) {
     if (!this._mouseDown) {
       // May happen when selecting elements with chrome dev tools
       return;

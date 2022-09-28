@@ -36,8 +36,8 @@ export default class Popup extends Widget implements PopupModel {
   verticalSwitch: boolean;
   trimWidth: boolean;
   trimHeight: boolean;
-  scrollType: 'position' | 'layoutAndPosition' | 'remove';
-  windowResizeType: 'position' | 'layoutAndPosition' | 'remove';
+  scrollType: PopupScrollType;
+  windowResizeType: PopupWindowResizeType;
   boundToAnchor: boolean;
   withArrow: boolean;
   closeOnAnchorMouseDown: boolean;
@@ -1159,3 +1159,6 @@ export default class Popup extends Widget implements PopupModel {
   SwitchRule[Alignment.BOTTOM] = Alignment.TOP;
   SwitchRule[Alignment.BOTTOMEDGE] = Alignment.TOPEDGE;
 })());
+
+export type PopupScrollType = 'position' | 'layoutAndPosition' | 'remove' | 'none';
+export type PopupWindowResizeType = 'position' | 'layoutAndPosition' | 'remove';

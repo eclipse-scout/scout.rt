@@ -14,18 +14,16 @@ import LookupCallModel from './LookupCallModel';
 import LookupResult from './LookupResult';
 import Deferred = JQuery.Deferred;
 
-export type StaticLookupCallDataRow<K> = [key: K, text: string, parentKey?: K];
-
 /**
  * Base class for lookup calls with static or local data. Implement the _data() and _dataToLookupRow()
  * functions to provide data for lookup calls. Results are resolved as a Promise, the delay
  * property controls how long it takes until the promise is resolved. You can set it to a higher value for testing purposes.
  */
-export default class StaticLookupCall<Key extends PropertyKey> extends LookupCall<Key> {
+export default class StaticLookupCall<Key> extends LookupCall<Key> {
 
   /** delay in [ms]. By default that value is 0. */
   delay: number;
-  data: StaticLookupCallDataRow<Key>[];
+  data: any[];
 
   constructor() {
     super();
@@ -35,7 +33,7 @@ export default class StaticLookupCall<Key extends PropertyKey> extends LookupCal
     this.active = true;
   }
 
-  protected override _init(model: LookupCallModel<Key> & { data: StaticLookupCallDataRow<Key>[] }) {
+  protected override _init(model: LookupCallModel<Key> & { data?: any[] }) {
     super._init(model);
     if (!this.data) {
       // data may either be provided by the model or by implementing the _data function
@@ -43,7 +41,7 @@ export default class StaticLookupCall<Key extends PropertyKey> extends LookupCal
     }
   }
 
-  refreshData(data?: StaticLookupCallDataRow<Key>[]) {
+  refreshData(data?: any[]) {
     if (data === undefined) {
       this.data = this._data();
     } else {
@@ -184,7 +182,7 @@ export default class StaticLookupCall<Key extends PropertyKey> extends LookupCal
   /**
    * Implement this function to convert a single data array into an instance of LookupRow.
    */
-  protected _dataToLookupRow(data: StaticLookupCallDataRow<Key>): LookupRow<Key> {
+  protected _dataToLookupRow(data: any): LookupRow<Key> {
     return scout.create(LookupRow, {
       key: data[0],
       text: data[1],
@@ -195,7 +193,7 @@ export default class StaticLookupCall<Key extends PropertyKey> extends LookupCal
   /**
    * Implement this function to provide static data.
    */
-  protected _data(): StaticLookupCallDataRow<Key>[] {
+  protected _data(): any[] {
     return [];
   }
 }

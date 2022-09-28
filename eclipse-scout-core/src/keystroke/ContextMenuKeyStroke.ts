@@ -9,14 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {keys, KeyStroke, Widget} from '../index';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class ContextMenuKeyStroke extends KeyStroke {
 
-  protected _contextFunction: (event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;
+  protected _contextFunction: (event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;
   protected _bindObject: any;
 
-  constructor(field: Widget, contextFunction: (event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) => void, bindObject?: any) {
+  constructor(field: Widget, contextFunction: (event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) => void, bindObject?: any) {
     super();
     this._contextFunction = contextFunction;
     this._bindObject = bindObject || this;
@@ -31,7 +30,7 @@ export default class ContextMenuKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
-  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     this._contextFunction.call(this._bindObject, event);
   }
 }

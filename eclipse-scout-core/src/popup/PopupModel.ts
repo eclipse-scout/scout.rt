@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FocusRule, Widget, WidgetModel} from '../index';
-import {PopupAlignment} from './Popup';
+import {PopupAlignment, PopupScrollType, PopupWindowResizeType} from './Popup';
 
 export default interface PopupModel extends WidgetModel {
   /**
@@ -76,9 +76,9 @@ export default interface PopupModel extends WidgetModel {
   trimHeight?: boolean;
 
   /** Defines what should happen when the scroll parent is scrolled. It is also used if the anchor changes its location (needs to support the locationChange event). Default is 'remove'. */
-  scrollType?: 'position' | 'layoutAndPosition' | 'remove';
+  scrollType?: PopupScrollType;
 
-  windowResizeType?: 'position' | 'layoutAndPosition' | 'remove';
+  windowResizeType?: PopupWindowResizeType;
 
   /** If true, the anchor is considered when computing the position and size of the popup. Default is true. */
   boundToAnchor?: boolean;

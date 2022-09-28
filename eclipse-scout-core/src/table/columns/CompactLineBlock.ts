@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,8 +11,14 @@
 import {scout, strings} from '../../index';
 
 export default class CompactLineBlock {
+  text: string;
+  icon: string;
+  encodeHtmlEnabled: boolean;
+  nlToBrEnabled: boolean;
+  htmlToPlainTextEnabled: boolean;
+  protected _processedText: string;
 
-  constructor(text, icon) {
+  constructor(text?: string, icon?: string) {
     this.text = '';
     this.icon = '';
     this._processedText = null;
@@ -23,10 +29,7 @@ export default class CompactLineBlock {
     this.setIcon(icon);
   }
 
-  /**
-   * @param {string} text
-   */
-  setText(text) {
+  setText(text: string) {
     this.text = scout.nvl(text, '');
   }
 
@@ -37,28 +40,21 @@ export default class CompactLineBlock {
     return this._processedText;
   }
 
-  /**
-   * @param {string} icon
-   */
-  setIcon(icon) {
+  setIcon(icon: string) {
     this.icon = scout.nvl(icon, '');
   }
 
   /**
-   * Has no effect if htmlToPlainTextEnabled is true.
-   * @param {boolean}
+   * Has no effect if {@link htmlToPlainTextEnabled} is true.
    */
-  setEncodeHtmlEnabled(encodeHtmlEnabled) {
+  setEncodeHtmlEnabled(encodeHtmlEnabled: boolean) {
     if (this.encodeHtmlEnabled !== encodeHtmlEnabled) {
       this._processedText = null;
     }
     this.encodeHtmlEnabled = encodeHtmlEnabled;
   }
 
-  /**
-   * @param {boolean} nlToBrEnabled
-   */
-  setNlToBrEnabled(nlToBrEnabled) {
+  setNlToBrEnabled(nlToBrEnabled: boolean) {
     if (this.nlToBrEnabled !== nlToBrEnabled) {
       this._processedText = null;
     }
@@ -67,16 +63,15 @@ export default class CompactLineBlock {
 
   /**
    * Wins over encodeHtmlEnabled
-   * @param {boolean} htmlToPlainTextEnabled
    */
-  setHtmlToPlainTextEnabled(htmlToPlainTextEnabled) {
+  setHtmlToPlainTextEnabled(htmlToPlainTextEnabled: boolean) {
     if (this.htmlToPlainTextEnabled !== htmlToPlainTextEnabled) {
       this._processedText = null;
     }
     this.htmlToPlainTextEnabled = htmlToPlainTextEnabled;
   }
 
-  processText() {
+  processText(): string {
     let text = this.text;
     if (this.htmlToPlainTextEnabled) {
       if (this.nlToBrEnabled) {
@@ -93,7 +88,7 @@ export default class CompactLineBlock {
     return text;
   }
 
-  build() {
+  build(): string {
     if (this.icon) {
       return $('<div>').appendIcon(this.icon).addClass(this.processedText() ? ' with-text' : '').parent()[0].innerHTML + this.processedText();
     }

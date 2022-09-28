@@ -1,24 +1,27 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, Table} from '../../index';
+import {TableCellPosition} from '../Table';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class TableStartCellEditKeyStroke extends KeyStroke {
+  declare field: Table;
 
-  constructor(table) {
+  constructor(table: Table) {
     super();
     this.field = table;
     this.ctrl = true;
     this.which = [keys.ENTER];
     this.stopPropagation = true;
-    this.renderingHints.$drawingArea = ($drawingArea, event) => {
+    this.renderingHints.$drawingArea = ($drawingArea, event: ScoutKeyboardEvent & { _editPosition?: TableCellPosition }) => {
       let editPosition = event._editPosition,
         columnIndex = this.field.visibleColumns().indexOf(editPosition.column);
       if (columnIndex === 0) {
@@ -29,7 +32,7 @@ export default class TableStartCellEditKeyStroke extends KeyStroke {
     };
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent & { _editPosition?: TableCellPosition }): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -53,7 +56,7 @@ export default class TableStartCellEditKeyStroke extends KeyStroke {
     return false;
   }
 
-  handle(event) {
+  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & { _editPosition?: TableCellPosition }) {
     let editPosition = event._editPosition;
     this.field.prepareCellEdit(editPosition.column, editPosition.row, true);
   }

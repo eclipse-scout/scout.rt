@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, graphics, KeyStroke} from '../../index';
+import {arrays, graphics, KeyStroke, Rectangle, ScoutKeyboardEvent, Table, TableRow} from '../../index';
 
-export default class AbstractTableNavigationKeyStroke extends KeyStroke {
+export default abstract class AbstractTableNavigationKeyStroke extends KeyStroke {
+  declare field: Table;
 
-  constructor(table) {
+  constructor(table: Table) {
     super();
     this.repeatable = true;
     this.field = table;
@@ -22,7 +23,7 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -51,19 +52,18 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
   /**
    * Returns viewport sensitive information containing the first and last visible row in the viewport.
    */
-  _viewportInfo() {
-    let viewportBounds, dataInsets, dataMarginTop, firstRow, lastRow,
-      table = this.field,
-      viewport = {},
+  protected _viewportInfo(): ViewPortInfo {
+    let table = this.field,
+      viewport: ViewPortInfo = {},
       rows = table.visibleRows;
 
     if (rows.length === 0) {
       return viewport;
     }
 
-    viewportBounds = graphics.offsetBounds(table.$data);
-    dataInsets = graphics.insets(table.$data);
-    dataMarginTop = table.$data.cssMarginTop();
+    let viewportBounds = graphics.offsetBounds(table.$data);
+    let dataInsets = graphics.insets(table.$data);
+    let dataMarginTop = table.$data.cssMarginTop();
     viewportBounds = viewportBounds.subtract(dataInsets);
 
     // if data has a negative margin, adjust viewport otherwise a selected first row will never be in the viewport
@@ -72,34 +72,34 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
       viewportBounds.height += Math.abs(dataMarginTop);
     }
 
-    firstRow = this._findFirstRowInViewport(table, viewportBounds);
-    lastRow = this._findLastRowInViewport(table, rows.indexOf(firstRow), viewportBounds);
+    let firstRow = this._findFirstRowInViewport(table, viewportBounds);
+    let lastRow = this._findLastRowInViewport(table, rows.indexOf(firstRow), viewportBounds);
 
     viewport.firstRow = firstRow;
     viewport.lastRow = lastRow;
     return viewport;
   }
 
-  firstRowAfterSelection() {
+  firstRowAfterSelection(): TableRow {
     let $selectedRows = this.field.$selectedRows();
     if (!$selectedRows.length) {
       return;
     }
 
     let rows = this.field.visibleRows,
-      row = $selectedRows.last().data('row'),
+      row = $selectedRows.last().data('row') as TableRow,
       rowIndex = this.field.filteredRows().indexOf(row);
 
     return rows[rowIndex + 1];
   }
 
-  firstRowBeforeSelection() {
+  firstRowBeforeSelection(): TableRow {
     let $selectedRows = this.field.$selectedRows();
     if (!$selectedRows.length) {
       return;
     }
     let rows = this.field.visibleRows,
-      row = $selectedRows.first().data('row'),
+      row = $selectedRows.first().data('row') as TableRow,
       rowIndex = this.field.visibleRows.indexOf(row);
 
     return rows[rowIndex - 1];
@@ -108,12 +108,12 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
   /**
    * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
    */
-  _findLastSelectedRowBefore(table, rowIndex) {
-    let row, rows = table.visibleRows;
+  protected _findLastSelectedRowBefore(table: Table, rowIndex: number): TableRow {
+    let rows = table.visibleRows;
     if (rowIndex === 0) {
       return rows[rowIndex];
     }
-    row = arrays.findFromReverse(rows, rowIndex, (row, i) => {
+    let row = arrays.findFromReverse(rows, rowIndex, (row, i) => {
       let previousRow = rows[i - 1];
       if (!previousRow) {
         return false;
@@ -130,12 +130,12 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
   /**
    * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
    */
-  _findLastSelectedRowAfter(table, rowIndex) {
-    let row, rows = table.visibleRows;
+  protected _findLastSelectedRowAfter(table: Table, rowIndex: number): TableRow {
+    let rows = table.visibleRows;
     if (rowIndex === rows.length - 1) {
       return rows[rowIndex];
     }
-    row = arrays.findFrom(rows, rowIndex, (row, i) => {
+    let row = arrays.findFrom(rows, rowIndex, (row, i) => {
       let nextRow = rows[i + 1];
       if (!nextRow) {
         return false;
@@ -149,18 +149,16 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
     return row;
   }
 
-  _findFirstRowInViewport(table, viewportBounds) {
+  protected _findFirstRowInViewport(table: Table, viewportBounds: Rectangle): TableRow {
     let rows = table.visibleRows;
     return arrays.find(rows, (row, i) => {
-      let rowOffset, rowMarginTop,
-        $row = row.$row;
-
-      if (!row.$row) {
+      let $row = row.$row;
+      if (!$row) {
         // If row is not rendered, it cannot be part of the view port -> check next row
         return false;
       }
-      rowOffset = $row.offset();
-      rowMarginTop = row.$row.cssMarginTop();
+      let rowOffset = $row.offset();
+      let rowMarginTop = row.$row.cssMarginTop();
       // Selected row has a negative row margin
       // -> add this margin to the offset to make sure this function does always return the same row independent of selection state
       if (rowMarginTop < 0) {
@@ -172,31 +170,31 @@ export default class AbstractTableNavigationKeyStroke extends KeyStroke {
     });
   }
 
-  _findLastRowInViewport(table, startRowIndex, viewportBounds) {
+  protected _findLastRowInViewport(table: Table, startRowIndex: number, viewportBounds: Rectangle): TableRow {
     let rows = table.visibleRows;
     if (startRowIndex === rows.length - 1) {
       return rows[startRowIndex];
     }
     return arrays.findFromForward(rows, startRowIndex, (row, i) => {
-      let nextRowOffsetBounds, $nextRow,
-        nextRow = rows[i + 1];
-
+      let nextRow = rows[i + 1];
       if (!nextRow) {
         // If next row is not available (row is the last row) -> break and return current row
         return true;
       }
-      $nextRow = nextRow.$row;
+      let $nextRow = nextRow.$row;
       if (!$nextRow) {
         // If next row is not rendered anymore, current row has to be the last in the viewport
         return true;
       }
-      nextRowOffsetBounds = graphics.offsetBounds($nextRow);
+      let nextRowOffsetBounds = graphics.offsetBounds($nextRow);
       // If the next row is not fully visible in the viewport -> break and return current row
       return !viewportBounds.contains(nextRowOffsetBounds.x, nextRowOffsetBounds.y + nextRowOffsetBounds.height - 1);
     });
   }
 
-  _isEnabled() {
+  protected override _isEnabled(): boolean {
     return !this.field.tileMode;
   }
 }
+
+export type ViewPortInfo = { firstRow?: TableRow; lastRow?: TableRow };

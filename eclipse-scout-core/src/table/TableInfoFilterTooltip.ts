@@ -1,22 +1,25 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, scout, Tooltip} from '../index';
+import {Menu, scout, TableFooter, TableInfoFilterTooltipModel, Tooltip} from '../index';
 
-export default class TableInfoFilterTooltip extends Tooltip {
+export default class TableInfoFilterTooltip extends Tooltip implements TableInfoFilterTooltipModel {
+  declare model: TableInfoFilterTooltipModel;
+
+  tableFooter: TableFooter;
 
   constructor() {
     super();
   }
 
-  _init(options) {
+  protected override _init(options: TableInfoFilterTooltipModel) {
     super._init(options);
     this.tableFooter = options.tableFooter;
     let removeFilterMenu = scout.create(Menu, {
@@ -27,7 +30,7 @@ export default class TableInfoFilterTooltip extends Tooltip {
     this.setMenus(removeFilterMenu);
   }
 
-  _renderText() {
+  protected override _renderText() {
     let table = this.tableFooter.table,
       numRowsFiltered = table.filteredRows().length,
       filteredBy = table.filteredBy().join(', '); // filteredBy() returns an array
@@ -35,7 +38,7 @@ export default class TableInfoFilterTooltip extends Tooltip {
       .text(this.session.text('ui.NumRowsFilteredBy', this.tableFooter.computeCountInfo(numRowsFiltered), filteredBy));
   }
 
-  _onRemoveFilterClick() {
+  protected _onRemoveFilterClick() {
     this.tableFooter.table.resetUserFilter();
     this.destroy();
   }

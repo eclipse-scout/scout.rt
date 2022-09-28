@@ -11,7 +11,7 @@
 import {LookupCall, LookupRow, objects, scout} from '../index';
 import $ from 'jquery';
 
-export default class HierarchicalLookupResultBuilder<Key extends PropertyKey> {
+export default class HierarchicalLookupResultBuilder<Key> {
 
   lookupCall: LookupCall<Key>;
   protected _lookupRowMap: Record<PropertyKey, LookupRow<Key>>;
@@ -41,8 +41,8 @@ export default class HierarchicalLookupResultBuilder<Key extends PropertyKey> {
     }
 
     // parent already exists in map
-    if (this._lookupRowMap.hasOwnProperty(key)) {
-      lookupRow = this._lookupRowMap[key];
+    if (this._lookupRowMap.hasOwnProperty(key + '')) {
+      lookupRow = this._lookupRowMap[key + ''];
       return this._addParent(lookupRow);
     }
 
@@ -52,14 +52,14 @@ export default class HierarchicalLookupResultBuilder<Key extends PropertyKey> {
       .execute()
       .then(result => {
         let lookupRow = LookupCall.firstLookupRow(result);
-        this._lookupRowMap[lookupRow.key] = lookupRow;
+        this._lookupRowMap[lookupRow.key + ''] = lookupRow;
         return this._addParent(lookupRow);
       });
   }
 
   protected _fillMap(lookupRows: LookupRow<Key>[]) {
     lookupRows.forEach(lookupRow => {
-      this._lookupRowMap[lookupRow.key] = lookupRow;
+      this._lookupRowMap[lookupRow.key + ''] = lookupRow;
     });
   }
 

@@ -215,9 +215,7 @@ export default class CalendarComponent extends Widget implements CalendarCompone
   getLengthInHoursDecimal(): number {
     let toTimestamp = dates.parseJsonDate(this.toDate);
     let fromTimestamp = dates.parseJsonDate(this.fromDate);
-    // FIXME TS: does this work correctly (subtracting dates):
-    // @ts-ignore
-    return (toTimestamp - fromTimestamp) / (1000 * 60 * 60);
+    return (toTimestamp.getTime() - fromTimestamp.getTime()) / (1000 * 60 * 60);
   }
 
   protected _findDayInGrid(date: Date, $grid: JQuery): JQuery {
