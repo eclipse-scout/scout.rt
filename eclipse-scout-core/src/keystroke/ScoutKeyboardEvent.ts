@@ -51,6 +51,12 @@ export default interface ScoutKeyboardEvent {
   type: string;
 
   /**
+   * Optional original {@link KeyboardEvent} enhanced by a custom smartfield event flag. May be undefined.
+   * @see JQuery.KeyboardEventBase.originalEvent
+   */
+  originalEvent?: KeyboardEvent & { smartFieldEvent?: boolean } | undefined;
+
+  /**
    * @see JQuery.Event.stopPropagation
    */
   stopPropagation();

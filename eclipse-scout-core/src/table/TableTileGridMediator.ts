@@ -1,39 +1,79 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AggregateTableControl, arrays, Group, objects, scout, TileAccordion, TileGrid, TileTableHierarchyFilter, Widget} from '../index';
+import {
+  AggregateTableControl, arrays, Column, Event, EventHandler, Group, objects, PropertyChangeEvent, scout, Table, TableFilter, TableRow, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel, Tile, TileAccordion,
+  TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
+} from '../index';
 import $ from 'jquery';
+import {ScrollToOptions} from '../scrollbar/scrollbars';
+import {TableAllRowsDeletedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent} from './TableEventMap';
 
 /**
  * Delegates events between the Table and it's internal TileGrid.
  *
  */
-export default class TableTileGridMediator extends Widget {
+export default class TableTileGridMediator extends Widget implements TableTileGridMediatorModel {
+  declare model: TableTileGridMediatorModel;
+  declare eventMap: TableTileGridMediatorEventMap;
+  declare parent: Table;
+
+  table: Table;
+  tileAccordion: TileAccordion;
+  tiles: Tile[];
+
+  /** used only in scout classic */
+  tileMappings: TableRowTileMapping[];
+
+  /** tiles by rowId */
+  tilesMap: Record<string, Tile>;
+
+  /** groupId by tile */
+  groupForTileMap: Record<string, string>;
+
+  /** always stores the last table state before tileMode activation */
+  tableState: Record<string, any>;
+
+  /** properties for internal tileAccordion */
+  exclusiveExpand: boolean;
+
+  gridColumnCount: number;
+  tileGridLayoutConfig: TileGridLayoutConfig;
+  withPlaceholders: boolean;
+
+  protected _isUpdatingTiles: boolean;
+  protected _tableHierarchyFilter: TileTableHierarchyFilter;
+  protected _destroyHandler: () => void;
+  protected _tileAccordionPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, TileAccordion>>;
+  protected _tileAccordionActionHandler: EventHandler<Event<TileAccordion>>; // FIXME TS: use correct event type as soon as TileAccordion has been migrated
+  protected _tileAccordionClickHandler: EventHandler<Event<TileAccordion>>; // FIXME TS: use correct event type as soon as TileAccordion has been migrated
+  protected _tableFilterAddedHandler: EventHandler<TableFilterAddedEvent>;
+  protected _tableFilterRemovedHandler: EventHandler<TableFilterRemovedEvent>;
+  protected _tableFilterHandler: EventHandler<Event<Table>>;
+  protected _tableGroupHandler: EventHandler<TableGroupEvent>;
+  protected _tableRowsSelectedHandler: EventHandler<TableRowsSelectedEvent>;
+  protected _tableRowsInsertedHandler: EventHandler<TableRowsInsertedEvent>;
+  protected _tableRowsDeletedHandler: EventHandler<TableRowsDeletedEvent>;
+  protected _tableAllRowsDeletedHandler: EventHandler<TableAllRowsDeletedEvent>;
+  protected _tableRowOrderChangedHandler: EventHandler<TableRowOrderChangedEvent>;
 
   constructor() {
     super();
 
     this.table = null;
     this.tileAccordion = null;
-
-    this._tileGridListener = null;
-    this._tableListener = null;
-    this._destroyHandler = null;
-
     this.tiles = [];
-    this.tileMappings = []; // used only in scout classic
-    this.tilesMap = {}; // tiles by rowId
-    this.groups = {};
-    this.groupForTileMap = {}; // groupId by tile
-    this.tableState = {}; // always stores the last table state before tileMode activation
-
+    this.tileMappings = [];
+    this.tilesMap = {};
+    this.groupForTileMap = {};
+    this.tableState = {};
     this._tileAccordionPropertyChangeHandler = this._onTileAccordionPropertyChange.bind(this);
     this._tileAccordionActionHandler = this._onTileAccordionAction.bind(this);
     this._tileAccordionClickHandler = this._onTileAccordionClick.bind(this);
@@ -46,10 +86,7 @@ export default class TableTileGridMediator extends Widget {
     this._tableRowsDeletedHandler = this._onTableRowsDeleted.bind(this);
     this._tableAllRowsDeletedHandler = this._onTableAllRowsDeleted.bind(this);
     this._tableRowOrderChangedHandler = this._onTableRowOrderChangedHandler.bind(this);
-
     this._destroyHandler = this._uninstallListeners.bind(this);
-
-    // properties for internal tileAccordion
     this.exclusiveExpand = false;
     this.gridColumnCount = null;
     this.tileGridLayoutConfig = null;
@@ -58,7 +95,7 @@ export default class TableTileGridMediator extends Widget {
     this._addWidgetProperties(['tileAccordion', 'tiles', 'tileMappings']);
   }
 
-  init(model) {
+  override init(model: TableTileGridMediatorModel) {
     super._init(model);
 
     this.table = this.parent;
@@ -73,7 +110,7 @@ export default class TableTileGridMediator extends Widget {
     this._setTileMappings(this.tileMappings);
   }
 
-  _installListeners() {
+  protected _installListeners() {
     this.tileAccordion.on('propertyChange', this._tileAccordionPropertyChangeHandler);
     this.tileAccordion.on('tileAction', this._tileAccordionActionHandler);
     this.tileAccordion.on('tileClick', this._tileAccordionClickHandler);
@@ -91,7 +128,7 @@ export default class TableTileGridMediator extends Widget {
     this.table.on('destroy', this._destroyHandler);
   }
 
-  _uninstallListeners() {
+  protected _uninstallListeners() {
     this.tileAccordion.off('propertyChange', this._tileAccordionPropertyChangeHandler);
     this.tileAccordion.off('tileAction', this._tileAccordionActionHandler);
     this.tileAccordion.off('tileClick', this._tileAccordionClickHandler);
@@ -109,7 +146,7 @@ export default class TableTileGridMediator extends Widget {
     this.table.off('destroy', this._destroyHandler);
   }
 
-  setGridColumnCount(gridColumnCount) {
+  setGridColumnCount(gridColumnCount: number) {
     this.setProperty('gridColumnCount', gridColumnCount);
     if (this.tileAccordion) {
       this.tileAccordion.setGridColumnCount(gridColumnCount);
@@ -123,14 +160,14 @@ export default class TableTileGridMediator extends Widget {
     }
   }
 
-  setWithPlaceholders(withPlaceholders) {
+  setWithPlaceholders(withPlaceholders: boolean) {
     this.setProperty('withPlaceholders', withPlaceholders);
     if (this.tileAccordion) {
       this.tileAccordion.setWithPlaceholders(withPlaceholders);
     }
   }
 
-  _setTileMappings(tableRowTileMappings) {
+  protected _setTileMappings(tableRowTileMappings: TableRowTileMapping[]) {
     this._setProperty('tileMappings', tableRowTileMappings);
     if (!tableRowTileMappings) {
       return;
@@ -139,11 +176,11 @@ export default class TableTileGridMediator extends Widget {
     this._setTiles(tiles);
   }
 
-  setTiles(tiles) {
+  setTiles(tiles: Tile[]) {
     this.setProperty('tiles', tiles);
   }
 
-  _setTiles(tiles) {
+  protected _setTiles(tiles: Tile[]) {
     this._isUpdatingTiles = true;
     // remove all new tiles from this.tiles to prevent reused tiles from being destroyed in reset()
     arrays.removeAll(this.tiles, tiles);
@@ -152,12 +189,9 @@ export default class TableTileGridMediator extends Widget {
     this._isUpdatingTiles = false;
   }
 
-  _setTilesInternal(tiles) {
+  protected _setTilesInternal(tiles: Tile[]) {
     // check if all tiles are already available in the table
-    let tableRowMissing = tiles.some(function(tile) {
-      return this.table.rowsMap[tile.rowId] === undefined;
-    }, this);
-
+    let tableRowMissing = tiles.some(tile => this.table.rowsMap[tile.rowId] === undefined);
     if (tableRowMissing) {
       if (this.table.initialized) {
         // wait for next insertRows event on the table to execute this function again
@@ -185,16 +219,14 @@ export default class TableTileGridMediator extends Widget {
   // only used in ScoutJS, see TableAdapter.modifyTablePrototype()
   loadTiles() {
     // hierarchy is not supported in tile mode. There is no way to visualize a parent-child hierarchy in the tileGrid. Therefore only top level rows are displayed.
-    let rows = this.table.rows.filter(row => {
-      return !row.parentRow;
-    });
+    let rows = this.table.rows.filter(row => !row.parentRow);
     let tiles = this.table.createTiles(rows);
     if (tiles) {
       this.setTiles(tiles);
     }
   }
 
-  resolveMapping(tableRowTileMapping) {
+  resolveMapping(tableRowTileMapping: TableRowTileMapping): Tile {
     let tile = tableRowTileMapping.tile;
     tile.rowId = tableRowTileMapping.tableRow;
     tile.setParent(this);
@@ -203,30 +235,26 @@ export default class TableTileGridMediator extends Widget {
   }
 
   // update tilesMap with the given tiles or recreate tilesMap completely in case of null given
-  _refreshTilesMap(tiles) {
+  protected _refreshTilesMap(tiles: Tile[]) {
     if (!tiles) {
       tiles = this.tiles;
       this.tilesMap = {};
     }
-    tiles.forEach(function(tile) {
+    tiles.forEach(tile => {
       this.tilesMap[tile.rowId] = tile;
-    }, this);
-  }
-
-  getTilesForRows(rows) {
-    return rows.map(function(row) {
-      return this.tilesMap[row.id];
-    }, this).filter(t => {
-      return !!t;
     });
   }
 
-  _initGroups(tiles) {
-    let primaryGroupingColumn = arrays.find(this.table.columns, column => {
-      return column.grouped && column.sortIndex === 0;
-    });
+  getTilesForRows(rows: TableRow[]): Tile[] {
+    return rows
+      .map(row => this.tilesMap[row.id])
+      .filter(t => !!t);
+  }
 
-    tiles.forEach(function(tile) {
+  protected _initGroups(tiles: Tile[]) {
+    let primaryGroupingColumn = arrays.find(this.table.columns, column => column.grouped && column.sortIndex === 0);
+
+    tiles.forEach(tile => {
       let row = this.table.rowsMap[tile.rowId];
       let groupId = primaryGroupingColumn ? primaryGroupingColumn.cellTextForGrouping(row) : 'default';
       groupId = scout.nvl(groupId, ''); // use empty group to avoid NPE
@@ -235,17 +263,17 @@ export default class TableTileGridMediator extends Widget {
       let group = this.tileAccordion.getGroupById(groupId);
       if (!group) {
         group = this._createTileGroup(groupId, primaryGroupingColumn, row);
-        this._adaptTileGrid(group.body);
+        this._adaptTileGrid(group.body as TileGrid);
         this.tileAccordion.insertGroup(group);
       }
       tile.parent = group;
-    }, this);
+    });
   }
 
-  _adaptTileGrid(tileGrid) {
+  protected _adaptTileGrid(tileGrid: TileGrid) {
     // The table contains the menu items -> pass them to the showContextMenu function of the tileGrid.
     objects.mandatoryFunction(tileGrid, '_showContextMenu');
-    let origShowContextMenu = tileGrid._showContextMenu;
+    let origShowContextMenu = tileGrid._showContextMenu; // FIXME TS: adapt signatures as soon as TileGrid has been migrated
     tileGrid._showContextMenu = function(options) {
       objects.mandatoryFunction(this.table, '_filterMenusForContextMenu');
       options.menuItems = this.table._filterMenusForContextMenu();
@@ -257,7 +285,7 @@ export default class TableTileGridMediator extends Widget {
     tileGrid.keyStrokeContext.$bindTarget = this.table.keyStrokeContext.$bindTarget;
   }
 
-  _createTileAccordion() {
+  protected _createTileAccordion(): TileAccordion {
     return scout.create(TileAccordion, {
       parent: this.table,
       virtual: true,
@@ -270,8 +298,8 @@ export default class TableTileGridMediator extends Widget {
     });
   }
 
-  _createTileGroup(groupId, primaryGroupingColumn, row) {
-    let htmlEnabled, title, iconId;
+  protected _createTileGroup(groupId: string, primaryGroupingColumn: Column, row: TableRow): Group {
+    let htmlEnabled: boolean, title: string, iconId: string;
     if (primaryGroupingColumn) {
       htmlEnabled = primaryGroupingColumn.htmlEnabled;
       let cell = primaryGroupingColumn.createAggrGroupCell(row);
@@ -300,16 +328,13 @@ export default class TableTileGridMediator extends Widget {
     }
 
     // hide aggregation table control
-    this.table.tableControls.forEach(function(control) {
+    this.table.tableControls.forEach(control => {
       if (control instanceof AggregateTableControl) {
         this.tableState.aggregateTableControlSelected = control.selected;
-        control.setSelected(false, {
-          closeWhenUnselected: true,
-          animate: false
-        });
+        control.setSelected(false, {closeWhenUnselected: true, animate: false});
         control.setVisible(false);
       }
-    }, this);
+    });
 
     this.tableState.loadingSupportContainer = this.table.loadingSupport.options$Container;
     this.table.loadingSupport.options$Container = function() {
@@ -317,10 +342,7 @@ export default class TableTileGridMediator extends Widget {
     }.bind(this);
 
     // check if there exists a hierarchy within the tableRows
-    let hasHierarchy = arrays.find(this.table.rows, row => {
-      return row.parentRow;
-    }) !== null;
-
+    let hasHierarchy = arrays.find(this.table.rows, row => !!row.parentRow) !== null;
     if (hasHierarchy) {
       // add the hierarchyFilter since the tileMode doesn't support hierarchy
       this._tableHierarchyFilter = scout.create(TileTableHierarchyFilter, {
@@ -341,9 +363,10 @@ export default class TableTileGridMediator extends Widget {
       if (control instanceof AggregateTableControl) {
         control.setVisible(true);
       }
-    }, this);
+    });
 
     // use _setProperty to avoid instant rendering, render manually later on (this is necessary since TableHeader depends upon table.$data)
+    // @ts-ignore
     this.table._setProperty('headerVisible', this.tableState.headerVisible);
     if (this.table.tileTableHeader) {
       this.table.tileTableHeader.setVisible(false);
@@ -366,21 +389,19 @@ export default class TableTileGridMediator extends Widget {
 
   reset() {
     this.tilesMap = {};
-    this.groups = {};
     this.groupForTileMap = {};
     this.tileAccordion.deleteAllTiles();
     this.tileAccordion.deleteAllGroups();
 
     // destroy tiles manually since owner is the mediator thus the tileGrid can't destroy them
-    this.tiles.forEach(tile => {
-      tile.destroy();
-    });
+    this.tiles.forEach(tile => tile.destroy());
   }
 
   renderTileMode() {
     if (this.table.tileMode) {
       // if the table was previously in tileMode this is not necessary...
       if (this.table.$data) {
+        // @ts-ignore
         this.table._removeData();
       }
       this._renderTileTableHeader();
@@ -388,31 +409,28 @@ export default class TableTileGridMediator extends Widget {
     } else {
       this._removeTileTableHeader();
       this._removeTileAccordion();
+      // @ts-ignore
       this.table._renderData();
+      // @ts-ignore
       this.table._renderTableHeader();
 
       // restore selected state of the aggregationTableControl here since it depends on table.$data
       if (this.tableState.aggregateTableControlSelected) {
-        arrays.find(this.table.tableControls,
-          control => control instanceof AggregateTableControl)
-          .setSelected(true);
+        arrays.find(this.table.tableControls, control => control instanceof AggregateTableControl).setSelected(true);
       }
-
     }
+    // @ts-ignore
     this.table._refreshMenuBarPosition();
   }
 
-  destroy() {
+  override destroy() {
     // destroy tiles manually since owner is the mediator thus the tileGrid can't destroy them
-    this.tiles.forEach(tile => {
-      tile.destroy();
-    });
-
+    this.tiles.forEach(tile => tile.destroy());
     this.tileAccordion.destroy();
     this.tileAccordion = null;
   }
 
-  insertTiles(tiles) {
+  insertTiles(tiles: Tile[] | Tile) {
     tiles = arrays.ensure(tiles);
     if (tiles.length === 0) {
       return;
@@ -420,12 +438,12 @@ export default class TableTileGridMediator extends Widget {
     this.setTiles(this.tiles.concat(tiles));
   }
 
-  deleteTiles(tiles) {
+  deleteTiles(tiles?: Tile[]) {
     if (!tiles) {
       tiles = this.tiles.slice();
     }
     arrays.removeAll(this.tiles, tiles);
-    tiles.forEach(function(tile) {
+    tiles.forEach(tile => {
       delete this.tilesMap[tile.rowId];
       delete this.groupForTileMap[tile.rowId];
       let group = this.tileAccordion.getGroupByTile(tile);
@@ -436,11 +454,11 @@ export default class TableTileGridMediator extends Widget {
         }
       }
       tile.destroy();
-    }, this);
+    });
     this.tileAccordion.deleteTiles(tiles);
   }
 
-  _onTileAccordionPropertyChange(event) {
+  protected _onTileAccordionPropertyChange(event: PropertyChangeEvent<any, TileAccordion>) {
     if (!this.table.tileMode) {
       return;
     }
@@ -451,66 +469,67 @@ export default class TableTileGridMediator extends Widget {
         // and the tiles itself, which doesn't look nice. Remove the text selection when selection tiles to avoid this.
         this.tileAccordion.$container.document(true).getSelection().removeAllRanges();
       }
-    }
-    if (event.propertyName === 'filteredTiles') {
+    } else if (event.propertyName === 'filteredTiles') {
       this._updateGroupVisibility();
     }
   }
 
-  _onTileAccordionAction(event) {
+  protected _onTileAccordionAction(event: Event<TileAccordion>) { // FIXME TS: use correct event type as soon as TileAccordion has been migrated and remove ts-ignore
     if (!this.table.tileMode) {
       return;
     }
+    // @ts-ignore
     this.table.doRowAction(this.table.rowsMap[event.tile.rowId]);
   }
 
-  _onTileAccordionClick(event) {
+  protected _onTileAccordionClick(event: Event<TileAccordion>) { // FIXME TS: use correct event type as soon as TileAccordion has been migrated and remove ts-ignore
     if (!this.table.tileMode) {
       return;
     }
+    // @ts-ignore
     this.table._triggerRowClick(event, this.table.rowsMap[event.tile.rowId], event.mouseButton);
   }
 
-  _onTableRowsSelected(event) {
+  protected _onTableRowsSelected(event: TableRowsSelectedEvent) {
     if (!this.table.tileMode) {
       return;
     }
     this._syncSelectionFromTableToTile();
   }
 
-  _onTableRowsInserted(event) {
+  protected _onTableRowsInserted(event: TableRowsInsertedEvent) {
     if (!this.table.tileMode) {
       return;
     }
+    // @ts-ignore
     this.insertTiles(this.table.createTiles(event.rows));
   }
 
-  _onTableRowsDeleted(event) {
+  protected _onTableRowsDeleted(event: TableRowsDeletedEvent) {
     if (!this.table.tileMode) {
       return;
     }
+    // @ts-ignore
     this.deleteTiles(this.getTilesForRows(event.rows));
   }
 
-  _onTableAllRowsDeleted(event) {
+  protected _onTableAllRowsDeleted(event: TableAllRowsDeletedEvent) {
     if (!this.table.tileMode) {
       return;
     }
     this.deleteTiles();
   }
 
-  _onTableRowOrderChangedHandler(event) {
+  protected _onTableRowOrderChangedHandler(event: TableRowOrderChangedEvent) {
     // ignore event when not in tileMode or when this.tilesMap is not (yet) initialized correctly
     if (!this.table.tileMode || $.isEmptyObject(this.tilesMap)) {
       return;
     }
-    this.tiles = this.table.rows.map(function(row) {
-      return this.tilesMap[row.id];
-    }, this);
+    this.tiles = this.table.rows.map(row => this.tilesMap[row.id]);
     this.tileAccordion.setTiles(this.tiles);
   }
 
-  _onTableGroup(event) {
+  protected _onTableGroup(event?: TableGroupEvent) {
     if (!this.table.tileMode) {
       return;
     }
@@ -519,26 +538,28 @@ export default class TableTileGridMediator extends Widget {
     this.tileAccordion.setTiles(this.tiles);
   }
 
-  _onTableFilterAdded(event) {
+  protected _onTableFilterAdded(event: TableFilterAddedEvent) {
     if (!this.table.tileMode) {
       return;
     }
     this._addFilter(event.filter);
   }
 
-  _onTableFilterRemoved(event) {
+  protected _onTableFilterRemoved(event: TableFilterRemovedEvent) {
     if (!this.table.tileMode) {
       return;
     }
 
+    // @ts-ignore
     this.tileAccordion.removeFilter(event.filter.tileFilter);
   }
 
-  _addFilter(tableFilter) {
+  // FIXME TS: use tileFilter in parameter signature as soon as tile accordion has been migrated
+  protected _addFilter(tableFilter: TableFilter & { tileFilter?: { table: Table; accept(tile: Tile): boolean } }) {
     let tileFilter = {
       table: this.table,
-      accept: function(tile) {
-        let rowForTile = this.table.rowsMap[tile.rowId];
+      accept: function(tile: Tile) {
+        let rowForTile = this.table.rowsMap[tile.rowId] as TableRow;
         if (rowForTile) {
           return tableFilter.accept(rowForTile);
         }
@@ -552,40 +573,40 @@ export default class TableTileGridMediator extends Widget {
     this.tileAccordion.addFilter(tileFilter);
   }
 
-  _onTableFilter(event) {
+  protected _onTableFilter(event: Event<Table>) {
     if (!this.table.tileMode) {
       return;
     }
     this.tileAccordion.filter();
   }
 
-  _syncSelectionFromTableToTile() {
+  protected _syncSelectionFromTableToTile() {
     if (this.tileAccordion) {
       this.tileAccordion.selectTiles(this.getTilesForRows(this.table.selectedRows));
     }
   }
 
-  _syncSelectionFromTileGridToTable(selectedTiles) {
+  protected _syncSelectionFromTileGridToTable(selectedTiles: Tile[]) {
     if (!this._isUpdatingTiles) {
-      let selectedRows = selectedTiles.map(function(tile) {
-        return this.table.rowsMap[tile.rowId];
-      }, this).filter(t => {
-        return Boolean(t);
-      });
+      let selectedRows = selectedTiles
+        .map(tile => this.table.rowsMap[tile.rowId])
+        .filter(t => Boolean(t));
       this.table.selectRows(selectedRows);
     }
   }
 
-  _updateGroupVisibility() {
+  protected _updateGroupVisibility() {
     this.tileAccordion.groups.forEach(group => {
       // Make groups invisible if a tile filter is active and no tiles match (= no tiles are visible)
-      let groupEmpty = group.body.filters.length > 0 && group.body.filteredTiles.length === 0;
+      let body = group.body as TileGrid;
+      let groupEmpty = body.filters.length > 0 && body.filteredTiles.length === 0;
       group.setVisible(!groupEmpty);
-      group.setTitleSuffix(group.body.filteredTiles.length);
+      group.setTitleSuffix(body.filteredTiles.length + '');
     });
   }
 
-  _syncScrollTopFromTableToTile() {
+  protected _syncScrollTopFromTableToTile() {
+    // @ts-ignore
     let rowIndex = this.table._rowIndexAtScrollTop(this.table.scrollTop);
     if (rowIndex <= 0) {
       return;
@@ -598,7 +619,7 @@ export default class TableTileGridMediator extends Widget {
     // reset scrollTop on tileAccordion, otherwise it would overwrite the synced scrollTop
     this.tileAccordion.scrollTop = null;
 
-    let options = {
+    let options: ScrollToOptions = {
       align: 'top'
     };
 
@@ -610,12 +631,13 @@ export default class TableTileGridMediator extends Widget {
     tile.reveal(options);
   }
 
-  _syncScrollTopFromTileGridToTable() {
+  protected _syncScrollTopFromTileGridToTable() {
     let tile = this.tileAccordion._tileAtScrollTop(this.tileAccordion.scrollTop);
     if (tile) {
-      let options = {
+      let options: ScrollToOptions = {
         align: 'top'
       };
+      // @ts-ignore
       if (!this.table._isDataRendered()) {
         this.table.session.layoutValidator.schedulePostValidateFunction(this.table.scrollTo.bind(this.table, this.table.rowsMap[tile.rowId], options));
       } else {
@@ -624,32 +646,32 @@ export default class TableTileGridMediator extends Widget {
     }
   }
 
-  _syncFiltersFromTableToTile() {
+  protected _syncFiltersFromTableToTile() {
     if (this.tileAccordion) {
       this.tileAccordion.setFilters([]);
       this.table.filters.forEach(tableFilter => this._addFilter(tableFilter));
     }
   }
 
-  _renderTileTableHeader() {
+  protected _renderTileTableHeader() {
     if (this.table.tileTableHeader) {
       this.table.tileTableHeader.render();
     }
   }
 
-  _removeTileTableHeader() {
+  protected _removeTileTableHeader() {
     if (this.table.tileTableHeader) {
       this.table.tileTableHeader.remove();
     }
   }
 
-  _renderTileAccordion() {
+  protected _renderTileAccordion() {
     if (!this.tileAccordion.rendered) {
       this.tileAccordion.render();
     }
   }
 
-  _removeTileAccordion() {
+  protected _removeTileAccordion() {
     if (this.tileAccordion.rendered) {
       this.tileAccordion.remove();
     }

@@ -3,15 +3,34 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorTabKeyStroke, events, FormField, graphics, Point, Popup, Rectangle, scout} from '../../index';
+import {
+  AbstractLayout, Cell, CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorPopupModel, CellEditorTabKeyStroke, Column, EventHandler, events, FormField, graphics, KeyStroke, Point, Popup,
+  Rectangle, scout, Table, TableRow
+} from '../../index';
 import $ from 'jquery';
+import {KeyStrokeManagerKeyStrokeEvent} from '../../keystroke/KeyStrokeManagerEventMap';
+import {TableRowOrderChangedEvent} from '../TableEventMap';
 
-export default class CellEditorPopup extends Popup {
+export type CellEditorPopupRenderedOptions = {
+  openFieldPopup: boolean;
+  cellEditorPopup: CellEditorPopup;
+};
+
+export default class CellEditorPopup extends Popup implements CellEditorPopupModel {
+  declare model: CellEditorPopupModel;
+
+  table: Table;
+  column: Column;
+  row: TableRow;
+  cell: Cell;
+  protected _rowOrderChangedFunc: EventHandler<TableRowOrderChangedEvent>;
+  protected _pendingCompleteCellEdit: JQuery.Promise<void>;
+  protected _keyStrokeHandler: EventHandler<KeyStrokeManagerKeyStrokeEvent>;
 
   constructor() {
     super();
@@ -23,7 +42,7 @@ export default class CellEditorPopup extends Popup {
     this._keyStrokeHandler = this._onKeyStroke.bind(this);
   }
 
-  _init(options) {
+  protected override _init(options: CellEditorPopupModel) {
     options.scrollType = options.scrollType || 'position';
     super._init(options);
 
@@ -31,46 +50,34 @@ export default class CellEditorPopup extends Popup {
     this.link(this.cell.field);
   }
 
-  _createLayout() {
+  protected override _createLayout(): AbstractLayout {
     return new CellEditorPopupLayout(this);
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    this.keyStrokeContext.registerKeyStroke([
+    this.keyStrokeContext.registerKeyStrokes([
       new CellEditorCompleteEditKeyStroke(this),
       new CellEditorTabKeyStroke(this)
     ]);
   }
 
-  /**
-   * @override
-   */
-  _createCloseKeyStroke() {
+  protected override _createCloseKeyStroke(): KeyStroke {
     return new CellEditorCancelEditKeyStroke(this);
   }
 
-  /**
-   * @override
-   */
-  _open($parent, event) {
-    this.render($parent, event);
+  protected override _open($parent: JQuery) {
+    this.render($parent);
     this.position();
     this.pack();
   }
 
-  /**
-   * @override
-   */
-  _getDefaultOpen$Parent() {
+  protected override _getDefaultOpen$Parent(): JQuery {
     return this.table.$data;
   }
 
-  _render() {
+  protected override _render() {
     super._render();
 
     // determine CSS class for first and last column, required for additional margins/padding in cell-editor
@@ -79,7 +86,7 @@ export default class CellEditorPopup extends Popup {
       colPos = visibleCols.indexOf(this.column);
     if (colPos === 0) { // first cell
       cssClass = 'first';
-    } else if (colPos === visibleCols.length - 1) { // last cell
+    } else if (colPos === visibleCols.length - 1) {
       cssClass = 'last';
     }
 
@@ -123,7 +130,7 @@ export default class CellEditorPopup extends Popup {
    * If there is no border between the rows, there is no adjustment necessary, the selection is as height as the row.
    * -> Position and size of the cell editor popup depends on the selection of the current row and the table style (with or without row borders)
    */
-  _alignWithSelection() {
+  protected _alignWithSelection() {
     let selectionTop = this._rowSelectionBounds().y;
     if (selectionTop < 0) {
       this.$container.cssMarginTop(selectionTop);
@@ -131,7 +138,7 @@ export default class CellEditorPopup extends Popup {
     }
   }
 
-  _rowSelectionBounds() {
+  protected _rowSelectionBounds(): Rectangle {
     let bounds = new Rectangle();
     let style = getComputedStyle(this.row.$row[0], ':after');
     if (style) {
@@ -140,11 +147,11 @@ export default class CellEditorPopup extends Popup {
     return bounds;
   }
 
-  _postRender() {
+  protected override _postRender() {
     super._postRender(); // installs the focus context for this popup
 
     // If applicable, invoke the field's function 'onCellEditorRendered' to signal the cell-editor to be rendered.
-    let field = this.cell.field;
+    let field = this.cell.field as FormField & { onCellEditorRendered?(options: CellEditorPopupRenderedOptions): void };
     if (field.onCellEditorRendered) {
       field.onCellEditorRendered({
         openFieldPopup: this.table.openFieldPopupOnCellEdit,
@@ -153,7 +160,7 @@ export default class CellEditorPopup extends Popup {
     }
   }
 
-  _remove() {
+  protected override _remove() {
     super._remove(); // uninstalls the focus context for this popup
 
     this.session.keyStrokeManager.off('keyStroke', this._keyStrokeHandler);
@@ -165,7 +172,7 @@ export default class CellEditorPopup extends Popup {
     this.$anchor.css('visibility', '');
   }
 
-  position() {
+  override position(switchIfNecessary?: boolean) {
     let $tableData = this.table.$data,
       $row = this.row.$row,
       $cell = this.$anchor,
@@ -179,9 +186,10 @@ export default class CellEditorPopup extends Popup {
   }
 
   /**
-   * @returns {Promise} resolved when acceptInput is performed on the editor field
+   * @param waitForAcceptInput default is true
+   * @returns A promise resolved when acceptInput is performed on the editor field
    */
-  completeEdit(waitForAcceptInput) {
+  completeEdit(waitForAcceptInput?: boolean): JQuery.Promise<any> {
     if (this._pendingCompleteCellEdit) {
       // Make sure complete cell edit does not get sent twice since it will lead to exceptions. This may happen if user clicks very fast multiple times.
       return this._pendingCompleteCellEdit;
@@ -191,14 +199,12 @@ export default class CellEditorPopup extends Popup {
     // When acceptInput returns a promise, we must wait until input is accepted
     // Otherwise call completeEdit immediately, also call it immediately if waitForAcceptInput is false (see _onKeyStroke)
     let field = this.cell.field;
-    let acceptInputPromise = field.acceptInput();
+    let acceptInputPromise = field.acceptInput() as JQuery.Promise<void>; // FIXME TS: cast can be removed as soon as ValueField has been migrated
     if (!acceptInputPromise || !scout.nvl(waitForAcceptInput, true)) {
       this._pendingCompleteCellEdit = $.resolvedPromise();
       this.table.completeCellEdit();
     } else {
-      this._pendingCompleteCellEdit = acceptInputPromise.then(() => {
-        this.table.completeCellEdit();
-      });
+      this._pendingCompleteCellEdit = acceptInputPromise.then(() => this.table.completeCellEdit());
     }
 
     this._pendingCompleteCellEdit.then(() => {
@@ -209,7 +215,7 @@ export default class CellEditorPopup extends Popup {
     return this._pendingCompleteCellEdit;
   }
 
-  isCompleteCellEditRequested() {
+  isCompleteCellEditRequested(): boolean {
     return !!this._pendingCompleteCellEdit;
   }
 
@@ -218,7 +224,7 @@ export default class CellEditorPopup extends Popup {
     this.remove();
   }
 
-  _onMouseDownOutside(event) {
+  protected override _onMouseDownOutside(event: MouseEvent) {
     let $clickedRow = $(event.target).closest('.table-row', this.table.$container[0]);
     // noinspection JSIgnoredPromiseFromCall
     this.completeEdit();
@@ -232,9 +238,10 @@ export default class CellEditorPopup extends Popup {
     }
   }
 
-  _propagateMouseDownToTableRow(event) {
+  protected _propagateMouseDownToTableRow(event: MouseEvent) {
     let doc = this.table.$container.document(true);
-    let $target = $(doc.elementFromPoint(event.pageX, event.pageY));
+    let clickedElement = doc.elementFromPoint(event.pageX, event.pageY) as HTMLElement;
+    let $target = $(clickedElement);
     let $clickedRow = $target.closest('.table-row', this.table.$container[0]);
     if ($clickedRow.length === 0) {
       return;
@@ -242,7 +249,7 @@ export default class CellEditorPopup extends Popup {
     events.propagateEvent($target[0], event);
   }
 
-  _onKeyStroke(event) {
+  protected _onKeyStroke(event: KeyStrokeManagerKeyStrokeEvent) {
     if (!this._invokeCompleteEditBeforeKeyStroke(event)) {
       return;
     }
@@ -252,7 +259,7 @@ export default class CellEditorPopup extends Popup {
     this.completeEdit(false);
   }
 
-  _invokeCompleteEditBeforeKeyStroke(event) {
+  protected _invokeCompleteEditBeforeKeyStroke(event: KeyStrokeManagerKeyStrokeEvent): boolean {
     if (!this.session.keyStrokeManager.invokeAcceptInputOnActiveValueField(event.keyStroke, event.keyStrokeContext)) {
       return false;
     }
@@ -263,7 +270,7 @@ export default class CellEditorPopup extends Popup {
     return true;
   }
 
-  waitForCompleteCellEdit() {
+  waitForCompleteCellEdit(): JQuery.Promise<void> {
     if (this._pendingCompleteCellEdit) {
       return this._pendingCompleteCellEdit.promise();
     }

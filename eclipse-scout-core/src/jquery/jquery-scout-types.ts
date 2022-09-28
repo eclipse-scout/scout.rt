@@ -84,7 +84,7 @@ declare global {
      * @param [options] an optional options object. Short-hand version: If a number is passed instead
      *          of an object, the value is automatically converted to the option 'delay'.
      */
-    debounce(fx: (...args: any[]) => unknown, options?: DebounceOptions | number): void;
+    debounce(fx: (...args: any[]) => void, options?: DebounceOptions | number): ((...args: any[]) => void) & { cancel(): boolean };
 
     /**
      * Executes the given function. Further calls to the same function are delayed by the given delay.
@@ -287,7 +287,7 @@ declare global {
     isJqXHR(obj: unknown): obj is JQuery.jqXHR;
   }
 
-  interface JQuery<TElement = HTMLElement> {
+  interface JQuery<TElement = HTMLElement> extends Array<TElement> {
     /**
      * @param $element returns the given element if the current jquery object does not contain any elements.
      * Otherwise returns the current jquery object.

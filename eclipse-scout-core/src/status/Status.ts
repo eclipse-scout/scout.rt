@@ -19,12 +19,14 @@ export type StatusOrModel<T extends Status = Status> = Status | ModelOf<T> & { o
 
 export default class Status {
   declare model: StatusModel;
+
   message: string;
   severity: StatusSeverity;
   iconId: string;
   code: number;
   children: Status[];
   deletable: boolean;
+  uiState: string;
 
   constructor(model?: StatusModel) {
     this.message = null;

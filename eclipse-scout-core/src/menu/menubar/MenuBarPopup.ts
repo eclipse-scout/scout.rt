@@ -36,9 +36,7 @@ export default class MenuBarPopup extends ContextMenuPopup implements MenuBarPop
     this.$container.addClass('menu-bar-popup');
   }
 
-  protected override _getMenuItems() {
-    // @ts-ignore
-    // FIXME TS: this.menu.menus does not exist. Is this still necessary?
-    return this.menu.childActions || this.menu.menus;
+  protected override _getMenuItems(): Menu[] {
+    return this.menu.childActions;
   }
 }

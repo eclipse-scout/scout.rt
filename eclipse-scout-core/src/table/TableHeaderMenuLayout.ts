@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, graphics, HtmlComponent, PopupLayout} from '../index';
+import {Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Popup, PopupLayout, TableHeaderMenu} from '../index';
 
 export default class TableHeaderMenuLayout extends PopupLayout {
+  declare popup: TableHeaderMenu;
 
-  constructor(popup) {
+  constructor(popup: Popup) {
     super(popup);
-    this.popup = popup;
     this.doubleCalcPrefSize = false;
   }
 
@@ -25,15 +25,14 @@ export default class TableHeaderMenuLayout extends PopupLayout {
    * - layout the filter-fields (their size is fixed)
    * - use the remaining height to layout the filter table
    */
-  layout($container) {
+  override layout($container: JQuery) {
     super.layout($container);
 
     if (!this.popup.hasFilterFields && !this.popup.hasFilterTable) {
       return;
     }
 
-    let
-      actionColumnSize, filterColumnSize,
+    let filterColumnSize: Dimension,
       $filterColumn = this.popup.$columnFilters,
       filterColumnInsets = graphics.insets($filterColumn),
       filterColumnMargins = graphics.margins($filterColumn),
@@ -68,13 +67,11 @@ export default class TableHeaderMenuLayout extends PopupLayout {
 
     // Filter table
     if (this.popup.hasFilterTable) {
-      let
-        filterTableContainerHeight,
-        $filterTableGroup = this.popup.$filterTableGroup,
+      let $filterTableGroup = this.popup.$filterTableGroup,
         filterTableContainerInsets = graphics.insets($filterTableGroup),
         filterTableHtmlComp = this.popup.filterTable.htmlComp;
 
-      filterTableContainerHeight = filterColumnSize.height - filterColumnInsets.vertical();
+      let filterTableContainerHeight = filterColumnSize.height - filterColumnInsets.vertical();
       // subtract height of filter-fields container
       filterTableContainerHeight -= filterFieldGroupSize.height;
       // subtract group-title height
@@ -85,31 +82,28 @@ export default class TableHeaderMenuLayout extends PopupLayout {
       filterTableContainerHeight = Math.min(filterTableContainerHeight, TableHeaderMenuLayout.TABLE_MAX_HEIGHT);
 
       // Layout filter table
-      filterTableHtmlComp.setSize(new Dimension(
-        filterColumnSize.width - filterColumnInsets.horizontal(),
-        filterTableContainerHeight));
+      filterTableHtmlComp.setSize(new Dimension(filterColumnSize.width - filterColumnInsets.horizontal(), filterTableContainerHeight));
     }
 
     // fix width of actions column, so it doesn't become wider when user
     // hovers over a button and thus the text of the group changes.
     this._setMaxWidth();
-    actionColumnSize = graphics.size(this.popup.$columnActions);
+    let actionColumnSize = graphics.size(this.popup.$columnActions);
     this._setMaxWidth(actionColumnSize.width);
   }
 
-  _adjustSizeWithAnchor(prefSize) {
-    let maxWidth,
-      htmlComp = this.popup.htmlComp,
+  protected override _adjustSizeWithAnchor(prefSize: Dimension): Dimension {
+    let htmlComp = this.popup.htmlComp,
       windowPaddingX = this.popup.windowPaddingX,
       popupMargins = htmlComp.margins(),
       popupBounds = htmlComp.offsetBounds(),
       $window = this.popup.$container.window(),
       windowWidth = $window.width();
 
-    maxWidth = (windowWidth - popupMargins.horizontal() - popupBounds.x - windowPaddingX);
+    let maxWidth = (windowWidth - popupMargins.horizontal() - popupBounds.x - windowPaddingX);
     let compact = popupBounds.width > maxWidth;
     if (compact) {
-      this.popup.$body.addClass('compact', compact);
+      this.popup.$body.addClass('compact');
       prefSize = this.preferredLayoutSize(this.popup.$container);
     }
 
@@ -117,11 +111,11 @@ export default class TableHeaderMenuLayout extends PopupLayout {
   }
 
   // group title (size used for table + field container)
-  _groupTitleHeight($group) {
+  protected _groupTitleHeight($group: JQuery): number {
     return graphics.size($group.find('.table-header-menu-group-text'), true).height;
   }
 
-  _filterFieldsGroupBoxHeight() {
+  protected _filterFieldsGroupBoxHeight(): number {
     return this.popup.filterFieldsGroupBox.htmlComp.prefSize().height;
   }
 
@@ -131,9 +125,8 @@ export default class TableHeaderMenuLayout extends PopupLayout {
    * + size of filter-fields
    * + paddings of surrounding containers
    */
-  preferredLayoutSize($container, options) {
-    let prefSize, filterColumnMargins, filterColumnInsets,
-      rightColumnHeight = 0,
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
+    let rightColumnHeight = 0,
       leftColumnHeight = 0,
       containerInsets = graphics.insets($container),
       oldMaxWidth = this._getMaxWidth();
@@ -146,13 +139,12 @@ export default class TableHeaderMenuLayout extends PopupLayout {
       let
         $filterTableGroup = this.popup.$filterTableGroup,
         filterTableHeight = this.popup.filterTable.htmlComp.size(true).height,
-        filterTableContainerInsets = graphics.insets($filterTableGroup),
-        filterTableContainerHeight;
+        filterTableContainerInsets = graphics.insets($filterTableGroup);
 
       // limit height of table
       filterTableHeight = Math.min(filterTableHeight, TableHeaderMenuLayout.TABLE_MAX_HEIGHT);
       // size of container with table
-      filterTableContainerHeight = filterTableHeight;
+      let filterTableContainerHeight = filterTableHeight;
       // add group-title height
       filterTableContainerHeight += this._groupTitleHeight($filterTableGroup);
       // add insets of container
@@ -165,11 +157,10 @@ export default class TableHeaderMenuLayout extends PopupLayout {
     if (this.popup.hasFilterFields) {
       let
         $filterFieldsGroup = this.popup.$filterFieldsGroup,
-        filterFieldContainerInsets = graphics.insets($filterFieldsGroup),
-        filterFieldContainerHeight;
+        filterFieldContainerInsets = graphics.insets($filterFieldsGroup);
 
       // size of group-box with 1 or 2 filter fields
-      filterFieldContainerHeight = this._filterFieldsGroupBoxHeight();
+      let filterFieldContainerHeight = this._filterFieldsGroupBoxHeight();
       // add group-title height
       filterFieldContainerHeight += this._groupTitleHeight($filterFieldsGroup);
       // add insets of container
@@ -179,14 +170,14 @@ export default class TableHeaderMenuLayout extends PopupLayout {
     }
 
     if (this.popup.hasFilterFields || this.popup.hasFilterTable) {
-      filterColumnMargins = graphics.margins(this.popup.$columnFilters);
-      filterColumnInsets = graphics.insets(this.popup.$columnFilters);
+      let filterColumnMargins = graphics.margins(this.popup.$columnFilters);
+      let filterColumnInsets = graphics.insets(this.popup.$columnFilters);
       rightColumnHeight += filterColumnMargins.vertical();
       rightColumnHeight += filterColumnInsets.vertical();
     }
 
     // Use height of left or right column as preferred size (and add insets of container)
-    prefSize = graphics.prefSize($container);
+    let prefSize = graphics.prefSize($container);
     if (!this.popup.$body.hasClass('compact')) {
       prefSize.height = Math.max(leftColumnHeight, rightColumnHeight) + containerInsets.vertical();
     } else {
@@ -199,11 +190,11 @@ export default class TableHeaderMenuLayout extends PopupLayout {
     return prefSize;
   }
 
-  _getMaxWidth() {
-    return this.popup.$columnActions.css('max-width');
+  protected _getMaxWidth(): number {
+    return parseInt(this.popup.$columnActions.css('max-width'), 10);
   }
 
-  _setMaxWidth(maxWidth) {
+  protected _setMaxWidth(maxWidth?: number) {
     this.popup.$columnActions.css('max-width', maxWidth || '');
   }
 }

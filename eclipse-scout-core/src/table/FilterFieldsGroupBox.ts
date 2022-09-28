@@ -1,16 +1,21 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GroupBox, scout} from '../index';
+import {ColumnUserFilter, FilterFieldsGroupBoxModel, GroupBox, scout, ValueField} from '../index';
+import {ObjectType} from '../ObjectFactory';
 
-export default class FilterFieldsGroupBox extends GroupBox {
+
+export default class FilterFieldsGroupBox extends GroupBox implements FilterFieldsGroupBoxModel {
+  declare model: FilterFieldsGroupBoxModel;
+
+  filter: ColumnUserFilter;
 
   constructor() {
     super();
@@ -18,20 +23,17 @@ export default class FilterFieldsGroupBox extends GroupBox {
     this.cssClass = 'filter-fields';
   }
 
-  _init(model) {
+  protected override _init(model: FilterFieldsGroupBoxModel) {
     super._init(model);
     this.filter.addFilterFields(this);
   }
 
-  /**
-   * @override GroupBox.js
-   */
-  _renderProperties($parent) {
-    super._renderProperties($parent);
+  protected override _renderProperties() {
+    super._renderProperties();
     this.filter.modifyFilterFields();
   }
 
-  addFilterField(objectType, text) {
+  addFilterField(objectType: ObjectType<ValueField>, text: string): ValueField {
     let field = scout.create(objectType, {
       parent: this,
       label: this.session.text(text),
@@ -46,7 +48,7 @@ export default class FilterFieldsGroupBox extends GroupBox {
 
   // Info from awe, cgu: Added '0' to the name to avoid temporarily to avoid naming conflict with FormField#addField
   // This should be refactored in a future release
-  addField0(field) {
+  addField0(field: ValueField) {
     this.fields.push(field);
     this._prepareFields();
   }

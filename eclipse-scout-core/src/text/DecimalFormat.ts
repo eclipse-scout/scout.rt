@@ -270,9 +270,9 @@ export default class DecimalFormat {
     patternSeparator: ';'
   } as const;
 
-  static ensure(locale: Locale, format: DecimalFormat | string | DecimalFormatOptions) {
+  static ensure(locale: Locale, format: DecimalFormat | string | DecimalFormatOptions): DecimalFormat {
     if (!format) {
-      return format;
+      return format as DecimalFormat;
     }
     if (format instanceof DecimalFormat) {
       return format;

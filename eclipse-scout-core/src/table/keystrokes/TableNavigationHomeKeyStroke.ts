@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractTableNavigationKeyStroke, arrays, keys} from '../../index';
+import {AbstractTableNavigationKeyStroke, arrays, keys, Table, TableRow} from '../../index';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class TableNavigationHomeKeyStroke extends AbstractTableNavigationKeyStroke {
 
-  constructor(table) {
+  constructor(table: Table) {
     super(table);
     this.which = [keys.HOME];
     this.renderingHints.text = 'Home';
@@ -24,12 +25,12 @@ export default class TableNavigationHomeKeyStroke extends AbstractTableNavigatio
     };
   }
 
-  handle(event) {
+  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     let table = this.field,
       rows = table.visibleRows,
       firstRow = arrays.first(rows),
       selectedRows = table.selectedRows,
-      newSelectedRows = [],
+      newSelectedRows: TableRow[] = [],
       lastActionRow = table.selectionHandler.lastActionRow,
       lastActionRowIndex = -1;
 
@@ -45,7 +46,7 @@ export default class TableNavigationHomeKeyStroke extends AbstractTableNavigatio
       newSelectedRows = rows.slice(0, lastActionRowIndex);
       newSelectedRows = arrays.union(newSelectedRows, selectedRows);
     } else {
-      newSelectedRows = firstRow;
+      newSelectedRows = [firstRow];
     }
     table.selectionHandler.lastActionRow = firstRow;
     table.selectRows(newSelectedRows);

@@ -1,21 +1,32 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, objects} from '../../index';
+import {Device, objects, Session} from '../../index';
 import $ from 'jquery';
+import {Comparator} from '../../types';
+
+export type ColumnComparator<T = any> = {
+  compare(a: T, b: T): number;
+  compareIgnoreCase?(a: T, b: T): number;
+  /**
+   * @returns whether or not it was possible to install a compare function.
+   */
+  install(session: Session): boolean;
+  [key: string]: any;
+};
 
 /**
  * Text comparator, used to compare strings with support for internationalization (i18n).
  * The collator object is only installed once.
  */
-const TEXT = {
+const TEXT: ColumnComparator<string> = {
   collator: null,
   installed: false,
   install: function(session) {
@@ -79,7 +90,7 @@ const TEXT = {
 /**
  * Numeric comparator, used to compare numeric values. Used for numbers, dates, etc.
  */
-const NUMERIC = {
+const NUMERIC: ColumnComparator<number> = {
   install: session => {
     // NOP
     return true;
@@ -107,7 +118,7 @@ const NUMERIC = {
 /**
  * Alphanumeric comparator.
  */
-const ALPHANUMERIC = {
+const ALPHANUMERIC: ColumnComparator<string | number> = {
   collator: null,
   installed: false,
   install: function(session) {
@@ -121,7 +132,7 @@ const ALPHANUMERIC = {
   compareIgnoreCase: function(valueA, valueB) {
     return this._compare(valueA, valueB, true);
   },
-  _compare: (valueA, valueB, ignoreCase) => {
+  _compare: (valueA: string | number, valueB: string | number, ignoreCase: boolean) => {
     if (!valueA && !valueB) {
       return 0;
     }
@@ -135,8 +146,8 @@ const ALPHANUMERIC = {
     let pattern = '(([0-9]+)|([^0-9]+))';
     let regexp1 = new RegExp(pattern, 'g');
     let regexp2 = new RegExp(pattern, 'g');
-    let found1 = regexp1.exec(valueA);
-    let found2 = regexp2.exec(valueB);
+    let found1 = regexp1.exec(valueA + '');
+    let found2 = regexp2.exec(valueB + '');
     while (found1 && found2) {
       let n1 = parseInt(found1[1], 0);
       let n2 = parseInt(found2[1], 0);
@@ -151,8 +162,8 @@ const ALPHANUMERIC = {
           return textResult;
         }
       }
-      found1 = regexp1.exec(valueA);
-      found2 = regexp2.exec(valueB);
+      found1 = regexp1.exec(valueA + '');
+      found2 = regexp2.exec(valueB + '');
     }
 
     if (!found1 && !found2) {
@@ -167,11 +178,10 @@ const ALPHANUMERIC = {
 
 /**
  * Applies the comparator to each pair until one pair doesn't return 0 or all pairs are compared.
- * @param {function(*, *): number} comparator a function that takes 2 parameters and returns -1, 0 or 1.
- * @param [[*]] pairs array of pairs, where a pair is an array with 2 values.
- * @return {number}
+ * @param comparator a function that takes 2 parameters and returns -1, 0 or 1.
+ * @param pairs array of pairs, where a pair is an array with 2 values.
  */
-export function compare(comparator, ...pairs) {
+export function compare<T>(comparator: Comparator<T>, ...pairs: T[][]): number {
   let result = 0;
   pairs.some(pair => {
     if (pair.length !== 2) {

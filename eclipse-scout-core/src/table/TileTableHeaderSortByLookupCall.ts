@@ -1,29 +1,31 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons, LookupRow, scout, StaticLookupCall} from '../index';
+import {Column, icons, LookupRow, scout, StaticLookupCall, Table, TileTableHeaderSortByLookupCallModel} from '../index';
 
-export default class TileTableHeaderSortByLookupCall extends StaticLookupCall {
+export default class TileTableHeaderSortByLookupCall extends StaticLookupCall<TileTableHeaderSortKey> implements TileTableHeaderSortByLookupCallModel {
+  declare model: TileTableHeaderSortByLookupCallModel;
+  table: Table;
 
   constructor() {
     super();
     this.table = null;
   }
 
-  _init(model) {
+  protected override _init(model: TileTableHeaderSortByLookupCallModel) {
     super._init(model);
   }
 
-  _data() {
+  protected override _data(): any[] {
     let lookupRows = [];
-    this.table.visibleColumns().forEach(function(column) {
+    this.table.visibleColumns().forEach(column => {
       if (column.isSortingPossible()) {
         lookupRows.push([
           {
@@ -42,15 +44,17 @@ export default class TileTableHeaderSortByLookupCall extends StaticLookupCall {
           icons.LONG_ARROW_DOWN_BOLD
         ]);
       }
-    }, this);
+    });
     return lookupRows;
   }
 
-  _dataToLookupRow(data) {
+  protected override _dataToLookupRow(data: any): LookupRow<TileTableHeaderSortKey> {
     return scout.create(LookupRow, {
       key: data[0],
       text: data[1],
       iconId: data[2]
-    });
+    }) as LookupRow<TileTableHeaderSortKey>;
   }
 }
+
+export type TileTableHeaderSortKey = { column: Column; asc: boolean };

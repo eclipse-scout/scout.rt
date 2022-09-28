@@ -657,7 +657,7 @@ export function _createDefaultScrollToOptions(options?: ScrollToOptions): Scroll
 /**
  * Horizontally scrolls the $scrollable to the given $element (must be a child of $scrollable)
  */
-export function scrollHorizontalTo($scrollable: JQuery, $element: JQuery, options: ScrollOptions) {
+export function scrollHorizontalTo($scrollable: JQuery, $element: JQuery, options?: ScrollOptions) {
   let scrollTo,
     scrollableW = $scrollable.width(),
     elementBounds = graphics.bounds($element, true),
@@ -842,7 +842,7 @@ export function fix($elem: JQuery) {
 /**
  * Reverts the changes made by fix().
  */
-export function unfix($elem: JQuery, timeoutId: number, immediate: boolean) {
+export function unfix($elem: JQuery, timeoutId: number, immediate?: boolean): number {
   clearTimeout(timeoutId);
   if (immediate) {
     _unfix($elem);
@@ -966,7 +966,7 @@ export function _getCompleteChildRowsHeightRecursive(children: ExpandableElement
 
 export interface ExpandableElement {
   height: number;
-  level: number;
+  level?: number;
 }
 
 export interface ExpansionParent<T extends ExpandableElement> {
@@ -974,7 +974,7 @@ export interface ExpansionParent<T extends ExpandableElement> {
   $element: JQuery;
   $scrollable: JQuery;
   defaultChildHeight: number;
-  nodePaddingLevel: number;
+  nodePaddingLevel?: number;
 
   isExpanded(element: T): boolean;
 

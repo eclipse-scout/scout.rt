@@ -32,7 +32,7 @@ export default class EventEmitter {
 
   // Cannot use this as for other methods, see https://stackoverflow.com/questions/73648158/type-error-when-using-this-with-a-custom-type
   trigger<K extends string & keyof EventMapOf<EventEmitter>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<EventEmitter>[K]>): EventMapOf<EventEmitter>[K] {
-    let event;
+    let event: Event;
     if (eventOrModel instanceof Event) {
       event = eventOrModel;
     } else {

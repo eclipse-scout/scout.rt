@@ -1,16 +1,26 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ActionExecKeyStroke} from '../index';
+import {Action, ActionExecKeyStroke, TableHeaderMenuButtonModel, TableHeaderMenuGroup} from '../index';
+import {NumberColumnAggregationFunction, NumberColumnBackgroundEffect} from './columns/NumberColumn';
 
-export default class TableHeaderMenuButton extends Action {
+export default class TableHeaderMenuButton extends Action implements TableHeaderMenuButtonModel {
+  declare parent: TableHeaderMenuGroup;
+  declare model: TableHeaderMenuButtonModel;
+
+  aggregation: NumberColumnAggregationFunction;
+  backgroundEffect: NumberColumnBackgroundEffect;
+  direction: string;
+  additional: boolean;
+
+  $icon: JQuery<HTMLSpanElement>;
 
   constructor() {
     super();
@@ -18,16 +28,13 @@ export default class TableHeaderMenuButton extends Action {
     this.tabbable = true;
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    this.keyStrokeContext.registerKeyStroke([new ActionExecKeyStroke(this)]);
+    this.keyStrokeContext.registerKeyStroke(new ActionExecKeyStroke(this));
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this.$container = this.$container.addClass('table-header-menu-command button')
       .unfocusable()
@@ -36,30 +43,26 @@ export default class TableHeaderMenuButton extends Action {
     this.$icon = this.$container.appendSpan('icon font-icon');
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderToggleAction();
   }
 
   // Show 'remove' text when button is already selected
-  _onMouseOver() {
-    let text = this.selected ?
-      this.session.text('ui.remove') : this.text;
+  protected _onMouseOver() {
+    let text = this.selected ? this.session.text('ui.remove') : this.text;
     this.parent.appendText(text);
   }
 
-  _onMouseOut() {
+  protected _onMouseOut() {
     this.parent.resetText();
   }
 
-  _renderToggleAction() {
+  protected _renderToggleAction() {
     this.$container.toggleClass('togglable', this.toggleAction);
   }
 
-  /**
-   * @override
-   */
-  _renderIconId() {
+  protected override _renderIconId() {
     if (this.iconId) {
       this.$icon.attr('data-icon', this.iconId);
     } else {

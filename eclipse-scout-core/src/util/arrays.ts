@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, Predicate, strings} from '../index';
+import {objects, strings} from '../index';
 
 /**
  * Ensures the given parameter is an array.
@@ -146,7 +146,7 @@ export function insertSorted<T>(arr: T[], element: T, compareFunc: (a: T, b: T) 
  *
  * @param thisArg optional "this" binding for predicate function
  */
-export function insertBefore<T>(arr: T[], elementToInsert: T, predicate: Predicate<T>, thisArg?: any) {
+export function insertBefore<T>(arr: T[], elementToInsert: T, predicate: (elem: T, index: number, arr: T[]) => boolean, thisArg?: any) {
   let index = findIndex(arr, predicate, thisArg);
   if (index === -1) {
     arr.unshift(elementToInsert);
@@ -159,7 +159,7 @@ export function insertBefore<T>(arr: T[], elementToInsert: T, predicate: Predica
  * Inserts to given element into the array directly AFTER the first array element that matches the given predicate.
  * If no such element can be found, the new element is inserted at the END of the array.
  */
-export function insertAfter<T>(arr: T[], elementToInsert: T, predicate: Predicate<T>) {
+export function insertAfter<T>(arr: T[], elementToInsert: T, predicate: (elem: T, index: number, arr: T[]) => boolean) {
   let index = findIndex(arr, predicate);
   if (index === -1) {
     arr.push(elementToInsert);
@@ -346,7 +346,7 @@ export function eachSibling<T>(arr: ArrayLike<T>, element: T, func: (elem: T, in
  *
  * @param optional "this" binding for predicate function
  */
-export function findIndex<T>(arr: ArrayLike<T>, predicate: (arg0: T, index: number, arr: T[]) => boolean, thisArg?: any): number {
+export function findIndex<T>(arr: ArrayLike<T>, predicate: (elem: T, index: number, arr: T[]) => boolean, thisArg?: any): number {
   if (!arr || !predicate) {
     return -1;
   }
@@ -362,7 +362,7 @@ export function findIndex<T>(arr: ArrayLike<T>, predicate: (arg0: T, index: numb
  *
  * @param thisArg optional "this" binding for predicate function
  */
-export function find<T>(arr: ArrayLike<T>, predicate: Predicate<T>, thisArg?: any): T {
+export function find<T>(arr: ArrayLike<T>, predicate: (elem: T, index: number, arr: T[]) => boolean, thisArg?: any): T {
   let index = findIndex(arr, predicate, thisArg);
   if (index === -1) {
     return null;
@@ -370,21 +370,21 @@ export function find<T>(arr: ArrayLike<T>, predicate: Predicate<T>, thisArg?: an
   return arr[index];
 }
 
-export function findFrom<T>(arr: ArrayLike<T>, startIndex: number, predicate: Predicate<T>, reverse?: boolean): T {
+export function findFrom<T>(arr: ArrayLike<T>, startIndex: number, predicate: (elem: T, index: number) => boolean, reverse?: boolean): T {
   if (reverse) {
     return findFromReverse(arr, startIndex, predicate);
   }
   return findFromForward(arr, startIndex, predicate);
 }
 
-export function findIndexFrom<T>(arr: ArrayLike<T>, startIndex: number, predicate: Predicate<T>, reverse?: boolean): number {
+export function findIndexFrom<T>(arr: ArrayLike<T>, startIndex: number, predicate: (elem: T, index: number) => boolean, reverse?: boolean): number {
   if (reverse) {
     return findIndexFromReverse(arr, startIndex, predicate);
   }
   return findIndexFromForward(arr, startIndex, predicate);
 }
 
-export function findFromForward<T>(arr: ArrayLike<T>, startIndex: number, predicate: Predicate<T>): T {
+export function findFromForward<T>(arr: ArrayLike<T>, startIndex: number, predicate: (elem: T, index: number) => boolean): T {
   let index = findIndexFromForward(arr, startIndex, predicate);
   if (index === -1) {
     return null;
@@ -408,7 +408,7 @@ export function findIndexFromForward<T>(arr: ArrayLike<T>, startIndex: number, p
   return -1;
 }
 
-export function findFromReverse<T>(arr: ArrayLike<T>, startIndex: number, predicate: Predicate<T>): T {
+export function findFromReverse<T>(arr: ArrayLike<T>, startIndex: number, predicate: (elem: T, index: number) => boolean): T {
   let index = findIndexFromReverse(arr, startIndex, predicate);
   if (index === -1) {
     return null;

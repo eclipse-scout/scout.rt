@@ -278,7 +278,7 @@ export default class LookupCall<Key> implements LookupCallModel<Key> {
   /**
    * @param properties Properties to add to the resulting clone instance.
    */
-  clone(properties: object): LookupCall<Key> {
+  clone(properties?: object): LookupCall<Key> {
     // Warning: This is _not_ a deep clone! (Because otherwise the entire session would be duplicated.)
     // Non-primitive properties must _only_ be added to the resulting clone during the 'prepareLookupCall' event!
     return scout.cloneShallow(this, properties, true) as LookupCall<Key>;

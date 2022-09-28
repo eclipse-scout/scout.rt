@@ -1,30 +1,31 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, arrays, Dimension, graphics, HtmlComponent, MenuBarLayout, RowLayout, scout, scrollbars} from '../index';
+import {AbstractLayout, arrays, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, MenuBarLayout, RowLayout, scout, scrollbars, Table} from '../index';
 
 export default class TableLayout extends AbstractLayout {
+  table: Table;
+  protected _dataHeightPositive: boolean;
 
-  constructor(table) {
+  constructor(table: Table) {
     super();
     this.table = table;
     this._dataHeightPositive = false;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let menuBarHeight = 0,
       footerHeight = 0,
       headerHeight = 0,
       tileTableHeight = 0,
       controlContainerHeight = 0,
-      controlContainerInsets,
       tileAccordion = this.table.tableTileGridMediator ? this.table.tableTileGridMediator.tileAccordion : null,
       $data = this.table.$data,
       dataMargins = graphics.margins(scout.nvl($data, this.table.$container)),
@@ -36,9 +37,7 @@ export default class TableLayout extends AbstractLayout {
       visibleColumns = this.table.visibleColumns(),
       lastColumn = visibleColumns[visibleColumns.length - 1],
       htmlContainer = this.table.htmlComp,
-      containerSize = htmlContainer.availableSize({
-        exact: true
-      }).subtract(htmlContainer.insets());
+      containerSize = htmlContainer.availableSize({exact: true}).subtract(htmlContainer.insets());
 
     if (this.table.menuBarVisible && menuBar.visible) {
       let htmlMenuBar = HtmlComponent.get(menuBar.$container);
@@ -57,7 +56,7 @@ export default class TableLayout extends AbstractLayout {
       // Layout table footer and add size of footer (including the control content) to 'height'
       footerHeight = graphics.size(footer.$container).height;
       controlContainerHeight = footer.computeControlContainerHeight(this.table, footer.selectedControl, !this._dataHeightPositive);
-      controlContainerInsets = graphics.insets(footer.$controlContainer);
+      let controlContainerInsets = graphics.insets(footer.$controlContainer);
       if (!footer.animating) { // closing or opening: height is about to be changed
         footer.$controlContainer.cssHeight(controlContainerHeight);
         footer.$controlContent.outerHeight(controlContainerHeight - controlContainerInsets.vertical());
@@ -98,15 +97,18 @@ export default class TableLayout extends AbstractLayout {
       this.table.setViewRangeSize(this.table.calculateViewRangeSize());
 
       if (!htmlContainer.layouted) {
+        // @ts-ignore
         this.table._renderScrollTop();
       }
 
       // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
+      // @ts-ignore
       this.table._renderViewport();
 
       // Render scroll top again to make sure the data is really at the correct position after rendering viewport.
       // Somehow table.$data[0].scrollTop changes during _renderViewport sometimes (e.g. when there are aggregate rows)
       if (!htmlContainer.layouted) {
+        // @ts-ignore
         this.table._renderScrollTop();
       }
 
@@ -125,7 +127,7 @@ export default class TableLayout extends AbstractLayout {
     }
   }
 
-  _layoutColumns(widthHint) {
+  protected _layoutColumns(widthHint?: number) {
     this._autoOptimizeColumnsWidths();
 
     let htmlContainer = this.table.htmlComp;
@@ -148,8 +150,10 @@ export default class TableLayout extends AbstractLayout {
   /**
    * Workaround for Chrome bug, see {@link Table._updateRealColumnWidths}
    */
-  _updateRealColumnWidths() {
+  protected _updateRealColumnWidths() {
+    // @ts-ignore
     if (this.table._updateRealColumnWidths()) {
+      // @ts-ignore
       this.table._updateRowWidth();
       if (this.table.header && this.table.header.rendered) {
         this.table.header.resizeHeaderItems();
@@ -162,19 +166,19 @@ export default class TableLayout extends AbstractLayout {
   /**
    * Resizes all visible columns with autoOptimizeWidth set to true, if necessary (means if autoOptimizeWidthRequired is true)
    */
-  _autoOptimizeColumnsWidths() {
-    this.table.visibleColumns().forEach(function(column) {
+  protected _autoOptimizeColumnsWidths() {
+    this.table.visibleColumns().forEach(column => {
       if (column.autoOptimizeWidth && column.autoOptimizeWidthRequired) {
         this.table.resizeToFit(column, column.autoOptimizeMaxWidth);
       }
-    }, this);
+    });
   }
 
   /**
    * Resizes the visible columns to make them use all the available space.
    */
-  _autoResizeColumns(widthHint) {
-    let newWidth, weight,
+  protected _autoResizeColumns(widthHint?: number) {
+    let newWidth: number, weight: number,
       relevantColumns = [],
       currentWidth = 0,
       totalInitialWidth = 0,
@@ -256,7 +260,7 @@ export default class TableLayout extends AbstractLayout {
     });
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     if (this.table.tileMode) {
       // Use RowLayout to calculate preferredLayoutSize of TileTableHeader, TileAccordion and Footer.
       return new RowLayout().preferredLayoutSize($container, options);
@@ -266,6 +270,7 @@ export default class TableLayout extends AbstractLayout {
 
     // If table was not visible during renderViewport, the rows are not rendered yet (see _renderViewport)
     // -> make sure rows are rendered otherwise preferred height cannot be determined
+    // @ts-ignore
     this.table._renderViewport();
     return super.preferredLayoutSize($container, options);
   }

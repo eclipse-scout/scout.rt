@@ -270,7 +270,7 @@ export interface DragAndDropOptions {
   /**
    * Returns the allowed drop type during a drop event. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
    */
-  dropType?: () => number;
+  dropType?: () => DragAndDropType;
 
   /**
    * Returns the maximum allowed size of a dropped object. Default is {@link Widget.dropMaximumSize}

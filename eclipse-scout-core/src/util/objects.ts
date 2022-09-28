@@ -375,8 +375,8 @@ export function isPromise(value: any): value is PromiseLike<any> {
  * @param [all] can be set to true to return all properties instead of own properties
  * @returns an Array with values
  */
-export function values(obj: object, all?: boolean): any[] {
-  let values = [];
+export function values<K extends PropertyKey, V>(obj: Record<K, V>, all?: boolean): V[] {
+  let values: V[] = [];
   if (obj) {
     if (typeof obj.hasOwnProperty !== 'function') {
       all = true;
@@ -391,9 +391,9 @@ export function values(obj: object, all?: boolean): any[] {
 }
 
 /**
- * @returns the key / name of a property with given value
+ * @returns the key (name) of a property with given value
  */
-export function keyByValue(obj: object, value: any): string {
+export function keyByValue<V>(obj: Record<string, V>, value: V): string {
   return Object.keys(obj)[values(obj).indexOf(value)];
 }
 

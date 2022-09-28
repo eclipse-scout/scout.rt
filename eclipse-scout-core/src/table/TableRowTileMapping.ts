@@ -1,16 +1,18 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../index';
+import {TableRow, Tile, Widget} from '../index';
 
 export default class TableRowTileMapping extends Widget {
+  tableRow: TableRow;
+  tile: Tile;
 
   constructor() {
     super();
@@ -18,5 +20,4 @@ export default class TableRowTileMapping extends Widget {
     this.tile = null;
     this._addWidgetProperties(['tile']);
   }
-
 }

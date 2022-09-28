@@ -124,6 +124,7 @@ export default class ValueField extends FormField {
    * <p>
    * The default reads the display text using this._readDisplayText() and writes it to the model by calling _triggerAcceptInput().
    * If subclasses don't have a display-text or want to write another state to the server, they may override this method.
+   * @return {$.Promise}
    */
   acceptInput(whileTyping) {
     whileTyping = !!whileTyping; // cast to boolean

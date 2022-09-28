@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CellModel, ContextMenuPopup, DateFormat, DateRange, dates, EnumObject, Event, graphics, HtmlComponent, KeyStrokeContext, Menu, MenuBar, menus as menuUtil, objects, PlannerHeader, PlannerLayout, PlannerMenuItemsOrder, Range, scout, scrollbars, strings, styles, tooltips, TooltipSupport, Widget, YearPanel} from '../index';
+import {
+  arrays, CellModel, ContextMenuPopup, DateFormat, DateRange, dates, EnumObject, Event, graphics, HtmlComponent, KeyStrokeContext, Menu, MenuBar, menus as menuUtil, objects, PlannerHeader, PlannerLayout, PlannerMenuItemsOrder, Range, scout,
+  scrollbars, strings, styles, tooltips, TooltipSupport, Widget, YearPanel
+} from '../index';
 import $ from 'jquery';
 import PlannerModel from './PlannerModel';
 import {YearPanelDateSelectEvent} from '../calendar/YearPanelEventMap';
@@ -16,40 +19,6 @@ import {PlannerHeaderDisplayModeClickEvent} from './PlannerHeaderEventMap';
 import PlannerEventMap from './PlannerEventMap';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {JsonDateRange} from '../util/dates';
-
-export type PlannerDisplayMode = EnumObject<typeof Planner.DisplayMode>;
-export type PlannerDirection = EnumObject<typeof Planner.Direction>;
-export type PlannerSelectionMode = EnumObject<typeof Planner.SelectionMode>;
-
-export interface PlannerActivity {
-  id: string;
-  beginTime: string | Date;
-  endTime: string | Date;
-  text: string;
-  backgroundColor: string;
-  foregroundColor: string;
-  level: number;
-  levelColor: string;
-  tooltipText: string;
-  cssClass: string;
-  $activity?: JQuery;
-}
-
-export interface PlannerResource {
-  id: string;
-  resourceCell: CellModel;
-  activities: PlannerActivity[];
-  $resource?: JQuery;
-  $cells?: JQuery;
-}
-
-export interface PlannerDisplayModeOptions {
-  interval: number;
-  firstHourOfDay: number;
-  lastHourOfDay: number;
-  labelPeriod?: number;
-  minSelectionIntervalCount?: number;
-}
 
 export default class Planner extends Widget implements PlannerModel {
   declare model: PlannerModel;
@@ -59,7 +28,7 @@ export default class Planner extends Widget implements PlannerModel {
   activitySelectable: boolean;
   availableDisplayModes: PlannerDisplayMode[];
   displayMode: PlannerDisplayMode;
-  displayModeOptions: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>;
+  displayModeOptions: Record<PlannerDisplayMode, PlannerDisplayModeOptions>;
   headerVisible: boolean;
   label: string;
   resources: PlannerResource[];
@@ -110,6 +79,7 @@ export default class Planner extends Widget implements PlannerModel {
     this.activitySelectable = false;
     this.availableDisplayModes = [];
     this.displayMode = null;
+    // @ts-ignore
     this.displayModeOptions = {};
     this.headerVisible = true;
     this.label = null;
@@ -1322,7 +1292,7 @@ export default class Planner extends Widget implements PlannerModel {
     this.setProperty('displayModeOptions', displayModeOptions);
   }
 
-  protected _setDisplayModeOptions(displayModeOptions: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>) {
+  protected _setDisplayModeOptions(displayModeOptions: Record<PlannerDisplayMode, PlannerDisplayModeOptions>) {
     if (displayModeOptions) {
       this._adjustHours(displayModeOptions);
     }
@@ -1332,7 +1302,7 @@ export default class Planner extends Widget implements PlannerModel {
   /**
    * Make sure configured our is between 0 and 23.
    */
-  protected _adjustHours(optionsMap: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>) {
+  protected _adjustHours(optionsMap: Record<PlannerDisplayMode, PlannerDisplayModeOptions>) {
     objects.values(optionsMap).forEach((options: PlannerDisplayModeOptions) => {
       if (options.firstHourOfDay) {
         options.firstHourOfDay = validHour(options.firstHourOfDay);
@@ -1683,4 +1653,38 @@ export default class Planner extends Widget implements PlannerModel {
       }
     });
   }
+}
+
+export type PlannerDisplayMode = EnumObject<typeof Planner.DisplayMode>;
+export type PlannerDirection = EnumObject<typeof Planner.Direction>;
+export type PlannerSelectionMode = EnumObject<typeof Planner.SelectionMode>;
+
+export interface PlannerActivity {
+  id: string;
+  beginTime: string | Date;
+  endTime: string | Date;
+  text: string;
+  backgroundColor: string;
+  foregroundColor: string;
+  level: number;
+  levelColor: string;
+  tooltipText: string;
+  cssClass: string;
+  $activity?: JQuery;
+}
+
+export interface PlannerResource {
+  id: string;
+  resourceCell: CellModel;
+  activities: PlannerActivity[];
+  $resource?: JQuery;
+  $cells?: JQuery;
+}
+
+export interface PlannerDisplayModeOptions {
+  interval: number;
+  firstHourOfDay: number;
+  lastHourOfDay: number;
+  labelPeriod?: number;
+  minSelectionIntervalCount?: number;
 }

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, events, graphics, HtmlComponent, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorModel, PropertyChangeEvent, Widget} from '../index';
+import {arrays, EventHandler, events, graphics, HtmlComponent, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorModel, PropertyChangeEvent, Widget} from '../index';
 import {SwipeCallbackEvent} from '../util/events';
 
 export default class ModeSelector<T> extends Widget implements ModeSelectorModel<T> {
@@ -25,8 +25,7 @@ export default class ModeSelector<T> extends Widget implements ModeSelectorModel
    * Setting a new mode should not trigger two change events.
    */
   protected _isModeChanging: boolean;
-
-  protected _modePropertyChangeHandler: (event: PropertyChangeEvent<any>) => void;
+  protected _modePropertyChangeHandler: EventHandler<PropertyChangeEvent<any>>;
 
   constructor() {
     super();

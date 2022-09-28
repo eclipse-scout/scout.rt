@@ -1,37 +1,48 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, BooleanColumn, Cell, Column, ColumnUserFilter, defaultValues, ModelAdapter, objects, scout, Table, TableUserFilter} from '../index';
+import {
+  App, arrays, BooleanColumn, Cell, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, objects, scout, Table, TableFilter, TableFilterModel, TableModel, TableRow, TableUserFilter, ValueField
+} from '../index';
 import $ from 'jquery';
+import {
+  TableAggregationFunctionChangedEvent, TableAppLinkActionEvent, TableCancelCellEditEvent, TableColumnBackgroundEffectChangedEvent, TableColumnMovedEvent, TableColumnOrganizeActionEvent, TableColumnResizedEvent, TableCompleteCellEditEvent,
+  TableDropEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TablePrepareCellEditEvent, TableReloadEvent, TableRowActionEvent, TableRowClickEvent, TableRowsCheckedEvent, TableRowsExpandedEvent, TableRowsSelectedEvent,
+  TableSortEvent
+} from './TableEventMap';
+import {TableRowData} from './TableRowModel';
+import {AdapterData} from '../session/Session';
 
-export default class TableAdapter extends ModelAdapter {
+export default class TableAdapter<T extends Table = Table> extends ModelAdapter<T> {
+
+  protected _rebuildingTable: boolean;
 
   constructor() {
     super();
     this._addRemoteProperties(['contextColumn']);
   }
 
-  _initProperties(model) {
+  protected override _initProperties(model: TableModel) {
     super._initProperties(model);
     model.compactHandler = null; // Disable Scout JS compact handling, will be done on the server
   }
 
-  _postCreateWidget() {
-    // if a newly created table has already a userfilter defined, we need to fire the filter event after creation
-    // because the original event had been fired before the eventhandler was registered.
+  protected override _postCreateWidget() {
+    // if a newly created table has already a user-filter defined, we need to fire the filter event after creation
+    // because the original event had been fired before the event-handler was registered.
     if (this.widget.hasUserFilter()) {
       this._onWidgetFilter();
     }
   }
 
-  _sendRowsSelected(rowIds, debounceSend) {
+  protected _sendRowsSelected(rowIds: string[], debounceSend?: boolean) {
     let eventData = {
       rowIds: rowIds
     };
@@ -46,7 +57,7 @@ export default class TableAdapter extends ModelAdapter {
     });
   }
 
-  _sendRowClick(rowId, mouseButton, columnId) {
+  protected _sendRowClick(rowId: string, mouseButton: number, columnId: string) {
     let data = {
       rowId: rowId,
       columnId: columnId,
@@ -55,13 +66,14 @@ export default class TableAdapter extends ModelAdapter {
     this._send('rowClick', data);
   }
 
-  _onWidgetRowsSelected(event) {
+  protected _onWidgetRowsSelected(event: TableRowsSelectedEvent) {
+    // @ts-ignore
     let rowIds = this.widget._rowsToIds(this.widget.selectedRows);
     this._sendRowsSelected(rowIds, event.debounce);
   }
 
-  _onWidgetRowClick(event) {
-    let columnId;
+  protected _onWidgetRowClick(event: TableRowClickEvent) {
+    let columnId: string;
     if (event.column !== undefined) {
       columnId = event.column.id;
     }
@@ -69,7 +81,7 @@ export default class TableAdapter extends ModelAdapter {
     this._sendRowClick(event.row.id, event.mouseButton, columnId);
   }
 
-  _onWidgetFilterAdded(event) {
+  protected _onWidgetFilterAdded(event: TableFilterAddedEvent) {
     let filter = event.filter;
     if (!(filter instanceof TableUserFilter) || (filter instanceof ColumnUserFilter && filter.column.guiOnly)) {
       return;
@@ -77,7 +89,7 @@ export default class TableAdapter extends ModelAdapter {
     this._send('filterAdded', filter.createFilterAddedEventData());
   }
 
-  _onWidgetFilterRemoved(event) {
+  protected _onWidgetFilterRemoved(event: TableFilterRemovedEvent) {
     let filter = event.filter;
     if (!(filter instanceof TableUserFilter) || (filter instanceof ColumnUserFilter && filter.column.guiOnly)) {
       return;
@@ -85,11 +97,11 @@ export default class TableAdapter extends ModelAdapter {
     this._send('filterRemoved', filter.createFilterRemovedEventData());
   }
 
-  _onWidgetColumnResized(event) {
+  protected _onWidgetColumnResized(event: TableColumnResizedEvent) {
     this._sendColumnResized(event.column);
   }
 
-  _sendColumnResized(column) {
+  protected _sendColumnResized(column: Column) {
     if (column.fixedWidth || column.guiOnly || this.widget.autoResizeColumns) {
       return;
     }
@@ -110,11 +122,11 @@ export default class TableAdapter extends ModelAdapter {
     });
   }
 
-  _onWidgetAggregationFunctionChanged(event) {
+  protected _onWidgetAggregationFunctionChanged(event: TableAggregationFunctionChangedEvent) {
     this._sendAggregationFunctionChanged(event.column);
   }
 
-  _sendAggregationFunctionChanged(column) {
+  protected _sendAggregationFunctionChanged(column: NumberColumn) {
     if (column.guiOnly) {
       return;
     }
@@ -125,11 +137,11 @@ export default class TableAdapter extends ModelAdapter {
     this._send('aggregationFunctionChanged', data);
   }
 
-  _onWidgetColumnBackgroundEffectChanged(event) {
+  protected _onWidgetColumnBackgroundEffectChanged(event: TableColumnBackgroundEffectChangedEvent) {
     this._sendColumnBackgroundEffectChanged(event.column);
   }
 
-  _sendColumnBackgroundEffectChanged(column) {
+  protected _sendColumnBackgroundEffectChanged(column: NumberColumn) {
     if (column.guiOnly) {
       return;
     }
@@ -140,14 +152,14 @@ export default class TableAdapter extends ModelAdapter {
     this._send('columnBackgroundEffectChanged', data);
   }
 
-  _onWidgetColumnOrganizeAction(event) {
+  protected _onWidgetColumnOrganizeAction(event: TableColumnOrganizeActionEvent) {
     this._send('columnOrganizeAction', {
       action: event.action,
       columnId: event.column.id
     });
   }
 
-  _onWidgetColumnMoved(event) {
+  protected _onWidgetColumnMoved(event: TableColumnMovedEvent) {
     let index = event.newPos;
     this.widget.columns.forEach((iteratingColumn, i) => {
       // Adjust index if column is only known on the gui
@@ -158,7 +170,7 @@ export default class TableAdapter extends ModelAdapter {
     this._sendColumnMoved(event.column, index);
   }
 
-  _sendColumnMoved(column, index) {
+  protected _sendColumnMoved(column: Column, index: number) {
     if (column.guiOnly) {
       return;
     }
@@ -169,12 +181,12 @@ export default class TableAdapter extends ModelAdapter {
     this._send('columnMoved', data);
   }
 
-  _onWidgetPrepareCellEdit(event) {
+  protected _onWidgetPrepareCellEdit(event: TablePrepareCellEditEvent) {
     event.preventDefault();
     this._sendPrepareCellEdit(event.row, event.column);
   }
 
-  _sendPrepareCellEdit(row, column) {
+  protected _sendPrepareCellEdit(row: TableRow, column: Column) {
     if (column.guiOnly) {
       return;
     }
@@ -185,29 +197,29 @@ export default class TableAdapter extends ModelAdapter {
     this._send('prepareCellEdit', data);
   }
 
-  _onWidgetCompleteCellEdit(event) {
+  protected _onWidgetCompleteCellEdit(event: TableCompleteCellEditEvent) {
     event.preventDefault();
     this._sendCompleteCellEdit();
   }
 
-  _sendCompleteCellEdit() {
+  protected _sendCompleteCellEdit() {
     this._send('completeCellEdit');
   }
 
-  _onWidgetCancelCellEdit(event) {
+  protected _onWidgetCancelCellEdit(event: TableCancelCellEditEvent) {
     event.preventDefault();
     this._sendCancelCellEdit();
   }
 
-  _sendCancelCellEdit() {
+  protected _sendCancelCellEdit() {
     this._send('cancelCellEdit');
   }
 
-  _onWidgetRowsChecked(event) {
+  protected _onWidgetRowsChecked(event: TableRowsCheckedEvent) {
     this._sendRowsChecked(event.rows);
   }
 
-  _sendRowsChecked(rows) {
+  protected _sendRowsChecked(rows: TableRow[]) {
     let data = {
       rows: []
     };
@@ -222,11 +234,11 @@ export default class TableAdapter extends ModelAdapter {
     this._send('rowsChecked', data);
   }
 
-  _onWidgetRowsExpanded(event) {
+  protected _onWidgetRowsExpanded(event: TableRowsExpandedEvent) {
     this._sendRowsExpanded(event.rows);
   }
 
-  _sendRowsExpanded(rows) {
+  protected _sendRowsExpanded(rows: TableRow[]) {
     let data = {
       rows: rows.map(row => {
         return {
@@ -238,13 +250,14 @@ export default class TableAdapter extends ModelAdapter {
     this._send('rowsExpanded', data);
   }
 
-  _onWidgetFilter(event) {
+  protected _onWidgetFilter() {
+    // @ts-ignore
     let rowIds = this.widget._rowsToIds(this.widget.filteredRows());
     this._sendFilter(rowIds);
   }
 
-  _sendFilter(rowIds) {
-    let eventData = {};
+  protected _sendFilter(rowIds: string[]) {
+    let eventData: { remove?: boolean; rowIds?: string[] } = {};
     if (rowIds.length === this.widget.rows.length) {
       eventData.remove = true;
     } else {
@@ -262,7 +275,7 @@ export default class TableAdapter extends ModelAdapter {
     });
   }
 
-  _onWidgetSort(event) {
+  protected _onWidgetSort(event: TableSortEvent) {
     if (event.column.guiOnly) {
       return;
     }
@@ -275,7 +288,7 @@ export default class TableAdapter extends ModelAdapter {
     });
   }
 
-  _onWidgetGroup(event) {
+  protected _onWidgetGroup(event: TableGroupEvent) {
     if (event.column.guiOnly) {
       return;
     }
@@ -288,17 +301,15 @@ export default class TableAdapter extends ModelAdapter {
     });
   }
 
-  _onWidgetRowAction(event) {
+  protected _onWidgetRowAction(event: TableRowActionEvent) {
     this._sendRowAction(event.row, event.column);
   }
 
-  _sendRowAction(row, column) {
+  protected _sendRowAction(row: TableRow, column: Column) {
     if (column.guiOnly) {
       // Send row action with a real column
       // If there is only one guiOnly column (e.g. CompactColumn), sent column will be null
-      column = arrays.find(this.columns, col => {
-        return !col.guiOnly;
-      });
+      column = arrays.find(this.widget.columns, col => !col.guiOnly);
     }
     let columnId = column ? column.id : null;
     this._send('rowAction', {
@@ -307,23 +318,23 @@ export default class TableAdapter extends ModelAdapter {
     });
   }
 
-  _onWidgetAppLinkAction(event) {
+  protected _onWidgetAppLinkAction(event: TableAppLinkActionEvent) {
     this._sendAppLinkAction(event.column, event.ref);
   }
 
-  _sendAppLinkAction(column, ref) {
+  protected _sendAppLinkAction(column: Column, ref: string) {
     this._send('appLinkAction', {
       columnId: column.id,
       ref: ref
     });
   }
 
-  _sendContextColumn(contextColumn) {
+  protected _sendContextColumn(contextColumn: Column) {
     if (contextColumn.guiOnly) {
       contextColumn = null;
       this.widget.contextColumn = null;
     }
-    let columnId = null;
+    let columnId: string = null;
     if (contextColumn) {
       columnId = contextColumn.id;
     }
@@ -332,89 +343,91 @@ export default class TableAdapter extends ModelAdapter {
     });
   }
 
-  _onWidgetReload(event) {
+  protected _onWidgetReload(event: TableReloadEvent) {
     let data = {
       reloadReason: event.reloadReason
     };
     this._send('reload', data);
   }
 
-  _onWidgetExportToClipboard(event) {
+  protected _onWidgetExportToClipboard(event: Event<Table>) {
     this._send('clipboardExport');
     event.preventDefault();
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<T>) {
     if (event.type === 'rowsSelected') {
-      this._onWidgetRowsSelected(event);
+      this._onWidgetRowsSelected(event as TableRowsSelectedEvent<T>);
     } else if (event.type === 'rowsChecked') {
-      this._onWidgetRowsChecked(event);
+      this._onWidgetRowsChecked(event as TableRowsCheckedEvent<T>);
     } else if (event.type === 'rowsExpanded') {
-      this._onWidgetRowsExpanded(event);
+      this._onWidgetRowsExpanded(event as TableRowsExpandedEvent<T>);
     } else if (event.type === 'filter') {
-      this._onWidgetFilter(event);
+      this._onWidgetFilter();
     } else if (event.type === 'sort') {
-      this._onWidgetSort(event);
+      this._onWidgetSort(event as TableSortEvent<T>);
     } else if (event.type === 'group') {
-      this._onWidgetGroup(event);
+      this._onWidgetGroup(event as TableGroupEvent<T>);
     } else if (event.type === 'rowClick') {
-      this._onWidgetRowClick(event);
+      this._onWidgetRowClick(event as TableRowClickEvent<T>);
     } else if (event.type === 'rowAction') {
-      this._onWidgetRowAction(event);
+      this._onWidgetRowAction(event as TableRowActionEvent<T>);
     } else if (event.type === 'prepareCellEdit') {
-      this._onWidgetPrepareCellEdit(event);
+      this._onWidgetPrepareCellEdit(event as TablePrepareCellEditEvent<T>);
     } else if (event.type === 'completeCellEdit') {
-      this._onWidgetCompleteCellEdit(event);
+      this._onWidgetCompleteCellEdit(event as TableCompleteCellEditEvent<T>);
     } else if (event.type === 'cancelCellEdit') {
-      this._onWidgetCancelCellEdit(event);
+      this._onWidgetCancelCellEdit(event as TableCancelCellEditEvent<T>);
     } else if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event);
+      this._onWidgetAppLinkAction(event as TableAppLinkActionEvent<T>);
     } else if (event.type === 'clipboardExport') {
       this._onWidgetExportToClipboard(event);
     } else if (event.type === 'reload') {
-      this._onWidgetReload(event);
+      this._onWidgetReload(event as TableReloadEvent<T>);
     } else if (event.type === 'filterAdded') {
-      this._onWidgetFilterAdded(event);
+      this._onWidgetFilterAdded(event as TableFilterAddedEvent<T>);
     } else if (event.type === 'filterRemoved') {
-      this._onWidgetFilterRemoved(event);
+      this._onWidgetFilterRemoved(event as TableFilterRemovedEvent<T>);
     } else if (event.type === 'columnResized') {
-      this._onWidgetColumnResized(event);
+      this._onWidgetColumnResized(event as TableColumnResizedEvent<T>);
     } else if (event.type === 'columnMoved') {
-      this._onWidgetColumnMoved(event);
+      this._onWidgetColumnMoved(event as TableColumnMovedEvent<T>);
     } else if (event.type === 'columnBackgroundEffectChanged') {
-      this._onWidgetColumnBackgroundEffectChanged(event);
+      this._onWidgetColumnBackgroundEffectChanged(event as TableColumnBackgroundEffectChangedEvent<T>);
     } else if (event.type === 'columnOrganizeAction') {
-      this._onWidgetColumnOrganizeAction(event);
+      this._onWidgetColumnOrganizeAction(event as TableColumnOrganizeActionEvent<T>);
     } else if (event.type === 'aggregationFunctionChanged') {
-      this._onWidgetAggregationFunctionChanged(event);
+      this._onWidgetAggregationFunctionChanged(event as TableAggregationFunctionChangedEvent<T>);
     } else if (event.type === 'drop' && this.widget.dragAndDropHandler) {
-      this.widget.dragAndDropHandler.uploadFiles(event);
+      this.widget.dragAndDropHandler.uploadFiles(event as TableDropEvent<T>);
     } else {
       super._onWidgetEvent(event);
     }
   }
 
-  _onRowsInserted(rows) {
+  protected _onRowsInserted(rows: TableRowData | TableRowData[]) {
     this.widget.insertRows(rows);
     this._rebuildingTable = false;
   }
 
-  _onRowsDeleted(rowIds) {
+  protected _onRowsDeleted(rowIds: string[]) {
+    // @ts-ignore
     let rows = this.widget._rowsByIds(rowIds);
     this.addFilterForWidgetEventType('rowsSelected');
     this.widget.deleteRows(rows);
   }
 
-  _onAllRowsDeleted() {
+  protected _onAllRowsDeleted() {
     this.addFilterForWidgetEventType('rowsSelected');
     this.widget.deleteAllRows();
   }
 
-  _onRowsUpdated(rows) {
+  protected _onRowsUpdated(rows: TableRow | TableRow[]) {
     this.widget.updateRows(rows);
   }
 
-  _onRowsSelected(rowIds) {
+  protected _onRowsSelected(rowIds: string[]) {
+    // @ts-ignore
     let rows = this.widget._rowsByIds(rowIds);
     this.addFilterForWidgetEventType('rowsSelected');
     this.widget.selectRows(rows);
@@ -422,18 +435,19 @@ export default class TableAdapter extends ModelAdapter {
     this.widget.selectionHandler.clearLastSelectedRowMarker();
   }
 
-  _onRowsChecked(rows) {
-    let checkedRows = [],
-      uncheckedRows = [];
+  protected _onRowsChecked(rows: TableRowData[]) {
+    let checkedRows: TableRow[] = [],
+      uncheckedRows: TableRow[] = [];
 
-    rows.forEach(function(rowData) {
+    rows.forEach(rowData => {
+      // @ts-ignore
       let row = this.widget._rowById(rowData.id);
       if (rowData.checked) {
         checkedRows.push(row);
       } else {
         uncheckedRows.push(row);
       }
-    }, this);
+    });
 
     this.addFilterForWidgetEventType('rowsChecked');
     this.widget.checkRows(checkedRows, {
@@ -445,77 +459,79 @@ export default class TableAdapter extends ModelAdapter {
     });
   }
 
-  _onRowsExpanded(rows) {
-    let expandedRows = [],
-      collapsedRows = [];
-    rows.forEach(function(rowData) {
+  protected _onRowsExpanded(rows: TableRowData[]) {
+    let expandedRows: TableRow[] = [],
+      collapsedRows: TableRow[] = [];
+    rows.forEach(rowData => {
+      // @ts-ignore
       let row = this.widget._rowById(rowData.id);
       if (rowData.expanded) {
         expandedRows.push(row);
       } else {
         collapsedRows.push(row);
       }
-    }, this);
+    });
     this.addFilterForWidgetEventType('rowsExpanded');
 
     this.widget.expandRows(expandedRows);
     this.widget.collapseRows(collapsedRows);
   }
 
-  _onRowOrderChanged(rowIds) {
+  protected _onRowOrderChanged(rowIds: string[]) {
+    // @ts-ignore
     let rows = this.widget._rowsByIds(rowIds);
     this.widget.updateRowOrder(rows);
   }
 
-  _onColumnStructureChanged(columns) {
+  protected _onColumnStructureChanged(columns: Column[]) {
     this._rebuildingTable = true;
     this.widget.updateColumnStructure(columns);
   }
 
-  _onColumnOrderChanged(columnIds) {
+  protected _onColumnOrderChanged(columnIds: string[]) {
     let columns = this.widget.columnsByIds(columnIds);
     this.widget.updateColumnOrder(columns);
   }
 
-  _onColumnHeadersUpdated(columns) {
-    columns.forEach(column => {
-      defaultValues.applyTo(column);
-    });
+  protected _onColumnHeadersUpdated(columns: Column[]) {
+    columns.forEach(column => defaultValues.applyTo(column));
     this.widget.updateColumnHeaders(columns);
 
     if (this.widget.tileMode && this.widget.tableTileGridMediator) {
-      // grouping might have changed, trigger reinit of the groups on the tileGrid in tileMode
+      // grouping might have changed, trigger re-init of the groups on the tileGrid in tileMode
+      // @ts-ignore
       this.widget.tableTileGridMediator._onTableGroup();
       // removing of a group column doesn't cause a rowOrderChange, nonetheless aggregation columns might need to be removed.
       this.widget.updateRowOrder(this.widget.rows);
     }
   }
 
-  _onStartCellEdit(columnId, rowId, fieldId) {
+  protected _onStartCellEdit(columnId: string, rowId: string, fieldId: string) {
     let column = this.widget.columnById(columnId),
+      // @ts-ignore
       row = this.widget._rowById(rowId),
-      field = this.session.getOrCreateWidget(fieldId, this.widget);
+      field = this.session.getOrCreateWidget(fieldId, this.widget) as ValueField;
 
     this.widget.startCellEdit(column, row, field);
   }
 
-  _onEndCellEdit(fieldId) {
+  protected _onEndCellEdit(fieldId: string) {
     let field = this.session.getModelAdapter(fieldId);
     if (!field) {
       throw new Error('Field adapter could not be resolved. Id: ' + fieldId);
     }
-    this.widget.endCellEdit(field.widget);
+    this.widget.endCellEdit(field.widget as ValueField);
   }
 
-  _onRequestFocus() {
+  protected _onRequestFocus() {
     this.widget.focus();
   }
 
-  _onScrollToSelection() {
+  protected _onScrollToSelection() {
     this.widget.revealSelection();
   }
 
-  _onColumnBackgroundEffectChanged(event) {
+  protected _onColumnBackgroundEffectChanged(event: any) {
     event.eventParts.forEach(function(eventPart) {
       let column = this.widget.columnById(eventPart.columnId),
         backgroundEffect = eventPart.backgroundEffect;
@@ -530,14 +546,15 @@ export default class TableAdapter extends ModelAdapter {
     }, this);
   }
 
-  _onRequestFocusInCell(event) {
+  protected _onRequestFocusInCell(event) {
+    // @ts-ignore
     let row = this.widget._rowById(event.rowId),
       column = this.widget.columnById(event.columnId);
 
     this.widget.focusCell(column, row);
   }
 
-  _onAggregationFunctionChanged(event) {
+  protected _onAggregationFunctionChanged(event: any) {
     let columns = [],
       functions = [];
 
@@ -558,18 +575,18 @@ export default class TableAdapter extends ModelAdapter {
     this.widget.changeAggregations(columns, functions);
   }
 
-  _onFiltersChanged(filters) {
+  protected _onFiltersChanged(filters: (TableFilter | TableFilterModel | Filter<TableRow>)[]) {
     this.addFilterForWidgetEventType('filterAdded');
     this.addFilterForWidgetEventType('filterRemoved');
 
     this.widget.setFilters(filters);
-    // do not refilter while the table is being rebuilt (because column.index in filter and row.cells may be inconsistent)
+    // do not re-filter while the table is being rebuilt (because column.index in filter and row.cells may be inconsistent)
     if (!this._rebuildingTable) {
       this.widget.filter();
     }
   }
 
-  onModelAction(event) {
+  override onModelAction(event: any) {
     if (event.type === 'rowsInserted') {
       this._onRowsInserted(event.rows);
     } else if (event.type === 'rowsDeleted') {
@@ -613,10 +630,7 @@ export default class TableAdapter extends ModelAdapter {
     }
   }
 
-  /**
-   * @override ModelAdapter.js
-   */
-  exportAdapterData(adapterData) {
+  override exportAdapterData(adapterData: AdapterData): AdapterData {
     adapterData = super.exportAdapterData(adapterData);
     delete adapterData.selectedRows;
     adapterData.rows = [];
@@ -627,17 +641,20 @@ export default class TableAdapter extends ModelAdapter {
     return adapterData;
   }
 
-  _initRowModel(rowModel) {
+  protected _initRowModel(rowModel: TableRowData): TableRowData {
     rowModel = rowModel || {};
     rowModel.objectType = scout.nvl(rowModel.objectType, 'TableRow');
     defaultValues.applyTo(rowModel);
     return rowModel;
   }
 
-  static _createRowRemote(rowModel) {
+  protected static _createRowRemote(rowModel: TableRowData): TableRow {
+    // @ts-ignore
     if (this.modelAdapter) {
+      // @ts-ignore
       rowModel = this.modelAdapter._initRowModel(rowModel);
     }
+    // @ts-ignore
     return this._createRowOrig(rowModel);
   }
 
@@ -652,7 +669,7 @@ export default class TableAdapter extends ModelAdapter {
     objects.replacePrototypeFunction(Table, '_createRow', TableAdapter._createRowRemote, true);
 
     // _sortAfterInsert
-    objects.replacePrototypeFunction(Table, '_sortAfterInsert', function(wasEmpty) {
+    objects.replacePrototypeFunction(Table, '_sortAfterInsert', function(wasEmpty: boolean) {
       if (this.modelAdapter) {
         // There will only be a row order changed event if table was not empty.
         // If it was empty, there will be NO row order changed event (tableEventBuffer) -> inserted rows are already in correct order -> no sort necessary but group is
@@ -674,7 +691,7 @@ export default class TableAdapter extends ModelAdapter {
     }, true);
 
     // uiSortPossible
-    objects.replacePrototypeFunction(Table, '_isSortingPossible', function(sortColumns) {
+    objects.replacePrototypeFunction(Table, '_isSortingPossible', function(sortColumns: Column[]) {
       if (this.modelAdapter) {
         // In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally we check if each column can install
         // its comparator used to sort. If installation failed for some reason, sorting is not possible. In a remote app the server sets the
@@ -686,7 +703,7 @@ export default class TableAdapter extends ModelAdapter {
     }, true);
 
     // sort
-    objects.replacePrototypeFunction(Table, 'sort', function(column, direction, multiSort, remove) {
+    objects.replacePrototypeFunction(Table, 'sort', function(column: Column, direction?: 'asc' | 'desc', multiSort?: boolean, remove?: boolean) {
       if (this.modelAdapter && column.guiOnly) {
         return;
       }
@@ -703,7 +720,7 @@ export default class TableAdapter extends ModelAdapter {
     }, true);
 
     // not used in classic mode since tiles are created by the server
-    objects.replacePrototypeFunction(Table, 'createTiles', function(rows) {
+    objects.replacePrototypeFunction(Table, 'createTiles', function(rows: TableRow[]) {
       if (this.modelAdapter) {
         // nop in classic mode
         return;
@@ -718,7 +735,7 @@ export default class TableAdapter extends ModelAdapter {
     }
 
     // init
-    objects.replacePrototypeFunction(Column, 'init', function(model) {
+    objects.replacePrototypeFunction(Column, 'init', function(model: ColumnModel) {
       if (model.table && model.table.modelAdapter && !model.guiOnly) {
         // Fill in the missing default values only in remote case, don't do it JS case to not accidentally set undefined properties (e.g. uiSortEnabled)
         model = $.extend({}, model);
@@ -728,7 +745,7 @@ export default class TableAdapter extends ModelAdapter {
     }, true);
 
     // _ensureCell
-    objects.replacePrototypeFunction(Column, '_ensureCell', function(vararg) {
+    objects.replacePrototypeFunction(Column, '_ensureCell', function(vararg: any) {
       if (this.table.modelAdapter) {
         // Note: we do almost the same thing as in _ensureCellOrig, the difference is that
         // we treat a plain object always as cell-model and we always must apply defaultValues
@@ -784,7 +801,7 @@ export default class TableAdapter extends ModelAdapter {
     }
 
     // _toggleCellValue
-    objects.replacePrototypeFunction(BooleanColumn, '_toggleCellValue', function(row, cell) {
+    objects.replacePrototypeFunction(BooleanColumn, '_toggleCellValue', function(row: TableRow, cell: Cell) {
       if (this.table.modelAdapter) {
         // NOP - do nothing, since server will handle the click, see Java AbstractTable#interceptRowClickSingleObserver
       } else {

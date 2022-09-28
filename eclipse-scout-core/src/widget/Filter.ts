@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+
 // FIXME TS mig move filter stuff to filter folder
 import {Predicate} from '../types';
 
@@ -40,7 +51,7 @@ export interface SetFiltersResult<TElem extends FilterElement> {
 }
 
 export interface TextFilter<TElem extends FilterElement> extends Filter<TElem> {
-  acceptedText: string;
+  acceptedText?: string;
 }
 
 export interface UpdateFilteredElementsOptions {
