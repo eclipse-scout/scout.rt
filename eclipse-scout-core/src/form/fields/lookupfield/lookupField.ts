@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Cell, LookupRow, scout, TableRowModel} from '../../../index';
+import {BooleanColumn, Cell, Column, IconColumn, LookupRow, scout, TableRowModel} from '../../../index';
 
 export const lookupField = {
   /**
@@ -40,7 +40,7 @@ export const lookupField = {
   /**
    * Creates a table cell for a descriptor. If no descriptor is provided, the default lookupRow cell is created.
    */
-  createTableCell<T>(lookupRow: LookupRow<T>, desc?: { propertyName?: string }, tableRowData?: object): Cell<T> {
+  createTableCell<T>(lookupRow: LookupRow<T>, desc?: { propertyName?: string; columnObjectType?: typeof Column }, tableRowData?: object): Cell<T> {
     let cell = scout.create(Cell);
 
     // default column descriptor (first column) has propertyName null
@@ -61,6 +61,10 @@ export const lookupField = {
       if (lookupRow.font) {
         cell.font = lookupRow.font;
       }
+    } else if (desc.columnObjectType === IconColumn) {
+      cell.iconId = tableRowData[desc.propertyName];
+    } else if (desc.columnObjectType === BooleanColumn) {
+      cell.value = tableRowData[desc.propertyName];
     } else {
       cell.text = tableRowData[desc.propertyName];
     }
