@@ -104,6 +104,58 @@ public class NamespaceVersionedModelTest {
   }
 
   @Test
+  public void testTransitivDependenciesSparse() {
+    NamespaceVersionedModel<INamespaceVersioned> inventory = createInventory(
+        item("alfa-3"),
+        item("alfa-4"),
+        item("alfa-5"),
+        item("bravo-18", dep("alfa-5")),
+        item("charlie-8", dep("alfa-4")),
+        item("charlie-10", dep("bravo-18")),
+        item("foxtrot-21", dep("alfa-3")),
+        item("foxtrot-22", dep("alfa-5")));
+    assertItems(
+        Arrays.asList(item("foxtrot-21"), item("alfa-4"), item("charlie-8"), item("alfa-5"), item("charlie-10"), item("foxtrot-22")),
+        inventory.getItems(versions(version("alfa-3"), version("charlie-7"), version("foxtrot-20")), versions(version("alfa-5"), version("bravo-18"), version("charlie-10"), version("foxtrot-22"))));
+
+    assertItems(
+        Arrays.asList(item("alfa-3"), item("foxtrot-21"), item("alfa-4"), item("charlie-8"), item("alfa-5"), item("bravo-18"), item("charlie-10"), item("foxtrot-22")),
+        inventory.getItems());
+  }
+
+  @Test
+  public void testTransitivDependenciesSparse2() {
+    // alfa sees no other
+    // bravo sees alfa
+    // charlie sees bravo & alfa
+    // foxtrot sees alfa
+    NamespaceVersionedModel<INamespaceVersioned> inventory = createInventory(
+        item("alfa-12"),
+        item("alfa-14"),
+        item("alfa-20"),
+        item("bravo-18", dep("alfa-14")),
+        item("bravo-20", dep("alfa-20")),
+        item("charlie-12"),
+        item("charlie-13"),
+        item("charlie-20", dep("alfa-20")),
+        item("foxtrot-11"),
+        item("foxtrot-12"),
+        item("foxtrot-13", dep("charlie-12")),
+        item("foxtrot-14"),
+        item("foxtrot-15"),
+        item("foxtrot-20", dep("charlie-20")),
+        item("foxtrot-21"),
+        item("foxtrot-23"));
+
+    assertItems(
+        Arrays.asList(
+            item("alfa-12"), item("alfa-14"), item("bravo-18"), item("foxtrot-11"), item("foxtrot-12"), item("charlie-12"),
+            item("foxtrot-13"), item("foxtrot-14"), item("charlie-13"), item("foxtrot-15"), item("alfa-20"), item("bravo-20"),
+            item("charlie-20"), item("foxtrot-20"), item("foxtrot-21"), item("foxtrot-23")),
+        inventory.getItems());
+  }
+
+  @Test
   public void testMissingNamespaceInToVersions() {
     NamespaceVersionedModel<INamespaceVersioned> inventory = createInventory(Arrays.asList("alfa", "bravo", "charlie"), Arrays.asList(
         item("alfa-4"),
