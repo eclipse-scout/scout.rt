@@ -104,19 +104,32 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
   }
 
   protected Map<T, Set<T>> initDependencyModel(Builder builder) {
-    Map<T, Set<T>> deps = collectDirectDependencies();
-    deps = collectTransitiveDependencies(deps);
-    deps = collectPreviousItemTransitiveDependencies(deps);
-    return deps;
+    Map<T, Set<T>> collector = new HashMap<>();
+
+    collectDirectDependencies(collector);
+
+    Map<T, Set<T>> itemDependencies = new HashMap<>(collector.size());
+    for (Entry<T, Set<T>> entry : collector.entrySet()) {
+      itemDependencies.put(entry.getKey(), new HashSet<>(entry.getValue()));
+    }
+    collectTransitiveDependencies(collector, itemDependencies);
+    for (Entry<T, Set<T>> entry : collector.entrySet()) { // update itemDependencies from collector
+      itemDependencies.get(entry.getKey()).addAll(entry.getValue());
+    }
+    collectTransitiveRootToPreviousDependencies(collector, itemDependencies);
+    for (Entry<T, Set<T>> entry : collector.entrySet()) { // update itemDependencies from collector
+      itemDependencies.get(entry.getKey()).addAll(entry.getValue());
+    }
+    collectPreviousItemTransitiveDependencies(collector, itemDependencies);
+    return collector;
   }
 
-  protected Map<T, Set<T>> collectDirectDependencies() {
-    Map<T, Set<T>> deps = new HashMap<>();
+  protected void collectDirectDependencies(Map<T, Set<T>> collector) {
     for (List<T> items : m_items.values()) {
       T previousItem = null;
       for (T item : items) {
         Set<T> dependencies = new HashSet<>();
-        deps.put(item, dependencies);
+        collector.put(item, dependencies);
 
         // add implicit dependency from last item within same name
         if (previousItem != null) {
@@ -133,23 +146,24 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
         }
       }
     }
-    return deps;
   }
 
-  protected Map<T, Set<T>> collectTransitiveDependencies(Map<T, Set<T>> itemDependencies) {
-    Map<T, Set<T>> deps = new HashMap<>();
+  protected void collectTransitiveDependencies(Map<T, Set<T>> collector, Map<T, Set<T>> itemDependencies) {
+    Set<T> visited = new HashSet<>();
+    Deque<T> queue = new ArrayDeque<>();
     for (Entry<T, Set<T>> e : itemDependencies.entrySet()) {
       T item = e.getKey();
       Set<T> depsDirect = e.getValue();
 
-      // initial copy of dependency set
-      List<T> depsTransitive = new ArrayList<>(depsDirect);
+      Set<T> dependencies = collector.get(item);
 
       // add transitive dependencies
       //   If item A depends on B and B depends on C then A depends on C, BUT only for names we have no dependency yet
       //   breath-first search where it is important that only the first visited dependency of a namespace is considered
-      Set<T> visited = new HashSet<>(depsDirect);
-      Deque<T> queue = new ArrayDeque<>(depsDirect);
+      visited.clear();
+      visited.addAll(depsDirect);
+      queue.clear();
+      queue.addAll(depsDirect);
       while (!queue.isEmpty()) {
         T i = queue.pop();
 
@@ -160,7 +174,7 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
 
           NamespaceVersion v = td.getVersion();
           boolean hasLaterVersion = false;
-          for (Iterator<T> it = depsTransitive.iterator(); it.hasNext();) {
+          for (Iterator<T> it = dependencies.iterator(); it.hasNext();) {
             T dtd = it.next();
             NamespaceVersion nv = dtd.getVersion();
             if (!nv.namespaceEquals(v)) {
@@ -174,26 +188,56 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
             }
           }
           if (!hasLaterVersion) {
-            depsTransitive.add(td);
+            dependencies.add(td);
             queue.add(td);
           }
         }
-
       }
-
-      deps.put(item, new HashSet<>(depsTransitive));
     }
-    return deps;
   }
 
-  protected Map<T, Set<T>> collectPreviousItemTransitiveDependencies(Map<T, Set<T>> itemDependencies) {
-    Map<T, Set<T>> deps = new HashMap<>();
+  protected void collectTransitiveRootToPreviousDependencies(Map<T, Set<T>> collector, Map<T, Set<T>> itemDependencies) {
+    // for an item X, find for each dependency their dependency root, add on these roots a dependency to previous item of item X
+    Set<T> seenRoots = new HashSet<>(); // ensure to not build dependency cycles
+    Set<T> seenItems = new HashSet<>();
+    Set<T> dependencyRoots = new HashSet<>();
+    for (Entry<String, List<T>> entry : m_items.entrySet()) {
+      seenRoots.clear();
+      List<T> items = entry.getValue();
+      for (T item : items) {
+        // find dependency root
+        dependencyRoots.clear();
+        seenItems.clear();
+        collectDependencyRoots(dependencyRoots, itemDependencies, item, seenItems);
+        for (T dependencyRoot : dependencyRoots) {
+          if (seenRoots.add(dependencyRoot)) {
+            getPrevious(item.getVersion()).ifPresent(p -> collector.get(dependencyRoot).add(p));
+          }
+        }
+      }
+    }
+  }
+
+  protected boolean collectDependencyRoots(Set<T> dependencyRoots, Map<T, Set<T>> itemDependencies, T item, Set<T> seenItems) {
+    boolean added = false;
+    for (T i : itemDependencies.get(item)) {
+      boolean notSeen = seenItems.add(i);
+      if (!item.getVersion().getNamespace().equals(i.getVersion().getNamespace())) {
+        if (notSeen) {
+          if (!collectDependencyRoots(dependencyRoots, itemDependencies, i, seenItems)) {
+            dependencyRoots.add(i);
+          }
+        }
+        added = true;
+      }
+    }
+    return added;
+  }
+
+  protected void collectPreviousItemTransitiveDependencies(Map<T, Set<T>> collector, Map<T, Set<T>> itemDependencies) {
     for (Entry<T, Set<T>> e : itemDependencies.entrySet()) {
       T item = e.getKey();
-
-      // add initial copy of dependency set
-      Set<T> dependencies = new HashSet<>(e.getValue());
-      deps.put(item, dependencies);
+      Set<T> dependencies = collector.get(item);
 
       // add all items which depend on previous item with same name (except itself)
       Optional<T> previousItem = getPrevious(item.getVersion());
@@ -206,7 +250,6 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
         }
       }
     }
-    return deps;
   }
 
   protected void validateDependencyModel() {
@@ -407,6 +450,25 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
     return new VersionedItems<>(result, unsatisfiedDependencies);
   }
 
+  protected static <T extends INamespaceVersioned> String dependencyModelToString(Map<T, Set<T>> dependencyMap) {
+    StringBuilder sb = new StringBuilder("{");
+    if (!dependencyMap.isEmpty()) {
+      for (Entry<T, Set<T>> entry : dependencyMap.entrySet()) {
+        sb.append(entry.getKey().getVersion().unwrap()).append("=").append("[");
+        if (!entry.getValue().isEmpty()) {
+          for (T d : entry.getValue()) {
+            sb.append(d.getVersion().unwrap());
+            sb.append(", ");
+          }
+          sb.setLength(sb.length() - 2);
+        }
+        sb.append("], ");
+      }
+      sb.setLength(sb.length() - 2);
+    }
+    return sb.append("}").toString();
+  }
+
   public static class VersionedItems<T extends INamespaceVersioned> {
 
     private final List<T> m_items;
@@ -526,7 +588,9 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
           return entry.getKey();
         }
       }
-      assertTrue(m_dependencyMap.isEmpty(), "Unable to resolve all dependencies - cycle in dependencies? {}", m_dependencyMap);
+      if (!m_dependencyMap.isEmpty()) {
+        fail("Unable to resolve all dependencies - cycle in dependencies? {}", dependencyModelToString(m_dependencyMap));
+      }
       return null;
     }
 
