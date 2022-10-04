@@ -156,6 +156,33 @@ public class NamespaceVersionedModelTest {
   }
 
   @Test
+  public void testTransitivDependenciesSparse3() {
+    NamespaceVersionedModel<INamespaceVersioned> inventory = createInventory(
+        item("alfa-27"),
+        item("alfa-34"),
+        item("bravo-33", dep("alfa-27")),
+        item("bravo-34", dep("alfa-34")),
+        item("bravo-40"),
+        item("charlie-2", dep("alfa-27")),
+        item("charlie-11", dep("bravo-33")),
+        item("charlie-21", dep("bravo-34")),
+        item("charlie-21.1"),
+        item("charlie-22"),
+        item("charlie-22.1"),
+        item("charlie-23", dep("bravo-40")),
+        item("foxtrot-1", dep("charlie-22")),
+        item("foxtrot-21", dep("charlie-23")),
+        item("foxtrot-22", dep("charlie-23")));
+
+    assertItems(
+        Arrays.asList(
+            item("alfa-27"), item("bravo-33"), item("charlie-2"), item("charlie-11"), item("alfa-34"), item("bravo-34"),
+            item("charlie-21"), item("charlie-21.1"), item("bravo-40"), item("charlie-22"), item("foxtrot-1"),
+            item("charlie-22.1"), item("charlie-23"), item("foxtrot-21"), item("foxtrot-22")),
+        inventory.getItems());
+  }
+
+  @Test
   public void testMissingNamespaceInToVersions() {
     NamespaceVersionedModel<INamespaceVersioned> inventory = createInventory(Arrays.asList("alfa", "bravo", "charlie"), Arrays.asList(
         item("alfa-4"),

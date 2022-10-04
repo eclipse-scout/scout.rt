@@ -197,34 +197,33 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
   }
 
   protected void collectTransitiveRootToPreviousDependencies(Map<T, Set<T>> collector, Map<T, Set<T>> itemDependencies) {
-    // for an item X, find for each dependency their dependency root, add on these roots a dependency to previous item of item X
-    Set<T> seenRoots = new HashSet<>(); // ensure to not build dependency cycles
-    Set<T> seenItems = new HashSet<>();
+    // for an item X, find for each item their dependency root, add on these roots a dependency to previous item of item X
+    Set<T> visited = new HashSet<>();
     Set<T> dependencyRoots = new HashSet<>();
     for (Entry<String, List<T>> entry : m_items.entrySet()) {
-      seenRoots.clear();
       List<T> items = entry.getValue();
       for (T item : items) {
         // find dependency root
         dependencyRoots.clear();
-        seenItems.clear();
-        collectDependencyRoots(dependencyRoots, itemDependencies, item, seenItems);
+        visited.clear();
+        collectDependencyRoots(dependencyRoots, itemDependencies, item, visited);
         for (T dependencyRoot : dependencyRoots) {
-          if (seenRoots.add(dependencyRoot)) {
-            getPrevious(item.getVersion()).ifPresent(p -> collector.get(dependencyRoot).add(p));
+          Optional<T> previous = getPrevious(item.getVersion());
+          if (previous.isPresent() && !dependsOnRecursive(previous.get(), dependencyRoot, itemDependencies)) {
+            collector.get(dependencyRoot).add(previous.get());
           }
         }
       }
     }
   }
 
-  protected boolean collectDependencyRoots(Set<T> dependencyRoots, Map<T, Set<T>> itemDependencies, T item, Set<T> seenItems) {
+  protected boolean collectDependencyRoots(Set<T> dependencyRoots, Map<T, Set<T>> itemDependencies, T item, Set<T> visited) {
     boolean added = false;
     for (T i : itemDependencies.get(item)) {
-      boolean notSeen = seenItems.add(i);
+      boolean notSeen = visited.add(i);
       if (!item.getVersion().getNamespace().equals(i.getVersion().getNamespace())) {
         if (notSeen) {
-          if (!collectDependencyRoots(dependencyRoots, itemDependencies, i, seenItems)) {
+          if (!collectDependencyRoots(dependencyRoots, itemDependencies, i, visited)) {
             dependencyRoots.add(i);
           }
         }
@@ -232,6 +231,20 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
       }
     }
     return added;
+  }
+
+  protected boolean dependsOnRecursive(T item, T dependency, Map<T, Set<T>> itemDependencies) {
+    Set<T> visited = new HashSet<>();
+    ArrayDeque<T> work = new ArrayDeque<>();
+    while (item != null) {
+      visited.add(item);
+      if (item.equals(dependency)) {
+        return true;
+      }
+      itemDependencies.get(item).stream().filter(Predicate.not(visited::contains)).forEach(work::add);
+      item = work.pollLast();
+    }
+    return false;
   }
 
   protected void collectPreviousItemTransitiveDependencies(Map<T, Set<T>> collector, Map<T, Set<T>> itemDependencies) {
@@ -259,7 +272,9 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
     // call getItems on full version range to detect any dependency cycles
     VersionedItems<T> items = getItems(fromVersions, toVersions);
     assertTrue(items.getUnsatisfiedDependencies().isEmpty());
-    LOG.debug("Loaded versioned items: {}", items);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Loaded versioned items:\n{}\ndependency model:\n{}", items, dependencyModelToString(m_dependencyModel));
+    }
   }
 
   protected List<T> getItemsInternal(String name) {
@@ -451,12 +466,19 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
   }
 
   protected static <T extends INamespaceVersioned> String dependencyModelToString(Map<T, Set<T>> dependencyMap) {
+    Comparator<T> itemComparator = Comparator.comparing(INamespaceVersioned::getVersion, Comparator.comparing(NamespaceVersion::getNamespace).thenComparing(NamespaceVersion::compareVersion));
     StringBuilder sb = new StringBuilder("{");
     if (!dependencyMap.isEmpty()) {
-      for (Entry<T, Set<T>> entry : dependencyMap.entrySet()) {
-        sb.append(entry.getKey().getVersion().unwrap()).append("=").append("[");
-        if (!entry.getValue().isEmpty()) {
-          for (T d : entry.getValue()) {
+      List<T> keys = new ArrayList<>(dependencyMap.keySet());
+      keys.sort(itemComparator);
+      List<T> deps = new ArrayList<>();
+      for (T key : keys) {
+        sb.append(key.getVersion().unwrap()).append("=").append("[");
+        deps.clear();
+        deps.addAll(dependencyMap.get(key));
+        if (!deps.isEmpty()) {
+          deps.sort(itemComparator);
+          for (T d : deps) {
             sb.append(d.getVersion().unwrap());
             sb.append(", ");
           }
@@ -493,6 +515,12 @@ public class NamespaceVersionedModel<T extends INamespaceVersioned> {
 
     public Collection<T> getUnsatisfiedDependencies() {
       return m_unsatisfiedDependencies;
+    }
+
+    @Override
+    public String toString() {
+      return "VersionedItems[items=[" + m_items.stream().map(INamespaceVersioned::getVersion).map(NamespaceVersion::unwrap).collect(Collectors.joining(", ")) +
+          "], unsatisfiedDependencies=" + m_unsatisfiedDependencies.stream().map(INamespaceVersioned::getVersion).map(NamespaceVersion::unwrap).collect(Collectors.joining(", ")) + "]";
     }
   }
 
