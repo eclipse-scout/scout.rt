@@ -193,7 +193,7 @@ export default abstract class AbstractTableNavigationKeyStroke extends KeyStroke
   }
 
   protected override _isEnabled(): boolean {
-    return !this.field.tileMode;
+    return !this.field.tileMode && super._isEnabled();
   }
 }
 

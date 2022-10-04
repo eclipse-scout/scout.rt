@@ -160,24 +160,21 @@ export default class KeyStroke implements KeyStrokeModel {
   protected _isEnabled(): boolean {
     // Hint: do not check for which.length because there are keystrokes without a which, e.g. RangeKeyStroke.js
 
-    if (this.field) {
-      // Check visibility
-      if (this.field.visible !== undefined && !this.field.visible) {
-        return false;
-      }
-      // Check enabled state (if inheritAccessibility is true)
-      if (!this.inheritAccessibility) {
-        return true;
-      }
-      if (this.field.enabledComputed !== undefined) {
-        return this.field.enabledComputed;
-      }
-      if (this.field.enabled !== undefined) {
-        // This should actually not happen because this.field should always be a hypothetical case if this.field is not a widget
-        return this.field.enabled;
-      }
+    if (!this.field) {
+      return true;
     }
-    return true;
+    if (this.field.isRemovalPending()) {
+      // Prevent possible exceptions or unexpected behavior if a keystroke is executed while a widget is being removed.
+      return false;
+    }
+    if (!this.field.visible) {
+      return false;
+    }
+    if (!this.inheritAccessibility) {
+      return true;
+    }
+    // Check enabled state only if inheritAccessibility is true
+    return this.field.enabledComputed;
   }
 
   /**
