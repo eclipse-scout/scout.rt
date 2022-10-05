@@ -10,6 +10,8 @@
  */
 .tree {
   position: relative;
+  // The value of the css variable is read by Tree.js and added to the level padding if the parent node has an icon
+  --node-padding-level-diff-parent-has-icon: @tree-node-padding-level-diff-parent-has-icon;
 
   &:focus,
   &.focused {
@@ -122,7 +124,7 @@
 
   & > .icon {
     vertical-align: top;
-    padding-right: 9px;
+    padding-right: @tree-node-icon-padding-right;
     display: inline-block;
     text-align: center;
     min-width: @tree-node-icon-width;
