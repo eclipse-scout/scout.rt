@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings} from '@eclipse-scout/core';
+import {objects, strings} from '@eclipse-scout/core';
 import {AbstractSvgChartRenderer} from '../index';
 import $ from 'jquery';
 
@@ -344,13 +344,10 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
   }
 
   _calcConversionRate(valueBefore, value) {
-    let returnValue = 0;
-    if (valueBefore === 0) {
-      returnValue = undefined;
-    } else if (value !== valueBefore) {
-      returnValue = Math.round(value / valueBefore * 100);
+    if (objects.isNullOrUndefined(valueBefore) || objects.isNullOrUndefined(value) || valueBefore === 0) {
+      return undefined;
     }
-    return returnValue;
+    return Math.round(value / valueBefore * 100);
   }
 
   _analyzeData(valueGroups) {
