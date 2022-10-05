@@ -253,12 +253,13 @@ export default class TreeNode {
 
   _renderControl() {
     let $control = this.$node.prependDiv('tree-node-control');
-    this._updateControl($control, this.getTree());
+    this._updateControl($control);
   }
 
-  _updateControl($control, tree) {
+  _updateControl($control) {
+    let tree = this.getTree();
     $control.toggleClass('checkable', tree.checkable);
-    $control.cssPaddingLeft(tree.nodeControlPaddingLeft + this.level * tree.nodePaddingLevel);
+    $control.cssPaddingLeft(tree._computeNodeControlPaddingLeft(this));
     $control.setVisible(!this.leaf);
   }
 

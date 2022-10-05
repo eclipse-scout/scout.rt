@@ -414,7 +414,7 @@ describe('TreeAdapter', () => {
 
         let event = helper.createNodeChangedEvent(model, node0.id);
         adapter.onModelAction(event);
-        expect(tree.changeNode).toHaveBeenCalledWith(node0);
+        expect(tree.changeNode).toHaveBeenCalled();
       });
 
       it('updates the text of the node', () => {

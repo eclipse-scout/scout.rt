@@ -37,6 +37,7 @@ export default class Tree extends Widget {
     this.nodesMap = {}; // all nodes by id
     this.nodePaddingLevelCheckable = 23; /* padding for one tree-level if the tree is checkable */
     this.nodePaddingLevelNotCheckable = 18; /* padding for one tree-level if the tree is not checkable. this includes outline trees! */
+    this.nodePaddingLevelDiffParentHasIcon = null; /* is read from CSS */
     this.nodePaddingLeft = null; /* is read from CSS */
     this.nodeCheckBoxPaddingLeft = 29;
     this.nodeControlPaddingLeft = null; /* is read from CSS */
@@ -70,6 +71,7 @@ export default class Tree extends Widget {
 
     // contains all parents of a selected node, the selected node and the first level children
     this._inSelectionPathList = {};
+    this._changeNodeTaskScheduled = false;
     this.viewRangeRendered = new Range(0, 0);
     this.viewRangeSize = 20;
 
@@ -890,7 +892,7 @@ export default class Tree extends Widget {
 
   _renderNode(node) {
     let paddingLeft = this._computeNodePaddingLeft(node);
-    node.render(this.$container, paddingLeft, this.checkable, this.enabledComputed);
+    node.render(this.$container, paddingLeft);
     return node.$node;
   }
 
@@ -953,7 +955,7 @@ export default class Tree extends Widget {
       let $control = $node.children('.tree-node-control');
       let $checkbox = $node.children('.tree-node-checkbox');
 
-      node._updateControl($control, this);
+      node._updateControl($control);
       if (this.checkable) {
         if ($checkbox.length === 0) {
           node._renderCheckbox();
@@ -1312,7 +1314,7 @@ export default class Tree extends Widget {
       let node = $node.data('node');
       let paddingLeft = this._computeNodePaddingLeft(node);
       $node.cssPaddingLeft(objects.isNullOrUndefined(paddingLeft) ? '' : paddingLeft);
-      node._updateControl($node.children('.tree-node-control'), this);
+      node._updateControl($node.children('.tree-node-control'));
     });
   }
 
@@ -2087,9 +2089,32 @@ export default class Tree extends Widget {
     if (this.isBreadcrumbStyleActive()) {
       return this.nodePaddingLeft;
     }
-    let padding = node.level * this.nodePaddingLevel + this.nodePaddingLeft;
+    let padding = this.nodePaddingLeft + this._computeNodePaddingLeftForLevel(node);
     if (this.checkable) {
       padding += this.nodeCheckBoxPaddingLeft;
+    }
+    return padding;
+  }
+
+  _computeNodeControlPaddingLeft(node) {
+    return this.nodeControlPaddingLeft + this._computeNodePaddingLeftForLevel(node);
+  }
+
+  _computeNodePaddingLeftForLevel(node) {
+    if (this.checkable || !this.nodePaddingLevelDiffParentHasIcon) {
+      return node.level * this.nodePaddingLevel;
+    }
+    let padding = 0;
+    let parentNode = node.parentNode;
+    while (parentNode) {
+      padding += this.nodePaddingLevel;
+      // Increase the padding if the parent node has an icon to make the hierarchy more clear
+      // This is not necessary if the child nodes have icons as well, the padding even looks too big, as it is the case for checkable trees.
+      // We only check the first child node for an icon because that one has the biggest impact on the hierarchy visualization. It also increases performance a little.
+      if (parentNode.iconId && !parentNode.childNodes[0].iconId) {
+        padding += this.nodePaddingLevelDiffParentHasIcon;
+      }
+      parentNode = parentNode.parentNode;
     }
     return padding;
   }
@@ -2098,7 +2123,7 @@ export default class Tree extends Widget {
    * Reads the paddings from CSS and stores them in nodePaddingLeft and nodeControlPaddingLeft
    */
   _computeNodePaddings() {
-    if (this.nodePaddingLeft !== null && this.nodeControlPaddingLeft !== null) {
+    if (this.nodePaddingLeft !== null && this.nodeControlPaddingLeft !== null && this.nodePaddingLevelDiffParentHasIcon !== null) {
       return;
     }
     let $dummyNode = this.$data.appendDiv('tree-node');
@@ -2108,6 +2133,9 @@ export default class Tree extends Widget {
     }
     if (this.nodeControlPaddingLeft === null) {
       this.nodeControlPaddingLeft = $dummyNodeControl.cssPaddingLeft();
+    }
+    if (this.nodePaddingLevelDiffParentHasIcon === null) {
+      this.nodePaddingLevelDiffParentHasIcon = this.$container.cssPxValue('--node-padding-level-diff-parent-has-icon');
     }
     $dummyNode.remove();
   }
@@ -3169,6 +3197,19 @@ export default class Tree extends Widget {
     this.applyFiltersForNode(node);
     if (this.rendered) {
       node._decorate();
+      // The padding size of a node depends on whether the node or the parent node has an icon, see _computeNodePaddingLeftForLevel
+      // Unfortunately, we cannot easily detect whether the icon has changed or not.
+      // However, the padding calculation only needs to be done if the node that toggles the icon is visible and expanded or has an expanded parent.
+      let paddingDirty = !!this.nodePaddingLevelDiffParentHasIcon && !!this.visibleNodesMap[node.id] && (node.expanded || !!node.parentNode);
+      if (paddingDirty && !this._changeNodeTaskScheduled) {
+        // Because the change node event is not batch capable, performance would slow down if many change node events are processed
+        // To mitigate this, the updating is done later
+        queueMicrotask(() => {
+          this._updateNodePaddingsLeft();
+          this._changeNodeTaskScheduled = false;
+        });
+        this._changeNodeTaskScheduled = true;
+      }
     }
     this.trigger('nodeChanged', {
       node: node
