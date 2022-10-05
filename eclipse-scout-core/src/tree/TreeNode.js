@@ -258,7 +258,7 @@ export default class TreeNode {
 
   _updateControl($control, tree) {
     $control.toggleClass('checkable', tree.checkable);
-    $control.cssPaddingLeft(tree.nodeControlPaddingLeft + this.level * tree.nodePaddingLevel);
+    $control.cssPaddingLeft(tree._computeNodeControlPaddingLeft(this));
     $control.setVisible(!this.leaf);
   }
 

@@ -37,6 +37,7 @@ export default class Tree extends Widget {
     this.nodesMap = {}; // all nodes by id
     this.nodePaddingLevelCheckable = 23; /* padding for one tree-level if the tree is checkable */
     this.nodePaddingLevelNotCheckable = 18; /* padding for one tree-level if the tree is not checkable. this includes outline trees! */
+    this.nodePaddingLevelDiffParentHasIcon = null; /* is read from CSS */
     this.nodePaddingLeft = null; /* is read from CSS */
     this.nodeCheckBoxPaddingLeft = 29;
     this.nodeControlPaddingLeft = null; /* is read from CSS */
@@ -890,7 +891,7 @@ export default class Tree extends Widget {
 
   _renderNode(node) {
     let paddingLeft = this._computeNodePaddingLeft(node);
-    node.render(this.$container, paddingLeft, this.checkable, this.enabledComputed);
+    node.render(this.$container, paddingLeft);
     return node.$node;
   }
 
@@ -2087,9 +2088,29 @@ export default class Tree extends Widget {
     if (this.isBreadcrumbStyleActive()) {
       return this.nodePaddingLeft;
     }
-    let padding = node.level * this.nodePaddingLevel + this.nodePaddingLeft;
+    let padding = this.nodePaddingLeft + this._computeNodePaddingLeftForLevel(node);
     if (this.checkable) {
       padding += this.nodeCheckBoxPaddingLeft;
+    }
+    return padding;
+  }
+
+  _computeNodeControlPaddingLeft(node) {
+    return this.nodeControlPaddingLeft + this._computeNodePaddingLeftForLevel(node);
+  }
+
+  _computeNodePaddingLeftForLevel(node) {
+    if (this.checkable) {
+      return node.level * this.nodePaddingLevel;
+    }
+    let padding = 0;
+    let parentNode = node.parentNode;
+    while (parentNode) {
+      padding += this.nodePaddingLevel;
+      if (parentNode.iconId) {
+        padding += this.nodePaddingLevelDiffParentHasIcon;
+      }
+      parentNode = parentNode.parentNode;
     }
     return padding;
   }
@@ -2098,7 +2119,7 @@ export default class Tree extends Widget {
    * Reads the paddings from CSS and stores them in nodePaddingLeft and nodeControlPaddingLeft
    */
   _computeNodePaddings() {
-    if (this.nodePaddingLeft !== null && this.nodeControlPaddingLeft !== null) {
+    if (this.nodePaddingLeft !== null && this.nodeControlPaddingLeft !== null && this.nodePaddingLevelDiffParentHasIcon !== null) {
       return;
     }
     let $dummyNode = this.$data.appendDiv('tree-node');
@@ -2108,6 +2129,9 @@ export default class Tree extends Widget {
     }
     if (this.nodeControlPaddingLeft === null) {
       this.nodeControlPaddingLeft = $dummyNodeControl.cssPaddingLeft();
+    }
+    if (this.nodePaddingLevelDiffParentHasIcon === null) {
+      this.nodePaddingLevelDiffParentHasIcon = this.$container.cssPxValue('--node-padding-level-diff-parent-has-icon');
     }
     $dummyNode.remove();
   }
