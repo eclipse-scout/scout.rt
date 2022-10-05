@@ -1046,8 +1046,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       origin = graphics.offsetBounds(this.$canvas);
     origin.x += tooltip.caretX + positionAndOffset.offsetX;
     origin.y += tooltip.caretY + positionAndOffset.offsetY;
-    // Tooltip adds origin.height to origin.y in 'bottom' mode, but origin.y is already the correct value for 'top' and 'bottom' mode
-    origin.height = 0;
+    origin.height = positionAndOffset.height;
 
     this._tooltip = scout.create({
       objectType: 'Tooltip',
@@ -1090,7 +1089,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let tooltipPosition = 'top',
       tooltipDirection = 'right',
       offsetX = 0,
-      offsetY = 0;
+      offsetY = 0,
+      height = 0;
 
     let chart = tooltipItem.chart,
       datasetIndex = tooltipItem.datasetIndex,
@@ -1137,8 +1137,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
        * @type BarElement
        */
       let element = chart.getDatasetMeta(datasetIndex).data[dataIndex];
-      let height = element.height,
-        width = element.width,
+      height = element.height;
+      let width = element.width,
         // golden ratio: (a + b) / a = a / b = PHI
         // and a + b = width
         // -> b = width / (PHI + 1)
@@ -1158,7 +1158,8 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         offset += value.r;
       }
 
-      offsetY = tooltipPosition === 'top' ? -offset : offset;
+      height = 2 * offset;
+      offsetY = -offset;
     } else if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
       // noinspection JSValidateTypes
       /**
@@ -1175,12 +1176,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       offsetY = offset * Math.sin(angle);
     }
 
-    return {
-      tooltipPosition: tooltipPosition,
-      tooltipDirection: tooltipDirection,
-      offsetX: offsetX,
-      offsetY: offsetY
-    };
+    return {tooltipPosition, tooltipDirection, offsetX, offsetY, height};
   }
 
   _adjustGrid(config) {
