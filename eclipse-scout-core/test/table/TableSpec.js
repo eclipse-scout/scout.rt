@@ -3220,13 +3220,61 @@ describe('Table', () => {
       let row = table.rows[1];
       table.render();
       table.addFilter({
-        createKey: () => 1,
         accept: r => row !== r
       });
-      table.filter();
       table.scrollTo(row);
       // Expect no error and no scrolling
       expect(table.$data[0].scrollTop).toBe(0);
+    });
+  });
+
+  describe('addFilter', () => {
+    it('accepts filter function', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      let filter = row => row === table.rows[1];
+      table.addFilter(filter);
+      expect(table.filters.length).toBe(1);
+      expect(table.filteredRows().length).toBe(1);
+      expect(table.filteredRows()[0]).toBe(table.rows[1]);
+
+      table.removeFilter(filter);
+      expect(table.filters.length).toBe(0);
+      expect(table.filteredRows().length).toBe(4);
+
+      table.setFilters([filter]);
+      expect(table.filters.length).toBe(1);
+      expect(table.filteredRows().length).toBe(1);
+      expect(table.filteredRows()[0]).toBe(table.rows[1]);
+
+      table.setFilters([]);
+      expect(table.filters.length).toBe(0);
+      expect(table.filteredRows().length).toBe(4);
+    });
+
+    it('accepts filter object', () => {
+      let model = helper.createModelFixture(2, 4);
+      let table = helper.createTable(model);
+      let filter = {
+        accept: row => row === table.rows[1]
+      };
+      table.addFilter(filter);
+      expect(table.filters.length).toBe(1);
+      expect(table.filteredRows().length).toBe(1);
+      expect(table.filteredRows()[0]).toBe(table.rows[1]);
+
+      table.removeFilter(filter);
+      expect(table.filters.length).toBe(0);
+      expect(table.filteredRows().length).toBe(4);
+
+      table.setFilters([filter]);
+      expect(table.filters.length).toBe(1);
+      expect(table.filteredRows().length).toBe(1);
+      expect(table.filteredRows()[0]).toBe(table.rows[1]);
+
+      table.setFilters([]);
+      expect(table.filters.length).toBe(0);
+      expect(table.filteredRows().length).toBe(4);
     });
   });
 });

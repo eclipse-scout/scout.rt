@@ -8,10 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Tile} from '../index';
+import {Event, HtmlComponent, Tile} from '../index';
 import $ from 'jquery';
+import TileModel from './TileModel';
+import TileEventMap from './TileEventMap';
 
-export default class BeanTile extends Tile {
+export interface BeanTileAppLinkActionEvent<T extends BeanTile = BeanTile> extends Event<T> {
+  ref: string;
+}
+
+export interface BeanTileModel extends TileModel {
+  bean?: object;
+}
+
+export interface BeanTileEventMap extends TileEventMap {
+  'appLinkAction': BeanTileAppLinkActionEvent;
+}
+
+export default class BeanTile extends Tile implements BeanTileModel {
+  declare model: BeanTileModel;
+  declare eventMap: BeanTileEventMap;
+
+  bean: object;
 
   constructor() {
     super();
@@ -19,27 +37,27 @@ export default class BeanTile extends Tile {
     this.bean = null;
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('bean-tile');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderBean();
   }
 
-  _renderBean() {
+  protected _renderBean() {
     // to be implemented by the subclass
   }
 
-  triggerAppLinkAction(ref) {
+  triggerAppLinkAction(ref: string) {
     this.trigger('appLinkAction', {
       ref: ref
     });
   }
 
-  _onAppLinkAction(event) {
+  protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
     let $target = $(event.delegateTarget);
     let ref = $target.data('ref');
     this.triggerAppLinkAction(ref);

@@ -8,25 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, TileGridSelectKeyStroke} from '../../index';
+import {keys, ScoutKeyboardEvent, TileGrid, TileGridSelectKeyStroke} from '../../index';
 
 export default class TileGridSelectAllKeyStroke extends TileGridSelectKeyStroke {
 
-  constructor(tileGrid) {
+  constructor(tileGrid: TileGrid) {
     super(tileGrid);
     this.ctrl = true;
     this.shift = false;
     this.which = [keys.A];
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let tile = this.getSelectionHandler().getVisibleTiles()[0];
       if (tile) {
         // Draw in first tile so that other key stroke hints (e.g. left, right etc.) don't overlap this one
         return tile.$container;
       }
-    }.bind(this);
+    };
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -37,7 +37,7 @@ export default class TileGridSelectAllKeyStroke extends TileGridSelectKeyStroke 
     return true;
   }
 
-  handle(event) {
+  override handle(event: ScoutKeyboardEvent) {
     this.getSelectionHandler().toggleSelection();
   }
 }

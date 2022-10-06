@@ -8,15 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridConfig} from '../index';
+import {LogicalGridConfig, TileGrid} from '../index';
 
 export default class TileGridGridConfig extends LogicalGridConfig {
+  declare widget: TileGrid;
 
   constructor() {
     super();
   }
 
-  getGridWidgets() {
+  override getGridWidgets() {
     return this.widget.filteredTiles;
   }
 }

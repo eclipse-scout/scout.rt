@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, CloseKeyStroke, DialogLayout, Dimension, EnumObject, Event, EventHandler, FocusRule, GlassPaneRenderer, graphics, HtmlComponent, Insets, KeyStroke, KeyStrokeContext, Point, PopupEventMap, PopupLayout, Rectangle, scout, scrollbars, strings, Widget, widgets} from '../index';
+import {
+  AbstractLayout, CloseKeyStroke, DialogLayout, Dimension, EnumObject, Event, EventHandler, FocusRule, GlassPaneRenderer, graphics, HtmlComponent, Insets, KeyStroke, KeyStrokeContext, Point, PopupEventMap, PopupLayout, Rectangle, scout,
+  scrollbars, strings, Widget, widgets
+} from '../index';
 import $ from 'jquery';
 import PopupModel from './PopupModel';
 
@@ -45,8 +48,8 @@ export default class Popup extends Widget implements PopupModel {
   closeOnOtherPopupOpen: boolean;
   modal: boolean;
   $anchor: JQuery;
-  $arrow: JQuery<HTMLDivElement>;
-  $arrowOverlay: JQuery<HTMLDivElement>;
+  $arrow: JQuery;
+  $arrowOverlay: JQuery;
   protected _documentMouseDownHandler: (event: MouseEvent) => void;
   protected _anchorScrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _anchorLocationChangeHandler: EventHandler;

@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TileAdapter} from '../index';
+import {BeanTile, Event, TileAdapter} from '../index';
+import {BeanTileAppLinkActionEvent} from './BeanTile';
 
 export default class BeanTileAdapter extends TileAdapter {
 
@@ -16,15 +17,15 @@ export default class BeanTileAdapter extends TileAdapter {
     super();
   }
 
-  _onWidgetAppLinkAction(event) {
+  protected _onWidgetAppLinkAction(event: BeanTileAppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref
     });
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<BeanTile>) {
     if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event);
+      this._onWidgetAppLinkAction(event as BeanTileAppLinkActionEvent);
     } else {
       super._onWidgetEvent(event);
     }

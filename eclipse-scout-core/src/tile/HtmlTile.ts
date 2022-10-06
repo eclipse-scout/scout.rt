@@ -8,30 +8,44 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Tile} from '../index';
+import {HtmlComponent, PropertyChangeEvent, Tile} from '../index';
+import TileModel from './TileModel';
+import TileEventMap from './TileEventMap';
 
-export default class HtmlTile extends Tile {
+export interface HtmlTileModel extends TileModel {
+  content?: string;
+}
+
+export interface HtmlTileEventMap extends TileEventMap {
+  'propertyChange:content': PropertyChangeEvent<string, HtmlTile>;
+}
+
+export default class HtmlTile extends Tile implements HtmlTileModel {
+  declare model: HtmlTileModel;
+  declare eventMap: HtmlTileEventMap;
+
+  content: string;
 
   constructor() {
     super();
     this.content = null;
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('html-tile');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderContent();
   }
 
-  setContent(content) {
+  setContent(content: string) {
     this.setProperty('content', content);
   }
 
-  _renderContent() {
+  protected _renderContent() {
     if (!this.content) {
       this.$container.empty();
       return;
@@ -46,11 +60,11 @@ export default class HtmlTile extends Tile {
     this.invalidateLayoutTree();
   }
 
-  _onImageLoad(event) {
+  protected _onImageLoad(event: JQuery.TriggeredEvent) {
     this.invalidateLayoutTree();
   }
 
-  _onImageError(event) {
+  protected _onImageError(event: JQuery.TriggeredEvent) {
     this.invalidateLayoutTree();
   }
 }

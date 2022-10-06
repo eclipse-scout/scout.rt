@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {colorSchemes, objects, strings, Tile} from '../index';
+import {colorSchemes, objects, strings} from '../index';
 
 export interface ColorScheme {
   scheme?: string;
   inverted?: boolean;
-  tile?: Tile;
+  tile?: boolean;
 }
 
 const ColorSchemeId = {
@@ -25,7 +25,7 @@ const ColorSchemeId = {
 /**
  * Converts the given colorScheme that may be a string into an object.
  */
-export function ensureColorScheme(colorScheme: ColorScheme | string, tile?: Tile): ColorScheme {
+export function ensureColorScheme(colorScheme: ColorScheme | string, tile?: boolean): ColorScheme {
   let colorSchemeObj: ColorScheme = {};
   if (colorScheme && typeof colorScheme === 'object') {
     colorSchemeObj = colorScheme;

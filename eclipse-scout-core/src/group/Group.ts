@@ -14,7 +14,7 @@ import MouseDownEvent = JQuery.MouseDownEvent;
 
 export type GroupCollapseStyle = EnumObject<typeof Group.CollapseStyle>;
 
-export default class Group extends Widget implements GroupModel {
+export default class Group<Body extends Widget = Widget> extends Widget implements GroupModel {
   declare model: GroupModel;
   declare eventMap: GroupEventMap;
 
@@ -27,7 +27,7 @@ export default class Group extends Widget implements GroupModel {
   header: Widget;
   headerFocusable: boolean;
   headerVisible: boolean;
-  body: Widget;
+  body: Body;
   collapseStyle: GroupCollapseStyle;
   htmlHeader: HtmlComponent;
   htmlFooter: HtmlComponent;

@@ -9,20 +9,23 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {HtmlField} from '../../../index';
+import {Optional} from '../../../types';
+import {ScrollbarInstallOptions} from '../../../scrollbar/scrollbars';
 
+// @ts-ignore // FIXME TS remove ts ignore as soon as HtmlField is migrated
 export default class TileHtmlField extends HtmlField {
 
   constructor() {
     super();
   }
 
-  _render() {
+  protected override _render() {
     super._render();
 
     this.$container.addClass('scrollbar-y-outside');
   }
 
-  _installScrollbars(options) {
-    return super._installScrollbars($.extend(true, {}, options, {scrollShadow: 'gradient'}));
+  protected override _installScrollbars(options: Optional<ScrollbarInstallOptions, 'parent'>) {
+    super._installScrollbars($.extend(true, {}, options, {scrollShadow: 'gradient'}));
   }
 }

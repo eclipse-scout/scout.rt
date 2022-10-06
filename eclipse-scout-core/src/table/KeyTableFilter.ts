@@ -8,14 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Column, Session, Table, TableFilter, TableFilterModel, TableRow} from '../index';
+import {arrays, Filter, TableRow} from '../index';
 
-export default class KeyTableFilter implements TableFilter {
-  declare model: TableFilterModel;
-
-  session: Session;
-  table: Table;
-  column: Column;
+export default class KeyTableFilter implements Filter<TableRow> {
   acceptedKeys: any[];
   keySupplier: (row: TableRow) => any;
   active: boolean;

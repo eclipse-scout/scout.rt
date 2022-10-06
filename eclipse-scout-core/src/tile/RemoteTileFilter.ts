@@ -8,25 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default class RemoteTileFilter {
+import {Tile} from '../index';
 
-  constructor(model) {
-    model = model || {};
+export interface RemoteTileFilterOptions {
+  tileIds?: string[];
+}
+
+export default class RemoteTileFilter {
+  synthetic: boolean;
+  tileMap: Record<string, string>;
+
+  constructor(options?: RemoteTileFilterOptions) {
+    options = options || {};
     this.synthetic = true;
     this.tileMap = {};
-    if (model.tileIds) {
-      this.setTileIds(model.tileIds);
+    if (options.tileIds) {
+      this.setTileIds(options.tileIds);
     }
   }
 
-  setTileIds(tileIds) {
+  setTileIds(tileIds: string[]) {
     this.tileMap = {};
-    tileIds.forEach(function(tileId) {
+    tileIds.forEach(tileId => {
       this.tileMap[tileId] = tileId;
-    }, this);
+    });
   }
 
-  accept(tile) {
+  accept(tile: Tile): boolean {
     return !!this.tileMap[tile.id];
   }
 }

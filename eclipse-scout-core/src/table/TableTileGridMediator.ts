@@ -9,12 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AggregateTableControl, arrays, Column, Event, EventHandler, Group, objects, PropertyChangeEvent, scout, Table, TableFilter, TableRow, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel, Tile, TileAccordion,
+  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, Group, objects, PropertyChangeEvent, scout, Table, TableRow, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel, Tile, TileAccordion,
   TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
 } from '../index';
 import $ from 'jquery';
 import {ScrollToOptions} from '../scrollbar/scrollbars';
 import {TableAllRowsDeletedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent} from './TableEventMap';
+import {TileActionEvent, TileClickEvent} from '../tile/TileGridEventMap';
 
 /**
  * Delegates events between the Table and it's internal TileGrid.
@@ -50,8 +51,8 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
   protected _tableHierarchyFilter: TileTableHierarchyFilter;
   protected _destroyHandler: () => void;
   protected _tileAccordionPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, TileAccordion>>;
-  protected _tileAccordionActionHandler: EventHandler<Event<TileAccordion>>; // FIXME TS: use correct event type as soon as TileAccordion has been migrated
-  protected _tileAccordionClickHandler: EventHandler<Event<TileAccordion>>; // FIXME TS: use correct event type as soon as TileAccordion has been migrated
+  protected _tileAccordionActionHandler: EventHandler<TileActionEvent<TileAccordion>>;
+  protected _tileAccordionClickHandler: EventHandler<TileClickEvent<TileAccordion>>;
   protected _tableFilterAddedHandler: EventHandler<TableFilterAddedEvent>;
   protected _tableFilterRemovedHandler: EventHandler<TableFilterRemovedEvent>;
   protected _tableFilterHandler: EventHandler<Event<Table>>;
@@ -271,14 +272,18 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
   protected _adaptTileGrid(tileGrid: TileGrid) {
     // The table contains the menu items -> pass them to the showContextMenu function of the tileGrid.
     objects.mandatoryFunction(tileGrid, '_showContextMenu');
-    let origShowContextMenu = tileGrid._showContextMenu; // FIXME TS: adapt signatures as soon as TileGrid has been migrated
-    tileGrid._showContextMenu = function(options) {
+    // @ts-ignore
+    let origShowContextMenu = tileGrid._showContextMenu;
+    // @ts-ignore
+    tileGrid._showContextMenu = options => {
       objects.mandatoryFunction(this.table, '_filterMenusForContextMenu');
+      // @ts-ignore
       options.menuItems = this.table._filterMenusForContextMenu();
       scout.assertProperty(this.table, '_filterMenusHandler');
+      // @ts-ignore
       options.menuFilter = this.table._filterMenusHandler;
       origShowContextMenu.call(tileGrid, options);
-    }.bind(this);
+    };
     // use the table's keyStrokeContext bindTarget for each tileGrid as well to ensure that the tileGrid's keyStrokes are active when the table is active
     tileGrid.keyStrokeContext.$bindTarget = this.table.keyStrokeContext.$bindTarget;
   }
@@ -296,7 +301,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     });
   }
 
-  protected _createTileGroup(groupId: string, primaryGroupingColumn: Column, row: TableRow): Group {
+  protected _createTileGroup(groupId: string, primaryGroupingColumn: Column, row: TableRow): Group<TileGrid> {
     let htmlEnabled: boolean, title: string, iconId: string;
     if (primaryGroupingColumn) {
       htmlEnabled = primaryGroupingColumn.htmlEnabled;
@@ -315,7 +320,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
         objectType: TileGrid,
         scrollable: false
       }
-    });
+    }) as Group<TileGrid>;
   }
 
   activate() {
@@ -472,20 +477,19 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     }
   }
 
-  protected _onTileAccordionAction(event: Event<TileAccordion>) { // FIXME TS: use correct event type as soon as TileAccordion has been migrated and remove ts-ignore
+  protected _onTileAccordionAction(event: TileActionEvent<TileAccordion>) {
     if (!this.table.tileMode) {
       return;
     }
-    // @ts-ignore
     this.table.doRowAction(this.table.rowsMap[event.tile.rowId]);
   }
 
-  protected _onTileAccordionClick(event: Event<TileAccordion>) { // FIXME TS: use correct event type as soon as TileAccordion has been migrated and remove ts-ignore
+  protected _onTileAccordionClick(event: TileClickEvent<TileAccordion>) {
     if (!this.table.tileMode) {
       return;
     }
     // @ts-ignore
-    this.table._triggerRowClick(event, this.table.rowsMap[event.tile.rowId], event.mouseButton);
+    this.table._triggerRowClick(event, this.table.rowsMap[event.tile.rowId], event.mouseButton); // FIXME TS JQuery event is not available here -> original Event cannot be passed -> change signature?
   }
 
   protected _onTableRowsSelected(event: TableRowsSelectedEvent) {
@@ -552,11 +556,10 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     this.tileAccordion.removeFilter(event.filter.tileFilter);
   }
 
-  // FIXME TS: use tileFilter in parameter signature as soon as tile accordion has been migrated
-  protected _addFilter(tableFilter: TableFilter & { tileFilter?: { table: Table; accept(tile: Tile): boolean } }) {
+  protected _addFilter(tableFilter: Filter<TableRow> & { tileFilter?: Filter<Tile> & { table: Table } }) {
     let tileFilter = {
       table: this.table,
-      accept: function(tile: Tile) {
+      accept: (tile: Tile) => {
         let rowForTile = this.table.rowsMap[tile.rowId] as TableRow;
         if (rowForTile) {
           return tableFilter.accept(rowForTile);
@@ -630,7 +633,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
   }
 
   protected _syncScrollTopFromTileGridToTable() {
-    let tile = this.tileAccordion._tileAtScrollTop(this.tileAccordion.scrollTop);
+    let tile = this.tileAccordion.tileAtScrollTop(this.tileAccordion.scrollTop);
     if (tile) {
       let options: ScrollToOptions = {
         align: 'top'

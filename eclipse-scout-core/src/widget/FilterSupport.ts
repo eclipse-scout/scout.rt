@@ -9,14 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, EventHandler, Filter, Filterable, FilterResult, FilterSupportOptions, FormField, HAlign, keys, KeyStroke, objects, scout, SetFiltersResult, StringField, strings, styles, UpdateFilteredElementsOptions, ValueField, Widget,
-  WidgetSupport
+  arrays, EventHandler, Filter, Filterable, FilterResult, FilterSupportOptions, FormField, HAlign, keys, KeyStroke, objects, Predicate, scout, SetFiltersResult, StringField, strings, styles, UpdateFilteredElementsOptions, ValueField,
+  Widget, WidgetSupport
 } from '../index';
 import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
 import {FilterElement, TextFilter} from './Filter';
 
-export type FilterFunction<TElem extends FilterElement> = (elem: TElem) => boolean;
-export type FilterOrFunction<TElem extends FilterElement> = Filter<TElem> | FilterFunction<TElem>;
+export type FilterOrFunction<TElem extends FilterElement> = Filter<TElem> | Predicate<TElem>;
 
 export default class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
   declare widget: Widget & Filterable<TElem>;
@@ -263,7 +262,7 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
   /**
    * @param filter The filters to remove.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
-   * @returns Returns the removed filters.
+   * @returns the removed filters.
    */
   removeFilter(filter: FilterOrFunction<TElem> | FilterOrFunction<TElem>[], applyFilter = true): Filter<TElem>[] {
     let filtersToRemove = arrays.ensure(filter);
@@ -360,7 +359,7 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
     return !!this._findFilter(filters, filter);
   }
 
-  protected _createFilterByFunction(filterFunc): Filter<TElem> {
+  protected _createFilterByFunction(filterFunc: Predicate<TElem>): Filter<TElem> {
     return {
       createdByFunction: true,
       accept: filterFunc

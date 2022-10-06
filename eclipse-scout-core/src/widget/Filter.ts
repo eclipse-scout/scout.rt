@@ -12,6 +12,9 @@
 // FIXME TS mig move filter stuff to filter folder
 import {Predicate} from '../types';
 
+/**
+ * A filter is used to only accept specific elements and to hide all others.
+ */
 export default interface Filter<TElem extends FilterElement> {
   /**
    * A function that returns true or false, whether the filter accepts the element or not.
@@ -61,6 +64,6 @@ export interface UpdateFilteredElementsOptions {
 export interface Filterable<TElem extends FilterElement> {
   isTextFilterFieldVisible(): boolean;
   filters: Filter<TElem>[];
-  filteredElementsDirty: boolean;
-  updateFilteredElements(result: FilterResult<TElem>, options: UpdateFilteredElementsOptions);
+  filteredElementsDirty?: boolean;
+  updateFilteredElements?(result: FilterResult<TElem>, options: UpdateFilteredElementsOptions);
 }

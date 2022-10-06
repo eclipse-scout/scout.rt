@@ -8,52 +8,67 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Tile, Widget} from '../index';
+import {EventHandler, PropertyChangeEvent, Tile, Widget} from '../index';
+import TileModel from './TileModel';
+import TileEventMap from './TileEventMap';
+
+export interface WidgetTileModel extends TileModel {
+  /** The widget that should be embedded in the tile */
+  tileWidget?: Widget;
+}
+
+export interface WidgetTileEventMap extends TileEventMap {
+  'propertyChange:tileWidget': PropertyChangeEvent<Widget, WidgetTile>;
+}
 
 /**
  * A tile containing a widget.
  */
-export default class WidgetTile extends Tile {
+export default class WidgetTile extends Tile implements WidgetTileModel {
+  declare model: WidgetTileModel;
+  declare eventMap: WidgetTileEventMap;
+
+  tileWidget: Widget;
+  protected _widgetPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Widget>>;
 
   constructor() {
     super();
-    // The referenced widget which will be rendered (it is not possible to just call it 'widget' due to the naming conflict with the widget function)
     this.tileWidget = null;
     this._addWidgetProperties(['tileWidget']);
     this._widgetPropertyChangeHandler = this._onWidgetPropertyChange.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model) {
     super._init(model);
     this._setTileWidget(this.tileWidget);
   }
 
-  _destroy() {
+  protected override _destroy() {
     if (this.tileWidget) {
       this.tileWidget.off('propertyChange', this._widgetPropertyChangeHandler);
     }
     super._destroy();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderTileWidget();
   }
 
-  _renderTileWidget() {
+  protected _renderTileWidget() {
     if (this.tileWidget) {
       // render the tileWidget into the container of this tile.
       this.tileWidget.render();
     }
   }
 
-  _removeTileWidget() {
+  protected _removeTileWidget() {
     if (this.tileWidget) {
       this.tileWidget.remove();
     }
   }
 
-  _onWidgetPropertyChange(event) {
+  protected _onWidgetPropertyChange(event: PropertyChangeEvent) {
     if (event.propertyName === 'visible') {
       this.setVisible(event.newValue);
     } else if (event.propertyName === 'enabled') {
@@ -63,7 +78,7 @@ export default class WidgetTile extends Tile {
     }
   }
 
-  _setTileWidget(tileWidget) {
+  protected _setTileWidget(tileWidget: Widget) {
     if (this.tileWidget) {
       this.tileWidget.off('propertyChange', this._widgetPropertyChangeHandler);
     }

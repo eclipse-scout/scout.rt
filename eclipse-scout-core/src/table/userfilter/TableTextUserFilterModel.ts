@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {TableFilterModel} from '../../index';
+import {TableUserFilterModel} from '../../index';
 
-export default interface TableTextUserFilterModel extends TableFilterModel {
+export default interface TableTextUserFilterModel extends TableUserFilterModel {
   text?: string;
 }

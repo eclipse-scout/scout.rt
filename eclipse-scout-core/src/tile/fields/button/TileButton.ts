@@ -10,15 +10,18 @@
  */
 import {Button, FormFieldTile, NullLayout, strings, tooltips} from '../../../index';
 
+// @ts-ignore // FIXME TS remove ts ignore as soon as Button is migrated
 export default class TileButton extends Button {
+  $iconContainer: JQuery;
 
   constructor() {
     super();
     this.processButton = false;
+    this.$iconContainer = null;
   }
 
-  _render() {
-    if (this.parent.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
+  protected override _render() {
+    if ((this.parent as FormFieldTile).displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
       super._render();
       return;
     }
@@ -37,13 +40,13 @@ export default class TileButton extends Button {
       .unfocusable();
   }
 
-  _remove() {
+  protected override _remove() {
     this.$iconContainer = null;
     super._remove();
   }
 
-  _renderIconId() {
-    if (this.parent.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
+  protected override _renderIconId() {
+    if ((this.parent as FormFieldTile).displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
       super._renderIconId();
       return;
     }
@@ -65,7 +68,7 @@ export default class TileButton extends Button {
     this.invalidateLayoutTree();
   }
 
-  _renderTooltipText() {
+  protected override _renderTooltipText() {
     // Because tile buttons don't have a visible status, display the tooltip text as normal "hover" tooltip
     if (strings.hasText(this.tooltipText)) {
       tooltips.install(this.$container, {

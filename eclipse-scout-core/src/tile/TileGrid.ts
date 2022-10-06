@@ -9,32 +9,84 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGridData, MenuDestinations, menus as menuUtil, numbers, objects,
-  PlaceholderTile, Range, scout, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke,
-  TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter, VirtualScrolling, Widget
+  AbstractGrid, arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, Event, Filter, FilterResult, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, Menu,
+  MenuDestinations, menus as menuUtil, numbers, objects, PlaceholderTile, Predicate, Range, scout, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke,
+  TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter,
+  UpdateFilteredElementsOptions, VirtualScrolling, Widget
 } from '../index';
 import $ from 'jquery';
+import {Comparator} from '../types';
+import TileGridModel from './TileGridModel';
+import TileModel from './TileModel';
+import {MenuFilter} from '../menu/Menu';
+import {ScrollToOptions} from '../scrollbar/scrollbars';
+import {FilterOrFunction} from '../widget/FilterSupport';
+import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 /**
  * Only select top-level tile elements. Do not select elements with a 'tile' class deeper in the tree.
  * This prevents errors when a developer accidentally adds an element that has the 'tile' class. #262146
- * @type {string}
  */
 const TILE_SELECTOR = '> .tile';
 
-export default class TileGrid extends Widget {
+export default class TileGrid extends Widget implements TileGridModel {
+  declare model: TileGridModel;
+  declare eventMap: TileGridEventMap;
+  declare logicalGrid: AbstractGrid;
+
+  animateTileRemoval: boolean;
+  animateTileInsertion: boolean;
+  comparator: Comparator<Tile>;
+  contextMenu: ContextMenuPopup;
+  empty: boolean;
+  filters: Filter<Tile>[];
+  filteredTiles: Tile[];
+  filteredElementsDirty: boolean;
+  focusedTile: Tile;
+  // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
+  gridColumnCount: number;
+  prefGridColumnCount: number;
+  layoutConfig: TileGridLayoutConfig;
+  menus: Menu[];
+  multiSelect: boolean;
+  renderAnimationEnabled: boolean;
+  selectable: boolean;
+  selectedTiles: Tile[];
+  selectionHandler: TileGridSelectionHandler;
+  scrollable: boolean;
+  startupAnimationDone: boolean;
+  startupAnimationEnabled: boolean;
+  tiles: Tile[];
+  tileRemovalPendingCount: number;
+  viewRangeSize: number;
+  viewRangeRendered: Range;
+  virtual: boolean;
+  virtualScrolling: VirtualScrolling;
+  withPlaceholders: boolean;
+  textFilterEnabled: boolean;
+  filterSupport: FilterSupport<Tile>;
+  createTextFilter: () => TextFilter<Tile>;
+  updateTextFilterText: string;
+  $filterFieldContainer: JQuery;
+  $fillBefore: JQuery;
+  $fillAfter: JQuery;
+  protected _doubleClickSupport: DoubleClickSupport;
+  protected _filterMenusHandler: (menuItems: Menu[], destination: MenuDestinations) => Menu[];
+  protected _renderViewPortAfterAttach: boolean;
+  protected _scrollParentScrollHandler: (event: JQuery.ScrollEvent<HTMLElement>) => void;
+
   constructor() {
     super();
     this.animateTileRemoval = true;
     this.animateTileInsertion = true;
     this.comparator = null;
+    this.contextMenu = null;
     this._doubleClickSupport = new DoubleClickSupport();
     this.empty = false;
     this.filters = [];
     this.filteredTiles = [];
     this.filteredElementsDirty = true;
     this.focusedTile = null;
-    // GridColumnCount will be modified by the layout, prefGridColumnCount remains unchanged
     this.gridColumnCount = 4;
     this.prefGridColumnCount = this.gridColumnCount;
     this.logicalGrid = scout.create(HorizontalGrid);
@@ -73,7 +125,7 @@ export default class TileGrid extends Widget {
     this.$fillAfter = null;
   }
 
-  _init(model) {
+  protected override _init(model: TileGridModel) {
     super._init(model);
     this._setGridColumnCount(this.gridColumnCount);
     this._setLayoutConfig(this.layoutConfig);
@@ -85,18 +137,15 @@ export default class TileGrid extends Widget {
     this._setMenus(this.menus);
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  _initVirtualScrolling() {
+  protected _initVirtualScrolling() {
     this.virtualScrolling = this._createVirtualScrolling();
   }
 
-  _createVirtualScrolling() {
+  protected _createVirtualScrolling(): VirtualScrolling {
     return new VirtualScrolling({
       widget: this,
       enabled: this.virtual,
@@ -107,22 +156,16 @@ export default class TileGrid extends Widget {
     });
   }
 
-  /**
-   * @override
-   */
-  _createLoadingSupport() {
+  protected override _createLoadingSupport(): LoadingSupport {
     return new LoadingSupport({
       widget: this
     });
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    this.keyStrokeContext.registerKeyStroke([
+    this.keyStrokeContext.registerKeyStrokes([
       new TileGridSelectAllKeyStroke(this),
       new TileGridSelectLeftKeyStroke(this),
       new TileGridSelectRightKeyStroke(this),
@@ -134,13 +177,13 @@ export default class TileGrid extends Widget {
     ]);
   }
 
-  _initTiles() {
-    this.tiles.forEach(function(tile) {
+  protected _initTiles() {
+    this.tiles.forEach(tile => {
       this._initTile(tile);
-    }, this);
+    });
   }
 
-  _initTile(tile) {
+  protected _initTile(tile: Tile) {
     tile.setSelectable(this.selectable);
     tile.setSelected(this.selectedTiles.indexOf(tile) >= 0);
 
@@ -149,7 +192,7 @@ export default class TileGrid extends Widget {
     tile.setFilterAccepted(true);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('tile-grid');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(this._createLayout());
@@ -160,11 +203,11 @@ export default class TileGrid extends Widget {
     this.$filterFieldContainer = this.$container.prependDiv('filter-field-container');
   }
 
-  _createLayout() {
+  protected _createLayout(): TileGridLayout {
     return new TileGridLayout(this, this.layoutConfig);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderLayoutConfig();
     this._renderScrollable();
@@ -174,7 +217,7 @@ export default class TileGrid extends Widget {
     this._renderTextFilterEnabled();
   }
 
-  _remove() {
+  protected override _remove() {
     this.$fillBefore = null;
     this.$fillAfter = null;
     this.filterSupport.remove();
@@ -183,10 +226,7 @@ export default class TileGrid extends Widget {
     super._remove();
   }
 
-  /**
-   * @override
-   */
-  _renderOnAttach() {
+  protected override _renderOnAttach() {
     super._renderOnAttach();
     if (this._renderViewPortAfterAttach) {
       this._renderViewPort();
@@ -194,13 +234,13 @@ export default class TileGrid extends Widget {
     }
   }
 
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
 
     this._updateTabbable();
   }
 
-  _updateTabbable() {
+  protected _updateTabbable() {
     if (!this.textFilterEnabled && !this.selectable) {
       this.$container.setTabbable(false);
     } else {
@@ -208,23 +248,24 @@ export default class TileGrid extends Widget {
     }
   }
 
-  insertTile(tile) {
+  insertTile(tile: Tile | TileModel) {
     this.insertTiles([tile]);
   }
 
-  insertTiles(tilesToInsert, appendPlaceholders) {
+  insertTiles(tilesToInsert: Tile | TileModel | (Tile | TileModel)[], appendPlaceholders?: boolean) {
     tilesToInsert = arrays.ensure(tilesToInsert);
     if (tilesToInsert.length === 0) {
       return;
     }
-    this.setTiles(this.tiles.concat(tilesToInsert), appendPlaceholders);
+    let tiles = this.tiles as (Tile | TileModel)[];
+    this.setTiles(tiles.concat(tilesToInsert), appendPlaceholders);
   }
 
-  deleteTile(tile) {
+  deleteTile(tile: Tile) {
     this.deleteTiles([tile]);
   }
 
-  deleteTiles(tilesToDelete, appendPlaceholders) {
+  deleteTiles(tilesToDelete: Tile[], appendPlaceholders?: boolean) {
     tilesToDelete = arrays.ensure(tilesToDelete);
     if (tilesToDelete.length === 0) {
       return;
@@ -238,14 +279,14 @@ export default class TileGrid extends Widget {
     this.setTiles([]);
   }
 
-  setTiles(tiles, appendPlaceholders) {
-    tiles = arrays.ensure(tiles);
-    if (objects.equals(this.tiles, tiles)) {
+  setTiles(tilesOrModels: Tile[] | TileModel[], appendPlaceholders?: boolean) {
+    tilesOrModels = arrays.ensure(tilesOrModels);
+    if (objects.equals(this.tiles, tilesOrModels)) {
       return;
     }
 
     // Ensure given tiles are real tiles (of type Tile)
-    tiles = this._createChildren(tiles);
+    let tiles = this._createChildren(tilesOrModels) as Tile[];
 
     if (this.withPlaceholders && scout.nvl(appendPlaceholders, true)) {
       // Remove placeholders from new tiles, they will be added later
@@ -282,17 +323,17 @@ export default class TileGrid extends Widget {
     }
   }
 
-  _insertTiles(tiles) {
+  protected _insertTiles(tiles: Tile[]) {
     if (tiles.length === 0) {
       return;
     }
 
-    tiles.forEach(function(tile) {
+    tiles.forEach(tile => {
       this._insertTile(tile);
-    }, this);
+    });
   }
 
-  _insertTile(tile) {
+  protected _insertTile(tile: Tile) {
     this._initTile(tile);
     this._applyFilters([tile]);
     if (!this.virtual && this.rendered) {
@@ -300,7 +341,7 @@ export default class TileGrid extends Widget {
     }
   }
 
-  _renderTile(tile) {
+  protected _renderTile(tile: Tile) {
     if (tile.removalPending) {
       // If tile is being removed by the filter and the filter cleared so that the tile should be rendered again while the animation is still running,
       // we need to wait for the remove animation, otherwise an already rendered exception occurs
@@ -322,8 +363,8 @@ export default class TileGrid extends Widget {
     tile.$container.addClass('newly-rendered');
   }
 
-  _renderInsertTiles(tiles) {
-    tiles.forEach(function(tile) {
+  protected _renderInsertTiles(tiles: Tile[]) {
+    tiles.forEach(tile => {
       if (!tile.rendered) {
         return;
       }
@@ -339,7 +380,7 @@ export default class TileGrid extends Widget {
           }
         }
       });
-    }, this);
+    });
 
     if (!this.htmlComp.layouting) {
       // no need to invalidate when tile placeholders are added or removed while layouting
@@ -347,27 +388,27 @@ export default class TileGrid extends Widget {
     }
   }
 
-  _removeAllTiles() {
+  protected _removeAllTiles() {
     this.tiles.forEach(tile => {
       tile.remove();
     });
     this.viewRangeRendered = new Range(0, 0);
   }
 
-  _renderAllTiles() {
-    this.tiles.forEach(function(tile) {
+  protected _renderAllTiles() {
+    this.tiles.forEach(tile => {
       this._renderTile(tile);
-    }, this);
+    });
   }
 
-  _deleteTiles(tiles) {
+  protected _deleteTiles(tiles: Tile[]) {
     if (tiles.length === 0) {
       return;
     }
 
-    tiles.forEach(function(tile) {
+    tiles.forEach(tile => {
       this._deleteTile(tile);
-    }, this);
+    });
     this.deselectTiles(tiles);
 
     if (this.rendered && !this.htmlComp.layouting) {
@@ -376,7 +417,7 @@ export default class TileGrid extends Widget {
     }
   }
 
-  _deleteTile(tile) {
+  protected _deleteTile(tile: Tile) {
     if (this._animateTileRemoval(tile)) {
       // Animate tile removal, but not while layouting when tile placeholders are added or removed
       tile.animateRemoval = true;
@@ -394,15 +435,15 @@ export default class TileGrid extends Widget {
     }
   }
 
-  _animateTileRemoval(tile) {
+  protected _animateTileRemoval(tile: Tile) {
     return this.animateTileRemoval && tile && tile.isVisible() && !(tile instanceof PlaceholderTile);
   }
 
-  _animateTileInsertion(tile) {
+  protected _animateTileInsertion(tile: Tile) {
     return this.animateTileInsertion && tile && tile.isVisible() && !(tile instanceof PlaceholderTile);
   }
 
-  _onAnimatedTileRemove(tile) {
+  protected _onAnimatedTileRemove(tile: Tile) {
     if (!tile.removalPending) {
       return;
     }
@@ -415,7 +456,12 @@ export default class TileGrid extends Widget {
     });
   }
 
-  setComparator(comparator) {
+  /**
+   * Sets a comparator that is used to sort the tiles. After setting a comparator, you need to call {@link sort}.
+   *
+   * The tiles will be sorted automatically whenever new tiles are inserted.
+   */
+  setComparator(comparator: Comparator<Tile>) {
     if (this.comparator === comparator) {
       return;
     }
@@ -442,7 +488,7 @@ export default class TileGrid extends Widget {
     }
   }
 
-  _sort(tiles) {
+  protected _sort(tiles: Tile[]) {
     if (this.comparator === null) {
       return;
     }
@@ -456,7 +502,7 @@ export default class TileGrid extends Widget {
     arrays.pushAll(tiles, placeholders);
   }
 
-  invalidateLayoutTree(invalidateParents) {
+  override invalidateLayoutTree(invalidateParents?: boolean) {
     if (this.tileRemovalPendingCount > 0) {
       // Do not invalidate while tile removal is still pending
       return;
@@ -464,50 +510,53 @@ export default class TileGrid extends Widget {
     super.invalidateLayoutTree(invalidateParents);
   }
 
-  setGridColumnCount(gridColumnCount) {
+  /** @see TileGridModel.gridColumnCount */
+  setGridColumnCount(gridColumnCount: number) {
     this.setProperty('gridColumnCount', gridColumnCount);
   }
 
-  _setGridColumnCount(gridColumnCount) {
+  protected _setGridColumnCount(gridColumnCount: number) {
     this._setProperty('gridColumnCount', gridColumnCount);
     this.prefGridColumnCount = gridColumnCount;
     this.invalidateLogicalGrid();
   }
 
-  setLayoutConfig(layoutConfig) {
+  /** @see TileGridModel.layoutConfig */
+  setLayoutConfig(layoutConfig: TileGridLayoutConfig) {
     this.setProperty('layoutConfig', layoutConfig);
   }
 
-  _setLayoutConfig(layoutConfig) {
+  protected _setLayoutConfig(layoutConfig: TileGridLayoutConfig) {
     if (!layoutConfig) {
       layoutConfig = new TileGridLayoutConfig();
     }
     this._setProperty('layoutConfig', TileGridLayoutConfig.ensure(layoutConfig));
   }
 
-  _renderLayoutConfig() {
-    let oldMinWidth = this.htmlComp.layout.minWidth;
-    this.layoutConfig.applyToLayout(this.htmlComp.layout);
+  protected _renderLayoutConfig() {
+    let layout = this.htmlComp.layout as TileGridLayout;
+    let oldMinWidth = layout.minWidth;
+    this.layoutConfig.applyToLayout(layout);
     if (this.virtualScrolling) {
       this.virtualScrolling.setMinRowHeight(this._minRowHeight());
       this.setViewRangeSize(this.virtualScrolling.viewRangeSize, false);
     }
-    if (oldMinWidth !== this.htmlComp.layout.minWidth) {
+    if (oldMinWidth !== layout.minWidth) {
       this._renderScrollable();
     }
     this.invalidateLayoutTree();
   }
 
-  _setMenus(menus, oldMenus) {
-    this.updateKeyStrokes(menus, oldMenus);
+  protected _setMenus(menus: Menu[]) {
+    this.updateKeyStrokes(menus, this.menus);
     this._setProperty('menus', menus);
   }
 
-  _filterMenus(menus, destination, onlyVisible, enableDisableKeyStrokes, notAllowedTypes) {
+  protected _filterMenus(menus: Menu[], destination: MenuDestinations, onlyVisible?: boolean, enableDisableKeyStrokes?: boolean, notAllowedTypes?: string | string[]) {
     return menuUtil.filterAccordingToSelection('TileGrid', this.selectedTiles.length, menus, destination, {onlyVisible, enableDisableKeyStrokes, notAllowedTypes});
   }
 
-  showContextMenu(options) {
+  showContextMenu(options: { pageX?: number; pageY?: number }) {
     this.session.onRequestsDone(this._showContextMenu.bind(this, options));
   }
 
@@ -515,7 +564,7 @@ export default class TileGrid extends Widget {
    * @param options may contain pageX, pageY, menuItems and menuFilter.
    * If these properties are not provided they are determined automatically.
    */
-  _showContextMenu(options) {
+  protected _showContextMenu(options?: { pageX?: number; pageY?: number; menuItems?: Menu[]; menuFilter?: MenuFilter }) {
     options = options || {};
     if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
       return;
@@ -568,11 +617,12 @@ export default class TileGrid extends Widget {
     this.contextMenu.open();
   }
 
-  setScrollable(scrollable) {
+  /** @see TileGridModel.scrollable */
+  setScrollable(scrollable: boolean) {
     this.setProperty('scrollable', scrollable);
   }
 
-  _renderScrollable() {
+  protected _renderScrollable() {
     this._uninstallScrollbars();
 
     // horizontal (x-axis) scrollbar is only installed when minWidth is > 0
@@ -590,28 +640,25 @@ export default class TileGrid extends Widget {
     this.invalidateLayoutTree();
   }
 
-  /**
-   * @override
-   */
-  _onScroll() {
+  protected override _onScroll() {
     let scrollTop = this.$container[0].scrollTop;
     let scrollLeft = this.$container[0].scrollLeft;
     if (this.scrollTop !== scrollTop && this.virtual) {
-      this.htmlComp.layout.updateViewPort();
+      (this.htmlComp.layout as TileGridLayout).updateViewPort();
     }
     this.scrollTop = scrollTop;
     this.scrollLeft = scrollLeft;
   }
 
-  _onScrollParentScroll(event) {
-    this.htmlComp.layout.updateViewPort();
+  protected _onScrollParentScroll(event: JQuery.ScrollEvent<HTMLElement>) {
+    (this.htmlComp.layout as TileGridLayout).updateViewPort();
   }
 
-  setWithPlaceholders(withPlaceholders) {
+  setWithPlaceholders(withPlaceholders: boolean) {
     this.setProperty('withPlaceholders', withPlaceholders);
   }
 
-  _renderWithPlaceholders() {
+  protected _renderWithPlaceholders() {
     this.invalidateLayoutTree();
   }
 
@@ -628,14 +675,14 @@ export default class TileGrid extends Widget {
     this._insertMissingPlaceholders();
   }
 
-  tilesWithoutPlaceholders() {
+  tilesWithoutPlaceholders(): Tile[] {
     if (!this.withPlaceholders) {
       return this.tiles;
     }
     return this.tiles.filter(tile => !(tile instanceof PlaceholderTile));
   }
 
-  _createPlaceholders() {
+  protected _createPlaceholders(): PlaceholderTile[] {
     let numPlaceholders, lastX,
       columnCount = this.gridColumnCount,
       tiles = this.filteredTiles,
@@ -662,7 +709,7 @@ export default class TileGrid extends Widget {
     return placeholders;
   }
 
-  _createPlaceholder() {
+  protected _createPlaceholder(): PlaceholderTile {
     let placeholder = (this.placeholderProducer && this.placeholderProducer()) || {};
     if (placeholder instanceof PlaceholderTile) {
       return placeholder;
@@ -676,12 +723,12 @@ export default class TileGrid extends Widget {
     throw new Error('Placeholder producer returned unexpected result.');
   }
 
-  _deleteObsoletePlaceholders() {
+  protected _deleteObsoletePlaceholders() {
     let obsoletePlaceholders = [],
       obsolete = false;
 
     let placeholders = this.placeholders();
-    placeholders.forEach(function(placeholder) {
+    placeholders.forEach(placeholder => {
       // Remove all placeholder in the row if there is one at x=0 (don't do it if there are only placeholders)
       if (placeholder.gridData.x === 0 && this.filteredTiles[0] !== placeholder) {
         obsolete = true;
@@ -689,16 +736,16 @@ export default class TileGrid extends Widget {
       if (obsolete) {
         obsoletePlaceholders.push(placeholder);
       }
-    }, this);
+    });
 
     this.deleteTiles(obsoletePlaceholders, false);
   }
 
-  _deleteAllPlaceholders() {
+  protected _deleteAllPlaceholders() {
     this.deleteTiles(this.placeholders(), false);
   }
 
-  placeholders() {
+  placeholders(): PlaceholderTile[] {
     let i, placeholders = [];
     for (i = this.tiles.length - 1; i >= 0; i--) {
       if (!(this.tiles[i] instanceof PlaceholderTile)) {
@@ -710,12 +757,15 @@ export default class TileGrid extends Widget {
     return placeholders;
   }
 
-  _insertMissingPlaceholders() {
+  protected _insertMissingPlaceholders() {
     let placeholders = this._createPlaceholders();
     this.insertTiles(placeholders, false);
   }
 
-  _deletePlaceholders(tiles) {
+  /**
+   * @returns the deleted placeholders
+   */
+  protected _deletePlaceholders(tiles: Tile[]): PlaceholderTile[] {
     let i;
     let deletedPlaceholders = [];
     for (i = tiles.length - 1; i >= 0; i--) {
@@ -727,22 +777,7 @@ export default class TileGrid extends Widget {
     return deletedPlaceholders.reverse();
   }
 
-  _replacePlaceholders(tiles, tilesToInsert) {
-    // Find index of the first tile which is not a placeholder (placeholders are always added at the end, so it is faster if search is done backwards)
-    let index = arrays.findIndexFromReverse(tiles, tiles.length - 1, tile => {
-      return !(tile instanceof PlaceholderTile);
-    });
-
-    let numPlaceholders = tiles.length - 1 - index;
-    for (let i = 1; i <= numPlaceholders; i++) {
-      let tile = tiles[index + i];
-      if (tilesToInsert[i - 1] && !(tilesToInsert[i - 1] instanceof PlaceholderTile)) {
-        arrays.remove(tiles, tile);
-      }
-    }
-  }
-
-  validateLogicalGrid() {
+  override validateLogicalGrid() {
     if (!this.logicalGrid.dirty) {
       return;
     }
@@ -752,17 +787,14 @@ export default class TileGrid extends Widget {
     this.logicalGrid.validate(this);
   }
 
-  /**
-   * @override
-   */
-  _setLogicalGrid(logicalGrid) {
+  protected override _setLogicalGrid(logicalGrid: LogicalGrid | string) {
     super._setLogicalGrid(logicalGrid);
     if (this.logicalGrid) {
       this.logicalGrid.setGridConfig(new TileGridGridConfig());
     }
   }
 
-  setFocusedTile(tile) {
+  setFocusedTile(tile: Tile) {
     if (this.focusedTile === tile) {
       return;
     }
@@ -780,7 +812,8 @@ export default class TileGrid extends Widget {
     });
   }
 
-  setSelectable(selectable) {
+  /** @see TileGridModel.selectable */
+  setSelectable(selectable: boolean) {
     this.setProperty('selectable', selectable);
     if (!selectable) {
       this.deselectAllTiles();
@@ -790,23 +823,24 @@ export default class TileGrid extends Widget {
     });
   }
 
-  _renderSelectable() {
+  protected _renderSelectable() {
     this.$container.toggleClass('selectable', this.selectable);
     this._updateTabbable();
     this.invalidateLayoutTree();
   }
 
-  setMultiSelect(multiSelect) {
+  /** @see TileGridModel.multiSelect */
+  setMultiSelect(multiSelect: boolean) {
     this.setProperty('multiSelect', multiSelect);
   }
 
   /**
    * Selects the given tiles and deselects the previously selected ones.
+   *
+   * Tiles, that are currently invisible due to an active filter, are excluded and won't be selected.
    */
-  selectTiles(tiles) {
+  selectTiles(tiles: Tile[]) {
     tiles = arrays.ensure(tiles);
-    // Ensure given tiles are real tiles (of type Tile)
-    tiles = this._createChildren(tiles);
     tiles = this._filterTiles(tiles); // Selecting invisible tiles is not allowed
 
     // Ensure no tiles will be selected if selectable is disabled
@@ -827,22 +861,23 @@ export default class TileGrid extends Widget {
     // Deselect the tiles which are not part of the new selection
     let tilesToUnselect = this.selectedTiles;
     arrays.removeAll(tilesToUnselect, tiles);
-    tilesToUnselect.forEach(function(tile) {
+    tilesToUnselect.forEach(tile => {
       tile.setSelected(false);
       if (tile === this.focusedTile) {
         this.setFocusedTile(null);
       }
-    }, this);
+    });
 
     // Select the tiles
     tiles.forEach(tile => {
       tile.setSelected(true);
-    }, this);
+    });
 
     this.setProperty('selectedTiles', tiles.slice());
   }
 
-  selectTile(tile) {
+  /** @see selectTiles */
+  selectTile(tile: Tile) {
     this.selectTiles([tile]);
   }
 
@@ -853,7 +888,7 @@ export default class TileGrid extends Widget {
     this.selectTiles(this.filteredTiles);
   }
 
-  deselectTiles(tiles) {
+  deselectTiles(tiles: Tile[]) {
     tiles = arrays.ensure(tiles);
     let selectedTiles = this.selectedTiles.slice();
     if (arrays.removeAll(selectedTiles, tiles)) {
@@ -861,7 +896,7 @@ export default class TileGrid extends Widget {
     }
   }
 
-  deselectTile(tile) {
+  deselectTile(tile: Tile) {
     this.deselectTiles([tile]);
   }
 
@@ -869,6 +904,9 @@ export default class TileGrid extends Widget {
     this.selectTiles([]);
   }
 
+  /**
+   * Deselects every tile if all tiles are selected. Otherwise selects all tiles.
+   */
   toggleSelection() {
     if (this.selectedTiles.length === this.filteredTiles.length) {
       this.deselectAllTiles();
@@ -877,19 +915,19 @@ export default class TileGrid extends Widget {
     }
   }
 
-  addTilesToSelection(tiles) {
+  addTilesToSelection(tiles: Tile[]) {
     tiles = arrays.ensure(tiles);
     this.selectTiles(this.selectedTiles.concat(tiles));
   }
 
-  addTileToSelection(tile) {
+  addTileToSelection(tile: Tile) {
     this.addTilesToSelection([tile]);
   }
 
   /**
-   * @returns {boolean} true if the tile is completely or partially visible in the first scrollable parent.
+   * @returns true if the tile is completely or partially visible in the first scrollable parent.
    */
-  isTileInView(tile) {
+  isTileInView(tile: Tile): boolean {
     let $scrollable = this.$container.scrollParent();
     if ($scrollable.length === 0) {
       $scrollable = this.$container;
@@ -900,7 +938,7 @@ export default class TileGrid extends Widget {
     return graphics.offsetBounds(tile.$container).intersects(graphics.offsetBounds($scrollable));
   }
 
-  _onTileMouseDown(event) {
+  protected _onTileMouseDown(event: JQuery.MouseDownEvent) {
     this._doubleClickSupport.mousedown(event);
     this._selectTileOnMouseDown(event);
 
@@ -913,7 +951,7 @@ export default class TileGrid extends Widget {
     }
   }
 
-  _onTileClick(event) {
+  protected _onTileClick(event: JQuery.ClickEvent) {
     let $tile = $(event.currentTarget);
     let tile = $tile.data('widget');
     if (tile instanceof PlaceholderTile) {
@@ -929,7 +967,7 @@ export default class TileGrid extends Widget {
     this._triggerTileClick(tile, mouseButton);
   }
 
-  _triggerTileClick(tile, mouseButton) {
+  protected _triggerTileClick(tile: Tile, mouseButton: number) {
     let event = {
       tile: tile,
       mouseButton: mouseButton
@@ -937,7 +975,7 @@ export default class TileGrid extends Widget {
     this.trigger('tileClick', event);
   }
 
-  _onTileDoubleClick(event) {
+  protected _onTileDoubleClick(event: JQuery.DoubleClickEvent) {
     let $tile = $(event.currentTarget);
     let tile = $tile.data('widget');
     if (tile instanceof PlaceholderTile) {
@@ -946,35 +984,38 @@ export default class TileGrid extends Widget {
     this.doTileAction(tile);
   }
 
-  doTileAction(tile) {
+  doTileAction(tile: Tile) {
     if (!tile) {
       return;
     }
     this._triggerTileAction(tile);
   }
 
-  _triggerTileAction(tile) {
+  protected _triggerTileAction(tile: Tile) {
     this.trigger('tileAction', {
       tile: tile
     });
   }
 
-  setSelectionHandler(selectionHandler) {
+  setSelectionHandler(selectionHandler: TileGridSelectionHandler) {
     this.selectionHandler = selectionHandler;
   }
 
-  _selectTileOnMouseDown(event) {
+  protected _selectTileOnMouseDown(event: JQuery.MouseDownEvent) {
     this.selectionHandler.selectTileOnMouseDown(event);
   }
 
-  scrollTo(tile, options) {
+  scrollTo(tile: Tile, options?: ScrollToOptions) {
     this.ensureTileRendered(tile);
     // If tile was not rendered it is not yet positioned correctly -> make sure layout is valid before trying to scroll
     // Layout must not render the viewport because scroll position is not correct yet -> just make sure tiles are at the correct position
-    this.htmlComp.layout.updateViewPort(true);
+    (this.htmlComp.layout as TileGridLayout).updateViewPort(true);
     tile.reveal(options);
   }
 
+  /**
+   * Brings the first selected tile into view by scrolling the first scrollable parent.
+   */
   revealSelection() {
     if (!this.rendered) {
       // Execute delayed because tileGrid may be not layouted yet
@@ -988,26 +1029,26 @@ export default class TileGrid extends Widget {
   }
 
   /**
-   * @param {Filter|function|(Filter|function)[]} filter The filters to add.
-   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   * @param filter The filters to add.
+   * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  addFilter(filter, applyFilter = true) {
+  addFilter(filter: FilterOrFunction<Tile> | FilterOrFunction<Tile>[], applyFilter = true) {
     this.filterSupport.addFilter(filter, applyFilter);
   }
 
   /**
-   * @param {Filter|function|(Filter|function)[]} filter The filters to remove.
-   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   * @param filter The filters to remove.
+   * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  removeFilter(filter, applyFilter = true) {
+  removeFilter(filter: FilterOrFunction<Tile> | FilterOrFunction<Tile>[], applyFilter = true) {
     this.filterSupport.removeFilter(filter, applyFilter);
   }
 
   /**
-   * @param {Filter|function|(Filter|function)[]} filter The new filters.
-   * @param {boolean} applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
+   * @param filter The new filters.
+   * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  setFilters(filters, applyFilter = true) {
+  setFilters(filters: FilterOrFunction<Tile> | FilterOrFunction<Tile>[], applyFilter = true) {
     this.filterSupport.setFilters(filters, applyFilter);
   }
 
@@ -1015,14 +1056,11 @@ export default class TileGrid extends Widget {
     this.filterSupport.filter();
   }
 
-  _applyFilters(tiles, fullReset) {
+  protected _applyFilters(tiles: Tile[], fullReset?: boolean) {
     return this.filterSupport.applyFilters(tiles.filter(tile => !(tile instanceof PlaceholderTile)), fullReset);
   }
 
-  /**
-   * @returns {FilterSupport}
-   */
-  _createFilterSupport() {
+  protected _createFilterSupport(): FilterSupport<Tile> {
     return new FilterSupport({
       widget: this,
       $container: () => this.$filterFieldContainer,
@@ -1032,14 +1070,14 @@ export default class TileGrid extends Widget {
     });
   }
 
-  _createTextFilter() {
+  protected _createTextFilter(): TextFilter<Tile> {
     if (objects.isFunction(this.createTextFilter)) {
       return this.createTextFilter();
     }
     return new TileTextFilter();
   }
 
-  _updateTextFilterText(filter, text) {
+  protected _updateTextFilterText(filter: Filter<Tile>, text: string): boolean {
     if (objects.isFunction(this.updateTextFilterText)) {
       return this.updateTextFilterText(filter, text);
     }
@@ -1049,20 +1087,21 @@ export default class TileGrid extends Widget {
     return false;
   }
 
-  setTextFilterEnabled(textFilterEnabled) {
+  /** @see TileGridModel.textFilterEnabled */
+  setTextFilterEnabled(textFilterEnabled: boolean) {
     this.setProperty('textFilterEnabled', textFilterEnabled);
   }
 
-  isTextFilterFieldVisible() {
+  isTextFilterFieldVisible(): boolean {
     return this.textFilterEnabled;
   }
 
-  _renderTextFilterEnabled() {
+  protected _renderTextFilterEnabled() {
     this._updateTabbable();
     this.filterSupport.renderFilterField();
   }
 
-  updateFilteredElements(result, opts) {
+  updateFilteredElements(result?: FilterResult<Tile>, opts?: UpdateFilteredElementsOptions) {
     if (!this.filteredElementsDirty) {
       this._updateEmpty();
       return;
@@ -1090,33 +1129,31 @@ export default class TileGrid extends Widget {
     this._updateEmpty();
   }
 
-  _updateEmpty() {
+  protected _updateEmpty() {
     this.setEmpty(this.filteredTiles.length === 0);
   }
 
-  setEmpty(empty) {
+  setEmpty(empty: boolean) {
     this.setProperty('empty', empty);
   }
 
-  _renderEmpty() {
+  protected _renderEmpty() {
     this.$container.toggleClass('empty', this.empty);
     this.invalidateLayoutTree();
   }
 
   /**
-   * @returns {Tile[]} the tiles which are accepted by the filter and therefore visible.
+   * @returns the tiles which are accepted by the filter and therefore visible.
    */
-  _filterTiles(tiles) {
+  protected _filterTiles(tiles?: Tile[]): Tile[] {
     tiles = scout.nvl(tiles, this.tiles);
     if (this.filters.length === 0) {
       return tiles.slice();
     }
-    return tiles.filter(tile => {
-      return tile.filterAccepted;
-    });
+    return tiles.filter(tile => tile.filterAccepted);
   }
 
-  findTileIndexAt(x, y, startIndex, reverse) {
+  findTileIndexAt(x: number, y: number, startIndex?: number, reverse?: boolean): number {
     startIndex = scout.nvl(startIndex, 0);
     return arrays.findIndexFrom(this.filteredTiles, startIndex, (tile, i) => {
       return tile.gridData.x === x && tile.gridData.y === y;
@@ -1126,7 +1163,7 @@ export default class TileGrid extends Widget {
   /**
    * If the max range is used, the live list of filtered tiles is returned, because every tile has to be in the range.
    */
-  findTilesInRange(viewRange, filter) {
+  findTilesInRange(viewRange: Range, filter?: Predicate<Tile>): Tile[] {
     if (viewRange.equals(this.virtualScrolling.maxViewRange())) {
       // Directly return all tiles if max view range
       return this.filteredTiles;
@@ -1143,7 +1180,7 @@ export default class TileGrid extends Widget {
     return tiles;
   }
 
-  findTilesInRow(row) {
+  findTilesInRow(row: number): Tile[] {
     let tiles = [];
     this.eachTileInRow(row, tile => {
       tiles.push(tile);
@@ -1154,7 +1191,7 @@ export default class TileGrid extends Widget {
   /**
    * Executes the given function for each tile in a row.
    */
-  eachTileInRow(row, func) {
+  eachTileInRow(row: number, func: (tile: Tile, index: number) => void): Tile[] {
     let startIndex = row * this.gridColumnCount;
     let tiles = [];
     for (let i = startIndex; i < startIndex + this.gridColumnCount; i++) {
@@ -1165,16 +1202,17 @@ export default class TileGrid extends Widget {
     return tiles;
   }
 
-  setVirtual(virtual) {
+  /** @see TileGridModel.virtual */
+  setVirtual(virtual: boolean) {
     this.setProperty('virtual', virtual);
   }
 
-  _setVirtual(virtual) {
+  protected _setVirtual(virtual: boolean) {
     this._setProperty('virtual', virtual);
     this.virtualScrolling.setEnabled(this.virtual);
   }
 
-  _renderVirtual() {
+  protected _renderVirtual() {
     this._updateVirtualScrollable();
     if (!this.rendering) {
       // No need to do it while rendering, will be done by the layout. But needs to be done if virtual changes on the fly
@@ -1198,7 +1236,7 @@ export default class TileGrid extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _updateVirtualScrollable() {
+  protected _updateVirtualScrollable() {
     let $scrollable = this.virtualScrolling.$scrollable;
     if ($scrollable) {
       $scrollable.off('scroll', this._scrollParentScrollHandler);
@@ -1215,11 +1253,12 @@ export default class TileGrid extends Widget {
     }
   }
 
-  calculateViewRangeSize() {
+  calculateViewRangeSize(): number {
     return this.virtualScrolling.calculateViewRangeSize();
   }
 
-  setViewRangeSize(viewRangeSize, updateViewPort) {
+  /** @see TileGrid.viewRangeSize */
+  setViewRangeSize(viewRangeSize: number, updateViewPort?: boolean) {
     if (this.viewRangeSize === viewRangeSize) {
       return;
     }
@@ -1227,13 +1266,14 @@ export default class TileGrid extends Widget {
     this.virtualScrolling.setViewRangeSize(viewRangeSize, updateViewPort);
   }
 
-  _heightForRow(row) {
+  protected _heightForRow(row: number): number {
     let height = 0;
 
-    height = this.htmlComp.layout.rowHeight;
+    let layout = this.htmlComp.layout as TileGridLayout;
+    height = layout.rowHeight;
     if (row !== this.rowCount() - 1) {
       // Add row gap unless it is the last row
-      height += this.htmlComp.layout.vgap;
+      height += layout.vgap;
     }
 
     if (!numbers.isNumber(height)) {
@@ -1244,13 +1284,14 @@ export default class TileGrid extends Widget {
 
   /**
    * Used for virtual scrolling to calculate the view range size.
-   * @returns {number} the configured rowHeight + vgap / 2. Reason: the gaps are only between rows, the first and last row therefore only have 1 gap.
+   * @returns the configured rowHeight + vgap / 2. Reason: the gaps are only between rows, the first and last row therefore only have 1 gap.
    */
-  _minRowHeight() {
-    return this.htmlComp.layout.rowHeight + this.htmlComp.layout.vgap / 2;
+  protected _minRowHeight(): number {
+    let layout = this.htmlComp.layout as TileGridLayout;
+    return layout.rowHeight + layout.vgap / 2;
   }
 
-  rowCount(gridColumnCount) {
+  rowCount(gridColumnCount?: number): number {
     gridColumnCount = scout.nvl(gridColumnCount, this.gridColumnCount);
     return Math.ceil(this.filteredTiles.length / gridColumnCount);
   }
@@ -1258,7 +1299,7 @@ export default class TileGrid extends Widget {
   /**
    * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
    */
-  _renderViewPort() {
+  protected _renderViewPort() {
     if (!this.isAttachedAndRendered()) {
       // if grid is not attached the correct viewPort can not be evaluated. Mark for render after attach.
       this._renderViewPortAfterAttach = true;
@@ -1267,13 +1308,13 @@ export default class TileGrid extends Widget {
     if (!this.virtual) {
       return;
     }
-    this.virtualScrolling._renderViewPort();
+    this.virtualScrolling.renderViewPort();
   }
 
   /**
    * Renders the rows visible in the viewport and removes the other rows
    */
-  _renderViewRange(viewRange) {
+  protected _renderViewRange(viewRange: Range) {
     if (viewRange.equals(this.viewRangeRendered)) {
       if (viewRange.size() === 0) {
         // Iif view range is empty initially viewRangeRendered will be empty as well -> make sure fillers are rendered correctly (used for pref size)
@@ -1299,7 +1340,7 @@ export default class TileGrid extends Widget {
     this._renderFiller();
   }
 
-  _renderTilesInRange(range) {
+  protected _renderTilesInRange(range: Range) {
     let numRowsRendered = 0;
     let tilesRendered = 0;
     let tiles = this.filteredTiles;
@@ -1335,9 +1376,9 @@ export default class TileGrid extends Widget {
   }
 
   /**
-   * @returns {Tile[]} the newly rendered tiles
+   * @returns the newly rendered tiles
    */
-  _renderTileDelta(filterResult) {
+  protected _renderTileDelta(filterResult?: FilterResult<Tile>): Tile[] {
     if (!this.virtual) {
       return [];
     }
@@ -1348,30 +1389,30 @@ export default class TileGrid extends Widget {
     let tilesToRemove = arrays.diff(prevTiles, newTiles);
     let tilesToRender = arrays.diff(newTiles, prevTiles);
     if (filterResult) {
-      filterResult.newlyHidden.forEach(function(tile) {
+      filterResult.newlyHidden.forEach(tile => {
         if (tile.rendered) {
           this._removeTileByFilter(tile);
         }
-      }, this);
+      });
     }
 
     // tilesToRemove contains newlyHidden as well but remove() does nothing if it is already removing
     tilesToRemove.forEach(tile => {
       tile.remove();
     });
-    tilesToRender.forEach(function(tile) {
+    tilesToRender.forEach(tile => {
       this._renderTile(tile);
-    }, this);
+    });
 
     if (filterResult) {
       // Suppress because Tile.js would invalidate which leads to poor performance if grid is used in a Group.js and group is being expanded while tiles are shown
       // invalidating will be done afterwards anyway so no need to do it for each tile
       this.htmlComp.suppressInvalidate = true;
-      filterResult.newlyShown.forEach(function(tile) {
+      filterResult.newlyShown.forEach(tile => {
         if (tile.rendered) {
           this._renderTileVisibleForFilter(tile);
         }
-      }, this);
+      });
       this.htmlComp.suppressInvalidate = false;
     }
 
@@ -1385,7 +1426,7 @@ export default class TileGrid extends Widget {
     return tilesToRender;
   }
 
-  _removeTileByFilter(tile) {
+  protected _removeTileByFilter(tile: Tile) {
     // In virtual mode, filtered tiles are not rendered. In normal mode, the filter animation is triggered by _renderVisible of the tile.
     // Since the tile is removed immediately, the invisible animation would not start, so we use the remove animation instead.
     // But because the delete animation is a different one to the filter animation, the removeClass needs to be swapped
@@ -1403,7 +1444,7 @@ export default class TileGrid extends Widget {
     });
   }
 
-  _renderTileVisibleForFilter(tile) {
+  protected _renderTileVisibleForFilter(tile: Tile) {
     if (!tile.filterAccepted || tile.$container.hasClass('animate-visible')) {
       return;
     }
@@ -1412,15 +1453,16 @@ export default class TileGrid extends Widget {
     }
     // Start filter animation (at the time setFilterAccepted was set the tile was not rendered)
     tile.$container.setVisible(false);
+    // @ts-ignore
     tile._renderVisible();
   }
 
-  _renderTileOrder(prevTiles) {
+  protected _renderTileOrder(prevTiles: Tile[]) {
     // Loop through the tiles and move every html element to the end of the container
     // Only move if the order is different to the old order
     // This is actually only necessary to make debugging easier, since the tiles are positioned absolutely it would work without it
     let different = false;
-    this.tiles.forEach(function(tile, i) {
+    this.tiles.forEach((tile, i) => {
       if (prevTiles[i] !== tile || different) {
         // Start ordering as soon as the order of the arrays starts to differ
         if (this.virtual && !tile.rendered) {
@@ -1430,7 +1472,7 @@ export default class TileGrid extends Widget {
         different = true;
         tile.$container.appendTo(this.$container);
       }
-    }, this);
+    });
 
     if (different && !this.virtual) {
       // In virtual mode this is done by _renderTileDelta()
@@ -1438,13 +1480,13 @@ export default class TileGrid extends Widget {
     }
   }
 
-  _rowsRenderedInfo() {
+  protected _rowsRenderedInfo(): string {
     let numRenderedTiles = this.$container.children('.tile').length;
     let renderedRowsRange = '(' + this.viewRangeRendered + ')';
     return numRenderedTiles + ' tiles rendered in range ' + renderedRowsRange;
   }
 
-  _removeTilesInRange(range) {
+  protected _removeTilesInRange(range: Range) {
     let numRowsRemoved = 0;
     let newRange = this.viewRangeRendered.subtract(range);
     if (newRange.length === 2) {
@@ -1463,29 +1505,29 @@ export default class TileGrid extends Widget {
     }
   }
 
-  _removeTilesInRow(row) {
+  protected _removeTilesInRow(row: number) {
     let tiles = this.findTilesInRow(row);
     tiles.forEach(tile => {
       tile.remove();
     });
   }
 
-  rowHasRenderedTiles(row) {
+  rowHasRenderedTiles(row: number) {
     let tilesInRow = this.findTilesInRow(row);
     return tilesInRow.some(tile => {
       return tile.rendered && !tile.removing;
     });
   }
 
-  ensureTileRendered(tile) {
+  ensureTileRendered(tile: Tile) {
     if (!tile.rendered) {
       let rowIndex = tile.gridData.y;
-      this.virtualScrolling._renderViewRangeForRowIndex(rowIndex);
+      this.virtualScrolling.renderViewRangeForRowIndex(rowIndex);
       this.invalidateLayoutTree();
     }
   }
 
-  _renderFiller() {
+  protected _renderFiller() {
     if (!this.$fillBefore) {
       this.$fillBefore = this.$container.prependDiv('filler');
     }
@@ -1511,7 +1553,7 @@ export default class TileGrid extends Widget {
     $.log.isTraceEnabled() && $.log.trace('FillAfter height: ' + fillAfterHeight);
   }
 
-  _calculateFillerHeight(range) {
+  protected _calculateFillerHeight(range: Range): number {
     let totalHeight = 0;
     for (let i = range.from; i < range.to; i++) {
       totalHeight += this._heightForRow(i);
@@ -1520,9 +1562,10 @@ export default class TileGrid extends Widget {
   }
 
   /**
-   * If virtual is false, the live list of filtered tiles is returned, because every tile has to be rendered. If virtual is true, the rendered tiles are collected and returned.
+   * If virtual is false, the live list of filtered tiles is returned, because every tile has to be rendered.
+   * If virtual is true, the rendered tiles are collected and returned.
    */
-  renderedTiles() {
+  renderedTiles(): Tile[] {
     if (!this.rendered) {
       return [];
     }
@@ -1539,5 +1582,9 @@ export default class TileGrid extends Widget {
       }
     });
     return tiles;
+  }
+
+  override trigger<K extends string & keyof EventMapOf<TileGrid>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<TileGrid>[K]>): EventMapOf<TileGrid>[K] {
+    return super.trigger(type, eventOrModel);
   }
 }

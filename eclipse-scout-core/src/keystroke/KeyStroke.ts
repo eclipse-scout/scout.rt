@@ -11,7 +11,6 @@
 import {Action, EnumObject, HAlign, Key, keys, KeyStrokeModel, scout, ScoutKeyboardEvent, Widget} from '../index';
 import $ from 'jquery';
 import {KeyStrokeFirePolicy} from '../action/Action';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class KeyStroke implements KeyStrokeModel {
   field?: Widget;
@@ -118,11 +117,11 @@ export default class KeyStroke implements KeyStrokeModel {
   /**
    * Method invoked to handle the given keystroke event, and is only called if the event was accepted by 'KeyStroke.accept(event)'.
    */
-  handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     throw new Error('keystroke event not handled: ' + event);
   }
 
-  invokeHandle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  invokeHandle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     // if key stroke is repeatable, handle is called each time the key event occurs
     // which means it is executed multiple times while a key is pressed.
     if (this.repeatable) {

@@ -8,11 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStroke} from '../../index';
+import {KeyStroke, ScoutKeyboardEvent, TileGrid, TileGridSelectionHandler} from '../../index';
+import {TileGridSelectionInstruction} from '../TileGridSelectionHandler';
 
 export default class TileGridSelectKeyStroke extends KeyStroke {
+  declare field: TileGrid;
 
-  constructor(tileGrid) {
+  constructor(tileGrid: TileGrid) {
     super();
     this.field = tileGrid;
     this.shift = !tileGrid.multiSelect ? false : undefined;
@@ -29,12 +31,12 @@ export default class TileGridSelectKeyStroke extends KeyStroke {
    * Selection handler should be used for every interaction with the tileGrid.
    * This is necessary to provide the same selection behavior for the tile accordion which uses multiple tile grids
    */
-  getSelectionHandler() {
+  getSelectionHandler(): TileGridSelectionHandler {
     // Not stored as member variable by purpose because it will be exchanged later by the tile accordion
     return this.field.selectionHandler;
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -48,11 +50,12 @@ export default class TileGridSelectKeyStroke extends KeyStroke {
     return true;
   }
 
-  handle(event) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this.getSelectionHandler().executeSelection(this._computeNewSelection(event.shiftKey));
   }
 
-  _computeNewSelection(extend) {
+  protected _computeNewSelection(extend?: boolean): TileGridSelectionInstruction {
     // To be implemented by subclasses
+    return null;
   }
 }

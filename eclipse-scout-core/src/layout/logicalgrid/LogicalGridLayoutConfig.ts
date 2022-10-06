@@ -11,13 +11,37 @@
 import {LogicalGridLayout} from '../../index';
 
 export interface LogicalGridLayoutConfigOptions {
-  hgap: number;
-  vgap: number;
-  columnWidth: number;
-  rowHeight: number;
-  minWidth: number;
+  /**
+   * The horizontal gap in pixels to use between two logical grid columns.
+   */
+  hgap?: number;
+  /**
+   * The vertical gap in pixels to use between two logical grid rows.
+   */
+  vgap?: number;
+  /**
+   * The width in pixels to use for elements with the logical unit "width = 1".
+   * Larger logical widths are multiplied with this value (and gaps are added).
+   */
+  columnWidth?: number;
+  /**
+   * The height in pixels to use for elements with the logical unit "height = 1".
+   * Larger logical heights are multiplied with this value (and gaps are added).
+   */
+  rowHeight?: number;
+  /**
+   * The minimum width of the widget.
+   * If this width is > 0 a horizontal scrollbar is shown when the widgets gets smaller than this value.
+   */
+  minWidth?: number;
 }
 
+/**
+ * Configures layouting hints for elements layouted by {@link LogicalGridLayout}.
+ *
+ * The configured hints only have an effect if theirs value is >=0.
+ * Otherwise, the default values specified by CSS are applied (see {@link LogicalGridLayout._initDefaults}).
+ */
 export default class LogicalGridLayoutConfig implements LogicalGridLayoutConfigOptions {
   hgap: number;
   vgap: number;
@@ -25,11 +49,11 @@ export default class LogicalGridLayoutConfig implements LogicalGridLayoutConfigO
   rowHeight: number;
   minWidth: number;
 
-  constructor(options: LogicalGridLayoutConfigOptions) {
+  constructor(options?: LogicalGridLayoutConfigOptions) {
     this._extend(options);
   }
 
-  protected _extend(options) {
+  protected _extend(options?: LogicalGridLayoutConfigOptions) {
     // -1 means use the UI defaults
     options = options || {};
     if (options.hgap > -1) {

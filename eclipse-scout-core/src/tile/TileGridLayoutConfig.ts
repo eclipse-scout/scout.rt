@@ -8,15 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridLayoutConfig} from '../index';
+import {LogicalGridLayoutConfig, TileGridLayout} from '../index';
+import {LogicalGridLayoutConfigOptions} from '../layout/logicalgrid/LogicalGridLayoutConfig';
 
+export interface TileGridLayoutConfigOptions extends LogicalGridLayoutConfigOptions {
+  /**
+   * The maximum width in pixels to use for the content.
+   * There is no maximum if this value is <= 0.
+   *
+   * Default is -1;
+   */
+  maxWidth?: number;
+}
+
+/**
+ * Configures layouting hints for tiles layouted by {@link TileGridLayout}.
+ *
+ * The configured hints only have an effect if theirs value is >=0.
+ * Otherwise, the default values specified by CSS are applied (see {@link TileGridLayout._initDefaults}).
+ */
 export default class TileGridLayoutConfig extends LogicalGridLayoutConfig {
+  maxWidth: number;
 
-  constructor(options) {
+  constructor(options?: TileGridLayoutConfigOptions) {
     super(options);
   }
 
-  _extend(options) {
+  protected override _extend(options?: TileGridLayoutConfigOptions) {
     super._extend(options);
     options = options || {};
     if (options.maxWidth > -2) {
@@ -24,20 +42,20 @@ export default class TileGridLayoutConfig extends LogicalGridLayoutConfig {
     }
   }
 
-  applyToLayout(layout) {
+  override applyToLayout(layout: TileGridLayout) {
     super.applyToLayout(layout);
     if (this.maxWidth) {
       layout.maxWidth = this.maxWidth;
     }
   }
 
-  clone() {
+  override clone(): TileGridLayoutConfig {
     return new TileGridLayoutConfig(this);
   }
 
-  static ensure(layoutConfig) {
+  static override ensure(layoutConfig: TileGridLayoutConfig | TileGridLayoutConfigOptions): TileGridLayoutConfig {
     if (!layoutConfig) {
-      return layoutConfig;
+      return null;
     }
     if (layoutConfig instanceof TileGridLayoutConfig) {
       return layoutConfig;

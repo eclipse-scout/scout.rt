@@ -8,16 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HorizontalGrid, PlaceholderTile} from '../index';
+import {arrays, HorizontalGrid, PlaceholderTile, Tile, TileGrid} from '../index';
 import $ from 'jquery';
 
-export default class TileGridSelectionHandler {
+export interface TileGridSelectionInstruction {
+  selectedTiles: Tile[];
+  focusedTile: Tile;
+}
 
-  constructor(tileGrid) {
+export default class TileGridSelectionHandler {
+  tileGrid: TileGrid;
+
+  constructor(tileGrid: TileGrid) {
     this.tileGrid = tileGrid;
   }
 
-  selectTileOnMouseDown(event) {
+  selectTileOnMouseDown(event: JQuery.MouseDownEvent) {
     if (!this.isSelectable()) {
       return;
     }
@@ -79,67 +85,67 @@ export default class TileGridSelectionHandler {
     }
   }
 
-  getFilteredTiles() {
+  getFilteredTiles(): Tile[] {
     return this.tileGrid.filteredTiles;
   }
 
-  getFilteredTileCount() {
+  getFilteredTileCount(): number {
     return this.tileGrid.filteredTiles.length;
   }
 
-  getVisibleTiles() {
+  getVisibleTiles(): Tile[] {
     return this.tileGrid.filteredTiles;
   }
 
-  getVisibleTileCount() {
+  getVisibleTileCount(): number {
     return this.tileGrid.filteredTiles.length;
   }
 
-  getGridColumnCount() {
+  getGridColumnCount(): number {
     return this.tileGrid.gridColumnCount;
   }
 
-  getVisibleGridRowCount() {
+  getVisibleGridRowCount(): number {
     return this.tileGrid.logicalGrid.gridRows;
   }
 
-  getVisibleGridX(tile) {
+  getVisibleGridX(tile: Tile): number {
     return tile.gridData.x;
   }
 
-  getVisibleGridY(tile) {
+  getVisibleGridY(tile: Tile): number {
     return tile.gridData.y;
   }
 
-  getSelectedTiles(event) {
+  getSelectedTiles(): Tile[] {
     return this.tileGrid.selectedTiles;
   }
 
-  isSelectable() {
+  isSelectable(): boolean {
     return this.tileGrid.selectable;
   }
 
-  isMultiSelect() {
+  isMultiSelect(): boolean {
     return this.tileGrid.multiSelect;
   }
 
-  addTilesToSelection(tiles) {
+  addTilesToSelection(tiles: Tile[]) {
     this.tileGrid.addTilesToSelection(tiles);
   }
 
-  selectTile(tile) {
+  selectTile(tile: Tile) {
     this.tileGrid.selectTile(tile);
   }
 
-  selectTiles(tiles) {
+  selectTiles(tiles: Tile[]) {
     this.tileGrid.selectTiles(tiles);
   }
 
-  deselectTile(tile) {
+  deselectTile(tile: Tile) {
     this.tileGrid.deselectTile(tile);
   }
 
-  deselectTiles(tiles) {
+  deselectTiles(tiles: Tile[]) {
     this.tileGrid.deselectTiles(tiles);
   }
 
@@ -151,14 +157,14 @@ export default class TileGridSelectionHandler {
     this.tileGrid.toggleSelection();
   }
 
-  getFocusedTile() {
+  getFocusedTile(): Tile {
     return this.tileGrid.focusedTile;
   }
 
   /**
    * Only sets the focus if event does not prevent the default and the tile does not have the class 'unfocusable'.
    */
-  _checkAndSetFocusedTile(event, tile) {
+  protected _checkAndSetFocusedTile(event: JQuery.MouseDownEvent, tile: Tile) {
     if (event.isDefaultPrevented()) {
       return;
     }
@@ -168,11 +174,11 @@ export default class TileGridSelectionHandler {
     this.setFocusedTile(tile);
   }
 
-  setFocusedTile(tile) {
+  setFocusedTile(tile: Tile) {
     this.tileGrid.setFocusedTile(tile);
   }
 
-  scrollTo(tile) {
+  scrollTo(tile: Tile) {
     this.tileGrid.scrollTo(tile);
   }
 
@@ -184,26 +190,26 @@ export default class TileGridSelectionHandler {
     this.tileGrid.scrollToBottom();
   }
 
-  findVisibleTileIndexAt(x, y, startIndex, reverse) {
+  findVisibleTileIndexAt(x: number, y: number, startIndex?: number, reverse?: boolean) {
     return this.tileGrid.findTileIndexAt(x, y, startIndex, reverse);
   }
 
-  getTileGridByRow(rowIndex) {
+  getTileGridByRow(rowIndex: number): TileGrid {
     if (rowIndex < 0 || rowIndex >= this.getVisibleGridRowCount()) {
       return null;
     }
     return this.tileGrid;
   }
 
-  isHorizontalGridActive() {
+  isHorizontalGridActive(): boolean {
     return this.tileGrid.logicalGrid instanceof HorizontalGrid;
   }
 
-  computeSelectionX(xDiff, extend) {
+  computeSelectionX(xDiff: number, extend: boolean): TileGridSelectionInstruction {
     let tiles = this.getVisibleTiles();
     let focusedTile = null;
     let focusedTileIndex = -1;
-    let result = this._computeFocusedTile(xDiff, extend);
+    let result = this._computeFocusedTile(xDiff);
     if (result.selectedTiles !== null) {
       // New selection could be determined already -> return it;
       return result;
@@ -213,14 +219,14 @@ export default class TileGridSelectionHandler {
     return this.computeSelectionBetween(focusedTileIndex, focusedTileIndex + xDiff, extend);
   }
 
-  computeSelectionY(yDiff, extend) {
+  computeSelectionY(yDiff: number, extend: boolean): TileGridSelectionInstruction {
     let tiles = this.getVisibleTiles();
     let focusedTile = null;
     let focusedTileRow = -1;
     let focusedTileColumn = -1;
     let focusedTileIndex = -1;
     let rowCount = this.getVisibleGridRowCount();
-    let result = this._computeFocusedTile(yDiff, extend);
+    let result = this._computeFocusedTile(yDiff);
     if (result.selectedTiles !== null) {
       // New selection could be determined already -> return it;
       return result;
@@ -246,7 +252,7 @@ export default class TileGridSelectionHandler {
     return this.computeSelectionBetween(focusedTileIndex, newFocusedTileIndex, extend);
   }
 
-  computeSelectionToFirst(extend) {
+  computeSelectionToFirst(extend: boolean): TileGridSelectionInstruction {
     let tiles = this.getVisibleTiles();
     let focusedTile = this.getFocusedTile();
     let focusedTileIndex = -1;
@@ -268,7 +274,7 @@ export default class TileGridSelectionHandler {
     return this.computeSelectionBetween(focusedTileIndex, 0, extend);
   }
 
-  computeSelectionToLast(extend) {
+  computeSelectionToLast(extend: boolean): TileGridSelectionInstruction {
     let tiles = this.getVisibleTiles();
     let focusedTile = this.getFocusedTile();
     let focusedTileIndex = -1;
@@ -290,7 +296,7 @@ export default class TileGridSelectionHandler {
     return this.computeSelectionBetween(focusedTileIndex, tiles.length - 1, extend);
   }
 
-  _computeFocusedTile(diff, extend) {
+  protected _computeFocusedTile(diff: number): TileGridSelectionInstruction {
     let tiles = this.getVisibleTiles();
     let selectedTiles = this.getSelectedTiles();
     let focusedTile = this.getFocusedTile();
@@ -324,7 +330,7 @@ export default class TileGridSelectionHandler {
     };
   }
 
-  computeSelectionBetween(focusedTileIndex, newFocusedTileIndex, extend) {
+  computeSelectionBetween(focusedTileIndex: number, newFocusedTileIndex: number, extend: boolean): TileGridSelectionInstruction {
     let tiles = this.getVisibleTiles();
     let selectedTiles = this.getSelectedTiles();
     let newFocusedTile = tiles[newFocusedTileIndex];
@@ -337,7 +343,7 @@ export default class TileGridSelectionHandler {
     }
 
     if (!extend) {
-      // Select only the tile at the newFocusedTileindex
+      // Select only the tile at the newFocusedTileIndex
       return {
         selectedTiles: [newFocusedTile],
         focusedTile: newFocusedTile
@@ -356,7 +362,7 @@ export default class TileGridSelectionHandler {
         newFocusedTile = this._findLastSelectedTileBefore(tiles, newFocusedTileIndex);
       }
     } else {
-      // TOOO CGU what is Bug #172929 about? Do we need to consider this as well?
+      // TODO CGU what is Bug #172929 about? Do we need to consider this as well?
       if (newFocusedTileIndex > focusedTileIndex) {
         // Remove all tiles between focused tile and newly focused tile from selection if newly focused tile already is selected
         newSelectedTiles = selectedTiles.slice();
@@ -373,7 +379,7 @@ export default class TileGridSelectionHandler {
     };
   }
 
-  executeSelection(instruction) {
+  executeSelection(instruction: TileGridSelectionInstruction) {
     if (!instruction) {
       return;
     }
@@ -397,7 +403,7 @@ export default class TileGridSelectionHandler {
   /**
    * Searches for the last selected tile in the current selection block, starting from tileIndex. Expects tile at tileIndex to be selected.
    */
-  _findLastSelectedTileBefore(tiles, tileIndex) {
+  protected _findLastSelectedTileBefore(tiles: Tile[], tileIndex: number): Tile {
     if (tileIndex === 0) {
       return tiles[tileIndex];
     }
@@ -418,7 +424,7 @@ export default class TileGridSelectionHandler {
   /**
    * Searches for the last selected tile in the current selection block, starting from tileIndex. Expects tile at tileIndex to be selected.
    */
-  _findLastSelectedTileAfter(tiles, tileIndex) {
+  protected _findLastSelectedTileAfter(tiles: Tile[], tileIndex: number): Tile {
     if (tileIndex === tiles.length - 1) {
       return tiles[tileIndex];
     }
