@@ -1481,7 +1481,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Sets a new value for a specific property. If the new value is the same value as the old one, nothing is performed.
    * Otherwise, the following phases are executed:
-   * <p>
+   *
    * 1. Preparation: If the property is a widget property, several actions are performed in \_prepareWidgetProperty().
    * 2. DOM removal: If the property is a widget property and the widget is rendered, the changed widget(s) are removed unless the property should not be preserved (see {@link _preserveOnPropertyChangeProperties}).
    *    If there is a custom remove function (e.g. \_removeXY where XY is the property name), it will be called instead of removing the widgets directly.
@@ -2297,6 +2297,9 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
 
   /**
    * Brings the widget into view by scrolling the first scrollable parent.
+   * @param options
+   *          an optional options object. Short-hand version: If a string is passed instead
+   *          of an object, the value is automatically converted to the option {@link ScrollToOptions.align}.
    */
   reveal(options: ScrollToOptions | string) {
     if (!this.rendered) {

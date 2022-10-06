@@ -11,7 +11,7 @@
 import $ from 'jquery';
 import {EventEmitter} from '../index';
 
-export default class Event<T extends EventEmitter = EventEmitter> {
+export default class Event<T = EventEmitter> {
   source: T;
   defaultPrevented: boolean;
   type: string;

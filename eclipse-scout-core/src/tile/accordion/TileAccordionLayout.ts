@@ -9,16 +9,18 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {AccordionLayout, HtmlComponent} from '../../index';
+import {AccordionLayout, HtmlComponent, TileAccordion, TileGrid, TileGridLayout} from '../../index';
+import {RowLayoutOptions} from '../../layout/RowLayout';
 
 export default class TileAccordionLayout extends AccordionLayout {
+  tileAccordion: TileAccordion;
 
-  constructor(tileAccordion, options) {
+  constructor(tileAccordion: TileAccordion, options?: RowLayoutOptions) {
     super(options);
     this.tileAccordion = tileAccordion;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let previousGroupHeights = this.tileAccordion.groups
       .map(group => group.body)
       .map(tileGrid => this._getTileGridHeight(tileGrid));
@@ -31,7 +33,7 @@ export default class TileAccordionLayout extends AccordionLayout {
       .forEach((tileGrid, index) => this._updateTileGridViewPort(tileGrid, previousGroupHeights[index]));
   }
 
-  _updateTileGridViewPort(tileGrid, previousHeight) {
+  protected _updateTileGridViewPort(tileGrid: TileGrid, previousHeight: number) {
     if (!tileGrid.rendered || !tileGrid.htmlComp || previousHeight <= 0) {
       return;
     }
@@ -41,11 +43,11 @@ export default class TileAccordionLayout extends AccordionLayout {
       // The viewPort of the virtual tileGrid has not been updated as no layout update was done for the grid because its height is unchanged.
       // But as there might be more space available in the accordion now (its height might have changed), enforce a viewPort update to ensure all necessary tiles are rendered.
       tileGrid.setViewRangeSize(tileGrid.calculateViewRangeSize(), false);
-      tileGrid.htmlComp.layout.updateViewPort();
+      (tileGrid.htmlComp.layout as TileGridLayout).updateViewPort();
     }
   }
 
-  _getTileGridHeight(tileGrid) {
+  protected _getTileGridHeight(tileGrid: TileGrid): number {
     if (!tileGrid) {
       return 0;
     }
@@ -60,7 +62,7 @@ export default class TileAccordionLayout extends AccordionLayout {
     return size.height;
   }
 
-  _updateFilterFieldMaxWidth($container) {
+  protected _updateFilterFieldMaxWidth($container: JQuery) {
     let htmlComp = HtmlComponent.get($container),
       width = htmlComp.availableSize().subtract(htmlComp.insets()).width;
     this.tileAccordion.$filterFieldContainer.css('--filter-field-max-width', (width * 0.6) + 'px');

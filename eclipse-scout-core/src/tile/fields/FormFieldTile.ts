@@ -8,28 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BrowserField, Device, FormFieldLayout, Tile, WidgetTile} from '../../index';
+import {BrowserField, Device, EnumObject, FormFieldLayout, PropertyChangeEvent, Tile, WidgetTile} from '../../index';
+
+export type FormFieldTileDisplayStyle = EnumObject<typeof FormFieldTile.DisplayStyle>;
 
 export default class FormFieldTile extends WidgetTile {
+  // @ts-ignore
+  declare displayStyle: FormFieldTileDisplayStyle;
 
   constructor() {
     super();
     this.displayStyle = FormFieldTile.DisplayStyle.DASHBOARD;
   }
 
-  static DisplayStyle = {
+  static override DisplayStyle = {
     DEFAULT: Tile.DisplayStyle.DEFAULT,
     PLAIN: Tile.DisplayStyle.PLAIN,
     DASHBOARD: 'dashboard'
-  };
+  } as const;
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderFieldLabelVisible();
     this._renderCompact();
   }
 
-  _renderTileWidget() {
+  protected override _renderTileWidget() {
     super._renderTileWidget();
     if (this.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
       return;
@@ -39,12 +43,12 @@ export default class FormFieldTile extends WidgetTile {
     }
   }
 
-  _renderDisplayStyle() {
+  protected override _renderDisplayStyle() {
     super._renderDisplayStyle();
     this.$container.toggleClass('dashboard', this.displayStyle === FormFieldTile.DisplayStyle.DASHBOARD);
   }
 
-  _renderFieldLabelVisible() {
+  protected _renderFieldLabelVisible() {
     if (this.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
       return;
     }
@@ -54,11 +58,12 @@ export default class FormFieldTile extends WidgetTile {
     }
   }
 
-  _renderCompact() {
+  protected _renderCompact() {
     this.$container.toggleClass('compact', Device.get().type === Device.Type.MOBILE);
   }
 
-  _onFieldPropertyChange(event) {
+  // FIXME TS is this code used? Maybe override onWidgetPropertyChange instead and call super?
+  protected _onFieldPropertyChange(event: PropertyChangeEvent) {
     if (event.propertyName === 'labelVisible' || event.propertyName === 'errorStatus') {
       if (this.rendered) {
         this._renderFieldLabelVisible();

@@ -8,18 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AccordionAdapter} from '../../index';
+import {AccordionAdapter, TileAccordion, WidgetModel} from '../../index';
 
-export default class TileAccordionAdapter extends AccordionAdapter {
+export default class TileAccordionAdapter<W extends TileAccordion = TileAccordion> extends AccordionAdapter<W> {
 
   constructor() {
     super();
   }
 
-  /**
-   * @override
-   */
-  _initProperties(model) {
+  protected override _initProperties(model: WidgetModel) {
     super._initProperties(model);
     // TileGridAdapter creates a RemoteTileFilter for each grid.
     // Such filters must not be added to the tile accordion, otherwise no tiles would be visible at all.

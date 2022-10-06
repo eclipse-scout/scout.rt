@@ -8,10 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldTile, TableField} from '../../../index';
+import {EventHandler, FormFieldTile, MenuBar, PropertyChangeEvent, TableField} from '../../../index';
 import $ from 'jquery';
 
+// @ts-ignore // FIXME TS remove ts ignore as soon as TableField is migrated
 export default class TileTableField extends TableField {
+  protected _tableBlurHandler: JQuery.EventHandler<HTMLElement>;
+  protected _tableFocusHandler: JQuery.EventHandler<HTMLElement>;
+  protected _menuBarPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, MenuBar>>;
+  protected _documentMouseDownHandler: (event: MouseEvent) => void;
 
   constructor() {
     super();
@@ -22,24 +27,21 @@ export default class TileTableField extends TableField {
     this._documentMouseDownHandler = this._onDocumentMouseDown.bind(this);
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     if (!this.session.focusManager.restrictedFocusGain) {
       this.$container.document(true).addEventListener('mousedown', this._documentMouseDownHandler, true);
     }
   }
 
-  _remove() {
+  protected override _remove() {
     this.$container.document(true).removeEventListener('mousedown', this._documentMouseDownHandler, true);
     super._remove();
   }
 
-  /**
-   * @override
-   */
-  _renderTable() {
+  protected override _renderTable() {
     super._renderTable();
-    if (this.parent.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
+    if ((this.parent as FormFieldTile).displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
       return;
     }
     if (this.table) {
@@ -54,11 +56,8 @@ export default class TileTableField extends TableField {
     }
   }
 
-  /**
-   * @override
-   */
-  _removeTable() {
-    if (this.parent.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
+  protected override _removeTable() {
+    if ((this.parent as FormFieldTile).displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
       return;
     }
     if (this.table) {
@@ -70,7 +69,7 @@ export default class TileTableField extends TableField {
     super._removeTable();
   }
 
-  _onTableBlur(event) {
+  protected _onTableBlur(event: JQuery.BlurEvent) {
     let popup = $('.popup').data('widget');
 
     // hide menu bar if context menu popup is not attached to TileTableField
@@ -79,22 +78,22 @@ export default class TileTableField extends TableField {
     }
   }
 
-  _onTableFocus(event) {
+  protected _onTableFocus(event: JQuery.FocusEvent) {
     this._hideMenuBar(false);
   }
 
-  _hideMenuBar(hiddenByUi) {
+  protected _hideMenuBar(hiddenByUi: boolean) {
     this.table.menuBar.hiddenByUi = hiddenByUi;
     this.table.menuBar.updateVisibility();
   }
 
-  _onMenuBarPropertyChange(event) {
+  protected _onMenuBarPropertyChange(event: PropertyChangeEvent<any, MenuBar>) {
     if (event.propertyName === 'visible') {
       this._toggleHasMenuBar();
     }
   }
 
-  _toggleHasMenuBar() {
+  protected _toggleHasMenuBar() {
     if (!this.rendered && !this.rendering) {
       return;
     }
@@ -102,10 +101,10 @@ export default class TileTableField extends TableField {
     this.$container.toggleClass('has-menubar', this.table.menuBar.visible);
   }
 
-  _onDocumentMouseDown(event) {
+  protected _onDocumentMouseDown(event: MouseEvent) {
     let $popup = $('.popup');
     let popup = $popup.data('widget');
-    if (this.table && popup && this.table.has(popup) && $popup.has(event.target)) {
+    if (this.table && popup && this.table.has(popup) && $popup.has(event.target as HTMLElement)) {
       // Ensure focus is not removed from table when clicking on a context-menu
       // Otherwise the menubar would get invisible while closing the context-menu (e.g. by clicking on header)
       // This is only necessary if restrictedFocusGain is false (e.g. on mobile).

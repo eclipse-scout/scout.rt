@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, TileGridSelectKeyStroke} from '../../index';
+import {keys, ScoutKeyboardEvent, TileGrid, TileGridSelectKeyStroke} from '../../index';
+import {TileGridSelectionInstruction} from '../TileGridSelectionHandler';
 
 export default class TileGridSelectDownKeyStroke extends TileGridSelectKeyStroke {
 
-  constructor(tileGrid) {
+  constructor(tileGrid: TileGrid) {
     super(tileGrid);
     this.stopPropagation = true;
     this.repeatable = true;
@@ -20,7 +21,7 @@ export default class TileGridSelectDownKeyStroke extends TileGridSelectKeyStroke
     this.renderingHints.text = '↓';
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -31,7 +32,7 @@ export default class TileGridSelectDownKeyStroke extends TileGridSelectKeyStroke
     return true;
   }
 
-  _computeNewSelection(extend) {
+  protected override _computeNewSelection(extend: boolean): TileGridSelectionInstruction {
     return this.getSelectionHandler().computeSelectionY(1, extend);
   }
 }

@@ -11,7 +11,7 @@
 import {FormFieldTile} from '../../../index';
 
 export default class ButtonTile extends FormFieldTile {
-  _render() {
+  protected override _render() {
     super._render();
     this.$container.addClass('button-tile');
   }

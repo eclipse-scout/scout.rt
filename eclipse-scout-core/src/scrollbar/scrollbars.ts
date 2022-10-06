@@ -576,9 +576,9 @@ export interface ScrollToOptions extends ScrollOptions {
  *          the scrollable object
  * @param $element
  *          the element to scroll to
- * @param [options]
+ * @param options
  *          an optional options object. Short-hand version: If a string is passed instead
- *          of an object, the value is automatically converted to the option "align".
+ *          of an object, the value is automatically converted to the option {@link ScrollToOptions.align}.
  */
 export function scrollTo($scrollable: JQuery, $element: JQuery, options?: ScrollToOptions | string) {
   if (typeof options === 'string') {

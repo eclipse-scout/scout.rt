@@ -8,9 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Tile} from '../index';
+import {HtmlComponent, PropertyChangeEvent, Tile, Widget} from '../index';
+import TileModel from './TileModel';
+import TileEventMap from './TileEventMap';
 
-export default class CompositeTile extends Tile {
+export interface CompositeTileModel extends TileModel {
+  widgets?: Widget[];
+}
+
+export interface CompositeTileEventMap extends TileEventMap {
+  'propertyChange:widgets': PropertyChangeEvent<Widget[], CompositeTile>;
+}
+
+export default class CompositeTile extends Tile implements CompositeTileModel {
+  declare model: CompositeTileModel;
+  declare eventMap: CompositeTileEventMap;
+
+  widgets: Widget[];
 
   constructor() {
     super();
@@ -19,24 +33,24 @@ export default class CompositeTile extends Tile {
     this._addWidgetProperties(['widgets']);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv();
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderWidgets();
   }
 
-  setWidgets(widgets) {
+  setWidgets(widgets: Widget[]) {
     this.setProperty('widgets', widgets);
   }
 
-  _renderWidgets() {
+  protected _renderWidgets() {
     this.widgets.forEach(widget => {
       widget.render();
-    }, this);
+    });
     this.invalidateLayoutTree();
   }
 }

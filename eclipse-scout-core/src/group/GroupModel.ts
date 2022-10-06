@@ -24,7 +24,7 @@ export default interface GroupModel extends WidgetModel {
    * If the value is null, a default header is created that consists of the {@link iconId}, {@link title} and {@link titleSuffix}.
    * Default is null.
    */
-  header?: Widget;
+  header?: Widget | RefModel<WidgetModel>;
 
   /**
    * Specifies whether the header should receive the focused when being clicked.

@@ -263,7 +263,7 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
   /**
    * @param filter The filters to remove.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
-   * @returns Returns the removed filters.
+   * @returns the removed filters.
    */
   removeFilter(filter: FilterOrFunction<TElem> | FilterOrFunction<TElem>[], applyFilter = true): Filter<TElem>[] {
     let filtersToRemove = arrays.ensure(filter);

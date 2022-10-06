@@ -60,7 +60,7 @@ export default class VirtualScrolling implements VirtualScrollingOptions {
     }
     this.viewRangeSize = viewRangeSize;
     if (this.widget.rendered && scout.nvl(updateViewPort, true)) {
-      this._renderViewPort();
+      this.renderViewPort();
     }
   }
 
@@ -116,9 +116,9 @@ export default class VirtualScrolling implements VirtualScrollingOptions {
   }
 
   /**
-   * Returns a range of size this.viewRangeSize. Start of range is rowIndex - viewRangeSize / 4.
+   * Returns a range of size {@link this.viewRangeSize}. Start of range is rowIndex - viewRangeSize / 4.
    * -> 1/4 of the rows are before the viewport 2/4 in the viewport 1/4 after the viewport,
-   * assuming viewRangeSize is 2*number of possible rows in the viewport (see calculateViewRangeSize).
+   * assuming viewRangeSize is 2*number of possible rows in the viewport (see {@link calculateViewRangeSize}).
    */
   calculateViewRangeForRowIndex(rowIndex: number): Range {
     if (!this.enabled) {
@@ -174,12 +174,12 @@ export default class VirtualScrolling implements VirtualScrollingOptions {
   /**
    * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
    */
-  protected _renderViewPort() {
+  renderViewPort() {
     let viewRange = this.calculateCurrentViewRange();
     this._renderViewRange(viewRange);
   }
 
-  protected _renderViewRangeForRowIndex(rowIndex: number) {
+  renderViewRangeForRowIndex(rowIndex: number) {
     let viewRange = this.calculateViewRangeForRowIndex(rowIndex);
     this._renderViewRange(viewRange);
   }

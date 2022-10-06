@@ -16,6 +16,7 @@ import {EventMapOf, EventModel} from '../events/EventEmitter';
 export default class Image extends Widget implements ImageModel {
   declare model: ImageModel;
   declare eventMap: ImageEventMap;
+
   autoFit: boolean;
   imageUrl: string;
   prepend: boolean;
@@ -25,10 +26,6 @@ export default class Image extends Widget implements ImageModel {
     this.autoFit = false;
     this.imageUrl = null;
     this.prepend = false;
-  }
-
-  override init(model: ImageModel) { // FIXME TS better use generic?
-    super.init(model);
   }
 
   protected override _render() {
@@ -80,7 +77,7 @@ export default class Image extends Widget implements ImageModel {
     this.$container.toggleClass('autofit', this.autoFit);
   }
 
-  protected _onImageLoad(event) {
+  protected _onImageLoad(event: JQuery.TriggeredEvent) {
     if (!this.rendered) { // check needed, because this is an async callback
       return;
     }
@@ -107,7 +104,7 @@ export default class Image extends Widget implements ImageModel {
     });
   }
 
-  protected _onImageError(event) {
+  protected _onImageError(event: JQuery.TriggeredEvent) {
     if (!this.rendered) { // check needed, because this is an async callback
       return;
     }

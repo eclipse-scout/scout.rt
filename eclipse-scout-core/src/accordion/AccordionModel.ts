@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Group, WidgetModel} from '../index';
-import {Comparator} from '../types';
+import {Comparator, RefModel} from '../types';
 import {GroupCollapseStyle} from '../group/Group';
 
 export default interface AccordionModel extends WidgetModel {
@@ -29,6 +29,6 @@ export default interface AccordionModel extends WidgetModel {
    */
   exclusiveExpand?: boolean;
 
-  groups?: Group[];
+  groups?: Group[] | RefModel<Group>[];
   scrollable?: boolean;
 }
