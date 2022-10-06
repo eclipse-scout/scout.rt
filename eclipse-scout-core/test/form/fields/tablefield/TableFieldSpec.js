@@ -58,7 +58,7 @@ describe('TableField', () => {
       let tableField = createTableField();
       tableField.render();
 
-      expect(tableField.table).toBeUndefined();
+      expect(tableField.table).toBeNull();
       tableField.setTable(table);
       expect(tableField.table.rendered).toBe(true);
 
@@ -94,7 +94,7 @@ describe('TableField', () => {
       let tableField = createTableField();
       tableField.render();
 
-      expect(tableField.table).toBeUndefined();
+      expect(tableField.table).toBeNull();
       tableField.setTable(table);
       expect(tableField.table.$container).toHaveClass('field');
     });

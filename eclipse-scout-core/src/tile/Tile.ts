@@ -8,51 +8,66 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {colorSchemes, GridData, HtmlComponent, LoadingSupport, scrollbars, SingleLayout, Widget} from '../index';
+import {colorSchemes, EnumObject, GridData, HtmlComponent, LoadingSupport, scrollbars, SingleLayout, Widget} from '../index';
 import $ from 'jquery';
+import {ColorScheme} from '../util/colorSchemes';
+import TileModel from './TileModel';
+import TileEventMap from './TileEventMap';
 
-export default class Tile extends Widget {
+export type TileDisplayStyle = EnumObject<typeof Tile.DisplayStyle>;
+
+export default class Tile extends Widget implements TileModel {
+  declare model: TileModel;
+  declare eventMap: TileEventMap;
+
+  colorScheme: ColorScheme;
+  displayStyle: TileDisplayStyle;
+  filterAccepted: boolean;
+  gridData: GridData;
+  gridDataHints: GridData;
+  rowId: string;
+  selected: boolean;
+  selectable: boolean;
+  plainText: string;
 
   constructor() {
     super();
     this.displayStyle = Tile.DisplayStyle.DEFAULT;
     this.filterAccepted = true;
     this.gridData = null;
-    this.rowId = null; // string
+    this.rowId = null;
     this.gridDataHints = new GridData();
     this.colorScheme = null;
     this.selected = false;
     this.selectable = false;
+    this.plainText = null;
   }
 
   static DisplayStyle = {
     DEFAULT: 'default',
     PLAIN: 'plain'
-  };
+  } as const;
 
-  /**
-   * @override
-   */
-  _createLoadingSupport() {
+  protected override _createLoadingSupport(): LoadingSupport {
     return new LoadingSupport({
       widget: this
     });
   }
 
-  _init(model) {
+  protected override _init(model: TileModel) {
     super._init(model);
     this._setGridDataHints(this.gridDataHints);
     this._setColorScheme(this.colorScheme);
     this._setSelectable(this.selectable);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('tile');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new SingleLayout());
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderColorScheme();
     this._renderSelectable();
@@ -60,18 +75,19 @@ export default class Tile extends Widget {
     this._renderDisplayStyle();
   }
 
-  _postRender() {
+  protected override _postRender() {
     this.$container.addClass('tile');
     // Make sure prefSize returns the size the tile has after the animation even if it is called while the animation runs
     // Otherwise the tile may have the wrong size after making a tile with useUiHeight = true visible
     this.htmlComp.layout.animateClasses = ['animate-visible', 'animate-invisible', 'animate-insert', 'animate-remove'];
   }
 
-  _renderDisplayStyle() {
+  protected _renderDisplayStyle() {
     this.$container.toggleClass('default-tile', this.displayStyle === Tile.DisplayStyle.DEFAULT);
   }
 
-  setGridDataHints(gridData) {
+  /** @see TileModel.gridDataHints */
+  setGridDataHints(gridData: GridData) {
     this.setProperty('gridDataHints', gridData);
     if (this.rendered) {
       // Do it here instead of _renderGridDataHints because grid does not need to be invalidated when rendering, only when hints change
@@ -80,18 +96,19 @@ export default class Tile extends Widget {
     }
   }
 
-  _setGridDataHints(gridData) {
+  protected _setGridDataHints(gridData: GridData) {
     if (!gridData) {
       gridData = new GridData();
     }
     this._setProperty('gridDataHints', GridData.ensure(gridData));
   }
 
-  setColorScheme(colorScheme) {
+  /** @see TileModel.colorScheme */
+  setColorScheme(colorScheme: ColorScheme | string) {
     this.setProperty('colorScheme', colorScheme);
   }
 
-  _setColorScheme(colorScheme) {
+  protected _setColorScheme(colorScheme: ColorScheme | string) {
     let defaultScheme = {
       scheme: colorSchemes.ColorSchemeId.DEFAULT,
       inverted: false
@@ -101,45 +118,47 @@ export default class Tile extends Widget {
     this._setProperty('colorScheme', colorScheme);
   }
 
-  _renderColorScheme() {
+  protected _renderColorScheme() {
     colorSchemes.toggleColorSchemeClasses(this.$container, this.colorScheme);
   }
 
-  setSelected(selected) {
+  /** @see TileModel.selected */
+  setSelected(selected: boolean) {
     if (selected && !this.selectable) {
       return;
     }
     this.setProperty('selected', selected);
   }
 
-  _renderSelected() {
+  protected _renderSelected() {
     this.$container.toggleClass('selected', this.selected);
   }
 
-  setSelectable(selectable) {
+  /** @see TileModel.selectable */
+  setSelectable(selectable: boolean) {
     this.setProperty('selectable', selectable);
   }
 
-  _setSelectable(selectable) {
+  protected _setSelectable(selectable: boolean) {
     this._setProperty('selectable', selectable);
     if (!this.selectable) {
       this.setSelected(false);
     }
   }
 
-  _renderSelectable() {
+  protected _renderSelectable() {
     this.$container.toggleClass('selectable', this.selectable);
   }
 
-  setFilterAccepted(filterAccepted) {
+  setFilterAccepted(filterAccepted: boolean) {
     this.setProperty('filterAccepted', filterAccepted);
   }
 
-  _renderFilterAccepted() {
+  protected _renderFilterAccepted() {
     this._renderVisible();
   }
 
-  _renderVisible() {
+  protected override _renderVisible() {
     if (this.rendering) {
       this.$container.setVisible(this.isVisible());
       return;
@@ -182,10 +201,7 @@ export default class Tile extends Widget {
     this.invalidateParentLogicalGrid();
   }
 
-  /**
-   * @override
-   */
-  isVisible() {
+  override isVisible(): boolean {
     return this.visible && this.filterAccepted;
   }
 }

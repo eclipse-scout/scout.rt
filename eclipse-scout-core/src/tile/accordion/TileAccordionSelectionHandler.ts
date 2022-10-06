@@ -8,91 +8,60 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HorizontalGrid, TileGridSelectionHandler} from '../../index';
+import {HorizontalGrid, Tile, TileAccordion, TileGridSelectionHandler} from '../../index';
+import TileGrid from '../TileGrid';
 
 export default class TileAccordionSelectionHandler extends TileGridSelectionHandler {
+  /** The difference to the main selectionHandler is that this one works on the TileAccordion rather than on the TileGrid */
+  tileAccordion: TileAccordion;
 
-  constructor(tileAccordion) {
-    super(tileAccordion);
-    // The difference to the main selectionHandler is that this one works on the TileAccordion rather than on the TileGrid
-    this.tileAccordion = this.tileGrid;
+  constructor(tileAccordion: TileAccordion) {
+    super(tileAccordion as unknown as TileGrid); // Not all methods are overridden (e.g. getGridColumnCount)
+    this.tileAccordion = tileAccordion;
   }
 
-  /**
-   * @override
-   */
-  getFilteredTiles() {
+  override getFilteredTiles(): Tile[] {
     return this.tileAccordion.getFilteredTiles();
   }
 
-  /**
-   * @override
-   */
-  getFilteredTileCount() {
+  override getFilteredTileCount(): number {
     return this.tileAccordion.getFilteredTileCount();
   }
 
-  /**
-   * @override
-   */
-  getVisibleTiles() {
+  override getVisibleTiles(): Tile[] {
     return this.tileAccordion.getVisibleTiles();
   }
 
-  /**
-   * @override
-   */
-  getVisibleTileCount() {
+  override getVisibleTileCount(): number {
     return this.tileAccordion.getVisibleTileCount();
   }
 
-  /**
-   * @override
-   */
-  getSelectedTiles(event) {
+  override getSelectedTiles(): Tile[] {
     return this.tileAccordion.getSelectedTiles();
   }
 
-  /**
-   * @override
-   */
-  getFocusedTile() {
+  override getFocusedTile(): Tile {
     return this.tileAccordion.getFocusedTile();
   }
 
-  /**
-   * @override
-   */
-  getVisibleGridRowCount() {
+  override getVisibleGridRowCount(): number {
     return this.tileAccordion.getVisibleGridRowCount();
   }
 
-  /**
-   * @override
-   */
-  getVisibleGridX(tile) {
+  override getVisibleGridX(tile: Tile): number {
     return this.tileAccordion.getVisibleGridX(tile);
   }
 
-  /**
-   * @override
-   */
-  getVisibleGridY(tile) {
+  override getVisibleGridY(tile: Tile): number {
     return this.tileAccordion.getVisibleGridY(tile);
   }
 
-  /**
-   * @override
-   */
-  scrollTo(tile) {
+  override scrollTo(tile: Tile) {
     let group = this.tileAccordion.getGroupByTile(tile);
     group.body.scrollTo(tile);
   }
 
-  /**
-   * @override
-   */
-  getTileGridByRow(rowIndex) {
+  override getTileGridByRow(rowIndex: number): TileGrid {
     let group = this.tileAccordion.getGroupByVisibleRow(rowIndex);
     if (group) {
       return group.body;
@@ -100,17 +69,11 @@ export default class TileAccordionSelectionHandler extends TileGridSelectionHand
     return null;
   }
 
-  /**
-   * @override
-   */
-  findVisibleTileIndexAt(x, y, startIndex, reverse) {
+  override findVisibleTileIndexAt(x: number, y: number, startIndex?: number, reverse?: boolean): number {
     return this.tileAccordion.findVisibleTileIndexAt(x, y, startIndex, reverse);
   }
 
-  /**
-   * @override
-   */
-  isHorizontalGridActive() {
+  override isHorizontalGridActive(): boolean {
     if (this.tileAccordion.groups.length === 0) {
       return false;
     }

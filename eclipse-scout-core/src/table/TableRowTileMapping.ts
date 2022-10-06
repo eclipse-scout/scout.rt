@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableRow, TableRowTileMappingModel, Tile, Widget} from '../index';
+import {TableRowTileMappingModel, Tile, Widget} from '../index';
 
 export default class TableRowTileMapping extends Widget implements TableRowTileMappingModel {
   declare model: TableRowTileMappingModel;
 
-  tableRow: TableRow;
+  tableRow: string;
   tile: Tile;
 
   constructor() {

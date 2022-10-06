@@ -23,6 +23,7 @@ export default class TableField extends FormField {
     this._insertedRows = objects.createMap();
     this._updatedRows = objects.createMap();
     this._checkedRows = objects.createMap();
+    this.table = null;
     this._addWidgetProperties(['table']);
   }
 

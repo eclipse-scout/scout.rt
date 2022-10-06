@@ -1,0 +1,22 @@
+/*
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+import {AccordionEventMap, Filter, PropertyChangeEvent, Tile, TileAccordion} from '../../index';
+import {TileActionEvent, TileClickEvent} from '../TileGridEventMap';
+
+export default interface TileAccordionEventMap extends AccordionEventMap {
+  'tileAction': TileActionEvent<TileAccordion>;
+  'tileClick': TileClickEvent<TileAccordion>;
+  'propertyChange:filters': PropertyChangeEvent<Filter<Tile>[], TileAccordion>;
+  'propertyChange:gridColumnCount': PropertyChangeEvent<number, TileAccordion>;
+  'propertyChange:tiles': PropertyChangeEvent<Filter<Tile>[], TileAccordion>;
+  'propertyChange:filteredTiles': PropertyChangeEvent<Tile[], TileAccordion>;
+  'propertyChange:selectedTiles': PropertyChangeEvent<Tile[], TileAccordion>;
+}

@@ -271,14 +271,18 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
   protected _adaptTileGrid(tileGrid: TileGrid) {
     // The table contains the menu items -> pass them to the showContextMenu function of the tileGrid.
     objects.mandatoryFunction(tileGrid, '_showContextMenu');
-    let origShowContextMenu = tileGrid._showContextMenu; // FIXME TS: adapt signatures as soon as TileGrid has been migrated
-    tileGrid._showContextMenu = function(options) {
+    // @ts-ignore
+    let origShowContextMenu = tileGrid._showContextMenu;
+    // @ts-ignore
+    tileGrid._showContextMenu = options => {
       objects.mandatoryFunction(this.table, '_filterMenusForContextMenu');
+      // @ts-ignore
       options.menuItems = this.table._filterMenusForContextMenu();
       scout.assertProperty(this.table, '_filterMenusHandler');
+      // @ts-ignore
       options.menuFilter = this.table._filterMenusHandler;
       origShowContextMenu.call(tileGrid, options);
-    }.bind(this);
+    };
     // use the table's keyStrokeContext bindTarget for each tileGrid as well to ensure that the tileGrid's keyStrokes are active when the table is active
     tileGrid.keyStrokeContext.$bindTarget = this.table.keyStrokeContext.$bindTarget;
   }
@@ -296,7 +300,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     });
   }
 
-  protected _createTileGroup(groupId: string, primaryGroupingColumn: Column, row: TableRow): Group {
+  protected _createTileGroup(groupId: string, primaryGroupingColumn: Column, row: TableRow): Group<TileGrid> {
     let htmlEnabled: boolean, title: string, iconId: string;
     if (primaryGroupingColumn) {
       htmlEnabled = primaryGroupingColumn.htmlEnabled;
@@ -315,7 +319,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
         objectType: TileGrid,
         scrollable: false
       }
-    });
+    }) as Group<TileGrid>;
   }
 
   activate() {
@@ -630,7 +634,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
   }
 
   protected _syncScrollTopFromTileGridToTable() {
-    let tile = this.tileAccordion._tileAtScrollTop(this.tileAccordion.scrollTop);
+    let tile = this.tileAccordion.tileAtScrollTop(this.tileAccordion.scrollTop);
     if (tile) {
       let options: ScrollToOptions = {
         align: 'top'

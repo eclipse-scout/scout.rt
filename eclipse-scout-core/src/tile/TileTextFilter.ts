@@ -9,16 +9,20 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {HtmlTile, objects, strings} from '../index';
+import {EventHandler, HtmlTile, objects, PropertyChangeEvent, strings, Tile} from '../index';
 
 export default class TileTextFilter {
+  text: string;
+  protected _htmlTileContentChangeHandler: EventHandler<PropertyChangeEvent<string, HtmlTile>>;
+  protected _tilePropertyChangeHandler: EventHandler<PropertyChangeEvent>;
+
   constructor() {
     this.text = null;
     this._htmlTileContentChangeHandler = this._onHtmlTileContentChange.bind(this);
     this._tilePropertyChangeHandler = this._onTilePropertyChange.bind(this);
   }
 
-  setText(text) {
+  setText(text: string): boolean {
     text = text || '';
     text = text.toLowerCase();
     if (objects.equals(this.text, text)) {
@@ -28,7 +32,7 @@ export default class TileTextFilter {
     return true;
   }
 
-  accept(tile) {
+  accept(tile: Tile): boolean {
     if (strings.empty(this.text)) {
       return true;
     }
@@ -40,7 +44,7 @@ export default class TileTextFilter {
     return filterText.indexOf(this.text) > -1;
   }
 
-  _plainTextForTile(tile) {
+  protected _plainTextForTile(tile: Tile): string {
     if (tile.plainText) {
       return tile.plainText;
     }
@@ -65,11 +69,11 @@ export default class TileTextFilter {
     return tile.plainText;
   }
 
-  _onHtmlTileContentChange(event) {
+  protected _onHtmlTileContentChange(event: PropertyChangeEvent<any, Tile>) {
     delete event.source.plainText;
   }
 
-  _onTilePropertyChange(event) {
+  protected _onTilePropertyChange(event: PropertyChangeEvent<any, Tile>) {
     if (event.propertyName === 'filterAccepted') {
       return;
     }

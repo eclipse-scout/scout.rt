@@ -8,12 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Dimension, graphics, HtmlComponent, LogicalGridLayout, PlaceholderTile, Point, Rectangle, scout, scrollbars, styles} from '../index';
+import {arrays, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LogicalGridLayout, PlaceholderTile, Point, Rectangle, scout, scrollbars, styles, Tile, TileGrid, TileGridLayoutConfig, Widget} from '../index';
 import $ from 'jquery';
 
 export default class TileGridLayout extends LogicalGridLayout {
+  declare widget: TileGrid;
+  containerPos: Point;
+  containerScrollTop: number;
+  maxWidth: number;
+  tiles: Tile[];
+  protected _calculatingPrimitivePrefSize: boolean;
 
-  constructor(widget, layoutConfig) {
+  constructor(widget: Widget, layoutConfig: TileGridLayoutConfig) {
     super(widget, layoutConfig);
     this.containerPos = null;
     this.containerScrollTop = null;
@@ -21,20 +27,20 @@ export default class TileGridLayout extends LogicalGridLayout {
     this._calculatingPrimitivePrefSize = false;
   }
 
-  static _DEFAULTSIZE = undefined;
+  protected static _DEFAULT_SIZE = undefined;
 
-  static getTileDimensions() {
-    if (!(TileGridLayout._DEFAULTSIZE instanceof Rectangle)) {
+  static getTileDimensions(): Rectangle {
+    if (!(TileGridLayout._DEFAULT_SIZE instanceof Rectangle)) {
       let h = styles.getSize('tile-grid-layout-config', 'height', 'height', -1);
       let w = styles.getSize('tile-grid-layout-config', 'width', 'width', -1);
       let horizontalGap = styles.getSize('tile-grid-layout-config', 'margin-left', 'marginLeft', -1);
       let verticalGap = styles.getSize('tile-grid-layout-config', 'margin-top', 'marginTop', -1);
-      TileGridLayout._DEFAULTSIZE = new Rectangle(horizontalGap, verticalGap, w, h);
+      TileGridLayout._DEFAULT_SIZE = new Rectangle(horizontalGap, verticalGap, w, h);
     }
-    return TileGridLayout._DEFAULTSIZE;
+    return TileGridLayout._DEFAULT_SIZE;
   }
 
-  _initDefaults() {
+  protected override _initDefaults() {
     super._initDefaults();
     let dim = TileGridLayout.getTileDimensions();
     this.hgap = dim.x;
@@ -45,11 +51,10 @@ export default class TileGridLayout extends LogicalGridLayout {
   }
 
   /**
-   *
-   * @param {boolean} [scrollTopDirty] If the scroll top position should be considered dirty while updating the view port.
+   * @param scrollTopDirty If the scroll top position should be considered dirty while updating the view port.
    * If true, the view port is not rendered, as the scroll positions are not reliable anyway. Then only the layout of the TileGrid is updated.
    */
-  updateViewPort(scrollTopDirty) {
+  updateViewPort(scrollTopDirty?: boolean) {
     let tileGrid = this.widget;
     if (!tileGrid.rendered) {
       return;
@@ -58,13 +63,14 @@ export default class TileGridLayout extends LogicalGridLayout {
     // Try to layout only as much as needed while scrolling in virtual mode
     // Scroll top may be dirty when layout is validated before scrolling to a specific tile (see tileGrid.scrollTo)
     if (!scout.nvl(scrollTopDirty, false)) {
+      // @ts-ignore
       tileGrid._renderViewPort();
     }
     this._layout(tileGrid.$container);
     tileGrid.trigger('layoutAnimationDone');
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let htmlComp = this.widget.htmlComp;
 
     // Animate only once on startup (if enabled) but animate every time on resize
@@ -109,11 +115,13 @@ export default class TileGridLayout extends LogicalGridLayout {
     }
 
     if (!htmlComp.layouted) {
+      // @ts-ignore
       this.widget._renderScrollTop();
     }
     if (this.widget.virtual && (!htmlComp.layouted || this._sizeChanged(htmlComp) || this.widget.withPlaceholders)) {
       // When changing size of the container, more or less tiles might be shown and some tiles might even change rows due to a new gridColumnCount -> ensure correct tiles are rendered in the range
       this.widget.setViewRangeSize(this.widget.calculateViewRangeSize(), false);
+      // @ts-ignore
       let newTiles = this.widget._renderTileDelta();
       // Make sure newly rendered tiles are animated (if enabled) and layouted as well
       this._storeBounds(newTiles);
@@ -136,30 +144,24 @@ export default class TileGridLayout extends LogicalGridLayout {
     this._updateFilterFieldMaxWidth($container);
   }
 
-  _sizeChanged(htmlComp) {
+  protected _sizeChanged(htmlComp: HtmlComponent): boolean {
     return htmlComp.sizeCached && !htmlComp.sizeCached.equals(htmlComp.size());
   }
 
-  _storeBounds(tiles) {
+  protected _storeBounds(tiles: Tile[]) {
     tiles.forEach((tile, i) => {
       let bounds = graphics.cssBounds(tile.$container);
       tile.$container.data('oldBounds', bounds);
       tile.$container.data('was-layouted', tile.htmlComp.layouted);
-    }, this);
+    });
   }
 
-  /**
-   * @override
-   */
-  _validateGridData(htmlComp) {
+  protected override _validateGridData(htmlComp: HtmlComponent): boolean {
     htmlComp.$comp.removeClass('newly-rendered');
     return super._validateGridData(htmlComp);
   }
 
-  /**
-   * @override
-   */
-  _layoutCellBounds(containerSize, containerInsets) {
+  protected override _layoutCellBounds(containerSize: Dimension, containerInsets: Insets): Rectangle[][] {
     // Since the tiles are positioned absolutely it is necessary to add the height of the filler to the top insets
     if (this.widget.virtual && this.widget.$fillBefore) {
       containerInsets.top += this.widget.$fillBefore.outerHeight(true);
@@ -167,7 +169,7 @@ export default class TileGridLayout extends LogicalGridLayout {
     return super._layoutCellBounds(containerSize, containerInsets);
   }
 
-  _animateTiles() {
+  protected _animateTiles(): JQuery.Promise<void>[] {
     let htmlComp = this.widget.htmlComp;
     let $container = htmlComp.$comp;
 
@@ -180,7 +182,7 @@ export default class TileGridLayout extends LogicalGridLayout {
 
     // Animate the position change of the tiles
     let promises = [];
-    this.tiles.forEach(function(tile, i) {
+    this.tiles.forEach((tile, i) => {
       if (!tile.rendered) {
         // Only animate tiles which were there at the beginning of the layout
         // RenderViewPort may remove or render some, the removed ones cannot be animated because $container is missing and don't need to anyway, the rendered ones cannot because fromBounds are missing
@@ -194,12 +196,12 @@ export default class TileGridLayout extends LogicalGridLayout {
 
       tile.$container.removeData('oldBounds');
       tile.$container.removeData('was-layouted');
-    }, this);
+    });
 
     return promises;
   }
 
-  _animateTile(tile) {
+  protected _animateTile(tile: Tile): void | JQuery.Promise<void> {
     let htmlComp = this.widget.htmlComp;
 
     // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
@@ -250,7 +252,7 @@ export default class TileGridLayout extends LogicalGridLayout {
     return this._animateTileBounds(tile, fromBounds, bounds);
   }
 
-  _inViewport(bounds) {
+  protected _inViewport(bounds: Rectangle) {
     bounds = bounds.translate(this.containerPos.x, this.containerPos.y).translate(0, -this.containerScrollTop);
     let topLeftPos = new Point(bounds.x, bounds.y);
     let bottomRightPos = new Point(bounds.x + bounds.width, bounds.y + bounds.height);
@@ -258,12 +260,12 @@ export default class TileGridLayout extends LogicalGridLayout {
     return scrollbars.isLocationInView(topLeftPos, $scrollable) || scrollbars.isLocationInView(bottomRightPos, $scrollable);
   }
 
-  _onAnimationDone() {
+  protected _onAnimationDone() {
     this._updateScrollbar();
     this.widget.trigger('layoutAnimationDone');
   }
 
-  _animateTileBounds(tile, fromBounds, bounds) {
+  protected _animateTileBounds(tile: Tile, fromBounds: Rectangle, bounds: Rectangle): JQuery.Promise<void> {
     // jQuery's animate() function sets "overflow: hidden" during the animation. After the animation, the
     // original value is restored. (Search for "opts.overflow" in the jQuery source code, and see
     // https://stackoverflow.com/a/5696656/7188380 for details why this is required.)
@@ -311,7 +313,7 @@ export default class TileGridLayout extends LogicalGridLayout {
     return $.promiseAll(promises).then(restoreOverflowStyle);
   }
 
-  _updateScrollbar() {
+  protected _updateScrollbar() {
     scrollbars.setVisible(this.widget.$container, true);
     scrollbars.opacity(this.widget.$container, 1);
 
@@ -331,7 +333,7 @@ export default class TileGridLayout extends LogicalGridLayout {
    * When max. width should be enforced, add a padding to the container if necessary
    * (to make sure, scrollbar position is not changed)
    */
-  _updateMaxWidth() {
+  protected _updateMaxWidth() {
     // Reset padding-right set by layout
     let htmlComp = this.widget.htmlComp;
     htmlComp.$comp.cssPaddingRight(null);
@@ -353,11 +355,11 @@ export default class TileGridLayout extends LogicalGridLayout {
     }
   }
 
-  _resetGridColumnCount() {
+  protected _resetGridColumnCount() {
     this.widget.gridColumnCount = this.widget.prefGridColumnCount;
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     options = $.extend({}, options);
 
     if (this.widget.virtual) {
@@ -370,7 +372,7 @@ export default class TileGridLayout extends LogicalGridLayout {
    * Calculates the preferred size only based on the grid column count, row count and layout config. Does not use rendered elements.
    * Therefore only works if all tiles are of the same size (which is a precondition for the virtual scrolling anyway).
    */
-  virtualPrefSize($container, options) {
+  virtualPrefSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     let rowCount, columnCount;
     let insets = HtmlComponent.get($container).insets();
     let prefSize = new Dimension();
@@ -405,7 +407,7 @@ export default class TileGridLayout extends LogicalGridLayout {
     return prefSize;
   }
 
-  primitivePrefSize($container, options) {
+  primitivePrefSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     if (!options.widthHint || this._calculatingPrimitivePrefSize) {
       return super.preferredLayoutSize($container, options);
     }
@@ -415,7 +417,7 @@ export default class TileGridLayout extends LogicalGridLayout {
     return prefSize;
   }
 
-  _primitivePrefSize(options) {
+  protected _primitivePrefSize(options: HtmlCompPrefSizeOptions): Dimension {
     let prefSize,
       htmlComp = this.widget.htmlComp,
       contentFits = false,
@@ -449,7 +451,7 @@ export default class TileGridLayout extends LogicalGridLayout {
     return prefSize;
   }
 
-  _updateFilterFieldMaxWidth($container) {
+  protected _updateFilterFieldMaxWidth($container: JQuery) {
     let htmlComp = HtmlComponent.get($container),
       width = htmlComp.availableSize().subtract(htmlComp.insets()).width;
     this.widget.$filterFieldContainer.css('--filter-field-max-width', (width * 0.6) + 'px');

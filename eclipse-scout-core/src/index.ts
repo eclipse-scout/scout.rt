@@ -762,7 +762,9 @@ export {default as TagBarOverflowPopupLayout} from './tagbar/TagBarOverflowPopup
 export {default as Tile} from './tile/Tile';
 export {default as TileAdapter} from './tile/TileAdapter';
 export {default as TileGrid} from './tile/TileGrid';
+export {default as TileGridModel} from './tile/TileGridModel';
 export {default as TileGridAdapter} from './tile/TileGridAdapter';
+export {default as TileGridEventMap} from './tile/TileGridEventMap';
 export {default as TileGridGridConfig} from './tile/TileGridGridConfig';
 export {default as TileGridLayout} from './tile/TileGridLayout';
 export {default as TileGridLayoutConfig} from './tile/TileGridLayoutConfig';
@@ -774,6 +776,8 @@ export {default as HtmlTileAdapter} from './tile/HtmlTileAdapter';
 export {default as BeanTile} from './tile/BeanTile';
 export {default as BeanTileAdapter} from './tile/BeanTileAdapter';
 export {default as TileAccordion} from './tile/accordion/TileAccordion';
+export {default as TileAccordionModel} from './tile/accordion/TileAccordionModel';
+export {default as TileAccordionEventMap} from './tile/accordion/TileAccordionEventMap';
 export {default as TileAccordionAdapter} from './tile/accordion/TileAccordionAdapter';
 export {default as TileAccordionLayout} from './tile/accordion/TileAccordionLayout';
 export {default as TileAccordionSelectionHandler} from './tile/accordion/TileAccordionSelectionHandler';

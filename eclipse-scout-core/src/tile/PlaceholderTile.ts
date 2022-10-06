@@ -18,7 +18,7 @@ export default class PlaceholderTile extends Tile {
     this.displayStyle = Tile.DisplayStyle.PLAIN;
   }
 
-  _setSelectable(selectable) {
+  protected override _setSelectable(selectable: boolean) {
     // Placeholder tiles should not be selectable
     super._setSelectable(false);
   }

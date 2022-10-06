@@ -8,28 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModelAdapter, objects, RemoteTileFilter, scout} from '../index';
+import {Event, ModelAdapter, objects, RemoteTileFilter, scout, Tile, TileGrid} from '../index';
+import TileGridModel from './TileGridModel';
+import {TileActionEvent, TileClickEvent} from './TileGridEventMap';
 
-export default class TileGridAdapter extends ModelAdapter {
+export default class TileGridAdapter<W extends TileGrid = TileGrid> extends ModelAdapter<W> {
+  tileFilter: RemoteTileFilter;
 
   constructor() {
     super();
+    this.tileFilter = null;
     this._addRemoteProperties(['selectedTiles']);
-    this._tileFilter = null;
   }
 
-  _syncSelectedTiles(tiles) {
+  protected _syncSelectedTiles(tiles: Tile[]) {
     // TileGrid.js won't modify the selectedTiles array while processing the response -> ignore every selectedTiles property change
     this.addFilterForPropertyName('selectedTiles');
     this.widget.selectTiles(tiles);
   }
 
-  _syncTiles(tiles) {
+  protected _syncTiles(tiles: Tile[]) {
     this.addFilterForPropertyName('selectedTiles');
     this.widget.setTiles(tiles);
   }
 
-  _initProperties(model) {
+  protected override _initProperties(model: TileGridModel) {
     super._initProperties(model);
     if (!objects.isNullOrUndefined(model.filteredTiles)) {
       // If filteredTiles is set a server side filter is active -> add a tile filter on JS side as well
@@ -42,7 +45,7 @@ export default class TileGridAdapter extends ModelAdapter {
     delete model.filteredTiles;
   }
 
-  _syncFilteredTiles(tileIds) {
+  protected _syncFilteredTiles(tileIds: string[]) {
     // If filteredTiles property changes on the fly, create or remove the filter accordingly
     // -> If filteredTiles is null, no server side filter is active
     // -> If filteredTiles is an empty array, the server side filter rejects every tile
@@ -59,7 +62,7 @@ export default class TileGridAdapter extends ModelAdapter {
     }
   }
 
-  _onWidgetTileClick(event) {
+  protected _onWidgetTileClick(event: TileClickEvent) {
     let data = {
       tile: event.tile.id,
       mouseButton: event.mouseButton
@@ -67,18 +70,18 @@ export default class TileGridAdapter extends ModelAdapter {
     this._send('tileClick', data);
   }
 
-  _onWidgetTileAction(event) {
+  protected _onWidgetTileAction(event: TileActionEvent) {
     let data = {
       tile: event.tile.id
     };
     this._send('tileAction', data);
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<W>) {
     if (event.type === 'tileClick') {
-      this._onWidgetTileClick(event);
+      this._onWidgetTileClick(event as TileClickEvent<W>);
     } else if (event.type === 'tileAction') {
-      this._onWidgetTileAction(event);
+      this._onWidgetTileAction(event as TileActionEvent<W>);
     } else {
       super._onWidgetEvent(event);
     }

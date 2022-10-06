@@ -1188,7 +1188,7 @@ export default class FormField extends Widget {
    *
    * @param $parent to which container is appended
    * @param cssClass cssClass to add to the new container DIV
-   * @param layout when layout is undefined, this#_createLayout() is called
+   * @param [layout] when layout is undefined, {@link _createLayout} is called
    *
    */
   addContainer($parent, cssClass, layout) {
