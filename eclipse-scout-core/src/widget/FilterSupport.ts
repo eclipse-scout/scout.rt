@@ -9,14 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, EventHandler, Filter, Filterable, FilterResult, FilterSupportOptions, FormField, HAlign, keys, KeyStroke, objects, scout, SetFiltersResult, StringField, strings, styles, UpdateFilteredElementsOptions, ValueField, Widget,
-  WidgetSupport
+  arrays, EventHandler, Filter, Filterable, FilterResult, FilterSupportOptions, FormField, HAlign, keys, KeyStroke, objects, Predicate, scout, SetFiltersResult, StringField, strings, styles, UpdateFilteredElementsOptions, ValueField,
+  Widget, WidgetSupport
 } from '../index';
 import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
 import {FilterElement, TextFilter} from './Filter';
 
-export type FilterFunction<TElem extends FilterElement> = (elem: TElem) => boolean;
-export type FilterOrFunction<TElem extends FilterElement> = Filter<TElem> | FilterFunction<TElem>;
+export type FilterOrFunction<TElem extends FilterElement> = Filter<TElem> | Predicate<TElem>;
 
 export default class FilterSupport<TElem extends FilterElement> extends WidgetSupport {
   declare widget: Widget & Filterable<TElem>;
@@ -360,7 +359,7 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
     return !!this._findFilter(filters, filter);
   }
 
-  protected _createFilterByFunction(filterFunc): Filter<TElem> {
+  protected _createFilterByFunction(filterFunc: Predicate<TElem>): Filter<TElem> {
     return {
       createdByFunction: true,
       accept: filterFunc

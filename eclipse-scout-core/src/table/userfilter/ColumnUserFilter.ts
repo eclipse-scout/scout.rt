@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilterEventMap, comparators, Event, FilterFieldsGroupBox, strings, TableMatrix, TableRow, TableUserFilter} from '../../index';
+import {Column, ColumnUserFilterEventMap, comparators, FilterFieldsGroupBox, strings, TableMatrix, TableRow, TableUserFilter} from '../../index';
 import {TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup} from '../TableMatrix';
 import {TableUserFilterAddedEventData, TableUserFilterRemovedEventData} from './TableUserFilter';
 import {ColumnComparator} from '../columns/comparators';
@@ -17,6 +17,7 @@ import {EventMapOf, EventModel} from '../../events/EventEmitter';
 export default class ColumnUserFilter extends TableUserFilter {
   declare eventMap: ColumnUserFilterEventMap;
 
+  column: Column;
   /**
    * This property is used to check early whether or not this filter can produce filter-fields.
    * Set this property to true in your sub-class, if it creates filter fields.

@@ -11,10 +11,10 @@
 import {
   Action, AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, ContextMenuKeyStroke, ContextMenuPopup, Desktop, Device, DoubleClickSupport, dragAndDrop,
   DragAndDropHandler, EnumObject, Event, EventHandler, Filter, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStroke, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus,
-  NumberColumn, objects, Popup, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFilter, TableFilterModel, TableFooter,
-  TableHeader, TableLayout, TableModel, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke,
-  TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator,
-  TableToggleRowKeyStroke, TableTooltip, TableTooltipModel, TableUpdateBuffer, TableUserFilter, Tile, TileTableHeaderBox, tooltips, UpdateFilteredElementsOptions, ValueField, Widget
+  NumberColumn, objects, Popup, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
+  TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
+  TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip,
+  TableTooltipModel, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, UpdateFilteredElementsOptions, ValueField, Widget
 } from '../index';
 import $ from 'jquery';
 import {ScrollToOptions} from '../scrollbar/scrollbars';
@@ -25,6 +25,7 @@ import {StatusOrModel} from '../status/Status';
 import {HorizontalAlignment} from '../cell/Cell';
 import {DragAndDropType} from '../util/dragAndDrop';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {FilterOrFunction} from '../widget/FilterSupport';
 
 export default class Table extends Widget implements TableModel {
   declare model: TableModel;
@@ -74,7 +75,7 @@ export default class Table extends Widget implements TableModel {
   tileProducer: (row: TableRow) => Tile;
   footer: TableFooter;
   footerVisible: boolean;
-  filters: TableFilter[];
+  filters: Filter<TableRow>[];
   rows: TableRow[];
   rootRows: TableRow[];
   visibleRows: TableRow[];
@@ -2771,11 +2772,11 @@ export default class Table extends Widget implements TableModel {
     this._triggerRowAction(row, column);
   }
 
-  insertRow(row: TableRowData | TableRow) {
+  insertRow(row: TableRow | TableRowData) {
     this.insertRows([row]);
   }
 
-  insertRows(rows: TableRowData | TableRowData[] | TableRow | TableRow[]) {
+  insertRows(rows: TableRow | TableRowData | (TableRow | TableRowData)[]) {
     let rowsArr = arrays.ensure(rows);
     if (rowsArr.length === 0) {
       return;
@@ -3600,7 +3601,7 @@ export default class Table extends Widget implements TableModel {
         parentRow = this.rowsMap[row.parentRow.id];
       } else {
         // expect id
-        let parentRowId = (row.parentRow as unknown) as string;
+        let parentRowId = row.parentRow as unknown as string;
         parentRow = this.rowsMap[parentRowId];
       }
       if (parentRow) {
@@ -3819,16 +3820,16 @@ export default class Table extends Widget implements TableModel {
   }
 
   /**
-   * @param filter The filters to add.
+   * @param filter The filter to add.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  addFilter(filter: TableFilter | TableFilter[], applyFilter = true) {
+  addFilter(filter: FilterOrFunction<TableRow>, applyFilter = true) {
     if (filter instanceof TableUserFilter) {
       let previousFilter = this.getFilter(filter.createKey());
       this.filterSupport.removeFilter(previousFilter, false);
     }
 
-    let added = this.filterSupport.addFilter(filter, applyFilter) as TableFilter[];
+    let added = this.filterSupport.addFilter(filter, applyFilter);
     if (added && added.length) {
       this.trigger('filterAdded', {
         filter: added[0]
@@ -3837,11 +3838,11 @@ export default class Table extends Widget implements TableModel {
   }
 
   /**
-   * @param filter The filters to remove.
+   * @param filter The filter to remove.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  removeFilter(filter: TableFilter | TableFilter[], applyFilter = true) {
-    let removed = this.filterSupport.removeFilter(filter, applyFilter) as TableFilter[];
+  removeFilter(filter: FilterOrFunction<TableRow>, applyFilter = true) {
+    let removed = this.filterSupport.removeFilter(filter, applyFilter);
     if (removed && removed.length) {
       this.trigger('filterRemoved', {
         filter: removed[0]
@@ -3853,7 +3854,7 @@ export default class Table extends Widget implements TableModel {
     this.removeFilter(this.getFilter(key), applyFilter);
   }
 
-  getFilter(key: string): TableFilter {
+  getFilter(key: string): Filter<TableRow> {
     return arrays.find(this.filters, f => {
       if (!(f instanceof TableUserFilter)) {
         return false;
@@ -3866,12 +3867,12 @@ export default class Table extends Widget implements TableModel {
    * @param filter The new filters.
    * @param applyFilter Whether to apply the filters after modifying the filter list or not. Default is true.
    */
-  setFilters(filters: (TableFilter | TableFilterModel | Filter<TableRow>)[], applyFilter = true) {
+  setFilters(filters: (FilterOrFunction<TableRow> | TableUserFilterModel)[], applyFilter = true) {
     this.resetUserFilter(false);
     let tableFilters = filters.map(filter => this._ensureFilter(filter));
     let result = this.filterSupport.setFilters(tableFilters, applyFilter);
-    let filtersAdded = result.filtersAdded as TableFilter[];
-    let filtersRemoved = result.filtersRemoved as TableFilter[];
+    let filtersAdded = result.filtersAdded as Filter<TableRow>[];
+    let filtersRemoved = result.filtersRemoved as Filter<TableRow>[];
     filtersAdded.forEach(filter => this.trigger('filterAdded', {
       filter: filter
     }));
@@ -3880,13 +3881,13 @@ export default class Table extends Widget implements TableModel {
     }));
   }
 
-  protected _ensureFilter<T extends TableFilter>(filter: TableFilter | TableFilterModel | Filter<TableRow>): TableFilter {
+  protected _ensureFilter<T extends Filter<TableRow>>(filter: TableUserFilterModel | FilterOrFunction<TableRow>): Filter<TableRow> {
     // @ts-ignore
     if (filter instanceof TableUserFilter || !filter.objectType) {
-      return filter as TableFilter;
+      return filter as Filter<TableRow>;
     }
 
-    let filterModel = filter as RefModel<TableFilterModel>;
+    let filterModel = filter as RefModel<TableUserFilterModel>;
     if (filterModel.column) {
       filterModel.column = this.columnById(filterModel.column as string);
     }
@@ -4518,8 +4519,8 @@ export default class Table extends Widget implements TableModel {
     this.setProperty('menus', menus);
   }
 
-  protected _setMenus(menus: Menu[], oldMenus?: Menu[]) {
-    this.updateKeyStrokes(menus, oldMenus);
+  protected _setMenus(menus: Menu[]) {
+    this.updateKeyStrokes(menus, this.menus);
     this._setProperty('menus', menus);
     this._updateMenuBar();
 

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Column, ColumnModel, KeyStroke, KeyStrokeModel, Menu, MenuModel, Status, TableCompactHandler, TableControl, TableControlModel, TableFilter, TableFilterModel, TableRow, TableRowModel, TableSelectionHandler, TableTileGridMediator, Tile,
+  Column, ColumnModel, Filter, KeyStroke, KeyStrokeModel, Menu, MenuModel, Status, TableCompactHandler, TableControl, TableControlModel, TableRow, TableRowModel, TableSelectionHandler, TableTileGridMediator, TableUserFilterModel, Tile,
   WidgetModel
 } from '../index';
 import {TableCheckableStyle, TableGroupingStyle, TableHierarchicalStyle} from './Table';
@@ -114,7 +114,7 @@ export default interface TableModel extends WidgetModel {
    * Specifies if the table footer is visible. Default is false.
    */
   footerVisible?: boolean;
-  filters?: TableFilter[] | RefModel<TableFilterModel>[];
+  filters?: Filter<TableRow>[] | RefModel<TableUserFilterModel>[];
   rows?: TableRow[] | RefModel<TableRowModel>[];
   maxRowCount?: number;
   /**
@@ -150,6 +150,17 @@ export default interface TableModel extends WidgetModel {
   rowIconColumnWidth?: number;
   staticMenus?: Menu[] | RefModel<MenuModel>[];
   selectionHandler?: TableSelectionHandler;
+  /**
+   * Virtual relates to the term "Virtual Scrolling". This means, only the table rows in the view port and some more will be
+   * rendered. The others will be rendered as soon as they will be moved into the view port, either by scrolling or by
+   * any other action like sorting, filtering etc. This can lead to a big performance boost when having many rows.
+   *
+   * Default is true.
+   */
   virtual?: boolean;
+  /**
+   * If enabled, a text field is shown when the table is focused or hovered so the user can filter the table rows by typing.
+   * Default is true.
+   */
   textFilterEnabled?: boolean;
 }

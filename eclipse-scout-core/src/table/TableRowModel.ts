@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Table, TableRow} from '../index';
-import {TableRowStatus} from './TableRow';
 import {RefModel} from '../types';
 import {ObjectType} from '../ObjectFactory';
 
@@ -21,17 +20,12 @@ export default interface TableRowModel {
   cells?: any[];
   checked?: boolean;
   enabled?: boolean;
-  height?: number;
-  hasError?: boolean;
   id?: string;
-  initialized?: boolean;
   iconId?: string;
   cssClass?: string;
-  parentRow?: TableRow | RefModel<TableRowModel>;
+  parentRow?: string | TableRow | RefModel<TableRowModel>;
   parent: Table;
-  childRows?: TableRow[] | RefModel<TableRowModel>[];
   expanded?: boolean;
-  status?: TableRowStatus;
   dataMap?: Record<PropertyKey, any>;
 }
 

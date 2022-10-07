@@ -8,14 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, Session, strings, Table, TableFilter, TableFilterModel, TableRow, TextFilter} from '../index';
+import {strings, TableRow, TextFilter} from '../index';
 
-export default class TextTableFilter implements TableFilter, TextFilter<TableRow> {
-  declare model: TableFilterModel;
-
-  session: Session;
-  table: Table;
-  column: Column;
+export default class TextTableFilter implements TextFilter<TableRow> {
   acceptedText: string;
   textSupplier: (row: TableRow) => string;
   active: boolean;

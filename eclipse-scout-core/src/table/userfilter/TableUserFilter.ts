@@ -8,15 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, EventEmitter, objects, Session, Table, TableFilter, TableFilterModel, TableRow} from '../../index';
+import {EventEmitter, Filter, objects, Session, Table, TableRow, TableUserFilterModel} from '../../index';
 import $ from 'jquery';
 
-export default abstract class TableUserFilter extends EventEmitter implements TableFilter {
-  declare model: TableFilterModel;
+export default abstract class TableUserFilter extends EventEmitter implements Filter<TableRow> {
+  declare model: TableUserFilterModel;
 
   session: Session;
   table: Table;
-  column: Column;
   filterType: string;
 
   constructor() {
@@ -24,7 +23,7 @@ export default abstract class TableUserFilter extends EventEmitter implements Ta
     this.session = null;
   }
 
-  init(model: TableFilterModel) {
+  init(model: TableUserFilterModel) {
     this.session = model.session;
     if (!this.session) {
       throw new Error('Session expected: ' + this);
@@ -32,7 +31,7 @@ export default abstract class TableUserFilter extends EventEmitter implements Ta
     this._init(model);
   }
 
-  protected _init(model: TableFilterModel) {
+  protected _init(model: TableUserFilterModel) {
     $.extend(this, model);
   }
 
@@ -56,7 +55,7 @@ export default abstract class TableUserFilter extends EventEmitter implements Ta
 
   abstract accept(row: TableRow): boolean;
 
-  equals(filter: TableFilter): boolean {
+  equals(filter: Filter<TableRow>): boolean {
     if (!(filter instanceof TableUserFilter)) {
       return false;
     }

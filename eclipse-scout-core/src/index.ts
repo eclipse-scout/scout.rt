@@ -531,8 +531,7 @@ export {default as TableNavigationHomeKeyStroke} from './table/keystrokes/TableN
 export {default as TableNavigationEndKeyStroke} from './table/keystrokes/TableNavigationEndKeyStroke';
 export {default as TableNavigationPageUpKeyStroke} from './table/keystrokes/TableNavigationPageUpKeyStroke';
 export {default as TableNavigationPageDownKeyStroke} from './table/keystrokes/TableNavigationPageDownKeyStroke';
-export {default as TableFilter} from './table/userfilter/TableFilter';
-export {default as TableFilterModel} from './table/userfilter/TableFilterModel';
+export {default as TableUserFilterModel} from './table/userfilter/TableUserFilterModel';
 export {default as TableUserFilter} from './table/userfilter/TableUserFilter';
 export {default as ColumnUserFilter} from './table/userfilter/ColumnUserFilter';
 export {default as ColumnUserFilterEventMap} from './table/userfilter/ColumnUserFilterEventMap';
