@@ -836,6 +836,9 @@ export default class TableHeader extends Widget implements TableHeaderModel {
   }
 
   protected _onTableAddFilterRemoved(event: TableFilterAddedEvent | TableFilterRemovedEvent) {
+    if (!(event.filter instanceof ColumnUserFilter)) {
+      return;
+    }
     let column = event.filter.column;
     // Check for column.$header because column may have been removed in the mean time due to a structure changed event -> don't try to render state
     if (event.filter.filterType === ColumnUserFilter.TYPE && column.$header) {

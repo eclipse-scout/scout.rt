@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Event, EventHandler, fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, PropertyChangeEvent, scout, Status, strings, Table, TableControl, TableFooterLayout, TableFooterModel, TableTextUserFilter, Tooltip, Widget
+  Event, EventHandler, fields, graphics, HtmlComponent, InputFieldKeyStrokeContext, MenuBarLayout, PropertyChangeEvent, scout, Status, strings, Table, TableControl, TableFooterLayout, TableFooterModel, TableTextUserFilter, TableUserFilter,
+  Tooltip, Widget
 } from '../index';
 import $ from 'jquery';
 import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
@@ -808,7 +809,7 @@ export default class TableFooter extends Widget implements TableFooterModel {
   protected _onTableFilterAdded(event: TableFilterAddedEvent) {
     this._renderInfoFilter();
     this._updateInfoFilterVisibility();
-    if (event.filter.filterType === TableTextUserFilter.TYPE) {
+    if (event.filter instanceof TableUserFilter && event.filter.filterType === TableTextUserFilter.TYPE) {
       // Do not update the content when the value does not change. This is the case when typing text in
       // the UI. If we would call val() unconditionally, the current cursor position will get lost.
       let textFilter = event.filter as TableTextUserFilter;
@@ -824,7 +825,7 @@ export default class TableFooter extends Widget implements TableFooterModel {
   protected _onTableFilterRemoved(event: TableFilterRemovedEvent) {
     this._renderInfoFilter();
     this._updateInfoFilterVisibility();
-    if (event.filter.filterType === TableTextUserFilter.TYPE) {
+    if (event.filter instanceof TableUserFilter && event.filter.filterType === TableTextUserFilter.TYPE) {
       this._$textFilter.val('');
       this._updateHasFilterText();
       this._applyFilter();

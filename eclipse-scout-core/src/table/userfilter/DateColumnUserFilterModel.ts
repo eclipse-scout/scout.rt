@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableFilterModel} from '../../index';
+import {TableUserFilterModel} from '../../index';
 
-export default interface DateColumnUserFilterModel extends TableFilterModel {
+export default interface DateColumnUserFilterModel extends TableUserFilterModel {
   dateFrom?: string;
   dateTo?: string;
 }

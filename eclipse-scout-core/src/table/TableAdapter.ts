@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  App, arrays, BooleanColumn, Cell, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, objects, scout, Table, TableFilter, TableFilterModel, TableModel, TableRow, TableUserFilter, ValueField
+  App, arrays, BooleanColumn, Cell, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, objects, scout, Table, TableModel, TableRow, TableUserFilter, TableUserFilterModel, ValueField
 } from '../index';
 import $ from 'jquery';
 import {
@@ -405,7 +405,7 @@ export default class TableAdapter<T extends Table = Table> extends ModelAdapter<
     }
   }
 
-  protected _onRowsInserted(rows: TableRowData | TableRowData[]) {
+  protected _onRowsInserted(rows: TableRowData[]) {
     this.widget.insertRows(rows);
     this._rebuildingTable = false;
   }
@@ -575,7 +575,7 @@ export default class TableAdapter<T extends Table = Table> extends ModelAdapter<
     this.widget.changeAggregations(columns, functions);
   }
 
-  protected _onFiltersChanged(filters: (TableFilter | TableFilterModel | Filter<TableRow>)[]) {
+  protected _onFiltersChanged(filters: (TableUserFilter | TableUserFilterModel | Filter<TableRow>)[]) {
     this.addFilterForWidgetEventType('filterAdded');
     this.addFilterForWidgetEventType('filterRemoved');
 

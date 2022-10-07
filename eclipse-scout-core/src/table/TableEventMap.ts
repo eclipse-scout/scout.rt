@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, Column, Event, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableControl, TableFilter, TableRow, Tile, TileTableHeaderBox, ValueField, WidgetEventMap} from '../index';
+import {Cell, Column, Event, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableControl, TableRow, Tile, TileTableHeaderBox, ValueField, WidgetEventMap} from '../index';
 import {TableCheckableStyle, TableGroupingStyle, TableHierarchicalStyle} from './Table';
 import {DragAndDropType, FileDropEvent} from '../util/dragAndDrop';
 
@@ -64,15 +64,15 @@ export interface TableDropEvent<T extends Table = Table> extends Event<T>, FileD
 }
 
 export interface TableFilterAddedEvent<T extends Table = Table> extends Event<T> {
-  filter: TableFilter;
+  filter: Filter<TableRow>;
 }
 
 export interface TableFilterRemovedEvent<T extends Table = Table> extends Event<T> {
-  filter: TableFilter;
+  filter: Filter<TableRow>;
 }
 
 export interface TableFiltersRemovedEvent<T extends Table = Table> extends Event<T> {
-  filter: TableFilter;
+  filter: Filter<TableRow>;
 }
 
 export interface TableGroupEvent<T extends Table = Table> extends Event<T> {
