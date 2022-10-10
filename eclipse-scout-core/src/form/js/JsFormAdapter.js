@@ -15,6 +15,7 @@ import {FormAdapter} from '../../index';
  * @property {object} parent
  * @property {object} owner
  * @property {object} displayParent
+ * @property {string} displayHint
  * @property {object} inputData
  * @property {string} jsFormObjectType
  * @property {object} jsFormModel
@@ -41,6 +42,7 @@ export default class JsFormAdapter extends FormAdapter {
       owner: model.owner,
       objectType: model.jsFormObjectType,
       displayParent: model.displayParent,
+      displayHint: model.displayHint,
       data: model.inputData
     };
 
