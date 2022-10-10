@@ -222,6 +222,8 @@ export {default as GlassPane} from './glasspane/GlassPane';
 export {default as DeferredGlassPaneTarget} from './glasspane/DeferredGlassPaneTarget';
 export {default as GlassPaneRenderer} from './glasspane/GlassPaneRenderer';
 export {default as IFrame} from './iframe/IFrame';
+export {default as IFrameModel} from './iframe/IFrameModel';
+export {default as IFrameEventMap} from './iframe/IFrameEventMap';
 export {default as Scrollbar} from './scrollbar/Scrollbar';
 export {default as ScrollbarEventMap} from './scrollbar/ScrollbarEventMap';
 export {default as scrollbars} from './scrollbar/scrollbars';
