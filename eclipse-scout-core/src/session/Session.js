@@ -1069,12 +1069,13 @@ export default class Session {
    *          do nothing. Can be used to prevent double messages for the same error.
    */
   showFatalMessage(options, errorCode) {
-    if (errorCode) {
-      if (this._fatalMessagesOnScreen[errorCode]) {
-        return;
-      }
-      this._fatalMessagesOnScreen[errorCode] = true;
+    if (!errorCode) {
+      errorCode = App.get().errorHandler.getJsErrorCode();
     }
+    if (this._fatalMessagesOnScreen[errorCode]) {
+      return;
+    }
+    this._fatalMessagesOnScreen[errorCode] = true;
 
     options = options || {};
     let model = {
@@ -1105,6 +1106,10 @@ export default class Session {
       }
     });
     messageBox.render($entryPoint);
+  }
+
+  isFatalMessageShown() {
+    return Object.keys(this._fatalMessagesOnScreen).length > 0;
   }
 
   uploadFiles(target, files, uploadProperties, maxTotalSize, allowedTypes) {
