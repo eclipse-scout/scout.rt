@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -19,6 +19,7 @@ export default class ErrorHandler {
     this.displayError = true;
     this.sendError = false;
     this.windowErrorHandler = this._onWindowError.bind(this);
+    this.session = null;
   }
 
   /**
@@ -264,8 +265,8 @@ export default class ErrorHandler {
     // Note: The error handler is installed globally and we cannot tell in which scout session the error happened.
     // We simply use the first scout session to display the message box and log the error. This is not ideal in the
     // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
-    if (App.get().sessions.length > 0) {
-      let session = App.get().sessions[0];
+    let session = this.session || App.get().sessions[0];
+    if (session) {
       if (this.displayError && errorInfo.level === logging.Level.ERROR) {
         this._showMessageBox(session, errorInfo.message, errorInfo.code, errorInfo.log);
       }

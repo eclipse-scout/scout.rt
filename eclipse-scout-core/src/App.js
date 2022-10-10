@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -341,8 +341,9 @@ export default class App extends EventEmitter {
     // Bluebird has a polyfill -> can it be ported to jQuery?
   }
 
-  _createErrorHandler() {
-    return scout.create(ErrorHandler);
+  _createErrorHandler(opts) {
+    opts = $.extend({}, opts);
+    return scout.create(ErrorHandler, opts);
   }
 
   /**
@@ -459,16 +460,33 @@ export default class App extends EventEmitter {
     $.log.error('App initialization failed.');
     this.setLoading(false);
 
-    return this.errorHandler.handle(error, ...args)
-      .then(errorInfo => {
-        let $error = $('body').appendDiv('startup-error');
-        $error.appendDiv('startup-error-title').text('The application could not be started');
-        if (errorInfo.message) {
-          $error.appendDiv('startup-error-message').text(errorInfo.message);
-        }
-        // Reject with original rejection arguments
-        return $.rejectedPromise(error, ...args);
-      });
+    let promises = [];
+    if (this.sessions.length === 0) {
+      promises.push(this.errorHandler.handle(error, ...args)
+        .then(errorInfo => {
+          this._appendStartupError($('body'), errorInfo.message);
+        }));
+    } else {
+      // Session.js may already display a fatal message box
+      // -> don't handle the error again and display multiple error messages
+      this.sessions
+        .filter(session => !session.ready && !session.isFatalMessageShown())
+        .forEach(session => {
+          session.$entryPoint.empty();
+          promises.push(this._createErrorHandler({session: session}).handle(error));
+        });
+    }
+
+    // Reject with original rejection arguments
+    return $.promiseAll(promises).then(errorInfo => $.rejectedPromise(error, ...args));
+  }
+
+  _appendStartupError($parent, message) {
+    let $error = $parent.appendDiv('startup-error');
+    $error.appendDiv('startup-error-title').text('The application could not be started');
+    if (message) {
+      $error.appendDiv('startup-error-message').text(message);
+    }
   }
 
   /**
