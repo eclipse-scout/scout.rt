@@ -28,8 +28,6 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
   table: Table;
   tileAccordion: TileAccordion;
   tiles: Tile[];
-
-  /** used only in scout classic */
   tileMappings: TableRowTileMapping[];
 
   /** tiles by rowId */

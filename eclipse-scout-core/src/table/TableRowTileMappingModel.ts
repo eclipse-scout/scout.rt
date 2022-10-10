@@ -8,18 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableRow, TableRowTileMappingModel, Tile, Widget} from '../index';
+import {TableRow, TableRowModel, Tile, WidgetModel} from '../index';
+import {RefModel} from '../types';
 
-export default class TableRowTileMapping extends Widget implements TableRowTileMappingModel {
-  declare model: TableRowTileMappingModel;
-
-  tableRow: TableRow;
-  tile: Tile;
-
-  constructor() {
-    super();
-    this.tableRow = null;
-    this.tile = null;
-    this._addWidgetProperties(['tile']);
-  }
+export default interface TableRowTileMappingModel extends WidgetModel {
+  tableRow?: TableRow | RefModel<TableRowModel>;
+  tile?: Tile; // FIXME TS: add RefModel<TileModel> as soon as Tile has been migrated.
 }

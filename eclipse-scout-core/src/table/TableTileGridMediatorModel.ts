@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Table, TileAccordion, TileGridLayoutConfig, WidgetModel} from '../index';
+import {Table, TableRowTileMapping, TableRowTileMappingModel, TileAccordion, TileGridLayoutConfig, WidgetModel} from '../index';
+import {RefModel} from '../types';
 
 export default interface TableTileGridMediatorModel extends WidgetModel {
   parent: Table;
@@ -16,4 +17,5 @@ export default interface TableTileGridMediatorModel extends WidgetModel {
   gridColumnCount?: number;
   tileGridLayoutConfig?: TileGridLayoutConfig;
   withPlaceholders?: boolean;
+  tileMappings?: TableRowTileMapping[] | RefModel<TableRowTileMappingModel>[];
 }

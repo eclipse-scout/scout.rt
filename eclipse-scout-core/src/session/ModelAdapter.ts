@@ -206,10 +206,8 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
   }
 
   /**
-   * @returns Creates a Event object from the current adapter instance and
-   *   sends the event by using the Session#sendEvent() method. Local objects may
-   *   set a different remoteHandler to call custom code instead of the Session#sendEvent()
-   *   method.
+   * Creates a Event object from the current adapter instance and sends the event by using the Session#sendEvent() method.
+   * Local objects may set a different remoteHandler to call custom code instead of the Session#sendEvent() method.
    *
    * @param type of event
    * @param data of event
