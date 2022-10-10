@@ -464,6 +464,7 @@ export {default as TableTileGridMediatorAdapter} from './table/TableTileGridMedi
 export {default as TableRowDetail} from './table/TableRowDetail';
 export {default as TableRowDetailModel} from './table/TableRowDetailModel';
 export {default as TableRowTileMapping} from './table/TableRowTileMapping';
+export {default as TableRowTileMappingModel} from './table/TableRowTileMappingModel';
 export {default as TableRowTileMappingAdapter} from './table/TableRowTileMappingAdapter';
 export {default as TableTooltip} from './table/TableTooltip';
 export {default as TableTooltipModel} from './table/TableTooltipModel';

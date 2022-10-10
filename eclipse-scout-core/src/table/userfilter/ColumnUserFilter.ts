@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilterEventMap, comparators, FilterFieldsGroupBox, strings, TableMatrix, TableRow, TableUserFilter} from '../../index';
+import {ColumnUserFilterEventMap, comparators, Event, FilterFieldsGroupBox, strings, TableMatrix, TableRow, TableUserFilter} from '../../index';
 import {TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup} from '../TableMatrix';
 import {TableUserFilterAddedEventData, TableUserFilterRemovedEventData} from './TableUserFilter';
 import {ColumnComparator} from '../columns/comparators';
+import {EventMapOf, EventModel} from '../../events/EventEmitter';
 
 export default class ColumnUserFilter extends TableUserFilter {
   declare eventMap: ColumnUserFilterEventMap;
@@ -154,6 +155,10 @@ export default class ColumnUserFilter extends TableUserFilter {
 
   triggerFilterFieldsChanged() {
     this.trigger('filterFieldsChanged');
+  }
+
+  override trigger<K extends string & keyof EventMapOf<ColumnUserFilter>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<ColumnUserFilter>[K]>): EventMapOf<ColumnUserFilter>[K] {
+    return super.trigger(type, eventOrModel);
   }
 
   /**
