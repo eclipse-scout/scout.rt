@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -31,10 +31,11 @@ export default class RemoteApp extends App {
     defaultValues.bootstrap();
   }
 
-  _createErrorHandler() {
-    return scout.create('ErrorHandler', {
+  _createErrorHandler(opts) {
+    opts = $.extend({
       sendError: true
-    });
+    }, opts);
+    return super._createErrorHandler(opts);
   }
 
   /**
@@ -46,13 +47,5 @@ export default class RemoteApp extends App {
     let session = this._createSession(options);
     App.get().sessions.push(session);
     return session.start();
-  }
-
-  _fail(options, error, ...args) {
-    $.log.error('App initialization failed', error);
-    this.setLoading(false);
-    // Session.js already handled the error -> don't show a message here
-    // Reject with original rejection arguments
-    return $.rejectedPromise(error, ...args);
   }
 }
