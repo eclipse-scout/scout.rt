@@ -146,7 +146,7 @@ export function onScrollStartEndDuringTouch($elem: JQuery, startHandler: () => v
  * @param target the element which should receive the event
  * @param event the original event which should be propagated
  */
-export function propagateEvent(target: HTMLElement, event: Event) {
+export function propagateEvent(target: EventTarget, event: Event) {
   if (typeof (Event) !== 'function') {
     return;
   }
@@ -170,7 +170,7 @@ export function propagateEvent(target: HTMLElement, event: Event) {
  * @param types an array of event types.
  * @param an optional filter function which can return false if the event should not be propagated.
  */
-export function addPropagationListener(source: HTMLElement, target: HTMLElement, types: string[], filter?: Predicate<Event>) {
+export function addPropagationListener(source: EventTarget, target: EventTarget, types: string[], filter?: Predicate<Event>) {
   types = arrays.ensure(types);
   types.forEach(type => {
     source.addEventListener(type, event => {
