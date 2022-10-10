@@ -29,7 +29,7 @@
     "ts-rename": "ts-migrate --migrate false --sources src/layout/*",
     "ts-migrate": "ts-migrate --rename false --sources src/layout/*",
     "ts-event-maps": "ts-migrate --rename false --migrate false --print-event-maps --sources src/layout/*.ts",
-    "ts-count": "ts-migrate --rename false --migrate false --count --sources src/**/*.ts",
+    "ts-count": "ts-migrate --rename false --migrate false --count --sources src/**/*.ts --sources ../eclipse-scout-chart/src/**/*.ts",
     "testserver:start": "scout-scripts test-server:start",
     "testserver:stop": "scout-scripts test-server:stop",
     "test:ci": "scout-scripts test:ci",
