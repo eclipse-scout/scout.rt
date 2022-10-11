@@ -82,4 +82,21 @@ public final class CalendarChains {
       callChain(methodInvocation);
     }
   }
+
+  public static class CalendarAppLinkActionChain extends AbstractCalendarChain {
+
+    public CalendarAppLinkActionChain(List<? extends ICalendarExtension<? extends AbstractCalendar>> extensions) {
+      super(extensions);
+    }
+
+    public void execAppLinkAction(final String ref) {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(ICalendarExtension<? extends AbstractCalendar> next) {
+          next.execAppLinkAction(CalendarAppLinkActionChain.this, ref);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
 }

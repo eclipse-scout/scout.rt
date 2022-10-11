@@ -10,8 +10,12 @@
  */
 package org.eclipse.scout.rt.ui.html.json.calendar;
 
+import java.util.stream.Collectors;
+
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonCalendarItem implements IJsonObject {
@@ -40,6 +44,18 @@ public class JsonCalendarItem implements IJsonObject {
     json.put("description", m_item.getDescription());
     json.put("cssClass", m_item.getCssClass());
     json.put("recurrencePattern", new JsonRecurrencePattern(m_item.getRecurrencePattern()).toJson());
+    json.put("subjectLabel", m_item.getSubjectLabel());
+    json.put("subjectAppLink", m_item.getSubjectAppLink());
+    json.put("subjectIconId", m_item.getSubjectIconId());
+    if (CollectionUtility.hasElements(m_item.getDescriptionElements())) {
+      json.put("descriptionElements", new JSONArray(m_item.getDescriptionElements().stream().map(element -> {
+        JSONObject jsonElement = new JSONObject();
+        jsonElement.put("text", element.getText());
+        jsonElement.put("iconId", element.getIconId());
+        jsonElement.put("appLink", element.getAppLink());
+        return jsonElement;
+      }).collect(Collectors.toList())));
+    }
     return json;
   }
 }

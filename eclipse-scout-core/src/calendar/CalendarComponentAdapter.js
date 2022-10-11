@@ -16,4 +16,17 @@ export default class CalendarComponentAdapter extends ModelAdapter {
     super();
   }
 
+  _onWidgetAppLinkAction(event) {
+    this._send('appLinkAction', {
+      ref: event.ref
+    });
+  }
+
+  _onWidgetEvent(event) {
+    if (event.type === 'appLinkAction') {
+      this._onWidgetAppLinkAction(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 }

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.services.common.calendar;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public interface ICalendarItem {
 
@@ -39,6 +40,18 @@ public interface ICalendarItem {
   String getSubject();
 
   void setSubject(String a);
+
+  String getSubjectLabel();
+
+  void setSubjectLabel(String subjectLabel);
+
+  String getSubjectAppLink();
+
+  void setSubjectAppLink(String subjectAppLink);
+
+  String getSubjectIconId();
+
+  void setSubjectIconId(String subjectIconId);
 
   String getBody();
 
@@ -72,4 +85,5 @@ public interface ICalendarItem {
    */
   String getDescription();
 
+  List<ICalendarItemDescriptionElement> getDescriptionElements();
 }

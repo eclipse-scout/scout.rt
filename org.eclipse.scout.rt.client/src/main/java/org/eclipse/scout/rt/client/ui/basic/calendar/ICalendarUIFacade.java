@@ -34,4 +34,6 @@ public interface ICalendarUIFacade {
 
   void setSelectedDateFromUI(Date date);
 
+  void fireAppLinkActionFromUI(String ref);
+
 }
