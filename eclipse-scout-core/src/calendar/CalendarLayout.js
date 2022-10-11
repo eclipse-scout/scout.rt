@@ -25,6 +25,7 @@ export default class CalendarLayout extends AbstractLayout {
       headerHeight = 0,
       $yearContainer = this.calendar._yearPanel.$container,
       $grids = this.calendar.$grids,
+      $listContainer = this.calendar.$listContainer,
       $header = this.calendar.$header;
 
     height += $container.cssMarginTop() + $container.cssMarginBottom();
@@ -43,6 +44,7 @@ export default class CalendarLayout extends AbstractLayout {
     headerHeight = $header.outerHeight(true);
     $yearContainer.css('height', 'calc(100% - ' + (headerHeight + $yearContainer.cssMarginY()) + 'px)');
     $grids.css('height', 'calc(100% - ' + (headerHeight + $grids.cssMarginY()) + 'px)');
+    $listContainer.css('height', 'calc(100% - ' + (headerHeight + $listContainer.cssMarginY()) + 'px)');
 
     this.calendar.layoutSize();
     this.calendar.layoutYearPanel();
