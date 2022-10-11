@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, ContextMenuPopup, EnumObject, Event, HtmlComponent, icons, MenuBarPopup, MenuBarPopupModel, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, scout, strings, tooltips, TreeVisitResult} from '../index';
+import {
+  Action, ActionKeyStroke, arrays, ContextMenuPopup, EnumObject, Event, HtmlComponent, icons, MenuBarPopup, MenuBarPopupModel, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, scout,
+  strings, tooltips, TreeVisitResult
+} from '../index';
 import {PopupAlignment} from '../popup/Popup';
 import {CloneOptions, TreeVisitor} from '../widget/Widget';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
@@ -544,7 +547,7 @@ export default class Menu extends Action implements MenuModel {
     return scout.create(MenuBarPopup, options);
   }
 
-  protected override _createActionKeyStroke(): MenuKeyStroke {
+  protected override _createActionKeyStroke(): ActionKeyStroke {
     return new MenuKeyStroke(this);
   }
 

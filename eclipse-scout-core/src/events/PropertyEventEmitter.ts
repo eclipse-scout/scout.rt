@@ -74,13 +74,13 @@ export default class PropertyEventEmitter extends EventEmitter {
   /**
    * Triggers a property change for a single property.
    */
-  triggerPropertyChange(propertyName: string, oldValue, newValue: any): PropertyChangeEvent<any, this> {
+  triggerPropertyChange<T>(propertyName: string, oldValue: T, newValue: T): PropertyChangeEvent<T, this> {
     scout.assertParameter('propertyName', propertyName);
     return this.trigger('propertyChange', {
       propertyName: propertyName,
       oldValue: oldValue,
       newValue: newValue
-    }) as PropertyChangeEvent<any, this>;
+    }) as PropertyChangeEvent<T, this>;
   }
 
   /**

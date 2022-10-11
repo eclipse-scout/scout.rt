@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Menu} from '../../../index';
+import {Action, KeyStrokeContext, Menu, NavigateButtonModel, Outline, Page} from '../../../index';
 import $ from 'jquery';
 
 /**
@@ -16,10 +16,17 @@ import $ from 'jquery';
  * When a navigation button is clicked, we process that click browser-side first and send an event to
  * the server which nodes have been selected. We do that for better user experience. In a first attempt
  * the whole navigation logic was on the server, which caused a lag and flickering in the UI.
- *
- * @abstract
  */
-export default class NavigateButton extends Menu {
+export default abstract class NavigateButton extends Menu implements NavigateButtonModel {
+  declare model: NavigateButtonModel;
+
+  node: Page;
+  outline: Outline;
+  altKeyStrokeContext: KeyStrokeContext;
+  overflow: boolean;
+
+  protected _defaultText: string;
+  protected _defaultIconId: string;
 
   constructor() {
     super();
@@ -31,10 +38,7 @@ export default class NavigateButton extends Menu {
     this.inheritAccessibility = false;
   }
 
-  /**
-   * @override
-   */
-  _render() {
+  protected override _render() {
     if (this.overflow) {
       this.text = this.session.text(this._defaultText);
       this.iconId = null;
@@ -48,24 +52,18 @@ export default class NavigateButton extends Menu {
     this.altKeyStrokeContext.registerKeyStroke(this);
   }
 
-  /**
-   * @override Action.js
-   */
-  _remove() {
+  protected override _remove() {
     super._remove();
     this.altKeyStrokeContext.unregisterKeyStroke(this);
   }
 
-  _setDetailVisible() {
+  protected _setDetailVisible() {
     let detailVisible = this._toggleDetail();
     $.log.isDebugEnabled() && $.log.debug('show detail-' + (detailVisible ? 'form' : 'table'));
     this.outline.setDetailFormVisibleByUi(this.node, detailVisible);
   }
 
-  /**
-   * @override Menu.js
-   */
-  _doAction() {
+  protected override _doAction() {
     super._doAction();
     if (this._isDetail()) {
       this._setDetailVisible();
@@ -73,6 +71,14 @@ export default class NavigateButton extends Menu {
       this._drill();
     }
   }
+
+  protected abstract _isDetail(): boolean;
+
+  protected abstract _drill();
+
+  protected abstract _toggleDetail(): boolean;
+
+  protected abstract _buttonEnabled(): boolean;
 
   /**
    * Called when enabled state must be re-calculated and probably rendered.

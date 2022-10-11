@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, PropertyEventEmitter} from '../index';
+import {Event} from '../index';
 
-export default interface PropertyChangeEvent<Value = any, Source extends PropertyEventEmitter = PropertyEventEmitter> extends Event<Source> {
+export default interface PropertyChangeEvent<Value = any, Source = any> extends Event<Source> {
   propertyName: string;
   oldValue: Value;
   newValue: Value;

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DisabledStyle, LogicalGrid, Session, Widget} from '../index';
+import {DisabledStyle, DisplayParent, LogicalGrid, Session, Widget} from '../index';
 import {ObjectType} from '../ObjectFactory';
 
 export default interface WidgetModel {
@@ -17,6 +17,7 @@ export default interface WidgetModel {
    */
   parent: Widget;
   owner?: Widget;
+  id?: string;
   /**
    * If not specified, the session of the parent widget is used
    */
@@ -32,6 +33,8 @@ export default interface WidgetModel {
   cssClass?: string;
   loading?: boolean;
   logicalGrid?: LogicalGrid;
+  displayParent?: DisplayParent;
+  animateRemoval?: boolean;
 
   [property: string]: any; // FIXME TS necessary for variable model properties, required?
 }

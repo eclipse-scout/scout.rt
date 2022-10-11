@@ -8,15 +8,84 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopFormController, DesktopHeader, DesktopLayout, DesktopNavigation, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, Event, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStrokeContext, MessageBoxController, objects, OfflineDesktopNotification, OpenUriHandler, Outline, Popup, scout, SimpleTabArea, Splitter, strings, styles, Tree, UnsavedFormChangesForm, URL, webstorage, Widget, widgets} from '../index';
+import {
+  AbstractLayout, arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel, DesktopNavigation, DesktopNotification, Device,
+  DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStroke, KeyStrokeContext,
+  Menu, MessageBox, MessageBoxController, objects, OfflineDesktopNotification, OpenUriHandler, Outline, Popup, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, strings, styles, Tooltip, Tree, UnsavedFormChangesForm, URL,
+  ViewButton, webstorage, Widget, widgets
+} from '../index';
 import $ from 'jquery';
+import {NativeNotificationVisibility} from './notification/DesktopNotification';
+import {DesktopBenchViewActivateEvent} from './bench/DesktopBenchEventMap';
+import {SplitterMoveEndEvent, SplitterMoveEvent, SplitterPositionChangeEvent} from '../splitter/SplitterEventMap';
+import BenchColumnLayoutDataModel from './bench/layout/BenchColumnLayoutDataModel';
+import {TreeDisplayStyle} from '../tree/Tree';
+import {GlassPaneTarget} from '../widget/Widget';
+import {ReloadPageOptions} from '../scout';
 
-export default class Desktop extends Widget {
+export default class Desktop extends Widget implements DesktopModel, DisplayParent {
+  declare model: DesktopModel;
+  declare eventMap: DesktopEventMap;
+
+  displayStyle: DesktopDisplayStyle;
+  title: string;
+  selectViewTabsKeyStrokesEnabled: boolean;
+  selectViewTabsKeyStrokeModifier: string;
+  cacheSplitterPosition: boolean;
+  browserHistoryEntry: BrowserHistoryEntry;
+  logoId: string;
+  logoUrl: string;
+  navigationVisible: boolean;
+  navigationHandleVisible: boolean;
+  logoActionEnabled: boolean;
+  benchVisible: boolean;
+  headerVisible: boolean;
+  geolocationServiceAvailable: boolean;
+  benchLayoutData: BenchColumnLayoutData;
+  nativeNotificationDefaults: NativeNotificationDefaults;
+  menus: Menu[];
+  addOns: Widget[];
+  dialogs: Form[];
+  views: Form[];
+  keyStrokes: KeyStroke[];
+  viewButtons: ViewButton[];
+  messageBoxes: MessageBox[];
+  fileChoosers: FileChooser[];
+  outline: Outline;
+  activeForm: Form;
+  selectedViewTabs: Form[];
+  notifications: DesktopNotification[];
+  navigation: DesktopNavigation;
+  header: DesktopHeader;
+  bench: DesktopBench;
+  splitter: Splitter;
+  splitterVisible: boolean;
+  formController: DesktopFormController;
+  messageBoxController: MessageBoxController;
+  fileChooserController: FileChooserController;
+  initialFormRendering: boolean;
+  resizing: boolean;
+  offline: boolean;
+  inBackground: boolean;
+  openUriHandler: OpenUriHandler;
+  theme: string;
+  dense: boolean;
+  animateLayoutChange: boolean;
+  url: URL;
+  responsiveHandler: ResponsiveHandler;
+
+  $notifications: JQuery;
+  $overlaySeparator: JQuery;
+
+  protected _glassPaneTargetFilters: GlassPaneTargetFilter[];
+  protected _offlineNotification: OfflineDesktopNotification;
+  /** event listeners */
+  protected _benchActiveViewChangedHandler: EventHandler<DesktopBenchViewActivateEvent>;
+  protected _resizeHandler: (event: JQuery.ResizeEvent) => void;
+  protected _popstateHandler: (event: JQuery.TriggeredEvent) => void;
 
   constructor() {
     super();
-
-    this.desktopStyle = Desktop.DisplayStyle.DEFAULT;
 
     this.title = null;
     this.selectViewTabsKeyStrokesEnabled = true;
@@ -31,9 +100,7 @@ export default class Desktop extends Widget {
     this.headerVisible = true;
     this.geolocationServiceAvailable = Device.get().supportsGeolocation();
     this.benchLayoutData = null;
-    /** @type NativeNotificationDefaults|null */
     this.nativeNotificationDefaults = null;
-
     this.menus = [];
     this.addOns = [];
     this.dialogs = [];
@@ -46,7 +113,6 @@ export default class Desktop extends Widget {
     this.activeForm = null;
     this.selectedViewTabs = [];
     this.notifications = [];
-
     this.navigation = null;
     this.header = null;
     this.bench = null;
@@ -61,15 +127,13 @@ export default class Desktop extends Widget {
     this.openUriHandler = null;
     this.theme = null;
     this.dense = false;
-    this._glassPaneTargetFilters = [];
     this.url = null;
+    this.$notifications = null;
 
     this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm', 'focusedElement']);
     this._addPreserveOnPropertyChangeProperties(['focusedElement']);
 
-    this.$notifications = null;
-
-    // event listeners
+    this._glassPaneTargetFilters = [];
     this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
   }
 
@@ -77,7 +141,7 @@ export default class Desktop extends Widget {
     DEFAULT: 'default',
     BENCH: 'bench',
     COMPACT: 'compact'
-  };
+  } as const;
 
   /**
    * The action that should be performed when handling an "open URI" event.
@@ -125,11 +189,11 @@ export default class Desktop extends Widget {
      * If it points to a file or uses a special protocol, the handling depends on the used browser.
      */
     SAME_WINDOW: 'sameWindow'
-  };
+  } as const;
 
   static DEFAULT_THEME = 'default';
 
-  _init(model) {
+  protected override _init(model: DesktopModel) {
     // Note: session and desktop are tightly coupled. Because a lot of widgets want to register
     // a listener on the desktop in their init phase, they access the desktop by calling 'this.session.desktop'
     // that's why we need this instance as early as possible. When that happens they access a desktop which is
@@ -175,45 +239,32 @@ export default class Desktop extends Widget {
     });
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     this.keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-    this.keyStrokeContext.registerKeyStroke([
+    this.keyStrokeContext.registerKeyStrokes([
       new DisableBrowserF5ReloadKeyStroke(this),
       new DisableBrowserTabSwitchingKeyStroke(this)
     ]);
   }
 
-  /**
-   * @param {object} model desktop model
-   * @return {NativeNotificationDefaults}
-   */
-  _createNativeNotificationDefaults(model) {
+  protected _createNativeNotificationDefaults(model: DesktopModel): NativeNotificationDefaults {
     return $.extend({
       title: model.title,
       iconId: model.logoId
     }, model.nativeNotificationDefaults);
   }
 
-  /**
-   * @param {NativeNotificationDefaults} defaults
-   */
-  setNativeNotificationDefaults(defaults) {
+  setNativeNotificationDefaults(defaults: NativeNotificationDefaults) {
     this.setProperty('nativeNotificationDefaults', defaults);
   }
 
-  _onBenchActivateViewChanged(event) {
+  protected _onBenchActivateViewChanged(event: DesktopBenchViewActivateEvent) {
     if (this.initialFormRendering) {
       return;
     }
@@ -224,7 +275,7 @@ export default class Desktop extends Widget {
     }
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent;
     this.$container.addClass('desktop');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
@@ -249,9 +300,7 @@ export default class Desktop extends Widget {
     this._renderNavigationHandleVisible();
     this._renderNotifications();
     this._renderBrowserHistoryEntry();
-    this.addOns.forEach(addOn => {
-      addOn.render();
-    }, this);
+    this.addOns.forEach(addOn => addOn.render());
 
     // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
     this._setupDragAndDrop();
@@ -259,7 +308,7 @@ export default class Desktop extends Widget {
     this._disableContextMenu();
   }
 
-  _remove() {
+  protected override _remove() {
     this.formController.remove();
     this.messageBoxController.remove();
     this.fileChooserController.remove();
@@ -269,7 +318,7 @@ export default class Desktop extends Widget {
     super._remove();
   }
 
-  _postRender() {
+  protected override _postRender() {
     super._postRender();
 
     // Render attached forms, message boxes and file choosers.
@@ -281,7 +330,7 @@ export default class Desktop extends Widget {
     this.initialFormRendering = false;
   }
 
-  _setDisplayStyle(displayStyle) {
+  protected _setDisplayStyle(displayStyle: DesktopDisplayStyle) {
     this._setProperty('displayStyle', displayStyle);
 
     let compact = this.displayStyle === Desktop.DisplayStyle.COMPACT;
@@ -306,22 +355,22 @@ export default class Desktop extends Widget {
     }
   }
 
-  setDense(dense) {
+  setDense(dense: boolean) {
     this.setProperty('dense', dense);
   }
 
-  _setDense(dense) {
+  protected _setDense(dense: boolean) {
     this._setProperty('dense', dense);
 
     styles.clearCache();
     HtmlEnvironment.get().init(this.dense ? 'dense' : null);
   }
 
-  _renderDense() {
+  protected _renderDense() {
     this.$container.toggleClass('dense', this.dense);
   }
 
-  _createLayout() {
+  protected _createLayout(): AbstractLayout {
     return new DesktopLayout(this);
   }
 
@@ -329,7 +378,7 @@ export default class Desktop extends Widget {
    * Displays attached forms, message boxes and file choosers.
    * Outline does not need to be rendered to show the child elements, it needs to be active (necessary if navigation is invisible)
    */
-  _renderDisplayChildrenOfOutline() {
+  protected _renderDisplayChildrenOfOutline() {
     if (!this.outline) {
       return;
     }
@@ -337,20 +386,22 @@ export default class Desktop extends Widget {
     this.outline.messageBoxController.render();
     this.outline.fileChooserController.render();
 
-    // this restores the selected view after a page refresh. selectedViewTabs is only set by the model.
+    // this restores the selected view after a page refresh. selectedViewTabs is only set by the server.
     if (this.outline.selectedViewTabs) {
       this.outline.selectedViewTabs.forEach(selectedView => {
+        // @ts-ignore
         this.formController._activateView(selectedView);
       });
     } else {
       // views on the outline are not activated by default. Check for modal views on this outline
       let modalViews = this.outline.views.filter(view => view.modal);
       // activate each modal view in the order it was originally activated
+      // @ts-ignore
       modalViews.forEach(this.formController._activateView.bind(this.formController));
     }
   }
 
-  _removeDisplayChildrenOfOutline() {
+  protected _removeDisplayChildrenOfOutline() {
     if (!this.outline) {
       return;
     }
@@ -359,7 +410,7 @@ export default class Desktop extends Widget {
     this.outline.fileChooserController.remove();
   }
 
-  computeParentForDisplayParent(displayParent) {
+  computeParentForDisplayParent(displayParent: DisplayParent) {
     // Outline must not be used as parent, otherwise the children (form, messageboxes etc.) would be removed if navigation is made invisible
     // The functions _render/removeDisplayChildrenOfOutline take care that the elements are correctly rendered/removed on an outline switch
     let parent = displayParent;
@@ -369,7 +420,7 @@ export default class Desktop extends Widget {
     return parent;
   }
 
-  _renderTitle() {
+  protected _renderTitle() {
     let title = this.title;
     if (title === undefined || title === null) {
       return;
@@ -380,11 +431,11 @@ export default class Desktop extends Widget {
     }
   }
 
-  _renderActiveForm() {
+  protected _renderActiveForm() {
     // NOP -> is handled in _setFormActivated when ui changes active form or if model changes form in _onFormShow/_onFormActivate
   }
 
-  _renderBench() {
+  protected _renderBench() {
     if (this.bench) {
       return;
     }
@@ -395,7 +446,7 @@ export default class Desktop extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _createBench() {
+  protected _createBench(): DesktopBench {
     return scout.create(DesktopBench, {
       parent: this,
       animateRemoval: true,
@@ -404,7 +455,7 @@ export default class Desktop extends Widget {
     });
   }
 
-  _removeBench() {
+  protected _removeBench() {
     if (!this.bench) {
       return;
     }
@@ -416,7 +467,7 @@ export default class Desktop extends Widget {
     this.bench.destroy();
   }
 
-  _renderBenchVisible() {
+  protected _renderBenchVisible() {
     this.animateLayoutChange = this.rendered;
     if (this.benchVisible) {
       this._renderBench();
@@ -426,7 +477,7 @@ export default class Desktop extends Widget {
     }
   }
 
-  _renderNavigation() {
+  protected _renderNavigation() {
     if (this.navigation) {
       return;
     }
@@ -437,7 +488,7 @@ export default class Desktop extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _createNavigation() {
+  protected _createNavigation(): DesktopNavigation {
     return scout.create(DesktopNavigation, {
       parent: this,
       outline: this.outline,
@@ -448,7 +499,7 @@ export default class Desktop extends Widget {
     });
   }
 
-  _removeNavigation() {
+  protected _removeNavigation() {
     this.$container.addClass('navigation-invisible');
     if (!this.navigation) {
       return;
@@ -458,7 +509,7 @@ export default class Desktop extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _renderNavigationVisible() {
+  protected _renderNavigationVisible() {
     this.animateLayoutChange = this.rendered;
     if (this.navigationVisible) {
       this._renderNavigation();
@@ -472,7 +523,7 @@ export default class Desktop extends Widget {
     }
   }
 
-  _renderHeader() {
+  protected _renderHeader() {
     if (this.header) {
       return;
     }
@@ -485,12 +536,13 @@ export default class Desktop extends Widget {
     }
     // register header tab area
     if (this.bench) {
+      // @ts-ignore
       this.bench._setTabArea(this.header.tabArea);
     }
     this.invalidateLayoutTree();
   }
 
-  _createHeader() {
+  protected _createHeader(): DesktopHeader {
     let compact = this.displayStyle === Desktop.DisplayStyle.COMPACT;
     return scout.create(DesktopHeader, {
       parent: this,
@@ -503,7 +555,7 @@ export default class Desktop extends Widget {
     });
   }
 
-  _removeHeader() {
+  protected _removeHeader() {
     if (!this.header) {
       return;
     }
@@ -514,7 +566,7 @@ export default class Desktop extends Widget {
     this.header.destroy();
   }
 
-  _renderHeaderVisible() {
+  protected _renderHeaderVisible() {
     if (this.headerVisible) {
       this._renderHeader();
     } else {
@@ -522,13 +574,13 @@ export default class Desktop extends Widget {
     }
   }
 
-  _renderLogoUrl() {
+  protected _renderLogoUrl() {
     if (this.header) {
       this.header.setLogoUrl(this.logoUrl);
     }
   }
 
-  _renderSplitterVisible() {
+  protected _renderSplitterVisible() {
     if (this.splitterVisible) {
       this._renderSplitter();
     } else {
@@ -536,7 +588,7 @@ export default class Desktop extends Widget {
     }
   }
 
-  _renderSplitter() {
+  protected _renderSplitter() {
     if (this.splitter || !this.navigation) {
       return;
     }
@@ -553,7 +605,7 @@ export default class Desktop extends Widget {
     this.updateSplitterPosition();
   }
 
-  _removeSplitter() {
+  protected _removeSplitter() {
     if (!this.splitter) {
       return;
     }
@@ -561,14 +613,14 @@ export default class Desktop extends Widget {
     this.splitter = null;
   }
 
-  _renderInBackground() {
+  protected _renderInBackground() {
     this.$container.toggleClass('in-background', this.inBackground && this.displayStyle !== Desktop.DisplayStyle.COMPACT);
     if (this.bench) {
       this.bench.$container.toggleClass('drop-shadow', this.inBackground);
     }
   }
 
-  _renderBrowserHistoryEntry() {
+  protected _renderBrowserHistoryEntry() {
     if (!Device.get().supportsHistoryApi()) {
       return;
     }
@@ -577,16 +629,15 @@ export default class Desktop extends Widget {
     if (history) {
       let historyPath = this._createHistoryPath(history);
       let setStateFunc = (this.rendered ? myWindow.history.pushState : myWindow.history.replaceState).bind(myWindow.history);
-      setStateFunc({
-        deepLinkPath: history.deepLinkPath
-      }, history.title, historyPath);
+      let historyState: DesktopHistoryState = {deepLinkPath: history.deepLinkPath};
+      setStateFunc(historyState, history.title, historyPath);
     }
   }
 
   /**
    * Takes the history.path provided by the browserHistoryEvent and appends additional URL parameters.
    */
-  _createHistoryPath(history) {
+  protected _createHistoryPath(history: BrowserHistoryEntry): string {
     if (!history.pathVisible) {
       return '';
     }
@@ -597,15 +648,15 @@ export default class Desktop extends Widget {
     if (objects.countOwnProperties(cloneUrl.parameterMap) > 0) {
       let pathUrl = new URL(historyPath);
       for (let paramName in cloneUrl.parameterMap) {
-        pathUrl.addParameter(paramName, cloneUrl.getParameter(paramName));
+        pathUrl.addParameter(paramName, cloneUrl.getParameter(paramName) as string);
       }
       historyPath = pathUrl.toString({alwaysFirst: ['dl', 'i']});
     }
     return historyPath;
   }
 
-  _setupDragAndDrop() {
-    let dragEnterOrOver = event => {
+  protected _setupDragAndDrop() {
+    let dragEnterOrOver = (event: JQuery.DragEnterEvent | JQuery.DragOverEvent) => {
       event.stopPropagation();
       event.preventDefault();
       // change cursor to forbidden (no dropping allowed)
@@ -614,7 +665,7 @@ export default class Desktop extends Widget {
 
     this.$container.on('dragenter', dragEnterOrOver);
     this.$container.on('dragover', dragEnterOrOver);
-    this.$container.on('drop', event => {
+    this.$container.on('drop', (event: JQuery.DropEvent) => {
       event.stopPropagation();
       event.preventDefault();
     });
@@ -625,7 +676,7 @@ export default class Desktop extends Widget {
     this.setSplitterVisible(this.navigationVisible && this.benchVisible && this.displayStyle !== Desktop.DisplayStyle.COMPACT);
   }
 
-  setSplitterVisible(visible) {
+  setSplitterVisible(visible: boolean) {
     this.setProperty('splitterVisible', visible);
   }
 
@@ -646,7 +697,7 @@ export default class Desktop extends Widget {
     }
   }
 
-  _disableContextMenu() {
+  protected _disableContextMenu() {
     // Switch off browser's default context menu for the entire scout desktop (except input fields)
     this.$container.on('contextmenu', event => {
       if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA' && !event.target.isContentEditable) {
@@ -655,7 +706,7 @@ export default class Desktop extends Widget {
     });
   }
 
-  setOutline(outline) {
+  setOutline(outline: Outline) {
     if (this.outline === outline) {
       return;
     }
@@ -686,76 +737,73 @@ export default class Desktop extends Widget {
     }
   }
 
-  _setViews(views) {
+  protected _setViews(views: Form[]) {
     if (views) {
-      views.forEach(view => {
-        view.setDisplayParent(this);
-      });
+      views.forEach(view => view.setDisplayParent(this));
     }
     this._setProperty('views', views);
   }
 
-  _setViewButtons(viewButtons) {
+  protected _setViewButtons(viewButtons: ViewButton[]) {
     this.updateKeyStrokes(viewButtons, this.viewButtons);
     this._setProperty('viewButtons', viewButtons);
   }
 
-  setMenus(menus) {
+  setMenus(menus: Menu[]) {
     if (this.header) {
       this.header.setMenus(menus);
     }
   }
 
-  _setMenus(menus) {
+  protected _setMenus(menus: Menu[]) {
     this.updateKeyStrokes(menus, this.menus);
     this._setProperty('menus', menus);
   }
 
-  _setKeyStrokes(keyStrokes) {
+  protected _setKeyStrokes(keyStrokes: KeyStroke[]) {
     this.updateKeyStrokes(keyStrokes, this.keyStrokes);
     this._setProperty('keyStrokes', keyStrokes);
   }
 
-  setNavigationHandleVisible(visible) {
+  setNavigationHandleVisible(visible: boolean) {
     this.setProperty('navigationHandleVisible', visible);
   }
 
-  _renderNavigationHandleVisible() {
+  protected _renderNavigationHandleVisible() {
     this.$container.toggleClass('has-navigation-handle', this.navigationHandleVisible);
   }
 
-  setNavigationVisible(visible) {
+  setNavigationVisible(visible: boolean) {
     this.setProperty('navigationVisible', visible);
     this.updateSplitterVisibility();
   }
 
-  setBenchVisible(visible) {
+  setBenchVisible(visible: boolean) {
     this.setProperty('benchVisible', visible);
     this.updateSplitterVisibility();
   }
 
-  setHeaderVisible(visible) {
+  setHeaderVisible(visible: boolean) {
     this.setProperty('headerVisible', visible);
   }
 
-  _setBenchLayoutData(layoutData) {
+  protected _setBenchLayoutData(layoutData: BenchColumnLayoutData | BenchColumnLayoutDataModel) {
     layoutData = BenchColumnLayoutData.ensure(layoutData);
     this._setProperty('benchLayoutData', layoutData);
   }
 
-  _setInBackground(inBackground) {
+  protected _setInBackground(inBackground: boolean) {
     this._setProperty('inBackground', inBackground);
   }
 
-  outlineDisplayStyle() {
+  outlineDisplayStyle(): TreeDisplayStyle {
     if (this.outline) {
       return this.outline.displayStyle;
     }
   }
 
   shrinkNavigation() {
-    if (this.outline && this.outline.toggleBreadcrumbStyleEnabled && this.navigationVisible &&
-      this.outlineDisplayStyle() === Tree.DisplayStyle.DEFAULT) {
+    if (this.outline && this.outline.toggleBreadcrumbStyleEnabled && this.navigationVisible && this.outlineDisplayStyle() === Tree.DisplayStyle.DEFAULT) {
       this.outline.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
     } else {
       this.setNavigationVisible(false);
@@ -775,9 +823,9 @@ export default class Desktop extends Widget {
   }
 
   /**
-   * @param {boolean} headerVisible whether the desktop header should be made visible
+   * @param headerVisible whether the desktop header should be visible. Default is true.
    */
-  switchToBench(headerVisible) {
+  switchToBench(headerVisible?: boolean) {
     this.setHeaderVisible(scout.nvl(headerVisible, true));
     this.setBenchVisible(true);
     this.setNavigationVisible(false);
@@ -811,14 +859,14 @@ export default class Desktop extends Widget {
     this._removeOfflineNotification();
   }
 
-  _removeOfflineNotification() {
+  protected _removeOfflineNotification() {
     if (this._offlineNotification) {
       setTimeout(this.removeNotification.bind(this, this._offlineNotification), 3000);
       this._offlineNotification = null;
     }
   }
 
-  addNotification(notification) {
+  addNotification(notification: DesktopNotification) {
     if (!notification) {
       return;
     }
@@ -828,7 +876,7 @@ export default class Desktop extends Widget {
     }
   }
 
-  _renderNotification(notification) {
+  protected _renderNotification(notification: DesktopNotification) {
     if (this.$notifications) {
       // Bring to front
       this.$notifications.appendTo(this.$container);
@@ -838,28 +886,24 @@ export default class Desktop extends Widget {
     notification.fadeIn(this.$notifications);
     if (notification.duration > 0) {
       notification.removeTimeout = setTimeout(notification.hide.bind(notification), notification.duration);
-      notification.one('remove', () => {
-        this.removeNotification(notification);
-      });
+      notification.one('remove', () => this.removeNotification(notification));
     }
   }
 
-  _renderNotifications() {
-    this.notifications.forEach(notification => {
-      this._renderNotification(notification);
-    });
+  protected _renderNotifications() {
+    this.notifications.forEach(notification => this._renderNotification(notification));
   }
 
   /**
    * Removes the given notification.
-   * @param {DesktopNotification|string} notification Either an instance of DesktopNavigation or a String containing an ID of a notification instance.
+   * @param notification Either an instance of DesktopNavigation or a String containing an ID of a notification instance.
    */
-  removeNotification(notification) {
-    if (typeof notification === 'string') {
-      let notificationId = notification;
-      notification = arrays.find(this.notifications, n => {
-        return notificationId === n.id;
-      });
+  removeNotification(desktopNotification: DesktopNotification | string) {
+    let notification: DesktopNotification;
+    if (typeof desktopNotification === 'string') {
+      notification = arrays.find(this.notifications, n => desktopNotification === n.id);
+    } else {
+      notification = desktopNotification;
     }
     if (!notification) {
       return;
@@ -872,16 +916,16 @@ export default class Desktop extends Widget {
       return;
     }
     if (notification.rendered) {
-      notification.one('remove', this._onNotificationRemove.bind(this, notification));
+      notification.one('remove', this._onNotificationRemove.bind(this));
     }
     notification.fadeOut();
   }
 
-  getPopups() {
+  getPopups(): Popup[] {
     if (!this.$container) {
       return [];
     }
-    let popups = [];
+    let popups: Popup[] = [];
     this.$container.children('.popup').each((i, elem) => {
       let $popup = $(elem);
       let popup = widgets.get($popup);
@@ -892,25 +936,23 @@ export default class Desktop extends Widget {
     return popups;
   }
 
-  getPopupsFor(widget) {
+  getPopupsFor(widget: Widget): Popup[] {
     return this.getPopups().filter(popup => widget.has(popup));
   }
 
   /**
    * Removes every popup which is a descendant of the given widget.
    */
-  removePopupsFor(widget) {
-    this.getPopupsFor(widget).forEach(popup => {
-      popup.remove();
-    });
+  removePopupsFor(widget: Widget) {
+    this.getPopupsFor(widget).forEach(popup => popup.remove());
   }
 
   /**
    * Opens the uri using {@link OpenUriHandler}
-   * @param {string} uri the uri to open
-   * @param {Desktop.UriAction} [action] the action to be performed on the given uri. Default is Desktop.UriAction.OPEN.
+   * @param uri the uri to open
+   * @param action the action to be performed on the given uri. Default is Desktop.UriAction.OPEN.
    */
-  openUri(uri, action) {
+  openUri(uri: string, action?: DesktopUriAction) {
     if (!this.rendered) {
       this._postRenderActions.push(this.openUri.bind(this, uri, action));
       return;
@@ -966,16 +1008,16 @@ export default class Desktop extends Widget {
    *
    * Returns 'true' if the Desktop is currently accessible to the user.
    */
-  inFront() {
+  inFront(): boolean {
     return true; // Desktop is always available to the user.
   }
 
   /**
    * === Method required for objects that act as 'displayParent' ===
    *
-   * @returns {JQuery[]} the DOM elements to paint a glassPanes over, once a modal Form, message-box, file-chooser or wait-dialog is showed with the Desktop as its 'displayParent'.
+   * @returns the DOM elements to paint a glassPanes over, once a modal Form, message-box, file-chooser or wait-dialog is showed with the Desktop as its 'displayParent'.
    */
-  _glassPaneTargets(element) {
+  protected override _glassPaneTargets(element: Widget): GlassPaneTarget[] {
     // Do not return $container, because this is the parent of all forms and message boxes. Otherwise, no form could gain focus, even the form requested desktop modality.
     let $glassPaneTargets = this.$container
       .children()
@@ -1020,7 +1062,7 @@ export default class Desktop extends Widget {
       });
     }
 
-    let glassPaneTargets;
+    let glassPaneTargets: GlassPaneTarget[];
     if (element instanceof Form && element.displayHint === Form.DisplayHint.VIEW) {
       $glassPaneTargets = $glassPaneTargets
         .not('.desktop-bench')
@@ -1042,10 +1084,8 @@ export default class Desktop extends Widget {
     return glassPaneTargets;
   }
 
-  _isGlassPaneTargetFiltered(targetElem, element) {
-    return this._glassPaneTargetFilters.every(filter => {
-      return filter(targetElem, element);
-    }, this);
+  protected _isGlassPaneTargetFiltered(targetElem: HTMLElement, element: Widget): boolean {
+    return this._glassPaneTargetFilters.every(filter => filter(targetElem, element));
   }
 
   /**
@@ -1054,15 +1094,15 @@ export default class Desktop extends Widget {
    * This filter should be used primarily for elements like the help-popup which stand outside
    * of the regular modality hierarchy.
    *
-   * @param {function} filter a function with the parameter target and element. Target is the element which
+   * @param filter a function with the parameter target and element. Target is the element which
    *     would be covered by a glass pane, element is the element the user interacts with (e.g. the modal dialog).
    * @see _glassPaneTargets
    */
-  addGlassPaneTargetFilter(filter) {
+  addGlassPaneTargetFilter(filter: GlassPaneTargetFilter) {
     this._glassPaneTargetFilters.push(filter);
   }
 
-  removeGlassPaneTargetFilter(filter) {
+  removeGlassPaneTargetFilter(filter: GlassPaneTargetFilter) {
     arrays.remove(this._glassPaneTargetFilters, filter);
   }
 
@@ -1070,24 +1110,22 @@ export default class Desktop extends Widget {
    * This 'deferred' object is used because popup windows are not immediately usable when they're opened.
    * That's why we must render the glass-pane of a popup window later. Which means, at the point in time
    * when its $container is created and ready for usage. To avoid race conditions we must also wait until
-   * the glass pane renderer is ready. Only when both conditions are fullfilled, we can render the glass
+   * the glass pane renderer is ready. Only when both conditions are fulfilled, we can render the glass
    * pane.
    */
-  _deferredGlassPaneTarget(popupWindow) {
+  protected _deferredGlassPaneTarget(popupWindow: EventEmitter & { $container: JQuery }): DeferredGlassPaneTarget {
     let deferred = new DeferredGlassPaneTarget();
-    popupWindow.one('init', () => {
-      deferred.ready([popupWindow.$container]);
-    });
+    popupWindow.one('init', () => deferred.ready([popupWindow.$container]));
     return deferred;
   }
 
-  _getBenchGlassPaneTargetsForView(view) {
-    let $glassPanes = [];
+  protected _getBenchGlassPaneTargetsForView(view: Form): JQuery[] {
+    let $glassPanes: JQuery[] = [];
 
     $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, this.header));
 
     if (this.bench) {
-      this.bench.visibleTabBoxes().forEach(function(tabBox) {
+      this.bench.visibleTabBoxes().forEach(tabBox => {
         if (!tabBox.rendered) {
           return;
         }
@@ -1096,13 +1134,13 @@ export default class Desktop extends Widget {
         } else {
           $glassPanes.push(tabBox.$container);
         }
-      }, this);
+      });
     }
     return $glassPanes;
   }
 
-  _getTabGlassPaneTargetsForView(view, tabBox) {
-    let $glassPanes = [];
+  protected _getTabGlassPaneTargetsForView(view: Form, tabBox: SimpleTabBox | DesktopHeader): JQuery[] {
+    let $glassPanes: JQuery[] = [];
     if (tabBox && tabBox.tabArea) {
       tabBox.tabArea.tabs.forEach(tab => {
         if (tab.view !== view) {
@@ -1117,19 +1155,19 @@ export default class Desktop extends Widget {
     return $glassPanes;
   }
 
-  _pushPopupWindowGlassPaneTargets(glassPaneTargets, element) {
-    this.formController._popupWindows.forEach(function(popupWindow) {
+  protected _pushPopupWindowGlassPaneTargets(glassPaneTargets: GlassPaneTarget[], element: Widget) {
+    // @ts-ignore
+    this.formController._popupWindows.forEach(popupWindow => {
       if (element === popupWindow.form) {
         // Don't block form itself
         return;
       }
-      glassPaneTargets.push(popupWindow.initialized ?
-        popupWindow.$container[0] : this._deferredGlassPaneTarget(popupWindow));
-    }, this);
+      glassPaneTargets.push(popupWindow.initialized ? popupWindow.$container[0] : this._deferredGlassPaneTarget(popupWindow));
+    });
   }
 
-  showForm(form, position) {
-    let displayParent = form.displayParent || this;
+  showForm(form: Form, position?: number) {
+    let displayParent: DisplayParent = form.displayParent || this;
     form.setDisplayParent(displayParent);
 
     this._setFormActivated(form);
@@ -1137,7 +1175,7 @@ export default class Desktop extends Widget {
     displayParent.formController.registerAndRender(form, position, true);
   }
 
-  hideForm(form) {
+  hideForm(form: Form) {
     if (!form.displayParent) {
       // showForm has probably never been called -> nothing to do here
       // May happen if form.close() is called immediately after form.open() without waiting for the open promise to resolve
@@ -1163,15 +1201,14 @@ export default class Desktop extends Widget {
   }
 
   /**
-   * @see {@link Form.isShown}
-   * @param {Form} form
+   * @see Form.isShown
    */
-  isFormShown(form) {
+  isFormShown(form: Form): boolean {
     let displayParent = form.displayParent || this;
     return displayParent.formController.isFormShown(form);
   }
 
-  activateForm(form) {
+  activateForm(form: Form) {
     if (!form) {
       this._setFormActivated(null);
       return;
@@ -1181,21 +1218,21 @@ export default class Desktop extends Widget {
     this._setFormActivated(form);
 
     // If the form has a modal child dialog, this dialog needs to be activated as well.
-    form.dialogs.forEach(function(dialog) {
+    form.dialogs.forEach(dialog => {
       if (dialog.modal) {
         this.activateForm(dialog);
       }
-    }, this);
+    });
   }
 
-  _setOutlineActivated() {
+  protected _setOutlineActivated() {
     this._setFormActivated(null);
     if (this.outline) {
       this.outline.activateCurrentPage();
     }
   }
 
-  _setFormActivated(form) {
+  protected _setFormActivated(form: Form) {
     // If desktop is in rendering process the can not set a new active form. instead the active form from the model is set selected.
     if (!this.rendered || this.initialFormRendering) {
       return;
@@ -1219,28 +1256,24 @@ export default class Desktop extends Widget {
     this.triggerFormActivate(form);
   }
 
-  triggerFormActivate(form) {
+  triggerFormActivate(form: Form) {
     this.trigger('formActivate', {
       form: form
     });
   }
 
-  cancelViews(forms) {
-    let event = new Event();
-    event.forms = forms;
-    this.trigger('cancelForms', event);
+  cancelViews(forms: Form[]) {
+    let event = this.trigger('cancelForms', {
+      forms: forms
+    });
     if (!event.defaultPrevented) {
       this._cancelViews(forms);
     }
   }
 
-  _cancelViews(forms) {
+  protected _cancelViews(forms: Form[]) {
     // do not cancel forms when the form child hierarchy does not get canceled.
-    forms = forms.filter(form => {
-      return !arrays.find(form.views, view => {
-        return view.modal;
-      });
-    });
+    forms = forms.filter((form: Form) => !arrays.find(form.views, view => view.modal));
 
     // if there's only one form simply cancel it directly
     if (forms.length === 1) {
@@ -1251,18 +1284,16 @@ export default class Desktop extends Widget {
     // collect all forms in the display child hierarchy with unsaved changes.
     let unsavedForms = forms.filter(form => {
       let requiresSaveChildDialogs = false;
-      form.visitDisplayChildren(dialog => {
+      form.visitDisplayChildren((dialog: Form) => {
         if (dialog.lifecycle.requiresSave()) {
           requiresSaveChildDialogs = true;
         }
-      }, displayChild => {
-        return displayChild instanceof Form;
-      });
+      }, displayChild => displayChild instanceof Form);
       return form.lifecycle.requiresSave() || requiresSaveChildDialogs;
     });
 
     // initialize with a resolved promise in case there are no unsaved forms.
-    let waitFor = $.resolvedPromise();
+    let waitFor: JQuery.Promise<Form[]> = $.resolvedPromise();
     if (unsavedForms.length > 0) {
       let unsavedFormChangesForm = scout.create(UnsavedFormChangesForm, {
         parent: this,
@@ -1273,7 +1304,7 @@ export default class Desktop extends Widget {
       unsavedFormChangesForm.open();
       // promise that is resolved when the UnsavedFormChangesForm is stored
       waitFor = unsavedFormChangesForm.whenSave().then(() => {
-        let formsToSave = unsavedFormChangesForm.openFormsField.value;
+        let formsToSave = unsavedFormChangesForm.openFormsField.value as Form[];
         formsToSave.forEach(form => {
           form.visitDisplayChildren(dialog => {
             // forms should be stored with ok(). Other display children can simply be closed.
@@ -1295,9 +1326,7 @@ export default class Desktop extends Widget {
       }
       // close the remaining forms that don't require saving.
       forms.forEach(form => {
-        form.visitDisplayChildren(dialog => {
-          dialog.close();
-        });
+        form.visitDisplayChildren(dialog => dialog.close());
         form.close();
       });
     });
@@ -1324,7 +1353,7 @@ export default class Desktop extends Widget {
     this.repositionTooltips();
   }
 
-  onResize(event) {
+  onResize(event: JQuery.ResizeEvent) {
     this.revalidateLayoutTree();
   }
 
@@ -1332,7 +1361,7 @@ export default class Desktop extends Widget {
     this.setPopstateHandler(this.onPopstate.bind(this));
   }
 
-  setPopstateHandler(handler) {
+  setPopstateHandler(handler: (event: JQuery.TriggeredEvent) => void) {
     if (this.rendered || this.rendering) {
       let window = this.$container.window();
       if (this._popstateHandler) {
@@ -1345,30 +1374,31 @@ export default class Desktop extends Widget {
     this._popstateHandler = handler;
   }
 
-  onPopstate(event) {
-    let historyState = event.originalEvent.state;
+  onPopstate(event: JQuery.TriggeredEvent) {
+    let originalEvent = event.originalEvent as PopStateEvent;
+    let historyState = originalEvent.state as DesktopHistoryState;
     if (historyState && historyState.deepLinkPath) {
       this.trigger('historyEntryActivate', historyState);
     }
   }
 
-  _onSplitterMove(event) {
+  protected _onSplitterMove(event: SplitterMoveEvent) {
     // disallow a position greater than 50%
     this.resizing = true;
     let max = Math.floor(this.$container.outerWidth(true) / 2);
     if (event.position > max) {
-      event.setPosition(max);
+      event.source.setPosition(max);
     }
   }
 
-  _onSplitterPositionChange(event) {
-    // No need to revalidate while layouting (desktop layout sets the splitter position and would trigger a relayout)
+  protected _onSplitterPositionChange(event: SplitterPositionChangeEvent) {
+    // No need to revalidate while layouting (desktop layout sets the splitter position and would trigger a re-layout)
     if (!this.htmlComp.layouting) {
       this.revalidateLayout();
     }
   }
 
-  _onSplitterMoveEnd(event) {
+  protected _onSplitterMoveEnd(event: SplitterMoveEndEvent) {
     let splitterPosition = event.position;
 
     // Store size
@@ -1406,17 +1436,17 @@ export default class Desktop extends Widget {
     }
   }
 
-  _loadCachedSplitterPosition() {
+  protected _loadCachedSplitterPosition(): string {
     return webstorage.getItemFromSessionStorage('scout:desktopSplitterPosition') ||
       webstorage.getItemFromLocalStorage('scout:desktopSplitterPosition:' + window.location.pathname);
   }
 
-  _storeCachedSplitterPosition(splitterPosition) {
-    webstorage.setItemToSessionStorage('scout:desktopSplitterPosition', splitterPosition);
-    webstorage.setItemToLocalStorage('scout:desktopSplitterPosition:' + window.location.pathname, splitterPosition);
+  protected _storeCachedSplitterPosition(splitterPosition: number) {
+    webstorage.setItemToSessionStorage('scout:desktopSplitterPosition', splitterPosition + '');
+    webstorage.setItemToLocalStorage('scout:desktopSplitterPosition:' + window.location.pathname, splitterPosition + '');
   }
 
-  _onNotificationRemove(notification) {
+  protected _onNotificationRemove(event: Event<DesktopNotification>) {
     if (this.notifications.length === 0 && this.$notifications) {
       this.$notifications.remove();
       this.$notifications = null;
@@ -1446,11 +1476,11 @@ export default class Desktop extends Widget {
     this._offlineNotification.reconnectFailed();
   }
 
-  dataChange(dataType) {
+  dataChange(dataType: object) {
     this.trigger('dataChange', dataType);
   }
 
-  _activeTheme() {
+  protected _activeTheme(): string {
     return cookies.get('scout.ui.theme') || Desktop.DEFAULT_THEME;
   }
 
@@ -1460,10 +1490,10 @@ export default class Desktop extends Widget {
     }
   }
 
-  _initTheme() {
+  protected _initTheme() {
     let theme = this.theme;
     if (this.url.hasParameter('theme')) {
-      theme = strings.nullIfEmpty(this.url.getParameter('theme')) || Desktop.DEFAULT_THEME;
+      theme = strings.nullIfEmpty(this.url.getParameter('theme') as string) || Desktop.DEFAULT_THEME;
     } else if (theme === null) {
       theme = this._activeTheme();
     }
@@ -1478,21 +1508,21 @@ export default class Desktop extends Widget {
    * <p>
    * Since it is a persistent cookie, the theme will be activated again the next time the app is started, unless the cookie is deleted.
    */
-  setTheme(theme) {
+  setTheme(theme: string) {
     this.setProperty('theme', theme);
     if (this.theme !== this._activeTheme()) {
       this._switchTheme(theme);
     }
   }
 
-  _switchTheme(theme) {
+  protected _switchTheme(theme: string) {
     // Add a persistent cookie which expires in 30 days
     cookies.set('scout.ui.theme', theme, 30 * 24 * 3600);
 
     // Reload page in order to download the CSS files for the new theme
     // Don't remove body but make it invisible, otherwise JS exceptions might be thrown if body is removed while an action executed
     $('body').setVisible(false);
-    let reloadOptions = {
+    let reloadOptions: ReloadPageOptions = {
       clearBody: false
     };
     // If parameter 'theme' exists in the URL, remove it now - otherwise the parameter would overrule the cookie settings
@@ -1506,17 +1536,16 @@ export default class Desktop extends Widget {
   /**
    * Moves all the given overlays (popups, dialogs, message boxes etc.) before the target overlay and activates the focus context of the target overlay.
    *
-   * @param overlaysToMove {HTMLElement[]} the overlays which should be moved before the target overlay
-   * @param $targetOverlay {$|HTMLElement} the overlay which should eventually be on top of the movable overlays
+   * @param overlaysToMove the overlays which should be moved before the target overlay
+   * @param $targetOverlay the overlay which should eventually be on top of the movable overlays
    */
-  moveOverlaysBehindAndFocus(overlaysToMove, $targetOverlay) {
+  moveOverlaysBehindAndFocus(overlaysToMove: HTMLElement[], $targetOverlay: JQuery | HTMLElement) {
     $targetOverlay = $.ensure($targetOverlay);
-    $targetOverlay.nextAll().toArray()
-      .forEach(overlay => {
-        if (arrays.containsAll(overlaysToMove, [overlay])) {
-          $(overlay).insertBefore($targetOverlay);
-        }
-      });
+    $targetOverlay.nextAll().toArray().forEach(overlay => {
+      if (arrays.containsAll(overlaysToMove, [overlay])) {
+        $(overlay).insertBefore($targetOverlay);
+      }
+    });
 
     // Activate the focus context of the form (will restore the previously focused field)
     // This must not be done when the currently focused element is part of this dialog's DOM
@@ -1531,11 +1560,12 @@ export default class Desktop extends Widget {
 
   repositionTooltips() {
     this.$container.children('.tooltip').each(function() {
-      scout.widget($(this)).position();
+      let widget = scout.widget($(this)) as Tooltip;
+      widget.position();
     });
   }
 
-  _renderTrackFocus() {
+  protected override _renderTrackFocus() {
     if (this.trackFocus) {
       // Use capture phase because FocusContext stops propagation
       this.$container[0].addEventListener('focusin', this._focusInListener, true);
@@ -1544,10 +1574,26 @@ export default class Desktop extends Widget {
     }
   }
 
-  _onFocusIn(event) {
+  protected override _onFocusIn(event: JQuery.FocusInEvent) {
     super._onFocusIn(event);
     let $target = $(event.target);
     let focusedElement = scout.widget($target);
     this.setProperty('focusedElement', focusedElement);
   }
 }
+
+export type DesktopDisplayStyle = EnumObject<typeof Desktop.DisplayStyle>;
+export type DesktopUriAction = EnumObject<typeof Desktop.UriAction>;
+export type NativeNotificationDefaults = {
+  title: string;
+  iconId: string;
+  visibility?: NativeNotificationVisibility;
+};
+export type BrowserHistoryEntry = {
+  path: string;
+  title: string;
+  deepLinkPath: string;
+  pathVisible: boolean;
+};
+export type DesktopHistoryState = { deepLinkPath: string };
+export type GlassPaneTargetFilter = (target: HTMLElement, element: Widget) => boolean;

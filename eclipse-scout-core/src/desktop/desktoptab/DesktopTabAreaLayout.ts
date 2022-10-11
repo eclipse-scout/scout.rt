@@ -3,19 +3,22 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {SimpleTabAreaLayout} from '../../index';
+import DesktopTabArea from './DesktopTabArea';
 
 export default class DesktopTabAreaLayout extends SimpleTabAreaLayout {
-  constructor(tabArea) {
+  declare tabArea: DesktopTabArea;
+
+  constructor(tabArea: DesktopTabArea) {
     super(tabArea);
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     super.layout($container);
     this.tabArea.updateFirstTabSelected();
   }

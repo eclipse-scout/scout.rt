@@ -15,6 +15,7 @@ import {
 import $ from 'jquery';
 import {FormRevealInvalidFieldEvent} from './FormEventMap';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {DisplayViewId} from '../tabbox/SimpleTab';
 import Promise = JQuery.Promise;
 
 export type DisplayHint = EnumObject<typeof Form.DisplayHint>;
@@ -28,7 +29,7 @@ export type ValidationResult = {
   reveal: () => void;
 }; // FIXME TS: move to FormField
 
-export default class Form extends Widget implements FormModel {
+export default class Form extends Widget implements FormModel, DisplayParent {
   declare model: FormModel;
   declare eventMap: FormEventMap;
 
@@ -36,7 +37,7 @@ export default class Form extends Widget implements FormModel {
   askIfNeedSave: boolean;
   askIfNeedSaveText: string;
   data: object;
-  displayViewId: string;
+  displayViewId: DisplayViewId;
   displayHint: DisplayHint;
   maximized: boolean;
   headerVisible: boolean;
@@ -805,7 +806,7 @@ export default class Form extends Widget implements FormModel {
     }
   }
 
-  setDisplayViewId(displayViewId: string) {
+  setDisplayViewId(displayViewId: DisplayViewId) {
     this.setProperty('displayViewId', displayViewId);
   }
 
@@ -1136,6 +1137,7 @@ export default class Form extends Widget implements FormModel {
     // form is attached even if children are not yet
     if ((this.isView() || this.isDialog()) && !this.detailForm) {
       // notify model this form is active
+      // @ts-ignore
       this.session.desktop._setFormActivated(this);
     }
     super._attach();
@@ -1251,7 +1253,7 @@ export default class Form extends Widget implements FormModel {
    * Visits all dialogs, messageBoxes and fileChoosers of this form in pre-order (top-down).
    * filter is an optional parameter.
    */
-  visitDisplayChildren(visitor: (child: Form | MessageBox | FileChooser) => void, filter: (child: Form | MessageBox | FileChooser) => boolean) {
+  visitDisplayChildren(visitor: (child: Form | MessageBox | FileChooser) => void, filter?: (child: Form | MessageBox | FileChooser) => boolean) {
     if (!filter) {
       filter = displayChild => true;
     }

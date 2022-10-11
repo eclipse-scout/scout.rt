@@ -14,6 +14,7 @@ import {
 } from '../index';
 import $ from 'jquery';
 import PopupModel from './PopupModel';
+import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
 
 export type PopupAlignment = EnumObject<typeof Popup.Alignment>;
 
@@ -52,7 +53,7 @@ export default class Popup extends Widget {
   protected _documentMouseDownHandler: (event: MouseEvent) => void;
   protected _anchorScrollHandler: (event: JQuery.ScrollEvent) => void;
   protected _anchorLocationChangeHandler: EventHandler;
-  protected _popupOpenHandler: EventHandler;// FIXME TS: add PopupOpenEvent as soon as Desktop has been migrated
+  protected _popupOpenHandler: EventHandler<DesktopPopupOpenEvent>;
   protected _glassPaneRenderer: GlassPaneRenderer;
   protected _openLater: boolean;
   protected _windowResizeHandler: (event: JQuery.ResizeEvent<Window>) => void;
@@ -630,7 +631,7 @@ export default class Popup extends Widget {
   /**
    * Method invoked once a popup is opened.
    */
-  protected _onPopupOpen(event: Event & { popup?: Popup }) { // FIXME TS: add PopupOpenEvent as soon as Desktop has been migrated
+  protected _onPopupOpen(event: DesktopPopupOpenEvent) {
     // Make sure child popups don't close the parent popup, we must check parent hierarchy in both directions
     // Use case: Opening of a context menu or cell editor in a form popup
     // Also, popups covered by a glass pane (a modal dialog is open) must never be closed
@@ -976,7 +977,7 @@ export default class Popup extends Widget {
    * Fire event that this popup is about to open.
    */
   protected _triggerPopupOpenEvent() {
-    this.session.desktop.trigger('popupOpen', { // FIXME TS: add PopupOpenEvent as soon as Desktop has been migrated
+    this.session.desktop.trigger('popupOpen', {
       popup: this
     });
   }

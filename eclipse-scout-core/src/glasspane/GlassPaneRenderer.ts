@@ -10,6 +10,7 @@
  */
 import {arrays, DeferredGlassPaneTarget, DisplayParent, Event, EventHandler, Form, scout, Session, Widget} from '../index';
 import $ from 'jquery';
+import {GlassPaneTarget} from '../widget/Widget';
 
 /**
  * Renders glassPanes over the 'glassPaneTargets' of a widget.
@@ -44,22 +45,21 @@ export default class GlassPaneRenderer {
   }
 
   renderGlassPanes() {
-    this.findGlassPaneTargets().forEach(glassPaneTarget => {
-      if (glassPaneTarget instanceof DeferredGlassPaneTarget) {
-        glassPaneTarget.rendererReady(this);
-        this._deferredGlassPanes.push(glassPaneTarget);
-      } else {
-        this.renderGlassPane(glassPaneTarget);
-      }
-    });
+    this.findGlassPaneTargets().forEach(glassPaneTarget => this.renderGlassPane(glassPaneTarget));
     if (!this._glassPaneRendererRegistered) {
       this.session.focusManager.registerGlassPaneRenderer(this);
       this._glassPaneRendererRegistered = true;
     }
   }
 
-  renderGlassPane($target: JQuery | HTMLElement) {
-    let $glassPaneTarget = $.ensure($target);
+  renderGlassPane(target: GlassPaneTarget) {
+    if (target instanceof DeferredGlassPaneTarget) {
+      target.rendererReady(this);
+      this._deferredGlassPanes.push(target);
+      return;
+    }
+
+    let $glassPaneTarget = $.ensure(target);
     if (this._widget.$container && this._widget.$container[0] === $glassPaneTarget[0]) {
       // Don't render a glass pane on the widget itself (necessary if glass pane is added after the widget is rendered)
       return;
@@ -147,7 +147,7 @@ export default class GlassPaneRenderer {
     this._$glassPanes.forEach($glassPane => func($glassPane));
   }
 
-  findGlassPaneTargets(): (JQuery | DeferredGlassPaneTarget)[] {
+  findGlassPaneTargets(): GlassPaneTarget[] {
     if (!this._enabled) {
       return []; // No glasspanes to be rendered, e.g. for none-modal dialogs.
     }

@@ -9,23 +9,23 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Event, SimpleTabBox, WidgetEventMap} from '../index';
-import {SimpleTabView} from './SimpleTab';
+import {OutlineContent} from '../desktop/bench/DesktopBench';
 
 export interface SimpleTabBoxViewActivateEvent<S extends SimpleTabBox = SimpleTabBox> extends Event<S> {
-  view: SimpleTabView;
+  view: OutlineContent;
 }
 
 export interface SimpleTabBoxViewAddEvent<S extends SimpleTabBox = SimpleTabBox> extends Event<S> {
-  view: SimpleTabView;
-  siblingView: SimpleTabView;
+  view: OutlineContent;
+  siblingView: OutlineContent;
 }
 
 export interface SimpleTabBoxViewDeactivateEvent<S extends SimpleTabBox = SimpleTabBox> extends Event<S> {
-  view: SimpleTabView;
+  view: OutlineContent;
 }
 
 export interface SimpleTabBoxViewRemoveEvent<S extends SimpleTabBox = SimpleTabBox> extends Event<S> {
-  view: SimpleTabView;
+  view: OutlineContent;
 }
 
 export default interface SimpleTabBoxEventMap extends WidgetEventMap {

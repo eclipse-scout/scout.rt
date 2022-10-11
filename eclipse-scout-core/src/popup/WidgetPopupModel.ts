@@ -32,5 +32,5 @@ export default interface WidgetPopupModel extends PopupModel {
   /**
    * The content of the WidgetPopup
    */
-  content: Widget | RefModel<WidgetModel>;
+  content?: Widget | RefModel<WidgetModel>;
 }

@@ -1,22 +1,23 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ContextMenuPopup, HAlign, Menu, scout, SimpleTab} from '../../index';
+import {arrays, ContextMenuPopup, HAlign, Menu, scout, SimpleTab, SimpleTabArea} from '../../index';
 
 export default class DesktopTab extends SimpleTab {
+  declare parent: SimpleTabArea;
 
   constructor() {
     super();
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this.$container.addClass('desktop-tab');
     this.$container.on('contextmenu', this._onContextMenu.bind(this));
@@ -24,7 +25,7 @@ export default class DesktopTab extends SimpleTab {
     this.$container.appendDiv('edge right');
   }
 
-  _renderClosable() {
+  protected override _renderClosable() {
     super._renderClosable();
     if (this.closable && this.view.closeKeyStroke) {
       this.view.closeKeyStroke.renderingHints = {
@@ -35,7 +36,7 @@ export default class DesktopTab extends SimpleTab {
     }
   }
 
-  _onContextMenu(event) {
+  protected _onContextMenu(event: JQuery.ContextMenuEvent) {
     let menuCloseAllTabs = scout.create(Menu, {
       parent: this,
       text: this.session.text('ui.CloseAllTabs')
@@ -61,12 +62,12 @@ export default class DesktopTab extends SimpleTab {
     popup.open();
   }
 
-  _onCloseAll() {
+  protected _onCloseAll() {
     let openViews = this.parent.tabs.map(desktopTab => desktopTab.view);
     this.session.desktop.cancelViews(openViews);
   }
 
-  _onCloseOther() {
+  protected _onCloseOther() {
     let openViews = this.parent.tabs.map(desktopTab => desktopTab.view);
     arrays.remove(openViews, this.view);
     this.session.desktop.cancelViews(openViews);

@@ -1,16 +1,41 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, DesktopHeaderLayout, DesktopLogo, DesktopTabArea, DesktopToolBox, Form, HtmlComponent, scout, ViewButtonBox, Widget} from '../../index';
+import {
+  Desktop, DesktopHeaderEventMap, DesktopHeaderLayout, DesktopHeaderModel, DesktopLogo, DesktopTabArea, DesktopToolBox, Event, EventHandler, Form, HtmlComponent, Menu, MenuBar, PropertyChangeEvent, scout, ViewButtonBox, Widget
+} from '../../index';
+import {OutlineContent} from '../bench/DesktopBench';
 
-export default class DesktopHeader extends Widget {
+export default class DesktopHeader extends Widget implements DesktopHeaderModel {
+  declare model: DesktopHeaderModel;
+  declare eventMap: DesktopHeaderEventMap;
+
+  desktop: Desktop;
+  tabArea: DesktopTabArea;
+
+  logoUrl: string;
+  logo: DesktopLogo;
+
+  toolBoxVisible: boolean;
+  toolBox: DesktopToolBox;
+
+  viewButtonBoxVisible: boolean;
+  viewButtonBox: ViewButtonBox;
+
+  outlineContent: OutlineContent;
+
+  protected _desktopPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Desktop>>;
+  protected _desktopAnimationEndHandler: EventHandler<Event<Desktop>>;
+  protected _outlineContentMenuBarVisibleChangeHandler: EventHandler<PropertyChangeEvent<boolean, MenuBar>>;
+  protected _outlineContentCssClassChangeHandler: EventHandler<PropertyChangeEvent<string, OutlineContent>>;
+  protected _viewButtonBoxPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, ViewButtonBox>>;
 
   constructor() {
     super();
@@ -27,20 +52,20 @@ export default class DesktopHeader extends Widget {
     this._viewButtonBoxPropertyChangeHandler = this._onViewButtonBoxPropertyChange.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model: DesktopHeaderModel) {
     super._init(model);
     this.desktop = this.session.desktop;
     this.updateViewButtonBoxVisibility();
     this.tabArea = this._createTabArea();
   }
 
-  _createTabArea() {
+  protected _createTabArea(): DesktopTabArea {
     return scout.create(DesktopTabArea, $.extend({
       parent: this
     }, this.tabArea));
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('desktop-header');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new DesktopHeaderLayout(this));
@@ -51,7 +76,7 @@ export default class DesktopHeader extends Widget {
     }
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderViewButtonBoxVisible();
     this._renderViewTabs();
@@ -60,18 +85,18 @@ export default class DesktopHeader extends Widget {
     this._renderInBackground();
   }
 
-  _remove() {
+  protected override _remove() {
     this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
     this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
     this._setOutlineContent(null);
     super._remove();
   }
 
-  _renderViewTabs() {
+  protected _renderViewTabs() {
     this.tabArea.render();
   }
 
-  _renderToolBox() {
+  protected _renderToolBox() {
     if (this.toolBox) {
       return;
     }
@@ -79,14 +104,14 @@ export default class DesktopHeader extends Widget {
     this.toolBox.render();
   }
 
-  _createToolBox() {
+  protected _createToolBox(): DesktopToolBox {
     return scout.create(DesktopToolBox, {
       parent: this,
       menus: this.desktop.menus
     });
   }
 
-  _removeToolBox() {
+  protected _removeToolBox() {
     if (!this.toolBox) {
       return;
     }
@@ -94,7 +119,7 @@ export default class DesktopHeader extends Widget {
     this.toolBox = null;
   }
 
-  _renderToolBoxVisible() {
+  protected _renderToolBoxVisible() {
     if (this.toolBoxVisible) {
       this._renderToolBox();
     } else {
@@ -103,7 +128,7 @@ export default class DesktopHeader extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _renderLogoUrl() {
+  protected _renderLogoUrl() {
     if (this.logoUrl) {
       this._renderLogo();
     } else {
@@ -112,7 +137,7 @@ export default class DesktopHeader extends Widget {
     this.invalidateLayoutTree();
   }
 
-  _renderLogo() {
+  protected _renderLogo() {
     if (this.desktop.displayStyle === Desktop.DisplayStyle.COMPACT) {
       // Do not render logo in compact mode (wastes space)
       return;
@@ -125,14 +150,14 @@ export default class DesktopHeader extends Widget {
     }
   }
 
-  _createLogo() {
+  protected _createLogo(): DesktopLogo {
     return scout.create(DesktopLogo, {
       parent: this,
       url: this.logoUrl
     });
   }
 
-  _removeLogo() {
+  protected _removeLogo() {
     if (!this.logo) {
       return;
     }
@@ -140,7 +165,7 @@ export default class DesktopHeader extends Widget {
     this.logo = null;
   }
 
-  _renderViewButtonBox() {
+  protected _renderViewButtonBox() {
     if (this.viewButtonBox) {
       return;
     }
@@ -151,7 +176,7 @@ export default class DesktopHeader extends Widget {
     this.updateViewButtonStyling();
   }
 
-  _createViewButtonBox() {
+  protected _createViewButtonBox(): ViewButtonBox {
     return scout.create(ViewButtonBox, {
       parent: this,
       viewButtons: this.desktop.viewButtons,
@@ -159,7 +184,7 @@ export default class DesktopHeader extends Widget {
     });
   }
 
-  _removeViewButtonBox() {
+  protected _removeViewButtonBox() {
     if (!this.viewButtonBox) {
       return;
     }
@@ -168,7 +193,7 @@ export default class DesktopHeader extends Widget {
     this.viewButtonBox = null;
   }
 
-  _renderViewButtonBoxVisible() {
+  protected _renderViewButtonBoxVisible() {
     if (this.viewButtonBoxVisible) {
       this._renderViewButtonBox();
     } else {
@@ -190,29 +215,29 @@ export default class DesktopHeader extends Widget {
     }
   }
 
-  _renderInBackground() {
+  protected _renderInBackground() {
     this.$container.toggleClass('in-background', this.desktop.inBackground);
   }
 
-  setLogoUrl(logoUrl) {
+  setLogoUrl(logoUrl: string) {
     this.setProperty('logoUrl', logoUrl);
   }
 
-  setToolBoxVisible(visible) {
+  setToolBoxVisible(visible: boolean) {
     this.setProperty('toolBoxVisible', visible);
   }
 
-  setViewButtonBoxVisible(visible) {
+  setViewButtonBoxVisible(visible: boolean) {
     this.setProperty('viewButtonBoxVisible', visible);
   }
 
-  setMenus(menus) {
+  setMenus(menus: Menu[]) {
     if (this.toolBox) {
       this.toolBox.setMenus(menus);
     }
   }
 
-  _setOutlineContent(outlineContent) {
+  protected _setOutlineContent(outlineContent: OutlineContent) {
     if (this.outlineContent === outlineContent) {
       return;
     }
@@ -229,12 +254,12 @@ export default class DesktopHeader extends Widget {
     this.setViewButtonBoxVisible(this.desktop.viewButtons.some(button => button.visible) && !this.desktop.navigationVisible && this.desktop.displayStyle !== Desktop.DisplayStyle.COMPACT);
   }
 
-  _attachOutlineContentHandlers() {
+  protected _attachOutlineContentHandlers() {
     this._attachOutlineContentMenuBarHandler();
     this._attachOutlineContentCssClassHandler();
   }
 
-  _attachOutlineContentMenuBarHandler() {
+  protected _attachOutlineContentMenuBarHandler() {
     if (!this.outlineContent) {
       return;
     }
@@ -244,19 +269,19 @@ export default class DesktopHeader extends Widget {
     }
   }
 
-  _attachOutlineContentCssClassHandler() {
+  protected _attachOutlineContentCssClassHandler() {
     if (!this.outlineContent) {
       return;
     }
     this.outlineContent.on('propertyChange:cssClass', this._outlineContentCssClassChangeHandler);
   }
 
-  _detachOutlineContentHandlers() {
+  protected _detachOutlineContentHandlers() {
     this._detachOutlineContentMenuBarHandler();
     this._detachOutlineContentCssClassHandler();
   }
 
-  _detachOutlineContentMenuBarHandler() {
+  protected _detachOutlineContentMenuBarHandler() {
     if (!this.outlineContent) {
       return;
     }
@@ -266,17 +291,18 @@ export default class DesktopHeader extends Widget {
     }
   }
 
-  _detachOutlineContentCssClassHandler() {
+  protected _detachOutlineContentCssClassHandler() {
     if (!this.outlineContent) {
       return;
     }
     this.outlineContent.off('propertyChange:cssClass', this._outlineContentCssClassChangeHandler);
   }
 
-  _outlineContentMenuBar(outlineContent) {
+  protected _outlineContentMenuBar(outlineContent: OutlineContent): MenuBar {
     if (outlineContent instanceof Form) {
       return outlineContent.rootGroupBox.menuBar;
     }
+    // @ts-ignore
     return outlineContent.menuBar;
   }
 
@@ -285,14 +311,14 @@ export default class DesktopHeader extends Widget {
     this._updateOutlineContentHasDimmedBackground();
   }
 
-  _getOutlineContentForViewButtonStyling() {
+  protected _getOutlineContentForViewButtonStyling(): OutlineContent {
     if (!this.viewButtonBoxVisible || !this.outlineContent || !this.outlineContent.visible) {
       return;
     }
     return this.outlineContent;
   }
 
-  _updateOutlineContentHasMenuBar() {
+  protected _updateOutlineContentHasMenuBar() {
     let outlineContent = this._getOutlineContentForViewButtonStyling();
     if (!outlineContent) {
       return;
@@ -302,12 +328,13 @@ export default class DesktopHeader extends Widget {
       let rootGroupBox = outlineContent.rootGroupBox;
       hasMenuBar = rootGroupBox.menuBar && rootGroupBox.menuBarVisible && rootGroupBox.menuBar.visible;
     } else {
+      // @ts-ignore
       hasMenuBar = outlineContent.menuBar && outlineContent.menuBar.visible;
     }
     this.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
   }
 
-  _updateOutlineContentHasDimmedBackground() {
+  protected _updateOutlineContentHasDimmedBackground() {
     let outlineContent = this._getOutlineContentForViewButtonStyling();
     if (!outlineContent) {
       return;
@@ -319,7 +346,7 @@ export default class DesktopHeader extends Widget {
     this.$container.toggleClass('outline-content-has-dimmed-background', hasDimmedBackground);
   }
 
-  _onDesktopNavigationVisibleChange(event) {
+  protected _onDesktopNavigationVisibleChange() {
     // If navigation gets visible: Hide view buttons immediately
     // If navigation gets hidden using animation: Show view buttons when animation ends
     if (this.desktop.navigationVisible) {
@@ -327,29 +354,29 @@ export default class DesktopHeader extends Widget {
     }
   }
 
-  _onDesktopAnimationEnd(event) {
+  protected _onDesktopAnimationEnd(event: Event<Desktop>) {
     this.updateViewButtonBoxVisibility();
   }
 
-  onBenchOutlineContentChange(content) {
+  onBenchOutlineContentChange(content: OutlineContent, oldContent: OutlineContent) {
     this._setOutlineContent(content);
   }
 
-  _onDesktopPropertyChange(event) {
+  protected _onDesktopPropertyChange(event: PropertyChangeEvent<any, Desktop>) {
     if (event.propertyName === 'navigationVisible') {
       this._onDesktopNavigationVisibleChange();
     }
   }
 
-  _onOutlineContentMenuBarVisibleChange(event) {
+  protected _onOutlineContentMenuBarVisibleChange(event: PropertyChangeEvent<boolean, MenuBar>) {
     this._updateOutlineContentHasMenuBar();
   }
 
-  _onOutlineContentCssClassChange(event) {
+  protected _onOutlineContentCssClassChange(event: PropertyChangeEvent<string, OutlineContent>) {
     this._updateOutlineContentHasDimmedBackground();
   }
 
-  _onViewButtonBoxPropertyChange(event) {
+  protected _onViewButtonBoxPropertyChange(event: PropertyChangeEvent<any, ViewButtonBox>) {
     if (event.propertyName === 'menuButtons' || event.propertyName === 'tabButtons') {
       this.invalidateLayoutTree();
     }

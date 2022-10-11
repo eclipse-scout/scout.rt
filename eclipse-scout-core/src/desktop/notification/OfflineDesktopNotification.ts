@@ -1,24 +1,26 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopNotification, Status} from '../../index';
+import {DesktopNotification, DesktopNotificationModel, Status} from '../../index';
 
 export default class OfflineDesktopNotification extends DesktopNotification {
+  connectFailedReset: number;
+  connectionInterruptedStatus: Status;
+  reconnectingStatus: Status;
 
   constructor() {
     super();
-
     this.connectFailedReset = null;
   }
 
-  _init(model) {
+  protected override _init(model: DesktopNotificationModel) {
     super._init(model);
     this.closable = false;
     this.duration = DesktopNotification.INFINITE;
@@ -35,7 +37,7 @@ export default class OfflineDesktopNotification extends DesktopNotification {
     this._setStatus(this.connectionInterruptedStatus);
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this.$content.addClass('offline-message');
     this.$messageText.addClass('offline-message-text');

@@ -1,32 +1,25 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Column, MenuBar, Page, scout, Table, TableRow} from '../../../index';
 import $ from 'jquery';
+import {TableRowActionEvent} from '../../../table/TableEventMap';
 
-/**
- * @class
- * @extends Page
- */
 export default class PageWithNodes extends Page {
 
   constructor() {
     super();
-
     this.nodeType = Page.NodeType.NODES;
   }
 
-  /**
-   * @override Page.js
-   */
-  _createDetailTable() {
+  protected override _createDetailTable(): Table {
     let nodeColumn = scout.create(Column, {
       id: 'NodeColumn',
       session: this.session
@@ -43,11 +36,11 @@ export default class PageWithNodes extends Page {
     return table;
   }
 
-  _onDetailTableRowAction(event) {
+  protected _onDetailTableRowAction(event: TableRowActionEvent) {
     this.getOutline().mediator.onTableRowAction(event, this);
   }
 
-  _rebuildDetailTable(childPages) {
+  protected _rebuildDetailTable(childPages: Page[]) {
     let table = this.detailTable;
     if (!table) {
       return;
@@ -58,7 +51,7 @@ export default class PageWithNodes extends Page {
     table.insertRows(rows);
   }
 
-  _unlinkAllTableRows(rows) {
+  protected _unlinkAllTableRows(rows: TableRow[]) {
     rows.forEach(row => {
       if (row.page) {
         row.page.unlinkWithRow(row);
@@ -66,21 +59,18 @@ export default class PageWithNodes extends Page {
     });
   }
 
-  _createTableRowsForChildPages(childPages) {
-    return childPages.map(function(childPage) {
+  protected _createTableRowsForChildPages(childPages: Page[]): TableRow[] {
+    return childPages.map(childPage => {
       let row = scout.create(TableRow, {
         parent: this.detailTable,
         cells: [childPage.text]
       });
       childPage.linkWithRow(row);
       return row;
-    }, this);
+    });
   }
 
-  /**
-   * @override TreeNode.js
-   */
-  loadChildren() {
+  override loadChildren() {
     this.childrenLoaded = false;
     return this._createChildPages().done(childPages => {
       this._rebuildDetailTable(childPages);
@@ -93,9 +83,8 @@ export default class PageWithNodes extends Page {
 
   /**
    * Override this method to create child pages for this page. The default impl. returns an empty array.
-   * @return {$.Deferred}
    */
-  _createChildPages() {
+  protected _createChildPages(): JQuery.Deferred<Page[]> {
     return $.resolvedDeferred(this.childNodes);
   }
 }

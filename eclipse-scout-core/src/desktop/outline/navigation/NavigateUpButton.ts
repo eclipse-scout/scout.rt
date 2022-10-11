@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -21,18 +21,18 @@ export default class NavigateUpButton extends NavigateButton {
     this.keyStroke = 'backspace';
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this.$container.addClass('up');
   }
 
-  _isDetail() {
+  protected _isDetail(): boolean {
     // Button is in "detail mode" if there are both detail form and detail table visible and detail form _is_ hidden.
     return !!(this.node.detailFormVisible && this.node.detailForm &&
       this.node.detailTableVisible && this.node.detailTable && !this.node.detailFormVisibleByUi);
   }
 
-  _toggleDetail() {
+  protected _toggleDetail(): boolean {
     return true;
   }
 
@@ -40,12 +40,12 @@ export default class NavigateUpButton extends NavigateButton {
    * Returns true when current node has either a parentNode or if current node is a
    * top-level node without a parent and the outline has a default detail-form.
    */
-  _buttonEnabled() {
+  protected _buttonEnabled(): boolean {
     let parentNode = this.node.parentNode;
     return !!parentNode || !!this.outline.defaultDetailForm || !!this.outline.outlineOverview;
   }
 
-  _drill() {
+  protected _drill() {
     let parentNode = this.node.parentNode;
     if (parentNode) {
       $.log.isDebugEnabled() && $.log.debug('drill up to node ' + parentNode);

@@ -11,7 +11,7 @@
 import {
   Action, AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, ContextMenuKeyStroke, ContextMenuPopup, Desktop, Device, DoubleClickSupport, dragAndDrop,
   DragAndDropHandler, EnumObject, Event, EventHandler, Filter, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStroke, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus,
-  NumberColumn, objects, Popup, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
+  NumberColumn, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
   TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
   TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip,
   TableTooltipModel, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, UpdateFilteredElementsOptions, ValueField, Widget
@@ -25,7 +25,9 @@ import {StatusOrModel} from '../status/Status';
 import {HorizontalAlignment} from '../cell/Cell';
 import {DragAndDropType} from '../util/dragAndDrop';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {DisplayViewId} from '../tabbox/SimpleTab';
 import {FilterOrFunction} from '../widget/FilterSupport';
+import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
 
 export default class Table extends Widget implements TableModel {
   declare model: TableModel;
@@ -37,6 +39,7 @@ export default class Table extends Widget implements TableModel {
   columns: Column[];
   contextColumn: Column;
   checkable: boolean;
+  displayViewId: DisplayViewId; // set by DesktopBench
   checkableStyle: TableCheckableStyle;
   cellEditorPopup: CellEditorPopup;
   compact: boolean;
@@ -131,7 +134,7 @@ export default class Table extends Widget implements TableModel {
   protected _permanentHeadSortColumns: Column[];
   protected _permanentTailSortColumns: Column[];
   protected _filterMenusHandler: (menuItems: Menu[], destination: MenuDestinations) => Menu[];
-  protected _popupOpenHandler: EventHandler<Event<Desktop>>; // FIXME TS: replace with DesktopPopupOpenEvent as soon as Desktop has been migrated.
+  protected _popupOpenHandler: EventHandler<DesktopPopupOpenEvent>;
   protected _rerenderViewPortAfterAttach: boolean;
   protected _renderViewportBlocked: boolean;
   protected _renderViewPortAfterAttach: boolean;
@@ -5476,9 +5479,8 @@ export default class Table extends Widget implements TableModel {
   }
 
   // same as on Tree.prototype._onDesktopPopupOpen
-  protected _onDesktopPopupOpen(event: Event<Desktop>) { // FIXME TS: replace with DesktopPopupOpenEvent as soon as Desktop has been migrated and remove ts-ignore and cast.
-    // @ts-ignore
-    let popup = event.popup as Popup;
+  protected _onDesktopPopupOpen(event: DesktopPopupOpenEvent) {
+    let popup = event.popup;
     if (!this.isFocusable(false)) {
       return;
     }

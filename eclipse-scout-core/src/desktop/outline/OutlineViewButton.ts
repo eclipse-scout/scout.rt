@@ -1,16 +1,20 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ViewButton} from '../../index';
+import {Outline, OutlineViewButtonEventMap, OutlineViewButtonModel, ViewButton} from '../../index';
 
-export default class OutlineViewButton extends ViewButton {
+export default class OutlineViewButton extends ViewButton implements OutlineViewButtonModel {
+  declare model: OutlineViewButtonModel;
+  declare eventMap: OutlineViewButtonEventMap;
+
+  outline: Outline;
 
   constructor() {
     super();
@@ -20,29 +24,26 @@ export default class OutlineViewButton extends ViewButton {
     this._addCloneProperties(['outline']);
   }
 
-  _init(model) {
+  protected override _init(model: OutlineViewButtonModel) {
     super._init(model);
     this._setOutline(this.outline);
   }
 
-  _setOutline(outline) {
+  protected _setOutline(outline: Outline) {
     this._setProperty('outline', outline);
     if (this.outline) {
       this.outline.setIconId(this.iconId);
     }
   }
 
-  _setIconId(iconId) {
+  protected _setIconId(iconId: string) {
     this._setProperty('iconId', iconId);
     if (this.outline) {
       this.outline.setIconId(this.iconId);
     }
   }
 
-  /**
-   * @override
-   */
-  _doAction() {
+  protected override _doAction() {
     super._doAction();
     if (this.outline) {
       this.session.desktop.setOutline(this.outline);
@@ -50,7 +51,7 @@ export default class OutlineViewButton extends ViewButton {
     }
   }
 
-  onOutlineChange(outline) {
+  onOutlineChange(outline: Outline) {
     let selected = !!outline && this.outline === outline;
     this.setSelected(selected);
   }
