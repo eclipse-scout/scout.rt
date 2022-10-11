@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -29,6 +29,7 @@ export default class Popup extends Widget {
     this.windowPaddingX = 10;
     this.windowPaddingY = 5;
     this.withGlassPane = false;
+    this._withGlassPane = null;
     this.withFocusContext = true;
     this.initialFocus = () => FocusRule.AUTO;
     this.focusableContainer = false;
@@ -67,12 +68,19 @@ export default class Popup extends Widget {
     // This is necessary because the mousedown listener is attached to the capture phase and therefore executed before any other.
     // If anchor was clicked, popup would already be closed and then opened again -> popup could never be closed by clicking the anchor
     this.closeOnAnchorMouseDown = true;
+    this._closeOnAnchorMouseDown = null;
 
     // Defines whether the popup should be closed on a mouse click outside of the popup
     this.closeOnMouseDownOutside = true;
+    this._closeOnMouseDownOutside = null;
 
     // Defines whether the popup should be closed whenever another popup opens.
     this.closeOnOtherPopupOpen = true;
+    this._closeOnOtherPopupOpen = null;
+
+    // Defines whether the popup should behave like a modal form. If true, the properties closeOnAnchorMouseDown, closeOnMouseDownOutside
+    // and closeOnOtherPopupOpen ore overruled and set to false. The property withGlassPane is overruled too and set to true.
+    this.modal = false;
 
     this._openLater = false;
 
@@ -145,10 +153,8 @@ export default class Popup extends Widget {
     if (options.location) {
       this.anchorBounds = new Rectangle(options.location.x, options.location.y, 0, 0);
     }
-    if (this.withGlassPane) {
-      this._glassPaneRenderer = new GlassPaneRenderer(this);
-    }
     this._setAnchor(this.anchor);
+    this._setModal(this.modal);
   }
 
   /**
@@ -303,6 +309,7 @@ export default class Popup extends Widget {
     this._renderWithArrow();
     this._renderWithFocusContext();
     this._renderWithGlassPane();
+    this._renderModal();
   }
 
   _postRender() {
@@ -387,9 +394,89 @@ export default class Popup extends Widget {
     this.session.focusManager.installFocusContext(this.$container, FocusRule.PREPARE);
   }
 
+  setModal(modal) {
+    this.setProperty('modal', modal);
+  }
+
+  _setModal(modal) {
+    this._setProperty('modal', modal);
+    if (modal) {
+      widgets.preserveAndSetProperty(() => this.setProperty('withGlassPane', true), () => this.withGlassPane, this, '_withGlassPane');
+      widgets.preserveAndSetProperty(() => this.setProperty('closeOnAnchorMouseDown', false), () => this.closeOnAnchorMouseDown, this, '_closeOnAnchorMouseDown');
+      widgets.preserveAndSetProperty(() => this.setProperty('closeOnMouseDownOutside', false), () => this.closeOnMouseDownOutside, this, '_closeOnMouseDownOutside');
+      widgets.preserveAndSetProperty(() => this.setProperty('closeOnOtherPopupOpen', false), () => this.closeOnOtherPopupOpen, this, '_closeOnOtherPopupOpen');
+    } else {
+      widgets.resetProperty(v => this.setWithGlassPane(v), this, '_withGlassPane');
+      widgets.resetProperty(v => this.setCloseOnAnchorMouseDown(v), this, '_closeOnAnchorMouseDown');
+      widgets.resetProperty(v => this.setCloseOnMouseDownOutside(v), this, '_closeOnMouseDownOutside');
+      widgets.resetProperty(v => this.setCloseOnOtherPopupOpen(v), this, '_closeOnOtherPopupOpen');
+    }
+  }
+
+  _renderModal() {
+    this.$container.toggleClass('modal', this.modal);
+  }
+
+  setWithGlassPane(withGlassPane) {
+    if (!this.modal) {
+      this.setProperty('withGlassPane', withGlassPane);
+    } else {
+      this._withGlassPane = withGlassPane;
+    }
+  }
+
   _renderWithGlassPane() {
-    if (this._glassPaneRenderer) {
+    if (this.withGlassPane && !this._glassPaneRenderer) {
+      this._glassPaneRenderer = new GlassPaneRenderer(this);
       this._glassPaneRenderer.renderGlassPanes();
+    } else if (!this.withGlassPane && this._glassPaneRenderer) {
+      this._glassPaneRenderer.removeGlassPanes();
+      this._glassPaneRenderer = null;
+    }
+  }
+
+  setCloseOnMouseDownOutside(closeOnMouseDownOutside) {
+    if (!this.modal) {
+      this.setProperty('closeOnMouseDownOutside', closeOnMouseDownOutside);
+    } else {
+      this._closeOnMouseDownOutside = closeOnMouseDownOutside;
+    }
+  }
+
+  _renderCloseOnMouseDownOutside() {
+    // The listener needs to be executed in the capturing phase -> prevents that _onDocumentMouseDown will be executed right after the popup gets opened using mouse down, otherwise the popup would be closed immediately
+    if (this.closeOnMouseDownOutside && !this._documentMouseDownHandler) {
+      this._documentMouseDownHandler = this._onDocumentMouseDown.bind(this);
+      this.$container.document(true).addEventListener('mousedown', this._documentMouseDownHandler, true); // true=the event handler is executed in the capturing phase
+    } else if (!this.closeOnMouseDownOutside && this._documentMouseDownHandler) {
+      this.$container.document(true).removeEventListener('mousedown', this._documentMouseDownHandler, true);
+      this._documentMouseDownHandler = null;
+    }
+  }
+
+  setCloseOnAnchorMouseDown(closeOnAnchorMouseDown) {
+    if (!this.modal) {
+      this.setProperty('closeOnAnchorMouseDown', closeOnAnchorMouseDown);
+    } else {
+      this._closeOnAnchorMouseDown = closeOnAnchorMouseDown;
+    }
+  }
+
+  setCloseOnOtherPopupOpen(closeOnOtherPopupOpen) {
+    if (!this.modal) {
+      this.setProperty('closeOnOtherPopupOpen', closeOnOtherPopupOpen);
+    } else {
+      this._closeOnOtherPopupOpen = closeOnOtherPopupOpen;
+    }
+  }
+
+  _renderCloseOnOtherPopupOpen() {
+    if (this.closeOnOtherPopupOpen && !this._popupOpenHandler) {
+      this._popupOpenHandler = this._onPopupOpen.bind(this);
+      this.session.desktop.on('popupOpen', this._popupOpenHandler);
+    } else if (!this.closeOnOtherPopupOpen && this._popupOpenHandler) {
+      this.session.desktop.off('popupOpen', this._popupOpenHandler);
+      this._popupOpenHandler = null;
     }
   }
 
@@ -486,17 +573,9 @@ export default class Popup extends Widget {
    */
   _attachCloseHandlers() {
     // Install mouse close handler
-    // The listener needs to be executed in the capturing phase -> prevents that _onDocumentMouseDown will be executed right after the popup gets opened using mouse down, otherwise the popup would be closed immediately
-    if (this.closeOnMouseDownOutside) {
-      this._documentMouseDownHandler = this._onDocumentMouseDown.bind(this);
-      this.$container.document(true).addEventListener('mousedown', this._documentMouseDownHandler, true); // true=the event handler is executed in the capturing phase
-    }
-
+    this._renderCloseOnMouseDownOutside();
     // Install popup open close handler
-    if (this.closeOnOtherPopupOpen) {
-      this._popupOpenHandler = this._onPopupOpen.bind(this);
-      this.session.desktop.on('popupOpen', this._popupOpenHandler);
-    }
+    this._renderCloseOnOtherPopupOpen();
   }
 
   _attachAnchorHandlers() {
