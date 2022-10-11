@@ -209,6 +209,17 @@
 
   & > .content {
     #scout.overflow-ellipsis();
+
+    & > .icon {
+      padding-right: 3px;
+      font-size: 14px;
+      display: inline-block;
+      min-width: 20px;
+    }
+
+    & > .subject {
+      vertical-align: top;
+    }
   }
 
   & > .calendar-component-leftcolorborder {
@@ -220,7 +231,7 @@
     background-color: @palette-blue-1; /* Default colors used when component has no specific class */
   }
 
-   /* Default colors used when component has no specific class */
+  /* Default colors used when component has no specific class */
   background-color: @palette-blue-0;
 
   &:hover {
@@ -292,13 +303,79 @@
   }
 }
 
+.widget-popup > .calendar-component-tooltip-content.tooltip-content {
+  padding: 0;
+  #scout.font-text-normal();
+  max-width: 300px;
+  max-height: 500px;
+}
+
+.calendar-component-header {
+  padding: 18px 18px 10px 18px;
+  background-color: @table-header-background-color;
+
+  &:not(.with-description) {
+    padding-bottom: 18px;
+  }
+}
+
+.calendar-component-title-label {
+  color: @top-label-color;
+  font-size: @top-label-font-size;
+  padding-bottom: @top-label-border-padding-bottom;
+}
+
 .calendar-component-title {
   font-weight: bold;
+  font-size: @font-size-plus;
 }
 
 .calendar-component-intro {
   font-size: 11px;
+  margin-top: 9px;
   color: @calendar-component-intro-color;
+
+  & > .icon {
+    padding-right: 9px;
+    display: inline-block;
+    font-size: 12px;
+    line-height: 15px;
+    min-width: 27px;
+    text-align: center;
+    vertical-align: middle;
+  }
+}
+
+.calendar-component-description-container {
+  padding: 10px 18px 18px 18px;
+}
+
+.calendar-component-description-element {
+
+  display: flex;
+  align-items: center;
+
+  & > .icon {
+    padding-right: 9px;
+    display: inline-block;
+    min-width: 27px;
+    vertical-align: top;
+    text-align: center;
+  }
+
+  & > .text {
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  &:not(.first) {
+    padding-top: 10px;
+    border-top: 1px solid @tooltip-border-color;
+  }
+
+  &:not(.last) {
+    padding-bottom: 10px;
+  }
 }
 
 .calendar-list-container {
@@ -321,6 +398,12 @@
     background-color: transparent !important; /* NOSONAR (required to override original component background color) */
     margin-top: 12px;
     color: @text-color;
+
+    & > .content {
+      width: 100%;
+      white-space: normal;
+      line-height: normal;
+    }
   }
 }
 

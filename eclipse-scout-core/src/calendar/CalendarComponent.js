@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
+import {dates, icons, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
 import $ from 'jquery';
 
 export default class CalendarComponent extends Widget {
@@ -118,7 +118,11 @@ export default class CalendarComponent extends Widget {
         .mouseup(this._onMouseUp.bind(this))
         .on('contextmenu', this._onContextMenu.bind(this));
       $part.appendDiv('calendar-component-leftcolorborder');
-      $part.appendDiv('content', this.item.subject);
+      let $partContent = $part.appendDiv('content');
+      if (this.item.subjectIconId) {
+        $partContent.appendIcon(this.item.subjectIconId);
+      }
+      $partContent.appendSpan('subject', this.item.subject);
 
       this._$parts.push($part);
 
@@ -278,11 +282,11 @@ export default class CalendarComponent extends Widget {
         horizontalAlignment: Popup.Alignment.LEFT,
         verticalAlignment: Popup.Alignment.CENTER,
         trimWidth: false,
-        trimHeight: false,
+        trimHeight: true,
         horizontalSwitch: true,
-        verticalSwitch: true,
+        verticalSwitch: false,
         withArrow: true,
-        cssClass: 'tooltip',
+        cssClass: 'popup',
         scrollType: 'remove',
         location: {
           y: event.originalEvent.clientY
@@ -290,11 +294,14 @@ export default class CalendarComponent extends Widget {
         widget: {
           objectType: Label,
           htmlEnabled: true,
-          cssClass: 'tooltip-content',
-          value: this._description()
+          scrollable: true,
+          cssClass: 'calendar-component-tooltip-content tooltip-content',
+          value: this._description(true)
         }
       });
       popup.open();
+      popup.$container.find('.app-link')
+        .on('click', this._onAppLinkAction.bind(this));
     }
   }
 
@@ -306,19 +313,27 @@ export default class CalendarComponent extends Widget {
     return dates.format(date, this.session.locale, pattern);
   }
 
-  _description() {
-    let descParts = [],
-      range = null,
+  _description(linkAllowed) {
+    let range = null,
       text = '',
       fromDate = dates.parseJsonDate(this.fromDate),
-      toDate = dates.parseJsonDate(this.toDate);
+      toDate = dates.parseJsonDate(this.toDate),
+      descriptionAvailable = strings.hasText(this.item.description) || this.item.descriptionElements;
+
+    let $header = $('<div>').addClass('calendar-component-header');
+    if (descriptionAvailable) {
+      $header.addClass('with-description');
+    }
 
     // subject
     if (strings.hasText(this.item.subject)) {
-      descParts.push({
-        text: strings.encode(this.item.subject),
-        cssClass: 'calendar-component-title'
-      });
+      if (strings.hasText(this.item.subjectLabel)) {
+        $header.appendDiv('calendar-component-title-label', this.item.subjectLabel);
+      }
+      let $subject = $header.appendDiv('calendar-component-title', this.item.subject);
+      if (linkAllowed && strings.hasText(this.item.subjectAppLink)) {
+        $subject.addClass('app-link').attr('data-ref', this.item.subjectAppLink);
+      }
     }
 
     // time-range
@@ -331,24 +346,63 @@ export default class CalendarComponent extends Widget {
     }
 
     if (strings.hasText(range)) {
-      descParts.push({
-        text: range,
-        cssClass: 'calendar-component-intro'
-      });
+      let $timeContainer = $header.appendDiv('calendar-component-intro');
+      $timeContainer.appendIcon(icons.CLOCK);
+      $timeContainer.appendSpan('', range);
     }
 
-    // description
-    if (strings.hasText(this.item.description)) {
-      descParts.push({
-        text: strings.nl2br(this.item.description)
-      });
-    }
+    text += $header[0].outerHTML;
 
-    // build text
-    descParts.forEach(part => {
-      text += (part.cssClass ? '<span class="' + part.cssClass + '">' + part.text + '</span>' : part.text) + '<br/>';
-    });
+    if (descriptionAvailable) {
+      let $description = $('<div>').addClass('calendar-component-description-container');
+
+      // description
+      if (strings.hasText(this.item.description)) {
+        $description.appendSpan('calendar-component-description').html(strings.nl2br(this.item.description));
+      }
+
+      if (this.item.descriptionElements) {
+        let descriptionIconExists = false;
+        for (let i = 0; i < this.item.descriptionElements.length; i++) {
+          if (this.item.descriptionElements[i].iconId) {
+            descriptionIconExists = true;
+            break;
+          }
+        }
+        for (let i = 0; i < this.item.descriptionElements.length; i++) {
+          let descriptionElement = this.item.descriptionElements[i];
+          let $descriptionElementContainer = $description.appendDiv('calendar-component-description-element');
+          if (i === 0) {
+            $descriptionElementContainer.addClass('first');
+          }
+          if (i === this.item.descriptionElements.length - 1) {
+            $descriptionElementContainer.addClass('last');
+          }
+          if (strings.hasText(descriptionElement.iconId) || descriptionIconExists) {
+            $descriptionElementContainer.appendIcon(descriptionElement.iconId);
+          }
+          let $text = $descriptionElementContainer.appendDiv('text').html(strings.nl2br(descriptionElement.text));
+          if (linkAllowed && strings.hasText(descriptionElement.appLink)) {
+            $text.addClass(' app-link').attr('data-ref', descriptionElement.appLink);
+          }
+        }
+      }
+
+      text += $description[0].outerHTML;
+    }
 
     return text;
+  }
+
+  triggerAppLinkAction(ref) {
+    this.trigger('appLinkAction', {
+      ref: ref
+    });
+  }
+
+  _onAppLinkAction(event) {
+    let $target = $(event.delegateTarget);
+    let ref = $target.data('ref');
+    this.triggerAppLinkAction(ref);
   }
 }
