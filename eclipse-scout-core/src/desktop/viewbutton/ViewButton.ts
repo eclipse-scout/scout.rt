@@ -1,51 +1,50 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Desktop, HtmlComponent, ViewButtonActionKeyStroke} from '../../index';
+import {Action, ActionKeyStroke, Desktop, EventHandler, HtmlComponent, PropertyChangeEvent, ViewButtonActionKeyStroke, ViewButtonEventMap, ViewButtonModel} from '../../index';
+import {ViewButtonDisplayStyle} from './ViewButtonModel';
 
-export default class ViewButton extends Action {
+export default class ViewButton extends Action implements ViewButtonModel {
+  declare model: ViewButtonModel;
+  declare eventMap: ViewButtonEventMap;
+
+  displayStyle: ViewButtonDisplayStyle;
+  selectedAsMenu: boolean;
+
+  protected _desktopInBackgroundHandler: EventHandler<PropertyChangeEvent<boolean, Desktop>>;
 
   constructor() {
     super();
     this.showTooltipWhenSelected = false;
     this.displayStyle = 'TAB';
-    /**
-     * Indicates if this view button is currently the "selected button" in the ViewMenuTab widget,
-     * i.e. if it was the last view button of type MENU to have been selected. Note that the
-     * "selected" property does not necessarily have to be true as well, since an other button of
-     * type TAB might currently be selected. This information is used when restoring the "selected
-     * button" when the ViewMenuTab widget is removed and restored again, e.g. when toggling the
-     * desktop's 'navigationVisible' property.
-     * @type {boolean}
-     */
     this.selectedAsMenu = false;
     this._desktopInBackgroundHandler = this._onDesktopInBackgroundChange.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model: ViewButtonModel) {
     super._init(model);
     this.session.desktop.on('propertyChange:inBackground', this._desktopInBackgroundHandler);
   }
 
-  _destroy() {
+  protected override _destroy() {
     this.session.desktop.off('propertyChange:inBackground', this._desktopInBackgroundHandler);
     super._destroy();
   }
 
-  renderAsTab($parent) {
+  renderAsTab($parent: JQuery) {
     let $wrapper = $parent.appendDiv('view-tab-wrapper');
     this.render($wrapper);
     this.$container.addClass('view-tab view-button-tab');
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('view-button')
       .on('mousedown', this._onMouseEvent.bind(this));
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
@@ -53,7 +52,7 @@ export default class ViewButton extends Action {
     this.$container.appendDiv('edge right');
   }
 
-  _remove() {
+  protected override _remove() {
     let $wrapper = this.$container.parent();
     if ($wrapper.hasClass('view-tab-wrapper')) {
       $wrapper.remove();
@@ -61,12 +60,12 @@ export default class ViewButton extends Action {
     super._remove();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderInBackground();
   }
 
-  _renderInBackground() {
+  protected _renderInBackground() {
     if (this.session.desktop.displayStyle === Desktop.DisplayStyle.COMPACT) {
       return;
     }
@@ -80,33 +79,27 @@ export default class ViewButton extends Action {
     this.$container.toggleClass('in-background', this.session.desktop.inBackground);
   }
 
-  /**
-   * @override
-   */
-  _renderText() {
+  protected override _renderText() {
     // No text
   }
 
-  setDisplayStyle(displayStyle) {
+  setDisplayStyle(displayStyle: ViewButtonDisplayStyle) {
     this.setProperty('displayStyle', displayStyle);
   }
 
-  _onMouseEvent(event) {
+  protected _onMouseEvent(event: JQuery.MouseDownEvent) {
     this.doAction();
   }
 
-  /**
-   * @override Action.js
-   */
-  _createActionKeyStroke() {
+  protected override _createActionKeyStroke(): ActionKeyStroke {
     return new ViewButtonActionKeyStroke(this);
   }
 
-  setSelectedAsMenu(selectedAsMenu) {
+  setSelectedAsMenu(selectedAsMenu: boolean) {
     this.selectedAsMenu = selectedAsMenu;
   }
 
-  _onDesktopInBackgroundChange() {
+  protected _onDesktopInBackgroundChange(event: PropertyChangeEvent<boolean, Desktop>) {
     if (this.rendered) {
       this._renderInBackground();
     }

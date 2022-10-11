@@ -10,7 +10,7 @@
  */
 import $ from 'jquery';
 import {AggregateTableRow} from './Table';
-import {Cell, EnumObject, LookupRow, Table, TableRowModel} from '../index';
+import {Cell, EnumObject, LookupRow, Page, Table, TableRowModel} from '../index';
 
 export type TableRowStatus = EnumObject<typeof TableRow.Status>;
 
@@ -33,12 +33,14 @@ export default class TableRow implements TableRowModel {
   expanded: boolean;
   status: TableRowStatus;
   dataMap?: Record<PropertyKey, any>;
+  nodeId: string;
   hierarchyLevel: number;
   cssClass: string;
   aggregateRowAfter: AggregateTableRow;
   aggregateRowBefore: AggregateTableRow;
   lookupRow: LookupRow<any>;
   $row: JQuery;
+  page: Page;
 
   protected _expandable: boolean;
 

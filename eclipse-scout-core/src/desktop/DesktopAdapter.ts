@@ -1,44 +1,47 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModelAdapter} from '../index';
+import {Desktop, DesktopNotification, DisplayParent, Event, FileChooser, FileChooserAdapter, Form, FormAdapter, MessageBox, MessageBoxAdapter, ModelAdapter, Outline, Widget} from '../index';
+import {DesktopHistoryState} from './Desktop';
+import {DesktopCancelFormsEvent, DesktopFormActivateEvent} from './DesktopEventMap';
 
 export default class DesktopAdapter extends ModelAdapter {
+  declare widget: Desktop;
 
   constructor() {
     super();
     this._addRemoteProperties(['benchVisible', 'navigationVisible', 'navigationHandleVisible', 'headerVisible', 'geolocationServiceAvailable', 'inBackground', 'focusedElement']);
   }
 
-  _goOffline() {
+  protected override _goOffline() {
     this.widget.goOffline();
   }
 
-  _goOnline() {
+  protected override _goOnline() {
     this.widget.goOnline();
   }
 
-  _onWidgetHistoryEntryActivate(event) {
+  protected _onWidgetHistoryEntryActivate(event: Event & DesktopHistoryState) {
     this._send('historyEntryActivate', {
       deepLinkPath: event.deepLinkPath
     });
   }
 
-  _onWidgetFormActivate(event) {
+  protected _onWidgetFormActivate(event: DesktopFormActivateEvent) {
     if (event.form && !event.form.modelAdapter) {
       return; // Ignore ScoutJS forms
     }
     this._sendFormActivate(event.form);
   }
 
-  _sendFormActivate(form) {
+  protected _sendFormActivate(form: Form) {
     let eventData = {
       formId: form ? form.modelAdapter.id : null
     };
@@ -53,162 +56,148 @@ export default class DesktopAdapter extends ModelAdapter {
     });
   }
 
-  _prepareRemoteProperty(propertyName, value) {
+  protected override _prepareRemoteProperty(propertyName: string, value: any): any {
     if (propertyName === 'focusedElement') {
       return value;
     }
     return super._prepareRemoteProperty(propertyName, value);
   }
 
-  _sendFocusedElement(focusedElement) {
+  protected _sendFocusedElement(focusedElement: Widget) {
     // Find the nearest widget with a model adapter
     while (focusedElement && !focusedElement.modelAdapter) {
       focusedElement = focusedElement.parent;
     }
-    focusedElement = focusedElement ? focusedElement.id : null;
-    this._sendProperty('focusedElement', focusedElement);
+    this._sendProperty('focusedElement', focusedElement ? focusedElement.id : null);
   }
 
-  _logoAction(event) {
+  protected _logoAction(event: Event) {
     this._send('logoAction');
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<Desktop>) {
     if (event.type === 'formActivate') {
-      this._onWidgetFormActivate(event);
+      this._onWidgetFormActivate(event as DesktopFormActivateEvent);
     } else if (event.type === 'historyEntryActivate') {
-      this._onWidgetHistoryEntryActivate(event);
+      this._onWidgetHistoryEntryActivate(event as Event<Desktop> & DesktopHistoryState);
     } else if (event.type === 'logoAction') {
       this._logoAction(event);
     } else if (event.type === 'cancelForms') {
-      this._onWidgetCancelAllForms(event);
+      this._onWidgetCancelAllForms(event as DesktopCancelFormsEvent);
     } else {
       super._onWidgetEvent(event);
     }
   }
 
-  _onFormShow(event) {
-    let form,
-      displayParent = this.session.getModelAdapter(event.displayParent);
-
+  protected _onFormShow(event: any) {
+    let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
-      form = this.session.getOrCreateWidget(event.form, displayParent.widget);
-      form.setDisplayParent(displayParent.widget);
+      let form = this.session.getOrCreateWidget(event.form, displayParent.widget) as Form;
+      form.setDisplayParent(displayParent.widget as DisplayParent);
 
-      let hasPendingFormActivateEvent = this.session.asyncEvents.some(function(event) {
-        return event.type === 'formActivate' && event.target === this.id;
-      }, this);
+      let hasPendingFormActivateEvent = this.session.asyncEvents.some(event => event.type === 'formActivate' && event.target === this.id);
       if (!hasPendingFormActivateEvent) {
-        this.addFilterForWidgetEvent(widgetEvent => {
-          return (widgetEvent.type === 'formActivate' && widgetEvent.form === form);
-        });
+        // @ts-ignore
+        this.addFilterForWidgetEvent(widgetEvent => widgetEvent.type === 'formActivate' && widgetEvent.form === form);
       }
 
       this.widget.showForm(form, event.position);
     }
   }
 
-  _onFormHide(event) {
-    let form,
-      displayParent = this.session.getModelAdapter(event.displayParent);
-
+  protected _onFormHide(event: any) {
+    let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
-      form = this.session.getModelAdapter(event.form);
+      let form = this.session.getModelAdapter(event.form) as FormAdapter;
       this.widget.hideForm(form.widget);
     }
   }
 
-  _onFormActivate(event) {
-    let form = this.session.getWidget(event.form);
+  protected _onFormActivate(event: any) {
+    let form = this.session.getWidget(event.form) as Form;
     this.widget.activateForm(form);
   }
 
-  _onWidgetCancelAllForms(event) {
+  protected _onWidgetCancelAllForms(event: DesktopCancelFormsEvent) {
     event.preventDefault();
-    let formIds = [];
+    let formIds: string[] = [];
     if (event.forms) {
-      formIds = event.forms.map(form => {
-        return form.modelAdapter.id;
-      });
+      formIds = event.forms.map(form => form.modelAdapter.id);
     }
     this._send('cancelForms', {
       formIds: formIds
     });
   }
 
-  _onMessageBoxShow(event) {
-    let messageBox,
-      displayParent = this.session.getModelAdapter(event.displayParent);
-
+  protected _onMessageBoxShow(event: any) {
+    let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
-      messageBox = this.session.getOrCreateWidget(event.messageBox, displayParent.widget);
-      messageBox.setDisplayParent(displayParent.widget);
-      displayParent.widget.messageBoxController.registerAndRender(messageBox);
+      let messageBox = this.session.getOrCreateWidget(event.messageBox, displayParent.widget) as MessageBox;
+      let parent = displayParent.widget as DisplayParent;
+      messageBox.setDisplayParent(parent);
+      parent.messageBoxController.registerAndRender(messageBox);
     }
   }
 
-  _onMessageBoxHide(event) {
-    let messageBox,
-      displayParent = this.session.getModelAdapter(event.displayParent);
-
+  protected _onMessageBoxHide(event: any) {
+    let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
-      messageBox = this.session.getModelAdapter(event.messageBox);
-      displayParent.widget.messageBoxController.unregisterAndRemove(messageBox.widget);
+      let messageBox = this.session.getModelAdapter(event.messageBox) as MessageBoxAdapter;
+      let parent = displayParent.widget as DisplayParent;
+      parent.messageBoxController.unregisterAndRemove(messageBox.widget);
     }
   }
 
-  _onFileChooserShow(event) {
-    let fileChooser,
-      displayParent = this.session.getModelAdapter(event.displayParent);
-
+  protected _onFileChooserShow(event: any) {
+    let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
-      fileChooser = this.session.getOrCreateWidget(event.fileChooser, displayParent.widget);
-      fileChooser.setDisplayParent(displayParent.widget);
-      displayParent.widget.fileChooserController.registerAndRender(fileChooser);
+      let parent = displayParent.widget as DisplayParent;
+      let fileChooser = this.session.getOrCreateWidget(event.fileChooser, parent) as FileChooser;
+      fileChooser.setDisplayParent(parent);
+      parent.fileChooserController.registerAndRender(fileChooser);
     }
   }
 
-  _onFileChooserHide(event) {
-    let fileChooser,
-      displayParent = this.session.getModelAdapter(event.displayParent);
-
+  protected _onFileChooserHide(event: any) {
+    let displayParent = this.session.getModelAdapter(event.displayParent);
     if (displayParent) {
-      fileChooser = this.session.getModelAdapter(event.fileChooser);
-      displayParent.widget.fileChooserController.unregisterAndRemove(fileChooser.widget);
+      let fileChooser = this.session.getModelAdapter(event.fileChooser) as FileChooserAdapter;
+      let parent = displayParent.widget as DisplayParent;
+      parent.fileChooserController.unregisterAndRemove(fileChooser.widget);
     }
   }
 
-  _onOpenUri(event) {
+  protected _onOpenUri(event: any) {
     this.widget.openUri(event.uri, event.action);
   }
 
-  _onOutlineChanged(event) {
-    let outline = this.session.getOrCreateWidget(event.outline, this.widget);
+  protected _onOutlineChanged(event: any) {
+    let outline = this.session.getOrCreateWidget(event.outline, this.widget) as Outline;
     this.widget.setOutline(outline);
   }
 
-  _onAddNotification(event) {
-    let notification = this.session.getOrCreateWidget(event.notification, this.widget);
+  protected _onAddNotification(event: any) {
+    let notification = this.session.getOrCreateWidget(event.notification, this.widget) as DesktopNotification;
     this.widget.addNotification(notification);
   }
 
-  _onRemoveNotification(event) {
+  protected _onRemoveNotification(event: any) {
     this.widget.removeNotification(event.notification);
   }
 
-  _onOutlineContentActivate(event) {
+  protected _onOutlineContentActivate(event: any) {
     this.widget.bringOutlineToFront();
   }
 
-  _onRequestGeolocation(event) {
+  protected _onRequestGeolocation(event: any) {
     if (navigator.geolocation) {
-      let success = function(position) {
+      let success = function(position: GeolocationPosition) {
         this._send('geolocationDetermined', {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         });
       }.bind(this);
-      let error = function(error) {
+      let error = function(error: GeolocationPositionError) {
         this._send('geolocationDetermined', {
           errorCode: error.code,
           errorMessage: error.message
@@ -218,7 +207,7 @@ export default class DesktopAdapter extends ModelAdapter {
     }
   }
 
-  onModelAction(event) {
+  override onModelAction(event: any) {
     if (event.type === 'formShow') {
       this._onFormShow(event);
     } else if (event.type === 'formHide') {

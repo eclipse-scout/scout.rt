@@ -9,9 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {EventEmitter} from '../index';
 
-export default class Event<T = EventEmitter> {
+export default class Event<T = any> {
   source: T;
   defaultPrevented: boolean;
   type: string;

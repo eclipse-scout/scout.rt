@@ -216,6 +216,7 @@ export default class FormField extends Widget {
    * this.addMandatoryIndicator();
    * this.addStatus();
    * </pre>
+   * @protected
    */
   _render() {
     throw new Error('sub-classes of FormField must implement a _render method');
@@ -433,6 +434,9 @@ export default class FormField extends Widget {
     this.setProperty('tooltipText', tooltipText);
   }
 
+  /**
+   * @protected
+   */
   _renderTooltipText() {
     this._updateTooltip();
   }

@@ -1,37 +1,37 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics} from '../../index';
+import {AbstractLayout, Dimension, graphics, HtmlCompPrefSizeOptions, Outline, Page} from '../../index';
 
 export default class PageLayout extends AbstractLayout {
+  outline: Outline;
+  page: Page;
 
-  constructor(outline, page) {
+  constructor(outline: Outline, page: Page) {
     super();
     this.outline = outline;
     this.page = page;
   }
 
-  layout($container) {
-    let containerSize, detailMenuBarSize,
-      htmlContainer = this.page.htmlComp,
+  override layout($container: JQuery) {
+    let htmlContainer = this.page.htmlComp,
       $text = this.page.$text,
       $icon = this.page.$icon(),
       titleHeight = 0,
       iconHeight = 0,
       nodeMenuBar = this.outline.nodeMenuBar,
-      nodeMenuBarPrefSize = 0,
       detailMenuBar = this.outline.detailMenuBar,
       detailMenuBarHeight = 0,
       textWidth = 0;
 
-    containerSize = htmlContainer.availableSize({exact: true}) // exact is important to calculate text width correctly and to prevent node menubar from wrapping
+    let containerSize = htmlContainer.availableSize({exact: true}) // exact is important to calculate text width correctly and to prevent node menubar from wrapping
       .subtract(htmlContainer.insets());
     textWidth = containerSize.width;
 
@@ -40,7 +40,7 @@ export default class PageLayout extends AbstractLayout {
     }
 
     if (nodeMenuBar.visible) {
-      nodeMenuBarPrefSize = nodeMenuBar.htmlComp.prefSize();
+      let nodeMenuBarPrefSize = nodeMenuBar.htmlComp.prefSize();
       nodeMenuBar.htmlComp.setSize(nodeMenuBarPrefSize);
       textWidth -= nodeMenuBarPrefSize.add(nodeMenuBar.htmlComp.margins()).width;
     }
@@ -49,7 +49,7 @@ export default class PageLayout extends AbstractLayout {
 
     if (detailMenuBar.visible) {
       detailMenuBarHeight = detailMenuBar.htmlComp.prefSize().height;
-      detailMenuBarSize = new Dimension(containerSize.width, detailMenuBarHeight)
+      let detailMenuBarSize = new Dimension(containerSize.width, detailMenuBarHeight)
         .subtract(detailMenuBar.htmlComp.margins());
       detailMenuBar.htmlComp.setSize(detailMenuBarSize);
     }
@@ -67,9 +67,8 @@ export default class PageLayout extends AbstractLayout {
     }
   }
 
-  preferredLayoutSize($container, options) {
-    let prefSize, textHeight,
-      iconHeight = 0,
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
+    let iconHeight = 0,
       htmlContainer = this.page.htmlComp,
       detailContentPrefSize = new Dimension(),
       $text = this.page.$text,
@@ -91,7 +90,7 @@ export default class PageLayout extends AbstractLayout {
     }
 
     // needs a width to be able to calculate the pref height
-    textHeight = graphics.prefSize($text, {
+    let textHeight = graphics.prefSize($text, {
       includeMargin: true,
       widthHint: textWidth,
       enforceSizeHints: true,
@@ -112,7 +111,7 @@ export default class PageLayout extends AbstractLayout {
       detailContentPrefSize = htmlDetailContent.prefSize(options).add(htmlDetailContent.margins());
     }
 
-    prefSize = new Dimension(Math.max(detailContentPrefSize.width, detailMenuBarPrefSize.width), titlePrefHeight + detailMenuBarPrefSize.height + detailContentPrefSize.height);
+    let prefSize = new Dimension(Math.max(detailContentPrefSize.width, detailMenuBarPrefSize.width), titlePrefHeight + detailMenuBarPrefSize.height + detailContentPrefSize.height);
     prefSize = prefSize.add(htmlContainer.insets());
     return prefSize;
   }

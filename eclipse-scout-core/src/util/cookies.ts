@@ -10,7 +10,7 @@
  */
 import {scout} from '../index';
 
-export function get(name: string, doc: Document): string {
+export function get(name: string, doc?: Document): string {
   doc = doc || document;
   let prefix = name + '=';
   let cookies = doc.cookie.split(';');
@@ -28,7 +28,7 @@ export function get(name: string, doc: Document): string {
  *
  * @param maxAge If specified the cookie will be persistent, otherwise it will be a session cookie.
  */
-export function set(name: string, value: string, maxAge: number, path: string) {
+export function set(name: string, value?: string, maxAge?: number, path?: string) {
   value = scout.nvl(value, '');
   maxAge = scout.nvl(maxAge, -1);
 

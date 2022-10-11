@@ -1,28 +1,29 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, SimpleTabArea, SimpleTabAreaLayout} from '../../index';
+import {AbstractLayout, Desktop, Dimension, graphics, MenuBoxLayout, SimpleTabArea} from '../../index';
+import DesktopHeader from './DesktopHeader';
+import DesktopTabAreaLayout from '../desktoptab/DesktopTabAreaLayout';
 
 export default class DesktopHeaderLayout extends AbstractLayout {
+  header: DesktopHeader;
+  desktop: Desktop;
 
-  constructor(header) {
+  constructor(header: DesktopHeader) {
     super();
     this.header = header;
     this.desktop = header.desktop;
   }
 
-  /**
-   * @override AbstractLayout.js
-   */
-  layout($container) {
-    let viewButtonBoxPrefSize, toolBoxPrefSize, tabsPrefSize, smallTabsPrefSize,
+  override layout($container: JQuery) {
+    let viewButtonBoxPrefSize: Dimension, toolBoxPrefSize: Dimension, tabsPrefSize: Dimension, smallTabsPrefSize: Dimension,
       htmlContainer = this.header.htmlComp,
       containerSize = htmlContainer.size(),
       toolBox = this.header.toolBox,
@@ -90,7 +91,8 @@ export default class DesktopHeaderLayout extends AbstractLayout {
       tabsWidth = Math.min(smallTabsPrefSize.width, tabsWidth);
     }
     // Ensure minimum width for the the overflow menu - expect if there are no tabs at all (in that case ensure min width of 0)
-    let overflowTabItemWidth = tabArea.htmlComp.layout.overflowTabItemWidth;
+    let layout = tabArea.htmlComp.layout as DesktopTabAreaLayout;
+    let overflowTabItemWidth = layout.overflowTabItemWidth;
     tabsWidth = Math.max(tabsWidth, (tabArea.tabs.length ? overflowTabItemWidth : 0));
     setTabsSize();
 
@@ -102,7 +104,7 @@ export default class DesktopHeaderLayout extends AbstractLayout {
       setToolBoxLocation();
     }
 
-    function calcTabsWidth() {
+    function calcTabsWidth(): number {
       return containerSize.width - toolBoxWidth - logoWidth - viewButtonBoxWidth;
     }
 
@@ -110,24 +112,23 @@ export default class DesktopHeaderLayout extends AbstractLayout {
       tabArea.htmlComp.setSize(new Dimension(tabsWidth, tabsPrefSize.height).subtract(tabArea.htmlComp.margins()));
     }
 
-    function getTabsSmallPrefSize() {
-      return tabArea.htmlComp.layout.smallPrefSize({widthHint: tabsWidth}).add(tabArea.htmlComp.margins());
+    function getTabsSmallPrefSize(): Dimension {
+      let tabAreaLayout = tabArea.htmlComp.layout as DesktopTabAreaLayout;
+      return tabAreaLayout.smallPrefSize({widthHint: tabsWidth}).add(tabArea.htmlComp.margins());
     }
 
     function setToolBoxSize() {
       toolBox.htmlComp.setSize(new Dimension(toolBoxWidth, toolBoxPrefSize.height).subtract(toolBox.htmlComp.margins()));
     }
 
-    function getToolBoxCompactPrefSize() {
-      return toolBox.htmlComp.layout.compactPrefSize().add(toolBox.htmlComp.margins());
+    function getToolBoxCompactPrefSize(): Dimension {
+      let toolBoxLayout = toolBox.htmlComp.layout as MenuBoxLayout;
+      return toolBoxLayout.compactPrefSize().add(toolBox.htmlComp.margins());
     }
 
-    function getToolBoxShrinkPrefSize() {
-      return toolBox.htmlComp.layout.shrinkPrefSize().add(toolBox.htmlComp.margins());
-    }
-
-    function getToolBoxActualPrefSize() {
-      return toolBox.htmlComp.layout.actualPrefSize().add(toolBox.htmlComp.margins());
+    function getToolBoxShrinkPrefSize(): Dimension {
+      let toolBoxLayout = toolBox.htmlComp.layout as MenuBoxLayout;
+      return toolBoxLayout.shrinkPrefSize().add(toolBox.htmlComp.margins());
     }
 
     function setToolBoxLocation() {

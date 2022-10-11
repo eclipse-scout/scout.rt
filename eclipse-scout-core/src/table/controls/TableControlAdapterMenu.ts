@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventHandler, FormMenu, PropertyChangeEvent, TableControl, TableControlAdapterMenuModel} from '../../index';
+import {Event, EventHandler, FormMenu, PropertyChangeEvent, TableControl, TableControlAdapterMenuModel, TableControlModel} from '../../index';
 
 export default class TableControlAdapterMenu extends FormMenu implements TableControlAdapterMenuModel {
   declare model: TableControlAdapterMenuModel;
@@ -58,7 +58,7 @@ export default class TableControlAdapterMenu extends FormMenu implements TableCo
 
   protected _onTableControlPropertyChange(event: PropertyChangeEvent<any, TableControl>) {
     // Whenever a tableControl property changes, apply the changes to the menu
-    let changedProperties: Record<string, any> = {};
+    let changedProperties: Omit<TableControlModel, 'parent'> = {};
     changedProperties[event.propertyName] = event.newValue;
     changedProperties = TableControlAdapterMenu.adaptTableControlProperties(changedProperties);
     for (let prop in changedProperties) {
@@ -82,7 +82,7 @@ export default class TableControlAdapterMenu extends FormMenu implements TableCo
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
-  static adaptTableControlProperties(tableControlProperties: Record<string, any>, menuProperties?: Record<string, any>): Record<string, any> {
+  static adaptTableControlProperties(tableControlProperties: Omit<TableControlModel, 'parent'>, menuProperties?: Omit<TableControlAdapterMenuModel, 'parent'>): TableControlAdapterMenuModel {
     menuProperties = menuProperties || {};
 
     // Plain properties: simply copy, no translation required
@@ -96,6 +96,6 @@ export default class TableControlAdapterMenu extends FormMenu implements TableCo
         delete menuProperties[prop];
       }
     }
-    return menuProperties;
+    return menuProperties as TableControlAdapterMenuModel;
   }
 }

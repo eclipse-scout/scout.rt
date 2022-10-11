@@ -1,17 +1,28 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {InputFieldKeyStrokeContext, keys, keyStrokeModifier, Outline, scout, SearchOutlineLayout} from '../../index';
+import {InputFieldKeyStrokeContext, keys, KeyStrokeContext, keyStrokeModifier, Outline, scout, SearchOutlineEventMap, SearchOutlineLayout, SearchOutlineModel} from '../../index';
 import $ from 'jquery';
 
-export default class SearchOutline extends Outline {
+export default class SearchOutline extends Outline implements SearchOutlineModel {
+  declare model: SearchOutlineModel;
+  declare eventMap: SearchOutlineEventMap;
+
+  hasText: boolean;
+  searchQuery: string;
+  searchStatus: string;
+  searchFieldKeyStrokeContext: KeyStrokeContext;
+  $searchPanel: JQuery;
+  $clearIcon: JQuery;
+  $searchStatus: JQuery;
+  $queryField: JQuery<HTMLInputElement>;
 
   constructor() {
     super();
@@ -22,30 +33,20 @@ export default class SearchOutline extends Outline {
     this.$queryField = null;
   }
 
-  /**
-   * @override Tree.js
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
-
     this.searchFieldKeyStrokeContext = this._createKeyStrokeContextForSearchField();
   }
 
-  _createKeyStrokeContextForSearchField() {
+  protected _createKeyStrokeContextForSearchField(): KeyStrokeContext {
     let keyStrokeContext = new InputFieldKeyStrokeContext();
-    keyStrokeContext.$scopeTarget = function() {
-      return this.$searchPanel;
-    }.bind(this);
-    keyStrokeContext.$bindTarget = function() {
-      return this.$queryField;
-    }.bind(this);
-    keyStrokeContext.registerStopPropagationKeys(keyStrokeModifier.NONE, [
-      keys.ENTER, keys.BACKSPACE
-    ]);
+    keyStrokeContext.$scopeTarget = () => this.$searchPanel;
+    keyStrokeContext.$bindTarget = () => this.$queryField;
+    keyStrokeContext.registerStopPropagationKeys(keyStrokeModifier.NONE, [keys.ENTER, keys.BACKSPACE]);
     return keyStrokeContext;
   }
 
-  _render() {
+  protected override _render() {
     super._render();
 
     // Override layout
@@ -55,7 +56,7 @@ export default class SearchOutline extends Outline {
     this.$searchPanel = this.$container.prependDiv('search-outline-panel');
     this.$queryField = this.$searchPanel.appendElement('<input>', 'search-outline-field')
       .on('input', this._createOnQueryFieldInputFunction().bind(this))
-      .on('keypress', this._onQueryFieldKeyPress.bind(this));
+      .on('keypress', this._onQueryFieldKeyPress.bind(this)) as JQuery<HTMLInputElement>;
     this.$clearIcon = this.$searchPanel.appendSpan('clear-icon unfocusable action text-field-icon')
       .on('mousedown', this._onClearIconMouseDown.bind(this));
 
@@ -64,20 +65,20 @@ export default class SearchOutline extends Outline {
     this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
   }
 
-  _remove() {
+  protected override _remove() {
     this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
     this.$searchPanel.remove();
     super._remove();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderSearchQuery();
     this._renderSearchStatus();
     this._updateHasText();
   }
 
-  _renderTitle() {
+  protected override _renderTitle() {
     super._renderTitle();
     // Move before search panel
     if (this.titleVisible) {
@@ -85,11 +86,11 @@ export default class SearchOutline extends Outline {
     }
   }
 
-  _renderSearchQuery() {
+  protected _renderSearchQuery() {
     this.$queryField.val(this.searchQuery);
   }
 
-  _renderSearchStatus() {
+  protected _renderSearchStatus() {
     let animate = this.rendered;
 
     if (this.searchStatus && !this.$searchStatus.isVisible()) {
@@ -119,13 +120,13 @@ export default class SearchOutline extends Outline {
     this.validateFocus();
   }
 
-  _triggerSearch() {
+  protected _triggerSearch() {
     this.trigger('search', {
       query: scout.nvl(this.searchQuery, '')
     });
   }
 
-  _createOnQueryFieldInputFunction(event) {
+  protected _createOnQueryFieldInputFunction(): (event: JQuery.TriggeredEvent) => void {
     let debounceFunction = $.debounce(this._search.bind(this));
     return function(event) {
       this._updateHasText();
@@ -134,7 +135,7 @@ export default class SearchOutline extends Outline {
     };
   }
 
-  _onClearIconMouseDown(event) {
+  protected _onClearIconMouseDown(event: JQuery.MouseDownEvent) {
     this.$queryField.val('');
     this._updateHasText();
     this._search();
@@ -144,16 +145,16 @@ export default class SearchOutline extends Outline {
     event.preventDefault();
   }
 
-  _onQueryFieldKeyPress(event) {
+  protected _onQueryFieldKeyPress(event: JQuery.KeyPressEvent) {
     if (event.which === keys.ENTER) {
-      this._setSearchQuery(this.$queryField.val());
+      this._setSearchQuery(this.$queryField.val() as string);
       this._triggerSearch();
     }
   }
 
-  _search(event) {
+  protected _search() {
     // Don't send query if value did not change (may happen when _createOnQueryFieldInputFunction is executed after _onQueryFieldKeyPress)
-    let searchQuery = this.$queryField.val();
+    let searchQuery = this.$queryField.val() as string;
     if (this.searchQuery !== searchQuery) {
       // Store locally so that the value persists when changing the outline without performing the search
       this._setSearchQuery(searchQuery);
@@ -161,20 +162,18 @@ export default class SearchOutline extends Outline {
     }
   }
 
-  _setSearchQuery(searchQuery) {
+  protected _setSearchQuery(searchQuery: string) {
     this.searchQuery = searchQuery;
   }
 
-  _updateHasText() {
+  protected _updateHasText() {
     this.$queryField.toggleClass('has-text', !!this.$queryField.val());
   }
 
   /**
    * Focus and select content AFTER the search outline was rendered (and therefore the query field filled).
-   *
-   * @override Outline.js
    */
-  validateFocus() {
+  override validateFocus() {
     if (!this.rendered) {
       return;
     }

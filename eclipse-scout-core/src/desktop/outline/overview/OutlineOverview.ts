@@ -1,23 +1,29 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Outline, scout, Widget} from '../../../index';
+import {HtmlComponent, Outline, OutlineOverviewModel, scout, Widget} from '../../../index';
+import {DisplayViewId} from '../../../tabbox/SimpleTab';
 
-export default class OutlineOverview extends Widget {
+export default class OutlineOverview extends Widget implements OutlineOverviewModel {
+  declare model: OutlineOverviewModel;
+
+  outline: Outline;
+  displayViewId: DisplayViewId; // set by DesktopBench
+  $content: JQuery;
 
   constructor() {
     super();
     this.outline = null;
   }
 
-  _init(model) {
+  protected override _init(model: OutlineOverviewModel) {
     super._init(model);
     if (!this.outline && this.parent instanceof Outline) {
       this.outline = this.parent;
@@ -25,7 +31,7 @@ export default class OutlineOverview extends Widget {
     scout.assertProperty(this, 'outline', Outline);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('outline-overview');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.$content = this.$container.appendDiv('outline-overview-content');
@@ -33,20 +39,14 @@ export default class OutlineOverview extends Widget {
     this.$content.appendDiv('outline-overview-title').text(this.outline.title);
   }
 
-  /**
-   * @override Widget.js
-   */
-  _attach() {
+  protected override _attach() {
     this.$parent.append(this.$container);
     let htmlParent = this.htmlComp.getParent();
     this.htmlComp.setSize(htmlParent.size());
     super._attach();
   }
 
-  /**
-   * @override Widget.js
-   */
-  _detach() {
+  protected override _detach() {
     this.$container.detach();
     super._detach();
   }

@@ -1,19 +1,28 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, EventEmitter, HtmlComponent, Rectangle, scout, SingleLayout} from '../index';
+import {Dimension, EventEmitter, Form, HtmlComponent, PopupWindowEventMap, Rectangle, scout, Session, SingleLayout} from '../index';
 import $ from 'jquery';
 
 export default class PopupWindow extends EventEmitter {
+  declare eventMap: PopupWindowEventMap;
 
-  constructor(myWindow, form) { // use 'myWindow' in place of 'window' to prevent confusion with global window variable
+  myWindow: Window;
+  form: Form;
+  session: Session;
+  initialized: boolean;
+  resizeToPrefSize: boolean;
+  htmlComp: HtmlComponent;
+  $container: JQuery;
+
+  constructor(myWindow: Window, form: Form) { // use 'myWindow' in place of 'window' to prevent confusion with global window variable
     super();
 
     this.myWindow = myWindow;
@@ -28,13 +37,13 @@ export default class PopupWindow extends EventEmitter {
     form.popupWindow = this;
 
     // link Window instance with this popupWindow instance
-    // this is required when we want to check if a certain DOM element belongs
-    // to a popup window
+    // this is required when we want to check if a certain DOM element belongs to a popup window
+    // @ts-ignore
     myWindow.popupWindow = this;
     myWindow.name = 'Scout popup-window ' + form.modelClass;
   }
 
-  _onUnload() {
+  protected _onUnload() {
     $.log.isDebugEnabled() && $.log.debug('stored form ID ' + this.form.id + ' to session storage');
     if (this.form.destroyed) {
       $.log.isDebugEnabled() && $.log.debug('form ID ' + this.form.id + ' is already destroyed - don\'t trigger unload event');
@@ -43,7 +52,7 @@ export default class PopupWindow extends EventEmitter {
     }
   }
 
-  _onReady() {
+  protected _onReady() {
     // set container (used as document-root from callers)
     let myDocument = this.myWindow.document,
       $myWindow = $(this.myWindow),
@@ -51,6 +60,7 @@ export default class PopupWindow extends EventEmitter {
 
     // Establish the link again, as Chrome removes this property after a page load.
     // (page load is made by design in PopupBlockerHandler.openWindow)
+    // @ts-ignore
     this.myWindow.popupWindow = this;
 
     scout.prepareDOM(myDocument);
@@ -102,7 +112,7 @@ export default class PopupWindow extends EventEmitter {
   // Note: currently _onResize is only called when the window is resized, but not when the position of the window changes.
   // if we need to do that in a later release we should take a look on the SO-post below:
   // http://stackoverflow.com/questions/4319487/detecting-if-the-browser-window-is-moved-with-javascript
-  _onResize() {
+  protected _onResize() {
     let $myWindow = $(this.myWindow),
       width = $myWindow.width(),
       height = $myWindow.height(),
@@ -115,7 +125,7 @@ export default class PopupWindow extends EventEmitter {
     this.htmlComp.setSize(windowSize);
   }
 
-  isClosed() {
+  isClosed(): boolean {
     return this.myWindow.closed;
   }
 
@@ -123,7 +133,7 @@ export default class PopupWindow extends EventEmitter {
     this.myWindow.close();
   }
 
-  title(title) {
+  title(title: string) {
     this.myWindow.document.title = title;
   }
 }

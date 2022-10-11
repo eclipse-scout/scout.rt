@@ -31,7 +31,7 @@ export default class FormController implements FormControllerModel {
    * position is only used if form is a view. this position determines at which position the tab is placed.
    * if select view is set the view rendered in _renderView is also selected.
    */
-  registerAndRender(form: Form, position: number, selectView: boolean) {
+  registerAndRender(form: Form, position?: number, selectView?: boolean) {
     scout.assertProperty(form, 'displayParent');
     if (form.isPopupWindow()) {
       this._renderPopupWindow(form);
@@ -134,7 +134,7 @@ export default class FormController implements FormControllerModel {
     return this.displayParent.rendered;
   }
 
-  protected _renderView(view: Form, register: boolean, position: number, selectView: boolean) {
+  protected _renderView(view: Form, register: boolean, position?: number, selectView?: boolean) {
     if (register) {
       if (position !== undefined) {
         arrays.insert(this.displayParent.views, view, position);
@@ -157,8 +157,6 @@ export default class FormController implements FormControllerModel {
       return;
     }
     let desktop = this.session.desktop;
-    // FIXME TS: remove as soon as Desktop has been migrated
-    // @ts-ignore
     if (desktop.displayStyle === Desktop.DisplayStyle.COMPACT && !desktop.bench) {
       // Show bench and hide navigation if this is the first view to be shown
       desktop.sendOutlineToBack();
@@ -200,8 +198,10 @@ export default class FormController implements FormControllerModel {
     dialog.on('remove', () => {
       let formToActivate = this._findFormToActivateAfterDialogRemove();
       if (formToActivate) {
+        // @ts-ignore
         desktop._setFormActivated(formToActivate);
       } else {
+        // @ts-ignore
         desktop._setOutlineActivated();
       }
     });
@@ -213,6 +213,7 @@ export default class FormController implements FormControllerModel {
       dialog.setTrackFocus(true);
       dialog.render(desktop.$container);
       this._layoutDialog(dialog);
+      // @ts-ignore
       desktop._setFormActivated(dialog);
 
       // Only display the dialog if its 'displayParent' is visible to the user.
@@ -312,8 +313,6 @@ export default class FormController implements FormControllerModel {
     });
     movableSiblings = movableSiblings.concat(movableSiblingsDescendants);
 
-    // FIXME TS: remove as soon as Desktop has been migrated
-    // @ts-ignore
     this.session.desktop.moveOverlaysBehindAndFocus(movableSiblings, dialog.$container);
   }
 

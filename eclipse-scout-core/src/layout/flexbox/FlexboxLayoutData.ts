@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {LayoutData} from '../../index';
+import {FlexboxLayoutDataModel, LayoutData} from '../../index';
 
-export default class FlexboxLayoutData implements LayoutData {
+export default class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
+  declare model: FlexboxLayoutDataModel;
+
   grow: number;
   initial: number;
   order: number;
@@ -21,8 +23,7 @@ export default class FlexboxLayoutData implements LayoutData {
   initialPx: number;
   diff: number;
 
-  constructor(model?: FlexboxLayoutData) {
-    this._prepare();
+  constructor(model?: FlexboxLayoutDataModel) {
     // initial
     this.relative = true;
     this.grow = 1;
@@ -34,10 +35,6 @@ export default class FlexboxLayoutData implements LayoutData {
     this.sizePx = null; // current display size in pixel
     this.initialPx = null; // initial in pixel
     this.diff = null;
-  }
-
-  protected _prepare() {
-    // nop. may be overridden by sub classes
   }
 
   withOrder(order: number): this {
@@ -93,8 +90,7 @@ export default class FlexboxLayoutData implements LayoutData {
     return delta - consumedDelta;
   }
 
-  /* Static functions */
-  static fixed(size: number): FlexboxLayoutData {
+  static fixed(size?: number): FlexboxLayoutData {
     let layoutData = new FlexboxLayoutData();
     layoutData.relative = false;
     layoutData.initial = size || -1;

@@ -9,7 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Filter, FilterSupport, Menu, TextFilter, Tile, TileGridLayoutConfig, TileGridSelectionHandler, VirtualScrolling, WidgetModel} from '../index';
-import {Comparator} from '../types';
+import {Comparator, RefModel} from '../types';
+import {LogicalGridLayoutConfigOptions} from '../layout/logicalgrid/LogicalGridLayoutConfig';
+import TileModel from './TileModel';
 
 export default interface TileGridModel extends WidgetModel {
   /**
@@ -41,7 +43,7 @@ export default interface TileGridModel extends WidgetModel {
    * By default, an empty {@link TileGridLayoutConfig} is used which means the values are read by CSS.
    * @see TileGridLayout._initDefaults
    */
-  layoutConfig?: TileGridLayoutConfig;
+  layoutConfig?: TileGridLayoutConfig | LogicalGridLayoutConfigOptions;
   menus?: Menu[];
   /**
    * Specifies whether multiple tiles can be selected at once. Default is true.
@@ -81,7 +83,7 @@ export default interface TileGridModel extends WidgetModel {
   /**
    * Specifies the tiles of the tile grid. By default, there are no tiles.
    */
-  tiles?: Tile[];
+  tiles?: Tile[] | RefModel<TileModel>[];
   /**
    * Specifies the number of grid rows to be rendered if virtual scrolling is active (if {@link virtual} is true).
    * The value depends on the grid size and will be calculated automatically by the layout using {@link VirtualScrolling.calculateViewRangeSize}.

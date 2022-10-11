@@ -1,24 +1,26 @@
 /*
- * Copyright (c) 2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Distribution License v1.0
+ * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/org/documents/edl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {StaticLookupCall, UnsavedFormChangesForm} from '../../index';
+import {Form, StaticLookupCall, UnsavedFormChangesForm, UnsavedFormsLookupCallModel} from '../../index';
 
-export default class UnsavedFormsLookupCall extends StaticLookupCall {
+export default class UnsavedFormsLookupCall extends StaticLookupCall<Form> implements UnsavedFormsLookupCallModel {
+  declare model: UnsavedFormsLookupCallModel;
+
+  unsavedForms: Form[];
 
   constructor() {
     super();
-
     this.unsavedForms = [];
   }
 
-  _data() {
+  protected override _data(): any {
     return this.unsavedForms.map(form => {
       let text = UnsavedFormChangesForm.getFormDisplayName(form);
       return [form, text];

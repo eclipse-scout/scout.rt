@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Menu, MenuBar, MenuBoxEventMap, MenuBoxLayout, MenuBoxModel, Widget} from '../../index';
+import {HtmlComponent, Menu, MenuBoxEventMap, MenuBoxLayout, MenuBoxModel, Widget} from '../../index';
 
 export default class MenuBox extends Widget implements MenuBoxModel {
   declare model: MenuBoxModel;
@@ -19,7 +19,7 @@ export default class MenuBox extends Widget implements MenuBoxModel {
   menus: Menu[];
   uiMenuCssClass: string;
 
-  constructor(menuBar: MenuBar) {
+  constructor() {
     super();
     this.compact = false;
     this.menus = [];

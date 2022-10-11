@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -56,6 +56,9 @@ export default class Button extends FormField {
 
   static SUBMENU_ICON = icons.ANGLE_DOWN_BOLD;
 
+  /**
+   * @protected
+   */
   _init(model) {
     super._init(model);
     this.resolveIconIds(['iconId']);
@@ -119,6 +122,7 @@ export default class Button extends FormField {
   /**
    * The button form-field has no label and no status. Additionally it also has no container.
    * Container and field are the same thing.
+   * @protected
    */
   _render() {
     let $button;
@@ -167,6 +171,9 @@ export default class Button extends FormField {
     });
   }
 
+  /**
+   * @protected
+   */
   _remove() {
     super._remove();
     tooltips.uninstall(this.$buttonLabel);
@@ -299,6 +306,7 @@ export default class Button extends FormField {
 
   /**
    * Adds an image or font-based icon to the button by adding either an IMG or SPAN element to the button.
+   * @protected
    */
   _renderIconId() {
     let $iconTarget = this.$fieldContainer;

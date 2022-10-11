@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HierarchicalLookupResultBuilder, LookupCall, LookupRow, objects, QueryBy, scout, strings} from '../index';
+import {arrays, HierarchicalLookupResultBuilder, LookupCall, LookupRow, objects, QueryBy, scout, StaticLookupCallModel, strings} from '../index';
 import $ from 'jquery';
-import LookupCallModel from './LookupCallModel';
 import LookupResult from './LookupResult';
 import Deferred = JQuery.Deferred;
 
@@ -19,9 +18,9 @@ import Deferred = JQuery.Deferred;
  * functions to provide data for lookup calls. Results are resolved as a Promise, the delay
  * property controls how long it takes until the promise is resolved. You can set it to a higher value for testing purposes.
  */
-export default class StaticLookupCall<Key> extends LookupCall<Key> {
+export default class StaticLookupCall<Key> extends LookupCall<Key> implements StaticLookupCallModel<Key> {
+  declare model: StaticLookupCallModel<Key>;
 
-  /** delay in [ms]. By default that value is 0. */
   delay: number;
   data: any[];
 
@@ -33,7 +32,7 @@ export default class StaticLookupCall<Key> extends LookupCall<Key> {
     this.active = true;
   }
 
-  protected override _init(model: LookupCallModel<Key> & { data?: any[] }) {
+  protected override _init(model: StaticLookupCallModel<Key>) {
     super._init(model);
     if (!this.data) {
       // data may either be provided by the model or by implementing the _data function

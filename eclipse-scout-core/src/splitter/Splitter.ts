@@ -89,13 +89,12 @@ export default class Splitter extends Widget implements SplitterModel {
   }
 
   /**
-   * Sets the splitter position to the specified newSize (in pixels). If the newSize is
-   * not specified, the size is calculated automatically by reading the this.$anchor
-   * element's bounds.
+   * Sets the splitter position to the specified newSize (in pixels).
+   * If the newSize is not specified, the size is calculated automatically by reading the this.$anchor element's bounds.
    *
    * @returns the effective position in pixel.
    */
-  setPosition(position: number): number {
+  setPosition(position?: number): number {
     if (!$.isNumeric(position)) {
       position = this._derivePositionFromAnchor();
     }

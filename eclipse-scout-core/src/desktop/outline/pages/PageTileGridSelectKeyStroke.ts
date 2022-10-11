@@ -1,18 +1,20 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, RangeKeyStroke, TileButton} from '../../../index';
+import {ButtonTile, keys, PageTileGrid, RangeKeyStroke, ScoutKeyboardEvent, TileButton} from '../../../index';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class PageTileGridSelectKeyStroke extends RangeKeyStroke {
+  declare field: PageTileGrid;
 
-  constructor(pageTileGrid) {
+  constructor(pageTileGrid: PageTileGrid) {
     super();
     this.field = pageTileGrid;
 
@@ -25,20 +27,18 @@ export default class PageTileGridSelectKeyStroke extends RangeKeyStroke {
     );
 
     // rendering hints
-    this.renderingHints.$drawingArea = function($drawingArea, event) {
+    this.renderingHints.$drawingArea = ($drawingArea, event) => {
       let index = event.which - keys['1'];
       let tiles = this._tiles();
       if (index < tiles.length && tiles[index].tileWidget instanceof TileButton) {
-        return tiles[index].tileWidget.$fieldContainer;
+        let tileWidget = tiles[index].tileWidget as TileButton;
+        return tileWidget.$fieldContainer;
       }
       return null;
-    }.bind(this);
+    };
   }
 
-  /**
-   * @override
-   */
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent & { _$element?: JQuery }): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -60,15 +60,13 @@ export default class PageTileGridSelectKeyStroke extends RangeKeyStroke {
     return false;
   }
 
-  /**
-   * @override
-   */
-  handle(event) {
-    let tile = event._$element.data('widget');
-    tile.tileWidget.doAction();
+  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> & { _$element?: JQuery }) {
+    let tile = event._$element.data('widget') as ButtonTile;
+    let tileWidget = tile.tileWidget as TileButton;
+    tileWidget.doAction();
   }
 
-  _tiles() {
+  protected _tiles(): ButtonTile[] {
     return this.field.tiles;
   }
 }

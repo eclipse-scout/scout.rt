@@ -19,7 +19,8 @@ import {ScrollbarInstallOptions, ScrollOptions, ScrollToOptions} from '../scroll
 import {Optional, RefModel} from '../types';
 
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
-export type GlassPaneContribution = (widget: Widget) => JQuery | JQuery[];
+export type GlassPaneTarget = JQuery | HTMLElement | DeferredGlassPaneTarget;
+export type GlassPaneContribution = (widget: Widget) => GlassPaneTarget | GlassPaneTarget[];
 export type WidgetOrModel = Widget | WidgetModel;
 export type TreeVisitor<T> = (element: T) => boolean | TreeVisitResult | void;
 
@@ -87,7 +88,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   $parent: JQuery;
   protected _$lastFocusedElement: JQuery;
   protected _cloneProperties: string[];
-  protected _focusInListener: JQuery.EventHandler<HTMLElement>;
+  protected _focusInListener: (event: FocusEvent | JQuery.FocusInEvent) => void;
   protected _glassPaneContributions: GlassPaneContribution[];
   protected _parentDestroyHandler: EventHandler;
   protected _parentRemovingWhileAnimatingHandler: EventHandler;
@@ -313,7 +314,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Calls {@link scout.create} for the given model, or if model is already a Widget simply returns the widget.
    */
-  protected _createChild(model: WidgetModel | Widget): Widget {
+  protected _createChild(model: WidgetModel | Widget | string): Widget {
     if (model instanceof Widget) {
       return model;
     }
@@ -842,7 +843,6 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     if (this.session.desktop) {
       return this.session.desktop;
     }
-    // @ts-ignore // FIXME TS remove after rename from Desktop.js to Desktop.TS
     return this.findParent(parent => parent instanceof Desktop) as Desktop;
   }
 
@@ -1599,8 +1599,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
    * @param element widget that requested a glass pane
    */
-  glassPaneTargets(element: Widget): (JQuery | DeferredGlassPaneTarget)[] {
-    let resolveGlassPanes: (element: Widget) => JQuery[] = element => {
+  glassPaneTargets(element?: Widget): GlassPaneTarget[] {
+    let resolveGlassPanes: (element: Widget) => GlassPaneTarget[] = element => {
       // contributions
       let targets = arrays.flatMap(this._glassPaneContributions, (cont: GlassPaneContribution) => {
         let $elements = cont(element);
@@ -1621,7 +1621,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * @param element widget that requested a glass pane
    */
-  protected _glassPaneTargets(element: Widget): JQuery[] {
+  protected _glassPaneTargets(element: Widget): GlassPaneTarget[] {
     // since popups are rendered outside the DOM of the widget parent-child hierarchy, get glassPaneTargets of popups belonging to this widget separately.
     return [this.$container].concat(
       this.session.desktop.getPopupsFor(this)
@@ -2072,7 +2072,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Method invoked once a 'focusin' event is fired by this context's $container or one of its child controls.
    */
-  protected _onFocusIn(event: JQuery.FocusInEvent) {
+  protected _onFocusIn(event: FocusEvent | JQuery.FocusInEvent) {
     // do not track focus events during rendering to avoid initial focus to be restored.
     if (this.rendering) {
       return;

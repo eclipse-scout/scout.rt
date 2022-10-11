@@ -1,17 +1,21 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {icons, NavigateButton, Page} from '../../../index';
+import {EventHandler, icons, NavigateButton, NavigateButtonModel, Page} from '../../../index';
 import $ from 'jquery';
+import {TableRowsSelectedEvent} from '../../../table/TableEventMap';
+import {OutlinePageRowLinkEvent} from '../OutlineEventMap';
 
 export default class NavigateDownButton extends NavigateButton {
+  protected _detailTableRowsSelectedHandler: EventHandler<TableRowsSelectedEvent>;
+  protected _outlinePageRowLinkHandler: EventHandler<OutlinePageRowLinkEvent>;
 
   constructor() {
     super();
@@ -23,7 +27,7 @@ export default class NavigateDownButton extends NavigateButton {
     this._outlinePageRowLinkHandler = this._onOutlinePageRowLink.bind(this);
   }
 
-  _init(options) {
+  protected override _init(options: NavigateButtonModel) {
     super._init(options);
 
     if (this.node.detailTable) {
@@ -32,7 +36,7 @@ export default class NavigateDownButton extends NavigateButton {
     this.outline.on('pageRowLink', this._outlinePageRowLinkHandler);
   }
 
-  _destroy() {
+  protected override _destroy() {
     if (this.node.detailTable) {
       this.node.detailTable.off('rowsSelected', this._detailTableRowsSelectedHandler);
     }
@@ -41,22 +45,22 @@ export default class NavigateDownButton extends NavigateButton {
     super._destroy();
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this.$container.addClass('down');
   }
 
-  _isDetail() {
+  protected _isDetail(): boolean {
     // Button is in "detail mode" if there are both detail form and detail table visible and detail form is _not_ hidden.
     return !!(this.node.detailFormVisible && this.node.detailForm &&
       this.node.detailTableVisible && this.node.detailTable && this.node.detailFormVisibleByUi);
   }
 
-  _toggleDetail() {
+  protected _toggleDetail(): boolean {
     return false;
   }
 
-  _buttonEnabled() {
+  protected _buttonEnabled(): boolean {
     if (this._isDetail()) {
       return true;
     }
@@ -72,8 +76,8 @@ export default class NavigateDownButton extends NavigateButton {
     return true;
   }
 
-  _drill() {
-    let drillNode;
+  protected _drill() {
+    let drillNode: Page;
 
     if (this.node.detailTable) {
       let row = this.node.detailTable.selectedRow();
@@ -90,7 +94,7 @@ export default class NavigateDownButton extends NavigateButton {
         parentNode.childNodes.forEach(childNode => {
           if (childNode.expanded && childNode !== drillNode) {
             this.outline.collapseNode(childNode, {
-              animateExpansion: false
+              renderAnimated: false
             });
           }
         });
@@ -107,11 +111,11 @@ export default class NavigateDownButton extends NavigateButton {
     }
   }
 
-  _onDetailTableRowsSelected(event) {
+  protected _onDetailTableRowsSelected(event: TableRowsSelectedEvent) {
     this.updateEnabled();
   }
 
-  _onOutlinePageRowLink(event) {
+  protected _onOutlinePageRowLink(event: OutlinePageRowLinkEvent) {
     let table = this.node.detailTable;
     if (table && table.selectedRows.length === 1 && table.selectedRows[0].page === event.page) {
       this.updateEnabled();

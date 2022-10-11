@@ -8,8 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventSupport, Form, icons, inspector, MenuBar, scout, TileOutlineOverview, TileOverviewForm, TreeNode, Widget} from '../../../index';
+import {
+  ButtonTile, EnumObject, Event, EventHandler, EventListener, EventSupport, Form, FormModel, HtmlComponent, icons, inspector, MenuBar, Outline, PageEventMap, PageModel, PropertyChangeEvent, scout, Table, TableModel, TableRow,
+  TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+} from '../../../index';
 import $ from 'jquery';
+import {TableRowClickEvent} from '../../../table/TableEventMap';
+import {EventMapOf, EventModel} from '../../../events/EventEmitter';
 
 /**
  * This class is used differently in online and JS-only case. In the online case we only have instances
@@ -17,18 +22,48 @@ import $ from 'jquery';
  * between pages with tables and pages with nodes in some cases. In the JS only case, Page is an abstract
  * class and is never instantiated directly, instead we always use subclasses of PageWithTable or PageWithNodes.
  * Implementations of these classes contain code which loads table data or child nodes.
- *
- * @class
- * @extends TreeNode
  */
-export default class Page extends TreeNode {
+export default class Page extends TreeNode implements PageModel {
+  declare model: PageModel;
+  declare eventMap: PageEventMap;
+  declare parent: Outline;
+  declare childNodes: Page[];
+  declare parentNode: Page;
+
+  /**
+   * This property is set by the server, see: JsonOutline#putNodeType.
+   */
+  nodeType: NodeType;
+  compactRoot: boolean;
+  detailTable: Table;
+  detailTableVisible: boolean;
+  detailForm: Form;
+  detailFormVisible: boolean;
+  detailFormVisibleByUi: boolean;
+  navigateButtonsVisible: boolean;
+  tableStatusVisible: boolean;
+  htmlComp: HtmlComponent;
+  /**
+   * True to select the page linked with the selected row when the row was selected. May be useful on touch devices.
+   */
+  drillDownOnRowClick: boolean;
+  /**
+   * The icon id which is used for icons in the tile outline overview.
+   */
+  overviewIconId: string;
+  showTileOverview: boolean;
+  row: TableRow;
+  tile: ButtonTile;
+  events: EventSupport;
+
+  protected _tableFilterHandler: EventHandler<Event<Table>>;
+  protected _tableRowClickHandler: EventHandler<TableRowClickEvent>;
+  protected _detailTableModel: TableModel;
+  protected _detailFormModel: FormModel;
 
   constructor() {
     super();
 
-    /**
-     * This property is set by the server, see: JsonOutline#putNodeType.
-     */
     this.nodeType = null;
     this.compactRoot = false;
     this.detailTable = null;
@@ -39,19 +74,11 @@ export default class Page extends TreeNode {
     this.navigateButtonsVisible = true;
 
     this.tableStatusVisible = true;
-    /**
-     * True to select the page linked with the selected row when the row was selected. May be useful on touch devices.
-     */
     this.drillDownOnRowClick = false;
-    /**
-     * The icon id which is used for icons in the tile outline overview.
-     */
     this.overviewIconId = null;
     this.showTileOverview = false;
     this.events = new EventSupport();
-    this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => {
-      return event.propertyName === propertyName;
-    });
+    this.events.registerSubTypePredicate('propertyChange', (event, propertyName) => event.propertyName === propertyName);
     this._tableFilterHandler = this._onTableFilter.bind(this);
     this._tableRowClickHandler = this._onTableRowClick.bind(this);
     this._detailTableModel = null;
@@ -59,21 +86,15 @@ export default class Page extends TreeNode {
   }
 
   /**
-   * This enum defines a node-type. This is basically used for the online case where we only have instances
-   * of Page, but never instances of PageWithTable or PageWithNodes. The server simply sets a nodeType
-   * instead.
-   *
-   * @type {{NODES: string, TABLE: string}}
+   * This enum defines a node-type. This is basically used for the Scout Classic case where we only have instances
+   * of Page, but never instances of PageWithTable or PageWithNodes. The server simply sets a nodeType instead.
    */
   static NodeType = {
     NODES: 'nodes',
     TABLE: 'table'
-  };
+  } as const;
 
-  /**
-   * @override TreeNode.js
-   */
-  _init(model) {
+  protected override _init(model: PageModel) {
     this._detailTableModel = Page._removePropertyIfLazyLoading(model, 'detailTable');
     this._detailFormModel = Page._removePropertyIfLazyLoading(model, 'detailForm');
 
@@ -85,7 +106,7 @@ export default class Page extends TreeNode {
     this._internalInitDetailForm();
   }
 
-  static _removePropertyIfLazyLoading(object, name) {
+  protected static _removePropertyIfLazyLoading(object: PageModel, name: string): any {
     let prop = object[name];
     if (typeof prop === 'string') {
       // Scout Classic: it is an object id -> do not remove it. directly create the widget. lazy loading is done on backend
@@ -101,10 +122,7 @@ export default class Page extends TreeNode {
     return prop;
   }
 
-  /**
-   * @override TreeNode.js
-   */
-  _destroy() {
+  protected override _destroy() {
     super._destroy();
     if (this.detailTable) {
       this.detailTable.destroy();
@@ -114,19 +132,21 @@ export default class Page extends TreeNode {
     }
   }
 
-  _internalInitTable() {
+  protected _internalInitTable() {
     let tableModel = this.detailTable;
     if (tableModel) {
       // this case is used for Scout classic
-      let newDetailTable = this.getOutline()._createChild(tableModel);
+      // @ts-ignore
+      let newDetailTable = this.getOutline()._createChild(tableModel) as Table;
       this._setDetailTable(newDetailTable);
     }
   }
 
-  _internalInitDetailForm() {
+  protected _internalInitDetailForm() {
     let formModel = this.detailForm;
     if (formModel) {
-      let newDetailForm = this.getOutline()._createChild(formModel);
+      // @ts-ignore
+      let newDetailForm = this.getOutline()._createChild(formModel) as Form;
       this._setDetailForm(newDetailForm);
     }
   }
@@ -140,12 +160,13 @@ export default class Page extends TreeNode {
 
   /**
    * Creates the detail table
-   * @returns {Table} the created table or null
+   * @returns the created table or null
    */
-  createDetailTable() {
+  createDetailTable(): Table {
     let detailTable = this._createDetailTable();
     if (!detailTable && this._detailTableModel) {
-      detailTable = this.getOutline()._createChild(this._detailTableModel);
+      // @ts-ignore
+      detailTable = this.getOutline()._createChild(this._detailTableModel) as Table;
       this._detailTableModel = null; // no longer needed
     }
     return detailTable;
@@ -153,10 +174,8 @@ export default class Page extends TreeNode {
 
   /**
    * Override this function to create the internal table. Default impl. returns null.
-   *
-   * @returns {Table}
    */
-  _createDetailTable() {
+  protected _createDetailTable(): Table {
     return null;
   }
 
@@ -169,12 +188,13 @@ export default class Page extends TreeNode {
 
   /**
    * Creates the detail form
-   * @returns {Form|*} the created form or null
+   * @returns the created form or null
    */
-  createDetailForm() {
+  createDetailForm(): Form {
     let detailForm = this._createDetailForm();
     if (!detailForm && this._detailFormModel) {
-      detailForm = this.getOutline()._createChild(this._detailFormModel);
+      // @ts-ignore
+      detailForm = this.getOutline()._createChild(this._detailFormModel) as Form;
       this._detailFormModel = null; // no longer needed
     }
     return detailForm;
@@ -183,25 +203,21 @@ export default class Page extends TreeNode {
   /**
    * Override this function to return a detail form which is displayed in the outline when this page is selected.
    * The default implementation returns null.
-   *
-   * @returns {Form|*}
    */
-  _createDetailForm() {
+  protected _createDetailForm(): Form {
     return null;
   }
 
   /**
    * Override this function to initialize the internal detail form.
-   * @param {Form} form the form to initialize.
+   * @param form the form to initialize.
    */
-  _initDetailForm(form) {
+  protected _initDetailForm(form: Form) {
     if (form instanceof Form) {
       form.setModal(false);
       form.setClosable(false);
-
       form.setDisplayHint(Form.DisplayHint.VIEW);
       form.setDisplayViewId('C');
-
       form.setShowOnOpen(false);
     }
     if (form instanceof TileOverviewForm) {
@@ -211,9 +227,9 @@ export default class Page extends TreeNode {
 
   /**
    * Override this function to destroy the internal (detail) form.
-   * @param {Form} form the form to destroy.
+   * @param form the form to destroy.
    */
-  _destroyDetailForm(form) {
+  protected _destroyDetailForm(form: Form) {
     if (form instanceof TileOverviewForm) {
       form.setPage(null);
     }
@@ -227,9 +243,9 @@ export default class Page extends TreeNode {
   /**
    * Override this function to initialize the internal (detail) table.
    * Default impl. delegates filter events to the outline mediator.
-   * @param {Table} table The table to initialize.
+   * @param table The table to initialize.
    */
-  _initDetailTable(table) {
+  protected _initDetailTable(table: Table) {
     table.menuBar.setPosition(MenuBar.Position.TOP);
     table.on('filter', this._tableFilterHandler);
     if (this.drillDownOnRowClick) {
@@ -241,9 +257,9 @@ export default class Page extends TreeNode {
 
   /**
    * Override this function to destroy the internal (detail) table.
-   * @param {Table} table the table to destroy.
+   * @param table the table to destroy.
    */
-  _destroyDetailTable(table) {
+  protected _destroyDetailTable(table: Table) {
     table.off('filter', this._tableFilterHandler);
     table.off('rowClick', this._tableRowClickHandler);
     if (table.owner === this.getOutline()) {
@@ -253,10 +269,7 @@ export default class Page extends TreeNode {
     }
   }
 
-  /**
-   * @override
-   */
-  _decorate() {
+  protected override _decorate() {
     super._decorate();
     if (!this.$node) {
       return;
@@ -277,25 +290,26 @@ export default class Page extends TreeNode {
 
   // see Java: AbstractPage#pageDeactivatedNotify
   deactivate() {
+    // NOP
   }
 
   /**
-   * @returns {Outline} the tree / outline / parent instance. it's all the same,
+   * @returns the tree / outline / parent instance. it's all the same,
    *     but it's more intuitive to work with the 'outline' when we deal with pages.
    */
-  getOutline() {
+  getOutline(): Outline {
     return this.parent;
   }
 
   /**
-   * @returns {Array.<Page>} an array of pages linked with the given rows.
+   * @returns an array of pages linked with the given rows.
    *   The order of the returned pages will be the same as the order of the rows.
    */
-  pagesForTableRows(rows) {
+  pagesForTableRows(rows: TableRow[]): Page[] {
     return rows.map(this.pageForTableRow);
   }
 
-  pageForTableRow(row) {
+  pageForTableRow(row: TableRow): Page {
     if (!row.page) {
       throw new Error('Table-row is not linked to a page');
     }
@@ -303,16 +317,16 @@ export default class Page extends TreeNode {
   }
 
   /**
-   * @param {Form} form The new form
+   * @param form The new form
    */
-  setDetailForm(form) {
+  setDetailForm(form: Form) {
     if (form === this.detailForm) {
       return;
     }
     this._setDetailForm(form);
   }
 
-  _setDetailForm(form) {
+  protected _setDetailForm(form: Form) {
     let oldDetailForm = this.detailForm;
     if (oldDetailForm !== form && oldDetailForm instanceof Widget) {
       // must be a widget to be destroyed. At startup in Scout Classic it might be a string (the widget id)
@@ -326,16 +340,16 @@ export default class Page extends TreeNode {
   }
 
   /**
-   * @param {Table} table The new table
+   * @param table The new table
    */
-  setDetailTable(table) {
+  setDetailTable(table: Table) {
     if (table === this.detailTable) {
       return;
     }
     this._setDetailTable(table);
   }
 
-  _setDetailTable(table) {
+  protected _setDetailTable(table: Table) {
     let oldDetailTable = this.detailTable;
     if (oldDetailTable !== table && oldDetailTable instanceof Widget) {
       // must be a widget to be destroyed. At startup in Scout Classic it might be a string (the widget id)
@@ -351,22 +365,18 @@ export default class Page extends TreeNode {
   /**
    * Updates relevant properties from the pages linked with the given rows using the method updatePageFromTableRow and returns the pages.
    *
-   * @returns {Array.<Page>} pages linked with the given rows.
+   * @returns pages linked with the given rows.
    */
-  updatePagesFromTableRows(rows) {
-    return rows.map(row => {
-      let page = row.page;
-      page.updatePageFromTableRow(row);
-      return page;
-    });
+  updatePagesFromTableRows(rows: TableRow[]): Page[] {
+    return rows.map(row => row.page.updatePageFromTableRow(row));
   }
 
   /**
    * Updates relevant properties (text, enabled, htmlEnabled) from the page linked with the given row.
    *
-   * @returns {Page} page linked with the given row.
+   * @returns page linked with the given row.
    */
-  updatePageFromTableRow(row) {
+  updatePageFromTableRow(row: TableRow): Page {
     let page = row.page;
     page.enabled = row.enabled;
     page.text = page.computeTextForRow(row);
@@ -381,10 +391,8 @@ export default class Page extends TreeNode {
    * This function creates the text property of this page. The default implementation returns the
    * text from the first cell of the given row. It's allowed to ignore the given row entirely, when you override
    * this function.
-   *
-   * @param {TableRow} row
    */
-  computeTextForRow(row) {
+  computeTextForRow(row: TableRow): string {
     let text = '';
     if (row.cells.length >= 1) {
       text = row.cells[0].text;
@@ -393,16 +401,16 @@ export default class Page extends TreeNode {
   }
 
   /**
-   * @returns {object} a page parameter object used to pass to newly created child pages. Sets the parent
+   * @returns a page parameter object used to pass to newly created child pages. Sets the parent
    *     to our outline instance and adds optional other properties. Typically you'll pass an
    *     object (entity-key or arbitrary data) to a child page.
    */
-  _pageParam(paramProperties) {
+  protected _pageParam<T extends object>(paramProperties: T): T {
     let param = {
       parent: this.getOutline()
     };
     $.extend(param, paramProperties);
-    return param;
+    return param as T;
   }
 
   reloadPage() {
@@ -412,7 +420,7 @@ export default class Page extends TreeNode {
     }
   }
 
-  linkWithRow(row) {
+  linkWithRow(row: TableRow) {
     this.row = row;
     row.page = this;
     this.getOutline().trigger('pageRowLink', {
@@ -421,16 +429,16 @@ export default class Page extends TreeNode {
     });
   }
 
-  unlinkWithRow(row) {
+  unlinkWithRow(row: TableRow) {
     delete this.row;
     delete row.page;
   }
 
-  _onTableFilter(event) {
+  protected _onTableFilter(event: Event<Table>) {
     this.getOutline().mediator.onTableFilter(event, this);
   }
 
-  _onTableRowClick(event) {
+  protected _onTableRowClick(event: TableRowClickEvent) {
     if (!this.drillDownOnRowClick) {
       return;
     }
@@ -443,32 +451,38 @@ export default class Page extends TreeNode {
   /**
    * Triggers a property change for a single property.
    */
-  triggerPropertyChange(propertyName, oldValue, newValue) {
+  triggerPropertyChange<T>(propertyName: string, oldValue: T, newValue: T): PropertyChangeEvent<T, this> {
     scout.assertParameter('propertyName', propertyName);
-    let event = new Event({
+    return this.trigger('propertyChange', {
       propertyName: propertyName,
       oldValue: oldValue,
       newValue: newValue
-    });
-    this.trigger('propertyChange', event);
+    }) as PropertyChangeEvent<T, this>;
+  }
+
+  trigger<K extends string & keyof EventMapOf<Page>>(type: K, eventOrModel?: Event<Page> | EventModel<EventMapOf<Page>[K]>): EventMapOf<Page>[K] {
+    let event: Event<Page>;
+    if (eventOrModel instanceof Event) {
+      event = eventOrModel;
+    } else {
+      event = new Event(eventOrModel);
+    }
+    event.source = this;
+    this.events.trigger(type, event);
     return event;
   }
 
-  trigger(type, event) {
-    event = event || {};
-    event.source = this;
-    this.events.trigger(type, event);
+  one<K extends string & keyof EventMapOf<this>>(type: K, handler: EventHandler<EventMapOf<this>[K] & Event<this>>) {
+    this.events.one(type, handler);
   }
 
-  one(type, func) {
-    this.events.one(type, func);
+  on<K extends string & keyof EventMapOf<this>>(type: K, handler: EventHandler<(EventMapOf<this>)[K] & Event<this>>): EventListener {
+    return this.events.on(type, handler);
   }
 
-  on(type, func) {
-    return this.events.on(type, func);
-  }
-
-  off(type, func) {
-    this.events.off(type, func);
+  off<K extends string & keyof EventMapOf<this>>(type: K, handler?: EventHandler<EventMapOf<this>[K]>) {
+    this.events.off(type, handler);
   }
 }
+
+export type NodeType = EnumObject<typeof Page.NodeType>;

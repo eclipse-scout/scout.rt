@@ -11,5 +11,5 @@
 import {MenuModel, TableControl} from '../../index';
 
 export default interface TableControlAdapterMenuModel extends MenuModel { // FIXME TS: user FormMenuModel as super interface as soon as FormMenu has been migrated
-  tableControl: TableControl;
+  tableControl?: TableControl;
 }

@@ -8,12 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CompositeTile, Icon, Label, scout, Tile, TileGrid, ViewMenuPopupEnterKeyStroke, WidgetPopup} from '../../index';
+import {CompositeTile, Icon, Label, scout, Tile, TileGrid, ViewButton, ViewMenuPopupEnterKeyStroke, ViewMenuPopupModel, WidgetPopup} from '../../index';
+import {RefModel} from '../../types';
+import {CompositeTileModel} from '../../tile/CompositeTile';
 
 /**
  * Popup menu to switch between outlines.
  */
-export default class ViewMenuPopup extends WidgetPopup {
+export default class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupModel {
+  declare model: ViewMenuPopupModel;
+  declare content: TileGrid;
+
+  defaultIconId: string;
+  viewMenus: ViewButton[];
 
   constructor() {
     super();
@@ -23,7 +30,7 @@ export default class ViewMenuPopup extends WidgetPopup {
     this.trimWidth = true;
   }
 
-  _init(options) {
+  protected override _init(options: ViewMenuPopupModel) {
     super._init(options);
     let tiles = this._createTiles();
     let noIcons = tiles.every(tile => !tile.widgets[0].visible);
@@ -41,13 +48,14 @@ export default class ViewMenuPopup extends WidgetPopup {
         hgap: 10
       }
     });
-    let tile = this.content.tiles.find(tile => tile.viewMenu.selected);
+    let viewButtonTiles = this.content.tiles as ViewButtonTile[];
+    let tile = viewButtonTiles.find(tile => tile.viewMenu.selected);
     if (tile) {
       this.content.selectTile(tile);
     }
   }
 
-  _computeGridColumnCount(tiles) {
+  protected _computeGridColumnCount(tiles: RefModel<ViewButtonTileModel>[]): number {
     if (tiles.length > 8) {
       return 4;
     }
@@ -57,7 +65,7 @@ export default class ViewMenuPopup extends WidgetPopup {
     return 2;
   }
 
-  _createTiles() {
+  protected _createTiles(): RefModel<ViewButtonTileModel>[] {
     return this.viewMenus.map(menu => ({
       objectType: CompositeTile,
       displayStyle: Tile.DisplayStyle.PLAIN,
@@ -85,26 +93,23 @@ export default class ViewMenuPopup extends WidgetPopup {
     }));
   }
 
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
-
-    this.keyStrokeContext.registerKeyStroke([
-      new ViewMenuPopupEnterKeyStroke(this)
-    ]);
+    this.keyStrokeContext.registerKeyStroke(new ViewMenuPopupEnterKeyStroke(this));
   }
 
-  _renderContent() {
+  protected override _renderContent() {
     super._renderContent();
     this.content.$container.on('click', '.tile', event => {
       let target = scout.widget(event.target);
       if (!(target instanceof Tile)) {
         target = target.findParent(parent => parent instanceof Tile);
       }
-      this.activateTile(target);
+      this.activateTile(target as Tile);
     });
   }
 
-  activateTile(tile) {
+  activateTile(tile: Tile & { viewMenu?: ViewButton }) {
     if (!tile || !tile.viewMenu.enabledComputed) {
       return;
     }
@@ -112,3 +117,5 @@ export default class ViewMenuPopup extends WidgetPopup {
     this.close();
   }
 }
+export type ViewButtonTileModel = CompositeTileModel & { viewMenu?: ViewButton };
+export type ViewButtonTile = CompositeTile & { viewMenu?: ViewButton };
