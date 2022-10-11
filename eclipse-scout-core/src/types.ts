@@ -23,6 +23,8 @@ export type RefModel<MODEL extends { parent?: any; objectType?: ObjectType<any> 
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
+export type SomeRequired<T, K extends keyof T> = Pick<Required<T>, K> & Omit<T, K>;
+
 export type EnumObject<TYPE> = TYPE[keyof TYPE];
 
 export type EmptyObject = Record<string, never>;

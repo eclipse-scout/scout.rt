@@ -1,23 +1,30 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopTabBoxController, scout} from '../../index';
+import {DesktopBench, DesktopTabArea, DesktopTabBoxController, scout, SimpleTab, SimpleTabArea} from '../../index';
+import {SimpleTabAreaTabSelectEvent} from '../../tabbox/SimpleTabAreaEventMap';
 
 /**
- * The {@link {@link scout.HeaderViewTabAreaController}} is used to link the center {@link {@link SimpleTabBox}} (all forms with displayViewId='C')
+ * The {@link {@link HeaderTabBoxController}} is used to link the center {@link {@link SimpleTabBox}} (all forms with displayViewId='C')
  * with a {@link {@link SimpleTabArea}} placed in the header.
- * It is an extension of {@link {@link SimpleTabBoxController}}.
  *
  * @see SimpleTabBoxController
  */
 export default class HeaderTabBoxController extends DesktopTabBoxController {
+  declare tabArea: DesktopTabArea;
+
+  bench: DesktopBench;
+  tabAreaCenter: SimpleTabArea;
+  tabAreaInHeader: boolean;
+  protected _viewsChangedHandler: () => void;
+
   constructor() {
     super();
 
@@ -28,7 +35,8 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
     this.tabAreaInHeader = false;
   }
 
-  install(bench, tabArea) {
+  // @ts-ignore
+  override install(bench: DesktopBench, tabArea?: DesktopTabArea) {
     this.bench = scout.assertParameter('bench', bench);
 
     let tabBoxCenter = this.bench.getTabBox('C');
@@ -37,13 +45,13 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
     super.install(tabBoxCenter, tabArea);
   }
 
-  _installListeners() {
+  protected override _installListeners() {
     super._installListeners();
     this.bench.on('viewAdd', this._viewsChangedHandler);
     this.bench.on('viewRemove', this._viewsChangedHandler);
   }
 
-  _onViewsChanged() {
+  protected _onViewsChanged() {
     if (this.bench.getViews().some(view => 'C' !== view.displayViewId)) {
       // has views in other view stacks
       this._setViewTabAreaInHeader(false);
@@ -53,7 +61,7 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
     }
   }
 
-  _setViewTabAreaInHeader(inHeader) {
+  protected _setViewTabAreaInHeader(inHeader: boolean) {
     this.tabAreaInHeader = inHeader;
     this.tabAreaCenter.setVisible(!inHeader);
     this.tabArea.setVisible(inHeader);
@@ -63,14 +71,14 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
     }
   }
 
-  getTabs() {
+  override getTabs(): SimpleTab[] {
     if (this.tabAreaInHeader) {
       return this.tabArea.getTabs();
     }
     return this.tabAreaCenter.getTabs();
   }
 
-  _onViewTabSelect(view) {
+  protected override _onViewTabSelect(view: SimpleTabAreaTabSelectEvent) {
     super._onViewTabSelect(view);
     this.tabArea.updateFirstTabSelected();
   }

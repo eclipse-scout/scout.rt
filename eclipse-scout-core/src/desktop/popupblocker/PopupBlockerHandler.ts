@@ -1,42 +1,43 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ErrorHandler, MessageBoxes, PopupBlockerDesktopNotification, scout, Status} from '../../index';
+import {ErrorHandler, Event, EventHandler, MessageBoxes, PopupBlockerDesktopNotification, PopupBlockerHandlerModel, scout, Session, Status} from '../../index';
 import $ from 'jquery';
 
-export default class PopupBlockerHandler {
-  /**
-   * @param {boolean} [preserveOpener] A boolean indicating if the popup-window should have a back reference to the origin window. By default this parameter is false because of security reasons. Only trusted sites may be allowed to access the opener window and potentially modify the origin web application! See https://mathiasbynens.github.io/rel-noopener/ for more details.
-   * @deprecated use scout.create to create an instance of this class
-   */
-  constructor(session, preserveOpener) {
-    this.session = session;
-    this.preserveOpener = preserveOpener;
+export default class PopupBlockerHandler implements PopupBlockerHandlerModel {
+  declare model: PopupBlockerHandlerModel;
+
+  session: Session;
+  preserveOpener: boolean;
+
+  constructor() {
+    this.session = null;
+    this.preserveOpener = false;
   }
 
-  init(options) {
+  init(options: PopupBlockerHandlerModel) {
     $.extend(this, options);
   }
 
   /**
-   * @param {String} uri The URI for the window to open
-   * @param {String} [windowName] An optional string name for the new window. The name can be used as the target of links and forms using the target attribute of an 'a' or 'form' element. The name should not contain any blank space.
+   * @param uri The URI for the window to open
+   * @param windowName An optional string name for the new window. The name can be used as the target of links and forms using the target attribute of an 'a' or 'form' element. The name should not contain any blank space.
    *         Note that the window name does not specify the title of the new window.
-   * @param {String} [windowSpecs] Optional parameter listing the features (size, position, scrollbars, etc.) of the new window.
+   * @param windowSpecs Optional parameter listing the features (size, position, scrollbars, etc.) of the new window.
    *         The string must not contain any blank space, each feature name and value must be separated by a comma.
-   * @param {function} [onWindowOpened] Optional function to call when the window has been successfully opened.
+   * @param onWindowOpened Optional function to call when the window has been successfully opened.
    *         Due to popup-blockers this may not necessarily be directly after the call to this method but may be later when the popup-blocker-notification-link is manually activated by the user.
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/open
    */
-  openWindow(uri, windowName, windowSpecs, onWindowOpened) {
+  openWindow(uri: string, windowName?: string, windowSpecs?: string, onWindowOpened?: (popup: Window) => void) {
     windowName = windowName || 'scout_' + new Date().getTime();
 
     let popup = window.open('', windowName, windowSpecs);
@@ -62,15 +63,15 @@ export default class PopupBlockerHandler {
   }
 
   // Shows a notification when popup-blocker has been detected
-  showNotification(vararg) {
-    let notification, linkUrl,
+  showNotification(vararg: string | EventHandler<Event<PopupBlockerDesktopNotification>>) {
+    let linkUrl: string,
       desktop = this.session.desktop;
 
     if (typeof vararg === 'string') {
       linkUrl = vararg;
     }
 
-    notification = scout.create(PopupBlockerDesktopNotification, {
+    let notification = scout.create(PopupBlockerDesktopNotification, {
       parent: desktop,
       linkUrl: linkUrl,
       preserveOpener: this.preserveOpener
@@ -82,7 +83,7 @@ export default class PopupBlockerHandler {
     notification.show();
   }
 
-  _handleInvalidUri(uri, popup, err) {
+  protected _handleInvalidUri(uri: string, popup: Window, err: any) {
     // Log
     scout.create(ErrorHandler, {
       logError: true,

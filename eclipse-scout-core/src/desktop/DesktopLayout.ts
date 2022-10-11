@@ -1,24 +1,25 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, DesktopNavigation, Dimension, ResponsiveManager, Tree} from '../index';
+import {AbstractLayout, Desktop, DesktopNavigation, Dimension, HtmlComponent, ResponsiveManager, Tree} from '../index';
 
 export default class DesktopLayout extends AbstractLayout {
+  desktop: Desktop;
 
-  constructor(desktop) {
+  constructor(desktop: Desktop) {
     super();
     this.desktop = desktop;
   }
 
-  layout($container) {
-    let navigationSize, headerSize, htmlHeader, htmlBench, benchSize, htmlNavigation, animationProps,
+  override layout($container: JQuery) {
+    let animationProps,
       navigationWidth = 0,
       headerHeight = 0,
       desktop = this.desktop,
@@ -39,15 +40,15 @@ export default class DesktopLayout extends AbstractLayout {
       }
 
       if (desktop.navigationVisible) {
-        htmlNavigation = navigation.htmlComp;
-        navigationSize = new Dimension(navigationWidth, containerSize.height)
+        let htmlNavigation = navigation.htmlComp;
+        let navigationSize = new Dimension(navigationWidth, containerSize.height)
           .subtract(htmlNavigation.margins());
         htmlNavigation.setSize(navigationSize);
       }
     }
 
     if (header) {
-      htmlHeader = header.htmlComp;
+      let htmlHeader = header.htmlComp;
       headerHeight = htmlHeader.$comp.outerHeight(true);
       if (desktop.headerVisible) {
         // positioning
@@ -56,7 +57,7 @@ export default class DesktopLayout extends AbstractLayout {
         }
 
         // sizing
-        headerSize = new Dimension(containerSize.width - navigationWidth, headerHeight)
+        let headerSize = new Dimension(containerSize.width - navigationWidth, headerHeight)
           .subtract(htmlHeader.margins());
         if (!animated || fullWidthNavigation) {
           htmlHeader.setSize(headerSize);
@@ -67,13 +68,13 @@ export default class DesktopLayout extends AbstractLayout {
             left: containerSize.width
           };
           prepareAnimate(animationProps, htmlHeader, headerSize);
-          this._animate(animationProps, htmlHeader, headerSize);
+          this._animate(animationProps, htmlHeader);
         }
       }
     }
 
     if (bench) {
-      htmlBench = bench.htmlComp;
+      let htmlBench = bench.htmlComp;
       if (desktop.benchVisible) {
         // positioning
         bench.$container.cssTop(headerHeight);
@@ -82,7 +83,7 @@ export default class DesktopLayout extends AbstractLayout {
         }
 
         // sizing
-        benchSize = new Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
+        let benchSize = new Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
           .subtract(htmlBench.margins());
         if (!animated || fullWidthNavigation) {
           let oldSize = htmlBench.size();
@@ -97,12 +98,12 @@ export default class DesktopLayout extends AbstractLayout {
             left: containerSize.width
           };
           prepareAnimate(animationProps, htmlBench, benchSize);
-          this._animate(animationProps, htmlBench, benchSize);
+          this._animate(animationProps, htmlBench);
         }
       }
     }
 
-    function prepareAnimate(animationProps, htmlComp, size) {
+    function prepareAnimate(animationProps: any, htmlComp: HtmlComponent, size: Dimension) {
       if (fullWidthNavigation) {
         // Slide bench in from right to left, don't resize
         htmlComp.$comp.cssLeft(containerSize.width);
@@ -121,7 +122,7 @@ export default class DesktopLayout extends AbstractLayout {
   /**
    * Used to animate bench and header
    */
-  _animate(animationProps, htmlComp, size) {
+  protected _animate(animationProps: any, htmlComp: HtmlComponent) {
     // If animation is already running, stop the existing and don't use timeout to schedule the new to have a smoother transition
     // Concurrent animation of the same element is bad because jquery messes up the overflow style
     if (htmlComp.$comp.is(':animated')) {
@@ -139,16 +140,13 @@ export default class DesktopLayout extends AbstractLayout {
     }
   }
 
-  containerSize() {
+  containerSize(): Dimension {
     let htmlContainer = this.desktop.htmlComp,
-      containerSize = htmlContainer.availableSize({
-        exact: true
-      });
-
+      containerSize = htmlContainer.availableSize({exact: true});
     return containerSize.subtract(htmlContainer.insets());
   }
 
-  calculateNavigationWidth(containerSize) {
+  calculateNavigationWidth(containerSize: Dimension): number {
     if (!this.desktop.navigationVisible) {
       return 0;
     }

@@ -1,25 +1,31 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopNotification, scout, Status} from '../../index';
+import {DesktopNotification, PopupBlockerDesktopNotificationEventMap, PopupBlockerDesktopNotificationModel, scout, Status} from '../../index';
 
-export default class PopupBlockerDesktopNotification extends DesktopNotification {
+export default class PopupBlockerDesktopNotification extends DesktopNotification implements PopupBlockerDesktopNotificationModel {
+  declare model: PopupBlockerDesktopNotificationModel;
+  declare eventMap: PopupBlockerDesktopNotificationEventMap;
+
+  preserveOpener: boolean;
+  linkUrl: string;
+  linkText: string;
+  $link: JQuery<HTMLAnchorElement>;
 
   constructor() {
     super();
     this.duration = DesktopNotification.INFINITE;
-    this.linkUrl;
     this.preserveOpener = false;
   }
 
-  _init(model) {
+  protected override _init(model: PopupBlockerDesktopNotificationModel) {
     super._init(model);
     this.linkText = scout.nvl(this.linkText, this.session.text('ui.OpenManually'));
     this._setStatus({
@@ -28,21 +34,21 @@ export default class PopupBlockerDesktopNotification extends DesktopNotification
     });
   }
 
-  _render() {
+  protected override _render() {
     super._render();
 
     this.$messageText.addClass('popup-blocked-title');
     this.$link = this.$content.appendElement('<a>', 'popup-blocked-link')
       .text(this.linkText)
-      .on('click', this._onLinkClick.bind(this));
+      .on('click', this._onLinkClick.bind(this)) as JQuery<HTMLAnchorElement>;
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderLinkUrl();
   }
 
-  _renderLinkUrl() {
+  protected _renderLinkUrl() {
     if (this.linkUrl) {
       this.$link
         .attr('href', this.linkUrl)
@@ -56,7 +62,7 @@ export default class PopupBlockerDesktopNotification extends DesktopNotification
     }
   }
 
-  _onLinkClick() {
+  protected _onLinkClick(event: JQuery.ClickEvent) {
     this.trigger('linkClick');
     this.hide();
   }

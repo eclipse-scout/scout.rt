@@ -8,25 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventHandler, GlassPaneContribution, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
+import {Event, EventHandler, Form, GlassPaneContribution, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
 
-export type SimpleTabView = Widget & {
-  title?: string;
-  subTitle?: string;
-  iconId?: string;
-  closable?: boolean;
-  saveNeeded?: boolean;
-  saveNeededVisible?: boolean;
-  status?: Status;
-  displayViewId?: string;
-  abort();
-};
+export type DisplayViewId = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C' | 'OUTLINE' | 'OUTLINE_SELECTOR' | 'PAGE_DETAIL' | 'PAGE_SEARCH' | 'PAGE_TABLE';
 
 export default class SimpleTab extends Widget implements SimpleTabModel {
   declare model: SimpleTabModel;
   declare eventMap: SimpleTabEventMap;
 
-  view: SimpleTabView;
+  view: Form;
   title: string;
   subTitle: string;
   iconId: string;
@@ -46,14 +36,13 @@ export default class SimpleTab extends Widget implements SimpleTabModel {
   protected _statusContainerUsageCounter: number;
   protected _statusIconDivs: JQuery[];
   protected _viewPropertyChangeListener: EventHandler<PropertyChangeEvent>;
-  protected _viewRemoveListener: EventHandler<Event<SimpleTabView>>;
+  protected _viewRemoveListener: EventHandler<Event<Form>>;
   protected _glassPaneContribution: GlassPaneContribution;
 
   constructor() {
     super();
 
     this.view = null;
-
     this.title = null;
     this.subTitle = null;
     this.iconId = null;
@@ -71,7 +60,6 @@ export default class SimpleTab extends Widget implements SimpleTabModel {
 
     this._statusContainerUsageCounter = 0;
     this._statusIconDivs = [];
-
     this._viewPropertyChangeListener = this._onViewPropertyChange.bind(this);
     this._viewRemoveListener = this._onViewRemove.bind(this);
     this._glassPaneContribution = element => {
@@ -346,7 +334,7 @@ export default class SimpleTab extends Widget implements SimpleTabModel {
    * of the this tab, because in bench-mode the tab is never rendered
    * and thus the _remove function is never called.
    */
-  protected _onViewRemove(event: Event<SimpleTabView>) {
+  protected _onViewRemove(event: Event<Form>) {
     this._uninstallViewListeners();
     if (this.rendered) {
       this.remove();

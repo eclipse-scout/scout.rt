@@ -1,21 +1,35 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, Desktop, HtmlComponent, icons, KeyStrokeContext, OutlineViewButton, scout, ViewMenuOpenKeyStroke, ViewMenuPopup, Widget} from '../../index';
+import {
+  Action, arrays, Desktop, EventHandler, HtmlComponent, icons, KeyStrokeContext, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewMenuOpenKeyStroke, ViewMenuPopup, ViewMenuTabEventMap, ViewMenuTabModel, Widget
+} from '../../index';
 
 /**
  * Shows a list of view buttons with displayStyle=MENU
  * and shows the title of the active view button, if the view button is one
  * of the view buttons contained in the menu.
  */
-export default class ViewMenuTab extends Widget {
+export default class ViewMenuTab extends Widget implements ViewMenuTabModel {
+  declare model: ViewMenuTabModel;
+  declare eventMap: ViewMenuTabEventMap;
+
+  selected: boolean;
+  selectedButtonVisible: boolean;
+  defaultIconId: string;
+  viewButtons: ViewButton[];
+  selectedButton: ViewButton;
+  dropdown: Action;
+  popup: ViewMenuPopup;
+  desktopKeyStrokeContext: KeyStrokeContext;
+  protected _desktopInBackgroundHandler: EventHandler<PropertyChangeEvent<boolean, Desktop>>;
 
   constructor() {
     super();
@@ -30,7 +44,7 @@ export default class ViewMenuTab extends Widget {
     this._addPreserveOnPropertyChangeProperties(['selectedButton']);
   }
 
-  _init(model) {
+  protected override _init(model: ViewMenuTabModel) {
     super._init(model);
     this.dropdown = scout.create(Action, {
       parent: this,
@@ -44,12 +58,12 @@ export default class ViewMenuTab extends Widget {
     this.session.desktop.on('propertyChange:inBackground', this._desktopInBackgroundHandler);
   }
 
-  _destroy() {
+  protected override _destroy() {
     this.session.desktop.off('propertyChange:inBackground', this._desktopInBackgroundHandler);
     super._destroy();
   }
 
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     // Bound to desktop
@@ -57,12 +71,10 @@ export default class ViewMenuTab extends Widget {
     this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
     this.desktopKeyStrokeContext.$bindTarget = this.session.desktop.$container;
     this.desktopKeyStrokeContext.$scopeTarget = this.session.desktop.$container;
-    this.desktopKeyStrokeContext.registerKeyStroke([
-      new ViewMenuOpenKeyStroke(this)
-    ]);
+    this.desktopKeyStrokeContext.registerKeyStroke(new ViewMenuOpenKeyStroke(this));
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('view-tab view-menu-tab');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.dropdown.render(this.$container);
@@ -70,7 +82,7 @@ export default class ViewMenuTab extends Widget {
     this.$container.appendDiv('edge right');
   }
 
-  _remove() {
+  protected override _remove() {
     this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
     super._remove();
     if (this.selectedButton) {
@@ -78,18 +90,18 @@ export default class ViewMenuTab extends Widget {
     }
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderSelectedButtonVisible();
     this._renderSelected();
     this._renderInBackground();
   }
 
-  setViewButtons(viewButtons) {
+  setViewButtons(viewButtons: ViewButton[]) {
     this.setProperty('viewButtons', viewButtons);
   }
 
-  _setViewButtons(viewButtons) {
+  protected _setViewButtons(viewButtons: ViewButton[]) {
     this._setProperty('viewButtons', viewButtons);
     this.setVisible(this.viewButtons.length > 0);
     let selectedButton = this._findSelectedViewButton();
@@ -101,7 +113,7 @@ export default class ViewMenuTab extends Widget {
     this.setSelected(!!selectedButton);
   }
 
-  setSelectedButton(viewButton) {
+  setSelectedButton(viewButton: ViewButton) {
     if (this.selectedButton && this.selectedButton.cloneOf === viewButton) {
       return;
     }
@@ -110,7 +122,7 @@ export default class ViewMenuTab extends Widget {
     }
   }
 
-  _setSelectedButton(viewButton) {
+  protected _setSelectedButton(viewButton: ViewButton) {
     this.viewButtons.forEach(vb => vb.setSelectedAsMenu(vb === viewButton));
 
     // The selectedViewButton is a fake ViewButton but reflects the state of the actually selected one.
@@ -129,6 +141,7 @@ export default class ViewMenuTab extends Widget {
 
     // Link our fake button with the original and apply all the relevant properties (which are stored in cloneProperties, e.g. outline, cssClass, enabled, etc.)
     clone.cloneOf = viewButton;
+    // @ts-ignore
     viewButton._cloneProperties.forEach(property => clone.callSetter(property, viewButton[property]));
 
     // Use default icon if outline does not define one.
@@ -145,15 +158,15 @@ export default class ViewMenuTab extends Widget {
     this._setProperty('selectedButton', clone);
   }
 
-  _renderSelectedButton() {
+  protected _renderSelectedButton() {
     this._renderSelectedButtonVisible();
   }
 
-  setSelectedButtonVisible(selectedButtonVisible) {
+  setSelectedButtonVisible(selectedButtonVisible: boolean) {
     this.setProperty('selectedButtonVisible', selectedButtonVisible);
   }
 
-  _renderSelectedButtonVisible() {
+  protected _renderSelectedButtonVisible() {
     this.$container.toggleClass('selected-button-invisible', !this.selectedButtonVisible);
     if (!this.selectedButton) {
       return;
@@ -172,15 +185,15 @@ export default class ViewMenuTab extends Widget {
     }
   }
 
-  setSelected(selected) {
+  setSelected(selected: boolean) {
     this.setProperty('selected', selected);
   }
 
-  _renderSelected() {
+  protected _renderSelected() {
     this.$container.select(this.selected);
   }
 
-  _findSelectedViewButton() {
+  protected _findSelectedViewButton(): ViewButton {
     return arrays.find(this.viewButtons, v => v.selected);
   }
 
@@ -195,7 +208,7 @@ export default class ViewMenuTab extends Widget {
     }
   }
 
-  _openPopup() {
+  protected _openPopup() {
     if (this.popup) {
       // already open
       return;
@@ -213,13 +226,13 @@ export default class ViewMenuTab extends Widget {
     });
   }
 
-  _closePopup() {
+  protected _closePopup() {
     if (this.popup) {
       this.popup.close();
     }
   }
 
-  _renderInBackground() {
+  protected _renderInBackground() {
     if (this.session.desktop.displayStyle === Desktop.DisplayStyle.COMPACT) {
       return;
     }
@@ -242,7 +255,7 @@ export default class ViewMenuTab extends Widget {
     this._closePopup();
   }
 
-  _onDesktopInBackgroundChange() {
+  protected _onDesktopInBackgroundChange(event: PropertyChangeEvent<boolean, Desktop>) {
     if (this.rendered) {
       this._renderInBackground();
     }

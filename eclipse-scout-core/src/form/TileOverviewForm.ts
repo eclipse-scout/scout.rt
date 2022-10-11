@@ -1,17 +1,29 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Form, HtmlComponent, PageTileGrid, RowLayout, scout} from '../index';
+import {Desktop, EventHandler, Form, HtmlComponent, Outline, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOverviewFormEventMap, TileOverviewFormModel} from '../index';
 
-export default class TileOverviewForm extends Form {
+export default class TileOverviewForm extends Form implements TileOverviewFormModel {
+  declare model: TileOverviewFormModel;
+  declare eventMap: TileOverviewFormEventMap;
+
+  outline: Outline;
+  nodes: Page[];
+  tileOverviewTitle: string;
+  scrollable: boolean;
+  pageTileGrid: PageTileGrid;
+  contentHtmlComp: HtmlComponent;
+  $content: JQuery;
+  protected _desktopNavigationVisibilityChangeHandler: EventHandler<PropertyChangeEvent<boolean, Desktop>>;
+
   constructor() {
     super();
 
@@ -20,14 +32,12 @@ export default class TileOverviewForm extends Form {
     this.tileOverviewTitle = null;
     this.scrollable = true;
     this._addWidgetProperties(['pageTileGrid']);
-
     this.$content = null;
     this.$title = null;
-
     this._desktopNavigationVisibilityChangeHandler = this._onDesktopNavigationVisibilityChange.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model: TileOverviewFormModel) {
     super._init(model);
     if (!this.pageTileGrid) {
       this.pageTileGrid = this._createPageTileGrid();
@@ -35,7 +45,7 @@ export default class TileOverviewForm extends Form {
     this.addCssClass('dimmed-background');
   }
 
-  _renderForm() {
+  protected override _renderForm() {
     super._renderForm();
     this.htmlComp.setLayout(new RowLayout());
     this.$content = this.$container.appendDiv('tile-overview-content');
@@ -48,16 +58,14 @@ export default class TileOverviewForm extends Form {
     this.findDesktop().on('propertyChange:navigationVisible', this._desktopNavigationVisibilityChangeHandler);
   }
 
-  _remove() {
+  protected override _remove() {
     this.$content = null;
     this.$title = null;
-
     this.findDesktop().off('propertyChange:navigationVisible', this._desktopNavigationVisibilityChangeHandler);
-
     super._remove();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     if (this.pageTileGrid.rendered) {
       this.pageTileGrid = this._createPageTileGrid();
@@ -66,11 +74,11 @@ export default class TileOverviewForm extends Form {
     this._renderScrollable();
   }
 
-  _renderPageTileGrid() {
+  protected _renderPageTileGrid() {
     this.pageTileGrid.render(this.$content);
   }
 
-  _createPageTileGrid() {
+  protected _createPageTileGrid(): PageTileGrid {
     return scout.create(PageTileGrid, {
       parent: this,
       outline: this.outline,
@@ -78,11 +86,11 @@ export default class TileOverviewForm extends Form {
     });
   }
 
-  setScrollable(scrollable) {
+  setScrollable(scrollable: boolean) {
     this.setProperty('scrollable', scrollable);
   }
 
-  _renderScrollable() {
+  protected _renderScrollable() {
     if (this.scrollable) {
       this._installScrollbars({
         axis: 'y'
@@ -92,7 +100,7 @@ export default class TileOverviewForm extends Form {
     }
   }
 
-  setPage(page) {
+  setPage(page: Page) {
     this.outline = page.getOutline();
     this.nodes = page.childNodes;
     this.tileOverviewTitle = page.text;
@@ -104,7 +112,7 @@ export default class TileOverviewForm extends Form {
     this.pageTileGrid.setNodes(this.nodes);
   }
 
-  _updateTitle(animated = true) {
+  protected _updateTitle(animated = true) {
     if (!this.$title) {
       return;
     }
@@ -112,7 +120,7 @@ export default class TileOverviewForm extends Form {
     this.$title.toggleClass('removed', this.findDesktop().navigationVisible);
   }
 
-  _onDesktopNavigationVisibilityChange(event) {
+  protected _onDesktopNavigationVisibilityChange(event: PropertyChangeEvent<boolean, Desktop>) {
     this._updateTitle();
   }
 }

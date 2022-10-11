@@ -9,32 +9,22 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays,
-  Button,
-  CheckBoxField,
-  CompositeField,
-  FormField,
-  GridData,
-  GroupBox,
-  HtmlEnvironment,
-  LabelField,
-  PlaceholderField,
-  RadioButtonGroup,
-  ResponsiveHandler,
-  ResponsiveManager,
-  SequenceBox,
-  TreeVisitResult
+  arrays, Button, CheckBoxField, CompositeField, EventHandler, FormField, GridData, GroupBox, HtmlComponent, HtmlEnvironment, LabelField, PlaceholderField, PropertyChangeEvent, RadioButtonGroup, ResponsiveHandler, ResponsiveHandlerModel,
+  ResponsiveManager, SequenceBox, TreeVisitResult
 } from '../index';
 
 export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
+  declare widget: GroupBox;
+
+  protected _compositeFields: CompositeField[];
+  protected _formFieldAddedHandler: EventHandler<PropertyChangeEvent<any, CompositeField>>;
+  protected _htmlPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, HtmlEnvironment>>;
 
   constructor() {
     super();
 
     this._initDefaults();
     this.allowedStates = [ResponsiveManager.ResponsiveState.NORMAL, ResponsiveManager.ResponsiveState.CONDENSED, ResponsiveManager.ResponsiveState.COMPACT];
-
-    // Event handlers
     this._formFieldAddedHandler = this._onFormFieldAdded.bind(this);
     this._compositeFields = [];
     this._htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
@@ -51,20 +41,17 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     HIDE_PLACE_HOLDER_FIELD: 'hidePlaceHolderField',
     FIELD_SCALABLE: 'fieldScalable',
     RADIO_BUTTON_GROUP_USE_UI_HEIGHT: 'radioButtonGroupUseUiHeight'
-  };
+  } as const;
 
-  _initDefaults() {
+  protected _initDefaults() {
     this.compactThreshold = HtmlEnvironment.get().formColumnWidth;
   }
 
-  _onHtmlEnvironmentPropertyChange() {
+  protected _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
   }
 
-  /**
-   * @Override
-   */
-  init(model) {
+  override init(model: ResponsiveHandlerModel) {
     super.init(model);
 
     let transformationType = GroupBoxResponsiveHandler.TransformationType;
@@ -105,50 +92,29 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     });
   }
 
-  /**
-   * @Override
-   */
-  destroy() {
+  override destroy() {
     super.destroy();
 
-    this._compositeFields.forEach(compositeField => {
-      compositeField.off('propertyChange', this._formFieldAddedHandler);
-    });
-
+    this._compositeFields.forEach(compositeField => compositeField.off('propertyChange', this._formFieldAddedHandler));
     HtmlEnvironment.get().off('propertyChange', this._htmlPropertyChangeHandler);
   }
 
-  /**
-   * @Override
-   */
-  active() {
+  override active(): boolean {
     return this.widget.responsive;
   }
 
-  /**
-   * @Override
-   */
-  getCondensedThreshold() {
+  override getCondensedThreshold(): number {
     if (this.condensedThreshold > 0) {
       return this.condensedThreshold;
     }
-
-    return this.widget.htmlComp.prefSize({
-      widthOnly: true
-    }).width;
+    return this.widget.htmlComp.prefSize({widthOnly: true}).width;
   }
 
-  /**
-   * @Override
-   */
-  _transform() {
+  protected override _transform() {
     this.widget.visitFields(this._transformWidget.bind(this));
   }
 
-  /**
-   * @Override
-   */
-  _transformWidget(widget) {
+  protected override _transformWidget(widget: FormField): TreeVisitResult {
     // skip group boxes with responsiveness set.
     if (widget !== this.widget && widget instanceof GroupBox && widget.responsive !== null) {
       return TreeVisitResult.SKIP_SUBTREE;
@@ -161,7 +127,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
 
     // suppress a validate of the layout tree, because these widgets will be validated later anyway.
     // the component still might be marked as invalid (which is necessary) caused by the responsive modifications applied.
-    let htmlParent;
+    let htmlParent: HtmlComponent;
     if (widget.htmlComp) {
       widget.htmlComp.suppressValidate = true;
       htmlParent = widget.htmlComp.getParent();
@@ -185,10 +151,8 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
   /**
    * Label Position -> ON_FIELD
    */
-  _transformLabelPositionOnField(field, apply) {
-    if (field.parent instanceof SequenceBox ||
-      field instanceof CheckBoxField ||
-      field instanceof LabelField) {
+  protected _transformLabelPositionOnField(field: FormField, apply: boolean) {
+    if (field.parent instanceof SequenceBox || field instanceof CheckBoxField || field instanceof LabelField) {
       return;
     }
 
@@ -205,7 +169,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
   /**
    * Label Position -> ON_TOP
    */
-  _transformLabelPositionOnTop(field, apply) {
+  protected _transformLabelPositionOnTop(field: FormField, apply: boolean) {
     if (field.parent instanceof SequenceBox ||
       field instanceof CheckBoxField ||
       field instanceof LabelField ||
@@ -226,7 +190,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
   /**
    * Label visibility
    */
-  _transformLabelVisibility(field, apply) {
+  protected _transformLabelVisibility(field: FormField, apply: boolean) {
     if (!(field instanceof CheckBoxField)) {
       return;
     }
@@ -241,20 +205,20 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     }
   }
 
-  // Scoutjs specific method. This methods will be overridden by GroupBoxAdapter for scout classic case.
-  getGridData(field) {
+  // ScoutJs specific method. This methods will be overridden by GroupBoxAdapter for scout classic case.
+  getGridData(field: FormField): GridData {
     return new GridData(field.gridDataHints);
   }
 
-  // Scoutjs specific method. This methods will be overridden by GroupBoxAdapter for scout classic case.
-  setGridData(field, gridData) {
+  // ScoutJs specific method. This methods will be overridden by GroupBoxAdapter for scout classic case.
+  setGridData(field: FormField, gridData: GridData) {
     field.setGridDataHints(gridData);
   }
 
   /**
    * Status position
    */
-  _transformStatusPosition(field, apply) {
+  protected _transformStatusPosition(field: FormField, apply: boolean) {
     if (apply) {
       this._storeFieldProperty(field, 'statusPosition', field.statusPosition);
       field.setStatusPosition(FormField.StatusPosition.TOP);
@@ -268,7 +232,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
   /**
    * Status visibility
    */
-  _transformStatusVisibility(field, apply) {
+  protected _transformStatusVisibility(field: FormField, apply: boolean) {
     if (apply) {
       this._storeFieldProperty(field, 'statusVisible', field.statusVisible);
       field.setStatusVisible(false);
@@ -282,7 +246,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
   /**
    * Vertical alignment
    */
-  _transformVerticalAlignment(field, apply) {
+  protected _transformVerticalAlignment(field: FormField, apply: boolean) {
     let isDefaultButton = field instanceof Button && field.displayStyle === Button.DisplayStyle.DEFAULT;
     let isCheckbox = field instanceof CheckBoxField;
     let isSingleHeightOnFieldLabelField = field.labelPosition === FormField.LabelPosition.ON_FIELD && field.gridData && field.gridData.h === 1;
@@ -313,7 +277,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
   /**
    * Column count
    */
-  _transformGridColumnCount(field, apply) {
+  protected _transformGridColumnCount(field: FormField, apply: boolean) {
     if (!(field instanceof GroupBox)) {
       return;
     }
@@ -331,7 +295,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
   /**
    * Hide placeholder field
    */
-  _transformHidePlaceHolderField(field, apply) {
+  protected _transformHidePlaceHolderField(field: FormField, apply: boolean) {
     if (!(field instanceof PlaceholderField)) {
       return;
     }
@@ -355,7 +319,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
    * Additionally, since we use a one column layout, setting weightX to 0 might destroy the layout because it affects
    * all the fields in the groupBox.
    */
-  _transformFieldScalable(field, apply) {
+  protected _transformFieldScalable(field: FormField, apply: boolean) {
     if (field.parent instanceof SequenceBox) {
       return;
     }
@@ -373,7 +337,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     this.setGridData(field, gridData);
   }
 
-  _transformRadioButtonGroupUseUiHeight(field, apply) {
+  protected _transformRadioButtonGroupUseUiHeight(field: FormField, apply: boolean) {
     if (!(field instanceof RadioButtonGroup)) {
       return;
     }
@@ -393,12 +357,10 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
 
   /* --- HANDLERS ------------------------------------------------------------- */
 
-  _onFormFieldAdded(event) {
+  protected _onFormFieldAdded(event: PropertyChangeEvent<any, CompositeField>) {
     if (this.state !== ResponsiveManager.ResponsiveState.NORMAL && (event.propertyName === 'fields' || event.propertyName === 'tabItems')) {
-      let newFields = arrays.diff(event.newValue, event.oldValue);
-      newFields.forEach(field => {
-        field.visitFields(this._transformWidget.bind(this));
-      });
+      let newFields = arrays.diff(event.newValue, event.oldValue) as CompositeField[];
+      newFields.forEach(field => field.visitFields(this._transformWidget.bind(this)));
     }
   }
 }

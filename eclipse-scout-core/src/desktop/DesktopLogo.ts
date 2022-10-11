@@ -1,16 +1,25 @@
 /*
- * Copyright (c) 2014-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Image, scout, Widget} from '../index';
+import {Desktop, DesktopLogoEventMap, DesktopLogoModel, EventHandler, HtmlComponent, Image, PropertyChangeEvent, scout, Widget} from '../index';
 
-export default class DesktopLogo extends Widget {
+export default class DesktopLogo extends Widget implements DesktopLogoModel {
+  declare model: DesktopLogoModel;
+  declare eventMap: DesktopLogoEventMap;
+
+  desktop: Desktop;
+  clickable: boolean;
+  url: string;
+  image: Image;
+  protected _desktopPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Desktop>>;
+  protected _clickHandler: (event: JQuery.ClickEvent) => void;
 
   constructor() {
     super();
@@ -21,7 +30,7 @@ export default class DesktopLogo extends Widget {
     this._clickHandler = this._onClick.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model: DesktopLogoModel) {
     super._init(model);
     this.desktop = this.session.desktop;
     this.clickable = this.desktop.logoActionEnabled;
@@ -32,24 +41,24 @@ export default class DesktopLogo extends Widget {
     });
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('desktop-logo');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.image.render();
     this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderClickable();
   }
 
-  _remove() {
+  protected override _remove() {
     this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
     super._remove();
   }
 
-  _renderClickable() {
+  protected _renderClickable() {
     this.$container.toggleClass('clickable', this.clickable);
     if (this.clickable) {
       this.$container.on('click', this._clickHandler);
@@ -58,22 +67,22 @@ export default class DesktopLogo extends Widget {
     }
   }
 
-  setUrl(url) {
+  setUrl(url: string) {
     this.setProperty('url', url);
     this.image.setImageUrl(url);
   }
 
-  setClickable(clickable) {
+  setClickable(clickable: boolean) {
     this.setProperty('clickable', clickable);
   }
 
-  _onDesktopPropertyChange(event) {
+  protected _onDesktopPropertyChange(event: PropertyChangeEvent<any, Desktop>) {
     if (event.propertyName === 'logoActionEnabled') {
       this.setClickable(event.newValue);
     }
   }
 
-  _onClick(event) {
+  protected _onClick(event: JQuery.ClickEvent) {
     this.desktop.logoAction();
   }
 }

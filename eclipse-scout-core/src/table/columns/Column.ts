@@ -299,7 +299,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     return this.buildCell(cell, {});
   }
 
-  buildCell(cell: Cell, row: TableRow | { hasError?: boolean; expanded?: boolean }): string {
+  buildCell(cell: Cell, row: TableRow | { hasError?: boolean; expanded?: boolean; expandable?: boolean }): string {
     scout.assertParameter('cell', cell, Cell);
 
     let tableNodeColumn = this.table.isTableNodeColumn(this),
@@ -332,8 +332,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
       }
     }
 
-    // @ts-ignore
-    if (tableNodeColumn && row._expandable) {
+    if (tableNodeColumn && row.expandable) {
       this.tableNodeColumn = true;
       content = this._expandIcon(row.expanded, rowPadding) + content;
       if (row.expanded) {

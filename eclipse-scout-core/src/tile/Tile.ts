@@ -46,7 +46,7 @@ export default class Tile extends Widget implements TileModel {
   static DisplayStyle = {
     DEFAULT: 'default',
     PLAIN: 'plain'
-  } as const;
+  }; // not const, can be extended
 
   protected override _createLoadingSupport(): LoadingSupport {
     return new LoadingSupport({

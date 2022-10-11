@@ -28,7 +28,6 @@ export default interface TreeNodeModel {
   lazyExpandingEnabled?: boolean;
   leaf?: boolean;
   level?: number;
-  parentNode?: TreeNode;
   session?: Session;
   text?: string;
   tooltipText?: string;

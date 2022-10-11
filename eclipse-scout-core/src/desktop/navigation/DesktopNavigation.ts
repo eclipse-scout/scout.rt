@@ -1,16 +1,42 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CollapseHandle, Desktop, DesktopNavigationHandle, DesktopNavigationLayout, DesktopToolBox, HtmlComponent, scout, SingleLayout, styles, Tree, ViewButtonBox, Widget} from '../../index';
+import {
+  CollapseHandle, Desktop, DesktopNavigationEventMap, DesktopNavigationHandle, DesktopNavigationLayout, DesktopNavigationModel, DesktopToolBox, EventHandler, HtmlComponent, LayoutData, Outline, PropertyChangeEvent, scout, SingleLayout,
+  styles, Tree, ViewButtonBox, Widget
+} from '../../index';
+import {CollapseHandleActionEvent} from '../../collapsehandle/CollapseHandleEventMap';
 
-export default class DesktopNavigation extends Widget {
+export default class DesktopNavigation extends Widget implements DesktopNavigationModel {
+  declare model: DesktopNavigationModel;
+  declare eventMap: DesktopNavigationEventMap;
+  declare parent: Desktop;
+  declare htmlComp: HtmlComponent & { layoutData: DesktopNavigationLayoutData };
+
+  desktop: Desktop;
+  outline: Outline;
+
+  handleVisible: boolean;
+  handle: DesktopNavigationHandle;
+
+  toolBox: DesktopToolBox;
+  toolBoxVisible: boolean;
+
+  viewButtonBox: ViewButtonBox;
+  layoutData: DesktopNavigationLayoutData;
+  $body: JQuery;
+  htmlCompBody: HtmlComponent;
+
+  protected _outlinePropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Outline>>;
+  protected _desktopPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Desktop>>;
+  protected _viewButtonBoxPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, ViewButtonBox>>;
 
   constructor() {
     super();
@@ -28,7 +54,7 @@ export default class DesktopNavigation extends Widget {
   static BREADCRUMB_STYLE_WIDTH = null; // Configured in sizes.css
   static MIN_WIDTH = null; // Configured in sizes.css
 
-  _init(model) {
+  protected override _init(model: DesktopNavigationModel) {
     super._init(model);
     DesktopNavigation.MIN_WIDTH = styles.getSize('desktop-navigation', 'min-width', 'minWidth', 49);
     DesktopNavigation.DEFAULT_STYLE_WIDTH = styles.getSize('desktop-navigation', 'width', 'width', 290);
@@ -43,7 +69,7 @@ export default class DesktopNavigation extends Widget {
     this.viewButtonBox.on('propertyChange', this._viewButtonBoxPropertyChangeHandler);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('desktop-navigation');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new DesktopNavigationLayout(this));
@@ -57,12 +83,12 @@ export default class DesktopNavigation extends Widget {
     this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   }
 
-  _remove() {
+  protected override _remove() {
     this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
     super._remove();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderViewButtonBox();
     this._renderViewButtonBoxVisible();
@@ -72,23 +98,23 @@ export default class DesktopNavigation extends Widget {
     this._renderInBackground();
   }
 
-  _renderInBackground() {
+  protected _renderInBackground() {
     this.$container.toggleClass('in-background', this.desktop.inBackground && this.desktop.displayStyle !== Desktop.DisplayStyle.COMPACT);
   }
 
-  _renderViewButtonBox() {
+  protected _renderViewButtonBox() {
     this.viewButtonBox.render();
     this.viewButtonBox.$container.insertBefore(this.$body);
   }
 
-  _removeOutline() {
+  protected _removeOutline() {
     if (!this.outline) {
       return;
     }
     this.outline.remove();
   }
 
-  _renderOutline() {
+  protected _renderOutline() {
     if (!this.outline) {
       return;
     }
@@ -101,11 +127,11 @@ export default class DesktopNavigation extends Widget {
     }
   }
 
-  setOutline(outline) {
+  setOutline(outline: Outline) {
     this.setProperty('outline', outline);
   }
 
-  _setOutline(newOutline) {
+  protected _setOutline(newOutline: Outline) {
     let oldOutline = this.outline;
     if (this.outline) {
       this.outline.off('propertyChange', this._outlinePropertyChangeHandler);
@@ -118,8 +144,7 @@ export default class DesktopNavigation extends Widget {
       this.outline.setParent(this);
       this.outline.setBreadcrumbTogglingThreshold(DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
       // if both have breadcrumb-toggling enabled: make sure new outline uses same display style as old
-      if (this.outline.toggleBreadcrumbStyleEnabled && oldOutline && oldOutline.toggleBreadcrumbStyleEnabled &&
-        oldOutline.displayStyle) {
+      if (this.outline.toggleBreadcrumbStyleEnabled && oldOutline && oldOutline.toggleBreadcrumbStyleEnabled && oldOutline.displayStyle) {
         this.outline.setDisplayStyle(oldOutline.displayStyle);
       }
       this.outline.inBackground = this.desktop.inBackground;
@@ -128,7 +153,7 @@ export default class DesktopNavigation extends Widget {
     }
   }
 
-  _renderViewButtonBoxVisible() {
+  protected _renderViewButtonBoxVisible() {
     this.$container.toggleClass('view-button-box-invisible', !this.viewButtonBox.visible);
   }
 
@@ -150,18 +175,17 @@ export default class DesktopNavigation extends Widget {
     }
   }
 
-  setToolBoxVisible(toolBoxVisible) {
+  setToolBoxVisible(toolBoxVisible: boolean) {
     this.setProperty('toolBoxVisible', toolBoxVisible);
   }
 
-  setHandleVisible(visible) {
+  setHandleVisible(visible: boolean) {
     this.setProperty('handleVisible', visible);
   }
 
-  _updateHandle() {
+  protected _updateHandle() {
     if (this.handle) {
-      this.handle.setRightVisible(this.outline && this.outline.toggleBreadcrumbStyleEnabled &&
-        this.desktop.outlineDisplayStyle() === Tree.DisplayStyle.BREADCRUMB);
+      this.handle.setRightVisible(this.outline && this.outline.toggleBreadcrumbStyleEnabled && this.desktop.outlineDisplayStyle() === Tree.DisplayStyle.BREADCRUMB);
     }
   }
 
@@ -170,7 +194,7 @@ export default class DesktopNavigation extends Widget {
     this.setHandleVisible(this.desktop.navigationHandleVisible);
   }
 
-  _renderToolBoxVisible() {
+  protected _renderToolBoxVisible() {
     if (this.toolBoxVisible) {
       this._renderToolBox();
     } else {
@@ -178,7 +202,7 @@ export default class DesktopNavigation extends Widget {
     }
   }
 
-  _renderToolBox() {
+  protected _renderToolBox() {
     if (this.toolBox) {
       return;
     }
@@ -189,7 +213,7 @@ export default class DesktopNavigation extends Widget {
     this.toolBox.render();
   }
 
-  _removeToolBox() {
+  protected _removeToolBox() {
     if (!this.toolBox) {
       return;
     }
@@ -197,7 +221,7 @@ export default class DesktopNavigation extends Widget {
     this.toolBox = null;
   }
 
-  _renderHandleVisible() {
+  protected _renderHandleVisible() {
     if (this.handleVisible) {
       this._renderHandle();
     } else {
@@ -205,7 +229,7 @@ export default class DesktopNavigation extends Widget {
     }
   }
 
-  _createHandle() {
+  protected _createHandle(): DesktopNavigationHandle {
     return scout.create(DesktopNavigationHandle, {
       parent: this,
       rightVisible: false,
@@ -213,7 +237,7 @@ export default class DesktopNavigation extends Widget {
     });
   }
 
-  _renderHandle() {
+  protected _renderHandle() {
     if (this.handle) {
       return;
     }
@@ -224,7 +248,7 @@ export default class DesktopNavigation extends Widget {
     this._updateHandle();
   }
 
-  _removeHandle() {
+  protected _removeHandle() {
     if (!this.handle) {
       return;
     }
@@ -232,11 +256,11 @@ export default class DesktopNavigation extends Widget {
     this.handle = null;
   }
 
-  _onNavigationBodyMouseDown(event) {
+  protected _onNavigationBodyMouseDown(event: JQuery.MouseDownEvent) {
     this.desktop.bringOutlineToFront();
   }
 
-  _onViewButtonBoxPropertyChange(event) {
+  protected _onViewButtonBoxPropertyChange(event: PropertyChangeEvent<any, ViewButtonBox>) {
     if (event.propertyName === 'visible') {
       if (this.rendered) {
         this._renderViewButtonBoxVisible();
@@ -244,19 +268,19 @@ export default class DesktopNavigation extends Widget {
     }
   }
 
-  _onOutlinePropertyChange(event) {
+  protected _onOutlinePropertyChange(event: PropertyChangeEvent<any, Outline>) {
     if (event.propertyName === 'displayStyle') {
       this._updateHandle();
     }
   }
 
-  _onDesktopPropertyChange(event) {
+  protected _onDesktopPropertyChange(event: PropertyChangeEvent<any, Desktop>) {
     if (event.propertyName === 'navigationHandleVisible') {
       this.updateHandleVisibility();
     }
   }
 
-  _onHandleAction(event) {
+  protected _onHandleAction(event: CollapseHandleActionEvent) {
     if (event.left) {
       this.desktop.shrinkNavigation();
     } else {
@@ -264,3 +288,4 @@ export default class DesktopNavigation extends Widget {
     }
   }
 }
+export type DesktopNavigationLayoutData = LayoutData & { fullWidth?: boolean };

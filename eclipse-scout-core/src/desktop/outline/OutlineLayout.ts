@@ -1,30 +1,29 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, graphics, TreeLayout} from '../../index';
+import {Dimension, graphics, Outline, TreeLayout} from '../../index';
 
 export default class OutlineLayout extends TreeLayout {
+  outline: Outline;
 
-  constructor(outline) {
+  constructor(outline: Outline) {
     super(outline);
     this.outline = outline;
   }
 
-  _layout($container) {
-    let containerSize,
-      htmlContainer = this.outline.htmlComp;
+  protected override _layout($container: JQuery) {
+    let htmlContainer = this.outline.htmlComp;
 
     super._layout($container);
 
-    containerSize = htmlContainer.availableSize({exact: true})
-      .subtract(htmlContainer.insets());
+    let containerSize = htmlContainer.availableSize({exact: true}).subtract(htmlContainer.insets());
 
     if (this.outline.embedDetailContent) {
       let selectedNode = this.outline.selectedNodes[0];
@@ -45,9 +44,8 @@ export default class OutlineLayout extends TreeLayout {
     this.outline.detailMenuBar.validateLayout();
   }
 
-  _setDataHeight(heightOffset) {
-    /** @type {Dimension} */
-    let titleSize = null;
+  protected override _setDataHeight(heightOffset: number) {
+    let titleSize: Dimension = null;
     if (this.outline.titleVisible) {
       titleSize = graphics.size(this.outline.$title, true);
     }

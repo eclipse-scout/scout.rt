@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FileChooser, FileChooserController, Form, MessageBox, MessageBoxController, Widget} from '../index';
+import {FileChooser, FileChooserController, Form, FormController, MessageBox, MessageBoxController, Widget} from '../index';
 
 export default interface DisplayParent extends Widget {
 
   views: Form[];
   dialogs: Form[];
+  formController: FormController;
 
   messageBoxes: MessageBox[];
   messageBoxController: MessageBoxController;

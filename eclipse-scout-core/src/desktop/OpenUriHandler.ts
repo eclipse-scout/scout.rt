@@ -8,16 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, Device, PopupBlockerHandler, scout} from '../index';
+import {Desktop, Device, OpenUriHandlerModel, PopupBlockerHandler, scout, Session} from '../index';
 import $ from 'jquery';
+import {DesktopUriAction} from './Desktop';
 
-export default class OpenUriHandler {
+export default class OpenUriHandler implements OpenUriHandlerModel {
+  declare model: OpenUriHandlerModel;
 
-  init(model) {
+  session: Session;
+
+  init(model: OpenUriHandlerModel) {
     this.session = model.session;
   }
 
-  openUri(uri, action) {
+  openUri(uri: string, action?: DesktopUriAction) {
     $.log.isDebugEnabled() && $.log.debug('(OpenUriHandler#openUri) uri=' + uri + ' action=' + action);
     if (!uri) {
       return;
@@ -37,7 +41,7 @@ export default class OpenUriHandler {
     }
   }
 
-  handleUriActionDownload(uri) {
+  handleUriActionDownload(uri: string) {
     if (Device.get().isIos()) {
       // The iframe trick does not work for ios
       // Since the file cannot be stored on the file system it will be shown in the browser if possible
@@ -58,11 +62,11 @@ export default class OpenUriHandler {
     }
   }
 
-  isUriWithExternallyHandledProtocol(uri) {
+  isUriWithExternallyHandledProtocol(uri: string): boolean {
     return /^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|tel|google.navigation|sms|msteams):/.test(uri);
   }
 
-  handleUriActionOpen(uri) {
+  handleUriActionOpen(uri: string) {
     if (Device.get().isIos()) {
       // Open in same window.
       // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
@@ -81,23 +85,23 @@ export default class OpenUriHandler {
     }
   }
 
-  handleUriActionNewWindow(uri) {
+  handleUriActionNewWindow(uri: string) {
     this.openUriAsNewWindow(uri);
   }
 
-  handleUriActionPopupWindow(uri) {
+  handleUriActionPopupWindow(uri: string) {
     this.openUriAsPopupWindow(uri);
   }
 
-  handleUriActionSameWindow(uri) {
+  handleUriActionSameWindow(uri: string) {
     this.openUriInSameWindow(uri);
   }
 
-  openUriInSameWindow(uri) {
+  openUriInSameWindow(uri: string) {
     window.location.assign(uri);
   }
 
-  openUriInIFrame(uri) {
+  openUriInIFrame(uri: string) {
     // Create a hidden iframe and set the URI as src attribute value
     let $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
       .attr('tabindex', -1)
@@ -109,12 +113,12 @@ export default class OpenUriHandler {
     }, 10 * 1000);
   }
 
-  openUriAsNewWindow(uri) {
+  openUriAsNewWindow(uri: string) {
     let popupBlockerHandler = scout.create(PopupBlockerHandler, {session: this.session});
     popupBlockerHandler.openWindow(uri);
   }
 
-  openUriAsPopupWindow(uri) {
+  openUriAsPopupWindow(uri: string) {
     let popupBlockerHandler = scout.create(PopupBlockerHandler, {session: this.session});
     popupBlockerHandler.openWindow(uri, null, 'location=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes');
   }

@@ -1,21 +1,28 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, AutoLeafPageWithNodes, Page, scout, Status} from '../../../index';
+import {arrays, AutoLeafPageWithNodes, EventHandler, Form, Page, PageWithTableModel, scout, Status, Table, TableRow} from '../../../index';
 import $ from 'jquery';
+import {TableAllRowsDeletedEvent, TableReloadEvent, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent} from '../../../table/TableEventMap';
 
-/**
- * @class
- * @extends Page
- */
-export default class PageWithTable extends Page {
+export default class PageWithTable extends Page implements PageWithTableModel {
+  declare model: PageWithTableModel;
+
+  alwaysCreateChildPage: boolean;
+
+  protected _tableRowDeleteHandler: EventHandler<TableRowsDeletedEvent | TableAllRowsDeletedEvent>;
+  protected _tableRowInsertHandler: EventHandler<TableRowsInsertedEvent>;
+  protected _tableRowUpdateHandler: EventHandler<TableRowsUpdatedEvent>;
+  protected _tableRowActionHandler: EventHandler<TableRowActionEvent>;
+  protected _tableRowOrderChangeHandler: EventHandler<TableRowOrderChangedEvent>;
+  protected _tableDataLoadHandler: EventHandler<TableReloadEvent>;
 
   constructor() {
     super();
@@ -31,10 +38,7 @@ export default class PageWithTable extends Page {
     this._tableDataLoadHandler = this.loadTableData.bind(this);
   }
 
-  /**
-   * @override Page
-   */
-  _initDetailTable(table) {
+  protected override _initDetailTable(table: Table) {
     super._initDetailTable(table);
     table.on('rowsDeleted allRowsDeleted', this._tableRowDeleteHandler);
     table.on('rowsInserted', this._tableRowInsertHandler);
@@ -45,10 +49,7 @@ export default class PageWithTable extends Page {
     table.hasReloadHandler = true;
   }
 
-  /**
-   * @override Page
-   */
-  _destroyDetailTable(table) {
+  protected override _destroyDetailTable(table: Table) {
     table.off('rowsDeleted allRowsDeleted', this._tableRowDeleteHandler);
     table.off('rowsInserted', this._tableRowInsertHandler);
     table.off('rowsUpdated', this._tableRowUpdateHandler);
@@ -58,7 +59,7 @@ export default class PageWithTable extends Page {
     super._destroyDetailTable(table);
   }
 
-  _onTableRowsDeleted(event) {
+  protected _onTableRowsDeleted(event: TableRowsDeletedEvent | TableAllRowsDeletedEvent) {
     if (this.leaf) { // when page is a leaf we do nothing at all
       return;
     }
@@ -67,7 +68,7 @@ export default class PageWithTable extends Page {
         let childPage = row.page;
         childPage.unlinkWithRow(row);
         return childPage;
-      }, this);
+      });
 
     this.getOutline().mediator.onTableRowsDeleted(rows, childPages, this);
   }
@@ -76,35 +77,33 @@ export default class PageWithTable extends Page {
    * We must set childNodeIndex on each created childPage because it is required to
    * determine the order of nodes in the tree.
    */
-  _onTableRowsInserted(event) {
+  protected _onTableRowsInserted(event: TableRowsInsertedEvent) {
     if (this.leaf) { // when page is a leaf we do nothing at all
       return;
     }
 
     let rows = arrays.ensure(event.rows),
-      childPages = rows.map(function(row) {
-        return this._createChildPageInternal(row);
-      }, this);
+      childPages = rows.map(row => this._createChildPageInternal(row));
 
     this.getOutline().mediator.onTableRowsInserted(rows, childPages, this);
   }
 
-  _onTableRowsUpdated(event) {
+  protected _onTableRowsUpdated(event: TableRowsUpdatedEvent) {
     this.getOutline().mediator.onTableRowsUpdated(event, this);
   }
 
-  _onTableRowAction(event) {
+  protected _onTableRowAction(event: TableRowActionEvent) {
     this.getOutline().mediator.onTableRowAction(event, this);
   }
 
-  _onTableRowOrderChanged(event) {
+  protected _onTableRowOrderChanged(event: TableRowOrderChangedEvent) {
     if (event.animating) { // do nothing while row order animation is in progress
       return;
     }
     this.getOutline().mediator.onTableRowOrderChanged(event, this);
   }
 
-  _createChildPageInternal(row) {
+  protected _createChildPageInternal(row: TableRow): Page {
     let childPage = this.createChildPage(row);
     if (childPage === null && this.alwaysCreateChildPage) {
       childPage = this.createDefaultChildPage(row);
@@ -116,23 +115,20 @@ export default class PageWithTable extends Page {
 
   /**
    * Override this method to return a specific Page instance for the given table-row.
-   * The default impl. returns null, which means a AutoLeaftPageWithNodes instance will be created for the table-row.
+   * The default impl. returns null, which means a AutoLeafPageWithNodes instance will be created for the table-row.
    */
-  createChildPage(row) {
+  createChildPage(row: TableRow): Page {
     return null;
   }
 
-  createDefaultChildPage(row) {
+  createDefaultChildPage(row: TableRow): Page {
     return scout.create(AutoLeafPageWithNodes, {
       parent: this.getOutline(),
       row: row
     });
   }
 
-  /**
-   * @override TreeNode.js
-   */
-  loadChildren() {
+  override loadChildren(): JQuery.Deferred<any> {
     // It's allowed to have no table - but we don't have to load data in that case
     if (!this.detailTable) {
       return $.resolvedDeferred();
@@ -140,11 +136,13 @@ export default class PageWithTable extends Page {
     return this.loadTableData();
   }
 
-  _createSearchFilter() {
+  protected _createSearchFilter(): any {
     let firstFormTableControl = arrays.find(this.detailTable.tableControls, tableControl => {
-      return tableControl.form;
+      // @ts-ignore
+      return tableControl.form instanceof Form;
     });
     if (firstFormTableControl) {
+      // @ts-ignore
       return firstFormTableControl.form.exportData();
     }
     return null;
@@ -152,16 +150,15 @@ export default class PageWithTable extends Page {
 
   /**
    * see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
-   * @returns {$.Deferred}
    */
-  loadTableData() {
+  loadTableData(): JQuery.Deferred<any> {
     this.ensureDetailTable();
     this.detailTable.deleteAllRows();
     this.detailTable.setLoading(true);
     return this._loadTableData(this._createSearchFilter())
       .then(this._onLoadTableDataDone.bind(this))
       .catch(this._onLoadTableDataFail.bind(this))
-      .then(this._onLoadTableDataAlways.bind(this));
+      .then(this._onLoadTableDataAlways.bind(this)) as JQuery.Deferred<any>;
   }
 
   /**
@@ -179,10 +176,8 @@ export default class PageWithTable extends Page {
    * </code>
    *
    * @param searchFilter The search filter as exported by the search form or null.
-   *
-   * @return {Promise}
    */
-  _loadTableData(searchFilter) {
+  protected _loadTableData(searchFilter: any): JQuery.Deferred<any> {
     return $.resolvedDeferred();
   }
 
@@ -192,21 +187,21 @@ export default class PageWithTable extends Page {
    *
    * @param tableData data loaded by <code>_loadTableData</code>
    */
-  _onLoadTableDataDone(tableData) {
+  protected _onLoadTableDataDone(tableData: any) {
     let rows = this._transformTableDataToTableRows(tableData);
     if (rows && rows.length > 0) {
       this.detailTable.insertRows(rows);
     }
   }
 
-  _onLoadTableDataFail(error) {
+  protected _onLoadTableDataFail(error: any) {
     this.detailTable.setTableStatus(Status.error({
       message: this.session.text('ErrorWhileLoadingData')
     }));
     $.log.error('Failed to load tableData. error=', error);
   }
 
-  _onLoadTableDataAlways() {
+  protected _onLoadTableDataAlways() {
     this.childrenLoaded = true;
     this.detailTable.setLoading(false);
   }
@@ -214,11 +209,8 @@ export default class PageWithTable extends Page {
   /**
    * This method converts the loaded table data, which can be any object, into table rows.
    * You must override this method unless tableData is already an array of table rows.
-   *
-   * @param tableData
-   * @returns
    */
-  _transformTableDataToTableRows(tableData) {
+  protected _transformTableDataToTableRows(tableData: any): TableRow[] {
     return tableData;
   }
 }

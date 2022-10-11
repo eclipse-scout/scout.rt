@@ -10,6 +10,7 @@
  */
 
 import {GlassPaneRenderer, Widget} from '../index';
+import {GlassPaneTarget} from '../widget/Widget';
 
 /**
  * Is used to render glasspane after the glasspane targets are set. This case occurs when a child is rendered before a parent is rendered-> on reload page.
@@ -17,14 +18,14 @@ import {GlassPaneRenderer, Widget} from '../index';
 export default class DeferredGlassPaneTarget {
 
   glassPaneRenderer: GlassPaneRenderer;
-  $glassPaneTargets: JQuery[];
+  $glassPaneTargets: GlassPaneTarget[];
 
   constructor() {
     this.$glassPaneTargets = null;
     this.glassPaneRenderer = null;
   }
 
-  ready($glassPaneTargets: JQuery[]) {
+  ready($glassPaneTargets: GlassPaneTarget[]) {
     this.$glassPaneTargets = $glassPaneTargets;
     this.renderWhenReady();
   }
@@ -42,7 +43,7 @@ export default class DeferredGlassPaneTarget {
 
   renderWhenReady() {
     if (this.glassPaneRenderer && this.$glassPaneTargets && this.$glassPaneTargets.length > 0) {
-      this.$glassPaneTargets.forEach($glassPaneTarget => this.glassPaneRenderer.renderGlassPane($glassPaneTarget));
+      this.$glassPaneTargets.forEach(glassPaneTarget => this.glassPaneRenderer.renderGlassPane(glassPaneTarget));
     }
   }
 
@@ -52,7 +53,7 @@ export default class DeferredGlassPaneTarget {
    * @param widget a not rendered Widget
    * @param findGlassPaneTargets function which returns the targets
    */
-  static createFor(widget: Widget, findGlassPaneTargets: () => JQuery[]): DeferredGlassPaneTarget[] {
+  static createFor(widget: Widget, findGlassPaneTargets: () => GlassPaneTarget[]): DeferredGlassPaneTarget[] {
     if (widget.rendered) {
       throw new Error('Don\'t call this function if widget is already rendered.');
     }

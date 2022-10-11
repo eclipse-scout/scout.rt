@@ -12,6 +12,7 @@ import {Event, MessageBox, ModelAdapter} from '../index';
 import {MessageBoxActionEvent} from './MessageBoxEventMap';
 
 export default class MessageBoxAdapter extends ModelAdapter {
+  declare widget: MessageBox;
 
   constructor() {
     super();

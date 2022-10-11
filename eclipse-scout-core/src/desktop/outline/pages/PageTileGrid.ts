@@ -1,16 +1,30 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ButtonTile, KeyStrokeContext, PageTileButton, PageTileGridSelectKeyStroke, scout, TileGrid, TileGridLayoutConfig} from '../../../index';
+import {ButtonTile, EventHandler, KeyStrokeContext, Outline, Page, PageTileButton, PageTileGridEventMap, PageTileGridModel, PageTileGridSelectKeyStroke, scout, TileGrid, TileGridLayoutConfig} from '../../../index';
+import {TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent, TreeNodeChangedEvent, TreeNodesDeletedEvent, TreeNodesInsertedEvent} from '../../../tree/TreeEventMap';
+import {OutlinePageChangedEvent} from '../OutlineEventMap';
 
-export default class PageTileGrid extends TileGrid {
+export default class PageTileGrid extends TileGrid implements PageTileGridModel {
+  declare model: PageTileGridModel;
+  declare eventMap: PageTileGridEventMap;
+  declare tiles: ButtonTile[];
+
+  compact: boolean;
+  compactLayoutConfig: TileGridLayoutConfig;
+  outline: Outline;
+  page: Page;
+  nodes: Page[];
+
+  protected _outlineNodeChangedHandler: EventHandler<TreeNodeChangedEvent<Outline> | OutlinePageChangedEvent>;
+  protected _outlineStructureChangedHandler: EventHandler<TreeNodesDeletedEvent | TreeNodesInsertedEvent | TreeAllChildNodesDeletedEvent | TreeChildNodeOrderChangedEvent>;
 
   constructor() {
     super();
@@ -31,7 +45,7 @@ export default class PageTileGrid extends TileGrid {
     this._outlineStructureChangedHandler = this._onOutlineStructureChanged.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model: PageTileGridModel) {
     super._init(model);
     this.nodes = this.nodes || (this.page && this.page.childNodes) || (this.outline && this.outline.nodes);
     this._setCompact(this.compact);
@@ -41,32 +55,24 @@ export default class PageTileGrid extends TileGrid {
     this._setCompactLayoutConfig(this.compactLayoutConfig);
   }
 
-  _destroy() {
+  protected override _destroy() {
     this.setOutline(null);
     this.setPage(null);
     this.setNodes(null);
     super._destroy();
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
     this.keyStrokeContext.$bindTarget = this.session.$entryPoint;
-    this.keyStrokeContext.registerKeyStroke([
-      new PageTileGridSelectKeyStroke(this)
-    ]);
+    this.keyStrokeContext.registerKeyStroke(new PageTileGridSelectKeyStroke(this));
   }
 
-  setOutline(outline) {
+  setOutline(outline: Outline) {
     if (this.outline) {
       this.outline.off('nodeChanged pageChanged', this._outlineNodeChangedHandler);
       this.outline.off('nodesDeleted', this._outlineStructureChangedHandler);
@@ -84,11 +90,11 @@ export default class PageTileGrid extends TileGrid {
     }
   }
 
-  setCompact(compact) {
+  setCompact(compact: boolean) {
     this.setProperty('compact', compact);
   }
 
-  _setCompact(compact) {
+  protected _setCompact(compact: boolean) {
     this._setProperty('compact', compact);
     if (this.compact) {
       this.setLayoutConfig(this.compactLayoutConfig);
@@ -103,29 +109,27 @@ export default class PageTileGrid extends TileGrid {
     }
   }
 
-  _setCompactLayoutConfig(layoutConfig) {
+  protected _setCompactLayoutConfig(layoutConfig: TileGridLayoutConfig) {
     if (!layoutConfig) {
       layoutConfig = new TileGridLayoutConfig();
     }
     this._setProperty('compactLayoutConfig', TileGridLayoutConfig.ensure(layoutConfig));
   }
 
-  setPage(page) {
+  setPage(page: Page) {
     this._setProperty('page', page);
   }
 
-  setNodes(nodes) {
+  setNodes(nodes: Page[]) {
     this._setProperty('nodes', nodes);
     this._rebuild();
   }
 
-  _createPageTiles(pages) {
-    return (pages || []).map(function(page) {
-      return this._createPageTile(page);
-    }, this);
+  protected _createPageTiles(pages: Page[]): ButtonTile[] {
+    return (pages || []).map(page => this._createPageTile(page));
   }
 
-  _createPageTile(page) {
+  protected _createPageTile(page: Page): ButtonTile {
     let button = scout.create(PageTileButton, {
       parent: this,
       outline: this.outline,
@@ -140,28 +144,29 @@ export default class PageTileGrid extends TileGrid {
     return tile;
   }
 
-  _rebuild() {
+  protected _rebuild() {
     this.setTiles(this._createPageTiles(this.nodes));
   }
 
-  _onOutlineNodeChanged(event) {
-    let page = event.node || event.page;
+  protected _onOutlineNodeChanged(event: TreeNodeChangedEvent<Outline> | OutlinePageChangedEvent) {
+    // @ts-ignore
+    let page: Page = event.node || event.page;
     let tile = page.tile;
     if (!tile) {
       return;
     }
-    tile.tileWidget.notifyPageChanged();
+    let tileButton = tile.tileWidget as PageTileButton;
+    tileButton.notifyPageChanged();
   }
 
-  _onOutlineStructureChanged(event) {
+  protected _onOutlineStructureChanged(event: TreeNodesDeletedEvent | TreeNodesInsertedEvent | TreeAllChildNodesDeletedEvent | TreeChildNodeOrderChangedEvent) {
     if (this.page) {
       if (this.page === event.parentNode) {
         this.setNodes(this.page.childNodes);
       }
     } else {
-      let eventContainsTopLevelNode = event.nodes && event.nodes.some(node => {
-        return !node.parentNode;
-      }) || event.type === 'allChildNodesDeleted';
+      // @ts-ignore
+      let eventContainsTopLevelNode = event.nodes && event.nodes.some(node => !node.parentNode) || event.type === 'allChildNodesDeleted';
       // only rebuild if top level nodes change
       if (eventContainsTopLevelNode) {
         this.setNodes(this.outline.nodes);

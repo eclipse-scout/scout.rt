@@ -12,7 +12,7 @@ import {WidgetModel} from '../index';
 import {CollapseHandleHorizontalAlignment} from './CollapseHandle';
 
 export default interface CollapseHandleModel extends WidgetModel {
-  leftVisible: boolean;
-  rightVisible: boolean;
-  horizontalAlignment: CollapseHandleHorizontalAlignment;
+  leftVisible?: boolean;
+  rightVisible?: boolean;
+  horizontalAlignment?: CollapseHandleHorizontalAlignment;
 }

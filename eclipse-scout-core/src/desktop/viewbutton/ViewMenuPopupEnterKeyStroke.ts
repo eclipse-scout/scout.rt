@@ -9,13 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {keys, KeyStroke} from '../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, ViewMenuPopup} from '../../index';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class ViewMenuPopupEnterKeyStroke extends KeyStroke {
+  declare field: ViewMenuPopup;
 
-  constructor(popup) {
+  constructor(popup: ViewMenuPopup) {
     super();
-    /** @type ViewMenuPopup */
     this.field = popup;
     this.which = [keys.ENTER, keys.SPACE];
     this.renderingHints.$drawingArea = ($drawingArea, event) => {
@@ -27,11 +28,11 @@ export default class ViewMenuPopupEnterKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
-  accept(event) {
+  override accept(event: ScoutKeyboardEvent): boolean {
     return super.accept(event) && this.field.content.selectedTiles.length === 1 && this.field.content.selectedTiles[0].enabledComputed;
   }
 
-  handle(event) {
+  override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     this.field.activateTile(this.field.content.selectedTiles[0]);
   }
 }

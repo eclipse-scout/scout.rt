@@ -1,19 +1,25 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Dimension, FormController, PopupBlockerHandler, PopupWindow, scout} from '../index';
+import {arrays, Desktop, DesktopFormControllerModel, Dimension, Event, Form, FormController, PopupBlockerHandler, PopupWindow, scout} from '../index';
 import $ from 'jquery';
 
-export default class DesktopFormController extends FormController {
+export default class DesktopFormController extends FormController implements DesktopFormControllerModel {
+  declare model: DesktopFormControllerModel;
+  declare displayParent: Desktop;
 
-  constructor(model) {
+  desktop: Desktop;
+  protected _popupWindows: PopupWindow[];
+  protected _documentPopupWindowReadyHandler: (event: JQuery.TriggeredEvent, data: PopupWindowReadyData) => void;
+
+  constructor(model: DesktopFormControllerModel) {
     super(model);
     this.desktop = model.displayParent;
     this._popupWindows = [];
@@ -24,7 +30,7 @@ export default class DesktopFormController extends FormController {
     $(document).on('popupWindowReady', this._documentPopupWindowReadyHandler);
   }
 
-  render() {
+  override render() {
     super.render();
     let activeForm = this.desktop.activeForm;
     if (activeForm) {
@@ -34,13 +40,11 @@ export default class DesktopFormController extends FormController {
     }
   }
 
-  _renderViews() {
+  protected override _renderViews() {
     super._renderViews();
 
     if (this.desktop.selectedViewTabs) {
-      this.desktop.selectedViewTabs.forEach(selectedView => {
-        this._activateView(selectedView);
-      });
+      this.desktop.selectedViewTabs.forEach(selectedView => this._activateView(selectedView));
     }
 
     // ensure in all view stacks the last view is activated
@@ -49,19 +53,16 @@ export default class DesktopFormController extends FormController {
     }
   }
 
-  isFormShown(form) {
+  override isFormShown(form: Form): boolean {
     if (form.isPopupWindow()) {
       return this._popupWindows.some(popup => popup.form.id === form.id);
     }
     return super.isFormShown(form);
   }
 
-  /**
-   * @override FormController.js
-   */
-  _renderPopupWindow(form) {
-    let windowSpecs,
-      resizeToPrefSize; // flag used to resize browser-window later (see PopupWindow.js)
+  protected override _renderPopupWindow(form: Form, position?: number) {
+    let windowSpecs: string,
+      resizeToPrefSize: boolean; // flag used to resize browser-window later (see PopupWindow.js)
 
     let bounds = form.readCacheBounds();
     if (bounds) {
@@ -90,7 +91,7 @@ export default class DesktopFormController extends FormController {
     });
   }
 
-  _addPopupWindow(newWindow, form, resizeToPrefSize) {
+  protected _addPopupWindow(newWindow: Window, form: Form, resizeToPrefSize: boolean) {
     let popupWindow = new PopupWindow(newWindow, form);
     popupWindow.resizeToPrefSize = resizeToPrefSize;
     popupWindow.events.on('popupWindowUnload', this._onPopupWindowUnload.bind(this));
@@ -98,14 +99,14 @@ export default class DesktopFormController extends FormController {
     $.log.isDebugEnabled() && $.log.debug('Opened new popup window for form ID ' + form.id);
   }
 
-  _onDocumentPopupWindowReady(event, data) {
+  protected _onDocumentPopupWindowReady(event: JQuery.TriggeredEvent, data: PopupWindowReadyData) {
     $.log.isDebugEnabled() && $.log.debug('(FormController#_onDocumentPopupWindowReady) data=' + data);
-    let popupWindow;
+    let popupWindow: PopupWindow;
     if (data.formId) {
       // reload (existing popup window)
-      let i, formId = data.formId;
+      let formId = data.formId;
       $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + formId + ' has been reloaded');
-      for (i = 0; i < this._popupWindows.length; i++) {
+      for (let i = 0; i < this._popupWindows.length; i++) {
         popupWindow = this._popupWindows[i];
         if (popupWindow.form.id === formId) {
           break;
@@ -121,10 +122,11 @@ export default class DesktopFormController extends FormController {
       // error assertion
       throw new Error('Neither property \'formId\' nor \'popupWindow\' exists on data parameter');
     }
+    // @ts-ignore
     popupWindow._onReady();
   }
 
-  _onPopupWindowUnload(popupWindow) {
+  protected _onPopupWindowUnload(popupWindow: Event<PopupWindow> & PopupWindow) {
     let form = popupWindow.form;
     $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + form.id + ' is unloaded - don\'t know if its closed or reloaded yet');
 
@@ -152,16 +154,11 @@ export default class DesktopFormController extends FormController {
    * again when the page has been reloaded.
    */
   closePopupWindows() {
-    this._popupWindows.forEach(function(popupWindow) {
-      this._removePopupWindow(popupWindow.form);
-    }, this);
+    this._popupWindows.forEach(popupWindow => this._removePopupWindow(popupWindow.form));
     this._popupWindows = [];
   }
 
-  /**
-   * @override FormController.js
-   */
-  _removePopupWindow(form) {
+  protected override _removePopupWindow(form: Form) {
     let popupWindow = form.popupWindow;
     if (!popupWindow) {
       throw new Error('Form has no popupWindow reference');
@@ -177,4 +174,10 @@ export default class DesktopFormController extends FormController {
   dispose() {
     $(document).off('popupWindowReady', this._documentPopupWindowReadyHandler);
   }
+}
+
+export interface PopupWindowReadyData {
+  window: Window;
+  popupWindow?: PopupWindow;
+  formId?: string;
 }

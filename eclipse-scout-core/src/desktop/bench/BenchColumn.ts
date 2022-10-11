@@ -1,26 +1,44 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DesktopTabBoxController, FlexboxLayout, FlexboxLayoutData, HtmlComponent, scout, SimpleTabBox, Splitter, strings, Widget, widgets} from '../../index';
+import {arrays, BenchColumnEventMap, BenchColumnModel, DesktopTabBoxController, Event, EventHandler, FlexboxLayout, FlexboxLayoutData, HtmlComponent, scout, SimpleTabBox, Splitter, strings, Widget, widgets} from '../../index';
+import {SimpleTabBoxViewActivateEvent, SimpleTabBoxViewAddEvent, SimpleTabBoxViewDeactivateEvent, SimpleTabBoxViewRemoveEvent} from '../../tabbox/SimpleTabBoxEventMap';
+import BenchRowLayoutData from './layout/BenchRowLayoutData';
+import {DisplayViewId} from '../../tabbox/SimpleTab';
+import {SplitterMoveEvent} from '../../splitter/SplitterEventMap';
+import {EventMapOf, EventModel} from '../../events/EventEmitter';
+import {OutlineContent} from './DesktopBench';
 
-export default class BenchColumn extends Widget {
+export default class BenchColumn extends Widget implements BenchColumnModel {
+  declare model: BenchColumnModel;
+  declare eventMap: BenchColumnEventMap;
+
+  tabBoxes: SimpleTabBox[];
+  layoutData: BenchRowLayoutData;
+  components: (SimpleTabBox | Splitter)[];
+  layoutCacheKey: string[];
+
+  protected _widgetToTabBox: Record<string /* viewId */, SimpleTabBox>;
+  protected _removeViewInProgress: number;
+  protected _viewAddHandler: EventHandler<SimpleTabBoxViewAddEvent>;
+  protected _viewRemoveHandler: EventHandler<SimpleTabBoxViewRemoveEvent>;
+  protected _viewActivateHandler: EventHandler<SimpleTabBoxViewActivateEvent>;
+  protected _viewDeactivateHandler: EventHandler<SimpleTabBoxViewDeactivateEvent>;
 
   constructor() {
     super();
     this.tabBoxes = [];
-    this._widgetToTabBox = {}; // [key=viewId, value=SimpleTabBox instance]
+    this._widgetToTabBox = {};
     this.components = null;
     this._removeViewInProgress = 0;
-    this.layoutData;
 
-    // event listener functions
     this._viewAddHandler = this._onViewAdd.bind(this);
     this._viewRemoveHandler = this._onViewRemove.bind(this);
     this._viewActivateHandler = this._onViewActivate.bind(this);
@@ -31,15 +49,15 @@ export default class BenchColumn extends Widget {
     TOP: 0,
     CENTER: 1,
     BOTTOM: 2
-  };
+  } as const;
 
   static TAB_BOX_CLASSES = [
     'north',
     'center',
     'south'
-  ];
+  ] as const;
 
-  _init(model) {
+  protected override _init(model: BenchColumnModel) {
     super._init(model);
     this.layoutData = model.layoutData;
     this.layoutCacheKey = model.cacheKey;
@@ -47,16 +65,7 @@ export default class BenchColumn extends Widget {
     this._createTabBoxes();
   }
 
-  /**
-   * Returns a $container used as a bind target for the key-stroke context of the group-box.
-   * By default this function returns the container of the form, or when group-box is has no
-   * form as a parent the container of the group-box.
-   */
-  _keyStrokeBindTarget() {
-    return this.$container;
-  }
-
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('bench-column');
     if (this.cssClass) {
       this.$container.addClass(this.cssClass);
@@ -67,36 +76,32 @@ export default class BenchColumn extends Widget {
     this.htmlComp.layoutData = this.getLayoutData();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderTabBoxes();
     this._revalidateSplitters();
   }
 
-  _renderTabBoxes() {
-    this.visibleTabBoxes().forEach(tabBox => {
-      this._renderTabBox(tabBox);
-    });
+  protected _renderTabBoxes() {
+    this.visibleTabBoxes().forEach(tabBox => this._renderTabBox(tabBox));
     this.updateFirstLastMarker();
   }
 
-  _renderTabBox(tabBox) {
+  protected _renderTabBox(tabBox: SimpleTabBox) {
     if (!tabBox.rendered) {
       tabBox.render();
     }
   }
 
   postRender() {
-    this.tabBoxes.forEach(tabBox => {
-      tabBox.postRender();
-    });
+    this.tabBoxes.forEach(tabBox => tabBox.postRender());
   }
 
-  _createLayout() {
+  protected _createLayout(): FlexboxLayout {
     return new FlexboxLayout(FlexboxLayout.Direction.COLUMN, this.layoutCacheKey);
   }
 
-  updateLayoutData(layoutData, cacheKey) {
+  updateLayoutData(layoutData: BenchRowLayoutData, cacheKey: string[]) {
     if (this.getLayoutData() === layoutData) {
       return;
     }
@@ -105,57 +110,60 @@ export default class BenchColumn extends Widget {
 
     // update columns
     let rowDatas = this.layoutData.getRows();
-    this.tabBoxes.forEach((tb, i) => {
-      tb.setLayoutData(rowDatas[i]);
-    });
+    this.tabBoxes.forEach((tb, i) => tb.setLayoutData(rowDatas[i]));
     this._updateSplitterMovable();
     if (this.rendered) {
-      this.htmlComp.layout.setCacheKey(this.layoutCacheKey);
-      this.htmlComp.layout.reset();
+      let layout = this.htmlComp.layout as FlexboxLayout;
+      layout.setCacheKey(this.layoutCacheKey);
+      layout.reset();
       this.htmlComp.invalidateLayoutTree();
     }
   }
 
-  setLayoutData(layoutData) {
+  override setLayoutData(layoutData: BenchRowLayoutData) {
     super.setLayoutData(layoutData);
     this.layoutData = layoutData;
   }
 
-  getLayoutData() {
+  getLayoutData(): BenchRowLayoutData {
     return this.layoutData;
   }
 
-  _onViewAdd(event) {
+  protected _onViewAdd(event: SimpleTabBoxViewAddEvent) {
     this.trigger('viewAdd', {
       view: event.view
     });
   }
 
-  _onViewRemove(event) {
+  protected _onViewRemove(event: SimpleTabBoxViewRemoveEvent) {
     this.trigger('viewRemove', {
       view: event.view
     });
   }
 
-  _onViewActivate(event) {
+  protected _onViewActivate(event: SimpleTabBoxViewActivateEvent) {
     this.trigger('viewActivate', {
       view: event.view
     });
   }
 
-  _onViewDeactivate(event) {
+  protected _onViewDeactivate(event: SimpleTabBoxViewDeactivateEvent) {
     this.trigger('viewDeactivate', {
       view: event.view
     });
   }
 
-  activateView(view) {
+  override trigger<K extends string & keyof EventMapOf<BenchColumn>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<BenchColumn>[K]>): EventMapOf<BenchColumn>[K] {
+    return super.trigger(type, eventOrModel);
+  }
+
+  activateView(view: OutlineContent) {
     let tabBox = this.getTabBox(view.displayViewId);
     tabBox.activateView(view);
   }
 
-  _createTabBoxes() {
-    let rowLayoutDatas = [];
+  protected _createTabBoxes() {
+    let rowLayoutDatas: FlexboxLayoutData[] = [];
     if (this.layoutData) {
       rowLayoutDatas = this.layoutData.getRows();
     }
@@ -174,7 +182,7 @@ export default class BenchColumn extends Widget {
     }
   }
 
-  _revalidateSplitters(clearPosition) {
+  _revalidateSplitters() {
     // remove old splitters
     if (this.components) {
       this.components.forEach(comp => {
@@ -184,7 +192,7 @@ export default class BenchColumn extends Widget {
       });
     }
     this.components = this.visibleTabBoxes()
-      .reduce((arr, col) => {
+      .reduce((arr: (SimpleTabBox | Splitter)[], col: SimpleTabBox) => {
         if (arr.length > 0) {
           // add sep
           let splitter = scout.create(Splitter, {
@@ -203,9 +211,8 @@ export default class BenchColumn extends Widget {
         return arr;
       }, []);
     // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
-    this.components.filter(comp => {
-      return comp instanceof SimpleTabBox;
-    })
+    this.components
+      .filter(comp => comp instanceof SimpleTabBox)
       .reduce((c1, c2, index) => {
         if (index > 0) {
           c2.$container.insertAfter(c1.$container);
@@ -215,57 +222,44 @@ export default class BenchColumn extends Widget {
     this._updateSplitterMovable();
   }
 
-  _updateSplitterMovable() {
+  protected _updateSplitterMovable() {
     if (!this.components) {
       return;
     }
     this.components.forEach((c, i) => {
       if (c instanceof Splitter) {
-        let componentsBefore = this.components.slice(0, i).reverse();
-        let componentsAfter = this.components.slice(i + 1);
+        let componentsBefore = this.components.slice(0, i).reverse() as SimpleTabBox[];
+        let componentsAfter = this.components.slice(i + 1) as SimpleTabBox[];
         // shrink
-        if (
-          componentsBefore.filter(c => {
-            return c.getLayoutData().shrink > 0;
-          }).length > 0 &&
-          componentsAfter.filter(c => {
-            return c.getLayoutData().grow > 0;
-          }).length > 0
-        ) {
+        if (componentsBefore.filter(tab => tab.getLayoutData().shrink > 0).length > 0
+          && componentsAfter.filter(tab => tab.getLayoutData().grow > 0).length > 0) {
           c.setEnabled(true);
           c.on('move', this._onSplitterMove.bind(this));
           return;
         }
         // grow
-        if (
-          componentsBefore.filter(c => {
-            return c.getLayoutData().grow > 0;
-          }).length > 0 &&
-          componentsAfter.filter(c => {
-            return c.getLayoutData().shrink > 0;
-          }).length > 0
-        ) {
+        if (componentsBefore.filter(c => c.getLayoutData().grow > 0).length > 0
+          && componentsAfter.filter(c => c.getLayoutData().shrink > 0).length > 0) {
           c.setEnabled(true);
           c.on('move', this._onSplitterMove.bind(this));
           return;
         }
         c.setEnabled(false);
-
       }
     });
   }
 
-  _onSplitterMove(event) {
+  protected _onSplitterMove(event: SplitterMoveEvent) {
     let splitter = event.source;
     // noinspection UnnecessaryLocalVariableJS
     let diff = event.position - splitter.htmlComp.location().y - splitter.htmlComp.margins().top - splitter.htmlComp.insets().top;
-    splitter.getLayoutData().diff = diff;
+    (splitter.getLayoutData() as FlexboxLayoutData).diff = diff;
     this.revalidateLayout();
-    splitter.getLayoutData().diff = null;
+    (splitter.getLayoutData() as FlexboxLayoutData).diff = null;
     event.preventDefault();
   }
 
-  addView(view, bringToFront) {
+  addView(view: OutlineContent, bringToFront?: boolean) {
     let tabBox = this.getTabBox(view.displayViewId);
     this._widgetToTabBox[view.id] = tabBox;
 
@@ -276,15 +270,16 @@ export default class BenchColumn extends Widget {
         // lazy render if the first view is added.
         tabBox.render();
       }
-      this._revalidateSplitters(true);
+      this._revalidateSplitters();
       this.updateFirstLastMarker();
-      this.htmlComp.layout.reset();
+      let layout = this.htmlComp.layout as FlexboxLayout;
+      layout.reset();
       this.htmlComp.invalidateLayoutTree();
     }
   }
 
-  getTabBox(displayViewId) {
-    let tabBox;
+  getTabBox(displayViewId: DisplayViewId): SimpleTabBox {
+    let tabBox: SimpleTabBox;
     switch (displayViewId) {
       case 'NW':
       case 'N':
@@ -303,7 +298,7 @@ export default class BenchColumn extends Widget {
     return tabBox;
   }
 
-  removeView(view, showSiblingView) {
+  removeView(view: OutlineContent, showSiblingView?: boolean) {
     let tabBox = this._widgetToTabBox[view.id];
     if (tabBox) {
       this._removeViewInProgress++;
@@ -313,47 +308,44 @@ export default class BenchColumn extends Widget {
       if (this.rendered && tabBox.viewCount() === 0 && this._removeViewInProgress === 0) {
         // remove view area if no view is left.
         tabBox.remove();
-        this._revalidateSplitters(true);
+        this._revalidateSplitters();
         this.updateFirstLastMarker();
-        this.htmlComp.layout.reset();
+        let layout = this.htmlComp.layout as FlexboxLayout;
+        layout.reset();
         this.htmlComp.invalidateLayoutTree();
       }
     }
   }
 
-  viewCount() {
-    return this.tabBoxes.map(tabBox => {
-      return tabBox.viewCount();
-    }).reduce((c1, c2) => {
-      return c1 + c2;
-    }, 0);
+  viewCount(): number {
+    return this.tabBoxes
+      .map(tabBox => tabBox.viewCount())
+      .reduce((c1, c2) => c1 + c2, 0);
   }
 
-  hasView(view) {
-    return this.tabBoxes.filter(tabBox => {
-      return tabBox.hasView(view);
-    }).length > 0;
+  hasView(view: OutlineContent): boolean {
+    return this.tabBoxes
+      .filter(tabBox => tabBox.hasView(view))
+      .length > 0;
   }
 
-  hasViews() {
+  hasViews(): boolean {
     return this.viewCount() > 0;
   }
 
-  getViews(displayViewId) {
-    return this.tabBoxes.reduce((arr, tabBox) => {
+  getViews(displayViewId?: string): OutlineContent[] {
+    return this.tabBoxes.reduce((arr: OutlineContent[], tabBox) => {
       arrays.pushAll(arr, tabBox.getViews(displayViewId));
       return arr;
     }, []);
   }
 
-  getComponents() {
+  getComponents(): (SimpleTabBox | Splitter)[] {
     return this.components;
   }
 
-  visibleTabBoxes() {
-    return this.tabBoxes.filter(tabBox => {
-      return tabBox.hasViews();
-    });
+  visibleTabBoxes(): SimpleTabBox[] {
+    return this.tabBoxes.filter(tabBox => tabBox.hasViews());
   }
 
   updateFirstLastMarker() {

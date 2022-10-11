@@ -1,23 +1,68 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, BenchColumn, DesktopNavigationHandle, DesktopTabSelectKeyStroke, FlexboxLayout, FlexboxLayoutData, HeaderTabBoxController, HtmlComponent, KeyStrokeContext, scout, Splitter, styles, Table, Widget, widgets} from '../../index';
+import {
+  arrays, BenchColumn, BenchColumnLayoutData, BenchRowLayoutData, Desktop, DesktopBenchEventMap, DesktopBenchModel, DesktopNavigationHandle, DesktopTabArea, DesktopTabSelectKeyStroke, Event, EventHandler, FlexboxLayout, FlexboxLayoutData,
+  Form, HeaderTabBoxController, HtmlComponent, KeyStrokeContext, Outline, OutlineOverview, Page, PropertyChangeEvent, scout, SimpleTab, SimpleTabBox, Splitter, styles, Table, Widget, widgets
+} from '../../index';
 import $ from 'jquery';
+import {DisplayViewId} from '../../tabbox/SimpleTab';
+import {BenchColumnViewActivateEvent, BenchColumnViewAddEvent, BenchColumnViewDeactivateEvent, BenchColumnViewRemoveEvent} from './BenchColumnEventMap';
+import {CollapseHandleActionEvent} from '../../collapsehandle/CollapseHandleEventMap';
+import {SplitterMoveEvent} from '../../splitter/SplitterEventMap';
+import {TreeNodesSelectedEvent} from '../../tree/TreeEventMap';
+import {OutlinePageChangedEvent} from '../outline/OutlineEventMap';
 
-export default class DesktopBench extends Widget {
+export default class DesktopBench extends Widget implements DesktopBenchModel {
+  declare model: DesktopBenchModel;
+  declare eventMap: DesktopBenchEventMap;
+
+  desktop: Desktop;
+  outline: Outline;
+  outlineContent: OutlineContent;
+  navigationHandle: DesktopNavigationHandle;
+  headerTabArea: DesktopTabArea;
+  columns: BenchColumn[];
+  components: (BenchColumn | Splitter)[];
+  tabBoxMap: Record<string /* viewId */, BenchColumn>;
+  layoutData: BenchColumnLayoutData;
+  headerTabAreaController: HeaderTabBoxController;
+  changingCounter: number;
+  changed: boolean;
+  outlineContentVisible: boolean;
+  navigationHandleVisible: boolean;
+  layoutCacheKey: string[];
+  desktopKeyStrokeContext: KeyStrokeContext;
+
+  protected _removeViewInProgress: number;
+  protected _updateOutlineContentTimeout: number;
+  protected _desktopOutlineChangeHandler: EventHandler<Event<Desktop>>;
+  protected _desktopPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Desktop>>;
+  protected _desktopAnimationEndHandler: EventHandler<Event<Desktop>>;
+
+  protected _outlineNodesSelectedHandler: EventHandler<TreeNodesSelectedEvent>;
+  protected _outlinePageChangedHandler: EventHandler<OutlinePageChangedEvent>;
+  protected _outlinePropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Outline>>;
+  protected _outlineContentDestroyHandler: EventHandler<Event<Widget>>;
+  protected _outlineContentCssClassChangeHandler: EventHandler<PropertyChangeEvent<string, Widget>>;
+
+  protected _viewAddHandler: EventHandler<BenchColumnViewAddEvent>;
+  protected _viewRemoveHandler: EventHandler<BenchColumnViewRemoveEvent>;
+  protected _viewActivateHandler: EventHandler<BenchColumnViewActivateEvent>;
+  protected _viewDeactivateHandler: EventHandler<BenchColumnViewDeactivateEvent>;
 
   constructor() {
     super();
     this.columns = [];
     this.components = null;
-    this.tabBoxMap = {}; // [key=viewId, value=SimpleTabBox instance]
+    this.tabBoxMap = {};
     this._removeViewInProgress = 0;
     this.changingCounter = 0;
     this.changed = false;
@@ -25,19 +70,18 @@ export default class DesktopBench extends Widget {
 
     this._desktopOutlineChangeHandler = this._onDesktopOutlineChange.bind(this);
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
+    this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
+
     this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
     this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
     this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
     this._outlineContentDestroyHandler = this._onOutlineContentDestroy.bind(this);
-    this._outlineContentCssClassChangeHandler = this._onOutlineContentCssClassChange.bind(this);
 
-    // event listener functions
+    this._outlineContentCssClassChangeHandler = this._onOutlineContentCssClassChange.bind(this);
     this._viewAddHandler = this._onViewAdd.bind(this);
     this._viewRemoveHandler = this._onViewRemove.bind(this);
     this._viewActivateHandler = this._onViewActivate.bind(this);
     this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
-
-    this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
   }
 
   static VIEW_MIN_HEIGHT = null; // Configured in sizes.css
@@ -47,15 +91,15 @@ export default class DesktopBench extends Widget {
     LEFT: 0,
     CENTER: 1,
     RIGHT: 2
-  };
+  } as const;
 
   static VIEW_AREA_COLUMN_CLASSES = [
     'west',
     'center',
     'east'
-  ];
+  ] as const;
 
-  _init(model) {
+  protected override _init(model: DesktopBenchModel) {
     super._init(model);
 
     DesktopBench.VIEW_MIN_HEIGHT = $.pxToNumber(styles.get('view-tab-box', 'min-height').minHeight);
@@ -76,30 +120,29 @@ export default class DesktopBench extends Widget {
     this.updateNavigationHandleVisibility();
   }
 
-  _setTabArea(headerTabArea) {
+  protected _setTabArea(headerTabArea: DesktopTabArea) {
     this.headerTabArea = headerTabArea;
     if (this.headerTabAreaController) {
       this.headerTabAreaController.install(this, this.headerTabArea);
       // for all views
       let tabBox = this.getTabBox('C');
-      tabBox.viewStack.slice().reverse().forEach(function(view) {
-        this.headerTabAreaController._onViewAdd({
-          view: view
-        });
+      tabBox.viewStack.slice().reverse().forEach(view => {
+        // @ts-ignore
+        this.headerTabAreaController._onViewAdd({view: view});
         if (tabBox.currentView === view) {
-          this.headerTabAreaController._onViewActivate({
-            view: view
-          });
+          // @ts-ignore
+          this.headerTabAreaController._onViewActivate({view: view});
         }
-      }, this);
+      });
       // ensure the correct view tab area is visible (header or center part)
+      // @ts-ignore
       this.headerTabAreaController._onViewsChanged();
     }
   }
 
-  _createColumns() {
+  protected _createColumns() {
     let layoutData = this.getLayoutData(),
-      columnLayoutData = [];
+      columnLayoutData: BenchRowLayoutData[] = [];
 
     if (layoutData) {
       columnLayoutData = this.getLayoutData().getColumns();
@@ -123,7 +166,7 @@ export default class DesktopBench extends Widget {
     }
   }
 
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     // Bound to desktop
@@ -134,7 +177,7 @@ export default class DesktopBench extends Widget {
     this.desktopKeyStrokeContext.registerKeyStroke(new DesktopTabSelectKeyStroke(this.desktop));
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('desktop-bench');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
@@ -151,31 +194,27 @@ export default class DesktopBench extends Widget {
     this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
   }
 
-  _createLayout() {
+  protected _createLayout(): FlexboxLayout {
     return new FlexboxLayout(FlexboxLayout.Direction.ROW, this.layoutCacheKey);
   }
 
-  visibleColumns() {
-    return this.columns.filter(column => {
-      return column.hasViews();
-    });
+  visibleColumns(): BenchColumn[] {
+    return this.columns.filter(column => column.hasViews());
   }
 
-  _renderColumns() {
-    this.visibleColumns().forEach(function(column) {
-      this._renderColumn(column);
-    }, this);
+  protected _renderColumns() {
+    this.visibleColumns().forEach(column => this._renderColumn(column));
     this.updateFirstLastMarker();
   }
 
-  _renderColumn(column) {
+  protected _renderColumn(column: BenchColumn) {
     if (!column || column.rendered) {
       return;
     }
     column.render();
   }
 
-  _remove() {
+  protected override _remove() {
     this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
     this.desktop.off('outlineChange', this._desktopOutlineChangeHandler);
     this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
@@ -187,14 +226,17 @@ export default class DesktopBench extends Widget {
     widgets.updateFirstLastMarker(this.visibleColumns());
   }
 
-  _renderOutlineContent() {
+  protected _renderOutlineContent() {
     if (!this.outlineContent) {
       return;
     }
 
     // Reset view tab relevant properties to make sure no tab is visible for the outline content
+    // @ts-ignore
     delete this.outlineContent.title;
+    // @ts-ignore
     delete this.outlineContent.subTitle;
+    // @ts-ignore
     delete this.outlineContent.iconId;
 
     // bring the view to top if the desktop is not in background.
@@ -206,21 +248,21 @@ export default class DesktopBench extends Widget {
     }
   }
 
-  _removeOutlineContent() {
+  protected _removeOutlineContent() {
     if (!this.outlineContent) {
       return;
     }
     this.removeView(this.outlineContent, false);
   }
 
-  _createNavigationHandle() {
+  protected _createNavigationHandle(): DesktopNavigationHandle {
     return scout.create(DesktopNavigationHandle, {
       parent: this,
       leftVisible: false
     });
   }
 
-  _renderNavigationHandle() {
+  protected _renderNavigationHandle() {
     if (this.navigationHandle) {
       return;
     }
@@ -230,7 +272,7 @@ export default class DesktopBench extends Widget {
     this.navigationHandle.on('action', this._onNavigationHandleAction.bind(this));
   }
 
-  _removeNavigationHandle() {
+  protected _removeNavigationHandle() {
     if (!this.navigationHandle) {
       return;
     }
@@ -238,7 +280,7 @@ export default class DesktopBench extends Widget {
     this.navigationHandle = null;
   }
 
-  _renderNavigationHandleVisible() {
+  protected _renderNavigationHandleVisible() {
     if (this.navigationHandleVisible) {
       this._renderNavigationHandle();
     } else {
@@ -251,25 +293,24 @@ export default class DesktopBench extends Widget {
    * is called in post render of desktop used to initialize the ui state. E.g. show default views
    */
   postRender() {
-    this.columns.forEach(column => {
-      column.postRender();
-    });
+    this.columns.forEach(column => column.postRender());
   }
 
-  setChanging(changing) {
+  setChanging(changing: boolean) {
     if (changing) {
       this.changingCounter++;
     } else {
       this.changingCounter--;
     }
     if (this.changingCounter === 0 && this.changed && this.rendered) {
-      this.htmlComp.layout.reset();
+      let layout = this.htmlComp.layout as FlexboxLayout;
+      layout.reset();
       this.htmlComp.invalidateLayoutTree();
       this.changed = false;
     }
   }
 
-  updateLayoutData(layoutData) {
+  updateLayoutData(layoutData: BenchColumnLayoutData) {
     if (this.getLayoutData() === layoutData) {
       return;
     }
@@ -279,7 +320,7 @@ export default class DesktopBench extends Widget {
     let columnDatas = layoutData.getColumns();
 
     this.columns.forEach((c, i) => {
-      let cacheKey;
+      let cacheKey: string[];
       if (this.layoutCacheKey && this.layoutCacheKey.length > 0) {
         cacheKey = this.layoutCacheKey.slice();
         cacheKey.push('column' + i);
@@ -287,34 +328,37 @@ export default class DesktopBench extends Widget {
       c.updateLayoutData(columnDatas[i], cacheKey);
     });
     if (this.rendered) {
-      this.htmlComp.layout.setCacheKey(this.layoutCacheKey);
-      this.htmlComp.layout.reset();
+      let layout = this.htmlComp.layout as FlexboxLayout;
+      layout.setCacheKey(this.layoutCacheKey);
+      layout.reset();
       this.htmlComp.invalidateLayoutTree();
     }
     this._updateSplitterMovable();
   }
 
-  setLayoutData(layoutData) {
+  override setLayoutData(layoutData: BenchColumnLayoutData) {
     if (this.layoutData === layoutData) {
       return;
     }
     super.setLayoutData(layoutData);
     this.layoutData = layoutData;
     this.layoutCacheKey = [];
+    // @ts-ignore
     if (layoutData.cacheKey) {
+      // @ts-ignore
       this.layoutCacheKey.push(layoutData.cacheKey);
     }
   }
 
-  getLayoutData() {
+  getLayoutData(): BenchColumnLayoutData {
     return this.layoutData;
   }
 
-  setNavigationHandleVisible(visible) {
+  setNavigationHandleVisible(visible: boolean) {
     this.setProperty('navigationHandleVisible', visible);
   }
 
-  setOutline(outline) {
+  setOutline(outline: Outline) {
     if (this.outline) {
       this.outline.off('nodesSelected', this._outlineNodesSelectedHandler);
       this.outline.off('pageChanged', this._outlinePageChangedHandler);
@@ -329,11 +373,11 @@ export default class DesktopBench extends Widget {
     this.updateOutlineContent();
   }
 
-  setOutlineContent(content) {
-    let oldContent = this.outlineContent;
+  setOutlineContent(content: OutlineContent) {
     if (this.outlineContent === content) {
       return;
     }
+    let oldContent = this.outlineContent;
     if (oldContent) {
       oldContent.off('destroy', this._outlineContentDestroyHandler);
       oldContent.off('propertyChange:cssClass', this._outlineContentCssClassChangeHandler);
@@ -362,7 +406,7 @@ export default class DesktopBench extends Widget {
     this._renderOutlineContent();
   }
 
-  setOutlineContentVisible(visible) {
+  setOutlineContentVisible(visible: boolean) {
     if (visible === this.outlineContentVisible) {
       return;
     }
@@ -381,7 +425,7 @@ export default class DesktopBench extends Widget {
     // nop
   }
 
-  _updateOutlineContentHasDimmedBackground() {
+  protected _updateOutlineContentHasDimmedBackground() {
     if (!this.outlineContent) {
       return;
     }
@@ -392,12 +436,12 @@ export default class DesktopBench extends Widget {
     this.toggleCssClass('outline-content-has-dimmed-background', hasDimmedBackground);
   }
 
-  _computeDetailContentForPage(node) {
+  protected _computeDetailContentForPage(node: Page): Form | Table {
     if (!node) {
       throw new Error('called _showDetailContentForPage without node');
     }
 
-    let content;
+    let content: Form | Table;
     if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
       content = node.detailForm;
       content.uiCssClass = 'detail-form';
@@ -413,12 +457,13 @@ export default class DesktopBench extends Widget {
     if (!this.outlineContentVisible || !this.outline) {
       return;
     }
-    let content,
+    let content: OutlineContent,
       selectedPage = this.outline.selectedNode();
     if (selectedPage) {
       // Outline does not support multi selection
       content = this._computeDetailContentForPage(selectedPage);
     } else {
+      // @ts-ignore
       content = this.outline._computeRootContent();
     }
     if (content) {
@@ -433,9 +478,7 @@ export default class DesktopBench extends Widget {
 
   updateOutlineContentDebounced() {
     clearTimeout(this._updateOutlineContentTimeout);
-    this._updateOutlineContentTimeout = setTimeout(() => {
-      this.updateOutlineContent();
-    }, 300);
+    this._updateOutlineContentTimeout = setTimeout(() => this.updateOutlineContent(), 300);
   }
 
   updateNavigationHandleVisibility() {
@@ -444,20 +487,20 @@ export default class DesktopBench extends Widget {
     this.setNavigationHandleVisible(this.desktop.navigationHandleVisible && !this.desktop.navigationVisible);
   }
 
-  _onDesktopOutlineChange(event) {
+  protected _onDesktopOutlineChange(event: Event<Desktop>) {
     this.setOutline(this.desktop.outline);
     this.updateNavigationHandleVisibility();
   }
 
-  _onOutlineContentDestroy(event) {
+  protected _onOutlineContentDestroy(event: Event<Widget>) {
     this.setOutlineContent(null);
   }
 
-  _onOutlineContentCssClassChange(event) {
+  protected _onOutlineContentCssClassChange(event: PropertyChangeEvent<string, Widget>) {
     this._updateOutlineContentHasDimmedBackground();
   }
 
-  _onOutlineNodesSelected(event) {
+  protected _onOutlineNodesSelected(event: TreeNodesSelectedEvent) {
     if (event.debounce) {
       this.updateOutlineContentDebounced();
     } else {
@@ -465,20 +508,20 @@ export default class DesktopBench extends Widget {
     }
   }
 
-  _onOutlinePageChanged(event) {
+  protected _onOutlinePageChanged(event: OutlinePageChangedEvent) {
     let selectedPage = this.outline.selectedNode();
     if (!event.page && !selectedPage || event.page === selectedPage) {
       this.updateOutlineContent();
     }
   }
 
-  _onOutlinePropertyChange(event) {
+  protected _onOutlinePropertyChange(event: PropertyChangeEvent<any, Outline>) {
     if (scout.isOneOf(event.propertyName, ['defaultDetailForm', 'outlineOverview'])) {
       this.updateOutlineContent();
     }
   }
 
-  _onDesktopNavigationVisibleChange(event) {
+  protected _onDesktopNavigationVisibleChange() {
     // If navigation gets visible: Hide handle immediately
     // If navigation gets hidden using animation: Show handle when animation ends
     if (this.desktop.navigationVisible) {
@@ -486,21 +529,21 @@ export default class DesktopBench extends Widget {
     }
   }
 
-  _onDesktopNavigationHandleVisibleChange(event) {
+  protected _onDesktopNavigationHandleVisibleChange() {
     this.updateNavigationHandleVisibility();
   }
 
-  _onDesktopAnimationEnd(event) {
+  protected _onDesktopAnimationEnd(event: Event<Desktop>) {
     if (!this.desktop.navigationVisible) {
       this.updateNavigationHandleVisibility();
     }
   }
 
-  _onBenchLayoutDataChange(event) {
+  protected _onBenchLayoutDataChange() {
     this.updateLayoutData(this.desktop.benchLayoutData);
   }
 
-  _onDesktopPropertyChange(event) {
+  protected _onDesktopPropertyChange(event: PropertyChangeEvent<any, Desktop>) {
     if (event.propertyName === 'navigationVisible') {
       this._onDesktopNavigationVisibleChange();
     } else if (event.propertyName === 'navigationHandleVisible') {
@@ -511,11 +554,11 @@ export default class DesktopBench extends Widget {
     }
   }
 
-  _onNavigationHandleAction(event) {
+  protected _onNavigationHandleAction(event: CollapseHandleActionEvent) {
     this.desktop.enlargeNavigation();
   }
 
-  _revalidateSplitters() {
+  protected _revalidateSplitters() {
     // remove old splitters
     if (this.components) {
       this.components.forEach(comp => {
@@ -544,10 +587,9 @@ export default class DesktopBench extends Widget {
         return arr;
       }, []);
     // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
-    this.components.filter(comp => {
-      return comp instanceof BenchColumn;
-    })
-      .reduce((c1, c2, index) => {
+    this.components
+      .filter(comp => comp instanceof BenchColumn)
+      .reduce((c1: BenchColumn, c2: BenchColumn, index) => {
         if (index > 0) {
           c2.$container.insertAfter(c1.$container);
         }
@@ -556,36 +598,22 @@ export default class DesktopBench extends Widget {
     this._updateSplitterMovable();
   }
 
-  _updateSplitterMovable() {
+  protected _updateSplitterMovable() {
     if (!this.components) {
       return;
     }
     this.components.forEach((c, i) => {
       if (c instanceof Splitter) {
-        let componentsBefore = this.components.slice(0, i).reverse();
-        let componentsAfter = this.components.slice(i + 1);
+        let componentsBefore = this.components.slice(0, i).reverse() as BenchColumn[];
+        let componentsAfter = this.components.slice(i + 1) as BenchColumn[];
         // shrink
-        if (
-          componentsBefore.filter(c => {
-            return c.getLayoutData().shrink > 0;
-          }).length > 0 &&
-          componentsAfter.filter(c => {
-            return c.getLayoutData().grow > 0;
-          }).length > 0
-        ) {
+        if (componentsBefore.filter(col => col.getLayoutData().shrink > 0).length > 0 && componentsAfter.filter(c => c.getLayoutData().grow > 0).length > 0) {
           c.setEnabled(true);
           c.on('move', this._onSplitterMove.bind(this));
           return;
         }
         // grow
-        if (
-          componentsBefore.filter(c => {
-            return c.getLayoutData().grow > 0;
-          }).length > 0 &&
-          componentsAfter.filter(c => {
-            return c.getLayoutData().shrink > 0;
-          }).length > 0
-        ) {
+        if (componentsBefore.filter(c => c.getLayoutData().grow > 0).length > 0 && componentsAfter.filter(c => c.getLayoutData().shrink > 0).length > 0) {
           c.setEnabled(true);
           c.on('move', this._onSplitterMove.bind(this));
           return;
@@ -596,29 +624,29 @@ export default class DesktopBench extends Widget {
     });
   }
 
-  _onSplitterMove(event) {
+  protected _onSplitterMove(event: SplitterMoveEvent) {
     let splitter = event.source;
     // noinspection UnnecessaryLocalVariableJS
     let diff = event.position - splitter.htmlComp.location().x - splitter.htmlComp.margins().left - splitter.htmlComp.insets().left;
-    splitter.getLayoutData().diff = diff;
+    (splitter.getLayoutData() as FlexboxLayoutData).diff = diff;
     this.revalidateLayout();
-    splitter.getLayoutData().diff = null;
+    (splitter.getLayoutData() as FlexboxLayoutData).diff = null;
     event.preventDefault();
   }
 
-  _onViewAdd(event) {
+  protected _onViewAdd(event: BenchColumnViewAddEvent) {
     this.trigger('viewAdd', {
       view: event.view
     });
   }
 
-  _onViewRemove(event) {
+  protected _onViewRemove(event: BenchColumnViewRemoveEvent) {
     this.trigger('viewRemove', {
       view: event.view
     });
   }
 
-  _onViewActivate(event) {
+  protected _onViewActivate(event: BenchColumnViewActivateEvent) {
     let view = event.view;
     if (this.outlineContent === view) {
       this.desktop.bringOutlineToFront();
@@ -628,7 +656,7 @@ export default class DesktopBench extends Widget {
     });
   }
 
-  _onViewDeactivate(event) {
+  protected _onViewDeactivate(event: BenchColumnViewDeactivateEvent) {
     if (this.outlineContent === event.view) {
       this.desktop.sendOutlineToBack();
     }
@@ -637,7 +665,7 @@ export default class DesktopBench extends Widget {
     });
   }
 
-  addView(view, activate) {
+  addView(view: OutlineContent, activate?: boolean) {
     // normalize displayViewId
     switch (view.displayViewId) {
       case 'NW':
@@ -667,14 +695,15 @@ export default class DesktopBench extends Widget {
         if (this.changingCounter > 0) {
           this.changed = true;
         } else {
-          this.htmlComp.layout.reset();
+          let layout = this.htmlComp.layout as FlexboxLayout;
+          layout.reset();
           this.htmlComp.invalidateLayoutTree();
         }
       }
     }
   }
 
-  activateView(view) {
+  activateView(view: OutlineContent) {
     // activate views is only for existing views allowed.
     if (!this.hasView(view)) {
       return;
@@ -685,9 +714,8 @@ export default class DesktopBench extends Widget {
     }
   }
 
-  _getColumn(displayViewId) {
-    let column;
-
+  protected _getColumn(displayViewId: DisplayViewId): BenchColumn {
+    let column: BenchColumn;
     switch (displayViewId) {
       case 'NW':
       case 'W':
@@ -706,7 +734,7 @@ export default class DesktopBench extends Widget {
     return column;
   }
 
-  removeView(view, showSiblingView) {
+  removeView(view: OutlineContent, showSiblingView?: boolean) {
     let column = this.tabBoxMap[view.id];
     if (column) {
       this._removeViewInProgress++;
@@ -721,18 +749,19 @@ export default class DesktopBench extends Widget {
         if (this.changingCounter > 0) {
           this.changed = true;
         } else {
-          this.htmlComp.layout.reset();
+          let layout = this.htmlComp.layout as FlexboxLayout;
+          layout.reset();
           this.htmlComp.invalidateLayoutTree();
         }
       }
     }
   }
 
-  getComponents() {
+  getComponents(): (BenchColumn | Splitter)[] {
     return this.components;
   }
 
-  getTabBox(displayViewId) {
+  getTabBox(displayViewId: DisplayViewId): SimpleTabBox {
     let viewColumn = this._getColumn(displayViewId);
     if (!viewColumn) {
       return;
@@ -740,28 +769,28 @@ export default class DesktopBench extends Widget {
     return viewColumn.getTabBox(displayViewId);
   }
 
-  visibleTabBoxes() {
+  visibleTabBoxes(): SimpleTabBox[] {
     return this.visibleColumns().reduce((arr, column) => {
       arrays.pushAll(arr, column.visibleTabBoxes());
       return arr;
     }, []);
   }
 
-  hasView(view) {
-    return this.columns.filter(column => {
-      return column.hasView(view);
-    }).length > 0;
+  hasView(view: OutlineContent): boolean {
+    return this.columns
+      .filter(column => column.hasView(view))
+      .length > 0;
   }
 
-  getViews(displayViewId) {
+  getViews(displayViewId?: string): OutlineContent[] {
     return this.columns.reduce((arr, column) => {
       arrays.pushAll(arr, column.getViews(displayViewId));
       return arr;
     }, []);
   }
 
-  getViewTab(view) {
-    let viewTab = null;
+  getViewTab(view: OutlineContent): SimpleTab {
+    let viewTab: SimpleTab = null;
     this.getTabs().some(vt => {
       if (vt.view === view) {
         viewTab = vt;
@@ -772,8 +801,8 @@ export default class DesktopBench extends Widget {
     return viewTab;
   }
 
-  getTabs() {
-    let tabs = [];
+  getTabs(): SimpleTab[] {
+    let tabs: SimpleTab[] = [];
     // consider right order
     tabs = tabs.concat(this.getTabBox('NW').getController().getTabs());
     tabs = tabs.concat(this.getTabBox('W').getController().getTabs());
@@ -792,10 +821,10 @@ export default class DesktopBench extends Widget {
   }
 
   /**
-   * @returns {array} all the currently active views (the selected ones) of all the visible tab boxes
+   * @returns all the currently active views (the selected ones) of all the visible tab boxes
    */
-  activeViews() {
-    let activeViews = [];
+  activeViews(): OutlineContent[] {
+    let activeViews: OutlineContent[] = [];
     this.visibleColumns().forEach(column => {
       column.visibleTabBoxes().forEach(tabBox => {
         activeViews.push(tabBox.currentView);
@@ -804,3 +833,4 @@ export default class DesktopBench extends Widget {
     return activeViews;
   }
 }
+export type OutlineContent = Form | Table | OutlineOverview;

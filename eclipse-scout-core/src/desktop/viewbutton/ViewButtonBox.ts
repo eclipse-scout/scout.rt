@@ -3,14 +3,25 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, OutlineViewButton, scout, ViewMenuTab, Widget, widgets} from '../../index';
+import {Desktop, Event, EventHandler, HtmlComponent, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewButtonBoxEventMap, ViewButtonBoxModel, ViewMenuTab, Widget, widgets} from '../../index';
 
-export default class ViewButtonBox extends Widget {
+export default class ViewButtonBox extends Widget implements ViewButtonBoxModel {
+  declare model: ViewButtonBoxModel;
+  declare eventMap: ViewButtonBoxEventMap;
+
+  desktop: Desktop;
+  viewMenuTab: ViewMenuTab;
+  viewButtons: ViewButton[];
+  menuButtons: ViewButton[];
+  tabButtons: ViewButton[];
+  selectedMenuButtonAlwaysVisible: boolean;
+  protected _desktopOutlineChangeHandler: EventHandler<Event<Desktop>>;
+  protected _viewButtonPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, ViewButton>>;
 
   constructor() {
     super();
@@ -24,7 +35,7 @@ export default class ViewButtonBox extends Widget {
     this._addWidgetProperties(['viewButtons']);
   }
 
-  _init(model) {
+  protected override _init(model: ViewButtonBoxModel) {
     super._init(model);
     this.desktop = this.session.desktop;
     this.viewMenuTab = scout.create(ViewMenuTab, {
@@ -34,7 +45,7 @@ export default class ViewButtonBox extends Widget {
     this.desktop.on('outlineChange', this._desktopOutlineChangeHandler);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('view-button-box');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
@@ -42,35 +53,35 @@ export default class ViewButtonBox extends Widget {
     this._onDesktopOutlineChange();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderTabButtons();
   }
 
-  _remove() {
+  protected override _remove() {
     this.desktop.off('outlineChange', this._desktopOutlineChangeHandler);
     this.viewButtons.forEach(viewButton => viewButton.off('selected', this._viewButtonPropertyChangeHandler));
 
     super._remove();
   }
 
-  setSelectedMenuButtonVisible(selectedMenuButtonVisible) {
+  setSelectedMenuButtonVisible(selectedMenuButtonVisible: boolean) {
     this.viewMenuTab.setSelectedButtonVisible(selectedMenuButtonVisible);
   }
 
-  setSelectedMenuButtonAlwaysVisible(selectedMenuButtonAlwaysVisible) {
+  setSelectedMenuButtonAlwaysVisible(selectedMenuButtonAlwaysVisible: boolean) {
     this.setProperty('selectedMenuButtonAlwaysVisible', selectedMenuButtonAlwaysVisible);
   }
 
-  _setSelectedMenuButtonAlwaysVisible(selectedMenuButtonAlwaysVisible) {
+  protected _setSelectedMenuButtonAlwaysVisible(selectedMenuButtonAlwaysVisible: boolean) {
     this._updateSelectedMenuButtonVisibility();
   }
 
-  setViewButtons(viewButtons) {
+  setViewButtons(viewButtons: ViewButton[]) {
     this.setProperty('viewButtons', viewButtons);
   }
 
-  _setViewButtons(viewButtons) {
+  protected _setViewButtons(viewButtons: ViewButton[]) {
     if (this.viewButtons) {
       this.viewButtons.forEach(viewButton => viewButton.off('propertyChange', this._viewButtonPropertyChangeHandler));
     }
@@ -79,20 +90,20 @@ export default class ViewButtonBox extends Widget {
     this._updateViewButtons();
   }
 
-  _setTabButtons(tabButtons) {
+  protected _setTabButtons(tabButtons: ViewButton[]) {
     this._setProperty('tabButtons', tabButtons);
   }
 
-  _removeTabButtons() {
+  protected _removeTabButtons() {
     this.tabButtons.forEach(button => button.remove());
   }
 
-  _renderTabButtons() {
+  protected _renderTabButtons() {
     this.tabButtons.forEach((viewTab, i) => viewTab.renderAsTab(this.$container));
     widgets.updateFirstLastMarker(this.tabButtons);
   }
 
-  _updateViewButtons() {
+  protected _updateViewButtons() {
     let viewButtons = this.viewButtons.filter(b => b.visible);
     let menuButtons = viewButtons.filter(b => b.displayStyle === 'MENU');
     let tabButtons = null;
@@ -117,16 +128,16 @@ export default class ViewButtonBox extends Widget {
     this._updateSelectedMenuButtonVisibility();
   }
 
-  _updateVisibility(menuButtons) {
+  protected _updateVisibility() {
     this.setVisible((this.tabButtons.length + this.menuButtons.length) > 1);
   }
 
-  _setMenuButtons(menuButtons) {
+  protected _setMenuButtons(menuButtons: ViewButton[]) {
     this._setProperty('menuButtons', menuButtons);
     this.viewMenuTab.setViewButtons(this.menuButtons);
   }
 
-  _updateSelectedMenuButtonVisibility() {
+  protected _updateSelectedMenuButtonVisibility() {
     this.setSelectedMenuButtonVisible(this.selectedMenuButtonAlwaysVisible || (this.tabButtons.length >= 1 && this.menuButtons.length >= 1));
   }
 
@@ -134,7 +145,7 @@ export default class ViewButtonBox extends Widget {
    * This method updates the state of the view-menu-tab and the selected state of outline-view-button-box.
    * This method must also work in offline mode.
    */
-  _onDesktopOutlineChange(event) {
+  protected _onDesktopOutlineChange() {
     let outline = this.desktop.outline;
     this.viewButtons.forEach(viewTab => {
       if (viewTab instanceof OutlineViewButton) {
@@ -143,7 +154,7 @@ export default class ViewButtonBox extends Widget {
     });
   }
 
-  _onViewButtonSelected(event) {
+  protected _onViewButtonSelected(event: PropertyChangeEvent<boolean, ViewButton>) {
     // Deselect other toggleable view buttons
     this.viewButtons.forEach(viewButton => {
       if (viewButton !== event.source && viewButton.isToggleAction()) {
@@ -155,11 +166,10 @@ export default class ViewButtonBox extends Widget {
     this.viewMenuTab.onViewButtonSelected();
   }
 
-  _onViewButtonPropertyChange(event) {
+  protected _onViewButtonPropertyChange(event: PropertyChangeEvent<any, ViewButton>) {
     if (event.propertyName === 'selected') {
       this._onViewButtonSelected(event);
-    } else if (event.propertyName === 'visible' ||
-      event.propertyName === 'displayStyle') {
+    } else if (event.propertyName === 'visible' || event.propertyName === 'displayStyle') {
       this._updateViewButtons();
     }
   }

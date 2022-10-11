@@ -1,16 +1,25 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, OutlineOverview, PageTileGrid, RowLayout, scout} from '../../../index';
+import {Desktop, EventHandler, HtmlComponent, OutlineOverview, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOutlineOverviewEventMap, TileOutlineOverviewModel} from '../../../index';
 
-export default class TileOutlineOverview extends OutlineOverview {
+export default class TileOutlineOverview extends OutlineOverview implements TileOutlineOverviewModel {
+  declare model: TileOutlineOverviewModel;
+  declare eventMap: TileOutlineOverviewEventMap;
+
+  pageTileGrid: PageTileGrid;
+  scrollable: boolean;
+  titleVisible: boolean;
+  contentHtmlComp: HtmlComponent;
+  $title: JQuery;
+  protected _desktopNavigationVisibilityChangeHandler: EventHandler<PropertyChangeEvent<boolean, Desktop>>;
 
   constructor() {
     super();
@@ -21,7 +30,7 @@ export default class TileOutlineOverview extends OutlineOverview {
     this._desktopNavigationVisibilityChangeHandler = this._onDesktopNavigationVisibilityChange.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model: TileOutlineOverviewModel) {
     super._init(model);
     if (!this.pageTileGrid) {
       this.pageTileGrid = this._createPageTileGrid();
@@ -30,7 +39,7 @@ export default class TileOutlineOverview extends OutlineOverview {
     this.addCssClass('dimmed-background');
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('tile-overview');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new RowLayout({stretch: this.outline.compact}));
@@ -44,24 +53,24 @@ export default class TileOutlineOverview extends OutlineOverview {
     this.findDesktop().on('propertyChange:navigationVisible', this._desktopNavigationVisibilityChangeHandler);
   }
 
-  _remove() {
+  protected override _remove() {
     super._remove();
     this.findDesktop().off('propertyChange:navigationVisible', this._desktopNavigationVisibilityChangeHandler);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderPageTileGrid();
     this._renderScrollable();
   }
 
-  _renderPageTileGrid() {
+  protected _renderPageTileGrid() {
     this.pageTileGrid.render(this.$content);
   }
 
-  _createPageTileGrid() {
-    let page;
-    let nodes;
+  protected _createPageTileGrid(): PageTileGrid {
+    let page: Page;
+    let nodes: Page[];
     if (this.outline.compact) {
       page = this.outline.compactRootNode();
       if (page) {
@@ -77,11 +86,11 @@ export default class TileOutlineOverview extends OutlineOverview {
     });
   }
 
-  setScrollable(scrollable) {
+  setScrollable(scrollable: boolean) {
     this.setProperty('scrollable', scrollable);
   }
 
-  _renderScrollable() {
+  protected _renderScrollable() {
     if (this.scrollable) {
       this._installScrollbars({
         axis: 'y'
@@ -91,7 +100,7 @@ export default class TileOutlineOverview extends OutlineOverview {
     }
   }
 
-  _updateTitle(animated = true) {
+  protected _updateTitle(animated = true) {
     if (!this.$title) {
       return;
     }
@@ -99,7 +108,7 @@ export default class TileOutlineOverview extends OutlineOverview {
     this.$title.toggleClass('removed', this.findDesktop().navigationVisible);
   }
 
-  _onDesktopNavigationVisibilityChange(event) {
+  protected _onDesktopNavigationVisibilityChange(event: PropertyChangeEvent<boolean, Desktop>) {
     this._updateTitle();
   }
 }

@@ -68,8 +68,7 @@ export default class BooleanColumn extends Column {
       checkBoxCssClass += ' disabled';
     }
 
-    // @ts-ignore
-    if (tableNodeColumn && row._expandable) {
+    if (tableNodeColumn && row.expandable) {
       this.tableNodeColumn = true;
       content = this._expandIcon(row.expanded, rowPadding) + content;
       if (row.expanded) {

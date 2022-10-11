@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Status, WidgetModel} from '../index';
-import {SimpleTabView} from './SimpleTab';
+import {Form, Status, WidgetModel} from '../index';
 
 export default interface SimpleTabModel extends WidgetModel {
-  view?: SimpleTabView;
+  view?: Form;
   title?: string;
   subTitle?: string;
   iconId?: string;

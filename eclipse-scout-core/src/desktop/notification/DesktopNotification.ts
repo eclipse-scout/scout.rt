@@ -3,14 +3,28 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, Notification as ScoutNotification, scout, Status, strings} from '../../index';
+import {DesktopNotificationEventMap, DesktopNotificationModel, Device, EnumObject, Notification as ScoutNotification, scout, Status, strings} from '../../index';
+import {StatusOrModel} from '../../status/Status';
 
-export default class DesktopNotification extends ScoutNotification {
+export default class DesktopNotification extends ScoutNotification implements DesktopNotificationModel {
+  declare model: DesktopNotificationModel;
+  declare eventMap: DesktopNotificationEventMap;
+
+  duration: number;
+  removeTimeout: number;
+  nativeOnly: boolean;
+  nativeNotificationTitle: string;
+  nativeNotificationStatus: Status;
+  nativeNotificationVisibility: NativeNotificationVisibility;
+  nativeNotification: Notification;
+  nativeNotificationShown: boolean;
+  $loader: JQuery;
+  protected _removing: boolean;
 
   constructor() {
     super();
@@ -20,7 +34,7 @@ export default class DesktopNotification extends ScoutNotification {
     this._removing = false;
     this.nativeOnly = false;
     this.nativeNotificationTitle = null;
-    this.nativeNotificationStatus = null; // holds native message & native icon
+    this.nativeNotificationStatus = null;
     this.nativeNotificationVisibility = DesktopNotification.NativeNotificationVisibility.NONE;
     this.nativeNotification = null;
     this.nativeNotificationShown = false;
@@ -39,21 +53,14 @@ export default class DesktopNotification extends ScoutNotification {
      * The native notification is always shown.
      */
     ALWAYS: 'always'
-  };
+  } as const;
 
   /**
    * When duration is set to INFINITE, the notification is not removed automatically.
    */
   static INFINITE = -1;
 
-  /**
-   * @typedef NativeNotificationDefaults
-   * @property {string} title
-   * @property {string} iconId
-   * @property {NativeNotificationVisibility} visibility
-   */
-
-  _init(model) {
+  protected override _init(model: DesktopNotificationModel) {
     super._init(model);
     let defaults = this.session.desktop.nativeNotificationDefaults;
     if (defaults) {
@@ -70,7 +77,7 @@ export default class DesktopNotification extends ScoutNotification {
     this.resolveTextKeys(['nativeNotificationTitle']);
   }
 
-  _render() {
+  protected override _render() {
     this._initNativeNotification();
     this.$container = this.$parent.prependDiv('desktop-notification');
     this.$content = this.$container.appendDiv('desktop-notification-content');
@@ -85,15 +92,12 @@ export default class DesktopNotification extends ScoutNotification {
     }
   }
 
-  /**
-   *  @override
-   */
-  _renderLoading() {
+  protected override _renderLoading() {
     this.$container.toggleClass('loading', this.loading);
     this.$loader.setVisible(this.loading);
   }
 
-  _destroy() {
+  protected override _destroy() {
     if (this.nativeNotification) {
       // No need to keep the native notification open if the regular one is closed (relevant if the user actively closes it)
       this.nativeNotification.close();
@@ -101,11 +105,11 @@ export default class DesktopNotification extends ScoutNotification {
     super._destroy();
   }
 
-  _isDocumentHidden() {
+  protected _isDocumentHidden(): boolean {
     return document.hidden;
   }
 
-  _showNativeNotification(permission) {
+  protected _showNativeNotification(permission: NotificationPermission) {
     if (permission === 'denied' || permission === 'default') {
       if (this.nativeOnly) {
         // See comment in _initNativeNotification
@@ -154,7 +158,7 @@ export default class DesktopNotification extends ScoutNotification {
     });
   }
 
-  _initNativeNotification() {
+  protected _initNativeNotification() {
     if (this.nativeNotificationShown) {
       // Don't show the same notification twice (could happen if the user reloads the page and the notification is still open. Especially important for nativeOnly with infinite duration).
       return;
@@ -181,7 +185,7 @@ export default class DesktopNotification extends ScoutNotification {
     }
   }
 
-  _hideLaterIfNativeOnly() {
+  protected _hideLaterIfNativeOnly() {
     if (!this.nativeOnly) {
       return;
     }
@@ -192,7 +196,7 @@ export default class DesktopNotification extends ScoutNotification {
   /**
    * Checks if browser supports the promise-based version of the method requestPermission. Safari only supports the older callback version.
    */
-  _checkNotificationPromise() {
+  protected _checkNotificationPromise(): boolean {
     try {
       Notification.requestPermission().then();
     } catch (e) {
@@ -201,7 +205,7 @@ export default class DesktopNotification extends ScoutNotification {
     return true;
   }
 
-  _onCloseIconClick() {
+  protected override _onCloseIconClick() {
     this.hide();
   }
 
@@ -223,7 +227,7 @@ export default class DesktopNotification extends ScoutNotification {
     this.session.desktop.removeNotification(this);
   }
 
-  fadeIn($parent) {
+  fadeIn($parent: JQuery) {
     this.render($parent);
     if (!Device.get().supportsCssAnimation()) {
       return;
@@ -252,31 +256,30 @@ export default class DesktopNotification extends ScoutNotification {
     });
   }
 
-  /**
-   * @override
-   */
-  invalidateLayoutTree() {
+  override invalidateLayoutTree() {
     // called by notification.js. Since desktop notification has no htmlComp, no need to invalidate
   }
 
-  _setNativeNotificationShown(shown) {
+  protected _setNativeNotificationShown(shown: boolean) {
     this._setProperty('nativeNotificationShown', shown);
   }
 
-  setNativeNotificationTitle(title) {
+  setNativeNotificationTitle(title: string) {
     this.setProperty('nativeNotificationTitle', title);
   }
 
-  setNativeNotificationStatus(status) {
+  setNativeNotificationStatus(status: StatusOrModel) {
     this.setProperty('nativeNotificationStatus', status);
   }
 
-  _setNativeNotificationStatus(status) {
+  protected _setNativeNotificationStatus(status: StatusOrModel) {
     status = Status.ensure(status);
     this._setProperty('nativeNotificationStatus', status);
   }
 
-  setNativeNotificationVisibility(visibility) {
+  setNativeNotificationVisibility(visibility: NativeNotificationVisibility) {
     this.setProperty('nativeNotificationVisibility', visibility);
   }
 }
+
+export type NativeNotificationVisibility = EnumObject<typeof DesktopNotification.NativeNotificationVisibility>;

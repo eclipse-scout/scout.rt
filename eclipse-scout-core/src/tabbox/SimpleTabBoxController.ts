@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventHandler, scout, SimpleTab, SimpleTabArea, SimpleTabBox, SimpleTabBoxControllerModel} from '../index';
+import {EventHandler, Form, scout, SimpleTab, SimpleTabArea, SimpleTabBox, SimpleTabBoxControllerModel} from '../index';
 import $ from 'jquery';
 import {SimpleTabBoxViewActivateEvent, SimpleTabBoxViewAddEvent, SimpleTabBoxViewDeactivateEvent, SimpleTabBoxViewRemoveEvent} from './SimpleTabBoxEventMap';
 import {SimpleTabAreaTabSelectEvent} from './SimpleTabAreaEventMap';
-import {SimpleTabView} from './SimpleTab';
+import {OutlineContent} from '../desktop/bench/DesktopBench';
 
 /**
  * The {@link {@link SimpleTabBoxController}} is used to link a {@link {@link SimpleTabBox}} with a {@link {@link SimpleTabArea}}.
@@ -88,25 +88,22 @@ export default class SimpleTabBoxController implements SimpleTabBoxControllerMod
     });
   }
 
-  protected _onViewAdd(event: SimpleTabBoxViewAddEvent) {
-    let view = event.view,
-      siblingView = event.siblingView,
-      viewTab: SimpleTab,
-      // the sibling to insert the tab after.
-      siblingViewTab: SimpleTab;
-
+  protected _onViewAdd(event: { view: OutlineContent; siblingView?: OutlineContent }) {
+    let view = event.view;
     if (!SimpleTabBoxController.hasViewTab(view)) {
       return;
     }
-    viewTab = this.getTab(view);
+
+    let viewTab = this.getTab(view);
     if (!viewTab && this._shouldCreateTabForView(view)) {
-      siblingViewTab = this.getTab(siblingView);
+      let siblingView = event.siblingView;
+      let siblingViewTab = this.getTab(siblingView); // the sibling to insert the tab after.
       viewTab = this._createTab(view);
       this.tabArea.addTab(viewTab, siblingViewTab);
     }
   }
 
-  protected _shouldCreateTabForView(view: SimpleTabView): boolean {
+  protected _shouldCreateTabForView(view: Form): boolean {
     return true;
   }
 
@@ -141,14 +138,14 @@ export default class SimpleTabBoxController implements SimpleTabBoxControllerMod
     this.tabBox.activateView(view);
   }
 
-  protected _createTab(view: SimpleTabView): SimpleTab {
+  protected _createTab(view: Form): SimpleTab {
     return scout.create(SimpleTab, {
       parent: this.tabArea,
       view: view
     });
   }
 
-  protected getTab(view: SimpleTabView): SimpleTab {
+  protected getTab(view: OutlineContent): SimpleTab {
     if (!view) {
       return;
     }
@@ -169,10 +166,7 @@ export default class SimpleTabBoxController implements SimpleTabBoxControllerMod
 
   /* ----- static functions ----- */
 
-  static hasViewTab(view: any): boolean {
-    return view &&
-      (view.title !== undefined
-        || view.subTitle !== undefined
-        || view.iconId !== undefined);
+  static hasViewTab(view: any): view is Form {
+    return view && (view.title !== undefined || view.subTitle !== undefined || view.iconId !== undefined);
   }
 }

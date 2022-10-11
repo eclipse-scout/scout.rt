@@ -21,7 +21,7 @@ export default class ResponsiveHandler implements ResponsiveHandlerModel {
   oldState: ResponsiveState;
   state: ResponsiveState;
   allowedStates: ResponsiveState[];
-  transformations: Record<string, (Widget, boolean) => void>;
+  transformations: Record<string, (widget: Widget, apply: boolean) => void>;
   enabledTransformations: Record<ResponsiveState, string[]>;
 
   protected _transformationsToApply: string[];
@@ -77,7 +77,7 @@ export default class ResponsiveHandler implements ResponsiveHandlerModel {
   /**
    * Register a transformation with a given transformation id. The transformation id has to be unique.
    */
-  protected _registerTransformation(transformationId: string, transformation: (Widget, boolean) => void) {
+  protected _registerTransformation(transformationId: string, transformation: (widget: Widget, apply: boolean) => void) {
     this.transformations[transformationId] = transformation.bind(this);
   }
 
