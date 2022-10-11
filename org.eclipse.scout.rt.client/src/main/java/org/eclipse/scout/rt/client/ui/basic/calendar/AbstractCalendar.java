@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
+import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarDisposeCalendarChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarFilterCalendarItemsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarInitCalendarChain;
@@ -177,6 +178,9 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   @ConfigOperation
   @Order(10)
   protected void execInitCalendar() {
+  }
+
+  protected void execAppLinkAction(String ref) {
   }
 
   @ConfigOperation
@@ -785,6 +789,10 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     }
   }
 
+  public void doAppLinkAction(String ref) {
+    interceptAppLinkAction(ref);
+  }
+
   @Override
   public ICalendarUIFacade getUIFacade() {
     return m_uiFacade;
@@ -895,6 +903,11 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
         popUIProcessor();
       }
     }
+
+    @Override
+    public void fireAppLinkActionFromUI(String ref) {
+      doAppLinkAction(ref);
+    }
   }
 
   /**
@@ -923,6 +936,10 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
       getOwner().execInitCalendar();
     }
 
+    @Override
+    public void execAppLinkAction(CalendarAppLinkActionChain chain, String ref) {
+      getOwner().execAppLinkAction(ref);
+    }
   }
 
   protected final void interceptFilterCalendarItems(Set<Class<? extends ICalendarItemProvider>> changedProviderTypes, Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider) {
@@ -941,5 +958,11 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     List<? extends ICalendarExtension<? extends AbstractCalendar>> extensions = getAllExtensions();
     CalendarInitCalendarChain chain = new CalendarInitCalendarChain(extensions);
     chain.execInitCalendar();
+  }
+
+  protected final void interceptAppLinkAction(String ref) {
+    List<? extends ICalendarExtension<? extends AbstractCalendar>> extensions = getAllExtensions();
+    CalendarAppLinkActionChain chain = new CalendarAppLinkActionChain(extensions);
+    chain.execAppLinkAction(ref);
   }
 }

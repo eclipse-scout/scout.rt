@@ -16,6 +16,8 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonDateRange;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.json.JSONObject;
 
 public class JsonCalendarComponent<CALENDAR_COMPONENT extends CalendarComponent> extends AbstractJsonAdapter<CALENDAR_COMPONENT> {
@@ -42,5 +44,20 @@ public class JsonCalendarComponent<CALENDAR_COMPONENT extends CalendarComponent>
     json.put("fullDay", getModel().isFullDay());
     json.put("draggable", getModel().getProvider().isMoveItemEnabled());
     return json;
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (JsonEventType.APP_LINK_ACTION.matches(event.getType())) {
+      handleUiAppLinkAction(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
+  }
+
+  protected void handleUiAppLinkAction(JsonEvent event) {
+    String ref = event.getData().optString("ref", null);
+    getModel().getCalendar().getUIFacade().fireAppLinkActionFromUI(ref);
   }
 }

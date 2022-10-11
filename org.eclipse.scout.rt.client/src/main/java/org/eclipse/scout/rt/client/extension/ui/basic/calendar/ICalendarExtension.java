@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarAppLinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarDisposeCalendarChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarFilterCalendarItemsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarInitCalendarChain;
@@ -30,4 +31,5 @@ public interface ICalendarExtension<OWNER extends AbstractCalendar> extends IExt
 
   void execInitCalendar(CalendarInitCalendarChain chain);
 
+  void execAppLinkAction(CalendarAppLinkActionChain chain, String ref);
 }

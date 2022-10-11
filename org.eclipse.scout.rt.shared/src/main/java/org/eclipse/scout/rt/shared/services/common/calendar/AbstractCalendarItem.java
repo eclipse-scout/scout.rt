@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.shared.services.common.calendar;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -33,9 +35,13 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   private Object m_itemId;
   private String m_owner;
   private String m_subject;
+  private String m_subjectLabel;
+  private String m_subjectAppLink;
+  private String m_subjectIconId;
   private String m_body;
   private String m_cssClass;
   private RecurrencePattern m_recurrencyPattern;
+  private List<ICalendarItemDescriptionElement> m_descriptionElements = new ArrayList<>();
 
   /**
    * External key is intentionally not copied in the copy() method.
@@ -59,9 +65,17 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
       a.m_itemId = this.m_itemId;
       a.m_owner = this.m_owner;
       a.m_subject = this.m_subject;
+      a.m_subjectLabel = this.m_subjectLabel;
+      a.m_subjectAppLink = this.m_subjectAppLink;
+      a.m_subjectIconId = this.m_subjectIconId;
       a.m_body = this.m_body;
       a.m_cssClass = this.m_cssClass;
       a.m_recurrencyPattern = this.m_recurrencyPattern;
+      if (this.m_descriptionElements != null) {
+        for (ICalendarItemDescriptionElement descriptionElement : this.m_descriptionElements) {
+          a.m_descriptionElements.add(descriptionElement.copy());
+        }
+      }
       return a;
     }
     catch (Exception e) {
@@ -130,6 +144,36 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
   }
 
   @Override
+  public String getSubjectLabel() {
+    return m_subjectLabel;
+  }
+
+  @Override
+  public void setSubjectLabel(String subjectLabel) {
+    m_subjectLabel = subjectLabel;
+  }
+
+  @Override
+  public String getSubjectAppLink() {
+    return m_subjectAppLink;
+  }
+
+  @Override
+  public void setSubjectAppLink(String subjectAppLink) {
+    m_subjectAppLink = subjectAppLink;
+  }
+
+  @Override
+  public String getSubjectIconId() {
+    return m_subjectIconId;
+  }
+
+  @Override
+  public void setSubjectIconId(String subjectIconId) {
+    m_subjectIconId = subjectIconId;
+  }
+
+  @Override
   public String getBody() {
     return m_body;
   }
@@ -149,12 +193,24 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
     m_recurrencyPattern = p;
   }
 
+  @Override
+  public List<ICalendarItemDescriptionElement> getDescriptionElements() {
+    return m_descriptionElements;
+  }
+
+  public void setDescriptionElements(List<ICalendarItemDescriptionElement> descriptionElements) {
+    m_descriptionElements = descriptionElements;
+  }
+
   protected void dumpState(Map<String, Object> attributes) {
     attributes.put("exists", m_exists);
     attributes.put("lastModified", getDumpDateFormat().format(m_lastModified));
     attributes.put("id", String.valueOf(m_itemId));
     attributes.put("owner", m_owner);
     attributes.put("subject", m_subject);
+    attributes.put("subjectLabel", m_subjectLabel);
+    attributes.put("subjectAppLink", m_subjectAppLink);
+    attributes.put("subjectIconId", m_subjectIconId);
     if (m_body != null) {
       attributes.put("body", m_body.replace('\n', ' ').replace('\r', ' ').substring(0, Math.min(200, m_body.length())));
     }
@@ -193,6 +249,11 @@ public abstract class AbstractCalendarItem implements ICalendarItem, Serializabl
         count++;
       }
     }
+    b.append(", descriptionElements={");
+    for (ICalendarItemDescriptionElement descriptionElement : getDescriptionElements()) {
+      b.append(descriptionElement.toString());
+    }
+    b.append("}");
     b.append("]");
     return b.toString();
   }

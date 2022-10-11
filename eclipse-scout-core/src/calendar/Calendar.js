@@ -278,7 +278,8 @@ export default class Calendar extends Widget {
     this.$grid = this.$grids.appendDiv('calendar-grid');
     this.$grid.toggleClass('mobile', isMobile);
 
-    this.$list = this.$container.appendDiv('calendar-list-container').appendDiv('calendar-list');
+    this.$listContainer = this.$container.appendDiv('calendar-list-container');
+    this.$list = this.$listContainer.appendDiv('calendar-list calendar-scrollable-components');
     this.$listTitle = this.$list.appendDiv('calendar-list-title');
 
     // header contains range, title and commands. On small screens title will be moved to headerRow2
@@ -1013,6 +1014,7 @@ export default class Calendar extends Widget {
 
   _updateListPanel() {
     if (this._showListPanel) {
+      scrollbars.uninstall(this.$list, this.session);
 
       // remove old list-components
       this._listComponents.forEach(listComponent => {
@@ -1021,6 +1023,11 @@ export default class Calendar extends Widget {
 
       this._listComponents = [];
       this._renderListPanel();
+      scrollbars.install(this.$list, {
+        parent: this,
+        session: this.session,
+        axis: 'y'
+      });
     }
   }
 
