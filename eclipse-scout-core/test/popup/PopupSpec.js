@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -75,7 +75,110 @@ describe('Popup', () => {
   afterEach(() => {
     removePopups(session);
   });
+  describe('modal', () => {
+    it('has the "modal" css class if set to true', () => {
+      let popup = scout.create('Popup', {
+        parent: session.desktop,
+        modal: true
+      });
+      popup.render();
+      expect(popup.$container.hasClass('modal')).toBe(true);
+    });
 
+    it('has not the "modal" css class if set to false', () => {
+      let popup = scout.create('Popup', {
+        parent: session.desktop,
+        modal: false
+      });
+      popup.render();
+      expect(popup.$container.hasClass('modal')).toBe(false);
+    });
+
+    it('does not closes on mouse down outside', () => {
+      let popup = scout.create('Popup', {
+        parent: session.desktop,
+        modal: true
+      });
+      popup.open();
+      $desktop.triggerMouseDownCapture();
+      expect(popup.destroyed).toBe(false);
+
+      popup.setModal(false);
+      $desktop.triggerMouseDownCapture();
+      expect(popup.destroyed).toBe(true);
+    });
+
+    it('can be activated after the popup was opened', () => {
+      let popup = scout.create('Popup', {
+        parent: session.desktop,
+        modal: false
+      });
+      popup.open();
+      expect(popup.$container.hasClass('modal')).toBe(false);
+
+      popup.setModal(true);
+      expect(popup.$container.hasClass('modal')).toBe(true);
+    });
+
+    it('overrules the "withGlassPane" and the close properties, but restores their values afterwards', () => {
+      let popup = scout.create('Popup', {
+        parent: session.desktop,
+        modal: false,
+        withGlassPane: false,
+        closeOnMouseDownOutside: false,
+        closeOnAnchorMouseDown: true,
+        closeOnOtherPopupOpen: false
+      });
+      popup.open();
+      popup.setModal(true);
+      // modal overrules these properties
+      expect(popup.withGlassPane).toBe(true);
+      expect(popup.closeOnMouseDownOutside).toBe(false);
+      expect(popup.closeOnAnchorMouseDown).toBe(false);
+      expect(popup.closeOnOtherPopupOpen).toBe(false);
+
+      popup.setModal(false);
+      // properties are restored
+      expect(popup.withGlassPane).toBe(false);
+      expect(popup.closeOnMouseDownOutside).toBe(false);
+      expect(popup.closeOnAnchorMouseDown).toBe(true);
+      expect(popup.closeOnOtherPopupOpen).toBe(false);
+    });
+
+    it('keeps track of the changes to the "withGlassPane" and the close properties and restores their values afterwards', () => {
+      let popup = scout.create('Popup', {
+        parent: session.desktop,
+        modal: true,
+        withGlassPane: false,
+        closeOnMouseDownOutside: false,
+        closeOnAnchorMouseDown: true,
+        closeOnOtherPopupOpen: false
+      });
+      popup.open();
+      // modal overrules these properties
+      expect(popup.withGlassPane).toBe(true);
+      expect(popup.closeOnMouseDownOutside).toBe(false);
+      expect(popup.closeOnAnchorMouseDown).toBe(false);
+      expect(popup.closeOnOtherPopupOpen).toBe(false);
+
+      popup.setWithGlassPane(true);
+      popup.setCloseOnMouseDownOutside(true);
+      popup.setCloseOnAnchorMouseDown(false);
+      popup.setCloseOnOtherPopupOpen(false);
+      // setters do not have an immediate impact on the properties
+      expect(popup.withGlassPane).toBe(true);
+      expect(popup.closeOnMouseDownOutside).toBe(false);
+      expect(popup.closeOnAnchorMouseDown).toBe(false);
+      expect(popup.closeOnOtherPopupOpen).toBe(false);
+
+      popup.setModal(false);
+      // properties are restored
+      expect(popup.withGlassPane).toBe(true);
+      expect(popup.closeOnMouseDownOutside).toBe(true);
+      expect(popup.closeOnAnchorMouseDown).toBe(false);
+      expect(popup.closeOnOtherPopupOpen).toBe(false);
+    });
+  });
   describe('withGlassPane', () => {
     it('shows a glass pane if set to true', () => {
       let popup = scout.create('Popup', {
