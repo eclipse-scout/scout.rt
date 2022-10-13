@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '@eclipse-scout/core';
+import {WidgetModel} from '@eclipse-scout/core';
+import {Chart, ChartModel} from '../../../index';
+import {RefModel} from '@eclipse-scout/core/src/types';
 
-export default class ChartFieldAdapter extends FormFieldAdapter {
-
-  constructor() {
-    super();
-  }
+export default interface ChartFieldModel extends WidgetModel { // FIXME TS FormFieldModel
+  chart?: Chart | RefModel<ChartModel>;
 }

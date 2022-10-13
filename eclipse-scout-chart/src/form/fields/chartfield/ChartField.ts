@@ -9,15 +9,21 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormField} from '@eclipse-scout/core';
+import {Chart, ChartFieldModel} from '../../../index';
 
-export default class ChartField extends FormField {
+export default class ChartField extends FormField implements ChartFieldModel {
+  declare model: ChartFieldModel;
+
+  chart: Chart;
 
   constructor() {
     super();
     this._addWidgetProperties(['chart']);
+
+    this.chart = null;
   }
 
-  _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'chart-field');
     this.addLabel();
     this.addMandatoryIndicator();
@@ -25,14 +31,14 @@ export default class ChartField extends FormField {
     this._renderChart();
   }
 
-  _renderChart() {
+  protected _renderChart() {
     if (this.chart) {
       this.chart.render();
       this.addField(this.chart.$container);
     }
   }
 
-  _removeChart() {
+  protected _removeChart() {
     this.chart.remove();
     this._removeField();
   }
