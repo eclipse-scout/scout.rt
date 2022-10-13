@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormAdapter} from '../index';
+import {WidgetPopupModel} from '../index';
 
-export default class TileOverviewFormAdapter extends FormAdapter {
-  constructor() {
-    super();
-  }
+export default interface MobilePopupModel extends WidgetPopupModel {
+  title?: string;
 }

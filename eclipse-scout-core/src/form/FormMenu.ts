@@ -8,9 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ContextMenuPopup, Device, Form, FormMenuActionKeyStroke, GroupBox, Menu, MobilePopup, scout, WidgetPopup} from '../index';
+import {ActionKeyStroke, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, GroupBox, Menu, MobilePopup, Popup, scout, WidgetPopup} from '../index';
+import {CloneOptions} from '../widget/Widget';
 
-export default class FormMenu extends Menu {
+export default class FormMenu extends Menu implements FormMenuModel {
+  declare model: FormMenuModel;
+  declare eventMap: FormMenuEventMap;
+
+  form: Form;
+  popupStyle: FormMenuPopupStyle;
+  popupClosable: boolean;
+  popupMovable: boolean;
+  popupResizable: boolean;
+  protected _formDestroyHandler: EventHandler<Event<Form>>;
 
   constructor() {
     super();
@@ -27,12 +37,9 @@ export default class FormMenu extends Menu {
   static PopupStyle = {
     DEFAULT: 'default',
     MOBILE: 'mobile'
-  };
+  } as const;
 
-  /**
-   * @protected
-   */
-  _init(model) {
+  protected override _init(model: FormMenuModel) {
     super._init(model);
 
     if (!this.popupStyle) {
@@ -46,7 +53,7 @@ export default class FormMenu extends Menu {
     this._setForm(this.form);
   }
 
-  _renderForm() {
+  protected _renderForm() {
     if (!this.rendered) {
       // Don't execute initially since _renderSelected will be executed
       return;
@@ -54,23 +61,21 @@ export default class FormMenu extends Menu {
     this._renderSelected();
   }
 
-  /**
-   * @override
-   */
-  clone(modelOverride, options) {
+  override clone(modelOverride: FormMenuModel, options: CloneOptions): FormMenu {
+    // @ts-ignore
     modelOverride = modelOverride || {};
     // If the FormMenu is put into a context menu it will be cloned.
-    // Cloning a form is not possible because it may non clonable components (Table, TabBox, etc.) -> exclude
+    // Cloning a form is not possible because it may non cloneable components (Table, TabBox, etc.) -> exclude
     // Luckily, it is not necessary to clone it since the form is never shown multiple times at once -> Just use the same instance
     modelOverride.form = this.form;
-    return super.clone(modelOverride, options);
+    return super.clone(modelOverride, options) as FormMenu;
   }
 
-  setForm(form) {
+  setForm(form: Form) {
     this.setProperty('form', form);
   }
 
-  _setForm(form) {
+  protected _setForm(form: Form) {
     if (this.form) {
       this.form.off('destroy', this._formDestroyHandler);
     }
@@ -81,7 +86,7 @@ export default class FormMenu extends Menu {
     }
   }
 
-  _adaptForm(form) {
+  protected _adaptForm(form: Form) {
     form.setDisplayHint(Form.DisplayHint.VIEW);
     form.setModal(false);
     form.setClosable(false);
@@ -90,7 +95,7 @@ export default class FormMenu extends Menu {
   /**
    * Called when the popup form is destroyed (e.g. form.close() was called) -> ensure menu is unselected and popup closed.
    */
-  _onFormDestroy(event) {
+  protected _onFormDestroy(event: Event<Form>) {
     if (!this.popup || !this.popup.destroying) {
       // Unselect if form is closed (e.g. if a close button on the form itself is pressed. Mainly necessary for Scout JS only)
       // Don't interfere with regular popup lifecycle. If popup is being closed already it will be or is already unselected anyway.
@@ -99,14 +104,14 @@ export default class FormMenu extends Menu {
     }
     this.setForm(null);
 
-    let parentContextMenuPopup = this.findParent(p => p instanceof ContextMenuPopup);
+    let parentContextMenuPopup = this.findParent(p => p instanceof ContextMenuPopup) as ContextMenuPopup;
     if (parentContextMenuPopup && !(parentContextMenuPopup.destroying || parentContextMenuPopup.removing)) {
       // only explicitly close the popup if it is not already being closed. Otherwise it is removed twice.
       parentContextMenuPopup.close();
     }
   }
 
-  _setSelected(selected) {
+  protected _setSelected(selected: boolean) {
     this._setProperty('selected', selected);
     if (this.popupStyle === FormMenu.PopupStyle.MOBILE && this._doActionTogglesPopup()) {
       // Mobile Popup can be rendered even if menu is not. This is useful if a tool form menu should be opened while the desktop bench is open instead of the outline
@@ -119,14 +124,14 @@ export default class FormMenu extends Menu {
     }
   }
 
-  _renderSelected() {
+  protected override _renderSelected() {
     super._renderSelected();
 
     // Form menu always has a popup (form could be set later, so super call cannot set the class correctly)
     this.$container.addClass('has-popup');
   }
 
-  _canOpenPopup() {
+  protected override _canOpenPopup(): boolean {
     // A menu can be opened in the menu bar but also in a context menu, where it will be cloned.
     // The form itself won't be cloned, so there can always be only one rendered form.
     // If the menus use a remove animation and a new menu is opened while the other one is still removing, the form rendering will fail
@@ -136,13 +141,14 @@ export default class FormMenu extends Menu {
     return super._canOpenPopup();
   }
 
-  _closeOtherPopupsForSameMenu() {
+  protected _closeOtherPopupsForSameMenu() {
     this._findOtherPopupsForSameMenu().forEach(popup => {
       if (popup.isRemovalPending()) {
         popup.removeImmediately();
         return;
       }
       // If popup is open but remove animation has not started yet (can only be triggered programmatically, see test FormMenuSpec.js)
+      // @ts-ignore
       if (popup._rendered) {
         let currentAnimateRemoval = popup.animateRemoval;
         popup.animateRemoval = false;
@@ -152,7 +158,7 @@ export default class FormMenu extends Menu {
     });
   }
 
-  _findOtherPopupsForSameMenu() {
+  protected _findOtherPopupsForSameMenu(): Popup[] {
     return this.session.desktop.getPopups().filter(popup => {
       if (popup === this.popup || popup.has(this)) {
         return false;
@@ -161,7 +167,7 @@ export default class FormMenu extends Menu {
     });
   }
 
-  _popupBelongsToMenu(popup) {
+  protected _popupBelongsToMenu(popup: Popup): boolean {
     // Check if the widget popup containing the form is open (parent is always the form menu, if it's in a context menu the parent is a clone)
     if (popup.parent.original() === this.original()) {
       return true;
@@ -173,10 +179,7 @@ export default class FormMenu extends Menu {
     return false;
   }
 
-  /**
-   * @override Menu.js
-   */
-  _createPopup() {
+  protected override _createPopup(): Popup {
     // Menu bar should always be on the bottom
     this.form.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
 
@@ -202,14 +205,11 @@ export default class FormMenu extends Menu {
     });
   }
 
-  /**
-   * @override
-   */
-  _doActionTogglesPopup() {
+  protected override _doActionTogglesPopup(): boolean {
     return !!this.form;
   }
 
-  _handleSelectedInEllipsis() {
+  protected override _handleSelectedInEllipsis() {
     if (this.popupStyle === FormMenu.PopupStyle.MOBILE) {
       // The mobile popup is not attached to a header -> no need to open the overflow menu (popup is already open due to _setSelected)
       return;
@@ -217,10 +217,9 @@ export default class FormMenu extends Menu {
     super._handleSelectedInEllipsis();
   }
 
-  /**
-   * @return {FormMenuActionKeyStroke}
-   */
-  _createActionKeyStroke() {
+  protected override _createActionKeyStroke(): ActionKeyStroke {
     return new FormMenuActionKeyStroke(this);
   }
 }
+
+export type FormMenuPopupStyle = EnumObject<typeof FormMenu.PopupStyle>;

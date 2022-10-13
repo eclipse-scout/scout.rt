@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormAdapter} from '../index';
+import {Form, MenuEventMap, PropertyChangeEvent} from '../index';
 
-export default class TileOverviewFormAdapter extends FormAdapter {
-  constructor() {
-    super();
-  }
+export default interface FormMenuEventMap extends MenuEventMap {
+  'propertyChange:form': PropertyChangeEvent<Form>;
 }
