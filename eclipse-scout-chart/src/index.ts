@@ -28,6 +28,7 @@ export {default as VennChartRenderer} from './chart/VennChartRenderer';
 export {default as VennCircle} from './chart/VennCircle';
 export {default as ChartField} from './form/fields/chartfield/ChartField';
 export {default as ChartFieldAdapter} from './form/fields/chartfield/ChartFieldAdapter';
+export {default as ChartFieldModel} from './form/fields/chartfield/ChartFieldModel';
 export {default as ChartFieldTile} from './tile/ChartFieldTile';
 export {default as ChartFieldTileAdapter} from './tile/ChartFieldTileAdapter';
 export {default as ChartTableControl} from './table/controls/ChartTableControl';
