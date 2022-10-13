@@ -41,8 +41,7 @@ export default class TableRow implements TableRowModel {
   lookupRow: LookupRow<any>;
   $row: JQuery;
   page: Page;
-
-  protected _expandable: boolean;
+  expandable: boolean;
 
   constructor() {
     this.$row = null;

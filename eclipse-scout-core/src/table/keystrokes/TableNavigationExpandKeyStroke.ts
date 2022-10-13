@@ -34,8 +34,7 @@ export default class TableNavigationExpandKeyStroke extends AbstractTableNavigat
     if (!selectedRow) {
       return false;
     }
-    // @ts-ignore
-    return selectedRow._expandable;
+    return selectedRow.expandable;
   }
 
   override handle(event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
@@ -44,8 +43,7 @@ export default class TableNavigationExpandKeyStroke extends AbstractTableNavigat
     if (!selectedRow) {
       return;
     }
-    // @ts-ignore
-    if (selectedRow._expandable) {
+    if (selectedRow.expandable) {
       if (selectedRow.expanded) {
         // select first child
         let visibleChildRows = table.visibleChildRows(selectedRow);
