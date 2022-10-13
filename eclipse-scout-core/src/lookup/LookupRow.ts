@@ -12,12 +12,12 @@ import $ from 'jquery';
 import objects from '../util/objects';
 import LookupRowModel from './LookupRowModel';
 
-export default class LookupRow<Key> implements LookupRowModel<Key> {
-  declare model: LookupRowModel<Key>;
+export default class LookupRow<TKey> implements LookupRowModel<TKey> {
+  declare model: LookupRowModel<TKey>;
 
-  key: Key;
+  key: TKey;
   text: string;
-  parentKey: Key;
+  parentKey: TKey;
   enabled: boolean;
   active: boolean;
   additionalTableRowData: any;
@@ -43,11 +43,11 @@ export default class LookupRow<Key> implements LookupRowModel<Key> {
     this.font = null;
   }
 
-  init(model?: LookupRowModel<Key>) {
+  init(model?: LookupRowModel<TKey>) {
     $.extend(this, model);
   }
 
-  setKey(key: Key) {
+  setKey(key: TKey) {
     this.key = key;
   }
 
@@ -55,7 +55,7 @@ export default class LookupRow<Key> implements LookupRowModel<Key> {
     this.text = text;
   }
 
-  setParentKey(parentKey: Key) {
+  setParentKey(parentKey: TKey) {
     this.parentKey = parentKey;
   }
 

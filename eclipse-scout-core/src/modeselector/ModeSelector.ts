@@ -11,12 +11,12 @@
 import {arrays, EventHandler, events, graphics, HtmlComponent, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorModel, PropertyChangeEvent, Widget} from '../index';
 import {SwipeCallbackEvent} from '../util/events';
 
-export default class ModeSelector<T> extends Widget implements ModeSelectorModel<T> {
-  declare model: ModeSelectorModel<T>;
-  declare eventMap: ModeSelectorEventMap<T>;
+export default class ModeSelector<TModeRef = any> extends Widget implements ModeSelectorModel<TModeRef> {
+  declare model: ModeSelectorModel<TModeRef>;
+  declare eventMap: ModeSelectorEventMap<TModeRef>;
 
-  modes: Mode<T>[];
-  selectedMode: Mode<T>;
+  modes: Mode<TModeRef>[];
+  selectedMode: Mode<TModeRef>;
   $slider: JQuery;
 
   /**
@@ -40,7 +40,7 @@ export default class ModeSelector<T> extends Widget implements ModeSelectorModel
     this._modePropertyChangeHandler = this._onModePropertyChange.bind(this);
   }
 
-  protected override _init(model: ModeSelectorModel<T>) {
+  protected override _init(model: ModeSelectorModel<TModeRef>) {
     super._init(model);
     this._setModes(this.modes);
     this._setSelectedMode(this.selectedMode);
@@ -58,11 +58,11 @@ export default class ModeSelector<T> extends Widget implements ModeSelectorModel
     this._renderModes();
   }
 
-  setModes(modes: Mode<T>[]) {
+  setModes(modes: Mode<TModeRef>[]) {
     this.setProperty('modes', modes);
   }
 
-  protected _setModes(modes: Mode<T>[]) {
+  protected _setModes(modes: Mode<TModeRef>[]) {
     this.modes.forEach(mode => mode.off('propertyChange', this._modePropertyChangeHandler));
     this._setProperty('modes', arrays.ensure(modes));
     this.modes.forEach(mode => {
@@ -85,11 +85,11 @@ export default class ModeSelector<T> extends Widget implements ModeSelectorModel
     this._updateMarkers();
   }
 
-  setSelectedMode(selectedMode: Mode<T>) {
+  setSelectedMode(selectedMode: Mode<TModeRef>) {
     this.setProperty('selectedMode', selectedMode);
   }
 
-  protected _setSelectedMode(selectedMode: Mode<T>) {
+  protected _setSelectedMode(selectedMode: Mode<TModeRef>) {
     this._isModeChanging = true;
     if (this.selectedMode && this.selectedMode !== selectedMode) {
       this.selectedMode.setSelected(false);
@@ -102,7 +102,7 @@ export default class ModeSelector<T> extends Widget implements ModeSelectorModel
     this._updateMarkers();
   }
 
-  protected _onModePropertyChange(event: PropertyChangeEvent<any, Mode<T>>) {
+  protected _onModePropertyChange(event: PropertyChangeEvent<any, Mode<TModeRef>>) {
     if (event.propertyName === 'selected' && !this._isModeChanging) {
       this.setSelectedMode(event.newValue ? event.source : null);
     } else if (event.propertyName === 'visible') {
@@ -175,7 +175,7 @@ export default class ModeSelector<T> extends Widget implements ModeSelectorModel
     events.onSwipe($mode, className, onDown, onMove, onUp);
   }
 
-  protected _computeNewSelectedMode(e: SwipeCallbackEvent): Mode<T> {
+  protected _computeNewSelectedMode(e: SwipeCallbackEvent): Mode<TModeRef> {
     if (e.direction === 0 || Math.abs(e.deltaX) <= 5) {
       // ignore if the slide is below threshold
       return this.selectedMode;
@@ -188,7 +188,7 @@ export default class ModeSelector<T> extends Widget implements ModeSelectorModel
     return this._findModeByPos(e.newLeft + this.$slider.width());
   }
 
-  protected _findModeByPos(pos: number): Mode<T> {
+  protected _findModeByPos(pos: number): Mode<TModeRef> {
     let visibleModes = this.modes.filter(m => m.isVisible());
     for (let i = visibleModes.length - 1; i >= 0; i--) {
       let mode = visibleModes[i];
@@ -204,11 +204,11 @@ export default class ModeSelector<T> extends Widget implements ModeSelectorModel
     return null;
   }
 
-  findModeById(id: string): Mode<T> {
+  findModeById(id: string): Mode<TModeRef> {
     return arrays.find(this.modes, mode => mode.id === id);
   }
 
-  findModeByRef(ref: T): Mode<T> {
+  findModeByRef(ref: TModeRef): Mode<TModeRef> {
     return arrays.find(this.modes, mode => mode.ref === ref);
   }
 
@@ -216,7 +216,7 @@ export default class ModeSelector<T> extends Widget implements ModeSelectorModel
     this.setSelectedMode(this.findModeById(id));
   }
 
-  selectModeByRef(ref: T) {
+  selectModeByRef(ref: TModeRef) {
     this.setSelectedMode(this.findModeByRef(ref));
   }
 }

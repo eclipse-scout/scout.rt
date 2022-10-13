@@ -11,7 +11,7 @@
 import {Mode, ModeModel, WidgetModel} from '../index';
 import {RefModel} from '../types';
 
-export default interface ModeSelectorModel<T> extends WidgetModel {
+export default interface ModeSelectorModel<T = any> extends WidgetModel {
   /**
    * Default is [].
    */
