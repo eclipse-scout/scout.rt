@@ -21,7 +21,7 @@ export default interface PlannerHeaderEventMap extends WidgetEventMap {
   'previousClick': Event<PlannerHeader>;
   'todayClick': Event<PlannerHeader>;
   'yearClick': Event<PlannerHeader>;
-  'propertyChange:availableDisplayModes': PropertyChangeEvent<PlannerDisplayMode[], PlannerHeader>;
-  'propertyChange:displayMode': PropertyChangeEvent<PlannerDisplayMode, PlannerHeader>;
+  'propertyChange:availableDisplayModes': PropertyChangeEvent<PlannerDisplayMode[]>;
+  'propertyChange:displayMode': PropertyChangeEvent<PlannerDisplayMode>;
 
 }

@@ -37,7 +37,7 @@ const printEventMapsPlugin = {
             // Don't replace existing value if it already has a type
             return;
           }
-          propEvents.set(eventName, `'propertyChange:${eventName}': PropertyChangeEvent<${type}, ${className}>;`);
+          propEvents.set(eventName, `'propertyChange:${eventName}': PropertyChangeEvent<${type}>;`);
         } else {
           let eventObj = expression.value.arguments[1];
           let event = '?';

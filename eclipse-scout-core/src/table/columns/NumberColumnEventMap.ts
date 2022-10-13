@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnEventMap, DecimalFormat, NumberColumn, PropertyChangeEvent} from '../../index';
+import {ColumnEventMap, DecimalFormat, PropertyChangeEvent} from '../../index';
 import {NumberColumnAggregationFunction, NumberColumnBackgroundEffect} from './NumberColumn';
 
 export default interface NumberColumnEventMap extends ColumnEventMap {
-  'propertyChange:aggregationFunction': PropertyChangeEvent<NumberColumnAggregationFunction, NumberColumn>;
-  'propertyChange:backgroundEffect': PropertyChangeEvent<NumberColumnBackgroundEffect, NumberColumn>;
-  'propertyChange:decimalFormat': PropertyChangeEvent<DecimalFormat, NumberColumn>;
+  'propertyChange:aggregationFunction': PropertyChangeEvent<NumberColumnAggregationFunction>;
+  'propertyChange:backgroundEffect': PropertyChangeEvent<NumberColumnBackgroundEffect>;
+  'propertyChange:decimalFormat': PropertyChangeEvent<DecimalFormat>;
 }

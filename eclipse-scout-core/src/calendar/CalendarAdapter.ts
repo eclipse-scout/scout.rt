@@ -12,7 +12,8 @@ import {Calendar, dates, Event, ModelAdapter} from '../index';
 import {JsonDateRange} from '../util/dates';
 import {CalendarComponentMoveEvent} from './CalendarEventMap';
 
-export default class CalendarAdapter<C extends Calendar = Calendar> extends ModelAdapter<C> {
+export default class CalendarAdapter extends ModelAdapter {
+  declare widget: Calendar;
 
   constructor() {
     super();
@@ -26,7 +27,7 @@ export default class CalendarAdapter<C extends Calendar = Calendar> extends Mode
     this._sendViewRangeChange();
   }
 
-  protected override _onWidgetEvent(event: Event<C>) {
+  protected override _onWidgetEvent(event: Event<Calendar>) {
     if (event.type === 'viewRangeChange') {
       this._sendViewRangeChange();
     } else if (event.type === 'modelChange') {
@@ -34,7 +35,7 @@ export default class CalendarAdapter<C extends Calendar = Calendar> extends Mode
     } else if (event.type === 'selectionChange') {
       this._sendSelectionChange();
     } else if (event.type === 'componentMove') {
-      this._sendComponentMove(event as CalendarComponentMoveEvent<C>);
+      this._sendComponentMove(event as CalendarComponentMoveEvent);
     } else if (event.type === 'selectedRangeChange') {
       this._sendSelectedRangeChange();
     } else {
@@ -86,7 +87,7 @@ export default class CalendarAdapter<C extends Calendar = Calendar> extends Mode
     });
   }
 
-  protected _sendComponentMove(event: CalendarComponentMoveEvent<C>) {
+  protected _sendComponentMove(event: CalendarComponentMoveEvent) {
     this._send('componentMove', {
       componentId: event.component.id,
       fromDate: event.component.fromDate,

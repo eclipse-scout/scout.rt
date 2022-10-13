@@ -11,7 +11,7 @@
 import {Event, Label, ModelAdapter} from '../index';
 import {LabelAppLinkActionEvent} from './LabelEventMap';
 
-export default class LabelAdapter extends ModelAdapter<Label> {
+export default class LabelAdapter extends ModelAdapter {
 
   constructor() {
     super();

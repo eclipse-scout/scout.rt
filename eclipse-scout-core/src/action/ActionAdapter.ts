@@ -10,7 +10,8 @@
  */
 import {Action, Event, ModelAdapter} from '../index';
 
-export default class ActionAdapter<A extends Action = Action> extends ModelAdapter<A> {
+export default class ActionAdapter extends ModelAdapter {
+  declare widget: Action;
 
   constructor() {
     super();
@@ -26,14 +27,14 @@ export default class ActionAdapter<A extends Action = Action> extends ModelAdapt
     this.widget.setEnabled(this._enabledBeforeOffline);
   }
 
-  protected _onWidgetAction(event: Event<A>) {
+  protected _onWidgetAction(event: Event<Action>) {
     if (this.widget.isToggleAction()) {
       return;
     }
     this._send('action');
   }
 
-  protected override _onWidgetEvent(event: Event<A>) {
+  protected override _onWidgetEvent(event: Event<Action>) {
     if (event.type === 'action') {
       this._onWidgetAction(event);
     } else {

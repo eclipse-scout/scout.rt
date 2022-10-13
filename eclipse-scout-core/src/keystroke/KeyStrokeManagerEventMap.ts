@@ -11,7 +11,7 @@
 import {Event, EventMap, KeyStroke, KeyStrokeContext} from '../index';
 import KeyStrokeManager from './KeyStrokeManager';
 
-export interface KeyStrokeManagerKeyStrokeEvent<T extends KeyStrokeManager = KeyStrokeManager> extends Event<T> {
+export interface KeyStrokeManagerKeyStrokeEvent<T = KeyStrokeManager> extends Event<T> {
   keyStroke: KeyStroke;
   keyStrokeContext: KeyStrokeContext;
 }

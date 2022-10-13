@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PropertyChangeEvent, TableRowTileMapping, TableTileGridMediator, Tile, TileGridLayoutConfig, WidgetEventMap} from '../index';
+import {PropertyChangeEvent, TableRowTileMapping, Tile, TileGridLayoutConfig, WidgetEventMap} from '../index';
 
 export default interface TableTileGridMediatorEventMap extends WidgetEventMap {
-  'propertyChange:gridColumnCount': PropertyChangeEvent<number, TableTileGridMediator>;
-  'propertyChange:tileGridLayoutConfig': PropertyChangeEvent<TileGridLayoutConfig, TableTileGridMediator>;
-  'propertyChange:tileMappings': PropertyChangeEvent<TableRowTileMapping[], TableTileGridMediator>;
-  'propertyChange:tiles': PropertyChangeEvent<Tile[], TableTileGridMediator>;
-  'propertyChange:withPlaceholders': PropertyChangeEvent<boolean, TableTileGridMediator>;
+  'propertyChange:gridColumnCount': PropertyChangeEvent<number>;
+  'propertyChange:tileGridLayoutConfig': PropertyChangeEvent<TileGridLayoutConfig>;
+  'propertyChange:tileMappings': PropertyChangeEvent<TableRowTileMapping[]>;
+  'propertyChange:tiles': PropertyChangeEvent<Tile[]>;
+  'propertyChange:withPlaceholders': PropertyChangeEvent<boolean>;
 }

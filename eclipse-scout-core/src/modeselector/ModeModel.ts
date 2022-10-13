@@ -10,10 +10,10 @@
  */
 import {ActionModel} from '../index';
 
-export default interface ModeModel<T> extends ActionModel {
+export default interface ModeModel<TRef = any> extends ActionModel {
   /**
-   *  Arbitrary reference value, can be used to find and select modes (see ModeSelector.js).
+   *  Arbitrary reference value, can be used to find and select modes (see {@link ModeSelector}).
    *  Default is null.
    **/
-  ref?: T;
+  ref?: TRef;
 }

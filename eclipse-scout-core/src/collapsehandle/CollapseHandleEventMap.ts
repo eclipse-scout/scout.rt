@@ -11,7 +11,7 @@
 import {CollapseHandle, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
 import {CollapseHandleHorizontalAlignment} from './CollapseHandle';
 
-export interface CollapseHandleActionEvent<T extends CollapseHandle = CollapseHandle> extends Event<T> {
+export interface CollapseHandleActionEvent<T = CollapseHandle> extends Event<T> {
   left?: boolean;
   right?: boolean;
 }
@@ -21,5 +21,4 @@ export default interface CollapseHandleEventMap extends WidgetEventMap {
   'propertyChange:horizontalAlignment': PropertyChangeEvent<CollapseHandleHorizontalAlignment>;
   'propertyChange:leftVisible': PropertyChangeEvent<boolean>;
   'propertyChange:rightVisible': PropertyChangeEvent<boolean>;
-
 }

@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionEventMap, Form, FormTableControl, PropertyChangeEvent} from '../../index';
+import {ActionEventMap, Form, PropertyChangeEvent} from '../../index';
 
 export default interface FormTableControlEventMap extends ActionEventMap {
-  'propertyChange:form': PropertyChangeEvent<Form, FormTableControl>;
+  'propertyChange:form': PropertyChangeEvent<Form>;
 }

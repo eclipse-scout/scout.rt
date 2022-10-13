@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionAdapter, Menu} from '../index';
+import {ActionAdapter} from '../index';
 
-export default class MenuAdapter<M extends Menu = Menu> extends ActionAdapter<M> {
+export default class MenuAdapter extends ActionAdapter {
 
   constructor() {
     super();

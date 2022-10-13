@@ -11,7 +11,8 @@
 import {Event, OutlineAdapter, SearchOutline, SearchOutlineModel} from '../../index';
 import {SearchOutlineSearchEvent} from './SearchOutlineEventMap';
 
-export default class SearchOutlineAdapter<TWidget extends SearchOutline = SearchOutline> extends OutlineAdapter<TWidget> {
+export default class SearchOutlineAdapter extends OutlineAdapter {
+  declare widget: SearchOutline;
 
   constructor() {
     super();
@@ -28,7 +29,7 @@ export default class SearchOutlineAdapter<TWidget extends SearchOutline = Search
     this.widget.focusQueryField();
   }
 
-  protected _onWidgetSearch(event: SearchOutlineSearchEvent<TWidget>) {
+  protected _onWidgetSearch(event: SearchOutlineSearchEvent) {
     this._send('search', {
       query: event.query
     }, {
@@ -36,9 +37,9 @@ export default class SearchOutlineAdapter<TWidget extends SearchOutline = Search
     });
   }
 
-  protected override _onWidgetEvent(event: Event<TWidget>) {
+  protected override _onWidgetEvent(event: Event<SearchOutline>) {
     if (event.type === 'search') {
-      this._onWidgetSearch(event as SearchOutlineSearchEvent<TWidget>);
+      this._onWidgetSearch(event as SearchOutlineSearchEvent);
     } else {
       super._onWidgetEvent(event);
     }

@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Accordion, ModelAdapter} from '../index';
+import {ModelAdapter} from '../index';
 
-export default class AccordionAdapter<W extends Accordion = Accordion> extends ModelAdapter<W> {
+export default class AccordionAdapter extends ModelAdapter {
 
   constructor() {
     super();

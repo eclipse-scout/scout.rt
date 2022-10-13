@@ -10,7 +10,8 @@
  */
 import {OutlineViewButton, ViewButtonAdapter} from '../../index';
 
-export default class OutlineViewButtonAdapter<TWidget extends OutlineViewButton = OutlineViewButton> extends ViewButtonAdapter<TWidget> {
+export default class OutlineViewButtonAdapter extends ViewButtonAdapter {
+  declare widget: OutlineViewButton;
 
   constructor() {
     super();

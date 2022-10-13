@@ -22,11 +22,11 @@ export interface SmartColumnPrepareLookupCallEvent<S extends SmartColumn = Smart
 export default interface SmartColumnEventMap extends ColumnEventMap {
   'lookupCallDone': SmartColumnCallDoneEvent;
   'prepareLookupCall': SmartColumnPrepareLookupCallEvent;
-  'propertyChange:activeFilterEnabled': PropertyChangeEvent<boolean, SmartColumn>;
-  'propertyChange:browseAutoExpandAll': PropertyChangeEvent<boolean, SmartColumn>;
-  'propertyChange:browseHierarchy': PropertyChangeEvent<boolean, SmartColumn>;
-  'propertyChange:browseLoadIncremental': PropertyChangeEvent<boolean, SmartColumn>;
-  'propertyChange:browseMaxRowCount': PropertyChangeEvent<number, SmartColumn>;
-  'propertyChange:codeType': PropertyChangeEvent<string, SmartColumn>;
-  'propertyChange:lookupCall': PropertyChangeEvent<LookupCall<any>, SmartColumn>;
+  'propertyChange:activeFilterEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:browseAutoExpandAll': PropertyChangeEvent<boolean>;
+  'propertyChange:browseHierarchy': PropertyChangeEvent<boolean>;
+  'propertyChange:browseLoadIncremental': PropertyChangeEvent<boolean>;
+  'propertyChange:browseMaxRowCount': PropertyChangeEvent<number>;
+  'propertyChange:codeType': PropertyChangeEvent<string>;
+  'propertyChange:lookupCall': PropertyChangeEvent<LookupCall<any>>;
 }

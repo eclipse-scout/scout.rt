@@ -12,7 +12,7 @@ import {Event, PropertyChangeEvent, Switch, WidgetEventMap} from '../index';
 
 export default interface SwitchEventMap extends WidgetEventMap {
   'switch': Event<Switch>;
-  'propertyChange:activated': PropertyChangeEvent<boolean, Switch>;
-  'propertyChange:label': PropertyChangeEvent<string, Switch>;
-  'propertyChange:tooltipText': PropertyChangeEvent<string, Switch>;
+  'propertyChange:activated': PropertyChangeEvent<boolean>;
+  'propertyChange:label': PropertyChangeEvent<string>;
+  'propertyChange:tooltipText': PropertyChangeEvent<string>;
 }

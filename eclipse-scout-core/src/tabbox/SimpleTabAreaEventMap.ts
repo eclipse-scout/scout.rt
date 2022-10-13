@@ -17,5 +17,5 @@ export interface SimpleTabAreaTabSelectEvent<S extends SimpleTabArea = SimpleTab
 
 export default interface SimpleTabAreaEventMap extends WidgetEventMap {
   'tabSelect': SimpleTabAreaTabSelectEvent;
-  'propertyChange:displayStyle': PropertyChangeEvent<SimpleTabAreaDisplayStyle, SimpleTabArea>;
+  'propertyChange:displayStyle': PropertyChangeEvent<SimpleTabAreaDisplayStyle>;
 }

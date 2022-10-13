@@ -12,7 +12,7 @@ import {Event as ScoutEvent, PropertyChangeEvent, WidgetEventMap} from '@eclipse
 import {AbstractChartRenderer, Chart} from '../index';
 import {ChartConfig, ChartData, ClickObject} from './Chart';
 
-export interface ChartValueClickEvent<C extends Chart = Chart> extends ScoutEvent<C> {
+export interface ChartValueClickEvent<C = Chart> extends ScoutEvent<C> {
   data: ClickObject;
   originalEvent?: Event;
 }
@@ -20,8 +20,8 @@ export interface ChartValueClickEvent<C extends Chart = Chart> extends ScoutEven
 export default interface ChartEventMap extends WidgetEventMap {
   'chartRender': ScoutEvent<Chart>;
   'valueClick': ChartValueClickEvent;
-  'propertyChange:chartRenderer': PropertyChangeEvent<AbstractChartRenderer, Chart>;
-  'propertyChange:checkedItems': PropertyChangeEvent<ClickObject[], Chart>;
-  'propertyChange:config': PropertyChangeEvent<ChartConfig, Chart>;
-  'propertyChange:data': PropertyChangeEvent<ChartData, Chart>;
+  'propertyChange:chartRenderer': PropertyChangeEvent<AbstractChartRenderer>;
+  'propertyChange:checkedItems': PropertyChangeEvent<ClickObject[]>;
+  'propertyChange:config': PropertyChangeEvent<ChartConfig>;
+  'propertyChange:data': PropertyChangeEvent<ChartData>;
 }

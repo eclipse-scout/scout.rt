@@ -11,19 +11,19 @@
 import {App, Desktop, Event, EventMap, Session} from './index';
 import {AppBootstrapOptions, AppOptions} from './App';
 
-export interface AppInitEvent<T extends App = App> extends Event<T> {
+export interface AppInitEvent<T = App> extends Event<T> {
   options: AppOptions;
 }
 
-export interface AppBootstrapEvent<T extends App = App> extends Event<T> {
+export interface AppBootstrapEvent<T = App> extends Event<T> {
   options: AppBootstrapOptions;
 }
 
-export interface AppDesktopReadyEvent<T extends App = App> extends Event<T> {
+export interface AppDesktopReadyEvent<T = App> extends Event<T> {
   desktop: Desktop;
 }
 
-export interface AppSessionReadyEvent<T extends App = App> extends Event<T> {
+export interface AppSessionReadyEvent<T = App> extends Event<T> {
   session: Session;
 }
 

@@ -96,19 +96,26 @@ function events() {
   });
   img.one('hierarchyChange', event => {
     console.log(event.oldParent);
+    console.log(event.source.autoFit);
+  });
+
+  img.on('propertyChange:autoFit', event => {
+    console.log(event.source.autoFit);
   });
 
   img.on('propertyChange', onPropertyChange);
 
-  function onPropertyChange(event: PropertyChangeEvent<any>) {
+  function onPropertyChange(event: PropertyChangeEvent<any, Image>) {
     console.log(event.newValue);
+    console.log(event.source.autoFit);
   }
 
   img.one('propertyChange:enabled', onEnabledChange);
 
-  function onEnabledChange(event: PropertyChangeEvent<boolean>) {
+  function onEnabledChange(event: PropertyChangeEvent<boolean, Image>) {
     let bool: boolean = event.newValue;
     console.log(event.newValue);
+    console.log(event.source.autoFit);
   }
 
   img.off('propertyChange', onPropertyChange);

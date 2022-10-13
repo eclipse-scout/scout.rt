@@ -12,9 +12,9 @@ import {arrays, LookupCall, LookupFieldAdapter, LookupResult, LookupRow, objects
 import $ from 'jquery';
 import Deferred = JQuery.Deferred;
 
-export default class RemoteLookupCall<Key> extends LookupCall<Key> {
+export default class RemoteLookupCall<TKey> extends LookupCall<TKey> {
   adapter: LookupFieldAdapter;
-  deferred: Deferred<LookupResult<Key>, { canceled: boolean }> & { requestParameter?: RemoteLookupRequest<string | Key | void> };
+  deferred: Deferred<LookupResult<TKey>, { canceled: boolean }> & { requestParameter?: RemoteLookupRequest<string | TKey | void> };
 
   constructor(adapter: LookupFieldAdapter) {
     super();
@@ -22,31 +22,31 @@ export default class RemoteLookupCall<Key> extends LookupCall<Key> {
     this.deferred = null;
   }
 
-  protected override _getAll(): JQuery.Promise<LookupResult<Key>> {
+  protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.ALL));
     this.adapter.sendLookup(QueryBy.ALL);
     return this.deferred.promise();
   }
 
-  protected override _getByText(text: string): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.TEXT, text));
     this.adapter.sendLookup(QueryBy.TEXT, text);
     return this.deferred.promise();
   }
 
-  protected override _getByKey(key: Key): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.KEY, key));
     this.adapter.sendLookup(QueryBy.KEY, key);
     return this.deferred.promise();
   }
 
-  protected override _getByRec(rec: Key): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByRec(rec: TKey): JQuery.Promise<LookupResult<TKey>> {
     this._newDeferred(new RemoteLookupRequest(QueryBy.REC, rec));
     this.adapter.sendLookup(QueryBy.REC, rec);
     return this.deferred.promise();
   }
 
-  resolveLookup(lookupResult: LookupResult<Key>) {
+  resolveLookup(lookupResult: LookupResult<TKey>) {
     if (!this._belongsToLatestRequest(lookupResult)) {
       $.log.isTraceEnabled() && $.log.trace('(RemoteLookupCall#resolveLookup) ignore lookupResult. Does not belong to latest request',
         objects.optProperty(this.deferred, 'requestParameter'));
@@ -54,11 +54,11 @@ export default class RemoteLookupCall<Key> extends LookupCall<Key> {
     }
 
     lookupResult.lookupRows = arrays.ensure(lookupResult.lookupRows)
-      .map(lookupRowObject => scout.create(LookupRow, lookupRowObject) as LookupRow<Key>);
+      .map(lookupRowObject => scout.create(LookupRow, lookupRowObject) as LookupRow<TKey>);
     this.deferred.resolve(lookupResult);
   }
 
-  protected _belongsToLatestRequest(lookupResult: LookupResult<Key>): boolean {
+  protected _belongsToLatestRequest(lookupResult: LookupResult<TKey>): boolean {
     // This case may happen when a lookup is initialized by the UI server (not the browser)
     // Note: currently we simply ignore that case because it can only occur when the UI server
     // calls doSearch in unexpected conditions. However, we could support this case in a similar
@@ -76,7 +76,7 @@ export default class RemoteLookupCall<Key> extends LookupCall<Key> {
   /**
    * Creates a new deferred and rejects the previous one.
    */
-  protected _newDeferred(requestParameter: RemoteLookupRequest<string | Key | void>) {
+  protected _newDeferred(requestParameter: RemoteLookupRequest<string | TKey | void>) {
     if (this.deferred) {
       this.deferred.reject({
         canceled: true

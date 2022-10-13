@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AccordionAdapter, TileAccordion, WidgetModel} from '../../index';
+import {AccordionAdapter, WidgetModel} from '../../index';
 
-export default class TileAccordionAdapter<W extends TileAccordion = TileAccordion> extends AccordionAdapter<W> {
+export default class TileAccordionAdapter extends AccordionAdapter {
 
   constructor() {
     super();

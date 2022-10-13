@@ -1291,6 +1291,9 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     return new Rectangle(bounds.x, bounds.y, bounds.width, bounds.height);
   }
 
+  /**
+   * @returns the form the widget belongs to (returns the first parent which is a {@link Form}.
+   */
   static findForm(widget: Widget): Form {
     let parent = widget.parent;
     while (parent && !(parent instanceof Form)) {

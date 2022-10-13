@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupEventMap, PropertyChangeEvent, TableHeaderMenu} from '../index';
+import {PopupEventMap, PropertyChangeEvent} from '../index';
 
 export default interface TableHeaderMenuEventMap extends PopupEventMap {
-  'propertyChange:compact': PropertyChangeEvent<boolean, TableHeaderMenu>;
+  'propertyChange:compact': PropertyChangeEvent<boolean>;
 }

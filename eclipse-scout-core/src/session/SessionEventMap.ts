@@ -10,7 +10,7 @@
  */
 import {Event, EventMap, Locale, Session} from '../index';
 
-export interface LocaleSwitchEvent<T extends Session = Session> extends Event<T> {
+export interface LocaleSwitchEvent<T = Session> extends Event<T> {
   locale: Locale;
 }
 

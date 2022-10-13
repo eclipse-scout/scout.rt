@@ -14,9 +14,9 @@ import {TileActionEvent, TileClickEvent} from '../TileGridEventMap';
 export default interface TileAccordionEventMap extends AccordionEventMap {
   'tileAction': TileActionEvent<TileAccordion>;
   'tileClick': TileClickEvent<TileAccordion>;
-  'propertyChange:filters': PropertyChangeEvent<Filter<Tile>[], TileAccordion>;
-  'propertyChange:gridColumnCount': PropertyChangeEvent<number, TileAccordion>;
-  'propertyChange:tiles': PropertyChangeEvent<Filter<Tile>[], TileAccordion>;
-  'propertyChange:filteredTiles': PropertyChangeEvent<Tile[], TileAccordion>;
-  'propertyChange:selectedTiles': PropertyChangeEvent<Tile[], TileAccordion>;
+  'propertyChange:filters': PropertyChangeEvent<Filter<Tile>[]>;
+  'propertyChange:gridColumnCount': PropertyChangeEvent<number>;
+  'propertyChange:tiles': PropertyChangeEvent<Filter<Tile>[]>;
+  'propertyChange:filteredTiles': PropertyChangeEvent<Tile[]>;
+  'propertyChange:selectedTiles': PropertyChangeEvent<Tile[]>;
 }

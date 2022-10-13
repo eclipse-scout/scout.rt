@@ -11,12 +11,12 @@
 import {LookupCall, LookupRow, objects, scout} from '../index';
 import $ from 'jquery';
 
-export default class HierarchicalLookupResultBuilder<Key> {
+export default class HierarchicalLookupResultBuilder<TKey> {
 
-  lookupCall: LookupCall<Key>;
-  protected _lookupRowMap: Record<PropertyKey, LookupRow<Key>>;
+  lookupCall: LookupCall<TKey>;
+  protected _lookupRowMap: Record<PropertyKey, LookupRow<TKey>>;
 
-  constructor(lookupCall: LookupCall<Key>) {
+  constructor(lookupCall: LookupCall<TKey>) {
     scout.assertParameter('lookupCall', lookupCall);
     this.lookupCall = lookupCall;
     this._lookupRowMap = {};
@@ -25,7 +25,7 @@ export default class HierarchicalLookupResultBuilder<Key> {
   /**
    * Load all parent nodes of the given lookup rows up to the root.
    */
-  addParentLookupRows(lookupRows: LookupRow<Key>[]): JQuery.Promise<LookupRow<Key>[]> {
+  addParentLookupRows(lookupRows: LookupRow<TKey>[]): JQuery.Promise<LookupRow<TKey>[]> {
     this._fillMap(lookupRows);
 
     let promises = lookupRows.map(this._addParent.bind(this));
@@ -33,7 +33,7 @@ export default class HierarchicalLookupResultBuilder<Key> {
       .then(() => objects.values(this._lookupRowMap));
   }
 
-  protected _addParent(lookupRow: LookupRow<Key>): JQuery.Promise<void> {
+  protected _addParent(lookupRow: LookupRow<TKey>): JQuery.Promise<void> {
     let key = lookupRow.parentKey;
 
     if (!key) {
@@ -57,7 +57,7 @@ export default class HierarchicalLookupResultBuilder<Key> {
       });
   }
 
-  protected _fillMap(lookupRows: LookupRow<Key>[]) {
+  protected _fillMap(lookupRows: LookupRow<TKey>[]) {
     lookupRows.forEach(lookupRow => {
       this._lookupRowMap[lookupRow.key + ''] = lookupRow;
     });
@@ -66,7 +66,7 @@ export default class HierarchicalLookupResultBuilder<Key> {
   /**
    * Load all parent child of the given lookup rows.
    */
-  addChildLookupRows(lookupRows: LookupRow<Key>[]): JQuery.Promise<LookupRow<Key>[]> {
+  addChildLookupRows(lookupRows: LookupRow<TKey>[]): JQuery.Promise<LookupRow<TKey>[]> {
     this._fillMap(lookupRows);
 
     let promises = lookupRows.map(this._addChildren.bind(this));
@@ -74,7 +74,7 @@ export default class HierarchicalLookupResultBuilder<Key> {
       .then(() => objects.values(this._lookupRowMap));
   }
 
-  protected _addChildren(lookupRow: LookupRow<Key>): JQuery.Promise<LookupRow<Key>[]> {
+  protected _addChildren(lookupRow: LookupRow<TKey>): JQuery.Promise<LookupRow<TKey>[]> {
     return this.lookupCall
       .cloneForRec(lookupRow.key)
       .execute()
