@@ -10,7 +10,8 @@
  */
 import {Event, Form, FormField, FormModel, ModelAdapter, ObjectWithType, Widget} from '../index';
 
-export default class FormAdapter extends ModelAdapter<Form> {
+export default class FormAdapter extends ModelAdapter {
+  declare widget: Form;
 
   constructor() {
     super();

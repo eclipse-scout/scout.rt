@@ -12,7 +12,8 @@ import {App, DateRange, dates, defaultValues, Event, ModelAdapter, objects, Plan
 import {PlannerResourcesSelectedEvent} from './PlannerEventMap';
 import {PlannerActivity, PlannerResource} from './Planner';
 
-export default class PlannerAdapter<P extends Planner = Planner> extends ModelAdapter<P> {
+export default class PlannerAdapter extends ModelAdapter {
+  declare widget: Planner;
 
   constructor() {
     super();
@@ -59,9 +60,9 @@ export default class PlannerAdapter<P extends Planner = Planner> extends ModelAd
     });
   }
 
-  protected override _onWidgetEvent(event: Event<P>) {
+  protected override _onWidgetEvent(event: Event<Planner>) {
     if (event.type === 'resourcesSelected') {
-      this._onWidgetResourcesSelected(event as PlannerResourcesSelectedEvent<P>);
+      this._onWidgetResourcesSelected(event as PlannerResourcesSelectedEvent);
     } else {
       super._onWidgetEvent(event);
     }

@@ -20,8 +20,8 @@ import {
 import {TableRowData} from './TableRowModel';
 import {AdapterData} from '../session/Session';
 
-export default class TableAdapter<T extends Table = Table> extends ModelAdapter<T> {
-
+export default class TableAdapter extends ModelAdapter {
+  declare widget: Table;
   protected _rebuildingTable: boolean;
 
   constructor() {
@@ -355,51 +355,51 @@ export default class TableAdapter<T extends Table = Table> extends ModelAdapter<
     event.preventDefault();
   }
 
-  protected override _onWidgetEvent(event: Event<T>) {
+  protected override _onWidgetEvent(event: Event<Table>) {
     if (event.type === 'rowsSelected') {
-      this._onWidgetRowsSelected(event as TableRowsSelectedEvent<T>);
+      this._onWidgetRowsSelected(event as TableRowsSelectedEvent);
     } else if (event.type === 'rowsChecked') {
-      this._onWidgetRowsChecked(event as TableRowsCheckedEvent<T>);
+      this._onWidgetRowsChecked(event as TableRowsCheckedEvent);
     } else if (event.type === 'rowsExpanded') {
-      this._onWidgetRowsExpanded(event as TableRowsExpandedEvent<T>);
+      this._onWidgetRowsExpanded(event as TableRowsExpandedEvent);
     } else if (event.type === 'filter') {
       this._onWidgetFilter();
     } else if (event.type === 'sort') {
-      this._onWidgetSort(event as TableSortEvent<T>);
+      this._onWidgetSort(event as TableSortEvent);
     } else if (event.type === 'group') {
-      this._onWidgetGroup(event as TableGroupEvent<T>);
+      this._onWidgetGroup(event as TableGroupEvent);
     } else if (event.type === 'rowClick') {
-      this._onWidgetRowClick(event as TableRowClickEvent<T>);
+      this._onWidgetRowClick(event as TableRowClickEvent);
     } else if (event.type === 'rowAction') {
-      this._onWidgetRowAction(event as TableRowActionEvent<T>);
+      this._onWidgetRowAction(event as TableRowActionEvent);
     } else if (event.type === 'prepareCellEdit') {
-      this._onWidgetPrepareCellEdit(event as TablePrepareCellEditEvent<T>);
+      this._onWidgetPrepareCellEdit(event as TablePrepareCellEditEvent);
     } else if (event.type === 'completeCellEdit') {
-      this._onWidgetCompleteCellEdit(event as TableCompleteCellEditEvent<T>);
+      this._onWidgetCompleteCellEdit(event as TableCompleteCellEditEvent);
     } else if (event.type === 'cancelCellEdit') {
-      this._onWidgetCancelCellEdit(event as TableCancelCellEditEvent<T>);
+      this._onWidgetCancelCellEdit(event as TableCancelCellEditEvent);
     } else if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event as TableAppLinkActionEvent<T>);
+      this._onWidgetAppLinkAction(event as TableAppLinkActionEvent);
     } else if (event.type === 'clipboardExport') {
       this._onWidgetExportToClipboard(event);
     } else if (event.type === 'reload') {
-      this._onWidgetReload(event as TableReloadEvent<T>);
+      this._onWidgetReload(event as TableReloadEvent);
     } else if (event.type === 'filterAdded') {
-      this._onWidgetFilterAdded(event as TableFilterAddedEvent<T>);
+      this._onWidgetFilterAdded(event as TableFilterAddedEvent);
     } else if (event.type === 'filterRemoved') {
-      this._onWidgetFilterRemoved(event as TableFilterRemovedEvent<T>);
+      this._onWidgetFilterRemoved(event as TableFilterRemovedEvent);
     } else if (event.type === 'columnResized') {
-      this._onWidgetColumnResized(event as TableColumnResizedEvent<T>);
+      this._onWidgetColumnResized(event as TableColumnResizedEvent);
     } else if (event.type === 'columnMoved') {
-      this._onWidgetColumnMoved(event as TableColumnMovedEvent<T>);
+      this._onWidgetColumnMoved(event as TableColumnMovedEvent);
     } else if (event.type === 'columnBackgroundEffectChanged') {
-      this._onWidgetColumnBackgroundEffectChanged(event as TableColumnBackgroundEffectChangedEvent<T>);
+      this._onWidgetColumnBackgroundEffectChanged(event as TableColumnBackgroundEffectChangedEvent);
     } else if (event.type === 'columnOrganizeAction') {
-      this._onWidgetColumnOrganizeAction(event as TableColumnOrganizeActionEvent<T>);
+      this._onWidgetColumnOrganizeAction(event as TableColumnOrganizeActionEvent);
     } else if (event.type === 'aggregationFunctionChanged') {
-      this._onWidgetAggregationFunctionChanged(event as TableAggregationFunctionChangedEvent<T>);
+      this._onWidgetAggregationFunctionChanged(event as TableAggregationFunctionChangedEvent);
     } else if (event.type === 'drop' && this.widget.dragAndDropHandler) {
-      this.widget.dragAndDropHandler.uploadFiles(event as TableDropEvent<T>);
+      this.widget.dragAndDropHandler.uploadFiles(event as TableDropEvent);
     } else {
       super._onWidgetEvent(event);
     }

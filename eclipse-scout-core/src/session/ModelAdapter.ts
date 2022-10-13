@@ -22,7 +22,7 @@ import {EventMapOf, EventModel} from '../events/EventEmitter';
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
  * It also sends events to the server whenever an action happens on the widget.
  */
-export default class ModelAdapter<W extends Widget = Widget> extends EventEmitter implements ModelAdapterModel<W>, ModelAdapterLike {
+export default class ModelAdapter extends EventEmitter implements ModelAdapterModel<Widget>, ModelAdapterLike {
   declare model: ModelAdapterModel;
   declare eventMap: ModelAdapterEventMap;
   id: string;
@@ -30,7 +30,7 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
   initialized: boolean;
   attached: boolean;
   destroyed: boolean;
-  widget: W;
+  widget: Widget;
   session: Session;
 
   protected _enabledBeforeOffline: boolean;
@@ -79,7 +79,7 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
     this.destroyed = true;
   }
 
-  createWidget(adapterData: Omit<WidgetModel, 'parent'> & ObjectWithType, parent: Widget): W {
+  createWidget(adapterData: Omit<WidgetModel, 'parent'> & ObjectWithType, parent: Widget): Widget {
     let model = this._initModel(adapterData, parent);
     this.widget = this._createWidget(model);
     this._attachWidget();
@@ -127,8 +127,8 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
   /**
    * @returns A new widget instance. The default impl. uses calls scout.create() with property objectType from given model.
    */
-  protected _createWidget(model: WidgetModel & ObjectWithType): W {
-    let widget = scout.create(model) as W;
+  protected _createWidget(model: WidgetModel & ObjectWithType): Widget {
+    let widget = scout.create(model) as Widget;
     // @ts-ignore
     widget._addCloneProperties(['modelClass', 'classId']);
     return widget;
@@ -289,7 +289,7 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
     return this._propertyChangeEventFilter.filter(propertyName, value);
   }
 
-  protected _isWidgetEventFiltered(event: Event<W>): boolean {
+  protected _isWidgetEventFiltered(event: Event<Widget>): boolean {
     return this._widgetEventTypeFilter.filter(event);
   }
 
@@ -298,7 +298,7 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
     this._widgetEventTypeFilter.reset();
   }
 
-  protected _onWidgetPropertyChange(event: PropertyChangeEvent<any, W>) {
+  protected _onWidgetPropertyChange(event: PropertyChangeEvent<any, Widget>) {
     let propertyName = event.propertyName;
     let value = event.newValue;
 
@@ -338,24 +338,24 @@ export default class ModelAdapter<W extends Widget = Widget> extends EventEmitte
     }
   }
 
-  protected _onWidgetDestroy(event: Event<W>) {
+  protected _onWidgetDestroy(event: Event<Widget>) {
     this.destroy();
   }
 
   /**
    * Do not override this method. Widget event filtering is done here, before _onWidgetEvent is called.
    */
-  protected _onWidgetEventInternal(event: Event<W>) {
+  protected _onWidgetEventInternal(event: Event<Widget>) {
     if (!this._isWidgetEventFiltered(event)) {
       this._onWidgetEvent(event);
     }
   }
 
-  protected _onWidgetEvent(event: Event<W>) {
+  protected _onWidgetEvent(event: Event<Widget>) {
     if (event.type === 'destroy') {
       this._onWidgetDestroy(event);
     } else if (event.type === 'propertyChange') {
-      this._onWidgetPropertyChange(event as PropertyChangeEvent<any, W>);
+      this._onWidgetPropertyChange(event as PropertyChangeEvent<any>);
     }
   }
 

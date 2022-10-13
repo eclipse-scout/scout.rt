@@ -12,19 +12,19 @@ import {Event, ModelAdapter} from '@eclipse-scout/core';
 import {Chart} from '../index';
 import {ChartValueClickEvent} from './ChartEventMap';
 
-export default class ChartAdapter<C extends Chart = Chart> extends ModelAdapter<C> {
+export default class ChartAdapter extends ModelAdapter {
 
   constructor() {
     super();
   }
 
-  protected _onWidgetValueClick(event: ChartValueClickEvent<C>) {
+  protected _onWidgetValueClick(event: ChartValueClickEvent) {
     this._send('valueClick', event.data);
   }
 
-  protected override _onWidgetEvent(event: Event<C>) {
+  protected override _onWidgetEvent(event: Event<Chart>) {
     if (event.type === 'valueClick') {
-      this._onWidgetValueClick(event as ChartValueClickEvent<C>);
+      this._onWidgetValueClick(event as ChartValueClickEvent);
     } else {
       super._onWidgetEvent(event);
     }
