@@ -8,11 +8,44 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DateColumn, Icon, icons, NumberColumn, objects, scout, scrollbars, strings, styles, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
-import {Chart, ChartTableControlLayout, ChartTableUserFilter} from '../../index';
+import {arrays, Column, DateColumn, EventListener, Icon, icons, NumberColumn, objects, scout, scrollbars, strings, styles, TableControl, TableMatrix, tooltips} from '@eclipse-scout/core';
+import {Chart, ChartTableControlEventMap, ChartTableControlLayout, ChartTableControlModel, ChartTableUserFilter} from '../../index';
 import $ from 'jquery';
+import {TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup, TableMatrixResult} from '@eclipse-scout/core/src/table/TableMatrix';
+import {BubbleDataPoint, ChartData, ChartType as ChartJsType} from 'chart.js';
+import {ChartConfig, ClickObject} from '../../chart/Chart';
+import {Event, IconDesc, Table} from '@eclipse-scout/core/src';
+import {EventMapOf, EventModel} from '@eclipse-scout/core/src/events/EventEmitter';
 
-export default class ChartTableControl extends TableControl {
+export default class ChartTableControl extends TableControl implements ChartTableControlModel {
+  declare model: ChartTableControlModel;
+  declare eventMap: ChartTableControlEventMap;
+
+  chartAggregation: TableControlChartAggregation;
+  chartGroup1: TableControlChartGroup;
+  chartGroup2: TableControlChartGroup;
+  chartType: TableControlChartType;
+  oldChartType: TableControlChartType;
+  chart: Chart;
+  chartColorScheme: string;
+  xAxis: TableMatrixKeyAxis;
+  yAxis: TableMatrixKeyAxis;
+  dateGroup: (TableMatrixDateGroup | string)[][];
+
+  $chartSelect: JQuery;
+  $axisSelectContainer: JQuery;
+  $xAxisSelect: JQuery;
+  $yAxisSelect: JQuery;
+  $dataSelect: JQuery;
+  protected _chartTypeMap: Record<TableControlChartType, JQuery>;
+  protected _aggregationMap: Record<string, JQuery>;
+  protected _chartGroup1Map: Record<string, JQuery>;
+  protected _chartGroup2Map: Record<string, JQuery>;
+  protected _tableUpdatedHandler: (e: Event<Table>) => void;
+  protected _tableColumnStructureChangedHandler: () => void;
+  protected _chartValueClickedHandler: () => void;
+  protected _filterResetListener: EventListener;
+  protected _tableUpdatedTimeOutId: number;
 
   constructor() {
     super();
@@ -22,9 +55,10 @@ export default class ChartTableControl extends TableControl {
     };
     this.chartType = Chart.Type.BAR;
     this.oldChartType = null;
+    this.chart = null;
     this.chartColorScheme = 'chart-table-control';
 
-    // chart config selection
+    /** chart config selection */
     this.$chartSelect = null;
     this.$xAxisSelect = null;
     this.$yAxisSelect = null;
@@ -43,7 +77,7 @@ export default class ChartTableControl extends TableControl {
   static DATE_GROUP_FLAG = 0x100;
   static MAX_AXIS_COUNT = 100;
 
-  _init(model) {
+  protected override _init(model: ChartTableControlModel) {
     super._init(model);
     this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
 
@@ -52,30 +86,34 @@ export default class ChartTableControl extends TableControl {
     });
   }
 
-  _destroy() {
+  override trigger<K extends string & keyof EventMapOf<ChartTableControl>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<ChartTableControl>[K]>): EventMapOf<ChartTableControl>[K] {
+    return super.trigger(type, eventOrModel);
+  }
+
+  protected override _destroy() {
     this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
     super._destroy();
   }
 
-  _computeEnabled(inheritAccessibility, parentEnabled) {
+  protected override _computeEnabled(inheritAccessibility: boolean, parentEnabled: boolean): boolean {
     if (!this._hasColumns() && !this.selected) {
       return false;
     }
     return super._computeEnabled(inheritAccessibility, parentEnabled);
   }
 
-  _renderChart() {
+  protected _renderChart() {
     if (this.chart) {
       this.chart.render(this.$contentContainer);
       this.chart.$container.addClass(this.denseClass);
     }
   }
 
-  _createLayout() {
+  protected override _createLayout(): ChartTableControlLayout {
     return new ChartTableControlLayout(this);
   }
 
-  _renderChartType() {
+  protected _renderChartType() {
     this._selectChartType();
     this.$yAxisSelect.toggleClass('hide', this.chartType !== Chart.Type.BUBBLE);
     this.$yAxisSelect.toggleClass('animated', scout.isOneOf(Chart.Type.BUBBLE, this.chartType, this.oldChartType) && !!this.oldChartType);
@@ -94,22 +132,22 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _selectChartType() {
+  protected _selectChartType() {
     objects.values(this._chartTypeMap).forEach($element => {
       $element.removeClass('selected');
     });
     this._chartTypeMap[this.chartType].addClass('selected');
   }
 
-  _renderChartGroup1() {
+  protected _renderChartGroup1() {
     this._renderChartGroup(1);
   }
 
-  _renderChartGroup2() {
+  protected _renderChartGroup2() {
     this._renderChartGroup(2);
   }
 
-  _renderChartGroup(groupId) {
+  protected _renderChartGroup(groupId: 1 | 2) {
     if (!this._hasColumns()) {
       return;
     }
@@ -132,10 +170,10 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _renderChartAggregation() {
+  protected _renderChartAggregation() {
     let $element = this._aggregationMap[this.chartAggregation.id || 'all'];
     if ($element) {
-      $element.selectOne('selected');
+      $element.selectOne();
       $element
         .removeClass('data-sum')
         .removeClass('data-avg');
@@ -146,7 +184,7 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _getAggregationCssClass() {
+  protected _getAggregationCssClass(): string {
     switch (this.chartAggregation.modifier) {
       case TableMatrix.NumberGroup.COUNT:
         return 'data-count';
@@ -159,7 +197,7 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _renderChartSelect(cssClass, chartType, iconId) {
+  protected _renderChartSelect(cssClass: string, chartType: TableControlChartType, iconId: string) {
     let icon = scout.create(Icon, {
       parent: this,
       iconDesc: iconId,
@@ -181,13 +219,13 @@ export default class ChartTableControl extends TableControl {
 
   /**
    * Appends a chart selection divs to this.$contentContainer and sets the this.$chartSelect property.
-   * */
-  _renderChartSelectContainer() {
+   **/
+  protected _renderChartSelectContainer() {
     // create container
     this.$chartSelect = this.$contentContainer.appendDiv('chart-select');
 
     // create chart types for selection
-    this._chartTypeMap = {};
+    this._chartTypeMap = {} as Record<TableControlChartType, JQuery>;
 
     let supportedChartTypes = this._getSupportedChartTypes();
 
@@ -208,7 +246,7 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _getSupportedChartTypes() {
+  protected _getSupportedChartTypes(): TableControlChartType[] {
     return [
       Chart.Type.BAR,
       Chart.Type.BAR_HORIZONTAL,
@@ -218,13 +256,13 @@ export default class ChartTableControl extends TableControl {
     ];
   }
 
-  _onClickChartType(event) {
+  protected _onClickChartType(event: JQuery.ClickEvent) {
     let $target = $(event.currentTarget),
       chartType = $target.data('chartType');
     this.setChartType(chartType);
   }
 
-  _onClickChartGroup(event) {
+  protected _onClickChartGroup(event: JQuery.ClickEvent) {
     let $target = $(event.currentTarget),
       groupId = $target.parent().data('groupId'),
       column = $target.data('column'),
@@ -246,7 +284,7 @@ export default class ChartTableControl extends TableControl {
     this._setChartGroup(groupId, config);
   }
 
-  _onClickAggregation(event) {
+  protected _onClickAggregation(event: JQuery.ClickEvent) {
     let $target = $(event.currentTarget);
     // update modifier
     let origModifier = $target.data('modifier');
@@ -262,7 +300,7 @@ export default class ChartTableControl extends TableControl {
     this._setChartAggregation(aggregation);
   }
 
-  _nextDateModifier(modifier) {
+  protected _nextDateModifier(modifier: TableMatrixDateGroup): TableMatrixDateGroup {
     switch (modifier) {
       case TableMatrix.DateGroup.DATE:
         return TableMatrix.DateGroup.MONTH;
@@ -277,7 +315,7 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _nextModifier(modifier) {
+  protected _nextModifier(modifier: TableMatrixNumberGroup): TableMatrixNumberGroup {
     switch (modifier) {
       case TableMatrix.NumberGroup.SUM:
         return TableMatrix.NumberGroup.AVG;
@@ -288,7 +326,7 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _setChartAggregation(chartAggregation) {
+  protected _setChartAggregation(chartAggregation: TableControlChartAggregation) {
     if (chartAggregation === this.chartAggregation) {
       return;
     }
@@ -298,20 +336,20 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _setChartGroup1(chartGroup) {
+  protected _setChartGroup1(chartGroup: TableControlChartGroup) {
     this._setChartGroup(1, chartGroup);
   }
 
-  _setChartGroup2(chartGroup) {
+  protected _setChartGroup2(chartGroup: TableControlChartGroup) {
     this._setChartGroup(2, chartGroup);
   }
 
-  _setChartGroup(groupId, chartGroup) {
+  protected _setChartGroup(groupId: 1 | 2, chartGroup: TableControlChartGroup) {
     let propertyName = 'chartGroup' + groupId;
     this._changeProperty(propertyName, chartGroup);
   }
 
-  _changeProperty(prop, value) {
+  protected _changeProperty(prop: string, value: any) {
     if (value === this[prop]) {
       return;
     }
@@ -321,27 +359,27 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  setChartType(chartType) {
+  setChartType(chartType: TableControlChartType) {
     this.oldChartType = this.chartType;
     this.setProperty('chartType', chartType);
   }
 
-  _hasColumns() {
+  protected _hasColumns(): boolean {
     return this.table.columns.length !== 0;
   }
 
-  _axisCount(columnCount, column) {
+  protected _axisCount(columnCount: (number | Column)[][], column: Column): number {
     let i, tmpColumn;
     for (i = 0; i < columnCount.length; i++) {
       tmpColumn = columnCount[i][0];
       if (tmpColumn === column) {
-        return columnCount[i][1];
+        return columnCount[i][1] as number;
       }
     }
     return 0;
   }
 
-  _plainAxisText(column, text) {
+  protected _plainAxisText(column: Column, text: string): string {
     if (column.headerHtmlEnabled) {
       let plainText = strings.plainText(text);
       return plainText.replace(/\n/g, ' ');
@@ -349,7 +387,7 @@ export default class ChartTableControl extends TableControl {
     return text;
   }
 
-  _renderContent($parent) {
+  protected override _renderContent($parent: JQuery) {
     this.$contentContainer = $parent.appendDiv('chart-container');
 
     // scrollbars
@@ -387,19 +425,19 @@ export default class ChartTableControl extends TableControl {
     this._drawChart();
   }
 
-  _addListeners() {
+  protected _addListeners() {
     this.table.on('rowsInserted', this._tableUpdatedHandler);
     this.table.on('rowsDeleted', this._tableUpdatedHandler);
     this.table.on('allRowsDeleted', this._tableUpdatedHandler);
     this.chart.on('valueClick', this._chartValueClickedHandler);
   }
 
-  _renderAxisSelectorsContainer() {
+  protected _renderAxisSelectorsContainer() {
     this.$axisSelectContainer = this.$contentContainer
       .appendDiv('axis-select-container');
   }
 
-  _renderAxisSelectors() {
+  protected _renderAxisSelectors(): (number | Column)[][] {
     // create container for x/y-axis
     this.$xAxisSelect = this.$axisSelectContainer
       .appendDiv('xaxis-select')
@@ -427,7 +465,7 @@ export default class ChartTableControl extends TableControl {
     let matrix = new TableMatrix(this.table, this.session),
       columnCount = matrix.columnCount(false); // filterNumberColumns false: number columns will be filtered below
     columnCount.sort((a, b) => {
-      return Math.abs(a[1] - 8) - Math.abs(b[1] - 8);
+      return Math.abs(a[1] as number - 8) - Math.abs(b[1] as number - 8);
     });
 
     let axisCount, enabled,
@@ -551,7 +589,7 @@ export default class ChartTableControl extends TableControl {
     return columnCount;
   }
 
-  _initializeSelection(columnCount) {
+  protected _initializeSelection(columnCount: (number | Column)[][]) {
     let $axisColumns;
 
     if (!this.chartType) {
@@ -582,19 +620,19 @@ export default class ChartTableControl extends TableControl {
    * The implementation only considers columns that are part of the specified columnCount matrix and $candidates array.
    * From all these columns the last match that is lower or equal to the specified maxIndex is set as default chart group.
    *
-   * @param {number} chartGroup The number of the chart group (1 or 2) for which the default column should be set.
-   * @param {matrix} columnCount Column-count matrix as returned by TableMatrix#columnCount(). Holds possible grouping columns.
-   * @param {array} $candidates jQuery array holding all axis columns that could be used as default.
-   * @param {number} maxIndex The maximum column index to use as default column for the specified chartGroup.
+   * @param chartGroup The number of the chart group (1 or 2) for which the default column should be set.
+   * @param columnCount Column-count matrix as returned by TableMatrix#columnCount(). Holds possible grouping columns.
+   * @param $candidates jQuery array holding all axis columns that could be used as default.
+   * @param maxIndex The maximum column index to use as default column for the specified chartGroup.
    */
-  _setDefaultSelectionForGroup(chartGroup, columnCount, $candidates, maxIndex) {
+  protected _setDefaultSelectionForGroup(chartGroup: 1 | 2, columnCount: (number | Column)[][], $candidates: JQuery, maxIndex: number) {
     let col = this._getDefaultSelectedColumn(columnCount, $candidates, maxIndex);
     if (col) {
       this._setChartGroup(chartGroup, this._getDefaultChartGroup(col));
     }
   }
 
-  _getDefaultSelectedColumn(columnCount, $candidates, maxIndex) {
+  protected _getDefaultSelectedColumn(columnCount: (number | Column)[][], $candidates: JQuery, maxIndex: number): Column {
     let matchCounter = 0,
       curColumn,
       result;
@@ -608,7 +646,7 @@ export default class ChartTableControl extends TableControl {
     return result;
   }
 
-  _existsInAxisColumns($candidates, columnToSearch) {
+  protected _existsInAxisColumns($candidates: JQuery, columnToSearch: Column): boolean {
     for (let i = 0; i < $candidates.length; i++) {
       if ($candidates.eq(i).data('column') === columnToSearch) {
         return true;
@@ -617,7 +655,7 @@ export default class ChartTableControl extends TableControl {
     return false;
   }
 
-  _getDefaultChartGroup(column) {
+  protected _getDefaultChartGroup(column: Column): TableControlChartGroup {
     let modifier;
     if (column instanceof DateColumn) {
       modifier = 256;
@@ -628,14 +666,14 @@ export default class ChartTableControl extends TableControl {
     };
   }
 
-  _renderChartParts() {
+  protected _renderChartParts() {
     this._renderChartType();
     this._renderChartAggregation();
     this._renderChartGroup1();
     this._renderChartGroup2();
   }
 
-  _drawChart() {
+  protected _drawChart() {
     if (!this._hasColumns()) {
       this._hideChart();
       return;
@@ -643,14 +681,14 @@ export default class ChartTableControl extends TableControl {
 
     let cube = this._calculateValues();
 
-    if (cube.length) {
+    if (cube && cube.length) {
       this.chart.setVisible(true);
     } else {
       this._hideChart();
       return;
     }
 
-    let config = {
+    let config: ChartConfig = {
       type: this.chartType,
       options: {
         handleResize: true,
@@ -676,19 +714,19 @@ export default class ChartTableControl extends TableControl {
     this.chart.setCheckedItems(checkedItems);
   }
 
-  _hideChart() {
+  protected _hideChart() {
     this.chart.setConfig({
       type: this.chartType
     });
     this.chart.setVisible(false);
   }
 
-  _getDatasetLabel() {
+  protected _getDatasetLabel(): string {
     let elem = this._aggregationMap[this.chartAggregation.id || 'all'];
     return (elem ? elem.text() : null) || this.session.text('ui.Value');
   }
 
-  _calculateValues() {
+  protected _calculateValues(): TableMatrixResult {
     // build matrix
     let matrix = new TableMatrix(this.table, this.session);
 
@@ -713,27 +751,27 @@ export default class ChartTableControl extends TableControl {
 
     // return not possible to draw chart
     if (matrix.isEmpty() || !matrix.isMatrixValid()) {
-      return false;
+      return;
     }
 
     // calculate matrix
     return matrix.calculate();
   }
 
-  _getXAxis() {
+  protected _getXAxis(): TableMatrixKeyAxis {
     return this.xAxis;
   }
 
-  _getYAxis() {
+  protected _getYAxis(): TableMatrixKeyAxis {
     return this.yAxis;
   }
 
-  _computeData(iconClasses, cube) {
+  protected _computeData(iconClasses: string[], cube: TableMatrixResult): ChartData {
     let data = {
       datasets: [{
         label: this._getDatasetLabel()
       }]
-    };
+    } as ChartData;
     if (!cube) {
       return data;
     }
@@ -781,7 +819,7 @@ export default class ChartTableControl extends TableControl {
     return data;
   }
 
-  _computeBubbleData(iconClasses, cube) {
+  protected _computeBubbleData(iconClasses: string[], cube: TableMatrixResult): { value: BubbleDataPoint; deterministicKey: TableControlDeterministicKey }[] {
     if (!cube) {
       return [];
     }
@@ -826,7 +864,7 @@ export default class ChartTableControl extends TableControl {
     return segments;
   }
 
-  _handleIconLabel(label, axis, iconClasses) {
+  protected _handleIconLabel(label: string, axis: TableMatrixKeyAxis, iconClasses: string[]): string {
     if (axis && axis.textIsIcon) {
       let icon = icons.parseIconId(label);
       if (icon && icon.isFontIcon()) {
@@ -837,7 +875,7 @@ export default class ChartTableControl extends TableControl {
     return label;
   }
 
-  _adjustFont(config, iconClasses) {
+  protected _adjustFont(config: ChartConfig, iconClasses: string[]) {
     if (!config || !iconClasses) {
       return;
     }
@@ -888,7 +926,7 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _adjustLabels(config) {
+  protected _adjustLabels(config: ChartConfig) {
     if (!config) {
       return;
     }
@@ -927,11 +965,11 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _formatLabel(label, axis) {
+  protected _formatLabel(label: number | string, axis: TableMatrixKeyAxis): string {
     if (axis) {
       if (axis.column instanceof DateColumn) {
-        label = label + axis.min;
-        if (label !== parseInt(label) || (axis.length < 2 && (label < axis.min || label > axis.max))) {
+        label = label as number + axis.min;
+        if (label !== parseInt('' + label) || (axis.length < 2 && (label < axis.min || label > axis.max))) {
           return null;
         }
       }
@@ -942,7 +980,7 @@ export default class ChartTableControl extends TableControl {
           return null;
         }
       }
-      label = axis.format(label);
+      label = axis.format(label as number);
       if (axis.textIsIcon) {
         let icon = icons.parseIconId(label);
         if (icon && icon.isFontIcon()) {
@@ -950,10 +988,10 @@ export default class ChartTableControl extends TableControl {
         }
       }
     }
-    return label;
+    return '' + label;
   }
 
-  _adjustConfig(config) {
+  protected _adjustConfig(config: ChartConfig) {
     if (!config) {
       return;
     }
@@ -970,7 +1008,7 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _adjustClickable(config) {
+  protected _adjustClickable(config: ChartConfig) {
     if (!config) {
       return;
     }
@@ -984,11 +1022,11 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _isChartClickable() {
+  protected _isChartClickable(): boolean {
     return true;
   }
 
-  _adjustBubble(config) {
+  protected _adjustBubble(config: ChartConfig) {
     if (!config || this.chartType !== Chart.Type.BUBBLE) {
       return;
     }
@@ -999,7 +1037,7 @@ export default class ChartTableControl extends TableControl {
     });
   }
 
-  _adjustPie(config) {
+  protected _adjustPie(config: ChartConfig) {
     if (!config || this.chartType !== Chart.Type.PIE) {
       return;
     }
@@ -1041,7 +1079,7 @@ export default class ChartTableControl extends TableControl {
     });
   }
 
-  _adjustScales(config) {
+  protected _adjustScales(config: ChartConfig) {
     if (!config) {
       return;
     }
@@ -1058,14 +1096,14 @@ export default class ChartTableControl extends TableControl {
     });
   }
 
-  _computeCheckedItems(deterministicKeys) {
+  protected _computeCheckedItems(deterministicKeys: TableControlDeterministicKey[]): ClickObject[] {
     if (!deterministicKeys) {
       return [];
     }
 
     let xAxis = this._getXAxis(),
       yAxis = this._getYAxis(),
-      tableFilter = this.table.getFilter(ChartTableUserFilter.TYPE),
+      tableFilter = this.table.getFilter(ChartTableUserFilter.TYPE) as ChartTableUserFilter,
       filters = [],
       checkedIndices = [];
 
@@ -1081,7 +1119,7 @@ export default class ChartTableControl extends TableControl {
     let datasetIndex = 0;
     if (this.chartType === Chart.Type.PIE) {
       let maxSegments = this.chart.config.options.maxSegments,
-        collapsedIndices = arrays.init(deterministicKeys.length - maxSegments).map((elem, idx) => idx + maxSegments);
+        collapsedIndices = arrays.init(deterministicKeys.length - maxSegments, null).map((elem, idx) => idx + maxSegments);
       if (!arrays.containsAll(checkedIndices, collapsedIndices)) {
         arrays.remove(checkedIndices, maxSegments - 1);
       }
@@ -1104,18 +1142,18 @@ export default class ChartTableControl extends TableControl {
     return checkedItems;
   }
 
-  _onChartValueClick() {
+  protected _onChartValueClick() {
     //  prepare filter
     let filters = [];
     if (this.chart && this.chart.config.data) {
       let maxSegments = this.chart.config.options.maxSegments,
         dataset = this.chart.config.data.datasets[0],
-        getFilters = index => ({deterministicKey: dataset.deterministicKeys[index]});
+        getFilters: (index: number) => { deterministicKey: TableControlDeterministicKey } | { deterministicKey: TableControlDeterministicKey }[] = index => ({deterministicKey: dataset.deterministicKeys[index]});
       if (this.chartType === Chart.Type.PIE) {
         getFilters = index => {
-          index = parseInt(index);
+          index = parseInt('' + index);
           if (maxSegments && maxSegments === index + 1) {
-            return arrays.init(dataset.deterministicKeys.length - index).map((elem, idx) => ({deterministicKey: dataset.deterministicKeys[idx + index]}));
+            return arrays.init(dataset.deterministicKeys.length - index, null).map((elem, idx) => ({deterministicKey: dataset.deterministicKeys[idx + index]}));
           }
           return {deterministicKey: dataset.deterministicKeys[index]};
         };
@@ -1145,7 +1183,7 @@ export default class ChartTableControl extends TableControl {
     }
   }
 
-  _axisContentForColumn(column) {
+  protected _axisContentForColumn(column: Column): { text: string; icon?: IconDesc } {
     let icon,
       text = column.text;
 
@@ -1176,7 +1214,7 @@ export default class ChartTableControl extends TableControl {
     };
   }
 
-  _removeContent() {
+  protected override _removeContent() {
     this._removeScrollbars();
     this.$contentContainer.remove();
     this.chart.remove();
@@ -1186,7 +1224,7 @@ export default class ChartTableControl extends TableControl {
     this.recomputeEnabled();
   }
 
-  _removeScrollbars() {
+  protected _removeScrollbars() {
     this.$xAxisSelect.each((index, element) => {
       tooltips.uninstall($(element));
     });
@@ -1199,28 +1237,14 @@ export default class ChartTableControl extends TableControl {
     this._uninstallScrollbars();
   }
 
-  _removeListeners() {
+  protected _removeListeners() {
     this.table.off('rowsInserted', this._tableUpdatedHandler);
     this.table.off('rowsDeleted', this._tableUpdatedHandler);
     this.table.off('allRowsDeleted', this._tableUpdatedHandler);
     this.chart.off('valueClick', this._chartValueClickedHandler);
   }
 
-  _pathSegment(mx, my, r, start, end) {
-    let s = start * 2 * Math.PI,
-      e = end * 2 * Math.PI,
-      pathString = '';
-
-    pathString += 'M' + (mx + r * Math.sin(s)) + ',' + (my - r * Math.cos(s));
-    pathString += 'A' + r + ', ' + r;
-    pathString += (end - start < 0.5) ? ' 0 0,1 ' : ' 0 1,1 ';
-    pathString += (mx + r * Math.sin(e)) + ',' + (my - r * Math.cos(e));
-    pathString += 'L' + mx + ',' + my + 'Z';
-
-    return pathString;
-  }
-
-  _onTableUpdated(event) {
+  protected _onTableUpdated(event?: Event<Table>) {
     if (this._tableUpdatedTimeOutId) {
       return;
     }
@@ -1239,10 +1263,31 @@ export default class ChartTableControl extends TableControl {
     });
   }
 
-  _onTableColumnStructureChanged() {
+  protected _onTableColumnStructureChanged() {
     this.recomputeEnabled();
     if (this.contentRendered && this.selected) {
       this._onTableUpdated();
     }
+  }
+}
+
+export type TableControlChartType = typeof Chart.Type['BAR' | 'BAR_HORIZONTAL' | 'LINE' | 'PIE' | 'BUBBLE'];
+
+export type TableControlChartAggregation = {
+  id?: string;
+  modifier?: TableMatrixNumberGroup;
+};
+
+export type TableControlChartGroup = {
+  id?: string;
+  modifier?: TableMatrixNumberGroup | TableMatrixDateGroup;
+};
+
+export type TableControlDeterministicKey = (number | string) | (number | string)[];
+
+// extend chart.js
+declare module 'chart.js' {
+  interface ChartDatasetProperties<TType extends ChartJsType, TData> {
+    deterministicKeys?: TableControlDeterministicKey[];
   }
 }
