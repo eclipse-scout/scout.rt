@@ -8,10 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormAdapter} from '../index';
+import {Form, MenuModel} from '../index';
+import {FormMenuPopupStyle} from './FormMenu';
 
-export default class TileOverviewFormAdapter extends FormAdapter {
-  constructor() {
-    super();
-  }
+export default interface FormMenuModel extends MenuModel {
+  form?: Form;
+  popupStyle?: FormMenuPopupStyle;
+  popupClosable?: boolean;
+  popupMovable?: boolean;
+  popupResizable?: boolean;
 }

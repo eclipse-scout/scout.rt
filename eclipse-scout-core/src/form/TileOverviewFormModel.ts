@@ -8,10 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormAdapter} from '../index';
+import {FormModel, Outline, Page, TileGrid} from '../index';
 
-export default class TileOverviewFormAdapter extends FormAdapter {
-  constructor() {
-    super();
-  }
+export default interface TileOverviewFormModel extends FormModel {
+  outline?: Outline;
+  nodes?: Page[];
+  tileOverviewTitle?: string;
+  scrollable?: boolean;
+  pageTileGrid?: TileGrid;
 }
