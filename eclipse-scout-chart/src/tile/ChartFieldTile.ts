@@ -9,20 +9,27 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormFieldTile} from '@eclipse-scout/core';
+import {Chart, ChartField, ChartFieldTileModel} from '../index';
+import {ChartConfig} from '../chart/Chart';
+import {PropertyChangeEvent} from '@eclipse-scout/core/src';
 
-export default class ChartFieldTile extends FormFieldTile {
+export default class ChartFieldTile extends FormFieldTile implements ChartFieldTileModel {
+  declare model: ChartFieldTileModel;
+  declare tileWidget: ChartField;
+
+  protected _chartConfigChangeHandler: (event: PropertyChangeEvent<ChartConfig, Chart>) => void;
 
   constructor() {
     super();
     this._chartConfigChangeHandler = this._onChartConfigChange.bind(this);
   }
 
-  _renderColorScheme() {
+  protected override _renderColorScheme() {
     super._renderColorScheme();
     this._updateChartColorScheme();
   }
 
-  _updateChartColorScheme() {
+  protected _updateChartColorScheme() {
     let config = $.extend(true, {}, this.tileWidget.chart.config, {
       options: {
         colorScheme: this.colorScheme
@@ -32,11 +39,11 @@ export default class ChartFieldTile extends FormFieldTile {
     this.tileWidget.chart.setConfig(config);
   }
 
-  _onChartConfigChange(event) {
+  protected _onChartConfigChange(event: PropertyChangeEvent<ChartConfig, Chart>) {
     this._updateChartColorScheme();
   }
 
-  _setTileWidget(tileWidget) {
+  protected override _setTileWidget(tileWidget: ChartField) {
     if (this.tileWidget) {
       this.tileWidget.chart.off('propertyChange:config', this._chartConfigChangeHandler);
     }
