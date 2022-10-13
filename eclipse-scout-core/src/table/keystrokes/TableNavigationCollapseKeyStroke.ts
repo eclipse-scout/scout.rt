@@ -35,8 +35,7 @@ export default class TableNavigationCollapseKeyStroke extends AbstractTableNavig
     if (!selectedRow) {
       return false;
     }
-    // @ts-ignore
-    if (selectedRow.expanded && selectedRow._expandable) {
+    if (selectedRow.expanded && selectedRow.expandable) {
       // collapse
       return true;
     }
@@ -51,8 +50,7 @@ export default class TableNavigationCollapseKeyStroke extends AbstractTableNavig
     }
     let table = this.field;
     let focus = false;
-    // @ts-ignore
-    if (selectedRow.expanded && selectedRow._expandable) {
+    if (selectedRow.expanded && selectedRow.expandable) {
       table.collapseRow(selectedRow);
       focus = true;
     } else if (selectedRow.parentRow) {

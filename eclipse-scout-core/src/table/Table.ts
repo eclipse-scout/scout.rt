@@ -2049,7 +2049,7 @@ export default class Table extends Widget implements TableModel {
     }
   }
 
-  protected _calcRowLevelPadding(row: TableRow): number {
+  protected _calcRowLevelPadding(row: { parentRow?: TableRow }): number {
     if (!row) {
       return -this.rowLevelPadding;
     }
@@ -3670,8 +3670,7 @@ export default class Table extends Widget implements TableModel {
       } else if (visibleChildRows.length > 0) {
         visibleRows.push(row);
       }
-      // @ts-ignore
-      row._expandable = visibleChildRows.length > 0;
+      row.expandable = visibleChildRows.length > 0;
       if (row.expanded) {
         visibleRows = visibleRows.concat(visibleChildRows);
       }
