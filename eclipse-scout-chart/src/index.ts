@@ -13,7 +13,9 @@ import * as self from './index';
 
 export {default as Chart} from './chart/Chart';
 export {default as ChartAdapter} from './chart/ChartAdapter';
+export {default as ChartEventMap} from './chart/ChartEventMap';
 export {default as ChartLayout} from './chart/ChartLayout';
+export {default as ChartModel} from './chart/ChartModel';
 export {default as AbstractChartRenderer} from './chart/AbstractChartRenderer';
 export {default as AbstractSvgChartRenderer} from './chart/AbstractSvgChartRenderer';
 export {default as ChartJsRenderer} from './chart/ChartJsRenderer';

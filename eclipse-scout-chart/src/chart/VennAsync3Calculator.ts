@@ -11,9 +11,34 @@
 
 // place venn 3 by simulation
 // find angle and distance (to a) and radius where "error" is minimal
-export default class VennAsync3Calculator {
+import {VennCircle, VennCircleHelper} from '../index';
 
-  constructor(helper, venn1, venn2, venn3, u, v, w, uv, uw, vw, uvw, d12, d13, d23) {
+export default class VennAsync3Calculator {
+  helper: VennCircleHelper;
+  venn1: VennCircle;
+  venn2: VennCircle;
+  venn3: VennCircle;
+  u: number;
+  v: number;
+  w: number;
+  uv: number;
+  uw: number;
+  vw: number;
+  uvw: number;
+
+  maxD: number;
+  dStep: number;
+  rStep: number;
+  alphaStep: number;
+
+  alphaBest: number;
+  dBest: number;
+  rBest: number;
+  errorBest: number;
+  callback: () => void;
+  cancelled: boolean;
+
+  constructor(helper: VennCircleHelper, venn1: VennCircle, venn2: VennCircle, venn3: VennCircle, u: number, v: number, w: number, uv: number, uw: number, vw: number, uvw: number, d12: number, d13: number, d23: number) {
     // if circles are empty, they are drawn as small circle, so: adjust u v w to find better errors
     if (u === 0 && uv === 0 && uw === 0 && uvw === 0) {
       u = 1;
@@ -37,13 +62,13 @@ export default class VennAsync3Calculator {
     this.vw = vw;
     this.uvw = uvw;
 
-    // step and ranges for loops
+    /** step and ranges for loops */
     this.maxD = this.venn1.r + 2 * this.venn2.r + 2 * this.venn1.r + this.helper.distR;
     this.dStep = this.maxD / 30;
     this.rStep = venn3.r / 4;
     this.alphaStep = Math.PI / 30;
 
-    // best vars (initialize with 0 so the optimizer knows that they are numbers)
+    /** best vars (initialize with 0 so the optimizer knows that they are numbers) */
     this.alphaBest = 0;
     this.dBest = 0;
     this.rBest = 0;
@@ -53,7 +78,7 @@ export default class VennAsync3Calculator {
     this.cancelled = false;
   }
 
-  start(callback) {
+  start(callback: () => void) {
     this.callback = callback;
     setTimeout(this._next.bind(this, 0));
   }
@@ -62,7 +87,7 @@ export default class VennAsync3Calculator {
     this.cancelled = true;
   }
 
-  _end() {
+  protected _end() {
     // set  x and y and r of  venn3
     this.venn3.x = this.venn1.x + this.dBest * Math.cos(this.alphaBest);
     this.venn3.y = this.venn1.y - this.dBest * Math.sin(this.alphaBest);
@@ -71,7 +96,7 @@ export default class VennAsync3Calculator {
     this.callback();
   }
 
-  _next(alpha) {
+  protected _next(alpha: number) {
     if (!this.cancelled) {
       // iterate
       this._iteration(alpha);
@@ -90,7 +115,7 @@ export default class VennAsync3Calculator {
     }
   }
 
-  _iteration(alpha) {
+  protected _iteration(alpha: number) {
     // optimize speed: no var lookup (should help the optimizer in general, and IE in particular)
     let maxD = this.maxD,
       dStep = this.dStep,
@@ -196,7 +221,7 @@ export default class VennAsync3Calculator {
     this.errorBest = errorBest;
   }
 
-  _error(u, total, a, aTotal) {
+  protected _error(u: number, total: number, a: number, aTotal: number): number {
     // be brutal if basic error
     if ((u === 0 && a !== 0) || (u !== 0 && a === 0)) {
       return 1000;
