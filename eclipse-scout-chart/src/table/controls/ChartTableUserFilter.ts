@@ -9,8 +9,21 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, TableMatrix, TableUserFilter} from '@eclipse-scout/core';
+import {ChartTableUserFilterModel} from '../../index';
+import {TableMatrixKeyAxis} from '@eclipse-scout/core/src/table/TableMatrix';
+import {TableRow} from '@eclipse-scout/core/src';
+import {TableUserFilterAddedEventData} from '@eclipse-scout/core/src/table/userfilter/TableUserFilter';
+import {TableControlDeterministicKey} from './ChartTableControl';
 
-export default class ChartTableUserFilter extends TableUserFilter {
+export default class ChartTableUserFilter extends TableUserFilter implements ChartTableUserFilterModel {
+  declare model: ChartTableUserFilterModel;
+
+  text: string;
+  xAxis: TableMatrixKeyAxis;
+  yAxis: TableMatrixKeyAxis;
+  filters: { deterministicKey: TableControlDeterministicKey }[];
+  columnIdX: string;
+  columnIdY: string;
 
   constructor() {
     super();
@@ -29,11 +42,8 @@ export default class ChartTableUserFilter extends TableUserFilter {
     return this.text;
   }
 
-  /**
-   * @override TableUserFilter.js
-   */
-  createFilterAddedEventData() {
-    let data = super.createFilterAddedEventData();
+  override createFilterAddedEventData(): ChartTableUserFilterAddedEventData {
+    let data: ChartTableUserFilterAddedEventData = super.createFilterAddedEventData();
     data.text = this.text;
     data.filters = this.filters;
     data.columnIdX = (this.xAxis && this.xAxis.column) ? this.xAxis.column.id : null;
@@ -54,7 +64,7 @@ export default class ChartTableUserFilter extends TableUserFilter {
     matrix.calculate();
   }
 
-  accept(row) {
+  accept(row: TableRow): boolean {
     if (!this.xAxis) {
       // Lazy calculation. It is not possible on init, because the table is not rendered yet.
       this.calculate();
@@ -63,10 +73,16 @@ export default class ChartTableUserFilter extends TableUserFilter {
     let deterministicKeyX = this.xAxis.normDeterministic(value);
 
     if (!this.yAxis) {
-      return (this.filters.filter(filter => filter.deterministicKey === deterministicKeyX).length);
+      return this.filters.filter(filter => filter.deterministicKey === deterministicKeyX).length > 0;
     }
     value = this.yAxis.column.cellValueOrTextForCalculation(row);
     let deterministicKeyY = this.yAxis.normDeterministic(value);
-    return (this.filters.filter(filter => arrays.equals(filter.deterministicKey, [deterministicKeyX, deterministicKeyY])).length);
+    return this.filters.filter(filter => arrays.equals(filter.deterministicKey as (number | string)[], [deterministicKeyX, deterministicKeyY])).length > 0;
   }
 }
+
+type ChartTableUserFilterAddedEventData = TableUserFilterAddedEventData & {
+  filters?: { deterministicKey: TableControlDeterministicKey }[];
+  columnIdX?: string;
+  columnIdY?: string;
+};

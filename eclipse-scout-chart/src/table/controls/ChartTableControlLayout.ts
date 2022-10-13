@@ -9,15 +9,17 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractLayout, scrollbars} from '@eclipse-scout/core';
+import {ChartTableControl} from '../../index';
 
 export default class ChartTableControlLayout extends AbstractLayout {
+  control: ChartTableControl;
 
-  constructor(control) {
+  constructor(control: ChartTableControl) {
     super();
     this.control = control;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     if (!this.control.contentRendered) {
       return;
     }

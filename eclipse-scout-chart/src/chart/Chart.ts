@@ -400,11 +400,11 @@ export type ChartValueGroup = {
   cssClass: string;
 };
 
-export type ChartConfig = Omit<ChartConfiguration, 'type'> & {
+export type ChartConfig = Partial<Omit<ChartConfiguration, 'type'>> & {
   type: ChartType;
   options?: {
     autoColor?: boolean;
-    colorScheme?: ColorScheme;
+    colorScheme?: ColorScheme | string;
     transparent?: boolean;
     maxSegments?: number;
     otherSegmentClickable?: boolean;
@@ -449,7 +449,7 @@ export type ChartConfig = Omit<ChartConfiguration, 'type'> & {
     };
     plugins?: {
       legend?: {
-        clickable: boolean;
+        clickable?: boolean;
       };
     };
   };

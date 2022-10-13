@@ -11,7 +11,7 @@
 import {EventEmitter, Filter, objects, Session, Table, TableRow, TableUserFilterModel} from '../../index';
 import $ from 'jquery';
 
-export default abstract class TableUserFilter extends EventEmitter implements Filter<TableRow> {
+export default abstract class TableUserFilter extends EventEmitter implements Filter<TableRow>, TableUserFilterModel {
   declare model: TableUserFilterModel;
 
   session: Session;

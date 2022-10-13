@@ -33,7 +33,10 @@ export {default as ChartFieldTile} from './tile/ChartFieldTile';
 export {default as ChartFieldTileAdapter} from './tile/ChartFieldTileAdapter';
 export {default as ChartFieldTileModel} from './tile/ChartFieldTileModel';
 export {default as ChartTableControl} from './table/controls/ChartTableControl';
+export {default as ChartTableControlEventMap} from './table/controls/ChartTableControlEventMap';
+export {default as ChartTableControlModel} from './table/controls/ChartTableControlModel';
 export {default as ChartTableUserFilter} from './table/controls/ChartTableUserFilter';
+export {default as ChartTableUserFilterModel} from './table/controls/ChartTableUserFilterModel';
 export {default as ChartTableControlAdapter} from './table/controls/ChartTableControlAdapter';
 export {default as ChartTableControlLayout} from './table/controls/ChartTableControlLayout';
 
