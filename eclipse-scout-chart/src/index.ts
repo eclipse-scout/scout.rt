@@ -31,6 +31,7 @@ export {default as ChartFieldAdapter} from './form/fields/chartfield/ChartFieldA
 export {default as ChartFieldModel} from './form/fields/chartfield/ChartFieldModel';
 export {default as ChartFieldTile} from './tile/ChartFieldTile';
 export {default as ChartFieldTileAdapter} from './tile/ChartFieldTileAdapter';
+export {default as ChartFieldTileModel} from './tile/ChartFieldTileModel';
 export {default as ChartTableControl} from './table/controls/ChartTableControl';
 export {default as ChartTableUserFilter} from './table/controls/ChartTableUserFilter';
 export {default as ChartTableControlAdapter} from './table/controls/ChartTableControlAdapter';
