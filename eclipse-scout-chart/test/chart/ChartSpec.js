@@ -1,16 +1,15 @@
 /*
- * Copyright (c) 2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
 import {Chart} from '../../src/index';
-import {Event} from '@eclipse-scout/core';
 
 describe('ChartSpec', () => {
 
@@ -34,30 +33,24 @@ describe('ChartSpec', () => {
 
       expect(chart.checkedItems).toEqual([]);
 
-      let click0 = new Event();
-      click0.data = {
+      chart.handleValueClick({
         datasetIndex: 0,
         dataIndex: 0
-      };
-      chart._onValueClick(click0);
+      });
 
       expect(chart.checkedItems).toEqual([]);
 
-      let click3 = new Event();
-      click3.data = {
+      chart.handleValueClick({
         datasetIndex: 0,
         dataIndex: 3
-      };
-      chart._onValueClick(click3);
+      });
 
       expect(chart.checkedItems).toEqual([]);
 
-      let click0Again = new Event();
-      click0Again.data = {
+      chart.handleValueClick({
         datasetIndex: 0,
         dataIndex: 0
-      };
-      chart._onValueClick(click0Again);
+      });
 
       expect(chart.checkedItems).toEqual([]);
     });
@@ -73,24 +66,20 @@ describe('ChartSpec', () => {
 
       expect(chart.checkedItems).toEqual([]);
 
-      let click0 = new Event();
-      click0.data = {
+      chart.handleValueClick({
         datasetIndex: 0,
         dataIndex: 0
-      };
-      chart._onValueClick(click0);
+      });
 
       expect(chart.checkedItems).toEqual([{
         datasetIndex: 0,
         dataIndex: 0
       }]);
 
-      let click3 = new Event();
-      click3.data = {
+      chart.handleValueClick({
         datasetIndex: 0,
         dataIndex: 3
-      };
-      chart._onValueClick(click3);
+      });
 
       expect(chart.checkedItems).toEqual([{
         datasetIndex: 0,
@@ -100,12 +89,10 @@ describe('ChartSpec', () => {
         dataIndex: 3
       }]);
 
-      let click0Again = new Event();
-      click0Again.data = {
+      chart.handleValueClick({
         datasetIndex: 0,
         dataIndex: 0
-      };
-      chart._onValueClick(click0Again);
+      });
 
       expect(chart.checkedItems).toEqual([{
         datasetIndex: 0,

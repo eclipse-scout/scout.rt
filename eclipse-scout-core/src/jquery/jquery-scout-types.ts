@@ -628,6 +628,18 @@ declare global {
     animateAVCSD(attr: string, value, complete?: (elem: JQuery) => void, step?: (elem: JQuery) => void, duration?: number): this;
 
     /**
+     * Animates the attribute to the given end value. When the animation is completed, the given handler will be executed.
+     * The animation will add the property <code>tabIndex</code> if it does not exist.
+     *
+     * @param attr The name of the attribute.
+     * @param endValue The end value of the animation.
+     * @param duration A number determining how long the animation will run.
+     * @param complete A function that is called once the animation is complete.
+     * @param withoutTabIndex Whether the property <code>tabIndex</code> should be removed after the animation or not.
+     */
+    animateSVG(attr: string, endValue: number, duration: number, complete: (HTMLElement) => void, withoutTabIndex: boolean): this;
+
+    /**
      * Adds a class which will animate the element. When the animation finishes, the class will be removed again.
      * Removing the class again is necessary, otherwise the animation will be executed each time the element changes its visibility (attach/rerender).
      * and even each time when the css classes change.

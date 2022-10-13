@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -203,7 +203,6 @@ $.throttle = (fx, delay) => {
     }
   };
 };
-
 
 $.negate = fx => function(...args) {
   return !fx.apply(this, args);
@@ -818,6 +817,32 @@ $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
   return this;
 };
 
+// SVG animate, array contains attr, endValue + startValue
+$.fn.animateSVG = function(attr, endValue, duration, complete, withoutTabIndex) {
+  return this.each(function() {
+    let startValue = parseFloat($(this).attr(attr));
+    if (withoutTabIndex) {
+      let oldComplete = complete;
+      complete = function() {
+        if (oldComplete) {
+          oldComplete.call(this);
+        }
+        $(this).removeAttr('tabindex');
+      };
+    }
+    $(this).animate({
+      tabIndex: 0
+    }, {
+      step: function(now, fx) {
+        this.setAttribute(attr, startValue + (endValue - startValue) * fx.pos);
+      },
+      duration: duration,
+      complete: complete,
+      queue: false
+    });
+  });
+};
+
 $.fn.addClassForAnimation = function(className, options) {
   let defaultOptions = {
     classesToRemove: className
@@ -931,7 +956,6 @@ $.fn.cssWidthToContentAnimated = function(opts) {
   this.cssWidthAnimated(oldW, newW, opts);
   return this;
 };
-
 
 $.fn.offsetTo = function($to) {
   let toOffset = $to.offset(),

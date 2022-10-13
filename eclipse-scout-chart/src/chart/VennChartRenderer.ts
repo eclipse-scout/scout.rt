@@ -8,12 +8,36 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractSvgChartRenderer, VennAsync3Calculator, VennCircle, VennCircleHelper} from '../index';
+import {AbstractSvgChartRenderer, Chart, VennAsync3Calculator, VennCircle, VennCircleHelper} from '../index';
 import $ from 'jquery';
+import {ChartValueGroup} from './Chart';
+import {LegendPositions} from './AbstractSvgChartRenderer';
 
 export default class VennChartRenderer extends AbstractSvgChartRenderer {
+  animationTriggered: boolean;
 
-  constructor(chart) {
+  data: ChartValueGroup[];
+  centerX: number;
+  centerY: number;
+  numberOfCircles: number;
+  readyToDraw: boolean;
+  wasCircle: boolean;
+
+  vennCircleHelper: VennCircleHelper;
+  async3Calculator: VennAsync3Calculator;
+
+  vennNumber1: VennCircle;
+  vennReal1: VennCircle;
+  vennNumber2: VennCircle;
+  vennReal2: VennCircle;
+  vennNumber3: VennCircle;
+  vennReal3: VennCircle;
+
+  $v1: JQuery<SVGElement>;
+  $v2: JQuery<SVGElement>;
+  $v3: JQuery<SVGElement>;
+
+  constructor(chart: Chart) {
     super(chart);
     this.animationTriggered = false;
     this.suppressLegendBox = true;
@@ -28,7 +52,7 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
     chart.config = $.extend(true, {}, defaultConfig, chart.config);
   }
 
-  _validate() {
+  protected override _validate(): boolean {
     let chartData = this.chart.data;
     if (!chartData ||
       chartData.axes.length !== 0 ||
@@ -39,12 +63,12 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
     return true;
   }
 
-  _renderInternal() {
+  protected override _renderInternal() {
     this.centerX = this.width / 2;
     this.centerY = this.height / 2;
 
     if (this.centerX === 0 || this.centerY === 0) {
-      return false;
+      return;
     }
 
     // basic values
@@ -56,7 +80,7 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
       maxR = Math.min(this.centerX, this.centerY),
       minR = maxR / 15,
       total = this.data.reduce((s, e) => {
-        return s + parseFloat(e.values[0]);
+        return s + (e.values[0] as number);
       }, 1);
 
     this.vennCircleHelper = new VennCircleHelper(distR, maxR, minR, total);
@@ -112,16 +136,16 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
     }
   }
 
-  remove(requestAnimation, afterRemoveFunc) {
+  override remove(requestAnimation = false, afterRemoveFunc?: (chartAnimationStopping?: boolean) => void) {
     this._cancelAsync3Calculator();
     super.remove(requestAnimation, afterRemoveFunc);
   }
 
   // calculation
 
-  _calc1(v1) {
+  protected _calc1(v1: VennCircle) {
     // set basic data
-    let a = this.data[0].values[0];
+    let a = this.data[0].values[0] as number;
 
     // calc sizes
     if (a > 0) {
@@ -138,11 +162,11 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
     v1.addLabel(a, v1.x, v1.y);
   }
 
-  _calc2(v1, v2, real) {
+  protected _calc2(v1: VennCircle, v2: VennCircle, real: boolean) {
     // set basic data
-    let a = this.data[0].values[0];
-    let b = this.data[1].values[0];
-    let ab = this.data[2].values[0];
+    let a = this.data[0].values[0] as number;
+    let b = this.data[1].values[0] as number;
+    let ab = this.data[2].values[0] as number;
     let d12;
 
     if (real) {
@@ -199,15 +223,15 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
     }
   }
 
-  _calc3(v1, v2, v3, real, callback) {
+  protected _calc3(v1: VennCircle, v2: VennCircle, v3: VennCircle, real: boolean, callback: () => void) {
     // set basic data
-    let a = this.data[0].values[0];
-    let b = this.data[1].values[0];
-    let c = this.data[2].values[0];
-    let ab = this.data[3].values[0];
-    let ac = this.data[4].values[0];
-    let bc = this.data[5].values[0];
-    let abc = this.data[6].values[0];
+    let a = this.data[0].values[0] as number;
+    let b = this.data[1].values[0] as number;
+    let c = this.data[2].values[0] as number;
+    let ab = this.data[3].values[0] as number;
+    let ac = this.data[4].values[0] as number;
+    let bc = this.data[5].values[0] as number;
+    let abc = this.data[6].values[0] as number;
 
     let d12, d13, d23;
 
@@ -279,7 +303,7 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
     }
   }
 
-  _cancelAsync3Calculator() {
+  protected _cancelAsync3Calculator() {
     if (this.async3Calculator) {
       this.async3Calculator.cancel();
       this.async3Calculator = null;
@@ -288,7 +312,7 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
 
   // drawing
 
-  _draw(animated, real) {
+  protected _draw(animated: boolean, real: boolean) {
     if (!this.rendered && !this.rendering) { // additional check, because this method might be called from a setTimeout()
       return;
     }
@@ -337,7 +361,7 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
   }
 
   // handling of circles
-  _createCircle(circleIndex, color, cssClass) {
+  protected _createCircle(circleIndex: number, color: string, cssClass: string): JQuery<SVGElement> {
     let $circle = this.$svg.appendSVG('circle', 'venn-circle')
       .attr('cx', this.centerX)
       .attr('cy', this.centerY)
@@ -358,14 +382,14 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
     }
 
     if (this.chart.config.options.clickable) {
-      $circle.on('click', this._createClickObject(null, circleIndex), this.chart._onValueClick.bind(this.chart));
+      $circle.on('click', this._createClickObject(null, circleIndex), e => this.chart.handleValueClick(e.data));
     }
 
     return $circle;
   }
 
   // handling of venn, label and legend
-  _updateVenn(venn, animated) {
+  protected _updateVenn(venn: VennCircle, animated: boolean) {
     // move circle
     venn.$circle
       .animateSVG('cx', this.centerX + venn.x, animated ? this.animationDuration : 0, null, true)
@@ -386,12 +410,12 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
       y2: y2,
       v: venn.legendV,
       h: venn.legendH
-    };
+    } as LegendPositions;
 
     this._renderWireLegend(venn.legend, legendPositions, 'venn-legend');
   }
 
-  _drawLabel(text, dx, dy, animated) {
+  protected _drawLabel(text: number, dx: number, dy: number, animated: boolean) {
     // draw label
     let $label = this.$svg.appendSVG('text', 'venn-label')
       .attr('x', this.centerX + dx)
@@ -407,7 +431,7 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
   }
 
   // handling of show/hide numbers
-  _show(event) {
+  protected _show(event: JQuery.MouseEventBase) {
     if (this.numberOfCircles === 1) {
       return; // Nothing to do for only one circle
     }
@@ -418,7 +442,7 @@ export default class VennChartRenderer extends AbstractSvgChartRenderer {
     // check if true enter or just from one circle to another
     let isCircle = toElement && $(toElement).hasClass('venn-circle');
     if (this.wasCircle && isCircle) {
-      return false;
+      return;
     }
     this.wasCircle = isCircle;
 

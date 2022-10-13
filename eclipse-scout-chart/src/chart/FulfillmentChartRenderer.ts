@@ -9,17 +9,20 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, scout} from '@eclipse-scout/core';
-import {AbstractSvgChartRenderer} from '../index';
+import {AbstractSvgChartRenderer, Chart} from '../index';
 import $ from 'jquery';
+import {UpdateChartOptions} from './Chart';
 
 export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
+  animationTriggered: boolean;
+  segmentSelectorForAnimation: string;
+  r: number;
+  fullR: number;
 
-  constructor(chart) {
+  constructor(chart: Chart) {
     super(chart);
 
     this.animationTriggered = false;
-    this.r;
-
     this.segmentSelectorForAnimation = '.fulfillment-chart';
     this.suppressLegendBox = true;
 
@@ -33,7 +36,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
     chart.config = $.extend(true, {}, defaultConfig, chart.config);
   }
 
-  _validate() {
+  protected override _validate(): boolean {
     let chartValueGroups = this.chart.data.chartValueGroups;
     if (chartValueGroups.length !== 2 ||
       chartValueGroups[0].values.length !== 1 ||
@@ -43,11 +46,11 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
     return true;
   }
 
-  _renderInternal() {
+  protected override _renderInternal() {
     // Calculate percentage
     let chartData = this.chart.data;
-    let value = chartData.chartValueGroups[0].values[0];
-    let total = chartData.chartValueGroups[1].values[0];
+    let value = chartData.chartValueGroups[0].values[0] as number;
+    let total = chartData.chartValueGroups[1].values[0] as number;
 
     this.fullR = (Math.min(this.chartBox.height, this.chartBox.width) / 2) - 2;
 
@@ -55,7 +58,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
     this._renderPercentage(value, total);
   }
 
-  _renderPercentage(value, total) {
+  protected _renderPercentage(value: number, total: number) {
     // arc segment
     let arcClass = 'fulfillment-chart',
       color = this.chart.data.chartValueGroups[0].colorHexValue,
@@ -104,7 +107,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
       .text(percentage + '%');
 
     if (this.chart.config.options.clickable) {
-      $arc.on('click', this._createClickObject(null, null), this.chart._onValueClick.bind(this.chart));
+      $arc.on('click', this._createClickObject(null, null), e => this.chart.handleValueClick(e.data));
     }
     if (!this.chart.config.options.autoColor && !chartGroupCss) {
       $arc.attr('fill', color);
@@ -124,7 +127,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
     }
   }
 
-  pathSegment(start, end) {
+  pathSegment(start: number, end: number): string {
     let s = start * 2 * Math.PI,
       e = end * 2 * Math.PI,
       pathString = '';
@@ -138,7 +141,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
     return pathString;
   }
 
-  _renderCirclePath(cssClass, id, radius) {
+  protected _renderCirclePath(cssClass: string, id: string, radius: number): JQuery<SVGElement> {
     let chartGroupCss = this.chart.data.chartValueGroups[0].cssClass;
     let color = this.chart.data.chartValueGroups[1].colorHexValue;
 
@@ -165,7 +168,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
     return $path;
   }
 
-  _renderInnerCircle() {
+  protected _renderInnerCircle() {
     let radius = (this.fullR / 8) * 7.5,
       radius2 = (this.fullR / 8) * 7.2;
 
@@ -178,7 +181,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
    * Do not animate the removal of the chart if the chart data has been updated and the startValue option is set.
    * If startValue is not set use default implementation.
    */
-  shouldAnimateRemoveOnUpdate(opts) {
+  override shouldAnimateRemoveOnUpdate(opts: UpdateChartOptions): boolean {
     let startValue = objects.optProperty(this.chart, 'config', 'options', 'fulfillment', 'startValue');
     if (!objects.isNullOrUndefined(startValue)) {
       return false;
@@ -187,7 +190,7 @@ export default class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
     return super.shouldAnimateRemoveOnUpdate(opts);
   }
 
-  _removeAnimated(afterRemoveFunc) {
+  protected override _removeAnimated(afterRemoveFunc: (chartAnimationStopping?: boolean) => void) {
     if (this.animationTriggered) {
       return;
     }

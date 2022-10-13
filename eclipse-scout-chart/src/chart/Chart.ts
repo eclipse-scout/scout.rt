@@ -8,45 +8,42 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ChartJsRenderer, ChartLayout, FulfillmentChartRenderer, SalesfunnelChartRenderer, SpeedoChartRenderer, VennChartRenderer} from '../index';
-import {arrays, colorSchemes, HtmlComponent, objects, Widget} from '@eclipse-scout/core';
+import {AbstractChartRenderer, ChartEventMap, ChartJsRenderer, ChartLayout, ChartModel, FulfillmentChartRenderer, SalesfunnelChartRenderer, SpeedoChartRenderer, VennChartRenderer} from '../index';
+import {arrays, colorSchemes, EnumObject, Event as ScoutEvent, HtmlComponent, objects, Widget} from '@eclipse-scout/core';
+import {EventMapOf, EventModel} from '@eclipse-scout/core/src/events/EventEmitter';
+import {ColorScheme} from '@eclipse-scout/core/src/util/colorSchemes';
+import {GreenAreaPosition} from './SpeedoChartRenderer';
+import {ChartConfiguration, LinearScaleOptions, RadialLinearScaleOptions} from 'chart.js';
 
-/**
- * @typedef ChartValueGroup
- * @property {string} type
- */
+export default class Chart extends Widget implements ChartModel {
+  declare model: ChartModel;
+  declare eventMap: ChartEventMap;
 
-/**
- * @typedef ClickObject
- * @property {number} datasetIndex
- * @property {number} dataIndex
- * @property {number} [xIndex]
- * @property {number} [yIndex]
- */
+  data: ChartData;
+  config: ChartConfig;
+  checkedItems: ClickObject[];
 
-export default class Chart extends Widget {
+  chartRenderer: AbstractChartRenderer;
+
+  protected _updateChartTimeoutId: number;
+  protected _updateChartOpts: UpdateChartOptions;
+  protected _updateChartOptsWhileNotAttached: UpdateChartOptions[];
+  protected _updatedOnce: boolean;
 
   constructor() {
     super();
 
     this.$container = null;
-    this.chartRenderer = null;
 
-    /**
-     * @type {object}
-     * @property {ChartValueGroup[]} chartValueGroups
-     */
     this.data = null;
     this.config = null;
-    /**
-     *  @type {ClickObject[]}
-     */
     this.checkedItems = [];
 
+    this.chartRenderer = null;
     this._updateChartTimeoutId = null;
     this._updateChartOpts = null;
     this._updateChartOptsWhileNotAttached = [];
-    this.updatedOnce = false;
+    this._updatedOnce = false;
   }
 
   static Type = {
@@ -64,7 +61,7 @@ export default class Chart extends Widget {
     RADAR: 'radar',
     BUBBLE: 'bubble',
     SCATTER: 'scatter'
-  };
+  } as const;
 
   static Position = {
     TOP: 'top',
@@ -72,17 +69,17 @@ export default class Chart extends Widget {
     LEFT: 'left',
     RIGHT: 'right',
     CENTER: 'center'
-  };
+  } as const;
 
   static DEFAULT_ANIMATION_DURATION = 600; // ms
   static DEFAULT_DEBOUNCE_TIMEOUT = 100; // ms
 
-  _init(model) {
+  protected override _init(model: ChartModel) {
     super._init(model);
     this.setConfig(this.config);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('chart');
 
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
@@ -93,7 +90,7 @@ export default class Chart extends Widget {
     // !!! will eventually call updateChart() when the layout is validated.
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderClickable();
     this._renderCheckable();
@@ -105,12 +102,12 @@ export default class Chart extends Widget {
     });
   }
 
-  _renderOnAttach() {
+  protected override _renderOnAttach() {
     super._renderOnAttach();
     this._updateChartOptsWhileNotAttached.splice(0).forEach(opts => this.updateChart($.extend(true, {}, opts, {debounce: true})));
   }
 
-  _remove() {
+  protected override _remove() {
     if (this.chartRenderer) {
       this.chartRenderer.remove(false);
     }
@@ -118,12 +115,12 @@ export default class Chart extends Widget {
     this.$container = null;
   }
 
-  setData(data) {
+  setData(data: ChartData) {
     this.setProperty('data', data);
     this.setCheckedItems(this.checkedItems);
   }
 
-  _renderData() {
+  protected _renderData() {
     this.updateChart({
       requestAnimation: true,
       debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT,
@@ -131,7 +128,7 @@ export default class Chart extends Widget {
     });
   }
 
-  setConfig(config) {
+  setConfig(config: ChartConfig) {
     let defaultConfig = {
       type: Chart.Type.PIE,
       options: {
@@ -214,7 +211,7 @@ export default class Chart extends Widget {
     this._updateChartRenderer();
   }
 
-  _renderConfig(onlyUpdateData) {
+  protected _renderConfig(onlyUpdateData: boolean) {
     this._renderClickable();
     this._renderCheckable();
     this._renderChartType();
@@ -226,11 +223,11 @@ export default class Chart extends Widget {
     });
   }
 
-  setCheckedItems(checkedItems) {
+  setCheckedItems(checkedItems: ClickObject[]) {
     this.setProperty('checkedItems', arrays.ensure(this._filterCheckedItems(checkedItems)));
   }
 
-  _filterCheckedItems(checkedItems) {
+  protected _filterCheckedItems(checkedItems: ClickObject[]): ClickObject[] {
     if (!Array.isArray(checkedItems)) {
       return checkedItems;
     }
@@ -247,43 +244,33 @@ export default class Chart extends Widget {
     return checkedItems;
   }
 
-  _renderCheckedItems() {
+  protected _renderCheckedItems() {
     if (this.chartRenderer) {
       this.chartRenderer.renderCheckedItems();
     }
   }
 
-  /**
-   * @override
-   */
-  _renderEnabled() {
+  protected override _renderEnabled() {
     this.updateChart();
   }
 
-  _renderClickable() {
+  protected _renderClickable() {
     this.$container.toggleClass('clickable', this.config.options.clickable);
   }
 
-  _renderCheckable() {
+  protected _renderCheckable() {
     this.$container.toggleClass('checkable', this.config.options.checkable);
   }
 
-  _renderChartType() {
+  protected _renderChartType() {
     this.$container.addClass(this.config.type + '-chart');
   }
 
-  _renderColorScheme() {
+  protected _renderColorScheme() {
     colorSchemes.toggleColorSchemeClasses(this.$container, this.config.options.colorScheme);
   }
 
-  /**
-   * @param opts
-   *   [requestAnimation] default false
-   *   [debounce] default 0
-   *   [onlyUpdateData] default false
-   *   [onlyRefresh] default false
-   */
-  updateChart(opts) {
+  updateChart(opts?: UpdateChartOptions) {
     opts = opts || {};
     opts.enforceRerender = !opts.onlyUpdateData && !opts.onlyRefresh;
 
@@ -325,7 +312,7 @@ export default class Chart extends Widget {
         return;
       }
 
-      this.updatedOnce = true;
+      this._updatedOnce = true;
       if (!this.chartRenderer) {
         return; // nothing to render when there is no renderer.
       }
@@ -346,7 +333,7 @@ export default class Chart extends Widget {
     }
   }
 
-  _resolveChartRenderer() {
+  protected _resolveChartRenderer(): AbstractChartRenderer {
     switch (this.config.type) {
       case Chart.Type.FULFILLMENT:
         return new FulfillmentChartRenderer(this);
@@ -371,15 +358,14 @@ export default class Chart extends Widget {
     return null;
   }
 
-  _updateChartRenderer() {
+  protected _updateChartRenderer() {
     this.chartRenderer && this.chartRenderer.remove();
     this.setProperty('chartRenderer', this._resolveChartRenderer());
   }
 
-  _onValueClick(event) {
+  handleValueClick(clickedItem: ClickObject, originalEvent?: Event) {
     if (this.config.options.checkable) {
       let checkedItems = [...this.checkedItems],
-        clickedItem = event.data,
         checkedItem = checkedItems.filter(item => item.datasetIndex === clickedItem.datasetIndex && item.dataIndex === clickedItem.dataIndex)[0];
       if (checkedItem) {
         arrays.remove(checkedItems, checkedItem);
@@ -388,6 +374,112 @@ export default class Chart extends Widget {
       }
       this.setCheckedItems(checkedItems);
     }
-    this.trigger('valueClick', event);
+    this.trigger('valueClick', {
+      data: clickedItem,
+      originalEvent
+    });
+  }
+
+  override trigger<K extends string & keyof EventMapOf<Chart>>(type: K, eventOrModel?: ScoutEvent | EventModel<EventMapOf<Chart>[K]>): EventMapOf<Chart>[K] {
+    return super.trigger(type, eventOrModel);
   }
 }
+
+export type ChartData = {
+  axes: ChartAxis[][];
+  chartValueGroups: ChartValueGroup[];
+};
+export type ChartAxis = {
+  label: string;
+};
+export type ChartValueGroup = {
+  type: string;
+  groupName: string;
+  values: number[] | Record<string, number>[];
+  colorHexValue: string;
+  cssClass: string;
+};
+
+export type ChartConfig = Omit<ChartConfiguration, 'type'> & {
+  type: ChartType;
+  options?: {
+    autoColor?: boolean;
+    colorScheme?: ColorScheme;
+    transparent?: boolean;
+    maxSegments?: number;
+    otherSegmentClickable?: boolean;
+    adjustGridMaxMin?: boolean;
+    clickable?: boolean;
+    checkable?: boolean;
+    scaleLabelByTypeMap?: Record<ChartType, Record<string, string>>;
+    numberFormatter?: NumberFormatter;
+    reformatLabels?: boolean;
+    handleResize?: boolean;
+    animation?: {
+      duration?: number;
+    };
+    scales?: {
+      x?: LinearScaleOptions & {
+        minSpaceBetweenTicks?: number;
+      };
+      y?: LinearScaleOptions & {
+        minSpaceBetweenTicks?: number;
+      };
+      yDiffType?: LinearScaleOptions;
+      r?: RadialLinearScaleOptions & {
+        minSpaceBetweenTicks?: number;
+      };
+    };
+    bubble?: {
+      sizeOfLargestBubble?: number;
+      minBubbleSize?: number;
+    };
+    fulfillment?: {
+      startValue?: number;
+    };
+    salesfunnel?: {
+      normalized?: boolean;
+      calcConversionRate?: boolean;
+    };
+    speedo?: {
+      greenAreaPosition?: GreenAreaPosition;
+    };
+    venn?: {
+      numberOfCircles?: 1 | 2 | 3;
+    };
+    plugins?: {
+      legend?: {
+        clickable: boolean;
+      };
+    };
+  };
+};
+export type ChartType = EnumObject<typeof Chart.Type>;
+export type NumberFormatter = (label: number | string, defaultFormatter: (label: number | string) => string) => string;
+
+export type ClickObject = {
+  datasetIndex: number;
+  dataIndex: number;
+  xIndex?: number;
+  yIndex?: number;
+};
+
+export type UpdateChartOptions = {
+  /**
+   * Default is false.
+   */
+  requestAnimation?: boolean;
+  /**
+   * Default is 0.
+   */
+  debounce?: number | boolean;
+  /**
+   * Default is false.
+   */
+  onlyUpdateData?: boolean;
+  /**
+   * Default is false.
+   */
+  onlyRefresh?: boolean;
+  enforceRerender?: boolean;
+};

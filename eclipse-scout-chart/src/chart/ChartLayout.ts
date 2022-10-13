@@ -10,22 +10,25 @@
  */
 import {AbstractLayout} from '@eclipse-scout/core';
 import {Chart} from '../index';
+import {UpdateChartOptions} from './Chart';
 
 export default class ChartLayout extends AbstractLayout {
+  chart: Chart;
 
-  constructor(chart) {
+  constructor(chart: Chart) {
     super();
     this.chart = chart;
   }
 
-  layout($container) {
-    let opts = {
+  override layout($container: JQuery) {
+    let opts: UpdateChartOptions = {
       requestAnimation: true,
       debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT,
       onlyUpdateData: true
     };
     // Don't request animations when the session is not ready or the chart was already updated once
-    if (!this.chart.session.ready || this.chart.updatedOnce) {
+    // @ts-ignore
+    if (!this.chart.session.ready || this.chart._updatedOnce) {
       opts.requestAnimation = false;
     }
     // Don't debounce while session is not yet ready. Otherwise, it might happen that the area to layout is not

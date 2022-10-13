@@ -9,24 +9,46 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {objects, strings} from '@eclipse-scout/core';
-import {AbstractSvgChartRenderer} from '../index';
+import {AbstractSvgChartRenderer, Chart} from '../index';
 import $ from 'jquery';
+import {ChartValueGroup, ClickObject} from './Chart';
+import {LegendPositions} from './AbstractSvgChartRenderer';
 
 export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
+  segmentSelectorForAnimation: string;
+  widthThresholdMedium: number;
+  widthThresholdSmall: number;
 
-  constructor(chart) {
+  /**
+   * Constants for "normalized mode"
+   * Width of a bar is calculated by multiplying this value with the previous bar's width
+   */
+  barDeltaPercentage: number;
+
+  /**
+   * Factor to be multiplied with the last bar's width. This will create a funnel effect, because
+   * the last bar is considerably smaller than the other bars.
+   */
+  lastBarAdditionalPercentage: number;
+
+  /** Percentage of the total width the last bar always has (delta might get smaller due to this constraint). */
+  lastBarMinWidthPercentage: number;
+
+  paddingBetweenLabel: number;
+  dataAnalyzeResult: AnalyzedData;
+  barHeight: number;
+  barAreaWidth: number;
+  centerX: number;
+  animationTriggered: boolean;
+
+  constructor(chart: Chart) {
     super(chart);
 
     this.segmentSelectorForAnimation = '.salesfunnel-chart-bar';
     this.widthThresholdMedium = 400;
     this.widthThresholdSmall = 200;
-    // Constants for "normalized mode"
-    // Width of a bar is calculated by multiplying this value with the previous bar's width
     this.barDeltaPercentage = 0.95;
-    // Factor to be multiplied with the last bar's width. This will create a funnel effect, because
-    // the last bar is considerably smaller than the other bars.
     this.lastBarAdditionalPercentage = 0.7;
-    // Percentage of the total width the last bar always has (delta might get smaller due to this constraint).
     this.lastBarMinWidthPercentage = 0.4;
     this.suppressLegendBox = true;
 
@@ -41,7 +63,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     chart.config = $.extend(true, {}, defaultConfig, chart.config);
   }
 
-  _validate() {
+  protected override _validate(): boolean {
     let chartData = this.chart.data;
     let chartConfig = this.chart.config;
     if (!chartData ||
@@ -56,20 +78,19 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     return true;
   }
 
-  _renderInternal() {
+  protected override _renderInternal() {
     let chartData = this.chart.data,
       bars = chartData.chartValueGroups.length;
 
-    this.conversionRateWidth = this._dynamicConversionRateWidth();
-    this.dataAnalyzeResult = this._analyzeData(chartData.chartValueGroups);
+    let conversionRateWidth = this._dynamicConversionRateWidth();
     this.paddingBetweenLabel = 20;
+    this.dataAnalyzeResult = this._analyzeData(chartData.chartValueGroups);
     this.barHeight = this.chartBox.height / bars;
-    this.barAreaHeight = this.barHeight * bars;
     this.barAreaWidth = this.chartBox.width -
       this.dataAnalyzeResult.maxLengthFirstValueRow -
       (this.paddingBetweenLabel * this.dataAnalyzeResult.labelCount) -
       this.dataAnalyzeResult.maxLengthSecondValueRow -
-      this.conversionRateWidth;
+      conversionRateWidth;
     this.centerX = this.barAreaWidth / 2;
 
     if (this.chart.config.options.salesfunnel.normalized) {
@@ -81,7 +102,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     this._addClipping('salesfunnel-chart-bar');
   }
 
-  _renderBarsNormalized(chartValueGroups) {
+  protected _renderBarsNormalized(chartValueGroups: ChartValueGroup[]) {
     let barCount = chartValueGroups.length;
     let startPointX = this.barAreaWidth +
       this.dataAnalyzeResult.maxLengthFirstValueRow +
@@ -124,23 +145,23 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       }
 
       this._renderPolygon(renderPolyOptions);
-      this._renderLabel(chartValueGroups[i].values[0], false, i);
+      this._renderLabel(chartValueGroups[i].values[0] as number, false, i);
       this._renderBarLabel(barLabel, i, renderPolyOptions.widthBottom);
       let labelLineWidth = this.dataAnalyzeResult.maxLengthFirstValueRow + this.paddingBetweenLabel;
       if (chartValueGroups[i].values.length > 1) {
-        this._renderLabel(chartValueGroups[i].values[1], true, i);
+        this._renderLabel(chartValueGroups[i].values[1] as number, true, i);
         labelLineWidth += this.dataAnalyzeResult.maxLengthSecondValueRow + this.paddingBetweenLabel;
       }
       if (i > 0) {
         this._renderLabelSeparatorLine(yCoord, labelLineWidth);
         if (this.chart.config.options.salesfunnel.calcConversionRate) {
-          this._renderConversionRate(i, startPointX, this._calcConversionRate(chartValueGroups[i - 1].values[0], chartValueGroups[i].values[0]));
+          this._renderConversionRate(i, startPointX, this._calcConversionRate(chartValueGroups[i - 1].values[0] as number, chartValueGroups[i].values[0] as number));
         }
       }
     }
   }
 
-  _renderLabel(label, secondLabel, barIndexFromTop) {
+  protected _renderLabel(label: number, secondLabel: boolean, barIndexFromTop: number) {
     if (label === null) {
       return;
     }
@@ -161,12 +182,12 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     }
     if (this.chart.config.options.plugins.tooltip.enabled && this.chart.data.axes.length > 0) {
       let desc = this.chart.data.axes[barIndexFromTop][secondLabel ? 1 : 0].label,
-        textBounds = this._measureText(label, labelClass);
+        textBounds = this._measureText('' + label, labelClass);
       this._renderWireLabels(desc, $label, x - textBounds.width / 2, y - textBounds.height);
     }
   }
 
-  _renderWireLabels(label, $text, x1, y1) {
+  protected _renderWireLabels(label: string, $text: JQuery<SVGElement>, x1: number, y1: number) {
     let legendPositions = {
       x1: x1,
       x2: x1 - 10,
@@ -174,7 +195,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       y2: y1 - 10,
       v: -1,
       h: -1
-    };
+    } as LegendPositions;
     // calculate opening direction
     let labelPositionFunc = (labelWidth, labelHeight) => {
       if (legendPositions.y2 - labelHeight < 0) {
@@ -188,15 +209,15 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     legendPositions.autoPosition = true;
     legendPositions.posFunc = labelPositionFunc;
     let
-      legend = this._renderWireLegend(label, legendPositions, 'line-chart-wire-label', 'wire-label-line-white', false),
+      legend = this._renderWireLegend(label, legendPositions, 'line-chart-wire-label', true),
       mouseIn = legend.attachFunc.bind(legend),
       mouseOut = legend.detachFunc.bind(legend);
     legend.detachFunc();
-    $text.mouseenter(mouseIn)
-      .mouseleave(mouseOut);
+    $text.on('mouseenter', mouseIn)
+      .on('mouseleave', mouseOut);
   }
 
-  _renderBarLabel(label, barIndexFromTop, barWidth) {
+  protected _renderBarLabel(label: string, barIndexFromTop: number, barWidth: number) {
     let y = (barIndexFromTop * this.barHeight) + (this.barHeight / 2),
       x = this.centerX,
       labelClass = this._dynamicCssClass('salesfunnel-bar-label');
@@ -204,7 +225,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     this._renderLineLabel(x, y, label, labelClass, true);
   }
 
-  _renderConversionRate(barIndexFromTop, startPointX, conversionRate) {
+  protected _renderConversionRate(barIndexFromTop: number, startPointX: number, conversionRate: number) {
     if (conversionRate === undefined) {
       return;
     }
@@ -222,13 +243,12 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     }
   }
 
-  _renderPolygon(renderPolyOptions) {
+  protected _renderPolygon(renderPolyOptions: PolyOptions): JQuery<SVGElement> {
     let that = this,
       points = this._calcPolygonPoints(true, this.animationDuration ? 0 : 1, renderPolyOptions.xStart, renderPolyOptions.yStart, renderPolyOptions.width, renderPolyOptions.widthBottom, this.barHeight - 1);
 
     let $poly = this.$svg.appendSVG('polygon', renderPolyOptions.cssClass, '', renderPolyOptions.id)
       .attr('points', points)
-      .attr('opacity', renderPolyOptions.opacity)
       .data('xStart', renderPolyOptions.xStart)
       .data('yStart', renderPolyOptions.yStart)
       .data('widthBar', renderPolyOptions.width)
@@ -255,7 +275,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       }, this._createAnimationObjectWithTabIndexRemoval(expandFunc, this.animationDuration));
     }
     if (this.chart.config.options.clickable) {
-      $poly.on('click', renderPolyOptions.clickObject, this.chart._onValueClick.bind(this.chart));
+      $poly.on('click', renderPolyOptions.clickObject, e => this.chart.handleValueClick(e.data));
     }
     if (renderPolyOptions.fill) {
       $poly.attr('fill', renderPolyOptions.fill);
@@ -264,7 +284,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     return $poly;
   }
 
-  _calcPolygonPoints(expand, fxPos, xStart, yStart, width, widthBottom, height) {
+  protected _calcPolygonPoints(expand: boolean, fxPos: number, xStart: number, yStart: number, width: number, widthBottom: number, height: number): string {
     let xOffsetTop = 0,
       xOffsetBottom = 0;
     if (expand) {
@@ -274,28 +294,25 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       xOffsetTop = (width / 2) - (width / 2 * fxPos);
       xOffsetBottom = (widthBottom / 2) - (widthBottom / 2 * fxPos);
     }
-    let x1 = xStart - xOffsetTop,
-      y1 = yStart,
-      x2 = xStart + xOffsetTop,
-      y2 = y1,
-      x3 = xStart + xOffsetBottom,
-      y3 = yStart + height,
-      x4 = xStart - xOffsetBottom,
-      y4 = y3;
-    return x1 + ',' + y1 + ' ' + x2 + ',' + y2 + ' ' + x3 + ',' + y3 + ' ' + x4 + ',' + y4 + ' ';
+    return strings.join(' ',
+      (xStart - xOffsetTop) + ',' + yStart, // x1, y1
+      (xStart + xOffsetTop) + ',' + yStart, // x2, y2
+      (xStart + xOffsetBottom) + ',' + (yStart + height), // x3, y3
+      (xStart - xOffsetBottom) + ',' + (yStart + height) // x4, y4
+    );
   }
 
-  _renderBarsAccordingToValues(chartValueGroups) {
+  protected _renderBarsAccordingToValues(chartValueGroups: ChartValueGroup[]) {
     let widthPerN = (this.dataAnalyzeResult.maxValue ? this.barAreaWidth * 0.8 / this.dataAnalyzeResult.maxValue : 0),
       startPointX = this.barAreaWidth + this.dataAnalyzeResult.maxLengthFirstValueRow + this.dataAnalyzeResult.maxLengthSecondValueRow + this.paddingBetweenLabel * this.dataAnalyzeResult.labelCount + 2 * this.paddingBetweenLabel,
       barCount = chartValueGroups.length;
 
     for (let i = 0; i < barCount; i++) {
-      let width = chartValueGroups[i].values[0] * widthPerN + this.barAreaWidth * 0.2,
+      let width = (chartValueGroups[i].values[0] as number) * widthPerN + this.barAreaWidth * 0.2,
         barLabel = chartValueGroups[i].groupName,
         yCoord = i * this.barHeight;
 
-      let renderPolyOptions = {
+      let renderPolyOptions: PolyOptions = {
         xStart: this.centerX,
         yStart: yCoord,
         rect: true,
@@ -314,23 +331,23 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       }
 
       this._renderPolygon(renderPolyOptions);
-      this._renderLabel(chartValueGroups[i].values[0], false, i);
+      this._renderLabel(chartValueGroups[i].values[0] as number, false, i);
       this._renderBarLabel(barLabel, i, renderPolyOptions.widthBottom);
       let labelLineWidth = this.dataAnalyzeResult.maxLengthFirstValueRow + this.paddingBetweenLabel;
       if (chartValueGroups[i].values.length > 1) {
-        this._renderLabel(chartValueGroups[i].values[1], true, i);
+        this._renderLabel(chartValueGroups[i].values[1] as number, true, i);
         labelLineWidth += this.dataAnalyzeResult.maxLengthSecondValueRow + this.paddingBetweenLabel;
       }
       if (i > 0) {
         this._renderLabelSeparatorLine(yCoord, labelLineWidth);
         if (this.chart.config.options.salesfunnel.calcConversionRate) {
-          this._renderConversionRate(i, startPointX, this._calcConversionRate(chartValueGroups[i - 1].values[0], chartValueGroups[i].values[0]));
+          this._renderConversionRate(i, startPointX, this._calcConversionRate(chartValueGroups[i - 1].values[0] as number, chartValueGroups[i].values[0] as number));
         }
       }
     }
   }
 
-  _renderLabelSeparatorLine(yCoord, labelLineWidth) {
+  protected _renderLabelSeparatorLine(yCoord: number, labelLineWidth: number) {
     let $line = this.$svg.appendSVG('line', 'label-separator')
       .attr('x1', this.barAreaWidth + this.paddingBetweenLabel)
       .attr('y1', yCoord)
@@ -343,15 +360,15 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     }
   }
 
-  _calcConversionRate(valueBefore, value) {
+  protected _calcConversionRate(valueBefore: number, value: number): number {
     if (objects.isNullOrUndefined(valueBefore) || objects.isNullOrUndefined(value) || valueBefore === 0) {
       return undefined;
     }
     return Math.round(value / valueBefore * 100);
   }
 
-  _analyzeData(valueGroups) {
-    let result = {
+  protected _analyzeData(valueGroups: ChartValueGroup[]): AnalyzedData {
+    let result: AnalyzedData = {
         labelCount: 0,
         maxValue: null,
         maxLengthFirstValueRow: 0,
@@ -366,20 +383,20 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       // only first value is relevant for bar
       if (valueGroup.values.length > 0 && valueGroup.values[0]) {
         if (result.maxValue === null) {
-          result.maxValue = valueGroup.values[0];
+          result.maxValue = valueGroup.values[0] as number;
         } else {
-          result.maxValue = Math.max(result.maxValue, valueGroup.values[0]);
+          result.maxValue = Math.max(result.maxValue, valueGroup.values[0] as number);
         }
-        result.maxLengthFirstValueRow = Math.max(result.maxLengthFirstValueRow, this._measureText(this.session.locale.decimalFormat.format(valueGroup.values[0]), labelClass).width);
+        result.maxLengthFirstValueRow = Math.max(result.maxLengthFirstValueRow, this._measureText(this.session.locale.decimalFormat.format(valueGroup.values[0] as number), labelClass).width);
       }
       if (valueGroup.values.length > 1 && valueGroup.values[1]) {
-        result.maxLengthSecondValueRow = Math.max(result.maxLengthSecondValueRow, this._measureText(this.session.locale.decimalFormat.format(valueGroup.values[1]), labelClass).width);
+        result.maxLengthSecondValueRow = Math.max(result.maxLengthSecondValueRow, this._measureText(this.session.locale.decimalFormat.format(valueGroup.values[1] as number), labelClass).width);
       }
     }
     return result;
   }
 
-  _removeAnimated(afterRemoveFunc) {
+  protected override _removeAnimated(afterRemoveFunc: (chartAnimationStopping?: boolean) => void) {
     if (this.animationTriggered) {
       return;
     }
@@ -404,7 +421,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
       });
   }
 
-  _dynamicCssClass(cssClass) {
+  protected _dynamicCssClass(cssClass: string): string {
     let small = '';
     if (this.chartBox.width <= this.widthThresholdSmall) {
       small = 'small';
@@ -414,7 +431,7 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     return strings.join(' ', cssClass, small);
   }
 
-  _dynamicConversionRateWidth() {
+  protected _dynamicConversionRateWidth(): number {
     if (!this.chart.config.options.salesfunnel.calcConversionRate) {
       return 0; // don't show conversion rate
     }
@@ -427,3 +444,23 @@ export default class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
     return 100;
   }
 }
+
+export type AnalyzedData = {
+  labelCount: number;
+  maxValue: number;
+  maxLengthFirstValueRow: number;
+  maxLengthSecondValueRow: number;
+};
+
+export type PolyOptions = {
+  id?: string;
+  xStart: number;
+  yStart: number;
+  rect: boolean;
+  width: number;
+  widthBottom: number;
+  cssClass: string;
+  fill: string;
+  label: string;
+  clickObject: ClickObject;
+};
