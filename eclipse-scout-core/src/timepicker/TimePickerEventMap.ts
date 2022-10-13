@@ -10,12 +10,12 @@
  */
 import {Event, PropertyChangeEvent, TimePicker, WidgetEventMap} from '../index';
 
-export interface TimePickerTimeSelectEvent<T extends TimePicker = TimePicker> extends Event<T> {
+export interface TimePickerTimeSelectEvent<T = TimePicker> extends Event<T> {
   time: Date;
 }
 
 export default interface TimePickerEventMap extends WidgetEventMap {
   'timeSelect': TimePickerTimeSelectEvent;
-  'propertyChange:preselectedTime': PropertyChangeEvent<Date, TimePicker>;
-  'propertyChange:selectedTime': PropertyChangeEvent<Date, TimePicker>;
+  'propertyChange:preselectedTime': PropertyChangeEvent<Date>;
+  'propertyChange:selectedTime': PropertyChangeEvent<Date>;
 }

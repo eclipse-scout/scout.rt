@@ -12,70 +12,70 @@ import {Cell, Column, Event, Filter, KeyStroke, Menu, NumberColumn, PropertyChan
 import {TableCheckableStyle, TableGroupingStyle, TableHierarchicalStyle} from './Table';
 import {DragAndDropType, FileDropEvent} from '../util/dragAndDrop';
 
-export interface TableColumnBackgroundEffectChangedEvent<T extends Table = Table> extends Event<T> {
+export interface TableColumnBackgroundEffectChangedEvent<T = Table> extends Event<T> {
   column: NumberColumn;
 }
 
-export interface TableAggregationFunctionChangedEvent<T extends Table = Table> extends Event<T> {
+export interface TableAggregationFunctionChangedEvent<T = Table> extends Event<T> {
   column: NumberColumn;
 }
 
-export interface TableAllRowsDeletedEvent<T extends Table = Table> extends Event<T> {
+export interface TableAllRowsDeletedEvent<T = Table> extends Event<T> {
   rows: TableRow[];
 }
 
-export interface TableAppLinkActionEvent<T extends Table = Table> extends Event<T> {
+export interface TableAppLinkActionEvent<T = Table> extends Event<T> {
   column: Column;
   row: TableRow;
   ref: string;
   $appLink: JQuery;
 }
 
-export interface TableCancelCellEditEvent<T extends Table = Table> extends Event<T> {
+export interface TableCancelCellEditEvent<T = Table> extends Event<T> {
   field: ValueField;
   row: TableRow;
   column: Column;
   cell: Cell;
 }
 
-export interface TableColumnMovedEvent<T extends Table = Table> extends Event<T> {
+export interface TableColumnMovedEvent<T = Table> extends Event<T> {
   column: Column;
   oldPos: number;
   newPos: number;
   dragged: boolean;
 }
 
-export interface TableColumnResizedEvent<T extends Table = Table> extends Event<T> {
+export interface TableColumnResizedEvent<T = Table> extends Event<T> {
   column: Column;
 }
 
-export interface TableColumnResizedToFitEvent<T extends Table = Table> extends Event<T> {
+export interface TableColumnResizedToFitEvent<T = Table> extends Event<T> {
   column: Column;
 }
 
-export interface TableCompleteCellEditEvent<T extends Table = Table> extends Event<T> {
+export interface TableCompleteCellEditEvent<T = Table> extends Event<T> {
   field: ValueField;
   row: TableRow;
   column: Column;
   cell: Cell;
 }
 
-export interface TableDropEvent<T extends Table = Table> extends Event<T>, FileDropEvent {
+export interface TableDropEvent<T = Table> extends Event<T>, FileDropEvent {
 }
 
-export interface TableFilterAddedEvent<T extends Table = Table> extends Event<T> {
+export interface TableFilterAddedEvent<T = Table> extends Event<T> {
   filter: Filter<TableRow>;
 }
 
-export interface TableFilterRemovedEvent<T extends Table = Table> extends Event<T> {
+export interface TableFilterRemovedEvent<T = Table> extends Event<T> {
   filter: Filter<TableRow>;
 }
 
-export interface TableFiltersRemovedEvent<T extends Table = Table> extends Event<T> {
+export interface TableFiltersRemovedEvent<T = Table> extends Event<T> {
   filter: Filter<TableRow>;
 }
 
-export interface TableGroupEvent<T extends Table = Table> extends Event<T> {
+export interface TableGroupEvent<T = Table> extends Event<T> {
   column: Column;
   groupAscending: boolean;
   groupingRemoved?: boolean;
@@ -83,61 +83,61 @@ export interface TableGroupEvent<T extends Table = Table> extends Event<T> {
   groupingRequested?: boolean;
 }
 
-export interface TablePrepareCellEditEvent<T extends Table = Table> extends Event<T> {
+export interface TablePrepareCellEditEvent<T = Table> extends Event<T> {
   column: Column;
   row: TableRow;
 }
 
-export interface TableReloadEvent<T extends Table = Table> extends Event<T> {
+export interface TableReloadEvent<T = Table> extends Event<T> {
   reloadReason: string;
 }
 
-export interface TableRowActionEvent<T extends Table = Table> extends Event<T> {
+export interface TableRowActionEvent<T = Table> extends Event<T> {
   column: Column;
   row: TableRow;
 }
 
-export interface TableRowClickEvent<T extends Table = Table> extends Event<T> {
+export interface TableRowClickEvent<T = Table> extends Event<T> {
   originalEvent: JQuery.MouseUpEvent;
   row: TableRow;
   mouseButton: number;
   column: Column;
 }
 
-export interface TableRowInitEvent<T extends Table = Table> extends Event<T> {
+export interface TableRowInitEvent<T = Table> extends Event<T> {
   row: TableRow;
 }
 
-export interface TableRowOrderChangedEvent<T extends Table = Table> extends Event<T> {
+export interface TableRowOrderChangedEvent<T = Table> extends Event<T> {
   row: TableRow;
   animating: boolean;
 }
 
-export interface TableRowsCheckedEvent<T extends Table = Table> extends Event<T> {
+export interface TableRowsCheckedEvent<T = Table> extends Event<T> {
   rows: TableRow[];
 }
 
-export interface TableRowsDeletedEvent<T extends Table = Table> extends Event<T> {
+export interface TableRowsDeletedEvent<T = Table> extends Event<T> {
   rows: TableRow[];
 }
 
-export interface TableRowsExpandedEvent<T extends Table = Table> extends Event<T> {
+export interface TableRowsExpandedEvent<T = Table> extends Event<T> {
   rows: TableRow[];
 }
 
-export interface TableRowsInsertedEvent<T extends Table = Table> extends Event<T> {
+export interface TableRowsInsertedEvent<T = Table> extends Event<T> {
   rows: TableRow[];
 }
 
-export interface TableRowsSelectedEvent<T extends Table = Table> extends Event<T> {
+export interface TableRowsSelectedEvent<T = Table> extends Event<T> {
   debounce: boolean;
 }
 
-export interface TableRowsUpdatedEvent<T extends Table = Table> extends Event<T> {
+export interface TableRowsUpdatedEvent<T = Table> extends Event<T> {
   rows: TableRow[];
 }
 
-export interface TableSortEvent<T extends Table = Table> extends Event<T> {
+export interface TableSortEvent<T = Table> extends Event<T> {
   column: Column;
   sortAscending: boolean;
   sortingRemoved?: boolean;
@@ -145,13 +145,13 @@ export interface TableSortEvent<T extends Table = Table> extends Event<T> {
   sortingRequested?: boolean;
 }
 
-export interface TableStartCellEditEvent<T extends Table = Table> extends Event<T> {
+export interface TableStartCellEditEvent<T = Table> extends Event<T> {
   column: Column;
   row: TableRow;
   field: ValueField;
 }
 
-export interface TableColumnOrganizeActionEvent<T extends Table = Table> extends Event<T> {
+export interface TableColumnOrganizeActionEvent<T = Table> extends Event<T> {
   action: 'add' | 'remove' | 'modify';
   column: Column;
 }
@@ -161,17 +161,17 @@ export default interface TableEventMap extends WidgetEventMap {
   'allRowsDeleted': TableAllRowsDeletedEvent;
   'appLinkAction': TableAppLinkActionEvent;
   'cancelCellEdit': TableCancelCellEditEvent;
-  'clipboardExport': Event<Table>;
+  'clipboardExport': Event;
   'columnMoved': TableColumnMovedEvent;
   'columnResized': TableColumnResizedEvent;
   'columnResizedToFit': TableColumnResizedToFitEvent;
-  'columnStructureChanged': Event<Table>;
+  'columnStructureChanged': Event;
   'completeCellEdit': TableCompleteCellEditEvent;
   'drop': TableDropEvent;
-  'filter': Event<Table>;
+  'filter': Event;
   'filterAdded': TableFilterAddedEvent;
   'filterRemoved': TableFilterRemovedEvent;
-  'filterReset': Event<Table>;
+  'filterReset': Event;
   'filtersRemoved': TableFiltersRemovedEvent;
   'group': TableGroupEvent;
   'prepareCellEdit': TablePrepareCellEditEvent;
@@ -188,44 +188,44 @@ export default interface TableEventMap extends WidgetEventMap {
   'rowsUpdated': TableRowsUpdatedEvent;
   'sort': TableSortEvent;
   'startCellEdit': TableStartCellEditEvent;
-  'statusChanged': Event<Table>;
+  'statusChanged': Event;
   'columnBackgroundEffectChanged': TableColumnBackgroundEffectChangedEvent;
   'columnOrganizeAction': TableColumnOrganizeActionEvent;
-  'propertyChange:autoResizeColumns': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:checkable': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:checkableStyle': PropertyChangeEvent<TableCheckableStyle, Table>;
-  'propertyChange:compact': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:contextColumn': PropertyChangeEvent<Column, Table>;
-  'propertyChange:dropMaximumSize': PropertyChangeEvent<number, Table>;
-  'propertyChange:dropType': PropertyChangeEvent<DragAndDropType, Table>;
-  'propertyChange:footerVisible': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:groupingStyle': PropertyChangeEvent<TableGroupingStyle, Table>;
-  'propertyChange:headerEnabled': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:headerMenusEnabled': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:headerVisible': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:hierarchical': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:hierarchicalStyle': PropertyChangeEvent<TableHierarchicalStyle, Table>;
-  'propertyChange:keyStrokes': PropertyChangeEvent<KeyStroke[], Table>;
-  'propertyChange:menuBarVisible': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:menus': PropertyChangeEvent<Menu[], Table>;
-  'propertyChange:multiCheck': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:multiSelect': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:multilineText': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:rowIconColumnWidth': PropertyChangeEvent<number, Table>;
-  'propertyChange:rowIconVisible': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:rowLevelPadding': PropertyChangeEvent<number, Table>;
-  'propertyChange:scrollToSelection': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:selectedRows': PropertyChangeEvent<TableRow[], Table>;
-  'propertyChange:sortEnabled': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:staticMenus': PropertyChangeEvent<Menu[], Table>;
-  'propertyChange:tableControls': PropertyChangeEvent<TableControl[], Table>;
-  'propertyChange:tableStatus': PropertyChangeEvent<Status, Table>;
-  'propertyChange:tableStatusVisible': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:textFilterEnabled': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:tileMode': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:tileProducer': PropertyChangeEvent<(row: TableRow) => Tile, Table>;
-  'propertyChange:tileTableHeader': PropertyChangeEvent<TileTableHeaderBox, Table>;
-  'propertyChange:truncatedCellTooltipEnabled': PropertyChangeEvent<boolean, Table>;
-  'propertyChange:viewRangeSize': PropertyChangeEvent<number, Table>;
-  'propertyChange:virtual': PropertyChangeEvent<boolean, Table>;
+  'propertyChange:autoResizeColumns': PropertyChangeEvent<boolean>;
+  'propertyChange:checkable': PropertyChangeEvent<boolean>;
+  'propertyChange:checkableStyle': PropertyChangeEvent<TableCheckableStyle>;
+  'propertyChange:compact': PropertyChangeEvent<boolean>;
+  'propertyChange:contextColumn': PropertyChangeEvent<Column>;
+  'propertyChange:dropMaximumSize': PropertyChangeEvent<number>;
+  'propertyChange:dropType': PropertyChangeEvent<DragAndDropType>;
+  'propertyChange:footerVisible': PropertyChangeEvent<boolean>;
+  'propertyChange:groupingStyle': PropertyChangeEvent<TableGroupingStyle>;
+  'propertyChange:headerEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:headerMenusEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:headerVisible': PropertyChangeEvent<boolean>;
+  'propertyChange:hierarchical': PropertyChangeEvent<boolean>;
+  'propertyChange:hierarchicalStyle': PropertyChangeEvent<TableHierarchicalStyle>;
+  'propertyChange:keyStrokes': PropertyChangeEvent<KeyStroke[]>;
+  'propertyChange:menuBarVisible': PropertyChangeEvent<boolean>;
+  'propertyChange:menus': PropertyChangeEvent<Menu[]>;
+  'propertyChange:multiCheck': PropertyChangeEvent<boolean>;
+  'propertyChange:multiSelect': PropertyChangeEvent<boolean>;
+  'propertyChange:multilineText': PropertyChangeEvent<boolean>;
+  'propertyChange:rowIconColumnWidth': PropertyChangeEvent<number>;
+  'propertyChange:rowIconVisible': PropertyChangeEvent<boolean>;
+  'propertyChange:rowLevelPadding': PropertyChangeEvent<number>;
+  'propertyChange:scrollToSelection': PropertyChangeEvent<boolean>;
+  'propertyChange:selectedRows': PropertyChangeEvent<TableRow[]>;
+  'propertyChange:sortEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:staticMenus': PropertyChangeEvent<Menu[]>;
+  'propertyChange:tableControls': PropertyChangeEvent<TableControl[]>;
+  'propertyChange:tableStatus': PropertyChangeEvent<Status>;
+  'propertyChange:tableStatusVisible': PropertyChangeEvent<boolean>;
+  'propertyChange:textFilterEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:tileMode': PropertyChangeEvent<boolean>;
+  'propertyChange:tileProducer': PropertyChangeEvent<(row: TableRow) => Tile>;
+  'propertyChange:tileTableHeader': PropertyChangeEvent<TileTableHeaderBox>;
+  'propertyChange:truncatedCellTooltipEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:viewRangeSize': PropertyChangeEvent<number>;
+  'propertyChange:virtual': PropertyChangeEvent<boolean>;
 }

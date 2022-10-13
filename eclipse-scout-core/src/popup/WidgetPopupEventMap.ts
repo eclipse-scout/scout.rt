@@ -10,7 +10,7 @@
  */
 import {Event, PopupEventMap, PropertyChangeEvent, Widget, WidgetPopup} from '../index';
 
-export interface WidgetPopupMoveEvent<T extends WidgetPopup = WidgetPopup> extends Event<T> {
+export interface WidgetPopupMoveEvent<T = WidgetPopup> extends Event<T> {
   top: number;
   left: number;
 }

@@ -16,10 +16,10 @@ export default interface DesktopBenchEventMap extends WidgetEventMap {
   'viewAdd': DesktopBenchViewAddEvent;
   'viewDeactivate': DesktopBenchViewDeactivateEvent;
   'viewRemove': DesktopBenchViewRemoveEvent;
-  'propertyChange:navigationHandleVisible': PropertyChangeEvent<boolean, DesktopBench>;
-  'propertyChange:outline': PropertyChangeEvent<Outline, DesktopBench>;
-  'propertyChange:outlineContent': PropertyChangeEvent<OutlineContent, DesktopBench>;
-  'propertyChange:outlineContentVisible': PropertyChangeEvent<boolean, DesktopBench>;
+  'propertyChange:navigationHandleVisible': PropertyChangeEvent<boolean>;
+  'propertyChange:outline': PropertyChangeEvent<Outline>;
+  'propertyChange:outlineContent': PropertyChangeEvent<OutlineContent>;
+  'propertyChange:outlineContentVisible': PropertyChangeEvent<boolean>;
 }
 
 export interface DesktopBenchViewActivateEvent<D extends DesktopBench = DesktopBench> extends Event<D> {

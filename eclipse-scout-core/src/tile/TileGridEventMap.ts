@@ -22,18 +22,18 @@ export interface TileClickEvent<T = TileGrid> extends Event<T> {
 export default interface TileGridEventMap extends WidgetEventMap {
   'tileAction': TileActionEvent;
   'tileClick': TileClickEvent;
-  'propertyChange:empty': PropertyChangeEvent<boolean, TileGrid>;
-  'propertyChange:filteredTiles': PropertyChangeEvent<Tile[], TileGrid>;
-  'propertyChange:gridColumnCount': PropertyChangeEvent<number, TileGrid>;
-  'propertyChange:layoutConfig': PropertyChangeEvent<TileGridLayoutConfig, TileGrid>;
-  'propertyChange:menus': PropertyChangeEvent<Menu[], TileGrid>;
-  'propertyChange:multiSelect': PropertyChangeEvent<boolean, TileGrid>;
-  'propertyChange:scrollable': PropertyChangeEvent<boolean, TileGrid>;
-  'propertyChange:selectable': PropertyChangeEvent<boolean, TileGrid>;
-  'propertyChange:selectedTiles': PropertyChangeEvent<Tile[], TileGrid>;
-  'propertyChange:textFilterEnabled': PropertyChangeEvent<boolean, TileGrid>;
-  'propertyChange:tiles': PropertyChangeEvent<Tile[], TileGrid>;
-  'propertyChange:viewRangeSize': PropertyChangeEvent<number, TileGrid>;
-  'propertyChange:virtual': PropertyChangeEvent<boolean, TileGrid>;
-  'propertyChange:withPlaceholders': PropertyChangeEvent<boolean, TileGrid>;
+  'propertyChange:empty': PropertyChangeEvent<boolean>;
+  'propertyChange:filteredTiles': PropertyChangeEvent<Tile[]>;
+  'propertyChange:gridColumnCount': PropertyChangeEvent<number>;
+  'propertyChange:layoutConfig': PropertyChangeEvent<TileGridLayoutConfig>;
+  'propertyChange:menus': PropertyChangeEvent<Menu[]>;
+  'propertyChange:multiSelect': PropertyChangeEvent<boolean>;
+  'propertyChange:scrollable': PropertyChangeEvent<boolean>;
+  'propertyChange:selectable': PropertyChangeEvent<boolean>;
+  'propertyChange:selectedTiles': PropertyChangeEvent<Tile[]>;
+  'propertyChange:textFilterEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:tiles': PropertyChangeEvent<Tile[]>;
+  'propertyChange:viewRangeSize': PropertyChangeEvent<number>;
+  'propertyChange:virtual': PropertyChangeEvent<boolean>;
+  'propertyChange:withPlaceholders': PropertyChangeEvent<boolean>;
 }

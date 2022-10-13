@@ -355,7 +355,7 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
     if (event.type === 'destroy') {
       this._onWidgetDestroy(event);
     } else if (event.type === 'propertyChange') {
-      this._onWidgetPropertyChange(event as PropertyChangeEvent<any>);
+      this._onWidgetPropertyChange(event as PropertyChangeEvent<any, Widget>);
     }
   }
 

@@ -12,12 +12,12 @@ import {Event, PropertyChangeEvent, SimpleTab, Status, WidgetEventMap} from '../
 
 export default interface SimpleTabEventMap extends WidgetEventMap {
   'click': Event<SimpleTab>;
-  'propertyChange:closable': PropertyChangeEvent<boolean, SimpleTab>;
-  'propertyChange:iconId': PropertyChangeEvent<string, SimpleTab>;
-  'propertyChange:saveNeeded': PropertyChangeEvent<boolean, SimpleTab>;
-  'propertyChange:saveNeededVisible': PropertyChangeEvent<boolean, SimpleTab>;
-  'propertyChange:selected': PropertyChangeEvent<boolean, SimpleTab>;
-  'propertyChange:status': PropertyChangeEvent<Status, SimpleTab>;
-  'propertyChange:subTitle': PropertyChangeEvent<string, SimpleTab>;
-  'propertyChange:title': PropertyChangeEvent<string, SimpleTab>;
+  'propertyChange:closable': PropertyChangeEvent<boolean>;
+  'propertyChange:iconId': PropertyChangeEvent<string>;
+  'propertyChange:saveNeeded': PropertyChangeEvent<boolean>;
+  'propertyChange:saveNeededVisible': PropertyChangeEvent<boolean>;
+  'propertyChange:selected': PropertyChangeEvent<boolean>;
+  'propertyChange:status': PropertyChangeEvent<Status>;
+  'propertyChange:subTitle': PropertyChangeEvent<string>;
+  'propertyChange:title': PropertyChangeEvent<string>;
 }

@@ -9,25 +9,25 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Column, PropertyChangeEvent, PropertyEventMap} from '../../index';
+import {PropertyChangeEvent, PropertyEventMap} from '../../index';
 import {HorizontalAlignment} from '../../cell/Cell';
 
 export default interface ColumnEventMap extends PropertyEventMap {
-  'propertyChange:autoOptimizeWidth': PropertyChangeEvent<boolean, Column>;
-  'propertyChange:compacted': PropertyChangeEvent<boolean, Column>;
-  'propertyChange:cssClass': PropertyChangeEvent<string, Column>;
-  'propertyChange:displayable': PropertyChangeEvent<boolean, Column>;
-  'propertyChange:editable': PropertyChangeEvent<boolean, Column>;
-  'propertyChange:headerCssClass': PropertyChangeEvent<string, Column>;
-  'propertyChange:headerHtmlEnabled': PropertyChangeEvent<boolean, Column>;
-  'propertyChange:headerIconId': PropertyChangeEvent<string, Column>;
-  'propertyChange:headerTooltipHtmlEnabled': PropertyChangeEvent<boolean, Column>;
-  'propertyChange:headerTooltipText': PropertyChangeEvent<string, Column>;
-  'propertyChange:horizontalAlignment': PropertyChangeEvent<HorizontalAlignment, Column>;
-  'propertyChange:mandatory': PropertyChangeEvent<boolean, Column>;
-  'propertyChange:maxLength': PropertyChangeEvent<number, Column>;
-  'propertyChange:text': PropertyChangeEvent<string, Column>;
-  'propertyChange:textWrap': PropertyChangeEvent<boolean, Column>;
-  'propertyChange:visible': PropertyChangeEvent<boolean, Column>;
-  'propertyChange:width': PropertyChangeEvent<number, Column>;
+  'propertyChange:autoOptimizeWidth': PropertyChangeEvent<boolean>;
+  'propertyChange:compacted': PropertyChangeEvent<boolean>;
+  'propertyChange:cssClass': PropertyChangeEvent<string>;
+  'propertyChange:displayable': PropertyChangeEvent<boolean>;
+  'propertyChange:editable': PropertyChangeEvent<boolean>;
+  'propertyChange:headerCssClass': PropertyChangeEvent<string>;
+  'propertyChange:headerHtmlEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:headerIconId': PropertyChangeEvent<string>;
+  'propertyChange:headerTooltipHtmlEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:headerTooltipText': PropertyChangeEvent<string>;
+  'propertyChange:horizontalAlignment': PropertyChangeEvent<HorizontalAlignment>;
+  'propertyChange:mandatory': PropertyChangeEvent<boolean>;
+  'propertyChange:maxLength': PropertyChangeEvent<number>;
+  'propertyChange:text': PropertyChangeEvent<string>;
+  'propertyChange:textWrap': PropertyChangeEvent<boolean>;
+  'propertyChange:visible': PropertyChangeEvent<boolean>;
+  'propertyChange:width': PropertyChangeEvent<number>;
 }

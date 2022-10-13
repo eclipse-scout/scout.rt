@@ -12,54 +12,54 @@ import {Event, KeyStroke, Menu, PropertyChangeEvent, Tree, TreeNode, WidgetEvent
 import {TreeCheckableStyle, TreeDisplayStyle} from './Tree';
 import {FileDropEvent} from '../util/dragAndDrop';
 
-export interface TreeAllChildNodesDeletedEvent<T extends Tree = Tree> extends Event<T> {
+export interface TreeAllChildNodesDeletedEvent<T = Tree> extends Event<T> {
   parentNode: TreeNode;
 }
 
-export interface TreeChildNodeOrderChangedEvent<T extends Tree = Tree> extends Event<T> {
+export interface TreeChildNodeOrderChangedEvent<T = Tree> extends Event<T> {
   parentNode: TreeNode;
 }
 
-export interface TreeDropEvent<T extends Tree = Tree> extends Event<T>, FileDropEvent {
+export interface TreeDropEvent<T = Tree> extends Event<T>, FileDropEvent {
 }
 
-export interface TreeNodeActionEvent<T extends Tree = Tree> extends Event<T> {
+export interface TreeNodeActionEvent<T = Tree> extends Event<T> {
   node: TreeNode;
 }
 
-export interface TreeNodeChangedEvent<T extends Tree = Tree> extends Event<T> {
+export interface TreeNodeChangedEvent<T = Tree> extends Event<T> {
   node: TreeNode;
 }
 
-export interface TreeNodeClickEvent<T extends Tree = Tree> extends Event<T> {
+export interface TreeNodeClickEvent<T = Tree> extends Event<T> {
   node: TreeNode;
 }
 
-export interface TreeNodeExpandedEvent<T extends Tree = Tree> extends Event<T> {
+export interface TreeNodeExpandedEvent<T = Tree> extends Event<T> {
   node: TreeNode;
   expanded: boolean;
   expandedLazy: boolean;
 }
 
-export interface TreeNodesCheckedEvent<T extends Tree = Tree> extends Event<T> {
+export interface TreeNodesCheckedEvent<T = Tree> extends Event<T> {
   nodes: TreeNode[];
 }
 
-export interface TreeNodesDeletedEvent<T extends Tree = Tree> extends Event<T> {
-  nodes: TreeNode[];
-  parentNode: TreeNode;
-}
-
-export interface TreeNodesInsertedEvent<T extends Tree = Tree> extends Event<T> {
+export interface TreeNodesDeletedEvent<T = Tree> extends Event<T> {
   nodes: TreeNode[];
   parentNode: TreeNode;
 }
 
-export interface TreeNodesSelectedEvent<T extends Tree = Tree> extends Event<T> {
+export interface TreeNodesInsertedEvent<T = Tree> extends Event<T> {
+  nodes: TreeNode[];
+  parentNode: TreeNode;
+}
+
+export interface TreeNodesSelectedEvent<T = Tree> extends Event<T> {
   debounce: boolean;
 }
 
-export interface TreeNodesUpdatedEvent<T extends Tree = Tree> extends Event<T> {
+export interface TreeNodesUpdatedEvent<T = Tree> extends Event<T> {
   nodes: TreeNode[];
 }
 
@@ -76,15 +76,15 @@ export default interface TreeEventMap extends WidgetEventMap {
   'nodesInserted': TreeNodesInsertedEvent;
   'nodesSelected': TreeNodesSelectedEvent;
   'nodesUpdated': TreeNodesUpdatedEvent;
-  'propertyChange:breadcrumbTogglingThreshold': PropertyChangeEvent<number, Tree>;
-  'propertyChange:checkable': PropertyChangeEvent<boolean, Tree>;
-  'propertyChange:checkableStyle': PropertyChangeEvent<TreeCheckableStyle, Tree>;
-  'propertyChange:displayStyle': PropertyChangeEvent<TreeDisplayStyle, Tree>;
-  'propertyChange:dropMaximumSize': PropertyChangeEvent<number, Tree>;
-  'propertyChange:dropType': PropertyChangeEvent<number, Tree>;
-  'propertyChange:keyStrokes': PropertyChangeEvent<KeyStroke[], Tree>;
-  'propertyChange:menus': PropertyChangeEvent<Menu[], Tree>;
-  'propertyChange:textFilterEnabled': PropertyChangeEvent<boolean, Tree>;
-  'propertyChange:toggleBreadcrumbStyleEnabled': PropertyChangeEvent<boolean, Tree>;
-  'propertyChange:viewRangeSize': PropertyChangeEvent<number, Tree>;
+  'propertyChange:breadcrumbTogglingThreshold': PropertyChangeEvent<number>;
+  'propertyChange:checkable': PropertyChangeEvent<boolean>;
+  'propertyChange:checkableStyle': PropertyChangeEvent<TreeCheckableStyle>;
+  'propertyChange:displayStyle': PropertyChangeEvent<TreeDisplayStyle>;
+  'propertyChange:dropMaximumSize': PropertyChangeEvent<number>;
+  'propertyChange:dropType': PropertyChangeEvent<number>;
+  'propertyChange:keyStrokes': PropertyChangeEvent<KeyStroke[]>;
+  'propertyChange:menus': PropertyChangeEvent<Menu[]>;
+  'propertyChange:textFilterEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:toggleBreadcrumbStyleEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:viewRangeSize': PropertyChangeEvent<number>;
 }

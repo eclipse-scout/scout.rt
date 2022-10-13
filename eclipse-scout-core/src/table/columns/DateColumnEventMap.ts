@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnEventMap, DateColumn, DateFormat, PropertyChangeEvent} from '../../index';
+import {ColumnEventMap, DateFormat, PropertyChangeEvent} from '../../index';
 
 export default interface DateColumnEventMap extends ColumnEventMap {
-  'propertyChange:format': PropertyChangeEvent<DateFormat, DateColumn>;
-  'propertyChange:groupFormat': PropertyChangeEvent<DateFormat, DateColumn>;
+  'propertyChange:format': PropertyChangeEvent<DateFormat>;
+  'propertyChange:groupFormat': PropertyChangeEvent<DateFormat>;
 }
