@@ -11,7 +11,7 @@
 import {Form, FormLifecycleModel, Lifecycle, scout, Status, strings, ValueField} from '../../index';
 import {ValidationResult} from '../Form';
 
-export default class FormLifecycle<VALIDATION_RESULT extends ValidationResult = ValidationResult> extends Lifecycle<VALIDATION_RESULT> implements FormLifecycleModel {
+export default class FormLifecycle<TValidationResult extends ValidationResult = ValidationResult> extends Lifecycle<TValidationResult> implements FormLifecycleModel {
   declare model: FormLifecycleModel;
   declare widget: Form;
 
@@ -37,7 +37,7 @@ export default class FormLifecycle<VALIDATION_RESULT extends ValidationResult = 
     });
   }
 
-  protected override _invalidElements(): { missingElements: VALIDATION_RESULT[]; invalidElements: VALIDATION_RESULT[] } {
+  protected override _invalidElements(): { missingElements: TValidationResult[]; invalidElements: TValidationResult[] } {
     let missingFields = [];
     let invalidFields = [];
 
@@ -62,11 +62,11 @@ export default class FormLifecycle<VALIDATION_RESULT extends ValidationResult = 
     };
   }
 
-  protected override _invalidElementText(element: VALIDATION_RESULT): string {
+  protected override _invalidElementText(element: TValidationResult): string {
     return strings.plainText(element.label);
   }
 
-  protected override _missingElementText(element: VALIDATION_RESULT): string {
+  protected override _missingElementText(element: TValidationResult): string {
     return strings.plainText(element.label);
   }
 
@@ -75,7 +75,7 @@ export default class FormLifecycle<VALIDATION_RESULT extends ValidationResult = 
     return this.widget._validate();
   }
 
-  protected override _revealInvalidElement(invalidElement: VALIDATION_RESULT) {
+  protected override _revealInvalidElement(invalidElement: TValidationResult) {
     this.widget.revealInvalidField(invalidElement);
   }
 

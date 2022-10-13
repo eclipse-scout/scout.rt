@@ -14,7 +14,7 @@ import MouseDownEvent = JQuery.MouseDownEvent;
 
 export type GroupCollapseStyle = EnumObject<typeof Group.CollapseStyle>;
 
-export default class Group<Body extends Widget = Widget> extends Widget implements GroupModel {
+export default class Group<TBody extends Widget = Widget> extends Widget implements GroupModel<TBody> {
   declare model: GroupModel;
   declare eventMap: GroupEventMap;
 
@@ -27,7 +27,7 @@ export default class Group<Body extends Widget = Widget> extends Widget implemen
   header: Widget;
   headerFocusable: boolean;
   headerVisible: boolean;
-  body: Body;
+  body: TBody;
   collapseStyle: GroupCollapseStyle;
   htmlHeader: HtmlComponent;
   htmlFooter: HtmlComponent;
@@ -249,11 +249,11 @@ export default class Group<Body extends Widget = Widget> extends Widget implemen
   }
 
   /** @see GroupModel.body */
-  setBody(body: Widget) {
+  setBody(body: TBody) {
     this.setProperty('body', body);
   }
 
-  protected _setBody(body: Widget) {
+  protected _setBody(body: TBody) {
     if (!body) {
       // Create empty body if no body was provided
       body = scout.create(Widget, {
@@ -262,7 +262,7 @@ export default class Group<Body extends Widget = Widget> extends Widget implemen
           this.$container = this.$parent.appendDiv('group');
           this.htmlComp = HtmlComponent.install(this.$container, this.session);
         }
-      });
+      }) as TBody;
     }
     this._setProperty('body', body);
   }

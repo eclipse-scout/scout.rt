@@ -17,11 +17,11 @@ import {objects, QueryBy} from '../index';
  * with the parameters from the result. If the parameters don't match, we simply ignore the
  * result, because it is out-dated.
  */
-export default class RemoteLookupRequest<DATA> {
+export default class RemoteLookupRequest<TData> {
   requestType: QueryBy;
-  requestData: DATA;
+  requestData: TData;
 
-  constructor(requestType: QueryBy, requestData?: DATA) {
+  constructor(requestType: QueryBy, requestData?: TData) {
     if (!QueryBy.hasOwnProperty(requestType)) {
       throw new Error('Invalid enum value');
     }

@@ -42,7 +42,7 @@ import Deferred = JQuery.Deferred;
  * 4. Hard-coded properties that are fundamental to the respective queryBy mode (cannot be overridden).
  *    These are: 'ids' (KEY, KEYS) and 'text' (TEXT)
  */
-export default class RestLookupCall<Key> extends LookupCall<Key> {
+export default class RestLookupCall<TKey> extends LookupCall<TKey> {
 
   resourceUrl: string;
   maxTextLength: number;
@@ -50,7 +50,7 @@ export default class RestLookupCall<Key> extends LookupCall<Key> {
 
   protected _restriction: Record<string, any>;
   protected _ajaxCall: AjaxCall;
-  protected _deferred: Deferred<LookupResult<Key>, { canceled: boolean }>;
+  protected _deferred: Deferred<LookupResult<TKey>, { canceled: boolean }>;
 
   constructor() {
     super();
@@ -92,41 +92,41 @@ export default class RestLookupCall<Key> extends LookupCall<Key> {
     }
   }
 
-  protected override _getAll(): JQuery.Promise<LookupResult<Key>> {
+  protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
     return this._call();
   }
 
-  protected override _getByText(text: string): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
     this.addRestriction('text', text);
     return this._call();
   }
 
-  protected override _getByKey(key: Key): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
     this.addRestriction('ids', arrays.ensure(key));
     return this._call();
   }
 
-  protected override _getByKeys(keys: Key[]): JQuery.Promise<LookupResult<Key>> {
+  protected override _getByKeys(keys: TKey[]): JQuery.Promise<LookupResult<TKey>> {
     this.addRestriction('ids', arrays.ensure(keys));
     return this._call();
   }
 
-  override cloneForAll(): RestLookupCall<Key> {
-    let clone = super.cloneForAll() as RestLookupCall<Key>;
+  override cloneForAll(): RestLookupCall<TKey> {
+    let clone = super.cloneForAll() as RestLookupCall<TKey>;
     clone._addRestrictionIfAbsent('active', true);
     clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
     return clone;
   }
 
-  override cloneForText(text: string): RestLookupCall<Key> {
-    let clone = super.cloneForText(text) as RestLookupCall<Key>;
+  override cloneForText(text: string): RestLookupCall<TKey> {
+    let clone = super.cloneForText(text) as RestLookupCall<TKey>;
     clone._addRestrictionIfAbsent('active', true);
     clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
     return clone;
   }
 
-  override cloneForRec(parentKey: Key): RestLookupCall<Key> {
-    let clone = super.cloneForRec(parentKey) as RestLookupCall<Key>;
+  override cloneForRec(parentKey: TKey): RestLookupCall<TKey> {
+    let clone = super.cloneForRec(parentKey) as RestLookupCall<TKey>;
     clone._addRestrictionIfAbsent('active', true);
     clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
     return clone;
@@ -136,9 +136,9 @@ export default class RestLookupCall<Key> extends LookupCall<Key> {
     return true;
   }
 
-  protected _createLookupRowFromDo(lookupRowDo: LookupRowDo<Key>): LookupRow<Key> {
+  protected _createLookupRowFromDo(lookupRowDo: LookupRowDo<TKey>): LookupRow<TKey> {
     // propagate all properties from lookup row DO to scout lookup row (there might be custom ones on specific lookup row DOs)
-    let clonedLookupRowDo = $.extend({}, lookupRowDo) as LookupRowDo<Key> & LookupRowModel<Key>;
+    let clonedLookupRowDo = $.extend({}, lookupRowDo) as LookupRowDo<TKey> & LookupRowModel<TKey>;
 
     // [text, enabled, active, iconId, cssClass, tooltipText, additionalTableRowData] are the same for LookupRow.ts and LookupRowDo.java
     // [backgroundColor, foregroundColor, font] currently not supported by LookupRowDo.java
@@ -162,10 +162,10 @@ export default class RestLookupCall<Key> extends LookupCall<Key> {
       }
     }
 
-    return scout.create(LookupRow, clonedLookupRowDo, {ensureUniqueId: false}) as LookupRow<Key>;
+    return scout.create(LookupRow, clonedLookupRowDo, {ensureUniqueId: false}) as LookupRow<TKey>;
   }
 
-  protected _call(): JQuery.Promise<LookupResult<Key>> {
+  protected _call(): JQuery.Promise<LookupResult<TKey>> {
     this._deferred = $.Deferred();
     this._ajaxCall = this._createAjaxCall();
 

@@ -10,8 +10,8 @@
  */
 import {Event} from '../index';
 
-export default interface PropertyChangeEvent<Value = any, Source = object> extends Event<Source> {
+export default interface PropertyChangeEvent<TValue = any, TSource = object> extends Event<TSource> {
   propertyName: string;
-  oldValue: Value;
-  newValue: Value;
+  oldValue: TValue;
+  newValue: TValue;
 }

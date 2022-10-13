@@ -10,10 +10,10 @@
  */
 import {Action, ModeModel} from '../index';
 
-export default class Mode<T> extends Action implements ModeModel<T> {
-  declare model: ModeModel<T>;
+export default class Mode<TRef = any> extends Action implements ModeModel<TRef> {
+  declare model: ModeModel<TRef>;
 
-  ref: T;
+  ref: TRef;
 
   constructor() {
     super();
@@ -22,7 +22,7 @@ export default class Mode<T> extends Action implements ModeModel<T> {
     this.ref = null;
   }
 
-  protected override _init(model: ModeModel<T>) {
+  protected override _init(model: ModeModel<TRef>) {
     model.owner = model.parent;
     super._init(model);
   }
