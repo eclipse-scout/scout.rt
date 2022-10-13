@@ -11,7 +11,7 @@
 import {DisplayParent, Event, MessageBox, PropertyChangeEvent, WidgetEventMap} from '../index';
 import {MessageBoxOption} from './MessageBox';
 
-export interface MessageBoxActionEvent<T extends MessageBox = MessageBox> extends Event<T> {
+export interface MessageBoxActionEvent<T = MessageBox> extends Event<T> {
   option: MessageBoxOption;
 }
 

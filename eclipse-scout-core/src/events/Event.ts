@@ -10,7 +10,7 @@
  */
 import $ from 'jquery';
 
-export default class Event<T = any> {
+export default class Event<T = object> {
   source: T;
   defaultPrevented: boolean;
   type: string;

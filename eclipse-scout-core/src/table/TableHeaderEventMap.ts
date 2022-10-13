@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PropertyChangeEvent, TableHeader, WidgetEventMap} from '../index';
+import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export default interface TableHeaderEventMap extends WidgetEventMap {
-  'propertyChange:headerMenusEnabled': PropertyChangeEvent<boolean, TableHeader>;
+  'propertyChange:headerMenusEnabled': PropertyChangeEvent<boolean>;
 }

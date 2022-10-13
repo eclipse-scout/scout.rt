@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {IFrame, PropertyChangeEvent, WidgetEventMap} from '../index';
+import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export default interface IFrameEventMap extends WidgetEventMap {
-  'propertyChange:location': PropertyChangeEvent<string, IFrame>;
-  'propertyChange:sandboxEnabled': PropertyChangeEvent<boolean, IFrame>;
-  'propertyChange:sandboxPermissions': PropertyChangeEvent<string, IFrame>;
-  'propertyChange:scrollBarEnabled': PropertyChangeEvent<boolean, IFrame>;
-  'propertyChange:trackLocation': PropertyChangeEvent<boolean, IFrame>;
+  'propertyChange:location': PropertyChangeEvent<string>;
+  'propertyChange:sandboxEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:sandboxPermissions': PropertyChangeEvent<string>;
+  'propertyChange:scrollBarEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:trackLocation': PropertyChangeEvent<boolean>;
 }

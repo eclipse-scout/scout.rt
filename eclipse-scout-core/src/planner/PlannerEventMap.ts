@@ -17,13 +17,13 @@ export interface PlannerResourcesSelectedEvent<P extends Planner = Planner> exte
 
 export default interface PlannerEventMap extends WidgetEventMap {
   'resourcesSelected': PlannerResourcesSelectedEvent;
-  'propertyChange:availableDisplayModes': PropertyChangeEvent<PlannerDisplayMode[], Planner>;
-  'propertyChange:displayMode': PropertyChangeEvent<PlannerDisplayMode, Planner>;
-  'propertyChange:displayModeOptions': PropertyChangeEvent<Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>, Planner>;
-  'propertyChange:menus': PropertyChangeEvent<Menu[], Planner>;
-  'propertyChange:selectedActivity': PropertyChangeEvent<PlannerActivity, Planner>;
-  'propertyChange:selectedResources': PropertyChangeEvent<PlannerResource[], Planner>;
-  'propertyChange:selectionRange': PropertyChangeEvent<DateRange, Planner>;
-  'propertyChange:viewRange': PropertyChangeEvent<DateRange, Planner>;
-  'propertyChange:yearPanelVisible': PropertyChangeEvent<boolean, Planner>;
+  'propertyChange:availableDisplayModes': PropertyChangeEvent<PlannerDisplayMode[]>;
+  'propertyChange:displayMode': PropertyChangeEvent<PlannerDisplayMode>;
+  'propertyChange:displayModeOptions': PropertyChangeEvent<Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>>;
+  'propertyChange:menus': PropertyChangeEvent<Menu[]>;
+  'propertyChange:selectedActivity': PropertyChangeEvent<PlannerActivity>;
+  'propertyChange:selectedResources': PropertyChangeEvent<PlannerResource[]>;
+  'propertyChange:selectionRange': PropertyChangeEvent<DateRange>;
+  'propertyChange:viewRange': PropertyChangeEvent<DateRange>;
+  'propertyChange:yearPanelVisible': PropertyChangeEvent<boolean>;
 }

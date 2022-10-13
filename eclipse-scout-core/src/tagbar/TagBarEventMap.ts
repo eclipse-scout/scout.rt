@@ -10,11 +10,11 @@
  */
 import {Event, PropertyChangeEvent, TagBar, WidgetEventMap} from '../index';
 
-export interface TagBarTagClickEvent<T extends TagBar = TagBar> extends Event<T> {
+export interface TagBarTagClickEvent<T = TagBar> extends Event<T> {
   tag: string;
 }
 
-export interface TagBarTagRemoveEvent<T extends TagBar = TagBar> extends Event<T> {
+export interface TagBarTagRemoveEvent<T = TagBar> extends Event<T> {
   tag: string;
   $tag: JQuery;
 }

@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PropertyChangeEvent, TableHeaderMenuGroup, WidgetEventMap} from '../index';
+import {PropertyChangeEvent, WidgetEventMap} from '../index';
 
 export default interface TableHeaderMenuGroupEventMap extends WidgetEventMap {
-  'propertyChange:last': PropertyChangeEvent<boolean, TableHeaderMenuGroup>;
+  'propertyChange:last': PropertyChangeEvent<boolean>;
 }
