@@ -11,27 +11,29 @@
 // circle
 
 export default class VennCircle {
+  labels: Label[];
+  $circle: JQuery<SVGElement>;
+  x: number;
+  y: number;
+  r: number;
+  legend: string;
+  legendR: number;
+  legendH: -1 | 1;
+  legendV: -1 | 1;
 
-  constructor($circle) {
+  constructor($circle: JQuery<SVGElement>) {
     this.$circle = $circle;
-    this.x;
-    this.y;
-    this.r;
-    this.legend;
-    this.legendR;
-    this.legendH;
-    this.legendV;
     this.labels = [];
   }
 
-  setLegend(legend, horizontal, vertical, r) {
+  setLegend(legend: string, horizontal: -1 | 1, vertical: -1 | 1, r?: number) {
     this.legend = legend;
     this.legendH = horizontal;
     this.legendV = vertical;
     this.legendR = r || this.r;
   }
 
-  addLabel(text, x, y) {
+  addLabel(text: number, x: number, y: number) {
     this.labels.push({
       text: text,
       x: x,
@@ -39,3 +41,10 @@ export default class VennCircle {
     });
   }
 }
+
+export type Label = {
+  text: number;
+  x: number;
+  y: number;
+};
+

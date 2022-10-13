@@ -8,21 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModelAdapter} from '@eclipse-scout/core';
+import {Event, ModelAdapter} from '@eclipse-scout/core';
+import {Chart} from '../index';
+import {ChartValueClickEvent} from './ChartEventMap';
 
-export default class ChartAdapter extends ModelAdapter {
+export default class ChartAdapter<C extends Chart = Chart> extends ModelAdapter<C> {
 
   constructor() {
     super();
   }
 
-  _onWidgetValueClick(event) {
+  protected _onWidgetValueClick(event: ChartValueClickEvent<C>) {
     this._send('valueClick', event.data);
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<C>) {
     if (event.type === 'valueClick') {
-      this._onWidgetValueClick(event);
+      this._onWidgetValueClick(event as ChartValueClickEvent<C>);
     } else {
       super._onWidgetEvent(event);
     }

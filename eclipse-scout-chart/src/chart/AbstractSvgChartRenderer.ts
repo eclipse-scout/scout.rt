@@ -11,15 +11,25 @@
 import {ObjectFactory, strings, styles} from '@eclipse-scout/core';
 import $ from 'jquery';
 import {AbstractChartRenderer, Chart} from '../index';
+import {ClickObject} from './Chart';
 
 export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
+  chartBox: ChartBox;
 
-  constructor(chart) {
+  /** Clipping and masking */
+  clipId: string;
+  maskId: string;
+  suppressLegendBox: boolean;
+  height: number;
+  width: number;
+  chartAnimationStopping: boolean;
+
+  $svg: JQuery<SVGElement>;
+
+  constructor(chart: Chart) {
     super(chart);
-    this.chartBox = {};
-    this.labelBox = {};
+    this.chartBox = null;
 
-    // Clipping and masking
     this.clipId = 'Clip-' + ObjectFactory.get().createUniqueId();
     this.maskId = 'Mask-' + ObjectFactory.get().createUniqueId();
 
@@ -31,16 +41,14 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
   static FONT_SIZE_MIDDLE = 'middleFont';
   static FONT_SIZE_BIG = 'bigFont';
 
-  _render() {
+  protected override _render() {
     if (!this.$svg) {
       this.$svg = this.chart.$container.appendSVG('svg', 'chart-svg');
     }
     this.firstOpaqueBackgroundColor = styles.getFirstOpaqueBackgroundColor(this.$svg);
-    this.svgHeight = this.$svg.height();
-    this.svgWidth = this.$svg.width();
     // This works, because CSS specifies 100% width/height
-    this.height = this.svgHeight;
-    this.width = this.svgWidth;
+    this.height = this.$svg.height();
+    this.width = this.$svg.width();
     this._initChartBox();
     if (this._useFontSizeBig()) {
       this.$svg.addClass(AbstractSvgChartRenderer.FONT_SIZE_BIG);
@@ -58,27 +66,27 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     this._renderInternal();
   }
 
-  _renderInternal() {
+  protected _renderInternal() {
     // Override in subclasses
   }
 
-  _useFontSizeBig() {
+  protected _useFontSizeBig(): boolean {
     return false;
   }
 
-  _useFontSizeMiddle() {
+  protected _useFontSizeMiddle(): boolean {
     return false;
   }
 
-  _useFontSizeSmall() {
+  protected _useFontSizeSmall(): boolean {
     return false;
   }
 
-  _useFontSizeSmallest() {
+  protected _useFontSizeSmallest(): boolean {
     return false;
   }
 
-  remove(requestAnimation, afterRemoveFunc) {
+  override remove(requestAnimation = false, afterRemoveFunc?: (chartAnimationStopping?: boolean) => void) {
     if (this.rendered && !this.chartAnimationStopping) {
       this.chartAnimationStopping = true;
       this.$svg.children().stop(true, false);
@@ -87,7 +95,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     super.remove(requestAnimation, afterRemoveFunc);
   }
 
-  _remove(afterRemoveFunc) {
+  protected override _remove(afterRemoveFunc: (chartAnimationStopping?: boolean) => void) {
     // this function is called directly from renderers after all removal animations are done
     // however, other animations may have been queued in the meantime (e.g. in case the chart was removed, then added (+animation queued), and then removed again)
     if (this.rendered) {
@@ -104,11 +112,8 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
 
   /**
    * For all parameters: use null when parameter is not used or set by a chart type.
-   *
-   * @param xIndex number
-   * @param datasetIndex number
    */
-  _createClickObject(xIndex, datasetIndex) {
+  protected _createClickObject(xIndex: number, datasetIndex: number): ClickObject {
     return {
       xIndex: xIndex,
       dataIndex: xIndex,
@@ -116,15 +121,15 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     };
   }
 
-  _measureText(text, legendLabelClass) {
+  protected _measureText(text: string, legendLabelClass?: string): { height: number; width: number } {
     let $label = this.$svg.appendSVG('text', legendLabelClass)
       .attr('x', 0)
       .attr('y', 0)
       .attr('visibility', 'hidden')
-      .text(text);
+      .text(text) as JQuery<SVGGraphicsElement>;
     let textBounds;
     try {
-      // Firefox throws error when node is not in dom(already removed by navigating away). all other browser returns a boundingbox with 0
+      // Firefox throws error when node is not in dom(already removed by navigating away). all other browser returns a bounding box with 0
       textBounds = $label[0].getBBox();
     } catch (e) {
       return {
@@ -137,7 +142,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     return textBounds;
   }
 
-  _renderLine(x1, y1, x2, y2, lineClass) {
+  protected _renderLine(x1: number, y1: number, x2: number, y2: number, lineClass: string): JQuery<SVGElement> {
     let $line = this.$svg.appendSVG('line', lineClass)
       .attr('x1', x1).attr('y1', y1)
       .attr('x2', x2).attr('y2', y2);
@@ -149,7 +154,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     return $line;
   }
 
-  _renderLineLabel(x, y, label, labelClass, drawBackground) {
+  protected _renderLineLabel(x: number, y: number, label: string, labelClass: string, drawBackground: boolean): JQuery<SVGElement> {
     let $label = this.$svg.appendSVG('text', labelClass ? labelClass : 'line-label')
       .attr('x', x).attr('y', y)
       .text(label);
@@ -179,7 +184,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     return $label;
   }
 
-  _initChartBox() {
+  protected _initChartBox() {
     this.chartBox = {
       width: this.width,
       height: this.height,
@@ -194,7 +199,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     };
   }
 
-  _createAnimationObjectWithTabIndexRemoval(animationFunc, duration) {
+  protected _createAnimationObjectWithTabIndexRemoval<T>(animationFunc: (now: number, tween: JQuery.Tween<T>) => void, duration?: number): JQuery.EffectsOptions<T> {
     return {
       step: function(now, fx) {
         try {
@@ -212,7 +217,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     };
   }
 
-  _addClipping(cssClass) {
+  protected _addClipping(cssClass: string) {
     // add clip and mask paths for all relevant objects
     let $clip = this.$svg
       .appendSVG('clipPath');
@@ -234,19 +239,22 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     });
   }
 
-  _renderWireLegend(text, legendPositions, className, drawBackgroundBox) {
-    let legend = {
-      detachFunc: () => {
-      },
-      attachFunc: () => {
-      },
-      removeFunc: () => {
-      }
-    };
+  protected _renderWireLegend(text: string, legendPositions: LegendPositions, className: string, drawBackgroundBox?: boolean): Legend {
     if (!this.chart.config.options.plugins.tooltip.enabled) {
-      return legend;
+      return {
+        detachFunc: () => {
+          // nop
+        },
+        attachFunc: () => {
+          // nop
+        },
+        removeFunc: () => {
+          // nop
+        }
+      };
     }
-    let padding = 5,
+    let legend = {} as Legend,
+      padding = 5,
       $background,
       backgroundWidth = 0,
       lineHeight = 17,
@@ -274,7 +282,7 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
       for (let i = 0; i < text.length; i++) {
         let posIndex = text.length - i - 1;
         let yPos = positions.y2 + positions.v * padding - lineHeight * posIndex - padding * posIndex;
-        let $line = this._renderLineLabel(positions.x2 + padding, yPos, strings.truncateText(text[i], horizontalSpace, this._measureText.bind(this)), '', drawBackgroundBox);
+        let $line = this._renderLineLabel(positions.x2 + padding, yPos, strings.truncateText(text[i], horizontalSpace, this._measureText.bind(this)), '', drawBackgroundBox) as JQuery<SVGTextContentElement>;
         $line.addClass(className);
         lengthLegend = Math.max(lengthLegend, $line[0].getComputedTextLength());
         if (i === 0) {
@@ -417,3 +425,30 @@ export default class AbstractSvgChartRenderer extends AbstractChartRenderer {
     return legend;
   }
 }
+
+export type ChartBox = {
+  width: number;
+  height: number;
+  xOffset: number;
+  yOffset: number;
+  mX: () => number;
+  mY: () => number;
+};
+
+export type Legend = {
+  $field?: JQuery;
+  detachFunc: () => void;
+  attachFunc: () => void;
+  removeFunc: () => void;
+};
+
+export type LegendPositions = {
+  x1: number;
+  x2: number;
+  y1: number;
+  y2: number;
+  v: number;
+  h: number;
+  autoPosition: boolean;
+  posFunc: (labelWidth: number, labelHeight: number) => LegendPositions;
+};
