@@ -11,7 +11,8 @@
 import {App, arrays, CellModel, defaultValues, Event, ModelAdapter, objects, RemoteEvent, scout, Tree, TreeNode, TreeNodeModel} from '../index';
 import {TreeDropEvent, TreeNodeActionEvent, TreeNodeClickEvent, TreeNodeExpandedEvent, TreeNodesCheckedEvent, TreeNodesSelectedEvent} from './TreeEventMap';
 
-export default class TreeAdapter<T extends Tree = Tree> extends ModelAdapter<T> {
+export default class TreeAdapter extends ModelAdapter {
+  declare widget: Tree;
 
   constructor() {
     super();
@@ -33,25 +34,25 @@ export default class TreeAdapter<T extends Tree = Tree> extends ModelAdapter<T> 
     });
   }
 
-  protected _onWidgetNodeClick(event: TreeNodeClickEvent<T>) {
+  protected _onWidgetNodeClick(event: TreeNodeClickEvent) {
     this._send('nodeClick', {
       nodeId: event.node.id
     });
   }
 
-  protected _onWidgetNodeAction(event: TreeNodeActionEvent<T>) {
+  protected _onWidgetNodeAction(event: TreeNodeActionEvent) {
     this._send('nodeAction', {
       nodeId: event.node.id
     });
   }
 
-  protected _onWidgetNodesSelected(event: TreeNodesSelectedEvent<T>) {
+  protected _onWidgetNodesSelected(event: TreeNodesSelectedEvent) {
     // @ts-ignore
     let nodeIds = this.widget._nodesToIds(this.widget.selectedNodes);
     this._sendNodesSelected(nodeIds, event.debounce);
   }
 
-  protected _onWidgetNodeExpanded(event: TreeNodeExpandedEvent<T>) {
+  protected _onWidgetNodeExpanded(event: TreeNodeExpandedEvent) {
     this._send('nodeExpanded', {
       nodeId: event.node.id,
       expanded: event.expanded,
@@ -59,7 +60,7 @@ export default class TreeAdapter<T extends Tree = Tree> extends ModelAdapter<T> 
     });
   }
 
-  protected _onWidgetNodesChecked(event: TreeNodesCheckedEvent<T>) {
+  protected _onWidgetNodesChecked(event: TreeNodesCheckedEvent) {
     this._sendNodesChecked(event.nodes);
   }
 
@@ -78,19 +79,19 @@ export default class TreeAdapter<T extends Tree = Tree> extends ModelAdapter<T> 
     this._send('nodesChecked', data);
   }
 
-  protected override _onWidgetEvent(event: Event<T>) {
+  protected override _onWidgetEvent(event: Event<Tree>) {
     if (event.type === 'nodesSelected') {
-      this._onWidgetNodesSelected(event as TreeNodesSelectedEvent<T>);
+      this._onWidgetNodesSelected(event as TreeNodesSelectedEvent);
     } else if (event.type === 'nodeClick') {
-      this._onWidgetNodeClick(event as TreeNodeClickEvent<T>);
+      this._onWidgetNodeClick(event as TreeNodeClickEvent);
     } else if (event.type === 'nodeAction') {
-      this._onWidgetNodeAction(event as TreeNodeActionEvent<T>);
+      this._onWidgetNodeAction(event as TreeNodeActionEvent);
     } else if (event.type === 'nodeExpanded') {
-      this._onWidgetNodeExpanded(event as TreeNodeExpandedEvent<T>);
+      this._onWidgetNodeExpanded(event as TreeNodeExpandedEvent);
     } else if (event.type === 'nodesChecked') {
-      this._onWidgetNodesChecked(event as TreeNodesCheckedEvent<T>);
+      this._onWidgetNodesChecked(event as TreeNodesCheckedEvent);
     } else if (event.type === 'drop' && this.widget.dragAndDropHandler) {
-      this.widget.dragAndDropHandler.uploadFiles(event as TreeDropEvent<T>);
+      this.widget.dragAndDropHandler.uploadFiles(event as TreeDropEvent);
     } else {
       super._onWidgetEvent(event);
     }

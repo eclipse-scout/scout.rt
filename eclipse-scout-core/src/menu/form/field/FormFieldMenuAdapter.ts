@@ -10,7 +10,8 @@
  */
 import {FormFieldMenu, GridData, MenuAdapter} from '../../../index';
 
-export default class FormFieldMenuAdapter<F extends FormFieldMenu = FormFieldMenu> extends MenuAdapter<F> {
+export default class FormFieldMenuAdapter extends MenuAdapter {
+  declare widget: FormFieldMenu;
 
   constructor() {
     super();

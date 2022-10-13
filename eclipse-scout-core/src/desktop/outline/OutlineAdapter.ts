@@ -11,8 +11,8 @@
 import {App, EventHandler, Form, objects, Outline, Page, scout, Table, TableRow, TreeAdapter} from '../../index';
 import {TableFilterRemovedEvent, TableRowInitEvent, TableRowsInsertedEvent} from '../../table/TableEventMap';
 
-export default class OutlineAdapter<TWidget extends Outline = Outline> extends TreeAdapter<TWidget> {
-
+export default class OutlineAdapter extends TreeAdapter {
+  declare widget: Outline;
   protected _filterDirty: boolean;
   protected _nodeIdToRowMap: Record<string, TableRow>;
   protected _detailTableRowInitHandler: EventHandler<TableRowInitEvent>;

@@ -11,7 +11,7 @@
 import {Event, ModelAdapter, Notification} from '../index';
 import {NotificationAppLinkActionEvent} from './NotificationEventMap';
 
-export default class NotificationAdapter extends ModelAdapter<Notification> {
+export default class NotificationAdapter extends ModelAdapter {
 
   constructor() {
     super();

@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionAdapter, ViewButton} from '../../index';
+import {ActionAdapter} from '../../index';
 
-export default class ViewButtonAdapter<TWidget extends ViewButton = ViewButton> extends ActionAdapter<TWidget> {
+export default class ViewButtonAdapter extends ActionAdapter {
 
   constructor() {
     super();

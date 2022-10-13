@@ -12,7 +12,8 @@ import {Event, ModelAdapter, objects, RemoteTileFilter, scout, Tile, TileGrid} f
 import TileGridModel from './TileGridModel';
 import {TileActionEvent, TileClickEvent} from './TileGridEventMap';
 
-export default class TileGridAdapter<W extends TileGrid = TileGrid> extends ModelAdapter<W> {
+export default class TileGridAdapter extends ModelAdapter {
+  declare widget: TileGrid;
   tileFilter: RemoteTileFilter;
 
   constructor() {
@@ -77,11 +78,11 @@ export default class TileGridAdapter<W extends TileGrid = TileGrid> extends Mode
     this._send('tileAction', data);
   }
 
-  protected override _onWidgetEvent(event: Event<W>) {
+  protected override _onWidgetEvent(event: Event<TileGrid>) {
     if (event.type === 'tileClick') {
-      this._onWidgetTileClick(event as TileClickEvent<W>);
+      this._onWidgetTileClick(event as TileClickEvent);
     } else if (event.type === 'tileAction') {
-      this._onWidgetTileAction(event as TileActionEvent<W>);
+      this._onWidgetTileAction(event as TileActionEvent);
     } else {
       super._onWidgetEvent(event);
     }
