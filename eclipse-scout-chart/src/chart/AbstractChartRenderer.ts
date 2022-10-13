@@ -9,26 +9,32 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
+import {Chart} from '../index';
+import {Session} from '@eclipse-scout/core';
+import {UpdateChartOptions} from './Chart';
+
 export default class AbstractChartRenderer {
+  chart: Chart;
+  session: Session;
 
-  /**
-   * @param {Chart} chart
-   */
-  constructor(chart) {
+  /** true while this.render() is executing */
+  rendering: boolean;
+  rendered: boolean;
 
-    /**
-     * @property {Chart} chart
-     */
+  /** set by render() and remove(), makes it unnecessary to carry an argument through all method calls */
+  animationDuration: number;
+  firstOpaqueBackgroundColor: string;
+
+  constructor(chart: Chart) {
     this.chart = chart;
     this.session = chart.session;
-    this.rendering = false; // true while this.render() is executing
+    this.rendering = false;
     this.rendered = false;
-    this.animationDuration = 0; // set by render() and remove(), makes it unnecessary to carry an argument through all method calls
-
+    this.animationDuration = 0;
     this.firstOpaqueBackgroundColor = '';
   }
 
-  validate() {
+  validate(): boolean {
     if (!this._validateChartData()) {
       return false;
     }
@@ -36,7 +42,7 @@ export default class AbstractChartRenderer {
     return this._validate();
   }
 
-  _validateChartData() {
+  protected _validateChartData(): boolean {
     let chartData = this.chart && this.chart.data;
     if (!chartData || !chartData.chartValueGroups || chartData.chartValueGroups.length === 0) {
       return false;
@@ -71,7 +77,7 @@ export default class AbstractChartRenderer {
     return true;
   }
 
-  _validate() {
+  protected _validate(): boolean {
     // Override in subclasses
     return true;
   }
@@ -81,7 +87,7 @@ export default class AbstractChartRenderer {
    *          Whether animations should be used while rendering the chart. Note that his
    *          property is ignored when chart.config.options.animation.duration is <code>0</code>!
    */
-  render(requestAnimation) {
+  render(requestAnimation: boolean) {
     this.animationDuration = requestAnimation ? this.chart.config.options.animation.duration : 0;
     if (!this.validate() || !this.chart.rendered) {
       return;
@@ -92,7 +98,7 @@ export default class AbstractChartRenderer {
     this.rendered = true;
   }
 
-  _render() {
+  protected _render() {
     // Override in subclasses
   }
 
@@ -102,7 +108,7 @@ export default class AbstractChartRenderer {
     }
   }
 
-  _renderCheckedItems() {
+  protected _renderCheckedItems() {
     // nop
   }
 
@@ -111,7 +117,7 @@ export default class AbstractChartRenderer {
    *          Whether animations should be used while updating the chart. Note that his
    *          property is ignored when chart.config.options.animation.duration is <code>0</code>!
    */
-  updateData(requestAnimation) {
+  updateData(requestAnimation: boolean) {
     if (!this.rendered) {
       this.render(requestAnimation);
       return;
@@ -123,11 +129,11 @@ export default class AbstractChartRenderer {
     this._updateData();
   }
 
-  _updateData() {
+  protected _updateData() {
     // Override in subclasses
   }
 
-  isDataUpdatable() {
+  isDataUpdatable(): boolean {
     return false;
   }
 
@@ -143,7 +149,7 @@ export default class AbstractChartRenderer {
    *          Whether animations should be used while removing the chart. Note that his
    *          property is ignored when chart.config.options.animation.duration is <code>0</code>!
    */
-  remove(requestAnimation, afterRemoveFunc) {
+  remove(requestAnimation = false, afterRemoveFunc?: (chartAnimationStopping?: boolean) => void) {
     this.animationDuration = requestAnimation && this.chart.config.options.animation.duration;
     if (this.animationDuration && this.rendered) {
       this._removeAnimated(afterRemoveFunc);
@@ -152,12 +158,12 @@ export default class AbstractChartRenderer {
     }
   }
 
-  _remove(afterRemoveFunc) {
+  protected _remove(afterRemoveFunc: (chartAnimationStopping?: boolean) => void) {
     this.rendered = false;
     afterRemoveFunc && afterRemoveFunc();
   }
 
-  _removeAnimated(afterRemoveFunc) {
+  protected _removeAnimated(afterRemoveFunc: (chartAnimationStopping?: boolean) => void) {
     // Override in subclasses
     this._remove(afterRemoveFunc);
   }
@@ -165,7 +171,7 @@ export default class AbstractChartRenderer {
   /**
    * Controls if the animation of the chart is shown when chart data has been updated.
    */
-  shouldAnimateRemoveOnUpdate(opts) {
+  shouldAnimateRemoveOnUpdate(opts: UpdateChartOptions): boolean {
     return opts.requestAnimation;
   }
 }

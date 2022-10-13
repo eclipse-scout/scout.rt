@@ -8,12 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableControlAdapter} from '@eclipse-scout/core';
+import {WidgetModel} from '@eclipse-scout/core';
+import {ChartConfig, ChartData, ClickObject} from './Chart';
 
-export default class ChartTableControlAdapter extends TableControlAdapter {
-
-  constructor() {
-    super();
-    this._addRemoteProperties(['chartType', 'chartAggregation', 'chartGroup1', 'chartGroup2']);
-  }
+export default interface ChartModel extends WidgetModel {
+  data?: ChartData;
+  config?: ChartConfig;
+  /**
+   * Default is [].
+   */
+  checkedItems?: ClickObject[];
 }

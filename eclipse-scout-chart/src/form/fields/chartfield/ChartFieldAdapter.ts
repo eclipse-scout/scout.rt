@@ -15,5 +15,4 @@ export default class ChartFieldAdapter extends FormFieldAdapter {
   constructor() {
     super();
   }
-
 }

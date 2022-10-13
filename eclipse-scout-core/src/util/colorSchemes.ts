@@ -54,7 +54,7 @@ export function ensureColorScheme(colorScheme: ColorScheme | string, tile?: bool
  *
  * @param {$} $container
  */
-export function toggleColorSchemeClasses($container: JQuery, colorScheme: ColorScheme) {
+export function toggleColorSchemeClasses($container: JQuery, colorScheme: string | ColorScheme) {
   if (!$container || !colorScheme) {
     return;
   }

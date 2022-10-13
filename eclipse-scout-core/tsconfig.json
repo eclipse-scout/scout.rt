@@ -20,6 +20,7 @@
     "outDir": "dist/d.ts"
   },
   "include": [
-    "./src/**/*"
+    "./src/**/*",
+    "./test/typeExamples.ts"
   ]
 }

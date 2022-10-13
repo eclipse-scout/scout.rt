@@ -8,12 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableControlAdapter} from '@eclipse-scout/core';
+import {WidgetModel} from '@eclipse-scout/core';
+import {Chart, ChartModel} from '../../../index';
+import {RefModel} from '@eclipse-scout/core/src/types';
 
-export default class ChartTableControlAdapter extends TableControlAdapter {
-
-  constructor() {
-    super();
-    this._addRemoteProperties(['chartType', 'chartAggregation', 'chartGroup1', 'chartGroup2']);
-  }
+export default interface ChartFieldModel extends WidgetModel { // FIXME TS FormFieldModel
+  chart?: Chart | RefModel<ChartModel>;
 }

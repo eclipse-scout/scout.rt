@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableControlAdapter} from '@eclipse-scout/core';
+import {ChartField} from '../index';
+import {WidgetTileModel} from '@eclipse-scout/core/src/tile/WidgetTile';
 
-export default class ChartTableControlAdapter extends TableControlAdapter {
-
-  constructor() {
-    super();
-    this._addRemoteProperties(['chartType', 'chartAggregation', 'chartGroup1', 'chartGroup2']);
-  }
+export default interface ChartFieldTileModel extends WidgetTileModel {
+  tileWidget?: ChartField;
 }

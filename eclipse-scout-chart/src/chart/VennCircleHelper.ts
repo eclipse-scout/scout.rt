@@ -8,16 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default class VennCircleHelper {
+import {VennCircle} from '../index';
 
-  constructor(distR, maxR, minR, total) {
+export default class VennCircleHelper {
+  distR: number;
+  maxR: number;
+  minR: number;
+  total: number;
+
+  constructor(distR: number, maxR: number, minR: number, total: number) {
     this.distR = distR;
     this.maxR = maxR;
     this.minR = minR;
     this.total = total;
   }
 
-  findBalance2(venn1, venn2) {
+  findBalance2(venn1: VennCircle, venn2: VennCircle) {
     // find center
     let midX = (venn1.r * venn1.x + venn2.r * venn2.x) / (venn1.r + venn2.r);
     let midY = (venn1.r * venn1.y + venn2.r * venn2.y) / (venn1.r + venn2.r);
@@ -30,7 +36,7 @@ export default class VennCircleHelper {
     venn2.y = venn2.y - midY;
   }
 
-  findBalance3(venn1, venn2, venn3) {
+  findBalance3(venn1: VennCircle, venn2: VennCircle, venn3: VennCircle) {
     // find center
     let midX = (venn1.r * venn1.x + venn2.r * venn2.x + venn3.r * venn3.x) / (venn1.r + venn2.r + venn3.r);
     let midY = (venn1.r * venn1.y + venn2.r * venn2.y + venn3.r * venn3.y) / (venn1.r + venn2.r + venn3.r);
@@ -45,15 +51,15 @@ export default class VennCircleHelper {
     venn3.y = venn3.y - midY;
   }
 
-  calcR(count, factorMax) {
+  calcR(count: number, factorMax: number): number {
     if (count === -1) {
       return this.maxR * factorMax;
     }
     return Math.max(this.minR, Math.sqrt(count / this.total) * this.maxR * factorMax);
   }
 
-  calcD(venn1, venn2, u, v, uv, changeR) {
-    let ret;
+  calcD(venn1: VennCircle, venn2: VennCircle, u: number, v: number, uv: number, changeR: boolean): number {
+    let ret: number;
     if (uv === 0) {
       // separated circles
       ret = venn1.r + venn2.r + this.distR * 2;

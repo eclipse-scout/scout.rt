@@ -8,13 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {numbers, RoundingMode} from '@eclipse-scout/core';
-import {AbstractSvgChartRenderer} from '../index';
+import {EnumObject, numbers, RoundingMode} from '@eclipse-scout/core';
+import {AbstractSvgChartRenderer, Chart} from '../index';
 
 export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
 
-  constructor(chart) {
+  segmentSelectorForAnimation: string;
+
+  r: number;
+  scaleWeight: number;
+  my: number;
+  parts: number;
+  numSegmentsPerPart: number;
+  segmentWidth: number;
+  widthOfSegmentWithGap: number;
+  animationTriggered: boolean;
+
+  $filledParts: JQuery<SVGElement>[];
+  $pointer: JQuery<SVGElement>;
+
+  constructor(chart: Chart) {
     super(chart);
+
     this.segmentSelectorForAnimation = '.pointer';
     this.suppressLegendBox = true;
 
@@ -32,7 +47,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     LEFT: 'left',
     CENTER: 'center',
     RIGHT: 'right'
-  };
+  } as const;
 
   static NUM_PARTS_GREEN_CENTER = 7;
   static NUM_PARTS_GREEN_EDGE = 4;
@@ -47,7 +62,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
 
   static SEGMENT_GAP = 0.0103; // space between two segments (lines)
 
-  _validate() {
+  protected override _validate(): boolean {
     let chartData = this.chart.data;
     let chartConfig = this.chart.config;
     if (!chartData ||
@@ -61,11 +76,11 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     return true;
   }
 
-  _renderInternal() {
+  protected override _renderInternal() {
     let chartData = this.chart.data,
-      minValue = chartData.chartValueGroups[0].values[0],
-      maxValue = chartData.chartValueGroups[0].values[2],
-      value = chartData.chartValueGroups[0].values[1];
+      minValue = chartData.chartValueGroups[0].values[0] as number,
+      maxValue = chartData.chartValueGroups[0].values[2] as number,
+      value = chartData.chartValueGroups[0].values[1] as number;
 
     // radius of the scale
     this.r = Math.min(this.chartBox.height, this.chartBox.width / 2) * 0.7;
@@ -113,19 +128,19 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
 
     this.$svg.addClass('speedo-chart-svg');
     if (this.chart.config.options.clickable) {
-      this.$svg.on('click', this._createClickObject(null, null), this.chart._onValueClick.bind(this.chart));
+      this.$svg.on('click', this._createClickObject(null, null), e => this.chart.handleValueClick(e.data));
     }
   }
 
-  _getValuePercentage(value, minValue, maxValue) {
+  protected _getValuePercentage(value: number, minValue: number, maxValue: number): number {
     return this._limitValue((value - minValue) / (maxValue - minValue), 1);
   }
 
-  _getSegmentToPointAt(valuePercentage, numTotalSegments) {
+  protected _getSegmentToPointAt(valuePercentage: number, numTotalSegments: number): number {
     return this._limitValue(Math.floor(valuePercentage * numTotalSegments), numTotalSegments - 1);
   }
 
-  _limitValue(value, maxValue) {
+  protected _limitValue(value: number, maxValue: number): number {
     value = Math.max(value, 0); // cannot be < 0
     value = Math.min(value, maxValue); // cannot be > maxValue
     return value;
@@ -134,7 +149,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
   /**
    * Gets the percentage value in range [0,1] of the specified segment.
    */
-  _getPercentageValueOfSegment(segmentIndexInPart, part) {
+  protected _getPercentageValueOfSegment(segmentIndexInPart: number, part: number): number {
     // get the segment position
     let pointerRange = this._calcSegmentPos(segmentIndexInPart, part);
 
@@ -148,7 +163,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
   /**
    * Renders the pointer line and registers animation to move the pointer and the corresponding filling of the segments
    */
-  _renderPointer(valuePercentage) {
+  protected _renderPointer(valuePercentage: number) {
     this.$pointer = this.$svg.appendSVG('path', 'pointer')
       .attr('d', this._pathPointer(0))
       .attr('data-end', valuePercentage)
@@ -176,7 +191,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
   /**
    * renders a single segment line.
    */
-  _renderSegment(from, to, colorClass) {
+  protected _renderSegment(from: number, to: number, colorClass: string): JQuery<SVGElement> {
     return this.$svg.appendSVG('path', 'speedo-chart-arc ' + colorClass)
       .attr('id', 'ArcAxisWide' + this.chart.id)
       .attr('fill', 'none')
@@ -184,7 +199,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
       .attr('d', this._pathSegment(from, to));
   }
 
-  _renderCirclePart(part) {
+  protected _renderCirclePart(part: number) {
     let colorClass = this._getColorForPart(part);
     // render 'empty' segments
     for (let i = 0; i < this.numSegmentsPerPart; i++) {
@@ -196,7 +211,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     this.$filledParts.push(this._renderSegment(SpeedoChartRenderer.ARC_MIN, SpeedoChartRenderer.ARC_MIN, colorClass)); // 'filled' segments. invisible by default
   }
 
-  _renderLegend(minValue, value, maxValue, groupName) {
+  protected _renderLegend(minValue: number, value: number, maxValue: number, groupName: string) {
     let minMaxLegendFontSize = this.scaleWeight * 0.8,
       padding = 5, // same as in AbstractChartRenderer#_renderWireLegend
       labelYPos = this.my + padding,
@@ -210,7 +225,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
         h: 1
       },
       minLegendValue = minValue ? this._formatValue(minValue) : 0,
-      legendValue = value ? this._formatValue(value) : 0,
+      legendValue = value ? this._formatValue(value) : '' + 0,
       maxLegendValue = maxValue ? this._formatValue(maxValue) : 0;
 
     // tooltip for min/max value
@@ -239,8 +254,8 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
       };
       mouseOut();
       this.$svg
-        .mouseenter(mouseIn)
-        .mouseleave(mouseOut);
+        .on('mouseenter', mouseIn)
+        .on('mouseleave', mouseOut);
     }
 
     // actual value
@@ -254,7 +269,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
   /**
    * returns the part index for the specified valuePercentage. The valuePercentage must be in the range [0,1].
    */
-  _getPartForValue(valuePercentage) {
+  protected _getPartForValue(valuePercentage: number): number {
     let part = Math.floor(valuePercentage * this.parts);
     return this._limitValue(part, this.parts - 1);
   }
@@ -266,7 +281,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
    * 10 to 999 thousand: 123k
    * >= 1 million: millions with max. two fraction digits -> 1.23M
    */
-  _formatValue(value) {
+  protected _formatValue(value: number): string {
     if (value < SpeedoChartRenderer.TEN_THOUSAND) {
       return this.session.locale.decimalFormat.format(value);
     }
@@ -281,7 +296,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
   /**
    * Updates the pointer position to point to the specified valuePercentage in range [0,1].
    */
-  _updatePointer(valuePercentage) {
+  protected _updatePointer(valuePercentage: number) {
     this.$pointer
       .attr('d', this._pathPointer(valuePercentage))
       .removeClass('red yellow light-green dark-green')
@@ -291,13 +306,13 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
   /**
    * Updates the filling of the 'filled' segments to be filled up to the specified valuePercentage in range [0,1].
    */
-  _updatePartsFill(valuePercentage) {
+  protected _updatePartsFill(valuePercentage: number) {
     let from, to;
     for (let part = 0; part < this.$filledParts.length; part++) {
-      from = this._calcSegmentPos(0, part, this.segmentWidth).from;
+      from = this._calcSegmentPos(0, part).from;
       if ((part + 1) / this.parts < valuePercentage) {
         // the current part is smaller than the value: completely filled part
-        to = this._calcSegmentPos(this.numSegmentsPerPart - 1, part, this.segmentWidth).to;
+        to = this._calcSegmentPos(this.numSegmentsPerPart - 1, part).to;
       } else if (part / this.parts > valuePercentage) {
         // the current part is bigger than the speedo-value: hide element
         from = SpeedoChartRenderer.ARC_MIN;
@@ -315,7 +330,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
    * @param segmentIndexInPart the index of the segment line within the part.
    * @param part the part index.
    */
-  _calcSegmentPos(segmentIndexInPart, part) {
+  protected _calcSegmentPos(segmentIndexInPart: number, part: number): { from: number; to: number } {
     let result = {
       from: 0,
       to: 0
@@ -326,7 +341,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     return result;
   }
 
-  _getColorForPart(part) {
+  protected _getColorForPart(part: number): string {
     let position = this.chart.config.options.speedo.greenAreaPosition;
     switch (position) {
       case SpeedoChartRenderer.Position.LEFT:
@@ -378,7 +393,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
   /**
    * calculates the path-values to be used in the 'd' attribute of the path tag for a segment.
    */
-  _pathSegment(start, end) {
+  protected _pathSegment(start: number, end: number): string {
     let s = start * 2 * Math.PI,
       e = end * 2 * Math.PI,
       pathString = '';
@@ -398,7 +413,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
   /**
    * calculates the path-values to be used in the 'd' attribute of the path tag for the pointer
    */
-  _pathPointer(valuePercentage) {
+  protected _pathPointer(valuePercentage: number): string {
     let point = SpeedoChartRenderer.ARC_RANGE * valuePercentage - SpeedoChartRenderer.ARC_MAX;
     let s = point * 2 * Math.PI,
       pointerOuterR = this.r - (1.4 * this.scaleWeight),
@@ -411,10 +426,7 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
     return pathString;
   }
 
-  /**
-   * @override
-   */
-  _removeAnimated(afterRemoveFunc) {
+  protected override _removeAnimated(afterRemoveFunc: (chartAnimationStopping?: boolean) => void) {
     if (this.animationTriggered) {
       return;
     }
@@ -437,3 +449,5 @@ export default class SpeedoChartRenderer extends AbstractSvgChartRenderer {
       });
   }
 }
+
+export type GreenAreaPosition = EnumObject<typeof SpeedoChartRenderer.Position>;
