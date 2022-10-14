@@ -12,9 +12,9 @@ import {WidgetModel} from '../index';
 import {StatusSeverity} from '../status/Status';
 
 export default interface MessageBoxModel extends WidgetModel {
-  header: string;
-  body: string;
-  severity: StatusSeverity;
+  header?: string;
+  body?: string;
+  severity?: StatusSeverity;
   iconId?: string;
   hiddenText?: string;
   html?: string;

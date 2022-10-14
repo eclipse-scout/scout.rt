@@ -9,15 +9,17 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {scout, TabBox, TabItem} from '../../../../index';
+import {scout, Session, TabBox, TabItem} from '../../../../index';
 
+// FIXME TS use TabBoxModel
 export default class TabBoxSpecHelper {
+  session: Session;
 
-  constructor(session) {
+  constructor(session: Session) {
     this.session = session;
   }
 
-  createTabBoxWith2Tabs(model) {
+  createTabBoxWith2Tabs(model): TabBox {
     model = $.extend({
       tabItems: [{
         objectType: TabItem,
@@ -30,7 +32,7 @@ export default class TabBoxSpecHelper {
     return this.createTabBox(model);
   }
 
-  createTabBoxWith(tabItems) {
+  createTabBoxWith(tabItems: TabItem[]): TabBox {
     tabItems = scout.nvl(tabItems, []);
     return this.createTabBox({
       tabItems: tabItems,
@@ -38,7 +40,7 @@ export default class TabBoxSpecHelper {
     });
   }
 
-  createTabBox(model) {
+  createTabBox(model): TabBox {
     model = $.extend({
       parent: this.session.desktop
     }, model);
@@ -46,11 +48,10 @@ export default class TabBoxSpecHelper {
     return scout.create(TabBox, model);
   }
 
-  createTabItem(model) {
+  createTabItem(model): TabItem {
     model = $.extend({
       parent: this.session.desktop
     }, model);
     return scout.create(TabItem, model);
   }
-
 }

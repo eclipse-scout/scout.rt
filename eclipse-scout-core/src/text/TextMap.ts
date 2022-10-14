@@ -48,7 +48,7 @@ export default class TextMap {
     return text;
   }
 
-  optGet(textKey: string, defaultValue: string, ...vararg: string[]): string {
+  optGet(textKey: string, defaultValue?: string, ...vararg: string[]): string {
     if (!this._exists(textKey)) {
       if (this.parent) {
         return this.parent.optGet(textKey, defaultValue, ...vararg);

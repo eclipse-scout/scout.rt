@@ -26,9 +26,9 @@
     "src"
   ],
   "scripts": {
-    "ts-rename": "ts-migrate --migrate false --sources src/layout/*",
-    "ts-migrate": "ts-migrate --rename false --sources src/layout/*",
-    "ts-event-maps": "ts-migrate --rename false --migrate false --print-event-maps --sources src/layout/*.ts",
+    "ts-rename": "ts-migrate --migrate false --sources ../karma-jasmine-scout/src/**/*",
+    "ts-migrate": "ts-migrate --rename false --sources ../karma-jasmine-scout/src/**/*",
+    "ts-event-maps": "ts-migrate --rename false --migrate false --print-event-maps --sources src/testing/*.ts",
     "ts-count": "ts-migrate --rename false --migrate false --count --sources src/**/*.ts --sources ../eclipse-scout-chart/src/**/*.ts",
     "testserver:start": "scout-scripts test-server:start",
     "testserver:stop": "scout-scripts test-server:stop",
@@ -50,6 +50,9 @@
     "jasmine-ajax": "4.0.0",
     "jasmine-jquery": "2.1.1",
     "@types/jquery": "3.5.14",
+    "@types/jasmine": "3.10.3",
+    "@types/jasmine-ajax": "3.3.3",
+    "@types/jasmine-jquery": "1.5.34",
     "karma": "6.4.0",
     "@eclipse-scout/ts-migrate": ">=23.1.0-snapshot <23.1.0"
   },

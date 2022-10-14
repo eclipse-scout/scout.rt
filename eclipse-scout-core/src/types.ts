@@ -19,11 +19,11 @@ export type Comparator<T> = (a: T, b: T) => number;
 // Type that makes some properties optional and some required.
 export type PartialAndRequired<T, OPTIONAL extends keyof T, REQUIRED extends keyof T> = Omit<T, OPTIONAL | REQUIRED> & Partial<Pick<T, OPTIONAL>> & Required<Pick<T, REQUIRED>>;
 
-export type RefModel<MODEL extends { parent?: any; objectType?: ObjectType<any> }> = PartialAndRequired<MODEL, 'parent', 'objectType'>;
+export type RefModel<MODEL extends { parent?: any; objectType?: ObjectType<any> }> = Omit<SomeRequired<MODEL, 'objectType'>, 'parent'>;
 
-export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+export type Optional<T, K extends keyof T> = Partial<Pick<T, K>> & Omit<T, K>;
 
-export type SomeRequired<T, K extends keyof T> = Pick<Required<T>, K> & Omit<T, K>;
+export type SomeRequired<T, K extends keyof T> = Required<Pick<T, K>> & T;
 
 export type EnumObject<TYPE> = TYPE[keyof TYPE];
 

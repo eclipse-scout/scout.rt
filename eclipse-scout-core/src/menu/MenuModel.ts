@@ -10,10 +10,11 @@
  */
 import {ActionModel} from '../index';
 import {PopupAlignment} from '../popup/Popup';
-import {MenuFilter, MenuStyle, SubMenuVisibility} from './Menu';
+import Menu, {MenuFilter, MenuStyle, SubMenuVisibility} from './Menu';
+import {RefModel} from '../types';
 
 export default interface MenuModel extends ActionModel {
-  childActions?: MenuModel[];
+  childActions?: (Menu | RefModel<MenuModel>)[];
   menuTypes?: string[];
   /**
    * Default is {@link Menu.MenuStyle.NONE}.

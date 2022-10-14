@@ -9,9 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, Action, arrays, Button, ButtonAdapterMenu, CompositeField, EnumObject, fields, Form, FormField, GroupBoxEventMap, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, GroupBoxModel, GroupBoxResponsiveHandler,
-  HAlign, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, Notification, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, VerticalSmartGrid,
-  WrappedFormField
+  AbstractLayout, Action, arrays, Button, ButtonAdapterMenu, CompositeField, EnumObject, fields, Form, FormField, FormFieldModel, GroupBoxEventMap, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, GroupBoxModel,
+  GroupBoxResponsiveHandler, HAlign, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, Notification, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips,
+  VerticalSmartGrid, WrappedFormField
 } from '../../../index';
 import $ from 'jquery';
 import {MenuBarEllipsisPosition} from '../../../menu/menubar/MenuBar';
@@ -169,7 +169,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     this.setFields(newFields);
   }
 
-  setFields(fields: FormField[]) {
+  setFields(fields: (FormField | FormFieldModel)[]) {
     this.setProperty('fields', fields);
   }
 

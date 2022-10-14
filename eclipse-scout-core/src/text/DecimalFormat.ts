@@ -36,7 +36,7 @@ export default class DecimalFormat {
   multiplier: number;
   roundingMode: RoundingMode;
 
-  constructor(locale: Locale, options: string | DecimalFormatOptions) {
+  constructor(locale: Locale, options?: string | DecimalFormatOptions) {
     // format function will use these (defaults)
     this.positivePrefix = '';
     this.positiveSuffix = '';

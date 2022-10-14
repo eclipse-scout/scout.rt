@@ -21,7 +21,7 @@ export default interface CalendarModel extends WidgetModel {
   components?: CalendarComponent[];
   selectedComponent?: CalendarComponent;
   displayCondensed?: boolean;
-  selectedDate?: Date;
+  selectedDate?: Date | string;
   showDisplayModeSelection?: boolean;
   title?: string;
   useOverflowCells?: boolean;

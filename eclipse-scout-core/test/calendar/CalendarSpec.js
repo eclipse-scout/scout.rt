@@ -8,18 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Calendar, dates} from '../../src/index';
-import {CalendarSpecHelper} from '../../src/testing/index';
+import {Calendar, CalendarComponent, dates, scout} from '../../src/index';
 
 describe('Calendar', () => {
-  let session, helper;
+  let session;
 
   beforeEach(() => {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     jasmine.clock().install();
     session = sandboxSession();
-    helper = new CalendarSpecHelper(session);
     uninstallUnloadHandlers(session);
   });
 
@@ -32,7 +30,7 @@ describe('Calendar', () => {
   describe('init', () => {
 
     it('creates an empty calendar', () => {
-      let cal = helper.createCalendar(helper.createSimpleModel());
+      let cal = scout.create(Calendar, {parent: session.desktop});
       expect(cal.viewRange).toBeDefined();
     });
 
@@ -41,7 +39,7 @@ describe('Calendar', () => {
   describe('dayPosition', () => {
 
     it('calculates the day position', () => {
-      let cal = helper.createCalendar(helper.createSimpleModel());
+      let cal = scout.create(Calendar, {parent: session.desktop});
       // fix total size: 80
       // All day event. Not relevant since in top grid
       expect(cal._dayPosition(-1, 0)).toBe(0);
@@ -61,7 +59,6 @@ describe('Calendar', () => {
   describe('component', () => {
     let cal, c1, c2, c3, c4, c5, c6, c7, c8;
     let day = dates.parseJsonDate('2016-07-20 00:00:00.000');
-    let day2 = dates.parseJsonDate('2016-07-21 00:00:00.000');
     let option1 = {
       fromDate: '2016-07-20 12:00:00.000',
       toDate: '2016-07-20 12:30:00.000'
@@ -94,15 +91,15 @@ describe('Calendar', () => {
     };
 
     beforeEach(() => {
-      cal = helper.createCalendar(helper.createSimpleModel());
-      c1 = helper.createComponent(option1, cal);
-      c2 = helper.createComponent(option2, cal);
-      c3 = helper.createComponent(option3, cal);
-      c4 = helper.createComponent(option4, cal);
-      c5 = helper.createComponent(option5, cal);
-      c6 = helper.createComponent(optionSmall1, cal);
-      c7 = helper.createComponent(optionSmall1, cal);
-      c8 = helper.createComponent(option8, cal);
+      cal = scout.create(Calendar, {parent: session.desktop});
+      c1 = scout.create(CalendarComponent, $.extend({parent: cal}, option1));
+      c2 = scout.create(CalendarComponent, $.extend({parent: cal}, option2));
+      c3 = scout.create(CalendarComponent, $.extend({parent: cal}, option3));
+      c4 = scout.create(CalendarComponent, $.extend({parent: cal}, option4));
+      c5 = scout.create(CalendarComponent, $.extend({parent: cal}, option5));
+      c6 = scout.create(CalendarComponent, $.extend({parent: cal}, optionSmall1));
+      c7 = scout.create(CalendarComponent, $.extend({parent: cal}, optionSmall1));
+      c8 = scout.create(CalendarComponent, $.extend({parent: cal}, option8));
     });
 
     describe('part day position', () => {
@@ -232,13 +229,11 @@ describe('Calendar', () => {
       // empty parent div
       let $div = $('<div></div>');
 
-      // init model
-      let model = helper.createSimpleModel();
-      model.selectedDate = '2016-01-01 12:00:00.000';
-      model.displayMode = Calendar.DisplayMode.MONTH;
-
-      // init and render calendar
-      let cal = helper.createCalendar(model);
+      let cal = scout.create(Calendar, {
+        parent: session.desktop,
+        selectedDate: '2016-01-01 12:00:00.000',
+        displayMode: Calendar.DisplayMode.MONTH
+      });
       cal.render($div);
 
       let viewRange = cal.viewRange;
@@ -266,13 +261,11 @@ describe('Calendar', () => {
       // empty parent div
       let $div = $('<div></div>');
 
-      // init model
-      let model = helper.createSimpleModel();
-      model.selectedDate = '2016-01-31 12:00:00.000';
-      model.displayMode = Calendar.DisplayMode.MONTH;
-
-      // init and render calendar
-      let cal = helper.createCalendar(model);
+      let cal = scout.create(Calendar, {
+        parent: session.desktop,
+        selectedDate: '2016-01-31 12:00:00.000',
+        displayMode: Calendar.DisplayMode.MONTH
+      });
       cal.render($div);
 
       let viewRange = cal.viewRange;

@@ -10,39 +10,42 @@
  */
 import {StaticLookupCall} from '../../index';
 import $ from 'jquery';
+import LookupResult from '../../lookup/LookupResult';
 
-export default class AbortableMicrotaskStaticLookupCall extends StaticLookupCall {
+export default class AbortableMicrotaskStaticLookupCall<TKey> extends StaticLookupCall<TKey> {
+  protected _deferred: JQuery.Deferred<LookupResult<TKey>>;
+
   constructor() {
     super();
     this._deferred = null;
   }
 
-  abort() {
+  override abort() {
     this._deferred.reject({
       canceled: true
     });
     super.abort();
   }
 
-  _getByKey(key) {
+  protected override _getByKey(key: TKey) {
     this._deferred = $.Deferred();
     queueMicrotask(this._queryByKey.bind(this, this._deferred, key));
     return this._deferred.promise();
   }
 
-  _getAll() {
+  protected override _getAll() {
     this._deferred = $.Deferred();
     queueMicrotask(this._queryByAll.bind(this, this._deferred));
     return this._deferred.promise();
   }
 
-  _getByText(text) {
+  protected override _getByText(text: string) {
     this._deferred = $.Deferred();
     queueMicrotask(this._queryByText.bind(this, this._deferred, text));
     return this._deferred.promise();
   }
 
-  _getByRec(rec) {
+  protected override _getByRec(rec: TKey) {
     this._deferred = $.Deferred();
     queueMicrotask(this._queryByRec.bind(this, this._deferred, rec));
     return this._deferred.promise();

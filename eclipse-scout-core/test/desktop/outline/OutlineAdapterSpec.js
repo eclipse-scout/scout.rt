@@ -12,7 +12,11 @@ import {OutlineSpecHelper, TableSpecHelper, TreeSpecHelper} from '../../../src/t
 import {defaultValues} from '../../../src';
 
 describe('OutlineAdapter', () => {
-  let session, helper, tableHelper;
+  let session;
+  /** @type OutlineSpecHelper */
+  let helper;
+  /** @type TableSpecHelper */
+  let tableHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -54,6 +58,9 @@ describe('OutlineAdapter', () => {
     }
   };
 
+  /**
+   * @returns {Outline}
+   */
   function createOutlineWithDetailTable() {
     let model = helper.createModelFixture();
     let adapter = helper.createOutlineAdapter(model);
@@ -163,7 +170,7 @@ describe('OutlineAdapter', () => {
     outline.updateNode({
       id: 'node1',
       text: 'node 1 new'
-    }, node);
+    });
     table.updateRow({
       id: 'row1',
       nodeId: 'node1',
@@ -176,7 +183,7 @@ describe('OutlineAdapter', () => {
     outline.updateNode({
       id: 'node2',
       text: 'node 2 new'
-    }, node);
+    });
     table.updateRow({
       id: 'row2',
       nodeId: 'node2',
@@ -189,7 +196,7 @@ describe('OutlineAdapter', () => {
     outline.updateNode({
       id: 'node2',
       text: 'node 1 from 2'
-    }, node);
+    });
     table.updateRow({
       id: 'row2',
       nodeId: 'node2',
@@ -258,15 +265,19 @@ describe('OutlineAdapter', () => {
     defaultValues.init(defaults);
     let outline = createOutlineWithDetailTable();
     let node0 = outline.nodes[0];
+    // noinspection JSUnresolvedVariable
     expect(outline.a).toBe(123);
+    // noinspection JSUnresolvedVariable
     expect(outline.nodes[0].b).toBe(234);
     expect(outline.nodes[0].childNodes[0]).toBe(undefined);
 
-    let newChildNode = helper.createModelNode('0_1', 'newChildNode', 3);
+    let newChildNode = helper.createModelNode('0_1', 'newChildNode');
     let treeHelper = new TreeSpecHelper(session);
     let event = treeHelper.createNodesInsertedEvent(outline, [newChildNode], node0.id);
     outline.modelAdapter.onModelAction(event);
+    // noinspection JSUnresolvedVariable
     expect(outline.a).toBe(123);
+    // noinspection JSUnresolvedVariable
     expect(outline.nodes[0].childNodes[0].b).toBe(234);
   });
 });

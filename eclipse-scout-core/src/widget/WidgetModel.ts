@@ -9,20 +9,18 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {DisabledStyle, DisplayParent, LogicalGrid, Session, Widget} from '../index';
-import {ObjectType} from '../ObjectFactory';
+import {ObjectModel} from '../scout';
 
-export default interface WidgetModel {
+export default interface WidgetModel extends ObjectModel<Widget, WidgetModel> {
   /**
    * The parent widget.
    */
   parent: Widget;
   owner?: Widget;
-  id?: string;
   /**
    * If not specified, the session of the parent widget is used
    */
   session?: Session;
-  objectType?: ObjectType<Widget>;
   enabled?: boolean;
   trackFocus?: boolean;
   scrollTop?: number;
@@ -32,7 +30,7 @@ export default interface WidgetModel {
   visible?: boolean;
   cssClass?: string;
   loading?: boolean;
-  logicalGrid?: LogicalGrid;
+  logicalGrid?: LogicalGrid | string;
   displayParent?: DisplayParent;
   animateRemoval?: boolean;
 

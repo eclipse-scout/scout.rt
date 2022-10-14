@@ -11,7 +11,7 @@
 import {Status} from '../index';
 import {Alignment} from './Cell';
 
-export default interface CellModel<TValue> {
+export default interface CellModel<TValue = any> {
   cssClass?: string;
   editable?: boolean;
   errorStatus?: Status;

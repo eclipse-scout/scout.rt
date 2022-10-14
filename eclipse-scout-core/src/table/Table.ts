@@ -2956,11 +2956,11 @@ export default class Table extends Widget implements TableModel {
     }
   }
 
-  updateRow(row: TableRow) {
+  updateRow(row: TableRow | TableRowData) {
     this.updateRows([row]);
   }
 
-  updateRows(rows: TableRow | TableRow[]) {
+  updateRows(rows: TableRow | TableRowData | (TableRow | TableRowData)[]) {
     rows = arrays.ensure(rows);
     if (rows.length === 0) {
       return;
@@ -2979,22 +2979,26 @@ export default class Table extends Widget implements TableModel {
 
     let oldRowsMap: Record<string, TableRow> = {};
     let structureChanged = false;
-    rows = rows.map(row => {
-      let parentRowId: any = row.parentRow,
-        oldRow = this.rowsMap[row.id];
+    let updatedRows = rows.map(rowOrModel => {
+      let parentRowId: any = rowOrModel.parentRow;
+      let oldRow = this.rowsMap[rowOrModel.id];
       // collect old rows
-      oldRowsMap[row.id] = oldRow;
+      oldRowsMap[rowOrModel.id] = oldRow;
       if (!oldRow) {
-        throw new Error('Update event received for non existing row. RowId: ' + row.id);
+        throw new Error('Update event received for non existing row. RowId: ' + rowOrModel.id);
       }
       // check structure changes
-      if (row.parentRow && !objects.isNullOrUndefined(row.parentRow.id)) {
-        parentRowId = row.parentRow.id;
+      if (rowOrModel.parentRow) {
+        if (typeof rowOrModel.parentRow === 'string') {
+          parentRowId = rowOrModel.parentRow;
+        } else if (!objects.isNullOrUndefined(rowOrModel.parentRow.id)) {
+          parentRowId = rowOrModel.parentRow.id;
+        }
       }
       // @ts-ignore
       structureChanged = structureChanged || (scout.nvl(oldRow._parentRowId, null) !== scout.nvl(parentRowId, null));
-      expansionChanged = expansionChanged || (oldRow.expanded !== scout.nvl(row.expanded, false));
-      row = this._initRow(row);
+      expansionChanged = expansionChanged || (oldRow.expanded !== scout.nvl(rowOrModel.expanded, false));
+      let row = this._initRow(rowOrModel);
       // Check if cell values have changed
       if (row.status === TableRow.Status.NON_CHANGED) {
         row.cells.some((cell, i) => {
@@ -3030,10 +3034,10 @@ export default class Table extends Widget implements TableModel {
       visibleRows: true
     });
 
-    this._triggerRowsUpdated(rows);
+    this._triggerRowsUpdated(updatedRows);
 
     if (this._isDataRendered()) {
-      this._renderUpdateRows(rows, oldRowsMap);
+      this._renderUpdateRows(updatedRows, oldRowsMap);
       if (structureChanged) {
         this._renderRowOrderChanges();
       }
@@ -5299,7 +5303,7 @@ export default class Table extends Widget implements TableModel {
     }
   }
 
-  updateColumnOrder(columns: Column<any>[]) {
+  updateColumnOrder(columns: (Column<any> | { id: string })[]) {
     if (columns.length !== this.columns.length) {
       throw new Error('Column order may not be updated because lengths of the arrays differ.');
     }
@@ -5327,8 +5331,8 @@ export default class Table extends Widget implements TableModel {
   /**
    * @param columns array of columns which were updated.
    */
-  updateColumnHeaders(columns: Column<any>[]) {
-    let oldColumnState: ColumnModel<any>;
+  updateColumnHeaders(columns: Column[]) {
+    let oldColumnState: ColumnModel;
 
     // Update model columns
     for (let i = 0; i < columns.length; i++) {

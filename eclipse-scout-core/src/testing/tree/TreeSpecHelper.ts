@@ -8,16 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompactTree, ObjectFactory, Tree, TreeAdapter} from '../../index';
+import {arrays, CompactTree, ModelAdapterModel, ObjectFactory, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode} from '../../index';
 import $ from 'jquery';
+import {TreeNodeData} from '../../tree/TreeNodeModel';
+import {SomeRequired} from '../../types';
+import {ObjectType} from '../../ObjectFactory';
 
 export default class TreeSpecHelper {
+  session: Session;
 
-  constructor(session) {
+  constructor(session: Session) {
     this.session = session;
   }
 
-  createModel(nodes) {
+  createModel(nodes: TreeNodeData[]): TreeModel & { objectType: ObjectType<Tree, TreeModel> } {
     let model = createSimpleModel('Tree', this.session);
 
     if (nodes) {
@@ -27,11 +31,11 @@ export default class TreeSpecHelper {
     return model;
   }
 
-  createModelFixture(nodeCount, depth, expanded) {
+  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): TreeModel & { objectType: ObjectType<Tree, TreeModel> } {
     return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
   }
 
-  createModelNode(id, text, position) {
+  createModelNode(id?: string, text?: string, position?: number): TreeNodeData {
     return {
       id: id + '' || ObjectFactory.get().createUniqueId(),
       text: text,
@@ -41,11 +45,11 @@ export default class TreeSpecHelper {
     };
   }
 
-  createModelNodes(nodeCount, depth, expanded) {
+  createModelNodes(nodeCount?: number, depth?: number, expanded?: boolean): TreeNodeData[] {
     return this.createModelNodesInternal(nodeCount, depth, expanded);
   }
 
-  createModelNodesInternal(nodeCount, depth, expanded, parentNode) {
+  createModelNodesInternal(nodeCount: number, depth?: number, expanded?: boolean, parentNode?: TreeNodeData): TreeNodeData[] {
     if (!nodeCount) {
       return;
     }
@@ -69,7 +73,7 @@ export default class TreeSpecHelper {
     return nodes;
   }
 
-  createTree(model) {
+  createTree(model: TreeModel): Tree {
     let defaults = {
       parent: this.session.desktop
     };
@@ -79,30 +83,30 @@ export default class TreeSpecHelper {
     return tree;
   }
 
-  createTreeAdapter(model) {
+  createTreeAdapter(model: ModelAdapterModel | SomeRequired<TreeModel, 'session' | 'id'>): TreeAdapter {
     let adapter = new TreeAdapter();
     adapter.init(model);
     return adapter;
   }
 
-  createCompactTree(model) {
+  createCompactTree(model: TreeModel): CompactTree {
     let tree = new CompactTree();
     tree.init(model);
     return tree;
   }
 
-  createCompactTreeAdapter(model) {
+  createCompactTreeAdapter(model: ModelAdapterModel): TreeAdapter {
     model.objectType = 'Tree:Compact';
     let tree = new TreeAdapter();
     tree.init(model);
     return tree;
   }
 
-  findAllNodes(tree) {
+  findAllNodes(tree: Tree): JQuery {
     return tree.$container.find('.tree-node');
   }
 
-  createNodeExpandedEvent(model, nodeId, expanded) {
+  createNodeExpandedEvent(model: { id: string }, nodeId: string, expanded: boolean): RemoteEvent {
     return {
       target: model.id,
       nodeId: nodeId,
@@ -111,12 +115,12 @@ export default class TreeSpecHelper {
     };
   }
 
-  selectNodesAndAssert(tree, nodes) {
+  selectNodesAndAssert(tree: Tree, nodes: TreeNode[]) {
     tree.selectNodes(nodes);
     this.assertSelection(tree, nodes);
   }
 
-  assertSelection(tree, nodes) {
+  assertSelection(tree: Tree, nodes: TreeNode[]) {
     let $selectedNodes = tree.$selectedNodes();
     expect($selectedNodes.length).toBe(nodes.length);
 
@@ -129,7 +133,7 @@ export default class TreeSpecHelper {
     expect(arrays.equalsIgnoreOrder(nodes, tree.selectedNodes)).toBeTruthy();
   }
 
-  createNodesSelectedEvent(model, nodeIds) {
+  createNodesSelectedEvent(model: { id: string }, nodeIds: string[]): RemoteEvent {
     return {
       target: model.id,
       nodeIds: nodeIds,
@@ -137,7 +141,7 @@ export default class TreeSpecHelper {
     };
   }
 
-  createNodesInsertedEvent(model, nodes, commonParentNodeId) {
+  createNodesInsertedEvent(model: { id: string }, nodes: TreeNodeData[], commonParentNodeId: string): RemoteEvent {
     return {
       target: model.id,
       commonParentNodeId: commonParentNodeId,
@@ -146,7 +150,7 @@ export default class TreeSpecHelper {
     };
   }
 
-  createNodesInsertedEventTopNode(model, nodes) {
+  createNodesInsertedEventTopNode(model: { id: string }, nodes: TreeNodeData[]): RemoteEvent {
     return {
       target: model.id,
       nodes: nodes,
@@ -154,7 +158,7 @@ export default class TreeSpecHelper {
     };
   }
 
-  createNodesDeletedEvent(model, nodeIds, commonParentNodeId) {
+  createNodesDeletedEvent(model: { id: string }, nodeIds: string[], commonParentNodeId: string): RemoteEvent {
     return {
       target: model.id,
       commonParentNodeId: commonParentNodeId,
@@ -163,7 +167,7 @@ export default class TreeSpecHelper {
     };
   }
 
-  createAllChildNodesDeletedEvent(model, commonParentNodeId) {
+  createAllChildNodesDeletedEvent(model: { id: string }, commonParentNodeId?: string): RemoteEvent {
     return {
       target: model.id,
       commonParentNodeId: commonParentNodeId,
@@ -171,7 +175,7 @@ export default class TreeSpecHelper {
     };
   }
 
-  createNodeChangedEvent(model, nodeId) {
+  createNodeChangedEvent(model: { id: string }, nodeId: string): RemoteEvent {
     return {
       target: model.id,
       nodeId: nodeId,
@@ -179,7 +183,7 @@ export default class TreeSpecHelper {
     };
   }
 
-  createNodesUpdatedEvent(model, nodes) {
+  createNodesUpdatedEvent(model: { id: string }, nodes: TreeNodeData[]): RemoteEvent {
     return {
       target: model.id,
       nodes: nodes,
@@ -187,7 +191,7 @@ export default class TreeSpecHelper {
     };
   }
 
-  createChildNodeOrderChangedEvent(model, childNodeIds, parentNodeId) {
+  createChildNodeOrderChangedEvent(model: { id: string }, childNodeIds: string[], parentNodeId: string): RemoteEvent {
     return {
       target: model.id,
       parentNodeId: parentNodeId,
@@ -196,7 +200,7 @@ export default class TreeSpecHelper {
     };
   }
 
-  createTreeEnabledEvent(model, enabled) {
+  createTreeEnabledEvent(model: { id: string }, enabled: boolean): RemoteEvent {
     return {
       target: model.id,
       type: 'property',

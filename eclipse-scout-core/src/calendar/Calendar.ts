@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, Event, EventHandler, events, GroupBox, HtmlComponent, KeyStrokeContext, Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel} from '../index';
+import {
+  CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, Event, EventHandler, events, GroupBox, HtmlComponent, KeyStrokeContext,
+  Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel
+} from '../index';
 import $ from 'jquery';
 import {YearPanelDateSelectEvent} from './YearPanelEventMap';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
@@ -51,10 +54,10 @@ export default class Calendar extends Widget implements CalendarModel {
   heightPerDay: number;
   spaceBeforeScrollTop: number;
   workDayIndices: number[];
+  displayCondensed: boolean;
   displayMode: CalendarDisplayMode;
   components: CalendarComponent[];
   selectedComponent: CalendarComponent;
-  displayCondensed: boolean;
   loadInProgress: boolean;
   selectedDate: Date;
   showDisplayModeSelection: boolean;
@@ -68,19 +71,19 @@ export default class Calendar extends Widget implements CalendarModel {
   menus: Menu[];
   needsScrollToStartHour: boolean;
 
-  $header: JQuery<HTMLDivElement>;
-  $range: JQuery<HTMLDivElement>;
-  $commands: JQuery<HTMLDivElement>;
-  $grids: JQuery<HTMLDivElement>;
-  $grid: JQuery<HTMLDivElement>;
-  $topGrid: JQuery<HTMLDivElement>;
-  $list: JQuery<HTMLDivElement>;
-  $listTitle: JQuery<HTMLDivElement>;
-  $progress: JQuery<HTMLDivElement>;
-  $headerRow1: JQuery<HTMLDivElement>;
-  $headerRow2: JQuery<HTMLDivElement>;
-  $title: JQuery<HTMLDivElement>;
-  $select: JQuery<HTMLDivElement>;
+  $header: JQuery;
+  $range: JQuery;
+  $commands: JQuery;
+  $grids: JQuery;
+  $grid: JQuery;
+  $topGrid: JQuery;
+  $list: JQuery;
+  $listTitle: JQuery;
+  $progress: JQuery;
+  $headerRow1: JQuery;
+  $headerRow2: JQuery;
+  $title: JQuery;
+  $select: JQuery;
   $window: JQuery<Window>;
 
   /** additional modes; should be stored in model */
@@ -114,17 +117,18 @@ export default class Calendar extends Widget implements CalendarModel {
     super();
 
     this.monthViewNumberOfWeeks = 6;
-    this.numberOfHourDivisions = this.getConfiguredNumberOfHourDivisions();
-    this.heightPerDivision = this.getConfiguredHeightPerDivision();
-    this.startHour = this.getConfiguredStartHour();
+    this.numberOfHourDivisions = 2;
+    this.heightPerDivision = 30;
+    this.startHour = 6;
     this.heightPerHour = this.numberOfHourDivisions * this.heightPerDivision;
     this.heightPerDay = 24 * this.heightPerHour;
     this.spaceBeforeScrollTop = 15;
     this.workDayIndices = [1, 2, 3, 4, 5]; // Workdays: Mon-Fri (Week starts at Sun in JS)
     this.components = [];
     this.displayCondensed = false;
+    this.displayMode = Calendar.DisplayMode.MONTH;
     this.loadInProgress = false;
-    this.selectedDate = null;
+    this.selectedDate = new Date();
     this.showDisplayModeSelection = true;
     this.title = null;
     this.useOverflowCells = true;
@@ -184,18 +188,6 @@ export default class Calendar extends Widget implements CalendarModel {
     FORWARD: 1
   } as const;
 
-  getConfiguredNumberOfHourDivisions(): number {
-    return 2;
-  }
-
-  getConfiguredHeightPerDivision(): number {
-    return 30;
-  }
-
-  getConfiguredStartHour(): number {
-    return 6;
-  }
-
   protected _isDay(): boolean {
     return this.displayMode === Calendar.DisplayMode.DAY;
   }
@@ -227,9 +219,9 @@ export default class Calendar extends Widget implements CalendarModel {
       visible: false,
       displayMode: this.displayMode
     });
-    this._setSelectedDate(model.selectedDate);
-    this._setDisplayMode(model.displayMode);
-    this._setMenuInjectionTarget(model.menuInjectionTarget);
+    this._setSelectedDate(this.selectedDate);
+    this._setDisplayMode(this.displayMode);
+    this._setMenuInjectionTarget(this.menuInjectionTarget);
     this._exactRange = this._calcExactRange();
     this._yearPanel.setViewRange(this._exactRange);
     this.viewRange = this._calcViewRange();

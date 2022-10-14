@@ -14,7 +14,9 @@ import {triggerClick, triggerContextMenu, triggerMouseDown, triggerMouseUp} from
 
 /* global removePopups */
 describe('Table', () => {
-  let session, helper;
+  let session;
+  /** @type TableSpecHelper */
+  let helper;
 
   /**
    * TestBeanColumn that validates that the table is available in _init
@@ -64,7 +66,7 @@ describe('Table', () => {
       expect(table.$container).toHaveClass('checkable');
 
       // row must have 'checked' class
-      table.checkRow(table.rows[0], true, true);
+      table.checkRow(table.rows[0], true);
       expect(table.$container.find('.table-row').first().hasClass('checked')).toBe(true);
     });
 
@@ -80,7 +82,7 @@ describe('Table', () => {
 
       it('accepts rows with cells', () => {
         let model = helper.createModelFixture(3, 1);
-        model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '', '0']);
+        model.rows[0] = helper.createModelRowByTexts('1', ['cell1', '', '0']);
         let table = helper.createTable(model);
         table.render();
 
@@ -93,7 +95,7 @@ describe('Table', () => {
 
       it('accepts rows with text only', () => {
         let model = helper.createModelFixture(3, 1);
-        model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '', '0'], true);
+        model.rows[0] = helper.createModelRowByTexts('1', ['cell1', '', '0'], true);
         let table = helper.createTable(model);
         table.render();
 
@@ -154,7 +156,7 @@ describe('Table', () => {
       model = helper.createModelFixture(1);
       model.rowIconVisible = true;
       table = helper.createTable(model);
-      row = helper.createModelRow(1, ['Foo']);
+      row = helper.createModelRow('1', ['Foo']);
       row.rowIcon = icons.WORLD;
       table.insertRow(row);
 
@@ -228,7 +230,7 @@ describe('Table', () => {
       table.on('rowOrderChanged', () => {
         events += 'rowOrderChanged';
       });
-      table.insertRows([helper.createModelRow(1, ['A']), helper.createModelRow(1, ['Z'])]);
+      table.insertRows([helper.createModelRow('1', ['A']), helper.createModelRow('1', ['Z'])]);
 
       // we expect exactly this order of events when new rows are inserted
       expect(events).toBe('rowsInserted rowOrderChanged');
@@ -559,13 +561,13 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.checkRow(rows[0], true, true);
-      table.checkRow(rows[4], true, true);
+      table.checkRow(rows[0], true);
+      table.checkRow(rows[4], true);
 
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(2);
 
-      table.checkRow(rows[4], false, true);
+      table.checkRow(rows[4], false);
 
       checkedRows = [];
       for (let z = 0; z < rows.length; z++) {
@@ -587,13 +589,13 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.checkRow(rows[0], true, true);
-      table.checkRow(rows[4], true, true);
+      table.checkRow(rows[0], true);
+      table.checkRow(rows[4], true);
 
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(1);
 
-      table.checkRow(rows[4], false, true);
+      table.checkRow(rows[4], false);
 
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
@@ -610,7 +612,7 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.checkRow(rows[0], true, true);
+      table.checkRow(rows[0], true);
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
     });
@@ -626,7 +628,7 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
       rows[0].enabled = false;
-      table.checkRow(rows[0], true, true);
+      table.checkRow(rows[0], true);
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
     });
@@ -643,7 +645,7 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.checkRow(rows[0], true, true);
+      table.checkRow(rows[0], true);
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
     });
@@ -681,7 +683,7 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.checkRow(rows[0], true, true);
+      table.checkRow(rows[0], true);
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(1);
 
@@ -811,7 +813,7 @@ describe('Table', () => {
       expect($selectedRows.length).toBe(0);
 
       table.toggleSelection();
-      helper.assertSelection(table, model.rows);
+      helper.assertSelection(table, table.rows);
       sendQueuedAjaxCalls();
       helper.assertSelectionEvent(model.id, helper.getRowIds(model.rows));
     });
@@ -964,7 +966,7 @@ describe('Table', () => {
       table.resizeColumn(table.columns[0], 100);
       expect(table.columns[0].width).toBe(100);
 
-      sendQueuedAjaxCalls('', 1000);
+      sendQueuedAjaxCalls(null, 1000);
       let event = new RemoteEvent(table.id, 'columnResized', {
         columnId: table.columns[0].id,
         width: 100,
@@ -997,7 +999,7 @@ describe('Table', () => {
       table.resizeColumn(table.columns[0], 100);
       table.resizeColumn(table.columns[0], 150);
 
-      sendQueuedAjaxCalls('', 1000);
+      sendQueuedAjaxCalls(null, 1000);
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
@@ -2689,9 +2691,9 @@ describe('Table', () => {
       let model = helper.createModelFixture(1, 0);
       let table = helper.createTable(model);
       table.insertRows([
-        helper.createModelRow(1, ['A']),
-        helper.createModelRow(1, ['B']),
-        helper.createModelRow(1, ['C'])
+        helper.createModelRow('1', ['A']),
+        helper.createModelRow('1', ['B']),
+        helper.createModelRow('1', ['C'])
       ]);
 
       // Move row B one up
@@ -2728,9 +2730,9 @@ describe('Table', () => {
       let model = helper.createModelFixture(1, 0);
       let table = helper.createTable(model);
       table.insertRows([
-        helper.createModelRow(1, ['A']),
-        helper.createModelRow(1, ['B']),
-        helper.createModelRow(1, ['C'])
+        helper.createModelRow('1', ['A']),
+        helper.createModelRow('1', ['B']),
+        helper.createModelRow('1', ['C'])
       ]);
 
       // Move row B one down
@@ -2767,9 +2769,9 @@ describe('Table', () => {
       let model = helper.createModelFixture(1, 0);
       let table = helper.createTable(model);
       table.insertRows([
-        helper.createModelRow(1, ['A']),
-        helper.createModelRow(1, ['B']),
-        helper.createModelRow(1, ['C'])
+        helper.createModelRow('1', ['A']),
+        helper.createModelRow('1', ['B']),
+        helper.createModelRow('1', ['C'])
       ]);
 
       // Move row B to top
@@ -2800,9 +2802,9 @@ describe('Table', () => {
       let model = helper.createModelFixture(1, 0);
       let table = helper.createTable(model);
       table.insertRows([
-        helper.createModelRow(1, ['A']),
-        helper.createModelRow(1, ['B']),
-        helper.createModelRow(1, ['C'])
+        helper.createModelRow('1', ['A']),
+        helper.createModelRow('1', ['B']),
+        helper.createModelRow('1', ['C'])
       ]);
 
       // Move row B to bottom
@@ -2833,13 +2835,13 @@ describe('Table', () => {
       let model = helper.createModelFixture(1, 0);
       let table = helper.createTable(model);
       table.insertRows([
-        helper.createModelRow(1, ['A']),
-        helper.createModelRow(1, ['B-filtered']),
-        helper.createModelRow(1, ['C']),
-        helper.createModelRow(1, ['D-filtered']),
-        helper.createModelRow(1, ['E']),
-        helper.createModelRow(1, ['F-filtered']),
-        helper.createModelRow(1, ['G'])
+        helper.createModelRow('1', ['A']),
+        helper.createModelRow('1', ['B-filtered']),
+        helper.createModelRow('1', ['C']),
+        helper.createModelRow('1', ['D-filtered']),
+        helper.createModelRow('1', ['E']),
+        helper.createModelRow('1', ['F-filtered']),
+        helper.createModelRow('1', ['G'])
       ]);
 
       // Filter active
@@ -2900,13 +2902,13 @@ describe('Table', () => {
       let model = helper.createModelFixture(1, 0);
       let table = helper.createTable(model);
       table.insertRows([
-        helper.createModelRow(1, ['A']),
-        helper.createModelRow(1, ['B-filtered']),
-        helper.createModelRow(1, ['C']),
-        helper.createModelRow(1, ['D-filtered']),
-        helper.createModelRow(1, ['E']),
-        helper.createModelRow(1, ['F-filtered']),
-        helper.createModelRow(1, ['G'])
+        helper.createModelRow('1', ['A']),
+        helper.createModelRow('1', ['B-filtered']),
+        helper.createModelRow('1', ['C']),
+        helper.createModelRow('1', ['D-filtered']),
+        helper.createModelRow('1', ['E']),
+        helper.createModelRow('1', ['F-filtered']),
+        helper.createModelRow('1', ['G'])
       ]);
 
       // Filter active
@@ -3017,21 +3019,21 @@ describe('Table', () => {
       model = helper.createModelFixture(1, 0);
       table = helper.createTable(model);
       table.insertRows([
-        helper.createModelRow(1, ['A']),
-        helper.createModelRow(2, ['B']),
-        helper.createModelRow(3, ['C']),
-        helper.createModelRow(4, ['D']),
-        helper.createModelRow(5, ['E']),
-        helper.createModelRow(6, ['F']),
-        helper.createModelRow(7, ['G'])
+        helper.createModelRow('1', ['A']),
+        helper.createModelRow('2', ['B']),
+        helper.createModelRow('3', ['C']),
+        helper.createModelRow('4', ['D']),
+        helper.createModelRow('5', ['E']),
+        helper.createModelRow('6', ['F']),
+        helper.createModelRow('7', ['G'])
       ]);
-      table.insertRows(helper.createModelRows(1, 2, 1));
-      table.insertRows(helper.createModelRows(1, 2, 2));
-      table.insertRows(helper.createModelRows(1, 2, 3));
-      table.insertRows(helper.createModelRows(1, 5, 4));
-      table.insertRows(helper.createModelRows(1, 2, 5));
-      table.insertRows(helper.createModelRows(1, 2, 6));
-      table.insertRows(helper.createModelRows(1, 2, 7));
+      table.insertRows(helper.createModelRows(1, 2, '1'));
+      table.insertRows(helper.createModelRows(1, 2, '2'));
+      table.insertRows(helper.createModelRows(1, 2, '3'));
+      table.insertRows(helper.createModelRows(1, 5, '4'));
+      table.insertRows(helper.createModelRows(1, 2, '5'));
+      table.insertRows(helper.createModelRows(1, 2, '6'));
+      table.insertRows(helper.createModelRows(1, 2, '7'));
       rows = table.rows;
 
       table.render();
@@ -3040,30 +3042,30 @@ describe('Table', () => {
     });
 
     it('scrolls current row to the top when expanding a large child set', () => {
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(1).$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(7).$row), $scrollable)).toBe(false);
-      expect(table._rowById(4).expanded).toBe(false);
-      table.expandRow(table._rowById(4), true);
-      expect(table._rowById(4).expanded).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('1').$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('7').$row), $scrollable)).toBe(false);
+      expect(table._rowById('4').expanded).toBe(false);
+      table.expandRow(table._rowById('4'), true);
+      expect(table._rowById('4').expanded).toBe(true);
       // first visible row should be row3 (one above the expanded node)
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(2).$row), $scrollable)).toBe(false);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(3).$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(4).$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('2').$row), $scrollable)).toBe(false);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('3').$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('4').$row), $scrollable)).toBe(true);
       // node5 isn't visible anymore since node4's children use up all the space
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(5).$row), $scrollable)).toBe(false);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('5').$row), $scrollable)).toBe(false);
     });
 
     it('scrolls current row up so that the full expansion is visible plus half a row at the bottom', () => {
-      expect(table._rowById(5).expanded).toBe(false);
-      table.expandRow(table._rowById(5), true);
-      expect(table._rowById(5).expanded).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(4).$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(5).$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(5).childRows[0].$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(5).childRows[1].$row), $scrollable)).toBe(true);
+      expect(table._rowById('5').expanded).toBe(false);
+      table.expandRow(table._rowById('5'), true);
+      expect(table._rowById('5').expanded).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('4').$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('5').$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('5').childRows[0].$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('5').childRows[1].$row), $scrollable)).toBe(true);
       // half of row6 should still be visible after the expansion
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(6).$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(7).$row), $scrollable)).toBe(false);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('6').$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('7').$row), $scrollable)).toBe(false);
     });
 
   });
@@ -3197,11 +3199,11 @@ describe('Table', () => {
       let model = helper.createModelFixture(2, 0);
       model.columns[0].multilineText = true;
       model.rows = [
-        helper.createModelRow(1, [
+        helper.createModelRow('1', [
           '\n  \n\tline 1  \n line   2\n\n\nline 3  ',
           ' second\ncolumn '
         ]),
-        helper.createModelRow(2, [
+        helper.createModelRow('2', [
           '',
           'test'
         ])

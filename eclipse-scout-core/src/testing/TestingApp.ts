@@ -16,11 +16,8 @@ export default class TestingApp extends RemoteApp {
     super();
   }
 
-  /**
-   * @override
-   */
-  _doBootstrapDefaultValues() {
+  protected override _doBootstrapDefaultValues(): JQuery.Promise<void> {
     // nop for testing
+    return null;
   }
-
 }

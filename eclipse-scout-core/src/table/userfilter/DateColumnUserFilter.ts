@@ -12,8 +12,9 @@ import {ColumnUserFilter, DateColumn, DateColumnUserFilterModel, DateField, date
 import $ from 'jquery';
 import {TableMatrixDateGroup, TableMatrixNumberGroup} from '../TableMatrix';
 import {TableUserFilterAddedEventData} from './TableUserFilter';
+import ColumnUserFilterModel from './ColumnUserFilterModel';
 
-export default class DateColumnUserFilter extends ColumnUserFilter {
+export default class DateColumnUserFilter extends ColumnUserFilter implements ColumnUserFilterModel {
   declare model: DateColumnUserFilterModel;
   declare column: DateColumn;
 

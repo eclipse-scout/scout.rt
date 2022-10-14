@@ -16,7 +16,7 @@ import * as $ from 'jquery';
 import {ObjectType} from '../ObjectFactory';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {ScrollbarInstallOptions, ScrollOptions, ScrollToOptions} from '../scrollbar/scrollbars';
-import {Optional, RefModel} from '../types';
+import {Optional} from '../types';
 
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
 export type GlassPaneTarget = JQuery | HTMLElement | DeferredGlassPaneTarget;
@@ -284,7 +284,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Default implementation simply returns undefined. A Subclass
    * may override this method to load or extend a JSON model with models.getModel or models.extend.
    */
-  protected _jsonModel(): RefModel<WidgetModel> {
+  protected _jsonModel(): Omit<WidgetModel, 'parent'> {
     return null;
   }
 
@@ -1934,7 +1934,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   }
 
   widget<T extends Widget>(widgetId: string, type: new() => T): T;
-  widget(widgetId: string): AnyWidget;
+  widget(widgetId: string): Widget;
 
   /**
    * Traverses the object-tree (children) of this widget and searches for a widget with the given ID.

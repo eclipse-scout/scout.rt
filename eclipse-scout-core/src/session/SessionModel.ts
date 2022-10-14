@@ -22,7 +22,7 @@ export default interface SessionModel {
    * Necessary when multiple UI sessions are managed by the same window (portlet support).
    * Each session's partId must be unique. Default is 0.
    */
-  portletPartId?: number;
+  portletPartId?: string;
 
   /**
    * Identifies the 'client instance' on the UI server. If the property is not set (which is the default case), the clientSessionId is taken from the browser's session storage (per browser window, survives F5 refresh of page).

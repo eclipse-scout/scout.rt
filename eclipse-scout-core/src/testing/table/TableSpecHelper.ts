@@ -8,17 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Cell, comparators, DecimalFormat, ObjectFactory, objects, RemoteEvent, scout, Table, TableAdapter, TableTextUserFilter, TextColumnUserFilter} from '../../index';
+import {
+  arrays, Cell, CellModel, Column, ColumnModel, ColumnUserFilter, comparators, DecimalFormat, Filter, MenuModel, ModelAdapterModel, NumberColumnModel, ObjectFactory, objects, RemoteEvent, scout, Session, Table, TableAdapter, TableModel,
+  TableRow, TableTextUserFilter, TextColumnUserFilter, TextColumnUserFilterModel
+} from '../../index';
 import {MenuSpecHelper} from '../index';
 import $ from 'jquery';
+import {RefModel, SomeRequired} from '../../types';
+import {ObjectType} from '../../ObjectFactory';
+import {TableRowData} from '../../table/TableRowModel';
+import ColumnUserFilterModel from '../../table/userfilter/ColumnUserFilterModel';
 
 export default class TableSpecHelper {
+  session: Session;
+  menuHelper: MenuSpecHelper;
+
   constructor(session) {
     this.session = session;
     this.menuHelper = new MenuSpecHelper(session);
   }
 
-  createModel(columns, rows) {
+  createModel(columns: RefModel<ColumnModel>[], rows: TableRowData[]): TableModel & { objectType: ObjectType<Table, TableModel> } {
     let model = createSimpleModel('Table', this.session);
 
     // Server will never send undefined -> don't create model with undefined properties.
@@ -32,7 +42,7 @@ export default class TableSpecHelper {
     return model;
   }
 
-  createModelRow(id, cells, parentRow) {
+  createModelRow(id?: string, cells?: any[], parentRow?: TableRowData | string): TableRowData {
     return {
       id: scout.nvl(id, ObjectFactory.get().createUniqueId()),
       cells: cells,
@@ -45,7 +55,7 @@ export default class TableSpecHelper {
    * @param texts array of texts for the cells in the new row or a string if only one cell should be created.
    * @param withoutCells true if only text instead of cells should be created (server only sends text without a cell object if no other properties are set)
    */
-  createModelRowByTexts(id, texts, withoutCells) {
+  createModelRowByTexts(id: string, texts: string[] | string, withoutCells?: boolean): TableRowData {
     texts = arrays.ensure(texts);
 
     let cells = [];
@@ -63,7 +73,7 @@ export default class TableSpecHelper {
    *
    * @param values array of values for the cells in the new row or a number if only one cell should be created.
    */
-  createModelRowByValues(id, values) {
+  createModelRowByValues(id: string, values: any[]): TableRowData {
     values = arrays.ensure(values);
     let cells = [];
     for (let i = 0; i < values.length; i++) {
@@ -72,18 +82,21 @@ export default class TableSpecHelper {
     return this.createModelRow(id, cells);
   }
 
-  createModelColumn(text, type) {
-    return {
+  createModelColumn(text: string, type?: ObjectType<Column, ColumnModel>): ColumnModel & { uiSortPossible: boolean } {
+    let model = {
       id: ObjectFactory.get().createUniqueId(),
       text: text,
       objectType: (type === undefined ? 'Column' : type),
-      decimalFormat: (type === 'NumberColumn' ? new DecimalFormat(this.session.locale) : undefined),
       uiSortPossible: true
     };
+    if (type === 'NumberColumn') {
+      (model as NumberColumnModel).decimalFormat = new DecimalFormat(this.session.locale);
+    }
+    return model;
   }
 
-  createModelCell(text, value) {
-    let cell = {};
+  createModelCell(text?: string, value?: any): CellModel {
+    let cell = {} as CellModel;
     if (text !== undefined) {
       cell.text = text;
     }
@@ -93,15 +106,15 @@ export default class TableSpecHelper {
     return scout.create(Cell, cell);
   }
 
-  createMenuModel(text, icon) {
+  createMenuModel(text?: string, icon?: string): MenuModel {
     return this.menuHelper.createModel(text, icon, ['Table.SingleSelection']);
   }
 
-  createMenuModelWithSingleAndHeader(text, icon) {
+  createMenuModelWithSingleAndHeader(text: string, icon?: string): MenuModel {
     return this.menuHelper.createModel(text, icon, ['Table.SingleSelection', 'Table.Header']);
   }
 
-  createModelColumns(count, columnType) {
+  createModelColumns(count: number, columnType?: ObjectType): RefModel<ColumnModel>[] {
     if (!count) {
       return;
     }
@@ -132,9 +145,9 @@ export default class TableSpecHelper {
    * Creates cells with values.
    *
    * If the column is of type NumberColumn a numeric value is set.
-   * Otherwise the value is similar to 'cell0_0' if rowId is given, or 'cell0' if no rowId is given.
+   * Otherwise, the value is similar to 'cell0_0' if rowId is given, or 'cell0' if no rowId is given.
    */
-  createModelCells(columns, rowId) {
+  createModelCells(columns: ColumnModel[] | number, rowId?: string): CellModel[] {
     let cells = [];
     if (rowId === undefined) {
       rowId = '';
@@ -160,19 +173,19 @@ export default class TableSpecHelper {
    * Creates #rowCount rows where columns is either the column count or the column objects.
    * Passing the column objects allows to consider the column type for cell creation.
    */
-  createModelRows(columns, rowCount, parentRow) {
+  createModelRows(columns: number | ColumnModel[], rowCount: number, parentRow?: RefModel<TableRowData> | string): TableRowData[] {
     if (!rowCount) {
       return;
     }
 
     let rows = [];
     for (let i = 0; i < rowCount; i++) {
-      rows[i] = this.createModelRow(null, this.createModelCells(columns, i), parentRow);
+      rows[i] = this.createModelRow(null, this.createModelCells(columns, i + ''), parentRow);
     }
     return rows;
   }
 
-  createModelSingleColumnByTexts(texts) {
+  createModelSingleColumnByTexts(texts: string[]): TableModel {
     let rows = [];
     for (let i = 0; i < texts.length; i++) {
       rows.push(this.createModelRowByTexts(null, texts[i]));
@@ -180,7 +193,7 @@ export default class TableSpecHelper {
     return this.createModel(this.createModelColumns(1), rows);
   }
 
-  createModelSingleColumnByValues(values, columnType) {
+  createModelSingleColumnByValues(values: any[], columnType: ObjectType<Column, ColumnModel>) {
     let rows = [];
     for (let i = 0; i < values.length; i++) {
       rows.push(this.createModelRowByValues(null, values[i]));
@@ -188,7 +201,7 @@ export default class TableSpecHelper {
     return this.createModel(this.createModelColumns(1, columnType), rows);
   }
 
-  createModelFixture(colCount, rowCount) {
+  createModelFixture(colCount: number, rowCount?: number): TableModel & { objectType: ObjectType<Table, TableModel> } {
     return this.createModel(this.createModelColumns(colCount), this.createModelRows(colCount, rowCount));
   }
 
@@ -197,42 +210,39 @@ export default class TableSpecHelper {
     return this.createTable(model);
   }
 
-  createModelSingleConfiguredCheckableColumn(rowCount) {
+  createModelSingleConfiguredCheckableColumn(rowCount: number): TableModel {
     let cols = this.createModelColumns(1);
     cols[0].checkable = true;
     return this.createModel(cols, this.createModelRows(1, rowCount));
   }
 
-  createTable(model) {
+  createTable(model: TableModel): Table {
     let defaults = {
       parent: this.session.desktop
     };
     model = $.extend({}, defaults, model);
-    let table = new Table();
-    table.init(model);
-    return table;
+    return scout.create(Table, model);
   }
 
-  createTableAdapter(model) {
+  createTableAdapter(model: ModelAdapterModel | SomeRequired<TableModel, 'session' | 'id'>): TableAdapter {
     let tableAdapter = new TableAdapter();
     tableAdapter.init(model);
     return tableAdapter;
   }
 
-  createColumnFilter(model) {
+  createColumnFilter(model: TextColumnUserFilterModel): TextColumnUserFilter {
     let filter = new TextColumnUserFilter();
     filter.init(model);
     return filter;
   }
 
-  createAndRegisterColumnFilter(model) {
+  createAndRegisterColumnFilter(model: ColumnUserFilterModel): ColumnUserFilter {
     let filter = this.createColumnFilter(model);
     model.table.addFilter(filter);
     return filter;
   }
 
-
-  createTableTextFilter(table, text) {
+  createTableTextFilter(table: Table, text: string): TableTextUserFilter {
     return scout.create(TableTextUserFilter, {
       session: this.session,
       table: table,
@@ -240,7 +250,7 @@ export default class TableSpecHelper {
     });
   }
 
-  createTextColumnFilter(table, column, text) {
+  createTextColumnFilter(table: Table, column: Column, text: string): TextColumnUserFilter {
     return scout.create(TextColumnUserFilter, {
       session: this.session,
       table: table,
@@ -249,7 +259,7 @@ export default class TableSpecHelper {
     });
   }
 
-  createColumnStructureChangedEvent(model, columns) {
+  createColumnStructureChangedEvent(model: { id: string }, columns: ColumnModel[]): RemoteEvent {
     return {
       target: model.id,
       columns: columns,
@@ -257,7 +267,7 @@ export default class TableSpecHelper {
     };
   }
 
-  createRowsInsertedEvent(model, rows) {
+  createRowsInsertedEvent(model: { id: string }, rows: TableRowData[]): RemoteEvent {
     return {
       target: model.id,
       rows: rows,
@@ -265,14 +275,14 @@ export default class TableSpecHelper {
     };
   }
 
-  createAllRowsDeletedEvent(model) {
+  createAllRowsDeletedEvent(model: { id: string }): RemoteEvent {
     return {
       target: model.id,
       type: 'allRowsDeleted'
     };
   }
 
-  createFiltersChangedEvent(model, filters) {
+  createFiltersChangedEvent(model: { id: string }, filters: Filter<TableRow>[]): RemoteEvent {
     return {
       target: model.id,
       filters: filters,
@@ -285,7 +295,7 @@ export default class TableSpecHelper {
    * Applies display style on rows and cells so that cells are positioned correctly in a row.<br>
    * Necessary because the stylesheet is not applied when running the specs.
    */
-  applyDisplayStyle(table) {
+  applyDisplayStyle(table: Table) {
     table.$data.css('position', 'relative');
     table.$rows().each(function() {
       let $row = $(this);
@@ -297,7 +307,7 @@ export default class TableSpecHelper {
     });
   }
 
-  getRowIds(rows) {
+  getRowIds(rows: (TableRow | TableRowData)[]): string[] {
     let rowIds = [];
     for (let i = 0; i < rows.length; i++) {
       rowIds.push(rows[i].id);
@@ -305,12 +315,12 @@ export default class TableSpecHelper {
     return rowIds;
   }
 
-  selectRowsAndAssert(table, rows) {
+  selectRowsAndAssert(table: Table, rows: TableRow[]) {
     table.selectRows(rows);
     this.assertSelection(table, rows);
   }
 
-  assertSelection(table, rows) {
+  assertSelection(table: Table, rows: TableRow[]) {
     let $selectedRows = table.$selectedRows();
     expect($selectedRows.length).toBe(rows.length);
 
@@ -331,35 +341,35 @@ export default class TableSpecHelper {
    * Asserts that the rows contain the given texts at column specified by colIndex
    * @param texts array with same length as rows.
    */
-  assertTextsInCells(rows, colIndex, texts) {
+  assertTextsInCells(rows: TableRow[], colIndex: number, texts: string[]) {
     expect(rows.length).toBe(texts.length);
     for (let i = 0; i < rows.length; i++) {
       expect(rows[i].cells[colIndex].text).toBe(texts[i]);
     }
   }
 
-  assertValuesInCells(rows, colIndex, values) {
+  assertValuesInCells(rows: TableRow[], colIndex: number, values: any[]) {
     expect(rows.length).toBe(values.length);
     for (let i = 0; i < rows.length; i++) {
       expect(rows[i].cells[colIndex].value).toBe(values[i]);
     }
   }
 
-  assertDatesInCells(rows, colIndex, dates) {
+  assertDatesInCells(rows: TableRow[], colIndex: number, dates: Date[]) {
     expect(rows.length).toBe(dates.length);
     for (let i = 0; i < rows.length; i++) {
       expect(rows[i].cells[colIndex].value.getTime()).toBe(dates[i].getTime());
     }
   }
 
-  assertSelectionEvent(id, rowIds) {
+  assertSelectionEvent(id: string, rowIds: string[]) {
     let event = new RemoteEvent(id, 'rowsSelected', {
       rowIds: rowIds
     });
     expect(mostRecentJsonRequest()).toContainEvents(event);
   }
 
-  getDisplayingContextMenu(table) {
+  getDisplayingContextMenu(table: Table): JQuery {
     return $('body').find('.context-menu');
   }
 

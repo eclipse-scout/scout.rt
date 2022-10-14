@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {DummyLookupCall} from '../index';
+import {LookupRow} from '../../index';
 
 export default class ColumnDescriptorDummyLookupCall extends DummyLookupCall {
   constructor() {
@@ -18,7 +19,7 @@ export default class ColumnDescriptorDummyLookupCall extends DummyLookupCall {
     this.setDelay(250);
   }
 
-  _dataToLookupRow(data) {
+  protected override _dataToLookupRow(data: any[]): LookupRow<number> {
     let lookupRow = super._dataToLookupRow(data);
     lookupRow.additionalTableRowData = {
       column1: lookupRow.text + ' column1',

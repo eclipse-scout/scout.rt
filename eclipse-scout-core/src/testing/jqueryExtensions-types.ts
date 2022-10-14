@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import ColumnUserFilterModel from './ColumnUserFilterModel';
 
-export default interface NumberColumnUserFilterModel extends ColumnUserFilterModel {
-  numberFrom?: number;
-  numberTo?: number;
+interface JQuery<TElement = HTMLElement> extends Array<TElement | JQuery> {
+  triggerBlur(): JQuery;
 }
+
+
+export {};
