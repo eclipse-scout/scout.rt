@@ -11,6 +11,7 @@
 import {ColumnUserFilter, FilterFieldsGroupBox, scout, StringField, strings, TableRow, TextColumnUserFilterModel} from '../../index';
 import $ from 'jquery';
 import {TableUserFilterAddedEventData} from './TableUserFilter';
+import {ValueFieldAcceptInputEvent} from '../../form/fields/ValueFieldEventMap';
 
 export default class TextColumnUserFilter extends ColumnUserFilter {
   declare model: TextColumnUserFilterModel;
@@ -59,8 +60,9 @@ export default class TextColumnUserFilter extends ColumnUserFilter {
     groupBox.addField0(this.freeTextField);
   }
 
-  protected _onAcceptInput(event) { // FIXME TS: add event type as soon as StringField has been migrated.
-    this.freeText = this.freeTextField.$field.val().trim();
+  protected _onAcceptInput(event: ValueFieldAcceptInputEvent<string>) {
+    let val = this.freeTextField.$field.val() as string;
+    this.freeText = val.trim();
     $.log.isDebugEnabled() && $.log.debug('(TextColumnUserFilter#_onAcceptInput) freeText=' + this.freeText);
     this.triggerFilterFieldsChanged();
   }

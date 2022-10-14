@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GridData, LogicalGrid, LogicalGridContainer, Widget} from '../../index';
+import {GridData, LogicalGrid, LogicalGridContainer} from '../../index';
 import {LogicalGridOptions} from './LogicalGrid';
 import {LogicalGridWidget} from './LogicalGridData';
 
@@ -90,7 +90,7 @@ export default class AbstractGrid extends LogicalGrid {
   /**
    * If grid w is greater than column count, grid w will be set to the column count.
    */
-  static getGridDataFromHints(widget: Widget, groupBoxColumnCount: number): GridData {
+  static getGridDataFromHints(widget: LogicalGridWidget, groupBoxColumnCount: number): GridData {
     let data = GridData.createFromHints(widget, groupBoxColumnCount);
     data.w = Math.min(groupBoxColumnCount, data.w);
     return data;

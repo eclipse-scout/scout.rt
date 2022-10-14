@@ -9,13 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Column, Session, Table} from '../../index';
-import {HorizontalAlignment} from '../../cell/Cell';
+import {Alignment} from '../../cell/Cell';
 import {ColumnComparator} from './comparators';
 import {ObjectType} from '../../ObjectFactory';
 
-export default interface ColumnModel {
+export default interface ColumnModel<TValue> {
   session?: Session;
-  objectType?: ObjectType<Column>;
+  objectType?: ObjectType<Column<TValue>>;
 
   id?: string;
 
@@ -133,7 +133,7 @@ export default interface ColumnModel {
    * Configures the horizontal alignment of text inside this column (including header text).
    * Default is -1 (left alignment).
    */
-  horizontalAlignment?: HorizontalAlignment;
+  horizontalAlignment?: Alignment;
 
   /**
    * Configures, if HTML rendering is enabled for this column. Default is false.

@@ -1675,7 +1675,7 @@ export interface PlannerActivity {
 
 export interface PlannerResource {
   id: string;
-  resourceCell: CellModel;
+  resourceCell: CellModel<any>;
   activities: PlannerActivity[];
   $resource?: JQuery;
   $cells?: JQuery;

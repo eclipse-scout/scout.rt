@@ -12,7 +12,7 @@ import {Status, StatusModel} from '../index';
 
 export default class ValidationFailedStatus extends Status {
 
-  constructor(model: StatusModel) {
+  constructor(model?: StatusModel) {
     super(model);
   }
 }

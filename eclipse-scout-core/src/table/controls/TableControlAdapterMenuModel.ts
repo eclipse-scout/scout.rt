@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuModel, TableControl} from '../../index';
+import {FormMenuModel, TableControl} from '../../index';
 
-export default interface TableControlAdapterMenuModel extends MenuModel { // FIXME TS: user FormMenuModel as super interface as soon as FormMenu has been migrated
+export default interface TableControlAdapterMenuModel extends FormMenuModel {
   tableControl?: TableControl;
 }

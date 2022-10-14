@@ -14,7 +14,7 @@ import AbstractLayout from '../layout/AbstractLayout';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {TooltipSupportOptions} from '../tooltip/TooltipSupport';
 import {TooltipPosition} from '../tooltip/Tooltip';
-import {HorizontalAlignment} from '../cell/Cell';
+import {Alignment} from '../cell/Cell';
 
 export type ActionStyle = EnumObject<typeof Action.ActionStyle>;
 export type KeyStrokeFirePolicy = EnumObject<typeof Action.KeyStrokeFirePolicy>;
@@ -28,7 +28,7 @@ export default class Action extends Widget implements ActionModel {
   compact: boolean;
   compactOrig: boolean;
   iconId: string;
-  horizontalAlignment: HorizontalAlignment;
+  horizontalAlignment: Alignment;
   keyStroke: string;
   keyStrokeFirePolicy: KeyStrokeFirePolicy;
   selected: boolean;
@@ -394,7 +394,7 @@ export default class Action extends Widget implements ActionModel {
     }
   }
 
-  setHorizontalAlignment(horizontalAlignment: HorizontalAlignment) {
+  setHorizontalAlignment(horizontalAlignment: Alignment) {
     this.setProperty('horizontalAlignment', horizontalAlignment);
   }
 

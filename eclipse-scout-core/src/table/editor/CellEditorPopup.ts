@@ -10,24 +10,19 @@
  */
 import {
   AbstractLayout, Cell, CellEditorCancelEditKeyStroke, CellEditorCompleteEditKeyStroke, CellEditorPopupLayout, CellEditorPopupModel, CellEditorTabKeyStroke, Column, EventHandler, events, FormField, graphics, KeyStroke, Point, Popup,
-  Rectangle, scout, Table, TableRow
+  Rectangle, scout, Table, TableRow, ValueField
 } from '../../index';
 import $ from 'jquery';
 import {KeyStrokeManagerKeyStrokeEvent} from '../../keystroke/KeyStrokeManagerEventMap';
 import {TableRowOrderChangedEvent} from '../TableEventMap';
 
-export type CellEditorPopupRenderedOptions = {
-  openFieldPopup: boolean;
-  cellEditorPopup: CellEditorPopup;
-};
-
-export default class CellEditorPopup extends Popup implements CellEditorPopupModel {
-  declare model: CellEditorPopupModel;
+export default class CellEditorPopup<TValue> extends Popup implements CellEditorPopupModel<TValue> {
+  declare model: CellEditorPopupModel<TValue>;
 
   table: Table;
-  column: Column;
+  column: Column<TValue>;
   row: TableRow;
-  cell: Cell;
+  cell: Cell<TValue>;
   protected _rowOrderChangedFunc: EventHandler<TableRowOrderChangedEvent>;
   protected _pendingCompleteCellEdit: JQuery.Promise<void>;
   protected _keyStrokeHandler: EventHandler<KeyStrokeManagerKeyStrokeEvent>;
@@ -42,7 +37,7 @@ export default class CellEditorPopup extends Popup implements CellEditorPopupMod
     this._keyStrokeHandler = this._onKeyStroke.bind(this);
   }
 
-  protected override _init(options: CellEditorPopupModel) {
+  protected override _init(options: CellEditorPopupModel<TValue>) {
     options.scrollType = options.scrollType || 'position';
     super._init(options);
 
@@ -151,7 +146,7 @@ export default class CellEditorPopup extends Popup implements CellEditorPopupMod
     super._postRender(); // installs the focus context for this popup
 
     // If applicable, invoke the field's function 'onCellEditorRendered' to signal the cell-editor to be rendered.
-    let field = this.cell.field as FormField & { onCellEditorRendered?(options: CellEditorPopupRenderedOptions): void };
+    let field = this.cell.field as ValueField<TValue> & { onCellEditorRendered?(options: CellEditorRenderedOptions<TValue>): void };
     if (field.onCellEditorRendered) {
       field.onCellEditorRendered({
         openFieldPopup: this.table.openFieldPopupOnCellEdit,
@@ -199,7 +194,7 @@ export default class CellEditorPopup extends Popup implements CellEditorPopupMod
     // When acceptInput returns a promise, we must wait until input is accepted
     // Otherwise call completeEdit immediately, also call it immediately if waitForAcceptInput is false (see _onKeyStroke)
     let field = this.cell.field;
-    let acceptInputPromise = field.acceptInput() as JQuery.Promise<void>; // FIXME TS: cast can be removed as soon as ValueField has been migrated
+    let acceptInputPromise = field.acceptInput();
     if (!acceptInputPromise || !scout.nvl(waitForAcceptInput, true)) {
       this._pendingCompleteCellEdit = $.resolvedPromise();
       this.table.completeCellEdit();
@@ -277,3 +272,8 @@ export default class CellEditorPopup extends Popup implements CellEditorPopupMod
     return $.resolvedPromise();
   }
 }
+
+export type CellEditorRenderedOptions<TValue> = {
+  openFieldPopup: boolean;
+  cellEditorPopup: CellEditorPopup<TValue>;
+};

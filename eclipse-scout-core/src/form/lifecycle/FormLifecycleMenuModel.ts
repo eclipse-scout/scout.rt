@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {MenuModel} from '../../index';
+import {ButtonSystemType} from '../fields/button/Button';
 
 export default interface FormLifecycleMenuModel extends MenuModel {
-  systemType?: number; // FIXME TS: SystemType (Button.SystemType)
+  systemType?: ButtonSystemType;
 }

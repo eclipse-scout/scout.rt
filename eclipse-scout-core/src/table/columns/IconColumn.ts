@@ -10,7 +10,7 @@
  */
 import {Cell, Column, TableRow} from '../../index';
 
-export default class IconColumn extends Column {
+export default class IconColumn extends Column<string> {
 
   constructor() {
     super();
@@ -19,7 +19,7 @@ export default class IconColumn extends Column {
     this.textBased = false;
   }
 
-  protected override _initCell(cell: Cell): Cell {
+  protected override _initCell(cell: Cell<string>): Cell<string> {
     super._initCell(cell);
     // only display icon, no text
     cell.text = null;
@@ -27,7 +27,7 @@ export default class IconColumn extends Column {
     return cell;
   }
 
-  protected override _formatValue(value: any, row?: TableRow): string {
+  protected override _formatValue(value: string, row?: TableRow): string {
     // only display icon, no text
     return null;
   }
@@ -42,7 +42,7 @@ export default class IconColumn extends Column {
     return cell.value;
   }
 
-  override createAggrGroupCell(row: TableRow): Cell {
+  override createAggrGroupCell(row: TableRow): Cell<string> {
     let cell = super.createAggrGroupCell(row);
     // Make sure only icon and no text is displayed
     cell.text = null;

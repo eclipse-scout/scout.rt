@@ -54,7 +54,7 @@ export default class TableRowDetail extends Widget implements TableRowDetailMode
     this.invalidateLayoutTree();
   }
 
-  protected _renderCell(column: Column) {
+  protected _renderCell(column: Column<any>) {
     let cell = this.table.cell(column, this.row);
     if (strings.empty(cell.text) && !cell.iconId) {
       return;

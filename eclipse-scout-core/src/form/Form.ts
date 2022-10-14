@@ -9,25 +9,18 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbortKeyStroke, Button, DialogLayout, DisabledStyle, DisplayParent, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormField, FormGrid, FormLayout, FormLifecycle, FormModel,
-  GlassPaneRenderer, GroupBox, HtmlComponent, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, Point, PopupWindow, Rectangle, scout, Status, StatusModel, strings, tooltips, TreeVisitResult, webstorage, Widget, WrappedFormField
+  AbortKeyStroke, Button, DialogLayout, DisabledStyle, DisplayParent, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormLayout, FormLifecycle, FormModel, GlassPaneRenderer,
+  GroupBox, HtmlComponent, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, Point, PopupWindow, Rectangle, scout, Status, StatusModel, strings, tooltips, TreeVisitResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
 import {FormRevealInvalidFieldEvent} from './FormEventMap';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {DisplayViewId} from '../tabbox/SimpleTab';
+import {ValidationResult} from './fields/FormField';
+import {ButtonSystemType} from './fields/button/Button';
 import Promise = JQuery.Promise;
 
 export type DisplayHint = EnumObject<typeof Form.DisplayHint>;
-
-export type ValidationResult = {
-  valid: boolean;
-  validByErrorStatus: boolean;
-  validByMandatory: boolean;
-  field: FormField;
-  label: string;
-  reveal: () => void;
-}; // FIXME TS: move to FormField
 
 export default class Form extends Widget implements FormModel, DisplayParent {
   declare model: FormModel;
@@ -552,18 +545,17 @@ export default class Form extends Widget implements FormModel, DisplayParent {
    */
   protected _abort() {
     // Search for a close button in the menus and buttons of the root group box
-    let hasCloseButton = this.rootGroupBox.controls
-      .concat(this.rootGroupBox.menus)
+    let controls: (Widget & { systemType?: ButtonSystemType })[] = this.rootGroupBox.controls;
+    controls = controls.concat(this.rootGroupBox.menus);
+    let hasCloseButton = controls
       .filter(control => {
         let enabled = control.enabled;
         if (control.enabledComputed !== undefined) {
           enabled = control.enabledComputed; // Menus don't have enabledComputed, only form fields
         }
-        return control.visible && enabled && control.systemType && control.systemType !== Button.SystemType.NONE;
+        return control.visible && enabled && control.systemType;
       })
-      .some(control => {
-        return control.systemType === Button.SystemType.CLOSE;
-      });
+      .some(control => control.systemType === Button.SystemType.CLOSE);
 
     if (hasCloseButton) {
       // noinspection JSIgnoredPromiseFromCall
@@ -1245,7 +1237,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
   /**
    * Visits all form-fields of this form in pre-order (top-down).
    */
-  visitFields(visitor: (FormField) => (TreeVisitResult | void)) {
+  visitFields(visitor: (FormField) => TreeVisitResult | void) {
     this.rootGroupBox.visitFields(visitor);
   }
 

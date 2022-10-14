@@ -276,7 +276,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * This function sets the property value. Override this function when you need special init behavior for certain properties.
    * For instance you could not simply set the property value, but extend an already existing value.
    */
-  protected _initProperty(propertyName, value) {
+  protected _initProperty(propertyName: string, value: any) {
     this[propertyName] = value;
   }
 
@@ -1804,7 +1804,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Therefore, this model may be used to override the cloned properties or to add additional properties.
    * @param options Options passed to the mirror function.
    */
-  clone(model: WidgetModel, options?: CloneOptions) {
+  clone(model: WidgetModel, options?: CloneOptions): this {
     let clone, cloneModel;
     // @ts-ignore
     model = model || {};
@@ -2190,7 +2190,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     }
   }
 
-  protected _onScroll(event: JQuery.ScrollEvent<HTMLElement>) {
+  protected _onScroll(event: JQuery.ScrollEvent) {
     let $scrollable = this.get$Scrollable();
     this._setProperty('scrollTop', $scrollable[0].scrollTop);
     this._setProperty('scrollLeft', $scrollable[0].scrollLeft);

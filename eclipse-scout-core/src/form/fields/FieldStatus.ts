@@ -1,16 +1,32 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ContextMenuPopup, Event, FormField, HtmlComponent, scout, Status, strings, Tooltip, Widget} from '../../index';
+import {arrays, ContextMenuPopup, EventHandler, FieldStatusEventMap, FieldStatusModel, FormField, HierarchyChangeEvent, HtmlComponent, Menu, PropertyChangeEvent, scout, Status, strings, Tooltip, Widget} from '../../index';
+import {FormFieldStatusPosition} from './FormField';
+import {StatusOrModel} from '../../status/Status';
 
-export default class FieldStatus extends Widget {
+export default class FieldStatus extends Widget implements FieldStatusModel {
+  declare model: FieldStatusModel;
+  declare eventMap: FieldStatusEventMap;
+
+  autoRemove: boolean;
+  status: Status;
+  position: FormFieldStatusPosition;
+  menus: Menu[];
+  tooltip: Tooltip;
+  contextMenu: ContextMenuPopup;
+  updating: boolean;
+
+  protected _parents: Widget[];
+  protected _parentPropertyChangeListener: EventHandler<PropertyChangeEvent<any, Widget>>;
+  protected _parentHierarchyChangeListener: EventHandler<HierarchyChangeEvent>;
 
   constructor() {
     super();
@@ -26,13 +42,13 @@ export default class FieldStatus extends Widget {
     this._parentHierarchyChangeListener = this._onParentHierarchyChange.bind(this);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendSpan('status')
       .on('mousedown', this._onStatusMouseDown.bind(this));
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 
-  _remove() {
+  protected override _remove() {
     super._remove();
     if (this.tooltip) {
       this.tooltip.destroy();
@@ -45,12 +61,12 @@ export default class FieldStatus extends Widget {
     this._removeParentListeners();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderPosition();
   }
 
-  update(status, menus, autoRemove, showStatus) {
+  update(status: StatusOrModel, menus: Menu | Menu[], autoRemove: boolean, showStatus?: boolean) {
     this.updating = true;
     this.setStatus(status);
     this.setMenus(menus);
@@ -63,61 +79,60 @@ export default class FieldStatus extends Widget {
     this.setStatus(null);
   }
 
-  setStatus(status) {
+  setStatus(status: StatusOrModel) {
     this.setProperty('status', status);
   }
 
-  _setStatus(status) {
+  protected _setStatus(status: StatusOrModel) {
     status = Status.ensure(status);
     this._setProperty('status', status);
   }
 
-  _renderStatus() {
+  protected _renderStatus() {
     if (!this.updating) {
       this._updatePopup();
     }
   }
 
-  setPosition(position) {
+  setPosition(position: FormFieldStatusPosition) {
     this.setProperty('position', position);
   }
 
-  _renderPosition() {
+  protected _renderPosition() {
     this.$container.toggleClass('top', this.position === FormField.StatusPosition.TOP);
     this.invalidateLayoutTree();
   }
 
-  _renderVisible() {
+  protected override _renderVisible() {
     super._renderVisible();
     if (!this.visible) {
       this.hidePopup();
     }
   }
 
-  setMenus(menus) {
+  setMenus(menus: Menu | Menu[]) {
     this.setProperty('menus', arrays.ensure(menus));
   }
 
-  _renderMenus() {
+  protected _renderMenus() {
     if (!this.updating) {
       this._updatePopup();
     }
   }
 
-  setAutoRemove(autoRemove) {
+  setAutoRemove(autoRemove: boolean) {
     this.setProperty('autoRemove', autoRemove);
   }
 
-  _renderAutoRemove() {
+  protected _renderAutoRemove() {
     if (!this.updating) {
       this._updatePopup();
     }
   }
 
   hideTooltip() {
-    let event = new Event();
     if (this.tooltip) {
-      this.trigger('hideTooltip', event);
+      let event = this.trigger('hideTooltip');
       if (!event.defaultPrevented) {
         this.tooltip.destroy();
         this._removeParentListeners();
@@ -125,7 +140,7 @@ export default class FieldStatus extends Widget {
     }
   }
 
-  _updatePopup(showStatus) {
+  protected _updatePopup(showStatus?: boolean) {
     if (!this._requiresTooltip()) {
       this.hideTooltip();
     }
@@ -139,7 +154,7 @@ export default class FieldStatus extends Widget {
     }
   }
 
-  _requiresTooltip() {
+  protected _requiresTooltip(): boolean {
     if (!this.status || !this.rendered) {
       return false;
     }
@@ -153,8 +168,7 @@ export default class FieldStatus extends Widget {
     if (!this._requiresTooltip()) {
       return;
     }
-    let event = new Event();
-    this.trigger('showTooltip', event);
+    let event = this.trigger('showTooltip');
     if (event.defaultPrevented) {
       return;
     }
@@ -269,14 +283,14 @@ export default class FieldStatus extends Widget {
     }
   }
 
-  _onStatusMouseDown(event) {
-    this.trigger('statusMouseDown', event);
-    if (!event.defaultPrevented) {
+  protected _onStatusMouseDown(event: JQuery.MouseDownEvent) {
+    let statusDownEvent = this.trigger('statusMouseDown', event);
+    if (!statusDownEvent.defaultPrevented) {
       this.togglePopup();
     }
   }
 
-  _updateTooltipVisibility(parent) {
+  protected _updateTooltipVisibility(parent: Widget) {
     if (this.isEveryParentVisible()) {
       /* We must use a timeout here, because the propertyChange event for the visible property
        * is triggered before the _renderVisible() function is called. Which means the DOM is still
@@ -298,19 +312,19 @@ export default class FieldStatus extends Widget {
     }
   }
 
-  _onParentHierarchyChange(event) {
+  protected _onParentHierarchyChange(event: HierarchyChangeEvent) {
     // If the parent of a widget we're listening to changes, we must re-check the parent hierarchy
     // and re-install the property change listener
     this._updateParentListeners();
   }
 
-  _onParentPropertyChange(event) {
+  protected _onParentPropertyChange(event: PropertyChangeEvent<any, Widget>) {
     if ('visible' === event.propertyName) {
       this._updateTooltipVisibility(event.source);
     }
   }
 
-  _removeParentListeners() {
+  protected _removeParentListeners() {
     this._parents.forEach(parent => {
       parent.off('hierarchyChange', this._parentHierarchyChangeListener);
       parent.off('propertyChange', this._parentPropertyChangeListener);
@@ -322,7 +336,7 @@ export default class FieldStatus extends Widget {
    * Adds a property change listener to every parent of the field status. We keep a list of all parents because
    * we need to remove the listeners later, also when the parent hierarchy has changed.
    */
-  _updateParentListeners() {
+  protected _updateParentListeners() {
     this._removeParentListeners();
     let parent = this.parent;
     while (parent) {

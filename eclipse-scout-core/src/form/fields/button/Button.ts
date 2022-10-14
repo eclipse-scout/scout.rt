@@ -8,9 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ButtonKeyStroke, ButtonLayout, ContextMenuPopup, Device, DoubleClickSupport, FormField, icons, KeyStrokeContext, LoadingSupport, scout, styles, tooltips} from '../../../index';
+import {
+  ButtonAdapterMenu, ButtonEventMap, ButtonKeyStroke, ButtonLayout, ButtonModel, ContextMenuPopup, Device, DoubleClickSupport, EnumObject, FormField, icons, KeyStrokeContext, LoadingSupport, Menu, scout, styles, tooltips, Widget
+} from '../../../index';
 
-export default class Button extends FormField {
+export default class Button extends FormField implements ButtonModel {
+  declare model: ButtonModel;
+  declare eventMap: ButtonEventMap;
+
+  defaultButton: boolean;
+  displayStyle: ButtonDisplayStyle;
+  iconId: string;
+  keyStroke: string;
+  keyStrokeScope: Widget;
+  processButton: boolean;
+  selected: boolean;
+  systemType: ButtonSystemType;
+  preventDoubleClick: boolean;
+  stackable: boolean;
+  shrinkable: boolean;
+  adaptedBy: ButtonAdapterMenu;
+  buttonKeyStroke: ButtonKeyStroke;
+  formKeyStrokeContext: KeyStrokeContext;
+  popup: ContextMenuPopup;
+  $buttonLabel: JQuery;
+  $submenuIcon: JQuery;
+  protected _doubleClickSupport: DoubleClickSupport;
 
   constructor() {
     super();
@@ -29,7 +52,6 @@ export default class Button extends FormField {
     this.preventDoubleClick = false;
     this.stackable = true;
     this.shrinkable = false;
-
     this.$buttonLabel = null;
     this.buttonKeyStroke = new ButtonKeyStroke(this, null);
     this._doubleClickSupport = new DoubleClickSupport();
@@ -44,7 +66,7 @@ export default class Button extends FormField {
     RESET: 4,
     SAVE: 5,
     SAVE_WITHOUT_MARKER_CHANGE: 6
-  };
+  } as const;
 
   static DisplayStyle = {
     DEFAULT: 0,
@@ -52,14 +74,11 @@ export default class Button extends FormField {
     RADIO: 2,
     LINK: 3,
     BORDERLESS: 4
-  };
+  } as const;
 
   static SUBMENU_ICON = icons.ANGLE_DOWN_BOLD;
 
-  /**
-   * @protected
-   */
-  _init(model) {
+  protected override _init(model: ButtonModel) {
     super._init(model);
     this.resolveIconIds(['iconId']);
     this._setKeyStroke(this.keyStroke);
@@ -67,14 +86,11 @@ export default class Button extends FormField {
     this._setInheritAccessibility(this.inheritAccessibility && !this._isIgnoreAccessibilityFlags());
   }
 
-  getContextMenuItems(onlyVisible = true) {
+  override getContextMenuItems(onlyVisible = true): Menu[] {
     return [];
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     this._initDefaultKeyStrokes();
@@ -82,7 +98,7 @@ export default class Button extends FormField {
     this.formKeyStrokeContext = new KeyStrokeContext();
     this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
     this.formKeyStrokeContext.registerKeyStroke(this.buttonKeyStroke);
-    this.formKeyStrokeContext.$bindTarget = function() {
+    this.formKeyStrokeContext.$bindTarget = () => {
       if (this.keyStrokeScope) {
         return this.keyStrokeScope.$container;
       }
@@ -93,39 +109,35 @@ export default class Button extends FormField {
       }
       // use desktop otherwise
       return this.session.desktop.$container;
-    }.bind(this);
+    };
   }
 
-  _isIgnoreAccessibilityFlags() {
+  protected _isIgnoreAccessibilityFlags(): boolean {
     return this.systemType === Button.SystemType.CANCEL || this.systemType === Button.SystemType.CLOSE;
   }
 
-  _initDefaultKeyStrokes() {
-    this.keyStrokeContext.registerKeyStroke([
+  protected _initDefaultKeyStrokes() {
+    this.keyStrokeContext.registerKeyStrokes([
       new ButtonKeyStroke(this, 'ENTER'),
       new ButtonKeyStroke(this, 'SPACE')
     ]);
   }
 
-  /**
-   * @override
-   */
-  _createLoadingSupport() {
+  protected override _createLoadingSupport(): LoadingSupport {
     return new LoadingSupport({
       widget: this,
-      $container: function() {
+      $container: () => {
         return this.$field;
-      }.bind(this)
+      }
     });
   }
 
   /**
    * The button form-field has no label and no status. Additionally it also has no container.
    * Container and field are the same thing.
-   * @protected
    */
-  _render() {
-    let $button;
+  protected _render() {
+    let $button: JQuery;
     if (this.displayStyle === Button.DisplayStyle.LINK) {
       // Render as link-button
       $button = this.$parent.makeDiv('link-button menu-item');
@@ -154,9 +166,7 @@ export default class Button extends FormField {
       .unfocusable();
 
     if (this.menus && this.menus.length > 0) {
-      this.menus.forEach(function(menu) {
-        this.keyStrokeContext.registerKeyStroke(menu);
-      }, this);
+      this.menus.forEach(menu => this.keyStrokeContext.registerKeyStroke(menu));
       if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
         let icon = icons.parseIconId(Button.SUBMENU_ICON);
         this.$submenuIcon = $button
@@ -171,27 +181,21 @@ export default class Button extends FormField {
     });
   }
 
-  /**
-   * @protected
-   */
-  _remove() {
+  protected override _remove() {
     super._remove();
     tooltips.uninstall(this.$buttonLabel);
     this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
     this.$submenuIcon = null;
   }
 
-  /**
-   * @override
-   */
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderIconId();
     this._renderSelected();
     this._renderDefaultButton();
   }
 
-  _renderForegroundColor() {
+  protected override _renderForegroundColor() {
     super._renderForegroundColor();
     // Color button label as well, otherwise the color would not be visible because button label has already a color set using css
     styles.legacyForegroundColor(this, this.$buttonLabel);
@@ -199,12 +203,12 @@ export default class Button extends FormField {
     styles.legacyForegroundColor(this, this.$submenuIcon);
   }
 
-  _renderBackgroundColor() {
+  protected override _renderBackgroundColor() {
     super._renderBackgroundColor();
     styles.legacyBackgroundColor(this, this.$fieldContainer);
   }
 
-  _renderFont() {
+  protected override _renderFont() {
     super._renderFont();
     styles.legacyFont(this, this.$buttonLabel);
     // Changing the font may enlarge or shrink the field (e.g. set the style to bold makes the text bigger) -> invalidate layout
@@ -212,11 +216,9 @@ export default class Button extends FormField {
   }
 
   /**
-   * @returns {Boolean}
-   *          <code>true</code> if the action has been performed or <code>false</code> if it
-   *          has not been performed (e.g. when the button is not enabled).
+   * @returns true if the action has been performed or false if it has not been performed (e.g. when the button is not enabled).
    */
-  doAction() {
+  doAction(): boolean {
     if (!this.enabledComputed || !this.visible) {
       return false;
     }
@@ -230,7 +232,7 @@ export default class Button extends FormField {
     return true;
   }
 
-  _doAction() {
+  protected _doAction() {
     this.trigger('click');
   }
 
@@ -245,7 +247,7 @@ export default class Button extends FormField {
     }
   }
 
-  _openPopup() {
+  protected _openPopup(): ContextMenuPopup {
     let popup = scout.create(ContextMenuPopup, {
       parent: this,
       menuItems: this.menus,
@@ -257,42 +259,36 @@ export default class Button extends FormField {
     return popup;
   }
 
-  _doActionTogglesSubMenu() {
+  protected _doActionTogglesSubMenu() {
     return false;
   }
 
-  setDefaultButton(defaultButton) {
+  setDefaultButton(defaultButton: boolean) {
     this.setProperty('defaultButton', defaultButton);
   }
 
-  _renderDefaultButton() {
+  protected _renderDefaultButton() {
     this.$field.toggleClass('default', this.defaultButton);
   }
 
-  /**
-   * @override
-   */
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     if (this.displayStyle === Button.DisplayStyle.LINK) {
       this.$field.setTabbable(this.enabledComputed && !Device.get().supportsOnlyTouch());
     }
   }
 
-  setSelected(selected) {
+  setSelected(selected: boolean) {
     this.setProperty('selected', selected);
   }
 
-  _renderSelected() {
+  protected _renderSelected() {
     if (this.displayStyle === Button.DisplayStyle.TOGGLE) {
       this.$field.toggleClass('selected', this.selected);
     }
   }
 
-  /**
-   * @override
-   */
-  _renderLabel() {
+  protected override _renderLabel() {
     this.$buttonLabel.contentOrNbsp(this.labelHtmlEnabled, this.label, 'empty');
     this._updateLabelAndIconStyle();
 
@@ -300,18 +296,17 @@ export default class Button extends FormField {
     this.invalidateLayoutTree();
   }
 
-  setIconId(iconId) {
+  setIconId(iconId: string) {
     this.setProperty('iconId', iconId);
   }
 
   /**
    * Adds an image or font-based icon to the button by adding either an IMG or SPAN element to the button.
-   * @protected
    */
-  _renderIconId() {
+  protected _renderIconId() {
     let $iconTarget = this.$fieldContainer;
     $iconTarget.icon(this.iconId);
-    let $icon = $iconTarget.data('$icon');
+    let $icon = $iconTarget.data('$icon') as JQuery;
     if ($icon) {
       // <img>s are loaded asynchronously. The real image size is not known until the image is loaded.
       // We add a listener to revalidate the button layout after this has happened. The 'loading' and
@@ -335,34 +330,34 @@ export default class Button extends FormField {
 
     // ----- Helper functions -----
 
-    function updateButtonLayoutAfterImageLoaded(success) {
+    function updateButtonLayoutAfterImageLoaded(success: boolean) {
       $icon.removeClass('loading');
       $icon.toggleClass('broken', !success);
       this.invalidateLayoutTree();
     }
   }
 
-  get$Icon() {
+  get$Icon(): JQuery {
     let $iconTarget = this.$fieldContainer;
     return $iconTarget.children('.icon');
   }
 
-  _updateLabelAndIconStyle() {
+  protected _updateLabelAndIconStyle() {
     let hasText = !!this.label;
     this.$buttonLabel.setVisible(hasText || !this.iconId);
     this.get$Icon().toggleClass('with-label', hasText);
   }
 
-  setKeyStroke(keyStroke) {
+  setKeyStroke(keyStroke: string) {
     this.setProperty('keyStroke', keyStroke);
   }
 
-  _setKeyStroke(keyStroke) {
+  protected _setKeyStroke(keyStroke: string) {
     this._setProperty('keyStroke', keyStroke);
     this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
   }
 
-  _setKeyStrokeScope(keyStrokeScope) {
+  protected _setKeyStrokeScope(keyStrokeScope: Widget | string) {
     if (typeof keyStrokeScope === 'string') {
       keyStrokeScope = this._resolveKeyStrokeScope(keyStrokeScope);
       if (!keyStrokeScope) {
@@ -374,7 +369,7 @@ export default class Button extends FormField {
     this._setProperty('keyStrokeScope', keyStrokeScope);
   }
 
-  _resolveKeyStrokeScope(keyStrokeScope) {
+  protected _resolveKeyStrokeScope(keyStrokeScope: string): Widget {
     // Basically, the desktop could be used to find the scope, but that would mean to traverse the whole widget tree.
     // To make it faster the form is used instead but that limits the resolving to the form.
     // This should be acceptable because the scope can still be set explicitly without using an id.
@@ -388,14 +383,14 @@ export default class Button extends FormField {
       form.one('init', this._setKeyStrokeScope.bind(this, keyStrokeScope));
       return;
     }
-    keyStrokeScope = form.widget(keyStrokeScope);
-    if (!keyStrokeScope) {
+    let scope = form.widget(keyStrokeScope);
+    if (!scope) {
       throw new Error('Could not resolve keyStrokeScope ' + keyStrokeScope + ' using form ' + form);
     }
-    return keyStrokeScope;
+    return scope;
   }
 
-  _onClick(event) {
+  protected _onClick(event: JQuery.ClickEvent) {
     if (event.which !== 1) {
       return; // Other button than left mouse button --> nop
     }
@@ -413,45 +408,39 @@ export default class Button extends FormField {
     }
   }
 
-  setStackable(stackable) {
+  setStackable(stackable: boolean) {
     this.setProperty('stackable', stackable);
   }
 
-  setShrinkable(shrinkable) {
+  setShrinkable(shrinkable: boolean) {
     this.setProperty('shrinkable', shrinkable);
   }
 
-  setPreventDoubleClick(preventDoubleClick) {
+  setPreventDoubleClick(preventDoubleClick: boolean) {
     this.setProperty('preventDoubleClick', preventDoubleClick);
   }
 
-  /**
-   * @override
-   */
-  getFocusableElement() {
+  override getFocusableElement(): HTMLElement | JQuery {
     if (this.adaptedBy) {
       return this.adaptedBy.getFocusableElement();
     }
     return super.getFocusableElement();
   }
 
-  /**
-   * @override
-   */
-  isFocusable() {
+  override isFocusable(checkTabbable?: boolean): boolean {
     if (this.adaptedBy) {
       return this.adaptedBy.isFocusable();
     }
     return super.isFocusable();
   }
 
-  /**
-   * @override
-   */
-  focus() {
+  override focus(): boolean {
     if (this.adaptedBy) {
       return this.adaptedBy.focus();
     }
     return super.focus();
   }
 }
+
+export type ButtonSystemType = EnumObject<typeof Button.SystemType>;
+export type ButtonDisplayStyle = EnumObject<typeof Button.DisplayStyle>;

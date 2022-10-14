@@ -12,6 +12,7 @@ import {arrays, LookupRow, objects, QueryBy, scout, Session} from '../index';
 import $ from 'jquery';
 import LookupCallModel from './LookupCallModel';
 import LookupResult from './LookupResult';
+import {SomeRequired} from '../types';
 import {ObjectType} from '../ObjectFactory';
 
 /**
@@ -22,7 +23,7 @@ import {ObjectType} from '../ObjectFactory';
 export default class LookupCall<TKey> implements LookupCallModel<TKey> {
 
   declare model: LookupCallModel<TKey>;
-  objectType: string;
+  objectType: ObjectType<LookupCall<TKey>>;
   session: Session;
   hierarchical: boolean;
   loadIncremental: boolean;
@@ -324,7 +325,7 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
 
   // ---- static helpers ----
 
-  static ensure<K>(lookupCall: LookupCall<K> | LookupCallModel<K> & { objectType: ObjectType<LookupCall<K>> } | string, session: Session): LookupCall<K> {
+  static ensure<K>(lookupCall: LookupCall<K> | SomeRequired<LookupCallModel<K>, 'objectType'> | string, session: Session): LookupCall<K> {
     if (lookupCall instanceof LookupCall) {
       return lookupCall;
     }

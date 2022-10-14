@@ -16,7 +16,7 @@ export default class UnsavedFormChangesForm extends Form implements UnsavedFormC
   declare model: UnsavedFormChangesFormModel;
 
   unsavedForms: Form[];
-  openFormsField: ListBox;
+  openFormsField: ListBox<Form>;
 
   constructor() {
     super();
@@ -61,7 +61,7 @@ export default class UnsavedFormChangesForm extends Form implements UnsavedFormC
   protected override _init(model: UnsavedFormChangesFormModel) {
     super._init(model);
 
-    this.openFormsField = this.widget('OpenFormsField', ListBox);
+    this.openFormsField = this.widget('OpenFormsField', ListBox<Form>);
     this.openFormsField.setLookupCall(scout.create(UnsavedFormsLookupCall, {
       session: this.session,
       unsavedForms: this.unsavedForms

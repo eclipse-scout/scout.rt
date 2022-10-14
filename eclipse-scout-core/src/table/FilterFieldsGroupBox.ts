@@ -33,7 +33,7 @@ export default class FilterFieldsGroupBox extends GroupBox implements FilterFiel
     this.filter.modifyFilterFields();
   }
 
-  addFilterField(objectType: ObjectType<ValueField>, text: string): ValueField {
+  addFilterField<TValue>(objectType: ObjectType<ValueField<TValue>>, text: string): ValueField<TValue> {
     let field = scout.create(objectType, {
       parent: this,
       label: this.session.text(text),
@@ -48,7 +48,7 @@ export default class FilterFieldsGroupBox extends GroupBox implements FilterFiel
 
   // Info from awe, cgu: Added '0' to the name to avoid temporarily to avoid naming conflict with FormField#addField
   // This should be refactored in a future release
-  addField0(field: ValueField) {
+  addField0(field: ValueField<any>) {
     this.fields.push(field);
     this._prepareFields();
   }

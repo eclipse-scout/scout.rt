@@ -12,9 +12,9 @@ import {CellEditorPopup, keys, KeyStroke} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class CellEditorCompleteEditKeyStroke extends KeyStroke {
-  declare field: CellEditorPopup;
+  declare field: CellEditorPopup<any>;
 
-  constructor(popup: CellEditorPopup) {
+  constructor(popup: CellEditorPopup<any>) {
     super();
     this.field = popup;
     this.which = [keys.ENTER];

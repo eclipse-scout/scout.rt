@@ -10,7 +10,7 @@
  */
 import {Column, comparators, DateColumnEventMap, DateColumnModel, DateField, DateFormat, dates, Locale, scout, TableRow} from '../../index';
 
-export default class DateColumn extends Column implements DateColumnModel {
+export default class DateColumn extends Column<Date> implements DateColumnModel {
   declare model: DateColumnModel;
   declare eventMap: DateColumnEventMap;
 
@@ -74,7 +74,7 @@ export default class DateColumn extends Column implements DateColumnModel {
     return this.format.format(value);
   }
 
-  protected override _parseValue(text: Date | string): Date {
+  protected override _parseValue(text: Date): Date {
     return dates.ensure(text);
   }
 

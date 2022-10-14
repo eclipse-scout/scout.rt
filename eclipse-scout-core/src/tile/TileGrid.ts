@@ -640,7 +640,7 @@ export default class TileGrid extends Widget implements TileGridModel {
     this.invalidateLayoutTree();
   }
 
-  protected override _onScroll() {
+  protected override _onScroll(event: JQuery.ScrollEvent) {
     let scrollTop = this.$container[0].scrollTop;
     let scrollLeft = this.$container[0].scrollLeft;
     if (this.scrollTop !== scrollTop && this.virtual) {

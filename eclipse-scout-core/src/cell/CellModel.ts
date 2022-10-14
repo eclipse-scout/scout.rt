@@ -9,20 +9,20 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Status} from '../index';
-import {HorizontalAlignment} from './Cell';
+import {Alignment} from './Cell';
 
-export default interface CellModel {
+export default interface CellModel<TValue> {
   cssClass?: string;
   editable?: boolean;
   errorStatus?: Status;
-  horizontalAlignment?: HorizontalAlignment;
+  horizontalAlignment?: Alignment;
   htmlEnabled?: boolean;
   iconId?: string;
   mandatory?: boolean;
   text?: string;
   flowsLeft?: boolean;
   empty?: boolean;
-  value?: any;
+  value?: TValue;
   tooltipText?: string;
   foregroundColor?: string;
   backgroundColor?: string;

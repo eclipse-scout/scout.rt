@@ -1,19 +1,22 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, MenuBarLayout, ResponsiveManager, scrollbars} from '../../../index';
+import {AbstractLayout, Dimension, EventHandler, FormField, graphics, GroupBox, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, MenuBarLayout, PropertyChangeEvent, ResponsiveManager, scrollbars} from '../../../index';
 import $ from 'jquery';
 
 export default class GroupBoxLayout extends AbstractLayout {
+  groupBox: GroupBox;
+  protected _htmlPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, HtmlEnvironment>>;
+  protected _statusWidth: number;
 
-  constructor(groupBox) {
+  constructor(groupBox: GroupBox) {
     super();
     this.groupBox = groupBox;
 
@@ -26,24 +29,24 @@ export default class GroupBoxLayout extends AbstractLayout {
     });
   }
 
-  _initDefaults() {
+  protected _initDefaults() {
     this._statusWidth = HtmlEnvironment.get().fieldStatusWidth;
   }
 
-  _onHtmlEnvironmentPropertyChange() {
+  protected _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this.groupBox.invalidateLayoutTree();
   }
 
-  layout($container) {
-    let gbBodySize,
-      menuBarSize,
+  override layout($container: JQuery) {
+    let menuBarSize: Dimension,
       menuBarHeight = 0,
       statusWidth = 0,
       statusPosition = this.groupBox.statusPosition,
       htmlContainer = this.groupBox.htmlComp,
       htmlGbBody = this._htmlGbBody(),
       htmlMenuBar = this._htmlMenuBar(),
+      // @ts-ignore
       tooltip = this.groupBox._tooltip(),
       $header = this.groupBox.$header,
       $title = this.groupBox.$title,
@@ -87,7 +90,7 @@ export default class GroupBoxLayout extends AbstractLayout {
       setWidthForStatus(this.groupBox.notification.$container, statusWidth);
     }
 
-    gbBodySize = containerSize.subtract(htmlGbBody.margins());
+    let gbBodySize = containerSize.subtract(htmlGbBody.margins());
     gbBodySize.height -= this._headerHeight();
     gbBodySize.height -= this._notificationHeight();
     gbBodySize.height -= menuBarHeight;
@@ -104,7 +107,7 @@ export default class GroupBoxLayout extends AbstractLayout {
     }
 
     // Make $element wider, so status is on the left
-    function setWidthForStatus($element, statusWidth) {
+    function setWidthForStatus($element: JQuery, statusWidth?: number) {
       if (statusWidth) {
         let marginX = $element.cssMarginX() + statusWidth;
         $element.cssWidth('calc(100% - ' + marginX + 'px)');
@@ -114,7 +117,7 @@ export default class GroupBoxLayout extends AbstractLayout {
     }
   }
 
-  _updateMenuBar(htmlMenuBar, containerSize, statusWidth) {
+  protected _updateMenuBar(htmlMenuBar: HtmlComponent, containerSize: Dimension, statusWidth: number): Dimension {
     let $groupBox = this.groupBox.$container;
     let $menuBar = htmlMenuBar.$comp;
     if (!this.groupBox.mainBox &&
@@ -140,7 +143,7 @@ export default class GroupBoxLayout extends AbstractLayout {
     return this._menuBarSize(htmlMenuBar, containerSize, statusWidth);
   }
 
-  _menuBarSize(htmlMenuBar, containerSize, statusWidth) {
+  protected _menuBarSize(htmlMenuBar: HtmlComponent, containerSize: Dimension, statusWidth: number): Dimension {
     let menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
     if (!this.groupBox.mainBox) {
       // adjust size of menubar as well if it is in a regular group box
@@ -149,7 +152,7 @@ export default class GroupBoxLayout extends AbstractLayout {
     return menuBarSize;
   }
 
-  _updateHeaderMenuBar(htmlMenuBar, $header, $title, statusWidth) {
+  protected _updateHeaderMenuBar(htmlMenuBar: HtmlComponent, $header: JQuery, $title: JQuery, statusWidth: number): Dimension {
     // Use Math.floor/ceil and +1 to avoid rounding issues with text-ellipsis and title label
     let menuBarSize = htmlMenuBar.prefSize({
       exact: true
@@ -193,11 +196,11 @@ export default class GroupBoxLayout extends AbstractLayout {
     return menuBarSize;
   }
 
-  _$status() {
+  protected _$status(): JQuery {
     return this.groupBox.$status;
   }
 
-  _layoutStatus() {
+  protected _layoutStatus() {
     let htmlContainer = this.groupBox.htmlComp,
       containerPadding = htmlContainer.insets({
         includeBorder: false
@@ -221,19 +224,17 @@ export default class GroupBoxLayout extends AbstractLayout {
       .cssHeight(headerInnerHeight - statusMargins.vertical());
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     options = options || {};
     let htmlContainer = this.groupBox.htmlComp,
       htmlGbBody = this._htmlGbBody(),
-      htmlMenuBar,
-      prefSize,
+      prefSize: Dimension,
       widthInPixel = 0,
       heightInPixel = 0,
       gridData = this.groupBox.gridData,
       undoResponsive = false;
 
-    if (this.groupBox.responsive &&
-      options.widthHint) {
+    if (this.groupBox.responsive && options.widthHint) {
       undoResponsive = ResponsiveManager.get().handleResponsive(this.groupBox, options.widthHint);
     }
 
@@ -258,7 +259,7 @@ export default class GroupBoxLayout extends AbstractLayout {
       prefSize = htmlGbBody.prefSize(options)
         .add(htmlGbBody.margins());
 
-      htmlMenuBar = this._htmlMenuBar();
+      let htmlMenuBar = this._htmlMenuBar();
       if (htmlMenuBar && this.groupBox.menuBarPosition !== GroupBox.MenuBarPosition.TITLE) {
         prefSize.height += htmlMenuBar.prefSize(options).height;
       }
@@ -284,11 +285,11 @@ export default class GroupBoxLayout extends AbstractLayout {
     return prefSize;
   }
 
-  _headerHeight() {
+  protected _headerHeight(): number {
     return graphics.prefSize(this.groupBox.$header, true).height;
   }
 
-  _notificationHeight(options) {
+  protected _notificationHeight(options?: HtmlCompPrefSizeOptions): number {
     options = options || {};
     if (!this.groupBox.notification) {
       return 0;
@@ -300,7 +301,7 @@ export default class GroupBoxLayout extends AbstractLayout {
   /**
    * Return menu-bar when it exists and it is visible.
    */
-  _htmlMenuBar() {
+  protected _htmlMenuBar(): HtmlComponent {
     if (this.groupBox.menuBar && this.groupBox.menuBarVisible) {
       let htmlMenuBar = HtmlComponent.optGet(this.groupBox.menuBar.$container);
       if (htmlMenuBar && htmlMenuBar.isVisible()) {
@@ -310,7 +311,7 @@ export default class GroupBoxLayout extends AbstractLayout {
     return null;
   }
 
-  _htmlGbBody() {
+  protected _htmlGbBody(): HtmlComponent {
     return HtmlComponent.get(this.groupBox.$body);
   }
 }

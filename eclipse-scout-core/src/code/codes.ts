@@ -17,7 +17,7 @@ import CodeTypeModel from './CodeTypeModel';
  */
 let defaultLanguage = 'en';
 
-let registry: Record<string, CodeType> = {};
+let registry: Record<string, CodeType<any>> = {};
 
 export function bootstrap(url: string): JQuery.Promise<any> {
   let promise = url ? $.ajaxJson(url) : $.resolvedPromise({});
@@ -40,18 +40,18 @@ export function init(data) {
   Object.keys(data).forEach(codeTypeId => add(data[codeTypeId]));
 }
 
-export function add(codeTypes: CodeTypeModel | CodeTypeModel[]) {
+export function add(codeTypes: CodeTypeModel<any> | CodeTypeModel<any>[]) {
   codeTypes = arrays.ensure(codeTypes);
   codeTypes.forEach(codeTypeModel => {
     let codeType = CodeType.ensure(codeTypeModel);
     registry[codeType.id] = codeType;
-  }, this);
+  });
 }
 
 /**
  * @param codeTypes code types or code type ids to remove
  */
-export function remove(codeTypes: (string | CodeType)[]) {
+export function remove(codeTypes: (string | CodeType<any>)[]) {
   codeTypes = arrays.ensure(codeTypes);
   codeTypes.forEach(codeType => {
     let id;
@@ -61,7 +61,7 @@ export function remove(codeTypes: (string | CodeType)[]) {
       id = codeType.id;
     }
     delete registry[id];
-  }, this);
+  });
 }
 
 /**
@@ -87,7 +87,7 @@ export function remove(codeTypes: (string | CodeType)[]) {
  * @returns a code for the given codeId
  * @throw Error if code does not exist
  */
-export function get(vararg: string, codeId?: string): Code {
+export function get<T>(vararg: string, codeId?: T): Code<T> {
   // eslint-disable-next-line prefer-rest-params
   return _get('get', objects.argumentsToArray(arguments));
 }
@@ -100,12 +100,12 @@ export function get(vararg: string, codeId?: string): Code {
  * @param codeId
  * @returns code for the given codeId or undefined if code does not exist
  */
-export function optGet(vararg: string, codeId?: string): Code {
+export function optGet<T>(vararg: string, codeId?: T): Code<T> {
   // eslint-disable-next-line prefer-rest-params
   return _get('optGet', objects.argumentsToArray(arguments));
 }
 
-export function _get(funcName: string, funcArgs: string[]): Code {
+export function _get(funcName: string, funcArgs: any[]): Code<any> {
   let codeTypeId, codeId;
   if (funcArgs.length === 2) {
     codeTypeId = funcArgs[0];
@@ -123,7 +123,7 @@ export function _get(funcName: string, funcArgs: string[]): Code {
   return codeType(codeTypeId)[funcName](codeId);
 }
 
-export function codeType(codeTypeId: string, optional?: boolean): CodeType {
+export function codeType(codeTypeId: string, optional?: boolean): CodeType<any> {
   let codeType = registry[codeTypeId];
   if (!optional && !codeType) {
     throw new Error('No CodeType found for id=' + codeTypeId);
@@ -131,7 +131,7 @@ export function codeType(codeTypeId: string, optional?: boolean): CodeType {
   return codeType;
 }
 
-export function generateTextKey(code: Code): string {
+export function generateTextKey(code: Code<any>): string {
   // Use __ as prefix to reduce the possibility of overriding 'real' keys
   return '__code.' + code.id;
 }
@@ -144,7 +144,7 @@ export function generateTextKey(code: Code): string {
  * @param textsArg an object with the languageTag as key and the translated text as value
  * @return the generated text key
  */
-export function registerTexts(code: Code, textsArg: Record<string, string>): string {
+export function registerTexts(code: Code<any>, textsArg: Record<string, string>): string {
   let key = generateTextKey(code);
 
   // In case of changed defaultLanguage clear the 'default' entry

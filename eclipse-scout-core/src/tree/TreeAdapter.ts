@@ -209,7 +209,7 @@ export default class TreeAdapter extends ModelAdapter {
     }
   }
 
-  protected _onNodeChanged(nodeId: string, cell: CellModel) {
+  protected _onNodeChanged(nodeId: string, cell: CellModel<any>) {
     let node = this.widget.nodesMap[nodeId];
 
     defaultValues.applyTo(cell, 'TreeNode');

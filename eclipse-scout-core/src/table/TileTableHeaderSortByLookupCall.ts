@@ -57,4 +57,4 @@ export default class TileTableHeaderSortByLookupCall extends StaticLookupCall<Ti
   }
 }
 
-export type TileTableHeaderSortKey = { column: Column; asc: boolean };
+export type TileTableHeaderSortKey = { column: Column<any>; asc: boolean };

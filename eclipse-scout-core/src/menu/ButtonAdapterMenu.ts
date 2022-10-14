@@ -8,8 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Button, ButtonAdapterMenuModel, Event, EventHandler, Menu, MenuBar, MenuModel, PropertyChangeEvent} from '../index';
+import {Action, Button, ButtonAdapterMenuModel, ButtonModel, Event, EventHandler, Menu, MenuBar, PropertyChangeEvent} from '../index';
 import {ActionStyle, ActionTextPosition} from '../action/Action';
+import {ButtonDisplayStyle} from '../form/fields/button/Button';
+import {FormFieldLabelPosition} from '../form/fields/FormField';
 
 export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenuModel {
   declare model: ButtonAdapterMenuModel;
@@ -64,7 +66,7 @@ export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenu
 
   protected _onButtonPropertyChange(event: PropertyChangeEvent) {
     // Whenever a button property changes, apply the changes to the menu
-    let changedProperties = {};
+    let changedProperties: Partial<ButtonModel> = {};
     changedProperties[event.propertyName] = event.newValue;
     changedProperties = ButtonAdapterMenu.adaptButtonProperties(changedProperties);
     for (let prop in changedProperties) { // NOSONAR
@@ -104,7 +106,7 @@ export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenu
     return this.session.focusManager.requestFocus(this.getFocusableElement());
   }
 
-  static adaptButtonProperties(buttonProperties: Record<string, any>, menuProperties?: MenuModel): MenuModel { // FIXME TS: use ButtonModel for buttonProperties
+  static adaptButtonProperties(buttonProperties: Partial<ButtonModel>, menuProperties?: ButtonAdapterMenuModel): ButtonAdapterMenuModel {
     // @ts-ignore
     menuProperties = menuProperties || {};
 
@@ -119,7 +121,7 @@ export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenu
     menuProperties.horizontalAlignment = buttonProperties.gridData ? buttonProperties.gridData.horizontalAlignment : undefined;
     menuProperties.actionStyle = buttonStyleToActionStyle(buttonProperties.displayStyle);
     menuProperties.toggleAction = buttonProperties.displayStyle === Button.DisplayStyle.TOGGLE;
-    menuProperties.childActions = buttonProperties.menus;
+    menuProperties.childActions = buttonProperties.menus as Menu[];
     if (menuProperties.defaultMenu === undefined) {
       // buttonProperties.defaultButton property is only mapped if it is true, false should not be mapped as the default defaultMenu = null setting
       // would be overridden if this default null setting is overridden MenuBar.prototype.updateDefaultMenu would not consider these entries anymore
@@ -136,7 +138,7 @@ export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenu
     }
     return menuProperties;
 
-    function buttonStyleToActionStyle(buttonStyle: number): ActionStyle { // FIXME TS: use ButtonDisplayStyle
+    function buttonStyleToActionStyle(buttonStyle: ButtonDisplayStyle): ActionStyle {
       if (buttonStyle === undefined) {
         return undefined;
       }
@@ -146,7 +148,7 @@ export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenu
       return Action.ActionStyle.BUTTON;
     }
 
-    function labelPositionToTextPosition(labelPosition: number): ActionTextPosition { // FIXME TS: use ButtonLabelPosition
+    function labelPositionToTextPosition(labelPosition: FormFieldLabelPosition): ActionTextPosition {
       if (labelPosition === undefined) {
         return undefined;
       }

@@ -10,7 +10,7 @@
  */
 import {Cell, Column, Event, Filter, KeyStroke, Menu, NumberColumn, PropertyChangeEvent, Status, Table, TableControl, TableRow, Tile, TileTableHeaderBox, ValueField, WidgetEventMap} from '../index';
 import {TableCheckableStyle, TableGroupingStyle, TableHierarchicalStyle} from './Table';
-import {DragAndDropType, FileDropEvent} from '../util/dragAndDrop';
+import {DropType, FileDropEvent} from '../util/dragAndDrop';
 
 export interface TableColumnBackgroundEffectChangedEvent<T = Table> extends Event<T> {
   column: NumberColumn;
@@ -24,40 +24,40 @@ export interface TableAllRowsDeletedEvent<T = Table> extends Event<T> {
   rows: TableRow[];
 }
 
-export interface TableAppLinkActionEvent<T = Table> extends Event<T> {
-  column: Column;
+export interface TableAppLinkActionEvent<TValue = any, T = Table> extends Event<T> {
+  column: Column<TValue>;
   row: TableRow;
   ref: string;
   $appLink: JQuery;
 }
 
-export interface TableCancelCellEditEvent<T = Table> extends Event<T> {
-  field: ValueField;
+export interface TableCancelCellEditEvent<TValue = any, T = Table> extends Event<T> {
+  field: ValueField<TValue>;
   row: TableRow;
-  column: Column;
-  cell: Cell;
+  column: Column<TValue>;
+  cell: Cell<TValue>;
 }
 
-export interface TableColumnMovedEvent<T = Table> extends Event<T> {
-  column: Column;
+export interface TableColumnMovedEvent<TValue = any, T = Table> extends Event<T> {
+  column: Column<TValue>;
   oldPos: number;
   newPos: number;
   dragged: boolean;
 }
 
-export interface TableColumnResizedEvent<T = Table> extends Event<T> {
-  column: Column;
+export interface TableColumnResizedEvent<TValue = any, T = Table> extends Event<T> {
+  column: Column<TValue>;
 }
 
-export interface TableColumnResizedToFitEvent<T = Table> extends Event<T> {
-  column: Column;
+export interface TableColumnResizedToFitEvent<TValue = any, T = Table> extends Event<T> {
+  column: Column<TValue>;
 }
 
-export interface TableCompleteCellEditEvent<T = Table> extends Event<T> {
-  field: ValueField;
+export interface TableCompleteCellEditEvent<TValue = any, T = Table> extends Event<T> {
+  field: ValueField<TValue>;
   row: TableRow;
-  column: Column;
-  cell: Cell;
+  column: Column<TValue>;
+  cell: Cell<TValue>;
 }
 
 export interface TableDropEvent<T = Table> extends Event<T>, FileDropEvent {
@@ -75,16 +75,16 @@ export interface TableFiltersRemovedEvent<T = Table> extends Event<T> {
   filter: Filter<TableRow>;
 }
 
-export interface TableGroupEvent<T = Table> extends Event<T> {
-  column: Column;
+export interface TableGroupEvent<TValue = any, T = Table> extends Event<T> {
+  column: Column<TValue>;
   groupAscending: boolean;
   groupingRemoved?: boolean;
   multiGroup?: boolean;
   groupingRequested?: boolean;
 }
 
-export interface TablePrepareCellEditEvent<T = Table> extends Event<T> {
-  column: Column;
+export interface TablePrepareCellEditEvent<TValue = any, T = Table> extends Event<T> {
+  column: Column<TValue>;
   row: TableRow;
 }
 
@@ -92,16 +92,16 @@ export interface TableReloadEvent<T = Table> extends Event<T> {
   reloadReason: string;
 }
 
-export interface TableRowActionEvent<T = Table> extends Event<T> {
-  column: Column;
+export interface TableRowActionEvent<TValue = any, T = Table> extends Event<T> {
+  column: Column<TValue>;
   row: TableRow;
 }
 
-export interface TableRowClickEvent<T = Table> extends Event<T> {
+export interface TableRowClickEvent<TValue = any, T = Table> extends Event<T> {
   originalEvent: JQuery.MouseUpEvent;
   row: TableRow;
   mouseButton: number;
-  column: Column;
+  column: Column<TValue>;
 }
 
 export interface TableRowInitEvent<T = Table> extends Event<T> {
@@ -137,23 +137,23 @@ export interface TableRowsUpdatedEvent<T = Table> extends Event<T> {
   rows: TableRow[];
 }
 
-export interface TableSortEvent<T = Table> extends Event<T> {
-  column: Column;
+export interface TableSortEvent<TValue = any, T = Table> extends Event<T> {
+  column: Column<TValue>;
   sortAscending: boolean;
   sortingRemoved?: boolean;
   multiSort?: boolean;
   sortingRequested?: boolean;
 }
 
-export interface TableStartCellEditEvent<T = Table> extends Event<T> {
-  column: Column;
+export interface TableStartCellEditEvent<TValue = any, T = Table> extends Event<T> {
+  column: Column<TValue>;
   row: TableRow;
-  field: ValueField;
+  field: ValueField<TValue>;
 }
 
-export interface TableColumnOrganizeActionEvent<T = Table> extends Event<T> {
+export interface TableColumnOrganizeActionEvent<TValue = any, T = Table> extends Event<T> {
   action: 'add' | 'remove' | 'modify';
-  column: Column;
+  column: Column<TValue>;
 }
 
 export default interface TableEventMap extends WidgetEventMap {
@@ -195,9 +195,9 @@ export default interface TableEventMap extends WidgetEventMap {
   'propertyChange:checkable': PropertyChangeEvent<boolean>;
   'propertyChange:checkableStyle': PropertyChangeEvent<TableCheckableStyle>;
   'propertyChange:compact': PropertyChangeEvent<boolean>;
-  'propertyChange:contextColumn': PropertyChangeEvent<Column>;
+  'propertyChange:contextColumn': PropertyChangeEvent<Column<any>>;
   'propertyChange:dropMaximumSize': PropertyChangeEvent<number>;
-  'propertyChange:dropType': PropertyChangeEvent<DragAndDropType>;
+  'propertyChange:dropType': PropertyChangeEvent<DropType>;
   'propertyChange:footerVisible': PropertyChangeEvent<boolean>;
   'propertyChange:groupingStyle': PropertyChangeEvent<TableGroupingStyle>;
   'propertyChange:headerEnabled': PropertyChangeEvent<boolean>;

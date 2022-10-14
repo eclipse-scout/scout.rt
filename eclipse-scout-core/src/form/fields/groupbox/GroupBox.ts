@@ -8,10 +8,55 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Button, ButtonAdapterMenu, CompositeField, fields, Form, FormField, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, GroupBoxResponsiveHandler, HAlign, HtmlComponent, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, MenuBar, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, VerticalSmartGrid, WrappedFormField} from '../../../index';
+import {
+  AbstractLayout, Action, arrays, Button, ButtonAdapterMenu, CompositeField, EnumObject, fields, Form, FormField, GroupBoxEventMap, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, GroupBoxModel, GroupBoxResponsiveHandler,
+  HAlign, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, Notification, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, VerticalSmartGrid,
+  WrappedFormField
+} from '../../../index';
 import $ from 'jquery';
+import {MenuBarEllipsisPosition} from '../../../menu/menubar/MenuBar';
+import {FormFieldStatusPosition} from '../FormField';
+import {KeyStrokeRenderingHints} from '../../../keystroke/KeyStroke';
+import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
+import {CloneOptions} from '../../../widget/Widget';
 
-export default class GroupBox extends CompositeField {
+export default class GroupBox extends CompositeField implements GroupBoxModel {
+  declare model: GroupBoxModel;
+  declare eventMap: GroupBoxEventMap;
+
+  fields: FormField[];
+  menuBarVisible: boolean;
+  menuBarPosition: GroupBoxMenuBarPosition;
+  menuBarEllipsisPosition: MenuBarEllipsisPosition;
+  notification: Notification;
+  bodyLayoutConfig: LogicalGridLayoutConfig;
+  borderDecoration: GroupBoxBorderDecoration;
+  borderVisible: boolean;
+  mainBox: boolean;
+  menuBar: MenuBar;
+  subLabel: string;
+  scrollable: boolean;
+  expandable: boolean;
+  expanded: boolean;
+  gridColumnCount: number;
+  controls: FormField[];
+  systemButtons: Button[];
+  customButtons: Button[];
+  processButtons: Button[];
+  processMenus: Menu[];
+  staticMenus: Menu[];
+  selectionKeystroke: string;
+  responsive: boolean;
+  responsiveHandler?: GroupBoxResponsiveHandler;
+  htmlBody: HtmlComponent;
+  $header: JQuery;
+  $body: JQuery;
+  $title: JQuery;
+  $borderBottom: JQuery;
+  $subLabel: JQuery;
+
+  protected _statusPositionOrig: FormFieldStatusPosition;
+  protected _collapsedWeightY: number;
 
   constructor() {
     super();
@@ -27,9 +72,7 @@ export default class GroupBox extends CompositeField {
     this.borderDecoration = GroupBox.BorderDecoration.AUTO;
     this.borderVisible = true;
     this.mainBox = false;
-    // set to null to enable conditional default
-    // -> it will be set to true if it is a mainbox unless it was explicitly set to false
-    this.scrollable = null;
+    this.scrollable = null; // set to null to enable conditional default  -> it will be set to true if it is a MainBox unless it was explicitly set to false
     this.expandable = false;
     this.expanded = true;
     this.logicalGrid = scout.create(VerticalSmartGrid);
@@ -44,7 +87,6 @@ export default class GroupBox extends CompositeField {
     this.staticMenus = [];
     this.selectionKeystroke = null;
     this.responsive = null;
-
     this.$header = null;
     this.$body = null;
     this.$title = null;
@@ -56,19 +98,16 @@ export default class GroupBox extends CompositeField {
     AUTO: 'auto',
     EMPTY: 'empty',
     LINE: 'line'
-  };
+  } as const;
 
   static MenuBarPosition = {
     AUTO: 'auto',
     TOP: 'top',
     BOTTOM: 'bottom',
     TITLE: 'title'
-  };
+  } as const;
 
-  /**
-   * @protected
-   */
-  _init(model) {
+  protected override _init(model: GroupBoxModel) {
     super._init(model);
     this.resolveConsts([{
       property: 'menuBarPosition',
@@ -92,77 +131,68 @@ export default class GroupBox extends CompositeField {
     this._setResponsive(this.responsive);
   }
 
-  _destroy() {
+  protected override _destroy() {
     ResponsiveManager.get().unregisterHandler(this);
     super._destroy();
   }
 
-  /**
-   * @override
-   */
-  getFields() {
+  getFields(): FormField[] {
     return this.fields;
   }
 
-  insertField(field, index) {
+  insertField(field: FormField, index?: number) {
     let newFields = this.fields.slice();
     index = scout.nvl(index, this.fields.length);
     newFields.splice(index, 0, field);
     this.setFields(newFields);
   }
 
-  insertFieldBefore(field, sibling) {
+  insertFieldBefore(field: FormField, sibling: FormField) {
     scout.assertParameter('sibling', sibling);
     let index = this.fields.indexOf(sibling);
     this.insertField(field, index);
   }
 
-  insertFieldAfter(field, sibling) {
+  insertFieldAfter(field: FormField, sibling: FormField) {
     scout.assertParameter('sibling', sibling);
     let index = this.fields.indexOf(sibling) + 1;
     this.insertField(field, index);
   }
 
-  deleteField(field) {
-    let newFields = this.fields.slice(),
-      index = this.fields.indexOf(field);
+  deleteField(field: FormField) {
+    let index = this.fields.indexOf(field);
     if (index < 0) {
       return;
     }
+    let newFields = this.fields.slice();
     newFields.splice(index, 1);
     this.setFields(newFields);
   }
 
-  setFields(fields) {
+  setFields(fields: FormField[]) {
     this.setProperty('fields', fields);
   }
 
-  _setFields(fields) {
+  protected _setFields(fields: FormField[]) {
     this._setProperty('fields', fields);
     this._prepareFields();
   }
 
-  _renderFields(fields) {
+  protected _renderFields(fields: FormField[]) {
     this._renderExpanded();
     this.invalidateLogicalGrid(true);
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
     this.keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
     this.keyStrokeContext.$bindTarget = this._keyStrokeBindTarget.bind(this);
   }
 
-  /**
-   * @override FormField.js
-   */
-  _setKeyStrokes(keyStrokes) {
+  protected override _setKeyStrokes(keyStrokes: Action | Action[]) {
     keyStrokes = arrays.ensure(keyStrokes);
 
-    let groupBoxRenderingHints = {
+    let groupBoxRenderingHints: KeyStrokeRenderingHints = {
       render: () => true,
       offset: 0,
       hAlign: HAlign.RIGHT,
@@ -174,10 +204,9 @@ export default class GroupBox extends CompositeField {
       }
     };
 
-    keyStrokes
-      .forEach(keyStroke => {
-        keyStroke.actionKeyStroke.renderingHints = $.extend({}, keyStroke.actionKeyStroke.renderingHints, groupBoxRenderingHints);
-      }, this);
+    keyStrokes.forEach(keyStroke => {
+      keyStroke.actionKeyStroke.renderingHints = $.extend({}, keyStroke.actionKeyStroke.renderingHints, groupBoxRenderingHints);
+    });
 
     super._setKeyStrokes(keyStrokes);
   }
@@ -187,7 +216,7 @@ export default class GroupBox extends CompositeField {
    * By default this function returns the container of the form, or when group-box is has no
    * form as a parent the container of the group-box.
    */
-  _keyStrokeBindTarget() {
+  protected _keyStrokeBindTarget(): JQuery {
     let form = this.getForm();
     if (form) {
       // keystrokes on a group-box have form scope
@@ -196,7 +225,7 @@ export default class GroupBox extends CompositeField {
     return this.$container;
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, this.mainBox ? 'root-group-box' : 'group-box');
 
     this.$header = this.$container.appendDiv('group-box-header');
@@ -211,15 +240,12 @@ export default class GroupBox extends CompositeField {
     this.htmlBody.setLayout(this._createBodyLayout());
   }
 
-  _remove() {
+  protected override _remove() {
     this._removeSubLabel();
     super._remove();
   }
 
-  /**
-   * @protected
-   */
-  _renderProperties() {
+  protected override _renderProperties() {
     this._renderScrollable(); // Need to be before renderExpanded in order to have the scrollbars when the fields are rendered. The status tooltips require a scrollable parent to move when scrolling.
     this._renderExpanded(); // Need to be before renderVisible is executed, otherwise controls might be rendered if group box is invisible which breaks some widgets (e.g. Tree and Table)
     super._renderProperties();
@@ -234,28 +260,29 @@ export default class GroupBox extends CompositeField {
     this._renderSubLabel();
   }
 
-  _createLayout() {
+  protected override _createLayout(): AbstractLayout {
     return new GroupBoxLayout(this);
   }
 
-  _createBodyLayout() {
+  protected _createBodyLayout(): LogicalGridLayout {
     return new LogicalGridLayout(this, this.bodyLayoutConfig);
   }
 
-  setBodyLayoutConfig(bodyLayoutConfig) {
+  setBodyLayoutConfig(bodyLayoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
     this.setProperty('bodyLayoutConfig', bodyLayoutConfig);
   }
 
-  _setBodyLayoutConfig(bodyLayoutConfig) {
+  protected _setBodyLayoutConfig(bodyLayoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
     if (!bodyLayoutConfig) {
       bodyLayoutConfig = new LogicalGridLayoutConfig();
     }
     this._setProperty('bodyLayoutConfig', LogicalGridLayoutConfig.ensure(bodyLayoutConfig));
   }
 
-  _renderBodyLayoutConfig() {
-    let oldMinWidth = this.htmlBody.layout.minWidth;
-    this.bodyLayoutConfig.applyToLayout(this.htmlBody.layout);
+  protected _renderBodyLayoutConfig() {
+    let layout = this.htmlBody.layout as LogicalGridLayout;
+    let oldMinWidth = layout.minWidth;
+    this.bodyLayoutConfig.applyToLayout(layout);
     if (oldMinWidth !== this.bodyLayoutConfig.minWidth) {
       this._renderScrollable();
     }
@@ -265,7 +292,7 @@ export default class GroupBox extends CompositeField {
   }
 
   /**
-   * Redraws the group box body by removing and rerendering every control.
+   * Redraws the group box body by removing and re-rendering every control.
    * This may be necessary if a field does not support a dynamic property change and therefore needs to be redrawn completely to reflect the change.
    */
   rerenderControls() {
@@ -274,20 +301,18 @@ export default class GroupBox extends CompositeField {
     this.htmlBody.invalidateLayoutTree();
   }
 
-  _removeControls() {
-    this.controls.forEach(control => {
-      control.remove();
-    }, this);
+  protected _removeControls() {
+    this.controls.forEach(control => control.remove());
   }
 
-  _renderControls() {
-    this.controls.forEach(function(control) {
+  protected _renderControls() {
+    this.controls.forEach(control => {
       if (!control.rendered) {
         control.render(this.$body);
         // set each children layout data to logical grid data
         control.setLayoutData(new LogicalGridData(control));
       }
-    }, this);
+    });
   }
 
   addSubLabel() {
@@ -300,7 +325,7 @@ export default class GroupBox extends CompositeField {
     });
   }
 
-  _removeSubLabel() {
+  protected _removeSubLabel() {
     if (!this.$subLabel) {
       return;
     }
@@ -309,28 +334,28 @@ export default class GroupBox extends CompositeField {
     this.$subLabel = null;
   }
 
-  setSubLabel(subLabel) {
+  setSubLabel(subLabel: string) {
     this.setProperty('subLabel', subLabel);
   }
 
-  _renderSubLabel() {
+  protected _renderSubLabel() {
     this.$subLabel.setVisible(strings.hasText(this.subLabel));
     this.$subLabel.textOrNbsp(this.subLabel);
     this.$container.toggleClass('has-sub-label', this.$subLabel.isVisible());
     this.invalidateLayoutTree();
   }
 
-  setScrollable(scrollable) {
+  setScrollable(scrollable: boolean) {
     this.setProperty('scrollable', scrollable);
   }
 
-  _renderScrollable() {
+  protected _renderScrollable() {
     this._uninstallScrollbars();
 
     // horizontal (x-axis) scrollbar is only installed when minWidth is > 0
     if (this.scrollable) {
       this._installScrollbars({
-        axis: ((this.bodyLayoutConfig.minWidth > 0) ? 'both' : 'y')
+        axis: this.bodyLayoutConfig.minWidth > 0 ? 'both' : 'y'
       });
     } else if (this.bodyLayoutConfig.minWidth > 0) {
       this._installScrollbars({
@@ -339,19 +364,16 @@ export default class GroupBox extends CompositeField {
     }
   }
 
-  /**
-   * @override
-   */
-  get$Scrollable() {
+  override get$Scrollable(): JQuery {
     return this.$body;
   }
 
-  _onScroll() {
-    super._onScroll();
+  protected override _onScroll(event: JQuery.ScrollEvent) {
+    super._onScroll(event);
     this._updateScrollShadow();
   }
 
-  _updateScrollShadow() {
+  protected _updateScrollShadow() {
     if (this.mainBox || !this.rendered) {
       // No need to do anything if it's the mainBox because header is invisible and the menu bar already takes the full width
       return;
@@ -374,11 +396,11 @@ export default class GroupBox extends CompositeField {
     fields.adjustStatusPositionForScrollShadow(this, () => hasScrollShadowTop && headerVisible && !hasMenubarTop);
   }
 
-  setMainBox(mainBox) {
+  setMainBox(mainBox: boolean) {
     this.setProperty('mainBox', mainBox);
   }
 
-  _setMainBox(mainBox) {
+  protected _setMainBox(mainBox: boolean) {
     this._setProperty('mainBox', mainBox);
     if (this.mainBox) {
       this.menuBar.setCssClass('main-menubar');
@@ -391,7 +413,7 @@ export default class GroupBox extends CompositeField {
     }
   }
 
-  addLabel() {
+  override addLabel() {
     if (this.$label) {
       return;
     }
@@ -401,23 +423,23 @@ export default class GroupBox extends CompositeField {
     });
   }
 
-  _renderLabel() {
+  protected override _renderLabel() {
     this.$label.textOrNbsp(this.label);
     if (this.rendered) {
       this._renderLabelVisible();
     }
   }
 
-  addStatus() {
+  override addStatus() {
     super.addStatus();
     this._updateStatusPosition();
   }
 
-  _renderStatusPosition() {
+  protected override _renderStatusPosition() {
     this._updateStatusPosition();
   }
 
-  _updateStatusPosition() {
+  protected _updateStatusPosition() {
     if (!this.fieldStatus) {
       return;
     }
@@ -430,11 +452,11 @@ export default class GroupBox extends CompositeField {
     this.invalidateLayoutTree();
   }
 
-  setNotification(notification) {
+  setNotification(notification: Notification) {
     this.setProperty('notification', notification);
   }
 
-  _renderNotification() {
+  protected _renderNotification() {
     if (!this.notification) {
       this.invalidateLayoutTree();
       return;
@@ -444,7 +466,7 @@ export default class GroupBox extends CompositeField {
     this.invalidateLayoutTree();
   }
 
-  _prepareFields() {
+  protected _prepareFields() {
     this.processButtons.forEach(this._unregisterButtonKeyStrokes.bind(this));
 
     this.controls = [];
@@ -453,9 +475,8 @@ export default class GroupBox extends CompositeField {
     this.processButtons = [];
     this.processMenus = [];
 
-    let i, field;
-    for (i = 0; i < this.fields.length; i++) {
-      field = this.fields[i];
+    for (let i = 0; i < this.fields.length; i++) {
+      let field = this.fields[i];
       if (field instanceof Button) {
         if (field.processButton) {
           this.processButtons.push(field);
@@ -481,7 +502,7 @@ export default class GroupBox extends CompositeField {
     }
 
     // Create menu for each process button
-    this.processMenus = this.processButtons.map(function(button) {
+    this.processMenus = this.processButtons.map(button => {
       return scout.create(ButtonAdapterMenu,
         ButtonAdapterMenu.adaptButtonProperties(button, {
           parent: this,
@@ -491,31 +512,27 @@ export default class GroupBox extends CompositeField {
           // would be overridden if this default null setting is overridden MenuBar.prototype.updateDefaultMenu would not consider these entries anymore
           defaultMenu: button.defaultButton ? true : null
         }));
-    }, this);
+    });
     this.registerKeyStrokes(this.processMenus);
   }
 
-  _unregisterButtonKeyStrokes(button) {
+  protected _unregisterButtonKeyStrokes(button: Button) {
     if (button.keyStrokes) {
-      button.keyStrokes.forEach(function(keyStroke) {
-        this.keyStrokeContext.unregisterKeyStroke(keyStroke);
-      }, this);
+      button.keyStrokes.forEach(keyStroke => this.keyStrokeContext.unregisterKeyStroke(keyStroke));
     }
   }
 
-  _registerButtonKeyStrokes(button) {
+  protected _registerButtonKeyStrokes(button: Button) {
     if (button.keyStrokes) {
-      button.keyStrokes.forEach(function(keyStroke) {
-        this.keyStrokeContext.registerKeyStroke(keyStroke);
-      }, this);
+      button.keyStrokes.forEach(keyStroke => this.keyStrokeContext.registerKeyStroke(keyStroke));
     }
   }
 
-  setBorderVisible(borderVisible) {
+  setBorderVisible(borderVisible: boolean) {
     this.setProperty('borderVisible', borderVisible);
   }
 
-  _renderBorderVisible() {
+  protected _renderBorderVisible() {
     let borderVisible = this.borderVisible;
     if (this.borderDecoration === GroupBox.BorderDecoration.AUTO) {
       borderVisible = this._computeBorderVisible(borderVisible);
@@ -525,32 +542,32 @@ export default class GroupBox extends CompositeField {
     this.invalidateLayoutTree();
   }
 
-  setBorderDecoration(borderDecoration) {
+  setBorderDecoration(borderDecoration: GroupBoxBorderDecoration) {
     this.setProperty('borderDecoration', borderDecoration);
   }
 
   // Don't include in renderProperties, it is not necessary to execute it initially because renderBorderVisible is executed already
-  _renderBorderDecoration() {
+  protected _renderBorderDecoration() {
     this._renderBorderVisible();
   }
 
-  getContextMenuItems(onlyVisible = true) {
+  override getContextMenuItems(onlyVisible = true): Menu[] {
     if (this.menuBarVisible) {
       return [];
     }
     return super.getContextMenuItems(onlyVisible);
   }
 
-  setMenuBarVisible(visible) {
+  setMenuBarVisible(visible: boolean) {
     this.setProperty('menuBarVisible', visible);
   }
 
-  _setMenuBarVisible(visible) {
+  protected _setMenuBarVisible(visible: boolean) {
     this._setProperty('menuBarVisible', visible);
     this._updateMenuBar();
   }
 
-  _renderMenuBarVisible() {
+  protected _renderMenuBarVisible() {
     if (this.menuBarVisible) {
       this._renderMenuBar();
     } else {
@@ -560,7 +577,7 @@ export default class GroupBox extends CompositeField {
     this.invalidateLayoutTree();
   }
 
-  _renderMenuBar() {
+  protected _renderMenuBar() {
     this.menuBar.render();
     if (this.menuBarPosition === GroupBox.MenuBarPosition.TITLE) {
       // move right of title
@@ -576,11 +593,11 @@ export default class GroupBox extends CompositeField {
     }
   }
 
-  setMenuBarPosition(menuBarPosition) {
+  setMenuBarPosition(menuBarPosition: GroupBoxMenuBarPosition) {
     this.setProperty('menuBarPosition', menuBarPosition);
   }
 
-  _renderMenuBarPosition() {
+  protected _renderMenuBarPosition() {
     let position = this.menuBarPosition;
     if (position === GroupBox.MenuBarPosition.AUTO) {
       position = GroupBox.MenuBarPosition.TOP;
@@ -605,12 +622,12 @@ export default class GroupBox extends CompositeField {
     }
   }
 
-  setMenuBarEllipsisPosition(menuBarEllipsisPosition) {
+  setMenuBarEllipsisPosition(menuBarEllipsisPosition: MenuBarEllipsisPosition) {
     this.setProperty('menuBarEllipsisPosition', menuBarEllipsisPosition);
     this.menuBar.setEllipsisPosition(menuBarEllipsisPosition);
   }
 
-  _renderMenuBarEllipsisPosition() {
+  protected _renderMenuBarEllipsisPosition() {
     this.menuBar.reorderMenus();
     if (this.rendered) {
       this.menuBar.remove();
@@ -618,13 +635,13 @@ export default class GroupBox extends CompositeField {
     }
   }
 
-  _updateMenuBarStyle() {
+  protected _updateMenuBarStyle() {
     if (this.rendered) {
       this._renderMenuBarStyle();
     }
   }
 
-  _renderMenuBarStyle() {
+  protected _renderMenuBarStyle() {
     let visible = this.menuBar.visible;
     let hasTitleMenuBar = this.menuBarPosition === GroupBox.MenuBarPosition.TITLE;
     this.$header.toggleClass('has-menubar', visible && hasTitleMenuBar);
@@ -632,11 +649,7 @@ export default class GroupBox extends CompositeField {
     this.$container.toggleClass('menubar-position-bottom', visible && !hasTitleMenuBar && this.menuBar.position === MenuBar.Position.BOTTOM);
   }
 
-  /**
-   *
-   * @returns {boolean} false if it is the mainbox. Or if the groupbox contains exactly one tablefield which has an invisible label
-   */
-  _computeBorderVisible(borderVisible) {
+  protected _computeBorderVisible(borderVisible: boolean): boolean {
     if (this.mainBox) {
       borderVisible = false;
     } else if (this.parent instanceof GroupBox &&
@@ -650,11 +663,11 @@ export default class GroupBox extends CompositeField {
     return borderVisible;
   }
 
-  setExpandable(expandable) {
+  setExpandable(expandable: boolean) {
     this.setProperty('expandable', expandable);
   }
 
-  _renderExpandable() {
+  protected _renderExpandable() {
     let expandable = this.expandable;
     let $control = this.$header.children('.group-box-control');
 
@@ -677,20 +690,20 @@ export default class GroupBox extends CompositeField {
     this.invalidateLayoutTree();
   }
 
-  setExpanded(expanded) {
+  setExpanded(expanded: boolean) {
     this.setProperty('expanded', expanded);
   }
 
-  _renderExpanded() {
+  protected _renderExpanded() {
     this.$container.toggleClass('collapsed', !this.expanded);
 
     // Group boxes have set "useUiHeight=true" by default. When a group box is collapsed, it should not
     // stretched vertically (no "weight Y"). However, because "weightY" is -1 by default, a calculated value
     // is assigned (LogicalGridData._inheritWeightY()) that is based on the group boxes height. In collapsed
     // state, this height would be wrong. Therefore, we manually assign "weightY=0" to collapsed group boxes
-    // to prevent them from beeing stretched.
+    // to prevent them from being stretched.
     if (this.expanded) {
-      // If group box was previously collapsed, restore original "weightY" griaData value
+      // If group box was previously collapsed, restore original "weightY" gridData value
       if (this._collapsedWeightY !== undefined) {
         this.gridData.weightY = this._collapsedWeightY;
         delete this._collapsedWeightY;
@@ -709,57 +722,46 @@ export default class GroupBox extends CompositeField {
     this.invalidateLayoutTree();
   }
 
-  setGridColumnCount(gridColumnCount) {
+  setGridColumnCount(gridColumnCount: number) {
     this.setProperty('gridColumnCount', gridColumnCount);
     this.invalidateLogicalGrid();
   }
 
-  /**
-   * @override
-   */
-  invalidateLogicalGrid(invalidateLayout) {
+  override invalidateLogicalGrid(invalidateLayout?: boolean) {
     super.invalidateLogicalGrid(false);
     if (scout.nvl(invalidateLayout, true) && this.rendered) {
       this.htmlBody.invalidateLayoutTree();
     }
   }
 
-  /**
-   * @override
-   */
-  _setLogicalGrid(logicalGrid) {
+  protected override _setLogicalGrid(logicalGrid: LogicalGrid | string) {
     super._setLogicalGrid(logicalGrid);
     if (this.logicalGrid) {
       this.logicalGrid.setGridConfig(new GroupBoxGridConfig());
     }
   }
 
-  /**
-   * @override FormField.js
-   */
-  _renderLabelVisible(labelVisible) {
-    this.$header.setVisible(this._computeTitleVisible(labelVisible));
+  protected override _renderLabelVisible() {
+    this.$header.setVisible(this._computeTitleVisible());
     this._updateFieldStatus();
     if (this.menuBarPosition === GroupBox.MenuBarPosition.TITLE) {
       this.invalidateLayoutTree();
     }
   }
 
-  _computeTitleVisible(labelVisible) {
+  protected _computeTitleVisible(labelVisible?: boolean): boolean {
     labelVisible = scout.nvl(labelVisible, this.labelVisible);
     return !!(labelVisible && this.label && !this.mainBox);
   }
 
   /**
-   * @override FormField.js
-   *
    * Only show the group box status if title is visible.
    */
-  _computeStatusVisible() {
+  protected override _computeStatusVisible(): boolean {
     return super._computeStatusVisible() && this._computeTitleVisible();
   }
 
-  _setMenus(menus) {
+  protected override _setMenus(menus: Menu | Menu[]) {
     super._setMenus(menus);
 
     if (this.menuBar) {
@@ -768,7 +770,7 @@ export default class GroupBox extends CompositeField {
     }
   }
 
-  _updateMenuBar() {
+  protected _updateMenuBar() {
     if (!this.menuBarVisible) {
       // Do not update menuBar while it is invisible, the menus may now be managed by another widget.
       // -> this makes sure the parent is not accidentally set to the group box, the other widget should remain responsible
@@ -782,16 +784,16 @@ export default class GroupBox extends CompositeField {
     this.menuBar.setMenuItems(menus);
   }
 
-  _removeMenus() {
+  protected _removeMenus() {
     // menubar takes care about removal
   }
 
-  setStaticMenus(staticMenus) {
+  setStaticMenus(staticMenus: Menu[]) {
     this.setProperty('staticMenus', staticMenus);
     this._updateMenuBar();
   }
 
-  _onControlClick(event) {
+  protected _onControlClick(event: JQuery.ClickEvent) {
     if (!this.expandable) {
       return;
     }
@@ -805,11 +807,11 @@ export default class GroupBox extends CompositeField {
     $.suppressEvent(event); // otherwise, the event would be triggered twice sometimes (by group-box-control and group-box-title)
   }
 
-  setResponsive(responsive) {
+  setResponsive(responsive: boolean) {
     this.setProperty('responsive', responsive);
   }
 
-  _setResponsive(responsive) {
+  protected _setResponsive(responsive: boolean) {
     this._setProperty('responsive', responsive);
 
     if (!this.initialized) {
@@ -820,19 +822,20 @@ export default class GroupBox extends CompositeField {
     } else {
       ResponsiveManager.get().reset(this, true);
       if (this.responsive === null) {
-        let parent = this.findParent(parent => {
-          return parent instanceof GroupBox && parent.responsive;
-        });
+        let parent = this.findParent(parent => parent instanceof GroupBox && parent.responsive) as GroupBox;
         ResponsiveManager.get().reset(parent, true);
       }
     }
     this.invalidateLayoutTree();
   }
 
-  clone(model, options) {
-    let clone = super.clone(model);
+  override clone(model: GroupBoxModel, options?: CloneOptions): this {
+    let clone = super.clone(model) as GroupBox;
     this._deepCloneProperties(clone, ['fields'], options);
     clone._prepareFields();
-    return clone;
+    return clone as this;
   }
 }
+
+export type GroupBoxBorderDecoration = EnumObject<typeof GroupBox.BorderDecoration>;
+export type GroupBoxMenuBarPosition = EnumObject<typeof GroupBox.MenuBarPosition>;

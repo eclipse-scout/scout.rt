@@ -10,13 +10,13 @@
  */
 import {Menu, MenuBar, menus, scout, Session} from '../index';
 
-export type MenuOrder = {
+export interface MenuOrder {
   order(items: Menu[]): OrderedMenuItems;
-};
+}
 
 export type OrderedMenuItems = { left: Menu[]; right: Menu[]; all: Menu[] };
 
-export default class MenuItemsOrder {
+export default class MenuItemsOrder implements MenuOrder {
   session: Session;
   objectType: string;
   emptySpaceTypes: string[];
