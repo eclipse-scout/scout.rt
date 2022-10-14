@@ -21,7 +21,7 @@
 
   <groupId>org.eclipse.scout.archetypes</groupId>
   <artifactId>scout-hellojs-app</artifactId>
-  <version>23.1-SNAPSHOT</version>
+  <version>23.1.0-cs.2</version>
   <packaging>maven-archetype</packaging>
 
   <name>ScoutJS Sample Application</name>
