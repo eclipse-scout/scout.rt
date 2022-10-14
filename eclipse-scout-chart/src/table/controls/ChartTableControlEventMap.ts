@@ -10,11 +10,10 @@
  */
 import {ActionEventMap, PropertyChangeEvent} from '@eclipse-scout/core/src';
 import {TableControlChartAggregation, TableControlChartGroup, TableControlChartType} from './ChartTableControl';
-import {ChartTableControl} from '../../index';
 
 export default interface ChartTableControlEventMap extends ActionEventMap {
-  'propertyChange:chartAggregation': PropertyChangeEvent<TableControlChartAggregation, ChartTableControl>;
-  'propertyChange:chartGroup1': PropertyChangeEvent<TableControlChartGroup, ChartTableControl>;
-  'propertyChange:chartGroup2': PropertyChangeEvent<TableControlChartGroup, ChartTableControl>;
-  'propertyChange:chartType': PropertyChangeEvent<TableControlChartType, ChartTableControl>;
+  'propertyChange:chartAggregation': PropertyChangeEvent<TableControlChartAggregation>;
+  'propertyChange:chartGroup1': PropertyChangeEvent<TableControlChartGroup>;
+  'propertyChange:chartGroup2': PropertyChangeEvent<TableControlChartGroup>;
+  'propertyChange:chartType': PropertyChangeEvent<TableControlChartType>;
 }
