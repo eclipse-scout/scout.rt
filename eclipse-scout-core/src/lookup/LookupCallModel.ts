@@ -8,10 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {QueryBy, Session} from '../index';
+import {LookupCall, QueryBy, Session} from '../index';
+import {ObjectType} from '../ObjectFactory';
 
-export default interface LookupCallModel<Key> {
+export default interface LookupCallModel<TKey> {
   session: Session;
+  objectType?: ObjectType<LookupCall<TKey>>;
   hierarchical?: boolean;
   loadIncremental?: boolean;
 
@@ -24,13 +26,13 @@ export default interface LookupCallModel<Key> {
   searchText?: string;
 
   /** used on QueryBy.KEY */
-  key?: Key;
+  key?: TKey;
 
   /** used on QueryBy.KEYS */
-  keys?: Key[];
+  keys?: TKey[];
 
   /** used on QueryBy.REC */
-  parentKey?: Key;
+  parentKey?: TKey;
 
   active?: boolean;
 

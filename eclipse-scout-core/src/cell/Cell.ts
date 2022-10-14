@@ -15,28 +15,28 @@ import CellModel from './CellModel';
 /**
  * -1 for left, 0 for center and 1 for right.
  */
-export type HorizontalAlignment = -1 | 0 | 1;
+export type Alignment = -1 | 0 | 1;
 
-export default class Cell implements CellModel {
-  declare model: CellModel;
+export default class Cell<TValue = any> implements CellModel<TValue> {
+  declare model: CellModel<TValue>;
 
   cssClass: string;
   editable: boolean;
   errorStatus: Status;
-  horizontalAlignment: HorizontalAlignment;
+  horizontalAlignment: Alignment;
   htmlEnabled: boolean;
   iconId: string;
   mandatory: boolean;
   text: string;
   flowsLeft: boolean;
   empty: boolean;
-  value: any;
+  value: TValue;
   tooltipText: string;
   foregroundColor: string;
   backgroundColor: string;
   font: string;
   sortCode: number;
-  field: ValueField;
+  field: ValueField<TValue>;
   protected _cachedEncodedText: string;
 
   constructor() {
@@ -54,15 +54,15 @@ export default class Cell implements CellModel {
     this.sortCode = null;
   }
 
-  init(model: CellModel) {
+  init(model: CellModel<TValue>) {
     this._init(model);
   }
 
-  protected _init(model: CellModel) {
+  protected _init(model: CellModel<TValue>) {
     $.extend(this, model);
   }
 
-  update(model: CellModel) {
+  update(model: CellModel<TValue>) {
     this.setText(model.text);
     $.extend(this, model);
   }
@@ -75,11 +75,11 @@ export default class Cell implements CellModel {
     this.mandatory = mandatory;
   }
 
-  setHorizontalAlignment(hAlign: HorizontalAlignment) {
+  setHorizontalAlignment(hAlign: Alignment) {
     this.horizontalAlignment = hAlign;
   }
 
-  setValue(value: any) {
+  setValue(value: TValue) {
     this.value = value;
   }
 

@@ -14,7 +14,7 @@ import {Cell, CheckBoxField, Column, comparators, scout, TableRow} from '../../i
  * May be an ordinary boolean column or the table's checkable column (table.checkableColumn)
  * Difference: the table's checkable column represents the row.checked state, other boolean columns represent their own value.
  */
-export default class BooleanColumn extends Column {
+export default class BooleanColumn extends Column<boolean> {
   triStateEnabled: boolean;
 
   constructor() {
@@ -34,7 +34,7 @@ export default class BooleanColumn extends Column {
     return value ? 'X' : '';
   }
 
-  override buildCell(cell: Cell, row: TableRow): string {
+  override buildCell(cell: Cell<boolean>, row: TableRow): string {
     let content = '',
       enabled = row.enabled,
       tableNodeColumn = this.table.isTableNodeColumn(this),
@@ -85,7 +85,7 @@ export default class BooleanColumn extends Column {
     return $cell.children('.check-box');
   }
 
-  protected override _cellCssClass(cell: Cell, tableNode?: boolean): string {
+  protected override _cellCssClass(cell: Cell<boolean>, tableNode?: boolean): string {
     let cssClass = super._cellCssClass(cell);
     cssClass = cssClass.replace(' editable', '');
     cssClass += ' checkable';
@@ -113,7 +113,7 @@ export default class BooleanColumn extends Column {
    * In a remote app this function is overridden, the default implementation is the local case.
    * @see TableAdapter
    */
-  protected _toggleCellValue(row: TableRow, cell: Cell) {
+  protected _toggleCellValue(row: TableRow, cell: Cell<boolean>) {
     let value = cell.value as boolean;
     if (!this.triStateEnabled) {
       this.setCellValue(row, !value);

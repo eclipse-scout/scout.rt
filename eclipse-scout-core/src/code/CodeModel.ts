@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ObjectWithType} from '../scout';
+import {ObjectType} from '../ObjectFactory';
+import {Code} from '../index';
 
-export default interface CodeModel extends ObjectWithType {
+export default interface CodeModel<TCodeId> {
 
-  objectType: string;
-  id: string;
+  objectType: ObjectType<Code<TCodeId>, CodeModel<TCodeId>>;
+  id: TCodeId;
   active?: boolean;
   sortCode?: number;
   modelClass?: string;
@@ -21,5 +22,5 @@ export default interface CodeModel extends ObjectWithType {
   text?: string;
   texts?: Record<string, string>;
 
-  children?: CodeModel[];
+  children?: CodeModel<TCodeId>[];
 }

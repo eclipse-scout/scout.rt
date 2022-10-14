@@ -1,16 +1,16 @@
-// noinspection DuplicatedCode
-
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+
 import {AbstractGrid, GridData, LogicalGridMatrix, LogicalGridMatrixCell, LogicalGridMatrixCursor, Point, Widget} from '../../../index';
+import {LogicalGridWidget} from '../LogicalGridData';
 
 export default class VerticalGridMatrix extends LogicalGridMatrix {
   protected _widgets: Widget[];
@@ -32,7 +32,7 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
     this._cursor = new LogicalGridMatrixCursor(this._cursor.startX, this._cursor.startY, columnCount, rowCount, LogicalGridMatrixCursor.Orientation.VERTICAL);
   }
 
-  computeGridData(widgets: Widget[]): boolean {
+  computeGridData(widgets: LogicalGridWidget[]): boolean {
     this._widgets = widgets;
     return widgets.every((f, i) => {
       this._widgetGridDatas[i] = AbstractGrid.getGridDataFromHints(f, this._cursor.columnCount);
@@ -60,7 +60,7 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
     return this._assignedCells;
   }
 
-  protected _add(f, gd: GridData): boolean {
+  protected _add(f: LogicalGridWidget, gd: GridData): boolean {
     let idx = this._cursor.currentIndex();
     if (gd.w > 1) {
       // try to reorganize widgets above

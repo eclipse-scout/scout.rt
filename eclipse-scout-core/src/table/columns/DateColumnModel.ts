@@ -10,7 +10,7 @@
  */
 import {ColumnModel, DateFormat} from '../../index';
 
-export default interface DateColumnModel extends ColumnModel {
+export default interface DateColumnModel extends ColumnModel<Date> {
   format?: DateFormat | string;
   groupFormat?: DateFormat | string;
   hasDate?: boolean;

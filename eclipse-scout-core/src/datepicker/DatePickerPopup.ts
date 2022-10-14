@@ -55,6 +55,9 @@ export default class DatePickerPopup extends Popup {
    * override because the icon is not in the $anchor container.
    */
   protected override _isMouseDownOnAnchor(event: MouseEvent): boolean {
-    return this.field.$dateField.isOrHas(event.target) || this.field.$dateFieldIcon.isOrHas(event.target) || (this.field.$dateClearIcon && this.field.$dateClearIcon.isOrHas(event.target));
+    let target = event.target as HTMLElement;
+    return this.field.$dateField.isOrHas(target)
+      || this.field.$dateFieldIcon.isOrHas(target)
+      || (this.field.$dateClearIcon && this.field.$dateClearIcon.isOrHas(target));
   }
 }

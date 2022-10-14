@@ -8,41 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, FormField, ModelAdapter, objects} from '../../index';
-
-/**
- * @typedef FormFieldModel
- * @property {string[]} currentMenuTypes
- */
+import {App, arrays, Event, FormField, FormFieldModel, ModelAdapter, objects} from '../../index';
+import {FileDropEvent} from '../../util/dragAndDrop';
 
 export default class FormFieldAdapter extends ModelAdapter {
+  declare widget: FormField;
+
+  /**
+   * Set this property to true when the form-field should stay enabled in offline case.
+   * By default the field will be disabled.
+   */
+  enabledWhenOffline: boolean;
+  protected _currentMenuTypes: string[];
 
   constructor() {
     super();
-
-    /**
-     * Set this property to true when the form-field should stay enabled in offline case.
-     * By default the field will be disabled.
-     */
     this.enabledWhenOffline = false;
     this._currentMenuTypes = [];
   }
 
-  /**
-   * @param {FormFieldModel} model
-   */
-  _initProperties(model) {
+  protected override _initProperties(model: FormFieldModel) {
     super._initProperties(model);
     this._currentMenuTypes = arrays.ensure(model.currentMenuTypes);
     delete model.currentMenuTypes;
   }
 
-  _syncCurrentMenuTypes(currentMenuTypes) {
+  protected _syncCurrentMenuTypes(currentMenuTypes: string | string[]) {
     this._currentMenuTypes = arrays.ensure(currentMenuTypes);
+    // @ts-ignore
     this.widget._updateMenus();
   }
 
-  _goOffline() {
+  protected override _goOffline() {
     if (this.enabledWhenOffline) {
       return;
     }
@@ -50,16 +47,16 @@ export default class FormFieldAdapter extends ModelAdapter {
     this.widget.setEnabled(false);
   }
 
-  _goOnline() {
+  protected override _goOnline() {
     if (this.enabledWhenOffline) {
       return;
     }
     this.widget.setEnabled(this._enabledBeforeOffline);
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<FormField>) {
     if (event.type === 'drop' && this.widget.dragAndDropHandler) {
-      this.widget.dragAndDropHandler.uploadFiles(event);
+      this.widget.dragAndDropHandler.uploadFiles(event as Event<FormField> & FileDropEvent);
     } else {
       super._onWidgetEvent(event);
     }
@@ -76,10 +73,13 @@ export default class FormFieldAdapter extends ModelAdapter {
     objects.replacePrototypeFunction(FormField, 'getCurrentMenuTypes', FormFieldAdapter.getCurrentMenuTypes, true);
   }
 
-  static getCurrentMenuTypes() {
-    if (this.modelAdapter) {
-      return this.modelAdapter._currentMenuTypes;
+  static getCurrentMenuTypes(): string[] {
+    // @ts-ignore
+    let modelAdapter = this.modelAdapter as FormFieldAdapter;
+    if (modelAdapter) {
+      return modelAdapter._currentMenuTypes;
     }
+    // @ts-ignore
     return this.getCurrentMenuTypesOrig();
   }
 }

@@ -32,7 +32,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
   protected _tableAddFilterRemovedHandler: EventHandler<TableFilterAddedEvent | TableFilterRemovedEvent>;
   protected _tableColumnResizedHandler: EventHandler<TableColumnResizedEvent>;
   protected _tableColumnMovedHandler: EventHandler<TableColumnMovedEvent>;
-  protected _renderedColumns: Column[];
+  protected _renderedColumns: Column<any>[];
   protected _$window: JQuery<Window>;
   protected _$body: JQuery<Body>;
   protected _fixTimeout: number;
@@ -115,7 +115,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     this._reconcileScrollPos();
   }
 
-  protected _renderColumn(column: Column, index: number) {
+  protected _renderColumn(column: Column<any>, index: number) {
     let columnWidth = column.realWidthIfAvailable(),
       visibleColumns = this._visibleColumns(),
       isFirstColumn = (index === 0),
@@ -174,7 +174,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     this._renderedColumns.slice().forEach(this._removeColumn, this);
   }
 
-  protected _removeColumn(column: Column) {
+  protected _removeColumn(column: Column<any>) {
     if (column.$header) {
       column.$header.remove();
       column.$header = null;
@@ -186,7 +186,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     arrays.remove(this._renderedColumns, column);
   }
 
-  resizeHeaderItem(column: Column) {
+  resizeHeaderItem(column: Column<any>) {
     if (!column) {
       // May be undefined if there are no columns
       return;
@@ -272,7 +272,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     });
   }
 
-  protected _installHeaderItemTooltip(column: Column) {
+  protected _installHeaderItemTooltip(column: Column<any>) {
     tooltips.install(column.$header, {
       parent: this,
       text: this._headerItemTooltipText.bind(this),
@@ -287,7 +287,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     this._visibleColumns().forEach(this._installHeaderItemTooltip, this);
   }
 
-  protected _uninstallHeaderItemTooltip(column: Column) {
+  protected _uninstallHeaderItemTooltip(column: Column<any>) {
     tooltips.uninstall(column.$header);
   }
 
@@ -296,7 +296,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
   }
 
   protected _headerItemTooltipText($col: JQuery): string {
-    let column = $col.data('column') as Column;
+    let column = $col.data('column') as Column<any>;
     if (column && strings.hasText(column.headerTooltipText)) {
       return column.headerTooltipText;
     }
@@ -311,7 +311,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
   }
 
   protected _headerItemTooltipHtmlEnabled($col: JQuery): boolean {
-    let column = $col.data('column') as Column;
+    let column = $col.data('column') as Column<any>;
     return column.headerTooltipHtmlEnabled;
   }
 
@@ -323,7 +323,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     this._visibleColumns().forEach(column => this._decorateHeader(column));
   }
 
-  openHeaderMenu(column: Column) {
+  openHeaderMenu(column: Column<any>) {
     if (this.tableHeaderMenu) {
       // Make sure existing header menu is closed first
       this.closeHeaderMenu();
@@ -356,14 +356,14 @@ export default class TableHeader extends Widget implements TableHeaderModel {
    * Updates the column headers visualization of the text, sorting and styling state
    * @param oldColumnState only necessary when the css class was updated
    */
-  updateHeader(column: Column, oldColumnState?: ColumnModel) {
+  updateHeader(column: Column<any>, oldColumnState?: ColumnModel<any>) {
     if (!column.isVisible()) {
       return;
     }
     this._decorateHeader(column, oldColumnState);
   }
 
-  protected _decorateHeader(column: Column, oldColumnState?: ColumnModel) {
+  protected _decorateHeader(column: Column<any>, oldColumnState?: ColumnModel<any>) {
     this._renderColumnCssClass(column, oldColumnState);
     this._renderColumnText(column);
     this._renderColumnIconId(column);
@@ -373,7 +373,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     this._renderColumnHorizontalAlignment(column);
   }
 
-  protected _renderColumnCssClass(column: Column, oldColumnState?: ColumnModel) {
+  protected _renderColumnCssClass(column: Column<any>, oldColumnState?: ColumnModel<any>) {
     let $header = column.$header;
     if (oldColumnState) {
       $header.removeClass(oldColumnState.headerCssClass);
@@ -381,7 +381,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     $header.addClass(column.headerCssClass);
   }
 
-  protected _renderColumnText(column: Column) {
+  protected _renderColumnText(column: Column<any>) {
     let text = column.text,
       $header = column.$header,
       $headerText = $header.children('.table-header-item-text');
@@ -394,17 +394,17 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     this._updateColumnIconAndTextStyle(column);
   }
 
-  protected _renderColumnIconId(column: Column) {
+  protected _renderColumnIconId(column: Column<any>) {
     column.$header.icon(column.headerIconId);
     this._updateColumnIconAndTextStyle(column);
   }
 
-  protected _renderColumnHorizontalAlignment(column: Column) {
+  protected _renderColumnHorizontalAlignment(column: Column<any>) {
     column.$header.removeClass('halign-left halign-center halign-right');
     column.$header.addClass('halign-' + Table.parseHorizontalAlignment(column.horizontalAlignment));
   }
 
-  protected _updateColumnIconAndTextStyle(column: Column) {
+  protected _updateColumnIconAndTextStyle(column: Column<any>) {
     let $icon = column.$header.data('$icon'),
       $text = column.$header.children('.table-header-item-text');
 
@@ -417,15 +417,15 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     column.$header.toggleClass('table-header-item-icon-only', !!(column.headerIconId && !column.text));
   }
 
-  protected _renderColumnLegacyStyle(column: Column) {
+  protected _renderColumnLegacyStyle(column: Column<any>) {
     styles.legacyStyle(column, column.$header, 'header');
   }
 
-  protected _renderColumnHeaderMenuEnabled(column: Column) {
+  protected _renderColumnHeaderMenuEnabled(column: Column<any>) {
     column.$header.toggleClass('disabled', !this._isHeaderMenuEnabled(column) || !this.enabled); // enabledComputed not used on purpose
   }
 
-  protected _renderColumnState(column: Column) {
+  protected _renderColumnState(column: Column<any>) {
     let $header = column.$header,
       filtered = this.table.getFilter(column.id);
 
@@ -467,7 +467,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
   /**
    * Makes sure state is fully visible by adjusting width (happens if column.minWidth is < DEFAULT_MIN_WIDTH)
    */
-  protected _adjustColumnMinWidth(column: Column & { __minWidthWithoutState?: number; __widthWithoutState?: number }) {
+  protected _adjustColumnMinWidth(column: Column<any> & { __minWidthWithoutState?: number; __widthWithoutState?: number }) {
     let filtered = this.table.getFilter(column.id);
     if (column.sortActive || column.grouped || filtered) {
       if (column.minWidth < Column.DEFAULT_MIN_WIDTH) {
@@ -565,15 +565,15 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     }
   }
 
-  protected _visibleColumns(): Column[] {
+  protected _visibleColumns(): Column<any>[] {
     return this.table.visibleColumns();
   }
 
-  protected _lastVisibleColumn(): Column {
+  protected _lastVisibleColumn(): Column<any> {
     return arrays.last(this._visibleColumns());
   }
 
-  onOrderChanged(oldColumnOrder: Column[]) {
+  onOrderChanged(oldColumnOrder: Column<any>[]) {
     let $headers = this.findHeaderItems();
 
     // store old position of headers
@@ -599,13 +599,13 @@ export default class TableHeader extends Widget implements TableHeaderModel {
   /**
    * Header menus are enabled when property is enabled on the header itself and on the column too.
    */
-  protected _isHeaderMenuEnabled(column: Column): boolean {
+  protected _isHeaderMenuEnabled(column: Column<any>): boolean {
     return !!(column.headerMenuEnabled && this.headerMenusEnabled);
   }
 
   protected _onHeaderItemClick(event: JQuery.ClickEvent): boolean {
     let $headerItem = $(event.currentTarget),
-      column = $headerItem.data('column') as Column;
+      column = $headerItem.data('column') as Column<any>;
 
     if (this.dragging || this.columnMoved) {
       this.dragging = false;
@@ -631,7 +631,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
       that = this,
       startX = Math.floor(event.pageX),
       $header = $(event.currentTarget),
-      column = $header.data('column') as Column,
+      column = $header.data('column') as Column<any>,
       oldPos = this._visibleColumns().indexOf(column),
       newPos = oldPos,
       move = $header.outerWidth(),
@@ -777,7 +777,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
 
     let startX = Math.floor(event.pageX),
       $header = $(event.target).prev(),
-      column = $header.data('column') as Column,
+      column = $header.data('column') as Column<any>,
       that = this,
       headerWidth = column.width;
 

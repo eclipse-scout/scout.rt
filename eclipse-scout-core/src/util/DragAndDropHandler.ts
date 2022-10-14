@@ -10,18 +10,18 @@
  */
 import {arrays, dragAndDrop, files as fileUtil, MessageBoxes, Status, Widget} from '../index';
 import $ from 'jquery';
-import {DragAndDropType, DropValidationErrorMessage, FileDropEvent} from './dragAndDrop';
+import {DropType, DropValidationErrorMessage, FileDropEvent} from './dragAndDrop';
 import {MessageBoxOption} from '../messagebox/MessageBox';
 
 export default class DragAndDropHandler {
   additionalDropProperties: (event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => Record<string, string | Blob>;
   allowedTypes: () => string[];
-  dropType: () => number;
+  dropType: () => DropType;
   dropMaximumSize: () => number;
   target: Widget;
   onDrop: (data: FileDropEvent) => void;
   validateFiles: (files: File[], defaultValidator: (f: File[]) => void) => void;
-  supportedScoutTypes: DragAndDropType[];
+  supportedScoutTypes: DropType[];
   $element: JQuery;
   selector: JQuery.Selector;
   protected _onDragEnterHandler: (event: JQuery.DragEnterEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;

@@ -9,9 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {ColumnModel, LookupCall, LookupCallModel} from '../../index';
-import {ObjectType} from '../../ObjectFactory';
+import {SomeRequired} from '../../types';
 
-export default interface SmartColumnModel extends ColumnModel {
+export default interface SmartColumnModel<TValue> extends ColumnModel<TValue> {
   /**
    * @see codes.get
    */
@@ -19,7 +19,7 @@ export default interface SmartColumnModel extends ColumnModel {
   /**
    * Reference to LookupCall, a LookupCallModel or a string to a LookupCall class.
    */
-  lookupCall?: LookupCall<any> | LookupCallModel<any> & { objectType: ObjectType<LookupCall<any>> } | string;
+  lookupCall?: LookupCall<TValue> | SomeRequired<LookupCallModel<TValue>, 'objectType'> | string;
   browseHierarchy?: boolean;
   browseMaxRowCount?: number;
   browseAutoExpandAll?: boolean;

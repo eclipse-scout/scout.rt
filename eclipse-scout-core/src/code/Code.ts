@@ -12,14 +12,14 @@ import {codes, Locale, scout, texts, TreeVisitResult} from '../index';
 import CodeModel from './CodeModel';
 import {TreeVisitor} from '../widget/Widget';
 
-export default class Code {
+export default class Code<TCodeId> {
 
-  declare model: CodeModel;
+  declare model: CodeModel<TCodeId>;
 
   active: boolean;
-  id: string;
-  parent?: Code;
-  children: Code[];
+  id: TCodeId;
+  parent?: Code<TCodeId>;
+  children: Code<TCodeId>[];
   sortCode: number;
   modelClass: string;
 
@@ -29,7 +29,7 @@ export default class Code {
     this.children = [];
   }
 
-  init(model: CodeModel) {
+  init(model: CodeModel<TCodeId>) {
     scout.assertParameter('id', model.id);
 
     this.active = model.active;
@@ -59,7 +59,7 @@ export default class Code {
     return texts.resolveText(this._text, vararg);
   }
 
-  visitChildren(visitor: TreeVisitor<Code>): boolean | TreeVisitResult {
+  visitChildren(visitor: TreeVisitor<Code<TCodeId>>): boolean | TreeVisitResult {
     for (let i = 0; i < this.children.length; i++) {
       let child = this.children[i];
       let visitResult = visitor(child);

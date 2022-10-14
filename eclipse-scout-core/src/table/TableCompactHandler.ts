@@ -106,34 +106,34 @@ export default class TableCompactHandler implements TableCompactHandlerModel {
     rows.forEach(row => this._updateValue(columns, row));
   }
 
-  protected _updateValue(columns: Column[], row: TableRow) {
+  protected _updateValue(columns: Column<any>[], row: TableRow) {
     row.setCompactValue(this.buildValue(columns, row));
   }
 
-  buildValue(columns: Column[], row: TableRow): string {
+  buildValue(columns: Column<any>[], row: TableRow): string {
     return this._buildValue(this._createBean(columns, row));
   }
 
-  protected _createBean(columns: Column[], row: TableRow): CompactBean {
+  protected _createBean(columns: Column<any>[], row: TableRow): CompactBean {
     let bean = new CompactBean();
     this._processColumns(columns, row, bean);
     this._postProcessBean(bean);
     return bean;
   }
 
-  protected _processColumns(columns: Column[], row: TableRow, bean: CompactBean) {
+  protected _processColumns(columns: Column<any>[], row: TableRow, bean: CompactBean) {
     columns.forEach((column, i) => this._processColumn(column, i, row, bean));
   }
 
-  protected _getColumns(): Column[] {
+  protected _getColumns(): Column<any>[] {
     return this.table.filterColumns(column => this._acceptColumn(column));
   }
 
-  protected _acceptColumn(column: Column): boolean {
+  protected _acceptColumn(column: Column<any>): boolean {
     return !column.guiOnly && (!this.useOnlyVisibleColumns || (column.visible && column.displayable));
   }
 
-  protected _processColumn(column: Column, index: number, row: TableRow, bean: CompactBean) {
+  protected _processColumn(column: Column<any>, index: number, row: TableRow, bean: CompactBean) {
     this._updateBean(bean, column, index, row);
   }
 
@@ -147,7 +147,7 @@ export default class TableCompactHandler implements TableCompactHandlerModel {
    * @param row
    *          the current row
    */
-  protected _updateBean(bean: CompactBean, column: Column, index: number, row: TableRow) {
+  protected _updateBean(bean: CompactBean, column: Column<any>, index: number, row: TableRow) {
     if (this._acceptColumnForTitle(column, index)) {
       bean.setTitleLine(this._createCompactLine(column, index, row));
     } else if (this._acceptColumnForTitleSuffix(column, index)) {
@@ -159,19 +159,19 @@ export default class TableCompactHandler implements TableCompactHandlerModel {
     }
   }
 
-  protected _acceptColumnForTitle(column: Column, index: number): boolean {
+  protected _acceptColumnForTitle(column: Column<any>, index: number): boolean {
     return index === 0;
   }
 
-  protected _acceptColumnForSubtitle(column: Column, index: number): boolean {
+  protected _acceptColumnForSubtitle(column: Column<any>, index: number): boolean {
     return index === 1;
   }
 
-  protected _acceptColumnForTitleSuffix(column: Column, index: number): boolean {
+  protected _acceptColumnForTitleSuffix(column: Column<any>, index: number): boolean {
     return false;
   }
 
-  protected _createCompactLine(column: Column, index: number, row: TableRow): CompactLine {
+  protected _createCompactLine(column: Column<any>, index: number, row: TableRow): CompactLine {
     let headerCell: Cell;
     if (this._showLabel(column, index, row)) {
       headerCell = column.headerCell();
@@ -182,11 +182,11 @@ export default class TableCompactHandler implements TableCompactHandlerModel {
     return line;
   }
 
-  protected _showLabel(column: Column, index: number, row: TableRow): boolean {
+  protected _showLabel(column: Column<any>, index: number, row: TableRow): boolean {
     return !this._acceptColumnForTitle(column, index) && !this._acceptColumnForSubtitle(column, index) && !this._acceptColumnForTitleSuffix(column, index);
   }
 
-  protected _adaptCompactLine(line: CompactLine, column: Column, headerCell: Cell, cell: Cell) {
+  protected _adaptCompactLine<TValue>(line: CompactLine, column: Column<TValue>, headerCell: Cell<TValue>, cell: Cell<TValue>) {
     if (column instanceof BooleanColumn) {
       let text = '';
       let value = cell.value as boolean;

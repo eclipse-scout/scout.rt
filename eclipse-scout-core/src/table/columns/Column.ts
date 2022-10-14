@@ -13,17 +13,17 @@ import {
   styles, Table, TableHeader, TableHeaderMenu, TableRow, texts, ValueField
 } from '../../index';
 import $ from 'jquery';
-import {HorizontalAlignment} from '../../cell/Cell';
+import {Alignment} from '../../cell/Cell';
 import {ColumnComparator} from './comparators';
 import {AggregateTableRow} from '../Table';
 import {ObjectType} from '../../ObjectFactory';
 import {TableColumnMovedEvent} from '../TableEventMap';
 
-export default class Column extends PropertyEventEmitter implements ColumnModel {
-  declare model: ColumnModel;
+export default class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue> {
+  declare model: ColumnModel<TValue>;
   declare eventMap: ColumnEventMap;
 
-  objectType: ObjectType<Column>;
+  objectType: ObjectType<Column<TValue>>;
   id: string;
   autoOptimizeWidth: boolean;
   /** true if content of the column changed and width has to be optimized */
@@ -46,7 +46,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
   headerForegroundColor: string;
   headerFont: string;
   headerTooltipHtmlEnabled: boolean;
-  horizontalAlignment: HorizontalAlignment;
+  horizontalAlignment: Alignment;
   htmlEnabled: boolean;
   initialAlwaysIncludeSortAtBegin: boolean;
   initialAlwaysIncludeSortAtEnd: boolean;
@@ -93,10 +93,10 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     this.autoOptimizeWidth = false;
     this.autoOptimizeWidthRequired = false;
     this.autoOptimizeMaxWidth = -1;
-    this.cssClass = null;
     this.compacted = false;
-    this.editable = false;
     this.removable = false;
+    this.cssClass = null;
+    this.editable = false;
     this.modifiable = false;
     this.fixedWidth = false;
     this.fixedPosition = false;
@@ -147,7 +147,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
   static SMALL_MIN_WIDTH = 38;
   static NARROW_MIN_WIDTH = 34;
 
-  init(model: ColumnModel) {
+  init(model: ColumnModel<TValue>) {
     this.session = model.session;
 
     // Copy all properties from model to this
@@ -164,7 +164,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
   /**
    * Override this function in order to implement custom init logic.
    */
-  protected _init(model: ColumnModel) {
+  protected _init(model: ColumnModel<TValue>) {
     texts.resolveTextProperty(this, 'text');
     texts.resolveTextProperty(this, 'headerTooltipText');
     icons.resolveIconProperty(this, 'headerIconId');
@@ -206,7 +206,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
    * @see JsonCell.java
    * @param vararg either a Cell instance or a scalar value
    */
-  initCell(vararg: any, row?: TableRow): Cell {
+  initCell(vararg: TValue | Cell<TValue>, row?: TableRow): Cell<TValue> {
     let cell = this._ensureCell(vararg);
     this._initCell(cell);
 
@@ -223,8 +223,8 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
    *
    * @param vararg either a Cell instance or a scalar value
    */
-  private _ensureCell(vararg: any): Cell {
-    let cell: Cell;
+  private _ensureCell(vararg: Cell<TValue> | TValue): Cell<TValue> {
+    let cell: Cell<TValue>;
 
     if (vararg instanceof Cell) {
       cell = vararg;
@@ -233,7 +233,8 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
       cell.value = this._parseValue(cell.value);
     } else {
       // in this case 'vararg' is only a scalar value, typically a string
-      cell = scout.create(Cell, {
+      let cellType = Cell<TValue>;
+      cell = scout.create(cellType, {
         value: this._parseValue(vararg)
       });
     }
@@ -244,11 +245,11 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
   /**
    * Override this method to create a value based on the given scalar value.
    */
-  protected _parseValue(scalar: any): any {
+  protected _parseValue(scalar: TValue): TValue {
     return scalar;
   }
 
-  protected _updateCellText(row: TableRow, cell: Cell) {
+  protected _updateCellText(row: TableRow, cell: Cell<TValue>) {
     let value = cell.value;
     if (!row) {
       // row is omitted when creating aggregate cells
@@ -264,7 +265,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     }
   }
 
-  protected _formatValue(value: any, row?: TableRow): string | JQuery.Promise<string> {
+  protected _formatValue(value: TValue, row?: TableRow): string | JQuery.Promise<string> {
     return scout.nvl(value, '');
   }
 
@@ -273,7 +274,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
    * Override this function to implement type specific init cell behavior.
    *
    */
-  protected _initCell(cell: Cell): Cell {
+  protected _initCell(cell: Cell<TValue>): Cell<TValue> {
     cell.cssClass = scout.nvl(cell.cssClass, this.cssClass);
     cell.editable = scout.nvl(cell.editable, this.editable);
     cell.horizontalAlignment = scout.nvl(cell.horizontalAlignment, this.horizontalAlignment);
@@ -288,7 +289,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
   }
 
   buildCellForAggregateRow(aggregateRow: AggregateTableRow): string {
-    let cell: Cell;
+    let cell: Cell<TValue>;
     if (this.grouped) {
       let refRow = (this.table.groupingStyle === Table.GroupingStyle.TOP ? aggregateRow.nextRow : aggregateRow.prevRow);
       cell = this.createAggrGroupCell(refRow);
@@ -299,7 +300,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     return this.buildCell(cell, {});
   }
 
-  buildCell(cell: Cell, row: TableRow | { hasError?: boolean; expanded?: boolean; expandable?: boolean }): string {
+  buildCell(cell: Cell<TValue>, row: TableRow | { hasError?: boolean; expanded?: boolean; expandable?: boolean }): string {
     scout.assertParameter('cell', cell, Cell);
 
     let tableNodeColumn = this.table.isTableNodeColumn(this),
@@ -343,7 +344,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     return this._buildCell(cell, content, style, cssClass);
   }
 
-  protected _buildCell(cell: Cell, content: string, style: string, cssClass: string): string {
+  protected _buildCell(cell: Cell<TValue>, content: string, style: string, cssClass: string): string {
     return '<div class="' + cssClass + '" style="' + style + '">' + content + '</div>';
   }
 
@@ -374,7 +375,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     return '<img class="' + cssClass + '" src="' + icon.iconUrl + '">';
   }
 
-  protected _text(cell: Cell): string {
+  protected _text(cell: Cell<TValue>): string {
     let text = cell.text || '';
 
     if (!cell.htmlEnabled) {
@@ -392,7 +393,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     return text;
   }
 
-  protected _cellCssClass(cell: Cell, tableNode?: boolean): string {
+  protected _cellCssClass(cell: Cell<TValue>, tableNode?: boolean): string {
     let cssClass = 'table-cell';
     if (cell.mandatory) {
       cssClass += ' mandatory';
@@ -428,7 +429,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     return cssClass;
   }
 
-  protected _cellStyle(cell: Cell, tableNodeColumn?: boolean, rowPadding?: number): string {
+  protected _cellStyle(cell: Cell<TValue>, tableNodeColumn?: boolean, rowPadding?: number): string {
     let style,
       width = this.width;
 
@@ -453,11 +454,11 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     }
   }
 
-  isCellEditable(row: TableRow, cell: Cell, event: JQuery.MouseUpEvent): boolean {
+  isCellEditable(row: TableRow, cell: Cell<TValue>, event: JQuery.MouseUpEvent): boolean {
     return this.table.enabledComputed && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey;
   }
 
-  startCellEdit(row: TableRow, field: ValueField): CellEditorPopup {
+  startCellEdit(row: TableRow, field: ValueField<TValue>): CellEditorPopup<TValue> {
     let $row = row.$row,
       cell = this.cell(row),
       $cell = this.table.$cell(this, $row);
@@ -471,8 +472,9 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     return popup;
   }
 
-  protected _createEditorPopup(row: TableRow, cell: Cell): CellEditorPopup {
-    return scout.create(CellEditorPopup, {
+  protected _createEditorPopup(row: TableRow, cell: Cell<TValue>): CellEditorPopup<TValue> {
+    let cellEditorPopup = CellEditorPopup<TValue>;
+    return scout.create(cellEditorPopup, {
       parent: this.table,
       column: this,
       row: row,
@@ -483,15 +485,16 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
   /**
    * @returns the cell object for this column from the given row.
    */
-  cell(row: TableRow): Cell {
+  cell(row: TableRow): Cell<TValue> {
     return this.table.cell(this, row);
   }
 
   /**
    * Creates an artificial cell from the properties relevant for the column header.
    */
-  headerCell(): Cell {
-    return scout.create(Cell, {
+  headerCell(): Cell<string> {
+    let cellType = Cell<string>;
+    return scout.create(cellType, {
       value: this.text,
       text: this.text,
       iconId: this.headerIconId,
@@ -504,7 +507,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
   /**
    * @returns the cell object for this column from the first selected row in the table.
    */
-  selectedCell(): Cell {
+  selectedCell(): Cell<TValue> {
     let selectedRow = this.table.selectedRow();
     return this.table.cell(this, selectedRow);
   }
@@ -512,14 +515,14 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
   /**
    * @returns the value of the cell. If it is text based as string otherwise the raw value.
    */
-  cellValueOrText(row: TableRow): any {
+  cellValueOrText(row: TableRow): TValue | string {
     if (this.textBased) {
       return this.table.cellText(this, row);
     }
     return this.table.cellValue(this, row);
   }
 
-  cellValue(row: TableRow): any {
+  cellValue(row: TableRow): TValue | string {
     return this.table.cellValue(this, row);
   }
 
@@ -530,7 +533,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
   /**
    * @returns the cell value to be used for grouping and filtering (chart, column filter).
    */
-  cellValueOrTextForCalculation(row: TableRow): any {
+  cellValueOrTextForCalculation(row: TableRow): TValue | string {
     let cell = this.cell(row);
     let value = this.cellValueOrText(row);
     if (objects.isNullOrUndefined(value)) {
@@ -539,7 +542,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     return this._preprocessValueOrTextForCalculation(value, cell);
   }
 
-  protected _preprocessValueOrTextForCalculation(value: any, cell?: Cell): any {
+  protected _preprocessValueOrTextForCalculation(value: TValue | string, cell?: Cell<TValue>): TValue | string {
     if (typeof value === 'string') {
       // In case of string columns, value and text are equal -> use _preprocessStringForCalculation to handle html tags and new lines correctly
       return this._preprocessTextForCalculation(value, cell?.htmlEnabled);
@@ -615,13 +618,13 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     return text;
   }
 
-  setCellValue(row: TableRow, value: any) {
+  setCellValue(row: TableRow, value: TValue) {
     let cell = this.cell(row);
     this._setCellValue(row, value, cell);
     this._updateCellText(row, cell);
   }
 
-  protected _setCellValue(row: TableRow, value: any, cell: Cell) {
+  protected _setCellValue(row: TableRow, value: TValue, cell: Cell<TValue>) {
     // value may have the wrong type (e.g. text instead of date) -> ensure type
     value = this._parseValue(value);
 
@@ -635,7 +638,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     cell.setValue(value);
   }
 
-  setCellTextDeferred(promise: JQuery.Promise<string>, row: TableRow, cell: Cell) {
+  setCellTextDeferred(promise: JQuery.Promise<string>, row: TableRow, cell: Cell<TValue>) {
     promise
       .done(text => this.setCellText(row, text, cell))
       .fail(error => {
@@ -648,7 +651,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     this.table.updateBuffer.pushPromise(promise);
   }
 
-  setCellText(row: TableRow, text: string, cell?: Cell) {
+  setCellText(row: TableRow, text: string, cell?: Cell<TValue>) {
     if (!cell) {
       cell = this.cell(row);
     }
@@ -666,7 +669,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     }
   }
 
-  setCellErrorStatus(row: TableRow, errorStatus: Status, cell?: Cell) {
+  setCellErrorStatus(row: TableRow, errorStatus: Status, cell?: Cell<TValue>) {
     if (!cell) {
       cell = this.cell(row);
     }
@@ -684,7 +687,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     }
   }
 
-  setHorizontalAlignment(horizontalAlignment: HorizontalAlignment) {
+  setHorizontalAlignment(horizontalAlignment: Alignment) {
     let changed = this.setProperty('horizontalAlignment', horizontalAlignment);
     if (!changed) {
       return;
@@ -736,9 +739,10 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     this.table.resizeColumn(this, width);
   }
 
-  createAggrGroupCell(row: TableRow): Cell {
+  createAggrGroupCell(row: TableRow): Cell<TValue> {
     let cell = this.cell(row);
-    return this.initCell(scout.create(Cell, {
+    let cellType = Cell<TValue>;
+    return this.initCell(scout.create(cellType, {
       // value necessary for value based columns (e.g. checkbox column)
       value: cell.value,
       text: this.cellTextForGrouping(row),
@@ -751,12 +755,13 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     }));
   }
 
-  createAggrValueCell(value: any): Cell {
+  createAggrValueCell(value: TValue): Cell<TValue> {
     return this.createAggrEmptyCell();
   }
 
-  createAggrEmptyCell(): Cell {
-    return this.initCell(scout.create(Cell, {
+  createAggrEmptyCell(): Cell<TValue> {
+    let cellType = Cell<TValue>;
+    return this.initCell(scout.create(cellType, {
       empty: true,
       cssClass: 'table-aggregate-cell'
     }));
@@ -794,7 +799,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
   /**
    * @returns a field instance used as editor when a cell of this column is in edit mode.
    */
-  createEditor(row: TableRow): ValueField {
+  createEditor(row: TableRow): ValueField<TValue> {
     let field = this._createEditor(row);
     let cell = this.cell(row);
     this._initEditorField(field, cell);
@@ -810,7 +815,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
    * Depending on the type of column the editor may need to be initialized differently.
    * The default implementation either copies the value to the field if the field has no error or copies the text and error status if it has an error.
    */
-  protected _initEditorField(field: ValueField, cell: Cell) {
+  protected _initEditorField(field: ValueField<TValue>, cell: Cell<TValue>) {
     if (cell.errorStatus) {
       this._updateEditorFromInvalidCell(field, cell);
     } else {
@@ -818,16 +823,16 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     }
   }
 
-  protected _updateEditorFromValidCell(field: ValueField, cell: Cell) {
+  protected _updateEditorFromValidCell(field: ValueField<TValue>, cell: Cell<TValue>) {
     field.setValue(cell.value);
   }
 
-  protected _updateEditorFromInvalidCell(field: ValueField, cell: Cell) {
+  protected _updateEditorFromInvalidCell(field: ValueField<TValue>, cell: Cell<TValue>) {
     field.setErrorStatus(cell.errorStatus);
     field.setDisplayText(cell.text);
   }
 
-  protected _createEditor(row: TableRow): ValueField {
+  protected _createEditor(row: TableRow): ValueField<TValue> {
     return scout.create(StringField, {
       parent: this.table,
       maxLength: this.maxLength,
@@ -836,7 +841,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     });
   }
 
-  updateCellFromEditor(row: TableRow, field: ValueField) {
+  updateCellFromEditor(row: TableRow, field: ValueField<TValue>) {
     if (field.errorStatus) {
       this._updateCellFromInvalidEditor(row, field);
     } else {
@@ -844,12 +849,12 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     }
   }
 
-  protected _updateCellFromInvalidEditor(row: TableRow, field: ValueField) {
+  protected _updateCellFromInvalidEditor(row: TableRow, field: ValueField<TValue>) {
     this.setCellErrorStatus(row, field.errorStatus);
     this.setCellText(row, field.displayText);
   }
 
-  protected _updateCellFromValidEditor(row: TableRow, field: ValueField) {
+  protected _updateCellFromValidEditor(row: TableRow, field: ValueField<TValue>) {
     this.setCellErrorStatus(row, null);
     this.setCellValue(row, field.value);
   }
@@ -1015,7 +1020,7 @@ export default class Column extends PropertyEventEmitter implements ColumnModel 
     };
   }
 
-  protected _hasCellValue(cell: Cell): boolean {
+  protected _hasCellValue(cell: Cell<TValue>): boolean {
     return !!cell.value;
   }
 

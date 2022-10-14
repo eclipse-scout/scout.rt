@@ -10,12 +10,12 @@
  */
 import {AbstractLayout, CellEditorPopup, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, ValueField} from '../../index';
 
-export default class CellEditorPopupLayout extends AbstractLayout {
-  cellEditorPopup: CellEditorPopup;
-  protected _field: ValueField;
+export default class CellEditorPopupLayout<TValue> extends AbstractLayout {
+  cellEditorPopup: CellEditorPopup<TValue>;
+  protected _field: ValueField<TValue>;
   protected _htmlContainer: HtmlComponent;
 
-  constructor(cellEditorPopup: CellEditorPopup) {
+  constructor(cellEditorPopup: CellEditorPopup<TValue>) {
     super();
     this.cellEditorPopup = cellEditorPopup;
     this._field = cellEditorPopup.cell.field;

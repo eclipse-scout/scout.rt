@@ -12,12 +12,11 @@ import {Column, ColumnUserFilterEventMap, comparators, FilterFieldsGroupBox, str
 import {TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup} from '../TableMatrix';
 import {TableUserFilterAddedEventData, TableUserFilterRemovedEventData} from './TableUserFilter';
 import {ColumnComparator} from '../columns/comparators';
-import {EventMapOf, EventModel} from '../../events/EventEmitter';
 
 export default class ColumnUserFilter extends TableUserFilter {
   declare eventMap: ColumnUserFilterEventMap;
 
-  column: Column;
+  column: Column<any>;
   /**
    * This property is used to check early whether or not this filter can produce filter-fields.
    * Set this property to true in your sub-class, if it creates filter fields.
@@ -156,10 +155,6 @@ export default class ColumnUserFilter extends TableUserFilter {
 
   triggerFilterFieldsChanged() {
     this.trigger('filterFieldsChanged');
-  }
-
-  override trigger<K extends string & keyof EventMapOf<ColumnUserFilter>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<ColumnUserFilter>[K]>): EventMapOf<ColumnUserFilter>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   /**

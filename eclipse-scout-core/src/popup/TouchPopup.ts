@@ -8,7 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Action, DateField, Event, EventHandler, FormField, HtmlComponent, Menu, Point, Popup, PropertyChangeEvent, scout, SingleLayout, SmartField, Tooltip, TouchPopupLayout, TouchPopupModel, ValueField, Widget} from '../index';
+import {
+  AbstractLayout, Action, DateField, Event, EventHandler, FormField, FormFieldModel, HtmlComponent, Menu, Point, Popup, PropertyChangeEvent, scout, SingleLayout, SmartField, Tooltip, TouchPopupLayout, TouchPopupModel, ValueField, Widget
+} from '../index';
 import RowLayout from '../layout/RowLayout';
 import {PopupAlignment} from './Popup';
 
@@ -49,9 +51,11 @@ export default class TouchPopup extends Popup {
   protected override _init(options: TouchPopupModel) {
     super._init(options);
     this._touchField = options.field;
-    if (this._touchField._tooltip() && this._touchField._tooltip().rendered) {
+    // @ts-ignore
+    let touchFieldTooltip = this._touchField._tooltip();
+    if (touchFieldTooltip && touchFieldTooltip.rendered) {
       // Hide existing tooltip to not show it twice (it will be shown on the popup too). It may even throw an exception if the tooltip contains a (not cloned) menu
-      this._touchFieldTooltip = this._touchField._tooltip();
+      this._touchFieldTooltip = touchFieldTooltip;
       this._touchFieldTooltip.remove();
     }
 
@@ -71,12 +75,13 @@ export default class TouchPopup extends Popup {
     this._touchField.off('propertyChange', this._touchFieldPropertyChangeListener);
     if (this._touchFieldTooltip && !this._touchFieldTooltip.destroyed) {
       // Make tooltip visible again if not destroyed in the meantime
+      // @ts-ignore
       this._touchFieldTooltip.render(this._touchField._$tooltipParent());
     }
     super._destroy();
   }
 
-  protected _fieldOverrides(): object { // FIXME TS: add return type as soon as FormField has been migrated.
+  protected _fieldOverrides(): FormFieldModel { // FIXME TS: use SmartFieldModel | DateFieldModel as soon as migrated
     return {
       parent: this,
       labelVisible: false,

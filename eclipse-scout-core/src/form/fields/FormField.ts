@@ -8,22 +8,98 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, clipboard, ContextMenuPopup, Device, dragAndDrop, Event, fields, FieldStatus, FormFieldLayout, GridData, GroupBox, HtmlComponent, KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, objects, scout, Status, strings, styles, tooltips, Widget} from '../../index';
+import {
+  AbstractLayout, arrays, clipboard, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, EnumObject, EventHandler, fields, FieldStatus, FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HtmlComponent, KeyStroke,
+  KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, objects, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, strings, styles, Tooltip, tooltips, TreeVisitResult, Widget
+} from '../../index';
 import $ from 'jquery';
+import {DragAndDropOptions, DropType} from '../../util/dragAndDrop';
+import {TooltipSupportOptions} from '../../tooltip/TooltipSupport';
+import {StatusOrModel} from '../../status/Status';
+import {CloneOptions} from '../../widget/Widget';
+import {FormFieldClipboardExportEvent} from './FormFieldEventMap';
 
 /**
  * Base class for all form-fields.
  */
-export default class FormField extends Widget {
+export default abstract class FormField extends Widget implements FormFieldModel {
+  declare model: FormFieldModel;
+  declare eventMap: FormFieldEventMap;
+
+  dropType: DropType;
+  dropMaximumSize: number;
+  empty: boolean;
+  errorStatus: Status;
+  fieldStyle: FormFieldStyle;
+  gridData: GridData;
+  gridDataHints: GridData;
+  mode: FormFieldMode;
+  fieldStatus: FieldStatus;
+  keyStrokes: KeyStroke[];
+  displayText: string;
+  label: string;
+  labelVisible: boolean;
+  labelPosition: FormFieldLabelPosition;
+  labelWidthInPixel: number;
+  labelUseUiWidth: boolean;
+  labelHtmlEnabled: boolean;
+  mandatory: boolean;
+  statusMenuMappings: StatusMenuMapping[];
+  menus: Menu[];
+  menusVisible: boolean;
+  defaultMenuTypes: string[];
+  preventInitialFocus: boolean;
+  requiresSave: boolean;
+  statusPosition: FormFieldStatusPosition;
+  statusVisible: boolean;
+  suppressStatus: FormFieldSuppressStatus;
+  touched: boolean;
+  tooltipText: string;
+  font: string;
+  foregroundColor: string;
+  backgroundColor: string;
+  labelFont: string;
+  labelForegroundColor: string;
+  labelBackgroundColor: string;
+  tooltipAnchor: FormFieldTooltipAnchor;
+  onFieldTooltipOptionsCreator: (this: FormField) => TooltipSupportOptions;
+  dragAndDropHandler: DragAndDropHandler;
+  /**
+   * Some browsers don't support copying text from disabled input fields. If such a browser is detected
+   * and this flag is true (default is false), an overlay DIV is rendered over disabled fields which
+   * provides a custom copy context menu that opens the ClipboardForm.
+   */
+  disabledCopyOverlay: boolean;
+
+  $label: JQuery;
+  /**
+   * Note the difference between $field and $fieldContainer:
+   * - $field points to the input-field (typically a browser-text field)
+   * - $fieldContainer could point to the same input-field or when the field is a composite,
+   *   to the parent DIV of that composite. For instance: the multi-line-smartfield is a
+   *   composite with a input-field and a DIV showing the additional lines. In that case $field
+   *   points to the input-field and $fieldContainer to the parent DIV of the input-field.
+   *   This property should be used primarily for layout-functionality.
+   */
+  $field: JQuery;
+  $clearIcon: JQuery;
+  $fieldContainer: JQuery;
+  $icon: JQuery;
+  $pseudoStatus: JQuery;
+  /**
+   * The status is used for error-status, tooltip-icon and menus.
+   */
+  $status: JQuery;
+  $mandatory: JQuery;
+  $disabledCopyOverlay: JQuery;
+  protected _menuPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Menu>>;
+
   constructor() {
     super();
 
     this.dropType = 0;
     this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
     this.empty = true;
-    /**
-     * @type {Status}
-     */
     this.errorStatus = null;
     this.fieldStyle = FormField.DEFAULT_FIELD_STYLE;
     this.gridData = null;
@@ -45,36 +121,18 @@ export default class FormField extends Widget {
     this.requiresSave = false;
     this.statusPosition = FormField.StatusPosition.DEFAULT;
     this.statusVisible = true;
-    this.suppressStatus = false;
+    this.suppressStatus = null;
     this.touched = false;
     this.tooltipText = null;
     this.tooltipAnchor = FormField.TooltipAnchor.DEFAULT;
     this.onFieldTooltipOptionsCreator = null;
-    this.suppressStatus = null;
 
     this.$label = null;
-    /**
-     * Note the difference between $field and $fieldContainer:
-     * - $field points to the input-field (typically a browser-text field)
-     * - $fieldContainer could point to the same input-field or when the field is a composite,
-     *   to the parent DIV of that composite. For instance: the multi-line-smartfield is a
-     *   composite with a input-field and a DIV showing the additional lines. In that case $field
-     *   points to the input-field and $fieldContainer to the parent DIV of the input-field.
-     *   This property should be used primarily for layout-functionality.
-     */
     this.$field = null;
     this.$fieldContainer = null;
     this.$icon = null;
-    /**
-     * The status is used for error-status, tooltip-icon and menus.
-     */
     this.$status = null;
 
-    /**
-     * Some browsers don't support copying text from disabled input fields. If such a browser is detected
-     * and this flag is true (default is false), an overlay DIV is rendered over disabled fields which
-     * provides a custom copy context menu that opens the ClipboardForm.
-     */
     this.disabledCopyOverlay = false;
     this.$disabledCopyOverlay = null;
 
@@ -89,7 +147,7 @@ export default class FormField extends Widget {
   static FieldStyle = {
     CLASSIC: 'classic',
     ALTERNATIVE: 'alternative'
-  };
+  } as const;
 
   static SuppressStatus = {
     /**
@@ -104,7 +162,7 @@ export default class FormField extends Widget {
      * Suppress status on field (CSS class), but still show status as icon.
      */
     FIELD: 'field'
-  };
+  } as const;
 
   /** Global variable to make it easier to adjust the default field style for all fields */
   static DEFAULT_FIELD_STYLE = FormField.FieldStyle.ALTERNATIVE;
@@ -112,7 +170,7 @@ export default class FormField extends Widget {
   static StatusPosition = {
     DEFAULT: 'default',
     TOP: 'top'
-  };
+  } as const;
 
   static LabelPosition = {
     DEFAULT: 0,
@@ -121,17 +179,17 @@ export default class FormField extends Widget {
     RIGHT: 3,
     TOP: 4,
     BOTTOM: 5
-  };
+  } as const;
 
   static TooltipAnchor = {
     DEFAULT: 'default',
     ON_FIELD: 'onField'
-  };
+  } as const;
 
   static LabelWidth = {
     DEFAULT: 0,
     UI: -1
-  };
+  } as const;
 
   // see org.eclipse.scout.rt.client.ui.form.fields.IFormField.FULL_WIDTH
   static FULL_WIDTH = 0;
@@ -139,31 +197,21 @@ export default class FormField extends Widget {
   static Mode = {
     DEFAULT: 'default',
     CELLEDITOR: 'celleditor'
-  };
+  } as const;
 
   static SEVERITY_CSS_CLASSES = 'has-error has-warning has-info has-ok';
 
-  /**
-   * @override
-   * @returns {KeyStrokeContext}
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _createLoadingSupport() {
+  protected override _createLoadingSupport(): LoadingSupport {
     return new LoadingSupport({
       widget: this
     });
   }
 
-  /**
-   * @protected
-   */
-  _init(model) {
+  protected override _init(model: FormFieldModel) {
     super._init(model);
     this.resolveConsts([{
       property: 'labelPosition',
@@ -178,7 +226,7 @@ export default class FormField extends Widget {
     this._updateEmpty();
   }
 
-  _initProperty(propertyName, value) {
+  protected override _initProperty(propertyName: string, value: any) {
     if ('gridDataHints' === propertyName) {
       this._initGridDataHints(value);
     } else {
@@ -191,10 +239,8 @@ export default class FormField extends Widget {
    * The default values for grid data hints are set in the constructor of the FormField and its subclasses.
    * When the given gridDataHints is a plain object, we extend our default values. When gridDataHints is
    * already instanceof GridData we overwrite default values completely.
-   * @param gridDataHints
-   * @private
    */
-  _initGridDataHints(gridDataHints) {
+  private _initGridDataHints(gridDataHints: GridData) {
     if (gridDataHints instanceof GridData) {
       this.gridDataHints = gridDataHints;
     } else if (objects.isPlainObject(gridDataHints)) {
@@ -205,10 +251,9 @@ export default class FormField extends Widget {
   }
 
   /**
-   * All sub-classes of FormField must implement a _render method. The default implementation
-   * will throw an Error when _render is called. The _render method should call the various add*
-   * methods provided by the FormField class. A possible _render implementation could look like this.
+   * All sub-classes of FormField must implement a _render method. It should call the various add* methods provided by the FormField class.
    *
+   * A possible _render implementation could look like this.
    * <pre>
    * this.addContainer(this.$parent, 'form-field');
    * this.addLabel();
@@ -216,16 +261,10 @@ export default class FormField extends Widget {
    * this.addMandatoryIndicator();
    * this.addStatus();
    * </pre>
-   * @protected
    */
-  _render() {
-    throw new Error('sub-classes of FormField must implement a _render method');
-  }
+  protected abstract override _render();
 
-  /**
-   * @protected
-   */
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderMandatory();
     this._renderTooltipText();
@@ -246,7 +285,7 @@ export default class FormField extends Widget {
     this._renderFieldStyle();
   }
 
-  _remove() {
+  protected override _remove() {
     super._remove();
     this._removeField();
     this._removeStatus();
@@ -257,11 +296,11 @@ export default class FormField extends Widget {
     dragAndDrop.uninstallDragAndDropHandler(this);
   }
 
-  setFieldStyle(fieldStyle) {
+  setFieldStyle(fieldStyle: FormFieldStyle) {
     this.setProperty('fieldStyle', fieldStyle);
   }
 
-  _renderFieldStyle() {
+  protected _renderFieldStyle() {
     this._renderFieldStyleInternal(this.$container);
     this._renderFieldStyleInternal(this.$fieldContainer);
     this._renderFieldStyleInternal(this.$field);
@@ -275,18 +314,18 @@ export default class FormField extends Widget {
     }
   }
 
-  _renderFieldStyleInternal($element) {
+  protected _renderFieldStyleInternal($element: JQuery) {
     if (!$element) {
       return;
     }
     $element.toggleClass('alternative', this.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
   }
 
-  setMandatory(mandatory) {
+  setMandatory(mandatory: boolean) {
     this.setProperty('mandatory', mandatory);
   }
 
-  _renderMandatory() {
+  protected _renderMandatory() {
     this.$container.toggleClass('mandatory', this.mandatory);
   }
 
@@ -294,17 +333,16 @@ export default class FormField extends Widget {
    * Override this function to return another error status property.
    * The default implementation returns the property 'errorStatus'.
    *
-   * @return {Status}
    */
-  _errorStatus() {
+  protected _errorStatus(): Status {
     return this.errorStatus;
   }
 
-  setErrorStatus(errorStatus) {
+  setErrorStatus(errorStatus: StatusOrModel) {
     this.setProperty('errorStatus', errorStatus);
   }
 
-  _setErrorStatus(errorStatus) {
+  protected _setErrorStatus(errorStatus: StatusOrModel) {
     errorStatus = Status.ensure(errorStatus);
     this._setProperty('errorStatus', errorStatus);
   }
@@ -313,9 +351,8 @@ export default class FormField extends Widget {
    * Adds the given (functional) error status to the list of error status. Prefer this function over #setErrorStatus
    * when you don't want to mess with the internal error states of the field (parsing, validation).
    *
-   * @param errorStatus
    */
-  addErrorStatus(errorStatus) {
+  addErrorStatus(errorStatus: string | Status) {
     if (typeof errorStatus === 'string') {
       errorStatus = this._createErrorStatus(errorStatus);
     }
@@ -335,58 +372,53 @@ export default class FormField extends Widget {
   /**
    * Create an error status with severity {@link Status.Severity.ERROR} containing the given message.
    *
-   * @param message {String} The message for the error status.
-   * @return {Status} error status with severity {@link Status.Severity.ERROR} containing the given message.
+   * @param message The message for the error status.
+   * @returns containing the given message.
    */
-  _createErrorStatus(message) {
+  protected _createErrorStatus(message: string): Status {
     return Status.error(message);
   }
 
   /**
    * Whether or not the error status is or has the given status type.
-   * @param statusType
-   * @returns {boolean}
    */
-  containsStatus(statusType) {
+  containsStatus(statusType: new() => Status): boolean {
     if (!this.errorStatus) {
       return false;
     }
     return this.errorStatus.containsStatus(statusType);
   }
 
-  setSuppressStatus(suppressStatus) {
+  setSuppressStatus(suppressStatus: FormFieldSuppressStatus) {
     this.setProperty('suppressStatus', suppressStatus);
   }
 
-  _renderSuppressStatus() {
+  protected _renderSuppressStatus() {
     this._renderErrorStatus();
   }
 
   /**
-   * @returns {boolean} Whether or not error status icon is suppressed
+   * @returns Whether or not error status icon is suppressed
    */
-  _isSuppressStatusIcon() {
+  protected _isSuppressStatusIcon(): boolean {
     return scout.isOneOf(this.suppressStatus, FormField.SuppressStatus.ALL, FormField.SuppressStatus.ICON);
   }
 
   /**
-   * @returns {boolean} Whether or not error status CSS class is suppressed on field
+   * @returns Whether or not error status CSS class is suppressed on field
    */
-  _isSuppressStatusField() {
+  protected _isSuppressStatusField(): boolean {
     return scout.isOneOf(this.suppressStatus, FormField.SuppressStatus.ALL, FormField.SuppressStatus.FIELD);
   }
 
   /**
    * Removes all status (incl. children) with the given type.
-   * @param {object} statusType
    */
-  removeErrorStatus(statusType) {
-    this.removeErrorStatusByPredicate(status => {
-      return status instanceof statusType;
-    });
+  removeErrorStatus(statusType: new() => Status) {
+    this.removeErrorStatusByPredicate(status => status instanceof statusType);
   }
 
-  removeErrorStatusByPredicate(predicate) {
+  removeErrorStatusByPredicate(predicate: Predicate<Status>) {
     let status = this._errorStatus();
     if (!status) {
       return;
@@ -407,7 +439,7 @@ export default class FormField extends Widget {
     this.setErrorStatus(null);
   }
 
-  _renderErrorStatus() {
+  protected _renderErrorStatus() {
     let status = this._errorStatus(),
       hasStatus = !!status,
       statusClass = (hasStatus && !this._isSuppressStatusField()) ? 'has-' + status.cssClass() : '';
@@ -416,40 +448,37 @@ export default class FormField extends Widget {
     this._updateFieldStatus();
   }
 
-  _updateErrorStatusClasses(statusClass, hasStatus) {
+  protected _updateErrorStatusClasses(statusClass: string, hasStatus: boolean) {
     this._updateErrorStatusClassesOnElement(this.$container, statusClass, hasStatus);
     this._updateErrorStatusClassesOnElement(this.$field, statusClass, hasStatus);
   }
 
-  _updateErrorStatusClassesOnElement($element, statusClass, hasStatus) {
+  protected _updateErrorStatusClassesOnElement($element: JQuery, statusClass: string, hasStatus: boolean) {
     if (!$element) {
       return;
     }
     $element
       .removeClass(FormField.SEVERITY_CSS_CLASSES)
-      .addClass(statusClass, hasStatus);
+      .addClass(statusClass);
   }
 
-  setTooltipText(tooltipText) {
+  setTooltipText(tooltipText: string) {
     this.setProperty('tooltipText', tooltipText);
   }
 
-  /**
-   * @protected
-   */
-  _renderTooltipText() {
+  protected _renderTooltipText() {
     this._updateTooltip();
   }
 
-  setTooltipAnchor(tooltipAnchor) {
+  setTooltipAnchor(tooltipAnchor: FormFieldTooltipAnchor) {
     this.setProperty('tooltipAnchor', tooltipAnchor);
   }
 
-  _renderTooltipAnchor() {
+  protected _renderTooltipAnchor() {
     this._updateTooltip();
   }
 
-  _updateTooltip() {
+  protected _updateTooltip() {
     let hasTooltipText = this.hasStatusTooltip();
     this.$container.toggleClass('has-tooltip', hasTooltipText);
     if (this.$field) {
@@ -467,21 +496,19 @@ export default class FormField extends Widget {
     }
   }
 
-  hasStatusTooltip() {
-    return this.tooltipAnchor === FormField.TooltipAnchor.DEFAULT &&
-      strings.hasText(this.tooltipText);
+  hasStatusTooltip(): boolean {
+    return this.tooltipAnchor === FormField.TooltipAnchor.DEFAULT && strings.hasText(this.tooltipText);
   }
 
-  hasOnFieldTooltip() {
-    return this.tooltipAnchor === FormField.TooltipAnchor.ON_FIELD &&
-      strings.hasText(this.tooltipText);
+  hasOnFieldTooltip(): boolean {
+    return this.tooltipAnchor === FormField.TooltipAnchor.ON_FIELD && strings.hasText(this.tooltipText);
   }
 
-  setOnFieldTooltipOptionsCreator(onFieldTooltipOptionsCreator) {
+  setOnFieldTooltipOptionsCreator(onFieldTooltipOptionsCreator: (this: FormField) => TooltipSupportOptions) {
     this.onFieldTooltipOptionsCreator = onFieldTooltipOptionsCreator;
   }
 
-  _createOnFieldTooltipOptions() {
+  protected _createOnFieldTooltipOptions(): TooltipSupportOptions {
     return {
       parent: this,
       text: this.tooltipText,
@@ -489,10 +516,7 @@ export default class FormField extends Widget {
     };
   }
 
-  /**
-   * @override
-   */
-  _renderVisible() {
+  protected override _renderVisible() {
     super._renderVisible();
     if (this.rendered) {
       // Make sure error status is hidden / shown when visibility changes
@@ -500,11 +524,11 @@ export default class FormField extends Widget {
     }
   }
 
-  setLabel(label) {
+  setLabel(label: string) {
     this.setProperty('label', label);
   }
 
-  _renderLabel() {
+  protected _renderLabel() {
     let label = this.label;
     if (this.labelPosition === FormField.LabelPosition.ON_FIELD) {
       this._renderPlaceholder();
@@ -530,13 +554,13 @@ export default class FormField extends Widget {
    * property in order to provide some layout-flexibility. Makes sure the empty label has the same height as the other labels,
    * which is especially important for top labels.
    */
-  _renderEmptyLabel() {
+  protected _renderEmptyLabel() {
     this.$label
       .html('&nbsp;')
       .toggleClass('top', this.labelPosition === FormField.LabelPosition.TOP);
   }
 
-  _renderPlaceholder($field) {
+  protected _renderPlaceholder($field?: JQuery) {
     $field = scout.nvl($field, this.$field);
     if ($field) {
       $field.placeholder(this.label);
@@ -544,20 +568,20 @@ export default class FormField extends Widget {
   }
 
   /**
-   * @param $field (optional) argument is required by DateField.js, when not set this.$field is used
+   * @param $field argument is required by DateField.js, when not set this.$field is used
    */
-  _removePlaceholder($field) {
+  protected _removePlaceholder($field?: JQuery) {
     $field = scout.nvl($field, this.$field);
     if ($field) {
       $field.placeholder('');
     }
   }
 
-  setLabelVisible(visible) {
+  setLabelVisible(visible: boolean) {
     this.setProperty('labelVisible', visible);
   }
 
-  _renderLabelVisible() {
+  protected _renderLabelVisible() {
     let visible = this.labelVisible;
     this._renderChildVisible(this.$label, visible);
     this.$container.toggleClass('label-hidden', !visible);
@@ -570,53 +594,53 @@ export default class FormField extends Widget {
     }
   }
 
-  setLabelWidthInPixel(labelWidthInPixel) {
+  setLabelWidthInPixel(labelWidthInPixel: number) {
     this.setProperty('labelWidthInPixel', labelWidthInPixel);
   }
 
-  _renderLabelWidthInPixel() {
+  protected _renderLabelWidthInPixel() {
     this.invalidateLayoutTree();
   }
 
-  setLabelUseUiWidth(labelUseUiWidth) {
+  setLabelUseUiWidth(labelUseUiWidth: number) {
     this.setProperty('labelUseUiWidth', labelUseUiWidth);
   }
 
-  _renderLabelUseUiWidth() {
+  protected _renderLabelUseUiWidth() {
     this.invalidateLayoutTree();
   }
 
-  setStatusVisible(visible) {
+  setStatusVisible(visible: boolean) {
     this.setProperty('statusVisible', visible);
   }
 
-  _renderStatusVisible() {
+  protected _renderStatusVisible() {
     this._updateFieldStatus();
   }
 
-  setStatusPosition(statusPosition) {
+  setStatusPosition(statusPosition: FormFieldStatusPosition) {
     this.setProperty('statusPosition', statusPosition);
   }
 
-  _renderStatusPosition(statusPosition) {
+  protected _renderStatusPosition() {
     this._updateFieldStatus();
   }
 
-  _tooltip() {
+  protected _tooltip(): Tooltip {
     if (this.fieldStatus) {
       return this.fieldStatus.tooltip;
     }
     return null;
   }
 
-  _updateFieldStatus() {
+  protected _updateFieldStatus() {
     if (!this.fieldStatus) {
       return;
     }
     // compute status
-    let menus,
+    let menus: Menu[],
       errorStatus = this._errorStatus(),
-      status = null,
+      status: Status = null,
       statusVisible = this._computeStatusVisible(),
       autoRemove = true;
 
@@ -652,7 +676,7 @@ export default class FormField extends Widget {
     this.fieldStatus.update(status, menus, autoRemove, this._isInitialShowStatus());
   }
 
-  _isInitialShowStatus() {
+  protected _isInitialShowStatus(): boolean {
     return !!this._errorStatus();
   }
 
@@ -660,7 +684,7 @@ export default class FormField extends Widget {
    * Computes whether the $status should be visible based on statusVisible, errorStatus and tooltip.
    * -> errorStatus and tooltip override statusVisible, so $status may be visible event though statusVisible is set to false
    */
-  _computeStatusVisible() {
+  protected _computeStatusVisible() {
     let status = this._errorStatus(),
       statusVisible = this.statusVisible,
       hasStatus = !!status,
@@ -669,7 +693,7 @@ export default class FormField extends Widget {
     return !this._isSuppressStatusIcon() && this.visible && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
   }
 
-  _renderChildVisible($child, visible) {
+  protected _renderChildVisible($child: JQuery, visible: boolean): boolean {
     if (!$child) {
       return;
     }
@@ -680,12 +704,12 @@ export default class FormField extends Widget {
     }
   }
 
-  setLabelPosition(labelPosition) {
+  setLabelPosition(labelPosition: FormFieldLabelPosition) {
     this.setProperty('labelPosition', labelPosition);
   }
 
   // Don't include in renderProperties, it is not necessary to execute it initially because the positioning is done by _renderLabel
-  _renderLabelPosition(position) {
+  protected _renderLabelPosition() {
     this._renderLabel();
     if (this.rendered) {
       // Necessary to invalidate parent as well if parent uses the logical grid.
@@ -698,19 +722,16 @@ export default class FormField extends Widget {
     }
   }
 
-  setLabelHtmlEnabled(labelHtmlEnabled) {
+  setLabelHtmlEnabled(labelHtmlEnabled: boolean) {
     this.setProperty('labelHtmlEnabled', labelHtmlEnabled);
   }
 
-  _renderLabelHtmlEnabled() {
+  protected _renderLabelHtmlEnabled() {
     // Render the label again when html enabled changes dynamically
     this._renderLabel();
   }
 
-  /**
-   * @override
-   */
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     if (this.$field) {
       this.$field.setEnabled(this.enabledComputed);
@@ -719,87 +740,84 @@ export default class FormField extends Widget {
     this._installOrUninstallDragAndDropHandler();
   }
 
-  /**
-   * @override Wigdet.js
-   */
-  _renderDisabledStyle() {
+  protected override _renderDisabledStyle() {
     this._renderDisabledStyleInternal(this.$container);
     this._renderDisabledStyleInternal(this.$fieldContainer);
     this._renderDisabledStyleInternal(this.$field);
     this._renderDisabledStyleInternal(this.$mandatory);
   }
 
-  setFont(font) {
+  setFont(font: string) {
     this.setProperty('font', font);
   }
 
-  _renderFont() {
+  protected _renderFont() {
     styles.legacyFont(this, this.$field);
   }
 
-  setForegroundColor(foregroundColor) {
+  setForegroundColor(foregroundColor: string) {
     this.setProperty('foregroundColor', foregroundColor);
   }
 
-  _renderForegroundColor() {
+  protected _renderForegroundColor() {
     styles.legacyForegroundColor(this, this.$field);
   }
 
-  setBackgroundColor(backgroundColor) {
+  setBackgroundColor(backgroundColor: string) {
     this.setProperty('backgroundColor', backgroundColor);
   }
 
-  _renderBackgroundColor() {
+  protected _renderBackgroundColor() {
     styles.legacyBackgroundColor(this, this.$field);
   }
 
-  setLabelFont(labelFont) {
+  setLabelFont(labelFont: string) {
     this.setProperty('labelFont', labelFont);
   }
 
-  _renderLabelFont() {
+  protected _renderLabelFont() {
     styles.legacyFont(this, this.$label, 'label');
   }
 
-  setLabelForegroundColor(labelForegroundColor) {
+  setLabelForegroundColor(labelForegroundColor: string) {
     this.setProperty('labelForegroundColor', labelForegroundColor);
   }
 
-  _renderLabelForegroundColor() {
+  protected _renderLabelForegroundColor() {
     styles.legacyForegroundColor(this, this.$label, 'label');
   }
 
-  setLabelBackgroundColor(labelBackgroundColor) {
+  setLabelBackgroundColor(labelBackgroundColor: string) {
     this.setProperty('labelBackgroundColor', labelBackgroundColor);
   }
 
-  _renderLabelBackgroundColor() {
+  protected _renderLabelBackgroundColor() {
     styles.legacyBackgroundColor(this, this.$label, 'label');
   }
 
-  setGridDataHints(gridData) {
+  setGridDataHints(gridData: GridData) {
     this.setProperty('gridDataHints', gridData);
   }
 
-  _setGridDataHints(gridData) {
+  protected _setGridDataHints(gridData: GridData) {
     if (!gridData) {
       gridData = new GridData();
     }
     this._setProperty('gridDataHints', GridData.ensure(gridData));
   }
 
-  _renderGridDataHints() {
+  protected _renderGridDataHints() {
     this.parent.invalidateLogicalGrid();
   }
 
-  _setGridData(gridData) {
+  protected _setGridData(gridData: GridData) {
     if (!gridData) {
       gridData = new GridData();
     }
     this._setProperty('gridData', GridData.ensure(gridData));
   }
 
-  _renderGridData() {
+  protected _renderGridData() {
     if (this.rendered) {
       let htmlCompParent = this.htmlComp.getParent();
       if (htmlCompParent) { // may be null if $container is detached
@@ -808,29 +826,23 @@ export default class FormField extends Widget {
     }
   }
 
-  setMenus(menus) {
+  setMenus(menus: Menu | Menu[]) {
     this.setProperty('menus', menus);
   }
 
-  _setMenus(menus) {
+  protected _setMenus(menus: Menu | Menu[]) {
     menus = arrays.ensure(menus);
-    this.menus.forEach(function(menu) {
-      menu.off('propertyChange', this._menuPropertyChangeHandler);
-    }, this);
-
+    this.menus.forEach(menu => menu.off('propertyChange', this._menuPropertyChangeHandler));
     this.updateKeyStrokes(menus, this.menus);
     this._setProperty('menus', menus);
-
-    this.menus.forEach(function(menu) {
-      menu.on('propertyChange', this._menuPropertyChangeHandler);
-    }, this);
+    this.menus.forEach(menu => menu.on('propertyChange', this._menuPropertyChangeHandler));
   }
 
-  insertMenu(menuToInsert) {
+  insertMenu(menuToInsert: Menu) {
     this.insertMenus([menuToInsert]);
   }
 
-  insertMenus(menusToInsert) {
+  insertMenus(menusToInsert: Menu[]) {
     menusToInsert = arrays.ensure(menusToInsert);
     if (menusToInsert.length === 0) {
       return;
@@ -838,11 +850,11 @@ export default class FormField extends Widget {
     this.setMenus(this.menus.concat(menusToInsert));
   }
 
-  deleteMenu(menuToDelete) {
+  deleteMenu(menuToDelete: Menu) {
     this.deleteMenus([menuToDelete]);
   }
 
-  deleteMenus(menusToDelete) {
+  deleteMenus(menusToDelete: Menu[]) {
     menusToDelete = arrays.ensure(menusToDelete);
     if (menusToDelete.length === 0) {
       return;
@@ -852,40 +864,38 @@ export default class FormField extends Widget {
     this.setMenus(menus);
   }
 
-  _onMenuPropertyChange(event) {
+  protected _onMenuPropertyChange(event: PropertyChangeEvent<any, Menu>) {
     if (event.propertyName === 'visible' && this.rendered) {
       this._updateMenus();
     }
   }
 
-  getContextMenuItems(onlyVisible = true) {
+  getContextMenuItems(onlyVisible = true): Menu[] {
     let currentMenuTypes = this.getCurrentMenuTypes();
     if (currentMenuTypes.length) {
-      return menuUtil.filter(this.menus, currentMenuTypes, {onlyVisible, defaultMenuTypes: this.defaultMenuTypes});
+      return menuUtil.filter(this.menus, currentMenuTypes, {onlyVisible: onlyVisible, defaultMenuTypes: this.defaultMenuTypes});
     } else if (onlyVisible) {
       return this.menus.filter(menu => menu.visible);
     }
     return this.menus;
   }
 
-  _getMenusForStatus(status) {
+  protected _getMenusForStatus(status: Status): Menu[] {
     return this.statusMenuMappings.filter(mapping => {
       if (!mapping.menu || !mapping.menu.visible) {
         return false;
       }
       // Show the menus which are mapped to the status code and severity (if set)
-      return (mapping.codes.length === 0 || mapping.codes.indexOf(status.code) > -1) &&
-        (mapping.severities.length === 0 || mapping.severities.indexOf(status.severity) > -1);
-    }).map(mapping => {
-      return mapping.menu;
-    });
+      return (mapping.codes.length === 0 || mapping.codes.indexOf(status.code) > -1)
+        && (mapping.severities.length === 0 || mapping.severities.indexOf(status.severity) > -1);
+    }).map(mapping => mapping.menu);
   }
 
-  _hasMenus() {
+  protected _hasMenus(): boolean {
     return !!(this.menus && this.getContextMenuItems().length > 0);
   }
 
-  _updateMenus() {
+  protected _updateMenus() {
     if (!this.rendered && !this.rendering) {
       return;
     }
@@ -893,38 +903,35 @@ export default class FormField extends Widget {
     this._updateFieldStatus();
   }
 
-  _renderMenus() {
+  protected _renderMenus() {
     this._updateMenus();
   }
 
-  _renderStatusMenuMappings() {
+  protected _renderStatusMenuMappings() {
     this._updateMenus();
   }
 
-  setMenusVisible(menusVisible) {
+  setMenusVisible(menusVisible: boolean) {
     this.setProperty('menusVisible', menusVisible);
   }
 
-  /**
-   * override by TabItem
-   **/
-  _setMenusVisible(menusVisible) {
+  protected _setMenusVisible(menusVisible: boolean) {
     this._setProperty('menusVisible', menusVisible);
   }
 
-  _renderMenusVisible() {
+  protected _renderMenusVisible() {
     this._updateMenus();
   }
 
-  getCurrentMenuTypes() {
+  getCurrentMenuTypes(): string[] {
     return this._getCurrentMenuTypes();
   }
 
-  _getCurrentMenuTypes() {
+  protected _getCurrentMenuTypes(): string[] {
     return [];
   }
 
-  _setKeyStrokes(keyStrokes) {
+  protected _setKeyStrokes(keyStrokes: KeyStroke[]) {
     this.updateKeyStrokes(keyStrokes, this.keyStrokes);
     this._setProperty('keyStrokes', keyStrokes);
   }
@@ -932,27 +939,25 @@ export default class FormField extends Widget {
   /**
    * May be overridden to explicitly provide a tooltip $parent
    */
-  _$tooltipParent() {
+  protected _$tooltipParent(): JQuery {
     // Will be determined by the tooltip itself
     return undefined;
   }
 
-  _hideStatusMessage() {
+  protected _hideStatusMessage() {
     if (this.fieldStatus) {
       this.fieldStatus.hideTooltip();
     }
   }
 
-  _renderPreventInitialFocus() {
+  protected _renderPreventInitialFocus() {
     this.$container.toggleClass('prevent-initial-focus', !!this.preventInitialFocus);
   }
 
   /**
    * Sets the focus on this field. If the field is not rendered, the focus will be set as soon as it is rendered.
-   *
-   * @override
    */
-  focus() {
+  override focus(): boolean {
     if (!this.rendered) {
       this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
       return false;
@@ -972,21 +977,19 @@ export default class FormField extends Widget {
   /**
    * This method returns the HtmlElement to be used as initial focus element or when {@link #focus()} is called.
    * It can be overridden, in case the FormField needs to return something other than this.$field[0].
-   *
-   * @override
    */
-  getFocusableElement() {
+  override getFocusableElement(): HTMLElement | JQuery {
     if (this.rendered && this.$field) {
       return this.$field[0];
     }
     return null;
   }
 
-  _onFieldFocus(event) {
+  protected _onFieldFocus(event: JQuery.FocusEvent) {
     this.setFocused(true);
   }
 
-  _onFieldBlur() {
+  protected _onFieldBlur(event: JQuery.BlurEvent) {
     this.setFocused(false);
   }
 
@@ -1005,22 +1008,19 @@ export default class FormField extends Widget {
     }
   }
 
-  /**
-   * @override
-   */
-  get$Scrollable() {
+  override get$Scrollable(): JQuery {
     return this.$field;
   }
 
-  getParentGroupBox() {
+  getParentGroupBox(): GroupBox {
     let parent = this.parent;
     while (parent && !(parent instanceof GroupBox)) {
       parent = parent.parent;
     }
-    return parent;
+    return parent as GroupBox;
   }
 
-  getParentField() {
+  getParentField(): Widget {
     return this.parent;
   }
 
@@ -1038,7 +1038,7 @@ export default class FormField extends Widget {
     this.$label.on('click', this._onLabelClick.bind(this));
   }
 
-  _onLabelClick(event) {
+  protected _onLabelClick(event: JQuery.ClickEvent) {
     if (!strings.hasText(this.label)) {
       // Clicking on "invisible" labels should not have any effect since it is confusing
       return;
@@ -1046,7 +1046,7 @@ export default class FormField extends Widget {
     this.activate();
   }
 
-  _removeLabel() {
+  protected _removeLabel() {
     if (!this.$label) {
       return;
     }
@@ -1059,7 +1059,7 @@ export default class FormField extends Widget {
    * Links the given element with the label by setting aria-labelledby.<br>
    * This allows screen readers to build a catalog of the elements on the screen and their relationships, for example, to read the label when the input is focused.
    */
-  _linkWithLabel($element) {
+  protected _linkWithLabel($element: JQuery) {
     if (!this.$label || !$element) {
       return;
     }
@@ -1067,7 +1067,7 @@ export default class FormField extends Widget {
     fields.linkElementWithLabel($element, this.$label);
   }
 
-  _removeIcon() {
+  protected _removeIcon() {
     if (!this.$icon) {
       return;
     }
@@ -1079,7 +1079,7 @@ export default class FormField extends Widget {
    * Appends the given field to the this.$container and sets the property this.$field.
    * The $field is used as $fieldContainer as long as you don't explicitly call addFieldContainer before calling addField.
    */
-  addField($field) {
+  addField($field: JQuery) {
     if (!this.$fieldContainer) {
       this.addFieldContainer($field);
     }
@@ -1092,12 +1092,14 @@ export default class FormField extends Widget {
   /**
    * Call this method before addField if you'd like to have a different field container than $field.
    */
-  addFieldContainer($fieldContainer) {
+  addFieldContainer($fieldContainer: JQuery) {
     this.$fieldContainer = $fieldContainer
       .addClass('field');
 
     // Only append if not already appended or it is not the last element so that append would move it to the end
     // This can be important for some widgets, e.g. iframe which would cancel and restart the request on every dom insertion
+    // FIXME TS: jquery api wrong or does this not work? has() does not seem to accept a jquery element?
+    // @ts-ignore
     if (this.$container.has($fieldContainer).length === 0 || $fieldContainer.next().length > 0) {
       $fieldContainer.appendTo(this.$container);
     }
@@ -1106,7 +1108,7 @@ export default class FormField extends Widget {
   /**
    * Removes this.$field and this.$fieldContainer and sets the properties to null.
    */
-  _removeField() {
+  protected _removeField() {
     if (this.$field) {
       this.$field.remove();
       this.$field = null;
@@ -1135,7 +1137,7 @@ export default class FormField extends Widget {
     this._updateFieldStatus();
   }
 
-  _removeStatus() {
+  protected _removeStatus() {
     if (!this.fieldStatus) {
       return;
     }
@@ -1168,9 +1170,8 @@ export default class FormField extends Widget {
   /**
    * Adds a SPAN element with class 'icon' the the given optional $parent.
    * When $parent is not set, the element is added to this.$container.
-   * @param $parent (optional)
    */
-  addIcon($parent) {
+  addIcon($parent?: JQuery) {
     if (!$parent) {
       $parent = this.$container;
     }
@@ -1178,7 +1179,7 @@ export default class FormField extends Widget {
       .on('mousedown', this._onIconMouseDown.bind(this));
   }
 
-  _onIconMouseDown(event) {
+  protected _onIconMouseDown(event: JQuery.MouseDownEvent) {
     if (!this.enabledComputed) {
       return;
     }
@@ -1192,10 +1193,10 @@ export default class FormField extends Widget {
    *
    * @param $parent to which container is appended
    * @param cssClass cssClass to add to the new container DIV
-   * @param [layout] when layout is undefined, {@link _createLayout} is called
+   * @param layout when layout is undefined, {@link _createLayout} is called
    *
    */
-  addContainer($parent, cssClass, layout) {
+  addContainer($parent: JQuery, cssClass?: string, layout?: AbstractLayout) {
     this.$container = $parent.appendDiv('form-field');
     if (cssClass) {
       this.$container.addClass(cssClass);
@@ -1206,30 +1207,21 @@ export default class FormField extends Widget {
   }
 
   /**
-   * @return {FormFieldLayout|AbstractLayout} the default layout FormFieldLayout. Override this function if your field needs another layout.
+   * @returns the default layout FormFieldLayout. Override this function if your field needs another layout.
    */
-  _createLayout() {
+  protected _createLayout(): AbstractLayout {
     return new FormFieldLayout(this);
   }
 
   /**
-   * Updates the "inner alignment" of a field. Usually, the GridData hints only have influence on the
-   * LogicalGridLayout. However, the properties "horizontalAlignment" and "verticalAlignment" are
-   * sometimes used differently. Instead of controlling the field alignment in case fillHorizontal/
-   * fillVertical is false, the developer expects the _contents_ of the field to be aligned correspondingly
-   * inside the field. Technically, this is not correct, but is supported for legacy and convenience
-   * reasons for some of the Scout fields. Those who support the behavior may override _renderGridData()
-   * and call this method. Some CSS classes are then added to the field.
-   *
-   * opts:
-   *   useHorizontalAlignment:
-   *     When this option is true, "halign-" classes are added according to gridData.horizontalAlignment.
-   *   useVerticalAlignment:
-   *     When this option is true, "valign-" classes are added according to gridData.verticalAlignment.
-   *   $fieldContainer:
-   *     Specifies the div where the classes should be added. If omitted, this.$fieldContainer is used.
+   * Updates the "inner alignment" of a field. Usually, the GridData hints only have influence on the LogicalGridLayout.
+   * However, the properties "horizontalAlignment" and "verticalAlignment" are sometimes used differently.
+   * Instead of controlling the field alignment in case fillHorizontal/fillVertical is false, the developer expects the _contents_ of the field to be aligned correspondingly inside the field.
+   * Technically, this is not correct, but is supported for legacy and convenience reasons for some of the Scout fields.
+   * Those who support the behavior may override _renderGridData() and call this method.
+   * Some CSS classes are then added to the field.
    */
-  updateInnerAlignment(opts) {
+  updateInnerAlignment(opts?: FormFieldAlignmentUpdateOptions) {
     opts = opts || {};
     let $fieldContainer = opts.$fieldContainer || this.$fieldContainer;
 
@@ -1240,7 +1232,7 @@ export default class FormField extends Widget {
     }
   }
 
-  _updateElementInnerAlignment(opts, $field) {
+  protected _updateElementInnerAlignment(opts: FormFieldAlignmentUpdateOptions, $field: JQuery) {
     opts = opts || {};
     let useHorizontalAlignment = scout.nvl(opts.useHorizontalAlignment, true);
     let useVerticalAlignment = scout.nvl(opts.useVerticalAlignment, true);
@@ -1271,7 +1263,7 @@ export default class FormField extends Widget {
     }
   }
 
-  addCellEditorFieldCssClasses($field, opts) {
+  addCellEditorFieldCssClasses($field: JQuery, opts: { cssClass?: string }) {
     $field
       .addClass('cell-editor-field')
       .addClass(Device.get().cssClassForEdge());
@@ -1280,7 +1272,7 @@ export default class FormField extends Widget {
     }
   }
 
-  prepareForCellEdit(opts) {
+  prepareForCellEdit(opts?: { cssClass?: string }) {
     opts = opts || {};
 
     // remove mandatory and status indicators (popup should 'fill' the whole cell)
@@ -1299,28 +1291,23 @@ export default class FormField extends Widget {
     }
   }
 
-  setDropType(dropType) {
+  setDropType(dropType: DropType) {
     this.setProperty('dropType', dropType);
   }
 
-  _renderDropType() {
+  protected _renderDropType() {
     this._installOrUninstallDragAndDropHandler();
   }
 
-  setDropMaximumSize(dropMaximumSize) {
+  setDropMaximumSize(dropMaximumSize: number) {
     this.setProperty('dropMaximumSize', dropMaximumSize);
   }
 
-  _installOrUninstallDragAndDropHandler() {
+  protected _installOrUninstallDragAndDropHandler() {
     dragAndDrop.installOrUninstallDragAndDropHandler(this._getDragAndDropHandlerOptions());
   }
 
-  /**
-   *
-   * @return {DragAndDropOptions}
-   * @private
-   */
-  _getDragAndDropHandlerOptions() {
+  protected _getDragAndDropHandlerOptions(): DragAndDropOptions {
     return {
       target: this,
       doInstall: () => this.dropType && this.enabledComputed,
@@ -1330,7 +1317,7 @@ export default class FormField extends Widget {
     };
   }
 
-  _updateDisabledCopyOverlay() {
+  protected _updateDisabledCopyOverlay() {
     if (this.disabledCopyOverlay && !Device.get().supportsCopyFromDisabledInputFields()) {
       if (this.enabledComputed) {
         this._removeDisabledCopyOverlay();
@@ -1341,7 +1328,7 @@ export default class FormField extends Widget {
     }
   }
 
-  _renderDisabledCopyOverlay() {
+  protected _renderDisabledCopyOverlay() {
     if (!this.$disabledCopyOverlay) {
       this.$disabledCopyOverlay = this.$container
         .appendDiv('disabled-overlay')
@@ -1349,14 +1336,14 @@ export default class FormField extends Widget {
     }
   }
 
-  _removeDisabledCopyOverlay() {
+  protected _removeDisabledCopyOverlay() {
     if (this.$disabledCopyOverlay) {
       this.$disabledCopyOverlay.remove();
       this.$disabledCopyOverlay = null;
     }
   }
 
-  _createCopyContextMenu(event) {
+  protected _createCopyContextMenu(event: JQuery.ContextMenuEvent) {
     if (!this.visible || strings.empty(this.displayText)) {
       return;
     }
@@ -1366,9 +1353,7 @@ export default class FormField extends Widget {
       text: this.session.text('ui.Copy'),
       inheritAccessibility: false
     });
-    menu.on('action', event => {
-      this.exportToClipboard();
-    });
+    menu.on('action', event => this.exportToClipboard());
 
     let popup = scout.create(ContextMenuPopup, {
       parent: this,
@@ -1385,19 +1370,17 @@ export default class FormField extends Widget {
   /**
    * Visits this field and all child form fields in pre-order (top-down).
    *
-   * @param {function(FormField):string|TreeVisitResult|null} visitor
-   * @returns {string} the TreeVisitResult, or nothing to continue.
+   * @returns the TreeVisitResult, or nothing to continue.
    */
-  visitFields(visitor) {
+  visitFields(visitor: (field: FormField) => TreeVisitResult | void): TreeVisitResult | void {
     return visitor(this);
   }
 
   /**
    * Visit all parent form fields. The visit stops if the parent is no form field anymore (e.g. a form, desktop or session).
    *
-   * @param {function(FormField)} visitor
    */
-  visitParentFields(visitor) {
+  visitParentFields(visitor: (parent: FormField) => void) {
     let curParent = this.parent;
     while (curParent instanceof FormField) {
       visitor(curParent);
@@ -1429,30 +1412,16 @@ export default class FormField extends Widget {
    * Override this function in order to return whether or not this field requires to be saved.
    * The default impl. returns false.
    *
-   * @returns {boolean}
    */
-  computeRequiresSave() {
+  computeRequiresSave(): boolean {
     return false;
   }
 
-  /**
-   * @typedef ValidationResult
-   * @property {boolean} valid
-   * @property {boolean} validByErrorStatus
-   * @property {boolean} validByMandatory
-   * @property {FormField} field
-   * @property {String} label
-   * @property {function} reveal
-   */
 
-  /**
-   * @returns {ValidationResult}
-   */
-  getValidationResult() {
+  getValidationResult(): ValidationResult {
     let validByErrorStatus = !this._errorStatus();
     let validByMandatory = !this.mandatory || !this.empty;
     let valid = validByErrorStatus && validByMandatory;
-    // noinspection JSValidateTypes
     return {
       valid: valid,
       validByErrorStatus: validByErrorStatus,
@@ -1466,7 +1435,7 @@ export default class FormField extends Widget {
     };
   }
 
-  _updateEmpty() {
+  protected _updateEmpty() {
     // NOP
   }
 
@@ -1476,29 +1445,60 @@ export default class FormField extends Widget {
     }
   }
 
-  clone(model, options) {
+  override clone(model: FormFieldModel, options?: CloneOptions): this {
     let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'menus', options);
-    return clone;
+    return clone as this;
   }
 
   exportToClipboard() {
     if (!this.displayText) {
       return;
     }
-    let event = new Event({
+    let event = this.trigger('clipboardExport', {
       text: this.displayText
-    });
-    this.trigger('clipboardExport', event);
+    }) as FormFieldClipboardExportEvent;
     if (!event.defaultPrevented) {
       this._exportToClipboard(event.text);
     }
   }
 
-  _exportToClipboard(text) {
+  protected _exportToClipboard(text: string) {
     clipboard.copyText({
       parent: this,
       text: text
     });
   }
 }
+
+export type FormFieldStyle = EnumObject<typeof FormField.FieldStyle>;
+export type FormFieldSuppressStatus = EnumObject<typeof FormField.SuppressStatus>;
+export type FormFieldStatusPosition = EnumObject<typeof FormField.StatusPosition>;
+export type FormFieldLabelPosition = EnumObject<typeof FormField.LabelPosition>;
+export type FormFieldTooltipAnchor = EnumObject<typeof FormField.TooltipAnchor>;
+export type FormFieldLabelWidth = EnumObject<typeof FormField.LabelWidth>;
+export type FormFieldMode = EnumObject<typeof FormField.Mode>;
+export type FormFieldAlignmentUpdateOptions = {
+  /**
+   * When this option is true, "halign-" classes are added according to gridData.horizontalAlignment. Default is true.
+   */
+  useHorizontalAlignment?: boolean;
+
+  /**
+   * When this option is true, "valign-" classes are added according to gridData.verticalAlignment. Default is true.
+   */
+  useVerticalAlignment?: boolean;
+
+  /**
+   * Specifies the div where the classes should be added. If omitted, this.$fieldContainer is used.
+   */
+  $fieldContainer?: JQuery;
+};
+export type ValidationResult = {
+  valid: boolean;
+  validByErrorStatus: boolean;
+  validByMandatory: boolean;
+  field: FormField;
+  label: string;
+  reveal: () => void;
+};

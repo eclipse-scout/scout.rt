@@ -1,36 +1,44 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueField} from '../../index';
+import {BasicFieldEventMap, ValueField} from '../../index';
 
 /**
  * Common base class for ValueFields having an HTML input field.
  */
-export default class BasicField extends ValueField {
+export default abstract class BasicField<TValue> extends ValueField<TValue> {
+  declare eventMap: BasicFieldEventMap<TValue>;
+
+  updateDisplayTextOnModify: boolean;
+  /** in milliseconds */
+  updateDisplayTextOnModifyDelay: number;
+
+  protected _displayTextModifiedTimeoutId: number;
+  protected _displayTextChangedWhileTyping: boolean;
 
   constructor() {
     super();
     this.disabledCopyOverlay = true;
     this._displayTextModifiedTimeoutId = null;
     this.updateDisplayTextOnModify = false;
-    this.updateDisplayTextOnModifyDelay = 250; // in milliseconds
+    this.updateDisplayTextOnModifyDelay = 250;
   }
 
-  addField($field) {
+  override addField($field: JQuery) {
     super.addField($field);
     if ($field) {
       $field.on('input', this._onFieldInput.bind(this));
     }
   }
 
-  setUpdateDisplayTextOnModify(updateDisplayTextOnModify) {
+  setUpdateDisplayTextOnModify(updateDisplayTextOnModify: boolean) {
     // Execute pending "accept input while typing" function _before_ updating the "updateDisplayTextOnModify" property
     if (this._displayTextModifiedTimeoutId !== null) {
       // Cancel pending "acceptInput(true)" call (see _onDisplayTextModified) and execute it now
@@ -41,17 +49,17 @@ export default class BasicField extends ValueField {
     this.setProperty('updateDisplayTextOnModify', updateDisplayTextOnModify);
   }
 
-  setUpdateDisplayTextOnModifyDelay(delay) {
+  setUpdateDisplayTextOnModifyDelay(delay: number) {
     this.setProperty('updateDisplayTextOnModifyDelay', delay);
   }
 
-  _clear() {
+  protected override _clear() {
     if (this.$field) {
       this.$field.val('');
     }
   }
 
-  _onFieldInput() {
+  protected _onFieldInput() {
     this._updateHasText();
     if (this.updateDisplayTextOnModify) {
       this._onDisplayTextModified();
@@ -63,7 +71,7 @@ export default class BasicField extends ValueField {
    * value) has been modified by a user action, e.g. a key or paste event. If the property is FALSE, this
    * method is _never_ called. Uses the debounce pattern.
    */
-  _onDisplayTextModified() {
+  protected _onDisplayTextModified() {
     clearTimeout(this._displayTextModifiedTimeoutId);
     if (this.updateDisplayTextOnModifyDelay) {
       this._displayTextModifiedTimeoutId = setTimeout(this._acceptInputWhileTyping.bind(this), this.updateDisplayTextOnModifyDelay);
@@ -72,14 +80,14 @@ export default class BasicField extends ValueField {
     }
   }
 
-  _acceptInputWhileTyping() {
+  protected _acceptInputWhileTyping() {
     this._displayTextModifiedTimeoutId = null;
     if (this.rendered) { // Check needed because field may have been removed in the meantime
       this.acceptInput(true);
     }
   }
 
-  acceptInput(whileTyping) {
+  override acceptInput(whileTyping?: boolean) {
     if (this._displayTextModifiedTimeoutId !== null) {
       // Cancel pending "acceptInput(true)" call (see _onDisplayTextModified) and execute it now
       clearTimeout(this._displayTextModifiedTimeoutId);
@@ -88,19 +96,16 @@ export default class BasicField extends ValueField {
     super.acceptInput(whileTyping);
   }
 
-  _renderDisplayText() {
+  protected override _renderDisplayText() {
     this.$field.val(this.displayText);
     super._renderDisplayText();
   }
 
-  _readDisplayText() {
-    return this.$field ? this.$field.val() : '';
+  protected override _readDisplayText(): string {
+    return this.$field ? this.$field.val() as string : '';
   }
 
-  /**
-   * @override ValueField.js
-   */
-  _checkDisplayTextChanged(displayText, whileTyping) {
+  protected override _checkDisplayTextChanged(displayText: string, whileTyping: boolean): boolean {
     let displayTextChanged = super._checkDisplayTextChanged(displayText, whileTyping);
 
     if (whileTyping) {

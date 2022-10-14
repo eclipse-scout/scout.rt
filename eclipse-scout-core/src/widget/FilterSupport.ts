@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, EventHandler, Filter, Filterable, FilterResult, FilterSupportOptions, FormField, HAlign, keys, KeyStroke, objects, Predicate, scout, SetFiltersResult, StringField, strings, styles, UpdateFilteredElementsOptions, ValueField,
-  Widget, WidgetSupport
+  arrays, EventHandler, Filter, Filterable, FilterResult, FilterSupportOptions, FormField, HAlign, keys, KeyStroke, objects, Predicate, PropertyChangeEvent, scout, SetFiltersResult, StringField, strings, styles,
+  UpdateFilteredElementsOptions, ValueField, Widget, WidgetSupport
 } from '../index';
 import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
 import {FilterElement, TextFilter} from './Filter';
@@ -24,7 +24,7 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
   protected _exitFilterFieldKeyStroke: KeyStroke;
   protected _filterElements: () => FilterResult<TElem>;
   protected _filterField: StringField;
-  protected _filterFieldDisplayTextChangedHandler: EventHandler;
+  protected _filterFieldDisplayTextChangedHandler: EventHandler<PropertyChangeEvent<string>>;
   protected _focusFilterFieldKeyStroke: KeyStroke;
   protected _focusInHandler: JQuery.EventHandler<HTMLElement>;
   protected _focusOutHandler: JQuery.EventHandler<HTMLElement>;
@@ -170,7 +170,7 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
     this._filterField.$container.css('--filter-field-transparent-80-background-color', transparent80Color);
   }
 
-  protected _onFilterFieldDisplayTextChanged(event) { // FIXME TS: DisplayTextChangedEvent as soon as StringField has been migrated
+  protected _onFilterFieldDisplayTextChanged(event: PropertyChangeEvent<string>) {
     if (this._filterField && this._filterField.rendered) {
       this._filterField.$container.toggleClass('empty', !event.newValue);
     }

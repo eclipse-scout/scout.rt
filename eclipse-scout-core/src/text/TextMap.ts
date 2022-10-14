@@ -28,7 +28,7 @@ export default class TextMap {
    * @param textKey key to lookup the text
    * @param vararg texts to replace the placeholders specified by {0}, {1}, etc.
    */
-  get(textKey: string, ...vararg: string[]): string {
+  get(textKey: string, ...vararg: any[]): string {
     if (!this._exists(textKey)) {
       if (this.parent) {
         return this.parent.get(textKey, ...vararg);

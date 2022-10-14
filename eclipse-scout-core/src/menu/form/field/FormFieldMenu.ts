@@ -82,6 +82,7 @@ export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
 
   protected override _renderOverflown() {
     super._renderOverflown();
+    // @ts-ignore
     this.field._hideStatusMessage();
   }
 }

@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, BasicField, Device, Dimension, FormField, graphics, HtmlComponent, HtmlEnvironment, Insets, Rectangle, scout, scrollbars} from '../../index';
+import {AbstractLayout, BasicField, Device, Dimension, EventHandler, FormField, graphics, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, Insets, PropertyChangeEvent, Rectangle, scout, scrollbars} from '../../index';
 
 /**
  * Form-Field Layout, for a form-field with label, status, mandatory-indicator and a field.
@@ -17,8 +17,14 @@ import {AbstractLayout, BasicField, Device, Dimension, FormField, graphics, Html
  * (composite) form-fields work with a HtmlComponent which has its own LayoutManager.
  */
 export default class FormFieldLayout extends AbstractLayout {
+  formField: FormField;
+  mandatoryIndicatorWidth: number;
+  statusWidth: number;
+  rowHeight: number;
+  compactFieldWidth: number;
+  htmlPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, HtmlEnvironment>>;
 
-  constructor(formField) {
+  constructor(formField: FormField) {
     super();
     this.formField = formField;
     this._initDefaults();
@@ -33,37 +39,39 @@ export default class FormFieldLayout extends AbstractLayout {
   // Minimum field with to normal state, for smaller widths the "compact" style is applied.
   static COMPACT_FIELD_WIDTH = 61;
 
-  _initDefaults() {
+  protected _initDefaults() {
     this.mandatoryIndicatorWidth = HtmlEnvironment.get().fieldMandatoryIndicatorWidth;
     this.statusWidth = HtmlEnvironment.get().fieldStatusWidth;
     this.rowHeight = HtmlEnvironment.get().formRowHeight;
     this.compactFieldWidth = FormFieldLayout.COMPACT_FIELD_WIDTH;
   }
 
-  _onHtmlEnvironmentPropertyChange() {
+  protected _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this.formField.invalidateLayoutTree();
   }
 
-  layout($container) {
-    let containerPadding, fieldOffset, fieldSize, fieldBounds, htmlField, labelHasFieldWidth, top, bottom, left, right,
+  override layout($container: JQuery) {
+    let labelHasFieldWidth: boolean,
+      fieldBounds: Rectangle,
       htmlContainer = HtmlComponent.get($container),
       formField = this.formField,
+      // @ts-ignore
       tooltip = formField._tooltip(),
       labelWidth = this.labelWidth(),
       statusWidth = this.statusWidth;
 
     // Note: Position coordinates start _inside_ the border, therefore we only use the padding
-    containerPadding = htmlContainer.insets({
+    let containerPadding = htmlContainer.insets({
       includeBorder: false
     });
-    top = containerPadding.top;
-    right = containerPadding.right;
-    bottom = containerPadding.bottom;
-    left = containerPadding.left;
+    let top = containerPadding.top;
+    let right = containerPadding.right;
+    let bottom = containerPadding.bottom;
+    let left = containerPadding.left;
 
     if (this._isLabelVisible()) {
-      // currently a gui only flag, necessary for sequencebox
+      // currently a gui only flag, necessary for sequence box
       if (formField.labelWidthInPixel === FormField.LabelWidth.UI || formField.labelUseUiWidth) {
         if (formField.$label.hasClass('empty')) {
           labelWidth = 0;
@@ -91,8 +99,7 @@ export default class FormFieldLayout extends AbstractLayout {
       left += formField.$mandatory.outerWidth(true);
     }
     if (this._isStatusVisible()) {
-      formField.$status
-        .cssWidth(statusWidth);
+      formField.$status.cssWidth(statusWidth);
       // If both status and label position is "top", pull status up (without margin on the right side)
       if (formField.statusPosition === FormField.StatusPosition.TOP && labelHasFieldWidth) {
         let statusHeight = graphics.prefSize(formField.$status, {
@@ -119,14 +126,14 @@ export default class FormFieldLayout extends AbstractLayout {
 
     if (formField.$fieldContainer) {
       // Calculate the additional field offset (because of label, mandatory indicator etc.) without the containerInset.
-      fieldOffset = new Insets(
+      let fieldOffset = new Insets(
         top - containerPadding.top,
         right - containerPadding.right,
         bottom - containerPadding.bottom,
         left - containerPadding.left);
       // Calculate field size: "available size" - "insets (border and padding)" - "additional offset" - "field's margin"
       let fieldMargins = graphics.margins(formField.$fieldContainer);
-      fieldSize = htmlContainer.availableSize({
+      let fieldSize = htmlContainer.availableSize({
         exact: true
       })
         .subtract(htmlContainer.insets())
@@ -137,7 +144,7 @@ export default class FormFieldLayout extends AbstractLayout {
         fieldBounds.x = 0;
         fieldBounds.y = 0;
       }
-      htmlField = HtmlComponent.optGet(formField.$fieldContainer);
+      let htmlField = HtmlComponent.optGet(formField.$fieldContainer);
       if (htmlField) {
         htmlField.setBounds(fieldBounds);
       } else {
@@ -192,7 +199,7 @@ export default class FormFieldLayout extends AbstractLayout {
     this._layoutDisabledCopyOverlay();
   }
 
-  _layoutDisabledCopyOverlay() {
+  protected _layoutDisabledCopyOverlay() {
     if (this.formField.$field && this.formField.$disabledCopyOverlay) {
       let $overlay = this.formField.$disabledCopyOverlay;
       let $field = this.formField.$field;
@@ -221,15 +228,15 @@ export default class FormFieldLayout extends AbstractLayout {
     }
   }
 
-  _isLabelVisible() {
+  protected _isLabelVisible(): boolean {
     return !!this.formField.$label && this.formField.labelVisible;
   }
 
-  _isStatusVisible() {
+  protected _isStatusVisible(): boolean {
     return !!this.formField.$status && (this.formField.statusVisible || this.formField.$status.isVisible());
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let htmlContainer = HtmlComponent.get(this.formField.$container);
     let formField = this.formField;
     let prefSizeLabel = new Dimension();
@@ -336,13 +343,13 @@ export default class FormFieldLayout extends AbstractLayout {
   }
 
   /**
-   * @returns {$} the input element used to position the icon. May be overridden if another element than $field should be used.
+   * @returns the input element used to position the icon. May be overridden if another element than $field should be used.
    */
-  _$elementForIconLayout() {
+  protected _$elementForIconLayout(): JQuery {
     return this.formField.$field;
   }
 
-  _layoutIcon(formField, fieldBounds, right, top) {
+  protected _layoutIcon(formField: FormField, fieldBounds: Rectangle, right: number, top: number) {
     let height = this.rowHeight;
     if (fieldBounds) {
       // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field
@@ -354,7 +361,7 @@ export default class FormFieldLayout extends AbstractLayout {
       .cssHeight(height);
   }
 
-  _layoutClearIcon(formField, fieldBounds, right, top) {
+  protected _layoutClearIcon(formField: FormField, fieldBounds: Rectangle, right: number, top: number) {
     let height = this.rowHeight;
     if (fieldBounds) {
       // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field
@@ -375,7 +382,7 @@ export default class FormFieldLayout extends AbstractLayout {
     }
   }
 
-  labelWidth() {
+  labelWidth(): number {
     // use configured label width in pixel or default label width
     if (FormField.LabelWidth.DEFAULT === this.formField.labelWidthInPixel) {
       return HtmlEnvironment.get().fieldLabelWidth;

@@ -1,16 +1,21 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, WidgetFieldLayout} from '../../index';
+import {FormField, Widget, WidgetFieldEventMap, WidgetFieldLayout, WidgetFieldModel} from '../../index';
 
-export default class WidgetField extends FormField {
+export default class WidgetField extends FormField implements WidgetFieldModel {
+  declare model: WidgetFieldModel;
+  declare eventMap: WidgetFieldEventMap;
+
+  scrollable: boolean;
+  fieldWidget: Widget;
 
   constructor() {
     super();
@@ -20,28 +25,28 @@ export default class WidgetField extends FormField {
     this._addWidgetProperties(['fieldWidget']);
   }
 
-  _init(model) {
+  protected override _init(model: WidgetFieldModel) {
     super._init(model);
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'widget-field', new WidgetFieldLayout(this));
     this.addLabel();
     this.addMandatoryIndicator();
     this.addStatus();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderFieldWidget();
     this._renderScrollable();
   }
 
-  setFieldWidget(fieldWidget) {
+  setFieldWidget(fieldWidget: Widget) {
     this.setProperty('fieldWidget', fieldWidget);
   }
 
-  _renderFieldWidget() {
+  protected _renderFieldWidget() {
     if (!this.fieldWidget) {
       return;
     }
@@ -50,7 +55,7 @@ export default class WidgetField extends FormField {
     this.invalidateLayoutTree();
   }
 
-  _removeFieldWidget() {
+  protected _removeFieldWidget() {
     if (!this.fieldWidget) {
       return;
     }
@@ -59,21 +64,18 @@ export default class WidgetField extends FormField {
     this.invalidateLayoutTree();
   }
 
-  setScrollable(scrollable) {
+  setScrollable(scrollable: boolean) {
     this.setProperty('scrollable', scrollable);
   }
 
-  _renderScrollable() {
+  protected _renderScrollable() {
     this._uninstallScrollbars();
     if (this.scrollable) {
       this._installScrollbars();
     }
   }
 
-  /**
-   * @override
-   */
-  get$Scrollable() {
+  override get$Scrollable(): JQuery {
     return this.$fieldContainer;
   }
 }
