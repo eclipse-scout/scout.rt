@@ -12,7 +12,7 @@ import {Event as ScoutEvent, PropertyChangeEvent, WidgetEventMap} from '@eclipse
 import {AbstractChartRenderer, Chart} from '../index';
 import {ChartConfig, ChartData, ClickObject} from './Chart';
 
-export interface ChartValueClickEvent<C extends Chart = Chart> extends ScoutEvent<C> {
+export interface ChartValueClickEvent<C = Chart> extends ScoutEvent<C> {
   data: ClickObject;
   originalEvent?: Event;
 }
