@@ -434,6 +434,7 @@ export {default as TileOverviewFormModel} from './form/TileOverviewFormModel';
 export {default as TileOverviewFormEventMap} from './form/TileOverviewFormEventMap';
 export {default as TileOverviewFormAdapter} from './form/TileOverviewFormAdapter';
 export {default as JsFormAdapter} from './form/js/JsFormAdapter';
+export {default as JsFormModel} from './form/js/JsFormModel';
 export {default as Table} from './table/Table';
 export {default as TableModel} from './table/TableModel';
 export {default as TableEventMap} from './table/TableEventMap';
