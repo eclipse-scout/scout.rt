@@ -467,7 +467,7 @@ export default abstract class ValueField<TValue> extends FormField implements Va
   /**
    * @param the value to be validated
    * @returns the validated value
-   * @throws a message, a Status or an error if the validation fails
+   * @throws a message, a {@link Status} or an error if the validation fails
    */
   validateValue(value: TValue): TValue {
     let defaultValidator = this._validateValue.bind(this);
@@ -480,7 +480,7 @@ export default abstract class ValueField<TValue> extends FormField implements Va
 
   /**
    * @returns the validated value
-   * @throws a message, a Status or an error if the validation fails
+   * @throws a message, a {@link Status} or an error if the validation fails
    */
   protected _validateValue(value: TValue): TValue {
     if (typeof value === 'string' && value === '') {

@@ -56,8 +56,7 @@ export default class FormFieldLayout extends AbstractLayout {
       fieldBounds: Rectangle,
       htmlContainer = HtmlComponent.get($container),
       formField = this.formField,
-      // @ts-ignore
-      tooltip = formField._tooltip(),
+      tooltip = formField.tooltip(),
       labelWidth = this.labelWidth(),
       statusWidth = this.statusWidth;
 

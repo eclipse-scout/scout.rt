@@ -13,7 +13,7 @@ import {RefModel} from '../../../types';
 
 export default interface PageModel extends TreeNodeModel {
   parent: Outline;
-  childNodes?: RefModel<PageModel>[] | Page[];
+  childNodes?: Omit<PageModel, 'parent'>[] | Page[];
   compactRoot?: boolean;
   detailTable?: Table | RefModel<TableModel>;
   detailTableVisible?: boolean;

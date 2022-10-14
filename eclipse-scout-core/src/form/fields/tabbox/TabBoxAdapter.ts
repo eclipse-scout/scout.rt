@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {CompositeFieldAdapter} from '../../../index';
+import {AdapterData} from '../../../session/Session';
 
 export default class TabBoxAdapter extends CompositeFieldAdapter {
 
@@ -17,10 +18,7 @@ export default class TabBoxAdapter extends CompositeFieldAdapter {
     this._addRemoteProperties(['selectedTab']);
   }
 
-  /**
-   * @override ModelAdapter.js
-   */
-  exportAdapterData(adapterData) {
+  override exportAdapterData(adapterData: AdapterData): AdapterData {
     adapterData = super.exportAdapterData(adapterData);
     delete adapterData.selectedTab;
     return adapterData;

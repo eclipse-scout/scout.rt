@@ -1090,7 +1090,7 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     return elements;
   }
 
-  onGlassPaneMouseDown?(glassPaneOwner: Widget, $glassPane: JQuery<HTMLDivElement>) {
+  onGlassPaneMouseDown?(glassPaneOwner: Widget, $glassPane: JQuery) {
     let desktop = this.session.desktop;
     if (desktop.navigation) {
       if ($glassPane.parent()[0] === desktop.navigation.$body[0]) {

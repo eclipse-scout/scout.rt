@@ -8,13 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Locale} from '../../index';
+import {Locale, LocaleModel} from '../../index';
+import {DateFormatSymbols, DecimalFormatSymbols} from '../../session/LocaleModel';
 
 export default class LocaleSpecHelper {
   static DEFAULT_LOCALE = 'de-CH';
   static GERMAN_LOCALE = 'de-DE';
   static DEFAULT_DATE_FORMAT_PATTERN = 'dd.MM.yyyy';
   static DEFAULT_TIME_FORMAT_PATTERN = 'HH:mm';
+  decimalFormatSymbolsByLocale: Record<string, DecimalFormatSymbols>;
+  dateFormatSymbolsByLocale: Record<string, DateFormatSymbols>;
+  dateFormatPatternByLocale: Record<string, string>;
 
   constructor() {
     this._initDecimalFormatSymbols();
@@ -22,13 +26,13 @@ export default class LocaleSpecHelper {
     this._initDateFormatDefaultPatterns();
   }
 
-  createModel(languageTag) {
-    let model = {};
-    model.languageTag = languageTag;
-    return model;
+  createModel(languageTag: string): LocaleModel {
+    return {
+      languageTag: languageTag
+    };
   }
 
-  createLocale(languageTag) {
+  createLocale(languageTag: string): Locale {
     let model = this.createModel(languageTag);
     model.decimalFormatSymbols = this.decimalFormatSymbolsByLocale[languageTag];
     model.decimalFormatPatternDefault = '#,##0.###';
@@ -38,43 +42,40 @@ export default class LocaleSpecHelper {
     return new Locale(model);
   }
 
-  _initDecimalFormatSymbols() {
+  protected _initDecimalFormatSymbols() {
     this.decimalFormatSymbolsByLocale = {};
     this.decimalFormatSymbolsByLocale[LocaleSpecHelper.DEFAULT_LOCALE] = this.createDecimalFormatSymbolsForDeCH();
     this.decimalFormatSymbolsByLocale[LocaleSpecHelper.GERMAN_LOCALE] = this.createDecimalFormatSymbolsForDeDE();
   }
 
-  createDecimalFormatSymbolsForDeCH() {
+  createDecimalFormatSymbolsForDeCH(): DecimalFormatSymbols {
     return {
-      'digit': '#',
-      'zeroDigit': '0',
       'decimalSeparator': '.',
       'groupingSeparator': '\'',
-      'minusSign': '-',
-      'patternSeparator': ';'
+      'minusSign': '-'
     };
   }
 
-  createDecimalFormatSymbolsForDeDE() {
+  createDecimalFormatSymbolsForDeDE(): DecimalFormatSymbols {
     let symbols = this.createDecimalFormatSymbolsForDeCH();
     symbols.decimalSeparator = ',';
     symbols.groupingSeparator = '.';
     return symbols;
   }
 
-  _initDateFormatSymbols() {
+  protected _initDateFormatSymbols() {
     let symbols = this.createDateFormatSymbolsForDe();
     this.dateFormatSymbolsByLocale = {};
     this.dateFormatSymbolsByLocale[LocaleSpecHelper.DEFAULT_LOCALE] = symbols;
     this.dateFormatSymbolsByLocale[LocaleSpecHelper.GERMAN_LOCALE] = symbols;
   }
 
-  _initDateFormatDefaultPatterns() {
+  protected _initDateFormatDefaultPatterns() {
     this.dateFormatPatternByLocale = {};
     this.dateFormatPatternByLocale.de = 'dd.MM.yyyy';
   }
 
-  createDateFormatSymbolsForDe() {
+  createDateFormatSymbolsForDe(): DateFormatSymbols {
     return {
       'weekdays': ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
       'weekdaysShort': ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],

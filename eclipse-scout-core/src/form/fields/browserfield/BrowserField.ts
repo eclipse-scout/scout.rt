@@ -8,10 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BrowserFieldLayout, IFrame, numbers, PopupBlockerHandler, Rectangle, scout, strings, ValueField} from '../../../index';
+import {BrowserFieldLayout, EnumObject, FormField, FormFieldModel, IFrame, numbers, PopupBlockerHandler, PropertyChangeEvent, Rectangle, scout, strings} from '../../../index';
 import $ from 'jquery';
+import BrowserFieldModel from './BrowserFieldModel';
+import BrowserFieldEventMap from './BrowserFieldEventMap';
+import TriggeredEvent = JQuery.TriggeredEvent;
 
-export default class BrowserField extends ValueField {
+export type BrowserFieldWindowStates = EnumObject<typeof BrowserField.WindowStates>;
+
+export default class BrowserField extends FormField implements BrowserFieldModel {
+  declare model: BrowserFieldModel;
+  declare eventMap: BrowserFieldEventMap;
+
+  autoCloseExternalWindow: boolean;
+  externalWindowButtonText: string;
+  externalWindowFieldText: string;
+  location: string;
+  trackLocation: boolean;
+  sandboxEnabled: boolean;
+  sandboxPermissions: string;
+  trustedMessageOrigins: string[];
+  scrollBarEnabled: boolean;
+  showInExternalWindow: boolean;
+  iframe: IFrame;
+  myWindow: Window;
+  protected _messageListener: (event: MessageEvent) => any;
+  protected _popupWindow: Window;
+  protected _externalWindowTextField: JQuery;
+  protected _externalWindowButton: JQuery;
 
   constructor() {
     super();
@@ -37,7 +61,7 @@ export default class BrowserField extends ValueField {
     WINDOW_CLOSED: 'false'
   };
 
-  _init(model) {
+  protected override _init(model: FormFieldModel) {
     super._init(model);
 
     this.iframe = scout.create(IFrame, {
@@ -51,7 +75,7 @@ export default class BrowserField extends ValueField {
     this.iframe.on('propertyChange', this._onIFramePropertyChange.bind(this));
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'browser-field', new BrowserFieldLayout(this));
     this.addLabel();
     this.addStatus();
@@ -69,7 +93,7 @@ export default class BrowserField extends ValueField {
         .addClass('alt');
       this._externalWindowButton = this.$field.appendDiv()
         .addClass('button')
-        .on('click', this._openPopupWindow.bind(this));
+        .on('click', event => this._openPopupWindow(true));
     }
 
     this.myWindow = this.$parent.window(true);
@@ -83,19 +107,13 @@ export default class BrowserField extends ValueField {
     }
   }
 
-  /**
-   * @override ValueField.js
-   */
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderExternalWindowButtonText();
     this._renderExternalWindowFieldText();
   }
 
-  /**
-   * @override FormField.js
-   */
-  _remove() {
+  protected override _remove() {
     super._remove();
     this.myWindow.removeEventListener('message', this._messageListener);
     this._messageListener = null;
@@ -109,12 +127,12 @@ export default class BrowserField extends ValueField {
     }
   }
 
-  setLocation(location) {
+  setLocation(location: string) {
     this.setProperty('location', location);
     this.iframe.setLocation(location);
   }
 
-  _renderLocation() {
+  protected _renderLocation() {
     // Convert empty locations to 'about:blank', because in Firefox (maybe others, too?),
     // empty locations simply remove the src attribute but don't remove the old content.
     let location = this.location || 'about:blank';
@@ -126,25 +144,25 @@ export default class BrowserField extends ValueField {
     }
   }
 
-  setAutoCloseExternalWindow(autoCloseExternalWindow) {
+  setAutoCloseExternalWindow(autoCloseExternalWindow: boolean) {
     this.setProperty('autoCloseExternalWindow', autoCloseExternalWindow);
   }
 
-  setExternalWindowButtonText(externalWindowButtonText) {
+  setExternalWindowButtonText(externalWindowButtonText: string) {
     this.setProperty('externalWindowButtonText', externalWindowButtonText);
   }
 
-  _renderExternalWindowButtonText() {
+  protected _renderExternalWindowButtonText() {
     if (this.showInExternalWindow) {
       this._externalWindowButton.text(this.externalWindowButtonText || '');
     }
   }
 
-  setExternalWindowFieldText(externalWindowFieldText) {
+  setExternalWindowFieldText(externalWindowFieldText: string) {
     this.setProperty('externalWindowFieldText', externalWindowFieldText);
   }
 
-  _renderExternalWindowFieldText() {
+  protected _renderExternalWindowFieldText() {
     if (this.showInExternalWindow) {
       this._externalWindowTextField.text(this.externalWindowFieldText || '');
     }
@@ -163,7 +181,7 @@ export default class BrowserField extends ValueField {
    * a HTML document. So we removed the check entirely, which shouldn't be an issue since the browser itself does prevent
    * popups from having an invalid position.
    */
-  _calcPopupBounds() {
+  protected _calcPopupBounds(): Rectangle {
     let myWindow = this.$container.window(true);
 
     let POPUP_WINDOW_TOP_HEIGHT = 30;
@@ -208,7 +226,7 @@ export default class BrowserField extends ValueField {
     );
   }
 
-  _openPopupWindow(reopenIfClosed) {
+  protected _openPopupWindow(reopenIfClosed?: boolean) {
     reopenIfClosed = scout.nvl(reopenIfClosed, true);
     if (!this.showInExternalWindow) {
       return;
@@ -239,7 +257,7 @@ export default class BrowserField extends ValueField {
     }
   }
 
-  _popupWindowOpen(popup) {
+  protected _popupWindowOpen(popup: Window) {
     this._popupWindow = popup;
     if (this._popupWindow && !this._popupWindow.closed) {
       this.trigger('externalWindowStateChange', {
@@ -264,7 +282,7 @@ export default class BrowserField extends ValueField {
     }
   }
 
-  _onMessage(event) {
+  protected _onMessage(event: MessageEvent) {
     // Only handle event originating form "our" iframe
     if (!this._isValidMessageSource(event.source)) {
       return;
@@ -282,20 +300,18 @@ export default class BrowserField extends ValueField {
     });
   }
 
-  /**
-   * @param w Window of event
-   */
-  _isValidMessageSource(w) {
-    let iframeWindow = this.$field[0].contentWindow;
-    if (w === iframeWindow) {
+  protected _isValidMessageSource(source: MessageEventSource): boolean {
+    let iframeWindow = (this.$field[0] as HTMLIFrameElement).contentWindow;
+    if (source === iframeWindow) {
       return true; // same source
     }
 
     // Check parents of window in case event source is an inner iframe
     // parent window of topmost window is itself (https://developer.mozilla.org/en-US/docs/Web/API/Window/parent)
-    while (w && w !== w.parent) {
-      w = w.parent;
-      if (w === iframeWindow) {
+    let win = source as Window;
+    while (win && win !== win.parent) {
+      win = win.parent;
+      if (win === iframeWindow) {
         return true;
       }
     }
@@ -303,17 +319,30 @@ export default class BrowserField extends ValueField {
     return false; // no valid parent window found
   }
 
-  postMessage(message, targetOrigin) {
+  /**
+   * Sends a message to the embedded web page (`iframe`).
+   *
+   * @param message
+   *          The message to send.
+   * @param targetOrigin
+   *          The expected origin of the receiving `window`. If the origin does not match, the browser will not
+   *          dispatch the message for security reasons. See the
+   *          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">documentation</a> for
+   *          details.
+   * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">window.postMessage (MDN)</a>
+   */
+  postMessage(message: any, targetOrigin: string) {
     $.log.isDebugEnabled() && $.log.debug('send post-message: message=' + message + ', targetOrigin=' + targetOrigin);
     this.iframe && this.iframe.postMessage(message, targetOrigin);
   }
 
-  setTrackLocation(trackLocation) {
+  /** @see BrowserFieldModel.sandboxPermissions */
+  setTrackLocation(trackLocation: boolean) {
     this.setProperty('trackLocation', trackLocation);
     this.iframe.setTrackLocation(trackLocation);
   }
 
-  _onIFramePropertyChange(event) {
+  protected _onIFramePropertyChange(event: PropertyChangeEvent<IFrame>) {
     if (!this.trackLocation) {
       return;
     }
@@ -322,7 +351,7 @@ export default class BrowserField extends ValueField {
     }
   }
 
-  _onLoad(event) {
+  protected _onLoad(event: TriggeredEvent) {
     if (!this.rendered) { // check needed, because this is an async callback
       return;
     }
@@ -330,17 +359,19 @@ export default class BrowserField extends ValueField {
     this.invalidateLayoutTree();
   }
 
-  setSandboxEnabled(sandboxEnabled) {
+  /** @see BrowserFieldModel.sandboxEnabled */
+  setSandboxEnabled(sandboxEnabled: boolean) {
     this.setProperty('sandboxEnabled', sandboxEnabled);
     this.iframe.setSandboxEnabled(sandboxEnabled);
   }
 
-  setSandboxPermissions(sandboxPermissions) {
+  /** @see BrowserFieldModel.sandboxPermissions */
+  setSandboxPermissions(sandboxPermissions: string) {
     this.setProperty('sandboxPermissions', sandboxPermissions);
     this.iframe.setSandboxPermissions(sandboxPermissions);
   }
 
-  setScrollBarEnabled(scrollBarEnabled) {
+  setScrollBarEnabled(scrollBarEnabled: boolean) {
     this.setProperty('scrollBarEnabled', scrollBarEnabled);
     this.iframe.setScrollBarEnabled(scrollBarEnabled);
   }

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AccordionLayout, AccordionModel, arrays, EventHandler, Group, HtmlComponent, LoadingSupport, objects, PropertyChangeEvent, Widget, widgets} from '../index';
+import {AccordionLayout, AccordionModel, arrays, EventHandler, Group, GroupModel, HtmlComponent, LoadingSupport, objects, PropertyChangeEvent, Widget, widgets} from '../index';
 import {Comparator} from '../types';
 import {GroupCollapseStyle} from '../group/Group';
 
@@ -63,20 +63,21 @@ export default class Accordion extends Widget implements AccordionModel {
     this._renderGroups();
   }
 
-  insertGroup(group: Group) {
+  insertGroup(group: Group | GroupModel) {
     this.insertGroups([group]);
   }
 
-  insertGroups(groupsToInsert: Group[]) {
+  insertGroups(groupsToInsert: Group | GroupModel | (Group | GroupModel)[]) {
     groupsToInsert = arrays.ensure(groupsToInsert);
-    this.setGroups(this.groups.concat(groupsToInsert));
+    let groups = this.groups as (Group | GroupModel)[];
+    this.setGroups(groups.concat(groupsToInsert));
   }
 
   deleteGroup(group: Group) {
     this.deleteGroups([group]);
   }
 
-  deleteGroups(groupsToDelete: Group[]) {
+  deleteGroups(groupsToDelete: Group[] | Group) {
     groupsToDelete = arrays.ensure(groupsToDelete);
     let groups = this.groups.slice();
     arrays.removeAll(groups, groupsToDelete);
@@ -93,14 +94,14 @@ export default class Accordion extends Widget implements AccordionModel {
     });
   }
 
-  setGroups(groups: Group[]) {
-    groups = arrays.ensure(groups);
-    if (objects.equals(this.groups, groups)) {
+  setGroups(groupsOrModels: (Group | GroupModel)[]) {
+    groupsOrModels = arrays.ensure(groupsOrModels);
+    if (objects.equals(this.groups, groupsOrModels)) {
       return;
     }
 
     // Ensure given groups are real groups (of type Group)
-    groups = this._createChildren(groups) as Group[];
+    let groups = this._createChildren(groupsOrModels) as Group[];
 
     // Only delete those which are not in the new array
     // Only insert those which are not already there

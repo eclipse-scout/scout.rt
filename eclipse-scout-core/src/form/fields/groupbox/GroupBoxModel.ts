@@ -8,14 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, FormFieldModel, LogicalGridLayoutConfig, Menu, Notification, NotificationModel} from '../../../index';
+import {FormField, FormFieldModel, LogicalGridLayoutConfig, Menu, MenuModel, Notification, NotificationModel} from '../../../index';
 import {MenuBarEllipsisPosition} from '../../../menu/menubar/MenuBar';
 import {GroupBoxBorderDecoration, GroupBoxMenuBarPosition} from './GroupBox';
 import {RefModel} from '../../../types';
 import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
 
 export default interface GroupBoxModel extends FormFieldModel {
-  fields?: FormField[];
+  fields?: (FormField | RefModel<FormFieldModel>)[];
   menuBarVisible?: boolean;
   menuBarPosition?: GroupBoxMenuBarPosition;
   menuBarEllipsisPosition?: MenuBarEllipsisPosition;
@@ -28,7 +28,7 @@ export default interface GroupBoxModel extends FormFieldModel {
   expandable?: boolean;
   expanded?: boolean;
   gridColumnCount?: number;
-  staticMenus?: Menu[];
+  staticMenus?: (Menu | MenuModel)[];
   selectionKeystroke?: string;
   responsive?: boolean;
 }

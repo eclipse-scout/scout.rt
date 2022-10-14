@@ -11,14 +11,10 @@
 import {Column, Session, Table} from '../../index';
 import {Alignment} from '../../cell/Cell';
 import {ColumnComparator} from './comparators';
-import {ObjectType} from '../../ObjectFactory';
+import {ObjectModel} from '../../scout';
 
-export default interface ColumnModel<TValue> {
+export default interface ColumnModel<TValue = string> extends ObjectModel<Column<TValue>, ColumnModel<TValue>> {
   session?: Session;
-  objectType?: ObjectType<Column<TValue>>;
-
-  id?: string;
-
   /**
    * Configures whether the column width is auto optimized.
    * If true: whenever the table content changes, the optimized column width is automatically calculated so that all column content is displayed without cropping.

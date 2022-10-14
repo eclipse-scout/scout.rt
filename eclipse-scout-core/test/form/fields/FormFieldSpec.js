@@ -482,11 +482,11 @@ describe('FormField', () => {
       formField.render();
 
       expect(formField.$container.isVisible()).toBe(true);
-      expect(formField._tooltip().rendered).toBe(true);
+      expect(formField.tooltip().rendered).toBe(true);
       expect($('.tooltip').length).toBe(1);
 
       formField.setVisible(false);
-      expect(formField._tooltip()).toBe(null);
+      expect(formField.tooltip()).toBe(null);
       expect($('.tooltip').length).toBe(0);
     });
 
@@ -499,11 +499,11 @@ describe('FormField', () => {
       formField.render();
 
       expect(formField.$container.isVisible()).toBe(false);
-      expect(formField._tooltip()).toBe(null);
+      expect(formField.tooltip()).toBe(null);
       expect($('.tooltip').length).toBe(0);
 
       formField.setVisible(true);
-      expect(formField._tooltip().rendered).toBe(true);
+      expect(formField.tooltip().rendered).toBe(true);
       expect($('.tooltip').length).toBe(1);
     });
 

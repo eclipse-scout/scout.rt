@@ -26,10 +26,11 @@ describe('Session', () => {
   function createSession(userAgent) {
     setFixtures(sandbox());
     let session = sandboxSession({
-      'userAgent': userAgent
+      userAgent: userAgent
     });
     // test request only, don't test response (would require valid session, desktop etc.)
     session._processStartupResponse = () => {
+      // nop
     };
     return session;
   }
@@ -72,7 +73,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
-      sendQueuedAjaxCalls('', 100);
+      sendQueuedAjaxCalls(null, 100);
 
       // since 500 ms are not passed yet, the request has not been sent and following events should be added
       send(session, 1, 'nodeSelected');
@@ -81,7 +82,7 @@ describe('Session', () => {
       send(session, 1, 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      sendQueuedAjaxCalls('', 1000);
+      sendQueuedAjaxCalls(null, 1000);
 
       // after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -99,7 +100,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
-      sendQueuedAjaxCalls('', 100);
+      sendQueuedAjaxCalls(null, 100);
 
       // since 500 ms are not passed yet, the request has not been sent and following events should be added
       send(session, 1, 'nodeSelected');
@@ -108,7 +109,7 @@ describe('Session', () => {
       send(session, 1, 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      sendQueuedAjaxCalls('', 0);
+      sendQueuedAjaxCalls(null, 0);
 
       // after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -130,13 +131,13 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
-      sendQueuedAjaxCalls('', 100);
+      sendQueuedAjaxCalls(null, 100);
 
       // since 300 ms are not passed yet, the request has not been sent
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 250 ms --> both events should now have been sent
-      sendQueuedAjaxCalls('', 250);
+      sendQueuedAjaxCalls(null, 250);
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
 

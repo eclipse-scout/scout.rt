@@ -25,7 +25,7 @@ import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
 export default class Session extends EventEmitter implements ModelAdapterLike {
   declare model: SessionModel;
   declare eventMap: SessionEventMap;
-  partId: number;
+  partId: string;
   url: URL;
   userAgent: UserAgent;
   locale: Locale;
@@ -83,15 +83,15 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
   protected _deferredEventTypes: string[];
   protected _deferred: JQuery.Deferred<string[], never, never>;
   protected _fatalMessagesOnScreen: Record<string, boolean>;
-  protected _retryRequest: Request;
-  protected _queuedRequest: Request;
+  protected _retryRequest: RemoteRequest;
+  protected _queuedRequest: RemoteRequest;
   protected _asyncDelay: number;
   protected _sendTimeoutId: number;
 
   constructor() {
     super();
     this.$entryPoint = null;
-    this.partId = 0;
+    this.partId = '0';
     this.url = new URL();
     this.userAgent = new UserAgent({
       deviceType: Device.get().type,
@@ -563,7 +563,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     return previousEvents.filter(filter);
   }
 
-  protected _sendRequest(request: Request) {
+  protected _sendRequest(request: RemoteRequest) {
     if (!request) {
       return; // nothing to send
     }
@@ -603,7 +603,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     this._performUserAjaxRequest(ajaxOptions, busyHandling, request);
   }
 
-  protected _handleSendWhenOffline(request: Request) {
+  protected _handleSendWhenOffline(request: RemoteRequest) {
     // No need to queue the request when request does not contain events (e.g. log request, unload request)
     if (!request.events) {
       return;
@@ -627,7 +627,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     this.layoutValidator.validate();
   }
 
-  defaultAjaxOptions(request: Request): JQuery.AjaxSettings {
+  defaultAjaxOptions(request: RemoteRequest): JQuery.AjaxSettings {
     request = request || this._newRequest();
     let url = this._decorateUrl(this.remoteUrl, request);
 
@@ -656,7 +656,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     return ajaxOptions;
   }
 
-  protected _decorateUrl(url: string, request: Request): string {
+  protected _decorateUrl(url: string, request: RemoteRequest): string {
     let urlHint = null;
     // Add dummy URL parameter as marker (for debugging purposes)
     if (request.unload) {
@@ -678,7 +678,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     return url;
   }
 
-  protected _getRequestName(request: Request, defaultName: string): string {
+  protected _getRequestName(request: RemoteRequest, defaultName: string): string {
     if (request) {
       if (request.unload) {
         return 'unload';
@@ -697,7 +697,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     return defaultName;
   }
 
-  protected _requestToJson(request: Request): string {
+  protected _requestToJson(request: RemoteRequest): string {
     return JSON.stringify(request, function(key: string, value: any) {
       // Replacer function that filter certain properties from the resulting JSON string.
       // See https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
@@ -720,7 +720,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
       .always(this.unregisterAjaxCall.bind(this, ajaxCall));
   }
 
-  protected _performUserAjaxRequest(ajaxOptions: JQuery.AjaxSettings, busyHandling: boolean, request?: Request) {
+  protected _performUserAjaxRequest(ajaxOptions: JQuery.AjaxSettings, busyHandling: boolean, request?: RemoteRequest) {
     if (busyHandling) {
       this.setBusy(true);
     }
@@ -739,7 +739,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
 
     // ----- Helper methods -----
 
-    function onAjaxDone(data: Response) {
+    function onAjaxDone(data: RemoteResponse) {
       try {
         // Busy handling is remove _before_ processing the response, otherwise the focus cannot be set
         // correctly, because the glasspane of the busy indicator is still visible.
@@ -768,7 +768,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     // Variable arguments:
     // "done" --> data, textStatus, jqXHR
     // "fail" --> jqXHR, textStatus, errorThrown
-    function onAjaxAlways(data: Response | JQuery.jqXHR, textStatus: JQuery.Ajax.TextStatus, errorThrown: string | JQuery.jqXHR) {
+    function onAjaxAlways(data: RemoteResponse | JQuery.jqXHR, textStatus: JQuery.Ajax.TextStatus, errorThrown: string | JQuery.jqXHR) {
       this.setRequestPending(false);
 
       // "success" is false when either
@@ -869,7 +869,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
 
     // --- Helper methods ---
 
-    function onAjaxDone(data: Response) {
+    function onAjaxDone(data: RemoteResponse) {
       if (data.error) {
         // Don't schedule a new polling request, when an error occurs
         // when the next user-initiated request succeeds, we re-enable polling
@@ -923,7 +923,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
    *
    * Otherwise, the response queue's expected sequence number will get out of sync.
    */
-  processJsonResponseInternal(data: Response) {
+  processJsonResponseInternal(data: RemoteResponse) {
     let success = false;
     if (data.error) {
       this._processErrorJsonResponse(data.error);
@@ -934,7 +934,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     return success;
   }
 
-  protected _processSuccessResponse(message: Response) {
+  protected _processSuccessResponse(message: RemoteResponse) {
     if (message.adapterData) {
       this._copyAdapterData(message.adapterData);
     }
@@ -969,7 +969,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     }
   }
 
-  protected _processErrorResponse(jqXHR: JQuery.jqXHR, textStatus: ErrorTextStatus, errorThrown: string, request: Request) {
+  protected _processErrorResponse(jqXHR: JQuery.jqXHR, textStatus: ErrorTextStatus, errorThrown: string, request: RemoteRequest) {
     $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
     let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown);
@@ -1056,7 +1056,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     this.showFatalMessage(boxOptions, jsonError.code + '');
   }
 
-  protected _fireRequestFinished(message: Response) {
+  protected _fireRequestFinished(message: RemoteResponse) {
     if (!this._deferred) {
       return;
     }
@@ -1402,10 +1402,10 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     $.ajax(this.defaultAjaxOptions(request));
   }
 
-  protected _newRequest(requestData?: RequestData): Request {
+  protected _newRequest(requestData?: RemoteRequestData): RemoteRequest {
     let request = $.extend({
       uiSessionId: this.uiSessionId
-    }, requestData) as Request;
+    }, requestData) as RemoteRequest;
 
     // Certain requests do not require a sequence number
     if (!request.log && !request.syncResponseQueue) {
@@ -1629,7 +1629,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
    * @param defaultValue the text to return if the key has not been found.
    * @param args texts to replace the placeholders specified by {0}, {1}, etc.
    */
-  optText(textKey: string, defaultValue: string, ...args: string[]): string {
+  optText(textKey: string, defaultValue?: string, ...args: string[]): string {
     return this.textMap.optGet(textKey, defaultValue, ...args);
   }
 
@@ -1638,8 +1638,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
   }
 }
 
-
-export interface Request extends RequestData {
+export interface RemoteRequest extends RemoteRequestData {
   uiSessionId: string;
   '#'?: number;
   '#ACK'?: number;
@@ -1649,7 +1648,7 @@ export interface Request extends RequestData {
   };
 }
 
-export interface RequestData {
+export interface RemoteRequestData {
   events?: RemoteEvent[];
   clientSessionId?: string;
   syncResponseQueue?: boolean;
@@ -1660,7 +1659,7 @@ export interface RequestData {
   unload?: boolean;
   cancel?: boolean;
   ping?: boolean;
-  partId?: number;
+  partId?: string;
   version?: string;
   userAgent?: UserAgent;
   sessionStartupParams?: SessionStartupParams;
@@ -1672,7 +1671,7 @@ export interface AdapterData extends ObjectWithType {
   [name: string]: any;
 }
 
-export interface Response {
+export interface RemoteResponse {
   '#'?: number;
   adapterData?: Record<string, AdapterData>;
   events?: RemoteEvent[];
@@ -1682,7 +1681,7 @@ export interface Response {
   combined?: boolean;
 }
 
-export interface SessionStartupResponse extends Response {
+export interface SessionStartupResponse extends RemoteResponse {
   startupData?: {
     uiSessionId?: string;
     clientSessionId?: string;

@@ -24,9 +24,9 @@ export default class Carousel extends Widget implements CarouselModel {
    * last translation position
    */
   positionX: number;
-  $carouselItems: JQuery<HTMLDivElement>[];
-  $carouselStatusItems: JQuery<HTMLDivElement>[];
-  $carouselFilmstrip: JQuery<HTMLDivElement>;
+  $carouselItems: JQuery[];
+  $carouselStatusItems: JQuery[];
+  $carouselFilmstrip: JQuery;
   /**
    * carousel status bar (containing current position)
    */
@@ -129,7 +129,7 @@ export default class Carousel extends Widget implements CarouselModel {
     if (!this.$carouselStatus) {
       return;
     }
-    this.$carouselStatusItems.forEach((e: JQuery<HTMLDivElement>, i: number) => {
+    this.$carouselStatusItems.forEach((e: JQuery, i: number) => {
       e.toggleClass('current-item', i === this.currentItem);
     });
   }

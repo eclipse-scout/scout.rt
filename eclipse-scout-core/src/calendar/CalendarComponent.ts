@@ -104,7 +104,7 @@ export default class CalendarComponent extends Widget implements CalendarCompone
   }
 
   protected override _render() {
-    let partDay: Date, $day: JQuery, $part: JQuery<HTMLDivElement>;
+    let partDay: Date, $day: JQuery, $part: JQuery;
     if (!this.coveredDaysRange) {
       // coveredDaysRange is not set on current CalendarComponent. Cannot show calendar component without from and to values.
       return;

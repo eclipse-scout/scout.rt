@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueFieldAdapter} from '../../../index';
+import {BeanField, Event, ValueFieldAdapter} from '../../../index';
+import {AppLinkActionEvent} from './BeanFieldEventMap';
 
 export default class BeanFieldAdapter extends ValueFieldAdapter {
 
@@ -16,15 +17,15 @@ export default class BeanFieldAdapter extends ValueFieldAdapter {
     super();
   }
 
-  _onWidgetAppLinkAction(event) {
+  protected _onWidgetAppLinkAction(event: AppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref
     });
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<BeanField<object>>) {
     if (event.type === 'appLinkAction') {
-      this._onWidgetAppLinkAction(event);
+      this._onWidgetAppLinkAction(event as AppLinkActionEvent);
     } else {
       super._onWidgetEvent(event);
     }

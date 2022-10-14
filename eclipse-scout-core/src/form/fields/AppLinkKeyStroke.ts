@@ -29,9 +29,9 @@ export default class AppLinkKeyStroke extends KeyStroke {
     return accepted && $(event.target).hasClass('app-link');
   }
 
-  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this.appLinkTriggerFunction.call(this.field, event);
   }
 }
 
-export type AppLinkTriggerFunction = (this: Widget, event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;
+export type AppLinkTriggerFunction = (this: Widget, event: JQuery.KeyboardEventBase) => void;

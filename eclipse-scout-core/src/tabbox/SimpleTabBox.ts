@@ -21,7 +21,7 @@ export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
   controller: SimpleTabBoxController;
   layoutData: FlexboxLayoutData;
   viewContent: HtmlComponent;
-  $viewContent: JQuery<HTMLDivElement>;
+  $viewContent: JQuery;
   $tabArea: JQuery;
 
   protected _removeViewInProgress: number;

@@ -10,13 +10,13 @@
  */
 import {BeanField} from '../../../../index';
 
-export default class TestBeanField extends BeanField {
-  _render() {
+export default class TestBeanField extends BeanField<{ sender: string; message: string }> {
+  protected override _render() {
     super._render();
     this.$container.addClass('test-bean-field');
   }
 
-  _renderValue() {
+  protected override _renderValue() {
     this.$field.empty();
     if (!this.value) {
       return;

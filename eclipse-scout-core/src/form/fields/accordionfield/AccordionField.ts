@@ -8,9 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventDelegator, FormField} from '../../../index';
+import {Accordion, AccordionFieldEventMap, AccordionFieldModel, AccordionModel, EventDelegator, FormField, LoadingSupport} from '../../../index';
 
-export default class AccordionField extends FormField {
+export default class AccordionField extends FormField implements AccordionFieldModel {
+  declare model: AccordionFieldModel;
+  declare eventMap: AccordionFieldEventMap;
+
+  accordion: Accordion;
+  eventDelegator: EventDelegator;
 
   constructor() {
     super();
@@ -19,21 +24,18 @@ export default class AccordionField extends FormField {
     this._addWidgetProperties(['accordion']);
   }
 
-  _init(model) {
+  protected override _init(model: AccordionFieldModel) {
     super._init(model);
 
     this._setAccordion(this.accordion);
   }
 
-  /**
-   * @override
-   */
-  _createLoadingSupport() {
+  protected override _createLoadingSupport(): LoadingSupport {
     // Loading is delegated to accordion
     return null;
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'accordion-field');
     this.addLabel();
     this.addMandatoryIndicator();
@@ -43,16 +45,16 @@ export default class AccordionField extends FormField {
     }
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderDropType();
   }
 
-  setAccordion(accordion) {
+  setAccordion(accordion: Accordion | AccordionModel) {
     this.setProperty('accordion', accordion);
   }
 
-  _setAccordion(accordion) {
+  protected _setAccordion(accordion: Accordion) {
     if (this.accordion) {
       if (this.eventDelegator) {
         this.eventDelegator.destroy();
@@ -69,7 +71,7 @@ export default class AccordionField extends FormField {
     }
   }
 
-  _renderAccordion() {
+  protected _renderAccordion() {
     if (!this.accordion) {
       return;
     }
@@ -78,7 +80,7 @@ export default class AccordionField extends FormField {
     this.invalidateLayoutTree();
   }
 
-  _removeAccordion() {
+  protected _removeAccordion() {
     if (!this.accordion) {
       return;
     }
@@ -87,20 +89,14 @@ export default class AccordionField extends FormField {
     this.invalidateLayoutTree();
   }
 
-  /**
-   * @override
-   */
-  getFocusableElement() {
+  override getFocusableElement(): HTMLElement | JQuery {
     if (this.accordion) {
       return this.accordion.getFocusableElement();
     }
     return null;
   }
 
-  /**
-   * @override
-   */
-  getDelegateScrollable() {
+  override getDelegateScrollable(): Accordion {
     return this.accordion;
   }
 }

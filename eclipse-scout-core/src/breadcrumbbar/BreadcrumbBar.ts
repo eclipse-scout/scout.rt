@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {arrays, BreadcrumbBarEventMap, BreadcrumbBarLayout, BreadcrumbBarModel, BreadcrumbItem, HtmlComponent, scout, Widget} from '../index';
+import {arrays, BreadcrumbBarEventMap, BreadcrumbBarLayout, BreadcrumbBarModel, BreadcrumbItem, BreadcrumbItemModel, HtmlComponent, scout, Widget} from '../index';
 
 export default class BreadcrumbBar extends Widget implements BreadcrumbBarModel {
   declare model: BreadcrumbBarModel;
@@ -42,7 +42,7 @@ export default class BreadcrumbBar extends Widget implements BreadcrumbBarModel 
     this._renderBreadcrumbItems();
   }
 
-  setBreadcrumbItems(breadcrumbItems: BreadcrumbItem | BreadcrumbItem[]) {
+  setBreadcrumbItems(breadcrumbItems: (BreadcrumbItem | BreadcrumbItemModel) | (BreadcrumbItem | BreadcrumbItemModel)[]) {
     this.setProperty('breadcrumbItems', breadcrumbItems);
   }
 

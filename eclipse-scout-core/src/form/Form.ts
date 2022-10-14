@@ -757,6 +757,10 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     this.$saveNeeded = null;
   }
 
+  setRootGroupBox(rootGroupBox: GroupBox) {
+    this.setProperty('rootGroupBox', rootGroupBox);
+  }
+
   protected _setRootGroupBox(rootGroupBox: GroupBox) {
     this._setProperty('rootGroupBox', rootGroupBox);
     if (this.rootGroupBox) {

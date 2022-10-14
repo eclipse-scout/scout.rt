@@ -12,7 +12,7 @@ import {ColumnUserFilter, FilterFieldsGroupBox, NumberColumn, NumberColumnUserFi
 import $ from 'jquery';
 import {TableUserFilterAddedEventData} from './TableUserFilter';
 
-export default class NumberColumnUserFilter extends ColumnUserFilter {
+export default class NumberColumnUserFilter extends ColumnUserFilter implements NumberColumnUserFilterModel {
   declare model: NumberColumnUserFilterModel;
   declare column: NumberColumn;
 

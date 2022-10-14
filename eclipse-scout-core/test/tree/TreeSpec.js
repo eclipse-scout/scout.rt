@@ -15,7 +15,8 @@ import {triggerClick, triggerDoubleClick, triggerMouseDown} from '../../src/test
 describe('Tree', () => {
   let session;
 
-  let helper; /* TreeSpecHelper*/
+  /** @type TreeSpecHelper */
+  let helper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -2131,7 +2132,7 @@ describe('Tree', () => {
       expect(tree.nodes[1].rendered).toBe(false);
 
       let newNode = helper.createModelNode('', 'newNode0Child1');
-      tree.insertNodes([newNode], tree.nodes[0], 2);
+      tree.insertNodes([newNode], tree.nodes[0]);
 
       expect(tree.nodes[0].childNodes.length).toBe(3);
       expect(tree.nodes[0].rendered).toBe(true);

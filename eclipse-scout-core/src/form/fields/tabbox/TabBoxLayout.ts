@@ -8,13 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, FormField, graphics, HtmlComponent, HtmlEnvironment} from '../../../index';
+import {AbstractLayout, Dimension, EventHandler, FormField, graphics, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, TabBox} from '../../../index';
 
 export default class TabBoxLayout extends AbstractLayout {
+  htmlPropertyChangeHandler: EventHandler;
+  protected _tabBox: TabBox;
+  private _statusWidth: number;
 
-  constructor(tabBox) {
+  constructor(tabBox: TabBox) {
     super();
     this._tabBox = tabBox;
+    this._statusWidth = null;
 
     this._initDefaults();
 
@@ -25,23 +29,24 @@ export default class TabBoxLayout extends AbstractLayout {
     });
   }
 
-  _initDefaults() {
+  protected _initDefaults() {
     this._statusWidth = HtmlEnvironment.get().fieldStatusWidth;
   }
 
-  _onHtmlEnvironmentPropertyChange() {
+  protected _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this._tabBox.invalidateLayoutTree();
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let containerSize, tabContentSize, headerMargins, innerHeaderSize,
       htmlContainer = HtmlComponent.get($container),
+      // @ts-ignore
       htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
       htmlHeader = HtmlComponent.get(this._tabBox.header.$container),
       headerWidthHint = 0,
       headerSize = new Dimension(),
-      tooltip = this._tabBox._tooltip(),
+      tooltip = this._tabBox.tooltip(),
       $status = this._tabBox.$status,
       statusPosition = this._tabBox.statusPosition;
 
@@ -80,7 +85,7 @@ export default class TabBoxLayout extends AbstractLayout {
     }
   }
 
-  _layoutStatus(height) {
+  protected _layoutStatus(height = 0) {
     let htmlContainer = this._tabBox.htmlComp,
       containerPadding = htmlContainer.insets({
         includeBorder: false
@@ -109,9 +114,10 @@ export default class TabBoxLayout extends AbstractLayout {
   /**
    * Preferred size of the tab-box aligns every tab-item in a single line, so that each item is visible.
    */
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     options = options || {};
     let htmlContainer = HtmlComponent.get($container),
+      // @ts-ignore
       htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
       htmlHeader = HtmlComponent.get(this._tabBox.header.$container),
       headerSize = new Dimension(),

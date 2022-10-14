@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ActionModel, Menu, TreeNode, TreeNodeModel, WidgetModel} from '../index';
+import {Action, ActionModel, Menu, TreeNode, WidgetModel} from '../index';
 import {FilterOrFunction} from '../widget/FilterSupport';
 import {TreeCheckableStyle, TreeDisplayStyle} from './Tree';
 import {RefModel} from '../types';
+import {TreeNodeData} from './TreeNodeModel';
 
 export default interface TreeModel extends WidgetModel {
   /**
@@ -52,7 +53,7 @@ export default interface TreeModel extends WidgetModel {
   multiCheck?: boolean;
 
   /** top-level nodes */
-  nodes?: TreeNode[] | RefModel<TreeNodeModel>[];
+  nodes?: (TreeNode | TreeNodeData)[];
 
   /**
    * Default is 23.

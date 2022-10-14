@@ -25,7 +25,7 @@ export default class StringFieldCtrlEnterKeyStroke extends KeyStroke {
     return accepted && this.field.hasAction;
   }
 
-  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: JQuery.KeyboardEventBase) {
     // @ts-ignore
     this.field._onIconClick();
   }

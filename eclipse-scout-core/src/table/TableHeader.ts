@@ -25,8 +25,8 @@ export default class TableHeader extends Widget implements TableHeaderModel {
   columnMoved: boolean;
   menuBar: MenuBar;
   tableHeaderMenu: TableHeaderMenu;
-  $menuBarContainer: JQuery<HTMLDivElement>;
-  $filler: JQuery<HTMLDivElement>;
+  $menuBarContainer: JQuery;
+  $filler: JQuery;
 
   protected _tableDataScrollHandler: () => void;
   protected _tableAddFilterRemovedHandler: EventHandler<TableFilterAddedEvent | TableFilterRemovedEvent>;

@@ -13,7 +13,7 @@ import {AbstractLayout, arrays, EventHandler, Popup, PopupModel, PropertyChangeE
 export default class TagBarOverflowPopup extends Popup {
   declare parent: TagBar;
 
-  $body: JQuery<HTMLDivElement>;
+  $body: JQuery;
 
   protected _tagBarPropertyChangeListener: EventHandler;
 

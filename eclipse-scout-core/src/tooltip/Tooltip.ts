@@ -39,7 +39,7 @@ export default class Tooltip extends Widget implements TooltipModel {
   $anchor: JQuery;
   $arrow: JQuery;
   $content: JQuery;
-  $menus: JQuery<HTMLDivElement>;
+  $menus: JQuery;
 
   protected _openLater: boolean;
   protected _mouseDownHandler: (event: MouseEvent) => boolean;

@@ -626,7 +626,10 @@ export default abstract class FormField extends Widget implements FormFieldModel
     this._updateFieldStatus();
   }
 
-  protected _tooltip(): Tooltip {
+  /**
+   * The tooltip of the {@link fieldStatus}, if it is shown.
+   */
+  tooltip(): Tooltip {
     if (this.fieldStatus) {
       return this.fieldStatus.tooltip;
     }
@@ -956,6 +959,7 @@ export default abstract class FormField extends Widget implements FormFieldModel
 
   /**
    * Sets the focus on this field. If the field is not rendered, the focus will be set as soon as it is rendered.
+   * @returns true if the element could be focused, false if not
    */
   override focus(): boolean {
     if (!this.rendered) {

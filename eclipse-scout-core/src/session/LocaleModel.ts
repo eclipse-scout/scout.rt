@@ -10,13 +10,13 @@
  */
 export default interface LocaleModel {
   languageTag: string;
-  decimalFormatPatternDefault: string;
-  dateFormatPatternDefault: string;
-  timeFormatPatternDefault: string;
+  decimalFormatPatternDefault?: string;
+  dateFormatPatternDefault?: string;
+  timeFormatPatternDefault?: string;
   displayLanguage?: string;
   displayCountry?: string;
-  decimalFormatSymbols: DecimalFormatSymbols;
-  dateFormatSymbols: DateFormatSymbols;
+  decimalFormatSymbols?: DecimalFormatSymbols;
+  dateFormatSymbols?: DateFormatSymbols;
 }
 
 export interface DecimalFormatSymbols {

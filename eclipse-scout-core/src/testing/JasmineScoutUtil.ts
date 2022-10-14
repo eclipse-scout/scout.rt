@@ -10,6 +10,7 @@
  */
 import {arrays, scout, strings} from '../index';
 import $ from 'jquery';
+import 'jasmine-ajax';
 
 let _jsonResourceCache = {};
 
@@ -19,12 +20,9 @@ let _jsonResourceCache = {};
 export const JasmineScoutUtil = {
 
   /**
-   * @param {string} jsonResourceUrl
-   * @param {object} [options]
-   * @param {boolean} [options.useCache=true]
-   * @return {Promise<object>} - the loaded JSON data structure
+   * @returns the loaded JSON data structure
    */
-  loadJsonResource(jsonResourceUrl, options = {}) {
+  loadJsonResource(jsonResourceUrl: string, options: { useCache?: boolean } = {}): JQuery.Promise<any> {
     scout.assertParameter('jsonResourceUrl', jsonResourceUrl);
 
     if (scout.nvl(options.useCache, true)) {
@@ -53,27 +51,18 @@ export const JasmineScoutUtil = {
       });
   },
 
-  /**
-   * @param {string} resourceUrlToMock
-   * @param {string} jsonResourceUrl
-   * @param {object} [options]
-   * @param {boolean} [options.useCache=true]
-   * @param {*} [options.restriction]
-   * @param {string} [options.method]
-   */
-  loadJsonResourceAndMockRestCall(resourceUrlToMock, jsonResourceUrl, options = {}) {
+  loadJsonResourceAndMockRestCall(resourceUrlToMock: string, jsonResourceUrl: string, options: {
+    useCache?: boolean;
+    restriction?: any;
+    method?: string;
+  } = {}) {
     scout.assertParameter('resourceUrlToMock', resourceUrlToMock);
 
     this.loadJsonResource(jsonResourceUrl, options)
       .then(json => this.mockRestCall(resourceUrlToMock, json, options));
   },
 
-  /**
-   * @param {string} resourceUrlToMock
-   * @param {array} lookupRows
-   * @param {*} [parentRestriction]
-   */
-  mockRestLookupCall(resourceUrlToMock, lookupRows, parentRestriction) {
+  mockRestLookupCall(resourceUrlToMock: string, lookupRows: any[], parentRestriction?: any) {
     scout.assertParameter('resourceUrlToMock', resourceUrlToMock);
 
     // Normalize lookup rows
@@ -100,14 +89,10 @@ export const JasmineScoutUtil = {
     });
   },
 
-  /**
-   * @param {string} resourceUrlToMock
-   * @param {*} responseData
-   * @param {object} [options]
-   * @param {*} [options.restriction]
-   * @param {string} [options.method]
-   */
-  mockRestCall(resourceUrlToMock, responseData, options = {}) {
+  mockRestCall(resourceUrlToMock: string, responseData: any, options: {
+    restriction?: any;
+    method?: string;
+  } = {}) {
     let url = new RegExp('.*' + strings.quote(resourceUrlToMock) + '.*');
     let data = options.restriction ? new RegExp('.*' + strings.quote(options.restriction) + '.*') : undefined;
     jasmine.Ajax.stubRequest(url, data, options.method).andReturn({
@@ -120,8 +105,8 @@ export const JasmineScoutUtil = {
    * If a ajax call is not mocked, this fallback will be triggered to show information about which url is not mocked.
    */
   captureNotMockedCalls() {
-    jasmine.Ajax.stubRequest(/.*/).andCallFunction((stub, mockAjax) => {
-      fail('Ajax call not mocked for url: ' + mockAjax.url + ', method: ' + mockAjax.method);
+    jasmine.Ajax.stubRequest(/.*/).andCallFunction((request: JasmineAjaxRequest) => {
+      fail('Ajax call not mocked for url: ' + request.url + ', method: ' + request.method);
     });
   }
 };

@@ -8,15 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {StaticLookupCall} from '../../index';
+import {LookupRow, StaticLookupCall} from '../../index';
 
-export default class ActiveDummyLookupCall extends StaticLookupCall {
+export default class ActiveDummyLookupCall extends StaticLookupCall<number> {
   constructor() {
     super();
     this.setDelay(250);
   }
 
-  _data() {
+  protected override _data() {
     return [
       [1, 'Foo', true],
       [2, 'Bar', false],
@@ -24,7 +24,7 @@ export default class ActiveDummyLookupCall extends StaticLookupCall {
     ];
   }
 
-  _dataToLookupRow(data) {
+  protected override _dataToLookupRow(data: any[]): LookupRow<number> {
     let lookupRow = super._dataToLookupRow(data);
     lookupRow.active = data[2];
     return lookupRow;

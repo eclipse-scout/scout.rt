@@ -8,9 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EllipsisMenu, HtmlComponent, KeyStrokeContext, scout, strings, Tab, TabAreaLayout, TabAreaLeftKeyStroke, TabAreaRightKeyStroke, Widget} from '../../../index';
+import {arrays, EllipsisMenu, EnumObject, EventHandler, HtmlComponent, KeyStrokeContext, PropertyChangeEvent, scout, strings, Tab, TabAreaLayout, TabAreaLeftKeyStroke, TabAreaRightKeyStroke, TabBox, TabItem, Widget} from '../../../index';
+import TabAreaModel from './TabAreaModel';
+import TabAreaEventMap from './TabAreaEventMap';
 
-export default class TabArea extends Widget {
+export type TabAreaStyle = EnumObject<typeof TabArea.DisplayStyle>;
+
+export default class TabArea extends Widget implements TabAreaModel {
+  declare model: TabAreaModel;
+  declare eventMap: TabAreaEventMap;
+
+  tabBox: TabBox;
+  tabs: Tab[];
+  displayStyle: TabAreaStyle;
+  hasSubLabel: boolean;
+  selectedTab: Tab;
+  ellipsis: EllipsisMenu;
+  $selectionMarker: JQuery;
+  protected _tabItemPropertyChangeHandler: EventHandler<PropertyChangeEvent>;
+  protected _tabPropertyChangeHandler: EventHandler<PropertyChangeEvent>;
 
   constructor() {
     super();
@@ -30,9 +46,9 @@ export default class TabArea extends Widget {
   static DisplayStyle = {
     DEFAULT: 'default',
     SPREAD_EVEN: 'spreadEven'
-  };
+  } as const;
 
-  _init(options) {
+  protected override _init(options: TabAreaModel) {
     super._init(options);
     this.tabBox = options.tabBox;
 
@@ -45,25 +61,19 @@ export default class TabArea extends Widget {
     });
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new KeyStrokeContext();
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
-    this.keyStrokeContext.registerKeyStroke([
+    this.keyStrokeContext.registerKeyStrokes([
       new TabAreaLeftKeyStroke(this),
       new TabAreaRightKeyStroke(this)
     ]);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('tab-area');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new TabAreaLayout(this));
@@ -73,7 +83,7 @@ export default class TabArea extends Widget {
     this.$selectionMarker = this.$container.appendDiv('selection-marker');
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderTabs();
     this._renderSelectedTab();
@@ -81,27 +91,24 @@ export default class TabArea extends Widget {
     this._renderDisplayStyle();
   }
 
-  /**
-   * @override FormField.js
-   */
-  _remove() {
+  protected override _remove() {
     super._remove();
     this._removeTabs();
   }
 
-  setSelectedTabItem(tabItem) {
+  setSelectedTabItem(tabItem: TabItem) {
     this.setSelectedTab(this.getTabForItem(tabItem));
   }
 
-  getTabForItem(tabItem) {
+  getTabForItem(tabItem: TabItem): Tab {
     return arrays.find(this.tabs, tab => tab.tabItem === tabItem);
   }
 
-  setSelectedTab(tab) {
+  setSelectedTab(tab: Tab) {
     this.setProperty('selectedTab', tab);
   }
 
-  _setSelectedTab(tab) {
+  protected _setSelectedTab(tab: Tab) {
     if (this.selectedTab) {
       this.selectedTab.setSelected(false);
     }
@@ -112,32 +119,32 @@ export default class TabArea extends Widget {
     this._setTabbableItem(tab);
   }
 
-  _renderSelectedTab() {
+  protected _renderSelectedTab() {
     // force a relayout in case the selected tab is overflown. The layout will ensure the selected tab is visible.
     if (this.selectedTab && this.selectedTab.overflown) {
       this.invalidateLayoutTree();
     }
   }
 
-  isTabItemFocused(tabItem) {
+  isTabItemFocused(tabItem: TabItem): boolean {
     return this.getTabForItem(tabItem).isFocused();
   }
 
-  focusTabItem(tabItem) {
-    this.focusTab(this.getTabForItem(tabItem));
+  focusTabItem(tabItem: TabItem): boolean {
+    return this.focusTab(this.getTabForItem(tabItem));
   }
 
-  focusTab(tabItem) {
-    tabItem.focus();
+  focusTab(tab: Tab): boolean {
+    return tab.focus();
   }
 
-  setTabItems(tabItems) {
+  setTabItems(tabItems: TabItem[]) {
     this.setProperty('tabs', tabItems);
     this._updateHasSubLabel();
     this.invalidateLayoutTree();
   }
 
-  _setTabs(tabItems) {
+  protected _setTabs(tabItems: TabItem[]) {
     let tabsToRemove = this.tabs.slice(),
       tabs = tabItems.map(tabItem => {
         let tab = this.getTabForItem(tabItem);
@@ -155,15 +162,16 @@ export default class TabArea extends Widget {
       });
 
     // un-register model listeners
-    tabsToRemove.forEach(function(tab) {
+    tabsToRemove.forEach(tab => {
       tab.tabItem.off('propertyChange', this._tabItemPropertyChangeHandler);
-    }, this);
+    });
 
     this._removeTabs(tabsToRemove);
     this._setProperty('tabs', tabs);
   }
 
-  _renderTabs() {
+  protected _renderTabs() {
+    // noinspection JSVoidFunctionReturnValueUsed Obviously an IntelliJ bug, it assumes reverse is from Animation rather than from Array
     this.tabs.slice().reverse().forEach((tab, index, items) => {
       if (!tab.rendered) {
         tab.render();
@@ -178,31 +186,31 @@ export default class TabArea extends Widget {
     });
   }
 
-  _removeTabs(tabs) {
+  protected _removeTabs(tabs?: Tab[]) {
     tabs = tabs || this.tabs;
     tabs.forEach(tab => {
       tab.remove();
     });
   }
 
-  setDisplayStyle(displayStyle) {
+  setDisplayStyle(displayStyle: TabAreaStyle) {
     this.setProperty('displayStyle', displayStyle);
   }
 
-  _renderDisplayStyle() {
+  protected _renderDisplayStyle() {
     this.$container.toggleClass('spread-even', this.displayStyle === TabArea.DisplayStyle.SPREAD_EVEN);
     this.invalidateLayoutTree();
   }
 
-  _onTabItemFocus() {
+  protected _onTabItemFocus() {
     this.setFocused(true);
   }
 
-  _onTabItemBlur() {
+  protected _onTabItemBlur() {
     this.setFocused(false);
   }
 
-  _updateHasSubLabel() {
+  protected _updateHasSubLabel() {
     let items = this.visibleTabs();
     this._setHasSubLabel(items.some(item => {
       return strings.hasText(item.subLabel);
@@ -213,7 +221,7 @@ export default class TabArea extends Widget {
     return this.tabs.filter(tab => tab.isVisible());
   }
 
-  _setHasSubLabel(hasSubLabel) {
+  protected _setHasSubLabel(hasSubLabel: boolean) {
     if (this.hasSubLabel === hasSubLabel) {
       return;
     }
@@ -223,22 +231,22 @@ export default class TabArea extends Widget {
     }
   }
 
-  _renderHasSubLabel() {
+  protected _renderHasSubLabel() {
     this.$container.toggleClass('has-sub-label', this.hasSubLabel);
     // Invalidate other tabs as well because the class has an impact on their size, too
     this.visibleTabs().forEach(tab => tab.invalidateLayout());
     this.invalidateLayoutTree();
   }
 
-  selectNextTab(focusTab) {
+  selectNextTab(focusTab: boolean) {
     this._moveSelectionHorizontal(true, focusTab);
   }
 
-  selectPreviousTab(focusTab) {
+  selectPreviousTab(focusTab: boolean) {
     this._moveSelectionHorizontal(false, focusTab);
   }
 
-  _moveSelectionHorizontal(directionRight, focusTab) {
+  protected _moveSelectionHorizontal(directionRight: boolean, focusTab: boolean) {
     let tabItems = this.tabs.slice(),
       $focusedElement = this.$container.activeElement(),
       selectNext = false;
@@ -270,25 +278,25 @@ export default class TabArea extends Widget {
     }
   }
 
-  _setTabbableItem(tabItem) {
-    let tabItems = this.tabs;
-    if (tabItem) {
+  protected _setTabbableItem(tab: Tab | EllipsisMenu) {
+    let tabs = this.tabs;
+    if (tab) {
       // clear old tabbable
       this.ellipsis.setTabbable(false);
-      tabItems.forEach(item => {
+      tabs.forEach(item => {
         item.setTabbable(false);
       });
-      tabItem.setTabbable(true);
+      tab.setTabbable(true);
     }
   }
 
-  _onTabPropertyChange(event) {
+  protected _onTabPropertyChange(event: PropertyChangeEvent<any, Tab>) {
     if (event.propertyName === 'selected') {
       this.setSelectedTab(event.source);
     }
   }
 
-  _onTabItemPropertyChange(event) {
+  protected _onTabItemPropertyChange(event: PropertyChangeEvent) {
     if (event.propertyName === 'visible') {
       this._updateHasSubLabel();
       this.invalidateLayoutTree();

@@ -51,7 +51,7 @@ export default class TreeNode implements TreeNodeModel {
   width: number;
   displayBackup: string;
   prevSelectionAnimationDone: boolean;
-  $node: JQuery<HTMLDivElement>;
+  $node: JQuery;
   $text: JQuery<HTMLSpanElement>;
   childNodeIndex: number; // set by the Tree or from the UI server
 

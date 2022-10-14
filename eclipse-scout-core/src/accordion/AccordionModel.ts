@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Group, WidgetModel} from '../index';
+import {Group, GroupModel, WidgetModel} from '../index';
 import {Comparator, RefModel} from '../types';
 import {GroupCollapseStyle} from '../group/Group';
 
@@ -29,6 +29,6 @@ export default interface AccordionModel extends WidgetModel {
    */
   exclusiveExpand?: boolean;
 
-  groups?: Group[] | RefModel<Group>[];
+  groups?: (Group | RefModel<GroupModel>)[];
   scrollable?: boolean;
 }

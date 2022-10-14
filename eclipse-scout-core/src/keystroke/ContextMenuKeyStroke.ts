@@ -12,10 +12,10 @@ import {keys, KeyStroke, Widget} from '../index';
 
 export default class ContextMenuKeyStroke extends KeyStroke {
 
-  protected _contextFunction: (event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;
+  protected _contextFunction: (event: JQuery.KeyboardEventBase) => void;
   protected _bindObject: any;
 
-  constructor(field: Widget, contextFunction: (event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) => void, bindObject?: any) {
+  constructor(field: Widget, contextFunction: (event: JQuery.KeyboardEventBase) => void, bindObject?: any) {
     super();
     this._contextFunction = contextFunction;
     this._bindObject = bindObject || this;
@@ -30,7 +30,7 @@ export default class ContextMenuKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
-  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this._contextFunction.call(this._bindObject, event);
   }
 }

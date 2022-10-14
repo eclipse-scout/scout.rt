@@ -17,8 +17,9 @@ export default class RemoteEvent {
   showBusyIndicator?: boolean;
   coalesce?: Predicate<RemoteEvent>;
   newRequest?: boolean;
-  animate?: boolean;
-  properties: Record<string, any>;
+  properties?: Record<string, any>;
+
+  [property: string]: any; // Data will be applied to the event directly
 
   constructor(target: string, type: string, data?: object) {
     scout.assertParameter('target', target);

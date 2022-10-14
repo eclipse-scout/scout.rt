@@ -9,11 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Session, strings} from '../index';
-import {Request, Response} from './Session';
+import {RemoteRequest, RemoteResponse} from './Session';
 
 export default class ResponseQueue {
   session: Session;
-  queue: Response[];
+  queue: RemoteResponse[];
   lastProcessedSequenceNo: number;
   nextExpectedSequenceNo: number;
   force: boolean;
@@ -33,7 +33,7 @@ export default class ResponseQueue {
    */
   static FORCE_TIMEOUT = 10 * 1000;
 
-  add(response?: Response) {
+  add(response?: RemoteResponse) {
     let sequenceNo = response && response['#'];
 
     // Ignore responses that were already processed (duplicate detection)
@@ -76,7 +76,7 @@ export default class ResponseQueue {
     }
   }
 
-  process(response?: Response): boolean {
+  process(response?: RemoteResponse): boolean {
     if (response) {
       this.add(response);
     }
@@ -160,7 +160,7 @@ export default class ResponseQueue {
     }
   }
 
-  prepareRequest(request: Request) {
+  prepareRequest(request: RemoteRequest) {
     request['#ACK'] = this.lastProcessedSequenceNo;
   }
 

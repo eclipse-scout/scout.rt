@@ -36,14 +36,14 @@ export default class Resizable implements ResizableModel {
   boundaries: Insets;
   $container: JQuery;
   $window: JQuery<Window>;
-  $resizableS: JQuery<HTMLDivElement>;
-  $resizableE: JQuery<HTMLDivElement>;
-  $resizableSE: JQuery<HTMLDivElement>;
-  $resizableW: JQuery<HTMLDivElement>;
-  $resizableSW: JQuery<HTMLDivElement>;
-  $resizableN: JQuery<HTMLDivElement>;
-  $resizableNW: JQuery<HTMLDivElement>;
-  $resizableNE: JQuery<HTMLDivElement>;
+  $resizableS: JQuery;
+  $resizableE: JQuery;
+  $resizableSE: JQuery;
+  $resizableW: JQuery;
+  $resizableSW: JQuery;
+  $resizableN: JQuery;
+  $resizableNW: JQuery;
+  $resizableNE: JQuery;
 
   protected _context: ResizableContext;
   protected _mouseDownHandler: (event: MouseDownEvent) => void;

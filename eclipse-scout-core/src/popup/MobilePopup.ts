@@ -15,8 +15,8 @@ export default class MobilePopup extends WidgetPopup implements MobilePopupModel
   declare model: MobilePopupModel;
 
   title: string;
-  $header: JQuery<HTMLDivElement>;
-  $title: JQuery<HTMLDivElement>;
+  $header: JQuery;
+  $title: JQuery;
 
   constructor() {
     super();

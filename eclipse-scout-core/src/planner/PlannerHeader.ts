@@ -16,8 +16,8 @@ import {EventMapOf, EventModel} from '../events/EventEmitter';
 export default class PlannerHeader extends Widget {
   declare eventMap: PlannerHeaderEventMap;
 
-  $range: JQuery<HTMLDivElement>;
-  $commands: JQuery<HTMLDivElement>;
+  $range: JQuery;
+  $commands: JQuery;
   availableDisplayModes: PlannerDisplayMode[];
   displayMode: PlannerDisplayMode;
 

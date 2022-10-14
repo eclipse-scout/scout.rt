@@ -19,9 +19,9 @@ export default class Notification extends Widget implements NotificationModel {
   status: Status;
   closable: boolean;
   htmlEnabled: boolean;
-  $content: JQuery<HTMLDivElement>;
-  $messageText: JQuery<HTMLDivElement>;
-  $closer: JQuery<HTMLDivElement>;
+  $content: JQuery;
+  $messageText: JQuery;
+  $closer: JQuery;
 
   protected _icon: Icon;
 

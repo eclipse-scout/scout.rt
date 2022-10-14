@@ -19,7 +19,7 @@ export default class TouchPopup extends Popup {
 
   doneAction: Action;
   htmlBody: HtmlComponent;
-  $body: JQuery<HTMLDivElement>;
+  $body: JQuery;
 
   /** the original touch field from the form */
   protected _touchField: DateField | SmartField<any>;
@@ -29,7 +29,7 @@ export default class TouchPopup extends Popup {
   /** the widget placed below the field */
   protected _widget: Widget;
   protected _$widgetContainer: JQuery;
-  protected _$header: JQuery<HTMLDivElement>;
+  protected _$header: JQuery;
   protected _widgetContainerHtmlComp: HtmlComponent;
   protected _touchFieldPropertyChangeListener: EventHandler<PropertyChangeEvent<any>>;
 
@@ -51,8 +51,7 @@ export default class TouchPopup extends Popup {
   protected override _init(options: TouchPopupModel) {
     super._init(options);
     this._touchField = options.field;
-    // @ts-ignore
-    let touchFieldTooltip = this._touchField._tooltip();
+    let touchFieldTooltip = this._touchField.tooltip();
     if (touchFieldTooltip && touchFieldTooltip.rendered) {
       // Hide existing tooltip to not show it twice (it will be shown on the popup too). It may even throw an exception if the tooltip contains a (not cloned) menu
       this._touchFieldTooltip = touchFieldTooltip;

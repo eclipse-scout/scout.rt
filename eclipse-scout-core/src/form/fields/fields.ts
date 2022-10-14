@@ -77,7 +77,7 @@ export function makeInputOrDiv(field: Widget & { touchMode?: boolean }, cssClass
 /**
  * Creates a DIV element that looks like an INPUT element.
  */
-export function makeInputDiv(field: Widget, cssClass?: string): JQuery<HTMLDivElement> {
+export function makeInputDiv(field: Widget, cssClass?: string): JQuery {
   return field.$container.makeDiv(strings.join(' ', 'input-field', cssClass));
 }
 
@@ -127,8 +127,7 @@ export function eventOutsideProposalField(field: ValueField<any> & { popup: Popu
     || safeIsOrHas(field.$icon, target)
     || safeIsOrHas(field.$clearIcon, target);
   let eventOnPopup = safeWidgetIsOrHas(field.popup, target);
-  // @ts-ignore
-  let eventOnTooltip = safeWidgetIsOrHas(field._tooltip(), target);
+  let eventOnTooltip = safeWidgetIsOrHas(field.tooltip(), target);
 
   return !eventOnField && !eventOnPopup && !eventOnTooltip;
 

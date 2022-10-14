@@ -8,31 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GroupBoxLayout, MenuBarLayout} from '../../../index';
+import {Dimension, GroupBoxLayout, HtmlComponent, MenuBarLayout, TabItem} from '../../../index';
 
 export default class TabItemLayout extends GroupBoxLayout {
+  declare groupBox: TabItem;
 
-  constructor(tabItem) {
+  constructor(tabItem: TabItem) {
     super(tabItem);
   }
 
-  _$status() {
+  protected override _$status(): JQuery {
     // Use status area from tab box for alignment purposes (e.g. to align notification with title border)
     return this.groupBox.parent.$status;
   }
 
-  _layoutStatus() {
+  protected override _layoutStatus() {
     // Nothing to layout here because the status of the tab item is displayed in the tab (see TabItem.addStatus, Tab._updateStatus)
   }
 
-  _menuBarSize(htmlMenuBar, containerSize, statusWidth) {
+  protected override _menuBarSize(htmlMenuBar: HtmlComponent, containerSize: Dimension, statusWidth: number): Dimension {
     let menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
     let tabBox = this.groupBox.parent;
     menuBarSize.width = tabBox.header.$container.outerWidth();
     return menuBarSize;
   }
 
-  _headerHeight() {
+  protected override _headerHeight(): number {
     return 0;
   }
 }
