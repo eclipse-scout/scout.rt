@@ -10,7 +10,10 @@
  */
 import {StaticLookupCall} from '../../index';
 
-export default class LanguageDummyLookupCall extends StaticLookupCall {
+export default class LanguageDummyLookupCall extends StaticLookupCall<number> {
+  multiline: boolean;
+  showText: boolean;
+
   constructor() {
     super();
     this.multiline = false;
@@ -18,7 +21,7 @@ export default class LanguageDummyLookupCall extends StaticLookupCall {
     this.setDelay(250);
   }
 
-  _data() {
+  protected override _data(): any[] {
     return [
       [100, line.call(this, 'English')],
       [200, line.call(this, 'German')],

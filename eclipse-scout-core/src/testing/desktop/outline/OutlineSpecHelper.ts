@@ -8,20 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Outline, OutlineAdapter} from '../../../index';
+import {Outline, OutlineAdapter, OutlineModel, PageModel, Session} from '../../../index';
 import {FormSpecHelper, TableSpecHelper} from '../../index';
 import $ from 'jquery';
+import {Optional, RefModel, SomeRequired} from '../../../types';
+import ModelAdapterModel from '../../../session/ModelAdapterModel';
+import {ObjectType} from '../../../ObjectFactory';
 
 export default class OutlineSpecHelper {
-  constructor(session) {
+  session: Session;
+
+  constructor(session: Session) {
     this.session = session;
   }
 
-  createModelFixture(nodeCount, depth, expanded) {
+  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): OutlineModel & { objectType: ObjectType<Outline, OutlineModel> } {
     return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
   }
 
-  createModel(nodes) {
+  createModel(nodes: RefModel<PageModel>[]): OutlineModel & { objectType: ObjectType<Outline, OutlineModel> } {
     let model = createSimpleModel('Outline', this.session);
     if (nodes) {
       model.nodes = nodes;
@@ -29,18 +34,18 @@ export default class OutlineSpecHelper {
     return model;
   }
 
-  createModelNode(id, text) {
+  createModelNode(id: string, text: string): Optional<PageModel, 'parent'> {
     return {
       id: id,
       text: text
     };
   }
 
-  createModelNodes(nodeCount, depth, expanded) {
+  createModelNodes(nodeCount: number, depth?: number, expanded?: boolean): RefModel<PageModel>[] {
     return this.createModelNodesInternal(nodeCount, depth, expanded);
   }
 
-  createModelNodesInternal(nodeCount, depth, expanded, parentNode) {
+  createModelNodesInternal(nodeCount: number, depth?: number, expanded?: boolean, parentNode?: PageModel): RefModel<PageModel>[] {
     if (!nodeCount) {
       return;
     }
@@ -64,7 +69,7 @@ export default class OutlineSpecHelper {
     return nodes;
   }
 
-  createOutline(model) {
+  createOutline(model: OutlineModel): Outline {
     let defaults = {
       parent: this.session.desktop
     };
@@ -74,7 +79,7 @@ export default class OutlineSpecHelper {
     return tree;
   }
 
-  createOutlineAdapter(model) {
+  createOutlineAdapter(model: ModelAdapterModel | SomeRequired<OutlineModel, 'session' | 'id'>): OutlineAdapter {
     let outlineAdapter = new OutlineAdapter();
     outlineAdapter.init(model);
     return outlineAdapter;
@@ -83,7 +88,7 @@ export default class OutlineSpecHelper {
   /**
    * Creates an outline with 3 nodes, the first node has a visible detail form
    */
-  createOutlineWithOneDetailForm() {
+  createOutlineWithOneDetailForm(): Outline {
     let model = this.createModelFixture(3, 2, true);
     let outline = this.createOutline(model);
     let node = outline.nodes[0];
@@ -97,7 +102,7 @@ export default class OutlineSpecHelper {
   /**
    * Creates an outline with 3 nodes, the first node has a visible detail table
    */
-  createOutlineWithOneDetailTable() {
+  createOutlineWithOneDetailTable(): Outline {
     let model = this.createModelFixture(3, 2, true);
     let outline = this.createOutline(model);
     let node = outline.nodes[0];
@@ -106,7 +111,7 @@ export default class OutlineSpecHelper {
     return outline;
   }
 
-  setMobileFlags(outline) {
+  setMobileFlags(outline: Outline) {
     outline.setBreadcrumbStyleActive(true);
     outline.setToggleBreadcrumbStyleEnabled(false);
     outline.setCompact(true);

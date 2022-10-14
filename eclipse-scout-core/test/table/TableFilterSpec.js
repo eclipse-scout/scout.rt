@@ -654,7 +654,7 @@ describe('TableFilter', () => {
         expect(table.rows[0].filterAccepted).toBe(false);
         expect(table.rows[1].filterAccepted).toBe(true);
 
-        sendQueuedAjaxCalls('', 400);
+        sendQueuedAjaxCalls(null, 400);
 
         expect(jasmine.Ajax.requests.count()).toBe(1);
 

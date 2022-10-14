@@ -8,30 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default class CloneSpecHelper {
-  constructor(session) {
-    this.session = session;
-  }
+import {Widget} from '../../../index';
 
-  validateClone(original, clone, localProperties) {
+export default class CloneSpecHelper {
+
+  validateClone(original: Widget, clone: Widget) {
+    // @ts-expect-error
     let properties = original._cloneProperties.filter(prop => {
+        // @ts-expect-error
         return original._widgetProperties.indexOf(prop) < 0;
       }),
+      // @ts-expect-error
       widgetProperties = original._cloneProperties.filter(prop => {
+        // @ts-expect-error
         return original._widgetProperties.indexOf(prop) > -1;
       });
 
     // simple properties to be cloned
     properties.forEach(prop => {
-      expect(clone).definedProperty(original, prop);
-      expect(original).sameProperty(clone, prop);
+      expect(clone[prop]).toBeDefined();
+      expect(clone[prop]).toBe(original[prop]);
     });
 
     // widget properties to be cloned
     widgetProperties.forEach(prop => {
-      expect(clone).definedProperty(original, prop);
-
-      expect(original).widgetCloneProperty(clone, prop);
+      expect(clone[prop]).toBeDefined();
+      expect(clone).toHaveClonedWidgetProperty(original, prop);
     });
   }
 }

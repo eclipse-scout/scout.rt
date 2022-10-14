@@ -10,13 +10,14 @@
  */
 import {BeanField} from '../../../../index';
 
+// @ts-ignore // FIXME TS remove after field migration
 export default class TestBeanField extends BeanField {
-  _render() {
+  protected override _render() {
     super._render();
     this.$container.addClass('test-bean-field');
   }
 
-  _renderValue() {
+  protected override _renderValue() {
     this.$field.empty();
     if (!this.value) {
       return;

@@ -22,7 +22,7 @@ export default interface FormFieldModel extends WidgetModel {
   fieldStyle?: FormFieldStyle;
   gridDataHints?: GridData;
   mode?: FormFieldMode;
-  keyStrokes?: Action[] | RefModel<ActionModel>[];
+  keyStrokes?: (Action | RefModel<ActionModel>)[];
   displayText?: string;
   label?: string;
   labelVisible?: boolean;

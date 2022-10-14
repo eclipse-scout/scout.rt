@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {AnyWidget, App, Device, ObjectFactory, objects, Session, strings, ValueField, widgets} from './index';
+import {AnyWidget, App, Device, ObjectFactory, objects, Session, strings, ValueField, Widget, widgets} from './index';
 import $ from 'jquery';
 import {ObjectCreator, ObjectFactoryOptions, ObjectType} from './ObjectFactory';
 import {ModelAdapterLike} from './session/ModelAdapter';
@@ -113,8 +113,8 @@ export interface ObjectWithType {
   objectType: string;
 }
 
-export interface ObjectModel<T = object> {
-  objectType?: ObjectType<T>;
+export interface ObjectModel<T = object, M = object> {
+  objectType?: ObjectType<T, M>;
   id?: string;
 }
 
@@ -207,6 +207,9 @@ export function installSyntheticActiveStateHandler(myDocument: Document) {
   }
 }
 
+export function widget<T extends Widget>(widgetIdOrElement: string | number | HTMLElement | JQuery, partIdOrType?: string | (new() => T)): T;
+export function widget(widgetIdOrElement: string | number | HTMLElement | JQuery, partId?: string): AnyWidget;
+
 /**
  * Resolves the widget using the given widget id or HTML element.
  * <p>
@@ -220,20 +223,21 @@ export function installSyntheticActiveStateHandler(myDocument: Document) {
  *          argument is a widget ID). If omitted, the first session is used.
  * @returns the widget for the given element or id
  */
-export function widget(widgetIdOrElement: string | number | HTMLElement | JQuery, partId?: string): AnyWidget {
+export function widget<T extends Widget>(widgetIdOrElement: string | number | HTMLElement | JQuery, partIdOrType?: string | (new() => T)): T {
   if (objects.isNullOrUndefined(widgetIdOrElement)) {
     return null;
   }
   let $elem = widgetIdOrElement;
   if (typeof widgetIdOrElement === 'string' || typeof widgetIdOrElement === 'number') {
     // Find widget for ID
+    let partId = typeof partIdOrType === 'string' ? partIdOrType : null;
     let session = getSession(partId);
     if (session) {
       widgetIdOrElement = strings.asString(widgetIdOrElement);
-      return session.root.widget(widgetIdOrElement);
+      return session.root.widget(widgetIdOrElement) as T;
     }
   }
-  return widgets.get($elem as (HTMLElement | JQuery));
+  return widgets.get($elem as (HTMLElement | JQuery)) as T;
 }
 
 /**

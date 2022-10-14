@@ -8,22 +8,58 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Desktop, ObjectFactory, scout, Session} from '../index';
+import {App, arrays, Desktop, DesktopModel, ModelAdapter, ModelAdapterModel, ObjectFactory, scout, Session, SessionModel, Widget, WidgetModel} from '../index';
 import {LocaleSpecHelper, TestingApp} from './index';
+import {ObjectType} from '../ObjectFactory';
+import {AdapterData, RemoteRequest} from '../session/Session';
+import 'jasmine-jquery';
+import jasmineScoutMatchers from './scoutMatchers';
+import {RefModel} from '../types';
+
+declare global {
+  function sandboxSession(options?: SandboxSessionOptions & Partial<SessionModel>): Session;
+
+  function linkWidgetAndAdapter(widget: Widget, adapterClass: (new() => ModelAdapter) | string);
+
+  function mapAdapterData(adapterDataArray: (AdapterData | WidgetModel) | (AdapterData | WidgetModel)[]): Record<string, AdapterData>;
+
+  function registerAdapterData(adapterDataArray: AdapterData[], session: Session): void;
+
+  function removePopups(session: Session, cssClass?: string): void;
+
+  function createSimpleModel(objectType: ObjectType, session: Session, id?: string);
+
+  function mostRecentJsonRequest(): RemoteRequest;
+
+  function sandboxDesktop();
+
+  function sendQueuedAjaxCalls(response?: JasmineAjaxResponse, time?: number);
+
+  function receiveResponseForAjaxCall(request: JasmineAjaxRequest, response?: JasmineAjaxResponse);
+
+  function uninstallUnloadHandlers(session: Session);
+
+  function createPropertyChangeEvent(model: { id: string }, properties: object);
+
+  function createAdapterModel(widgetModel: ModelAdapterModel): ModelAdapterModel;
+}
+
+export interface SandboxSessionOptions {
+  desktop?: RefModel<DesktopModel>;
+  renderDesktop?: boolean;
+}
 
 window.sandboxSession = options => {
+  options = options || {};
   let $sandbox = $('#sandbox')
     .addClass('scout');
 
-  options = options || {};
-  options.portletPartId = options.portletPartId || '0';
-  options.backgroundJobPollingEnabled = false;
-  options.suppressErrors = true;
-  options.renderDesktop = scout.nvl(options.renderDesktop, true);
-  options.remote = true; // required so adapters will be registered in the adapter registry
-  options.$entryPoint = $sandbox;
-
-  let session = scout.create(Session, options, {
+  let model = options as SessionModel;
+  model.portletPartId = options.portletPartId || '0';
+  model.backgroundJobPollingEnabled = false;
+  model.suppressErrors = true;
+  model.$entryPoint = $sandbox;
+  let session = scout.create(Session, model, {
     ensureUniqueId: false
   });
 
@@ -31,6 +67,7 @@ window.sandboxSession = options => {
   // the value of the "showBusyIndicator" using toContainEvents(). Usually, this
   // flag is filtered from the request before sending the AJAX call, however in
   // the tests we want to keep it.
+  // @ts-ignore
   session._requestToJson = request => JSON.stringify(request);
 
   // Simulate successful session initialization
@@ -38,19 +75,20 @@ window.sandboxSession = options => {
   session.modelAdapterRegistry[session.uiSessionId] = session;
   session.locale = new LocaleSpecHelper().createLocale('de-CH');
 
-  let desktop = options.desktop || {};
+  let desktop = (options.desktop || {}) as DesktopModel;
   desktop.navigationVisible = scout.nvl(desktop.navigationVisible, false);
   desktop.headerVisible = scout.nvl(desktop.headerVisible, false);
   desktop.benchVisible = scout.nvl(desktop.benchVisible, false);
   desktop.parent = scout.nvl(desktop.parent, session.root);
   session.desktop = scout.create(Desktop, desktop);
-  if (options.renderDesktop) {
+  if (scout.nvl(options.renderDesktop, true)) {
+    // @ts-ignore
     session._renderDesktop();
   }
 
   // Prevent exception when test window gets resized
-  $sandbox.window()
-    .off('resize', session.desktop._resizeHandler);
+  // @ts-ignore
+  $sandbox.window().off('resize', session.desktop._resizeHandler);
   return session;
 };
 
@@ -79,12 +117,14 @@ window.linkWidgetAndAdapter = (widget, adapterClass) => {
   });
   adapter.widget = widget;
   widget.modelAdapter = adapter;
+  // @ts-ignore
   adapter._attachWidget();
+  // @ts-ignore
   adapter._postCreateWidget();
 };
 
 /**
- * Converts the given adapaterDataArray into a map of adapterData where the key
+ * Converts the given adapterDataArray into a map of adapterData where the key
  * is the adapterData.id and the value is the adapterData itself.
  */
 window.mapAdapterData = adapterDataArray => {
@@ -104,7 +144,8 @@ window.mapAdapterData = adapterDataArray => {
  * @param adapterDataArray
  */
 window.registerAdapterData = (adapterDataArray, session) => {
-  let adapterDataMap = mapAdapterData(adapterDataArray);
+  let adapterDataMap = window.mapAdapterData(adapterDataArray);
+  // @ts-ignore
   session._copyAdapterData(adapterDataMap);
 };
 
@@ -134,7 +175,77 @@ window.createSimpleModel = (objectType, session, id) => {
   };
 };
 
-export function startApp(App) {
+
+window.mostRecentJsonRequest = () => {
+  let req = jasmine.Ajax.requests.mostRecent();
+  if (req) {
+    return $.parseJSON(req.params);
+  }
+};
+
+window.sandboxDesktop = () => {
+  let $sandbox = sandbox() as unknown as JQuery;
+  $sandbox.addClass('scout desktop');
+  return $sandbox;
+};
+
+/**
+ * Sends the queued requests and simulates a response as well.
+ * @param response if not set an empty success response will be generated
+ */
+window.sendQueuedAjaxCalls = (response, time) => {
+  time = time || 0;
+  jasmine.clock().tick(time);
+
+  window.receiveResponseForAjaxCall(null, response);
+};
+
+window.receiveResponseForAjaxCall = (request, response) => {
+  if (!response) {
+    response = {
+      status: 200,
+      responseText: '{"events":[]}'
+    };
+  }
+  if (!request) {
+    request = jasmine.Ajax.requests.mostRecent();
+  }
+  if (request && request.onload) {
+    request.respondWith(response);
+  }
+};
+
+/**
+ * Uninstalls 'beforeunload' and 'unload' events from window that were previously installed by session.start()
+ */
+window.uninstallUnloadHandlers = session => {
+  $(window)
+    .off('beforeunload.' + session.uiSessionId)
+    .off('unload.' + session.uiSessionId);
+};
+
+window.createPropertyChangeEvent = (model, properties) => ({
+  target: model.id,
+  properties: properties,
+  type: 'property'
+});
+
+/**
+ * Returns a new object instance having two properties id, objectType from the given widgetModel.
+ * this function is required because the model object passed to the scout.create() function is modified
+ * --> model.objectType is changed to whatever string is passed as parameter objectType
+ *
+ * @param widgetModel
+ */
+// FIXME TS can this be deleted?
+window.createAdapterModel = widgetModel => ({
+  id: widgetModel.id,
+  objectType: widgetModel.objectType,
+  session: widgetModel.session
+});
+
+
+export function startApp(App: new() => App) {
   // App initialization uses promises which are executed asynchronously
   // -> Use the clock to make sure all promise callbacks are executed before any test starts.
   jasmine.clock().install();
@@ -148,6 +259,11 @@ export function startApp(App) {
 export default {
   runTestSuite: context => {
     startApp(TestingApp);
+
+    beforeEach(() => {
+      jasmine.addMatchers(jasmineScoutMatchers);
+    });
+
     context.keys().forEach(context);
   },
   startApp

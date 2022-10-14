@@ -8,22 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Table, TableRow} from '../index';
-import {RefModel} from '../types';
-import {ObjectType} from '../ObjectFactory';
+import {Cell, Table, TableRow} from '../index';
+import {Primitive} from '../types';
+import {ObjectModel} from '../scout';
 
-export default interface TableRowModel {
-  objectType?: ObjectType<TableRow, TableRowModel>;
+export default interface TableRowModel extends ObjectModel<TableRow, TableRowModel> {
   /**
    * Cell instances or cell values.
    */
-  cells?: any[];
+  cells?: (Primitive | object | Cell)[];
   checked?: boolean;
   enabled?: boolean;
-  id?: string;
   iconId?: string;
   cssClass?: string;
-  parentRow?: string | TableRow | RefModel<TableRowModel>;
+  parentRow?: string | TableRow | TableRowData;
   parent: Table;
   expanded?: boolean;
   dataMap?: Record<PropertyKey, any>;

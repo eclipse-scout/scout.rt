@@ -12,25 +12,15 @@ import {Column, ColumnUserFilterEventMap, comparators, FilterFieldsGroupBox, str
 import {TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup} from '../TableMatrix';
 import {TableUserFilterAddedEventData, TableUserFilterRemovedEventData} from './TableUserFilter';
 import {ColumnComparator} from '../columns/comparators';
+import ColumnUserFilterModel from './ColumnUserFilterModel';
 
-export default class ColumnUserFilter extends TableUserFilter {
+export default class ColumnUserFilter extends TableUserFilter implements ColumnUserFilterModel {
+  declare model: ColumnUserFilterModel;
   declare eventMap: ColumnUserFilterEventMap;
 
   column: Column<any>;
-  /**
-   * This property is used to check early whether or not this filter can produce filter-fields.
-   * Set this property to true in your sub-class, if it creates filter fields.
-   */
   hasFilterFields: boolean;
-
-  /**
-   * array of (normalized) key, text composite
-   */
   availableValues: ColumnUserFilterValues[];
-
-  /**
-   * array of (normalized) keys
-   */
   selectedValues: (string | number)[];
   matrix: TableMatrix;
   xAxis: TableMatrixKeyAxis;

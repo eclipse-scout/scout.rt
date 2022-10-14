@@ -22,6 +22,7 @@ import Filter from '../widget/Filter';
 import TreeEventMap from './TreeEventMap';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
+import {TreeNodeData} from './TreeNodeModel';
 import {DropType} from '../util/dragAndDrop';
 
 export default class Tree extends Widget implements TreeModel {
@@ -247,7 +248,7 @@ export default class Tree extends Widget implements TreeModel {
    * ensures that the attribute childNodeIndex is set. By default we use the order of the nodes array as index
    * but only if childNodeIndex is undefined.
    */
-  protected _ensureTreeNodes(nodes: TreeNode[] | TreeNodeModel[]) {
+  protected _ensureTreeNodes(nodes: (TreeNode | TreeNodeModel)[]) {
     let node;
     for (let i = 0; i < nodes.length; i++) {
       node = nodes[i];
@@ -2197,11 +2198,11 @@ export default class Tree extends Widget implements TreeModel {
     }
   }
 
-  insertNode(node: TreeNode | TreeNodeModel, parentNode?: TreeNode) {
+  insertNode(node: TreeNode | TreeNodeData, parentNode?: TreeNode) {
     this.insertNodes([node], parentNode);
   }
 
-  insertNodes(nodes: TreeNode | TreeNode[] | TreeNodeModel[] | TreeNodeModel, parentNode?: TreeNode) {
+  insertNodes(nodes: TreeNode | TreeNodeData | (TreeNode | TreeNodeData)[], parentNode?: TreeNode) {
     let treeNodes = arrays.ensure(nodes).slice() as TreeNode[];
     if (treeNodes.length === 0) {
       return;
@@ -2262,17 +2263,19 @@ export default class Tree extends Widget implements TreeModel {
     });
   }
 
-  updateNode(node: TreeNode) {
+  updateNode(node: TreeNode | TreeNodeData) {
     this.updateNodes([node]);
   }
 
-  updateNodes(nodes: TreeNode | TreeNode[]) {
+  updateNodes(nodes: TreeNode | TreeNodeData | (TreeNode | TreeNodeData)[]) {
     nodes = arrays.ensure(nodes);
     if (nodes.length === 0) {
       return;
     }
+    let updatedNodes = [];
     nodes.forEach(updatedNode => {
-      let propertiesChanged: boolean, oldNode = this.nodesMap[updatedNode.id];
+      let propertiesChanged: boolean;
+      let oldNode = this.nodesMap[updatedNode.id];
 
       // if same instance has been updated we must set the flag always to true
       // because we cannot compare against an "old" node
@@ -2290,10 +2293,11 @@ export default class Tree extends Widget implements TreeModel {
           oldNode._decorate();
         }
       }
+      updatedNodes.push(oldNode);
     });
 
     this.trigger('nodesUpdated', {
-      nodes: nodes
+      nodes: updatedNodes
     });
   }
 
@@ -2310,7 +2314,7 @@ export default class Tree extends Widget implements TreeModel {
    *          true if at least one property has changed, false otherwise. This value is used to
    *          determine if the node has to be rendered again.
    */
-  protected _applyUpdatedNodeProperties(oldNode: TreeNode, updatedNode: TreeNode): boolean {
+  protected _applyUpdatedNodeProperties(oldNode: TreeNode, updatedNode: TreeNode | TreeNodeData): boolean {
     // Note: We only update _some_ of the properties, because everything else will be handled
     // with separate events. --> See also: JsonTree.java/handleModelNodesUpdated()
     let propertiesChanged = false;
@@ -2333,7 +2337,7 @@ export default class Tree extends Widget implements TreeModel {
     return propertiesChanged;
   }
 
-  deleteNode(node: TreeNode, parentNode: TreeNode) {
+  deleteNode(node: TreeNode, parentNode?: TreeNode) {
     this.deleteNodes([node], parentNode);
   }
 
@@ -2470,7 +2474,7 @@ export default class Tree extends Widget implements TreeModel {
     });
   }
 
-  checkNode(node: TreeNode, checked: boolean, options?: TreeNodeCheckOptions) {
+  checkNode(node: TreeNode, checked?: boolean, options?: TreeNodeCheckOptions) {
     let opts = $.extend(options, {
       checked: checked
     });

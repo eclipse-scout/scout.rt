@@ -14,6 +14,7 @@ import {triggerClick, triggerDoubleClick, triggerMouseDown, triggerMouseUp} from
 
 describe('TreeAdapter', () => {
   let session;
+  /** @type TreeSpecHelper */
   let helper;
 
   beforeEach(() => {
@@ -323,14 +324,18 @@ describe('TreeAdapter', () => {
         model = helper.createModelFixture(3, 1, true);
         adapter = helper.createTreeAdapter(model);
         tree = adapter.createWidget(model, session.desktop);
+        // noinspection JSUnresolvedVariable
         expect(tree.a).toBe(123);
+        // noinspection JSUnresolvedVariable
         expect(tree.nodes[0].b).toBe(234);
         expect(tree.nodes[0].childNodes[3]).toBe(undefined);
 
         let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         let event = helper.createNodesInsertedEvent(model, [newNode0Child3], node0.id);
         adapter.onModelAction(event);
+        // noinspection JSUnresolvedVariable
         expect(tree.a).toBe(123);
+        // noinspection JSUnresolvedVariable
         expect(tree.nodes[0].childNodes[3].b).toBe(234);
       });
     });

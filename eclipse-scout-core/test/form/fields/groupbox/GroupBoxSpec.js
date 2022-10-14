@@ -13,6 +13,7 @@ import {FormSpecHelper} from '../../../../src/testing/index';
 
 describe('GroupBox', () => {
   let session;
+  /** @type FormSpecHelper */
   let helper;
 
   beforeEach(() => {
@@ -116,9 +117,9 @@ describe('GroupBox', () => {
       let box = scout.create(GroupBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'StringField'
+          objectType: StringField
         }, {
-          objectType: 'StringField'
+          objectType: StringField
         }]
       });
       box.render();
@@ -313,7 +314,7 @@ describe('GroupBox', () => {
     });
 
     it('uses widthInPixel and heightInPixel as dialog width and height if set on main box', done => {
-      let $tmpStyle = $('<style type="text/css">.dialog { position: absolute; }</style>')
+      let $tmpStyle = $('<style>.dialog { position: absolute; }</style>')
         .appendTo($('head'));
 
       // stub function because when running in phantom js the window has an unpredictable size, it seems to get smaller when adding new specs...

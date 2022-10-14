@@ -8,14 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Session, Widget} from '../index';
+import {Session} from '../index';
+import {ObjectType} from '../ObjectFactory';
 
-export default interface ModelAdapterModel<W extends Widget = Widget> {
+export default interface ModelAdapterModel {
   id: string;
-  objectType?: string;
-  initialized?: boolean;
-  attached?: boolean;
-  destroyed?: boolean;
-  widget?: W;
   session: Session;
+  objectType?: ObjectType;
 }

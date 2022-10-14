@@ -12,7 +12,9 @@ import {defaultValues, RemoteEvent} from '../../src/index';
 import {LocaleSpecHelper, TableSpecHelper} from '../../src/testing/index';
 
 describe('TableAdapter', () => {
-  let session, helper;
+  let session;
+  /** @type TableSpecHelper */
+  let helper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -123,7 +125,7 @@ describe('TableAdapter', () => {
   describe('expandRows', () => {
 
     it('sends rowsExpanded event containing rowIds', () => {
-      let rowIds = [0, 1, 2],
+      let rowIds = ['0', '1', '2'],
         rows = rowIds.map(id => {
           let rowData = helper.createModelRow(id, ['row' + id]);
           rowData.expanded = true;
@@ -133,7 +135,6 @@ describe('TableAdapter', () => {
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop);
       rows = table.rows;
-      rows[1].parentId = rows[0].id;
       table.updateRows(rows);
       table.render();
 
@@ -152,7 +153,7 @@ describe('TableAdapter', () => {
     });
 
     it('does not send rowsChecked event if triggered by server', () => {
-      let rowIds = [0, 1, 2],
+      let rowIds = ['0', '1', '2'],
         rows = rowIds.map(id => {
           let rowData = helper.createModelRow(id, ['row' + id]);
           rowData.expanded = true;
@@ -214,7 +215,13 @@ describe('TableAdapter', () => {
     });
 
     describe('rowsDeleted event', () => {
-      let model, table, adapter, rows, row0, row1, row2;
+      let model;
+      /** @type Table */
+      let table;
+      let adapter;
+      /** @type TableRow[] */
+      let rows;
+      let row0, row1, row2;
 
       function createRowsDeletedEvent(model, rowIds) {
         return {
@@ -721,7 +728,7 @@ describe('TableAdapter', () => {
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop);
 
-      sendQueuedAjaxCalls('', 250);
+      sendQueuedAjaxCalls(null, 250);
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       let rows = [table.rows[2]];

@@ -13,8 +13,9 @@ import {MenuSpecHelper} from '../../src/testing/index';
 import {triggerMouseEnter, triggerMouseLeave} from '../../src/testing/jquery-testing';
 
 describe('Menu', () => {
-
-  let helper, session, $sandbox, menu1, menu2;
+  let session, $sandbox, menu1, menu2;
+  /** @type MenuSpecHelper */
+  let helper;
 
   beforeEach(() => {
     jasmine.clock().install();

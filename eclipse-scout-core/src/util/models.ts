@@ -21,9 +21,9 @@ export function init(data: any) {
  * Returns a new instance of a model supplied by the given model func
  *
  * @param modelFunc A function that returns the model instance.
- * @param [parent] Optional parent that is set on the returned object.
+ * @param parent Optional parent that is set on the returned object.
  */
-export function get(modelFunc: () => { parent: object }, parent?: object): object {
+export function get<T extends { parent?: object }>(modelFunc: () => T, parent?: object): T {
   let model = modelFunc();
   if (parent) {
     model.parent = parent;

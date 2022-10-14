@@ -838,7 +838,7 @@ export default class Column<TValue = string> extends PropertyEventEmitter implem
       maxLength: this.maxLength,
       multilineText: this.table.multilineText,
       wrapText: this.textWrap
-    });
+    }) as unknown as ValueField<TValue>;
   }
 
   updateCellFromEditor(row: TableRow, field: ValueField<TValue>) {

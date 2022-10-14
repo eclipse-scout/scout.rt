@@ -9,21 +9,19 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Session, Tree, TreeNode} from '../index';
-import {ObjectType} from '../ObjectFactory';
-import {RefModel} from '../types';
+import {ObjectModel} from '../scout';
 
-export default interface TreeNodeModel {
+export default interface TreeNodeModel extends ObjectModel<TreeNode, TreeNodeModel> {
   parent: Tree;
-  objectType?: ObjectType<TreeNode, TreeNodeModel>;
   checked?: boolean;
-  childNodes?: RefModel<TreeNodeModel>[] | TreeNode[];
+  childNodes?: (TreeNodeData | TreeNode)[];
+  childNodeIndex?: number;
   cssClass?: string;
   enabled?: boolean;
   expanded?: boolean;
   expandedLazy?: boolean;
   htmlEnabled?: boolean;
   iconId?: string;
-  id?: string;
   initialExpanded?: boolean;
   lazyExpandingEnabled?: boolean;
   leaf?: boolean;
@@ -35,3 +33,5 @@ export default interface TreeNodeModel {
   backgroundColor?: string;
   font?: string;
 }
+
+export type TreeNodeData = Omit<TreeNodeModel, 'parent'>;

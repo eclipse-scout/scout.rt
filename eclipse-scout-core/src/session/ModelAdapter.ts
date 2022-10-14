@@ -9,20 +9,22 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  App, arrays, comparators, defaultValues, Event, EventEmitter, ModelAdapterEventMap, ModelAdapterModel, objects, ObjectWithType, Predicate, PropertyChangeEvent, PropertyChangeEventFilter, RemoteEvent, scout, Session, strings, Widget,
-  WidgetEventTypeFilter
+  App, arrays, comparators, defaultValues, Event, EventEmitter, ModelAdapterEventMap, ModelAdapterModel, objects, Predicate, PropertyChangeEvent, PropertyChangeEventFilter, RemoteEvent, scout, Session, strings, Widget, WidgetEventTypeFilter
 } from '../index';
 import $ from 'jquery';
 import EventListener from '../events/EventListener';
 import WidgetModel from '../widget/WidgetModel';
 import {AdapterData} from './Session';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {RefModel, SomeRequired} from '../types';
+import {ObjectType} from '../ObjectFactory';
+import {ModelOf} from '../scout';
 
 /**
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
  * It also sends events to the server whenever an action happens on the widget.
  */
-export default class ModelAdapter extends EventEmitter implements ModelAdapterModel<Widget>, ModelAdapterLike {
+export default class ModelAdapter extends EventEmitter implements ModelAdapterModel, ModelAdapterLike {
   declare model: ModelAdapterModel;
   declare eventMap: ModelAdapterEventMap;
   id: string;
@@ -79,12 +81,12 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
     this.destroyed = true;
   }
 
-  createWidget(adapterData: Omit<WidgetModel, 'parent'> & ObjectWithType, parent: Widget): Widget {
+  createWidget<T extends Widget>(adapterData: Omit<WidgetModel, 'parent'> & { objectType: ObjectType<T, ModelOf<T>> }, parent: Widget): T {
     let model = this._initModel(adapterData, parent);
     this.widget = this._createWidget(model);
     this._attachWidget();
     this._postCreateWidget();
-    return this.widget;
+    return this.widget as T;
   }
 
   /**
@@ -95,7 +97,7 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
     // NOP
   }
 
-  protected _initModel(m: Omit<WidgetModel, 'parent'> & ObjectWithType, parent: Widget): WidgetModel & ObjectWithType {
+  protected _initModel(m: RefModel<WidgetModel>, parent: Widget): SomeRequired<WidgetModel, 'objectType'> {
     // Make a copy to prevent a modification of the given model
     let deepCopy = this.session.adapterExportEnabled;
     let model: any = $.extend(deepCopy, {}, m);
@@ -127,8 +129,8 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
   /**
    * @returns A new widget instance. The default impl. uses calls scout.create() with property objectType from given model.
    */
-  protected _createWidget(model: WidgetModel & ObjectWithType): Widget {
-    let widget = scout.create(model) as Widget;
+  protected _createWidget(model: SomeRequired<WidgetModel, 'objectType'>): Widget {
+    let widget = scout.create(model);
     // @ts-ignore
     widget._addCloneProperties(['modelClass', 'classId']);
     return widget;

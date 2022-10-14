@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-
 // /////////////////////////////////////////////////////////////////
 // TEST SUPPORT - DO NOT USE IN PRODUCTION CODE
 // /////////////////////////////////////////////////////////////////
 import {ObjectFactory} from '../index';
-import * as self from './index.js';
+import * as self from './index';
 
 export {default as TestingApp} from './TestingApp';
 export {default as JasmineScout} from './JasmineScout';
@@ -32,7 +31,6 @@ export {default as AbortableMicrotaskStaticLookupCall} from './lookup/AbortableM
 export {default as ActiveDummyLookupCall} from './lookup/ActiveDummyLookupCall';
 export {default as ColumnDescriptorDummyLookupCall} from './lookup/ColumnDescriptorDummyLookupCall';
 export {default as LanguageDummyLookupCall} from './lookup/LanguageDummyLookupCall';
-export {default as CalendarSpecHelper} from './calendar/CalendarSpecHelper';
 export {default as FocusManagerSpecHelper} from './focus/FocusManagerSpecHelper';
 export {default as GroupBoxSpecHelper} from './form/fields/groupbox/GroupBoxSpecHelper';
 export {default as JQueryTesting} from './jquery-testing';

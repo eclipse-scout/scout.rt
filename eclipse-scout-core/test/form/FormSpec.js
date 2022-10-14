@@ -10,9 +10,14 @@
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
 import {Dimension, fields, Form, NullWidget, Popup, Rectangle, scout, Status, webstorage} from '../../src/index';
+import {DateField, GroupBox} from '../../src';
 
 describe('Form', () => {
-  let session, helper, outlineHelper;
+  let session;
+  /** @type FormSpecHelper */
+  let helper;
+  /** @type OutlineSpecHelper */
+  let outlineHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -39,9 +44,9 @@ describe('Form', () => {
       let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           fields: [{
-            objectType: 'GroupBox'
+            objectType: GroupBox
           }]
         }
       });
@@ -365,7 +370,7 @@ describe('Form', () => {
     it('does not fail on form close if a field has focus and validation wants to show a warning', done => {
       let form = helper.createFormWithOneField();
       form.setDisplayHint(Form.DisplayHint.DIALOG);
-      let field = helper.createField('DateField');
+      let field = helper.createField(DateField);
       field.setValidator(value => {
         throw Status.warning({
           message: 'Invalid value'
@@ -376,7 +381,11 @@ describe('Form', () => {
         return {
           valid: true,
           validByErrorStatus: true,
-          validByMandatory: true
+          validByMandatory: true,
+          field: field,
+          label: field.label,
+          reveal: () => {
+          }
         };
       };
       field.setOwner(form.rootGroupBox);

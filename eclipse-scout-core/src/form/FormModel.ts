@@ -111,7 +111,13 @@ export default interface FormModel extends WidgetModel {
    * Default is true.
    */
   showOnOpen?: boolean;
-  initialFocus?: Widget;
+  /**
+   * The widget to be focused initially when the form renders. If not set, the first focusable element will be focused.
+   * If a string is provided, the widget will be resolved automatically in the context of the form.
+   *
+   * Default is null.
+   */
+  initialFocus?: Widget | string;
   /**
    * Whether this form should render its initial focus
    *
