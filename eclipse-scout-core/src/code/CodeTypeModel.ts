@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Code} from '../index';
 import CodeModel from './CodeModel';
 
-export default interface CodeTypeModel {
+export default interface CodeTypeModel<TCodeId> {
   id: string;
   modelClass?: string;
-  codes?: CodeModel[];
+  codes?: CodeModel<TCodeId>[];
 }

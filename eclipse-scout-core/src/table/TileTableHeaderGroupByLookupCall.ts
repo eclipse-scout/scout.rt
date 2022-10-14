@@ -10,7 +10,7 @@
  */
 import {Column, LookupRow, scout, StaticLookupCall, Table, TileTableHeaderGroupByLookupCallModel} from '../index';
 
-export default class TileTableHeaderGroupByLookupCall extends StaticLookupCall<Column> implements TileTableHeaderGroupByLookupCallModel {
+export default class TileTableHeaderGroupByLookupCall extends StaticLookupCall<Column<any>> implements TileTableHeaderGroupByLookupCallModel {
   declare model: TileTableHeaderGroupByLookupCallModel;
   table: Table;
 
@@ -34,11 +34,11 @@ export default class TileTableHeaderGroupByLookupCall extends StaticLookupCall<C
     return lookupRows;
   }
 
-  protected override _dataToLookupRow(data: any): LookupRow<Column> {
+  protected override _dataToLookupRow(data: any): LookupRow<Column<any>> {
     return scout.create(LookupRow, {
       key: data[0],
       text: data[1],
       font: data[2]
-    }) as LookupRow<Column>;
+    }) as LookupRow<Column<any>>;
   }
 }

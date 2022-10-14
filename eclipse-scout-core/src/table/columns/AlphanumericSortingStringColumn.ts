@@ -10,7 +10,7 @@
  */
 import {Column, comparators} from '../../index';
 
-export default class AlphanumericSortingStringColumn extends Column {
+export default class AlphanumericSortingStringColumn extends Column<string> {
   constructor() {
     super();
     this.comparator = comparators.ALPHANUMERIC;

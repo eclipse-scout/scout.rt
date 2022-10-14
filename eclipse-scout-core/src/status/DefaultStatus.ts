@@ -16,7 +16,7 @@ import {Status, StatusModel} from '../index';
  */
 export default class DefaultStatus extends Status {
 
-  constructor(model: StatusModel) {
+  constructor(model?: StatusModel) {
     super(model);
   }
 

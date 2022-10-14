@@ -101,7 +101,7 @@ export default class TableAdapter extends ModelAdapter {
     this._sendColumnResized(event.column);
   }
 
-  protected _sendColumnResized(column: Column) {
+  protected _sendColumnResized(column: Column<any>) {
     if (column.fixedWidth || column.guiOnly || this.widget.autoResizeColumns) {
       return;
     }
@@ -170,7 +170,7 @@ export default class TableAdapter extends ModelAdapter {
     this._sendColumnMoved(event.column, index);
   }
 
-  protected _sendColumnMoved(column: Column, index: number) {
+  protected _sendColumnMoved(column: Column<any>, index: number) {
     if (column.guiOnly) {
       return;
     }
@@ -186,7 +186,7 @@ export default class TableAdapter extends ModelAdapter {
     this._sendPrepareCellEdit(event.row, event.column);
   }
 
-  protected _sendPrepareCellEdit(row: TableRow, column: Column) {
+  protected _sendPrepareCellEdit(row: TableRow, column: Column<any>) {
     if (column.guiOnly) {
       return;
     }
@@ -305,7 +305,7 @@ export default class TableAdapter extends ModelAdapter {
     this._sendRowAction(event.row, event.column);
   }
 
-  protected _sendRowAction(row: TableRow, column: Column) {
+  protected _sendRowAction(row: TableRow, column: Column<any>) {
     if (column.guiOnly) {
       // Send row action with a real column
       // If there is only one guiOnly column (e.g. CompactColumn), sent column will be null
@@ -322,14 +322,14 @@ export default class TableAdapter extends ModelAdapter {
     this._sendAppLinkAction(event.column, event.ref);
   }
 
-  protected _sendAppLinkAction(column: Column, ref: string) {
+  protected _sendAppLinkAction(column: Column<any>, ref: string) {
     this._send('appLinkAction', {
       columnId: column.id,
       ref: ref
     });
   }
 
-  protected _sendContextColumn(contextColumn: Column) {
+  protected _sendContextColumn(contextColumn: Column<any>) {
     if (contextColumn.guiOnly) {
       contextColumn = null;
       this.widget.contextColumn = null;
@@ -483,7 +483,7 @@ export default class TableAdapter extends ModelAdapter {
     this.widget.updateRowOrder(rows);
   }
 
-  protected _onColumnStructureChanged(columns: Column[]) {
+  protected _onColumnStructureChanged(columns: Column<any>[]) {
     this._rebuildingTable = true;
     this.widget.updateColumnStructure(columns);
   }
@@ -493,7 +493,7 @@ export default class TableAdapter extends ModelAdapter {
     this.widget.updateColumnOrder(columns);
   }
 
-  protected _onColumnHeadersUpdated(columns: Column[]) {
+  protected _onColumnHeadersUpdated(columns: Column<any>[]) {
     columns.forEach(column => defaultValues.applyTo(column));
     this.widget.updateColumnHeaders(columns);
 
@@ -510,7 +510,7 @@ export default class TableAdapter extends ModelAdapter {
     let column = this.widget.columnById(columnId),
       // @ts-ignore
       row = this.widget._rowById(rowId),
-      field = this.session.getOrCreateWidget(fieldId, this.widget) as ValueField;
+      field = this.session.getOrCreateWidget(fieldId, this.widget) as ValueField<any>;
 
     this.widget.startCellEdit(column, row, field);
   }
@@ -520,7 +520,7 @@ export default class TableAdapter extends ModelAdapter {
     if (!field) {
       throw new Error('Field adapter could not be resolved. Id: ' + fieldId);
     }
-    this.widget.endCellEdit(field.widget as ValueField);
+    this.widget.endCellEdit(field.widget as ValueField<any>);
   }
 
   protected _onRequestFocus() {
@@ -691,7 +691,7 @@ export default class TableAdapter extends ModelAdapter {
     }, true);
 
     // uiSortPossible
-    objects.replacePrototypeFunction(Table, '_isSortingPossible', function(sortColumns: Column[]) {
+    objects.replacePrototypeFunction(Table, '_isSortingPossible', function(sortColumns: Column<any>[]) {
       if (this.modelAdapter) {
         // In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally we check if each column can install
         // its comparator used to sort. If installation failed for some reason, sorting is not possible. In a remote app the server sets the
@@ -703,7 +703,7 @@ export default class TableAdapter extends ModelAdapter {
     }, true);
 
     // sort
-    objects.replacePrototypeFunction(Table, 'sort', function(column: Column, direction?: 'asc' | 'desc', multiSort?: boolean, remove?: boolean) {
+    objects.replacePrototypeFunction(Table, 'sort', function(column: Column<any>, direction?: 'asc' | 'desc', multiSort?: boolean, remove?: boolean) {
       if (this.modelAdapter && column.guiOnly) {
         return;
       }
@@ -735,7 +735,7 @@ export default class TableAdapter extends ModelAdapter {
     }
 
     // init
-    objects.replacePrototypeFunction(Column, 'init', function(model: ColumnModel) {
+    objects.replacePrototypeFunction(Column, 'init', function(model: ColumnModel<any>) {
       if (model.table && model.table.modelAdapter && !model.guiOnly) {
         // Fill in the missing default values only in remote case, don't do it JS case to not accidentally set undefined properties (e.g. uiSortEnabled)
         model = $.extend({}, model);
@@ -801,7 +801,7 @@ export default class TableAdapter extends ModelAdapter {
     }
 
     // _toggleCellValue
-    objects.replacePrototypeFunction(BooleanColumn, '_toggleCellValue', function(row: TableRow, cell: Cell) {
+    objects.replacePrototypeFunction(BooleanColumn, '_toggleCellValue', function(row: TableRow, cell: Cell<boolean>) {
       if (this.table.modelAdapter) {
         // NOP - do nothing, since server will handle the click, see Java AbstractTable#interceptRowClickSingleObserver
       } else {

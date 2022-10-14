@@ -13,21 +13,21 @@ import CodeTypeModel from './CodeTypeModel';
 import CodeModel from './CodeModel';
 import {TreeVisitor} from '../widget/Widget';
 
-export default class CodeType {
+export default class CodeType<TCodeId> {
 
-  declare model: CodeTypeModel;
+  declare model: CodeTypeModel<TCodeId>;
 
   id: string;
   modelClass: string;
-  codes: Code[];
-  codeMap: Record<string, Code>;
+  codes: Code<TCodeId>[];
+  codeMap: Record<string, Code<TCodeId>>;
 
   constructor() {
     this.codes = [];
     this.codeMap = {};
   }
 
-  init(model: CodeTypeModel) {
+  init(model: CodeTypeModel<TCodeId>) {
     scout.assertParameter('id', model.id);
     this.id = model.id;
     this.modelClass = model.modelClass;
@@ -39,8 +39,8 @@ export default class CodeType {
     }
   }
 
-  protected _initCode(modelCode: CodeModel, parent?: Code) {
-    let code = scout.create(modelCode) as Code;
+  protected _initCode(modelCode: CodeModel<TCodeId>, parent?: Code<TCodeId>) {
+    let code = scout.create(modelCode);
     this.add(code, parent);
     if (modelCode.children) {
       for (let i = 0; i < modelCode.children.length; i++) {
@@ -49,9 +49,9 @@ export default class CodeType {
     }
   }
 
-  add(code: Code, parent?: Code) {
+  add(code: Code<TCodeId>, parent?: Code<TCodeId>) {
     this.codes.push(code);
-    this.codeMap[code.id] = code;
+    this.codeMap[code.id + ''] = code;
     if (parent) {
       parent.children.push(code);
       code.parent = parent;
@@ -61,7 +61,7 @@ export default class CodeType {
   /**
    * @throw Error if code does not exist
    */
-  get(codeId: string): Code {
+  get(codeId: TCodeId): Code<TCodeId> {
     let code = this.optGet(codeId);
     if (!code) {
       throw new Error('No code found for id=' + codeId);
@@ -74,11 +74,11 @@ export default class CodeType {
    *
    * @returns code for the given codeId or undefined if code does not exist
    */
-  optGet(codeId: string): Code {
-    return this.codeMap[codeId];
+  optGet(codeId: TCodeId): Code<TCodeId> {
+    return this.codeMap[codeId + ''];
   }
 
-  getCodes(rootOnly: boolean): Code[] {
+  getCodes(rootOnly: boolean): Code<TCodeId>[] {
     if (rootOnly) {
       let rootCodes = [];
       for (let i = 0; i < this.codes.length; i++) {
@@ -98,7 +98,7 @@ export default class CodeType {
    * To only abort the visiting of a sub tree, the visitor can return SKIP_SUBTREE.
    * </p>
    */
-  visitChildren(visitor: TreeVisitor<Code>): boolean | TreeVisitResult {
+  visitChildren(visitor: TreeVisitor<Code<TCodeId>>): boolean | TreeVisitResult {
     let rootCodes = this.getCodes(true);
     for (let i = 0; i < rootCodes.length; i++) {
       let code = rootCodes[i];
@@ -115,13 +115,13 @@ export default class CodeType {
     }
   }
 
-  static ensure(codeType: CodeType | CodeTypeModel): CodeType {
+  static ensure<TCodeId>(codeType: CodeType<TCodeId> | CodeTypeModel<TCodeId>): CodeType<TCodeId> {
     if (!codeType) {
-      return codeType as CodeType;
+      return codeType as CodeType<TCodeId>;
     }
     if (codeType instanceof CodeType) {
       return codeType;
     }
-    return scout.create(CodeType, codeType);
+    return scout.create(CodeType, codeType) as CodeType<TCodeId>;
   }
 }

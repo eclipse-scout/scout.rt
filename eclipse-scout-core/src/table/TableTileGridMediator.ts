@@ -301,7 +301,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     });
   }
 
-  protected _createTileGroup(groupId: string, primaryGroupingColumn: Column, row: TableRow): Group<TileGrid> {
+  protected _createTileGroup(groupId: string, primaryGroupingColumn: Column<any>, row: TableRow): Group<TileGrid> {
     let htmlEnabled: boolean, title: string, iconId: string;
     if (primaryGroupingColumn) {
       htmlEnabled = primaryGroupingColumn.htmlEnabled;

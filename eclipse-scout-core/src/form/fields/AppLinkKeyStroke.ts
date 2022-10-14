@@ -1,19 +1,21 @@
 /*
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, Widget} from '../../index';
 import $ from 'jquery';
 
 export default class AppLinkKeyStroke extends KeyStroke {
 
-  constructor(field, appLinkTriggerFunction) {
+  appLinkTriggerFunction: AppLinkTriggerFunction;
+
+  constructor(field: Widget, appLinkTriggerFunction: AppLinkTriggerFunction) {
     super();
     this.field = field;
     this.appLinkTriggerFunction = appLinkTriggerFunction;
@@ -22,18 +24,14 @@ export default class AppLinkKeyStroke extends KeyStroke {
     this.renderingHints.render = false;
   }
 
-  /**
-   * @override KeyStroke.js
-   */
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     return accepted && $(event.target).hasClass('app-link');
   }
 
-  /**
-   * @override KeyStroke.js
-   */
-  handle(event) {
+  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     this.appLinkTriggerFunction.call(this.field, event);
   }
 }
+
+export type AppLinkTriggerFunction = (this: Widget, event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;

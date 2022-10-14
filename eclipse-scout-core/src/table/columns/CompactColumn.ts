@@ -10,7 +10,7 @@
  */
 import {Column} from '../../index';
 
-export default class CompactColumn extends Column {
+export default class CompactColumn extends Column<any> {
   constructor() {
     super();
     this.cssClass = 'compact-cell';

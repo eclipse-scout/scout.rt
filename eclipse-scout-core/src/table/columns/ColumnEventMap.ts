@@ -10,7 +10,7 @@
  */
 
 import {PropertyChangeEvent, PropertyEventMap} from '../../index';
-import {HorizontalAlignment} from '../../cell/Cell';
+import {Alignment} from '../../cell/Cell';
 
 export default interface ColumnEventMap extends PropertyEventMap {
   'propertyChange:autoOptimizeWidth': PropertyChangeEvent<boolean>;
@@ -23,7 +23,7 @@ export default interface ColumnEventMap extends PropertyEventMap {
   'propertyChange:headerIconId': PropertyChangeEvent<string>;
   'propertyChange:headerTooltipHtmlEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:headerTooltipText': PropertyChangeEvent<string>;
-  'propertyChange:horizontalAlignment': PropertyChangeEvent<HorizontalAlignment>;
+  'propertyChange:horizontalAlignment': PropertyChangeEvent<Alignment>;
   'propertyChange:mandatory': PropertyChangeEvent<boolean>;
   'propertyChange:maxLength': PropertyChangeEvent<number>;
   'propertyChange:text': PropertyChangeEvent<string>;

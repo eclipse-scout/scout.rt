@@ -22,8 +22,8 @@ import {NumberColumnAggregationFunction, NumberColumnBackgroundEffect} from './c
 import {TableRowData} from './TableRowModel';
 import {Comparator, RefModel} from '../types';
 import {StatusOrModel} from '../status/Status';
-import {HorizontalAlignment} from '../cell/Cell';
-import {DragAndDropType} from '../util/dragAndDrop';
+import {Alignment} from '../cell/Cell';
+import {DropType} from '../util/dragAndDrop';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {DisplayViewId} from '../tabbox/SimpleTab';
 import {FilterOrFunction} from '../widget/FilterSupport';
@@ -36,17 +36,17 @@ export default class Table extends Widget implements TableModel {
   autoResizeColumns: boolean;
   columnAddable: boolean;
   columnLayoutDirty: boolean;
-  columns: Column[];
-  contextColumn: Column;
+  columns: Column<any>[];
+  contextColumn: Column<any>;
   checkable: boolean;
   displayViewId: DisplayViewId; // set by DesktopBench
   checkableStyle: TableCheckableStyle;
-  cellEditorPopup: CellEditorPopup;
+  cellEditorPopup: CellEditorPopup<any>;
   compact: boolean;
   openFieldPopupOnCellEdit: boolean;
   compactHandler: TableCompactHandler;
   compactColumn: CompactColumn;
-  dropType: DragAndDropType;
+  dropType: DropType;
   dropMaximumSize: number;
   dragAndDropHandler: DragAndDropHandler;
   groupingStyle: TableGroupingStyle;
@@ -105,7 +105,7 @@ export default class Table extends Widget implements TableModel {
   staticMenus: Menu[];
   selectionHandler: TableSelectionHandler;
   tooltips: TableTooltip[];
-  tableNodeColumn: Column;
+  tableNodeColumn: Column<any>;
   updateBuffer: TableUpdateBuffer;
   /**
    * Initial value must be > 0 to make prefSize work (if it is 0, no filler will be generated).
@@ -131,8 +131,8 @@ export default class Table extends Widget implements TableModel {
   protected _animationRowLimit: number;
   protected _blockLoadThreshold: number;
   protected _doubleClickSupport: DoubleClickSupport;
-  protected _permanentHeadSortColumns: Column[];
-  protected _permanentTailSortColumns: Column[];
+  protected _permanentHeadSortColumns: Column<any>[];
+  protected _permanentTailSortColumns: Column<any>[];
   protected _filterMenusHandler: (menuItems: Menu[], destination: MenuDestinations) => Menu[];
   protected _popupOpenHandler: EventHandler<DesktopPopupOpenEvent>;
   protected _rerenderViewPortAfterAttach: boolean;
@@ -146,7 +146,7 @@ export default class Table extends Widget implements TableModel {
   protected _insertedRows: TableRow[];
   protected _$mouseDownRow: JQuery;
   protected _mouseDownRowId: string;
-  protected _mouseDownColumn: Column;
+  protected _mouseDownColumn: Column<any>;
 
   constructor() {
     super();
@@ -374,9 +374,9 @@ export default class Table extends Widget implements TableModel {
   }
 
   protected _initColumns() {
-    let cols = this.columns as (Column | RefModel<ColumnModel>)[];
+    let cols = this.columns as (Column<any> | RefModel<ColumnModel<any>>)[];
     this.columns = cols.map((colModel, index) => {
-      let column: Column;
+      let column: Column<any>;
       let columnOrModel = colModel;
       columnOrModel.session = this.session;
       if (columnOrModel instanceof Column) {
@@ -395,7 +395,7 @@ export default class Table extends Widget implements TableModel {
         // set checkable column if this column is the checkable one
         this.checkableColumn = column as BooleanColumn;
       }
-      return column as Column;
+      return column as Column<any>;
     });
 
     // Add gui only checkbox column at the beginning
@@ -875,7 +875,7 @@ export default class Table extends Widget implements TableModel {
     this.trigger('statusChanged');
   }
 
-  setContextColumn(contextColumn: Column) {
+  setContextColumn(contextColumn: Column<any>) {
     this.setProperty('contextColumn', contextColumn);
   }
 
@@ -920,13 +920,13 @@ export default class Table extends Widget implements TableModel {
   }
 
   protected _cellTooltipText($cell: JQuery): string {
-    let cell: Cell, tooltipText: string,
+    let tooltipText: string,
       $row = $cell.parent(),
       column = this.columnFor$Cell($cell, $row),
       row = $row.data('row') as TableRow;
 
     if (row) {
-      cell = this.cell(column, row);
+      let cell = this.cell(column, row);
       tooltipText = cell.tooltipText;
     }
 
@@ -963,7 +963,7 @@ export default class Table extends Widget implements TableModel {
   /**
    * Decides if a cell tooltip should be shown for a truncated cell.
    */
-  protected _isTruncatedCellTooltipEnabled(column: Column): boolean {
+  protected _isTruncatedCellTooltipEnabled(column: Column<any>): boolean {
     if (this.truncatedCellTooltipEnabled === null) {
       // Show cell tooltip only if it is not possible to resize the column.
       return !this.headerVisible || !this.headerEnabled || column.fixedWidth;
@@ -1107,11 +1107,11 @@ export default class Table extends Widget implements TableModel {
   /**
    * @returns whether or not sorting is possible. Asks each column to answer this question by calling Column#isSortingPossible.
    */
-  protected _isSortingPossible(sortColumns: Column[]): boolean {
+  protected _isSortingPossible(sortColumns: Column<any>[]): boolean {
     return sortColumns.every(column => column.isSortingPossible());
   }
 
-  protected _sortColumns(): Column[] {
+  protected _sortColumns(): Column<any>[] {
     let sortColumns = [];
     for (let c = 0; c < this.columns.length; c++) {
       let column = this.columns[c];
@@ -1123,7 +1123,7 @@ export default class Table extends Widget implements TableModel {
     return sortColumns;
   }
 
-  protected _sortImpl(sortColumns: Column[]) {
+  protected _sortImpl(sortColumns: Column<any>[]) {
     let sortFunction: Comparator<TableRow> = (row1, row2) => {
       for (let s = 0; s < sortColumns.length; s++) {
         let column = sortColumns[s];
@@ -1249,7 +1249,7 @@ export default class Table extends Widget implements TableModel {
    * @param multiSort true to add the column to the list of sorted columns. False to use this column exclusively as sort column (reset other columns). Default is false.
    * @param remove true to remove the column from the sort columns. Default is false.
    */
-  sort(column: Column, direction?: 'asc' | 'desc', multiSort?: boolean, remove?: boolean) {
+  sort(column: Column<any>, direction?: 'asc' | 'desc', multiSort?: boolean, remove?: boolean) {
     multiSort = scout.nvl(multiSort, false);
     remove = scout.nvl(remove, false);
     // Animate if sort removes aggregate rows
@@ -1282,7 +1282,7 @@ export default class Table extends Widget implements TableModel {
     this.trigger('sort', data);
   }
 
-  protected _addSortColumn(column: Column, direction?: 'asc' | 'desc', multiSort?: boolean) {
+  protected _addSortColumn(column: Column<any>, direction?: 'asc' | 'desc', multiSort?: boolean) {
     direction = scout.nvl(direction, column.sortAscending ? 'asc' : 'desc');
     multiSort = scout.nvl(multiSort, true);
 
@@ -1307,7 +1307,7 @@ export default class Table extends Widget implements TableModel {
    * Intended to be called for new sort columns.
    * Sets the sortIndex of the given column and its siblings.
    */
-  protected _updateSortIndexForColumn(column: Column, multiSort: boolean) {
+  protected _updateSortIndexForColumn(column: Column<any>, multiSort: boolean) {
     let sortIndex = -1;
     if (multiSort) {
       // if not already sorted set the appropriate sort index (check for sortIndex necessary if called by _onColumnHeadersUpdated)
@@ -1341,7 +1341,7 @@ export default class Table extends Widget implements TableModel {
     }
   }
 
-  protected _removeSortColumn(column: Column) {
+  protected _removeSortColumn(column: Column<any>) {
     if (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) {
       return;
     }
@@ -1354,7 +1354,7 @@ export default class Table extends Widget implements TableModel {
     this._removeSortColumnInternal(column);
   }
 
-  protected _removeSortColumnInternal(column: Column) {
+  protected _removeSortColumnInternal(column: Column<any>) {
     if (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) {
       return;
     }
@@ -1363,7 +1363,7 @@ export default class Table extends Widget implements TableModel {
     column.sortIndex = -1;
   }
 
-  isGroupingPossible(column: Column): boolean {
+  isGroupingPossible(column: Column<any>): boolean {
     let possible = true;
 
     if (this.hierarchical) {
@@ -1402,7 +1402,7 @@ export default class Table extends Widget implements TableModel {
     return possible;
   }
 
-  isAggregationPossible(column: Column): boolean {
+  isAggregationPossible(column: Column<any>): boolean {
     if (!(column instanceof NumberColumn)) {
       return false;
     }
@@ -1437,7 +1437,7 @@ export default class Table extends Widget implements TableModel {
     this._group();
   }
 
-  protected _addGroupColumn(column: Column, direction?: 'asc' | 'desc', multiGroup?: boolean) {
+  protected _addGroupColumn(column: Column<any>, direction?: 'asc' | 'desc', multiGroup?: boolean) {
     let sortIndex = -1;
 
     if (!this.isGroupingPossible(column)) {
@@ -1526,7 +1526,7 @@ export default class Table extends Widget implements TableModel {
     column.grouped = true;
   }
 
-  protected _removeGroupColumn(column: Column) {
+  protected _removeGroupColumn(column: Column<any>) {
     column.grouped = false;
 
     if (column.initialAlwaysIncludeSortAtBegin) {
@@ -1614,7 +1614,7 @@ export default class Table extends Widget implements TableModel {
     return changed;
   }
 
-  protected _updateRealColumnWidth(column: Column, colIndex?: number, $row?: JQuery): boolean {
+  protected _updateRealColumnWidth(column: Column<any>, colIndex?: number, $row?: JQuery): boolean {
     if (!Device.get().hasTableCellZoomBug()) {
       return false;
     }
@@ -2089,7 +2089,7 @@ export default class Table extends Widget implements TableModel {
   /**
    * @returns the column at position x (e.g. from event.pageX)
    */
-  protected _columnAtX(x: number): Column {
+  protected _columnAtX(x: number): Column<any> {
     let columnOffsetRight = 0,
       columnOffsetLeft = this.$data.offset().left + this.rowBorders.left + this.rowMargins.left,
       scrollLeft = this.$data.scrollLeft();
@@ -2150,7 +2150,7 @@ export default class Table extends Widget implements TableModel {
     this.session.onRequestsDone(this._updateMenuBar.bind(this));
   }
 
-  protected _triggerRowClick(originalEvent: JQuery.MouseUpEvent, row: TableRow, mouseButton: number, column: Column) {
+  protected _triggerRowClick(originalEvent: JQuery.MouseUpEvent, row: TableRow, mouseButton: number, column: Column<any>) {
     let event = {
       originalEvent: originalEvent,
       row: row,
@@ -2160,7 +2160,7 @@ export default class Table extends Widget implements TableModel {
     this.trigger('rowClick', event);
   }
 
-  protected _triggerRowAction(row: TableRow, column: Column) {
+  protected _triggerRowAction(row: TableRow, column: Column<any>) {
     this.trigger('rowAction', {
       row: row,
       column: column
@@ -2171,7 +2171,7 @@ export default class Table extends Widget implements TableModel {
    * Starts cell editing for the cell at the given column and row, but only if editing is allowed.
    * @see prepareCellEdit
    */
-  focusCell(column: Column, row: TableRow) {
+  focusCell(column: Column<any>, row: TableRow) {
     let cell = this.cell(column, row);
     if (this.enabledComputed && row.enabled && cell.editable) {
       this.prepareCellEdit(column, row);
@@ -2187,7 +2187,7 @@ export default class Table extends Widget implements TableModel {
    *    This only has an effect if the editor has a popup (e.g. SmartField or DateField).
    * @returns Promise the promise will be resolved when the preparation has been finished.
    */
-  prepareCellEdit(column: Column, row: TableRow, openFieldPopupOnCellEdit?: boolean): JQuery.Promise<void> {
+  prepareCellEdit(column: Column<any>, row: TableRow, openFieldPopupOnCellEdit?: boolean): JQuery.Promise<void> {
     let promise: JQuery.Promise<void> = $.resolvedPromise();
     if (this.cellEditorPopup) {
       promise = this.cellEditorPopup.waitForCompleteCellEdit();
@@ -2201,7 +2201,7 @@ export default class Table extends Widget implements TableModel {
    *    to decide whether or not it should open a popup immediately after it is rendered. This is used
    *    for Smart- and DateFields. Default is false.
    */
-  prepareCellEditInternal(column: Column, row: TableRow, openFieldPopupOnCellEdit?: boolean) {
+  prepareCellEditInternal(column: Column<any>, row: TableRow, openFieldPopupOnCellEdit?: boolean) {
     this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
     let event = this.trigger('prepareCellEdit', {
       column: column,
@@ -2218,27 +2218,29 @@ export default class Table extends Widget implements TableModel {
   /**
    * @returns a cell for the given column and row. Row Icon column and cell icon column don't not have cells --> generate one.
    */
-  cell(column: Column, row: TableRow): Cell {
+  cell<TValue>(column: Column<TValue>, row: TableRow): Cell<TValue> {
+    // @ts-ignore
     if (column === this.rowIconColumn) {
       return scout.create(Cell, {
         iconId: row.iconId,
         cssClass: strings.join(' ', 'row-icon-cell', row.cssClass)
-      });
+      }) as Cell<TValue>;
     }
 
+    // @ts-ignore
     if (column === this.checkableColumn) {
       return scout.create(Cell, {
         value: row.checked,
         editable: true,
         cssClass: row.cssClass
-      });
+      }) as Cell<TValue>;
     }
 
     if (column === this.compactColumn) {
       return scout.create(Cell, {
         text: row.compactValue,
         htmlEnabled: true
-      });
+      }) as Cell<TValue>;
     }
 
     return row.cells[column.index];
@@ -2248,10 +2250,10 @@ export default class Table extends Widget implements TableModel {
     return this.cell(this.columns[cellIndex], row);
   }
 
-  cellValue(column: Column, row: TableRow): any {
+  cellValue<TValue>(column: Column<TValue>, row: TableRow): TValue | string {
     let cell = this.cell(column, row);
     if (!cell) {
-      return cell;
+      return cell as TValue;
     }
     if (cell.value !== undefined) {
       return cell.value;
@@ -2259,7 +2261,7 @@ export default class Table extends Widget implements TableModel {
     return '';
   }
 
-  cellText(column: Column, row: TableRow): string {
+  cellText(column: Column<any>, row: TableRow): string {
     let cell = this.cell(column, row);
     if (!cell) {
       return '';
@@ -2272,7 +2274,7 @@ export default class Table extends Widget implements TableModel {
    * @returns the next editable position in the table, starting from the cell at (currentColumn / currentRow).
    * A position is an object containing row and column (cell has no reference to a row or column due to memory reasons).
    */
-  nextEditableCellPos(currentColumn: Column, currentRow: TableRow, reverse: boolean): TableCellPosition {
+  nextEditableCellPos(currentColumn: Column<any>, currentRow: TableRow, reverse: boolean): TableCellPosition {
     let colIndex = this.columns.indexOf(currentColumn);
     let startColumnIndex = colIndex + 1;
     if (reverse) {
@@ -2309,7 +2311,7 @@ export default class Table extends Widget implements TableModel {
   }
 
   nextEditableCellPosForRow(startColumnIndex: number, row: TableRow, reverse?: boolean): TableCellPosition {
-    let predicate: Predicate<Column> = column => {
+    let predicate: Predicate<Column<any>> = column => {
       if (!column.isVisible() || column.guiOnly) {
         // does not support tabbing
         return false;
@@ -2410,7 +2412,7 @@ export default class Table extends Widget implements TableModel {
     }
   }
 
-  protected _isNewGroup(groupedColumns: Column[], row: TableRow, nextRow: TableRow): boolean {
+  protected _isNewGroup(groupedColumns: Column<any>[], row: TableRow, nextRow: TableRow): boolean {
     let newRow = false;
     if (!nextRow) {
       return true; // row is last row
@@ -2428,7 +2430,7 @@ export default class Table extends Widget implements TableModel {
     return false;
   }
 
-  protected _groupedColumns(): Column[] {
+  protected _groupedColumns(): Column<any>[] {
     return this.columns.filter(col => col.grouped);
   }
 
@@ -2508,7 +2510,7 @@ export default class Table extends Widget implements TableModel {
     return $aggregateRow;
   }
 
-  groupColumn(column: Column, multiGroup?: boolean, direction?: 'asc' | 'desc', remove?: boolean) {
+  groupColumn(column: Column<any>, multiGroup?: boolean, direction?: 'asc' | 'desc', remove?: boolean) {
     multiGroup = scout.nvl(multiGroup, false);
     remove = scout.nvl(remove, false);
     if (remove) {
@@ -2546,7 +2548,7 @@ export default class Table extends Widget implements TableModel {
     this.trigger('group', data);
   }
 
-  removeColumnGrouping(column: Column) {
+  removeColumnGrouping(column: Column<any>) {
     if (column) {
       this.groupColumn(column, false, 'asc', true);
     }
@@ -2604,7 +2606,7 @@ export default class Table extends Widget implements TableModel {
     });
   }
 
-  protected _markAutoOptimizeWidthColumnsAsDirtyIfNeeded(autoOptimizeWidthColumns: Column[], oldRow: TableRow, newRow: TableRow): boolean {
+  protected _markAutoOptimizeWidthColumnsAsDirtyIfNeeded(autoOptimizeWidthColumns: Column<any>[], oldRow: TableRow, newRow: TableRow): boolean {
     let marked = false;
     for (let i = autoOptimizeWidthColumns.length - 1; i >= 0; i--) {
       let column = autoOptimizeWidthColumns[i];
@@ -2677,7 +2679,7 @@ export default class Table extends Widget implements TableModel {
     this.checkRows(rows, opts);
   }
 
-  isTableNodeColumn(column: Column): boolean {
+  isTableNodeColumn(column: Column<any>): boolean {
     return this.hierarchical && this.tableNodeColumn === column;
   }
 
@@ -2761,7 +2763,7 @@ export default class Table extends Widget implements TableModel {
     }
   }
 
-  doRowAction(row: TableRow, column?: Column) {
+  doRowAction(row: TableRow, column?: Column<any>) {
     if (this.selectedRows.length !== 1 || this.selectedRows[0] !== row) {
       // Only allow row action if the selected row was double clicked because the handler of the event expects a selected row.
       // This may happen if the user modifies the selection using ctrl or shift while double clicking.
@@ -3138,7 +3140,7 @@ export default class Table extends Widget implements TableModel {
     }
   }
 
-  startCellEdit(column: Column, row: TableRow, field: ValueField): CellEditorPopup {
+  startCellEdit<TValue>(column: Column<TValue>, row: TableRow, field: ValueField<TValue>): CellEditorPopup<TValue> {
     if (field.destroyed) {
       // May happen if the action was postponed and the field destroyed in the meantime using endCellEdit.
       return;
@@ -3169,7 +3171,7 @@ export default class Table extends Widget implements TableModel {
    *    new value on the edited cell. In remote case this parameter is always false, because the cell
    *    value is updated by an updateRow event instead. Default is false.
    */
-  endCellEdit(field: ValueField, saveEditorValue?: boolean) {
+  endCellEdit(field: ValueField<any>, saveEditorValue?: boolean) {
     if (!this.cellEditorPopup) {
       // the cellEditorPopup could already be removed by scrolling (out of view range) or be removed by update rows
       field.destroy();
@@ -3184,7 +3186,7 @@ export default class Table extends Widget implements TableModel {
     this._destroyCellEditorPopup(this._updateCellFromEditor.bind(this, this.cellEditorPopup, field, saveEditorValue));
   }
 
-  protected _updateCellFromEditor(cellEditorPopup: CellEditorPopup, field: ValueField, saveEditorValue?: boolean) {
+  protected _updateCellFromEditor<TValue>(cellEditorPopup: CellEditorPopup<TValue>, field: ValueField<TValue>, saveEditorValue?: boolean) {
     saveEditorValue = scout.nvl(saveEditorValue, false);
     if (saveEditorValue) {
       let column = cellEditorPopup.column;
@@ -3526,7 +3528,7 @@ export default class Table extends Widget implements TableModel {
   /**
    * @param column or columnIndex
    */
-  $cell(column: Column | number, $row: JQuery): JQuery {
+  $cell(column: Column<any> | number, $row: JQuery): JQuery {
     let columnIndex: number;
     if (typeof column !== 'number') {
       columnIndex = this.visibleColumns().indexOf(column);
@@ -3536,7 +3538,7 @@ export default class Table extends Widget implements TableModel {
     return $row.children('.table-cell').eq(columnIndex);
   }
 
-  columnById(columnId: string): Column {
+  columnById(columnId: string): Column<any> {
     return arrays.find(this.columns, column => column.id === columnId);
   }
 
@@ -3545,13 +3547,13 @@ export default class Table extends Widget implements TableModel {
    * @param $row the $row which contains the $cell. If not passed it will be determined automatically
    * @returns the column for the given $cell
    */
-  columnFor$Cell($cell: JQuery, $row?: JQuery): Column {
+  columnFor$Cell($cell: JQuery, $row?: JQuery): Column<any> {
     $row = $row || $cell.parent();
     let cellIndex = this.$cellsForRow($row).index($cell);
     return this.visibleColumns()[cellIndex];
   }
 
-  columnsByIds(columnIds: string[]): Column[] {
+  columnsByIds(columnIds: string[]): Column<any>[] {
     return columnIds.map(this.columnById.bind(this));
   }
 
@@ -3793,7 +3795,7 @@ export default class Table extends Widget implements TableModel {
       .length > 0;
   }
 
-  resizeToFit(column: Column, maxWidth?: number) {
+  resizeToFit(column: Column<any>, maxWidth?: number) {
     if (column.fixedWidth) {
       return;
     }
@@ -3806,7 +3808,7 @@ export default class Table extends Widget implements TableModel {
     }
   }
 
-  protected _resizeToFit(column: Column, maxWidth?: number, calculatedSize?: number) {
+  protected _resizeToFit(column: Column<any>, maxWidth?: number, calculatedSize?: number) {
     if (calculatedSize === -1) {
       // Calculation has been aborted -> don't resize
       return;
@@ -3957,7 +3959,7 @@ export default class Table extends Widget implements TableModel {
    * @param column column to resize
    * @param width new column size
    */
-  resizeColumn(column: Column, width: number) {
+  resizeColumn(column: Column<any>, width: number) {
     if (column.fixedWidth) {
       return;
     }
@@ -4156,7 +4158,7 @@ export default class Table extends Widget implements TableModel {
     return spaceAvailableForText + (newIsIconVisible ? -iconWidth : iconWidth);
   }
 
-  moveColumn(column: Column, visibleOldPos: number, visibleNewPos: number, dragged?: boolean) {
+  moveColumn(column: Column<any>, visibleOldPos: number, visibleNewPos: number, dragged?: boolean) {
     // If there are fixed columns, don't allow moving the column onto the other side of the fixed columns
     visibleNewPos = this._considerFixedPositionColumns(visibleOldPos, visibleNewPos);
 
@@ -4204,7 +4206,7 @@ export default class Table extends Widget implements TableModel {
     return visibleNewPos;
   }
 
-  protected _renderColumnOrderChanges(oldColumnOrder: Column[]) {
+  protected _renderColumnOrderChanges(oldColumnOrder: Column<any>[]) {
     let $cell: HTMLElement, that = this;
 
     if (this.header) {
@@ -4282,7 +4284,7 @@ export default class Table extends Widget implements TableModel {
     this.trigger('filterReset');
   }
 
-  protected _triggerAppLinkAction(column: Column, row: TableRow, ref: string, $appLink: JQuery) {
+  protected _triggerAppLinkAction(column: Column<any>, row: TableRow, ref: string, $appLink: JQuery) {
     this.trigger('appLinkAction', {
       column: column,
       row: row,
@@ -4312,21 +4314,21 @@ export default class Table extends Widget implements TableModel {
     this.trigger('rowOrderChanged', event);
   }
 
-  protected _triggerColumnResized(column: Column) {
+  protected _triggerColumnResized(column: Column<any>) {
     let event = {
       column: column
     };
     this.trigger('columnResized', event);
   }
 
-  protected _triggerColumnResizedToFit(column: Column) {
+  protected _triggerColumnResizedToFit(column: Column<any>) {
     let event = {
       column: column
     };
     this.trigger('columnResizedToFit', event);
   }
 
-  protected _triggerColumnMoved(column: Column, oldPos: number, newPos: number, dragged?: boolean) {
+  protected _triggerColumnMoved(column: Column<any>, oldPos: number, newPos: number, dragged?: boolean) {
     let event = {
       column: column,
       oldPos: oldPos,
@@ -4434,8 +4436,6 @@ export default class Table extends Widget implements TableModel {
   }
 
   protected _adaptTile(tile: Tile) {
-    // FIXME TS: remove comment as soon as Tile and GridData has been migrated
-    // @ts-ignore
     tile.gridDataHints = {
       weightX: 0
     };
@@ -4935,7 +4935,7 @@ export default class Table extends Widget implements TableModel {
     this.redraw();
   }
 
-  setDropType(dropType: DragAndDropType) {
+  setDropType(dropType: DropType) {
     this.setProperty('dropType', dropType);
   }
 
@@ -5286,7 +5286,7 @@ export default class Table extends Widget implements TableModel {
    * Rebuilds the header.<br>
    * Does not modify the rows, it expects a deleteAll and insert operation to follow which will do the job.
    */
-  updateColumnStructure(columns: Column[]) {
+  updateColumnStructure(columns: Column<any>[]) {
     this._destroyColumns();
     this.columns = columns;
     this._initColumns();
@@ -5299,7 +5299,7 @@ export default class Table extends Widget implements TableModel {
     }
   }
 
-  updateColumnOrder(columns: Column[]) {
+  updateColumnOrder(columns: Column<any>[]) {
     if (columns.length !== this.columns.length) {
       throw new Error('Column order may not be updated because lengths of the arrays differ.');
     }
@@ -5327,8 +5327,8 @@ export default class Table extends Widget implements TableModel {
   /**
    * @param columns array of columns which were updated.
    */
-  updateColumnHeaders(columns: Column[]) {
-    let oldColumnState: ColumnModel;
+  updateColumnHeaders(columns: Column<any>[]) {
+    let oldColumnState: ColumnModel<any>;
 
     // Update model columns
     for (let i = 0; i < columns.length; i++) {
@@ -5452,19 +5452,19 @@ export default class Table extends Widget implements TableModel {
     this._setProperty('virtual', virtual);
   }
 
-  setCellValue(column: Column, row: TableRow, value: any) {
+  setCellValue<TValue>(column: Column<TValue>, row: TableRow, value: TValue) {
     column.setCellValue(row, value);
   }
 
-  setCellText(column: Column, row: TableRow, displayText: string) {
+  setCellText(column: Column<any>, row: TableRow, displayText: string) {
     column.setCellText(row, displayText);
   }
 
-  setCellErrorStatus(column: Column, row: TableRow, errorStatus: Status) {
+  setCellErrorStatus(column: Column<any>, row: TableRow, errorStatus: Status) {
     column.setCellErrorStatus(row, errorStatus);
   }
 
-  visibleColumns(includeGuiColumns?: boolean): Column[] {
+  visibleColumns(includeGuiColumns?: boolean): Column<any>[] {
     return this.filterColumns(column => column.isVisible(), includeGuiColumns);
   }
 
@@ -5472,7 +5472,7 @@ export default class Table extends Widget implements TableModel {
     return this.filterColumns(column => column.displayable, includeGuiColumns);
   }
 
-  filterColumns(filter: Predicate<Column>, includeGuiColumns?: boolean): Column[] {
+  filterColumns(filter: Predicate<Column<any>>, includeGuiColumns?: boolean): Column<any>[] {
     includeGuiColumns = scout.nvl(includeGuiColumns, true);
     return this.columns.filter(column => filter(column) && (includeGuiColumns || !column.guiOnly));
   }
@@ -5513,7 +5513,7 @@ export default class Table extends Widget implements TableModel {
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
-  static parseHorizontalAlignment(alignment: HorizontalAlignment): string {
+  static parseHorizontalAlignment(alignment: Alignment): string {
     if (alignment > 0) {
       return 'right';
     }
@@ -5562,7 +5562,7 @@ export type UpdateTableRowStructureOptions = {
 };
 
 export type TableCellPosition = {
-  column: Column;
+  column: Column<any>;
   row: TableRow;
 };
 

@@ -1,19 +1,35 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormField} from '../../index';
 import $ from 'jquery';
+import {Alignment} from '../../cell/Cell';
+import {LogicalGridWidget} from '../../layout/logicalgrid/LogicalGridData';
 
 export default class GridData {
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
+  weightX?: number;
+  weightY?: number;
+  useUiWidth?: boolean;
+  useUiHeight?: boolean;
+  horizontalAlignment?: Alignment;
+  verticalAlignment?: Alignment;
+  fillHorizontal?: boolean;
+  fillVertical?: boolean;
+  widthInPixel?: number;
+  heightInPixel?: number;
 
-  constructor(model) {
+  constructor(model?: GridData) {
     model = model || {};
     this.x = -1;
     this.y = -1;
@@ -33,7 +49,7 @@ export default class GridData {
     $.extend(this, model);
   }
 
-  static createFromHints(field, gridColumnCount) {
+  static createFromHints(field: LogicalGridWidget, gridColumnCount?: number): GridData {
     let data = new GridData(field.gridDataHints);
     if (data.w === FormField.FULL_WIDTH) {
       data.w = gridColumnCount;
@@ -41,9 +57,9 @@ export default class GridData {
     return data;
   }
 
-  static ensure(gridData) {
+  static ensure(gridData: GridData): GridData {
     if (!gridData) {
-      return gridData;
+      return gridData as GridData;
     }
     if (gridData instanceof GridData) {
       return gridData;

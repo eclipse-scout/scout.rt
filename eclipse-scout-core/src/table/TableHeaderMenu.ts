@@ -20,7 +20,7 @@ export default class TableHeaderMenu extends Popup implements TableHeaderMenuMod
   declare model: TableHeaderMenuModel;
   declare eventMap: TableHeaderMenuEventMap;
 
-  column: Column;
+  column: Column<any>;
   tableHeader: TableHeader;
   compact: boolean;
   table: Table;
@@ -777,7 +777,7 @@ export default class TableHeaderMenu extends Popup implements TableHeaderMenuMod
   }
 
   protected _createFilterTable(): Table {
-    let objectType = Column;
+    let objectType = Column<any>;
     if (this.column instanceof NumberColumn) {
       objectType = NumberColumn;
     }

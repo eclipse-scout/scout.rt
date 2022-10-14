@@ -725,7 +725,7 @@ export default class Menu extends Action implements MenuModel {
   }
 
   override clone(model: MenuModel, options: CloneOptions): Menu {
-    let clone = super.clone(model, options);
+    let clone = super.clone(model, options) as Menu;
     this._deepCloneProperties(clone, 'childActions', options);
     clone._setChildActions(clone.childActions);
     return clone;

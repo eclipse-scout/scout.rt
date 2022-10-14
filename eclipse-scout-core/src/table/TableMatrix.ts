@@ -45,7 +45,7 @@ export default class TableMatrix {
   /**
    * add data axis
    */
-  addData(data: Column, dataGroup: TableMatrixNumberGroup): TableMatrixDataAxis {
+  addData(data: Column<any>, dataGroup: TableMatrixNumberGroup): TableMatrixDataAxis {
     // @ts-ignore
     let dataAxis: TableMatrixDataAxis = {},
       locale = this.locale;
@@ -91,7 +91,7 @@ export default class TableMatrix {
   }
 
   // add x or y Axis
-  addAxis(axis: Column, axisGroup: TableMatrixNumberGroup | TableMatrixDateGroup): TableMatrixKeyAxis {
+  addAxis(axis: Column<any>, axisGroup: TableMatrixNumberGroup | TableMatrixDateGroup): TableMatrixKeyAxis {
     // @ts-ignore
     let keyAxis: TableMatrixKeyAxis = [],
       locale = this.locale,
@@ -430,9 +430,9 @@ export default class TableMatrix {
    *
    * @returns Array holding an entry for each column. Each entry consists of an array with the column at index 0 and the count at index 1.
    */
-  columnCount(filterNumberColumns?: boolean): Array<Array<Column | number>> {
+  columnCount(filterNumberColumns?: boolean): Array<Array<Column<any> | number>> {
     let columns = this.columns(filterNumberColumns),
-      colCount: Array<Array<Column | any[] | number>> = [],
+      colCount: Array<Array<Column<any> | any[] | number>> = [],
       count = 0;
 
     for (let c = 0; c < columns.length; c++) {
@@ -451,7 +451,7 @@ export default class TableMatrix {
       colCount[count][1] = values.length;
       count++;
     }
-    return colCount as Array<Array<Column | number>>;
+    return colCount as Array<Array<Column<any> | number>>;
   }
 
   isEmpty(): boolean {
@@ -462,7 +462,7 @@ export default class TableMatrix {
    * @returns valid columns for table-matrix (not instance of NumberColumn and not guiOnly)
    * @param filterNumberColumns whether or not to filter NumberColumn, default is true
    */
-  columns(filterNumberColumns?: boolean): Column[] {
+  columns(filterNumberColumns?: boolean): Column<any>[] {
     filterNumberColumns = scout.nvl(filterNumberColumns, true);
     return this._table.visibleColumns().filter(column => {
       if (column.guiOnly) {
@@ -488,7 +488,7 @@ export type TableMatrixNumberGroup = EnumObject<typeof TableMatrix.NumberGroup>;
 export type TableMatrixDateGroup = EnumObject<typeof TableMatrix.DateGroup>;
 
 export type TableMatrixKeyAxis = number[] & {
-  column: Column;
+  column: Column<any>;
   normTable: string[];
   sortCodeMap: Record<number, number>;
   textIsIcon?: boolean;
@@ -504,7 +504,7 @@ export type TableMatrixKeyAxis = number[] & {
 };
 
 export type TableMatrixDataAxis = {
-  column: Column;
+  column: Column<any>;
   total: number;
   min: number;
   max: number;

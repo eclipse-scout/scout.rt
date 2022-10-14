@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Form, FormLifecycleModel, Lifecycle, scout, Status, strings, ValueField} from '../../index';
-import {ValidationResult} from '../Form';
+import {ValidationResult} from '../fields/FormField';
 
 export default class FormLifecycle<TValidationResult extends ValidationResult = ValidationResult> extends Lifecycle<TValidationResult> implements FormLifecycleModel {
   declare model: FormLifecycleModel;

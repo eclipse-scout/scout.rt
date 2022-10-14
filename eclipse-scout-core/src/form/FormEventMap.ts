@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {DisplayParent, Event, Form, GroupBox, PropertyChangeEvent, Status, WidgetEventMap} from '../index';
-import {DisplayHint, ValidationResult} from './Form';
+import {DisplayHint} from './Form';
+import {ValidationResult} from './fields/FormField';
 
 export interface FormRevealInvalidFieldEvent<F extends Form = Form> extends Event<F> {
   validationResult: ValidationResult;

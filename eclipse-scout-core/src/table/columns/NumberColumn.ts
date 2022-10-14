@@ -19,7 +19,7 @@ export type NumberColumnBackgroundEffect = 'colorGradient1' | 'colorGradient2' |
 export type NumberColumnBackgroundStyle = { backgroundColor?: string; backgroundImage?: string };
 export type NumberColumnBackgroundEffectFunc = (value: number) => NumberColumnBackgroundStyle;
 
-export default class NumberColumn extends Column implements NumberColumnModel {
+export default class NumberColumn extends Column<number> implements NumberColumnModel {
   declare model: NumberColumnModel;
   declare eventMap: NumberColumnEventMap;
 
@@ -129,9 +129,10 @@ export default class NumberColumn extends Column implements NumberColumnModel {
     }
   }
 
-  override createAggrValueCell(value: number): Cell {
+  override createAggrValueCell(value: number): Cell<number> {
     let formattedValue = this._formatValue(value);
-    return scout.create(Cell, {
+    let cellType = Cell<number>;
+    return scout.create(cellType, {
       text: formattedValue,
       iconId: (formattedValue ? this.aggrSymbol : null),
       horizontalAlignment: this.horizontalAlignment,
@@ -140,7 +141,7 @@ export default class NumberColumn extends Column implements NumberColumnModel {
     });
   }
 
-  protected override _cellStyle(cell: Cell, tableNodeColumn?: boolean, rowPadding?: number): string {
+  protected override _cellStyle(cell: Cell<number>, tableNodeColumn?: boolean, rowPadding?: number): string {
     let style = super._cellStyle(cell, tableNodeColumn, rowPadding);
     if (!this.backgroundEffect || cell.value === undefined || strings.contains(cell.cssClass, 'table-aggregate-cell')) {
       return style;
@@ -158,7 +159,7 @@ export default class NumberColumn extends Column implements NumberColumnModel {
     return style;
   }
 
-  protected override _preprocessValueOrTextForCalculation(value: number, cell?: Cell): number {
+  protected override _preprocessValueOrTextForCalculation(value: number, cell?: Cell<number>): number {
     return this.decimalFormat.round(value);
   }
 
@@ -298,7 +299,7 @@ export default class NumberColumn extends Column implements NumberColumnModel {
     });
   }
 
-  protected override _hasCellValue(cell: Cell): boolean {
+  protected override _hasCellValue(cell: Cell<number>): boolean {
     return !objects.isNullOrUndefined(cell.value); // Zero (0) is valid too
   }
 }

@@ -8,13 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Desktop, Device, Event, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterModel, NullWidget, ObjectFactory, objects, ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, SessionEventMap, SessionModel, Status, strings, TextMap, texts, TypeDescriptor, URL, UserAgent, webstorage, Widget} from '../index';
+import {
+  AjaxCall, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, Desktop, Device, Event, EventEmitter, FileInput, files as fileUtil, FocusManager, fonts, icons, KeyStrokeManager, LayoutValidator, Locale,
+  LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterModel, NullWidget, ObjectFactory, objects, ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, SessionEventMap, SessionModel, Status, strings, TextMap, texts,
+  TypeDescriptor, URL, UserAgent, webstorage, Widget
+} from '../index';
 import $ from 'jquery';
 import {AjaxCallModel} from '../ajax/AjaxCall';
 import {ObjectFactoryOptions} from '../ObjectFactory';
 import {JsonErrorResponse} from '../App';
 import {ModelAdapterLike} from './ModelAdapter';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {StatusSeverity} from '../status/Status';
 import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
 
 export default class Session extends EventEmitter implements ModelAdapterLike {
@@ -1613,7 +1618,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
    * @param textKey key to lookup the text
    * @param args texts to replace the placeholders specified by {0}, {1}, etc.
    */
-  text(textKey: string, ...args: string[]): string {
+  text(textKey: string, ...args: any[]): string {
     return this.textMap.get(textKey, ...args);
   }
 
@@ -1702,7 +1707,7 @@ export interface SessionStartupParams {
 export interface FatalMessageOptions {
   header?: string;
   body?: string;
-  severity?: number;
+  severity?: StatusSeverity;
   iconId?: string;
   entryPoint?: JQuery;
 

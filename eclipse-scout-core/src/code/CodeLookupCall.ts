@@ -10,15 +10,8 @@
  */
 import {Code, codes, LookupCallModel, LookupRow, Predicate, scout, StaticLookupCall, strings} from '../index';
 
-export interface CodeLookupCallModel extends LookupCallModel<string> {
-  /**
-   * CodeTypeId {@link CodeType.id}
-   */
-  codeType: string;
-}
-
-export default class CodeLookupCall extends StaticLookupCall<string> {
-  declare model: CodeLookupCallModel;
+export default class CodeLookupCall<TCodeId> extends StaticLookupCall<TCodeId> {
+  declare model: CodeLookupCallModel<TCodeId>;
   codeType: string;
 
   constructor() {
@@ -26,7 +19,7 @@ export default class CodeLookupCall extends StaticLookupCall<string> {
     this.codeType = null;
   }
 
-  protected override _lookupRowByKey(key: string): LookupRow<string> {
+  protected override _lookupRowByKey(key: TCodeId): LookupRow<TCodeId> {
     let codeType = codes.codeType(this.codeType, true);
     if (!codeType) {
       return null;
@@ -34,22 +27,22 @@ export default class CodeLookupCall extends StaticLookupCall<string> {
     return this._createLookupRow(codeType.optGet(key));
   }
 
-  protected override _lookupRowsByAll(): LookupRow<string>[] {
+  protected override _lookupRowsByAll(): LookupRow<TCodeId>[] {
     return this._collectLookupRows();
   }
 
-  protected override _lookupRowsByText(text: string): LookupRow<string>[] {
+  protected override _lookupRowsByText(text: string): LookupRow<TCodeId>[] {
     return this._collectLookupRows(lookupRow => {
       let lookupRowText = lookupRow.text || '';
       return strings.startsWith(lookupRowText.toLowerCase(), text.toLowerCase());
     });
   }
 
-  protected override _lookupRowsByRec(rec: string): LookupRow<string>[] {
+  protected override _lookupRowsByRec(rec: TCodeId): LookupRow<TCodeId>[] {
     return this._collectLookupRows(lookupRow => lookupRow.parentKey === rec);
   }
 
-  protected _collectLookupRows(predicate?: Predicate<LookupRow<string>>): LookupRow<string>[] {
+  protected _collectLookupRows(predicate?: Predicate<LookupRow<TCodeId>>): LookupRow<TCodeId>[] {
     let codeType = codes.codeType(this.codeType, true);
     if (!codeType) {
       return [];
@@ -64,7 +57,7 @@ export default class CodeLookupCall extends StaticLookupCall<string> {
     return lookupRows;
   }
 
-  protected _createLookupRow(code: Code): LookupRow<string> {
+  protected _createLookupRow(code: Code<TCodeId>): LookupRow<TCodeId> {
     if (!code) {
       return null;
     }
@@ -72,6 +65,13 @@ export default class CodeLookupCall extends StaticLookupCall<string> {
       key: code.id,
       text: code.text(this.session.locale),
       parentKey: code.parent && code.parent.id
-    }) as LookupRow<string>;
+    }) as LookupRow<TCodeId>;
   }
+}
+
+export interface CodeLookupCallModel<TCodeId> extends LookupCallModel<TCodeId> {
+  /**
+   * CodeTypeId {@link CodeType.id}
+   */
+  codeType: string;
 }

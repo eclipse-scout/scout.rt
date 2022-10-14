@@ -11,7 +11,7 @@
 import {Column, PopupModel, TableHeader} from '../index';
 
 export default interface TableHeaderMenuModel extends PopupModel {
-  column: Column;
+  column: Column<any>;
   tableHeader: TableHeader;
   compact?: boolean;
 }

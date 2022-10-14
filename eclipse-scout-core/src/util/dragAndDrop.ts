@@ -17,7 +17,7 @@ const SCOUT_TYPES = {
   IMAGE_TRANSFER: 1 << 3 // IDNDSupport.TYPE_IMAGE_TRANSFER (NOSONAR)
 } as const;
 
-export type DragAndDropType = EnumObject<typeof SCOUT_TYPES>;
+export type DropType = EnumObject<typeof SCOUT_TYPES>;
 
 const DEFAULT_DROP_MAXIMUM_SIZE = 50 * 1024 * 1024; // 50 MB
 
@@ -26,7 +26,7 @@ const DEFAULT_DROP_MAXIMUM_SIZE = 50 * 1024 * 1024; // 50 MB
  *
  * @param scoutTypesArray array of SCOUT_TYPES
  */
-export function scoutTypeToDragTypeMapping(scoutTypesArray: DragAndDropType | DragAndDropType[]): Array<string> {
+export function scoutTypeToDragTypeMapping(scoutTypesArray: DropType | DropType[]): Array<string> {
   scoutTypesArray = arrays.ensure(scoutTypesArray);
   let ret = [];
   if (scoutTypesArray.indexOf(SCOUT_TYPES.FILE_TRANSFER) >= 0) {
@@ -42,7 +42,7 @@ export function scoutTypeToDragTypeMapping(scoutTypesArray: DragAndDropType | Dr
  * @param fieldAllowedTypes allowed types on field (integer, bitwise comparison used)
  * @param scoutTypeArray e.g. FILE_TRANSFER
  */
-export function verifyDataTransferTypesScoutTypes(event: JQuery.DragEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>, scoutTypeArray: DragAndDropType | DragAndDropType[], fieldAllowedTypes: number) {
+export function verifyDataTransferTypesScoutTypes(event: JQuery.DragEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>, scoutTypeArray: DropType | DropType[], fieldAllowedTypes: number) {
   scoutTypeArray = arrays.ensure(scoutTypeArray);
   let dragTypeArray = [];
 
@@ -87,7 +87,7 @@ export function verifyDataTransferTypes(event: JQuery.DragEventBase<HTMLElement,
  * @param dataTransfer dataTransfer object (not dataTransfer.types)
  * @param scoutTypesArray e.g. FILE_TRANSFER
  */
-export function dataTransferTypesContainsScoutTypes(dataTransfer: DataTransfer, scoutTypesArray: DragAndDropType | DragAndDropType[]): boolean {
+export function dataTransferTypesContainsScoutTypes(dataTransfer: DataTransfer, scoutTypesArray: DropType | DropType[]): boolean {
   scoutTypesArray = arrays.ensure(scoutTypesArray);
   let dragTypesArray = scoutTypeToDragTypeMapping(scoutTypesArray);
   return dataTransferTypesContains(dataTransfer, dragTypesArray);
@@ -255,7 +255,7 @@ export interface DragAndDropOptions {
   /**
    * The scout type which will be allowed to drop into the target. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
    */
-  supportedScoutTypes?: DragAndDropType | DragAndDropType[];
+  supportedScoutTypes?: DropType | DropType[];
 
   /**
    * Allowed mime types.
@@ -270,7 +270,7 @@ export interface DragAndDropOptions {
   /**
    * Returns the allowed drop type during a drop event. Default is {@link dragAndDrop.SCOUT_TYPES.FILE_TRANSFER}
    */
-  dropType?: () => DragAndDropType;
+  dropType?: () => DropType;
 
   /**
    * Returns the maximum allowed size of a dropped object. Default is {@link Widget.dropMaximumSize}

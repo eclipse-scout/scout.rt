@@ -325,7 +325,7 @@ export default class Status {
    *
    * @returns Status constructor
    */
-  static classForName(className: 'Status' | 'DefaultStatus' | 'ParsingFailedStatus' | 'ValidationFailedStatus'): new(model: StatusModel) => Status {
+  static classForName(className: StatusType): new(model?: StatusModel) => Status {
     return {
       Status: Status,
       DefaultStatus: DefaultStatus,
@@ -334,3 +334,5 @@ export default class Status {
     }[className];
   }
 }
+
+export type StatusType = 'Status' | 'DefaultStatus' | 'ParsingFailedStatus' | 'ValidationFailedStatus';

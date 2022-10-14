@@ -8,19 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, focusUtils, FormField, objects, ParsingFailedStatus, scout, Status, strings, ValidationFailedStatus} from '../../index';
+import {AbstractLayout, arrays, EnumObject, focusUtils, FormField, objects, ParsingFailedStatus, scout, Status, strings, ValidationFailedStatus, ValueFieldEventMap, ValueFieldModel} from '../../index';
 import $ from 'jquery';
+import {StatusSeverity, StatusType} from '../../status/Status';
 
-/**
- * @abstract
- */
-export default class ValueField extends FormField {
+export default abstract class ValueField<TValue> extends FormField implements ValueFieldModel<TValue> {
+  declare model: ValueFieldModel<TValue>;
+  declare eventMap: ValueFieldEventMap<TValue>;
+
+  clearable: ValueFieldClearable;
+  formatter: ValueFieldFormatter<TValue>;
+  hasText: boolean;
+  initialValue: TValue;
+  invalidValueMessageKey: string;
+  parser: ValueFieldParser<TValue>;
+  value: TValue;
+  validators: ValueFieldValidator<TValue>[];
+  protected _updateDisplayTextPending: boolean;
 
   constructor() {
     super();
 
     this.defaultMenuTypes = [...this.defaultMenuTypes, ValueField.MenuTypes.NotNull, ValueField.MenuTypes.Null];
-
     this.clearable = ValueField.Clearable.FOCUSED;
     this.displayText = null;
     this.formatter = this._formatValue.bind(this);
@@ -32,7 +41,6 @@ export default class ValueField extends FormField {
     this.validators = [];
     this.validators.push(this._validateValue.bind(this));
     this._updateDisplayTextPending = false;
-
     this.$clearIcon = null;
 
     this._addCloneProperties(['value', 'displayText', 'clearable']);
@@ -51,20 +59,20 @@ export default class ValueField extends FormField {
      * Never show the clear icon.
      */
     NEVER: 'never'
-  };
+  } as const;
 
   static MenuTypes = {
     Null: 'ValueField.Null',
     NotNull: 'ValueField.NotNull'
-  };
+  } as const;
 
-  _init(model) {
+  protected override _init(model: ValueFieldModel<TValue>) {
     super._init(model);
-    if (this.validator) {
+    if (model.validator) {
       // Validators are kept in a list, allow a single validator to be set in the model, similar to parser and formatter.
       // setValidator will add the new validator to this.validators and remove the other ones.
-      this.setValidator(this.validator);
-      delete this.validator;
+      this.setValidator(model.validator);
+      delete model.validator;
     }
     this._initValue(this.value);
   }
@@ -72,21 +80,21 @@ export default class ValueField extends FormField {
   /**
    * Override this method if you need to influence the value initialization (e.g. do something before the value is initially set)
    */
-  _initValue(value) {
+  protected _initValue(value: TValue) {
     // Delete value first, value may be invalid and must not be set
     this.value = null;
     this._setValue(value);
     this._updateEmpty();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderDisplayText();
     this._renderClearable();
     this._renderHasText();
   }
 
-  _remove() {
+  protected override _remove() {
     super._remove();
     this.$clearIcon = null;
   }
@@ -94,24 +102,24 @@ export default class ValueField extends FormField {
   /**
    * The default impl. is a NOP, because not every ValueField has a sensible display text.
    */
-  _renderDisplayText() {
+  protected _renderDisplayText() {
     this._updateHasText();
   }
 
   /**
    * The default impl. returns an empty string, because not every ValueField has a sensible display text.
    */
-  _readDisplayText() {
+  protected _readDisplayText(): string {
     return '';
   }
 
-  _onClearIconMouseDown(event) {
+  protected _onClearIconMouseDown(event: JQuery.MouseDownEvent) {
     this.clear();
     event.preventDefault();
   }
 
-  _onFieldBlur() {
-    super._onFieldBlur();
+  protected override _onFieldBlur(event: JQuery.BlurEvent) {
+    super._onFieldBlur(event);
     this.acceptInput(false);
   }
 
@@ -124,9 +132,8 @@ export default class ValueField extends FormField {
    * <p>
    * The default reads the display text using this._readDisplayText() and writes it to the model by calling _triggerAcceptInput().
    * If subclasses don't have a display-text or want to write another state to the server, they may override this method.
-   * @return {$.Promise}
    */
-  acceptInput(whileTyping) {
+  acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
     whileTyping = !!whileTyping; // cast to boolean
     let displayText = scout.nvl(this._readDisplayText(), '');
 
@@ -144,13 +151,12 @@ export default class ValueField extends FormField {
     }
   }
 
-  parseAndSetValue(displayText) {
+  parseAndSetValue(displayText: string) {
     this.removeErrorStatus(ParsingFailedStatus);
     try {
-      let event = new Event({
+      let event = this.trigger('parse', {
         displayText: displayText
       });
-      this.trigger('parse', event);
       if (!event.defaultPrevented) {
         let parsedValue = this.parseValue(displayText);
         this.setValue(parsedValue);
@@ -160,41 +166,40 @@ export default class ValueField extends FormField {
     }
   }
 
-  _parsingFailed(displayText, error) {
+  protected _parsingFailed(displayText: string, error: any) {
     $.log.isDebugEnabled() && $.log.debug('Parsing failed for field with id ' + this.id, error);
-    let event = new Event({
+    let event = this.trigger('parseError', {
       displayText: displayText,
       error: error
     });
-    this.trigger('parseError', event);
     if (!event.defaultPrevented) {
       this._addParsingFailedErrorStatus(displayText, error);
     }
   }
 
-  _addParsingFailedErrorStatus(displayText, error) {
+  protected _addParsingFailedErrorStatus(displayText: string, error: any) {
     let status = this._createParsingFailedStatus(displayText, error);
     this.addErrorStatus(status);
   }
 
-  _createParsingFailedStatus(displayText, error) {
+  protected _createParsingFailedStatus(displayText: string, error: any): Status {
     return this._createInvalidValueStatus('ParsingFailedStatus', displayText, error);
   }
 
   /**
    * Replaces the existing parser. The parser is called during {@link #parseValue(displayText)}.
-   * <p>
+   *
    * Remember calling the default parser passed as parameter to the parse function, if needed.
-   * @param {function} parser the new parser. If null, the default parser is used.
+   * @param parser the new parser. If null, the default parser is used.
    */
-  setParser(parser) {
+  setParser(parser: ValueFieldParser<TValue>) {
     this.setProperty('parser', parser);
     if (this.initialized) {
       this.parseAndSetValue(this.displayText);
     }
   }
 
-  _setParser(parser) {
+  protected _setParser(parser: ValueFieldParser<TValue>) {
     if (!parser) {
       parser = this._parseValue.bind(this);
     }
@@ -202,10 +207,10 @@ export default class ValueField extends FormField {
   }
 
   /**
-   * @returns {*} the parsed value
+   * @returns the parsed value
    * @throws a message, a Status or an error if the parsing fails
    */
-  parseValue(displayText) {
+  parseValue(displayText: string): TValue {
     let defaultParser = this._parseValue.bind(this);
     return this.parser(displayText, defaultParser);
   }
@@ -213,11 +218,11 @@ export default class ValueField extends FormField {
   /**
    * @throws a message, a Status or an error if the parsing fails
    */
-  _parseValue(displayText) {
-    return displayText;
+  protected _parseValue(displayText: string): TValue {
+    return displayText as TValue;
   }
 
-  _checkDisplayTextChanged(displayText, whileTyping) {
+  protected _checkDisplayTextChanged(displayText: string, whileTyping: boolean): boolean {
     let oldDisplayText = scout.nvl(this.displayText, '');
     return displayText !== oldDisplayText;
   }
@@ -231,25 +236,22 @@ export default class ValueField extends FormField {
    * @param target
    *        the DOM target where the mouse down event occurred.
    */
-  aboutToBlurByMouseDown(target) {
+  aboutToBlurByMouseDown(target: Element) {
     let eventOnField = this.isFocusOnField(target);
     if (!eventOnField) {
       this.acceptInput(); // event outside this value field.
     }
   }
 
-  /**
-   * @override
-   */
-  isFocused() {
+  override isFocused(): boolean {
     return this.rendered && focusUtils.isActiveElement(this.$field);
   }
 
-  isFocusOnField(target) {
+  isFocusOnField(target: Element): boolean {
     return this.$field.isOrHas(target) || (this.$clearIcon && this.$clearIcon.isOrHas(target));
   }
 
-  _triggerAcceptInput(whileTyping) {
+  protected _triggerAcceptInput(whileTyping: boolean) {
     let event = {
       displayText: this.displayText,
       whileTyping: !!whileTyping
@@ -257,30 +259,30 @@ export default class ValueField extends FormField {
     this.trigger('acceptInput', event);
   }
 
-  setDisplayText(displayText) {
+  setDisplayText(displayText: string) {
     this.setProperty('displayText', displayText);
   }
 
-  _updateHasText() {
+  protected _updateHasText() {
     this.setHasText(strings.hasText(this._readDisplayText()));
   }
 
-  setHasText(hasText) {
+  setHasText(hasText: boolean) {
     this.setProperty('hasText', hasText);
   }
 
-  _renderHasText() {
+  protected _renderHasText() {
     if (this.$field) {
       this.$field.toggleClass('has-text', this.hasText);
     }
     this.$container.toggleClass('has-text', this.hasText);
   }
 
-  setClearable(clearableStyle) {
+  setClearable(clearableStyle: ValueFieldClearable) {
     this.setProperty('clearable', clearableStyle);
   }
 
-  _renderClearable() {
+  protected _renderClearable() {
     if (this.isClearable()) {
       if (!this.$clearIcon) {
         this.addClearIcon();
@@ -295,7 +297,7 @@ export default class ValueField extends FormField {
     this._updateClearableStyles();
   }
 
-  _updateClearableStyles() {
+  protected _updateClearableStyles() {
     this.$container.removeClass('clearable-always clearable-focused');
     if (this.isClearable()) {
       if (this.clearable === ValueField.Clearable.ALWAYS) {
@@ -306,7 +308,7 @@ export default class ValueField extends FormField {
     }
   }
 
-  isClearable() {
+  isClearable(): boolean {
     return this.clearable === ValueField.Clearable.ALWAYS || this.clearable === ValueField.Clearable.FOCUSED;
   }
 
@@ -320,15 +322,15 @@ export default class ValueField extends FormField {
     this._triggerClear();
   }
 
-  _clear() {
+  protected _clear() {
     // to be implemented by sub-classes
   }
 
-  _triggerClear() {
+  protected _triggerClear() {
     this.trigger('clear');
   }
 
-  setValue(value) {
+  setValue(value: TValue) {
     // Same code as in Widget#setProperty expect for the equals check
     // -> _setValue has to be called even if the value is equal so that update display text will be executed
     value = this._prepareProperty('value', value);
@@ -351,13 +353,13 @@ export default class ValueField extends FormField {
   /**
    * Default does nothing because the value field does not know which type the concrete field uses.
    * May be overridden to cast the value to the required type.
-   * @returns {*} the value with the correct type.
+   * @returns the value with the correct type.
    */
-  _ensureValue(value) {
+  protected _ensureValue(value: TValue): TValue {
     return value;
   }
 
-  _setValue(value) {
+  protected _setValue(value: TValue) {
     // When widget is initialized with a given errorStatus and a value -> don't remove the error
     // status. This is a typical case for Scout Classic: field has a ParsingFailedError and user
     // hits reload.
@@ -388,18 +390,18 @@ export default class ValueField extends FormField {
     this.triggerPropertyChange('value', oldValue, this.value);
   }
 
-  _valueEquals(valueA, valueB) {
+  protected _valueEquals(valueA: TValue, valueB: TValue): boolean {
     return objects.equals(valueA, valueB);
   }
 
   /**
    * Is called after a value is changed. May be implemented by subclasses. The default does nothing.
    */
-  _valueChanged() {
+  protected _valueChanged() {
     // NOP
   }
 
-  _getCurrentMenuTypes() {
+  protected override _getCurrentMenuTypes(): string[] {
     if (objects.isNullOrUndefined(this.value)) {
       return [...super._getCurrentMenuTypes(), ValueField.MenuTypes.Null];
     }
@@ -414,22 +416,22 @@ export default class ValueField extends FormField {
   }
 
   /**
-   * @param {function} validator the validator to be added.
+   * @param validator the validator to be added.
    *     A validator is a function that accepts a raw value and either returns the validated value or
    *     throws an Error, a Status or an error message (string) if the value is invalid.
-   * @param {boolean} [revalidate] True, to revalidate the value, false to just add the validator and do nothing else. Default is true.
+   * @param revalidate True, to revalidate the value, false to just add the validator and do nothing else. Default is true.
    */
-  addValidator(validator, revalidate) {
+  addValidator(validator: ValueFieldValidator<TValue>, revalidate?: boolean) {
     let validators = this.validators.slice();
     validators.push(validator);
     this.setValidators(validators, revalidate);
   }
 
   /**
-   * @param {function} validator the validator to be removed
-   * @param {boolean} [revalidate] True, to revalidate the value, false to just remove the validator and do nothing else. Default is true.
+   * @param validator the validator to be removed
+   * @param revalidate True, to revalidate the value, false to just remove the validator and do nothing else. Default is true.
    */
-  removeValidator(validator, revalidate) {
+  removeValidator(validator: ValueFieldValidator<TValue>, revalidate?: boolean) {
     let validators = this.validators.slice();
     arrays.remove(validators, validator);
     this.setValidators(validators, revalidate);
@@ -440,11 +442,11 @@ export default class ValueField extends FormField {
    * <p>
    * Remember calling the default validator which is passed as parameter to the validate function, if needed.
    *
-   * @param {function} validator the new validator which replaces every other. If null, the default validator is used.
+   * @param validator the new validator which replaces every other. If null, the default validator is used.
    *     A validator is a function that accepts a raw value and either returns the validated value or
    *     throws an Error, a Status or an error message (string) if the value is invalid.
    */
-  setValidator(validator, revalidate) {
+  setValidator(validator: ValueFieldValidator<TValue>, revalidate?: boolean) {
     if (!validator) {
       validator = this._validateValue.bind(this);
     }
@@ -455,7 +457,7 @@ export default class ValueField extends FormField {
     this.setValidators(validators, revalidate);
   }
 
-  setValidators(validators, revalidate) {
+  setValidators(validators: ValueFieldValidator<TValue>[], revalidate?: boolean) {
     this.setProperty('validators', validators);
     if (this.initialized && scout.nvl(revalidate, true)) {
       this.validate();
@@ -464,10 +466,10 @@ export default class ValueField extends FormField {
 
   /**
    * @param the value to be validated
-   * @returns {*} the validated value
+   * @returns the validated value
    * @throws a message, a Status or an error if the validation fails
    */
-  validateValue(value) {
+  validateValue(value: TValue): TValue {
     let defaultValidator = this._validateValue.bind(this);
     this.validators.forEach(validator => {
       value = validator(value, defaultValidator);
@@ -477,10 +479,10 @@ export default class ValueField extends FormField {
   }
 
   /**
-   * @returns {*} the validated value
+   * @returns the validated value
    * @throws a message, a Status or an error if the validation fails
    */
-  _validateValue(value) {
+  protected _validateValue(value: TValue): TValue {
     if (typeof value === 'string' && value === '') {
       // Convert empty string to null.
       // Not using strings.nullIfEmpty is by purpose because it also removes white space characters which may not be desired here
@@ -489,28 +491,24 @@ export default class ValueField extends FormField {
     return value;
   }
 
-  _validationFailed(value, error) {
+  protected _validationFailed(value: TValue, error: any) {
     $.log.isDebugEnabled() && $.log.debug('Validation failed for field with id ' + this.id, error);
     let status = this._createValidationFailedStatus(value, error);
     this.addErrorStatus(status);
     this._updateDisplayText(value);
   }
 
-  _createValidationFailedStatus(value, error) {
+  protected _createValidationFailedStatus(value: TValue, error: any): Status {
     return this._createInvalidValueStatus('ValidationFailedStatus', value, error);
   }
 
-  /**
-   * @param {string} statusType
-   * @returns {Status}
-   */
-  _createInvalidValueStatus(statusType, value, error) {
+  protected _createInvalidValueStatus(statusType: StatusType, value: any, error: any): Status {
     let statusFunc = Status.classForName(statusType);
     // type of status is correct
     if (error instanceof statusFunc) {
       return error;
     }
-    let message, severity = Status.Severity.ERROR;
+    let message, severity: StatusSeverity = Status.Severity.ERROR;
     if (error instanceof Status) {
       // its a Status, but it has the wrong specific type
       message = error.message;
@@ -528,7 +526,7 @@ export default class ValueField extends FormField {
     });
   }
 
-  _updateDisplayText(value) {
+  protected _updateDisplayText(value?: TValue) {
     if (!this.initialized && !objects.isNullOrUndefined(this.displayText)) {
       // If a displayText is provided initially, use that text instead of using formatValue to generate a text based on the value
       return;
@@ -560,16 +558,16 @@ export default class ValueField extends FormField {
    * Replaces the existing formatter. The formatter is called during {@link #formatValue(value)}.
    * <p>
    * Remember calling the default formatter which is passed as parameter to the format function, if needed.
-   * @param {function} formatter the new formatter. If null, the default formatter is used.
+   * @param formatter the new formatter. If null, the default formatter is used.
    */
-  setFormatter(formatter) {
+  setFormatter(formatter: ValueFieldFormatter<TValue>) {
     this.setProperty('formatter', formatter);
     if (this.initialized) {
       this.validate();
     }
   }
 
-  _setFormatter(formatter) {
+  protected _setFormatter(formatter: ValueFieldFormatter<TValue>) {
     if (!formatter) {
       formatter = this._formatValue.bind(this);
     }
@@ -577,25 +575,23 @@ export default class ValueField extends FormField {
   }
 
   /**
-   * @returns {string|Promise} the formatted display text
+   * @returns the formatted display text
    */
-  formatValue(value) {
+  formatValue(value: TValue): string | JQuery.Promise<string> {
     let defaultFormatter = this._formatValue.bind(this);
     return this.formatter(value, defaultFormatter);
   }
 
-  /**
-   * @returns {string|Promise} the formatted string or a promise
-   */
-  _formatValue(value) {
+  protected _formatValue(value: TValue): string | JQuery.Promise<string> {
+    // @ts-ignore
     return scout.nvl(value, '') + '';
   }
 
-  _updateTouched() {
+  protected _updateTouched() {
     this.touched = !this._valueEquals(this.value, this.initialValue);
   }
 
-  addClearIcon($parent) {
+  addClearIcon($parent?: JQuery) {
     if (!$parent) {
       $parent = this.$container;
     }
@@ -603,25 +599,22 @@ export default class ValueField extends FormField {
       .on('mousedown', this._onClearIconMouseDown.bind(this));
   }
 
-  addContainer($parent, cssClass, layout) {
+  override addContainer($parent: JQuery, cssClass?: string, layout?: AbstractLayout) {
     super.addContainer($parent, cssClass, layout);
     this.$container.addClass('value-field');
   }
 
-  addField($field) {
+  override addField($field: JQuery) {
     super.addField($field);
     this.$field.data('valuefield', this);
   }
 
-  markAsSaved() {
+  override markAsSaved() {
     super.markAsSaved();
     this.initialValue = this.value;
   }
 
-  /**
-   * @override
-   */
-  _updateEmpty() {
+  protected override _updateEmpty() {
     this.empty = this.value === null || this.value === undefined;
   }
 
@@ -631,7 +624,7 @@ export default class ValueField extends FormField {
    * Invokes 'ValueField.aboutToBlurByMouseDown' on the currently active value field.
    * This method has no effect if another element is the focus owner.
    */
-  static invokeValueFieldAboutToBlurByMouseDown(target) {
+  static invokeValueFieldAboutToBlurByMouseDown(target: Element) {
     let activeValueField = this._getActiveValueField(target);
     if (activeValueField) {
       activeValueField.aboutToBlurByMouseDown(target);
@@ -642,7 +635,7 @@ export default class ValueField extends FormField {
    * Invokes 'ValueField.acceptInput' on the currently active value field.
    * This method has no effect if another element is the focus owner.
    */
-  static invokeValueFieldAcceptInput(target) {
+  static invokeValueFieldAcceptInput(target: Element) {
     let activeValueField = this._getActiveValueField(target);
     if (activeValueField) {
       activeValueField.acceptInput();
@@ -654,7 +647,7 @@ export default class ValueField extends FormField {
    * Also, if no value field currently owns the focus, its parent is checked to be a value field and is returned accordingly.
    * That is used in DateField.js with multiple input elements.
    */
-  static _getActiveValueField(target) {
+  protected static _getActiveValueField(target: Element): ValueField<any> {
     let $activeElement = $(target).activeElement(),
       activeWidget = scout.widget($activeElement);
     if (activeWidget instanceof ValueField && activeWidget.enabledComputed) {
@@ -663,3 +656,9 @@ export default class ValueField extends FormField {
     return null;
   }
 }
+
+export type ValueFieldClearable = EnumObject<typeof ValueField.Clearable>;
+export type ValueFieldMenuTypes = EnumObject<typeof ValueField.MenuTypes>;
+export type ValueFieldValidator<TValue> = (value: TValue, defaultValidator: ValueFieldValidator<TValue>) => TValue;
+export type ValueFieldFormatter<TValue> = (value: TValue, defaultFormatter: ValueFieldFormatter<TValue>) => string | JQuery.Promise<string>;
+export type ValueFieldParser<TValue> = (displayText: string, defaultParser: ValueFieldParser<TValue>) => TValue;

@@ -11,18 +11,14 @@
 import {Cell, Column, strings, TableRow} from '../../index';
 import $ from 'jquery';
 
-export default class BeanColumn extends Column {
-
-  constructor() {
-    super();
-  }
+export default class BeanColumn<TBean> extends Column<TBean> {
 
   override buildCellForRow(row: TableRow): string {
     let cell = this.cell(row);
     let cssClass = this._cellCssClass(cell);
     let style = this._cellStyle(cell);
     let $cell = $(super._buildCell(cell, '', style, cssClass));
-    let value = this.table.cellValue(this, row);
+    let value = this.table.cellValue(this, row) as TBean;
 
     if (cell.errorStatus) {
       row.hasError = true;
@@ -33,7 +29,7 @@ export default class BeanColumn extends Column {
   }
 
   /**
-   * Override to render the value.<p>
+   * Override to render the value.
    * If you have a large table you should consider overriding buildCellForRow instead and create the html as string instead of using jquery.
    */
   protected _renderValue($cell: JQuery, value: any) {
@@ -41,7 +37,7 @@ export default class BeanColumn extends Column {
   }
 
   protected _plainTextForRow(row: TableRow): string {
-    let cell = this.table.cell(this, row) as Cell & { plainText?: string };
+    let cell = this.table.cell(this, row) as Cell<TBean> & { plainText?: string };
     if (!cell.plainText) {
       // Convert to plain text and cache it because rendering is expensive
       let html = this.buildCellForRow(row);
@@ -54,7 +50,7 @@ export default class BeanColumn extends Column {
    * Default approach reads the html using buildCellForRow and uses _preprocessTextForGrouping to generate the value. Just using text() does not work because new lines get omitted.
    * If this approach does not work for a specific bean column, just override this method.
    */
-  override cellValueOrTextForCalculation(row: TableRow): any {
+  override cellValueOrTextForCalculation(row: TableRow): string {
     let plainText = this._plainTextForRow(row);
     return this._preprocessTextForCalculation(plainText);
   }

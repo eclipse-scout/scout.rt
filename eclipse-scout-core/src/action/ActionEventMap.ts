@@ -11,11 +11,12 @@
 import {Action, Event, PropertyChangeEvent, WidgetEventMap} from '../index';
 import {ActionStyle, ActionTextPosition} from './Action';
 import {TooltipPosition} from '../tooltip/Tooltip';
+import {Alignment} from '../cell/Cell';
 
 export default interface ActionEventMap extends WidgetEventMap {
   'action': Event<Action>;
   'propertyChange:actionStyle': PropertyChangeEvent<ActionStyle>;
-  'propertyChange:horizontalAlignment': PropertyChangeEvent<-1 | 0 | 1>;
+  'propertyChange:horizontalAlignment': PropertyChangeEvent<Alignment>;
   'propertyChange:htmlEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:iconId': PropertyChangeEvent<string>;
   'propertyChange:keyStroke': PropertyChangeEvent<string>;

@@ -13,7 +13,7 @@ import $ from 'jquery';
 import {AggregateTableRow} from '../Table';
 
 export default class ColumnOptimalWidthMeasurer {
-  column: Column;
+  column: Column<any>;
   table: Table;
   deferred: JQuery.Deferred<number>;
   imageCount: number;
@@ -22,7 +22,7 @@ export default class ColumnOptimalWidthMeasurer {
   protected _imageLoadOrErrorHandler: (Event) => void;
   protected _columnCellContents: Record<string, boolean>;
 
-  constructor(column: Column) {
+  constructor(column: Column<any>) {
     this.column = column;
     this.table = null;
     this.$measurement = null;

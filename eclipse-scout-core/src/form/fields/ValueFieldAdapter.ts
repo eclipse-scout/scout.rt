@@ -1,22 +1,21 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '../../index';
+import {Event, FormFieldAdapter, ValueField} from '../../index';
+import {AdapterData} from '../../session/Session';
+import {ValueFieldAcceptInputEvent} from './ValueFieldEventMap';
 
 export default class ValueFieldAdapter extends FormFieldAdapter {
+  declare widget: ValueField<any>;
 
-  constructor() {
-    super();
-  }
-
-  _onWidgetAcceptInput(event) {
+  protected _onWidgetAcceptInput(event: ValueFieldAcceptInputEvent) {
     this._send('acceptInput', {
       displayText: event.displayText,
       whileTyping: event.whileTyping
@@ -28,24 +27,21 @@ export default class ValueFieldAdapter extends FormFieldAdapter {
     });
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<ValueField<any>>) {
     if (event.type === 'acceptInput') {
-      this._onWidgetAcceptInput(event);
+      this._onWidgetAcceptInput(event as ValueFieldAcceptInputEvent);
     } else {
       super._onWidgetEvent(event);
     }
   }
 
-  /**
-   * @override ModelAdapter.js
-   */
-  exportAdapterData(adapterData) {
+  override exportAdapterData(adapterData: AdapterData): AdapterData {
     adapterData = super.exportAdapterData(adapterData);
     delete adapterData.displayText;
     return adapterData;
   }
 
-  _syncDisplayText(displayText) {
+  protected _syncDisplayText(displayText: string) {
     this.widget.setDisplayText(displayText);
     this.widget.parseAndSetValue(displayText);
   }

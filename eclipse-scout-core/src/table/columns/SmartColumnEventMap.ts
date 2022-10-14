@@ -10,18 +10,18 @@
  */
 import {ColumnEventMap, Event, LookupCall, LookupResult, PropertyChangeEvent, SmartColumn, TableRow} from '../../index';
 
-export interface SmartColumnCallDoneEvent<S extends SmartColumn = SmartColumn> extends Event<S> {
-  result: LookupResult<any>;
+export interface SmartColumnCallDoneEvent<TValue = any, S extends SmartColumn<TValue> = SmartColumn<TValue>> extends Event<S> {
+  result: LookupResult<TValue>;
 }
 
-export interface SmartColumnPrepareLookupCallEvent<S extends SmartColumn = SmartColumn> extends Event<S> {
-  lookupCall: LookupCall<any>;
+export interface SmartColumnPrepareLookupCallEvent<TValue = any, S extends SmartColumn<TValue> = SmartColumn<TValue>> extends Event<S> {
+  lookupCall: LookupCall<TValue>;
   row?: TableRow;
 }
 
-export default interface SmartColumnEventMap extends ColumnEventMap {
-  'lookupCallDone': SmartColumnCallDoneEvent;
-  'prepareLookupCall': SmartColumnPrepareLookupCallEvent;
+export default interface SmartColumnEventMap<TValue> extends ColumnEventMap {
+  'lookupCallDone': SmartColumnCallDoneEvent<TValue>;
+  'prepareLookupCall': SmartColumnPrepareLookupCallEvent<TValue>;
   'propertyChange:activeFilterEnabled': PropertyChangeEvent<boolean>;
   'propertyChange:browseAutoExpandAll': PropertyChangeEvent<boolean>;
   'propertyChange:browseHierarchy': PropertyChangeEvent<boolean>;

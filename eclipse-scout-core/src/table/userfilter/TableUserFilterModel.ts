@@ -16,6 +16,6 @@ export default interface TableUserFilterModel {
   table?: Table;
   session?: Session;
   objectType?: ObjectType<Filter<TableRow>>;
-  column?: string | Column;
+  column?: string | Column<any>;
   filterType?: string;
 }

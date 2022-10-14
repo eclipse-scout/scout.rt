@@ -116,7 +116,7 @@ export default class TileTableHeaderBox extends GroupBox implements TileTableHea
       .find(rowKey => rowKey.column === key.column && rowKey.asc === key.asc);
   }
 
-  protected _createGroupByLookupCall(): LookupCall<Column> {
+  protected _createGroupByLookupCall(): LookupCall<Column<any>> {
     return scout.create(TileTableHeaderGroupByLookupCall, {
       session: this.session,
       table: this.table
@@ -137,11 +137,11 @@ export default class TileTableHeaderBox extends GroupBox implements TileTableHea
     if (event.propertyName === 'value') {
       this.isGrouping = true;
       if (event.newValue !== null) {
-        let column = event.newValue as Column;
+        let column = event.newValue as Column<any>;
         let direction: 'asc' | 'desc' = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
         this.table.groupColumn(column, false, direction, false);
       } else {
-        let column = event.oldValue as Column;
+        let column = event.oldValue as Column<any>;
         this.table.groupColumn(column, false, null, true);
       }
       this.isGrouping = false;

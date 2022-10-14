@@ -12,7 +12,7 @@ import {Status, StatusModel} from '../index';
 
 export default class ParsingFailedStatus extends Status {
 
-  constructor(model: StatusModel) {
+  constructor(model?: StatusModel) {
     super(model);
   }
 

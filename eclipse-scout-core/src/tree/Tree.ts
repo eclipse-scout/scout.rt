@@ -22,6 +22,7 @@ import Filter from '../widget/Filter';
 import TreeEventMap from './TreeEventMap';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
+import {DropType} from '../util/dragAndDrop';
 
 export default class Tree extends Widget implements TreeModel {
   declare model: TreeModel;
@@ -33,7 +34,7 @@ export default class Tree extends Widget implements TreeModel {
   checkable: boolean;
   checkableStyle: TreeCheckableStyle;
   displayStyle: TreeDisplayStyle;
-  dropType: number;
+  dropType: DropType;
   dropMaximumSize: number;
   lazyExpandingEnabled: boolean;
   menus: Menu[];
@@ -1194,7 +1195,7 @@ export default class Tree extends Widget implements TreeModel {
     }
   }
 
-  setDropType(dropType: number) {
+  setDropType(dropType: DropType) {
     this.setProperty('dropType', dropType);
   }
 

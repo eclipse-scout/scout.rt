@@ -10,7 +10,7 @@
  */
 import {WidgetModel} from '../index';
 import {ActionStyle, ActionTextPosition, KeyStrokeFirePolicy} from './Action';
-import {HorizontalAlignment} from '../cell/Cell';
+import {Alignment} from '../cell/Cell';
 
 export default interface ActionModel extends WidgetModel {
   /**
@@ -25,7 +25,7 @@ export default interface ActionModel extends WidgetModel {
   /**
    * Default is -1 (left)
    */
-  horizontalAlignment?: HorizontalAlignment;
+  horizontalAlignment?: Alignment;
   keyStroke?: string;
   /**
    * Default is {@link Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY}.

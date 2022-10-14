@@ -8,10 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HtmlComponent, LookupCall, objects, Status, strings, ValueField} from '../../index';
+import {AbstractLayout, arrays, HtmlComponent, LookupBoxEventMap, LookupBoxModel, LookupCall, LookupResult, LookupRow, objects, PropertyChangeEvent, Status, strings, ValueField, Widget} from '../../index';
 import $ from 'jquery';
+import LookupCallModel from '../../lookup/LookupCallModel';
+import {ObjectType} from '../../ObjectFactory';
 
-export default class LookupBox extends ValueField {
+export default abstract class LookupBox<TValue> extends ValueField<TValue[]> implements LookupBoxModel<TValue> {
+  declare model: LookupBoxModel<TValue>;
+  declare eventMap: LookupBoxEventMap<TValue>;
+
+  filterBox: Widget;
+  lookupCall: LookupCall<TValue>;
+  lookupStatus: Status;
+
+  protected _currentLookupCall: LookupCall<TValue>;
+  protected _lookupExecuted: boolean;
+  /** true when value is either syncing to table or table to value */
+  protected _valueSyncing: boolean;
 
   constructor() {
     super();
@@ -20,13 +33,10 @@ export default class LookupBox extends ValueField {
     this.gridDataHints.h = 2;
     this.value = [];
     this.clearable = ValueField.Clearable.NEVER;
-
     this.lookupCall = null;
-    this._pendingLookup = null;
     this._currentLookupCall = null;
-    this._pendingLookup = null;
     this._lookupExecuted = false;
-    this._valueSyncing = false; // true when value is either syncing to table or table to value
+    this._valueSyncing = false;
 
     this._addCloneProperties(['lookupCall']);
   }
@@ -35,7 +45,7 @@ export default class LookupBox extends ValueField {
     NO_DATA: 1
   };
 
-  _init(model) {
+  protected override _init(model: LookupBoxModel<TValue>) {
     super._init(model);
     if (this.filterBox) {
       this.filterBox.enabledComputed = true; // filter is always enabled
@@ -44,7 +54,7 @@ export default class LookupBox extends ValueField {
     }
   }
 
-  _initValue(value) {
+  protected override _initValue(value: TValue[]) {
     if (this.lookupCall) {
       this._setLookupCall(this.lookupCall);
     }
@@ -52,7 +62,9 @@ export default class LookupBox extends ValueField {
     super._initValue(value);
   }
 
-  _render() {
+  protected abstract _initStructure(value: TValue[]);
+
+  protected _render() {
     this.addContainer(this.$parent, 'lookup-box');
     this.addLabel();
     this.addMandatoryIndicator();
@@ -71,47 +83,42 @@ export default class LookupBox extends ValueField {
     this.$container.css('--inactive-lookup-row-suffix-text', `'${this.session.text('InactiveState')}'`);
   }
 
-  _renderFilterBox() {
+  protected abstract _createFieldContainerLayout(): AbstractLayout;
+
+  protected abstract _renderStructure();
+
+  protected _renderFilterBox() {
     if (!this.filterBox || !this.filterBox.visible) {
       return;
     }
     this.filterBox.render(this.$fieldContainer);
   }
 
-  _ensureValue(value) {
+  protected override _ensureValue(value: TValue | TValue[]): TValue[] {
     return arrays.ensure(value);
   }
 
-  _updateEmpty() {
+  protected override _updateEmpty() {
     this.empty = arrays.empty(this.value);
   }
 
-  _lookupByAll() {
+  protected _lookupByAll(): JQuery.Promise<LookupResult<TValue>> {
     if (!this.lookupCall) {
       return;
     }
-    this._clearPendingLookup();
 
-    let deferred = $.Deferred();
-    let doneHandler = function(result) {
-      this._lookupByAllDone(result);
-      deferred.resolve(result);
-    }.bind(this);
+    let deferred = $.Deferred<LookupResult<TValue>>();
 
     this._executeLookup(this.lookupCall.cloneForAll(), true)
-      .done(doneHandler);
+      .done(result => {
+        this._lookupByAllDone(result);
+        deferred.resolve(result);
+      });
 
     return deferred.promise();
   }
 
-  _clearPendingLookup() {
-    if (this._pendingLookup) {
-      clearTimeout(this._pendingLookup);
-      this._pendingLookup = null;
-    }
-  }
-
-  _executeLookup(lookupCall, abortExisting) {
+  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting: boolean): JQuery.Promise<LookupResult<TValue>> {
     this.setLoading(true);
 
     if (abortExisting && this._currentLookupCall) {
@@ -132,7 +139,7 @@ export default class LookupBox extends ValueField {
       });
   }
 
-  _lookupByAllDone(result) {
+  protected _lookupByAllDone(result: LookupResult<TValue>): boolean {
     try {
       if (result.exception) {
         // Oops! Something went wrong while the lookup has been processed.
@@ -159,31 +166,31 @@ export default class LookupBox extends ValueField {
     }
   }
 
-  _errorStatus() {
+  protected override _errorStatus(): Status {
     return this.lookupStatus || this.errorStatus;
   }
 
-  setLookupStatus(lookupStatus) {
+  setLookupStatus(lookupStatus: Status) {
     this.setProperty('lookupStatus', lookupStatus);
     if (this.rendered) {
       this._renderErrorStatus();
     }
   }
 
-  clearErrorStatus() {
+  override clearErrorStatus() {
     this.setErrorStatus(null);
     this._clearLookupStatus();
   }
 
-  _clearLookupStatus() {
+  protected _clearLookupStatus() {
     this.setLookupStatus(null);
   }
 
-  setLookupCall(lookupCall) {
+  setLookupCall(lookupCall: LookupCall<TValue> | LookupCallModel<TValue> & { objectType: ObjectType<LookupCall<TValue>> } | string) {
     this.setProperty('lookupCall', lookupCall);
   }
 
-  _setLookupCall(lookupCall) {
+  protected _setLookupCall(lookupCall: LookupCall<TValue> | LookupCallModel<TValue> & { objectType: ObjectType<LookupCall<TValue>> } | string) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
     this._lookupExecuted = false;
     if (this.rendered) {
@@ -197,9 +204,9 @@ export default class LookupBox extends ValueField {
   }
 
   /**
-   * @return {boolean} true if a lookup call execution has been scheduled now. false otherwise.
+   * @returns true if a lookup call execution has been scheduled now. false otherwise.
    */
-  _ensureLookupCallExecuted() {
+  protected _ensureLookupCallExecuted(): boolean {
     if (this._lookupExecuted) {
       return false;
     }
@@ -207,7 +214,7 @@ export default class LookupBox extends ValueField {
     return true;
   }
 
-  _formatValue(value) {
+  protected override _formatValue(value: TValue[]): string | JQuery.Promise<string> {
     if (objects.isNullOrUndefined(value)) {
       return '';
     }
@@ -215,28 +222,28 @@ export default class LookupBox extends ValueField {
     return this._formatLookupRows(this.getCheckedLookupRows());
   }
 
-  _formatLookupRows(lookupRows) {
+  abstract getCheckedLookupRows(): LookupRow<TValue>[];
+
+  protected _formatLookupRows(lookupRows: LookupRow<TValue>[]): string {
     lookupRows = arrays.ensure(lookupRows);
     if (lookupRows.length === 0) {
       return '';
     }
 
-    let formatted = [];
-    lookupRows.forEach(row => {
-      formatted.push(row.text);
-    });
-    return strings.join(', ', formatted);
+    let formatted: string[] = [];
+    lookupRows.forEach(row => formatted.push(row.text));
+    return strings.join(', ', ...formatted);
   }
 
-  _readDisplayText() {
+  protected override _readDisplayText() {
     return this.displayText;
   }
 
-  _clear() {
+  protected override _clear() {
     this.setValue(null);
   }
 
-  _onFilterBoxPropertyChange(event) {
+  protected _onFilterBoxPropertyChange(event: PropertyChangeEvent<any, Widget>) {
     if (event.propertyName === 'visible') {
       if (!this.rendered) {
         return;

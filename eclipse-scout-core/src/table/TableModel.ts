@@ -14,7 +14,7 @@ import {
 } from '../index';
 import {TableCheckableStyle, TableGroupingStyle, TableHierarchicalStyle} from './Table';
 import {RefModel} from '../types';
-import {DragAndDropType} from '../util/dragAndDrop';
+import {DropType} from '../util/dragAndDrop';
 
 export default interface TableModel extends WidgetModel {
   /**
@@ -24,7 +24,7 @@ export default interface TableModel extends WidgetModel {
    */
   autoResizeColumns?: boolean;
   columnAddable?: boolean;
-  columns?: Column[] | RefModel<ColumnModel>[];
+  columns?: Column<any>[] | RefModel<ColumnModel<any>>[];
   /**
    * Configures whether the table is checkable. Default is false.
    */
@@ -38,7 +38,7 @@ export default interface TableModel extends WidgetModel {
   /**
    * Configures the drop support of this table. One of {@link dragAndDrop.SCOUT_TYPES}. Default is none.
    */
-  dropType?: DragAndDropType;
+  dropType?: DropType;
   /**
    * Configures the maximum size for a drop request (in bytes).
    * Default is {@link dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE}.
