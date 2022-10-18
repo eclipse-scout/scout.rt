@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -99,10 +99,15 @@ export default class TableControl extends Action {
   /**
    * Renders the content if not already rendered.<br>
    * Opens the container if the container is not already open.<br>
-   * Does nothing if the content is not available yet to -> don't open container if content is not rendered yet to prevent blank container or laggy opening.
+   * Does nothing if the content is not available yet to -> don't open container if content is not rendered yet to prevent blank container or laggy opening.<br>
+   * Does nothing if the control is not selected.
    */
   renderContent() {
     if (!this.contentRendered && !this.isContentAvailable()) {
+      return;
+    }
+
+    if (!this.selected) {
       return;
     }
 
