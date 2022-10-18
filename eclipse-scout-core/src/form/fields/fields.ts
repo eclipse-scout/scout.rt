@@ -15,7 +15,7 @@ import {FormFieldStatusPosition} from './FormField';
  * @param $parent used to determine which HTML document is used to create the new HTML element
  * @returns an INPUT element as used in Scout forms.
  */
-export function makeTextField($parent: JQuery, cssClass: string): JQuery<HTMLInputElement> {
+export function makeTextField($parent: JQuery, cssClass?: string): JQuery<HTMLInputElement> {
   return $parent.makeElement('<input>', cssClass)
     .attr('type', 'text')
     .attr('autocomplete', 'NoAutocomplete') /* off and false are currently ignored in Chrome */
