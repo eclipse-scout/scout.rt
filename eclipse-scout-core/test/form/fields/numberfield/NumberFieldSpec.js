@@ -10,6 +10,7 @@
  */
 import {FormSpecHelper, LocaleSpecHelper} from '../../../../src/testing/index';
 import {DecimalFormat, NumberField, scout, Status} from '../../../../src/index';
+import {triggerClick} from '../../../../src/testing/jquery-testing';
 
 describe('NumberField', () => {
   let session;
@@ -564,7 +565,7 @@ describe('NumberField', () => {
         label: 'label'
       });
       field.render();
-      field.$label.triggerClick();
+      triggerClick(field.$label);
       expect(field.$field).toBeFocused();
     });
 

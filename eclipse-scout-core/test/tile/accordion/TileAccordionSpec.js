@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Group, scout, Tile, TileAccordion, TileGridLayoutConfig} from '../../../src/index';
+import {triggerClick, triggerDoubleClick} from '../../../src/testing/jquery-testing';
 
 describe('TileAccordion', () => {
   let session;
@@ -300,7 +301,7 @@ describe('TileAccordion', () => {
       expect(tile0.selected).toBe(false);
       expect(clickEventCount).toBe(0);
 
-      tile0.$container.triggerClick();
+      triggerClick(tile0.$container);
       expect(tile0.selected).toBe(false);
       expect(clickEventCount).toBe(1);
     });
@@ -334,7 +335,7 @@ describe('TileAccordion', () => {
       expect(selectEventCount).toBe(0);
       expect(clickEventCount).toBe(0);
 
-      tile0.$container.triggerClick();
+      triggerClick(tile0.$container);
       expect(tile0.selected).toBe(true);
       expect(selectEventCount).toBe(1);
       expect(clickEventCount).toBe(1);
@@ -380,7 +381,7 @@ describe('TileAccordion', () => {
       expect(clickEventCount).toBe(0);
       expect(actionEventCount).toBe(0);
 
-      tile0.$container.triggerDoubleClick();
+      triggerDoubleClick(tile0.$container);
       expect(tile0.selected).toBe(true);
       expect(selectEventCount).toBe(1);
       expect(clickEventCount).toBe(1);
@@ -430,7 +431,7 @@ describe('TileAccordion', () => {
       expect(group0.rendered).toBe(true);
 
       // First accordion must not delegate anymore but second has to
-      tile0.$container.triggerClick();
+      triggerClick(tile0.$container);
       expect(clickEventCount).toBe(0);
       expect(clickEventCount2).toBe(1);
     });

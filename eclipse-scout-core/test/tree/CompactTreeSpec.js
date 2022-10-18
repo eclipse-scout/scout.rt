@@ -10,6 +10,7 @@
  */
 import {Range} from '../../src/index';
 import {TreeSpecHelper} from '../../src/testing/index';
+import {triggerMouseDown} from '../../src/testing/jquery-testing';
 
 describe('Compacttree', () => {
   let session;
@@ -121,7 +122,7 @@ describe('Compacttree', () => {
       spyOn(tree, 'selectNodes');
       tree.render();
 
-      tree.nodes[0].childNodes[0].$node.triggerMouseDown();
+      triggerMouseDown(tree.nodes[0].childNodes[0].$node);
       expect(tree.selectNodes).toHaveBeenCalled();
     });
   });

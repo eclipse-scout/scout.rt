@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Action, keys, scout} from '../../src/index';
+import {triggerKeyInputCapture} from '../../src/testing/jquery-testing';
 
 describe('Action', () => {
   let $sandbox, session;
@@ -62,7 +63,7 @@ describe('Action', () => {
       });
 
       expect(executed).toBe(0);
-      session.desktop.$container.triggerKeyInputCapture(keys.X, 'ctrl');
+      triggerKeyInputCapture(session.desktop.$container, keys.X, 'ctrl');
       expect(executed).toBe(1);
     });
 
@@ -91,7 +92,7 @@ describe('Action', () => {
 
       expect(actionExecuted).toBe(0);
       expect(action2Executed).toBe(0);
-      session.desktop.$container.triggerKeyInputCapture(keys.X, 'ctrl');
+      triggerKeyInputCapture(session.desktop.$container, keys.X, 'ctrl');
       expect(actionExecuted).toBe(1);
       expect(action2Executed).toBe(0);
     });

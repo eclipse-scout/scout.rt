@@ -10,6 +10,7 @@
  */
 import {MessageBox, ObjectFactory, objects, OutlineOverview, scout, Status, TileOutlineOverview, Tree} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from '../../../src/testing/index';
+import {triggerMouseDown} from '../../../src/testing/jquery-testing';
 
 describe('Outline', () => {
   let helper, menuHelper, formHelper, session;
@@ -461,7 +462,7 @@ describe('Outline', () => {
         spyOn(outline, 'selectNodes');
         spyOn(tree, 'selectNodes');
 
-        tree.nodes[0].$node.triggerMouseDown();
+        triggerMouseDown(tree.nodes[0].$node);
 
         // Outline must not react to clicks on tree nodes of the detail content tree
         expect(outline.selectNodes).not.toHaveBeenCalled();

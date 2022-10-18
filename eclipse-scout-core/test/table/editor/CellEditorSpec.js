@@ -10,6 +10,7 @@
  */
 import {Cell, keys, scout, StaticLookupCall, Status, StringField, TableRow, Widget} from '../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../src/testing/index';
+import {triggerClick, triggerKeyInputCapture, triggerMouseDown, triggerMouseUp} from '../../../src/testing/jquery-testing';
 
 describe('CellEditor', () => {
   let session;
@@ -94,9 +95,9 @@ describe('CellEditor', () => {
       table.rows[1].cells[0].editable = false;
 
       spyOn(table, 'prepareCellEdit');
-      $cell1_0.triggerClick();
+      triggerClick($cell1_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
-      $cell0_0.triggerClick();
+      triggerClick($cell0_0);
       expect(table.prepareCellEdit).toHaveBeenCalled();
     });
 
@@ -104,7 +105,7 @@ describe('CellEditor', () => {
       table.rows[0].cells[0].editable = false;
 
       spyOn(table, 'prepareCellEdit');
-      $cell0_0.triggerClick();
+      triggerClick($cell0_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -113,7 +114,7 @@ describe('CellEditor', () => {
       table.rows[0].enabled = false;
 
       spyOn(table, 'prepareCellEdit');
-      $cell0_0.triggerClick();
+      triggerClick($cell0_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -123,7 +124,7 @@ describe('CellEditor', () => {
       table.recomputeEnabled();
 
       spyOn(table, 'prepareCellEdit');
-      $cell0_0.triggerClick();
+      triggerClick($cell0_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -132,7 +133,7 @@ describe('CellEditor', () => {
       table.enabledComputed = false;
 
       spyOn(table, 'prepareCellEdit');
-      $cell0_0.triggerClick();
+      triggerClick($cell0_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -141,8 +142,8 @@ describe('CellEditor', () => {
       table.rows[0].cells[1].editable = true;
 
       spyOn(table, 'prepareCellEdit');
-      $cell0_1.triggerMouseDown();
-      $cell0_0.triggerMouseUp();
+      triggerMouseDown($cell0_1);
+      triggerMouseUp($cell0_0);
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -150,8 +151,8 @@ describe('CellEditor', () => {
       table.rows[0].cells[0].editable = true;
 
       spyOn(table, 'prepareCellEdit');
-      $cell0_0.triggerMouseDown({which: 3});
-      $cell0_0.triggerMouseUp({which: 3});
+      triggerMouseDown($cell0_0, {which: 3});
+      triggerMouseUp($cell0_0, {which: 3});
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -159,8 +160,8 @@ describe('CellEditor', () => {
       table.rows[0].cells[0].editable = true;
 
       spyOn(table, 'prepareCellEdit');
-      $cell0_0.triggerMouseDown({which: 2});
-      $cell0_0.triggerMouseUp({which: 2});
+      triggerMouseDown($cell0_0, {which: 2});
+      triggerMouseUp($cell0_0, {which: 2});
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
@@ -171,10 +172,10 @@ describe('CellEditor', () => {
       spyOn(table, 'prepareCellEdit');
       // row 0 is selected, user presses shift and clicks row 2
       table.selectRows([table.rows[0]]);
-      $cell1_0.triggerClick({modifier: 'shift'});
+      triggerClick($cell1_0, {modifier: 'shift'});
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
 
-      $cell1_0.triggerClick({modifier: 'ctrl'});
+      triggerClick($cell1_0, {modifier: 'ctrl'});
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
   });
@@ -198,7 +199,7 @@ describe('CellEditor', () => {
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
 
-      $(document.activeElement).triggerKeyInputCapture(keys.TAB);
+      triggerKeyInputCapture($(document.activeElement), keys.TAB);
       jasmine.clock().tick(0);
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[1]);
@@ -215,7 +216,7 @@ describe('CellEditor', () => {
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
 
-      $(document.activeElement).triggerKeyInputCapture(keys.TAB);
+      triggerKeyInputCapture($(document.activeElement), keys.TAB);
       jasmine.clock().tick(0);
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[2], table.rows[1]);

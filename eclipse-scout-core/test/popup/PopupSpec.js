@@ -10,6 +10,7 @@
  */
 // eslint-disable-next-line max-classes-per-file
 import {Dimension, HtmlComponent, Popup, scout, StringField, Widget, WidgetPopup} from '../../src/index';
+import {triggerMouseDownCapture} from '../../src/testing/jquery-testing';
 
 describe('Popup', () => {
   let session, $desktop;
@@ -100,11 +101,11 @@ describe('Popup', () => {
         modal: true
       });
       popup.open();
-      $desktop.triggerMouseDownCapture();
+      triggerMouseDownCapture($desktop);
       expect(popup.destroyed).toBe(false);
 
       popup.setModal(false);
-      $desktop.triggerMouseDownCapture();
+      triggerMouseDownCapture($desktop);
       expect(popup.destroyed).toBe(true);
     });
 

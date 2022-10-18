@@ -10,6 +10,7 @@
  */
 import {BooleanColumn, Cell, scout} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
+import {triggerImageLoadCapture} from '../../../src/testing/jquery-testing';
 
 describe('Column', () => {
   let session;
@@ -492,7 +493,7 @@ describe('Column', () => {
       expect(table._resizeToFit.calls.count()).toBe(0);
 
       // Simulate imaeg load event
-      table.columns[1].optimalWidthMeasurer.$measurement.find('img').triggerImageLoadCapture();
+      triggerImageLoadCapture(table.columns[1].optimalWidthMeasurer.$measurement.find('img'));
       // Image has been loaded and the promise is resolved -> _resizeToFit will be called
       expect(table.resizeToFit.calls.count()).toBe(1);
       expect(table._resizeToFit.calls.count()).toBe(1);
