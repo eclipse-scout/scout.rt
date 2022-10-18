@@ -8,9 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField} from '../../../index';
+import {FormField, Tree, TreeFieldEventMap, TreeFieldModel, Widget} from '../../../index';
 
-export default class TreeField extends FormField {
+export default class TreeField extends FormField implements TreeFieldModel {
+  declare model: TreeFieldModel;
+  declare eventMap: TreeFieldEventMap;
+
+  tree: Tree;
 
   constructor() {
     super();
@@ -20,7 +24,7 @@ export default class TreeField extends FormField {
     this._addWidgetProperties(['tree']);
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'tree-field');
     this.addLabel();
     this.addMandatoryIndicator();
@@ -30,18 +34,18 @@ export default class TreeField extends FormField {
     }
   }
 
-  setTree(tree) {
+  setTree(tree: Tree) {
     this.setProperty('tree', tree);
   }
 
-  _setTree(tree) {
+  protected _setTree(tree: Tree) {
     this._setProperty('tree', tree);
     if (tree) {
       tree.setScrollTop(this.scrollTop);
     }
   }
 
-  _renderTree() {
+  protected _renderTree() {
     if (!this.tree) {
       return;
     }
@@ -51,7 +55,7 @@ export default class TreeField extends FormField {
     this.invalidateLayoutTree();
   }
 
-  _removeTree() {
+  protected _removeTree() {
     if (!this.tree) {
       return;
     }
@@ -60,10 +64,7 @@ export default class TreeField extends FormField {
     this.invalidateLayoutTree();
   }
 
-  /**
-   * @override
-   */
-  getDelegateScrollable() {
+  override getDelegateScrollable(): Widget {
     return this.tree;
   }
 }
