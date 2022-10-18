@@ -1,35 +1,33 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CompositeFieldAdapter, GridData, ResponsiveManager} from '../../../index';
+import {CompositeFieldAdapter, FormField, GridData, GroupBox, ObjectWithType, ResponsiveManager, Widget} from '../../../index';
+import WidgetModel from '../../../widget/WidgetModel';
 
 export default class GroupBoxAdapter extends CompositeFieldAdapter {
+  declare widget: GroupBox;
 
   constructor() {
     super();
     this._addRemoteProperties(['expanded']);
   }
 
-  /**
-   * @override
-   */
-  _initModel(model, parent) {
-    model = super._initModel(model, parent);
+  protected override _initModel(m: Omit<WidgetModel, 'parent'> & ObjectWithType, parent: Widget): WidgetModel & ObjectWithType {
+    let model = super._initModel(m, parent);
     // Set logical grid to null -> Calculation happens on server side
     model.logicalGrid = null;
-
     return model;
   }
 
   // Replace method on responsive handler.
-  _postCreateWidget() {
+  protected override _postCreateWidget() {
     super._postCreateWidget();
 
     if (this.widget.responsiveHandler) {
@@ -39,15 +37,12 @@ export default class GroupBoxAdapter extends CompositeFieldAdapter {
     }
   }
 
-  destroy() {
-    super.destroy();
-  }
-
-  _getGridData(field) {
+  protected _getGridData(field: FormField) {
     return new GridData(field.gridData);
   }
 
-  _setGridData(field, gridData) {
+  protected _setGridData(field: FormField, gridData: GridData) {
+    // @ts-ignore
     field._setGridData(gridData);
   }
 }

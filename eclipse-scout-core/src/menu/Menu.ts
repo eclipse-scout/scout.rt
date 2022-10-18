@@ -724,11 +724,11 @@ export default class Menu extends Action implements MenuModel {
     this.childActions.forEach(child => child.setMenuFilter(menuFilter));
   }
 
-  override clone(model: MenuModel, options: CloneOptions): Menu {
+  override clone(model: MenuModel, options: CloneOptions): this {
     let clone = super.clone(model, options) as Menu;
     this._deepCloneProperties(clone, 'childActions', options);
     clone._setChildActions(clone.childActions);
-    return clone;
+    return clone as this;
   }
 
   override focus(): boolean {

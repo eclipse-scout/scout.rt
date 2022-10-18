@@ -346,7 +346,7 @@ export default class Scrollbar extends Widget {
    * EVENT HANDLING
    */
 
-  protected override _onScroll(event: JQuery.ScrollEvent<HTMLDivElement>) {
+  protected override _onScroll(event: JQuery.ScrollEvent) {
     this.update();
   }
 

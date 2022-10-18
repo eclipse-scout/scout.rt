@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, Column, EventHandler, FormField, GroupBox, LookupCall, LookupRow, PlaceholderField, PropertyChangeEvent, scout, SmartField, Table, TileTableHeaderBoxModel, TileTableHeaderGroupByLookupCall, TileTableHeaderSortByLookupCall,
-  ValueField
+  arrays, Column, EventHandler, FormField, GroupBox, LogicalGridLayoutConfig, LookupCall, LookupRow, PlaceholderField, PropertyChangeEvent, scout, SmartField, Table, TileTableHeaderBoxModel, TileTableHeaderGroupByLookupCall,
+  TileTableHeaderSortByLookupCall, ValueField
 } from '../index';
 import {TileTableHeaderSortKey} from './TileTableHeaderSortByLookupCall';
 import StaticLookupCall from '../lookup/StaticLookupCall';
@@ -36,9 +36,9 @@ export default class TileTableHeaderBox extends GroupBox implements TileTableHea
     this.labelVisible = false;
     this.statusVisible = false;
     this.gridColumnCount = 7;
-    this.bodyLayoutConfig = {
+    this.bodyLayoutConfig = LogicalGridLayoutConfig.ensure({
       hgap: 8
-    };
+    });
 
     this.groupByField = null;
     this.sortByField = null;

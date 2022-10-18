@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, GridData, KeyStroke, KeyStrokeModel, Menu, MenuModel, StatusMenuMapping, StatusMenuMappingModel, WidgetModel} from '../../index';
+import {Action, ActionModel, FormField, GridData, Menu, MenuModel, StatusMenuMapping, StatusMenuMappingModel, WidgetModel} from '../../index';
 import {DropType} from '../../util/dragAndDrop';
 import {TooltipSupportOptions} from '../../tooltip/TooltipSupport';
 import {FormFieldLabelPosition, FormFieldMode, FormFieldStatusPosition, FormFieldStyle, FormFieldSuppressStatus, FormFieldTooltipAnchor} from './FormField';
@@ -22,7 +22,7 @@ export default interface FormFieldModel extends WidgetModel {
   fieldStyle?: FormFieldStyle;
   gridDataHints?: GridData;
   mode?: FormFieldMode;
-  keyStrokes?: KeyStroke[] | KeyStrokeModel[];
+  keyStrokes?: Action[] | RefModel<ActionModel>[];
   displayText?: string;
   label?: string;
   labelVisible?: boolean;

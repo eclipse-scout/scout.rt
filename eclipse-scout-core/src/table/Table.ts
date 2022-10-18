@@ -10,8 +10,8 @@
  */
 import {
   Action, AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, ContextMenuKeyStroke, ContextMenuPopup, Desktop, Device, DoubleClickSupport, dragAndDrop,
-  DragAndDropHandler, EnumObject, Event, EventHandler, Filter, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStroke, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus,
-  NumberColumn, objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
+  DragAndDropHandler, EnumObject, Event, EventHandler, Filter, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn,
+  objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
   TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
   TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip,
   TableTooltipModel, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, UpdateFilteredElementsOptions, ValueField, Widget
@@ -59,7 +59,7 @@ export default class Table extends Widget implements TableModel {
   hasReloadHandler: boolean;
   hierarchical: boolean;
   hierarchicalStyle: TableHierarchicalStyle;
-  keyStrokes: KeyStroke[];
+  keyStrokes: Action[];
   menus: Menu[];
   menuBar: MenuBar;
   menuBarVisible: boolean;
@@ -861,7 +861,7 @@ export default class Table extends Widget implements TableModel {
     }
   }
 
-  protected override _onScroll() {
+  protected override _onScroll(event: JQuery.ScrollEvent) {
     let scrollTop = this.$data[0].scrollTop;
     let scrollLeft = this.$data[0].scrollLeft;
     if (this.scrollTop !== scrollTop) {
@@ -4603,7 +4603,7 @@ export default class Table extends Widget implements TableModel {
 
   }
 
-  protected _setKeyStrokes(keyStrokes: KeyStroke | KeyStroke[] | Action | Action[]) {
+  protected _setKeyStrokes(keyStrokes: Action[]) {
     this.updateKeyStrokes(keyStrokes, this.keyStrokes);
     this._setProperty('keyStrokes', keyStrokes);
   }

@@ -663,6 +663,8 @@ export {default as FileChooserFieldAdapter} from './form/fields/filechooserfield
 export {default as FileChooserFieldBrowseKeyStroke} from './form/fields/filechooserfield/FileChooserFieldBrowseKeyStroke';
 export {default as FileChooserFieldDeleteKeyStroke} from './form/fields/filechooserfield/FileChooserFieldDeleteKeyStroke';
 export {default as GroupBox} from './form/fields/groupbox/GroupBox';
+export {default as GroupBoxModel} from './form/fields/groupbox/GroupBoxModel';
+export {default as GroupBoxEventMap} from './form/fields/groupbox/GroupBoxEventMap';
 export {default as GroupBoxGridConfig} from './form/fields/groupbox/GroupBoxGridConfig';
 export {default as GroupBoxAdapter} from './form/fields/groupbox/GroupBoxAdapter';
 export {default as GroupBoxLayout} from './form/fields/groupbox/GroupBoxLayout';

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Column, ColumnModel, Filter, KeyStroke, KeyStrokeModel, Menu, MenuModel, Status, TableCompactHandler, TableControl, TableControlModel, TableRow, TableRowModel, TableSelectionHandler, TableTileGridMediator, TableUserFilterModel, Tile,
+  Action, ActionModel, Column, ColumnModel, Filter, Menu, MenuModel, Status, TableCompactHandler, TableControl, TableControlModel, TableRow, TableRowModel, TableSelectionHandler, TableTileGridMediator, TableUserFilterModel, Tile,
   WidgetModel
 } from '../index';
 import {TableCheckableStyle, TableGroupingStyle, TableHierarchicalStyle} from './Table';
@@ -62,7 +62,7 @@ export default interface TableModel extends WidgetModel {
   headerMenusEnabled?: boolean;
   hierarchical?: boolean;
   hierarchicalStyle?: TableHierarchicalStyle;
-  keyStrokes?: KeyStroke[] | KeyStrokeModel[];
+  keyStrokes?: Action[] | RefModel<ActionModel>[];
   menus?: Menu[] | RefModel<MenuModel>[];
   menuBarVisible?: boolean;
   /**

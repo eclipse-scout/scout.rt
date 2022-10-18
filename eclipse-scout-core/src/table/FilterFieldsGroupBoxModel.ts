@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilter, WidgetModel} from '../index';
+import {ColumnUserFilter, GroupBoxModel} from '../index';
 
-export default interface FilterFieldsGroupBoxModel extends WidgetModel { // FIXME TS: add correct super interface as soon as GroupBoxModel has been created
+export default interface FilterFieldsGroupBoxModel extends GroupBoxModel {
   filter: ColumnUserFilter;
 }

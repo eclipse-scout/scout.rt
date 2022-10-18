@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LogicalGridLayout} from '../../index';
 
-export interface LogicalGridLayoutConfigOptions {
+export interface LogicalGridLayoutConfigModel {
   /**
    * The horizontal gap in pixels to use between two logical grid columns.
    */
@@ -42,18 +42,18 @@ export interface LogicalGridLayoutConfigOptions {
  * The configured hints only have an effect if theirs value is >=0.
  * Otherwise, the default values specified by CSS are applied (see {@link LogicalGridLayout._initDefaults}).
  */
-export default class LogicalGridLayoutConfig implements LogicalGridLayoutConfigOptions {
+export default class LogicalGridLayoutConfig implements LogicalGridLayoutConfigModel {
   hgap: number;
   vgap: number;
   columnWidth: number;
   rowHeight: number;
   minWidth: number;
 
-  constructor(options?: LogicalGridLayoutConfigOptions) {
+  constructor(options?: LogicalGridLayoutConfigModel) {
     this._extend(options);
   }
 
-  protected _extend(options?: LogicalGridLayoutConfigOptions) {
+  protected _extend(options?: LogicalGridLayoutConfigModel) {
     // -1 means use the UI defaults
     options = options || {};
     if (options.hgap > -1) {
@@ -96,7 +96,7 @@ export default class LogicalGridLayoutConfig implements LogicalGridLayoutConfigO
     }
   }
 
-  static ensure(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigOptions): LogicalGridLayoutConfig {
+  static ensure(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel): LogicalGridLayoutConfig {
     if (!layoutConfig) {
       return null;
     }
