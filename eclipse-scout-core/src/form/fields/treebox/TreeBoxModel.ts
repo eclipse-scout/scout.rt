@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupBoxLayout, Tree, TreeBox, Widget} from '../../../index';
+import {LookupBoxModel, Tree, TreeModel} from '../../../index';
+import {RefModel} from '../../../types';
 
-export default class TreeBoxLayout extends LookupBoxLayout {
-
-  constructor(treeBox: TreeBox<any>, tree: Tree, filterBox: Widget) {
-    super(treeBox, tree, filterBox);
-  }
+export default interface TreeBoxModel<TValue> extends LookupBoxModel<TValue> {
+  tree?: Tree | RefModel<TreeModel>;
 }

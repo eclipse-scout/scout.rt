@@ -15,5 +15,4 @@ export default class TreeBoxAdapter extends ValueFieldAdapter {
   constructor() {
     super();
   }
-
 }
