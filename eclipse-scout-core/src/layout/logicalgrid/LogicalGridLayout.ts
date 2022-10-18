@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,7 +11,7 @@
 import {AbstractLayout, Dimension, EventHandler, HtmlComponent, HtmlEnvironment, Insets, LayoutConstants, LogicalGridData, LogicalGridLayoutConfig, LogicalGridLayoutInfo, Rectangle, Widget} from '../../index';
 import $ from 'jquery';
 import {HtmlCompPrefSizeOptions} from '../HtmlComponent';
-import {LogicalGridLayoutConfigOptions} from './LogicalGridLayoutConfig';
+import {LogicalGridLayoutConfigModel} from './LogicalGridLayoutConfig';
 
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayout.
@@ -32,7 +32,7 @@ export default class LogicalGridLayout extends AbstractLayout {
   rowHeight: number;
   minWidth: number;
 
-  constructor(widget: Widget, layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigOptions) {
+  constructor(widget: Widget, layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
     super();
     this.cssClass = 'logical-grid-layout';
     this.validityBasedOnContainerSize = new Dimension();
@@ -41,7 +41,7 @@ export default class LogicalGridLayout extends AbstractLayout {
     this.info = null;
 
     this._initDefaults();
-    this.layoutConfig = LogicalGridLayoutConfig.ensure(layoutConfig || {} as LogicalGridLayoutConfigOptions);
+    this.layoutConfig = LogicalGridLayoutConfig.ensure(layoutConfig || {} as LogicalGridLayoutConfigModel);
     this.layoutConfig.applyToLayout(this);
 
     this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);

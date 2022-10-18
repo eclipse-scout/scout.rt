@@ -10,7 +10,7 @@
  */
 import {Filter, FilterSupport, Menu, TextFilter, Tile, TileGridLayoutConfig, TileGridSelectionHandler, VirtualScrolling, WidgetModel} from '../index';
 import {Comparator, RefModel} from '../types';
-import {LogicalGridLayoutConfigOptions} from '../layout/logicalgrid/LogicalGridLayoutConfig';
+import {LogicalGridLayoutConfigModel} from '../layout/logicalgrid/LogicalGridLayoutConfig';
 import TileModel from './TileModel';
 
 export default interface TileGridModel extends WidgetModel {
@@ -43,7 +43,7 @@ export default interface TileGridModel extends WidgetModel {
    * By default, an empty {@link TileGridLayoutConfig} is used which means the values are read by CSS.
    * @see TileGridLayout._initDefaults
    */
-  layoutConfig?: TileGridLayoutConfig | LogicalGridLayoutConfigOptions;
+  layoutConfig?: TileGridLayoutConfig | LogicalGridLayoutConfigModel;
   menus?: Menu[];
   /**
    * Specifies whether multiple tiles can be selected at once. Default is true.

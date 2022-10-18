@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Button, ButtonAdapterMenuModel, ButtonModel, Event, EventHandler, Menu, MenuBar, MenuModel, PropertyChangeEvent} from '../index';
+import {Action, Button, ButtonAdapterMenuModel, ButtonModel, Event, EventHandler, Menu, MenuBar, PropertyChangeEvent} from '../index';
 import {ActionStyle, ActionTextPosition} from '../action/Action';
 import {ButtonDisplayStyle} from '../form/fields/button/Button';
 import {FormFieldLabelPosition} from '../form/fields/FormField';
@@ -106,7 +106,8 @@ export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenu
     return this.session.focusManager.requestFocus(this.getFocusableElement());
   }
 
-  static adaptButtonProperties(buttonProperties: Partial<ButtonModel>, menuProperties?: Partial<MenuModel>): Partial<MenuModel> {
+  static adaptButtonProperties(buttonProperties: Partial<ButtonModel>, menuProperties?: ButtonAdapterMenuModel): ButtonAdapterMenuModel {
+    // @ts-ignore
     menuProperties = menuProperties || {};
 
     // Plain properties: simply copy, no translation required

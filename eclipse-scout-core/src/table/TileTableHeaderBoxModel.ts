@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Table, WidgetModel} from '../index';
+import {GroupBoxModel, Table} from '../index';
 
-export default interface TileTableHeaderBoxModel extends WidgetModel { // FIXME TS: use GroupBoxModel as soon as groupbox has been migrated
+export default interface TileTableHeaderBoxModel extends GroupBoxModel {
   parent: Table;
 }

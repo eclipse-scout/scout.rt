@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {KeyStroke, Menu, TreeNode, TreeNodeModel, WidgetModel} from '../index';
+import {Action, ActionModel, Menu, TreeNode, TreeNodeModel, WidgetModel} from '../index';
 import {FilterOrFunction} from '../widget/FilterSupport';
 import {TreeCheckableStyle, TreeDisplayStyle} from './Tree';
-import KeyStrokeModel from '../keystroke/KeyStrokeModel';
 import {RefModel} from '../types';
 
 export default interface TreeModel extends WidgetModel {
@@ -46,7 +45,7 @@ export default interface TreeModel extends WidgetModel {
    */
   lazyExpandingEnabled?: boolean;
   menus?: Menu[];
-  keyStrokes?: KeyStroke[] | KeyStrokeModel[];
+  keyStrokes?: Action[] | RefModel<ActionModel>[];
   /**
    * Default is true.
    */

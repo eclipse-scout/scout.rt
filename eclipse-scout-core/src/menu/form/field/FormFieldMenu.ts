@@ -70,10 +70,10 @@ export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
     }
   }
 
-  override clone(model: FormFieldMenuModel, options: CloneOptions): FormFieldMenu {
+  override clone(model: FormFieldMenuModel, options: CloneOptions): this {
     let clone = super.clone(model, options) as FormFieldMenu;
     this._deepCloneProperties(clone, ['field'], options);
-    return clone;
+    return clone as this;
   }
 
   override isTabTarget(): boolean {

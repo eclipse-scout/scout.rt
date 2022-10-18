@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default class GroupBoxMenuItemsOrder {
+import {MenuOrder, OrderedMenuItems} from '../../../menu/MenuItemsOrder';
+import {Menu} from '../../../index';
+
+export default class GroupBoxMenuItemsOrder implements MenuOrder {
 
   /**
    * Sorts the given menus item by horizontal alignment and divides the items in two groups for each alignment.
@@ -21,17 +24,18 @@ export default class GroupBoxMenuItemsOrder {
    *
    * The buttons are always on the outer side of the group-box, the menus are on the inner side.
    */
-  order(items) { // FIXME TS: use signature from MenuItemsOrder
-    let leftButtons = [],
-      leftMenus = [],
-      rightButtons = [],
-      rightMenus = [];
+  order(items: Menu[]): OrderedMenuItems {
+    let leftButtons: Menu[] = [],
+      leftMenus: Menu[] = [],
+      rightButtons: Menu[] = [],
+      rightMenus: Menu[] = [];
 
     items.forEach(item => {
       if (item.isButton()) {
         let horizontalAlignment = item.horizontalAlignment;
         if (horizontalAlignment === undefined) {
           // Real buttons have no property 'horizontalAlignment' but a corresponding field on the gridData
+          // @ts-ignore
           horizontalAlignment = (item.gridData && item.gridData.horizontalAlignment);
         }
         if (horizontalAlignment === 1) {

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, arrays, clipboard, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, EnumObject, EventHandler, fields, FieldStatus, FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HtmlComponent, KeyStroke,
+  AbstractLayout, Action, arrays, clipboard, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, EnumObject, EventHandler, fields, FieldStatus, FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HtmlComponent,
   KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, objects, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, strings, styles, Tooltip, tooltips, TreeVisitResult, Widget
 } from '../../index';
 import $ from 'jquery';
@@ -35,7 +35,7 @@ export default abstract class FormField extends Widget implements FormFieldModel
   gridDataHints: GridData;
   mode: FormFieldMode;
   fieldStatus: FieldStatus;
-  keyStrokes: KeyStroke[];
+  keyStrokes: Action[];
   displayText: string;
   label: string;
   labelVisible: boolean;
@@ -931,7 +931,7 @@ export default abstract class FormField extends Widget implements FormFieldModel
     return [];
   }
 
-  protected _setKeyStrokes(keyStrokes: KeyStroke[]) {
+  protected _setKeyStrokes(keyStrokes: Action[]) {
     this.updateKeyStrokes(keyStrokes, this.keyStrokes);
     this._setProperty('keyStrokes', keyStrokes);
   }

@@ -9,9 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel, DesktopNavigation, DesktopNotification, Device,
-  DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStroke, KeyStrokeContext,
-  Menu, MessageBox, MessageBoxController, objects, OfflineDesktopNotification, OpenUriHandler, Outline, Popup, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, strings, styles, Tooltip, Tree, UnsavedFormChangesForm, URL,
+  AbstractLayout, Action, arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel, DesktopNavigation, DesktopNotification, Device,
+  DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStrokeContext, Menu,
+  MessageBox, MessageBoxController, objects, OfflineDesktopNotification, OpenUriHandler, Outline, Popup, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, strings, styles, Tooltip, Tree, UnsavedFormChangesForm, URL,
   ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
@@ -47,7 +47,7 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
   addOns: Widget[];
   dialogs: Form[];
   views: Form[];
-  keyStrokes: KeyStroke[];
+  keyStrokes: Action[];
   viewButtons: ViewButton[];
   messageBoxes: MessageBox[];
   fileChoosers: FileChooser[];
@@ -760,7 +760,7 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
     this._setProperty('menus', menus);
   }
 
-  protected _setKeyStrokes(keyStrokes: KeyStroke[]) {
+  protected _setKeyStrokes(keyStrokes: Action[]) {
     this.updateKeyStrokes(keyStrokes, this.keyStrokes);
     this._setProperty('keyStrokes', keyStrokes);
   }

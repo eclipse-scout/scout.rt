@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, EnumObject, Event, EventHandler, FilterResult, FilterSupport, graphics, HtmlComponent, KeyStroke, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter,
+  Action, arrays, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, EnumObject, Event, EventHandler, FilterResult, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter,
   Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, objects, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeLayout,
   TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
 } from '../index';
@@ -40,7 +40,7 @@ export default class Tree extends Widget implements TreeModel {
   menus: Menu[];
   contextMenu: ContextMenuPopup;
   menuBar: MenuBar;
-  keyStrokes: KeyStroke[];
+  keyStrokes: Action[];
   multiCheck: boolean;
   nodes: TreeNode[];
   /** all nodes by id */
@@ -307,7 +307,7 @@ export default class Tree extends Widget implements TreeModel {
     }
   }
 
-  protected _setKeyStrokes(keyStrokes: KeyStroke[]) {
+  protected _setKeyStrokes(keyStrokes: Action[]) {
     this.updateKeyStrokes(keyStrokes, this.keyStrokes);
     this._setProperty('keyStrokes', keyStrokes);
   }
@@ -468,7 +468,7 @@ export default class Tree extends Widget implements TreeModel {
     return this.checkableStyle === Tree.CheckableStyle.CHECKBOX_TREE_NODE;
   }
 
-  protected override _onScroll() {
+  protected override _onScroll(event: JQuery.ScrollEvent) {
     let scrollToSelectionBackup = this.scrollToSelection;
     this.scrollToSelection = false;
     let scrollTop = this.$data[0].scrollTop;

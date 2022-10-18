@@ -61,14 +61,14 @@ export default class FormMenu extends Menu implements FormMenuModel {
     this._renderSelected();
   }
 
-  override clone(modelOverride: FormMenuModel, options: CloneOptions): FormMenu {
+  override clone(modelOverride: FormMenuModel, options: CloneOptions): this {
     // @ts-ignore
     modelOverride = modelOverride || {};
     // If the FormMenu is put into a context menu it will be cloned.
     // Cloning a form is not possible because it may non cloneable components (Table, TabBox, etc.) -> exclude
     // Luckily, it is not necessary to clone it since the form is never shown multiple times at once -> Just use the same instance
     modelOverride.form = this.form;
-    return super.clone(modelOverride, options) as FormMenu;
+    return super.clone(modelOverride, options) as this;
   }
 
   setForm(form: Form) {

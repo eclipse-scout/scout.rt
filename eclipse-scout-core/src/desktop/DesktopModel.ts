@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BenchColumnLayoutData, KeyStroke, KeyStrokeModel, Menu, MenuModel, Outline, OutlineModel, ViewButton, ViewButtonModel, Widget, WidgetModel} from '../index';
+import {Action, ActionModel, BenchColumnLayoutData, Menu, MenuModel, Outline, OutlineModel, ViewButton, ViewButtonModel, Widget, WidgetModel} from '../index';
 import {DesktopDisplayStyle, NativeNotificationDefaults} from './Desktop';
 import {RefModel} from '../types';
 
@@ -29,7 +29,7 @@ export default interface DesktopModel extends WidgetModel {
   benchLayoutData?: BenchColumnLayoutData;
   menus?: Menu[] | RefModel<MenuModel>[];
   addOns?: Widget[] | RefModel<WidgetModel>[];
-  keyStrokes?: KeyStroke[] | KeyStrokeModel[];
+  keyStrokes?: Action[] | RefModel<ActionModel>[];
   viewButtons?: ViewButton[] | RefModel<ViewButtonModel>[];
   outline?: Outline | RefModel<OutlineModel>;
   inBackground?: boolean;
