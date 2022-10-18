@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NumberField, objects} from '../../../index';
+import {DecimalFormat, Locale, NumberField, objects} from '../../../index';
 
 export default class IntegerField extends NumberField {
 
@@ -21,19 +21,15 @@ export default class IntegerField extends NumberField {
     this.maxValue = IntegerField.MAX_VALUE;
   }
 
-  _getDefaultFormat(locale) {
+  protected override _getDefaultFormat(locale: Locale): string | DecimalFormat {
     return '#,##0';
   }
 
-  /**
-   * @override
-   */
-  _parseValue(displayText) {
+  protected override _parseValue(displayText: string): number {
     let result = super._parseValue(displayText);
     if (objects.isNullOrUndefined(result)) {
       return null;
     }
     return this.decimalFormat.round(result, false);
   }
-
 }
