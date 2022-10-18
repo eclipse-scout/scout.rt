@@ -1,29 +1,29 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldLayout, graphics} from '../../../index';
+import {Button, Dimension, FormFieldLayout, graphics, HtmlCompPrefSizeOptions} from '../../../index';
 
 export default class ButtonLayout extends FormFieldLayout {
+  declare formField: Button;
 
   constructor(button) {
     super(button);
-    this.button = button;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     super.layout($container);
 
-    let $icon = this.button.get$Icon(),
-      $submenuIcon = this.button.$submenuIcon,
-      $label = this.button.$buttonLabel,
-      $fieldContainer = this.button.$fieldContainer;
+    let $icon = this.formField.get$Icon(),
+      $submenuIcon = this.formField.$submenuIcon,
+      $label = this.formField.$buttonLabel,
+      $fieldContainer = this.formField.$fieldContainer;
 
     // Set max width to make it possible to set text-overflow: ellipsis using CSS
     $label.css('max-width', ''); // reset required because .size() operations below might return wrong results when label contains complex HTML
@@ -40,8 +40,8 @@ export default class ButtonLayout extends FormFieldLayout {
     $label.css('max-width', labelMaxWidth);
   }
 
-  preferredLayoutSize($container, options) {
-    let $label = this.button.$buttonLabel;
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
+    let $label = this.formField.$buttonLabel;
 
     // Reset max width before calculating pref size
     let maxWidth = $label.css('max-width');

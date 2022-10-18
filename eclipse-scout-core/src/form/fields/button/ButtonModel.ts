@@ -8,9 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MenuModel} from '../../index';
-import {ButtonSystemType} from '../fields/button/Button';
+import {FormFieldModel, Widget} from '../../../index';
+import {ButtonDisplayStyle, ButtonSystemType} from './Button';
 
-export default interface FormLifecycleMenuModel extends MenuModel {
+export default interface ButtonModel extends FormFieldModel {
+  defaultButton?: boolean;
+  displayStyle?: ButtonDisplayStyle;
+  iconId?: string;
+  keyStroke?: string;
+  keyStrokeScope?: Widget | string;
+  processButton?: boolean;
+  selected?: boolean;
   systemType?: ButtonSystemType;
+  preventDoubleClick?: boolean;
+  stackable?: boolean;
+  shrinkable?: boolean;
 }

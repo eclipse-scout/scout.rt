@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, Action, DateField, Event, EventHandler, FormField, FormFieldModel, HtmlComponent, Menu, Point, Popup, PropertyChangeEvent, scout, SingleLayout, SmartField, Tooltip, TouchPopupLayout, TouchPopupModel, ValueField, Widget
+  AbstractLayout, Action, DateField, Event, EventHandler, FormField, HtmlComponent, Menu, Point, Popup, PropertyChangeEvent, scout, SingleLayout, SmartField, Tooltip, TouchPopupLayout, TouchPopupModel, ValueField, ValueFieldModel, Widget
 } from '../index';
 import RowLayout from '../layout/RowLayout';
 import {PopupAlignment} from './Popup';
@@ -81,7 +81,7 @@ export default class TouchPopup extends Popup {
     super._destroy();
   }
 
-  protected _fieldOverrides(): FormFieldModel { // FIXME TS: use SmartFieldModel | DateFieldModel as soon as migrated
+  protected _fieldOverrides(): ValueFieldModel<any> { // FIXME TS: use SmartFieldModel | DateFieldModel as soon as migrated
     return {
       parent: this,
       labelVisible: false,
