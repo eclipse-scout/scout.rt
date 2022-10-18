@@ -684,6 +684,8 @@ export {default as ModeSelectorField} from './form/fields/modeselectorfield/Mode
 export {default as ModeSelectorFieldAdapter} from './form/fields/modeselectorfield/ModeSelectorFieldAdapter';
 export {default as NumberField} from './form/fields/numberfield/NumberField';
 export {default as NumberFieldAdapter} from './form/fields/numberfield/NumberFieldAdapter';
+export {default as NumberFieldEventMap} from './form/fields/numberfield/NumberFieldEventMap';
+export {default as NumberFieldModel} from './form/fields/numberfield/NumberFieldModel';
 export {default as Calculator} from './form/fields/numberfield/Calculator';
 export {default as IntegerField} from './form/fields/integerfield/IntegerField';
 export {default as PlaceholderField} from './form/fields/placeholder/PlaceholderField';

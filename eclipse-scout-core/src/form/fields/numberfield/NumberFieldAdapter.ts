@@ -8,21 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, BasicFieldAdapter, NumberField, objects} from '../../../index';
+import {App, BasicFieldAdapter, Event, NumberField, objects} from '../../../index';
+import {ValueFieldParseErrorEvent} from '../ValueFieldEventMap';
 
 export default class NumberFieldAdapter extends BasicFieldAdapter {
   constructor() {
     super();
   }
 
-  _onWidgetParseError(event) {
+  protected _onWidgetParseError(event: ValueFieldParseErrorEvent<number, NumberField>) {
     // The parsing might fail on JS side, but it might succeed on server side -> Don't show an error status, instead let the server decide
     event.preventDefault();
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<NumberField>) {
     if (event.type === 'parseError') {
-      this._onWidgetParseError(event);
+      this._onWidgetParseError(event as ValueFieldParseErrorEvent<number, NumberField>);
     } else {
       super._onWidgetEvent(event);
     }
