@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '../../../index';
+import {FormFieldModel, Table, TableModel} from '../../../index';
+import {RefModel} from '../../../types';
 
-export default class TableFieldAdapter extends FormFieldAdapter {
-
-  constructor() {
-    super();
-  }
+export default interface TableFieldModel extends FormFieldModel {
+  table?: Table | RefModel<TableModel>;
 }

@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '../../../index';
+import {FormFieldEventMap, PropertyChangeEvent, Table} from '../../../index';
 
-export default class TableFieldAdapter extends FormFieldAdapter {
-
-  constructor() {
-    super();
-  }
+export default interface TableFieldEventMap extends FormFieldEventMap {
+  'propertyChange:table': PropertyChangeEvent<Table>;
 }

@@ -754,6 +754,8 @@ export {default as TabItemAdapter} from './form/fields/tabbox/TabItemAdapter';
 export {default as TabItemLayout} from './form/fields/tabbox/TabItemLayout';
 export {default as TableField} from './form/fields/tablefield/TableField';
 export {default as TableFieldAdapter} from './form/fields/tablefield/TableFieldAdapter';
+export {default as TableFieldEventMap} from './form/fields/tablefield/TableFieldEventMap';
+export {default as TableFieldModel} from './form/fields/tablefield/TableFieldModel';
 export {default as TagChooserPopup} from './form/fields/tagfield/TagChooserPopup';
 export {default as TagChooserPopupLayout} from './form/fields/tagfield/TagChooserPopupLayout';
 export {default as TagField} from './form/fields/tagfield/TagField';

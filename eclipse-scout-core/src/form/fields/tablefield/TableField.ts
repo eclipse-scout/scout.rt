@@ -8,9 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EventDelegator, FormField, objects, scout, TableRow} from '../../../index';
+import {arrays, Event, EventDelegator, FormField, objects, scout, Table, TableFieldEventMap, TableFieldModel, TableRow, Widget} from '../../../index';
+import {ValidationResult} from '../FormField';
+import {TableAllRowsDeletedEvent, TableRowsCheckedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent} from '../../../table/TableEventMap';
 
-export default class TableField extends FormField {
+export default class TableField extends FormField implements TableFieldModel {
+  declare model: TableFieldModel;
+  declare eventMap: TableFieldEventMap;
+
+  table: Table;
+  eventDelegator: EventDelegator;
+  protected _tableChangedHandler: (event: Event<Table>) => void;
+  protected _deletedRows: Record<string, TableRow>;
+  protected _insertedRows: Record<string, TableRow>;
+  protected _updatedRows: Record<string, TableRow>;
+  protected _checkedRows: Record<string, TableRow>;
 
   constructor() {
     super();
@@ -29,13 +41,13 @@ export default class TableField extends FormField {
 
   static TABLE_CHANGE_EVENTS = 'rowsInserted rowsDeleted allRowsDeleted rowsUpdated rowsChecked';
 
-  _init(model) {
+  protected override _init(model: TableFieldModel) {
     super._init(model);
 
     this._setTable(this.table);
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'table-field');
     this.addLabel();
     this.addMandatoryIndicator();
@@ -43,11 +55,11 @@ export default class TableField extends FormField {
     this._renderTable();
   }
 
-  setTable(table) {
+  setTable(table: Table) {
     this.setProperty('table', table);
   }
 
-  _setTable(table) {
+  protected _setTable(table: Table) {
     if (this.table) {
       this.table.off(TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);
       if (this.eventDelegator) {
@@ -67,7 +79,7 @@ export default class TableField extends FormField {
     }
   }
 
-  _renderTable() {
+  protected _renderTable() {
     if (!this.table) {
       return;
     }
@@ -77,7 +89,7 @@ export default class TableField extends FormField {
     this.invalidateLayoutTree();
   }
 
-  _removeTable() {
+  protected _removeTable() {
     if (!this.table) {
       return;
     }
@@ -86,26 +98,26 @@ export default class TableField extends FormField {
     this.invalidateLayoutTree();
   }
 
-  computeRequiresSave() {
+  override computeRequiresSave(): boolean {
     return Object.keys(this._deletedRows).length > 0 ||
       Object.keys(this._insertedRows).length > 0 ||
       Object.keys(this._updatedRows).length > 0 ||
       Object.keys(this._checkedRows).length > 0;
   }
 
-  _onTableChanged(event) {
+  protected _onTableChanged(event: Event<Table>) {
     if (scout.isOneOf(event.type, 'rowsDeleted', 'allRowsDeleted')) {
-      this._updateDeletedRows(event.rows);
+      this._updateDeletedRows((event as TableRowsDeletedEvent | TableAllRowsDeletedEvent).rows);
     } else if (event.type === 'rowsInserted') {
-      this._updateInsertedRows(event.rows);
+      this._updateInsertedRows((event as TableRowsInsertedEvent).rows);
     } else if (event.type === 'rowsUpdated') {
-      this._updateUpdatedRows(event.rows);
+      this._updateUpdatedRows((event as TableRowsUpdatedEvent).rows);
     } else if (event.type === 'rowsChecked') {
-      this._updateCheckedRows(event.rows);
+      this._updateCheckedRows((event as TableRowsCheckedEvent).rows);
     }
   }
 
-  _updateDeletedRows(rows) {
+  protected _updateDeletedRows(rows: TableRow[]) {
     rows.forEach(function(row) {
       if (row.id in this._insertedRows) {
         // If a row is contained in _insertedRows an inserted row has been deleted again.
@@ -119,13 +131,13 @@ export default class TableField extends FormField {
     }, this);
   }
 
-  _updateInsertedRows(rows) {
+  protected _updateInsertedRows(rows: TableRow[]) {
     rows.forEach(function(row) {
       this._insertedRows[row.id] = row;
     }, this);
   }
 
-  _updateUpdatedRows(rows) {
+  protected _updateUpdatedRows(rows: TableRow[]) {
     rows.forEach(function(row) {
       if (row.status === TableRow.Status.NON_CHANGED) {
         return;
@@ -138,7 +150,7 @@ export default class TableField extends FormField {
    * If a row already exists in the _checkedRows array, remove it (row was checked/unchecked again, which
    * means it is no longer changed). Add it to the array otherwise.
    */
-  _updateCheckedRows(rows) {
+  protected _updateCheckedRows(rows: TableRow[]) {
     rows.forEach(function(row) {
       if (row.id in this._checkedRows) {
         delete this._checkedRows[row.id];
@@ -148,7 +160,7 @@ export default class TableField extends FormField {
     }, this);
   }
 
-  markAsSaved() {
+  override markAsSaved() {
     super.markAsSaved();
     this._deletedRows = objects.createMap();
     this._insertedRows = objects.createMap();
@@ -157,7 +169,7 @@ export default class TableField extends FormField {
     this.table.markRowsAsNonChanged();
   }
 
-  getValidationResult() {
+  override getValidationResult(): ValidationResult {
     let desc = super.getValidationResult();
     if (desc && !desc.valid) {
       return desc;
@@ -170,6 +182,7 @@ export default class TableField extends FormField {
     let rows = arrays.ensure(this.table.rows);
     let columns = arrays.ensure(this.table.columns);
     let reveal = () => {
+      // nop
     };
     let label = this.label || '';
 
@@ -203,10 +216,7 @@ export default class TableField extends FormField {
     };
   }
 
-  /**
-   * @override
-   */
-  getDelegateScrollable() {
+  override getDelegateScrollable(): Widget {
     return this.table;
   }
 }
