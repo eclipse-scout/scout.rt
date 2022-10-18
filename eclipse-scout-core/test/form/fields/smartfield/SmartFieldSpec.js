@@ -10,6 +10,7 @@
  */
 import {fields, keys, LookupRow, QueryBy, scout, SmartField, SmartFieldMultiline, Status, strings} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
+import {triggerClick, triggerKeyDown} from '../../../../src/testing/jquery-testing';
 
 describe('SmartField', () => {
 
@@ -155,7 +156,7 @@ describe('SmartField', () => {
       field.$field.focus();
       field.setValue(1);
       jasmine.clock().tick(500);
-      field.$field.triggerClick();
+      triggerClick(field.$field);
       jasmine.clock().tick(500);
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
@@ -177,7 +178,7 @@ describe('SmartField', () => {
       field.render();
       field.setValue(1);
       jasmine.clock().tick(500);
-      field.$field.triggerClick();
+      triggerClick(field.$field);
       jasmine.clock().tick(500);
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
@@ -250,7 +251,7 @@ describe('SmartField', () => {
       field.$field.focus();
       field.setValue(1);
       jasmine.clock().tick(500);
-      field.$field.triggerClick();
+      triggerClick(field.$field);
       jasmine.clock().tick(500);
       expect(field.popup).not.toBe(null);
       expect(field.popup._field.$field.val()).toBe('Foo');
@@ -264,7 +265,7 @@ describe('SmartField', () => {
       });
       field.render();
       jasmine.clock().tick(500);
-      field.$field.triggerClick();
+      triggerClick(field.$field);
       jasmine.clock().tick(500);
       field.popup._widget.activeFilterGroup.radioButtons[1].select();
       jasmine.clock().tick(500);
@@ -279,13 +280,13 @@ describe('SmartField', () => {
       });
       field.render();
       jasmine.clock().tick(500);
-      field.$field.triggerClick();
+      triggerClick(field.$field);
       jasmine.clock().tick(500);
       field.popup._widget.activeFilterGroup.radioButtons[1].select();
       // Simulate that lookup call does not return any data (happens if user clicks 'inactive' radio button and there are no inactive rows
       field.popup._field.lookupCall.data = [];
       field.popup._field.$field.focus();
-      field.popup._field.$field.triggerKeyDown(keys.BACKSPACE);
+      triggerKeyDown(field.popup._field.$field, keys.BACKSPACE);
       field.popup._field._onFieldKeyUp({});
       jasmine.clock().tick(500);
       expect(field.popup).not.toBe(null);
@@ -300,7 +301,7 @@ describe('SmartField', () => {
       });
       field.render();
       jasmine.clock().tick(500);
-      field.$field.triggerClick();
+      triggerClick(field.$field);
       jasmine.clock().tick(500);
       expect(field._tooltip().rendered).toBe(false);
       expect(field.popup._field._tooltip().rendered).toBe(true);
@@ -320,7 +321,7 @@ describe('SmartField', () => {
       });
       field.render();
       jasmine.clock().tick(500);
-      field.$field.triggerClick();
+      triggerClick(field.$field);
       jasmine.clock().tick(500);
       expect(field.popup._field._tooltip().rendered).toBe(true);
       expect(field.popup._field._tooltip().$container.find('.glasspane').length).toBe(0);
@@ -938,7 +939,7 @@ describe('SmartField', () => {
         lookupCall: 'DummyLookupCall'
       });
       smartField.render();
-      smartField.$label.triggerClick();
+      triggerClick(smartField.$label);
       jasmine.clock().tick(500);
       expect(smartField.popup).toBeTruthy();
 
@@ -962,7 +963,7 @@ describe('SmartField', () => {
         lookupCall: 'DummyLookupCall'
       });
       smartField.render();
-      smartField.$label.triggerClick();
+      triggerClick(smartField.$label);
       jasmine.clock().tick(500);
       expect(smartField.popup).toBeTruthy();
 

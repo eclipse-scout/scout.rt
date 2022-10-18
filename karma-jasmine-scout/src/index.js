@@ -30,11 +30,7 @@ let initJasmine_scout = files => {
   files.splice(insertPos, 0,
     createPattern(require.resolve('sourcemapped-stacktrace')),
     createPattern(path.join(__dirname, 'stackTraceMapper.js')),
-    createPattern(path.join(__dirname, 'scoutMatchers.js')),
-    createPattern(path.join(__dirname, 'cloneMatchers.js')),
-    createPattern(path.join(__dirname, 'jqueryExtensions.js')),
-    createPattern(path.join(__dirname, 'JasmineScout.css')),
-    createPattern(path.join(__dirname, 'jasmineScoutHelpers.js')));
+    createPattern(path.join(__dirname, 'JasmineScout.css')));
 };
 
 initJasmine_scout.$inject = ['config.files'];

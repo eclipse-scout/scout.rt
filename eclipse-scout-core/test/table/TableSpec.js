@@ -10,6 +10,7 @@
  */
 import {BeanColumn, Column, Device, graphics, IconColumn, icons, Menu, MenuDestinations, Range, RemoteEvent, scout, scrollbars, Table, TableField, TableRow} from '../../src/index';
 import {LocaleSpecHelper, TableSpecHelper} from '../../src/testing/index';
+import {triggerClick, triggerContextMenu, triggerMouseDown, triggerMouseUp} from '../../src/testing/jquery-testing';
 
 /* global removePopups */
 describe('Table', () => {
@@ -717,14 +718,14 @@ describe('Table', () => {
       let checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(0);
 
-      table.$cell(0, table.rows[4].$row).triggerClick();
-      table.$cell(0, table.rows[1].$row).triggerClick();
+      triggerClick(table.$cell(0, table.rows[4].$row));
+      triggerClick(table.$cell(0, table.rows[1].$row));
 
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(2);
 
       // click on row1 wouldn't work because of the doubleClickSupport!
-      table.$cell(0, table.rows[4].$row).triggerClick();
+      triggerClick(table.$cell(0, table.rows[4].$row));
 
       checkedRows = findCheckedRows(rows);
       expect(checkedRows.length).toBe(1);
@@ -1618,7 +1619,7 @@ describe('Table', () => {
   describe('row click', () => {
 
     function clickRowAndAssertSelection(table, $row) {
-      $row.triggerClick();
+      triggerClick($row);
 
       let $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(1);
@@ -1653,7 +1654,7 @@ describe('Table', () => {
       table.render();
 
       let $row = table.$rows().first();
-      $row.triggerClick();
+      triggerClick($row);
 
       sendQueuedAjaxCalls();
 
@@ -1693,7 +1694,7 @@ describe('Table', () => {
       table.render();
 
       let $checkbox = table.$rows().first().find('.check-box').first();
-      $checkbox.triggerClick();
+      triggerClick($checkbox);
 
       sendQueuedAjaxCalls();
 
@@ -1719,7 +1720,7 @@ describe('Table', () => {
         menu = helper.menuHelper.createMenu(menuModel);
       table.menus = [menu];
       let $row0 = table.$data.children('.table-row').eq(0);
-      $row0.triggerContextMenu();
+      triggerContextMenu($row0);
 
       sendQueuedAjaxCalls();
 
@@ -1740,7 +1741,7 @@ describe('Table', () => {
 
       table.menus = [menu1, menu2];
       let $row0 = table.$data.children('.table-row').eq(0);
-      $row0.triggerContextMenu();
+      triggerContextMenu($row0);
 
       sendQueuedAjaxCalls();
 
@@ -1765,7 +1766,7 @@ describe('Table', () => {
 
       table.menus = [menu1, menu2];
       let $row0 = table.$data.children('.table-row').eq(0);
-      $row0.triggerContextMenu();
+      triggerContextMenu($row0);
 
       sendQueuedAjaxCalls();
 
@@ -1998,10 +1999,10 @@ describe('Table', () => {
 
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
 
-      $row0.triggerMouseDown();
+      triggerMouseDown($row0);
       $row1.trigger('mouseover');
       $row2.trigger('mouseover');
-      $row2.triggerMouseUp();
+      triggerMouseUp($row2);
 
       expect([$row0, $row1, $row2]).allToHaveClass('selected');
       expect($row0).toHaveClass('select-top');
@@ -2028,10 +2029,10 @@ describe('Table', () => {
 
       expect($rows).not.toHaveClass('selected');
 
-      $row0.triggerMouseDown();
+      triggerMouseDown($row0);
       $row1.trigger('mouseover');
       $row2.trigger('mouseover');
-      $row2.triggerMouseUp();
+      triggerMouseUp($row2);
 
       sendQueuedAjaxCalls();
 
@@ -2057,8 +2058,8 @@ describe('Table', () => {
 
       expect($rows).not.toHaveClass('selected');
 
-      $row0.triggerMouseDown();
-      $row0.triggerMouseUp();
+      triggerMouseDown($row0);
+      triggerMouseUp($row0);
 
       sendQueuedAjaxCalls();
 
@@ -2096,10 +2097,10 @@ describe('Table', () => {
 
       expect($rows).not.toHaveClass('selected');
 
-      $row0.triggerMouseDown();
+      triggerMouseDown($row0);
       $row1.trigger('mouseover');
       $row2.trigger('mouseover');
-      $row2.triggerMouseUp();
+      triggerMouseUp($row2);
 
       let expectedSelectedRowIndex = (selectionMovable ? 2 : 0);
       for (let i = 0; i < $rows.length; i++) {

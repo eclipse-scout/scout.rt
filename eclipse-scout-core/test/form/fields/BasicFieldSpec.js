@@ -10,6 +10,7 @@
  */
 import {BasicFieldAdapter, RemoteEvent, scout, StringField} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
+import {triggerBlur} from '../../../src/testing/jquery-testing';
 
 describe('BasicField', () => {
   let session, helper, field;
@@ -54,7 +55,7 @@ describe('BasicField', () => {
         showBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
-      field.$field.triggerBlur();
+      triggerBlur(field.$field);
       sendQueuedAjaxCalls();
       event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
@@ -111,7 +112,7 @@ describe('BasicField', () => {
         showBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
-      field.$field.triggerBlur();
+      triggerBlur(field.$field);
       sendQueuedAjaxCalls();
       event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test2',
@@ -135,7 +136,7 @@ describe('BasicField', () => {
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
       field.setUpdateDisplayTextOnModify(false);
-      field.$field.triggerBlur();
+      triggerBlur(field.$field);
       sendQueuedAjaxCalls();
       event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
@@ -163,7 +164,7 @@ describe('BasicField', () => {
       sendQueuedAjaxCalls();
       expect(mostRecentJsonRequest()).toContainEvents(event);
 
-      field.$field.triggerBlur();
+      triggerBlur(field.$field);
       sendQueuedAjaxCalls();
       event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
@@ -201,7 +202,7 @@ describe('BasicField', () => {
         showBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
-      field.$field.triggerBlur();
+      triggerBlur(field.$field);
       sendQueuedAjaxCalls();
       event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test4',
@@ -224,7 +225,7 @@ describe('BasicField', () => {
         showBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
-      field.$field.triggerBlur();
+      triggerBlur(field.$field);
       sendQueuedAjaxCalls();
       event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test5',

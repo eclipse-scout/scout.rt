@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {DateField, dates, keys, RemoteEvent, scout} from '../../../../src/index';
+import {triggerClick, triggerKeyDown, triggerMouseDown} from '../../../../src/testing/jquery-testing';
 
 describe('DateFieldAdapter', () => {
   let session;
@@ -46,7 +47,7 @@ describe('DateFieldAdapter', () => {
   }
 
   function openDatePicker(dateField) {
-    dateField.$dateField.triggerMouseDown();
+    triggerMouseDown(dateField.$dateField);
     expect(findDatePicker().length).toBe(1);
   }
 
@@ -107,11 +108,11 @@ describe('DateFieldAdapter', () => {
       expect(field.errorStatus.children[0].message).toBe('error status from server');
 
       // Enter another date, but don't press enter
-      field.$dateField.triggerKeyDown(keys.DOWN);
+      triggerKeyDown(field.$dateField, keys.DOWN);
       expect(field.displayText).toBe('24.05.2017');
 
       // Revert to the old date and press enter -> send the event so that server may validate again
-      field.$dateField.triggerKeyDown(keys.UP);
+      triggerKeyDown(field.$dateField, keys.UP);
       expect(field.displayText).toBe('23.05.2017');
       field.acceptInput();
       expect(field.errorStatus.children.length).toBe(1);
@@ -133,7 +134,7 @@ describe('DateFieldAdapter', () => {
 
       // Open picker and select invalid date again -> error status must not vanish
       openDatePicker(field);
-      find$Day(field.getDatePicker(), new Date(2017, 4, 23)).triggerClick();
+      triggerClick(find$Day(field.getDatePicker(), new Date(2017, 4, 23)));
       expect(field.$dateField.val()).toBe('23.05.2017');
       expect(field.errorStatus.children.length).toBe(1);
       expect(field.errorStatus.children[0].message).toBe('error status from server');
@@ -164,7 +165,7 @@ describe('DateFieldAdapter', () => {
       focusDate(field);
       openDatePicker(field);
 
-      find$Day(field.getDatePicker(), new Date(2016, 1, 1)).triggerClick();
+      triggerClick(find$Day(field.getDatePicker(), new Date(2016, 1, 1)));
       expect(field.$dateField.val()).toBe('01.02.2016');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);

@@ -13,60 +13,72 @@
 
 // JQuery extensions for testing purpose
 
-$.fn.triggerBlur = function() {
+export interface TriggerMouseOptions {
+  clicks?: number;
+  click?: number;
+  which?: number;
+  modifier?: KeyStrokeModifier;
+  position?: {
+    top: number;
+    left: number;
+  };
+}
+
+export type KeyStrokeModifier = 'alt' | 'ctrl' | 'shift' | 'meta';
+
+export function triggerBlur($elem: JQuery) {
   let event = jQuery.Event('blur', {
     originalEvent: jQuery.Event('dummy') // create dummy object
   });
-  this.trigger(event);
-};
+  $elem.trigger(event);
+}
 
-$.fn.triggerRightClick = function() {
-  this.trigger(jQuery.Event('mousedown', {which: 3}));
-  this.trigger(jQuery.Event('mouseup', {which: 3}));
-  return this;
-};
+export function triggerRightClick($elem: JQuery) {
+  $elem.trigger(jQuery.Event('mousedown', {which: 3}));
+  $elem.trigger(jQuery.Event('mouseup', {which: 3}));
+}
 
-$.fn.triggerKeyUp = function(key, modifier) {
+export function triggerKeyUp($elem, key: number, modifier: KeyStrokeModifier) {
   let event = jQuery.Event('keyup', {
     originalEvent: jQuery.Event('dummy'), // create dummy object
     which: key
   });
   extendEventWithModifier(event, modifier);
-  this.trigger(event);
-};
+  $elem.trigger(event);
+}
 
-$.fn.triggerKeyDown = function(key, modifier) {
+export function triggerKeyDown($elem: JQuery, key: number, modifier?: KeyStrokeModifier) {
   let event = jQuery.Event('keydown', {
     originalEvent: jQuery.Event('dummy'), // create dummy object
     which: key
   });
   extendEventWithModifier(event, modifier);
-  this.trigger(event);
-};
+  $elem.trigger(event);
+}
 
-function extendEventWithModifier(event, modifier) {
+function extendEventWithModifier(event: JQuery.Event, modifier?: KeyStrokeModifier) {
   event.altKey = modifier === 'alt';
   event.ctrlKey = modifier === 'ctrl';
   event.shiftKey = modifier === 'shift';
   event.metaKey = modifier === 'meta';
 }
 
-$.fn.triggerMouseEnter = function(opts) {
-  return this.triggerMouseAction('mouseenter', opts);
-};
+export function triggerMouseEnter($elem: JQuery, opts?: TriggerMouseOptions) {
+  triggerMouseAction($elem, 'mouseenter', opts);
+}
 
-$.fn.triggerMouseLeave = function(opts) {
-  return this.triggerMouseAction('mouseleave', opts);
-};
+export function triggerMouseLeave($elem: JQuery, opts?: TriggerMouseOptions) {
+  triggerMouseAction($elem, 'mouseleave', opts);
+}
 
-$.fn.triggerMouseDown = function(opts) {
-  return this.triggerMouseAction('mousedown', opts);
-};
+export function triggerMouseDown($elem: JQuery, opts?: TriggerMouseOptions) {
+  triggerMouseAction($elem, 'mousedown', opts);
+}
 
 /**
  * Does not use jQuery to create the event to make sure capture phase listeners are notified as well.
  */
-$.fn.triggerMouseDownCapture = function(opts) {
+export function triggerMouseDownCapture($elem: JQuery) {
   let event;
   try {
     event = new MouseEvent('mousedown', {
@@ -79,28 +91,26 @@ $.fn.triggerMouseDownCapture = function(opts) {
     event = document.createEvent('MouseEvent');
     event.initEvent('mousedown', true, true);
   }
-  this[0].dispatchEvent(event);
-  return this;
-};
+  $elem[0].dispatchEvent(event);
+}
 
-$.fn.triggerKeyDownCapture = function(which, modifier) {
-  return this.triggerKeyCapture('keydown', which, modifier);
-};
+export function triggerKeyDownCapture($elem: JQuery, which: number, modifier?: KeyStrokeModifier) {
+  triggerKeyCapture($elem, 'keydown', which, modifier);
+}
 
-$.fn.triggerKeyUpCapture = function(which, modifier) {
-  return this.triggerKeyCapture('keyup', which, modifier);
-};
+export function triggerKeyUpCapture($elem: JQuery, which: number, modifier?: KeyStrokeModifier) {
+  triggerKeyCapture($elem, 'keyup', which, modifier);
+}
 
 /**
  * Triggers key down and key up events.
  */
-$.fn.triggerKeyInputCapture = function(which, modifier) {
-  this.triggerKeyCapture('keydown', which, modifier);
-  this.triggerKeyCapture('keyup', which, modifier);
-  return this;
-};
+export function triggerKeyInputCapture($elem: JQuery, which: number, modifier?: KeyStrokeModifier) {
+  triggerKeyCapture($elem, 'keydown', which, modifier);
+  triggerKeyCapture($elem, 'keyup', which, modifier);
+}
 
-$.fn.triggerKeyCapture = function(eventType, which, modifier) {
+export function triggerKeyCapture($elem: JQuery, eventType: string, which: number, modifier?: KeyStrokeModifier) {
   // Due to a Chrome bug, "new KeyboardEvent" cannot be used,
   // as it doesn't set "which". We have to use this less specific
   // constructor.
@@ -121,26 +131,19 @@ $.fn.triggerKeyCapture = function(eventType, which, modifier) {
   eventObj.which = which;
   extendEventWithModifier(eventObj, modifier);
 
-  this[0].dispatchEvent(eventObj);
-  return this;
-};
+  $elem[0].dispatchEvent(eventObj);
+}
 
-$.fn.triggerMouseUp = function(opts) {
-  return this.triggerMouseAction('mouseup', opts);
-};
+export function triggerMouseUp($elem: JQuery, opts?: TriggerMouseOptions) {
+  triggerMouseAction($elem, 'mouseup', opts);
+}
 
-$.fn.triggerMouseMove = function(position) {
-  return this.triggerWithPosition('mousemove', {
-    position: position
-  });
-};
-
-$.fn.triggerMouseAction = function(eventType, opts) {
+export function triggerMouseAction($elem: JQuery, eventType: string, opts: TriggerMouseOptions) {
   let event;
   opts = opts || {};
 
   if (!opts.position) {
-    opts.position = this.offset();
+    opts.position = $elem.offset();
   }
   if (!opts.clicks) {
     opts.clicks = 1;
@@ -160,73 +163,54 @@ $.fn.triggerMouseAction = function(eventType, opts) {
     extendEventWithModifier(event, opts.modifier);
   }
 
-  this.trigger(event);
-  return this;
-};
+  $elem.trigger(event);
+}
 
-$.fn.triggerWithPosition = function(event, position) {
-  if (!position) {
-    position = this.offset();
-  }
-
-  this.trigger({
-    type: event,
-    pageX: position.left,
-    pageY: position.right
-  });
-  return this;
-};
-
-$.fn.triggerContextMenu = function() {
+export function triggerContextMenu($elem: JQuery) {
   let opts = {
-    position: this.offset(),
+    position: $elem.offset(),
     which: 3
   };
 
-  this.triggerMouseDown(opts);
-  this.triggerMouseUp(opts);
-  this.trigger(jQuery.Event('contextmenu', {
+  triggerMouseDown($elem, opts);
+  triggerMouseUp($elem, opts);
+  $elem.trigger(jQuery.Event('contextmenu', {
     pageX: opts.position.left,
     pageY: opts.position.top
   }));
-  return this;
-};
+}
 
 /**
  * Triggers mouse down, mouse up and click events. <br>
  * Also sets the detail property of the originalEvent which contains the numbers of clicks.
  * @param opts options object passed to triggerMouse* functions
  */
-$.fn.triggerClick = function(opts) {
+export function triggerClick($elem: JQuery, opts?: TriggerMouseOptions) {
   opts = opts || {};
 
   if (!opts.click) {
     opts.click = 1;
   }
 
-  this.triggerMouseDown(opts);
-  this.triggerMouseUp(opts);
-  this.triggerMouseAction('click', opts);
+  triggerMouseDown($elem, opts);
+  triggerMouseUp($elem, opts);
+  triggerMouseAction($elem, 'click', opts);
+}
 
-  return this;
-};
-
-$.fn.triggerDoubleClick = function() {
-  this.triggerClick();
-  this.triggerClick({click: 2});
-  this.trigger(jQuery.Event('dblclick', {
+export function triggerDoubleClick($elem: JQuery) {
+  triggerClick($elem);
+  triggerClick($elem, {click: 2});
+  $elem.trigger(jQuery.Event('dblclick', {
     originalEvent: jQuery.Event('dummy', {
       detail: 2
     })
   }));
-  return this;
-};
+}
 
-$.fn.triggerImageLoadCapture = function(opts) {
+export function triggerImageLoadCapture($elem: JQuery) {
   let event;
   try {
     event = new Event('load', {
-      'view': window,
       'bubbles': true,
       'cancelable': true
     });
@@ -235,6 +219,26 @@ $.fn.triggerImageLoadCapture = function(opts) {
     event = document.createEvent('Event');
     event.initEvent('load', true, true);
   }
-  this[0].dispatchEvent(event);
-  return this;
+  $elem[0].dispatchEvent(event);
+}
+
+export default {
+  triggerBlur,
+  triggerRightClick,
+  triggerKeyUp,
+  triggerKeyDown,
+  triggerMouseEnter,
+  triggerMouseLeave,
+  triggerMouseDownCapture,
+  triggerKeyDownCapture,
+  triggerKeyUpCapture,
+  triggerKeyInputCapture,
+  triggerKeyCapture,
+  triggerMouseUp,
+  triggerMouseAction,
+  triggerContextMenu,
+  triggerClick,
+  triggerDoubleClick,
+  triggerImageLoadCapture
 };
+

@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Group, Range, scout, Tile, TileAccordion, TileGrid} from '../../src/index';
+import {triggerMouseDown} from '../../src/testing/jquery-testing';
 
 describe('VirtualTileGrid', () => {
   let session;
@@ -500,7 +501,7 @@ describe('VirtualTileGrid', () => {
 
           tileGrid._renderViewRange(new Range(1, 2));
           expect(tile0.rendered).toBe(false);
-          tile2.$container.triggerMouseDown({
+          triggerMouseDown(tile2.$container, {
             modifier: 'ctrl'
           });
           expect(tile0.selected).toBe(true);

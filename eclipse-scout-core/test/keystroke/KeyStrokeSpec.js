@@ -9,11 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {keys, KeyStroke} from '../../src/index';
+import {triggerKeyDownCapture, triggerKeyUpCapture} from '../../src/testing/jquery-testing';
 
 describe('KeyStroke', () => {
   let session;
 
   let spyable = () => {
+    // nop
   };
 
   class TestingKeyStroke extends KeyStroke {
@@ -47,9 +49,9 @@ describe('KeyStroke', () => {
       spyOn(keyStroke, 'handle');
 
       while (keyDownCount-- > 0) {
-        session.desktop.$container.triggerKeyDownCapture(keys.ENTER);
+        triggerKeyDownCapture(session.desktop.$container, keys.ENTER);
       }
-      session.desktop.$container.triggerKeyUpCapture(keys.ENTER);
+      triggerKeyUpCapture(session.desktop.$container, keys.ENTER);
 
       expect(keyStroke.handle.calls.count())
         .toEqual(1, 'because an unrepeatable keystroke should only be invoked once before the closing keyup event');

@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, keys, scout, Tile, TileAccordion} from '../../../src/index';
+import {triggerKeyDownCapture, triggerKeyInputCapture, triggerKeyUpCapture} from '../../../src/testing/jquery-testing';
 
 describe('TileAccordionKeyStrokes', () => {
   let session;
@@ -80,9 +81,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.A, 'ctrl');
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.A, 'ctrl');
       expect(accordion.getSelectedTiles().length).toBe(5);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.A, 'ctrl');
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.A, 'ctrl');
 
       accordion.selectTile(tiles[0]);
       expect(accordion.getSelectedTiles().length).toBe(1);
@@ -90,9 +91,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.selectTile(tiles[4]);
       expect(accordion.getSelectedTiles().length).toBe(1);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.A, 'ctrl');
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.A, 'ctrl');
       expect(accordion.getSelectedTiles().length).toBe(5);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.A, 'ctrl');
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.A, 'ctrl');
     });
 
     it('deselects all tiles if tiles are already selected', () => {
@@ -107,17 +108,17 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectAllTiles();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.A, 'ctrl');
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.A, 'ctrl');
       expect(accordion.getSelectedTiles().length).toBe(0);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.A, 'ctrl');
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.A, 'ctrl');
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.A, 'ctrl');
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.A, 'ctrl');
       expect(accordion.getSelectedTiles().length).toBe(5);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.A, 'ctrl');
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.A, 'ctrl');
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.A, 'ctrl');
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.A, 'ctrl');
       expect(accordion.getSelectedTiles().length).toBe(0);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.A, 'ctrl');
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.A, 'ctrl');
     });
 
     it('only considers tiles of expanded groups', () => {
@@ -133,24 +134,24 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.A, 'ctrl');
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.A, 'ctrl');
       expect(accordion.getSelectedTiles().length).toBe(3);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.A, 'ctrl');
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.A, 'ctrl');
 
       accordion.selectTile(tiles[2]);
       expect(accordion.getSelectedTiles().length).toBe(1);
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.A, 'ctrl');
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.A, 'ctrl');
       expect(accordion.getSelectedTiles().length).toBe(3);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.A, 'ctrl');
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.A, 'ctrl');
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.A, 'ctrl');
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.A, 'ctrl');
       expect(accordion.getSelectedTiles().length).toBe(0);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.A, 'ctrl');
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.A, 'ctrl');
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.A, 'ctrl');
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.A, 'ctrl');
       expect(accordion.getSelectedTiles().length).toBe(3);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.A, 'ctrl');
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.A, 'ctrl');
     });
 
   });
@@ -169,9 +170,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[1]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.RIGHT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.RIGHT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[2]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.RIGHT);
     });
 
     it('selects the first tile of the next group if selected tile is the last one in the current group but only if next group is not collapsed', () => {
@@ -190,9 +191,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[1]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.RIGHT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.RIGHT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[4]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.RIGHT);
     });
 
     it('selects the first tile if no tile is selected yet', () => {
@@ -207,9 +208,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.RIGHT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.RIGHT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.RIGHT);
     });
 
     it('does nothing if the last tile is already selected', () => {
@@ -225,9 +226,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(arrays.last(tiles));
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.RIGHT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.RIGHT);
       expect(accordion.getSelectedTiles()).toEqual([arrays.last(tiles)]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.RIGHT);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -240,19 +241,19 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.RIGHT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.RIGHT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.RIGHT);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.RIGHT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.RIGHT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.RIGHT);
 
       accordion.deselectAllTiles();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.RIGHT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.RIGHT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.RIGHT);
     });
 
     describe('with shift', () => {
@@ -269,13 +270,13 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.validateLayout();
         accordion.selectTile(tiles[1]);
 
-        accordion.groups[0].body.$container.triggerKeyDownCapture(keys.RIGHT, 'shift');
+        triggerKeyDownCapture(accordion.groups[0].body.$container, keys.RIGHT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2]]);
-        accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT, 'shift');
+        triggerKeyUpCapture(accordion.groups[0].body.$container, keys.RIGHT, 'shift');
 
-        accordion.groups[1].body.$container.triggerKeyDownCapture(keys.RIGHT, 'shift');
+        triggerKeyDownCapture(accordion.groups[1].body.$container, keys.RIGHT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3]]);
-        accordion.groups[1].body.$container.triggerKeyUpCapture(keys.RIGHT, 'shift');
+        triggerKeyUpCapture(accordion.groups[1].body.$container, keys.RIGHT, 'shift');
       });
 
       it('removes the next tile from the selection if the focused tile is the first tile of the selection', () => {
@@ -292,13 +293,13 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.selectTiles([tiles[1], tiles[2], tiles[3]]);
         accordion.setFocusedTile(tiles[1]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.RIGHT, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.RIGHT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[2], tiles[3]]);
 
-        accordion.groups[1].body.$container.triggerKeyInputCapture(keys.RIGHT, 'shift');
+        triggerKeyInputCapture(accordion.groups[1].body.$container, keys.RIGHT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[3]]);
 
-        accordion.groups[1].body.$container.triggerKeyInputCapture(keys.RIGHT, 'shift');
+        triggerKeyInputCapture(accordion.groups[1].body.$container, keys.RIGHT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[3], tiles[4]]);
       });
 
@@ -315,13 +316,13 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.validateLayout();
         accordion.selectTile(tiles[1]);
 
-        accordion.groups[0].body.$container.triggerKeyDownCapture(keys.RIGHT, 'shift');
+        triggerKeyDownCapture(accordion.groups[0].body.$container, keys.RIGHT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2]]);
-        accordion.groups[0].body.$container.triggerKeyUpCapture(keys.RIGHT, 'shift');
+        triggerKeyUpCapture(accordion.groups[0].body.$container, keys.RIGHT, 'shift');
 
-        accordion.groups[1].body.$container.triggerKeyDownCapture(keys.RIGHT, 'shift');
+        triggerKeyDownCapture(accordion.groups[1].body.$container, keys.RIGHT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2]]);
-        accordion.groups[1].body.$container.triggerKeyUpCapture(keys.RIGHT, 'shift');
+        triggerKeyUpCapture(accordion.groups[1].body.$container, keys.RIGHT, 'shift');
       });
 
       it('adds the correct tile to the selection if the focused tile gets invisible', () => {
@@ -348,7 +349,7 @@ describe('TileAccordionKeyStrokes', () => {
         expect(accordion.getSelectedTiles()).toEqual([tiles[2]]);
         expect(accordion.getFocusedTile()).toBe(null);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.RIGHT, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.RIGHT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[2], tiles[3]]);
       });
 
@@ -366,16 +367,16 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.selectTiles([tiles[1], tiles[4]]);
         accordion.setFocusedTile(tiles[1]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.RIGHT, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.RIGHT, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[1], tiles[2], tiles[4]])).toBe(true);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.RIGHT, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.RIGHT, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
 
-        accordion.groups[1].body.$container.triggerKeyInputCapture(keys.RIGHT, 'shift');
+        triggerKeyInputCapture(accordion.groups[1].body.$container, keys.RIGHT, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]])).toBe(true);
 
-        accordion.groups[1].body.$container.triggerKeyInputCapture(keys.RIGHT, 'shift');
+        triggerKeyInputCapture(accordion.groups[1].body.$container, keys.RIGHT, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]])).toBe(true);
       });
     });
@@ -395,9 +396,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[2]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.LEFT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.LEFT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[1]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.LEFT);
     });
 
     it('selects the last tile of the previous group if selected tile is the first one in the current group but only if the group is not collapsed', () => {
@@ -416,9 +417,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[4]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.LEFT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.LEFT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[1]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.LEFT);
     });
 
     it('selects the last tile if no tile is selected yet', () => {
@@ -433,9 +434,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.LEFT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.LEFT);
       expect(accordion.getSelectedTiles()).toEqual([arrays.last(tiles)]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.LEFT);
     });
 
     it('does nothing if the first tile is already selected', () => {
@@ -451,9 +452,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[0]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.LEFT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.LEFT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.LEFT);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -466,19 +467,19 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.LEFT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.LEFT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.LEFT);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.LEFT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.LEFT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.LEFT);
 
       accordion.deselectAllTiles();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.LEFT);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.LEFT);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.LEFT);
     });
 
     describe('with shift', () => {
@@ -495,13 +496,13 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.validateLayout();
         accordion.selectTile(tiles[3]);
 
-        accordion.groups[1].body.$container.triggerKeyDownCapture(keys.LEFT, 'shift');
+        triggerKeyDownCapture(accordion.groups[1].body.$container, keys.LEFT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[2], tiles[3]]);
-        accordion.groups[1].body.$container.triggerKeyUpCapture(keys.LEFT, 'shift');
+        triggerKeyUpCapture(accordion.groups[1].body.$container, keys.LEFT, 'shift');
 
-        accordion.groups[1].body.$container.triggerKeyDownCapture(keys.LEFT, 'shift');
+        triggerKeyDownCapture(accordion.groups[1].body.$container, keys.LEFT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3]]);
-        accordion.groups[1].body.$container.triggerKeyUpCapture(keys.LEFT, 'shift');
+        triggerKeyUpCapture(accordion.groups[1].body.$container, keys.LEFT, 'shift');
       });
 
       it('does nothing if the first tile is already selected', () => {
@@ -517,13 +518,13 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.validateLayout();
         accordion.selectTile(tiles[1]);
 
-        accordion.groups[0].body.$container.triggerKeyDownCapture(keys.LEFT, 'shift');
+        triggerKeyDownCapture(accordion.groups[0].body.$container, keys.LEFT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[0], tiles[1]]);
-        accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT, 'shift');
+        triggerKeyUpCapture(accordion.groups[0].body.$container, keys.LEFT, 'shift');
 
-        accordion.groups[0].body.$container.triggerKeyDownCapture(keys.LEFT, 'shift');
+        triggerKeyDownCapture(accordion.groups[0].body.$container, keys.LEFT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[0], tiles[1]]);
-        accordion.groups[0].body.$container.triggerKeyUpCapture(keys.LEFT, 'shift');
+        triggerKeyUpCapture(accordion.groups[0].body.$container, keys.LEFT, 'shift');
       });
 
       it('removes the previous tile from the selection if the next tile is already selected', () => {
@@ -540,13 +541,13 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.selectTiles([tiles[1], tiles[2], tiles[3]]);
         accordion.setFocusedTile(tiles[3]);
 
-        accordion.groups[1].body.$container.triggerKeyInputCapture(keys.LEFT, 'shift');
+        triggerKeyInputCapture(accordion.groups[1].body.$container, keys.LEFT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2]]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.LEFT, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.LEFT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1]]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.LEFT, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.LEFT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[0], tiles[1]]);
       });
 
@@ -574,7 +575,7 @@ describe('TileAccordionKeyStrokes', () => {
         expect(accordion.getSelectedTiles()).toEqual([tiles[1]]);
         expect(accordion.getFocusedTile()).toBe(null);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.LEFT, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.LEFT, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[0], tiles[1]]);
       });
 
@@ -592,16 +593,16 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.selectTiles([tiles[1], tiles[4]]);
         accordion.setFocusedTile(tiles[4]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.LEFT, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.LEFT, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[1], tiles[3], tiles[4]])).toBe(true);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.LEFT, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.LEFT, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.LEFT, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.LEFT, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.LEFT, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.LEFT, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4]])).toBe(true);
       });
 
@@ -624,13 +625,13 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[0]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[3]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.DOWN);
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[6]]);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.DOWN);
     });
 
     it('selects the tile in the grid below if the selected tile is in the last line of the current group but only if the group is not collapsed', () => {
@@ -650,9 +651,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[0]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[6]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.DOWN);
     });
 
     it('considers filtered tiles', () => {
@@ -677,14 +678,14 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.selectTile(tiles[0]);
 
       // Tile 3 is not accepted by filter -> tile 4 has to be selected
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[4]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.DOWN);
 
       // Tile 7 is not accepted by filter -> tile 8 has to be selected
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[8]]);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.DOWN);
     });
 
     it('selects the first tile if no tile is selected yet', () => {
@@ -700,9 +701,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.DOWN);
     });
 
     it('selects the first tile if no tile is selected yet or the focused tile was in a collapsed group', () => {
@@ -726,9 +727,9 @@ describe('TileAccordionKeyStrokes', () => {
       expect(accordion.getFocusedTile()).toBe(null);
       expect(accordion.getSelectedTiles().length).toBe(0);
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[2]]);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.DOWN);
     });
 
     it('does nothing if a tile in the last row is already selected', () => {
@@ -745,17 +746,17 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[3]);
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[3]]);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.DOWN);
 
       accordion.selectTile(arrays.last(tiles));
       accordion.setFocusedTile(arrays.last(tiles));
       expect(accordion.getSelectedTiles()).toEqual([arrays.last(tiles)]);
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([arrays.last(tiles)]);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.DOWN);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -771,19 +772,19 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.DOWN);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.DOWN);
 
       accordion.deselectAllTiles();
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.DOWN);
     });
 
     it('selects the last tile if below the focused tile is no tile', () => {
@@ -800,15 +801,15 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[3]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.DOWN);
 
       accordion.selectTile(tiles[6]);
       accordion.setFocusedTile(tiles[6]);
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.DOWN);
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.DOWN);
       expect(accordion.getSelectedTiles()).toEqual([tiles[7]]);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.DOWN);
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.DOWN);
     });
 
     describe('with shift', () => {
@@ -826,13 +827,13 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.validateLayout();
         accordion.selectTile(tiles[1]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.DOWN, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.DOWN, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3], tiles[4]]);
 
-        accordion.groups[1].body.$container.triggerKeyInputCapture(keys.DOWN, 'shift');
+        triggerKeyInputCapture(accordion.groups[1].body.$container, keys.DOWN, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6]]);
 
-        accordion.groups[1].body.$container.triggerKeyInputCapture(keys.DOWN, 'shift');
+        triggerKeyInputCapture(accordion.groups[1].body.$container, keys.DOWN, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8], tiles[9]]);
       });
 
@@ -851,13 +852,13 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.selectTiles([tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6]]);
         accordion.setFocusedTile(tiles[1]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.DOWN, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.DOWN, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[4], tiles[5], tiles[6]]);
 
-        accordion.groups[1].body.$container.triggerKeyInputCapture(keys.DOWN, 'shift');
+        triggerKeyInputCapture(accordion.groups[1].body.$container, keys.DOWN, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[6]]);
 
-        accordion.groups[1].body.$container.triggerKeyInputCapture(keys.DOWN, 'shift');
+        triggerKeyInputCapture(accordion.groups[1].body.$container, keys.DOWN, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[6], tiles[7], tiles[8], tiles[9]]);
       });
 
@@ -875,7 +876,7 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.validateLayout();
         accordion.selectTiles([tiles[2], tiles[3]]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.DOWN, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.DOWN, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[2], tiles[3]]);
       });
 
@@ -905,7 +906,7 @@ describe('TileAccordionKeyStrokes', () => {
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2]]);
         expect(accordion.getFocusedTile()).toBe(null);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.DOWN, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.DOWN, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3], tiles[4]]);
       });
 
@@ -924,13 +925,13 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.selectTiles([tiles[0], tiles[1], tiles[5]]);
         accordion.setFocusedTile(tiles[1]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.DOWN, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.DOWN, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5]])).toBe(true);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.DOWN, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.DOWN, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.DOWN, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.DOWN, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
       });
     });
@@ -952,9 +953,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(arrays.last(tiles));
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.UP);
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.UP);
       expect(accordion.getSelectedTiles()).toEqual([tiles[2]]);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.UP);
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.UP);
     });
 
     it('selects the tile in the grid above if the selected tile is in the first line of the current group but only if the group is not collapsed', () => {
@@ -974,9 +975,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[8]);
 
-      accordion.groups[2].body.$container.triggerKeyDownCapture(keys.UP);
+      triggerKeyDownCapture(accordion.groups[2].body.$container, keys.UP);
       expect(accordion.getSelectedTiles()).toEqual([tiles[2]]);
-      accordion.groups[2].body.$container.triggerKeyUpCapture(keys.UP);
+      triggerKeyUpCapture(accordion.groups[2].body.$container, keys.UP);
     });
 
     it('selects the last tile if no tile is selected yet', () => {
@@ -992,9 +993,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.UP);
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.UP);
       expect(accordion.getSelectedTiles()).toEqual([arrays.last(tiles)]);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.UP);
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.UP);
     });
 
     it('does nothing if a tile in the first row is already selected', () => {
@@ -1011,16 +1012,16 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[2]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.UP);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.UP);
       expect(accordion.getSelectedTiles()).toEqual([tiles[2]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.UP);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.UP);
 
       accordion.selectTile(tiles[0]);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.UP);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.UP);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.UP);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.UP);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -1036,19 +1037,19 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.UP);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.UP);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.UP);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.UP);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.UP);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.UP);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.UP);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.UP);
 
       accordion.deselectAllTiles();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.UP);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.UP);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.UP);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.UP);
     });
 
     describe('with shift', () => {
@@ -1066,7 +1067,7 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.validateLayout();
         accordion.selectTile(tiles[4]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.UP, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.UP, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3], tiles[4]]);
       });
 
@@ -1085,7 +1086,7 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.selectTiles([tiles[1], tiles[2], tiles[3], tiles[4]]);
         accordion.setFocusedTile(tiles[4]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.UP, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.UP, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1]]);
       });
 
@@ -1104,7 +1105,7 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.selectTiles([tiles[1], tiles[2], tiles[3]]);
         accordion.setFocusedTile(tiles[2]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.UP, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.UP, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[1], tiles[2], tiles[3]]);
       });
 
@@ -1134,7 +1135,7 @@ describe('TileAccordionKeyStrokes', () => {
         expect(accordion.getSelectedTiles()).toEqual([tiles[3], tiles[4]]);
         expect(accordion.getFocusedTile()).toBe(null);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.UP, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.UP, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[0], tiles[1], tiles[3], tiles[4]]);
       });
 
@@ -1153,13 +1154,13 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.selectTiles([tiles[3], tiles[7], tiles[8]]);
         accordion.setFocusedTile(tiles[7]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.UP, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.UP, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.UP, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.UP, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.UP, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.UP, 'shift');
         expect(arrays.equalsIgnoreOrder(accordion.getSelectedTiles(), [tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]])).toBe(true);
       });
     });
@@ -1180,9 +1181,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[1]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.HOME);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.HOME);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.HOME);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.HOME);
     });
 
     it('selects the first tile but only if the group is not collapsed', () => {
@@ -1202,9 +1203,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[5]);
 
-      accordion.groups[1].body.$container.triggerKeyDownCapture(keys.HOME);
+      triggerKeyDownCapture(accordion.groups[1].body.$container, keys.HOME);
       expect(accordion.getSelectedTiles()).toEqual([tiles[2]]);
-      accordion.groups[1].body.$container.triggerKeyUpCapture(keys.HOME);
+      triggerKeyUpCapture(accordion.groups[1].body.$container, keys.HOME);
     });
 
     it('does nothing if the first tile is already selected', () => {
@@ -1220,9 +1221,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(tiles[0]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.HOME);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.HOME);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.HOME);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.HOME);
     });
 
     it('selects only the first tile if first and other tiles are selected', () => {
@@ -1240,9 +1241,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.selectTiles([tiles[0], tiles[1]]);
       accordion.setFocusedTile(tiles[1]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.HOME);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.HOME);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.HOME);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.HOME);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -1258,19 +1259,19 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.HOME);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.HOME);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.HOME);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.HOME);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.HOME);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.HOME);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.HOME);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.HOME);
 
       accordion.deselectAllTiles();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.HOME);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.HOME);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.HOME);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.HOME);
     });
 
     describe('with shift', () => {
@@ -1288,7 +1289,7 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.validateLayout();
         accordion.selectTiles([tiles[6], tiles[7]]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.HOME, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.HOME, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7]]);
       });
     });
@@ -1309,9 +1310,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.END);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.END);
       expect(accordion.getSelectedTiles()).toEqual([arrays.last(tiles)]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.END);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.END);
     });
 
     it('selects the last tile but only if the group is not collapsed', () => {
@@ -1330,9 +1331,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.END);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.END);
       expect(accordion.getSelectedTiles()).toEqual([tiles[3]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.END);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.END);
     });
 
     it('does nothing if the last tile is already selected', () => {
@@ -1348,9 +1349,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.validateLayout();
       accordion.selectTile(arrays.last(tiles));
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.END);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.END);
       expect(accordion.getSelectedTiles()).toEqual([arrays.last(tiles)]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.END);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.END);
     });
 
     it('selects only the last tile if last and other tiles are selected', () => {
@@ -1368,9 +1369,9 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.selectTiles([tiles[4], tiles[5]]);
       accordion.setFocusedTile(tiles[5]);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.END);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.END);
       expect(accordion.getSelectedTiles()).toEqual([tiles[4], tiles[5]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.END);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.END);
     });
 
     it('selects the only tile if there is only one', () => {
@@ -1386,19 +1387,19 @@ describe('TileAccordionKeyStrokes', () => {
       accordion.render();
       accordion.validateLayout();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.END);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.END);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.END);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.END);
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.END);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.END);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.END);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.END);
 
       accordion.deselectAllTiles();
 
-      accordion.groups[0].body.$container.triggerKeyDownCapture(keys.END);
+      triggerKeyDownCapture(accordion.groups[0].body.$container, keys.END);
       expect(accordion.getSelectedTiles()).toEqual([tiles[0]]);
-      accordion.groups[0].body.$container.triggerKeyUpCapture(keys.END);
+      triggerKeyUpCapture(accordion.groups[0].body.$container, keys.END);
     });
 
     describe('with shift', () => {
@@ -1416,11 +1417,11 @@ describe('TileAccordionKeyStrokes', () => {
         accordion.validateLayout();
         accordion.selectTiles([tiles[4], tiles[5]]);
 
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.END, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.END, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]]);
 
         // After pressing shift home afterwards all tiles should be selected
-        accordion.groups[0].body.$container.triggerKeyInputCapture(keys.HOME, 'shift');
+        triggerKeyInputCapture(accordion.groups[0].body.$container, keys.HOME, 'shift');
         expect(accordion.getSelectedTiles()).toEqual([tiles[0], tiles[1], tiles[2], tiles[3], tiles[4], tiles[5], tiles[6], tiles[7], tiles[8]]);
       });
     });

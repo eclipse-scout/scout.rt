@@ -35,6 +35,6 @@ export {default as LanguageDummyLookupCall} from './lookup/LanguageDummyLookupCa
 export {default as CalendarSpecHelper} from './calendar/CalendarSpecHelper';
 export {default as FocusManagerSpecHelper} from './focus/FocusManagerSpecHelper';
 export {default as GroupBoxSpecHelper} from './form/fields/groupbox/GroupBoxSpecHelper';
-
+export {default as JQueryTesting} from './jquery-testing';
 export default self;
 ObjectFactory.get().registerNamespace('scout', self);

@@ -10,6 +10,7 @@
  */
 import {dates, FormField, scout, SequenceBox, SequenceBoxGridConfig, Status} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '../../../../src/testing/index';
+import {triggerClick} from '../../../../src/testing/jquery-testing';
 
 describe('SequenceBox', () => {
   let session, helper, menuHelper;
@@ -536,11 +537,11 @@ describe('SequenceBox', () => {
       let field = createField();
       field.render();
       field.setLabel('box label');
-      field.$label.triggerClick();
+      triggerClick(field.$label);
       expect(field.fields[0].$field).toBeFocused();
 
       field.fields[0].setVisible(false);
-      field.$label.triggerClick();
+      triggerClick(field.$label);
       expect(field.fields[1].$dateField).toBeFocused();
     });
 

@@ -10,6 +10,7 @@
  */
 import {RemoteEvent, scout, StringField} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
+import {triggerClick} from '../../../../src/testing/jquery-testing';
 
 describe('StringField', () => {
   let session, helper, field;
@@ -294,7 +295,7 @@ describe('StringField', () => {
         label: 'label'
       });
       field.render();
-      field.$label.triggerClick();
+      triggerClick(field.$label);
       expect(field.$field).toBeFocused();
     });
 

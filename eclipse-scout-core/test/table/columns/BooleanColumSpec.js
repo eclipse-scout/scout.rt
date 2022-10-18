@@ -10,6 +10,7 @@
  */
 import {BooleanColumn} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
+import {triggerClick} from '../../../src/testing/jquery-testing';
 
 describe('BooleanColumn', () => {
   let session;
@@ -107,7 +108,7 @@ describe('BooleanColumn', () => {
         expect(event.mouseButton).toBe(1);
         expect(event.column).toBe(column0);
       });
-      table.$cell(0, table.rows[1].$row).triggerClick();
+      triggerClick(table.$cell(0, table.rows[1].$row));
     });
 
     describe('setCellValue', () => {
