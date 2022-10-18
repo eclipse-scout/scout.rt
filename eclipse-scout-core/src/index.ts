@@ -761,6 +761,8 @@ export {default as TagFieldLayout} from './form/fields/tagfield/TagFieldLayout';
 export {default as TagFieldContainerLayout} from './form/fields/tagfield/TagFieldContainerLayout';
 export {default as TileField} from './form/fields/tilefield/TileField';
 export {default as TileFieldAdapter} from './form/fields/tilefield/TileFieldAdapter';
+export {default as TileFieldEventMap} from './form/fields/tilefield/TileFieldEventMap';
+export {default as TileFieldModel} from './form/fields/tilefield/TileFieldModel';
 export {default as TreeBox} from './form/fields/treebox/TreeBox';
 export {default as TreeBoxAdapter} from './form/fields/treebox/TreeBoxAdapter';
 export {default as TreeBoxLayout} from './form/fields/treebox/TreeBoxLayout';

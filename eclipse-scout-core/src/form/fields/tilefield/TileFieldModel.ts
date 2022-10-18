@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '../../../index';
+import {FormFieldModel, TileGrid} from '../../../index';
 
-export default class TileFieldAdapter extends FormFieldAdapter {
-
-  constructor() {
-    super();
-  }
+export default interface TileFieldModel extends FormFieldModel {
+  tileGrid?: TileGrid;
 }
