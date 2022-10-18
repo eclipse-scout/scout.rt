@@ -9,12 +9,31 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, HorizontalGrid, HtmlComponent, LoadingSupport, LogicalGridData, LogicalGridLayoutConfig, LookupCall, objects, RadioButton, RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke,
-  RadioButtonGroupRightOrDownKeyStroke, scout, Status, TreeVisitResult, ValueField
+  arrays, FormField, HorizontalGrid, HtmlComponent, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupResult, LookupRow, objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap,
+  RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, RadioButtonModel, scout, Status, TreeVisitResult, ValueField
 } from '../../../index';
 import $ from 'jquery';
+import {CloneOptions} from '../../../widget/Widget';
+import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
 
-export default class RadioButtonGroup extends ValueField {
+export default class RadioButtonGroup<TValue> extends ValueField<TValue> implements RadioButtonGroupModel<TValue> {
+  declare model: RadioButtonGroupModel<TValue>;
+  declare eventMap: RadioButtonGroupEventMap<TValue>;
+
+  layoutConfig: LogicalGridLayoutConfig;
+  fields: FormField[];
+  radioButtons: RadioButton<TValue>[];
+  gridColumnCount: number;
+  selectedButton: RadioButton<TValue>;
+  lookupStatus: Status;
+  lookupCall: LookupCall<TValue>;
+  htmlBody: HtmlComponent;
+  $body: JQuery;
+  protected _lookupExecuted: boolean;
+  protected _selectButtonLocked: boolean;
+  protected _lookupInProgress: boolean;
+  protected _currentLookupCall: LookupCall<TValue>;
+  protected _buttonPropertyChangeHandler: (event: PropertyChangeEvent<any, RadioButton<TValue>>) => void;
 
   constructor() {
     super();
@@ -30,7 +49,6 @@ export default class RadioButtonGroup extends ValueField {
 
     this._lookupExecuted = false;
     this._selectButtonLocked = false;
-    this._pendingLookup = null;
     this._lookupInProgress = false;
     this._currentLookupCall = null;
 
@@ -43,16 +61,16 @@ export default class RadioButtonGroup extends ValueField {
 
   static ErrorCode = {
     NO_DATA: 1
-  };
+  } as const;
 
-  _init(model) {
+  protected override _init(model: RadioButtonGroupModel<TValue>) {
     super._init(model);
 
     this._setLayoutConfig(this.layoutConfig);
     this._setGridColumnCount(this.gridColumnCount);
   }
 
-  _initValue(value) {
+  protected override _initValue(value: TValue) {
     if (this.lookupCall) {
       this._setLookupCall(this.lookupCall);
     }
@@ -61,26 +79,21 @@ export default class RadioButtonGroup extends ValueField {
     super._initValue(value);
   }
 
-  /**
-   * @override ModelAdapter.js
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    this.keyStrokeContext.registerKeyStroke([
+    this.keyStrokeContext.registerKeyStrokes([
       new RadioButtonGroupLeftOrUpKeyStroke(this),
       new RadioButtonGroupRightOrDownKeyStroke(this)
     ]);
   }
 
-  _initButtons() {
-    this.radioButtons = this.fields.filter(formField => {
-      return formField instanceof RadioButton;
-    });
+  protected _initButtons() {
+    this.radioButtons = this.fields.filter(formField => formField instanceof RadioButton) as RadioButton<TValue>[];
     this.radioButtons.forEach(this._initButton.bind(this));
   }
 
-  _initButton(button) {
+  protected _initButton(button: RadioButton<TValue>) {
     if (button.events.count('propertyChange', this._buttonPropertyChangeHandler) === 0) {
       button.on('propertyChange', this._buttonPropertyChangeHandler);
     }
@@ -93,7 +106,7 @@ export default class RadioButtonGroup extends ValueField {
     }
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'radiobutton-group');
     this.addLabel();
     this.addMandatoryIndicator();
@@ -107,69 +120,57 @@ export default class RadioButtonGroup extends ValueField {
     this.addStatus();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderFields();
     this._renderLayoutConfig();
   }
 
-  _createBodyLayout() {
+  protected _createBodyLayout(): RadioButtonGroupLayout {
     return new RadioButtonGroupLayout(this, this.layoutConfig);
   }
 
-  /**
-   * @override Widgets.js
-   */
-  _setLogicalGrid(logicalGrid) {
+  protected override _setLogicalGrid(logicalGrid: LogicalGrid | string) {
     super._setLogicalGrid(logicalGrid);
     if (this.logicalGrid) {
       this.logicalGrid.setGridConfig(new RadioButtonGroupGridConfig());
     }
   }
 
-  /**
-   * @override Widgets.js
-   */
-  invalidateLogicalGrid(invalidateLayout) {
+  override invalidateLogicalGrid(invalidateLayout?: boolean) {
     super.invalidateLogicalGrid(false);
     if (scout.nvl(invalidateLayout, true) && this.rendered) {
       this.htmlBody.invalidateLayoutTree();
     }
   }
 
-  setLayoutConfig(layoutConfig) {
+  setLayoutConfig(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
     this.setProperty('layoutConfig', layoutConfig);
   }
 
-  _setLayoutConfig(layoutConfig) {
+  protected _setLayoutConfig(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
     if (!layoutConfig) {
       layoutConfig = new LogicalGridLayoutConfig();
     }
     this._setProperty('layoutConfig', LogicalGridLayoutConfig.ensure(layoutConfig));
   }
 
-  _renderLayoutConfig() {
-    this.layoutConfig.applyToLayout(this.htmlBody.layout);
+  protected _renderLayoutConfig() {
+    this.layoutConfig.applyToLayout(this.htmlBody.layout as RadioButtonGroupLayout);
     if (this.rendered) {
       this.htmlBody.invalidateLayoutTree();
     }
   }
 
-  /**
-   * @override ValueField.js
-   */
-  isClearable() {
+  override isClearable(): boolean {
     return false;
   }
 
-  getFields() {
+  getFields(): FormField[] {
     return this.fields;
   }
 
-  /**
-   * @override
-   */
-  visitFields(visitor) {
+  override visitFields(visitor: (field: FormField) => TreeVisitResult | void): TreeVisitResult | void {
     let treeVisitResult = super.visitFields(visitor);
     if (treeVisitResult === TreeVisitResult.TERMINATE) {
       return TreeVisitResult.TERMINATE;
@@ -189,24 +190,21 @@ export default class RadioButtonGroup extends ValueField {
     }
   }
 
-  /**
-   * @override
-   */
-  getFocusableElement() {
+  override getFocusableElement(): HTMLElement | JQuery {
     // The first button may not be focusable because it is not selected and therefore has no tab index -> find the first focusable button
     return this.session.focusManager.findFirstFocusableElement(this.$container);
   }
 
-  setFields(fields) {
+  setFields(fields: FormField[]) {
     this.setProperty('fields', fields);
   }
 
-  _setFields(fields) {
+  protected _setFields(fields: FormField[]) {
     this._setProperty('fields', fields);
     this._initButtons();
   }
 
-  _renderFields() {
+  protected _renderFields() {
     this._ensureLookupCallExecuted();
     this.fields.forEach(function(formField) {
       formField.render(this.$body);
@@ -220,10 +218,7 @@ export default class RadioButtonGroup extends ValueField {
     this.invalidateLogicalGrid();
   }
 
-  /**
-   * @override
-   */
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     this._provideTabIndex();
   }
@@ -231,7 +226,7 @@ export default class RadioButtonGroup extends ValueField {
   /**
    * Set the selected (or first if none is selected) to tabbable
    */
-  _provideTabIndex() {
+  protected _provideTabIndex() {
     let tabSet;
     this.radioButtons.forEach(function(radioButton) {
       if (radioButton.enabledComputed && this.enabledComputed && !tabSet) {
@@ -247,11 +242,11 @@ export default class RadioButtonGroup extends ValueField {
     }, this);
   }
 
-  setGridColumnCount(gridColumnCount) {
+  setGridColumnCount(gridColumnCount: number) {
     this.setProperty('gridColumnCount', gridColumnCount);
   }
 
-  _setGridColumnCount(gridColumnCount) {
+  protected _setGridColumnCount(gridColumnCount: number): boolean {
     if (gridColumnCount < 0) {
       gridColumnCount = this._calcDefaultGridColumnCount();
     }
@@ -264,7 +259,7 @@ export default class RadioButtonGroup extends ValueField {
     return true;
   }
 
-  _calcDefaultGridColumnCount() {
+  protected _calcDefaultGridColumnCount(): number {
     let height = 1,
       hints = this.gridDataHints;
     if (hints && hints.h > 1) {
@@ -273,7 +268,7 @@ export default class RadioButtonGroup extends ValueField {
     return Math.ceil(this.fields.length / height);
   }
 
-  getButtonForRadioValue(radioValue) {
+  getButtonForRadioValue(radioValue: TValue): RadioButton<TValue> {
     if (radioValue === null) {
       return null;
     }
@@ -285,7 +280,7 @@ export default class RadioButtonGroup extends ValueField {
   /**
    * Search and then select the button with the corresponding radioValue
    */
-  _validateValue(value) {
+  protected override _validateValue(value: TValue): TValue {
     super._validateValue(value);
 
     if (!this.initialized && this.lookupCall) {
@@ -309,7 +304,7 @@ export default class RadioButtonGroup extends ValueField {
     return value;
   }
 
-  _valueChanged() {
+  protected override _valueChanged() {
     super._valueChanged();
     // Don't select button during initialization if value is null to not override selected state of a button
     if (this.value !== null || this.initialized) {
@@ -325,13 +320,13 @@ export default class RadioButtonGroup extends ValueField {
     this.selectButtonByIndex(this.radioButtons.length - 1);
   }
 
-  selectButtonByIndex(index) {
+  selectButtonByIndex(index: number) {
     if (this.radioButtons.length && index >= 0 && index < this.radioButtons.length) {
       this.selectButton(this.radioButtons[index]);
     }
   }
 
-  selectButton(radioButton) {
+  selectButton(radioButton: RadioButton<TValue>) {
     if (this.selectedButton === radioButton) {
       // Already selected
       return;
@@ -370,19 +365,19 @@ export default class RadioButtonGroup extends ValueField {
     this.setProperty('selectedButton', radioButton);
   }
 
-  getTabbableButton() {
+  getTabbableButton(): RadioButton<TValue> {
     return arrays.find(this.radioButtons, button => {
       return button.visible && button.isTabbable();
     });
   }
 
-  insertButton(radioButton) {
+  insertButton(radioButton: RadioButton<TValue>) {
     let newFields = this.fields.slice();
     newFields.push(radioButton);
     this.setFields(newFields);
   }
 
-  _onButtonPropertyChange(event) {
+  protected _onButtonPropertyChange(event: PropertyChangeEvent<any, RadioButton<TValue>>) {
     if (event.propertyName === 'selected') {
       let selected = event.newValue;
       if (selected) {
@@ -396,7 +391,7 @@ export default class RadioButtonGroup extends ValueField {
     }
   }
 
-  _setLookupCall(lookupCall) {
+  protected _setLookupCall(lookupCall: LookupCall<TValue>) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
     this._lookupExecuted = false;
     if (this.rendered) {
@@ -405,23 +400,21 @@ export default class RadioButtonGroup extends ValueField {
   }
 
   /**
-   * @return {boolean} true if a lookup call execution has been scheduled now. false otherwise.
+   * @returns true if a lookup call execution has been scheduled now. false otherwise.
    */
-  _ensureLookupCallExecuted() {
+  protected _ensureLookupCallExecuted(): boolean {
     if (!this.lookupCall) {
       return false;
     }
     if (this._lookupExecuted) {
       return false;
     }
+    // noinspection JSIgnoredPromiseFromCall
     this._lookupByAll();
     return true;
   }
 
-  /**
-   * @override
-   */
-  _createLoadingSupport() {
+  protected override _createLoadingSupport(): LoadingSupport {
     return new LoadingSupport({
       widget: this,
       $container: function() {
@@ -430,12 +423,10 @@ export default class RadioButtonGroup extends ValueField {
     });
   }
 
-  _lookupByAll() {
+  protected _lookupByAll(): JQuery.Promise<LookupResult<TValue>> {
     if (!this.lookupCall) {
       return;
     }
-
-    this._clearPendingLookup();
 
     let deferred = $.Deferred();
     let doneHandler = function(result) {
@@ -449,17 +440,10 @@ export default class RadioButtonGroup extends ValueField {
     return deferred.promise();
   }
 
-  _clearPendingLookup() {
-    if (this._pendingLookup) {
-      clearTimeout(this._pendingLookup);
-      this._pendingLookup = null;
-    }
-  }
-
   /**
    * A wrapper function around lookup calls used to set the _lookupInProgress flag, and display the state in the UI.
    */
-  _executeLookup(lookupCall, abortExisting) {
+  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting: boolean): JQuery.Promise<LookupResult<TValue>> {
     if (abortExisting && this._currentLookupCall) {
       this._currentLookupCall.abort();
     }
@@ -483,7 +467,7 @@ export default class RadioButtonGroup extends ValueField {
       });
   }
 
-  _lookupByAllDone(result) {
+  protected _lookupByAllDone(result: LookupResult<TValue>) {
     try {
 
       if (result.exception) {
@@ -512,7 +496,7 @@ export default class RadioButtonGroup extends ValueField {
     }
   }
 
-  _populateRadioButtonGroup(result) {
+  protected _populateRadioButtonGroup(result: LookupResult<TValue>) {
     let lookupRows = result.lookupRows;
     let newFields = this.fields.slice();
     lookupRows.forEach(function(lookupRow) {
@@ -526,23 +510,23 @@ export default class RadioButtonGroup extends ValueField {
     this.selectButton(this.getButtonForRadioValue(this.value));
   }
 
-  _clearLookupStatus() {
+  protected _clearLookupStatus() {
     this.setLookupStatus(null);
   }
 
-  setLookupStatus(lookupStatus) {
+  setLookupStatus(lookupStatus: Status) {
     this.setProperty('lookupStatus', lookupStatus);
     if (this.rendered) {
       this._renderErrorStatus();
     }
   }
 
-  _errorStatus() {
+  protected override _errorStatus(): Status {
     return this.lookupStatus || this.errorStatus;
   }
 
-  _createLookupRowRadioButton(lookupRow) {
-    let button = {
+  protected _createLookupRowRadioButton(lookupRow: LookupRow<TValue>): RadioButton<TValue> {
+    let button: RadioButtonModel<TValue> = {
       parent: this,
       label: lookupRow.text,
       radioValue: lookupRow.key,
@@ -574,10 +558,10 @@ export default class RadioButtonGroup extends ValueField {
       button.cssClass = lookupRow.cssClass;
     }
 
-    return scout.create(RadioButton, button);
+    return scout.create(RadioButton, button) as RadioButton<TValue>;
   }
 
-  clone(model, options) {
+  override clone(model: RadioButtonGroupModel<TValue>, options?: CloneOptions): this {
     let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'fields', options);
     clone._initButtons();

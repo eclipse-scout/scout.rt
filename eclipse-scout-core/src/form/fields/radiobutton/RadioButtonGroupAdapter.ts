@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueFieldAdapter} from '../../../index';
+import {RadioButtonGroupModel, ValueFieldAdapter, Widget} from '../../../index';
+import {RefModel, SomeRequired} from '../../../types';
 
 export default class RadioButtonGroupAdapter extends ValueFieldAdapter {
 
@@ -16,11 +17,8 @@ export default class RadioButtonGroupAdapter extends ValueFieldAdapter {
     super();
   }
 
-  /**
-   * @override
-   */
-  _initModel(model, parent) {
-    model = super._initModel(model, parent);
+  protected override _initModel(m: RefModel<RadioButtonGroupModel<any>>, parent: Widget): SomeRequired<RadioButtonGroupModel<any>, 'objectType'> {
+    let model = super._initModel(m, parent);
     // Set logical grid to null -> Calculation happens on server side
     model.logicalGrid = null;
     return model;

@@ -15,5 +15,4 @@ export default class TreeFieldAdapter extends FormFieldAdapter {
   constructor() {
     super();
   }
-
 }

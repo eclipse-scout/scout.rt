@@ -15,5 +15,4 @@ export default class ListBoxAdapter extends ValueFieldAdapter {
   constructor() {
     super();
   }
-
 }

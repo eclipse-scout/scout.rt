@@ -8,16 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ButtonLayout} from '../../../index';
+import {ButtonLayout, RadioButton} from '../../../index';
 
 export default class RadioButtonLayout extends ButtonLayout {
+  radioButton: RadioButton<any>;
 
-  constructor(radioButton) {
+  constructor(radioButton: RadioButton<any>) {
     super(radioButton);
     this.radioButton = radioButton;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     super.layout($container);
 
     let $icon = this.radioButton.get$Icon(),

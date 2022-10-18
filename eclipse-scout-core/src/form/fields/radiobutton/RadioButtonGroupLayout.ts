@@ -8,18 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlEnvironment, LogicalGridLayout} from '../../../index';
+import {HtmlEnvironment, LogicalGridLayout, LogicalGridLayoutConfig, RadioButtonGroup} from '../../../index';
+import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
 
 export default class RadioButtonGroupLayout extends LogicalGridLayout {
+  declare widget: RadioButtonGroup<any>;
 
-  constructor(widget, layoutConfig) {
+  constructor(widget: RadioButtonGroup<any>, layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
     super(widget, layoutConfig);
   }
 
-  /**
-   * @override LogicalGridLayout.js
-   */
-  _initDefaults() {
+  protected override _initDefaults() {
     super._initDefaults();
     this.hgap = HtmlEnvironment.get().smallColumnGap;
   }

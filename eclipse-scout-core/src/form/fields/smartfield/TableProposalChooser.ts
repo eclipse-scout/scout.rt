@@ -8,18 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Column, lookupField, objects, ProposalChooser, scout, Table, TableLayoutResetter} from '../../../index';
+import {arrays, Cell, Column, ColumnDescriptor, lookupField, LookupRow, objects, ProposalChooser, scout, Table, TableLayoutResetter, TableRow} from '../../../index';
+import {TableRowClickEvent} from '../../../table/TableEventMap';
+import {TableRowData} from '../../../table/TableRowModel';
+import {SmartFieldLookupResult} from './SmartField';
 
-export default class TableProposalChooser extends ProposalChooser {
+export default class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table, TableRow> {
 
   constructor() {
     super();
   }
 
-  /**
-   * @returns {Table}
-   */
-  _createModel() {
+  protected override _createContent(): Table {
     let headerVisible = false,
       columns = [],
       descriptors = this.smartField.columnDescriptors;
@@ -39,19 +39,19 @@ export default class TableProposalChooser extends ProposalChooser {
     return table;
   }
 
-  _createLayoutResetter() {
-    return scout.create(TableLayoutResetter, this.model);
+  protected override _createLayoutResetter(): TableLayoutResetter {
+    return scout.create(TableLayoutResetter, this.content);
   }
 
-  _createColumn() {
+  protected _createColumn(): Column<TValue> {
     return scout.create(Column, {
       session: this.session,
       width: Column.NARROW_MIN_WIDTH,
       horizontalAlignment: this.smartField.gridData.horizontalAlignment
-    });
+    }) as Column<TValue>;
   }
 
-  _createColumnForDescriptor(descriptor) {
+  protected _createColumnForDescriptor(descriptor: ColumnDescriptor) {
     let width = Column.NARROW_MIN_WIDTH;
     if (descriptor.width && descriptor.width > 0) { // 0 = default
       width = descriptor.width;
@@ -70,7 +70,7 @@ export default class TableProposalChooser extends ProposalChooser {
     });
   }
 
-  _createTable(columns, headerVisible) {
+  protected _createTable(columns: Column<TValue>[], headerVisible: boolean): Table {
     return scout.create(Table, {
       parent: this,
       headerVisible: headerVisible,
@@ -84,7 +84,7 @@ export default class TableProposalChooser extends ProposalChooser {
     });
   }
 
-  _onRowClick(event) {
+  protected _onRowClick(event: TableRowClickEvent) {
     let row = event.row;
     if (!row || !row.enabled) {
       return;
@@ -93,58 +93,58 @@ export default class TableProposalChooser extends ProposalChooser {
     this.triggerLookupRowSelected(row);
   }
 
-  selectedRow() {
-    return this.model.selectedRow();
+  override selectedRow(): TableRow {
+    return this.content.selectedRow();
   }
 
-  setLookupResult(result) {
+  override setLookupResult(result: SmartFieldLookupResult<TValue>) {
     let
       tableRows = [],
       lookupRows = result.lookupRows,
       multipleColumns = !!this.smartField.columnDescriptors;
 
-    this.model.deleteAllRows();
-    lookupRows.forEach(function(lookupRow) {
+    this.content.deleteAllRows();
+    lookupRows.forEach(lookupRow => {
       tableRows.push(this._createTableRow(lookupRow, multipleColumns));
-    }, this);
-    this.model.insertRows(tableRows);
+    });
+    this.content.insertRows(tableRows);
 
     this._selectProposal(result, tableRows);
   }
 
-  trySelectCurrentValue() {
+  override trySelectCurrentValue() {
     let currentValue = this.smartField.getValueForSelection();
     if (objects.isNullOrUndefined(currentValue)) {
       return;
     }
-    let tableRow = arrays.find(this.model.rows, row => {
+    let tableRow = arrays.find(this.content.rows, row => {
       return row.lookupRow.key === currentValue;
     });
     if (tableRow) {
-      this.model.selectRow(tableRow);
+      this.content.selectRow(tableRow);
     }
   }
 
-  selectFirstLookupRow() {
-    if (this.model.rows.length) {
-      this.model.selectRow(this.model.rows[0]);
+  override selectFirstLookupRow() {
+    if (this.content.rows.length) {
+      this.content.selectRow(this.content.rows[0]);
     }
   }
 
-  clearSelection() {
-    this.model.deselectAll();
+  override clearSelection() {
+    this.content.deselectAll();
   }
 
-  clearLookupRows() {
-    this.model.removeAllRows();
+  override clearLookupRows() {
+    this.content.removeAllRows();
   }
 
   /**
    * Creates a table-row for the given lookup-row.
    *
-   * @returns {object} table-row model
+   * @returns table-row model
    */
-  _createTableRow(lookupRow, multipleColumns) {
+  protected _createTableRow(lookupRow: LookupRow<TValue>, multipleColumns: boolean): TableRowData {
     let row = lookupField.createTableRow(lookupRow, multipleColumns);
     if (multipleColumns) {
       arrays.pushAll(row.cells, this._transformTableRowData(lookupRow, lookupRow.additionalTableRowData));
@@ -152,14 +152,14 @@ export default class TableProposalChooser extends ProposalChooser {
     return row;
   }
 
-  _renderModel() {
-    this.model.setVirtual(this.smartField.virtual());
-    super._renderModel();
-    this.model.$data.addClass('top-border-on-first-row');
+  protected override _renderContent() {
+    this.content.setVirtual(this.smartField.virtual());
+    super._renderContent();
+    this.content.$data.addClass('top-border-on-first-row');
   }
 
-  getSelectedLookupRow() {
-    let selectedRow = this.model.selectedRow();
+  override getSelectedLookupRow(): LookupRow<TValue> {
+    let selectedRow = this.content.selectedRow();
     if (!selectedRow) {
       return null;
     }
@@ -170,7 +170,7 @@ export default class TableProposalChooser extends ProposalChooser {
    * Takes the TableRowData bean and the infos provided by the column descriptors to create an
    * array of additional values in the correct order, as defined by the descriptors.
    */
-  _transformTableRowData(lookupRow, tableRowData) {
+  protected _transformTableRowData(lookupRow: LookupRow<TValue>, tableRowData: object): Cell<TValue>[] {
     let descriptors = this.smartField.columnDescriptors;
     let cells = [];
     descriptors.forEach(desc => {

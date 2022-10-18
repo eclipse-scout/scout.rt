@@ -8,15 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldLayout, graphics} from '../../../index';
+import {FormFieldLayout, graphics, Rectangle, StringField} from '../../../index';
 
 export default class StringFieldLayout extends FormFieldLayout {
 
-  constructor(stringField) {
+  constructor(stringField: StringField) {
     super(stringField);
   }
 
-  _layoutClearIcon(formField, fieldBounds, right, top) {
+  protected override _layoutClearIcon(formField: StringField, fieldBounds: Rectangle, right: number, top: number) {
     if (formField.$icon && formField.$icon.isVisible()) {
       right += graphics.prefSize(formField.$icon, true).width;
     }

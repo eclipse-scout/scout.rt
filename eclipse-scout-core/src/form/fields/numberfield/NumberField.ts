@@ -8,9 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicField, Calculator, DecimalFormat, fields, InputFieldKeyStrokeContext, numbers, objects} from '../../../index';
+import {BasicField, Calculator, DecimalFormat, fields, InputFieldKeyStrokeContext, KeyStrokeContext, Locale, NumberFieldEventMap, NumberFieldModel, numbers, objects} from '../../../index';
 
-export default class NumberField extends BasicField {
+export default class NumberField extends BasicField<number> implements NumberFieldModel {
+  declare model: NumberFieldModel;
+  declare eventMap: NumberFieldEventMap;
+
+  calc: Calculator;
+  minValue: number;
+  maxValue: number;
+  decimalFormat: DecimalFormat;
 
   constructor() {
     super();
@@ -22,7 +29,7 @@ export default class NumberField extends BasicField {
     this.gridDataHints.horizontalAlignment = 1; // number fields are right aligned by default.
   }
 
-  _init(model) {
+  protected override _init(model: NumberFieldModel) {
     super._init(model);
     this._setMinValue(this.minValue);
     this._setMaxValue(this.maxValue);
@@ -33,19 +40,16 @@ export default class NumberField extends BasicField {
    * Initializes the decimal format before calling set value.
    * This cannot be done in _init because the value field would call _setValue first
    */
-  _initValue(value) {
+  protected override _initValue(value: number) {
     this._setDecimalFormat(this.decimalFormat);
     super._initValue(value);
   }
 
-  /**
-   * @override Widget.js
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new InputFieldKeyStrokeContext();
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'number-field');
     this.addLabel();
     this.addMandatoryIndicator();
@@ -54,29 +58,29 @@ export default class NumberField extends BasicField {
     this.addStatus();
   }
 
-  _renderGridData() {
+  protected override _renderGridData() {
     super._renderGridData();
     this.updateInnerAlignment({
       useHorizontalAlignment: true
     });
   }
 
-  _renderGridDataHints() {
+  protected override _renderGridDataHints() {
     super._renderGridDataHints();
     this.updateInnerAlignment({
       useHorizontalAlignment: true
     });
   }
 
-  _getDefaultFormat(locale) {
+  protected _getDefaultFormat(locale: Locale): string | DecimalFormat {
     return locale.decimalFormatPatternDefault;
   }
 
-  setDecimalFormat(decimalFormat) {
+  setDecimalFormat(decimalFormat: string | DecimalFormat) {
     this.setProperty('decimalFormat', decimalFormat);
   }
 
-  _setDecimalFormat(decimalFormat) {
+  protected _setDecimalFormat(decimalFormat: string | DecimalFormat) {
     if (!decimalFormat) {
       decimalFormat = this._getDefaultFormat(this.session.locale);
     }
@@ -89,10 +93,7 @@ export default class NumberField extends BasicField {
     }
   }
 
-  /**
-   * @override
-   */
-  _parseValue(displayText) {
+  protected override _parseValue(displayText: string): number {
     if (!displayText) {
       return null;
     }
@@ -100,7 +101,7 @@ export default class NumberField extends BasicField {
     return this.decimalFormat.parse(displayText, this._evaluateNumber.bind(this));
   }
 
-  _evaluateNumber(normalizedNumberString) {
+  protected _evaluateNumber(normalizedNumberString: string): number {
     // Convert to JS number format (remove groupingChar, replace decimalSeparatorChar with '.')
     // Only needed for calculator
     // if only math symbols are in the input string...
@@ -117,19 +118,11 @@ export default class NumberField extends BasicField {
     return Number(normalizedNumberString);
   }
 
-  /**
-   * @override
-   */
-  _ensureValue(value) {
+  protected override _ensureValue(value: number) {
     return numbers.ensure(value);
   }
 
-  /**
-   * @param {number} the number to validate
-   * @return {number} the validated number
-   * @override
-   */
-  _validateValue(value) {
+  protected override _validateValue(value: number): number {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }
@@ -145,24 +138,21 @@ export default class NumberField extends BasicField {
     return value;
   }
 
-  _onNumberTooLarge() {
+  protected _onNumberTooLarge() {
     if (objects.isNullOrUndefined(this.minValue)) {
       throw this.session.text('NumberTooLargeMessageX', this._formatValue(this.maxValue));
     }
     throw this.session.text('NumberTooLargeMessageXY', this._formatValue(this.minValue), this._formatValue(this.maxValue));
   }
 
-  _onNumberTooSmall() {
+  protected _onNumberTooSmall() {
     if (objects.isNullOrUndefined(this.maxValue)) {
       throw this.session.text('NumberTooSmallMessageX', this._formatValue(this.minValue));
     }
     throw this.session.text('NumberTooSmallMessageXY', this._formatValue(this.minValue), this._formatValue(this.maxValue));
   }
 
-  /**
-   * @override
-   */
-  _formatValue(value) {
+  protected override _formatValue(value: number): string | JQuery.Promise<string> {
     if (objects.isNullOrUndefined(value)) {
       return '';
     }
@@ -177,9 +167,8 @@ export default class NumberField extends BasicField {
    * Set the minimum value. Value <code>null</code> means no limitation.
    * <p>
    * If the new minimum value is bigger than the current maxValue, the current maximum value is changed to the new minimum value.
-   * @param {number} the new minimum value
    */
-  setMinValue(minValue) {
+  setMinValue(minValue: number) {
     if (this.minValue === minValue) {
       return;
     }
@@ -187,7 +176,7 @@ export default class NumberField extends BasicField {
     this.validate();
   }
 
-  _setMinValue(minValue) {
+  protected _setMinValue(minValue: number) {
     this._setProperty('minValue', minValue);
     if (!objects.isNullOrUndefined(this.maxValue) && !objects.isNullOrUndefined(this.minValue) && minValue > this.maxValue) {
       this._setMaxValue(minValue);
@@ -198,9 +187,8 @@ export default class NumberField extends BasicField {
    * Set the maximum value. Value <code>null</code> means no limitation.
    * <p>
    * If the new maximum value is smaller than the current minValue, the current minimum value is changed to the new maximum value.
-   * @param {number} the new minimum value
    */
-  setMaxValue(maxValue) {
+  setMaxValue(maxValue: number) {
     if (this.maxValue === maxValue) {
       return;
     }
@@ -208,7 +196,7 @@ export default class NumberField extends BasicField {
     this.validate();
   }
 
-  _setMaxValue(maxValue) {
+  protected _setMaxValue(maxValue: number) {
     this._setProperty('maxValue', maxValue);
     if (!objects.isNullOrUndefined(this.maxValue) && !objects.isNullOrUndefined(this.minValue) && maxValue < this.minValue) {
       this._setMinValue(maxValue);

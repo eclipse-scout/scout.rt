@@ -8,14 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, SmartField} from '../../../index';
 
 /**
  * Closes the popup without accepting the proposal
  */
 export default class SmartFieldCancelKeyStroke extends KeyStroke {
+  declare field: SmartField<any>;
 
-  constructor(field) {
+  constructor(field: SmartField<any>) {
     super();
     this.field = field;
     this.which = [keys.ESC];
@@ -27,7 +28,7 @@ export default class SmartFieldCancelKeyStroke extends KeyStroke {
     }.bind(this);
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -38,10 +39,7 @@ export default class SmartFieldCancelKeyStroke extends KeyStroke {
     return true;
   }
 
-  /**
-   * @override
-   */
-  handle(event) {
+  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     this.field.closePopup();
     this.field.resetDisplayText();
   }

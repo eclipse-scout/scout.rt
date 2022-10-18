@@ -8,9 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Button, Device, fields, RadioButtonKeyStroke, RadioButtonLayout, tooltips} from '../../../index';
+import {Button, Device, fields, RadioButtonEventMap, RadioButtonKeyStroke, RadioButtonLayout, RadioButtonModel, tooltips} from '../../../index';
 
-export default class RadioButton extends Button {
+export default class RadioButton<TValue> extends Button implements RadioButtonModel<TValue> {
+  declare model: RadioButtonModel<TValue>;
+  declare eventMap: RadioButtonEventMap<TValue>;
+
+  focusWhenSelected: boolean;
+  wrapText: boolean;
+  radioValue: TValue;
+  $radioButton: JQuery;
 
   constructor() {
     super();
@@ -22,17 +29,14 @@ export default class RadioButton extends Button {
     this.radioValue = null;
   }
 
-  /**
-   * @override Button.js
-   */
-  _initDefaultKeyStrokes() {
-    this.keyStrokeContext.registerKeyStroke([
+  protected override _initDefaultKeyStrokes() {
+    this.keyStrokeContext.registerKeyStrokes([
       new RadioButtonKeyStroke(this, 'ENTER'),
       new RadioButtonKeyStroke(this, 'SPACE')
     ]);
   }
 
-  _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'radio-button', new RadioButtonLayout(this));
     this.addFieldContainer(this.$parent.makeDiv());
     this.$radioButton = this.$fieldContainer
@@ -56,26 +60,23 @@ export default class RadioButton extends Button {
     this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
   }
 
-  _remove() {
+  protected override _remove() {
     tooltips.uninstall(this.$buttonLabel);
     this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
     super._remove();
   }
 
-  /**
-   * @override
-   */
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderWrapText();
     this._renderSelected();
   }
 
-  setWrapText(wrapText) {
+  setWrapText(wrapText: boolean) {
     this.setProperty('wrapText', wrapText);
   }
 
-  _renderWrapText() {
+  protected _renderWrapText() {
     this.$buttonLabel.toggleClass('white-space-nowrap', !this.wrapText);
     this.invalidateLayoutTree();
   }
@@ -87,26 +88,22 @@ export default class RadioButton extends Button {
     this.setSelected(true);
   }
 
-  setSelected(selected) {
-    this.setProperty('selected', selected);
-  }
-
-  _renderSelected() {
+  protected override _renderSelected() {
     this.$fieldContainer.toggleClass('checked', this.selected);
     this.$field.toggleClass('checked', this.selected);
   }
 
-  setTabbable(tabbable) {
+  setTabbable(tabbable: boolean) {
     if (this.rendered) {
       this.$field.setTabbable(tabbable && !Device.get().supportsOnlyTouch());
     }
   }
 
-  isTabbable() {
+  isTabbable(): boolean {
     return this.rendered && this.$field.isTabbable();
   }
 
-  _renderIconId() {
+  protected override _renderIconId() {
     super._renderIconId();
     let $icon = this.get$Icon();
     if ($icon.length > 0) {
@@ -114,10 +111,7 @@ export default class RadioButton extends Button {
     }
   }
 
-  /**
-   * @override Button.js
-   */
-  doAction() {
+  override doAction(): boolean {
     if (!this.enabledComputed || !this.visible) {
       return false;
     }
@@ -126,7 +120,7 @@ export default class RadioButton extends Button {
     return true;
   }
 
-  _onMouseDown(event) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent) {
     if (!this.enabledComputed) {
       return;
     }

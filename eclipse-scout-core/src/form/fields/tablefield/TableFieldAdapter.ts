@@ -15,5 +15,4 @@ export default class TableFieldAdapter extends FormFieldAdapter {
   constructor() {
     super();
   }
-
 }

@@ -46,9 +46,9 @@ export type AnyWidget =
   | TabArea
   | TabBoxHeader
   | Tab
-  | ProposalChooser
-  | TableProposalChooser
-  | TreeProposalChooser
+  | ProposalChooser<any, any, any>
+  | TableProposalChooser<any>
+  | TreeProposalChooser<any>
   | MenuBarBox
   | MenuBar
   | MenuBox
@@ -70,7 +70,7 @@ export type AnyWidget =
   | Label
   | Popup
   | TagChooserPopup
-  | SmartFieldPopup
+  | SmartFieldPopup<any>
   | ContextMenuPopup
   | TouchPopup
   | WidgetPopup

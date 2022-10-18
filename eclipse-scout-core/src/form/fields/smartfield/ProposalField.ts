@@ -8,10 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {objects, scout, SmartField, strings} from '../../../index';
+import {LookupRow, objects, ProposalFieldEventMap, ProposalFieldModel, scout, SmartField, strings} from '../../../index';
 import $ from 'jquery';
+import {SmartFieldLookupResult} from './SmartField';
 
-export default class ProposalField extends SmartField {
+export default class ProposalField extends SmartField<string> implements ProposalFieldModel {
+  declare model: ProposalFieldModel;
+  declare eventMap: ProposalFieldEventMap;
+
+  trimText: boolean;
+
+  /**
+   * If this flag is set to true the proposal field performs a lookup by text when
+   * accept proposal is called. The behavior is similar to what the smart-field does
+   * in that case, but without the need to have a valid single match as the result
+   * from the lookup.
+   */
+  lookupOnAcceptByText: boolean;
 
   constructor() {
     super();
@@ -19,28 +32,22 @@ export default class ProposalField extends SmartField {
     this.maxLength = 4000;
     this.trimText = true;
 
-    /**
-     * If this flag is set to true the proposal field performs a lookup by text when
-     * accept proposal is called. The behavior is similar to what the smart-field does
-     * in that case, but without the need to have a valid single match as the result
-     * from the lookup.
-     */
     this.lookupOnAcceptByText = false;
   }
 
-  _getValueFromLookupRow(lookupRow) {
+  protected override _getValueFromLookupRow(lookupRow: LookupRow<string>): string {
     return lookupRow.text;
   }
 
-  _getLastSearchText() {
+  protected override _getLastSearchText(): string {
     return this.value;
   }
 
-  cssClassName() {
+  override cssClassName(): string {
     return 'proposal-field';
   }
 
-  _handleEnterKey(event) {
+  protected override _handleEnterKey(event: JQuery.KeyDownEvent) {
     // The state of 'this.popup' is different on various browsers. On some browsers (IE11) we don't
     // do CSS animations. This means IE11 sets the popup to null immediately whereas other browsers
     // use a timeout. Anyway: in case the popup is open at the time the user presses enter, we must
@@ -56,7 +63,7 @@ export default class ProposalField extends SmartField {
     }
   }
 
-  _lookupByTextOrAllDone(result) {
+  protected override _lookupByTextOrAllDone(result: SmartFieldLookupResult<string>) {
     if (super._handleException(result)) {
       return;
     }
@@ -68,11 +75,11 @@ export default class ProposalField extends SmartField {
     super._lookupByTextOrAllDone(result);
   }
 
-  _formatValue(value) {
+  protected override _formatValue(value: string): string {
     return scout.nvl(value, '');
   }
 
-  _validateValue(value) {
+  protected override _validateValue(value: string): string {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }
@@ -86,7 +93,7 @@ export default class ProposalField extends SmartField {
     return validValue;
   }
 
-  _ensureValue(value) {
+  protected override _ensureValue(value: string): string {
     return strings.asString(value);
   }
 
@@ -94,7 +101,7 @@ export default class ProposalField extends SmartField {
    * When 'clear' has been clicked (searchText is empty), we want to call customTextAccepted,
    * so the new value is sent to the server #221199.
    */
-  _acceptByText(sync, searchText) {
+  protected override _acceptByText(sync: boolean, searchText: string) {
     $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptByText) searchText=', searchText);
     let async = !sync;
 
@@ -111,7 +118,7 @@ export default class ProposalField extends SmartField {
    * Only used in case lookupOnAcceptByText is true. It's basically the same code
    * as in the smart-field but without the error handling.
    */
-  _acceptByTextDone(result) {
+  protected override _acceptByTextDone(result: SmartFieldLookupResult<string>) {
     this._userWasTyping = false;
     this._extendResult(result);
 
@@ -128,38 +135,29 @@ export default class ProposalField extends SmartField {
     this._customTextAccepted(result.text);
   }
 
-  _checkResetLookupRow(value) {
+  protected override _checkResetLookupRow(value: string): boolean {
     return this.lookupRow && this.lookupRow.text !== value;
   }
 
-  _checkSearchTextChanged(searchText) {
+  protected override _checkSearchTextChanged(searchText: string): boolean {
     return this._checkDisplayTextChanged(searchText);
   }
 
-  _customTextAccepted(searchText) {
+  protected _customTextAccepted(searchText: string) {
     this._setLookupRow(null); // only reset property lookup
     this._setValue(searchText);
     this._inputAccepted(true, false);
   }
 
-  getValueForSelection() {
+  override getValueForSelection(): string {
     return this._showSelection() ? this.lookupRow.key : null;
-  }
-
-  /**
-   * This function is overridden by ProposalField because it has a different behavior than the smart-field.
-   */
-  _acceptLookupRowAndValueFromField(otherField) {
-    if (this.lookupRow !== otherField.lookupRow) {
-      this.setLookupRow(otherField.lookupRow);
-    }
   }
 
   /**
    * In ProposalField value and display-text is the same. When a custom text has been entered,
    * the value is set and the lookup-row is null.
    */
-  _copyValuesFromField(otherField) {
+  protected override _copyValuesFromField(otherField: ProposalField) {
     if (this.lookupRow !== otherField.lookupRow) {
       this.setLookupRow(otherField.lookupRow);
     }
@@ -168,7 +166,7 @@ export default class ProposalField extends SmartField {
     }
   }
 
-  _acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
+  protected override _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<string>): JQuery.Promise<void> | void {
     // Do nothing when search text is equals to the text of the current lookup row
     if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
       $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) unchanged: text is equals. Close popup');
@@ -201,14 +199,11 @@ export default class ProposalField extends SmartField {
     return this._acceptInputDeferred.promise();
   }
 
-  setTrimText(trimText) {
+  setTrimText(trimText: boolean) {
     this.setProperty('trimText', trimText);
   }
 
-  /**
-   * @override ValueField.js
-   */
-  _updateEmpty() {
+  protected override _updateEmpty() {
     this.empty = strings.empty(this.value);
   }
 }

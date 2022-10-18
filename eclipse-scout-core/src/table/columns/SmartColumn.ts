@@ -186,19 +186,19 @@ export default class SmartColumn<TValue> extends Column<TValue> {
    * which is not necessary, since the cell already contains text and value. This also avoids a problem
    * with multiple lookups running at once, see ticket 236960.
    */
-  protected override _updateEditorFromValidCell(field: SmartField, cell: Cell<TValue>) {
+  protected override _updateEditorFromValidCell(field: SmartField<TValue>, cell: Cell<TValue>) {
     if (objects.isNullOrUndefined(cell.value)) {
       field.setValue(null);
       return;
     }
 
-    let lookupRow = new LookupRow();
+    let lookupRow: LookupRow<TValue> = new LookupRow();
     lookupRow.key = cell.value;
     lookupRow.text = cell.text;
     field.setLookupRow(lookupRow);
   }
 
-  protected override _createEditor(row: TableRow): SmartField {
+  protected override _createEditor(row: TableRow): SmartField<TValue> {
     let field = scout.create(SmartField, {
       parent: this.table,
       codeType: this.codeType,
@@ -208,20 +208,16 @@ export default class SmartColumn<TValue> extends Column<TValue> {
       browseAutoExpandAll: this.browseAutoExpandAll,
       browseLoadIncremental: this.browseLoadIncremental,
       activeFilterEnabled: this.activeFilterEnabled
-    });
+    }) as SmartField<TValue>;
 
-    // FIXME TS: add correct events as soon as SmartField has been migrated.
     field.on('prepareLookupCall', event => {
       this.trigger('prepareLookupCall', {
-        // @ts-ignore
         lookupCall: event.lookupCall,
         row: row
       });
     });
-    // FIXME TS: add correct events as soon as SmartField has been migrated.
     field.on('lookupCallDone', event => {
       this.trigger('lookupCallDone', {
-        // @ts-ignore
         result: event.result
       });
     });
@@ -229,7 +225,7 @@ export default class SmartColumn<TValue> extends Column<TValue> {
     return field;
   }
 
-  protected override _updateCellFromValidEditor(row: TableRow, field: SmartField) {
+  protected override _updateCellFromValidEditor(row: TableRow, field: SmartField<TValue>) {
     // The following code is only necessary to prevent flickering because the text is updated async.
     // Instead of only calling setCellValue which itself would update the display text, we set the text manually before calling setCellValue.
     // This works because in most of the cases the text computed by the column will be the same as the one computed by the editor field.

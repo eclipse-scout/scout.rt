@@ -20,14 +20,17 @@
  */
 export default class Calculator {
 
+  protected _tokens: string[];
+
   constructor() {
+    this._tokens = [];
   }
 
-  isFormula(input) {
+  isFormula(input: string): RegExpMatchArray {
     return input.match(/^[\d()+\-*/.]+$/);
   }
 
-  evalFormula(input) {
+  evalFormula(input: string): number {
     this._tokens = input
       .split(/([\d.]+|\(|\)|[+\-*/])/)
       .filter(e => {
@@ -36,25 +39,25 @@ export default class Calculator {
     return this._expr();
   }
 
-  _next() {
+  protected _next(): string {
     if (this._tokens.length === 0) {
       return undefined;
     }
     return this._tokens[0];
   }
 
-  _consumeNext() {
+  protected _consumeNext(): string {
     let cur = this._tokens[0];
     this._tokens = this._tokens.slice(1, this._tokens.length);
     return cur;
   }
 
-  _expr() {
+  protected _expr(): number {
     return this._sum();
   }
 
   // a+b+...
-  _sum() {
+  protected _sum(): number {
     let v = this._prod();
     while (this._next() === '+' || this._next() === '-') {
       switch (this._consumeNext()) { // NOSONAR
@@ -70,7 +73,7 @@ export default class Calculator {
   }
 
   // a*b*...
-  _prod() {
+  protected _prod(): number {
     let v = this._unary();
     while (this._next() === '*' || this._next() === '/') {
       switch (this._consumeNext()) { // NOSONAR
@@ -86,7 +89,7 @@ export default class Calculator {
   }
 
   // [+-]123, [+-](a)
-  _unary() {
+  protected _unary(): number {
     let qualifier = 1;
     if (this._next() === '+') {
       this._consumeNext();
@@ -104,7 +107,7 @@ export default class Calculator {
   }
 
   // (a)
-  _group() {
+  protected _group(): number {
     if (this._next() === '(') {
       this._consumeNext();
       let v = this._expr();

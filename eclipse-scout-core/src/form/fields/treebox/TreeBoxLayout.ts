@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupBoxLayout} from '../../../index';
+import {LookupBoxLayout, Tree, TreeBox, Widget} from '../../../index';
 
 export default class TreeBoxLayout extends LookupBoxLayout {
 
-  constructor(treeBox, tree, filterBox) {
+  constructor(treeBox: TreeBox<any>, tree: Tree, filterBox: Widget) {
     super(treeBox, tree, filterBox);
   }
-
 }

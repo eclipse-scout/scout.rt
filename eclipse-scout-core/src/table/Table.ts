@@ -3920,11 +3920,11 @@ export default class Table extends Widget implements TableModel {
         session: this.session,
         table: this
       }),
-      updateTextFilterText: (filter, text) => {
-        if (objects.equals(filter.acceptedText, text)) {
+      updateTextFilterText: (filter: TableTextUserFilter, text) => {
+        if (objects.equals(filter.text, text)) {
           return false;
         }
-        filter.acceptedText = text;
+        filter.text = text;
         return true;
       }
     });

@@ -8,18 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormAdapter} from '../../index';
-
-/**
- * @typedef JsFormModel
- * @property {object} parent
- * @property {object} owner
- * @property {object} displayParent
- * @property {string} displayHint
- * @property {object} inputData
- * @property {string} jsFormObjectType
- * @property {object} jsFormModel
- */
+import {Event, Form, FormAdapter, FormModel, JsFormModel, ObjectWithType, Widget} from '../../index';
 
 export default class JsFormAdapter extends FormAdapter {
 
@@ -27,11 +16,8 @@ export default class JsFormAdapter extends FormAdapter {
     super();
   }
 
-  /**
-   * @param {JsFormModel} model
-   */
-  _initModel(model, parent) {
-    model = super._initModel(model, parent);
+  protected override _initModel(m: Omit<JsFormModel, 'parent'> & ObjectWithType, parent: Widget): FormModel & ObjectWithType {
+    let model = super._initModel(m, parent) as JsFormModel;
 
     if (!model.jsFormObjectType || !model.jsFormObjectType.length) {
       throw new Error('jsFormObjectType not set');
@@ -53,16 +39,17 @@ export default class JsFormAdapter extends FormAdapter {
     return jsFormModel;
   }
 
-  _createWidget(model) {
-    let widget = super._createWidget(model);
+  protected override _createWidget(model: FormModel & ObjectWithType): Form {
+    let widget = super._createWidget(model) as Form;
 
     widget.showOnOpen = false;
+    // noinspection JSIgnoredPromiseFromCall
     widget.open();
 
     return widget;
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<Form>) {
     if (event.type === 'save') {
       this._onWidgetSave(event);
     } else {
@@ -70,13 +57,13 @@ export default class JsFormAdapter extends FormAdapter {
     }
   }
 
-  _onWidgetSave(event) {
+  protected _onWidgetSave(event: Event<Form>) {
     this._send('save', {
       outputData: this.widget.data
     });
   }
 
-  _onWidgetClose(event) {
+  protected override _onWidgetClose(event: Event<Form>) {
     // marks the end of the js lifecycle
     // prevent remove/destroy of the widget as it will be done by the UI server
     event.preventDefault();
@@ -84,7 +71,7 @@ export default class JsFormAdapter extends FormAdapter {
     this._send('formClosing');
   }
 
-  _onWidgetAbort(event) {
+  protected override _onWidgetAbort(event: Event<Form>) {
     // completely handled by the js lifecycle -> no need to notify the UI server
   }
 }

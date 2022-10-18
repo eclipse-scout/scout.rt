@@ -14,7 +14,5 @@ export default class RadioButtonAdapter extends ButtonAdapter {
 
   constructor() {
     super();
-    this._addRemoteProperties(['selected']);
   }
-
 }

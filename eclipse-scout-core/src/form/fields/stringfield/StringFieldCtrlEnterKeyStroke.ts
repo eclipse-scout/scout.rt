@@ -8,23 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, StringField} from '../../../index';
 
 export default class StringFieldCtrlEnterKeyStroke extends KeyStroke {
+  declare field: StringField;
 
-  constructor(stringField) {
+  constructor(stringField: StringField) {
     super();
     this.field = stringField;
     this.which = [keys.ENTER];
     this.ctrl = true;
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     return accepted && this.field.hasAction;
   }
 
-  handle(event) {
+  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+    // @ts-ignore
     this.field._onIconClick();
   }
 }

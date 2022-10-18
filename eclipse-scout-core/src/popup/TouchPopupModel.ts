@@ -11,5 +11,5 @@
 import {DateField, PopupModel, SmartField} from '../index';
 
 export default interface TouchPopupModel extends PopupModel {
-  field: DateField | SmartField;
+  field: DateField | SmartField<any>;
 }

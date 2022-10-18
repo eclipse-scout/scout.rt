@@ -15,5 +15,4 @@ export default class TileFieldAdapter extends FormFieldAdapter {
   constructor() {
     super();
   }
-
 }
