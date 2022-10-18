@@ -10,6 +10,7 @@
  */
 import {keys, scout, TabBox} from '../../../../src/index';
 import {TabBoxSpecHelper} from '../../../../src/testing/index';
+import {triggerKeyDownCapture} from '../../../../src/testing/jquery-testing';
 
 describe('TabBox', () => {
   let session;
@@ -86,18 +87,18 @@ describe('TabBox', () => {
       tabItemA.focus();
       // check right/left keys
       expect(tabBox.selectedTab).toBe(tabItemA);
-      tabBox.header.tabArea.$container.triggerKeyDownCapture(keys.RIGHT);
+      triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.RIGHT);
       expect(tabBox.selectedTab).toBe(tabItemB);
-      tabBox.header.tabArea.$container.triggerKeyDownCapture(keys.LEFT);
+      triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.LEFT);
       expect(tabBox.selectedTab).toBe(tabItemA);
 
       // make sure that nothing happens when first or last tab is selected and left/right is pressed
       tabBox.setSelectedTab(tabItemA);
-      tabBox.header.tabArea.$container.triggerKeyDownCapture(keys.LEFT);
+      triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.LEFT);
       expect(tabBox.selectedTab).toBe(tabItemA); // still A
 
       tabBox.setSelectedTab(tabItemB);
-      tabBox.header.tabArea.$container.triggerKeyDownCapture(keys.RIGHT);
+      triggerKeyDownCapture(tabBox.header.tabArea.$container, keys.RIGHT);
       expect(tabBox.selectedTab).toBe(tabItemB); // still B
     });
 

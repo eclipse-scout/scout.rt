@@ -10,6 +10,7 @@
  */
 import {Device, FileChooserField, scout, Status} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
+import {triggerClick} from '../../../../src/testing/jquery-testing';
 
 describe('FileChooserField', () => {
   let session;
@@ -125,7 +126,7 @@ describe('FileChooserField', () => {
         label: 'label'
       });
       field.render();
-      field.$label.triggerClick();
+      triggerClick(field.$label);
       expect(field.$field).toBeFocused();
     });
 

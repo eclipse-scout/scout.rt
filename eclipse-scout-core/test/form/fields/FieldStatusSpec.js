@@ -10,6 +10,7 @@
  */
 import {FieldStatus, GroupBox, Menu, scout, SmartField, Status, StringField} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
+import {triggerMouseDownCapture} from '../../../src/testing/jquery-testing';
 
 describe('FieldStatus', () => {
   let session, helper;
@@ -154,7 +155,7 @@ describe('FieldStatus', () => {
     expect(tooltip.rendered).toBeTrue();
     expect(popup.rendered).toBeTrue();
 
-    $outside.triggerMouseDownCapture();
+    triggerMouseDownCapture($outside);
     expect(tooltip.rendered).toBeFalse();
     expect(popup.rendered).toBeFalse();
     expect(popup.destroyed).toBe(true);

@@ -10,6 +10,7 @@
  */
 import {Action, EllipsisMenu, Menu, scout, tooltips} from '../../src/index';
 import {MenuSpecHelper} from '../../src/testing/index';
+import {triggerMouseEnter, triggerMouseLeave} from '../../src/testing/jquery-testing';
 
 describe('Menu', () => {
 
@@ -140,7 +141,7 @@ describe('Menu', () => {
       let $tooltip = find$Tooltips();
       expect($tooltip.length).toBe(0);
 
-      testMenu.$container.triggerMouseEnter();
+      triggerMouseEnter(testMenu.$container);
       jasmine.clock().tick(1000);
 
       $tooltip = find$Tooltips();
@@ -153,8 +154,8 @@ describe('Menu', () => {
       expect($tooltip.length).toBe(1);
       expect($tooltip.text()).toBe('quack');
 
-      testMenu.$container.triggerMouseLeave();
-      testMenu.$container.triggerMouseEnter();
+      triggerMouseLeave(testMenu.$container);
+      triggerMouseEnter(testMenu.$container);
       jasmine.clock().tick(1000);
 
       $tooltip = find$Tooltips();

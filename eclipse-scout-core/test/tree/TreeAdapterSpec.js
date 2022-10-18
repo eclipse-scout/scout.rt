@@ -10,6 +10,7 @@
  */
 import {defaultValues, RemoteEvent} from '../../src/index';
 import {TreeSpecHelper} from '../../src/testing/index';
+import {triggerClick, triggerDoubleClick, triggerMouseDown, triggerMouseUp} from '../../src/testing/jquery-testing';
 
 describe('TreeAdapter', () => {
   let session;
@@ -55,7 +56,7 @@ describe('TreeAdapter', () => {
       tree.render();
 
       let $node = tree.$container.find('.tree-node:first');
-      $node.triggerClick();
+      triggerClick($node);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -73,7 +74,7 @@ describe('TreeAdapter', () => {
 
       let $checkbox = tree.$container.find('.tree-node:first').children('.tree-node-checkbox')
         .children('div');
-      $checkbox.triggerClick();
+      triggerClick($checkbox);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -90,8 +91,8 @@ describe('TreeAdapter', () => {
 
       let $node0 = tree.nodes[0].$node;
       let $node1 = tree.nodes[1].$node;
-      $node0.triggerMouseDown();
-      $node1.triggerMouseUp();
+      triggerMouseDown($node0);
+      triggerMouseUp($node1);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -113,8 +114,8 @@ describe('TreeAdapter', () => {
       tree.render();
 
       let $node0 = tree.nodes[0].$node;
-      $node0.triggerMouseDown();
-      $(window).triggerMouseUp({
+      triggerMouseDown($node0);
+      triggerMouseUp($(window), {
         position: {
           left: 0,
           top: 0
@@ -135,13 +136,13 @@ describe('TreeAdapter', () => {
       jasmine.Ajax.uninstall();
       jasmine.Ajax.install();
 
-      $(window).triggerMouseDown({
+      triggerMouseDown($(window), {
         position: {
           left: 0,
           top: 0
         }
       });
-      $node0.triggerMouseUp();
+      triggerMouseUp($node0);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -156,7 +157,7 @@ describe('TreeAdapter', () => {
       tree.render();
 
       let $node = tree.$container.find('.tree-node:first');
-      $node.triggerDoubleClick();
+      triggerDoubleClick($node);
 
       sendQueuedAjaxCalls();
 
@@ -172,7 +173,7 @@ describe('TreeAdapter', () => {
       tree.render();
 
       let $node = tree.$container.find('.tree-node:first');
-      $node.triggerDoubleClick();
+      triggerDoubleClick($node);
 
       sendQueuedAjaxCalls();
 

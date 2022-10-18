@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {RemoteTileFilter, scout, Tile, TileGrid} from '../../src/index';
+import {triggerClick, triggerDoubleClick, triggerMouseDown} from '../../src/testing/jquery-testing';
 
 describe('TileGrid', () => {
   let session;
@@ -599,7 +600,7 @@ describe('TileGrid', () => {
         tileGrid.render();
         let tile0 = tileGrid.tiles[0];
 
-        tile0.$container.triggerMouseDown();
+        triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
@@ -614,7 +615,7 @@ describe('TileGrid', () => {
         tileGrid.selectTile(tile1);
         expect(tile1.selected).toBe(true);
 
-        tile0.$container.triggerMouseDown();
+        triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(false);
         expect(tileGrid.selectedTiles.length).toBe(1);
@@ -636,7 +637,7 @@ describe('TileGrid', () => {
           }
         });
 
-        tile0.$container.triggerMouseDown();
+        triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
         expect(eventTriggered).toBe(false);
@@ -649,7 +650,7 @@ describe('TileGrid', () => {
         tileGrid.render();
         let tile0 = tileGrid.tiles[0];
 
-        tile0.$container.triggerMouseDown();
+        triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tileGrid.focusedTile).toBe(tile0);
       });
@@ -666,7 +667,7 @@ describe('TileGrid', () => {
         tileGrid.render();
         let tile0 = tileGrid.tiles[0];
 
-        tile0.$container.triggerMouseDown();
+        triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
       });
@@ -682,7 +683,7 @@ describe('TileGrid', () => {
         tileGrid.selectTile(tile1);
         expect(tile1.selected).toBe(true);
 
-        tile0.$container.triggerMouseDown();
+        triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(false);
         expect(tileGrid.selectedTiles.length).toBe(1);
@@ -705,7 +706,7 @@ describe('TileGrid', () => {
           }
         });
 
-        tile0.$container.triggerMouseDown();
+        triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tileGrid.selectedTiles.length).toBe(1);
         expect(eventTriggered).toBe(false);
@@ -723,7 +724,7 @@ describe('TileGrid', () => {
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(true);
 
-        tile0.$container.triggerMouseDown();
+        triggerMouseDown(tile0.$container);
         expect(tile0.selected).toBe(true);
         expect(tile1.selected).toBe(false);
         expect(tileGrid.selectedTiles.length).toBe(1);
@@ -743,7 +744,7 @@ describe('TileGrid', () => {
           expect(tile0.selected).toBe(false);
           expect(tile1.selected).toBe(true);
 
-          tile0.$container.triggerMouseDown({
+          triggerMouseDown(tile0.$container, {
             modifier: 'ctrl'
           });
           expect(tile0.selected).toBe(true);
@@ -763,7 +764,7 @@ describe('TileGrid', () => {
           expect(tile0.selected).toBe(true);
           expect(tile1.selected).toBe(true);
 
-          tile0.$container.triggerMouseDown({
+          triggerMouseDown(tile0.$container, {
             modifier: 'ctrl'
           });
           expect(tile0.selected).toBe(false);
@@ -780,7 +781,7 @@ describe('TileGrid', () => {
           tileGrid.selectTile(tile0);
           expect(tile0.selected).toBe(true);
 
-          tile0.$container.triggerMouseDown({
+          triggerMouseDown(tile0.$container, {
             modifier: 'ctrl'
           });
           expect(tile0.selected).toBe(false);
@@ -809,7 +810,7 @@ describe('TileGrid', () => {
       expect(tile0.selected).toBe(false);
       expect(clickEventCount).toBe(0);
 
-      tile0.$container.triggerClick();
+      triggerClick(tile0.$container);
       expect(tile0.selected).toBe(false);
       expect(clickEventCount).toBe(1);
     });
@@ -839,7 +840,7 @@ describe('TileGrid', () => {
       expect(selectEventCount).toBe(0);
       expect(clickEventCount).toBe(0);
 
-      tile0.$container.triggerClick();
+      triggerClick(tile0.$container);
       expect(tile0.selected).toBe(true);
       expect(selectEventCount).toBe(1);
       expect(clickEventCount).toBe(1);
@@ -881,7 +882,7 @@ describe('TileGrid', () => {
       expect(clickEventCount).toBe(0);
       expect(actionEventCount).toBe(0);
 
-      tile0.$container.triggerDoubleClick();
+      triggerDoubleClick(tile0.$container);
       expect(tile0.selected).toBe(true);
       expect(selectEventCount).toBe(1);
       expect(clickEventCount).toBe(1);

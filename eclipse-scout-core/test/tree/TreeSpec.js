@@ -10,6 +10,7 @@
  */
 import {graphics, objects, Page, Range, scout, scrollbars, strings, Tree, TreeField} from '../../src/index';
 import {TreeSpecHelper} from '../../src/testing/index';
+import {triggerClick, triggerDoubleClick, triggerMouseDown} from '../../src/testing/jquery-testing';
 
 describe('Tree', () => {
   let session;
@@ -1106,14 +1107,14 @@ describe('Tree', () => {
       let checkedNodes = findCheckedNodes(nodes);
       expect(checkedNodes.length).toBe(0);
 
-      tree.$nodes().eq(2).triggerClick();
-      tree.$nodes().eq(1).triggerClick();
+      triggerClick(tree.$nodes().eq(2));
+      triggerClick(tree.$nodes().eq(1));
 
       checkedNodes = findCheckedNodes(nodes);
       expect(checkedNodes.length).toBe(2);
 
       // unchecking node 1 wouldn't work since then the tree's doubleClick handler would detect the second click as a double click
-      tree.$nodes().eq(2).triggerClick();
+      triggerClick(tree.$nodes().eq(2));
 
       checkedNodes = findCheckedNodes(nodes);
       expect(checkedNodes.length).toBe(1);
@@ -1130,7 +1131,7 @@ describe('Tree', () => {
       tree.render();
 
       let $node = tree.$container.find('.tree-node:first');
-      $node.triggerMouseDown();
+      triggerMouseDown($node);
 
       expect(tree._onNodeMouseDown).toHaveBeenCalled();
     });
@@ -1143,7 +1144,7 @@ describe('Tree', () => {
       expect(tree.selectedNodes.length).toBe(0);
 
       let $node = tree.$container.find('.tree-node:first');
-      $node.triggerClick();
+      triggerClick($node);
 
       expect(tree.selectedNodes.length).toBe(1);
       expect(tree.selectedNodes[0].id).toBe(tree.nodes[0].id);
@@ -1160,10 +1161,10 @@ describe('Tree', () => {
       let $node = tree.$container.find('.tree-node:first');
       expect($node).not.toHaveClass('expanded');
 
-      $node.triggerDoubleClick();
+      triggerDoubleClick($node);
       expect($node).toHaveClass('expanded');
 
-      $node.triggerDoubleClick();
+      triggerDoubleClick($node);
       expect($node).not.toHaveClass('expanded');
     });
   });
@@ -1178,13 +1179,13 @@ describe('Tree', () => {
       let $node = $nodeControl.parent();
       expect($node).not.toHaveClass('expanded');
 
-      $nodeControl.triggerDoubleClick();
+      triggerDoubleClick($nodeControl);
       expect($node).toHaveClass('expanded');
 
       // Reset internal state because there is no "sleep" in JS
       tree._doubleClickSupport._lastTimestamp -= 5000; // simulate last click 5 seconds ago
 
-      $nodeControl.triggerDoubleClick();
+      triggerDoubleClick($nodeControl);
       expect($node).not.toHaveClass('expanded');
     });
   });
@@ -1199,7 +1200,7 @@ describe('Tree', () => {
       let $node = tree.$container.find('.tree-node:first');
       expect($node).not.toHaveClass('expanded');
 
-      $node.triggerDoubleClick();
+      triggerDoubleClick($node);
       expect($node).not.toHaveClass('expanded');
     });
 
@@ -1213,10 +1214,10 @@ describe('Tree', () => {
       let $node = tree.$container.find('.tree-node:first');
       expect($node).not.toHaveClass('expanded');
 
-      $node.triggerDoubleClick();
+      triggerDoubleClick($node);
       expect($node).toHaveClass('expanded');
 
-      $node.triggerDoubleClick();
+      triggerDoubleClick($node);
       expect($node).not.toHaveClass('expanded');
     });
   });

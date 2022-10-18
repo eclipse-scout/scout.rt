@@ -10,6 +10,7 @@
  */
 import {LookupRow, QueryBy, RemoteEvent, scout, SmartField, SmartFieldPopup, Status} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
+import {triggerClick} from '../../../../src/testing/jquery-testing';
 
 /* global linkWidgetAndAdapter */
 describe('SmartFieldRemote', () => {
@@ -211,7 +212,7 @@ describe('SmartFieldRemote', () => {
         lookupCallClone = event.lookupCall;
       });
 
-      smartField.$field.triggerClick();
+      triggerClick(smartField.$field);
       resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect($('.touch-popup').length).toBe(1);
@@ -223,7 +224,7 @@ describe('SmartFieldRemote', () => {
       expect($('.smart-field-popup').length).toBe(0);
 
       // Expect same behavior after a second click
-      smartField.$field.triggerClick();
+      triggerClick(smartField.$field);
       resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect($('.touch-popup').length).toBe(1);
@@ -239,7 +240,7 @@ describe('SmartFieldRemote', () => {
       smartField.on('prepareLookupCall', event => {
         lookupCallClone = event.lookupCall;
       });
-      smartField.$field.triggerClick();
+      triggerClick(smartField.$field);
       resolveLookupCall(lookupCallClone);
       expect(smartField.popup.rendered).toBe(true);
       expect(smartField.popup._field.displayText).toBe(smartField.displayText);

@@ -10,6 +10,7 @@
  */
 import {ColumnUserFilter, TableHeaderMenu} from '../../src/index';
 import {TableSpecHelper} from '../../src/testing/index';
+import {triggerClick} from '../../src/testing/jquery-testing';
 
 describe('TableHeaderMenu', () => {
   let session;
@@ -178,9 +179,9 @@ describe('TableHeaderMenu', () => {
         let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'Value');
         expectTableRowText($filterItems, 1, 'Value2');
-        $filterItems.eq(0).triggerClick();
+        triggerClick($filterItems.eq(0));
         expect(table.getFilter(table.columns[0].id).selectedValues).toEqual(['Value']);
-        $filterItems.eq(1).triggerClick();
+        triggerClick($filterItems.eq(1));
         expect(table.getFilter(table.columns[0].id).selectedValues).toEqual(['Value', 'Value2']);
         table.header.closeHeaderMenu();
       });
@@ -198,7 +199,7 @@ describe('TableHeaderMenu', () => {
         let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'Value');
         expectTableRowText($filterItems, 1, '-empty-');
-        $filterItems.eq(1).triggerClick();
+        triggerClick($filterItems.eq(1));
         table.header.closeHeaderMenu();
 
         expect(table.getFilter(table.columns[0].id).selectedValues).toEqual([null]);
