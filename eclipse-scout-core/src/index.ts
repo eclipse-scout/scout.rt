@@ -637,6 +637,8 @@ export {default as BrowserField} from './form/fields/browserfield/BrowserField';
 export {default as BrowserFieldAdapter} from './form/fields/browserfield/BrowserFieldAdapter';
 export {default as BrowserFieldLayout} from './form/fields/browserfield/BrowserFieldLayout';
 export {default as Button} from './form/fields/button/Button';
+export {default as ButtonModel} from './form/fields/button/ButtonModel';
+export {default as ButtonEventMap} from './form/fields/button/ButtonEventMap';
 export {default as ButtonLayout} from './form/fields/button/ButtonLayout';
 export {default as ButtonAdapter} from './form/fields/button/ButtonAdapter';
 export {default as ButtonKeyStroke} from './form/fields/button/ButtonKeyStroke';

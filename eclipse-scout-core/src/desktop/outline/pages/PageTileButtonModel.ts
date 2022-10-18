@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Outline, Page, WidgetModel} from '../../../index';
+import {ButtonModel, Outline, Page} from '../../../index';
 
-export default interface PageTileButtonModel extends WidgetModel { // FIXME TS: change to ButtonModel as soon as Button has been migrated
+export default interface PageTileButtonModel extends ButtonModel {
   page: Page;
   outline: Outline;
 }

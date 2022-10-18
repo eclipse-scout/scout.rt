@@ -368,9 +368,9 @@ export default class ChartTableControl extends TableControl implements ChartTabl
     return this.table.columns.length !== 0;
   }
 
-  protected _axisCount(columnCount: (number | Column)[][], column: Column): number {
-    let i, tmpColumn;
-    for (i = 0; i < columnCount.length; i++) {
+  protected _axisCount(columnCount: (number | Column<any>)[][], column: Column<any>): number {
+    let tmpColumn;
+    for (let i = 0; i < columnCount.length; i++) {
       tmpColumn = columnCount[i][0];
       if (tmpColumn === column) {
         return columnCount[i][1] as number;
@@ -379,7 +379,7 @@ export default class ChartTableControl extends TableControl implements ChartTabl
     return 0;
   }
 
-  protected _plainAxisText(column: Column, text: string): string {
+  protected _plainAxisText(column: Column<any>, text: string): string {
     if (column.headerHtmlEnabled) {
       let plainText = strings.plainText(text);
       return plainText.replace(/\n/g, ' ');
@@ -437,7 +437,7 @@ export default class ChartTableControl extends TableControl implements ChartTabl
       .appendDiv('axis-select-container');
   }
 
-  protected _renderAxisSelectors(): (number | Column)[][] {
+  protected _renderAxisSelectors(): (number | Column<any>)[][] {
     // create container for x/y-axis
     this.$xAxisSelect = this.$axisSelectContainer
       .appendDiv('xaxis-select')
@@ -589,7 +589,7 @@ export default class ChartTableControl extends TableControl implements ChartTabl
     return columnCount;
   }
 
-  protected _initializeSelection(columnCount: (number | Column)[][]) {
+  protected _initializeSelection(columnCount: (number | Column<any>)[][]) {
     let $axisColumns;
 
     if (!this.chartType) {
@@ -625,14 +625,14 @@ export default class ChartTableControl extends TableControl implements ChartTabl
    * @param $candidates jQuery array holding all axis columns that could be used as default.
    * @param maxIndex The maximum column index to use as default column for the specified chartGroup.
    */
-  protected _setDefaultSelectionForGroup(chartGroup: 1 | 2, columnCount: (number | Column)[][], $candidates: JQuery, maxIndex: number) {
+  protected _setDefaultSelectionForGroup(chartGroup: 1 | 2, columnCount: (number | Column<any>)[][], $candidates: JQuery, maxIndex: number) {
     let col = this._getDefaultSelectedColumn(columnCount, $candidates, maxIndex);
     if (col) {
       this._setChartGroup(chartGroup, this._getDefaultChartGroup(col));
     }
   }
 
-  protected _getDefaultSelectedColumn(columnCount: (number | Column)[][], $candidates: JQuery, maxIndex: number): Column {
+  protected _getDefaultSelectedColumn(columnCount: (number | Column<any>)[][], $candidates: JQuery, maxIndex: number): Column<any> {
     let matchCounter = 0,
       curColumn,
       result;
@@ -646,7 +646,7 @@ export default class ChartTableControl extends TableControl implements ChartTabl
     return result;
   }
 
-  protected _existsInAxisColumns($candidates: JQuery, columnToSearch: Column): boolean {
+  protected _existsInAxisColumns($candidates: JQuery, columnToSearch: Column<any>): boolean {
     for (let i = 0; i < $candidates.length; i++) {
       if ($candidates.eq(i).data('column') === columnToSearch) {
         return true;
@@ -655,7 +655,7 @@ export default class ChartTableControl extends TableControl implements ChartTabl
     return false;
   }
 
-  protected _getDefaultChartGroup(column: Column): TableControlChartGroup {
+  protected _getDefaultChartGroup(column: Column<any>): TableControlChartGroup {
     let modifier;
     if (column instanceof DateColumn) {
       modifier = 256;
@@ -1183,10 +1183,8 @@ export default class ChartTableControl extends TableControl implements ChartTabl
     }
   }
 
-  protected _axisContentForColumn(column: Column): { text: string; icon?: IconDesc } {
-    let icon,
-      text = column.text;
-
+  protected _axisContentForColumn(column: Column<any>): { text: string; icon?: IconDesc } {
+    let text = column.text;
     if (strings.hasText(text)) {
       return {
         text: text
@@ -1194,7 +1192,7 @@ export default class ChartTableControl extends TableControl implements ChartTabl
     }
 
     if (column.headerIconId) {
-      icon = icons.parseIconId(column.headerIconId);
+      let icon = icons.parseIconId(column.headerIconId);
       if (icon.isFontIcon()) {
         return {
           text: icon.iconCharacter,
