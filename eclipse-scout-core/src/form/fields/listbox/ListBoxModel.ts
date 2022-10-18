@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueFieldAdapter} from '../../../index';
+import {LookupBoxModel, Table, TableModel} from '../../../index';
+import {RefModel} from '../../../types';
 
-export default class ListBoxAdapter extends ValueFieldAdapter {
-
-  constructor() {
-    super();
-  }
+export default interface ListBoxModel<TValue> extends LookupBoxModel<TValue> {
+  table?: Table | RefModel<TableModel>;
 }

@@ -8,9 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Cell, Column, ListBoxLayout, LookupBox, scout, Table} from '../../../index';
+import {arrays, Cell, Column, ListBoxLayout, ListBoxModel, LookupBox, LookupResult, LookupRow, scout, Table, Widget} from '../../../index';
+import {TableRowsCheckedEvent} from '../../../table/TableEventMap';
+import {TableRowData} from '../../../table/TableRowModel';
 
-export default class ListBox extends LookupBox {
+export default class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<TValue> {
+  table: Table;
 
   constructor() {
     super();
@@ -21,13 +24,13 @@ export default class ListBox extends LookupBox {
     this._addWidgetProperties(['table', 'filterBox']);
   }
 
-  _init(model) {
+  protected override _init(model: ListBoxModel<TValue>) {
     super._init(model);
     this.table.on('rowsChecked', this._onTableRowsChecked.bind(this));
     this.table.setScrollTop(this.scrollTop);
   }
 
-  _initStructure(value) {
+  protected _initStructure(value: TValue[]) {
     if (!this.table) {
       this.table = this._createDefaultListBoxTable();
     }
@@ -39,25 +42,25 @@ export default class ListBox extends LookupBox {
     }
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this.$container.addClass('list-box');
   }
 
-  _createFieldContainerLayout() {
+  protected _createFieldContainerLayout(): ListBoxLayout {
     return new ListBoxLayout(this, this.table, this.filterBox);
   }
 
-  _renderStructure() {
+  protected _renderStructure() {
     this.table.render(this.$fieldContainer);
     this.addField(this.table.$container);
   }
 
-  _onTableRowsChecked(event) {
+  protected _onTableRowsChecked(event: TableRowsCheckedEvent) {
     this._syncTableToValue();
   }
 
-  _syncTableToValue() {
+  protected _syncTableToValue() {
     if (!this.lookupCall || this._valueSyncing) {
       return;
     }
@@ -73,12 +76,12 @@ export default class ListBox extends LookupBox {
     this._valueSyncing = false;
   }
 
-  _valueChanged() {
+  protected override _valueChanged() {
     super._valueChanged();
     this._syncValueToTable(this.value);
   }
 
-  _syncValueToTable(newValue) {
+  protected _syncValueToTable(newValue: TValue[]) {
     if (!this.lookupCall || this._valueSyncing || !this.initialized) {
       return;
     }
@@ -114,13 +117,15 @@ export default class ListBox extends LookupBox {
     }
   }
 
-  _lookupByAllDone(result) {
+  protected override _lookupByAllDone(result: LookupResult<TValue>): boolean {
     if (super._lookupByAllDone(result)) {
       this._populateTable(result);
+      return true;
     }
+    return false;
   }
 
-  _populateTable(result) {
+  protected _populateTable(result: LookupResult<TValue>) {
     let
       tableRows = [],
       lookupRows = result.lookupRows;
@@ -138,25 +143,23 @@ export default class ListBox extends LookupBox {
   /**
    * Returns a lookup row for each value currently checked.
    */
-  getCheckedLookupRows() {
+  getCheckedLookupRows(): LookupRow<TValue>[] {
     if (this.value === null || arrays.empty(this.value) || this.table.rows.length === 0) {
       return [];
     }
 
-    return this.table.rows.filter(row => {
-      return row.checked;
-    }).map(row => {
-      return row.lookupRow;
-    });
+    return this.table.rows
+      .filter(row => row.checked)
+      .map(row => row.lookupRow);
   }
 
-  _createTableRow(lookupRow) {
+  protected _createTableRow(lookupRow: LookupRow<TValue>): ListBoxTableRowData<TValue> {
     let
       cell = scout.create(Cell, {
         text: lookupRow.text
       }),
       cells = [cell],
-      row = {
+      row: ListBoxTableRowData<TValue> = {
         cells: cells,
         lookupRow: lookupRow
       };
@@ -190,7 +193,7 @@ export default class ListBox extends LookupBox {
     return row;
   }
 
-  _createDefaultListBoxTable() {
+  protected _createDefaultListBoxTable(): Table {
     return scout.create(Table, {
       parent: this,
       autoResizeColumns: true,
@@ -204,10 +207,13 @@ export default class ListBox extends LookupBox {
     });
   }
 
-  /**
-   * @override
-   */
-  getDelegateScrollable() {
+  override getDelegateScrollable(): Widget {
     return this.table;
   }
 }
+
+type ListBoxTableRowData<TValue> = TableRowData & {
+  lookupRow: LookupRow<TValue>;
+  active?: boolean;
+};
+
