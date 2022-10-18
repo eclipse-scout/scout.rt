@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FileChooser, FileChooserController, FileChooserModel, Form, FormController, GroupBoxModel, KeyStroke, MessageBox, MessageBoxController, MessageBoxModel, Status, Widget, WidgetModel} from '../index';
+import {FileChooser, FileChooserController, FileChooserModel, Form, FormController, GroupBox, GroupBoxModel, KeyStroke, MessageBox, MessageBoxController, MessageBoxModel, Status, Widget, WidgetModel} from '../index';
 import {DisplayHint} from './Form';
 import {RefModel} from '../types';
 import StatusModel from '../status/StatusModel';
@@ -87,7 +87,7 @@ export default interface FormModel extends WidgetModel {
    * Default is true.
    */
   movable?: boolean;
-  rootGroupBox?: RefModel<GroupBoxModel>;
+  rootGroupBox?: GroupBox | RefModel<GroupBoxModel>;
   /**
    * Default is false.
    */
