@@ -767,6 +767,7 @@ export {default as TileFieldModel} from './form/fields/tilefield/TileFieldModel'
 export {default as TreeBox} from './form/fields/treebox/TreeBox';
 export {default as TreeBoxAdapter} from './form/fields/treebox/TreeBoxAdapter';
 export {default as TreeBoxLayout} from './form/fields/treebox/TreeBoxLayout';
+export {default as TreeBoxModel} from './form/fields/treebox/TreeBoxModel';
 export {default as TreeField} from './form/fields/treefield/TreeField';
 export {default as TreeFieldAdapter} from './form/fields/treefield/TreeFieldAdapter';
 export {default as WizardProgressField} from './form/fields/wizard/WizardProgressField';

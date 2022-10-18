@@ -67,7 +67,7 @@ export default interface TreeModel extends WidgetModel {
    * Default is false
    */
   scrollToSelection?: boolean;
-  selectedNodes: string[] | TreeNode[];
+  selectedNodes?: string[] | TreeNode[];
   filters?: FilterOrFunction<TreeNode>[];
   textFilterEnabled?: boolean;
 }

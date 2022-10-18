@@ -8,9 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupBox, objects, scout, Tree, TreeBoxLayout, TreeNode} from '../../../index';
+import {arrays, LookupBox, LookupResult, LookupRow, objects, scout, Tree, TreeBoxLayout, TreeBoxModel, TreeNode, TreeNodeModel, Widget} from '../../../index';
+import {TreeNodesCheckedEvent} from '../../../tree/TreeEventMap';
+import {TreeNodeUncheckOptions} from '../../../tree/Tree';
 
-export default class TreeBox extends LookupBox {
+export default class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<TValue> {
+  tree: Tree;
+  protected _populating: boolean;
 
   constructor() {
     super();
@@ -19,67 +23,65 @@ export default class TreeBox extends LookupBox {
     this._addWidgetProperties(['tree', 'filterBox']);
   }
 
-  _init(model) {
+  protected override _init(model: TreeBoxModel<TValue>) {
     super._init(model);
     this.tree.on('nodesChecked', this._onTreeNodesChecked.bind(this));
     this.tree.setScrollTop(this.scrollTop);
   }
 
-  _initStructure(value) {
+  protected _initStructure(value: TValue[]) {
     if (!this.tree) {
       this.tree = this._createDefaultTreeBoxTree();
     }
   }
 
-  _initValue(value) {
+  protected override _initValue(value: TValue[]) {
     if (!this.tree) {
       this.tree = this._createDefaultTreeBoxTree();
     }
     super._initValue(value);
   }
 
-  _render() {
+  protected override _render() {
     super._render();
     this.$container.addClass('tree-box');
   }
 
-  _createFieldContainerLayout() {
+  protected _createFieldContainerLayout(): TreeBoxLayout {
     return new TreeBoxLayout(this, this.tree, this.filterBox);
   }
 
-  _renderStructure($fieldContainer) {
+  protected _renderStructure() {
     this.tree.render(this.$fieldContainer);
     this.addField(this.tree.$container);
   }
 
-  _onTreeNodesChecked(event) {
+  protected _onTreeNodesChecked(event: TreeNodesCheckedEvent) {
     if (this._populating) {
       return;
     }
     this._syncTreeToValue();
   }
 
-  _syncTreeToValue() {
+  protected _syncTreeToValue() {
     if (!this.lookupCall || this._valueSyncing) {
       return;
     }
     this._valueSyncing = true;
-    let valueArray = objects.values(this.tree.nodesMap).filter(node => {
-      return node.checked;
-    }).map(node => {
-      return node.id;
-    });
+    let valueArray = objects.values(this.tree.nodesMap)
+      .filter(node => node.checked)
+      .map((node: TreeBoxTreeNode<TValue>) => node.id);
 
     this.setValue(valueArray);
     this._valueSyncing = false;
   }
 
-  _valueChanged() {
+  protected override _valueChanged() {
     super._valueChanged();
     this._syncValueToTree(this.value);
   }
 
-  _syncValueToTree(newValue) {
+  protected _syncValueToTree(newValue: TValue[]) {
     if (!this.lookupCall || this._valueSyncing || !this.initialized) {
       return;
     }
@@ -100,8 +102,8 @@ export default class TreeBox extends LookupBox {
         }
 
         this.uncheckAll(opts);
-        objects.values(this.tree.nodesMap).forEach(function(node) {
-          if (arrays.containsAny(newValue, node.id)) {
+        objects.values(this.tree.nodesMap).forEach((node: TreeBoxTreeNode<TValue>) => {
+          if (arrays.contains(newValue, node.id)) {
             this.tree.checkNode(node, true, opts);
           }
         }, this);
@@ -113,7 +115,7 @@ export default class TreeBox extends LookupBox {
     }
   }
 
-  uncheckAll(options) {
+  uncheckAll(options: TreeNodeUncheckOptions) {
     for (let nodeId in this.tree.nodesMap) {
       if (this.tree.nodesMap.hasOwnProperty(nodeId)) {
         this.tree.uncheckNode(this.tree.nodesMap[nodeId], options);
@@ -121,13 +123,15 @@ export default class TreeBox extends LookupBox {
     }
   }
 
-  _lookupByAllDone(result) {
+  protected override _lookupByAllDone(result: LookupResult<TValue>): boolean {
     if (super._lookupByAllDone(result)) {
       this._populateTree(result);
+      return true;
     }
+    return false;
   }
 
-  _populateTree(result) {
+  protected _populateTree(result: LookupResult<TValue>) {
     let topLevelNodes = [];
     this._populating = true;
     this._populateTreeRecursive(null, topLevelNodes, result.lookupRows);
@@ -139,7 +143,7 @@ export default class TreeBox extends LookupBox {
     this._syncValueToTree(this.value);
   }
 
-  _populateTreeRecursive(parentKey, nodesArray, lookupRows) {
+  protected _populateTreeRecursive(parentKey: TValue, nodesArray: TreeNode[], lookupRows: LookupRow<TValue>[]) {
     let node;
     lookupRows.forEach(function(lookupRow) {
       if (lookupRow.parentKey === parentKey) {
@@ -154,26 +158,24 @@ export default class TreeBox extends LookupBox {
   /**
    * Returns a lookup row for each node currently checked.
    */
-  getCheckedLookupRows() {
+  getCheckedLookupRows(): LookupRow<TValue>[] {
     if (this.value === null || arrays.empty(this.value) || this.tree.nodes.length === 0) {
       return [];
     }
 
-    return objects.values(this.tree.nodesMap).filter(node => {
-      return node.checked;
-    }).map(node => {
-      return node.lookupRow;
-    });
+    return objects.values(this.tree.nodesMap)
+      .filter(node => node.checked)
+      .map((node: TreeBoxTreeNode<TValue>) => node.lookupRow);
   }
 
-  _createNode(lookupRow) {
+  protected _createNode(lookupRow: LookupRow<TValue>): TreeBoxTreeNode<TValue> {
     let
       node = scout.create(TreeNode, {
         parent: this.tree,
         id: lookupRow.key,
         text: lookupRow.text,
         lookupRow: lookupRow
-      });
+      } as TreeNodeModel) as TreeBoxTreeNode<TValue>;
 
     if (lookupRow.iconId) {
       node.iconId = lookupRow.iconId;
@@ -204,17 +206,20 @@ export default class TreeBox extends LookupBox {
     return node;
   }
 
-  _createDefaultTreeBoxTree() {
+  protected _createDefaultTreeBoxTree(): Tree {
     return scout.create(Tree, {
       parent: this,
       checkable: true
     });
   }
 
-  /**
-   * @override
-   */
-  getDelegateScrollable() {
+  override getDelegateScrollable(): Widget {
     return this.tree;
   }
 }
+
+type TreeBoxTreeNode<TValue> = TreeNode & {
+  id: TValue;
+  lookupRow: LookupRow<TValue>;
+  active?: boolean;
+};
