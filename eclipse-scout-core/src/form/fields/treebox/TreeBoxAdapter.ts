@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupBoxLayout} from '../../../index';
+import {ValueFieldAdapter} from '../../../index';
 
-export default class TreeBoxLayout extends LookupBoxLayout {
+export default class TreeBoxAdapter extends ValueFieldAdapter {
 
-  constructor(treeBox, tree, filterBox) {
-    super(treeBox, tree, filterBox);
+  constructor() {
+    super();
   }
 
 }
