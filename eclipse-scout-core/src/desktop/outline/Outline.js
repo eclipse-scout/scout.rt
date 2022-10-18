@@ -476,6 +476,7 @@ export default class Outline extends Tree {
     }
     this._setProperty('defaultDetailForm', defaultDetailForm);
     if (this.defaultDetailForm) {
+      this.defaultDetailForm.setClosable(false);
       this.defaultDetailForm.detailForm = true;
     }
     if (this.initialized) {
