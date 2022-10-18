@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, StringField} from '../../../index';
 
 export default class StringFieldEnterKeyStroke extends KeyStroke {
+  declare field: StringField;
 
-  constructor(stringField) {
+  constructor(stringField: StringField) {
     super();
     this.field = stringField;
     this.which = [keys.ENTER];
@@ -20,7 +21,7 @@ export default class StringFieldEnterKeyStroke extends KeyStroke {
     this.preventDefault = false;
   }
 
-  _applyPropagationFlags(event) {
+  protected override _applyPropagationFlags(event: ScoutKeyboardEvent) {
     super._applyPropagationFlags(event);
 
     let activeElement = this.field.$container.activeElement(true);
@@ -30,7 +31,7 @@ export default class StringFieldEnterKeyStroke extends KeyStroke {
     }
   }
 
-  handle(event) {
+  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     // NOP
   }
 }
