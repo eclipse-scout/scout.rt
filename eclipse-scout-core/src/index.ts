@@ -735,6 +735,8 @@ export {default as SplitBoxFirstCollapseKeyStroke} from './form/fields/splitbox/
 export {default as SplitBoxSecondCollapseKeyStroke} from './form/fields/splitbox/SplitBoxSecondCollapseKeyStroke';
 export {default as SplitBoxLayout} from './form/fields/splitbox/SplitBoxLayout';
 export {default as StringField} from './form/fields/stringfield/StringField';
+export {default as StringFieldEventMap} from './form/fields/stringfield/StringFieldEventMap';
+export {default as StringFieldModel} from './form/fields/stringfield/StringFieldModel';
 export {default as StringFieldLayout} from './form/fields/stringfield/StringFieldLayout';
 export {default as StringFieldAdapter} from './form/fields/stringfield/StringFieldAdapter';
 export {default as StringFieldEnterKeyStroke} from './form/fields/stringfield/StringFieldEnterKeyStroke';

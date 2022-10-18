@@ -8,13 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicField, DesktopNotification, fields, InputFieldKeyStrokeContext, MaxLengthHandler, objects, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldLayout, strings, texts} from '../../../index';
+import {
+  BasicField, DesktopNotification, EnumObject, fields, InputFieldKeyStrokeContext, MaxLengthHandler, objects, scout, Status, StringFieldCtrlEnterKeyStroke, StringFieldEnterKeyStroke, StringFieldEventMap, StringFieldLayout, StringFieldModel,
+  strings, texts
+} from '../../../index';
+import {OldWheelEvent} from '../../../types';
 
-export default class StringField extends BasicField {
+export default class StringField extends BasicField<string> {
+  declare model: StringFieldModel;
+  declare eventMap: StringFieldEventMap;
+  declare keyStrokeContext: InputFieldKeyStrokeContext;
+  declare $field: JQuery | JQuery<HTMLInputElement>;
+
+  format: StringFieldFormat;
+  hasAction: boolean;
+  inputMasked: boolean;
+  inputObfuscated: boolean;
+  maxLength: number;
+  maxLengthHandler: MaxLengthHandler;
+  multilineText: boolean;
+  selectionStart: number;
+  selectionEnd: number;
+  selectionTrackingEnabled: boolean;
+  spellCheckEnabled: boolean;
+  trimText: boolean;
+  wrapText: boolean;
+  mouseClicked: boolean;
+  protected _onSelectionChangingActionHandler: (event: JQuery.TriggeredEvent) => void;
+
   constructor() {
     super();
 
-    this.format;
+    this.format = null;
     this.hasAction = false;
     this.inputMasked = false;
     this.inputObfuscated = false;
@@ -34,7 +59,7 @@ export default class StringField extends BasicField {
   static Format = {
     LOWER: 'a' /* IStringField.FORMAT_LOWER */,
     UPPER: 'A' /* IStringField.FORMAT_UPPER */
-  };
+  } as const;
 
   static TRIM_REGEXP = new RegExp('^(\\s*)(.*?)(\\s*)$');
 
@@ -42,36 +67,30 @@ export default class StringField extends BasicField {
    * Resolves the text key if value contains one.
    * This cannot be done in _init because the value field would call _setValue first
    */
-  _initValue(value) {
+  protected override _initValue(value: string) {
     value = texts.resolveText(value, this.session.locale.languageTag);
     super._initValue(value);
   }
 
-  /**
-   * @override ModelAdapter.js
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    this.keyStrokeContext.registerKeyStroke([
+    this.keyStrokeContext.registerKeyStrokes([
       new StringFieldEnterKeyStroke(this),
       new StringFieldCtrlEnterKeyStroke(this)
     ]);
   }
 
-  /**
-   * @override
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): InputFieldKeyStrokeContext {
     return new InputFieldKeyStrokeContext();
   }
 
-  _init(model) {
+  protected override _init(model: StringFieldModel) {
     super._init(model);
     this._setMultilineText(this.multilineText);
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'string-field', new StringFieldLayout(this));
     this.addLabel();
     this.addMandatoryIndicator();
@@ -89,7 +108,7 @@ export default class StringField extends BasicField {
     this.addStatus();
   }
 
-  _makeMultilineField() {
+  protected _makeMultilineField(): JQuery {
     let mouseDownHandler = function() {
       this.mouseClicked = true;
     }.bind(this);
@@ -98,7 +117,7 @@ export default class StringField extends BasicField {
       .on('DOMMouseScroll mousewheel', this._onMouseWheel.bind(this))
       .on('mousedown', mouseDownHandler)
       .on('focus', event => {
-        this.$field.off('mousedown', mouseDownHandler);
+        (this.$field as JQuery).off('mousedown', mouseDownHandler);
         if (!this.mouseClicked) { // only trigger on tab focus in
           setTimeout(() => {
             if (!this.rendered || this.session.focusManager.isElementCovertByGlassPane(this.$field)) {
@@ -116,8 +135,8 @@ export default class StringField extends BasicField {
       .addDeviceClass();
   }
 
-  _onFieldBlur() {
-    super._onFieldBlur();
+  protected override _onFieldBlur(event: JQuery.BlurEvent) {
+    super._onFieldBlur(event);
     if (this.multilineText) {
       this._updateSelection();
     }
@@ -127,10 +146,10 @@ export default class StringField extends BasicField {
     }
   }
 
-  _onMouseWheel(event) {
-    event = event.originalEvent || this.$container.window(true).event.originalEvent;
-    // noinspection JSUnresolvedVariable
-    let delta = event.wheelDelta ? -event.wheelDelta : event.detail;
+  protected _onMouseWheel(event: JQuery.TriggeredEvent) {
+    // @ts-ignore
+    let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event.originalEvent;
+    let delta = originalEvent.wheelDelta ? -originalEvent.wheelDelta : originalEvent.detail;
     let scrollTop = this.$field[0].scrollTop;
     if (delta < 0 && scrollTop === 0) {
       // StringField is scrolled to the very top -> parent may scroll
@@ -143,10 +162,10 @@ export default class StringField extends BasicField {
       return;
     }
     // Don't allow others to scroll (e.g. Scrollbar) while scrolling in the text area
-    event.stopPropagation();
+    originalEvent.stopPropagation();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
 
     this._renderInputMasked();
@@ -164,9 +183,8 @@ export default class StringField extends BasicField {
 
   /**
    * Adds a click handler instead of a mouse down handler because it executes an action.
-   * @override
    */
-  addIcon() {
+  override addIcon($parent?: JQuery) {
     this.$icon = fields.appendIcon(this.$container)
       .on('click', this._onIconClick.bind(this));
   }
@@ -174,60 +192,61 @@ export default class StringField extends BasicField {
   /**
    * override to ensure dropdown fields and touch mode smart fields does not have a clear icon.
    */
-  isClearable() {
+  override isClearable(): boolean {
     return super.isClearable() && !this.multilineText;
   }
 
-  setSelectionStart(selectionStart) {
+  setSelectionStart(selectionStart: number) {
     this.setProperty('selectionStart', selectionStart);
   }
 
-  _renderSelectionStart() {
+  protected _renderSelectionStart() {
     if (scout.nvl(this.selectionStart, null) !== null) {
-      this.$field[0].selectionStart = this.selectionStart;
+      (this.$field[0] as HTMLInputElement).selectionStart = this.selectionStart;
     }
   }
 
-  setSelectionEnd(selectionEnd) {
+  setSelectionEnd(selectionEnd: number) {
     this.setProperty('selectionEnd', selectionEnd);
   }
 
-  _renderSelectionEnd() {
+  protected _renderSelectionEnd() {
     if (scout.nvl(this.selectionEnd, null) !== null) {
-      this.$field[0].selectionEnd = this.selectionEnd;
+      (this.$field[0] as HTMLInputElement).selectionEnd = this.selectionEnd;
     }
   }
 
-  setSelectionTrackingEnabled(selectionTrackingEnabled) {
+  setSelectionTrackingEnabled(selectionTrackingEnabled: boolean) {
     this.setProperty('selectionTrackingEnabled', selectionTrackingEnabled);
   }
 
-  _renderSelectionTrackingEnabled() {
-    this.$field
+  protected _renderSelectionTrackingEnabled() {
+    (this.$field as JQuery)
       .off('select', this._onSelectionChangingActionHandler)
       .off('mousedown', this._onSelectionChangingActionHandler)
       .off('keydown', this._onSelectionChangingActionHandler)
       .off('input', this._onSelectionChangingActionHandler);
     if (this.selectionTrackingEnabled) {
-      this.$field.on('select', this._onSelectionChangingActionHandler)
+      (this.$field as JQuery)
+        .on('select', this._onSelectionChangingActionHandler)
         .on('mousedown', this._onSelectionChangingActionHandler)
         .on('keydown', this._onSelectionChangingActionHandler)
         .on('input', this._onSelectionChangingActionHandler);
     }
   }
 
-  setInputMasked(inputMasked) {
+  setInputMasked(inputMasked: boolean) {
     this.setProperty('inputMasked', inputMasked);
   }
 
-  _renderInputMasked() {
+  protected _renderInputMasked() {
     if (this.multilineText) {
       return;
     }
     this.$field.attr('type', this.inputMasked ? 'password' : 'text');
   }
 
-  _renderInputObfuscated() {
+  protected _renderInputObfuscated() {
     if (this.inputObfuscated && this.focused) {
       // If a new display text is set (e.g. because value in model changed) and field is focused,
       // do not display new display text but clear content (as in _onFieldFocus).
@@ -237,11 +256,11 @@ export default class StringField extends BasicField {
     }
   }
 
-  setHasAction(hasAction) {
+  setHasAction(hasAction: boolean) {
     this.setProperty('hasAction', hasAction);
   }
 
-  _renderHasAction() {
+  protected _renderHasAction() {
     if (this.hasAction) {
       if (!this.$icon) {
         this.addIcon();
@@ -255,15 +274,12 @@ export default class StringField extends BasicField {
     this.revalidateLayout();
   }
 
-  /**
-   * @override
-   */
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     this.revalidateLayout();
   }
 
-  setFormatUpper(formatUpper) {
+  setFormatUpper(formatUpper: boolean) {
     if (formatUpper) {
       this.setFormat(StringField.Format.UPPER);
     } else {
@@ -271,7 +287,7 @@ export default class StringField extends BasicField {
     }
   }
 
-  setFormatLower(formatLower) {
+  setFormatLower(formatLower: boolean) {
     if (formatLower) {
       this.setFormat(StringField.Format.LOWER);
     } else {
@@ -279,11 +295,11 @@ export default class StringField extends BasicField {
     }
   }
 
-  setFormat(format) {
+  setFormat(format: StringFieldFormat) {
     this.setProperty('format', format);
   }
 
-  _renderFormat() {
+  protected _renderFormat() {
     if (this.format === StringField.Format.LOWER) {
       this.$field.css('text-transform', 'lowercase');
     } else if (this.format === StringField.Format.UPPER) {
@@ -293,11 +309,11 @@ export default class StringField extends BasicField {
     }
   }
 
-  setSpellCheckEnabled(spellCheckEnabled) {
+  setSpellCheckEnabled(spellCheckEnabled: boolean) {
     this.setProperty('spellCheckEnabled', spellCheckEnabled);
   }
 
-  _renderSpellCheckEnabled() {
+  protected _renderSpellCheckEnabled() {
     if (this.spellCheckEnabled) {
       this.$field.attr('spellcheck', 'true');
     } else {
@@ -305,10 +321,7 @@ export default class StringField extends BasicField {
     }
   }
 
-  /**
-   * @override
-   */
-  _renderDisplayText() {
+  protected override _renderDisplayText() {
     if (this.inputObfuscated && this.focused) {
       // If a new display text is set (e.g. because value in model changed) and field is focused,
       // do not display new display text but clear content (as in _onFieldFocus).
@@ -319,7 +332,7 @@ export default class StringField extends BasicField {
     }
 
     let displayText = strings.nvl(this.displayText);
-    let oldDisplayText = strings.nvl(this.$field.val());
+    let oldDisplayText = strings.nvl(this.$field.val() as string);
     let oldSelection = this._getSelection();
     super._renderDisplayText();
     // Try to keep the current selection for cases where the old and new display
@@ -335,7 +348,7 @@ export default class StringField extends BasicField {
     }
   }
 
-  insertText(text) {
+  insertText(text: string) {
     if (!this.rendered) {
       this._postRenderActions.push(this.insertText.bind(this, text));
       return;
@@ -343,14 +356,14 @@ export default class StringField extends BasicField {
     this._insertText(text);
   }
 
-  _insertText(textToInsert) {
+  protected _insertText(textToInsert: string) {
     if (!textToInsert) {
       return;
     }
 
     // Prevent insert if new length would exceed maxLength to prevent unintended deletion of characters at the end of the string
     let selection = this._getSelection();
-    let text = this._applyTextToSelection(this.$field.val(), textToInsert, selection);
+    let text = this._applyTextToSelection(this.$field.val() as string, textToInsert, selection);
     if (text.length > this.maxLength) {
       this._showNotification('ui.CannotInsertTextTooLong');
       return;
@@ -367,7 +380,7 @@ export default class StringField extends BasicField {
     this.acceptInput();
   }
 
-  _applyTextToSelection(text, textToInsert, selection) {
+  protected _applyTextToSelection(text: string, textToInsert: string, selection: StringFieldSelection): string {
     if (this.inputObfuscated) {
       // Use empty text when input is obfuscated, otherwise text will be added to obfuscated text
       text = '';
@@ -375,56 +388,56 @@ export default class StringField extends BasicField {
     return text.slice(0, selection.start) + textToInsert + text.slice(selection.end);
   }
 
-  setWrapText(wrapText) {
+  setWrapText(wrapText: boolean) {
     this.setProperty('wrapText', wrapText);
   }
 
-  _renderWrapText() {
+  protected _renderWrapText() {
     this.$field.attr('wrap', this.wrapText ? 'soft' : 'off');
   }
 
-  setTrimText(trimText) {
+  setTrimText(trimText: boolean) {
     this.setProperty('trimText', trimText);
   }
 
-  _renderTrimText() {
+  protected _renderTrimText() {
     // nop, property used in _validateDisplayText()
   }
 
-  _setMultilineText(multilineText) {
+  protected _setMultilineText(multilineText: boolean) {
     this._setProperty('multilineText', multilineText);
     this.keyStrokeContext.setMultiline(this.multilineText);
   }
 
-  _renderGridData() {
+  protected override _renderGridData() {
     super._renderGridData();
     this.updateInnerAlignment({
       useHorizontalAlignment: !this.multilineText
     });
   }
 
-  _renderGridDataHints() {
+  protected override _renderGridDataHints() {
     super._renderGridDataHints();
     this.updateInnerAlignment({
       useHorizontalAlignment: true
     });
   }
 
-  setMaxLength(maxLength) {
+  setMaxLength(maxLength: number) {
     this.setProperty('maxLength', maxLength);
   }
 
-  _renderMaxLength() {
+  protected _renderMaxLength() {
     this.maxLengthHandler.render();
   }
 
-  _onIconClick(event) {
+  protected _onIconClick(event: JQuery.ClickEvent) {
     this.acceptInput();
     this.$field.focus();
     this.trigger('action');
   }
 
-  _onSelectionChangingAction(event) {
+  protected _onSelectionChangingAction(event: JQuery.TriggeredEvent) {
     if (event.type === 'mousedown') {
       this.$field.window().one('mouseup.stringfield', () => {
         // For some reason, when clicking side an existing selection (which clears the selection), the old
@@ -440,9 +453,9 @@ export default class StringField extends BasicField {
     }
   }
 
-  _getSelection() {
-    let start = scout.nvl(this.$field[0].selectionStart, null);
-    let end = scout.nvl(this.$field[0].selectionEnd, null);
+  protected _getSelection(): StringFieldSelection {
+    let start = scout.nvl((this.$field[0] as HTMLInputElement).selectionStart, null);
+    let end = scout.nvl((this.$field[0] as HTMLInputElement).selectionEnd, null);
     if (start === null || end === null) {
       start = 0;
       end = 0;
@@ -453,23 +466,23 @@ export default class StringField extends BasicField {
     };
   }
 
-  _setSelection(selectionStart, selectionEnd) {
-    if (typeof selectionStart === 'number') {
-      selectionEnd = scout.nvl(selectionEnd, selectionStart);
-    } else if (typeof selectionStart === 'object') {
-      selectionEnd = selectionStart.end;
-      selectionStart = selectionStart.start;
+  protected _setSelection(selectionStartOrSelection: number | StringFieldSelection, selectionEnd?: number) {
+    if (typeof selectionStartOrSelection === 'number') {
+      selectionEnd = scout.nvl(selectionEnd, selectionStartOrSelection);
+    } else if (typeof selectionStartOrSelection === 'object') {
+      selectionEnd = selectionStartOrSelection.end;
+      selectionStartOrSelection = selectionStartOrSelection.start;
     }
-    this.$field[0].selectionStart = selectionStart;
-    this.$field[0].selectionEnd = selectionEnd;
+    (this.$field[0] as HTMLInputElement).selectionStart = selectionStartOrSelection;
+    (this.$field[0] as HTMLInputElement).selectionEnd = selectionEnd;
     this._updateSelection();
   }
 
-  _updateSelection() {
+  protected _updateSelection() {
     let oldSelectionStart = this.selectionStart;
     let oldSelectionEnd = this.selectionEnd;
-    this.selectionStart = this.$field[0].selectionStart;
-    this.selectionEnd = this.$field[0].selectionEnd;
+    this.selectionStart = (this.$field[0] as HTMLInputElement).selectionStart;
+    this.selectionEnd = (this.$field[0] as HTMLInputElement).selectionEnd;
     if (this.selectionTrackingEnabled) {
       let selectionChanged = this.selectionStart !== oldSelectionStart || this.selectionEnd !== oldSelectionEnd;
       if (selectionChanged) {
@@ -485,7 +498,7 @@ export default class StringField extends BasicField {
     });
   }
 
-  _validateValue(value) {
+  protected override _validateValue(value: string): string {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }
@@ -496,27 +509,18 @@ export default class StringField extends BasicField {
     return super._validateValue(value);
   }
 
-  /**
-   * @override ValueField.js
-   */
-  _clear() {
+  protected override _clear() {
     super._clear();
 
     // Disable obfuscation when user clicks on clear icon.
     this.inputObfuscated = false;
   }
 
-  /**
-   * @override ValueField.js
-   */
-  _updateEmpty() {
+  protected override _updateEmpty() {
     this.empty = strings.empty(this.value);
   }
 
-  /**
-   * @override ValueField.js
-   */
-  acceptInput(whileTyping) {
+  override acceptInput(whileTyping?: boolean) {
     let displayText = scout.nvl(this._readDisplayText(), '');
     if (this.inputObfuscated && displayText !== '') {
       // Disable obfuscation if user has typed text (on focus, field will be cleared if obfuscated, so any typed text is new text).
@@ -526,10 +530,7 @@ export default class StringField extends BasicField {
     super.acceptInput(whileTyping);
   }
 
-  /**
-   * @override BasicField.js
-   */
-  _onFieldFocus(event) {
+  protected override _onFieldFocus(event: JQuery.FocusEvent) {
     super._onFieldFocus(event);
 
     if (this.inputObfuscated) {
@@ -540,14 +541,14 @@ export default class StringField extends BasicField {
         if (!this.rendered) {
           return;
         }
-        let $field = this.$field[0];
+        let $field = this.$field[0] as HTMLInputElement;
         $field.selectionStart = 0;
         $field.selectionEnd = 0;
       });
     }
   }
 
-  _showNotification(textKey) {
+  protected _showNotification(textKey: string) {
     scout.create(DesktopNotification, {
       parent: this,
       severity: Status.Severity.WARNING,
@@ -555,10 +556,7 @@ export default class StringField extends BasicField {
     }).show();
   }
 
-  /**
-   * @override BasicField.js
-   */
-  _checkDisplayTextChanged(displayText, whileTyping) {
+  protected override _checkDisplayTextChanged(displayText: string, whileTyping: boolean): boolean {
     let displayTextChanged = super._checkDisplayTextChanged(displayText, whileTyping);
 
     // Display text hasn't changed if input is obfuscated and current display text is empty (because field will be cleared if user focuses obfuscated text field).
@@ -569,3 +567,9 @@ export default class StringField extends BasicField {
     return displayTextChanged;
   }
 }
+
+export type StringFieldFormat = EnumObject<typeof StringField.Format>;
+type StringFieldSelection = {
+  start: number;
+  end: number;
+};

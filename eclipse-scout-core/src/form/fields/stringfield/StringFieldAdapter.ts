@@ -8,26 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicFieldAdapter} from '../../../index';
+import {BasicFieldAdapter, Event, StringField, StringFieldModel} from '../../../index';
+import {StringFieldSelectionChangeEvent} from './StringFieldEventMap';
 
 export default class StringFieldAdapter extends BasicFieldAdapter {
+  declare widget: StringField;
 
   constructor() {
     super();
   }
 
-  _initProperties(model) {
+  protected override _initProperties(model: StringFieldModel) {
     if (model.insertText !== undefined) {
       // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)
       delete model.insertText;
     }
   }
 
-  _syncInsertText(insertText) {
+  protected _syncInsertText(insertText: string) {
     this.widget.insertText(insertText);
   }
 
-  _onWidgetSelectionChange(event) {
+  protected _onWidgetSelectionChange(event: StringFieldSelectionChangeEvent) {
     // send delayed to avoid a lot of requests while selecting
     // coalesce: only send the latest selection changed event for a field
     this._send('selectionChange', {
@@ -42,13 +44,13 @@ export default class StringFieldAdapter extends BasicFieldAdapter {
     });
   }
 
-  _onWidgetAction(event) {
+  protected _onWidgetAction(event: Event<StringField>) {
     this._send('action');
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<StringField>) {
     if (event.type === 'selectionChange') {
-      this._onWidgetSelectionChange(event);
+      this._onWidgetSelectionChange(event as StringFieldSelectionChangeEvent);
     } else if (event.type === 'action') {
       this._onWidgetAction(event);
     } else {
