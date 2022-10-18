@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '../../../index';
+import {FormFieldModel, Tree, TreeModel} from '../../../index';
+import {RefModel} from '../../../types';
 
-export default class TreeFieldAdapter extends FormFieldAdapter {
-
-  constructor() {
-    super();
-  }
+export default interface TreeFieldModel extends FormFieldModel {
+  tree?: Tree | RefModel<TreeModel>;
 }

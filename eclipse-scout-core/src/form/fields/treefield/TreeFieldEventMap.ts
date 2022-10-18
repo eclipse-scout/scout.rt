@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '../../../index';
+import {FormFieldEventMap, PropertyChangeEvent, Tree} from '../../../index';
 
-export default class TreeFieldAdapter extends FormFieldAdapter {
-
-  constructor() {
-    super();
-  }
+export default interface TreeFieldEventMap extends FormFieldEventMap {
+  'propertyChange:tree': PropertyChangeEvent<Tree>;
 }
