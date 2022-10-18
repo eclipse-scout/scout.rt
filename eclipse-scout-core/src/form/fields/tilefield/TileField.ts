@@ -8,9 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventDelegator, FormField} from '../../../index';
+import {EventDelegator, FormField, LoadingSupport, TileFieldEventMap, TileFieldModel, TileGrid, Widget} from '../../../index';
 
-export default class TileField extends FormField {
+export default class TileField extends FormField implements TileFieldModel {
+  declare model: TileFieldModel;
+  declare eventMap: TileFieldEventMap;
+
+  tileGrid: TileGrid;
+  eventDelegator: EventDelegator;
 
   constructor() {
     super();
@@ -18,21 +23,18 @@ export default class TileField extends FormField {
     this._addWidgetProperties(['tileGrid']);
   }
 
-  _init(model) {
+  protected override _init(model: TileFieldModel) {
     super._init(model);
 
     this._setTileGrid(this.tileGrid);
   }
 
-  /**
-   * @override
-   */
-  _createLoadingSupport() {
+  protected override _createLoadingSupport(): LoadingSupport {
     // Loading is delegated to tileGrid
     return null;
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'tile-field');
     this.addLabel();
     this.addMandatoryIndicator();
@@ -42,16 +44,16 @@ export default class TileField extends FormField {
     }
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderDropType();
   }
 
-  setTileGrid(tileGrid) {
+  setTileGrid(tileGrid: TileGrid) {
     this.setProperty('tileGrid', tileGrid);
   }
 
-  _setTileGrid(tileGrid) {
+  protected _setTileGrid(tileGrid: TileGrid) {
     if (this.tileGrid) {
       if (this.eventDelegator) {
         this.eventDelegator.destroy();
@@ -68,7 +70,7 @@ export default class TileField extends FormField {
     }
   }
 
-  _renderTileGrid() {
+  protected _renderTileGrid() {
     if (!this.tileGrid) {
       return;
     }
@@ -77,7 +79,7 @@ export default class TileField extends FormField {
     this.invalidateLayoutTree();
   }
 
-  _removeTileGrid() {
+  protected _removeTileGrid() {
     if (!this.tileGrid) {
       return;
     }
@@ -86,10 +88,7 @@ export default class TileField extends FormField {
     this.invalidateLayoutTree();
   }
 
-  /**
-   * @override
-   */
-  getDelegateScrollable() {
+  override getDelegateScrollable(): Widget {
     return this.tileGrid;
   }
 }

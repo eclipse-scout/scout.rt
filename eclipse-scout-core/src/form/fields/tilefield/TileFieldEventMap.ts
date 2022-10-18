@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '../../../index';
+import {FormFieldEventMap, PropertyChangeEvent, TileGrid} from '../../../index';
 
-export default class TileFieldAdapter extends FormFieldAdapter {
-
-  constructor() {
-    super();
-  }
+export default interface TileFieldEventMap extends FormFieldEventMap {
+  'propertyChange:tileGrid': PropertyChangeEvent<TileGrid>;
 }
