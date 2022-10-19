@@ -785,7 +785,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
   }
 
   protected _removeMenus() {
-    // menubar takes care about removal
+    // menubar takes care of removal
   }
 
   setStaticMenus(staticMenus: Menu[]) {

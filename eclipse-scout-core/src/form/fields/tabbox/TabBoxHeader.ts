@@ -8,9 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GroupBoxMenuItemsOrder, HtmlComponent, MenuBar, scout, TabArea, TabBoxHeaderLayout, Widget} from '../../../index';
+import {EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, MenuBar, PropertyChangeEvent, scout, TabArea, TabBoxHeaderLayout, TabItem, Widget, WidgetEventMap, WidgetModel} from '../../../index';
+import TabBox from './TabBox';
+import Tab from './Tab';
 
-export default class TabBoxHeader extends Widget {
+export interface TabBoxHeaderModel extends WidgetModel {
+  tabBox: TabBox;
+}
+
+export interface TabBoxHeaderEventMap extends WidgetEventMap {
+  'propertyChange:selectedTabItem': PropertyChangeEvent<TabItem>;
+}
+
+export default class TabBoxHeader extends Widget implements TabBoxHeaderModel {
+  declare model: TabBoxHeaderModel;
+  declare eventMap: TabBoxHeaderEventMap;
+
+  tabBox: TabBox;
+  tabArea: TabArea;
+  menuBar: MenuBar;
+  $borderBottom: JQuery;
+  protected _tabBoxPropertyChangeHandler: EventHandler<PropertyChangeEvent>;
+  protected _tabAreaPropertyChangeHandler: EventHandler<PropertyChangeEvent>;
 
   constructor() {
     super();
@@ -18,14 +37,12 @@ export default class TabBoxHeader extends Widget {
     this.tabBox = null;
     this.tabArea = null;
     this.menuBar = null;
-    this.$container = null;
-    this.htmlComp = null;
     this.$borderBottom = null;
     this._tabBoxPropertyChangeHandler = this._onTabBoxPropertyChange.bind(this);
     this._tabAreaPropertyChangeHandler = this._onTabAreaPropertyChange.bind(this);
   }
 
-  _init(options) {
+  protected override _init(options: TabBoxHeaderModel) {
     super._init(options);
 
     this.tabArea = scout.create(TabArea, {
@@ -44,7 +61,7 @@ export default class TabBoxHeader extends Widget {
     this.setVisible(this.tabBox.labelVisible);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('tab-box-header');
     this.$borderBottom = this.$container.appendDiv('bottom-border');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
@@ -54,17 +71,17 @@ export default class TabBoxHeader extends Widget {
     this.$container.append(this.menuBar.$container);
   }
 
-  _destroy() {
+  protected override _destroy() {
     this.tabBox.off('propertyChange', this._tabBoxPropertyChangeHandler);
     this.tabArea.off('propertyChange', this._tabAreaPropertyChangeHandler);
     super._destroy();
   }
 
-  setTabItems(tabItems) {
+  setTabItems(tabItems: TabItem[]) {
     this.tabArea.setTabItems(tabItems);
   }
 
-  _setSelectedTab(tab) {
+  protected _setSelectedTab(tab: Tab) {
     if (tab) {
       this.setSelectedTabItem(tab.tabItem);
     } else {
@@ -72,28 +89,28 @@ export default class TabBoxHeader extends Widget {
     }
   }
 
-  setSelectedTabItem(tabItem) {
+  setSelectedTabItem(tabItem: TabItem) {
     this.setProperty('selectedTabItem', tabItem);
   }
 
-  _setSelectedTabItem(tabItem) {
+  protected _setSelectedTabItem(tabItem: TabItem) {
     this._setProperty('selectedTabItem', tabItem);
     this.tabArea.setSelectedTabItem(tabItem);
   }
 
-  isTabItemFocused(tabItem) {
+  isTabItemFocused(tabItem: TabItem): boolean {
     return this.tabArea.isTabItemFocused(tabItem);
   }
 
-  focusTabItem(tabItem) {
-    this.tabArea.focusTabItem(tabItem);
+  focusTabItem(tabItem: TabItem): boolean {
+    return this.tabArea.focusTabItem(tabItem);
   }
 
-  getTabForItem(tabItem) {
+  getTabForItem(tabItem: TabItem) {
     return this.tabArea.getTabForItem(tabItem);
   }
 
-  _onTabBoxPropertyChange(event) {
+  protected _onTabBoxPropertyChange(event: PropertyChangeEvent) {
     if (event.propertyName === 'menus') {
       this.menuBar.setMenuItems(this.tabBox.menus);
     } else if (event.propertyName === 'labelVisible') {
@@ -101,7 +118,7 @@ export default class TabBoxHeader extends Widget {
     }
   }
 
-  _onTabAreaPropertyChange(event) {
+  protected _onTabAreaPropertyChange(event: PropertyChangeEvent) {
     if (event.propertyName === 'selectedTab') {
       this._setSelectedTab(event.newValue);
     }

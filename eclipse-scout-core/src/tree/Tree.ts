@@ -956,7 +956,7 @@ export default class Tree extends Widget implements TreeModel {
   }
 
   protected _removeMenus() {
-    // menubar takes care about removal
+    // menubar takes care of removal
   }
 
   protected _filterMenus(argMenus: Menu[], destination: MenuDestinations, onlyVisible?: boolean, enableDisableKeyStrokes?: boolean): Menu[] {

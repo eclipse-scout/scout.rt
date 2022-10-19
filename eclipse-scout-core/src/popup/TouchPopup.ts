@@ -52,8 +52,7 @@ export default class TouchPopup extends Popup {
   protected override _init(options: TouchPopupModel) {
     super._init(options);
     this._touchField = options.field;
-    // @ts-ignore
-    let touchFieldTooltip = this._touchField._tooltip();
+    let touchFieldTooltip = this._touchField.tooltip();
     if (touchFieldTooltip && touchFieldTooltip.rendered) {
       // Hide existing tooltip to not show it twice (it will be shown on the popup too). It may even throw an exception if the tooltip contains a (not cloned) menu
       this._touchFieldTooltip = touchFieldTooltip;

@@ -166,15 +166,15 @@ describe('SequenceBox', () => {
       });
       field.render();
 
-      expect(field.fields[1]._tooltip()).toBeFalsy();
-      expect(field._tooltip()).toBeFalsy();
+      expect(field.fields[1].tooltip()).toBeFalsy();
+      expect(field.tooltip()).toBeFalsy();
 
       field.fields[1].setProperty('errorStatus', {
         message: 'foo'
       });
 
-      expect(field.fields[1]._tooltip()).toBeFalsy();
-      expect(field._tooltip().rendered).toBe(true);
+      expect(field.fields[1].tooltip()).toBeFalsy();
+      expect(field.tooltip().rendered).toBe(true);
     });
 
     it('removes the tooltip from the seq box if last field gets invisible', () => {
@@ -228,9 +228,9 @@ describe('SequenceBox', () => {
 
       expect(field.$status.isVisible()).toBe(false);
       expect(field.errorStatus).toBeFalsy();
-      expect(field._tooltip()).toBeFalsy();
+      expect(field.tooltip()).toBeFalsy();
       expect(field.fields[0].$status.isVisible()).toBe(true);
-      expect(field.fields[0]._tooltip().rendered).toBe(true);
+      expect(field.fields[0].tooltip().rendered).toBe(true);
       expect(field.fields[0].errorStatus.message).toBe('foo');
 
       field.fields[1].setProperty('visible', false);
@@ -238,7 +238,7 @@ describe('SequenceBox', () => {
       expect(field.$status.isVisible()).toBe(true);
       expect(field.errorStatus.message).toBe('foo');
       expect(field.fields[0].$status.isVisible()).toBe(false);
-      expect(field.fields[0]._tooltip()).toBe(null);
+      expect(field.fields[0].tooltip()).toBe(null);
       expect(field.fields[0].errorStatus.message).toBe('foo');
     });
 
@@ -253,9 +253,9 @@ describe('SequenceBox', () => {
 
       expect(field.$status.isVisible()).toBe(false);
       expect(field.errorStatus).toBeFalsy();
-      expect(field._tooltip()).toBeFalsy();
+      expect(field.tooltip()).toBeFalsy();
       expect(field.fields[0].$status.isVisible()).toBe(true);
-      expect(field.fields[0]._tooltip().rendered).toBe(true);
+      expect(field.fields[0].tooltip().rendered).toBe(true);
       expect(field.fields[0].errorStatus.message).toBe('foo');
 
       field.fields[1].setProperty('visible', false);
@@ -263,16 +263,16 @@ describe('SequenceBox', () => {
       expect(field.$status.isVisible()).toBe(true);
       expect(field.errorStatus.message).toBe('foo');
       expect(field.fields[0].$status.isVisible()).toBe(false);
-      expect(field.fields[0]._tooltip()).toBe(null);
+      expect(field.fields[0].tooltip()).toBe(null);
       expect(field.fields[0].errorStatus.message).toBe('foo');
 
       field.fields[1].setProperty('visible', true);
 
       expect(field.$status.isVisible()).toBe(false);
       expect(field.errorStatus).toBeFalsy();
-      expect(field._tooltip()).toBeFalsy();
+      expect(field.tooltip()).toBeFalsy();
       expect(field.fields[0].$status.isVisible()).toBe(true);
-      expect(field.fields[0]._tooltip().rendered).toBe(true);
+      expect(field.fields[0].tooltip().rendered).toBe(true);
       expect(field.fields[0].errorStatus.message).toBe('foo');
     });
 

@@ -22,12 +22,12 @@ export default class OutlineSpecHelper {
     this.session = session;
   }
 
-  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): OutlineModel & { objectType: ObjectType<Outline, OutlineModel> } {
+  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): OutlineModel & { objectType: ObjectType<Outline> } {
     return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
   }
 
-  createModel(nodes: RefModel<PageModel>[]): OutlineModel & { objectType: ObjectType<Outline, OutlineModel> } {
-    let model = createSimpleModel('Outline', this.session);
+  createModel(nodes: RefModel<PageModel>[]): OutlineModel & { objectType: ObjectType<Outline> } {
+    let model = createSimpleModel('Outline', this.session) as OutlineModel & { objectType: ObjectType<Outline> };
     if (nodes) {
       model.nodes = nodes;
     }

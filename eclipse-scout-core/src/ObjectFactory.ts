@@ -14,7 +14,7 @@ import {ModelOf, ObjectModel} from './scout';
 import {TypeDescriptorOptions} from './TypeDescriptor';
 
 export type ObjectCreator = (model?: any) => object;
-export type ObjectType<TObject = object, TModel = object> = string | (new(model?: TModel) => TObject);
+export type ObjectType<TObject = object, TModel = ModelOf<TObject>> = string | (new(model?: TModel) => TObject);
 
 export interface ObjectFactoryOptions extends TypeDescriptorOptions {
   /**

@@ -18,7 +18,7 @@ export default class MenuSpecHelper {
   }
 
   createModel(text?: string, iconId?: string, menuTypes?: string[]): MenuModel {
-    let model = createSimpleModel('Menu', this.session);
+    let model = createSimpleModel('Menu', this.session) as MenuModel;
     $.extend(model, {
       text: text,
       iconId: iconId,

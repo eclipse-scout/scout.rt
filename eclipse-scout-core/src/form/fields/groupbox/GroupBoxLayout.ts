@@ -46,8 +46,7 @@ export default class GroupBoxLayout extends AbstractLayout {
       htmlContainer = this.groupBox.htmlComp,
       htmlGbBody = this._htmlGbBody(),
       htmlMenuBar = this._htmlMenuBar(),
-      // @ts-ignore
-      tooltip = this.groupBox._tooltip(),
+      tooltip = this.groupBox.tooltip(),
       $header = this.groupBox.$header,
       $title = this.groupBox.$title,
       containerSize = htmlContainer.availableSize()

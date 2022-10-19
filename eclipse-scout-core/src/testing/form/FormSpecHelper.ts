@@ -12,8 +12,8 @@ import {Action, arrays, Column, Form, FormField, FormModel, GroupBox, Mode, Mode
 import $ from 'jquery';
 import {ObjectType} from '../../ObjectFactory';
 import {Optional, SomeRequired} from '../../types';
+import {ModelOf} from '../../scout';
 
-// FIXME TS use FormFieldModel for return types
 export default class FormSpecHelper {
   session: Session;
 
@@ -183,9 +183,9 @@ export default class FormSpecHelper {
     return form;
   }
 
-  createFieldModel(objectType: ObjectType, parent: Widget, modelProperties: Record<string, any>) {
+  createFieldModel<T>(objectType: ObjectType<T>, parent: Widget, modelProperties: Record<string, any>): ModelOf<T> {
     parent = scout.nvl(parent, this.session.desktop);
-    let model = createSimpleModel(objectType || 'StringField', this.session);
+    let model = createSimpleModel(objectType || 'StringField', this.session) as ModelOf<T>;
     if (modelProperties) {
       $.extend(model, modelProperties);
     }

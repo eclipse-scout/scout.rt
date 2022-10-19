@@ -27,7 +27,9 @@ declare global {
 
   function removePopups(session: Session, cssClass?: string): void;
 
-  function createSimpleModel(objectType: ObjectType, session: Session, id?: string);
+  function createSimpleModel<T>(objectType: ObjectType<T>, session: Session, id?: string): {
+    id: string; objectType: ObjectType<T>; parent: Widget; session: Session;
+  };
 
   function mostRecentJsonRequest(): RemoteRequest;
 
