@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, Table, TableRow} from '../index';
+import {Cell, LookupRow, Table, TableRow} from '../index';
 import {Primitive} from '../types';
 import {ObjectModel} from '../scout';
 
@@ -25,6 +25,7 @@ export default interface TableRowModel extends ObjectModel<TableRow, TableRowMod
   parent: Table;
   expanded?: boolean;
   dataMap?: Record<PropertyKey, any>;
+  lookupRow?: LookupRow<any>;
 }
 
 export type TableRowData = Omit<TableRowModel, 'parent'>;

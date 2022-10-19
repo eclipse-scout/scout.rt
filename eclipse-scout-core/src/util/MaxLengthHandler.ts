@@ -8,26 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DesktopNotification, objects, scout, Status, Widget} from '../index';
+import {arrays, DesktopNotification, MaxLengthHandlerModel, objects, scout, Status} from '../index';
 import $ from 'jquery';
 import {assertValue} from '../scout';
-
-export type MaxLengthHandlerTarget = Widget & {
-  maxLength: number;
-  _readDisplayText: () => string;
-  parseAndSetValue: (value: string) => void;
-};
-
-export interface MaxLengthHandlerOptions {
-  target: MaxLengthHandlerTarget;
-}
+import {MaxLengthHandlerTarget} from './MaxLengthHandlerModel';
 
 export default class MaxLengthHandler {
+  declare model: MaxLengthHandlerModel;
+
   onInputFieldPaste: (event: JQuery.TriggeredEvent<HTMLInputElement, undefined, HTMLInputElement, HTMLInputElement>) => void;
   target: MaxLengthHandlerTarget;
   $textInputField: JQuery<HTMLInputElement>;
 
-  constructor(options: MaxLengthHandlerOptions) {
+  constructor(options: MaxLengthHandlerModel) {
     options = options || {target: null};
     assertValue(options.target, 'target is mandatory');
 

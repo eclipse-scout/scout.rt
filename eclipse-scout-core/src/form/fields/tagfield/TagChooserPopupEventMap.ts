@@ -8,17 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldLayout, TagField} from '../../../index';
+import {Event, LookupRow, PopupEventMap, TagChooserPopup} from '../../../index';
 
-export default class TagFieldLayout extends FormFieldLayout {
-  declare formField: TagField;
+export interface TagChooserPopupLookupRowSelectedEvent<T = TagChooserPopup> extends Event<T> {
+  lookupRow: LookupRow<string>;
+}
 
-  constructor(field: TagField) {
-    super(field);
-  }
-
-  protected override _$elementForIconLayout(): JQuery {
-    // The field container has the border and not the input ($field) element
-    return this.formField.$fieldContainer;
-  }
+export default interface TagChooserPopupEventMap extends PopupEventMap {
+  'lookupRowSelected': TagChooserPopupLookupRowSelectedEvent;
 }

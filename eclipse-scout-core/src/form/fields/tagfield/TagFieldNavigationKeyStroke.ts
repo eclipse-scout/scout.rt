@@ -8,16 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke, TagBar} from '../../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, TagBar} from '../../../index';
 import $ from 'jquery';
+import {TagFieldKeyStrokeAdapter} from './TagField';
+import {Alignment} from '../../../cell/Cell';
 
 /**
  * @param fieldAdapter acts as an interface so we can use the same key-stroke for TagField and TagBarOverflowPopup.
  *
  */
 export default class TagFieldNavigationKeyStroke extends KeyStroke {
+  fieldAdapter: TagFieldKeyStrokeAdapter;
 
-  constructor(fieldAdapter) { // FIXME TS: use TagFieldKeyStrokeAdapter as input
+  constructor(fieldAdapter: TagFieldKeyStrokeAdapter) {
     super();
     this.fieldAdapter = fieldAdapter;
     this.which = [keys.LEFT, keys.RIGHT];
@@ -25,7 +28,7 @@ export default class TagFieldNavigationKeyStroke extends KeyStroke {
     this.preventInvokeAcceptInputOnActiveValueField = true;
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -33,7 +36,7 @@ export default class TagFieldNavigationKeyStroke extends KeyStroke {
     return this.fieldAdapter.enabled();
   }
 
-  handle(event) {
+  override handle(event: JQuery.KeyboardEventBase) {
     if (event.which === keys.LEFT) {
       this._focusTagElement(-1);
     } else if (event.which === keys.RIGHT) {
@@ -41,7 +44,7 @@ export default class TagFieldNavigationKeyStroke extends KeyStroke {
     }
   }
 
-  _focusTagElement(direction) {
+  protected _focusTagElement(direction: Alignment) {
     let UNDEFINED = -1;
     let INPUT = -2;
 

@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, TagField} from '../../../index';
 
 export default class TagFieldOpenPopupKeyStroke extends KeyStroke {
+  declare field: TagField;
 
-  constructor(tagField) {
+  constructor(tagField: TagField) {
     super();
     this.field = tagField;
     this.which = [keys.ENTER, keys.SPACE];
@@ -20,7 +21,7 @@ export default class TagFieldOpenPopupKeyStroke extends KeyStroke {
     this.preventDefault = false;
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -28,7 +29,7 @@ export default class TagFieldOpenPopupKeyStroke extends KeyStroke {
     return this.field.tagBar && this.field.tagBar.isOverflowIconFocused();
   }
 
-  handle(event) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this.field.tagBar.openOverflowPopup();
   }
 }
