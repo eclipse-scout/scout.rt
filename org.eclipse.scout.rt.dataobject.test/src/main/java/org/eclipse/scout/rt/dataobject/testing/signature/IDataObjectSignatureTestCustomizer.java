@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -30,4 +30,14 @@ public interface IDataObjectSignatureTestCustomizer {
    * must not be part of the supported types.
    */
   Set<Class<?>> supportedTypes();
+
+  /**
+   * Allows contributing custom validation on attribute type.
+   * <p>
+   * If a subclass of {@link IDoEntity}, {@link IEnum} or {@link IId} should not be accepted, override this method and
+   * return a non-null error message.
+   */
+  default String validateAttributeType(String attributeName, Class<?> attributeTypeClazz, Class<? extends IDoEntity> containingEntityClass) {
+    return null;
+  }
 }
