@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -26,8 +26,6 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.dataobject.DataObjectAttributeDescriptor;
 import org.eclipse.scout.rt.dataobject.DataObjectInventory;
@@ -131,15 +129,16 @@ public class DataObjectSignatureGenerator {
       + "([\\w.\\-]+)"
       + "]");
 
-  protected DataObjectInventory m_dataObjectInventory;
-  protected EnumInventory m_enumInventory;
-  protected Set<Class<?>> m_supportedAttributeTypes;
+  protected final DataObjectInventory m_dataObjectInventory;
+  protected final EnumInventory m_enumInventory;
+  protected final List<IDataObjectSignatureTestCustomizer> m_customizers;
+  protected final Set<Class<?>> m_supportedAttributeTypes;
 
   /**
    * Either directly having {@link TypeVersionRequired} annotation or by inheritance (only interfaces and abstract
    * classes)
    */
-  protected Set<Class<?>> m_classesWithTypeVersionRequired = new HashSet<>();
+  protected final Set<Class<?>> m_classesWithTypeVersionRequired = new HashSet<>();
 
   protected final List<String> m_errors = new ArrayList<>();
 
@@ -149,12 +148,12 @@ public class DataObjectSignatureGenerator {
   protected Predicate<Class<? extends IDoEntity>> m_dataObjectPredicate;
   protected BiPredicate<Class<? extends IDoEntity>, String> m_attributePredicate;
 
-  @PostConstruct
-  protected void init() {
+  public DataObjectSignatureGenerator() {
     m_dataObjectInventory = BEANS.get(DataObjectInventory.class);
     m_enumInventory = BEANS.get(EnumInventory.class);
+    m_customizers = BEANS.all(IDataObjectSignatureTestCustomizer.class);
 
-    m_supportedAttributeTypes = BEANS.all(IDataObjectSignatureTestCustomizer.class).stream()
+    m_supportedAttributeTypes = m_customizers.stream()
         .flatMap(collector -> collector.supportedTypes().stream())
         .collect(Collectors.toSet());
 
@@ -322,7 +321,7 @@ public class DataObjectSignatureGenerator {
     ParameterizedType attributeType = attributeDescriptor.getType();
 
     if (!(attributeType.getRawType() instanceof Class)) {
-      m_errors.add(String.format("Raw type must be a class (referenced in '%s')", getContextText(doEntityClass, attributeDescriptor.getName())));
+      m_errors.add(String.format("Raw type must be a class (referenced in '%s')", getContextText(attributeDescriptor.getName(), doEntityClass)));
       return null;
     }
 
@@ -340,14 +339,14 @@ public class DataObjectSignatureGenerator {
       list = true;
     }
     else {
-      m_errors.add(String.format("Unknown attribute type '%s' referenced in '%s'", rawType.getName(), getContextText(doEntityClass, attributeDescriptor.getName())));
+      m_errors.add(String.format("Unknown attribute type '%s' referenced in '%s'", rawType.getName(), getContextText(attributeDescriptor.getName(), doEntityClass)));
       return null;
     }
 
     String valueType = type.getTypeName();
     if (m_attributePredicate == null || m_attributePredicate.test(doEntityClass, attributeDescriptor.getName())) {
       // Only process type if not excluded
-      valueType = processType(type, doEntityClass, attributeDescriptor.getName());
+      valueType = processType(attributeDescriptor.getName(), type, doEntityClass);
     }
 
     AttributeDataObjectSignatureDo attribute = BEANS.get(AttributeDataObjectSignatureDo.class)
@@ -365,27 +364,27 @@ public class DataObjectSignatureGenerator {
     return attribute;
   }
 
-  protected String processType(Type type, Class<? extends IDoEntity> containingEntityClass, String containingAttributeName) {
+  protected String processType(String attributeName, Type type, Class<? extends IDoEntity> containingEntityClass) {
     if (type instanceof ParameterizedType) {
-      return processParametrizedType((ParameterizedType) type, containingEntityClass, containingAttributeName);
+      return processParametrizedType(attributeName, (ParameterizedType) type, containingEntityClass);
     }
     else if (type instanceof WildcardType) {
-      return processWildcardType((WildcardType) type, containingEntityClass, containingAttributeName);
+      return processWildcardType(attributeName, (WildcardType) type, containingEntityClass);
     }
     else if (type instanceof Class) {
-      return processClass((Class<?>) type, containingEntityClass, containingAttributeName);
+      return processClass(attributeName, (Class<?>) type, containingEntityClass);
     }
     else {
-      m_errors.add(String.format("Unknown type '%s' referenced in '%s'", type, getContextText(containingEntityClass, containingAttributeName)));
+      m_errors.add(String.format("Unknown type '%s' referenced in '%s'", type, getContextText(attributeName, containingEntityClass)));
       return type.getTypeName();
     }
   }
 
-  protected String processParametrizedType(ParameterizedType parameterizedType, Class<? extends IDoEntity> containingEntityClass, String containingAttributeName) {
-    String rawType = processType(parameterizedType.getRawType(), containingEntityClass, containingAttributeName);
+  protected String processParametrizedType(String attributeName, ParameterizedType parameterizedType, Class<? extends IDoEntity> containingEntityClass) {
+    String rawType = processType(attributeName, parameterizedType.getRawType(), containingEntityClass);
     List<String> genericParameters = new LinkedList<>();
     for (Type genericType : parameterizedType.getActualTypeArguments()) {
-      genericParameters.add(processType(genericType, containingEntityClass, containingAttributeName));
+      genericParameters.add(processType(attributeName, genericType, containingEntityClass));
     }
 
     return box(VALUE_TYPE_CLASS_PREFIX, rawType) + "<" + StringUtility.join(", ", genericParameters) + ">";
@@ -394,14 +393,14 @@ public class DataObjectSignatureGenerator {
   /**
    * Example: DoValue&lt;TypedId&lt;? extends IUuId&gt;&gt;
    */
-  protected String processWildcardType(WildcardType wildcardType, Class<? extends IDoEntity> containingEntityClass, String containingAttributeName) {
+  protected String processWildcardType(String attributeName, WildcardType wildcardType, Class<? extends IDoEntity> containingEntityClass) {
     List<String> lowerBounds = new ArrayList<>();
     for (Type lowerBound : wildcardType.getLowerBounds()) {
-      lowerBounds.add(processType(lowerBound, containingEntityClass, containingAttributeName));
+      lowerBounds.add(processType(attributeName, lowerBound, containingEntityClass));
     }
     List<String> upperBunds = new ArrayList<>();
     for (Type upperBund : wildcardType.getUpperBounds()) {
-      lowerBounds.add(processType(upperBund, containingEntityClass, containingAttributeName));
+      lowerBounds.add(processType(attributeName, upperBund, containingEntityClass));
     }
 
     String lowerBoundText = StringUtility.join(" & ", lowerBounds);
@@ -409,24 +408,31 @@ public class DataObjectSignatureGenerator {
     return StringUtility.join(";", StringUtility.isNullOrEmpty(lowerBoundText) ? null : "? extends " + lowerBoundText, StringUtility.isNullOrEmpty(upperBoundText) ? null : "? super " + upperBoundText);
   }
 
-  protected String processClass(Class<?> clazz, Class<? extends IDoEntity> containingEntityClass, String containingAttributeName) {
+  protected String processClass(String attributeName, Class<?> clazz, Class<? extends IDoEntity> containingEntityClass) {
+    for (IDataObjectSignatureTestCustomizer c : m_customizers) {
+      String errorMsg = c.validateAttributeType(attributeName, clazz, containingEntityClass);
+      if (errorMsg != null) {
+        m_errors.add(errorMsg);
+      }
+    }
+
     if (IEnum.class.isAssignableFrom(clazz)) {
       @SuppressWarnings("unchecked")
       Class<? extends IEnum> enumClass = (Class<? extends IEnum>) clazz;
-      return processAttributeTypeEnum(enumClass, containingEntityClass, containingAttributeName);
+      return processAttributeTypeEnum(attributeName, enumClass, containingEntityClass);
     }
 
     if (IId.class.isAssignableFrom(clazz)) {
       @SuppressWarnings("unchecked")
       Class<? extends IId<?>> idClass = (Class<? extends IId<?>>) clazz;
-      return processAttributeTypeId(idClass, containingEntityClass, containingAttributeName);
+      return processAttributeTypeId(attributeName, idClass, containingEntityClass);
     }
 
     if (IDoEntity.class.isAssignableFrom(clazz)) {
       // It's a DoEntity, resolve type name as reference
       @SuppressWarnings("unchecked")
       Class<? extends IDoEntity> doEntityClass = (Class<? extends IDoEntity>) clazz;
-      return processAttributeTypeDoEntity(doEntityClass, containingEntityClass, containingAttributeName);
+      return processAttributeTypeDoEntity(attributeName, doEntityClass, containingEntityClass);
     }
 
     if (m_supportedAttributeTypes.contains(clazz)) {
@@ -435,13 +441,13 @@ public class DataObjectSignatureGenerator {
 
     m_errors.add(String.format("Unsupported class type '%s' referenced in '%s' (check for missing dependencies on %s implementors)",
         clazz,
-        getContextText(containingEntityClass, containingAttributeName),
+        getContextText(attributeName, containingEntityClass),
         IDataObjectSignatureTestCustomizer.class.getName()));
 
     return clazz.getName();
   }
 
-  protected String processAttributeTypeEnum(Class<? extends IEnum> enumClass, Class<? extends IDoEntity> containingEntityClass, String containingAttributeName) {
+  protected String processAttributeTypeEnum(String attributeName, Class<? extends IEnum> enumClass, Class<? extends IDoEntity> containingEntityClass) {
     if (isMatchingPackageNamePrefix(containingEntityClass)) {
       // only add as reference enum class if enum is referenced in an accepted class, i.e. from own module
       // We don't want to add signature for all enums, only for those that are referenced in one of the own data objects.
@@ -450,28 +456,28 @@ public class DataObjectSignatureGenerator {
 
     String enumName = m_enumInventory.toEnumName(enumClass);
     if (enumName == null) {
-      m_errors.add(String.format("Enum class '%s' is missing enum name (referenced in '%s')", enumClass.getName(), getContextText(containingEntityClass, containingAttributeName)));
+      m_errors.add(String.format("Enum class '%s' is missing enum name (referenced in '%s')", enumClass.getName(), getContextText(attributeName, containingEntityClass)));
       enumName = enumClass.getName();
     }
 
     return box(VALUE_TYPE_ENUM_PREFIX, enumName);
   }
 
-  protected String processAttributeTypeId(Class<? extends IId<?>> idClass, Class<? extends IDoEntity> containingEntityClass, String containingAttributeName) {
+  protected String processAttributeTypeId(String attributeName, Class<? extends IId<?>> idClass, Class<? extends IDoEntity> containingEntityClass) {
     String idTypeName = BEANS.get(IdExternalFormatter.class).getTypeName(idClass);
     if (idTypeName == null) {
-      m_errors.add(String.format("IId class '%s' is missing id type name (referenced in '%s')", idClass.getName(), getContextText(containingEntityClass, containingAttributeName)));
+      m_errors.add(String.format("IId class '%s' is missing id type name (referenced in '%s')", idClass.getName(), getContextText(attributeName, containingEntityClass)));
       idTypeName = idClass.getName();
     }
 
     return box(VALUE_TYPE_ID_PREFIX, idTypeName);
   }
 
-  protected String processAttributeTypeDoEntity(Class<? extends IDoEntity> doEntityClass, Class<? extends IDoEntity> containingEntityClass, String containingAttributeName) {
+  protected String processAttributeTypeDoEntity(String attributeName, Class<? extends IDoEntity> doEntityClass, Class<? extends IDoEntity> containingEntityClass) {
     if (Modifier.isAbstract(doEntityClass.getModifiers()) || doEntityClass.isInterface()) {
       // An interface or abstract class that is referenced within a data object node must have a TypeVersionRequired annotation.
       if (!m_classesWithTypeVersionRequired.contains(doEntityClass)) {
-        m_errors.add(String.format("Interface/abstract class '%s' is missing @TypeVersionRequired (referenced in '%s')", doEntityClass, getContextText(containingEntityClass, containingAttributeName)));
+        m_errors.add(String.format("Interface/abstract class '%s' is missing @TypeVersionRequired (referenced in '%s')", doEntityClass, getContextText(attributeName, containingEntityClass)));
       }
 
       // Use FQN for interface/abstract class because there is not other identifier available.
@@ -482,11 +488,11 @@ public class DataObjectSignatureGenerator {
       NamespaceVersion typeVersion = m_dataObjectInventory.getTypeVersion(doEntityClass); // if replaced, replaced data object must have it's own type version
       if (typeName == null) {
         // Check for type name is required to because there might be data objects only having a type version but not type name annotation
-        m_errors.add(String.format("Data object '%s' is missing @TypeName (referenced in '%s')", doEntityClass, getContextText(containingEntityClass, containingAttributeName)));
+        m_errors.add(String.format("Data object '%s' is missing @TypeName (referenced in '%s')", doEntityClass, getContextText(attributeName, containingEntityClass)));
       }
       if (typeVersion == null) {
         // Check for type name is required to because there might be data objects only having a type version but not type name annotation
-        m_errors.add(String.format("Data object '%s' is missing @TypeVersion (referenced in '%s')", doEntityClass, getContextText(containingEntityClass, containingAttributeName)));
+        m_errors.add(String.format("Data object '%s' is missing @TypeVersion (referenced in '%s')", doEntityClass, getContextText(attributeName, containingEntityClass)));
       }
       return box(VALUE_TYPE_DO_PREFIX, typeName);
     }
@@ -506,7 +512,7 @@ public class DataObjectSignatureGenerator {
     return valueTypePrefix + "[" + name + "]";
   }
 
-  protected String getContextText(Class<? extends IDoEntity> containingEntityClass, String containingAttributeName) {
-    return m_dataObjectInventory.toTypeName(containingEntityClass) + "#" + containingAttributeName;
+  protected String getContextText(String attributeName, Class<? extends IDoEntity> containingEntityClass) {
+    return m_dataObjectInventory.toTypeName(containingEntityClass) + "#" + attributeName;
   }
 }
