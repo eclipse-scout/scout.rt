@@ -28,5 +28,5 @@ export default interface DisplayParent extends Widget {
 
   acceptDialog?(dialog: Widget): boolean;
 
-  onGlassPaneMouseDown?(glassPaneOwner: Widget, $glassPane: JQuery<HTMLDivElement>);
+  onGlassPaneMouseDown?(glassPaneOwner: Widget, $glassPane: JQuery);
 }

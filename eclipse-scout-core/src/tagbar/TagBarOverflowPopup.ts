@@ -14,7 +14,7 @@ import {TagFieldKeyStrokeAdapter} from '../form/fields/tagfield/TagField';
 export default class TagBarOverflowPopup extends Popup {
   declare parent: TagBar;
 
-  $body: JQuery<HTMLDivElement>;
+  $body: JQuery;
 
   protected _tagBarPropertyChangeListener: EventHandler;
 

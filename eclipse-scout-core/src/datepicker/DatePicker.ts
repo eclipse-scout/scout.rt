@@ -15,7 +15,7 @@ import {JQueryMouseWheelEvent} from '../jquery/jquery-scout-types';
 import {OldWheelEvent} from '../types';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 
-export type DatePickerMonth = { viewDate: Date; rendered: boolean; $container: JQuery<HTMLDivElement>; $weekendSeparator?: JQuery<HTMLDivElement> };
+export type DatePickerMonth = { viewDate: Date; rendered: boolean; $container: JQuery; $weekendSeparator?: JQuery };
 
 export default class DatePicker extends Widget implements DatePickerModel {
   declare model: DatePickerModel;
@@ -425,7 +425,7 @@ export default class DatePicker extends Widget implements DatePickerModel {
     return this.allowedDates.some(allowedDate => allowedDate.getTime() === dateAsTimestamp);
   }
 
-  protected _build$DateBox(viewDate: Date): JQuery<HTMLDivElement> {
+  protected _build$DateBox(viewDate: Date): JQuery {
     let cl, i, day, dayEnabled, dayInMonth, $day,
       now = new Date(),
       start = new Date(viewDate);

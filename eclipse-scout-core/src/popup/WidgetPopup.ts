@@ -23,13 +23,13 @@ export default class WidgetPopup extends Popup {
   movable: boolean;
   resizable: boolean;
   resizeModes: ResizableMode[];
-  $dragHandle: JQuery<HTMLDivElement>;
+  $dragHandle: JQuery;
   content: Widget;
   /**
    * Action bar on the top right corner, is used to display the close action but may also be used by popups to add custom actions.
    * The bar will only be added automatically if the popup is closable.
    */
-  $actions: JQuery<HTMLDivElement>;
+  $actions: JQuery;
 
   protected _moveHandler: (position: { top: number; left: number }) => void;
   protected _resizeHandler: (event: JQuery.ResizeEvent) => boolean;

@@ -120,7 +120,7 @@ export default class Table extends Widget implements TableModel {
   filterSupport: FilterSupport<TableRow>;
   filteredElementsDirty: boolean;
 
-  $data: JQuery<HTMLDivElement>;
+  $data: JQuery;
   $emptyData: JQuery;
   $fillBefore: JQuery;
   $fillAfter: JQuery;
@@ -535,7 +535,7 @@ export default class Table extends Widget implements TableModel {
     this.rowIconColumn = column;
   }
 
-  handleAppLinkAction(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  handleAppLinkAction(event: JQuery.KeyboardEventBase) {
     let $appLink = $(event.target);
     let column = this._columnAtX($appLink.offset().left);
     let row = $appLink.findUp($elem => $elem.hasClass('table-row'), this.$container).data('row') as TableRow;

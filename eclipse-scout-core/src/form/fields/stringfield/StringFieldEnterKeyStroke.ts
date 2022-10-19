@@ -31,7 +31,7 @@ export default class StringFieldEnterKeyStroke extends KeyStroke {
     }
   }
 
-  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: JQuery.KeyboardEventBase) {
     // NOP
   }
 }

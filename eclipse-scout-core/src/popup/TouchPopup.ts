@@ -20,7 +20,7 @@ export default class TouchPopup extends Popup {
 
   doneAction: Action;
   htmlBody: HtmlComponent;
-  $body: JQuery<HTMLDivElement>;
+  $body: JQuery;
 
   /** the original touch field from the form */
   protected _touchField: DateField | SmartField;
@@ -30,7 +30,7 @@ export default class TouchPopup extends Popup {
   /** the widget placed below the field */
   protected _widget: Widget;
   protected _$widgetContainer: JQuery;
-  protected _$header: JQuery<HTMLDivElement>;
+  protected _$header: JQuery;
   protected _widgetContainerHtmlComp: HtmlComponent;
   protected _touchFieldPropertyChangeListener: EventHandler<PropertyChangeEvent<any>>;
 

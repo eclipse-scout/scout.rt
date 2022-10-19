@@ -89,9 +89,9 @@ export default class Tree extends Widget implements TreeModel {
   nodeWidthDirty: boolean;
   requestFocusOnNodeControlMouseDown: boolean;
   initialTraversing: boolean;
-  $data: JQuery<HTMLDivElement>;
-  $fillBefore: JQuery<HTMLDivElement>;
-  $fillAfter: JQuery<HTMLDivElement>;
+  $data: JQuery;
+  $fillBefore: JQuery;
+  $fillAfter: JQuery;
 
   /** may be used by subclasses to set additional CSS classes */
   protected _additionalContainerClasses: string;
@@ -949,7 +949,7 @@ export default class Tree extends Widget implements TreeModel {
     }
   }
 
-  protected _renderNode(node: TreeNode): JQuery<HTMLDivElement> {
+  protected _renderNode(node: TreeNode): JQuery {
     let paddingLeft = this._computeNodePaddingLeft(node);
     node.render(this.$container, paddingLeft);
     return node.$node;

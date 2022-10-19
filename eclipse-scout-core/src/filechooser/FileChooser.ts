@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, Device, DisplayParent, dragAndDrop, DragAndDropHandler, Event, FileChooserEventMap, FileChooserModel, FileInput, files as fileUtil, FocusAdjacentElementKeyStroke, FocusRule, Form, FormLayout, GlassPaneRenderer, HtmlComponent, keys, KeyStrokeContext, MessageBoxes, scout, scrollbars, Status, Widget} from '../index';
+import {
+  Action, arrays, BoxButtons, ClickActiveElementKeyStroke, CloseKeyStroke, Device, DisplayParent, dragAndDrop, DragAndDropHandler, Event, FileChooserEventMap, FileChooserModel, FileInput, files as fileUtil, FocusAdjacentElementKeyStroke,
+  FocusRule, Form, FormLayout, GlassPaneRenderer, HtmlComponent, keys, KeyStrokeContext, MessageBoxes, scout, scrollbars, Status, Widget
+} from '../index';
 import {FileInputChangeEvent} from './FileInputEventMap';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 
@@ -25,8 +28,8 @@ export default class FileChooser extends Widget implements FileChooserModel {
   uploadButton: Action;
   cancelButton: Action;
   fileInput: FileInput;
-  $content: JQuery<HTMLDivElement>;
-  $title: JQuery<HTMLDivElement>;
+  $content: JQuery;
+  $title: JQuery;
   $files: JQuery<HTMLUListElement>;
   dragAndDropHandler: DragAndDropHandler;
 

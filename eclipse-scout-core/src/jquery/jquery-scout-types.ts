@@ -310,7 +310,7 @@ declare global {
      * @param cssClass string added to the 'class' attribute
      * @param text string used as inner text
      */
-    makeDiv(cssClass?: string, text?: string): JQuery<HTMLDivElement>;
+    makeDiv(cssClass?: string, text?: string): JQuery;
 
     /**
      * Creates a new SPAN element using the current document.
@@ -398,22 +398,22 @@ declare global {
     /**
      * Creates a new DIV and prepends it to the current element.
      */
-    prependDiv(cssClass?: string, text?: string): JQuery<HTMLDivElement>;
+    prependDiv(cssClass?: string, text?: string): JQuery;
 
     /**
      * Creates a new DIV and appends it to the current element.
      */
-    appendDiv(cssClass?: string, text?: string): JQuery<HTMLDivElement>;
+    appendDiv(cssClass?: string, text?: string): JQuery;
 
     /**
      * Creates a new DIV and adds it after the current element.
      */
-    afterDiv(cssClass?: string, text?: string): JQuery<HTMLDivElement>;
+    afterDiv(cssClass?: string, text?: string): JQuery;
 
     /**
      * Creates a new DIV and adds it before current element.
      */
-    beforeDiv(cssClass?: string, text?: string): JQuery<HTMLDivElement>;
+    beforeDiv(cssClass?: string, text?: string): JQuery;
 
     /**
      * Creates a new SPAN and appends it to the current element.

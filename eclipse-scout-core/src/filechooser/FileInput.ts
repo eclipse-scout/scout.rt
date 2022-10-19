@@ -22,7 +22,7 @@ export default class FileInput extends Widget implements FileInputModel {
   uploadController: Widget;
   files: File[];
   $fileInput: JQuery<HTMLInputElement>;
-  $text: JQuery<HTMLDivElement>;
+  $text: JQuery;
   dragAndDropHandler: DragAndDropHandler;
 
   constructor() {

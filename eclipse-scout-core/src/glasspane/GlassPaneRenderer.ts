@@ -19,7 +19,7 @@ export default class GlassPaneRenderer {
   session: Session;
   protected _widget: Widget;
   protected _enabled: boolean;
-  protected _$glassPanes: JQuery<HTMLDivElement>[];
+  protected _$glassPanes: JQuery[];
   protected _deferredGlassPanes: DeferredGlassPaneTarget[];
   protected _resolvedDisplayParent: DisplayParent;
   protected _registeredDisplayParent: DisplayParent;
@@ -143,7 +143,7 @@ export default class GlassPaneRenderer {
     this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
   }
 
-  eachGlassPane(func: ($glassPane: JQuery<HTMLDivElement>) => void) {
+  eachGlassPane(func: ($glassPane: JQuery) => void) {
     this._$glassPanes.forEach($glassPane => func($glassPane));
   }
 
