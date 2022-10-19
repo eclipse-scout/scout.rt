@@ -8,65 +8,72 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GroupBox, TabItemLayout} from '../../../index';
+import {GroupBox, GroupBoxEventMap, GroupBoxModel, PropertyChangeEvent, Tab, TabBox, TabItemLayout} from '../../../index';
 
-export default class TabItem extends GroupBox {
+export interface TabItemModel extends GroupBoxModel {
+  marked?: boolean;
+}
+
+export interface TabItemEventMap extends GroupBoxEventMap {
+  'propertyChange:marked': PropertyChangeEvent<boolean>;
+}
+
+export default class TabItem extends GroupBox implements TabItemModel {
+  declare model: TabItemModel;
+  declare eventMap: TabItemEventMap;
+  declare parent: TabBox;
+
+  marked: boolean;
 
   constructor() {
     super();
     this.marked = false;
   }
 
-  _createLayout() {
+  protected override _createLayout(): TabItemLayout {
     return new TabItemLayout(this);
   }
 
   /**
-   * @override GroupBox.js
-   *
-   * handled by Tab.js
+   * Handled by {@link Tab}
    */
-  _computeTitleVisible(labelVisible) {
+  protected override _computeTitleVisible(labelVisible: boolean) {
     return false;
   }
 
   /**
-   * @override GroupBox.js
-   *
-   * handled by Tab.js
+   * Handled by {@link Tab}
    */
-  addStatus() {
+  override addStatus() {
     // void
   }
 
   /**
-   * @override GroupBox.js
-   *
-   * handled by Tab.js
+   * Handled by {@link Tab}
    */
-  _computeStatusVisible() {
+  protected override _computeStatusVisible() {
     return false;
   }
 
-  setMarked(marked) {
+  setMarked(marked: boolean) {
     this.setProperty('marked', marked);
   }
 
-  getContextMenuItems(onlyVisible = true) {
+  override getContextMenuItems(onlyVisible = true) {
     return [];
   }
 
   /**
-   * @override FormField.js
+   * Selects and focuses the corresponding {@link Tab}.
+   * @returns true if the tab could be focused, false if not
    */
-  focus() {
+  override focus(): boolean {
     this.select();
     // ensure the focus is on the tab
-    this.parent.focusTabItem(this);
-    return false;
+    return this.parent.focusTabItem(this);
   }
 
-  isFocused() {
+  override isFocused(): boolean {
     return this.parent.isTabItemFocused(this);
   }
 
@@ -76,7 +83,7 @@ export default class TabItem extends GroupBox {
     }
   }
 
-  getTab() {
+  getTab(): Tab {
     return this.parent.getTabForItem(this);
   }
 }

@@ -18,7 +18,6 @@ import {AdapterData} from './Session';
 import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {RefModel, SomeRequired} from '../types';
 import {ObjectType} from '../ObjectFactory';
-import {ModelOf} from '../scout';
 
 /**
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
@@ -81,7 +80,7 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
     this.destroyed = true;
   }
 
-  createWidget<T extends Widget>(adapterData: Omit<WidgetModel, 'parent'> & { objectType: ObjectType<T, ModelOf<T>> }, parent: Widget): T {
+  createWidget<T extends Widget>(adapterData: Omit<WidgetModel, 'parent'> & { objectType: ObjectType<T> }, parent: Widget): T {
     let model = this._initModel(adapterData, parent);
     this.widget = this._createWidget(model);
     this._attachWidget();

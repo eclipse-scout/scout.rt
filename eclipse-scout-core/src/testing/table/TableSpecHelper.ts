@@ -28,8 +28,8 @@ export default class TableSpecHelper {
     this.menuHelper = new MenuSpecHelper(session);
   }
 
-  createModel(columns: RefModel<ColumnModel>[], rows: TableRowData[]): TableModel & { objectType: ObjectType<Table, TableModel> } {
-    let model = createSimpleModel('Table', this.session);
+  createModel(columns: RefModel<ColumnModel>[], rows: TableRowData[]): TableModel & { objectType: ObjectType<Table> } {
+    let model = createSimpleModel('Table', this.session) as TableModel & { objectType: ObjectType<Table> };
 
     // Server will never send undefined -> don't create model with undefined properties.
     if (rows) {
@@ -82,7 +82,7 @@ export default class TableSpecHelper {
     return this.createModelRow(id, cells);
   }
 
-  createModelColumn(text: string, type?: ObjectType<Column, ColumnModel>): ColumnModel & { uiSortPossible: boolean } {
+  createModelColumn(text: string, type?: ObjectType<Column>): ColumnModel & { uiSortPossible: boolean } {
     let model = {
       id: ObjectFactory.get().createUniqueId(),
       text: text,
@@ -193,7 +193,7 @@ export default class TableSpecHelper {
     return this.createModel(this.createModelColumns(1), rows);
   }
 
-  createModelSingleColumnByValues(values: any[], columnType: ObjectType<Column, ColumnModel>) {
+  createModelSingleColumnByValues(values: any[], columnType: ObjectType<Column>) {
     let rows = [];
     for (let i = 0; i < values.length; i++) {
       rows.push(this.createModelRowByValues(null, values[i]));
@@ -201,7 +201,7 @@ export default class TableSpecHelper {
     return this.createModel(this.createModelColumns(1, columnType), rows);
   }
 
-  createModelFixture(colCount: number, rowCount?: number): TableModel & { objectType: ObjectType<Table, TableModel> } {
+  createModelFixture(colCount: number, rowCount?: number): TableModel & { objectType: ObjectType<Table> } {
     return this.createModel(this.createModelColumns(colCount), this.createModelRows(colCount, rowCount));
   }
 

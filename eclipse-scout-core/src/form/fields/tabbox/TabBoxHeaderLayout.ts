@@ -8,13 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, FormField, graphics, HtmlComponent, HtmlEnvironment, Rectangle} from '../../../index';
+import {AbstractLayout, Dimension, EventHandler, FormField, graphics, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, MenuBarLayout, Rectangle, TabAreaLayout, TabBoxHeader} from '../../../index';
 
 export default class TabBoxHeaderLayout extends AbstractLayout {
+  tabBoxHeader: TabBoxHeader;
+  htmlPropertyChangeHandler: EventHandler;
+  fieldStatusWidth: number;
 
-  constructor(tabBoxHeader) {
+  constructor(tabBoxHeader: TabBoxHeader) {
     super();
     this.tabBoxHeader = tabBoxHeader;
+    this.fieldStatusWidth = null;
 
     this._initDefaults();
 
@@ -25,16 +29,16 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
     });
   }
 
-  _initDefaults() {
+  protected _initDefaults() {
     this.fieldStatusWidth = HtmlEnvironment.get().fieldStatusWidth;
   }
 
-  _onHtmlEnvironmentPropertyChange() {
+  protected _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this.tabBoxHeader.invalidateLayoutTree();
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let htmlContainer = HtmlComponent.get($container),
       tabArea = this.tabBoxHeader.tabArea,
       tabAreaMargins = tabArea.htmlComp.margins(),
@@ -69,7 +73,7 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
       containerSize.height - tabAreaMargins.vertical()
     ));
 
-    menuBar.htmlComp.layout.collapsed = tabArea.htmlComp.layout.overflowTabs.length > 0;
+    (menuBar.htmlComp.layout as MenuBarLayout).collapsed = (tabArea.htmlComp.layout as TabAreaLayout).overflowTabs.length > 0;
     // layout menuBar
     menuBar.htmlComp.setBounds(new Rectangle(
       insets.left + tabAreaPrefSize.width + tabAreaMargins.horizontal(),
@@ -86,7 +90,7 @@ export default class TabBoxHeaderLayout extends AbstractLayout {
     }
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     let htmlContainer = HtmlComponent.get($container),
       insets = htmlContainer.insets(),
       wHint = (options.widthHint || htmlContainer.availableSize().width) - htmlContainer.insets().horizontal(),

@@ -127,8 +127,7 @@ export function eventOutsideProposalField(field: ValueField<any> & { popup: Popu
     || safeIsOrHas(field.$icon, target)
     || safeIsOrHas(field.$clearIcon, target);
   let eventOnPopup = safeWidgetIsOrHas(field.popup, target);
-  // @ts-ignore
-  let eventOnTooltip = safeWidgetIsOrHas(field._tooltip(), target);
+  let eventOnTooltip = safeWidgetIsOrHas(field.tooltip(), target);
 
   return !eventOnField && !eventOnPopup && !eventOnTooltip;
 

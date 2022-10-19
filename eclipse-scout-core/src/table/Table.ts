@@ -2139,7 +2139,7 @@ export default class Table extends Widget implements TableModel {
   }
 
   protected _removeMenus() {
-    // menubar takes care about removal
+    // menubar takes care of removal
   }
 
   notifyRowSelectionFinished() {

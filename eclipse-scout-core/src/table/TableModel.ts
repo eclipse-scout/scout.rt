@@ -115,7 +115,7 @@ export default interface TableModel extends WidgetModel {
    */
   footerVisible?: boolean;
   filters?: Filter<TableRow>[] | RefModel<TableUserFilterModel>[];
-  rows?: TableRow[] | TableRowData[];
+  rows?: (TableRow | TableRowData)[];
   maxRowCount?: number;
   /**
    * Configures whether the table shows tooltips if the cell content is truncated.

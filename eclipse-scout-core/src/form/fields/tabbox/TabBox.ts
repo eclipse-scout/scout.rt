@@ -8,20 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompositeField, fields, FormField, HtmlComponent, scout, SingleLayout, TabArea, TabBoxHeader, TabBoxLayout} from '../../../index';
+import {arrays, CompositeField, fields, FormField, HtmlComponent, Menu, PropertyChangeEvent, scout, SingleLayout, TabArea, TabBoxEventMap, TabBoxHeader, TabBoxLayout, TabBoxModel, TabItem, TabItemModel} from '../../../index';
 import $ from 'jquery';
+import {TabAreaStyle} from './TabArea';
+import Tab from './Tab';
 
 /**
  * Tab-area = where the 1-n tabs are placed (may have multiple runs = lines).
  * Tab-content = where the content of a single tab is displayed.
  */
-export default class TabBox extends CompositeField {
+export default class TabBox extends CompositeField implements TabBoxModel {
+  declare model: TabBoxModel;
+  declare eventMap: TabBoxEventMap;
+
+  selectedTab: TabItem;
+  header: TabBoxHeader;
+  tabItems: TabItem[];
+  tabAreaStyle: TabAreaStyle;
+  protected _$tabContent: JQuery;
+  protected _statusPositionOrig: any;
+  protected _tabBoxHeaderPropertyChangeHandler: any;
 
   constructor() {
     super();
 
     this.gridDataHints.useUiHeight = true;
     this.gridDataHints.w = FormField.FULL_WIDTH;
+    this.header = null;
     this.selectedTab = null;
     this.tabItems = [];
     this.tabAreaStyle = TabArea.DisplayStyle.DEFAULT;
@@ -31,13 +44,10 @@ export default class TabBox extends CompositeField {
     this._addWidgetProperties(['tabItems', 'selectedTab']);
     this._addPreserveOnPropertyChangeProperties(['selectedTab']);
 
-    this._tabBoxHeaderPropertyChangeHander = this._onTabBoxHeaderPropertyChange.bind(this);
+    this._tabBoxHeaderPropertyChangeHandler = this._onTabBoxHeaderPropertyChange.bind(this);
   }
 
-  /**
-   * @override FormField.js
-   */
-  _init(model) {
+  protected override _init(model: TabBoxModel) {
     super._init(model);
     this.header = scout.create(TabBoxHeader, {
       parent: this,
@@ -45,21 +55,21 @@ export default class TabBox extends CompositeField {
     });
 
     this._initProperties(model);
-    this.header.on('propertyChange', this._tabBoxHeaderPropertyChangeHander);
+    this.header.on('propertyChange', this._tabBoxHeaderPropertyChangeHandler);
   }
 
-  _initProperties(model) {
+  protected _initProperties(model: TabBoxModel) {
     this._setTabItems(this.tabItems);
     this._setSelectedTab(this.selectedTab);
     this._setTabAreaStyle(this.tabAreaStyle);
   }
 
-  _destroy() {
+  protected override _destroy() {
     super._destroy();
-    this.header.off('propertyChange', this._tabBoxHeaderPropertyChangeHander);
+    this.header.off('propertyChange', this._tabBoxHeaderPropertyChangeHandler);
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'tab-box', new TabBoxLayout(this));
 
     this.header.render(this.$container);
@@ -70,32 +80,26 @@ export default class TabBox extends CompositeField {
     htmlCompContent.setLayout(new SingleLayout());
   }
 
-  /**
-   * @override FormField.js
-   */
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderSelectedTab();
   }
 
-  /**
-   * @override FormField.js
-   */
-  _remove() {
+  protected override _remove() {
     super._remove();
     this._removeSelectedTab();
   }
 
-  getContextMenuItems(onlyVisible = true) {
+  override getContextMenuItems(onlyVisible = true): Menu[] {
     // handled by the menubar
     return [];
   }
 
-  _removeMenus() {
-    // menubar takes care about removal
+  protected _removeMenus() {
+    // menubar takes care of removal
   }
 
-  deleteTabItem(tabItem) {
+  deleteTabItem(tabItem: TabItem) {
     let index = this.tabItems.indexOf(tabItem);
     let newTabItems = this.tabItems.slice();
     if (index >= 0) {
@@ -104,21 +108,25 @@ export default class TabBox extends CompositeField {
     }
   }
 
-  insertTabItem(tabItem, index) {
+  /**
+   * Inserts a new tab item.
+   * @param index The position where the new tab should be inserted. By default, it will be appended at the end of the existing tab items.
+   */
+  insertTabItem(tabItem: TabItem | TabItemModel, index?: number) {
     if (!tabItem) {
       return;
     }
     index = scout.nvl(index, this.tabItems.length);
-    let newTabItems = this.tabItems.slice();
-    newTabItems.splice(index, 0, tabItem);
-    this.setTabItems(newTabItems);
+    let tabItems = this.tabItems.slice() as (TabItem | TabItemModel)[];
+    tabItems.splice(index, 0, tabItem);
+    this.setTabItems(tabItems);
   }
 
-  setTabItems(tabItems) {
+  setTabItems(tabItems: (TabItem | TabItemModel)[]) {
     this.setProperty('tabItems', tabItems);
   }
 
-  _setTabItems(tabItems) {
+  protected _setTabItems(tabItems: TabItem[]) {
     tabItems = tabItems || [];
     let tabsToRemove = this.tabItems || [];
     tabsToRemove.filter(tabItem => tabItems.indexOf(tabItem) < 0
@@ -134,21 +142,24 @@ export default class TabBox extends CompositeField {
     }
   }
 
-  _renderTabItems(tabItems) {
+  protected _renderTabItems(tabItems: TabItem[]) {
     // void only selected tab is rendered
   }
 
-  _removeTabItems(tabItems) {
+  protected _removeTabItems(tabItems: TabItem[]) {
     // void only selected tab is rendered
   }
 
-  _removeTabContent() {
+  protected _removeTabContent() {
     this.tabItems.forEach(tabItem => {
       tabItem.remove();
-    }, this);
+    });
   }
 
-  selectTabById(tabId) {
+  /**
+   * @deprecated use {@link setSelectedTab} instead
+   */
+  selectTabById(tabId: string) {
     let tab = this.getTabItem(tabId);
     if (!tab) {
       throw new Error('Tab with ID \'' + tabId + '\' does not exist');
@@ -156,11 +167,14 @@ export default class TabBox extends CompositeField {
     this.setSelectedTab(tab);
   }
 
-  setSelectedTab(tabItem) {
+  /**
+   * @param tabItem if a string is provided, the tab will be resolved automatically
+   */
+  setSelectedTab(tabItem: TabItem | string) {
     this.setProperty('selectedTab', tabItem);
   }
 
-  _setSelectedTab(tabItem) {
+  protected _setSelectedTab(tabItem: TabItem) {
     $.log.isDebugEnabled() && $.log.debug('(TabBox#_selectTab) tab=' + tabItem);
     if (this.selectedTab && this.selectedTab.rendered) {
       this.selectedTab.remove();
@@ -169,7 +183,7 @@ export default class TabBox extends CompositeField {
     this.header.setSelectedTabItem(this.selectedTab);
   }
 
-  _renderSelectedTab() {
+  protected _renderSelectedTab() {
     if (this.selectedTab) {
       this.selectedTab.render(this._$tabContent);
       this.selectedTab.get$Scrollable().data('scroll-shadow-customizer', this._updateScrollShadow.bind(this));
@@ -180,14 +194,14 @@ export default class TabBox extends CompositeField {
     }
   }
 
-  _removeSelectedTab() {
+  protected _removeSelectedTab() {
     if (this.selectedTab) {
       this.selectedTab.get$Scrollable().removeData('scroll-shadow-customizer');
       this.selectedTab.remove();
     }
   }
 
-  _updateScrollShadow() {
+  protected _updateScrollShadow() {
     if (!this.rendered) {
       return;
     }
@@ -202,21 +216,18 @@ export default class TabBox extends CompositeField {
     fields.adjustStatusPositionForScrollShadow(this, () => hasScrollShadowTop && this.labelVisible);
   }
 
-  setTabAreaStyle(tabAreaStyle) {
+  setTabAreaStyle(tabAreaStyle: TabAreaStyle) {
     this.setProperty('tabAreaStyle', tabAreaStyle);
   }
 
-  _setTabAreaStyle(tabAreaStyle) {
+  protected _setTabAreaStyle(tabAreaStyle: TabAreaStyle) {
     this.tabAreaStyle = tabAreaStyle;
     if (this.header && this.header.tabArea) {
       this.header.tabArea.setDisplayStyle(tabAreaStyle);
     }
   }
 
-  /**
-   * @override FormField.js
-   */
-  _renderStatusPosition() {
+  protected override _renderStatusPosition() {
     super._renderStatusPosition();
     if (!this.fieldStatus) {
       return;
@@ -230,7 +241,7 @@ export default class TabBox extends CompositeField {
     this.invalidateLayoutTree();
   }
 
-  _updateFieldStatus() {
+  protected override _updateFieldStatus() {
     super._updateFieldStatus();
     if (this.selectedTab && this.selectedTab.notification) {
       // Also invalidate tab item if a notification is shown because notification size depends on status visibility
@@ -238,28 +249,24 @@ export default class TabBox extends CompositeField {
     }
   }
 
-  _renderLabelVisible() {
+  protected override _renderLabelVisible() {
     super._renderLabelVisible();
     this._updateScrollShadow();
   }
 
-  /**
-   * @override CompositeField.js
-   */
-  getFields() {
+  getFields(): TabItem[] {
     return this.tabItems;
   }
 
-  getTabItem(tabId) {
-    return arrays.find(this.tabItems, tabItem => {
-      return tabItem.id === tabId;
-    });
+  getTabItem(tabId: string): TabItem {
+    return arrays.find(this.tabItems, tabItem => tabItem.id === tabId);
   }
 
   /**
-   * @override FormField.js
+   * Focuses the selected tab.
+   * @returns true if the tab could be focused, false if not.
    */
-  focus() {
+  override focus(): boolean {
     if (!this.rendered) {
       this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
       return false;
@@ -270,31 +277,28 @@ export default class TabBox extends CompositeField {
   }
 
   /**
-   * @override
+   * @returns the focusable element of the selected tab.
    */
-  getFocusableElement() {
+  override getFocusableElement(): HTMLElement | JQuery {
     if (this.selectedTab) {
       return this.selectedTab.getFocusableElement();
     }
     return null;
   }
 
-  isTabItemFocused(tabItem) {
+  isTabItemFocused(tabItem: TabItem): boolean {
     return this.header.isTabItemFocused(tabItem);
   }
 
-  focusTabItem(tabItem) {
-    if (this.selectedTab !== tabItem) {
-      this.selectTab(tabItem);
-    }
-    this.header.focusTabItem(tabItem);
+  focusTabItem(tabItem: TabItem): boolean {
+    return this.header.focusTabItem(tabItem);
   }
 
-  getTabForItem(tabItem) {
+  getTabForItem(tabItem: TabItem): Tab {
     return this.header.getTabForItem(tabItem);
   }
 
-  _onTabBoxHeaderPropertyChange(event) {
+  protected _onTabBoxHeaderPropertyChange(event: PropertyChangeEvent) {
     if (event.propertyName === 'selectedTabItem') {
       this.setSelectedTab(event.newValue);
     }

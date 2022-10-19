@@ -8,12 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../../index';
+import {keys, KeyStroke, TabArea} from '../../../index';
+import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class TabAreaRightKeyStroke extends KeyStroke {
+  declare field: TabArea;
 
-  // noinspection DuplicatedCode
-  constructor(tabArea) {
+  constructor(tabArea: TabArea) {
+    // noinspection DuplicatedCode
     super();
     this.field = tabArea;
     this.which = [keys.RIGHT];
@@ -23,7 +25,7 @@ export default class TabAreaRightKeyStroke extends KeyStroke {
     this.inheritAccessibility = false;
   }
 
-  handle(event) {
+  override handle(event: KeyboardEventBase) {
     this.field.selectNextTab(true);
     this.field.selectedTab.$container.addClass('keyboard-navigation');
   }

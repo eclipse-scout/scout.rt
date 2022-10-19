@@ -21,8 +21,8 @@ export default class TreeSpecHelper {
     this.session = session;
   }
 
-  createModel(nodes: TreeNodeData[]): TreeModel & { objectType: ObjectType<Tree, TreeModel> } {
-    let model = createSimpleModel('Tree', this.session);
+  createModel(nodes: TreeNodeData[]): TreeModel & { objectType: ObjectType<Tree> } {
+    let model = createSimpleModel('Tree', this.session) as TreeModel & { objectType: ObjectType<Tree> };
 
     if (nodes) {
       model.nodes = nodes;
@@ -31,7 +31,7 @@ export default class TreeSpecHelper {
     return model;
   }
 
-  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): TreeModel & { objectType: ObjectType<Tree, TreeModel> } {
+  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): TreeModel & { objectType: ObjectType<Tree> } {
     return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
   }
 

@@ -26,9 +26,9 @@
     "src"
   ],
   "scripts": {
-    "ts-rename": "ts-migrate --migrate false --sources ../karma-jasmine-scout/src/**/*",
-    "ts-migrate": "ts-migrate --rename false --sources ../karma-jasmine-scout/src/**/*",
-    "ts-event-maps": "ts-migrate --rename false --migrate false --print-event-maps --sources src/testing/*.ts",
+    "ts-rename": "ts-migrate --migrate false --sources src/form/fields/tabbox/**/*",
+    "ts-migrate": "ts-migrate --rename false --sources src/form/fields/tabbox/**/*",
+    "ts-event-maps": "ts-migrate --rename false --migrate false --print-event-maps --sources src/form/fields/tabbox/**/*.ts",
     "ts-count": "ts-migrate --rename false --migrate false --count --sources src/**/*.ts --sources ../eclipse-scout-chart/src/**/*.ts",
     "testserver:start": "scout-scripts test-server:start",
     "testserver:stop": "scout-scripts test-server:stop",

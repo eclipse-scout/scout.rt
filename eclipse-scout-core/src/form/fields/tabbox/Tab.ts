@@ -8,9 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, FieldStatus, FormField, HtmlComponent, HtmlEnvironment, scout, Status, strings, tooltips, Widget} from '../../../index';
+import {Device, Event, EventHandler, FieldStatus, FormField, HtmlComponent, HtmlEnvironment, PropertyChangeEvent, scout, Status, strings, TabItem, TabModel, tooltips, Widget} from '../../../index';
+import TabEventMap from './TabEventMap';
 
-export default class Tab extends Widget {
+export default class Tab extends Widget implements TabModel {
+  declare model: TabModel;
+  declare eventMap: TabEventMap;
+
+  label: string;
+  subLabel: string;
+  selected: boolean;
+  overflown: boolean;
+  marked: boolean;
+  errorStatus: Status;
+  tooltipText: string;
+  fieldStatus: FieldStatus;
+  tabItem: TabItem;
+  tabbable: boolean;
+  $title: JQuery;
+  $label: JQuery;
+  $subLabel: JQuery;
+  protected _preventTabSelection: boolean;
+  protected _tabPropertyChangeHandler: EventHandler<PropertyChangeEvent>;
+  protected _statusMouseDownHandler: EventHandler;
+  protected _desktopPropertyChangeHandler: EventHandler<PropertyChangeEvent>;
 
   constructor() {
     super();
@@ -19,16 +40,23 @@ export default class Tab extends Widget {
     this.subLabel = null;
     this.selected = false;
     this.overflown = false;
-    this._preventTabSelection = false;
+    this.marked = false;
+    this.errorStatus = null;
+    this.tooltipText = null;
+    this.fieldStatus = null;
+    this.tabItem = null;
+    this.tabbable = false;
 
     this.$label = null;
     this.$subLabel = null;
+    this.$title = null;
+    this._preventTabSelection = false;
     this._tabPropertyChangeHandler = this._onTabPropertyChange.bind(this);
     this._statusMouseDownHandler = this._onStatusMouseDown.bind(this);
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   }
 
-  _init(options) {
+  protected override _init(options: TabModel) {
     super._init(options);
     this.visible = this.tabItem.visible;
     this.label = this.tabItem.label;
@@ -47,13 +75,13 @@ export default class Tab extends Widget {
     this.tabItem.on('propertyChange', this._tabPropertyChangeHandler);
   }
 
-  _destroy() {
+  protected override _destroy() {
     super._destroy();
     this.tabItem.off('propertyChange', this._tabPropertyChangeHandler);
     this.fieldStatus.off('statusMouseDown', this._statusMouseDownHandler);
   }
 
-  _render() {
+  protected override _render() {
     this.$container = this.$parent.appendDiv('tab-item');
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.$title = this.$container.appendDiv('title');
@@ -74,7 +102,12 @@ export default class Tab extends Widget {
     this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   }
 
-  _renderProperties() {
+  protected override _remove() {
+    this.session.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
+    super._remove();
+  }
+
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderVisible();
     this._renderLabel();
@@ -87,56 +120,58 @@ export default class Tab extends Widget {
     this._renderErrorStatus();
   }
 
-  _renderVisible() {
+  protected override _renderVisible() {
     super._renderVisible();
     this._updateStatus();
   }
 
-  setLabel(label) {
+  setLabel(label: string) {
     this.setProperty('label', label);
   }
 
-  _renderLabel(label) {
+  protected _renderLabel() {
     this.$label.textOrNbsp(this.label);
     this.$label.attr('data-text', this.label);
     this.invalidateLayoutTree();
   }
 
-  setSubLabel(subLabel) {
+  setSubLabel(subLabel: string) {
     this.setProperty('subLabel', subLabel);
   }
 
-  _renderSubLabel() {
+  protected _renderSubLabel() {
     this.$subLabel.textOrNbsp(this.subLabel);
     this.invalidateLayoutTree();
   }
 
-  setTooltipText(tooltipText) {
+  setTooltipText(tooltipText: string) {
     this.setProperty('tooltipText', tooltipText);
   }
 
-  _renderTooltipText() {
+  protected _renderTooltipText() {
     this.$container.toggleClass('has-tooltip', strings.hasText(this.tooltipText));
     this._updateStatus();
   }
 
-  setErrorStatus(errorStatus) {
+  setErrorStatus(errorStatus: Status) {
     this.setProperty('errorStatus', errorStatus);
   }
 
-  _renderErrorStatus() {
+  protected _renderErrorStatus() {
     let hasStatus = !!this.errorStatus,
       statusClass = hasStatus ? 'has-' + this.errorStatus.cssClass() : '';
-    this._updateErrorStatusClasses(statusClass, hasStatus);
+    this._updateErrorStatusClasses(statusClass);
     this._updateStatus();
   }
 
-  _updateErrorStatusClasses(statusClass, hasStatus) {
+  protected _updateErrorStatusClasses(statusClass: string) {
     this.$container.removeClass(FormField.SEVERITY_CSS_CLASSES);
-    this.$container.addClass(statusClass, hasStatus);
+    if (statusClass) {
+      this.$container.addClass(statusClass);
+    }
   }
 
-  _updateStatus() {
+  protected _updateStatus() {
     let visible = this._computeVisible(),
       status = null,
       autoRemove = true,
@@ -158,15 +193,15 @@ export default class Tab extends Widget {
     this.fieldStatus.update(status, null, autoRemove, initialShow);
   }
 
-  _computeVisible() {
-    return this.visible && !this.overflown && (this.errorStatus || strings.hasText(this.tooltipText));
+  protected _computeVisible(): boolean {
+    return this.visible && !this.overflown && (!!this.errorStatus || strings.hasText(this.tooltipText));
   }
 
-  setTabbable(tabbable) {
+  setTabbable(tabbable: boolean) {
     this.setProperty('tabbable', tabbable);
   }
 
-  _renderTabbable() {
+  protected _renderTabbable() {
     this.$container.setTabbable(this.tabbable && !Device.get().supportsOnlyTouch());
   }
 
@@ -174,45 +209,40 @@ export default class Tab extends Widget {
     this.setSelected(true);
   }
 
-  setSelected(selected) {
+  setSelected(selected: boolean) {
     this.setProperty('selected', selected);
   }
 
-  _renderSelected() {
+  protected _renderSelected() {
     this.$container.select(this.selected);
     this.$container.setTabbable(this.selected && !Device.get().supportsOnlyTouch());
   }
 
-  setMarked(marked) {
+  setMarked(marked: boolean) {
     this.setProperty('marked', marked);
   }
 
-  _renderMarked(marked) {
+  protected _renderMarked() {
     this.$container.toggleClass('marked', this.marked);
   }
 
-  setOverflown(overflown) {
+  setOverflown(overflown: boolean) {
     this.setProperty('overflown', overflown);
   }
 
-  _renderOverflown() {
+  protected _renderOverflown() {
     this.$container.toggleClass('overflown', this.overflown);
     this._updateStatus();
   }
 
-  _remove() {
-    this.session.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
-    super._remove();
-  }
-
-  _onDesktopPropertyChange(event) {
+  protected _onDesktopPropertyChange(event: PropertyChangeEvent) {
     // switching from or to the dense mode requires clearing of the tab's htmlComponent prefSize cache.
     if (event.propertyName === 'dense') {
       this.invalidateLayout();
     }
   }
 
-  _onTabMouseDown(event) {
+  protected _onTabMouseDown(event: JQuery.MouseDownEvent) {
     if (this._preventTabSelection) {
       this._preventTabSelection = false;
       return;
@@ -237,7 +267,7 @@ export default class Tab extends Widget {
     }
   }
 
-  _onStatusMouseDown(event) {
+  protected _onStatusMouseDown(event: Event) {
     // Prevent switching tabs when status gets clicked
     // Don't use event.preventDefault, otherwise other mouse listener (like tooltip mouse down) will not be executed as well
     this._preventTabSelection = true;
@@ -245,7 +275,7 @@ export default class Tab extends Widget {
     event.preventDefault();
   }
 
-  _onTabPropertyChange(event) {
+  protected _onTabPropertyChange(event: PropertyChangeEvent) {
     if (event.propertyName === 'visible') {
       this.setVisible(event.newValue);
     } else if (event.propertyName === 'label') {

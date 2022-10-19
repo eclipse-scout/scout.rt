@@ -18,8 +18,6 @@ export default abstract class CompositeField extends FormField {
    */
   abstract getFields(): FormField[];
 
-  abstract setFields(fields: FormField[]);
-
   override visitFields(visitor: (field: FormField) => TreeVisitResult | void): TreeVisitResult | void {
     let treeVisitResult = super.visitFields(visitor);
     if (treeVisitResult === TreeVisitResult.TERMINATE) {
