@@ -146,7 +146,7 @@ export default class CellEditorPopup<TValue> extends Popup implements CellEditor
     super._postRender(); // installs the focus context for this popup
 
     // If applicable, invoke the field's function 'onCellEditorRendered' to signal the cell-editor to be rendered.
-    let field = this.cell.field as ValueField<TValue> & { onCellEditorRendered?(options: CellEditorRenderedOptions<TValue>): void };
+    let field = this.cell.field as ValueFieldWithCellEditorRenderedCallback<TValue>;
     if (field.onCellEditorRendered) {
       field.onCellEditorRendered({
         openFieldPopup: this.table.openFieldPopupOnCellEdit,
@@ -277,3 +277,7 @@ export type CellEditorRenderedOptions<TValue> = {
   openFieldPopup: boolean;
   cellEditorPopup: CellEditorPopup<TValue>;
 };
+
+export interface ValueFieldWithCellEditorRenderedCallback<TValue> extends ValueField<TValue> {
+  onCellEditorRendered(options: CellEditorRenderedOptions<TValue>): void;
+}

@@ -654,6 +654,8 @@ export {default as ColorField} from './form/fields/colorfield/ColorField';
 export {default as ColorFieldAdapter} from './form/fields/colorfield/ColorFieldAdapter';
 export {default as DatePredictionFailedStatus} from './form/fields/datefield/DatePredictionFailedStatus';
 export {default as DateField} from './form/fields/datefield/DateField';
+export {default as DateFieldModel} from './form/fields/datefield/DateFieldModel';
+export {default as DateFieldEventMap} from './form/fields/datefield/DateFieldEventMap';
 export {default as DateFieldAdapter} from './form/fields/datefield/DateFieldAdapter';
 export {default as DateTimeCompositeLayout} from './form/fields/datefield/DateTimeCompositeLayout';
 export {default as FileChooserButton} from './form/fields/filechooserbutton/FileChooserButton';

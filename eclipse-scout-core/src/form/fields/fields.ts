@@ -36,7 +36,7 @@ export function appendIcon($field: JQuery, cssClass?: string): JQuery {
   return $icon;
 }
 
-export function initTouch<T extends { embedded: boolean; touchMode: boolean }>(field: T, model: Partial<T>) {
+export function initTouch(field: { embedded: boolean; touchMode: boolean }, model: { embedded?: boolean; touchMode?: boolean }) {
   field.embedded = scout.nvl(model.embedded, false);
   // when 'touchMode' is not set explicitly, check the device
   field.touchMode = scout.nvl(model.touchMode, Device.get().supportsOnlyTouch());
