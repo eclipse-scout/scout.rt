@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractLayout, DateField, DatePicker, DatePickerTouchPopupLayout, DatePickerTouchPopupModel, ParsingFailedStatus, scout, TouchPopup} from '../index';
+import {DateFieldAcceptInputEvent} from '../form/fields/datefield/DateFieldEventMap';
 
 export default class DatePickerTouchPopup extends TouchPopup {
   declare model: DatePickerTouchPopupModel;
@@ -51,7 +52,7 @@ export default class DatePickerTouchPopup extends TouchPopup {
     return new DatePickerTouchPopupLayout(this);
   }
 
-  protected _onFieldAcceptInput(event) { // FIXME TS: add event type as soon as DateField has been migrated
+  protected _onFieldAcceptInput(event: DateFieldAcceptInputEvent) {
     // Delegate to original field
     this._touchField.setDisplayText(event.displayText);
     this._touchField.setErrorStatus(event.errorStatus);
@@ -59,6 +60,7 @@ export default class DatePickerTouchPopup extends TouchPopup {
     if (!hasParsingFailedError) {
       this._touchField.setValue(event.value);
     }
+    // @ts-ignore
     this._touchField._triggerAcceptInput();
   }
 

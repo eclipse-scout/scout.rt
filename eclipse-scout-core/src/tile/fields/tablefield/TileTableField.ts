@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,7 +11,6 @@
 import {EventHandler, FormFieldTile, MenuBar, PropertyChangeEvent, TableField} from '../../../index';
 import $ from 'jquery';
 
-// @ts-ignore // FIXME TS remove ts ignore as soon as TableField is migrated
 export default class TileTableField extends TableField {
   protected _tableBlurHandler: JQuery.EventHandler<HTMLElement>;
   protected _tableFocusHandler: JQuery.EventHandler<HTMLElement>;

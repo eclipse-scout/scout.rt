@@ -2196,10 +2196,8 @@ export default class Table extends Widget implements TableModel {
   }
 
   /**
-   * @param openFieldPopupOnCellEdit when this parameter is set to true, the CellEditorPopup sets an
-   *    additional property 'cellEditor' on the editor-field. The field instance may use this property
-   *    to decide whether or not it should open a popup immediately after it is rendered. This is used
-   *    for Smart- and DateFields. Default is false.
+   * @param openFieldPopupOnCellEdit when this parameter is set to true, the field instance may use this property (passed to onCellEditorRendered of the field)
+   * to decide whether or not it should open a popup immediately after it is rendered. This is used for Smart- and DateFields. Default is false.
    */
   prepareCellEditInternal(column: Column<any>, row: TableRow, openFieldPopupOnCellEdit?: boolean) {
     this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);

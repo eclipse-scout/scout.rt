@@ -1263,7 +1263,7 @@ export default abstract class FormField extends Widget implements FormFieldModel
     }
   }
 
-  addCellEditorFieldCssClasses($field: JQuery, opts: { cssClass?: string }) {
+  addCellEditorFieldCssClasses($field: JQuery, opts: AddCellEditorFieldCssClassesOptions) {
     $field
       .addClass('cell-editor-field')
       .addClass(Device.get().cssClassForEdge());
@@ -1272,7 +1272,7 @@ export default abstract class FormField extends Widget implements FormFieldModel
     }
   }
 
-  prepareForCellEdit(opts?: { cssClass?: string }) {
+  prepareForCellEdit(opts?: AddCellEditorFieldCssClassesOptions) {
     opts = opts || {};
 
     // remove mandatory and status indicators (popup should 'fill' the whole cell)
@@ -1502,3 +1502,4 @@ export type ValidationResult = {
   label: string;
   reveal: () => void;
 };
+export type AddCellEditorFieldCssClassesOptions = { cssClass?: string };

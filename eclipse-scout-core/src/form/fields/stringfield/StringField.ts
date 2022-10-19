@@ -556,7 +556,7 @@ export default class StringField extends BasicField<string> {
     }).show();
   }
 
-  protected override _checkDisplayTextChanged(displayText: string, whileTyping: boolean): boolean {
+  protected override _checkDisplayTextChanged(displayText: string, whileTyping?: boolean): boolean {
     let displayTextChanged = super._checkDisplayTextChanged(displayText, whileTyping);
 
     // Display text hasn't changed if input is obfuscated and current display text is empty (because field will be cleared if user focuses obfuscated text field).

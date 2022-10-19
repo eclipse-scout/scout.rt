@@ -105,7 +105,7 @@ export default abstract class BasicField<TValue> extends ValueField<TValue> {
     return this.$field ? this.$field.val() as string : '';
   }
 
-  protected override _checkDisplayTextChanged(displayText: string, whileTyping: boolean): boolean {
+  protected override _checkDisplayTextChanged(displayText: string, whileTyping?: boolean): boolean {
     let displayTextChanged = super._checkDisplayTextChanged(displayText, whileTyping);
 
     if (whileTyping) {
