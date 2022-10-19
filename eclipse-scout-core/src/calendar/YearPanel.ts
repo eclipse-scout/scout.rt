@@ -17,8 +17,8 @@ export default class YearPanel extends Widget implements YearPanelModel {
   declare model: YearPanelModel;
   declare eventMap: YearPanelEventMap;
 
-  $yearTitle: JQuery<HTMLDivElement>;
-  $yearList: JQuery<HTMLDivElement>;
+  $yearTitle: JQuery;
+  $yearList: JQuery;
   selectedDate: Date;
   displayMode: PlannerDisplayMode; // we must use Planner.DisplayMode (extends Calendar.DisplayMode) here because YearPanel must work for calendar and planner.
   alwaysSelectFirstDay: boolean;

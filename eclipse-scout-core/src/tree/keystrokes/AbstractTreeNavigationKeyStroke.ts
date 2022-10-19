@@ -13,7 +13,7 @@ import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export type TreeEventCurrentNode = {
   _treeCurrentNode?: TreeNode;
-  _$treeCurrentNode?: JQuery<HTMLDivElement>;
+  _$treeCurrentNode?: JQuery;
 };
 
 export default class AbstractTreeNavigationKeyStroke extends KeyStroke {

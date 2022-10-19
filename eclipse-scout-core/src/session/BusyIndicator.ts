@@ -30,10 +30,10 @@ export default class BusyIndicator extends Widget implements BusyIndicatorModel 
   cancelButton: Action;
   boxButtons: BoxButtons;
   protected _glassPaneRenderer: GlassPaneRenderer;
-  $content: JQuery<HTMLDivElement>;
+  $content: JQuery;
   $buttons: JQuery;
-  $label: JQuery<HTMLDivElement>;
-  $details: JQuery<HTMLDivElement>;
+  $label: JQuery;
+  $details: JQuery;
   protected _busyIndicatorTimeoutId: number;
 
   constructor() {

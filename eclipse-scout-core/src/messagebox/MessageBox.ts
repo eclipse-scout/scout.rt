@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbortKeyStroke, Action, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, DisplayParent, EnumObject, Event, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, Icon, keys, KeyStrokeContext, MessageBoxLayout, objects, scout, Status, strings, Widget} from '../index';
+import {
+  AbortKeyStroke, Action, BoxButtons, ClickActiveElementKeyStroke, clipboard, CopyKeyStroke, DisplayParent, EnumObject, Event, FocusAdjacentElementKeyStroke, FocusRule, Form, GlassPaneRenderer, HtmlComponent, Icon, keys, KeyStrokeContext,
+  MessageBoxLayout, objects, scout, Status, strings, Widget
+} from '../index';
 import {StatusSeverity} from '../status/Status';
 import MessageBoxModel from './MessageBoxModel';
 import MessageBoxEventMap from './MessageBoxEventMap';
@@ -37,10 +40,10 @@ export default class MessageBox extends Widget {
   cancelButton: Action;
   /** button to be executed when abort() is called, e.g. when ESCAPE is pressed. points to the last (most right) button in the list (one of yes, no or cancel) */
   abortButton: Action;
-  $content: JQuery<HTMLDivElement>;
-  $header: JQuery<HTMLDivElement>;
-  $body: JQuery<HTMLDivElement>;
-  $html: JQuery<HTMLDivElement>;
+  $content: JQuery;
+  $header: JQuery;
+  $body: JQuery;
+  $html: JQuery;
   $hiddenText: JQuery;
   $buttons: JQuery;
 

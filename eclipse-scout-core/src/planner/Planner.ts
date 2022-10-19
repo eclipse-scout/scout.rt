@@ -54,13 +54,13 @@ export default class Planner extends Widget implements PlannerModel {
   $range: JQuery;
   $modes: JQuery;
   $selector: JQuery;
-  $grid: JQuery<HTMLDivElement>;
-  $highlight: JQuery<HTMLDivElement>;
-  $timeline: JQuery<HTMLDivElement>;
-  $timelineLarge: JQuery<HTMLDivElement>;
-  $timelineSmall: JQuery<HTMLDivElement>;
-  $scaleTitle: JQuery<HTMLDivElement>;
-  $scale: JQuery<HTMLDivElement>;
+  $grid: JQuery;
+  $highlight: JQuery;
+  $timeline: JQuery;
+  $timelineLarge: JQuery;
+  $timelineSmall: JQuery;
+  $scaleTitle: JQuery;
+  $scale: JQuery;
 
   /** visual */
   protected _resourceTitleWidth: number;

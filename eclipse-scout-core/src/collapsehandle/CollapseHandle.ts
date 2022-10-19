@@ -20,8 +20,8 @@ export default class CollapseHandle extends Widget implements CollapseHandleMode
   leftVisible: boolean;
   rightVisible: boolean;
   horizontalAlignment: CollapseHandleHorizontalAlignment;
-  $left: JQuery<HTMLDivElement>;
-  $right: JQuery<HTMLDivElement>;
+  $left: JQuery;
+  $right: JQuery;
 
   constructor() {
     super();

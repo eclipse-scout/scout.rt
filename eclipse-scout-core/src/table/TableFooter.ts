@@ -27,9 +27,9 @@ export default class TableFooter extends Widget implements TableFooterModel {
   resizing: boolean;
   selectedControl: TableControl;
   searchFieldKeyStrokeContext: InputFieldKeyStrokeContext;
-  $controlContent: JQuery<HTMLDivElement>;
-  $controlContainer: JQuery<HTMLDivElement>;
-  $resizer: JQuery<HTMLDivElement>;
+  $controlContent: JQuery;
+  $controlContainer: JQuery;
+  $resizer: JQuery;
   $clearIcon: JQuery<HTMLSpanElement>;
 
   protected _compactStyle: boolean;
@@ -46,13 +46,13 @@ export default class TableFooter extends Widget implements TableFooterModel {
   protected _autoHideTableStatusTooltipTimeoutId: number;
   protected _$window: JQuery<Window>;
   protected _$body: JQuery<Body>;
-  protected _$controls: JQuery<HTMLDivElement>;
-  protected _$infoLoad: JQuery<HTMLDivElement>;
-  protected _$infoFilter: JQuery<HTMLDivElement>;
-  protected _$infoSelection: JQuery<HTMLDivElement>;
-  protected _$infoTableStatus: JQuery<HTMLDivElement>;
+  protected _$controls: JQuery;
+  protected _$infoLoad: JQuery;
+  protected _$infoFilter: JQuery;
+  protected _$infoSelection: JQuery;
+  protected _$infoTableStatus: JQuery;
   protected _$infoTableStatusIcon: JQuery<HTMLSpanElement>;
-  protected _$info: JQuery<HTMLDivElement>;
+  protected _$info: JQuery;
   protected _$textFilter: JQuery<HTMLInputElement>;
 
   constructor() {

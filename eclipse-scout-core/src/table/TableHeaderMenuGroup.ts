@@ -17,7 +17,7 @@ export default class TableHeaderMenuGroup extends Widget implements TableHeaderM
   text: string;
   textKey: string;
   last: boolean;
-  $text: JQuery<HTMLDivElement>;
+  $text: JQuery;
 
   constructor() {
     super();

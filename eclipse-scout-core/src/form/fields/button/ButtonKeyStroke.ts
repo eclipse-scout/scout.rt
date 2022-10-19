@@ -27,7 +27,7 @@ export default class ButtonKeyStroke extends KeyStroke {
     return accepted && this.field.$field.isAttached();
   }
 
-  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this.field.doAction();
   }
 }

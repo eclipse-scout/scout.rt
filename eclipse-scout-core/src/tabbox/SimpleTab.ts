@@ -25,13 +25,13 @@ export default class SimpleTab extends Widget implements SimpleTabModel {
   saveNeededVisible: boolean;
   status: Status;
   selected: boolean;
-  $title: JQuery<HTMLDivElement>;
-  $subTitle: JQuery<HTMLDivElement>;
-  $iconContainer: JQuery<HTMLDivElement>;
-  $statusContainer: JQuery<HTMLDivElement>;
-  $close: JQuery<HTMLDivElement>;
-  $titleLine: JQuery<HTMLDivElement>;
-  $saveNeeded: JQuery<HTMLDivElement>;
+  $title: JQuery;
+  $subTitle: JQuery;
+  $iconContainer: JQuery;
+  $statusContainer: JQuery;
+  $close: JQuery;
+  $titleLine: JQuery;
+  $saveNeeded: JQuery;
 
   protected _statusContainerUsageCounter: number;
   protected _statusIconDivs: JQuery[];

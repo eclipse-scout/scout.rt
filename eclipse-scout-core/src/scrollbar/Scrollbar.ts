@@ -22,9 +22,9 @@ export default class Scrollbar extends Widget {
   borderless: boolean;
   mouseWheelNeedsShift: boolean;
   /** thumb body for layout purposes */
-  $thumb: JQuery<HTMLDivElement>;
+  $thumb: JQuery;
   /** thumb handle */
-  $thumbHandle: JQuery<HTMLDivElement>;
+  $thumbHandle: JQuery;
 
   protected _scrollSize: number;
   protected _offsetSize: number;
@@ -43,9 +43,9 @@ export default class Scrollbar extends Widget {
   protected _onAncestorScrollOrResizeHandler: (event: JQuery.TriggeredEvent<HTMLDivElement>) => void;
   protected _fixScrollbarHandler: () => void;
   protected _unfixScrollbarHandler: () => void;
-  protected _$thumb: JQuery<HTMLDivElement>;
-  protected _$thumbHandle: JQuery<HTMLDivElement>;
-  protected _$ancestors: JQuery<HTMLDivElement>;
+  protected _$thumb: JQuery;
+  protected _$thumbHandle: JQuery;
+  protected _$ancestors: JQuery;
 
   constructor() {
     super();

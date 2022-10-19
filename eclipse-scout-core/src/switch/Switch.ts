@@ -20,8 +20,8 @@ export default class Switch extends Widget implements SwitchModel {
   htmlEnabled: boolean;
   tooltipText: string;
 
-  $label: JQuery<HTMLDivElement>;
-  $button: JQuery<HTMLDivElement>;
+  $label: JQuery;
+  $button: JQuery;
 
   constructor() {
     super();
