@@ -1,40 +1,41 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupFieldAdapter, RemoteLookupCall, scout} from '../../../index';
+import {FormFieldModel, LookupFieldAdapter, RemoteLookupCall, scout, TagField} from '../../../index';
+import {TagFieldAcceptInputEvent} from './TagFieldEventMap';
 
 export default class TagFieldAdapter extends LookupFieldAdapter {
+  declare widget: TagField;
 
-  constructor() {
-    super();
-  }
-
-  _initProperties(model) {
+  protected override _initProperties(model: FormFieldModel) {
     if (model.insertText !== undefined) {
       // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)
       delete model.insertText;
     }
   }
 
-  _postCreateWidget() {
+  protected override _postCreateWidget() {
     super._postCreateWidget();
-    this.widget.lookupCall = scout.create(RemoteLookupCall, this);
+    let lookupCallType = RemoteLookupCall<string>;
+    this.widget.lookupCall = scout.create(lookupCallType, this);
   }
 
-  _syncResult(result) {
-    if (this.widget._currentLookupCall) {
-      this.widget._currentLookupCall.resolveLookup(result);
+  protected _syncResult(result) {
+    // @ts-ignore
+    let currentLookupCall = this.widget._currentLookupCall as RemoteLookupCall<string>;
+    if (currentLookupCall) {
+      currentLookupCall.resolveLookup(result);
     }
   }
 
-  _onWidgetAcceptInput(event) {
+  protected override _onWidgetAcceptInput(event: TagFieldAcceptInputEvent) {
     this._send('acceptInput', {
       displayText: event.displayText,
       value: event.value

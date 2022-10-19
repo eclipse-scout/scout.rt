@@ -44,7 +44,9 @@ export default class StringField extends BasicField<string> {
     this.inputMasked = false;
     this.inputObfuscated = false;
     this.maxLength = 4000;
-    this.maxLengthHandler = scout.create(MaxLengthHandler, {target: this});
+    this.maxLengthHandler = scout.create(MaxLengthHandler, {
+      target: this
+    });
     this.multilineText = false;
     this.selectionStart = 0;
     this.selectionEnd = 0;
@@ -70,6 +72,10 @@ export default class StringField extends BasicField<string> {
   protected override _initValue(value: string) {
     value = texts.resolveText(value, this.session.locale.languageTag);
     super._initValue(value);
+  }
+
+  override _readDisplayText(): string {
+    return this.$field ? this.$field.val() as string : '';
   }
 
   protected override _initKeyStrokeContext() {

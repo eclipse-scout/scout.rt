@@ -8,9 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, fields, HtmlComponent, InputFieldKeyStrokeContext, keys, LookupCall, MaxLengthHandler, scout, strings, TagBar, TagChooserPopup, TagFieldContainerLayout, TagFieldDeleteKeyStroke, TagFieldEnterKeyStroke, TagFieldLayout, TagFieldNavigationKeyStroke, TagFieldOpenPopupKeyStroke, ValueField} from '../../../index';
+import {
+  arrays, Event, fields, HtmlComponent, InputFieldKeyStrokeContext, keys, KeyStrokeContext, LookupCall, LookupResult, MaxLengthHandler, Popup, PropertyChangeEvent, scout, strings, TagBar, TagChooserPopup, TagFieldContainerLayout,
+  TagFieldDeleteKeyStroke, TagFieldEnterKeyStroke, TagFieldEventMap, TagFieldLayout, TagFieldModel, TagFieldNavigationKeyStroke, TagFieldOpenPopupKeyStroke, ValueField
+} from '../../../index';
+import {TagBarTagRemoveEvent} from '../../../tagbar/TagBarEventMap';
+import {SomeRequired} from '../../../types';
+import LookupCallModel from '../../../lookup/LookupCallModel';
+import {TagChooserPopupLookupRowSelectedEvent} from './TagChooserPopupEventMap';
 
-export default class TagField extends ValueField {
+export default class TagField extends ValueField<string[]> implements TagFieldModel {
+  declare model: TagFieldModel;
+  declare eventMap: TagFieldEventMap;
+
+  lookupCall: LookupCall<string>;
+  maxLength: number;
+  fieldHtmlComp: HtmlComponent;
+  popup: TagChooserPopup;
+  tagBar: TagBar;
+  maxLengthHandler: MaxLengthHandler;
+  protected _currentLookupCall: LookupCall<string>;
 
   constructor() {
     super();
@@ -22,10 +39,12 @@ export default class TagField extends ValueField {
     this._currentLookupCall = null;
     this.tagBar = null;
     this.maxLength = 500;
-    this.maxLengthHandler = scout.create(MaxLengthHandler, {target: this});
+    this.maxLengthHandler = scout.create(MaxLengthHandler, {
+      target: this
+    });
   }
 
-  _init(model) {
+  protected override _init(model: TagFieldModel) {
     super._init(model);
 
     this.tagBar = scout.create(TagBar, {
@@ -38,13 +57,13 @@ export default class TagField extends ValueField {
     this._setLookupCall(this.lookupCall);
   }
 
-  _onTagRemove(event) {
+  protected _onTagRemove(event: TagBarTagRemoveEvent) {
     this.removeTag(event.tag);
   }
 
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
-    this.keyStrokeContext.registerKeyStroke([
+    this.keyStrokeContext.registerKeyStrokes([
       new TagFieldEnterKeyStroke(this),
       new TagFieldNavigationKeyStroke(this._createFieldAdapter()),
       new TagFieldDeleteKeyStroke(this._createFieldAdapter()),
@@ -52,11 +71,11 @@ export default class TagField extends ValueField {
     ]);
   }
 
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new InputFieldKeyStrokeContext();
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'tag-field', new TagFieldLayout(this));
     this.addLabel();
     this.addMandatoryIndicator();
@@ -68,45 +87,42 @@ export default class TagField extends ValueField {
       .attr('type', 'text') // So that css rules from main.less are applied
       .on('keydown', this._onInputKeydown.bind(this))
       .on('keyup', this._onInputKeyup.bind(this))
-      .on('input', this._onFieldInput.bind(this));
+      .on('input', this._onFieldInput.bind(this)) as JQuery<HTMLInputElement>;
     this.addFieldContainer($fieldContainer);
     this.addField($field);
     this.maxLengthHandler.install($field);
     this.addStatus();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderValue();
     this._renderMaxLength();
   }
 
-  _renderValue() {
+  protected _renderValue() {
     this.tagBar.updateTags();
   }
 
-  _setValue(value) {
+  protected override _setValue(value: string[]) {
     super._setValue(value);
     if (this.tagBar) { // required for _init case
       this.tagBar.setTags(this.value /* do not use the function parameter here. instead use the member variable because the value might have changed in a validator. */);
     }
   }
 
-  _setLookupCall(lookupCall) {
+  protected _setLookupCall(lookupCall: LookupCall<string> | SomeRequired<LookupCallModel<string>, 'objectType'> | string) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
   }
 
-  formatValue(value) {
+  override formatValue(value: string[]): string | JQuery.Promise<string> {
     // Info: value and displayText are not related in the TagField
     return '';
   }
 
-  /**
-   * @override ValueField.js
-   */
-  _validateValue(value) {
+  protected override _validateValue(value: string[]): string[] {
     let tags = arrays.ensure(value);
-    let result = [];
+    let result: string[] = [];
     tags.forEach(tag => {
       if (!strings.empty(tag)) {
         tag = tag.toLowerCase();
@@ -118,41 +134,41 @@ export default class TagField extends ValueField {
     return result;
   }
 
-  _parseValue(displayText) {
+  protected override _parseValue(displayText: string): string[] {
     let tags = arrays.ensure(this.value);
     tags = tags.slice();
     tags.push(displayText);
     return tags;
   }
 
-  _renderDisplayText() {
+  protected override _renderDisplayText() {
     this.$field.val(this.displayText); // needs to be before super call (otherwise updateHasText fails)
     super._renderDisplayText();
     this._updateInputVisible();
   }
 
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     this._updateInputVisible();
   }
 
-  _renderFieldStyle() {
+  protected override _renderFieldStyle() {
     super._renderFieldStyle();
     if (this.rendered) {
       this.fieldHtmlComp.invalidateLayoutTree();
     }
   }
 
-  setMaxLength(maxLength) {
+  setMaxLength(maxLength: number) {
     this.setProperty('maxLength', maxLength);
   }
 
-  _renderMaxLength() {
+  protected _renderMaxLength() {
     this.maxLengthHandler.render();
   }
 
-  _updateInputVisible() {
-    let visible, oldVisible = !this.$field.isVisible();
+  protected _updateInputVisible() {
+    let visible: boolean, oldVisible = !this.$field.isVisible();
     if (this.enabledComputed) {
       visible = true;
     } else {
@@ -165,18 +181,15 @@ export default class TagField extends ValueField {
     }
   }
 
-  _readDisplayText() {
-    return this.$field.val();
+  override _readDisplayText(): string {
+    return this.$field.val() as string;
   }
 
-  _clear() {
+  protected override _clear() {
     this.$field.val('');
   }
 
-  /**
-   * @override
-   */
-  acceptInput(whileTyping) {
+  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
     if (this.popup) {
       if (this.popup.selectedRow()) {
         this.popup.triggerLookupRowSelected();
@@ -188,23 +201,21 @@ export default class TagField extends ValueField {
     super.acceptInput(false);
   }
 
-  _triggerAcceptInput() {
+  protected override _triggerAcceptInput(whileTyping?: boolean) {
     this.trigger('acceptInput', {
       displayText: this.displayText,
+      whileTyping: whileTyping,
       value: this.value
     });
   }
 
-  aboutToBlurByMouseDown(target) {
+  override aboutToBlurByMouseDown(target: Element) {
     if (fields.eventOutsideProposalField(this, target)) {
       this.acceptInput(true);
     }
   }
 
-  /**
-   * @override
-   */
-  _onFieldBlur(event) {
+  protected override _onFieldBlur(event: JQuery.BlurEvent) {
     // We cannot call super until chooser popup has been closed (see #acceptInput)
     this.closePopup();
     super._onFieldBlur(event);
@@ -213,27 +224,24 @@ export default class TagField extends ValueField {
     }
   }
 
-  /**
-   * @override
-   */
-  _onFieldFocus(event) {
+  protected override _onFieldFocus(event: JQuery.FocusEvent) {
     super._onFieldFocus(event);
     if (this.rendered && !this.removing) {
       this.tagBar.focus();
     }
   }
 
-  _onFieldInput() {
+  protected _onFieldInput() {
     this._updateHasText();
   }
 
-  addTag(text) {
+  addTag(text: string) {
     let value = this._parseValue(text);
     this.setValue(value);
     this._triggerAcceptInput();
   }
 
-  removeTag(tag) {
+  removeTag(tag: string) {
     if (strings.empty(tag)) {
       return;
     }
@@ -250,7 +258,7 @@ export default class TagField extends ValueField {
     this.focus();
   }
 
-  _onInputKeydown(event) {
+  protected _onInputKeydown(event: JQuery.KeyDownEvent) {
     if (this._isNavigationKey(event) && this.popup) {
       this.popup.delegateKeyEvent(event);
     } else if (event.which === keys.ESC) {
@@ -258,7 +266,7 @@ export default class TagField extends ValueField {
     }
   }
 
-  _isNavigationKey(event) {
+  protected _isNavigationKey(event: JQuery.KeyboardEventBase): boolean {
     return scout.isOneOf(event.which, [
       keys.PAGE_UP,
       keys.PAGE_DOWN,
@@ -267,17 +275,17 @@ export default class TagField extends ValueField {
     ]);
   }
 
-  _onInputKeyup(event) {
+  protected _onInputKeyup(event: JQuery.KeyUpEvent) {
     // Prevent chooser popup from being opened again, after it has been closed by pressing ESC
     if (event.which === keys.ESC) {
       return;
     }
     if (!this._isNavigationKey(event)) {
-      this._lookupByText(this.$field.val());
+      this._lookupByText(this.$field.val() as string);
     }
   }
 
-  _lookupByText(text) {
+  protected _lookupByText(text: string) {
     if (!this.lookupCall) {
       return null;
     }
@@ -298,7 +306,7 @@ export default class TagField extends ValueField {
       .done(this._onLookupDone.bind(this));
   }
 
-  _onLookupDone(result) {
+  protected _onLookupDone(result: LookupResult<string>) {
     try {
       if (!this.rendered || !this.isFocused() || result.lookupRows.length === 0) {
         this.closePopup();
@@ -336,29 +344,29 @@ export default class TagField extends ValueField {
     }
   }
 
-  _onLookupRowSelected(event) {
+  protected _onLookupRowSelected(event: TagChooserPopupLookupRowSelectedEvent) {
     this._clear();
     this._updateHasText();
     this.addTag(event.lookupRow.key);
     this.closePopup();
   }
 
-  _onPopupClose(event) {
+  protected _onPopupClose(event: Event<Popup>) {
     this.popup = null;
   }
 
-  isInputFocused() {
+  isInputFocused(): boolean {
     let ae = this.$fieldContainer.activeElement();
     return this.$field.is(ae);
   }
 
-  _onValueChange(event) {
+  protected _onValueChange(event: PropertyChangeEvent<any, TagField>) {
     if ('value' === event.propertyName) {
       this._renderLabel();
     }
   }
 
-  _renderPlaceholder($field) {
+  protected override _renderPlaceholder($field?: JQuery) {
     // only render placeholder when tag field is empty (has no tags)
     let hasTags = !!arrays.ensure(this.value).length;
     $field = scout.nvl($field, this.$field);
@@ -367,32 +375,26 @@ export default class TagField extends ValueField {
     }
   }
 
-  _createFieldAdapter() {
+  protected _createFieldAdapter(): TagFieldKeyStrokeAdapter {
     return TagField.createFieldAdapter(this);
   }
 
-  // FIXME TS: use TagFieldKeyStrokeAdapter as return type
-  static createFieldAdapter(field) {
+  static createFieldAdapter(field: TagField): TagFieldKeyStrokeAdapter {
     return {
       $container: () => field.$fieldContainer,
-
       enabled: () => strings.empty(field._readDisplayText()),
-
-      focus: () => {
-        field.$field.focus();
-      },
-
-      one: (p1, p2) => {
-        field.one(p1, p2);
-      },
-
-      off: (p1, p2) => {
-        field.off(p1, p2);
-      },
-
-      removeTag: tag => {
-        field.removeTag(tag);
-      }
+      focus: () => field.$field.focus(),
+      removeTag: tag => field.removeTag(tag)
     };
   }
+}
+
+export interface TagFieldKeyStrokeAdapter {
+  $container(): JQuery;
+
+  enabled(): boolean;
+
+  focus();
+
+  removeTag(tag: string);
 }

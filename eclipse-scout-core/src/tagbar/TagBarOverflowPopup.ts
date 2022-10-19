@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractLayout, arrays, EventHandler, Popup, PopupModel, PropertyChangeEvent, TagBar, TagBarOverflowPopupLayout, TagField, TagFieldDeleteKeyStroke, TagFieldNavigationKeyStroke} from '../index';
+import {TagFieldKeyStrokeAdapter} from '../form/fields/tagfield/TagField';
 
 export default class TagBarOverflowPopup extends Popup {
   declare parent: TagBar;
@@ -116,15 +117,4 @@ export default class TagBarOverflowPopup extends Popup {
       }
     };
   }
-}
-
-// FIXME TS: move to TagField as soon as it has been migrated
-export interface TagFieldKeyStrokeAdapter {
-  $container(): JQuery;
-
-  enabled(): boolean;
-
-  focus();
-
-  removeTag(tag: string);
 }

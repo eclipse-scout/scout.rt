@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke, strings} from '../../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, strings, TagField} from '../../../index';
 
 export default class TagFieldEnterKeyStroke extends KeyStroke {
+  declare field: TagField;
 
-  constructor(tagField) {
+  constructor(tagField: TagField) {
     super();
     this.field = tagField;
     this.which = [keys.ENTER];
@@ -21,7 +22,7 @@ export default class TagFieldEnterKeyStroke extends KeyStroke {
     this.stopPropagation = true;
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -33,7 +34,7 @@ export default class TagFieldEnterKeyStroke extends KeyStroke {
     return this.field.isInputFocused();
   }
 
-  handle(event) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this.field.acceptInput();
   }
 }

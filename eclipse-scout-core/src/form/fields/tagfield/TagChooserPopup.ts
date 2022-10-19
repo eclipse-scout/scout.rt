@@ -1,30 +1,34 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Column, lookupField, Popup, scout, Table, TagChooserPopupLayout} from '../../../index';
+import {AbstractLayout, Column, lookupField, LookupResult, Popup, scout, ScoutKeyboardEvent, Table, TableRow, TagChooserPopupEventMap, TagChooserPopupLayout, TagChooserPopupModel, TagField} from '../../../index';
+import {TableRowClickEvent} from '../../../table/TableEventMap';
 
-export default class TagChooserPopup extends Popup {
+export default class TagChooserPopup extends Popup implements TagChooserPopupModel {
+  declare model: TagChooserPopupModel;
+  declare eventMap: TagChooserPopupEventMap;
+
+  table: Table;
+  field: TagField;
 
   constructor() {
     super();
-
     this.table = null;
     this.windowPaddingX = 0;
     this.windowPaddingY = 0;
   }
 
-  _init(model) {
+  protected override _init(model: TagChooserPopupModel) {
     super._init(model);
 
     let column = scout.create(Column, {
-      index: 0,
       session: this.session,
       text: 'Tag',
       autoOptimizeWidth: false
@@ -44,11 +48,11 @@ export default class TagChooserPopup extends Popup {
     this.table.on('rowClick', this._onRowClick.bind(this));
   }
 
-  _createLayout() {
+  protected override _createLayout(): AbstractLayout {
     return new TagChooserPopupLayout(this);
   }
 
-  _render() {
+  protected override _render() {
     super._render();
 
     this.$container
@@ -57,7 +61,7 @@ export default class TagChooserPopup extends Popup {
     this._renderTable();
   }
 
-  _renderTable() {
+  protected _renderTable() {
     this.table.setVirtual(false);
     this.table.render();
 
@@ -67,19 +71,14 @@ export default class TagChooserPopup extends Popup {
       .addClass('focused');
   }
 
-  setLookupResult(result) {
-    let
-      tableRows = [],
-      lookupRows = result.lookupRows;
-
+  setLookupResult(result: LookupResult<string>) {
+    let lookupRows = result.lookupRows;
     this.table.deleteAllRows();
-    lookupRows.forEach(lookupRow => {
-      tableRows.push(lookupField.createTableRow(lookupRow));
-    }, this);
+    let tableRows = lookupRows.map(lookupRow => lookupField.createTableRow(lookupRow));
     this.table.insertRows(tableRows);
   }
 
-  _onRowClick(event) {
+  protected _onRowClick(event: TableRowClickEvent) {
     this.triggerLookupRowSelected();
   }
 
@@ -89,23 +88,23 @@ export default class TagChooserPopup extends Popup {
    * should stay open when the SmartField popup is closed. It also prevents the focus blur
    * event on the SmartField input-field.
    */
-  _onContainerMouseDown(event) {
+  protected _onContainerMouseDown(event: JQuery.MouseDownEvent): boolean {
     // when user clicks on proposal popup with table or tree (prevent default,
     // so input-field does not lose the focus, popup will be closed by the
     // proposal chooser impl.
     return false;
   }
 
-  _isMouseDownOnAnchor(event) {
-    return this.field.$field.isOrHas(event.target);
+  protected override _isMouseDownOnAnchor(event: MouseEvent): boolean {
+    return this.field.$field.isOrHas(event.target as HTMLElement);
   }
 
-  delegateKeyEvent(event) {
+  delegateKeyEvent(event: JQuery.KeyDownEvent & ScoutKeyboardEvent) {
     event.originalEvent.smartFieldEvent = true;
     this.table.$container.trigger(event);
   }
 
-  triggerLookupRowSelected(row) {
+  triggerLookupRowSelected(row?: TableRow) {
     row = row || this.selectedRow();
     if (!row || !row.enabled) {
       return;
@@ -115,7 +114,7 @@ export default class TagChooserPopup extends Popup {
     });
   }
 
-  selectedRow() {
+  selectedRow(): TableRow {
     return this.table.selectedRow();
   }
 }
