@@ -8,11 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ButtonAdapter} from '../../../index';
+import {ButtonModel} from '../../../index';
 
-export default class RadioButtonAdapter extends ButtonAdapter {
-
-  constructor() {
-    super();
-  }
+export default interface RadioButtonModel<TValue> extends ButtonModel {
+  /**
+   * Default is true.
+   */
+  focusWhenSelected?: boolean;
+  /**
+   * Default is false.
+   */
+  wrapText?: boolean;
+  radioValue?: TValue;
 }

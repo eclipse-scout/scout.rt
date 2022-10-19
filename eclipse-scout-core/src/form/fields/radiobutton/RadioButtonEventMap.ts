@@ -8,11 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ButtonAdapter} from '../../../index';
+import {ButtonEventMap, PropertyChangeEvent} from '../../../index';
 
-export default class RadioButtonAdapter extends ButtonAdapter {
-
-  constructor() {
-    super();
-  }
+export default interface RadioButtonEventMap<TValue> extends ButtonEventMap {
+  'propertyChange:wrapText': PropertyChangeEvent<boolean>;
 }

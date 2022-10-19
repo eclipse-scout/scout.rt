@@ -8,21 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ButtonKeyStroke, HAlign} from '../../../index';
+import {ButtonKeyStroke, HAlign, RadioButton, ScoutKeyboardEvent} from '../../../index';
 
 export default class RadioButtonKeyStroke extends ButtonKeyStroke {
+  declare field: RadioButton<any>;
 
-  constructor(button, keyStroke) {
+  constructor(button: RadioButton<any>, keyStroke: string) {
     super(button, keyStroke);
     this.renderingHints.hAlign = HAlign.LEFT;
   }
 
   /**
-   * @override ButtonKeyStroke.js
-   *
    * To not prevent a parent key stroke context from execution of the event, the key stroke event is only accepted if the radio button is not selected.
    */
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     return accepted && !this.field.selected;
   }
