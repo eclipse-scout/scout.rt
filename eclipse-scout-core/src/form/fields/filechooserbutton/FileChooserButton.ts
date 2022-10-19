@@ -1,28 +1,37 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Button, Device, FileInput, HtmlComponent, scout, SingleLayout, strings, ValueField} from '../../../index';
+import {arrays, Button, Device, Event, FileChooserButtonEventMap, FileChooserButtonModel, FileInput, HtmlComponent, scout, SingleLayout, strings, ValueField} from '../../../index';
+import {FileInputChangeEvent} from '../../../filechooser/FileInputEventMap';
 
-export default class FileChooserButton extends ValueField {
+export default class FileChooserButton extends ValueField<File> implements FileChooserButtonModel {
+  declare model: FileChooserButtonModel;
+  declare eventMap: FileChooserButtonEventMap;
+
+  button: Button;
+  fileInput: FileInput;
+  acceptTypes: string;
+  maximumUploadSize: number;
+  iconId: string;
+  fileExtensions: string | string[];
 
   constructor() {
     super();
 
     this.button = null;
     this.fileInput = null;
-
     this.acceptTypes = null;
     this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
   }
 
-  _init(model) {
+  protected override _init(model: FileChooserButtonModel) {
     super._init(model);
 
     this.button = scout.create(Button, {
@@ -47,7 +56,7 @@ export default class FileChooserButton extends ValueField {
    * Initializes the file input before calling set value.
    * This cannot be done in _init because the value field would call _setValue first
    */
-  _initValue(value) {
+  protected override _initValue(value: File) {
     this.fileInput = scout.create(FileInput, {
       parent: this,
       acceptTypes: this.acceptTypes,
@@ -60,11 +69,11 @@ export default class FileChooserButton extends ValueField {
     super._initValue(value);
   }
 
-  _buttonLabel() {
+  protected _buttonLabel(): string {
     return this.label;
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'file-chooser-button has-icon');
     this.addLabel();
 
@@ -80,7 +89,7 @@ export default class FileChooserButton extends ValueField {
     this.addStatus();
   }
 
-  setDisplayText(text) {
+  override setDisplayText(text: string) {
     super.setDisplayText(text);
     this.fileInput.setText(text);
     if (!text) {
@@ -88,77 +97,60 @@ export default class FileChooserButton extends ValueField {
     }
   }
 
-  /**
-   * @override
-   */
-  _readDisplayText() {
+  protected override _readDisplayText(): string {
     return this.fileInput.text;
   }
 
-  /**
-   * @override
-   */
-  _renderLabel() {
+  protected override _renderLabel() {
     this._renderEmptyLabel();
   }
 
-  _onButtonClick(event) {
+  protected _onButtonClick(event: Event<Button>) {
     this.fileInput.browse();
   }
 
-  setLabel(label) {
+  override setLabel(label: string) {
     super.setLabel(label);
     this.button.setLabel(this._buttonLabel());
   }
 
-  setIconId(iconId) {
+  setIconId(iconId: string) {
     this.setProperty('iconId', iconId);
     this.button.setIconId(iconId);
   }
 
-  setAcceptTypes(acceptTypes) {
+  setAcceptTypes(acceptTypes: string) {
     this.setProperty('acceptTypes', acceptTypes);
     this.fileInput.setAcceptTypes(acceptTypes);
   }
 
-  setFileExtensions(fileExtensions) {
+  setFileExtensions(fileExtensions: string | string[]) {
     this.setProperty('fileExtensions', fileExtensions);
     let acceptTypes = arrays.ensure(fileExtensions);
-    acceptTypes = acceptTypes.map(acceptType => {
-      return acceptType.indexOf(0) === '.' ? acceptType : '.' + acceptType;
-    });
-    this.setAcceptTypes(strings.join(',', acceptTypes));
+    acceptTypes = acceptTypes.map(acceptType => acceptType.indexOf('.') === 0 ? acceptType : '.' + acceptType);
+    this.setAcceptTypes(strings.join(',', ...acceptTypes));
     this.fileInput.acceptTypes = this.acceptTypes;
   }
 
-  setMaximumUploadSize(maximumUploadSize) {
+  setMaximumUploadSize(maximumUploadSize: number) {
     this.setProperty('maximumUploadSize', maximumUploadSize);
     this.fileInput.setMaximumUploadSize(maximumUploadSize);
   }
 
-  _onFileChange(event) {
+  protected _onFileChange(event: FileInputChangeEvent) {
     this.setValue(arrays.first(event.files));
   }
 
-  /**
-   * @override
-   */
-  _validateValue(value) {
+  protected override _validateValue(value: File): File {
     this.fileInput.validateMaximumUploadSize(value);
     return value;
   }
 
-  /**
-   * @override
-   */
-  _formatValue(value) {
+  protected override _formatValue(value: File): string | JQuery.Promise<string> {
     return !value ? '' : value.name;
   }
 
-  /**
-   * @override
-   */
-  getFocusableElement() {
+  override getFocusableElement(): HTMLElement | JQuery {
     return this.button.getFocusableElement();
   }
 }

@@ -1,27 +1,21 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, DateField, dates, objects, ParsingFailedStatus, ValueFieldAdapter} from '../../../index';
+import {App, arrays, DateField, dates, objects, ParsingFailedStatus, RemoteEvent, ValueFieldAdapter} from '../../../index';
+import {ValueFieldAcceptInputEvent} from '../ValueFieldEventMap';
 
 export default class DateFieldAdapter extends ValueFieldAdapter {
 
-  constructor() {
-    super();
-  }
-
   static PROPERTIES_ORDER = ['hasTime', 'hasDate'];
 
-  /**
-   * @override
-   */
-  _onWidgetAcceptInput(event) {
+  protected override _onWidgetAcceptInput(event: ValueFieldAcceptInputEvent<Date>) {
     let parsingFailedError = null;
     let errorStatus = this.widget.errorStatus;
     // Only send Parsing errors to the server
@@ -31,7 +25,7 @@ export default class DateFieldAdapter extends ValueFieldAdapter {
       });
     }
 
-    let data = {
+    let data: any = {
       displayText: this.widget.displayText,
       errorStatus: parsingFailedError
     };
@@ -41,7 +35,7 @@ export default class DateFieldAdapter extends ValueFieldAdapter {
     }
     this._send('acceptInput', data, {
       showBusyIndicator: !event.whileTyping,
-      coalesce: function(previous) {
+      coalesce: function(previous: RemoteEvent) {
         return this.target === previous.target && this.type === previous.type;
       }
     });
@@ -50,15 +44,15 @@ export default class DateFieldAdapter extends ValueFieldAdapter {
   /**
    * Make sure hasDate and hasTime are always set before displayText, otherwise toggling hasDate and hasTime dynamically
    * won't work because renderDisplayText would try to write the time into the date field
-   *
-   * @override
    */
-  _orderPropertyNamesOnSync(newProperties) {
+  protected override _orderPropertyNamesOnSync(newProperties: Record<string, any>): string[] {
     return Object.keys(newProperties).sort(this._createPropertySortFunc(DateFieldAdapter.PROPERTIES_ORDER));
   }
 
-  static isDateAllowedRemote(date) {
+  static isDateAllowedRemote(date: Date): boolean {
+    // @ts-ignore
     if (!this.modelAdapter) {
+      // @ts-ignore
       return this.isDateAllowedOrig(date);
     }
     // Server will take care of it

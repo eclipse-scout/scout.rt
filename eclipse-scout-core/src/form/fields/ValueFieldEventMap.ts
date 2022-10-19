@@ -31,6 +31,7 @@ export default interface ValueFieldEventMap<TValue> extends FormFieldEventMap {
   'clear': Event<ValueField<TValue>>;
   'parse': ValueFieldParseEvent<TValue>;
   'parseError': ValueFieldParseErrorEvent<TValue>;
+  'propertyChange:value': PropertyChangeEvent<TValue>;
   'propertyChange:clearable': PropertyChangeEvent<ValueFieldClearable>;
   'propertyChange:displayText': PropertyChangeEvent<string>;
   'propertyChange:formatter': PropertyChangeEvent<ValueFieldFormatter<TValue>>;

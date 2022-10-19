@@ -10,7 +10,7 @@
  */
 import {
   Action, AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, ContextMenuKeyStroke, ContextMenuPopup, Desktop, Device, DoubleClickSupport, dragAndDrop,
-  DragAndDropHandler, EnumObject, Event, EventHandler, Filter, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn,
+  DragAndDropHandler, EnumObject, EventHandler, Filter, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn,
   objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
   TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
   TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip,
@@ -24,7 +24,6 @@ import {Comparator, RefModel} from '../types';
 import {StatusOrModel} from '../status/Status';
 import {Alignment} from '../cell/Cell';
 import {DropType} from '../util/dragAndDrop';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {DisplayViewId} from '../tabbox/SimpleTab';
 import {FilterOrFunction} from '../widget/FilterSupport';
 import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
@@ -2150,14 +2149,13 @@ export default class Table extends Widget implements TableModel {
     this.session.onRequestsDone(this._updateMenuBar.bind(this));
   }
 
-  protected _triggerRowClick(originalEvent: JQuery.MouseUpEvent, row: TableRow, mouseButton: number, column: Column<any>) {
-    let event = {
+  protected _triggerRowClick(originalEvent: JQuery.MouseEventBase, row: TableRow, mouseButton: number, column?: Column<any>) {
+    this.trigger('rowClick', {
       originalEvent: originalEvent,
       row: row,
       mouseButton: mouseButton,
       column: column
-    };
-    this.trigger('rowClick', event);
+    });
   }
 
   protected _triggerRowAction(row: TableRow, column: Column<any>) {
@@ -2196,10 +2194,8 @@ export default class Table extends Widget implements TableModel {
   }
 
   /**
-   * @param openFieldPopupOnCellEdit when this parameter is set to true, the CellEditorPopup sets an
-   *    additional property 'cellEditor' on the editor-field. The field instance may use this property
-   *    to decide whether or not it should open a popup immediately after it is rendered. This is used
-   *    for Smart- and DateFields. Default is false.
+   * @param openFieldPopupOnCellEdit when this parameter is set to true, the field instance may use this property (passed to onCellEditorRendered of the field)
+   * to decide whether or not it should open a popup immediately after it is rendered. This is used for Smart- and DateFields. Default is false.
    */
   prepareCellEditInternal(column: Column<any>, row: TableRow, openFieldPopupOnCellEdit?: boolean) {
     this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
@@ -5509,10 +5505,6 @@ export default class Table extends Widget implements TableModel {
     arrays.ensure(rows || this.rows).forEach(row => {
       row.status = TableRow.Status.NON_CHANGED;
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Table>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Table>[K]>): EventMapOf<Table>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */

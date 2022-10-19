@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -117,13 +117,6 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
     return null;
   }
 
-  /**
-   * Configures the allowed mime types for the clipboard paste event.
-   * <p>
-   * Subclasses can override this method. Default is <code>null</code> which does not restrict the allowed types.
-   *
-   * @return allowed mime types.
-   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
   protected boolean getConfiguredReadOnly() {

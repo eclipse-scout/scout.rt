@@ -13,7 +13,6 @@ import {
   FocusRule, Form, FormLayout, GlassPaneRenderer, HtmlComponent, keys, KeyStrokeContext, MessageBoxes, scout, scrollbars, Status, Widget
 } from '../index';
 import {FileInputChangeEvent} from './FileInputEventMap';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export default class FileChooser extends Widget implements FileChooserModel {
   declare model: FileChooserModel;
@@ -219,10 +218,6 @@ export default class FileChooser extends Widget implements FileChooserModel {
     if (!event.defaultPrevented) {
       this._close();
     }
-  }
-
-  override trigger<K extends string & keyof EventMapOf<FileChooser>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<FileChooser>[K]>): EventMapOf<FileChooser>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   /**

@@ -15,7 +15,6 @@ import {TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup, TableM
 import {BubbleDataPoint, ChartData, ChartType as ChartJsType} from 'chart.js';
 import {ChartConfig, ClickObject} from '../../chart/Chart';
 import {Event, IconDesc, Table} from '@eclipse-scout/core/src';
-import {EventMapOf, EventModel} from '@eclipse-scout/core/src/events/EventEmitter';
 
 export default class ChartTableControl extends TableControl implements ChartTableControlModel {
   declare model: ChartTableControlModel;
@@ -84,10 +83,6 @@ export default class ChartTableControl extends TableControl implements ChartTabl
     this.chart = scout.create(Chart, {
       parent: this
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<ChartTableControl>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<ChartTableControl>[K]>): EventMapOf<ChartTableControl>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected override _destroy() {

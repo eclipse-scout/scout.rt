@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionEventMap, ActionKeyStroke, ActionModel, Device, DoubleClickSupport, EnumObject, Event, HtmlComponent, Icon, KeyStrokeContext, NullLayout, scout, tooltips, Widget} from '../index';
+import {ActionEventMap, ActionKeyStroke, ActionModel, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, KeyStrokeContext, NullLayout, scout, tooltips, Widget} from '../index';
 import $ from 'jquery';
 import AbstractLayout from '../layout/AbstractLayout';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {TooltipSupportOptions} from '../tooltip/TooltipSupport';
 import {TooltipPosition} from '../tooltip/Tooltip';
 import {Alignment} from '../cell/Cell';
@@ -331,10 +330,6 @@ export default class Action extends Widget implements ActionModel {
       return false;
     }
     return true;
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Action>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Action>[K]>): EventMapOf<Action>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected _doAction() {

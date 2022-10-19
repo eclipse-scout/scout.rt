@@ -8,15 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke, TagBar} from '../../../index';
+import {keys, KeyStroke, ScoutKeyboardEvent, TagBar} from '../../../index';
+import {TagFieldKeyStrokeAdapter} from './TagField';
 
 /**
  * @param fieldAdapter acts as an interface so we can use the same key-stroke for TagField and TagBarOverflowPopup.
  *
  */
 export default class TagFieldDeleteKeyStroke extends KeyStroke {
+  fieldAdapter: TagFieldKeyStrokeAdapter;
 
-  constructor(fieldAdapter) { // FIXME TS: use TagFieldKeyStrokeAdapter as input
+  constructor(fieldAdapter: TagFieldKeyStrokeAdapter) {
     super();
     this.fieldAdapter = fieldAdapter;
     this.which = [keys.DELETE];
@@ -24,7 +26,7 @@ export default class TagFieldDeleteKeyStroke extends KeyStroke {
     this.preventDefault = false;
   }
 
-  _accept(event) {
+  protected override _accept(event: ScoutKeyboardEvent): boolean {
     let accepted = super._accept(event);
     if (!accepted) {
       return false;
@@ -32,13 +34,13 @@ export default class TagFieldDeleteKeyStroke extends KeyStroke {
     return this._$focusedTag().length > 0;
   }
 
-  handle(event) {
+  override handle(event: JQuery.KeyboardEventBase) {
     let $tag = this._$focusedTag();
     let tag = TagBar.getTagData($tag);
     this.fieldAdapter.removeTag(tag);
   }
 
-  _$focusedTag() {
+  protected _$focusedTag(): JQuery {
     return TagBar.findFocusedTagElement(this.fieldAdapter.$container());
   }
 }

@@ -9,12 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, Event, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext,
-  LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData,
+  LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
 import * as $ from 'jquery';
 import {ObjectType} from '../ObjectFactory';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {ScrollbarInstallOptions, ScrollOptions, ScrollToOptions} from '../scrollbar/scrollbars';
 import {Optional} from '../types';
 
@@ -2077,10 +2076,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     if (this.rendering) {
       return;
     }
-    let $target = $(event.target);
-    // @ts-ignore
-    if (this.$container.has($target)) { // FIXME TS does this work? according to signature has accepts only elements, not JQuery elements
-      this._$lastFocusedElement = $target;
+    if (this.$container.has(event.target)) {
+      this._$lastFocusedElement = $(event.target);
     }
   }
 
@@ -2251,7 +2248,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return this.$container;
   }
 
-  hasScrollShadow(position: string): boolean { // FIXME TS define available positions
+  hasScrollShadow(position: string): boolean {
     return scrollbars.hasScrollShadow(this.get$Scrollable(), position);
   }
 
@@ -2348,10 +2345,6 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    */
   isAttachedAndRendered(): boolean {
     return (this.rendered || this.rendering) && this.$container.isAttached();
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Widget>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Widget>[K]>): EventMapOf<Widget>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */

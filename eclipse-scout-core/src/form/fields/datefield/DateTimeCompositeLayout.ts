@@ -1,18 +1,25 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, HtmlComponent, HtmlEnvironment, Insets} from '../../../index';
+import {AbstractLayout, DateField, Dimension, EventHandler, graphics, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, Insets, PropertyChangeEvent} from '../../../index';
 
 export default class DateTimeCompositeLayout extends AbstractLayout {
+  MIN_DATE_FIELD_WIDTH: number;
+  PREF_DATE_FIELD_WIDTH: number;
+  MIN_TIME_FIELD_WIDTH: number;
+  PREF_TIME_FIELD_WIDTH: number;
+  htmlPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, HtmlEnvironment>>;
+  hgap: number;
+  protected _dateField: DateField;
 
-  constructor(dateField) {
+  constructor(dateField: DateField) {
     super();
     this._dateField = dateField;
 
@@ -26,21 +33,19 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
 
     this.htmlPropertyChangeHandler = this._onHtmlEnvironmentPropertyChange.bind(this);
     HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
-    this._dateField.one('remove', () => {
-      HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
-    });
+    this._dateField.one('remove', () => HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler));
   }
 
-  _initDefaults() {
+  protected _initDefaults() {
     this.hgap = HtmlEnvironment.get().smallColumnGap;
   }
 
-  _onHtmlEnvironmentPropertyChange() {
+  protected _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this._dateField.invalidateLayoutTree();
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let htmlContainer = HtmlComponent.get($container),
       $dateField = this._dateField.$dateField,
       $timeField = this._dateField.$timeField,
@@ -48,7 +53,9 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
       $timeFieldIcon = this._dateField.$timeFieldIcon,
       $dateClearIcon = this._dateField.$dateClearIcon,
       $timeClearIcon = this._dateField.$timeClearIcon,
+      // @ts-ignore
       $predictDateField = this._dateField._$predictDateField,
+      // @ts-ignore
       $predictTimeField = this._dateField._$predictTimeField,
       htmlDateField = ($dateField ? HtmlComponent.get($dateField) : null),
       htmlTimeField = ($timeField ? HtmlComponent.get($timeField) : null),
@@ -57,10 +64,9 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
 
     let availableSize = htmlContainer.availableSize({
       exact: true
-    })
-      .subtract(htmlContainer.insets());
+    }).subtract(htmlContainer.insets());
 
-    let dateFieldSize, timeFieldSize;
+    let dateFieldSize: Dimension, timeFieldSize: Dimension;
     // --- Date and time ---
     if (hasDate && hasTime) {
       // Field size
@@ -170,14 +176,11 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
     }
   }
 
-  _hgap() {
-    if (this._dateField.cellEditor) {
-      return 0;
-    }
+  protected _hgap(): number {
     return this.hgap;
   }
 
-  preferredLayoutSize($container) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let prefSize = new Dimension(),
       $dateField = this._dateField.$dateField,
       $timeField = this._dateField.$timeField,

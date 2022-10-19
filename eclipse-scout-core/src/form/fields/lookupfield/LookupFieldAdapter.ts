@@ -15,10 +15,6 @@ import {objects, QueryBy, strings, ValueFieldAdapter} from '../../../index';
  */
 export default class LookupFieldAdapter extends ValueFieldAdapter {
 
-  constructor() {
-    super();
-  }
-
   /**
    * @param queryData optional data (text, key, rec)
    */

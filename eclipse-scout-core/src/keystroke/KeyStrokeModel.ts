@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 export default interface KeyStrokeModel {
-  alt: boolean;
-  ctrl: boolean;
-  shift: boolean;
+  alt?: boolean;
+  ctrl?: boolean;
+  shift?: boolean;
   which: number[];
 }

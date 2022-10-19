@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CollapseHandleEventMap, CollapseHandleModel, EnumObject, Event, Widget} from '../index';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {CollapseHandleEventMap, CollapseHandleModel, EnumObject, Widget} from '../index';
 
 export type CollapseHandleHorizontalAlignment = EnumObject<typeof CollapseHandle.HorizontalAlignment>;
 
@@ -89,10 +88,6 @@ export default class CollapseHandle extends Widget implements CollapseHandleMode
     this.$left.toggleClass('both-visible', bothVisible);
     this.$right.toggleClass('both-visible', bothVisible);
     this.$container.toggleClass('one-visible', (this.leftVisible || this.rightVisible) && !bothVisible);
-  }
-
-  override trigger<K extends string & keyof EventMapOf<CollapseHandle>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<CollapseHandle>[K]>): EventMapOf<CollapseHandle>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected _onMouseDown(event: JQuery.MouseDownEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {

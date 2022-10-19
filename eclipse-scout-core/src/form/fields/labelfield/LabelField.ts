@@ -1,16 +1,22 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {strings, texts, ValueField} from '../../../index';
+import {LabelFieldEventMap, LabelFieldModel, strings, texts, ValueField} from '../../../index';
 
-export default class LabelField extends ValueField {
+export default class LabelField extends ValueField<string> implements LabelFieldModel {
+  declare model: LabelFieldModel;
+  declare eventMap: LabelFieldEventMap;
+
+  htmlEnabled: boolean;
+  selectable: boolean;
+  wrapText: boolean;
 
   constructor() {
     super();
@@ -24,28 +30,25 @@ export default class LabelField extends ValueField {
    * Resolves the text key if value contains one.
    * This cannot be done in _init because the value field would call _setValue first
    */
-  _initValue(value) {
+  protected override _initValue(value: string) {
     value = texts.resolveText(value, this.session.locale.languageTag);
     super._initValue(value);
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'label-field');
     this.addLabel();
     this.addField(this.$parent.makeDiv());
     this.addStatus();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderWrapText();
     this._renderSelectable();
   }
 
-  /**
-   * @override
-   */
-  _renderFocused() {
+  protected override _renderFocused() {
     // NOP, don't add "focused" class. It doesn't look good when the label is highlighted but no cursor is visible.
   }
 
@@ -54,23 +57,20 @@ export default class LabelField extends ValueField {
    * Otherwise LabelFields could 'become' touched, because value and displayText
    * of the LabelField don't match.
    */
-  acceptInput() {
+  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
     // NOP
   }
 
-  setHtmlEnabled(htmlEnabled) {
+  setHtmlEnabled(htmlEnabled: boolean) {
     this.setProperty('htmlEnabled', htmlEnabled);
   }
 
-  _renderHtmlEnabled() {
+  protected _renderHtmlEnabled() {
     // Render the display text again when html enabled changes dynamically
     this._renderDisplayText();
   }
 
-  /**
-   * @override
-   */
-  _renderDisplayText() {
+  protected override _renderDisplayText() {
     let displayText = this.displayText || '';
     if (this.htmlEnabled) {
       this.$field.html(displayText);
@@ -85,20 +85,20 @@ export default class LabelField extends ValueField {
     this.invalidateLayoutTree();
   }
 
-  setWrapText(wrapText) {
+  setWrapText(wrapText: boolean) {
     this.setProperty('wrapText', wrapText);
   }
 
-  _renderWrapText() {
+  protected _renderWrapText() {
     this.$field.toggleClass('white-space-nowrap', !this.wrapText);
     this.invalidateLayoutTree();
   }
 
-  setSelectable(selectable) {
+  setSelectable(selectable: boolean) {
     this.setProperty('selectable', selectable);
   }
 
-  _renderSelectable() {
+  protected _renderSelectable() {
     this.$container.toggleClass('selectable', !!this.selectable);
     // Allow this field to receive the focus when selecting text with the mouse. Otherwise, form
     // keystrokes would no longer work because the focus would automatically be set to the desktop
@@ -107,33 +107,33 @@ export default class LabelField extends ValueField {
     this.$field.toggleAttr('tabindex', !!this.selectable, '-1');
   }
 
-  _renderGridData() {
+  protected override _renderGridData() {
     super._renderGridData();
     this.updateInnerAlignment({
       useHorizontalAlignment: true
     });
   }
 
-  _renderGridDataHints() {
+  protected override _renderGridDataHints() {
     super._renderGridDataHints();
     this.updateInnerAlignment({
       useHorizontalAlignment: true
     });
   }
 
-  _onAppLinkAction(event) {
+  protected _onAppLinkAction(event: JQuery.ClickEvent) {
     let $target = $(event.delegateTarget);
-    let ref = $target.data('ref');
+    let ref = $target.data('ref') as string;
     this.triggerAppLinkAction(ref);
   }
 
-  triggerAppLinkAction(ref) {
+  triggerAppLinkAction(ref: string) {
     this.trigger('appLinkAction', {
       ref: ref
     });
   }
 
-  addField($field) {
+  override addField($field: JQuery) {
     super.addField($field);
     this.$field.off('blur')
       .off('focus');

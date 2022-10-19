@@ -1,41 +1,52 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, Form, FormField, GroupBox, icons, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldLayout} from '../../../index';
+import {Device, Form, FormField, FormFieldLayout, GroupBox, icons, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel} from '../../../index';
 import $ from 'jquery';
 
-export default class WizardProgressField extends FormField {
+export default class WizardProgressField extends FormField implements WizardProgressFieldModel {
+  declare model: WizardProgressFieldModel;
+  declare eventMap: WizardProgressFieldEventMap;
+
+  activeStepIndex: number;
+  steps: WizardStep[];
+
+  /** Used to determine direction of transition ("going backward" or "going forward") */
+  previousActiveStepIndex: number;
+  /**
+   * Helper map to find a step by step index. The step index does not necessarily correspond to the
+   * array index, because invisible model steps can produce "holes" in the sequence of indices.
+   */
+  stepsMap: Record<number, WizardStep>;
+  keepActiveStepAtLeftBorder: boolean;
+  animateScrolling: boolean;
+  $wizardStepsBody: JQuery;
 
   constructor() {
     super();
 
     this.activeStepIndex = -1;
     this.steps = [];
-
-    // Used to determine direction of transition ("going backward" or "going forward")
     this.previousActiveStepIndex = -1;
-
-    // Helper map to find a step by step index. The step index does not necessarily correspond to the
-    // array index, because invisible model steps can produce "holes" in the sequence of indices.
     this.stepsMap = {};
     this.$wizardStepsBody = null;
     this.keepActiveStepAtLeftBorder = Device.get().type === Device.Type.MOBILE;
     this.animateScrolling = Device.get().type === Device.Type.MOBILE;
   }
 
-  _init(model) {
+  protected override _init(model: WizardProgressFieldModel) {
     super._init(model);
     this._updateStepsMap();
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'wizard-progress-field', new WizardProgressFieldLayout(this));
     this.addField(this.$parent.makeDiv('wizard-steps'));
     this.addStatus();
@@ -44,7 +55,8 @@ export default class WizardProgressField extends FormField {
     // Add compact class on mobile. It is not based on width because height will be smaller too which is not desired on desktop or tablet
     // (field would not be correctly aligned with other components anymore)
     this.$field.toggleClass('compact', Device.get().type === Device.Type.MOBILE);
-    this.htmlComp.layout.compactFieldWidth = -1; // disable compact toggling
+    let layout = this.htmlComp.layout as FormFieldLayout;
+    layout.compactFieldWidth = -1; // disable compact toggling
 
     this.$wizardStepsBody = this.$field.appendDiv('wizard-steps-body');
 
@@ -60,18 +72,18 @@ export default class WizardProgressField extends FormField {
     }
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderSteps();
     this._renderActiveStepIndex();
   }
 
-  _setSteps(steps) {
+  protected _setSteps(steps: WizardStep[]) {
     this._setProperty('steps', steps);
     this._updateStepsMap();
   }
 
-  _renderSteps() {
+  protected _renderSteps() {
     this.$wizardStepsBody.children('.wizard-step').each(function() {
       // Tooltips are only uninstalled if user clicked outside container. However, the steps
       // may be updated by clicking inside the container. Therefore, manually make sure all
@@ -129,19 +141,19 @@ export default class WizardProgressField extends FormField {
     this.invalidateLayoutTree(false);
   }
 
-  _setActiveStepIndex(activeStepIndex) {
+  protected _setActiveStepIndex(activeStepIndex: number) {
     this.previousActiveStepIndex = this.activeStepIndex;
     // Ensure this.activeStepIndex always has a value. If the server has no active step set (may
     // happen during transition between steps), we use -1 as dummy value
     this._setProperty('activeStepIndex', scout.nvl(activeStepIndex, -1));
   }
 
-  _renderActiveStepIndex() {
+  protected _renderActiveStepIndex() {
     this.steps.forEach(this._updateStepClasses.bind(this));
     this.invalidateLayoutTree(false);
   }
 
-  _updateStepClasses(step) {
+  protected _updateStepClasses(step: WizardStep) {
     let $step = step.$step;
     $step.removeClass('selected first last action-enabled disabled');
     $step.off('click.selected');
@@ -179,9 +191,9 @@ export default class WizardProgressField extends FormField {
     }
   }
 
-  _stepIndex($step) {
+  protected _stepIndex($step: JQuery): number {
     if ($step) {
-      let step = $step.data('wizard-step');
+      let step = $step.data('wizard-step') as WizardStep;
       if (step) {
         return step.index;
       }
@@ -189,14 +201,14 @@ export default class WizardProgressField extends FormField {
     return -1;
   }
 
-  _updateStepsMap() {
+  protected _updateStepsMap() {
     this.stepsMap = {};
     this.steps.forEach(step => {
       this.stepsMap[step.index] = step;
     });
   }
 
-  _resolveStep(stepIndex) {
+  protected _resolveStep(stepIndex: number): WizardStep {
     // Because "step index" does not necessarily correspond to the array indices
     // (invisible model steps produce "holes"), we have to loop over the array.
     for (let i = 0; i < this.steps.length; i++) {
@@ -208,7 +220,7 @@ export default class WizardProgressField extends FormField {
     return null;
   }
 
-  _onStepClick(event) {
+  protected _onStepClick(event: JQuery.ClickEvent) {
     let $step = $(event.currentTarget); // currentTarget instead of target to support event bubbling from inner divs
     let targetStepIndex = this._stepIndex($step);
     if (targetStepIndex >= 0 && targetStepIndex !== this.activeStepIndex) {
@@ -245,4 +257,20 @@ export default class WizardProgressField extends FormField {
       }
     }
   }
+}
+
+export interface WizardStep {
+  index?: number;
+  title?: string;
+  subTitle?: string;
+  tooltipText?: string;
+  iconId?: string;
+  enabled?: boolean;
+  actionEnabled?: boolean;
+  cssClass?: string;
+  finished?: boolean;
+  modelClass?: string;
+  classId?: string;
+
+  $step?: JQuery;
 }

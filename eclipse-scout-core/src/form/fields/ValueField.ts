@@ -222,7 +222,7 @@ export default abstract class ValueField<TValue> extends FormField implements Va
     return displayText as TValue;
   }
 
-  protected _checkDisplayTextChanged(displayText: string, whileTyping: boolean): boolean {
+  protected _checkDisplayTextChanged(displayText: string, whileTyping?: boolean): boolean {
     let oldDisplayText = scout.nvl(this.displayText, '');
     return displayText !== oldDisplayText;
   }

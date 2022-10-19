@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, strings, SwitchEventMap, SwitchModel, tooltips, Widget} from '../index';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {strings, SwitchEventMap, SwitchModel, tooltips, Widget} from '../index';
 
 export default class Switch extends Widget implements SwitchModel {
   declare model: SwitchModel;
@@ -65,10 +64,6 @@ export default class Switch extends Widget implements SwitchModel {
     // When the action is clicked the user wants to execute the action and not see the tooltip -> cancel the task
     // If it is already displayed it will stay
     tooltips.cancel(this.$container);
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Switch>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Switch>[K]>): EventMapOf<Switch>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   setLabel(label: string) {

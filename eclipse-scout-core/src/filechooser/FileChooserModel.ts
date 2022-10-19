@@ -15,6 +15,12 @@ export default interface FileChooserModel extends WidgetModel {
    * Default is {@link FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE}
    */
   maximumUploadSize?: number;
+  /**
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept
+   */
   acceptTypes?: string;
+  /**
+   * Default is false.
+   */
   multiSelect?: boolean;
 }

@@ -1,17 +1,23 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AppLinkKeyStroke, scrollbars, ValueField} from '../../../index';
+import {AppLinkKeyStroke, HtmlFieldEventMap, HtmlFieldModel, scrollbars, ValueField} from '../../../index';
 import $ from 'jquery';
 
-export default class HtmlField extends ValueField {
+export default class HtmlField extends ValueField<string> implements HtmlFieldModel {
+  declare model: HtmlFieldModel;
+  declare eventMap: HtmlFieldEventMap;
+
+  scrollBarEnabled: boolean;
+  selectable: boolean;
+  scrollToAnchor: string;
 
   constructor() {
     super();
@@ -21,24 +27,19 @@ export default class HtmlField extends ValueField {
     this.selectable = true;
   }
 
-  /**
-   * @override FormField.js
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
-
     this.keyStrokeContext.registerKeyStroke(new AppLinkKeyStroke(this, this._onAppLinkAction));
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'html-field');
     this.addLabel();
-
     this.addField(this.$parent.makeDiv());
     this.addStatus();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
 
     this._renderScrollBarEnabled();
@@ -46,14 +47,11 @@ export default class HtmlField extends ValueField {
     this._renderSelectable();
   }
 
-  _readDisplayText() {
+  protected override _readDisplayText(): string {
     return this.$field.html();
   }
 
-  /**
-   * @override
-   */
-  _renderDisplayText() {
+  protected override _renderDisplayText() {
     if (!this.displayText) {
       this.$field.empty();
       return;
@@ -83,18 +81,15 @@ export default class HtmlField extends ValueField {
     this.invalidateLayoutTree();
   }
 
-  /**
-   * @override
-   */
-  _renderFocused() {
+  protected override _renderFocused() {
     // NOP, don't add "focused" class. It doesn't look good when the label is highlighted but no cursor is visible.
   }
 
-  setScrollBarEnabled(scrollBarEnabled) {
+  setScrollBarEnabled(scrollBarEnabled: boolean) {
     this.setProperty('scrollBarEnabled', scrollBarEnabled);
   }
 
-  _renderScrollBarEnabled() {
+  protected _renderScrollBarEnabled() {
     if (this.scrollBarEnabled) {
       this._installScrollbars();
     } else {
@@ -102,7 +97,7 @@ export default class HtmlField extends ValueField {
     }
   }
 
-  _renderScrollToAnchor() {
+  protected _renderScrollToAnchor() {
     if (!this.rendered) {
       this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollToAnchor.bind(this));
       return;
@@ -115,11 +110,11 @@ export default class HtmlField extends ValueField {
     }
   }
 
-  setSelectable(selectable) {
+  setSelectable(selectable: boolean) {
     this.setProperty('selectable', selectable);
   }
 
-  _renderSelectable() {
+  protected _renderSelectable() {
     this.$container.toggleClass('selectable', !!this.selectable);
     // Allow this field to receive the focus when selecting text with the mouse. Otherwise, form
     // keystrokes would no longer work because the focus would automatically be set to the desktop
@@ -128,23 +123,23 @@ export default class HtmlField extends ValueField {
     this.$field.toggleAttr('tabindex', !!this.selectable, '-1');
   }
 
-  _onAppLinkAction(event) {
+  protected _onAppLinkAction(event: JQuery.KeyboardEventBase | JQuery.ClickEvent) {
     let $target = $(event.delegateTarget);
-    let ref = $target.data('ref');
+    let ref = $target.data('ref') as string;
     this.triggerAppLinkAction(ref);
   }
 
-  triggerAppLinkAction(ref) {
+  triggerAppLinkAction(ref: string) {
     this.trigger('appLinkAction', {
       ref: ref
     });
   }
 
-  _onImageLoad(event) {
+  protected _onImageLoad(event: JQuery.TriggeredEvent) {
     this.invalidateLayoutTree();
   }
 
-  _onImageError(event) {
+  protected _onImageError(event: JQuery.TriggeredEvent) {
     this.invalidateLayoutTree();
   }
 }

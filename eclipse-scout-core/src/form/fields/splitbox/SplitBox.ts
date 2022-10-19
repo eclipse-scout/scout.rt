@@ -1,17 +1,46 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CollapseHandle, CompositeField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, KeyStroke, scout, SplitBoxCollapseKeyStroke, SplitBoxFirstCollapseKeyStroke, SplitBoxLayout, SplitBoxSecondCollapseKeyStroke} from '../../../index';
+import {
+  CollapseHandle, CompositeField, Dimension, FormField, graphics, GroupBox, HtmlComponent, HtmlEnvironment, KeyStroke, PropertyChangeEvent, scout, SplitBoxCollapseKeyStroke, SplitBoxEventMap, SplitBoxFirstCollapseKeyStroke, SplitBoxLayout,
+  SplitBoxModel, SplitBoxSecondCollapseKeyStroke
+} from '../../../index';
 import $ from 'jquery';
+import {CollapseHandleHorizontalAlignment} from '../../../collapsehandle/CollapseHandle';
 
-export default class SplitBox extends CompositeField {
+export default class SplitBox extends CompositeField implements SplitBoxModel {
+  declare model: SplitBoxModel;
+  declare eventMap: SplitBoxEventMap;
+
+  firstField: FormField;
+  secondField: FormField;
+  collapsibleField: FormField;
+  fieldCollapsed: boolean;
+  toggleCollapseKeyStroke: SplitBoxCollapseKeyStroke;
+  firstCollapseKeyStroke: SplitBoxFirstCollapseKeyStroke;
+  secondCollapseKeyStroke: SplitBoxSecondCollapseKeyStroke;
+  splitHorizontal: boolean;
+  splitterEnabled: boolean;
+  splitterPosition: number;
+  minSplitterPosition: number;
+  splitterPositionType: string;
+  fieldMinimized: boolean;
+  minimizeEnabled: boolean;
+  htmlSplitArea: HtmlComponent;
+
+  protected _oldSplitterPositionType: string;
+  protected _collapseHandle: CollapseHandle;
+  protected _$splitArea: JQuery;
+  protected _$splitter: JQuery;
+  protected _$window: JQuery<Window>;
+  protected _$body: JQuery<Body>;
 
   // noinspection DuplicatedCode
   constructor() {
@@ -22,19 +51,17 @@ export default class SplitBox extends CompositeField {
     this.firstField = null;
     this.secondField = null;
     this.collapsibleField = null;
-    this.collapseKeyStroke = null;
     this.fieldCollapsed = false;
     this.toggleCollapseKeyStroke = null;
     this.firstCollapseKeyStroke = null;
     this.secondCollapseKeyStroke = null;
-    this.splitHorizontal = true; // true = split x-axis, false = split y-axis
+    this.splitHorizontal = true;
     this.splitterEnabled = true;
     this.splitterPosition = 0.5;
     this.minSplitterPosition = 0;
     this.splitterPositionType = SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST;
     this.fieldMinimized = false;
     this.minimizeEnabled = true;
-
     this._$splitArea = null;
     this._$splitter = null;
   }
@@ -44,10 +71,13 @@ export default class SplitBox extends CompositeField {
   static SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST = 'absoluteFirst';
   static SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = 'absoluteSecond';
 
-  _init(model) {
+  protected override _init(model: SplitBoxModel) {
     super._init(model);
+    // @ts-ignore
     this._setToggleCollapseKeyStroke(this.toggleCollapseKeyStroke);
+    // @ts-ignore
     this._setFirstCollapseKeyStroke(this.firstCollapseKeyStroke);
+    // @ts-ignore
     this._setSecondCollapseKeyStroke(this.secondCollapseKeyStroke);
     this._updateCollapseHandle();
     this._initResponsive();
@@ -56,7 +86,7 @@ export default class SplitBox extends CompositeField {
   /**
    * Set the group boxes of the split box to responsive if not set otherwise.
    */
-  _initResponsive() {
+  protected _initResponsive() {
     this.getFields().forEach(field => {
       if (field instanceof GroupBox && field.responsive === null) {
         field.setResponsive(true);
@@ -64,7 +94,7 @@ export default class SplitBox extends CompositeField {
     });
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'split-box');
     // This widget does not support label, mandatoryIndicator and status
 
@@ -100,11 +130,16 @@ export default class SplitBox extends CompositeField {
 
     // --- Helper functions ---
 
-    function resizeSplitter(event) {
+    function resizeSplitter(event: JQuery.MouseDownEvent): boolean {
       if (event.which !== 1) {
         return; // only handle left mouse button
       }
-      let mousePosition, splitAreaPosition, splitAreaSize, splitterSize, splitterPosition, $tempSplitter;
+      let mousePosition: { x: number; y: number },
+        splitAreaPosition: JQuery.Coordinates,
+        splitAreaSize: Dimension,
+        splitterSize: Dimension,
+        splitterPosition: JQuery.Coordinates,
+        $tempSplitter: JQuery;
       if (this.splitterEnabled) {
         // Update mouse position (see resizeMove() for details)
         mousePosition = {
@@ -137,10 +172,10 @@ export default class SplitBox extends CompositeField {
         this._$splitter.addClass('dragging');
       }
 
-      let newSplitterPosition = this.splitterPosition;
+      let newSplitterPosition: number = this.splitterPosition;
       let SNAP_SIZE = 10;
 
-      function resizeMove(event) {
+      function resizeMove(event: JQuery.MouseMoveEvent) {
         if (event.pageX === mousePosition.x && event.pageY === mousePosition.y) {
           // Chrome bug: https://code.google.com/p/chromium/issues/detail?id=161464
           // When holding the mouse, but not moving it, a 'mousemove' event is fired every second nevertheless.
@@ -156,8 +191,8 @@ export default class SplitBox extends CompositeField {
           let targetSplitterPositionLeft = event.pageX - splitAreaPosition.left;
 
           // De-normalize minimum splitter position to allowed splitter range in pixel [minSplitterPositionLeft, maxSplitterPositionLeft]
-          let minSplitterPositionLeft;
-          let maxSplitterPositionLeft;
+          let minSplitterPositionLeft: number;
+          let maxSplitterPositionLeft: number;
 
           // Splitter width plus margin on right side, if temporary splitter position is x, the splitter div position is x-splitterOffset
           let splitterOffset = Math.floor((splitterSize.width + HtmlEnvironment.get().fieldMandatoryIndicatorWidth) / 2);
@@ -230,7 +265,7 @@ export default class SplitBox extends CompositeField {
         }
       }
 
-      function resizeEnd(event) {
+      function resizeEnd(event: JQuery.MouseUpEvent) {
         if (event.which !== 1) {
           return; // only handle left mouse button
         }
@@ -254,7 +289,7 @@ export default class SplitBox extends CompositeField {
       return false;
     }
 
-    function onInnerFieldPropertyChange(event) {
+    function onInnerFieldPropertyChange(event: PropertyChangeEvent<any, FormField>) {
       if (event.propertyName === 'visible') {
         this._updateFieldVisibilityClasses();
         // Mark layout as invalid
@@ -263,7 +298,7 @@ export default class SplitBox extends CompositeField {
     }
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderSplitterPosition();
     this._renderSplitterEnabled();
@@ -272,23 +307,23 @@ export default class SplitBox extends CompositeField {
     this._renderFieldMinimized();
   }
 
-  _remove() {
+  protected override _remove() {
     this._$splitArea = null;
     this._$splitter = null;
     super._remove();
   }
 
-  _setSplitterPosition(splitterPosition) {
+  protected _setSplitterPosition(splitterPosition: number) {
     this._setProperty('splitterPosition', splitterPosition);
     // If splitter position is explicitly set by an event, no recalculation is necessary
     this._oldSplitterPositionType = null;
   }
 
-  _renderSplitterPosition() {
+  protected _renderSplitterPosition() {
     this.newSplitterPosition(this.splitterPosition, false); // do not update (override) field minimized if new position is set by model
   }
 
-  _setSplitterPositionType(splitterPositionType) {
+  protected _setSplitterPositionType(splitterPositionType: string) {
     if (this.rendered && !this._oldSplitterPositionType) {
       this._oldSplitterPositionType = this.splitterPositionType;
       // We need to recalculate the splitter position. Because this requires the proper
@@ -297,7 +332,7 @@ export default class SplitBox extends CompositeField {
     this._setProperty('splitterPositionType', splitterPositionType);
   }
 
-  _renderSplitterPositionType() {
+  protected _renderSplitterPositionType() {
     if (this._oldSplitterPositionType) {
       // splitterPositionType changed while the split box was rendered --> convert splitterPosition
       // to the target type such that the current position in screen does not change.
@@ -358,31 +393,32 @@ export default class SplitBox extends CompositeField {
     }
   }
 
-  _isSplitterPositionTypeRelative(positionType) {
-    return (positionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (positionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND);
+  protected _isSplitterPositionTypeRelative(positionType: string): boolean {
+    return (positionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST)
+      || (positionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND);
   }
 
-  _renderSplitterEnabled() {
+  protected _renderSplitterEnabled() {
     if (this._$splitter) {
       this._$splitter.setEnabled(this.splitterEnabled);
     }
   }
 
-  setFieldCollapsed(collapsed) {
+  setFieldCollapsed(collapsed: boolean) {
     this.setProperty('fieldCollapsed', collapsed);
     this._updateCollapseHandleButtons();
   }
 
-  _renderFieldCollapsed() {
+  protected _renderFieldCollapsed() {
     this._renderCollapsibleField();
   }
 
-  setCollapsibleField(field) {
+  setCollapsibleField(field: FormField) {
     this.setProperty('collapsibleField', field);
     this._updateCollapseHandle();
   }
 
-  _updateCollapseHandle() {
+  protected _updateCollapseHandle() {
     // always unregister key stroke first (although it may have been added by _setToggleCollapseKeyStroke before)
     if (this.toggleCollapseKeyStroke) {
       this.unregisterKeyStrokes(this.toggleCollapseKeyStroke);
@@ -395,7 +431,7 @@ export default class SplitBox extends CompositeField {
     }
 
     if (this.collapsibleField) {
-      let horizontalAlignment = CollapseHandle.HorizontalAlignment.LEFT;
+      let horizontalAlignment: CollapseHandleHorizontalAlignment = CollapseHandle.HorizontalAlignment.LEFT;
       if (this.collapsibleField !== this.firstField) {
         horizontalAlignment = CollapseHandle.HorizontalAlignment.RIGHT;
       }
@@ -433,11 +469,11 @@ export default class SplitBox extends CompositeField {
     }
   }
 
-  _updateCollapseHandleButtons() {
+  protected _updateCollapseHandleButtons() {
     if (!this._collapseHandle) {
       return;
     }
-    let leftVisible, rightVisible,
+    let leftVisible: boolean, rightVisible: boolean,
       collapsed = this.fieldCollapsed,
       minimized = this.fieldMinimized,
       minimizable = this._isMinimizable(),
@@ -482,31 +518,31 @@ export default class SplitBox extends CompositeField {
     }
   }
 
-  getEffectiveSplitterPosition() {
+  getEffectiveSplitterPosition(): number {
     if (this._isMinimizable() && this.fieldMinimized) {
       return this.minSplitterPosition;
     }
     return this.splitterPosition;
   }
 
-  setMinSplitterPosition(minSplitterPosition) {
+  setMinSplitterPosition(minSplitterPosition: number) {
     this.setProperty('minSplitterPosition', minSplitterPosition);
     this._updateCollapseHandleButtons();
   }
 
-  _renderMinSplitterPosition() {
+  protected _renderMinSplitterPosition() {
     // minimum splitter position is considered automatically when layout is updated
     if (this.rendered) { // don't invalidate layout on initial rendering
       this.htmlSplitArea.invalidateLayoutTree(false);
     }
   }
 
-  setFieldMinimized(minimized) {
+  setFieldMinimized(minimized: boolean) {
     this.setProperty('fieldMinimized', minimized);
     this._updateCollapseHandleButtons();
   }
 
-  _renderFieldMinimized() {
+  protected _renderFieldMinimized() {
     this.$container.removeClass('first-field-minimized second-field-minimized');
     if (this.firstField) {
       this.firstField.$container.removeClass('minimized');
@@ -526,7 +562,7 @@ export default class SplitBox extends CompositeField {
     }
   }
 
-  setMinimizeEnabled(enabled) {
+  setMinimizeEnabled(enabled: boolean) {
     this.setProperty('minimizeEnabled', enabled);
     if (this._isMinimizable() && this._isSplitterPositionInMinimalRange(this.splitterPosition)) {
       this.setFieldMinimized(true);
@@ -535,18 +571,18 @@ export default class SplitBox extends CompositeField {
     this._updateCollapseHandleButtons();
   }
 
-  _renderMinimizeEnabled() {
+  protected _renderMinimizeEnabled() {
     // minimize enabled is considered automatically when layout is updated
     if (this.rendered) { // don't invalidate layout on initial rendering
       this.htmlSplitArea.invalidateLayoutTree(false);
     }
   }
 
-  _isMinimizable() {
+  protected _isMinimizable(): boolean {
     return !!this.minSplitterPosition && this.minimizeEnabled;
   }
 
-  _renderCollapsibleField() {
+  protected _renderCollapsibleField() {
     this.$container.removeClass('first-field-collapsed second-field-collapsed');
     if (this.firstField) {
       this.firstField.$container.removeClass('collapsed');
@@ -564,10 +600,10 @@ export default class SplitBox extends CompositeField {
     }
   }
 
-  _setToggleCollapseKeyStroke(keyStroke) {
+  protected _setToggleCollapseKeyStroke(keyStroke: string) {
     if (keyStroke) {
       if (this.toggleCollapseKeyStroke instanceof KeyStroke) {
-        this.unregisterKeyStrokes(this.collapseKeyStroke);
+        this.unregisterKeyStrokes(this.toggleCollapseKeyStroke);
       }
       this.toggleCollapseKeyStroke = new SplitBoxCollapseKeyStroke(this, keyStroke);
       if (this._collapseHandle) {
@@ -576,7 +612,7 @@ export default class SplitBox extends CompositeField {
     }
   }
 
-  _setFirstCollapseKeyStroke(keyStroke) {
+  protected _setFirstCollapseKeyStroke(keyStroke: string) {
     if (keyStroke) {
       if (this.firstCollapseKeyStroke instanceof KeyStroke) {
         this.unregisterKeyStrokes(this.firstCollapseKeyStroke);
@@ -588,7 +624,7 @@ export default class SplitBox extends CompositeField {
     }
   }
 
-  _setSecondCollapseKeyStroke(keyStroke) {
+  protected _setSecondCollapseKeyStroke(keyStroke: string) {
     if (keyStroke) {
       if (this.secondCollapseKeyStroke instanceof KeyStroke) {
         this.unregisterKeyStrokes(this.secondCollapseKeyStroke);
@@ -600,13 +636,13 @@ export default class SplitBox extends CompositeField {
     }
   }
 
-  _renderCollapseHandle() {
+  protected _renderCollapseHandle() {
     if (this._collapseHandle) {
       this._collapseHandle.render();
     }
   }
 
-  newSplitterPosition(newSplitterPosition, updateFieldMinimizedState) {
+  newSplitterPosition(newSplitterPosition: number, updateFieldMinimizedState: boolean) {
     if (this._isSplitterPositionTypeRelative(this.splitterPositionType)) {
       // Ensure range 0..1
       newSplitterPosition = Math.max(0, Math.min(1, newSplitterPosition));
@@ -641,7 +677,7 @@ export default class SplitBox extends CompositeField {
     this.htmlSplitArea.invalidateLayoutTree(false);
   }
 
-  _updateFieldMinimized() {
+  protected _updateFieldMinimized() {
     if (this._isMinimizable()) {
       this.setFieldMinimized(this._isSplitterPositionInMinimalRange(this.splitterPosition));
     } else {
@@ -649,7 +685,7 @@ export default class SplitBox extends CompositeField {
     }
   }
 
-  _isSplitterPositionInMinimalRange(newSplitterPosition) {
+  protected _isSplitterPositionInMinimalRange(newSplitterPosition: number): boolean {
     if (!this._isMinimizable()) {
       return false;
     }
@@ -660,7 +696,7 @@ export default class SplitBox extends CompositeField {
     this.setFieldCollapsed(!this.fieldCollapsed);
   }
 
-  collapseHandleButtonPressed(event) {
+  collapseHandleButtonPressed(event: { left?: boolean; right?: boolean } /* CollapseHandleActionEvent */) {
     let collapsed = this.fieldCollapsed,
       minimized = this.fieldMinimized,
       minimizable = this._isMinimizable(),
@@ -712,11 +748,8 @@ export default class SplitBox extends CompositeField {
     }
   }
 
-  /**
-   * @override CompositeField.js
-   */
-  getFields() {
-    let fields = [];
+  getFields(): FormField[] {
+    let fields: FormField[] = [];
     if (this.firstField) {
       fields.push(this.firstField);
     }
@@ -726,7 +759,7 @@ export default class SplitBox extends CompositeField {
     return fields;
   }
 
-  _updateFieldVisibilityClasses() {
+  protected _updateFieldVisibilityClasses() {
     if (!this.rendered && !this.rendering) {
       return;
     }

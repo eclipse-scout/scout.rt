@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, dragAndDrop, DragAndDropHandler, Event, FileInputEventMap, FileInputModel, files as fileUtil, Widget} from '../index';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {arrays, dragAndDrop, DragAndDropHandler, FileInputEventMap, FileInputModel, files as fileUtil, Widget} from '../index';
 
 export default class FileInput extends Widget implements FileInputModel {
   declare model: FileInputModel;
@@ -34,7 +33,10 @@ export default class FileInput extends Widget implements FileInputModel {
     this.text = null;
   }
 
-  static DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // 50 MB
+  /**
+   * 50 MiB
+   */
+  static DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024;
 
   protected override _init(model: FileInputModel) {
     super._init(model);
@@ -147,10 +149,6 @@ export default class FileInput extends Widget implements FileInputModel {
     });
   }
 
-  override trigger<K extends string & keyof EventMapOf<FileInput>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<FileInput>[K]>): EventMapOf<FileInput>[K] {
-    return super.trigger(type, eventOrModel);
-  }
-
   upload(): boolean {
     if (this.files.length === 0) {
       return true;
@@ -177,7 +175,7 @@ export default class FileInput extends Widget implements FileInputModel {
     this.browse();
   }
 
-  validateMaximumUploadSize(files: File[]) {
+  validateMaximumUploadSize(files: Blob | Blob[]) {
     if (!fileUtil.validateMaximumUploadSize(files, this.maximumUploadSize)) {
       throw this.session.text('ui.FileSizeLimit', (this.maximumUploadSize / 1024 / 1024) + '');
     }

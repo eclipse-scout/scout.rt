@@ -8,17 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, scout} from '../../../index';
+import {Cell, LookupRow, scout} from '../../../index';
+import {TableRowData} from '../../../table/TableRowModel';
 
 /**
  * Creates a table-row for the given lookup-row.
- *
- * @returns {object} table-row model
  */
-export function createTableRow(lookupRow, multipleColumns) {
+export function createTableRow(lookupRow: LookupRow<any>, multipleColumns?: boolean): TableRowData {
   multipleColumns = scout.nvl(multipleColumns, false);
-  let cells = [],
-    row = {
+  let cells: Cell[] = [],
+    row: TableRowData = {
       cells: cells,
       lookupRow: lookupRow
     };
@@ -29,7 +28,6 @@ export function createTableRow(lookupRow, multipleColumns) {
     row.cssClass = lookupRow.cssClass;
   }
   if (lookupRow.active === false) {
-    row.active = false;
     row.cssClass = (row.cssClass ? (row.cssClass + ' ') : '') + 'inactive';
   }
 
@@ -43,7 +41,7 @@ export function createTableRow(lookupRow, multipleColumns) {
 /**
  * Creates a table cell for a descriptor. If no descriptor is provided, the default lookupRow cell is created.
  */
-export function createTableCell(lookupRow, desc, tableRowData) {
+export function createTableCell<T>(lookupRow: LookupRow<T>, desc?: { propertyName?: string }, tableRowData?: object): Cell<T> {
   let cell = scout.create(Cell);
 
   // default column descriptor (first column) has propertyName null

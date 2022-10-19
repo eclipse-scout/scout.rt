@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractGrid, arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, Event, Filter, FilterResult, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, Menu,
+  AbstractGrid, arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, Filter, FilterResult, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, Menu,
   MenuDestinations, menus as menuUtil, numbers, objects, PlaceholderTile, Predicate, Range, scout, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke,
   TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter,
   UpdateFilteredElementsOptions, VirtualScrolling, Widget
@@ -21,7 +21,6 @@ import TileModel from './TileModel';
 import {MenuFilter} from '../menu/Menu';
 import {ScrollToOptions} from '../scrollbar/scrollbars';
 import {FilterOrFunction} from '../widget/FilterSupport';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 /**
  * Only select top-level tile elements. Do not select elements with a 'tile' class deeper in the tree.
@@ -964,15 +963,15 @@ export default class TileGrid extends Widget implements TileGridModel {
     }
 
     let mouseButton = event.which;
-    this._triggerTileClick(tile, mouseButton);
+    this._triggerTileClick(tile, mouseButton, event);
   }
 
-  protected _triggerTileClick(tile: Tile, mouseButton: number) {
-    let event = {
+  protected _triggerTileClick(tile: Tile, mouseButton: number, originalEvent: JQuery.ClickEvent) {
+    this.trigger('tileClick', {
       tile: tile,
-      mouseButton: mouseButton
-    };
-    this.trigger('tileClick', event);
+      mouseButton: mouseButton,
+      originalEvent: originalEvent
+    });
   }
 
   protected _onTileDoubleClick(event: JQuery.DoubleClickEvent) {
@@ -1582,9 +1581,5 @@ export default class TileGrid extends Widget implements TileGridModel {
       }
     });
     return tiles;
-  }
-
-  override trigger<K extends string & keyof EventMapOf<TileGrid>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<TileGrid>[K]>): EventMapOf<TileGrid>[K] {
-    return super.trigger(type, eventOrModel);
   }
 }

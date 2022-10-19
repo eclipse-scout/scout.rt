@@ -9,12 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, ActionKeyStroke, arrays, ContextMenuPopup, EnumObject, Event, HtmlComponent, icons, MenuBarPopup, MenuBarPopupModel, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, scout,
-  strings, tooltips, TreeVisitResult
+  Action, ActionKeyStroke, arrays, ContextMenuPopup, EnumObject, HtmlComponent, icons, MenuBarPopup, MenuBarPopupModel, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, scout, strings,
+  tooltips, TreeVisitResult
 } from '../index';
 import {PopupAlignment} from '../popup/Popup';
 import {CloneOptions, TreeVisitor} from '../widget/Widget';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {MenuOrder} from './MenuItemsOrder';
 
 export type SubMenuVisibility = EnumObject<typeof Menu.SubMenuVisibility>;
@@ -737,9 +736,5 @@ export default class Menu extends Action implements MenuModel {
       return super.focus();
     }
     return false;
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Menu>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Menu>[K]>): EventMapOf<Menu>[K] {
-    return super.trigger(type, eventOrModel);
   }
 }

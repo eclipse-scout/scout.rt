@@ -1,24 +1,25 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, HtmlComponent, Rectangle, SplitBox} from '../../../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, Rectangle, SplitBox} from '../../../index';
 import $ from 'jquery';
 
 export default class SplitBoxLayout extends AbstractLayout {
+  splitBox: SplitBox;
 
-  constructor(splitBox) {
+  constructor(splitBox: SplitBox) {
     super();
     this.splitBox = splitBox;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     // Extract components
     let htmlContainer = HtmlComponent.get($container), // = split-area
       $splitter = $container.children('.splitter'),
@@ -30,7 +31,7 @@ export default class SplitBoxLayout extends AbstractLayout {
 
     $splitter.removeClass('hidden');
 
-    let firstFieldSize, secondFieldSize, firstFieldBounds, secondFieldBounds,
+    let firstFieldBounds: Rectangle,
       availableSize = htmlContainer.availableSize().subtract(htmlContainer.insets()),
       hasFirstField = (htmlFirstField && htmlFirstField.isVisible()),
       hasSecondField = (htmlSecondField && htmlSecondField.isVisible()),
@@ -52,13 +53,13 @@ export default class SplitBoxLayout extends AbstractLayout {
     // Default case: two fields
     if (hasTwoFields) {
       // Distribute available size to the two fields according to the splitter position ratio
-      firstFieldSize = new Dimension(availableSizeForFields);
-      secondFieldSize = new Dimension(availableSizeForFields);
+      let firstFieldSize = new Dimension(availableSizeForFields);
+      let secondFieldSize = new Dimension(availableSizeForFields);
       this.computeInnerFieldsDimensions(splitXAxis, firstFieldSize, secondFieldSize, splitterPosition);
 
       // Calculate and set bounds (splitter and second field have to be moved)
       firstFieldBounds = new Rectangle(0, 0, firstFieldSize.width, firstFieldSize.height);
-      secondFieldBounds = new Rectangle(0, 0, secondFieldSize.width, secondFieldSize.height);
+      let secondFieldBounds = new Rectangle(0, 0, secondFieldSize.width, secondFieldSize.height);
       if (splitXAxis) { // "|"
         $splitter.cssLeft(firstFieldBounds.width);
         secondFieldBounds.x = firstFieldBounds.width + htmlFirstField.margins().right;
@@ -79,8 +80,10 @@ export default class SplitBoxLayout extends AbstractLayout {
     }
 
     // Calculate collapse button position
-    if (this.splitBox._collapseHandle) {
-      let $collapseHandle = this.splitBox._collapseHandle.$container;
+    // @ts-ignore
+    let collapseHandle = this.splitBox._collapseHandle;
+    if (collapseHandle) {
+      let $collapseHandle = collapseHandle.$container;
 
       // Show collapse handle, if split box has two fields which are visible (one field may be collapsed)
       let collapseHandleVisible = this.splitBox.firstField && this.splitBox.firstField.visible && this.splitBox.secondField && this.splitBox.secondField.visible;
@@ -99,7 +102,7 @@ export default class SplitBoxLayout extends AbstractLayout {
     }
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     // Extract components
     let htmlContainer = HtmlComponent.get($container), // = split-area
       $fields = $container.children('.form-field'),
@@ -135,7 +138,7 @@ export default class SplitBoxLayout extends AbstractLayout {
     }
 
     // Calculate prefSize
-    let prefSize;
+    let prefSize: Dimension;
     if (splitXAxis) { // "|"
       prefSize = new Dimension(
         firstFieldSize.width + secondFieldSize.width,
@@ -160,7 +163,7 @@ export default class SplitBoxLayout extends AbstractLayout {
    * @param secondFieldSize initialize with the total available space. Will be adjusted to the available size of the second field.
    * @param splitterPosition effective splitter position
    */
-  computeInnerFieldsDimensions(splitXAxis, firstFieldSize, secondFieldSize, splitterPosition) {
+  computeInnerFieldsDimensions(splitXAxis: boolean, firstFieldSize: Dimension, secondFieldSize: Dimension, splitterPosition: number) {
     if (splitXAxis) { // "|"
       if (this.splitBox.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
         // Relative first

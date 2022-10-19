@@ -80,7 +80,7 @@ export default class TouchPopup extends Popup {
     super._destroy();
   }
 
-  protected _fieldOverrides(): ValueFieldModel<any> { // FIXME TS: use SmartFieldModel | DateFieldModel as soon as migrated
+  protected _fieldOverrides(): ValueFieldModel<any> {
     return {
       parent: this,
       labelVisible: false,

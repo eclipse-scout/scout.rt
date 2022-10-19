@@ -47,7 +47,7 @@ export default class LogicalGridData implements LayoutData {
   widget: LogicalGridWidget;
   widthHint: number;
 
-  constructor(vararg) {
+  constructor(vararg?: LogicalGridData | Widget) {
     this.gridx = 0;
     this.gridy = 0;
     this.gridw = 1;

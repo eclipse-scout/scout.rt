@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, Event, HtmlComponent, ImageLayout, Widget} from '../index';
+import {Device, HtmlComponent, ImageLayout, Widget} from '../index';
 import ImageModel from './ImageModel';
 import ImageEventMap from './ImageEventMap';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export default class Image extends Widget implements ImageModel {
   declare model: ImageModel;
@@ -111,9 +110,5 @@ export default class Image extends Widget implements ImageModel {
     this.$container.addClass('empty broken');
     this.invalidateLayoutTree();
     this.trigger('error');
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Image>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Image>[K]>): EventMapOf<Image>[K] {
-    return super.trigger(type, eventOrModel);
   }
 }

@@ -115,9 +115,7 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
       .filter(ks => this.keyStrokes.indexOf(ks) === -1) // must not be registered yet
       .forEach(keystroke => {
         this.keyStrokes.push(keystroke);
-        let ks: KeyStroke & { destroyListener: EventHandler };
-        // FIXME TS what is our pattern for such stuff?
-        // @ts-ignore
+        let ks: KeyStroke & { destroyListener?: EventHandler };
         ks = keystroke;
         // Registers a destroy listener, so that the keystroke is uninstalled once its field is destroyed.
         if (ks.field && !ks.destroyListener) {
@@ -141,9 +139,7 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
     arrays.ensure(keyStrokes)
       .map(this._resolveKeyStroke, this)
       .forEach(keystroke => {
-        let ks: KeyStroke & { destroyListener: EventHandler };
-        // FIXME TS what is our pattern for such stuff?
-        // @ts-ignore
+        let ks: KeyStroke & { destroyListener?: EventHandler };
         ks = keystroke;
         if (arrays.remove(this.keyStrokes, ks) && ks.field && ks.destroyListener) {
           ks.field.off('destroy', ks.destroyListener);

@@ -10,6 +10,7 @@
  */
 import {DateField, ParsingFailedStatus, scout, TimePicker, TouchPopup} from '../index';
 import TimePickerTouchPopupModel from './TimePickerTouchPopupModel';
+import {DateFieldAcceptInputEvent} from '../form/fields/datefield/DateFieldEventMap';
 
 export default class TimePickerTouchPopup extends TouchPopup {
   declare model: TimePickerTouchPopupModel;
@@ -42,7 +43,7 @@ export default class TimePickerTouchPopup extends TouchPopup {
     return this._widget;
   }
 
-  protected _onFieldAcceptInput(event) { // FIXME TS: add event type as soon as DateField has been migrated
+  protected _onFieldAcceptInput(event: DateFieldAcceptInputEvent) {
     // Delegate to original field
     this._touchField.setDisplayText(event.displayText);
     this._touchField.setErrorStatus(event.errorStatus);
@@ -50,6 +51,7 @@ export default class TimePickerTouchPopup extends TouchPopup {
     if (!hasParsingFailedError) {
       this._touchField.setValue(event.value);
     }
+    // @ts-ignore
     this._touchField._triggerAcceptInput();
   }
 

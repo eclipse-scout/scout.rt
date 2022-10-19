@@ -1,19 +1,23 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileInput, objects, scout, ValueField} from '../../../index';
+import {arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileChooserFieldEventMap, FileChooserFieldModel, FileInput, objects, scout, ValueField} from '../../../index';
+import {FileInputChangeEvent} from '../../../filechooser/FileInputEventMap';
 
-/**
- * The <code>value</code> of the FormChooserField is a <code>File</code> object.
- */
-export default class FileChooserField extends ValueField {
+export default class FileChooserField extends ValueField<File> implements FileChooserFieldModel {
+  declare model: FileChooserFieldModel;
+  declare eventMap: FileChooserFieldEventMap;
+
+  fileInput: FileInput;
+  acceptTypes: string;
+  maximumUploadSize: number;
 
   constructor() {
     super();
@@ -23,7 +27,7 @@ export default class FileChooserField extends ValueField {
     this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
   }
 
-  _init(model) {
+  protected override _init(model: FileChooserFieldModel) {
     super._init(model);
 
     this.fileInput.on('change', this._onFileChange.bind(this));
@@ -39,7 +43,7 @@ export default class FileChooserField extends ValueField {
    * Initializes the file input before calling set value.
    * This cannot be done in _init because the value field would call _setValue first
    */
-  _initValue(value) {
+  protected override _initValue(value: File) {
     this.fileInput = scout.create(FileInput, {
       parent: this,
       acceptTypes: this.acceptTypes,
@@ -51,15 +55,13 @@ export default class FileChooserField extends ValueField {
     super._initValue(value);
   }
 
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
-    if (!this.fileInput.legacy) {
-      this.keyStrokeContext.registerKeyStroke(new FileChooserFieldBrowseKeyStroke(this));
-      this.keyStrokeContext.registerKeyStroke(new FileChooserFieldDeleteKeyStroke(this));
-    }
+    this.keyStrokeContext.registerKeyStroke(new FileChooserFieldBrowseKeyStroke(this));
+    this.keyStrokeContext.registerKeyStroke(new FileChooserFieldDeleteKeyStroke(this));
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'file-chooser-field has-icon');
     this.addLabel();
     this.addMandatoryIndicator();
@@ -68,12 +70,12 @@ export default class FileChooserField extends ValueField {
     this.addStatus();
   }
 
-  _renderFileInput() {
+  protected _renderFileInput() {
     this.fileInput.render();
     this.addField(this.fileInput.$container);
   }
 
-  setDisplayText(text) {
+  override setDisplayText(text: string) {
     super.setDisplayText(text);
     this.fileInput.setText(text);
     if (!text) {
@@ -81,52 +83,49 @@ export default class FileChooserField extends ValueField {
     }
   }
 
-  /**
-   * @override
-   */
-  _readDisplayText() {
+  protected override _readDisplayText(): string {
     return this.fileInput.text;
   }
 
-  setAcceptTypes(acceptTypes) {
+  setAcceptTypes(acceptTypes: string) {
     this.setProperty('acceptTypes', acceptTypes);
     this.fileInput.setAcceptTypes(acceptTypes);
   }
 
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     this.$field.setTabbable(this.enabledComputed);
   }
 
-  _renderPlaceholder() {
+  protected override _renderPlaceholder() {
     let $field = this.fileInput.$text;
     if ($field) {
       $field.placeholder(this.label);
     }
   }
 
-  _removePlaceholder() {
+  protected override _removePlaceholder() {
     let $field = this.fileInput.$text;
     if ($field) {
       $field.placeholder('');
     }
   }
 
-  setMaximumUploadSize(maximumUploadSize) {
+  setMaximumUploadSize(maximumUploadSize: number) {
     this.setProperty('maximumUploadSize', maximumUploadSize);
     this.fileInput.setMaximumUploadSize(maximumUploadSize);
   }
 
-  _clear() {
+  protected override _clear() {
     this.fileInput.clear();
   }
 
-  _onIconMouseDown(event) {
+  protected override _onIconMouseDown(event: JQuery.MouseDownEvent) {
     super._onIconMouseDown(event);
     this.activate();
   }
 
-  _onFileChange(event) {
+  protected _onFileChange(event: FileInputChangeEvent) {
     let file = arrays.first(event.files);
     if (objects.isNullOrUndefined(file)) {
       this.acceptInput(false);
@@ -134,10 +133,7 @@ export default class FileChooserField extends ValueField {
     this.setValue(file);
   }
 
-  /**
-   * @override
-   */
-  activate() {
+  override activate() {
     if (!this.enabledComputed || !this.rendered) {
       return;
     }
@@ -145,27 +141,20 @@ export default class FileChooserField extends ValueField {
     this.fileInput.browse();
   }
 
-  /**
-   * @override
-   */
-  _validateValue(value) {
+  protected override _validateValue(value: File): File {
     this.fileInput.validateMaximumUploadSize(value);
     return value;
   }
 
-  /**
-   * @override
-   */
-  _formatValue(value) {
+  protected override _formatValue(value: File): string | JQuery.Promise<string> {
     return !value ? '' : value.name;
   }
 
-  _parseValue(displayText) {
+  protected override _parseValue(displayText: string): File {
     if (!displayText) {
       return null;
     }
     let files = this.fileInput.files;
     return files && files.length ? files[0] : null;
   }
-
 }
