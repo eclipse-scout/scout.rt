@@ -8,19 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, KeyStroke} from '../../../index';
+import {keys, KeyStroke, RadioButtonGroup} from '../../../index';
 import $ from 'jquery';
 
 export default class RadioButtonGroupLeftOrUpKeyStroke extends KeyStroke {
+  declare field: RadioButtonGroup<any>;
 
-  constructor(radioButtonGroup) {
+  constructor(radioButtonGroup: RadioButtonGroup<any>) {
     super();
     this.field = radioButtonGroup;
     this.which = [keys.LEFT, keys.UP];
     this.renderingHints.render = false;
   }
 
-  handle(event) {
+  override handle(event: JQuery.KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
     let fieldBefore,
       focusedButton = $(event.target).data('radiobutton');
 

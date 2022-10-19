@@ -697,9 +697,13 @@ export {default as PlaceholderFieldAdapter} from './form/fields/placeholder/Plac
 export {default as PlannerField} from './form/fields/plannerfield/PlannerField';
 export {default as PlannerFieldAdapter} from './form/fields/plannerfield/PlannerFieldAdapter';
 export {default as RadioButton} from './form/fields/radiobutton/RadioButton';
+export {default as RadioButtonEventMap} from './form/fields/radiobutton/RadioButtonEventMap';
+export {default as RadioButtonModel} from './form/fields/radiobutton/RadioButtonModel';
 export {default as RadioButtonLayout} from './form/fields/radiobutton/RadioButtonLayout';
 export {default as RadioButtonAdapter} from './form/fields/radiobutton/RadioButtonAdapter';
 export {default as RadioButtonGroup} from './form/fields/radiobutton/RadioButtonGroup';
+export {default as RadioButtonGroupEventMap} from './form/fields/radiobutton/RadioButtonGroupEventMap';
+export {default as RadioButtonGroupModel} from './form/fields/radiobutton/RadioButtonGroupModel';
 export {default as RadioButtonGroupAdapter} from './form/fields/radiobutton/RadioButtonGroupAdapter';
 export {default as RadioButtonGroupGridConfig} from './form/fields/radiobutton/RadioButtonGroupGridConfig';
 export {default as RadioButtonGroupLayout} from './form/fields/radiobutton/RadioButtonGroupLayout';

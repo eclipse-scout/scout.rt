@@ -8,19 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LogicalGridConfig} from '../../../index';
+import {LogicalGridConfig, LogicalGridContainer, RadioButtonGroup} from '../../../index';
+import {LogicalGridWidget} from '../../../layout/logicalgrid/LogicalGridData';
 
 export default class RadioButtonGroupGridConfig extends LogicalGridConfig {
+  declare widget: LogicalGridContainer & RadioButtonGroup<any>;
 
   constructor() {
     super();
   }
 
-  getGridColumnCount() {
-    return this.widget.gridColumnCount;
-  }
-
-  getGridWidgets() {
+  override getGridWidgets(): LogicalGridWidget[] {
     return this.widget.fields;
   }
 }

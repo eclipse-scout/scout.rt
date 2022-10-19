@@ -8,18 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlEnvironment, LogicalGridLayout, LogicalGridLayoutConfig, RadioButtonGroup} from '../../../index';
+import {FormField, FormFieldModel, LogicalGridLayoutConfig, LookupCall, ValueFieldModel} from '../../../index';
+import {RefModel} from '../../../types';
 import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
 
-export default class RadioButtonGroupLayout extends LogicalGridLayout {
-  declare widget: RadioButtonGroup<any>;
-
-  constructor(widget: RadioButtonGroup<any>, layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
-    super(widget, layoutConfig);
-  }
-
-  protected override _initDefaults() {
-    super._initDefaults();
-    this.hgap = HtmlEnvironment.get().smallColumnGap;
-  }
+export default interface RadioButtonGroupModel<TValue> extends ValueFieldModel<TValue> {
+  layoutConfig?: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel;
+  fields?: FormField[] | RefModel<FormFieldModel>[];
+  gridColumnCount?: number;
+  lookupCall?: LookupCall<TValue>;
 }
