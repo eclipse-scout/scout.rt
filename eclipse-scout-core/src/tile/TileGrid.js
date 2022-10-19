@@ -51,6 +51,7 @@ export default class TileGrid extends Widget {
     this.virtual = false;
     this.virtualScrolling = null;
     this.withPlaceholders = false;
+    this.placeholderProducer = null;
 
     this.$filterFieldContainer = null;
     this.textFilterEnabled = false;
@@ -610,6 +611,10 @@ export default class TileGrid extends Widget {
     this.invalidateLayoutTree();
   }
 
+  setPlaceholderProducer(placeholderProducer) {
+    this.setProperty('placeholderProducer', placeholderProducer);
+  }
+
   fillUpWithPlaceholders() {
     if (!this.withPlaceholders) {
       this._deleteAllPlaceholders();
@@ -623,9 +628,7 @@ export default class TileGrid extends Widget {
     if (!this.withPlaceholders) {
       return this.tiles;
     }
-    return this.tiles.filter(tile => {
-      return !(tile instanceof PlaceholderTile);
-    });
+    return this.tiles.filter(tile => !(tile instanceof PlaceholderTile));
   }
 
   _createPlaceholders() {
@@ -656,9 +659,17 @@ export default class TileGrid extends Widget {
   }
 
   _createPlaceholder() {
-    return scout.create('PlaceholderTile', {
-      parent: this
-    });
+    let placeholder = (this.placeholderProducer && this.placeholderProducer()) || {};
+    if (placeholder instanceof PlaceholderTile) {
+      return placeholder;
+    }
+    if (objects.isPlainObject(placeholder)) {
+      return scout.create($.extend(true, {}, {
+        objectType: 'PlaceholderTile',
+        parent: this
+      }, placeholder));
+    }
+    throw new Error('Placeholder producer returned unexpected result.');
   }
 
   _deleteObsoletePlaceholders() {
@@ -1001,7 +1012,7 @@ export default class TileGrid extends Widget {
   }
 
   _applyFilters(tiles, fullReset) {
-    return this.filterSupport.applyFilters(tiles, fullReset);
+    return this.filterSupport.applyFilters(tiles.filter(tile => !(tile instanceof PlaceholderTile)), fullReset);
   }
 
   /**
@@ -1011,7 +1022,7 @@ export default class TileGrid extends Widget {
     return new FilterSupport({
       widget: this,
       $container: () => this.$filterFieldContainer,
-      getElementsForFiltering: () => this.tiles,
+      getElementsForFiltering: this.tilesWithoutPlaceholders.bind(this),
       createTextFilter: this._createTextFilter.bind(this),
       updateTextFilterText: this._updateTextFilterText.bind(this)
     });
