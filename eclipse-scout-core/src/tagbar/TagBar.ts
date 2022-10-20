@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, Event, HtmlComponent, scout, TagBarEventMap, TagBarLayout, TagBarModel, TagBarOverflowPopup, tooltips, Widget} from '../index';
+import {arrays, Device, HtmlComponent, scout, TagBarEventMap, TagBarLayout, TagBarModel, TagBarOverflowPopup, tooltips, Widget} from '../index';
 import $ from 'jquery';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export default class TagBar extends Widget implements TagBarModel {
   declare model: TagBarModel;
@@ -90,10 +89,6 @@ export default class TagBar extends Widget implements TagBarModel {
     this.trigger('tagClick', {
       tag: tag
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<TagBar>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<TagBar>[K]>): EventMapOf<TagBar>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected override _renderEnabled() {

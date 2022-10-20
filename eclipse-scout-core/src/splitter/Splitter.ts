@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, graphics, HtmlComponent, LayoutData, SplitterEventMap, SplitterModel, Widget} from '../index';
+import {graphics, HtmlComponent, LayoutData, SplitterEventMap, SplitterModel, Widget} from '../index';
 import $ from 'jquery';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {SplitterMoveEvent} from './SplitterEventMap';
 
 export default class Splitter extends Widget implements SplitterModel {
   declare model: SplitterModel;
@@ -204,15 +204,11 @@ export default class Splitter extends Widget implements SplitterModel {
     // fire event
     let moveEvent = this.trigger('move', {
       position: splitterPosition
-    });
+    }) as SplitterMoveEvent;
     if (moveEvent.defaultPrevented) {
       return;
     }
     this._setPosition(moveEvent.position);
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Splitter>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Splitter>[K]>): EventMapOf<Splitter>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected _onMouseUp(event: JQuery.MouseUpEvent<Window>) {

@@ -9,12 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, Event, EventHandler, events, GroupBox, HtmlComponent, KeyStrokeContext,
-  Menu, menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel
+  CalendarComponent, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, ContextMenuPopup, DateRange, dates, Device, EnumObject, EventHandler, events, GroupBox, HtmlComponent, KeyStrokeContext, Menu,
+  menus, numbers, objects, Point, PropertyChangeEvent, RoundingMode, scout, scrollbars, strings, ViewportScroller, Widget, YearPanel
 } from '../index';
 import $ from 'jquery';
 import {YearPanelDateSelectEvent} from './YearPanelEventMap';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {JsonDateRange} from '../util/dates';
 
 export type CalendarDisplayMode = EnumObject<typeof Calendar.DisplayMode>;
@@ -1591,10 +1590,6 @@ export default class Calendar extends Widget implements CalendarModel {
         });
       }
     }
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Calendar>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Calendar>[K]>): EventMapOf<Calendar>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected _setComponentLogicalPosition(component: CalendarComponent, logicalPosition: Point) {

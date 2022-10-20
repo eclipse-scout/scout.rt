@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, events, graphics, Insets, scout, scrollbars, Widget} from '../index';
+import {events, graphics, Insets, scout, scrollbars, Widget} from '../index';
 import $ from 'jquery';
 import ScrollbarEventMap from './ScrollbarEventMap';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {JQueryMouseWheelEvent} from '../jquery/jquery-scout-types';
 import {OldWheelEvent} from '../types';
 
@@ -479,10 +478,6 @@ export default class Scrollbar extends Widget {
 
   notifyAfterScroll() {
     this.trigger('scrollEnd');
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Scrollbar>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Scrollbar>[K]>): EventMapOf<Scrollbar>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   /*

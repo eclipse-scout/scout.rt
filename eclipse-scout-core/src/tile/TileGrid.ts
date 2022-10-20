@@ -1569,8 +1569,4 @@ export default class TileGrid extends Widget implements TileGridModel {
     });
     return tiles;
   }
-
-  override trigger<K extends string & keyof EventMapOf<TileGrid>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<TileGrid>[K]>): EventMapOf<TileGrid>[K] {
-    return super.trigger(type, eventOrModel);
-  }
 }

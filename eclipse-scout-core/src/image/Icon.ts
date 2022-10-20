@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, HtmlComponent, IconDesc, IconModel, Image, scout, Widget} from '../index';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {HtmlComponent, IconDesc, IconModel, Image, scout, Widget} from '../index';
 import IconEventMap from './IconEventMap';
 
 /**
@@ -110,10 +109,6 @@ export default class Icon extends Widget implements IconModel {
     });
     this.$container = this.image.$container;
     this.htmlComp = this.image.htmlComp;
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Icon>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Icon>[K]>): EventMapOf<Icon>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected _removeImageIcon() {

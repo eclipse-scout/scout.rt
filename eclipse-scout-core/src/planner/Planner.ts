@@ -17,7 +17,6 @@ import PlannerModel from './PlannerModel';
 import {YearPanelDateSelectEvent} from '../calendar/YearPanelEventMap';
 import {PlannerHeaderDisplayModeClickEvent} from './PlannerHeaderEventMap';
 import PlannerEventMap from './PlannerEventMap';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {JsonDateRange} from '../util/dates';
 
 export default class Planner extends Widget implements PlannerModel {
@@ -1560,10 +1559,6 @@ export default class Planner extends Widget implements PlannerModel {
       // Render selection range as well for the case if selectedRange does not change but selected resources do
       this._renderSelectionRange();
     }
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Planner>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Planner>[K]>): EventMapOf<Planner>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   /**

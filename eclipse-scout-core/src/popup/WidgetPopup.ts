@@ -12,7 +12,6 @@ import {Action, Event, graphics, icons, Insets, Point, Popup, PopupLayout, Resiz
 import $ from 'jquery';
 import {ResizableMode} from '../resizable/Resizable';
 import {PopupAlignment} from './Popup';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export default class WidgetPopup extends Popup {
   declare model: WidgetPopupModel;
@@ -296,10 +295,6 @@ export default class WidgetPopup extends Popup {
       layout.autoPosition = false;
     }
     this.trigger('move', newOffset);
-  }
-
-  override trigger<K extends string & keyof EventMapOf<WidgetPopup>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<WidgetPopup>[K]>): EventMapOf<WidgetPopup>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   override set$Anchor($anchor: JQuery) {

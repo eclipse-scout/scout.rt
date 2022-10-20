@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Action, BoxButtons, BusyIndicatorEventMap, ClickActiveElementKeyStroke, CloseKeyStroke, Event, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget, WidgetModel} from '../index';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export interface BusyIndicatorModel extends WidgetModel {
   cancellable?: boolean;
@@ -186,10 +185,6 @@ export default class BusyIndicator extends Widget implements BusyIndicatorModel 
 
   protected _onCancelClick(event: Event) {
     this.trigger('cancel', event);
-  }
-
-  override trigger<K extends string & keyof EventMapOf<BusyIndicator>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<BusyIndicator>[K]>): EventMapOf<BusyIndicator>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   /**
