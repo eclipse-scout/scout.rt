@@ -8,19 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldLayout} from '../../../index';
+import {FormFieldLayout, SmartField} from '../../../index';
 
 /**
  * SmartFieldLayout works like FormLayout but additionally layouts its proposal-chooser popup.
  */
 export default class SmartFieldLayout extends FormFieldLayout {
+  protected _smartField: SmartField<any>;
 
-  constructor(smartField) {
+  constructor(smartField: SmartField<any>) {
     super(smartField);
     this._smartField = smartField;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     super.layout($container);
 
     // when embedded smart-field layout must not validate the popup

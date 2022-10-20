@@ -8,9 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, FormField, Popup, scout, SmartFieldPopupLayout} from '../../../index';
+import {AbstractLayout, Device, Event, FormField, LookupRow, Popup, ProposalChooser, scout, ScoutKeyboardEvent, SmartField, SmartFieldPopupEventMap, SmartFieldPopupLayout, SmartFieldPopupModel} from '../../../index';
+import {ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent} from './ProposalChooserEventMap';
+import {SmartFieldLookupResult} from './SmartField';
+import {StatusOrModel} from '../../../status/Status';
 
-export default class SmartFieldPopup extends Popup {
+export default class SmartFieldPopup<TValue> extends Popup implements SmartFieldPopupModel<TValue> {
+  declare model: SmartFieldPopupModel<TValue>;
+  declare eventMap: SmartFieldPopupEventMap<TValue>;
+
+  field: SmartField<TValue>;
+  lookupResult: SmartFieldLookupResult<TValue>;
+  smartField: SmartField<TValue>;
+  proposalChooser: ProposalChooser<TValue, any, any>;
 
   constructor() {
     super();
@@ -19,11 +29,11 @@ export default class SmartFieldPopup extends Popup {
     this.windowPaddingY = 0;
   }
 
-  _init(options) {
+  protected override _init(options: SmartFieldPopupModel<TValue>) {
     options.withFocusContext = false;
     super._init(options);
 
-    this.smartField = this.parent;
+    this.smartField = this.parent as SmartField<TValue>;
     this.proposalChooser = this._createProposalChooser();
     this.proposalChooser.on('lookupRowSelected', this._triggerEvent.bind(this));
     this.proposalChooser.on('activeFilterSelected', this._triggerEvent.bind(this));
@@ -33,18 +43,18 @@ export default class SmartFieldPopup extends Popup {
     this.setStatus(options.status);
   }
 
-  _createProposalChooser() {
+  protected _createProposalChooser(): ProposalChooser<TValue, any, any> {
     let objectType = this.smartField.browseHierarchy ? 'TreeProposalChooser' : 'TableProposalChooser';
     return scout.create(objectType, {
       parent: this
     });
   }
 
-  _createLayout() {
-    return new SmartFieldPopupLayout(this, this.proposalChooser);
+  protected override _createLayout(): AbstractLayout {
+    return new SmartFieldPopupLayout(this);
   }
 
-  _render() {
+  protected override _render() {
     let cssClass = this.smartField.cssClassName() + '-popup';
     super._render();
     this.$container
@@ -54,7 +64,7 @@ export default class SmartFieldPopup extends Popup {
     this.proposalChooser.render();
   }
 
-  setLookupResult(result) {
+  setLookupResult(result: SmartFieldLookupResult<TValue>) {
     this._setProperty('lookupResult', result);
     this.proposalChooser.setLookupResult(result);
   }
@@ -62,7 +72,7 @@ export default class SmartFieldPopup extends Popup {
   /**
    * @returns the selected lookup row from the proposal chooser. If the row is disabled this function returns null.
    */
-  getSelectedLookupRow() {
+  getSelectedLookupRow(): LookupRow<TValue> {
     let lookupRow = this.proposalChooser.getSelectedLookupRow();
     if (lookupRow && lookupRow.enabled) {
       return lookupRow;
@@ -70,7 +80,7 @@ export default class SmartFieldPopup extends Popup {
     return null;
   }
 
-  setStatus(status) {
+  setStatus(status: StatusOrModel) {
     this.proposalChooser.setStatus(status);
   }
 
@@ -85,12 +95,12 @@ export default class SmartFieldPopup extends Popup {
   /**
    * Delegates the key event to the proposal chooser.
    */
-  delegateKeyEvent(event) {
+  delegateKeyEvent(event: ScoutKeyboardEvent & JQuery.Event) {
     event.originalEvent.smartFieldEvent = true;
     this.proposalChooser.delegateKeyEvent(event);
   }
 
-  _triggerEvent(event) {
+  protected _triggerEvent(event: ProposalChooserActiveFilterSelectedEvent<TValue> | ProposalChooserLookupRowSelectedEvent<TValue>) {
     this.trigger(event.type, event);
   }
 
@@ -100,7 +110,7 @@ export default class SmartFieldPopup extends Popup {
    * should stay open when the SmartField popup is closed. It also prevents the focus blur
    * event on the SmartField input-field.
    */
-  _onContainerMouseDown(event) {
+  protected _onContainerMouseDown(event: JQuery.MouseDownEvent) {
     // when user clicks on proposal popup with table or tree (prevent default,
     // so input-field does not lose the focus, popup will be closed by the
     // proposal chooser impl.
@@ -108,25 +118,25 @@ export default class SmartFieldPopup extends Popup {
   }
 
   // when smart-field is removed, also remove popup. Don't animate removal in that case
-  _onRemoveSmartField(event) {
+  protected _onRemoveSmartField(event: Event<SmartField<TValue>>) {
     this.animateRemoval = false;
     this.remove();
   }
 
-  /**
-   * @override because the icon is not in the $anchor container.
-   */
-  _isMouseDownOnAnchor(event) {
-    return this.field.$field.isOrHas(event.target) || this.field.$icon.isOrHas(event.target) || (this.field.$clearIcon && this.field.$clearIcon.isOrHas(event.target));
+  protected override _isMouseDownOnAnchor(event: MouseEvent): boolean {
+    let target = event.target as HTMLElement;
+    return this.field.$field.isOrHas(target)
+      || this.field.$icon.isOrHas(target)
+      || (this.field.$clearIcon && this.field.$clearIcon.isOrHas(target));
   }
 
-  _onAnimationEnd() {
+  protected _onAnimationEnd() {
     this.proposalChooser.updateScrollbars();
   }
 
   // --- static helpers --- //
 
-  static hasPopupAnimation() {
+  static hasPopupAnimation(): boolean {
     return Device.get().supportsCssAnimation();
   }
 }

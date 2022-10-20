@@ -8,20 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TreeNode} from '../../../index';
+import {LookupRow, TreeNode, TreeProposalChooser} from '../../../index';
 import $ from 'jquery';
+import ProposalTreeNodeModel from './ProposalTreeNodeModel';
+import {SmartFieldLookupResult} from './SmartField';
 
-export default class ProposalTreeNode extends TreeNode {
+export default class ProposalTreeNode<TValue> extends TreeNode implements ProposalTreeNodeModel<TValue> {
+  declare model: ProposalTreeNodeModel<TValue>;
+
+  lookupRow: LookupRow<TValue>;
+  parentId: string;
+  proposalChooser: TreeProposalChooser<TValue>;
 
   constructor() {
     super();
   }
 
-  _init(model) {
-    super._init(model);
-  }
-
-  _renderText() {
+  protected override _renderText() {
     if (this.htmlEnabled) {
       this.$text.html(this.text);
     } else {
@@ -29,11 +32,11 @@ export default class ProposalTreeNode extends TreeNode {
     }
   }
 
-  _getStyles() {
+  protected override _getStyles(): LookupRow<TValue> {
     return this.lookupRow;
   }
 
-  _decorate() {
+  protected override _decorate() {
     // This node is not yet rendered, nothing to do
     if (!this.$node) {
       return;
@@ -43,20 +46,20 @@ export default class ProposalTreeNode extends TreeNode {
     this.$node.toggleClass('inactive', !this.lookupRow.active);
   }
 
-  isBrowseLoadIncremental() {
+  isBrowseLoadIncremental(): boolean {
     return this.proposalChooser.isBrowseLoadIncremental();
   }
 
-  loadChildren() {
+  override loadChildren(): JQuery.Deferred<SmartFieldLookupResult<TValue>> {
     if (this.isBrowseLoadIncremental()) {
       let parentKey = this.lookupRow.key;
-      return this.proposalChooser.smartField.lookupByRec(parentKey);
+      return this.proposalChooser.smartField.lookupByRec(parentKey) as JQuery.Deferred<SmartFieldLookupResult<TValue>>;
     }
     // child nodes are already loaded -> same as parent.loadChildren
     return $.resolvedDeferred();
   }
 
-  hasChildNodes() {
+  override hasChildNodes(): boolean {
     if (this.isBrowseLoadIncremental() && !this.childrenLoaded) {
       return true; // because we don't now yet
     }

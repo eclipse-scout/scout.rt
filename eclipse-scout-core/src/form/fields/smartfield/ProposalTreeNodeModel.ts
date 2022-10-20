@@ -8,8 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateField, PopupModel, SmartField} from '../index';
+import {LookupRow, TreeNodeModel, TreeProposalChooser} from '../../../index';
 
-export default interface TouchPopupModel extends PopupModel {
-  field: DateField | SmartField<any>;
+export default interface ProposalTreeNodeModel<TValue> extends TreeNodeModel {
+  lookupRow?: LookupRow<TValue>;
+  parentId?: string;
+  proposalChooser?: TreeProposalChooser<TValue>;
 }

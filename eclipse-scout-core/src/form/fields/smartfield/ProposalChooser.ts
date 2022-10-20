@@ -8,25 +8,41 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, objects, ProposalChooserLayout, ProposalField, RadioButton, RadioButtonGroup, scout, SmartField, Status, Table, Widget} from '../../../index';
+import {
+  HtmlComponent, LookupRow, objects, ProposalChooserEventMap, ProposalChooserLayout, ProposalChooserModel, ProposalField, RadioButton, RadioButtonGroup, scout, ScoutKeyboardEvent, SmartField, SmartFieldPopup, Status, Table, Widget
+} from '../../../index';
 import $ from 'jquery';
+import {SmartFieldLookupResult} from './SmartField';
+import {StatusOrModel} from '../../../status/Status';
 
-export default class ProposalChooser extends Widget {
+export default abstract class ProposalChooser<TValue, TContent extends ProposalChooserContent, TContentRow extends ProposalChooserContentRow<TValue>> extends Widget implements ProposalChooserModel<TValue> {
+  declare model: ProposalChooserModel<TValue>;
+  declare eventMap: ProposalChooserEventMap<TValue, TContent, TContentRow>;
+  declare parent: SmartFieldPopup<TValue>;
+
+  smartField: SmartField<TValue>;
+  activeFilterGroup: RadioButtonGroup<string>;
+  status: StatusOrModel;
+  statusVisible: boolean;
+  touch: boolean;
+  content: TContent;
+  $status: JQuery;
+  protected _updateStatusTimeout: number;
 
   constructor() {
     super();
 
-    this.$container = null;
-    this.$status = null;
     this.activeFilterGroup = null;
-    this.htmlComp = null;
-    this._updateStatusTimeout = null;
     this.status = null;
     this.statusVisible = true;
     this.touch = false;
+
+    this.$status = null;
+
+    this._updateStatusTimeout = null;
   }
 
-  _init(model) {
+  protected override _init(model: ProposalChooserModel<TValue>) {
     super._init(model);
 
     // If smartField is not explicitly provided by model, use smartField instance
@@ -35,40 +51,28 @@ export default class ProposalChooser extends Widget {
       this.smartField = this.parent.smartField;
     }
 
-    this.model = this._createModel();
+    this.content = this._createContent();
   }
 
-  _createModel($parent) {
-    throw new Error('_createModel() not implemented');
-  }
+  protected abstract _createContent(): TContent;
 
   /**
    * Creates a layout resetter that is used by the {@link ProposalChooserLayout}.
    */
-  _createLayoutResetter() {
-    throw new Error('_createLayoutResetter() not implemented');
-  }
+  protected abstract _createLayoutResetter(): ProposalChooserLayoutResetter;
 
-  setLookupResult(result) {
-    throw new Error('setLookupResult() not implemented');
-  }
+  abstract setLookupResult(result: SmartFieldLookupResult<TValue>);
 
-  selectFirstLookupRow() {
-    throw new Error('selectFirstLookupRow() not implemented');
-  }
+  abstract selectFirstLookupRow();
 
-  clearSelection() {
-    throw new Error('clearSelection() not implemented');
-  }
+  abstract clearSelection();
 
-  clearLookupRows() {
-    throw new Error('clearLookupRows() not implemented');
-  }
+  abstract clearLookupRows();
 
   /**
    * @param row TableRow or TreeNode (both have the same properties)
    */
-  triggerLookupRowSelected(row) {
+  triggerLookupRowSelected(row?: TContentRow) {
     row = row || this.selectedRow();
     if (!row || !row.enabled) {
       return;
@@ -82,18 +86,18 @@ export default class ProposalChooser extends Widget {
    * Implement this function to get the selected row or node from the proposal chooser.
    * The implementation depends on the widget used by the chooser (Table or Tree).
    */
-  selectedRow() {
-    throw new Error('selectedRow() not implemented');
-  }
+  abstract selectedRow(): TContentRow;
 
-  _render() {
+  abstract getSelectedLookupRow(): LookupRow<TValue>;
+
+  protected override _render() {
     this.$container = this.$parent
       .appendDiv('proposal-chooser')
       .toggleClass('touch', this.touch);
     this.htmlComp = HtmlComponent.install(this.$container, this.session);
     this.htmlComp.setLayout(new ProposalChooserLayout(this, this._createLayoutResetter()));
 
-    this._renderModel();
+    this._renderContent();
 
     // status
     this.$status = this.$container
@@ -107,7 +111,7 @@ export default class ProposalChooser extends Widget {
         labelVisible: false,
         statusVisible: false,
         gridColumnCount: SmartField.ACTIVE_FILTER_VALUES.length
-      });
+      }) as RadioButtonGroup<string>;
 
       // add radio buttons
       SmartField.ACTIVE_FILTER_VALUES.forEach(function(value, index) {
@@ -120,45 +124,45 @@ export default class ProposalChooser extends Widget {
     }
   }
 
-  _renderModel() {
-    this.model.render();
+  protected _renderContent() {
+    this.content.render();
 
     // Make sure container never gets the focus, but looks focused
-    this.model.$container.setTabbable(false);
-    this.model.$container.addClass('focused');
+    this.content.$container.setTabbable(false);
+    this.content.$container.addClass('focused');
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._updateStatus();
   }
 
   /**
-   * Delegates an event (e.g. keyup, keydown) to the model.$container of this instance,
+   * Delegates an event (e.g. keyup, keydown) to the content.$container of this instance,
    * calling the JQuery trigger method.
    */
-  delegateEvent(event) {
+  delegateEvent(event: ScoutKeyboardEvent & JQuery.Event) {
     event.originalEvent.smartFieldEvent = true;
-    this.model.$container.trigger(event);
+    this.content.$container.trigger(event);
   }
 
-  delegateKeyEvent(event) {
-    this.model.$container.trigger(event);
+  delegateKeyEvent(event: ScoutKeyboardEvent & JQuery.Event) {
+    this.content.$container.trigger(event);
   }
 
-  _renderStatus() {
+  protected _renderStatus() {
     this._updateStatus();
   }
 
-  _renderStatusVisible() {
+  protected _renderStatusVisible() {
     this._updateStatus();
   }
 
-  _computeStatusVisible() {
+  protected _computeStatusVisible(): boolean {
     return !!(this.statusVisible && this.status);
   }
 
-  _updateStatus() {
+  protected _updateStatus() {
     // Note: the UI has a special way to deal with the status. When the UI is rendered
     // we do NOT render an OK status, even when it is set on the model. The status
     // "Search proposals..." is set to severity OK. That status is only displayed, when
@@ -177,7 +181,7 @@ export default class ProposalChooser extends Widget {
     }
   }
 
-  _updateStatusImpl() {
+  protected _updateStatusImpl() {
     if (!this.rendered && !this.rendering) {
       return;
     }
@@ -205,11 +209,11 @@ export default class ProposalChooser extends Widget {
   /**
    * Replaces an ellipsis (...) at the end of the message-text with a CSS animation.
    */
-  _setStatusMessage(message) {
+  protected _setStatusMessage(message: string) {
     Status.animateStatusMessage(this.$status, message);
   }
 
-  _insertActiveFilterButton(value, index) {
+  protected _insertActiveFilterButton(value: string, index: number) {
     let radio = scout.create(RadioButton, {
       parent: this.activeFilterGroup,
       label: this._activeFilterLabel(index),
@@ -219,7 +223,7 @@ export default class ProposalChooser extends Widget {
       gridDataHints: {
         useUiWidth: true
       }
-    });
+    }) as RadioButton<string>;
 
     radio.on('propertyChange', event => {
       if (event.propertyName === 'selected' && event.newValue === true) {
@@ -232,22 +236,22 @@ export default class ProposalChooser extends Widget {
     this.activeFilterGroup.insertButton(radio);
   }
 
-  setVirtual(virtual) {
-    if (this.model instanceof Table) {
-      this.model.setVirtual(virtual);
+  setVirtual(virtual: boolean) {
+    if (this.content instanceof Table) {
+      this.content.setVirtual(virtual);
     }
   }
 
-  setStatus(status) {
+  setStatus(status: StatusOrModel) {
     this.setProperty('status', status);
   }
 
-  setBusy(busy) {
-    this.model.setProperty('loading', busy);
-    this.model.setProperty('enabled', !busy);
+  setBusy(busy: boolean) {
+    this.content.setProperty('loading', busy);
+    this.content.setProperty('enabled', !busy);
   }
 
-  _activeFilterLabel(index) {
+  protected _activeFilterLabel(index: number): string {
     return this.smartField.activeFilterLabels[index];
   }
 
@@ -255,14 +259,14 @@ export default class ProposalChooser extends Widget {
    * Override this function to implement update scrollbar behavior.
    */
   updateScrollbars() {
-    this.model.updateScrollbars();
+    this.content.updateScrollbars();
   }
 
-  _isProposal() {
+  protected _isProposal(): boolean {
     return this.smartField instanceof ProposalField;
   }
 
-  _selectProposal(result, proposals) {
+  protected _selectProposal(result: SmartFieldLookupResult<TValue>, proposals: TContentRow[]) {
     if (this._isProposal()) {
       return; // no pre-selection when field is a proposal field
     }
@@ -272,4 +276,23 @@ export default class ProposalChooser extends Widget {
       this.selectFirstLookupRow();
     }
   }
+
+  abstract trySelectCurrentValue();
+}
+
+export interface ProposalChooserLayoutResetter {
+  cssSelector: string;
+
+  modifyDom(): void;
+
+  restoreDom(): void;
+}
+
+export interface ProposalChooserContent extends Widget {
+  updateScrollbars(): void;
+}
+
+export interface ProposalChooserContentRow<TValue> {
+  enabled: boolean;
+  lookupRow: LookupRow<TValue>;
 }

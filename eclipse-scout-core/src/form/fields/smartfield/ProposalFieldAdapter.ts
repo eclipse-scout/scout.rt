@@ -17,5 +17,4 @@ export default class ProposalFieldAdapter extends SmartFieldAdapter {
 
     this._addRemoteProperties(['lookupRows']);
   }
-
 }

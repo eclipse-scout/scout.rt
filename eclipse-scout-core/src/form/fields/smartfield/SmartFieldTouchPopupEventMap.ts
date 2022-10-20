@@ -8,8 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateField, PopupModel, SmartField} from '../index';
+import {PopupEventMap} from '../../../index';
+import {ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent} from './ProposalChooserEventMap';
 
-export default interface TouchPopupModel extends PopupModel {
-  field: DateField | SmartField<any>;
+export default interface SmartFieldTouchPopupEventMap<TValue> extends PopupEventMap {
+  'activeFilterSelected': ProposalChooserActiveFilterSelectedEvent<TValue>;
+  'lookupRowSelected': ProposalChooserLookupRowSelectedEvent<TValue>;
 }

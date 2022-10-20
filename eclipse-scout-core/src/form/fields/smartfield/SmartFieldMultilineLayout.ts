@@ -8,14 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, HtmlComponent, HtmlEnvironment} from '../../../index';
+import {AbstractLayout, HtmlComponent, HtmlEnvironment, SmartField} from '../../../index';
 
 /**
  * This layout only layouts the INPUT and DIV part of the multi-line smart-field, not the entire form-field.
  */
 export default class SmartFieldMultilineLayout extends AbstractLayout {
+  smartField: SmartField<any>;
+  htmlPropertyChangeHandler: () => void;
+  rowHeight: number;
 
-  constructor(smartField) {
+  constructor(smartField: SmartField<any>) {
     super();
     this.smartField = smartField;
 
@@ -28,16 +31,16 @@ export default class SmartFieldMultilineLayout extends AbstractLayout {
     });
   }
 
-  _initDefaults() {
+  protected _initDefaults() {
     this.rowHeight = HtmlEnvironment.get().formRowHeight;
   }
 
-  _onHtmlEnvironmentPropertyChange() {
+  protected _onHtmlEnvironmentPropertyChange() {
     this._initDefaults();
     this.smartField.invalidateLayoutTree();
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let htmlContainer = HtmlComponent.get($container),
       $input = $container.children('.multiline-input'),
       $lines = $container.children('.multiline-lines'),

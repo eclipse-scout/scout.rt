@@ -104,13 +104,13 @@ describe('TreeProposalChooser', () => {
       });
       // Lookup rows with parentKey = null are top level nodes. They must never be linked to another lookup row, even if there is a lookup row with key = null.
       // Key = null has a special behavior: when such a row is clicked the text is cleared since the new value is null.
-      expect(chooser.model.nodes.length).toBe(4);
-      expect(chooser.model.nodes[0].parentNode).toBe(null);
-      expect(chooser.model.nodes[1].parentNode).toBe(null);
-      expect(chooser.model.nodes[2].parentNode).toBe(null);
-      expect(chooser.model.nodes[3].parentNode).toBe(null);
-      expect(chooser.model.nodes[3].expanded).toBe(true);
-      expect(chooser.model.nodes[3].childNodes[0].parentNode).toBe(chooser.model.nodes[3]);
+      expect(chooser.content.nodes.length).toBe(4);
+      expect(chooser.content.nodes[0].parentNode).toBe(null);
+      expect(chooser.content.nodes[1].parentNode).toBe(null);
+      expect(chooser.content.nodes[2].parentNode).toBe(null);
+      expect(chooser.content.nodes[3].parentNode).toBe(null);
+      expect(chooser.content.nodes[3].expanded).toBe(true);
+      expect(chooser.content.nodes[3].childNodes[0].parentNode).toBe(chooser.content.nodes[3]);
     });
 
     it('clears the field if a lookup row with key null is selected', () => {
@@ -135,7 +135,7 @@ describe('TreeProposalChooser', () => {
       smartField.requestInput();
       jasmine.clock().tick(300);
       let chooser = smartField.popup.proposalChooser;
-      chooser.model.selectNode(chooser.model.nodes[0]);
+      chooser.content.selectNode(chooser.content.nodes[0]);
       smartField.popup.selectLookupRow();
       expect(smartField.value).toBe(null);
       expect(smartField.displayText).toBe('');
@@ -166,8 +166,8 @@ describe('TreeProposalChooser', () => {
       smartField._onFieldKeyUp({});
       jasmine.clock().tick(300);
       let chooser = smartField.popup.proposalChooser;
-      expect(chooser.model.nodes.length).toBe(1);
-      expect(chooser.model.selectedNode().text).toBe('Null Key');
+      expect(chooser.content.nodes.length).toBe(1);
+      expect(chooser.content.selectedNode().text).toBe('Null Key');
       smartField.popup.selectLookupRow();
       expect(smartField.value).toBe(null);
       expect(smartField.displayText).toBe('');

@@ -9,13 +9,18 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
+import {Table} from '../../../index';
+import {ProposalChooserLayoutResetter} from './ProposalChooser';
 
 /**
  * This class is used to reset and restore styles in the DOM, so we can measure the preferred size of the table.
  */
-export default class TableLayoutResetter {
+export default class TableLayoutResetter implements ProposalChooserLayoutResetter {
+  cssSelector: string;
+  protected _table: Table;
+  protected _fillerWidth: string;
 
-  constructor(table) {
+  constructor(table: Table) {
     this._table = table;
     this._fillerWidth = null;
     this.cssSelector = '.table';
@@ -55,14 +60,14 @@ export default class TableLayoutResetter {
    * Clears the given CSS property and stores the old value as data with prefix 'backup'
    * which is used to restore the CSS property later.
    */
-  _cssBackup($element, property) {
+  protected _cssBackup($element: JQuery, property: string) {
     let oldValue = $element.css(property);
     $element
       .css(property, '')
       .data('backup' + property, oldValue);
   }
 
-  _cssRestore($element, property) {
+  protected _cssRestore($element: JQuery, property: string) {
     let dataProperty = 'backup' + property,
       oldValue = $element.data(dataProperty);
     $element
@@ -73,7 +78,7 @@ export default class TableLayoutResetter {
   /**
    * Go through all rows and cells and call the given modifyFunc (backup/restore) on each element.
    */
-  _modifyTableData(modifyFunc) {
+  protected _modifyTableData(modifyFunc: ($element: JQuery, property: string) => void) {
     let that = this;
     this._table.$rows().each(function() {
       let $row = $(this);
@@ -86,14 +91,14 @@ export default class TableLayoutResetter {
     });
   }
 
-  _modifyFiller($filler) {
+  protected _modifyFiller($filler: JQuery) {
     if ($filler) {
       this._fillerWidth = $filler.css('width');
       $filler.css('width', '');
     }
   }
 
-  _restoreFiller($filler) {
+  protected _restoreFiller($filler: JQuery) {
     if ($filler) {
       $filler.css('width', this._fillerWidth);
     }

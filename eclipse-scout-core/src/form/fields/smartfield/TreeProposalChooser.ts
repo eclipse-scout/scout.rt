@@ -8,18 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, objects, ProposalChooser, ProposalTreeNode, scout, Tree, TreeLayoutResetter} from '../../../index';
+import {arrays, LookupRow, objects, ProposalChooser, ProposalTreeNode, scout, Tree, TreeLayoutResetter, TreeNode} from '../../../index';
+import {TreeNodeClickEvent} from '../../../tree/TreeEventMap';
+import {SmartFieldLookupResult} from './SmartField';
 
-export default class TreeProposalChooser extends ProposalChooser {
+export default class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, ProposalTreeNode<TValue>> {
 
   constructor() {
     super();
   }
 
-  /**
-   * @returns {Tree}
-   */
-  _createModel() {
+  protected override _createContent(): Tree {
     let tree = scout.create(Tree, {
       parent: this,
       requestFocusOnNodeControlMouseDown: false,
@@ -30,44 +29,41 @@ export default class TreeProposalChooser extends ProposalChooser {
     return tree;
   }
 
-  _createLayoutResetter() {
-    return scout.create(TreeLayoutResetter, this.model);
+  protected override _createLayoutResetter(): TreeLayoutResetter {
+    return scout.create(TreeLayoutResetter, this.content);
   }
 
-  _onNodeClick(event) {
-    this.triggerLookupRowSelected(event.node);
+  protected _onNodeClick(event: TreeNodeClickEvent) {
+    this.triggerLookupRowSelected(event.node as ProposalTreeNode<TValue>);
   }
 
-  selectedRow() {
-    return this.model.selectedNode();
+  override selectedRow(): ProposalTreeNode<TValue> {
+    return this.content.selectedNode() as ProposalTreeNode<TValue>;
   }
 
-  isBrowseLoadIncremental() {
+  isBrowseLoadIncremental(): boolean {
     return this.smartField.browseLoadIncremental;
   }
 
-  getSelectedLookupRow() {
-    let selectedNode = this.model.selectedNode();
+  override getSelectedLookupRow(): LookupRow<TValue> {
+    let selectedNode = this.content.selectedNode() as ProposalTreeNode<TValue>;
     if (!selectedNode) {
       return null;
     }
     return selectedNode.lookupRow;
   }
 
-  selectFirstLookupRow() {
-    if (this.model.nodes.length) {
-      this.model.selectNode(this.model.nodes[0]);
+  override selectFirstLookupRow() {
+    if (this.content.nodes.length) {
+      this.content.selectNode(this.content.nodes[0]);
     }
   }
 
-  clearSelection() {
-    this.model.deselectAll();
+  override clearSelection() {
+    this.content.deselectAll();
   }
 
-  /**
-   * @param {LookupResult} result
-   */
-  setLookupResult(result) {
+  override setLookupResult(result: SmartFieldLookupResult<TValue>) {
     let treeNodes, treeNodesFlat,
       lookupRows = result.lookupRows,
       appendResult = scout.nvl(result.appendResult, false);
@@ -78,36 +74,36 @@ export default class TreeProposalChooser extends ProposalChooser {
       if (treeNodes.length) {
         let parentNode = null;
         treeNodes.forEach(treeNode => {
-          parentNode = this.model.nodesMap[treeNode.parentId];
+          parentNode = this.content.nodesMap[treeNode.parentId];
           this._appendChildNode(parentNode, treeNode);
         });
         if (parentNode) {
-          this.model.insertNodes(treeNodes, parentNode);
+          this.content.insertNodes(treeNodes, parentNode);
         }
       } else {
         // remove control icon, when no child nodes are available
-        let node = this.model.nodesMap[result.rec];
+        let node = this.content.nodesMap[this._createNodeId(result.rec)];
         node.leaf = true;
         node.childrenLoaded = true;
-        this.model.updateNode(node);
+        this.content.updateNode(node);
       }
     } else {
-      this.model.deleteAllChildNodes();
+      this.content.deleteAllChildNodes();
       treeNodesFlat = lookupRows.map(this._createTreeNode.bind(this));
       treeNodes = this._flatListToSubTree(treeNodesFlat);
       if (result.byText) {
         this._expandAllParentNodes(treeNodesFlat);
       }
-      this.model.insertNodes(treeNodes);
+      this.content.insertNodes(treeNodes);
     }
 
     this._selectProposal(result, treeNodesFlat);
   }
 
-  _expandAllParentNodes(treeNodesFlat) {
+  protected _expandAllParentNodes(treeNodesFlat: TreeNode[]) {
     // when tree node is a leaf or children are not loaded yet
     let leafs = treeNodesFlat.reduce((aggr, treeNode) => {
-      if (treeNode.leaf || !treeNode.childNodesLoaded && treeNode.childNodes.length === 0) {
+      if (treeNode.leaf || !treeNode.childrenLoaded && treeNode.childNodes.length === 0) {
         aggr.push(treeNode);
       }
       return aggr;
@@ -120,27 +116,27 @@ export default class TreeProposalChooser extends ProposalChooser {
       }
       treeNode = treeNode.parentNode;
       while (treeNode) {
-        this.model.setNodeExpanded(treeNode, true);
+        this.content.setNodeExpanded(treeNode, true);
         treeNode = treeNode.parentNode;
       }
     }
   }
 
-  trySelectCurrentValue() {
+  override trySelectCurrentValue() {
     let currentValue = this.smartField.getValueForSelection();
     if (objects.isNullOrUndefined(currentValue)) {
       return;
     }
-    let allTreeNodes = objects.values(this.model.nodesMap);
+    let allTreeNodes = objects.values(this.content.nodesMap) as ProposalTreeNode<TValue>[];
     let treeNode = arrays.find(allTreeNodes, node => {
       return node.lookupRow.key === currentValue;
     });
     if (treeNode) {
-      this.model.selectNode(treeNode);
+      this.content.selectNode(treeNode);
     }
   }
 
-  _createTreeNode(lookupRow) {
+  protected _createTreeNode(lookupRow: LookupRow<TValue>): ProposalTreeNode<TValue> {
     let
       initialLeaf = true,
       expandAll = this.smartField.browseAutoExpandAll,
@@ -158,21 +154,31 @@ export default class TreeProposalChooser extends ProposalChooser {
     }
 
     return scout.create(ProposalTreeNode, {
-      parent: this.model,
+      parent: this.content,
       proposalChooser: this,
       childNodeIndex: 0,
       enabled: lookupRow.enabled,
       htmlEnabled: false,
       iconId: lookupRow.iconId,
-      id: lookupRow.key,
-      parentId: lookupRow.parentKey,
+      id: this._createNodeId(lookupRow.key),
+      parentId: this._createNodeId(lookupRow.parentKey),
       expanded: expandAll,
       initialExpanded: expandAll,
       text: lookupRow.text,
       lookupRow: lookupRow,
       leaf: initialLeaf,
       tooltipText: lookupRow.tooltipText
-    });
+    }) as ProposalTreeNode<TValue>;
+  }
+
+  protected _createNodeId(value: TValue): string {
+    if (objects.isNullOrUndefined(value)) {
+      return value;
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    return JSON.stringify(value);
   }
 
   /**
@@ -184,24 +190,24 @@ export default class TreeProposalChooser extends ProposalChooser {
    * Note: because we only match nodes that have the property leaf set to true, it's not
    * possible to accept a node with accept input that is not a leaf.
    *
-   * @returns {TreeNode[]} the leafs in the current tree model.
+   * @returns the leafs in the current tree content.
    */
-  findLeafs() {
+  findLeafs(): ProposalTreeNode<TValue>[] {
     let leafs = [];
     Tree.visitNodes((node, parentNode) => {
       if (node.leaf || !node.childNodes.length) {
         leafs.push(node);
       }
-    }, this.model.nodes);
+    }, this.content.nodes);
     return leafs;
   }
 
   /**
    * This function creates a sub-tree from a list of flat tree nodes. It sets the parent/child references
    * between the nodes and returns the top-level nodes of the sub-tree. This subtree is not yet attached
-   * to the real tree (= this.model).
+   * to the real tree (= this.content).
    */
-  _flatListToSubTree(treeNodesFlat) {
+  protected _flatListToSubTree(treeNodesFlat: ProposalTreeNode<TValue>[]): ProposalTreeNode<TValue>[] {
     // 1. put all nodes with the same parent in a map (key=parentId, value=[nodes])
     let nodesMap = {};
     treeNodesFlat.forEach(treeNode => {
@@ -233,7 +239,7 @@ export default class TreeProposalChooser extends ProposalChooser {
   /**
    * This functions appends a tree node to a parent node and sets the required flags on the parent node.
    */
-  _appendChildNode(parentNode, treeNode) {
+  protected _appendChildNode(parentNode: TreeNode, treeNode: TreeNode) {
     if (!parentNode.childNodes) {
       parentNode.childNodes = [];
     }
@@ -244,7 +250,7 @@ export default class TreeProposalChooser extends ProposalChooser {
     parentNode.childrenLoaded = true;
   }
 
-  clearLookupRows() {
-    this.model.deleteAllNodes();
+  override clearLookupRows() {
+    this.content.deleteAllNodes();
   }
 }
