@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AppLinkKeyStroke, ValueField} from '../../../index';
+import {AppLinkKeyStroke, BeanFieldModel, ValueField} from '../../../index';
 import $ from 'jquery';
 
 /**
  * Base class for fields where the value should be visualized.
  */
-export default class BeanField extends ValueField {
+export default class BeanField<TValue extends object> extends ValueField<TValue> implements BeanFieldModel<TValue> {
 
   constructor() {
     super();
@@ -22,28 +22,25 @@ export default class BeanField extends ValueField {
     this.preventInitialFocus = true;
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'bean-field');
     this.addLabel();
     this.addField(this.$parent.makeDiv());
     this.addStatus();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderValue();
   }
 
-  /**
-   * @override FormField.js
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     this.keyStrokeContext.registerKeyStroke(new AppLinkKeyStroke(this, this._onAppLinkAction));
   }
 
-  _formatValue(value) {
+  protected override _formatValue(value: TValue): string {
     // The value cannot be changed by the user, therefore we always return the initial displayText property.
     //
     // Strange things happen, if an other value is returned... Example:
@@ -63,34 +60,31 @@ export default class BeanField extends ValueField {
     return this.displayText;
   }
 
-  _parseValue(displayText) {
+  protected override _parseValue(displayText: string): TValue {
     // DisplayText cannot be converted to value, use original value (see comment in _formatValue).
     return this.value;
   }
 
-  _readDisplayText() {
+  protected override _readDisplayText(): string {
     // DisplayText cannot be changed, therefore it must be equal to the current value (see comment in _formatValue)
     return this.displayText;
   }
 
-  /**
-   * @override
-   */
-  _renderDisplayText() {
+  protected override _renderDisplayText() {
     // nop
   }
 
-  _renderValue() {
+  protected _renderValue() {
     // to be implemented by the subclass
   }
 
-  triggerAppLinkAction(ref) {
+  triggerAppLinkAction(ref: string) {
     this.trigger('appLinkAction', {
       ref: ref
     });
   }
 
-  _onAppLinkAction(event) {
+  protected _onAppLinkAction(event) {
     let $target = $(event.delegateTarget);
     let ref = $target.data('ref');
     this.triggerAppLinkAction(ref);
