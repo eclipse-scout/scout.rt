@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateField, PopupModel, SmartField} from '../index';
 
-export default interface TouchPopupModel extends PopupModel {
-  field: DateField | SmartField<any>;
+import {PropertyChangeEvent, SmartFieldEventMap} from '../../../index';
+
+export default interface ProposalFieldEventMap extends SmartFieldEventMap<string> {
+  'propertyChange:trimText': PropertyChangeEvent<boolean>;
 }

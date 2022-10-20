@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, Column, EventHandler, FormField, GroupBox, LogicalGridLayoutConfig, LookupCall, LookupRow, PlaceholderField, PropertyChangeEvent, scout, SmartField, Table, TileTableHeaderBoxModel, TileTableHeaderGroupByLookupCall,
+  arrays, Column, EventHandler, FormField, GroupBox, LogicalGridLayoutConfig, LookupRow, PlaceholderField, PropertyChangeEvent, scout, SmartField, Table, TileTableHeaderBoxModel, TileTableHeaderGroupByLookupCall,
   TileTableHeaderSortByLookupCall, ValueField
 } from '../index';
 import {TileTableHeaderSortKey} from './TileTableHeaderSortByLookupCall';
@@ -21,8 +21,8 @@ export default class TileTableHeaderBox extends GroupBox implements TileTableHea
   declare parent: Table;
 
   table: Table;
-  groupByField: SmartField;
-  sortByField: SmartField;
+  groupByField: SmartField<Column<any>>;
+  sortByField: SmartField<TileTableHeaderSortKey>;
   isGrouping: boolean;
   isSorting: boolean;
   protected _tableGroupHandler: EventHandler<TableGroupEvent>;
@@ -82,9 +82,9 @@ export default class TileTableHeaderBox extends GroupBox implements TileTableHea
       clearable: ValueField.Clearable.ALWAYS,
       statusVisible: false,
       displayStyle: SmartField.DisplayStyle.DROPDOWN
-    });
+    }) as SmartField<Column<any>>;
     this.groupByField.setLookupCall(this._createGroupByLookupCall());
-    this.groupByField.setVisible(!arrays.empty(this.groupByField.lookupCall.data));
+    this.groupByField.setVisible(!arrays.empty((this.groupByField.lookupCall as StaticLookupCall<Column<any>>).data));
     this.groupByField.on('propertyChange', this._onGroupingChange.bind(this));
 
     this.insertField(this.groupByField);
@@ -98,9 +98,9 @@ export default class TileTableHeaderBox extends GroupBox implements TileTableHea
       clearable: ValueField.Clearable.ALWAYS,
       statusVisible: false,
       displayStyle: SmartField.DisplayStyle.DROPDOWN
-    });
+    }) as SmartField<TileTableHeaderSortKey>;
     this.sortByField.setLookupCall(this._createSortByLookupCall());
-    this.sortByField.setVisible(!arrays.empty(this.sortByField.lookupCall.data));
+    this.sortByField.setVisible(!arrays.empty((this.sortByField.lookupCall as StaticLookupCall<TileTableHeaderSortKey>).data));
     this.sortByField.on('propertyChange', this._onSortingChange.bind(this));
 
     this.insertField(this.sortByField);
@@ -116,7 +116,7 @@ export default class TileTableHeaderBox extends GroupBox implements TileTableHea
       .find(rowKey => rowKey.column === key.column && rowKey.asc === key.asc);
   }
 
-  protected _createGroupByLookupCall(): LookupCall<Column<any>> {
+  protected _createGroupByLookupCall(): StaticLookupCall<Column<any>> {
     return scout.create(TileTableHeaderGroupByLookupCall, {
       session: this.session,
       table: this.table
@@ -130,7 +130,7 @@ export default class TileTableHeaderBox extends GroupBox implements TileTableHea
     });
   }
 
-  protected _onGroupingChange(event: PropertyChangeEvent<any, SmartField>) {
+  protected _onGroupingChange(event: PropertyChangeEvent<any, SmartField<Column<any>>>) {
     if (!this.table.tileMode) {
       return;
     }
@@ -148,7 +148,7 @@ export default class TileTableHeaderBox extends GroupBox implements TileTableHea
     }
   }
 
-  protected _onSortingChange(event: PropertyChangeEvent<any, SmartField>) {
+  protected _onSortingChange(event: PropertyChangeEvent<any, SmartField<TileTableHeaderSortKey>>) {
     if (!this.table.tileMode) {
       return;
     }

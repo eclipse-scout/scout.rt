@@ -8,8 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateField, PopupModel, SmartField} from '../index';
+import {SmartField, WidgetModel} from '../../../index';
+import {StatusOrModel} from '../../../status/Status';
 
-export default interface TouchPopupModel extends PopupModel {
-  field: DateField | SmartField<any>;
+export default interface ProposalChooserModel<TValue> extends WidgetModel {
+  smartField?: SmartField<TValue>;
+  status?: StatusOrModel;
+  /**
+   * Default is true.
+   */
+  statusVisible?: boolean;
+  /**
+   * Default is false.
+   */
+  touch?: boolean;
 }

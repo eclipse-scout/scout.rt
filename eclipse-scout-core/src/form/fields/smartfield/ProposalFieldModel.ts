@@ -8,8 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateField, PopupModel, SmartField} from '../index';
 
-export default interface TouchPopupModel extends PopupModel {
-  field: DateField | SmartField<any>;
+import {SmartFieldModel} from '../../../index';
+
+export default interface ProposalFieldModel extends SmartFieldModel<string> {
+  /**
+   * true if leading and trailing whitespace should be stripped from the entered text while validating the value.
+   *
+   * Default is true.
+   */
+  trimText?: boolean;
 }

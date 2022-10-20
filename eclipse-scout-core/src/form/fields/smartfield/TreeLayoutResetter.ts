@@ -9,12 +9,17 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
+import {Tree} from '../../../index';
+import {ProposalChooserLayoutResetter} from './ProposalChooser';
+
 /**
  * This class is used to reset and restore styles in the DOM, so we can measure the preferred size of the tree.
  */
-export default class TreeLayoutResetter {
+export default class TreeLayoutResetter implements ProposalChooserLayoutResetter {
+  cssSelector: string;
+  protected _tree: Tree;
 
-  constructor(tree) {
+  constructor(tree: Tree) {
     this._tree = tree;
     this.cssSelector = '.tree';
   }
@@ -38,7 +43,7 @@ export default class TreeLayoutResetter {
       .css('display', 'block');
   }
 
-  _ensureFirstLast() {
+  protected _ensureFirstLast() {
     let $nodes = this._tree.$data
       .children('.tree-node')
       .removeClass('first last');

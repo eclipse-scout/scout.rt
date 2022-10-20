@@ -22,10 +22,10 @@ export default class TouchPopup extends Popup {
   $body: JQuery;
 
   /** the original touch field from the form */
-  protected _touchField: DateField | SmartField;
+  protected _touchField: DateField | SmartField<any>;
   protected _touchFieldTooltip: Tooltip;
   /** the cloned field from the popup */
-  protected _field: DateField | SmartField;
+  protected _field: DateField | SmartField<any>;
   /** the widget placed below the field */
   protected _widget: Widget;
   protected _$widgetContainer: JQuery;
@@ -151,7 +151,7 @@ export default class TouchPopup extends Popup {
     if (event.propertyName === 'errorStatus') {
       this._field.setErrorStatus(event.newValue);
     } else if (event.propertyName === 'lookupRow') {
-      let smartfield = this._field as SmartField;
+      let smartfield = this._field as SmartField<any>;
       smartfield.setLookupRow(event.newValue);
     }
   }

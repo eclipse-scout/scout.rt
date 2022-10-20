@@ -8,17 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, HtmlComponent, scrollbars} from '../../../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, ProposalChooser, scrollbars} from '../../../index';
+import {ProposalChooserLayoutResetter} from './ProposalChooser';
 
 export default class ProposalChooserLayout extends AbstractLayout {
+  protected _proposalChooser: ProposalChooser<any, any, any>;
+  protected _layoutResetter: ProposalChooserLayoutResetter;
 
-  constructor(proposalChooser, layoutResetter) {
+  constructor(proposalChooser: ProposalChooser<any, any, any>, layoutResetter: ProposalChooserLayoutResetter) {
     super();
     this._proposalChooser = proposalChooser;
     this._layoutResetter = layoutResetter;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let filterPrefSize,
       htmlContainer = HtmlComponent.get($container),
       htmlComp = HtmlComponent.get($container.children(this._layoutResetter.cssSelector)),
@@ -46,7 +49,7 @@ export default class ProposalChooserLayout extends AbstractLayout {
    * in a way the DIV does not limit the size of the table/tree. Thus we can read the preferred
    * size of the table/tree. After that the original width and height is restored.
    */
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let oldDisplay, prefSize, modelSize, statusSize, filterPrefSize,
       pcWidth, pcHeight,
       htmlComp = this._proposalChooser.htmlComp,
@@ -54,7 +57,7 @@ export default class ProposalChooserLayout extends AbstractLayout {
       filter = this._proposalChooser.activeFilterGroup,
       $parent = $container.parent();
 
-    modelSize = this._proposalChooser.model.htmlComp.prefSize(options);
+    modelSize = this._proposalChooser.content.htmlComp.prefSize(options);
     prefSize = modelSize;
     scrollbars.storeScrollPositions($container, this._proposalChooser.session);
 

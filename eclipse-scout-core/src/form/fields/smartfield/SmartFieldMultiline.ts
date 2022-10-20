@@ -8,17 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, fields, graphics, HtmlComponent, SmartField, SmartFieldLayout, SmartFieldMultilineLayout} from '../../../index';
+import {arrays, fields, graphics, HtmlComponent, Rectangle, SmartField, SmartFieldLayout, SmartFieldMultilineLayout} from '../../../index';
 
-export default class SmartFieldMultiline extends SmartField {
+export default class SmartFieldMultiline<TValue> extends SmartField<TValue> {
+  protected _$multilineLines: JQuery;
 
   constructor() {
     super();
-    this.options;
-    this._$multilineLines;
+    this._$multilineLines = null;
   }
 
-  _render() {
+  protected override _render() {
     let $input, htmlComp;
 
     this.addContainer(this.$parent, 'smart-field has-icon', new SmartFieldLayout(this));
@@ -49,7 +49,7 @@ export default class SmartFieldMultiline extends SmartField {
     this.addStatus();
   }
 
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     this._$multilineLines.setEnabled(this.enabledComputed);
   }
@@ -59,7 +59,7 @@ export default class SmartFieldMultiline extends SmartField {
    * Otherwise it would be impossible for the user to select the text. That's why we cannot use the
    * mousedown event here too.
    */
-  _onMultilineLinesClick(event) {
+  protected _onMultilineLinesClick(event: JQuery.ClickEvent) {
     if (this.enabledComputed) {
       let selection = this.$field.window(true).getSelection();
       if (!selection.toString()) {
@@ -68,7 +68,7 @@ export default class SmartFieldMultiline extends SmartField {
     }
   }
 
-  _renderDisplayText() {
+  protected override _renderDisplayText() {
     super._renderDisplayText();
     let additionalLines = this.additionalLines();
     if (additionalLines) {
@@ -78,19 +78,19 @@ export default class SmartFieldMultiline extends SmartField {
     }
   }
 
-  _getInputBounds() {
+  protected _getInputBounds(): Rectangle {
     let fieldBounds = graphics.offsetBounds(this.$fieldContainer),
       textFieldBounds = graphics.offsetBounds(this.$field);
     fieldBounds.height = textFieldBounds.height;
     return fieldBounds;
   }
 
-  _renderFocused() {
+  protected override _renderFocused() {
     super._renderFocused();
     this._$multilineLines.toggleClass('focused', this.focused);
   }
 
-  _updateErrorStatusClasses(statusClass, hasStatus) {
+  protected override _updateErrorStatusClasses(statusClass: string, hasStatus: boolean) {
     super._updateErrorStatusClasses(statusClass, hasStatus);
     this._updateErrorStatusClassesOnElement(this._$multilineLines, statusClass, hasStatus);
   }

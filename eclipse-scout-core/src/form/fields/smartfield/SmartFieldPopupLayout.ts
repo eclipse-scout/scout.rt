@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, graphics, HtmlEnvironment, PopupLayout, SmartFieldPopup} from '../../../index';
+import {Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, HtmlEnvironment, PopupLayout, SmartFieldPopup} from '../../../index';
 
 /**
  * The popup layout is different from other layouts, since it can determine its own size
@@ -20,15 +20,18 @@ import {Dimension, graphics, HtmlEnvironment, PopupLayout, SmartFieldPopup} from
  * The proposal-chooser DIV is not always present.
  */
 export default class SmartFieldPopupLayout extends PopupLayout {
+  declare popup: SmartFieldPopup<any>;
 
-  constructor(popup) {
+  animating: boolean;
+
+  constructor(popup: SmartFieldPopup<any>) {
     super(popup);
 
     this.animating = false;
     this.doubleCalcPrefSize = false;
   }
 
-  layout($container) {
+  override layout($container: JQuery) {
     let size, popupSize,
       htmlProposalChooser = this._htmlProposalChooser();
 
@@ -71,16 +74,14 @@ export default class SmartFieldPopupLayout extends PopupLayout {
         this.popup.htmlComp.$comp.addClassForAnimation('animate-open');
         this.popup.htmlComp.$comp.oneAnimationEnd(() => {
           this.animating = false;
+          // @ts-ignore
           this.popup._onAnimationEnd();
         });
       });
     }
   }
 
-  /**
-   * @override AbstractLayout.js
-   */
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
     let prefSize,
       htmlProposalChooser = this._htmlProposalChooser(),
       fieldBounds = graphics.offsetBounds(this.popup.smartField.$field);
@@ -104,7 +105,7 @@ export default class SmartFieldPopupLayout extends PopupLayout {
     return prefSize;
   }
 
-  _htmlProposalChooser() {
+  protected _htmlProposalChooser(): HtmlComponent {
     let proposalChooser = this.popup.proposalChooser;
     if (!proposalChooser) {
       return null;
@@ -112,7 +113,7 @@ export default class SmartFieldPopupLayout extends PopupLayout {
     return proposalChooser.htmlComp;
   }
 
-  _maxWindowSize() {
+  protected _maxWindowSize(): number {
     return this.popup.$container.window().width() - (2 * this.popup.windowPaddingX);
   }
 }

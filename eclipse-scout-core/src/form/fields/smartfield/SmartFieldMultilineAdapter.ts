@@ -15,5 +15,4 @@ export default class SmartFieldMultilineAdapter extends SmartFieldAdapter {
   constructor() {
     super();
   }
-
 }

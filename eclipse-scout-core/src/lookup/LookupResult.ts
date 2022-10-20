@@ -28,7 +28,4 @@ export default interface LookupResult<Key> {
   rec?: Key;
 
   exception?: string;
-  // appendResult?: boolean;
-  // uniqueMatch?: boolean;
-  // seqNo?: number;
 }

@@ -70,7 +70,7 @@ export default class TreeBox<TValue> extends LookupBox<TValue> implements TreeBo
     this._valueSyncing = true;
     let valueArray = objects.values(this.tree.nodesMap)
       .filter(node => node.checked)
-      .map((node: TreeBoxTreeNode<TValue>) => node.id);
+      .map((node: TreeBoxTreeNode<TValue>) => node.lookupRow.key);
 
     this.setValue(valueArray);
     this._valueSyncing = false;
@@ -103,7 +103,7 @@ export default class TreeBox<TValue> extends LookupBox<TValue> implements TreeBo
 
         this.uncheckAll(opts);
         objects.values(this.tree.nodesMap).forEach((node: TreeBoxTreeNode<TValue>) => {
-          if (arrays.contains(newValue, node.id)) {
+          if (arrays.contains(newValue, node.lookupRow.key)) {
             this.tree.checkNode(node, true, opts);
           }
         }, this);
@@ -144,11 +144,11 @@ export default class TreeBox<TValue> extends LookupBox<TValue> implements TreeBo
   }
 
   protected _populateTreeRecursive(parentKey: TValue, nodesArray: TreeNode[], lookupRows: LookupRow<TValue>[]) {
-    let node;
+    let node: TreeBoxTreeNode<TValue>;
     lookupRows.forEach(function(lookupRow) {
       if (lookupRow.parentKey === parentKey) {
         node = this._createNode(lookupRow);
-        this._populateTreeRecursive(node.id, node.childNodes, lookupRows);
+        this._populateTreeRecursive(node.lookupRow.key, node.childNodes, lookupRows);
         node.leaf = !node.childNodes.length;
         nodesArray.push(node);
       }
@@ -172,7 +172,6 @@ export default class TreeBox<TValue> extends LookupBox<TValue> implements TreeBo
     let
       node = scout.create(TreeNode, {
         parent: this.tree,
-        id: lookupRow.key,
         text: lookupRow.text,
         lookupRow: lookupRow
       } as TreeNodeModel) as TreeBoxTreeNode<TValue>;
@@ -219,7 +218,6 @@ export default class TreeBox<TValue> extends LookupBox<TValue> implements TreeBo
 }
 
 type TreeBoxTreeNode<TValue> = TreeNode & {
-  id: TValue;
   lookupRow: LookupRow<TValue>;
   active?: boolean;
 };

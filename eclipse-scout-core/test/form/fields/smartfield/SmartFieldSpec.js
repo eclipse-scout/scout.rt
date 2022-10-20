@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -161,14 +161,14 @@ describe('SmartField', () => {
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
       expect(field.$field.val()).toBe('Foo');
-      expect(field.popup.proposalChooser.model.selectedRows.length).toBe(1);
+      expect(field.popup.proposalChooser.content.selectedRows.length).toBe(1);
 
       field.clear();
       jasmine.clock().tick(500);
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
       expect(field.$field.val()).toBe('');
-      expect(field.popup.proposalChooser.model.selectedRows.length).toBe(0);
+      expect(field.popup.proposalChooser.content.selectedRows.length).toBe(0);
     });
 
     it('clears the value, also in embedded mode', () => {
@@ -183,7 +183,7 @@ describe('SmartField', () => {
       expect(field.value).toBe(1);
       expect(field.displayText).toBe('Foo');
       expect(field.$field.text()).toBe('Foo');
-      expect(field.popup._widget.model.selectedRows.length).toBe(1);
+      expect(field.popup._widget.content.selectedRows.length).toBe(1);
 
       field.popup._field.$field.focus();
       field.popup._field.clear();
@@ -191,7 +191,7 @@ describe('SmartField', () => {
       expect(field.popup._field.value).toBe(null);
       expect(field.popup._field.displayText).toBe('');
       expect(field.popup._field.$field.val()).toBe('');
-      expect(field.popup._widget.model.selectedRows.length).toBe(0);
+      expect(field.popup._widget.content.selectedRows.length).toBe(0);
 
       field.popup.close();
       expect(field.value).toBe(null);
@@ -530,7 +530,6 @@ describe('SmartField', () => {
         });
       jasmine.clock().tick(500); // 2 ticks required for promises in StaticLookupCall.js
       jasmine.clock().tick(500);
-      expect(result.empty).toBe(false);
       expect(result.numLookupRows).toBe(1);
       expect(result.lookupRows.length).toBe(2); // 2 because parent row has been added to result
       expect(result.uniqueMatch.text).toBe('Bar');
@@ -993,9 +992,9 @@ describe('SmartField', () => {
       field.$field.val('Bar');
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
-      expect(field.popup.proposalChooser.model.rows[0].cells[0].text).toBe('Bar');
-      expect(field.popup.proposalChooser.model.rows[0].cells[1].text).toBe('Bar column1');
-      expect(field.popup.proposalChooser.model.rows[0].cells[2].text).toBe('Bar column2');
+      expect(field.popup.proposalChooser.content.rows[0].cells[0].text).toBe('Bar');
+      expect(field.popup.proposalChooser.content.rows[0].cells[1].text).toBe('Bar column1');
+      expect(field.popup.proposalChooser.content.rows[0].cells[2].text).toBe('Bar column2');
     });
 
     it('with default lookup column in the middle renders lookup row column in the middle', () => {
@@ -1019,10 +1018,10 @@ describe('SmartField', () => {
       field.$field.val('Bar');
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
-      expect(field.popup.proposalChooser.model.rows[0].cells[0].text).toBe('Bar column1');
-      expect(field.popup.proposalChooser.model.rows[0].cells[1].text).toBe('Bar');
-      expect(field.popup.proposalChooser.model.rows[0].cells[2].text).toBe('Bar column2');
-      expect(field.popup.proposalChooser.model.rows[0].cells[2].cssClass).toBe('css-column2');
+      expect(field.popup.proposalChooser.content.rows[0].cells[0].text).toBe('Bar column1');
+      expect(field.popup.proposalChooser.content.rows[0].cells[1].text).toBe('Bar');
+      expect(field.popup.proposalChooser.content.rows[0].cells[2].text).toBe('Bar column2');
+      expect(field.popup.proposalChooser.content.rows[0].cells[2].cssClass).toBe('css-column2');
     });
   });
 

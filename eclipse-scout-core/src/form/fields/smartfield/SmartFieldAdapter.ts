@@ -8,9 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupFieldAdapter, RemoteLookupCall, scout, strings} from '../../../index';
+import {Event, LookupFieldAdapter, RemoteLookupCall, scout, SmartField, SmartFieldTouchPopup, strings} from '../../../index';
+import {SmartFieldAcceptByTextEvent, SmartFieldAcceptInputEvent} from './SmartFieldEventMap';
+import {SmartFieldLookupResult} from './SmartField';
 
 export default class SmartFieldAdapter extends LookupFieldAdapter {
+  declare widget: SmartField<any>;
 
   constructor() {
     super();
@@ -27,45 +30,48 @@ export default class SmartFieldAdapter extends LookupFieldAdapter {
    */
   static PROPERTIES_ORDER = ['lookupRow', 'value', 'errorStatus', 'displayText'];
 
-  _postCreateWidget() {
+  protected override _postCreateWidget() {
     super._postCreateWidget();
     this.widget.lookupCall = scout.create(RemoteLookupCall, this);
   }
 
-  _syncResult(result) {
+  protected _syncResult(result: SmartFieldLookupResult<any>) {
+    // @ts-ignore
     let executedLookupCall = this.widget._currentLookupCall;
-    if (!executedLookupCall && this.widget.touchMode && this.widget.popup && this.widget.popup._field) {
+    // @ts-ignore
+    if (!executedLookupCall && this.widget.touchMode && this.widget.popup && (this.widget.popup as SmartFieldTouchPopup<any>)._field) {
       // in case lookupCall is executed from within the popup (touch):
-      executedLookupCall = this.widget.popup._field._currentLookupCall;
+      // @ts-ignore
+      executedLookupCall = ((this.widget.popup as SmartFieldTouchPopup<any>)._field as SmartField<any>)._currentLookupCall;
     }
     if (executedLookupCall) {
-      executedLookupCall.resolveLookup(result);
+      (executedLookupCall as RemoteLookupCall<any>).resolveLookup(result);
     }
   }
 
   // When displayText comes from the server we must not call parseAndSetValue here.
-  _syncDisplayText(displayText) {
+  protected override _syncDisplayText(displayText: string) {
     this.widget.setDisplayText(displayText);
   }
 
-  _orderPropertyNamesOnSync(newProperties) {
+  protected override _orderPropertyNamesOnSync(newProperties: Record<string, any>): string[] {
     return Object.keys(newProperties).sort(this._createPropertySortFunc(SmartFieldAdapter.PROPERTIES_ORDER));
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<SmartField<any>>) {
     if (event.type === 'acceptByText') {
-      this._onWidgetAcceptByText(event);
+      this._onWidgetAcceptByText(event as SmartFieldAcceptByTextEvent);
     } else {
       super._onWidgetEvent(event);
     }
   }
 
-  _onWidgetAcceptByText(event) {
+  protected _onWidgetAcceptByText(event: SmartFieldAcceptByTextEvent) {
     this._sendProperty('errorStatus', event.errorStatus);
   }
 
-  _onWidgetAcceptInput(event) {
-    let eventData = {
+  protected override _onWidgetAcceptInput(event: SmartFieldAcceptInputEvent) {
+    let eventData: Partial<SmartFieldAcceptInputEvent> = {
       displayText: event.displayText,
       errorStatus: event.errorStatus
     };
