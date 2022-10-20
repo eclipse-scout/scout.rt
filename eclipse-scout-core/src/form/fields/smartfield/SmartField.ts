@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CodeLookupCall, Device, fields, FormField, InputFieldKeyStrokeContext, keys, LookupCall, MaxLengthHandler, objects, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldLayout, Status, strings, TreeProposalChooser, ValueField} from '../../../index';
+import {
+  arrays, CodeLookupCall, Device, fields, FormField, InputFieldKeyStrokeContext, keys, LookupCall, MaxLengthHandler, objects, QueryBy, scout, SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldLayout, Status, strings,
+  TreeProposalChooser, ValueField
+} from '../../../index';
 import $ from 'jquery';
 
 export default class SmartField extends ValueField {
