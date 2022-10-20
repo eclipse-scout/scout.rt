@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractChartRenderer, ChartEventMap, ChartJsRenderer, ChartLayout, ChartModel, FulfillmentChartRenderer, SalesfunnelChartRenderer, SpeedoChartRenderer, VennChartRenderer} from '../index';
-import {arrays, colorSchemes, EnumObject, Event as ScoutEvent, HtmlComponent, objects, Widget} from '@eclipse-scout/core';
-import {EventMapOf, EventModel} from '@eclipse-scout/core/src/events/EventEmitter';
+import {arrays, colorSchemes, EnumObject, HtmlComponent, objects, Widget} from '@eclipse-scout/core';
 import {ColorScheme} from '@eclipse-scout/core/src/util/colorSchemes';
 import {GreenAreaPosition} from './SpeedoChartRenderer';
 import {ChartConfiguration, LinearScaleOptions, RadialLinearScaleOptions} from 'chart.js';
@@ -378,10 +377,6 @@ export default class Chart extends Widget implements ChartModel {
       data: clickedItem,
       originalEvent
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Chart>>(type: K, eventOrModel?: ScoutEvent | EventModel<EventMapOf<Chart>[K]>): EventMapOf<Chart>[K] {
-    return super.trigger(type, eventOrModel);
   }
 }
 

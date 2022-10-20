@@ -10,7 +10,7 @@
  */
 import {
   Action, AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, ContextMenuKeyStroke, ContextMenuPopup, Desktop, Device, DoubleClickSupport, dragAndDrop,
-  DragAndDropHandler, EnumObject, Event, EventHandler, Filter, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn,
+  DragAndDropHandler, EnumObject, EventHandler, Filter, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn,
   objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
   TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
   TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip,
@@ -24,7 +24,6 @@ import {Comparator, RefModel} from '../types';
 import {StatusOrModel} from '../status/Status';
 import {Alignment} from '../cell/Cell';
 import {DropType} from '../util/dragAndDrop';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {DisplayViewId} from '../tabbox/SimpleTab';
 import {FilterOrFunction} from '../widget/FilterSupport';
 import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
@@ -5507,10 +5506,6 @@ export default class Table extends Widget implements TableModel {
     arrays.ensure(rows || this.rows).forEach(row => {
       row.status = TableRow.Status.NON_CHANGED;
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Table>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Table>[K]>): EventMapOf<Table>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */

@@ -2350,10 +2350,6 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return (this.rendered || this.rendering) && this.$container.isAttached();
   }
 
-  override trigger<K extends string & keyof EventMapOf<Widget>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Widget>[K]>): EventMapOf<Widget>[K] {
-    return super.trigger(type, eventOrModel);
-  }
-
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
   static cssClassAsArray(cssClass: string): string[] {

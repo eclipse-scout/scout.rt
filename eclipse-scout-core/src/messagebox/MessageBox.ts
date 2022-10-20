@@ -15,7 +15,6 @@ import {
 import {StatusSeverity} from '../status/Status';
 import MessageBoxModel from './MessageBoxModel';
 import MessageBoxEventMap from './MessageBoxEventMap';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import TriggeredEvent = JQuery.TriggeredEvent;
 
 export type MessageBoxOption = EnumObject<typeof MessageBox.Buttons>;
@@ -296,10 +295,6 @@ export default class MessageBox extends Widget {
     this.trigger('action', {
       option: option
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<MessageBox>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<MessageBox>[K]>): EventMapOf<MessageBox>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   setDisplayParent(displayParent: DisplayParent) {

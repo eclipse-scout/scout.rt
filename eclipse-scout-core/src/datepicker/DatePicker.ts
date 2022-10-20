@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DateFormat, DatePickerEventMap, DatePickerModel, dates, Device, Event, events, graphics, HtmlComponent, objects, scout, Widget} from '../index';
+import {arrays, DateFormat, DatePickerEventMap, DatePickerModel, dates, Device, events, graphics, HtmlComponent, objects, scout, Widget} from '../index';
 import $ from 'jquery';
 import {SwipeCallbackEvent} from '../util/events';
 import {JQueryMouseWheelEvent} from '../jquery/jquery-scout-types';
 import {OldWheelEvent} from '../types';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export type DatePickerMonth = { viewDate: Date; rendered: boolean; $container: JQuery; $weekendSeparator?: JQuery };
 
@@ -587,10 +586,6 @@ export default class DatePicker extends Widget implements DatePickerModel {
     this.trigger('dateSelect', {
       date: date
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<DatePicker>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<DatePicker>[K]>): EventMapOf<DatePicker>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected _onMouseWheel(event: JQueryMouseWheelEvent<HTMLDivElement>) {

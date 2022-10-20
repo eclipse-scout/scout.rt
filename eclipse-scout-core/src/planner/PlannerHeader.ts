@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, Planner, PlannerHeaderEventMap, Widget} from '../index';
+import {Planner, PlannerHeaderEventMap, Widget} from '../index';
 import $ from 'jquery';
 import {PlannerDisplayMode} from './Planner';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export default class PlannerHeader extends Widget {
   declare eventMap: PlannerHeaderEventMap;
@@ -113,10 +112,6 @@ export default class PlannerHeader extends Widget {
 
   protected _onYearClick(event: JQuery.ClickEvent<HTMLDivElement>) {
     this.trigger('yearClick');
-  }
-
-  override trigger<K extends string & keyof EventMapOf<PlannerHeader>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<PlannerHeader>[K]>): EventMapOf<PlannerHeader>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected _onDisplayModeClick(event: JQuery.ClickEvent<HTMLDivElement>) {

@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Calendar, DateRange, dates, Event, Planner, scout, scrollbars, Widget, YearPanelEventMap, YearPanelModel} from '../index';
+import {Calendar, DateRange, dates, Planner, scout, scrollbars, Widget, YearPanelEventMap, YearPanelModel} from '../index';
 import $ from 'jquery';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {PlannerDisplayMode} from '../planner/Planner';
 
 export default class YearPanel extends Widget implements YearPanelModel {
@@ -238,10 +237,6 @@ export default class YearPanel extends Widget implements YearPanelModel {
     this.trigger('dateSelect', {
       date: this.selectedDate
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<YearPanel>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<YearPanel>[K]>): EventMapOf<YearPanel>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected _onYearDayClick(event: JQuery.ClickEvent<HTMLDivElement>) {

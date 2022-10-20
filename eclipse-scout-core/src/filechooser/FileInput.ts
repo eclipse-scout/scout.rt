@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, dragAndDrop, DragAndDropHandler, Event, FileInputEventMap, FileInputModel, files as fileUtil, Widget} from '../index';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
+import {arrays, dragAndDrop, DragAndDropHandler, FileInputEventMap, FileInputModel, files as fileUtil, Widget} from '../index';
 
 export default class FileInput extends Widget implements FileInputModel {
   declare model: FileInputModel;
@@ -145,10 +144,6 @@ export default class FileInput extends Widget implements FileInputModel {
     this.trigger('change', {
       files: fileArray
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<FileInput>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<FileInput>[K]>): EventMapOf<FileInput>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   upload(): boolean {

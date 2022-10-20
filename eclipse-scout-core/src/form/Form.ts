@@ -14,7 +14,6 @@ import {
 } from '../index';
 import $ from 'jquery';
 import {FormRevealInvalidFieldEvent} from './FormEventMap';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {DisplayViewId} from '../tabbox/SimpleTab';
 import {ValidationResult} from './fields/FormField';
 import {ButtonSystemType} from './fields/button/Button';
@@ -293,10 +292,6 @@ export default class Form extends Widget implements FormModel, DisplayParent {
       askIfNeedSave: this.askIfNeedSave,
       askIfNeedSaveText: this.askIfNeedSaveText
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Form>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Form>[K]>): EventMapOf<Form>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   /**

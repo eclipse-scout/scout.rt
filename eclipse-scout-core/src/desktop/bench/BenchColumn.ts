@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, BenchColumnEventMap, BenchColumnModel, DesktopTabBoxController, Event, EventHandler, FlexboxLayout, FlexboxLayoutData, HtmlComponent, scout, SimpleTabBox, Splitter, strings, Widget, widgets} from '../../index';
+import {arrays, BenchColumnEventMap, BenchColumnModel, DesktopTabBoxController, EventHandler, FlexboxLayout, FlexboxLayoutData, HtmlComponent, scout, SimpleTabBox, Splitter, strings, Widget, widgets} from '../../index';
 import {SimpleTabBoxViewActivateEvent, SimpleTabBoxViewAddEvent, SimpleTabBoxViewDeactivateEvent, SimpleTabBoxViewRemoveEvent} from '../../tabbox/SimpleTabBoxEventMap';
 import BenchRowLayoutData from './layout/BenchRowLayoutData';
 import {DisplayViewId} from '../../tabbox/SimpleTab';
 import {SplitterMoveEvent} from '../../splitter/SplitterEventMap';
-import {EventMapOf, EventModel} from '../../events/EventEmitter';
 import {OutlineContent} from './DesktopBench';
 
 export default class BenchColumn extends Widget implements BenchColumnModel {
@@ -151,10 +150,6 @@ export default class BenchColumn extends Widget implements BenchColumnModel {
     this.trigger('viewDeactivate', {
       view: event.view
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<BenchColumn>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<BenchColumn>[K]>): EventMapOf<BenchColumn>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   activateView(view: OutlineContent) {
