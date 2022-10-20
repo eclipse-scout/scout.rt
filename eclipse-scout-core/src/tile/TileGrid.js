@@ -635,7 +635,8 @@ export default class TileGrid extends Widget {
       placeholders = [];
 
     if (tiles.length > 0) {
-      lastX = tiles[tiles.length - 1].gridData.x;
+      let tile = tiles[tiles.length - 1];
+      lastX = tile.gridData.x + tile.gridData.w - 1;
     } else {
       // If there are no tiles, create one row with placeholders
       lastX = -1;
