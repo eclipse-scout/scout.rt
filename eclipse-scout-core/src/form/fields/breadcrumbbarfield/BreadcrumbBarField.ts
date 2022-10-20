@@ -9,16 +9,21 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {FormField} from '../../../index';
+import {BreadcrumbBar, BreadcrumbBarFieldEventMap, BreadcrumbBarFieldModel, BreadcrumbBarModel, BreadcrumbItem, BreadcrumbItemModel, FormField} from '../../../index';
 
-export default class BreadcrumbBarField extends FormField {
+export default class BreadcrumbBarField extends FormField implements BreadcrumbBarFieldModel {
+  declare model: BreadcrumbBarFieldModel;
+  declare eventMap: BreadcrumbBarFieldEventMap;
+
+  breadcrumbBar: BreadcrumbBar;
+
   constructor() {
     super();
     this.breadcrumbBar = null;
     this._addWidgetProperties(['breadcrumbBar']);
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'breadcrumb-bar-field');
     this.addLabel();
     this.addMandatoryIndicator();
@@ -26,18 +31,18 @@ export default class BreadcrumbBarField extends FormField {
     this._renderBreadcrumbBar();
   }
 
-  setBreadcrumbItems(breadcrumbItems) {
+  setBreadcrumbItems(breadcrumbItems: (BreadcrumbItem | BreadcrumbItemModel) | (BreadcrumbItem | BreadcrumbItemModel)[]) {
     if (!this.breadcrumbBar) {
       return;
     }
     this.breadcrumbBar.setBreadcrumbItems(breadcrumbItems);
   }
 
-  setBreadcrumbBar(breadcrumbBar) {
+  setBreadcrumbBar(breadcrumbBar: BreadcrumbBar | BreadcrumbBarModel) {
     this.setProperty('breadcrumbBar', breadcrumbBar);
   }
 
-  _renderBreadcrumbBar() {
+  protected _renderBreadcrumbBar() {
     if (!this.breadcrumbBar) {
       return;
     }
@@ -46,7 +51,7 @@ export default class BreadcrumbBarField extends FormField {
     this.invalidateLayoutTree();
   }
 
-  _removeBreadcrumbBar() {
+  protected _removeBreadcrumbBar() {
     if (!this.breadcrumbBar) {
       return;
     }

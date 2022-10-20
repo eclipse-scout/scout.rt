@@ -8,43 +8,45 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueFieldAdapter} from '../../../index';
+import {BrowserField, Event, FormFieldAdapter} from '../../../index';
+import {BrowserFieldExternalWindowStateChangeEvent, BrowserFieldMessageEvent} from './BrowserFieldEventMap';
 
-export default class BrowserFieldAdapter extends ValueFieldAdapter {
+export default class BrowserFieldAdapter extends FormFieldAdapter {
+  declare widget: BrowserField;
 
   constructor() {
     super();
     this._addRemoteProperties(['location']);
   }
 
-  _onWidgetMessage(event) {
+  protected _onWidgetMessage(event: BrowserFieldMessageEvent) {
     this._send('postMessage', {
       data: event.data,
       origin: event.origin
     });
   }
 
-  _onWidgetExternalWindowStateChange(event) {
+  protected _onWidgetExternalWindowStateChange(event: BrowserFieldExternalWindowStateChangeEvent) {
     this._send('externalWindowStateChange', {
       windowState: event.windowState
     });
   }
 
-  _onWidgetEvent(event) {
+  protected override _onWidgetEvent(event: Event<BrowserField>) {
     if (event.type === 'message') {
-      this._onWidgetMessage(event);
+      this._onWidgetMessage(event as BrowserFieldMessageEvent);
     } else if (event.type === 'externalWindowStateChange') {
-      this._onWidgetExternalWindowStateChange(event);
+      this._onWidgetExternalWindowStateChange(event as BrowserFieldExternalWindowStateChangeEvent);
     } else {
       super._onWidgetEvent(event);
     }
   }
 
-  _onModelPostMessage(event) {
+  protected _onModelPostMessage(event: any) {
     this.widget.postMessage(event.message, event.targetOrigin);
   }
 
-  onModelAction(event) {
+  override onModelAction(event: any) {
     if (event.type === 'postMessage') {
       this._onModelPostMessage(event);
     } else {
@@ -52,7 +54,7 @@ export default class BrowserFieldAdapter extends ValueFieldAdapter {
     }
   }
 
-  _orderPropertyNamesOnSync(newProperties) {
+  protected override _orderPropertyNamesOnSync(newProperties: Record<string, any>) {
     // IE won't show scrollbars if the location is set before scrollBarEnabled is set to true.
     // Rendering the location again after setting the scrollBarEnabled property as done in IFrame.js doesn't seem to work.
     // It looks like the scrollBarEnabled property cannot be changed anymore once the location is set, even if location is unset and set again.
