@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BreadcrumbItem, BreadcrumbItemModel, WidgetModel} from '../index';
-import {RefModel} from '../types';
+import {BreadcrumbBar, FormFieldEventMap, PropertyChangeEvent} from '../../../index';
 
-export default interface BreadcrumbBarModel extends WidgetModel {
-  breadcrumbItems?: (BreadcrumbItem | RefModel<BreadcrumbItemModel>)[];
+export default interface BreadcrumbBarFieldEventMap extends FormFieldEventMap {
+  'propertyChange:breadcrumbBar': PropertyChangeEvent<BreadcrumbBar>;
 }

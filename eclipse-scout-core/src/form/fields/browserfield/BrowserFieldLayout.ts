@@ -8,17 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldLayout} from '../../../index';
+import {Dimension, FormFieldLayout, HtmlCompPrefSizeOptions} from '../../../index';
 import $ from 'jquery';
+import BrowserField from './BrowserField';
 
 export default class BrowserFieldLayout extends FormFieldLayout {
+  browserField: BrowserField;
 
-  constructor(browserField) {
+  constructor(browserField: BrowserField) {
     super(browserField);
     this.browserField = browserField;
   }
 
-  preferredLayoutSize($container, options) {
+  override preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     let prefSize = super.preferredLayoutSize($container, options);
     if (this._isIFrameReadable()) {
       prefSize.height = this.browserField.$field.contents().height() + // get height of content
@@ -28,7 +30,7 @@ export default class BrowserFieldLayout extends FormFieldLayout {
     return prefSize;
   }
 
-  _isIFrameReadable() {
+  protected _isIFrameReadable(): boolean {
     let field = this.browserField;
     let perms = field.sandboxPermissions;
     if (field.sandboxEnabled && (perms && perms.indexOf('allow-same-origin') === -1)) {
@@ -37,7 +39,7 @@ export default class BrowserFieldLayout extends FormFieldLayout {
       return false;
     }
     try {
-      field.$field[0].contentWindow.document;
+      (field.$field[0] as HTMLIFrameElement).contentWindow.document;
     } catch (e) {
       $.log.isWarnEnabled() && $.log.warn('Access to IFrame denied, cannot read height. Reason: denied by browser');
       return false;
@@ -48,5 +50,4 @@ export default class BrowserFieldLayout extends FormFieldLayout {
     }
     return true;
   }
-
 }
