@@ -23,7 +23,6 @@ export {default as TreeSpecHelper} from './tree/TreeSpecHelper';
 export {default as TableSpecHelper} from './table/TableSpecHelper';
 export {default as FormSpecHelper} from './form/FormSpecHelper';
 export {default as CloneSpecHelper} from './form/fields/CloneSpecHelper';
-export {default as TestBeanField} from './form/fields/beanfield/TestBeanField';
 export {default as TabBoxSpecHelper} from './form/fields/tabbox/TabBoxSpecHelper';
 export {default as OutlineSpecHelper} from './desktop/outline/OutlineSpecHelper';
 export {default as DummyLookupCall} from './lookup/DummyLookupCall';
