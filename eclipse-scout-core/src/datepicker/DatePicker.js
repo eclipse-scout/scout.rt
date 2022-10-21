@@ -23,7 +23,7 @@ export default class DatePicker extends Widget {
     this.selectedDate = null;
     this.dateFormat = null;
     this.viewDate = null;
-    this.allowedDates = null;
+    this.allowedDates = [];
     this.currentMonth = null;
     this.$scrollable = null;
     // Contains the months to be rendered.
@@ -342,7 +342,7 @@ export default class DatePicker extends Widget {
     let date = this.preselectedDate;
 
     if (this.selectedDate) {
-      if (this.allowedDates) {
+      if (this.allowedDates.length > 0) {
         date = this._findNextAllowedDate(years, months, days);
       } else {
         date = dates.shift(this.selectedDate, years, months, days);
@@ -391,16 +391,12 @@ export default class DatePicker extends Widget {
 
   _isDateAllowed(date) {
     // when allowedDates is empty or not set, any date is allowed
-    if (!this.allowedDates || this.allowedDates.length === 0) {
+    if (this.allowedDates.length === 0) {
       return true;
     }
     // when allowedDates is set, only dates contained in this array are allowed
-    let allowedDateAsTimestamp,
-      dateAsTimestamp = date.getTime();
-    return this.allowedDates.some(allowedDate => {
-      allowedDateAsTimestamp = allowedDate.getTime();
-      return allowedDateAsTimestamp === dateAsTimestamp;
-    });
+    let dateAsTimestamp = dates.trunc(date).getTime();
+    return this.allowedDates.some(allowedDate => allowedDate.getTime() === dateAsTimestamp);
   }
 
   _build$DateBox(viewDate) {

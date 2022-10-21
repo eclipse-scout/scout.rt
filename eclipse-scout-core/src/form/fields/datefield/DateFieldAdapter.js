@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, dates, ParsingFailedStatus, ValueFieldAdapter} from '../../../index';
+import {App, arrays, DateField, dates, objects, ParsingFailedStatus, ValueFieldAdapter} from '../../../index';
 
 export default class DateFieldAdapter extends ValueFieldAdapter {
 
@@ -17,13 +17,6 @@ export default class DateFieldAdapter extends ValueFieldAdapter {
   }
 
   static PROPERTIES_ORDER = ['hasTime', 'hasDate'];
-
-  /**
-   * @override
-   */
-  _initProperties(model) {
-    super._initProperties(model);
-  }
 
   /**
    * @override
@@ -64,4 +57,21 @@ export default class DateFieldAdapter extends ValueFieldAdapter {
     return Object.keys(newProperties).sort(this._createPropertySortFunc(DateFieldAdapter.PROPERTIES_ORDER));
   }
 
+  static isDateAllowedRemote(date) {
+    if (!this.modelAdapter) {
+      return this.isDateAllowedOrig(date);
+    }
+    // Server will take care of it
+    return true;
+  }
+
+  static modifyPrototype() {
+    if (!App.get().remote) {
+      return;
+    }
+
+    objects.replacePrototypeFunction(DateField, 'isDateAllowed', DateFieldAdapter.isDateAllowedRemote, true);
+  }
 }
+
+App.addListener('bootstrap', DateFieldAdapter.modifyPrototype);

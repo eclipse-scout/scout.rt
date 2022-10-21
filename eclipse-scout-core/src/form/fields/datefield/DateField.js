@@ -16,6 +16,7 @@ export default class DateField extends ValueField {
   constructor() {
     super();
 
+    this.allowedDates = [];
     this.popup = null;
     this.autoDate = null;
     this.dateDisplayText = null;
@@ -438,11 +439,24 @@ export default class DateField extends ValueField {
     if (!(value instanceof Date)) {
       throw this.session.text(this.invalidValueMessageKey);
     }
+
+    if (!this.isDateAllowed(value)) {
+      throw this.session.text('DateIsNotAllowed');
+    }
+
     if (!this.hasDate && !this.value) {
       // truncate to 01.01.1970 if no date was entered before. Otherwise preserve date part (important for toggling hasDate on the fly)
       value = dates.combineDateTime(null, value);
     }
     return value;
+  }
+
+  isDateAllowed(date) {
+    if (!date || this.allowedDates.length === 0 || this.embedded) { // in embedded mode, main date field must take care of validation, otherwise error status won't be shown
+      return true;
+    }
+    let dateAsTimestamp = dates.trunc(date).getTime();
+    return this.allowedDates.some(allowedDate => allowedDate.getTime() === dateAsTimestamp);
   }
 
   _valueEquals(valueA, valueB) {
@@ -458,15 +472,19 @@ export default class DateField extends ValueField {
     this._setProperty('autoDate', autoDate);
   }
 
+  setAllowedDates(allowedDates) {
+    this.setProperty('allowedDates', allowedDates);
+  }
+
   _setAllowedDates(allowedDates) {
-    if (Array.isArray(allowedDates)) {
-      allowedDates = allowedDates.map(date => {
-        return dates.ensure(date);
-      });
-      this._setProperty('allowedDates', allowedDates);
-    } else {
-      this._setProperty('allowedDates', null);
-    }
+    let truncDates = [];
+    arrays.ensure(allowedDates).forEach(date => {
+      if (date) {
+        truncDates.push(dates.trunc(dates.ensure(date)));
+      }
+    });
+    truncDates = truncDates.sort(dates.compare);
+    this._setProperty('allowedDates', truncDates);
   }
 
   /**
