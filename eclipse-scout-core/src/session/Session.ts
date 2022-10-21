@@ -1120,9 +1120,9 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     messageBox.render($entryPoint);
   }
 
-  uploadFiles(target: { id: string }, files: (File & { scoutName?: string })[], uploadProperties?: Record<string, string | Blob>, maxTotalSize?: number, allowedTypes?: string[]): boolean {
+  uploadFiles(target: { id: string }, files: BlobWithName[], uploadProperties?: Record<string, string | Blob>, maxTotalSize?: number, allowedTypes?: string[]): boolean {
     let formData = new FormData(),
-      acceptedFiles: File[] = [];
+      acceptedFiles: Blob[] = [];
 
     if (uploadProperties) {
       $.each(uploadProperties, (key, value) => {
@@ -1137,7 +1137,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
          * - Some Browsers (e.g. Edge) handle an empty string as filename as if the filename is not set and therefore introduce a default filename like 'blob'.
          *   To counter this, we introduce a empty filename string. The string consists of characters that can not occur in regular filenames, to prevent collisions.
          */
-        let filename = scout.nvl(value.scoutName, value.name, Session.EMPTY_UPLOAD_FILENAME);
+        let filename = scout.nvl(value.scoutName, value.name, Session.EMPTY_UPLOAD_FILENAME) as string;
         formData.append('files', value, filename);
         acceptedFiles.push(value);
       }
@@ -1715,3 +1715,8 @@ export interface FatalMessageOptions {
   cancelButtonText?: string;
   cancelButtonAction?: () => void;
 }
+
+export type BlobWithName = Blob & {
+  scoutName?: string;
+  name?: string;
+};

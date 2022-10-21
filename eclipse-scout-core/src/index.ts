@@ -660,6 +660,7 @@ export {default as CheckBoxFieldEventMap} from './form/fields/checkbox/CheckBoxF
 export {default as CheckBoxFieldAdapter} from './form/fields/checkbox/CheckBoxFieldAdapter';
 export {default as CheckBoxToggleKeyStroke} from './form/fields/checkbox/CheckBoxToggleKeyStroke';
 export {default as ClipboardField} from './form/fields/clipboardfield/ClipboardField';
+export {default as ClipboardFieldModel} from './form/fields/clipboardfield/ClipboardFieldModel';
 export {default as ClipboardFieldAdapter} from './form/fields/clipboardfield/ClipboardFieldAdapter';
 export {default as ColorField} from './form/fields/colorfield/ColorField';
 export {default as ColorFieldAdapter} from './form/fields/colorfield/ColorFieldAdapter';
