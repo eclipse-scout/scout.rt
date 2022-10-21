@@ -111,7 +111,7 @@ export default class DragAndDropHandler {
   /**
    * @throws {DropValidationErrorMessage} validationErrorMessage
    */
-  private _validateFiles(files: File[]) {
+  private _validateFiles(files: Blob | Blob[]) {
     if (!this.dropMaximumSize) {
       return;
     }
