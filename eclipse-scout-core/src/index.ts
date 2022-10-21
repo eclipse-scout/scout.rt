@@ -697,6 +697,8 @@ export {default as ImageFieldEventMap} from './form/fields/imagefield/ImageField
 export {default as ImageFieldAdapter} from './form/fields/imagefield/ImageFieldAdapter';
 export {default as ImageFieldLayout} from './form/fields/imagefield/ImageFieldLayout';
 export {default as LabelField} from './form/fields/labelfield/LabelField';
+export {default as LabelFieldModel} from './form/fields/labelfield/LabelFieldModel';
+export {default as LabelFieldEventMap} from './form/fields/labelfield/LabelFieldEventMap';
 export {default as LabelFieldAdapter} from './form/fields/labelfield/LabelFieldAdapter';
 export {default as ListBox} from './form/fields/listbox/ListBox';
 export {default as ListBoxAdapter} from './form/fields/listbox/ListBoxAdapter';
