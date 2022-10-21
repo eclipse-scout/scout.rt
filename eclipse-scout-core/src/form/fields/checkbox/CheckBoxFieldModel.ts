@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default interface KeyStrokeModel {
-  alt?: boolean;
-  ctrl?: boolean;
-  shift?: boolean;
-  which: number[];
+import {ValueFieldModel} from '../../../index';
+
+export default interface CheckBoxFieldModel extends ValueFieldModel<boolean> {
+  triStateEnabled?: boolean;
+  wrapText?: boolean;
+  keyStroke?: string;
 }

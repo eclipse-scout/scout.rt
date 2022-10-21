@@ -1,16 +1,27 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxToggleKeyStroke, Device, fields, KeyStrokeContext, styles, tooltips, ValueField} from '../../../index';
+import {CheckBoxFieldEventMap, CheckBoxFieldModel, CheckBoxToggleKeyStroke, Device, fields, KeyStrokeContext, styles, tooltips, ValueField} from '../../../index';
+import {AddCellEditorFieldCssClassesOptions} from '../FormField';
 
-export default class CheckBoxField extends ValueField {
+export default class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldModel {
+  declare model: CheckBoxFieldModel;
+  declare eventMap: CheckBoxFieldEventMap;
+
+  triStateEnabled: boolean;
+  wrapText: boolean;
+  keyStroke: string;
+  checkBoxKeyStroke: CheckBoxToggleKeyStroke;
+  formKeyStrokeContext: KeyStrokeContext;
+  $checkBox: JQuery;
+  $checkBoxLabel: JQuery;
 
   constructor() {
     super();
@@ -19,20 +30,16 @@ export default class CheckBoxField extends ValueField {
     this.wrapText = false;
     this.keyStroke = null;
     this.checkBoxKeyStroke = new CheckBoxToggleKeyStroke(this);
-
     this.$checkBox = null;
     this.$checkBoxLabel = null;
   }
 
-  _init(model) {
+  protected override _init(model: CheckBoxFieldModel) {
     super._init(model);
     this._setKeyStroke(this.keyStroke);
   }
 
-  /**
-   * @override
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
     this.keyStrokeContext.registerKeyStroke(new CheckBoxToggleKeyStroke(this));
@@ -41,7 +48,7 @@ export default class CheckBoxField extends ValueField {
     this.formKeyStrokeContext = new KeyStrokeContext();
     this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
     this.formKeyStrokeContext.registerKeyStroke(this.checkBoxKeyStroke);
-    this.formKeyStrokeContext.$bindTarget = function() {
+    this.formKeyStrokeContext.$bindTarget = () => {
       // use form if available
       let form = this.getForm();
       if (form) {
@@ -49,10 +56,10 @@ export default class CheckBoxField extends ValueField {
       }
       // use desktop otherwise
       return this.session.desktop.$container;
-    }.bind(this);
+    };
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'check-box-field');
     this.addLabel();
     this.addMandatoryIndicator();
@@ -76,116 +83,101 @@ export default class CheckBoxField extends ValueField {
     this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderValue();
     this._renderWrapText();
   }
 
-  _remove() {
+  protected override _remove() {
     tooltips.uninstall(this.$checkBoxLabel);
     this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
     super._remove();
   }
 
-  _renderDisplayText() {
+  protected override _renderDisplayText() {
     // NOP
   }
 
-  setValue(value) {
+  override setValue(value: boolean) {
     this.setProperty('value', value);
   }
 
   /**
    * The value may be false, true (and null in tri-state mode)
    */
-  _renderValue() {
+  protected _renderValue() {
     this.$fieldContainer.toggleClass('checked', this.value === true);
     this.$checkBox.toggleClass('checked', this.value === true);
     this.$checkBox.toggleClass('undefined', this.triStateEnabled && this.value !== true && this.value !== false);
   }
 
-  /**
-   * @override
-   */
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     this.$checkBox
       .setTabbable(this.enabledComputed && !Device.get().supportsOnlyTouch())
       .setEnabled(this.enabledComputed);
   }
 
-  setTriStateEnabled(triStateEnabled) {
+  setTriStateEnabled(triStateEnabled: boolean) {
     this.setProperty('triStateEnabled', triStateEnabled);
     if (this.rendered) {
       this._renderValue();
     }
   }
 
-  /**
-   * @override
-   */
-  _renderLabel() {
+  protected override _renderLabel() {
     this.$checkBoxLabel.contentOrNbsp(this.labelHtmlEnabled, this.label, 'empty');
     this._renderEmptyLabel();
   }
 
-  /**
-   * @override
-   */
-  _renderFont() {
+  protected override _renderFont() {
     styles.legacyFont(this, this.$fieldContainer);
     // Changing the font may enlarge or shrink the field (e.g. set the style to bold makes the text bigger) -> invalidate layout
     this.invalidateLayoutTree();
   }
 
-  /**
-   * @override
-   */
-  _renderForegroundColor() {
+  protected override _renderForegroundColor() {
     styles.legacyForegroundColor(this, this.$fieldContainer);
   }
 
-  /**
-   * @override
-   */
-  _renderBackgroundColor() {
+  protected override _renderBackgroundColor() {
     styles.legacyBackgroundColor(this, this.$fieldContainer);
   }
 
-  _renderGridData() {
+  protected override _renderGridData() {
     super._renderGridData();
     this.updateInnerAlignment({
       useHorizontalAlignment: true
     });
   }
 
-  _renderGridDataHints() {
+  protected override _renderGridDataHints() {
     super._renderGridDataHints();
     this.updateInnerAlignment({
       useHorizontalAlignment: true
     });
   }
 
-  setKeyStroke(keyStroke) {
+  setKeyStroke(keyStroke: string) {
     this.setProperty('keyStroke', keyStroke);
   }
 
-  _setKeyStroke(keyStroke) {
+  protected _setKeyStroke(keyStroke: string) {
     this._setProperty('keyStroke', keyStroke);
     this.checkBoxKeyStroke.parseAndSetKeyStroke(this.keyStroke);
   }
 
-  setWrapText(wrapText) {
+  setWrapText(wrapText: boolean) {
     this.setProperty('wrapText', wrapText);
   }
 
-  _renderWrapText() {
+  protected _renderWrapText() {
     this.$checkBoxLabel.toggleClass('white-space-nowrap', !this.wrapText);
     this.invalidateLayoutTree();
   }
 
-  acceptInput(whileTyping, forceSend) {
+  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
     // NOP
   }
 
@@ -206,12 +198,12 @@ export default class CheckBoxField extends ValueField {
     }
   }
 
-  prepareForCellEdit(opts) {
+  override prepareForCellEdit(opts?: AddCellEditorFieldCssClassesOptions) {
     super.prepareForCellEdit(opts);
     this.$checkBoxLabel.hide();
   }
 
-  _onMouseDown(event) {
+  protected _onMouseDown(event: JQuery.MouseDownEvent) {
     if (!this.enabledComputed) {
       return;
     }

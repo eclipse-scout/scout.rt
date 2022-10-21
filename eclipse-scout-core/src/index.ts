@@ -655,6 +655,8 @@ export {default as CalendarFieldAdapter} from './form/fields/calendarfield/Calen
 export {default as CarouselField} from './form/fields/carousel/CarouselField';
 export {default as CarouselFieldModel} from './form/fields/carousel/CarouselFieldModel';
 export {default as CheckBoxField} from './form/fields/checkbox/CheckBoxField';
+export {default as CheckBoxFieldModel} from './form/fields/checkbox/CheckBoxFieldModel';
+export {default as CheckBoxFieldEventMap} from './form/fields/checkbox/CheckBoxFieldEventMap';
 export {default as CheckBoxFieldAdapter} from './form/fields/checkbox/CheckBoxFieldAdapter';
 export {default as CheckBoxToggleKeyStroke} from './form/fields/checkbox/CheckBoxToggleKeyStroke';
 export {default as ClipboardField} from './form/fields/clipboardfield/ClipboardField';
