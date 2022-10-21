@@ -8,10 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '../../../index';
+import {Form, FormFieldEventMap, PropertyChangeEvent} from '../../../index';
 
-export default class WrappedFormFieldAdapter extends FormFieldAdapter {
-  constructor() {
-    super();
-  }
+export default interface WrappedFormFieldEventMap extends FormFieldEventMap {
+  'propertyChange:innerForm': PropertyChangeEvent<Form>;
 }

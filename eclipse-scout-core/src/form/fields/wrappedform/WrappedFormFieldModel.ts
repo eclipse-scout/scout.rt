@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '../../../index';
+import {Form, FormFieldModel, FormModel} from '../../../index';
+import {RefModel} from '../../../types';
 
-export default class WrappedFormFieldAdapter extends FormFieldAdapter {
-  constructor() {
-    super();
-  }
+export default interface WrappedFormFieldModel extends FormFieldModel {
+  innerForm: Form | RefModel<FormModel>;
+  initialFocusEnabled: boolean;
 }

@@ -829,6 +829,8 @@ export {default as WizardProgressField} from './form/fields/wizard/WizardProgres
 export {default as WizardProgressFieldAdapter} from './form/fields/wizard/WizardProgressFieldAdapter';
 export {default as WizardProgressFieldLayout} from './form/fields/wizard/WizardProgressFieldLayout';
 export {default as WrappedFormField} from './form/fields/wrappedform/WrappedFormField';
+export {default as WrappedFormFieldModel} from './form/fields/wrappedform/WrappedFormFieldModel';
+export {default as WrappedFormFieldEventMap} from './form/fields/wrappedform/WrappedFormFieldEventMap';
 export {default as WrappedFormFieldAdapter} from './form/fields/wrappedform/WrappedFormFieldAdapter';
 export {default as Switch} from './switch/Switch';
 export {default as SwitchModel} from './switch/SwitchModel';
