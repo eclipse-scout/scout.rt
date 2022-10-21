@@ -8,16 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, FileInput, FormField, HtmlComponent, Icon, ImageFieldLayout, scout, scrollbars, SingleLayout} from '../../../index';
+import {arrays, Device, EnumObject, Event, FileInput, FormField, HtmlComponent, Icon, ImageFieldEventMap, ImageFieldLayout, ImageFieldModel, scout, scrollbars, SingleLayout} from '../../../index';
 import $ from 'jquery';
+import {DragAndDropOptions} from '../../../util/dragAndDrop';
+import {FileInputChangeEvent} from '../../../filechooser/FileInputEventMap';
 
-export default class ImageField extends FormField {
+export default class ImageField extends FormField implements ImageFieldModel {
+  declare model: ImageFieldModel;
+  declare eventMap: ImageFieldEventMap;
+
+  autoFit: boolean;
+  imageUrl: string;
+  scrollBarEnabled: boolean;
+  uploadEnabled: boolean;
+  acceptTypes: string;
+  maximumUploadSize: number;
+  icon: Icon;
+  fileInput: FileInput;
+
+  protected _clickHandler: (event: JQuery.ClickEvent) => void;
 
   constructor() {
     super();
 
     this.defaultMenuTypes = [...this.defaultMenuTypes, ImageField.MenuTypes.ImageUrl, ImageField.MenuTypes.Null];
-
     this.autoFit = false;
     this.imageUrl = null;
     this.scrollBarEnabled = false;
@@ -31,9 +45,9 @@ export default class ImageField extends FormField {
   static MenuTypes = {
     Null: 'ImageField.Null',
     ImageUrl: 'ImageField.ImageUrl'
-  };
+  } as const;
 
-  _init(model) {
+  protected override _init(model: ImageFieldModel) {
     super._init(model);
 
     this.resolveIconIds(['imageUrl']);
@@ -47,7 +61,7 @@ export default class ImageField extends FormField {
     this.icon.on('error', this._onImageError.bind(this));
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'image-field', new ImageFieldLayout(this));
     this.addFieldContainer(this.$parent.makeDiv());
 
@@ -61,14 +75,14 @@ export default class ImageField extends FormField {
     this.addStatus();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderScrollBarEnabled();
     this._renderImageUrl();
     this._renderUploadEnabled();
   }
 
-  _remove() {
+  protected override _remove() {
     super._remove();
     this._clickHandler = null;
     if (this.fileInput) {
@@ -77,47 +91,47 @@ export default class ImageField extends FormField {
     }
   }
 
-  _getDragAndDropHandlerOptions() {
+  protected override _getDragAndDropHandlerOptions(): DragAndDropOptions {
     let options = super._getDragAndDropHandlerOptions();
     options.container = () => this.$fieldContainer;
     return options;
   }
 
-  setImageUrl(imageUrl) {
+  setImageUrl(imageUrl: string) {
     this.setProperty('imageUrl', imageUrl);
   }
 
-  _setImageUrl(imageUrl) {
+  protected _setImageUrl(imageUrl: string) {
     this._setProperty('imageUrl', imageUrl);
     this.icon.setIconDesc(imageUrl);
     this._updateMenus();
   }
 
-  _renderImageUrl() {
+  protected _renderImageUrl() {
     let hasImageUrl = !!this.imageUrl;
     this.$fieldContainer.toggleClass('has-image', hasImageUrl);
     this.$container.toggleClass('has-image', hasImageUrl);
     scrollbars.update(this.$fieldContainer);
   }
 
-  setAutoFit(autoFit) {
+  setAutoFit(autoFit: boolean) {
     this.setProperty('autoFit', autoFit);
   }
 
-  _setAutoFit(autoFit) {
+  protected _setAutoFit(autoFit: boolean) {
     this._setProperty('autoFit', autoFit);
     this.icon.setAutoFit(autoFit);
   }
 
-  _renderAutoFit() {
+  protected _renderAutoFit() {
     scrollbars.update(this.$fieldContainer);
   }
 
-  setScrollBarEnabled(scrollBarEnabled) {
+  setScrollBarEnabled(scrollBarEnabled: boolean) {
     this.setProperty('scrollBarEnabled', scrollBarEnabled);
   }
 
-  _renderScrollBarEnabled() {
+  protected _renderScrollBarEnabled() {
     // Note: Inner alignment has to be updated _before_ installing the scrollbar, because the inner
     // alignment uses absolute positioning, which confuses the scrollbar calculations.
     this._updateInnerAlignment();
@@ -129,45 +143,42 @@ export default class ImageField extends FormField {
     }
   }
 
-  /**
-   * @override
-   */
-  get$Scrollable() {
+  override get$Scrollable(): JQuery {
     return this.$fieldContainer;
   }
 
-  _renderGridData() {
+  protected override _renderGridData() {
     super._renderGridData();
     this._updateInnerAlignment();
   }
 
-  _renderGridDataHints() {
+  protected override _renderGridDataHints() {
     super._renderGridDataHints();
     this._updateInnerAlignment();
   }
 
-  _updateInnerAlignment() {
+  protected _updateInnerAlignment() {
     // Enable inner alignment only when scrollbars are disabled
     this.updateInnerAlignment({
-      useHorizontalAlignment: (!this.scrollBarEnabled),
-      useVerticalAlignment: (!this.scrollBarEnabled)
+      useHorizontalAlignment: !this.scrollBarEnabled,
+      useVerticalAlignment: !this.scrollBarEnabled
     });
   }
 
-  _renderEnabled() {
+  protected override _renderEnabled() {
     super._renderEnabled();
     this._updateUploadEnabled();
   }
 
-  setUploadEnabled(uploadEnabled) {
+  setUploadEnabled(uploadEnabled: boolean) {
     this.setProperty('uploadEnabled', uploadEnabled);
   }
 
-  _renderUploadEnabled() {
+  protected _renderUploadEnabled() {
     this._updateUploadEnabled();
   }
 
-  _updateUploadEnabled() {
+  protected _updateUploadEnabled() {
     let enabled = this.enabledComputed && this.uploadEnabled;
     this.$fieldContainer.toggleClass('clickable', enabled);
     if (enabled) {
@@ -197,7 +208,7 @@ export default class ImageField extends FormField {
     }
   }
 
-  _getCurrentMenuTypes() {
+  protected override _getCurrentMenuTypes(): string[] {
     if (this.imageUrl) {
       return [...super._getCurrentMenuTypes(), ImageField.MenuTypes.ImageUrl];
     }
@@ -209,23 +220,23 @@ export default class ImageField extends FormField {
    * this would trigger our own click handler again. We prevent recursion by
    * checking the click target.
    */
-  _onClickUpload(event) {
+  protected _onClickUpload(event: JQuery.ClickEvent) {
     if ($(event.target).isOrHas(this.$field)) {
       this.fileInput.browse();
     }
   }
 
-  _onFileChange(event) {
+  protected _onFileChange(event: FileInputChangeEvent) {
     this.trigger('fileUpload', {
       file: arrays.first(event.files)
     });
   }
 
-  _onImageLoad(event) {
+  protected _onImageLoad(event: Event<Icon>) {
     this._onIconUpdated();
   }
 
-  _onImageError(event) {
+  protected _onImageError(event: Event<Icon>) {
     this._onIconUpdated();
   }
 
@@ -236,8 +247,10 @@ export default class ImageField extends FormField {
    * <p>
    * Override this method if a sub-class of ImageField.js needs to update its DOM too.
    */
-  _onIconUpdated() {
+  protected _onIconUpdated() {
     scrollbars.update(this.$fieldContainer);
     this.$field = this.icon.$container;
   }
 }
+
+export type ImageFieldMenuTypes = EnumObject<typeof ImageField.MenuTypes>;
