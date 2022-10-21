@@ -15,6 +15,12 @@ export default interface ImageFieldModel extends FormFieldModel {
   imageUrl?: string;
   scrollBarEnabled?: boolean;
   uploadEnabled?: boolean;
+  /**
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept
+   */
   acceptTypes?: string;
+  /**
+   * Default is {@link FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE}.
+   */
   maximumUploadSize?: number;
 }

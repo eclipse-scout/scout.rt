@@ -12,7 +12,7 @@ import {Widget, WidgetModel} from '../index';
 
 export default interface FileInputModel extends WidgetModel {
   /**
-   * By default accept all
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept
    */
   acceptTypes?: string;
   /**

@@ -11,7 +11,15 @@
 import {ValueFieldModel} from '../../../index';
 
 export default interface ClipboardFieldModel extends ValueFieldModel<string> {
+  /**
+   * Configures the allowed mime types for the clipboard paste event.
+   * Default is null which does not restrict the allowed types.
+   * @see https://developer.mozilla.org/en-US/docs/Glossary/MIME_type
+   */
   allowedMimeTypes?: string[];
+  /**
+   * Configures the maximum size for a clipboard paste event. Default is no limit.
+   */
   maximumSize?: number;
   readOnly?: boolean;
 }

@@ -11,6 +11,13 @@
 import {ValueFieldModel} from '../../../index';
 
 export default interface CheckBoxFieldModel extends ValueFieldModel<boolean> {
+  /**
+   * <ul>
+   * <li>true: the check box can have a value of true, false and null. Null is the third state that represents "undefined".
+   * <li>false: the check box can have a value of true and false. The value is never null (setting the value to null will automatically convert it to false).
+   * </ul>
+   * The default is value is false.
+   */
   triStateEnabled?: boolean;
   wrapText?: boolean;
   keyStroke?: string;
