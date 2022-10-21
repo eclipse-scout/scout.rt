@@ -650,6 +650,7 @@ export {default as ButtonLayout} from './form/fields/button/ButtonLayout';
 export {default as ButtonAdapter} from './form/fields/button/ButtonAdapter';
 export {default as ButtonKeyStroke} from './form/fields/button/ButtonKeyStroke';
 export {default as CalendarField} from './form/fields/calendarfield/CalendarField';
+export {default as CalendarFieldModel} from './form/fields/calendarfield/CalendarFieldModel';
 export {default as CalendarFieldAdapter} from './form/fields/calendarfield/CalendarFieldAdapter';
 export {default as CarouselField} from './form/fields/carousel/CarouselField';
 export {default as CheckBoxField} from './form/fields/checkbox/CheckBoxField';
