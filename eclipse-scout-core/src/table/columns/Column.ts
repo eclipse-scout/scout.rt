@@ -454,7 +454,7 @@ export default class Column<TValue = string> extends PropertyEventEmitter implem
     }
   }
 
-  isCellEditable(row: TableRow, cell: Cell<TValue>, event: JQuery.MouseUpEvent): boolean {
+  isCellEditable(row: TableRow, cell: Cell<TValue>, event: JQuery.MouseEventBase): boolean {
     return this.table.enabledComputed && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey;
   }
 

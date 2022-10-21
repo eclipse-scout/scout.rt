@@ -489,7 +489,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
       return;
     }
     // @ts-ignore
-    this.table._triggerRowClick(event, this.table.rowsMap[event.tile.rowId], event.mouseButton); // FIXME TS JQuery event is not available here -> original Event cannot be passed -> change signature?
+    this.table._triggerRowClick(event.originalEvent, this.table.rowsMap[event.tile.rowId], event.mouseButton);
   }
 
   protected _onTableRowsSelected(event: TableRowsSelectedEvent) {

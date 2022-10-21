@@ -98,7 +98,7 @@ export interface TableRowActionEvent<TValue = any, T = Table> extends Event<T> {
 }
 
 export interface TableRowClickEvent<TValue = any, T = Table> extends Event<T> {
-  originalEvent: JQuery.MouseUpEvent;
+  originalEvent: JQuery.MouseEventBase;
   row: TableRow;
   mouseButton: number;
   column: Column<TValue>;
