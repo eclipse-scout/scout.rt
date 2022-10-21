@@ -826,6 +826,8 @@ export {default as TreeFieldAdapter} from './form/fields/treefield/TreeFieldAdap
 export {default as TreeFieldEventMap} from './form/fields/treefield/TreeFieldEventMap';
 export {default as TreeFieldModel} from './form/fields/treefield/TreeFieldModel';
 export {default as WizardProgressField} from './form/fields/wizard/WizardProgressField';
+export {default as WizardProgressFieldModel} from './form/fields/wizard/WizardProgressFieldModel';
+export {default as WizardProgressFieldEventMap} from './form/fields/wizard/WizardProgressFieldEventMap';
 export {default as WizardProgressFieldAdapter} from './form/fields/wizard/WizardProgressFieldAdapter';
 export {default as WizardProgressFieldLayout} from './form/fields/wizard/WizardProgressFieldLayout';
 export {default as WrappedFormField} from './form/fields/wrappedform/WrappedFormField';
