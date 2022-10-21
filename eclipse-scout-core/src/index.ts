@@ -671,8 +671,12 @@ export {default as DateFieldEventMap} from './form/fields/datefield/DateFieldEve
 export {default as DateFieldAdapter} from './form/fields/datefield/DateFieldAdapter';
 export {default as DateTimeCompositeLayout} from './form/fields/datefield/DateTimeCompositeLayout';
 export {default as FileChooserButton} from './form/fields/filechooserbutton/FileChooserButton';
+export {default as FileChooserButtonModel} from './form/fields/filechooserbutton/FileChooserButtonModel';
+export {default as FileChooserButtonEventMap} from './form/fields/filechooserbutton/FileChooserButtonEventMap';
 export {default as FileChooserButtonAdapter} from './form/fields/filechooserbutton/FileChooserButtonAdapter';
 export {default as FileChooserField} from './form/fields/filechooserfield/FileChooserField';
+export {default as FileChooserFieldModel} from './form/fields/filechooserfield/FileChooserFieldModel';
+export {default as FileChooserFieldEventMap} from './form/fields/filechooserfield/FileChooserFieldEventMap';
 export {default as FileChooserFieldAdapter} from './form/fields/filechooserfield/FileChooserFieldAdapter';
 export {default as FileChooserFieldBrowseKeyStroke} from './form/fields/filechooserfield/FileChooserFieldBrowseKeyStroke';
 export {default as FileChooserFieldDeleteKeyStroke} from './form/fields/filechooserfield/FileChooserFieldDeleteKeyStroke';
