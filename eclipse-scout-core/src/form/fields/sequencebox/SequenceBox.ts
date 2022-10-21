@@ -8,9 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxField, CompositeField, DateField, dates, FormField, HorizontalGrid, HtmlComponent, LogicalGridData, LogicalGridLayoutConfig, scout, SequenceBoxGridConfig, SequenceBoxLayout} from '../../../index';
+import {
+  CheckBoxField, CompositeField, DateField, dates, EventHandler, FormField, HorizontalGrid, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, PropertyChangeEvent, scout, SequenceBoxEventMap,
+  SequenceBoxGridConfig, SequenceBoxLayout, SequenceBoxModel, ValueField, Widget
+} from '../../../index';
+import {FormFieldSuppressStatus} from '../FormField';
+import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
+import {StatusOrModel} from '../../../status/Status';
+import {CloneOptions} from '../../../widget/Widget';
 
-export default class SequenceBox extends CompositeField {
+export default class SequenceBox extends CompositeField implements SequenceBoxModel {
+  declare model: SequenceBoxModel;
+  declare eventMap: SequenceBoxEventMap;
+
+  layoutConfig: LogicalGridLayoutConfig;
+  fields: FormField[];
+  htmlBody: HtmlComponent;
+  boxErrorStatus: StatusOrModel;
+  boxTooltipText: string;
+  boxMenus: Menu[];
+  boxMenusVisible: boolean;
+
+  protected _lastVisibleField: FormField;
+  protected _isOverwritingStatusFromField: boolean;
+  protected _isErrorStatusOverwritten: boolean;
+  protected _isTooltipTextOverwritten: boolean;
+  protected _isMenusOverwritten: boolean;
+  protected _fieldPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, FormField>>;
+  protected _lastVisibleFieldSuppressStatusHandler: EventHandler<PropertyChangeEvent<FormFieldSuppressStatus>>;
 
   constructor() {
     super();
@@ -23,13 +48,11 @@ export default class SequenceBox extends CompositeField {
     this._lastVisibleFieldSuppressStatusHandler = this._onLastVisibleFieldSuppressStatusChange.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model: SequenceBoxModel) {
     super._init(model);
 
     this._setLayoutConfig(this.layoutConfig);
-
     this._initDateFields();
-
     this.setErrorStatus(this.errorStatus);
     this.setTooltipText(this.tooltipText);
     this.setMenus(this.menus);
@@ -39,9 +62,9 @@ export default class SequenceBox extends CompositeField {
   /**
    * Initialize all DateFields in this SequenceBox with a meaningful autoDate, except fields which already have an autoDate provided by the model.
    */
-  _initDateFields() {
+  protected _initDateFields() {
     let dateFields = this._getDateFields();
-    let newAutoDate = null;
+    let newAutoDate: Date = null;
     for (let i = 0; i < dateFields.length; i++) {
       let currField = dateFields[i];
       if (currField.autoDate) {
@@ -55,8 +78,7 @@ export default class SequenceBox extends CompositeField {
     }
   }
 
-  _render() {
-    let field, i;
+  protected _render() {
     this.addContainer(this.$parent, 'sequence-box');
     this.addLabel();
     this.addField(this.$parent.makeDiv());
@@ -64,8 +86,8 @@ export default class SequenceBox extends CompositeField {
     this._handleStatus();
     this.htmlBody = HtmlComponent.install(this.$field, this.session);
     this.htmlBody.setLayout(this._createBodyLayout());
-    for (i = 0; i < this.fields.length; i++) {
-      field = this.fields[i];
+    for (let i = 0; i < this.fields.length; i++) {
+      let field = this.fields[i];
       field.labelUseUiWidth = true;
       field.on('propertyChange', this._fieldPropertyChangeHandler);
       field.render(this.$field);
@@ -76,16 +98,16 @@ export default class SequenceBox extends CompositeField {
     }
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderLayoutConfig();
   }
 
-  _createBodyLayout() {
+  protected _createBodyLayout(): LogicalGridLayout {
     return new SequenceBoxLayout(this, this.layoutConfig);
   }
 
-  _remove() {
+  protected override _remove() {
     this.fields.forEach(f => f.off('propertyChange', this._fieldPropertyChangeHandler));
     if (this._lastVisibleField) {
       this._lastVisibleField.off('propertyChange:suppressStatus', this._lastVisibleFieldSuppressStatusHandler);
@@ -93,65 +115,63 @@ export default class SequenceBox extends CompositeField {
     super._remove();
   }
 
-  /**
-   * @override
-   */
-  invalidateLogicalGrid(invalidateLayout) {
+  override invalidateLogicalGrid(invalidateLayout?: boolean) {
     super.invalidateLogicalGrid(false);
     if (scout.nvl(invalidateLayout, true) && this.rendered) {
       this.htmlBody.invalidateLayoutTree();
     }
   }
 
-  /**
-   * @override
-   */
-  _setLogicalGrid(logicalGrid) {
+  protected override _setLogicalGrid(logicalGrid: LogicalGrid | string) {
     super._setLogicalGrid(logicalGrid);
     if (this.logicalGrid) {
       this.logicalGrid.setGridConfig(new SequenceBoxGridConfig());
     }
   }
 
-  setLayoutConfig(layoutConfig) {
+  setLayoutConfig(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
     this.setProperty('layoutConfig', layoutConfig);
   }
 
-  _setLayoutConfig(layoutConfig) {
+  protected _setLayoutConfig(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
     if (!layoutConfig) {
       layoutConfig = new LogicalGridLayoutConfig();
     }
     this._setProperty('layoutConfig', LogicalGridLayoutConfig.ensure(layoutConfig));
   }
 
-  _renderLayoutConfig() {
-    this.layoutConfig.applyToLayout(this.htmlBody.layout);
+  protected _renderLayoutConfig() {
+    let layout = this.htmlBody.layout as LogicalGridLayout;
+    this.layoutConfig.applyToLayout(layout);
     if (this.rendered) {
       this.htmlBody.invalidateLayoutTree();
     }
   }
 
-  _onFieldPropertyChange(event) {
-    let visibiltyChanged = (event.propertyName === 'visible');
+  protected _onFieldPropertyChange(event: PropertyChangeEvent<any, FormField>) {
+    let visibilityChanged = (event.propertyName === 'visible');
     if (scout.isOneOf(event.propertyName, ['errorStatus', 'tooltipText', 'visible', 'menus', 'menusVisible'])) {
-      this._handleStatus(visibiltyChanged);
+      this._handleStatus(visibilityChanged);
     }
     if (event.propertyName === 'value') {
-      this._onFieldValueChange(event);
+      this._onFieldValueChange(event as PropertyChangeEvent<any, ValueField<any>>);
     }
   }
 
   /**
-   * Moves the status relevant properties from the last visible field to the sequencebox. This makes sure that the fields inside the sequencebox have the same size.
+   * Moves the status relevant properties from the last visible field to the SequenceBox. This makes sure that the fields inside the SequenceBox have the same size.
    */
-  _handleStatus(visibilityChanged) {
+  protected _handleStatus(visibilityChanged?: boolean) {
     if (visibilityChanged && this._lastVisibleField) {
       // if there is a new last visible field, make sure the status is shown on the previously last one
       this._lastVisibleField.off('propertyChange:suppressStatus', this._lastVisibleFieldSuppressStatusHandler);
       this._lastVisibleField.setSuppressStatus(null);
       if (this._lastVisibleField.rendered) {
+        // @ts-ignore
         this._lastVisibleField._renderErrorStatus();
+        // @ts-ignore
         this._lastVisibleField._renderTooltipText();
+        // @ts-ignore
         this._lastVisibleField._renderMenus();
       }
     }
@@ -160,7 +180,7 @@ export default class SequenceBox extends CompositeField {
       return;
     }
 
-    // Update the sequencebox with the status relevant flags
+    // Update the SequenceBox with the status relevant flags
     this._isOverwritingStatusFromField = true;
     if (this._lastVisibleField.errorStatus) {
       this.setErrorStatus(this._lastVisibleField.errorStatus);
@@ -199,19 +219,22 @@ export default class SequenceBox extends CompositeField {
     if (visibilityChanged) {
       // If the last field got invisible, make sure the new last field does not display a status anymore (now done by the seq box)
       if (this._lastVisibleField.rendered) {
+        // @ts-ignore
         this._lastVisibleField._renderErrorStatus();
+        // @ts-ignore
         this._lastVisibleField._renderTooltipText();
+        // @ts-ignore
         this._lastVisibleField._renderMenus();
       }
     }
   }
 
-  _onLastVisibleFieldSuppressStatusChange(e) {
+  protected _onLastVisibleFieldSuppressStatusChange(e: PropertyChangeEvent<FormFieldSuppressStatus>) {
     // do not change suppressStatus
     e.preventDefault();
   }
 
-  setErrorStatus(errorStatus) {
+  override setErrorStatus(errorStatus: StatusOrModel) {
     if (this._isOverwritingStatusFromField && !this._isErrorStatusOverwritten) {
       // was not overwritten, will be overwritten now -> backup old value
       this.boxErrorStatus = this.errorStatus;
@@ -225,7 +248,7 @@ export default class SequenceBox extends CompositeField {
     }
   }
 
-  setTooltipText(tooltipText) {
+  override setTooltipText(tooltipText: string) {
     if (this._isOverwritingStatusFromField && !this._isTooltipTextOverwritten) {
       // was not overwritten, will be overwritten now -> backup old value
       this.boxTooltipText = this.tooltipText;
@@ -239,9 +262,9 @@ export default class SequenceBox extends CompositeField {
     }
   }
 
-  setMenus(menus) {
+  override setMenus(menus: Menu | Menu[]) {
     // ensure menus are real and not just model objects
-    menus = this._createChildren(menus);
+    menus = this._createChildren(menus) as Menu[];
 
     if (this._isOverwritingStatusFromField && !this._isMenusOverwritten) {
       // was not overwritten, will be overwritten now -> backup old value
@@ -256,13 +279,11 @@ export default class SequenceBox extends CompositeField {
     }
   }
 
-  _updateBoxMenuOwner(newOwner) {
-    this.boxMenus.forEach(menu => {
-      menu.setOwner(newOwner);
-    });
+  protected _updateBoxMenuOwner(newOwner: Widget) {
+    this.boxMenus.forEach(menu => menu.setOwner(newOwner));
   }
 
-  setMenusVisible(menusVisible) {
+  override setMenusVisible(menusVisible: boolean) {
     if (this._isOverwritingStatusFromField && !this._isMenusOverwritten) {
       // was not overwritten, will be overwritten now -> backup old value
       this.boxMenusVisible = this.menusVisible;
@@ -276,24 +297,21 @@ export default class SequenceBox extends CompositeField {
     }
   }
 
-  _getLastVisibleField() {
-    let visibleFields = this.fields.filter(field => {
-      return field.visible;
-    });
+  protected _getLastVisibleField(): FormField {
+    let visibleFields = this.fields.filter(field => field.visible);
     if (visibleFields.length === 0) {
       return;
     }
-
     return visibleFields[visibleFields.length - 1];
   }
 
-  _onFieldValueChange(event) {
+  protected _onFieldValueChange(event: PropertyChangeEvent<any, ValueField<any>>) {
     if (event.source instanceof DateField) {
-      this._onDateFieldValueChange(event);
+      this._onDateFieldValueChange(event as PropertyChangeEvent<Date, DateField>);
     }
   }
 
-  _onDateFieldValueChange(event) {
+  protected _onDateFieldValueChange(event: PropertyChangeEvent<Date, DateField>) {
     // For a better user experience preselect a meaningful date on all following DateFields in the sequence box.
     let field = event.source;
     let dateFields = this._getDateFields();
@@ -310,14 +328,12 @@ export default class SequenceBox extends CompositeField {
     }
   }
 
-  _getDateFields() {
-    return this.fields.filter(field => {
-      return field instanceof DateField;
-    });
+  protected _getDateFields(): (DateField & { hasModelAutoDateSet?: boolean })[] {
+    return this.fields.filter(field => field instanceof DateField) as (DateField & { hasModelAutoDateSet?: boolean })[];
   }
 
-  _getAutoDateProposal(field) {
-    let newAutoDate = null;
+  protected _getAutoDateProposal(field: DateField): Date {
+    let newAutoDate: Date = null;
     // if it's only a time field, add one hour, otherwise add one day
     if (field && field.value) {
       if (!field.hasDate && field.hasTime) {
@@ -330,7 +346,7 @@ export default class SequenceBox extends CompositeField {
   }
 
   // The new sequence-box sets the label to invisible on the model.
-  _modifyLabel(field) {
+  protected _modifyLabel(field: FormField) {
     if (field instanceof CheckBoxField) {
       field.labelVisible = false;
     }
@@ -349,21 +365,18 @@ export default class SequenceBox extends CompositeField {
     }
   }
 
-  setFields(fields) {
+  setFields(fields: FormField[]) {
     if (this.rendered) {
       throw new Error('Setting fields is not supported if sequence box is already rendered.');
     }
     this.setProperty('fields', fields);
   }
 
-  /**
-   * @override CompositeField.js
-   */
-  getFields() {
+  getFields(): FormField[] {
     return this.fields;
   }
 
-  clone(model, options) {
+  override clone(model: SequenceBoxModel, options?: CloneOptions): this {
     let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'fields', options);
     return clone;

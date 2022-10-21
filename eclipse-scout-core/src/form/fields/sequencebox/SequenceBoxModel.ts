@@ -8,17 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlEnvironment, LogicalGridLayout, LogicalGridLayoutConfig, SequenceBox} from '../../../index';
+import {FormField, FormFieldModel, LogicalGridLayoutConfig} from '../../../index';
 import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
+import {RefModel} from '../../../types';
 
-export default class SequenceBoxLayout extends LogicalGridLayout {
-
-  constructor(widget: SequenceBox, layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
-    super(widget, layoutConfig);
-  }
-
-  protected override _initDefaults() {
-    super._initDefaults();
-    this.hgap = HtmlEnvironment.get().smallColumnGap;
-  }
+export default interface SequenceBoxModel extends FormFieldModel {
+  layoutConfig?: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel;
+  fields?: FormField[] | RefModel<FormFieldModel>[];
 }
