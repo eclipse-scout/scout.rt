@@ -762,6 +762,8 @@ export {default as TableLayoutResetter} from './form/fields/smartfield/TableLayo
 export {default as TreeProposalChooser} from './form/fields/smartfield/TreeProposalChooser';
 export {default as TreeLayoutResetter} from './form/fields/smartfield/TreeLayoutResetter';
 export {default as SplitBox} from './form/fields/splitbox/SplitBox';
+export {default as SplitBoxModel} from './form/fields/splitbox/SplitBoxModel';
+export {default as SplitBoxEventMap} from './form/fields/splitbox/SplitBoxEventMap';
 export {default as SplitBoxAdapter} from './form/fields/splitbox/SplitBoxAdapter';
 export {default as SplitBoxCollapseKeyStroke} from './form/fields/splitbox/SplitBoxCollapseKeyStroke';
 export {default as SplitBoxFirstCollapseKeyStroke} from './form/fields/splitbox/SplitBoxFirstCollapseKeyStroke';
