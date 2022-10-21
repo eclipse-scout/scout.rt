@@ -102,7 +102,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
 
   @Override
   public long getMaximumUploadSize() {
-    return propertySupport.getPropertyInt(PROP_MAXIMUM_UPLOAD_SIZE);
+    return propertySupport.getPropertyLong(PROP_MAXIMUM_UPLOAD_SIZE);
   }
 
   // Convenience file getter
