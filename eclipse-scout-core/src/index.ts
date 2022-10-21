@@ -718,6 +718,7 @@ export {default as IntegerField} from './form/fields/integerfield/IntegerField';
 export {default as PlaceholderField} from './form/fields/placeholder/PlaceholderField';
 export {default as PlaceholderFieldAdapter} from './form/fields/placeholder/PlaceholderFieldAdapter';
 export {default as PlannerField} from './form/fields/plannerfield/PlannerField';
+export {default as PlannerFieldModel} from './form/fields/plannerfield/PlannerFieldModel';
 export {default as PlannerFieldAdapter} from './form/fields/plannerfield/PlannerFieldAdapter';
 export {default as RadioButton} from './form/fields/radiobutton/RadioButton';
 export {default as RadioButtonEventMap} from './form/fields/radiobutton/RadioButtonEventMap';

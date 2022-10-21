@@ -1,25 +1,27 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField} from '../../../index';
+import {FormField, Planner, PlannerFieldModel} from '../../../index';
 
-export default class PlannerField extends FormField {
+export default class PlannerField extends FormField implements PlannerFieldModel {
+  declare model: PlannerFieldModel;
+
+  planner: Planner;
 
   constructor() {
     super();
     this._addWidgetProperties(['planner']);
-
     this.gridDataHints.weightY = 1.0;
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'planner-field');
     this.addLabel();
     this.addStatus();
@@ -31,12 +33,12 @@ export default class PlannerField extends FormField {
   /**
    * Will also be called by model adapter on property change event
    */
-  _renderPlanner() {
+  protected _renderPlanner() {
     this.planner.render();
     this.addField(this.planner.$container);
   }
 
-  _removePlanner() {
+  protected _removePlanner() {
     this.planner.remove();
     this._removeField();
   }
