@@ -13,5 +13,9 @@ import {RefModel} from '../../../types';
 
 export default interface WrappedFormFieldModel extends FormFieldModel {
   innerForm: Form | RefModel<FormModel>;
+  /**
+   * true if the inner form should request the initial focus once loaded, false if not.
+   * Default is false.
+   */
   initialFocusEnabled: boolean;
 }

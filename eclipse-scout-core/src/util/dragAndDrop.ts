@@ -259,6 +259,7 @@ export interface DragAndDropOptions {
 
   /**
    * Allowed mime types.
+   * @see https://developer.mozilla.org/en-US/docs/Glossary/MIME_type
    */
   allowedTypes?: () => string[];
 
