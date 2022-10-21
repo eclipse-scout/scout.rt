@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '../../../index';
+import {FormFieldModel, Planner, PlannerModel} from '../../../index';
+import {RefModel} from '../../../types';
 
-export default class PlannerFieldAdapter extends FormFieldAdapter {
-  constructor() {
-    super();
-  }
+export default interface PlannerFieldModel extends FormFieldModel {
+  planner?: Planner | RefModel<PlannerModel>;
 }
