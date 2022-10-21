@@ -8,17 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldLayout, ImageField, scrollbars} from '../../../index';
+import {FormFieldModel} from '../../../index';
 
-export default class ImageFieldLayout extends FormFieldLayout {
-  declare formField: ImageField;
-
-  constructor(imageField: ImageField) {
-    super(imageField);
-  }
-
-  override layout($container: JQuery) {
-    super.layout($container);
-    scrollbars.update(this.formField.$fieldContainer);
-  }
+export default interface ImageFieldModel extends FormFieldModel {
+  autoFit?: boolean;
+  imageUrl?: string;
+  scrollBarEnabled?: boolean;
+  uploadEnabled?: boolean;
+  acceptTypes?: string;
+  maximumUploadSize?: number;
 }

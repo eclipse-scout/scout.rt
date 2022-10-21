@@ -692,6 +692,8 @@ export {default as HtmlFieldModel} from './form/fields/htmlfield/HtmlFieldModel'
 export {default as HtmlFieldEventMap} from './form/fields/htmlfield/HtmlFieldEventMap';
 export {default as HtmlFieldAdapter} from './form/fields/htmlfield/HtmlFieldAdapter';
 export {default as ImageField} from './form/fields/imagefield/ImageField';
+export {default as ImageFieldModel} from './form/fields/imagefield/ImageFieldModel';
+export {default as ImageFieldEventMap} from './form/fields/imagefield/ImageFieldEventMap';
 export {default as ImageFieldAdapter} from './form/fields/imagefield/ImageFieldAdapter';
 export {default as ImageFieldLayout} from './form/fields/imagefield/ImageFieldLayout';
 export {default as LabelField} from './form/fields/labelfield/LabelField';
