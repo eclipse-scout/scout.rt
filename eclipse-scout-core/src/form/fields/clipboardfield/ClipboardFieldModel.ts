@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueFieldAdapter} from '../../../index';
+import {ValueFieldModel} from '../../../index';
 
-export default class ClipboardFieldAdapter extends ValueFieldAdapter {
-  constructor() {
-    super();
-  }
+export default interface ClipboardFieldModel extends ValueFieldModel<string> {
+  allowedMimeTypes?: string[];
+  maximumSize?: number;
+  readOnly?: boolean;
 }

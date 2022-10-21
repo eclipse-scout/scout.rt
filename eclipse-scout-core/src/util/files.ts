@@ -18,16 +18,13 @@ import {arrays} from '../index';
  * @param maximumUploadSize maximum combined file size. null disables the size check
  * @returns true if the total size does not exceed maximumUploadSize, otherwise false
  */
-export function validateMaximumUploadSize(files: File[], maximumUploadSize: number): boolean {
+export function validateMaximumUploadSize(files: Blob | Blob[], maximumUploadSize: number): boolean {
   files = arrays.ensure(files);
   if (files.length === 0 || maximumUploadSize == null) {
     return true;
   }
 
-  let totalSize = files.reduce((total, file) => {
-    return total + file.size;
-  }, 0);
-
+  let totalSize = files.reduce((total, file) => total + file.size, 0);
   return totalSize <= maximumUploadSize;
 }
 

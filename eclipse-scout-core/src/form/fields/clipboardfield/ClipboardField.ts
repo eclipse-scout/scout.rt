@@ -1,17 +1,26 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, InputFieldKeyStrokeContext, keys, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
+import {arrays, ClipboardFieldModel, Device, InputFieldKeyStrokeContext, keys, KeyStrokeContext, mimeTypes, scout, Session, strings, ValueField} from '../../../index';
 import $ from 'jquery';
+import {DragAndDropOptions} from '../../../util/dragAndDrop';
+import {BlobWithName, FatalMessageOptions} from '../../../session/Session';
 
-export default class ClipboardField extends ValueField {
+export default class ClipboardField extends ValueField<string> implements ClipboardFieldModel {
+  declare model: ClipboardFieldModel;
+
+  allowedMimeTypes: string[];
+  maximumSize: number;
+  readOnly: boolean;
+  protected _fileUploadWaitRetryCountTimeout: number;
+  protected _fullSelectionLength: number;
 
   constructor() {
     super();
@@ -58,14 +67,11 @@ export default class ClipboardField extends ValueField {
     keys.DELETE
   ];
 
-  /**
-   * @override Widget.js
-   */
-  _createKeyStrokeContext() {
+  protected override _createKeyStrokeContext(): KeyStrokeContext {
     return new InputFieldKeyStrokeContext();
   }
 
-  _render() {
+  protected _render() {
     // We don't use makeDiv() here intentionally because the DIV created must
     // not have the 'unselectable' attribute.
     this.addContainer(this.$parent, 'clipboard-field');
@@ -75,7 +81,7 @@ export default class ClipboardField extends ValueField {
 
     this.$field
       .disableSpellcheck()
-      .attr('contenteditable', true)
+      .attr('contenteditable', 'true')
       .attr('tabindex', '0')
       .on('keydown', this._onKeyDown.bind(this))
       .on('input', this._onInput.bind(this))
@@ -84,7 +90,7 @@ export default class ClipboardField extends ValueField {
       .on('cut', this._onCopy.bind(this));
   }
 
-  _getDragAndDropHandlerOptions() {
+  protected override _getDragAndDropHandlerOptions(): DragAndDropOptions {
     let options = super._getDragAndDropHandlerOptions();
     options.allowedTypes = () => this.allowedMimeTypes;
     // use the smaller property (this.maximumSize for backwards compatibility) but ignore null values which would result in a maximum size of zero.
@@ -92,9 +98,9 @@ export default class ClipboardField extends ValueField {
     return options;
   }
 
-  _renderDisplayText() {
+  protected override _renderDisplayText() {
     let displayText = this.displayText;
-    let img;
+    let img: HTMLElement;
     this.$field.children().each((idx, elem) => {
       if (!img && elem.nodeName === 'IMG') {
         img = elem;
@@ -122,17 +128,18 @@ export default class ClipboardField extends ValueField {
 
   // Because a <div> is used as field, jQuery's val() used in ValueField.js is not working here, so
   // the content of displayText variable is used instead.
-  // (For reading the displayText innerHmtl() _could_ be used on the div-field, but some browsers
+  // (For reading the displayText innerHtml() _could_ be used on the div-field, but some browsers
   // would collapse whitespaces which would also collapse multiple tabs when coping some table rows.
   // So instead of reading the effective displayText from the field, the internal displayText value
   // will be reused without actual reading. Parsing of pasted content is handled onPaste() and stored
   // in this.displayText.)
-  _readDisplayText() {
+  protected override _readDisplayText(): string {
     return this.displayText;
   }
 
-  _getSelection() {
-    let selection, myWindow = this.$container.window(true);
+  protected _getSelection(): Selection {
+    let selection: Selection,
+      myWindow = this.$container.window(true);
     if (myWindow.getSelection) {
       selection = myWindow.getSelection();
     } else if (document.getSelection) {
@@ -144,7 +151,7 @@ export default class ClipboardField extends ValueField {
     return selection;
   }
 
-  _onKeyDown(event) {
+  protected _onKeyDown(event: JQuery.KeyDownEvent): boolean {
     if (scout.isOneOf(event.which, ClipboardField.ALWAYS_DESTRUCTIVE_KEYS)) {
       return false; // never allowed
     }
@@ -155,22 +162,27 @@ export default class ClipboardField extends ValueField {
     return false;
   }
 
-  _onInput(event) {
+  protected _onInput(event: JQuery.TriggeredEvent): boolean {
     // if the user somehow managed to fire to input something (e.g. "delete" menu in FF & IE), just reset the value to the previous content
     this._renderDisplayText();
     return false;
   }
 
-  _onCopy(event) {
+  protected _onCopy(event: JQuery.TriggeredEvent): boolean {
     if (Device.get().isIos() && this._onIosCopy(event) === false) {
       return;
     }
 
-    let selection, text, dataTransfer, myWindow = this.$container.window(true);
+    let text: string,
+      dataTransfer: DataTransfer,
+      myWindow = this.$container.window(true);
     try {
-      if (event.originalEvent.clipboardData) {
-        dataTransfer = event.originalEvent.clipboardData;
+      let originalEvent = event.originalEvent as ClipboardEvent;
+      if (originalEvent.clipboardData) {
+        dataTransfer = originalEvent.clipboardData;
+        // @ts-ignore
       } else if (myWindow.clipboardData) {
+        // @ts-ignore
         dataTransfer = myWindow.clipboardData;
       }
     } catch (e) {
@@ -187,7 +199,7 @@ export default class ClipboardField extends ValueField {
     // scroll bar must not be in field when copying
     this._uninstallScrollbars();
 
-    selection = this._getSelection();
+    let selection = this._getSelection();
     if (!selection) {
       return;
     }
@@ -215,7 +227,7 @@ export default class ClipboardField extends ValueField {
     return false;
   }
 
-  _onIosCopy(event) {
+  protected _onIosCopy(event: JQuery.TriggeredEvent): boolean {
     // Setting custom clipboard data is not possible with iOS due to a WebKit bug.
     // The default behavior copies rich text. Since it is not expected to copy the style of the clipboard field, temporarily set color and background-color
     // https://bugs.webkit.org/show_bug.cgi?id=176980
@@ -230,26 +242,30 @@ export default class ClipboardField extends ValueField {
     return false;
   }
 
-  _onPaste(event) {
+  protected _onPaste(event: JQuery.TriggeredEvent): boolean {
     if (this.readOnly) {
       // Prevent pasting in "copy" mode
       return false;
     }
 
     let startPasteTimestamp = Date.now();
-    let dataTransfer, myWindow = this.$container.window(true);
+    let dataTransfer: DataTransfer,
+      myWindow = this.$container.window(true);
     this.$field.selectAllText();
-    if (event.originalEvent.clipboardData) {
-      dataTransfer = event.originalEvent.clipboardData;
+    let originalEvent = event.originalEvent as ClipboardEvent;
+    if (originalEvent.clipboardData) {
+      dataTransfer = originalEvent.clipboardData;
+      // @ts-ignore
     } else if (myWindow.clipboardData) {
+      // @ts-ignore
       dataTransfer = myWindow.clipboardData;
     } else {
       // unable to obtain data transfer object
       throw new Error('Unable to access clipboard data.');
     }
 
-    let filesArgument = [], // options to be uploaded, arguments for this.session.uploadFiles
-      additionalOptions = {},
+    let filesArgument: BlobWithName[] = [], // options to be uploaded, arguments for this.session.uploadFiles
+      additionalOptions: Record<string, string> = {},
       additionalOptionsCompatibilityIndex = 0, // counter for additional options
       contentCount = 0;
 
@@ -269,7 +285,7 @@ export default class ClipboardField extends ValueField {
     }
 
     if (contentCount === 0 && dataTransfer.items) {
-      Array.prototype.forEach.call(dataTransfer.items, item => {
+      Array.prototype.forEach.call(dataTransfer.items, (item: DataTransferItem) => {
         if (item.type === mimeTypes.TEXT_PLAIN) {
           item.getAsString(str => {
             filesArgument.push(new Blob([str], {
@@ -278,7 +294,7 @@ export default class ClipboardField extends ValueField {
             contentCount++;
           });
         } else if (scout.isOneOf(item.type, [mimeTypes.IMAGE_PNG, mimeTypes.IMAGE_JPG, mimeTypes.IMAGE_JPEG, mimeTypes.IMAGE_GIF])) {
-          let file = item.getAsFile();
+          let file: BlobWithName & File = item.getAsFile();
           if (file) {
             // When pasting an image from the clipboard, Chrome and Firefox create a File object with
             // a generic name such as "image.png" or "grafik.png" (hardcoded in Chrome, locale-dependent
@@ -301,11 +317,11 @@ export default class ClipboardField extends ValueField {
 
     let waitForFileReaderEvents = 0;
     if (contentCount === 0 && dataTransfer.files) {
-      Array.prototype.forEach.call(dataTransfer.files, item => {
+      Array.prototype.forEach.call(dataTransfer.files, (item: File) => {
         let reader = new FileReader();
         // register functions for file reader
         reader.onload = event => {
-          let f = new Blob([event.target.result], {
+          let f: BlobWithName = new Blob([event.target.result], {
             type: item.type
           });
           f.name = item.name;
@@ -332,7 +348,7 @@ export default class ClipboardField extends ValueField {
       }
 
       if (uploadFunctionTimeoutCount >= this._fileUploadWaitRetryCountTimeout) {
-        let boxOptions = {
+        let boxOptions: FatalMessageOptions = {
           entryPoint: this.$container.entryPoint(),
           header: this.session.text('ui.ClipboardTimeoutTitle'),
           body: this.session.text('ui.ClipboardTimeout'),
@@ -374,7 +390,7 @@ export default class ClipboardField extends ValueField {
                 byteNumbers[i] = encData.charCodeAt(i);
               }
               let byteArray = new Uint8Array(byteNumbers);
-              let f = new Blob([byteArray], {
+              let f: BlobWithName = new Blob([byteArray], {
                 type: mimeType
               });
               f.name = '';
@@ -386,7 +402,7 @@ export default class ClipboardField extends ValueField {
         if (imgElementsFound) {
           restoreOldHtmlContent();
         } else {
-          // try to read nativly pasted text from field
+          // try to read natively pasted text from field
           let nativePasteContent = this.$field.text();
           if (strings.hasText(nativePasteContent)) {
             this.setDisplayText(nativePasteContent);
@@ -417,12 +433,12 @@ export default class ClipboardField extends ValueField {
    * Safari creates two files when pasting an image from clipboard, one PNG and one JPEG.
    * If that happens, remove the JPEG and only keep the PNG.
    */
-  _cleanupFiles(files) {
+  protected _cleanupFiles(files: BlobWithName[]) {
     if (files.length !== 2) {
       return;
     }
-    let pngImage;
-    let jpgImage;
+    let pngImage: BlobWithName;
+    let jpgImage: BlobWithName;
     files.forEach(file => {
       // Check for the scoutName because it will only be set if it is likely a paste from clipboard event
       if (file.name === 'image.png' && file.scoutName) {
