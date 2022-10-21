@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default interface KeyStrokeModel {
-  alt?: boolean;
-  ctrl?: boolean;
-  shift?: boolean;
-  which: number[];
+import {PropertyChangeEvent, ValueFieldEventMap} from '../../../index';
+
+export default interface CheckBoxFieldEventMap extends ValueFieldEventMap<boolean> {
+  'propertyChange:keyStroke': PropertyChangeEvent<string>;
+  'propertyChange:triStateEnabled': PropertyChangeEvent<boolean>;
+  'propertyChange:wrapText': PropertyChangeEvent<boolean>;
 }
