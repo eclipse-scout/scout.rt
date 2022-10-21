@@ -2149,14 +2149,13 @@ export default class Table extends Widget implements TableModel {
     this.session.onRequestsDone(this._updateMenuBar.bind(this));
   }
 
-  protected _triggerRowClick(originalEvent: JQuery.MouseUpEvent, row: TableRow, mouseButton: number, column: Column<any>) {
-    let event = {
+  protected _triggerRowClick(originalEvent: JQuery.MouseEventBase, row: TableRow, mouseButton: number, column?: Column<any>) {
+    this.trigger('rowClick', {
       originalEvent: originalEvent,
       row: row,
       mouseButton: mouseButton,
       column: column
-    };
-    this.trigger('rowClick', event);
+    });
   }
 
   protected _triggerRowAction(row: TableRow, column: Column<any>) {

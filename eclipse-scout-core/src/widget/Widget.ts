@@ -2076,10 +2076,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     if (this.rendering) {
       return;
     }
-    let $target = $(event.target);
-    // @ts-ignore
-    if (this.$container.has($target)) { // FIXME TS does this work? according to signature has accepts only elements, not JQuery elements
-      this._$lastFocusedElement = $target;
+    if (this.$container.has(event.target)) {
+      this._$lastFocusedElement = $(event.target);
     }
   }
 

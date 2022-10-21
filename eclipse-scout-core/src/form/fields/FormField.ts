@@ -1102,7 +1102,6 @@ export default abstract class FormField extends Widget implements FormFieldModel
 
     // Only append if not already appended or it is not the last element so that append would move it to the end
     // This can be important for some widgets, e.g. iframe which would cancel and restart the request on every dom insertion
-    // FIXME TS: jquery api wrong or does this not work? has() does not seem to accept a jquery element?
     // @ts-ignore
     if (this.$container.has($fieldContainer).length === 0 || $fieldContainer.next().length > 0) {
       $fieldContainer.appendTo(this.$container);

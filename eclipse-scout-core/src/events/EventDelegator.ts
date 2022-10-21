@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, EventDelegatorOptions, EventEmitter, EventListener, objects, PropertyChangeEvent, PropertyEventEmitter, scout} from '../index';
+import {arrays, Event, EventDelegatorOptions, EventEmitter, EventHandler, EventListener, objects, PropertyChangeEvent, PropertyEventEmitter, scout} from '../index';
 
 /**
  * Delegates events between two {@link EventEmitter}s.
@@ -23,7 +23,7 @@ export default class EventDelegator {
   delegateAllProperties: boolean;
   delegateAllEvents: boolean;
   protected _mirrorListener: EventListener;
-  protected _destroyHandler: any; // FIXME TS remove because never assigned?
+  protected _destroyHandler: EventHandler;
 
   constructor(source: EventEmitter, target: EventEmitter, options?: EventDelegatorOptions) {
     options = options || {};
