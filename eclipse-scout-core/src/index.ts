@@ -741,6 +741,7 @@ export {default as SequenceBoxGridConfig} from './form/fields/sequencebox/Sequen
 export {default as SequenceBoxLayout} from './form/fields/sequencebox/SequenceBoxLayout';
 export {default as SequenceBoxAdapter} from './form/fields/sequencebox/SequenceBoxAdapter';
 export {default as SliderField} from './form/fields/slider/SliderField';
+export {default as SliderFieldModel} from './form/fields/slider/SliderFieldModel';
 export {default as SmartField} from './form/fields/smartfield/SmartField';
 export {default as SmartFieldAdapter} from './form/fields/smartfield/SmartFieldAdapter';
 export {default as SmartFieldLayout} from './form/fields/smartfield/SmartFieldLayout';
