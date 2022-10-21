@@ -204,39 +204,6 @@ export default class TimePicker extends Widget {
 
   }
 
-  _findNextAllowedDate(years, months, days) {
-    let i, date,
-      sum = years + months + days,
-      dir = sum > 0 ? 1 : -1,
-      now = this.selectedDate || dates.trunc(new Date());
-
-    // if we shift by year or month, shift the 'now' date and then use that date as starting point
-    // to find the next allowed date.
-    if (years !== 0) {
-      now = dates.shift(now, years, 0, 0);
-    } else if (months !== 0) {
-      now = dates.shift(now, 0, months, 0);
-    }
-
-    if (dir === 1) { // find next allowed date, starting from currently selected date
-      for (i = 0; i < this.allowedDates.length; i++) {
-        date = this.allowedDates[i];
-        if (dates.compare(now, date) < 0) {
-          return date;
-        }
-      }
-    } else if (dir === -1) { // find previous allowed date, starting from currently selected date
-      for (i = this.allowedDates.length - 1; i >= 0; i--) {
-        date = this.allowedDates[i];
-        if (dates.compare(now, date) > 0) {
-          return date;
-        }
-      }
-    }
-
-    return null;
-  }
-
   _onNavigationMouseDown(event) {
     let $target = $(event.currentTarget);
     let diff = $target.data('shift');

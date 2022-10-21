@@ -877,7 +877,7 @@ describe('DateField', () => {
     it('_referenceDate returns only allowed date - choose nearest date in the future', () => {
       let dateField = scout.create(DateField, {
         parent: session.desktop,
-        allowedDates: ['2016-03-14', '2016-04-16', '2016-04-17'],
+        allowedDates: ['2016-07-14', '2016-04-16', '2016-04-17'],
         autoDate: '2016-04-15'
       });
       let date = dateField._referenceDate();
@@ -900,6 +900,15 @@ describe('DateField', () => {
       });
       dateField._setAllowedDates(['2016-02-14']);
       expectDate(dateField.allowedDates[0], 2016, 2, 14);
+    });
+
+    it('_setAllowedDates truncates dates', () => {
+      let dateField = scout.create('DateField', {
+        parent: session.desktop
+      });
+      dateField._setAllowedDates(['2016-02-14 15:13:00.000', '2016-05-18 11:08:00.000']);
+      expectDate(dateField.allowedDates[0], 2016, 2, 14, 0, 0);
+      expectDate(dateField.allowedDates[1], 2016, 5, 18, 0, 0);
     });
 
   });
