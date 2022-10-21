@@ -24,7 +24,7 @@
   left: 0;
   height: 16px;
   cursor: row-resize;
-  z-index: 1;
+  z-index: 2;
   border-top: @table-control-resize-border-width solid @table-control-resize-border-color;
 }
 
@@ -44,7 +44,7 @@
   }
 
   display: none;
-  z-index: 1;
+  z-index: 2; // Must not be smaller than z-index of scrollbar, see Table.less
   /* Reset nowrap, forms may have fields which need wrapping (e.g. label field) */
   white-space: normal;
 
