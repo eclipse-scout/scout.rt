@@ -24,6 +24,7 @@ public class UiTextContributor implements IUiTextContributor {
         "CloseButton",
         "Column",
         "ColumnSorting",
+        "DateIsNotAllowed",
         "ErrorWhileLoadingData",
         "FormEmptyMandatoryFieldsMessage",
         "FormInvalidFieldsMessage",

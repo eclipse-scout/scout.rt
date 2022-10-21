@@ -66,12 +66,6 @@ describe('DateField', () => {
     expect(dateField.$dateField).toBeFocused();
   }
 
-  function focusTime(dateField) {
-    dateField.$timeField.focus();
-    jasmine.clock().tick(101);
-    expect(dateField.$timeField).toBeFocused();
-  }
-
   function openDatePicker(dateField) {
     dateField.$dateField.triggerMouseDown();
     expect(findDatePicker().length).toBe(1);
@@ -579,7 +573,6 @@ describe('DateField', () => {
     describe('ENTER', () => {
 
       it('updates the model with the selected value and closes picker', () => {
-        let model = createModel();
         let dateField = scout.create('DateField', {
           parent: session.desktop,
           value: '2014-10-01'
@@ -884,7 +877,7 @@ describe('DateField', () => {
     it('_referenceDate returns only allowed date - choose nearest date in the future', () => {
       let dateField = scout.create('DateField', {
         parent: session.desktop,
-        allowedDates: ['2016-03-14', '2016-04-16', '2016-04-17'],
+        allowedDates: ['2016-07-14', '2016-04-16', '2016-04-17'],
         autoDate: '2016-04-15'
       });
       let date = dateField._referenceDate();
@@ -907,6 +900,15 @@ describe('DateField', () => {
       });
       dateField._setAllowedDates(['2016-02-14']);
       expectDate(dateField.allowedDates[0], 2016, 2, 14);
+    });
+
+    it('_setAllowedDates truncates dates', () => {
+      let dateField = scout.create('DateField', {
+        parent: session.desktop
+      });
+      dateField._setAllowedDates(['2016-02-14 15:13:00.000', '2016-05-18 11:08:00.000']);
+      expectDate(dateField.allowedDates[0], 2016, 2, 14, 0, 0);
+      expectDate(dateField.allowedDates[1], 2016, 5, 18, 0, 0);
     });
 
   });
@@ -940,7 +942,7 @@ describe('DateField', () => {
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
 
-        let selectedDate = selectFirstDayInPicker(dateField.popup._widget.currentMonth.$container);
+        selectFirstDayInPicker(dateField.popup._widget.currentMonth.$container);
         expect(dateField.popup).toBe(null);
       });
 
@@ -1190,7 +1192,7 @@ describe('DateField', () => {
         dateField.$timeField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
 
-        let selectedDate = selectFirstTimeInPicker(dateField.popup._widget.$container);
+        selectFirstTimeInPicker(dateField.popup._widget.$container);
         expect(dateField.popup).toBe(null);
       });
 
