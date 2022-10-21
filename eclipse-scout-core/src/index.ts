@@ -735,6 +735,8 @@ export {default as RadioButtonGroupLeftOrUpKeyStroke} from './form/fields/radiob
 export {default as RadioButtonGroupRightOrDownKeyStroke} from './form/fields/radiobutton/RadioButtonGroupRightOrDownKeyStroke';
 export {default as RadioButtonKeyStroke} from './form/fields/radiobutton/RadioButtonKeyStroke';
 export {default as SequenceBox} from './form/fields/sequencebox/SequenceBox';
+export {default as SequenceBoxModel} from './form/fields/sequencebox/SequenceBoxModel';
+export {default as SequenceBoxEventMap} from './form/fields/sequencebox/SequenceBoxEventMap';
 export {default as SequenceBoxGridConfig} from './form/fields/sequencebox/SequenceBoxGridConfig';
 export {default as SequenceBoxLayout} from './form/fields/sequencebox/SequenceBoxLayout';
 export {default as SequenceBoxAdapter} from './form/fields/sequencebox/SequenceBoxAdapter';
