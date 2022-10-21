@@ -8,40 +8,46 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, FormField, GroupBox} from '../../../index';
+import {Event, EventHandler, Form, FormField, GroupBox, WrappedFormFieldEventMap, WrappedFormFieldModel} from '../../../index';
 
-export default class WrappedFormField extends FormField {
+export default class WrappedFormField extends FormField implements WrappedFormFieldModel {
+  declare model: WrappedFormFieldModel;
+  declare eventMap: WrappedFormFieldEventMap;
+
+  innerForm: Form;
+  initialFocusEnabled: boolean;
+
+  protected _formDestroyHandler: EventHandler<Event<Form>>;
 
   constructor() {
     super();
     this._addWidgetProperties(['innerForm']);
     this.innerForm = null;
     this.initialFocusEnabled = false;
-
     this._formDestroyHandler = this._onInnerFormDestroy.bind(this);
   }
 
-  _init(model) {
+  protected override _init(model: WrappedFormFieldModel) {
     super._init(model);
     this._setInnerForm(this.innerForm);
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'wrapped-form-field');
     this.addLabel();
     this.addStatus();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderInnerForm();
   }
 
-  setInnerForm(innerForm) {
+  setInnerForm(innerForm: Form) {
     this.setProperty('innerForm', innerForm);
   }
 
-  _setInnerForm(innerForm) {
+  protected _setInnerForm(innerForm: Form) {
     if (this.innerForm) {
       this.innerForm.off('destroy', this._formDestroyHandler);
     }
@@ -54,7 +60,7 @@ export default class WrappedFormField extends FormField {
   /**
    * Will also be called by model adapter on property change event
    */
-  _renderInnerForm() {
+  protected _renderInnerForm() {
     if (!this.innerForm) {
       return;
     }
@@ -76,19 +82,19 @@ export default class WrappedFormField extends FormField {
     this._renderInitialFocusEnabled();
   }
 
-  _removeInnerForm() {
+  protected _removeInnerForm() {
     if (this.innerForm) {
       this.innerForm.remove();
     }
     this._removeField();
   }
 
-  _onInnerFormDestroy(event) {
+  protected _onInnerFormDestroy(event: Event<Form>) {
     this._removeInnerForm();
     this._setInnerForm(null);
   }
 
-  _renderInitialFocusEnabled() {
+  protected _renderInitialFocusEnabled() {
     if (this.innerForm && this.initialFocusEnabled) {
       this.innerForm.renderInitialFocus();
     }
