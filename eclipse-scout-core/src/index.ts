@@ -688,6 +688,8 @@ export {default as GroupBoxAdapter} from './form/fields/groupbox/GroupBoxAdapter
 export {default as GroupBoxLayout} from './form/fields/groupbox/GroupBoxLayout';
 export {default as GroupBoxMenuItemsOrder} from './form/fields/groupbox/GroupBoxMenuItemsOrder';
 export {default as HtmlField} from './form/fields/htmlfield/HtmlField';
+export {default as HtmlFieldModel} from './form/fields/htmlfield/HtmlFieldModel';
+export {default as HtmlFieldEventMap} from './form/fields/htmlfield/HtmlFieldEventMap';
 export {default as HtmlFieldAdapter} from './form/fields/htmlfield/HtmlFieldAdapter';
 export {default as ImageField} from './form/fields/imagefield/ImageField';
 export {default as ImageFieldAdapter} from './form/fields/imagefield/ImageFieldAdapter';
