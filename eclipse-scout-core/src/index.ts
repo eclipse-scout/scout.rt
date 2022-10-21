@@ -707,6 +707,7 @@ export {default as ListBoxModel} from './form/fields/listbox/ListBoxModel';
 export {default as lookupField} from './form/fields/lookupfield/lookupField';
 export {default as LookupFieldAdapter} from './form/fields/lookupfield/LookupFieldAdapter';
 export {default as ModeSelectorField} from './form/fields/modeselectorfield/ModeSelectorField';
+export {default as ModeSelectorFieldModel} from './form/fields/modeselectorfield/ModeSelectorFieldModel';
 export {default as ModeSelectorFieldAdapter} from './form/fields/modeselectorfield/ModeSelectorFieldAdapter';
 export {default as NumberField} from './form/fields/numberfield/NumberField';
 export {default as NumberFieldAdapter} from './form/fields/numberfield/NumberFieldAdapter';
