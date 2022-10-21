@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldAdapter} from '../../../index';
+import {Calendar, CalendarModel, FormFieldModel} from '../../../index';
+import {RefModel} from '../../../types';
 
-export default class CalendarFieldAdapter extends FormFieldAdapter {
-  constructor() {
-    super();
-  }
+export default interface CalendarFieldModel extends FormFieldModel {
+  calendar?: Calendar | RefModel<CalendarModel>;
 }

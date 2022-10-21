@@ -1,16 +1,19 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Device, FormField} from '../../../index';
+import {Calendar, CalendarFieldModel, Device, FormField} from '../../../index';
 
-export default class CalendarField extends FormField {
+export default class CalendarField extends FormField implements CalendarFieldModel {
+  declare model: CalendarFieldModel;
+
+  calendar: Calendar;
 
   constructor() {
     super();
@@ -18,7 +21,7 @@ export default class CalendarField extends FormField {
     this._addWidgetProperties(['calendar']);
   }
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'calendar-field');
     this.$container.toggleClass('mobile', Device.get().type === Device.Type.MOBILE);
     this.addLabel();
