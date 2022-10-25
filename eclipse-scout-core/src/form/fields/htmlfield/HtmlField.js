@@ -16,6 +16,7 @@ export default class HtmlField extends ValueField {
   constructor() {
     super();
     this.scrollBarEnabled = false;
+    this.scrollToAnchor = null;
     this.preventInitialFocus = true;
     this.selectable = true;
   }
@@ -106,9 +107,8 @@ export default class HtmlField extends ValueField {
       this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollToAnchor.bind(this));
       return;
     }
-    let anchor = this.scrollToAnchor;
-    if (this.scrollBarEnabled && anchor && this.$field.find(anchor)) {
-      let anchorElem = this.$field.find('#'.concat(anchor));
+    if (this.scrollBarEnabled && this.scrollToAnchor) {
+      let anchorElem = this.$field.find('#'.concat(this.scrollToAnchor));
       if (anchorElem && anchorElem.length > 0) {
         scrollbars.scrollTo(this.$field, anchorElem);
       }

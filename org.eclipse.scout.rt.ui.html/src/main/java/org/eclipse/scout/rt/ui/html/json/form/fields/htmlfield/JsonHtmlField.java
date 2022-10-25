@@ -100,5 +100,4 @@ public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField
     BinaryResource attachment = getModel().getAttachment(filename);
     return attachment == null ? null : new BinaryResourceHolder(attachment);
   }
-
 }
