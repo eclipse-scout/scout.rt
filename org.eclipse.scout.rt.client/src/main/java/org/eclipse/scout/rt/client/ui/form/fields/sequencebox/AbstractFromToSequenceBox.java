@@ -29,8 +29,8 @@ public abstract class AbstractFromToSequenceBox extends AbstractSequenceBox {
     this(true);
   }
 
-  protected AbstractFromToSequenceBox(boolean b) {
-    super(b);
+  protected AbstractFromToSequenceBox(boolean callInitializer) {
+    super(callInitializer);
   }
 
   @Override

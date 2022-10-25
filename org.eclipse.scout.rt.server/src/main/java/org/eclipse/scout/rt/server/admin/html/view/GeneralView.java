@@ -177,9 +177,9 @@ public class GeneralView extends DefaultView {
   private class P_EnableAction extends AbstractHtmlAction {
     private final boolean m_enabled;
 
-    public P_EnableAction(boolean b) {
-      super("mon.enabled." + b);
-      m_enabled = b;
+    public P_EnableAction(boolean enabled) {
+      super("mon.enabled." + enabled);
+      m_enabled = enabled;
     }
 
     @Override
