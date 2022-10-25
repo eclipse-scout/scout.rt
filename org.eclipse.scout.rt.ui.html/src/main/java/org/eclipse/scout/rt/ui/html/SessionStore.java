@@ -56,6 +56,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   private final HttpSession m_httpSession;
   private final String m_httpSessionId; // because getId() cannot be called on an invalid session
   private volatile boolean m_httpSessionValid = true;
+  private SessionStoreListeners m_listeners = new SessionStoreListeners();
 
   /**
    * key = clientSessionId
@@ -290,6 +291,8 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       m_uiSessionsByClientSession
           .computeIfAbsent(clientSession, k -> new HashSet<>())
           .add(uiSession);
+
+      m_listeners.fireEvent(new SessionStoreEvent(this, SessionStoreEvent.TYPE_UI_SESSION_REGISTERED));
     }
     finally {
       m_writeLock.unlock();
@@ -326,6 +329,8 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
           m_uiSessionsByClientSession.remove(clientSession);
         }
       }
+
+      listeners().fireEvent(new SessionStoreEvent(this, SessionStoreEvent.TYPE_UI_SESSION_UNREGISTERED));
 
       // Start housekeeping
       LOG.debug("{} UI sessions and {} preregistered UI session remaining for client session {}",
@@ -499,6 +504,11 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     catch (IllegalStateException e) { // NOSONAR
       // already invalid
     }
+  }
+
+  @Override
+  public SessionStoreListeners listeners() {
+    return m_listeners;
   }
 
   public static class SessionHousekeepingExceptionHandler extends ExceptionHandler {

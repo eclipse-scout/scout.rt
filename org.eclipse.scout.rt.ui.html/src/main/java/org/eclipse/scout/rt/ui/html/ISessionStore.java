@@ -104,4 +104,6 @@ public interface ISessionStore {
    * way.
    */
   void unregisterUiSession(IUiSession uiSession);
+
+  SessionStoreListeners listeners();
 }

@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
@@ -154,6 +155,27 @@ public final class UiHtmlConfigProperties {
     @Override
     public Integer getDefaultValue() {
       return 30;
+    }
+  }
+
+  public static class MaxUiSessionsPerHttpSession extends AbstractIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.ui.maxUiSessionsPerHttpSession";
+    }
+
+    @Override
+    public String description() {
+      return "The maximum number of ui sessions per http session before a notification is shown to warn the user about poor performance."
+          + "The browsers only allow a small amount of connections per domain. Due to the background polling of Scout, each tab uses at least one connection."
+          + "This means, if the maximum number of connection exceeds, the user can hardly work anymore and needs to close a browser tab in order to release a connection."
+          + "Important: this feature only works if the browser sends an unload event when the tab is closed. Mobile browsers don't do that, so the features is only enabled for desktop browsers.";
+    }
+
+    @Override
+    public Integer getDefaultValue() {
+      return 5;
     }
   }
 }

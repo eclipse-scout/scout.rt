@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.security.AccessController;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,11 +41,14 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
+import org.eclipse.scout.rt.client.ui.desktop.notification.DesktopNotification;
+import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -56,6 +61,8 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.LazyValue;
@@ -77,6 +84,7 @@ import org.eclipse.scout.rt.shared.ui.UiSystem;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.BackgroundPollingIntervalProperty;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.MaxUiSessionsPerHttpSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
@@ -253,6 +261,8 @@ public class UiSession implements IUiSession {
 
       // Start desktop
       startDesktop(jsonStartupReq.getSessionStartupParams());
+
+      checkIfSessionLimitReached();
 
       // Create a new JsonAdapter for the client session
       JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
@@ -475,6 +485,76 @@ public class UiSession implements IUiSession {
         .withExceptionHandling(null, false /* propagate */)); // exception handling done by caller
 
     BEANS.get(UiJobs.class).awaitAndGet(future);
+  }
+
+  protected int getMaxUiSessionsPerHttpSession() {
+    return CONFIG.getPropertyValue(MaxUiSessionsPerHttpSession.class);
+  }
+
+  protected boolean checkIfSessionLimitReachedEnabled() {
+    if (getMaxUiSessionsPerHttpSession() <= 0) {
+      return false;
+    }
+    // iOS devices don't send unload events -> drop of ui sessions cannot be detected, feature does not work
+    return getClientSession().getUserAgent().getUiDeviceType() == UiDeviceType.DESKTOP;
+  }
+
+  protected void checkIfSessionLimitReached() {
+    if (!checkIfSessionLimitReachedEnabled()) {
+      return;
+    }
+    Collection<IUiSession> uiSessions = new HashSet<>(m_sessionStore.getUiSessionMap().values());
+    uiSessions.add(this);
+    if (uiSessions.size() <= getMaxUiSessionsPerHttpSession()) {
+      return;
+    }
+
+    // Notify all client sessions
+    Collection<IClientSession> clientSessions = new HashSet<>(m_sessionStore.getClientSessionMap().values());
+    clientSessions.add(getClientSession());
+    clientSessions.forEach(clientSession -> addSessionLimitNotification(clientSession));
+    LOG.info("Ui session count exceeded limit. Count: {}", uiSessions.size());
+
+    // The first UiSession that exceeds the limit is responsible for removing the notification when the sessions drop
+    if (uiSessions.size() == getMaxUiSessionsPerHttpSession() + 1) {
+      SessionStoreListener listener = new SessionStoreListener() {
+        @Override
+        public void changed(SessionStoreEvent e) {
+          if (m_sessionStore.getUiSessionMap().size() > getMaxUiSessionsPerHttpSession()) {
+            return;
+          }
+          m_sessionStore.getClientSessionMap().values().forEach(clientSession -> removeSessionLimitNotification(clientSession));
+          m_sessionStore.listeners().remove(this);
+          LOG.info("Ui session count dropped under limit, stop listening.");
+        }
+      };
+      m_sessionStore.listeners().add(listener, false, SessionStoreEvent.TYPE_UI_SESSION_UNREGISTERED);
+      LOG.info("Listening for ui sessions to stop.");
+    }
+  }
+
+  protected void addSessionLimitNotification(IClientSession clientSession) {
+    final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent(true).withSession(clientSession, true);
+    ModelJobs.schedule(() -> {
+      if (clientSession.getDesktop().getNotifications().stream().anyMatch(n -> n instanceof P_SessionLimitExceededNotification)) {
+        return;
+      }
+      clientSession.getDesktop().addNotification(new P_SessionLimitExceededNotification());
+    },
+        ModelJobs.newInput(clientRunContext)
+            .withName("Adding session limit exceeded notification")
+            .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
+  }
+
+  protected void removeSessionLimitNotification(IClientSession clientSession) {
+    final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent(true).withSession(clientSession, true);
+    ModelJobs.schedule(() -> {
+      IDesktop desktop = clientSession.getDesktop();
+      desktop.getNotifications().stream().filter(n -> n instanceof P_SessionLimitExceededNotification).forEach(notification -> desktop.removeNotification(notification));
+    },
+        ModelJobs.newInput(clientRunContext)
+            .withName("Removing session limit exceeded notification")
+            .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
   }
 
   protected void putReloadPageStartupData() {
@@ -1144,7 +1224,7 @@ public class UiSession implements IUiSession {
    * completed.
    */
   protected Predicate<JobEvent> newUiDataAvailableFilter() {
-    return new Predicate<JobEvent>() {
+    return new Predicate<>() {
 
       @Override
       public boolean test(final JobEvent event) {
@@ -1414,6 +1494,16 @@ public class UiSession implements IUiSession {
 
     public synchronized HttpServletResponse getResponse() {
       return m_resp;
+    }
+  }
+
+  @ClassId("c6204373-2b3b-4726-a4cf-a8bf5e800dad")
+  protected static class P_SessionLimitExceededNotification extends DesktopNotification {
+
+    public P_SessionLimitExceededNotification() {
+      super(new Status(TEXTS.get("ui.SessionLimitExceeded"), IStatus.WARNING));
+      withDuration(-1);
+      withNativeNotificationVisibility(IDesktopNotification.NATIVE_NOTIFICATION_VISIBILITY_NONE);
     }
   }
 }
