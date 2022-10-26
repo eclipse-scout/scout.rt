@@ -23,10 +23,10 @@ export function init(data: any) {
  * @param modelFunc A function that returns the model instance.
  * @param parent Optional parent that is set on the returned object.
  */
-export function get<T extends { parent?: object }>(modelFunc: () => T, parent?: object): T {
+export function get<T>(modelFunc: () => T, parent?: object): T & { parent?: object } {
   let model = modelFunc();
   if (parent) {
-    model.parent = parent;
+    (model as T & { parent?: object }).parent = parent;
   }
   return model;
 }
