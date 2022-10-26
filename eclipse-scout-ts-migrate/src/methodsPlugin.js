@@ -1,11 +1,11 @@
 import jscodeshift from 'jscodeshift';
-import {defaultModuleMap, defaultParamTypeMap, defaultRecastOptions, defaultReturnTypeMap, findTypeByName, insertMissingImportsForTypes, methodFilter} from './common.js';
+import {defaultModuleMap, defaultParamTypeMap, defaultRecastOptions, defaultReturnTypeMap, findTypeByName, insertMissingImportsForTypes, mapType, methodFilter} from './common.js';
 
 const j = jscodeshift.withParser('ts');
 let referencedTypes;
 
 /**
- * @type import('ts-migrate-server').Plugin<{paramTypeMap?: object, returnTypeMap?: object, moduleMap?: object}>
+ * @type import('ts-migrate-server').Plugin<{paramTypeMap?: object, returnTypeMap?: object, moduleMap?: object, defaultReturnType?: string, defaultParamType?: string}>
  */
 const methodsPlugin = {
   name: 'methods-plugin',
@@ -15,6 +15,8 @@ const methodsPlugin = {
     const paramTypeMap = {...defaultParamTypeMap, ...options.paramTypeMap};
     const returnTypeMap = {...defaultReturnTypeMap, ...options.returnTypeMap};
     const moduleMap = {...defaultModuleMap, ...options.moduleMap};
+    const defaultReturnType = options.defaultReturnType;
+    const defaultParamType = options.defaultParamType;
     referencedTypes = new Set();
 
     root.find(j.Declaration)
@@ -23,10 +25,10 @@ const methodsPlugin = {
         let node = expression.node;
         if (node.params) {
           for (let param of node.params) {
-            processParamType(param, Object.values(paramTypeMap));
+            processParamType(param, Object.values(paramTypeMap), defaultParamType);
           }
         }
-        processReturnType(node, Object.values(returnTypeMap));
+        processReturnType(node, Object.values(returnTypeMap), defaultReturnType);
         removeJsDocTypes(node);
       });
 
@@ -35,12 +37,15 @@ const methodsPlugin = {
   }
 };
 
-function processReturnType(func, typeMaps) {
+function processReturnType(func, typeMaps, defaultReturnType) {
   let name = func.key ? func.key.name : func.id.name;
   if (func.returnType) {
     return;
   }
   let typeDesc = findTypeByName(j, typeMaps, name);
+  if (!typeDesc && defaultReturnType && func.kind !== 'constructor' && func.kind !== 'set') {
+    typeDesc = mapType(j, defaultReturnType);
+  }
   if (typeDesc) {
     func.returnType = j.tsTypeAnnotation(typeDesc.type);
     if (typeDesc.module) {
@@ -49,12 +54,15 @@ function processReturnType(func, typeMaps) {
   }
 }
 
-function processParamType(param, typeMaps) {
+function processParamType(param, typeMaps, defaultParamType) {
   let name = param.name;
   if (param.typeAnnotation) {
     return;
   }
   let typeDesc = findTypeByName(j, typeMaps, name);
+  if (!typeDesc && defaultParamType) {
+    typeDesc = mapType(j, defaultParamType);
+  }
   if (typeDesc) {
     param.typeAnnotation = j.tsTypeAnnotation(typeDesc.type);
     if (typeDesc.module) {
@@ -67,7 +75,7 @@ function processParamType(param, typeMaps) {
  * Removes all types form jsdoc if the types exist as TS types
  */
 function removeJsDocTypes(func) {
-  let comments = func.leadingComments;
+  let comments = func.comments;
   if (!comments) {
     return;
   }

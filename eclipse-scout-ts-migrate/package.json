@@ -36,7 +36,7 @@
     "ts-migrate-plugins": "0.1.33",
     "ts-migrate-server": "0.1.33",
     "yargs-parser": "21.1.1",
-    "jscodeshift": "0.13.1"
+    "jscodeshift": "0.14.0"
   },
   "devDependencies": {
     "@types/jscodeshift": "^0.11.5",
