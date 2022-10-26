@@ -50,10 +50,6 @@ export default class LogicalGridLayoutConfig implements LogicalGridLayoutConfigM
   minWidth: number;
 
   constructor(options?: LogicalGridLayoutConfigModel) {
-    this._extend(options);
-  }
-
-  protected _extend(options?: LogicalGridLayoutConfigModel) {
     // -1 means use the UI defaults
     options = options || {};
     if (options.hgap > -1) {

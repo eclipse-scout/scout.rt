@@ -32,10 +32,6 @@ export default class TileGridLayoutConfig extends LogicalGridLayoutConfig {
 
   constructor(options?: TileGridLayoutConfigOptions) {
     super(options);
-  }
-
-  protected override _extend(options?: TileGridLayoutConfigOptions) {
-    super._extend(options);
     options = options || {};
     if (options.maxWidth > -2) {
       this.maxWidth = options.maxWidth;
