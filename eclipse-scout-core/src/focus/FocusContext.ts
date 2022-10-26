@@ -248,7 +248,7 @@ export default class FocusContext {
       if (elementToFocus && (!activeElement || !this.focusManager.isElementCovertByGlassPane(activeElement))) {
         // If focus should be removed (blur), don't break here and try to focus the root element
         // Otherwise, if desired element cannot be focused then break and leave the focus where it is, unless the currently focused element is covered by a glass pane
-        return false;
+        return;
       }
       elementToFocus = null;
     }

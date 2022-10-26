@@ -121,7 +121,7 @@ export default class FileChooserController {
     this.displayParent.fileChoosers.forEach(fileChooser => fileChooser.detach());
   }
 
-  acceptView(view: FileChooser) {
+  acceptView(view: FileChooser): boolean {
     return this.displayParent.rendered;
   }
 }

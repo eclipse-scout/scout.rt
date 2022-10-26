@@ -52,7 +52,7 @@ export default class Code<TCodeId> {
   /**
    * @param vararg The language tag or the {@link Locale} to load the text for.
    */
-  text(vararg: string | Locale) {
+  text(vararg: string | Locale): string {
     if (typeof vararg === 'object') {
       return texts.resolveText(this._text, vararg.languageTag);
     }

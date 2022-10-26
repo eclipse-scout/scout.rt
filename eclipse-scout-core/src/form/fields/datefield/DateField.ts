@@ -314,16 +314,14 @@ export default class DateField extends ValueField<Date> implements DateFieldMode
   }
 
   protected override _renderPlaceholder($field?: JQuery) {
-    super._renderPlaceholder(
-      this._fieldForPlaceholder());
+    super._renderPlaceholder(this._fieldForPlaceholder());
   }
 
   protected override _removePlaceholder($field?: JQuery) {
-    super._removePlaceholder(
-      this._fieldForPlaceholder());
+    super._removePlaceholder(this._fieldForPlaceholder());
   }
 
-  protected _fieldForPlaceholder() {
+  protected _fieldForPlaceholder(): JQuery {
     if (this.hasDate) {
       return this.$dateField;
     }
@@ -388,7 +386,7 @@ export default class DateField extends ValueField<Date> implements DateFieldMode
     this._removePredictionFields();
   }
 
-  protected override _readDisplayText() {
+  protected override _readDisplayText(): string {
     let dateDisplayText: string, timeDisplayText: string;
     if (this.hasDate) {
       dateDisplayText = this._readDateDisplayText();
@@ -526,7 +524,7 @@ export default class DateField extends ValueField<Date> implements DateFieldMode
     }
   }
 
-  protected _errorStatusClass() {
+  protected _errorStatusClass(): string {
     return (this.errorStatus && !this._isSuppressStatusField()) ? 'has-' + this.errorStatus.cssClass() : '';
   }
 

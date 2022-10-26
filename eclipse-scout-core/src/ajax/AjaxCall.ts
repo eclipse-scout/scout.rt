@@ -70,7 +70,7 @@ export default class AjaxCall extends Call implements AjaxCallModel {
     super._onCallFail(jqXHR, textStatus, errorThrown);
   }
 
-  protected override _nextRetryImpl(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+  protected override _nextRetryImpl(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string): number | boolean {
     let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown);
     if (!offlineError) {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Unexpected HTTP error');
@@ -86,19 +86,19 @@ export default class AjaxCall extends Call implements AjaxCallModel {
     let offline = (
       // Status code = 0 -> no connection
       !jqXHR.status ||
-      // Workaround for IE 9: Apparently, Windows network error codes (http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx)
-      // are passed to JS as HTTP 'status' in some cases (e.g. when server goes offline).
-      jqXHR.status >= 12000 ||
-      // Status code 502 = Bad Gateway
-      // Status code 503 = Service Unavailable
-      // Status code 504 = Gateway Timeout
-      // Those codes usually happen when some network component between browser and UI server (e.g. a load balancer)
-      // has a short outage, most likely only temporarily. Therefore, we treat them like a lost connection.
-      // Otherwise, the polling loop would break, eventually causing the HTTP session to be invalidated on the
-      // server due to inactivity. Going offline starts the reconnector which regularly emits ping requests.
-      // This allows us to reconnect to the server as soon as the connection is fixed, hopefully saving the
-      // HTTP session from inactivation.
-      jqXHR.status === 502 ||
+        // Workaround for IE 9: Apparently, Windows network error codes (http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx)
+        // are passed to JS as HTTP 'status' in some cases (e.g. when server goes offline).
+        jqXHR.status >= 12000 ||
+        // Status code 502 = Bad Gateway
+        // Status code 503 = Service Unavailable
+        // Status code 504 = Gateway Timeout
+        // Those codes usually happen when some network component between browser and UI server (e.g. a load balancer)
+        // has a short outage, most likely only temporarily. Therefore, we treat them like a lost connection.
+        // Otherwise, the polling loop would break, eventually causing the HTTP session to be invalidated on the
+        // server due to inactivity. Going offline starts the reconnector which regularly emits ping requests.
+        // This allows us to reconnect to the server as soon as the connection is fixed, hopefully saving the
+        // HTTP session from inactivation.
+        jqXHR.status === 502 ||
       jqXHR.status === 503 ||
       jqXHR.status === 504
     );

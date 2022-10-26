@@ -1432,7 +1432,7 @@ export default class Calendar extends Widget implements CalendarModel {
     return -1;
   }
 
-  protected _endsBefore(component, pos: number, day: Date): boolean {
+  protected _endsBefore(component: CalendarComponent, pos: number, day: Date): boolean {
     return component.getPartDayPosition(day).to <= pos;
   }
 
@@ -1788,7 +1788,7 @@ export default class Calendar extends Widget implements CalendarModel {
     };
   }
 
-  protected _dayPositionByDivision(number): number {
+  protected _dayPositionByDivision(number: number): number {
     let hourMin = this._hourMinuteByDivision(number);
     return this._dayPosition(hourMin.hour, hourMin.minute);
   }

@@ -1178,7 +1178,7 @@ export default class Planner extends Widget implements PlannerModel {
     });
   }
 
-  protected _findScaleByToDate(to): DateRange {
+  protected _findScaleByToDate(to: Date): DateRange {
     return this._findScaleByFunction((i, elem) => {
       let $scaleItem = $(elem);
       if ($scaleItem.data('date-to').getTime() === to.getTime()) {
@@ -1287,7 +1287,9 @@ export default class Planner extends Widget implements PlannerModel {
     return menuUtil.filter(this.menus, allowedTypes, {onlyVisible, enableDisableKeyStrokes});
   }
 
-  setDisplayModeOptions(displayModeOptions: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>) {
+  setDisplayModeOptions(
+    displayModeOptions: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>
+  ) {
     this.setProperty('displayModeOptions', displayModeOptions);
   }
 

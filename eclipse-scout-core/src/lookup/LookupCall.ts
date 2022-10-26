@@ -126,7 +126,7 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
    *
    * * @returns A promise which returns an object that maps every {@link LookupRow} key to the text of the resolved {@link LookupRow}.
    */
-  protected _textsByKeys(keys): JQuery.Promise<Record<string, string>> {
+  protected _textsByKeys(keys: TKey[]): JQuery.Promise<Record<string, string>> {
     return this
       .cloneForKeys(keys)
       .execute()

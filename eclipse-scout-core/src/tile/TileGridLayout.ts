@@ -252,7 +252,7 @@ export default class TileGridLayout extends LogicalGridLayout {
     return this._animateTileBounds(tile, fromBounds, bounds);
   }
 
-  protected _inViewport(bounds: Rectangle) {
+  protected _inViewport(bounds: Rectangle): boolean {
     bounds = bounds.translate(this.containerPos.x, this.containerPos.y).translate(0, -this.containerScrollTop);
     let topLeftPos = new Point(bounds.x, bounds.y);
     let bottomRightPos = new Point(bounds.x + bounds.width, bounds.y + bounds.height);

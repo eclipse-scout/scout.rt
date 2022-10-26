@@ -235,7 +235,7 @@ export default abstract class LookupBox<TValue> extends ValueField<TValue[]> imp
     return strings.join(', ', ...formatted);
   }
 
-  protected override _readDisplayText() {
+  protected override _readDisplayText(): string {
     return this.displayText;
   }
 

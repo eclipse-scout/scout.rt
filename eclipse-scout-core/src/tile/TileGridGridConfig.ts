@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LogicalGridConfig, TileGrid} from '../index';
+import {LogicalGridWidget} from '../layout/logicalgrid/LogicalGridData';
 
 export default class TileGridGridConfig extends LogicalGridConfig {
   declare widget: TileGrid;
@@ -17,7 +18,7 @@ export default class TileGridGridConfig extends LogicalGridConfig {
     super();
   }
 
-  override getGridWidgets() {
+  override getGridWidgets(): LogicalGridWidget[] {
     return this.widget.filteredTiles;
   }
 }

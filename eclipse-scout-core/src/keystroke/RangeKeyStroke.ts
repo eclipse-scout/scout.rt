@@ -36,7 +36,7 @@ export default class RangeKeyStroke extends KeyStroke {
     return this.ranges.some(range => event.which >= this._getRangeFrom(range) && event.which <= this._getRangeTo(range));
   }
 
-  override keys() {
+  override keys(): Key[] {
     let keys = [];
     this.ranges.forEach(range => {
       let from = this._getRangeFrom(range);

@@ -217,7 +217,7 @@ export default class TabArea extends Widget implements TabAreaModel {
     }));
   }
 
-  visibleTabs() {
+  visibleTabs(): Tab[] {
     return this.tabs.filter(tab => tab.isVisible());
   }
 

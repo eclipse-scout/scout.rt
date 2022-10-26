@@ -84,7 +84,7 @@ export default class BeanField<TValue extends object> extends ValueField<TValue>
     });
   }
 
-  protected _onAppLinkAction(event) {
+  protected _onAppLinkAction(event: JQuery.TriggeredEvent) {
     let $target = $(event.delegateTarget);
     let ref = $target.data('ref');
     this.triggerAppLinkAction(ref);

@@ -70,9 +70,9 @@ export default class PageWithNodes extends Page {
     });
   }
 
-  override loadChildren() {
+  override loadChildren(): JQuery.Promise<any> {
     this.childrenLoaded = false;
-    return this._createChildPages().done(childPages => {
+    return this._createChildPages().done(childPages => { // FIXME TS can this be changed to then and <any> to void?
       this._rebuildDetailTable(childPages);
       if (childPages.length > 0) {
         this.getOutline().insertNodes(childPages, this);
@@ -84,7 +84,7 @@ export default class PageWithNodes extends Page {
   /**
    * Override this method to create child pages for this page. The default impl. returns an empty array.
    */
-  protected _createChildPages(): JQuery.Deferred<Page[]> {
-    return $.resolvedDeferred(this.childNodes);
+  protected _createChildPages(): JQuery.Promise<Page[]> {
+    return $.resolvedPromise(this.childNodes);
   }
 }

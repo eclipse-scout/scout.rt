@@ -546,7 +546,7 @@ export default class TableAdapter extends ModelAdapter {
     }, this);
   }
 
-  protected _onRequestFocusInCell(event) {
+  protected _onRequestFocusInCell(event: any) {
     // @ts-ignore
     let row = this.widget._rowById(event.rowId),
       column = this.widget.columnById(event.columnId);

@@ -35,7 +35,7 @@ export function _preInit(url: string, data: any) {
   init(data);
 }
 
-export function init(data) {
+export function init(data: any) {
   data = data || {};
   Object.keys(data).forEach(codeTypeId => add(data[codeTypeId]));
 }

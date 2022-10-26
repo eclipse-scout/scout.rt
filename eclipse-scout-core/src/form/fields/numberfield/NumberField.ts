@@ -118,7 +118,7 @@ export default class NumberField extends BasicField<number> implements NumberFie
     return Number(normalizedNumberString);
   }
 
-  protected override _ensureValue(value: number) {
+  protected override _ensureValue(value: number): number {
     return numbers.ensure(value);
   }
 

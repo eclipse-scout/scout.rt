@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, HtmlComponent, scout} from '../index';
+import {AbstractLayout, Dimension, HtmlComponent, HtmlCompPrefSizeOptions, scout} from '../index';
 import $ from 'jquery';
 
 export interface ColumnLayoutData {
@@ -78,7 +78,7 @@ export default class ColumnLayout extends AbstractLayout implements ColumnLayout
     });
   }
 
-  override preferredLayoutSize($container: JQuery, options): Dimension {
+  override preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     let prefSize = new Dimension(),
       htmlContainer = HtmlComponent.get($container),
       childOptions = {

@@ -457,7 +457,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
    *
    * @returns promise which may contain a Status specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
    */
-  protected _save(data): Promise<Status> {
+  protected _save(data: object): Promise<Status> {
     return $.resolvedPromise();
   }
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GroupBox, GroupBoxEventMap, GroupBoxModel, PropertyChangeEvent, Tab, TabBox, TabItemLayout} from '../../../index';
+import {GroupBox, GroupBoxEventMap, GroupBoxModel, Menu, PropertyChangeEvent, Tab, TabBox, TabItemLayout} from '../../../index';
 
 export interface TabItemModel extends GroupBoxModel {
   marked?: boolean;
@@ -37,7 +37,7 @@ export default class TabItem extends GroupBox implements TabItemModel {
   /**
    * Handled by {@link Tab}
    */
-  protected override _computeTitleVisible(labelVisible: boolean) {
+  protected override _computeTitleVisible(labelVisible: boolean): boolean {
     return false;
   }
 
@@ -51,7 +51,7 @@ export default class TabItem extends GroupBox implements TabItemModel {
   /**
    * Handled by {@link Tab}
    */
-  protected override _computeStatusVisible() {
+  protected override _computeStatusVisible(): boolean {
     return false;
   }
 
@@ -59,7 +59,7 @@ export default class TabItem extends GroupBox implements TabItemModel {
     this.setProperty('marked', marked);
   }
 
-  override getContextMenuItems(onlyVisible = true) {
+  override getContextMenuItems(onlyVisible = true): Menu[] {
     return [];
   }
 

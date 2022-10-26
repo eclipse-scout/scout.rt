@@ -24,7 +24,7 @@ export default class PromiseCreator {
   currentItem: number;
   aborted: boolean;
 
-  constructor(items) {
+  constructor(items: (() => JQuery.Promise<any>)[]) {
     this.results = [];
     this.error = null;
 

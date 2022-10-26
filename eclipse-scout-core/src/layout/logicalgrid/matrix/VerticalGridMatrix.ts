@@ -89,7 +89,7 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
     return true;
   }
 
-  protected _reorganizeGridAbove(x: number, y: number, w) {
+  protected _reorganizeGridAbove(x: number, y: number, w: number) {
     let widgetsToReorganize = [];
     let addWidgetToReorganize = f => {
       if (widgetsToReorganize.indexOf(f) === -1) {
@@ -156,11 +156,11 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
     });
   }
 
-  protected _horizontalMatchesOrOverlaps(bounds: { x: number; y: number; w: number; h: number }, gd: GridData) {
+  protected _horizontalMatchesOrOverlaps(bounds: { x: number; y: number; w: number; h: number }, gd: GridData): boolean {
     return bounds.x >= gd.x && bounds.x + bounds.w <= gd.x + gd.w;
   }
 
-  protected _horizontalOverlapsOnSide(bounds: { x: number; y: number; w: number; h: number }, gd: GridData) {
+  protected _horizontalOverlapsOnSide(bounds: { x: number; y: number; w: number; h: number }, gd: GridData): boolean {
     return bounds.x > gd.x || bounds.x + bounds.w < gd.x + gd.w;
   }
 }

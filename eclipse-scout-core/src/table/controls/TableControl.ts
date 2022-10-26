@@ -140,7 +140,7 @@ export default abstract class TableControl extends Action implements TableContro
     }
   }
 
-  override get$Scrollable() {
+  override get$Scrollable(): JQuery {
     return this.$contentContainer;
   }
 

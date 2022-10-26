@@ -526,7 +526,7 @@ export function forEachArgument(args: IArguments, func: (value: any, index: numb
  *   2. Open browser's development console
  *   3. Type: checkFunctionOverrides().join('\n')
  */
-export function checkFunctionOverrides() {
+export function checkFunctionOverrides(): string[] {
   let whitelist = [
     'ModelAdapter.init',
     'ModelAdapter._init',

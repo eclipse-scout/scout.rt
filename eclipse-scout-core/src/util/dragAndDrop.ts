@@ -42,7 +42,7 @@ export function scoutTypeToDragTypeMapping(scoutTypesArray: DropType | DropType[
  * @param fieldAllowedTypes allowed types on field (integer, bitwise comparison used)
  * @param scoutTypeArray e.g. FILE_TRANSFER
  */
-export function verifyDataTransferTypesScoutTypes(event: JQuery.DragEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>, scoutTypeArray: DropType | DropType[], fieldAllowedTypes: number) {
+export function verifyDataTransferTypesScoutTypes(event: JQuery.DragEventBase, scoutTypeArray: DropType | DropType[], fieldAllowedTypes: number) {
   scoutTypeArray = arrays.ensure(scoutTypeArray);
   let dragTypeArray = [];
 
@@ -68,7 +68,7 @@ export function verifyDataTransferTypesScoutTypes(event: JQuery.DragEventBase<HT
  * @param dataTransfer dataTransfer object (not dataTransfer.types)
  * @param needleArray e.g. 'Files'
  */
-export function verifyDataTransferTypes(event: JQuery.DragEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>, needleArray: string | string[]): boolean {
+export function verifyDataTransferTypes(event: JQuery.DragEventBase, needleArray: string | string[]): boolean {
   let dataTransfer = event.originalEvent.dataTransfer;
 
   if (dataTransferTypesContains(dataTransfer, needleArray)) {

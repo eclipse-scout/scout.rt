@@ -101,7 +101,7 @@ export default class PlannerAdapter extends ModelAdapter {
     this.widget.updateResources(resources);
   }
 
-  override onModelAction(event) {
+  override onModelAction(event: any) {
     if (event.type === 'resourcesInserted') {
       this._onResourcesInserted(event.resources);
     } else if (event.type === 'resourcesDeleted') {

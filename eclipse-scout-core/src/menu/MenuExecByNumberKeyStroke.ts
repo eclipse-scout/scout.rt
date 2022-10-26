@@ -13,7 +13,7 @@ import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class MenuExecByNumberKeyStroke extends MenuNavigationExecKeyStroke {
 
-  constructor(popup: ContextMenuPopup, menuItemClass) {
+  constructor(popup: ContextMenuPopup, menuItemClass: string) {
     super(popup, menuItemClass);
     this._menuItemClass = menuItemClass;
     this.which = [keys[1], keys[2], keys[3], keys[4], keys[5], keys[6], keys[7], keys[8], keys[9]];

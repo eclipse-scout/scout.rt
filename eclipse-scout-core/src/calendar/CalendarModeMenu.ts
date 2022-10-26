@@ -20,7 +20,7 @@ export default class CalendarModeMenu extends Menu implements CalendarModeMenuMo
     super();
   }
 
-  override doAction() {
+  override doAction(): boolean {
     if (!this.prepareDoAction()) {
       return false;
     }

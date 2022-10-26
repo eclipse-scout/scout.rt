@@ -11,9 +11,6 @@
 import {icons, objects, scout, Session, styles, texts, Tree, TreeNodeModel} from '../index';
 import $ from 'jquery';
 
-/**
- * @class
- */
 export default class TreeNode implements TreeNodeModel {
   declare model: TreeNodeModel;
 
@@ -201,7 +198,7 @@ export default class TreeNode implements TreeNodeModel {
    * @returns a Deferred or null when TreeNode cannot load children (which is the case for all
    *     TreeNodes in the remote case). The default impl. returns a resolved deferred.
    */
-  loadChildren(): JQuery.Deferred<any> {
+  loadChildren(): JQuery.Deferred<any> | JQuery.Promise<any> {
     return $.resolvedDeferred();
   }
 

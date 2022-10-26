@@ -55,7 +55,7 @@ export default class LogicalGridMatrix {
     return true;
   }
 
-  protected _isAllCellFree(x: number, y: number, w, h): boolean {
+  protected _isAllCellFree(x: number, y: number, w: number, h: number): boolean {
     if (x + w > this._cursor.startX + this._cursor.columnCount || y + h > this._cursor.startY + this._cursor.rowCount) {
       return false;
     }

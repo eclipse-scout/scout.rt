@@ -434,11 +434,11 @@ export default class TileGrid extends Widget implements TileGridModel {
     }
   }
 
-  protected _animateTileRemoval(tile: Tile) {
+  protected _animateTileRemoval(tile: Tile): boolean {
     return this.animateTileRemoval && tile && tile.isVisible() && !(tile instanceof PlaceholderTile);
   }
 
-  protected _animateTileInsertion(tile: Tile) {
+  protected _animateTileInsertion(tile: Tile): boolean {
     return this.animateTileInsertion && tile && tile.isVisible() && !(tile instanceof PlaceholderTile);
   }
 
@@ -551,7 +551,7 @@ export default class TileGrid extends Widget implements TileGridModel {
     this._setProperty('menus', menus);
   }
 
-  protected _filterMenus(menus: Menu[], destination: MenuDestinations, onlyVisible?: boolean, enableDisableKeyStrokes?: boolean, notAllowedTypes?: string | string[]) {
+  protected _filterMenus(menus: Menu[], destination: MenuDestinations, onlyVisible?: boolean, enableDisableKeyStrokes?: boolean, notAllowedTypes?: string | string[]): Menu[] {
     return menuUtil.filterAccordingToSelection('TileGrid', this.selectedTiles.length, menus, destination, {onlyVisible, enableDisableKeyStrokes, notAllowedTypes});
   }
 
@@ -937,7 +937,7 @@ export default class TileGrid extends Widget implements TileGridModel {
     return graphics.offsetBounds(tile.$container).intersects(graphics.offsetBounds($scrollable));
   }
 
-  protected _onTileMouseDown(event: JQuery.MouseDownEvent) {
+  protected _onTileMouseDown(event: JQuery.MouseDownEvent): boolean {
     this._doubleClickSupport.mousedown(event);
     this._selectTileOnMouseDown(event);
 
@@ -1055,7 +1055,7 @@ export default class TileGrid extends Widget implements TileGridModel {
     this.filterSupport.filter();
   }
 
-  protected _applyFilters(tiles: Tile[], fullReset?: boolean) {
+  protected _applyFilters(tiles: Tile[], fullReset?: boolean): FilterResult<Tile> {
     return this.filterSupport.applyFilters(tiles.filter(tile => !(tile instanceof PlaceholderTile)), fullReset);
   }
 
@@ -1511,11 +1511,9 @@ export default class TileGrid extends Widget implements TileGridModel {
     });
   }
 
-  rowHasRenderedTiles(row: number) {
+  rowHasRenderedTiles(row: number): boolean {
     let tilesInRow = this.findTilesInRow(row);
-    return tilesInRow.some(tile => {
-      return tile.rendered && !tile.removing;
-    });
+    return tilesInRow.some(tile => tile.rendered && !tile.removing);
   }
 
   ensureTileRendered(tile: Tile) {

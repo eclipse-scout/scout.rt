@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, defaultValues, ErrorHandler} from './index';
+import {App, defaultValues, ErrorHandler, SessionModel} from './index';
 import $ from 'jquery';
 import {AppBootstrapOptions} from './App';
 import {ErrorHandlerOptions} from './ErrorHandler';
@@ -37,10 +37,10 @@ export default class RemoteApp extends App {
     return super._createErrorHandler(opts);
   }
 
-  protected override _loadSession($entryPoint: JQuery, options): JQuery.Promise<any> {
-    options = options || {};
-    options.$entryPoint = $entryPoint;
-    let session = this._createSession(options);
+  protected override _loadSession($entryPoint: JQuery, options: Omit<SessionModel, '$entryPoint'>): JQuery.Promise<any> {
+    let model = (options || {}) as SessionModel;
+    model.$entryPoint = $entryPoint;
+    let session = this._createSession(model);
     App.get().sessions.push(session);
     return session.start();
   }

@@ -38,7 +38,7 @@ export default class GroupBoxAdapter extends CompositeFieldAdapter {
     }
   }
 
-  protected _getGridData(field: FormField) {
+  protected _getGridData(field: FormField): GridData {
     return new GridData(field.gridData);
   }
 

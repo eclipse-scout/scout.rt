@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Dimension, graphics, HtmlComponent, scout} from '../index';
+import {AbstractLayout, Dimension, graphics, HtmlComponent, HtmlCompPrefSizeOptions, scout} from '../index';
 import $ from 'jquery';
 
 export interface SingleLayoutOptions {
@@ -45,7 +45,7 @@ export default class SingleLayout extends AbstractLayout implements SingleLayout
     }
   }
 
-  override preferredLayoutSize($container: JQuery, options): Dimension {
+  override preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     let htmlChild = this._htmlChild;
     if (!htmlChild) {
       htmlChild = this._getHtmlSingleChild($container);

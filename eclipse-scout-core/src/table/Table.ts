@@ -691,7 +691,7 @@ export default class Table extends Widget implements TableModel {
     }
   }
 
-  protected _onRowMouseDown(event: JQuery.MouseDownEvent) {
+  protected _onRowMouseDown(event: JQuery.MouseDownEvent): boolean {
     this._doubleClickSupport.mousedown(event);
     this._$mouseDownRow = $(event.currentTarget);
     this._mouseDownRowId = this._$mouseDownRow.data('row').id;
@@ -886,7 +886,7 @@ export default class Table extends Widget implements TableModel {
     return this.tableControls.some(control => control instanceof AggregateTableControl);
   }
 
-  protected _createHeader() {
+  protected _createHeader(): TableHeader {
     return scout.create(TableHeader, {
       parent: this,
       table: this,
@@ -895,7 +895,7 @@ export default class Table extends Widget implements TableModel {
     });
   }
 
-  protected _createFooter() {
+  protected _createFooter(): TableFooter {
     return scout.create(TableFooter, {
       parent: this,
       table: this
@@ -2707,7 +2707,7 @@ export default class Table extends Widget implements TableModel {
    * @param rows {@link rootRows} are used if not specified.
    * @param expanded Default is true.
    * @param recursive Default is false.
-   */
+  */
   expandRowsInternal(rows?: TableRow[], expanded?: boolean, recursive?: boolean) {
     let changedRows: TableRow[] = [], rowsForAnimation: TableRow[] = [];
     rows = rows || this.rootRows;
@@ -5275,7 +5275,7 @@ export default class Table extends Widget implements TableModel {
     return totalHeight;
   }
 
-  containsAggregatedNumberColumn() {
+  containsAggregatedNumberColumn(): boolean {
     if (!this.initialized) {
       return false;
     }
@@ -5468,7 +5468,7 @@ export default class Table extends Widget implements TableModel {
     return this.filterColumns(column => column.isVisible(), includeGuiColumns);
   }
 
-  displayableColumns(includeGuiColumns?: boolean) {
+  displayableColumns(includeGuiColumns?: boolean): Column<any>[] {
     return this.filterColumns(column => column.displayable, includeGuiColumns);
   }
 

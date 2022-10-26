@@ -72,7 +72,7 @@ export default class TableControlAdapterMenu extends FormMenu implements TableCo
     this._uninstallListeners();
   }
 
-  override doAction() {
+  override doAction(): boolean {
     return this.tableControl.doAction();
   }
 

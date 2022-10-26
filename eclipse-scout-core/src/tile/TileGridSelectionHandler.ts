@@ -190,7 +190,7 @@ export default class TileGridSelectionHandler {
     this.tileGrid.scrollToBottom();
   }
 
-  findVisibleTileIndexAt(x: number, y: number, startIndex?: number, reverse?: boolean) {
+  findVisibleTileIndexAt(x: number, y: number, startIndex?: number, reverse?: boolean): number {
     return this.tileGrid.findTileIndexAt(x, y, startIndex, reverse);
   }
 

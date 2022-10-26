@@ -94,7 +94,7 @@ export default class EventDelegator {
     }
   }
 
-  static equalsProperty(propName: string, obj: object, value): boolean {
+  static equalsProperty(propName: string, obj: object, value: any): boolean {
     let propValue = obj[propName];
     // Compare arrays using arrays.equals()
     if (Array.isArray(value) && Array.isArray(propValue)) {

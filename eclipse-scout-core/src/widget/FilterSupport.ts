@@ -240,8 +240,8 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
    */
   addFilter(filter: FilterOrFunction<TElem> | FilterOrFunction<TElem>[], applyFilter = true): Filter<TElem>[] {
     let filtersToAdd = arrays.ensure(filter);
-    let filters: FilterOrFunction<TElem>[] = this._getFilters().slice(),
-      oldFilters = filters.slice();
+    let filters: FilterOrFunction<TElem>[] = this._getFilters().slice();
+    let oldFilters = filters.slice();
     filtersToAdd.forEach(filter => {
       if (this._hasFilter(filters, filter)) {
         return;
@@ -344,18 +344,18 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
     return this.widget.filters;
   }
 
-  protected _findFilter(filters: Filter<TElem>[], filter: FilterOrFunction<TElem>): Filter<TElem> {
+  protected _findFilter(filters: FilterOrFunction<TElem>[], filter: FilterOrFunction<TElem>): Filter<TElem> {
     if (objects.isFunction(filter)) {
       return this._getFilterCreatedByFunction(filters, filter);
     }
-    return arrays.find(filters, f => objects.equals(f, filter));
+    return arrays.find(filters, f => objects.equals(f, filter)) as Filter<TElem>;
   }
 
-  protected _getFilterCreatedByFunction(filters: Filter<TElem>[], filterFunc): Filter<TElem> {
-    return arrays.find(filters, filter => filter.createdByFunction && filter.accept === filterFunc);
+  protected _getFilterCreatedByFunction(filters: FilterOrFunction<TElem>[], filterFunc: Predicate<TElem>): Filter<TElem> {
+    return arrays.find(filters, filter => typeof filter !== 'function' && filter.createdByFunction && filter.accept === filterFunc) as Filter<TElem>;
   }
 
-  protected _hasFilter(filters, filter): boolean {
+  protected _hasFilter(filters: FilterOrFunction<TElem>[], filter: FilterOrFunction<TElem>): boolean {
     return !!this._findFilter(filters, filter);
   }
 

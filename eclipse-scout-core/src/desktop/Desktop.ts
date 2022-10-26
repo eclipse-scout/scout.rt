@@ -410,7 +410,7 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
     this.outline.fileChooserController.remove();
   }
 
-  computeParentForDisplayParent(displayParent: DisplayParent) {
+  computeParentForDisplayParent(displayParent: DisplayParent): Widget {
     // Outline must not be used as parent, otherwise the children (form, messageboxes etc.) would be removed if navigation is made invisible
     // The functions _render/removeDisplayChildrenOfOutline take care that the elements are correctly rendered/removed on an outline switch
     let parent = displayParent;

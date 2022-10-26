@@ -33,7 +33,7 @@ export default class CompactLineBlock {
     this.text = scout.nvl(text, '');
   }
 
-  processedText() {
+  processedText(): string {
     if (this._processedText == null) {
       this._processedText = this.processText();
     }

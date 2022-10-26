@@ -29,7 +29,7 @@ export default class DesktopTabBoxController extends SimpleTabBoxController {
     });
   }
 
-  protected override _shouldCreateTabForView(view: Form) {
+  protected override _shouldCreateTabForView(view: Form): boolean {
     // Don't create a tab if the view itself already has a header.
     return !view.headerVisible;
   }

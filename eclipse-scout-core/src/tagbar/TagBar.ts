@@ -258,7 +258,7 @@ export default class TagBar extends Widget implements TagBarModel {
     this._renderTagsRemovable($tags);
   }
 
-  renderTag($parent: JQuery, tagText: string) {
+  renderTag($parent: JQuery, tagText: string): JQuery {
     let $tag = $parent
       .appendDiv('tag-element')
       .data('tag', tagText);

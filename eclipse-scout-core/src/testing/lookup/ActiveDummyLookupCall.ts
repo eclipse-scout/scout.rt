@@ -16,7 +16,7 @@ export default class ActiveDummyLookupCall extends StaticLookupCall<number> {
     this.setDelay(250);
   }
 
-  protected override _data() {
+  protected override _data(): any[] {
     return [
       [1, 'Foo', true],
       [2, 'Bar', false],

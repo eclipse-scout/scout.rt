@@ -287,7 +287,7 @@ export default class TagField extends ValueField<string[]> implements TagFieldMo
 
   protected _lookupByText(text: string) {
     if (!this.lookupCall) {
-      return null;
+      return;
     }
     if (strings.empty(text) || text.length < 2) {
       this.closePopup();
@@ -298,7 +298,7 @@ export default class TagField extends ValueField<string[]> implements TagFieldMo
     this.trigger('prepareLookupCall', {
       lookupCall: this._currentLookupCall
     });
-    return this._currentLookupCall
+    this._currentLookupCall
       .execute()
       .always(() => {
         this._currentLookupCall = null;

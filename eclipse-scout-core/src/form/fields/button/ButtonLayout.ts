@@ -13,7 +13,7 @@ import {Button, Dimension, FormFieldLayout, graphics, HtmlCompPrefSizeOptions} f
 export default class ButtonLayout extends FormFieldLayout {
   declare formField: Button;
 
-  constructor(button) {
+  constructor(button: Button) {
     super(button);
   }
 

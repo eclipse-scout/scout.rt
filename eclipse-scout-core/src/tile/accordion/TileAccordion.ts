@@ -251,7 +251,7 @@ export default class TileAccordion extends Accordion implements TileAccordionMod
    * Distribute the tiles to the corresponding groups and returns an object with group id as key and array of tiles as value.
    * Always returns all current groups even if the given tiles may not be distributed to all groups.
    */
-  protected _groupTiles(tiles: Tile[]) {
+  protected _groupTiles(tiles: Tile[]): Record<string, Tile[]> {
     // Create a map of groups, key is the id, value is an array of tiles
     let tilesPerGroup = {};
     this.groups.forEach(group => {

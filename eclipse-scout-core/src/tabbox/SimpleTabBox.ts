@@ -274,7 +274,7 @@ export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
     return this.viewStack.filter(v => v === view).length > 0;
   }
 
-  getViews(displayViewId?: string) {
+  getViews(displayViewId?: string): OutlineContent[] {
     return this.viewStack.filter(view => {
       if (!displayViewId) {
         return true;

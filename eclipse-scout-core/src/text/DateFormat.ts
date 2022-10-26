@@ -983,7 +983,7 @@ export default class DateFormat {
    * Returns the date where parsed information should be applied to. The given
    * startDate is used when specified, otherwise a new date is created (today).
    */
-  protected _prepareStartDate(startDate: Date) {
+  protected _prepareStartDate(startDate: Date): Date {
     if (startDate) {
       // It is important that we don't alter the argument 'startDate', but create an independent copy!
       return new Date(startDate.getTime());

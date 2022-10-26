@@ -70,7 +70,7 @@ export default class FocusFilterFieldKeyStroke extends KeyStroke {
   /**
    * Returns a virtual key to represent this keystroke.
    */
-  override keys() {
+  override keys(): Key[] {
     // @ts-ignore
     return [new Key(this, this.virtualKeyStrokeWhich)];
   }

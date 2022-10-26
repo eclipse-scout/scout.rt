@@ -208,7 +208,7 @@ export default class StaticLookupCall<TKey> extends LookupCall<TKey> implements 
   /**
    * Implement this function to convert a single data array into an instance of LookupRow.
    */
-  protected _dataToLookupRow(data: any): LookupRow<TKey> {
+  protected _dataToLookupRow(data: any[]): LookupRow<TKey> {
     return scout.create(LookupRow, {
       key: data[0],
       text: data[1],

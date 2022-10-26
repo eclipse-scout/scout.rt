@@ -163,7 +163,7 @@ export interface Extension {
  * @param parentModel object which contains id's as properties
  * @returns parentModel extended by extension
  */
-export function extend(extension: Extension | string | (() => Extension), parentModel: object) {
+export function extend(extension: Extension | string | (() => Extension), parentModel: object): object {
   let extensionObject: Extension;
   if (typeof extension === 'string') {
     extensionObject = getExtension(extension);

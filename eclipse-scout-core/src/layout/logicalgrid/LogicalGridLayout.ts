@@ -115,7 +115,6 @@ export default class LogicalGridLayout extends AbstractLayout {
       rowHeight: this.rowHeight,
       columnWidth: this.columnWidth,
       widthHint: options.widthHint,
-      heightHint: options.heightHint,
       widthOnly: options.widthOnly
     });
     $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#validateLayout) $container=' + HtmlComponent.get($container).debug());
@@ -209,7 +208,7 @@ export default class LogicalGridLayout extends AbstractLayout {
     return this.info.layoutCellBounds(containerSize, containerInsets);
   }
 
-  override preferredLayoutSize($container: JQuery, options): Dimension {
+  override preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     // widthHint and heightHint are already adjusted by HtmlComponent, no need to remove insets here
     this.validateLayout($container, options);
 
