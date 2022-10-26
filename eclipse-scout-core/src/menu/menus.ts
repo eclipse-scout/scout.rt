@@ -74,7 +74,7 @@ export function filter(menus: Menu[], types: string | string[], options?: MenuFi
         _enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
         return;
       }
-    } else if (!_checkType(menu, types, defaultMenuTypes) || (notAllowedTypes.length !== 0 && _checkType(menu, notAllowedTypes, defaultMenuTypes))) {
+    } else if (!_checkType(menu, types as string[], defaultMenuTypes) || (notAllowedTypes.length !== 0 && _checkType(menu, notAllowedTypes as string[], defaultMenuTypes))) {
       // Don't check the menu type for a group
       _enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
       return;
@@ -153,7 +153,7 @@ export function _enableDisableMenuKeyStroke(menu: Menu, activated: boolean, excl
  * Checks the type of a menu. Don't use this for menu groups.
  */
 
-export function _checkType(menu: Menu, types, defaultMenuTypes: string | string[] = []): boolean {
+export function _checkType(menu: Menu, types: string[], defaultMenuTypes: string | string[] = []): boolean {
   if (!types || types.length === 0) {
     return false;
   }

@@ -19,7 +19,7 @@ export default class GroupToggleCollapseKeyStroke extends KeyStroke {
     this.which = [keys.SPACE];
   }
 
-  override handle(event) {
+  override handle(event: JQuery.KeyboardEventBase) {
     this.field.toggleCollapse();
   }
 }

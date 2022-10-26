@@ -205,7 +205,7 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
     }
   }
 
-  protected _checkRenderSubMenuItemsPossible(parentMenu, menus: Menu[], animated, initialSubMenuRendering): boolean {
+  protected _checkRenderSubMenuItemsPossible(parentMenu: Menu, menus: Menu[], animated: any, initialSubMenuRendering: any): boolean {
     if (!this.session.desktop.rendered && !initialSubMenuRendering) {
       this.initialSubMenusToRender = {
         parentMenu: parentMenu,

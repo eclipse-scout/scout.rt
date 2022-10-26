@@ -507,7 +507,7 @@ export default class HtmlComponent {
   /**
    * Delegates to {@link graphics.offsetBounds}.
    */
-  offsetBounds(options?): Rectangle {
+  offsetBounds(options?: BoundsOptions | boolean): Rectangle {
     return graphics.offsetBounds(this.$comp, options);
   }
 

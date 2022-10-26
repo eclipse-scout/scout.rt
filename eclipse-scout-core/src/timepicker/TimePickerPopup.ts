@@ -54,7 +54,8 @@ export default class TimePickerPopup extends Popup {
   /**
    * override because the icon is not in the $anchor container.
    */
-  protected override _isMouseDownOnAnchor(event): boolean {
-    return this.field.$timeField.isOrHas(event.target) || this.field.$timeFieldIcon.isOrHas(event.target) || (this.field.$timeClearIcon && this.field.$timeClearIcon.isOrHas(event.target));
+  protected override _isMouseDownOnAnchor(event: MouseEvent): boolean {
+    let target = event.target as HTMLElement;
+    return this.field.$timeField.isOrHas(target) || this.field.$timeFieldIcon.isOrHas(target) || (this.field.$timeClearIcon && this.field.$timeClearIcon.isOrHas(target));
   }
 }

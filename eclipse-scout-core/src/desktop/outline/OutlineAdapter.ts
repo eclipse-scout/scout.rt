@@ -238,7 +238,7 @@ export default class OutlineAdapter extends TreeAdapter {
    * This cannot be done using pageInit event because the page needs to be initialized during the outline initialization
    * and the event listener can only be attached afterwards.
    */
-  protected static _initTreeNodeInternalRemote(page: Page, parentNode) {
+  protected static _initTreeNodeInternalRemote(page: Page, parentNode: Page) {
     // @ts-ignore
     this._initTreeNodeInternalOrig(page, parentNode);
     // @ts-ignore

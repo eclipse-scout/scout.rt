@@ -15,7 +15,7 @@ export default class LogicalGridMatrixCell {
   widget: LogicalGridWidget;
   data: GridData;
 
-  constructor(widget?: LogicalGridWidget, data?) {
+  constructor(widget?: LogicalGridWidget, data?: GridData) {
     this.widget = widget;
     this.data = data;
   }

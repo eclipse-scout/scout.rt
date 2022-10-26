@@ -16,10 +16,6 @@ import {LoadingSupport} from '../index';
  */
 export default class SimpleLoadingSupport extends LoadingSupport {
 
-  constructor(options) {
-    super(options);
-  }
-
   protected override _renderLoadingIndicator() {
     if (this.widget.rendered || this.widget.rendering) {
       this.$container.addClass('loading');

@@ -12,11 +12,12 @@
  */
 import {arrays, Dimension, HtmlComponent, HtmlCompPrefSizeOptions, Insets, LayoutConstants, LogicalGridData, Rectangle, TreeSet} from '../../index';
 import $ from 'jquery';
+import {LogicalGridLayoutInfoModel} from './LogicalGridLayoutInfoModel';
 
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayoutInfo.
  */
-export default class LogicalGridLayoutInfo {
+export default class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel {
   gridDatas: LogicalGridData[];
   cons: LogicalGridData[];
   cols: number;
@@ -36,7 +37,7 @@ export default class LogicalGridLayoutInfo {
   widthOnly: boolean;
   $components: JQuery[];
 
-  constructor(model) {
+  constructor(model: LogicalGridLayoutInfoModel) {
     this.gridDatas = [];
     this.$components = null;
     this.cols = 0;

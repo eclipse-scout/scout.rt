@@ -38,7 +38,7 @@ export default class WidgetTile extends Tile implements WidgetTileModel {
     this._widgetPropertyChangeHandler = this._onWidgetPropertyChange.bind(this);
   }
 
-  protected override _init(model) {
+  protected override _init(model: WidgetTileModel) {
     super._init(model);
     this._setTileWidget(this.tileWidget);
   }

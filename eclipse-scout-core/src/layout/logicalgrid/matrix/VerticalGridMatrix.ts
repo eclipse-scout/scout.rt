@@ -89,7 +89,7 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
     return true;
   }
 
-  protected _reorganizeGridAbove(x: number, y: number, w) {
+  protected _reorganizeGridAbove(x: number, y: number, w: number) {
     let widgetsToReorganize = [];
     let addWidgetToReorganize = f => {
       if (widgetsToReorganize.indexOf(f) === -1) {

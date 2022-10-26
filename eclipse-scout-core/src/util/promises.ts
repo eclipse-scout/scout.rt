@@ -48,7 +48,7 @@ export function oneByOne(promiseCreator: PromiseCreator): JQuery.Promise<any> {
  * Use a promise creator to create a group of promises and wait until the whole group has been executed
  * before creating and executing promises for the next group.
  */
-export function groupwise(groupSize, promiseCreator): JQuery.Promise<any> {
+export function groupwise(groupSize: number, promiseCreator: PromiseCreator): JQuery.Promise<any> {
   let deferred = $.Deferred();
   _repeat(promiseCreator);
   return deferred.promise();
@@ -85,10 +85,9 @@ export function groupwise(groupSize, promiseCreator): JQuery.Promise<any> {
  * promises available).
  *
  * @param maxPoolSize defines how many promises should be created and executed at most in parallel.
- * @param promiseCreator
  * @param timeout specifies a timeout to wait for until the next promise will be started.
  */
-export function parallel(maxPoolSize, promiseCreator, timeout): JQuery.Promise<any> {
+export function parallel(maxPoolSize: number, promiseCreator: PromiseCreator, timeout: number): JQuery.Promise<any> {
   timeout = timeout || 0;
   let deferred = $.Deferred();
   let poolSize = 0;

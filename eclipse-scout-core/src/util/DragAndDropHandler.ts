@@ -10,11 +10,11 @@
  */
 import {arrays, dragAndDrop, files as fileUtil, MessageBoxes, Status, Widget} from '../index';
 import $ from 'jquery';
-import {DropType, DropValidationErrorMessage, FileDropEvent} from './dragAndDrop';
+import {DragAndDropOptions, DropType, DropValidationErrorMessage, FileDropEvent} from './dragAndDrop';
 import {MessageBoxOption} from '../messagebox/MessageBox';
 
 export default class DragAndDropHandler {
-  additionalDropProperties: (event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => Record<string, string | Blob>;
+  additionalDropProperties: (event: JQuery.DropEvent) => Record<string, string | Blob>;
   allowedTypes: () => string[];
   dropType: () => DropType;
   dropMaximumSize: () => number;
@@ -24,12 +24,12 @@ export default class DragAndDropHandler {
   supportedScoutTypes: DropType[];
   $element: JQuery;
   selector: JQuery.Selector;
-  protected _onDragEnterHandler: (event: JQuery.DragEnterEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;
-  protected _onDragOverHandler: (event: JQuery.DragOverEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;
-  protected _onDropHandler: (event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => void;
+  protected _onDragEnterHandler: (event: JQuery.DragEnterEvent) => void;
+  protected _onDragOverHandler: (event: JQuery.DragOverEvent) => void;
+  protected _onDropHandler: (event: JQuery.DropEvent) => void;
 
-  constructor(options) {
-    options = options || {};
+  constructor(options?: DragAndDropOptions) {
+    options = options || {} as DragAndDropOptions;
     this.additionalDropProperties = null;
     this.allowedTypes = null;
     this.dropType = null;
@@ -66,22 +66,22 @@ export default class DragAndDropHandler {
     this.selector = null;
   }
 
-  protected _onDragEnter(event: JQuery.DragEnterEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  protected _onDragEnter(event: JQuery.DragEnterEvent) {
     this._onDragEnterOrOver(event);
   }
 
-  protected _onDragOver(event: JQuery.DragOverEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  protected _onDragOver(event: JQuery.DragOverEvent) {
     this._onDragEnterOrOver(event);
   }
 
-  protected _onDragEnterOrOver(event: JQuery.DragEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  protected _onDragEnterOrOver(event: JQuery.DragEventBase) {
     // set dropEffect to copy. otherwise outlook will move dropped mails into the deleted files folder.
     // see: https://bugs.chromium.org/p/chromium/issues/detail?id=322605#c33
     event.originalEvent.dataTransfer.dropEffect = 'copy';
     dragAndDrop.verifyDataTransferTypesScoutTypes(event, this.supportedScoutTypes, this.dropType());
   }
 
-  protected _onDrop(event: JQuery.DropEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
+  protected _onDrop(event: JQuery.DropEvent) {
     if (this.supportedScoutTypes.indexOf(dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
       (this.dropType() & dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) === dragAndDrop.SCOUT_TYPES.FILE_TRANSFER && // NOSONAR
       dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {

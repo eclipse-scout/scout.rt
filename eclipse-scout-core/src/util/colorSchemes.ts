@@ -68,7 +68,7 @@ export function toggleColorSchemeClasses($container: JQuery, colorScheme: string
 /**
  * Get the css classes of the given colorScheme.
  */
-export function getCssClasses(colorScheme): string[] {
+export function getCssClasses(colorScheme: ColorScheme | string): string[] {
   let cssClasses: string[] = [];
   if (!colorScheme) {
     return cssClasses;

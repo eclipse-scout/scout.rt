@@ -11,9 +11,9 @@
 import {AbstractLayout, Dimension, HtmlCompPrefSizeOptions, ModeSelector} from '../index';
 
 export default class ModeSelectorLayout extends AbstractLayout {
-  modeSelector: ModeSelector<any>;
+  modeSelector: ModeSelector;
 
-  constructor(modeSelector) {
+  constructor(modeSelector: ModeSelector) {
     super();
     this.modeSelector = modeSelector;
   }

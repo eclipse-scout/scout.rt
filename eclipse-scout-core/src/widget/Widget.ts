@@ -478,7 +478,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return this._rendered && !this.isRemovalPending();
   }
 
-  set rendered(rendered) {
+  set rendered(rendered: boolean) {
     this._rendered = rendered;
   }
 
@@ -1168,7 +1168,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Delegates the invalidation request to {@link HtmlComponent#invalidateLayoutTree}.
    * @param invalidateParents Default is true
    */
-  invalidateLayoutTree(invalidateParents?) {
+  invalidateLayoutTree(invalidateParents?: boolean) {
     if (!this.rendered || this.removing) {
       return;
     }
@@ -1195,7 +1195,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Delegates the invalidation request to {@link HtmlComponent#revalidateLayoutTree}.
    * @param invalidateParents Default is true
    */
-  revalidateLayoutTree(invalidateParents?) {
+  revalidateLayoutTree(invalidateParents?: boolean) {
     if (!this.rendered || this.removing) {
       return;
     }
@@ -1488,7 +1488,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. \_renderXY where XY is the property name), it will be called. Otherwise nothing happens.
    * @returns true, if the property was changed, false if not.
    */
-  override setProperty(propertyName, value): boolean {
+  override setProperty(propertyName: string, value: any): boolean {
     if (objects.equals(this[propertyName], value)) {
       return false;
     }
@@ -2033,7 +2033,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * @returns the first child for which the given function returns true.
    */
-  findChild(predicate): AnyWidget {
+  findChild(predicate: Predicate<Widget>): AnyWidget {
     let foundChild = null;
     this.visitChildren(child => {
       if (predicate(child)) {

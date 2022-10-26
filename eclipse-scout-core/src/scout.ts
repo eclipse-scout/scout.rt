@@ -40,7 +40,7 @@ export function nvl(...args: any[]): any {
  * @param type if this optional parameter is set, the given value must be of this type (instanceof check)
  * @returns the value
  */
-export function assertParameter<T>(parameterName: string, value?: T, type?): T {
+export function assertParameter<T>(parameterName: string, value?: T, type?: new() => any): T {
   if (objects.isNullOrUndefined(value)) {
     throw new Error('Missing required parameter \'' + parameterName + '\'');
   }
@@ -98,7 +98,7 @@ export function assertInstance<T>(value: T, type: new() => any, msg?: string): T
  * Checks if one of the arguments from 1-n is equal to the first argument.
  * @param args to check against the value, may be an array or a variable argument list.
  */
-export function isOneOf(value, ...args): boolean {
+export function isOneOf(value: any, ...args: any): boolean {
   if (args.length === 0) {
     return false;
   }

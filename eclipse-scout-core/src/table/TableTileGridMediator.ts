@@ -152,7 +152,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     }
   }
 
-  setTileGridLayoutConfig(tileGridLayoutConfig) {
+  setTileGridLayoutConfig(tileGridLayoutConfig: TileGridLayoutConfig) {
     this.setProperty('tileGridLayoutConfig', tileGridLayoutConfig);
     if (this.tileAccordion) {
       this.tileAccordion.setTileGridLayoutConfig(tileGridLayoutConfig);
