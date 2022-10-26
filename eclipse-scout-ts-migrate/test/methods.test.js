@@ -201,4 +201,29 @@ class Class1 {
   }
 }`);
   });
+
+  it('does not remove or move unrelated comments', async () => {
+    let text = `
+class Class1 {
+  [property: string]: any; // Data will be applied to the event directly
+
+  constructor(target: string) {
+    this.target = target;
+  } // trailing
+}`;
+
+    text = lfToCrlf(text);
+    let result = await methodsPlugin.run(
+      mockPluginParams({text, fileName: 'file.ts', options: {}})
+    );
+    result = crlfToLf(result);
+    expect(result).toBe(`
+class Class1 {
+  [property: string]: any; // Data will be applied to the event directly
+
+  constructor(target: string) {
+    this.target = target;
+  } // trailing
+}`);
+  });
 });

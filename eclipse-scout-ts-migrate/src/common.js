@@ -135,6 +135,9 @@ export function mapType(j, name) {
     case 'any':
       type = j.tsAnyKeyword();
       break;
+    case 'void':
+      type = j.tsVoidKeyword();
+      break;
     default:
       if (name.indexOf('.') > -1) {
         [module, name] = name.split('.');
