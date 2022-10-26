@@ -132,7 +132,7 @@ export default class RestLookupCall<TKey> extends LookupCall<TKey> {
     return clone;
   }
 
-  protected _acceptLookupRow(lookupRowDo) {
+  protected _acceptLookupRow(lookupRowDo): boolean {
     return true;
   }
 

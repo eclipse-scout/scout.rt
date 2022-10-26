@@ -170,7 +170,7 @@ export default class FormController implements FormControllerModel {
     desktop.bench.addView(view, selectView);
   }
 
-  acceptDialog(dialog: Form) {
+  acceptDialog(dialog: Form): boolean {
     // Only render dialog if 'displayParent' is rendered yet; if not, the dialog will be rendered once 'displayParent' is rendered.
     return this.displayParent.rendered;
   }

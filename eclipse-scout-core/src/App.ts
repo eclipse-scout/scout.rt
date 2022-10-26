@@ -64,7 +64,7 @@ export interface AppBootstrapOptions {
 }
 
 export default class App extends EventEmitter {
-  static addListener<K extends string & keyof EventMapOf<App>>(type: K, handler: EventHandler<(EventMapOf<App>)[K] & Event<App>>) {
+  static addListener<K extends string & keyof EventMapOf<App>>(type: K, handler: EventHandler<(EventMapOf<App>)[K] & Event<App>>): EventListener {
     let listener = {
       type: type,
       func: handler

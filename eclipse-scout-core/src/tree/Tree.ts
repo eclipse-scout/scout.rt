@@ -1148,7 +1148,7 @@ export default class Tree extends Widget implements TreeModel {
     }
     // Highlight previously selected node, but do it only once
     if (this.prevSelectedNode.$node.hasClass('animate-prev-selected')) {
-      return this;
+      return;
     }
     this.prevSelectedNode.$node.addClassForAnimation('animate-prev-selected').oneAnimationEnd(() => {
       this.prevSelectedNode.prevSelectionAnimationDone = true;

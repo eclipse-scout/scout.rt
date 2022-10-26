@@ -259,7 +259,7 @@ export default class Button extends FormField implements ButtonModel {
     return popup;
   }
 
-  protected _doActionTogglesSubMenu() {
+  protected _doActionTogglesSubMenu(): boolean {
     return false;
   }
 

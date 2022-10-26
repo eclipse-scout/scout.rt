@@ -51,7 +51,7 @@ export default class TableProposalChooser<TValue> extends ProposalChooser<TValue
     }) as Column<TValue>;
   }
 
-  protected _createColumnForDescriptor(descriptor: ColumnDescriptor) {
+  protected _createColumnForDescriptor(descriptor: ColumnDescriptor): Column {
     let width = Column.NARROW_MIN_WIDTH;
     if (descriptor.width && descriptor.width > 0) { // 0 = default
       width = descriptor.width;

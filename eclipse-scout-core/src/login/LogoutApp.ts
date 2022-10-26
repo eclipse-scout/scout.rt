@@ -20,10 +20,6 @@ export default class LogoutApp extends App {
     super();
   }
 
-  override init(options?: LogoutAppOptions) {
-    return super.init(options);
-  }
-
   protected override _prepareEssentials(options: LogoutAppOptions) {
     ObjectFactory.get().init();
   }

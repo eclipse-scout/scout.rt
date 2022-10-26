@@ -687,7 +687,7 @@ export default abstract class FormField extends Widget implements FormFieldModel
    * Computes whether the $status should be visible based on statusVisible, errorStatus and tooltip.
    * -> errorStatus and tooltip override statusVisible, so $status may be visible event though statusVisible is set to false
    */
-  protected _computeStatusVisible() {
+  protected _computeStatusVisible(): boolean {
     let status = this._errorStatus(),
       statusVisible = this.statusVisible,
       hasStatus = !!status,

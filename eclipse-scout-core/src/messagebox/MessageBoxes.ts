@@ -88,7 +88,7 @@ export default class MessageBoxes implements MessageBoxesOptions {
     return this;
   }
 
-  build() {
+  build(): MessageBox {
     let options: MessageBoxModel = {
       parent: this.parent,
       header: this.headerText,
@@ -134,21 +134,21 @@ export default class MessageBoxes implements MessageBoxesOptions {
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
-  static create(parent: Widget) {
+  static create(parent: Widget): MessageBoxes {
     return scout.create(MessageBoxes, {
       parent: parent
     });
   }
 
-  static createOk(parent: Widget) {
+  static createOk(parent: Widget): MessageBoxes {
     return this.create(parent).withYes(parent.session.text('Ok'));
   }
 
-  static createYesNo(parent: Widget) {
+  static createYesNo(parent: Widget): MessageBoxes {
     return this.create(parent).withYes().withNo();
   }
 
-  static createYesNoCancel(parent: Widget) {
+  static createYesNoCancel(parent: Widget): MessageBoxes {
     return this.create(parent).withYes().withNo().withCancel();
   }
 

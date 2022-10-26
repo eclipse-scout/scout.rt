@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, Device, Event, HtmlComponent, scrollbars, TimePickerModel, TimePickerTouchPopup, Widget} from '../index';
+import {dates, Device, HtmlComponent, scrollbars, TimePickerModel, TimePickerTouchPopup, Widget} from '../index';
 import $ from 'jquery';
 import {Optional} from '../types';
 import {ScrollbarInstallOptions} from '../scrollbar/scrollbars';
 import TimePickerEventMap from './TimePickerEventMap';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 export default class TimePicker extends Widget {
   declare model: TimePickerModel;
@@ -48,7 +47,7 @@ export default class TimePicker extends Widget {
     this._installScrollbars();
   }
 
-  protected _renderTimeSelection() {
+  protected _renderTimeSelection(): JQuery {
     let i,
       date = dates.trunc(new Date()),
       now = dates.ceil(new Date(), this.resolution),

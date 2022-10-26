@@ -45,7 +45,7 @@ export default class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
     });
   }
 
-  protected _lookupRowsByAll() {
+  protected _lookupRowsByAll(): LookupRow<TKey>[] {
     return this.lookupRows
       .filter(this._filterActiveLookupRow, this)
       .slice(0, this.maxRowCount);

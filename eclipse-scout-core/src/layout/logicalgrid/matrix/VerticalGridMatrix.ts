@@ -156,11 +156,11 @@ export default class VerticalGridMatrix extends LogicalGridMatrix {
     });
   }
 
-  protected _horizontalMatchesOrOverlaps(bounds: { x: number; y: number; w: number; h: number }, gd: GridData) {
+  protected _horizontalMatchesOrOverlaps(bounds: { x: number; y: number; w: number; h: number }, gd: GridData): boolean {
     return bounds.x >= gd.x && bounds.x + bounds.w <= gd.x + gd.w;
   }
 
-  protected _horizontalOverlapsOnSide(bounds: { x: number; y: number; w: number; h: number }, gd: GridData) {
+  protected _horizontalOverlapsOnSide(bounds: { x: number; y: number; w: number; h: number }, gd: GridData): boolean {
     return bounds.x > gd.x || bounds.x + bounds.w < gd.x + gd.w;
   }
 }

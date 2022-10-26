@@ -90,7 +90,7 @@ export default class LookupBoxLayout extends AbstractLayout {
     return new Dimension(width, height);
   }
 
-  naturalSize(formField: FormField) {
+  naturalSize(formField: FormField): Dimension {
     return new Dimension(formField.$fieldContainer.width(), formField.$fieldContainer.height());
   }
 }

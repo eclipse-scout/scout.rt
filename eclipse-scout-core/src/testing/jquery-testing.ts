@@ -38,7 +38,7 @@ export function triggerRightClick($elem: JQuery) {
   $elem.trigger(jQuery.Event('mouseup', {which: 3}));
 }
 
-export function triggerKeyUp($elem, key: number, modifier: KeyStrokeModifier) {
+export function triggerKeyUp($elem: JQuery, key: number, modifier: KeyStrokeModifier) {
   let event = jQuery.Event('keyup', {
     originalEvent: jQuery.Event('dummy'), // create dummy object
     which: key

@@ -276,7 +276,7 @@ export default class TreeAdapter extends ModelAdapter {
     return nodeModel;
   }
 
-  protected _getDefaultNodeObjectType() {
+  protected _getDefaultNodeObjectType(): string {
     return 'TreeNode';
   }
 

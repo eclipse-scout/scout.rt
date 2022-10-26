@@ -106,7 +106,7 @@ export default class TabBoxHeader extends Widget implements TabBoxHeaderModel {
     return this.tabArea.focusTabItem(tabItem);
   }
 
-  getTabForItem(tabItem: TabItem) {
+  getTabForItem(tabItem: TabItem): Tab {
     return this.tabArea.getTabForItem(tabItem);
   }
 

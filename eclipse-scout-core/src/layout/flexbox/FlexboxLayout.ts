@@ -220,7 +220,7 @@ export default class FlexboxLayout extends AbstractLayout {
       .add(htmlComp.margins());
   }
 
-  ensureInitialValues(children: HtmlComponent[], containerSize: Dimension) {
+  ensureInitialValues(children: HtmlComponent[], containerSize: Dimension): number {
     let totalPx = this._getDimensionValue(containerSize),
       sumOfAbsolutePx = 0,
       sumOfRelatives = 0,
@@ -269,7 +269,6 @@ export default class FlexboxLayout extends AbstractLayout {
         this.childrenLayoutDatas.push(ld);
         return restWidth - ld.sizePx;
       }, totalPx);
-
   }
 
   protected _layoutFromLayoutDataWithCache(children: HtmlComponent[], containerSize: Dimension) {

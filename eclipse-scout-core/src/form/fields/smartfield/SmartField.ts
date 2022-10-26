@@ -273,8 +273,8 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
    * Accepts the selected lookup row and sets its id as value.
    * This function is called on blur, by a keystroke or programmatically at any time.
    *
-   * @param [sync] optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
-   */
+   * @param sync optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
+  */
   override acceptInput(sync?: boolean): JQuery.Promise<void> | void {
     if (!this._acceptInputEnabled) {
       $.log.isTraceEnabled() && $.log.trace('(SmartField#acceptInput) Skipped acceptInput because _acceptInputEnabled=false');
@@ -350,8 +350,8 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
   /**
    * This function is intended to be overridden. Proposal field has another behavior than the smart field.
    *
-   * @param [sync] optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
-   */
+   * @param sync optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
+  */
   protected _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<TValue>): JQuery.Promise<void> | void {
 
     let unchanged = false;
@@ -1023,7 +1023,7 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
    */
   override aboutToBlurByMouseDown(target: Element) {
     if (this.touchMode) {
-      return false;
+      return;
     }
     if (fields.eventOutsideProposalField(this, target)) {
       this.acceptInput(true);

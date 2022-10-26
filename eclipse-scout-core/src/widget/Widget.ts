@@ -235,7 +235,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * may override this method to alter the JSON model before the widgets
    * are created out of the widgetProperties in the model.
    */
-  protected _prepareModel(model: WidgetModel) {
+  protected _prepareModel(model: WidgetModel): WidgetModel {
     return model;
   }
 
@@ -916,7 +916,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return this.children;
   }
 
-  protected _computeEnabled(inheritAccessibility: boolean, parentEnabled: boolean) {
+  protected _computeEnabled(inheritAccessibility: boolean, parentEnabled: boolean): boolean {
     return this.enabled && (inheritAccessibility ? parentEnabled : true);
   }
 
@@ -1504,7 +1504,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return true;
   }
 
-  protected _prepareProperty(propertyName: string, value) {
+  protected _prepareProperty(propertyName: string, value: any): any {
     if (!this.isWidgetProperty(propertyName)) {
       return value;
     }
@@ -1660,7 +1660,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Returns the ancestors as string delimited by '\n'.
    * @param count the number of ancestors to be processed. Default is -1 which means all.
    */
-  ancestorsToString(count?: number) {
+  ancestorsToString(count?: number): string {
     let str = '',
       ancestors = this.ancestors();
 
@@ -1778,7 +1778,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Clones the widget and mirrors the events, see {@link clone} and {@link mirror} for details.
    */
-  cloneAndMirror(model: WidgetModel) {
+  cloneAndMirror(model: WidgetModel): Widget {
     return this.clone(model, {
       delegateAllPropertiesToClone: true
     });
@@ -1826,7 +1826,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return clone;
   }
 
-  protected _deepCloneProperties(clone: Widget, properties: string | string[], options: CloneOptions) {
+  protected _deepCloneProperties(clone: Widget, properties: string | string[], options: CloneOptions): Widget {
     if (!properties) {
       return clone;
     }

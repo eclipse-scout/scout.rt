@@ -110,7 +110,7 @@ export default class SmartFieldPopup<TValue> extends Popup implements SmartField
    * should stay open when the SmartField popup is closed. It also prevents the focus blur
    * event on the SmartField input-field.
    */
-  protected _onContainerMouseDown(event: JQuery.MouseDownEvent) {
+  protected _onContainerMouseDown(event: JQuery.MouseDownEvent): boolean {
     // when user clicks on proposal popup with table or tree (prevent default,
     // so input-field does not lose the focus, popup will be closed by the
     // proposal chooser impl.

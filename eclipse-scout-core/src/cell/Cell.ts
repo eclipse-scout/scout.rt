@@ -102,7 +102,7 @@ export default class Cell<TValue = any> implements CellModel<TValue> {
     this.iconId = iconId;
   }
 
-  encodedText() {
+  encodedText(): string {
     if (!this._cachedEncodedText) {
       // Encode text and cache it, encoding is expensive
       this._cachedEncodedText = strings.encode(this.text);

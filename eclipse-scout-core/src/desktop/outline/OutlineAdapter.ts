@@ -152,7 +152,7 @@ export default class OutlineAdapter extends TreeAdapter {
     delete this._nodeIdToRowMap[page.id];
   }
 
-  protected override _getDefaultNodeObjectType() {
+  protected override _getDefaultNodeObjectType(): string {
     return 'Page';
   }
 

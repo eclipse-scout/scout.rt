@@ -1287,7 +1287,9 @@ export default class Planner extends Widget implements PlannerModel {
     return menuUtil.filter(this.menus, allowedTypes, {onlyVisible, enableDisableKeyStrokes});
   }
 
-  setDisplayModeOptions(displayModeOptions: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>) {
+  setDisplayModeOptions(
+    displayModeOptions: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>
+  ) {
     this.setProperty('displayModeOptions', displayModeOptions);
   }
 

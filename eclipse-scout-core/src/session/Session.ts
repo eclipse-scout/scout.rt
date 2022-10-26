@@ -708,7 +708,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     });
   }
 
-  protected _callAjax(callOptions?: AjaxCallModel) {
+  protected _callAjax(callOptions?: AjaxCallModel): JQuery.Promise<RemoteResponse> {
     let defaultOptions = {
       retryIntervals: [100, 500, 500, 500]
     };
@@ -918,12 +918,12 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
 
   /**
    * Do NOT call this method directly, always use the response queue:
-   *
+   * ```
    *   session.responseQueue.process(data);
-   *
+   * ```
    * Otherwise, the response queue's expected sequence number will get out of sync.
    */
-  processJsonResponseInternal(data: RemoteResponse) {
+  processJsonResponseInternal(data: RemoteResponse): boolean {
     let success = false;
     if (data.error) {
       this._processErrorJsonResponse(data.error);

@@ -227,7 +227,7 @@ export default class KeyStrokeManager extends EventEmitter implements KeyStrokeM
     return true;
   }
 
-  invokeAcceptInputOnActiveValueField(keyStroke: KeyStroke, keyStrokeContext: KeyStrokeContext) {
+  invokeAcceptInputOnActiveValueField(keyStroke: KeyStroke, keyStrokeContext: KeyStrokeContext): boolean {
     return !keyStroke.preventInvokeAcceptInputOnActiveValueField && (keyStroke.invokeAcceptInputOnActiveValueField || keyStrokeContext.invokeAcceptInputOnActiveValueField);
   }
 

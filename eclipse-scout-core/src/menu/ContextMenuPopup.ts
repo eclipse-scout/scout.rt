@@ -92,7 +92,7 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
     });
   }
 
-  protected _checkRemoveSubMenuItemsPossible(parentMenu: Menu, animated: boolean) {
+  protected _checkRemoveSubMenuItemsPossible(parentMenu: Menu, animated: boolean): boolean {
     if (!this.rendered && !this.rendering) {
       return false;
     }
@@ -112,7 +112,7 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
 
   removeSubMenuItems(parentMenu: Menu, animated: boolean) {
     if (!this._checkRemoveSubMenuItemsPossible(parentMenu, animated)) {
-      return false;
+      return;
     }
     // @ts-ignore
     this.$body = parentMenu.__originalParent.$subMenuBody;

@@ -90,7 +90,7 @@ export function padZeroLeft(string: string | number, padding: number): string {
   return z.slice(-padding);
 }
 
-export function contains(string: string, searchFor: string) {
+export function contains(string: string, searchFor: string): boolean {
   if (!string) {
     return false;
   }
@@ -159,7 +159,7 @@ export function encode(text: string): string {
  * Tries to preserve the new lines. Since it does not consider the style, it won't be right in any cases.
  * A div for example always generates a new line, even if display style is not set to block.
  */
-export function plainText(text: string, options?: PlainTextEncoderOptions) {
+export function plainText(text: string, options?: PlainTextEncoderOptions): string {
   if (!plainTextEncoder) { // lazy instantiation to avoid cyclic dependency errors during webpack bootstrap
     plainTextEncoder = new PlainTextEncoder();
   }

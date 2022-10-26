@@ -189,12 +189,10 @@ export function containsAny<T>(haystack: T[], needles: T[]): boolean {
   });
 }
 
-export function containsAll<T>(haystack: T[], needles: T[]) {
+export function containsAll<T>(haystack: T[], needles: T[]): boolean {
   haystack = ensure(haystack);
   needles = ensure(needles);
-  return needles.every(element => {
-    return haystack.indexOf(element) >= 0;
-  });
+  return needles.every(element => haystack.indexOf(element) >= 0);
 }
 
 export function first<T>(arr: T[]): T {
@@ -455,7 +453,7 @@ export function pushSet<T>(arr: T[], element: T) {
  * Creates a string containing all elements in the array separated by the given delimiter.
  * @param encodeHtml true to encode the elements, false if not. Default is false
  */
-export function format(arr: ArrayLike<string>, delimiter?: string, encodeHtml?: boolean) {
+export function format(arr: ArrayLike<string>, delimiter?: string, encodeHtml?: boolean): string {
   if (!arr || arr.length === 0) {
     return '';
   }
@@ -474,7 +472,7 @@ export function format(arr: ArrayLike<string>, delimiter?: string, encodeHtml?: 
   return output;
 }
 
-export function formatEncoded(arr: ArrayLike<string>, delimiter?: string) {
+export function formatEncoded(arr: ArrayLike<string>, delimiter?: string): string {
   return format(arr, delimiter, true);
 }
 

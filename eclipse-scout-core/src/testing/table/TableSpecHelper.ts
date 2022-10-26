@@ -23,7 +23,7 @@ export default class TableSpecHelper {
   session: Session;
   menuHelper: MenuSpecHelper;
 
-  constructor(session) {
+  constructor(session: Session) {
     this.session = session;
     this.menuHelper = new MenuSpecHelper(session);
   }
@@ -193,7 +193,7 @@ export default class TableSpecHelper {
     return this.createModel(this.createModelColumns(1), rows);
   }
 
-  createModelSingleColumnByValues(values: any[], columnType: ObjectType<Column>) {
+  createModelSingleColumnByValues(values: any[], columnType: ObjectType<Column>): TableModel {
     let rows = [];
     for (let i = 0; i < values.length; i++) {
       rows.push(this.createModelRowByValues(null, values[i]));
@@ -205,7 +205,7 @@ export default class TableSpecHelper {
     return this.createModel(this.createModelColumns(colCount), this.createModelRows(colCount, rowCount));
   }
 
-  createTableWithOneColumn() {
+  createTableWithOneColumn(): Table {
     let model = this.createModelFixture(1, 1);
     return this.createTable(model);
   }
