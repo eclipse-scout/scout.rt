@@ -105,7 +105,7 @@
     <!-- careful: jackson breaks api with Double/BigDecimal from 2.11 to 2.12 -->
     <jackson.version>2.11.4</jackson.version>
     <io.netty-version>4.1.77.Final</io.netty-version>
-    <batik.version>1.14</batik.version>
+    <batik.version>1.16</batik.version>
     <activemq.version>5.16.3</activemq.version>
     <artemis.version>2.20.0</artemis.version>
     <com.google.http-client.version>1.38.1</com.google.http-client.version>
@@ -860,6 +860,29 @@
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>batik-xml</artifactId>
         <version>${batik.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-transcoder</artifactId>
+        <version>${batik.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-js</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
