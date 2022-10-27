@@ -26,8 +26,8 @@ export default class FilterSupport<TElem extends FilterElement> extends WidgetSu
   protected _filterField: StringField;
   protected _filterFieldDisplayTextChangedHandler: EventHandler<PropertyChangeEvent<string>>;
   protected _focusFilterFieldKeyStroke: KeyStroke;
-  protected _focusInHandler: JQuery.EventHandler<HTMLElement>;
-  protected _focusOutHandler: JQuery.EventHandler<HTMLElement>;
+  protected _focusInHandler: (event: JQuery.FocusInEvent) => void;
+  protected _focusOutHandler: (event: JQuery.FocusOutEvent) => void;
   protected _getElementText: (elem: TElem) => string;
   protected _getElementsForFiltering: () => TElem[];
   protected _textFilter: TextFilter<TElem>;
