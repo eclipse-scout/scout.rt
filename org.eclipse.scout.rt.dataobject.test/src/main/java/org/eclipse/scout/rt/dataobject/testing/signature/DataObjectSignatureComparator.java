@@ -239,11 +239,11 @@ public class DataObjectSignatureComparator {
       EnumApiSignatureDo currentEnum = currentEnums.get(currentEnumName);
 
       Set<String> newEnumValues = new HashSet<>(currentEnum.getValues());
-      newEnumValues.removeAll(previousEnum.getValues());
+      previousEnum.getValues().forEach(newEnumValues::remove);
       newEnumValues.forEach(enumValue -> m_differences.add(String.format("[VERIFY] Enum '%s' has new enum value '%s'", currentEnumName, enumValue)));
 
       Set<String> previousEnumValues = new HashSet<>(previousEnum.getValues());
-      previousEnumValues.removeAll(currentEnum.getValues());
+      currentEnum.getValues().forEach(previousEnumValues::remove);
 
       previousEnumValues.forEach(enumValue -> m_differences.add(String.format("[ACTION] Enum '%s' is missing value '%s' in new version", currentEnumName, enumValue)));
     }
@@ -258,7 +258,7 @@ public class DataObjectSignatureComparator {
   protected String normalizeValueType(String valueType) {
     Matcher matcher = DataObjectSignatureGenerator.VALUE_TYPE_PATTERN.matcher(valueType);
 
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     while (matcher.find()) {
       String type = matcher.group(1);
       String name = matcher.group(2);
@@ -275,6 +275,7 @@ public class DataObjectSignatureComparator {
           break;
         case DataObjectSignatureGenerator.VALUE_TYPE_DO_INTERFACE_PREFIX:
         case DataObjectSignatureGenerator.VALUE_TYPE_CLASS_PREFIX:
+        case DataObjectSignatureGenerator.VALUE_TYPE_ID_INTERFACE_PREFIX:
           name = m_classNameRenamings.getOrDefault(name, name);
           break;
       }

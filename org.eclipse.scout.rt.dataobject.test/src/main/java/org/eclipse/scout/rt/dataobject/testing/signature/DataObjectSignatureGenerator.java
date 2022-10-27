@@ -103,6 +103,14 @@ public class DataObjectSignatureGenerator {
   protected static final String VALUE_TYPE_ID_PREFIX = "ID";
 
   /**
+   * Used for FQN of non-instanciable {@link IId} (interfaces/abstract classes).
+   * <p>
+   * NOTE: All subclasses are required to have a @{@link IdTypeName} annotation or a custom implemented
+   * {@link IdExternalFormatter}
+   */
+  protected static final String VALUE_TYPE_ID_INTERFACE_PREFIX = "IDI";
+
+  /**
    * Used for FQN of supported attribute types ({@link #m_supportedAttributeTypes}).
    */
   protected static final String VALUE_TYPE_CLASS_PREFIX = "CLASS";
@@ -123,6 +131,7 @@ public class DataObjectSignatureGenerator {
           VALUE_TYPE_DO_INTERFACE_PREFIX,
           VALUE_TYPE_ENUM_PREFIX,
           VALUE_TYPE_ID_PREFIX,
+          VALUE_TYPE_ID_INTERFACE_PREFIX,
           VALUE_TYPE_CLASS_PREFIX)
       + ")"
       + "\\["
@@ -464,6 +473,10 @@ public class DataObjectSignatureGenerator {
   }
 
   protected String processAttributeTypeId(String attributeName, Class<? extends IId> idClass, Class<? extends IDoEntity> containingEntityClass) {
+    if (Modifier.isAbstract(idClass.getModifiers()) || idClass.isInterface()) {
+      return box(VALUE_TYPE_ID_INTERFACE_PREFIX, idClass.getName());
+    }
+
     String idTypeName = BEANS.get(IdExternalFormatter.class).getTypeName(idClass);
     if (idTypeName == null) {
       m_errors.add(String.format("IId class '%s' is missing id type name (referenced in '%s')", idClass.getName(), getContextText(attributeName, containingEntityClass)));
