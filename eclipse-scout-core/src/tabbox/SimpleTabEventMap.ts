@@ -9,9 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Event, PropertyChangeEvent, SimpleTab, Status, WidgetEventMap} from '../index';
+import {SimpleTabView} from './SimpleTab';
 
-export default interface SimpleTabEventMap extends WidgetEventMap {
-  'click': Event<SimpleTab>;
+export default interface SimpleTabEventMap<TView extends SimpleTabView = SimpleTabView> extends WidgetEventMap {
+  'click': Event<SimpleTab<TView>>;
   'propertyChange:closable': PropertyChangeEvent<boolean>;
   'propertyChange:iconId': PropertyChangeEvent<string>;
   'propertyChange:saveNeeded': PropertyChangeEvent<boolean>;

@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopBench, DesktopTabArea, DesktopTabBoxController, scout, SimpleTab, SimpleTabArea} from '../../index';
+import {DesktopBench, DesktopTab, DesktopTabArea, DesktopTabBoxController, Form, scout, SimpleTabBox} from '../../index';
 import {SimpleTabAreaTabSelectEvent} from '../../tabbox/SimpleTabAreaEventMap';
 
 /**
- * The {@link {@link HeaderTabBoxController}} is used to link the center {@link {@link SimpleTabBox}} (all forms with displayViewId='C')
- * with a {@link {@link SimpleTabArea}} placed in the header.
+ * The {@link HeaderTabBoxController} is used to link the center {@link SimpleTabBox} (all forms with displayViewId='C')
+ * with a {@link SimpleTabArea} placed in the header.
  *
  * @see SimpleTabBoxController
  */
@@ -21,7 +21,7 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
   declare tabArea: DesktopTabArea;
 
   bench: DesktopBench;
-  tabAreaCenter: SimpleTabArea;
+  tabAreaCenter: DesktopTabArea;
   tabAreaInHeader: boolean;
   protected _viewsChangedHandler: () => void;
 
@@ -39,8 +39,8 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
   override install(bench: DesktopBench, tabArea?: DesktopTabArea) {
     this.bench = scout.assertParameter('bench', bench);
 
-    let tabBoxCenter = this.bench.getTabBox('C');
-    this.tabAreaCenter = tabBoxCenter.tabArea;
+    let tabBoxCenter = this.bench.getTabBox('C') as SimpleTabBox<Form>;
+    this.tabAreaCenter = tabBoxCenter.tabArea as DesktopTabArea;
 
     super.install(tabBoxCenter, tabArea);
   }
@@ -71,15 +71,15 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
     }
   }
 
-  override getTabs(): SimpleTab[] {
+  override getTabs(): DesktopTab[] {
     if (this.tabAreaInHeader) {
       return this.tabArea.getTabs();
     }
     return this.tabAreaCenter.getTabs();
   }
 
-  protected override _onViewTabSelect(view: SimpleTabAreaTabSelectEvent) {
-    super._onViewTabSelect(view);
+  protected override _onViewTabSelect(event: SimpleTabAreaTabSelectEvent<Form>) {
+    super._onViewTabSelect(event);
     this.tabArea.updateFirstTabSelected();
   }
 }

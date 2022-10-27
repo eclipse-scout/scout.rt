@@ -10,7 +10,7 @@
  */
 import {DesktopTab, DesktopTabArea, Form, scout, SimpleTabBoxController} from '../index';
 
-export default class DesktopTabBoxController extends SimpleTabBoxController {
+export default class DesktopTabBoxController extends SimpleTabBoxController<Form> {
 
   constructor() {
     super();

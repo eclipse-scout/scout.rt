@@ -11,9 +11,10 @@
 import {SimpleTabBox, SimpleTabBoxModel, WidgetModel} from '../../index';
 import {RefModel} from '../../types';
 import BenchRowLayoutData from './layout/BenchRowLayoutData';
+import {OutlineContent} from './DesktopBench';
 
 export default interface BenchColumnModel extends WidgetModel {
   layoutData?: BenchRowLayoutData;
-  tabBoxes?: SimpleTabBox[] | RefModel<SimpleTabBoxModel>[];
+  tabBoxes?: SimpleTabBox<OutlineContent>[] | RefModel<SimpleTabBoxModel<OutlineContent>>[];
   cacheKey?: string[];
 }

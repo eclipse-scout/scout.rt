@@ -9,28 +9,28 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Event, SimpleTabBox, WidgetEventMap} from '../index';
-import {OutlineContent} from '../desktop/bench/DesktopBench';
+import {SimpleTabView} from './SimpleTab';
 
-export interface SimpleTabBoxViewActivateEvent<S extends SimpleTabBox = SimpleTabBox> extends Event<S> {
-  view: OutlineContent;
+export interface SimpleTabBoxViewActivateEvent<TView extends SimpleTabView = SimpleTabView, S extends SimpleTabBox<TView> = SimpleTabBox<TView>> extends Event<S> {
+  view: TView;
 }
 
-export interface SimpleTabBoxViewAddEvent<S extends SimpleTabBox = SimpleTabBox> extends Event<S> {
-  view: OutlineContent;
-  siblingView: OutlineContent;
+export interface SimpleTabBoxViewAddEvent<TView extends SimpleTabView = SimpleTabView, S extends SimpleTabBox<TView> = SimpleTabBox<TView>> extends Event<S> {
+  view: TView;
+  siblingView: TView;
 }
 
-export interface SimpleTabBoxViewDeactivateEvent<S extends SimpleTabBox = SimpleTabBox> extends Event<S> {
-  view: OutlineContent;
+export interface SimpleTabBoxViewDeactivateEvent<TView extends SimpleTabView = SimpleTabView, S extends SimpleTabBox<TView> = SimpleTabBox<TView>> extends Event<S> {
+  view: TView;
 }
 
-export interface SimpleTabBoxViewRemoveEvent<S extends SimpleTabBox = SimpleTabBox> extends Event<S> {
-  view: OutlineContent;
+export interface SimpleTabBoxViewRemoveEvent<TView extends SimpleTabView = SimpleTabView, S extends SimpleTabBox<TView> = SimpleTabBox<TView>> extends Event<S> {
+  view: TView;
 }
 
-export default interface SimpleTabBoxEventMap extends WidgetEventMap {
-  'viewActivate': SimpleTabBoxViewActivateEvent;
-  'viewAdd': SimpleTabBoxViewAddEvent;
-  'viewDeactivate': SimpleTabBoxViewDeactivateEvent;
-  'viewRemove': SimpleTabBoxViewRemoveEvent;
+export default interface SimpleTabBoxEventMap<TView extends SimpleTabView = SimpleTabView> extends WidgetEventMap {
+  'viewActivate': SimpleTabBoxViewActivateEvent<TView>;
+  'viewAdd': SimpleTabBoxViewAddEvent<TView>;
+  'viewDeactivate': SimpleTabBoxViewDeactivateEvent<TView>;
+  'viewRemove': SimpleTabBoxViewRemoveEvent<TView>;
 }

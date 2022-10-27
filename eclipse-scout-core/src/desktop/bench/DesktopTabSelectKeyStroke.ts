@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, keys, RangeKeyStroke, SimpleTab} from '../../index';
+import {Desktop, DesktopTab, keys, RangeKeyStroke} from '../../index';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 /**
@@ -57,7 +57,7 @@ export default class DesktopTabSelectKeyStroke extends RangeKeyStroke {
     }
   }
 
-  protected _viewTabs(): SimpleTab[] {
+  protected _viewTabs(): DesktopTab[] {
     if (this.field.bench) {
       return this.field.bench.getTabs();
     }

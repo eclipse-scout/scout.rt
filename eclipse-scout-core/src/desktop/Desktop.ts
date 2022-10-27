@@ -23,6 +23,7 @@ import BenchColumnLayoutDataModel from './bench/layout/BenchColumnLayoutDataMode
 import {TreeDisplayStyle} from '../tree/Tree';
 import {GlassPaneTarget} from '../widget/Widget';
 import {ReloadPageOptions} from '../scout';
+import {OutlineContent} from './bench/DesktopBench';
 
 export default class Desktop extends Widget implements DesktopModel, DisplayParent {
   declare model: DesktopModel;
@@ -1140,7 +1141,7 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
     return $glassPanes;
   }
 
-  protected _getTabGlassPaneTargetsForView(view: Form, tabBox: SimpleTabBox | DesktopHeader): JQuery[] {
+  protected _getTabGlassPaneTargetsForView(view: Form, tabBox: SimpleTabBox<OutlineContent> | DesktopHeader): JQuery[] {
     let $glassPanes: JQuery[] = [];
     if (tabBox && tabBox.tabArea) {
       tabBox.tabArea.tabs.forEach(tab => {

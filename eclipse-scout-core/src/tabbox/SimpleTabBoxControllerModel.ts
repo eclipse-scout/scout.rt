@@ -9,8 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {SimpleTabArea, SimpleTabBox} from '../index';
+import {SimpleTabView} from './SimpleTab';
 
-export default interface SimpleTabBoxControllerModel {
-  tabBox?: SimpleTabBox;
-  tabArea?: SimpleTabArea;
+export default interface SimpleTabBoxControllerModel<TView extends SimpleTabView = SimpleTabView> {
+  tabBox?: SimpleTabBox<TView>;
+  tabArea?: SimpleTabArea<TView>;
 }

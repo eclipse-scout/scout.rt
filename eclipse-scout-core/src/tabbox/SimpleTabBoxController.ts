@@ -8,30 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventHandler, Form, scout, SimpleTab, SimpleTabArea, SimpleTabBox, SimpleTabBoxControllerModel} from '../index';
+import {EventHandler, objects, scout, SimpleTab, SimpleTabArea, SimpleTabBox, SimpleTabBoxControllerModel} from '../index';
 import $ from 'jquery';
 import {SimpleTabBoxViewActivateEvent, SimpleTabBoxViewAddEvent, SimpleTabBoxViewDeactivateEvent, SimpleTabBoxViewRemoveEvent} from './SimpleTabBoxEventMap';
 import {SimpleTabAreaTabSelectEvent} from './SimpleTabAreaEventMap';
-import {OutlineContent} from '../desktop/bench/DesktopBench';
+import {SimpleTabView} from './SimpleTab';
 
 /**
- * The {@link {@link SimpleTabBoxController}} is used to link a {@link {@link SimpleTabBox}} with a {@link {@link SimpleTabArea}}.
- * There are {@link {@link SimpleTabBox}} with more than one {@link {@link SimpleTabArea}} to actualized.
- * Therefore the linking is separated in a controller.
- * The controller basically listens to 'viewAdd', 'viewRemove', 'viewActivate', 'viewDeactivate' on the {@link {@link SimpleTabBox}} and
- * updates the {@link {@link SimpleTabArea}}.
+ * The {@link SimpleTabBoxController} is used to link a {@link SimpleTabBox} with a {@link SimpleTabArea}.
+ * There are {@link SimpleTabBox} with more than one {@link SimpleTabArea} to be actualized.
+ * Therefore, the linking is separated in a controller.
+ * The controller basically listens to 'viewAdd', 'viewRemove', 'viewActivate', 'viewDeactivate' on the {@link SimpleTabBox} and
+ * updates the {@link SimpleTabArea}.
  */
-export default class SimpleTabBoxController implements SimpleTabBoxControllerModel {
-  declare model: SimpleTabBoxControllerModel;
+export default class SimpleTabBoxController<TView extends SimpleTabView = SimpleTabView> implements SimpleTabBoxControllerModel<TView> {
+  declare model: SimpleTabBoxControllerModel<TView>;
 
-  tabBox: SimpleTabBox;
-  tabArea: SimpleTabArea;
+  tabBox: SimpleTabBox<TView>;
+  tabArea: SimpleTabArea<TView>;
 
-  protected _viewAddHandler: EventHandler<SimpleTabBoxViewAddEvent>;
-  protected _viewRemoveHandler: EventHandler<SimpleTabBoxViewRemoveEvent>;
-  protected _viewActivateHandler: EventHandler<SimpleTabBoxViewActivateEvent>;
-  protected _viewDeactivateHandler: EventHandler<SimpleTabBoxViewDeactivateEvent>;
-  protected _viewTabSelectHandler: EventHandler<SimpleTabAreaTabSelectEvent>;
+  protected _viewAddHandler: EventHandler<SimpleTabBoxViewAddEvent<TView>>;
+  protected _viewRemoveHandler: EventHandler<SimpleTabBoxViewRemoveEvent<TView>>;
+  protected _viewActivateHandler: EventHandler<SimpleTabBoxViewActivateEvent<TView>>;
+  protected _viewDeactivateHandler: EventHandler<SimpleTabBoxViewDeactivateEvent<TView>>;
+  protected _viewTabSelectHandler: EventHandler<SimpleTabAreaTabSelectEvent<TView>>;
 
   constructor() {
     this.tabBox = null;
@@ -44,11 +44,11 @@ export default class SimpleTabBoxController implements SimpleTabBoxControllerMod
     this._viewTabSelectHandler = this._onViewTabSelect.bind(this);
   }
 
-  init(model: SimpleTabBoxControllerModel) {
+  init(model: SimpleTabBoxControllerModel<TView>) {
     $.extend(this, model);
   }
 
-  install(tabBox: SimpleTabBox, tabArea?: SimpleTabArea) {
+  install(tabBox: SimpleTabBox<TView>, tabArea?: SimpleTabArea<TView>) {
     this.uninstall();
     this.tabBox = scout.assertParameter('tabBox', tabBox);
     this.tabArea = scout.nvl(tabArea, this.tabBox.tabArea);
@@ -82,13 +82,13 @@ export default class SimpleTabBoxController implements SimpleTabBoxControllerMod
     }
   }
 
-  createTabArea(): SimpleTabArea {
+  createTabArea(): SimpleTabArea<TView> {
     return scout.create(SimpleTabArea, {
       parent: this.tabBox
-    });
+    }) as SimpleTabArea<TView>;
   }
 
-  protected _onViewAdd(event: { view: OutlineContent; siblingView?: OutlineContent }) {
+  protected _onViewAdd(event: { view: TView; siblingView?: TView }) {
     let view = event.view;
     if (!SimpleTabBoxController.hasViewTab(view)) {
       return;
@@ -103,11 +103,11 @@ export default class SimpleTabBoxController implements SimpleTabBoxControllerMod
     }
   }
 
-  protected _shouldCreateTabForView(view: Form): boolean {
+  protected _shouldCreateTabForView(view: TView): boolean {
     return true;
   }
 
-  protected _onViewRemove(event: SimpleTabBoxViewRemoveEvent) {
+  protected _onViewRemove(event: SimpleTabBoxViewRemoveEvent<TView>) {
     let view = event.view;
     if (!view) {
       return;
@@ -118,19 +118,19 @@ export default class SimpleTabBoxController implements SimpleTabBoxControllerMod
     }
   }
 
-  protected _onViewActivate(event: SimpleTabBoxViewActivateEvent) {
+  protected _onViewActivate(event: SimpleTabBoxViewActivateEvent<TView>) {
     let viewTab = this.getTab(event.view);
     // also reset selection if no view tab of the view is found.
     this.tabArea.selectTab(viewTab);
   }
 
-  protected _onViewDeactivate(event: SimpleTabBoxViewDeactivateEvent) {
+  protected _onViewDeactivate(event: SimpleTabBoxViewDeactivateEvent<TView>) {
     let viewTab = this.getTab(event.view);
     // also reset selection if no view tab of the view is found.
     this.tabArea.deselectTab(viewTab);
   }
 
-  protected _onViewTabSelect(event: SimpleTabAreaTabSelectEvent) {
+  protected _onViewTabSelect(event: SimpleTabAreaTabSelectEvent<TView>) {
     if (!event.viewTab) {
       return;
     }
@@ -138,18 +138,18 @@ export default class SimpleTabBoxController implements SimpleTabBoxControllerMod
     this.tabBox.activateView(view);
   }
 
-  protected _createTab(view: Form): SimpleTab {
+  protected _createTab(view: TView): SimpleTab<TView> {
     return scout.create(SimpleTab, {
       parent: this.tabArea,
       view: view
-    });
+    }) as SimpleTab<TView>;
   }
 
-  protected getTab(view: OutlineContent): SimpleTab {
+  protected getTab(view: TView): SimpleTab<TView> {
     if (!view) {
       return;
     }
-    let viewTab: SimpleTab = null;
+    let viewTab: SimpleTab<TView> = null;
     this.tabArea.getTabs().some(tab => {
       if (tab.view === view) {
         viewTab = tab;
@@ -160,13 +160,11 @@ export default class SimpleTabBoxController implements SimpleTabBoxControllerMod
     return viewTab;
   }
 
-  getTabs(): SimpleTab[] {
+  getTabs(): SimpleTab<TView>[] {
     return this.tabArea.getTabs();
   }
 
-  /* ----- static functions ----- */
-
-  static hasViewTab(view: any): view is Form {
-    return view && (view.title !== undefined || view.subTitle !== undefined || view.iconId !== undefined);
+  static hasViewTab(view: SimpleTabView): boolean {
+    return view && (!objects.isNullOrUndefined(view.title) || !objects.isNullOrUndefined(view.subTitle) || !objects.isNullOrUndefined(view.iconId));
   }
 }

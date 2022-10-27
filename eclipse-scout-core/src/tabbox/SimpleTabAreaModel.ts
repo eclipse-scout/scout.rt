@@ -10,8 +10,9 @@
  */
 import {SimpleTab, WidgetModel} from '../index';
 import {SimpleTabAreaDisplayStyle} from './SimpleTabArea';
+import {SimpleTabView} from './SimpleTab';
 
-export default interface SimpleTabAreaModel extends WidgetModel {
+export default interface SimpleTabAreaModel<TView extends SimpleTabView = SimpleTabView> extends WidgetModel {
   displayStyle?: SimpleTabAreaDisplayStyle;
-  tabs?: SimpleTab[];
+  tabs?: SimpleTab<TView>[];
 }

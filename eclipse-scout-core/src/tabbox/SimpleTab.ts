@@ -8,15 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventHandler, Form, GlassPaneContribution, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
+import {Event, EventHandler, GlassPaneContribution, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
 
 export type DisplayViewId = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C' | 'OUTLINE' | 'OUTLINE_SELECTOR' | 'PAGE_DETAIL' | 'PAGE_SEARCH' | 'PAGE_TABLE';
 
-export default class SimpleTab extends Widget implements SimpleTabModel {
-  declare model: SimpleTabModel;
-  declare eventMap: SimpleTabEventMap;
+export default class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabModel<TView> {
+  declare model: SimpleTabModel<TView>;
+  declare eventMap: SimpleTabEventMap<TView>;
 
-  view: Form;
+  view: TView;
   title: string;
   subTitle: string;
   iconId: string;
@@ -36,7 +36,7 @@ export default class SimpleTab extends Widget implements SimpleTabModel {
   protected _statusContainerUsageCounter: number;
   protected _statusIconDivs: JQuery[];
   protected _viewPropertyChangeListener: EventHandler<PropertyChangeEvent>;
-  protected _viewRemoveListener: EventHandler<Event<Form>>;
+  protected _viewRemoveListener: EventHandler<Event<TView>>;
   protected _glassPaneContribution: GlassPaneContribution;
 
   constructor() {
@@ -72,7 +72,7 @@ export default class SimpleTab extends Widget implements SimpleTabModel {
     };
   }
 
-  protected override _init(model: SimpleTabModel) {
+  protected override _init(model: SimpleTabModel<TView>) {
     super._init(model);
 
     this.view = model.view;
@@ -331,10 +331,10 @@ export default class SimpleTab extends Widget implements SimpleTabModel {
 
   /**
    * We cannot not bind the 'remove' event of the view to the remove function
-   * of the this tab, because in bench-mode the tab is never rendered
+   * of this tab, because in bench-mode the tab is never rendered
    * and thus the _remove function is never called.
    */
-  protected _onViewRemove(event: Event<Form>) {
+  protected _onViewRemove(event: Event<TView>) {
     this._uninstallViewListeners();
     if (this.rendered) {
       this.remove();
@@ -342,4 +342,16 @@ export default class SimpleTab extends Widget implements SimpleTabModel {
       this.trigger('remove');
     }
   }
+}
+
+export interface SimpleTabView extends Widget {
+  title?: string;
+  subTitle?: string;
+  iconId?: string;
+  closable?: boolean;
+  saveNeeded?: boolean;
+  saveNeededVisible?: boolean;
+  status?: Status;
+  displayViewId?: DisplayViewId;
+  abort?: () => void;
 }

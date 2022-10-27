@@ -57,17 +57,8 @@ export default class Form extends Widget implements FormModel, DisplayParent {
   /** set by PopupWindow if this Form has displayHint=Form.DisplayHint.POPUP_WINDOW */
   popupWindow: PopupWindow;
 
-  /**
-   * Do not initialize as e.g. {@link SimpleTabBoxController.hasViewTab} only checks existence of property and not whether its value is null or undefined or not
-   */
   title: string;
-  /**
-   * Do not initialize as e.g. {@link SimpleTabBoxController.hasViewTab} only checks existence of property and not whether its value is null or undefined or not
-   */
   subTitle: string;
-  /**
-   * Do not initialize as e.g. {@link SimpleTabBoxController.hasViewTab} only checks existence of property and not whether its value is null or undefined or not
-   */
   iconId: string;
   status: Status;
   uiCssClass: string;
@@ -125,6 +116,9 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     this.initialFocus = null;
     this.renderInitialFocusEnabled = true;
     this.popupWindow = null;
+    this.title = null;
+    this.subTitle = null;
+    this.iconId = null;
 
     this.$statusIcons = [];
     this.$header = null;

@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, BenchColumn, BenchColumnLayoutData, BenchRowLayoutData, Desktop, DesktopBenchEventMap, DesktopBenchModel, DesktopNavigationHandle, DesktopTabArea, DesktopTabSelectKeyStroke, Event, EventHandler, FlexboxLayout, FlexboxLayoutData,
+  arrays, BenchColumn, BenchColumnLayoutData, BenchRowLayoutData, Desktop, DesktopBenchEventMap, DesktopBenchModel, DesktopNavigationHandle, DesktopTab, DesktopTabArea, DesktopTabSelectKeyStroke, Event, EventHandler, FlexboxLayout,
+  FlexboxLayoutData,
   Form, HeaderTabBoxController, HtmlComponent, KeyStrokeContext, Outline, OutlineOverview, Page, PropertyChangeEvent, scout, SimpleTab, SimpleTabBox, Splitter, styles, Table, Widget, widgets
 } from '../../index';
 import $ from 'jquery';
@@ -126,6 +127,7 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
       this.headerTabAreaController.install(this, this.headerTabArea);
       // for all views
       let tabBox = this.getTabBox('C');
+      // noinspection JSVoidFunctionReturnValueUsed
       tabBox.viewStack.slice().reverse().forEach(view => {
         // @ts-ignore
         this.headerTabAreaController._onViewAdd({view: view});
@@ -604,6 +606,7 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     }
     this.components.forEach((c, i) => {
       if (c instanceof Splitter) {
+        // noinspection JSVoidFunctionReturnValueUsed
         let componentsBefore = this.components.slice(0, i).reverse() as BenchColumn[];
         let componentsAfter = this.components.slice(i + 1) as BenchColumn[];
         // shrink
@@ -761,7 +764,7 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     return this.components;
   }
 
-  getTabBox(displayViewId: DisplayViewId): SimpleTabBox {
+  getTabBox(displayViewId: DisplayViewId): SimpleTabBox<OutlineContent> {
     let viewColumn = this._getColumn(displayViewId);
     if (!viewColumn) {
       return;
@@ -769,7 +772,7 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     return viewColumn.getTabBox(displayViewId);
   }
 
-  visibleTabBoxes(): SimpleTabBox[] {
+  visibleTabBoxes(): SimpleTabBox<OutlineContent>[] {
     return this.visibleColumns().reduce((arr, column) => {
       arrays.pushAll(arr, column.visibleTabBoxes());
       return arr;
@@ -789,8 +792,8 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     }, []);
   }
 
-  getViewTab(view: OutlineContent): SimpleTab {
-    let viewTab: SimpleTab = null;
+  getViewTab(view: OutlineContent): SimpleTab<OutlineContent> {
+    let viewTab: SimpleTab<OutlineContent> = null;
     this.getTabs().some(vt => {
       if (vt.view === view) {
         viewTab = vt;
@@ -801,23 +804,27 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     return viewTab;
   }
 
-  getTabs(): SimpleTab[] {
-    let tabs: SimpleTab[] = [];
+  getTabs(): DesktopTab[] {
+    let tabs: DesktopTab[] = [];
     // consider right order
-    tabs = tabs.concat(this.getTabBox('NW').getController().getTabs());
-    tabs = tabs.concat(this.getTabBox('W').getController().getTabs());
-    tabs = tabs.concat(this.getTabBox('SW').getController().getTabs());
-    tabs = tabs.concat(this.getTabBox('N').getController().getTabs());
+    tabs = tabs.concat(this._getTabsForDisplayViewId('NW'));
+    tabs = tabs.concat(this._getTabsForDisplayViewId('W'));
+    tabs = tabs.concat(this._getTabsForDisplayViewId('SW'));
+    tabs = tabs.concat(this._getTabsForDisplayViewId('N'));
     if (this.headerTabAreaController) {
       tabs = tabs.concat(this.headerTabAreaController.getTabs());
     } else {
-      tabs = tabs.concat(this.getTabBox('C').getController().getTabs());
+      tabs = tabs.concat(this._getTabsForDisplayViewId('C'));
     }
-    tabs = tabs.concat(this.getTabBox('S').getController().getTabs());
-    tabs = tabs.concat(this.getTabBox('NE').getController().getTabs());
-    tabs = tabs.concat(this.getTabBox('E').getController().getTabs());
-    tabs = tabs.concat(this.getTabBox('SE').getController().getTabs());
+    tabs = tabs.concat(this._getTabsForDisplayViewId('S'));
+    tabs = tabs.concat(this._getTabsForDisplayViewId('NE'));
+    tabs = tabs.concat(this._getTabsForDisplayViewId('E'));
+    tabs = tabs.concat(this._getTabsForDisplayViewId('SE'));
     return tabs;
+  }
+
+  _getTabsForDisplayViewId(displayViewId: DisplayViewId): DesktopTab[] {
+    return this.getTabBox(displayViewId).getController().getTabs() as DesktopTab[];
   }
 
   /**

@@ -19,12 +19,12 @@ export default class BenchColumn extends Widget implements BenchColumnModel {
   declare model: BenchColumnModel;
   declare eventMap: BenchColumnEventMap;
 
-  tabBoxes: SimpleTabBox[];
+  tabBoxes: SimpleTabBox<OutlineContent>[];
   layoutData: BenchRowLayoutData;
-  components: (SimpleTabBox | Splitter)[];
+  components: (SimpleTabBox<OutlineContent> | Splitter)[];
   layoutCacheKey: string[];
 
-  protected _widgetToTabBox: Record<string /* viewId */, SimpleTabBox>;
+  protected _widgetToTabBox: Record<string /* viewId */, SimpleTabBox<OutlineContent>>;
   protected _removeViewInProgress: number;
   protected _viewAddHandler: EventHandler<SimpleTabBoxViewAddEvent>;
   protected _viewRemoveHandler: EventHandler<SimpleTabBoxViewRemoveEvent>;
@@ -86,7 +86,7 @@ export default class BenchColumn extends Widget implements BenchColumnModel {
     this.updateFirstLastMarker();
   }
 
-  protected _renderTabBox(tabBox: SimpleTabBox) {
+  protected _renderTabBox(tabBox: SimpleTabBox<OutlineContent>) {
     if (!tabBox.rendered) {
       tabBox.render();
     }
@@ -167,7 +167,7 @@ export default class BenchColumn extends Widget implements BenchColumnModel {
         parent: this,
         cssClass: strings.join(' ', 'view-tab-box', BenchColumn.TAB_BOX_CLASSES[i]),
         controller: scout.create(DesktopTabBoxController)
-      });
+      }) as SimpleTabBox<OutlineContent>;
       tabBox.setLayoutData(rowLayoutDatas[i]);
       tabBox.on('viewAdd', this._viewAddHandler);
       tabBox.on('viewRemove', this._viewRemoveHandler);
@@ -187,7 +187,7 @@ export default class BenchColumn extends Widget implements BenchColumnModel {
       });
     }
     this.components = this.visibleTabBoxes()
-      .reduce((arr: (SimpleTabBox | Splitter)[], col: SimpleTabBox) => {
+      .reduce((arr: (SimpleTabBox<OutlineContent> | Splitter)[], col: SimpleTabBox<OutlineContent>) => {
         if (arr.length > 0) {
           // add sep
           let splitter = scout.create(Splitter, {
@@ -223,8 +223,8 @@ export default class BenchColumn extends Widget implements BenchColumnModel {
     }
     this.components.forEach((c, i) => {
       if (c instanceof Splitter) {
-        let componentsBefore = this.components.slice(0, i).reverse() as SimpleTabBox[];
-        let componentsAfter = this.components.slice(i + 1) as SimpleTabBox[];
+        let componentsBefore = this.components.slice(0, i).reverse() as SimpleTabBox<OutlineContent>[];
+        let componentsAfter = this.components.slice(i + 1) as SimpleTabBox<OutlineContent>[];
         // shrink
         if (componentsBefore.filter(tab => tab.getLayoutData().shrink > 0).length > 0
           && componentsAfter.filter(tab => tab.getLayoutData().grow > 0).length > 0) {
@@ -273,8 +273,8 @@ export default class BenchColumn extends Widget implements BenchColumnModel {
     }
   }
 
-  getTabBox(displayViewId: DisplayViewId): SimpleTabBox {
-    let tabBox: SimpleTabBox;
+  getTabBox(displayViewId: DisplayViewId): SimpleTabBox<OutlineContent> {
+    let tabBox: SimpleTabBox<OutlineContent>;
     switch (displayViewId) {
       case 'NW':
       case 'N':
@@ -335,11 +335,11 @@ export default class BenchColumn extends Widget implements BenchColumnModel {
     }, []);
   }
 
-  getComponents(): (SimpleTabBox | Splitter)[] {
+  getComponents(): (SimpleTabBox<OutlineContent> | Splitter)[] {
     return this.components;
   }
 
-  visibleTabBoxes(): SimpleTabBox[] {
+  visibleTabBoxes(): SimpleTabBox<OutlineContent>[] {
     return this.tabBoxes.filter(tabBox => tabBox.hasViews());
   }
 
