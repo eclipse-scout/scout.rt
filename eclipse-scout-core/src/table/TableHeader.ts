@@ -611,7 +611,6 @@ export default class TableHeader extends Widget implements TableHeaderModel {
       this.dragging = false;
       this.columnMoved = false;
     } else if (this.table.sortEnabled && (event.shiftKey || event.ctrlKey || !this._isHeaderMenuEnabled(column))) {
-      this.table.removeColumnGrouping(column);
       this.table.sort(column, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
     } else if (this.tableHeaderMenu && this.tableHeaderMenu.isOpenFor($headerItem)) {
       this.closeHeaderMenu();
