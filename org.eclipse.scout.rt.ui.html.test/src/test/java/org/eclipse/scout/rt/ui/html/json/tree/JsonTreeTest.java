@@ -22,10 +22,12 @@ import java.util.List;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
@@ -898,6 +900,82 @@ public class JsonTreeTest {
       assertFalse(jsonNode.getBoolean("checked"));
     }
   }
+
+  @Test
+  public void testNodeFilterOnNewlyAddedChildren_332936() throws JSONException {
+    ITreeNode rootNode = new TreeNode("Root");
+    ITree tree = createTree(List.of(rootNode));
+
+    ITreeNodeFilter filter = (node, level) -> !StringUtility.startsWith(node.getCell().getText(), "_");
+    tree.addNodeFilter(filter);
+
+    // ---
+
+    UiSessionTestUtility.newJsonAdapter(m_uiSession, tree);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ---
+
+    ITreeNode p = new TreeNode("P");
+    ITreeNode c = new TreeNode("_C");
+    ITreeNode d1 = new TreeNode("_D1");
+    ITreeNode d2 = new TreeNode("_D2");
+    ITreeNode d3 = new TreeNode("_D3");
+
+    tree.setTreeChanging(true);
+    try {
+      tree.addChildNode(rootNode, p);
+      tree.addChildNode(p, c);
+      tree.addChildNode(c, d1);
+      tree.addChildNode(c, d2);
+      tree.addChildNode(c, d3);
+    }
+    finally {
+      tree.setTreeChanging(false);
+    }
+
+    // ---
+
+    // 1. Trigger event for filtered sub-tree (should not result in an additional event)
+
+    tree.updateChildNodeOrder(c, List.of(d3, d2, d1));
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals(1, events.size());
+    assertEquals(JsonTree.EVENT_NODES_INSERTED, events.get(0).getType());
+
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ---
+
+    // 2. Remove filter (should result in an artificial INSERTED event)
+
+    tree.removeNodeFilter(filter);
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    events = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals(1, events.size());
+    assertEquals(JsonTree.EVENT_NODES_INSERTED, events.get(0).getType());
+
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // ---
+
+    // 3. Add the filter again, and remove all child nodes of the filtered sub-tree (should not result in an additional event)
+
+    tree.addNodeFilter(filter);
+    tree.removeAllChildNodes(c);
+
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    events = m_uiSession.currentJsonResponse().getEventList();
+    assertEquals(1, events.size());
+    assertEquals(JsonTree.EVENT_ALL_CHILD_NODES_DELETED, events.get(0).getType());
+
+    JsonTestUtility.endRequest(m_uiSession);
+  }
+
+  // ------------------------------------------------------
 
   public static JsonEvent createJsonSelectedEvent(String nodeId) throws JSONException {
     String desktopId = "x"; // never used

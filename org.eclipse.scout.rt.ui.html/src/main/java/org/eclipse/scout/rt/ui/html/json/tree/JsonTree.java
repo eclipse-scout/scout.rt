@@ -523,6 +523,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   }
 
   protected void processBufferedEvent(TreeEvent event) {
+    if (event.getCommonParentNode() != null && !isNodeAccepted(event.getCommonParentNode())) {
+      return; // ignore entire event when CPN is not accepted
+    }
+
     switch (event.getType()) {
       case TreeEvent.TYPE_NODES_INSERTED:
         handleModelNodesInserted(event);
