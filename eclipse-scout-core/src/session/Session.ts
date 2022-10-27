@@ -18,7 +18,6 @@ import {AjaxCallModel} from '../ajax/AjaxCall';
 import {ObjectFactoryOptions} from '../ObjectFactory';
 import {JsonErrorResponse} from '../App';
 import {ModelAdapterLike} from './ModelAdapter';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {StatusSeverity} from '../status/Status';
 import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
 
@@ -1485,10 +1484,6 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
 
   exportAdapterData(adapterData: AdapterData): AdapterData {
     return adapterData;
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Session>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Session>[K]>): EventMapOf<Session>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected _onLocaleChanged(event: RemoteEvent & { locale?: LocaleModel; textMap?: Record<string, string> }) {
