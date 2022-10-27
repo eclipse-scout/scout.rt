@@ -10,12 +10,13 @@
  */
 import {Event, PropertyChangeEvent, SimpleTab, SimpleTabArea, WidgetEventMap} from '../index';
 import {SimpleTabAreaDisplayStyle} from './SimpleTabArea';
+import {SimpleTabView} from './SimpleTab';
 
-export interface SimpleTabAreaTabSelectEvent<S extends SimpleTabArea = SimpleTabArea> extends Event<S> {
-  viewTab: SimpleTab;
+export interface SimpleTabAreaTabSelectEvent<TView extends SimpleTabView = SimpleTabView, S extends SimpleTabArea<TView> = SimpleTabArea<TView>> extends Event<S> {
+  viewTab: SimpleTab<TView>;
 }
 
-export default interface SimpleTabAreaEventMap extends WidgetEventMap {
-  'tabSelect': SimpleTabAreaTabSelectEvent;
+export default interface SimpleTabAreaEventMap<TView extends SimpleTabView = SimpleTabView> extends WidgetEventMap {
+  'tabSelect': SimpleTabAreaTabSelectEvent<TView>;
   'propertyChange:displayStyle': PropertyChangeEvent<SimpleTabAreaDisplayStyle>;
 }

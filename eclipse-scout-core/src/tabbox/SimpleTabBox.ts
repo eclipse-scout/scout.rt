@@ -9,23 +9,23 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Event, EventHandler, FlexboxLayoutData, HtmlComponent, scout, SimpleTabArea, SimpleTabBoxController, SimpleTabBoxEventMap, SimpleTabBoxLayout, SimpleTabBoxModel, SimpleTabViewContentLayout, Widget} from '../index';
-import {OutlineContent} from '../desktop/bench/DesktopBench';
+import {SimpleTabView} from './SimpleTab';
 
-export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
-  declare model: SimpleTabBoxModel;
-  declare eventMap: SimpleTabBoxEventMap;
+export default class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabBoxModel<TView> {
+  declare model: SimpleTabBoxModel<TView>;
+  declare eventMap: SimpleTabBoxEventMap<TView>;
 
-  tabArea: SimpleTabArea;
-  viewStack: OutlineContent[];
-  currentView: OutlineContent;
-  controller: SimpleTabBoxController;
+  tabArea: SimpleTabArea<TView>;
+  viewStack: TView[];
+  currentView: TView;
+  controller: SimpleTabBoxController<TView>;
   layoutData: FlexboxLayoutData;
   viewContent: HtmlComponent;
   $viewContent: JQuery;
   $tabArea: JQuery;
 
   protected _removeViewInProgress: number;
-  protected _viewDestroyedHandler: EventHandler<Event<OutlineContent>>;
+  protected _viewDestroyedHandler: EventHandler<Event<TView>>;
 
   constructor() {
     super();
@@ -38,13 +38,13 @@ export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
     this._removeViewInProgress = 0;
   }
 
-  protected override _init(model: SimpleTabBoxModel) {
+  protected override _init(model: SimpleTabBoxModel<TView>) {
     super._init(model);
     this.cssClass = model.cssClass;
 
     if (!this.controller) {
       // default controller
-      this.controller = scout.create(SimpleTabBoxController);
+      this.controller = scout.create(SimpleTabBoxController) as SimpleTabBoxController<TView>;
     }
     // link
     this.controller.install(this, this.tabArea);
@@ -81,7 +81,7 @@ export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
     this.$tabArea.insertBefore(this.$viewContent);
   }
 
-  protected _renderView(view: OutlineContent) {
+  protected _renderView(view: TView) {
     if (!view) {
       return;
     }
@@ -100,7 +100,7 @@ export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
     }
   }
 
-  activateView(view: OutlineContent) {
+  activateView(view: TView) {
     if (view === this.currentView) {
       return;
     }
@@ -143,7 +143,7 @@ export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
   /**
    * @param bringToTop whether the view should be placed on top of the view stack. the view tab will be selected. Default is true.
    */
-  addView(view: OutlineContent, bringToTop?: boolean) {
+  addView(view: TView, bringToTop?: boolean) {
     let activate = scout.nvl(bringToTop, true);
     // add to view stack
     let siblingView = this._addToViewStack(view, activate);
@@ -161,10 +161,10 @@ export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
   }
 
   /**
-   * @returns the view which is gonna be the sibling to insert the new view tab after.
+   * @returns the view which is going to be the sibling to insert the new view tab after.
    */
-  protected _addToViewStack(view: OutlineContent, bringToTop: boolean): OutlineContent {
-    let sibling: OutlineContent;
+  protected _addToViewStack(view: TView, bringToTop: boolean): TView {
+    let sibling: TView;
     let index = this.viewStack.indexOf(view);
     if (index > -1) {
       return this.viewStack[index - 1];
@@ -190,15 +190,15 @@ export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
     return sibling;
   }
 
-  protected _addDestroyListener(view: OutlineContent) {
+  protected _addDestroyListener(view: TView) {
     view.one('destroy', this._viewDestroyedHandler);
   }
 
-  protected _removeDestroyListener(view: OutlineContent) {
+  protected _removeDestroyListener(view: TView) {
     view.off('destroy', this._viewDestroyedHandler);
   }
 
-  protected _onViewDestroyed(event: Event<OutlineContent>) {
+  protected _onViewDestroyed(event: Event<TView>) {
     let view = event.source;
     arrays.remove(this.viewStack, view);
     if (this.currentView === view) {
@@ -209,7 +209,7 @@ export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
     }
   }
 
-  removeView(view: OutlineContent, showSiblingView?: boolean) {
+  removeView(view: TView, showSiblingView?: boolean) {
     if (!view) {
       return;
     }
@@ -258,7 +258,7 @@ export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
     }
   }
 
-  getController(): SimpleTabBoxController {
+  getController(): SimpleTabBoxController<TView> {
     return this.controller;
   }
 
@@ -270,11 +270,11 @@ export default class SimpleTabBox extends Widget implements SimpleTabBoxModel {
     return this.viewStack.length > 0;
   }
 
-  hasView(view: OutlineContent): boolean {
+  hasView(view: TView): boolean {
     return this.viewStack.filter(v => v === view).length > 0;
   }
 
-  getViews(displayViewId?: string): OutlineContent[] {
+  getViews(displayViewId?: string): TView[] {
     return this.viewStack.filter(view => {
       if (!displayViewId) {
         return true;

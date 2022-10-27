@@ -9,12 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {AbstractLayout, EnumObject, Event, EventHandler, HtmlComponent, SimpleTab, SimpleTabAreaEventMap, SimpleTabAreaLayout, SimpleTabAreaModel, Widget, widgets} from '../index';
+import {SimpleTabView} from './SimpleTab';
 
 export type SimpleTabAreaDisplayStyle = EnumObject<typeof SimpleTabArea.DisplayStyle>;
 
-export default class SimpleTabArea extends Widget implements SimpleTabAreaModel {
-  declare model: SimpleTabAreaModel;
-  declare eventMap: SimpleTabAreaEventMap;
+export default class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabAreaModel<TView> {
+  declare model: SimpleTabAreaModel<TView>;
+  declare eventMap: SimpleTabAreaEventMap<TView>;
 
   static DisplayStyle = {
     DEFAULT: 'default',
@@ -22,10 +23,10 @@ export default class SimpleTabArea extends Widget implements SimpleTabAreaModel 
   } as const;
 
   displayStyle: SimpleTabAreaDisplayStyle;
-  tabs: SimpleTab[];
+  tabs: SimpleTab<TView>[];
 
-  protected _selectedViewTab: SimpleTab;
-  protected _tabClickHandler: EventHandler<Event<SimpleTab>>;
+  protected _selectedViewTab: SimpleTab<TView>;
+  protected _tabClickHandler: EventHandler<Event<SimpleTab<TView>>>;
 
   constructor() {
     super();
@@ -34,7 +35,7 @@ export default class SimpleTabArea extends Widget implements SimpleTabAreaModel 
     this._selectedViewTab = null;
   }
 
-  protected override _init(model: SimpleTabAreaModel) {
+  protected override _init(model: SimpleTabAreaModel<TView>) {
     super._init(model);
 
     this._tabClickHandler = this._onTabClick.bind(this);
@@ -72,7 +73,7 @@ export default class SimpleTabArea extends Widget implements SimpleTabAreaModel 
     widgets.updateFirstLastMarker(this.tabs);
   }
 
-  protected _renderTab(tab: SimpleTab) {
+  protected _renderTab(tab: SimpleTab<TView>) {
     tab.renderAfter(this.$container);
   }
 
@@ -81,15 +82,15 @@ export default class SimpleTabArea extends Widget implements SimpleTabAreaModel 
     this.invalidateLayoutTree();
   }
 
-  protected _onTabClick(event: Event<SimpleTab>) {
+  protected _onTabClick(event: Event<SimpleTab<TView>>) {
     this.selectTab(event.source);
   }
 
-  getTabs(): SimpleTab[] {
+  getTabs(): SimpleTab<TView>[] {
     return this.tabs;
   }
 
-  getVisibleTabs(): SimpleTab[] {
+  getVisibleTabs(): SimpleTab<TView>[] {
     return this.tabs.filter(tab => {
       // Layout operates on dom elements directly -> check dom visibility
       if (tab.$container) {
@@ -99,7 +100,7 @@ export default class SimpleTabArea extends Widget implements SimpleTabAreaModel 
     });
   }
 
-  selectTab(viewTab: SimpleTab) {
+  selectTab(viewTab: SimpleTab<TView>) {
     if (this._selectedViewTab === viewTab) {
       return;
     }
@@ -117,7 +118,7 @@ export default class SimpleTabArea extends Widget implements SimpleTabAreaModel 
     }
   }
 
-  deselectTab(viewTab: SimpleTab) {
+  deselectTab(viewTab: SimpleTab<TView>) {
     if (!viewTab) {
       return;
     }
@@ -127,11 +128,11 @@ export default class SimpleTabArea extends Widget implements SimpleTabAreaModel 
     this._selectedViewTab.deselect();
   }
 
-  getSelectedTab(): SimpleTab {
+  getSelectedTab(): SimpleTab<TView> {
     return this._selectedViewTab;
   }
 
-  addTab(tab: SimpleTab, sibling?: SimpleTab) {
+  addTab(tab: SimpleTab<TView>, sibling?: SimpleTab<TView>) {
     let insertPosition = -1;
     if (sibling) {
       insertPosition = this.tabs.indexOf(sibling);
@@ -146,7 +147,7 @@ export default class SimpleTabArea extends Widget implements SimpleTabAreaModel 
     }
   }
 
-  destroyTab(tab: SimpleTab) {
+  destroyTab(tab: SimpleTab<TView>) {
     let index = this.tabs.indexOf(tab);
     if (index > -1) {
       this.tabs.splice(index, 1);

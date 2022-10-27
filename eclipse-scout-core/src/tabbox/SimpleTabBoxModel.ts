@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FlexboxLayoutData, SimpleTabArea, SimpleTabBoxController, WidgetModel} from '../index';
-import {OutlineContent} from '../desktop/bench/DesktopBench';
+import {SimpleTabView} from './SimpleTab';
 
-export default interface SimpleTabBoxModel extends WidgetModel {
-  tabArea?: SimpleTabArea;
-  viewStack?: OutlineContent[];
-  currentView?: OutlineContent;
-  controller?: SimpleTabBoxController;
+export default interface SimpleTabBoxModel<TView extends SimpleTabView = SimpleTabView> extends WidgetModel {
+  tabArea?: SimpleTabArea<TView>;
+  viewStack?: TView[];
+  currentView?: TView;
+  controller?: SimpleTabBoxController<TView>;
   layoutData?: FlexboxLayoutData;
 }

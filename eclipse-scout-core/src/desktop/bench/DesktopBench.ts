@@ -761,7 +761,7 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     return this.components;
   }
 
-  getTabBox(displayViewId: DisplayViewId): SimpleTabBox {
+  getTabBox(displayViewId: DisplayViewId): SimpleTabBox<OutlineContent> {
     let viewColumn = this._getColumn(displayViewId);
     if (!viewColumn) {
       return;
@@ -769,7 +769,7 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     return viewColumn.getTabBox(displayViewId);
   }
 
-  visibleTabBoxes(): SimpleTabBox[] {
+  visibleTabBoxes(): SimpleTabBox<OutlineContent>[] {
     return this.visibleColumns().reduce((arr, column) => {
       arrays.pushAll(arr, column.visibleTabBoxes());
       return arr;
@@ -789,8 +789,8 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     }, []);
   }
 
-  getViewTab(view: OutlineContent): SimpleTab {
-    let viewTab: SimpleTab = null;
+  getViewTab(view: OutlineContent): SimpleTab<OutlineContent> {
+    let viewTab: SimpleTab<OutlineContent> = null;
     this.getTabs().some(vt => {
       if (vt.view === view) {
         viewTab = vt;
@@ -801,8 +801,8 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     return viewTab;
   }
 
-  getTabs(): SimpleTab[] {
-    let tabs: SimpleTab[] = [];
+  getTabs(): SimpleTab<OutlineContent>[] {
+    let tabs: SimpleTab<OutlineContent>[] = [];
     // consider right order
     tabs = tabs.concat(this.getTabBox('NW').getController().getTabs());
     tabs = tabs.concat(this.getTabBox('W').getController().getTabs());

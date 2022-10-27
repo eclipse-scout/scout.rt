@@ -8,10 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, SimpleTabArea} from '../../index';
+import {AbstractLayout, DesktopTab, Form, SimpleTabArea} from '../../index';
 import DesktopTabAreaLayout from './DesktopTabAreaLayout';
 
-export default class DesktopTabArea extends SimpleTabArea {
+export default class DesktopTabArea extends SimpleTabArea<Form> {
+  declare tabs: DesktopTab[];
+
   constructor() {
     super();
   }
@@ -32,5 +34,9 @@ export default class DesktopTabArea extends SimpleTabArea {
     }
     let firstTab = this.getVisibleTabs()[0];
     desktop.$container.toggleClass('first-tab-selected', firstTab && firstTab.selected);
+  }
+
+  override getTabs(): DesktopTab[] {
+    return super.getTabs() as DesktopTab[];
   }
 }

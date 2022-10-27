@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ContextMenuPopup, HAlign, Menu, scout, SimpleTab, SimpleTabArea} from '../../index';
+import {arrays, ContextMenuPopup, DesktopTabArea, Form, HAlign, Menu, scout, SimpleTab} from '../../index';
 
-export default class DesktopTab extends SimpleTab {
-  declare parent: SimpleTabArea;
+export default class DesktopTab extends SimpleTab<Form> {
+  declare parent: DesktopTabArea;
 
   constructor() {
     super();
