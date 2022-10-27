@@ -97,7 +97,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
 
   /**
    * Keep the parent/child hierarchy to that nodes may be disposed properly. In case of delete events the model is
-   * already updated so it is not always possible anymore to visit all the child nodes.
+   * already updated, so it is not always possible anymore to visit all the child nodes.
    */
   private final Map<ITreeNode, Set<ITreeNode>> m_childNodes;
   private final Map<ITreeNode, ITreeNode> m_parentNodes;
@@ -146,13 +146,13 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   @Override
   protected void initJsonProperties(TREE model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_TITLE, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_TITLE, model) {
       @Override
       protected String modelValue() {
         return getModel().getTitle();
       }
     });
-    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_ICON_ID, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_ICON_ID, model) {
       @Override
       protected String modelValue() {
         return getModel().getIconId();
@@ -163,49 +163,49 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         return BinaryResourceUrlUtility.createIconUrl((String) value);
       }
     });
-    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_CHECKABLE, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_CHECKABLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isCheckable();
       }
     });
-    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_MULTI_CHECK, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_MULTI_CHECK, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isMultiCheck();
       }
     });
-    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_LAZY_EXPANDING_ENABLED, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_LAZY_EXPANDING_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isLazyExpandingEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_AUTO_CHECK_CHILDREN, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_AUTO_CHECK_CHILDREN, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isAutoCheckChildNodes();
       }
     });
-    putJsonProperty(new JsonProperty<ITree>(ITree.PROP_SCROLL_TO_SELECTION, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_SCROLL_TO_SELECTION, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isScrollToSelection();
       }
     });
-    putJsonProperty(new JsonProperty<ITree>(ITree.PROP_DROP_TYPE, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_DROP_TYPE, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getDropType();
       }
     });
-    putJsonProperty(new JsonProperty<ITree>(ITree.PROP_DROP_MAXIMUM_SIZE, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_DROP_MAXIMUM_SIZE, model) {
       @Override
       protected Long modelValue() {
         return getModel().getDropMaximumSize();
       }
     });
-    putJsonProperty(new JsonAdapterProperty<ITree>(ITree.PROP_KEY_STROKES, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<>(ITree.PROP_KEY_STROKES, model, getUiSession()) {
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
         return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<>()).build();
@@ -216,19 +216,19 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         return getModel().getKeyStrokes();
       }
     });
-    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_DISPLAY_STYLE, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_DISPLAY_STYLE, model) {
       @Override
       protected String modelValue() {
         return getModel().getDisplayStyle();
       }
     });
-    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_TOGGLE_BREADCRUMB_STYLE_ENABLED, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_TOGGLE_BREADCRUMB_STYLE_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isToggleBreadcrumbStyleEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<ITree>(ITree.PROP_CHECKABLE_STYLE, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_CHECKABLE_STYLE, model) {
       @Override
       protected CheckableStyle modelValue() {
         return getModel().getCheckableStyle();
@@ -239,7 +239,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         return ((CheckableStyle) value).name().toLowerCase();
       }
     });
-    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_TEXT_FILTER_ENABLED, model) {
+    putJsonProperty(new JsonProperty<>(ITree.PROP_TEXT_FILTER_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isTextFilterEnabled();
@@ -831,7 +831,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
           continue;
         }
       }
-      // May be null if its the invisible root node
+      // May be null if it's the invisible root node
       if (nodeId != null) {
         jsonNodeIds.put(nodeId);
       }

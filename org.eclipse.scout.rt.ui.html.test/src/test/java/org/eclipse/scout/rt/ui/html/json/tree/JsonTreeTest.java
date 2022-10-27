@@ -948,7 +948,7 @@ public class JsonTreeTest {
 
   public static List<ITreeNode> getAllTreeNodes(final ITree tree) {
     final List<ITreeNode> nodes = new LinkedList<>();
-    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
+    IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<>() {
       @Override
       public TreeVisitResult preVisit(ITreeNode node, int level, int index) {
         if (!tree.isRootNodeVisible() && tree.getRootNode() == node) {
