@@ -148,7 +148,7 @@ export function readFromDOM(): Record<string, string> {
 
 /**
  * @param key to convert into a string with the form '${textKey:AKey}'.
- * @return text containing the text key like like '${textKey:AKey}'.
+ * @returns text containing the text key like like '${textKey:AKey}'.
  */
 export function buildKey(key: string): string {
   return '${textKey:' + key + '}';
@@ -156,7 +156,7 @@ export function buildKey(key: string): string {
 
 /**
  * @param value text which contains a text key like '${textKey:AKey}'.
- * @return the resolved key or the unchanged value if the text key could not be extracted.
+ * @returns the resolved key or the unchanged value if the text key could not be extracted.
  */
 export function resolveKey(value: string): string {
   let result = TEXT_KEY_REGEX.exec(value);
@@ -169,7 +169,7 @@ export function resolveKey(value: string): string {
 /**
  * @param value text which contains a text key like '${textKey:AKey}'.
  * @param languageTag the languageTag to use for the text lookup with the resolved key.
- * @return the resolved text in the language of the given session or the unchanged text if the text key could not be extracted.
+ * @returns the resolved text in the language of the given session or the unchanged text if the text key could not be extracted.
  */
 export function resolveText(value: string, languageTag: string): string {
   let key = resolveKey(value);

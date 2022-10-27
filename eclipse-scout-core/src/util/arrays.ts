@@ -39,7 +39,7 @@ export function init<T>(length: number, initValue: T): T[] {
  * if it is present (optional operation). If the array does not contain
  * the element, it is unchanged.
  *
- * @return true if the array contained the specified element
+ * @returns true if the array contained the specified element
  */
 export function remove<T>(arr: T[], element: T): boolean {
   if (arr) {
@@ -55,7 +55,7 @@ export function remove<T>(arr: T[], element: T): boolean {
 /**
  * Removes every given element from the array
  *
- * @return true if the array contained at least one of the specified elements
+ * @returns true if the array contained at least one of the specified elements
  */
 export function removeAll<T>(arr: T[], elements: T[]): boolean {
   let modified = false;
@@ -72,7 +72,7 @@ export function removeAll<T>(arr: T[], elements: T[]): boolean {
 }
 
 /**
- * @return the index of the replaced element
+ * @returns the index of the replaced element
  */
 export function replace<T>(arr: T[], element: T, replacement: T): number {
   let index = arr.indexOf(element);

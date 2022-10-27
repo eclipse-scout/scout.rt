@@ -12,8 +12,8 @@ import {EventHandler, FormFieldTile, MenuBar, PropertyChangeEvent, TableField} f
 import $ from 'jquery';
 
 export default class TileTableField extends TableField {
-  protected _tableBlurHandler: JQuery.EventHandler<HTMLElement>;
-  protected _tableFocusHandler: JQuery.EventHandler<HTMLElement>;
+  protected _tableBlurHandler: (event: JQuery.BlurEvent) => void;
+  protected _tableFocusHandler: (event: JQuery.FocusEvent) => void;
   protected _menuBarPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, MenuBar>>;
   protected _documentMouseDownHandler: (event: MouseEvent) => void;
 

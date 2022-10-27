@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, Event, EventEmitter, filters, Key, keys, KeyStroke, KeyStrokeContext, KeyStrokeManagerEventMap, KeyStrokeModel, Session, ValueField, VirtualKeyStrokeEvent} from '../index';
+import {Action, arrays, EventEmitter, filters, Key, keys, KeyStroke, KeyStrokeContext, KeyStrokeManagerEventMap, KeyStrokeModel, Session, ValueField, VirtualKeyStrokeEvent} from '../index';
 import $ from 'jquery';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerModel {
@@ -212,10 +211,6 @@ export default class KeyStrokeManager extends EventEmitter implements KeyStrokeM
       // Break on 'stopImmediate'.
       return event.isImmediatePropagationStopped(); // 'some-loop' breaks on true
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<KeyStrokeManager>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<KeyStrokeManager>[K]>): EventMapOf<KeyStrokeManager>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected _filter(keyStroke: KeyStroke): boolean {

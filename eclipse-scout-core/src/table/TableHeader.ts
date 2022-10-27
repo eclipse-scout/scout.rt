@@ -700,7 +700,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     }
 
     /**
-     * @return the middle of the text (not the middle of the whole header item)
+     * @returns the middle of the text (not the middle of the whole header item)
      */
     function realMiddle($div: JQuery): number {
       if ($div.hasClass('halign-right')) {

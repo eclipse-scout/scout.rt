@@ -38,7 +38,7 @@ export interface ClipboardTextCopyOptions {
  * the clipboard is blocked by the browser in other contexts (e.g. asynchronous callbacks).
  *
  * @param options mandatory
- * @return a promise or null if {@link options.showNotification} is true.
+ * @returns a promise or null if {@link options.showNotification} is true.
  */
 export function copyText(options: ClipboardTextCopyOptions): JQuery.Promise<void> {
   scout.assertParameter('options', options);

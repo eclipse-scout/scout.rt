@@ -25,7 +25,7 @@ let loadingComplete = true;
  * To disable preloading entirely, pass an empty array to this function.
  *
  * @param fonts (optional) array of fonts
- * @return promise that is resolved when all fonts are loaded
+ * @returns promise that is resolved when all fonts are loaded
  */
 export function bootstrap(fonts: FontSpec[]): JQuery.Promise<void> {
   fonts = fonts || autoDetectFonts();
@@ -56,7 +56,7 @@ export function bootstrap(fonts: FontSpec[]): JQuery.Promise<void> {
 }
 
 /**
- * @return  a promise object that is notified when the font preloading was completed.
+ * @returns  a promise object that is notified when the font preloading was completed.
  *          Important: Before waiting for this promise, always check that value of
  *          loadingComplete first! Do not wait for the promise when loadingComplete
  *          is true, because the promise will never be resolved.

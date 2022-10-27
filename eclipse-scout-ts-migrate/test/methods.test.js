@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 import {mockPluginParams} from './test-utils.js';
 import {crlfToLf, lfToCrlf} from '../src/common.js';
 import methodsPlugin from '../src/methodsPlugin';
@@ -95,7 +105,7 @@ class Class1 {
   /**
    * @param [menus] {Menu[]} name and type other way round
    * @param $abc already ok
-   * @return {boolean} true if else
+   * @returns {boolean} true if else
    */
   func2(menus, $abc, aaa): boolean {
   }
@@ -152,7 +162,7 @@ class Class1 {
    * @param {boolean} abc
    * @param {boolean} bbb with desc
    * @param {boolean} ccc
-   * @return {boolean}
+   * @returns {boolean}
    */
   func(abc: boolean, bbb: boolean, ccc: boolean): boolean {
   }

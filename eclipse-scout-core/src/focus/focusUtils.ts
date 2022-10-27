@@ -15,7 +15,7 @@ import $ from 'jquery';
  */
 
 /**
- * @return whether the given element is focusable by mouse.
+ * @returns whether the given element is focusable by mouse.
  */
 export function isFocusableByMouse(element: HTMLElement | JQuery): boolean {
   let $element = $(element);
@@ -23,7 +23,7 @@ export function isFocusableByMouse(element: HTMLElement | JQuery): boolean {
 }
 
 /**
- * @return whether the given element has a parent which is focusable by mouse.
+ * @returns whether the given element has a parent which is focusable by mouse.
  */
 export function containsParentFocusableByMouse(element: HTMLElement | JQuery, entryPoint: JQuery): boolean {
   let $focusableParentElements = $(element)

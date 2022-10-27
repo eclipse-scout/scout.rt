@@ -142,7 +142,7 @@ export function generateTextKey(code: Code<any>): string {
  *
  * @param code the code to register the text for
  * @param textsArg an object with the languageTag as key and the translated text as value
- * @return the generated text key
+ * @returns the generated text key
  */
 export function registerTexts(code: Code<any>, textsArg: Record<string, string>): string {
   let key = generateTextKey(code);

@@ -46,7 +46,7 @@ export function initTouch(field: { embedded: boolean; touchMode: boolean }, mode
  * Calls JQuery $.text() for touch-devices and $.val() for all other devices, used together with #makeInputOrDiv().
  * Works as setter when called with 2 arguments, works a getter when called with 1 arguments.
  *
- * @return when called with 1 argument: $field.text() or $field.val()
+ * @returns when called with 1 argument: $field.text() or $field.val()
  */
 export function valOrText($field: JQuery, text: string);
 export function valOrText($field: JQuery): string;

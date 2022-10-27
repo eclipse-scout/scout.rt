@@ -15,7 +15,6 @@ import $ from 'jquery';
 import EventListener from '../events/EventListener';
 import WidgetModel from '../widget/WidgetModel';
 import {AdapterData} from './Session';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 import {RefModel, SomeRequired} from '../types';
 import {ObjectType} from '../ObjectFactory';
 
@@ -449,10 +448,6 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
     delete adapterData.classId;
     delete adapterData.modelClass;
     return adapterData;
-  }
-
-  override trigger<K extends string & keyof EventMapOf<ModelAdapter>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<ModelAdapter>[K]>): EventMapOf<ModelAdapter>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   /**

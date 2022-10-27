@@ -2183,7 +2183,7 @@ export default class Table extends Widget implements TableModel {
    *
    * @param openFieldPopupOnCellEdit true to instruct the editor to open its control popup when the editor is rendered.
    *    This only has an effect if the editor has a popup (e.g. SmartField or DateField).
-   * @returns Promise the promise will be resolved when the preparation has been finished.
+   * @returns The promise will be resolved when the preparation has been finished.
    */
   prepareCellEdit(column: Column<any>, row: TableRow, openFieldPopupOnCellEdit?: boolean): JQuery.Promise<void> {
     let promise: JQuery.Promise<void> = $.resolvedPromise();

@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, EventEmitter, LifecycleModel, MessageBox, MessageBoxes, objects, scout, Session, Status, Widget} from '../index';
+import {arrays, EventEmitter, LifecycleModel, MessageBox, MessageBoxes, objects, scout, Session, Status, Widget} from '../index';
 import $ from 'jquery';
 import LifecycleEventMap from './LifecycleEventMap';
-import {EventMapOf, EventModel} from '../events/EventEmitter';
 
 /**
  * Abstract base class for validation lifecycles as used for forms.
@@ -79,10 +78,6 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
       this.markAsSaved();
       this.trigger('postLoad');
     });
-  }
-
-  override trigger<K extends string & keyof EventMapOf<Lifecycle<VALIDATION_RESULT>>>(type: K, eventOrModel?: Event | EventModel<EventMapOf<Lifecycle<VALIDATION_RESULT>>[K]>): EventMapOf<Lifecycle<VALIDATION_RESULT>>[K] {
-    return super.trigger(type, eventOrModel);
   }
 
   protected _load(): JQuery.Promise<void> {

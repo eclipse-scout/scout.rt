@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -65,11 +65,11 @@ export default class Rectangle {
   }
 
   /**
-   * Tests whether or not the specified rectangle intersects this rectangle.
+   * Tests whether the specified rectangle intersects this rectangle.
    * This means the two rectangles share at least one internal point.
    *
    * @param r the rectangle to test against
-   * @return true if the specified rectangle intersects this one
+   * @returns true if the specified rectangle intersects this one
    */
   intersects(r: Rectangle): boolean {
     if (!r) {
