@@ -1101,7 +1101,12 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       value = dataset.data[dataIndex];
 
     if (this._isHorizontalBar(config)) {
-      tooltipDirection = value < 0 ? 'left' : 'right';
+      if (!numbers.isNumber(value) && objects.isArray(value.x) && value.x.length === 2) {
+        let avg = (value.x[0] + value.x[1]) / 2;
+        tooltipDirection = avg < 0 ? 'left' : 'right';
+      } else {
+        tooltipDirection = value < 0 ? 'left' : 'right';
+      }
     } else if ((dataset.type || config.type) === Chart.Type.BAR) {
       tooltipPosition = value < 0 ? 'bottom' : 'top';
     } else if (scout.isOneOf(config.type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
