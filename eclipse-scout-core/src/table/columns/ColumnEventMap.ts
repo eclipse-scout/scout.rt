@@ -9,10 +9,20 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {PropertyChangeEvent, PropertyEventMap} from '../../index';
+import {Column, Event, PropertyChangeEvent, PropertyEventMap, TableHeaderMenu} from '../../index';
 import {Alignment} from '../../cell/Cell';
 
+export interface ColumnHeaderMenuOpenEvent<T = Column> extends Event<T> {
+  menu: TableHeaderMenu;
+}
+
+export interface ColumnHeaderMenuCloseEvent<T = Column> extends Event<T> {
+  menu: TableHeaderMenu;
+}
+
 export default interface ColumnEventMap extends PropertyEventMap {
+  'headerMenuOpen': ColumnHeaderMenuOpenEvent;
+  'headerMenuClose': ColumnHeaderMenuCloseEvent;
   'propertyChange:autoOptimizeWidth': PropertyChangeEvent<boolean>;
   'propertyChange:compacted': PropertyChangeEvent<boolean>;
   'propertyChange:cssClass': PropertyChangeEvent<string>;
