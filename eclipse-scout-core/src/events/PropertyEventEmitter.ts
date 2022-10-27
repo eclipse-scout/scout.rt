@@ -27,7 +27,7 @@ export default class PropertyEventEmitter extends EventEmitter {
    * If such a function exists, it will be called instead of {@link _setProperty}
    * @param propertyName the name of the property
    * @param newValue the new value the property should get
-   * @return true if the property has been changed, false if not.
+   * @returns true if the property has been changed, false if not.
    */
   setProperty(propertyName: string, value: any): boolean {
     if (objects.equals(this[propertyName], value)) {
@@ -53,7 +53,7 @@ export default class PropertyEventEmitter extends EventEmitter {
    *
    * @param propertyName the name of the property
    * @param newValue the new value the property should get
-   * @return true if the property has been changed, false if not.
+   * @returns true if the property has been changed, false if not.
    */
   protected _setProperty(propertyName: string, newValue: any): boolean {
     scout.assertParameter('propertyName', propertyName);

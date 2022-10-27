@@ -38,10 +38,7 @@ export interface DateFormatPatternDefinitionOptions {
    *   @param acceptedTerm
    *            The term that was accepted for this definition. This argument is usually only relevant,
    *            if a definition can accept more than one term.
-   *   @return
-   *            The function may return a string as result. If a string is returned, it is appended
-   *            to the formatContext.formattedString automatically. If the formatFunction already did
-   *            this, it should return "undefined".
+   *   @returns The function may return a string as result. If a string is returned, it is appended to the formatContext.formattedString automatically. If the formatFunction already did this, it should return "undefined".
    */
   formatFunction?: (formatContext: DateFormatContext, acceptedTerm: string) => string;
 
@@ -71,8 +68,7 @@ export interface DateFormatPatternDefinitionOptions {
    *            See documentation at _createParseContext().
    *   @param acceptedTerm
    *            The term that was accepted for this definition. This argument is usually only relevant, if a definition can accept more than one term.
-   *   @return
-   *            A string with the matched part of the input, or null if it did not match.
+   *   @returns A string with the matched part of the input, or null if it did not match.
    */
   parseFunction?: (parseContext: DateFormatParseContext, acceptedTerm: string) => string;
 }
@@ -157,7 +153,7 @@ export default class DateFormatPatternDefinition implements DateFormatPatternDef
   }
 
   /**
-   * @return the accepted term (if is accepted) or null (if it is not accepted)
+   * @returns the accepted term (if is accepted) or null (if it is not accepted)
    */
   accept(term: string): string {
     if (term) {

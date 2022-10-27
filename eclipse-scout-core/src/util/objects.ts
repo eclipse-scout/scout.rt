@@ -208,7 +208,7 @@ export function findChildObjectByKey(parentObj: any, property: string, propertyV
  *
  * @param object The object to select a property from.
  * @param path The path for the selection.
- * @return Object Returns the selected object.
+ * @returns Object Returns the selected object.
  * @throws Throws an error, if the provided parameters are malformed, or a property could not be found/a id property filter does not find any elements.
  */
 export function getByPath(object: object, path: string): any {
@@ -358,7 +358,7 @@ export function isArray(obj: any): obj is Array<any> {
 /**
  * Checks whether the provided value is a promise or not.
  * @param value The value to check.
- * @return true, in case the provided value is a thenable, false otherwise.
+ * @returns true, in case the provided value is a thenable, false otherwise.
  *
  * Note: This method checks whether the provided value is a "thenable" (see https://promisesaplus.com/#terminology).
  *       Checking for promise would require to check the behavior which is not possible. So you could provide an object
@@ -643,7 +643,7 @@ export function checkFunctionOverrides(): string[] {
 
 /**
  * @param value text which contains a constant reference like '${const:FormField.LabelPosition.RIGHT}'.
- * @return the resolved constant value or the unchanged input value if the constant could not be resolved.
+ * @returns the resolved constant value or the unchanged input value if the constant could not be resolved.
  */
 export function resolveConst(value: string, constType: any): any {
   if (!isString(value)) {

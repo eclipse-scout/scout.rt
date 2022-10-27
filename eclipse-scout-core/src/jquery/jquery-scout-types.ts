@@ -543,7 +543,7 @@ declare global {
     select(selected?: boolean): this;
 
     /**
-     * @return true if the current element has the class 'selected', false if not.
+     * @returns true if the current element has the class 'selected', false if not.
      */
     isSelected(): boolean;
 
@@ -599,7 +599,7 @@ declare global {
     placeholder(placeholder: string): this;
 
     /**
-     * @return true if the element is attached (= is in the dom tree), false if not
+     * @returns true if the element is attached (= is in the dom tree), false if not
      */
     isAttached(): boolean;
 

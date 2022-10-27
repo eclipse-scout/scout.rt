@@ -176,8 +176,8 @@ export default class HtmlComponent {
   }
 
   /**
-   * Calls the layout of the component to layout its children but only if the component is not valid.
-   * @return true if validation was successful, false if it could not be executed (e.g. because the element is invisible or detached)
+   * Calls the layout of the component to lay out its children but only if the component is not valid.
+   * @returns true if validation was successful, false if it could not be executed (e.g. because the element is invisible or detached)
    * @exception when component has no layout
    */
   validateLayout(): boolean {

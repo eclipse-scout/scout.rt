@@ -208,7 +208,7 @@ export default class KeyStroke implements KeyStrokeModel {
   /**
    * Renders the visual representation of this keystroke, with the 'which' as given by the event.
    *
-   * @return $drawingArea on which the key was finally rendered.
+   * @returns $drawingArea on which the key was finally rendered.
    */
   renderKeyBox($drawingArea: JQuery, event: ScoutKeyboardEvent): JQuery {
     $drawingArea = this.renderingHints.$drawingArea($drawingArea, event);

@@ -145,7 +145,7 @@ export function count(string: string, separator: string): number {
  * Returns the HTML encoded text. Example: 'Foo<br>Bar' returns 'Foo&amp;lt;br&amp;gt;Bar'.
  * If the argument is or undefined, the same value is returned.
  * @param text plain text to encode
- * @return HTML encoded text
+ * @returns HTML encoded text
  */
 export function encode(text: string): string {
   if (!htmlEncoder) { // lazy instantiation to avoid cyclic dependency errors during webpack bootstrap
@@ -414,7 +414,7 @@ export function removeSuffix(string: string, suffix: string): string {
  * @param text the text to be truncated
  * @param horizontalSpace the horizontal space the text needs to fit into
  * @param measureText a function that measures the span of a text, it needs to return an object containing a 'width' property.
- * @return the truncated text
+ * @returns the truncated text
  */
 export function truncateText(text: string, horizontalSpace: number, measureText: (text: string) => { width: number }): string {
   if (text && horizontalSpace && measureText && horizontalSpace > 0 && measureText(text).width > horizontalSpace) {

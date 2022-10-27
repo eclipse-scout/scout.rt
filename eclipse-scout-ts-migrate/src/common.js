@@ -217,7 +217,7 @@ export function findImportDeclarations(j, source, predicate) {
  * E.g. if the specifierName is b and the import declaration `import {a, b} from 'module'`, the {@link ImportSpecifier} for b wil be returned because it is in the list.
  * @param  {Collection<ImportDeclaration>} importDeclaration
  * @param {string} specifierName
- * @return {Collection<ImportSpecifier>}
+ * @returns {Collection<ImportSpecifier>}
  */
 export function findImportSpecifiers(j, importDeclaration, specifierName) {
   return importDeclaration
