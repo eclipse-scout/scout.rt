@@ -17,7 +17,6 @@ import {FormRevealInvalidFieldEvent} from './FormEventMap';
 import {DisplayViewId} from '../tabbox/SimpleTab';
 import {ValidationResult} from './fields/FormField';
 import {ButtonSystemType} from './fields/button/Button';
-import Promise = JQuery.Promise;
 
 export type DisplayHint = EnumObject<typeof Form.DisplayHint>;
 
@@ -243,7 +242,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
       layout = new DialogLayout(this);
       this.htmlComp.validateRoot = true;
       // Attach to capture phase to activate focus context before regular mouse down handlers may set the focus.
-      // E.g. clicking a check box label on another dialog executes mouse down handler of the check box which will focus the box. This only works if the focus context of the dialog is active.
+      // E.g. clicking a checkbox label on another dialog executes mouse down handler of the checkbox which will focus the box. This only works if the focus context of the dialog is active.
       this.$container[0].addEventListener('mousedown', this._onDialogMouseDown.bind(this), true);
     } else {
       layout = new FormLayout(this);
@@ -304,7 +303,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
    * This is only relevant if you need to access properties which are only available when the form is rendered (e.g. $container), which is not recommended anyway.
    * <p>
    */
-  open(): Promise<void> {
+  open(): JQuery.Promise<void> {
     return this.load()
       .then(() => {
         if (this.destroyed) {
@@ -321,21 +320,21 @@ export default class Form extends Widget implements FormModel, DisplayParent {
    * Initializes the life cycle and calls the {@link _load} function.
    * @returns promise which is resolved when the form is loaded.
    */
-  load(): Promise<void> {
+  load(): JQuery.Promise<void> {
     return this.lifecycle.load();
   }
 
   /**
-   * @returns promise which is resolved when the form is loaded, respectively when the 'load' event is triggered'.
+   * @returns promise which is resolved when the form is loaded, respectively when the 'load' event is triggered.
    */
-  whenLoad(): Promise<Event<Form>> {
+  whenLoad(): JQuery.Promise<Event<Form>> {
     return this.when('load');
   }
 
   /**
    * Lifecycle handle function registered for 'load'.
    */
-  protected _onLifecycleLoad(): Promise<Status> {
+  protected _onLifecycleLoad(): JQuery.Promise<Status> {
     try {
       return this._load()
         .then(data => {
@@ -355,39 +354,39 @@ export default class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * This function is called when an error occurs while the <code>_load</code> function is called or when the <code>_load</code> function returns with a rejected promise.
-   * By default the Form is destroyed and the error re-thrown so a caller of <code>Form.load()</code> may catch the error.
+   * This function is called when an error occurs while the {@link _load} function is called or when the {@link _load} function returns with a rejected promise.
+   * By default, the Form is destroyed and the error re-thrown so a caller of {@link Form.load()} may catch the error.
    *
    */
-  protected _handleLoadError(error: Error): Promise<Status> {
+  protected _handleLoadError(error: Error): JQuery.Promise<Status> {
     this.destroy();
     throw error;
   }
 
   /**
-   * Method may be implemented to load the data. <br>
-   * By default, a resolved promise containing the provided this.data is returned.
+   * Method may be implemented to load the data.
+   * By default, a resolved promise containing the provided {@link this.data} is returned.
    */
-  protected _load(): Promise<object> {
+  protected _load(): JQuery.Promise<object> {
     return $.resolvedPromise().then(() => {
       return this.data;
     });
   }
 
   /**
-   * @returns promise which is resolved when the form is post loaded, respectively when the 'postLoad' event is triggered'.
+   * @returns promise which is resolved when the form is post loaded, respectively when the 'postLoad' event is triggered.
    */
-  whenPostLoad(): Promise<Event<Form>> {
+  whenPostLoad(): JQuery.Promise<Event<Form>> {
     return this.when('postLoad');
   }
 
-  protected _onLifecyclePostLoad(): Promise<void> {
+  protected _onLifecyclePostLoad(): JQuery.Promise<void> {
     return this._postLoad().then(() => {
       this.trigger('postLoad');
     });
   }
 
-  protected _postLoad(): Promise<void> {
+  protected _postLoad(): JQuery.Promise<void> {
     return $.resolvedPromise();
   }
 
@@ -407,7 +406,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
    * Saves and closes the form.
    * @returns promise which is resolved when the form is closed.
    */
-  ok(): Promise<void> {
+  ok(): JQuery.Promise<void> {
     return this.lifecycle.ok();
   }
 
@@ -417,18 +416,18 @@ export default class Form extends Widget implements FormModel, DisplayParent {
    *    Note: it will be resolved even if the form does not require save and therefore even if {@link @_save} is not called.
    *    If you only want to be informed when save is required and {@link @_save} executed then you could use {@link whenSave()} or {@link on('save')} instead.
    */
-  save(): Promise<void> {
+  save(): JQuery.Promise<void> {
     return this.lifecycle.save();
   }
 
   /**
-   * @returns promise which is resolved when the form is saved, respectively when the 'save' event is triggered'.
+   * @returns promise which is resolved when the form is saved, respectively when the 'save' event is triggered.
    */
-  whenSave(): Promise<Event<Form>> {
+  whenSave(): JQuery.Promise<Event<Form>> {
     return this.when('save');
   }
 
-  protected _onLifecycleSave(): Promise<Status> {
+  protected _onLifecycleSave(): JQuery.Promise<Status> {
     let data = this.exportData();
     return this._save(data).then(status => {
       this.setData(data);
@@ -441,7 +440,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
    * This function is called by the lifecycle, for instance when the 'ok' function is called.
    * The function is called every time the 'ok' function is called, which means it runs even when
    * there is not a single touched field. The function should be used to implement an overall validate
-   * logic which is not related to a specific field. For instance you could validate the state of an
+   * logic which is not related to a specific field. For instance, you could validate the state of an
    * internal member variable.
    * <p>
    * You should return a Status object with severity ERROR in case the validation fails.
@@ -457,21 +456,21 @@ export default class Form extends Widget implements FormModel, DisplayParent {
    *
    * @returns promise which may contain a Status specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
    */
-  protected _save(data: object): Promise<Status> {
+  protected _save(data: object): JQuery.Promise<Status> {
     return $.resolvedPromise();
   }
 
   /**
    * Resets the form to its initial state.
    */
-  reset(): Promise<void> {
+  reset(): JQuery.Promise<void> {
     return this.lifecycle.reset();
   }
 
   /**
-   * @returns promise which is resolved when the form is reset, respectively when the 'reset' event is triggered'.
+   * @returns promise which is resolved when the form is reset, respectively when the 'reset' event is triggered.
    */
-  whenReset(): Promise<Event<Form>> {
+  whenReset(): JQuery.Promise<Event<Form>> {
     return this.when('reset');
   }
 
@@ -480,23 +479,23 @@ export default class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * Closes the form if there are no changes made. Otherwise it shows a message box asking to save the changes.
+   * Closes the form if there are no changes made. Otherwise, it shows a message box asking to save the changes.
    */
-  cancel(): Promise<void> {
+  cancel(): JQuery.Promise<void> {
     return this.lifecycle.cancel();
   }
 
   /**
    * Closes the form and discards any unsaved changes.
    */
-  close(): Promise<void> {
+  close(): JQuery.Promise<void> {
     return this.lifecycle.close();
   }
 
   /**
-   * @returns promise which is resolved when the form is closed, respectively when the 'close' event is triggered'.
+   * @returns promise which is resolved when the form is closed, respectively when the 'close' event is triggered.
    */
-  whenClose(): Promise<Event<Form>> {
+  whenClose(): JQuery.Promise<Event<Form>> {
     return this.when('close');
   }
 
@@ -529,9 +528,9 @@ export default class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * @returns promise which is resolved when the form is aborted, respectively when the 'abort' event is triggered'.
+   * @returns promise which is resolved when the form is aborted, respectively when the 'abort' event is triggered.
    */
-  whenAbort(): Promise<Event<Form>> {
+  whenAbort(): JQuery.Promise<Event<Form>> {
     return this.when('abort');
   }
 
@@ -592,7 +591,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * Override this method to provide a key stroke which closes the form.
+   * Override this method to provide a keystroke which closes the form.
    * The default implementation returns an AbortKeyStroke which handles the ESC key and calls {@link abort}.
    * <p>
    * The key stroke is only active if {@link this.closable} is set to true.
@@ -976,7 +975,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     } else if (!headerVisible && this.$header) {
       this._removeHeader();
     }
-    // If header contains no title it won't be a real header, it will be on the top right corner just containing icons.
+    // If header contains no title it won't be a real header, it will be in the top right corner just containing icons.
     let noTitleHeader = this.$header && this.$header.hasClass('no-title');
     this.$container.toggleClass('header-visible', headerVisible && !noTitleHeader);
     this.invalidateLayoutTree();
@@ -1179,7 +1178,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
       }
     }
     if (focused) {
-      // If the focus widget is outside of the view area the browser tries to scroll the widget into view.
+      // If the focus widget is outside the view area the browser tries to scroll the widget into view.
       // If the scroll area contains large (not absolutely positioned) content it can happen that the browsers scrolls the content even though the focused widget already is in the view area.
       // This is probably because the focus happens while the form is not layouted yet. We should actually refactor this and do the focusing after layouting, but this would be a bigger change.
       // The current workaround is to revert the scrolling done by the browser. Automatic scrolling to the focused widget when the form is not layouted does not work anyway.
@@ -1283,7 +1282,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
   }
 
   /**
-   * @returns the form the widget belongs to (returns the first parent which is a {@link Form}.
+   * @returns the form the widget belongs to (returns the first parent which is a {@link Form}).
    */
   static findForm(widget: Widget): Form {
     let parent = widget.parent;
