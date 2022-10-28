@@ -84,9 +84,9 @@ export default class SimpleTabBoxController {
     if (!SimpleTabBoxController.hasViewTab(view)) {
       return;
     }
-    viewTab = this._getTab(view);
+    viewTab = this.getTab(view);
     if (!viewTab && this._shouldCreateTabForView(view)) {
-      siblingViewTab = this._getTab(siblingView);
+      siblingViewTab = this.getTab(siblingView);
       viewTab = this._createTab(view);
       this.tabArea.addTab(viewTab, siblingViewTab);
     }
@@ -101,20 +101,20 @@ export default class SimpleTabBoxController {
     if (!view) {
       return;
     }
-    let viewTab = this._getTab(view);
+    let viewTab = this.getTab(view);
     if (viewTab) {
       this.tabArea.destroyTab(viewTab);
     }
   }
 
   _onViewActivate(event) {
-    let viewTab = this._getTab(event.view);
+    let viewTab = this.getTab(event.view);
     // also reset selection if no view tab of the view is found.
     this.tabArea.selectTab(viewTab);
   }
 
   _onViewDeactivate(event) {
-    let viewTab = this._getTab(event.view);
+    let viewTab = this.getTab(event.view);
     // also reset selection if no view tab of the view is found.
     this.tabArea.deselectTab(viewTab);
   }
@@ -134,7 +134,7 @@ export default class SimpleTabBoxController {
     });
   }
 
-  _getTab(view) {
+  getTab(view) {
     if (!view) {
       return;
     }
