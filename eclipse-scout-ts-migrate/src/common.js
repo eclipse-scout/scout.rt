@@ -27,6 +27,10 @@ export function findParentClassBody(path) {
   return findParentPath(path, parentPath => parentPath.node.type === 'ClassBody');
 }
 
+export function findClassName(path) {
+  return findParentPath(path, parentPath => parentPath.node.type === 'ClassDeclaration').value.id.name;
+}
+
 export function findParentPath(path, predicate) {
   let cur = path;
   while (cur.node.type !== 'Program') {

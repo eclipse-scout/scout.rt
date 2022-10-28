@@ -5,6 +5,16 @@ const j = jscodeshift.withParser('ts');
 let referencedTypes;
 
 /**
+ * Processes class methods and exported functions of utilities.
+ *
+ * Adds parameter and return types based on naming rules defined in type maps (see {@link defaultParamTypeMap} and {@link defaultParamTypeMap}).
+ * Custom type rules can be specified with an option.
+ *
+ * Also adds required imports for the added types.
+ * The types in the type maps can be prefixed with a module name that will be mapped to a npm module by the provided moduleMap (see {@link defaultModuleMap}).
+ *
+ * Finally, the js doc comments are cleaned up, which means the type information is removed.
+ *
  * @type import('ts-migrate-server').Plugin<{paramTypeMap?: object, returnTypeMap?: object, moduleMap?: object, defaultReturnType?: string, defaultParamType?: string}>
  */
 const methodsPlugin = {
