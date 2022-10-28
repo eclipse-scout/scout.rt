@@ -265,7 +265,7 @@ export default class TileGrid extends Widget implements TileGridModel {
     this.deleteTiles([tile]);
   }
 
-  deleteTiles(tilesToDelete: Tile[], appendPlaceholders?: boolean) {
+  deleteTiles(tilesToDelete: Tile | Tile[], appendPlaceholders?: boolean) {
     tilesToDelete = arrays.ensure(tilesToDelete);
     if (tilesToDelete.length === 0) {
       return;
@@ -563,8 +563,9 @@ export default class TileGrid extends Widget implements TileGridModel {
   /**
    * @param options may contain pageX, pageY, menuItems and menuFilter.
    * If these properties are not provided they are determined automatically.
+   * @internal
    */
-  protected _showContextMenu(options?: { pageX?: number; pageY?: number; menuItems?: Menu[]; menuFilter?: MenuFilter }) {
+  _showContextMenu(options?: { pageX?: number; pageY?: number; menuItems?: Menu[]; menuFilter?: MenuFilter }) {
     options = options || {};
     if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
       return;
@@ -839,7 +840,7 @@ export default class TileGrid extends Widget implements TileGridModel {
    *
    * Tiles, that are currently invisible due to an active filter, are excluded and won't be selected.
    */
-  selectTiles(tiles: Tile[]) {
+  selectTiles(tiles: Tile | Tile[]) {
     tiles = arrays.ensure(tiles);
     tiles = this._filterTiles(tiles); // Selecting invisible tiles is not allowed
 
@@ -888,7 +889,7 @@ export default class TileGrid extends Widget implements TileGridModel {
     this.selectTiles(this.filteredTiles);
   }
 
-  deselectTiles(tiles: Tile[]) {
+  deselectTiles(tiles: Tile | Tile[]) {
     tiles = arrays.ensure(tiles);
     let selectedTiles = this.selectedTiles.slice();
     if (arrays.removeAll(selectedTiles, tiles)) {
@@ -1298,8 +1299,9 @@ export default class TileGrid extends Widget implements TileGridModel {
 
   /**
    * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
+   * @internal
    */
-  protected _renderViewPort() {
+  _renderViewPort() {
     if (!this.isAttachedAndRendered()) {
       // if grid is not attached the correct viewPort can not be evaluated. Mark for render after attach.
       this._renderViewPortAfterAttach = true;
@@ -1377,8 +1379,9 @@ export default class TileGrid extends Widget implements TileGridModel {
 
   /**
    * @returns the newly rendered tiles
+   * @internal
    */
-  protected _renderTileDelta(filterResult?: FilterResult<Tile>): Tile[] {
+  _renderTileDelta(filterResult?: FilterResult<Tile>): Tile[] {
     if (!this.virtual) {
       return [];
     }
@@ -1453,7 +1456,6 @@ export default class TileGrid extends Widget implements TileGridModel {
     }
     // Start filter animation (at the time setFilterAccepted was set the tile was not rendered)
     tile.$container.setVisible(false);
-    // @ts-ignore
     tile._renderVisible();
   }
 

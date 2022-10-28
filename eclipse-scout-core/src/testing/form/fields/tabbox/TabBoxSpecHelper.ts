@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import $ from 'jquery';
-import {scout, Session, TabBox, TabBoxModel, TabItem} from '../../../../index';
+import {scout, Session, TabBox, TabBoxModel, TabItem, TabItemModel} from '../../../../index';
 import {Optional} from '../../../../types';
 
 export default class TabBoxSpecHelper {
@@ -19,7 +19,7 @@ export default class TabBoxSpecHelper {
     this.session = session;
   }
 
-  createTabBoxWith2Tabs(model: TabBoxModel): TabBox {
+  createTabBoxWith2Tabs(model?: TabBoxModel): TabBox {
     model = $.extend({
       tabItems: [{
         objectType: TabItem,
@@ -48,10 +48,10 @@ export default class TabBoxSpecHelper {
     return scout.create(TabBox, model as TabBoxModel);
   }
 
-  createTabItem(model?: TabBoxModel): TabItem {
+  createTabItem(model?: Optional<TabItemModel, 'parent'>): TabItem {
     model = $.extend({
       parent: this.session.desktop
     }, model);
-    return scout.create(TabItem, model);
+    return scout.create(TabItem, model as TabItemModel);
   }
 }

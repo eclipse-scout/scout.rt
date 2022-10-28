@@ -24,10 +24,12 @@ export default class Chart extends Widget implements ChartModel {
 
   chartRenderer: AbstractChartRenderer;
 
+  /** @internal */
+  _updatedOnce: boolean;
+
   protected _updateChartTimeoutId: number;
   protected _updateChartOpts: UpdateChartOptions;
   protected _updateChartOptsWhileNotAttached: UpdateChartOptions[];
-  protected _updatedOnce: boolean;
 
   constructor() {
     super();

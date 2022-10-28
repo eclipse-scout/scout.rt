@@ -1,21 +1,20 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, Page, PageWithTable, scout, Table, Widget} from '../../../../src';
+import {Form, FormModel, Outline, Page, PageWithTable, RefModel, scout, Table, TableModel, Widget} from '../../../../src';
 import {OutlineSpecHelper} from '../../../../src/testing';
 
 describe('Page', () => {
 
-  let session;
-  /** @type {Outline} */
-  let outline;
+  let session: SandboxSession;
+  let outline: Outline;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -26,9 +25,9 @@ describe('Page', () => {
   it('detailTable and detailForm are created lazily on page activation when created as object', () => {
     // test with object
     let page = createAndInsertPage({
-      objectType: 'Table'
+      objectType: Table
     }, {
-      objectType: 'Form'
+      objectType: Form
     });
     expect(page.detailTable).toBeFalsy();
     expect(page.detailForm).toBeFalsy();
@@ -51,9 +50,9 @@ describe('Page', () => {
 
   it('detailTable and detailForm are destroyed when overwritten', () => {
     let page = createAndInsertPage({
-      objectType: 'Table'
+      objectType: Table
     }, {
-      objectType: 'Form'
+      objectType: Form
     });
     outline.selectNode(page);
     expect(page.detailTable).toBeInstanceOf(Table);
@@ -72,15 +71,16 @@ describe('Page', () => {
     expect(newTable.destroyed).toBe(false);
   });
 
-  function createAndInsertPage(detailTable, detailForm) {
+  function createAndInsertPage(detailTable: RefModel<TableModel>, detailForm: RefModel<FormModel>) {
     let page = new PageWithLazyCreationCounter();
     page.on('propertyChange:detailForm', e => e.source.numFormCreated++);
     page.on('propertyChange:detailTable', e => e.source.numTableCreated++);
-    page.init({
+    let pageModel = {
       parent: outline,
       detailTable: detailTable,
       detailForm: detailForm
-    });
+    };
+    page.init(pageModel);
     outline.insertNodes([page], null);
     return page;
   }
@@ -92,19 +92,22 @@ describe('Page', () => {
 
   class PageWithLazyCreationCounter extends PageWithTable {
 
+    numTableCreated: number;
+    numFormCreated: number;
+
     constructor() {
       super();
       this.numTableCreated = 0;
       this.numFormCreated = 0;
     }
 
-    _initDetailForm(form) {
+    protected override _initDetailForm(form: Form) {
       super._initDetailForm(form);
       expect(form).toBeInstanceOf(Form);
       this.numFormCreated++;
     }
 
-    _initDetailTable(table) {
+    protected override _initDetailTable(table: Table) {
       super._initDetailTable(table);
       expect(table).toBeInstanceOf(Table);
       this.numTableCreated++;

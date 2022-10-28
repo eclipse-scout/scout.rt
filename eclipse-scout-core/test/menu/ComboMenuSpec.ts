@@ -3,16 +3,16 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ComboMenu, EllipsisMenu, Menu, scout} from '../../src/index';
+import {ComboMenu, EllipsisMenu, Menu, scout, Session} from '../../src/index';
 
 describe('ComboMenu', () => {
 
-  let session, $sandbox;
+  let session:Session, $sandbox: JQuery;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -20,22 +20,22 @@ describe('ComboMenu', () => {
     $sandbox = $('#sandbox');
   });
 
-  function createComboMenu() {
+  function createComboMenu(): ComboMenu {
     return scout.create(ComboMenu, {
       parent: session.desktop,
       childActions: [{
         id: 'ComboMenuChild1',
-        objectType: 'Menu',
+        objectType: Menu,
         text: 'Combo menu'
       }, {
         id: 'ComboMenuChild2',
-        objectType: 'Menu',
+        objectType: Menu,
         subMenuVisibility: Menu.SubMenuVisibility.ALWAYS,
         childActions: [{
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'Child menu 1'
         }, {
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'Child menu 2'
         }]
       }]

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -27,6 +27,7 @@ describe('scout.arrays', () => {
   describe('ensure', () => {
 
     it('creates an array if the param is not an array', () => {
+      // @ts-ignore
       expect(arrays.ensure()).toEqual([]);
       expect(arrays.ensure(undefined)).toEqual([]);
       expect(arrays.ensure(null)).toEqual([]);
@@ -47,7 +48,9 @@ describe('scout.arrays', () => {
 
     it('removes elements', () => {
       // Ensure empty arguments are supported
+      // @ts-ignore
       expect(arrays.remove()).toBe(false);
+      // @ts-ignore
       expect(arrays.remove([])).toBe(false);
       expect(arrays.remove([], 'x')).toBe(false);
 
@@ -67,6 +70,7 @@ describe('scout.arrays', () => {
       arr = ['a', 'b', undefined, 'c', undefined, 'd'];
       expect(arrays.remove(arr, 'a')).toBe(true);
       expect(arr).toEqual(['b', undefined, 'c', undefined, 'd']);
+      // @ts-ignore
       expect(arrays.remove(arr)).toBe(true);
       expect(arr).toEqual(['b', 'c', undefined, 'd']);
     });
@@ -94,9 +98,10 @@ describe('scout.arrays', () => {
       expect(arr).toEqual([]);
     });
 
-    it('considers emtpy args', () => {
-      // noinspection JSCheckFunctionSignatures
+    it('considers empty args', () => {
+      // @ts-ignore
       expect(arrays.removeAll()).toBe(false);
+      // @ts-ignore
       expect(arrays.removeAll([])).toBe(false);
       expect(arrays.removeAll([], [])).toBe(false);
       expect(arrays.removeAll([], ['x'])).toBe(false);
@@ -243,15 +248,21 @@ describe('scout.arrays', () => {
   describe('contains', () => {
 
     it('checks if single element is contained in array', () => {
+      // @ts-ignore
       expect(arrays.contains()).toBe(false);
+      // @ts-ignore
       expect(arrays.contains(null)).toBe(false);
       expect(arrays.contains(null, 'x')).toBe(false);
+      // @ts-ignore
       expect(arrays.contains(['a', 'b', 'c'])).toBe(false);
+      // @ts-ignore
       expect(arrays.contains(['a', 'b', undefined, 'c'])).toBe(true);
+      // @ts-ignore
       expect(arrays.contains(['a', 'b', null, 'c'])).toBe(false);
       expect(arrays.contains(['a', 'b', null, 'c'], null)).toBe(true);
       expect(arrays.contains(['a', 'b', 'c', '1', '2', '3'], 'b')).toBe(true);
       expect(arrays.contains(['a', 'b', 'c', '1', '2', '3'], 'B')).toBe(false);
+      // @ts-ignore
       expect(arrays.contains(['a', 'b', 'c', '1', '2', '3'], 2)).toBe(false);
     });
 
@@ -270,6 +281,7 @@ describe('scout.arrays', () => {
     });
 
     it('ignores non-number elements', () => {
+      // @ts-ignore
       expect(arrays.max([null, 5, 6.7, false, undefined, NaN, {}, 'batman'])).toBe(6.7);
     });
   });
@@ -287,6 +299,7 @@ describe('scout.arrays', () => {
     });
 
     it('ignores non-number elements', () => {
+      // @ts-ignore
       expect(arrays.min([null, 5, 6.7, false, undefined, NaN, {}, 'batman'])).toBe(5);
     });
   });
@@ -387,7 +400,7 @@ describe('scout.arrays', () => {
       expect(arrays.equals(arr1, arr2)).toBeFalsy();
     });
 
-    it('considers emtpy and same arrays', () => {
+    it('considers empty and same arrays', () => {
       let arr1 = [];
       let arr2 = ['b', 'a', 'b'];
       expect(arrays.equals(arr1, arr2)).toBeFalsy();
@@ -449,7 +462,7 @@ describe('scout.arrays', () => {
       expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
     });
 
-    it('considers emtpy and same arrays', () => {
+    it('considers empty and same arrays', () => {
       let arr1 = [];
       let arr2 = ['b', 'a', 'b'];
       expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
@@ -492,7 +505,9 @@ describe('scout.arrays', () => {
     it('returns the index of the element for which the given predicate returns true', () => {
       let arr = ['a', 'b', 'c', 'd'];
 
+      // @ts-ignore
       expect(arrays.findIndex()).toBe(-1);
+      // @ts-ignore
       expect(arrays.findIndex()).toBe(-1);
 
       let index = arrays.findIndex(arr, element => {
@@ -513,7 +528,9 @@ describe('scout.arrays', () => {
     it('returns the element for which the given predicate returns true', () => {
       let arr = ['a', 'b', 'c', 'd'];
 
+      // @ts-ignore
       expect(arrays.find()).toBe(null);
+      // @ts-ignore
       expect(arrays.find(arr)).toBe(null);
 
       let element = arrays.find(arr, element => {
@@ -534,7 +551,9 @@ describe('scout.arrays', () => {
     it('returns the element for which the given predicate returns true, starting from a given index', () => {
       let arr = ['a', 'b', 'c', 'd'];
 
+      // @ts-ignore
       expect(arrays.find()).toBe(null);
+      // @ts-ignore
       expect(arrays.find(arr)).toBe(null);
 
       let element = arrays.findFrom(arr, 1, element => {
@@ -617,7 +636,7 @@ describe('scout.arrays', () => {
     it('returns \'\' for empty array or if no array was provided', () => {
       let arr = [];
       expect(arrays.format(arr)).toBe('');
-      // noinspection JSCheckFunctionSignatures
+      // @ts-ignore
       expect(arrays.format()).toBe('');
     });
 
@@ -645,6 +664,7 @@ describe('scout.arrays', () => {
   describe('empty', () => {
 
     it('checks if the array is empty', () => {
+      // @ts-ignore
       expect(arrays.empty()).toBe(true);
       expect(arrays.empty(null)).toBe(true);
       expect(arrays.empty('test')).toBe(true);
@@ -661,6 +681,7 @@ describe('scout.arrays', () => {
   describe('hasElements', () => {
 
     it('checks if the array has elements', () => {
+      // @ts-ignore
       expect(arrays.hasElements()).toBe(false);
       expect(arrays.hasElements(null)).toBe(false);
       expect(arrays.hasElements('test')).toBe(false);
@@ -677,6 +698,7 @@ describe('scout.arrays', () => {
   describe('length', () => {
 
     it('returns the number of elements', () => {
+      // @ts-ignore
       expect(arrays.length()).toBe(0);
       expect(arrays.length(null)).toBe(0);
       expect(arrays.length('test')).toBe(0);
@@ -693,9 +715,12 @@ describe('scout.arrays', () => {
   describe('first', () => {
 
     it('finds first array element', () => {
+      // @ts-ignore
       expect(arrays.first()).toBe(undefined);
+      // @ts-ignore
       expect(arrays.first('test')).toBe('test');
       expect(arrays.first({
+        // @ts-ignore
         x: 'y'
       })).toEqual({
         x: 'y'
@@ -712,9 +737,12 @@ describe('scout.arrays', () => {
   describe('last', () => {
 
     it('finds last array element', () => {
+      // @ts-ignore
       expect(arrays.last()).toBe(undefined);
+      // @ts-ignore
       expect(arrays.last('test')).toBe('test');
       expect(arrays.last({
+        // @ts-ignore
         x: 'y'
       })).toEqual({
         x: 'y'
@@ -734,6 +762,7 @@ describe('scout.arrays', () => {
       let arr = null;
 
       // expect no errors:
+      // @ts-ignore
       arrays.pushIfDefined();
       arrays.pushIfDefined(arr);
       arrays.pushIfDefined(arr, 'element');
@@ -754,6 +783,7 @@ describe('scout.arrays', () => {
       expect(arr).toEqual(['element', 0, false, true]);
 
       arr = [];
+      // @ts-ignore
       arrays.pushIfDefined(arr, null, 1, undefined, 2, 3, null, null, '');
       expect(arr).toEqual([1, 2, 3, '']);
 
@@ -799,6 +829,7 @@ describe('scout.arrays', () => {
   describe('flatMap', () => {
 
     it('returns flat list of all merged array elements', () => {
+      // @ts-ignore
       expect(arrays.flatMap()).toEqual([]);
       expect(arrays.flatMap(null)).toEqual([]);
       expect(arrays.flatMap(null, null)).toEqual([]); // null func, but still works because array is missing, too
@@ -820,12 +851,15 @@ describe('scout.arrays', () => {
   describe('flattenRec', () => {
 
     it('returns flat list of all elements and the recursive child elements', () => {
+      // @ts-ignore
       let result = arrays.flattenRec();
       expect(result).toEqual([]);
 
+      // @ts-ignore
       result = arrays.flattenRec([]);
       expect(result).toEqual([]);
 
+      // @ts-ignore
       result = arrays.flattenRec(['a', 'b', 'c']);
       expect(result).toEqual(['a', 'b', 'c']);
 
@@ -884,10 +918,10 @@ describe('scout.arrays', () => {
         return (typeof element === 'string' || !element ? element : element.id);
       }
 
+      // @ts-ignore
       result = arrays.flattenRec(arr);
       expect(result.map(elementToString)).toEqual([null, 'n1', 'n2']);
 
-      // noinspection JSUnresolvedVariable
       result = arrays.flattenRec(arr, item => item.doesNotExist);
       expect(result.map(elementToString)).toEqual([null, 'n1', 'n2']);
 
@@ -901,11 +935,15 @@ describe('scout.arrays', () => {
 
     it('returns a random element', () => {
       // Edge cases
+      // @ts-ignore
       expect(arrays.randomElement()).toBeUndefined();
       expect(arrays.randomElement([])).toBeUndefined();
+      // @ts-ignore
       expect(arrays.randomElement('not-an-array')).toBe('not-an-array');
+      // @ts-ignore
       expect(arrays.randomElement(123)).toBe(123);
       let o = {x: 'x', y: 'y'};
+      // @ts-ignore
       expect(arrays.randomElement(o)).toBe(o);
 
       // Main case
@@ -922,6 +960,7 @@ describe('scout.arrays', () => {
   describe('toMap', () => {
 
     it('converts an array to an object', () => {
+      // @ts-ignore
       expect(arrays.toMap()).toEqual({});
       expect(arrays.toMap(['x'])).toEqual({x: 'x'});
       expect(arrays.toMap([1, 2, 3])).toEqual({1: 1, 2: 2, 3: 3});
@@ -944,8 +983,10 @@ describe('scout.arrays', () => {
   describe('nullIfEmpty', () => {
 
     it('converts an empty array to null', () => {
+      // @ts-ignore
       expect(arrays.nullIfEmpty()).toBeNull();
       expect(arrays.nullIfEmpty([])).toBeNull();
+      // @ts-ignore
       expect(arrays.nullIfEmpty('x')).toBeNull(); // not an array
       let arr = ['test'];
       arr.length = 0;
@@ -967,11 +1008,13 @@ describe('scout.arrays', () => {
       let a4 = [];
       let a5 = 'test';
 
+      // @ts-ignore
       expect(arrays.clear()).toEqual([]);
       expect(arrays.clear(a1)).toEqual([1, 2, 3]);
       expect(arrays.clear(a2)).toEqual([]);
       expect(arrays.clear(a3)).not.toBe(a3);
       expect(arrays.clear(a4)).toEqual([]);
+      // @ts-ignore
       expect(arrays.clear(a5)).toEqual([]);
     });
   });

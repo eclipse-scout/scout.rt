@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateField, dates, keys, RemoteEvent, scout} from '../../../../src/index';
+import {DateField, DateFieldModel, dates, keys, RemoteEvent, scout} from '../../../../src/index';
 import {triggerClick, triggerKeyDown, triggerMouseDown} from '../../../../src/testing/jquery-testing';
+import {Optional} from '../../../../src/types';
 
 describe('DateFieldAdapter', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -30,17 +31,24 @@ describe('DateFieldAdapter', () => {
     removePopups(session, '.touch-popup');
   });
 
-  function createWithAdapter(model) {
+  class SpecDateField extends DateField {
+    override _onDateFieldInput(event?: JQuery.TriggeredEvent) {
+      super._onDateFieldInput(event);
+    }
+  }
+
+  function createWithAdapter(model: Optional<DateFieldModel, 'parent'>): SpecDateField {
+    // @ts-ignore
     model = model || {};
     model = $.extend({
       parent: session.desktop
     }, model);
-    let field = scout.create(DateField, model);
+    let field = scout.create(SpecDateField, model as DateFieldModel);
     linkWidgetAndAdapter(field, 'DateFieldAdapter');
     return field;
   }
 
-  function focusDate(dateField) {
+  function focusDate(dateField: DateField) {
     dateField.$dateField.focus();
     jasmine.clock().tick(101);
     expect(dateField.$dateField).toBeFocused();

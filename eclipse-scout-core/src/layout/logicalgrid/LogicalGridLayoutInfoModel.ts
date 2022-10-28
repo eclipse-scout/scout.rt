@@ -11,12 +11,12 @@
 import {LogicalGridData} from '../../index';
 
 export interface LogicalGridLayoutInfoModel {
-  cons: LogicalGridData[];
-  hgap: number;
-  vgap: number;
-  rowHeight: number;
-  columnWidth: number;
-  widthHint: number;
-  widthOnly: boolean;
-  $components: JQuery[];
+  cons?: LogicalGridData[];
+  hgap?: number;
+  vgap?: number;
+  rowHeight?: number;
+  columnWidth?: number;
+  widthHint?: number;
+  widthOnly?: boolean;
+  $components?: JQuery[];
 }

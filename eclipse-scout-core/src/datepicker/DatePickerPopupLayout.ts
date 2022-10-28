@@ -37,7 +37,6 @@ export default class DatePickerPopupLayout extends PopupLayout {
       this.popup.position();
     }
 
-    // @ts-ignore
     this.popup.getDatePicker()._layoutWeekendSeparators();
   }
 

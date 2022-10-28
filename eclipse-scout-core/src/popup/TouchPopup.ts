@@ -21,11 +21,15 @@ export default class TouchPopup extends Popup {
   htmlBody: HtmlComponent;
   $body: JQuery;
 
+  /**
+   * the cloned field from the popup
+   * @internal
+   */
+  _field: TouchPopupField;
+
   /** the original touch field from the form */
   protected _touchField: TouchPopupField;
   protected _touchFieldTooltip: Tooltip;
-  /** the cloned field from the popup */
-  protected _field: TouchPopupField;
   /** the widget placed below the field */
   protected _widget: Widget;
   protected _$widgetContainer: JQuery;
@@ -74,7 +78,6 @@ export default class TouchPopup extends Popup {
     this._touchField.off('propertyChange', this._touchFieldPropertyChangeListener);
     if (this._touchFieldTooltip && !this._touchFieldTooltip.destroyed) {
       // Make tooltip visible again if not destroyed in the meantime
-      // @ts-ignore
       this._touchFieldTooltip.render(this._touchField._$tooltipParent());
     }
     super._destroy();
@@ -179,7 +182,7 @@ export type TouchPopupField = ValueField<any> & {
   touchMode: boolean;
 };
 
-export type TouchPopupFieldModel = ValueFieldModel<any> & {
+export type TouchPopupFieldModel = ValueFieldModel<any, any> & {
   popup?: Popup;
   embedded?: boolean;
   touchMode?: boolean;

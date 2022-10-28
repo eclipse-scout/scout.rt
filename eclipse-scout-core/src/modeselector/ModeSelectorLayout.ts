@@ -26,7 +26,6 @@ export default class ModeSelectorLayout extends AbstractLayout {
       // The slider will then become visible again (if necessary) in _updateSlider()
       this.modeSelector.$slider.setVisible(false);
     }
-    // @ts-ignore
     this.modeSelector._updateSlider();
   }
 

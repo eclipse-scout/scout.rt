@@ -3,17 +3,21 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, Range, Table} from '../../src/index';
+import {arrays, Column, Device, NumberColumn, Range, Table} from '../../src/index';
 import {TableSpecHelper} from '../../src/testing/index';
+import {TableModelWithCells, TableRowDataWithCells} from '../../src/testing/table/TableSpecHelper';
+import SpecTable from '../../src/testing/table/SpecTable';
+import SpecTableAdapter from '../../src/testing/table/SpecTableAdapter';
 
 describe('Table Grouping', () => {
 
-  let session, helper, model, table, column0, column1, column2, column3, column4, rows, columns, adapter;
+  let session: SandboxSession, helper: TableSpecHelper, model: TableModelWithCells, table: SpecTable;
+  let column0: Column, column1: Column, column2: Column, column3: NumberColumn, column4: NumberColumn, rows: TableRowDataWithCells[], columns, adapter: SpecTableAdapter;
   let $colHeaders, $header0, $header1;
 
   beforeEach(() => {
@@ -33,7 +37,7 @@ describe('Table Grouping', () => {
     $.fx.off = false;
   });
 
-  function prepareTable(withAdapter) {
+  function prepareTable(withAdapter?: boolean) {
     columns = [helper.createModelColumn('col0'),
       helper.createModelColumn('col1'),
       helper.createModelColumn('col2'),
@@ -49,15 +53,15 @@ describe('Table Grouping', () => {
     model = helper.createModel(columns, rows);
     if (withAdapter) {
       adapter = helper.createTableAdapter(model);
-      table = adapter.createWidget(model, session.desktop);
+      table = adapter.createWidget(model, session.desktop) as SpecTable;
     } else {
       table = helper.createTable(model);
     }
     column0 = table.columns[0];
     column1 = table.columns[1];
     column2 = table.columns[2];
-    column3 = table.columns[3];
-    column4 = table.columns[4];
+    column3 = table.columns[3] as NumberColumn;
+    column4 = table.columns[4] as NumberColumn;
     column3.setAggregationFunction('sum');
     column4.setAggregationFunction('sum');
   }
@@ -154,7 +158,7 @@ describe('Table Grouping', () => {
       session: session,
       column: column,
       selectedValues: selectedValues
-    }, session);
+    });
   }
 
   it('renders an aggregate row for each group', () => {

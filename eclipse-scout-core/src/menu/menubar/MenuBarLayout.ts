@@ -34,13 +34,11 @@ export default class MenuBarLayout extends AbstractLayout {
       undo: false
     });
 
-    // first set visible to ensure the correct menu gets the tabindex. Therefore the ellipsis visibility is split.
+    // first set visible to ensure the correct menu gets the tabindex. Therefore, the ellipsis visibility is split.
     if (ellipsis && this._overflowMenuItems.length > 0) {
       ellipsis.setHidden(false);
     }
-    // @ts-ignore
     visibleMenuItems.forEach(menuItem => menuItem._setOverflown(false));
-    // @ts-ignore
     this._overflowMenuItems.forEach(menuItem => menuItem._setOverflown(true));
     if (ellipsis && this._overflowMenuItems.length === 0) {
       ellipsis.setHidden(true);
@@ -49,7 +47,6 @@ export default class MenuBarLayout extends AbstractLayout {
     this._overflowMenuItems = this._overflowMenuItems.filter(menuItem => !menuItem.separator);
 
     if (ellipsis) {
-      // @ts-ignore
       ellipsis._closePopup();
       ellipsis.setChildActions(this._overflowMenuItems);
     }
@@ -73,7 +70,6 @@ export default class MenuBarLayout extends AbstractLayout {
     let visibleMenuItems = this.visibleMenuItems();
     let overflowMenuItems = visibleMenuItems.filter(menuItem => {
       let overflown = menuItem.overflown;
-      // @ts-ignore
       menuItem._setOverflown(false);
       return overflown;
     });
@@ -113,7 +109,7 @@ export default class MenuBarLayout extends AbstractLayout {
   }
 
   /**
-   * Moves menu items into _overflowMenuItems until prefSize.width is smaller than prefWidth.
+   * Moves menu items into _overflowMenuItems until {@link prefSize.width} is smaller than prefWidth.
    * The moved menu items will be removed from the given visibleMenuItems parameter.
    * @returns the calculated preferred size
    */
@@ -203,10 +199,7 @@ export default class MenuBarLayout extends AbstractLayout {
   }
 
   undoOverflow(overflowMenuItems: Menu[]) {
-    overflowMenuItems.forEach(menuItem => {
-      // @ts-ignore
-      menuItem._setOverflown(true);
-    });
+    overflowMenuItems.forEach(menuItem => menuItem._setOverflown(true));
   }
 
   /**

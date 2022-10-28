@@ -21,9 +21,7 @@ export default class TableFooterLayout extends AbstractLayout {
 
   override layout($container: JQuery) {
     let contentFits,
-      // @ts-ignore
       $controls = this._tableFooter._$controls,
-      // @ts-ignore
       $info = this._tableFooter._$info,
       $infoItems = $info.find('.table-info-item'),
       containerWidth = graphics.size($container).width;
@@ -43,19 +41,14 @@ export default class TableFooterLayout extends AbstractLayout {
     $info.css('max-width', '');
 
     // Always try to use max space first
-    // @ts-ignore
     if (this._tableFooter._compactStyle) {
-      // @ts-ignore
       this._tableFooter._compactStyle = false;
-      // @ts-ignore
       this._tableFooter._renderInfo();
     }
     infoWidth = graphics.size($info, true).width;
     if (controlsWidth + infoWidth <= containerWidth) {
       // Make sure table info tooltip is not shown anymore (only available in compact style)
-      // @ts-ignore
       if (this._tableFooter._tableInfoTooltip) {
-        // @ts-ignore
         this._tableFooter._tableInfoTooltip.destroy();
       }
       contentFits = true;
@@ -63,9 +56,7 @@ export default class TableFooterLayout extends AbstractLayout {
 
     if (!contentFits) {
       // If elements don't fit, try to minimize table-info
-      // @ts-ignore
       this._tableFooter._compactStyle = true;
-      // @ts-ignore
       this._tableFooter._renderInfo();
 
       infoWidth = graphics.size($info, true).width;
@@ -80,14 +71,11 @@ export default class TableFooterLayout extends AbstractLayout {
     let animated = this._tableFooter.htmlComp.layouted;
     this._setInfoItemsSize($infoItems, animated);
 
-    // @ts-ignore
     let tableStatusTooltip = this._tableFooter._tableStatusTooltip;
     if (tableStatusTooltip && tableStatusTooltip.rendered) {
       tableStatusTooltip.position();
     }
-    // @ts-ignore
     if (this._tableFooter._tableInfoTooltip && this._tableFooter._tableInfoTooltip.rendered) {
-      // @ts-ignore
       this._tableFooter._tableInfoTooltip.position();
     }
 

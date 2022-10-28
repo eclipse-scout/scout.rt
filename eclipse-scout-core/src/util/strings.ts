@@ -98,7 +98,6 @@ export function contains(string: string, searchFor: string): boolean {
 }
 
 export function startsWith(fullString: string, startString: string): boolean {
-  // noinspection DuplicatedCode
   if (fullString === undefined || fullString === null || startString === undefined || startString === null) {
     return false;
   }
@@ -114,7 +113,6 @@ export function startsWith(fullString: string, startString: string): boolean {
 }
 
 export function endsWith(fullString: string, endString: string): boolean {
-  // noinspection DuplicatedCode
   if (fullString === undefined || fullString === null || endString === undefined || endString === null) {
     return false;
   }

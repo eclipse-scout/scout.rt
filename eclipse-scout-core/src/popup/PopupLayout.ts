@@ -118,7 +118,6 @@ export default class PopupLayout extends AbstractLayout {
 
   adjustSize(prefSize: Dimension): Dimension {
     // Consider CSS min/max rules
-    // @ts-ignore
     this.popup.htmlComp._adjustPrefSizeWithMinMaxSize(prefSize);
 
     // Consider window boundaries

@@ -432,9 +432,9 @@ export default class Form extends Widget implements FormModel, DisplayParent {
    * internal member variable.
    * <p>
    * You should return a Status object with severity ERROR in case the validation fails.
-   *
+   * @internal
    */
-  protected _validate(): Status {
+  _validate(): Status {
     return Status.ok();
   }
 
@@ -540,16 +540,15 @@ export default class Form extends Widget implements FormModel, DisplayParent {
       .some(control => control.systemType === Button.SystemType.CLOSE);
 
     if (hasCloseButton) {
-      // noinspection JSIgnoredPromiseFromCall
       this.close();
     } else {
-      // noinspection JSIgnoredPromiseFromCall
       this.cancel();
     }
     this._afterAbort();
   }
 
-  protected _afterAbort() {
+  /** @internal */
+  _afterAbort() {
     if (!this.destroyed && this.isShown()) {
       // If the form is still shown after an abort request, something (e.g. a validation message box) is probably open
       // -> activate the form to show the validation message
@@ -1115,7 +1114,6 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     // form is attached even if children are not yet
     if ((this.isView() || this.isDialog()) && !this.detailForm) {
       // notify model this form is active
-      // @ts-ignore
       this.session.desktop._setFormActivated(this);
     }
     super._attach();

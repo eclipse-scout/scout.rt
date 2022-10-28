@@ -35,8 +35,7 @@ export default class GroupBoxMenuItemsOrder implements MenuOrder {
         let horizontalAlignment = item.horizontalAlignment;
         if (horizontalAlignment === undefined) {
           // Real buttons have no property 'horizontalAlignment' but a corresponding field on the gridData
-          // @ts-ignore
-          horizontalAlignment = (item.gridData && item.gridData.horizontalAlignment);
+          horizontalAlignment = (item['gridData'] && item['gridData'].horizontalAlignment);
         }
         if (horizontalAlignment === 1) {
           rightButtons.push(item);

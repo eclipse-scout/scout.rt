@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -337,7 +337,9 @@ describe('scout.dates', () => {
   describe('toJsonDate / parseJsonDate', () => {
 
     it('can handle missing or invalid inputs', () => {
+      // @ts-ignore
       expect(dates.toJsonDate()).toBe(null);
+      // @ts-ignore
       expect(dates.parseJsonDate()).toBe(null);
       expect(() => {
         dates.parseJsonDate('invalid date string');
@@ -398,6 +400,7 @@ describe('scout.dates', () => {
   describe('create', () => {
 
     it('can create dates', () => {
+      // @ts-ignore
       expect(dates.create()).toBe(undefined);
       expect(dates.create('')).toBe(undefined);
       expect(() => {
@@ -423,6 +426,7 @@ describe('scout.dates', () => {
   describe('weekInYear', () => {
 
     it('can calculate week in year', () => {
+      // @ts-ignore
       expect(dates.weekInYear()).toBe(undefined);
       expect(dates.weekInYear(undefined)).toBe(undefined);
       expect(dates.weekInYear(null)).toBe(undefined);
@@ -474,12 +478,15 @@ describe('scout.dates', () => {
 
     it('can handle invalid values', () => {
       expect(() => {
+        // @ts-ignore
         dates.format();
       }).toThrow();
       expect(() => {
+        // @ts-ignore
         dates.format(new Date());
       }).toThrow();
       expect(() => {
+        // @ts-ignore
         dates.format('gugus');
       }).toThrow();
 
@@ -502,6 +509,7 @@ describe('scout.dates', () => {
   describe('compare', () => {
 
     it('can handle invalid dates', () => {
+      // @ts-ignore
       expect(dates.compare()).toBe(0);
 
       let date = null;
@@ -516,6 +524,7 @@ describe('scout.dates', () => {
       expect(dates.compare(date, date2)).toBe(-1);
 
       expect(() => {
+        // @ts-ignore
         dates.compare('invalid value', date2);
       }).toThrow();
 
@@ -570,6 +579,7 @@ describe('scout.dates', () => {
   describe('isLeapYear', () => {
 
     it('correctly identifies leap years', () => {
+      // @ts-ignore
       expect(dates.isLeapYear()).toBe(false);
       expect(dates.isLeapYear(undefined)).toBe(false);
       expect(dates.isLeapYear(null)).toBe(false);
@@ -600,12 +610,12 @@ describe('scout.dates', () => {
       expect(date.toISOString()).toBe(dates.create('2014-11-21 05:15:50.999').toISOString());
     });
 
-    it('uses 01-01-1970 as date part if date is ommitted', () => {
+    it('uses 01-01-1970 as date part if date is omitted', () => {
       let date = dates.combineDateTime(null, dates.create('2017-12-10 05:15:50.999'));
       expect(date.toISOString()).toBe(dates.create('1970-01-01 05:15:50.999').toISOString());
     });
 
-    it('uses 00:00 as time part if time is ommitted', () => {
+    it('uses 00:00 as time part if time is omitted', () => {
       let date = dates.combineDateTime(dates.create('2017-12-10 05:15:50.999'));
       expect(date.toISOString()).toBe(dates.create('2017-12-10 00:00:00.000').toISOString());
     });

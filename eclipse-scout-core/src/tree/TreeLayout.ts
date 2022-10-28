@@ -60,25 +60,20 @@ export default class TreeLayout extends AbstractLayout {
       } else {
         // Nodes may contain wrapped text (with breadcrumb style-or if nodes contain html) -> update heights
         this.tree.updateNodeHeights();
-        // @ts-ignore
-        this.tree._renderViewport(); // Ensure viewRangeRendered is up to date and matches visibleNodesFlat (can diverge after filtering)
-        // @ts-ignore
+        this.tree._renderViewport(); // Ensure viewRangeRendered is up-to-date and matches visibleNodesFlat (can diverge after filtering)
         this.tree._renderFiller();
       }
     }
 
     if (!htmlContainer.layouted) {
-      // @ts-ignore
       this.tree._renderScrollTop();
     }
 
     // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
-    // @ts-ignore
     this.tree._renderViewport();
 
     // Render scroll top again to make sure the data is really at the correct position after rendering viewport, see tree.setScrollTop for details
     if (!htmlContainer.layouted) {
-      // @ts-ignore
       this.tree._renderScrollTop();
     }
   }
@@ -95,9 +90,8 @@ export default class TreeLayout extends AbstractLayout {
   }
 
   override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
-    // Make sure viewport is up to date before calculating pref size.
-    // This is necessary because the tree does not render the view port on any change (like insert or delete nodes). Instead it just invalidates the layout.
-    // @ts-ignore
+    // Make sure viewport is up-to-date before calculating pref size.
+    // This is necessary because the tree does not render the view port on any change (like insert or delete nodes). Instead, it just invalidates the layout.
     this.tree._renderViewport();
 
     // Node dimensions were fixed when calling _renderViewport using the current size, but that size might change during layout

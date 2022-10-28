@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -15,7 +15,7 @@ describe('scout.objects', () => {
   describe('copyProperties', () => {
 
     it('copies all properties', () => {
-      let dest = {},
+      let dest: any = {},
         source = {
           foo: 6,
           bar: 7
@@ -26,7 +26,7 @@ describe('scout.objects', () => {
     });
 
     it('copies the properties from prototype as well', () => {
-      let dest = {};
+      let dest: any = {};
       let TestConstructor = function() {
         this.foo = 6;
       };
@@ -41,7 +41,7 @@ describe('scout.objects', () => {
     });
 
     it('copies only the properties specified by the filter, if there is one', () => {
-      let dest = {};
+      let dest: any = {};
       let TestConstructor = function() {
         this.foo = 6;
         this.xyz = 9;
@@ -66,7 +66,7 @@ describe('scout.objects', () => {
   describe('copyOwnProperties', () => {
 
     it('copies all properties', () => {
-      let dest = {},
+      let dest: any = {},
         source = {
           foo: 6,
           bar: 7
@@ -77,7 +77,7 @@ describe('scout.objects', () => {
     });
 
     it('does not copy the properties from prototype', () => {
-      let dest = {};
+      let dest: any = {};
       let TestConstructor = function() {
         this.foo = 6;
       };
@@ -92,7 +92,7 @@ describe('scout.objects', () => {
     });
 
     it('copies only the properties specified by the filter, if there is one', () => {
-      let dest = {},
+      let dest: any = {},
         source = {
           foo: 6,
           bar: 7,
@@ -118,12 +118,12 @@ describe('scout.objects', () => {
         this.foo = 66;
         this.bar = 777;
       };
-      F.myProp = 'hello';
+      F['myProp'] = 'hello';
       F.prototype.anotherProp = 'goodbye';
       let x = new F();
       let y = {};
       objects.copyProperties(x, y);
-      y.qux = 9999;
+      y['qux'] = 9999;
 
       expect(objects.countOwnProperties(o)).toBe(2); // first, second
       expect(objects.countOwnProperties(F)).toBe(1); // myProp
@@ -143,7 +143,7 @@ describe('scout.objects', () => {
   describe('valueCopy', () => {
 
     it('copies an object by value', () => {
-      let o = {
+      let o: any = {
         first: 1,
         second: 2,
         arr: [],
@@ -207,7 +207,7 @@ describe('scout.objects', () => {
       expect(map2.author).toBe(undefined);
 
       // Nested map
-      let o = {
+      let o: any = {
         first: 1,
         second: 2
       };
@@ -248,6 +248,7 @@ describe('scout.objects', () => {
 
   describe('isString', () => {
     it('returns true iff argument is a string', () => {
+      // @ts-ignore
       expect(objects.isString()).toBe(false);
       expect(objects.isString(null)).toBe(false);
       expect(objects.isString(123)).toBe(false);
@@ -283,6 +284,7 @@ describe('scout.objects', () => {
 
   describe('isPromise', () => {
     it('returns false for "not a promise" inputs', () => {
+      // @ts-ignore
       expect(objects.isPromise()).toBeFalse();
       expect(objects.isPromise(null)).toBeFalse();
       expect(objects.isPromise('foo')).toBeFalse();
@@ -296,6 +298,7 @@ describe('scout.objects', () => {
       expect(objects.isPromise($.Deferred().promise())).toBeTrue();
       expect(objects.isPromise({
         then() {
+          // nop
         }
       })).toBeTrue();
     });
@@ -316,7 +319,7 @@ describe('scout.objects', () => {
       o2.a = 'X';
       o2.c = 'C';
 
-      // noinspection JSCheckFunctionSignatures
+      // @ts-ignore
       expect(objects.values()).toEqual([]);
       expect(objects.values(null)).toEqual([]);
       expect(objects.values(undefined)).toEqual([]);
@@ -427,8 +430,11 @@ describe('scout.objects', () => {
 
   describe('getByPath', () => {
     it('throws on invalid arguments', () => {
+      // @ts-ignore
       expect(() => objects.getByPath()).toThrowError('Missing required parameter \'object\'');
+      // @ts-ignore
       expect(() => objects.getByPath('')).toThrowError('Parameter \'object\' has wrong type');
+      // @ts-ignore
       expect(() => objects.getByPath({})).toThrowError('Missing required parameter \'path\'');
     });
 
@@ -562,7 +568,9 @@ describe('scout.objects', () => {
   describe('equals', () => {
 
     it('works as expected', () => {
+      // @ts-ignore
       expect(objects.equals()).toBe(true); // undefined === undefined
+      // @ts-ignore
       expect(objects.equals(2)).toBe(false);
       expect(objects.equals(2, 2)).toBe(true);
       expect(objects.equals(2, 3)).toBe(false);
@@ -591,7 +599,9 @@ describe('scout.objects', () => {
   describe('equalsRecursive', () => {
 
     it('works as expected', () => {
+      // @ts-ignore
       expect(objects.equalsRecursive()).toBe(true); // undefined === undefined
+      // @ts-ignore
       expect(objects.equalsRecursive(2)).toBe(false);
       expect(objects.equalsRecursive(2, 2)).toBe(true);
       expect(objects.equalsRecursive(2, 3)).toBe(false);
@@ -624,17 +634,17 @@ describe('scout.objects', () => {
   describe('Constant resolving from plain object / JSON model', () => {
 
     beforeEach(() => {
-      window.myConst = 6;
+      window['myConst'] = 6;
     });
 
     afterEach(() => {
-      delete window.myConst;
+      delete window['myConst'];
     });
 
     it('resolveConst', () => {
       expect(objects.resolveConst('${const:scout.FormField.LabelPosition.RIGHT}')).toBe(FormField.LabelPosition.RIGHT);
       expect(objects.resolveConst('${const:myConst}')).toBe(6);
-      // noinspection JSCheckFunctionSignatures
+      // @ts-ignore
       expect(objects.resolveConst(3)).toBe(3); // everything that is not a string, should be returned unchanged
       expect(objects.resolveConst('foo')).toBe('foo'); // a string that is not a constant should be returned unchanged too
 
@@ -651,6 +661,7 @@ describe('scout.objects', () => {
         property: 'labelPosition',
         constType: FormField.LabelPosition
       });
+      // @ts-ignore
       expect(model.labelPosition).toBe(FormField.LabelPosition.RIGHT);
 
       // case 2: provide the 'Window' object as constType - resolver takes that object as starting point
@@ -661,6 +672,7 @@ describe('scout.objects', () => {
         property: 'labelPosition',
         constType: window
       });
+      // @ts-ignore
       expect(model.labelPosition).toBe(FormField.LabelPosition.RIGHT);
     });
 
@@ -717,6 +729,7 @@ describe('scout.objects', () => {
 
   describe('ensureValidKey', () => {
     it('always returns a string', () => {
+      // @ts-ignore
       expect(objects.ensureValidKey()).toBe('undefined');
       expect(objects.ensureValidKey(null)).toBe('null');
       expect(objects.ensureValidKey(true)).toBe('true');

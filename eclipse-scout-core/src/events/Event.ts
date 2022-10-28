@@ -15,7 +15,7 @@ export default class Event<TSource = object> {
   defaultPrevented: boolean;
   type: string;
 
-  constructor(model?: any) {
+  constructor(model?: object) {
     this.defaultPrevented = false;
     $.extend(this, model);
   }

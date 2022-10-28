@@ -10,12 +10,14 @@
  */
 import {
   arrays, FormField, FormFieldModel, HorizontalGrid, HtmlComponent, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupResult, LookupRow, objects, PropertyChangeEvent, RadioButton,
-  RadioButtonGroupEventMap,
-  RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, RadioButtonModel, RefModel, scout, Status, TreeVisitResult, ValueField
+  RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, RadioButtonModel, RefModel, scout, Status, TreeVisitResult,
+  ValueField
 } from '../../../index';
 import $ from 'jquery';
 import {CloneOptions} from '../../../widget/Widget';
 import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
+import {Optional} from '../../../types';
+import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
 
 export default class RadioButtonGroup<TValue> extends ValueField<TValue> implements RadioButtonGroupModel<TValue> {
   declare model: RadioButtonGroupModel<TValue>;
@@ -392,7 +394,7 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
     }
   }
 
-  protected _setLookupCall(lookupCall: LookupCall<TValue>) {
+  protected _setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
     this._lookupExecuted = false;
     if (this.rendered) {
@@ -410,7 +412,6 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
     if (this._lookupExecuted) {
       return false;
     }
-    // noinspection JSIgnoredPromiseFromCall
     this._lookupByAll();
     return true;
   }
@@ -505,7 +506,7 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
     });
     this.setFields(newFields);
 
-    // because the lookup call is asynchronus, reset the value so that it is revalidated.
+    // because the lookup call is asynchronous, reset the value so that it is revalidated.
     this.setValue(this.value);
     // also select the button (the line above does not change the value, therefore _valueChanged is not called)
     this.selectButton(this.getButtonForRadioValue(this.value));
@@ -558,12 +559,12 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
       button.cssClass = lookupRow.cssClass;
     }
 
-    let radioButton = scout.create(RadioButton, button) as RadioButton<TValue>;
+    let radioButton = scout.create((RadioButton<TValue>), button);
     radioButton.lookupRow = lookupRow;
     return radioButton;
   }
 
-  override clone(model: RadioButtonGroupModel<TValue>, options?: CloneOptions): this {
+  override clone(model: Optional<RadioButtonGroupModel<TValue>, 'parent'>, options?: CloneOptions): this {
     let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'fields', options);
     clone._initButtons();

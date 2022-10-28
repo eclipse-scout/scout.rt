@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FocusManagerSpecHelper, FormSpecHelper} from '../../src/testing/index';
-import {FocusRule, focusUtils, GlassPane, scout} from '../../src/index';
+import {FocusManager, FocusRule, focusUtils, GlassPane, scout} from '../../src/index';
 
 /* global FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 describe('scout.FocusManager', () => {
-  let session, formHelper, focusHelper, focusManager;
+  let session: SandboxSession, formHelper: FormSpecHelper, focusHelper: FocusManagerSpecHelper, focusManager: FocusManager;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -103,6 +103,7 @@ describe('scout.FocusManager', () => {
         let dialog = formHelper.createFormWithFields(session.desktop, true, 2);
         dialog.render();
 
+        // @ts-ignore
         expect(focusManager._focusContexts.length).toBe(2);
 
         let dialogContext = focusManager._findActiveContext();
@@ -274,6 +275,7 @@ describe('scout.FocusManager', () => {
       expect(focusManager.evaluateFocusRule($container, FocusRule.AUTO)).toBe(input1);
       expect(focusManager.evaluateFocusRule($container, FocusRule.PREPARE)).toBe(input1);
       expect(focusManager.evaluateFocusRule($container, null)).toBe(input1);
+      // @ts-ignore
       expect(focusManager.evaluateFocusRule($container, 'invalid-rule')).toBe('invalid-rule');
       expect(focusManager.evaluateFocusRule($container, input2)).toBe(input2);
     });

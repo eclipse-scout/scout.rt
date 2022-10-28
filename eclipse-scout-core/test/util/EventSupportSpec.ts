@@ -1,18 +1,22 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventSupport} from '../../src/index';
+import {EventListener, EventSupport, Event} from '../../src/index';
 
 describe('EventSupport', () => {
 
-  let count, events;
+  let count: number, events: SpecEventSupport;
+
+  class SpecEventSupport extends EventSupport {
+    declare _eventListeners: EventListener[];
+  }
 
   function fooListener() {
     count++;
@@ -21,7 +25,7 @@ describe('EventSupport', () => {
   describe('on / trigger / off', () => {
 
     beforeEach(() => {
-      events = new EventSupport();
+      events = new SpecEventSupport();
       count = 0;
     });
 
@@ -47,7 +51,7 @@ describe('EventSupport', () => {
   describe('one', () => {
 
     beforeEach(() => {
-      events = new EventSupport();
+      events = new SpecEventSupport();
       count = 0;
     });
 
@@ -64,9 +68,9 @@ describe('EventSupport', () => {
       events.one('foo', event => {
         receivedEvent = event;
       });
-      events.trigger('foo', {
+      events.trigger('foo', new Event({
         theProp: 'bar'
-      });
+      }));
       // expect the event has been passed to the registered func
       expect(receivedEvent.theProp).toBe('bar');
       // expect the type property is automatically set by EventSupport
@@ -113,7 +117,7 @@ describe('EventSupport', () => {
     }
 
     beforeEach(() => {
-      events = new EventSupport();
+      events = new SpecEventSupport();
       count = 0;
     });
 

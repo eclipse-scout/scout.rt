@@ -1,23 +1,25 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, Cell, CellModel, Column, ColumnModel, ColumnUserFilter, comparators, DecimalFormat, Filter, MenuModel, ModelAdapterModel, NumberColumnModel, ObjectFactory, objects, RemoteEvent, scout, Session, Table, TableAdapter, TableModel,
-  TableRow, TableTextUserFilter, TextColumnUserFilter, TextColumnUserFilterModel
+  arrays, Cell, CellModel, Column, ColumnModel, ColumnUserFilter, comparators, DecimalFormat, Filter, MenuModel, ModelAdapterModel, NumberColumnModel, ObjectFactory, objects, RemoteEvent, scout, Session, Table, TableModel, TableRow,
+  TableTextUserFilter, TextColumnUserFilter, TextColumnUserFilterModel, Widget
 } from '../../index';
 import {MenuSpecHelper} from '../index';
 import $ from 'jquery';
-import {RefModel, SomeRequired} from '../../types';
+import {Optional, Primitive, RefModel, SomeRequired} from '../../types';
 import {ObjectType} from '../../ObjectFactory';
 import {TableRowData} from '../../table/TableRowModel';
 import ColumnUserFilterModel from '../../table/userfilter/ColumnUserFilterModel';
+import SpecTable from './SpecTable';
+import SpecTableAdapter from './SpecTableAdapter';
 
 export default class TableSpecHelper {
   session: Session;
@@ -28,8 +30,8 @@ export default class TableSpecHelper {
     this.menuHelper = new MenuSpecHelper(session);
   }
 
-  createModel(columns: RefModel<ColumnModel>[], rows: TableRowData[]): TableModel & { objectType: ObjectType<Table> } {
-    let model = createSimpleModel('Table', this.session) as TableModel & { objectType: ObjectType<Table> };
+  createModel(columns: RefModel<ColumnModel<any>>[], rows: TableRowData[]): TableModelWithCells {
+    let model = createSimpleModel('Table', this.session) as TableModelWithCells;
 
     // Server will never send undefined -> don't create model with undefined properties.
     if (rows) {
@@ -42,7 +44,7 @@ export default class TableSpecHelper {
     return model;
   }
 
-  createModelRow(id?: string, cells?: any[], parentRow?: TableRowData | string): TableRowData {
+  createModelRow(id?: string, cells?: (Primitive | object | Cell)[], parentRow?: TableRowData | string): TableRowData {
     return {
       id: scout.nvl(id, ObjectFactory.get().createUniqueId()),
       cells: cells,
@@ -73,16 +75,16 @@ export default class TableSpecHelper {
    *
    * @param values array of values for the cells in the new row or a number if only one cell should be created.
    */
-  createModelRowByValues(id: string, values: any[]): TableRowData {
+  createModelRowByValues(id: string, values: any | any[]): TableRowData {
     values = arrays.ensure(values);
-    let cells = [];
+    let cells: Cell[] = [];
     for (let i = 0; i < values.length; i++) {
       cells[i] = this.createModelCell(null, values[i]);
     }
     return this.createModelRow(id, cells);
   }
 
-  createModelColumn(text: string, type?: ObjectType<Column>): ColumnModel & { uiSortPossible: boolean } {
+  createModelColumn<T>(text: string, type?: ObjectType<Column<T>>): ColumnModel<T> & { uiSortPossible: boolean; objectType: ObjectType<Column<T>>} {
     let model = {
       id: ObjectFactory.get().createUniqueId(),
       text: text,
@@ -95,7 +97,7 @@ export default class TableSpecHelper {
     return model;
   }
 
-  createModelCell(text?: string, value?: any): CellModel {
+  createModelCell(text?: string, value?: any): Cell {
     let cell = {} as CellModel;
     if (text !== undefined) {
       cell.text = text;
@@ -147,8 +149,8 @@ export default class TableSpecHelper {
    * If the column is of type NumberColumn a numeric value is set.
    * Otherwise, the value is similar to 'cell0_0' if rowId is given, or 'cell0' if no rowId is given.
    */
-  createModelCells(columns: ColumnModel[] | number, rowId?: string): CellModel[] {
-    let cells = [];
+  createModelCells(columns: ColumnModel[] | number, rowId?: string): Cell[] {
+    let cells: Cell[] = [];
     if (rowId === undefined) {
       rowId = '';
     }
@@ -170,10 +172,10 @@ export default class TableSpecHelper {
   }
 
   /**
-   * Creates #rowCount rows where columns is either the column count or the column objects.
+   * Creates #rowCount rows where columns are either the column count or the column objects.
    * Passing the column objects allows to consider the column type for cell creation.
    */
-  createModelRows(columns: number | ColumnModel[], rowCount: number, parentRow?: RefModel<TableRowData> | string): TableRowData[] {
+  createModelRows(columns: number | ColumnModel<any>[], rowCount: number, parentRow?: RefModel<TableRowData> | string): TableRowDataWithCells[] {
     if (!rowCount) {
       return;
     }
@@ -185,7 +187,7 @@ export default class TableSpecHelper {
     return rows;
   }
 
-  createModelSingleColumnByTexts(texts: string[]): TableModel {
+  createModelSingleColumnByTexts(texts: string[]): TableModelWithCells {
     let rows = [];
     for (let i = 0; i < texts.length; i++) {
       rows.push(this.createModelRowByTexts(null, texts[i]));
@@ -193,7 +195,7 @@ export default class TableSpecHelper {
     return this.createModel(this.createModelColumns(1), rows);
   }
 
-  createModelSingleColumnByValues(values: any[], columnType: ObjectType<Column>): TableModel {
+  createModelSingleColumnByValues(values: any[], columnType: ObjectType<Column>): TableModelWithCells {
     let rows = [];
     for (let i = 0; i < values.length; i++) {
       rows.push(this.createModelRowByValues(null, values[i]));
@@ -201,7 +203,7 @@ export default class TableSpecHelper {
     return this.createModel(this.createModelColumns(1, columnType), rows);
   }
 
-  createModelFixture(colCount: number, rowCount?: number): TableModel & { objectType: ObjectType<Table> } {
+  createModelFixture(colCount: number, rowCount?: number): TableModelWithCells {
     return this.createModel(this.createModelColumns(colCount), this.createModelRows(colCount, rowCount));
   }
 
@@ -210,22 +212,22 @@ export default class TableSpecHelper {
     return this.createTable(model);
   }
 
-  createModelSingleConfiguredCheckableColumn(rowCount: number): TableModel {
+  createModelSingleConfiguredCheckableColumn(rowCount: number): TableModelWithCells {
     let cols = this.createModelColumns(1);
     cols[0].checkable = true;
     return this.createModel(cols, this.createModelRows(1, rowCount));
   }
 
-  createTable(model: TableModel): Table {
+  createTable(model: Optional<TableModel, 'parent'>): SpecTable {
     let defaults = {
       parent: this.session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create(Table, model);
+    return scout.create(SpecTable, model as TableModel);
   }
 
-  createTableAdapter(model: ModelAdapterModel | SomeRequired<TableModel, 'session' | 'id'>): TableAdapter {
-    let tableAdapter = new TableAdapter();
+  createTableAdapter(model: ModelAdapterModel | SomeRequired<TableModel, 'session' | 'id'>): SpecTableAdapter {
+    let tableAdapter = new SpecTableAdapter();
     tableAdapter.init(model);
     return tableAdapter;
   }
@@ -383,3 +385,6 @@ export default class TableSpecHelper {
     comparators.TEXT.collator = null;
   }
 }
+
+export type TableRowDataWithCells = TableRowData & { cells: Cell[] };
+export type TableModelWithCells = TableModel & { id: string; parent: Widget; session: Session; objectType: ObjectType<Table> };

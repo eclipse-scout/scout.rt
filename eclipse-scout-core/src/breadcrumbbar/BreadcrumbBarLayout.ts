@@ -54,10 +54,8 @@ export default class BreadcrumbBarLayout extends AbstractLayout {
   }
 
   protected _applyToEllipsis(fun: (ellipsisBreadcrumbItem: BreadcrumbItem) => void) {
-    // @ts-ignore
-    if (this._breadcrumbBar._ellipsisBreadcrumbItem) {
-      // @ts-ignore
-      fun(this._breadcrumbBar._ellipsisBreadcrumbItem);
+    if (this._breadcrumbBar.ellipsisBreadcrumbItem) {
+      fun(this._breadcrumbBar.ellipsisBreadcrumbItem);
     }
   }
 
@@ -101,10 +99,8 @@ export default class BreadcrumbBarLayout extends AbstractLayout {
       }
     });
 
-    // @ts-ignore
-    if (considerEllipsis && this._breadcrumbBar._ellipsisBreadcrumbItem && this._breadcrumbBar._ellipsisBreadcrumbItem.rendered) {
-      // @ts-ignore
-      breadcrumbsWidth += this._breadcrumbBar._ellipsisBreadcrumbItem.$container.outerWidth(true);
+    if (considerEllipsis && this._breadcrumbBar.ellipsisBreadcrumbItem && this._breadcrumbBar.ellipsisBreadcrumbItem.rendered) {
+      breadcrumbsWidth += this._breadcrumbBar.ellipsisBreadcrumbItem.$container.outerWidth(true);
     }
     return breadcrumbsWidth;
   }

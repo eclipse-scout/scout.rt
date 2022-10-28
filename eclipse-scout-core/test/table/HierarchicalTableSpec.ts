@@ -1,19 +1,21 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays} from '../../src/index';
+import {arrays, Column, ColumnUserFilter, Table, TableRow} from '../../src/index';
 import {TableSpecHelper} from '../../src/testing/index';
+import {TableRowData} from '../../src/table/TableRowModel';
+import SpecTable from '../../src/testing/table/SpecTable';
 
 describe('HierarchicalTableSpec', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -31,7 +33,7 @@ describe('HierarchicalTableSpec', () => {
     $.fx.off = false;
   });
 
-  function createAndRegisterColumnFilter(table, column, selectedValues) {
+  function createAndRegisterColumnFilter(table: Table, column: Column<any>, selectedValues: (string | number)[]): ColumnUserFilter {
     return helper.createAndRegisterColumnFilter({
       table: table,
       session: session,
@@ -40,11 +42,11 @@ describe('HierarchicalTableSpec', () => {
     });
   }
 
-  function expectRowIds(rows, ids) {
+  function expectRowIds(rows: TableRow[], ids: (number | string)[]) {
     expect(rows.map(row => row.id)).toEqual(ids.map(id => id + ''));
   }
 
-  function getTreeRows(table) {
+  function getTreeRows(table: Table): TableRow[] {
     let flatTreeRows = [];
     table.visitRows(row => {
       flatTreeRows.push(row);
@@ -52,13 +54,13 @@ describe('HierarchicalTableSpec', () => {
     return flatTreeRows;
   }
 
-  function getUiRows(table) {
+  function getUiRows(table: Table): TableRow[] {
     return $.makeArray(table.$rows()).map(row => {
       return $(row).data('row');
     });
   }
 
-  function getExpandedRows(table) {
+  function getExpandedRows(table: Table): TableRow[] {
     let expandedRows = [];
     table.visitRows(row => {
       if (row.expanded && row.childRows.length > 0) {
@@ -69,7 +71,7 @@ describe('HierarchicalTableSpec', () => {
   }
 
   describe('add', () => {
-    let table, rowIds, rows;
+    let table: SpecTable, rowIds: string[], rows: TableRowData[];
 
     /**
      * initial table
@@ -176,8 +178,8 @@ describe('HierarchicalTableSpec', () => {
     });
 
     it('a child row to a model row that was inserted before', () => {
-      let parentRow = {cells: ['newRow'], expanded: true};
-      let childRow = {cells: ['childRow'], parentRow: parentRow};
+      let parentRow = {cells: ['newRow'], expanded: true} as TableRowData;
+      let childRow = {cells: ['childRow'], parentRow: parentRow} as TableRowData;
 
       table.deleteAllRows();
       table.insertRows([parentRow, childRow]);
@@ -340,7 +342,7 @@ describe('HierarchicalTableSpec', () => {
 
       row.parentRow = rows[0].id;
       table.insertRow(row);
-      row = table._rowById('33');
+      row = table.rowById('33');
       expect(table._renderViewport.calls.count()).toBe(2);
 
       expectRowIds(table.visibleRows, [0, 1, 2, 33, 3]);

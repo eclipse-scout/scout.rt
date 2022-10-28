@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FieldStatus, GroupBox, Menu, scout, SmartField, Status, StringField} from '../../../src/index';
+import {FieldStatus, GroupBox, Menu, scout, SmartField, Status, StringField, StringFieldModel} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
 import {triggerMouseDownCapture} from '../../../src/testing/jquery-testing';
 
 describe('FieldStatus', () => {
-  let session, helper;
+  let session: SandboxSession, helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -27,7 +27,7 @@ describe('FieldStatus', () => {
   });
 
   describe('parent changes visibility', () => {
-    let formField, model;
+    let formField: StringField, model: StringFieldModel;
 
     beforeEach(() => {
       model = helper.createFieldModel();
@@ -77,8 +77,10 @@ describe('FieldStatus', () => {
 
     it('de-register all listeners when tooltip is destroyed', () => {
       // parents = StringField, Desktop, NullWidget, NullWidget (root parent)
+      // @ts-ignore
       expect(formField.fieldStatus._parents.length).toBe(4);
       formField.setErrorStatus(null);
+      // @ts-ignore
       expect(formField.fieldStatus._parents.length).toBe(0);
     });
 
@@ -89,7 +91,7 @@ describe('FieldStatus', () => {
    * In that case the tooltip must be closed. Set ticket 250554.
    */
   it('must hide tooltip when new status has no message', () => {
-    let model = helper.createFieldModel();
+    let model = helper.createFieldModel() as StringFieldModel;
     let formField = new StringField();
     formField.init(model);
     formField.render();
@@ -98,10 +100,10 @@ describe('FieldStatus', () => {
     let status1 = new Status({
       message: 'Foo',
       severity: Status.Severity.ERROR,
-      children: {
+      children: [{
         message: 'Foo',
         severity: Status.Severity.ERROR
-      }
+      }]
     });
     formField.setErrorStatus(status1);
     expect(session.desktop.$container.find('.tooltip').length).toBe(1);
@@ -119,10 +121,10 @@ describe('FieldStatus', () => {
     let formField = scout.create(SmartField, {parent: session.desktop});
     formField.render();
     formField.focus();
-    formField.setMenus({
+    formField.setMenus([{
       objectType: Menu,
       childActions: [{objectType: Menu}]
-    });
+    }]);
     formField.setTooltipText('hi there');
     formField.fieldStatus.togglePopup();
     let tooltip = formField.fieldStatus.tooltip;
@@ -133,6 +135,7 @@ describe('FieldStatus', () => {
 
     // Focus will be set to menu after popup has been opened -> simulate this
     formField.fieldStatus.tooltip.menus[0].popup.validateFocus();
+    // @ts-ignore
     formField._onFieldBlur();
     expect(tooltip.rendered).toBeTrue();
     expect(popup.rendered).toBeTrue();
@@ -141,10 +144,10 @@ describe('FieldStatus', () => {
   it('closes submenus of tooltip if tooltip is destroyed ', () => {
     let formField = scout.create(StringField, {parent: session.desktop});
     formField.setTooltipText('hi there');
-    formField.setMenus({
+    formField.setMenus([{
       objectType: Menu,
       childActions: [{objectType: Menu}]
-    });
+    }]);
     let $outside = session.$entryPoint.appendDiv();
     formField.render();
 

@@ -62,8 +62,7 @@ export default class FormLayout extends AbstractLayout {
   }
 
   protected _headerHeight(): number {
-    // @ts-ignore
-    let $header: JQuery = this.form.$header;
+    let $header = this.form['$header'] as JQuery;
     if ($header && $header.css('position') !== 'absolute') {
       return graphics.prefSize($header, true).height;
     }

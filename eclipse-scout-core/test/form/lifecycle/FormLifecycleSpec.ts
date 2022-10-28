@@ -1,21 +1,23 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper} from '../../../src/testing/index';
-import {FormLifecycle, scout, Status} from '../../../src';
+import {FormLifecycle, scout, Status, StringField, TabBox, TabItem, TableField} from '../../../src';
+import SpecForm from '../../../src/testing/form/SpecForm';
+import SpecLifecycle from '../../../src/testing/form/SpecLifecycle';
 
 describe('FormLifecycle', () => {
 
-  let session, helper, form, field;
+  let session: SandboxSession, helper: FormSpecHelper, form: SpecForm, field: StringField;
 
-  function expectMessageBox(shown) {
+  function expectMessageBox(shown: boolean) {
     expect(session.$entryPoint.find('.messagebox').length).toBe(shown ? 1 : 0);
   }
 
@@ -25,8 +27,8 @@ describe('FormLifecycle', () => {
     helper = new FormSpecHelper(session);
 
     form = helper.createFormWithOneField();
-    form.lifecycle = scout.create(FormLifecycle, {widget: form});
-    field = form.rootGroupBox.fields[0];
+    form.lifecycle = scout.create(SpecLifecycle, {widget: form});
+    field = form.rootGroupBox.fields[0] as StringField;
     form.render();
     jasmine.clock().install();
   });
@@ -54,7 +56,7 @@ describe('FormLifecycle', () => {
         disposed = true;
       });
       form.lifecycle.cancel();
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       expect(disposed).toBe(true);
     });
 
@@ -66,7 +68,7 @@ describe('FormLifecycle', () => {
       field.setMandatory(true);
       field.setValue(null);
       form.lifecycle.ok();
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       expectMessageBox(true);
     });
 
@@ -85,8 +87,8 @@ describe('FormLifecycle', () => {
     });
 
     it('stops lifecycle if severity is ERROR', () => {
-      let form2 = helper.createFormWithOneField();
-      form2.lifecycle = scout.create(FormLifecycle, {
+      let form2 = helper.createFormWithOneField() as SpecForm;
+      form2.lifecycle = scout.create(SpecLifecycle, {
         widget: form
       });
       form2.lifecycle._validate = () => $.resolvedPromise(Status.error({
@@ -96,8 +98,8 @@ describe('FormLifecycle', () => {
     });
 
     it('continues lifecycle if severity is WARNING', () => {
-      let form2 = helper.createFormWithOneField();
-      form2.lifecycle = scout.create(FormLifecycle, {
+      let form2 = helper.createFormWithOneField() as SpecForm;
+      form2.lifecycle = scout.create(SpecLifecycle, {
         widget: form
       });
       form2.lifecycle._validate = () => $.resolvedPromise(Status.warning({
@@ -115,7 +117,7 @@ describe('FormLifecycle', () => {
         form2.render();
       }
       form2.lifecycle.ok();
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       expectMessageBox(true);
       helper.closeMessageBoxes();
       jasmine.clock().tick(1000); // <- important, otherwise the promise will not be resolved somehow (?)
@@ -125,7 +127,7 @@ describe('FormLifecycle', () => {
     it('should call _validate function on form', () => {
       // validate should always be called, even when there is not a single touched field in the form
       let form2 = helper.createFormWithOneField();
-      form2.lifecycle = scout.create(FormLifecycle, {
+      form2.lifecycle = scout.create(SpecLifecycle, {
         widget: form2
       });
       let validateCalled = false;
@@ -151,21 +153,21 @@ describe('FormLifecycle', () => {
         widget: formWithFieldsAndTabBoxes
       });
 
-      let field3 = formWithFieldsAndTabBoxes.widget('Field3'),
-        field4 = formWithFieldsAndTabBoxes.widget('Field4'),
-        tabBox = formWithFieldsAndTabBoxes.widget('TabBox'),
-        tabA = formWithFieldsAndTabBoxes.widget('TabA'),
-        fieldA2 = formWithFieldsAndTabBoxes.widget('FieldA2'),
-        tabBoxA = formWithFieldsAndTabBoxes.widget('TabBoxA'),
-        tabAA = formWithFieldsAndTabBoxes.widget('TabAA'),
-        fieldAA2 = formWithFieldsAndTabBoxes.widget('FieldAA2'),
-        tabAB = formWithFieldsAndTabBoxes.widget('TabAB'),
-        fieldAB2 = formWithFieldsAndTabBoxes.widget('FieldAB2'),
-        fieldAC2 = formWithFieldsAndTabBoxes.widget('FieldAC2'),
-        tabB = formWithFieldsAndTabBoxes.widget('TabB'),
-        fieldB3 = formWithFieldsAndTabBoxes.widget('FieldB3'),
-        fieldB4 = formWithFieldsAndTabBoxes.widget('FieldB4'),
-        tableFieldB5 = formWithFieldsAndTabBoxes.widget('TableFieldB5'),
+      let field3 = formWithFieldsAndTabBoxes.widget('Field3') as StringField,
+        field4 = formWithFieldsAndTabBoxes.widget('Field4') as StringField,
+        tabBox = formWithFieldsAndTabBoxes.widget('TabBox') as TabBox,
+        tabA = formWithFieldsAndTabBoxes.widget('TabA') as TabItem,
+        fieldA2 = formWithFieldsAndTabBoxes.widget('FieldA2') as StringField,
+        tabBoxA = formWithFieldsAndTabBoxes.widget('TabBoxA') as TabBox,
+        tabAA = formWithFieldsAndTabBoxes.widget('TabAA') as TabItem,
+        fieldAA2 = formWithFieldsAndTabBoxes.widget('FieldAA2') as StringField,
+        tabAB = formWithFieldsAndTabBoxes.widget('TabAB') as TabItem,
+        fieldAB2 = formWithFieldsAndTabBoxes.widget('FieldAB2') as StringField,
+        fieldAC2 = formWithFieldsAndTabBoxes.widget('FieldAC2') as StringField,
+        tabB = formWithFieldsAndTabBoxes.widget('TabB') as TabItem,
+        fieldB3 = formWithFieldsAndTabBoxes.widget('FieldB3') as StringField,
+        fieldB4 = formWithFieldsAndTabBoxes.widget('FieldB4') as StringField,
+        tableFieldB5 = formWithFieldsAndTabBoxes.widget('TableFieldB5') as TableField,
         tableFieldB5Table = tableFieldB5.table,
         columnB52 = tableFieldB5Table.columns.filter(col => col.id === 'ColumnB52')[0],
         tableFieldB5TableRows = tableFieldB5Table.rows;
@@ -224,7 +226,7 @@ describe('FormLifecycle', () => {
       tableFieldB5Table.completeCellEdit();
 
       formWithFieldsAndTabBoxes.lifecycle.ok();
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       expectMessageBox(false);
     });
   });
@@ -283,6 +285,7 @@ describe('FormLifecycle', () => {
         field: field,
         label: field.label,
         reveal: () => {
+          // nop
         }
       }];
       let invalidField = helper.createField('StringField', session.desktop);
@@ -294,6 +297,7 @@ describe('FormLifecycle', () => {
         field: invalidField,
         label: invalidField.label,
         reveal: () => {
+          // nop
         }
       }];
       let html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);
@@ -311,6 +315,7 @@ describe('FormLifecycle', () => {
         field: field,
         label: field.label,
         reveal: () => {
+          // nop
         }
       }];
       let invalidField = helper.createField('StringField', session.desktop);
@@ -323,6 +328,7 @@ describe('FormLifecycle', () => {
         field: invalidField,
         label: invalidField.label,
         reveal: () => {
+          // nop
         }
       }];
       let html = form.lifecycle._createInvalidElementsMessageHtml(missingFields, invalidFields);

@@ -8,12 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ParsingFailedStatus, scout, Status, StringField, ValueField} from '../../../src/index';
+// eslint-disable-next-line max-classes-per-file
+import {arrays, FormField, ParsingFailedStatus, scout, Status, StringField, ValueField, ValueFieldModel} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '../../../src/testing/index';
+import {ValueFieldValidator} from '../../../src/form/fields/ValueField';
 
 /* global removePopups */
 describe('ValueField', () => {
-  let session, helper, menuHelper;
+  let session: SandboxSession, helper: FormSpecHelper, menuHelper: MenuSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -29,17 +31,20 @@ describe('ValueField', () => {
     jasmine.Ajax.uninstall();
   });
 
+  class SpecValueField extends ValueField<string> {
+    protected override _render() {
+      this.addContainer(this.$parent, 'form-field');
+      this.addField($('<div>'));
+      this.addStatus();
+    }
+  }
+
   describe('property status visible', () => {
-    let formField, model;
+    let formField: SpecValueField, model: ValueFieldModel<any>;
 
     beforeEach(() => {
       model = helper.createFieldModel();
-      formField = new ValueField();
-      formField._render = function() {
-        this.addContainer(this.$parent, 'form-field');
-        this.addField($('<div>'));
-        this.addStatus();
-      };
+      formField = new SpecValueField();
       formField.init(model);
     });
 
@@ -60,7 +65,7 @@ describe('ValueField', () => {
   describe('init', () => {
 
     it('sets display text using formatValue if value is set initially', () => {
-      let field = helper.createField('StringField', session.desktop, {
+      let field = helper.createField(StringField, session.desktop, {
         value: 'Foo'
       });
       expect(field.value).toBe('Foo');
@@ -70,7 +75,7 @@ describe('ValueField', () => {
 
     it('does not override display text using formatValue if display text is set initially', () => {
       // Don't parse the value, this is actually the same as one would call setDisplayText after the init
-      let field = helper.createField('StringField', session.desktop, {
+      let field = helper.createField(StringField, session.desktop, {
         displayText: 'Bar'
       });
       expect(field.value).toBe(null);
@@ -80,7 +85,7 @@ describe('ValueField', () => {
 
     it('does not override display text using formatValue if display text is set initially even if value is set as well', () => {
       // Don't override display text, otherwise specifying the display text would not have any effect
-      let field = helper.createField('StringField', session.desktop, {
+      let field = helper.createField(StringField, session.desktop, {
         value: 'Foo',
         displayText: 'ABC'
       });
@@ -89,7 +94,7 @@ describe('ValueField', () => {
       expect(field.empty).toBe(false);
 
       // The same could be achieved using setValue and setDisplayText
-      field = helper.createField('StringField');
+      field = helper.createField(StringField);
       field.setValue('Foo');
       field.setDisplayText('ABC');
       expect(field.value).toBe('Foo');
@@ -112,7 +117,7 @@ describe('ValueField', () => {
 
     it('does not override the errorStatus if an errorStatus is set initially', () => {
       // Mainly needed for page reload case with scout classic, but may be useful for scout JS too
-      let field = helper.createField('StringField', session.desktop, {
+      let field = helper.createField(StringField, session.desktop, {
         errorStatus: {
           message: 'initial error status'
         }
@@ -152,7 +157,7 @@ describe('ValueField', () => {
       }));
       expect(field.errorStatus.message).toBe('another error');
 
-      function findInitialError(field) {
+      function findInitialError(field: FormField): Status {
         return arrays.find(field.errorStatus.children, status => {
           return !(status instanceof ParsingFailedStatus);
         });
@@ -181,7 +186,7 @@ describe('ValueField', () => {
   describe('setValue', () => {
 
     it('sets the value, formats it and sets the display text', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValue('Foo');
       expect(field.value).toBe('Foo');
       expect(field.displayText).toBe('Foo');
@@ -191,7 +196,7 @@ describe('ValueField', () => {
     });
 
     it('does not set the value but the error status and display text if the validation fails', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValidator(value => {
         throw new Error('Validation failed');
       });
@@ -202,7 +207,7 @@ describe('ValueField', () => {
     });
 
     it('deletes the error status if value is valid', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValidator(value => {
         throw new Error('Validation failed');
       });
@@ -219,7 +224,7 @@ describe('ValueField', () => {
     });
 
     it('does not fire a property change if the value has not changed', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       let count = 0;
       field.on('propertyChange', event => {
         if (event.propertyName === 'value') {
@@ -238,7 +243,7 @@ describe('ValueField', () => {
     });
 
     it('executes every validator when validating the value', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.addValidator(value => {
         if (value === 'hi') {
           throw 'Hi is not allowed';
@@ -262,7 +267,7 @@ describe('ValueField', () => {
 
     it('converts undefined to null', () => {
       // Allowing undefined would break the equals checks in ValueField.js
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValue(undefined);
       expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
@@ -276,7 +281,7 @@ describe('ValueField', () => {
   describe('_validateValue', () => {
 
     it('may throw an error if value is invalid', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValidator(value => {
         throw new Error('an error');
       });
@@ -286,7 +291,7 @@ describe('ValueField', () => {
     });
 
     it('may throw a ParsingFailedStatus if value is invalid', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValidator(value => {
         throw ParsingFailedStatus.error({
           message: 'Custom message'
@@ -298,7 +303,7 @@ describe('ValueField', () => {
     });
 
     it('may throw a message if value is invalid', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValidator(value => {
         throw 'Invalid value';
       });
@@ -312,14 +317,14 @@ describe('ValueField', () => {
   describe('parseAndSetValue', () => {
 
     it('parses and sets the value', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.parseAndSetValue('Foo');
       expect(field.displayText).toBe('Foo');
       expect(field.value).toBe('Foo');
     });
 
     it('does not set the value but the error status if the parsing fails', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setParser(text => {
         throw new Error('Parsing failed');
       });
@@ -329,7 +334,7 @@ describe('ValueField', () => {
     });
 
     it('deletes the error status if parsing succeeds', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setParser(value => {
         throw new Error('Validation failed');
       });
@@ -350,7 +355,7 @@ describe('ValueField', () => {
   describe('acceptInput', () => {
 
     it('accepts the current display text by calling parse, validate and format', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setParser(displayText => {
         return (displayText === 'blau' ? 'gelb' : displayText);
       });
@@ -369,7 +374,7 @@ describe('ValueField', () => {
     });
 
     it('is triggered when input is accepted', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       let displayText;
       field.render();
       field.on('acceptInput', event => {
@@ -381,7 +386,7 @@ describe('ValueField', () => {
     });
 
     it('contains the actual displayText even if it was changed using format value', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.render();
       field.setFormatter(value => {
         return 'formatted value';
@@ -397,7 +402,7 @@ describe('ValueField', () => {
     });
 
     it('updates the display text even if it was changed using parse value', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setParser(text => {
         if (text === 'Error') {
           throw new Error();
@@ -421,7 +426,7 @@ describe('ValueField', () => {
       expect(field.value).toBe('Bar');
       expect(field.errorStatus instanceof Status).toBe(true);
 
-      // Revert back to valid value -> display text has to be updated as well even though value was not changed
+      // Revert to valid value -> display text has to be updated as well even though value was not changed
       field.$field.val('Foo');
       field.acceptInput();
       expect(field.displayText).toBe('Bar');
@@ -438,7 +443,7 @@ describe('ValueField', () => {
       let field = scout.create(StringField, {
         parent: session.desktop,
         value: 'hi',
-        validator: (value, defaultValidator) => {
+        validator: (value, defaultValidator: ValueFieldValidator<string>) => {
           value = defaultValidator(value);
           if (value === 'hi') {
             throw 'Hi is not allowed';
@@ -456,7 +461,7 @@ describe('ValueField', () => {
   describe('addValidator', () => {
 
     it('adds a validator and revalidates the value', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValue('hi');
       field.addValidator(value => {
         if (value === 'hi') {
@@ -480,7 +485,7 @@ describe('ValueField', () => {
     };
 
     it('removes a validator and revalidates the value', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValue('hi');
       field.addValidator(validator);
       expect(field.errorStatus.message).toBe('Hi is not allowed');
@@ -493,7 +498,7 @@ describe('ValueField', () => {
   describe('setValidator', () => {
 
     it('removes every validator and sets the new one', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       expect(field.validators.length).toBe(1);
       field.setValidator((value, defaultValidator) => {
         value = defaultValidator(value);
@@ -515,7 +520,7 @@ describe('ValueField', () => {
   describe('setValidators', () => {
 
     it('replaces the list of validators with the given ones', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValidators([value => {
         if (value === 'hi') {
           throw 'Hi is not allowed';
@@ -558,7 +563,7 @@ describe('ValueField', () => {
   describe('setParser', () => {
 
     it('replaces the existing parser by a new one and parses the display text again', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValue('1234-1234-1234-1234');
       expect(field.displayText).toBe('1234-1234-1234-1234');
       expect(field.value).toBe('1234-1234-1234-1234');
@@ -581,7 +586,7 @@ describe('ValueField', () => {
         parent: session.desktop,
         value: '1234123412341234',
         formatter: (value, defaultFormatter) => {
-          let displayText = defaultFormatter(value);
+          let displayText = defaultFormatter(value) as string;
           if (!displayText) {
             return displayText;
           }
@@ -596,13 +601,13 @@ describe('ValueField', () => {
   describe('setFormatter', () => {
 
     it('replaces the existing formatter by a new one and formats the value again', () => {
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       field.setValue('1234123412341234');
       expect(field.value).toBe('1234123412341234');
       expect(field.displayText).toBe('1234123412341234');
 
       field.setFormatter((value, defaultFormatter) => {
-        let displayText = defaultFormatter(value);
+        let displayText = defaultFormatter(value) as string;
         if (!displayText) {
           return displayText;
         }
@@ -619,7 +624,7 @@ describe('ValueField', () => {
     it('removes the text and accepts input', () => {
       // Not quite the same as ctrl-a del, but it is easier to handle.
       // E.g. DateField uses displayText to mark the day when the popup opens. If display text is not set a day might be selected even though input was cleared.
-      let field = helper.createField('StringField');
+      let field = helper.createField(StringField);
       let inputAccepted = false;
       field.render();
       field.setValue('abc');
@@ -644,7 +649,7 @@ describe('ValueField', () => {
     let field;
 
     beforeEach(() => {
-      field = helper.createField('StringField');
+      field = helper.createField(StringField);
     });
 
     it('sets initialValue when markAsSaved is called', () => {
@@ -701,19 +706,23 @@ describe('ValueField', () => {
   });
 
   describe('menu visibility', () => {
-    let formField, model;
+    let formField: SpecInputValueField, model;
 
-    beforeEach(() => {
-      model = helper.createFieldModel();
-      formField = new ValueField();
-      formField._render = function() {
+    class SpecInputValueField extends ValueField<string> {
+      protected override _render() {
         this.addContainer(this.$parent, 'form-field');
         this.addField($('<input>'));
         this.addStatus();
-      };
-      formField._readDisplayText = function() {
-        return this.$field.val();
-      };
+      }
+
+      protected override _readDisplayText(): string {
+        return this.$field.val() as string;
+      }
+    }
+
+    beforeEach(() => {
+      model = helper.createFieldModel();
+      formField = new SpecInputValueField();
       formField.init(model);
     });
 
@@ -771,6 +780,7 @@ describe('ValueField', () => {
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
 
       // 0 does not change current menu types
+      // @ts-ignore
       formField.setValue(0);
       formField.fieldStatus.showContextMenu();
 

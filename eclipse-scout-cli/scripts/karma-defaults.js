@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -37,7 +37,7 @@ module.exports = (config, specEntryPoint) => {
     delete webpackConfig.output.filename;
   }
 
-  // specify output directory for webpack (use different than normal output dir so that they are not polluted with test artifacts)
+  // specify output directory for webpack (use different from normal output dir so that they are not polluted with test artifacts)
   webpackConfig.output = webpackConfig.output || {};
   webpackConfig.output.path = path.resolve(scoutBuildConstants.outDir.target, scoutBuildConstants.outDir.distKarma, scoutBuildConstants.outSubDir.development);
   fs.mkdirSync(webpackConfig.output.path, {recursive: true});
@@ -50,7 +50,7 @@ module.exports = (config, specEntryPoint) => {
     delete sourceMapPlugin.sourceMapFilename;
   }
 
-  const specIndex = specEntryPoint ? path.resolve(specEntryPoint) : path.resolve('test', 'test-index.js');
+  const specIndex = searchSpecEntryPoint(specEntryPoint);
   const preprocessorObj = {};
   preprocessorObj[specIndex] = ['webpack'];
 
@@ -96,3 +96,14 @@ module.exports = (config, specEntryPoint) => {
     }
   });
 };
+
+function searchSpecEntryPoint(specEntryPoint) {
+  if (specEntryPoint) {
+    return path.resolve(specEntryPoint);
+  }
+  let defaultTypescriptIndex = path.resolve('test', 'test-index.ts');
+  if (fs.existsSync(defaultTypescriptIndex)) {
+    return defaultTypescriptIndex;
+  }
+  return path.resolve('test', 'test-index.js');
+}

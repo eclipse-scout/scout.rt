@@ -16,13 +16,14 @@ export default class DesktopFormController extends FormController implements Des
   declare displayParent: Desktop;
 
   desktop: Desktop;
-  protected _popupWindows: PopupWindow[];
+  popupWindows: PopupWindow[];
+
   protected _documentPopupWindowReadyHandler: (event: JQuery.TriggeredEvent, data: PopupWindowReadyData) => void;
 
   constructor(model: DesktopFormControllerModel) {
     super(model);
     this.desktop = model.displayParent;
-    this._popupWindows = [];
+    this.popupWindows = [];
     this._documentPopupWindowReadyHandler = this._onDocumentPopupWindowReady.bind(this);
 
     // must use a document-event, since when popup-window is reloading it does
@@ -55,7 +56,7 @@ export default class DesktopFormController extends FormController implements Des
 
   override isFormShown(form: Form): boolean {
     if (form.isPopupWindow()) {
-      return this._popupWindows.some(popup => popup.form.id === form.id);
+      return this.popupWindows.some(popup => popup.form.id === form.id);
     }
     return super.isFormShown(form);
   }
@@ -95,7 +96,7 @@ export default class DesktopFormController extends FormController implements Des
     let popupWindow = new PopupWindow(newWindow, form);
     popupWindow.resizeToPrefSize = resizeToPrefSize;
     popupWindow.events.on('popupWindowUnload', this._onPopupWindowUnload.bind(this));
-    this._popupWindows.push(popupWindow);
+    this.popupWindows.push(popupWindow);
     $.log.isDebugEnabled() && $.log.debug('Opened new popup window for form ID ' + form.id);
   }
 
@@ -106,8 +107,8 @@ export default class DesktopFormController extends FormController implements Des
       // reload (existing popup window)
       let formId = data.formId;
       $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + formId + ' has been reloaded');
-      for (let i = 0; i < this._popupWindows.length; i++) {
-        popupWindow = this._popupWindows[i];
+      for (let i = 0; i < this.popupWindows.length; i++) {
+        popupWindow = this.popupWindows[i];
         if (popupWindow.form.id === formId) {
           break;
         }
@@ -122,7 +123,6 @@ export default class DesktopFormController extends FormController implements Des
       // error assertion
       throw new Error('Neither property \'formId\' nor \'popupWindow\' exists on data parameter');
     }
-    // @ts-ignore
     popupWindow._onReady();
   }
 
@@ -154,8 +154,8 @@ export default class DesktopFormController extends FormController implements Des
    * again when the page has been reloaded.
    */
   closePopupWindows() {
-    this._popupWindows.forEach(popupWindow => this._removePopupWindow(popupWindow.form));
-    this._popupWindows = [];
+    this.popupWindows.forEach(popupWindow => this._removePopupWindow(popupWindow.form));
+    this.popupWindows = [];
   }
 
   protected override _removePopupWindow(form: Form) {
@@ -164,7 +164,7 @@ export default class DesktopFormController extends FormController implements Des
       throw new Error('Form has no popupWindow reference');
     }
     delete form.popupWindow;
-    arrays.remove(this._popupWindows, popupWindow);
+    arrays.remove(this.popupWindows, popupWindow);
     if (form.rendered) {
       form.remove();
       popupWindow.close();

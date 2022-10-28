@@ -210,7 +210,7 @@ export default class Tree extends Widget implements TreeModel {
     }
     this.initialTraversing = true;
     this._setCheckable(this.checkable);
-    this._ensureTreeNodes(this.nodes);
+    this.ensureTreeNodes(this.nodes);
     this._initNodes(this.nodes);
     this.initialTraversing = false;
     this.menuBar = scout.create(MenuBar, {
@@ -235,8 +235,7 @@ export default class Tree extends Widget implements TreeModel {
     }
     Tree.visitNodes(this._initTreeNode.bind(this), nodes, parentNode);
     if (typeof this.selectedNodes[0] === 'string') {
-      // @ts-ignore
-      this.selectedNodes = this._nodesByIds(this.selectedNodes as string[]);
+      this.selectedNodes = this.nodesByIds(this.selectedNodes as unknown as string[]);
     }
     this._updateSelectionPath();
     nodes.forEach(node => this.applyFiltersForNode(node));
@@ -246,10 +245,10 @@ export default class Tree extends Widget implements TreeModel {
   /**
    * Iterates through the given array and converts node-models to instances of TreeNode (or a subclass).
    * If the array element is already a TreeNode the function leaves the element untouched. This function also
-   * ensures that the attribute childNodeIndex is set. By default we use the order of the nodes array as index
+   * ensures that the attribute childNodeIndex is set. By default, we use the order of the nodes array as index
    * but only if childNodeIndex is undefined.
    */
-  protected _ensureTreeNodes(nodes: (TreeNode | TreeNodeModel)[]) {
+  ensureTreeNodes(nodes: (TreeNode | TreeNodeModel)[]) {
     let node;
     for (let i = 0; i < nodes.length; i++) {
       node = nodes[i];
@@ -370,7 +369,6 @@ export default class Tree extends Widget implements TreeModel {
     this._removeFromFlatList(node, false); // ensure node is not longer in visible nodes list.
     node.destroy();
 
-    // noinspection JSUnresolvedVariable
     if (this._onNodeDeleted) { // Necessary for subclasses
       this._onNodeDeleted(node);
     }
@@ -494,7 +492,8 @@ export default class Tree extends Widget implements TreeModel {
     }
   }
 
-  protected override _renderScrollTop() {
+  /** @internal */
+  override _renderScrollTop() {
     if (this.rendering) {
       // Not necessary to do it while rendering since it will be done by the layout
       return;
@@ -506,7 +505,8 @@ export default class Tree extends Widget implements TreeModel {
     return this.$data;
   }
 
-  protected _renderViewport() {
+  /** @internal */
+  _renderViewport() {
     if (this.runningAnimations > 0 || this._renderViewportBlocked) {
       // animation pending do not render view port because finishing should rerenderViewport
       return;
@@ -604,7 +604,8 @@ export default class Tree extends Widget implements TreeModel {
     return nodesToInsert.length;
   }
 
-  protected _renderFiller() {
+  /** @internal */
+  _renderFiller() {
     if (!this.$fillBefore) {
       this.$fillBefore = this.$data.prependDiv('tree-data-fill');
     }
@@ -859,7 +860,7 @@ export default class Tree extends Widget implements TreeModel {
    * will cause errors on inserting nodes at the right position. See #262890.
    */
   calculateViewRangeSize(): number {
-    // Make sure row height is up to date (row height may be different after zooming)
+    // Make sure row height is up-to-date (row height may be different after zooming)
     this._updateNodeDimensions();
     if (this.nodeHeight === 0) {
       throw new Error('Cannot calculate view range with nodeHeight = 0');
@@ -1006,11 +1007,9 @@ export default class Tree extends Widget implements TreeModel {
       let $control = $node.children('.tree-node-control');
       let $checkbox = $node.children('.tree-node-checkbox');
 
-      // @ts-ignore
       node._updateControl($control);
       if (this.checkable) {
         if ($checkbox.length === 0) {
-          // @ts-ignore
           node._renderCheckbox();
         }
       } else {
@@ -1368,7 +1367,6 @@ export default class Tree extends Widget implements TreeModel {
       let node = $node.data('node') as TreeNode;
       let paddingLeft = this._computeNodePaddingLeft(node);
       $node.cssPaddingLeft(objects.isNullOrUndefined(paddingLeft) ? '' : paddingLeft);
-      // @ts-ignore
       node._updateControl($node.children('.tree-node-control'));
     });
   }
@@ -1521,7 +1519,7 @@ export default class Tree extends Widget implements TreeModel {
       return;
     }
     if (node.expanded || node.expandedLazy) {
-      this._addChildrenToFlatList(node, null, true, null, true /* required so that double clicking a table-page-row expands the clicked child row */);
+      this._addChildrenToFlatList(node, null, true, null, true /* required so that double-clicking a table-page-row expands the clicked child row */);
     } else {
       this._removeChildrenFromFlatList(node, false);
     }
@@ -1785,7 +1783,7 @@ export default class Tree extends Widget implements TreeModel {
     // find the index of the last child element of our prev. sibling node
     // that's where we want to insert the new node. We go down the flat list
     // starting from the prev. sibling node, until we hit a node that does not
-    // belong to the sub tree of the prev. sibling node.
+    // belong to the subtree of the prev. sibling node.
     let i, checkNode;
     for (i = prevSiblingPos; i < this.visibleNodesFlat.length; i++) {
       checkNode = this.visibleNodesFlat[i];
@@ -1803,10 +1801,10 @@ export default class Tree extends Widget implements TreeModel {
   }
 
   /**
-   * Checks whether the given checkNode belongs to the same sub tree (or is) the given node.
+   * Checks whether the given checkNode belongs to the same subtree (or is) the given node.
    * The function goes up all parentNodes of the checkNode.
    *
-   * @param node which is used to for the sub tree comparison
+   * @param node which is used to for the subtree comparison
    * @param checkNode node which is checked against the given node
    */
   protected _isInSameSubTree(node: TreeNode, checkNode: TreeNode): boolean {
@@ -1826,7 +1824,7 @@ export default class Tree extends Widget implements TreeModel {
    *
    * @param node to check
    */
-  protected _isChildOfSelectedNodes(node: TreeNode): boolean {
+  isChildOfSelectedNodes(node: TreeNode): boolean {
     while (node) {
       if (this.selectedNodes.indexOf(node.parentNode) > -1) {
         return true;
@@ -1875,7 +1873,7 @@ export default class Tree extends Widget implements TreeModel {
 
   checkAndHandleBatchAnimationWrapper(parentNode: TreeNode, animatedRendering: boolean, insertBatch: InsertBatch) {
     if (animatedRendering && this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex() && this.viewRangeRendered.to >= insertBatch.lastBatchInsertIndex() && !insertBatch.$animationWrapper) {
-      // we are in visible area so we need a animation wrapper
+      // we are in visible area, so we need an animation wrapper
       // if parent is in visible area insert after parent else insert before first node.
       let lastNodeIndex = insertBatch.lastBatchInsertIndex() - 1,
         nodeBefore = this.viewRangeRendered.from === insertBatch.lastBatchInsertIndex() ? null : this.visibleNodesFlat[lastNodeIndex];
@@ -2141,7 +2139,8 @@ export default class Tree extends Widget implements TreeModel {
     return padding;
   }
 
-  protected _computeNodeControlPaddingLeft(node: TreeNode): number {
+  /** @internal */
+  _computeNodeControlPaddingLeft(node: TreeNode): number {
     return this.nodeControlPaddingLeft + this._computeNodePaddingLeftForLevel(node);
   }
 
@@ -2234,7 +2233,7 @@ export default class Tree extends Widget implements TreeModel {
     if (treeNodes.length === 0) {
       return;
     }
-    this._ensureTreeNodes(treeNodes);
+    this.ensureTreeNodes(treeNodes);
     if (parentNode && !(parentNode instanceof TreeNode)) {
       throw new Error('parent has to be a tree node: ' + parentNode);
     }
@@ -2316,7 +2315,6 @@ export default class Tree extends Widget implements TreeModel {
         this.applyFiltersForNode(oldNode);
         this._updateItemPath(false, oldNode.parentNode);
         if (this.rendered) {
-          // @ts-ignore
           oldNode._decorate();
         }
       }
@@ -2555,7 +2553,6 @@ export default class Tree extends Widget implements TreeModel {
       });
     }
     if (this.rendered) {
-      // @ts-ignore
       updatedNodes.forEach(node => node._renderChecked());
     }
   }
@@ -2617,7 +2614,8 @@ export default class Tree extends Widget implements TreeModel {
     this.session.onRequestsDone(func.bind(this), event);
   }
 
-  protected _onNodeMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>): boolean {
+  /** @internal */
+  _onNodeMouseDown(event: JQuery.MouseDownEvent<HTMLDivElement>): boolean {
     this._doubleClickSupport.mousedown(event);
     if (this._doubleClickSupport.doubleClicked()) {
       // don't execute on double click events
@@ -2646,7 +2644,8 @@ export default class Tree extends Widget implements TreeModel {
     return true;
   }
 
-  protected _onNodeMouseUp(event: JQuery.MouseUpEvent<HTMLDivElement>): boolean {
+  /** @internal */
+  _onNodeMouseUp(event: JQuery.MouseUpEvent<HTMLDivElement>): boolean {
     if (this._doubleClickSupport.doubleClicked()) {
       // don't execute on double click events
       return false;
@@ -2676,7 +2675,7 @@ export default class Tree extends Widget implements TreeModel {
   protected _updateItemPath(selectionChanged: boolean, ultimate?: TreeNode) {
     let selectedNodes: TreeNode[], node: TreeNode, level: number;
     if (selectionChanged) {
-      // first remove and select selected
+      // first remove and select the selected
       this.groupedNodes = {};
       this._inSelectionPathList = {};
     }
@@ -2727,7 +2726,6 @@ export default class Tree extends Widget implements TreeModel {
     function addToGroup(nodes: TreeNode[]) {
       nodes.forEach(node => {
         this.groupedNodes[node.id] = true;
-        // @ts-ignore
         node._decorate();
         if (node.expanded && node.isFilterAccepted()) {
           addToGroup.call(this, node.childNodes);
@@ -2806,7 +2804,7 @@ export default class Tree extends Widget implements TreeModel {
       return;
     }
     if (opts.textFilterText) {
-      this._nodesByIds(Object.keys(this.nodesMap))
+      this.nodesByIds(Object.keys(this.nodesMap))
         .filter(it => it.filterAccepted)
         .forEach(node => this._expandAllParentNodes(node));
     }
@@ -2950,7 +2948,6 @@ export default class Tree extends Widget implements TreeModel {
       if (!node.rendered) {
         this._renderNode(node);
       }
-      // @ts-ignore
       node._decorate();
       this._insertNodeInDOMAtPlace(node, index);
       if (this.prevSelectedNode === node) {
@@ -3125,15 +3122,15 @@ export default class Tree extends Widget implements TreeModel {
     }
   }
 
-  protected _nodesToIds(nodes: TreeNode[]): string[] {
+  nodesToIds(nodes: TreeNode[]): string[] {
     return nodes.map(node => node.id);
   }
 
-  protected _nodesByIds(ids: string[]): TreeNode[] {
+  nodesByIds(ids: string[]): TreeNode[] {
     return ids.map(id => this.nodesMap[id]);
   }
 
-  protected _nodeById(id: string): TreeNode {
+  nodeById(id: string): TreeNode {
     return this.nodesMap[id];
   }
 
@@ -3141,7 +3138,7 @@ export default class Tree extends Widget implements TreeModel {
    * Checks whether the given node is contained in the tree. Uses the id of the node for the lookup.
    */
   hasNode(node: TreeNode): boolean {
-    return Boolean(this._nodeById(node.id));
+    return Boolean(this.nodeById(node.id));
   }
 
   protected _onNodeDoubleClick(event: JQuery.DoubleClickEvent<HTMLDivElement>) {
@@ -3160,7 +3157,7 @@ export default class Tree extends Widget implements TreeModel {
       node: node
     });
 
-    // For CheckableStyle.CHECKBOX_TREE_NODE expand on double click is only enabled for disabled nodes. Otherwise it would conflict with the "check on node click" behavior.
+    // For CheckableStyle.CHECKBOX_TREE_NODE expand on double click is only enabled for disabled nodes. Otherwise, it would conflict with the "check on node click" behavior.
     if (!(this.checkable === true && this.isTreeNodeCheckEnabled() && node.enabled)) {
       this.setNodeExpanded(node, expanded, {
         lazy: false // always show all nodes on node double click
@@ -3225,7 +3222,6 @@ export default class Tree extends Widget implements TreeModel {
   changeNode(node: TreeNode) {
     this.applyFiltersForNode(node);
     if (this.rendered) {
-      // @ts-ignore
       node._decorate();
       // The padding size of a node depends on whether the node or the parent node has an icon, see _computeNodePaddingLeftForLevel
       // Unfortunately, we cannot easily detect whether the icon has changed or not.

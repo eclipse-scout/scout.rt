@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {Extension, scout, StringField} from '../src/index';
+import {Extension, scout, StringField, StringFieldModel} from '../src/index';
 import {LocaleSpecHelper} from '../src/testing/index';
 
 describe('Extension', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -27,10 +27,10 @@ describe('Extension', () => {
     class MyStringField extends StringField {
     }
 
-    window.scout.MyStringField = MyStringField;
+    window['scout'].MyStringField = MyStringField;
 
     // ---- extension #1 ----
-    class MyExtension1 extends Extension {
+    class MyExtension1 extends Extension<MyStringField> {
       init() {
         let proto = MyStringField.prototype;
         this.extend(proto, '_init');
@@ -49,7 +49,7 @@ describe('Extension', () => {
       }
 
       _renderFoo() {
-        this.extended.$container.appendDiv('foo').text(this.extended.foo);
+        this.extended.$container.appendDiv('foo').text(this.extended['foo']);
       }
 
       _renderInputMasked = function() {
@@ -57,10 +57,10 @@ describe('Extension', () => {
       };
     }
 
-    window.scout.MyExtension1 = MyExtension1;
+    window['scout'].MyExtension1 = MyExtension1;
 
     // ---- extension #2 ----
-    class MyExtension2 extends Extension {
+    class MyExtension2 extends Extension<MyStringField> {
       init() {
         let proto = MyStringField.prototype;
         this.extend(proto, '_init');
@@ -78,11 +78,11 @@ describe('Extension', () => {
       }
 
       _renderBar() {
-        this.extended.$container.appendDiv('bar').text(this.extended.bar);
+        this.extended.$container.appendDiv('bar').text(this.extended['bar']);
       }
     }
 
-    window.scout.MyExtension2 = MyExtension2;
+    window['scout'].MyExtension2 = MyExtension2;
 
     // ---- Spec starts here ----
 
@@ -94,7 +94,7 @@ describe('Extension', () => {
 
     beforeEach(() => {
       let model = createSimpleModel('StringField', session);
-      myStringField = scout.create(MyStringField, model);
+      myStringField = scout.create(MyStringField, model as StringFieldModel);
     });
 
     it('should extend _init method', () => {

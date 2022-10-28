@@ -1,21 +1,23 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {TableRow} from '../../../../src/index';
+import {TableField, TableModel, TableRow} from '../../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
+import {Optional} from '../../../../src/types';
+import SpecTable from '../../../../src/testing/table/SpecTable';
+import {TableModelWithCells} from '../../../../src/testing/table/TableSpecHelper';
 
 describe('TableField', () => {
-  let session;
-  let helper;
-  /** @type {TableSpecHelper} */
-  let tableHelper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
+  let tableHelper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -34,20 +36,20 @@ describe('TableField', () => {
     $.fx.off = false;
   });
 
-  function createTableFieldWithTable() {
+  function createTableFieldWithTable(): TableField {
     let table = createTableModel(2, 2);
     return createTableField({table: table});
   }
 
-  function createTableField(tableModel) {
-    return helper.createField('TableField', session.desktop, tableModel);
+  function createTableField(tableModel?: Optional<TableModel, 'parent'>): TableField {
+    return helper.createField(TableField, session.desktop, tableModel);
   }
 
-  function createTable(colCount, rowCount) {
+  function createTable(colCount: number, rowCount: number): SpecTable {
     return tableHelper.createTable(createTableModel(colCount, rowCount));
   }
 
-  function createTableModel(colCount, rowCount) {
+  function createTableModel(colCount: number, rowCount: number): TableModelWithCells {
     return tableHelper.createModelFixture(colCount, rowCount);
   }
 
@@ -187,7 +189,7 @@ describe('TableField', () => {
       tableField.updateRequiresSave();
       expect(tableField.requiresSave).toBe(false);
       tableField.table.prepareCellEdit(tableField.table.columns[0], tableField.table.rows[0]);
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       tableField.table.cellEditorPopup.cell.field.setValue('my new value');
       tableField.table.completeCellEdit();
       tableField.updateRequiresSave();
@@ -201,7 +203,7 @@ describe('TableField', () => {
       tableField.updateRequiresSave();
       expect(tableField.requiresSave).toBe(false);
       tableField.table.prepareCellEdit(tableField.table.columns[0], tableField.table.rows[0]);
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       tableField.table.completeCellEdit();
       tableField.updateRequiresSave();
       expect(tableField.requiresSave).toBe(false);

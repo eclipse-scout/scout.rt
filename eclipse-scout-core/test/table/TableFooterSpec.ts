@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,8 +13,8 @@ import {TableSpecHelper} from '../../src/testing/index';
 import {triggerMouseDownCapture} from '../../src/testing/jquery-testing';
 
 describe('TableFooterSpec', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -30,7 +30,7 @@ describe('TableFooterSpec', () => {
     jasmine.clock().uninstall();
   });
 
-  function createTableControl() {
+  function createTableControl(): TableControl {
     return scout.create(TableControl, {
       parent: session.desktop
     });
@@ -100,7 +100,7 @@ describe('TableFooterSpec', () => {
       expect(table.footer.animating).toBe(false);
       expect(table.footer.open).toBe(false);
 
-      // Expect that it is still closed after re rendering
+      // Expect that it is still closed after re-rendering
       table.render();
       expect(table.footer.animating).toBe(false);
       expect(table.footer.open).toBe(false);

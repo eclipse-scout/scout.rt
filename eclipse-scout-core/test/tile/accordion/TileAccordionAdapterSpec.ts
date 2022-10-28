@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteTileFilter, scout} from '../../../src/index';
+import {Group, RemoteTileFilter, scout, TileAccordion, TileGrid} from '../../../src/index';
 
 describe('TileAccordionAdapter', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -26,7 +26,7 @@ describe('TileAccordionAdapter', () => {
     jasmine.clock().uninstall();
   });
 
-  function createTileAccordion(model) {
+  function createTileAccordion(model): TileAccordion {
     let defaults = {
       parent: session.desktop,
       session: session,
@@ -43,9 +43,9 @@ describe('TileAccordionAdapter', () => {
       let filter = scout.create(RemoteTileFilter);
       let accordion = createTileAccordion({
         groups: [{
-          objectType: 'Group',
+          objectType: Group,
           body: {
-            objectType: 'TileGrid',
+            objectType: TileGrid,
             filters: [filter]
           }
         }]
@@ -55,7 +55,5 @@ describe('TileAccordionAdapter', () => {
       expect(accordion.groups[0].body.filters.length).toBe(1);
       expect(accordion.groups[0].body.filters[0]).toBe(filter);
     });
-
   });
-
 });

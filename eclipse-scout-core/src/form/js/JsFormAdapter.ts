@@ -43,7 +43,6 @@ export default class JsFormAdapter extends FormAdapter {
     let widget = super._createWidget(model) as Form;
 
     widget.showOnOpen = false;
-    // noinspection JSIgnoredPromiseFromCall
     widget.open();
 
     return widget;

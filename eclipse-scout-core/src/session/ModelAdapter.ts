@@ -91,7 +91,8 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
    * Override this method to do something right after the widget has been created and has been
    * attached to the remote adapter. The default impl. does nothing.
    */
-  protected _postCreateWidget() {
+  /** @internal */
+  _postCreateWidget() {
     // NOP
   }
 
@@ -129,12 +130,12 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
    */
   protected _createWidget(model: SomeRequired<WidgetModel, 'objectType'>): Widget {
     let widget = scout.create(model);
-    // @ts-ignore
     widget._addCloneProperties(['modelClass', 'classId']);
     return widget;
   }
 
-  protected _attachWidget() {
+  /** @internal */
+  _attachWidget() {
     if (this._widgetListener) {
       return;
     }
@@ -304,7 +305,7 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
 
     // TODO [7.0] cgu This does not work if value will be converted into another object (e.g DateRange.ensure(selectionRange) in Planner.js)
     // -> either do the check in this._send() or extract ensure into separate method and move the call of addFilterForProperties.
-    // The advantage of the first one would be simpler filter functions (e.g. this.widget._nodesToIds(this.widget.selectedNodes) in Tree.js)
+    // The advantage of the first one would be simpler filter functions (e.g. this.widget.nodesToIds(this.widget.selectedNodes) in Tree.js)
     if (this._isPropertyChangeEventFiltered(propertyName, value)) {
       return;
     }
@@ -454,7 +455,6 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
    * Static method to modify the prototype of Widget.
    */
   static modifyWidgetPrototype(event: Event) {
-    // @ts-ignore
     if (!App.get().remote) {
       return;
     }

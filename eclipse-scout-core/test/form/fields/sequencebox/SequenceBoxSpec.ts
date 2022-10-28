@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates, FormField, scout, SequenceBox, SequenceBoxGridConfig, Status} from '../../../../src/index';
+import {DateField, dates, FormField, LabelField, Menu, scout, SequenceBox, SequenceBoxGridConfig, SequenceBoxModel, Status, StringField} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '../../../../src/testing/index';
 import {triggerClick} from '../../../../src/testing/jquery-testing';
+import {Optional} from '../../../../src/types';
 
 describe('SequenceBox', () => {
-  let session, helper, menuHelper;
+  let session: SandboxSession, helper: FormSpecHelper, menuHelper: MenuSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -22,13 +23,13 @@ describe('SequenceBox', () => {
     menuHelper = new MenuSpecHelper(session);
   });
 
-  function createField(modelProperties) {
-    let seqBox = helper.createField('SequenceBox', session.desktop, modelProperties);
+  function createField(modelProperties?: Optional<SequenceBoxModel, 'parent'>): SequenceBox {
+    let seqBox = helper.createField(SequenceBox, session.desktop, modelProperties);
     let fields = [
-      helper.createField('StringField', seqBox, {
+      helper.createField(StringField, seqBox, {
         statusVisible: false
       }),
-      helper.createField('DateField', seqBox, {
+      helper.createField(DateField, seqBox, {
         statusVisible: false
       })
     ];
@@ -521,16 +522,18 @@ describe('SequenceBox', () => {
     it('is linked with the fields (also considers fields own label)', () => {
       let field = createField();
       field.setLabel('box label');
-      field.fields[0].setLabel('first label');
-      field.fields[1].setLabel('second label');
-      field.fields[1].setHasTime(true);
+      let stringField = field.fields[0] as StringField;
+      stringField.setLabel('first label');
+      let dateField = field.fields[1] as DateField;
+      dateField.setLabel('second label');
+      dateField.setHasTime(true);
       field.render();
-      expect(field.fields[0].$field.attr('aria-labelledby')).toBeTruthy();
-      expect(field.fields[0].$field.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + field.fields[0].$label.attr('id'));
-      expect(field.fields[1].$dateField.attr('aria-labelledby')).toBeTruthy();
-      expect(field.fields[1].$dateField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + field.fields[1].$label.attr('id'));
-      expect(field.fields[1].$timeField.attr('aria-labelledby')).toBeTruthy();
-      expect(field.fields[1].$timeField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + field.fields[1].$label.attr('id'));
+      expect(stringField.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(stringField.$field.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + stringField.$label.attr('id'));
+      expect(dateField.$dateField.attr('aria-labelledby')).toBeTruthy();
+      expect(dateField.$dateField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + dateField.$label.attr('id'));
+      expect(dateField.$timeField.attr('aria-labelledby')).toBeTruthy();
+      expect(dateField.$timeField.attr('aria-labelledby')).toBe(field.$label.attr('id') + ' ' + dateField.$label.attr('id'));
     });
 
     it('focuses the first visible field when clicked', () => {
@@ -542,7 +545,8 @@ describe('SequenceBox', () => {
 
       field.fields[0].setVisible(false);
       triggerClick(field.$label);
-      expect(field.fields[1].$dateField).toBeFocused();
+      let dateField = field.fields[1] as DateField;
+      expect(dateField.$dateField).toBeFocused();
     });
 
   });
@@ -555,14 +559,14 @@ describe('SequenceBox', () => {
         id: 'seq01',
         label: 'abc',
         fields: [{
-          objectType: 'StringField',
+          objectType: StringField,
           labelVisible: false
         }, {
-          objectType: 'DateField',
+          objectType: DateField,
           label: 'a date field'
         }],
         menus: [{
-          objectType: 'Menu'
+          objectType: Menu
         }]
       });
       let clone = seqBox.clone({
@@ -589,9 +593,9 @@ describe('SequenceBox', () => {
       let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'StringField'
+          objectType: StringField
         }, {
-          objectType: 'StringField'
+          objectType: StringField
         }]
       });
       box.render();
@@ -605,10 +609,10 @@ describe('SequenceBox', () => {
       let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'StringField',
+          objectType: StringField,
           enabled: false
         }, {
-          objectType: 'StringField',
+          objectType: StringField,
           enabled: true
         }]
       });
@@ -623,9 +627,9 @@ describe('SequenceBox', () => {
       let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'LabelField'
+          objectType: LabelField
         }, {
-          objectType: 'StringField'
+          objectType: StringField
         }]
       });
       box.render();
@@ -641,121 +645,134 @@ describe('SequenceBox', () => {
       let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'DateField'
+          objectType: DateField
         }, {
-          objectType: 'DateField'
+          objectType: DateField
         }]
       });
       box.render();
-      expect(box.fields[0].autoDate).toBe(null);
-      expect(box.fields[1].autoDate).toBe(null);
+      let firstField = box.fields[0] as DateField;
+      expect(firstField.autoDate).toBe(null);
+      let secondField = box.fields[1] as DateField;
+      expect(secondField.autoDate).toBe(null);
 
       let date = dates.create('2017-05-23 12:30:00.000');
 
-      box.fields[0].setValue(date);
+      firstField.setValue(date);
 
-      expect(box.fields[0].value.toISOString()).toBe(date.toISOString());
-      expect(box.fields[0].autoDate).toBe(null);
-      expect(box.fields[1].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
+      expect(firstField.value.toISOString()).toBe(date.toISOString());
+      expect(firstField.autoDate).toBe(null);
+      expect(secondField.autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
     });
 
     it('is set only on following fields in the sequence box', () => {
       let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'DateField'
+          objectType: DateField
         }, {
-          objectType: 'DateField'
+          objectType: DateField
         }, {
-          objectType: 'DateField'
+          objectType: DateField
         }, {
-          objectType: 'DateField'
+          objectType: DateField
         }]
       });
       box.render();
-      expect(box.fields[0].autoDate).toBe(null);
-      expect(box.fields[1].autoDate).toBe(null);
-      expect(box.fields[2].autoDate).toBe(null);
-      expect(box.fields[3].autoDate).toBe(null);
+      let firstField = box.fields[0] as DateField;
+      let secondField = box.fields[1] as DateField;
+      let thirdField = box.fields[2] as DateField;
+      let fourthField = box.fields[3] as DateField;
+
+      expect(firstField.autoDate).toBe(null);
+      expect(secondField.autoDate).toBe(null);
+      expect(thirdField.autoDate).toBe(null);
+      expect(fourthField.autoDate).toBe(null);
 
       let date = dates.create('2017-05-23 12:30:00.000');
 
-      box.fields[1].setValue(date);
+      secondField.setValue(date);
 
-      expect(box.fields[0].autoDate).toBe(null);
-      expect(box.fields[1].autoDate).toBe(null);
-      expect(box.fields[1].value.toISOString()).toBe(date.toISOString());
-      expect(box.fields[2].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
-      expect(box.fields[3].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
+      expect(firstField.autoDate).toBe(null);
+      expect(secondField.autoDate).toBe(null);
+      expect(secondField.value.toISOString()).toBe(date.toISOString());
+      expect(thirdField.autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
+      expect(fourthField.autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
 
       let date2 = dates.create('2017-05-26 12:30:00.000');
-      box.fields[2].setValue(date2);
+      thirdField.setValue(date2);
 
-      expect(box.fields[2].value.toISOString()).toBe(date2.toISOString());
-      expect(box.fields[3].autoDate.toISOString()).toBe(dates.shift(date2, 0, 0, 1).toISOString());
+      expect(thirdField.value.toISOString()).toBe(date2.toISOString());
+      expect(fourthField.autoDate.toISOString()).toBe(dates.shift(date2, 0, 0, 1).toISOString());
     });
 
     it('is correctly removed again after a date field value is removed', () => {
       let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'DateField'
+          objectType: DateField
         }, {
-          objectType: 'DateField'
+          objectType: DateField
         }, {
-          objectType: 'DateField'
+          objectType: DateField
         }, {
-          objectType: 'DateField'
+          objectType: DateField
         }]
       });
       box.render();
-      expect(box.fields[0].autoDate).toBe(null);
-      expect(box.fields[1].autoDate).toBe(null);
-      expect(box.fields[2].autoDate).toBe(null);
-      expect(box.fields[3].autoDate).toBe(null);
+      let firstField = box.fields[0] as DateField;
+      let secondField = box.fields[1] as DateField;
+      let thirdField = box.fields[2] as DateField;
+      let fourthField = box.fields[3] as DateField;
+      expect(firstField.autoDate).toBe(null);
+      expect(secondField.autoDate).toBe(null);
+      expect(thirdField.autoDate).toBe(null);
+      expect(fourthField.autoDate).toBe(null);
 
       let date = dates.create('2017-05-23 12:30:00.000');
       let date2 = dates.create('2017-05-26 12:30:00.000');
 
-      box.fields[0].setValue(date);
-      box.fields[2].setValue(date2);
+      firstField.setValue(date);
+      thirdField.setValue(date2);
 
-      expect(box.fields[0].value.toISOString()).toBe(date.toISOString());
-      expect(box.fields[1].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
-      expect(box.fields[2].value.toISOString()).toBe(date2.toISOString());
-      expect(box.fields[3].autoDate.toISOString()).toBe(dates.shift(date2, 0, 0, 1).toISOString());
+      expect(firstField.value.toISOString()).toBe(date.toISOString());
+      expect(secondField.autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
+      expect(thirdField.value.toISOString()).toBe(date2.toISOString());
+      expect(fourthField.autoDate.toISOString()).toBe(dates.shift(date2, 0, 0, 1).toISOString());
 
-      box.fields[0].setValue(null);
-      expect(box.fields[0].value).toBe(null);
-      expect(box.fields[1].autoDate).toBe(null);
-      expect(box.fields[2].autoDate).toBe(null);
+      firstField.setValue(null);
+      expect(firstField.value).toBe(null);
+      expect(secondField.autoDate).toBe(null);
+      expect(thirdField.autoDate).toBe(null);
       // field3.autoDate shouldn't be touched by field0's value change
-      expect(box.fields[3].autoDate.toISOString()).toBe(dates.shift(date2, 0, 0, 1).toISOString());
+      expect(fourthField.autoDate.toISOString()).toBe(dates.shift(date2, 0, 0, 1).toISOString());
     });
 
     it('is correctly set within sequence boxes containing other fields as well', () => {
       let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'DateField'
+          objectType: DateField
         }, {
-          objectType: 'StringField'
+          objectType: StringField
         }, {
-          objectType: 'DateField'
+          objectType: DateField
         }, {
-          objectType: 'StringField'
+          objectType: StringField
         }]
       });
       box.render();
-      expect(box.fields[0].autoDate).toBe(null);
-      expect(box.fields[2].autoDate).toBe(null);
+      let firstField = box.fields[0] as DateField;
+      let thirdField = box.fields[2] as DateField;
+      expect(firstField.autoDate).toBe(null);
+      expect(thirdField.autoDate).toBe(null);
 
       let date = dates.create('2017-05-23 12:30:00.000');
 
-      box.fields[0].setValue(date);
+      firstField.setValue(date);
 
-      expect(box.fields[0].value.toISOString()).toBe(date.toISOString());
-      expect(box.fields[2].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
+      expect(firstField.value.toISOString()).toBe(date.toISOString());
+      expect(thirdField.autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
     });
 
     it('works correctly with values already set on the datefield model', () => {
@@ -763,15 +780,17 @@ describe('SequenceBox', () => {
       let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'DateField',
+          objectType: DateField,
           value: date
         }, {
-          objectType: 'DateField'
+          objectType: DateField
         }]
       });
       box.render();
-      expect(box.fields[0].autoDate).toBe(null);
-      expect(box.fields[1].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
+      let firstField = box.fields[0] as DateField;
+      let secondField = box.fields[1] as DateField;
+      expect(firstField.autoDate).toBe(null);
+      expect(secondField.autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
     });
 
     it('dont conflict with already set/programmed autoDates', () => {
@@ -780,17 +799,19 @@ describe('SequenceBox', () => {
       let box = scout.create(SequenceBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'DateField',
+          objectType: DateField,
           autoDate: date
         }, {
-          objectType: 'DateField',
+          objectType: DateField,
           autoDate: date
         }]
       });
       box.render();
-      box.fields[0].setValue(date2);
-      expect(box.fields[0].autoDate.toISOString()).toBe(date.toISOString());
-      expect(box.fields[1].autoDate.toISOString()).toBe(date.toISOString());
+      let firstField = box.fields[0] as DateField;
+      let secondField = box.fields[1] as DateField;
+      firstField.setValue(date2);
+      expect(firstField.autoDate.toISOString()).toBe(date.toISOString());
+      expect(secondField.autoDate.toISOString()).toBe(date.toISOString());
     });
   });
 
@@ -798,14 +819,14 @@ describe('SequenceBox', () => {
     it('are replaced by the menus of the last field', () => {
       let field = createField({
         menus: [{
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'seq menu'
         }]
       });
       field.render();
       expect(field.fieldStatus.menus).toEqual(field.menus);
 
-      field.fields[1].insertMenu({objectType: 'Menu', text: 'field menu'});
+      field.fields[1].insertMenu({objectType: Menu, text: 'field menu'});
       expect(field.fieldStatus.menus).toEqual(field.fields[1].menus);
       field.fieldStatus.showContextMenu();
       expect(field.fieldStatus.contextMenu.$visibleMenuItems().eq(0).text()).toBe('field menu');
@@ -821,13 +842,13 @@ describe('SequenceBox', () => {
     it('adds all menus to sequence-box even if they are invisible', () => {
       let field = createField({
         menus: [{
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'seq menu'
         }]
       });
       field.fields[1].insertMenus([
-        {objectType: 'Menu', text: 'visible menu'},
-        {objectType: 'Menu', text: 'invisible menu', visible: false}]);
+        {objectType: Menu, text: 'visible menu'},
+        {objectType: Menu, text: 'invisible menu', visible: false}]);
       field.render();
 
       // ensure both menus are added to field

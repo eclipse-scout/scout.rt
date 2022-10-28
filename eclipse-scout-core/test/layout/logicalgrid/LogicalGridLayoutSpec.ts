@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {AbstractLayout, Dimension, GridData, HtmlComponent, LogicalGridData, LogicalGridLayout, Widget} from '../../../src/index';
+import {AbstractLayout, Dimension, GridData, HtmlComponent, HtmlCompPrefSizeOptions, LogicalGridData, LogicalGridLayout, Widget, WidgetModel} from '../../../src/index';
 
 describe('LogicalGridLayout', () => {
-  let session;
+  let session: SandboxSession;
   let containerPadding = 5;
   let childMargin = 2;
   let rowHeight = 20;
@@ -26,18 +26,20 @@ describe('LogicalGridLayout', () => {
   });
 
   class StaticLayout extends AbstractLayout {
+    prefSize: Dimension;
+
     constructor() {
       super();
       this.prefSize = new Dimension();
     }
 
-    preferredLayoutSize($container, options) {
+    override preferredLayoutSize($container: JQuery, options?: HtmlCompPrefSizeOptions): Dimension {
       return this.prefSize;
     }
   }
 
   class LglContainer extends Widget {
-    _render() {
+    protected override _render() {
       this.$container = this.$parent.appendDiv();
       this.$container.css({
         padding: containerPadding
@@ -53,22 +55,26 @@ describe('LogicalGridLayout', () => {
   }
 
   class LglChild extends Widget {
+    gridData: GridData;
+    declare htmlComp: HtmlComponent & { layout?: StaticLayout };
+
     constructor() {
       super();
       this.gridData = new GridData();
     }
 
-    _render() {
+    protected override _render() {
       this.$container = this.$parent.appendDiv();
       this.$container.css({
         margin: childMargin
       });
+      // @ts-ignore
       this.htmlComp = HtmlComponent.install(this.$container, this.session);
       this.htmlComp.setLayout(new StaticLayout());
     }
   }
 
-  function createLglChild(model) {
+  function createLglChild(model: WidgetModel): LglChild {
     let defaults = {
       parent: session.desktop
     };
@@ -188,7 +194,7 @@ describe('LogicalGridLayout', () => {
         return this.prefSize;
       };
 
-      let prefSize = lglContainer.htmlComp.prefSize({
+      lglContainer.htmlComp.prefSize({
         widthHint: 100
       });
       expect(widthHint).toBe(Math.ceil((100 - containerPadding * 2 - hgap) / 2) - childMargin * 2);
@@ -224,7 +230,7 @@ describe('LogicalGridLayout', () => {
         return this.prefSize;
       };
 
-      let prefSize = lglContainer.htmlComp.prefSize({
+      lglContainer.htmlComp.prefSize({
         widthHint: 400
       });
       // First column has weightX = 0 -> should be as width as the configured columnWidth
@@ -331,7 +337,7 @@ describe('LogicalGridLayout', () => {
         return this.prefSize;
       };
 
-      let prefSize = lglContainer.htmlComp.prefSize({
+      lglContainer.htmlComp.prefSize({
         widthHint: 400
       });
       expect(widthHint).toBe(120);

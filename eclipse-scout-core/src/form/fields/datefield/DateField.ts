@@ -20,7 +20,7 @@ import {StatusType} from '../../../status/Status';
 import {CellEditorRenderedOptions, ValueFieldWithCellEditorRenderedCallback} from '../../../table/editor/CellEditorPopup';
 import {AddCellEditorFieldCssClassesOptions} from '../FormField';
 
-export default class DateField extends ValueField<Date> implements DateFieldModel, ValueFieldWithCellEditorRenderedCallback<Date> {
+export default class DateField extends ValueField<Date, Date | string> implements DateFieldModel, ValueFieldWithCellEditorRenderedCallback<Date, Date | string> {
   declare model: DateFieldModel;
   declare eventMap: DateFieldEventMap;
 
@@ -52,8 +52,12 @@ export default class DateField extends ValueField<Date> implements DateFieldMode
   $dateClearIcon: JQuery;
   $timeClearIcon: JQuery;
 
-  protected _$predictDateField: JQuery;
-  protected _$predictTimeField: JQuery;
+  /** @internal */
+  _$predictDateField: JQuery;
+
+  /** @internal */
+  _$predictTimeField: JQuery;
+
   /**
    * This is the storage for the time (as date) while the focus in the field (e.g. when pressing up/down). In date fields, the date picker is used for that purposes.
    */
@@ -499,7 +503,8 @@ export default class DateField extends ValueField<Date> implements DateFieldMode
     this._setProperty('allowedDates', truncDates);
   }
 
-  protected override _renderErrorStatus() {
+  /** @internal */
+  override _renderErrorStatus() {
     super._renderErrorStatus();
     let hasStatus = !!this.errorStatus,
       statusClass = this._errorStatusClass();
@@ -986,7 +991,7 @@ export default class DateField extends ValueField<Date> implements DateFieldMode
       }
     }
     if (inputChanged) {
-      this._triggerAcceptInput();
+      this._triggerAcceptInput(whileTyping);
     }
   }
 
@@ -1197,7 +1202,7 @@ export default class DateField extends ValueField<Date> implements DateFieldMode
     this._setDateValid(true);
     this._setTimeValid(true);
     this.setValue(newValue);
-    this._triggerAcceptInput();
+    this._triggerAcceptInput(false);
     this.closePopup();
   }
 
@@ -1619,10 +1624,8 @@ export default class DateField extends ValueField<Date> implements DateFieldMode
   protected override _createInvalidValueStatus(statusType: StatusType, value: any, error: any): Status {
     let errorStatus = super._createInvalidValueStatus(statusType, value, error);
     // Set date and time to invalid, otherwise isDateValid and isTimeValid return false even though there is a validation error
-    // @ts-ignore
-    errorStatus.invalidDate = true;
-    // @ts-ignore
-    errorStatus.invalidTime = true;
+    errorStatus['invalidDate'] = true;
+    errorStatus['invalidTime'] = true;
     errorStatus.code = DateField.ErrorCode.PARSE_ERROR;
     return errorStatus;
   }
@@ -1825,11 +1828,13 @@ export default class DateField extends ValueField<Date> implements DateFieldMode
     this._renderDisabledStyleInternal(this.$timeField);
   }
 
-  protected override _triggerAcceptInput() {
+  /** @internal */
+  override _triggerAcceptInput(whileTyping?: boolean) {
     let event = {
       displayText: this.displayText,
       errorStatus: this.errorStatus,
-      value: this.value
+      value: this.value,
+      whileTyping: !!whileTyping
     };
     this.trigger('acceptInput', event);
   }

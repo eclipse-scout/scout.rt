@@ -139,7 +139,6 @@ export default class ColumnOptimalWidthMeasurer {
   }
 
   protected _appendAggregateRows() {
-    // @ts-ignore
     this.table._aggregateRows.forEach(this._appendAggregateRow.bind(this));
   }
 
@@ -157,7 +156,6 @@ export default class ColumnOptimalWidthMeasurer {
   protected _build$CellForAggregateRow(row: AggregateTableRow): JQuery {
     let columns = this.table.visibleColumns();
     let colIndex = columns.indexOf(this.column);
-    // @ts-ignore
     let $row = this.table._build$AggregateRow(row);
 
     $row.appendTo(this.table.$data);
@@ -184,7 +182,6 @@ export default class ColumnOptimalWidthMeasurer {
     if (!$cell || !$cell.length || $cell.hasClass('empty')) {
       return 0;
     }
-    // @ts-ignore
     let cellRange = this.table._getAggrCellRange($cell);
     if (cellRange.length < 2) {
       return 0;
@@ -238,8 +235,7 @@ export default class ColumnOptimalWidthMeasurer {
     }
 
     this.completeImageCount++;
-    // @ts-ignore
-    $.log.isTraceEnabled() && $.log.trace('Images complete (async) ' + this.completeImageCount + '/' + this.imageCount, event.target.src);
+    $.log.isTraceEnabled() && $.log.trace('Images complete (async) ' + this.completeImageCount + '/' + this.imageCount, event.target['src']);
     if (this.completeImageCount >= this.imageCount) {
       let optimalWidth = this._measure();
       $.log.isDebugEnabled() && $.log.debug('Optimal width measuring done (async) for column ' + this.column.id + ': ' + optimalWidth);

@@ -1,28 +1,46 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LookupRow, ProposalField, scout, Status} from '../../../../src/index';
+import {SmartFieldLookupResult} from '../../../../src/form/fields/smartfield/SmartField';
+import {QueryBy} from '../../../../src';
 
 describe('ProposalField', () => {
 
-  let session, field, lookupRow;
+  let session: SandboxSession, field: SpecProposalField, lookupRow: LookupRow<string>;
+
+  class SpecProposalField extends ProposalField {
+    declare _userWasTyping: boolean;
+
+    override _lookupByTextOrAllDone(result: SmartFieldLookupResult<string>) {
+      super._lookupByTextOrAllDone(result);
+    }
+
+    override _getLastSearchText(): string {
+      return super._getLastSearchText();
+    }
+
+    override _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<string>): JQuery.Promise<void> | void {
+      return super._acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
+    }
+  }
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
-    field = scout.create(ProposalField, {
+    field = scout.create(SpecProposalField, {
       parent: session.desktop,
       lookupCall: 'DummyLookupCall'
     });
-    lookupRow = scout.create(LookupRow, {
-      key: 123,
+    lookupRow = scout.create((LookupRow<string>), {
+      key: '123',
       text: 'Foo'
     });
     jasmine.clock().install();
@@ -84,10 +102,10 @@ describe('ProposalField', () => {
     });
 
     it('setLookupRow should set value too', () => {
-      let lookupRow = {
-        key: 123,
+      let lookupRow = scout.create((LookupRow<string>), {
+        key: '123',
         text: 'Foo'
-      };
+      });
       field.setLookupRow(lookupRow);
       expect(field.value).toBe('Foo');
       expect(field.lookupRow).toBe(lookupRow);
@@ -100,6 +118,7 @@ describe('ProposalField', () => {
     it('should set error status when result has an exception', () => {
       field._lookupByTextOrAllDone({
         lookupRows: [],
+        queryBy: QueryBy.ALL,
         exception: 'proposal lookup failed'
       });
       expect(field.errorStatus.severity).toBe(Status.Severity.ERROR);
@@ -140,7 +159,7 @@ describe('ProposalField', () => {
     field.$field.focus();
     field.$field.val('Foo');
     field._userWasTyping = true;
-    field.aboutToBlurByMouseDown();
+    field.aboutToBlurByMouseDown(undefined);
     jasmine.clock().tick(300);
     expect(field.displayText).toBe('Foo');
     expect(field.$field.val()).toBe('Foo');
@@ -155,6 +174,6 @@ describe('ProposalField', () => {
     field.setErrorStatus(Status.error('functional'));
     expect(field.errorStatus.containsStatus(Status)).toBe(true);
     field._acceptInput(false, 'Bar', false, true, null);
-    expect(field.getErrorStatus).toBeUndefined();
+    expect(field['getErrorStatus']).toBeUndefined();
   });
 });

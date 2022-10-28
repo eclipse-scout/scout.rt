@@ -1,25 +1,26 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicField, FormField, graphics, HtmlComponent, HtmlEnvironment} from '../../../src/index';
+import {BasicField, Dimension, FormField, graphics, HtmlComponent, HtmlEnvironment, Insets} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
+import {PrefSizeOptions} from '../../../src/layout/graphics';
 
 describe('FormFieldLayout', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
   // Sizes are with margin, static widths and heights are without margin
-  let formField, rowHeight, mandatoryWidth, statusWidth, labelWidth, labelHeight;
-  let mandatorySize, mandatoryMargins, labelSize, labelMargins, fieldSize, fieldMargins, statusSize, statusMargins;
+  let formField: CustomFormField, rowHeight: number, mandatoryWidth: number, statusWidth: number, labelWidth: number, labelHeight: number;
+  let mandatorySize: Dimension, mandatoryMargins: Insets, labelSize: Dimension, labelMargins: Insets, fieldSize: Dimension, fieldMargins: Insets, statusSize: Dimension, statusMargins: Insets;
   let origPrefSize;
 
-  class CustomFormField extends BasicField {
+  class CustomFormField extends BasicField<any> {
     _render() {
       this.addContainer(this.$parent, 'form-field');
       this.addLabel();
@@ -98,7 +99,7 @@ describe('FormFieldLayout', () => {
       unspyForWidthHint();
     }
     origPrefSize = graphics.prefSize;
-    graphics.prefSize = ($elem, options) => {
+    graphics.prefSize = ($elem: JQuery, options: PrefSizeOptions) => {
       if ($elem[0] === formField.$fieldContainer[0]) {
         func(options.widthHint, options.heightHint);
       }

@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {TableSpecHelper} from '../../../src/testing/index';
-import {arrays, Cell, LookupCall, objects, scout} from '../../../src';
+import {arrays, Cell, LookupCall, objects, scout, SmartColumn} from '../../../src';
 
 describe('SmartColumn', () => {
-  let session, helper;
+  let session: SandboxSession, helper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -28,12 +28,12 @@ describe('SmartColumn', () => {
   it('rows with object key can be resolved', () => {
     const table = helper.createTable({
       columns: [{
-        objectType: 'SmartColumn'
+        objectType: SmartColumn
       }]
     });
 
     const lookupCall = scout.create(LookupCall, {session: session, batch: true});
-    table.columns[0].setLookupCall(lookupCall);
+    (table.columns[0] as SmartColumn<any>).setLookupCall(lookupCall);
 
     const key1 = {a: 1, b: 1};
     const key2 = {a: 1, b: 2};
@@ -45,7 +45,7 @@ describe('SmartColumn', () => {
     valueMap[objects.ensureValidKey(key3)] = 'Value 3';
     spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
     spyOn(lookupCall, 'textByKey').and.callFake(key => {
-      return $.resolvedPromise(valueMap[key]);
+      return $.resolvedPromise(valueMap[objects.ensureValidKey(key)]);
     });
 
     // insert 6 rows
@@ -84,7 +84,7 @@ describe('SmartColumn', () => {
   it('isContentValid', () => {
     let table = helper.createTable({
       columns: [{
-        objectType: 'SmartColumn',
+        objectType: SmartColumn,
         mandatory: true
       }]
     });
@@ -105,13 +105,12 @@ describe('SmartColumn', () => {
   });
 
   /**
-   * Makes sure no lookup call is executed (this would throw an error, because no lookup call
-   * is configured for the column / smart-field.
+   * Makes sure no lookup call is executed (this would throw an error, because no lookup call is configured for the column / smart-field).
    */
   it('must NOT execute a lookup by key when the editor is initialized', () => {
     let table = helper.createTable({
       columns: [{
-        objectType: 'SmartColumn',
+        objectType: SmartColumn,
         mandatory: true
       }]
     });
@@ -130,7 +129,7 @@ describe('SmartColumn', () => {
     });
     table.render();
     table.focusCell(column, row);
-    jasmine.clock().tick();
+    jasmine.clock().tick(0);
     expect(field.displayText).toEqual('Foo');
     expect(field.value).toEqual(7);
   });
@@ -138,16 +137,16 @@ describe('SmartColumn', () => {
   it('must use batch lookup calls when enabled', () => {
     const table = helper.createTable({
       columns: [{
-        objectType: 'SmartColumn'
+        objectType: SmartColumn
       }]
     });
 
     const lookupCall = scout.create(LookupCall, {session: session, batch: true});
-    table.columns[0].setLookupCall(lookupCall);
+    (table.columns[0] as SmartColumn<any>).setLookupCall(lookupCall);
 
     const valueMap = {key1: 'Value 1', key2: 'Value 2', key3: 'Value 3'};
     spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
-    spyOn(lookupCall, 'textByKey').and.callFake(key => $.resolvedPromise(valueMap[key]));
+    spyOn(lookupCall, 'textByKey').and.callFake(key => $.resolvedPromise(valueMap[objects.ensureValidKey(key)]));
 
     // insert 6 rows
     table.insertRows(Object.keys(valueMap).concat(Object.keys(valueMap)).map(getRow));
@@ -190,11 +189,11 @@ describe('SmartColumn', () => {
   it('prepareLookupCall event contains a property row', () => {
     let table = helper.createTable({
       columns: [{
-        objectType: 'SmartColumn',
+        objectType: SmartColumn,
         mandatory: true
       }]
     });
-    let column = table.columns[0];
+    let column = table.columns[0] as SmartColumn<any>;
 
     let lookupCall = scout.create(LookupCall, {session: session, batch: true});
     column.setLookupCall(lookupCall);
@@ -235,25 +234,26 @@ describe('SmartColumn', () => {
   it('must trigger a prepareLookupCall event.', () => {
     let table = helper.createTable({
       columns: [{
-        objectType: 'SmartColumn'
+        objectType: SmartColumn
       }]
     });
 
     let lookupCall = scout.create(LookupCall, {session: session, batch: true});
-    table.columns[0].setLookupCall(lookupCall);
+    let column1 = table.columns[0] as SmartColumn<any>;
+    column1.setLookupCall(lookupCall);
 
     let counter = 0;
     let rowAvailable;
-    table.columns[0].on('prepareLookupCall', event => {
+    column1.on('prepareLookupCall', event => {
       counter++;
       expect(event.type).toBe('prepareLookupCall');
-      expect(event.source).toBe(table.columns[0]);
+      expect(event.source).toBe(column1);
       rowAvailable = event.row;
     });
 
     let valueMap = {key1: 'Value 1', key2: 'Value 2', key3: 'Value 3'};
     spyOn(lookupCall, 'textsByKeys').and.returnValue($.resolvedPromise(valueMap));
-    spyOn(lookupCall, 'textByKey').and.callFake(key => $.resolvedPromise(valueMap[key]));
+    spyOn(lookupCall, 'textByKey').and.callFake(key => $.resolvedPromise(valueMap[objects.ensureValidKey(key)]));
 
     let getRow = key => ({cells: [key]});
 

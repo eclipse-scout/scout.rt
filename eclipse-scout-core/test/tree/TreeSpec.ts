@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,10 +13,8 @@ import {TreeSpecHelper} from '../../src/testing/index';
 import {triggerClick, triggerDoubleClick, triggerMouseDown} from '../../src/testing/jquery-testing';
 
 describe('Tree', () => {
-  let session;
-
-  /** @type TreeSpecHelper */
-  let helper;
+  let session: SandboxSession;
+  let helper: TreeSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -900,7 +898,7 @@ describe('Tree', () => {
       tree.checkable = true;
 
       let node;
-      // find node with more then one child level
+      // find node with more than one child level
       for (let i = 0; i < tree.nodes.length; i++) {
         if (tree.nodes[i].childNodes && tree.nodes[i].childNodes.length > 0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length > 0) {
           node = tree.nodes[i].childNodes[0].childNodes[0];
@@ -924,7 +922,7 @@ describe('Tree', () => {
       tree.render();
       tree.checkable = true;
       let node, nodeToCheck;
-      // find node with more then one child level
+      // find node with more than one child level
       for (let i = 0; i < tree.nodes.length; i++) {
         if (tree.nodes[i].childNodes && tree.nodes[i].childNodes.length > 0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length > 0) {
           node = tree.nodes[i].childNodes[0].childNodes[0];
@@ -963,7 +961,7 @@ describe('Tree', () => {
       tree.render();
       tree.checkable = true;
       let nodeOne, nodeTwo;
-      // find node with more then one child level
+      // find node with more than one child level
       for (let i = 0; i < tree.nodes.length; i++) {
         if (tree.nodes[i].childNodes && tree.nodes[i].childNodes.length > 0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length > 1) {
           nodeOne = tree.nodes[i].childNodes[0].childNodes[0];
@@ -2381,7 +2379,7 @@ describe('Tree', () => {
         enabled: false
       })));
 
-      // as node_2_0_0 and node_2_1_0 are now disabled, they and their parents node_2_0 and node_2_1 are no longer visible
+      // as node_2_0_0 and node_2_1_0 are now disabled, they and their parent node_2_0 and node_2_1 are no longer visible
       expectExactlyNodesToBeVisible([
         // nodes matching the filter
         node_0, node_0_0, node_0_0_0, node_0_1_0, node_0_2_0, node_1_0, node_1_0_0, node_1_1_0, node_1_2_0, node_2_2_0,
@@ -2600,9 +2598,9 @@ describe('Tree', () => {
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
 
         let newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0', 0);
-        let treeNodeC3 = tree._nodeById(newNode0Child3.id);
+        let treeNodeC3 = tree.nodeById(newNode0Child3.id);
         tree.insertNodes([newNode0Child3Child0], treeNodeC3);
-        let treeNodeC3C0 = tree._nodeById(newNode0Child3Child0.id);
+        let treeNodeC3C0 = tree.nodeById(newNode0Child3Child0.id);
 
         expect(tree.visibleNodesFlat.indexOf(treeNodeC3) > -1).toBeTruthy();
         expect(tree.visibleNodesMap[treeNodeC3.id]).toBeTruthy();
@@ -2674,7 +2672,7 @@ describe('Tree', () => {
         });
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
 
-        let treeNode0C3 = tree._nodeById(newNode0Child3.id);
+        let treeNode0C3 = tree.nodeById(newNode0Child3.id);
         tree.visitNodes(node => {
           if (node === treeNode0C3) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
@@ -2711,7 +2709,7 @@ describe('Tree', () => {
         newNode0Child3.expanded = true;
         tree.insertNodes([newNode0Child3], tree.nodes[0]);
         let newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0', 0);
-        tree.insertNodes([newNode0Child3Child0], tree._nodeById(newNode0Child3.id));
+        tree.insertNodes([newNode0Child3Child0], tree.nodeById(newNode0Child3.id));
         expect(tree.visibleNodesFlat.indexOf(newNode0Child3) > -1).toBeFalsy();
         expect(tree.visibleNodesMap[newNode0Child3.id]).toBeFalsy();
         expect(tree.visibleNodesFlat.indexOf(newNode0Child3Child0) > -1).toBeFalsy();

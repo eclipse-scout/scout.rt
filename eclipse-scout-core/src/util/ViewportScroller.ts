@@ -114,7 +114,6 @@ export default class ViewportScroller implements ViewportScrollerModel {
     // dx/dy = distance (positive or negative) in pixel
     let dx = 0;
     let dy = 0;
-    // noinspection DuplicatedCode
     if (mouse.x < scrollAreaLeft) {
       dx = -(scrollAreaLeft - mouse.x);
       speedFactorX = (mouse.x > f2 ? SLOW : (mouse.x > f ? MEDIUM : FAST));
@@ -122,7 +121,6 @@ export default class ViewportScroller implements ViewportScrollerModel {
       dx = (mouse.x - scrollAreaRight);
       speedFactorX = (mouse.x > this.viewportWidth - f ? FAST : (mouse.x > this.viewportWidth - f2 ? MEDIUM : SLOW));
     }
-    // noinspection DuplicatedCode
     if (mouse.y < scrollAreaTop) {
       dy = -(scrollAreaTop - mouse.y);
       speedFactorY = (mouse.y > f2 ? SLOW : (mouse.y > f ? MEDIUM : FAST));

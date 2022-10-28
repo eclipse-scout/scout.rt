@@ -10,10 +10,11 @@
  */
 import {ObjectType} from '../ObjectFactory';
 import {Code} from '../index';
+import {RefModel} from '../types';
 
 export default interface CodeModel<TCodeId> {
 
-  objectType: ObjectType<Code<TCodeId>, CodeModel<TCodeId>>;
+  objectType?: ObjectType<Code<TCodeId>, CodeModel<TCodeId>>;
   id: TCodeId;
   active?: boolean;
   sortCode?: number;
@@ -22,5 +23,5 @@ export default interface CodeModel<TCodeId> {
   text?: string;
   texts?: Record<string, string>;
 
-  children?: CodeModel<TCodeId>[];
+  children?: RefModel<CodeModel<TCodeId>>[];
 }

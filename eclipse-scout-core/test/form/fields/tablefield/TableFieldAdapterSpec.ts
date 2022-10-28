@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, TableFieldAdapter} from '../../../../src/index';
+import {scout, TableField, TableFieldAdapter} from '../../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
 
 describe('TableFieldAdapter', () => {
-  let session, helper, tableHelper;
+  let session: SandboxSession, helper: FormSpecHelper, tableHelper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -50,7 +50,8 @@ describe('TableFieldAdapter', () => {
     it('destroys the table and model adapter if value is changed to \'\'', () => {
       let model = createTableFieldWithTableModel();
       let adapter = createTableFieldAdapter(model);
-      let tableField = adapter.createWidget(model, session.desktop);
+      // @ts-ignore
+      let tableField = adapter.createWidget(model, session.desktop) as TableField;
       let table = tableField.table;
       expect(session.getModelAdapter(table.id).widget).toBe(table);
 

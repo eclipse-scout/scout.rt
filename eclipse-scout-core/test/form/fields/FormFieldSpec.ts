@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, GridData, GroupBox, Menu, RadioButtonGroup, scout, Status, StringField, TreeVisitResult, Widget} from '../../../src/index';
+import {CheckBoxField, FormField, FormFieldModel, GridData, GroupBox, Menu, RadioButton, RadioButtonGroup, scout, Status, StringField, TreeVisitResult, Widget} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '../../../src/testing/index';
 
 describe('FormField', () => {
-  let session;
-  let helper;
-  let menuHelper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
+  let menuHelper: MenuSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -23,15 +23,26 @@ describe('FormField', () => {
     menuHelper = new MenuSpecHelper(session);
   });
 
-  function createFormField(model) {
-    let formField = new FormField();
-    formField._render = function() {
+  class SpecFormField extends FormField {
+    override _render() {
       this.addContainer(this.$parent, 'form-field');
       this.addLabel();
       this.addMandatoryIndicator();
       this.addField(this.$parent.makeDiv());
       this.addStatus();
-    };
+    }
+
+    override _isSuppressStatusField(): boolean {
+      return super._isSuppressStatusField();
+    }
+
+    override _isSuppressStatusIcon(): boolean {
+      return super._isSuppressStatusIcon();
+    }
+  }
+
+  function createFormField(model: FormFieldModel): SpecFormField {
+    let formField = new SpecFormField();
     formField.init(model);
     return formField;
   }
@@ -41,7 +52,7 @@ describe('FormField', () => {
 
     beforeEach(() => {
       model = helper.createFieldModel();
-      formField = new FormField();
+      formField = new SpecFormField();
       formField.init(model);
     });
 
@@ -56,7 +67,7 @@ describe('FormField', () => {
 
     beforeEach(() => {
       model = helper.createFieldModel();
-      formField = new FormField();
+      formField = new SpecFormField();
     });
 
     it('gridDataHints are extended (not replaced) on init when gridDataHints is a plain object', () => {
@@ -513,27 +524,27 @@ describe('FormField', () => {
     return scout.create(GroupBox, {
       parent: session.desktop,
       fields: [{
-        objectType: 'StringField'
+        objectType: StringField
       }, {
-        objectType: 'CheckBoxField'
+        objectType: CheckBoxField
       }, {
-        objectType: 'GroupBox',
+        objectType: GroupBox,
         toSkip: true,
         fields: [{
-          objectType: 'StringField'
+          objectType: StringField
         }, {
-          objectType: 'RadioButtonGroup',
+          objectType: RadioButtonGroup,
           fields: [{
-            objectType: 'RadioButton'
+            objectType: RadioButton
           }, {
-            objectType: 'RadioButton',
+            objectType: RadioButton,
             selected: true
           }]
         }]
       }, {
-        objectType: 'GroupBox',
+        objectType: GroupBox,
         fields: [{
-          objectType: 'StringField'
+          objectType: StringField
         }]
       }],
       responsive: true
@@ -552,26 +563,29 @@ describe('FormField', () => {
     it('visits each field', () => {
       let groupBox = createVisitStructure();
       groupBox.visitFields(field => {
-        field.hasBeenVisited = true;
+        field['hasBeenVisited'] = true;
       });
 
       expectVisited(groupBox);
       expectVisited(groupBox.fields[0]);
       expectVisited(groupBox.fields[1]);
-      expectVisited(groupBox.fields[2]);
-      expectVisited(groupBox.fields[2].fields[0]);
-      expectVisited(groupBox.fields[2].fields[1]);
-      expectVisited(groupBox.fields[2].fields[1].fields[0]);
-      expectVisited(groupBox.fields[2].fields[1].fields[1]);
-      expectVisited(groupBox.fields[3]);
-      expectVisited(groupBox.fields[3].fields[0]);
+      let box1 = groupBox.fields[2] as GroupBox;
+      expectVisited(box1);
+      expectVisited(box1.fields[0]);
+      let radioButtonGroup = box1.fields[1] as RadioButtonGroup<any>;
+      expectVisited(radioButtonGroup);
+      expectVisited(radioButtonGroup.fields[0]);
+      expectVisited(radioButtonGroup.fields[1]);
+      let box2 = groupBox.fields[3] as GroupBox;
+      expectVisited(box2);
+      expectVisited(box2.fields[0]);
     });
 
     it('can skip subtree of a group box when returning TreeVisitResult.SKIP_SUBTREE', () => {
       let groupBox = createVisitStructure();
       groupBox.visitFields(field => {
-        field.hasBeenVisited = true;
-        if (field.toSkip) {
+        field['hasBeenVisited'] = true;
+        if (field['toSkip']) {
           return TreeVisitResult.SKIP_SUBTREE;
         }
         return TreeVisitResult.CONTINUE;
@@ -580,19 +594,22 @@ describe('FormField', () => {
       expectVisited(groupBox);
       expectVisited(groupBox.fields[0]);
       expectVisited(groupBox.fields[1]);
-      expectVisited(groupBox.fields[2]);
-      expectNotVisited(groupBox.fields[2].fields[0]);
-      expectNotVisited(groupBox.fields[2].fields[1]);
-      expectNotVisited(groupBox.fields[2].fields[1].fields[0]);
-      expectNotVisited(groupBox.fields[2].fields[1].fields[1]);
-      expectVisited(groupBox.fields[3]);
-      expectVisited(groupBox.fields[3].fields[0]);
+      let box1 = groupBox.fields[2] as GroupBox;
+      expectVisited(box1);
+      expectNotVisited(box1.fields[0]);
+      let radioButtonGroup = box1.fields[1] as RadioButtonGroup<any>;
+      expectNotVisited(radioButtonGroup);
+      expectNotVisited(radioButtonGroup.fields[0]);
+      expectNotVisited(radioButtonGroup.fields[1]);
+      let box2 = groupBox.fields[3] as GroupBox;
+      expectVisited(box2);
+      expectVisited(box2.fields[0]);
     });
 
     it('can skip subtree of radio button group when returning TreeVisitResult.SKIP_SUBTREE', () => {
       let groupBox = createVisitStructure();
       groupBox.visitFields(field => {
-        field.hasBeenVisited = true;
+        field['hasBeenVisited'] = true;
         if (field instanceof RadioButtonGroup) {
           return TreeVisitResult.SKIP_SUBTREE;
         }
@@ -602,20 +619,23 @@ describe('FormField', () => {
       expectVisited(groupBox);
       expectVisited(groupBox.fields[0]);
       expectVisited(groupBox.fields[1]);
-      expectVisited(groupBox.fields[2]);
-      expectVisited(groupBox.fields[2].fields[0]);
-      expectVisited(groupBox.fields[2].fields[1]);
-      expectNotVisited(groupBox.fields[2].fields[1].fields[0]);
-      expectNotVisited(groupBox.fields[2].fields[1].fields[1]);
-      expectVisited(groupBox.fields[3]);
-      expectVisited(groupBox.fields[3].fields[0]);
+      let box1 = groupBox.fields[2] as GroupBox;
+      expectVisited(box1);
+      expectVisited(box1.fields[0]);
+      let radioButtonGroup = box1.fields[1] as RadioButtonGroup<any>;
+      expectVisited(radioButtonGroup);
+      expectNotVisited(radioButtonGroup.fields[0]);
+      expectNotVisited(radioButtonGroup.fields[1]);
+      let box2 = groupBox.fields[3] as GroupBox;
+      expectVisited(box2);
+      expectVisited(box2.fields[0]);
     });
 
     it('can terminate visiting by returning TreeVisitResult.TERMINATE', () => {
       let groupBox = createVisitStructure();
       groupBox.visitFields(field => {
-        field.hasBeenVisited = true;
-        if (field.toSkip) {
+        field['hasBeenVisited'] = true;
+        if (field['toSkip']) {
           return TreeVisitResult.TERMINATE;
         }
         return TreeVisitResult.CONTINUE;
@@ -624,21 +644,24 @@ describe('FormField', () => {
       expectVisited(groupBox);
       expectVisited(groupBox.fields[0]);
       expectVisited(groupBox.fields[1]);
-      expectVisited(groupBox.fields[2]);
-      expectNotVisited(groupBox.fields[2].fields[0]);
-      expectNotVisited(groupBox.fields[2].fields[1]);
-      expectNotVisited(groupBox.fields[2].fields[1].fields[0]);
-      expectNotVisited(groupBox.fields[2].fields[1].fields[1]);
-      expectNotVisited(groupBox.fields[3]);
-      expectNotVisited(groupBox.fields[3].fields[0]);
+      let box1 = groupBox.fields[2] as GroupBox;
+      expectVisited(box1);
+      expectNotVisited(box1.fields[0]);
+      let radioButtonGroup = box1.fields[1] as RadioButtonGroup<any>;
+      expectNotVisited(radioButtonGroup);
+      expectNotVisited(radioButtonGroup.fields[0]);
+      expectNotVisited(radioButtonGroup.fields[1]);
+      let box2 = groupBox.fields[3] as GroupBox;
+      expectNotVisited(box2);
+      expectNotVisited(box2.fields[0]);
 
       // reset visited flag
       groupBox.visitFields(field => {
-        field.hasBeenVisited = false;
+        field['hasBeenVisited'] = false;
       });
 
       groupBox.visitFields(field => {
-        field.hasBeenVisited = true;
+        field['hasBeenVisited'] = true;
         if (field instanceof RadioButtonGroup) {
           return TreeVisitResult.TERMINATE;
         }
@@ -648,34 +671,34 @@ describe('FormField', () => {
       expectVisited(groupBox);
       expectVisited(groupBox.fields[0]);
       expectVisited(groupBox.fields[1]);
-      expectVisited(groupBox.fields[2]);
-      expectVisited(groupBox.fields[2].fields[0]);
-      expectVisited(groupBox.fields[2].fields[1]);
-      expectNotVisited(groupBox.fields[2].fields[1].fields[0]);
-      expectNotVisited(groupBox.fields[2].fields[1].fields[1]);
-      expectNotVisited(groupBox.fields[3]);
-      expectNotVisited(groupBox.fields[3].fields[0]);
+      expectVisited(box1);
+      expectVisited(box1.fields[0]);
+      expectVisited(radioButtonGroup);
+      expectNotVisited(radioButtonGroup.fields[0]);
+      expectNotVisited(radioButtonGroup.fields[1]);
+      expectNotVisited(box2);
+      expectNotVisited(box2.fields[0]);
 
       // reset visited flag
       groupBox.visitFields(field => {
-        field.hasBeenVisited = false;
+        field['hasBeenVisited'] = false;
       });
 
       groupBox.visitFields(field => {
-        field.hasBeenVisited = true;
+        field['hasBeenVisited'] = true;
         return TreeVisitResult.TERMINATE;
       });
 
       expectVisited(groupBox);
       expectNotVisited(groupBox.fields[0]);
       expectNotVisited(groupBox.fields[1]);
-      expectNotVisited(groupBox.fields[2]);
-      expectNotVisited(groupBox.fields[2].fields[0]);
-      expectNotVisited(groupBox.fields[2].fields[1]);
-      expectNotVisited(groupBox.fields[2].fields[1].fields[0]);
-      expectNotVisited(groupBox.fields[2].fields[1].fields[1]);
-      expectNotVisited(groupBox.fields[3]);
-      expectNotVisited(groupBox.fields[3].fields[0]);
+      expectNotVisited(box1);
+      expectNotVisited(box1.fields[0]);
+      expectNotVisited(radioButtonGroup);
+      expectNotVisited(radioButtonGroup.fields[0]);
+      expectNotVisited(radioButtonGroup.fields[1]);
+      expectNotVisited(box2);
+      expectNotVisited(box2.fields[0]);
     });
   });
 });

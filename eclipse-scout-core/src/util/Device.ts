@@ -131,22 +131,22 @@ export default class Device implements DeviceModel {
   protected _needsIPhoneRotationHack(): boolean {
     $.log.isDebugEnabled() && $.log.debug('Activating iPhone rotation workaround.');
     // iPad does not automatically switch to minimal-ui mode on rotation.
-    // Also the hack is not necessary if the body is scrollable (which can be achieved with a custom desktop).
+    // Also, the hack is not necessary if the body is scrollable (which can be achieved with a custom desktop).
     return this.isIphone() && !this.isStandalone() && $(document.body).css('overflow') === 'hidden';
   }
 
   /**
-   * The iphone wants to activate the minimal-ui mode when it is rotated to landscape. This would actually be a good thing but unfortunately it is buggy.
+   * The iphone wants to activate the minimal-ui mode when it is rotated to landscape. This would actually be a good thing, but unfortunately it is buggy.
    * When the device is rotated there will be a white bar visible at the bottom of the screen.
-   * When it is rotated back it may look ok at first but touching an element does not work anymore because the touchpoint is about 30px at the wrong location.
+   * When it is rotated back it may look ok at first but touching an element does not work anymore because the touch-point is about 30px at the wrong location.
    * <p>
    * This happens because the height used for layouting the desktop is smaller than it should be. This layouting is triggered by the window resize event, so obviously
    * the resize event comes too early and no resize event will be triggered when the minimal-ui mode is activated.
    * <p>
-   * Unfortunately it is also not possible to schedule the relayouting after a rotation because the height does not seem to be reliable.
+   * Unfortunately it is also not possible to schedule the relay outing after a rotation because the height does not seem to be reliable.
    * Even if the window or body size will explicitly be set to the viewport size, there will be a white bar at the bottom, even though the scout desktop is layouted with the correct size.
    * <p>
-   * Luckily, it is possible to show the address bar programmatically but we need to wait for the rotation animation to complete.
+   * Luckily, it is possible to show the address bar programmatically, but we need to wait for the rotation animation to complete.
    * Since there is no event for that we need to try it several times, sometimes it will work after 150ms, sometimes we have to wait 250ms.
    * This is quite a hack and will likely break with a future ios release...
    */
@@ -247,7 +247,7 @@ export default class Device implements DeviceModel {
   }
 
   /**
-   * Compared to isIos() this function uses navigator.platform instead of navigator.userAgent to check whether the app runs on iOS.
+   * Compared to isIos() this function uses {@link navigator.platform} instead of navigator.userAgent to check whether the app runs on iOS.
    * Most of the time isIos() is the way to go.
    * This function was mainly introduced to detect whether it is a real iOS or an emulated one (e.g. using chrome emulator).
    * @returns true if the platform is iOS, false if not (e.g. if chrome emulator is running)
@@ -269,11 +269,10 @@ export default class Device implements DeviceModel {
   }
 
   /**
-   * @returns true if navigator.standalone is true which is the case for iOS home screen mode
+   * @returns true if {@link navigator.standalone} is true which is the case for iOS home screen mode
    */
   isStandalone(): boolean {
-    // @ts-ignore
-    return !!window.navigator.standalone;
+    return !!window.navigator['standalone'];
   }
 
   /**
@@ -372,7 +371,7 @@ export default class Device implements DeviceModel {
       userAgent = this.userAgent;
 
     if (this.browser === browsers.INTERNET_EXPLORER) {
-      // with internet explorer 11 user agent string does not contain the 'MSIE' string anymore
+      // with Internet Explorer 11 user agent string does not contain the 'MSIE' string anymore
       // additionally in new version the version-number after Trident/ is not the browser-version
       // but the engine-version.
       if (userAgent.indexOf('MSIE') > -1) {
@@ -418,7 +417,7 @@ export default class Device implements DeviceModel {
    * still touch devices, but support keyboard and mouse at the same time. In such cases this method will
    * return false, since the device is not touch only.
    *
-   * Currently this method returns the same as hasOnScreenKeyboard(). Maybe the implementation here will be
+   * Currently, this method returns the same as hasOnScreenKeyboard(). Maybe the implementation here will be
    * different in the future.
    */
   supportsOnlyTouch(): boolean {
@@ -431,8 +430,7 @@ export default class Device implements DeviceModel {
    */
   supportsTouch(): boolean {
     return this.supportsFeature('_touch', property => {
-      // @ts-ignore
-      return (('ontouchstart' in window) || window.TouchEvent || window.DocumentTouch && document instanceof window.DocumentTouch) as boolean;
+      return (('ontouchstart' in window) || window.TouchEvent || window['DocumentTouch'] && document instanceof window['DocumentTouch']) as boolean;
     });
   }
 
@@ -513,7 +511,7 @@ export default class Device implements DeviceModel {
   }
 
   /**
-   * If the mouse down on an element with a pseudo element removes the pseudo element (e.g. check box toggling),
+   * If the mouse down on an element with a pseudo-element removes the pseudo-element (e.g. check box toggling),
    * the firefox cannot focus the element anymore and instead focuses the body. In that case manual focus handling is necessary.
    */
   loosesFocusIfPseudoElementIsRemoved(): boolean {
@@ -543,7 +541,7 @@ export default class Device implements DeviceModel {
   /**
    * When we call .preventDefault() on a mousedown event Firefox doesn't apply the :active state.
    * Since W3C does not specify an expected behavior, we need this workaround for consistent behavior in
-   * our UI. The issue has been reported to Mozilla but it doesn't look like there will be a bugfix soon:
+   * our UI. The issue has been reported to Mozilla, but it doesn't look like there will be a bugfix soon:
    *
    * https://bugzilla.mozilla.org/show_bug.cgi?id=771241#c7
    */

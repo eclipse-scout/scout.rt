@@ -1,18 +1,37 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NavigateDownButton, NullWidget, Outline, Page, scout, Table, TableRow} from '../../../../src/index';
+import {Form, NavigateDownButton, NullWidget, Outline, Page, scout, Table, TableRow} from '../../../../src/index';
 
 describe('NavigateDownButton', () => {
 
-  let session, outline, menu, node;
+  let session: SandboxSession, outline: Outline, menu: SpecNavigateDownButton, node: Page;
+
+  class SpecNavigateDownButton extends NavigateDownButton {
+    override _toggleDetail(): boolean {
+      return super._toggleDetail();
+    }
+
+    override _isDetail(): boolean {
+      return super._isDetail();
+    }
+
+    override _buttonEnabled(): boolean {
+      return super._buttonEnabled();
+    }
+
+    override _drill() {
+      super._drill();
+    }
+  }
+
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -23,7 +42,7 @@ describe('NavigateDownButton', () => {
     node = scout.create(Page, {
       parent: outline
     });
-    menu = scout.create(NavigateDownButton, {
+    menu = scout.create(SpecNavigateDownButton, {
       parent: session.desktop,
       outline: outline,
       node: node
@@ -36,7 +55,7 @@ describe('NavigateDownButton', () => {
 
   it('_isDetail returns true or false depending on the state of the detail-form and detail-table', () => {
     // true when both detailForm and detailTable are visible
-    node.detailForm = {};
+    node.detailForm = new Form();
     node.detailFormVisible = true;
     node.detailFormVisibleByUi = true;
     node.detailTable = scout.create(Table, {
@@ -49,7 +68,7 @@ describe('NavigateDownButton', () => {
     // false when detailForm is absent, even when if detailFormVisible=true
     delete node.detailForm;
     expect(menu._isDetail()).toBe(false);
-    node.detailForm = {};
+    node.detailForm = new Form();
 
     // false when detailTable is absent, even when if detailTableVisible=true
     delete node.detailTable;
@@ -100,6 +119,7 @@ describe('NavigateDownButton', () => {
 
       node.detailTable.selectedRows = [{
         id: '1',
+        // @ts-ignore
         page: {}
       }];
       expect(menu._buttonEnabled()).toBe(true);
@@ -116,11 +136,13 @@ describe('NavigateDownButton', () => {
       });
       expect(menu._buttonEnabled()).toBe(false);
 
+      // @ts-ignore
       node.detailTable.selectedRows = [{
         id: '1'
       }];
       expect(menu._buttonEnabled()).toBe(false);
 
+      // @ts-ignore
       node.detailTable.selectedRows[0].page = {};
       expect(menu._buttonEnabled()).toBe(true);
     });
@@ -140,6 +162,7 @@ describe('NavigateDownButton', () => {
 
       let page = scout.create(Page, {
         parent: outline,
+        // @ts-ignore
         parentNode: node
       });
       let row = scout.create(TableRow, {

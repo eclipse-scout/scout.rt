@@ -137,7 +137,8 @@ export default class ModeSelector<TModeRef = any> extends Widget implements Mode
     this._updateSlider();
   }
 
-  protected _updateSlider() {
+  /** @internal */
+  _updateSlider() {
     if (!this.$slider) {
       return;
     }

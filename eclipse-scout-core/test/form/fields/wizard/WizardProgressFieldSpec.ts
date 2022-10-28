@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -12,23 +12,29 @@ import {scout, WizardProgressField} from '../../../../src/index';
 
 describe('WizardProgressField', () => {
 
-  let session, field;
+  let session: SandboxSession, field: SpecWizardProgressField;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
-    field = new WizardProgressField();
+    field = new SpecWizardProgressField();
     field.session = session;
   });
+
+  class SpecWizardProgressField extends WizardProgressField {
+    override _onStepClick(event: JQuery.ClickEvent) {
+      super._onStepClick(event);
+    }
+  }
 
   // #241222
   describe('rendering', () => {
 
     it('must evaluate activeStepIndex for action-enabled class', () => {
-      field = scout.create(WizardProgressField, {
+      field = scout.create(SpecWizardProgressField, {
         parent: session.desktop
       });
-      spyOn(field, '_onStepClick').and.callThrough();
+      let _onStepClickSpy = spyOn(field, '_onStepClick').and.callThrough();
 
       field.render();
       field.setProperty('activeStepIndex', 1);
@@ -54,17 +60,17 @@ describe('WizardProgressField', () => {
       $steps.eq(0).click();
       $steps.eq(1).click();
       expect(field._onStepClick).toHaveBeenCalledTimes(1);
-      expect(field._onStepClick.calls.first().args[0].currentTarget).toBe($steps[1]);
+      expect(_onStepClickSpy.calls.first().args[0].currentTarget).toBe($steps[1]);
 
       field.setProperty('activeStepIndex', 1);
       expect($steps.eq(0).hasClass('action-enabled')).toBe(true);
       expect($steps.eq(1).hasClass('action-enabled')).toBe(false);
 
-      field._onStepClick.calls.reset();
+      _onStepClickSpy.calls.reset();
       $steps.eq(0).click();
       $steps.eq(1).click();
       expect(field._onStepClick).toHaveBeenCalledTimes(1);
-      expect(field._onStepClick.calls.first().args[0].currentTarget).toBe($steps[0]);
+      expect(_onStepClickSpy.calls.first().args[0].currentTarget).toBe($steps[0]);
     });
 
   });

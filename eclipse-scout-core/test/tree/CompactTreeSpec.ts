@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -12,9 +12,9 @@ import {Range} from '../../src/index';
 import {TreeSpecHelper} from '../../src/testing/index';
 import {triggerMouseDown} from '../../src/testing/jquery-testing';
 
-describe('Compacttree', () => {
-  let session;
-  let helper;
+describe('CompactTree', () => {
+  let session: SandboxSession;
+  let helper: TreeSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -38,7 +38,7 @@ describe('Compacttree', () => {
       // top-level node (section) is only rendered, if there are child nodes
       let model = helper.createModelFixture(1);
       let tree = helper.createCompactTree(model);
-      let spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 1));
+      spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 1));
       tree.render();
       expect(tree.nodes.length).toBe(1);
     });
@@ -46,7 +46,7 @@ describe('Compacttree', () => {
     it('adds a node with child node', () => {
       let model = helper.createModelFixture(1, 1, true);
       let tree = helper.createCompactTree(model);
-      let spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 4));
+      spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 4));
       tree.render();
       expect(tree.nodes.length).toBe(1);
       expect(tree.visibleNodesFlat.length).toBe(2);
@@ -55,7 +55,7 @@ describe('Compacttree', () => {
     it('adds a node with child nodes in correct order', () => {
       let model = helper.createModelFixture(2, 1, true);
       let tree = helper.createCompactTree(model);
-      let spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
+      spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
       tree.render();
       expect(tree.nodes.length).toBe(2);
       expect(tree.visibleNodesFlat.length).toBe(6);
@@ -74,7 +74,7 @@ describe('Compacttree', () => {
     it('deletes a node', () => {
       let model = helper.createModelFixture(2, 1, true);
       let tree = helper.createCompactTree(model);
-      let spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
+      spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
       tree.render();
       tree.deleteNodes([tree.nodes[0].childNodes[0]], tree.nodes[0]);
       expect(tree.nodes.length).toBe(2);
@@ -94,7 +94,7 @@ describe('Compacttree', () => {
       let tree = helper.createCompactTree(model);
       let parent0 = tree.nodes[0];
       let child0 = parent0.childNodes[0];
-      let spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
+      spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
       tree.render();
       tree.deleteNodes([child0], parent0);
       tree.insertNodes([child0], parent0);

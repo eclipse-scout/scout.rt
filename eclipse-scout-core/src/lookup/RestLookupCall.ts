@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxCall, arrays, LookupCall, LookupRow, LookupRowModel, objects, scout} from '../index';
+import {AjaxCall, arrays, LookupCall, LookupRow, LookupRowModel, objects, RestLookupCallModel, scout} from '../index';
 import $ from 'jquery';
 import LookupResult from './LookupResult';
 import Deferred = JQuery.Deferred;
@@ -42,7 +42,8 @@ import Deferred = JQuery.Deferred;
  * 4. Hard-coded properties that are fundamental to the respective queryBy mode (cannot be overridden).
  *    These are: 'ids' (KEY, KEYS) and 'text' (TEXT)
  */
-export default class RestLookupCall<TKey> extends LookupCall<TKey> {
+export default class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookupCallModel<TKey> {
+  declare model: RestLookupCallModel<TKey>;
 
   resourceUrl: string;
   maxTextLength: number;
@@ -56,16 +57,11 @@ export default class RestLookupCall<TKey> extends LookupCall<TKey> {
     super();
     this.resourceUrl = null;
     this.maxTextLength = null;
-
-    // for predefined restrictions only (e.g. in JSON or sub-classes), don't change this attribute! this instance is shared with all clones!
     this.restriction = null;
-
     // dynamically added restrictions. after setting this attribute, this instance is shared with all following clones!
     this._restriction = null;
-
     this._ajaxCall = null;
     this._deferred = null;
-
     // RestLookupCall implements getByKeys
     this.batch = true;
   }
@@ -111,22 +107,22 @@ export default class RestLookupCall<TKey> extends LookupCall<TKey> {
     return this._call();
   }
 
-  override cloneForAll(): RestLookupCall<TKey> {
-    let clone = super.cloneForAll() as RestLookupCall<TKey>;
+  override cloneForAll(): this {
+    let clone = super.cloneForAll();
+    clone._addRestrictionIfAbsent('active', true);
+    clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
+    return clone as this;
+  }
+
+  override cloneForText(text: string): this {
+    let clone = super.cloneForText(text);
     clone._addRestrictionIfAbsent('active', true);
     clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
     return clone;
   }
 
-  override cloneForText(text: string): RestLookupCall<TKey> {
-    let clone = super.cloneForText(text) as RestLookupCall<TKey>;
-    clone._addRestrictionIfAbsent('active', true);
-    clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
-    return clone;
-  }
-
-  override cloneForRec(parentKey: TKey): RestLookupCall<TKey> {
-    let clone = super.cloneForRec(parentKey) as RestLookupCall<TKey>;
+  override cloneForRec(parentKey: TKey): this {
+    let clone = super.cloneForRec(parentKey);
     clone._addRestrictionIfAbsent('active', true);
     clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
     return clone;

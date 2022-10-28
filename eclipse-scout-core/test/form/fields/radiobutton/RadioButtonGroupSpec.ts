@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RadioButton, RadioButtonGroup, scout} from '../../../../src/index';
+import {FormField, LabelField, RadioButton, RadioButtonGroup, RadioButtonGroupLayout, scout} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
 
 describe('RadioButtonGroup', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -26,7 +26,7 @@ describe('RadioButtonGroup', () => {
     jasmine.clock().uninstall();
   });
 
-  function expectEnabled(field, expectedEnabled, expectedEnabledComputed, hasClass) {
+  function expectEnabled(field: FormField, expectedEnabled: boolean, expectedEnabledComputed: boolean, hasClass?: string) {
     expect(field.enabled).toBe(expectedEnabled);
     expect(field.enabledComputed).toBe(expectedEnabledComputed);
     if (hasClass) {
@@ -61,7 +61,8 @@ describe('RadioButtonGroup', () => {
       expect(radioButtonGroup.gridColumnCount).toBe(4);
 
       expect(radioButtonGroup.logicalGrid.dirty).toBe(true);
-      expect(radioButtonGroup.htmlBody.layout.valid).toBe(false);
+      let layout = radioButtonGroup.htmlBody.layout as RadioButtonGroupLayout;
+      expect(layout.valid).toBe(false);
     });
   });
 
@@ -87,10 +88,10 @@ describe('RadioButtonGroup', () => {
         parent: session.desktop,
         value: 1,
         fields: [{
-          objectType: 'RadioButton',
+          objectType: RadioButton,
           radioValue: 0
         }, {
-          objectType: 'RadioButton',
+          objectType: RadioButton,
           radioValue: 1
         }]
       });
@@ -104,9 +105,9 @@ describe('RadioButtonGroup', () => {
       let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
-          objectType: 'RadioButton'
+          objectType: RadioButton
         }, {
-          objectType: 'RadioButton',
+          objectType: RadioButton,
           selected: true
         }]
       });
@@ -121,12 +122,12 @@ describe('RadioButtonGroup', () => {
       let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
-          objectType: 'RadioButton'
+          objectType: RadioButton
         }, {
-          objectType: 'RadioButton',
+          objectType: RadioButton,
           selected: true
         }, {
-          objectType: 'LabelField',
+          objectType: LabelField,
           label: 'XX'
         }]
       });
@@ -239,10 +240,10 @@ describe('RadioButtonGroup', () => {
       let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
-          objectType: 'RadioButton',
+          objectType: RadioButton,
           radioValue: 0
         }, {
-          objectType: 'RadioButton',
+          objectType: RadioButton,
           radioValue: 1
         }]
       });
@@ -269,9 +270,9 @@ describe('RadioButtonGroup', () => {
       let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
-          objectType: 'RadioButton'
+          objectType: RadioButton
         }, {
-          objectType: 'RadioButton',
+          objectType: RadioButton,
           selected: true
         }]
       });
@@ -292,10 +293,10 @@ describe('RadioButtonGroup', () => {
       let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
-          objectType: 'RadioButton',
+          objectType: RadioButton,
           radioValue: 0
         }, {
-          objectType: 'RadioButton',
+          objectType: RadioButton,
           radioValue: 1
         }]
       });
@@ -439,10 +440,10 @@ describe('RadioButtonGroup', () => {
       let radioButtonGroup = scout.create(RadioButtonGroup, {
         parent: session.desktop,
         fields: [{
-          objectType: 'RadioButton',
+          objectType: RadioButton,
           selected: true
         }, {
-          objectType: 'RadioButton',
+          objectType: RadioButton,
           selected: true
         }]
       });

@@ -27,8 +27,7 @@ export default class CalendarLayout extends AbstractLayout {
   override layout($container: JQuery) {
     let height = 0,
       headerHeight = 0,
-      // @ts-ignore
-      $yearContainer = this.calendar._yearPanel.$container,
+      $yearContainer = this.calendar.yearPanel.$container,
       $grids = this.calendar.$grids,
       $listContainer = this.calendar.$listContainer,
       $header = this.calendar.$header;
@@ -42,7 +41,7 @@ export default class CalendarLayout extends AbstractLayout {
       this.stack();
     }
     if ($container.width() < this.compactWidth || $header[0].scrollWidth > $container.width()) {
-      // Title may take a lot of space, make it always compact for small devices so it won't toggle when changing display mode or view range
+      // Title may take a lot of space, make it always compact for small devices, so it won't toggle when changing display mode or view range
       this.compact();
     }
 

@@ -1,19 +1,23 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LocaleSpecHelper, TableSpecHelper} from '../../../src/testing/index';
-import {AggregateTableControl, DecimalFormat, scout} from '../../../src/index';
+import {AggregateTableControl, Cell, Column, DecimalFormat, NumberColumn, scout, TableControlModel} from '../../../src/index';
+import {Optional} from '../../../src/types';
+import {TableModelWithCells} from '../../../src/testing/table/TableSpecHelper';
+import SpecTable from '../../../src/testing/table/SpecTable';
+import {TableRowData} from '../../../src/table/TableRowModel';
 
 describe('AggregateTableControl', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -33,15 +37,15 @@ describe('AggregateTableControl', () => {
     $.fx.off = false;
   });
 
-  function createAggregateTC(model) {
+  function createAggregateTC(model: Optional<TableControlModel, 'parent'>): AggregateTableControl {
     let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create(AggregateTableControl, model);
+    return scout.create(AggregateTableControl, model as TableControlModel);
   }
 
-  function $aggregateRow(tableControl) {
+  function $aggregateRow(tableControl: AggregateTableControl): JQuery {
     return tableControl.$contentContainer;
   }
 
@@ -56,7 +60,8 @@ describe('AggregateTableControl', () => {
   }
 
   describe('aggregate', () => {
-    let model, table, column0, column1, column2, rows, tableControl;
+    let model: TableModelWithCells, table: SpecTable, column0: Column, column1: NumberColumn, column2: NumberColumn,
+      rows: (TableRowData & { cells: Cell[] })[], tableControl: AggregateTableControl;
 
     function prepareTable() {
       let columns = [helper.createModelColumn('col1'),
@@ -74,9 +79,9 @@ describe('AggregateTableControl', () => {
       table._setTableControls([tableControl]);
 
       column0 = table.columns[0];
-      column1 = table.columns[1];
+      column1 = table.columns[1] as NumberColumn;
       column1.setAggregationFunction('sum');
-      column2 = table.columns[2];
+      column2 = table.columns[2] as NumberColumn;
       column2.setAggregationFunction('sum');
     }
 
@@ -133,7 +138,7 @@ describe('AggregateTableControl', () => {
       rows[1].cells[1].value = 2;
       rows[2].cells[1].value = 3;
       table.render();
-      table.changeAggregation(table.columns[1], 'none');
+      table.changeAggregation(table.columns[1] as NumberColumn, 'none');
 
       let $aggrRow = $aggregateRow(tableControl);
       let $aggrCells = $aggrRow.children('.table-cell');

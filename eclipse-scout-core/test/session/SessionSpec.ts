@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BackgroundJobPollingStatus, Device, RemoteEvent, TextMap, UserAgent} from '../../src/index';
+import {BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, UserAgent} from '../../src/index';
 
 /* global receiveResponseForAjaxCall */
 describe('Session', () => {
@@ -23,7 +23,7 @@ describe('Session', () => {
     jasmine.clock().uninstall();
   });
 
-  function createSession(userAgent) {
+  function createSession(userAgent?: UserAgent): SandboxSession {
     setFixtures(sandbox());
     let session = sandboxSession({
       userAgent: userAgent
@@ -35,7 +35,7 @@ describe('Session', () => {
     return session;
   }
 
-  function send(session, target, type, data, delay) {
+  function send(session: Session, target: string, type: string, data?: object, delay?: number) {
     session.sendEvent(new RemoteEvent(target, type, data), delay);
   }
 
@@ -46,13 +46,13 @@ describe('Session', () => {
       // initially there should be no request at all
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      send(session, 1, 'nodeClick');
+      send(session, '1', 'nodeClick');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      send(session, 1, 'nodeSelected');
+      send(session, '1', 'nodeSelected');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      send(session, 1, 'nodeExpanded');
+      send(session, '1', 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       sendQueuedAjaxCalls();
@@ -69,17 +69,17 @@ describe('Session', () => {
       let session = createSession();
 
       // send first event delayed (in 500 ms)
-      send(session, 1, 'nodeClick', '', 500);
+      send(session, '1', 'nodeClick', {}, 500);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
       sendQueuedAjaxCalls(null, 100);
 
       // since 500 ms are not passed yet, the request has not been sent and following events should be added
-      send(session, 1, 'nodeSelected');
+      send(session, '1', 'nodeSelected');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      send(session, 1, 'nodeExpanded');
+      send(session, '1', 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       sendQueuedAjaxCalls(null, 1000);
@@ -92,21 +92,21 @@ describe('Session', () => {
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it('does not await the full delay if a susequent send call has a smaller delay', () => {
+    it('does not await the full delay if a subsequent send call has a smaller delay', () => {
       let session = createSession();
 
       // send first event delayed (in 500 ms)
-      send(session, 1, 'nodeClick', '', 500);
+      send(session, '1', 'nodeClick', {}, 500);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
       sendQueuedAjaxCalls(null, 100);
 
       // since 500 ms are not passed yet, the request has not been sent and following events should be added
-      send(session, 1, 'nodeSelected');
+      send(session, '1', 'nodeSelected');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      send(session, 1, 'nodeExpanded');
+      send(session, '1', 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       sendQueuedAjaxCalls(null, 0);
@@ -123,11 +123,11 @@ describe('Session', () => {
       let session = createSession();
 
       // send first event with 300ms delay
-      send(session, 1, 'nodeClick', '', 300);
+      send(session, '1', 'nodeClick', {}, 300);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // send second event with 500ms delay
-      send(session, 1, 'nodeSelected', '', 500);
+      send(session, '1', 'nodeSelected', {}, 500);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
@@ -153,26 +153,26 @@ describe('Session', () => {
         return this.target === previous.target && this.type === previous.type && this.column === previous.column;
       };
 
-      let event0 = new RemoteEvent(1, 'columnResized', {
+      let event0 = new RemoteEvent('1', 'columnResized', {
         column: 'a'
       });
       event0.coalesce = coalesce;
       session.sendEvent(event0);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      let event1 = new RemoteEvent(1, 'rowSelected');
+      let event1 = new RemoteEvent('1', 'rowSelected');
       event1.coalesce = coalesce;
       session.sendEvent(event1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      let event2 = new RemoteEvent(1, 'columnResized', {
+      let event2 = new RemoteEvent('1', 'columnResized', {
         column: 'a'
       });
       event2.coalesce = coalesce;
       session.sendEvent(event2);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      let event3 = new RemoteEvent(1, 'columnResized', {
+      let event3 = new RemoteEvent('1', 'columnResized', {
         column: 'z'
       });
       event3.coalesce = coalesce;
@@ -180,14 +180,14 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // event for another target
-      let event4 = new RemoteEvent(2, 'columnResized', {
+      let event4 = new RemoteEvent('2', 'columnResized', {
         column: 'a'
       });
       event4.coalesce = coalesce;
       session.sendEvent(event4);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      let event5 = new RemoteEvent(1, 'columnResized', {
+      let event5 = new RemoteEvent('1', 'columnResized', {
         column: 'a'
       });
       event5.coalesce = coalesce;
@@ -208,7 +208,7 @@ describe('Session', () => {
       let session = createSession();
 
       // send first request
-      send(session, 1, 'nodeSelected');
+      send(session, '1', 'nodeSelected');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // trigger sending (response not received yet)
@@ -217,7 +217,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(session.areRequestsPending()).toBe(true);
 
-      send(session, 1, 'nodeClick');
+      send(session, '1', 'nodeClick');
 
       // trigger sending of second request
       jasmine.clock().tick(0);
@@ -246,7 +246,7 @@ describe('Session', () => {
       let session = createSession();
 
       // send first request
-      send(session, 1, 'nodeSelected');
+      send(session, '1', 'nodeSelected');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // trigger sending (response not received yet)
@@ -256,7 +256,7 @@ describe('Session', () => {
       expect(session.areRequestsPending()).toBe(true);
 
       // send second request delayed
-      send(session, 1, 'nodeClick', '', 300);
+      send(session, '1', 'nodeClick', {}, 300);
 
       // trigger sending of second request
       jasmine.clock().tick(0);
@@ -291,27 +291,27 @@ describe('Session', () => {
     it('splits events into separate requests if an event requires a new request', () => {
       let session = createSession();
 
-      let event0 = new RemoteEvent(1, 'eventType0');
+      let event0 = new RemoteEvent('1', 'eventType0');
       session.sendEvent(event0);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      let event1 = new RemoteEvent(1, 'eventType1', {
+      let event1 = new RemoteEvent('1', 'eventType1', {
         newRequest: true
       });
       session.sendEvent(event1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      let event2 = new RemoteEvent(1, 'eventType2');
+      let event2 = new RemoteEvent('1', 'eventType2');
       session.sendEvent(event2);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      let event3 = new RemoteEvent(1, 'eventType3', {
+      let event3 = new RemoteEvent('1', 'eventType3', {
         newRequest: true
       });
       session.sendEvent(event3);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      let event4 = new RemoteEvent(1, 'eventType4');
+      let event4 = new RemoteEvent('1', 'eventType4');
       session.sendEvent(event4);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
@@ -344,17 +344,17 @@ describe('Session', () => {
     it('does not split events into separate requests if only first request requires a new request', () => {
       let session = createSession();
 
-      let event0 = new RemoteEvent(1, 'eventType0', {
+      let event0 = new RemoteEvent('1', 'eventType0', {
         newRequest: true
       });
       session.sendEvent(event0);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      let event1 = new RemoteEvent(1, 'eventType1');
+      let event1 = new RemoteEvent('1', 'eventType1');
       session.sendEvent(event1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      let event2 = new RemoteEvent(1, 'eventType2');
+      let event2 = new RemoteEvent('1', 'eventType2');
       session.sendEvent(event2);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
@@ -382,7 +382,7 @@ describe('Session', () => {
       expect(session.areResponsesQueued()).toBe(false);
 
       // Start user request
-      send(session, 1, 'nodeSelected');
+      send(session, '1', 'nodeSelected');
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(2);
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
@@ -580,7 +580,7 @@ describe('Session', () => {
       expect(requestData.startup).toBe(true);
 
       // don't send it on subsequent requests
-      send(session, 1, 'nodeClick');
+      send(session, '1', 'nodeClick');
       sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();
@@ -600,7 +600,7 @@ describe('Session', () => {
       expect(requestData.userAgent.deviceType).toBe('MOBILE');
 
       // don't send it on subsequent requests
-      send(session, 1, 'nodeClick');
+      send(session, '1', 'nodeClick');
       sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();

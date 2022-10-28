@@ -12,8 +12,8 @@ import {AbstractLayout, arrays, EnumObject, focusUtils, FormField, objects, Pars
 import $ from 'jquery';
 import {StatusSeverity, StatusType} from '../../status/Status';
 
-export default abstract class ValueField<TValue> extends FormField implements ValueFieldModel<TValue> {
-  declare model: ValueFieldModel<TValue>;
+export default abstract class ValueField<TValue extends TModelValue, TModelValue = TValue> extends FormField implements ValueFieldModel<TValue, TModelValue> {
+  declare model: ValueFieldModel<TValue, TModelValue>;
   declare eventMap: ValueFieldEventMap<TValue>;
 
   clearable: ValueFieldClearable;
@@ -66,7 +66,7 @@ export default abstract class ValueField<TValue> extends FormField implements Va
     NotNull: 'ValueField.NotNull'
   } as const;
 
-  protected override _init(model: ValueFieldModel<TValue>) {
+  protected override _init(model: ValueFieldModel<TValue, TModelValue>) {
     super._init(model);
     if (model.validator) {
       // Validators are kept in a list, allow a single validator to be set in the model, similar to parser and formatter.
@@ -126,7 +126,7 @@ export default abstract class ValueField<TValue> extends FormField implements Va
   /**
    * Accepts the current input and writes it to the model.
    * <p>
-   * This method is typically called by the _onBlur() function of the field, but may actually be called from anywhere (e.g. button, actions, cell editor, etc).
+   * This method is typically called by the _onBlur() function of the field, but may actually be called from anywhere (e.g. button, actions, cell editor, etc.).
    * It is also called by the _aboutToBlurByMouseDown() function, which is required because our Ok- and Cancel-buttons are not focusable (thus _onBlur() is
    * never called) but changes in the value-field must be sent to the server anyway when a button is clicked.
    * <p>
@@ -251,7 +251,8 @@ export default abstract class ValueField<TValue> extends FormField implements Va
     return this.$field.isOrHas(target) || (this.$clearIcon && this.$clearIcon.isOrHas(target));
   }
 
-  protected _triggerAcceptInput(whileTyping: boolean) {
+  /** @internal */
+  _triggerAcceptInput(whileTyping: boolean) {
     let event = {
       displayText: this.displayText,
       whileTyping: !!whileTyping
@@ -323,14 +324,14 @@ export default abstract class ValueField<TValue> extends FormField implements Va
   }
 
   protected _clear() {
-    // to be implemented by sub-classes
+    // to be implemented by subclasses
   }
 
   protected _triggerClear() {
     this.trigger('clear');
   }
 
-  setValue(value: TValue) {
+  setValue(value: TValue | TModelValue) {
     // Same code as in Widget#setProperty expect for the equals check
     // -> _setValue has to be called even if the value is equal so that update display text will be executed
     value = this._prepareProperty('value', value);
@@ -355,11 +356,11 @@ export default abstract class ValueField<TValue> extends FormField implements Va
    * May be overridden to cast the value to the required type.
    * @returns the value with the correct type.
    */
-  protected _ensureValue(value: TValue): TValue {
-    return value;
+  protected _ensureValue(value: TValue | TModelValue): TValue {
+    return value as TValue;
   }
 
-  protected _setValue(value: TValue) {
+  protected _setValue(value: TValue | TModelValue) {
     // When widget is initialized with a given errorStatus and a value -> don't remove the error
     // status. This is a typical case for Scout Classic: field has a ParsingFailedError and user
     // hits reload.
@@ -371,9 +372,14 @@ export default abstract class ValueField<TValue> extends FormField implements Va
     let typedValue = null;
     try {
       typedValue = this._ensureValue(value);
+    } catch (conversionError) {
+      this._ensureValueFailed(value, conversionError);
+      return;
+    }
+
+    try {
       this.value = this.validateValue(typedValue);
     } catch (error) {
-      typedValue = typedValue || value;
       this._validationFailed(typedValue, error);
       return;
     }
@@ -498,7 +504,18 @@ export default abstract class ValueField<TValue> extends FormField implements Va
     this._updateDisplayText(value);
   }
 
-  protected _createValidationFailedStatus(value: TValue, error: any): Status {
+  protected _ensureValueFailed(value: TModelValue, error: any) {
+    $.log.isDebugEnabled() && $.log.debug('EnsureValue failed for field with id ' + this.id, error);
+    let status = this._createValidationFailedStatus(value, error);
+    this.addErrorStatus(status);
+    this.setDisplayText(this._formatRawValue(value));
+  }
+
+  protected _formatRawValue(value: TModelValue): string {
+    return value + '';
+  }
+
+  protected _createValidationFailedStatus(value: TValue | TModelValue, error: any): Status {
     return this._createInvalidValueStatus('ValidationFailedStatus', value, error);
   }
 
@@ -510,7 +527,7 @@ export default abstract class ValueField<TValue> extends FormField implements Va
     }
     let message, severity: StatusSeverity = Status.Severity.ERROR;
     if (error instanceof Status) {
-      // its a Status, but it has the wrong specific type
+      // it's a Status, but it has the wrong specific type
       message = error.message;
       severity = error.severity;
     } else if (typeof error === 'string') {
@@ -583,7 +600,6 @@ export default abstract class ValueField<TValue> extends FormField implements Va
   }
 
   protected _formatValue(value: TValue): string | JQuery.Promise<string> {
-    // @ts-ignore
     return scout.nvl(value, '') + '';
   }
 
@@ -659,6 +675,6 @@ export default abstract class ValueField<TValue> extends FormField implements Va
 
 export type ValueFieldClearable = EnumObject<typeof ValueField.Clearable>;
 export type ValueFieldMenuTypes = EnumObject<typeof ValueField.MenuTypes>;
-export type ValueFieldValidator<TValue> = (value: TValue, defaultValidator: ValueFieldValidator<TValue>) => TValue;
-export type ValueFieldFormatter<TValue> = (value: TValue, defaultFormatter: ValueFieldFormatter<TValue>) => string | JQuery.Promise<string>;
-export type ValueFieldParser<TValue> = (displayText: string, defaultParser: ValueFieldParser<TValue>) => TValue;
+export type ValueFieldValidator<TValue> = (value: TValue, defaultValidator?: ValueFieldValidator<TValue>) => TValue;
+export type ValueFieldFormatter<TValue> = (value: TValue, defaultFormatter?: ValueFieldFormatter<TValue>) => string | JQuery.Promise<string>;
+export type ValueFieldParser<TValue> = (displayText: string, defaultParser?: ValueFieldParser<TValue>) => TValue;

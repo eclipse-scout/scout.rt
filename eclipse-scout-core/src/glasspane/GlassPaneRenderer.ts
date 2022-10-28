@@ -84,8 +84,7 @@ export default class GlassPaneRenderer {
     // Glasspanes in popup-windows must be visible, otherwise the user cannot recognize that the popup
     // is blocked, since the widget that blocks (e.g a message-box) may be opened in the main-window.
     let window = $glassPane.window(true);
-    // @ts-ignore
-    if (window && window.popupWindow) {
+    if (window && window['popupWindow']) {
       $glassPane.addClass('dark');
     }
     this._$glassPanes.push($glassPane);

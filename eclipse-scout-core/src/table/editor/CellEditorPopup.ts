@@ -133,7 +133,8 @@ export default class CellEditorPopup<TValue> extends Popup implements CellEditor
     }
   }
 
-  protected _rowSelectionBounds(): Rectangle {
+  /** @internal */
+  _rowSelectionBounds(): Rectangle {
     let bounds = new Rectangle();
     let style = getComputedStyle(this.row.$row[0], ':after');
     if (style) {
@@ -221,7 +222,6 @@ export default class CellEditorPopup<TValue> extends Popup implements CellEditor
 
   protected override _onMouseDownOutside(event: MouseEvent) {
     let $clickedRow = $(event.target).closest('.table-row', this.table.$container[0]);
-    // noinspection JSIgnoredPromiseFromCall
     this.completeEdit();
 
     // When the edit completes the edited row is updated and replaced with new html elements.
@@ -249,8 +249,7 @@ export default class CellEditorPopup<TValue> extends Popup implements CellEditor
       return;
     }
     // Make sure completeEdit is called immediately after calling acceptInput.
-    // Otherwise the key stroke will be executed before completing the edit which prevents the input from being saved
-    // noinspection JSIgnoredPromiseFromCall
+    // Otherwise, the keystroke will be executed before completing the edit which prevents the input from being saved
     this.completeEdit(false);
   }
 
@@ -259,7 +258,7 @@ export default class CellEditorPopup<TValue> extends Popup implements CellEditor
       return false;
     }
     if (this.$container.isOrHas(event.keyStrokeContext.$getScopeTarget())) {
-      // Don't interfere with key strokes of the popup or children of the popup (otherwise pressing enter would close both the popup and the form at once)
+      // Don't interfere with keystrokes of the popup or children of the popup (otherwise pressing enter would close both the popup and the form at once)
       return false;
     }
     return true;
@@ -278,6 +277,6 @@ export type CellEditorRenderedOptions<TValue> = {
   cellEditorPopup: CellEditorPopup<TValue>;
 };
 
-export interface ValueFieldWithCellEditorRenderedCallback<TValue> extends ValueField<TValue> {
+export interface ValueFieldWithCellEditorRenderedCallback<TValue extends TModelValue, TModelValue = TValue> extends ValueField<TValue, TModelValue> {
   onCellEditorRendered(options: CellEditorRenderedOptions<TValue>): void;
 }

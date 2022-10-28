@@ -56,7 +56,7 @@ export default class SmartFieldMultiline<TValue> extends SmartField<TValue> {
 
   /**
    * Sets the focus to the input field when user clicks on text lines, but only if nothing is selected.
-   * Otherwise it would be impossible for the user to select the text. That's why we cannot use the
+   * Otherwise, it would be impossible for the user to select the text. That's why we cannot use the
    * mousedown event here too.
    */
   protected _onMultilineLinesClick(event: JQuery.ClickEvent) {

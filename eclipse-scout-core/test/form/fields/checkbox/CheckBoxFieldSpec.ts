@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxField, keys, scout, ValueField} from '../../../../src/index';
+import {CheckBoxField, CheckBoxFieldModel, keys, scout, ValueField} from '../../../../src/index';
 import {triggerKeyInputCapture} from '../../../../src/testing/jquery-testing';
 
 describe('CheckBoxField', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -20,8 +20,8 @@ describe('CheckBoxField', () => {
   });
 
   describe('inheritance', () => {
-    let checkBox;
-    let model;
+    let checkBox: CheckBoxField;
+    let model: CheckBoxFieldModel;
 
     beforeEach(() => {
       model = createSimpleModel('CheckBoxField', session);
@@ -89,7 +89,7 @@ describe('CheckBoxField', () => {
       triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
       expect(field.value).toBe(false);
 
-      // Set another key stroke -> only the new one has to be active
+      // Set another keystroke -> only the new one has to be active
       field.setKeyStroke('ctrl-g');
       triggerKeyInputCapture(session.desktop.$container, keys.B, 'ctrl');
       expect(field.value).toBe(false);

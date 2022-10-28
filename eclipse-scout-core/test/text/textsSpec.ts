@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -41,13 +41,19 @@ describe('texts', () => {
 
     it('creates Texts objects for each language tag given in the model', () => {
       texts.init(model);
+      // @ts-ignore
       expect(texts._get('default')._exists('defaultKey1')).toBe(true);
+      // @ts-ignore
       expect(texts._get('default')._exists('deKey1')).toBe(false);
 
+      // @ts-ignore
       expect(texts._get('de')._exists('deKey1')).toBe(true);
+      // @ts-ignore
       expect(texts._get('de')._exists('deCHKey1')).toBe(false);
 
+      // @ts-ignore
       expect(texts._get('de-CH')._exists('deCHKey1')).toBe(true);
+      // @ts-ignore
       expect(texts._get('de-CH')._exists('deKey1')).toBe(false);
     });
 
@@ -87,8 +93,8 @@ describe('texts', () => {
       texts.init(model);
       let textMap = texts.get('de');
       expect(textMap instanceof TextMap).toBe(true);
-      expect(textMap._exists('deKey1')).toBe(true);
-      expect(textMap._exists('deCHKey')).toBe(false);
+      expect(textMap.exists('deKey1')).toBe(true);
+      expect(textMap.exists('deCHKey')).toBe(false);
     });
 
     it('returns a Texts object with correct linking', () => {

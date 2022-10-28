@@ -15,8 +15,8 @@ export default interface ColumnUserFilterModel extends TableUserFilterModel {
   column: Column<any>;
 
   /**
-   * This property is used to check early whether or not this filter can produce filter-fields.
-   * Set this property to true in your sub-class, if it creates filter fields.
+   * This property is used to check early whether this filter can produce filter-fields.
+   * Set this property to true in your subclass, if it creates filter fields.
    */
   hasFilterFields?: boolean;
 

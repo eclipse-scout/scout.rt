@@ -32,7 +32,21 @@ export default class TableFooter extends Widget implements TableFooterModel {
   $resizer: JQuery;
   $clearIcon: JQuery<HTMLSpanElement>;
 
-  protected _compactStyle: boolean;
+  /** @internal */
+  _$controls: JQuery;
+  /** @internal */
+  _$info: JQuery;
+  /** @internal */
+  _compactStyle: boolean;
+  /** @internal */
+  _tableInfoTooltip: Tooltip;
+  /** @internal */
+  _tableStatusTooltip: Tooltip;
+  /** @internal */
+  _$infoLoad: JQuery;
+  /** @internal */
+  _$infoSelection: JQuery;
+
   protected _tableRowsChangedHandler: EventHandler<TableRowsInsertedEvent>;
   protected _tableFilterHandler: EventHandler<Event<Table>>;
   protected _tableFilterAddedHandler: EventHandler<TableFilterAddedEvent>;
@@ -41,18 +55,12 @@ export default class TableFooter extends Widget implements TableFooterModel {
   protected _tableStatusChangedHandler: EventHandler<Event<Table>>;
   protected _tablePropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Table>>;
   protected _focusFilterFieldKeyStroke: FocusFilterFieldKeyStroke;
-  protected _tableInfoTooltip: Tooltip;
-  protected _tableStatusTooltip: Tooltip;
   protected _autoHideTableStatusTooltipTimeoutId: number;
   protected _$window: JQuery<Window>;
   protected _$body: JQuery<Body>;
-  protected _$controls: JQuery;
-  protected _$infoLoad: JQuery;
   protected _$infoFilter: JQuery;
-  protected _$infoSelection: JQuery;
   protected _$infoTableStatus: JQuery;
-  protected _$infoTableStatusIcon: JQuery<HTMLSpanElement>;
-  protected _$info: JQuery;
+  protected _$infoTableStatusIcon: JQuery;
   protected _$textFilter: JQuery<HTMLInputElement>;
 
   constructor() {
@@ -253,7 +261,8 @@ export default class TableFooter extends Widget implements TableFooterModel {
     }
   }
 
-  protected _renderControls() {
+  /** @internal */
+  _renderControls() {
     let controls = this.table.tableControls;
     if (controls) {
       controls.forEach(control => {
@@ -265,7 +274,8 @@ export default class TableFooter extends Widget implements TableFooterModel {
     }
   }
 
-  protected _renderInfo() {
+  /** @internal */
+  _renderInfo() {
     this._renderInfoLoad();
     this._renderInfoTableStatus();
     this._renderInfoFilter();
@@ -811,7 +821,7 @@ export default class TableFooter extends Widget implements TableFooterModel {
     this._updateInfoFilterVisibility();
     if (event.filter instanceof TableUserFilter && event.filter.filterType === TableTextUserFilter.TYPE) {
       // Do not update the content when the value does not change. This is the case when typing text in
-      // the UI. If we would call val() unconditionally, the current cursor position will get lost.
+      // the UI. If we called val() unconditionally, the current cursor position will get lost.
       let textFilter = event.filter as TableTextUserFilter;
       let currentText = this._$textFilter.val();
       if (currentText !== textFilter.text) {

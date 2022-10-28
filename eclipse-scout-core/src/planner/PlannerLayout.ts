@@ -21,13 +21,11 @@ export default class PlannerLayout extends AbstractLayout {
 
   override layout($container: JQuery) {
     let menuBarSize,
-      // @ts-ignore
-      $header = this.planner._header.$container,
+      $header = this.planner.header.$container,
       $scale = this.planner.$scale,
       $grid = this.planner.$grid,
       menuBar = this.planner.menuBar,
-      // @ts-ignore
-      $yearContainer = this.planner._yearPanel.$container,
+      $yearContainer = this.planner.yearPanel.$container,
       menuBarHeight = 0,
       gridHeight = 0,
       yearContainerHeight = 0,

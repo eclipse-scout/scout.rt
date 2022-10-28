@@ -27,8 +27,11 @@ export default class GroupBoxAdapter extends CompositeFieldAdapter {
     return model;
   }
 
-  // Replace method on responsive handler.
-  protected override _postCreateWidget() {
+  /**
+   * Replace method on responsive handler.
+   * @internal
+   */
+  override _postCreateWidget() {
     super._postCreateWidget();
 
     if (this.widget.responsiveHandler) {
@@ -43,7 +46,6 @@ export default class GroupBoxAdapter extends CompositeFieldAdapter {
   }
 
   protected _setGridData(field: FormField, gridData: GridData) {
-    // @ts-ignore
     field._setGridData(gridData);
   }
 }

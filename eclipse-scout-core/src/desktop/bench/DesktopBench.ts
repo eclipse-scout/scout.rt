@@ -10,8 +10,7 @@
  */
 import {
   arrays, BenchColumn, BenchColumnLayoutData, BenchRowLayoutData, Desktop, DesktopBenchEventMap, DesktopBenchModel, DesktopNavigationHandle, DesktopTab, DesktopTabArea, DesktopTabSelectKeyStroke, Event, EventHandler, FlexboxLayout,
-  FlexboxLayoutData,
-  Form, HeaderTabBoxController, HtmlComponent, KeyStrokeContext, Outline, OutlineOverview, Page, PropertyChangeEvent, scout, SimpleTab, SimpleTabBox, Splitter, styles, Table, Widget, widgets
+  FlexboxLayoutData, Form, HeaderTabBoxController, HtmlComponent, KeyStrokeContext, Outline, OutlineOverview, Page, PropertyChangeEvent, scout, SimpleTab, SimpleTabBox, Splitter, styles, Table, Widget, widgets
 } from '../../index';
 import $ from 'jquery';
 import {DisplayViewId} from '../../tabbox/SimpleTab';
@@ -121,7 +120,8 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     this.updateNavigationHandleVisibility();
   }
 
-  protected _setTabArea(headerTabArea: DesktopTabArea) {
+  /** @internal */
+  _setTabArea(headerTabArea: DesktopTabArea) {
     this.headerTabArea = headerTabArea;
     if (this.headerTabAreaController) {
       this.headerTabAreaController.install(this, this.headerTabArea);
@@ -137,7 +137,6 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
         }
       });
       // ensure the correct view tab area is visible (header or center part)
-      // @ts-ignore
       this.headerTabAreaController._onViewsChanged();
     }
   }
@@ -345,10 +344,8 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     super.setLayoutData(layoutData);
     this.layoutData = layoutData;
     this.layoutCacheKey = [];
-    // @ts-ignore
-    if (layoutData.cacheKey) {
-      // @ts-ignore
-      this.layoutCacheKey.push(layoutData.cacheKey);
+    if (layoutData['cacheKey']) {
+      this.layoutCacheKey.push(layoutData['cacheKey']);
     }
   }
 
@@ -465,8 +462,7 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
       // Outline does not support multi selection
       content = this._computeDetailContentForPage(selectedPage);
     } else {
-      // @ts-ignore
-      content = this.outline._computeRootContent();
+      content = this.outline.getRootContent();
     }
     if (content) {
       if (content instanceof Table) {

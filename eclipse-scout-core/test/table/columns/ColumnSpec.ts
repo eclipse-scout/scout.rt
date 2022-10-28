@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BooleanColumn, Cell, scout} from '../../../src/index';
+import {BooleanColumn, Cell, Column, NumberColumn, scout} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
 import {triggerImageLoadCapture} from '../../../src/testing/jquery-testing';
 
 describe('Column', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -38,11 +38,10 @@ describe('Column', () => {
     model.columns[1].horizontalAlignment = 0;
     model.columns[2].horizontalAlignment = 1;
 
-    model.rows[0].cells[1].horizontalAlignment = 0;
-    model.rows[0].cells[2].horizontalAlignment = 1;
-
-    model.rows[1].cells[1].horizontalAlignment = 0;
-    model.rows[1].cells[2].horizontalAlignment = 1;
+    (model.rows[0].cells[1] as Cell).horizontalAlignment = 0;
+    (model.rows[0].cells[2] as Cell).horizontalAlignment = 1;
+    (model.rows[1].cells[1] as Cell).horizontalAlignment = 0;
+    (model.rows[1].cells[2] as Cell).horizontalAlignment = 1;
 
     let table = helper.createTable(model);
     table.render();
@@ -148,7 +147,7 @@ describe('Column', () => {
   it('considers custom css class of a cell, if both are set only the cell class is used', () => {
     let model = helper.createModelFixture(3, 2);
     model.columns[0].cssClass = 'abc';
-    model.rows[0].cells[0].cssClass = 'custom-cell-0';
+    (model.rows[0].cells[0] as Cell).cssClass = 'custom-cell-0';
 
     let table = helper.createTable(model);
     table.render();
@@ -170,10 +169,10 @@ describe('Column', () => {
 
   it('considers htmlEnabled of a cell', () => {
     let model = helper.createModelFixture(3, 2);
-    model.rows[0].cells[0].text = '<b>hi</b>';
-    model.rows[0].cells[0].htmlEnabled = false;
-    model.rows[0].cells[1].text = '<b>hi</b>';
-    model.rows[0].cells[1].htmlEnabled = true;
+    (model.rows[0].cells[0] as Cell).text = '<b>hi</b>';
+    (model.rows[0].cells[0] as Cell).htmlEnabled = false;
+    (model.rows[0].cells[1] as Cell).text = '<b>hi</b>';
+    (model.rows[0].cells[1] as Cell).htmlEnabled = true;
 
     let table = helper.createTable(model);
     table.render();
@@ -187,35 +186,35 @@ describe('Column', () => {
 
   it('caches encoded text of a cell to improve performance', () => {
     let model = helper.createModelFixture(3, 1);
-    model.rows[0].cells[0].text = '<b>hi</b>';
-    model.rows[0].cells[0].htmlEnabled = false;
+    (model.rows[0].cells[0] as Cell).text = '<b>hi</b>';
+    (model.rows[0].cells[0] as Cell).htmlEnabled = false;
 
     let table = helper.createTable(model);
     expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
-    expect(table.rows[0].cells[0]._cachedEncodedText).toBeFalsy();
+    expect(table.rows[0].cells[0]['_cachedEncodedText']).toBeFalsy();
 
     table.render();
 
     expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
     expect(table.rows[0].cells[0].encodedText()).toBe('&lt;b&gt;hi&lt;/b&gt;');
     expect(table.rows[0].$row.find('.table-cell').eq(0).text()).toBe('<b>hi</b>');
-    let firstElement = table.rows[0].cells[0]._cachedEncodedText;
+    let firstElement = table.rows[0].cells[0]['_cachedEncodedText'];
     expect(firstElement).not.toBeFalsy();
 
     // re render -> encode must not be called again
     table.remove();
     table.render();
-    expect(firstElement).toBe(table.rows[0].cells[0]._cachedEncodedText);
+    expect(firstElement).toBe(table.rows[0].cells[0]['_cachedEncodedText']);
   });
 
   describe('multilineText', () => {
     it('replaces\n with br, but only if htmlEnabled is false', () => {
       let model = helper.createModelFixture(3, 2);
       model.multilineText = true;
-      model.rows[0].cells[0].text = '<br>hello\nyou';
-      model.rows[0].cells[0].htmlEnabled = false;
-      model.rows[0].cells[1].text = '<br>hello\nyou';
-      model.rows[0].cells[1].htmlEnabled = true;
+      (model.rows[0].cells[0] as Cell).text = '<br>hello\nyou';
+      (model.rows[0].cells[0] as Cell).htmlEnabled = false;
+      (model.rows[0].cells[1] as Cell).text = '<br>hello\nyou';
+      (model.rows[0].cells[1] as Cell).htmlEnabled = true;
 
       let table = helper.createTable(model);
       table.render();
@@ -413,8 +412,8 @@ describe('Column', () => {
 
     it('cellValue() and cellText() return the appropriate values', () => {
       let model = helper.createModel([
-        helper.createModelColumn('col0', 'Column'),
-        helper.createModelColumn('col1', 'NumberColumn')
+        helper.createModelColumn('col0', Column),
+        helper.createModelColumn('col1', NumberColumn)
       ], [
         helper.createModelRow('row0', [helper.createModelCell('Text0', 'Value0'), helper.createModelCell('Number0', 0)]),
         helper.createModelRow('row1', [helper.createModelCell('Text1'), helper.createModelCell('Number1', 1)])
@@ -449,7 +448,7 @@ describe('Column', () => {
       let model = helper.createModelFixture(3, 2);
       model.columns[1].autoOptimizeWidth = true;
       let table = helper.createTable(model);
-      spyOn(table, 'resizeToFit').and.callThrough();
+      let resizeToFitSpy = spyOn(table, 'resizeToFit').and.callThrough();
       table.render();
       expect(table.columns[0].autoOptimizeWidth).toBe(false);
       expect(table.columns[1].autoOptimizeWidth).toBe(true);
@@ -459,7 +458,7 @@ describe('Column', () => {
       table.validateLayout();
       expect(table.columns[1].autoOptimizeWidth).toBe(true);
       expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
-      expect(table.resizeToFit.calls.count()).toBe(1);
+      expect(resizeToFitSpy.calls.count()).toBe(1);
     });
 
     it('also works if there is no header', () => {
@@ -467,36 +466,36 @@ describe('Column', () => {
       model.columns[1].autoOptimizeWidth = true;
       model.headerVisible = false;
       let table = helper.createTable(model);
-      spyOn(table, 'resizeToFit').and.callThrough();
+      let resizeToFitSpy = spyOn(table, 'resizeToFit').and.callThrough();
       table.render();
       expect(table.resizeToFit).not.toHaveBeenCalled();
 
       table.validateLayout();
       expect(table.columns[1].autoOptimizeWidth).toBe(true);
-      expect(table.resizeToFit.calls.count()).toBe(1);
+      expect(resizeToFitSpy.calls.count()).toBe(1);
     });
 
     it('considers images', () => {
       let model = helper.createModelFixture(3, 2);
       model.columns[1].autoOptimizeWidth = true;
-      model.rows[0].cells[1].iconId = 'fancyIcon.png';
+      (model.rows[0].cells[1] as Cell).iconId = 'fancyIcon.png';
       let table = helper.createTable(model);
-      spyOn(table, 'resizeToFit').and.callThrough();
-      spyOn(table, '_resizeToFit').and.callThrough();
+      let resizeToFit = spyOn(table, 'resizeToFit').and.callThrough();
+      let _resizeToFit = spyOn(table, '_resizeToFit').and.callThrough();
       table.render();
       expect(table.resizeToFit).not.toHaveBeenCalled();
       expect(table._resizeToFit).not.toHaveBeenCalled();
 
       table.validateLayout();
-      expect(table.resizeToFit.calls.count()).toBe(1);
+      expect(resizeToFit.calls.count()).toBe(1);
       // _resizeToFit must not be called yet because fancyImage.png is not loaded yet
-      expect(table._resizeToFit.calls.count()).toBe(0);
+      expect(_resizeToFit.calls.count()).toBe(0);
 
-      // Simulate imaeg load event
+      // Simulate image load event
       triggerImageLoadCapture(table.columns[1].optimalWidthMeasurer.$measurement.find('img'));
       // Image has been loaded and the promise is resolved -> _resizeToFit will be called
-      expect(table.resizeToFit.calls.count()).toBe(1);
-      expect(table._resizeToFit.calls.count()).toBe(1);
+      expect(resizeToFit.calls.count()).toBe(1);
+      expect(_resizeToFit.calls.count()).toBe(1);
     });
 
     describe('autoOptimizeWidthRequired', () => {
@@ -511,7 +510,7 @@ describe('Column', () => {
         table.validateLayout();
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
-        spyOn(table, 'resizeToFit').and.callThrough();
+        let resizeToFitSpy = spyOn(table, 'resizeToFit').and.callThrough();
 
         // Update row but don't change relevant content -> no need to update the width
         table.updateRow({
@@ -531,7 +530,7 @@ describe('Column', () => {
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
         table.validateLayout();
-        expect(table.resizeToFit.calls.count()).toBe(1);
+        expect(resizeToFitSpy.calls.count()).toBe(1);
       });
 
       it('will be set to true if a row is inserted', () => {
@@ -543,13 +542,13 @@ describe('Column', () => {
         table.validateLayout();
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
-        spyOn(table, 'resizeToFit').and.callThrough();
+        let resizeToFitSpy = spyOn(table, 'resizeToFit').and.callThrough();
 
         table.insertRow({cells: ['a', 'b', 'c']});
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(true);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
         table.validateLayout();
-        expect(table.resizeToFit.calls.count()).toBe(2);
+        expect(resizeToFitSpy.calls.count()).toBe(2);
       });
 
       it('will be set to true if a row is deleted', () => {
@@ -561,13 +560,13 @@ describe('Column', () => {
         table.validateLayout();
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
-        spyOn(table, 'resizeToFit').and.callThrough();
+        let resizeToFitSpy = spyOn(table, 'resizeToFit').and.callThrough();
 
         table.deleteRow(table.rows[1]);
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(true);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
         table.validateLayout();
-        expect(table.resizeToFit.calls.count()).toBe(2);
+        expect(resizeToFitSpy.calls.count()).toBe(2);
       });
 
       it('will be set to true if all rows are deleted', () => {
@@ -579,13 +578,13 @@ describe('Column', () => {
         table.validateLayout();
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
-        spyOn(table, 'resizeToFit').and.callThrough();
+        let resizeToFitSpy = spyOn(table, 'resizeToFit').and.callThrough();
 
         table.deleteAllRows();
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(true);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(true);
         table.validateLayout();
-        expect(table.resizeToFit.calls.count()).toBe(2);
+        expect(resizeToFitSpy.calls.count()).toBe(2);
       });
 
       it('will be set to true if autoOptimizeWidth is set dynamically', () => {
@@ -595,24 +594,23 @@ describe('Column', () => {
         table.validateLayout();
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
-        spyOn(table, 'resizeToFit').and.callThrough();
+        let resizeToFitSpy = spyOn(table, 'resizeToFit').and.callThrough();
 
         table.columns[0].setAutoOptimizeWidth(true);
         expect(table.columns[0].autoOptimizeWidth).toBe(true);
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(true);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
         table.validateLayout();
-        expect(table.resizeToFit.calls.count()).toBe(1);
+        expect(resizeToFitSpy.calls.count()).toBe(1);
 
         table.columns[0].setAutoOptimizeWidth(false);
         expect(table.columns[0].autoOptimizeWidth).toBe(false);
         expect(table.columns[0].autoOptimizeWidthRequired).toBe(false);
         expect(table.columns[1].autoOptimizeWidthRequired).toBe(false);
         table.validateLayout();
-        expect(table.resizeToFit.calls.count()).toBe(1);
+        expect(resizeToFitSpy.calls.count()).toBe(1);
       });
     });
-
   });
 
   describe('displayable', () => {
@@ -642,7 +640,7 @@ describe('Column', () => {
   it('isContentValid', () => {
     let table = helper.createTable({
       columns: [{
-        objectType: 'Column',
+        objectType: Column,
         mandatory: true
       }]
     });

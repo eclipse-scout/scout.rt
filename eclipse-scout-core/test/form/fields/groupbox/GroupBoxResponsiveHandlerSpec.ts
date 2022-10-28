@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, GroupBox, HtmlEnvironment, ResponsiveManager, scout, StringField} from '../../../../src/index';
+import {CheckBoxField, FormField, FormFieldModel, GroupBox, HtmlEnvironment, LabelField, RadioButton, RadioButtonGroup, RefModel, ResponsiveManager, scout, StringField} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 
 describe('GroupBoxResponsiveHandler', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -21,24 +21,24 @@ describe('GroupBoxResponsiveHandler', () => {
     helper = new FormSpecHelper(session);
   });
 
-  function createGroupBox(fields) {
+  function createGroupBox(fields?: RefModel<FormFieldModel>[]): GroupBox {
     fields = fields || [{
-      objectType: 'StringField'
+      objectType: StringField
     }, {
-      objectType: 'CheckBoxField'
+      objectType: CheckBoxField
     }, {
-      objectType: 'LabelField'
+      objectType: LabelField
     }, {
-      objectType: 'RadioButtonGroup',
+      objectType: RadioButtonGroup,
       fields: [{
-        objectType: 'RadioButton'
+        objectType: RadioButton
       }, {
-        objectType: 'RadioButton'
+        objectType: RadioButton
       }]
     }, {
-      objectType: 'GroupBox',
+      objectType: GroupBox,
       fields: [{
-        objectType: 'StringField'
+        objectType: StringField
       }]
     }];
     return scout.create(GroupBox, {

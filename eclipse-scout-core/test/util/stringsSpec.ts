@@ -16,6 +16,7 @@ describe('strings', () => {
   describe('nl2br', () => {
 
     it('can convert newlines to br tags', () => {
+      // @ts-ignore
       expect(strings.nl2br()).toBe(undefined);
       expect(strings.nl2br(null)).toBe(null);
       expect(strings.nl2br('')).toBe('');
@@ -24,6 +25,7 @@ describe('strings', () => {
       expect(strings.nl2br('Hello\nGoodbye\n')).toBe('Hello<br>Goodbye<br>');
       expect(strings.nl2br('Hello\n\nGoodbye')).toBe('Hello<br><br>Goodbye');
       expect(strings.nl2br('Hello\n\r\nGoodbye')).toBe('Hello<br><br>Goodbye');
+      // @ts-ignore
       expect(strings.nl2br(123)).toBe('123');
     });
 
@@ -37,6 +39,7 @@ describe('strings', () => {
   describe('hasText', () => {
 
     it('can check if string has text', () => {
+      // @ts-ignore
       expect(strings.hasText()).toBe(false);
       expect(strings.hasText('')).toBe(false);
       expect(strings.hasText(' ')).toBe(false);
@@ -44,7 +47,9 @@ describe('strings', () => {
       expect(strings.hasText('       .      ')).toBe(true);
       expect(strings.hasText('       \n      ')).toBe(false);
       expect(strings.hasText('       \n      \nn')).toBe(true);
+      // @ts-ignore
       expect(strings.hasText(123)).toBe(true);
+      // @ts-ignore
       expect(strings.hasText(0)).toBe(true);
     });
 
@@ -53,12 +58,16 @@ describe('strings', () => {
   describe('repeat', () => {
 
     it('can repeat strings', () => {
+      // @ts-ignore
       expect(strings.repeat()).toBe(undefined);
+      // @ts-ignore
       expect(strings.repeat('')).toBe('');
+      // @ts-ignore
       expect(strings.repeat('X')).toBe('');
       expect(strings.repeat('X', 1)).toBe('X');
       expect(strings.repeat('Y', 7)).toBe('YYYYYYY');
       expect(strings.repeat('X', -7)).toBe('');
+      // @ts-ignore
       expect(strings.repeat(4, 4)).toBe('4444');
     });
 
@@ -67,8 +76,11 @@ describe('strings', () => {
   describe('padZeroLeft', () => {
 
     it('can pad strings with 0', () => {
+      // @ts-ignore
       expect(strings.padZeroLeft()).toBe(undefined);
+      // @ts-ignore
       expect(strings.padZeroLeft('')).toBe('');
+      // @ts-ignore
       expect(strings.padZeroLeft('X')).toBe('X');
       expect(strings.padZeroLeft('X', 1)).toBe('X');
       expect(strings.padZeroLeft('X', 7)).toBe('000000X');
@@ -88,20 +100,31 @@ describe('strings', () => {
       expect(strings.startsWith('äabc', 'Ä')).toBe(false);
       expect(strings.startsWith('abc', '')).toBe(true);
       expect(strings.startsWith('', '')).toBe(true);
+      // @ts-ignore
       expect(strings.startsWith()).toBe(false);
       expect(strings.startsWith(undefined, 'hello')).toBe(false);
       expect(strings.startsWith('Der Himmel ist blau!', 'Der')).toBe(true);
       expect(strings.startsWith('¿Vive usted en España?', 'Vive')).toBe(false);
       expect(strings.startsWith('¿Vive usted en España?', '¿Vive')).toBe(true);
+      // @ts-ignore
       expect(strings.startsWith(456, 4)).toBe(true);
+      // @ts-ignore
       expect(strings.startsWith(456, 5)).toBe(false);
+      // @ts-ignore
       expect(strings.startsWith(456, '4')).toBe(true);
+      // @ts-ignore
       expect(strings.startsWith('456', 4)).toBe(true);
+      // @ts-ignore
       expect(strings.startsWith(true, 't')).toBe(true);
+      // @ts-ignore
       expect(strings.startsWith({}, {})).toBe(true);
+      // @ts-ignore
       expect(strings.startsWith('xyz', {})).toBe(false);
+      // @ts-ignore
       expect(strings.startsWith({a: 2}, {a: 3})).toBe(true); // because both objects return the same toString()
+      // @ts-ignore
       expect(strings.startsWith(['a', 'b'], 'a')).toBe(true); // because arrays are converted to string
+      // @ts-ignore
       expect(strings.startsWith('xyz', [])).toBe(true); // because arrays are converted to string
     });
 
@@ -116,13 +139,18 @@ describe('strings', () => {
       expect(strings.endsWith('abcä', 'Ä')).toBe(false);
       expect(strings.endsWith('abc', '')).toBe(true);
       expect(strings.endsWith('', '')).toBe(true);
+      // @ts-ignore
       expect(strings.endsWith()).toBe(false);
       expect(strings.endsWith(undefined, 'hello')).toBe(false);
       expect(strings.endsWith('Der Himmel ist blau!', 'blau')).toBe(false);
       expect(strings.endsWith('Der Himmel ist blau!', 'blau!')).toBe(true);
+      // @ts-ignore
       expect(strings.endsWith(1234, 4)).toBe(true);
+      // @ts-ignore
       expect(strings.endsWith(1234, 5)).toBe(false);
+      // @ts-ignore
       expect(strings.endsWith(1234, '4')).toBe(true);
+      // @ts-ignore
       expect(strings.endsWith('1234', 4)).toBe(true);
     });
 
@@ -131,7 +159,9 @@ describe('strings', () => {
   describe('count', () => {
 
     it('can count occurrences', () => {
+      // @ts-ignore
       expect(strings.count()).toBe(0);
+      // @ts-ignore
       expect(strings.count('hello')).toBe(0);
       expect(strings.count('hello', 'xxx')).toBe(0);
       expect(strings.count('hello', 'l')).toBe(2);
@@ -143,6 +173,7 @@ describe('strings', () => {
       expect(strings.count('{"validJson": true, "example": "ümlauts"}', 'ü')).toBe(1);
       expect(strings.count('{"validJson": true, "example": "ümlauts"}', '"')).toBe(6);
       expect(strings.count('the bird is the word', 'rd')).toBe(2);
+      // @ts-ignore
       expect(strings.count(98138165, 1)).toBe(2);
     });
 
@@ -151,6 +182,7 @@ describe('strings', () => {
   describe('join', () => {
 
     it('joins strings', () => {
+      // @ts-ignore
       expect(strings.join()).toBe('');
       expect(strings.join('')).toBe('');
       expect(strings.join(' ')).toBe('');
@@ -165,10 +197,12 @@ describe('strings', () => {
       expect(strings.join('  ', ' ', '', ' ')).toBe('    ');
       expect(strings.join(undefined, 'one', 'two', 'three')).toBe('onetwothree');
       expect(strings.join('', 'one', 'two', 'three')).toBe('onetwothree');
+      // @ts-ignore
       expect(strings.join(2, 0, 0, 0)).toBe('02020');
     });
 
     it('join works with array as second parameter', () => {
+      // @ts-ignore
       expect(strings.join('-', ['hello', 'world'])).toBe('hello-world');
     });
 
@@ -177,7 +211,9 @@ describe('strings', () => {
   describe('box', () => {
 
     it('boxes strings', () => {
+      // @ts-ignore
       expect(strings.box()).toBe('');
+      // @ts-ignore
       expect(strings.box('(')).toBe('');
       expect(strings.box('(', undefined)).toBe('');
       expect(strings.box('(', 'x')).toBe('(x');
@@ -185,9 +221,11 @@ describe('strings', () => {
       expect(strings.box('(', 'x', ')')).toBe('(x)');
       expect(strings.box('   (', 'x ', ')')).toBe('   (x )');
       expect(strings.box(' (', 'x  ')).toBe(' (x  ');
+      // @ts-ignore
       expect(strings.box('(', 'x', ')', 'y')).toBe('(x)');
       expect(strings.box('', 'x', '')).toBe('x');
       expect(strings.box('a', ' ', 'b')).toBe('');
+      // @ts-ignore
       expect(strings.box(0, -3, 7)).toBe('0-37');
     });
 
@@ -196,11 +234,15 @@ describe('strings', () => {
   describe('length', () => {
 
     it('counts the length', () => {
+      // @ts-ignore
       expect(strings.length()).toBe(0);
       expect(strings.length(null)).toBe(0);
       expect(strings.length('')).toBe(0);
+      // @ts-ignore
       expect(strings.length(0)).toBe(1); // "0"
+      // @ts-ignore
       expect(strings.length(true)).toBe(4); // "true"
+      // @ts-ignore
       expect(strings.length({})).toBe(15); // "[object Object]"
       expect(strings.length(' ')).toBe(1);
       expect(strings.length(' xyz ')).toBe(5);
@@ -212,11 +254,15 @@ describe('strings', () => {
   describe('trim', () => {
 
     it('trims white space', () => {
+      // @ts-ignore
       expect(strings.trim()).toBe(undefined);
       expect(strings.trim(null)).toBe(null);
       expect(strings.trim('')).toBe('');
+      // @ts-ignore
       expect(strings.trim(0)).toBe('0');
+      // @ts-ignore
       expect(strings.trim(true)).toBe('true');
+      // @ts-ignore
       expect(strings.trim({})).toBe('[object Object]');
       expect(strings.trim('0')).toBe('0');
       expect(strings.trim(' ')).toBe('');
@@ -229,11 +275,15 @@ describe('strings', () => {
   describe('toLowerCase', () => {
 
     it('converts text to lower case', () => {
+      // @ts-ignore
       expect(strings.toLowerCase()).toBe(undefined);
       expect(strings.toLowerCase(null)).toBe(null);
       expect(strings.toLowerCase('')).toBe('');
+      // @ts-ignore
       expect(strings.toLowerCase(0)).toBe('0');
+      // @ts-ignore
       expect(strings.toLowerCase(true)).toBe('true');
+      // @ts-ignore
       expect(strings.toLowerCase({})).toBe('[object object]');
       expect(strings.toLowerCase('0')).toBe('0');
       expect(strings.toLowerCase(' ')).toBe(' ');
@@ -248,11 +298,15 @@ describe('strings', () => {
   describe('toUpperCaseFirstLetter', () => {
 
     it('converts first letter to upper case', () => {
+      // @ts-ignore
       expect(strings.toUpperCaseFirstLetter()).toBe(undefined);
       expect(strings.toUpperCaseFirstLetter(null)).toBe(null);
       expect(strings.toUpperCaseFirstLetter('')).toBe('');
+      // @ts-ignore
       expect(strings.toUpperCaseFirstLetter(0)).toBe('0');
+      // @ts-ignore
       expect(strings.toUpperCaseFirstLetter(true)).toBe('True');
+      // @ts-ignore
       expect(strings.toUpperCaseFirstLetter({})).toBe('[object Object]');
       expect(strings.toUpperCaseFirstLetter('0')).toBe('0');
       expect(strings.toUpperCaseFirstLetter(' ')).toBe(' ');
@@ -269,11 +323,15 @@ describe('strings', () => {
   describe('toLowerCaseFirstLetter', () => {
 
     it('converts first letter to lower case', () => {
+      // @ts-ignore
       expect(strings.toLowerCaseFirstLetter()).toBe(undefined);
       expect(strings.toLowerCaseFirstLetter(null)).toBe(null);
       expect(strings.toLowerCaseFirstLetter('')).toBe('');
+      // @ts-ignore
       expect(strings.toLowerCaseFirstLetter(0)).toBe('0');
+      // @ts-ignore
       expect(strings.toLowerCaseFirstLetter(true)).toBe('true');
+      // @ts-ignore
       expect(strings.toLowerCaseFirstLetter({})).toBe('[object Object]');
       expect(strings.toLowerCaseFirstLetter('0')).toBe('0');
       expect(strings.toLowerCaseFirstLetter(' ')).toBe(' ');
@@ -290,11 +348,13 @@ describe('strings', () => {
   describe('quote', () => {
 
     it('quotes special characters for regexp', () => {
+      // @ts-ignore
       expect(strings.quote()).toBe(undefined);
       expect(strings.quote(null)).toBe(null);
       expect(strings.quote('bla')).toBe('bla');
       expect(strings.quote('foo. bar.')).toBe('foo\\. bar\\.');
       expect(strings.quote('ein * am Himmel')).toBe('ein \\* am Himmel');
+      // @ts-ignore
       expect(strings.quote(123)).toBe('123');
     });
 
@@ -303,6 +363,7 @@ describe('strings', () => {
   describe('asString', () => {
 
     it('converts input to string', () => {
+      // @ts-ignore
       expect(strings.asString()).toBe(undefined);
       expect(strings.asString(null)).toBe(null);
       expect(strings.asString('bla')).toBe('bla');
@@ -317,14 +378,20 @@ describe('strings', () => {
   describe('insertAt', () => {
 
     it('can insert strings into other strings', () => {
+      // @ts-ignore
       expect(strings.insertAt()).toBe(undefined);
+      // @ts-ignore
       expect(strings.insertAt(null)).toBe(null);
+      // @ts-ignore
       expect(strings.insertAt('')).toBe('');
+      // @ts-ignore
       expect(strings.insertAt('Hello')).toBe('Hello');
+      // @ts-ignore
       expect(strings.insertAt('Hello', '_')).toBe('Hello');
       expect(strings.insertAt('Hello', '_', 0)).toBe('_Hello');
       expect(strings.insertAt('Hello', '_', 3)).toBe('Hel_lo');
       expect(strings.insertAt('Hello', '_', 200)).toBe('Hello_');
+      // @ts-ignore
       expect(strings.insertAt('Hello', '_', 'bla')).toBe('Hello');
     });
 
@@ -341,6 +408,7 @@ describe('strings', () => {
 
     it('should throw an error when called with more than one parameter', () => {
       expect(() => {
+        // @ts-ignore
         strings.nvl(null, 'foo');
       }).toThrow();
     });
@@ -360,9 +428,13 @@ describe('strings', () => {
   describe('splitMax', () => {
 
     it('returns not more than limit elements', () => {
+      // @ts-ignore
       expect(strings.splitMax()).toEqual([]);
+      // @ts-ignore
       expect(strings.splitMax('')).toEqual(['']);
+      // @ts-ignore
       expect(strings.splitMax('abc')).toEqual(['abc']);
+      // @ts-ignore
       expect(strings.splitMax('abc', '')).toEqual(['a', 'b', 'c']);
       expect(strings.splitMax('abc', '', 1)).toEqual(['abc']);
       expect(strings.splitMax('abc', '', 0)).toEqual(['a', 'b', 'c']);

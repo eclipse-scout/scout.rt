@@ -1,19 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {focusUtils} from '../../../../src/index';
+import {focusUtils, WrappedFormField, WrappedFormFieldModel} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
+import {Optional} from '../../../../src/types';
 
 describe('WrappedForm', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -21,8 +22,8 @@ describe('WrappedForm', () => {
     helper = new FormSpecHelper(session);
   });
 
-  function createField(modelProperties) {
-    return helper.createField('WrappedFormField', session.desktop, modelProperties);
+  function createField(modelProperties: Optional<WrappedFormFieldModel, 'parent'>): WrappedFormField {
+    return helper.createField(WrappedFormField, session.desktop, modelProperties);
   }
 
   describe('mandatory indicator', () => {

@@ -9,32 +9,32 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {Form, scout, StringField, WidgetPopup} from '../../src/index';
+import {Form, GroupBox, scout, StringField, Widget, WidgetPopup} from '../../src/index';
 
 describe('WidgetPopup', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  function createPopupWithFormAnd2Fields(initialFocus) {
+  function createPopupWithFormAnd2Fields(initialFocus?: Widget | string): WidgetPopup {
     return scout.create(WidgetPopup, {
       parent: session.desktop,
       content: {
-        objectType: 'Form',
+        objectType: Form,
         displayHint: Form.DisplayHint.VIEW,
         modal: false,
         initialFocus: initialFocus,
         rootGroupBox: {
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           fields: [{
             id: 'First Field',
-            objectType: 'StringField'
+            objectType: StringField
           }, {
             id: 'Second Field',
-            objectType: 'StringField'
+            objectType: StringField
           }]
         }
       }

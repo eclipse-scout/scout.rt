@@ -88,7 +88,8 @@ export default class SimpleTabBoxController<TView extends SimpleTabView = Simple
     }) as SimpleTabArea<TView>;
   }
 
-  protected _onViewAdd(event: { view: TView; siblingView?: TView }) {
+  /** @internal */
+  _onViewAdd(event: { view: TView; siblingView?: TView }) {
     let view = event.view;
     if (!SimpleTabBoxController.hasViewTab(view)) {
       return;
@@ -118,7 +119,8 @@ export default class SimpleTabBoxController<TView extends SimpleTabView = Simple
     }
   }
 
-  protected _onViewActivate(event: SimpleTabBoxViewActivateEvent<TView>) {
+  /** @internal */
+  _onViewActivate(event: { view: TView }) {
     let viewTab = this.getTab(event.view);
     // also reset selection if no view tab of the view is found.
     this.tabArea.selectTab(viewTab);

@@ -17,7 +17,7 @@ export default class HtmlEncoder {
     this.cache = new CachedElement('div');
   }
 
-  encode(text: string): string {
+  encode(text?: string): string {
     if (!text) {
       return text;
     }

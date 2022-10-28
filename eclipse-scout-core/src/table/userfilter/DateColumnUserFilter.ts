@@ -59,7 +59,7 @@ export default class DateColumnUserFilter extends ColumnUserFilter implements Co
     return !!this.dateFrom || !!this.dateTo;
   }
 
-  override acceptByFields(key: Date, normKey: number | string, row: TableRow): boolean {
+  override acceptByFields(key: Date, normKey?: number | string, row?: TableRow): boolean {
     // if date is empty and dateFrom/dateTo is set, the row should never match
     if (!key) {
       return false;

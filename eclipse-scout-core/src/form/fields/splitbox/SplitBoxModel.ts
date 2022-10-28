@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, FormFieldModel, KeyStroke, KeyStrokeModel} from '../../../index';
+import {FormField, FormFieldModel} from '../../../index';
 import {RefModel} from '../../../types';
 
 export default interface SplitBoxModel extends FormFieldModel {
@@ -16,9 +16,9 @@ export default interface SplitBoxModel extends FormFieldModel {
   secondField: FormField | RefModel<FormFieldModel>;
   collapsibleField: FormField | string;
   fieldCollapsed?: boolean;
-  toggleCollapseKeyStroke?: KeyStroke | KeyStrokeModel | string;
-  firstCollapseKeyStroke?: KeyStroke | KeyStrokeModel | string;
-  secondCollapseKeyStroke?: KeyStroke | KeyStrokeModel | string;
+  toggleCollapseKeyStroke?: string;
+  firstCollapseKeyStroke?: string;
+  secondCollapseKeyStroke?: string;
   /** true = split x-axis, false = split y-axis */
   splitHorizontal?: boolean;
   splitterEnabled?: boolean;

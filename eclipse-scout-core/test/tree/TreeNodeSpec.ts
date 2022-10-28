@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -12,7 +12,7 @@
 import {scout, Tree, TreeNode} from '../../src/index';
 
 describe('TreeNode', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -27,10 +27,12 @@ describe('TreeNode', () => {
       });
       let parentNode = scout.create(TreeNode, {
         parent: tree,
+        // @ts-ignore
         parentNode: rootNode
       });
       let node = scout.create(TreeNode, {
         parent: tree,
+        // @ts-ignore
         parentNode: parentNode
       });
       expect(rootNode.isAncestorOf(parentNode)).toBe(true);
@@ -51,10 +53,12 @@ describe('TreeNode', () => {
       });
       let parentNode = scout.create(TreeNode, {
         parent: tree,
+        // @ts-ignore
         parentNode: rootNode
       });
       let node = scout.create(TreeNode, {
         parent: tree,
+        // @ts-ignore
         parentNode: parentNode
       });
       expect(node.isDescendantOf(parentNode)).toBe(true);

@@ -67,7 +67,8 @@ export default class TileButton extends Button {
     this.invalidateLayoutTree();
   }
 
-  protected override _renderTooltipText() {
+  /** @internal */
+  override _renderTooltipText() {
     // Because tile buttons don't have a visible status, display the tooltip text as normal "hover" tooltip
     if (strings.hasText(this.tooltipText)) {
       tooltips.install(this.$container, {

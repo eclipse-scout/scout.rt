@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent} from '../../../../src/index';
+import {HtmlComponent, TabBox} from '../../../../src/index';
 import {TabBoxSpecHelper} from '../../../../src/testing/index';
 
 describe('TabItem', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TabBoxSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -22,7 +22,7 @@ describe('TabItem', () => {
   });
 
   describe('_renderStatusVisible', () => {
-    let tabBox;
+    let tabBox: TabBox;
 
     beforeEach(() => {
       let tabItem = helper.createTabItem({
@@ -35,11 +35,12 @@ describe('TabItem', () => {
       tabBox.render();
       tabBox.validateLayout();
       expect(HtmlComponent.get(tabBox.header.tabArea.$container).valid).toBe(true);
-      expect(tabBox.header.tabArea.tabs[0]._computeVisible()).toBe(false);
+      let firstTab = tabBox.header.tabArea.tabs[0];
+      expect(firstTab['_computeVisible']()).toBe(false);
 
       // TabArea needs to be invalidated, it may necessary to show ellipsis now because status got visible
       tabBox.tabItems[0].setTooltipText('test');
-      expect(tabBox.header.tabArea.tabs[0]._computeVisible()).toBe(true);
+      expect(firstTab['_computeVisible']()).toBe(true);
       expect(HtmlComponent.get(tabBox.header.tabArea.$container).valid).toBe(false);
     });
 

@@ -55,7 +55,7 @@ export function filterAccordingToSelection(prefix: string, selectionLength: numb
  * menu-bar DOM (invisible, however). They may change their visible state later. If there are any types in notAllowedTypes each menu is checked also against
  * these types and if they are matching the menu is filtered.
  */
-export function filter(menus: Menu[], types: string | string[], options?: MenuFilterOptions): Menu[] {
+export function filter(menus: Menu[], types?: string | string[], options?: MenuFilterOptions): Menu[] {
   if (!menus) {
     return;
   }
@@ -176,7 +176,6 @@ export function createEllipsisMenu(options: EllipsisMenuModel): EllipsisMenu {
 
 export function moveMenuIntoEllipsis(menu: Menu, ellipsis: EllipsisMenu) {
   menu.remove();
-  // @ts-ignore
   menu._setOverflown(true);
   menu.overflowMenu = ellipsis;
 
@@ -185,8 +184,7 @@ export function moveMenuIntoEllipsis(menu: Menu, ellipsis: EllipsisMenu) {
   ellipsis.setChildActions(menusInEllipsis);
 }
 
-export function removeMenuFromEllipsis(menu: Menu, $parent: JQuery) {
-  // @ts-ignore
+export function removeMenuFromEllipsis(menu: Menu, $parent?: JQuery) {
   menu._setOverflown(false);
   menu.overflowMenu = null;
   if (!menu.rendered) {

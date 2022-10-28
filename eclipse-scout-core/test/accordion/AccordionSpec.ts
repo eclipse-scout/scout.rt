@@ -1,28 +1,29 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Accordion, Group, scout} from '../../src/index';
+import {Accordion, AccordionModel, Group, GroupModel, scout} from '../../src/index';
+import {Optional} from '../../src/types';
 
 describe('Accordion', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  function createAccordion(numGroups, model) {
+  function createAccordion(numGroups: number, model?: Optional<AccordionModel, 'parent'>): Accordion {
     let groups = [];
     for (let i = 0; i < numGroups; i++) {
       groups.push({
-        objectType: 'Group',
+        objectType: Group,
         label: 'Group ' + i
       });
     }
@@ -30,16 +31,16 @@ describe('Accordion', () => {
       parent: session.desktop,
       groups: groups
     };
-    model = $.extend({}, defaults, model);
-    return scout.create(Accordion, model);
+    let m = $.extend({}, defaults, model) as AccordionModel;
+    return scout.create(Accordion, m);
   }
 
-  function createGroup(model) {
+  function createGroup(model?: Optional<GroupModel, 'parent'>): Group {
     let defaults = {
       parent: session.desktop
     };
-    model = $.extend({}, defaults, model);
-    return scout.create(Group, model);
+    let m = $.extend({}, defaults, model) as GroupModel;
+    return scout.create(Group, m);
   }
 
   describe('insertGroups', () => {
@@ -243,14 +244,14 @@ describe('Accordion', () => {
 
     it('uses the comparator to sort the groups', () => {
       let accordion = createAccordion(0);
-      let group0 = createGroup({label: 'a'});
-      let group1 = createGroup({label: 'b'});
-      let group2 = createGroup({label: 'c'});
+      let group0 = createGroup({title: 'a'});
+      let group1 = createGroup({title: 'b'});
+      let group2 = createGroup({title: 'c'});
       accordion.insertGroups([group0, group1, group2]);
 
       accordion.setComparator((g0, g1) => {
         // desc
-        return (g0.label < g1.label ? 1 : ((g0.label > g1.label) ? -1 : 0));
+        return (g0.title < g1.title ? 1 : ((g0.title > g1.title) ? -1 : 0));
       });
       accordion.sort();
       expect(accordion.groups[0]).toBe(group2);
@@ -259,7 +260,7 @@ describe('Accordion', () => {
 
       accordion.setComparator((g0, g1) => {
         // asc
-        return (g0.label < g1.label ? -1 : ((g0.label > g1.label) ? 1 : 0));
+        return (g0.title < g1.title ? -1 : ((g0.title > g1.title) ? 1 : 0));
       });
       accordion.sort();
       expect(accordion.groups[0]).toBe(group0);
@@ -269,13 +270,13 @@ describe('Accordion', () => {
 
     it('is executed when new groups are added', () => {
       let accordion = createAccordion(0);
-      let group0 = createGroup({label: 'a'});
-      let group1 = createGroup({label: 'b'});
-      let group2 = createGroup({label: 'c'});
+      let group0 = createGroup({title: 'a'});
+      let group1 = createGroup({title: 'b'});
+      let group2 = createGroup({title: 'c'});
 
       accordion.setComparator((g0, g1) => {
         // desc
-        return (g0.label < g1.label ? 1 : ((g0.label > g1.label) ? -1 : 0));
+        return (g0.title < g1.title ? 1 : ((g0.title > g1.title) ? -1 : 0));
       });
       accordion.insertGroups([group0, group1]);
       expect(accordion.groups[0]).toBe(group1);
@@ -289,15 +290,15 @@ describe('Accordion', () => {
 
     it('reorders the DOM elements accordingly', () => {
       let accordion = createAccordion(0);
-      let group0 = createGroup({label: 'a'});
-      let group1 = createGroup({label: 'b'});
-      let group2 = createGroup({label: 'c'});
+      let group0 = createGroup({title: 'a'});
+      let group1 = createGroup({title: 'b'});
+      let group2 = createGroup({title: 'c'});
       accordion.insertGroups([group0, group1, group2]);
       accordion.render();
 
       accordion.setComparator((g0, g1) => {
         // desc
-        return (g0.label < g1.label ? 1 : ((g0.label > g1.label) ? -1 : 0));
+        return (g0.title < g1.title ? 1 : ((g0.title > g1.title) ? -1 : 0));
       });
       accordion.sort();
       expect(accordion.groups[0]).toBe(group2);
@@ -308,7 +309,5 @@ describe('Accordion', () => {
       expect($groups.eq(1).data('widget')).toBe(group1);
       expect($groups.eq(2).data('widget')).toBe(group0);
     });
-
   });
-
 });

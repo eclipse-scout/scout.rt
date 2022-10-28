@@ -1,37 +1,46 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {Form, HtmlComponent, NullWidget, scout, TreeVisitResult, Widget} from '../../src/index';
+import {EventListener, EventSupport, Form, GroupBox, HtmlComponent, Menu, NullWidget, scout, StringField, TreeVisitResult, Widget, WidgetModel} from '../../src/index';
 
 describe('Widget', () => {
 
-  let session, parent;
+  let session: SandboxSession, parent: TestWidget;
 
   class TestWidget extends NullWidget {
-    _render() {
+    declare events: EventSupport & { _eventListeners: EventListener[] };
+    selected: true;
+
+    override _render() {
       this.$container = this.$parent.appendDiv();
       this.$container.setTabbable(true);
       this.htmlComp = HtmlComponent.install(this.$container, this.session);
       this.htmlComp.getParent = () => {
-        return null; // Detach from parent because our parent does not layout children
+        return null; // Detach from parent because our parent does not lay out children
       };
+    }
+
+    override _remove() {
+      super._remove();
     }
   }
 
   class ScrollableWidget extends NullWidget {
-    _render() {
+    $elem: JQuery;
+
+    override _render() {
       this.$container = this.$parent.appendDiv();
       this.htmlComp = HtmlComponent.install(this.$container, this.session);
       this.htmlComp.getParent = () => {
-        return null; // Detach from parent because our parent does not layout children
+        return null; // Detach from parent because our parent does not lay out children
       };
       this.$container.css({
         position: 'absolute',
@@ -48,6 +57,10 @@ describe('Widget', () => {
       this._installScrollbars({
         axis: 'both'
       });
+    }
+
+    override _uninstallScrollbars() {
+      super._uninstallScrollbars();
     }
   }
 
@@ -69,7 +82,7 @@ describe('Widget', () => {
     });
   });
 
-  function createWidget(model) {
+  function createWidget(model?: any): TestWidget {
     let defaults = {
       parent: parent,
       session: session
@@ -136,7 +149,7 @@ describe('Widget', () => {
       createVisitStructure();
 
       // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
-      parent.visitChildren(child => {
+      parent.visitChildren((child: any) => {
         child.wasVisited = true;
         return child === grandChild1;
       });
@@ -147,7 +160,7 @@ describe('Widget', () => {
       expect(grandChild2_1.wasVisited).toBe(false);
 
       // Reset wasVisited flag
-      parent.visitChildren(child => {
+      parent.visitChildren((child: any) => {
         child.wasVisited = false;
         return false;
       });
@@ -158,7 +171,7 @@ describe('Widget', () => {
       expect(grandChild2_1.wasVisited).toBe(false);
 
       // Abort at child2 -> don't visit children of child2
-      parent.visitChildren(child => {
+      parent.visitChildren((child: any) => {
         child.wasVisited = true;
         return child === child2;
       });
@@ -173,7 +186,7 @@ describe('Widget', () => {
       createVisitStructure();
 
       // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
-      parent.visitChildren(child => {
+      parent.visitChildren((child: any) => {
         child.wasVisited = true;
         if (child === grandChild1) {
           return TreeVisitResult.TERMINATE;
@@ -186,7 +199,7 @@ describe('Widget', () => {
       expect(grandChild2_1.wasVisited).toBe(false);
 
       // Reset wasVisited flag
-      parent.visitChildren(child => {
+      parent.visitChildren((child: any) => {
         child.wasVisited = false;
         return false;
       });
@@ -197,7 +210,7 @@ describe('Widget', () => {
       expect(grandChild2_1.wasVisited).toBe(false);
 
       // Abort at child2 -> don't visit children of child2
-      parent.visitChildren(child => {
+      parent.visitChildren((child: any) => {
         child.wasVisited = true;
         if (child === child2) {
           return TreeVisitResult.TERMINATE;
@@ -214,7 +227,7 @@ describe('Widget', () => {
       createVisitStructure();
 
       // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
-      parent.visitChildren(child => {
+      parent.visitChildren((child: any) => {
         child.wasVisited = true;
         if (child === child1) {
           return TreeVisitResult.SKIP_SUBTREE;
@@ -227,7 +240,7 @@ describe('Widget', () => {
       expect(grandChild2_1.wasVisited).toBe(true);
 
       // Reset wasVisited flag
-      parent.visitChildren(child => {
+      parent.visitChildren((child: any) => {
         child.wasVisited = false;
         return false;
       });
@@ -238,7 +251,7 @@ describe('Widget', () => {
       expect(grandChild2_1.wasVisited).toBe(false);
 
       // Abort at child2 -> don't visit children of child2
-      parent.visitChildren(child => {
+      parent.visitChildren((child: any) => {
         child.wasVisited = true;
         if (child === child2) {
           return TreeVisitResult.SKIP_SUBTREE;
@@ -309,11 +322,11 @@ describe('Widget', () => {
         session: session,
         parent: child1
       });
-      spyOn(parent, 'visitChildren').and.callThrough();
-      expect(parent.visitChildren.calls.count()).toBe(0);
+      let visitChildrenSpy = spyOn(parent, 'visitChildren').and.callThrough();
+      expect(visitChildrenSpy.calls.count()).toBe(0);
 
       expect(parent.widget('child1')).toBe(child1);
-      expect(parent.visitChildren.calls.count()).toBe(1); // Only called once
+      expect(visitChildrenSpy.calls.count()).toBe(1); // Only called once
     });
   });
 
@@ -439,19 +452,19 @@ describe('Widget', () => {
         session: session,
         parent: parent,
         rootGroupBox: {
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           fields: [{
-            objectType: 'StringField'
+            objectType: StringField
           }, {
-            objectType: 'StringField',
+            objectType: StringField,
             inheritAccessibility: false
           }, {
-            objectType: 'StringField',
+            objectType: StringField,
             enabled: false,
             inheritAccessibility: false
           }],
           menus: [{
-            objectType: 'Menu'
+            objectType: Menu
           }]
         }
       });
@@ -828,7 +841,7 @@ describe('Widget', () => {
       expect(child0.rendered).toBe(true);
 
       // If the owner is destroyed, the widget has to be removed even if another widget is currently the parent
-      // Otherwise the widget would be in a inconsistent state (destroyed, but still rendered)
+      // Otherwise the widget would be in an inconsistent state (destroyed, but still rendered)
       owner.destroy();
       expect(owner.rendered).toBe(false);
       expect(owner.destroyed).toBe(true);
@@ -989,12 +1002,14 @@ describe('Widget', () => {
           })
         ];
 
+        // @ts-ignore
         widget.setChildWidget(children);
         expect(children[0].parent).toBe(widget);
         expect(children[0].owner).toBe(parent);
         expect(children[1].parent).toBe(widget);
         expect(children[1].owner).toBe(parent);
 
+        // @ts-ignore
         another.setChildWidget(children);
         expect(children[0].parent).toBe(another);
         expect(children[0].owner).toBe(parent);
@@ -1006,17 +1021,12 @@ describe('Widget', () => {
         let widget = createWidget({
           parent: parent
         });
-        // noinspection JSUnusedLocalSymbols
-        let another = createWidget({
-          parent: parent
-        });
         let child = createWidget({
           parent: parent
         });
 
         widget.setChildWidget(child);
         widget.setChildWidget(null);
-        // noinspection JSCheckFunctionSignatures
         expect().nothing();
       });
     });
@@ -1031,6 +1041,7 @@ describe('Widget', () => {
       widget.setProperty('foo', 'xyz');
 
       // Add render method and set property again
+      // @ts-ignore
       widget._renderFoo = function() {
         this.$container.text(this.foo);
       };
@@ -1053,11 +1064,11 @@ describe('Widget', () => {
       });
       widget.on('propertyChange:type1', event => {
         type1ExecCount++;
-        type1Type = event.propertyName;
+        type1Type = event['propertyName'];
       });
       widget.on('propertyChange:type2', event => {
         type2ExecCount++;
-        type2Type = event.propertyName;
+        type2Type = event['propertyName'];
       });
       widget.on('propertyChange', event => {
         noTypeExecCount++;
@@ -1110,11 +1121,11 @@ describe('Widget', () => {
       });
       widget.one('propertyChange:type1', event => {
         type1ExecCount++;
-        type1Type = event.propertyName;
+        type1Type = event['propertyName'];
       });
       widget.one('propertyChange:type2', event => {
         type2ExecCount++;
-        type2Type = event.propertyName;
+        type2Type = event['propertyName'];
 
       });
       widget.one('propertyChange', event => {
@@ -1134,7 +1145,7 @@ describe('Widget', () => {
       expect(type2ExecCount).toBe(0);
       expect(noTypeExecCount).toBe(1);
 
-      // Trigger type2 -> since it was not executed yet it will be executed now
+      // Trigger type2 -> since it was not executed yet, it will be executed now
       widget.triggerPropertyChange('type2', 'old', 'new');
       expect(type1ExecCount).toBe(1);
       expect(type2ExecCount).toBe(1);
@@ -1440,21 +1451,28 @@ describe('Widget', () => {
       let model = {};
 
       class TestClass extends Widget {
-        _init(model0) {
+        override _init(model0) {
           expect(model0).toBe(model);
+        }
+
+        override _prepareModel(model: WidgetModel): WidgetModel {
+          return super._prepareModel(model);
         }
       }
 
       let widget = new TestClass();
 
-      spyOn(widget, '_prepareModel').and.callThrough();
+      let _prepareModelSpy = spyOn(widget, '_prepareModel').and.callThrough();
+      // @ts-ignore
       widget.init(model);
-      expect(widget._prepareModel.calls.count()).toBe(1);
+      expect(_prepareModelSpy.calls.count()).toBe(1);
     });
 
     it('changes the model before _init', () => {
       class TestClass extends Widget {
-        _prepareModel(model) {
+        message: string;
+
+        override _prepareModel(model) {
           model.message = 'B';
           return model;
         }
@@ -1474,7 +1492,7 @@ describe('Widget', () => {
   describe('Widget properties', () => {
 
     it('automatically resolves referenced widgets', () => {
-      window.testns = {};
+      window['testns'] = {};
 
       class ComplexTestWidget extends Widget {
         constructor() {
@@ -1484,7 +1502,7 @@ describe('Widget', () => {
         }
       }
 
-      window.testns.ComplexTestWidget = ComplexTestWidget;
+      window['testns'].ComplexTestWidget = ComplexTestWidget;
 
       class TestItem extends Widget {
         constructor() {
@@ -1493,7 +1511,7 @@ describe('Widget', () => {
         }
       }
 
-      window.testns.TestItem = TestItem;
+      window['testns'].TestItem = TestItem;
 
       // Create an instance
       let model1 = {
@@ -1510,7 +1528,7 @@ describe('Widget', () => {
         }],
         selectedItem: 'TI2'
       };
-      let ctw1 = scout.create(testns.ComplexTestWidget, model1);
+      let ctw1 = scout.create('testns.ComplexTestWidget', model1);
       expect(ctw1.items.length).toBe(2);
       expect(ctw1.items[1].name).toBe('Item #2');
       expect(ctw1.selectedItem).toBe(ctw1.items[1]);
@@ -1553,11 +1571,11 @@ describe('Widget', () => {
         }]
       };
       expect(() => {
-        scout.create(testns.ComplexTestWidget, model3);
+        scout.create('testns.ComplexTestWidget', model3);
       }).toThrow(new Error('Referenced widget not found: TI2'));
       // fix it
       delete model3.items[0].linkedItem;
-      let ctw3 = scout.create(testns.ComplexTestWidget, model3);
+      let ctw3 = scout.create('testns.ComplexTestWidget', model3);
       ctw3.items[0].setProperty('linkedItem', ctw3.items[1]);
     });
   });
@@ -1625,11 +1643,11 @@ describe('Widget', () => {
       });
       expect(widget.scrollTop).toBe(null);
 
-      spyOn(widget, '_renderScrollTop').and.callThrough();
+      let _renderScrollTopSpy = spyOn(widget, '_renderScrollTop').and.callThrough();
       widget.render(session.$entryPoint);
-      expect(widget._renderScrollTop.calls.count()).toBe(1);
+      expect(_renderScrollTopSpy.calls.count()).toBe(1);
       widget.revalidateLayoutTree(); // Scroll top will be rendered after the layout
-      expect(widget._renderScrollTop.calls.count()).toBe(1); // Must not be executed again for non scrollable widgets
+      expect(_renderScrollTopSpy.calls.count()).toBe(1); // Must not be executed again for non-scrollable widgets
     });
 
     it('is set to null if scrollbars are uninstalled on the fly', () => {
@@ -1641,11 +1659,11 @@ describe('Widget', () => {
       });
       expect(widget.scrollTop).toBe(40);
 
-      spyOn(widget, '_renderScrollTop').and.callThrough();
+      let _renderScrollTopSpy = spyOn(widget, '_renderScrollTop').and.callThrough();
       widget.render(session.$entryPoint);
-      expect(widget._renderScrollTop.calls.count()).toBe(1);
+      expect(_renderScrollTopSpy.calls.count()).toBe(1);
       widget.revalidateLayoutTree(); // Scroll top will be rendered after the layout
-      expect(widget._renderScrollTop.calls.count()).toBe(2); // Is executed again after layout
+      expect(_renderScrollTopSpy.calls.count()).toBe(2); // Is executed again after layout
       expect(widget.$container[0].scrollTop).toBe(40);
 
       widget._uninstallScrollbars();
@@ -1653,9 +1671,9 @@ describe('Widget', () => {
 
       widget.remove();
       widget.render(session.$entryPoint);
-      expect(widget._renderScrollTop.calls.count()).toBe(3);
+      expect(_renderScrollTopSpy.calls.count()).toBe(3);
       widget.revalidateLayoutTree();
-      expect(widget._renderScrollTop.calls.count()).toBe(3); // Must not be executed again
+      expect(_renderScrollTopSpy.calls.count()).toBe(3); // Must not be executed again
       expect(widget.$container[0].scrollTop).toBe(0);
     });
   });

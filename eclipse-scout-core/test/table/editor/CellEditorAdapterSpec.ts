@@ -1,20 +1,21 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteEvent, StringFieldAdapter} from '../../../src/index';
+import {Cell, CellEditorPopup, RemoteEvent, Session, StringField, StringFieldAdapter, StringFieldModel, Table, Widget} from '../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../src/testing/index';
+import {ObjectType} from '../../../src/ObjectFactory';
 
 describe('CellEditorAdapter', () => {
-  let session;
-  let helper;
-  let formHelper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
+  let formHelper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandboxDesktop());
@@ -35,29 +36,29 @@ describe('CellEditorAdapter', () => {
     }
   });
 
-  function createStringField(table) {
-    let model = formHelper.createFieldModel('StringField', session.desktop);
+  function createStringField(): StringField {
+    let model = formHelper.createFieldModel('StringField', session.desktop) as StringFieldModel & { id: string; objectType: ObjectType<StringField>; parent: Widget; session: Session };
     let adapter = new StringFieldAdapter();
     adapter.init(model);
-    return adapter.createWidget(model, session.desktop);
+    return adapter.createWidget(model, session.desktop) as StringField;
   }
 
-  function $findPopup() {
+  function $findPopup(): JQuery {
     return $('.cell-editor-popup');
   }
 
-  function findPopup() {
+  function findPopup(): CellEditorPopup<string> {
     return $findPopup().data('popup');
   }
 
-  function createTableAndStartCellEdit() {
+  function createTableAndStartCellEdit(): CellEditorPopup<string> {
     let model = helper.createModelFixture(2, 2);
-    model.rows[0].cells[0].editable = true;
+    (model.rows[0].cells[0] as Cell).editable = true;
     let adapter = helper.createTableAdapter(model);
-    let table = adapter.createWidget(model, session.desktop);
+    let table = adapter.createWidget(model, session.desktop) as Table;
     table.render();
 
-    let field = createStringField(table);
+    let field = createStringField();
     table.startCellEdit(table.columns[0], table.rows[0], field);
     return findPopup();
   }
@@ -143,7 +144,7 @@ describe('CellEditorAdapter', () => {
 
         expect(jasmine.Ajax.requests.count()).toBe(1);
         expect(mostRecentJsonRequest().events.length).toBe(1);
-        let event = new RemoteEvent(popup.table.id, 'completeCellEdit', );
+        let event = new RemoteEvent(popup.table.id, 'completeCellEdit');
         expect(mostRecentJsonRequest()).toContainEvents(event);
         done();
       };

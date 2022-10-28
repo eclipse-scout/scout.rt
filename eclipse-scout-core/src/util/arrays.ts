@@ -568,7 +568,7 @@ export function randomElement<T>(array: T[]): T {
  * @param keyMapper function that maps each element to the target key
  * @param valueExtractor function that maps each element to the target value
  */
-export function toMap<T>(array: T[], keyMapper: (el: T) => string = (el => el + ''), valueMapper: (el: T) => any = (el => el)): any {
+export function toMap<T>(array: T[], keyMapper: (el: T) => PropertyKey = (el => el + ''), valueMapper: (el: T) => any = (el => el)): any {
   return objects.createMap(ensure(array).reduce((map, element) => {
     map[keyMapper(element)] = valueMapper(element);
     return map;

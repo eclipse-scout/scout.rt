@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,7 +11,7 @@
 import {Calendar, CalendarComponent, dates, scout} from '../../src/index';
 
 describe('Calendar', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -57,7 +57,15 @@ describe('Calendar', () => {
   });
 
   describe('component', () => {
-    let cal, c1, c2, c3, c4, c5, c6, c7, c8;
+    let cal: Calendar,
+      c1: CalendarComponent,
+      c2: CalendarComponent,
+      c3: CalendarComponent,
+      c4: CalendarComponent,
+      c5: CalendarComponent,
+      c6: CalendarComponent,
+      c7: CalendarComponent,
+      c8: CalendarComponent;
     let day = dates.parseJsonDate('2016-07-20 00:00:00.000');
     let option1 = {
       fromDate: '2016-07-20 12:00:00.000',
@@ -122,7 +130,7 @@ describe('Calendar', () => {
     describe('sort', () => {
       it('sorts first from then to', () => {
         let components = [c4, c2, c1];
-        cal._sort(components, day);
+        cal._sort(components);
         expect(components[0] === c1).toBe(true);
         expect(components[1] === c2).toBe(true);
         expect(components[2] === c4).toBe(true);
@@ -141,8 +149,8 @@ describe('Calendar', () => {
         let components = [c1];
         cal._arrange(components, day);
         expect(components[0]).toEqual(c1);
-        expect(c1.stack[day].x).toEqual(0);
-        expect(c1.stack[day].w).toEqual(1);
+        expect(c1.stack[day + ''].x).toEqual(0);
+        expect(c1.stack[day + ''].w).toEqual(1);
       });
 
       it('arranges intersecting components', () => {
@@ -150,10 +158,10 @@ describe('Calendar', () => {
         cal._arrange(components, day);
         expect(components[0]).toEqual(c1);
         expect(components[1]).toEqual(c5);
-        expect(c1.stack[day].x).toEqual(0);
-        expect(c1.stack[day].w).toEqual(2);
-        expect(c5.stack[day].x).toEqual(1);
-        expect(c5.stack[day].w).toEqual(2);
+        expect(c1.stack[day + ''].x).toEqual(0);
+        expect(c1.stack[day + ''].w).toEqual(2);
+        expect(c5.stack[day + ''].x).toEqual(1);
+        expect(c5.stack[day + ''].w).toEqual(2);
       });
 
       it('arranges equal components', () => {
@@ -161,10 +169,10 @@ describe('Calendar', () => {
         cal._arrange(components, day);
         expect(components[0]).toEqual(c6);
         expect(components[1]).toEqual(c7);
-        expect(c6.stack[day].x).toEqual(0);
-        expect(c6.stack[day].w).toEqual(2);
-        expect(c7.stack[day].x).toEqual(1);
-        expect(c7.stack[day].w).toEqual(2);
+        expect(c6.stack[day + ''].x).toEqual(0);
+        expect(c6.stack[day + ''].w).toEqual(2);
+        expect(c7.stack[day + ''].x).toEqual(1);
+        expect(c7.stack[day + ''].w).toEqual(2);
       });
 
       it('arranges intersecting and non-intersecting components', () => {
@@ -176,19 +184,19 @@ describe('Calendar', () => {
         expect(components[3]).toEqual(c2);
         expect(components[4]).toEqual(c3);
         expect(components[5]).toEqual(c4);
-        expect(c1.stack[day].w).toEqual(3);
-        expect(c2.stack[day].w).toEqual(3);
-        expect(c3.stack[day].w).toEqual(3);
-        expect(c4.stack[day].w).toEqual(3);
-        expect(c5.stack[day].w).toEqual(3);
-        expect(c6.stack[day].w).toEqual(3);
+        expect(c1.stack[day + ''].w).toEqual(3);
+        expect(c2.stack[day + ''].w).toEqual(3);
+        expect(c3.stack[day + ''].w).toEqual(3);
+        expect(c4.stack[day + ''].w).toEqual(3);
+        expect(c5.stack[day + ''].w).toEqual(3);
+        expect(c6.stack[day + ''].w).toEqual(3);
 
-        expect(c6.stack[day].x).toEqual(0);
-        expect(c1.stack[day].x).toEqual(1);
-        expect(c5.stack[day].x).toEqual(2);
-        expect(c2.stack[day].x).toEqual(0);
-        expect(c3.stack[day].x).toEqual(0);
-        expect(c4.stack[day].x).toEqual(1);
+        expect(c6.stack[day + ''].x).toEqual(0);
+        expect(c1.stack[day + ''].x).toEqual(1);
+        expect(c5.stack[day + ''].x).toEqual(2);
+        expect(c2.stack[day + ''].x).toEqual(0);
+        expect(c3.stack[day + ''].x).toEqual(0);
+        expect(c4.stack[day + ''].x).toEqual(1);
       });
 
       it('reduces rows when arranging components', () => {
@@ -197,13 +205,13 @@ describe('Calendar', () => {
         expect(components[0]).toEqual(c6);
         expect(components[1]).toEqual(c1);
         expect(components[2]).toEqual(c3);
-        expect(c6.stack[day].w).toEqual(2);
-        expect(c1.stack[day].w).toEqual(2);
-        expect(c3.stack[day].w).toEqual(1);
+        expect(c6.stack[day + ''].w).toEqual(2);
+        expect(c1.stack[day + ''].w).toEqual(2);
+        expect(c3.stack[day + ''].w).toEqual(1);
 
-        expect(c6.stack[day].x).toEqual(0);
-        expect(c1.stack[day].x).toEqual(1);
-        expect(c3.stack[day].x).toEqual(0);
+        expect(c6.stack[day + ''].x).toEqual(0);
+        expect(c1.stack[day + ''].x).toEqual(1);
+        expect(c3.stack[day + ''].x).toEqual(0);
       });
 
       it('arranges intersecting components spanning more than one day', () => {
@@ -213,11 +221,11 @@ describe('Calendar', () => {
         cal._arrange(components, day1);
         expect(components[0]).toEqual(c8);
         expect(components[1]).toEqual(c3);
-        expect(c8.stack[day1].w).toEqual(2);
-        expect(c3.stack[day1].w).toEqual(2);
+        expect(c8.stack[day1 + ''].w).toEqual(2);
+        expect(c3.stack[day1 + ''].w).toEqual(2);
 
-        expect(c8.stack[day1].x).toEqual(0);
-        expect(c3.stack[day1].x).toEqual(1);
+        expect(c8.stack[day1 + ''].x).toEqual(0);
+        expect(c3.stack[day1 + ''].x).toEqual(1);
       });
 
     });

@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, keys, scout, TileGrid} from '../../../src/index';
+import {arrays, keys, scout, Tile, TileGrid, TileGridModel} from '../../../src/index';
 import {triggerKeyDownCapture, triggerKeyInputCapture, triggerKeyUpCapture} from '../../../src/testing/jquery-testing';
+import {Optional} from '../../../src/types';
 
 describe('TileGridKeyStrokes', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -26,11 +27,11 @@ describe('TileGridKeyStrokes', () => {
       '</style>').appendTo($('#sandbox'));
   });
 
-  function createTileGrid(numTiles, model) {
+  function createTileGrid(numTiles: number, model?: Optional<TileGridModel, 'parent'>): TileGrid {
     let tiles = [];
     for (let i = 0; i < numTiles; i++) {
       tiles.push({
-        objectType: 'Tile',
+        objectType: Tile,
         label: 'Tile ' + i
       });
     }
@@ -39,7 +40,7 @@ describe('TileGridKeyStrokes', () => {
       tiles: tiles
     };
     model = $.extend({}, defaults, model);
-    return scout.create(TileGrid, model);
+    return scout.create(TileGrid, model as TileGridModel);
   }
 
   describe('ctrl + a', () => {

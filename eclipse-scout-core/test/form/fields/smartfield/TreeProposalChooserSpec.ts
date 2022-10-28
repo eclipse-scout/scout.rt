@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupRow, scout, SmartField, StaticLookupCall, TreeProposalChooser} from '../../../../src/index';
+import {LookupRow, scout, SmartField, SmartFieldPopup, StaticLookupCall, TreeProposalChooser} from '../../../../src/index';
+import {QueryBy} from '../../../../src';
 
 describe('TreeProposalChooser', () => {
 
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -24,14 +25,14 @@ describe('TreeProposalChooser', () => {
     jasmine.clock().uninstall();
   });
 
-  function createLookupRow(key, parentKey, text) {
-    return {
+  function createLookupRow<T>(key: T, parentKey: T, text: string): LookupRow<T> {
+    return scout.create((LookupRow<T>), {
       key: key,
       parentKey: parentKey,
       text: text,
       enabled: true,
       active: true
-    };
+    });
   }
 
   describe('ProposalTreeNode', () => {
@@ -55,6 +56,7 @@ describe('TreeProposalChooser', () => {
       lookupRows[2].active = false;
 
       chooser.setLookupResult({
+        queryBy: QueryBy.ALL,
         lookupRows: lookupRows
       });
       chooser.render();
@@ -66,33 +68,34 @@ describe('TreeProposalChooser', () => {
 
     it('does not get messed up with null keys', () => {
       // dummy smart field
-      let smartField = scout.create(SmartField, {
+      let smartField = scout.create((SmartField<number>), {
         parent: session.desktop
       });
 
-      let chooser = scout.create(TreeProposalChooser, {
+      let chooser = scout.create((TreeProposalChooser<number>), {
         parent: session.desktop,
         smartField: smartField
       });
 
-      let lookupRows = [
-        scout.create(LookupRow, {
+      let lookupRows: LookupRow<number>[] = [
+        // @ts-ignore
+        scout.create((LookupRow<number>), {
           text: 'No Key, No Parent'
         }),
-        scout.create(LookupRow, {
+        scout.create((LookupRow<number>), {
           key: null,
           text: 'Explicit null Key, No Parent'
         }),
-        scout.create(LookupRow, {
+        scout.create((LookupRow<number>), {
           key: 1,
           text: 'No Parent'
         }),
-        scout.create(LookupRow, {
+        scout.create((LookupRow<number>), {
           key: 2,
           text: 'Explicit null Parent',
           parentKey: null
         }),
-        scout.create(LookupRow, {
+        scout.create((LookupRow<number>), {
           key: 3,
           parentKey: 2,
           text: 'Child'
@@ -100,6 +103,7 @@ describe('TreeProposalChooser', () => {
       ];
 
       chooser.setLookupResult({
+        queryBy: QueryBy.ALL,
         lookupRows: lookupRows
       });
       // Lookup rows with parentKey = null are top level nodes. They must never be linked to another lookup row, even if there is a lookup row with key = null.
@@ -118,7 +122,7 @@ describe('TreeProposalChooser', () => {
         parent: session.desktop,
         browseHierarchy: true,
         lookupCall: {
-          objectType: 'StaticLookupCall',
+          objectType: StaticLookupCall,
           data: [
             [null, 'Null Key'],
             [1, 'Value 1']
@@ -134,9 +138,10 @@ describe('TreeProposalChooser', () => {
       // Selecting lookup row with null key clears the field
       smartField.requestInput();
       jasmine.clock().tick(300);
-      let chooser = smartField.popup.proposalChooser;
+      let popup = smartField.popup as SmartFieldPopup<number>;
+      let chooser = popup.proposalChooser;
       chooser.content.selectNode(chooser.content.nodes[0]);
-      smartField.popup.selectLookupRow();
+      popup.selectLookupRow();
       expect(smartField.value).toBe(null);
       expect(smartField.displayText).toBe('');
     });
@@ -146,7 +151,7 @@ describe('TreeProposalChooser', () => {
         parent: session.desktop,
         browseHierarchy: true,
         lookupCall: {
-          objectType: 'StaticLookupCall',
+          objectType: StaticLookupCall,
           data: [
             [null, 'Null Key', null], // Set parentKey explicitly to null to force an infinite loop
             [1, 'Value 1'],
@@ -163,12 +168,14 @@ describe('TreeProposalChooser', () => {
 
       smartField.requestInput();
       smartField.$field.val('Null');
+      // @ts-ignore
       smartField._onFieldKeyUp({});
       jasmine.clock().tick(300);
-      let chooser = smartField.popup.proposalChooser;
+      let popup = smartField.popup as SmartFieldPopup<number>;
+      let chooser = popup.proposalChooser;
       expect(chooser.content.nodes.length).toBe(1);
       expect(chooser.content.selectedNode().text).toBe('Null Key');
-      smartField.popup.selectLookupRow();
+      popup.selectLookupRow();
       expect(smartField.value).toBe(null);
       expect(smartField.displayText).toBe('');
     });

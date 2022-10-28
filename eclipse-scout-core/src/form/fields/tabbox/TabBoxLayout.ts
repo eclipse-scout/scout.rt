@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -41,7 +41,6 @@ export default class TabBoxLayout extends AbstractLayout {
   override layout($container: JQuery) {
     let containerSize, tabContentSize, headerMargins, innerHeaderSize,
       htmlContainer = HtmlComponent.get($container),
-      // @ts-ignore
       htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
       htmlHeader = HtmlComponent.get(this._tabBox.header.$container),
       headerWidthHint = 0,
@@ -117,7 +116,6 @@ export default class TabBoxLayout extends AbstractLayout {
   override preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     options = options || {};
     let htmlContainer = HtmlComponent.get($container),
-      // @ts-ignore
       htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
       htmlHeader = HtmlComponent.get(this._tabBox.header.$container),
       headerSize = new Dimension(),

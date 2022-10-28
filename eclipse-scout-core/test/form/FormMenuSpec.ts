@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper} from '../../src/testing/index';
-import {ContextMenuPopup, FormMenu, MenuBar, menus, scout} from '../../src/index';
+import {ContextMenuPopup, Desktop, FormMenu, FormMenuModel, MenuBar, menus, scout} from '../../src/index';
+import {Optional} from '../../src/types';
 
 describe('FormMenu', () => {
-  let session, desktop, helper;
+  let session: SandboxSession, desktop: Desktop, helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -26,7 +27,7 @@ describe('FormMenu', () => {
       </style>`).appendTo($('#sandbox'));
   });
 
-  function createMenu(model) {
+  function createMenu(model?: Optional<FormMenuModel, 'parent'>): FormMenu {
     return scout.create(FormMenu, $.extend({
       parent: desktop,
       text: 'Menu',
@@ -34,7 +35,7 @@ describe('FormMenu', () => {
     }, model));
   }
 
-  function findPopup() {
+  function findPopup(): JQuery {
     return $('.popup');
   }
 
@@ -132,7 +133,7 @@ describe('FormMenu', () => {
         menuItems: [menu] // will be cloned, but form won't
       });
       contextMenu.open();
-      let menuInContextMenu = contextMenu.$menuItems(0).data('widget');
+      let menuInContextMenu = contextMenu.$menuItems().data('widget');
       menuInContextMenu.setSelected(true);
       // Old popup is removed immediately, context menu is rendered
       expect($popup.isAttached()).toBe(false);
@@ -168,7 +169,7 @@ describe('FormMenu', () => {
         menuItems: [menu] // will be cloned, but form won't
       });
       contextMenu.open();
-      let menuInContextMenu = contextMenu.$menuItems(0).data('widget');
+      let menuInContextMenu = contextMenu.$menuItems().data('widget');
       menuInContextMenu.setSelected(true);
       // Old popup is removed immediately, context menu is rendered
       expect($popup.isAttached()).toBe(false);
@@ -183,7 +184,7 @@ describe('FormMenu', () => {
         menuItems: [menu]
       });
       contextMenu.open();
-      let menuInContextMenu = contextMenu.$menuItems(0).data('widget');
+      let menuInContextMenu = contextMenu.$menuItems().data('widget');
       menuInContextMenu.setSelected(true);
       expect(menuInContextMenu.popup.$container).toBeVisible();
       expect(contextMenu.rendered).toBe(true);
@@ -205,7 +206,7 @@ describe('FormMenu', () => {
         menuItems: [menu]
       });
       contextMenu.open();
-      let menuInContextMenu = contextMenu.$menuItems(0).data('widget');
+      let menuInContextMenu = contextMenu.$menuItems().data('widget');
       menuInContextMenu.setSelected(true);
       expect(menuInContextMenu.popup.$container).toBeVisible();
       expect(contextMenu.rendered).toBe(true);
@@ -215,7 +216,7 @@ describe('FormMenu', () => {
         menuItems: [menu]
       });
       contextMenu2.open();
-      let menuInContextMenu2 = contextMenu2.$menuItems(0).data('widget');
+      let menuInContextMenu2 = contextMenu2.$menuItems().data('widget');
       menuInContextMenu2.setSelected(true);
       // Old context menu and popup are removed immediately, new context menu is rendered
       expect(contextMenu.rendered).toBe(false);

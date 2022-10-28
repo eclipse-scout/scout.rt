@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicFieldAdapter, RemoteEvent, scout, StringField} from '../../../src/index';
+import {BasicField, BasicFieldAdapter, RemoteEvent, scout, StringField, StringFieldModel} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
 import {triggerBlur} from '../../../src/testing/jquery-testing';
 
 describe('BasicField', () => {
-  let session, helper, field;
+  let session: SandboxSession, helper: FormSpecHelper, field: BasicField<any>;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -29,15 +29,16 @@ describe('BasicField', () => {
     jasmine.Ajax.uninstall();
   });
 
-  function createField(model) {
+  function createField(model): BasicField<any> {
     let adapter = new BasicFieldAdapter();
     adapter.init(model);
-    let field = adapter.createWidget(model, session.desktop);
+    let field = adapter.createWidget(model, session.desktop) as BasicField<any>;
+    // @ts-ignore
     field.$field = $('<input>').on('blur', field._onFieldBlur.bind(field));
     return field;
   }
 
-  function createModel() {
+  function createModel(): StringFieldModel {
     return helper.createFieldModel();
   }
 

@@ -127,7 +127,7 @@ export default class EventSupport {
     return count;
   }
 
-  trigger(type: string, event: Event) {
+  trigger(type: string, event?: Event) {
     event = event || {} as Event;
     event.type = type;
 

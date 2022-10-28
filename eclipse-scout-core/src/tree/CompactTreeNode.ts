@@ -35,14 +35,13 @@ export default class CompactTreeNode extends TreeNode {
       // Sections nodes
       this.$node = $parent.makeDiv('section-node')
         .data('node', this)
-        // @ts-ignore
         .on('mousedown', tree._onNodeMouseDown.bind(tree))
-        // @ts-ignore
         .on('mouseup', tree._onNodeMouseUp.bind(tree));
     }
   }
 
-  protected override _decorate() {
+  /** @internal */
+  override _decorate() {
     // This node is not yet rendered, nothing to do
     if (!this.$node) {
       return;

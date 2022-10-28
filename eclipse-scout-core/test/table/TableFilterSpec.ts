@@ -1,19 +1,21 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Range, RemoteEvent, Table} from '../../src/index';
+import {ColumnUserFilter, Range, RefModel, RemoteEvent, Table, TextColumnUserFilter} from '../../src/index';
 import {TableSpecHelper} from '../../src/testing/index';
+import ColumnUserFilterModel from '../../src/table/userfilter/ColumnUserFilterModel';
+import SpecTable from '../../src/testing/table/SpecTable';
 
 describe('TableFilter', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -31,21 +33,21 @@ describe('TableFilter', () => {
     $.fx.off = false;
   });
 
-  function createColumnFilterModel(columnId, selectedValues) {
+  function createColumnFilterModel(columnId, selectedValues): RefModel<ColumnUserFilterModel> {
     return {
-      objectType: 'TextColumnUserFilter',
+      objectType: TextColumnUserFilter,
       column: columnId,
       selectedValues: selectedValues
     };
   }
 
-  function createAndRegisterColumnFilter(table, column, selectedValues) {
+  function createAndRegisterColumnFilter(table, column, selectedValues): ColumnUserFilter {
     return helper.createAndRegisterColumnFilter({
       table: table,
       session: session,
       column: column,
       selectedValues: selectedValues
-    }, session);
+    });
   }
 
   describe('row filtering', () => {
@@ -246,7 +248,7 @@ describe('TableFilter', () => {
       // Filter active
       createAndRegisterColumnFilter(table, column0, ['1_0']);
       table.render();
-      expect(table._filterCount()).toBe(1);
+      expect(table.filterCount()).toBe(1);
       expect(table.rows.length).toBe(2);
       expect(table.filteredRows().length).toBe(1);
       expect(table.$rows().length).toBe(1);
@@ -259,7 +261,7 @@ describe('TableFilter', () => {
 
       // Remove filters
       table.setFilters([]);
-      expect(table._filterCount()).toBe(0);
+      expect(table.filterCount()).toBe(0);
 
       // Insert rows again
       let rows = helper.createModelRows(2, 2);
@@ -442,8 +444,9 @@ describe('TableFilter', () => {
 
       // filter table (descending)
       table.addFilter({
+        // @ts-ignore
         createKey: () => 1,
-        accept: row => row.$row.text() % 2 === 0
+        accept: row => Number(row.$row.text()) % 2 === 0
       });
 
       // after filtering
@@ -462,6 +465,7 @@ describe('TableFilter', () => {
     describe('filter', () => {
       let listener = {
         _onFilter: () => {
+          // nop
         }
       };
 
@@ -644,7 +648,7 @@ describe('TableFilter', () => {
       it('gets sent to server containing rowIds when rows are filtered', () => {
         let model = helper.createModelFixture(2, 2),
           adapter = helper.createTableAdapter(model),
-          table = adapter.createWidget(model, session.desktop),
+          table = adapter.createWidget(model, session.desktop) as SpecTable,
           column0 = table.columns[0];
 
         table.render();

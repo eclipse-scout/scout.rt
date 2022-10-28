@@ -45,6 +45,8 @@ export default class Planner extends Widget implements PlannerModel {
   startRow: PlannerResource;
   lastRow: PlannerResource;
   menuBar: MenuBar;
+  header: PlannerHeader;
+  yearPanel: YearPanel;
 
   /** scale calculator */
   transformLeft: (t: number) => number;
@@ -61,11 +63,8 @@ export default class Planner extends Widget implements PlannerModel {
   $scaleTitle: JQuery;
   $scale: JQuery;
 
-  /** visual */
   protected _resourceTitleWidth: number;
   protected _rangeSelectionStarted: boolean;
-  protected _yearPanel: YearPanel;
-  protected _header: PlannerHeader;
   protected _tooltipSupport: TooltipSupport;
   protected _gridScrollHandler: (event: JQuery.ScrollEvent<HTMLDivElement>) => void;
   protected _cellMousemoveHandler: (event: JQuery.MouseMoveEvent<Document>) => void;
@@ -140,19 +139,19 @@ export default class Planner extends Widget implements PlannerModel {
 
   protected override _init(model: PlannerModel) {
     super._init(model);
-    this._yearPanel = scout.create(YearPanel, {
+    this.yearPanel = scout.create(YearPanel, {
       parent: this,
       alwaysSelectFirstDay: true
     });
-    this._yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
-    this._header = scout.create(PlannerHeader, {
+    this.yearPanel.on('dateSelect', this._onYearPanelDateSelect.bind(this));
+    this.header = scout.create(PlannerHeader, {
       parent: this
     });
-    this._header.on('todayClick', this._onTodayClick.bind(this));
-    this._header.on('yearClick', this._onYearClick.bind(this));
-    this._header.on('previousClick', this._onPreviousClick.bind(this));
-    this._header.on('nextClick', this._onNextClick.bind(this));
-    this._header.on('displayModeClick', this._onDisplayModeClick.bind(this));
+    this.header.on('todayClick', this._onTodayClick.bind(this));
+    this.header.on('yearClick', this._onYearClick.bind(this));
+    this.header.on('previousClick', this._onPreviousClick.bind(this));
+    this.header.on('nextClick', this._onNextClick.bind(this));
+    this.header.on('displayModeClick', this._onDisplayModeClick.bind(this));
     this.menuBar = scout.create(MenuBar, {
       parent: this,
       position: MenuBar.Position.BOTTOM,
@@ -196,8 +195,8 @@ export default class Planner extends Widget implements PlannerModel {
     this.htmlComp.setLayout(layout);
 
     // main elements
-    this._header.render();
-    this._yearPanel.render();
+    this.header.render();
+    this.yearPanel.render();
     this.$grid = this.$container.appendDiv('planner-grid')
       .on('mousedown', '.resource-cells', this._onCellMouseDown.bind(this))
       .on('mousedown', '.resource-title', this._onResourceTitleMouseDown.bind(this))
@@ -210,7 +209,7 @@ export default class Planner extends Widget implements PlannerModel {
       parent: this,
       selector: '.planner-activity',
       text: function($comp: JQuery) {
-        let activity = this._activityById($comp.attr('data-id'));
+        let activity = this.activityById($comp.attr('data-id'));
         if (activity) {
           return activity.tooltipText;
         }
@@ -400,7 +399,7 @@ export default class Planner extends Widget implements PlannerModel {
     }
 
     // set text
-    $('.planner-select', this._header.$range).text(text);
+    $('.planner-select', this.header.$range).text(text);
   }
 
   protected _renderScale() {
@@ -783,7 +782,7 @@ export default class Planner extends Widget implements PlannerModel {
     // Match resources
     this.$grid.children('.planner-resource').each((index, element) => {
       let $element = $(element);
-      resource = this._resourceById($element.attr('data-id'));
+      resource = this.resourceById($element.attr('data-id'));
       this._linkResource($element, resource);
       this._linkActivitiesForResource(resource);
     });
@@ -824,7 +823,7 @@ export default class Planner extends Widget implements PlannerModel {
   protected _linkActivitiesForResource(resource: PlannerResource) {
     resource.$cells.children('.planner-activity').each((index, element) => {
       let $element = $(element);
-      let activity = this._activityById($element.attr('data-id'));
+      let activity = this.activityById($element.attr('data-id'));
       this._linkActivity($element, activity);
     });
   }
@@ -1219,14 +1218,14 @@ export default class Planner extends Widget implements PlannerModel {
   }
 
   protected _renderHeaderVisible() {
-    this._header.setVisible(this.headerVisible);
+    this.header.setVisible(this.headerVisible);
     this.invalidateLayoutTree();
   }
 
   protected _renderYearPanelVisible(animated: boolean) {
     let yearPanelWidth;
     if (this.yearPanelVisible) {
-      this._yearPanel.renderContent();
+      this.yearPanel.renderContent();
     }
 
     // show or hide year panel
@@ -1236,7 +1235,7 @@ export default class Planner extends Widget implements PlannerModel {
     } else {
       yearPanelWidth = 0;
     }
-    this._yearPanel.$container.animate({
+    this.yearPanel.$container.animate({
       width: yearPanelWidth
     }, {
       duration: animated ? 500 : 0,
@@ -1246,11 +1245,11 @@ export default class Planner extends Widget implements PlannerModel {
   }
 
   protected _onYearPanelWidthChange() {
-    if (!this._yearPanel.$container) {
+    if (!this.yearPanel.$container) {
       // If container has been removed in the meantime (e.g. user navigates away while animation is in progress)
       return;
     }
-    let yearPanelWidth = this._yearPanel.$container.outerWidth();
+    let yearPanelWidth = this.yearPanel.$container.outerWidth();
     this.$grid.css('width', 'calc(100% - ' + yearPanelWidth + 'px)');
     this.$scale.css('width', 'calc(100% - ' + yearPanelWidth + 'px)');
     this.revalidateLayout();
@@ -1258,7 +1257,7 @@ export default class Planner extends Widget implements PlannerModel {
 
   protected _afterYearPanelWidthChange() {
     if (!this.yearPanelVisible) {
-      this._yearPanel.removeContent();
+      this.yearPanel.removeContent();
     }
   }
 
@@ -1343,19 +1342,19 @@ export default class Planner extends Widget implements PlannerModel {
   protected _setViewRange(viewRange: DateRange | JsonDateRange) {
     viewRange = DateRange.ensure(viewRange);
     this._setProperty('viewRange', viewRange);
-    this._yearPanel.setViewRange(this.viewRange);
-    this._yearPanel.selectDate(this.viewRange.from);
+    this.yearPanel.setViewRange(this.viewRange);
+    this.yearPanel.selectDate(this.viewRange.from);
   }
 
   protected _setDisplayMode(displayMode: PlannerDisplayMode) {
     this._setProperty('displayMode', displayMode);
-    this._yearPanel.setDisplayMode(this.displayMode);
-    this._header.setDisplayMode(this.displayMode);
+    this.yearPanel.setDisplayMode(this.displayMode);
+    this.header.setDisplayMode(this.displayMode);
   }
 
   protected _setAvailableDisplayModes(availableDisplayModes: PlannerDisplayMode[]) {
     this._setProperty('availableDisplayModes', availableDisplayModes);
-    this._header.setAvailableDisplayModes(this.availableDisplayModes);
+    this.header.setAvailableDisplayModes(this.availableDisplayModes);
   }
 
   protected _setSelectionRange(selectionRange: DateRange | JsonDateRange) {
@@ -1366,7 +1365,7 @@ export default class Planner extends Widget implements PlannerModel {
 
   protected _setSelectedResources(selectedResources: PlannerResource[] | string[]) {
     if (typeof selectedResources[0] === 'string') {
-      selectedResources = this._resourcesByIds(selectedResources as string[]);
+      selectedResources = this.resourcesByIds(selectedResources as string[]);
     }
     if (this.rendered) {
       this._removeSelectedResources();
@@ -1445,7 +1444,7 @@ export default class Planner extends Widget implements PlannerModel {
 
   protected _setSelectedActivity(selectedActivity: PlannerActivity | string) {
     if (typeof selectedActivity === 'string') {
-      selectedActivity = this._activityById(selectedActivity);
+      selectedActivity = this.activityById(selectedActivity);
     }
     if (this.rendered) {
       this._removeSelectedActivity();
@@ -1473,15 +1472,15 @@ export default class Planner extends Widget implements PlannerModel {
     }
   }
 
-  protected _resourcesByIds(ids: string[]): PlannerResource[] {
-    return ids.map(this._resourceById.bind(this));
+  resourcesByIds(ids: string[]): PlannerResource[] {
+    return ids.map(this.resourceById.bind(this));
   }
 
-  protected _activityById(id: string): PlannerActivity {
+  activityById(id: string): PlannerActivity {
     return this.activityMap[id];
   }
 
-  protected _resourceById(id: string): PlannerResource {
+  resourceById(id: string): PlannerResource {
     return this.resourceMap[id];
   }
 
@@ -1493,9 +1492,8 @@ export default class Planner extends Widget implements PlannerModel {
 
   layoutYearPanel() {
     if (this.yearPanelVisible) {
-      scrollbars.update(this._yearPanel.$yearList);
-      // @ts-ignore
-      this._yearPanel._scrollYear();
+      scrollbars.update(this.yearPanel.$yearList);
+      this.yearPanel._scrollYear();
     }
   }
 
@@ -1660,13 +1658,13 @@ export interface PlannerActivity {
   id: string;
   beginTime: string | Date;
   endTime: string | Date;
-  text: string;
-  backgroundColor: string;
-  foregroundColor: string;
-  level: number;
-  levelColor: string;
-  tooltipText: string;
-  cssClass: string;
+  text?: string;
+  backgroundColor?: string;
+  foregroundColor?: string;
+  level?: number;
+  levelColor?: string;
+  tooltipText?: string;
+  cssClass?: string;
   $activity?: JQuery;
 }
 
@@ -1679,9 +1677,9 @@ export interface PlannerResource {
 }
 
 export interface PlannerDisplayModeOptions {
-  interval: number;
-  firstHourOfDay: number;
-  lastHourOfDay: number;
+  interval?: number;
+  firstHourOfDay?: number;
+  lastHourOfDay?: number;
   labelPeriod?: number;
   minSelectionIntervalCount?: number;
 }

@@ -79,11 +79,13 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
   $notifications: JQuery;
   $overlaySeparator: JQuery;
 
+  /** @internal */
+  _resizeHandler: (event: JQuery.ResizeEvent) => void;
+
   protected _glassPaneTargetFilters: GlassPaneTargetFilter[];
   protected _offlineNotification: OfflineDesktopNotification;
   /** event listeners */
   protected _benchActiveViewChangedHandler: EventHandler<DesktopBenchViewActivateEvent>;
-  protected _resizeHandler: (event: JQuery.ResizeEvent) => void;
   protected _popstateHandler: (event: JQuery.TriggeredEvent) => void;
 
   constructor() {
@@ -391,14 +393,12 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
     // this restores the selected view after a page refresh. selectedViewTabs is only set by the server.
     if (this.outline.selectedViewTabs) {
       this.outline.selectedViewTabs.forEach(selectedView => {
-        // @ts-ignore
         this.formController._activateView(selectedView);
       });
     } else {
       // views on the outline are not activated by default. Check for modal views on this outline
       let modalViews = this.outline.views.filter(view => view.modal);
       // activate each modal view in the order it was originally activated
-      // @ts-ignore
       modalViews.forEach(this.formController._activateView.bind(this.formController));
     }
   }
@@ -538,7 +538,6 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
     }
     // register header tab area
     if (this.bench) {
-      // @ts-ignore
       this.bench._setTabArea(this.header.tabArea);
     }
     this.invalidateLayoutTree();
@@ -1158,8 +1157,7 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
   }
 
   protected _pushPopupWindowGlassPaneTargets(glassPaneTargets: GlassPaneTarget[], element: Widget) {
-    // @ts-ignore
-    this.formController._popupWindows.forEach(popupWindow => {
+    this.formController.popupWindows.forEach(popupWindow => {
       if (element === popupWindow.form) {
         // Don't block form itself
         return;
@@ -1227,14 +1225,16 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
     });
   }
 
-  protected _setOutlineActivated() {
+  /** @internal */
+  _setOutlineActivated() {
     this._setFormActivated(null);
     if (this.outline) {
       this.outline.activateCurrentPage();
     }
   }
 
-  protected _setFormActivated(form: Form) {
+  /** @internal */
+  _setFormActivated(form: Form) {
     // If desktop is in rendering process the can not set a new active form. instead the active form from the model is set selected.
     if (!this.rendered || this.initialFormRendering) {
       return;
@@ -1449,7 +1449,8 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
     webstorage.setItemToLocalStorage('scout:desktopSplitterPosition:' + window.location.pathname, splitterPosition + '');
   }
 
-  protected _onNotificationRemove(event: Event<DesktopNotification>) {
+  /** @internal */
+  _onNotificationRemove(event: Event<DesktopNotification>) {
     if (this.notifications.length === 0 && this.$notifications) {
       this.$notifications.remove();
       this.$notifications = null;

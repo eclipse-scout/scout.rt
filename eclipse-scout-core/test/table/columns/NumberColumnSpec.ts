@@ -1,22 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LocaleSpecHelper, TableSpecHelper} from '../../../src/testing/index';
-import {DecimalFormat, Range, RemoteEvent, Status, styles} from '../../../src/index';
+import {Cell, DecimalFormat, Locale, NumberColumn, Range, RemoteEvent, Status, styles} from '../../../src/index';
 
-/* global LocaleSpecHelper */
-/* global linkWidgetAndAdapter */
 describe('NumberColumn', () => {
-  let session;
-  let helper;
-  let locale;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
+  let locale: Locale;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -70,7 +68,7 @@ describe('NumberColumn', () => {
       it('colors cells from red to green', () => {
         let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         let table = helper.createTable(model);
-        let column0 = table.columns[0];
+        let column0 = table.columns[0] as NumberColumn;
         table.render();
 
         table.setColumnBackgroundEffect(column0, 'colorGradient1');
@@ -82,7 +80,7 @@ describe('NumberColumn', () => {
       it('colors cells according to rounded values', () => {
         let model = helper.createModelSingleColumnByValues([0, 0.005, 0.006, 0.02], 'NumberColumn');
         let table = helper.createTable(model);
-        let column0 = table.columns[0];
+        let column0 = table.columns[0] as NumberColumn;
         table.render();
 
         column0.decimalFormat = new DecimalFormat(locale, {
@@ -99,7 +97,7 @@ describe('NumberColumn', () => {
     it('considers view range -> only colors rendered cells', () => {
       let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       let table = helper.createTable(model);
-      let column0 = table.columns[0];
+      let column0 = table.columns[0] as NumberColumn;
       table.viewRangeSize = 2;
       table.render();
 
@@ -108,7 +106,7 @@ describe('NumberColumn', () => {
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
       expect(table.rows[2].$row).toBeFalsy();
 
-      let spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 3));
+      spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 3));
       table._renderViewport();
 
       expect(table.rows[0].$row).toBeFalsy();
@@ -119,7 +117,7 @@ describe('NumberColumn', () => {
     it('updates colors if row gets deleted', () => {
       let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       let table = helper.createTable(model);
-      let column0 = table.columns[0];
+      let column0 = table.columns[0] as NumberColumn;
       table.render();
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');
@@ -131,7 +129,7 @@ describe('NumberColumn', () => {
     it('updates colors if row gets inserted', () => {
       let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       let table = helper.createTable(model);
-      let column0 = table.columns[0];
+      let column0 = table.columns[0] as NumberColumn;
       table.render();
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');
@@ -145,7 +143,7 @@ describe('NumberColumn', () => {
 
     it('updates colors if row gets updated', () => {
       let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-      model.columns[0].backgroundEffect = 'colorGradient1';
+      (model.columns[0] as NumberColumn).backgroundEffect = 'colorGradient1';
       let table = helper.createTable(model);
       let column0 = table.columns[0];
       table.render();
@@ -163,7 +161,7 @@ describe('NumberColumn', () => {
 
     it('colors cells if table gets rendered', () => {
       let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-      model.columns[0].backgroundEffect = 'colorGradient1';
+      (model.columns[0] as NumberColumn).backgroundEffect = 'colorGradient1';
       let table = helper.createTable(model);
       let column0 = table.columns[0];
 
@@ -175,9 +173,9 @@ describe('NumberColumn', () => {
 
     it('restores existing background color if background effect gets removed', () => {
       let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-      model.rows[1].cells[0].backgroundColor = 'ff0000';
+      (model.rows[1].cells[0] as Cell).backgroundColor = 'ff0000';
       let table = helper.createTable(model);
-      let column0 = table.columns[0];
+      let column0 = table.columns[0] as NumberColumn;
       table.render();
 
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(255, 0, 0)');
@@ -194,9 +192,9 @@ describe('NumberColumn', () => {
     describe('barChart', () => {
       it('does not overwrite existing background color', () => {
         let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
-        model.rows[1].cells[0].backgroundColor = 'ff0000';
+        (model.rows[1].cells[0] as Cell).backgroundColor = 'ff0000';
         let table = helper.createTable(model);
-        let column0 = table.columns[0];
+        let column0 = table.columns[0] as NumberColumn;
         table.render();
 
         table.setColumnBackgroundEffect(column0, 'barChart');
@@ -209,7 +207,7 @@ describe('NumberColumn', () => {
       it('changes the background effect', () => {
         let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         let table = helper.createTable(model);
-        let column0 = table.columns[0];
+        let column0 = table.columns[0] as NumberColumn;
         table.render();
 
         // initial: No effect
@@ -239,7 +237,7 @@ describe('NumberColumn', () => {
       it('sends columnBackgroundEffectChanged event', () => {
         let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         let table = helper.createTable(model);
-        let column0 = table.columns[0];
+        let column0 = table.columns[0] as NumberColumn;
         table.render();
 
         linkWidgetAndAdapter(table, 'TableAdapter');
@@ -258,10 +256,11 @@ describe('NumberColumn', () => {
       it('does not send columnBackgroundEffectChanged if server triggered it', () => {
         let model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         let table = helper.createTable(model);
-        let column0 = table.columns[0];
+        let column0 = table.columns[0] as NumberColumn;
         table.render();
 
         linkWidgetAndAdapter(table, 'TableAdapter');
+        // @ts-ignore
         table.modelAdapter._onColumnBackgroundEffectChanged({
           eventParts: [{
             columnId: column0.id,
@@ -285,7 +284,7 @@ describe('NumberColumn', () => {
     it('calculates the min/max values based on rounded values', () => {
       let model = helper.createModelSingleColumnByValues([0.005, 0.006], 'NumberColumn');
       let table = helper.createTable(model);
-      let column0 = table.columns[0];
+      let column0 = table.columns[0] as NumberColumn;
       table.render();
 
       column0.decimalFormat = new DecimalFormat(locale, {
@@ -302,7 +301,7 @@ describe('NumberColumn', () => {
     it('updates the value and the display text if the multiplier changes', () => {
       let model = helper.createModelSingleColumnByValues([0.05, 0.06], 'NumberColumn');
       let table = helper.createTable(model);
-      let column0 = table.columns[0];
+      let column0 = table.columns[0] as NumberColumn;
       table.render();
 
       column0.setDecimalFormat({
@@ -330,7 +329,7 @@ describe('NumberColumn', () => {
       let model = helper.createModelSingleColumnByValues([3], 'NumberColumn');
       let table = helper.createTable(model);
       table.columns[0].setEditable(true);
-      let column0 = table.columns[0];
+      let column0 = table.columns[0] as NumberColumn;
       // just values between 2 and 4 are valid
       column0.minValue = 2;
       column0.maxValue = 4;
@@ -341,7 +340,7 @@ describe('NumberColumn', () => {
 
       // set an invalid value
       table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       table.cellEditorPopup.cell.field.setValue(5);
       table.completeCellEdit();
       expect(table.rows[0].cells[0].errorStatus instanceof Status).toBe(true);
@@ -349,7 +348,7 @@ describe('NumberColumn', () => {
 
       // set a valid value
       table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       table.cellEditorPopup.cell.field.setValue(2);
       table.completeCellEdit();
       expect(column0.cell(table.rows[0]).text).toBe('2');
@@ -361,7 +360,7 @@ describe('NumberColumn', () => {
   it('isContentValid', () => {
     let table = helper.createTable({
       columns: [{
-        objectType: 'NumberColumn',
+        objectType: NumberColumn,
         mandatory: true
       }]
     });

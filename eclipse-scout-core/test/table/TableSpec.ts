@@ -1,35 +1,32 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BeanColumn, Column, Device, graphics, IconColumn, icons, Menu, MenuDestinations, Range, RemoteEvent, scout, scrollbars, Table, TableField, TableRow} from '../../src/index';
+import {BeanColumn, Column, Device, graphics, IconColumn, icons, Menu, MenuDestinations, NumberColumn, Range, RemoteEvent, scout, scrollbars, Table, TableField, TableRow} from '../../src/index';
 import {LocaleSpecHelper, TableSpecHelper} from '../../src/testing/index';
 import {triggerClick, triggerContextMenu, triggerMouseDown, triggerMouseUp} from '../../src/testing/jquery-testing';
+import SpecTable from '../../src/testing/table/SpecTable';
 
-/* global removePopups */
 describe('Table', () => {
-  let session;
-  /** @type TableSpecHelper */
-  let helper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
 
   /**
    * TestBeanColumn that validates that the table is available in _init
    */
-  class TestBeanColumn extends BeanColumn {
-    _init(model) {
+  class TestBeanColumn extends BeanColumn<any> {
+    override _init(model) {
       super._init(model);
       expect(this.table).toBeDefined();
       expect(this.table).not.toBeNull();
     }
   }
-
-  window.scout.TestBeanColumn = TestBeanColumn;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -742,7 +739,7 @@ describe('Table', () => {
       let table = helper.createTable(model);
       table.render();
 
-      let rows = [table.rows[0], model.rows[4]];
+      let rows = [table.rows[0], model.rows[4]] as TableRow[];
       table.selectRows(rows);
 
       expect(table.selectedRows).toEqual(rows);
@@ -756,8 +753,8 @@ describe('Table', () => {
       let $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
-      helper.selectRowsAndAssert(table, [model.rows[0], model.rows[4]]);
-      helper.selectRowsAndAssert(table, [model.rows[2]]);
+      helper.selectRowsAndAssert(table, [model.rows[0], model.rows[4]] as TableRow[]);
+      helper.selectRowsAndAssert(table, [model.rows[2]] as TableRow[]);
     });
 
     it('considers view range', () => {
@@ -778,7 +775,7 @@ describe('Table', () => {
     it('triggers rowsSelected', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
 
       let rows = [table.rows[0], table.rows[4]];
@@ -806,7 +803,7 @@ describe('Table', () => {
     it('selects all if not all are selected', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
 
       let $selectedRows = table.$selectedRows();
@@ -821,7 +818,7 @@ describe('Table', () => {
     it('selects none if all are selected', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
 
       let $selectedRows = table.$selectedRows();
@@ -875,7 +872,7 @@ describe('Table', () => {
     it('sends rowAction event with row and column', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       let row0 = table.rows[0];
       let column0 = table.columns[0];
 
@@ -898,7 +895,7 @@ describe('Table', () => {
     it('does not send rowAction event if the row is not selected', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       let row0 = table.rows[0];
       let column0 = table.columns[0];
 
@@ -938,7 +935,7 @@ describe('Table', () => {
     it('does not send rowAction event if it is not the only one selected row', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       let row0 = table.rows[0];
       let column0 = table.columns[0];
 
@@ -959,7 +956,7 @@ describe('Table', () => {
     it('updates column model and sends resize event ', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
 
       expect(table.columns[0].width).not.toBe(100);
@@ -978,7 +975,7 @@ describe('Table', () => {
     it('does not send resize event when resizing is in progress', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
 
       table.resizeColumn(table.columns[0], 50);
@@ -992,7 +989,7 @@ describe('Table', () => {
     it('sends resize event when resizing is finished', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
 
       table.resizeColumn(table.columns[0], 50);
@@ -1022,7 +1019,7 @@ describe('Table', () => {
       model.columns[3].width = 103;
       model.columns[4].width = 104;
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
       // Manually set a "large" table width, because otherwise it will depend on the window size.
       // When running with PhantomJS, the window size would be too small, causing the test to fail.
@@ -1645,14 +1642,14 @@ describe('Table', () => {
       clickRowAndAssertSelection(table, $rows.eq(1));
       clickRowAndAssertSelection(table, $rows.eq(2));
 
-      helper.selectRowsAndAssert(table, [model.rows[0], model.rows[4]]);
+      helper.selectRowsAndAssert(table, [model.rows[0], model.rows[4]] as TableRow[]);
       clickRowAndAssertSelection(table, $rows.eq(4));
     });
 
     it('sends selection and click events', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
 
       let $row = table.$rows().first();
@@ -1668,7 +1665,7 @@ describe('Table', () => {
     it('sends only click if row already is selected', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
 
       let $row = table.$rows().first();
@@ -1692,7 +1689,7 @@ describe('Table', () => {
       let model = helper.createModelFixture(2, 5);
       model.checkable = true;
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
 
       let $checkbox = table.$rows().first().find('.check-box').first();
@@ -2021,7 +2018,7 @@ describe('Table', () => {
     it('only sends selection event, no click', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
 
       let $rows = table.$data.children('.table-row');
@@ -2052,7 +2049,7 @@ describe('Table', () => {
     it('only send one event for mousedown and immediate mouseup on the same row', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.render();
 
       let $rows = table.$data.children('.table-row');
@@ -2078,14 +2075,14 @@ describe('Table', () => {
     it('only selects first row if mouse move selection or multi selection is disabled', () => {
       let model = helper.createModelFixture(2, 4);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.selectionHandler.mouseMoveSelectionEnabled = false;
       verifyMouseMoveSelectionIsDisabled(model, table, false);
 
       model = helper.createModelFixture(2, 4);
       model.multiSelect = false;
       adapter = helper.createTableAdapter(model);
-      table = adapter.createWidget(model, session.desktop);
+      table = adapter.createWidget(model, session.desktop) as SpecTable;
       verifyMouseMoveSelectionIsDisabled(model, table, true);
     });
 
@@ -2208,7 +2205,7 @@ describe('Table', () => {
       expect(table.rows.length).toBe(5);
 
       // Check if order in the DOM is correct
-      // Note: in a previous version of this test we checked if an animation was playing for certain DOM nodes
+      // Note: in a previous version of this test we checked if an animation was playing for certain DOM nodes,
       // but we must disable jQuery animations completely during test execution, otherwise test will fail, since
       // the complete/done function is scheduled and executed to a time where the test that started the animation
       // is already finished. So this will lead to unpredictable failures.
@@ -2229,7 +2226,7 @@ describe('Table', () => {
       scout.create(Table, {
         parent: session.desktop,
         columns: [{
-          objectType: 'TestBeanColumn'
+          objectType: TestBeanColumn
         }]
       });
       // assertions are done in the TestBeanColumn
@@ -2239,11 +2236,11 @@ describe('Table', () => {
       let table = scout.create(Table, {
         parent: session.desktop,
         columns: [{
-          objectType: 'Column'
+          objectType: Column
         }, {
-          objectType: 'NumberColumn'
+          objectType: NumberColumn
         }, {
-          objectType: 'NumberColumn'
+          objectType: NumberColumn
         }]
       });
       expect(table.columns[0].index).toBe(0);
@@ -2255,13 +2252,13 @@ describe('Table', () => {
       let table = scout.create(Table, {
         parent: session.desktop,
         columns: [{
-          objectType: 'Column',
+          objectType: Column,
           index: 2
         }, {
-          objectType: 'NumberColumn',
+          objectType: NumberColumn,
           index: 0
         }, {
-          objectType: 'NumberColumn',
+          objectType: NumberColumn,
           index: 1
         }]
       });
@@ -3042,30 +3039,30 @@ describe('Table', () => {
     });
 
     it('scrolls current row to the top when expanding a large child set', () => {
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('1').$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('7').$row), $scrollable)).toBe(false);
-      expect(table._rowById('4').expanded).toBe(false);
-      table.expandRow(table._rowById('4'), true);
-      expect(table._rowById('4').expanded).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('1').$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('7').$row), $scrollable)).toBe(false);
+      expect(table.rowById('4').expanded).toBe(false);
+      table.expandRow(table.rowById('4'), true);
+      expect(table.rowById('4').expanded).toBe(true);
       // first visible row should be row3 (one above the expanded node)
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('2').$row), $scrollable)).toBe(false);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('3').$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('4').$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('2').$row), $scrollable)).toBe(false);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('3').$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('4').$row), $scrollable)).toBe(true);
       // node5 isn't visible anymore since node4's children use up all the space
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('5').$row), $scrollable)).toBe(false);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('5').$row), $scrollable)).toBe(false);
     });
 
     it('scrolls current row up so that the full expansion is visible plus half a row at the bottom', () => {
-      expect(table._rowById('5').expanded).toBe(false);
-      table.expandRow(table._rowById('5'), true);
-      expect(table._rowById('5').expanded).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('4').$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('5').$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('5').childRows[0].$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('5').childRows[1].$row), $scrollable)).toBe(true);
+      expect(table.rowById('5').expanded).toBe(false);
+      table.expandRow(table.rowById('5'), true);
+      expect(table.rowById('5').expanded).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('4').$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('5').$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('5').childRows[0].$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('5').childRows[1].$row), $scrollable)).toBe(true);
       // half of row6 should still be visible after the expansion
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('6').$row), $scrollable)).toBe(true);
-      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById('7').$row), $scrollable)).toBe(false);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('6').$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table.rowById('7').$row), $scrollable)).toBe(false);
     });
 
   });
@@ -3197,7 +3194,7 @@ describe('Table', () => {
 
     it('can convert selected rows to text', () => {
       let model = helper.createModelFixture(2, 0);
-      model.columns[0].multilineText = true;
+      model.multilineText = true;
       model.rows = [
         helper.createModelRow('1', [
           '\n  \n\tline 1  \n line   2\n\n\nline 3  ',

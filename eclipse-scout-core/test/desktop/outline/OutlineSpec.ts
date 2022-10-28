@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,7 +13,10 @@ import {FormSpecHelper, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from 
 import {triggerMouseDown} from '../../../src/testing/jquery-testing';
 
 describe('Outline', () => {
-  let helper, menuHelper, formHelper, session;
+  let helper: OutlineSpecHelper;
+  let menuHelper: MenuSpecHelper;
+  let formHelper: FormSpecHelper;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -164,8 +167,10 @@ describe('Outline', () => {
       node.detailFormVisibleByUi = false;
       outline.navigateUpInProgress = false;
       outline._renderSelection = () => {
+        // nop
       };
       outline._renderMenus = () => {
+        // nop
       };
 
       // don't change the visibleByUi flag when selection is != 1
@@ -245,22 +250,24 @@ describe('Outline', () => {
       helper.setMobileFlags(outline);
       let node0 = outline.nodes[0];
       let node1 = outline.nodes[1];
-      let initialListenerCount = node0.detailTable.events._eventListeners.length;
+      // @ts-ignore
+      let eventListeners = node0.detailTable.events._eventListeners;
+      let initialListenerCount = eventListeners.length;
 
       outline.selectNodes(node0);
-      let selectionListenerCount = node0.detailTable.events._eventListeners.length;
+      let selectionListenerCount = eventListeners.length;
       expect(selectionListenerCount).toBe(initialListenerCount + 3); // destroy and propertyChange listener
 
       outline.selectNodes(node1);
-      selectionListenerCount = node0.detailTable.events._eventListeners.length;
+      selectionListenerCount = eventListeners.length;
       expect(selectionListenerCount).toBe(initialListenerCount + 1); // listeners removed
 
       outline.selectNodes(node0);
-      selectionListenerCount = node0.detailTable.events._eventListeners.length;
+      selectionListenerCount = eventListeners.length;
       expect(selectionListenerCount).toBe(initialListenerCount + 3); // listeners attached again
 
       outline.nodes[0].detailTable.destroy();
-      expect(node0.detailTable.events._eventListeners.length).toBe(0); // every listener should be removed now
+      expect(eventListeners.length).toBe(0); // every listener should be removed now
     });
 
     it('makes sure table does not update the menu parent for empty space menus', () => {
@@ -457,6 +464,8 @@ describe('Outline', () => {
         let treeModel = treeHelper.createModelFixture(3, 3);
         treeModel.nodes[0].id = ObjectFactory.get().createUniqueId(); // tree helper doesn't use unique ids -> do it here
         let tree = treeHelper.createTree(treeModel);
+        // FIXME TS: is it correct to set a tree as outline content? or should it be a table instead?
+        // @ts-ignore
         outline.setDetailContent(tree);
 
         spyOn(outline, 'selectNodes');
@@ -545,7 +554,7 @@ describe('Outline', () => {
     it('may be replaced by another OutlineOverview', () => {
       let model = helper.createModelFixture(3, 2);
       model.outlineOverview = {
-        objectType: 'OutlineOverview'
+        objectType: OutlineOverview
       };
       let outline = helper.createOutline(model);
       session.desktop.setOutline(outline);

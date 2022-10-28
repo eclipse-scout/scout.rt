@@ -10,6 +10,7 @@
  */
 import {ColumnLayout, FormField, FormFieldMenuEventMap, FormFieldMenuModel, FormFieldModel, GridData, HtmlComponent, LogicalGridData, Menu, RefModel} from '../../../index';
 import {CloneOptions} from '../../../widget/Widget';
+import {Optional} from '../../../types';
 
 export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
   declare model: FormFieldMenuModel;
@@ -70,7 +71,7 @@ export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
     }
   }
 
-  override clone(model: FormFieldMenuModel, options: CloneOptions): this {
+  override clone(model: Optional<FormFieldMenuModel, 'parent'>, options: CloneOptions): this {
     let clone = super.clone(model, options) as FormFieldMenu;
     this._deepCloneProperties(clone, ['field'], options);
     return clone as this;
@@ -82,7 +83,6 @@ export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
 
   protected override _renderOverflown() {
     super._renderOverflown();
-    // @ts-ignore
     this.field._hideStatusMessage();
   }
 }

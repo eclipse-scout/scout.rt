@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, Outline, Page, Table, TableModel, TreeNodeModel} from '../../../index';
+import {Form, FormModel, Outline, Page, Table, TableModel, TreeNodeModel} from '../../../index';
 import {RefModel} from '../../../types';
 
 export default interface PageModel extends TreeNodeModel {
@@ -17,7 +17,7 @@ export default interface PageModel extends TreeNodeModel {
   compactRoot?: boolean;
   detailTable?: Table | RefModel<TableModel>;
   detailTableVisible?: boolean;
-  detailForm?: Form | RefModel<Form>;
+  detailForm?: Form | RefModel<FormModel>;
   detailFormVisible?: boolean;
   navigateButtonsVisible?: boolean;
   tableStatusVisible?: boolean;
@@ -31,3 +31,5 @@ export default interface PageModel extends TreeNodeModel {
   overviewIconId?: string;
   showTileOverview?: boolean;
 }
+
+export type PageData = Omit<PageModel, 'parent'>;

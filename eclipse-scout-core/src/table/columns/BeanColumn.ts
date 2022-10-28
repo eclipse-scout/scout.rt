@@ -32,7 +32,7 @@ export default class BeanColumn<TBean> extends Column<TBean> {
    * Override to render the value.
    * If you have a large table you should consider overriding buildCellForRow instead and create the html as string instead of using jquery.
    */
-  protected _renderValue($cell: JQuery, value: any) {
+  protected _renderValue($cell: JQuery, value: TBean) {
     // to be implemented by the subclass
   }
 

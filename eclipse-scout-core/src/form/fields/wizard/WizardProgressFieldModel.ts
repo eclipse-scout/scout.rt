@@ -12,6 +12,6 @@ import {FormFieldModel} from '../../../index';
 import {WizardStep} from './WizardProgressField';
 
 export default interface WizardProgressFieldModel extends FormFieldModel {
-  activeStepIndex: number;
-  steps: WizardStep[];
+  activeStepIndex?: number;
+  steps?: WizardStep[];
 }

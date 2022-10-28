@@ -153,8 +153,7 @@ export default class StringField extends BasicField<string> {
   }
 
   protected _onMouseWheel(event: JQuery.TriggeredEvent) {
-    // @ts-ignore
-    let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event.originalEvent;
+    let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event['originalEvent'];
     let delta = originalEvent.wheelDelta ? -originalEvent.wheelDelta : originalEvent.detail;
     let scrollTop = this.$field[0].scrollTop;
     if (delta < 0 && scrollTop === 0) {
@@ -437,7 +436,8 @@ export default class StringField extends BasicField<string> {
     this.maxLengthHandler.render();
   }
 
-  protected _onIconClick(event: JQuery.ClickEvent) {
+  /** @internal */
+  _onIconClick() {
     this.acceptInput();
     this.$field.focus();
     this.trigger('action');
@@ -575,7 +575,7 @@ export default class StringField extends BasicField<string> {
 }
 
 export type StringFieldFormat = EnumObject<typeof StringField.Format>;
-type StringFieldSelection = {
+export type StringFieldSelection = {
   start: number;
   end: number;
 };

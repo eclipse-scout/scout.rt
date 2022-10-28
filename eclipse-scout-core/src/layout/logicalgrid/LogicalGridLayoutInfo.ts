@@ -1,11 +1,9 @@
-// noinspection DuplicatedCode
-
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -173,7 +171,7 @@ export default class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel
         size.height = cons.heightHint;
       } else if (cons.useUiHeight || !cons.fillVertical) {
         // Otherwise check if preferred height should be calculated.
-        // Don't do it now because because weightX need to be calculated first to get the correct width hints
+        // Don't do it now because weightX need to be calculated first to get the correct width hints
         uiHeightElements.push({
           cons: cons,
           $comp: $comp,
@@ -464,7 +462,7 @@ export default class LogicalGridLayoutInfo implements LogicalGridLayoutInfoModel
       sumSize += outSizes[i];
       tmpWeight[i] = weights[i];
       /**
-       * auto correction: if weight is 0 and min / max sizes are NOT equal then
+       * autocorrection: if weight is 0 and min / max sizes are NOT equal then
        * set weight to 1; if weight<eps set it to 0
        */
       if (tmpWeight[i] < LayoutConstants.EPS) {

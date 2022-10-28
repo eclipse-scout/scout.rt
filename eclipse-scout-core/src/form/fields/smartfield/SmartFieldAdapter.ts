@@ -30,18 +30,16 @@ export default class SmartFieldAdapter extends LookupFieldAdapter {
    */
   static PROPERTIES_ORDER = ['lookupRow', 'value', 'errorStatus', 'displayText'];
 
-  protected override _postCreateWidget() {
+  /** @internal */
+  override _postCreateWidget() {
     super._postCreateWidget();
     this.widget.lookupCall = scout.create(RemoteLookupCall, this);
   }
 
   protected _syncResult(result: SmartFieldLookupResult<any>) {
-    // @ts-ignore
     let executedLookupCall = this.widget._currentLookupCall;
-    // @ts-ignore
     if (!executedLookupCall && this.widget.touchMode && this.widget.popup && (this.widget.popup as SmartFieldTouchPopup<any>)._field) {
       // in case lookupCall is executed from within the popup (touch):
-      // @ts-ignore
       executedLookupCall = ((this.widget.popup as SmartFieldTouchPopup<any>)._field as SmartField<any>)._currentLookupCall;
     }
     if (executedLookupCall) {

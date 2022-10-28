@@ -72,7 +72,7 @@ export default class TooltipSupport {
     this._destroyTooltip();
   }
 
-  update($comp: JQuery, options: TooltipSupportOptions) {
+  update($comp: JQuery, options?: Partial<TooltipSupportOptions>) {
     $.extend(this._options, options);
     if (this._tooltip) {
       this._showTooltip($comp);

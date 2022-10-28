@@ -1,29 +1,49 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, Desktop, DesktopModel, ModelAdapter, ModelAdapterModel, ObjectFactory, scout, Session, SessionModel, Widget, WidgetModel} from '../index';
+import {App, arrays, Desktop, DesktopModel, ModelAdapter, ObjectFactory, RemoteEvent, scout, Session, SessionModel, Widget, WidgetModel} from '../index';
 import {LocaleSpecHelper, TestingApp} from './index';
 import {ObjectType} from '../ObjectFactory';
-import {AdapterData, RemoteRequest} from '../session/Session';
+import {AdapterData, RemoteRequest, RemoteResponse, SessionStartupResponse} from '../session/Session';
 import 'jasmine-jquery';
 import jasmineScoutMatchers from './scoutMatchers';
 import {RefModel} from '../types';
+import {JsonErrorResponse} from '../App';
 
 declare global {
-  function sandboxSession(options?: SandboxSessionOptions & Partial<SessionModel>): Session;
+
+  export class SandboxSession extends Session {
+    override _processEvents(events: RemoteEvent[]);
+
+    override _requestToJson(request: RemoteRequest): string;
+
+    override _processSuccessResponse(message: RemoteResponse);
+
+    override _copyAdapterData(adapterData: Record<string, AdapterData>);
+
+    override _processStartupResponse(data: SessionStartupResponse);
+
+    override _resumeBackgroundJobPolling();
+
+    override _processErrorJsonResponse(jsonError: JsonErrorResponse);
+
+    override _processErrorResponse(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string, request: RemoteRequest);
+  }
+
+  function sandboxSession(options?: SandboxSessionOptions & Partial<SessionModel>): SandboxSession;
 
   function linkWidgetAndAdapter(widget: Widget, adapterClass: (new() => ModelAdapter) | string);
 
-  function mapAdapterData(adapterDataArray: (AdapterData | WidgetModel) | (AdapterData | WidgetModel)[]): Record<string, AdapterData>;
+  function mapAdapterData(adapterDataArray: AdapterData | WidgetModel | (AdapterData | WidgetModel)[]): Record<string, AdapterData>;
 
-  function registerAdapterData(adapterDataArray: AdapterData[], session: Session): void;
+  function registerAdapterData(adapterDataArray: AdapterData | WidgetModel | (AdapterData | WidgetModel)[], session: SandboxSession): void;
 
   function removePopups(session: Session, cssClass?: string): void;
 
@@ -42,8 +62,6 @@ declare global {
   function uninstallUnloadHandlers(session: Session);
 
   function createPropertyChangeEvent(model: { id: string }, properties: object);
-
-  function createAdapterModel(widgetModel: ModelAdapterModel): ModelAdapterModel;
 }
 
 export interface SandboxSessionOptions {
@@ -63,13 +81,12 @@ window.sandboxSession = options => {
   model.$entryPoint = $sandbox;
   let session = scout.create(Session, model, {
     ensureUniqueId: false
-  });
+  }) as SandboxSession;
 
   // Install non-filtering requestToJson() function. This is required to test
   // the value of the "showBusyIndicator" using toContainEvents(). Usually, this
   // flag is filtered from the request before sending the AJAX call, however in
   // the tests we want to keep it.
-  // @ts-ignore
   session._requestToJson = request => JSON.stringify(request);
 
   // Simulate successful session initialization
@@ -84,12 +101,10 @@ window.sandboxSession = options => {
   desktop.parent = scout.nvl(desktop.parent, session.root);
   session.desktop = scout.create(Desktop, desktop);
   if (scout.nvl(options.renderDesktop, true)) {
-    // @ts-ignore
     session._renderDesktop();
   }
 
   // Prevent exception when test window gets resized
-  // @ts-ignore
   $sandbox.window().off('resize', session.desktop._resizeHandler);
   return session;
 };
@@ -119,9 +134,7 @@ window.linkWidgetAndAdapter = (widget, adapterClass) => {
   });
   adapter.widget = widget;
   widget.modelAdapter = adapter;
-  // @ts-ignore
   adapter._attachWidget();
-  // @ts-ignore
   adapter._postCreateWidget();
 };
 
@@ -142,12 +155,9 @@ window.mapAdapterData = adapterDataArray => {
  * Converts the given adapterDataArray into a map of adapterData and registers the adapterData in the Session.
  * Only use this function when your tests requires to have a remote adapter. In that case create widget and
  * remote adapter with Session#getOrCreateWidget().
- *
- * @param adapterDataArray
  */
 window.registerAdapterData = (adapterDataArray, session) => {
   let adapterDataMap = window.mapAdapterData(adapterDataArray);
-  // @ts-ignore
   session._copyAdapterData(adapterDataMap);
 };
 

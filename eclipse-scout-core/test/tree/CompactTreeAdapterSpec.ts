@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteEvent} from '../../src/index';
+import {RemoteEvent, Tree} from '../../src/index';
 import {TreeSpecHelper} from '../../src/testing/index';
 
 describe('CompactTreeAdapter', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TreeSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -36,10 +36,11 @@ describe('CompactTreeAdapter', () => {
     it('selects child node and notifies server if server selects the first title node', () => {
       let model = helper.createModelFixture(2, 1, true);
       let adapter = helper.createCompactTreeAdapter(model);
-      let tree = adapter.createWidget(model, session.desktop);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
       tree.render();
 
       let nodes = [tree.nodes[0]];
+      // @ts-ignore
       adapter._onNodesSelected([nodes[0].id]);
       sendQueuedAjaxCalls();
       expect(tree.selectedNodes[0]).toBe(tree.nodes[0].childNodes[0]);
@@ -50,7 +51,5 @@ describe('CompactTreeAdapter', () => {
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
-
   });
-
 });

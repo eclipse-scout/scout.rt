@@ -1,46 +1,46 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Code, codes} from '../../src/index';
+import {Code, codes, CodeType} from '../../src/index';
 
 describe('CodeType', () => {
 
   beforeEach(() => {
     codes.init({
       codeType0: {
-        objectType: 'CodeType',
+        objectType: CodeType,
         id: 'codeType0',
         codes: [{
           id: 'code0',
-          objectType: 'Code',
+          objectType: Code,
           children: [{
             id: 'code01',
-            objectType: 'Code'
+            objectType: Code
           }, {
             id: 'code02',
-            objectType: 'Code',
+            objectType: Code,
             children: [{
               id: 'code021',
-              objectType: 'Code'
+              objectType: Code
             }]
           }]
         }, {
           id: 'code1',
-          objectType: 'Code',
+          objectType: Code,
           children: [{
             id: 'code11',
-            objectType: 'Code'
+            objectType: Code
           }]
         }, {
           id: 'code2',
-          objectType: 'Code'
+          objectType: Code
         }]
       }
     });

@@ -13,6 +13,8 @@ import {TableRowsCheckedEvent} from '../../../table/TableEventMap';
 import {TableRowData} from '../../../table/TableRowModel';
 
 export default class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<TValue> {
+  declare model: ListBoxModel<TValue>;
+
   table: Table;
 
   constructor() {

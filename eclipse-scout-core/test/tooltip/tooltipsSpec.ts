@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -14,7 +14,15 @@ import {triggerMouseEnter, triggerMouseLeave} from '../../src/testing/jquery-tes
 
 describe('scout.tooltips', () => {
 
-  let session, helper, formField, model;
+  let session: SandboxSession, helper: FormSpecHelper, formField: SpecValueField;
+
+  class SpecValueField extends ValueField<string> {
+    protected override _render() {
+      this.addContainer(this.$parent, 'form-field');
+      this.addField($('<div>TestField</div>'));
+      this.addStatus();
+    }
+  }
 
   beforeEach(() => {
     jasmine.clock().install();
@@ -23,16 +31,11 @@ describe('scout.tooltips', () => {
     session = sandboxSession();
     helper = new FormSpecHelper(session);
 
-    // Add class desktop to sandbox, tooltip will be added to closest desktop
+    // Add class desktop to sandbox, tooltip will be added to the closest desktop
     session.$entryPoint.addClass('desktop');
 
-    model = helper.createFieldModel();
-    formField = new ValueField();
-    formField._render = function() {
-      this.addContainer(this.$parent, 'form-field');
-      this.addField($('<div>TestField</div>'));
-      this.addStatus();
-    };
+    let model: any = helper.createFieldModel();
+    formField = new SpecValueField();
     formField.init(model);
     formField.render();
   });

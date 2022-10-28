@@ -1,18 +1,20 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteTileFilter, scout, Tile, TileGrid} from '../../src/index';
+import {Group, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel} from '../../src/index';
 import {triggerClick, triggerDoubleClick, triggerMouseDown} from '../../src/testing/jquery-testing';
+import {Optional} from '../../src/types';
+import TileModel from '../../src/tile/TileModel';
 
 describe('TileGrid', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -24,11 +26,11 @@ describe('TileGrid', () => {
     $(':animated').finish();
   });
 
-  function createTileGrid(numTiles, model) {
+  function createTileGrid(numTiles?: number, model?: Optional<TileGridModel, 'parent'>): TileGrid {
     let tiles = [];
     for (let i = 0; i < numTiles; i++) {
       tiles.push({
-        objectType: 'Tile',
+        objectType: Tile,
         label: 'Tile ' + i
       });
     }
@@ -37,15 +39,15 @@ describe('TileGrid', () => {
       tiles: tiles
     };
     model = $.extend({}, defaults, model);
-    return scout.create(TileGrid, model);
+    return scout.create(TileGrid, model as TileGridModel);
   }
 
-  function createTile(model) {
+  function createTile(model?: Optional<TileModel, 'parent'>): Tile {
     let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create(Tile, model);
+    return scout.create(Tile, model as TileModel);
   }
 
   describe('selectTiles', () => {
@@ -501,7 +503,7 @@ describe('TileGrid', () => {
 
       tileGrid.setComparator((t0, t1) => {
         // desc
-        return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
+        return (t0['label'] < t1['label'] ? 1 : ((t0['label'] > t1['label']) ? -1 : 0));
       });
       tileGrid.sort();
       expect(tileGrid.tiles[0]).toBe(tile2);
@@ -513,7 +515,7 @@ describe('TileGrid', () => {
 
       tileGrid.setComparator((t0, t1) => {
         // asc
-        return (t0.label < t1.label ? -1 : ((t0.label > t1.label) ? 1 : 0));
+        return (t0['label'] < t1['label'] ? -1 : ((t0['label'] > t1['label']) ? 1 : 0));
       });
       tileGrid.sort();
       expect(tileGrid.tiles[0]).toBe(tile0);
@@ -539,7 +541,7 @@ describe('TileGrid', () => {
 
       tileGrid.setComparator((t0, t1) => {
         // desc
-        return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
+        return (t0['label'] < t1['label'] ? 1 : ((t0['label'] > t1['label']) ? -1 : 0));
       });
       tileGrid.sort();
       expect(tileGrid.tiles[0]).toBe(tile1);
@@ -571,7 +573,7 @@ describe('TileGrid', () => {
 
       tileGrid.setComparator((t0, t1) => {
         // desc
-        return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
+        return (t0['label'] < t1['label'] ? 1 : ((t0['label'] > t1['label']) ? -1 : 0));
       });
       tileGrid.render();
       tileGrid.sort();
@@ -1051,7 +1053,7 @@ describe('TileGrid', () => {
       expect(tileGrid.$container).not.toHaveClass('empty');
     });
 
-    it('still works if moved from one grid to anoter', () => {
+    it('still works if moved from one grid to another', () => {
       let tileGrid = createTileGrid();
       let tile0 = createTile({
         owner: session.desktop,
@@ -1129,30 +1131,30 @@ describe('TileGrid', () => {
     it('invalidates the logical grid', () => {
       let model = {
         parent: session.desktop,
-        objectType: 'Group',
+        objectType: Group,
         body: {
-          objectType: 'TileGrid',
+          objectType: TileGrid,
           tiles: []
         }
       };
-      let group = scout.create(model);
+      let group = scout.create(model) as Group<TileGrid>;
       let tileGrid = group.body;
       let tileFilter = scout.create(RemoteTileFilter);
-      tileFilter.setTileIds([4, 5, 6]);
+      tileFilter.setTileIds(['4', '5', '6']);
       tileGrid.addFilter(tileFilter);
       group.render();
       tileGrid.setTiles([{
-        objectType: 'Tile',
+        objectType: Tile,
         label: 'Tile 1"',
-        id: 1
+        id: '1'
       }, {
-        objectType: 'Tile',
+        objectType: Tile,
         label: 'Tile 2',
-        id: 2
+        id: '2'
       }, {
-        objectType: 'Tile',
+        objectType: Tile,
         label: 'Tile 3',
-        id: 3
+        id: '3'
       }]);
 
       expect(tileGrid.filters.length).toBe(1);

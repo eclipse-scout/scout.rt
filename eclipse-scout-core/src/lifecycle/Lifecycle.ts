@@ -92,19 +92,19 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
   }
 
   ok(): JQuery.Promise<void> {
-    // 1.) validate form
+    // 1. validate form
     return this._whenInvalid(this._validate)
       .then(invalid => {
         if (invalid) {
           return;
         }
 
-        // 2.) check if save is required
+        // 2. check if save is required
         if (!this.requiresSave()) {
           return this.close();
         }
 
-        // 3.) perform save operation
+        // 3. perform save operation
         return this._whenInvalid(this._save)
           .then(invalid => {
             if (invalid) {
@@ -145,16 +145,16 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
   }
 
   save(): JQuery.Promise<void> {
-    // 1.) validate form
+    // 1. validate form
     return this._whenInvalid(this._validate)
       .then(invalid => {
 
-        // 2.) invalid or form has not been changed
+        // 2. invalid or form has not been changed
         if (invalid || !this.requiresSave()) {
           return;
         }
 
-        // 3.) perform save operation
+        // 3. perform save operation
         return this._whenInvalid(this._save)
           .then(invalid => {
             if (invalid) {
@@ -268,10 +268,10 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
   }
 
   /**
-   * Validates all elements (i.e form-fields) covered by the lifecycle and checks for missing or invalid elements.
+   * Validates all elements (i.e. form-fields) covered by the lifecycle and checks for missing or invalid elements.
    */
   protected _validateElements(): Status {
-    let elements = this._invalidElements();
+    let elements = this.invalidElements();
     let status = new Status();
     if (elements.missingElements.length === 0 && elements.invalidElements.length === 0) {
       status.severity = Status.Severity.OK;
@@ -290,7 +290,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
   /**
    * Validates the widget (i.e. form) associated with this lifecycle. This function is only called when there are
    * no missing or invalid elements. It is used to implement an overall-validate logic which has nothing to do
-   * with a specific element or field. For instance you could validate if an internal member variable of a Lifecycle
+   * with a specific element or field. For instance, you could validate if an internal member variable of a Lifecycle
    * or Form is set.
    */
   protected _validateWidget(): Status {
@@ -298,10 +298,9 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
   }
 
   /**
-   * Override this function to check for invalid elements on the parent which prevent
-   * saving of the parent.(eg. check if all mandatory elements contain a value)
+   * Override this function to check for invalid elements on the parent which prevent saving of the parent (e.g. check if all mandatory elements contain a value).
    */
-  protected _invalidElements(): { missingElements: VALIDATION_RESULT[]; invalidElements: VALIDATION_RESULT[] } {
+  protected invalidElements(): { missingElements: VALIDATION_RESULT[]; invalidElements: VALIDATION_RESULT[] } {
     return {
       missingElements: [],
       invalidElements: []
@@ -309,7 +308,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
   }
 
   /**
-   * Creates a HTML message used to display missing and invalid fields in a message box.
+   * Creates an HTML message used to display missing and invalid fields in a message box.
    */
   protected _createInvalidElementsMessageHtml(missing: VALIDATION_RESULT[], invalid: VALIDATION_RESULT[]): string {
     let $div = $('<div>'),
@@ -345,7 +344,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
   }
 
   /**
-   * Override this function to retrieve the text of an missing mandatory element
+   * Override this function to retrieve the text of a missing mandatory element
    */
   protected _missingElementText(element: VALIDATION_RESULT): string {
     return '';

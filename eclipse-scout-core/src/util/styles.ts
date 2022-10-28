@@ -15,16 +15,6 @@ let styleMap = {};
 
 let element: HTMLDivElement = null;
 
-export interface StyleMap {
-  minHeight: string;
-  minWidth: string;
-  fill: string;
-  stroke: string;
-  fontFamily: string;
-  backgroundColor: string;
-  borderColor: string;
-}
-
 /**
  * Generates an invisible div and appends it to the body, only once. The same div will be reused on subsequent calls.
  * Adds the given css class to that element and returns a style object containing the values for every given property.
@@ -32,7 +22,7 @@ export interface StyleMap {
  *
  * @param styleProperties in the form {backgroundColor: 'black'}
  */
-export function get(cssClass: string | string[], properties: string | string[], styleProperties?: Record<string, string>): StyleMap {
+export function get(cssClass: string | string[], properties: string | string[], styleProperties?: Record<string, string>): Record<string, string> {
   // create invisible div
   let elem: HTMLDivElement = element;
   if (!elem) {
@@ -144,7 +134,7 @@ export function getSize(cssClass: string | string[], cssProperty: string | strin
   return $.pxToNumber(size);
 }
 
-export function put(cssClass: string, style: StyleMap) {
+export function put(cssClass: string, style: Record<string, string>) {
   styleMap[cssClass] = style;
 }
 
@@ -172,7 +162,7 @@ const RGB_WHITE: Rgba = {
 } as const;
 
 /**
- * Creates an rgb object based on the given rgb string with the format rgb(0, 0, 0).
+ * Creates a rgb object based on the given rgb string with the format rgb(0, 0, 0).
  * If the input string cannot be parsed, undefined is returned.
  */
 export function rgb(rgbString: string): Rgba {
@@ -275,7 +265,7 @@ export function lighterColor(color: string, ratio?: number): string {
  *
  * All arguments are mandatory.
  */
-export function mergeRgbColors(color1: string | Rgba, ratio1: number, color2: string | Rgba, ratio2: number): string {
+export function mergeRgbColors(color1: string | Rgba, ratio1?: number, color2?: string | Rgba, ratio2?: number): string {
   if (typeof color1 === 'string') {
     color1 = rgb(color1);
   }
@@ -362,7 +352,7 @@ export function modelToCssColor(color: string): string {
  * color and font.
  *
  * If an $element is provided, the CSS definitions are directly applied to the element. This can be
- * useful if the "style" attribute is shared and cannot be replaced in it's entirety.
+ * useful if the "style" attribute is shared and cannot be replaced in its entirety.
  *
  * If propertyPrefix is provided, the prefix will be applied to the properties, e.g. if the prefix is
  * 'label' the properties labelFont, labelBackgroundColor and labelForegroundColor are used instead of

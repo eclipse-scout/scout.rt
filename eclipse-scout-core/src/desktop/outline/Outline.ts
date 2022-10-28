@@ -9,22 +9,23 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FormModel, GroupBoxMenuItemsOrder, HtmlComponent, Icon, KeyStrokeContext,
-  keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator,
-  OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, OutlineOverviewModel, Page, PageLayout, PageModel, PropertyChangeEvent, RefModel, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail,
-  TileOutlineOverview,
-  Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, Widget
+  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FormModel, GroupBox, GroupBoxMenuItemsOrder, HtmlComponent, Icon,
+  KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout,
+  OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, OutlineOverviewModel, Page, PageLayout, PageModel, PropertyChangeEvent, RefModel, scout, Table, TableControl, TableControlAdapterMenu, TableRow,
+  TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, Widget
 } from '../../index';
 import {Optional, SomeRequired} from '../../types';
 import DisplayParent from '../DisplayParent';
 import {GlassPaneTarget} from '../../widget/Widget';
 import {OutlineContent} from '../bench/DesktopBench';
+import {PageData} from './pages/PageModel';
 
 export default class Outline extends Tree implements DisplayParent, OutlineModel {
   declare model: OutlineModel;
   declare eventMap: OutlineEventMap;
   declare nodes: Page[];
   declare selectedNodes: Page[];
+  declare nodesMap: Record<string, Page>;
 
   compact: boolean;
   defaultDetailForm: Form;
@@ -162,6 +163,10 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
    */
   protected _createMediator(): OutlineMediator {
     return scout.create(OutlineMediator);
+  }
+
+  override insertNode(node: Page | PageData, parentNode?: Page) {
+    super.insertNode(node, parentNode);
   }
 
   protected override _createTreeNode(nodeModel?: Optional<PageModel, 'parent'>): Page {
@@ -350,8 +355,7 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
   // cannot set the property 'keyStrokeContext' because this would interfere
   // with the default keyStrokeContext which is already created when the CTOR
   // of Widget runs.
-  protected _createNavigateButtons(node: Page, parent: Widget): Menu[] {
-    // @ts-ignore
+  protected _createNavigateButtons(node: Page, parent: Table | GroupBox): Menu[] {
     let menus = arrays.ensure(parent.staticMenus);
     if (!this._hasMenu(menus, NavigateUpButton)) {
       let upButton = scout.create(NavigateUpButton, {
@@ -693,7 +697,6 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     // Hide text if it is empty
     page.$text.setVisible(!!page.text);
     // Allow page to decorate based on content
-    // @ts-ignore
     page._decorate();
     this.detailContent.render(page.$node);
     this.detailContent.$container.addClass('detail-content');
@@ -702,6 +705,14 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     }
     this._ensurePageLayout(page);
     this.$data.addClass('detail-content-visible');
+  }
+
+  override nodeById(id: string): Page {
+    return super.nodeById(id) as Page;
+  }
+
+  override nodesByIds(ids: string[]): Page[] {
+    return super.nodesByIds(ids) as Page[];
   }
 
   protected _ensurePageLayout(page: Page) {
@@ -818,7 +829,7 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     }
     if (selectedPage === this.compactRootNode()) {
       // If the root node is selected and there is root content, use this
-      let rootContent = this._computeRootContent();
+      let rootContent = this.getRootContent();
       if (rootContent) {
         return rootContent;
       }
@@ -835,7 +846,7 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     return null;
   }
 
-  protected _computeRootContent(): Form | OutlineOverview {
+  getRootContent(): Form | OutlineOverview {
     if (this.defaultDetailForm) {
       return this.defaultDetailForm;
     }
@@ -848,8 +859,8 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
    * Detail menubar: Contains the other menus.
    *
    * The menu items are gathered from various sources:
-   * If the selected page has a detailForm, the menus are taken from there. Otherwise the detail table and the parent detail table provide the menus.
-   * The detail table contributes the empty space menus and the parent detail the the single selection menus.
+   * If the selected page has a detailForm, the menus are taken from there. Otherwise, the detail table and the parent detail table provide the menus.
+   * The detail table contributes the empty space menus and the parent detail the single selection menus.
    *
    * The menus of the outline itself are not displayed. In fact the server won't deliver any.
    * One reason is that no menus are displayed in regular mode, so when switching to compact mode no menus would be available.
@@ -877,7 +888,7 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
       }
     } else if (selectedPage && !(this.detailContent instanceof OutlineOverview)) {
       // Get empty space menus and table controls from detail table
-      // DetailContent can be null or it is the tableRowDetail. Don't show menus on OutlineOverview.
+      // DetailContent can be null, or it is the tableRowDetail. Don't show menus on OutlineOverview.
       if (selectedPage.detailTable) {
         detailTable = selectedPage.detailTable;
         menuItems = menuUtil.filter(detailTable.menus, ['Table.EmptySpace'], {
@@ -901,7 +912,7 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
       }
     }
 
-    // Add table controls to nodeMenus (destroy previously created ones first to cleanup correctly)
+    // Add table controls to nodeMenus (destroy previously created ones first to clean up correctly)
     let oldMenus = this.nodeMenuBar.menuItems.filter(menu => menu instanceof TableControlAdapterMenu);
     oldMenus.forEach(oldMenu => oldMenu.destroy());
     tableControls.forEach(tableControl => {
@@ -954,7 +965,7 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     if (!this._detailMenusNodesSelectedHandler) {
       // This nodes selection listener removes the property change listeners from the old menu containers (detail content) whenever a node gets selected
       // updateDetailMenus() is called afterwards and attaches the property change listeners to the new detail content
-      // This guarantees that no events are fired for non selected nodes
+      // This guarantees that no events are fired for non-selected nodes
       this._detailMenusNodesSelectedHandler = {
         outline: this,
         menuContainers: [],

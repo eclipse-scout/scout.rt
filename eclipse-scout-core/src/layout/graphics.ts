@@ -72,7 +72,7 @@ export interface PrefSizeOptions {
  * @param $elem
  *          the jQuery element to measure
  * @param options
- *          an optional options object. Short-hand version: If a boolean is passed instead
+ *          an optional options object. Shorthand version: If a boolean is passed instead
  *          of an object, the value is automatically converted to the option "includeMargin".
  */
 export function prefSize($elem: JQuery, options?: PrefSizeOptions | boolean): Dimension {
@@ -112,7 +112,7 @@ export function prefSize($elem: JQuery, options?: PrefSizeOptions | boolean): Di
   }
 
   // UseCssSize is necessary if the css rules have a fix height or width set.
-  // Otherwise setting the width/height to auto could result in a different size
+  // Otherwise, setting the width/height to auto could result in a different size
   let newWidth = (options.useCssSize ? '' : scout.nvl(options.widthHint, 'auto'));
   let newHeight = (options.useCssSize ? '' : scout.nvl(options.heightHint, 'auto'));
 
@@ -225,7 +225,7 @@ export interface SizeOptions {
  * @param $elem
  *          the jQuery element to measure
  * @param options
- *          an optional options object. Short-hand version: If a boolean is passed instead
+ *          an optional options object. Shorthand version: If a boolean is passed instead
  *          of an object, the value is automatically converted to the option "includeMargin".
  */
 export function size($elem: JQuery, options?: SizeOptions | boolean): Dimension {
@@ -311,24 +311,25 @@ export interface InsetsOptions {
  * @param $elem
  *          the jQuery element to measure
  * @param options
- *          an optional options object. Short-hand version: If a boolean is passed instead
- *          of an object, the value is automatically converted to the option "includeMargin".
+ *          an optional options object. Shorthand version: If a boolean is passed instead
+ *          of an object, the value is automatically converted to the option {@link InsetsOptions.includeMargin}.
  */
-export function insets($comp: JQuery, options?: InsetsOptions): Insets {
+export function insets($comp: JQuery, options?: InsetsOptions | boolean): Insets {
+  let opts: InsetsOptions;
   if (typeof options === 'boolean') {
-    options = {
+    opts = {
       includeMargin: options
     };
   } else {
-    options = options || {};
+    opts = options || {};
   }
 
   let i,
     directions = ['top', 'right', 'bottom', 'left'],
     insets = [0, 0, 0, 0],
-    includeMargin = scout.nvl(options.includeMargin, false),
-    includePadding = scout.nvl(options.includePadding, true),
-    includeBorder = scout.nvl(options.includeBorder, true);
+    includeMargin = scout.nvl(opts.includeMargin, false),
+    includePadding = scout.nvl(opts.includePadding, true),
+    includeBorder = scout.nvl(opts.includeBorder, true);
 
   for (i = 0; i < directions.length; i++) {
     if (includeMargin) {
@@ -417,7 +418,7 @@ export interface BoundsOptions {
  * @param $elem
  *          the jQuery element to measure
  * @param options
- *          an optional options object. Short-hand version: If a boolean is passed instead
+ *          an optional options object. Shorthand version: If a boolean is passed instead
  *          of an object, the value is automatically converted to the option "includeMargin".
  */
 export function bounds($elem: JQuery, options?: BoundsOptions | boolean): Rectangle {
@@ -439,7 +440,7 @@ export function position($elem: JQuery): Point {
  * @param $elem
  *          the jQuery element to measure
  * @param options
- *          an optional options object. Short-hand version: If a boolean is passed instead
+ *          an optional options object. Shorthand version: If a boolean is passed instead
  *          of an object, the value is automatically converted to the option "includeMargin".
  */
 export function offsetBounds($elem: JQuery, options?: BoundsOptions | boolean): Rectangle {

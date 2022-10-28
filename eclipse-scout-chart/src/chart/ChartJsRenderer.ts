@@ -271,7 +271,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
 
     // Transfer property from source object to target object:
     // 1. If the property is not set on the target object, copy it from source.
-    // 2. If the property is not set on the source object, set it to undefined if setToUndefined = true. Otherwise empty the array if it is an array property or set it to undefined.
+    // 2. If the property is not set on the source object, set it to undefined if setToUndefined = true. Otherwise, empty the array if it is an array property or set it to undefined.
     // 3. If the property is not an array on the source or the target object, copy the property from the source to the target object.
     // 4. If the property is an array on both objects, do not update the array, but transfer the elements (update elements directly, use pop(), push() or splice() if one array is longer than the other).
     let transferProperty = (source: object, target: object, property: string, setToUndefined?) => {
@@ -628,7 +628,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       borderWidthBackupIdentifier = hover ? 'hoverBorderWidthBackup' : 'borderWidthBackup',
       backgroundColorIdentifier = hover ? 'hoverBackgroundColor' : 'backgroundColor',
       borderColorIdentifier = hover ? 'hoverBorderColor' : 'borderColor';
-    // restore original state if there is an backup
+    // restore original state if there is a backup
     if (dataset[borderWidthBackupIdentifier]) {
       dataset[borderWidthIdentifier] = dataset[borderWidthBackupIdentifier];
       delete dataset[borderWidthBackupIdentifier];
@@ -913,7 +913,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     let tooltipLabelColor = legendColor || backgroundColor || borderColor;
     if (!tooltipLabelColor || objects.isFunction(tooltipLabelColor)) {
       let defaultTypeTooltipLabelColor;
-      // noinspection DuplicatedCode
       if (ChartJs.overrides[config.type] && ChartJs.overrides[config.type].plugins && ChartJs.overrides[config.type].plugins.tooltip && ChartJs.overrides[config.type].plugins.tooltip.callbacks) {
         defaultTypeTooltipLabelColor = ChartJs.overrides[config.type].plugins.tooltip.callbacks.labelColor;
       }
@@ -1948,7 +1947,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   protected _generateLegendLabels(chart: ChartJsChart): LegendItem[] {
     let config = chart.config,
       defaultTypeGenerateLabels;
-    // noinspection DuplicatedCode
     if (ChartJs.overrides[config.type] && ChartJs.overrides[config.type].plugins && ChartJs.overrides[config.type].plugins.legend && ChartJs.overrides[config.type].plugins.legend.labels) {
       defaultTypeGenerateLabels = ChartJs.overrides[config.type].plugins.legend.labels.generateLabels;
     }

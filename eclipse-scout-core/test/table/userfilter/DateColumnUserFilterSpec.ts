@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateColumnUserFilter, dates, FilterFieldsGroupBox} from '../../../src/index';
+import {DateColumnUserFilter, dates, FilterFieldsGroupBox, FilterFieldsGroupBoxModel} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
 
 describe('DateColumnUserFilter', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -83,12 +83,18 @@ describe('DateColumnUserFilter', () => {
     expect(filter.acceptByFields(null)).toBe(false);
   });
 
+  class SpecFilterFieldsGroupBox extends FilterFieldsGroupBox {
+    override _init(model: FilterFieldsGroupBoxModel) {
+      super._init(model);
+    }
+  }
+
   it('addFilterFields must not create date fields with time', () => {
     // In case this test case fails, the date filter fields are created with time.
     // If this is intended, the acceptByFields() implementation for DateColumnUserFilter has to be checked/adjusted to ensure correct filter functionality.
-    let model = createSimpleModel('DateColumnUserFilter', session),
+    let model = createSimpleModel(SpecFilterFieldsGroupBox, session) as FilterFieldsGroupBoxModel,
       filter = new DateColumnUserFilter(),
-      box = new FilterFieldsGroupBox();
+      box = new SpecFilterFieldsGroupBox();
     model.filter = filter;
     box._init(model);
     filter.addFilterFields(box);

@@ -73,7 +73,6 @@ export default class Reconnector {
   protected _ping() {
     this.session.onReconnecting();
 
-    // @ts-ignore
     let pingAjaxOptions = this.session.defaultAjaxOptions(this.session._newRequest({
       ping: true
     }));

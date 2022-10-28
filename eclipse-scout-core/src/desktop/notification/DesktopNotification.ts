@@ -105,7 +105,8 @@ export default class DesktopNotification extends ScoutNotification implements De
     super._destroy();
   }
 
-  protected _isDocumentHidden(): boolean {
+  /** @internal */
+  _isDocumentHidden(): boolean {
     return document.hidden;
   }
 

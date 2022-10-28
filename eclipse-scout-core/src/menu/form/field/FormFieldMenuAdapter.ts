@@ -17,7 +17,8 @@ export default class FormFieldMenuAdapter extends MenuAdapter {
     super();
   }
 
-  protected override _postCreateWidget() {
+  /** @internal */
+  override _postCreateWidget() {
     super._postCreateWidget();
     // Use grid data from server as hints
     if (this.widget.field) {

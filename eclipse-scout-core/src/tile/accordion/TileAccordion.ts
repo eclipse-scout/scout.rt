@@ -10,9 +10,7 @@
  */
 import {
   Accordion, arrays, Event, EventDelegator, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, Group, KeyStrokeContext, objects, PropertyChangeEvent, RefModel, scout, TextFilter, Tile, TileAccordionEventMap,
-  TileAccordionLayout,
-  TileAccordionModel,
-  TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
+  TileAccordionLayout, TileAccordionModel, TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
 } from '../../index';
 import {Comparator} from '../../types';
 
@@ -94,7 +92,7 @@ export default class TileAccordion extends Accordion implements TileAccordionMod
     return new KeyStrokeContext();
   }
 
-  protected override _initGroup(group: Group<TileGrid>) {
+  protected override _initGroup(group: Group<TileGrid> & { body: TileGrid & { __tileAccordionEventDelegator?: EventDelegator } }) {
     super._initGroup(group);
     group.body.setSelectionHandler(this.tileGridSelectionHandler);
 
@@ -151,18 +149,15 @@ export default class TileAccordion extends Accordion implements TileAccordionMod
     this._handleCollapsed(group);
 
     // Delegate events so that consumers don't need to attach a listener to each tile grid by themselves
-    // @ts-ignore
     group.body.__tileAccordionEventDelegator = EventDelegator.create(group.body, this, {
       delegateEvents: ['tileClick', 'tileAction']
     });
   }
 
-  protected override _deleteGroup(group: Group<TileGrid>) {
+  protected override _deleteGroup(group: Group<TileGrid> & { body: TileGrid & { __tileAccordionEventDelegator?: EventDelegator } }) {
     if (group.body) {
       group.body.off('propertyChange', this._tileGridPropertyChangeHandler);
-      // @ts-ignore
       group.body.__tileAccordionEventDelegator.destroy();
-      // @ts-ignore
       group.body.__tileAccordionEventDelegator = null;
     }
     super._deleteGroup(group);
@@ -469,7 +464,7 @@ export default class TileAccordion extends Accordion implements TileAccordionMod
     // Split tiles into separate lists for each group (result may contain groups without tiles)
     let tilesPerGroup = this._groupTiles(tiles);
 
-    // Select the tiles in the the corresponding tile grids
+    // Select the tiles in the corresponding tile grids
     for (let id in tilesPerGroup) { // NOSONAR
       let group = this.getGroupById(id);
       group.body.selectTiles(tilesPerGroup[id]);
@@ -534,7 +529,7 @@ export default class TileAccordion extends Accordion implements TileAccordionMod
   }
 
   /**
-   * Deselects every tile if all tiles are selected. Otherwise selects all tiles.
+   * Deselects every tile if all tiles are selected. Otherwise, selects all tiles.
    */
   toggleSelection() {
     if (this.getSelectedTileCount() === this.getVisibleTileCount()) {
@@ -685,7 +680,7 @@ export default class TileAccordion extends Accordion implements TileAccordionMod
 
   protected _handleCollapsed(group: Group<TileGrid>) {
     if (group.collapsed) {
-      // Deselect tiles of a collapsed group (this will also set focusedTile to null) -> actions on invisible elements is confusing, and key strokes only operate on visible elements, too
+      // Deselect tiles of a collapsed group (this will also set focusedTile to null) -> actions on invisible elements is confusing, and keystrokes only operate on visible elements, too
       group.body.deselectAllTiles();
     }
     if (group.rendered) {

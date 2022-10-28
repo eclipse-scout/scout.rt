@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DialogLayout, Form, FormField, GroupBox, HorizontalGrid, scout, StringField, VerticalSmartGrid} from '../../../../src/index';
+import {DialogLayout, Form, FormField, GroupBox, GroupBoxModel, HorizontalGrid, LabelField, scout, StringField, VerticalSmartGrid, Widget} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
+import {Optional} from '../../../../src/types';
 
 describe('GroupBox', () => {
-  let session;
-  /** @type FormSpecHelper */
-  let helper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -22,15 +22,15 @@ describe('GroupBox', () => {
     helper = new FormSpecHelper(session);
   });
 
-  function createField(model, parent) {
+  function createField(model: Optional<GroupBoxModel, 'parent'>, parent?: Widget): GroupBox {
     let field = new GroupBox();
     model.session = session;
     model.parent = parent || session.desktop;
-    field.init(model);
+    field.init(model as GroupBoxModel);
     return field;
   }
 
-  function expectEnabled(field, expectedEnabled, expectedEnabledComputed, hasClass) {
+  function expectEnabled(field: FormField, expectedEnabled: boolean, expectedEnabledComputed: boolean, hasClass?: string) {
     expect(field.enabled).toBe(expectedEnabled);
     expect(field.enabledComputed).toBe(expectedEnabledComputed);
     if (hasClass) {
@@ -39,6 +39,16 @@ describe('GroupBox', () => {
       } else {
         expect(field.$container).toHaveClass(hasClass);
       }
+    }
+  }
+
+  class SpecGroupBox extends GroupBox {
+    override _renderControls() {
+      super._renderControls();
+    }
+
+    override _computeTitleVisible(labelVisible?: boolean): boolean {
+      return super._computeTitleVisible(labelVisible);
     }
   }
 
@@ -60,25 +70,25 @@ describe('GroupBox', () => {
     });
 
     it('renders controls initially if expanded', () => {
-      let groupBox = helper.createGroupBoxWithOneField(session.desktop);
-      spyOn(groupBox, '_renderControls');
+      let groupBox = helper.createGroupBoxWithOneField(session.desktop) as SpecGroupBox;
+      let _renderControlsSpy = spyOn(groupBox, '_renderControls');
       groupBox.render();
-      expect(groupBox._renderControls.calls.count()).toEqual(1);
+      expect(_renderControlsSpy.calls.count()).toEqual(1);
     });
 
     it('does not render controls initially if collapsed, but on expand', () => {
-      let groupBox = helper.createGroupBoxWithOneField(session.desktop);
-      spyOn(groupBox, '_renderControls');
+      let groupBox = helper.createGroupBoxWithOneField(session.desktop) as SpecGroupBox;
+      let _renderControlsSpy = spyOn(groupBox, '_renderControls');
       groupBox.setExpanded(false);
       groupBox.render();
-      expect(groupBox._renderControls.calls.count()).toEqual(0);
+      expect(_renderControlsSpy.calls.count()).toEqual(0);
       groupBox.setExpanded(true);
-      expect(groupBox._renderControls.calls.count()).toEqual(1);
+      expect(_renderControlsSpy.calls.count()).toEqual(1);
     });
 
     it('automatically hides the label if it is empty', () => {
       // Test 1: render first
-      let groupBox = createField({});
+      let groupBox = createField({}) as SpecGroupBox;
       groupBox.render();
 
       expect(groupBox.labelVisible).toBe(true);
@@ -96,7 +106,7 @@ describe('GroupBox', () => {
       expect(groupBox.$title.text().trim()).toBe('test');
 
       // Test 2: render later
-      let groupBox2 = createField({});
+      let groupBox2 = createField({}) as SpecGroupBox;
       expect(groupBox2.labelVisible).toBe(true);
       expect(groupBox2._computeTitleVisible()).toBe(false);
       groupBox2.setLabel('test2');
@@ -133,10 +143,10 @@ describe('GroupBox', () => {
       let box = scout.create(GroupBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'StringField',
+          objectType: StringField,
           enabled: false
         }, {
-          objectType: 'StringField',
+          objectType: StringField,
           enabled: true
         }]
       });
@@ -151,9 +161,9 @@ describe('GroupBox', () => {
       let box = scout.create(GroupBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'LabelField'
+          objectType: LabelField
         }, {
-          objectType: 'StringField'
+          objectType: StringField
         }]
       });
       box.render();
@@ -167,19 +177,20 @@ describe('GroupBox', () => {
       let box = scout.create(GroupBox, {
         parent: session.desktop,
         fields: [{
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           fields: [{
-            objectType: 'LabelField'
+            objectType: LabelField
           }, {
-            objectType: 'StringField'
+            objectType: StringField
           }]
         }]
       });
       box.render();
-      expect(box.fields[0].fields[1].$field).not.toBeFocused();
+      let groupBox = box.fields[0] as GroupBox;
+      expect(groupBox.fields[1].$field).not.toBeFocused();
 
       box.focus();
-      expect(box.fields[0].fields[1].$field).toBeFocused();
+      expect(groupBox.fields[1].$field).toBeFocused();
     });
   });
 
@@ -236,13 +247,13 @@ describe('GroupBox', () => {
         gridColumnCount: 2,
         fields: [
           {
-            objectType: 'StringField'
+            objectType: StringField
           },
           {
-            objectType: 'StringField'
+            objectType: StringField
           },
           {
-            objectType: 'StringField'
+            objectType: StringField
           }
         ]
       });
@@ -270,13 +281,13 @@ describe('GroupBox', () => {
         gridColumnCount: 2,
         fields: [
           {
-            objectType: 'StringField'
+            objectType: StringField
           },
           {
-            objectType: 'StringField'
+            objectType: StringField
           },
           {
-            objectType: 'StringField'
+            objectType: StringField
           }
         ]
       });
@@ -325,7 +336,7 @@ describe('GroupBox', () => {
       let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           gridDataHints: {
             widthInPixel: 27,
             heightInPixel: 30

@@ -105,7 +105,6 @@ export default class ResponsiveHandler implements ResponsiveHandlerModel {
   /* --- TRANSFORMATIONS ------------------------------------------------------------- */
 
   protected _storeFieldProperty(widget: Widget, property: string, value: any) {
-    // @ts-ignore
     widget._setProperty('responsive-' + property, value);
   }
 
@@ -136,8 +135,8 @@ export default class ResponsiveHandler implements ResponsiveHandlerModel {
       oldTransformations = this.enabledTransformations[this.oldState] || [];
       newTransformations = this.enabledTransformations[this.state] || [];
     } else {
-      // if the state stays the same, it means we want to enforce the current state. Therefore the new transformations
-      // will contained the transformations of the current state. The old transformations will contain all others.
+      // if the state stays the same, it means we want to enforce the current state. Therefore, the new transformations
+      // will contain the transformations of the current state. The old transformations will contain all others.
       oldTransformations = [];
       if (this.state !== ResponsiveManager.ResponsiveState.NORMAL) {
         arrays.pushAll(oldTransformations, this.enabledTransformations[ResponsiveManager.ResponsiveState.NORMAL]);
@@ -159,7 +158,7 @@ export default class ResponsiveHandler implements ResponsiveHandlerModel {
   }
 
   /**
-   * Performs all the transformations. By default this method calls _transformWidget() for the own widget.
+   * Performs all the transformations. By default, this method calls _transformWidget() for the own widget.
    * If e.g. child elements need to be transformed as well, override this method and call _transformWidget() for
    * each child as well.
    */

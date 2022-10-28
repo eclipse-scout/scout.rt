@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,10 +11,10 @@
 import {Button, FormField, graphics, HtmlEnvironment} from '../../../../src/index';
 
 describe('ButtonLayout', () => {
-  let session;
+  let session: SandboxSession;
 
   class CustomButton extends Button {
-    _render() {
+    override _render() {
       super._render();
       this.$fieldContainer.css({
         display: 'inline-block',

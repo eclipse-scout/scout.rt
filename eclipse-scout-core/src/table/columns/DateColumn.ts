@@ -65,7 +65,6 @@ export default class DateColumn extends Column<Date> implements DateColumnModel 
     let groupFormat = DateFormat.ensure(this.session.locale, format);
     this._setProperty('groupFormat', groupFormat);
     if (this.initialized) {
-      // @ts-ignore
       this.table._group();
     }
   }

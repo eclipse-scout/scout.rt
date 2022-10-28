@@ -8,13 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnDescriptor, LookupCall, LookupRow, ValueFieldModel} from '../../../index';
+import {ColumnDescriptor, LookupRow, ValueFieldModel} from '../../../index';
 import {SmartFieldActiveFilter, SmartFieldDisplayStyle} from './SmartField';
-import LookupCallModel from '../../../lookup/LookupCallModel';
-import {ObjectType} from '../../../ObjectFactory';
+import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
 
 export default interface SmartFieldModel<TValue> extends ValueFieldModel<TValue> {
-  lookupCall?: LookupCall<TValue> | LookupCallModel<TValue> & { objectType: ObjectType<LookupCall<TValue>> } | string;
+  lookupCall?: LookupCallOrRefModel<TValue>;
   codeType?: string;
   lookupRow?: LookupRow<TValue>;
   /**

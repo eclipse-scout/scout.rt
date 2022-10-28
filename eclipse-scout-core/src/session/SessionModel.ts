@@ -36,7 +36,7 @@ export default interface SessionModel {
   forceNewClientSession?: boolean;
 
   /**
-   * By default the user agent for the running platform is used. Use this option if you want to set a custom one.
+   * By default, the user agent for the running platform is used. Use this option if you want to set a custom one.
    */
   userAgent?: UserAgent;
 

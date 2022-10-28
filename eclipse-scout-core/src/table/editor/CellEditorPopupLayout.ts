@@ -40,7 +40,6 @@ export default class CellEditorPopupLayout<TValue> extends AbstractLayout {
       // extend the width if the popup has a negative margin
       cellBounds.width = cellBounds.width + -margin;
     }
-    // @ts-ignore
     let selectionHeight = this.cellEditorPopup._rowSelectionBounds().height;
     if (selectionHeight) {
       // Use height of selection if available (the selection may be larger than the row if it covers the border of the previous row)

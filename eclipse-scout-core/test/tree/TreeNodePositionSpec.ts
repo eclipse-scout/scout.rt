@@ -1,22 +1,22 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension} from '../../src/index';
+import {Dimension, TreeNode} from '../../src/index';
 import {TreeSpecHelper} from '../../src/testing/index';
+import SpecTree from '../../src/testing/tree/SpecTree';
+import {TreeNodeData} from '../../src/tree/TreeNodeModel';
 
 describe('TreeNodePosition', () => {
 
-  /** @type {TreeSpecHelper} */
-  let helper;
-
-  let session, tree, node0, node1, node2, rootNode;
+  let helper: TreeSpecHelper;
+  let session: SandboxSession, tree: SpecTree, node0: TreeNodeData, node1: TreeNodeData, node2: TreeNodeData, rootNode: TreeNode;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -169,7 +169,7 @@ describe('TreeNodePosition', () => {
       // This tree does not use a root node
       tree = helper.createTree(helper.createModel([]));
 
-      function createNode(id, text, expanded, childNodeIndex) {
+      function createNode(id: string, text: string, expanded: boolean, childNodeIndex?: number): TreeNodeData {
         let node = helper.createModelNode(id, text, childNodeIndex);
         node.expanded = expanded;
         return node;
@@ -297,7 +297,7 @@ describe('TreeNodePosition', () => {
       // This tree does not use a root node
       tree = helper.createTree(helper.createModel([]));
 
-      function createNode(id, text, expanded, childNodeIndex) {
+      function createNode(id: string, text: string, expanded: boolean, childNodeIndex?: number): TreeNodeData {
         let node = helper.createModelNode(id, text, childNodeIndex);
         node.expanded = expanded;
         return node;

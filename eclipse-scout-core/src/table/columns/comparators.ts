@@ -91,10 +91,7 @@ const TEXT: ColumnComparator<string> = {
  * Numeric comparator, used to compare numeric values. Used for numbers, dates, etc.
  */
 const NUMERIC: ColumnComparator<number> = {
-  install: session => {
-    // NOP
-    return true;
-  },
+  install: session => true,
   compare: (valueA, valueB) => {
     if (objects.isNullOrUndefined(valueA) && objects.isNullOrUndefined(valueB)) {
       return 0;

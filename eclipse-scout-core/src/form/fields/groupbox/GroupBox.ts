@@ -22,6 +22,7 @@ import {FormFieldStatusPosition} from '../FormField';
 import {KeyStrokeRenderingHints} from '../../../keystroke/KeyStroke';
 import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
 import {CloneOptions} from '../../../widget/Widget';
+import {Optional} from '../../../types';
 
 export default class GroupBox extends CompositeField implements GroupBoxModel {
   declare model: GroupBoxModel;
@@ -832,7 +833,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     this.invalidateLayoutTree();
   }
 
-  override clone(model: GroupBoxModel, options?: CloneOptions): this {
+  override clone(model: Optional<GroupBoxModel, 'parent'>, options?: CloneOptions): this {
     let clone = super.clone(model) as GroupBox;
     this._deepCloneProperties(clone, ['fields'], options);
     clone._prepareFields();

@@ -32,7 +32,6 @@ export default class CancelMenu extends FormLifecycleMenu {
     let event = new Event();
     this.trigger('action', event);
     if (!event.defaultPrevented) {
-      // noinspection JSIgnoredPromiseFromCall
       form.cancel();
     }
   }

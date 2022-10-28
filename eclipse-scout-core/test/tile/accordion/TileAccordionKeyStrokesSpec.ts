@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, keys, scout, Tile, TileAccordion} from '../../../src/index';
+import {arrays, Group, keys, scout, Tile, TileAccordion, TileGrid} from '../../../src/index';
 import {triggerKeyDownCapture, triggerKeyInputCapture, triggerKeyUpCapture} from '../../../src/testing/jquery-testing';
+import TileModel from '../../../src/tile/TileModel';
 
 describe('TileAccordionKeyStrokes', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -27,14 +28,14 @@ describe('TileAccordionKeyStrokes', () => {
       '</style>').appendTo($('#sandbox'));
   });
 
-  function createAccordion(numGroups, model) {
+  function createAccordion(numGroups, model): TileAccordion {
     let groups = [];
     for (let i = 0; i < numGroups; i++) {
       groups.push({
-        objectType: 'Group',
+        objectType: Group,
         label: 'Group ' + i,
         body: {
-          objectType: 'TileGrid',
+          objectType: TileGrid,
           scrollable: false,
           layoutConfig: {
             columnWidth: 100,
@@ -52,7 +53,7 @@ describe('TileAccordionKeyStrokes', () => {
     return scout.create(TileAccordion, model);
   }
 
-  function createTile(model) {
+  function createTile(model: TileModel): Tile {
     let defaults = {
       parent: session.desktop
     };
@@ -60,7 +61,7 @@ describe('TileAccordionKeyStrokes', () => {
     return scout.create(Tile, model);
   }
 
-  function createTiles(numTiles, model) {
+  function createTiles(numTiles: number, model?: TileModel): Tile[] {
     let tiles = [];
     for (let i = 0; i < numTiles; i++) {
       tiles.push(createTile(model));

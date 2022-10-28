@@ -63,7 +63,6 @@ export default class FileChooserController {
   protected _render(fileChooser: FileChooser) {
     // missing displayParent (when render is called by reload), use displayParent of FileChooserController
     if (!fileChooser.displayParent) {
-      // @ts-ignore
       fileChooser._setProperty('displayParent', this.displayParent);
     }
     // Use parent's function or (if not implemented) our own.

@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, SequenceBoxAdapter} from '../../../../src/index';
+import {DateField, scout, SequenceBox, SequenceBoxAdapter, StringField} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '../../../../src/testing/index';
 
 describe('SequenceBoxAdapter', () => {
-  let session, helper, menuHelper;
+  let session: SandboxSession, helper: FormSpecHelper, menuHelper: MenuSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -32,16 +32,16 @@ describe('SequenceBoxAdapter', () => {
         modelClass: 'asdf',
         classId: 'bbb',
         fields: [{
-          objectType: 'StringField',
+          objectType: StringField,
           gridData: {
             useUiWidth: true
           }
         }, {
-          objectType: 'DateField'
+          objectType: DateField
         }]
       };
       let adapter = scout.create(SequenceBoxAdapter, $.extend({}, model));
-      let seqBox = adapter.createWidget(model, session.desktop);
+      let seqBox = adapter.createWidget(model, session.desktop) as SequenceBox;
       linkWidgetAndAdapter(seqBox.fields[0], 'StringFieldAdapter');
       linkWidgetAndAdapter(seqBox.fields[1], 'DateFieldAdapter');
       let clone = seqBox.clone({

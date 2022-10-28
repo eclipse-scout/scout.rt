@@ -145,7 +145,7 @@ export default class ErrorHandler implements ErrorHandlerOptions {
    * 3. Nothing                 (code: 'P3')
    * 4. Everything else         (code: 'P4')
    */
-  analyzeError(error: any, ...args: any[]): JQuery.Promise<any> {
+  analyzeError(error?: any, ...args: any[]): JQuery.Promise<any> {
     let errorInfo = {
       code: null,
       message: null,
@@ -200,10 +200,8 @@ export default class ErrorHandler implements ErrorHandlerOptions {
     if (error.stack) {
       errorInfo.stack = String(error.stack);
     }
-    // @ts-ignore
-    if (error.debugInfo) { // scout extension
-      // @ts-ignore
-      errorInfo.debugInfo = error.debugInfo;
+    if (error['debugInfo']) { // scout extension
+      errorInfo.debugInfo = error['debugInfo'];
     }
     let stack = errorInfo.mappedStack || errorInfo.stack;
     let log = [];

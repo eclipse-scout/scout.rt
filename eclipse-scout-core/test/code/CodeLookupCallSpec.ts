@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CodeLookupCall, codes, CodeType, scout} from '../../src/index';
+import {Code, CodeLookupCall, codes, CodeType, scout} from '../../src/index';
 
 describe('CodeLookupCall', () => {
-  let session, codeType123;
+  let session: SandboxSession, codeType123: CodeType<any>;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -21,19 +21,19 @@ describe('CodeLookupCall', () => {
       id: 'codeType.123',
       codes: [{
         id: 'code.1',
-        objectType: 'Code',
+        objectType: Code,
         text: 'code 1'
       }, {
         id: 'code.2',
-        objectType: 'Code',
+        objectType: Code,
         text: 'code 2',
         children: [{
           id: 'childcode.2a',
-          objectType: 'Code',
+          objectType: Code,
           text: 'child code 2a'
         }, {
           id: 'childcode.2b',
-          objectType: 'Code',
+          objectType: Code,
           text: 'child code 2b'
         }]
       }]
@@ -215,10 +215,10 @@ describe('CodeLookupCall', () => {
           codes.remove(codeType123);
           codes.add({
             id: 'codeType.123',
-            objectType: 'CodeType',
+            objectType: CodeType,
             codes: [{
               id: 'newcode.1',
-              objectType: 'Code',
+              objectType: Code,
               text: 'new code 1'
             }]
           });

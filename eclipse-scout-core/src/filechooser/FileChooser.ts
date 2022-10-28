@@ -276,7 +276,7 @@ export default class FileChooser extends Widget implements FileChooserModel {
     }
   }
 
-  removeFile(file: File, event: JQuery.ClickEvent) {
+  removeFile(file: File) {
     let files = this.files.slice();
     arrays.remove(files, file);
     this.setFiles(files);

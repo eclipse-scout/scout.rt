@@ -130,7 +130,8 @@ export default class SmartFieldPopup<TValue> extends Popup implements SmartField
       || (this.field.$clearIcon && this.field.$clearIcon.isOrHas(target));
   }
 
-  protected _onAnimationEnd() {
+  /** @internal */
+  _onAnimationEnd() {
     this.proposalChooser.updateScrollbars();
   }
 

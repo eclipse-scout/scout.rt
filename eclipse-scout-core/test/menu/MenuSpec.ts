@@ -3,19 +3,18 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, EllipsisMenu, Menu, scout, tooltips} from '../../src/index';
+import {Action, ContextMenuPopup, EllipsisMenu, Menu, scout, tooltips} from '../../src/index';
 import {MenuSpecHelper} from '../../src/testing/index';
 import {triggerMouseEnter, triggerMouseLeave} from '../../src/testing/jquery-testing';
 
 describe('Menu', () => {
-  let session, $sandbox, menu1, menu2;
-  /** @type MenuSpecHelper */
-  let helper;
+  let session: SandboxSession, $sandbox: JQuery, menu1: Menu, menu2: Menu;
+  let helper: MenuSpecHelper;
 
   beforeEach(() => {
     jasmine.clock().install();
@@ -270,27 +269,27 @@ describe('Menu', () => {
         inheritAccessibility: true,
         enabled: true,
         childActions: [{
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'child0',
           inheritAccessibility: true,
           enabled: true
         }, {
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'child1',
           inheritAccessibility: true,
           enabled: true,
           childActions: [{
-            objectType: 'Menu',
+            objectType: Menu,
             text: 'child1_0',
             inheritAccessibility: false,
             enabled: true
           }, {
-            objectType: 'Menu',
+            objectType: Menu,
             text: 'child1_1',
             inheritAccessibility: true,
             enabled: true
           }, {
-            objectType: 'Menu',
+            objectType: Menu,
             text: 'child1_2',
             inheritAccessibility: true,
             enabled: false
@@ -335,17 +334,17 @@ describe('Menu', () => {
         inheritAccessibility: true,
         enabled: true,
         childActions: [{
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'child0',
           inheritAccessibility: true,
           enabled: true
         }, {
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'child1',
           inheritAccessibility: true,
           enabled: true,
           childActions: [{
-            objectType: 'Menu',
+            objectType: Menu,
             text: 'child1_0',
             inheritAccessibility: false,
             enabled: true
@@ -376,7 +375,7 @@ describe('Menu', () => {
       expect(parent.enabled).toBe(false);
       expect(parent.enabledComputed).toBe(false);
 
-      // toggle the inherit state of a child menu
+      // toggle inherit state of a child menu
       menu.childActions[1].childActions[0].setInheritAccessibility(true);
 
       expect(menu.inheritAccessibility).toBe(true);
@@ -404,12 +403,12 @@ describe('Menu', () => {
         inheritAccessibility: true,
         enabled: true,
         childActions: [{
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'child1',
           inheritAccessibility: false,
           enabled: true,
           childActions: [{
-            objectType: 'Menu',
+            objectType: Menu,
             text: 'child1_0',
             inheritAccessibility: true,
             enabled: true
@@ -450,17 +449,17 @@ describe('Menu', () => {
         inheritAccessibility: true,
         enabled: true,
         childActions: [{
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'child0',
           inheritAccessibility: true,
           enabled: true
         }, {
-          objectType: 'Menu',
+          objectType: Menu,
           text: 'child1',
           inheritAccessibility: true,
           enabled: true,
           childActions: [{
-            objectType: 'Menu',
+            objectType: Menu,
             text: 'child1_0',
             inheritAccessibility: false,
             enabled: true
@@ -520,7 +519,7 @@ describe('Menu', () => {
       expect(menu.enabledComputed).toBe(true);
       expect(menu.$container).not.toHaveClass('disabled');
       ellipsis.setSelected(true);
-      expect(ellipsis.popup.$menuItems().eq(0)).not.toHaveClass('disabled'); // $container of the cloned menu item
+      expect((ellipsis.popup as ContextMenuPopup).$menuItems().eq(0)).not.toHaveClass('disabled'); // $container of the cloned menu item
 
       ellipsis.setSelected(false);
       menu.setEnabled(false);
@@ -529,7 +528,7 @@ describe('Menu', () => {
       expect(menu.enabledComputed).toBe(false);
       expect(menu.$container).toHaveClass('disabled');
       ellipsis.setSelected(true);
-      expect(ellipsis.popup.$menuItems().eq(0)).toHaveClass('disabled');
+      expect((ellipsis.popup as ContextMenuPopup).$menuItems().eq(0)).toHaveClass('disabled');
 
       ellipsis.setSelected(false);
       menu._setOverflown(false);
@@ -584,7 +583,7 @@ describe('Menu', () => {
         parent: session.desktop,
         text: 'text',
         iconId: 'iconId',
-        childActions: [{objectType: 'Menu'}]
+        childActions: [{objectType: Menu}]
       });
       menu.render();
       expect(menu.$submenuIcon.parent()[0]).toBe(menu.$container[0]);
@@ -598,7 +597,7 @@ describe('Menu', () => {
       let menu = scout.create(Menu, {
         parent: session.desktop,
         iconId: 'iconId',
-        childActions: [{objectType: 'Menu'}]
+        childActions: [{objectType: Menu}]
       });
       menu.render();
       menu.setTextPosition(Menu.TextPosition.BOTTOM);
@@ -611,7 +610,7 @@ describe('Menu', () => {
       let menu = scout.create(Menu, {
         parent: session.desktop,
         text: 'text',
-        childActions: [{objectType: 'Menu'}]
+        childActions: [{objectType: Menu}]
       });
       menu.render();
       menu.setTextPosition(Menu.TextPosition.BOTTOM);
@@ -626,7 +625,7 @@ describe('Menu', () => {
         iconId: 'iconId',
         text: 'asdf',
         subMenuVisibility: Menu.SubMenuVisibility.NEVER,
-        childActions: [{objectType: 'Menu'}]
+        childActions: [{objectType: Menu}]
       });
       menu.render();
       menu.setTextPosition(Menu.TextPosition.BOTTOM);

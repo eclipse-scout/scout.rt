@@ -3,20 +3,21 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Device} from '../../src/index';
+import {DeviceBrowser, DeviceSystem, DeviceType} from '../../src/util/Device';
 
 describe('Device', () => {
 
-  function test(userAgent, expectedDevice) {
+  function test(userAgent: string, expectedDevice: { system: DeviceSystem; systemVersion?: number; type: DeviceType; browser?: DeviceBrowser; browserVersion?: number }) {
     return verify(bootstrapDevice(userAgent), expectedDevice);
   }
 
-  function verify(actual, expected) {
+  function verify(actual, expected: { system: DeviceSystem; systemVersion?: number; type: DeviceType; browser?: DeviceBrowser; browserVersion?: number }) {
     if (expected.system) {
       expect(actual.system).toBe(expected.system);
     }
@@ -34,7 +35,7 @@ describe('Device', () => {
     }
   }
 
-  function bootstrapDevice(userAgent) {
+  function bootstrapDevice(userAgent: string): Device {
     let device = new Device({
       userAgent: userAgent
     });

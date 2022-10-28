@@ -1,5 +1,3 @@
-// noinspection JSUnusedLocalSymbols
-
 /*
  * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -10,7 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-// eslint-disable-next-line max-classes-per-file
+
+// noinspection JSUnusedLocalSymbols
+
 import {Image, PropertyChangeEvent, scout} from '../src';
 import $ from 'jquery';
 
@@ -67,20 +67,20 @@ function createUntyped() {
   img1.setAutoFit(false);
 
   let img2 = scout.create({
-    objectType: 'Image',
+    objectType: Image,
     parent: this,
     autoFit: true
   });
   img2.setAutoFit(false);
 
   let img3 = scout.create({
-    objectType: 'Image',
+    objectType: Image,
     parent: this
   });
   img3.setAutoFit(false);
 
   let img4 = scout.create({
-    objectType: 'Image',
+    objectType: Image,
     parent: this
   }, {
     ensureUniqueId: false

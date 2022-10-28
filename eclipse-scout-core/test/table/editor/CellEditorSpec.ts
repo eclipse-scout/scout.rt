@@ -1,21 +1,21 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, keys, scout, StaticLookupCall, Status, StringField, TableRow, Widget} from '../../../src/index';
+import {Cell, CellEditorPopup, Column, keys, scout, SmartColumn, StaticLookupCall, Status, StringField, Table, TableRow, Widget} from '../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../src/testing/index';
 import {triggerClick, triggerKeyInputCapture, triggerMouseDown, triggerMouseUp} from '../../../src/testing/jquery-testing';
 
 describe('CellEditor', () => {
-  let session;
-  let helper;
-  let formHelper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
+  let formHelper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandboxDesktop());
@@ -36,12 +36,8 @@ describe('CellEditor', () => {
     }
   });
 
-  class DummyLookupCall extends StaticLookupCall {
-    constructor() {
-      super();
-    }
-
-    _data() {
+  class DummyLookupCall extends StaticLookupCall<string> {
+    override _data() {
       return [
         ['key0', 'Key 0'],
         ['key1', 'Key 1']
@@ -49,21 +45,21 @@ describe('CellEditor', () => {
     }
   }
 
-  function createStringField() {
+  function createStringField(): StringField {
     return scout.create(StringField, {
       parent: session.desktop
     });
   }
 
-  function $findPopup() {
+  function $findPopup(): JQuery {
     return $('.cell-editor-popup');
   }
 
-  function findPopup() {
+  function findPopup(): CellEditorPopup<string> {
     return $findPopup().data('popup');
   }
 
-  function assertCellEditorIsOpen(table, column, row) {
+  function assertCellEditorIsOpen(table: Table, column: Column<any>, row: TableRow) {
     let popup = table.cellEditorPopup;
     expect(popup.cell.field.rendered).toBe(true);
     expect(popup.column).toBe(column);
@@ -199,7 +195,7 @@ describe('CellEditor', () => {
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
 
-      triggerKeyInputCapture($(document.activeElement), keys.TAB);
+      triggerKeyInputCapture($(document.activeElement as HTMLElement), keys.TAB);
       jasmine.clock().tick(0);
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[1]);
@@ -216,7 +212,7 @@ describe('CellEditor', () => {
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
 
-      triggerKeyInputCapture($(document.activeElement), keys.TAB);
+      triggerKeyInputCapture($(document.activeElement as HTMLElement), keys.TAB);
       jasmine.clock().tick(0);
       jasmine.clock().tick(0);
       assertCellEditorIsOpen(table, table.columns[2], table.rows[1]);
@@ -298,7 +294,7 @@ describe('CellEditor', () => {
 
     it('opens popup with field', () => {
       table.columns[0].setEditable(true);
-      let field = createStringField(table);
+      let field = createStringField();
       table.startCellEdit(table.columns[0], table.rows[0], field);
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
       expect(table.cellEditorPopup.cell.field).toBe(field);
@@ -320,7 +316,7 @@ describe('CellEditor', () => {
     it('postpones opening if table is not rendered yet', () => {
       table.remove();
       table.columns[0].setEditable(true);
-      let field = createStringField(table);
+      let field = createStringField();
       table.startCellEdit(table.columns[0], table.rows[0], field);
       expect(table.cellEditorPopup).toBe(null);
 
@@ -332,7 +328,7 @@ describe('CellEditor', () => {
     it('postpones opening if table is not attached yet', () => {
       table.detach();
       table.columns[0].setEditable(true);
-      let field = createStringField(table);
+      let field = createStringField();
       table.startCellEdit(table.columns[0], table.rows[0], field);
       expect(table.cellEditorPopup).toBe(null);
 
@@ -539,7 +535,7 @@ describe('CellEditor', () => {
 
       table = helper.createTable({
         columns: [{
-          objectType: 'SmartColumn',
+          objectType: SmartColumn,
           lookupCall: lookupCall
         }]
       });
@@ -558,7 +554,7 @@ describe('CellEditor', () => {
     it('does not fail when completing edit after removing a value', done => {
       jasmine.clock().uninstall();
       table.columns[0].setEditable(true);
-      table.sort(table.columns[0]); // Column needs to be sorted to force a rerendering of the rows at the end when rows are updated (_sortAfterUpdate)
+      table.sort(table.columns[0]); // Column needs to be sorted to force a re-rendering of the rows at the end when rows are updated (_sortAfterUpdate)
       table.prepareCellEdit(table.columns[0], table.rows[0], true).then(() => {
         table.cellEditorPopup.cell.field.clear();
 

@@ -38,8 +38,7 @@ export default class PopupWindow extends EventEmitter {
 
     // link Window instance with this popupWindow instance
     // this is required when we want to check if a certain DOM element belongs to a popup window
-    // @ts-ignore
-    myWindow.popupWindow = this;
+    myWindow['popupWindow'] = this;
     myWindow.name = 'Scout popup-window ' + form.modelClass;
   }
 
@@ -52,7 +51,8 @@ export default class PopupWindow extends EventEmitter {
     }
   }
 
-  protected _onReady() {
+  /** @internal */
+  _onReady() {
     // set container (used as document-root from callers)
     let myDocument = this.myWindow.document,
       $myWindow = $(this.myWindow),
@@ -60,8 +60,7 @@ export default class PopupWindow extends EventEmitter {
 
     // Establish the link again, as Chrome removes this property after a page load.
     // (page load is made by design in PopupBlockerHandler.openWindow)
-    // @ts-ignore
-    this.myWindow.popupWindow = this;
+    this.myWindow['popupWindow'] = this;
 
     scout.prepareDOM(myDocument);
 

@@ -152,7 +152,8 @@ export default class YearPanel extends Widget implements YearPanelModel {
     this._scrollYear();
   }
 
-  protected _scrollYear() {
+  /** @internal */
+  _scrollYear() {
     let top, halfMonth, halfYear,
       $day = $('.year-range-day', this.$yearList),
       $month = $day.parent(),

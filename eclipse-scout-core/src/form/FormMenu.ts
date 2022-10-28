@@ -12,6 +12,7 @@ import {
   ActionKeyStroke, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, FormModel, GroupBox, Menu, MobilePopup, Popup, RefModel, scout, WidgetPopup
 } from '../index';
 import {CloneOptions} from '../widget/Widget';
+import {Optional} from '../types';
 
 export default class FormMenu extends Menu implements FormMenuModel {
   declare model: FormMenuModel;
@@ -63,11 +64,10 @@ export default class FormMenu extends Menu implements FormMenuModel {
     this._renderSelected();
   }
 
-  override clone(modelOverride: FormMenuModel, options: CloneOptions): this {
-    // @ts-ignore
+  override clone(modelOverride: Optional<FormMenuModel, 'parent'>, options: CloneOptions): this {
     modelOverride = modelOverride || {};
     // If the FormMenu is put into a context menu it will be cloned.
-    // Cloning a form is not possible because it may non cloneable components (Table, TabBox, etc.) -> exclude
+    // Cloning a form is not possible because it may non-cloneable components (Table, TabBox, etc.) -> exclude
     // Luckily, it is not necessary to clone it since the form is never shown multiple times at once -> Just use the same instance
     modelOverride.form = this.form;
     return super.clone(modelOverride, options) as this;
@@ -108,7 +108,7 @@ export default class FormMenu extends Menu implements FormMenuModel {
 
     let parentContextMenuPopup = this.findParent(p => p instanceof ContextMenuPopup) as ContextMenuPopup;
     if (parentContextMenuPopup && !(parentContextMenuPopup.destroying || parentContextMenuPopup.removing)) {
-      // only explicitly close the popup if it is not already being closed. Otherwise it is removed twice.
+      // only explicitly close the popup if it is not already being closed. Otherwise, it is removed twice.
       parentContextMenuPopup.close();
     }
   }
@@ -150,7 +150,6 @@ export default class FormMenu extends Menu implements FormMenuModel {
         return;
       }
       // If popup is open but remove animation has not started yet (can only be triggered programmatically, see test FormMenuSpec.js)
-      // @ts-ignore
       if (popup._rendered) {
         let currentAnimateRemoval = popup.animateRemoval;
         popup.animateRemoval = false;
@@ -187,7 +186,7 @@ export default class FormMenu extends Menu implements FormMenuModel {
 
     if (this.popupStyle === FormMenu.PopupStyle.MOBILE) {
       return scout.create(MobilePopup, {
-        parent: this.session.desktop, // use desktop to make _handleSelectedInEllipsis work (if parent is this and this were not rendered, popup.entryPoint would not work)
+        parent: this.session.desktop, // use desktop to make _handleSelectedInEllipsis work (if parent is this and this is not rendered, popup.entryPoint would not work)
         content: this.form,
         title: this.form.title
       });

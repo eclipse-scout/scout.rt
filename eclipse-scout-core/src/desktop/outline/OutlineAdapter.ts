@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, EventHandler, Form, objects, Outline, Page, scout, Table, TableRow, TreeAdapter} from '../../index';
+import {App, EventHandler, Form, objects, Outline, Page, scout, Table, TableAdapter, TableRow, TreeAdapter} from '../../index';
 import {TableFilterRemovedEvent, TableRowInitEvent, TableRowsInsertedEvent} from '../../table/TableEventMap';
 
 export default class OutlineAdapter extends TreeAdapter {
@@ -29,8 +29,7 @@ export default class OutlineAdapter extends TreeAdapter {
   }
 
   protected _onPageChanged(event: any) {
-    // @ts-ignore
-    let page = this.widget._nodeById(event.nodeId) as Page;
+    let page = this.widget.nodeById(event.nodeId);
     page.overviewIconId = event.overviewIconId;
 
     page.detailFormVisible = event.detailFormVisible;
@@ -87,7 +86,7 @@ export default class OutlineAdapter extends TreeAdapter {
       return;
     }
 
-    let node = this.widget.nodesMap[nodeId] as Page;
+    let node = this.widget.nodesMap[nodeId];
     if (node) {
       node.linkWithRow(row);
     } else {
@@ -98,7 +97,7 @@ export default class OutlineAdapter extends TreeAdapter {
   }
 
   protected _unlinkNodeWithRow(row: TableRow) {
-    let node = this.widget.nodesMap[row.nodeId] as Page;
+    let node = this.widget.nodesMap[row.nodeId];
     if (node) {
       node.unlinkWithRow(row);
     }
@@ -117,11 +116,9 @@ export default class OutlineAdapter extends TreeAdapter {
   protected _onDetailTableRowsInserted(event: TableRowsInsertedEvent) {
     let table = event.source;
 
-    if (this._filterDirty ||
-      // @ts-ignore
-      (table._filterCount() > 0 && event.rows.some(row => !row.filterAccepted))) {
+    if (this._filterDirty || (table.filterCount() > 0 && event.rows.some(row => !row.filterAccepted))) {
       this._filterDirty = false;
-      // Explicitly call filter if some of the new rows are not accepted.
+      // Explicitly call filter if some new rows are not accepted.
       // If they are accepted, table.insertRows() will trigger a filter event by itself that will be mediated to the outline by OutlineMediator.js
       this.widget.filter();
     }
@@ -129,8 +126,8 @@ export default class OutlineAdapter extends TreeAdapter {
 
   protected _onDetailTableFilterRemoved(event: TableFilterRemovedEvent) {
     let table = event.source;
-    // @ts-ignore
-    if (table.modelAdapter && table.modelAdapter._rebuildingTable) {
+    let tableModelAdapter = table.modelAdapter as TableAdapter;
+    if (tableModelAdapter && tableModelAdapter._rebuildingTable) {
       // If a column is removed, the tableAdapter prevents filtering because the flag _rebuildingTable is true
       // -> the outline does not get informed, hence the nodes stay invisible.
       this._filterDirty = true;

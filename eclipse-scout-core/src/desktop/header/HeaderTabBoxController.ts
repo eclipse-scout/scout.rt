@@ -51,7 +51,8 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
     this.bench.on('viewRemove', this._viewsChangedHandler);
   }
 
-  protected _onViewsChanged() {
+  /** @internal */
+  _onViewsChanged() {
     if (this.bench.getViews().some(view => 'C' !== view.displayViewId)) {
       // has views in other view stacks
       this._setViewTabAreaInHeader(false);

@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AccordionLayout, AccordionModel, arrays, EventHandler, Group, GroupModel, HtmlComponent, LoadingSupport, objects, PropertyChangeEvent, RefModel, Widget, widgets} from '../index';
-import {Comparator} from '../types';
+import {AccordionLayout, AccordionModel, arrays, EventHandler, Group, GroupModel, HtmlComponent, LoadingSupport, objects, PropertyChangeEvent, Widget, widgets} from '../index';
+import {Comparator, RefModel} from '../types';
 import {GroupCollapseStyle} from '../group/Group';
 
 export default class Accordion extends Widget implements AccordionModel {
@@ -200,7 +200,7 @@ export default class Accordion extends Widget implements AccordionModel {
     if (!this.rendered) {
       return;
     }
-    // Loop through the the groups and move every html element to the end of the container
+    // Loop through the groups and move every html element to the end of the container
     // Only move if the order is different to the old order
     let different = false;
     groups.forEach((group, i) => {

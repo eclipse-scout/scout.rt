@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {StringField} from '../../../../src/index';
+import {StringField, StringFieldModel} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 
 describe('StringFieldAdapter', () => {
-  let session, helper;
+  let session: SandboxSession, helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -27,13 +27,13 @@ describe('StringFieldAdapter', () => {
     jasmine.Ajax.uninstall();
   });
 
-  function createField(model) {
+  function createField(model: StringFieldModel): StringField {
     let field = new StringField();
     field.init(model);
     return field;
   }
 
-  function createModel() {
+  function createModel(): StringFieldModel {
     return helper.createFieldModel();
   }
 
@@ -45,19 +45,20 @@ describe('StringFieldAdapter', () => {
         let field = createField(createModel());
         linkWidgetAndAdapter(field, 'StringFieldAdapter');
         field.render();
-        expect(field.$field[0].value).toBe('');
+        let $fieldElement = field.$field[0] as HTMLInputElement;
+        expect($fieldElement.value).toBe('');
 
         let event = createPropertyChangeEvent(field, {
           insertText: 'hello'
         });
         field.modelAdapter.onModelPropertyChange(event);
-        expect(field.$field[0].value).toBe('hello');
+        expect($fieldElement.value).toBe('hello');
 
         event = createPropertyChangeEvent(field, {
           insertText: 'hello'
         });
         field.modelAdapter.onModelPropertyChange(event);
-        expect(field.$field[0].value).toBe('hellohello');
+        expect($fieldElement.value).toBe('hellohello');
       });
     });
   });

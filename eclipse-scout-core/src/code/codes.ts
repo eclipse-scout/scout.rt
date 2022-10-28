@@ -20,7 +20,7 @@ let defaultLanguage = 'en';
 let registry: Record<string, CodeType<any>> = {};
 
 export function bootstrap(url: string): JQuery.Promise<any> {
-  let promise = url ? $.ajaxJson(url) : $.resolvedPromise({});
+  let promise: JQuery.PromiseBase<any, any, any, any, any, any, any, any, any, any, any, any> = url ? $.ajaxJson(url) : $.resolvedPromise({});
   return promise.then(_preInit.bind(this, url));
 }
 
@@ -35,15 +35,15 @@ export function _preInit(url: string, data: any) {
   init(data);
 }
 
-export function init(data: any) {
+export function init(data?: any) {
   data = data || {};
   Object.keys(data).forEach(codeTypeId => add(data[codeTypeId]));
 }
 
-export function add(codeTypes: CodeTypeModel<any> | CodeTypeModel<any>[]) {
-  codeTypes = arrays.ensure(codeTypes);
-  codeTypes.forEach(codeTypeModel => {
-    let codeType = CodeType.ensure(codeTypeModel);
+export function add(codeTypes: CodeType<any> | CodeTypeModel<any> | CodeType<any>[] | CodeTypeModel<any>[]) {
+  let types = arrays.ensure(codeTypes);
+  types.forEach(codeTypeOrModel => {
+    let codeType = CodeType.ensure(codeTypeOrModel);
     registry[codeType.id] = codeType;
   });
 }
@@ -51,9 +51,9 @@ export function add(codeTypes: CodeTypeModel<any> | CodeTypeModel<any>[]) {
 /**
  * @param codeTypes code types or code type ids to remove
  */
-export function remove(codeTypes: (string | CodeType<any>)[]) {
-  codeTypes = arrays.ensure(codeTypes);
-  codeTypes.forEach(codeType => {
+export function remove(codeTypes: string | CodeType<any> | (string | CodeType<any>)[]) {
+  let types = arrays.ensure(codeTypes);
+  types.forEach(codeType => {
     let id;
     if (typeof codeType === 'string') {
       id = codeType;
@@ -76,8 +76,8 @@ export function remove(codeTypes: (string | CodeType<any>)[]) {
  * "71074 104860"
  * "MessageChannel Phone"
  *
- * CodeType.id and Code.id are separated by a space.
- * The Code.id alone is not unique, that's why the CodeType.id must be always provided.
+ * CodeType.id and {@link Code.id} are separated by a space.
+ * The {@link Code.id} alone is not unique, that's why the {@link CodeType.id} must be always provided.
  *
  * You can also call this function with two arguments. In that case the first argument
  * is the codeTypeId and the second is the codeId.
@@ -152,7 +152,7 @@ export function registerTexts(code: Code<any>, textsArg: Record<string, string>)
 
   for (let languageTag in textsArg) { // NOSONAR
     let text = textsArg[languageTag];
-    // Use defaultLanguage as default, if specified (may be changed or set to null by the app).
+    // Use defaultLanguage as default, if specified (maybe changed or set to null by the app).
     if (languageTag && languageTag === defaultLanguage) {
       languageTag = 'default';
     }

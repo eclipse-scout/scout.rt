@@ -1,20 +1,23 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {defaultValues, RemoteEvent} from '../../src/index';
+import {defaultValues, RemoteEvent, Table, TableAdapter, TableRow, TableTextUserFilter} from '../../src/index';
 import {LocaleSpecHelper, TableSpecHelper} from '../../src/testing/index';
+import SpecTable from '../../src/testing/table/SpecTable';
+import {TableModelWithCells} from '../../src/testing/table/TableSpecHelper';
+import {RemoteResponse} from '../../src/session/Session';
+import SpecTableAdapter from '../../src/testing/table/SpecTableAdapter';
 
 describe('TableAdapter', () => {
-  let session;
-  /** @type TableSpecHelper */
-  let helper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -55,7 +58,7 @@ describe('TableAdapter', () => {
     it('sends rowsSelected event containing rowIds', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as Table;
 
       let rows = [table.rows[0], table.rows[4]];
       table.selectRows(rows);
@@ -72,7 +75,7 @@ describe('TableAdapter', () => {
     it('does not send selection event if triggered by server', () => {
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as SpecTable;
 
       let rows = [table.rows[0], table.rows[4]];
       adapter._onRowsSelected([rows[0].id, rows[1].id]);
@@ -88,7 +91,7 @@ describe('TableAdapter', () => {
       let model = helper.createModelFixture(2, 5);
       model.checkable = true;
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as Table;
 
       let rows = [table.rows[0]];
       table.checkRows(rows);
@@ -109,7 +112,7 @@ describe('TableAdapter', () => {
       let model = helper.createModelFixture(2, 5);
       model.checkable = true;
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as Table;
 
       let rows = [table.rows[0]];
       adapter._onRowsChecked([{
@@ -133,19 +136,19 @@ describe('TableAdapter', () => {
         });
       let model = helper.createModel(helper.createModelColumns(1), rows);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
-      rows = table.rows;
-      table.updateRows(rows);
+      let table = adapter.createWidget(model, session.desktop) as Table;
+      let tableRows = table.rows;
+      table.updateRows(tableRows);
       table.render();
 
-      table.collapseRow(rows[0]);
+      table.collapseRow(tableRows[0]);
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       let event = new RemoteEvent(table.id, 'rowsExpanded', {
         rows: [{
-          rowId: rows[0].id,
+          rowId: tableRows[0].id,
           expanded: false
         }]
       });
@@ -161,14 +164,14 @@ describe('TableAdapter', () => {
         });
       let model = helper.createModel(helper.createModelColumns(1), rows);
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
-      rows[1].parentId = rows[0].id;
+      let table = adapter.createWidget(model, session.desktop) as Table;
+      rows[1]['parentId'] = rows[0].id;
       table.updateRows(rows);
       table.render();
 
       adapter._onRowsExpanded(
         [{
-          id: 0,
+          id: '0',
           expanded: false
         }]
       );
@@ -202,7 +205,7 @@ describe('TableAdapter', () => {
       it('calls selectRows', () => {
         let model = helper.createModelFixture(2, 5);
         let adapter = helper.createTableAdapter(model);
-        let table = adapter.createWidget(model, session.desktop);
+        let table = adapter.createWidget(model, session.desktop) as Table;
         table.render();
 
         spyOn(table, 'selectRows');
@@ -215,12 +218,10 @@ describe('TableAdapter', () => {
     });
 
     describe('rowsDeleted event', () => {
-      let model;
-      /** @type Table */
-      let table;
-      let adapter;
-      /** @type TableRow[] */
-      let rows;
+      let model: TableModelWithCells;
+      let table: Table;
+      let adapter: SpecTableAdapter;
+      let rows: TableRow[];
       let row0, row1, row2;
 
       function createRowsDeletedEvent(model, rowIds) {
@@ -234,7 +235,7 @@ describe('TableAdapter', () => {
       beforeEach(() => {
         model = helper.createModelFixture(2, 3);
         adapter = helper.createTableAdapter(model);
-        table = adapter.createWidget(model, session.desktop);
+        table = adapter.createWidget(model, session.desktop) as Table;
         rows = table.rows;
         row0 = model.rows[0];
         row1 = model.rows[1];
@@ -264,7 +265,7 @@ describe('TableAdapter', () => {
     describe('allRowsDeleted event', () => {
       let model, table, adapter;
 
-      function createAllRowsDeletedEvent(model, rowIds) {
+      function createAllRowsDeletedEvent(model: {id: string}) {
         return {
           target: model.id,
           type: 'allRowsDeleted'
@@ -363,7 +364,7 @@ describe('TableAdapter', () => {
 
       it('uses text as value if value is not provided', () => {
         // This case is relevant for custom columns, where no JS representation exists.
-        // They have values on server but they are not sent to client. Since we expect every cell to have a value use the text as value.
+        // They have values on server, but they are not sent to client. Since we expect every cell to have a value use the text as value.
         let row = {
           cells: [{
             cssClass: 'abc',
@@ -621,7 +622,7 @@ describe('TableAdapter', () => {
       it('creates and registers menu adapters', () => {
         let model = helper.createModelFixture(2);
         let adapter = helper.createTableAdapter(model);
-        let table = adapter.createWidget(model, session.desktop);
+        let table = adapter.createWidget(model, session.desktop) as Table;
         let menu1 = helper.createMenuModel();
         let menu2 = helper.createMenuModel();
 
@@ -639,11 +640,11 @@ describe('TableAdapter', () => {
       it('destroys the old menus', () => {
         let model = helper.createModelFixture(2);
         let adapter = helper.createTableAdapter(model);
-        let table = adapter.createWidget(model, session.desktop);
+        let table = adapter.createWidget(model, session.desktop) as Table;
         let menu1 = helper.createMenuModel();
         let menu2 = helper.createMenuModel();
 
-        let message = {
+        let message: RemoteResponse = {
           adapterData: mapAdapterData([menu1, menu2]),
           events: [createPropertyChangeEvent(table, {
             menus: [menu1.id, menu2.id]
@@ -669,7 +670,7 @@ describe('TableAdapter', () => {
       it('destroys the old and creates the new menus if the list contains both', () => {
         let model = helper.createModelFixture(2);
         let adapter = helper.createTableAdapter(model);
-        let table = adapter.createWidget(model, session.desktop);
+        let table = adapter.createWidget(model, session.desktop) as Table;
         let menu1 = helper.createMenuModel();
         let menu2 = helper.createMenuModel();
         let menu3 = helper.createMenuModel();
@@ -724,9 +725,9 @@ describe('TableAdapter', () => {
 
     it('should send a filter event, if a filter exists on table after widget is created.', () => {
       let model = helper.createModelFixture(2, 5);
-      $.extend(model, {filters: [{objectType: 'TableTextUserFilter', filterType: 'text', text: '2'}]});
+      $.extend(model, {filters: [{objectType: TableTextUserFilter, filterType: 'text', text: '2'}]});
       let adapter = helper.createTableAdapter(model);
-      let table = adapter.createWidget(model, session.desktop);
+      let table = adapter.createWidget(model, session.desktop) as Table;
 
       sendQueuedAjaxCalls(null, 250);
       expect(jasmine.Ajax.requests.count()).toBe(1);

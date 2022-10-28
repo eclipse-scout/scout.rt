@@ -219,7 +219,8 @@ export default class NumberColumn extends Column<number> implements NumberColumn
     }
   }
 
-  protected _renderBackgroundEffect() {
+  /** @internal */
+  _renderBackgroundEffect() {
     this.table.visibleRows.forEach(row => {
       if (!row.$row) {
         return;

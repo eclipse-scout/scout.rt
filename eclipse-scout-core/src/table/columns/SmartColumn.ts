@@ -10,8 +10,7 @@
  */
 import {Cell, CodeLookupCall, codes, Column, LookupCall, LookupRow, scout, SmartColumnEventMap, SmartColumnModel, SmartField, TableRow} from '../../index';
 import objects from '../../util/objects';
-import LookupCallModel from '../../lookup/LookupCallModel';
-import {SomeRequired} from '../../types';
+import {LookupCallOrRefModel} from '../../lookup/LookupCall';
 
 /**
  * Column where each cell fetches its value using a lookup call.
@@ -71,11 +70,11 @@ export default class SmartColumn<TValue> extends Column<TValue> {
     this.table.rows.map(row => this.cell(row)).forEach(cell => cell.setSortCode(this._calculateCellSortCode(cell)));
   }
 
-  setLookupCall(lookupCall: LookupCall<TValue> | SomeRequired<LookupCallModel<TValue>, 'objectType'> | string) {
+  setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
     this.setProperty('lookupCall', lookupCall);
   }
 
-  protected _setLookupCall(lookupCall: LookupCall<TValue> | SomeRequired<LookupCallModel<TValue>, 'objectType'> | string) {
+  protected _setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
     let call = LookupCall.ensure(lookupCall, this.session);
     this._setProperty('lookupCall', call);
     if (this.initialized) {

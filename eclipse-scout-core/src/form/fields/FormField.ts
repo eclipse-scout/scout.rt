@@ -18,6 +18,7 @@ import {TooltipSupportOptions} from '../../tooltip/TooltipSupport';
 import {StatusOrModel} from '../../status/Status';
 import {CloneOptions} from '../../widget/Widget';
 import {FormFieldClipboardExportEvent} from './FormFieldEventMap';
+import {Optional} from '../../types';
 
 /**
  * Base class for all form-fields.
@@ -439,7 +440,8 @@ export default abstract class FormField extends Widget implements FormFieldModel
     this.setErrorStatus(null);
   }
 
-  protected _renderErrorStatus() {
+  /** @internal */
+  _renderErrorStatus() {
     let status = this._errorStatus(),
       hasStatus = !!status,
       statusClass = (hasStatus && !this._isSuppressStatusField()) ? 'has-' + status.cssClass() : '';
@@ -466,7 +468,8 @@ export default abstract class FormField extends Widget implements FormFieldModel
     this.setProperty('tooltipText', tooltipText);
   }
 
-  protected _renderTooltipText() {
+  /** @internal */
+  _renderTooltipText() {
     this._updateTooltip();
   }
 
@@ -813,7 +816,8 @@ export default abstract class FormField extends Widget implements FormFieldModel
     this.parent.invalidateLogicalGrid();
   }
 
-  protected _setGridData(gridData: GridData) {
+  /** @internal */
+  _setGridData(gridData: GridData) {
     if (!gridData) {
       gridData = new GridData();
     }
@@ -841,16 +845,17 @@ export default abstract class FormField extends Widget implements FormFieldModel
     this.menus.forEach(menu => menu.on('propertyChange', this._menuPropertyChangeHandler));
   }
 
-  insertMenu(menuToInsert: Menu) {
+  insertMenu(menuToInsert: Menu | RefModel<MenuModel>) {
     this.insertMenus([menuToInsert]);
   }
 
-  insertMenus(menusToInsert: Menu[]) {
+  insertMenus(menusToInsert: (Menu | RefModel<MenuModel>)[]) {
     menusToInsert = arrays.ensure(menusToInsert);
     if (menusToInsert.length === 0) {
       return;
     }
-    this.setMenus(this.menus.concat(menusToInsert));
+    let menus = this.menus as (Menu | RefModel<MenuModel>)[];
+    this.setMenus(menus.concat(menusToInsert));
   }
 
   deleteMenu(menuToDelete: Menu) {
@@ -898,7 +903,8 @@ export default abstract class FormField extends Widget implements FormFieldModel
     return !!(this.menus && this.getContextMenuItems().length > 0);
   }
 
-  protected _updateMenus() {
+  /** @internal */
+  _updateMenus() {
     if (!this.rendered && !this.rendering) {
       return;
     }
@@ -906,7 +912,8 @@ export default abstract class FormField extends Widget implements FormFieldModel
     this._updateFieldStatus();
   }
 
-  protected _renderMenus() {
+  /** @internal */
+  _renderMenus() {
     this._updateMenus();
   }
 
@@ -941,13 +948,15 @@ export default abstract class FormField extends Widget implements FormFieldModel
 
   /**
    * May be overridden to explicitly provide a tooltip $parent
+   * @internal
    */
-  protected _$tooltipParent(): JQuery {
+  _$tooltipParent(): JQuery {
     // Will be determined by the tooltip itself
     return undefined;
   }
 
-  protected _hideStatusMessage() {
+  /** @internal */
+  _hideStatusMessage() {
     if (this.fieldStatus) {
       this.fieldStatus.hideTooltip();
     }
@@ -1100,10 +1109,11 @@ export default abstract class FormField extends Widget implements FormFieldModel
     this.$fieldContainer = $fieldContainer
       .addClass('field');
 
-    // Only append if not already appended or it is not the last element so that append would move it to the end
+    // Only append if not already appended, or it is not the last element so that append would move it to the end
     // This can be important for some widgets, e.g. iframe which would cancel and restart the request on every dom insertion
     // @ts-ignore
-    if (this.$container.has($fieldContainer).length === 0 || $fieldContainer.next().length > 0) {
+    let withFieldContainer = this.$container.has($fieldContainer);
+    if (withFieldContainer.length === 0 || $fieldContainer.next().length > 0) {
       $fieldContainer.appendTo(this.$container);
     }
   }
@@ -1448,7 +1458,7 @@ export default abstract class FormField extends Widget implements FormFieldModel
     }
   }
 
-  override clone(model: FormFieldModel, options?: CloneOptions): this {
+  override clone(model: Optional<FormFieldModel, 'parent'>, options?: CloneOptions): this {
     let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'menus', options);
     return clone as this;

@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ContextMenuPopup, scout} from '../../src/index';
+import {ContextMenuPopup, Menu, Popup, scout, Widget} from '../../src/index';
 import {MenuSpecHelper} from '../../src/testing/index';
 
 describe('ContextMenuPopup', () => {
-  let helper, session;
+  let helper: MenuSpecHelper, session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -21,24 +21,24 @@ describe('ContextMenuPopup', () => {
   });
 
   /**
-   * Returns a clone for the given originalMenu. In the model we don't know the clone instance
+   * Returns a clone for the given originalMenu. In the model we don't know the clone instance,
    * so we have to find the clones by traversing the DOM of the popup, since each DOM node
    * has a data() referencing the widget instance.
    */
-  function findClone(popup, originalMenu) {
-    let clone = null;
+  function findClone(popup: Popup, originalMenu: Menu): Menu {
+    let clone: Menu = null;
     popup.$container.find('.menu-item').each(function() {
       let $menuItem = $(this);
-      let widget = $menuItem.data('widget');
+      let widget = $menuItem.data('widget') as Widget;
       if (widget.cloneOf === originalMenu) {
-        clone = widget;
+        clone = widget as Menu;
       }
     });
     return clone;
   }
 
   describe('options.cloneMenuItems', () => {
-    let popup, menu, childMenu;
+    let popup: ContextMenuPopup, menu: Menu, childMenu: Menu;
 
     beforeEach(() => {
       menu = helper.createMenu(helper.createModel());

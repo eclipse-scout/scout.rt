@@ -10,7 +10,7 @@
  */
 import {BasicField, Calculator, DecimalFormat, fields, InputFieldKeyStrokeContext, KeyStrokeContext, Locale, NumberFieldEventMap, NumberFieldModel, numbers, objects} from '../../../index';
 
-export default class NumberField extends BasicField<number> implements NumberFieldModel {
+export default class NumberField extends BasicField<number, number | string> implements NumberFieldModel {
   declare model: NumberFieldModel;
   declare eventMap: NumberFieldEventMap;
 
@@ -118,16 +118,21 @@ export default class NumberField extends BasicField<number> implements NumberFie
     return Number(normalizedNumberString);
   }
 
-  protected override _ensureValue(value: number): number {
-    return numbers.ensure(value);
+  protected override _ensureValue(value: number | string): number {
+    let typedValue = numbers.ensure(value);
+    if (objects.isNullOrUndefined(typedValue)) {
+      return typedValue;
+    }
+    if (!numbers.isNumber(typedValue)) {
+      // might be NaN if the string is no valid number
+      throw this.session.text(this.invalidValueMessageKey, value);
+    }
+    return typedValue;
   }
 
   protected override _validateValue(value: number): number {
     if (objects.isNullOrUndefined(value)) {
       return value;
-    }
-    if (!numbers.isNumber(value)) {
-      throw this.session.text(this.invalidValueMessageKey, value);
     }
     if (!objects.isNullOrUndefined(this.minValue) && value < this.minValue) {
       this._onNumberTooSmall();

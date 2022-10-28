@@ -109,12 +109,10 @@ export function dataTransferTypesContains(dataTransfer: DataTransfer, needleArra
       return true;
     }
 
-    // @ts-ignore
-    if (dataTransfer.types.contains) {
+    if (dataTransfer.types['contains']) {
       // DOMStringList: contains function
       return needleArray.some(element => {
-        // @ts-ignore
-        return dataTransfer.types.contains(element);
+        return dataTransfer.types['contains'](element);
       });
     }
   }

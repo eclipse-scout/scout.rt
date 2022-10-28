@@ -32,7 +32,7 @@ export function get<T>(modelFunc: () => T, parent?: object): T & { parent?: obje
 }
 
 /**
- * Returns a new instance of of an extension from the global modelMap.
+ * Returns a new instance of an extension from the global modelMap.
  *
  * @param extensionId The id of the extension.
  */
@@ -46,7 +46,6 @@ export function getExtension(extensionId: string): Extension {
  * @param id ID of the requested object (model or extension)
  * @param type Expected type of the requested object ('model' or 'extension')
  */
-
 export function _get(id: string, type: string): Extension {
   let model = modelMap[id];
   if (!model) {
@@ -59,14 +58,14 @@ export function _get(id: string, type: string): Extension {
 }
 
 export interface AppendToTarget {
-  id: string;
+  id?: string;
   root: boolean;
 }
 
 export interface InsertTarget {
   id: string;
-  root: boolean;
-  property: string;
+  root?: boolean;
+  property?: string;
   before?: string;
   after?: string;
   index?: number;
@@ -74,13 +73,13 @@ export interface InsertTarget {
 }
 
 export interface AppendToAction {
-  operation: 'appendTo';
+  operation: string; // 'appendTo'
   target: AppendToTarget;
   extension: object;
 }
 
 export interface InsertAction {
-  operation: 'insert';
+  operation: string; // 'insert'
   target: InsertTarget;
   extension: object;
 }
@@ -88,8 +87,8 @@ export interface InsertAction {
 export type ExtensionAction = AppendToAction | InsertAction;
 
 export interface Extension {
-  id: string;
-  type: 'extension';
+  id?: string;
+  type?: string; // 'extension'
   extensions: ExtensionAction[];
 }
 

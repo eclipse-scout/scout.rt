@@ -21,14 +21,14 @@ export default class TagFieldAdapter extends LookupFieldAdapter {
     }
   }
 
-  protected override _postCreateWidget() {
+  /** @internal */
+  override _postCreateWidget() {
     super._postCreateWidget();
     let lookupCallType = RemoteLookupCall<string>;
     this.widget.lookupCall = scout.create(lookupCallType, this);
   }
 
   protected _syncResult(result) {
-    // @ts-ignore
     let currentLookupCall = this.widget._currentLookupCall as RemoteLookupCall<string>;
     if (currentLookupCall) {
       currentLookupCall.resolveLookup(result);

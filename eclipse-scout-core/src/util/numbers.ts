@@ -11,8 +11,7 @@
 import {objects, RoundingMode, strings} from '../index';
 
 /**
- * Converts the given decimal number to base-62 (i.e. the same value, but
- * represented by [a-zA-Z0-9] instead of only [0-9].
+ * Converts the given decimal number to base-62 (i.e. the same value, but represented by [a-zA-Z0-9] instead of only [0-9]).
  */
 export function toBase62(number: number): string {
   if (number === undefined) {
@@ -31,10 +30,10 @@ export function toBase62(number: number): string {
 }
 
 /**
- * Returns a random sequence of characters out of the set [a-zA-Z0-9] with the
- * given length. The default length is 8.
+ * Returns a random sequence of characters out of the set [a-zA-Z0-9] with the given length.
+ * @param length The default length is 8.
  */
-export function randomId(length: number): string {
+export function randomId(length?: number): string {
   length = length || 8;
   let alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
@@ -196,7 +195,7 @@ export function shiftDecimalPoint(number: number, move: number): number {
  * Ensures that the given number is really a number.
  * <p>
  * If it already is a number, the number will be returned.
- * Otherwise a Number is created.
+ * Otherwise, a Number is created.
  *
  * @param number may be of type number or string.
  */

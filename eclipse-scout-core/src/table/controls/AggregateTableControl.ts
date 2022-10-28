@@ -116,7 +116,6 @@ export default class AggregateTableControl extends TableControl {
       this.$contentContainer.addClass('selection');
     }
 
-    // @ts-ignore
     aggregateCells.forEach($c => this.table._resizeAggregateCell($c));
   }
 
@@ -129,7 +128,6 @@ export default class AggregateTableControl extends TableControl {
   protected _installCellTooltip($cell: JQuery) {
     tooltips.install($cell, {
       parent: this,
-      // @ts-ignore
       text: this.table._cellTooltipText.bind(this.table),
       htmlEnabled: true,
       arrowPosition: 50,
@@ -150,11 +148,8 @@ export default class AggregateTableControl extends TableControl {
       rows = this.table.filteredRows();
     }
 
-    // @ts-ignore
     this.table._forEachVisibleColumn('aggrStart', aggregateRow);
-    // @ts-ignore
     rows.forEach(row => this.table._forEachVisibleColumn('aggrStep', aggregateRow, row));
-    // @ts-ignore
     this.table._forEachVisibleColumn('aggrFinish', aggregateRow);
 
     this.aggregateRow = aggregateRow;

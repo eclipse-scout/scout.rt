@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {dates} from '../../../src/index';
+import {DateColumn, dates} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
 
 describe('DateColumn', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -34,8 +34,8 @@ describe('DateColumn', () => {
       let testDate = dates.create('2017-01-01 13:01');
       let model = helper.createModelSingleColumnByValues([testDate], 'DateColumn');
       let table = helper.createTable(model);
-      let column0 = table.columns[0];
-      column0.setFormat();
+      let column0 = table.columns[0] as DateColumn;
+      column0.setFormat(undefined);
       table.render();
 
       expect(column0.cell(table.rows[0]).text).toBe('01.01.2017');

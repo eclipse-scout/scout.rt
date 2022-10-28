@@ -60,8 +60,7 @@ export default class DatePickerTouchPopup extends TouchPopup {
     if (!hasParsingFailedError) {
       this._touchField.setValue(event.value);
     }
-    // @ts-ignore
-    this._touchField._triggerAcceptInput();
+    this._touchField._triggerAcceptInput(event.whileTyping);
   }
 
   protected override _acceptInput() {

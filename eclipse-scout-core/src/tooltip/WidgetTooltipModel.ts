@@ -12,25 +12,25 @@ import {FocusRule, RefModel, ScoutKeyboardEvent, TooltipModel, Widget, WidgetMod
 
 export default interface WidgetTooltipModel extends TooltipModel {
   /**
-   * The default interceptor stops the propagation for all key strokes except ESCAPE and ENTER.
-   * Otherwise, the tooltip would be destroyed for all key strokes that bubble up to the
+   * The default interceptor stops the propagation for all keystrokes except ESCAPE and ENTER.
+   * Otherwise, the tooltip would be destroyed for all keystrokes that bubble up to the
    * root (see global document listener in {@link Tooltip}).
    */
-  keyStrokeStopPropagationInterceptor: (event: ScoutKeyboardEvent) => void;
+  keyStrokeStopPropagationInterceptor?: (event: ScoutKeyboardEvent) => void;
   /**
    * Default is true.
    */
-  withFocusContext: boolean;
+  withFocusContext?: boolean;
   /**
    * Default returns {@link FocusRule.AUTO}.
    */
-  initialFocus: () => FocusRule;
+  initialFocus?: () => FocusRule;
   /**
    * Default is false.
    */
-  focusableContainer: boolean;
+  focusableContainer?: boolean;
   /**
    * The {@link Widget} rendered inside the tooltip.
    */
-  content: Widget | RefModel<WidgetModel>;
+  content?: Widget | RefModel<WidgetModel>;
 }

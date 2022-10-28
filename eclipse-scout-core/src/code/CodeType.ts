@@ -12,6 +12,7 @@ import {Code, scout, TreeVisitResult} from '../index';
 import CodeTypeModel from './CodeTypeModel';
 import CodeModel from './CodeModel';
 import {TreeVisitor} from '../widget/Widget';
+import {RefModel} from '../types';
 
 export default class CodeType<TCodeId> {
 
@@ -39,7 +40,7 @@ export default class CodeType<TCodeId> {
     }
   }
 
-  protected _initCode(modelCode: CodeModel<TCodeId>, parent?: Code<TCodeId>) {
+  protected _initCode(modelCode: RefModel<CodeModel<TCodeId>>, parent?: Code<TCodeId>) {
     let code = scout.create(modelCode);
     this.add(code, parent);
     if (modelCode.children) {
@@ -78,7 +79,7 @@ export default class CodeType<TCodeId> {
     return this.codeMap[codeId + ''];
   }
 
-  getCodes(rootOnly: boolean): Code<TCodeId>[] {
+  getCodes(rootOnly?: boolean): Code<TCodeId>[] {
     if (rootOnly) {
       let rootCodes = [];
       for (let i = 0; i < this.codes.length; i++) {
@@ -95,7 +96,7 @@ export default class CodeType<TCodeId> {
    * Visits all codes and their children.
    * <p>
    * In order to abort visiting, the visitor can return true or TreeVisitResult.TERMINATE.
-   * To only abort the visiting of a sub tree, the visitor can return SKIP_SUBTREE.
+   * To only abort the visiting of a subtree, the visitor can return SKIP_SUBTREE.
    * </p>
    */
   visitChildren(visitor: TreeVisitor<Code<TCodeId>>): boolean | TreeVisitResult {

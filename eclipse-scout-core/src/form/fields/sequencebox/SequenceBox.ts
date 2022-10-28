@@ -10,14 +10,13 @@
  */
 import {
   CheckBoxField, CompositeField, DateField, dates, EventHandler, FormField, FormFieldModel, HorizontalGrid, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuModel, PropertyChangeEvent,
-  RefModel, scout,
-  SequenceBoxEventMap,
-  SequenceBoxGridConfig, SequenceBoxLayout, SequenceBoxModel, ValueField, Widget
+  RefModel, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxLayout, SequenceBoxModel, ValueField, Widget
 } from '../../../index';
 import {FormFieldSuppressStatus} from '../FormField';
 import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
 import {StatusOrModel} from '../../../status/Status';
 import {CloneOptions} from '../../../widget/Widget';
+import {Optional} from '../../../types';
 
 export default class SequenceBox extends CompositeField implements SequenceBoxModel {
   declare model: SequenceBoxModel;
@@ -169,11 +168,8 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
       this._lastVisibleField.off('propertyChange:suppressStatus', this._lastVisibleFieldSuppressStatusHandler);
       this._lastVisibleField.setSuppressStatus(null);
       if (this._lastVisibleField.rendered) {
-        // @ts-ignore
         this._lastVisibleField._renderErrorStatus();
-        // @ts-ignore
         this._lastVisibleField._renderTooltipText();
-        // @ts-ignore
         this._lastVisibleField._renderMenus();
       }
     }
@@ -221,11 +217,8 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
     if (visibilityChanged) {
       // If the last field got invisible, make sure the new last field does not display a status anymore (now done by the seq box)
       if (this._lastVisibleField.rendered) {
-        // @ts-ignore
         this._lastVisibleField._renderErrorStatus();
-        // @ts-ignore
         this._lastVisibleField._renderTooltipText();
-        // @ts-ignore
         this._lastVisibleField._renderMenus();
       }
     }
@@ -309,7 +302,7 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
 
   protected _onFieldValueChange(event: PropertyChangeEvent<any, ValueField<any>>) {
     if (event.source instanceof DateField) {
-      this._onDateFieldValueChange(event as PropertyChangeEvent<Date, DateField>);
+      this._onDateFieldValueChange(event as unknown as PropertyChangeEvent<Date, DateField>);
     }
   }
 
@@ -324,7 +317,7 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
         currField.setAutoDate(newAutoDate);
       }
       if (currField.value) {
-        // only update fields in between the current field and the next field with a value set. Otherwise already set autoDates would be overwritten.
+        // only update fields in between the current field and the next field with a value set. Otherwise, already set autoDates would be overwritten.
         break;
       }
     }
@@ -378,7 +371,7 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
     return this.fields;
   }
 
-  override clone(model: SequenceBoxModel, options?: CloneOptions): this {
+  override clone(model: Optional<SequenceBoxModel, 'parent'>, options?: CloneOptions): this {
     let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'fields', options);
     return clone;

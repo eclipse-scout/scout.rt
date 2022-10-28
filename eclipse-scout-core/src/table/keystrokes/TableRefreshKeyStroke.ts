@@ -20,7 +20,6 @@ export default class TableRefreshKeyStroke extends KeyStroke {
     this.which = [keys.F5];
     this.renderingHints.offset = 14;
     this.renderingHints.$drawingArea = ($drawingArea, event) => {
-      // @ts-ignore
       return this.field.footer ? this.field.footer._$infoLoad.find('.table-info-button') : null;
     };
   }

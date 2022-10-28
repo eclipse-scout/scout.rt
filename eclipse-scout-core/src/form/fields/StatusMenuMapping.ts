@@ -27,7 +27,8 @@ export default class StatusMenuMapping extends Widget implements StatusMenuMappi
     this._addWidgetProperties(['menu']);
   }
 
-  protected override _createChild<T extends Widget>(model: T | RefModel<ModelOf<T>> | string): T {
+  /** @internal */
+  override _createChild<T extends Widget>(model: T | RefModel<ModelOf<T>> | string): T {
     if (typeof model === 'string') {
       // If the model is a string it is probably the id of the menu.
       // Menus are defined by the parent (form field) -> search the parent's children for the menu

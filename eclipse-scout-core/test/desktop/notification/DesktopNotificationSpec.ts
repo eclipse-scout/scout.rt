@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,7 +11,7 @@
 import {DesktopNotification, scout, Status, Widget} from '../../../src/index';
 
 describe('DesktopNotification', () => {
-  let session, $sandbox,
+  let session: SandboxSession, $sandbox: JQuery,
     parent = new Widget();
 
   beforeEach(() => {
@@ -111,7 +111,7 @@ describe('DesktopNotification', () => {
         }, 10);
       });
 
-      it('background: dont show native notification when document is not hidden', () => {
+      it('background: dont show native notification when document is not hidden', done => {
         let notification = scout.create(DesktopNotification, {
           parent: parent,
           nativeNotificationVisibility: 'background',
@@ -145,7 +145,7 @@ describe('DesktopNotification', () => {
         }, 10);
       });
 
-      it('none: never shows native notification', () => {
+      it('none: never shows native notification', done => {
         let notification = scout.create(DesktopNotification, {
           parent: parent,
           nativeNotificationVisibility: 'none',

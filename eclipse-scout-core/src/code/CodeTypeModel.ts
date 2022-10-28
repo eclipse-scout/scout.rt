@@ -9,9 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import CodeModel from './CodeModel';
+import {ObjectType} from '../ObjectFactory';
+import {CodeType} from '../index';
+import {RefModel} from '../types';
 
 export default interface CodeTypeModel<TCodeId> {
   id: string;
+  objectType?: ObjectType<CodeType<TCodeId>, CodeTypeModel<TCodeId>>;
   modelClass?: string;
-  codes?: CodeModel<TCodeId>[];
+  codes?: RefModel<CodeModel<TCodeId>>[];
 }

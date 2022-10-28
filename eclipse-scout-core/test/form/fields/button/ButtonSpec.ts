@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Button, Form, icons, scout} from '../../../../src/index';
+import {Button, Form, GroupBox, icons, scout, WrappedFormField} from '../../../../src/index';
 
 describe('Button', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -128,16 +128,16 @@ describe('Button', () => {
         parent: session.desktop,
         rootGroupBox: {
           id: 'myMainBox',
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           fields: [{
             id: 'myButton',
-            objectType: 'Button',
+            objectType: Button,
             keyStroke: 'ctrl-1',
             keyStrokeScope: 'myMainBox'
           }]
         }
       });
-      let button = form.widget('myButton');
+      let button = form.widget('myButton', Button);
       expect(button.keyStrokeScope).toBe(form.rootGroupBox);
     });
 
@@ -146,17 +146,17 @@ describe('Button', () => {
         parent: session.desktop,
         id: 'outerForm',
         rootGroupBox: {
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           fields: [{
-            objectType: 'WrappedFormField',
+            objectType: WrappedFormField,
             innerForm: {
               id: 'innerForm',
-              objectType: 'Form',
+              objectType: Form,
               rootGroupBox: {
-                objectType: 'GroupBox',
+                objectType: GroupBox,
                 fields: [{
                   id: 'myButton',
-                  objectType: 'Button',
+                  objectType: Button,
                   keyStroke: 'ctrl-1',
                   keyStrokeScope: 'outerForm'
                 }]
@@ -165,7 +165,7 @@ describe('Button', () => {
           }]
         }
       });
-      let button = form.widget('myButton');
+      let button = form.widget('myButton', Button);
       expect(button.keyStrokeScope).toBe(form);
     });
   });

@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
-import {RemoteEvent, Widget} from '../../src/index';
+import {Desktop, DesktopAdapter, Form, FormModel, GroupBox, GroupBoxModel, RemoteEvent} from '../../src/index';
 
 describe('DesktopAdapter', () => {
-  let session, desktop, outlineHelper, formHelper, desktopAdapter;
+  let session: SandboxSession, desktop: Desktop, outlineHelper: OutlineSpecHelper, formHelper: FormSpecHelper, desktopAdapter: DesktopAdapter;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -28,7 +28,7 @@ describe('DesktopAdapter', () => {
     formHelper = new FormSpecHelper(session);
     desktop = session.desktop;
     linkWidgetAndAdapter(desktop, 'DesktopAdapter');
-    desktopAdapter = desktop.modelAdapter;
+    desktopAdapter = desktop.modelAdapter as DesktopAdapter;
   });
 
   afterEach(() => {
@@ -37,23 +37,22 @@ describe('DesktopAdapter', () => {
   });
 
   function createAndRegisterFormModel() {
-    let groupBoxModel = createSimpleModel('GroupBox', session);
+    let groupBoxModel = createSimpleModel('GroupBox', session) as GroupBoxModel;
     groupBoxModel.mainBox = true;
-    let formModel = createSimpleModel('Form', session);
+    let formModel = createSimpleModel('Form', session) as FormModel;
+    // @ts-ignore
     formModel.rootGroupBox = groupBoxModel.id;
     registerAdapterData([formModel, groupBoxModel], session);
     return formModel;
   }
 
   describe('activateForm', () => {
-    let ntfc,
-      parent = new Widget();
 
     it('sends formActivateEvent', () => {
       let formModel = createAndRegisterFormModel();
       let formModel2 = createAndRegisterFormModel();
-      let form = session.getOrCreateWidget(formModel.id, desktop);
-      let form2 = session.getOrCreateWidget(formModel2.id, desktop);
+      let form = session.getOrCreateWidget(formModel.id, desktop) as Form;
+      let form2 = session.getOrCreateWidget(formModel2.id, desktop) as Form;
       desktop.dialogs = [form, form2];
       session._renderDesktop();
 
@@ -78,7 +77,7 @@ describe('DesktopAdapter', () => {
 
     it('can close and open new form in the same response', () => {
       let formModel = createAndRegisterFormModel();
-      let form = session.getOrCreateWidget(formModel.id, desktop);
+      let form = session.getOrCreateWidget(formModel.id, desktop) as Form;
       desktop.dialogs = [form];
       session._renderDesktop();
 
@@ -94,7 +93,7 @@ describe('DesktopAdapter', () => {
 
       // Close form and open new form --> new form must be activated
 
-      let response = {
+      let response: any = {
         adapterData: {
           '400': {
             displayHint: 'view',
@@ -161,8 +160,6 @@ describe('DesktopAdapter', () => {
   });
 
   describe('onFormShow', () => {
-    let ntfc,
-      parent = new Widget();
 
     it('activates form but does not send an activate form event', () => {
       session._renderDesktop();
@@ -173,7 +170,7 @@ describe('DesktopAdapter', () => {
         displayParent: desktopAdapter.id
       });
       desktopAdapter.onModelAction(formShowEvent);
-      let form = session.getModelAdapter(formModel.id).widget;
+      let form = session.getModelAdapter(formModel.id).widget as Form;
       expect(form.rendered).toBe(true);
       expect(desktop.activeForm).toBe(form);
 

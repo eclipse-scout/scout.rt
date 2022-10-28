@@ -14,7 +14,6 @@ import KeyboardEventBase = JQuery.KeyboardEventBase;
 export default class MenuBarLeftKeyStroke extends KeyStroke {
   declare field: MenuBar;
 
-  // noinspection DuplicatedCode
   constructor(menuBar: MenuBar) {
     super();
     this.field = menuBar;

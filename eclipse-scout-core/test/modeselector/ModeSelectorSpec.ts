@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper} from '../../src/testing/index';
-import {Mode, ModeSelector, scout} from '../../src/index';
+import {Mode, ModeSelector, scout, Widget} from '../../src/index';
 
 describe('ModeSelector', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -26,7 +26,7 @@ describe('ModeSelector', () => {
     jasmine.clock().uninstall();
   });
 
-  function expectEnabled(field, expectedEnabled, expectedEnabledComputed, hasClass) {
+  function expectEnabled(field: Widget, expectedEnabled: boolean, expectedEnabledComputed: boolean, hasClass?: string) {
     expect(field.enabled).toBe(expectedEnabled);
     expect(field.enabledComputed).toBe(expectedEnabledComputed);
     if (hasClass) {
@@ -57,11 +57,11 @@ describe('ModeSelector', () => {
         ref: 1
       });
       let modeSelector = scout.create(ModeSelector, {
-        objectType: 'ModeSelector',
+        objectType: ModeSelector,
         parent: session.desktop,
         selectedMode: mode1,
         modes: [{
-          objectType: 'Mode',
+          objectType: Mode,
           ref: 0
         }, mode1]
       });
@@ -75,9 +75,9 @@ describe('ModeSelector', () => {
       let modeSelector = scout.create(ModeSelector, {
         parent: session.desktop,
         modes: [{
-          objectType: 'Mode'
+          objectType: Mode
         }, {
-          objectType: 'Mode',
+          objectType: Mode,
           selected: true
         }]
       });
@@ -92,10 +92,10 @@ describe('ModeSelector', () => {
       let modeSelector = scout.create(ModeSelector, {
         parent: session.desktop,
         modes: [{
-          objectType: 'Mode',
+          objectType: Mode,
           ref: 0
         }, {
-          objectType: 'Mode',
+          objectType: Mode,
           ref: 1
         }]
       });
@@ -118,21 +118,21 @@ describe('ModeSelector', () => {
       let modeSelector = scout.create(ModeSelector, {
         parent: session.desktop,
         modes: [{
-          objectType: 'Mode',
-          id: 0
+          objectType: Mode,
+          id: '0'
         }, {
-          objectType: 'Mode',
-          id: 1
+          objectType: Mode,
+          id: '1'
         }]
       });
       modeSelector.render();
 
-      modeSelector.selectModeById(1);
+      modeSelector.selectModeById('1');
       expect(modeSelector.selectedMode).toBe(modeSelector.modes[1]);
       expect(modeSelector.modes[0].selected).toBe(false);
       expect(modeSelector.modes[1].selected).toBe(true);
 
-      modeSelector.selectModeById(0);
+      modeSelector.selectModeById('0');
       expect(modeSelector.selectedMode).toBe(modeSelector.modes[0]);
       expect(modeSelector.modes[0].selected).toBe(true);
       expect(modeSelector.modes[1].selected).toBe(false);
@@ -144,10 +144,10 @@ describe('ModeSelector', () => {
       let modeSelector = scout.create(ModeSelector, {
         parent: session.desktop,
         modes: [{
-          objectType: 'Mode',
+          objectType: Mode,
           ref: 0
         }, {
-          objectType: 'Mode',
+          objectType: Mode,
           ref: 1,
           selected: true
         }]
@@ -222,10 +222,10 @@ describe('ModeSelector', () => {
       let modeSelector = scout.create(ModeSelector, {
         parent: session.desktop,
         modes: [{
-          objectType: 'Mode',
+          objectType: Mode,
           selected: true
         }, {
-          objectType: 'Mode',
+          objectType: Mode,
           selected: true
         }]
       });

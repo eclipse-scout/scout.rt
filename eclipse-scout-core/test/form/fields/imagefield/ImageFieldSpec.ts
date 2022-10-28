@@ -13,7 +13,7 @@ import {FormSpecHelper, MenuSpecHelper} from '../../../../src/testing/index';
 
 /* global removePopups */
 describe('ImageField', () => {
-  let session, helper, menuHelper;
+  let session: SandboxSession, helper: FormSpecHelper, menuHelper: MenuSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -30,7 +30,7 @@ describe('ImageField', () => {
   });
 
   describe('menu visibility', () => {
-    let imageField;
+    let imageField: ImageField;
 
     beforeEach(() => {
       imageField = helper.createField(ImageField);

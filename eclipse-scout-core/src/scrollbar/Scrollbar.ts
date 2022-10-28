@@ -378,8 +378,7 @@ export default class Scrollbar extends Widget implements ScrollbarModel {
     if (this.mouseWheelNeedsShift !== event.shiftKey) {
       return true; // only scroll if shift modifier matches
     }
-    // @ts-ignore
-    let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event.originalEvent;
+    let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event['originalEvent'];
     let w = originalEvent.wheelDelta ? -originalEvent.wheelDelta / 2 : originalEvent.detail * 20;
 
     this.notifyBeforeScroll();

@@ -167,14 +167,14 @@ export default class ProposalField extends SmartField<string> implements Proposa
   }
 
   protected override _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<string>): JQuery.Promise<void> | void {
-    // Do nothing when search text is equals to the text of the current lookup row
+    // 1. Do nothing when search text is equals to the text of the current lookup row
     if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
       $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) unchanged: text is equals. Close popup');
       this._inputAccepted(false);
       return;
     }
 
-    // 2.) proposal chooser is open -> use the selected row as value
+    // 2. proposal chooser is open -> use the selected row as value
     if (selectedLookupRow) {
       $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) lookup-row selected. Set lookup-row, close popup lookupRow=', selectedLookupRow.toString());
       this.clearErrorStatus();
@@ -183,7 +183,7 @@ export default class ProposalField extends SmartField<string> implements Proposa
       return;
     }
 
-    // 3.) proposal chooser is not open -> try to accept the current display text
+    // 3. proposal chooser is not open -> try to accept the current display text
     // this causes a lookup which may fail and open a new proposal chooser (property
     // change for 'result').
     if (searchTextChanged) {

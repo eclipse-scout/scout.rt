@@ -42,9 +42,12 @@ export default class FocusManager implements FocusManagerOptions {
   active: boolean;
   restrictedFocusGain: boolean;
 
+  /** @internal */
+  _glassPaneDisplayParents: DisplayParent[];
+  /** @internal */
+  _glassPaneTargets: JQuery[];
+
   protected _focusContexts: FocusContext[];
-  protected _glassPaneTargets: JQuery[];
-  protected _glassPaneDisplayParents: DisplayParent[];
   protected _glassPaneRenderers: GlassPaneRenderer[];
 
   constructor(options: FocusManagerOptions) {
@@ -112,7 +115,7 @@ export default class FocusManager implements FocusManagerOptions {
    * the given rule, or tries to gain focus for the given element.
    * @returns the installed context.
    */
-  installFocusContext($container: JQuery, focusRuleOrElement: FocusRule | HTMLElement): FocusContext {
+  installFocusContext($container: JQuery, focusRuleOrElement?: FocusRule | HTMLElement): FocusContext {
     let elementToFocus = this.evaluateFocusRule($container, focusRuleOrElement);
 
     // Create and register the focus context.
@@ -120,7 +123,7 @@ export default class FocusManager implements FocusManagerOptions {
     if (FocusRule.PREPARE !== focusRuleOrElement) {
       focusContext.ready();
     }
-    this._pushIfAbsendElseMoveTop(focusContext);
+    this._pushIfAbsentElseMoveTop(focusContext);
 
     if (elementToFocus) {
       focusContext.validateAndSetFocus(elementToFocus);
@@ -131,8 +134,8 @@ export default class FocusManager implements FocusManagerOptions {
   /**
    * Evaluates the {@link FocusRule} or just returns the given element if focusRuleOrElement is not a focus rule.
    */
-  evaluateFocusRule($container: JQuery, focusRuleOrElement: FocusRule | HTMLElement): HTMLElement {
-    let elementToFocus;
+  evaluateFocusRule($container: JQuery, focusRuleOrElement?: FocusRule | HTMLElement): HTMLElement {
+    let elementToFocus: HTMLElement;
     if (!focusRuleOrElement || focusRuleOrElement === FocusRule.AUTO || focusRuleOrElement === FocusRule.PREPARE) {
       elementToFocus = this.findFirstFocusableElement($container);
     } else if (focusRuleOrElement === FocusRule.NONE) {
@@ -190,7 +193,7 @@ export default class FocusManager implements FocusManagerOptions {
     if (!focusContext || this.isElementCovertByGlassPane(focusContext.$container)) {
       return;
     }
-    this._pushIfAbsendElseMoveTop(focusContext);
+    this._pushIfAbsentElseMoveTop(focusContext);
     this.validateFocus();
   }
 
@@ -208,7 +211,6 @@ export default class FocusManager implements FocusManagerOptions {
       return false; // no glasspanes active.
     }
 
-    // @ts-ignore
     if (this._glassPaneDisplayParents.indexOf(scout.widget(element)) >= 0) {
       return true;
     }
@@ -369,8 +371,9 @@ export default class FocusManager implements FocusManagerOptions {
 
   /**
    * Returns the currently active focus context, or null if not applicable.
+   * @internal
    */
-  protected _findActiveContext(): FocusContext {
+  _findActiveContext(): FocusContext {
     return arrays.last(this._focusContexts);
   }
 
@@ -439,8 +442,9 @@ export default class FocusManager implements FocusManagerOptions {
 
   /**
    * Registers the given focus context, or moves it on top if already registered.
+   * @internal
    */
-  protected _pushIfAbsendElseMoveTop(focusContext: FocusContext) {
+  _pushIfAbsentElseMoveTop(focusContext: FocusContext) {
     arrays.remove(this._focusContexts, focusContext);
     this._focusContexts.push(focusContext);
   }

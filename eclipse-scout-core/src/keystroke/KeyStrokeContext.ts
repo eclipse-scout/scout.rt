@@ -11,7 +11,7 @@
 import {Action, arrays, EventHandler, KeyStroke, keyStrokeModifier, scout, ScoutKeyboardEvent} from '../index';
 import $ from 'jquery';
 import KeyStrokeContextOptions from './KeyStrokeContextOptions';
-import KeyboardEventBase = JQuery.KeyboardEventBase;
+import {KeyboardEventWithMetaData} from './KeyStrokeManager';
 
 export default class KeyStrokeContext implements KeyStrokeContextOptions {
   invokeAcceptInputOnActiveValueField: boolean;
@@ -19,11 +19,14 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
   stopPropagationInterceptors: ((event: ScoutKeyboardEvent) => void)[];
   $bindTarget: JQuery | (() => JQuery);
   $scopeTarget: JQuery | (() => JQuery);
+
+  /** @internal */
+  _handler: ((event: KeyboardEventWithMetaData) => boolean) & { $target?: JQuery };
+
   /**
    * Arrays with combinations of keys to prevent from bubbling up in the DOM tree.
    */
   protected _stopPropagationKeys: Record<number, number[]>;
-  protected _handler: ((event: KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement>) => boolean) & { $target?: JQuery };
 
   constructor(options?: KeyStrokeContextOptions) {
     this.$bindTarget = null;
@@ -40,7 +43,7 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
   /**
    * Registers the given keys as 'stopPropagation' keys, meaning that any keystroke event with that key and matching the modifier bit mask is prevented from bubbling the DOM tree up.
    *
-   * @param modifierBitMask bitwise OR'ing together modifier constants to match a keystroke event. (KeyStrokeModifier.js)
+   * @param modifierBitMask bitwise OR modifier constants to match a keystroke event. (KeyStrokeModifier.js)
    * @param keys the keys to match a keystroke event.
    */
   registerStopPropagationKeys(modifierBitMask: number, keys: number[]) {
@@ -51,7 +54,7 @@ export default class KeyStrokeContext implements KeyStrokeContextOptions {
   /**
    * Unregisters the given keys as 'stopPropagation' keys.
    *
-   * @param modifierBitMask bitwise OR'ing together modifier constants to match a keystroke event. (KeyStrokeModifier.js)
+   * @param modifierBitMask bitwise OR modifier constants to match a keystroke event. (KeyStrokeModifier.js)
    * @param keys the keys to match a keystroke event.
    */
   unregisterStopPropagationKeys(modifierBitMask: number, keys: number[]) {

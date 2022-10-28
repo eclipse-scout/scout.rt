@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, AutoLeafPageWithNodes, EventHandler, Form, Page, PageWithTableModel, scout, Status, Table, TableRow} from '../../../index';
+import {arrays, AutoLeafPageWithNodes, EventHandler, Form, FormTableControl, Page, PageWithTableModel, scout, Status, Table, TableRow} from '../../../index';
 import $ from 'jquery';
 import {TableAllRowsDeletedEvent, TableReloadEvent, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent} from '../../../table/TableEventMap';
 
@@ -36,6 +36,10 @@ export default class PageWithTable extends Page implements PageWithTableModel {
     this._tableRowActionHandler = this._onTableRowAction.bind(this);
     this._tableRowOrderChangeHandler = this._onTableRowOrderChanged.bind(this);
     this._tableDataLoadHandler = this.loadTableData.bind(this);
+  }
+
+  override init(model: PageWithTableModel) {
+    super.init(model);
   }
 
   protected override _initDetailTable(table: Table) {
@@ -138,11 +142,9 @@ export default class PageWithTable extends Page implements PageWithTableModel {
 
   protected _createSearchFilter(): any {
     let firstFormTableControl = arrays.find(this.detailTable.tableControls, tableControl => {
-      // @ts-ignore
-      return tableControl.form instanceof Form;
-    });
+      return tableControl['form'] instanceof Form;
+    }) as FormTableControl;
     if (firstFormTableControl) {
-      // @ts-ignore
       return firstFormTableControl.form.exportData();
     }
     return null;

@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BooleanColumn} from '../../../src/index';
+import {BooleanColumn, Cell, TableRow} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
 import {triggerClick} from '../../../src/testing/jquery-testing';
 
 describe('BooleanColumn', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -61,7 +61,7 @@ describe('BooleanColumn', () => {
       table.render();
 
       expect(table.checkableColumn).not.toBeUndefined();
-      expect(table.checkableColumn).toBe(table.columns[0]);
+      expect(table.checkableColumn).toBe(table.columns[0] as BooleanColumn);
     });
 
     it('displays the row.checked state as checkbox', () => {
@@ -72,9 +72,10 @@ describe('BooleanColumn', () => {
       let table = helper.createTable(model);
       table.render();
       let $rows = table.$rows();
-      let $checkbox = table.columns[0].$checkBox($rows.eq(0));
+      let firstColumn = table.columns[0] as BooleanColumn;
+      let $checkbox = firstColumn.$checkBox($rows.eq(0));
       expect($checkbox).toHaveClass('checked');
-      $checkbox = table.columns[0].$checkBox($rows.eq(1));
+      $checkbox = firstColumn.$checkBox($rows.eq(1));
       expect($checkbox).not.toHaveClass('checked');
     });
 
@@ -85,14 +86,17 @@ describe('BooleanColumn', () => {
     it('displays the cell value as checkbox', () => {
       let model = helper.createModelFixture(2, 2);
       model.columns[0].objectType = BooleanColumn;
-      model.rows[0].cells[0].value = true;
-      model.rows[1].cells[0].value = false;
+      let cell0 = model.rows[0].cells[0] as Cell<boolean>;
+      let cell1 = model.rows[1].cells[0] as Cell<boolean>;
+      cell0.value = true;
+      cell1.value = false;
       let table = helper.createTable(model);
       table.render();
       let $rows = table.$rows();
-      let $checkbox = table.columns[0].$checkBox($rows.eq(0));
+      let column = table.columns[0] as BooleanColumn;
+      let $checkbox = column.$checkBox($rows.eq(0));
       expect($checkbox).toHaveClass('checked');
-      $checkbox = table.columns[0].$checkBox($rows.eq(1));
+      $checkbox = column.$checkBox($rows.eq(1));
       expect($checkbox).not.toHaveClass('checked');
     });
 
@@ -104,7 +108,7 @@ describe('BooleanColumn', () => {
       table.render();
       table.on('rowClick', event => {
         expect(event.row).toBeDefined();
-        expect(event.row).toBe(model.rows[1]);
+        expect(event.row).toBe(model.rows[1] as TableRow);
         expect(event.mouseButton).toBe(1);
         expect(event.column).toBe(column0);
       });
@@ -137,7 +141,7 @@ describe('BooleanColumn', () => {
         it('toggles the check box if column is editable', () => {
           let model = helper.createModelSingleColumnByValues([true], 'BooleanColumn');
           let table = helper.createTable(model);
-          let column0 = table.columns[0];
+          let column0 = table.columns[0] as BooleanColumn;
           column0.setTriStateEnabled(true);
           column0.setEditable(true);
           let updateRowCount = 0;
@@ -148,19 +152,19 @@ describe('BooleanColumn', () => {
           expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveClass('checked');
 
           table.on('rowsUpdated', event => updateRowCount++);
-          column0.onMouseUp({}, table.rows[0].$row);
+          column0.onMouseUp({} as JQuery.MouseUpEvent, table.rows[0].$row);
           expect(column0.cell(table.rows[0]).text).toBe('?');
           expect(column0.cell(table.rows[0]).value).toBe(null);
           expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveClass('undefined');
           expect(updateRowCount).toBe(1);
 
-          column0.onMouseUp({}, table.rows[0].$row);
+          column0.onMouseUp({} as JQuery.MouseUpEvent, table.rows[0].$row);
           expect(column0.cell(table.rows[0]).text).toBe('');
           expect(column0.cell(table.rows[0]).value).toBe(false);
           expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).not.toHaveClass('undefined checked');
           expect(updateRowCount).toBe(2);
 
-          column0.onMouseUp({}, table.rows[0].$row);
+          column0.onMouseUp({} as JQuery.MouseUpEvent, table.rows[0].$row);
           expect(column0.cell(table.rows[0]).text).toBe('X');
           expect(column0.cell(table.rows[0]).value).toBe(true);
           expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).not.toHaveClass('undefined');
@@ -173,7 +177,7 @@ describe('BooleanColumn', () => {
         it('updates the cell correctly', () => {
           let model = helper.createModelSingleColumnByValues([true], 'BooleanColumn');
           let table = helper.createTable(model);
-          let column0 = table.columns[0];
+          let column0 = table.columns[0] as BooleanColumn;
           column0.setTriStateEnabled(true);
           column0.setEditable(true);
           let updateRowCount = 0;

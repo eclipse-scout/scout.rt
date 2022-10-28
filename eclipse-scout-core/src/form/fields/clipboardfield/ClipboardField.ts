@@ -180,10 +180,8 @@ export default class ClipboardField extends ValueField<string> implements Clipbo
       let originalEvent = event.originalEvent as ClipboardEvent;
       if (originalEvent.clipboardData) {
         dataTransfer = originalEvent.clipboardData;
-        // @ts-ignore
-      } else if (myWindow.clipboardData) {
-        // @ts-ignore
-        dataTransfer = myWindow.clipboardData;
+      } else if (myWindow['clipboardData']) {
+        dataTransfer = myWindow['clipboardData'];
       }
     } catch (e) {
       // Because windows forbids concurrent access to the clipboard, a possible exception is thrown on 'myWindow.clipboardData'
@@ -255,10 +253,8 @@ export default class ClipboardField extends ValueField<string> implements Clipbo
     let originalEvent = event.originalEvent as ClipboardEvent;
     if (originalEvent.clipboardData) {
       dataTransfer = originalEvent.clipboardData;
-      // @ts-ignore
-    } else if (myWindow.clipboardData) {
-      // @ts-ignore
-      dataTransfer = myWindow.clipboardData;
+    } else if (myWindow['clipboardData']) {
+      dataTransfer = myWindow['clipboardData'];
     } else {
       // unable to obtain data transfer object
       throw new Error('Unable to access clipboard data.');

@@ -1,19 +1,21 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteEvent, scout, TableControl, TableControlAdapter} from '../../../src/index';
+import {ModelAdapterModel, RemoteEvent, scout, Session, TableControl, TableControlAdapter, TableControlModel, Widget} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
+import {ObjectType} from '../../../src/ObjectFactory';
+import SpecTable from '../../../src/testing/table/SpecTable';
 
 describe('TableControl', () => {
-  let session;
-  let tableHelper;
+  let session: SandboxSession;
+  let tableHelper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -32,27 +34,29 @@ describe('TableControl', () => {
     $.fx.off = false;
   });
 
-  function createModel() {
+  function createModel(): {
+    id: string; objectType: ObjectType<TableControl>; parent: Widget; session: Session;
+  } {
     return createSimpleModel('TableControl', session);
   }
 
-  function createAction(model) {
+  function createAction(model: TableControlModel): TableControl {
     return scout.create(TableControl, model);
   }
 
-  function createTableControlAdapter(model) {
+  function createTableControlAdapter(model: ModelAdapterModel): TableControlAdapter {
     let action = new TableControlAdapter();
     action.init(model);
     return action;
   }
 
-  function createTable() {
+  function createTable(): SpecTable {
     let tableModel = tableHelper.createModelFixture(2);
     return tableHelper.createTable(tableModel);
   }
 
   describe('selected', () => {
-    let table;
+    let table: SpecTable;
 
     beforeEach(() => {
       table = createTable();

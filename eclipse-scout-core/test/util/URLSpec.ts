@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -57,7 +57,9 @@ describe('scout.URL', () => {
     let u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug#66627'));
     u.addParameter('check', 'no');
     try {
+      // @ts-ignore
       u.addParameter();
+      // noinspection ExceptionCaughtLocallyJS
       throw new Error('addParameter() should throw an exception');
     } catch (e) {
       // should throw exception
@@ -115,6 +117,7 @@ describe('scout.URL', () => {
     u.addParameter('x', '');
     u.addParameter('user', 'admin');
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?check=no&debug&print&slow&submit=yes&user=admin&user=hugo&x=#66627');
+    // @ts-ignore
     let reverseAlphabetSorter = (a, b) => -1 * URL._sorter(a, b);
     expect(u.toString({
       sorter: reverseAlphabetSorter

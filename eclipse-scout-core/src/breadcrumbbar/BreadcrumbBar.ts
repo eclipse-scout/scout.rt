@@ -16,12 +16,12 @@ export default class BreadcrumbBar extends Widget implements BreadcrumbBarModel 
   declare eventMap: BreadcrumbBarEventMap;
 
   breadcrumbItems: BreadcrumbItem[];
-  protected _ellipsisBreadcrumbItem: BreadcrumbItem;
+  ellipsisBreadcrumbItem: BreadcrumbItem;
 
   constructor() {
     super();
     this.breadcrumbItems = [];
-    this._ellipsisBreadcrumbItem = null;
+    this.ellipsisBreadcrumbItem = null;
 
     this._addWidgetProperties(['breadcrumbItems']);
   }
@@ -63,20 +63,20 @@ export default class BreadcrumbBar extends Widget implements BreadcrumbBarModel 
   }
 
   protected _renderEllipsis() {
-    if (this._ellipsisBreadcrumbItem) {
-      this._ellipsisBreadcrumbItem.destroy();
+    if (this.ellipsisBreadcrumbItem) {
+      this.ellipsisBreadcrumbItem.destroy();
     }
     if (this.breadcrumbItems.length <= 2) {
       return;
     }
 
-    this._ellipsisBreadcrumbItem = scout.create(BreadcrumbItem, {
+    this.ellipsisBreadcrumbItem = scout.create(BreadcrumbItem, {
       parent: this,
       text: '...',
       enabled: false
     });
 
-    this._ellipsisBreadcrumbItem.render();
+    this.ellipsisBreadcrumbItem.render();
   }
 
   protected _updateMarkers() {

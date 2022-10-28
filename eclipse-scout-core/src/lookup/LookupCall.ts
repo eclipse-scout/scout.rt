@@ -12,7 +12,7 @@ import {arrays, LookupRow, objects, QueryBy, scout, Session} from '../index';
 import $ from 'jquery';
 import LookupCallModel from './LookupCallModel';
 import LookupResult from './LookupResult';
-import {SomeRequired} from '../types';
+import {Optional, SomeRequired} from '../types';
 import {ObjectType} from '../ObjectFactory';
 
 /**
@@ -23,6 +23,8 @@ import {ObjectType} from '../ObjectFactory';
 export default class LookupCall<TKey> implements LookupCallModel<TKey> {
 
   declare model: LookupCallModel<TKey>;
+
+  id: string;
   objectType: ObjectType<LookupCall<TKey>>;
   session: Session;
   hierarchical: boolean;
@@ -145,7 +147,7 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
   }
 
   /**
-   * Only call this function if this LookupCall is not used again. Otherwise use <code>.cloneForAll().execute()</code> or <code>.clone().getAll()</code>.
+   * Only call this function if this LookupCall is not used again. Otherwise, use {@link cloneForAll().execute()} or {@link clone().getAll()}.
    *
    * You should not override this function. Instead override {@link _getAll}.
    */
@@ -162,7 +164,7 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
   }
 
   /**
-   * Only call this function if this {@link LookupCall} is not used again. Otherwise use <code>.cloneForText(text).execute()</code> or <code>.clone().getByText(text)</code>.
+   * Only call this function if this {@link LookupCall} is not used again. Otherwise, use {@link cloneForText(text).execute()} or {@link clone().getByText(text)}.
    *
    * You should not override this function. Instead override {@link _getByText}.
    */
@@ -180,7 +182,7 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
   }
 
   /**
-   * Only call this function if this {@link LookupCall} is not used again. Otherwise use <code>.cloneForKey(key).execute()</code> or <code>.clone().getByKey(parentKey)</code>.
+   * Only call this function if this {@link LookupCall} is not used again. Otherwise, use {@link cloneForKey(key).execute()} or {@link clone().getByKey(parentKey)}.
    *
    * You should not override this function. Instead override {@link _getByKey}.
    */
@@ -198,7 +200,7 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
   }
 
   /**
-   * Only call this function if this {@link LookupCall} is not used again. Otherwise use <code>.cloneForKeys(keys).execute()</code> or <code>.clone().getByKeys(keys)</code>.
+   * Only call this function if this {@link LookupCall} is not used again. Otherwise, use {@link cloneForKeys(keys).execute()} or {@link clone().getByKeys(keys)}.
    *
    * You should not override this function. Instead override {@link _getByKeys}.
    */
@@ -216,7 +218,7 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
   }
 
   /**
-   * Only call this function if this {@link LookupCall} is not used again. Otherwise use <code>.cloneForRec(parentKey).execute()</code> or <code>.clone().getByRec(parentKey)</code>.
+   * Only call this function if this {@link LookupCall} is not used again. Otherwise, use {@link cloneForRec(parentKey).execute()} or {@link clone().getByRec(parentKey)}.
    *
    * You should not override this function. Instead override {@link _getByRec}.
    *
@@ -251,7 +253,7 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
 
   /**
    * Executes this LookupCall. For this method to work this LookupCall must be a clone created with one of the following methods:
-   * <code>cloneForAll()</code>, <code>cloneForText(text)</code>, <code>cloneForKey(key)</code>, <code>cloneForRec(parentKey)</code>
+   * {@link cloneForAll()}, {@link cloneForText(text)}, {@link cloneForKey(key)}, {@link cloneForRec(parentKey)}
    */
   execute(): JQuery.Promise<LookupResult<TKey>> {
     if (QueryBy.KEY === this.queryBy) {
@@ -279,40 +281,40 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
   /**
    * @param properties Properties to add to the resulting clone instance.
    */
-  clone(properties?: object): LookupCall<TKey> {
+  clone(properties?: object): this {
     // Warning: This is _not_ a deep clone! (Because otherwise the entire session would be duplicated.)
     // Non-primitive properties must _only_ be added to the resulting clone during the 'prepareLookupCall' event!
-    return scout.cloneShallow(this, properties, true) as LookupCall<TKey>;
+    return scout.cloneShallow(this, properties, true) as this;
   }
 
-  cloneForAll(): LookupCall<TKey> {
+  cloneForAll(): this {
     return this.clone({
       queryBy: QueryBy.ALL
     });
   }
 
-  cloneForText(text: string): LookupCall<TKey> {
+  cloneForText(text: string): this {
     return this.clone({
       queryBy: QueryBy.TEXT,
       searchText: text
     });
   }
 
-  cloneForKey(key: TKey): LookupCall<TKey> {
+  cloneForKey(key: TKey): this {
     return this.clone({
       queryBy: QueryBy.KEY,
       key: key
     });
   }
 
-  cloneForKeys(keys: TKey[]): LookupCall<TKey> {
+  cloneForKeys(keys: TKey[]): this {
     return this.clone({
       queryBy: QueryBy.KEYS,
       keys: keys
     });
   }
 
-  cloneForRec(parentKey: TKey): LookupCall<TKey> {
+  cloneForRec(parentKey: TKey): this {
     return this.clone({
       queryBy: QueryBy.REC,
       parentKey: parentKey
@@ -325,13 +327,13 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
 
   // ---- static helpers ----
 
-  static ensure<K>(lookupCall: LookupCall<K> | SomeRequired<LookupCallModel<K>, 'objectType'> | string, session: Session): LookupCall<K> {
+  static ensure<K>(lookupCall: LookupCallOrRefModel<K>, session: Session): LookupCall<K> {
     if (lookupCall instanceof LookupCall) {
       return lookupCall;
     }
     if (objects.isPlainObject(lookupCall)) {
       lookupCall.session = session;
-      return scout.create(lookupCall);
+      return scout.create(lookupCall as SomeRequired<LookupCallModel<K>, 'objectType'>);
     }
     if (typeof lookupCall === 'string') {
       lookupCall = scout.create(lookupCall, {
@@ -354,3 +356,8 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
     return result.lookupRows[0];
   }
 }
+
+/**
+ * A LookupCall, a LookupCallModel or a string with a LookupCall class name.
+ */
+export type LookupCallOrRefModel<K> = LookupCall<K> | Optional<SomeRequired<LookupCallModel<K>, 'objectType'>, 'session'> | string;

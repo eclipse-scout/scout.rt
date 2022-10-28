@@ -13,6 +13,7 @@ import {ObjectType} from '../ObjectFactory';
 
 export default interface LookupCallModel<TKey> {
   session: Session;
+  id?: string;
   objectType?: ObjectType<LookupCall<TKey>>;
   hierarchical?: boolean;
   loadIncremental?: boolean;
@@ -22,16 +23,16 @@ export default interface LookupCallModel<TKey> {
 
   queryBy?: QueryBy;
 
-  /** used on QueryBy.TEXT */
+  /** used on {@link QueryBy.TEXT} */
   searchText?: string;
 
-  /** used on QueryBy.KEY */
+  /** used on {@link QueryBy.KEY} */
   key?: TKey;
 
-  /** used on QueryBy.KEYS */
+  /** used on {@link QueryBy.KEYS} */
   keys?: TKey[];
 
-  /** used on QueryBy.REC */
+  /** used on {@link QueryBy.REC} */
   parentKey?: TKey;
 
   active?: boolean;
@@ -42,4 +43,6 @@ export default interface LookupCallModel<TKey> {
    * Default value is 100.
    */
   maxRowCount?: number;
+
+  [property: string]: any; // allow custom properties
 }

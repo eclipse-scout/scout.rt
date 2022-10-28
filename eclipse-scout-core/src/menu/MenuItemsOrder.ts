@@ -68,10 +68,10 @@ export default class MenuItemsOrder implements MenuOrder {
     };
   }
 
-  protected _menuTypes(types: string[]): string[] {
-    let i, menuTypes = [];
+  protected _menuTypes(types?: string[]): string[] {
+    let menuTypes: string[] = [];
     types = types || [];
-    for (i = 0; i < types.length; i++) {
+    for (let i = 0; i < types.length; i++) {
       menuTypes.push(this.objectType + '.' + types[i]);
     }
     return menuTypes;

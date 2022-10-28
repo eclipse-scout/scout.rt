@@ -15,7 +15,7 @@ import {ModelOf} from '../scout';
 
 export type StatusSeverity = EnumObject<typeof Status.Severity>;
 export type StatusSeverityNames = keyof typeof Status.Severity;
-export type StatusOrModel<T extends Status = Status> = Status | ModelOf<T> & { objectType?: ObjectType<T> };
+export type StatusOrModel<T extends Status = Status> = Status | (ModelOf<T> & { objectType?: ObjectType<T> });
 
 export default class Status {
   declare model: StatusModel;
@@ -112,7 +112,7 @@ export default class Status {
 
   /**
    * Note: we cannot 'overload' this function, because predicates and status-types are both functions,
-   * thus we cannot distinct them by type or instanceof.
+   * thus we cannot distinguish them by type or instanceof.
    *
    * @returns whether or not this status contains a child with the give type
    */
@@ -247,6 +247,7 @@ export default class Status {
     }
   }
 
+  static ensure(status: StatusOrModel): Status;
   static ensure<T extends Status>(status: StatusOrModel<T>): T {
     if (!status) {
       return status as T;
@@ -254,7 +255,7 @@ export default class Status {
     if (status instanceof Status) {
       return status as T;
     }
-    // May return a specialized sub-class of Status
+    // May return a specialized subclass of Status
     if (!status.objectType) {
       status.objectType = 'Status';
     }

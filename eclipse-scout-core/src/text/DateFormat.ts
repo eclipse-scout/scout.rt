@@ -774,7 +774,7 @@ export default class DateFormat {
    * Analyzes the given string and returns an information object with all recognized information
    * for the current date format.
    */
-  analyze(text: string, startDate: Date): DateFormatAnalyzeInfo {
+  analyze(text: string, startDate?: Date): DateFormatAnalyzeInfo {
     let analyzeInfo = this._createAnalyzeInfo(text);
     if (!text) {
       return analyzeInfo;

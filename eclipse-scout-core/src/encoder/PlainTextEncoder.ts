@@ -38,7 +38,7 @@ export default class PlainTextEncoder {
     this.cache = new CachedElement('textarea');
   }
 
-  encode(text: string, options: PlainTextEncoderOptions): string {
+  encode(text: string, options?: PlainTextEncoderOptions): string {
     options = options || {};
     if (!text) {
       return text;

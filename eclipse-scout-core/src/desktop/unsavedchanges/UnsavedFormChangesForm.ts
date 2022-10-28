@@ -94,7 +94,8 @@ export default class UnsavedFormChangesForm extends Form implements UnsavedFormC
     this.on('postLoad', event => this.touch());
   }
 
-  protected override _validate(): Status {
+  /** @internal */
+  override _validate(): Status {
     let invalidForms = this.getInvalidForms();
     if (invalidForms.length > 0) {
       let msg: string[] = [];
@@ -111,13 +112,11 @@ export default class UnsavedFormChangesForm extends Form implements UnsavedFormC
   getInvalidForms(): Form[] {
     let invalidForms: Form[] = [];
     this.openFormsField.value.forEach((form: Form) => {
-      // @ts-ignore
-      let diagElem = form.lifecycle._invalidElements();
+      let diagElem = form.lifecycle.invalidElements();
       let missingElements = diagElem.missingElements.slice();
       let invalidElements = diagElem.invalidElements.slice();
       form.visitDisplayChildren((dialog: Form) => {
-        // @ts-ignore
-        let diagElem = dialog.lifecycle._invalidElements();
+        let diagElem = dialog.lifecycle.invalidElements();
         arrays.pushAll(missingElements, diagElem.missingElements);
         arrays.pushAll(invalidElements, diagElem.invalidElements);
       }, dialog => {
@@ -132,7 +131,6 @@ export default class UnsavedFormChangesForm extends Form implements UnsavedFormC
   }
 
   static getFormDisplayName(form: Form): string {
-    // @ts-ignore
-    return [form.title, form.name, form.subTitle].filter(Boolean).join(' - ');
+    return [form.title, form['name'], form.subTitle].filter(Boolean).join(' - ');
   }
 }

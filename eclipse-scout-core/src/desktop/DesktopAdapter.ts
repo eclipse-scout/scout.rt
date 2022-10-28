@@ -97,8 +97,7 @@ export default class DesktopAdapter extends ModelAdapter {
 
       let hasPendingFormActivateEvent = this.session.asyncEvents.some(event => event.type === 'formActivate' && event.target === this.id);
       if (!hasPendingFormActivateEvent) {
-        // @ts-ignore
-        this.addFilterForWidgetEvent(widgetEvent => widgetEvent.type === 'formActivate' && widgetEvent.form === form);
+        this.addFilterForWidgetEvent(widgetEvent => widgetEvent.type === 'formActivate' && widgetEvent['form'] === form);
       }
 
       this.widget.showForm(form, event.position);

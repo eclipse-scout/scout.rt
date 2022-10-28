@@ -25,7 +25,8 @@ export default class ModeSelectorFieldAdapter extends ValueFieldAdapter {
     };
   }
 
-  protected override _postCreateWidget() {
+  /** @internal */
+  override _postCreateWidget() {
     this.widget.modeSelector.setModes(this.widget.modes);
     delete this.widget.modes;
   }

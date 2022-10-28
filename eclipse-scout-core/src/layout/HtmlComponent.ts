@@ -428,8 +428,9 @@ export default class HtmlComponent {
 
   /**
    * The html element may define a min or max height/height -> adjust the pref size accordingly
+   * @internal
    */
-  protected _adjustPrefSizeWithMinMaxSize(prefSize: Dimension, minSize?: Dimension, maxSize?: Dimension) {
+  _adjustPrefSizeWithMinMaxSize(prefSize: Dimension, minSize?: Dimension, maxSize?: Dimension) {
     minSize = minSize || this.cssMinSize();
     maxSize = maxSize || this.cssMaxSize();
     prefSize.height = Math.max(prefSize.height, minSize.height);
@@ -441,7 +442,7 @@ export default class HtmlComponent {
   /**
    * Returns the inset-dimensions of the component (padding and border, no margin).
    */
-  insets(options?: InsetsOptions): Insets {
+  insets(options?: InsetsOptions | boolean): Insets {
     return graphics.insets(this.$comp, options);
   }
 

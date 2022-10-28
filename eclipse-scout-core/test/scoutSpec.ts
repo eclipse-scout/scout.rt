@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,7 +11,7 @@
 import {Menu, NullWidget, ObjectFactory, objects, scout, Session, Status, Tooltip} from '../src/index';
 
 describe('main', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -81,7 +81,7 @@ describe('main', () => {
   describe('assertValue', () => {
 
     it('throws Error when value is not set', () => {
-      // noinspection JSCheckFunctionSignatures
+      // @ts-ignore
       expect(() => scout.assertValue()).toThrowError();
       expect(() => scout.assertValue(null)).toThrowError();
       expect(() => scout.assertValue(undefined)).toThrowError();
@@ -103,7 +103,7 @@ describe('main', () => {
   describe('assertInstance', () => {
 
     it('throws Error when value has wrong type', () => {
-      // noinspection JSCheckFunctionSignatures
+      // @ts-ignore
       expect(() => scout.assertInstance()).toThrowError();
       expect(() => scout.assertInstance(null, null)).toThrowError();
       expect(() => scout.assertInstance(undefined, null)).toThrowError();
@@ -114,7 +114,7 @@ describe('main', () => {
       const obj = {};
       const re = /a+b/;
 
-      // noinspection JSCheckFunctionSignatures
+      // @ts-ignore
       expect(() => scout.assertInstance(re)).toThrowError();
       expect(() => scout.assertInstance(re, null)).toThrowError();
       expect(() => scout.assertInstance(re, undefined)).toThrowError();
@@ -123,6 +123,7 @@ describe('main', () => {
 
       expect(scout.assertInstance(arr, Array)).toBe(arr);
       expect(scout.assertInstance(obj, Object)).toBe(obj);
+      // @ts-ignore
       expect(scout.assertInstance(re, RegExp)).toBe(re);
       expect(scout.assertInstance(session, Session)).toBe(session);
 
@@ -141,6 +142,7 @@ describe('main', () => {
   describe('isOneOf', () => {
 
     it('can check if value is one of multiple values', () => {
+      // @ts-ignore
       expect(scout.isOneOf()).toBe(false);
       expect(scout.isOneOf('test')).toBe(false);
       expect(scout.isOneOf('test', 'bla')).toBe(false);
@@ -159,7 +161,7 @@ describe('main', () => {
   describe('create', () => {
 
     it('accepts string as first argument', () => {
-      let menu = scout.create('Menu', {
+      let menu = scout.create(Menu, {
         parent: new NullWidget(),
         session: session
       });
@@ -178,7 +180,7 @@ describe('main', () => {
       let menu = scout.create({
         parent: new NullWidget(),
         session: session,
-        objectType: 'Menu'
+        objectType: Menu
       });
       expect(menu instanceof Menu).toBe(true);
     });
@@ -195,16 +197,19 @@ describe('main', () => {
     it('throws when first argument is invalid', () => {
       // must fail
       expect(() => {
+        // @ts-ignore
         scout.create(1);
       }).toThrow();
       expect(() => {
-        // noinspection JSCheckFunctionSignatures
+        // @ts-ignore
         scout.create();
       }).toThrow();
       expect(() => {
+        // @ts-ignore
         scout.create(true);
       }).toThrow();
       expect(() => {
+        // @ts-ignore
         scout.create(() => {
           // nop
         });
@@ -213,7 +218,7 @@ describe('main', () => {
 
     it('creates a new initialized widget with parent and session set', () => {
       let parent = new NullWidget();
-      let widget = scout.create('Tooltip', {
+      let widget = scout.create(Tooltip, {
         parent: parent,
         session: session
       });
@@ -227,7 +232,7 @@ describe('main', () => {
 
       it('sets property \'id\' correctly when no ID is provided', () => {
         let expectedSeqNo = ObjectFactory.get().uniqueIdSeqNo + 1,
-          menu = scout.create('Menu', {
+          menu = scout.create(Menu, {
             parent: new NullWidget(),
             session: session
           });
@@ -237,7 +242,7 @@ describe('main', () => {
 
       it('session must be set, but adapter should not be registered', () => {
         let oldNumProperties = objects.countOwnProperties(session.modelAdapterRegistry),
-          menu = scout.create('Menu', {
+          menu = scout.create(Menu, {
             parent: new NullWidget(),
             session: session
           });

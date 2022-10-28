@@ -13,10 +13,9 @@ import {
   SimpleLoadingSupport, SmartFieldCancelKeyStroke, SmartFieldEventMap, SmartFieldLayout, SmartFieldModel, SmartFieldPopup, SmartFieldTouchPopup, Status, strings, TreeProposalChooser, ValueField
 } from '../../../index';
 import $ from 'jquery';
-import LookupCallModel from '../../../lookup/LookupCallModel';
-import {ObjectType} from '../../../ObjectFactory';
 import CellEditorPopup, {CellEditorRenderedOptions} from '../../../table/editor/CellEditorPopup';
 import {ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent} from './ProposalChooserEventMap';
+import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
 
 export default class SmartField<TValue> extends ValueField<TValue> implements SmartFieldModel<TValue> {
   declare model: SmartFieldModel<TValue>;
@@ -39,34 +38,30 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
   touchMode: boolean;
   embedded: boolean;
   lookupStatus: Status;
-
   /** used to detect if the proposal chooser contains the results of the latest lookup, or an out-dated result. */
   lookupSeqNo: number;
-
   /** only when the result is up-to-date, we can use the selected lookup row */
   initActiveFilter: SmartFieldActiveFilter;
-
   maxLength: number;
   maxLengthHandler: MaxLengthHandler;
+
+  /**
+   * should only be accessed on the original widget since the adapter accesses it
+   * @internal
+   */
+  _currentLookupCall: LookupCall<TValue>;
+
   protected _pendingLookup: number;
   protected _pendingOpenPopup: boolean;
   protected _tabPrevented: { shiftKey: boolean };
-
   /** used to detect whether the last thing the user did was typing (a proposal) or something else, like selecting a proposal row */
   protected _userWasTyping: boolean;
-
   /** used to prevent multiple execution of blur/acceptInput */
   protected _acceptInputEnabled: boolean;
-
   protected _acceptInputDeferred: JQuery.Deferred<any>;
-
   /** used to store the error state 'not unique' which must not be showed while typing, but when the field loses focus */
   protected _notUnique: boolean;
-
   protected _lastSearchText: string;
-
-  /** should only be accessed on the original widget since the adapter accesses it */
-  protected _currentLookupCall: LookupCall<TValue>;
   protected _cellEditorPopup: CellEditorPopup<TValue>;
   protected _lockLookupRow: boolean;
 
@@ -274,7 +269,7 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
    * This function is called on blur, by a keystroke or programmatically at any time.
    *
    * @param sync optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
-  */
+   */
   override acceptInput(sync?: boolean): JQuery.Promise<void> | void {
     if (!this._acceptInputEnabled) {
       $.log.isTraceEnabled() && $.log.trace('(SmartField#acceptInput) Skipped acceptInput because _acceptInputEnabled=false');
@@ -351,7 +346,7 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
    * This function is intended to be overridden. Proposal field has another behavior than the smart field.
    *
    * @param sync optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
-  */
+   */
   protected _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<TValue>): JQuery.Promise<void> | void {
     let unchanged = false;
     if (this.removing) {
@@ -656,11 +651,11 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
     this.maxLengthHandler.render();
   }
 
-  setLookupCall(lookupCall: LookupCall<TValue> | LookupCallModel<TValue> & { objectType: ObjectType<LookupCall<TValue>> } | string) {
+  setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
     this.setProperty('lookupCall', lookupCall);
   }
 
-  protected _setLookupCall(lookupCall: LookupCall<TValue> | LookupCallModel<TValue> & { objectType: ObjectType<LookupCall<TValue>> } | string) {
+  protected _setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
     this._syncBrowseMaxRowCountWithLookupCall();
   }
@@ -996,7 +991,6 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
      *      is stateful. The java field always passes the activeFilter property to the
      *      lookup call.
      */
-    // @ts-ignore
     let fieldForPopup = useTouch ? (this.popup as SmartFieldTouchPopup<TValue>)._field as SmartField<TValue> : this;
     this.popup.on('lookupRowSelected', fieldForPopup._onLookupRowSelected.bind(fieldForPopup));
     this.popup.on('activeFilterSelected', this._onActiveFilterSelected.bind(this)); // intentionally use this instead of fieldForPopup *1
@@ -1018,7 +1012,7 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
   }
 
   /**
-   * Calls acceptInput if mouse down happens outside of the field or popup
+   * Calls acceptInput if mouse down happens outside the field or popup
    */
   override aboutToBlurByMouseDown(target: Element) {
     if (this.touchMode) {
@@ -1610,7 +1604,8 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
     this._triggerAcceptInput(false, true);
   }
 
-  protected override _triggerAcceptInput(acceptByLookupRow: boolean, failure?: boolean) {
+  /** @internal */
+  override _triggerAcceptInput(acceptByLookupRow?: boolean, failure?: boolean) {
     this.trigger('acceptInput', {
       displayText: this.displayText,
       errorStatus: this.errorStatus,

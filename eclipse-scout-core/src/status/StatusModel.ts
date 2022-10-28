@@ -8,15 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {StatusSeverity, StatusSeverityNames} from './Status';
-import {Status} from '../index';
+import {StatusOrModel, StatusSeverity, StatusSeverityNames} from './Status';
 
 export default interface StatusModel {
   message?: string;
   severity?: StatusSeverity | StatusSeverityNames;
   iconId?: string;
   code?: number;
-  children?: Status[];
+  children?: StatusOrModel[];
   deletable?: boolean;
   uiState?: string;
 }

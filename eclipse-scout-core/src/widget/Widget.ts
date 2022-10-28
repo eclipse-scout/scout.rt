@@ -85,18 +85,23 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   displayParent: DisplayParent;
   $container: JQuery;
   $parent: JQuery;
+
+  /** @internal */
+  _widgetProperties: string[];
+  /** @internal */
+  _cloneProperties: string[];
+  /** @internal */
+  _rendered: boolean;
+
   protected _$lastFocusedElement: JQuery;
-  protected _cloneProperties: string[];
   protected _focusInListener: (event: FocusEvent | JQuery.FocusInEvent) => void;
   protected _glassPaneContributions: GlassPaneContribution[];
   protected _parentDestroyHandler: EventHandler;
   protected _parentRemovingWhileAnimatingHandler: EventHandler;
   protected _postRenderActions: (() => void)[];
   protected _preserveOnPropertyChangeProperties: string[];
-  protected _rendered: boolean;
   protected _scrollHandler: (event: JQuery.ScrollEvent<HTMLElement>) => void;
   protected _storedFocusedWidget: Widget;
-  protected _widgetProperties: string[];
 
   constructor() {
     super();
@@ -132,7 +137,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
 
     /**
      * The 'rendering' flag is set the true while the _initial_ rendering is performed.
-     * It is used to to something different in a _render* method when the method is
+     * It is used to something different in a _render* method when the method is
      * called for the first time.
      */
     this.rendering = false;
@@ -239,7 +244,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
 
   /**
    * Initializes the widget instance. All properties of the model parameter (object) are set as properties on the widget instance.
-   * Override this function to initialize widget specific properties in sub-classes.
+   * Override this function to initialize widget specific properties in subclasses.
    */
   protected _init(model: WidgetModel) {
     if (!model.parent) {
@@ -271,7 +276,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
 
   /**
    * This function sets the property value. Override this function when you need special init behavior for certain properties.
-   * For instance you could not simply set the property value, but extend an already existing value.
+   * For instance, you could not simply set the property value, but extend an already existing value.
    */
   protected _initProperty(propertyName: string, value: any) {
     this[propertyName] = value;
@@ -310,8 +315,9 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
 
   /**
    * Calls {@link scout.create} for the given model, or if model is already a Widget simply returns the widget.
+   * @internal
    */
-  protected _createChild<T extends Widget>(widgetOrModel: T | RefModel<ModelOf<T>> | string): T {
+  _createChild<T extends Widget>(widgetOrModel: T | RefModel<ModelOf<T>> | string): T {
     if (widgetOrModel instanceof Widget) {
       return widgetOrModel;
     }
@@ -516,7 +522,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * It traverses down the widget hierarchy and calls {@link _remove} for each widget from the bottom up (depth first search).
    * <p>
    * If the property {@link Widget.animateRemoval} is set to true, the widget won't be removed immediately.
-   * Instead, it waits for the remove animation to complete so it's content is still visible while the animation runs.
+   * Instead, it waits for the remove animation to complete, so it's content is still visible while the animation runs.
    * During that time, {@link isRemovalPending} returns true.
    */
   remove() {
@@ -535,7 +541,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * If the remove animation is running it will stop immediately because the element is removed. There will no animationend event be triggered.
    * <p>
    * <b>Important</b>: You should only use this method if your widget uses remove animations (this.animateRemoval = true)
-   * and you deliberately want to not execute or abort it. Otherwise you should use the regular {@link remove} method.
+   * and you deliberately want to not execute or abort it. Otherwise, you should use the regular {@link remove} method.
    */
   removeImmediately() {
     this._removeInternal();
@@ -558,7 +564,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
 
   /**
    * Returns true if the removal of this or an ancestor widget is pending. Checking the ancestor is omitted if the parent is being removed.
-   * This may be used to prevent a removal if an ancestor will be removed (e.g by an animation)
+   * This may be used to prevent a removal if an ancestor will be removed (e.g. by an animation)
    */
   isRemovalPending(): boolean {
     if (this.removalPending) {
@@ -578,7 +584,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return false;
   }
 
-  protected _removeInternal() {
+  /** @internal */
+  _removeInternal() {
     if (!this._rendered) {
       return;
     }
@@ -691,7 +698,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Called right before _remove is called.<br>
    * Default calls {@link LayoutValidator.cleanupInvalidComponents} to make sure that child components are removed from the invalid components list.
-   * Also uninstalls key stroke context, loading support and scrollbars.
+   * Also uninstalls keystroke context, loading support and scrollbars.
    */
   protected _cleanup() {
     this.parent.off('removing', this._parentRemovingWhileAnimatingHandler);
@@ -753,7 +760,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
 
       if (this.parent !== this.owner) {
         // Remove from old parent if getting relinked
-        // If the old parent is still the owner, don't remove it because owner stays responsible for destroying it
+        // Is the old parent still the owner, don't remove it because owner stays responsible for destroying it
         this.parent._removeChild(this);
       }
     }
@@ -1205,10 +1212,10 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   }
 
   /**
-   * The layout data contains hints for the layout of the parent container to layout this individual child widget inside the container.<br>
+   * The layout data contains hints for the layout of the parent container to lay out this individual child widget inside the container.<br>
    * Note: this is not the same as the LayoutConfig. The LayoutConfig contains constraints for the layout itself and is therefore set on the parent container directly.
    * <p>
-   * Example: The parent container uses a {@link LogicalGridLayout} to layout its children. Every child has a {@link LogicalGridData} to tell the layout how this specific child should be layouted.
+   * Example: The parent container uses a {@link LogicalGridLayout} to lay out its children. Every child has a {@link LogicalGridData} to tell the layout how this specific child should be layouted.
    * The parent may have a {@link LogicalGridLayoutConfig} to specify constraints which affect either only the container or every child in the container.
    */
   setLayoutData(layoutData: LayoutData) {
@@ -1251,7 +1258,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   }
 
   /**
-   * Invalidates the logical grid of the parent widget. Typically done when the visibility of the widget changes.
+   * Invalidates the logical grid of the parent widget. Typically, done when the visibility of the widget changes.
    * @param invalidateLayout true, to invalidate the layout of the parent of {@link this.htmlComp}, false if not. Default is true.
    */
   invalidateParentLogicalGrid(invalidateLayout?: boolean) {
@@ -1372,7 +1379,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Detaches the element and all its children from the DOM.<br>
    * Compared to {@link remove}, the state of the HTML elements are preserved, so they can be attached again without the need to render them again from scratch.
-   * {@link attach}/{@link detach} is faster in general than {@link render}/{@link remove}, but it is much more error prone and should therefore only be used very carefully. Rule of thumb: Don't use it, use {@link remove} instead.<br>
+   * {@link attach}/{@link detach} is faster in general than {@link render}/{@link remove}, but it is much more error-prone and should therefore only be used very carefully. Rule of thumb: Don't use it, use {@link remove} instead.<br>
    * The main problem with attach/detach is that a widget can change its model anytime. If this happens for a removed widget, only the model will change, and when rendered again, the recent model is used to create the HTML elements.
    * If the same happens when a widget is detached, the widget is still considered rendered and the model applied to the currently detached elements.
    * This may or may not work because a detached element for example does not have a size or a position.
@@ -1442,7 +1449,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
 
   /**
    * Override this method to do something when the widget is detached.
-   * Typically you will call 'this.$container.detach()'. The default implementation does nothing.
+   * Typically, you will call 'this.$container.detach()'. The default implementation does nothing.
    */
   protected _detach() {
     // NOP
@@ -1483,8 +1490,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * 1. Preparation: If the property is a widget property, several actions are performed in \_prepareWidgetProperty().
    * 2. DOM removal: If the property is a widget property and the widget is rendered, the changed widget(s) are removed unless the property should not be preserved (see {@link _preserveOnPropertyChangeProperties}).
    *    If there is a custom remove function (e.g. \_removeXY where XY is the property name), it will be called instead of removing the widgets directly.
-   * 3. Model update: If there is a custom set function (e.g. \_setXY where XY is the property name), it will be called. Otherwise the default set function {@link _setProperty} is called.
-   * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. \_renderXY where XY is the property name), it will be called. Otherwise nothing happens.
+   * 3. Model update: If there is a custom set function (e.g. \_setXY where XY is the property name), it will be called. Otherwise, the default set function {@link _setProperty} is called.
+   * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. \_renderXY where XY is the property name), it will be called. Otherwise, nothing happens.
    * @returns true, if the property was changed, false if not.
    */
   override setProperty(propertyName: string, value: any): boolean {
@@ -1694,10 +1701,10 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   }
 
   /**
-   * A so called widget property is a property with a widget as value incl. automatic resolution of that widget.
+   * A so-called widget property is a property with a widget as value incl. automatic resolution of that widget.
    * This means the property not only accepts the actual widget, but also a widget model or a widget reference (id)
    * and then either creates a new widget based on the model or resolves the id and uses the referenced widget as value.
-   * Furthermore it will take care of its lifecycle which means, the widget will automatically be removed and destroyed (as long as the parent is also the owner).
+   * Furthermore, it will take care of its lifecycle which means, the widget will automatically be removed and destroyed (as long as the parent is also the owner).
    * <p>
    * If only the resolve operations without the lifecycle actions should be performed, you need to add the property to the list _preserveOnPropertyChangeProperties as well.
    */
@@ -1709,7 +1716,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return this._widgetProperties.indexOf(propertyName) > -1;
   }
 
-  protected _addCloneProperties(properties: string | string[]) {
+  /** @internal */
+  _addCloneProperties(properties: string | string[]) {
     this._addProperties('_cloneProperties', properties);
   }
 
@@ -1802,9 +1810,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Therefore, this model may be used to override the cloned properties or to add additional properties.
    * @param options Options passed to the mirror function.
    */
-  clone(model: WidgetModel, options?: CloneOptions): this {
+  clone(model: Optional<WidgetModel, 'parent'>, options?: CloneOptions): this {
     let clone, cloneModel;
-    // @ts-ignore
     model = model || {};
     options = options || {};
 
@@ -1942,15 +1949,12 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    */
   widget<T extends Widget>(widgetId: string, type?: new() => T): T {
     if (predicate(this)) {
-      // @ts-ignore
-      return this;
+      return this as unknown as T;
     }
     return this.findChild(predicate) as T;
 
-    function predicate(widget) {
-      if (widget.id === widgetId) {
-        return widget;
-      }
+    function predicate(widget: Widget): boolean {
+      return widget.id === widgetId;
     }
   }
 
@@ -2200,10 +2204,11 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     this.setProperty('scrollTop', scrollTop);
   }
 
-  protected _renderScrollTop() {
+  /** @internal */
+  _renderScrollTop() {
     let $scrollable = this.get$Scrollable();
     if (!$scrollable || this.scrollTop === null) {
-      // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollTop must not be done while rendering because it would provoke a reflow
+      // Don't do anything for non-scrollable elements. Also, reading $scrollable[0].scrollTop must not be done while rendering because it would provoke a reflow
       return;
     }
     if (this.rendering || this.htmlComp && !this.htmlComp.layouted && !this.htmlComp.layouting) {
@@ -2226,7 +2231,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   protected _renderScrollLeft() {
     let $scrollable = this.get$Scrollable();
     if (!$scrollable || this.scrollLeft === null) {
-      // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollLeft must not be done while rendering because it would provoke a reflow
+      // Don't do anything for non-scrollable elements. Also, reading $scrollable[0].scrollLeft must not be done while rendering because it would provoke a reflow
       return;
     }
     if (this.rendering || this.htmlComp && !this.htmlComp.layouted && !this.htmlComp.layouting) {
@@ -2294,7 +2299,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Brings the widget into view by scrolling the first scrollable parent.
    * @param options
-   *          an optional options object. Short-hand version: If a string is passed instead
+   *          an optional options object. Shorthand version: If a string is passed instead
    *          of an object, the value is automatically converted to the option {@link ScrollToOptions.align}.
    */
   reveal(options: ScrollToOptions | string) {

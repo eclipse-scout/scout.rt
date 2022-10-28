@@ -1,18 +1,37 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NavigateUpButton} from '../../../../src/index';
+import {Form, NavigateButtonModel, NavigateUpButton, Outline, Page, Table} from '../../../../src/index';
 
 describe('NavigateUpButton', () => {
 
-  let session, outline, menu, node = {};
+  let session: SandboxSession, outline: Outline, menu: SpecNavigateUpButton, node = {} as Page;
+
+  class SpecNavigateUpButton extends NavigateUpButton {
+    override _toggleDetail(): boolean {
+      return super._toggleDetail();
+    }
+
+    override _isDetail(): boolean {
+      return super._isDetail();
+    }
+
+    override _buttonEnabled(): boolean {
+      return super._buttonEnabled();
+    }
+
+    override _drill() {
+      super._drill();
+    }
+  }
+
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -20,12 +39,13 @@ describe('NavigateUpButton', () => {
     outline = {
       session: session,
       navigateToTop: () => {
+        // nop
       }
-    };
-    let model = createSimpleModel('NavigateUpButton', session);
+    } as unknown as Outline;
+    let model = createSimpleModel(SpecNavigateUpButton, session) as NavigateButtonModel;
     model.outline = outline;
     model.node = node;
-    menu = new NavigateUpButton();
+    menu = new SpecNavigateUpButton();
     menu.init(model);
   });
 
@@ -35,22 +55,22 @@ describe('NavigateUpButton', () => {
 
   it('_isDetail returns true or false depending on the state of the detail-form and detail-table', () => {
     // false when both detailForm and detailTable are visible
-    node.detailForm = {};
+    node.detailForm = new Form();
     node.detailFormVisible = true;
     node.detailFormVisibleByUi = true;
-    node.detailTable = {};
+    node.detailTable = new Table();
     node.detailTableVisible = true;
     expect(menu._isDetail()).toBe(false);
 
     // false when detailForm is absent, even when if detailFormVisible=true
     delete node.detailForm;
     expect(menu._isDetail()).toBe(false);
-    node.detailForm = {};
+    node.detailForm = new Form();
 
     // false when detailTable is absent, even when if detailTableVisible=true
     delete node.detailTable;
     expect(menu._isDetail()).toBe(false);
-    node.detailTable = {};
+    node.detailTable = new Table();
 
     // true when detailForm is hidden by UI
     node.detailFormVisibleByUi = false;
@@ -68,14 +88,14 @@ describe('NavigateUpButton', () => {
   describe('_buttonEnabled', () => {
 
     it('is true when current node has a parent or...', () => {
-      node.parentNode = {};
+      node.parentNode = new Page();
       outline.defaultDetailForm = undefined;
       expect(menu._buttonEnabled()).toBe(true);
     });
 
     it('is true when current node is a top-level node and outline a default detail-form or...', () => {
       node.parentNode = undefined;
-      outline.defaultDetailForm = {};
+      outline.defaultDetailForm = new Form();
       expect(menu._buttonEnabled()).toBe(true);
     });
 
@@ -91,15 +111,18 @@ describe('NavigateUpButton', () => {
 
     beforeEach(() => {
       outline.selectNodes = node => {
+        // nop
       };
       outline.collapseNode = node => {
+        // nop
       };
-      outline.collapseAll = node => {
+      outline.collapseAll = () => {
+        // nop
       };
     });
 
     it('drills up to parent node, sets the selection on the tree', () => {
-      node.parentNode = {};
+      node.parentNode = new Page();
       spyOn(outline, 'selectNodes');
       spyOn(outline, 'collapseNode');
       menu._drill();
@@ -110,7 +133,6 @@ describe('NavigateUpButton', () => {
 
     it('shows default detail-form or outline overview', () => {
       node.parentNode = undefined;
-      menu.drill;
       spyOn(outline, 'navigateToTop');
       menu._drill();
       expect(outline.navigateToTop).toHaveBeenCalled();

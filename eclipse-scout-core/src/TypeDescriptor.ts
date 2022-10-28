@@ -50,8 +50,7 @@ export default class TypeDescriptor {
   }
 
   resolve(options?: TypeDescriptorOptions): new() => object {
-    // @ts-ignore
-    let namespace = window.scout; // default namespace
+    let namespace = window['scout']; // default namespace
     options = options || {};
 
     if (this.namespaces.length) {

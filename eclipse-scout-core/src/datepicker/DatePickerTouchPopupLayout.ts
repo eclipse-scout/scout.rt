@@ -19,7 +19,6 @@ export default class DatePickerTouchPopupLayout extends TouchPopupLayout {
 
   override layout($container: JQuery) {
     super.layout($container);
-    // @ts-ignore
     this.popup.getDatePicker()._layoutWeekendSeparators();
   }
 }

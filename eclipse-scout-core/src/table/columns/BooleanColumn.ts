@@ -41,7 +41,6 @@ export default class BooleanColumn extends Column<boolean> {
       rowPadding = 0;
 
     if (tableNodeColumn) {
-      // @ts-ignore
       rowPadding = this.table._calcRowLevelPadding(row);
     }
 

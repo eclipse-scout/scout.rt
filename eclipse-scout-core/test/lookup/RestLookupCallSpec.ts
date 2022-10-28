@@ -1,18 +1,30 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RestLookupCall, scout} from '../../src/index';
+import {LookupResult, RestLookupCall, scout} from '../../src/index';
 
 describe('RestLookupCall', () => {
 
-  let session;
+  let session: SandboxSession;
+
+  class SpecRestLookupCall extends RestLookupCall<number> {
+    declare _restriction: Record<string, any>;
+
+    override _call(): JQuery.Promise<LookupResult<number>> {
+      return super._call();
+    }
+
+    override _getRestrictionForAjaxCall(): Record<string, any> {
+      return super._getRestrictionForAjaxCall();
+    }
+  }
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -20,7 +32,7 @@ describe('RestLookupCall', () => {
   });
 
   it('applies custom restriction only to the clone', () => {
-    const lookupCall = scout.create(RestLookupCall, {
+    const lookupCall = scout.create(SpecRestLookupCall, {
       session: session,
       resourceUrl: 'test-api/dummy',
       maxRowCount: 777
@@ -104,7 +116,7 @@ describe('RestLookupCall', () => {
     // 3. Restrictions applied to clones programmatically, e.g. during a 'prepareLookupCall' event.
     // 4. Hard-coded properties that are fundamental to the respective queryBy mode (cannot be overridden).
 
-    const lookupCall = scout.create(RestLookupCall, {
+    let model = {
       session: session,
       resourceUrl: 'test-api/dummy',
       maxRowCount: 777, // will be overwritten
@@ -117,7 +129,8 @@ describe('RestLookupCall', () => {
         myProperty: 'two',
         myDefaultProperty: 'three'
       }
-    });
+    };
+    const lookupCall = scout.create(SpecRestLookupCall, model);
     spyOn(lookupCall, '_call'); // <-- disable the ajax call in this test
 
     const expectedModelRestriction = {
@@ -132,7 +145,7 @@ describe('RestLookupCall', () => {
 
     const cloneAll = lookupCall.cloneForAll();
     expect(cloneAll.restriction).toEqual(expectedModelRestriction);
-    expect(cloneAll._restriction).toBeNull(); // all of the default restriction were already declared in the 'restriction' model object
+    expect(cloneAll._restriction).toBeNull(); // all the default restrictions were already declared in the 'restriction' model object
     cloneAll.addRestriction('myProperty', 'someValue');
     cloneAll.addRestriction('myProperty2', 'someOtherValue');
     cloneAll.execute();
@@ -144,7 +157,7 @@ describe('RestLookupCall', () => {
 
     const cloneText = lookupCall.cloneForText('xyz');
     expect(cloneText.restriction).toEqual(expectedModelRestriction);
-    expect(cloneText._restriction).toBeNull(); // all of the default restriction were already declared in the 'restriction' model object
+    expect(cloneText._restriction).toBeNull(); // all the default restrictions were already declared in the 'restriction' model object
     expect(cloneText.searchText).toBe('xyz'); // not (yet) on the restriction!
     cloneText.addRestriction('myProperty', 'someValue');
     cloneText.addRestriction('myProperty2', 'someOtherValue');
@@ -159,7 +172,7 @@ describe('RestLookupCall', () => {
 
     const cloneRec = lookupCall.cloneForRec(789);
     expect(cloneRec.restriction).toEqual(expectedModelRestriction);
-    expect(cloneRec._restriction).toBeNull(); // all of the default restriction were already declared in the 'restriction' model object
+    expect(cloneRec._restriction).toBeNull(); // all the default restrictions were already declared in the 'restriction' model object
     expect(cloneRec.parentKey).toBe(789); // not (yet) on the restriction!
     cloneRec.addRestriction('myProperty', 'someValue');
     cloneRec.addRestriction('myProperty2', 'someOtherValue');
@@ -208,7 +221,7 @@ describe('RestLookupCall', () => {
   });
 
   it('evaluates function restriction values', () => {
-    const lookupCall = scout.create(RestLookupCall, {
+    const lookupCall = scout.create(SpecRestLookupCall, {
       session: session,
       resourceUrl: 'test-api/dummy',
       restriction: {

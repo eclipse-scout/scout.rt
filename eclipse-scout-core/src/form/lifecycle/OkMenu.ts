@@ -31,7 +31,6 @@ export default class OkMenu extends FormLifecycleMenu {
     let event = new Event();
     this.trigger('action', event);
     if (!event.defaultPrevented) {
-      // noinspection JSIgnoredPromiseFromCall
       form.ok();
     }
   }

@@ -35,7 +35,6 @@ export default class FormFieldAdapter extends ModelAdapter {
 
   protected _syncCurrentMenuTypes(currentMenuTypes: string | string[]) {
     this._currentMenuTypes = arrays.ensure(currentMenuTypes);
-    // @ts-ignore
     this.widget._updateMenus();
   }
 

@@ -13,7 +13,7 @@ import {scout, StringField, WidgetTooltip} from '../../src/index';
 
 describe('WidgetTooltipSpec', () => {
 
-  let session, helper;
+  let session: SandboxSession, helper: FormSpecHelper;
 
   beforeEach(() => {
     jasmine.clock().install();
@@ -22,7 +22,7 @@ describe('WidgetTooltipSpec', () => {
     session = sandboxSession();
     helper = new FormSpecHelper(session);
 
-    // Add class desktop to sandbox, tooltip will be added to closest desktop
+    // Add class desktop to sandbox, tooltip will be added to the closest desktop
     session.$entryPoint.addClass('desktop');
   });
 
@@ -35,7 +35,7 @@ describe('WidgetTooltipSpec', () => {
       parent: session.desktop,
       $anchor: session.desktop.$container,
       content: {
-        objectType: 'StringField',
+        objectType: StringField,
         value: 'Test1'
       },
       cssClass: 'special-tooltip'
@@ -43,25 +43,26 @@ describe('WidgetTooltipSpec', () => {
     tooltip.render();
 
     expect(tooltip.rendered).toBe(true);
-    expect(tooltip.content instanceof StringField).toBe(true);
-    expect(tooltip.content.rendered).toBe(true);
-    expect(tooltip.content.$field.val()).toBe('Test1');
+    let content = tooltip.content as StringField;
+    expect(content instanceof StringField).toBe(true);
+    expect(content.rendered).toBe(true);
+    expect(content.$field.val()).toBe('Test1');
     expect(tooltip.$container).toHaveClass('special-tooltip');
 
     tooltip.remove();
     expect(tooltip.rendered).toBe(false);
-    expect(tooltip.content.rendered).toBe(false);
+    expect(content.rendered).toBe(false);
 
     tooltip.render();
-    tooltip.content.$field.val('Test2');
+    content.$field.val('Test2');
 
     expect(tooltip.rendered).toBe(true);
-    expect(tooltip.content.rendered).toBe(true);
+    expect(content.rendered).toBe(true);
 
     tooltip.destroy();
     expect(tooltip.destroyed).toBe(true);
-    expect(tooltip.content.destroyed).toBe(true);
-    expect(tooltip.content.value).toBe('Test2');
+    expect(content.destroyed).toBe(true);
+    expect(content.value).toBe('Test2');
   });
 
 });

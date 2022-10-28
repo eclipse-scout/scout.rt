@@ -277,15 +277,11 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
   protected _adaptTileGrid(tileGrid: TileGrid) {
     // The table contains the menu items -> pass them to the showContextMenu function of the tileGrid.
     objects.mandatoryFunction(tileGrid, '_showContextMenu');
-    // @ts-ignore
     let origShowContextMenu = tileGrid._showContextMenu;
-    // @ts-ignore
     tileGrid._showContextMenu = options => {
       objects.mandatoryFunction(this.table, '_filterMenusForContextMenu');
-      // @ts-ignore
       options.menuItems = this.table._filterMenusForContextMenu();
       scout.assertProperty(this.table, '_filterMenusHandler');
-      // @ts-ignore
       options.menuFilter = this.table._filterMenusHandler;
       origShowContextMenu.call(tileGrid, options);
     };
@@ -374,7 +370,6 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     });
 
     // use _setProperty to avoid instant rendering, render manually later on (this is necessary since TableHeader depends upon table.$data)
-    // @ts-ignore
     this.table._setProperty('headerVisible', this.tableState.headerVisible);
     if (this.table.tileTableHeader) {
       this.table.tileTableHeader.setVisible(false);
@@ -409,7 +404,6 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     if (this.table.tileMode) {
       // if the table was previously in tileMode this is not necessary...
       if (this.table.$data) {
-        // @ts-ignore
         this.table._removeData();
       }
       this._renderTileTableHeader();
@@ -417,9 +411,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     } else {
       this._removeTileTableHeader();
       this._removeTileAccordion();
-      // @ts-ignore
       this.table._renderData();
-      // @ts-ignore
       this.table._renderTableHeader();
 
       // restore selected state of the aggregationTableControl here since it depends on table.$data
@@ -427,7 +419,6 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
         arrays.find(this.table.tableControls, control => control instanceof AggregateTableControl).setSelected(true);
       }
     }
-    // @ts-ignore
     this.table._refreshMenuBarPosition();
   }
 
@@ -493,7 +484,6 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     if (!this.table.tileMode) {
       return;
     }
-    // @ts-ignore
     this.table._triggerRowClick(event.originalEvent, this.table.rowsMap[event.tile.rowId], event.mouseButton);
   }
 
@@ -508,7 +498,6 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     if (!this.table.tileMode) {
       return;
     }
-    // @ts-ignore
     this.insertTiles(this.table.createTiles(event.rows));
   }
 
@@ -516,7 +505,6 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     if (!this.table.tileMode) {
       return;
     }
-    // @ts-ignore
     this.deleteTiles(this.getTilesForRows(event.rows));
   }
 
@@ -536,7 +524,8 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     this.tileAccordion.setTiles(this.tiles);
   }
 
-  protected _onTableGroup(event?: TableGroupEvent) {
+  /** @internal */
+  _onTableGroup(event?: TableGroupEvent) {
     if (!this.table.tileMode) {
       return;
     }
@@ -556,9 +545,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     if (!this.table.tileMode) {
       return;
     }
-
-    // @ts-ignore
-    this.tileAccordion.removeFilter(event.filter.tileFilter);
+    this.tileAccordion.removeFilter(event.filter['tileFilter']);
   }
 
   protected _addFilter(tableFilter: Filter<TableRow> & { tileFilter?: Filter<Tile> & { table: Table } }) {
@@ -612,7 +599,6 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
   }
 
   protected _syncScrollTopFromTableToTile() {
-    // @ts-ignore
     let rowIndex = this.table._rowIndexAtScrollTop(this.table.scrollTop);
     if (rowIndex <= 0) {
       return;
@@ -643,7 +629,6 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
       let options: ScrollToOptions = {
         align: 'top'
       };
-      // @ts-ignore
       if (!this.table._isDataRendered()) {
         this.table.session.layoutValidator.schedulePostValidateFunction(this.table.scrollTo.bind(this.table, this.table.rowsMap[tile.rowId], options));
       } else {

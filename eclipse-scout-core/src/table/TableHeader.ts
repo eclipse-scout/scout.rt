@@ -493,7 +493,6 @@ export default class TableHeader extends Widget implements TableHeaderModel {
   }
 
   updateMenuBar() {
-    // @ts-ignore
     let menuItems = this.table._filterMenus(this.table.menus, MenuDestinations.HEADER);
     this.menuBar.setHiddenByUi(!this.enabled); // enabledComputed not used on purpose
     this.menuBar.setMenuItems(menuItems);

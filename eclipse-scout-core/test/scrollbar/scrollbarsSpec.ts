@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -12,14 +12,14 @@ import {graphics, NullWidget, scrollbars} from '../../src/index';
 import {_onScrollableVisibleChange, _processDomMutation} from '../../src/scrollbar/scrollbars';
 
 describe('scrollbars', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  function createScrollable() {
+  function createScrollable(): JQuery {
     return $('<div>')
       .css('height', '50px')
       .css('width', '200px')
@@ -27,7 +27,7 @@ describe('scrollbars', () => {
       .appendTo($('#sandbox'));
   }
 
-  function createContent($parent) {
+  function createContent($parent: JQuery): JQuery {
     return $('<div>')
       .text('element')
       .css('height', '100px')
@@ -259,6 +259,7 @@ describe('scrollbars', () => {
       $container.insertAfter($another);
 
       // MutationObserver is sometimes not executed when running headless, even when using setTimeout -> call processing explicitly
+      // @ts-ignore
       _processDomMutation({addedNodes: [$container[0]]});
       expect($scrollShadow[0]).toBe($container.next()[0]);
       expect($scrollShadow.next()[0]).toBeFalsy();

@@ -383,10 +383,10 @@ export function isPromise(value: any): value is PromiseLike<any> {
 }
 
 /**
- * Returns values from the given (map) object. By default only values of 'own' properties are returned.
+ * Returns values from the given (map) object. By default, only values of 'own' properties are returned.
  *
  * @param obj
- * @param [all] can be set to true to return all properties instead of own properties
+ * @param all can be set to true to return all properties instead of own properties
  * @returns an Array with values
  */
 export function values<K extends PropertyKey, V>(obj: Record<K, V>, all?: boolean): V[] {
@@ -659,7 +659,7 @@ export function checkFunctionOverrides(): string[] {
  * @param value text which contains a constant reference like '${const:FormField.LabelPosition.RIGHT}'.
  * @returns the resolved constant value or the unchanged input value if the constant could not be resolved.
  */
-export function resolveConst(value: string, constType: any): any {
+export function resolveConst(value: string, constType?: any): any {
   if (!isString(value)) {
     return value;
   }

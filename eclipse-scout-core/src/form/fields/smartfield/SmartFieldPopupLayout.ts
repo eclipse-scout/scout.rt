@@ -74,7 +74,6 @@ export default class SmartFieldPopupLayout extends PopupLayout {
         this.popup.htmlComp.$comp.addClassForAnimation('animate-open');
         this.popup.htmlComp.$comp.oneAnimationEnd(() => {
           this.animating = false;
-          // @ts-ignore
           this.popup._onAnimationEnd();
         });
       });

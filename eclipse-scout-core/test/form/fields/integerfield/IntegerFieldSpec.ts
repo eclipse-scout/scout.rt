@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -14,7 +14,7 @@ import {IntegerField, ParsingFailedStatus, scout, Status, ValidationFailedStatus
 
 describe('IntegerField', () => {
 
-  let session, helper;
+  let session: SandboxSession, helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -22,8 +22,14 @@ describe('IntegerField', () => {
     helper = new FormSpecHelper(session);
   });
 
+  class SpecIntegerField extends IntegerField {
+    override _parseValue(displayText: string): number {
+      return super._parseValue(displayText);
+    }
+  }
+
   it('_parseValue', () => {
-    let field = scout.create(IntegerField, {
+    let field = scout.create(SpecIntegerField, {
       parent: session.desktop
     });
 
@@ -69,7 +75,7 @@ describe('IntegerField', () => {
     runTest(field, '1234', 12, '1\'234', true);
   });
 
-  function runTest(field, userInput, expectedValue, expectedDisplayText, expectError) {
+  function runTest(field: IntegerField, userInput: string, expectedValue: number, expectedDisplayText: string, expectError?: boolean) {
     expectError = scout.nvl(expectError, false);
     field.$field.val(userInput);
     field.acceptInput();

@@ -1,25 +1,30 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {arrays, Page, PageWithTable, scout, StaticLookupCall} from '../../../../src/index';
+import {arrays, Column, Outline, Page, PageWithTable, scout, SmartColumn, StaticLookupCall, Table, TableRow} from '../../../../src/index';
 import {OutlineSpecHelper} from '../../../../src/testing/index';
 
 describe('PageWithTable', () => {
 
-  let session, helper;
+  let session: SandboxSession;
+  let helper: OutlineSpecHelper;
+  let outline: Outline;
+  let page: SpecPageWithTable;
 
-  /** @type {Outline} */
-  let outline;
-  /** @type {PageWithTable} */
-  let page;
+  class SpecPageWithTable extends PageWithTable {
+    override _loadTableData(searchFilter: any): JQuery.Deferred<any> {
+      return super._loadTableData(searchFilter);
+    }
+  }
+
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -27,10 +32,10 @@ describe('PageWithTable', () => {
     helper = new OutlineSpecHelper(session);
     outline = helper.createOutline();
 
-    page = scout.create(PageWithTable, {
+    page = scout.create(SpecPageWithTable, {
       parent: outline,
       detailTable: {
-        objectType: 'Table'
+        objectType: Table
       }
     });
     outline.insertNodes([page], null);
@@ -73,12 +78,8 @@ describe('PageWithTable', () => {
   });
 
   it('does not fail when cells with null values are inserted into a smart column ', done => {
-    class DummyLookupCall extends StaticLookupCall {
-      constructor() {
-        super();
-      }
-
-      _data() {
+    class DummyLookupCall extends StaticLookupCall<string> {
+      override _data() {
         return [
           ['key0', 'Key 0'],
           ['key1', 'Key 1']
@@ -87,13 +88,13 @@ describe('PageWithTable', () => {
     }
 
     class SamplePageWithTable extends PageWithTable {
-      createChildPage(row) {
+      override createChildPage(row) {
         return scout.create(Page, {
           parent: this.getOutline()
         });
       }
 
-      _loadTableData(searchFilter) {
+      protected override _loadTableData(searchFilter: any): JQuery.Deferred<any> {
         let data = [{
           string: 'string 1',
           smartValue: null
@@ -110,10 +111,10 @@ describe('PageWithTable', () => {
           string: 'string 5',
           smartValue: 'key0'
         }];
-        return $.resolvedPromise(data);
+        return $.resolvedDeferred(data);
       }
 
-      _transformTableDataToTableRows(tableData) {
+      protected override _transformTableDataToTableRows(tableData: any): TableRow[] {
         return tableData
           .map(row => {
             return {
@@ -130,34 +131,34 @@ describe('PageWithTable', () => {
     jasmine.clock().uninstall();
     let lookupCall = new DummyLookupCall();
     lookupCall.init({session: session});
-    page = new SamplePageWithTable();
-    page.init({
+    let samplePage = new SamplePageWithTable();
+    samplePage.init({
       parent: outline,
       detailTable: {
-        objectType: 'Table',
+        objectType: Table,
         columns: [
           {
             id: 'StringColumn',
-            objectType: 'Column',
+            objectType: Column,
             sortActive: true,
             sortIndex: 0
           },
           {
             id: 'SmartColumn',
-            objectType: 'SmartColumn',
+            objectType: SmartColumn,
             lookupCall: lookupCall
           }
         ]
       }
     });
-    outline.insertNode(page);
-    outline.selectNode(page);
-    page.detailTable.when('propertyChange:loading').then(event => {
+    outline.insertNode(samplePage);
+    outline.selectNode(samplePage);
+    samplePage.detailTable.when('propertyChange:loading').then(event => {
       // Loading is set to true when update buffer finishes
-      expect(page.detailTable.rows[0].cells[0].text).toEqual('string 1');
-      expect(page.detailTable.rows[0].cells[1].text).toEqual('');
-      expect(page.detailTable.rows[2].cells[0].text).toEqual('string 3');
-      expect(page.detailTable.rows[2].cells[1].text).toEqual('Key 0');
+      expect(samplePage.detailTable.rows[0].cells[0].text).toEqual('string 1');
+      expect(samplePage.detailTable.rows[0].cells[1].text).toEqual('');
+      expect(samplePage.detailTable.rows[2].cells[0].text).toEqual('string 3');
+      expect(samplePage.detailTable.rows[2].cells[1].text).toEqual('Key 0');
       done();
     })
       .catch(fail);

@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -12,19 +12,19 @@ import {Code, codes, CodeType} from '../../src/index';
 
 describe('codes', () => {
 
-  let CODE_TYPE = 12345;
+  let CODE_TYPE = '12345';
   let CODE = 12346;
 
   // Some dummy data used to make the tests below work
   beforeEach(() => {
     codes.init({
       12345: {
-        id: 12345,
-        objectType: 'CodeType',
+        id: '12345',
+        objectType: CodeType,
         codes: [
           {
             id: 12346,
-            objectType: 'Code',
+            objectType: Code,
             texts: {
               'de': 'Foo-de',
               'en': 'Foo-en'
@@ -86,10 +86,10 @@ describe('codes', () => {
     it('adds a code type or an array of code types', () => {
       let codeType = {
         id: 'codeType.123',
-        objectType: 'CodeType',
+        objectType: CodeType,
         codes: [{
           id: 'code.123',
-          objectType: 'Code',
+          objectType: Code,
           text: 'a text'
         }]
       };

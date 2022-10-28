@@ -15,7 +15,7 @@ import LocaleModel from '../session/LocaleModel';
 let localesMap = {};
 
 export function bootstrap(url: string): JQuery.Promise<void> {
-  let promise = url ? $.ajaxJson(url) : $.resolvedPromise([]);
+  let promise: JQuery.PromiseBase<any, any, any, any, any, any, any, any, any, any, any, any> = url ? $.ajaxJson(url) : $.resolvedPromise([]);
   return promise.then(_preInit.bind(this, url));
 }
 
@@ -75,8 +75,7 @@ export function get(languageTag: string): Locale {
 }
 
 export function getNavigatorLanguage(): string {
-  // @ts-ignore
-  return navigator.language || navigator.userLanguage;
+  return navigator.language || navigator['userLanguage'];
 }
 
 /**

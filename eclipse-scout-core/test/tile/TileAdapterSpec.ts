@@ -1,17 +1,21 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, Tile} from '../../src/index';
+import {scout, Tile, TileGrid, TileGridModel} from '../../src/index';
+import {Optional} from '../../src/types';
+import {AdapterData} from '../../src/session/Session';
+import TileModel from '../../src/tile/TileModel';
+import {ObjectType} from '../../src/ObjectFactory';
 
 describe('TileGridAdapter', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -26,23 +30,23 @@ describe('TileGridAdapter', () => {
     jasmine.clock().uninstall();
   });
 
-  function createTileGrid(model) {
+  function createTileGrid(model?: Optional<TileGridModel, 'parent'>): TileGrid {
     let defaults = {
       parent: session.desktop,
       session: session,
       objectType: 'TileGrid'
     };
-    model = $.extend({}, defaults, model);
-    let tileGridAdapter = session.createModelAdapter(model);
-    return tileGridAdapter.createWidget(model, model.parent);
+    let m = $.extend({}, defaults, model) as TileGridModel & {objectType: ObjectType<TileGrid>};
+    let tileGridAdapter = session.createModelAdapter(m as AdapterData);
+    return tileGridAdapter.createWidget(m, m.parent) as TileGrid;
   }
 
-  function createTile(model) {
+  function createTile(model?: Optional<TileModel, 'parent'>): Tile {
     let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    let tile = scout.create(Tile, model);
+    let tile = scout.create(Tile, model as TileModel);
     linkWidgetAndAdapter(tile, 'TileAdapter');
     return tile;
   }

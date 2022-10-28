@@ -10,7 +10,7 @@
  */
 import {Popup, ValueFieldModel} from '../../../index';
 
-export default interface DateFieldModel extends ValueFieldModel<Date> {
+export default interface DateFieldModel extends ValueFieldModel<Date, Date | string> {
   popup?: Popup;
   touchMode?: boolean;
   /**

@@ -15,7 +15,7 @@ import {
 import $ from 'jquery';
 import {CollapseHandleHorizontalAlignment} from '../../../collapsehandle/CollapseHandle';
 
-export default class SplitBox extends CompositeField implements SplitBoxModel {
+export default class SplitBox extends CompositeField {
   declare model: SplitBoxModel;
   declare eventMap: SplitBoxEventMap;
 
@@ -34,15 +34,14 @@ export default class SplitBox extends CompositeField implements SplitBoxModel {
   fieldMinimized: boolean;
   minimizeEnabled: boolean;
   htmlSplitArea: HtmlComponent;
+  collapseHandle: CollapseHandle;
 
   protected _oldSplitterPositionType: string;
-  protected _collapseHandle: CollapseHandle;
   protected _$splitArea: JQuery;
   protected _$splitter: JQuery;
   protected _$window: JQuery<Window>;
   protected _$body: JQuery<Body>;
 
-  // noinspection DuplicatedCode
   constructor() {
     super();
     this._addWidgetProperties(['firstField', 'secondField', 'collapsibleField']);
@@ -73,12 +72,9 @@ export default class SplitBox extends CompositeField implements SplitBoxModel {
 
   protected override _init(model: SplitBoxModel) {
     super._init(model);
-    // @ts-ignore
-    this._setToggleCollapseKeyStroke(this.toggleCollapseKeyStroke);
-    // @ts-ignore
-    this._setFirstCollapseKeyStroke(this.firstCollapseKeyStroke);
-    // @ts-ignore
-    this._setSecondCollapseKeyStroke(this.secondCollapseKeyStroke);
+    this._setToggleCollapseKeyStroke(model.toggleCollapseKeyStroke);
+    this._setFirstCollapseKeyStroke(model.firstCollapseKeyStroke);
+    this._setSecondCollapseKeyStroke(model.secondCollapseKeyStroke);
     this._updateCollapseHandle();
     this._initResponsive();
   }
@@ -436,13 +432,13 @@ export default class SplitBox extends CompositeField implements SplitBoxModel {
         horizontalAlignment = CollapseHandle.HorizontalAlignment.RIGHT;
       }
 
-      if (!this._collapseHandle) {
+      if (!this.collapseHandle) {
         // create new collapse handle
-        this._collapseHandle = scout.create(CollapseHandle, {
+        this.collapseHandle = scout.create(CollapseHandle, {
           parent: this,
           horizontalAlignment: horizontalAlignment
         });
-        this._collapseHandle.on('action', this.collapseHandleButtonPressed.bind(this));
+        this.collapseHandle.on('action', this.collapseHandleButtonPressed.bind(this));
         if (this.toggleCollapseKeyStroke) {
           this.registerKeyStrokes(this.toggleCollapseKeyStroke);
         }
@@ -457,20 +453,20 @@ export default class SplitBox extends CompositeField implements SplitBoxModel {
         }
       } else {
         // update existing collapse handle
-        this._collapseHandle.setHorizontalAlignment(horizontalAlignment);
+        this.collapseHandle.setHorizontalAlignment(horizontalAlignment);
       }
 
       this._updateCollapseHandleButtons();
     } else {
-      if (this._collapseHandle) {
-        this._collapseHandle.destroy();
-        this._collapseHandle = null;
+      if (this.collapseHandle) {
+        this.collapseHandle.destroy();
+        this.collapseHandle = null;
       }
     }
   }
 
   protected _updateCollapseHandleButtons() {
-    if (!this._collapseHandle) {
+    if (!this.collapseHandle) {
       return;
     }
     let leftVisible: boolean, rightVisible: boolean,
@@ -498,8 +494,8 @@ export default class SplitBox extends CompositeField implements SplitBoxModel {
       }
     }
 
-    this._collapseHandle.setLeftVisible(leftVisible);
-    this._collapseHandle.setRightVisible(rightVisible);
+    this.collapseHandle.setLeftVisible(leftVisible);
+    this.collapseHandle.setRightVisible(rightVisible);
 
     // update allowed keystrokes
     if (this.firstCollapseKeyStroke) {
@@ -606,7 +602,7 @@ export default class SplitBox extends CompositeField implements SplitBoxModel {
         this.unregisterKeyStrokes(this.toggleCollapseKeyStroke);
       }
       this.toggleCollapseKeyStroke = new SplitBoxCollapseKeyStroke(this, keyStroke);
-      if (this._collapseHandle) {
+      if (this.collapseHandle) {
         this.registerKeyStrokes(this.toggleCollapseKeyStroke);
       }
     }
@@ -618,7 +614,7 @@ export default class SplitBox extends CompositeField implements SplitBoxModel {
         this.unregisterKeyStrokes(this.firstCollapseKeyStroke);
       }
       this.firstCollapseKeyStroke = new SplitBoxFirstCollapseKeyStroke(this, keyStroke);
-      if (this._collapseHandle) {
+      if (this.collapseHandle) {
         this.registerKeyStrokes(this.firstCollapseKeyStroke);
       }
     }
@@ -630,15 +626,15 @@ export default class SplitBox extends CompositeField implements SplitBoxModel {
         this.unregisterKeyStrokes(this.secondCollapseKeyStroke);
       }
       this.secondCollapseKeyStroke = new SplitBoxSecondCollapseKeyStroke(this, keyStroke);
-      if (this._collapseHandle) {
+      if (this.collapseHandle) {
         this.registerKeyStrokes(this.secondCollapseKeyStroke);
       }
     }
   }
 
   protected _renderCollapseHandle() {
-    if (this._collapseHandle) {
-      this._collapseHandle.render();
+    if (this.collapseHandle) {
+      this.collapseHandle.render();
     }
   }
 

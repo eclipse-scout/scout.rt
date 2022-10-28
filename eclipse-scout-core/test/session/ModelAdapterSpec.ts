@@ -1,21 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper} from '../../src/testing/index';
-import {ModelAdapter, ObjectFactory, RemoteEvent, scout} from '../../src/index';
+import {Button, GroupBox, ModelAdapter, RemoteEvent, scout, Widget, WidgetModel} from '../../src/index';
+import {RemoteResponse} from '../../src/session/Session';
 
 describe('ModelAdapter', () => {
 
-  let session, $sandbox, myObjectFactory, helper,
-    model = {},
-    originalObjectFactory = ObjectFactory.get();
+  let session: SandboxSession, $sandbox: JQuery, helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -26,48 +25,50 @@ describe('ModelAdapter', () => {
     uninstallUnloadHandlers(session);
     $sandbox = $('#sandbox');
 
-    // Create a private object factory used for these tests
-    myObjectFactory = new ObjectFactory();
-    myObjectFactory.register('Generic', () => {
-      return new ModelAdapter();
-    });
-    myObjectFactory.register('HasChildAdapter', () => {
-      let adapter = new ModelAdapter();
-      adapter._addWidgetProperties('childAdapter');
-      return adapter;
-    });
-    myObjectFactory.register('HasChildAdapters', () => {
-      let adapter = new ModelAdapter();
-      adapter._addWidgetProperties('childAdapters');
-      return adapter;
-    });
-    ObjectFactory._set(myObjectFactory);
+    // // Create a private object factory used for these tests
+    // myObjectFactory = new ObjectFactory();
+    // myObjectFactory.register('Generic', () => {
+    //   return new ModelAdapter();
+    // });
+    // myObjectFactory.register('HasChildAdapter', () => {
+    //   let adapter = new ModelAdapter();
+    //   adapter._addWidgetProperties('childAdapter');
+    //   return adapter;
+    // });
+    // myObjectFactory.register('HasChildAdapters', () => {
+    //   let adapter = new ModelAdapter();
+    //   adapter._addWidgetProperties('childAdapters');
+    //   return adapter;
+    // });
+    // // @ts-ignore
+    // ObjectFactory._set(myObjectFactory);
   });
 
   afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
-    ObjectFactory._set(originalObjectFactory);
+    // // @ts-ignore
+    // ObjectFactory._set(originalObjectFactory);
   });
 
   /**
    * Creates a model and stores it as adapterData in the session.
    */
-  function createModel(model) {
+  function createModel(model?: Omit<WidgetModel, 'parent'>): WidgetModel {
     model = scout.nvl(model, {});
     if (!model.objectType) {
       model.objectType = 'NullWidget';
     }
-    model = $.extend(createSimpleModel(model.objectType, session), model);
-    registerAdapterData(model, session);
-    return model;
+    let m = $.extend(createSimpleModel(model.objectType, session), model) as WidgetModel;
+    registerAdapterData(m, session);
+    return m;
   }
 
   /**
    * Creates widget and remote-adapter.
    */
-  function createWidget(model) {
+  function createWidget(model?: Omit<WidgetModel, 'parent'>): Widget {
     model = createModel(model);
     return session.getOrCreateWidget(model.id, session.desktop);
   }
@@ -75,14 +76,14 @@ describe('ModelAdapter', () => {
   it('can handle properties in any order', () => {
     let widget = createWidget({id: '2'});
 
-    // Send a dummy event to this object which contains both a new object and a id-only ref to that new object
+    // Send a dummy event to this object which contains both a new object and an id-only ref to that new object
     let event = new RemoteEvent('2', 'property', {
       properties: {
         x1: 'val1',
         x2: 'val2',
         o1: {
           id: '3',
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           visible: true
         },
         o2: {
@@ -92,12 +93,14 @@ describe('ModelAdapter', () => {
     });
     session._processEvents([event]);
 
-    expect(widget.x1).toBe('val1');
-    expect(widget.x2).toBe('val2');
-    expect(widget.o1).toBeDefined();
-    expect(widget.o1.id).toBe('3');
-    expect(widget.o2).toBeDefined();
-    expect(widget.o2.id).toBe('3');
+    expect(widget['x1']).toBe('val1');
+    expect(widget['x2']).toBe('val2');
+    let o1 = widget['o1'];
+    expect(o1).toBeDefined();
+    expect(o1.id).toBe('3');
+    let o2 = widget['o2'];
+    expect(o2).toBeDefined();
+    expect(o2.id).toBe('3');
 
     // Now send a second event, but now send the id-only ref first (in o1).
     event = new RemoteEvent('2', 'property', {
@@ -109,27 +112,29 @@ describe('ModelAdapter', () => {
         },
         o2: {
           id: '4',
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           visible: false
         }
       }
     });
     session._processEvents([event]);
 
-    expect(widget.x1).toBe('val10');
-    expect(widget.x2).toBe('val20');
-    expect(widget.o1).toBeDefined();
-    expect(widget.o1.id).toBe('4');
-    expect(widget.o2).toBeDefined();
-    expect(widget.o2.id).toBe('4');
+    expect(widget['x1']).toBe('val10');
+    expect(widget['x2']).toBe('val20');
+    o1 = widget['o1'];
+    expect(o1).toBeDefined();
+    expect(o1.id).toBe('4');
+    o2 = widget['o2'];
+    expect(o2).toBeDefined();
+    expect(o2.id).toBe('4');
   });
 
   it('_syncPropertiesOnPropertyChange calls set* methods or setProperty method', () => {
     let widget = createWidget({
       foo: 1,
       bar: 2
-    });
-    widget.setFoo = function(value) {
+    }) as WidgetModel & { setFoo?(value): void };
+    widget['setFoo'] = function(value) {
       this.foo = value;
     };
     let newValues = {
@@ -150,7 +155,7 @@ describe('ModelAdapter', () => {
 
     it('copies properties to widget', () => {
       let widget = createWidget({foo: 6});
-      expect(widget.foo).toBe(6);
+      expect(widget['foo']).toBe(6);
     });
 
     it('sets default values', () => {
@@ -340,14 +345,14 @@ describe('ModelAdapter', () => {
         let adapter = new ModelAdapter();
 
         // regular top-level classes (.)
-        let model = {modelClass: 'com.bsiag.sandbox.FooField'};
+        let model = {modelClass: 'com.bsiag.sandbox.FooField', objectType: ''};
         adapter.exportAdapterData(model);
-        expect(model.id).toBe('FooField');
+        expect(model['id']).toBe('FooField');
 
         // inner classes ($)
-        model = {modelClass: 'com.bsiag.sandbox.FooBox$BarField'};
+        model = {modelClass: 'com.bsiag.sandbox.FooBox$BarField', objectType: ''};
         adapter.exportAdapterData(model);
-        expect(model.id).toBe('BarField');
+        expect(model['id']).toBe('BarField');
       });
 
     });
@@ -370,7 +375,7 @@ describe('ModelAdapter', () => {
       });
 
       it('destroys the old adapters', () => {
-        let message = {
+        let message: RemoteResponse = {
           adapterData: mapAdapterData([childModel, childModel2]),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: [childModel.id, childModel2.id]

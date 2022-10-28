@@ -10,6 +10,7 @@
  */
 import {AccordionModel, Filter, FilterSupport, TextFilter, Tile, TileAccordionSelectionHandler, TileGridLayoutConfig} from '../../index';
 import {Comparator} from '../../types';
+import {LogicalGridLayoutConfigModel} from '../../layout/logicalgrid/LogicalGridLayoutConfig';
 
 export default interface TileAccordionModel extends AccordionModel {
   /** @see TileGridModel.gridColumnCount */
@@ -24,7 +25,7 @@ export default interface TileAccordionModel extends AccordionModel {
   /** @see TileGridModel.filters */
   filters?: Filter<Tile>[];
   /** @see TileGridModel.layoutConfig */
-  tileGridLayoutConfig?: TileGridLayoutConfig;
+  tileGridLayoutConfig?: TileGridLayoutConfig | LogicalGridLayoutConfigModel;
   tileGridSelectionHandler?: TileAccordionSelectionHandler;
   /** @see TileGridModel.withPlaceholders */
   withPlaceholders?: boolean;

@@ -63,7 +63,6 @@ export default class TileGridLayout extends LogicalGridLayout {
     // Try to layout only as much as needed while scrolling in virtual mode
     // Scroll top may be dirty when layout is validated before scrolling to a specific tile (see tileGrid.scrollTo)
     if (!scout.nvl(scrollTopDirty, false)) {
-      // @ts-ignore
       tileGrid._renderViewPort();
     }
     this._layout(tileGrid.$container);
@@ -115,13 +114,11 @@ export default class TileGridLayout extends LogicalGridLayout {
     }
 
     if (!htmlComp.layouted) {
-      // @ts-ignore
       this.widget._renderScrollTop();
     }
     if (this.widget.virtual && (!htmlComp.layouted || this._sizeChanged(htmlComp) || this.widget.withPlaceholders)) {
       // When changing size of the container, more or less tiles might be shown and some tiles might even change rows due to a new gridColumnCount -> ensure correct tiles are rendered in the range
       this.widget.setViewRangeSize(this.widget.calculateViewRangeSize(), false);
-      // @ts-ignore
       let newTiles = this.widget._renderTileDelta();
       // Make sure newly rendered tiles are animated (if enabled) and layouted as well
       this._storeBounds(newTiles);

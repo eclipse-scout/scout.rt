@@ -31,7 +31,6 @@ export default class SaveMenu extends FormLifecycleMenu {
     let event = new Event();
     this.trigger('action', event);
     if (!event.defaultPrevented) {
-      // noinspection JSIgnoredPromiseFromCall
       form.save();
     }
   }

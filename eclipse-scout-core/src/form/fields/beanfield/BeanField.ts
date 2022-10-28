@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -43,7 +43,7 @@ export default class BeanField<TValue extends object> extends ValueField<TValue>
   protected override _formatValue(value: TValue): string {
     // The value cannot be changed by the user, therefore we always return the initial displayText property.
     //
-    // Strange things happen, if an other value is returned... Example:
+    // Strange things happen, if another value is returned... Example:
     // 1. The value is set asynchronously on the field using setValue().
     // 2. This causes the display text to be updated (using _formatValue).
     // 3. When acceptInput() is called (via aboutToBlurByMouseDown), the "current" displayText

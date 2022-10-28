@@ -63,7 +63,6 @@ export default class MessageBoxController {
   protected _render(messageBox: MessageBox) {
     // missing displayParent (when render is called by reload), use displayParent of MessageBoxController
     if (!messageBox.displayParent) {
-      // @ts-ignore
       messageBox._setProperty('displayParent', this.displayParent);
     }
     // Use parent's function or (if not implemented) our own.

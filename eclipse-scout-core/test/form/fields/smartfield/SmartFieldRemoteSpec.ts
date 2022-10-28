@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -17,7 +17,7 @@ describe('SmartFieldRemote', () => {
 
   // This spec contains test that use the SmartFieldAdapter (= remote case)
 
-  let session, helper;
+  let session: SandboxSession, helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -34,8 +34,8 @@ describe('SmartFieldRemote', () => {
     removePopups(session, '.touch-popup');
   });
 
-  function createSmartFieldWithAdapter() {
-    let model = helper.createFieldModel('SmartField');
+  function createSmartFieldWithAdapter(): SmartField<any> {
+    let model = helper.createFieldModel(SmartField);
     let smartField = new SmartField();
     smartField.init(model);
     linkWidgetAndAdapter(smartField, 'SmartFieldAdapter');
@@ -43,7 +43,7 @@ describe('SmartFieldRemote', () => {
   }
 
   describe('openPopup', () => {
-    let smartField;
+    let smartField: SmartField<any>;
 
     beforeEach(() => {
       smartField = createSmartFieldWithAdapter();
@@ -134,8 +134,10 @@ describe('SmartFieldRemote', () => {
       smartField.$field.val('foo');
       smartField.popup = scout.create(SmartFieldPopup, {
         parent: smartField,
+        field: smartField,
         lookupResult: {
           seqNo: 0, // must match smartField.lookupSeqNo
+          queryBy: QueryBy.ALL,
           lookupRows: [lookupRow]
         }
       });

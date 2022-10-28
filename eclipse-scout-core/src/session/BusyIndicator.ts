@@ -83,7 +83,7 @@ export default class BusyIndicator extends Widget implements BusyIndicatorModel 
     }
   }
 
-  override render($parent: JQuery) {
+  override render($parent?: JQuery) {
     // Use entry point by default
     $parent = $parent || this.entryPoint();
     super.render($parent);

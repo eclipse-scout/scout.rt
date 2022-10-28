@@ -73,8 +73,7 @@ export default class PlannerAdapter extends ModelAdapter {
   }
 
   protected _onResourcesDeleted(resourceIds: string[]) {
-    // @ts-ignore
-    let resources = this.widget._resourcesByIds(resourceIds);
+    let resources = this.widget.resourcesByIds(resourceIds);
     this.addFilterForWidgetEventType('resourcesSelected');
     this.addFilterForProperties({
       selectionRange: new DateRange()
@@ -91,8 +90,7 @@ export default class PlannerAdapter extends ModelAdapter {
   }
 
   protected _onResourcesSelected(resourceIds: string[]) {
-    // @ts-ignore
-    let resources = this.widget._resourcesByIds(resourceIds);
+    let resources = this.widget.resourcesByIds(resourceIds);
     this.addFilterForWidgetEventType('resourcesSelected');
     this.widget.selectResources(resources);
   }

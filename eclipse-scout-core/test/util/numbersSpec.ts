@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -19,8 +19,10 @@ describe('scout.numbers', () => {
   describe('round', () => {
 
     it('tests special cases', () => {
+      // @ts-ignore
       expect(numbers.round(undefined, 0)).toBe(undefined);
       expect(numbers.round(undefined)).toBe(undefined);
+      // @ts-ignore
       expect(numbers.round(undefined, 0, 0)).toBe(undefined);
       expect(numbers.round(undefined, undefined, 0)).toBe(undefined);
 
@@ -178,9 +180,13 @@ describe('scout.numbers', () => {
   describe('shiftDecimalPoint', () => {
 
     it('can shift decimal point to left and right', () => {
+      // @ts-ignore
       expect(numbers.shiftDecimalPoint()).toBe(undefined);
+      // @ts-ignore
       expect(numbers.shiftDecimalPoint(null)).toBe(null);
+      // @ts-ignore
       expect(numbers.shiftDecimalPoint('')).toBe('');
+      // @ts-ignore
       expect(numbers.shiftDecimalPoint(1234500)).toBe(1234500);
       expect(numbers.shiftDecimalPoint(1234500, 0)).toBe(1234500);
       expect(numbers.shiftDecimalPoint(0.1234500, 0)).toBe(0.1234500);

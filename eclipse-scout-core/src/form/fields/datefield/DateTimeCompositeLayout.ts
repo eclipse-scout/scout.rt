@@ -53,9 +53,7 @@ export default class DateTimeCompositeLayout extends AbstractLayout {
       $timeFieldIcon = this._dateField.$timeFieldIcon,
       $dateClearIcon = this._dateField.$dateClearIcon,
       $timeClearIcon = this._dateField.$timeClearIcon,
-      // @ts-ignore
       $predictDateField = this._dateField._$predictDateField,
-      // @ts-ignore
       $predictTimeField = this._dateField._$predictTimeField,
       htmlDateField = ($dateField ? HtmlComponent.get($dateField) : null),
       htmlTimeField = ($timeField ? HtmlComponent.get($timeField) : null),

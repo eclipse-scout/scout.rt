@@ -9,10 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
-import {arrays, BusyIndicator, Desktop, DesktopNotification, Device, FileChooser, Form, FormMenu, MessageBox, MessageBoxes, RemoteEvent, scout, Status, strings, UnsavedFormChangesForm, Widget, WidgetPopup} from '../../src/index';
+import {
+  arrays, BusyIndicator, Button, Desktop, DesktopNotification, DesktopTab, Device, Event, FileChooser, Form, FormMenu, GroupBox, ListBox, MessageBox, MessageBoxes, Outline, RemoteEvent, scout, Status, StringField, strings,
+  UnsavedFormChangesForm, Widget, WidgetPopup, WrappedFormField
+} from '../../src/index';
 
 describe('Desktop', () => {
-  let session, desktop, outlineHelper, formHelper;
+  let session: SandboxSession, desktop: Desktop, outlineHelper: OutlineSpecHelper, formHelper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -31,8 +34,7 @@ describe('Desktop', () => {
   });
 
   describe('notification', () => {
-    let ntfc,
-      parent = new Widget();
+    let ntfc: DesktopNotification, parent = new Widget();
 
     beforeEach(() => {
       parent.session = session;
@@ -59,7 +61,7 @@ describe('Desktop', () => {
       expect(ntfc.fadeIn).toHaveBeenCalled();
       expect(desktop.notifications.indexOf(ntfc)).toBe(0);
       expect(desktop.$container.find('.desktop-notifications').length).toBe(1);
-      expect(desktop.$notification).not.toBe(null);
+      expect(desktop.$notifications).not.toBe(null);
     });
 
     it('schedules addNotification when desktop is not rendered', () => {
@@ -101,7 +103,9 @@ describe('Desktop', () => {
       desktop.addNotification(ntfc); // first add -> create $notifications DIV
       desktop.removeNotification(ntfc);
       expect(desktop.notifications.length).toBe(0);
-      desktop._onNotificationRemove(ntfc); // this method is usually called after fade-out animation asynchronously
+      let event = new Event<DesktopNotification>();
+      event.source = ntfc;
+      desktop._onNotificationRemove(event); // this method is usually called after fade-out animation asynchronously
       expect(desktop.$container.find('.desktop-notifications').length).toBe(0);
       expect(desktop.$notifications).toBe(null);
     });
@@ -131,7 +135,7 @@ describe('Desktop', () => {
       let outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
 
       desktop.setOutline(outline1);
-      desktop.bringOutlineToFront(outline1);
+      desktop.bringOutlineToFront();
       expect(desktop.outline).toBe(outline1);
       expect(outline1.rendered).toBe(true);
 
@@ -147,7 +151,7 @@ describe('Desktop', () => {
 
       // switch the outline
       desktop.setOutline(outline2);
-      desktop.bringOutlineToFront(outline2);
+      desktop.bringOutlineToFront();
       expect(desktop.outline).toBe(outline2);
       expect(outline1.rendered).toBe(false);
       expect(outline2.rendered).toBe(true);
@@ -155,12 +159,12 @@ describe('Desktop', () => {
 
       // switch back to the outline with the modal form
       desktop.setOutline(outline1);
-      desktop.bringOutlineToFront(outline1);
+      desktop.bringOutlineToFront();
       expect(desktop.outline).toBe(outline1);
       expect(outline1.rendered).toBe(true);
       expect(outline2.rendered).toBe(false);
 
-      // and check that the form is propertly rendered
+      // and check that the form is properly rendered
       expect(form.rendered).toBe(true);
     });
 
@@ -209,7 +213,7 @@ describe('Desktop', () => {
       expect(form.parent).toBe(tabBox);
 
       // trigger actual remove
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       desktop.bench.removalPending = false;
       desktop.bench._removeInternal();
       expect(desktop.bench).toBeFalsy();
@@ -416,16 +420,16 @@ describe('Desktop', () => {
           headerVisible: true,
           benchVisible: true,
           outline: {
-            objectType: 'Outline',
+            objectType: Outline,
             modelClass: 'a.cbdke',
             title: 'Title',
             id: '123',
             dialogs: [{
-              objectType: 'Form',
+              objectType: Form,
               displayHint: Form.DisplayHint.DIALOG,
               modal: true,
               rootGroupBox: {
-                objectType: 'GroupBox'
+                objectType: GroupBox
               }
             }]
           }
@@ -458,12 +462,12 @@ describe('Desktop', () => {
           headerVisible: true,
           benchVisible: true,
           outline: {
-            objectType: 'Outline',
+            objectType: Outline,
             modelClass: 'a.cbdke',
             title: 'Title',
             id: '123',
             messageBoxes: [{
-              objectType: 'MessageBox'
+              objectType: MessageBox
             }]
           }
         }
@@ -495,12 +499,12 @@ describe('Desktop', () => {
           headerVisible: true,
           benchVisible: true,
           outline: {
-            objectType: 'Outline',
+            objectType: Outline,
             modelClass: 'a.cbdke',
             title: 'Title',
             id: '123',
             fileChoosers: [{
-              objectType: 'FileChooser'
+              objectType: FileChooser
             }]
           }
         }
@@ -572,21 +576,19 @@ describe('Desktop', () => {
 
   describe('geolocation', () => {
 
-    let browserImpl;
-    if (!navigator.geolocation) {
-      navigator.geolocation = {
-        getCurrentPosition: () => {
-        }
-      };
-    }
-    browserImpl = navigator.geolocation.getCurrentPosition;
-
+    let browserImpl = navigator.geolocation.getCurrentPosition;
     beforeEach(() => {
       navigator.geolocation.getCurrentPosition = (success, error) => {
         success({
+          timestamp: 0,
           coords: {
+            accuracy: 0,
+            altitude: 0,
+            altitudeAccuracy: 0,
+            heading: 0,
             latitude: 1,
-            longitude: 1
+            longitude: 1,
+            speed: 0
           }
         });
       };
@@ -1442,9 +1444,9 @@ describe('Desktop', () => {
         form.close();
         desktop.showForm(form2);
         expect(desktop.bench.removalPending).toBe(true);
-        jasmine.clock().tick();
+        jasmine.clock().tick(0);
         desktop.bench.$container.trigger('animationend');
-        jasmine.clock().tick();
+        jasmine.clock().tick(0);
         expect(form2.rendered).toBe(true);
         expect(desktop.navigationVisible).toBe(false);
         expect(desktop.benchVisible).toBe(true);
@@ -1643,7 +1645,9 @@ describe('Desktop', () => {
       promises.push(view2.whenClose());
       promises.push(view3.whenClose());
 
-      desktop.bench.getViewTab(modalView)._onCloseOther();
+      let desktopTab = desktop.bench.getViewTab(modalView) as DesktopTab;
+      // @ts-ignore
+      desktopTab._onCloseOther();
 
       $.promiseAll(promises).then(() => {
         expect(view1.close).not.toHaveBeenCalled();
@@ -1665,9 +1669,9 @@ describe('Desktop', () => {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
-      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
         // default is all selected, view2 should be saved
@@ -1690,7 +1694,7 @@ describe('Desktop', () => {
 
       desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
       unsavedFormChangesForm.whenPostLoad().then(() => {
         unsavedFormChangesForm.close();
@@ -1712,9 +1716,9 @@ describe('Desktop', () => {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
-      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
         expect(openFormsField.value.length).toBe(1);
@@ -1775,9 +1779,9 @@ describe('Desktop', () => {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
-      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
         // default is all selected, view2 should be saved
@@ -1806,7 +1810,8 @@ describe('Desktop', () => {
       desktop.showForm(modalDialog);
       expect(modalDialog.rendered).toBe(true);
 
-      modalDialog.rootGroupBox.fields[0].setValue('Foo');
+      let field = modalDialog.rootGroupBox.fields[0] as StringField;
+      field.setValue('Foo');
 
       promises.push(view1.whenClose());
       promises.push(view2.whenClose());
@@ -1818,9 +1823,9 @@ describe('Desktop', () => {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
-      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
         expect(openFormsField.value.length).toBe(1);
@@ -1885,19 +1890,19 @@ describe('Desktop', () => {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
-      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
         unsavedFormChangesForm.ok();
-        jasmine.clock().tick();
+        jasmine.clock().tick(0);
         // validation message should be displayed since view2 is in invalid state
         expect(session.$entryPoint.find('.messagebox').length).toBe(1);
         desktop.messageBoxes[0].yesButton.doAction();
-        jasmine.clock().tick();
+        jasmine.clock().tick(0);
         // untick all entries to not save the unsaved changes
         openFormsField.setValue(null);
         unsavedFormChangesForm.ok();
@@ -1927,31 +1932,32 @@ describe('Desktop', () => {
       spyOn(modalDialog, 'close').and.callThrough();
       spyOn(modalDialog, 'ok').and.callThrough();
 
-      modalDialog.rootGroupBox.fields[0].setValidator(value => {
+      let field = modalDialog.rootGroupBox.fields[0] as StringField;
+      field.setValidator(value => {
         if (strings.equalsIgnoreCase(value, 'Foo')) {
           throw new Error('Validation failed');
         }
         return value;
       });
-      modalDialog.rootGroupBox.fields[0].touch();
-      modalDialog.rootGroupBox.fields[0].setValue('Foo');
+      field.touch();
+      field.setValue('Foo');
 
       jasmine.clock().install();
       desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
-      let unsavedFormChangesForm = arrays.last(desktop.children);
+      let unsavedFormChangesForm = arrays.last(desktop.children) as UnsavedFormChangesForm;
       expect(unsavedFormChangesForm instanceof UnsavedFormChangesForm).toBe(true);
-      let openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
+      let openFormsField = (unsavedFormChangesForm.rootGroupBox.fields[0] as GroupBox).fields[0] as ListBox<Form>;
       expect(openFormsField.id).toBe('OpenFormsField');
       openFormsField.when('lookupCallDone').then(() => {
         expect(openFormsField.value.length).toBe(1);
         expect(openFormsField.value[0]).toEqual(view2);
         unsavedFormChangesForm.ok();
-        jasmine.clock().tick();
+        jasmine.clock().tick(0);
         // validation message should be displayed since view2 is in invalid state
         expect(session.$entryPoint.find('.messagebox').length).toBe(1);
         desktop.messageBoxes[0].yesButton.doAction();
-        jasmine.clock().tick();
+        jasmine.clock().tick(0);
         // untick all entries to not save the unsaved changes
         openFormsField.setValue(null);
         unsavedFormChangesForm.ok();
@@ -2023,18 +2029,18 @@ describe('Desktop', () => {
         id: 'outerForm',
         displayHint: Form.DisplayHint.VIEW,
         rootGroupBox: {
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           fields: [{
-            objectType: 'WrappedFormField',
+            objectType: WrappedFormField,
             id: 'wrappedFormField',
             innerForm: {
               id: 'innerForm',
-              objectType: 'Form',
+              objectType: Form,
               rootGroupBox: {
-                objectType: 'GroupBox',
+                objectType: GroupBox,
                 fields: [{
                   id: 'myButton',
-                  objectType: 'Button',
+                  objectType: Button,
                   keyStroke: 'ctrl-1',
                   keyStrokeScope: 'outerForm'
                 }]
@@ -2044,8 +2050,7 @@ describe('Desktop', () => {
         }
       });
       desktop.showForm(form);
-      let innerForm = form.widget('wrappedFormField').innerForm;
-
+      let innerForm = form.widget('wrappedFormField', WrappedFormField).innerForm;
       let viewModal = formHelper.createViewWithOneField({
         title: 'viewModal',
         parent: innerForm,
@@ -2080,7 +2085,7 @@ describe('Desktop', () => {
         displayHint: Form.DisplayHint.DIALOG,
         modal: true,
         rootGroupBox: {
-          objectType: 'GroupBox'
+          objectType: GroupBox
         }
       });
       desktop.showForm(modalDialog, 0);
@@ -2089,7 +2094,7 @@ describe('Desktop', () => {
       MessageBoxes.createOk(desktop).withBody('foo').buildAndOpen();
       let $glassPanes = modalDialog.$container.find('.glasspane');
       expect($glassPanes.length > 0).toBe(true);
-      let messageBox = scout.widget(desktop.$container.find('.messagebox')[0]);
+      let messageBox = scout.widget(desktop.$container.find('.messagebox')[0]) as MessageBox;
       messageBox.close();
 
       // Test with file-chooser
@@ -2123,7 +2128,7 @@ describe('Desktop', () => {
         displayHint: Form.DisplayHint.VIEW,
         modal: true,
         rootGroupBox: {
-          objectType: 'GroupBox'
+          objectType: GroupBox
         }
       });
       let viewB = scout.create(Form, {
@@ -2131,7 +2136,7 @@ describe('Desktop', () => {
         displayHint: Form.DisplayHint.VIEW,
         modal: true,
         rootGroupBox: {
-          objectType: 'GroupBox'
+          objectType: GroupBox
         }
       });
       desktop.showForm(viewA, 0);
@@ -2151,7 +2156,7 @@ describe('Desktop', () => {
       let helpPopup = scout.create(WidgetPopup, {
         parent: viewB,
         content: {
-          objectType: 'StringField'
+          objectType: StringField
         }
       });
       let glassPaneTargetFilter = (target, element) => {

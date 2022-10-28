@@ -43,7 +43,6 @@ export default class FormAdapter extends ModelAdapter {
     // Waiting for the current request to complete is necessary to be able to check whether the form is still open after the close request.
     this.session.onRequestsDone(() => {
       if (this.widget) {
-        // @ts-ignore
         this.widget._afterAbort();
       }
     });

@@ -35,21 +35,17 @@ export default class ContextMenuPopupLayout extends PopupLayout {
     // Ideally, the running animations would be stopped, the popup layouted, the animations adjusted to the new bounds and then continued.
     // This is currently too complicated to implement, so instead we let the animations finish and resize the popup at the end (but before other resize animations start).
     if (this.popup.bodyAnimating && htmlSource && htmlSource.isDescendantOf(this.popup.htmlComp)) {
-      // @ts-ignore
       this.popup._toggleSubMenuQueue.unshift(() => {
         if (!this.popup.rendered) {
           return;
         }
         let oldOffset = this.popup.$body.data('text-offset');
-        // @ts-ignore
         this.popup._adjustTextAlignment();
         this.popup.animateResize = true;
         this.resizeAnimationDuration = this.popup.animationDuration;
         this.popup.revalidateLayoutTree();
         this.popup.animateResize = false;
-        // @ts-ignore
         this.popup._animateTextOffset(this.popup.$body, oldOffset);
-        // @ts-ignore
         this.popup.$container.promise().done(() => this.popup._processSubMenuQueue());
       });
     }

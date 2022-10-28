@@ -11,13 +11,13 @@
 import {FormFieldModel} from '../../index';
 import {ValueFieldClearable, ValueFieldFormatter, ValueFieldParser, ValueFieldValidator} from './ValueField';
 
-export default interface ValueFieldModel<TValue> extends FormFieldModel {
+export default interface ValueFieldModel<TValue extends TModelValue, TModelValue = TValue> extends FormFieldModel {
   validator?: ValueFieldValidator<TValue>;
   validators?: ValueFieldValidator<TValue>[];
   clearable?: ValueFieldClearable;
   formatter?: ValueFieldFormatter<TValue>;
   initialValue?: TValue;
-  value?: TValue;
+  value?: TModelValue;
   invalidValueMessageKey?: string;
   parser?: ValueFieldParser<TValue>;
 }

@@ -8,11 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, arrays, Column, Form, FormField, FormModel, GroupBox, Mode, ModeSelector, RadioButton, RadioButtonGroup, scout, Session, StringField, TabBox, TabItem, Table, TableField, Widget} from '../../index';
+import {Action, arrays, Column, Form, FormField, FormModel, GroupBox, Mode, ModeSelector, RadioButton, scout, Session, StringField, TabBox, TabItem, Table, TableField, Widget} from '../../index';
 import $ from 'jquery';
 import {ObjectType} from '../../ObjectFactory';
 import {Optional, SomeRequired} from '../../types';
 import {ModelOf} from '../../scout';
+import SpecForm from './SpecForm';
+import SpecRadioButtonGroup from './SpecRadioButtonGroup';
 
 export default class FormSpecHelper {
   session: Session;
@@ -31,18 +33,18 @@ export default class FormSpecHelper {
     }
   }
 
-  createViewWithOneField(model: Optional<FormModel, 'parent'>): Form {
+  createViewWithOneField(model?: Optional<FormModel, 'parent'>): SpecForm {
     let form = this.createFormWithOneField(model);
     form.displayHint = Form.DisplayHint.VIEW;
     return form;
   }
 
-  createFormWithOneField(model?: Optional<FormModel, 'parent'>): Form {
+  createFormWithOneField(model?: Optional<FormModel, 'parent'>): SpecForm {
     let defaults = {
       parent: this.session.desktop
     };
     model = $.extend({}, defaults, model);
-    let form = scout.create(Form, model as SomeRequired<FormModel, 'parent'>);
+    let form = scout.create(SpecForm, model as SomeRequired<FormModel, 'parent'>);
     let rootGroupBox = this.createGroupBoxWithFields(form, 1);
     form.setRootGroupBox(rootGroupBox);
     return form;
@@ -140,7 +142,7 @@ export default class FormSpecHelper {
     return this.createGroupBoxWithFields(parent, 1);
   }
 
-  createGroupBoxWithFields(parent: Widget, numFields: number): GroupBox {
+  createGroupBoxWithFields(parent?: Widget, numFields?: number): GroupBox {
     parent = scout.nvl(parent, this.session.desktop);
     numFields = scout.nvl(numFields, 1);
     let
@@ -157,7 +159,7 @@ export default class FormSpecHelper {
     return groupBox;
   }
 
-  createRadioButtonGroup(parent?: Widget, numRadioButtons?: number): RadioButtonGroup<any> {
+  createRadioButtonGroup(parent?: Widget, numRadioButtons?: number): SpecRadioButtonGroup {
     parent = scout.nvl(parent, this.session.desktop);
     numRadioButtons = scout.nvl(numRadioButtons, 2);
     let fields = [];
@@ -166,7 +168,7 @@ export default class FormSpecHelper {
         objectType: RadioButton
       });
     }
-    return scout.create(RadioButtonGroup, {
+    return scout.create(SpecRadioButtonGroup, {
       parent: parent,
       fields: fields
     });
@@ -183,13 +185,13 @@ export default class FormSpecHelper {
     return form;
   }
 
-  createFieldModel<T>(objectType: ObjectType<T>, parent: Widget, modelProperties: Record<string, any>): ModelOf<T> {
+  createFieldModel<T>(objectType?: ObjectType<T>, parent?: Widget, modelProperties?: Record<string, any>): ModelOf<T> & { id: string; objectType: ObjectType<T>; parent: Widget; session: Session } {
     parent = scout.nvl(parent, this.session.desktop);
-    let model = createSimpleModel(objectType || 'StringField', this.session) as ModelOf<T>;
+    let model = createSimpleModel(objectType || 'StringField', this.session);
     if (modelProperties) {
       $.extend(model, modelProperties);
     }
-    return model;
+    return model as ModelOf<T> & { id: string; objectType: ObjectType<T>; parent: Widget; session: Session };
   }
 
   createField<T extends FormField>(objectType: ObjectType<T>, parent?: Widget, modelProperties?: Record<string, any>): T {

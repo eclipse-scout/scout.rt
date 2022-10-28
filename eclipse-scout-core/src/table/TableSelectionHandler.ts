@@ -93,7 +93,6 @@ export default class TableSelectionHandler {
       // Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
       // Right click on already selected rows must not clear the selection
       if (!oldSelectedState || (this.table.selectedRows.length > 1 && event.which !== 3)) {
-        // @ts-ignore
         this.table._removeSelection();
         this.table.selectedRows = [];
       }
@@ -176,7 +175,6 @@ export default class TableSelectionHandler {
     } else {
       // Single selection -> unselect previously selected row
       if (this.select) {
-        // @ts-ignore
         this.table._removeSelection();
         this.table.selectedRows = [];
       }

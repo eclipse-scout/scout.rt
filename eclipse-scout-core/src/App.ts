@@ -237,7 +237,7 @@ export default class App extends EventEmitter {
   protected _handleBootstrapTimeoutError(error: JQuery.jqXHR | JsonErrorResponse, url: string) {
     $.log.isInfoEnabled() && $.log.info('Timeout error for resource ' + url + '. Reloading page...');
     if (webstorage.getItemFromSessionStorage('scout:timeoutPageReload')) {
-      // Prevent loop in case a reload did not solve the problem
+      // Prevent loop in case reloading did not solve the problem
       $.log.isWarnEnabled() && $.log.warn('Prevented automatic reload, startup will likely fail', error, url);
       webstorage.removeItemFromSessionStorage('scout:timeoutPageReload');
       throw new Error('Resource ' + url + ' could not be loaded due to a session timeout, even after a page reload');
@@ -336,7 +336,6 @@ export default class App extends EventEmitter {
     if ($loadingRoot.children('.' + cssClass).length) {
       return;
     }
-    // noinspection JSValidateTypes
     $loadingRoot.appendDiv(cssClass).hide()
       .fadeIn();
   }
@@ -403,7 +402,7 @@ export default class App extends EventEmitter {
   }
 
   /**
-   * Uses the object returned by {@link _ajaxDefaults} to setup ajax. The values in that object are used as default values for every ajax call.
+   * Uses the object returned by {@link _ajaxDefaults} to set up ajax. The values in that object are used as default values for every ajax call.
    */
   protected _ajaxSetup() {
     let ajaxDefaults = this._ajaxDefaults();
@@ -459,7 +458,6 @@ export default class App extends EventEmitter {
     let desktop = this._createDesktop(session.root);
     this._triggerDesktopReady(desktop);
     session.render(() => {
-      // @ts-ignore
       session._renderDesktop();
 
       // Ensure layout is valid (explicitly layout immediately and don't wait for setTimeout to run to make layouting invisible to the user)
@@ -473,13 +471,15 @@ export default class App extends EventEmitter {
     return $.resolvedPromise();
   }
 
-  protected _triggerDesktopReady(desktop: Desktop) {
+  /** @internal */
+  _triggerDesktopReady(desktop: Desktop) {
     this.trigger('desktopReady', {
       desktop: desktop
     });
   }
 
-  protected _triggerSessionReady(session: Session) {
+  /** @internal */
+  _triggerSessionReady(session: Session) {
     this.trigger('sessionReady', {
       session: session
     });
@@ -498,7 +498,7 @@ export default class App extends EventEmitter {
   }
 
   /**
-   * @returns the locale to be used when no locale is provided as session option. By default the navigators locale is used.
+   * @returns the locale to be used when no locale is provided as session option. By default, the navigators locale is used.
    */
   protected _loadLocale(): Locale {
     return locales.getNavigatorLocale();

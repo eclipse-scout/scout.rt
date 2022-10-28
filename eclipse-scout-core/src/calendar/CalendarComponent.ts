@@ -57,9 +57,13 @@ export default class CalendarComponent extends Widget implements CalendarCompone
   toDate: string;
   selected: boolean;
   fullDay: boolean;
+  draggable: boolean;
   item: CalendarItem;
+  stack: Record<string, { x?: number; w?: number }>;
   coveredDaysRange: DateRange;
-  protected _$parts: JQuery[];
+
+  /** @internal */
+  _$parts: JQuery[];
 
   constructor() {
     super();
@@ -128,7 +132,7 @@ export default class CalendarComponent extends Widget implements CalendarCompone
     let lastComponentDay = dates.shift(coveredDaysRangeTo, 0, 0, 1);
 
     if (dates.compare(loopDay, lastComponentDay) > 0) {
-      // start day for the while loop is greater then the exit condition
+      // start day for the while loop is greater than the exit condition
       return;
     }
 
@@ -142,8 +146,7 @@ export default class CalendarComponent extends Widget implements CalendarCompone
         break;
       }
 
-      // @ts-ignore
-      if (this.fullDay && !this.parent._isMonth()) {
+      if (this.fullDay && !this.parent.isMonth()) {
         $day = this._findDayInGrid(partDay, this.parent.$topGrid);
       } else {
         $day = this._findDayInGrid(partDay, this.parent.$grid);
@@ -169,8 +172,7 @@ export default class CalendarComponent extends Widget implements CalendarCompone
 
       this._$parts.push($part);
 
-      // @ts-ignore
-      if (this.parent._isMonth()) {
+      if (this.parent.isMonth()) {
         let width = $day.data('new-width') || $day.width(); // prefer width from layoutSize
         $part.addClass('component-month')
           .toggleClass('compact', width < CalendarComponent.MONTH_COMPACT_THRESHOLD);
@@ -229,8 +231,7 @@ export default class CalendarComponent extends Widget implements CalendarCompone
   }
 
   protected _isTask(): boolean {
-    // @ts-ignore
-    return !this.parent._isMonth() && this.fullDay;
+    return !this.parent.isMonth() && this.fullDay;
   }
 
   protected _arrangeTask(taskOffset: number) {
@@ -238,8 +239,7 @@ export default class CalendarComponent extends Widget implements CalendarCompone
   }
 
   protected _isDayPart(): boolean {
-    // @ts-ignore
-    return !this.parent._isMonth() && !this.fullDay;
+    return !this.parent.isMonth() && !this.fullDay;
   }
 
   protected _getHourRange(day: Date): Range {
@@ -264,7 +264,6 @@ export default class CalendarComponent extends Widget implements CalendarCompone
 
   protected _getDisplayDayPosition(range: Range): Range {
     // Doesn't support minutes yet...
-    // @ts-ignore
     let preferredRange = new Range(this.parent._dayPosition(range.from, 0), this.parent._dayPosition(range.to, 0));
     // Fixed number of divisions...
     let minRangeSize = Math.round(100 * 100 / 24 / this.parent.numberOfHourDivisions) / 100; // Round to two digits
@@ -304,13 +303,11 @@ export default class CalendarComponent extends Widget implements CalendarCompone
   }
 
   updateSelectedComponent($part: JQuery, updateScrollPosition: boolean) {
-    // @ts-ignore
     this.parent._selectedComponentChanged(this, $part.data('partDay') as Date, updateScrollPosition);
   }
 
   protected _onMouseUp(event: JQuery.MouseUpEvent) {
     // don't show popup if dragging is in process
-    // @ts-ignore
     if (this.parent._moveData && this.parent._moveData.moving) {
       return;
     }
@@ -347,7 +344,7 @@ export default class CalendarComponent extends Widget implements CalendarCompone
           htmlEnabled: true,
           scrollable: true,
           cssClass: 'calendar-component-tooltip-content tooltip-content',
-          value: this._description(true)
+          value: this.description(true)
         }
       });
       popup.open();
@@ -356,8 +353,8 @@ export default class CalendarComponent extends Widget implements CalendarCompone
     }
   }
 
-  protected _onContextMenu(event: JQuery.ContextMenuEvent<HTMLDivElement>) {
-    // @ts-ignore
+  /** @internal */
+  _onContextMenu(event: JQuery.ContextMenuEvent) {
     this.parent._showContextMenu(event, 'Calendar.CalendarComponent');
   }
 
@@ -365,7 +362,7 @@ export default class CalendarComponent extends Widget implements CalendarCompone
     return dates.format(date, this.session.locale, pattern);
   }
 
-  protected _description(linkAllowed: boolean): string {
+  description(linkAllowed: boolean): string {
     let range = null,
       $container = $('<div>'),
       fromDate = dates.parseJsonDate(this.fromDate),

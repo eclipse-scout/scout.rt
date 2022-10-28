@@ -1,22 +1,20 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {OutlineSpecHelper, TableSpecHelper, TreeSpecHelper} from '../../../src/testing';
-import {defaultValues} from '../../../src';
+import {defaultValues, Outline} from '../../../src';
 
 describe('OutlineAdapter', () => {
-  let session;
-  /** @type OutlineSpecHelper */
-  let helper;
-  /** @type TableSpecHelper */
-  let tableHelper;
+  let session: SandboxSession;
+  let helper: OutlineSpecHelper;
+  let tableHelper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -58,13 +56,10 @@ describe('OutlineAdapter', () => {
     }
   };
 
-  /**
-   * @returns {Outline}
-   */
-  function createOutlineWithDetailTable() {
+  function createOutlineWithDetailTable(): Outline {
     let model = helper.createModelFixture();
     let adapter = helper.createOutlineAdapter(model);
-    let outline = adapter.createWidget(model, session.desktop);
+    let outline = adapter.createWidget(model, session.desktop) as Outline;
     let table = tableHelper.createTable(tableHelper.createModelFixture(2, 0));
     linkWidgetAndAdapter(table, 'TableAdapter');
 
@@ -256,7 +251,7 @@ describe('OutlineAdapter', () => {
     session._processSuccessResponse(message);
 
     // Expect that all nodes and rows are visible
-    expect(table._filterCount()).toBe(0);
+    expect(table.filterCount()).toBe(0);
     expect(table.$rows().length).toBe(2);
     expect(outline.$nodes().length).toBe(3);
   });
@@ -265,19 +260,15 @@ describe('OutlineAdapter', () => {
     defaultValues.init(defaults);
     let outline = createOutlineWithDetailTable();
     let node0 = outline.nodes[0];
-    // noinspection JSUnresolvedVariable
-    expect(outline.a).toBe(123);
-    // noinspection JSUnresolvedVariable
-    expect(outline.nodes[0].b).toBe(234);
+    expect(outline['a']).toBe(123);
+    expect(outline.nodes[0]['b']).toBe(234);
     expect(outline.nodes[0].childNodes[0]).toBe(undefined);
 
     let newChildNode = helper.createModelNode('0_1', 'newChildNode');
     let treeHelper = new TreeSpecHelper(session);
     let event = treeHelper.createNodesInsertedEvent(outline, [newChildNode], node0.id);
     outline.modelAdapter.onModelAction(event);
-    // noinspection JSUnresolvedVariable
-    expect(outline.a).toBe(123);
-    // noinspection JSUnresolvedVariable
-    expect(outline.nodes[0].childNodes[0].b).toBe(234);
+    expect(outline['a']).toBe(123);
+    expect(outline.nodes[0].childNodes[0]['b']).toBe(234);
   });
 });

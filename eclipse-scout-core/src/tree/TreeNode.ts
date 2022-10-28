@@ -132,8 +132,7 @@ export default class TreeNode implements TreeNodeModel {
 
     // make sure all child nodes are TreeNodes too
     if (this.hasChildNodes()) {
-      // @ts-ignore
-      this.getTree()._ensureTreeNodes(this.childNodes);
+      this.getTree().ensureTreeNodes(this.childNodes);
     }
   }
 
@@ -268,7 +267,8 @@ export default class TreeNode implements TreeNodeModel {
     }
   }
 
-  protected _renderChecked() {
+  /** @internal */
+  _renderChecked() {
     // if node is not rendered, do nothing
     if (!this.rendered) {
       return;
@@ -294,15 +294,16 @@ export default class TreeNode implements TreeNodeModel {
     this._updateControl($control);
   }
 
-  protected _updateControl($control: JQuery) {
+  /** @internal */
+  _updateControl($control: JQuery) {
     let tree = this.getTree();
     $control.toggleClass('checkable', tree.checkable);
-    // @ts-ignore
     $control.cssPaddingLeft(tree._computeNodeControlPaddingLeft(this));
     $control.setVisible(!this.leaf);
   }
 
-  protected _renderCheckbox() {
+  /** @internal */
+  _renderCheckbox() {
     let $checkboxContainer = this.$node.prependDiv('tree-node-checkbox');
     let $checkbox = $checkboxContainer
       .appendDiv('check-box')
@@ -311,7 +312,8 @@ export default class TreeNode implements TreeNodeModel {
     $checkbox.toggleClass('children-checked', !!this.childrenChecked);
   }
 
-  protected _decorate() {
+  /** @internal */
+  _decorate() {
     // This node is not yet rendered, nothing to do
     if (!this.$node) {
       return;
@@ -335,8 +337,7 @@ export default class TreeNode implements TreeNodeModel {
 
 
     if (!this.parentNode && tree.selectedNodes.length === 0 || // root nodes have class child-of-selected if no node is selected
-      // @ts-ignore
-      tree._isChildOfSelectedNodes(this)) {
+      tree.isChildOfSelectedNodes(this)) {
       $node.addClass('child-of-selected');
     }
 
@@ -364,8 +365,7 @@ export default class TreeNode implements TreeNodeModel {
 
   /**
    * This function extracts all CSS classes that are set externally by the tree.
-   * The classes depend on the tree hierarchy or the selection and thus cannot determined
-   * by the node itself.
+   * The classes depend on the tree hierarchy or the selection and thus cannot be determined by the node itself.
    */
   protected _preserveCssClasses($node: JQuery): string {
     let cssClass = 'tree-node';

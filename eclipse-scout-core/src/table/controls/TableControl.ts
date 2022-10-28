@@ -12,7 +12,7 @@ import {Action, ActionKeyStroke, HtmlComponent, KeyStrokeContext, NullLayout, sc
 import AbstractLayout from '../../layout/AbstractLayout';
 import {TooltipSupportOptions} from '../../tooltip/TooltipSupport';
 
-export default abstract class TableControl extends Action implements TableControlModel {
+export default class TableControl extends Action implements TableControlModel {
   declare model: TableControlModel;
 
   tableFooter: TableFooter;
@@ -200,7 +200,7 @@ export default abstract class TableControl extends Action implements TableContro
       this.tableFooter.selectedControl.setSelected(false, {closeWhenUnselected: false});
     }
 
-    // Instead of calling parent.setSelected(), we manually execute the required code. Otherwise
+    // Instead of calling parent.setSelected(), we manually execute the required code. Otherwise,
     // we would not be able to pass 'closeWhenUnselected' to _renderSelected().
     this._setSelected(selected);
     options = $.extend({}, {closeWhenUnselected: true}, options);
@@ -212,7 +212,7 @@ export default abstract class TableControl extends Action implements TableContro
   }
 
   protected _setSelected(selected: boolean) {
-    // Does not nothing more than the default but allows for extension by a subclass
+    // Does nothing more than the default but allows for extension by a subclass
     this._setProperty('selected', selected);
   }
 

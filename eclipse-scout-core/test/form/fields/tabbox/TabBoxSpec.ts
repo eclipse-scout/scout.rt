@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {keys, scout, TabBox} from '../../../../src/index';
+import {keys, scout, TabBox, TabItem} from '../../../../src/index';
 import {TabBoxSpecHelper} from '../../../../src/testing/index';
 import {triggerKeyDownCapture} from '../../../../src/testing/jquery-testing';
 
 describe('TabBox', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TabBoxSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -23,7 +23,7 @@ describe('TabBox', () => {
   });
 
   describe('render', () => {
-    let tabBox;
+    let tabBox: TabBox;
 
     beforeEach(() => {
       let tabItem = helper.createTabItem();
@@ -111,10 +111,10 @@ describe('TabBox', () => {
       tabBox = scout.create(TabBox, {
         parent: session.desktop,
         tabItems: [{
-          objectType: 'TabItem',
+          objectType: TabItem,
           label: 'first'
         }, {
-          objectType: 'TabItem',
+          objectType: TabItem,
           label: 'second'
         }]
       });
@@ -135,14 +135,14 @@ describe('TabBox', () => {
       tabBox = scout.create(TabBox, {
         parent: session.desktop,
         tabItems: [{
-          objectType: 'TabItem',
+          objectType: TabItem,
           label: 'first',
           visible: false
         }, {
-          objectType: 'TabItem',
+          objectType: TabItem,
           label: 'second'
         }, {
-          objectType: 'TabItem',
+          objectType: TabItem,
           label: 'third'
         }]
       });

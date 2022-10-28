@@ -8,7 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, Action, arrays, ContextMenuPopupLayout, ContextMenuPopupModel, Event, graphics, HtmlComponent, Menu, MenuDestinations, menuNavigationKeyStrokes, Popup, PopupLayout, PropertyChangeEvent, Rectangle, RowLayout, scout} from '../index';
+import {
+  AbstractLayout, Action, arrays, ContextMenuPopupLayout, ContextMenuPopupModel, Event, graphics, HtmlComponent, Menu, MenuDestinations, menuNavigationKeyStrokes, Popup, PopupLayout, PropertyChangeEvent, Rectangle, RowLayout, scout
+} from '../index';
 import $ from 'jquery';
 import {Optional} from '../types';
 import {ScrollbarInstallOptions} from '../scrollbar/scrollbars';
@@ -24,7 +26,9 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
   $body: JQuery;
   initialSubMenusToRender: { parentMenu: Menu; menus: Menu[] };
   menuFilter: MenuFilter;
-  protected _toggleSubMenuQueue: (() => void)[];
+
+  /** @internal */
+  _toggleSubMenuQueue: (() => void)[];
 
   constructor() {
     super();
@@ -111,18 +115,16 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
   }
 
   removeSubMenuItems(parentMenu: Menu, animated: boolean) {
-    if (!this._checkRemoveSubMenuItemsPossible(parentMenu, animated)) {
+    let internalParentMenu: Menu & { __originalParent?: Menu } = parentMenu;
+    if (!this._checkRemoveSubMenuItemsPossible(internalParentMenu, animated)) {
       return;
     }
-    // @ts-ignore
-    this.$body = parentMenu.__originalParent.$subMenuBody;
+    this.$body = internalParentMenu.__originalParent.$subMenuBody;
     // move new body to back
-    this.$body.insertBefore(parentMenu.$subMenuBody);
+    this.$body.insertBefore(internalParentMenu.$subMenuBody);
 
-    // @ts-ignore
-    if (parentMenu.__originalParent._doActionTogglesSubMenu) {
-      // @ts-ignore
-      parentMenu.__originalParent._doActionTogglesSubMenu();
+    if (internalParentMenu.__originalParent._doActionTogglesSubMenu) {
+      internalParentMenu.__originalParent._doActionTogglesSubMenu();
     }
 
     let popupBounds = this.htmlComp.bounds();
@@ -133,7 +135,7 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
     this.position();
 
     if (animated) {
-      this._animateRemoveSubmenuItems(parentMenu, popupBounds);
+      this._animateRemoveSubmenuItems(internalParentMenu, popupBounds);
     }
   }
 
@@ -198,7 +200,8 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
     this._processSubMenuQueue();
   }
 
-  protected _processSubMenuQueue() {
+  /** @internal */
+  _processSubMenuQueue() {
     let next = this._toggleSubMenuQueue.shift();
     if (next) {
       next();
@@ -231,39 +234,39 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
   }
 
   renderSubMenuItems(parentMenu: Menu, menus: Menu[], animated: boolean, initialSubMenuRendering?: boolean): boolean | undefined {
-    if (!this._checkRenderSubMenuItemsPossible(parentMenu, menus, animated, initialSubMenuRendering)) {
+    let internalParentMenu: Menu & { __originalParent?: Menu } = parentMenu;
+    if (!this._checkRenderSubMenuItemsPossible(internalParentMenu, menus, animated, initialSubMenuRendering)) {
       return false;
     }
 
     let popupBounds = this.htmlComp.bounds();
     let $oldBody = this.$body;
-    // @ts-ignore
-    parentMenu.__originalParent.$subMenuBody = $oldBody;
+    internalParentMenu.__originalParent.$subMenuBody = $oldBody;
     let $menuItems = this.$body.find('.menu-item');
     $menuItems.removeClass('next-to-selected');
 
-    if (!parentMenu.$subMenuBody) {
+    if (!internalParentMenu.$subMenuBody) {
       this._renderBody();
-      parentMenu.$subMenuBody = this.$body;
+      internalParentMenu.$subMenuBody = this.$body;
       this._renderMenuItems(menus, initialSubMenuRendering);
     } else {
       // append $body
-      this.$body = parentMenu.$subMenuBody;
+      this.$body = internalParentMenu.$subMenuBody;
     }
-    let $insertAfterElement = parentMenu.$container.prev();
-    let parentMenuPosition = parentMenu.$container.position();
-    parentMenu.$placeHolder = parentMenu.$container.clone();
-    // HtmlComponent is necessary for the row layout (it would normally be installed by Menu.js, but $placeholder is just a jquery clone of parentMenu.$container and is not managed by a real widget)
-    HtmlComponent.install(parentMenu.$placeHolder, this.session);
+    let $insertAfterElement = internalParentMenu.$container.prev();
+    let parentMenuPosition = internalParentMenu.$container.position();
+    internalParentMenu.$placeHolder = internalParentMenu.$container.clone();
+    // HtmlComponent is necessary for the row layout (it would normally be installed by Menu.js, but $placeholder is just a jquery clone of internalParentMenu.$container and is not managed by a real widget)
+    HtmlComponent.install(internalParentMenu.$placeHolder, this.session);
     if ($insertAfterElement.length) {
-      parentMenu.$placeHolder.insertAfter($insertAfterElement);
+      internalParentMenu.$placeHolder.insertAfter($insertAfterElement);
     } else {
-      $oldBody.prepend(parentMenu.$placeHolder);
+      $oldBody.prepend(internalParentMenu.$placeHolder);
     }
 
     this.$body.insertAfter($oldBody);
-    this.$body.prepend(parentMenu.$container);
-    parentMenu.$container.toggleClass('expanded');
+    this.$body.prepend(internalParentMenu.$container);
+    internalParentMenu.$container.toggleClass('expanded');
     this._adjustTextAlignment();
 
     HtmlComponent.get(this.$body).invalidateLayoutTree();
@@ -272,7 +275,7 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
     this.updateNextToSelected();
 
     if (animated) {
-      this._animateRenderSubMenuItems(parentMenu, popupBounds, parentMenuPosition);
+      this._animateRenderSubMenuItems(internalParentMenu, popupBounds, parentMenuPosition);
     } else {
       $oldBody.detach();
       this._updateFirstLastClass();
@@ -280,13 +283,13 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
   }
 
   protected _animateRenderSubMenuItems(parentMenu: Menu, popupBounds: Rectangle, parentMenuPosition: JQuery.Coordinates) {
-    // @ts-ignore
-    let $oldBody: JQuery = parentMenu.__originalParent.$subMenuBody;
+    let internalParentMenu: Menu & { __originalParent?: Menu } = parentMenu;
+    let $oldBody: JQuery = internalParentMenu.__originalParent.$subMenuBody;
     let endPopupBounds = this.htmlComp.bounds();
     let popupInsets = this.htmlComp.insets();
     let oldBodyBounds = graphics.bounds($oldBody);
     let bodyBounds = HtmlComponent.get(this.$body).bounds();
-    let startBodyBounds = new Rectangle(0, popupInsets.top + parentMenuPosition.top, oldBodyBounds.width, parentMenu.$container.cssHeight());
+    let startBodyBounds = new Rectangle(0, popupInsets.top + parentMenuPosition.top, oldBodyBounds.width, internalParentMenu.$container.cssHeight());
     let endBodyBounds = new Rectangle(0, popupInsets.top, bodyBounds.width, bodyBounds.height);
 
     this.bodyAnimating = true;
@@ -354,7 +357,8 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
       .cssHeightAnimated(popupBounds.height, targetBounds.height, options);
   }
 
-  protected _animateTextOffset($body: JQuery, textOffset: number, targetOffset?: number) {
+  /** @internal */
+  _animateTextOffset($body: JQuery, textOffset: number, targetOffset?: number) {
     targetOffset = scout.nvl(targetOffset, this.$body.data('text-offset'));
     let $menuItems = this.$visibleMenuItems($body);
     $menuItems.each((index: number, menuItem: HTMLElement) => {
@@ -376,14 +380,14 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
       return;
     }
 
-    menus.forEach(menu => {
+    menus.forEach((menu: Menu & { __originalParent?: Menu }) => {
       // Invisible menus are rendered as well because their visibility might change dynamically
       if (menu.separator) {
         return;
       }
 
       // prevent loosing original parent
-      let originalParent = menu.parent;
+      let originalParent = menu.parent as Menu;
       // Clone menu items but only clone once unless it is for a different context menu (e.g. a context menu of a combo menu inside a context menu)
       // Clone will recursively also clone all child actions.
       if (this.cloneMenuItems && !menu.cloneOf || !this.has(menu)) {
@@ -402,9 +406,7 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
       }
 
       // just set once because on second execution of this menu.parent is set to a popup
-      // @ts-ignore
       if (!menu.__originalParent) {
-        // @ts-ignore
         menu.__originalParent = originalParent;
       }
       menu.render(this.$body);
@@ -551,7 +553,8 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
     });
   }
 
-  protected _adjustTextAlignment($body?: JQuery<HTMLElement>) {
+  /** @internal */
+  _adjustTextAlignment($body?: JQuery<HTMLElement>) {
     $body = $body || this.$body;
     let $menuItems = this.$visibleMenuItems($body);
     let textOffset = this._calcTextOffset($menuItems);

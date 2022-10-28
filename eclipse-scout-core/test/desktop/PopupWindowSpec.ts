@@ -1,19 +1,26 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, PopupWindow} from '../../src/index';
+import {Form, HtmlComponent, PopupWindow} from '../../src/index';
 
 describe('PopupWindow', () => {
-  let session, helper, $sandbox, origDevice, myForm, myWindow,
+  let session: SandboxSession, $sandbox: JQuery, myForm: Form, myWindow: Window,
     myErrorHandler = () => {
+      // nop
     };
+
+  class SpecPopupWindow extends PopupWindow {
+    override _onResize() {
+      super._onResize();
+    }
+  }
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -25,9 +32,10 @@ describe('PopupWindow', () => {
       modelClass: 'Foo',
       session: session,
       render: () => {
+        // nop
       },
       htmlComp: HtmlComponent.install($sandbox, session)
-    };
+    } as unknown as Form;
 
     // window mock
     myWindow = $sandbox.window(true);
@@ -37,19 +45,16 @@ describe('PopupWindow', () => {
     };
   });
 
-  afterEach(() => {
-  });
-
   it('Constructor sets cross references and window-name', () => {
-    let popupWindow = new PopupWindow(myWindow, myForm);
+    let popupWindow = new SpecPopupWindow(myWindow, myForm);
 
-    expect(myWindow.popupWindow).toBe(popupWindow);
+    expect(myWindow['popupWindow']).toBe(popupWindow);
     expect(myWindow.name).toBe('Scout popup-window Foo');
     expect(myForm.popupWindow).toBe(popupWindow);
   });
 
   it('Initialization in _onReady', () => {
-    let popupWindow = new PopupWindow(myWindow, myForm),
+    let popupWindow = new SpecPopupWindow(myWindow, myForm),
       called = false;
 
     popupWindow.one('init', () => {

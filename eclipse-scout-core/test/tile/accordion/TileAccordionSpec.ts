@@ -1,18 +1,20 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Group, scout, Tile, TileAccordion, TileGridLayoutConfig} from '../../../src/index';
+import {Group, GroupModel, scout, Tile, TileAccordion, TileAccordionModel, TileGrid, TileGridLayoutConfig} from '../../../src/index';
 import {triggerClick, triggerDoubleClick} from '../../../src/testing/jquery-testing';
+import TileModel from '../../../src/tile/TileModel';
+import {Optional} from '../../../src/types';
 
 describe('TileAccordion', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -24,14 +26,14 @@ describe('TileAccordion', () => {
     $(':animated').finish();
   });
 
-  function createAccordion(numGroups, model) {
+  function createAccordion(numGroups: number, model?: Optional<TileAccordionModel, 'parent'>) {
     let groups = [];
     for (let i = 0; i < numGroups; i++) {
       groups.push({
-        objectType: 'Group',
+        objectType: Group,
         label: 'Group ' + i,
         body: {
-          objectType: 'TileGrid',
+          objectType: TileGrid,
           scrollable: false
         }
       });
@@ -41,22 +43,22 @@ describe('TileAccordion', () => {
       groups: groups
     };
     model = $.extend({}, defaults, model);
-    return scout.create(TileAccordion, model);
+    return scout.create(TileAccordion, model as TileAccordionModel);
   }
 
-  function createGroup(model) {
+  function createGroup(model?: GroupModel): Group<TileGrid> {
     let defaults = {
       parent: session.desktop,
       body: {
-        objectType: 'TileGrid',
+        objectType: TileGrid,
         scrollable: false
       }
     };
     model = $.extend({}, defaults, model);
-    return scout.create(Group, model);
+    return scout.create(Group, model) as Group<TileGrid>;
   }
 
-  function createTile(model) {
+  function createTile(model?: TileModel): Tile {
     let defaults = {
       parent: session.desktop
     };
@@ -66,7 +68,7 @@ describe('TileAccordion', () => {
 
   describe('init', () => {
     it('copies properties to tile grids', () => {
-      let comparator = () => true;
+      let comparator = (a: Tile, b: Tile) => 1;
       let filter = {
         accept: () => true
       };
@@ -83,9 +85,9 @@ describe('TileAccordion', () => {
         withPlaceholders: true
       });
       accordion.insertGroup({
-        objectType: 'Group',
+        objectType: Group,
         body: {
-          objectType: 'TileGrid'
+          objectType: TileGrid
         }
       });
       expect(accordion.groups[0].body.selectable).toBe(true);
@@ -107,9 +109,9 @@ describe('TileAccordion', () => {
       };
       let accordion = createAccordion(0);
       accordion.insertGroup({
-        objectType: 'Group',
+        objectType: Group,
         body: {
-          objectType: 'TileGrid',
+          objectType: TileGrid,
           selectable: true,
           multiSelect: false,
           layoutConfig: {
@@ -202,9 +204,9 @@ describe('TileAccordion', () => {
       expect(accordion.groups[0].body.filteredTiles).toEqual([tile1]);
 
       accordion.insertGroup({
-        objectType: 'Group',
+        objectType: Group,
         body: {
-          objectType: 'TileGrid',
+          objectType: TileGrid,
           tiles: [tile2, tile3]
         }
       });
@@ -269,9 +271,9 @@ describe('TileAccordion', () => {
       expect(accordion.groups[0].body.filteredTiles).toEqual([]);
 
       accordion.insertGroup({
-        objectType: 'Group',
+        objectType: Group,
         body: {
-          objectType: 'TileGrid',
+          objectType: TileGrid,
           tiles: [tile2, tile3]
         }
       });
@@ -449,7 +451,7 @@ describe('TileAccordion', () => {
       accordion.groups[1].body.insertTile(tile1);
       expect(accordion.getSelectedTileCount()).toBe(0);
 
-      accordion.selectTiles(tile0);
+      accordion.selectTile(tile0);
       expect(accordion.getSelectedTileCount()).toBe(1);
       expect(accordion.getSelectedTile()).toBe(tile0);
 
@@ -473,7 +475,7 @@ describe('TileAccordion', () => {
       accordion.groups[1].body.insertTile(tile1);
       expect(accordion.getSelectedTileCount()).toBe(0);
 
-      accordion.selectTiles(tile0);
+      accordion.selectTile(tile0);
       expect(accordion.getSelectedTileCount()).toBe(1);
       expect(accordion.getSelectedTile()).toBe(tile0);
 

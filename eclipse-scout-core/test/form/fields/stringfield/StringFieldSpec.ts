@@ -1,19 +1,21 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteEvent, scout, StringField} from '../../../../src/index';
+// eslint-disable-next-line max-classes-per-file
+import {RemoteEvent, scout, StringField, StringFieldModel} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 import {triggerClick} from '../../../../src/testing/jquery-testing';
+import {StringFieldSelection} from '../../../../src/form/fields/stringfield/StringField';
 
 describe('StringField', () => {
-  let session, helper, field;
+  let session: SandboxSession, helper: FormSpecHelper, field: SpecStringField;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -30,27 +32,31 @@ describe('StringField', () => {
     jasmine.Ajax.uninstall();
   });
 
-  function createField(model) {
-    let field = new StringField();
+  class SpecStringField extends StringField {
+    override _getSelection(): StringFieldSelection {
+      return super._getSelection();
+    }
+  }
+
+  function createField(model: StringFieldModel): SpecStringField {
+    let field = new SpecStringField();
     field.init(model);
     return field;
   }
 
-  function createModel() {
+  function createModel(): StringFieldModel {
     return helper.createFieldModel();
   }
 
   describe('init', () => {
     it('clear does not throw exception when called in init function', () => {
       class MyStringField extends StringField {
-        /**
-         * @override
-         */
-        init(model) {
+        override init(model) {
           super.init(model);
           this.clear();
         }
       }
+
       let myField = new MyStringField();
       myField.init(createModel());
       // without the bugfix the init function would throw an error
@@ -85,46 +91,52 @@ describe('StringField', () => {
   describe('insertText', () => {
     it('expects empty field at the beginning', () => {
       field.render();
-      expect(field.$field[0].value).toBe('');
+      let element = field.$field[0] as HTMLInputElement;
+      expect(element.value).toBe('');
     });
 
     it('inserts text into an empty field', () => {
       field.render();
       field.insertText('Test1');
-      expect(field.$field[0].value).toBe('Test1');
+      let element = field.$field[0] as HTMLInputElement;
+      expect(element.value).toBe('Test1');
     });
 
     it('appends text to the previous value (if no text is selected)', () => {
       field.render();
       field.insertText('Test1');
       field.insertText('ABC2');
-      expect(field.$field[0].value).toBe('Test1ABC2');
+      let element = field.$field[0] as HTMLInputElement;
+      expect(element.value).toBe('Test1ABC2');
     });
 
     it('replaces selection #1 (if part of the text is selected, selection does not start at the beginning)', () => {
       field.render();
       field.insertText('Test1');
-      field.$field[0].selectionStart = 2;
-      field.$field[0].selectionEnd = 4;
+      let element = field.$field[0] as HTMLInputElement;
+      element.selectionStart = 2;
+      element.selectionEnd = 4;
       field.insertText('sten2');
-      expect(field.$field[0].value).toBe('Testen21');
+      expect(element.value).toBe('Testen21');
     });
 
     it('replaces selection #2 (if part of the text is selected, start at the beginning)', () => {
       field.render();
       field.insertText('Test1');
-      field.$field[0].selectionStart = 0;
-      field.$field[0].selectionEnd = 4;
+      let element = field.$field[0] as HTMLInputElement;
+      element.selectionStart = 0;
+      element.selectionEnd = 4;
       field.insertText('ABC2');
-      expect(field.$field[0].value).toBe('ABC21');
+      expect(element.value).toBe('ABC21');
     });
 
     it('replaces selection #3 (if whole content is selected)', () => {
       field.render();
       field.insertText('Test1');
-      field.$field[0].select();
+      let element = field.$field[0] as HTMLInputElement;
+      element.select();
       field.insertText('ABC2');
-      expect(field.$field[0].value).toBe('ABC2');
+      expect(element.value).toBe('ABC2');
     });
 
     it('sends display text changed to server using accept text', () => {
@@ -140,7 +152,8 @@ describe('StringField', () => {
       expect(mostRecentJsonRequest()).toContainEvents(event);
 
       field.insertText('ABC2');
-      expect(field.$field[0].value).toBe('Test1ABC2');
+      let element = field.$field[0] as HTMLInputElement;
+      expect(element.value).toBe('Test1ABC2');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(2);
       event = new RemoteEvent(field.id, 'acceptInput', {
@@ -182,7 +195,8 @@ describe('StringField', () => {
         })]
       };
       session._processSuccessResponse(message);
-      expect(field.$field[0].value).toBe('Test1ABC2');
+      let element = field.$field[0] as HTMLInputElement;
+      expect(element.value).toBe('Test1ABC2');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(2);
       events = [];
@@ -206,7 +220,8 @@ describe('StringField', () => {
       field.trimText = true;
       field.render();
       field.$field.val(' foo ');
-      field.$field[0].select();
+      let element = field.$field[0] as HTMLInputElement;
+      element.select();
       let selection = field._getSelection();
       expect(selection.start).toBe(0);
       expect(selection.end).toBe(5);

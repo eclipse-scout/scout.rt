@@ -80,8 +80,7 @@ export default class SplitBoxLayout extends AbstractLayout {
     }
 
     // Calculate collapse button position
-    // @ts-ignore
-    let collapseHandle = this.splitBox._collapseHandle;
+    let collapseHandle = this.splitBox.collapseHandle;
     if (collapseHandle) {
       let $collapseHandle = collapseHandle.$container;
 

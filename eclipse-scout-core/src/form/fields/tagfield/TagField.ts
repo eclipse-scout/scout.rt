@@ -13,9 +13,8 @@ import {
   TagFieldDeleteKeyStroke, TagFieldEnterKeyStroke, TagFieldEventMap, TagFieldLayout, TagFieldModel, TagFieldNavigationKeyStroke, TagFieldOpenPopupKeyStroke, ValueField
 } from '../../../index';
 import {TagBarTagRemoveEvent} from '../../../tagbar/TagBarEventMap';
-import {SomeRequired} from '../../../types';
-import LookupCallModel from '../../../lookup/LookupCallModel';
 import {TagChooserPopupLookupRowSelectedEvent} from './TagChooserPopupEventMap';
+import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
 
 export default class TagField extends ValueField<string[]> implements TagFieldModel {
   declare model: TagFieldModel;
@@ -27,7 +26,9 @@ export default class TagField extends ValueField<string[]> implements TagFieldMo
   popup: TagChooserPopup;
   tagBar: TagBar;
   maxLengthHandler: MaxLengthHandler;
-  protected _currentLookupCall: LookupCall<string>;
+
+  /** @internal */
+  _currentLookupCall: LookupCall<string>;
 
   constructor() {
     super();
@@ -111,7 +112,7 @@ export default class TagField extends ValueField<string[]> implements TagFieldMo
     }
   }
 
-  protected _setLookupCall(lookupCall: LookupCall<string> | SomeRequired<LookupCallModel<string>, 'objectType'> | string) {
+  protected _setLookupCall(lookupCall: LookupCallOrRefModel<string>) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
   }
 
@@ -201,7 +202,7 @@ export default class TagField extends ValueField<string[]> implements TagFieldMo
     super.acceptInput(false);
   }
 
-  protected override _triggerAcceptInput(whileTyping?: boolean) {
+  override _triggerAcceptInput(whileTyping?: boolean) {
     this.trigger('acceptInput', {
       displayText: this.displayText,
       whileTyping: whileTyping,

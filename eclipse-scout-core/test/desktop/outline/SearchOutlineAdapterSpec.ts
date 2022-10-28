@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout} from '../../../src/index';
+import {scout, SearchOutline} from '../../../src/index';
 import {OutlineSpecHelper} from '../../../src/testing/index';
 
 describe('SearchOutlineAdapter', () => {
-  let helper, session;
+  let helper: OutlineSpecHelper, session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -32,7 +32,7 @@ describe('SearchOutlineAdapter', () => {
     describe('requestFocusQueryField', () => {
 
       it('may be called multiple times', () => {
-        let outline = scout.create(createSimpleModel('SearchOutline', session));
+        let outline = scout.create(createSimpleModel(SearchOutline, session));
         linkWidgetAndAdapter(outline, 'SearchOutlineAdapter');
         outline.render();
 

@@ -8,18 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnModel, LookupCall, LookupCallModel} from '../../index';
-import {SomeRequired} from '../../types';
+import {ColumnModel} from '../../index';
+import {LookupCallOrRefModel} from '../../lookup/LookupCall';
 
 export default interface SmartColumnModel<TValue> extends ColumnModel<TValue> {
   /**
    * @see codes.get
    */
   codeType?: string;
-  /**
-   * Reference to LookupCall, a LookupCallModel or a string to a LookupCall class.
-   */
-  lookupCall?: LookupCall<TValue> | SomeRequired<LookupCallModel<TValue>, 'objectType'> | string;
+  lookupCall?: LookupCallOrRefModel<TValue>;
   browseHierarchy?: boolean;
   browseMaxRowCount?: number;
   browseAutoExpandAll?: boolean;

@@ -802,19 +802,16 @@ export function isLocationInView(location: { x: number; y: number }, $scrollable
  * Make sure you remove the handlers when not needed anymore using offScroll.
  */
 export function onScroll($anchor: JQuery, handler: (event: JQuery.ScrollEvent<HTMLElement>) => void) {
-  // @ts-ignore
-  handler.$scrollParents = [];
+  handler['$scrollParents'] = [];
   $anchor.scrollParents().each(function() {
     let $scrollParent = $(this);
     $scrollParent.on('scroll', handler);
-    // @ts-ignore
-    handler.$scrollParents.push($scrollParent);
+    handler['$scrollParents'].push($scrollParent);
   });
 }
 
 export function offScroll(handler: (event: JQuery.ScrollEvent<HTMLElement>) => void) {
-  // @ts-ignore
-  let $scrollParents: JQuery[] = handler.$scrollParents;
+  let $scrollParents: JQuery[] = handler['$scrollParents'];
   if (!$scrollParents) {
     throw new Error('$scrollParents are not defined');
   }

@@ -97,18 +97,15 @@ export default class TableLayout extends AbstractLayout {
       this.table.setViewRangeSize(this.table.calculateViewRangeSize());
 
       if (!htmlContainer.layouted) {
-        // @ts-ignore
         this.table._renderScrollTop();
       }
 
       // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
-      // @ts-ignore
       this.table._renderViewport();
 
       // Render scroll top again to make sure the data is really at the correct position after rendering viewport.
       // Somehow table.$data[0].scrollTop changes during _renderViewport sometimes (e.g. when there are aggregate rows)
       if (!htmlContainer.layouted) {
-        // @ts-ignore
         this.table._renderScrollTop();
       }
 
@@ -151,9 +148,7 @@ export default class TableLayout extends AbstractLayout {
    * Workaround for Chrome bug, see {@link Table._updateRealColumnWidths}
    */
   protected _updateRealColumnWidths() {
-    // @ts-ignore
     if (this.table._updateRealColumnWidths()) {
-      // @ts-ignore
       this.table._updateRowWidth();
       if (this.table.header && this.table.header.rendered) {
         this.table.header.resizeHeaderItems();
@@ -270,7 +265,6 @@ export default class TableLayout extends AbstractLayout {
 
     // If table was not visible during renderViewport, the rows are not rendered yet (see _renderViewport)
     // -> make sure rows are rendered otherwise preferred height cannot be determined
-    // @ts-ignore
     this.table._renderViewport();
     return super.preferredLayoutSize($container, options);
   }

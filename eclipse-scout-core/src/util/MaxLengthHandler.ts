@@ -95,8 +95,7 @@ export default class MaxLengthHandler {
    * Must use a callback because this is required by Chrome's clipboard API.
    */
   protected _getClipboardData(event: JQuery.TriggeredEvent<HTMLInputElement, undefined, HTMLInputElement, HTMLInputElement>, doneHandler: (pastedText: string) => void) {
-    // @ts-ignore
-    let data: DataTransfer = event.originalEvent.clipboardData || this.target.$container.window(true).clipboardData;
+    let data: DataTransfer = event.originalEvent['clipboardData'] || this.target.$container.window(true)['clipboardData'];
     if (data) {
       // Chrome, Firefox
       if (data.items && data.items.length) {

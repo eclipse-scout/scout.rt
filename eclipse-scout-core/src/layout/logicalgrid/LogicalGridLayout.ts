@@ -75,7 +75,7 @@ export default class LogicalGridLayout extends AbstractLayout {
     // If there is no logical grid the grid relevant widgets are found using DOM by selecting the children with a html component (Scout classic).
     if (this.widget.logicalGrid) {
       this.widget.validateLogicalGrid();
-      // It is important that the logical grid and the layout use the same widgets. Otherwise there may be widgets without a gridData which is required by the layout.
+      // It is important that the logical grid and the layout use the same widgets. Otherwise, there may be widgets without a gridData which is required by the layout.
       // This can happen if the widgets are inserted and removed by an animation before the layout has been done. If the widget is removed using an animation it is not in the list of getGridWidgets() anymore but may still be in the DOM.
       this.widget.logicalGrid.gridConfig.getGridWidgets().forEach(function(widget) {
         if (!widget.rendered) {
@@ -212,13 +212,12 @@ export default class LogicalGridLayout extends AbstractLayout {
     // widthHint and heightHint are already adjusted by HtmlComponent, no need to remove insets here
     this.validateLayout($container, options);
 
-    let sizeflag = LayoutConstants.PREF;
+    let sizeFlag = LayoutConstants.PREF;
     let dim = new Dimension();
     // w
     let i, w, h, useCount = 0;
-    // noinspection DuplicatedCode
     for (i = 0; i < this.info.cols; i++) {
-      w = this.info.width[i][sizeflag];
+      w = this.info.width[i][sizeFlag];
       if (useCount > 0) {
         dim.width += this.hgap;
       }
@@ -227,9 +226,8 @@ export default class LogicalGridLayout extends AbstractLayout {
     }
     // h
     useCount = 0;
-    // noinspection DuplicatedCode
     for (i = 0; i < this.info.rows; i++) {
-      h = this.info.height[i][sizeflag];
+      h = this.info.height[i][sizeFlag];
       if (useCount > 0) {
         dim.height += this.vgap;
       }

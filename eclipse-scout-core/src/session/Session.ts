@@ -372,7 +372,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
    * "url":
    *   browser URL (without query and hash part)
    * "geolocationServiceAvailable":
-   *   true if browser supports geo location services
+   *   true if browser supports geolocation services
    *
    * Additionally, all query parameters from the URL are put in the resulting object.
    */
@@ -451,7 +451,6 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
     let clientSessionData = this._getAdapterData(data.startupData.clientSession);
     this.desktop = (this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter.widget) as unknown) as Desktop;
-    // @ts-ignore
     App.get()._triggerDesktopReady(this.desktop);
 
     let renderDesktopImpl = function() {
@@ -475,7 +474,6 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
       this._resumeBackgroundJobPolling();
 
       this.ready = true;
-      // @ts-ignore
       App.get()._triggerSessionReady(this);
 
       $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + Device.get());
@@ -791,13 +789,13 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
           this._sendRequest(queuedRequest);
         }
 
-        // If there already is a another request pending, send it now
+        // If there already is a request pending, send it now
         // But only if it should not be sent delayed
         if (!this._sendTimeoutId) {
           this._sendNow();
         }
       } else {
-        // Ensure busy is false when an error occurred an we won't be sending more requests.
+        // Ensure busy is false when an error occurred, and we won't be sending more requests.
         // It could still be true when here were more busy indicated events in the queue when
         // the error response was received (e.g. when selecting some table rows just when the
         // server is restarted).
@@ -1000,7 +998,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
       let loopDetection = webstorage.getItemFromSessionStorage('scout:versionMismatch');
       if (!loopDetection) {
         webstorage.setItemToSessionStorage('scout:versionMismatch', 'yes');
-        // Reload page -> everything should then be up to date
+        // Reload page -> everything should then be up-to-date
         scout.reloadPage();
         return;
       }
@@ -1139,7 +1137,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
         /*
          * - see ClipboardField for comments on "scoutName"
          * - Some Browsers (e.g. Edge) handle an empty string as filename as if the filename is not set and therefore introduce a default filename like 'blob'.
-         *   To counter this, we introduce a empty filename string. The string consists of characters that can not occur in regular filenames, to prevent collisions.
+         *   To counter this, we introduce an empty filename string. The string consists of characters that can not occur in regular filenames, to prevent collisions.
          */
         let filename = scout.nvl(value.scoutName, value.name, Session.EMPTY_UPLOAD_FILENAME) as string;
         formData.append('files', value, filename);
@@ -1335,7 +1333,6 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
         return; // No busy indicator without desktop (e.g. during shutdown)
       }
       this._busyIndicator = scout.create(BusyIndicator, {
-        // @ts-ignore
         parent: this.desktop
       });
       this._busyIndicator.on('cancel', this._onCancelProcessing.bind(this));
@@ -1358,7 +1355,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
   protected _onCancelProcessing(event: Event) {
     let busyIndicator = this._busyIndicator;
     if (!busyIndicator) {
-      return; // removed in the mean time
+      return; // removed in the meantime
     }
     busyIndicator.off('cancel');
 
@@ -1401,7 +1398,8 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     $.ajax(this.defaultAjaxOptions(request));
   }
 
-  protected _newRequest(requestData?: RemoteRequestData): RemoteRequest {
+  /** @internal */
+  _newRequest(requestData?: RemoteRequestData): RemoteRequest {
     let request = $.extend({
       uiSessionId: this.uiSessionId
     }, requestData) as RemoteRequest;
@@ -1424,7 +1422,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
         // Sometimes events seem to happen "too early", e.g. when a "requestFocus" event for a field is
         // encountered before the "showForm" event has been processed. If the target adapter cannot be
         // resolved, we try the other events first, expecting them to trigger the creation of the event
-        // adapter. As soon as a event could be processed successfully, we try our postponed event again.
+        // adapter. As soon as an event could be processed successfully, we try our postponed event again.
         $.log.isDebugEnabled() && $.log.debug('Postponing \'' + event.type + '\' for adapter with ID ' + event.target);
         i++;
         continue;
@@ -1510,7 +1508,8 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
     });
   }
 
-  protected _renderDesktop() {
+  /** @internal */
+  _renderDesktop() {
     this.desktop.render(this.$entryPoint);
     this.desktop.invalidateLayoutTree(false);
   }
@@ -1548,8 +1547,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
   }
 
   protected _onReloadPage(event: RemoteEvent) {
-    // Don't clear the body, because other events might be processed before the reload and
-    // it could cause errors when all DOM elements are already removed.
+    // Don't clear the body, because other events might be processed before reload, and it could cause errors when all DOM elements are already removed.
     scout.reloadPage({
       clearBody: false
     });
@@ -1578,8 +1576,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
       this.desktop.formController.closePopupWindows();
     }
 
-    // Destroy UI session on server (only when the server did not not initiate the logout,
-    // otherwise the UI session would already be disposed)
+    // Destroy UI session on server (only when the server did not initiate the logout, otherwise the UI session would already be disposed)
     if (!this.loggedOut) {
       this._sendUnloadRequest();
     }
@@ -1590,7 +1587,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
 
   /**
    * Returns the adapter-data sent with the JSON response from the adapter-data cache. Note that this operation
-   * removes the requested element from the cache, thus you cannot request the same ID twice. Typically once
+   * removes the requested element from the cache, thus you cannot request the same ID twice. Typically, once
    * you've requested an element from this cache an adapter for that ID is created and stored in the adapter
    * registry which too exists on this session object.
    */
@@ -1610,7 +1607,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
   /**
    * Returns the text for the given key.
    *
-   * @param textKey key to lookup the text
+   * @param textKey key to look up the text
    * @param args texts to replace the placeholders specified by {0}, {1}, etc.
    */
   text(textKey: string, ...args: any[]): string {
@@ -1620,7 +1617,7 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
   /**
    * Returns the text for the given key.
    *
-   * @param textKey key to lookup the text
+   * @param textKey key to look up the text
    * @param defaultValue the text to return if the key has not been found.
    * @param args texts to replace the placeholders specified by {0}, {1}, etc.
    */
@@ -1667,6 +1664,7 @@ export interface AdapterData extends ObjectWithType {
 }
 
 export interface RemoteResponse {
+  id?: string;
   '#'?: number;
   adapterData?: Record<string, AdapterData>;
   events?: RemoteEvent[];

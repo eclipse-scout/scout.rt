@@ -27,8 +27,7 @@ export default class SplitBoxFirstCollapseKeyStroke extends KeyStroke {
   }
 
   protected override _postRenderKeyBox($drawingArea: JQuery, $keyBox?: JQuery) {
-    // @ts-ignore
-    let $collapseHandle = this.field._collapseHandle.$container;
+    let $collapseHandle = this.field.collapseHandle.$container;
     $keyBox.addClass('split-box-collapse-key-box left');
     let handleOffset = $collapseHandle.offsetTo(this.field.$container);
 

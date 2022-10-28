@@ -24,7 +24,6 @@ export function bootstrap(url: string | string[]): JQuery.Promise<any> {
   let promises = [];
   let urls = arrays.ensure(url);
   urls.forEach(url => promises.push(
-    // @ts-ignore
     $.ajaxJson(url).then(_preInit.bind(this, url)))
   );
   return $.promiseAll(promises);
@@ -183,7 +182,7 @@ export function resolveText(value: string, languageTag: string): string {
  * Utility function to easily replace an object property which contains a text key like '${textKey:AKey}'.
  *
  * @param object object having a text property which contains a text-key
- * @param [textProperty] name of the property where a text-key should be replaced by a text. By default 'text' is used as property name.
+ * @param [textProperty] name of the property where a text-key should be replaced by a text. By default, 'text' is used as property name.
  * @param [session] can be undefined when given 'object' has a session property, otherwise mandatory
  */
 export function resolveTextProperty(object: any, textProperty?: string, session?: Session) {

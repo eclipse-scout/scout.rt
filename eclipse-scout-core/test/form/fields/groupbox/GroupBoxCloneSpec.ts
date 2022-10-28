@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GroupBox, GroupBoxGridConfig, HorizontalGrid, scout} from '../../../../src/index';
+import {DateField, GroupBox, GroupBoxGridConfig, HorizontalGrid, Menu, scout, SmartField, StringField} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper} from '../../../../src/testing/index';
 
 describe('GroupBox', () => {
-  let session;
-  let helper;
-  let cloneHelper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
+  let cloneHelper: CloneSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -33,15 +33,15 @@ describe('GroupBox', () => {
         gridColumnCount: 3,
         logicalGrid: 'HorizontalGrid',
         fields: [{
-          objectType: 'StringField'
+          objectType: StringField
         }, {
-          objectType: 'SmartField',
+          objectType: SmartField,
           label: 'a label'
         }, {
-          objectType: 'DateField'
+          objectType: DateField
         }],
         menus: [{
-          objectType: 'Menu'
+          objectType: Menu
         }]
       });
       let clone = groupBox.clone({
@@ -72,14 +72,14 @@ describe('GroupBox', () => {
           subLabel: 'abc',
           gridColumnCount: 2,
           fields: [{
-            objectType: 'StringField'
+            objectType: StringField
           }, {
-            objectType: 'SmartField'
+            objectType: SmartField
           }, {
-            objectType: 'DateField'
+            objectType: DateField
           }],
           menus: [{
-            objectType: 'Menu'
+            objectType: Menu
           }]
         });
       groupBox.render($('#sandbox'));

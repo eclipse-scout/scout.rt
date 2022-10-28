@@ -270,7 +270,6 @@ export function getSession(partId: string): Session {
   }
   for (let i = 0; i < sessions.length; i++) {
     let session = sessions[i];
-    // @ts-ignore
     // eslint-disable-next-line eqeqeq
     if (session.partId == partId) { // <-- compare with '==' is intentional! (NOSONAR)
       return session;
@@ -310,7 +309,6 @@ export function exportAdapter(adapterId: string, partId: string): AdapterData {
 
   function resolveAdapterReferences(adapter: ModelAdapterLike, adapterData: AdapterData) {
     let tmpAdapter: ModelAdapterLike, tmpAdapterData: AdapterData;
-    // @ts-ignore
     adapter.widget._widgetProperties.forEach(widgetPropertyName => {
       let widgetPropertyValue = adapterData[widgetPropertyName];
       if (!widgetPropertyValue) {

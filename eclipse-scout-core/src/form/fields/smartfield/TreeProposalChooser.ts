@@ -148,7 +148,7 @@ export default class TreeProposalChooser<TValue> extends ProposalChooser<TValue,
       expandAll = false;
 
       // when smartfield / lookup is configured as 'load incremental' we don't know if a node has children
-      // or not until we've made a lookup for that node. Thus all nodes are initially leaf=false, so the UI
+      // or not until we've made a lookup for that node. Thus, all nodes are initially leaf=false, so the UI
       // shows the expand icon.
       initialLeaf = false;
     }
@@ -203,8 +203,8 @@ export default class TreeProposalChooser<TValue> extends ProposalChooser<TValue,
   }
 
   /**
-   * This function creates a sub-tree from a list of flat tree nodes. It sets the parent/child references
-   * between the nodes and returns the top-level nodes of the sub-tree. This subtree is not yet attached
+   * This function creates a subtree from a list of flat tree nodes. It sets the parent/child references
+   * between the nodes and returns the top-level nodes of the subtree. This subtree is not yet attached
    * to the real tree (= this.content).
    */
   protected _flatListToSubTree(treeNodesFlat: ProposalTreeNode<TValue>[]): ProposalTreeNode<TValue>[] {

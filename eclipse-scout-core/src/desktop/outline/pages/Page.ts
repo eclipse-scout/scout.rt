@@ -136,7 +136,6 @@ export default class Page extends TreeNode implements PageModel {
     let tableModel = this.detailTable;
     if (tableModel) {
       // this case is used for Scout classic
-      // @ts-ignore
       let newDetailTable = this.getOutline()._createChild(tableModel) as Table;
       this._setDetailTable(newDetailTable);
     }
@@ -145,7 +144,6 @@ export default class Page extends TreeNode implements PageModel {
   protected _internalInitDetailForm() {
     let formModel = this.detailForm;
     if (formModel) {
-      // @ts-ignore
       let newDetailForm = this.getOutline()._createChild(formModel) as Form;
       this._setDetailForm(newDetailForm);
     }
@@ -165,7 +163,6 @@ export default class Page extends TreeNode implements PageModel {
   createDetailTable(): Table {
     let detailTable = this._createDetailTable();
     if (!detailTable && this._detailTableModel) {
-      // @ts-ignore
       detailTable = this.getOutline()._createChild(this._detailTableModel) as Table;
       this._detailTableModel = null; // no longer needed
     }
@@ -193,7 +190,6 @@ export default class Page extends TreeNode implements PageModel {
   createDetailForm(): Form {
     let detailForm = this._createDetailForm();
     if (!detailForm && this._detailFormModel) {
-      // @ts-ignore
       detailForm = this.getOutline()._createChild(this._detailFormModel) as Form;
       this._detailFormModel = null; // no longer needed
     }
@@ -235,7 +231,7 @@ export default class Page extends TreeNode implements PageModel {
     }
     if (form.owner === this.getOutline()) {
       // in Scout classic the owner is not an outline but the NullWidget.
-      // Then the destroy is controlled by the backend
+      // Then destroy is controlled by the backend
       form.destroy();
     }
   }
@@ -264,12 +260,13 @@ export default class Page extends TreeNode implements PageModel {
     table.off('rowClick', this._tableRowClickHandler);
     if (table.owner === this.getOutline()) {
       // in Scout classic the owner is not an outline but the NullWidget.
-      // Then the destroy is controlled by the backend
+      // Then destroy is controlled by the backend
       table.destroy();
     }
   }
 
-  protected override _decorate() {
+  /** @internal */
+  override _decorate() {
     super._decorate();
     if (!this.$node) {
       return;
@@ -402,7 +399,7 @@ export default class Page extends TreeNode implements PageModel {
 
   /**
    * @returns a page parameter object used to pass to newly created child pages. Sets the parent
-   *     to our outline instance and adds optional other properties. Typically you'll pass an
+   *     to our outline instance and adds optional other properties. Typically, you'll pass an
    *     object (entity-key or arbitrary data) to a child page.
    */
   protected _pageParam<T extends object>(paramProperties: T): T {

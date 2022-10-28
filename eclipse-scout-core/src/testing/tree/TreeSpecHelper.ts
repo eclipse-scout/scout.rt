@@ -1,18 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompactTree, ModelAdapterModel, ObjectFactory, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode} from '../../index';
+import {arrays, CompactTree, ModelAdapterModel, ObjectFactory, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode, Widget} from '../../index';
 import $ from 'jquery';
 import {TreeNodeData} from '../../tree/TreeNodeModel';
 import {SomeRequired} from '../../types';
 import {ObjectType} from '../../ObjectFactory';
+import SpecTree from './SpecTree';
+import SpecTreeAdapter from './SpecTreeAdapter';
 
 export default class TreeSpecHelper {
   session: Session;
@@ -21,17 +23,17 @@ export default class TreeSpecHelper {
     this.session = session;
   }
 
-  createModel(nodes: TreeNodeData[]): TreeModel & { objectType: ObjectType<Tree> } {
+  createModel(nodes: TreeNodeData[]): TreeModel & { id: string; objectType: ObjectType<Tree>; parent: Widget; session: Session } {
     let model = createSimpleModel('Tree', this.session) as TreeModel & { objectType: ObjectType<Tree> };
 
     if (nodes) {
       model.nodes = nodes;
     }
     model.enabled = true;
-    return model;
+    return model as TreeModel & { id: string; objectType: ObjectType<Tree>; parent: Widget; session: Session };
   }
 
-  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): TreeModel & { objectType: ObjectType<Tree> } {
+  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): TreeModel & { id: string; objectType: ObjectType<Tree>; parent: Widget; session: Session } {
     return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
   }
 
@@ -73,26 +75,26 @@ export default class TreeSpecHelper {
     return nodes;
   }
 
-  createTree(model: TreeModel): Tree {
+  createTree(model: TreeModel): SpecTree {
     let defaults = {
       parent: this.session.desktop
     };
     model = $.extend({}, defaults, model);
-    let tree = new Tree();
+    let tree = new SpecTree();
     tree.init(model);
     return tree;
   }
 
-  createTreeAdapter(model: ModelAdapterModel | SomeRequired<TreeModel, 'session' | 'id'>): TreeAdapter {
-    let adapter = new TreeAdapter();
+  createTreeAdapter(model: ModelAdapterModel | SomeRequired<TreeModel, 'session' | 'id'>): SpecTreeAdapter {
+    let adapter = new SpecTreeAdapter();
     adapter.init(model);
     return adapter;
   }
 
-  createCompactTree(model: TreeModel): CompactTree {
+  createCompactTree(model: TreeModel): CompactTree & SpecTree {
     let tree = new CompactTree();
     tree.init(model);
-    return tree;
+    return tree as CompactTree & SpecTree;
   }
 
   createCompactTreeAdapter(model: ModelAdapterModel): TreeAdapter {

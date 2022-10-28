@@ -12,7 +12,7 @@ import {Menu, menus, scout} from '../../src/index';
 import {MenuSpecHelper} from '../../src/testing/index';
 
 describe('menus', () => {
-  let helper, session;
+  let helper: MenuSpecHelper, session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -30,9 +30,9 @@ describe('menus', () => {
 
     it('returns no menus if no types are given', () => {
       let items, menu1, menu2, menu3;
-      menu1 = helper.createMenu(helper.createModel(1));
-      menu2 = helper.createMenu(helper.createModel(2));
-      menu3 = helper.createMenu(helper.createModel(3));
+      menu1 = helper.createMenu(helper.createModel('1'));
+      menu2 = helper.createMenu(helper.createModel('2'));
+      menu3 = helper.createMenu(helper.createModel('3'));
       menu3.visible = false;
 
       items = menus.filter([menu1, menu2, menu3]);
@@ -41,11 +41,11 @@ describe('menus', () => {
 
     it('only returns visible menus, if onlyVisible param is set to true', () => {
       let items, menu1, menu2, menu3;
-      menu1 = helper.createMenu(helper.createModel(1));
+      menu1 = helper.createMenu(helper.createModel('1'));
       menu1.setMenuTypes(['SingleSelection']);
-      menu2 = helper.createMenu(helper.createModel(2));
+      menu2 = helper.createMenu(helper.createModel('2'));
       menu2.setMenuTypes(['SingleSelection']);
-      menu3 = helper.createMenu(helper.createModel(3));
+      menu3 = helper.createMenu(helper.createModel('3'));
       menu3.setMenuTypes(['SingleSelection']);
       menu3.visible = false;
 
@@ -58,12 +58,12 @@ describe('menus', () => {
 
     it('only returns menus with given type (even when menu is not visible)', () => {
       let items, menu1, menu2, menu3;
-      menu1 = helper.createMenu(helper.createModel(1));
+      menu1 = helper.createMenu(helper.createModel('1'));
       menu1.setMenuTypes(['MultiSelection', 'SingleSelection']);
       menu1.visible = false;
-      menu2 = helper.createMenu(helper.createModel(2));
+      menu2 = helper.createMenu(helper.createModel('2'));
       menu2.setMenuTypes(['MultiSelection']);
-      menu3 = helper.createMenu(helper.createModel(3));
+      menu3 = helper.createMenu(helper.createModel('3'));
       menu3.setMenuTypes(['SingleSelection']);
 
       items = menus.filter([menu1, menu2, menu3], 'SingleSelection');
@@ -73,11 +73,11 @@ describe('menus', () => {
 
     it('only returns parent menus if child menus should be displayed', () => {
       let items, menu1, menu2, menu3;
-      menu1 = helper.createMenu(helper.createModel(1));
+      menu1 = helper.createMenu(helper.createModel('1'));
       menu1.setMenuTypes(['MultiSelection', 'SingleSelection']);
-      menu2 = helper.createMenu(helper.createModel(2));
+      menu2 = helper.createMenu(helper.createModel('2'));
       menu2.setMenuTypes(['SingleSelection']);
-      menu3 = helper.createMenu(helper.createModel(3));
+      menu3 = helper.createMenu(helper.createModel('3'));
       menu3.setMenuTypes(['MultiSelection']);
       menu2.childActions = [menu3];
 
@@ -91,10 +91,10 @@ describe('menus', () => {
 
     it('only returns parent menus if child menus have correct type', () => {
       let items, parentMenu, menu1, menu2;
-      parentMenu = helper.createMenu(helper.createModel(1));
-      menu1 = helper.createMenu(helper.createModel(2));
+      parentMenu = helper.createMenu(helper.createModel('1'));
+      menu1 = helper.createMenu(helper.createModel('2'));
       menu1.setMenuTypes(['SingleSelection']);
-      menu2 = helper.createMenu(helper.createModel(3));
+      menu2 = helper.createMenu(helper.createModel('3'));
       menu2.setMenuTypes(['EmptySpace']);
       parentMenu.childActions = [menu1, menu2];
 
@@ -108,12 +108,12 @@ describe('menus', () => {
 
     it('returns a menu with no menuTypes if the at least one defaultMenuType matches the given types', () => {
       let menu1, menu2, menu3;
-      menu1 = helper.createMenu(helper.createModel(1));
+      menu1 = helper.createMenu(helper.createModel('1'));
       menu1.setMenuTypes(['test.MenuType1', 'test.MenuType2']);
       menu1.visible = false;
-      menu2 = helper.createMenu(helper.createModel(2));
+      menu2 = helper.createMenu(helper.createModel('2'));
       menu2.setMenuTypes(['test.MenuType1']);
-      menu3 = helper.createMenu(helper.createModel(3));
+      menu3 = helper.createMenu(helper.createModel('3'));
       menu3.setMenuTypes(['test.MenuType2']);
 
       expect(menus.filter([menu1, menu2, menu3], 'test.MenuType1'))

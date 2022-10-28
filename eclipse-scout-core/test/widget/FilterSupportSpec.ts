@@ -1,86 +1,94 @@
-/* eslint-disable max-classes-per-file */
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FilterSupport, HtmlComponent, KeyStrokeContext, NullWidget, numbers, strings} from '../../src/index';
+
+/* eslint-disable max-classes-per-file */
+import {Filter, FilterOrFunction, FilterResult, FilterSupport, HtmlComponent, KeyStrokeContext, NullWidget, numbers, StringField, strings, UpdateFilteredElementsOptions, WidgetModel} from '../../src/index';
 import $ from 'jquery';
+import {Optional} from '../../src/types';
 
 describe('FilterSupport', () => {
 
-  let session;
+  let session: SandboxSession;
 
   class FilterSupportWidget extends NullWidget {
+
+    elements: Element[];
+    filters: Filter<Element>[];
+    filterSupport: FilterSupport<Element> & { _filterField: StringField };
+    textFilterEnabled: boolean;
+    filteredElementsDirty: boolean;
+
     constructor() {
       super();
       this.elements = [];
-
       this.filters = [];
       this.textFilterEnabled = false;
+      // @ts-ignore
       this.filterSupport = this._createFilterSupport();
-
       this.filteredElementsDirty = false;
     }
 
-    _render() {
+    protected override _render() {
       this.$container = this.$parent.appendDiv();
       this.htmlComp = HtmlComponent.install(this.$container, this.session);
     }
 
-    _renderProperties() {
+    protected override _renderProperties() {
       super._renderProperties();
       this._renderTextFilterEnabled();
     }
 
-    _remove() {
+    protected override _remove() {
       this.filterSupport.remove();
       super._remove();
     }
 
-    _init(model) {
+    protected override _init(model: WidgetModel & { elements?: object }) {
       super._init(model);
       this.setElements(this.elements);
       this.setFilters(this.filters);
     }
 
-    _createKeyStrokeContext() {
+    protected override _createKeyStrokeContext(): KeyStrokeContext {
       return new KeyStrokeContext();
     }
 
-    setElements(elements) {
+    setElements(elements: (Element | object)[]) {
       elements = elements.map(element => this._initElement(element));
       this.setProperty('elements', elements);
       this.filter();
     }
 
-    _initElement(element) {
+    _initElement(element: Element | object): Element {
       if (!(element instanceof Element)) {
         let e = new Element();
         e.init(element);
         element = e;
       }
-      return element;
+      return element as Element;
     }
 
-    filteredElements() {
+    filteredElements(): Element[] {
       return this.elements.filter(element => element.filterAccepted);
     }
 
-    addFilter(filter, applyFilter = true) {
+    addFilter(filter: FilterOrFunction<Element> | FilterOrFunction<Element>[], applyFilter = true) {
       this.filterSupport.addFilter(filter, applyFilter);
     }
 
-    removeFilter(filter, applyFilter = true) {
+    removeFilter(filter: FilterOrFunction<Element> | FilterOrFunction<Element>[], applyFilter = true) {
       this.filterSupport.removeFilter(filter, applyFilter);
     }
 
-    setFilters(filters, applyFilter = true) {
+    setFilters(filters: FilterOrFunction<Element> | FilterOrFunction<Element>[], applyFilter = true) {
       this.filterSupport.setFilters(filters, applyFilter);
     }
 
@@ -88,14 +96,11 @@ describe('FilterSupport', () => {
       this.filterSupport.filter();
     }
 
-    updateFilteredElements(result, opts) {
+    updateFilteredElements?(result: FilterResult<Element>, options: UpdateFilteredElementsOptions) {
       this.filteredElementsDirty = false;
     }
 
-    /**
-     * @returns {FilterSupport}
-     */
-    _createFilterSupport() {
+    protected _createFilterSupport(): FilterSupport<any> {
       return new FilterSupport({
         widget: this,
         $container: () => this.$container,
@@ -104,20 +109,25 @@ describe('FilterSupport', () => {
       });
     }
 
-    setTextFilterEnabled(textFilterEnabled) {
+    setTextFilterEnabled(textFilterEnabled: boolean) {
       this.setProperty('textFilterEnabled', textFilterEnabled);
     }
 
-    isTextFilterFieldVisible() {
+    isTextFilterFieldVisible(): boolean {
       return this.textFilterEnabled;
     }
 
-    _renderTextFilterEnabled() {
+    protected _renderTextFilterEnabled() {
       this.filterSupport.renderFilterField();
     }
   }
 
   class Element {
+    filterAccepted: boolean;
+    id: number;
+    text: string;
+    someProperty: boolean;
+
     constructor() {
       this.id = null;
       this.text = null;
@@ -125,11 +135,11 @@ describe('FilterSupport', () => {
       this.filterAccepted = true;
     }
 
-    init(model) {
+    init(model: object) {
       $.extend(this, model);
     }
 
-    setFilterAccepted(filterAccepted) {
+    setFilterAccepted(filterAccepted: boolean) {
       this.filterAccepted = filterAccepted;
     }
   }
@@ -139,18 +149,18 @@ describe('FilterSupport', () => {
     session = sandboxSession();
   });
 
-  function createWidget(model) {
+  function createWidget(model: Optional<WidgetModel, 'parent'> & { elements?: object }): FilterSupportWidget {
     let defaults = {
       parent: session.desktop,
       session: session
     };
     model = $.extend({}, defaults, model);
     let widget = new FilterSupportWidget();
-    widget.init(model);
+    widget.init(model as WidgetModel);
     return widget;
   }
 
-  function createElements() {
+  function createElements(): ({ id: number; text: string; someProperty?: boolean })[] {
     return [
       {id: 1, text: 'Hi! I am Marvin, the paranoid android'},
       {id: 2, text: 'Life? Don\'t talk to me about life.', someProperty: true},

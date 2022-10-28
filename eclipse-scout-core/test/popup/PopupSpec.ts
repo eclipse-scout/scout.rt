@@ -13,7 +13,7 @@ import {Dimension, HtmlComponent, Popup, scout, StringField, Widget, WidgetPopup
 import {triggerMouseDownCapture} from '../../src/testing/jquery-testing';
 
 describe('Popup', () => {
-  let session, $desktop;
+  let session: SandboxSession, $desktop: JQuery;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -37,12 +37,14 @@ describe('Popup', () => {
   });
 
   class WrappingContent extends Widget {
+    numBlocks: number;
+
     constructor() {
       super();
       this.numBlocks = 2;
     }
 
-    _render() {
+    override _render() {
       this.$container = this.$parent.appendDiv();
       this.htmlComp = HtmlComponent.install(this.$container, this.session);
       for (let i = 0; i < this.numBlocks; i++) {
@@ -51,16 +53,15 @@ describe('Popup', () => {
     }
   }
 
-  window.scouttests = window.scouttests || {};
-  window.scouttests.WrappingContent = WrappingContent;
-
   class LargeContent extends Widget {
+    numBlocks: number;
+
     constructor() {
       super();
       this.numBlocks = 2;
     }
 
-    _render() {
+    override _render() {
       this.$container = this.$parent.appendDiv();
       this.htmlComp = HtmlComponent.install(this.$container, this.session);
       for (let i = 0; i < this.numBlocks; i++) {
@@ -69,8 +70,6 @@ describe('Popup', () => {
     }
   }
 
-  window.scouttests.LargeContent = LargeContent;
-
   let entryPointSizeFunc = () => new Dimension($desktop.width(), $desktop.height());
 
   afterEach(() => {
@@ -78,7 +77,7 @@ describe('Popup', () => {
   });
   describe('modal', () => {
     it('has the "modal" css class if set to true', () => {
-      let popup = scout.create('Popup', {
+      let popup = scout.create(Popup, {
         parent: session.desktop,
         modal: true
       });
@@ -87,7 +86,7 @@ describe('Popup', () => {
     });
 
     it('has not the "modal" css class if set to false', () => {
-      let popup = scout.create('Popup', {
+      let popup = scout.create(Popup, {
         parent: session.desktop,
         modal: false
       });
@@ -96,7 +95,7 @@ describe('Popup', () => {
     });
 
     it('does not closes on mouse down outside', () => {
-      let popup = scout.create('Popup', {
+      let popup = scout.create(Popup, {
         parent: session.desktop,
         modal: true
       });
@@ -110,7 +109,7 @@ describe('Popup', () => {
     });
 
     it('can be activated after the popup was opened', () => {
-      let popup = scout.create('Popup', {
+      let popup = scout.create(Popup, {
         parent: session.desktop,
         modal: false
       });
@@ -122,7 +121,7 @@ describe('Popup', () => {
     });
 
     it('overrules the "withGlassPane" and the close properties, but restores their values afterwards', () => {
-      let popup = scout.create('Popup', {
+      let popup = scout.create(Popup, {
         parent: session.desktop,
         modal: false,
         withGlassPane: false,
@@ -147,7 +146,7 @@ describe('Popup', () => {
     });
 
     it('keeps track of the changes to the "withGlassPane" and the close properties and restores their values afterwards', () => {
-      let popup = scout.create('Popup', {
+      let popup = scout.create(Popup, {
         parent: session.desktop,
         modal: true,
         withGlassPane: false,
@@ -708,7 +707,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingX: 0,
           content: {
-            objectType: 'scouttests.WrappingContent',
+            objectType: WrappingContent,
             numBlocks: 3
           }
         });
@@ -730,7 +729,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingX: 0,
           content: {
-            objectType: 'scouttests.WrappingContent',
+            objectType: WrappingContent,
             numBlocks: 3
           }
         });
@@ -755,7 +754,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingX: 0,
           content: {
-            objectType: 'scouttests.WrappingContent',
+            objectType: WrappingContent,
             numBlocks: 4
           }
         });
@@ -781,7 +780,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingY: 0,
           content: {
-            objectType: 'scouttests.LargeContent',
+            objectType: LargeContent,
             numBlocks: 3
           }
         });
@@ -802,7 +801,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingY: 0,
           content: {
-            objectType: 'scouttests.LargeContent',
+            objectType: LargeContent,
             numBlocks: 3
           }
         });
@@ -823,7 +822,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingY: 0,
           content: {
-            objectType: 'scouttests.LargeContent',
+            objectType: LargeContent,
             numBlocks: 10
           }
         });
@@ -846,7 +845,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingY: 0,
           content: {
-            objectType: 'scouttests.LargeContent',
+            objectType: LargeContent,
             numBlocks: 20
           }
         });
@@ -871,7 +870,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingY: 0,
           content: {
-            objectType: 'scouttests.LargeContent',
+            objectType: LargeContent,
             numBlocks: 4
           }
         });
@@ -999,7 +998,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingY: 0,
           content: {
-            objectType: 'scouttests.LargeContent',
+            objectType: LargeContent,
             numBlocks: 5
           }
         });
@@ -1020,7 +1019,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingY: 0,
           content: {
-            objectType: 'scouttests.LargeContent',
+            objectType: LargeContent,
             numBlocks: 5
           }
         });
@@ -1088,7 +1087,7 @@ describe('Popup', () => {
           withArrow: true,
           scrollType: 'position',
           content: {
-            objectType: 'scouttests.LargeContent',
+            objectType: LargeContent,
             numBlocks: 5
           }
         });
@@ -1115,7 +1114,7 @@ describe('Popup', () => {
           scrollType: 'position',
           withArrow: true,
           content: {
-            objectType: 'scouttests.LargeContent',
+            objectType: LargeContent,
             numBlocks: 5
           }
         });
@@ -1174,7 +1173,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingX: 0,
           content: {
-            objectType: 'scouttests.WrappingContent',
+            objectType: WrappingContent,
             numBlocks: 5
           }
         });
@@ -1195,7 +1194,7 @@ describe('Popup', () => {
           $anchor: $anchor,
           windowPaddingX: 0,
           content: {
-            objectType: 'scouttests.WrappingContent',
+            objectType: WrappingContent,
             numBlocks: 5
           }
         });

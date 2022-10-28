@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -19,7 +19,7 @@ describe('scout.promises', () => {
   function createPromiseCreatorForDeferredArray(deferredArray) {
     return new PromiseCreator(deferredArray.map((v, i) => {
       return () => {
-        deferredArray[i] = new $.Deferred();
+        deferredArray[i] = $.Deferred();
         return deferredArray[i];
       };
     }));
@@ -110,7 +110,7 @@ describe('scout.promises', () => {
 
   it('adds all result arguments, one for each deferred', done => {
     let deferredArray = arrays.init(3, null).map(() => {
-      return new $.Deferred();
+      return $.Deferred();
     });
     let promiseCreator = new PromiseCreator(deferredArray.map((v, i) => {
       return () => deferredArray[i].promise();

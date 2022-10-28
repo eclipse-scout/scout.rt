@@ -290,7 +290,7 @@ export default class Popup extends Widget implements PopupModel {
     this.position();
   }
 
-  override render($parent: JQuery) {
+  override render($parent?: JQuery) {
     let $popupParent = $parent || this.entryPoint();
     // when the parent is detached it is not possible to render the popup -> do it later
     if (!$popupParent || !$popupParent.length || !$popupParent.isAttached()) {

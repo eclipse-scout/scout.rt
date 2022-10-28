@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Button, ButtonAdapterMenu, Dimension, GroupBoxMenuItemsOrder, HtmlComponent, Menu, MenuBar, MenuItemsOrder, scout} from '../../src/index';
+import {Action, Button, ButtonAdapterMenu, Dimension, EllipsisMenu, GroupBoxMenuItemsOrder, HtmlComponent, Menu, MenuBar, MenuItemsOrder, MenuModel, scout} from '../../src/index';
 import {MenuSpecHelper} from '../../src/testing/index';
+import {MenuOrder} from '../../src/menu/MenuItemsOrder';
 
 describe('MenuBar', () => {
-  let helper, session;
+  let helper: MenuSpecHelper, session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -27,17 +28,21 @@ describe('MenuBar', () => {
       '</style>').appendTo($('#sandbox'));
   });
 
-  function createModel(text, iconId, menuTypes) {
+  function createModel(text?: string, iconId?: string, menuTypes?: string[]): MenuModel {
     text = scout.nvl(text, 'Foo');
     menuTypes = scout.nvl(menuTypes, ['Table.EmptySpace']);
     return helper.createModel(text, iconId, menuTypes);
   }
 
-  function createMenuBar(menuOrder) {
-    return scout.create(MenuBar, {
+  function createMenuBar(menuOrder?: MenuOrder): SpecMenuBar {
+    return scout.create(SpecMenuBar, {
       parent: session.desktop,
       menuOrder: scout.nvl(menuOrder, new MenuItemsOrder(session, 'Table'))
     });
+  }
+
+  class SpecMenuBar extends MenuBar {
+    declare _ellipsis: EllipsisMenu;
   }
 
   describe('setMenuItems', () => {

@@ -79,14 +79,17 @@ export default class Column<TValue = string> extends PropertyEventEmitter implem
   tableNodeLevel0CellPadding: number;
   expandableIconLevel0CellPadding: number;
   nodeColumnCandidate: boolean;
-
   /** Set by TableHeader */
   $header: JQuery;
   $separator: JQuery;
 
+  /**
+   * Contains the width the cells of the column really have (only set in Chrome due to a Chrome bug, see Table._updateRealColumnWidths)
+   * @internal
+   */
+  _realWidth: number;
+
   protected _tableColumnsChangedHandler: EventHandler<TableColumnMovedEvent | Event<Table>>;
-  /** Contains the width the cells of the column really have (only set in Chrome due to a Chrome bug, see Table._updateRealColumnWidths) */
-  protected _realWidth: number;
 
   constructor() {
     super();
@@ -186,7 +189,8 @@ export default class Column<TValue = string> extends PropertyEventEmitter implem
     // NOP
   }
 
-  protected _setTable(table: Table) {
+  /** @internal */
+  _setTable(table: Table) {
     if (this.table) {
       this.table.off('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
     }
@@ -219,7 +223,7 @@ export default class Column<TValue = string> extends PropertyEventEmitter implem
 
   /**
    * Ensures that a Cell instance is returned.
-   * When vararg is a scalar value a new Cell instance is created and the value is set as cell.value property.
+   * When vararg is a scalar value a new Cell instance is created and the value is set as {@link cell.value} property.
    *
    * @param vararg either a Cell instance or a scalar value
    */
@@ -300,14 +304,13 @@ export default class Column<TValue = string> extends PropertyEventEmitter implem
     return this.buildCell(cell, {});
   }
 
-  buildCell(cell: Cell<TValue>, row: TableRow | { hasError?: boolean; expanded?: boolean; expandable?: boolean }): string {
+  buildCell(cell: Cell<TValue>, row: TableRow | { hasError?: boolean; expanded?: boolean; expandable?: boolean; parentRow?: TableRow }): string {
     scout.assertParameter('cell', cell, Cell);
 
     let tableNodeColumn = this.table.isTableNodeColumn(this),
       rowPadding = 0;
 
     if (tableNodeColumn) {
-      // @ts-ignore
       rowPadding = this.table._calcRowLevelPadding(row);
     }
 
@@ -773,7 +776,7 @@ export default class Column<TValue = string> extends PropertyEventEmitter implem
 
   /**
    * Returns a type specific column user-filter. The default impl. returns a ColumnUserFilter.
-   * Sub-classes that must return another type, must simply change the value of the 'filterType' property.
+   * Subclasses that must return another type, must simply change the value of the 'filterType' property.
    */
   createFilter(): ColumnUserFilter {
     return scout.create(this.filterType, {
@@ -784,7 +787,7 @@ export default class Column<TValue = string> extends PropertyEventEmitter implem
   }
 
   /**
-   * Returns a table header menu. Sub-classes can override this method to create a column specific table header menu.
+   * Returns a table header menu. Subclasses can override this method to create a column specific table header menu.
    */
   createTableHeaderMenu(tableHeader: TableHeader): TableHeaderMenu {
     let $header = this.$header;
@@ -832,7 +835,7 @@ export default class Column<TValue = string> extends PropertyEventEmitter implem
     field.setDisplayText(cell.text);
   }
 
-  protected _createEditor(row: TableRow): ValueField<TValue> {
+  protected _createEditor(row: TableRow): ValueField<TValue, any> {
     return scout.create(StringField, {
       parent: this.table,
       maxLength: this.maxLength,

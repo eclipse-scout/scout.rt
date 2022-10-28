@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,8 +13,8 @@ import {FormSpecHelper} from '../../../../src/testing/index';
 import {triggerClick} from '../../../../src/testing/jquery-testing';
 
 describe('FileChooserField', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -30,10 +30,10 @@ describe('FileChooserField', () => {
   });
 
   describe('setValue', () => {
-    let field;
+    let field: FileChooserField;
 
     beforeEach(() => {
-      field = helper.createField('FileChooserField');
+      field = helper.createField(FileChooserField);
     });
 
     it('sets the file as value', () => {
@@ -75,7 +75,7 @@ describe('FileChooserField', () => {
       let largeFile = new File(['abcdefghijklmnopqrstuvwxyz'], 'large file.txt');
       let largerFile = new File(['abcdefghijklmnopqrstuvwxyz0123456789'], 'larger file.txt');
 
-      let field = helper.createField('FileChooserField');
+      let field = helper.createField(FileChooserField);
       field.setMaximumUploadSize(5); // 5 bytes
 
       field.setValue(largeFile);
@@ -97,7 +97,7 @@ describe('FileChooserField', () => {
       }
       let largeFile = new File(['abcdefghijklmnopqrstuvwxyz'], 'large file.txt');
 
-      let field = helper.createField('FileChooserField');
+      let field = helper.createField(FileChooserField);
       field.setValue(largeFile);
       expect(field.errorStatus).toBe(null);
       expect(field.value).toBe(largeFile);

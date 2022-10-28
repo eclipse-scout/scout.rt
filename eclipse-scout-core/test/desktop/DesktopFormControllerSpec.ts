@@ -1,20 +1,30 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopFormController} from '../../src/index';
+import {DesktopFormController, Form, PopupWindow} from '../../src/index';
 
 describe('DesktopFormController', function() {
 
-  let ctrl, session, $sandbox, popupWindow,
-    myWindow, myForm,
+  let ctrl: SpecDesktopFormController, session: SandboxSession, $sandbox: JQuery, popupWindow: PopupWindow,
+    myWindow: Window, myForm: Form,
     displayParent = this;
+
+  class SpecDesktopFormController extends DesktopFormController {
+    override _addPopupWindow(newWindow: Window, form: Form, resizeToPrefSize: boolean) {
+      super._addPopupWindow(newWindow, form, resizeToPrefSize);
+    }
+
+    override _removePopupWindow(form: Form) {
+      super._removePopupWindow(form);
+    }
+  }
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -27,19 +37,22 @@ describe('DesktopFormController', function() {
       id: 'foo',
       rendered: true,
       remove: () => {
+        // nop
       }
-    };
+    } as Form;
 
     // mock popupWindow
     popupWindow = {
       form: myForm,
       _onReady: () => {
+        // nop
       },
       close: () => {
+        // nop
       }
-    };
+    } as PopupWindow;
 
-    // cross reference form and popup-window
+    // cross-reference form and popup-window
     myForm.popupWindow = popupWindow;
 
     // de-register ALL existing event-handlers (there are hundreds of them!)
@@ -48,7 +61,7 @@ describe('DesktopFormController', function() {
     // which is currently hard to make :-(
     $(document).off('popupWindowReady');
 
-    ctrl = new DesktopFormController({
+    ctrl = new SpecDesktopFormController({
       displayParent: displayParent,
       session: session
     });
@@ -68,7 +81,7 @@ describe('DesktopFormController', function() {
   });
 
   it('Listens to popupWindowReady event and calls _onReady - having only a form ID (reload case)', () => {
-    ctrl._popupWindows.push(popupWindow);
+    ctrl.popupWindows.push(popupWindow);
     spyOn(popupWindow, '_onReady');
     $(document).trigger('popupWindowReady', {
       formId: 'foo'
@@ -77,17 +90,17 @@ describe('DesktopFormController', function() {
   });
 
   it('_addPopupWindow registers listeners and adds to array with popup-windows', () => {
-    expect(ctrl._popupWindows.length).toBe(0);
+    expect(ctrl.popupWindows.length).toBe(0);
     ctrl._addPopupWindow(myWindow, myForm, false);
-    expect(ctrl._popupWindows.length).toBe(1);
+    expect(ctrl.popupWindows.length).toBe(1);
   });
 
   it('_removePopupWindow cleans up and removes from array with popup-windows', () => {
     spyOn(popupWindow, 'close');
     spyOn(myForm, 'remove');
-    ctrl._popupWindows.push(popupWindow);
+    ctrl.popupWindows.push(popupWindow);
     ctrl._removePopupWindow(myForm);
-    expect(ctrl._popupWindows.length).toBe(0);
+    expect(ctrl.popupWindows.length).toBe(0);
     expect(myForm.popupWindow).toBe(undefined);
     expect(popupWindow.close).toHaveBeenCalled();
     expect(myForm.remove).toHaveBeenCalled();

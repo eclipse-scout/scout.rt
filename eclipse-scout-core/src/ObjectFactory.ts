@@ -87,7 +87,7 @@ export default class ObjectFactory {
    * When the object factory contains a create function for the given objectType, this function is called.
    *
    * Otherwise, it tries to find the constructor function by the following logic:
-   * If the objectType provides a name space, it is used. Otherwise it takes the default "scout" name space.
+   * If the objectType provides a name space, it is used. Otherwise, it takes the default "scout" name space.
    * If the object type provides a variant ("Type:Variant"), the final object type is built by prepending
    * the variant to the type ("VariantType"). If no such type can be found and the option "variantLenient"
    * is set to true, a second attempt is made without the variant.
@@ -132,7 +132,7 @@ export default class ObjectFactory {
 
   /**
    * Creates and initializes a new Scout object. When the created object has an init function, the
-   * model object is passed to that function. Otherwise the init call is omitted.
+   * model object is passed to that function. Otherwise, the init call is omitted.
    *
    * @param objectTypeOrModel A class reference to the object to be created. Or a string with the requested objectType.
    *        This argument is optional, but if it is omitted, the argument "model" becomes mandatory and MUST contain a
@@ -162,7 +162,6 @@ export default class ObjectFactory {
     } else {
       throw new Error('Invalid arguments');
     }
-    // noinspection JSUndefinedPropertyAssignment
     options.model = model;
 
     // Create object
@@ -250,7 +249,7 @@ export default class ObjectFactory {
    * The namespace is an object on the window containing object names as keys and object references as values.
    * The type of the object is not restricted, mostly it is a class but may also be a function or a plain object used as enum.
    * <p>
-   * Registering classes enables creating an instance of the class by its name using the ObjectFactory (e.g. scout.create('Button', {}) ).
+   * Registering classes enables creating an instance of the class by its name using the ObjectFactory (e.g. scout.create(Button, {}) ).
    * This is necessary to import string based models, e.g. if the model is delivered by a server (Scout Classic).
    * Registering objects in general is also necessary, if the application does not use EcmaScript imports or the imports are treated as externals and transpiled to a window lookup (see Webpack root external for details).
    * <p>

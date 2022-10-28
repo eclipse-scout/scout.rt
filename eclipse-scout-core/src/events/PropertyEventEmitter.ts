@@ -51,11 +51,12 @@ export default class PropertyEventEmitter extends EventEmitter {
    * <p>
    * It is possible to prevent the setting of the property value by using {@link Event.preventDefault}.
    *
+   * @internal
    * @param propertyName the name of the property
    * @param newValue the new value the property should get
    * @returns true if the property has been changed, false if not.
    */
-  protected _setProperty(propertyName: string, newValue: any): boolean {
+  _setProperty(propertyName: string, newValue: any): boolean {
     scout.assertParameter('propertyName', propertyName);
     let oldValue = this[propertyName];
     if (objects.equals(oldValue, newValue)) {

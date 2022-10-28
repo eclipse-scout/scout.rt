@@ -238,7 +238,8 @@ export default class DatePicker extends Widget implements DatePickerModel {
     }
   }
 
-  protected _layoutWeekendSeparators() {
+  /** @internal */
+  _layoutWeekendSeparators() {
     this.months.forEach(m => this._layoutWeekendSeparator(m));
   }
 
@@ -589,8 +590,7 @@ export default class DatePicker extends Widget implements DatePickerModel {
   }
 
   protected _onMouseWheel(event: JQueryMouseWheelEvent<HTMLDivElement>) {
-    // @ts-ignore
-    let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event.originalEvent;
+    let originalEvent: OldWheelEvent = event.originalEvent || this.$container.window(true).event['originalEvent'];
     let wheelData = originalEvent.wheelDelta ? originalEvent.wheelDelta / 10 : -originalEvent.detail * 3;
     let diff = (wheelData >= 0 ? -1 : 1);
     this.shiftViewDate(0, diff, 0);

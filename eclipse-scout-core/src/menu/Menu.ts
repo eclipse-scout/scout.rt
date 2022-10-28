@@ -15,6 +15,7 @@ import {
 import {PopupAlignment} from '../popup/Popup';
 import {CloneOptions, TreeVisitor} from '../widget/Widget';
 import {MenuOrder} from './MenuItemsOrder';
+import {Optional} from '../types';
 
 export type SubMenuVisibility = EnumObject<typeof Menu.SubMenuVisibility>;
 export type MenuStyle = EnumObject<typeof Menu.MenuStyle>;
@@ -240,7 +241,8 @@ export default class Menu extends Action implements MenuModel {
     return true;
   }
 
-  protected _doActionTogglesSubMenu(): boolean {
+  /** @internal */
+  _doActionTogglesSubMenu(): boolean {
     if (!this.childActions.length) {
       return false;
     }
@@ -488,7 +490,8 @@ export default class Menu extends Action implements MenuModel {
     this.$container.toggleClass('menu-icononly', !hasText && hasOneIcon);
   }
 
-  protected _closePopup() {
+  /** @internal */
+  _closePopup() {
     if (this.popup && !this.popup.isRemovalPending()) {
       this.popup.close();
     }
@@ -556,11 +559,11 @@ export default class Menu extends Action implements MenuModel {
   /**
    * @deprecated use insertChildActions instead
    */
-  addChildActions(childActions: Menu | Menu[]) {
+  addChildActions(childActions: Menu | RefModel<MenuModel> | (Menu | RefModel<MenuModel>)[]) {
     this.insertChildActions(childActions);
   }
 
-  insertChildAction(actionsToInsert: Menu) {
+  insertChildAction(actionsToInsert: Menu | RefModel<MenuModel>) {
     this.insertChildActions([actionsToInsert]);
   }
 
@@ -682,8 +685,9 @@ export default class Menu extends Action implements MenuModel {
   /**
    * For internal usage only.
    * Used by the MenuBarLayout when a menu is moved to the ellipsis drop down.
+   * @internal
    */
-  protected _setOverflown(overflown: boolean) {
+  _setOverflown(overflown: boolean) {
     if (this.overflown === overflown) {
       return;
     }
@@ -719,7 +723,7 @@ export default class Menu extends Action implements MenuModel {
     this.childActions.forEach(child => child.setMenuFilter(menuFilter));
   }
 
-  override clone(model: MenuModel, options: CloneOptions): this {
+  override clone(model: Optional<MenuModel, 'parent'>, options: CloneOptions): this {
     let clone = super.clone(model, options) as Menu;
     this._deepCloneProperties(clone, 'childActions', options);
     clone._setChildActions(clone.childActions);

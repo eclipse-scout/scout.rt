@@ -1,18 +1,19 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper} from '../../../../src/testing/index';
+import {NumberField, NumberFieldAdapter} from '../../../../src';
 
 describe('NumberFieldAdapter', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -21,10 +22,10 @@ describe('NumberFieldAdapter', () => {
   });
 
   describe('parse', () => {
-    let field;
+    let field: NumberField;
 
     beforeEach(() => {
-      field = helper.createField('NumberField');
+      field = helper.createField(NumberField);
       linkWidgetAndAdapter(field, 'NumberFieldAdapter');
     });
 
@@ -44,7 +45,9 @@ describe('NumberFieldAdapter', () => {
       // The error status is handled completely by the server, thus it must not be cleared by JS, even if the value is valid
       // Use case: SequenceBox with number fields, second field contains smaller (invalid) value than first one, user types another too small value
       // -> error status must stay (server won't send another error status because the message has not changed)
-      field.modelAdapter._syncPropertiesOnPropertyChange({
+      let modelAdapter = field.modelAdapter as NumberFieldAdapter;
+      // @ts-ignore
+      modelAdapter._syncPropertiesOnPropertyChange({
         errorStatus: {
           message: 'error status from server'
         }
@@ -61,7 +64,7 @@ describe('NumberFieldAdapter', () => {
 
   it('supports the calculator', () => {
     // Check if the calculator still works if a model adapter is attached
-    let field = helper.createField('NumberField');
+    let field = helper.createField(NumberField);
     linkWidgetAndAdapter(field, 'NumberFieldAdapter');
     field.render();
     field.decimalFormat.decimalSeparatorChar = '.';
@@ -69,7 +72,8 @@ describe('NumberFieldAdapter', () => {
 
     field.$field.val('2.0+3.1');
     field.acceptInput();
-    expect(field.$field[0].value).toBe('5.1');
+    let $fieldElement = field.$field[0] as HTMLInputElement;
+    expect($fieldElement.value).toBe('5.1');
   });
 
 });

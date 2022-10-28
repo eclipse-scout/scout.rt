@@ -1,21 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {defaultValues, RemoteEvent} from '../../src/index';
+import {defaultValues, RemoteEvent, Tree} from '../../src/index';
 import {TreeSpecHelper} from '../../src/testing/index';
 import {triggerClick, triggerDoubleClick, triggerMouseDown, triggerMouseUp} from '../../src/testing/jquery-testing';
 
 describe('TreeAdapter', () => {
-  let session;
-  /** @type TreeSpecHelper */
-  let helper;
+  let session: SandboxSession;
+  let helper: TreeSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -69,7 +68,7 @@ describe('TreeAdapter', () => {
     it('sends selection, check and click events if tree is checkable and checkbox has been clicked', () => {
       let model = helper.createModelFixture(1);
       let adapter = helper.createTreeAdapter(model);
-      let tree = adapter.createWidget(model, session.desktop);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
       tree.checkable = true;
       tree.render();
 
@@ -87,7 +86,7 @@ describe('TreeAdapter', () => {
     it('does not send click if mouse down happens on another node than mouseup', () => {
       let model = helper.createModelFixture(2);
       let adapter = helper.createTreeAdapter(model);
-      let tree = adapter.createWidget(model, session.desktop);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
       tree.render();
 
       let $node0 = tree.nodes[0].$node;
@@ -110,12 +109,13 @@ describe('TreeAdapter', () => {
     it('does not send click if mouse down does not happen on a node', () => {
       let model = helper.createModelFixture(1);
       let adapter = helper.createTreeAdapter(model);
-      let tree = adapter.createWidget(model, session.desktop);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
       session.$entryPoint.makeDiv().cssHeight(10).cssWidth(10);
       tree.render();
 
       let $node0 = tree.nodes[0].$node;
       triggerMouseDown($node0);
+      // @ts-ignore
       triggerMouseUp($(window), {
         position: {
           left: 0,
@@ -137,6 +137,7 @@ describe('TreeAdapter', () => {
       jasmine.Ajax.uninstall();
       jasmine.Ajax.install();
 
+      // @ts-ignore
       triggerMouseDown($(window), {
         position: {
           left: 0,
@@ -187,7 +188,7 @@ describe('TreeAdapter', () => {
     it('sends nodeExpanded for the parents if a hidden node should be selected whose parents are collapsed (revealing the selection)', () => {
       let model = helper.createModelFixture(3, 3, false);
       let adapter = helper.createTreeAdapter(model);
-      let tree = adapter.createWidget(model, session.desktop);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
       let node0 = tree.nodes[0];
       let child0 = node0.childNodes[0];
       let grandchild0 = child0.childNodes[0];
@@ -221,7 +222,7 @@ describe('TreeAdapter', () => {
     it('does not send selection event if triggered by server', () => {
       let model = helper.createModelFixture(2, 2);
       let adapter = helper.createTreeAdapter(model);
-      let tree = adapter.createWidget(model, session.desktop);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
 
       adapter._onNodesSelected([tree.nodes[1].id]);
       sendQueuedAjaxCalls();
@@ -236,7 +237,7 @@ describe('TreeAdapter', () => {
     it('does not send checked event if triggered by server', () => {
       let model = helper.createModelFixture(2, 2);
       let adapter = helper.createTreeAdapter(model);
-      let tree = adapter.createWidget(model, session.desktop);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
       tree.checkable = true;
       expect(tree.nodes[1].checked).toBe(false);
 
@@ -256,12 +257,11 @@ describe('TreeAdapter', () => {
     it('does not send expand event if triggered by server', () => {
       let model = helper.createModelFixture(2, 2);
       let adapter = helper.createTreeAdapter(model);
-      let tree = adapter.createWidget(model, session.desktop);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
       let node = tree.nodes[1];
       expect(node.expanded).toBe(false);
 
       adapter._onNodeExpanded(node.id, {
-        nodeId: node.id,
         expanded: true,
         expandedLazy: false
       });
@@ -276,7 +276,7 @@ describe('TreeAdapter', () => {
     it('sends nodeExpanded for every collapsed node', () => {
       let model = helper.createModelFixture(3, 2, true);
       let adapter = helper.createTreeAdapter(model);
-      let tree = adapter.createWidget(model, session.desktop);
+      let tree = adapter.createWidget(model, session.desktop) as Tree;
       tree.render();
 
       let allNodes = [];
@@ -324,18 +324,14 @@ describe('TreeAdapter', () => {
         model = helper.createModelFixture(3, 1, true);
         adapter = helper.createTreeAdapter(model);
         tree = adapter.createWidget(model, session.desktop);
-        // noinspection JSUnresolvedVariable
         expect(tree.a).toBe(123);
-        // noinspection JSUnresolvedVariable
         expect(tree.nodes[0].b).toBe(234);
         expect(tree.nodes[0].childNodes[3]).toBe(undefined);
 
         let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         let event = helper.createNodesInsertedEvent(model, [newNode0Child3], node0.id);
         adapter.onModelAction(event);
-        // noinspection JSUnresolvedVariable
         expect(tree.a).toBe(123);
-        // noinspection JSUnresolvedVariable
         expect(tree.nodes[0].childNodes[3].b).toBe(234);
       });
     });

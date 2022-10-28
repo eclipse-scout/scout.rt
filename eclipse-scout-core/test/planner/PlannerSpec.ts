@@ -8,10 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateRange, dates, ObjectFactory, Planner} from '../../src/index';
+import {DateRange, dates, ObjectFactory, Planner, PlannerModel, Widget} from '../../src/index';
+import {ObjectType} from '../../src/ObjectFactory';
+import {PlannerResource} from '../../src/planner/Planner';
 
 describe('Planner', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -26,8 +28,18 @@ describe('Planner', () => {
     jasmine.clock().uninstall();
   });
 
-  function createPlannerModel(numResources) {
-    let model = createSimpleModel('Planner', session);
+  class SpecPlanner extends Planner {
+    override _renderDisplayModeOptions() {
+      super._renderDisplayModeOptions();
+    }
+
+    override _dateFormat(date: Date, pattern: string): string {
+      return super._dateFormat(date, pattern);
+    }
+  }
+
+  function createPlannerModel(numResources): PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession } {
+    let model = createSimpleModel('Planner', session) as PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession };
     model.resources = [];
     for (let i = 0; i < numResources; i++) {
       model.resources[i] = createResource('resource' + i);
@@ -35,7 +47,7 @@ describe('Planner', () => {
     return model;
   }
 
-  function createResource(text) {
+  function createResource(text?: string): PlannerResource {
     return {
       id: ObjectFactory.get().createUniqueId(),
       resourceCell: {
@@ -53,22 +65,26 @@ describe('Planner', () => {
     };
   }
 
-  function createPlanner(model) {
-    let planner = new Planner();
+  function createPlanner(model: PlannerModel): SpecPlanner {
+    let planner = new SpecPlanner();
     planner.init(model);
     return planner;
   }
 
-  function find$Resources(planner) {
+  function find$Resources(planner: Planner): JQuery {
     return planner.$grid.find('.planner-resource');
   }
 
-  function find$ActivitiesForResource(resource) {
+  function find$ActivitiesForResource(resource: PlannerResource): JQuery {
     return resource.$cells.children('.planner-activity');
   }
 
   describe('deleteResources', () => {
-    let model, planner, resource0, resource1, resource2;
+    let model: PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession };
+    let planner: SpecPlanner;
+    let resource0: PlannerResource;
+    let resource1: PlannerResource;
+    let resource2: PlannerResource;
 
     beforeEach(() => {
       model = createPlannerModel(3);
@@ -123,7 +139,12 @@ describe('Planner', () => {
   });
 
   describe('updateResources', () => {
-    let model, planner, resource0, resource1, resource2, $resource1;
+    let model: PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession };
+    let planner: SpecPlanner;
+    let resource0: PlannerResource;
+    let resource1: PlannerResource;
+    let resource2: PlannerResource;
+    let $resource1: JQuery;
 
     beforeEach(() => {
       model = createPlannerModel(3);
@@ -183,12 +204,14 @@ describe('Planner', () => {
   });
 
   describe('renderScale', () => {
-    let model, planner;
+    let model: PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession };
+    let planner: SpecPlanner;
 
     beforeEach(() => {
       model = createPlannerModel(0);
       planner = createPlanner(model);
       planner.render();
+      // @ts-ignore
       planner.displayModeOptions = {};
     });
 
@@ -224,8 +247,10 @@ describe('Planner', () => {
         for (let i = 0; i < smallCount; i++) {
           let visible = i % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          let labalValue = planner._dateFormat(new Date().setMinutes((i % hourParts) * interval), ':mm');
-          expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
+          let date = new Date();
+          date.setMinutes((i % hourParts) * interval);
+          let labelValue = planner._dateFormat(date, ':mm');
+          expect(planner.$timelineSmall.children()[i].textContent).toBe(labelValue);
         }
       }
 
@@ -287,7 +312,7 @@ describe('Planner', () => {
         firstHourOfDay = options.firstHourOfDay;
         lastHourOfDay = options.lastHourOfDay;
 
-        days = (planner.viewRange.to - planner.viewRange.from) / (24 * 60 * 60 * 1000);
+        days = (planner.viewRange.to.getTime() - planner.viewRange.from.getTime()) / (24 * 60 * 60 * 1000);
         hours = lastHourOfDay - firstHourOfDay + 1;
 
         // cap interval to first-/lastHourOfDay view range
@@ -304,8 +329,8 @@ describe('Planner', () => {
         for (let i = 0; i < smallCount; i++) {
           let visible = i % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          let labalValue = planner._dateFormat(dates.shiftTime(new Date(planner.viewRange.from.valueOf()), 0, interval * (i % dayParts), 0, 0), 'HH:mm');
-          expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
+          let labelValue = planner._dateFormat(dates.shiftTime(new Date(planner.viewRange.from.valueOf()), 0, interval * (i % dayParts), 0, 0), 'HH:mm');
+          expect(planner.$timelineSmall.children()[i].textContent).toBe(labelValue);
         }
       }
 
@@ -381,7 +406,7 @@ describe('Planner', () => {
         if (months < 0) {
           months += 12;
         }
-        days = (planner.viewRange.to - planner.viewRange.from) / (24 * 60 * 60 * 1000);
+        days = (planner.viewRange.to.getTime() - planner.viewRange.from.getTime()) / (24 * 60 * 60 * 1000);
 
         // element count
         expect(planner.$timelineLarge.children().length).toBe(months);
@@ -391,8 +416,8 @@ describe('Planner', () => {
         for (let i = 0; i < days; i++) {
           let visible = dates.shift(planner.viewRange.from, 0, 0, i).getDate() % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          let labalValue = planner._dateFormat(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, 0, i), 'dd');
-          expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
+          let labelValue = planner._dateFormat(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, 0, i), 'dd');
+          expect(planner.$timelineSmall.children()[i].textContent).toBe(labelValue);
         }
       }
 
@@ -445,8 +470,8 @@ describe('Planner', () => {
           let weekInYear = dates.weekInYear(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, 0, 7 * i));
           let visible = weekInYear % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          let labalValue = weekInYear + '';
-          expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
+          let labelValue = weekInYear + '';
+          expect(planner.$timelineSmall.children()[i].textContent).toBe(labelValue);
         }
       }
 
@@ -487,8 +512,8 @@ describe('Planner', () => {
         options = planner.displayModeOptions[planner.displayMode];
         labelPeriod = options.labelPeriod;
 
-        years = planner.viewRange.to.getYear() - planner.viewRange.from.getYear() + 1;
-        months = (planner.viewRange.to.getYear() - planner.viewRange.from.getYear()) * 12 + (planner.viewRange.to.getMonth() - planner.viewRange.from.getMonth());
+        years = planner.viewRange.to.getFullYear() - planner.viewRange.from.getFullYear() + 1;
+        months = (planner.viewRange.to.getFullYear() - planner.viewRange.from.getFullYear()) * 12 + (planner.viewRange.to.getMonth() - planner.viewRange.from.getMonth());
 
         // element count
         expect(planner.$timelineLarge.children().length).toBe(years);
@@ -498,8 +523,8 @@ describe('Planner', () => {
         for (let i = 0; i < months; i++) {
           let visible = (dates.shift(planner.viewRange.from, 0, i, 0).getMonth()) % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          let labalValue = planner._dateFormat(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, i, 0), 'MMMM');
-          expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
+          let labelValue = planner._dateFormat(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, i, 0), 'MMMM');
+          expect(planner.$timelineSmall.children()[i].textContent).toBe(labelValue);
         }
       }
 
@@ -568,7 +593,7 @@ describe('Planner', () => {
       let cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
 
       // during a day
-      expect(planner.transformLeft(dates.create('2016-06-20 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 09:00:00'))).toBeCloseTo(cellWidthPercent, 5);
       expect(planner.transformWidth(dates.create('2016-06-20 09:00:00'), dates.create('2016-06-20 12:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
       expect(planner.transformLeft(dates.create('2016-06-20 12:00:00'))).toBeCloseTo(4 * cellWidthPercent, 5);
 
@@ -584,12 +609,12 @@ describe('Planner', () => {
 
       // into the day
       expect(planner.transformLeft(dates.create('2016-06-21 06:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
-      expect(planner.transformWidth(dates.create('2016-06-21 06:00:00'), dates.create('2016-06-21 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-21 06:00:00'), dates.create('2016-06-21 09:00:00'))).toBeCloseTo(cellWidthPercent, 5);
       expect(planner.transformLeft(dates.create('2016-06-21 09:00:00'))).toBeCloseTo(11 * cellWidthPercent, 5);
 
       // into the day from previous day
       expect(planner.transformLeft(dates.create('2016-06-20 20:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
-      expect(planner.transformWidth(dates.create('2016-06-20 20:00:00'), dates.create('2016-06-21 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 20:00:00'), dates.create('2016-06-21 09:00:00'))).toBeCloseTo(cellWidthPercent, 5);
       expect(planner.transformLeft(dates.create('2016-06-21 09:00:00'))).toBeCloseTo(11 * cellWidthPercent, 5);
 
       // during night
@@ -603,7 +628,7 @@ describe('Planner', () => {
       expect(planner.transformLeft(dates.create('2016-06-22 09:00:00'))).toBeCloseTo(21 * cellWidthPercent, 5);
     });
 
-    it('calculates left and width in WEEK mode for limitted day range (only firstHourOfDay set)', () => {
+    it('calculates left and width in WEEK mode for limited day range (only firstHourOfDay set)', () => {
       planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
@@ -617,7 +642,7 @@ describe('Planner', () => {
       let cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
 
       // during a day
-      expect(planner.transformLeft(dates.create('2016-06-20 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 09:00:00'))).toBeCloseTo(cellWidthPercent, 5);
       expect(planner.transformWidth(dates.create('2016-06-20 09:00:00'), dates.create('2016-06-20 12:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
 
       // till the end of the day
@@ -657,29 +682,29 @@ describe('Planner', () => {
       // start of view range
       planner.startRow = planner.resources[0];
       planner.lastRow = planner.resources[0];
-      planner.startRange = new DateRange(dates.create('2016-06-20 00:00:00').getTime(), dates.create('2016-06-20 01:00:00').getTime());
-      planner.lastRange = new DateRange(dates.create('2016-06-20 00:00:00').getTime(), dates.create('2016-06-20 01:00:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-20 00:00:00'), dates.create('2016-06-20 01:00:00'));
+      planner.lastRange = new DateRange(dates.create('2016-06-20 00:00:00'), dates.create('2016-06-20 01:00:00'));
       planner._select();
       expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-20 00:00:00').toISOString());
       expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-20 03:00:00').toISOString());
 
       // end of view range
-      planner.startRange = new DateRange(dates.create('2016-06-26 23:00:00').getTime(), dates.create('2016-06-20 24:00:00').getTime());
-      planner.lastRange = new DateRange(dates.create('2016-06-26 23:00:00').getTime(), dates.create('2016-06-20 24:00:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-26 23:00:00'), dates.create('2016-06-20 24:00:00'));
+      planner.lastRange = new DateRange(dates.create('2016-06-26 23:00:00'), dates.create('2016-06-20 24:00:00'));
       planner._select();
       expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-26 21:00:00').toISOString());
       expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-26 24:00:00').toISOString());
 
       // selection to right
-      planner.startRange = new DateRange(dates.create('2016-06-20 16:00:00').getTime(), dates.create('2016-06-20 17:00:00').getTime());
-      planner.lastRange = new DateRange(dates.create('2016-06-20 17:00:00').getTime(), dates.create('2016-06-20 18:00:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-20 16:00:00'), dates.create('2016-06-20 17:00:00'));
+      planner.lastRange = new DateRange(dates.create('2016-06-20 17:00:00'), dates.create('2016-06-20 18:00:00'));
       planner._select();
       expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-20 16:00:00').toISOString());
       expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-20 19:00:00').toISOString());
 
       // selection to left
-      planner.startRange = new DateRange(dates.create('2016-06-20 16:00:00').getTime(), dates.create('2016-06-20 17:00:00').getTime());
-      planner.lastRange = new DateRange(dates.create('2016-06-20 15:00:00').getTime(), dates.create('2016-06-20 16:00:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-20 16:00:00'), dates.create('2016-06-20 17:00:00'));
+      planner.lastRange = new DateRange(dates.create('2016-06-20 15:00:00'), dates.create('2016-06-20 16:00:00'));
       planner._select();
       expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-20 14:00:00').toISOString());
       expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-20 17:00:00').toISOString());
@@ -699,29 +724,29 @@ describe('Planner', () => {
       planner.lastRow = planner.resources[0];
 
       // end of day
-      planner.startRange = new DateRange(dates.create('2016-06-26 17:00:00').getTime(), dates.create('2016-06-20 17:30:00').getTime());
-      planner.lastRange = new DateRange(dates.create('2016-06-26 17:00:00').getTime(), dates.create('2016-06-20 17:30:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-26 17:00:00'), dates.create('2016-06-20 17:30:00'));
+      planner.lastRange = new DateRange(dates.create('2016-06-26 17:00:00'), dates.create('2016-06-20 17:30:00'));
       planner._select();
       expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-26 17:00:00').toISOString());
       expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-26 18:00:00').toISOString());
 
       // end of day, click in last interval -> actual end would be 18:30 but since this is not visible to the user use 18:00 as end
-      planner.startRange = new DateRange(dates.create('2016-06-26 17:30:00').getTime(), dates.create('2016-06-20 18:00:00').getTime());
-      planner.lastRange = new DateRange(dates.create('2016-06-26 17:30:00').getTime(), dates.create('2016-06-20 18:00:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-26 17:30:00'), dates.create('2016-06-20 18:00:00'));
+      planner.lastRange = new DateRange(dates.create('2016-06-26 17:30:00'), dates.create('2016-06-20 18:00:00'));
       planner._select();
       expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-26 17:00:00').toISOString());
       expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-26 18:00:00').toISOString());
 
       // manual selection over end of day should still be possible
-      planner.startRange = new DateRange(dates.create('2016-06-20 17:30:00').getTime(), dates.create('2016-06-20 18:00:00').getTime());
-      planner.lastRange = new DateRange(dates.create('2016-06-21 09:00:00').getTime(), dates.create('2016-06-21 09:30:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-20 17:30:00'), dates.create('2016-06-20 18:00:00'));
+      planner.lastRange = new DateRange(dates.create('2016-06-21 09:00:00'), dates.create('2016-06-21 09:30:00'));
       planner._select();
       expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-20 17:30:00').toISOString());
       expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-21 09:30:00').toISOString());
 
       // selection to left
-      planner.startRange = new DateRange(dates.create('2016-06-20 17:30:00').getTime(), dates.create('2016-06-20 18:00:00').getTime());
-      planner.lastRange = new DateRange(dates.create('2016-06-20 15:00:00').getTime(), dates.create('2016-06-20 15:30:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-20 17:30:00'), dates.create('2016-06-20 18:00:00'));
+      planner.lastRange = new DateRange(dates.create('2016-06-20 15:00:00'), dates.create('2016-06-20 15:30:00'));
       planner._select();
       expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-20 15:00:00').toISOString());
       expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-20 18:00:00').toISOString());

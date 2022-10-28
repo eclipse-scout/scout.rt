@@ -10,17 +10,18 @@
  */
 
 import jasmineScoutMatchers from '../../src/testing/scoutMatchers';
+import {RemoteRequestData} from '../../src/session/Session';
 
 describe('JasmineScout', () => {
 
   describe('toContainEventTypesExactly', () => {
 
     function createRequestDataFixture() {
-      let requestData = {};
+      let requestData: RemoteRequestData = {};
       requestData.events = [];
-      requestData.events.push({target: 1, type: 'event1'});
-      requestData.events.push({target: 1, type: 'event2'});
-      requestData.events.push({target: 1, type: 'event3'});
+      requestData.events.push({target: '1', type: 'event1'});
+      requestData.events.push({target: '1', type: 'event2'});
+      requestData.events.push({target: '1', type: 'event3'});
       return requestData;
     }
 

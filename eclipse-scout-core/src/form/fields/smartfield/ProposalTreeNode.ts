@@ -36,7 +36,8 @@ export default class ProposalTreeNode<TValue> extends TreeNode implements Propos
     return this.lookupRow;
   }
 
-  protected override _decorate() {
+  /** @internal */
+  override _decorate() {
     // This node is not yet rendered, nothing to do
     if (!this.$node) {
       return;

@@ -1,22 +1,22 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, LocaleSpecHelper} from '../../../../src/testing/index';
-import {DecimalFormat, NumberField, scout, Status} from '../../../../src/index';
+import {DecimalFormat, Locale, NumberField, scout, Status} from '../../../../src/index';
 import {triggerClick} from '../../../../src/testing/jquery-testing';
 
 describe('NumberField', () => {
-  let session;
-  let helper;
-  let locale;
-  let localeHelper;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
+  let locale: Locale;
+  let localeHelper: LocaleSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -34,10 +34,10 @@ describe('NumberField', () => {
   });
 
   describe('setValue', () => {
-    let field;
+    let field: NumberField;
 
     beforeEach(() => {
-      field = helper.createField('NumberField');
+      field = helper.createField(NumberField);
     });
 
     it('sets the value and formats it using decimalFormat if the value is valid', () => {
@@ -78,7 +78,7 @@ describe('NumberField', () => {
 
   describe('minMaxValue', () => {
     it('is always in order', () => {
-      let field = helper.createField('NumberField');
+      let field = helper.createField(NumberField);
       field.setMinValue(2);
       field.setMaxValue(1);
 
@@ -93,7 +93,7 @@ describe('NumberField', () => {
     });
 
     it('is validated when setting new value', () => {
-      let field = helper.createField('NumberField');
+      let field = helper.createField(NumberField);
       field.setMinValue(1);
       field.setMaxValue(10);
 
@@ -108,7 +108,7 @@ describe('NumberField', () => {
     });
 
     it('is validated when changing minMaxValue', () => {
-      let field = helper.createField('NumberField');
+      let field = helper.createField(NumberField);
       field.setValue(5);
       expect(field.errorStatus).toBe(null);
 
@@ -126,21 +126,21 @@ describe('NumberField', () => {
     });
 
     it('works when max or min is null', () => {
-      let field = helper.createField('NumberField', helper.session.desktop, {
+      let field = helper.createField(NumberField, helper.session.desktop, {
         minValue: 6,
         maxValue: null
       });
       field.setValue(5);
       expect(field.errorStatus instanceof Status).toBe(true);
 
-      field = helper.createField('NumberField', helper.session.desktop, {
+      field = helper.createField(NumberField, helper.session.desktop, {
         minValue: null,
         maxValue: 6
       });
       field.setValue(7);
       expect(field.errorStatus instanceof Status).toBe(true);
 
-      field = helper.createField('NumberField');
+      field = helper.createField(NumberField);
 
       field.setValue(5);
       field.setMinValue(6);
@@ -163,7 +163,7 @@ describe('NumberField', () => {
 
   describe('acceptInput', () => {
     it('updates the display text after calculation even if the value was not changed', () => {
-      let field = helper.createField('NumberField');
+      let field = helper.createField(NumberField);
       field.render();
       field.$field.val('6');
       field.acceptInput();
@@ -193,7 +193,7 @@ describe('NumberField', () => {
     let field;
 
     beforeEach(() => {
-      field = helper.createField('NumberField');
+      field = helper.createField(NumberField);
     });
 
     it('sets the decimal format', () => {
@@ -259,7 +259,7 @@ describe('NumberField', () => {
     let field;
 
     beforeEach(() => {
-      field = helper.createField('NumberField');
+      field = helper.createField(NumberField);
     });
 
     it('with . as separator and \' as grouping char', () => {

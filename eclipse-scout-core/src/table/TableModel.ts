@@ -9,13 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, ActionModel, Column, ColumnModel, Filter, Menu, MenuModel, Status, TableCompactHandler, TableControl, TableControlModel, TableRow, TableSelectionHandler, TableTileGridMediator, TableTileGridMediatorModel, TableUserFilterModel,
-  Tile, TileTableHeaderBox, TileTableHeaderBoxModel, WidgetModel
+  Action, ActionModel, Column, ColumnModel, Filter, Menu, MenuModel, TableCompactHandler, TableControl, TableControlModel, TableRow, TableSelectionHandler, TableTileGridMediator, TableTileGridMediatorModel, TableUserFilterModel, Tile,
+  TileTableHeaderBox, TileTableHeaderBoxModel, WidgetModel
 } from '../index';
 import {TableCheckableStyle, TableGroupingStyle, TableHierarchicalStyle} from './Table';
 import {RefModel} from '../types';
 import {DropType} from '../util/dragAndDrop';
 import {TableRowData} from './TableRowModel';
+import {StatusOrModel} from '../status/Status';
 
 export default interface TableModel extends WidgetModel {
   /**
@@ -46,7 +47,7 @@ export default interface TableModel extends WidgetModel {
    */
   dropMaximumSize?: number;
   groupingStyle?: TableGroupingStyle;
-  tableStatus?: Status;
+  tableStatus?: StatusOrModel;
   /**
    * Configures whether the header row is enabled. Default is true.
    * In a disabled header it is not possible to move or resize the columns and the table header menu cannot be opened.

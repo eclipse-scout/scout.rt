@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilter, TableHeaderMenu} from '../../src/index';
+import {Column, ColumnUserFilter, Table, TableHeaderMenu} from '../../src/index';
 import {TableSpecHelper} from '../../src/testing/index';
 import {triggerClick} from '../../src/testing/jquery-testing';
 
 describe('TableHeaderMenu', () => {
-  let session;
-  let helper;
+  let session: SandboxSession;
+  let helper: TableSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -29,7 +29,7 @@ describe('TableHeaderMenu', () => {
     jasmine.clock().uninstall();
   });
 
-  function createAndRegisterColumnFilter(table, column, selectedValues) {
+  function createAndRegisterColumnFilter(table: Table, column: Column<any>, selectedValues: (string | number)[]): ColumnUserFilter {
     let filter = new ColumnUserFilter();
     helper.createAndRegisterColumnFilter({
       session: session,
@@ -180,9 +180,10 @@ describe('TableHeaderMenu', () => {
         expectTableRowText($filterItems, 0, 'Value');
         expectTableRowText($filterItems, 1, 'Value2');
         triggerClick($filterItems.eq(0));
-        expect(table.getFilter(table.columns[0].id).selectedValues).toEqual(['Value']);
+        let filter = table.getFilter(table.columns[0].id) as ColumnUserFilter;
+        expect(filter.selectedValues).toEqual(['Value']);
         triggerClick($filterItems.eq(1));
-        expect(table.getFilter(table.columns[0].id).selectedValues).toEqual(['Value', 'Value2']);
+        expect(filter.selectedValues).toEqual(['Value', 'Value2']);
         table.header.closeHeaderMenu();
       });
 
@@ -202,7 +203,8 @@ describe('TableHeaderMenu', () => {
         triggerClick($filterItems.eq(1));
         table.header.closeHeaderMenu();
 
-        expect(table.getFilter(table.columns[0].id).selectedValues).toEqual([null]);
+        let filter = table.getFilter(table.columns[0].id) as ColumnUserFilter;
+        expect(filter.selectedValues).toEqual([null]);
       });
     });
 
@@ -311,6 +313,7 @@ describe('TableHeaderMenu', () => {
         table.render();
         table.header.openHeaderMenu(column);
         let tableHeaderMenu = table.header.tableHeaderMenu;
+        // @ts-ignore
         tableHeaderMenu._onSortModeClick(); // changes sort mode from 'alphabetically' (default) to 'amount'
         let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'BValue');

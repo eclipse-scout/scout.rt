@@ -142,8 +142,7 @@ export default class FocusContext {
     }
 
     // Make this context the active context (nothing done if already active) and validate the focus event.
-    // @ts-ignore
-    this.focusManager._pushIfAbsendElseMoveTop(this);
+    this.focusManager._pushIfAbsentElseMoveTop(this);
     this.validateAndSetFocus(event.target);
     event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event. Otherwise, that 'parent context' would be activated as well.
   }

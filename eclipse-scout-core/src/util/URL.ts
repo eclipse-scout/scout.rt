@@ -59,7 +59,7 @@ export default class URL {
     return this;
   }
 
-  setParameter(param: string, value: string | string[]): URL {
+  setParameter(param: string, value?: string | string[]): URL {
     if (typeof param !== 'string') {
       throw new Error('Illegal argument type: ' + param);
     }
@@ -70,7 +70,7 @@ export default class URL {
     return this;
   }
 
-  addParameter(param: string, value: string): URL {
+  addParameter(param: string, value?: string): URL {
     if (typeof param !== 'string') {
       throw new Error('Illegal argument type: ' + param);
     }
@@ -153,7 +153,7 @@ export default class URL {
   /**
    * Helper function to build a query parameter with value
    */
-  protected static _formatQueryParam(key: string, value: string): string {
+  protected static _formatQueryParam(key: string, value?: string): string {
     let s = encodeURIComponent(key);
     if (value !== undefined && value !== null) {
       s += '=' + encodeURIComponent(value);
@@ -167,7 +167,7 @@ export default class URL {
    *
    * @memberOf URL
    */
-  protected static _addToMap(map: Record<string, string | string[]>, key: string, value: string) {
+  protected static _addToMap(map: Record<string, string | string[]>, key: string, value?: string) {
     if (map === undefined) {
       throw new Error('Argument \'map\' must not be null');
     }

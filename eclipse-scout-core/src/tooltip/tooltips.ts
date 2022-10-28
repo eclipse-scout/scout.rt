@@ -38,7 +38,7 @@ export function uninstall($comp: JQuery) {
  * If the tooltip is currently showing, its contents are updated immediately.
  * Otherwise, nothing happens.
  */
-export function update($comp: JQuery, options: TooltipSupportOptions) {
+export function update($comp: JQuery, options?: Partial<TooltipSupportOptions>) {
   let support = $comp.data('tooltipSupport') as TooltipSupport;
   if (support) {
     support.update($comp, options);

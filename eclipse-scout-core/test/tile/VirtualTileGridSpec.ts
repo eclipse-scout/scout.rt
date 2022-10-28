@@ -3,27 +3,35 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Group, Range, scout, Tile, TileAccordion, TileGrid} from '../../src/index';
+import {Group, Range, scout, Tile, TileAccordion, TileGrid, TileGridModel} from '../../src/index';
 import {triggerMouseDown} from '../../src/testing/jquery-testing';
+import {Optional} from '../../src/types';
+import TileModel from '../../src/tile/TileModel';
 
 describe('VirtualTileGrid', () => {
-  let session;
+  let session: SandboxSession;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
   });
 
-  function createTileGrid(numTiles, model) {
+  class SpecTileGrid extends TileGrid {
+    override _renderViewRange(viewRange: Range) {
+      super._renderViewRange(viewRange);
+    }
+  }
+
+  function createTileGrid(numTiles: number, model?: Optional<TileGridModel, 'parent'>): SpecTileGrid {
     let tiles = [];
     for (let i = 0; i < numTiles; i++) {
       tiles.push({
-        objectType: 'Tile',
+        objectType: Tile,
         label: 'Tile ' + i
       });
     }
@@ -34,15 +42,15 @@ describe('VirtualTileGrid', () => {
       gridColumnCount: 2
     };
     model = $.extend({}, defaults, model);
-    return scout.create(TileGrid, model);
+    return scout.create(SpecTileGrid, model as TileGridModel);
   }
 
-  function createTile(model) {
+  function createTile(model?: Optional<TileModel, 'parent'>): Tile {
     let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create(Tile, model);
+    return scout.create(Tile, model as TileModel);
   }
 
   describe('virtual', () => {
@@ -84,7 +92,7 @@ describe('VirtualTileGrid', () => {
       expect($tiles.length).toBe(7); // All tiles rendered
 
       tileGrid.virtualScrolling.calculateViewRangeSize = () => {
-        // Is called when toggling virtual, cannot determined correctly in the specs -> always return 2
+        // Is called when toggling virtual, cannot be determined correctly in the specs -> always return 2
         return 2;
       };
       tileGrid.setVirtual(true);
@@ -111,7 +119,7 @@ describe('VirtualTileGrid', () => {
       expect($tiles.length).toBe(4);
 
       tileGrid.virtualScrolling.calculateViewRangeSize = () => {
-        // Is called when toggling virtual, cannot determined correctly in the specs -> always return 2
+        // Is called when toggling virtual, cannot be determined correctly in the specs -> always return 2
         return 2;
       };
       tileGrid.setVirtual(true);
@@ -141,7 +149,7 @@ describe('VirtualTileGrid', () => {
       expect($tiles.length).toBe(6);
 
       tileGrid.virtualScrolling.calculateViewRangeSize = () => {
-        // Is called when toggling virtual, cannot determined correctly in the specs -> always return 2
+        // Is called when toggling virtual, cannot be determined correctly in the specs -> always return 2
         return 2;
       };
       tileGrid.setVirtual(true);
@@ -172,7 +180,7 @@ describe('VirtualTileGrid', () => {
       expect($tiles.length).toBe(4); // All tiles rendered
 
       tileGrid.virtualScrolling.calculateViewRangeSize = () => {
-        // Is called when toggling virtual, cannot determined correctly in the specs -> always return 2
+        // Is called when toggling virtual, cannot be determined correctly in the specs -> always return 2
         return 2;
       };
       tileGrid.setVirtual(true);
@@ -297,7 +305,7 @@ describe('VirtualTileGrid', () => {
       expect(tileGrid.$container.children('.tile').eq(0)[0]).toBe(tile0.$container[0]);
       expect(tileGrid.$container.children('.tile').eq(1)[0]).toBe(tile1.$container[0]);
 
-      jasmine.clock().tick(); // animate-remove is added later
+      jasmine.clock().tick(0); // animate-remove is added later
       expect(tileGrid.$container.children('.tile').eq(0)).toHaveClass('animate-remove');
       tile0._removeInternal();
       expect(tileGrid.$container.children('.tile').length).toBe(1);
@@ -452,7 +460,7 @@ describe('VirtualTileGrid', () => {
 
       tileGrid.setComparator((t0, t1) => {
         // desc
-        return (t0.label < t1.label ? 1 : ((t0.label > t1.label) ? -1 : 0));
+        return (t0['label'] < t1['label'] ? 1 : ((t0['label'] > t1['label']) ? -1 : 0));
       });
       tileGrid.render();
       tileGrid.sort();
@@ -537,7 +545,7 @@ describe('VirtualTileGrid', () => {
       expect(tileGrid.filteredTiles[0]).toBe(tile0);
       expect(tileGrid.filteredTiles[1]).toBe(tile2);
 
-      jasmine.clock().tick(); // animate-invisible is added later
+      jasmine.clock().tick(0); // animate-invisible is added later
       expect($tiles.eq(1)).toHaveClass('animate-invisible');
       tile1._removeInternal();
       $tiles = tileGrid.$container.children('.tile');
@@ -552,7 +560,7 @@ describe('VirtualTileGrid', () => {
       expect(tileGrid.filteredTiles.length).toBe(1);
       expect(tileGrid.filteredTiles[0]).toBe(tile0);
 
-      jasmine.clock().tick(); // animate-invisible is added later
+      jasmine.clock().tick(0); // animate-invisible is added later
       expect($tiles.eq(1)).toHaveClass('animate-invisible');
       tile2._removeInternal();
       $tiles = tileGrid.$container.children('.tile');
@@ -697,7 +705,7 @@ describe('VirtualTileGrid', () => {
         viewRangeSize: 1,
         scrollable: false
       });
-      tileGrid1.tiles[tileGrid1.tiles.length - 1].label = tileToSearchLabel;
+      tileGrid1.tiles[tileGrid1.tiles.length - 1]['label'] = tileToSearchLabel;
       let group0 = scout.create(Group, {
         parent: session.desktop,
         body: tileGrid0,
@@ -729,7 +737,7 @@ describe('VirtualTileGrid', () => {
       expect(tileGrid1.filteredTiles.length).toBe(1);
       expect(tileGrid1.renderedTiles().length).toBe(0);
 
-      accordion.addFilter(tile => tile.label === tileToSearchLabel);
+      accordion.addFilter(tile => tile['label'] === tileToSearchLabel);
       accordion.validateLayout(); // required because validateLayoutTree below only validates the desktop which does not know the Accordion as child
       accordion.validateLayoutTree(); // to run post-validate-function
 
@@ -770,7 +778,7 @@ describe('VirtualTileGrid', () => {
         accept: () => false
       };
       tileGrid.addFilter(filter);
-      jasmine.clock().tick(); // Ensure tiles are really removed
+      jasmine.clock().tick(0); // Ensure tiles are really removed
       tileGrid.validateLayoutTree();
       expect(tileGrid.filteredTiles.length).toBe(0);
       expect(tileGrid.renderedTiles().length).toBe(0);
@@ -779,7 +787,7 @@ describe('VirtualTileGrid', () => {
       // Make the filter accept all tiles -> ensure tiles will be rendered
       tileGrid.filters[0].accept = () => true;
       tileGrid.filter();
-      jasmine.clock().tick();
+      jasmine.clock().tick(0);
       tileGrid.validateLayoutTree();
       expect(tileGrid.filteredTiles.length).toBe(3);
       expect(tileGrid.renderedTiles().length).toBe(2);

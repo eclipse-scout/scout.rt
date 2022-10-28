@@ -198,10 +198,8 @@ export default class FormController implements FormControllerModel {
     dialog.on('remove', () => {
       let formToActivate = this._findFormToActivateAfterDialogRemove();
       if (formToActivate) {
-        // @ts-ignore
         desktop._setFormActivated(formToActivate);
       } else {
-        // @ts-ignore
         desktop._setOutlineActivated();
       }
     });
@@ -213,7 +211,6 @@ export default class FormController implements FormControllerModel {
       dialog.setTrackFocus(true);
       dialog.render(desktop.$container);
       this._layoutDialog(dialog);
-      // @ts-ignore
       desktop._setFormActivated(dialog);
 
       // Only display the dialog if its 'displayParent' is visible to the user.
@@ -261,7 +258,8 @@ export default class FormController implements FormControllerModel {
     }
   }
 
-  protected _activateView(view: Form) {
+  /** @internal */
+  _activateView(view: Form) {
     let bench = this.session.desktop.bench;
     if (bench) {
       // Bench may be null (e.g. in mobile mode). This may probably only happen if the form is not really a view, because otherwise the bench would already be open.

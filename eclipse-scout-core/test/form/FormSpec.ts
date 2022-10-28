@@ -1,23 +1,21 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormSpecHelper, OutlineSpecHelper} from '../../src/testing/index';
-import {Dimension, fields, Form, NullWidget, Popup, Rectangle, scout, Status, webstorage} from '../../src/index';
+import {CancelMenu, CloseMenu, Dimension, fields, Form, NullWidget, OkMenu, Popup, Rectangle, ResetMenu, SaveMenu, scout, Session, Status, StringField, TabBox, TabItem, webstorage, WrappedFormField} from '../../src/index';
 import {DateField, GroupBox} from '../../src';
 
 describe('Form', () => {
-  let session;
-  /** @type FormSpecHelper */
-  let helper;
-  /** @type OutlineSpecHelper */
-  let outlineHelper;
+  let session: Session;
+  let helper: FormSpecHelper;
+  let outlineHelper: OutlineSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -51,7 +49,8 @@ describe('Form', () => {
         }
       });
       expect(form.rootGroupBox.mainBox).toBe(true);
-      expect(form.rootGroupBox.fields[0].mainBox).toBe(false);
+      let formField = form.rootGroupBox.fields[0] as GroupBox;
+      expect(formField.mainBox).toBe(false);
     });
   });
 
@@ -186,7 +185,7 @@ describe('Form', () => {
 
     it('is marked saved after save', done => {
       let form = helper.createFormWithOneField();
-      let field = form.rootGroupBox.fields[0];
+      let field = form.rootGroupBox.fields[0] as StringField;
 
       field.setValue('whatever');
       form.save()
@@ -201,7 +200,7 @@ describe('Form', () => {
     it('is not marked saved on error', done => {
       jasmine.clock().install();
       let form = helper.createFormWithOneField();
-      let field = form.rootGroupBox.fields[0];
+      let field = form.rootGroupBox.fields[0] as StringField;
 
       form._save = data => $.resolvedPromise(Status.error());
 
@@ -267,19 +266,19 @@ describe('Form', () => {
       let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           menus: [{
-            objectType: 'CloseMenu'
+            objectType: CloseMenu
           }]
         }
       });
-      spyOn(form, 'close').and.callThrough();
-      spyOn(form, 'cancel').and.callThrough();
+      let closeSpy = spyOn(form, 'close').and.callThrough();
+      let cancelSpy = spyOn(form, 'cancel').and.callThrough();
       form.open()
         .then(() => {
           form.abort();
-          expect(form.close.calls.count()).toEqual(1);
-          expect(form.cancel.calls.count()).toEqual(0);
+          expect(closeSpy.calls.count()).toEqual(1);
+          expect(cancelSpy.calls.count()).toEqual(0);
           expect(form.destroyed).toBe(true);
         })
         .catch(fail)
@@ -290,18 +289,18 @@ describe('Form', () => {
       let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           menus: [{
-            objectType: 'CloseMenu'
+            objectType: CloseMenu
           }]
         }
       });
-      spyOn(form, 'close').and.callThrough();
-      spyOn(form, 'cancel').and.callThrough();
+      let closeSpy = spyOn(form, 'close').and.callThrough();
+      let cancelSpy = spyOn(form, 'cancel').and.callThrough();
       form.open()
         .then(() => {
-          expect(form.close.calls.count()).toEqual(1);
-          expect(form.cancel.calls.count()).toEqual(0);
+          expect(closeSpy.calls.count()).toEqual(1);
+          expect(cancelSpy.calls.count()).toEqual(0);
           expect(form.destroyed).toBe(true);
         })
         .catch(fail)
@@ -315,16 +314,16 @@ describe('Form', () => {
       let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
-          objectType: 'GroupBox'
+          objectType: GroupBox
         }
       });
-      spyOn(form, 'close').and.callThrough();
-      spyOn(form, 'cancel').and.callThrough();
+      let closeSpy = spyOn(form, 'close').and.callThrough();
+      let cancelSpy = spyOn(form, 'cancel').and.callThrough();
       form.open()
         .then(() => {
           form.abort();
-          expect(form.close.calls.count()).toEqual(0);
-          expect(form.cancel.calls.count()).toEqual(1);
+          expect(closeSpy.calls.count()).toEqual(0);
+          expect(cancelSpy.calls.count()).toEqual(1);
           expect(form.destroyed).toBe(true);
         })
         .catch(fail)
@@ -385,6 +384,7 @@ describe('Form', () => {
           field: field,
           label: field.label,
           reveal: () => {
+            // nop
           }
         };
       };
@@ -677,7 +677,7 @@ describe('Form', () => {
       let form = scout.create(Form, {
         parent: session.desktop,
         rootGroupBox: {
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           gridDataHints: {
             heightInPixel: 100
           }
@@ -698,15 +698,15 @@ describe('Form', () => {
         parent: session.desktop,
         initialFocus: 'tabItem1',
         rootGroupBox: {
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           fields: [{
-            objectType: 'TabBox',
+            objectType: TabBox,
             id: 'tabBox',
             tabItems: [{
-              objectType: 'TabItem',
+              objectType: TabItem,
               id: 'tabItem1'
             }, {
-              objectType: 'TabItem',
+              objectType: TabItem,
               id: 'tabItem2'
             }]
           }]
@@ -724,27 +724,27 @@ describe('Form', () => {
     it('works correctly even for wrapped forms', done => {
       let form = scout.create({
         parent: session.desktop,
-        objectType: 'Form',
+        objectType: Form,
         displayHint: Form.DisplayHint.VIEW,
         rootGroupBox: {
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           fields: [{
-            objectType: 'WrappedFormField',
+            objectType: WrappedFormField,
             initialFocusEnabled: true,
             innerForm: {
-              objectType: 'Form',
+              objectType: Form,
               initialFocus: 'Field2',
               rootGroupBox: {
-                objectType: 'GroupBox',
+                objectType: GroupBox,
                 fields: [
                   {
                     id: 'Field1',
-                    objectType: 'StringField',
+                    objectType: StringField,
                     value: 'Field1'
                   },
                   {
                     id: 'Field2',
-                    objectType: 'StringField',
+                    objectType: StringField,
                     value: 'Field2'
                   }
                 ]
@@ -755,7 +755,7 @@ describe('Form', () => {
       });
       form.open()
         .then(() => {
-          expect(form.widget('Field2').$field).toBeFocused();
+          expect(form.widget('Field2', StringField).$field).toBeFocused();
           form.close();
         })
         .catch(fail)
@@ -776,7 +776,7 @@ describe('Form', () => {
      * Scenario: Switch between two outline nodes and expect the focus in its detail forms are preserved.
      */
     it('on detail forms', () => {
-      // setup an outline with 2 nodes each node has a detail form with 3 fields
+      // set up an outline with 2 nodes each node has a detail form with 3 fields
       let model = outlineHelper.createModelFixture(2, 0, true);
       let outline = outlineHelper.createOutline(model);
       outline.nodes.forEach(node => {
@@ -810,32 +810,32 @@ describe('Form', () => {
         parent: session.desktop,
         rootGroupBox: {
           id: 'mainbox',
-          objectType: 'GroupBox',
+          objectType: GroupBox,
           gridDataHints: {
             widthInPixel: 1000
           },
           menus: [{
             id: 'okmenu',
-            objectType: 'OkMenu'
+            objectType: OkMenu
           }, {
             id: 'cancelmenu',
-            objectType: 'CancelMenu'
+            objectType: CancelMenu
           }, {
             id: 'closemenu',
-            objectType: 'CloseMenu'
+            objectType: CloseMenu
           }, {
             id: 'resetmenu',
-            objectType: 'ResetMenu'
+            objectType: ResetMenu
           }, {
             id: 'savemenu',
-            objectType: 'SaveMenu'
+            objectType: SaveMenu
           }],
           fields: [{
             id: 'stringfield1',
-            objectType: 'StringField'
+            objectType: StringField
           }, {
             id: 'stringfield2',
-            objectType: 'StringField',
+            objectType: StringField,
             inheritAccessibility: false
           }]
         }
@@ -980,17 +980,17 @@ describe('Form', () => {
       let form = helper.createFormWithFieldsAndTabBoxes();
 
       let field2 = form.widget('Field2'),
-        tabBox = form.widget('TabBox'),
-        tabA = form.widget('TabA'),
+        tabBox = form.widget('TabBox', TabBox),
+        tabA = form.widget('TabA', TabItem),
         fieldA1 = form.widget('FieldA1'),
-        tabBoxA = form.widget('TabBoxA'),
-        tabAA = form.widget('TabAA'),
+        tabBoxA = form.widget('TabBoxA', TabBox),
+        tabAA = form.widget('TabAA', TabItem),
         fieldAA2 = form.widget('FieldAA2'),
-        tabAB = form.widget('TabAB'),
+        tabAB = form.widget('TabAB', TabItem),
         fieldAB1 = form.widget('FieldAB1'),
-        tabAC = form.widget('TabAC'),
+        tabAC = form.widget('TabAC', TabItem),
         fieldAC1 = form.widget('FieldAC1'),
-        tabB = form.widget('TabB'),
+        tabB = form.widget('TabB', TabItem),
         fieldB3 = form.widget('FieldB3'),
         createValidationResult = field => ({
           valid: false,

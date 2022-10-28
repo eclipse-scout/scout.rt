@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -57,32 +57,32 @@ describe('comparators', () => {
     let comparator = comparators.NUMERIC;
 
     expect(comparator.compare(undefined, undefined)).toBe(0);
-    expect(comparator.compare(undefined, '1')).toBe(-1);
-    expect(comparator.compare('1', undefined)).toBe(1);
+    expect(comparator.compare(undefined, 1)).toBe(-1);
+    expect(comparator.compare(1, undefined)).toBe(1);
 
     expect(comparator.compare(null, null)).toBe(0);
-    expect(comparator.compare(null, '1')).toBe(-1);
-    expect(comparator.compare('1', null)).toBe(1);
+    expect(comparator.compare(null, 1)).toBe(-1);
+    expect(comparator.compare(1, null)).toBe(1);
 
     expect(comparator.compare(null, undefined)).toBe(0);
 
     expect(comparator.compare(null, null)).toBe(0);
-    expect(comparator.compare(null, '-1')).toBe(-1);
-    expect(comparator.compare('-1', null)).toBe(1);
+    expect(comparator.compare(null, -1)).toBe(-1);
+    expect(comparator.compare(-1, null)).toBe(1);
 
-    expect(comparator.compare('0', '-1')).toBe(1);
-    expect(comparator.compare('-1', '0')).toBe(-1);
+    expect(comparator.compare(0, -1)).toBe(1);
+    expect(comparator.compare(-1, 0)).toBe(-1);
 
-    expect(comparator.compare('0', '1')).toBe(-1);
-    expect(comparator.compare('1', '0')).toBe(1);
+    expect(comparator.compare(0, 1)).toBe(-1);
+    expect(comparator.compare(1, 0)).toBe(1);
 
-    expect(comparator.compare('1', '1')).toBe(0);
-    expect(comparator.compare('1', '2')).toBe(-1);
-    expect(comparator.compare('2', '1')).toBe(1);
+    expect(comparator.compare(1, 1)).toBe(0);
+    expect(comparator.compare(1, 2)).toBe(-1);
+    expect(comparator.compare(2, 1)).toBe(1);
 
-    expect(comparator.compare('1.0001', '1.0001')).toBe(0);
-    expect(comparator.compare('1.9998', '1.9999')).toBe(-1);
-    expect(comparator.compare('1.9999', '1.9998')).toBe(1);
+    expect(comparator.compare(1.0001, 1.0001)).toBe(0);
+    expect(comparator.compare(1.9998, 1.9999)).toBe(-1);
+    expect(comparator.compare(1.9999, 1.9998)).toBe(1);
   });
 
   it('tests \'compare\' method of ALPHANUMERIC comparator', () => {
@@ -169,13 +169,12 @@ describe('comparators', () => {
     });
   });
 
-  function createSession(userAgent) {
+  function createSession(): SandboxSession {
     setFixtures(sandbox());
-    let session = sandboxSession({
-      'userAgent': userAgent
-    });
+    let session = sandboxSession();
     // test request only, don't test response (would require valid session, desktop etc.)
     session._processStartupResponse = () => {
+      // nop
     };
     return session;
   }

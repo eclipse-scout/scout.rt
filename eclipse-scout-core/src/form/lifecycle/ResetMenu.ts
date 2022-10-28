@@ -30,7 +30,6 @@ export default class ResetMenu extends FormLifecycleMenu {
     let event = new Event();
     this.trigger('action', event);
     if (!event.defaultPrevented) {
-      // noinspection JSIgnoredPromiseFromCall
       form.reset();
     }
   }

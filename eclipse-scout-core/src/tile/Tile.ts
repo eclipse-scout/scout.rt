@@ -158,7 +158,8 @@ export default class Tile extends Widget implements TileModel {
     this._renderVisible();
   }
 
-  protected override _renderVisible() {
+  /** @internal */
+  override _renderVisible() {
     if (this.rendering) {
       this.$container.setVisible(this.isVisible());
       return;

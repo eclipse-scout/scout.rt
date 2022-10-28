@@ -10,7 +10,7 @@
  */
 import {DateFormat, DateRange, Locale, objects, scout, strings} from '../index';
 
-export function shift(date: Date, years: number, months: number, days: number): Date {
+export function shift(date: Date, years: number, months?: number, days?: number): Date {
   let newDate = new Date(date.getTime());
   if (years) {
     newDate.setFullYear(date.getFullYear() + years);
@@ -451,7 +451,7 @@ export function newDate(): Date {
   return new Date();
 }
 
-export function format(date: Date, locale: Locale, pattern: string): string {
+export function format(date: Date, locale: Locale, pattern?: string): string {
   let dateFormat = new DateFormat(locale, pattern);
   return dateFormat.format(date);
 }
@@ -494,7 +494,7 @@ export function equals(a: Date, b: Date): boolean {
  * If time is omitted, 00:00:00 is used as time part.<br>
  * If date is omitted, 1970-01-01 is used as date part independent of the time zone, means it is 1970-01-01 in every time zone.
  */
-export function combineDateTime(date: Date, time: Date): Date {
+export function combineDateTime(date: Date, time?: Date): Date {
   let newDate = new Date();
   newDate.setHours(0, 0, 0, 0); // set time part to zero in local time!
   newDate.setFullYear(1970, 0, 1); // make sure local time has no effect on date (if date is omitted it has to be 1970-01-01)

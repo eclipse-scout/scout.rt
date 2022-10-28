@@ -85,9 +85,9 @@ export function groupwise(groupSize: number, promiseCreator: PromiseCreator): JQ
  * promises available).
  *
  * @param maxPoolSize defines how many promises should be created and executed at most in parallel.
- * @param timeout specifies a timeout to wait for until the next promise will be started.
+ * @param timeout specifies a timeout to wait for until the next promise will be started. If not specified, no timeout (=0) is used).
  */
-export function parallel(maxPoolSize: number, promiseCreator: PromiseCreator, timeout: number): JQuery.Promise<any> {
+export function parallel(maxPoolSize: number, promiseCreator: PromiseCreator, timeout?: number): JQuery.Promise<any> {
   timeout = timeout || 0;
   let deferred = $.Deferred();
   let poolSize = 0;

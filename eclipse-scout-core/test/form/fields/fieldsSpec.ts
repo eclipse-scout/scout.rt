@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {fields} from '../../../src/index';
+import {fields, Form, StringField, TabBox, TabItem} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing';
 
 describe('scout.fields', () => {
-  let session;
-  let helper;
-  let form;
+  let session: SandboxSession;
+  let helper: FormSpecHelper;
+  let form: Form;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -24,19 +24,19 @@ describe('scout.fields', () => {
   });
 
   it('selectAllParentTabsOf', () => {
-    let field2 = form.widget('Field2'),
-      tabBox = form.widget('TabBox'),
-      tabA = form.widget('TabA'),
-      fieldA1 = form.widget('FieldA1'),
-      tabBoxA = form.widget('TabBoxA'),
-      tabAA = form.widget('TabAA'),
-      fieldAA2 = form.widget('FieldAA2'),
-      tabAB = form.widget('TabAB'),
-      fieldAB1 = form.widget('FieldAB1'),
-      tabAC = form.widget('TabAC'),
-      fieldAC1 = form.widget('FieldAC1'),
-      tabB = form.widget('TabB'),
-      fieldB3 = form.widget('FieldB3');
+    let field2 = form.widget('Field2', StringField),
+      tabBox = form.widget('TabBox', TabBox),
+      tabA = form.widget('TabA', TabItem),
+      fieldA1 = form.widget('FieldA1', StringField),
+      tabBoxA = form.widget('TabBoxA', TabBox),
+      tabAA = form.widget('TabAA', TabItem),
+      fieldAA2 = form.widget('FieldAA2', StringField),
+      tabAB = form.widget('TabAB', TabItem),
+      fieldAB1 = form.widget('FieldAB1', StringField),
+      tabAC = form.widget('TabAC', TabItem),
+      fieldAC1 = form.widget('FieldAC1', StringField),
+      tabB = form.widget('TabB', TabItem),
+      fieldB3 = form.widget('FieldB3', StringField);
 
     expect(tabBox.selectedTab).toBe(tabA);
     expect(tabBoxA.selectedTab).toBe(tabAA);
@@ -73,16 +73,16 @@ describe('scout.fields', () => {
   });
 
   it('selectIfIsTab', () => {
-    let field2 = form.widget('Field2'),
-      tabBox = form.widget('TabBox'),
-      tabA = form.widget('TabA'),
-      tabBoxA = form.widget('TabBoxA'),
-      tabAA = form.widget('TabAA'),
-      fieldAA2 = form.widget('FieldAA2'),
-      tabAB = form.widget('TabAB'),
-      tabAC = form.widget('TabAC'),
-      tabB = form.widget('TabB'),
-      fieldB3 = form.widget('FieldB3');
+    let field2 = form.widget('Field2', StringField),
+      tabBox = form.widget('TabBox', TabBox),
+      tabA = form.widget('TabA', TabItem),
+      tabBoxA = form.widget('TabBoxA', TabBox),
+      tabAA = form.widget('TabAA', TabItem),
+      fieldAA2 = form.widget('FieldAA2', StringField),
+      tabAB = form.widget('TabAB', TabItem),
+      tabAC = form.widget('TabAC', TabItem),
+      tabB = form.widget('TabB', TabItem),
+      fieldB3 = form.widget('FieldB3', StringField);
 
     expect(tabBox.selectedTab).toBe(tabA);
     expect(tabBoxA.selectedTab).toBe(tabAA);

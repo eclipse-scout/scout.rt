@@ -37,7 +37,7 @@ export default class FormLifecycle<TValidationResult extends ValidationResult = 
     });
   }
 
-  protected override _invalidElements(): { missingElements: TValidationResult[]; invalidElements: TValidationResult[] } {
+  override invalidElements(): { missingElements: TValidationResult[]; invalidElements: TValidationResult[] } {
     let missingFields = [];
     let invalidFields = [];
 
@@ -71,7 +71,6 @@ export default class FormLifecycle<TValidationResult extends ValidationResult = 
   }
 
   protected override _validateWidget(): Status {
-    // @ts-ignore
     return this.widget._validate();
   }
 

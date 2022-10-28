@@ -27,7 +27,6 @@ export default class ChartLayout extends AbstractLayout {
       onlyUpdateData: true
     };
     // Don't request animations when the session is not ready or the chart was already updated once
-    // @ts-ignore
     if (!this.chart.session.ready || this.chart._updatedOnce) {
       opts.requestAnimation = false;
     }

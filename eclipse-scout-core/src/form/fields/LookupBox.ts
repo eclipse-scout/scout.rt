@@ -10,10 +10,9 @@
  */
 import {AbstractLayout, arrays, HtmlComponent, LookupBoxEventMap, LookupBoxModel, LookupCall, LookupResult, LookupRow, objects, PropertyChangeEvent, Status, strings, ValueField, Widget} from '../../index';
 import $ from 'jquery';
-import LookupCallModel from '../../lookup/LookupCallModel';
-import {ObjectType} from '../../ObjectFactory';
+import {LookupCallOrRefModel} from '../../lookup/LookupCall';
 
-export default abstract class LookupBox<TValue> extends ValueField<TValue[]> implements LookupBoxModel<TValue> {
+export default abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TValue[]> implements LookupBoxModel<TValue> {
   declare model: LookupBoxModel<TValue>;
   declare eventMap: LookupBoxEventMap<TValue>;
 
@@ -118,7 +117,7 @@ export default abstract class LookupBox<TValue> extends ValueField<TValue[]> imp
     return deferred.promise();
   }
 
-  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting: boolean): JQuery.Promise<LookupResult<TValue>> {
+  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting?: boolean): JQuery.Promise<LookupResult<TValue>> {
     this.setLoading(true);
 
     if (abortExisting && this._currentLookupCall) {
@@ -186,11 +185,11 @@ export default abstract class LookupBox<TValue> extends ValueField<TValue[]> imp
     this.setLookupStatus(null);
   }
 
-  setLookupCall(lookupCall: LookupCall<TValue> | LookupCallModel<TValue> & { objectType: ObjectType<LookupCall<TValue>> } | string) {
+  setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
     this.setProperty('lookupCall', lookupCall);
   }
 
-  protected _setLookupCall(lookupCall: LookupCall<TValue> | LookupCallModel<TValue> & { objectType: ObjectType<LookupCall<TValue>> } | string) {
+  protected _setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
     this._lookupExecuted = false;
     if (this.rendered) {

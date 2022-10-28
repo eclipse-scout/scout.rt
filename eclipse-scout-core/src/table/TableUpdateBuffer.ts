@@ -30,7 +30,6 @@ export default class TableUpdateBuffer {
 
     // Also make sure viewport is not rendered as long as update events are buffered
     // Otherwise the other cells might already be visible during buffering
-    // @ts-ignore
     this.table._renderViewportBlocked = true;
     this.table.setLoading(true);
 
@@ -73,11 +72,8 @@ export default class TableUpdateBuffer {
 
     // Update the viewport as well if rendering was blocked
     this.table.setLoading(false);
-    // @ts-ignore
     this.table._renderViewportBlocked = false;
-    // @ts-ignore
     if (this.table._isDataRendered()) {
-      // @ts-ignore
       this.table._renderViewport();
     }
   }

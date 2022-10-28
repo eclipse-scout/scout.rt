@@ -22,7 +22,9 @@ import {AdapterData} from '../session/Session';
 
 export default class TableAdapter extends ModelAdapter {
   declare widget: Table;
-  protected _rebuildingTable: boolean;
+
+  /** @internal */
+  _rebuildingTable: boolean;
 
   constructor() {
     super();
@@ -34,7 +36,8 @@ export default class TableAdapter extends ModelAdapter {
     model.compactHandler = null; // Disable Scout JS compact handling, will be done on the server
   }
 
-  protected override _postCreateWidget() {
+  /** @internal */
+  override _postCreateWidget() {
     // if a newly created table has already a user-filter defined, we need to fire the filter event after creation
     // because the original event had been fired before the event-handler was registered.
     if (this.widget.hasUserFilter()) {
@@ -67,8 +70,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   protected _onWidgetRowsSelected(event: TableRowsSelectedEvent) {
-    // @ts-ignore
-    let rowIds = this.widget._rowsToIds(this.widget.selectedRows);
+    let rowIds = this.widget.rowsToIds(this.widget.selectedRows);
     this._sendRowsSelected(rowIds, event.debounce);
   }
 
@@ -251,8 +253,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   protected _onWidgetFilter() {
-    // @ts-ignore
-    let rowIds = this.widget._rowsToIds(this.widget.filteredRows());
+    let rowIds = this.widget.rowsToIds(this.widget.filteredRows());
     this._sendFilter(rowIds);
   }
 
@@ -411,8 +412,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   protected _onRowsDeleted(rowIds: string[]) {
-    // @ts-ignore
-    let rows = this.widget._rowsByIds(rowIds);
+    let rows = this.widget.rowsByIds(rowIds);
     this.addFilterForWidgetEventType('rowsSelected');
     this.widget.deleteRows(rows);
   }
@@ -427,8 +427,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   protected _onRowsSelected(rowIds: string[]) {
-    // @ts-ignore
-    let rows = this.widget._rowsByIds(rowIds);
+    let rows = this.widget.rowsByIds(rowIds);
     this.addFilterForWidgetEventType('rowsSelected');
     this.widget.selectRows(rows);
     // TODO [7.0] cgu what is this for? seems wrong here
@@ -440,8 +439,7 @@ export default class TableAdapter extends ModelAdapter {
       uncheckedRows: TableRow[] = [];
 
     rows.forEach(rowData => {
-      // @ts-ignore
-      let row = this.widget._rowById(rowData.id);
+      let row = this.widget.rowById(rowData.id);
       if (rowData.checked) {
         checkedRows.push(row);
       } else {
@@ -463,8 +461,7 @@ export default class TableAdapter extends ModelAdapter {
     let expandedRows: TableRow[] = [],
       collapsedRows: TableRow[] = [];
     rows.forEach(rowData => {
-      // @ts-ignore
-      let row = this.widget._rowById(rowData.id);
+      let row = this.widget.rowById(rowData.id);
       if (rowData.expanded) {
         expandedRows.push(row);
       } else {
@@ -478,8 +475,7 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   protected _onRowOrderChanged(rowIds: string[]) {
-    // @ts-ignore
-    let rows = this.widget._rowsByIds(rowIds);
+    let rows = this.widget.rowsByIds(rowIds);
     this.widget.updateRowOrder(rows);
   }
 
@@ -499,7 +495,6 @@ export default class TableAdapter extends ModelAdapter {
 
     if (this.widget.tileMode && this.widget.tableTileGridMediator) {
       // grouping might have changed, trigger re-init of the groups on the tileGrid in tileMode
-      // @ts-ignore
       this.widget.tableTileGridMediator._onTableGroup();
       // removing of a group column doesn't cause a rowOrderChange, nonetheless aggregation columns might need to be removed.
       this.widget.updateRowOrder(this.widget.rows);
@@ -508,8 +503,7 @@ export default class TableAdapter extends ModelAdapter {
 
   protected _onStartCellEdit(columnId: string, rowId: string, fieldId: string) {
     let column = this.widget.columnById(columnId),
-      // @ts-ignore
-      row = this.widget._rowById(rowId),
+      row = this.widget.rowById(rowId),
       field = this.session.getOrCreateWidget(fieldId, this.widget) as ValueField<any>;
 
     this.widget.startCellEdit(column, row, field);
@@ -547,10 +541,8 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   protected _onRequestFocusInCell(event: any) {
-    // @ts-ignore
-    let row = this.widget._rowById(event.rowId),
+    let row = this.widget.rowById(event.rowId),
       column = this.widget.columnById(event.columnId);
-
     this.widget.focusCell(column, row);
   }
 
@@ -693,7 +685,7 @@ export default class TableAdapter extends ModelAdapter {
     // uiSortPossible
     objects.replacePrototypeFunction(Table, '_isSortingPossible', function(sortColumns: Column<any>[]) {
       if (this.modelAdapter) {
-        // In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally we check if each column can install
+        // In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally, we check if each column can install
         // its comparator used to sort. If installation failed for some reason, sorting is not possible. In a remote app the server sets the
         // 'uiSortPossible' flag, which decides if the column must be sorted by the server or can be sorted by the client.
         let uiSortPossible = scout.nvl(this.uiSortPossible, true);
@@ -750,7 +742,7 @@ export default class TableAdapter extends ModelAdapter {
         // Note: we do almost the same thing as in _ensureCellOrig, the difference is that
         // we treat a plain object always as cell-model and we always must apply defaultValues
         // to this cell model. In the JS only case a plain-object has no special meaning and
-        // can be used as cell-value in the same way as a scalar value. Also we must not apply
+        // can be used as cell-value in the same way as a scalar value. Also, we must not apply
         // defaultValues in JS only case, because it would destroy the 'undefined' state of the
         // cell properties, which is required because the Column checks, whether it should apply
         // defaults from the Column instance to a cell, or use the values from the cell.
@@ -783,7 +775,7 @@ export default class TableAdapter extends ModelAdapter {
     // uiSortPossible
     objects.replacePrototypeFunction(Column, 'isSortingPossible', function() {
       if (this.table.modelAdapter) {
-        // Returns whether or not this column can be used to sort on the client side. In a JS only app the flag 'uiSortPossible'
+        // Returns whether this column can be used to sort on the client side. In a JS only app the flag 'uiSortPossible'
         // is never set and defaults to true. As a side effect of this function a comparator is installed.
         // The comparator returns false if it could not be installed which means sorting should be delegated to server (e.g. collator is not available).
         // In a remote app the server sets the 'uiSortPossible' flag, which decides if the column must be sorted by the

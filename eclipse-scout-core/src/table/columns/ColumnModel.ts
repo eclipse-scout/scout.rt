@@ -30,6 +30,8 @@ export default interface ColumnModel<TValue = string> extends ObjectModel<Column
    */
   autoOptimizeWidth?: boolean;
 
+  index?: number;
+
   checkable?: boolean;
 
   /**

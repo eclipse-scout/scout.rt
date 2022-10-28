@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -14,6 +14,7 @@ import $ from 'jquery';
 import {Optional, RefModel, SomeRequired} from '../../../types';
 import ModelAdapterModel from '../../../session/ModelAdapterModel';
 import {ObjectType} from '../../../ObjectFactory';
+import Widget from '../../../widget/Widget';
 
 export default class OutlineSpecHelper {
   session: Session;
@@ -22,12 +23,12 @@ export default class OutlineSpecHelper {
     this.session = session;
   }
 
-  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): OutlineModel & { objectType: ObjectType<Outline> } {
+  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): OutlineModel & { id: string; parent: Widget; objectType: ObjectType<Outline>; session: Session } {
     return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
   }
 
-  createModel(nodes: RefModel<PageModel>[]): OutlineModel & { objectType: ObjectType<Outline> } {
-    let model = createSimpleModel('Outline', this.session) as OutlineModel & { objectType: ObjectType<Outline> };
+  createModel(nodes: RefModel<PageModel>[]): OutlineModel & { id: string; parent: Widget; objectType: ObjectType<Outline>; session: Session } {
+    let model = createSimpleModel('Outline', this.session) as OutlineModel & { id: string; parent: Widget; objectType: ObjectType<Outline>; session: Session };
     if (nodes) {
       model.nodes = nodes;
     }
@@ -69,7 +70,7 @@ export default class OutlineSpecHelper {
     return nodes;
   }
 
-  createOutline(model: OutlineModel): Outline {
+  createOutline(model?: OutlineModel): Outline {
     let defaults = {
       parent: this.session.desktop
     };

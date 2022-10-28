@@ -148,7 +148,7 @@ export default class ColumnUserFilter extends TableUserFilter implements ColumnU
   }
 
   /**
-   * Returns whether or not the given key is accepted by the filter-fields in their current state.
+   * Returns whether the given key is accepted by the filter-fields in their current state.
    * The default impl. returns true.
    */
   acceptByFields(key: any, normKey: number | string, row: TableRow): boolean {
@@ -156,7 +156,7 @@ export default class ColumnUserFilter extends TableUserFilter implements ColumnU
   }
 
   /**
-   * Returns whether or not filter-fields have an effect on the column-filter in their current state.
+   * Returns whether filter-fields have an effect on the column-filter in their current state.
    * The default impl. returns false.
    */
   fieldsFilterActive(): boolean {

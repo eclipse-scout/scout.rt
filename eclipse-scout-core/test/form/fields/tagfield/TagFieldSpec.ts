@@ -1,29 +1,25 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, keys, LookupRow, scout, TagChooserPopup, TagField} from '../../../../src/index';
+import {arrays, keys, scout, TagChooserPopup, TagField} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
 
 describe('TagField', () => {
 
-  let session, field, lookupRow, helper;
+  let session: SandboxSession, field: TagField, helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
     field = new TagField();
     field.session = session;
-    lookupRow = scout.create(LookupRow, {
-      key: 123,
-      data: 'Foo'
-    });
     helper = new FormSpecHelper(session);
     jasmine.clock().install();
   });
@@ -93,7 +89,7 @@ describe('TagField', () => {
       field = scout.create(TagField, {
         parent: session.desktop,
         lookupCall: {
-          objectType: 'DummyLookupCall'
+          objectType: DummyLookupCall
         }
       });
 
@@ -133,12 +129,12 @@ describe('TagField', () => {
       field = scout.create(TagField, {
         parent: session.desktop,
         lookupCall: {
-          objectType: 'DummyLookupCall',
+          objectType: DummyLookupCall,
           customProperty: templatePropertyValue
         }
       });
       field.on('prepareLookupCall', event => {
-        expect(event.lookupCall.customProperty).toBe(templatePropertyValue);
+        expect(event.lookupCall['customProperty']).toBe(templatePropertyValue);
         expect(event.lookupCall.id).not.toBe(field.lookupCall.id);
         expect(event.type).toBe('prepareLookupCall');
         expect(event.source).toBe(field);

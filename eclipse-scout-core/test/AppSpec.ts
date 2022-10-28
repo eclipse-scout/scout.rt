@@ -1,18 +1,20 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {App} from '../src/index';
+import {AppOptions} from '../src/App';
 
 describe('App', () => {
 
   beforeEach(() => {
+    // @ts-ignore
     setFixtures(sandbox().addClass('scout'));
   });
 
@@ -38,8 +40,14 @@ describe('App', () => {
         .catch(fail);
     });
 
+    class SpecApp extends App {
+      override _load(options: AppOptions): JQuery.Promise<any> {
+        return super._load(options);
+      }
+    }
+
     it('waits for load to complete', done => {
-      let app = new App();
+      let app = new SpecApp();
       app.init();
 
       let loaded = false;
@@ -61,7 +69,7 @@ describe('App', () => {
     });
 
     it('is not executed when loading fails', done => {
-      let app = new App();
+      let app = new SpecApp();
       app.init()
         .catch(() => {
           expect(app.initialized).toBe(false);

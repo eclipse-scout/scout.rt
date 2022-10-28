@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,7 +11,7 @@
 import {styles} from '../../src/index';
 
 describe('scout.styles', () => {
-  let $sandbox;
+  let $sandbox: JQuery;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -32,6 +32,7 @@ describe('scout.styles', () => {
   });
 
   it('can get styles', () => {
+    // @ts-ignore
     expect(styles.get()).toEqual({});
     expect(styles.get('inner-class', 'backgroundColor').backgroundColor).toBe('rgb(255, 0, 0)');
     expect(styles.get(['inner-class'], 'backgroundColor').backgroundColor).toBe('rgb(255, 0, 0)');
@@ -90,6 +91,7 @@ describe('scout.styles', () => {
   });
 
   it('can merge colors', () => {
+    // @ts-ignore
     expect(styles.mergeRgbColors()).toBe(undefined);
     expect(styles.mergeRgbColors('rgb(1,2,3)')).toBe('rgb(0,0,0)'); // no ratio
     expect(styles.mergeRgbColors('#fff', 1)).toBe(undefined); // invalid format
@@ -99,20 +101,23 @@ describe('scout.styles', () => {
   });
 
   it('can lighten and darken colors', () => {
+    // @ts-ignore
     expect(styles.darkerColor()).toBe(undefined);
     expect(styles.darkerColor('#fff')).toBe(undefined);
     expect(styles.darkerColor('rgb(10,10,10)')).toBe('rgb(8,8,8)');
 
+    // @ts-ignore
     expect(styles.lighterColor()).toBe(undefined);
     expect(styles.lighterColor('#000')).toBe(undefined);
     expect(styles.lighterColor('rgb(10,10,10)')).toBe('rgb(59,59,59)');
   });
 
   it('can calculate and apply legacy styles', () => {
+    // @ts-ignore
     expect(styles.legacyStyle()).toBe('');
 
     let $el = $sandbox.appendDiv();
-    let obj = {};
+    let obj: any = {};
     expect(styles.legacyStyle(null, $el)).toBe('');
     expect($el.attr('style')).toBe(undefined);
     expect(styles.legacyStyle(obj, $el)).toBe('');

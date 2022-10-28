@@ -56,8 +56,7 @@ export default class KeyStrokeManager extends EventEmitter implements KeyStrokeM
       .keyup(backspaceHandler);
 
     if ('onhelp' in myWindow) {
-      // @ts-ignore
-      myWindow.onhelp = filters.returnFalse;
+      myWindow['onhelp'] = filters.returnFalse;
     }
   }
 
@@ -69,7 +68,6 @@ export default class KeyStrokeManager extends EventEmitter implements KeyStrokeM
       return;
     }
 
-    // @ts-ignore
     let handler = keyStrokeContext._handler;
     if (handler) {
       return; // context already installed
@@ -84,7 +82,6 @@ export default class KeyStrokeManager extends EventEmitter implements KeyStrokeM
     handler.$target.on('keydown', handler);
     handler.$target.on('keyup', handler);
 
-    // @ts-ignore
     keyStrokeContext._handler = handler;
   }
 
@@ -95,7 +92,6 @@ export default class KeyStrokeManager extends EventEmitter implements KeyStrokeM
     if (!keyStrokeContext) {
       return;
     }
-    // @ts-ignore
     let handler = keyStrokeContext._handler;
     if (!handler) {
       return; // context not installed
@@ -105,7 +101,6 @@ export default class KeyStrokeManager extends EventEmitter implements KeyStrokeM
     handler.$target.off('keyup', handler);
     handler.$target = null;
 
-    // @ts-ignore
     keyStrokeContext._handler = null;
   }
 

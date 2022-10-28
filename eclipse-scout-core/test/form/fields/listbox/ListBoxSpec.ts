@@ -1,18 +1,20 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ListBox, LookupRow, QueryBy, scout, Status} from '../../../../src/index';
-import {DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
+import {ListBox, ListBoxModel, LookupCall, LookupResult, LookupRow, QueryBy, scout, Status} from '../../../../src/index';
+import {DummyLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
+import {Optional} from '../../../../src/types';
+import {LookupCallOrRefModel} from '../../../../src/lookup/LookupCall';
 
 describe('ListBox', () => {
-  let session, field, helper;
+  let session: SandboxSession, field: ListBox<any>, helper: FormSpecHelper;
 
   beforeEach(() => {
     setFixtures(sandbox());
@@ -26,16 +28,26 @@ describe('ListBox', () => {
     jasmine.clock().uninstall();
   });
 
-  function createFieldWithLookupCall(model, lookupCallModel) {
+  class SpecListBox extends ListBox<any> {
+    override _lookupByAllDone(result: LookupResult<any>): boolean {
+      return super._lookupByAllDone(result);
+    }
+
+    override _executeLookup(lookupCall: LookupCall<any>, abortExisting?: boolean): JQuery.Promise<LookupResult<any>> {
+      return super._executeLookup(lookupCall, abortExisting);
+    }
+  }
+
+  function createFieldWithLookupCall(model?: Optional<ListBoxModel<any>, 'parent'>, lookupCallModel?: LookupCallOrRefModel<any>): SpecListBox {
     lookupCallModel = $.extend({
-      objectType: 'DummyLookupCall'
+      objectType: DummyLookupCall
     }, lookupCallModel);
 
     model = $.extend({}, {
       parent: session.desktop,
       lookupCall: lookupCallModel
     }, model);
-    let box = scout.create(ListBox, model);
+    let box = scout.create(SpecListBox, model as ListBoxModel<any>);
     box.render();
     return box;
   }
@@ -184,7 +196,7 @@ describe('ListBox', () => {
 
     it('switching should refill table', () => {
       let field = createFieldWithLookupCall({}, {
-        objectType: 'LanguageDummyLookupCall'
+        objectType: LanguageDummyLookupCall
       });
 
       field.setValue([100, 500]);
@@ -220,12 +232,12 @@ describe('ListBox', () => {
         }
       });
       field.on('prepareLookupCall', event => {
-        expect(event.lookupCall.customProperty).toBe(templatePropertyValue);
+        expect(event.lookupCall['customProperty']).toBe(templatePropertyValue);
         expect(event.lookupCall.id).not.toBe(field.lookupCall.id);
         expect(event.type).toBe('prepareLookupCall');
         expect(event.source).toBe(field);
 
-        event.lookupCall.customProperty = preparedPropertyValue; // change property for this call. Must not have any effect on the next call
+        event.lookupCall['customProperty'] = preparedPropertyValue; // change property for this call. Must not have any effect on the next call
         eventCounter++;
       });
 
@@ -319,7 +331,7 @@ describe('ListBox', () => {
     });
 
     it('uses a lookup call to format the value', () => {
-      let model = helper.createFieldModel('ListBox', session.desktop, {
+      let model = helper.createFieldModel(ListBox, session.desktop, {
         lookupCall: lookupCall
       });
       let listBox = scout.create(ListBox, model);
@@ -335,7 +347,7 @@ describe('ListBox', () => {
     });
 
     it('returns empty string if value is null or undefined', () => {
-      let model = helper.createFieldModel('ListBox', session.desktop, {
+      let model = helper.createFieldModel(ListBox, session.desktop, {
         lookupCall: lookupCall
       });
       let listBox = scout.create(ListBox, model);

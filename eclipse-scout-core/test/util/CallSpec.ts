@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {Call} from '../../src/index';
+import {Call, CallModel} from '../../src/index';
 
 describe('scout.Call', () => {
 
@@ -24,7 +24,11 @@ describe('scout.Call', () => {
   // ----- Test classes -----
 
   class SuccessCall extends Call {
-    _callImpl() {
+    override init(model?: CallModel) {
+      super.init(model);
+    }
+
+    override _callImpl() {
       let deferred = $.Deferred();
       deferred.resolve();
       return deferred.promise();
@@ -37,7 +41,11 @@ describe('scout.Call', () => {
       this.maxRetries = 0;
     }
 
-    _callImpl() {
+    override init(model?: CallModel) {
+      super.init(model);
+    }
+
+    override _callImpl() {
       let deferred = $.Deferred();
       deferred.reject();
       return deferred.promise();
@@ -50,7 +58,11 @@ describe('scout.Call', () => {
       this.maxRetries = 5;
     }
 
-    _callImpl() {
+    override init(model?: CallModel) {
+      super.init(model);
+    }
+
+    override _callImpl() {
       let deferred = $.Deferred();
       if (this.callCounter > 1) {
         deferred.resolve();

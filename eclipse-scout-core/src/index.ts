@@ -10,6 +10,7 @@
  */
 
 /// <reference path="./jquery/jquery-scout-types.ts" />
+/// <reference path="./testing/JasmineScout.ts" />
 import ObjectFactory from './ObjectFactory';
 export {default as scout, ObjectWithType} from './scout';
 export {default as Event} from './events/Event';
@@ -116,6 +117,7 @@ export {default as LookupResult} from './lookup/LookupResult';
 export {default as LookupRowModel} from './lookup/LookupRowModel';
 export {default as LookupRow} from './lookup/LookupRow';
 export {default as RestLookupCall} from './lookup/RestLookupCall';
+export {default as RestLookupCallModel} from './lookup/RestLookupCallModel';
 export {default as RemoteLookupCall} from './lookup/RemoteLookupCall';
 export {default as RemoteLookupRequest} from './lookup/RemoteLookupRequest';
 export {default as QueryBy} from './lookup/QueryBy';

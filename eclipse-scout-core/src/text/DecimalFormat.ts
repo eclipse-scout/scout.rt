@@ -167,7 +167,6 @@ export default class DecimalFormat {
   }
 
   format(number: number, applyMultiplier?: boolean): string {
-    applyMultiplier = scout.nvl(applyMultiplier, true);
     if (number === null || number === undefined) {
       return null;
     }
@@ -176,6 +175,7 @@ export default class DecimalFormat {
     let suffix = this.positiveSuffix;
 
     // apply multiplier
+    applyMultiplier = scout.nvl(applyMultiplier, true);
     if (applyMultiplier && this.multiplier !== 1) {
       number *= this.multiplier;
     }
