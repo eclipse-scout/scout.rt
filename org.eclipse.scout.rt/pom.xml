@@ -884,6 +884,16 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-codec</artifactId>
+        <version>${batik.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-extension</artifactId>
+        <version>${batik.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>com.google.http-client</groupId>
