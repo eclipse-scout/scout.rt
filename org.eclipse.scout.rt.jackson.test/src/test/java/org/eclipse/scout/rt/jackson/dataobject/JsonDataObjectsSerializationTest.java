@@ -2783,7 +2783,7 @@ public class JsonDataObjectsSerializationTest {
 
     // currently not deserializable using Scout Jackson implementation
     JsonMappingException exception = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
-    assertTrue(exception.getCause() instanceof UnrecognizedPropertyException);
+    assertTrue("expected cause UnrecognizedPropertyException, got " + exception.getCause(), exception.getCause() instanceof UnrecognizedPropertyException);
   }
 
   @Test
