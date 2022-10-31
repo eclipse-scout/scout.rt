@@ -22,8 +22,10 @@ import java.io.Serializable;
  * <code>null</code> if the given {@link String} is <code>null</code>, otherwise the wrapped value.
  * </ul>
  * <p>
+ *
  * @see IUuId
  * @see IStringId
+ * @see ILongId
  */
 public interface IId extends Serializable {
 
