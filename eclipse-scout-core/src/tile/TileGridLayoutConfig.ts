@@ -11,7 +11,7 @@
 import {LogicalGridLayoutConfig, TileGridLayout} from '../index';
 import {LogicalGridLayoutConfigModel} from '../layout/logicalgrid/LogicalGridLayoutConfig';
 
-export interface TileGridLayoutConfigOptions extends LogicalGridLayoutConfigModel {
+export interface TileGridLayoutConfigModel extends LogicalGridLayoutConfigModel {
   /**
    * The maximum width in pixels to use for the content.
    * There is no maximum if this value is <= 0.
@@ -27,10 +27,10 @@ export interface TileGridLayoutConfigOptions extends LogicalGridLayoutConfigMode
  * The configured hints only have an effect if theirs value is >=0.
  * Otherwise, the default values specified by CSS are applied (see {@link TileGridLayout._initDefaults}).
  */
-export default class TileGridLayoutConfig extends LogicalGridLayoutConfig {
+export default class TileGridLayoutConfig extends LogicalGridLayoutConfig implements TileGridLayoutConfigModel {
   maxWidth: number;
 
-  constructor(options?: TileGridLayoutConfigOptions) {
+  constructor(options?: TileGridLayoutConfigModel) {
     super(options);
     options = options || {};
     if (options.maxWidth > -2) {
@@ -49,7 +49,7 @@ export default class TileGridLayoutConfig extends LogicalGridLayoutConfig {
     return new TileGridLayoutConfig(this);
   }
 
-  static override ensure(layoutConfig: TileGridLayoutConfig | TileGridLayoutConfigOptions): TileGridLayoutConfig {
+  static override ensure(layoutConfig: TileGridLayoutConfig | TileGridLayoutConfigModel): TileGridLayoutConfig {
     if (!layoutConfig) {
       return null;
     }

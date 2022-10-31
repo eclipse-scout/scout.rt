@@ -33,7 +33,7 @@ export default class TileGridAdapter extends ModelAdapter {
     this.widget.setTiles(tiles);
   }
 
-  protected override _initProperties(model: TileGridModel) {
+  protected override _initProperties(model: TileGridModel & { filteredTiles?: string[] }) {
     super._initProperties(model);
     if (!objects.isNullOrUndefined(model.filteredTiles)) {
       // If filteredTiles is set a server side filter is active -> add a tile filter on JS side as well

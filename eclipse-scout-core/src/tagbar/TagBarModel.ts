@@ -20,9 +20,8 @@ export default interface TagBarModel extends WidgetModel {
    */
   overflowVisible?: boolean;
   tags?: string[];
-
   /**
-   * Whether or not the tag elements are clickable (even when TagBar is disabled).
+   * Whether the tag elements are clickable (even when TagBar is disabled).
    * When the tag elements are clickable a click handler is registered and
    * a pointer cursor appears when hovering over the element. Default is false.
    */

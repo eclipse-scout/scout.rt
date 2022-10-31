@@ -93,7 +93,7 @@ export function insert<T>(arr: T[], element: T, index: number) {
 
 /**
  * Inserts all elements of the given array at the specified index.
- * <p>
+ *
  * This function is based on Array.prototype.splice().
  * Thus, if the 'index' is greater than the length of the array, 'elements' will be added to the end of the array 'arr'.
  * This may cause unexpected behavior on accessing arr[index] after insertion.
@@ -102,8 +102,7 @@ export function insert<T>(arr: T[], element: T, index: number) {
  */
 export function insertAll<T>(arr: T[], elements: T | T[], index: number) {
   elements = ensure(elements);
-  // @ts-ignore // FIXME TS dom splice api wrong?
-  arr.splice(...[index, 0].concat(elements));
+  arr.splice(index, 0, ...elements);
 }
 
 /**

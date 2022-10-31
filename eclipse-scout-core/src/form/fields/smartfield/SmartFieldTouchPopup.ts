@@ -59,7 +59,7 @@ export default class SmartFieldTouchPopup<TValue> extends TouchPopup implements 
   }
 
   protected override _fieldOverrides(): SmartFieldModel<TValue> {
-    let obj = super._fieldOverrides() as SmartFieldModel<TValue>;
+    let obj = super._fieldOverrides() as SmartFieldModel<TValue> & {proposalChooser: ProposalChooser<any, any, any>};
     // Make sure proposal chooser does not get cloned, because it would not work (e.g. because selectedRows may not be cloned)
     // It would also generate a loop because field would try to render the chooser and the popup
     // -> The original smart field has to control the chooser

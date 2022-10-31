@@ -247,13 +247,6 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     this.rootGroupBox.render();
   }
 
-  protected _renderFocusedElement() {
-    if (this.focusedElement) {
-      this.focusedElement.focus();
-      this.focusedElement = null;
-    }
-  }
-
   setModal(modal: boolean) {
     this.setProperty('modal', modal);
   }

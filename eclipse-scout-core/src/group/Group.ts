@@ -8,15 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+// eslint-disable-next-line max-classes-per-file
 import {Dimension, EnumObject, graphics, GroupEventMap, GroupLayout, GroupModel, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, Insets, KeyStrokeContext, LoadingSupport, RefModel, scout, tooltips, Widget, WidgetModel} from '../index';
 import $ from 'jquery';
-import MouseDownEvent = JQuery.MouseDownEvent;
 import {ModelOf} from '../scout';
+import MouseDownEvent = JQuery.MouseDownEvent;
 
 export type GroupCollapseStyle = EnumObject<typeof Group.CollapseStyle>;
 
 export default class Group<TBody extends Widget = Widget> extends Widget implements GroupModel<TBody> {
-  declare model: GroupModel;
+  declare model: GroupModel<TBody>;
   declare eventMap: GroupEventMap;
 
   bodyAnimating: boolean;
@@ -256,13 +257,9 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
   protected _setBody(body: TBody) {
     if (!body) {
       // Create empty body if no body was provided
-      body = scout.create(Widget, {
-        parent: this,
-        _render: function() {
-          this.$container = this.$parent.appendDiv('group');
-          this.htmlComp = HtmlComponent.install(this.$container, this.session);
-        }
-      }) as TBody;
+      body = scout.create(EmptyBody, {
+        parent: this
+      }) as unknown as TBody;
     }
     this._setProperty('body', body);
   }
@@ -487,5 +484,12 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
         }
       })
       .promise();
+  }
+}
+
+class EmptyBody extends Widget {
+  protected override _render() {
+    this.$container = this.$parent.appendDiv('group');
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
 }

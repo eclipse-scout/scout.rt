@@ -32,7 +32,7 @@ export default interface GroupBoxModel extends FormFieldModel {
   subLabel?: string;
   /**
    * Configures whether this group box should be scrollable in vertical direction.
-   * By default this value is null which means a main-box of a form is scrollable, while all other boxes are false.
+   * By default, this value is null which means a main-box of a form is scrollable, while all other boxes are false.
    * If you want a non-main-box to be scrollable, you have to set this groupbox to scrollable while setting the main-box to scrollable=false.
    */
   scrollable?: boolean;

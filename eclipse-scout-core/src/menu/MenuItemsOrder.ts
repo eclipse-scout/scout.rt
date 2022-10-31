@@ -82,10 +82,11 @@ export default class MenuItemsOrder implements MenuOrder {
    * The createdBy property is added to the model to find and destroy items added by the UI later.
    */
   protected _createSeparator(): Menu {
-    return scout.create(Menu, {
+    let separator = scout.create(Menu, {
       parent: this.menuBar,
-      createdBy: this,
       separator: true
     });
+    separator.createdBy = this;
+    return separator;
   }
 }

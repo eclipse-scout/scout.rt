@@ -23,13 +23,12 @@ export default class MenuBox extends Widget implements MenuBoxModel {
     super();
     this.compact = false;
     this.menus = [];
+    this.uiMenuCssClass = 'menu-box-item';
     this._addWidgetProperties('menus');
   }
 
   protected override _init(options: MenuBoxModel) {
     super._init(options);
-    this.uiMenuCssClass = options.uiMenuCssClass || '';
-    this.uiMenuCssClass += ' ' + 'menu-box-item';
     this._initMenus(this.menus);
   }
 

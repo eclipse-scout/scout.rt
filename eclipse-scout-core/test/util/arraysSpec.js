@@ -149,6 +149,10 @@ describe('scout.arrays', () => {
       arr = ['a', 'b', 'c', 'd'];
       arrays.insertAll(arr, ['e', 'f', 'g'], 10);
       expect(arr).toEqual(['a', 'b', 'c', 'd', 'e', 'f', 'g']);
+
+      arr = ['a', 'b', 'c', 'd'];
+      arrays.insertAll(arr, 'x', 0);
+      expect(arr).toEqual(['x', 'a', 'b', 'c', 'd']);
     });
 
   });

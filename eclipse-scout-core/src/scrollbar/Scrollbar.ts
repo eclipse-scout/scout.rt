@@ -8,13 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {events, graphics, Insets, scout, scrollbars, Widget} from '../index';
+import {events, graphics, Insets, scout, ScrollbarModel, scrollbars, Widget} from '../index';
 import $ from 'jquery';
 import ScrollbarEventMap from './ScrollbarEventMap';
 import {JQueryMouseWheelEvent} from '../jquery/jquery-scout-types';
 import {OldWheelEvent} from '../types';
 
-export default class Scrollbar extends Widget {
+export default class Scrollbar extends Widget implements ScrollbarModel {
+  declare model: ScrollbarModel;
   declare eventMap: ScrollbarEventMap;
 
   axis: 'x' | 'y';

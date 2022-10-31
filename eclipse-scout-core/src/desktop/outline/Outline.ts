@@ -548,8 +548,7 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
   protected _createOutlineOverview(): TileOutlineOverview {
     return scout.create(TileOutlineOverview, {
       parent: this,
-      outline: this,
-      page: this.compact ? this.compactRootNode() : null
+      outline: this
     });
   }
 

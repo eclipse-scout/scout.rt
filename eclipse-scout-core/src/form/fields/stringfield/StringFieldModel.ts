@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MaxLengthHandler, ValueFieldModel} from '../../../index';
+import {BasicFieldModel, MaxLengthHandler} from '../../../index';
 import {StringFieldFormat} from './StringField';
 
-export default interface StringFieldModel extends ValueFieldModel<string> {
+export default interface StringFieldModel extends BasicFieldModel<string> {
   format?: StringFieldFormat;
   /**
    * Default is false.

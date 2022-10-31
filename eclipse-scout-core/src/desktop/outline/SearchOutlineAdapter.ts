@@ -18,7 +18,7 @@ export default class SearchOutlineAdapter extends OutlineAdapter {
     super();
   }
 
-  protected override _initProperties(model: SearchOutlineModel) {
+  protected override _initProperties(model: SearchOutlineModel & {requestFocusQueryField?: boolean}) {
     if (model.requestFocusQueryField !== undefined) {
       // ignore pseudo property initially (to prevent the function SearchOutlineAdapter#requestFocusQueryField() to be replaced)
       delete model.requestFocusQueryField;

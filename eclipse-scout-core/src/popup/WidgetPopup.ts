@@ -13,8 +13,8 @@ import $ from 'jquery';
 import {ResizableMode} from '../resizable/Resizable';
 import {PopupAlignment} from './Popup';
 
-export default class WidgetPopup extends Popup implements WidgetPopupModel {
-  declare model: WidgetPopupModel;
+export default class WidgetPopup<TContent extends Widget = Widget> extends Popup implements WidgetPopupModel<TContent> {
+  declare model: WidgetPopupModel<TContent>;
   declare eventMap: WidgetPopupEventMap;
 
   closable: boolean;
@@ -23,7 +23,7 @@ export default class WidgetPopup extends Popup implements WidgetPopupModel {
   resizable: boolean;
   resizeModes: ResizableMode[];
   $dragHandle: JQuery;
-  content: Widget;
+  content: TContent;
   /**
    * Action bar on the top right corner, is used to display the close action but may also be used by popups to add custom actions.
    * The bar will only be added automatically if the popup is closable.
@@ -84,7 +84,7 @@ export default class WidgetPopup extends Popup implements WidgetPopupModel {
     super._remove();
   }
 
-  setContent(content: Widget | RefModel<WidgetModel>) {
+  setContent(content: TContent | RefModel<RefModel<TContent>>) {
     this.setProperty('content', content);
   }
 

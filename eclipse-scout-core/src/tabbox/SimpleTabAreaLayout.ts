@@ -160,8 +160,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
       let tab = this.tabArea.getTabs()[i];
       let menu = scout.create(Menu, {
         parent: this.tabArea,
-        text: tab.getMenuText(),
-        tab: tab
+        text: tab.getMenuText()
       });
       menu.on('action', function() {
         $.log.isDebugEnabled() && $.log.debug('(SimpleTabAreaLayout#_onMouseDownOverflow) tab=' + this);

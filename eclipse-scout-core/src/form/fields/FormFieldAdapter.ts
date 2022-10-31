@@ -27,7 +27,7 @@ export default class FormFieldAdapter extends ModelAdapter {
     this._currentMenuTypes = [];
   }
 
-  protected override _initProperties(model: FormFieldModel) {
+  protected override _initProperties(model: FormFieldModel & {currentMenuTypes: string[]}) {
     super._initProperties(model);
     this._currentMenuTypes = arrays.ensure(model.currentMenuTypes);
     delete model.currentMenuTypes;

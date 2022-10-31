@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, ActionKeyStroke, arrays, ContextMenuPopup, EnumObject, HtmlComponent, icons, MenuBarPopup, MenuBarPopupModel, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, RefModel,
-  scout, strings,
+  Action, ActionKeyStroke, arrays, ContextMenuPopup, EnumObject, HtmlComponent, icons, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, RefModel, scout, strings,
   tooltips, TreeVisitResult
 } from '../index';
 import {PopupAlignment} from '../popup/Popup';
@@ -26,10 +25,7 @@ export default class Menu extends Action implements MenuModel {
   declare eventMap: MenuEventMap;
 
   childActions: Menu[];
-
-  /** null = determined by the menu bar */
   defaultMenu: boolean;
-
   excludedByFilter: boolean;
   menuTypes: string[];
   menuStyle: MenuStyle;
@@ -568,12 +564,13 @@ export default class Menu extends Action implements MenuModel {
     this.insertChildActions([actionsToInsert]);
   }
 
-  insertChildActions(actionsToInsert: Menu | Menu[]) {
+  insertChildActions(actionsToInsert: Menu | RefModel<MenuModel> | (Menu | RefModel<MenuModel>)[]) {
     actionsToInsert = arrays.ensure(actionsToInsert);
     if (actionsToInsert.length === 0) {
       return;
     }
-    this.setChildActions(this.childActions.concat(actionsToInsert));
+    let actions = this.childActions as (Menu | RefModel<MenuModel>)[];
+    this.setChildActions(actions.concat(actionsToInsert));
   }
 
   deleteChildAction(actionToDelete: Menu) {

@@ -8,8 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-
-// FIXME TS mig move filter stuff to filter folder
 import {Predicate} from '../types';
 
 /**

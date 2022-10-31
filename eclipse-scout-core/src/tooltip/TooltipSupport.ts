@@ -145,13 +145,13 @@ export default class TooltipSupport {
       this._tooltip.setMenus(this._options.menus);
     } else {
       // create new tooltip
-      let options = $.extend({}, this._options, {
+      let options: TooltipModel = $.extend({}, this._options, {
         $anchor: this._options.$anchor || $comp,
         text: text,
         htmlEnabled: htmlEnabled
       });
       this._tooltip = scout.create(Tooltip, options);
-      this._tooltip.render(options.$parent);
+      this._tooltip.render();
     }
   }
 }

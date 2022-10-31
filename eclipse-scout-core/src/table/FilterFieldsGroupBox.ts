@@ -38,9 +38,7 @@ export default class FilterFieldsGroupBox extends GroupBox implements FilterFiel
       parent: this,
       label: this.session.text(text),
       statusVisible: false,
-      labelWidthInPixel: 50,
-      maxLength: 100,
-      updateDisplayTextOnModify: true
+      labelWidthInPixel: 50
     });
     this.addField0(field);
     return field;

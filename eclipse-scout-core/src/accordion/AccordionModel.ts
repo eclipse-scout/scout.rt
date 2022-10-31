@@ -19,16 +19,13 @@ export default interface AccordionModel extends WidgetModel {
    * Default is false.
    */
   comparator?: Comparator<Group>;
-
   collapseStyle?: GroupCollapseStyle;
-
   /**
    * If true, only one group can be expanded at a time. If one group gets expanded, all other groups will be collapsed automatically.
    *
    * Default is true.
    */
   exclusiveExpand?: boolean;
-
   groups?: (Group | RefModel<GroupModel>)[];
   scrollable?: boolean;
 }

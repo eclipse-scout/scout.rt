@@ -8,16 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BasicFieldEventMap, ValueField} from '../../index';
+import {BasicFieldEventMap, BasicFieldModel, ValueField} from '../../index';
 
 /**
  * Common base class for ValueFields having an HTML input field.
  */
-export default abstract class BasicField<TValue> extends ValueField<TValue> {
+export default abstract class BasicField<TValue> extends ValueField<TValue> implements BasicFieldModel<TValue> {
+  declare model: BasicFieldModel<TValue>;
   declare eventMap: BasicFieldEventMap<TValue>;
 
   updateDisplayTextOnModify: boolean;
-  /** in milliseconds */
   updateDisplayTextOnModifyDelay: number;
 
   protected _displayTextModifiedTimeoutId: number;

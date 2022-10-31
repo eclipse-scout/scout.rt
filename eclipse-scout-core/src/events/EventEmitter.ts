@@ -14,7 +14,7 @@ export interface EventHandler<K extends Event = Event> {
   (event: K): void;
 }
 
-export type EventMapOf<T> = T extends { eventMap: infer Map } ? Map : object;
+export type EventMapOf<T> = T extends { eventMap: infer TMap } ? TMap : object;
 /** Omits all properties that cannot be passed as part of the event model when the event is triggered. */
 export type EventModel<T> = Omit<T, 'source' | 'defaultPrevented' | 'type' | 'preventDefault'>;
 

@@ -1390,6 +1390,7 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
     let max = Math.floor(this.$container.outerWidth(true) / 2);
     if (event.position > max) {
       event.source.setPosition(max);
+      event.preventDefault();
     }
   }
 

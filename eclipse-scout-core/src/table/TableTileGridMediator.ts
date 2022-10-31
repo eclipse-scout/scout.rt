@@ -20,8 +20,7 @@ import {TileActionEvent, TileClickEvent} from '../tile/TileGridEventMap';
 import TileModel from '../tile/TileModel';
 
 /**
- * Delegates events between the Table and it's internal TileGrid.
- *
+ * Delegates events between the {@link Table} and it's internal {@link TileGrid}.
  */
 export default class TableTileGridMediator extends Widget implements TableTileGridMediatorModel {
   declare model: TableTileGridMediatorModel;
@@ -64,6 +63,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
   protected _tableRowsDeletedHandler: EventHandler<TableRowsDeletedEvent>;
   protected _tableAllRowsDeletedHandler: EventHandler<TableAllRowsDeletedEvent>;
   protected _tableRowOrderChangedHandler: EventHandler<TableRowOrderChangedEvent>;
+  protected _tablePropertyChangeHandler: EventHandler<PropertyChangeEvent>;
 
   constructor() {
     super();
@@ -87,6 +87,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     this._tableRowsDeletedHandler = this._onTableRowsDeleted.bind(this);
     this._tableAllRowsDeletedHandler = this._onTableAllRowsDeleted.bind(this);
     this._tableRowOrderChangedHandler = this._onTableRowOrderChangedHandler.bind(this);
+    this._tablePropertyChangeHandler = this._onTablePropertyChange.bind(this);
     this._destroyHandler = this._uninstallListeners.bind(this);
     this.exclusiveExpand = false;
     this.gridColumnCount = null;
@@ -124,6 +125,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     this.table.on('rowsDeleted', this._tableRowsDeletedHandler);
     this.table.on('allRowsDeleted', this._tableAllRowsDeletedHandler);
     this.table.on('rowOrderChanged', this._tableRowOrderChangedHandler);
+    this.table.on('propertyChange', this._tablePropertyChangeHandler);
 
     this.tileAccordion.on('destroy', this._destroyHandler);
     this.table.on('destroy', this._destroyHandler);
@@ -142,6 +144,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     this.table.off('rowsDeleted', this._tableRowsDeletedHandler);
     this.table.off('allRowsDeleted', this._tableAllRowsDeletedHandler);
     this.table.off('rowOrderChanged', this._tableRowOrderChangedHandler);
+    this.table.off('propertyChange', this._tablePropertyChangeHandler);
 
     this.tileAccordion.off('destroy', this._destroyHandler);
     this.table.off('destroy', this._destroyHandler);
@@ -219,7 +222,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
 
   // only used in ScoutJS, see TableAdapter.modifyTablePrototype()
   loadTiles() {
-    // hierarchy is not supported in tile mode. There is no way to visualize a parent-child hierarchy in the tileGrid. Therefore only top level rows are displayed.
+    // hierarchy is not supported in tile mode. There is no way to visualize a parent-child hierarchy in the tileGrid. Therefore, only top level rows are displayed.
     let rows = this.table.rows.filter(row => !row.parentRow);
     let tiles = this.table.createTiles(rows);
     if (tiles) {
@@ -295,7 +298,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
       parent: this.table,
       virtual: true,
       selectable: true,
-      multiselect: this.table.multiSelect,
+      multiSelect: this.table.multiSelect,
       exclusiveExpand: this.exclusiveExpand,
       gridColumnCount: this.gridColumnCount,
       tileGridLayoutConfig: this.tileGridLayoutConfig,
@@ -311,7 +314,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
       title = cell.text;
       iconId = cell.iconId;
     }
-    return scout.create(Group, {
+    return scout.create((Group<TileGrid>), {
       parent: this.tileAccordion,
       id: groupId,
       headerVisible: groupId !== 'default',
@@ -322,7 +325,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
         objectType: TileGrid,
         scrollable: false
       }
-    }) as Group<TileGrid>;
+    });
   }
 
   activate() {
@@ -653,6 +656,12 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     if (this.tileAccordion) {
       this.tileAccordion.setFilters([]);
       this.table.filters.forEach(tableFilter => this._addFilter(tableFilter));
+    }
+  }
+
+  protected _onTablePropertyChange(event: PropertyChangeEvent) {
+    if (event.propertyName === 'multiSelect') {
+      this.tileAccordion.setMultiSelect(event.newValue as boolean);
     }
   }
 

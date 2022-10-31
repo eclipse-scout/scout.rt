@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, EventHandler, FlexboxLayoutData, HtmlComponent, scout, SimpleTabArea, SimpleTabBoxController, SimpleTabBoxEventMap, SimpleTabBoxLayout, SimpleTabBoxModel, SimpleTabViewContentLayout, Widget} from '../index';
+import {arrays, Event, EventHandler, HtmlComponent, LayoutData, scout, SimpleTabArea, SimpleTabBoxController, SimpleTabBoxEventMap, SimpleTabBoxLayout, SimpleTabBoxModel, SimpleTabViewContentLayout, Widget} from '../index';
 import {SimpleTabView} from './SimpleTab';
 
 export default class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabBoxModel<TView> {
@@ -19,7 +19,7 @@ export default class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> e
   viewStack: TView[];
   currentView: TView;
   controller: SimpleTabBoxController<TView>;
-  layoutData: FlexboxLayoutData;
+  layoutData: LayoutData;
   viewContent: HtmlComponent;
   $viewContent: JQuery;
   $tabArea: JQuery;
@@ -90,8 +90,6 @@ export default class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> e
     }
     view.render(this.$viewContent);
     view.$container.addClass('view');
-    // @ts-ignore
-    view.validateRoot = true; // FIXME TS: is this correct? should this be set on the HtmlComp instead?
   }
 
   postRender() {
@@ -131,12 +129,12 @@ export default class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> e
     }
   }
 
-  override setLayoutData(layoutData: FlexboxLayoutData) {
+  override setLayoutData(layoutData: LayoutData) {
     super.setLayoutData(layoutData);
     this.layoutData = layoutData;
   }
 
-  getLayoutData(): FlexboxLayoutData {
+  getLayoutData(): LayoutData {
     return this.layoutData;
   }
 

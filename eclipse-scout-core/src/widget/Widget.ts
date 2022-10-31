@@ -215,11 +215,9 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Calls {@link Widget#_init} and triggers an <em>init</em> event when initialization has been completed.
    */
   init(model: WidgetModel) {
-    if (model.loadJsonModel !== false) {
-      let staticModel = this._jsonModel();
-      if (staticModel) {
-        model = $.extend({}, staticModel, model);
-      }
+    let staticModel = this._jsonModel();
+    if (staticModel) {
+      model = $.extend({}, staticModel, model);
     }
     model = model || {} as WidgetModel;
     model = this._prepareModel(model);

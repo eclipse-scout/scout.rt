@@ -57,7 +57,7 @@ export default class LabelField extends ValueField<string> implements LabelField
    * Otherwise LabelFields could 'become' touched, because value and displayText
    * of the LabelField don't match.
    */
-  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
+  override acceptInput(whileTyping?: boolean) {
     // NOP
   }
 

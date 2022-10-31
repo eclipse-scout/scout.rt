@@ -323,8 +323,8 @@ export default class MenuBar extends Widget implements MenuBarModel {
 
   /**
    * Sets the property hiddenByUi. This does not automatically update the visibility of the menus.
-   * We assume that #updateVisibility() is called later anyway.
-   *
+   * We assume that {@link updateVisibility} is called later anyway.
+   * @internal
    */
   setHiddenByUi(hiddenByUi: boolean) {
     this.setProperty('hiddenByUi', hiddenByUi);

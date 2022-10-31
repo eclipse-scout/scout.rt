@@ -1340,7 +1340,7 @@ export default class Planner extends Widget implements PlannerModel {
     // done by PlannerHeader.js
   }
 
-  protected _setViewRange(viewRange: DateRange) {
+  protected _setViewRange(viewRange: DateRange | JsonDateRange) {
     viewRange = DateRange.ensure(viewRange);
     this._setProperty('viewRange', viewRange);
     this._yearPanel.setViewRange(this.viewRange);

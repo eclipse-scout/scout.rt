@@ -19,6 +19,5 @@ export default interface MenuBarModel extends WidgetModel {
   position?: MenuBarPosition;
   tabbable?: boolean;
   ellipsisPosition?: MenuBarEllipsisPosition;
-  hiddenByUi?: boolean;
   menuOrder?: MenuOrder;
 }

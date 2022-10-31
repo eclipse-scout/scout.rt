@@ -118,7 +118,7 @@ export interface ObjectModel<T = object, M = object> {
   id?: string;
 }
 
-export type ModelOf<T> = T extends { model: infer Model } ? Model : object;
+export type ModelOf<T> = T extends { model: infer TModel } ? TModel : object;
 
 export function create<T>(objectType: new() => T, model?: ModelOf<T>, options?: ObjectFactoryOptions): T;
 export function create<T>(model: ModelOf<T> & { objectType: new () => T }, options?: ObjectFactoryOptions): T;

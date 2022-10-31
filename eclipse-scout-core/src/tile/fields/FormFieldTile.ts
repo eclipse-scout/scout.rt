@@ -61,8 +61,8 @@ export default class FormFieldTile extends WidgetTile {
     this.$container.toggleClass('compact', Device.get().type === Device.Type.MOBILE);
   }
 
-  // FIXME TS is this code used? Maybe override onWidgetPropertyChange instead and call super?
-  protected _onFieldPropertyChange(event: PropertyChangeEvent) {
+  protected override _onWidgetPropertyChange(event: PropertyChangeEvent) {
+    super._onWidgetPropertyChange(event);
     if (event.propertyName === 'labelVisible' || event.propertyName === 'errorStatus') {
       if (this.rendered) {
         this._renderFieldLabelVisible();

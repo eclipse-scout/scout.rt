@@ -36,6 +36,8 @@ export default interface ActionModel extends WidgetModel {
    */
   selected?: boolean;
   /**
+   * Configures whether two or more consecutive clicks on the action within a short period of time (e.g. double click) should be prevented by the UI.
+   *
    * Default is false.
    */
   preventDoubleClick?: boolean;

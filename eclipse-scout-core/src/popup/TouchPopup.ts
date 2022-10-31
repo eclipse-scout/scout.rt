@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, Action, DateField, Event, EventHandler, FormField, HtmlComponent, Menu, Point, Popup, PropertyChangeEvent, scout, SingleLayout, SmartField, Tooltip, TouchPopupLayout, TouchPopupModel, ValueField, ValueFieldModel, Widget
+  AbstractLayout, Action, Event, EventHandler, FormField, HtmlComponent, Menu, Point, Popup, PropertyChangeEvent, scout, SingleLayout, SmartField, Tooltip, TouchPopupLayout, TouchPopupModel, ValueField, ValueFieldModel, Widget
 } from '../index';
 import RowLayout from '../layout/RowLayout';
 import {PopupAlignment} from './Popup';
@@ -22,10 +22,10 @@ export default class TouchPopup extends Popup {
   $body: JQuery;
 
   /** the original touch field from the form */
-  protected _touchField: DateField | SmartField<any>;
+  protected _touchField: TouchPopupField;
   protected _touchFieldTooltip: Tooltip;
   /** the cloned field from the popup */
-  protected _field: DateField | SmartField<any>;
+  protected _field: TouchPopupField;
   /** the widget placed below the field */
   protected _widget: Widget;
   protected _$widgetContainer: JQuery;
@@ -80,7 +80,7 @@ export default class TouchPopup extends Popup {
     super._destroy();
   }
 
-  protected _fieldOverrides(): ValueFieldModel<any> {
+  protected _fieldOverrides(): TouchPopupFieldModel {
     return {
       parent: this,
       labelVisible: false,
@@ -150,7 +150,7 @@ export default class TouchPopup extends Popup {
   protected _onTouchFieldPropertyChange(event: PropertyChangeEvent<any>) {
     if (event.propertyName === 'errorStatus') {
       this._field.setErrorStatus(event.newValue);
-    } else if (event.propertyName === 'lookupRow') {
+    } else if (event.propertyName === 'lookupRow' && this._field instanceof SmartField) {
       let smartfield = this._field as SmartField<any>;
       smartfield.setLookupRow(event.newValue);
     }
@@ -172,3 +172,15 @@ export default class TouchPopup extends Popup {
     this._acceptInput();
   }
 }
+
+export type TouchPopupField = ValueField<any> & {
+  popup: Popup;
+  embedded: boolean;
+  touchMode: boolean;
+};
+
+export type TouchPopupFieldModel = ValueFieldModel<any> & {
+  popup?: Popup;
+  embedded?: boolean;
+  touchMode?: boolean;
+};

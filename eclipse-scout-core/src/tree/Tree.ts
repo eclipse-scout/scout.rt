@@ -9,16 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, arrays, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, EnumObject, EventHandler, FilterResult, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, keyStrokeModifier, LazyNodeFilter, Menu,
+  Action, arrays, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, keyStrokeModifier,
+  LazyNodeFilter, Menu,
   MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, objects, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeLayout,
   TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
 } from '../index';
 import $ from 'jquery';
-import {FilterOrFunction} from '../widget/FilterSupport';
 import {MenuFilter} from '../menu/Menu';
 import {ScrollDirection, ScrollToOptions} from '../scrollbar/scrollbars';
 import {Optional} from '../types';
-import Filter from '../widget/Filter';
 import TreeEventMap from './TreeEventMap';
 import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
 import {TreeNodeData} from './TreeNodeModel';

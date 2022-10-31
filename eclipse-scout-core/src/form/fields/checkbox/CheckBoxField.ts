@@ -177,7 +177,7 @@ export default class CheckBoxField extends ValueField<boolean> implements CheckB
     this.invalidateLayoutTree();
   }
 
-  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
+  override acceptInput(whileTyping?: boolean) {
     // NOP
   }
 

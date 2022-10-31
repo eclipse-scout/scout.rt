@@ -11,28 +11,22 @@
 import {LayoutData, WidgetModel} from '../index';
 
 export default interface SplitterModel extends WidgetModel {
-
   /**
    * Default is true
    */
   splitHorizontal?: boolean;
-
   /**
    * current splitter position in pixels, updated by updatePosition()
    */
   position?: number;
-
   /**
-   * Direction set to position the splitter inside the root element. Default is 'top.
+   * Direction set to position the splitter inside the root element. Default is `top`.
    */
   orientation?: 'top' | 'right' | 'bottom' | 'left';
-
   layoutData?: LayoutData;
-
   $anchor?: JQuery;
-
   /**
-   * Optional. Fallback is this.$parent.
+   * Optional. Fallback is {@link this.$parent}.
    */
   $root?: JQuery;
 }

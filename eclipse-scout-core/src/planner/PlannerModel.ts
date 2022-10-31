@@ -19,12 +19,12 @@ export default interface PlannerModel extends WidgetModel {
   availableDisplayModes?: PlannerDisplayMode[];
   viewRange?: DateRange | JsonDateRange;
   /**
-   * selected resources or id's of selected resources.
+   * Selected resources or id's of selected resources.
    */
   selectedResources?: PlannerResource[] | string[];
   selectionRange?: DateRange | JsonDateRange;
   /**
-   * selected activity or id of selected activity.
+   * Selected activity or id of selected activity.
    */
   selectedActivity?: PlannerActivity | string;
   displayModeOptions?: Partial<Record<PlannerDisplayMode, PlannerDisplayModeOptions>>;

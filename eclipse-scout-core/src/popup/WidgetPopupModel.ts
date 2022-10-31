@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {PopupModel, Widget, WidgetModel} from '../index';
+import {PopupModel, RefModel, Widget} from '../index';
 import {ResizableMode} from '../resizable/Resizable';
-import {RefModel} from '../types';
+import {ModelOf} from '../scout';
 
-export default interface WidgetPopupModel extends PopupModel {
+export default interface WidgetPopupModel<TContent extends Widget = Widget> extends PopupModel {
   /**
    * Default is false.
    */
@@ -32,5 +32,5 @@ export default interface WidgetPopupModel extends PopupModel {
   /**
    * The content of the WidgetPopup
    */
-  content?: Widget | RefModel<WidgetModel>;
+  content?: TContent | RefModel<ModelOf<TContent>>;
 }

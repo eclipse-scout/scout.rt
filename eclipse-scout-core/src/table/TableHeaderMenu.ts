@@ -880,7 +880,6 @@ export default class TableHeaderMenu extends Popup implements TableHeaderMenuMod
   protected _renderFilterFields(): JQuery {
     this.filterFieldsGroupBox = scout.create(FilterFieldsGroupBox, {
       parent: this,
-      column: this.column,
       filter: this.filter
     });
     this.$filterFieldsGroup = this.$columnFilters.appendDiv('table-header-menu-group');

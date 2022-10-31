@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractGrid, arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, Filter, FilterResult, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, Menu,
+  AbstractGrid, arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, Filter, FilterOrFunction, FilterResult, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGrid,
+  LogicalGridData, Menu,
   MenuDestinations, menus as menuUtil, numbers, objects, PlaceholderTile, Predicate, Range, RefModel, scout, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke,
   TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter,
   UpdateFilteredElementsOptions, VirtualScrolling, Widget
@@ -20,7 +21,7 @@ import TileGridModel from './TileGridModel';
 import TileModel from './TileModel';
 import {MenuFilter} from '../menu/Menu';
 import {ScrollToOptions} from '../scrollbar/scrollbars';
-import {FilterOrFunction} from '../widget/FilterSupport';
+import {TileGridLayoutConfigModel} from './TileGridLayoutConfig';
 
 /**
  * Only select top-level tile elements. Do not select elements with a 'tile' class deeper in the tree.
@@ -521,11 +522,11 @@ export default class TileGrid extends Widget implements TileGridModel {
   }
 
   /** @see TileGridModel.layoutConfig */
-  setLayoutConfig(layoutConfig: TileGridLayoutConfig) {
+  setLayoutConfig(layoutConfig: TileGridLayoutConfig | TileGridLayoutConfigModel) {
     this.setProperty('layoutConfig', layoutConfig);
   }
 
-  protected _setLayoutConfig(layoutConfig: TileGridLayoutConfig) {
+  protected _setLayoutConfig(layoutConfig: TileGridLayoutConfig | TileGridLayoutConfigModel) {
     if (!layoutConfig) {
       layoutConfig = new TileGridLayoutConfig();
     }

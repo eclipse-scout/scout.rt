@@ -67,7 +67,6 @@ export default class TabAreaLayout extends AbstractLayout {
       let menu = scout.create(Menu, {
         parent: ellipsis,
         text: tab.label,
-        tab: tab,
         visible: tab.visible
       });
       menu.on('action', event => {

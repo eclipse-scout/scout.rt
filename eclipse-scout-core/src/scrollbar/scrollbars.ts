@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, graphics, HtmlComponent, Insets, objects, scout, Scrollbar, Session, WidgetModel} from '../index';
+import {arrays, Device, graphics, HtmlComponent, Insets, objects, scout, Scrollbar, ScrollbarModel, Session, WidgetModel} from '../index';
 import $ from 'jquery';
 
 /**
@@ -73,13 +73,12 @@ export interface ScrollbarInstallOptions extends WidgetModel {
    * Default is both
    */
   axis?: ScrollDirection;
-
+  borderless?: boolean;
   nativeScrollbars?: boolean;
-
   hybridScrollbars?: boolean;
 
   /**
-   * controls the scroll shadow behavior:
+   * Controls the scroll shadow behavior:
    * <ul>
    *   <li>To define where the shadow should appear, use one of the following values: x, y, top, right, bottom, left. Multiple values can be separated by space.
    *   <li>If no positioning value is provided, it is automatically determined based on the axis.</li>
@@ -403,18 +402,25 @@ export function _installJs($container: JQuery, options: ScrollbarInstallOptions)
   });
   scrollbars = [];
   let scrollbar;
+  let scrollbarModel: ScrollbarModel = {
+    session: options.session,
+    parent: options.parent,
+    borderless: options.borderless
+  };
   if (options.axis === 'both') {
-    let scrollOptions = $.extend({}, options);
-    scrollOptions.axis = 'y';
-    scrollbar = scout.create(Scrollbar, $.extend({}, scrollOptions));
+    scrollbarModel = $.extend({}, scrollbarModel, {axis: 'y'});
+    scrollbar = scout.create(Scrollbar, scrollbarModel);
     scrollbars.push(scrollbar);
 
-    scrollOptions.axis = 'x';
-    scrollOptions.mouseWheelNeedsShift = true;
-    scrollbar = scout.create(Scrollbar, $.extend({}, scrollOptions));
+    scrollbarModel = $.extend({}, scrollbarModel, {
+      axis: 'x',
+      mouseWheelNeedsShift: true
+    });
+    scrollbar = scout.create(Scrollbar, scrollbarModel);
     scrollbars.push(scrollbar);
   } else {
-    scrollbar = scout.create(Scrollbar, $.extend({}, options));
+    scrollbarModel = $.extend({}, scrollbarModel, {axis: options.axis});
+    scrollbar = scout.create(Scrollbar, scrollbarModel);
     scrollbars.push(scrollbar);
   }
   $container.data('scrollbars', scrollbars);

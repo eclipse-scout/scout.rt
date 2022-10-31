@@ -72,7 +72,7 @@ export default class PageWithNodes extends Page {
 
   override loadChildren(): JQuery.Promise<any> {
     this.childrenLoaded = false;
-    return this._createChildPages().done(childPages => { // FIXME TS can this be changed to then and <any> to void?
+    return this._createChildPages().done(childPages => {
       this._rebuildDetailTable(childPages);
       if (childPages.length > 0) {
         this.getOutline().insertNodes(childPages, this);

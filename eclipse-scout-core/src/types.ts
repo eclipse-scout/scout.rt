@@ -16,16 +16,13 @@ export type Predicate<T> = (obj: T) => boolean;
 
 export type Comparator<T> = (a: T, b: T) => number;
 
-// Type that makes some properties optional and some required.
-export type PartialAndRequired<T, OPTIONAL extends keyof T, REQUIRED extends keyof T> = Omit<T, OPTIONAL | REQUIRED> & Partial<Pick<T, OPTIONAL>> & Required<Pick<T, REQUIRED>>;
+export type RefModel<TModel extends { parent?: any; objectType?: ObjectType<any> }> = Omit<SomeRequired<TModel, 'objectType'>, 'parent'>;
 
-export type RefModel<MODEL extends { parent?: any; objectType?: ObjectType<any> }> = Omit<SomeRequired<MODEL, 'objectType'>, 'parent'>;
+export type Optional<TObject, TKey extends keyof TObject> = Partial<Pick<TObject, TKey>> & Omit<TObject, TKey>;
 
-export type Optional<T, K extends keyof T> = Partial<Pick<T, K>> & Omit<T, K>;
+export type SomeRequired<TObject, TKey extends keyof TObject> = Required<Pick<TObject, TKey>> & TObject;
 
-export type SomeRequired<T, K extends keyof T> = Required<Pick<T, K>> & T;
-
-export type EnumObject<TYPE> = TYPE[keyof TYPE];
+export type EnumObject<T> = T[keyof T];
 
 export type EmptyObject = Record<string, never>;
 

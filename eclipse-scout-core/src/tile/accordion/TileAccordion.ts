@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Accordion, arrays, Event, EventDelegator, EventHandler, Filter, FilterResult, FilterSupport, Group, KeyStrokeContext, objects, PropertyChangeEvent, RefModel, scout, TextFilter, Tile, TileAccordionEventMap, TileAccordionLayout,
+  Accordion, arrays, Event, EventDelegator, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, Group, KeyStrokeContext, objects, PropertyChangeEvent, RefModel, scout, TextFilter, Tile, TileAccordionEventMap,
+  TileAccordionLayout,
   TileAccordionModel,
   TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
 } from '../../index';
 import {Comparator} from '../../types';
-import {FilterOrFunction} from '../../widget/FilterSupport';
 
 export default class TileAccordion extends Accordion implements TileAccordionModel {
   declare model: TileAccordionModel;

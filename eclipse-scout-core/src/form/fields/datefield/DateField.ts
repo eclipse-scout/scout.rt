@@ -973,7 +973,7 @@ export default class DateField extends ValueField<Date> implements DateFieldMode
     }, 50);
   }
 
-  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
+  override acceptInput(whileTyping?: boolean) {
     let displayText = scout.nvl(this._readDisplayText(), '');
     let inputChanged = this._checkDisplayTextChanged(displayText);
     if (inputChanged) {

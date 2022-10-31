@@ -40,7 +40,7 @@ describe('SequenceBoxAdapter', () => {
           objectType: 'DateField'
         }]
       };
-      let adapter = scout.create(SequenceBoxAdapter, createAdapterModel(model));
+      let adapter = scout.create(SequenceBoxAdapter, $.extend({}, model));
       let seqBox = adapter.createWidget(model, session.desktop);
       linkWidgetAndAdapter(seqBox.fields[0], 'StringFieldAdapter');
       linkWidgetAndAdapter(seqBox.fields[1], 'DateFieldAdapter');

@@ -14,11 +14,7 @@ export default class DesktopToolBox extends MenuBox {
 
   constructor() {
     super();
-  }
-
-  protected override _init(options: MenuBoxModel) {
-    options.uiMenuCssClass = strings.join(' ', options.uiMenuCssClass, 'desktop-tool-box-item');
-    super._init(options);
+    this.uiMenuCssClass = strings.join(' ', this.uiMenuCssClass, 'desktop-tool-box-item');
   }
 
   protected override _initMenu(menu: Menu) {

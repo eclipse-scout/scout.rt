@@ -324,7 +324,7 @@ export default class CalendarComponent extends Widget implements CalendarCompone
     this.updateSelectedComponent($part, false);
 
     if (event.button === 0) {
-      let popup = scout.create(WidgetPopup, {
+      let popup = scout.create((WidgetPopup<Label>), {
         parent: this.parent,
         $anchor: $part,
         closeOnAnchorMouseDown: true,

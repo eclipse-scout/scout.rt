@@ -189,7 +189,7 @@ export default class TagField extends ValueField<string[]> implements TagFieldMo
     this.$field.val('');
   }
 
-  override acceptInput(whileTyping?: boolean): JQuery.Promise<void> | void {
+  override acceptInput(whileTyping?: boolean) {
     if (this.popup) {
       if (this.popup.selectedRow()) {
         this.popup.triggerLookupRowSelected();

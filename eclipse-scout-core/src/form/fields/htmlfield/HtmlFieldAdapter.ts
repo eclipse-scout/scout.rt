@@ -13,7 +13,7 @@ import {HtmlFieldAppLinkActionEvent} from './HtmlFieldEventMap';
 
 export default class HtmlFieldAdapter extends ValueFieldAdapter {
 
-  protected override _initProperties(model: HtmlFieldModel) {
+  protected override _initProperties(model: HtmlFieldModel & {scrollToEnd?: boolean}) {
     if (model.scrollToEnd !== undefined) {
       // ignore pseudo property initially (to prevent the function StringField#scrollToEnd() to be replaced)
       delete model.scrollToEnd;

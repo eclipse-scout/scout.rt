@@ -500,9 +500,9 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
   protected _populateRadioButtonGroup(result: LookupResult<TValue>) {
     let lookupRows = result.lookupRows;
     let newFields = this.fields.slice();
-    lookupRows.forEach(function(lookupRow) {
+    lookupRows.forEach(lookupRow => {
       newFields.push(this._createLookupRowRadioButton(lookupRow));
-    }, this);
+    });
     this.setFields(newFields);
 
     // because the lookup call is asynchronus, reset the value so that it is revalidated.
@@ -530,8 +530,7 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
     let button: RadioButtonModel<TValue> = {
       parent: this,
       label: lookupRow.text,
-      radioValue: lookupRow.key,
-      lookupRow: lookupRow
+      radioValue: lookupRow.key
     };
 
     if (lookupRow.iconId) {
@@ -559,7 +558,9 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
       button.cssClass = lookupRow.cssClass;
     }
 
-    return scout.create(RadioButton, button) as RadioButton<TValue>;
+    let radioButton = scout.create(RadioButton, button) as RadioButton<TValue>;
+    radioButton.lookupRow = lookupRow;
+    return radioButton;
   }
 
   override clone(model: RadioButtonGroupModel<TValue>, options?: CloneOptions): this {

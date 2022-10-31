@@ -576,8 +576,7 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
           let splitter = scout.create(Splitter, {
             parent: this,
             $anchor: arr[arr.length - 1].$container,
-            $root: this.$container,
-            maxRatio: 1
+            $root: this.$container
           });
           splitter.render();
           splitter.setLayoutData(FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));

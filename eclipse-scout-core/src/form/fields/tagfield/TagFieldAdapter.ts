@@ -14,7 +14,7 @@ import {TagFieldAcceptInputEvent} from './TagFieldEventMap';
 export default class TagFieldAdapter extends LookupFieldAdapter {
   declare widget: TagField;
 
-  protected override _initProperties(model: FormFieldModel) {
+  protected override _initProperties(model: FormFieldModel & {insertText?: boolean}) {
     if (model.insertText !== undefined) {
       // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)
       delete model.insertText;

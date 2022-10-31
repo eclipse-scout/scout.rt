@@ -34,5 +34,5 @@ export default interface WidgetModel extends ObjectModel<Widget, WidgetModel> {
   displayParent?: DisplayParent;
   animateRemoval?: boolean;
 
-  [property: string]: any; // FIXME TS necessary for variable model properties, required?
+  [property: string]: any;
 }

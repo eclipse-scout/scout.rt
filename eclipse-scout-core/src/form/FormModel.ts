@@ -67,7 +67,6 @@ export default interface FormModel extends WidgetModel {
    * Default is [].
    */
   fileChoosers?: FileChooser[] | RefModel<FileChooserModel>[];
-  focusedElement?: Widget;
   /**
    * Defines whether the form should display a close button [X] in the form header resp. view tab.
    *

@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DecimalFormat, ValueFieldModel} from '../../../index';
+import {BasicFieldModel, DecimalFormat} from '../../../index';
 
-export default interface NumberFieldModel extends ValueFieldModel<number> {
+export default interface NumberFieldModel extends BasicFieldModel<number> {
   minValue?: number;
   maxValue?: number;
   decimalFormat?: string | DecimalFormat;

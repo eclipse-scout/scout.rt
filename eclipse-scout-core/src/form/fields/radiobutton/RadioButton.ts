@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Button, Device, fields, RadioButtonEventMap, RadioButtonKeyStroke, RadioButtonLayout, RadioButtonModel, tooltips} from '../../../index';
+import {Button, Device, fields, LookupRow, RadioButtonEventMap, RadioButtonKeyStroke, RadioButtonLayout, RadioButtonModel, tooltips} from '../../../index';
 
 export default class RadioButton<TValue> extends Button implements RadioButtonModel<TValue> {
   declare model: RadioButtonModel<TValue>;
@@ -18,6 +18,7 @@ export default class RadioButton<TValue> extends Button implements RadioButtonMo
   wrapText: boolean;
   radioValue: TValue;
   $radioButton: JQuery;
+  lookupRow: LookupRow<TValue>;
 
   constructor() {
     super();

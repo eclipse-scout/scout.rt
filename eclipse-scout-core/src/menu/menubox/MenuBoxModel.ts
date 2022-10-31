@@ -13,5 +13,4 @@ import {Menu, MenuModel, RefModel, WidgetModel} from '../../index';
 export default interface MenuBoxModel extends WidgetModel {
   compact?: boolean;
   menus?: (Menu | RefModel<MenuModel>)[];
-  uiMenuCssClass?: string;
 }

@@ -47,7 +47,7 @@ export default interface ButtonModel extends FormFieldModel {
   systemType?: ButtonSystemType;
   /**
    * Configures whether two or more consecutive clicks on the button within a short period of time (e.g. double click) should be prevented.
-   * The default is false.
+   * Default is false.
    */
   preventDoubleClick?: boolean;
   /**

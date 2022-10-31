@@ -353,7 +353,6 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
    * @param sync optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
   */
   protected _acceptInput(sync: boolean, searchText: string, searchTextEmpty: boolean, searchTextChanged: boolean, selectedLookupRow: LookupRow<TValue>): JQuery.Promise<void> | void {
-
     let unchanged = false;
     if (this.removing) {
       // Rare case: _acceptInput may be called when the field is being removed. In that case

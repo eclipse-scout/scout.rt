@@ -239,13 +239,6 @@ window.createPropertyChangeEvent = (model, properties) => ({
  *
  * @param widgetModel
  */
-// FIXME TS can this be deleted?
-window.createAdapterModel = widgetModel => ({
-  id: widgetModel.id,
-  objectType: widgetModel.objectType,
-  session: widgetModel.session
-});
-
 
 export function startApp(App: new() => App) {
   // App initialization uses promises which are executed asynchronously

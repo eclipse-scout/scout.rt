@@ -38,7 +38,7 @@ describe('TableFieldAdapter', () => {
   }
 
   function createTableFieldAdapter(model) {
-    return scout.create(TableFieldAdapter, createAdapterModel(model));
+    return scout.create(TableFieldAdapter, $.extend({}, model));
   }
 
   function createTableFieldModel(tableModel) {
