@@ -10,17 +10,17 @@
  */
 import {
   Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData,
-  LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, RefModel, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
 import * as $ from 'jquery';
-import {ObjectType} from '../ObjectFactory';
 import {ScrollbarInstallOptions, ScrollOptions, ScrollToOptions} from '../scrollbar/scrollbars';
-import {Optional} from '../types';
+import {Optional, SomeRequired} from '../types';
+import {ModelOf} from '../scout';
 
 export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
 export type GlassPaneTarget = JQuery | HTMLElement | DeferredGlassPaneTarget;
 export type GlassPaneContribution = (widget: Widget) => GlassPaneTarget | GlassPaneTarget[];
-export type WidgetOrModel = Widget | WidgetModel;
+export type WidgetOrModel = Widget | RefModel<WidgetModel>;
 export type TreeVisitor<T> = (element: T) => boolean | TreeVisitResult | void;
 
 export interface CloneOptions {
@@ -287,14 +287,14 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return null;
   }
 
-  protected _createChildren(models: WidgetOrModel): Widget;
-  protected _createChildren(models: WidgetOrModel[]): Widget[];
-  protected _createChildren(models: WidgetOrModel | WidgetOrModel[]): Widget | Widget[];
+  protected _createChildren<T extends Widget>(models: T | RefModel<ModelOf<T>>): T;
+  protected _createChildren<T extends Widget>(models: (T | RefModel<ModelOf<T>>)[]): T[];
+  protected _createChildren<T extends Widget>(models: T | RefModel<ModelOf<T>> | (T | RefModel<ModelOf<T>>)[]): T | T[];
   /**
    * Creates the widgets using the given models, or returns the widgets if the given models already are widgets.
    * @returns an array of created widgets if models was an array. Or the created widget if models is not an array.
    */
-  protected _createChildren(models: WidgetOrModel | WidgetOrModel[]): Widget | Widget[] {
+  protected _createChildren<T extends Widget>(models: T | RefModel<ModelOf<T>> | (T | RefModel<ModelOf<T>>)[]): T | T[] {
     if (!models) {
       return null;
     }
@@ -313,20 +313,21 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   /**
    * Calls {@link scout.create} for the given model, or if model is already a Widget simply returns the widget.
    */
-  protected _createChild(model: WidgetModel | Widget | string): Widget {
-    if (model instanceof Widget) {
-      return model;
+  protected _createChild<T extends Widget>(widgetOrModel: T | RefModel<ModelOf<T>> | string): T {
+    if (widgetOrModel instanceof Widget) {
+      return widgetOrModel;
     }
-    if (typeof model === 'string') {
+    if (typeof widgetOrModel === 'string') {
       // Special case: If only an ID is supplied, try to (locally) resolve the corresponding widget
-      let existingWidget = this.widget(model);
+      let existingWidget = this.widget(widgetOrModel);
       if (!existingWidget) {
-        throw new Error('Referenced widget not found: ' + model);
+        throw new Error('Referenced widget not found: ' + widgetOrModel);
       }
-      return existingWidget;
+      return existingWidget as T;
     }
+    let model = widgetOrModel as SomeRequired<ModelOf<T>, 'parent' | 'objectType'>;
     model.parent = this;
-    return scout.create(model as WidgetModel & { objectType: ObjectType<Widget> });
+    return scout.create(model) as T;
   }
 
   protected _initKeyStrokeContext() {
@@ -1511,8 +1512,8 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return this._prepareWidgetProperty(propertyName, value);
   }
 
-  protected _prepareWidgetProperty(propertyName: string, models: Widget | WidgetModel): Widget;
-  protected _prepareWidgetProperty(propertyName: string, models: Widget[] | WidgetModel[]): Widget[];
+  protected _prepareWidgetProperty(propertyName: string, models: WidgetOrModel): Widget;
+  protected _prepareWidgetProperty(propertyName: string, models: WidgetOrModel[]): Widget[];
   protected _prepareWidgetProperty(propertyName: string, models: WidgetOrModel | WidgetOrModel[]): Widget | Widget[] {
     // Create new child widget(s)
     let widgets = this._createChildren(models);

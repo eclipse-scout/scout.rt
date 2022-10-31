@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormModel, Outline, Page, TileGrid} from '../index';
+import {FormModel, Outline, Page, PageTileGridModel, RefModel, TileGrid} from '../index';
 
 export default interface TileOverviewFormModel extends FormModel {
   outline?: Outline;
   nodes?: Page[];
   tileOverviewTitle?: string;
   scrollable?: boolean;
-  pageTileGrid?: TileGrid;
+  pageTileGrid?: TileGrid | RefModel<PageTileGridModel>;
 }

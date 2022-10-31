@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, ActionModel, Column, ColumnModel, Filter, Menu, MenuModel, Status, TableCompactHandler, TableControl, TableControlModel, TableRow, TableSelectionHandler, TableTileGridMediator, TableUserFilterModel, Tile, WidgetModel
+  Action, ActionModel, Column, ColumnModel, Filter, Menu, MenuModel, Status, TableCompactHandler, TableControl, TableControlModel, TableRow, TableSelectionHandler, TableTileGridMediator, TableTileGridMediatorModel, TableUserFilterModel,
+  Tile, TileTableHeaderBox, TileTableHeaderBoxModel, WidgetModel
 } from '../index';
 import {TableCheckableStyle, TableGroupingStyle, TableHierarchicalStyle} from './Table';
 import {RefModel} from '../types';
@@ -62,8 +63,8 @@ export default interface TableModel extends WidgetModel {
   headerMenusEnabled?: boolean;
   hierarchical?: boolean;
   hierarchicalStyle?: TableHierarchicalStyle;
-  keyStrokes?: Action[] | RefModel<ActionModel>[];
-  menus?: Menu[] | RefModel<MenuModel>[];
+  keyStrokes?: (Action | RefModel<ActionModel>)[];
+  menus?: (Menu | RefModel<MenuModel>)[];
   menuBarVisible?: boolean;
   /**
    * Configures whether only one row can be checked in this table. Default is true.
@@ -95,12 +96,13 @@ export default interface TableModel extends WidgetModel {
    * If sort is disabled, the table rows are not sorted and the user cannot change the sorting.
    */
   sortEnabled?: boolean;
-  tableControls?: TableControl[] | RefModel<TableControlModel>[];
+  tableControls?: (TableControl | RefModel<TableControlModel>)[];
   /**
    * Configures the visibility of the table status. Default is false (invisible).
    */
   tableStatusVisible?: boolean;
-  tableTileGridMediator?: TableTileGridMediator;
+  tableTileGridMediator?: TableTileGridMediator | RefModel<TableTileGridMediatorModel>;
+  tileTableHeader?: TileTableHeaderBox | RefModel<TileTableHeaderBoxModel>;
   /**
    * Configures whether the table tile mode is enabled by default. Default is false.
    */
@@ -148,7 +150,7 @@ export default interface TableModel extends WidgetModel {
    * Has only an effect if {@link rowIconVisible} is true.
    */
   rowIconColumnWidth?: number;
-  staticMenus?: Menu[] | RefModel<MenuModel>[];
+  staticMenus?: (Menu | RefModel<MenuModel>)[];
   selectionHandler?: TableSelectionHandler;
   /**
    * Virtual relates to the term "Virtual Scrolling". This means, only the table rows in the view port and some more will be

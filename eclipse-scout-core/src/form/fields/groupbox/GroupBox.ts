@@ -10,8 +10,11 @@
  */
 import {
   AbstractLayout, Action, arrays, Button, ButtonAdapterMenu, CompositeField, EnumObject, fields, Form, FormField, FormFieldModel, GroupBoxEventMap, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, GroupBoxModel,
-  GroupBoxResponsiveHandler, HAlign, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, Notification, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips,
-  VerticalSmartGrid, WrappedFormField
+  GroupBoxResponsiveHandler,
+  HAlign, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, MenuModel, Notification, NotificationModel, RefModel, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke,
+  tooltips,
+  VerticalSmartGrid,
+  WrappedFormField
 } from '../../../index';
 import $ from 'jquery';
 import {MenuBarEllipsisPosition} from '../../../menu/menubar/MenuBar';
@@ -169,7 +172,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     this.setFields(newFields);
   }
 
-  setFields(fields: (FormField | FormFieldModel)[]) {
+  setFields(fields: (FormField | RefModel<FormFieldModel>)[]) {
     this.setProperty('fields', fields);
   }
 
@@ -452,7 +455,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     this.invalidateLayoutTree();
   }
 
-  setNotification(notification: Notification) {
+  setNotification(notification: Notification | RefModel<NotificationModel>) {
     this.setProperty('notification', notification);
   }
 
@@ -788,7 +791,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     // menubar takes care of removal
   }
 
-  setStaticMenus(staticMenus: Menu[]) {
+  setStaticMenus(staticMenus: (Menu | RefModel<MenuModel>)[]) {
     this.setProperty('staticMenus', staticMenus);
     this._updateMenuBar();
   }

@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ViewButton, ViewButtonModel, WidgetModel} from '../../index';
-import {RefModel} from '../../types';
+import {ViewButton, WidgetModel} from '../../index';
 
 export default interface ViewMenuTabModel extends WidgetModel {
   selected?: boolean;
   selectedButtonVisible?: boolean;
   defaultIconId?: string;
-  viewButtons?: ViewButton[] | RefModel<ViewButtonModel>[];
+  viewButtons?: ViewButton[];
 }

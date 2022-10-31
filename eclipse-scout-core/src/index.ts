@@ -1044,7 +1044,7 @@ export {default as BreadcrumbBarFieldModel} from './form/fields/breadcrumbbarfie
 export {default as BreadcrumbBarFieldEventMap} from './form/fields/breadcrumbbarfield/BreadcrumbBarFieldEventMap';
 export {default as BreadcrumbBarFieldAdapter} from './form/fields/breadcrumbbarfield/BreadcrumbBarFieldAdapter';
 export {default as AnyWidget} from './AnyWidget';
-export {Predicate, EnumObject} from './types';
+export {Predicate, EnumObject, RefModel} from './types';
 
 // The following files don't export anything but they need to be imported so they participate on the webpack build
 import * as objectFactories from './objectFactories';

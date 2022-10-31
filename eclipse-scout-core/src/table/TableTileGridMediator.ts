@@ -9,13 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, Group, objects, PropertyChangeEvent, scout, Table, TableRow, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel, Tile, TileAccordion,
+  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, Group, objects, PropertyChangeEvent, RefModel, scout, Table, TableRow, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel, Tile,
+  TileAccordion,
   TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
 } from '../index';
 import $ from 'jquery';
 import {ScrollToOptions} from '../scrollbar/scrollbars';
 import {TableAllRowsDeletedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent} from './TableEventMap';
 import {TileActionEvent, TileClickEvent} from '../tile/TileGridEventMap';
+import TileModel from '../tile/TileModel';
 
 /**
  * Delegates events between the Table and it's internal TileGrid.
@@ -175,7 +177,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     this._setTiles(tiles);
   }
 
-  setTiles(tiles: Tile[]) {
+  setTiles(tiles: (Tile | RefModel<TileModel>)[]) {
     this.setProperty('tiles', tiles);
   }
 

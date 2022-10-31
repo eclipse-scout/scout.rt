@@ -31,8 +31,8 @@ export default interface FormFieldModel extends WidgetModel {
   labelUseUiWidth?: boolean;
   labelHtmlEnabled?: boolean;
   mandatory?: boolean;
-  statusMenuMappings?: StatusMenuMapping[] | RefModel<StatusMenuMappingModel>[];
-  menus?: Menu[] | RefModel<MenuModel>[];
+  statusMenuMappings?: (StatusMenuMapping | RefModel<StatusMenuMappingModel>)[];
+  menus?: (Menu | RefModel<MenuModel>)[];
   menusVisible?: boolean;
   defaultMenuTypes?: string[];
   preventInitialFocus?: boolean;

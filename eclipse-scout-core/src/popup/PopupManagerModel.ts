@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Popup, WidgetModel} from '../index';
+import {Popup, PopupModel, RefModel, WidgetModel} from '../index';
 
 export default interface PopupManagerModel extends WidgetModel {
-  popups: Popup[];
+  popups: (Popup | RefModel<PopupModel>)[];
 }

@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ViewButton, WidgetModel} from '../../index';
+import {RefModel, ViewButton, ViewButtonModel, WidgetModel} from '../../index';
 
 export default interface ViewButtonBoxModel extends WidgetModel {
-  viewButtons?: ViewButton[];
+  viewButtons?: (ViewButton | RefModel<ViewButtonModel>)[];
   /**
    * Default is false.
    */

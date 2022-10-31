@@ -8,7 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionKeyStroke, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, GroupBox, Menu, MobilePopup, Popup, scout, WidgetPopup} from '../index';
+import {
+  ActionKeyStroke, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, FormModel, GroupBox, Menu, MobilePopup, Popup, RefModel, scout, WidgetPopup
+} from '../index';
 import {CloneOptions} from '../widget/Widget';
 
 export default class FormMenu extends Menu implements FormMenuModel {
@@ -71,7 +73,7 @@ export default class FormMenu extends Menu implements FormMenuModel {
     return super.clone(modelOverride, options) as this;
   }
 
-  setForm(form: Form) {
+  setForm(form: Form | RefModel<FormModel>) {
     this.setProperty('form', form);
   }
 

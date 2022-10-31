@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NullWidgetEventMap, NullWidgetModel, Widget} from '../index';
+import {NullWidgetEventMap, NullWidgetModel, RefModel, Widget, WidgetModel} from '../index';
 
-export default class NullWidget extends Widget {
+export default class NullWidget extends Widget implements NullWidgetModel {
   declare model: NullWidgetModel;
   declare eventMap: NullWidgetEventMap;
 
@@ -22,7 +22,7 @@ export default class NullWidget extends Widget {
     this._addWidgetProperties(['childWidget']);
   }
 
-  setChildWidget(childWidget: Widget) {
+  setChildWidget(childWidget: Widget | RefModel<WidgetModel>) {
     this.setProperty('childWidget', childWidget);
   }
 }

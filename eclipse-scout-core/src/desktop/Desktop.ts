@@ -11,7 +11,8 @@
 import {
   AbstractLayout, Action, arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel, DesktopNavigation, DesktopNotification, Device,
   DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStrokeContext, Menu,
-  MessageBox, MessageBoxController, objects, OfflineDesktopNotification, OpenUriHandler, Outline, Popup, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, strings, styles, Tooltip, Tree, UnsavedFormChangesForm, URL,
+  MenuModel,
+  MessageBox, MessageBoxController, objects, OfflineDesktopNotification, OpenUriHandler, Outline, Popup, RefModel, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, strings, styles, Tooltip, Tree, UnsavedFormChangesForm, URL,
   ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
@@ -749,7 +750,7 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
     this._setProperty('viewButtons', viewButtons);
   }
 
-  setMenus(menus: Menu[]) {
+  setMenus(menus: (Menu | RefModel<MenuModel>)[]) {
     if (this.header) {
       this.header.setMenus(menus);
     }

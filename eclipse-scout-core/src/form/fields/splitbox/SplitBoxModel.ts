@@ -14,7 +14,7 @@ import {RefModel} from '../../../types';
 export default interface SplitBoxModel extends FormFieldModel {
   firstField: FormField | RefModel<FormFieldModel>;
   secondField: FormField | RefModel<FormFieldModel>;
-  collapsibleField: FormField | RefModel<FormFieldModel>;
+  collapsibleField: FormField | string;
   fieldCollapsed?: boolean;
   toggleCollapseKeyStroke?: KeyStroke | KeyStrokeModel | string;
   firstCollapseKeyStroke?: KeyStroke | KeyStrokeModel | string;

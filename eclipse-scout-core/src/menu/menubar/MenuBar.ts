@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, ComboMenu, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel, MenuBarRightKeyStroke, MenuDestinations, menus, PropertyChangeEvent, scout, Widget, widgets} from '../../index';
+import {
+  arrays, ComboMenu, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel,
+  MenuBarRightKeyStroke, MenuDestinations, MenuModel, menus, PropertyChangeEvent, RefModel, scout, Widget, widgets
+} from '../../index';
 import {MenuOrder, OrderedMenuItems} from '../MenuItemsOrder';
 import {MenuFilter} from '../Menu';
 import {TooltipPosition} from '../../tooltip/Tooltip';
@@ -180,8 +183,8 @@ export default class MenuBar extends Widget implements MenuBarModel {
     });
   }
 
-  setMenuItems(menuItems: Menu | Menu[]) {
-    menuItems = arrays.ensure(menuItems);
+  setMenuItems(menuOrModels: Menu | RefModel<MenuModel> | (Menu | RefModel<MenuModel>)[]) {
+    let menuItems = arrays.ensure(menuOrModels);
     if (arrays.equals(this.menuItems, menuItems)) {
       // Ensure existing menus are correctly linked even if the given menuItems are the same (see TableSpec for reasons)
       this.menuboxRight.link(this.menuboxRight.menuItems);

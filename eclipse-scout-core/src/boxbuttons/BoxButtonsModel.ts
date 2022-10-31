@@ -15,7 +15,7 @@ export default interface BoxButtonsModel extends WidgetModel {
   /**
    * Default is [].
    */
-  buttons?: Action[] | RefModel<ActionModel>[];
+  buttons?: (Action | RefModel<ActionModel>)[];
   /**
    * Default is 0.
    */

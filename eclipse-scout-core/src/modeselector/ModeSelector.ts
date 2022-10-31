@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EventHandler, events, graphics, HtmlComponent, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorModel, PropertyChangeEvent, Widget} from '../index';
+import {arrays, EventHandler, events, graphics, HtmlComponent, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorModel, PropertyChangeEvent, RefModel, Widget} from '../index';
 import {SwipeCallbackEvent} from '../util/events';
+import {ModelOf} from '../scout';
 
 export default class ModeSelector<TModeRef = any> extends Widget implements ModeSelectorModel<TModeRef> {
   declare model: ModeSelectorModel<TModeRef>;
@@ -58,7 +59,7 @@ export default class ModeSelector<TModeRef = any> extends Widget implements Mode
     this._renderModes();
   }
 
-  setModes(modes: Mode<TModeRef>[]) {
+  setModes(modes: (Mode<TModeRef> | RefModel<ModelOf<Mode>>)[]) {
     this.setProperty('modes', modes);
   }
 

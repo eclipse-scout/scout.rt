@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AccordionLayout, AccordionModel, arrays, EventHandler, Group, GroupModel, HtmlComponent, LoadingSupport, objects, PropertyChangeEvent, Widget, widgets} from '../index';
+import {AccordionLayout, AccordionModel, arrays, EventHandler, Group, GroupModel, HtmlComponent, LoadingSupport, objects, PropertyChangeEvent, RefModel, Widget, widgets} from '../index';
 import {Comparator} from '../types';
 import {GroupCollapseStyle} from '../group/Group';
 
@@ -63,13 +63,13 @@ export default class Accordion extends Widget implements AccordionModel {
     this._renderGroups();
   }
 
-  insertGroup(group: Group | GroupModel) {
+  insertGroup(group: Group | RefModel<GroupModel>) {
     this.insertGroups([group]);
   }
 
-  insertGroups(groupsToInsert: Group | GroupModel | (Group | GroupModel)[]) {
+  insertGroups(groupsToInsert: Group | RefModel<GroupModel> | (Group | RefModel<GroupModel>)[]) {
     groupsToInsert = arrays.ensure(groupsToInsert);
-    let groups = this.groups as (Group | GroupModel)[];
+    let groups = this.groups as (Group | RefModel<GroupModel>)[];
     this.setGroups(groups.concat(groupsToInsert));
   }
 
@@ -94,14 +94,14 @@ export default class Accordion extends Widget implements AccordionModel {
     });
   }
 
-  setGroups(groupsOrModels: (Group | GroupModel)[]) {
-    groupsOrModels = arrays.ensure(groupsOrModels);
+  setGroups(groupsOrModels: Group | RefModel<GroupModel> | (Group | RefModel<GroupModel>)[]) {
+    let groupsOrModelsArr = arrays.ensure(groupsOrModels);
     if (objects.equals(this.groups, groupsOrModels)) {
       return;
     }
 
     // Ensure given groups are real groups (of type Group)
-    let groups = this._createChildren(groupsOrModels) as Group[];
+    let groups = this._createChildren(groupsOrModelsArr) as unknown as Group[];
 
     // Only delete those which are not in the new array
     // Only insert those which are not already there

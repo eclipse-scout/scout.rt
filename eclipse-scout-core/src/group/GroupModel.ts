@@ -11,6 +11,7 @@
 import {Widget, WidgetModel} from '../index';
 import {GroupCollapseStyle} from './Group';
 import {RefModel} from '../types';
+import {ModelOf} from '../scout';
 
 export default interface GroupModel<TBody extends Widget = Widget> extends WidgetModel {
   collapsed?: boolean;
@@ -39,7 +40,7 @@ export default interface GroupModel<TBody extends Widget = Widget> extends Widge
    * The body will be rendered when the group is expanded, so having a body is required.
    * Default is null.
    */
-  body?: TBody | RefModel<WidgetModel>;
+  body?: TBody | RefModel<ModelOf<TBody>>;
 
   collapseStyle?: GroupCollapseStyle;
 

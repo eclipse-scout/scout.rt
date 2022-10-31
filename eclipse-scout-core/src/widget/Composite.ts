@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CompositeEventMap, CompositeModel, HtmlComponent, Widget} from '../index';
+import {CompositeEventMap, CompositeModel, HtmlComponent, RefModel, Widget, WidgetModel} from '../index';
 
 export default class Composite extends Widget implements CompositeModel {
   declare model: CompositeModel;
@@ -32,7 +32,7 @@ export default class Composite extends Widget implements CompositeModel {
     this._renderWidgets();
   }
 
-  setWidgets(widgets: Widget[]) {
+  setWidgets(widgets: (Widget | RefModel<WidgetModel>)[]) {
     this.setProperty('widgets', widgets);
   }
 

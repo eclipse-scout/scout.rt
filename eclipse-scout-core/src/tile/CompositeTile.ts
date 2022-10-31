@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, PropertyChangeEvent, Tile, Widget} from '../index';
+import {HtmlComponent, PropertyChangeEvent, RefModel, Tile, Widget, WidgetModel} from '../index';
 import TileModel from './TileModel';
 import TileEventMap from './TileEventMap';
 
 export interface CompositeTileModel extends TileModel {
-  widgets?: Widget[];
+  widgets?: (Widget | RefModel<WidgetModel>)[];
 }
 
 export interface CompositeTileEventMap extends TileEventMap {
@@ -43,7 +43,7 @@ export default class CompositeTile extends Tile implements CompositeTileModel {
     this._renderWidgets();
   }
 
-  setWidgets(widgets: Widget[]) {
+  setWidgets(widgets: (Widget | RefModel<WidgetModel>)[]) {
     this.setProperty('widgets', widgets);
   }
 

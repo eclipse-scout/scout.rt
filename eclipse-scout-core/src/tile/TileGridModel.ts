@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Filter, FilterSupport, Menu, TextFilter, Tile, TileGridLayoutConfig, TileGridSelectionHandler, VirtualScrolling, WidgetModel} from '../index';
+import {Filter, FilterSupport, Menu, MenuModel, TextFilter, Tile, TileGridLayoutConfig, TileGridSelectionHandler, VirtualScrolling, WidgetModel} from '../index';
 import {Comparator, RefModel} from '../types';
 import {LogicalGridLayoutConfigModel} from '../layout/logicalgrid/LogicalGridLayoutConfig';
 import TileModel from './TileModel';
@@ -44,7 +44,7 @@ export default interface TileGridModel extends WidgetModel {
    * @see TileGridLayout._initDefaults
    */
   layoutConfig?: TileGridLayoutConfig | LogicalGridLayoutConfigModel;
-  menus?: Menu[];
+  menus?: (Menu | RefModel<MenuModel>)[];
   /**
    * Specifies whether multiple tiles can be selected at once. Default is true.
    */
@@ -64,7 +64,7 @@ export default interface TileGridModel extends WidgetModel {
   /**
    * Specifies the tiles to be selected. By default, no tiles are selected.
    */
-  selectedTiles?: Tile[];
+  selectedTiles?: (Tile | string)[];
   selectionHandler?: TileGridSelectionHandler;
   /**
    * Specifies whether the tile grid should be scrollable or not.
@@ -83,7 +83,7 @@ export default interface TileGridModel extends WidgetModel {
   /**
    * Specifies the tiles of the tile grid. By default, there are no tiles.
    */
-  tiles?: Tile[] | RefModel<TileModel>[];
+  tiles?: (Tile | RefModel<TileModel>)[];
   /**
    * Specifies the number of grid rows to be rendered if virtual scrolling is active (if {@link virtual} is true).
    * The value depends on the grid size and will be calculated automatically by the layout using {@link VirtualScrolling.calculateViewRangeSize}.

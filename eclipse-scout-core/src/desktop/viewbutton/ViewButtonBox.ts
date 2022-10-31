@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, Event, EventHandler, HtmlComponent, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewButtonBoxEventMap, ViewButtonBoxModel, ViewMenuTab, Widget, widgets} from '../../index';
+import {Desktop, Event, EventHandler, HtmlComponent, OutlineViewButton, PropertyChangeEvent, RefModel, scout, ViewButton, ViewButtonBoxEventMap, ViewButtonBoxModel, ViewButtonModel, ViewMenuTab, Widget, widgets} from '../../index';
 
 export default class ViewButtonBox extends Widget implements ViewButtonBoxModel {
   declare model: ViewButtonBoxModel;
@@ -77,7 +77,7 @@ export default class ViewButtonBox extends Widget implements ViewButtonBoxModel 
     this._updateSelectedMenuButtonVisibility();
   }
 
-  setViewButtons(viewButtons: ViewButton[]) {
+  setViewButtons(viewButtons: (ViewButton | RefModel<ViewButtonModel>)[]) {
     this.setProperty('viewButtons', viewButtons);
   }
 

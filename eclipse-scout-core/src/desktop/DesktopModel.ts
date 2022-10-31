@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ActionModel, BenchColumnLayoutData, Menu, MenuModel, Outline, OutlineModel, ViewButton, ViewButtonModel, Widget, WidgetModel} from '../index';
+import {Action, ActionModel, BenchColumnLayoutData, DesktopNotification, DesktopNotificationModel, Form, FormModel, Menu, MenuModel, MessageBox, Outline, OutlineModel, ViewButton, ViewButtonModel, Widget, WidgetModel} from '../index';
 import {DesktopDisplayStyle, NativeNotificationDefaults} from './Desktop';
 import {RefModel} from '../types';
 
@@ -27,10 +27,11 @@ export default interface DesktopModel extends WidgetModel {
   headerVisible?: boolean;
   splitterVisible?: boolean;
   benchLayoutData?: BenchColumnLayoutData;
-  menus?: Menu[] | RefModel<MenuModel>[];
-  addOns?: Widget[] | RefModel<WidgetModel>[];
-  keyStrokes?: Action[] | RefModel<ActionModel>[];
-  viewButtons?: ViewButton[] | RefModel<ViewButtonModel>[];
+  menus?: (Menu | RefModel<MenuModel>)[];
+  notifications?: (DesktopNotification | RefModel<DesktopNotificationModel>)[];
+  addOns?: (Widget | RefModel<WidgetModel>)[];
+  keyStrokes?: (Action | RefModel<ActionModel>)[];
+  viewButtons?: (ViewButton | RefModel<ViewButtonModel>)[];
   outline?: Outline | RefModel<OutlineModel>;
   inBackground?: boolean;
   theme?: string;

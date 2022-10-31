@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, WidgetModel} from '../../index';
+import {Menu, MenuModel, RefModel, WidgetModel} from '../../index';
 import {StatusSeverity} from '../../status/Status';
 
 export default interface StatusMenuMappingModel extends WidgetModel {
   codes?: number[];
   severities?: StatusSeverity[];
-  menu: Menu;
+  menu: Menu | RefModel<MenuModel>;
 }

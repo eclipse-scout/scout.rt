@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FocusRule, keys, KeyStrokeContext, scout, ScoutKeyboardEvent, Tooltip, Widget, WidgetTooltipEventMap, WidgetTooltipModel} from '../index';
+import {FocusRule, keys, KeyStrokeContext, RefModel, scout, ScoutKeyboardEvent, Tooltip, Widget, WidgetModel, WidgetTooltipEventMap, WidgetTooltipModel} from '../index';
 
 export default class WidgetTooltip extends Tooltip implements WidgetTooltipModel {
   declare model: WidgetTooltipModel;
@@ -65,7 +65,7 @@ export default class WidgetTooltip extends Tooltip implements WidgetTooltipModel
     super._remove();
   }
 
-  setContent(content: Widget) {
+  setContent(content: Widget | RefModel<WidgetModel>) {
     this.setProperty('content', content);
   }
 

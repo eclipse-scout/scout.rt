@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventHandler, PropertyChangeEvent, Tile, Widget} from '../index';
+import {EventHandler, PropertyChangeEvent, RefModel, Tile, Widget, WidgetModel} from '../index';
 import TileModel from './TileModel';
 import TileEventMap from './TileEventMap';
 
 export interface WidgetTileModel extends TileModel {
   /** The widget that should be embedded in the tile */
-  tileWidget?: Widget;
+  tileWidget?: Widget | RefModel<WidgetModel>;
 }
 
 export interface WidgetTileEventMap extends TileEventMap {

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Form, graphics, keys, Menu, Rectangle, scout, scrollbars, Status, strings, TooltipEventMap, TooltipModel, Widget} from '../index';
+import {arrays, Form, graphics, keys, Menu, MenuModel, Rectangle, RefModel, scout, scrollbars, Status, strings, TooltipEventMap, TooltipModel, Widget} from '../index';
 import $ from 'jquery';
 import {StatusSeverity} from '../status/Status';
 import KeyDownEvent = JQuery.KeyDownEvent;
@@ -220,7 +220,7 @@ export default class Tooltip extends Widget implements TooltipModel {
     this.$container.addClass(Status.cssClassForSeverity(this.severity));
   }
 
-  setMenus(menus: Menu | Menu[]) {
+  setMenus(menus: Menu | RefModel<MenuModel> | (Menu | RefModel<MenuModel>)[]) {
     menus = arrays.ensure(menus);
     this.setProperty('menus', menus);
   }

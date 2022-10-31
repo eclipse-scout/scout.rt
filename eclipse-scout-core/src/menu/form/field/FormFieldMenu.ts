@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnLayout, FormField, FormFieldMenuEventMap, FormFieldMenuModel, GridData, HtmlComponent, LogicalGridData, Menu} from '../../../index';
+import {ColumnLayout, FormField, FormFieldMenuEventMap, FormFieldMenuModel, FormFieldModel, GridData, HtmlComponent, LogicalGridData, Menu, RefModel} from '../../../index';
 import {CloneOptions} from '../../../widget/Widget';
 
 export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
@@ -46,7 +46,7 @@ export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
     }
   }
 
-  setField(field: FormField) {
+  setField(field: FormField | RefModel<FormFieldModel>) {
     this.setProperty('field', field);
   }
 

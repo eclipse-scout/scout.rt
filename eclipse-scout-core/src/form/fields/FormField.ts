@@ -10,7 +10,7 @@
  */
 import {
   AbstractLayout, Action, arrays, clipboard, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, EnumObject, EventHandler, fields, FieldStatus, FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HtmlComponent,
-  KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, objects, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, strings, styles, Tooltip, tooltips, TreeVisitResult, Widget
+  KeyStrokeContext, LoadingSupport, Menu, MenuModel, menus as menuUtil, objects, Predicate, PropertyChangeEvent, RefModel, scout, Status, StatusMenuMapping, strings, styles, Tooltip, tooltips, TreeVisitResult, Widget
 } from '../../index';
 import $ from 'jquery';
 import {DragAndDropOptions, DropType} from '../../util/dragAndDrop';
@@ -829,7 +829,7 @@ export default abstract class FormField extends Widget implements FormFieldModel
     }
   }
 
-  setMenus(menus: Menu | Menu[]) {
+  setMenus(menus: (Menu | RefModel<MenuModel>)[]) {
     this.setProperty('menus', menus);
   }
 

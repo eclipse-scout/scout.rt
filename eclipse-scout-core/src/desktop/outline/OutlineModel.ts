@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, Page, PageModel, TreeModel} from '../../index';
+import {Form, FormModel, Page, PageModel, TreeModel} from '../../index';
 import {RefModel} from '../../types';
 
 export default interface OutlineModel extends TreeModel {
-  nodes?: Page[] | RefModel<PageModel>[];
+  nodes?: (Page | RefModel<PageModel>)[];
   compact?: boolean;
-  defaultDetailForm?: Form;
+  defaultDetailForm?: Form | RefModel<FormModel>;
   embedDetailContent?: boolean;
   iconId?: string;
   title?: string;

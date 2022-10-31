@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventDelegator, FormField, LoadingSupport, TileFieldEventMap, TileFieldModel, TileGrid, Widget} from '../../../index';
+import {EventDelegator, FormField, LoadingSupport, RefModel, TileFieldEventMap, TileFieldModel, TileGrid, TileGridModel, Widget} from '../../../index';
 
 export default class TileField extends FormField implements TileFieldModel {
   declare model: TileFieldModel;
@@ -49,7 +49,7 @@ export default class TileField extends FormField implements TileFieldModel {
     this._renderDropType();
   }
 
-  setTileGrid(tileGrid: TileGrid) {
+  setTileGrid(tileGrid: TileGrid | RefModel<TileGridModel>) {
     this.setProperty('tileGrid', tileGrid);
   }
 

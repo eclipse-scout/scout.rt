@@ -14,7 +14,7 @@ import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalG
 
 export default interface RadioButtonGroupModel<TValue> extends ValueFieldModel<TValue> {
   layoutConfig?: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel;
-  fields?: FormField[] | RefModel<FormFieldModel>[];
+  fields?: (FormField | RefModel<FormFieldModel>)[];
   gridColumnCount?: number;
   lookupCall?: LookupCall<TValue>;
 }

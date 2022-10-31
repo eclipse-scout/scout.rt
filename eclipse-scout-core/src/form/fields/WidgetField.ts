@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, Widget, WidgetFieldEventMap, WidgetFieldLayout, WidgetFieldModel} from '../../index';
+import {FormField, RefModel, Widget, WidgetFieldEventMap, WidgetFieldLayout, WidgetFieldModel, WidgetModel} from '../../index';
 
 export default class WidgetField extends FormField implements WidgetFieldModel {
   declare model: WidgetFieldModel;
@@ -42,7 +42,7 @@ export default class WidgetField extends FormField implements WidgetFieldModel {
     this._renderScrollable();
   }
 
-  setFieldWidget(fieldWidget: Widget) {
+  setFieldWidget(fieldWidget: Widget | RefModel<WidgetModel>) {
     this.setProperty('fieldWidget', fieldWidget);
   }
 

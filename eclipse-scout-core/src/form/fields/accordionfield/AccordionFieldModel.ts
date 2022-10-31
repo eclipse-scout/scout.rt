@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Accordion, FormFieldModel} from '../../../index';
+import {Accordion, AccordionModel, FormFieldModel} from '../../../index';
 import {RefModel} from '../../../types';
 
 export default interface AccordionFieldModel extends FormFieldModel {
-  accordion?: Accordion | RefModel<Accordion>;
+  accordion?: Accordion | RefModel<AccordionModel>;
 }

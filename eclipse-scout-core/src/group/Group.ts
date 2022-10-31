@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Dimension, EnumObject, graphics, GroupEventMap, GroupLayout, GroupModel, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, Insets, KeyStrokeContext, LoadingSupport, scout, tooltips, Widget} from '../index';
+import {Dimension, EnumObject, graphics, GroupEventMap, GroupLayout, GroupModel, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, Insets, KeyStrokeContext, LoadingSupport, RefModel, scout, tooltips, Widget, WidgetModel} from '../index';
 import $ from 'jquery';
 import MouseDownEvent = JQuery.MouseDownEvent;
+import {ModelOf} from '../scout';
 
 export type GroupCollapseStyle = EnumObject<typeof Group.CollapseStyle>;
 
@@ -66,8 +67,7 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
     this.htmlFooter = null;
     this.iconId = null;
     this.icon = null;
-    this._addWidgetProperties(['header']);
-    this._addWidgetProperties(['body']);
+    this._addWidgetProperties(['header', 'body']);
   }
 
   static CollapseStyle = {
@@ -196,7 +196,7 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
   }
 
   /** @see GroupModel.header */
-  setHeader(header: Widget) {
+  setHeader(header: Widget | RefModel<WidgetModel>) {
     this.setProperty('header', header);
   }
 
@@ -249,7 +249,7 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
   }
 
   /** @see GroupModel.body */
-  setBody(body: TBody) {
+  setBody(body: TBody | RefModel<ModelOf<TBody>>) {
     this.setProperty('body', body);
   }
 

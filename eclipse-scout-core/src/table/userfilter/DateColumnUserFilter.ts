@@ -90,11 +90,11 @@ export default class DateColumnUserFilter extends ColumnUserFilter implements Co
   }
 
   override addFilterFields(groupBox: FilterFieldsGroupBox) {
-    this.dateFromField = groupBox.addFilterField('DateField', 'ui.from') as DateField;
+    this.dateFromField = groupBox.addFilterField(DateField, 'ui.from') as DateField;
     this.dateFromField.setValue(this.dateFrom);
     this.dateFromField.on('propertyChange', this._onPropertyChange.bind(this));
 
-    this.dateToField = groupBox.addFilterField('DateField', 'ui.to') as DateField;
+    this.dateToField = groupBox.addFilterField(DateField, 'ui.to') as DateField;
     this.dateToField.setValue(this.dateTo);
     this.dateToField.on('propertyChange', this._onPropertyChange.bind(this));
   }

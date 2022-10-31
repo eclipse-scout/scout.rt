@@ -10,8 +10,9 @@
  */
 import {
   Action, AggregateTableControl, AppLinkKeyStroke, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, ContextMenuKeyStroke, ContextMenuPopup, Desktop, Device, DoubleClickSupport, dragAndDrop,
-  DragAndDropHandler, EnumObject, EventHandler, Filter, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus, NumberColumn,
-  objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
+  DragAndDropHandler, EnumObject, EventHandler, Filter, FilterResult, FilterSupport, graphics, HtmlComponent, IconColumn, Insets, KeyStrokeContext, LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, MenuModel, menus,
+  NumberColumn,
+  objects, Predicate, PropertyChangeEvent, Range, scout, scrollbars, Status, strings, styles, TableCompactHandler, TableControl, TableControlModel, TableCopyKeyStroke, TableEventMap, TableFooter, TableHeader, TableLayout, TableModel,
   TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke, TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke,
   TableNavigationUpKeyStroke, TableRefreshKeyStroke, TableRow, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip,
   TableTooltipModel, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, UpdateFilteredElementsOptions, ValueField, Widget
@@ -639,7 +640,7 @@ export default class Table extends Widget implements TableModel {
     this._rerenderViewport();
   }
 
-  setTableControls(controls: TableControl[]) {
+  setTableControls(controls: (TableControl | RefModel<TableControlModel>)[]) {
     this.setProperty('tableControls', controls);
   }
 
@@ -2071,14 +2072,13 @@ export default class Table extends Widget implements TableModel {
   protected _showCellError(row: TableRow, $cell: JQuery, errorStatus: Status) {
     let text = errorStatus.message;
 
-    let opts: TableTooltipModel = {
+    let tooltip = scout.create(TableTooltip, {
       parent: this,
       text: text,
       autoRemove: false,
       $anchor: $cell,
       table: this
-    };
-    let tooltip = scout.create(TableTooltip, opts);
+    });
     tooltip.render();
     // link to be able to remove it when row gets deleted
     tooltip.row = row;
@@ -2132,7 +2132,7 @@ export default class Table extends Widget implements TableModel {
     return this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
   }
 
-  setStaticMenus(staticMenus: Menu[]) {
+  setStaticMenus(staticMenus: (Menu | RefModel<MenuModel>)[]) {
     this.setProperty('staticMenus', staticMenus);
     this._updateMenuBar();
   }
@@ -4517,7 +4517,7 @@ export default class Table extends Widget implements TableModel {
     this._setProperty('selectedRows', selectedRows);
   }
 
-  setMenus(menus: Menu[]) {
+  setMenus(menus: (Menu | RefModel<MenuModel>)[]) {
     this.setProperty('menus', menus);
   }
 

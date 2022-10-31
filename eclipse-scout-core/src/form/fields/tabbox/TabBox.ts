@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompositeField, fields, FormField, HtmlComponent, Menu, PropertyChangeEvent, scout, SingleLayout, TabArea, TabBoxEventMap, TabBoxHeader, TabBoxLayout, TabBoxModel, TabItem, TabItemModel} from '../../../index';
+import {arrays, CompositeField, fields, FormField, HtmlComponent, Menu, PropertyChangeEvent, RefModel, scout, SingleLayout, TabArea, TabBoxEventMap, TabBoxHeader, TabBoxLayout, TabBoxModel, TabItem, TabItemModel} from '../../../index';
 import $ from 'jquery';
 import {TabAreaStyle} from './TabArea';
 import Tab from './Tab';
@@ -112,17 +112,17 @@ export default class TabBox extends CompositeField implements TabBoxModel {
    * Inserts a new tab item.
    * @param index The position where the new tab should be inserted. By default, it will be appended at the end of the existing tab items.
    */
-  insertTabItem(tabItem: TabItem | TabItemModel, index?: number) {
+  insertTabItem(tabItem: TabItem | RefModel<TabItemModel>, index?: number) {
     if (!tabItem) {
       return;
     }
     index = scout.nvl(index, this.tabItems.length);
-    let tabItems = this.tabItems.slice() as (TabItem | TabItemModel)[];
+    let tabItems = this.tabItems.slice() as (TabItem | RefModel<TabItemModel>)[];
     tabItems.splice(index, 0, tabItem);
     this.setTabItems(tabItems);
   }
 
-  setTabItems(tabItems: (TabItem | TabItemModel)[]) {
+  setTabItems(tabItems: (TabItem | RefModel<TabItemModel>)[]) {
     this.setProperty('tabItems', tabItems);
   }
 

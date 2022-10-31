@@ -8,13 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {WidgetModel} from '../../index';
+import {Menu, MenuModel, RefModel, WidgetModel} from '../../index';
 import {MenuOrder} from '../MenuItemsOrder';
 import {MenuFilter} from '../Menu';
 import {MenuBarEllipsisPosition, MenuBarPosition} from './MenuBar';
 
 export default interface MenuBarModel extends WidgetModel {
   menuFilter?: MenuFilter;
+  menuItems?: (Menu | RefModel<MenuModel>)[];
   position?: MenuBarPosition;
   tabbable?: boolean;
   ellipsisPosition?: MenuBarEllipsisPosition;

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {BreadcrumbBar, BreadcrumbBarFieldEventMap, BreadcrumbBarFieldModel, BreadcrumbBarModel, BreadcrumbItem, BreadcrumbItemModel, FormField} from '../../../index';
+import {BreadcrumbBar, BreadcrumbBarFieldEventMap, BreadcrumbBarFieldModel, BreadcrumbBarModel, BreadcrumbItem, BreadcrumbItemModel, FormField, RefModel} from '../../../index';
 
 export default class BreadcrumbBarField extends FormField implements BreadcrumbBarFieldModel {
   declare model: BreadcrumbBarFieldModel;
@@ -31,14 +31,14 @@ export default class BreadcrumbBarField extends FormField implements BreadcrumbB
     this._renderBreadcrumbBar();
   }
 
-  setBreadcrumbItems(breadcrumbItems: (BreadcrumbItem | BreadcrumbItemModel) | (BreadcrumbItem | BreadcrumbItemModel)[]) {
+  setBreadcrumbItems(breadcrumbItems: (BreadcrumbItem | RefModel<BreadcrumbItemModel>) | (BreadcrumbItem | RefModel<BreadcrumbItemModel>)[]) {
     if (!this.breadcrumbBar) {
       return;
     }
     this.breadcrumbBar.setBreadcrumbItems(breadcrumbItems);
   }
 
-  setBreadcrumbBar(breadcrumbBar: BreadcrumbBar | BreadcrumbBarModel) {
+  setBreadcrumbBar(breadcrumbBar: BreadcrumbBar | RefModel<BreadcrumbBarModel>) {
     this.setProperty('breadcrumbBar', breadcrumbBar);
   }
 

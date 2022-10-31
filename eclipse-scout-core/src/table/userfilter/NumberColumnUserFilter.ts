@@ -62,12 +62,12 @@ export default class NumberColumnUserFilter extends ColumnUserFilter implements 
   }
 
   override addFilterFields(groupBox: FilterFieldsGroupBox) {
-    this.numberFromField = groupBox.addFilterField('NumberField', 'ui.from') as NumberField;
+    this.numberFromField = groupBox.addFilterField(NumberField, 'ui.from') as NumberField;
     this.numberFromField.decimalFormat = this.column.decimalFormat;
     this.numberFromField.setValue(this.numberFrom);
     this.numberFromField.on('propertyChange', this._onPropertyChange.bind(this));
 
-    this.numberToField = groupBox.addFilterField('NumberField', 'ui.to') as NumberField;
+    this.numberToField = groupBox.addFilterField(NumberField, 'ui.to') as NumberField;
     this.numberToField.decimalFormat = this.column.decimalFormat;
     this.numberToField.setValue(this.numberTo);
     this.numberToField.on('propertyChange', this._onPropertyChange.bind(this));

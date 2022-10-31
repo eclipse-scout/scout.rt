@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ActionModel, Menu, TreeNode, WidgetModel} from '../index';
+import {Action, ActionModel, Menu, MenuModel, TreeNode, WidgetModel} from '../index';
 import {FilterOrFunction} from '../widget/FilterSupport';
 import {TreeCheckableStyle, TreeDisplayStyle} from './Tree';
 import {RefModel} from '../types';
@@ -45,8 +45,8 @@ export default interface TreeModel extends WidgetModel {
    * Default is true.
    */
   lazyExpandingEnabled?: boolean;
-  menus?: Menu[];
-  keyStrokes?: Action[] | RefModel<ActionModel>[];
+  menus?: (Menu | RefModel<MenuModel>)[];
+  keyStrokes?: (Action | RefModel<ActionModel>)[];
   /**
    * Default is true.
    */

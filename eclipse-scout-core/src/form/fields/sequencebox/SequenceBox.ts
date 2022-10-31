@@ -9,7 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  CheckBoxField, CompositeField, DateField, dates, EventHandler, FormField, HorizontalGrid, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, PropertyChangeEvent, scout, SequenceBoxEventMap,
+  CheckBoxField, CompositeField, DateField, dates, EventHandler, FormField, FormFieldModel, HorizontalGrid, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuModel, PropertyChangeEvent,
+  RefModel, scout,
+  SequenceBoxEventMap,
   SequenceBoxGridConfig, SequenceBoxLayout, SequenceBoxModel, ValueField, Widget
 } from '../../../index';
 import {FormFieldSuppressStatus} from '../FormField';
@@ -262,9 +264,9 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
     }
   }
 
-  override setMenus(menus: Menu | Menu[]) {
+  override setMenus(menusOrModels: (Menu | RefModel<MenuModel>)[]) {
     // ensure menus are real and not just model objects
-    menus = this._createChildren(menus) as Menu[];
+    let menus = this._createChildren(menusOrModels) as unknown as Menu[];
 
     if (this._isOverwritingStatusFromField && !this._isMenusOverwritten) {
       // was not overwritten, will be overwritten now -> backup old value
@@ -365,7 +367,7 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
     }
   }
 
-  setFields(fields: FormField[]) {
+  setFields(fields: (FormField | RefModel<FormFieldModel>)[]) {
     if (this.rendered) {
       throw new Error('Setting fields is not supported if sequence box is already rendered.');
     }

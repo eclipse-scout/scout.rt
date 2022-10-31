@@ -10,7 +10,7 @@
  */
 import {
   AbstractGrid, arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, Filter, FilterResult, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGrid, LogicalGridData, Menu,
-  MenuDestinations, menus as menuUtil, numbers, objects, PlaceholderTile, Predicate, Range, scout, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke,
+  MenuDestinations, menus as menuUtil, numbers, objects, PlaceholderTile, Predicate, Range, RefModel, scout, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke,
   TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter,
   UpdateFilteredElementsOptions, VirtualScrolling, Widget
 } from '../index';
@@ -247,16 +247,16 @@ export default class TileGrid extends Widget implements TileGridModel {
     }
   }
 
-  insertTile(tile: Tile | TileModel) {
+  insertTile(tile: Tile | RefModel<TileModel>) {
     this.insertTiles([tile]);
   }
 
-  insertTiles(tilesToInsert: Tile | TileModel | (Tile | TileModel)[], appendPlaceholders?: boolean) {
+  insertTiles(tilesToInsert: Tile | RefModel<TileModel> | (Tile | RefModel<TileModel>)[], appendPlaceholders?: boolean) {
     tilesToInsert = arrays.ensure(tilesToInsert);
     if (tilesToInsert.length === 0) {
       return;
     }
-    let tiles = this.tiles as (Tile | TileModel)[];
+    let tiles = this.tiles as (Tile | RefModel<TileModel>)[];
     this.setTiles(tiles.concat(tilesToInsert), appendPlaceholders);
   }
 
@@ -278,14 +278,14 @@ export default class TileGrid extends Widget implements TileGridModel {
     this.setTiles([]);
   }
 
-  setTiles(tilesOrModels: Tile[] | TileModel[], appendPlaceholders?: boolean) {
-    tilesOrModels = arrays.ensure(tilesOrModels);
+  setTiles(tilesOrModels: Tile | RefModel<TileModel> | (Tile | RefModel<TileModel>)[], appendPlaceholders?: boolean) {
+    let tilesOrModelsArr = arrays.ensure(tilesOrModels);
     if (objects.equals(this.tiles, tilesOrModels)) {
       return;
     }
 
     // Ensure given tiles are real tiles (of type Tile)
-    let tiles = this._createChildren(tilesOrModels) as Tile[];
+    let tiles = this._createChildren(tilesOrModelsArr) as unknown as Tile[];
 
     if (this.withPlaceholders && scout.nvl(appendPlaceholders, true)) {
       // Remove placeholders from new tiles, they will be added later

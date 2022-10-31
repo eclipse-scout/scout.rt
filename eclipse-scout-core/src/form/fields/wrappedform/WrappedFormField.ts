@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventHandler, Form, FormField, GroupBox, WrappedFormFieldEventMap, WrappedFormFieldModel} from '../../../index';
+import {Event, EventHandler, Form, FormField, FormModel, GroupBox, RefModel, WrappedFormFieldEventMap, WrappedFormFieldModel} from '../../../index';
 
 export default class WrappedFormField extends FormField implements WrappedFormFieldModel {
   declare model: WrappedFormFieldModel;
@@ -43,7 +43,7 @@ export default class WrappedFormField extends FormField implements WrappedFormFi
     this._renderInnerForm();
   }
 
-  setInnerForm(innerForm: Form) {
+  setInnerForm(innerForm: Form | RefModel<FormModel>) {
     this.setProperty('innerForm', innerForm);
   }
 

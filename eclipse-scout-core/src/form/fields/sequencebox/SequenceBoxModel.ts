@@ -14,5 +14,5 @@ import {RefModel} from '../../../types';
 
 export default interface SequenceBoxModel extends FormFieldModel {
   layoutConfig?: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel;
-  fields?: FormField[] | RefModel<FormFieldModel>[];
+  fields?: (FormField | RefModel<FormFieldModel>)[];
 }

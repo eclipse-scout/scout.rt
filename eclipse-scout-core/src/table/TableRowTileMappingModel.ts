@@ -10,8 +10,9 @@
  */
 import {TableRowModel, Tile, WidgetModel} from '../index';
 import {RefModel} from '../types';
+import TileModel from '../tile/TileModel';
 
 export default interface TableRowTileMappingModel extends WidgetModel {
   tableRow?: string;
-  tile?: Tile | RefModel<TableRowModel>;
+  tile?: Tile | RefModel<TileModel>;
 }

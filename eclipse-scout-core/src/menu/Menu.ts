@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, ActionKeyStroke, arrays, ContextMenuPopup, EnumObject, HtmlComponent, icons, MenuBarPopup, MenuBarPopupModel, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, scout, strings,
+  Action, ActionKeyStroke, arrays, ContextMenuPopup, EnumObject, HtmlComponent, icons, MenuBarPopup, MenuBarPopupModel, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, RefModel,
+  scout, strings,
   tooltips, TreeVisitResult
 } from '../index';
 import {PopupAlignment} from '../popup/Popup';
@@ -535,15 +536,13 @@ export default class Menu extends Action implements MenuModel {
   }
 
   protected _createPopup(): Popup {
-    let options: MenuBarPopupModel = {
+    return scout.create(MenuBarPopup, {
       parent: this,
       menu: this,
       menuFilter: this.menuFilter,
       horizontalAlignment: this.popupHorizontalAlignment,
       verticalAlignment: this.popupVerticalAlignment
-    };
-
-    return scout.create(MenuBarPopup, options);
+    });
   }
 
   protected override _createActionKeyStroke(): ActionKeyStroke {
@@ -591,7 +590,7 @@ export default class Menu extends Action implements MenuModel {
     this.setChildActions(actions);
   }
 
-  setChildActions(childActions: Menu[]) {
+  setChildActions(childActions: (Menu | RefModel<MenuModel>)[]) {
     this.setProperty('childActions', childActions);
   }
 

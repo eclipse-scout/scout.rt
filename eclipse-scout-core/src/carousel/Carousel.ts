@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CarouselLayout, CarouselModel, events, GridData, HtmlComponent, SingleLayout, Widget} from '../index';
+import {arrays, CarouselLayout, CarouselModel, events, GridData, HtmlComponent, RefModel, SingleLayout, Widget, WidgetModel} from '../index';
 
 export default class Carousel extends Widget implements CarouselModel {
   declare model: CarouselModel;
@@ -169,7 +169,7 @@ export default class Carousel extends Widget implements CarouselModel {
     }
   }
 
-  setWidgets(widgets: Widget[]) {
+  setWidgets(widgets: (Widget | RefModel<WidgetModel>)[]) {
     this.setProperty('widgets', widgets);
   }
 

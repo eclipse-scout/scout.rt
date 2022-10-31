@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Desktop, DesktopHeaderEventMap, DesktopHeaderLayout, DesktopHeaderModel, DesktopLogo, DesktopTabArea, DesktopToolBox, Event, EventHandler, Form, HtmlComponent, Menu, MenuBar, PropertyChangeEvent, scout, ViewButtonBox, Widget
+  Desktop, DesktopHeaderEventMap, DesktopHeaderLayout, DesktopHeaderModel, DesktopLogo, DesktopTabArea, DesktopToolBox, Event, EventHandler, Form, HtmlComponent, Menu, MenuBar, MenuModel, PropertyChangeEvent, RefModel, scout, ViewButtonBox,
+  Widget
 } from '../../index';
 import {OutlineContent} from '../bench/DesktopBench';
 
@@ -231,7 +232,7 @@ export default class DesktopHeader extends Widget implements DesktopHeaderModel 
     this.setProperty('viewButtonBoxVisible', visible);
   }
 
-  setMenus(menus: Menu[]) {
+  setMenus(menus: (Menu | RefModel<MenuModel>)[]) {
     if (this.toolBox) {
       this.toolBox.setMenus(menus);
     }

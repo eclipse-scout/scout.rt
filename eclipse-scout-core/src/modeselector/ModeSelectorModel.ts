@@ -15,6 +15,6 @@ export default interface ModeSelectorModel<T = any> extends WidgetModel {
   /**
    * Default is [].
    */
-  modes?: Mode<T>[] | RefModel<ModeModel<T>>[];
-  selectedMode?: Mode<T>;
+  modes?: (Mode<T> | RefModel<ModeModel<T>>)[];
+  selectedMode?: Mode<T> | string;
 }

@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Event, graphics, icons, Insets, Point, Popup, PopupLayout, Resizable, scout, Widget, WidgetPopupEventMap, WidgetPopupLayout, WidgetPopupModel} from '../index';
+import {Action, Event, graphics, icons, Insets, Point, Popup, PopupLayout, RefModel, Resizable, scout, Widget, WidgetModel, WidgetPopupEventMap, WidgetPopupLayout, WidgetPopupModel} from '../index';
 import $ from 'jquery';
 import {ResizableMode} from '../resizable/Resizable';
 import {PopupAlignment} from './Popup';
 
-export default class WidgetPopup extends Popup {
+export default class WidgetPopup extends Popup implements WidgetPopupModel {
   declare model: WidgetPopupModel;
   declare eventMap: WidgetPopupEventMap;
 
@@ -84,7 +84,7 @@ export default class WidgetPopup extends Popup {
     super._remove();
   }
 
-  setContent(content: Widget) {
+  setContent(content: Widget | RefModel<WidgetModel>) {
     this.setProperty('content', content);
   }
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, EventDelegator, FormField, objects, scout, Table, TableFieldEventMap, TableFieldModel, TableRow, Widget} from '../../../index';
+import {arrays, Event, EventDelegator, FormField, objects, RefModel, scout, Table, TableFieldEventMap, TableFieldModel, TableModel, TableRow, Widget} from '../../../index';
 import {ValidationResult} from '../FormField';
 import {TableAllRowsDeletedEvent, TableRowsCheckedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent} from '../../../table/TableEventMap';
 
@@ -55,7 +55,7 @@ export default class TableField extends FormField implements TableFieldModel {
     this._renderTable();
   }
 
-  setTable(table: Table) {
+  setTable(table: Table | RefModel<TableModel>) {
     this.setProperty('table', table);
   }
 

@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, StatusMenuMappingModel, Widget, WidgetModel} from '../../index';
+import {Menu, RefModel, StatusMenuMappingModel, Widget, WidgetModel} from '../../index';
 import {StatusSeverity} from '../../status/Status';
+import {ModelOf} from '../../scout';
 
 export default class StatusMenuMapping extends Widget implements StatusMenuMappingModel {
   declare model: StatusMenuMappingModel;
@@ -26,7 +27,7 @@ export default class StatusMenuMapping extends Widget implements StatusMenuMappi
     this._addWidgetProperties(['menu']);
   }
 
-  protected override _createChild(model: WidgetModel | Widget | string): Widget {
+  protected override _createChild<T extends Widget>(model: T | RefModel<ModelOf<T>> | string): T {
     if (typeof model === 'string') {
       // If the model is a string it is probably the id of the menu.
       // Menus are defined by the parent (form field) -> search the parent's children for the menu
@@ -34,7 +35,7 @@ export default class StatusMenuMapping extends Widget implements StatusMenuMappi
       if (!existingWidget) {
         throw new Error('Referenced widget not found: ' + model);
       }
-      return existingWidget;
+      return existingWidget as T;
     }
     return super._createChild(model);
   }

@@ -9,8 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, FormField, HorizontalGrid, HtmlComponent, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupResult, LookupRow, objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap,
-  RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, RadioButtonModel, scout, Status, TreeVisitResult, ValueField
+  arrays, FormField, FormFieldModel, HorizontalGrid, HtmlComponent, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupResult, LookupRow, objects, PropertyChangeEvent, RadioButton,
+  RadioButtonGroupEventMap,
+  RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, RadioButtonModel, RefModel, scout, Status, TreeVisitResult, ValueField
 } from '../../../index';
 import $ from 'jquery';
 import {CloneOptions} from '../../../widget/Widget';
@@ -195,7 +196,7 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
     return this.session.focusManager.findFirstFocusableElement(this.$container);
   }
 
-  setFields(fields: FormField[]) {
+  setFields(fields: (FormField | RefModel<FormFieldModel>)[]) {
     this.setProperty('fields', fields);
   }
 

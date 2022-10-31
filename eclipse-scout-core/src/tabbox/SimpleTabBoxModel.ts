@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FlexboxLayoutData, SimpleTabArea, SimpleTabBoxController, WidgetModel} from '../index';
+import {FlexboxLayoutData, RefModel, SimpleTabArea, SimpleTabAreaModel, SimpleTabBoxController, WidgetModel} from '../index';
 import {OutlineContent} from '../desktop/bench/DesktopBench';
 
 export default interface SimpleTabBoxModel extends WidgetModel {
-  tabArea?: SimpleTabArea;
+  tabArea?: SimpleTabArea | RefModel<SimpleTabAreaModel>;
   viewStack?: OutlineContent[];
   currentView?: OutlineContent;
   controller?: SimpleTabBoxController;

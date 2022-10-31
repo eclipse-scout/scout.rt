@@ -9,9 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, GroupBoxMenuItemsOrder, HtmlComponent, Icon, KeyStrokeContext,
+  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FormModel, GroupBoxMenuItemsOrder, HtmlComponent, Icon, KeyStrokeContext,
   keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator,
-  OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, OutlineOverviewModel, Page, PageLayout, PageModel, PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview,
+  OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, OutlineOverviewModel, Page, PageLayout, PageModel, PropertyChangeEvent, RefModel, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail,
+  TileOutlineOverview,
   Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, Widget
 } from '../../index';
 import {Optional, SomeRequired} from '../../types';
@@ -481,7 +482,7 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     super._removeNodeSelection(node);
   }
 
-  setDefaultDetailForm(defaultDetailForm: Form) {
+  setDefaultDetailForm(defaultDetailForm: Form | RefModel<FormModel>) {
     this.setProperty('defaultDetailForm', defaultDetailForm);
   }
 
@@ -509,12 +510,12 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     this._setProperty('outlineOverviewVisible', outlineOverviewVisible);
   }
 
-  setOutlineOverview(outlineOverview: OutlineOverview | OutlineOverviewModel) {
+  setOutlineOverview(outlineOverview: OutlineOverview | RefModel<OutlineOverviewModel>) {
     this.setProperty('outlineOverview', outlineOverview);
     this._updateOutlineOverview();
   }
 
-  protected _setOutlineOverview(outlineOverview: OutlineOverview | OutlineOverviewModel) {
+  protected _setOutlineOverview(outlineOverview: OutlineOverview | RefModel<OutlineOverviewModel>) {
     // Ensure outlineOverview is of type OutlineOverview.
     // Widget property cannot be used because nodes are not of type Page yet while _prepareWidgetProperty is running during initialization
     if (outlineOverview) {

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Accordion, AccordionFieldEventMap, AccordionFieldModel, AccordionModel, EventDelegator, FormField, LoadingSupport} from '../../../index';
+import {Accordion, AccordionFieldEventMap, AccordionFieldModel, AccordionModel, EventDelegator, FormField, LoadingSupport, RefModel} from '../../../index';
 
 export default class AccordionField extends FormField implements AccordionFieldModel {
   declare model: AccordionFieldModel;
@@ -50,7 +50,7 @@ export default class AccordionField extends FormField implements AccordionFieldM
     this._renderDropType();
   }
 
-  setAccordion(accordion: Accordion | AccordionModel) {
+  setAccordion(accordion: Accordion | RefModel<AccordionModel>) {
     this.setProperty('accordion', accordion);
   }
 

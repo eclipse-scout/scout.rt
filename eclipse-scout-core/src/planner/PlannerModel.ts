@@ -32,5 +32,5 @@ export default interface PlannerModel extends WidgetModel {
   headerVisible?: boolean;
   label?: string;
   selectionMode?: PlannerSelectionMode;
-  menus?: Menu[] | RefModel<MenuModel>[];
+  menus?: (Menu | RefModel<MenuModel>)[];
 }

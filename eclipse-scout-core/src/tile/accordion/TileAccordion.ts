@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Accordion, arrays, Event, EventDelegator, EventHandler, Filter, FilterResult, FilterSupport, Group, KeyStrokeContext, objects, PropertyChangeEvent, scout, TextFilter, Tile, TileAccordionEventMap, TileAccordionLayout, TileAccordionModel,
+  Accordion, arrays, Event, EventDelegator, EventHandler, Filter, FilterResult, FilterSupport, Group, KeyStrokeContext, objects, PropertyChangeEvent, RefModel, scout, TextFilter, Tile, TileAccordionEventMap, TileAccordionLayout,
+  TileAccordionModel,
   TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
 } from '../../index';
 import {Comparator} from '../../types';
@@ -296,14 +297,14 @@ export default class TileAccordion extends Accordion implements TileAccordionMod
    *
    * If the list contains new tiles not assigned to a group yet, an exception will be thrown.
    */
-  setTiles(tiles: Tile[]) {
-    tiles = arrays.ensure(tiles);
-    if (objects.equals(this.getTiles(), tiles)) {
+  setTiles(tilesOrModels: Tile | RefModel<Tile> | (Tile | RefModel<Tile>)[]) {
+    let tilesOrModelsArr = arrays.ensure(tilesOrModels);
+    if (objects.equals(this.getTiles(), tilesOrModelsArr)) {
       return;
     }
 
     // Ensure given tiles are real tiles (of type Tile)
-    tiles = this._createChildren(tiles) as Tile[];
+    let tiles = this._createChildren(tilesOrModelsArr) as unknown as Tile[];
 
     // Distribute the tiles to the corresponding groups (result may contain groups without tiles)
     let tilesPerGroup = this._groupTiles(tiles);
@@ -464,8 +465,6 @@ export default class TileAccordion extends Accordion implements TileAccordionMod
    */
   selectTiles(tiles: Tile[]) {
     tiles = arrays.ensure(tiles);
-    // Ensure given tiles are real tiles (of type Tile)
-    tiles = this._createChildren(tiles) as Tile[];
 
     // Split tiles into separate lists for each group (result may contain groups without tiles)
     let tilesPerGroup = this._groupTiles(tiles);

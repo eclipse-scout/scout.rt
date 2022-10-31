@@ -10,7 +10,8 @@
  */
 import {
   AbortKeyStroke, Button, DialogLayout, DisabledStyle, DisplayParent, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormLayout, FormLifecycle, FormModel, GlassPaneRenderer,
-  GroupBox, HtmlComponent, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, Point, PopupWindow, Rectangle, scout, Status, StatusModel, strings, tooltips, TreeVisitResult, webstorage, Widget, WrappedFormField
+  GroupBox, GroupBoxModel, HtmlComponent, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, Point, PopupWindow, Rectangle, RefModel, scout, Status, StatusModel, strings, tooltips, TreeVisitResult, webstorage, Widget,
+  WrappedFormField
 } from '../index';
 import $ from 'jquery';
 import {FormRevealInvalidFieldEvent} from './FormEventMap';
@@ -751,7 +752,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     this.$saveNeeded = null;
   }
 
-  setRootGroupBox(rootGroupBox: GroupBox) {
+  setRootGroupBox(rootGroupBox: GroupBox | RefModel<GroupBoxModel>) {
     this.setProperty('rootGroupBox', rootGroupBox);
   }
 
