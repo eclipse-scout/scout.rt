@@ -10,9 +10,9 @@
  */
 package org.eclipse.scout.rt.dataobject.fixture;
 
-import org.eclipse.scout.rt.dataobject.id.AbstractId;
+import org.eclipse.scout.rt.dataobject.id.AbstractLongId;
 
-public final class FixtureLongId extends AbstractId<Long> {
+public final class FixtureLongId extends AbstractLongId {
   private static final long serialVersionUID = 1L;
 
   public static FixtureLongId of(Long id) {
