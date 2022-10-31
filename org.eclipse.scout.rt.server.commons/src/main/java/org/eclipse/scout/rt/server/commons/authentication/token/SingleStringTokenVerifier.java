@@ -3,7 +3,7 @@
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -13,10 +13,12 @@ package org.eclipse.scout.rt.server.commons.authentication.token;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TokenUtility;
 
+@Bean
 public class SingleStringTokenVerifier implements ITokenVerifier {
 
   protected Predicate<char[]> m_verifier;
