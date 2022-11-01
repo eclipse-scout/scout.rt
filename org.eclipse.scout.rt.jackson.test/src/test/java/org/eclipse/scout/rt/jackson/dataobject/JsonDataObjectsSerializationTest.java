@@ -144,6 +144,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
@@ -2783,7 +2784,14 @@ public class JsonDataObjectsSerializationTest {
 
     // currently not deserializable using Scout Jackson implementation
     JsonMappingException exception = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
-    assertTrue("expected cause UnrecognizedPropertyException, got " + exception.getCause(), exception.getCause() instanceof UnrecognizedPropertyException);
+
+    // TODO [23.1] pbz remove when JDK 11 is no longer supported
+    if ("11".equals(System.getProperty("java.specification.version"))) {
+      assertTrue("expected cause UnrecognizedPropertyException, got " + exception.getCause(), exception.getCause() instanceof UnrecognizedPropertyException);
+    }
+    else {
+      assertTrue("expected cause InvalidDefinitionException, got " + exception.getCause(), exception.getCause() instanceof InvalidDefinitionException);
+    }
   }
 
   @Test
