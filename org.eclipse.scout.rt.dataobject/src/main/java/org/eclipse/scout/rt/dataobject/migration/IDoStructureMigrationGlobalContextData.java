@@ -19,6 +19,7 @@ package org.eclipse.scout.rt.dataobject.migration;
  * Because a global context data may be accessed concurrently by different threads each implementation must be
  * thread-safe.
  */
+// TODO 23.1 [data object migration] rename to IDataObjectMigrationGlobalContextData
 public interface IDoStructureMigrationGlobalContextData {
 
   /**

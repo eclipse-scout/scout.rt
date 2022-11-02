@@ -35,24 +35,29 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureT
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_4;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_5;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureNamespace;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.DeltaFixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.DeltaFixture_2;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.namespace.INamespace;
 
 /**
  * Helper methods used within tests to access common fixtures (namespaces, type versions, context data classes).
  */
+// TODO 23.1 [data object migration] rename to DataObjectMigrationTestHelper
 @ApplicationScoped
 public class DoStructureMigrationTestHelper {
 
   public List<INamespace> getFixtureNamespaces() {
-    return Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace());
+    return Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace(), new DeltaFixtureNamespace());
   }
 
   public Collection<ITypeVersion> getFixtureTypeVersions() {
     return Arrays.asList(
         new AlfaFixture_1(), new AlfaFixture_2(), new AlfaFixture_3(), new AlfaFixture_6(), new AlfaFixture_7(),
         new BravoFixture_1(), new BravoFixture_2(), new BravoFixture_3(),
-        new CharlieFixture_1(), new CharlieFixture_2(), new CharlieFixture_3(), new CharlieFixture_4(), new CharlieFixture_5());
+        new CharlieFixture_1(), new CharlieFixture_2(), new CharlieFixture_3(), new CharlieFixture_4(), new CharlieFixture_5(),
+        new DeltaFixture_1(), new DeltaFixture_2());
   }
 
   public Collection<Class<? extends IDoStructureMigrationTargetContextData>> getFixtureContextDataClasses() {
