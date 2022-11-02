@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Test;
 
+// TODO 23.1 [data object migration] rename to DataObjectMigrationContextTest
 public class DoStructureMigrationContextTest {
 
   @Test

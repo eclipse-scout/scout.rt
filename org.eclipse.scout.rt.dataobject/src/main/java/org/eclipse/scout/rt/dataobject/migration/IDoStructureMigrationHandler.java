@@ -13,11 +13,18 @@ package org.eclipse.scout.rt.dataobject.migration;
 import java.util.Set;
 
 import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 
 /**
- * Interface for a data object structure migration handler.
+ * Interface for a data object structure migration handler. Typical use cases include renaming of a data objects
+ * {@link TypeName} or renaming or type change of attributes.
+ * <p>
+ * In contrast to {@link IDoValueMigrationHandler}, a structure migration handler operates on <i>untyped</i> objects
+ * (i.e. raw {@link IDoEntity} objects) and its implementation must not access constants and attribute names from the
+ * current code base (but must use string literals instead), such that a structure migration handler is not required to
+ * change if the code base is changed.
  */
 @ApplicationScoped
 public interface IDoStructureMigrationHandler {
@@ -59,7 +66,7 @@ public interface IDoStructureMigrationHandler {
    * @param ctx
    *          Context
    * @param doEntity
-   *          Do entity to apply migration, according to {@link #getTypeNames()} (non-<code>null</code>)
+   *          Raw DO entity to apply migration, according to {@link #getTypeNames()} (non-<code>null</code>)
    * @return <code>true</code> if data object was changed in any way (including type version update only),
    *         <code>false</code> otherwise.
    */

@@ -14,6 +14,8 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
@@ -52,9 +54,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Tests for {@link DoStructureMigrator}.
+ * Tests for {@link DoStructureMigrator}, with focus on data object structure migrations
+ * ({@link IDoStructureMigrationHandler}).
  */
-public class DoStructureMigratorTest {
+public class DataObjectMigratorStructureMigrationTest {
 
   private static final List<IBean<?>> TEST_BEANS = new ArrayList<>();
 
@@ -68,20 +71,20 @@ public class DoStructureMigratorTest {
         testHelper.getFixtureNamespaces(),
         testHelper.getFixtureTypeVersions(),
         testHelper.getFixtureContextDataClasses(),
-        new PostalAddressFixtureUpdateVersionOnlyMigrationHandler_2(),
-        new PetFixtureCaseSensitiveNameMigrationHandler_2(),
-        new PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3(),
-        new CustomerFixtureMigrationHandler_3(),
-        new CharlieCustomerFixtureMigrationHandler_3(),
-        new HouseFixtureDoStructureMigrationHandler_2(),
-        new RoomFixtureDoStructureMigrationHandler_2(),
-        new RoomFixtureDoStructureMigrationHandler_3(),
-        new RoomFixtureDoStructureMigrationHandler_4(),
-        new RoomFixtureDoStructureMigrationHandler_5(),
-        new PersonFixtureDoStructureMigrationHandler_2());
+        Arrays.asList(new PostalAddressFixtureUpdateVersionOnlyMigrationHandler_2(),
+            new PetFixtureCaseSensitiveNameMigrationHandler_2(),
+            new PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3(),
+            new CustomerFixtureMigrationHandler_3(),
+            new CharlieCustomerFixtureMigrationHandler_3(),
+            new HouseFixtureDoStructureMigrationHandler_2(), // intentionally do not register HouseFixtureDoStructureMigrationHandler_3
+            new RoomFixtureDoStructureMigrationHandler_2(),
+            new RoomFixtureDoStructureMigrationHandler_3(),
+            new RoomFixtureDoStructureMigrationHandler_4(),
+            new RoomFixtureDoStructureMigrationHandler_5(),
+            new PersonFixtureDoStructureMigrationHandler_2()),
+        Collections.emptyList());
 
     TEST_BEANS.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestDoStructureMigrationInventory.class, inventory).withReplace(true)));
-
     s_migrationContext = BEANS.get(DoStructureMigrationContext.class);
     s_migrator = BEANS.get(DoStructureMigrator.class);
   }
@@ -103,7 +106,8 @@ public class DoStructureMigratorTest {
         .put("name", "CHARLIE")
         .build();
 
-    assertTrue(s_migrator.migrateDataObject(s_migrationContext, actual, BravoFixture_2.VERSION)); // stop at bravoFixture-2, otherwise namespace will change too
+    // stop at bravoFixture-2, otherwise namespace will change too
+    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, BravoFixture_2.VERSION));
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "bravoFixture.PetFixture")
@@ -127,7 +131,7 @@ public class DoStructureMigratorTest {
         .put("street", "Main street 12")
         .build();
 
-    assertTrue(s_migrator.migrateDataObject(s_migrationContext, actual));
+    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, null));
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.PostalAddressFixture")
@@ -152,7 +156,7 @@ public class DoStructureMigratorTest {
         .put("street", "Main street 12")
         .build();
 
-    assertTrue(s_migrator.migrateDataObject(s_migrationContext, actual));
+    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, null));
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.PostalAddressFixture")
@@ -177,7 +181,7 @@ public class DoStructureMigratorTest {
         .put("name", "JOHN")
         .build();
 
-    assertTrue(s_migrator.migrateDataObject(s_migrationContext, actual));
+    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, null));
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "alfaFixture.PetFixture")
@@ -200,7 +204,7 @@ public class DoStructureMigratorTest {
         .put("firstName", "John")
         .build();
 
-    assertTrue(s_migrator.migrateDataObject(s_migrationContext, actual));
+    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, null));
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "alfaFixture.CustomerFixture")
@@ -226,7 +230,7 @@ public class DoStructureMigratorTest {
         .put("firstName", "John")
         .build();
 
-    assertTrue(s_migrator.migrateDataObject(s_migrationContext, actual));
+    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, null));
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "alfaFixture.CustomerFixture")
@@ -250,7 +254,7 @@ public class DoStructureMigratorTest {
             .build())
         .build();
 
-    assertTrue(s_migrator.migrateDataObject(s_migrationContext, actual));
+    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, null));
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.HouseFixture") // BuildingFixture -> HouseFixture
@@ -281,7 +285,7 @@ public class DoStructureMigratorTest {
             .build())
         .build();
 
-    assertTrue(s_migrator.migrateDataObject(s_migrationContext, actual));
+    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, null));
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.HouseFixture")
@@ -324,7 +328,7 @@ public class DoStructureMigratorTest {
             .build())
         .build();
 
-    assertTrue(s_migrator.migrateDataObject(s_migrationContext, actual));
+    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, null));
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.PersonFixture")
@@ -360,7 +364,7 @@ public class DoStructureMigratorTest {
         .put("name", "example")
         .build();
 
-    assertTrue(s_migrator.migrateDataObject(s_migrationContext, actual));
+    assertTrue(s_migrator.applyStructureMigration(s_migrationContext, actual, null));
 
     IDoEntity expected = BEANS.get(DoEntityBuilder.class)
         .put("_type", "charlieFixture.PersonFixture")
