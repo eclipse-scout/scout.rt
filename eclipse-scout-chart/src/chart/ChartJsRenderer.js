@@ -1021,6 +1021,9 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (dataPoints.length < 1) {
       return;
     }
+    if (!dataPoints[0].chart.getDatasetMeta(dataPoints[0].datasetIndex).data[dataPoints[0].dataIndex]) {
+      return;
+    }
     if (this._tooltip) {
       this._tooltip.destroy();
       this._tooltip = null;
@@ -1101,7 +1104,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       value = dataset.data[dataIndex];
 
     if (this._isHorizontalBar(config)) {
-      if (!numbers.isNumber(value) && objects.isArray(value.x) && value.x.length === 2) {
+      if (!numbers.isNumber(value) && value && objects.isArray(value.x) && value.x.length === 2) {
         let avg = (value.x[0] + value.x[1]) / 2;
         tooltipDirection = avg < 0 ? 'left' : 'right';
       } else {
