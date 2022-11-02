@@ -83,8 +83,9 @@ public abstract class AbstractDoStructureMigrationHandlerTest {
       actual = (IDoEntity) dataObjectMapper.readValueRaw(in);
     }
 
-    DoStructureMigrationContext ctx = BEANS.get(DoStructureMigrationContext.class);
-    boolean changed = BEANS.get(DoStructureMigrator.class).migrateDataObject(ctx, actual, toVersion, initialLocalContextData);
+    DoStructureMigrationContext ctx = BEANS.get(DoStructureMigrationContext.class)
+        .withInitialLocalContext(initialLocalContextData);
+    boolean changed = BEANS.get(DoStructureMigrator.class).applyStructureMigration(ctx, actual, toVersion);
 
     assertTrue("Data object was not changed by migration", changed);
 

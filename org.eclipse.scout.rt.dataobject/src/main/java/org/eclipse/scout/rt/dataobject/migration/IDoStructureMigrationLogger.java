@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.dataobject.migration;
 /**
  * Interface of a global context data used as logger.
  */
+// TODO 23.1 [data object migration] rename to IDataObjectMigrationLogger
 public interface IDoStructureMigrationLogger extends IDoStructureMigrationGlobalContextData {
 
   @Override

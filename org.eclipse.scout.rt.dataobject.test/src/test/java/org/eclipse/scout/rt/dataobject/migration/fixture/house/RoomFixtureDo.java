@@ -14,6 +14,7 @@ import javax.annotation.Generated;
 
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_5;
@@ -44,6 +45,14 @@ public class RoomFixtureDo extends DoEntity {
 
   public DoValue<Integer> areaInSquareMeter() {
     return doValue("areaInSquareMeter");
+  }
+
+  public DoValue<RoomTypeFixtureStringId> roomType() {
+    return doValue("roomType");
+  }
+
+  public DoValue<IDoEntity> customData() {
+    return doValue("customData");
   }
 
   /* **************************************************************************
@@ -81,5 +90,27 @@ public class RoomFixtureDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Integer getAreaInSquareMeter() {
     return areaInSquareMeter().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public RoomFixtureDo withRoomType(RoomTypeFixtureStringId roomType) {
+    roomType().set(roomType);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public RoomTypeFixtureStringId getRoomType() {
+    return roomType().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public RoomFixtureDo withCustomData(IDoEntity customData) {
+    customData().set(customData);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public IDoEntity getCustomData() {
+    return customData().get();
   }
 }

@@ -20,9 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Thread-safe implementation of stats for data object structure migration.
+ * Thread-safe implementation of stats for data object migration.
  */
 @Bean
+// TODO 23.1 [data object migration] rename to DataObjectMigrationStatsContextData
 public class DoStructureMigrationStatsContextData implements IDoStructureMigrationGlobalContextData {
 
   private static final Logger LOG = LoggerFactory.getLogger(DoStructureMigrationStatsContextData.class);
@@ -99,10 +100,10 @@ public class DoStructureMigrationStatsContextData implements IDoStructureMigrati
    *          Name to print for entities
    * @param entityCount
    *          Number of entities processed (optional), can be different than the number of calls made to
-   *          {@link DoStructureMigrator#migrateDataObject(DoStructureMigrationContext, IDataObject)}.
+   *          {@link DoStructureMigrator#migrateDataObject(DoStructureMigrationContext, IDataObject, Class)}.
    */
   public void printStats(String name, Integer entityCount) {
-    LOG.info("DO structure migration of {}{} entities finished in {} ms (accumulated raw data object migration took {} ms). Changed {} of {} processed data objects.",
+    LOG.info("Data object migration of {}{} entities finished in {} ms (accumulated raw data object migration took {} ms). Changed {} of {} processed data objects.",
         entityCount == null ? "" : entityCount + " ",
         name,
         m_startNanos.get() == 0 ? "?" : StringUtility.formatNanos(getOverallMigrationDurationNano()),

@@ -23,18 +23,21 @@ import org.eclipse.scout.rt.platform.namespace.INamespace;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 @IgnoreBean
+// TODO 23.1 [data object migration] rename to TestDataObjectMigrationInventory
 public class TestDoStructureMigrationInventory extends DoStructureMigrationInventory {
 
   protected final List<INamespace> m_internalNamespaces = new ArrayList<>();
   protected final Collection<ITypeVersion> m_internalTypeVersions = new ArrayList<>();
   protected final Collection<Class<? extends IDoStructureMigrationTargetContextData>> m_internalContextDataClasses = new ArrayList<>();
-  protected final List<IDoStructureMigrationHandler> m_internalMigrationHandlers = new ArrayList<>();
+  protected final List<IDoStructureMigrationHandler> m_internalStructureMigrationHandlers = new ArrayList<>();
+  protected final List<IDoValueMigrationHandler<?>> m_internalValueMigrationHandlers = new ArrayList<>();
 
   public TestDoStructureMigrationInventory(
       List<INamespace> namespaces,
       Collection<ITypeVersion> typeVersions,
       Collection<Class<? extends IDoStructureMigrationTargetContextData>> contextDataClasses,
-      IDoStructureMigrationHandler... migrationHandlers) {
+      Collection<IDoStructureMigrationHandler> structureMigrationHandlers,
+      Collection<IDoValueMigrationHandler<?>> valueMigrationHandlers) {
     assertFalse(CollectionUtility.isEmpty(namespaces), "namespaces must be set");
     assertFalse(CollectionUtility.isEmpty(typeVersions), "typeVersions must be set");
 
@@ -44,11 +47,30 @@ public class TestDoStructureMigrationInventory extends DoStructureMigrationInven
       m_internalContextDataClasses.addAll(contextDataClasses);
     }
 
-    if (migrationHandlers != null) {
-      Collections.addAll(m_internalMigrationHandlers, migrationHandlers);
+    if (structureMigrationHandlers != null) {
+      m_internalStructureMigrationHandlers.addAll(structureMigrationHandlers);
+    }
+    if (valueMigrationHandlers != null) {
+      m_internalValueMigrationHandlers.addAll(valueMigrationHandlers);
     }
 
     init();
+  }
+
+  /**
+   * This constructor will be removed in a future release.
+   *
+   * @deprecated use {@link #TestDoStructureMigrationInventory(List, Collection, Collection, Collection, Collection)}
+   *             instead.
+   */
+  // TODO 23.1 [data object migration] remove deprecated constructor
+  @Deprecated
+  public TestDoStructureMigrationInventory(
+      List<INamespace> namespaces,
+      Collection<ITypeVersion> typeVersions,
+      Collection<Class<? extends IDoStructureMigrationTargetContextData>> contextDataClasses,
+      IDoStructureMigrationHandler... structureMigrationHandlers) {
+    this(namespaces, typeVersions, contextDataClasses, CollectionUtility.arrayList(structureMigrationHandlers), Collections.emptyList());
   }
 
   @Override
@@ -67,7 +89,12 @@ public class TestDoStructureMigrationInventory extends DoStructureMigrationInven
   }
 
   @Override
-  protected List<IDoStructureMigrationHandler> getAllMigrationHandlers() {
-    return m_internalMigrationHandlers;
+  protected List<IDoStructureMigrationHandler> getAllStructureMigrationHandlers() {
+    return m_internalStructureMigrationHandlers;
+  }
+
+  @Override
+  protected List<IDoValueMigrationHandler<?>> getAllValueMigrationHandlers() {
+    return m_internalValueMigrationHandlers;
   }
 }

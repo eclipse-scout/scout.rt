@@ -21,6 +21,7 @@ package org.eclipse.scout.rt.dataobject.migration;
  * A local context data is stacked, i.e. if multiple context data for the same {@link #getIdentifierClass()} are added,
  * the last one is retrieved.
  */
+// TODO 23.1 [data object migration] rename to IDataObjectMigrationLocalContextData
 public interface IDoStructureMigrationLocalContextData {
 
   /**

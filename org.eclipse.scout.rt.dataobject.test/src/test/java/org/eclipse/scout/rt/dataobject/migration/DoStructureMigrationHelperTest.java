@@ -191,12 +191,12 @@ public class DoStructureMigrationHelperTest {
         new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_5.VERSION.unwrap()))));
 
     assertFalse(s_helper.isAnyMigrationRequired(CollectionUtility.hashMap(
-        new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_2.VERSION.unwrap()),
+        new ImmutablePair<>("charlieFixture.HouseFixture", CharlieFixture_3.VERSION.unwrap()),
         new ImmutablePair<>("charlieFixture.RoomFixture", CharlieFixture_5.VERSION.unwrap()))));
   }
 
   /**
-   * References {@link HouseFixtureDo} that has type version {@link CharlieFixture_2}.
+   * References {@link HouseFixtureDo} that has type version {@link CharlieFixture_3}.
    */
   @Test
   public void testIsMigrationRequired() {
@@ -204,8 +204,8 @@ public class DoStructureMigrationHelperTest {
     assertFalse(s_helper.isMigrationRequired("charlieFixture.HouseFixture", NamespaceVersion.of("unknown", "1.0.0"))); // unknown type version
     assertTrue(s_helper.isMigrationRequired("charlieFixture.BuildingFixture", CharlieFixture_1.VERSION)); // unknown type name (e.g. renamed)
     assertTrue(s_helper.isMigrationRequired("charlieFixture.HouseFixture", CharlieFixture_1.VERSION)); // lower type version
-    assertFalse(s_helper.isMigrationRequired("charlieFixture.HouseFixture", CharlieFixture_2.VERSION)); // same type version
-    assertFalse(s_helper.isMigrationRequired("charlieFixture.HouseFixture", CharlieFixture_3.VERSION)); // newer type version (invalid)
+    assertFalse(s_helper.isMigrationRequired("charlieFixture.HouseFixture", CharlieFixture_3.VERSION)); // same type version
+    assertFalse(s_helper.isMigrationRequired("charlieFixture.HouseFixture", CharlieFixture_5.VERSION)); // newer type version (invalid)
   }
 
   @Test

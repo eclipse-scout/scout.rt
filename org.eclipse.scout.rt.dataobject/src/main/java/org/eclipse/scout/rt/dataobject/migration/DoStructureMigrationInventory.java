@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,17 +51,18 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.Pair;
 
 /**
- * Inventory of data object structure migration related classes (namespaces, versions, migration handlers, context data
- * classes).
+ * Inventory of data object migration related classes (namespaces, versions, structure and value migration handlers,
+ * context data classes).
  */
 @ApplicationScoped
+// TODO 23.1 [data object migration] rename to DataObjectMigrationInventory
 public class DoStructureMigrationInventory {
 
   protected final LinkedHashSet<String> m_namespaces = new LinkedHashSet<>();
   protected final LinkedHashSet<NamespaceVersion> m_orderedVersions = new LinkedHashSet<>(); // ordered versions according to VersionedItemInventory
   protected ByNamespaceVersionComparator m_comparator = null;
-  // only one migration handler per type version and type name can exist
-  protected final Map<NamespaceVersion, Map<String /* type name */, IDoStructureMigrationHandler>> m_migrationHandlers = new HashMap<>();
+  // only one structure migration handler per type version and type name can exist
+  protected final Map<NamespaceVersion, Map<String /* type name */, IDoStructureMigrationHandler>> m_structureMigrationHandlers = new HashMap<>();
 
   protected final Map<String /* type name */, Set<Class<? extends IDoStructureMigrationTargetContextData>>> m_doContextDataClassByTypeName = new HashMap<>();
   // Contains subclasses (replaced data objects) of classes within DoStructureMigrationContextDataTarget#doEntityClasses too.
@@ -76,6 +78,11 @@ public class DoStructureMigrationInventory {
    * Based on current data from {@link DataObjectInventory}.
    */
   protected final Map<String, NamespaceVersion> m_typeNameToCurrentTypeVersion = new HashMap<>();
+
+  /**
+   * Ordered map of all value migration handlers.
+   */
+  protected final LinkedHashMap<DoValueMigrationId, IDoValueMigrationHandler<?>> m_valueMigrationHandlers = new LinkedHashMap<>();
 
   /**
    * @return All namespaces (sorted).
@@ -107,10 +114,19 @@ public class DoStructureMigrationInventory {
   }
 
   /**
-   * @return All migration handlers (sorted).
+   * @return All structure migration handlers.
    */
-  protected List<IDoStructureMigrationHandler> getAllMigrationHandlers() {
+  protected List<IDoStructureMigrationHandler> getAllStructureMigrationHandlers() {
     return BEANS.all(IDoStructureMigrationHandler.class);
+  }
+
+  /**
+   * @return All value migration handlers.
+   */
+  protected List<IDoValueMigrationHandler<?>> getAllValueMigrationHandlers() {
+    return BEANS.all(IDoValueMigrationHandler.class).stream()
+        .map(handler -> (IDoValueMigrationHandler<?>) handler)
+        .collect(Collectors.toList());
   }
 
   @PostConstruct
@@ -166,13 +182,13 @@ public class DoStructureMigrationInventory {
       }
     }
 
-    // Collect migration handlers
+    // Collect structure migration handlers
     Map<NamespaceVersion, Map<String /* type name */, List<IDoStructureMigrationHandler>>> migrationHandlersPerVersionAndTypeName = new HashMap<>();
     Map<String, Set<NamespaceVersion>> unorderedTypeNameVersions = new HashMap<>();
-    for (IDoStructureMigrationHandler migrationHandler : getAllMigrationHandlers()) {
-      validateMigrationHandler(migrationHandler);
+    for (IDoStructureMigrationHandler migrationHandler : getAllStructureMigrationHandlers()) {
+      validateStructureMigrationHandler(migrationHandler);
 
-      // Collect migration handlers
+      // Collect structure migration handlers
       Map<String, List<IDoStructureMigrationHandler>> migrationHandlersPerTypeName = migrationHandlersPerVersionAndTypeName.computeIfAbsent(migrationHandler.toTypeVersion(), k -> new HashMap<>());
       for (String typeName : migrationHandler.getTypeNames()) {
         List<IDoStructureMigrationHandler> migrationHandlers = migrationHandlersPerTypeName.computeIfAbsent(typeName, k -> new ArrayList<>());
@@ -184,13 +200,13 @@ public class DoStructureMigrationInventory {
       }
     }
 
-    validateMigrationHandlerUniqueness(migrationHandlersPerVersionAndTypeName);
+    validateStructureMigrationHandlerUniqueness(migrationHandlersPerVersionAndTypeName);
 
     // validation takes care that there is only one migration handler per type version and type name
     migrationHandlersPerVersionAndTypeName.forEach((version, migrationHandlersPerTypeName) -> {
       Map<String, IDoStructureMigrationHandler> migrationHandlerPerTypeName = new HashMap<>();
       migrationHandlersPerTypeName.forEach((typeName, migrationHandlers) -> migrationHandlerPerTypeName.put(typeName, CollectionUtility.firstElement(migrationHandlers)));
-      m_migrationHandlers.put(version, migrationHandlerPerTypeName);
+      m_structureMigrationHandlers.put(version, migrationHandlerPerTypeName);
     });
 
     // Sort and add versions to m_typeNameVersions.
@@ -199,10 +215,19 @@ public class DoStructureMigrationInventory {
       versions.sort(m_comparator);
       m_typeNameVersions.put(entry.getKey(), versions);
     }
+
+    // Collect value migration handlers
+    List<IDoValueMigrationHandler<?>> allValueMigrationHandlers = getAllValueMigrationHandlers();
+    Map<DoValueMigrationId, IDoValueMigrationHandler<?>> validatedValueMigrationHandlers = new HashMap<>();
+    allValueMigrationHandlers.forEach(handler -> validateValueMigrationHandler(handler, validatedValueMigrationHandlers));
+    // Primary sort order by type version, secondary sort order provided by bean manager (order annotation and fully qualified class name).
+    allValueMigrationHandlers.stream()
+        .sorted(Comparator.comparing(IDoValueMigrationHandler::typeVersion, m_comparator))
+        .forEach(handler -> m_valueMigrationHandlers.put(handler.id(), handler));
   }
 
-  protected void validateMigrationHandlerUniqueness(Map<NamespaceVersion, Map<String, List<IDoStructureMigrationHandler>>> migrationHandlersPerVersionAndTypeName) {
-    // Verify that there there is not more than one migration handler per type version and type name
+  protected void validateStructureMigrationHandlerUniqueness(Map<NamespaceVersion, Map<String, List<IDoStructureMigrationHandler>>> migrationHandlersPerVersionAndTypeName) {
+    // Verify that there is not more than one migration handler per type version and type name
     StringBuilder duplicateBuilder = new StringBuilder();
     for (Entry<NamespaceVersion, Map<String, List<IDoStructureMigrationHandler>>> versionEntry : migrationHandlersPerVersionAndTypeName.entrySet()) {
       NamespaceVersion version = versionEntry.getKey();
@@ -241,7 +266,7 @@ public class DoStructureMigrationInventory {
    * <li>For all type names there is a type version as least as high as the target type version of the migration handler
    * </ul>
    */
-  protected <T extends IDoStructureMigrationHandler> T validateMigrationHandler(T migrationHandler) {
+  protected <T extends IDoStructureMigrationHandler> T validateStructureMigrationHandler(T migrationHandler) {
     // Check for missing type names
     if (CollectionUtility.isEmpty(migrationHandler.getTypeNames())) {
       throw new PlatformException("Migration handler {} doesn't have any type names", migrationHandler);
@@ -305,6 +330,46 @@ public class DoStructureMigrationInventory {
   }
 
   /**
+   * Validates a {@link IDoValueMigrationHandler} for unique value migration ID and valid type version.
+   *
+   * @param validatedValueMigrationHandlers
+   *          Map of already validated value migration handlers, used to check for unique value migration IDs
+   * @param valueMigrationHandler
+   *          Value migration handler to be validated
+   */
+  protected void validateValueMigrationHandler(IDoValueMigrationHandler valueMigrationHandler, Map<DoValueMigrationId, IDoValueMigrationHandler<?>> validatedValueMigrationHandlers) {
+    // Check for duplicate value migration ID
+    IDoValueMigrationHandler<?> existingHandler = validatedValueMigrationHandlers.put(valueMigrationHandler.id(), valueMigrationHandler);
+    if (existingHandler != null) {
+      throw new PlatformException("Multiple value migration handlers with identical ID detected. Value migration handler IDs must be unique.\n"
+          + "ID: {}, value migration handlers: {}, {}", valueMigrationHandler.id(), existingHandler.getClass().getSimpleName(), valueMigrationHandler.getClass().getSimpleName());
+    }
+
+    // Check for unknown type version
+    NamespaceVersion typeVersion = valueMigrationHandler.typeVersion();
+    if (!m_orderedVersions.contains(typeVersion)) {
+      throw new PlatformException("Unknown type version {}. Make sure that the type version value is registered within a {}", typeVersion, ITypeVersion.class.getSimpleName());
+    }
+  }
+
+  /**
+   * @return Unmodifiable list of all available {@link IDoValueMigrationHandler}s, ordered by type version. Migration
+   *         handlers with the same type version are ordered according to sort order provided by the bean manager (order
+   *         annotation and fully qualified class name).
+   */
+  public List<IDoValueMigrationHandler<?>> getValueMigrationHandlers() {
+    return m_valueMigrationHandlers.values().stream()
+        .collect(Collectors.toUnmodifiableList());
+  }
+
+  /**
+   * @return {@link IDoValueMigrationHandler} for a given {@link DoValueMigrationId}
+   */
+  public IDoValueMigrationHandler<?> getValueMigrationHandler(DoValueMigrationId valueMigrationId) {
+    return m_valueMigrationHandlers.get(valueMigrationId);
+  }
+
+  /**
    * @return Unmodifiable list of ordered versions according to VersionedItemInventory.
    */
   public List<NamespaceVersion> getAllVersionsOrdered() {
@@ -360,7 +425,7 @@ public class DoStructureMigrationInventory {
     }
 
     // remove all versions that don't have migration handlers
-    versions.removeIf(version -> !m_migrationHandlers.containsKey(version));
+    versions.removeIf(version -> !m_structureMigrationHandlers.containsKey(version));
 
     return new ArrayList<>(versions);
   }
@@ -562,10 +627,11 @@ public class DoStructureMigrationInventory {
     return ImmutablePair.of(FindNextMigrationHandlerVersionStatus.MIGRATION_HANDLER_FOUND, versions.get(insertionPoint));
   }
 
+  // TODO 23.1 [data object migration] rename to getStructureMigrationHandlers
   public Map<String, IDoStructureMigrationHandler> getMigrationHandlers(NamespaceVersion version) {
     assertNotNull(version, "version is required");
     assertTrue(m_orderedVersions.contains(version), "version is unknown");
-    return m_migrationHandlers.computeIfAbsent(version, k -> Collections.emptyMap());
+    return m_structureMigrationHandlers.computeIfAbsent(version, k -> Collections.emptyMap());
   }
 
   public Set<Class<? extends IDoStructureMigrationTargetContextData>> getDoMigrationContextValues(IDoEntity doEntity) {
