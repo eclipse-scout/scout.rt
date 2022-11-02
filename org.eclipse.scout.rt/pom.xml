@@ -118,8 +118,8 @@
     <io.netty-version>4.1.77.Final</io.netty-version>
     <apache.tika-version>2.4.0</apache.tika-version>
     <batik.version>1.16</batik.version>
-    <activemq.version>5.16.3</activemq.version>
-    <artemis.version>2.20.0</artemis.version>
+    <activemq.version>5.17.2</activemq.version>
+    <artemis.version>2.26.0</artemis.version>
     <com.google.http-client.version>1.40.1</com.google.http-client.version>
     <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
 
@@ -569,6 +569,12 @@
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-broker</artifactId>
         <version>${activemq.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -671,7 +677,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>4.2.0</version>
+        <version>4.8.1</version>
       </dependency>
 
       <dependency>

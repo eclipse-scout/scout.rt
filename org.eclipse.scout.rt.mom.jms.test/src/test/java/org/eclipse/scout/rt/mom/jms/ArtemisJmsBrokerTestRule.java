@@ -92,7 +92,7 @@ public class ArtemisJmsBrokerTestRule extends ExternalResource {
     Configuration config = new ConfigurationImpl();
     config.setSecurityEnabled(false);
     config.addAcceptorConfiguration(new TransportConfiguration(InVMAcceptorFactory.class.getName()));
-    config.addAddressesSetting("#", new AddressSettings()
+    config.addAddressSetting("#", new AddressSettings()
         .setExpiryAddress(new SimpleString("jms.queue.ExpiryQueue"))
         .setDeadLetterAddress(new SimpleString("jms.queue.DLQ")));
 
