@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 /**
  * Data object visitor to migrate data objects.
  */
-public class MigrationDataObjectVisitor extends AbstractDataObjectVisitor {
+public class DoStructureMigrationDataObjectVisitor extends AbstractDataObjectVisitor {
 
   protected final DoStructureMigrationHelper m_helper;
   protected final DoStructureMigrationInventory m_inventory;
@@ -35,7 +35,7 @@ public class MigrationDataObjectVisitor extends AbstractDataObjectVisitor {
 
   protected boolean m_changed = false;
 
-  public MigrationDataObjectVisitor(DoStructureMigrationContext ctx, NamespaceVersion version) {
+  public DoStructureMigrationDataObjectVisitor(DoStructureMigrationContext ctx, NamespaceVersion version) {
     m_helper = BEANS.get(DoStructureMigrationHelper.class);
     m_inventory = BEANS.get(DoStructureMigrationInventory.class);
 

@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,17 +25,21 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.house.CharlieCustomerFi
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CharlieCustomerFixtureTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.CustomerFixtureTargetContextData;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.DuplicateIdFixtureDoValueMigrationHandler_1;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDo;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureDoStructureMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureRawOnlyDoStructureMigrationTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureStructureMigrationTargetContextData;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseFixtureTypedOnlyDoStructureMigrationTargetContextData;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.HouseTypeFixtureDoValueMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.PetFixtureFamilyFriendlyMigrationHandlerInvalidTypeVersionToUpdate_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDoStructureMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDoStructureMigrationHandler_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDoStructureMigrationHandler_4;
 import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomFixtureDoStructureMigrationHandler_5;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomSizeFixtureDoValueMigrationHandler_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.house.RoomTypeFixtureDoValueMigrationHandler_2;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureNamespace;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_1;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.AlfaFixtureTypeVersions.AlfaFixture_2;
@@ -51,6 +56,9 @@ import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureT
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_3;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_4;
 import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_5;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureNamespace;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.DeltaFixture_1;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.DeltaFixtureTypeVersions.DeltaFixture_2;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -63,6 +71,7 @@ import org.junit.Test;
 /**
  * Tests for {@link DoStructureMigrationInventory}.
  */
+// TODO 23.1 [data object migration] rename to DataObjectMigrationInventoryTest
 public class DoStructureMigrationInventoryTest {
 
   private static DoStructureMigrationInventory s_inventory;
@@ -70,27 +79,34 @@ public class DoStructureMigrationInventoryTest {
   @BeforeClass
   public static void beforeClass() {
     s_inventory = new TestDoStructureMigrationInventory(
-        Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace()),
+        Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace(), new DeltaFixtureNamespace()),
         Arrays.asList(
             new AlfaFixture_1(), new AlfaFixture_2(), new AlfaFixture_3(), new AlfaFixture_6(), // AlfaFixture_7 is explicitly not registered
             new BravoFixture_1(), new BravoFixture_2(), new BravoFixture_3(),
-            new CharlieFixture_1(), new CharlieFixture_2(), new CharlieFixture_3(), new CharlieFixture_4(), new CharlieFixture_5()),
+            new CharlieFixture_1(), new CharlieFixture_2(), new CharlieFixture_3(), new CharlieFixture_4(), new CharlieFixture_5(),
+            new DeltaFixture_1(), new DeltaFixture_2()),
         Arrays.asList(
             HouseFixtureStructureMigrationTargetContextData.class,
             HouseFixtureRawOnlyDoStructureMigrationTargetContextData.class,
             HouseFixtureTypedOnlyDoStructureMigrationTargetContextData.class,
             CustomerFixtureTargetContextData.class,
             CharlieCustomerFixtureTargetContextData.class),
-        new HouseFixtureDoStructureMigrationHandler_2(),
-        new RoomFixtureDoStructureMigrationHandler_2(),
-        new RoomFixtureDoStructureMigrationHandler_3(),
-        new RoomFixtureDoStructureMigrationHandler_4(),
-        new RoomFixtureDoStructureMigrationHandler_5(),
-        new PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3());
+        Arrays.asList(
+            new HouseFixtureDoStructureMigrationHandler_2(),
+            new RoomFixtureDoStructureMigrationHandler_2(),
+            new RoomFixtureDoStructureMigrationHandler_3(),
+            new RoomFixtureDoStructureMigrationHandler_4(),
+            new RoomFixtureDoStructureMigrationHandler_5(),
+            new PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3()),
+        Arrays.asList(
+            // registration order here is relevant for test method testValueMigrationHandlersOrdered
+            new RoomSizeFixtureDoValueMigrationHandler_2(),
+            new RoomTypeFixtureDoValueMigrationHandler_2(),
+            new HouseTypeFixtureDoValueMigrationHandler_2()));
   }
 
   /**
-   * Tests for {@link DoStructureMigrationInventory#validateMigrationHandlerUniqueness(Map)} ()}.
+   * Tests for {@link DoStructureMigrationInventory#validateStructureMigrationHandlerUniqueness(Map)} ()}.
    */
   @Test
   public void testValidateMigrationHandlerUniqueness() {
@@ -101,7 +117,8 @@ public class DoStructureMigrationInventoryTest {
             new BravoFixture_1(), new BravoFixture_2(), new BravoFixture_3(),
             new CharlieFixture_1(), new CharlieFixture_2(), new CharlieFixture_3(), new CharlieFixture_4(), new CharlieFixture_5()),
         Collections.emptyList(),
-        new PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3());
+        Arrays.asList(new PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3()),
+        Collections.emptyList());
 
     assertNotNull(inventory); // no validation error on creation of inventory
 
@@ -112,8 +129,10 @@ public class DoStructureMigrationInventoryTest {
             new BravoFixture_1(), new BravoFixture_2(), new BravoFixture_3(),
             new CharlieFixture_1(), new CharlieFixture_2(), new CharlieFixture_3(), new CharlieFixture_4(), new CharlieFixture_5()),
         Collections.emptyList(),
-        new PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3(),
-        new PetFixtureFamilyFriendlyMigrationHandlerInvalidTypeVersionToUpdate_3())); // added this migration handler here -> validation error because multiple migration handlers per type version/type name
+        Arrays.asList(
+            new PetFixtureAlfaNamespaceFamilyFriendlyMigrationHandler_3(),
+            new PetFixtureFamilyFriendlyMigrationHandlerInvalidTypeVersionToUpdate_3()), // added this migration handler here -> validation error because multiple migration handlers per type version/type name
+        Collections.emptyList()));
   }
 
   /**
@@ -123,8 +142,8 @@ public class DoStructureMigrationInventoryTest {
   public void testOrdered() {
     assertEquals(
         Arrays.asList(
-            AlfaFixture_1.VERSION, BravoFixture_1.VERSION, CharlieFixture_1.VERSION,
-            AlfaFixture_2.VERSION, BravoFixture_2.VERSION, CharlieFixture_2.VERSION,
+            AlfaFixture_1.VERSION, BravoFixture_1.VERSION, CharlieFixture_1.VERSION, DeltaFixture_1.VERSION,
+            AlfaFixture_2.VERSION, BravoFixture_2.VERSION, CharlieFixture_2.VERSION, DeltaFixture_2.VERSION,
             AlfaFixture_3.VERSION, BravoFixture_3.VERSION, CharlieFixture_3.VERSION,
             CharlieFixture_4.VERSION,
             AlfaFixture_6.VERSION,
@@ -148,7 +167,7 @@ public class DoStructureMigrationInventoryTest {
 
   @Test
   public void testTypeNameToCurrentTypeVersion() {
-    assertEquals(CharlieFixture_2.VERSION, s_inventory.m_typeNameToCurrentTypeVersion.get("charlieFixture.HouseFixture"));
+    assertEquals(CharlieFixture_3.VERSION, s_inventory.m_typeNameToCurrentTypeVersion.get("charlieFixture.HouseFixture"));
     assertEquals(CharlieFixture_5.VERSION, s_inventory.m_typeNameToCurrentTypeVersion.get("charlieFixture.RoomFixture"));
     assertEquals(CharlieFixture_2.VERSION, s_inventory.m_typeNameToCurrentTypeVersion.get("charlieFixture.PostalAddressFixture"));
   }
@@ -201,7 +220,7 @@ public class DoStructureMigrationInventoryTest {
     // invalid, BuildingFixture not available for this type version (next version from full list is returned due to possible renamings)
     assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.BuildingFixture", CharlieFixture_3.VERSION));
 
-    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.HouseFixture", CharlieFixture_2.VERSION)); // current type version
+    assertTrue(s_inventory.isUpToDateOrMigrationAvailable("charlieFixture.HouseFixture", CharlieFixture_3.VERSION)); // current type version
   }
 
   @Test
@@ -241,7 +260,7 @@ public class DoStructureMigrationInventoryTest {
         s_inventory.findNextMigrationHandlerVersion("charlieFixture.BuildingFixture", CharlieFixture_3.VERSION));
 
     assertEquals(ImmutablePair.of(FindNextMigrationHandlerVersionStatus.UP_TO_DATE, null),
-        s_inventory.findNextMigrationHandlerVersion("charlieFixture.HouseFixture", CharlieFixture_2.VERSION)); // current type version
+        s_inventory.findNextMigrationHandlerVersion("charlieFixture.HouseFixture", CharlieFixture_3.VERSION)); // current type version
   }
 
   @Test
@@ -335,5 +354,41 @@ public class DoStructureMigrationInventoryTest {
     migrationHandlers = s_inventory.getMigrationHandlers(CharlieFixture_5.VERSION);
     assertEquals(1, migrationHandlers.size());
     assertTrue(migrationHandlers.get("charlieFixture.RoomFixture") instanceof RoomFixtureDoStructureMigrationHandler_5);
+  }
+
+  /**
+   * Tests sort order of value migration handlers.
+   */
+  @Test
+  public void testValueMigrationHandlersOrdered() {
+    // all value migration handlers, ordered (see initialization of s_inventory)
+    List<IDoValueMigrationHandler<?>> valueMigrationHandlers = s_inventory.getValueMigrationHandlers();
+    assertEquals(3, valueMigrationHandlers.size());
+    assertEquals(RoomTypeFixtureDoValueMigrationHandler_2.ID, valueMigrationHandlers.get(0).id());
+    // HouseTypeFixtureDoValueMigrationHandler_2 after RoomTypeFixtureDoValueMigrationHandler_2 because of registration order (same type version)
+    assertEquals(HouseTypeFixtureDoValueMigrationHandler_2.ID, valueMigrationHandlers.get(1).id());
+    // RoomSizeFixtureDoValueMigrationHandler_2 after HouseTypeFixtureDoValueMigrationHandler_2 because of type version (registration order is overridden)
+    assertEquals(RoomSizeFixtureDoValueMigrationHandler_2.ID, valueMigrationHandlers.get(2).id());
+  }
+
+  /**
+   * Register two value migration handlers with identical ID -> exception expected
+   */
+  @Test
+  public void voidTestDuplicateValueMigrationIds() {
+    PlatformException exception = assertThrows(PlatformException.class, () -> new TestDoStructureMigrationInventory(
+        Arrays.asList(new AlfaFixtureNamespace(), new BravoFixtureNamespace(), new CharlieFixtureNamespace(), new DeltaFixtureNamespace()),
+        Arrays.asList(
+            new AlfaFixture_1(), new AlfaFixture_2(),
+            new BravoFixture_1(), new BravoFixture_2(),
+            new CharlieFixture_1(), new CharlieFixture_2(),
+            new DeltaFixture_1(), new DeltaFixture_2()),
+        Collections.emptyList(),
+        Collections.emptyList(),
+        Arrays.asList(
+            new RoomSizeFixtureDoValueMigrationHandler_2(),
+            new DuplicateIdFixtureDoValueMigrationHandler_1())));
+
+    assertTrue(exception.getMessage().contains(DuplicateIdFixtureDoValueMigrationHandler_1.ID.unwrapAsString()));
   }
 }

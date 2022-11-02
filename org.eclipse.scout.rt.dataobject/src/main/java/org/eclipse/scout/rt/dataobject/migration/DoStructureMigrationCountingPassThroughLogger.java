@@ -15,8 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Thread-safe implementation for a DO structure migration logger that additional counts the log items per log level.
+ * Thread-safe implementation of a data object migration logger that additionally counts the log items per log level.
  */
+// TODO 23.1 [data object migration] rename to DataObjectMigrationCountingPassThroughLogger
 public class DoStructureMigrationCountingPassThroughLogger extends DoStructureMigrationPassThroughLogger {
 
   private static final Logger LOG = LoggerFactory.getLogger(DoStructureMigrationCountingPassThroughLogger.class);
@@ -80,10 +81,10 @@ public class DoStructureMigrationCountingPassThroughLogger extends DoStructureMi
   public void printSummary() {
     long total = m_traceCount.sum() + m_debugCount.sum() + m_infoCount.sum() + m_warnCount.sum() + m_errorCount.sum();
     if (total == 0) {
-      LOG.info("No DO structure migration log entries were made");
+      LOG.info("No data object migration log entries were made");
     }
     else {
-      LOG.info("{} DO structure migration log entries were made: {} trace, {} debug, {} info, {} warn, {} error", total, m_traceCount.sum(), m_debugCount.sum(), m_infoCount.sum(), m_warnCount.sum(), m_errorCount.sum());
+      LOG.info("{} data object migration log entries were made: {} trace, {} debug, {} info, {} warn, {} error", total, m_traceCount.sum(), m_debugCount.sum(), m_infoCount.sum(), m_warnCount.sum(), m_errorCount.sum());
     }
   }
 }

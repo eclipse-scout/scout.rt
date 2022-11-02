@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.platform.Bean;
  * threads, use {@link #copy()} in a new thread.
  */
 @Bean
+// TODO 23.1 [data object migration] rename to DataObjectMigrationContext
 public class DoStructureMigrationContext {
 
   // maybe accessed by different threads
@@ -66,16 +67,16 @@ public class DoStructureMigrationContext {
   }
 
   /**
-   * Clones the context via {@link #copy} and pushes the given initial local context datas to the local context data
-   * map. If no initial local context datas are provided behaves same as {@link #copy}.
+   * Pushes the given initial local context datas to the local context data map. This method must not be called on an
+   * exiting context object, but must be called on a fresh copy (see {@link #copy()} or on a fresh instance of
+   * {@link DoStructureMigrationContext}
    */
-  protected DoStructureMigrationContext initializedCopy(IDoStructureMigrationLocalContextData... initialLocalContextDatas) {
-    DoStructureMigrationContext copy = copy();
+  protected DoStructureMigrationContext withInitialLocalContext(IDoStructureMigrationLocalContextData... initialLocalContextDatas) {
     if (initialLocalContextDatas != null) {
-      // Calling push without a remove is okay here because these provided locale contexts are valid for the whole data object
-      Arrays.stream(initialLocalContextDatas).filter(Objects::nonNull).forEach(copy::push);
+      // Calling push without a remove is okay here because these provided local contexts are valid for the whole data object
+      Arrays.stream(initialLocalContextDatas).filter(Objects::nonNull).forEach(this::push);
     }
-    return copy;
+    return this;
   }
 
   /**

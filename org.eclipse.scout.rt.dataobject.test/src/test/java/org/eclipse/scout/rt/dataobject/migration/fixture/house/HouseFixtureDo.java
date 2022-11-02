@@ -20,19 +20,20 @@ import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
-import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_2;
+import org.eclipse.scout.rt.dataobject.migration.fixture.version.CharlieFixtureTypeVersions.CharlieFixture_3;
 
 /**
  * Change history:
  * <ul>
  * <li>charlieFixture-2: charlieFixture.BuildingFixture -> charlieFixture.HouseFixture, postalAddress and owner
  * attributes were added</li>
+ * <li>charlieFixture-3: no structure change, used for value migration tests</li>
  * </ul>
  *
  * @since charlieFixture-1
  */
 @TypeName("charlieFixture.HouseFixture")
-@TypeVersion(CharlieFixture_2.class)
+@TypeVersion(CharlieFixture_3.class)
 public class HouseFixtureDo extends DoEntity {
 
   public DoValue<String> name() {
@@ -49,6 +50,10 @@ public class HouseFixtureDo extends DoEntity {
 
   public DoList<RoomFixtureDo> rooms() {
     return doList("rooms");
+  }
+
+  public DoValue<HouseTypeFixtureStringId> houseType() {
+    return doValue("houseType");
   }
 
   /* **************************************************************************
@@ -103,5 +108,16 @@ public class HouseFixtureDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public List<RoomFixtureDo> getRooms() {
     return rooms().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public HouseFixtureDo withHouseType(HouseTypeFixtureStringId houseType) {
+    houseType().set(houseType);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public HouseTypeFixtureStringId getHouseType() {
+    return houseType().get();
   }
 }
