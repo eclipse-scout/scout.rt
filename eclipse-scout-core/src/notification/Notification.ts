@@ -15,6 +15,7 @@ import {StatusOrModel} from '../status/Status';
 export default class Notification extends Widget implements NotificationModel {
   declare model: NotificationModel;
   declare eventMap: NotificationEventMap;
+  declare self: Notification;
 
   status: Status;
   closable: boolean;

@@ -16,6 +16,7 @@ import {FileInputChangeEvent} from '../../../filechooser/FileInputEventMap';
 export default class ImageField extends FormField implements ImageFieldModel {
   declare model: ImageFieldModel;
   declare eventMap: ImageFieldEventMap;
+  declare self: ImageField;
 
   autoFit: boolean;
   imageUrl: string;

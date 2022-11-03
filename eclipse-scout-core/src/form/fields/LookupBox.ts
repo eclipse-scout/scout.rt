@@ -15,6 +15,7 @@ import {LookupCallOrRefModel} from '../../lookup/LookupCall';
 export default abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TValue[]> implements LookupBoxModel<TValue> {
   declare model: LookupBoxModel<TValue>;
   declare eventMap: LookupBoxEventMap<TValue>;
+  declare self: LookupBox<any>;
 
   filterBox: Widget;
   lookupCall: LookupCall<TValue>;

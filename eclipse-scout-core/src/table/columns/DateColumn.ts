@@ -13,6 +13,7 @@ import {Column, comparators, DateColumnEventMap, DateColumnModel, DateField, Dat
 export default class DateColumn extends Column<Date> implements DateColumnModel {
   declare model: DateColumnModel;
   declare eventMap: DateColumnEventMap;
+  declare self: DateColumn;
 
   format: DateFormat;
   groupFormat: DateFormat;

@@ -17,6 +17,7 @@ import {OutlineContent} from '../bench/DesktopBench';
 export default class DesktopHeader extends Widget implements DesktopHeaderModel {
   declare model: DesktopHeaderModel;
   declare eventMap: DesktopHeaderEventMap;
+  declare self: DesktopHeader;
 
   desktop: Desktop;
   tabArea: DesktopTabArea;

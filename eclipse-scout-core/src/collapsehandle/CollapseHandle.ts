@@ -15,6 +15,7 @@ export type CollapseHandleHorizontalAlignment = EnumObject<typeof CollapseHandle
 export default class CollapseHandle extends Widget implements CollapseHandleModel {
   declare model: CollapseHandleModel;
   declare eventMap: CollapseHandleEventMap;
+  declare self: CollapseHandle;
 
   leftVisible: boolean;
   rightVisible: boolean;

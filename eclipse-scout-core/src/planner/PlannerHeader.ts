@@ -14,6 +14,7 @@ import {PlannerDisplayMode} from './Planner';
 
 export default class PlannerHeader extends Widget {
   declare eventMap: PlannerHeaderEventMap;
+  declare self: PlannerHeader;
 
   $range: JQuery;
   $commands: JQuery;

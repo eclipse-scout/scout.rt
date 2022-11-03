@@ -13,6 +13,7 @@ import {BasicField, Calculator, DecimalFormat, fields, InputFieldKeyStrokeContex
 export default class NumberField extends BasicField<number, number | string> implements NumberFieldModel {
   declare model: NumberFieldModel;
   declare eventMap: NumberFieldEventMap;
+  declare self: NumberField;
 
   calc: Calculator;
   minValue: number;

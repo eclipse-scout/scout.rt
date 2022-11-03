@@ -26,6 +26,7 @@ import {EventMapOf, EventModel} from '../../../events/EventEmitter';
 export default class Page extends TreeNode implements PageModel {
   declare model: PageModel;
   declare eventMap: PageEventMap;
+  declare self: Page;
   declare parent: Outline;
   declare childNodes: Page[];
   declare parentNode: Page;

@@ -15,6 +15,7 @@ import {SmartFieldLookupResult} from './SmartField';
 export default class ProposalField extends SmartField<string> implements ProposalFieldModel {
   declare model: ProposalFieldModel;
   declare eventMap: ProposalFieldEventMap;
+  declare self: ProposalField;
 
   trimText: boolean;
 

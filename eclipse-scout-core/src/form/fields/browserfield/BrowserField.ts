@@ -19,6 +19,7 @@ export type BrowserFieldWindowStates = EnumObject<typeof BrowserField.WindowStat
 export default class BrowserField extends FormField implements BrowserFieldModel {
   declare model: BrowserFieldModel;
   declare eventMap: BrowserFieldEventMap;
+  declare self: BrowserField;
 
   autoCloseExternalWindow: boolean;
   externalWindowButtonText: string;

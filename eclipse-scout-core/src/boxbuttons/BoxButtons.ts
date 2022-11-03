@@ -17,6 +17,7 @@ import {ObjectFactoryOptions} from '../ObjectFactory';
 export default class BoxButtons extends Widget implements BoxButtonsModel {
   declare model: BoxButtonsModel;
   declare eventMap: BoxButtonsEventMap;
+  declare self: BoxButtons;
 
   buttons: Action[];
   defaultButtonIndex: number;

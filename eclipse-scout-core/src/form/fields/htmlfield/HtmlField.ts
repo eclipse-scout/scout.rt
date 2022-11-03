@@ -14,6 +14,7 @@ import $ from 'jquery';
 export default class HtmlField extends ValueField<string> implements HtmlFieldModel {
   declare model: HtmlFieldModel;
   declare eventMap: HtmlFieldEventMap;
+  declare self: HtmlField;
 
   scrollBarEnabled: boolean;
   selectable: boolean;

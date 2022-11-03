@@ -16,6 +16,7 @@ import {PopupAlignment} from './Popup';
 export default class WidgetPopup<TContent extends Widget = Widget> extends Popup implements WidgetPopupModel<TContent> {
   declare model: WidgetPopupModel<TContent>;
   declare eventMap: WidgetPopupEventMap;
+  declare self: WidgetPopup;
 
   closable: boolean;
   closeAction: Action;

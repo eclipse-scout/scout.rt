@@ -13,6 +13,7 @@ import {LabelFieldEventMap, LabelFieldModel, strings, texts, ValueField} from '.
 export default class LabelField extends ValueField<string> implements LabelFieldModel {
   declare model: LabelFieldModel;
   declare eventMap: LabelFieldEventMap;
+  declare self: LabelField;
 
   htmlEnabled: boolean;
   selectable: boolean;

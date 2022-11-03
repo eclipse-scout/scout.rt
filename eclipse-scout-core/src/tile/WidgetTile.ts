@@ -27,6 +27,7 @@ export interface WidgetTileEventMap extends TileEventMap {
 export default class WidgetTile extends Tile implements WidgetTileModel {
   declare model: WidgetTileModel;
   declare eventMap: WidgetTileEventMap;
+  declare self: WidgetTile;
 
   tileWidget: Widget;
   protected _widgetPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, Widget>>;

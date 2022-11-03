@@ -19,6 +19,7 @@ export type GroupCollapseStyle = EnumObject<typeof Group.CollapseStyle>;
 export default class Group<TBody extends Widget = Widget> extends Widget implements GroupModel<TBody> {
   declare model: GroupModel<TBody>;
   declare eventMap: GroupEventMap;
+  declare self: Group;
 
   bodyAnimating: boolean;
   collapsed: boolean;

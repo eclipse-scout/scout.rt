@@ -15,6 +15,7 @@ import {PlannerDisplayMode} from '../planner/Planner';
 export default class YearPanel extends Widget implements YearPanelModel {
   declare model: YearPanelModel;
   declare eventMap: YearPanelEventMap;
+  declare self: YearPanel;
 
   $yearTitle: JQuery;
   $yearList: JQuery;

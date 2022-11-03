@@ -13,6 +13,7 @@ import {DesktopNotification, PopupBlockerDesktopNotificationEventMap, PopupBlock
 export default class PopupBlockerDesktopNotification extends DesktopNotification implements PopupBlockerDesktopNotificationModel {
   declare model: PopupBlockerDesktopNotificationModel;
   declare eventMap: PopupBlockerDesktopNotificationEventMap;
+  declare self: PopupBlockerDesktopNotification;
 
   preserveOpener: boolean;
   linkUrl: string;

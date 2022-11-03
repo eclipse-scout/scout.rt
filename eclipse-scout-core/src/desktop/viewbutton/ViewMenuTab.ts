@@ -20,6 +20,7 @@ import {
 export default class ViewMenuTab extends Widget implements ViewMenuTabModel {
   declare model: ViewMenuTabModel;
   declare eventMap: ViewMenuTabEventMap;
+  declare self: ViewMenuTab;
 
   selected: boolean;
   selectedButtonVisible: boolean;

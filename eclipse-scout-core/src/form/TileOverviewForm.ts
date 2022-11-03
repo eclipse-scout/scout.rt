@@ -14,6 +14,7 @@ import {Desktop, EventHandler, Form, HtmlComponent, Outline, Page, PageTileGrid,
 export default class TileOverviewForm extends Form implements TileOverviewFormModel {
   declare model: TileOverviewFormModel;
   declare eventMap: TileOverviewFormEventMap;
+  declare self: TileOverviewForm;
 
   outline: Outline;
   nodes: Page[];

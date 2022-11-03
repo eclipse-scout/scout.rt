@@ -15,6 +15,7 @@ import {TableAllRowsDeletedEvent, TableRowsCheckedEvent, TableRowsDeletedEvent, 
 export default class TableField extends FormField implements TableFieldModel {
   declare model: TableFieldModel;
   declare eventMap: TableFieldEventMap;
+  declare self: TableField;
 
   table: Table;
   eventDelegator: EventDelegator;

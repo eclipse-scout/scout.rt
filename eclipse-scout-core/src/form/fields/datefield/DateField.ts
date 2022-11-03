@@ -23,6 +23,7 @@ import {AddCellEditorFieldCssClassesOptions} from '../FormField';
 export default class DateField extends ValueField<Date, Date | string> implements DateFieldModel, ValueFieldWithCellEditorRenderedCallback<Date, Date | string> {
   declare model: DateFieldModel;
   declare eventMap: DateFieldEventMap;
+  declare self: DateField;
 
   popup: Popup & { getDatePicker?(): DatePicker; getTimePicker?(): TimePicker };
   autoDate: Date;

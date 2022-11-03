@@ -14,6 +14,7 @@ import {FileInputChangeEvent} from '../../../filechooser/FileInputEventMap';
 export default class FileChooserField extends ValueField<File> implements FileChooserFieldModel {
   declare model: FileChooserFieldModel;
   declare eventMap: FileChooserFieldEventMap;
+  declare self: FileChooserField;
 
   fileInput: FileInput;
   acceptTypes: string;

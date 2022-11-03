@@ -19,6 +19,7 @@ import IconEventMap from './IconEventMap';
 export default class Icon extends Widget implements IconModel {
   declare model: IconModel;
   declare eventMap: IconEventMap;
+  declare self: Icon;
 
   autoFit: boolean;
   iconDesc: IconDesc;

@@ -13,6 +13,7 @@ import {Desktop, Event, EventHandler, HtmlComponent, OutlineViewButton, Property
 export default class ViewButtonBox extends Widget implements ViewButtonBoxModel {
   declare model: ViewButtonBoxModel;
   declare eventMap: ViewButtonBoxEventMap;
+  declare self: ViewButtonBox;
 
   desktop: Desktop;
   viewMenuTab: ViewMenuTab;

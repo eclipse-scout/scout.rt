@@ -32,6 +32,7 @@ const TILE_SELECTOR = '> .tile';
 export default class TileGrid extends Widget implements TileGridModel {
   declare model: TileGridModel;
   declare eventMap: TileGridEventMap;
+  declare self: TileGrid;
   declare logicalGrid: AbstractGrid;
 
   animateTileRemoval: boolean;

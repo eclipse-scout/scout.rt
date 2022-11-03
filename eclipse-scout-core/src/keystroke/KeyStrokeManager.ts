@@ -15,6 +15,7 @@ import KeyboardEventBase = JQuery.KeyboardEventBase;
 export default class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerModel {
   declare model: KeyStrokeManagerModel;
   declare eventMap: KeyStrokeManagerEventMap;
+  declare self: KeyStrokeManager;
 
   session: Session;
   helpKeyStroke: KeyStrokeModel;

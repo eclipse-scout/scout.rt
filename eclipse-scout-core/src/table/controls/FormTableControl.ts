@@ -14,6 +14,7 @@ import AbstractLayout from '../../layout/AbstractLayout';
 export default class FormTableControl extends TableControl implements FormTableControlModel {
   declare model: FormTableControlModel;
   declare eventMap: FormTableControlEventMap;
+  declare self: FormTableControl;
 
   form: Form;
   protected _formDestroyedHandler: EventHandler<Event<Form>>;

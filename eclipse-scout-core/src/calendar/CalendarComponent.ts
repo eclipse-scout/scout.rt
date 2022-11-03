@@ -51,6 +51,7 @@ export type CalendarItem = {
 export default class CalendarComponent extends Widget implements CalendarComponentModel {
   declare model: CalendarComponentModel;
   declare eventMap: CalendarComponentEventMap;
+  declare self: CalendarComponent;
   declare parent: Calendar;
 
   fromDate: string;

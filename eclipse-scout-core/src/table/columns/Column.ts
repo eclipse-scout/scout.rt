@@ -22,6 +22,7 @@ import {TableColumnMovedEvent} from '../TableEventMap';
 export default class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue> {
   declare model: ColumnModel<TValue>;
   declare eventMap: ColumnEventMap;
+  declare self: Column<any>;
 
   objectType: ObjectType<Column<TValue>>;
   id: string;

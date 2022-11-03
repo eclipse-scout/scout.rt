@@ -18,6 +18,7 @@ import {StatusOrModel} from '../../../status/Status';
 export default abstract class ProposalChooser<TValue, TContent extends ProposalChooserContent, TContentRow extends ProposalChooserContentRow<TValue>> extends Widget implements ProposalChooserModel<TValue> {
   declare model: ProposalChooserModel<TValue>;
   declare eventMap: ProposalChooserEventMap<TValue, TContent, TContentRow>;
+  declare self: ProposalChooser<any, any, any>;
   declare parent: SmartFieldPopup<TValue>;
 
   smartField: SmartField<TValue>;

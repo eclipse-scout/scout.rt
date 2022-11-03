@@ -13,6 +13,7 @@ import {scout, TableHeaderMenuGroupEventMap, TableHeaderMenuGroupModel, Widget, 
 export default class TableHeaderMenuGroup extends Widget implements TableHeaderMenuGroupModel {
   declare model: TableHeaderMenuGroupModel;
   declare eventMap: TableHeaderMenuGroupEventMap;
+  declare self: TableHeaderMenuGroup;
 
   text: string;
   textKey: string;

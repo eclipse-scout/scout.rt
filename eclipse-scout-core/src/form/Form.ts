@@ -24,11 +24,12 @@ export type DisplayHint = EnumObject<typeof Form.DisplayHint>;
 export default class Form extends Widget implements FormModel, DisplayParent {
   declare model: FormModel;
   declare eventMap: FormEventMap;
+  declare self: Form;
 
   animateOpening: boolean;
   askIfNeedSave: boolean;
   askIfNeedSaveText: string;
-  data: object;
+  data: any;
   displayViewId: DisplayViewId;
   displayHint: DisplayHint;
   maximized: boolean;
@@ -378,7 +379,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     return $.resolvedPromise();
   }
 
-  setData(data: object) {
+  setData(data: any) {
     this.setProperty('data', data);
   }
 
@@ -386,7 +387,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     // NOP
   }
 
-  exportData(): object {
+  exportData(): any {
     return null;
   }
 

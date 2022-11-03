@@ -18,6 +18,7 @@ import {OutlineContent} from './DesktopBench';
 export default class BenchColumn extends Widget implements BenchColumnModel {
   declare model: BenchColumnModel;
   declare eventMap: BenchColumnEventMap;
+  declare self: BenchColumn;
 
   tabBoxes: SimpleTabBox<OutlineContent>[];
   layoutData: BenchRowLayoutData;

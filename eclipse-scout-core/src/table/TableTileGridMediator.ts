@@ -24,6 +24,7 @@ import TileModel from '../tile/TileModel';
 export default class TableTileGridMediator extends Widget implements TableTileGridMediatorModel {
   declare model: TableTileGridMediatorModel;
   declare eventMap: TableTileGridMediatorEventMap;
+  declare self: TableTileGridMediator;
   declare parent: Table;
 
   table: Table;

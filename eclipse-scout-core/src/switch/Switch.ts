@@ -13,6 +13,7 @@ import {strings, SwitchEventMap, SwitchModel, tooltips, Widget} from '../index';
 export default class Switch extends Widget implements SwitchModel {
   declare model: SwitchModel;
   declare eventMap: SwitchEventMap;
+  declare self: Switch;
 
   activated: boolean;
   label: string;

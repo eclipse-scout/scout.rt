@@ -13,6 +13,7 @@ import {FormField, RefModel, Widget, WidgetFieldEventMap, WidgetFieldLayout, Wid
 export default class WidgetField extends FormField implements WidgetFieldModel {
   declare model: WidgetFieldModel;
   declare eventMap: WidgetFieldEventMap;
+  declare self: WidgetField;
 
   scrollable: boolean;
   fieldWidget: Widget;

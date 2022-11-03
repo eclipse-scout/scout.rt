@@ -19,6 +19,7 @@ export type DatePickerMonth = { viewDate: Date; rendered: boolean; $container: J
 export default class DatePicker extends Widget implements DatePickerModel {
   declare model: DatePickerModel;
   declare eventMap: DatePickerEventMap;
+  declare self: DatePicker;
 
   preselectedDate: Date;
   selectedDate: Date;

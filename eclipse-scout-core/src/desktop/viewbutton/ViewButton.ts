@@ -14,6 +14,7 @@ import {ViewButtonDisplayStyle} from './ViewButtonModel';
 export default class ViewButton extends Action implements ViewButtonModel {
   declare model: ViewButtonModel;
   declare eventMap: ViewButtonEventMap;
+  declare self: ViewButton;
 
   displayStyle: ViewButtonDisplayStyle;
   selectedAsMenu: boolean;

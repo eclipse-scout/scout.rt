@@ -19,6 +19,7 @@ export type TileDisplayStyle = EnumObject<typeof Tile.DisplayStyle>;
 export default class Tile extends Widget implements TileModel {
   declare model: TileModel;
   declare eventMap: TileEventMap;
+  declare self: Tile;
 
   colorScheme: ColorScheme;
   displayStyle: TileDisplayStyle;

@@ -20,6 +20,7 @@ import {StatusOrModel} from '../../../status/Status';
 export default class SmartFieldTouchPopup<TValue> extends TouchPopup implements SmartFieldTouchPopupModel<TValue> {
   declare model: SmartFieldTouchPopupModel<TValue>;
   declare eventMap: SmartFieldTouchPopupEventMap<TValue>;
+  declare self: SmartFieldTouchPopup<any>;
   declare _field: SmartField<TValue>;
   declare protected _widget: ProposalChooser<TValue, any, any>;
 

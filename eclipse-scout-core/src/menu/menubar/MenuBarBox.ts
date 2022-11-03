@@ -14,6 +14,7 @@ import {TooltipPosition} from '../../tooltip/Tooltip';
 export default class MenuBarBox extends Widget implements MenuBarBoxModel {
   declare model: MenuBarBoxModel;
   declare eventMap: MenuBarBoxEventMap;
+  declare self: MenuBarBox;
 
   menuItems: Menu[];
   tooltipPosition: TooltipPosition;

@@ -85,6 +85,7 @@ export default class App extends EventEmitter {
 
   declare model: AppOptions;
   declare eventMap: AppEventMap;
+  declare self: App;
 
   remote: boolean;
   initialized: boolean;

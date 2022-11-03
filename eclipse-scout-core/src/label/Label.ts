@@ -14,6 +14,7 @@ import $ from 'jquery';
 export default class Label extends Widget implements LabelModel {
   declare model: LabelModel;
   declare eventMap: LabelEventMap;
+  declare self: Label;
 
   value: string;
   htmlEnabled: boolean;

@@ -23,6 +23,7 @@ export interface CompositeTileEventMap extends TileEventMap {
 export default class CompositeTile extends Tile implements CompositeTileModel {
   declare model: CompositeTileModel;
   declare eventMap: CompositeTileEventMap;
+  declare self: CompositeTile;
 
   widgets: Widget[];
 

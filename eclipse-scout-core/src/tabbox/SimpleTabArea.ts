@@ -16,6 +16,7 @@ export type SimpleTabAreaDisplayStyle = EnumObject<typeof SimpleTabArea.DisplayS
 export default class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabAreaModel<TView> {
   declare model: SimpleTabAreaModel<TView>;
   declare eventMap: SimpleTabAreaEventMap<TView>;
+  declare self: SimpleTabArea<any>;
 
   static DisplayStyle = {
     DEFAULT: 'default',

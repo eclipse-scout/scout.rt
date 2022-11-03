@@ -19,6 +19,7 @@ import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
 export default class TagField extends ValueField<string[]> implements TagFieldModel {
   declare model: TagFieldModel;
   declare eventMap: TagFieldEventMap;
+  declare self: TagField;
 
   lookupCall: LookupCall<string>;
   maxLength: number;

@@ -180,18 +180,18 @@ export function contains<T>(haystack: T[], needle: T): boolean {
   return haystack.indexOf(needle) !== -1;
 }
 
-export function containsAny<T>(haystack: T[], needles: T[]): boolean {
-  haystack = ensure(haystack);
-  needles = ensure(needles);
-  return needles.some(element => {
-    return haystack.indexOf(element) >= 0;
+export function containsAny<T>(haystack: T[] | T, needles: T[] | T): boolean {
+  let haystackArr = ensure(haystack);
+  let needlesArr = ensure(needles);
+  return needlesArr.some(element => {
+    return haystackArr.indexOf(element) >= 0;
   });
 }
 
-export function containsAll<T>(haystack: T[], needles: T[]): boolean {
-  haystack = ensure(haystack);
-  needles = ensure(needles);
-  return needles.every(element => haystack.indexOf(element) >= 0);
+export function containsAll<T>(haystack: T[] | T, needles: T[] | T): boolean {
+  let haystackArr = ensure(haystack);
+  let needlesArr = ensure(needles);
+  return needlesArr.every(element => haystackArr.indexOf(element) >= 0);
 }
 
 export function first<T>(arr: T[]): T {

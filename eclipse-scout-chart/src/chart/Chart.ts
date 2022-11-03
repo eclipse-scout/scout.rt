@@ -17,6 +17,7 @@ import {ChartConfiguration, LinearScaleOptions, RadialLinearScaleOptions} from '
 export default class Chart extends Widget implements ChartModel {
   declare model: ChartModel;
   declare eventMap: ChartEventMap;
+  declare self: Chart;
 
   data: ChartData;
   config: ChartConfig;

@@ -22,6 +22,7 @@ export type ActionTextPosition = EnumObject<typeof Action.TextPosition>;
 export default class Action extends Widget implements ActionModel {
   declare model: ActionModel;
   declare eventMap: ActionEventMap;
+  declare self: Action;
 
   actionStyle: ActionStyle;
   compact: boolean;

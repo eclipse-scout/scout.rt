@@ -27,6 +27,7 @@ import {Optional} from '../../../types';
 export default class GroupBox extends CompositeField implements GroupBoxModel {
   declare model: GroupBoxModel;
   declare eventMap: GroupBoxEventMap;
+  declare self: GroupBox;
 
   fields: FormField[];
   menuBarVisible: boolean;

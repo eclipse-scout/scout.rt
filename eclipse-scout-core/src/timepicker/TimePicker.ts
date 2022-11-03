@@ -17,6 +17,7 @@ import TimePickerEventMap from './TimePickerEventMap';
 export default class TimePicker extends Widget {
   declare model: TimePickerModel;
   declare eventMap: TimePickerEventMap;
+  declare self: TimePicker;
 
   preselectedTime: Date;
   selectedTime: Date;

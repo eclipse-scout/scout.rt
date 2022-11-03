@@ -13,6 +13,7 @@ import {Button, Device, fields, LookupRow, RadioButtonEventMap, RadioButtonKeySt
 export default class RadioButton<TValue> extends Button implements RadioButtonModel<TValue> {
   declare model: RadioButtonModel<TValue>;
   declare eventMap: RadioButtonEventMap<TValue>;
+  declare self: RadioButton<any>;
 
   focusWhenSelected: boolean;
   wrapText: boolean;

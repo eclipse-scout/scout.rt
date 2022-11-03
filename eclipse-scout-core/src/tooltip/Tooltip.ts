@@ -20,6 +20,7 @@ export type TooltipScrollType = 'position' | 'remove';
 export default class Tooltip extends Widget implements TooltipModel {
   declare model: TooltipModel;
   declare eventMap: TooltipEventMap;
+  declare self: Tooltip;
 
   text: string;
   severity: StatusSeverity;

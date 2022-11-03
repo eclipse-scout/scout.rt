@@ -17,6 +17,7 @@ import {CollapseHandleActionEvent} from '../../collapsehandle/CollapseHandleEven
 export default class DesktopNavigation extends Widget implements DesktopNavigationModel {
   declare model: DesktopNavigationModel;
   declare eventMap: DesktopNavigationEventMap;
+  declare self: DesktopNavigation;
   declare parent: Desktop;
   declare htmlComp: HtmlComponent & { layoutData: DesktopNavigationLayoutData };
 

@@ -25,6 +25,7 @@ import {ObjectType} from '../ObjectFactory';
 export default class ModelAdapter extends EventEmitter implements ModelAdapterModel, ModelAdapterLike {
   declare model: ModelAdapterModel;
   declare eventMap: ModelAdapterEventMap;
+  declare self: ModelAdapter;
   id: string;
   objectType: string;
   initialized: boolean;

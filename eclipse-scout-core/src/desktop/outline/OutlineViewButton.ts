@@ -13,6 +13,7 @@ import {Outline, OutlineViewButtonEventMap, OutlineViewButtonModel, ViewButton} 
 export default class OutlineViewButton extends ViewButton implements OutlineViewButtonModel {
   declare model: OutlineViewButtonModel;
   declare eventMap: OutlineViewButtonEventMap;
+  declare self: OutlineViewButton;
 
   outline: Outline;
 

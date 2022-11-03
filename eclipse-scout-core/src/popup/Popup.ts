@@ -21,6 +21,7 @@ export type PopupAlignment = EnumObject<typeof Popup.Alignment>;
 export default class Popup extends Widget implements PopupModel {
   declare model: PopupModel;
   declare eventMap: PopupEventMap;
+  declare self: Popup;
 
   anchorBounds: Rectangle;
   animateOpening: boolean;

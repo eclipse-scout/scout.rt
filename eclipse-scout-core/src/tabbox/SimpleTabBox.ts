@@ -14,6 +14,7 @@ import {SimpleTabView} from './SimpleTab';
 export default class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabBoxModel<TView> {
   declare model: SimpleTabBoxModel<TView>;
   declare eventMap: SimpleTabBoxEventMap<TView>;
+  declare self: SimpleTabBox<any>;
 
   tabArea: SimpleTabArea<TView>;
   viewStack: TView[];

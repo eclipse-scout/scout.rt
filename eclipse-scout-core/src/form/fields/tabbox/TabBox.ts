@@ -20,6 +20,7 @@ import Tab from './Tab';
 export default class TabBox extends CompositeField implements TabBoxModel {
   declare model: TabBoxModel;
   declare eventMap: TabBoxEventMap;
+  declare self: TabBox;
 
   selectedTab: TabItem;
   header: TabBoxHeader;

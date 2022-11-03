@@ -13,6 +13,7 @@ import {CompositeEventMap, CompositeModel, HtmlComponent, RefModel, Widget, Widg
 export default class Composite extends Widget implements CompositeModel {
   declare model: CompositeModel;
   declare eventMap: CompositeEventMap;
+  declare self: Composite;
   widgets: Widget[];
 
   constructor() {

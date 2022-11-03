@@ -25,11 +25,12 @@ export interface BeanTileEventMap extends TileEventMap {
   'appLinkAction': BeanTileAppLinkActionEvent;
 }
 
-export default class BeanTile extends Tile implements BeanTileModel {
+export default class BeanTile<TBean extends object = object> extends Tile implements BeanTileModel {
   declare model: BeanTileModel;
   declare eventMap: BeanTileEventMap;
+  declare self: BeanTile;
 
-  bean: object;
+  bean: TBean;
 
   constructor() {
     super();

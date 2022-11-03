@@ -28,6 +28,7 @@ import {OutlineContent} from './bench/DesktopBench';
 export default class Desktop extends Widget implements DesktopModel, DisplayParent {
   declare model: DesktopModel;
   declare eventMap: DesktopEventMap;
+  declare self: Desktop;
 
   displayStyle: DesktopDisplayStyle;
   title: string;

@@ -15,6 +15,7 @@ import {Optional} from '../../../types';
 export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
   declare model: FormFieldMenuModel;
   declare eventMap: FormFieldMenuEventMap;
+  declare self: FormFieldMenu;
 
   field: FormField;
 

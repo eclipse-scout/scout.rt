@@ -14,6 +14,7 @@ import {BreadcrumbBar, BreadcrumbBarFieldEventMap, BreadcrumbBarFieldModel, Brea
 export default class BreadcrumbBarField extends FormField implements BreadcrumbBarFieldModel {
   declare model: BreadcrumbBarFieldModel;
   declare eventMap: BreadcrumbBarFieldEventMap;
+  declare self: BreadcrumbBarField;
 
   breadcrumbBar: BreadcrumbBar;
 

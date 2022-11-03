@@ -22,6 +22,7 @@ import {JsonDateRange} from '../util/dates';
 export default class Planner extends Widget implements PlannerModel {
   declare model: PlannerModel;
   declare eventMap: PlannerEventMap;
+  declare self: Planner;
 
   activityMap: Record<string, PlannerActivity>;
   activitySelectable: boolean;

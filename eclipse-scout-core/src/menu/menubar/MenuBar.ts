@@ -22,6 +22,7 @@ export type MenuBarPosition = EnumObject<typeof MenuBar.Position>;
 export default class MenuBar extends Widget implements MenuBarModel {
   declare model: MenuBarModel;
   declare eventMap: MenuBarEventMap;
+  declare self: MenuBar;
 
   menuSorter: MenuOrder & { menuBar?: MenuBar };
   menuFilter: MenuFilter;

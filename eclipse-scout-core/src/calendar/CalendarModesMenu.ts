@@ -14,6 +14,7 @@ import {CalendarDisplayMode} from './Calendar';
 export default class CalendarModesMenu extends Menu implements CalendarModesMenuModel {
   declare model: CalendarModesMenuModel;
   declare eventMap: CalendarModesMenuEventMap;
+  declare self: CalendarModesMenu;
   declare parent: Calendar;
   declare childActions: CalendarModeMenu[];
 

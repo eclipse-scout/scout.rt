@@ -17,6 +17,7 @@ import {OldWheelEvent} from '../../../types';
 export default class StringField extends BasicField<string> {
   declare model: StringFieldModel;
   declare eventMap: StringFieldEventMap;
+  declare self: StringField;
   declare keyStrokeContext: InputFieldKeyStrokeContext;
   declare $field: JQuery | JQuery<HTMLInputElement>;
 

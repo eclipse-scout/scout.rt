@@ -13,6 +13,7 @@ import PropertyEventMap from './PropertyEventMap';
 
 export default class PropertyEventEmitter extends EventEmitter {
   declare eventMap: PropertyEventMap;
+  declare self: PropertyEventEmitter;
 
   constructor() {
     super();

@@ -15,6 +15,7 @@ import {StatusOrModel} from '../../status/Status';
 export default class FieldStatus extends Widget implements FieldStatusModel {
   declare model: FieldStatusModel;
   declare eventMap: FieldStatusEventMap;
+  declare self: FieldStatus;
 
   autoRemove: boolean;
   status: Status;

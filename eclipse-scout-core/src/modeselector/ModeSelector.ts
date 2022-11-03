@@ -15,6 +15,7 @@ import {ModelOf} from '../scout';
 export default class ModeSelector<TModeRef = any> extends Widget implements ModeSelectorModel<TModeRef> {
   declare model: ModeSelectorModel<TModeRef>;
   declare eventMap: ModeSelectorEventMap<TModeRef>;
+  declare self: ModeSelector;
 
   modes: Mode<TModeRef>[];
   selectedMode: Mode<TModeRef>;

@@ -16,6 +16,7 @@ import {StatusOrModel} from '../../../status/Status';
 export default class SmartFieldPopup<TValue> extends Popup implements SmartFieldPopupModel<TValue> {
   declare model: SmartFieldPopupModel<TValue>;
   declare eventMap: SmartFieldPopupEventMap<TValue>;
+  declare self: SmartFieldPopup<any>;
 
   field: SmartField<TValue>;
   lookupResult: SmartFieldLookupResult<TValue>;

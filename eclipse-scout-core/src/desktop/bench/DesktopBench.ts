@@ -23,6 +23,7 @@ import {OutlinePageChangedEvent} from '../outline/OutlineEventMap';
 export default class DesktopBench extends Widget implements DesktopBenchModel {
   declare model: DesktopBenchModel;
   declare eventMap: DesktopBenchEventMap;
+  declare self: DesktopBench;
 
   desktop: Desktop;
   outline: Outline;

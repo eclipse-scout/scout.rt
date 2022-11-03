@@ -18,6 +18,7 @@ import {CollapseHandleHorizontalAlignment} from '../../../collapsehandle/Collaps
 export default class SplitBox extends CompositeField {
   declare model: SplitBoxModel;
   declare eventMap: SplitBoxEventMap;
+  declare self: SplitBox;
 
   firstField: FormField;
   secondField: FormField;

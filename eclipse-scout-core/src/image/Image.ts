@@ -15,6 +15,7 @@ import ImageEventMap from './ImageEventMap';
 export default class Image extends Widget implements ImageModel {
   declare model: ImageModel;
   declare eventMap: ImageEventMap;
+  declare self: Image;
 
   autoFit: boolean;
   imageUrl: string;

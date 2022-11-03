@@ -13,6 +13,7 @@ import {Event, EventHandler, Form, FormField, FormModel, GroupBox, RefModel, Wra
 export default class WrappedFormField extends FormField implements WrappedFormFieldModel {
   declare model: WrappedFormFieldModel;
   declare eventMap: WrappedFormFieldEventMap;
+  declare self: WrappedFormField;
 
   innerForm: Form;
   initialFocusEnabled: boolean;

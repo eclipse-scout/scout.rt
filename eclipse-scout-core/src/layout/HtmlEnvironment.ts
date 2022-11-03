@@ -16,6 +16,7 @@ let instance;
  */
 export default class HtmlEnvironment extends EventEmitter {
   declare eventMap: HtmlEnvironmentEventMap;
+  declare self: HtmlEnvironment;
 
   formRowHeight: number;
 

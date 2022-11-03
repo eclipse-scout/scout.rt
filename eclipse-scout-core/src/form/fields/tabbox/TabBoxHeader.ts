@@ -23,6 +23,7 @@ export interface TabBoxHeaderEventMap extends WidgetEventMap {
 export default class TabBoxHeader extends Widget implements TabBoxHeaderModel {
   declare model: TabBoxHeaderModel;
   declare eventMap: TabBoxHeaderEventMap;
+  declare self: TabBoxHeader;
 
   tabBox: TabBox;
   tabArea: TabArea;

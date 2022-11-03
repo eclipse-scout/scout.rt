@@ -13,6 +13,7 @@ import {EllipsisMenuEventMap, EllipsisMenuModel, icons, Menu, Widget} from '../i
 export default class EllipsisMenu extends Menu implements EllipsisMenuModel {
   declare model: EllipsisMenuModel;
   declare eventMap: EllipsisMenuEventMap;
+  declare self: EllipsisMenu;
 
   hidden: boolean;
 

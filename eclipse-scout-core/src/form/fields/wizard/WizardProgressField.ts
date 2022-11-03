@@ -14,6 +14,7 @@ import $ from 'jquery';
 export default class WizardProgressField extends FormField implements WizardProgressFieldModel {
   declare model: WizardProgressFieldModel;
   declare eventMap: WizardProgressFieldEventMap;
+  declare self: WizardProgressField;
 
   activeStepIndex: number;
   steps: WizardStep[];

@@ -17,6 +17,7 @@ export type TabAreaStyle = EnumObject<typeof TabArea.DisplayStyle>;
 export default class TabArea extends Widget implements TabAreaModel {
   declare model: TabAreaModel;
   declare eventMap: TabAreaEventMap;
+  declare self: TabArea;
 
   tabBox: TabBox;
   tabs: Tab[];

@@ -20,6 +20,7 @@ export interface BusyIndicatorModel extends WidgetModel {
 export default class BusyIndicator extends Widget implements BusyIndicatorModel {
   declare model: BusyIndicatorModel;
   declare eventMap: BusyIndicatorEventMap;
+  declare self: BusyIndicator;
 
   cancellable: boolean;
   showTimeout: number;

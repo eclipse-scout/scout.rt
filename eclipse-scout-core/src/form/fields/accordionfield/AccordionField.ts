@@ -13,6 +13,7 @@ import {Accordion, AccordionFieldEventMap, AccordionFieldModel, AccordionModel, 
 export default class AccordionField extends FormField implements AccordionFieldModel {
   declare model: AccordionFieldModel;
   declare eventMap: AccordionFieldEventMap;
+  declare self: AccordionField;
 
   accordion: Accordion;
   eventDelegator: EventDelegator;

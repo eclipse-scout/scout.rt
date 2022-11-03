@@ -18,6 +18,7 @@ import {TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, T
 export default class TableHeader extends Widget implements TableHeaderModel {
   declare model: TableHeaderModel;
   declare eventMap: TableHeaderEventMap;
+  declare self: TableHeader;
 
   headerMenusEnabled: boolean;
   table: Table;

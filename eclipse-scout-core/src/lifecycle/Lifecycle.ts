@@ -19,9 +19,10 @@ import LifecycleEventMap from './LifecycleEventMap';
  * - invalidElementsTextKey
  * - saveChangesQuestionTextKey
  */
-export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter implements LifecycleModel {
+export default abstract class Lifecycle<TValidationResult> extends EventEmitter implements LifecycleModel {
   declare model: LifecycleModel;
-  declare eventMap: LifecycleEventMap<VALIDATION_RESULT>;
+  declare eventMap: LifecycleEventMap<TValidationResult>;
+  declare self: Lifecycle<any>;
 
   widget: Widget;
   validationFailedTextKey: string;
@@ -283,7 +284,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
     return status;
   }
 
-  protected _revealInvalidElement(invalidElement: VALIDATION_RESULT) {
+  protected _revealInvalidElement(invalidElement: TValidationResult) {
     // NOP
   }
 
@@ -300,7 +301,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
   /**
    * Override this function to check for invalid elements on the parent which prevent saving of the parent (e.g. check if all mandatory elements contain a value).
    */
-  protected invalidElements(): { missingElements: VALIDATION_RESULT[]; invalidElements: VALIDATION_RESULT[] } {
+  protected invalidElements(): { missingElements: TValidationResult[]; invalidElements: TValidationResult[] } {
     return {
       missingElements: [],
       invalidElements: []
@@ -310,7 +311,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
   /**
    * Creates an HTML message used to display missing and invalid fields in a message box.
    */
-  protected _createInvalidElementsMessageHtml(missing: VALIDATION_RESULT[], invalid: VALIDATION_RESULT[]): string {
+  protected _createInvalidElementsMessageHtml(missing: TValidationResult[], invalid: TValidationResult[]): string {
     let $div = $('<div>'),
       hasMissing = missing.length > 0,
       hasInvalid = invalid.length > 0;
@@ -327,7 +328,7 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
 
     // ----- Helper function -----
 
-    function appendTitleAndList($div: JQuery, title: string, elements: VALIDATION_RESULT[], elementTextFunc: (element: VALIDATION_RESULT) => string) {
+    function appendTitleAndList($div: JQuery, title: string, elements: TValidationResult[], elementTextFunc: (element: TValidationResult) => string) {
       $div.appendDiv().text(title);
       let $ul = $div.appendElement('<ul>');
       elements.forEach(element => {
@@ -339,14 +340,14 @@ export default abstract class Lifecycle<VALIDATION_RESULT> extends EventEmitter 
   /**
    * Override this function to retrieve the text of an invalid element
    */
-  protected _invalidElementText(element: VALIDATION_RESULT): string {
+  protected _invalidElementText(element: TValidationResult): string {
     return '';
   }
 
   /**
    * Override this function to retrieve the text of a missing mandatory element
    */
-  protected _missingElementText(element: VALIDATION_RESULT): string {
+  protected _missingElementText(element: TValidationResult): string {
     return '';
   }
 

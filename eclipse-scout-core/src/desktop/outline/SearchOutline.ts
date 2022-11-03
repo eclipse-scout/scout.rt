@@ -14,6 +14,7 @@ import $ from 'jquery';
 export default class SearchOutline extends Outline implements SearchOutlineModel {
   declare model: SearchOutlineModel;
   declare eventMap: SearchOutlineEventMap;
+  declare self: SearchOutline;
 
   hasText: boolean;
   searchQuery: string;

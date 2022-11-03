@@ -22,6 +22,7 @@ import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
 export default class RadioButtonGroup<TValue> extends ValueField<TValue> implements RadioButtonGroupModel<TValue> {
   declare model: RadioButtonGroupModel<TValue>;
   declare eventMap: RadioButtonGroupEventMap<TValue>;
+  declare self: RadioButtonGroup<any>;
 
   layoutConfig: LogicalGridLayoutConfig;
   fields: FormField[];

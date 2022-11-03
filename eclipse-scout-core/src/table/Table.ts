@@ -30,6 +30,7 @@ import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
 export default class Table extends Widget implements TableModel {
   declare model: TableModel;
   declare eventMap: TableEventMap;
+  declare self: Table;
 
   autoResizeColumns: boolean;
   columnAddable: boolean;

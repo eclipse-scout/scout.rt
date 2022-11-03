@@ -11,7 +11,7 @@
 
 // noinspection JSUnusedLocalSymbols
 
-import {Image, PropertyChangeEvent, scout} from '../src';
+import {Image, PropertyChangeEvent, scout, SmartField, StringField} from '../src';
 import $ from 'jquery';
 
 function createTyped() {
@@ -124,6 +124,20 @@ function events() {
     let bool: boolean = event.newValue;
     console.log(bool);
     console.log(event.source.autoFit);
+  });
+
+  // Without generic
+  scout.create(StringField).on('propertyChange:value', event => {
+    let value: string = event.newValue;
+    console.log(value);
+    console.log(event.source.value);
+  });
+
+  // With generic
+  scout.create(SmartField<string>).on('propertyChange:value', event => {
+    let value: string = event.newValue;
+    console.log(value);
+    console.log(event.source.value);
   });
 
   // Native

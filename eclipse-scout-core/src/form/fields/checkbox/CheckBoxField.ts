@@ -14,6 +14,7 @@ import {AddCellEditorFieldCssClassesOptions} from '../FormField';
 export default class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldModel {
   declare model: CheckBoxFieldModel;
   declare eventMap: CheckBoxFieldEventMap;
+  declare self: CheckBoxField;
 
   triStateEnabled: boolean;
   wrapText: boolean;

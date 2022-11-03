@@ -22,6 +22,7 @@ export type NumberColumnBackgroundEffectFunc = (value: number) => NumberColumnBa
 export default class NumberColumn extends Column<number> implements NumberColumnModel {
   declare model: NumberColumnModel;
   declare eventMap: NumberColumnEventMap;
+  declare self: NumberColumn;
 
   aggregationFunction: NumberColumnAggregationFunction;
   backgroundEffect: NumberColumnBackgroundEffect;

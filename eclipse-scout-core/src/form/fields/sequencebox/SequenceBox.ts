@@ -21,6 +21,7 @@ import {Optional} from '../../../types';
 export default class SequenceBox extends CompositeField implements SequenceBoxModel {
   declare model: SequenceBoxModel;
   declare eventMap: SequenceBoxEventMap;
+  declare self: SequenceBox;
 
   layoutConfig: LogicalGridLayoutConfig;
   fields: FormField[];

@@ -17,6 +17,7 @@ import {Optional} from '../types';
 export default class FormMenu extends Menu implements FormMenuModel {
   declare model: FormMenuModel;
   declare eventMap: FormMenuEventMap;
+  declare self: FormMenu;
 
   form: Form;
   popupStyle: FormMenuPopupStyle;

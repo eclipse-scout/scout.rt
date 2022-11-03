@@ -24,6 +24,7 @@ import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
 export default class Session extends EventEmitter implements ModelAdapterLike {
   declare model: SessionModel;
   declare eventMap: SessionEventMap;
+  declare self: Session;
   partId: string;
   url: URL;
   userAgent: UserAgent;

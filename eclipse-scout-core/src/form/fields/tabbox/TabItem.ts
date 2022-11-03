@@ -21,6 +21,7 @@ export interface TabItemEventMap extends GroupBoxEventMap {
 export default class TabItem extends GroupBox implements TabItemModel {
   declare model: TabItemModel;
   declare eventMap: TabItemEventMap;
+  declare self: TabItem;
   declare parent: TabBox;
 
   marked: boolean;

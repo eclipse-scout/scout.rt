@@ -13,6 +13,7 @@ import {Desktop, DesktopLogoEventMap, DesktopLogoModel, EventHandler, HtmlCompon
 export default class DesktopLogo extends Widget implements DesktopLogoModel {
   declare model: DesktopLogoModel;
   declare eventMap: DesktopLogoEventMap;
+  declare self: DesktopLogo;
 
   desktop: Desktop;
   clickable: boolean;

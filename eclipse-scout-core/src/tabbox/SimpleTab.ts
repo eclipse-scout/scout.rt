@@ -15,6 +15,7 @@ export type DisplayViewId = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 
 export default class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabModel<TView> {
   declare model: SimpleTabModel<TView>;
   declare eventMap: SimpleTabEventMap<TView>;
+  declare self: SimpleTab<any>;
 
   view: TView;
   title: string;

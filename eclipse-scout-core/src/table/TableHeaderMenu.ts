@@ -19,6 +19,7 @@ import {TableRowsCheckedEvent} from './TableEventMap';
 export default class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   declare model: TableHeaderMenuModel;
   declare eventMap: TableHeaderMenuEventMap;
+  declare self: TableHeaderMenu;
 
   column: Column<any>;
   tableHeader: TableHeader;

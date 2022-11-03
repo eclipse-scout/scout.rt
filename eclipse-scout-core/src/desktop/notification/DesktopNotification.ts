@@ -14,6 +14,7 @@ import {StatusOrModel} from '../../status/Status';
 export default class DesktopNotification extends ScoutNotification implements DesktopNotificationModel {
   declare model: DesktopNotificationModel;
   declare eventMap: DesktopNotificationEventMap;
+  declare self: DesktopNotification;
 
   duration: number;
   removeTimeout: number;

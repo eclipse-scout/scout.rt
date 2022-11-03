@@ -13,6 +13,7 @@ import {HtmlComponent, Menu, MenuBoxEventMap, MenuBoxLayout, MenuBoxModel, MenuM
 export default class MenuBox extends Widget implements MenuBoxModel {
   declare model: MenuBoxModel;
   declare eventMap: MenuBoxEventMap;
+  declare self: MenuBox;
 
   compact: boolean;
   compactOrig: boolean;

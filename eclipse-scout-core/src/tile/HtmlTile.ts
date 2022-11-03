@@ -23,6 +23,7 @@ export interface HtmlTileEventMap extends TileEventMap {
 export default class HtmlTile extends Tile implements HtmlTileModel {
   declare model: HtmlTileModel;
   declare eventMap: HtmlTileEventMap;
+  declare self: HtmlTile;
 
   content: string;
 

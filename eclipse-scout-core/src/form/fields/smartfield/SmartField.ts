@@ -20,6 +20,7 @@ import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
 export default class SmartField<TValue> extends ValueField<TValue> implements SmartFieldModel<TValue> {
   declare model: SmartFieldModel<TValue>;
   declare eventMap: SmartFieldEventMap<TValue>;
+  declare self: SmartField<any>;
 
   popup: SmartFieldTouchPopup<TValue> | SmartFieldPopup<TValue>;
   lookupCall: LookupCall<TValue>;

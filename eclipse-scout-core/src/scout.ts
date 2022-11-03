@@ -98,7 +98,7 @@ export function assertInstance<T>(value: T, type: new() => any, msg?: string): T
  * Checks if one of the arguments from 1-n is equal to the first argument.
  * @param args to check against the value, may be an array or a variable argument list.
  */
-export function isOneOf(value: any, ...args: any): boolean {
+export function isOneOf(value: any, ...args /* explicit any produces warning at calling js code */): boolean {
   if (args.length === 0) {
     return false;
   }

@@ -13,6 +13,7 @@ import {FormField, RefModel, Tree, TreeFieldEventMap, TreeFieldModel, TreeModel,
 export default class TreeField extends FormField implements TreeFieldModel {
   declare model: TreeFieldModel;
   declare eventMap: TreeFieldEventMap;
+  declare self: TreeField;
 
   tree: Tree;
 

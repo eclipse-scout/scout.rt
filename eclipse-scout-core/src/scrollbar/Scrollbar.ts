@@ -17,6 +17,7 @@ import {OldWheelEvent} from '../types';
 export default class Scrollbar extends Widget implements ScrollbarModel {
   declare model: ScrollbarModel;
   declare eventMap: ScrollbarEventMap;
+  declare self: Scrollbar;
 
   axis: 'x' | 'y';
   borderless: boolean;

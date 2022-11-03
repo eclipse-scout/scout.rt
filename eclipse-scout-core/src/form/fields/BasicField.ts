@@ -16,6 +16,7 @@ import {BasicFieldEventMap, BasicFieldModel, ValueField} from '../../index';
 export default abstract class BasicField<TValue extends TModelValue, TModelValue = TValue> extends ValueField<TValue, TModelValue> implements BasicFieldModel<TValue, TModelValue> {
   declare model: BasicFieldModel<TValue, TModelValue>;
   declare eventMap: BasicFieldEventMap<TValue>;
+  declare self: BasicField<any>;
 
   updateDisplayTextOnModify: boolean;
   updateDisplayTextOnModifyDelay: number;

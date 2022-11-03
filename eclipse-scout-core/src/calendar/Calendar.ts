@@ -43,6 +43,7 @@ export type CalendarMoveData = {
 export default class Calendar extends Widget implements CalendarModel {
   declare model: CalendarModel;
   declare eventMap: CalendarEventMap;
+  declare self: Calendar;
 
   monthViewNumberOfWeeks: number;
   numberOfHourDivisions: number;

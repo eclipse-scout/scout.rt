@@ -26,6 +26,7 @@ import {Optional} from '../../types';
 export default abstract class FormField extends Widget implements FormFieldModel {
   declare model: FormFieldModel;
   declare eventMap: FormFieldEventMap;
+  declare self: FormField;
 
   dropType: DropType;
   dropMaximumSize: number;

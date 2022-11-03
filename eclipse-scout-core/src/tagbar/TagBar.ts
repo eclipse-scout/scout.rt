@@ -14,6 +14,7 @@ import $ from 'jquery';
 export default class TagBar extends Widget implements TagBarModel {
   declare model: TagBarModel;
   declare eventMap: TagBarEventMap;
+  declare self: TagBar;
 
   overflowEnabled: boolean;
   overflowVisible: boolean;

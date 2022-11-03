@@ -13,6 +13,7 @@ import {Device, HtmlComponent, objects, scout, SliderEventMap, SliderLayout, Sli
 export default class Slider extends Widget implements SliderModel {
   declare model: SliderModel;
   declare eventMap: SliderEventMap;
+  declare self: Slider;
 
   value: number;
   minValue: number;

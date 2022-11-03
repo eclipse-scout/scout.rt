@@ -17,6 +17,7 @@ import ColumnUserFilterModel from './ColumnUserFilterModel';
 export default class ColumnUserFilter extends TableUserFilter implements ColumnUserFilterModel {
   declare model: ColumnUserFilterModel;
   declare eventMap: ColumnUserFilterEventMap;
+  declare self: ColumnUserFilter;
 
   column: Column<any>;
   hasFilterFields: boolean;

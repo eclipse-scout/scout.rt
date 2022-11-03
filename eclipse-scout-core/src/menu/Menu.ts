@@ -24,6 +24,7 @@ export type MenuFilter = (menus: Menu[], destination: MenuDestinations) => Menu[
 export default class Menu extends Action implements MenuModel {
   declare model: MenuModel;
   declare eventMap: MenuEventMap;
+  declare self: Menu;
 
   childActions: Menu[];
   defaultMenu: boolean;

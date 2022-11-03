@@ -47,6 +47,7 @@ interface EventDelegatorForCloning {
 export default class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType {
   declare model: WidgetModel;
   declare eventMap: WidgetEventMap;
+  declare self: Widget;
   animateRemoval: boolean;
   animateRemovalClass: string;
   attached: boolean;

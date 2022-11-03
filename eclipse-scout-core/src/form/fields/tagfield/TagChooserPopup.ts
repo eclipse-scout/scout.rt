@@ -14,6 +14,7 @@ import {TableRowClickEvent} from '../../../table/TableEventMap';
 export default class TagChooserPopup extends Popup implements TagChooserPopupModel {
   declare model: TagChooserPopupModel;
   declare eventMap: TagChooserPopupEventMap;
+  declare self: TagChooserPopup;
 
   table: Table;
   field: TagField;

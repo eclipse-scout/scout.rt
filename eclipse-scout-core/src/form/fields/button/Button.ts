@@ -15,6 +15,7 @@ import {
 export default class Button extends FormField implements ButtonModel {
   declare model: ButtonModel;
   declare eventMap: ButtonEventMap;
+  declare self: Button;
 
   defaultButton: boolean;
   displayStyle: ButtonDisplayStyle;

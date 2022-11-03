@@ -14,6 +14,7 @@ import {arrays, BreadcrumbBarEventMap, BreadcrumbBarLayout, BreadcrumbBarModel, 
 export default class BreadcrumbBar extends Widget implements BreadcrumbBarModel {
   declare model: BreadcrumbBarModel;
   declare eventMap: BreadcrumbBarEventMap;
+  declare self: BreadcrumbBar;
 
   breadcrumbItems: BreadcrumbItem[];
   ellipsisBreadcrumbItem: BreadcrumbItem;

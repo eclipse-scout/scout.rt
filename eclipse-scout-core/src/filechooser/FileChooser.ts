@@ -17,6 +17,7 @@ import {FileInputChangeEvent} from './FileInputEventMap';
 export default class FileChooser extends Widget implements FileChooserModel {
   declare model: FileChooserModel;
   declare eventMap: FileChooserEventMap;
+  declare self: FileChooser;
 
   maximumUploadSize: number;
   acceptTypes: string;

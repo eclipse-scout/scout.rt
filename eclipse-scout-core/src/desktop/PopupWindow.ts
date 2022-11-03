@@ -13,6 +13,7 @@ import $ from 'jquery';
 
 export default class PopupWindow extends EventEmitter {
   declare eventMap: PopupWindowEventMap;
+  declare self: PopupWindow;
 
   static PROP_POPUP_WINDOW = 'popupWindow';
 

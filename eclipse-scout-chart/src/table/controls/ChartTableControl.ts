@@ -19,6 +19,7 @@ import {Event, IconDesc, Table} from '@eclipse-scout/core/src';
 export default class ChartTableControl extends TableControl implements ChartTableControlModel {
   declare model: ChartTableControlModel;
   declare eventMap: ChartTableControlEventMap;
+  declare self: ChartTableControl;
 
   chartAggregation: TableControlChartAggregation;
   chartGroup1: TableControlChartGroup;

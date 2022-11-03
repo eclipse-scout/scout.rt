@@ -22,6 +22,7 @@ export type MessageBoxOption = EnumObject<typeof MessageBox.Buttons>;
 export default class MessageBox extends Widget implements MessageBoxModel {
   declare model: MessageBoxModel;
   declare eventMap: MessageBoxEventMap;
+  declare self: MessageBox;
 
   severity: StatusSeverity;
   body: string;

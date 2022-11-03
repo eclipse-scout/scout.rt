@@ -13,6 +13,7 @@ import {arrays, dragAndDrop, DragAndDropHandler, FileInputEventMap, FileInputMod
 export default class FileInput extends Widget implements FileInputModel {
   declare model: FileInputModel;
   declare eventMap: FileInputEventMap;
+  declare self: FileInput;
 
   acceptTypes: string;
   maximumUploadSize: number;

@@ -25,6 +25,7 @@ import {DropType} from '../util/dragAndDrop';
 export default class Tree extends Widget implements TreeModel {
   declare model: TreeModel;
   declare eventMap: TreeEventMap;
+  declare self: Tree;
 
   toggleBreadcrumbStyleEnabled: boolean;
   breadcrumbTogglingThreshold: number;

@@ -13,6 +13,7 @@ import {Device, events, HtmlComponent, IFrameEventMap, IFrameModel, keys, scout,
 export default class IFrame extends Widget implements IFrameModel {
   declare model: IFrameModel;
   declare eventMap: IFrameEventMap;
+  declare self: IFrame;
 
   location: string;
   sandboxEnabled: boolean;

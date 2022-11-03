@@ -23,6 +23,7 @@ import {LookupCallOrRefModel} from '../../lookup/LookupCall';
 export default class SmartColumn<TValue> extends Column<TValue> {
   declare model: SmartColumnModel<TValue>;
   declare eventMap: SmartColumnEventMap<TValue>;
+  declare self: SmartColumn<any>;
 
   codeType: string;
   lookupCall: LookupCall<TValue>;

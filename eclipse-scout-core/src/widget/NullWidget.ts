@@ -13,6 +13,7 @@ import {NullWidgetEventMap, NullWidgetModel, RefModel, Widget, WidgetModel} from
 export default class NullWidget extends Widget implements NullWidgetModel {
   declare model: NullWidgetModel;
   declare eventMap: NullWidgetEventMap;
+  declare self: NullWidget;
 
   childWidget: Widget;
 

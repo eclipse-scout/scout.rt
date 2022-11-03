@@ -23,6 +23,7 @@ import {PageData} from './pages/PageModel';
 export default class Outline extends Tree implements DisplayParent, OutlineModel {
   declare model: OutlineModel;
   declare eventMap: OutlineEventMap;
+  declare self: Outline;
   declare nodes: Page[];
   declare selectedNodes: Page[];
   declare nodesMap: Record<string, Page>;

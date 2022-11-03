@@ -13,6 +13,7 @@ import {EventDelegator, FormField, LoadingSupport, RefModel, TileFieldEventMap, 
 export default class TileField extends FormField implements TileFieldModel {
   declare model: TileFieldModel;
   declare eventMap: TileFieldEventMap;
+  declare self: TileField;
 
   tileGrid: TileGrid;
   eventDelegator: EventDelegator;

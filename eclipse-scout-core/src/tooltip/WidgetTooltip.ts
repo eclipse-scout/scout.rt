@@ -13,6 +13,7 @@ import {FocusRule, keys, KeyStrokeContext, RefModel, scout, ScoutKeyboardEvent, 
 export default class WidgetTooltip extends Tooltip implements WidgetTooltipModel {
   declare model: WidgetTooltipModel;
   declare eventMap: WidgetTooltipEventMap;
+  declare self: WidgetTooltip;
 
   keyStrokeStopPropagationInterceptor: (event: ScoutKeyboardEvent) => void;
   withFocusContext: boolean;

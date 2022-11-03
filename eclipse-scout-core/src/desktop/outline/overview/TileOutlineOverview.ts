@@ -13,6 +13,7 @@ import {Desktop, EventHandler, HtmlComponent, OutlineOverview, Page, PageTileGri
 export default class TileOutlineOverview extends OutlineOverview implements TileOutlineOverviewModel {
   declare model: TileOutlineOverviewModel;
   declare eventMap: TileOutlineOverviewEventMap;
+  declare self: TileOutlineOverview;
 
   pageTileGrid: PageTileGrid;
   scrollable: boolean;

@@ -17,6 +17,7 @@ import {Comparator} from '../../types';
 export default class TileAccordion extends Accordion implements TileAccordionModel {
   declare model: TileAccordionModel;
   declare eventMap: TileAccordionEventMap;
+  declare self: TileAccordion;
   declare groups: Group<TileGrid>[];
 
   gridColumnCount: number;

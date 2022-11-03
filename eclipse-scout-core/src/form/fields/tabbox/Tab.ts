@@ -14,6 +14,7 @@ import TabEventMap from './TabEventMap';
 export default class Tab extends Widget implements TabModel {
   declare model: TabModel;
   declare eventMap: TabEventMap;
+  declare self: Tab;
 
   label: string;
   subLabel: string;

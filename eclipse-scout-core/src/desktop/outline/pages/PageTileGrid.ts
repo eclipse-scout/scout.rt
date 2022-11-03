@@ -15,6 +15,7 @@ import {OutlinePageChangedEvent} from '../OutlineEventMap';
 export default class PageTileGrid extends TileGrid implements PageTileGridModel {
   declare model: PageTileGridModel;
   declare eventMap: PageTileGridEventMap;
+  declare self: PageTileGrid;
   declare tiles: ButtonTile[];
 
   compact: boolean;

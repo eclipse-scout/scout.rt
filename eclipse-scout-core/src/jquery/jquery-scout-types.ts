@@ -505,7 +505,7 @@ declare global {
      * Appends a span and converts it to an app link.
      * @see appLink
      */
-    appendAppLink(appLinkBean: AppLinkBeanArgument, func: AppLinkFuncArgument<TElement>): this;
+    appendAppLink(appLinkBean: AppLinkBeanArgument, func?: AppLinkFuncArgument<TElement>): this;
 
     /**
      * Converts the current html element to an app link by adding the required class and attributes.

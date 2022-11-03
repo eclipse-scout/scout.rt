@@ -15,6 +15,7 @@ import {SplitterMoveEvent} from './SplitterEventMap';
 export default class Splitter extends Widget implements SplitterModel {
   declare model: SplitterModel;
   declare eventMap: SplitterEventMap;
+  declare self: Splitter;
 
   splitHorizontal: boolean;
   position: number;
