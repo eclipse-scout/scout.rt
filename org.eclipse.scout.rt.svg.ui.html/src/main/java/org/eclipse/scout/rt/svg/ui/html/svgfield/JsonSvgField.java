@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -41,7 +41,7 @@ public class JsonSvgField extends JsonFormField<ISvgField> {
   @Override
   protected void initJsonProperties(ISvgField model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<ISvgField>(ISvgField.PROP_SVG_DOCUMENT, model) {
+    putJsonProperty(new JsonProperty<>(ISvgField.PROP_SVG_DOCUMENT, model) {
       @Override
       protected SVGDocument modelValue() {
         return getModel().getSvgDocument();
@@ -61,7 +61,7 @@ public class JsonSvgField extends JsonFormField<ISvgField> {
     try {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       SVGUtility.writeSVGDocument(svg, out, SVG_ENCODING);
-      return new String(out.toByteArray(), SVG_ENCODING);
+      return out.toString(SVG_ENCODING);
     }
     catch (UnsupportedEncodingException | ProcessingException e) {
       throw new UiException("Failed to write SVG document", e);

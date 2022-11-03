@@ -1,23 +1,24 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AppLinkKeyStroke, ValueField} from '@eclipse-scout/core';
+import {AppLinkKeyStroke, FormField} from '@eclipse-scout/core';
 import $ from 'jquery';
+import {SvgFieldEventMap, SvgFieldModel} from '../index';
 
-export default class SvgField extends ValueField {
+export default class SvgField extends FormField implements SvgFieldModel {
+  declare model: SvgFieldModel;
+  declare eventMap: SvgFieldEventMap;
 
-  constructor() {
-    super();
-  }
+  svgDocument: string;
 
-  _render() {
+  protected _render() {
     this.addContainer(this.$parent, 'svg-field');
     this.addLabel();
     this.addField(this.$parent.makeDiv());
@@ -25,20 +26,17 @@ export default class SvgField extends ValueField {
     this.addStatus();
   }
 
-  _renderProperties() {
+  protected override _renderProperties() {
     super._renderProperties();
     this._renderSvgDocument();
   }
 
-  /**
-   * @override FormField.js
-   */
-  _initKeyStrokeContext() {
+  protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
     this.keyStrokeContext.registerKeyStroke(new AppLinkKeyStroke(this, this._onAppLinkAction));
   }
 
-  _renderSvgDocument() {
+  protected _renderSvgDocument() {
     if (!this.svgDocument) {
       this.$field.empty();
       return;
@@ -50,14 +48,14 @@ export default class SvgField extends ValueField {
       .unfocusable();
   }
 
-  _onAppLinkAction(event) {
+  protected _onAppLinkAction(event: JQuery.KeyboardEventBase | JQuery.ClickEvent) {
     let $target = $(event.delegateTarget);
-    let ref = $target.data('ref');
+    let ref = $target.data('ref') as string;
     this._triggerAppLinkAction(ref);
     event.preventDefault();
   }
 
-  _triggerAppLinkAction(ref) {
+  protected _triggerAppLinkAction(ref: string) {
     this.trigger('appLinkAction', {
       ref: ref
     });

@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ObjectFactory} from '@eclipse-scout/core';
-import * as self from './index';
+import {Event, FormFieldEventMap} from '@eclipse-scout/core';
+import {SvgField} from '../index';
 
-export {default as SvgField} from './svg/SvgField';
-export {default as SvgFieldModel} from './svg/SvgFieldModel';
-export {default as SvgFieldEventMap} from './svg/SvgFieldEventMap';
-export {default as SvgFieldAdapter} from './svg/SvgFieldAdapter';
+export interface SvgFieldAppLinkActionEvent<T = SvgField> extends Event<T> {
+  ref: string;
+}
 
-export default self;
-ObjectFactory.get().registerNamespace('scout', self);
+export default interface SvgFieldEventMap extends FormFieldEventMap {
+  'appLinkAction': SvgFieldAppLinkActionEvent;
+}
