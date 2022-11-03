@@ -14,11 +14,14 @@
     "npm": ">=8.1.0",
     "pnpm": ">=6.22.2"
   },
-  "main": "./src/main/js/index.js",
+  "main": "./src/main/js/index.ts",
   "files": [
     "src/main/js"
   ],
   "scripts": {
+    "ts-rename": "ts-migrate --migrate false --sources src/**/*",
+    "ts-migrate": "ts-migrate --rename false --sources src/**/*",
+    "ts-event-maps": "ts-migrate --rename false --migrate false --print-event-maps --sources src/**/*.ts",
     "build:dev": "scout-scripts build:dev",
     "build:prod": "scout-scripts build:prod",
     "build:all": "scout-scripts build:dev && scout-scripts build:prod",
@@ -31,7 +34,8 @@
   },
   "devDependencies": {
     "@eclipse-scout/cli": ">=23.1.0-snapshot <23.1.0",
-    "@eclipse-scout/releng": "^22.0.0"
+    "@eclipse-scout/releng": "^22.0.0",
+    "@eclipse-scout/ts-migrate": ">=23.1.0-snapshot <23.1.0"
   },
   "dependencies": {
     "@eclipse-scout/core": ">=23.1.0-snapshot <23.1.0",
