@@ -1,0 +1,24 @@
+{
+  "name": "@eclipse-scout/tsconfig",
+  "version": "23.1.0-snapshot",
+  "description": "TSConfig for scout projects",
+  "author": "BSI Business Systems Integration AG",
+  "homepage": "https://www.eclipse.org/scout",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eclipse-scout/scout.rt.git"
+  },
+  "license": "EPL-1.0",
+  "engines": {
+    "node": ">=16.13.0",
+    "npm": ">=8.1.0",
+    "pnpm": ">=6.22.2"
+  },
+  "keywords": [
+    "scout",
+    "tsconfig"
+  ],
+  "files": [
+    "tsconfig.json"
+  ]
+}

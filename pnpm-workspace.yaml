@@ -3,6 +3,7 @@ packages:
   - 'eclipse-scout-core'
   - 'eclipse-scout-chart'
   - 'eclipse-scout-ts-migrate'
+  - 'eclipse-scout-tsconfig'
   - 'eslint-config'
   - 'karma-jasmine-scout'
   - 'org.eclipse.scout.rt.svg.ui.html'
