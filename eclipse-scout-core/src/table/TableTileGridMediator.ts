@@ -9,9 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, Group, objects, PropertyChangeEvent, RefModel, scout, Table, TableRow, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel, Tile,
-  TileAccordion,
-  TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
+  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, FilterOrFunction, Group, objects, PropertyChangeEvent, RefModel, scout, Table, TableRow, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel,
+  Tile, TileAccordion, TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
 } from '../index';
 import $ from 'jquery';
 import {ScrollToOptions} from '../scrollbar/scrollbars';
@@ -541,14 +540,14 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     this._addFilter(event.filter);
   }
 
-  protected _onTableFilterRemoved(event: TableFilterRemovedEvent) {
+  protected _onTableFilterRemoved(event: TableFilterRemovedEvent & { filter: TableFilterWithTileFilter }) {
     if (!this.table.tileMode) {
       return;
     }
-    this.tileAccordion.removeFilter(event.filter['tileFilter']);
+    this.tileAccordion.removeFilter(event.filter.tileFilter);
   }
 
-  protected _addFilter(tableFilter: Filter<TableRow> & { tileFilter?: Filter<Tile> & { table: Table } }) {
+  protected _addFilter(tableFilter: TableFilterWithTileFilter) {
     let tileFilter = {
       table: this.table,
       accept: (tile: Tile) => {
@@ -674,3 +673,5 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     }
   }
 }
+
+export type TableFilterWithTileFilter = Filter<TableRow> & { tileFilter?: FilterOrFunction<Tile> | FilterOrFunction<Tile>[] };

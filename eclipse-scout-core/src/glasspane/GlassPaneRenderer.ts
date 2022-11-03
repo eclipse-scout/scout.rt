@@ -11,6 +11,7 @@
 import {arrays, DeferredGlassPaneTarget, DisplayParent, Event, EventHandler, Form, scout, Session, Widget} from '../index';
 import $ from 'jquery';
 import {GlassPaneTarget} from '../widget/Widget';
+import PopupWindow from '../desktop/PopupWindow';
 
 /**
  * Renders glassPanes over the 'glassPaneTargets' of a widget.
@@ -84,7 +85,7 @@ export default class GlassPaneRenderer {
     // Glasspanes in popup-windows must be visible, otherwise the user cannot recognize that the popup
     // is blocked, since the widget that blocks (e.g a message-box) may be opened in the main-window.
     let window = $glassPane.window(true);
-    if (window && window['popupWindow']) {
+    if (window && window[PopupWindow.PROP_POPUP_WINDOW]) {
       $glassPane.addClass('dark');
     }
     this._$glassPanes.push($glassPane);

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ButtonTile, EventHandler, KeyStrokeContext, Outline, Page, PageTileButton, PageTileGridEventMap, PageTileGridModel, PageTileGridSelectKeyStroke, scout, TileGrid, TileGridLayoutConfig, TreeNode} from '../../../index';
+import {ButtonTile, EventHandler, KeyStrokeContext, Outline, Page, PageTileButton, PageTileGridEventMap, PageTileGridModel, PageTileGridSelectKeyStroke, scout, TileGrid, TileGridLayoutConfig} from '../../../index';
 import {TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent, TreeNodeChangedEvent, TreeNodesDeletedEvent, TreeNodesInsertedEvent} from '../../../tree/TreeEventMap';
 import {OutlinePageChangedEvent} from '../OutlineEventMap';
 
@@ -149,7 +149,7 @@ export default class PageTileGrid extends TileGrid implements PageTileGridModel 
   }
 
   protected _onOutlineNodeChanged(event: TreeNodeChangedEvent<Outline> | OutlinePageChangedEvent) {
-    let page: Page = event['node'] || event['page'];
+    let page = (event as TreeNodeChangedEvent).node as Page || (event as OutlinePageChangedEvent).page;
     let tile = page.tile;
     if (!tile) {
       return;
@@ -164,7 +164,8 @@ export default class PageTileGrid extends TileGrid implements PageTileGridModel 
         this.setNodes(this.page.childNodes);
       }
     } else {
-      let eventContainsTopLevelNode = event['nodes'] && event['nodes'].some((node: TreeNode) => !node.parentNode) || event.type === 'allChildNodesDeleted';
+      let evt = event as TreeNodesDeletedEvent | TreeNodesInsertedEvent; // basically may also be a TreeAllChildNodesDeletedEvent | TreeChildNodeOrderChangedEvent. But as the presence of nodes is validated, this cast is ok.
+      let eventContainsTopLevelNode = evt.nodes && evt.nodes.some(node => !node.parentNode) || event.type === 'allChildNodesDeleted';
       // only rebuild if top level nodes change
       if (eventContainsTopLevelNode) {
         this.setNodes(this.outline.nodes);

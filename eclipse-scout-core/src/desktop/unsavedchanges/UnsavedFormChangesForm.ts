@@ -131,6 +131,6 @@ export default class UnsavedFormChangesForm extends Form implements UnsavedFormC
   }
 
   static getFormDisplayName(form: Form): string {
-    return [form.title, form['name'], form.subTitle].filter(Boolean).join(' - ');
+    return [form.title, form.subTitle].filter(Boolean).join(' - ');
   }
 }

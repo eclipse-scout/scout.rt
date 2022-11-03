@@ -167,6 +167,7 @@ describe('NavigateDownButton', () => {
       });
       let row = scout.create(TableRow, {
         parent: node.detailTable,
+        // @ts-ignore
         nodeId: page.id
       });
       node.detailTable.insertRow(row);

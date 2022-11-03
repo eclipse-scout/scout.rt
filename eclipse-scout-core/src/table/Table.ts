@@ -434,11 +434,11 @@ export default class Table extends Widget implements TableModel {
     let tableNodeColumn = arrays.first(candidateColumns);
     if (this.tableNodeColumn && this.tableNodeColumn !== tableNodeColumn) {
       // restore
-      this.tableNodeColumn.minWidth = this.tableNodeColumn['_initialMinWidth'];
+      this.tableNodeColumn.minWidth = this.tableNodeColumn['__initialMinWidth'];
     }
     this.tableNodeColumn = tableNodeColumn;
     if (this.tableNodeColumn) {
-      this.tableNodeColumn['_initialMinWidth'] = this.tableNodeColumn.minWidth;
+      this.tableNodeColumn['__initialMinWidth'] = this.tableNodeColumn.minWidth;
       this.tableNodeColumn.minWidth = this.rowLevelPadding * this._maxLevel + this.tableNodeColumn.tableNodeLevel0CellPadding + 8;
 
       if (this.tableNodeColumn.minWidth > this.tableNodeColumn.width) {
@@ -3773,8 +3773,8 @@ export default class Table extends Widget implements TableModel {
     let filteredBy: string[] = [];
     this.filters.forEach(filter => {
       // check if filter supports label
-      if (typeof filter['createLabel'] === 'function') {
-        filteredBy.push(filter['createLabel']());
+      if (filter instanceof TableUserFilter) {
+        filteredBy.push(filter.createLabel());
       }
     });
     return filteredBy;

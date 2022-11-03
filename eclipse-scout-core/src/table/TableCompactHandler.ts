@@ -227,9 +227,11 @@ export default class TableCompactHandler implements TableCompactHandlerModel {
   }
 
   protected _onTableEvent(event: TableRowsInsertedEvent | TableRowsUpdatedEvent | Event<Table>) {
-    let rows = event['rows'] as TableRow[];
+    let rows: TableRow[];
     if (event.type === 'columnStructureChanged') {
       rows = this.table.rows;
+    } else {
+      rows = (event as TableRowsInsertedEvent | TableRowsUpdatedEvent).rows;
     }
     this.updateValues(rows);
   }

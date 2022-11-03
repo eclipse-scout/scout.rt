@@ -14,6 +14,8 @@ import $ from 'jquery';
 export default class PopupWindow extends EventEmitter {
   declare eventMap: PopupWindowEventMap;
 
+  static PROP_POPUP_WINDOW = 'popupWindow';
+
   myWindow: Window;
   form: Form;
   session: Session;
@@ -38,7 +40,7 @@ export default class PopupWindow extends EventEmitter {
 
     // link Window instance with this popupWindow instance
     // this is required when we want to check if a certain DOM element belongs to a popup window
-    myWindow['popupWindow'] = this;
+    myWindow[PopupWindow.PROP_POPUP_WINDOW] = this;
     myWindow.name = 'Scout popup-window ' + form.modelClass;
   }
 
@@ -60,7 +62,7 @@ export default class PopupWindow extends EventEmitter {
 
     // Establish the link again, as Chrome removes this property after a page load.
     // (page load is made by design in PopupBlockerHandler.openWindow)
-    this.myWindow['popupWindow'] = this;
+    this.myWindow[PopupWindow.PROP_POPUP_WINDOW] = this;
 
     scout.prepareDOM(myDocument);
 

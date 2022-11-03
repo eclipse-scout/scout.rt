@@ -30,6 +30,14 @@ export default interface ColumnModel<TValue = string> extends ObjectModel<Column
    */
   autoOptimizeWidth?: boolean;
 
+  /**
+   * Specifies the index in {@link TableRow.cells} that contains the data for this {@link Column}.
+   * The default value is the same as the index of this {@link Column} in {@link Table.columns}.
+   * Use this property if the column order of the data is different from the initial visible column order.
+   *
+   * This property has nothing to do with the visible position of the column in the {@link Table}.
+   * The initial visible position is given by the index of this {@link Column} in {@link Table.columns} but may be changed by the user at anytime.
+   */
   index?: number;
 
   checkable?: boolean;
@@ -107,12 +115,12 @@ export default interface ColumnModel<TValue = string> extends ObjectModel<Column
   headerTooltipText?: string;
 
   /**
-   * Configures the background color of this column header. The color is represented by the HEX value (e.g. FFFFFF).
+   * Configures the background color of this column header. The color is represented by the HEX value (e.g. 'FFFFFF').
    */
   headerBackgroundColor?: string;
 
   /**
-   * Configures the color of this column header text. The color is represented by the HEX value (e.g. FFFFFF).
+   * Configures the color of this column header text. The color is represented by the HEX value (e.g. 'FFFFFF').
    */
   headerForegroundColor?: string;
 
@@ -238,7 +246,7 @@ export default interface ColumnModel<TValue = string> extends ObjectModel<Column
    * Configures whether the column is displayable or not. A non-displayable column is always invisible for the user.
    * Default is true.
    * A displayable column may be visible for a user, depending on {@link visible}.
-   * However if it is displayable, the user can show the column even it is initially hidden.
+   * However, if it is displayable, the user can show the column even it is initially hidden.
    */
   displayable?: boolean;
 

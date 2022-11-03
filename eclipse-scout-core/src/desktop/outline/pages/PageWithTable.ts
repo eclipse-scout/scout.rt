@@ -141,9 +141,11 @@ export default class PageWithTable extends Page implements PageWithTableModel {
   }
 
   protected _createSearchFilter(): any {
-    let firstFormTableControl = arrays.find(this.detailTable.tableControls, tableControl => {
-      return tableControl['form'] instanceof Form;
-    }) as FormTableControl;
+    // Cast could be wrong as any table control is in the list.
+    // But as the FormTableControl does not add new public items except the form and the presence of that is form is ensured in the find() method, it may be fine.
+    let controls = this.detailTable.tableControls as FormTableControl[];
+
+    let firstFormTableControl = arrays.find(controls, tableControl => tableControl.form instanceof Form);
     if (firstFormTableControl) {
       return firstFormTableControl.form.exportData();
     }

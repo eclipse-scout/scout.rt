@@ -303,7 +303,7 @@ export default class DesktopHeader extends Widget implements DesktopHeaderModel 
     if (outlineContent instanceof Form) {
       return outlineContent.rootGroupBox.menuBar;
     }
-    return outlineContent['menuBar'];
+    return (outlineContent as { menuBar?: MenuBar }).menuBar;
   }
 
   updateViewButtonStyling() {
@@ -328,7 +328,8 @@ export default class DesktopHeader extends Widget implements DesktopHeaderModel 
       let rootGroupBox = outlineContent.rootGroupBox;
       hasMenuBar = rootGroupBox.menuBar && rootGroupBox.menuBarVisible && rootGroupBox.menuBar.visible;
     } else {
-      hasMenuBar = outlineContent['menuBar'] && outlineContent['menuBar'].visible;
+      let outlineTable = outlineContent as { menuBar?: MenuBar };
+      hasMenuBar = outlineTable.menuBar && outlineTable.menuBar.visible;
     }
     this.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
   }

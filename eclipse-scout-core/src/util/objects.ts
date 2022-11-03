@@ -565,7 +565,7 @@ export function checkFunctionOverrides(): string[] {
           let parentFn = parent.prototype[name];
           if (parent.prototype.hasOwnProperty(name) && typeof parentFn === 'function') {
             let parentArgs = getFunctionArguments(parentFn);
-            // Check arguments (at least all of the parent args must be present)
+            // Check arguments (at least all the parent args must be present)
             let mismatch = false;
             for (let i = 0; i < parentArgs.length; i++) {
               if (args.length < i || args[i] !== parentArgs[i]) {
@@ -573,10 +573,10 @@ export function checkFunctionOverrides(): string[] {
                 break;
               }
             }
-            let fname = prop + '.' + name;
-            if (mismatch && whitelist.indexOf(fname) === -1) { // && args.length !== parentArgs.length) {
+            let fName = prop + '.' + name;
+            if (mismatch && whitelist.indexOf(fName) === -1) { // && args.length !== parentArgs.length) {
               // Collect found mismatch
-              let result = fname + '(' + args.join(', ') + ') does not correctly override ' + getPrototypeOwner(parentFn) + '.' + name + '(' + parentArgs.join(', ') + ')';
+              let result = fName + '(' + args.join(', ') + ') does not correctly override ' + getPrototypeOwner(parentFn) + '.' + name + '(' + parentArgs.join(', ') + ')';
               let includesSuperCall = fn.toString().match(new RegExp('scout.' + strings.quote(prop) + '.parent.prototype.' + strings.quote(name) + '.call\\(')) !== null;
               let parentFunctionUsesArguments = false;
               if (includesSuperCall) {

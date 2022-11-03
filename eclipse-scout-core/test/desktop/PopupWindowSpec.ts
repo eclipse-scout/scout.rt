@@ -48,7 +48,7 @@ describe('PopupWindow', () => {
   it('Constructor sets cross references and window-name', () => {
     let popupWindow = new SpecPopupWindow(myWindow, myForm);
 
-    expect(myWindow['popupWindow']).toBe(popupWindow);
+    expect(myWindow[PopupWindow.PROP_POPUP_WINDOW]).toBe(popupWindow);
     expect(myWindow.name).toBe('Scout popup-window Foo');
     expect(myForm.popupWindow).toBe(popupWindow);
   });

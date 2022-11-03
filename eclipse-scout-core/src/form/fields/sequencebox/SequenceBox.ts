@@ -302,7 +302,7 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
 
   protected _onFieldValueChange(event: PropertyChangeEvent<any, ValueField<any>>) {
     if (event.source instanceof DateField) {
-      this._onDateFieldValueChange(event as unknown as PropertyChangeEvent<Date, DateField>);
+      this._onDateFieldValueChange(event as PropertyChangeEvent<Date, DateField>);
     }
   }
 

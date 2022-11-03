@@ -20,7 +20,6 @@ export default interface TableRowModel extends ObjectModel<TableRow, TableRowMod
   checked?: boolean;
   enabled?: boolean;
   iconId?: string;
-  nodeId?: string;
   cssClass?: string;
   parentRow?: string | TableRow | TableRowData;
   parent: Table;

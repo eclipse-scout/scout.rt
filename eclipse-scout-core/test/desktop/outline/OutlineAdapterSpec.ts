@@ -243,7 +243,9 @@ describe('OutlineAdapter', () => {
         tableHelper.createAllRowsDeletedEvent(table),
         tableHelper.createFiltersChangedEvent(table, []),
         tableHelper.createRowsInsertedEvent(table, [
+          // @ts-ignore
           {id: 'row1', nodeId: 'node1', cells: ['cell 1']},
+          // @ts-ignore
           {id: 'row2', nodeId: 'node2', cells: ['cell 2']}
         ])
       ]
