@@ -32,7 +32,7 @@ describe('scout.styles', () => {
   });
 
   it('can get styles', () => {
-    // @ts-ignore
+    // @ts-expect-error
     expect(styles.get()).toEqual({});
     expect(styles.get('inner-class', 'backgroundColor').backgroundColor).toBe('rgb(255, 0, 0)');
     expect(styles.get(['inner-class'], 'backgroundColor').backgroundColor).toBe('rgb(255, 0, 0)');
@@ -91,7 +91,7 @@ describe('scout.styles', () => {
   });
 
   it('can merge colors', () => {
-    // @ts-ignore
+    // @ts-expect-error
     expect(styles.mergeRgbColors()).toBe(undefined);
     expect(styles.mergeRgbColors('rgb(1,2,3)')).toBe('rgb(0,0,0)'); // no ratio
     expect(styles.mergeRgbColors('#fff', 1)).toBe(undefined); // invalid format
@@ -101,19 +101,19 @@ describe('scout.styles', () => {
   });
 
   it('can lighten and darken colors', () => {
-    // @ts-ignore
+    // @ts-expect-error
     expect(styles.darkerColor()).toBe(undefined);
     expect(styles.darkerColor('#fff')).toBe(undefined);
     expect(styles.darkerColor('rgb(10,10,10)')).toBe('rgb(8,8,8)');
 
-    // @ts-ignore
+    // @ts-expect-error
     expect(styles.lighterColor()).toBe(undefined);
     expect(styles.lighterColor('#000')).toBe(undefined);
     expect(styles.lighterColor('rgb(10,10,10)')).toBe('rgb(59,59,59)');
   });
 
   it('can calculate and apply legacy styles', () => {
-    // @ts-ignore
+    // @ts-expect-error
     expect(styles.legacyStyle()).toBe('');
 
     let $el = $sandbox.appendDiv();

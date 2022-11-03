@@ -29,6 +29,7 @@ module.exports = {
     '@typescript-eslint/no-this-alias': 'off', // Allow assigment of this to a variable, e.g. for better readability. 'That' and 'self' are not used often anymore.
     'indent': 'off', // Disable because it will be replaced by the following ts rule
     '@typescript-eslint/indent': ['error', 2, {'SwitchCase': 1, 'ignoredNodes': ['PropertyDefinition[decorators]']}], // Workarounds bug https://github.com/typescript-eslint/typescript-eslint/issues/1824. See also https://github.com/eslint/eslint/issues/15299#issuecomment-967762181
-    'linebreak-style': 'off'
+    'linebreak-style': 'off',
+    '@typescript-eslint/prefer-ts-expect-error': 'warn'
   }
 };

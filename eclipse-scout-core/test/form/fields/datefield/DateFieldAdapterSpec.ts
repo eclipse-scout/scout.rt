@@ -38,7 +38,6 @@ describe('DateFieldAdapter', () => {
   }
 
   function createWithAdapter(model: Optional<DateFieldModel, 'parent'>): SpecDateField {
-    // @ts-ignore
     model = model || {};
     model = $.extend({
       parent: session.desktop

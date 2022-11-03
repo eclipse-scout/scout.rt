@@ -78,7 +78,7 @@ describe('HtmlComponent', () => {
     it('sets data \'htmlComponent\' when install() is called', () => {
       spyOn(jqueryMock, 'data');
       let htmlComp = HtmlComponent.install(jqueryMock, session);
-      // @ts-ignore
+      // @ts-expect-error
       expect(jqueryMock.data).toHaveBeenCalledWith('htmlComponent', htmlComp);
     });
 

@@ -107,7 +107,7 @@ export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenu
   }
 
   static adaptButtonProperties(buttonProperties: Partial<ButtonModel & {gridData: GridData}>, menuProperties?: ButtonAdapterMenuModel): ButtonAdapterMenuModel {
-    // @ts-ignore
+    // @ts-expect-error
     menuProperties = menuProperties || {};
 
     // Plain properties: simply copy, no translation required

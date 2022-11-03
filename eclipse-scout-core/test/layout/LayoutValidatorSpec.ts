@@ -84,7 +84,7 @@ describe('LayoutValidator', () => {
       htmlComp.invalidateLayoutTree();
       session.layoutValidator.validate();
       expect(htmlComp.layout.layout).toHaveBeenCalled();
-      // @ts-ignore
+      // @ts-expect-error
       expect(htmlComp.layout.layout.calls.count()).toEqual(1);
     });
 
@@ -126,7 +126,7 @@ describe('LayoutValidator', () => {
 
       session.layoutValidator.validate();
       expect(htmlComp.layout.layout).toHaveBeenCalled();
-      // @ts-ignore
+      // @ts-expect-error
       expect(htmlComp.layout.layout.calls.count()).toEqual(1);
       expect(session.layoutValidator._invalidComponents.length).toBe(0);
     });

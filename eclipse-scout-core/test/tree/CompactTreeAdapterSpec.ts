@@ -40,7 +40,7 @@ describe('CompactTreeAdapter', () => {
       tree.render();
 
       let nodes = [tree.nodes[0]];
-      // @ts-ignore
+      // @ts-expect-error
       adapter._onNodesSelected([nodes[0].id]);
       sendQueuedAjaxCalls();
       expect(tree.selectedNodes[0]).toBe(tree.nodes[0].childNodes[0]);

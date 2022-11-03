@@ -17,7 +17,7 @@ export function pageX(event: JQuery.TriggeredEvent): number {
   if (!objects.isNullOrUndefined(event.pageX)) {
     return event.pageX;
   }
-  // @ts-ignore
+  // @ts-expect-error
   return event.originalEvent.touches[0].pageX;
 }
 
@@ -28,7 +28,7 @@ export function pageY(event: JQuery.TriggeredEvent): number {
   if (!objects.isNullOrUndefined(event.pageY)) {
     return event.pageY;
   }
-  // @ts-ignore
+  // @ts-expect-error
   return event.originalEvent.touches[0].pageY;
 }
 
@@ -150,7 +150,7 @@ export function propagateEvent(target: EventTarget, event: Event) {
   if (typeof (Event) !== 'function') {
     return;
   }
-  // @ts-ignore
+  // @ts-expect-error
   let newEvent = new event.constructor(event.type, event);
   if (!target.dispatchEvent(newEvent)) {
     event.preventDefault();

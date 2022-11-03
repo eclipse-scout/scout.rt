@@ -77,7 +77,7 @@ export default class Planner extends Widget implements PlannerModel {
     this.activitySelectable = false;
     this.availableDisplayModes = [];
     this.displayMode = null;
-    // @ts-ignore
+    // @ts-expect-error
     this.displayModeOptions = {};
     this.headerVisible = true;
     this.label = null;

@@ -211,7 +211,7 @@ describe('Planner', () => {
       model = createPlannerModel(0);
       planner = createPlanner(model);
       planner.render();
-      // @ts-ignore
+      // @ts-expect-error
       planner.displayModeOptions = {};
     });
 

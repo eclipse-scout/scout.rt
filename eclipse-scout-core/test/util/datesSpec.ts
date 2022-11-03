@@ -337,9 +337,9 @@ describe('scout.dates', () => {
   describe('toJsonDate / parseJsonDate', () => {
 
     it('can handle missing or invalid inputs', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(dates.toJsonDate()).toBe(null);
-      // @ts-ignore
+      // @ts-expect-error
       expect(dates.parseJsonDate()).toBe(null);
       expect(() => {
         dates.parseJsonDate('invalid date string');
@@ -400,7 +400,7 @@ describe('scout.dates', () => {
   describe('create', () => {
 
     it('can create dates', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(dates.create()).toBe(undefined);
       expect(dates.create('')).toBe(undefined);
       expect(() => {
@@ -426,7 +426,7 @@ describe('scout.dates', () => {
   describe('weekInYear', () => {
 
     it('can calculate week in year', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(dates.weekInYear()).toBe(undefined);
       expect(dates.weekInYear(undefined)).toBe(undefined);
       expect(dates.weekInYear(null)).toBe(undefined);
@@ -478,15 +478,15 @@ describe('scout.dates', () => {
 
     it('can handle invalid values', () => {
       expect(() => {
-        // @ts-ignore
+        // @ts-expect-error
         dates.format();
       }).toThrow();
       expect(() => {
-        // @ts-ignore
+        // @ts-expect-error
         dates.format(new Date());
       }).toThrow();
       expect(() => {
-        // @ts-ignore
+        // @ts-expect-error
         dates.format('gugus');
       }).toThrow();
 
@@ -509,7 +509,7 @@ describe('scout.dates', () => {
   describe('compare', () => {
 
     it('can handle invalid dates', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(dates.compare()).toBe(0);
 
       let date = null;
@@ -524,7 +524,7 @@ describe('scout.dates', () => {
       expect(dates.compare(date, date2)).toBe(-1);
 
       expect(() => {
-        // @ts-ignore
+        // @ts-expect-error
         dates.compare('invalid value', date2);
       }).toThrow();
 
@@ -579,7 +579,7 @@ describe('scout.dates', () => {
   describe('isLeapYear', () => {
 
     it('correctly identifies leap years', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(dates.isLeapYear()).toBe(false);
       expect(dates.isLeapYear(undefined)).toBe(false);
       expect(dates.isLeapYear(null)).toBe(false);

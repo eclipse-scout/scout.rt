@@ -148,7 +148,7 @@ describe('TableKeyStrokes', () => {
       table.selectionHandler.lastActionRow = rows[4];
 
       table.addFilter({
-        // @ts-ignore
+        // @ts-expect-error
         createKey: () => 1,
         accept: row => row !== rows[4]
       });
@@ -317,7 +317,7 @@ describe('TableKeyStrokes', () => {
       table.selectionHandler.lastActionRow = rows[1];
 
       table.addFilter({
-        // @ts-ignore
+        // @ts-expect-error
         createKey: () => 1,
         accept: row => row !== rows[1]
       });
@@ -441,7 +441,7 @@ describe('TableKeyStrokes', () => {
         table.selectionHandler.lastActionRow = rows[1];
 
         table.addFilter({
-          // @ts-ignore
+          // @ts-expect-error
           createKey: () => 1,
           accept: row => row !== rows[1]
         });
@@ -535,7 +535,7 @@ describe('TableKeyStrokes', () => {
         table.selectionHandler.lastActionRow = rows[4];
 
         table.addFilter({
-          // @ts-ignore
+          // @ts-expect-error
           createKey: () => 1,
           accept: row => row !== rows[4]
         });

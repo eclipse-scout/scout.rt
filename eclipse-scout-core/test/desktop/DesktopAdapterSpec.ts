@@ -40,7 +40,7 @@ describe('DesktopAdapter', () => {
     let groupBoxModel = createSimpleModel('GroupBox', session) as GroupBoxModel;
     groupBoxModel.mainBox = true;
     let formModel = createSimpleModel('Form', session) as FormModel;
-    // @ts-ignore
+    // @ts-expect-error
     formModel.rootGroupBox = groupBoxModel.id;
     registerAdapterData([formModel, groupBoxModel], session);
     return formModel;

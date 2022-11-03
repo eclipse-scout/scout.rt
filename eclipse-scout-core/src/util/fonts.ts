@@ -296,7 +296,7 @@ export function autoDetectFonts(): FontSpec[] {
     for (let j = 0; j < styleSheet.cssRules.length; j++) {
       let cssRule = styleSheet.cssRules[j];
       if (cssRule.type === window.CSSRule.FONT_FACE_RULE) {
-        // @ts-ignore
+        // @ts-expect-error
         let style = cssRule.style;
         let ff = style.getPropertyValue('font-family');
         let fw = style.getPropertyValue('font-weight');

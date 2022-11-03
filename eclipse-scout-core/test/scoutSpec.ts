@@ -81,7 +81,7 @@ describe('main', () => {
   describe('assertValue', () => {
 
     it('throws Error when value is not set', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(() => scout.assertValue()).toThrowError();
       expect(() => scout.assertValue(null)).toThrowError();
       expect(() => scout.assertValue(undefined)).toThrowError();
@@ -103,7 +103,7 @@ describe('main', () => {
   describe('assertInstance', () => {
 
     it('throws Error when value has wrong type', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(() => scout.assertInstance()).toThrowError();
       expect(() => scout.assertInstance(null, null)).toThrowError();
       expect(() => scout.assertInstance(undefined, null)).toThrowError();
@@ -114,7 +114,7 @@ describe('main', () => {
       const obj = {};
       const re = /a+b/;
 
-      // @ts-ignore
+      // @ts-expect-error
       expect(() => scout.assertInstance(re)).toThrowError();
       expect(() => scout.assertInstance(re, null)).toThrowError();
       expect(() => scout.assertInstance(re, undefined)).toThrowError();
@@ -123,7 +123,7 @@ describe('main', () => {
 
       expect(scout.assertInstance(arr, Array)).toBe(arr);
       expect(scout.assertInstance(obj, Object)).toBe(obj);
-      // @ts-ignore
+      // @ts-expect-error
       expect(scout.assertInstance(re, RegExp)).toBe(re);
       expect(scout.assertInstance(session, Session)).toBe(session);
 
@@ -142,7 +142,7 @@ describe('main', () => {
   describe('isOneOf', () => {
 
     it('can check if value is one of multiple values', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(scout.isOneOf()).toBe(false);
       expect(scout.isOneOf('test')).toBe(false);
       expect(scout.isOneOf('test', 'bla')).toBe(false);
@@ -197,19 +197,19 @@ describe('main', () => {
     it('throws when first argument is invalid', () => {
       // must fail
       expect(() => {
-        // @ts-ignore
+        // @ts-expect-error
         scout.create(1);
       }).toThrow();
       expect(() => {
-        // @ts-ignore
+        // @ts-expect-error
         scout.create();
       }).toThrow();
       expect(() => {
-        // @ts-ignore
+        // @ts-expect-error
         scout.create(true);
       }).toThrow();
       expect(() => {
-        // @ts-ignore
+        // @ts-expect-error
         scout.create(() => {
           // nop
         });

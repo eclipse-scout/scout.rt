@@ -2217,7 +2217,7 @@ export default class Table extends Widget implements TableModel {
    * @returns a cell for the given column and row. Row Icon column and cell icon column don't have cells --> generate one.
    */
   cell<TValue>(column: Column<TValue>, row: TableRow): Cell<TValue> {
-    // @ts-ignore
+    // @ts-expect-error
     if (column === this.rowIconColumn) {
       return scout.create(Cell, {
         iconId: row.iconId,
@@ -2225,7 +2225,7 @@ export default class Table extends Widget implements TableModel {
       }) as Cell<TValue>;
     }
 
-    // @ts-ignore
+    // @ts-expect-error
     if (column === this.checkableColumn) {
       return scout.create(Cell, {
         value: row.checked,

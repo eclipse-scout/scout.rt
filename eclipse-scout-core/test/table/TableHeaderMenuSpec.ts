@@ -313,7 +313,7 @@ describe('TableHeaderMenu', () => {
         table.render();
         table.header.openHeaderMenu(column);
         let tableHeaderMenu = table.header.tableHeaderMenu;
-        // @ts-ignore
+        // @ts-expect-error
         tableHeaderMenu._onSortModeClick(); // changes sort mode from 'alphabetically' (default) to 'amount'
         let $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'BValue');

@@ -50,7 +50,7 @@ describe('TableFieldAdapter', () => {
     it('destroys the table and model adapter if value is changed to \'\'', () => {
       let model = createTableFieldWithTableModel();
       let adapter = createTableFieldAdapter(model);
-      // @ts-ignore
+      // @ts-expect-error
       let tableField = adapter.createWidget(model, session.desktop) as TableField;
       let table = tableField.table;
       expect(session.getModelAdapter(table.id).widget).toBe(table);

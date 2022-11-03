@@ -129,10 +129,10 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
       let tabBox = this.getTabBox('C');
       // noinspection JSVoidFunctionReturnValueUsed
       tabBox.viewStack.slice().reverse().forEach(view => {
-        // @ts-ignore
+        // @ts-expect-error
         this.headerTabAreaController._onViewAdd({view: view});
         if (tabBox.currentView === view) {
-          // @ts-ignore
+          // @ts-expect-error
           this.headerTabAreaController._onViewActivate({view: view});
         }
       });
@@ -233,11 +233,11 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     }
 
     // Reset view tab relevant properties to make sure no tab is visible for the outline content
-    // @ts-ignore
+    // @ts-expect-error
     delete this.outlineContent.title;
-    // @ts-ignore
+    // @ts-expect-error
     delete this.outlineContent.subTitle;
-    // @ts-ignore
+    // @ts-expect-error
     delete this.outlineContent.iconId;
 
     // bring the view to top if the desktop is not in background.

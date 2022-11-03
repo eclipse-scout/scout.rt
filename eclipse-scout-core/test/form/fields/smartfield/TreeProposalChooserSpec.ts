@@ -78,7 +78,7 @@ describe('TreeProposalChooser', () => {
       });
 
       let lookupRows: LookupRow<number>[] = [
-        // @ts-ignore
+        // @ts-expect-error
         scout.create((LookupRow<number>), {
           text: 'No Key, No Parent'
         }),
@@ -168,7 +168,7 @@ describe('TreeProposalChooser', () => {
 
       smartField.requestInput();
       smartField.$field.val('Null');
-      // @ts-ignore
+      // @ts-expect-error
       smartField._onFieldKeyUp({});
       jasmine.clock().tick(300);
       let popup = smartField.popup as SmartFieldPopup<number>;

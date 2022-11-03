@@ -33,7 +33,7 @@ describe('BasicField', () => {
     let adapter = new BasicFieldAdapter();
     adapter.init(model);
     let field = adapter.createWidget(model, session.desktop) as BasicField<any>;
-    // @ts-ignore
+    // @ts-expect-error
     field.$field = $('<input>').on('blur', field._onFieldBlur.bind(field));
     return field;
   }

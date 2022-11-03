@@ -1308,13 +1308,13 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
 
   window<T extends boolean>(domElement?: T): T extends true ? Window : JQuery<Window> {
     let $el = this.$container || this.$parent;
-    // @ts-ignore $() is not of type JQuery<Document>
+    // @ts-expect-error $() is not of type JQuery<Document>
     return $el ? $el.window(domElement) : domElement ? null : $();
   }
 
   document<T extends boolean>(domElement?: T): T extends true ? Document : JQuery<Document> {
     let $el = this.$container || this.$parent;
-    // @ts-ignore $() is not of type JQuery<Document>
+    // @ts-expect-error $() is not of type JQuery<Document>
     return $el ? $el.document(domElement) : domElement ? null : $();
   }
 

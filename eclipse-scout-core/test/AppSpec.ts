@@ -14,7 +14,7 @@ import {AppOptions} from '../src/App';
 describe('App', () => {
 
   beforeEach(() => {
-    // @ts-ignore
+    // @ts-expect-error
     setFixtures(sandbox().addClass('scout'));
   });
 

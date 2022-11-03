@@ -31,7 +31,7 @@ describe('FilterSupport', () => {
       this.elements = [];
       this.filters = [];
       this.textFilterEnabled = false;
-      // @ts-ignore
+      // @ts-expect-error
       this.filterSupport = this._createFilterSupport();
       this.filteredElementsDirty = false;
     }

@@ -68,7 +68,7 @@ describe('LogicalGridLayout', () => {
       this.$container.css({
         margin: childMargin
       });
-      // @ts-ignore
+      // @ts-expect-error
       this.htmlComp = HtmlComponent.install(this.$container, this.session);
       this.htmlComp.setLayout(new StaticLayout());
     }

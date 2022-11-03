@@ -77,10 +77,10 @@ describe('FieldStatus', () => {
 
     it('de-register all listeners when tooltip is destroyed', () => {
       // parents = StringField, Desktop, NullWidget, NullWidget (root parent)
-      // @ts-ignore
+      // @ts-expect-error
       expect(formField.fieldStatus._parents.length).toBe(4);
       formField.setErrorStatus(null);
-      // @ts-ignore
+      // @ts-expect-error
       expect(formField.fieldStatus._parents.length).toBe(0);
     });
 
@@ -135,7 +135,7 @@ describe('FieldStatus', () => {
 
     // Focus will be set to menu after popup has been opened -> simulate this
     formField.fieldStatus.tooltip.menus[0].popup.validateFocus();
-    // @ts-ignore
+    // @ts-expect-error
     formField._onFieldBlur();
     expect(tooltip.rendered).toBeTrue();
     expect(popup.rendered).toBeTrue();

@@ -560,9 +560,9 @@ export default class Device implements DeviceModel {
             return false;
           }
         });
-        // @ts-ignore
+        // @ts-expect-error
         window.addEventListener('test', options, options);
-        // @ts-ignore
+        // @ts-expect-error
         window.removeEventListener('test', options, options);
       } catch (err) {
         passiveSupported = false;

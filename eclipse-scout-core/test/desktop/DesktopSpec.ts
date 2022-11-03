@@ -1646,7 +1646,7 @@ describe('Desktop', () => {
       promises.push(view3.whenClose());
 
       let desktopTab = desktop.bench.getViewTab(modalView) as DesktopTab;
-      // @ts-ignore
+      // @ts-expect-error
       desktopTab._onCloseOther();
 
       $.promiseAll(promises).then(() => {

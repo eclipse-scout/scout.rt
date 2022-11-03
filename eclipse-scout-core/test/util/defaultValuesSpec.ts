@@ -21,7 +21,7 @@ describe('scout.defaultValues', () => {
 
     it('can load invalid configurations', () => {
       expect(() => {
-        // @ts-ignore
+        // @ts-expect-error
         defaultValues.init();
       }).toThrow();
       defaultValues.init({});
@@ -151,32 +151,32 @@ describe('scout.defaultValues', () => {
       defaultValues.applyTo(testObjects);
 
       expect(testObjects[0].width).toBe(10);
-      // @ts-ignore
+      // @ts-expect-error
       expect(testObjects[0].x).toBe(undefined);
       expect(testObjects[1].width).toBe(20);
-      // @ts-ignore
+      // @ts-expect-error
       expect(testObjects[1].alignment).toBe(-1);
-      // @ts-ignore
+      // @ts-expect-error
       expect(testObjects[2].alignment).toBe(1);
       expect(testObjects[2].width).toBe(20);
       expect(testObjects[3].gridData).toBe(undefined);
       expect(testObjects[4].gridData).toBe('77');
-      // @ts-ignore
+      // @ts-expect-error
       expect(testObjects[5].gridData.x).toBe(0);
-      // @ts-ignore
+      // @ts-expect-error
       expect(testObjects[5].gridData.y).toBe(5);
-      // @ts-ignore
+      // @ts-expect-error
       expect(testObjects[6].chartData.value).toBe(2);
-      // @ts-ignore
+      // @ts-expect-error
       expect(testObjects[7].chartData).toEqual({});
       expect(testObjects[7].axisData).toBe(undefined);
       expect(testObjects[8].chartData).toBe('none');
       expect(testObjects[8].axisData).toBe(undefined);
-      // @ts-ignore
+      // @ts-expect-error
       expect(testObjects[9].axisData.xAxis).toBe(undefined);
-      // @ts-ignore
+      // @ts-expect-error
       expect(testObjects[9].axisData.yAxis.label).toBe('non-default');
-      // @ts-ignore
+      // @ts-expect-error
       expect(testObjects[10].axisData.length).toBe(3);
       expect(testObjects[10].axisData[0].xAxis).toBe(undefined);
       expect(testObjects[10].axisData[0].yAxis.label).toBe('non-default');
@@ -184,7 +184,7 @@ describe('scout.defaultValues', () => {
       expect(testObjects[10].axisData[1].yAxis.label).toBe('');
       expect(testObjects[10].axisData[2].xAxis).toBe(undefined);
       expect(testObjects[10].axisData[2].yAxis.label).toBe('');
-      // @ts-ignore
+      // @ts-expect-error
       expect(testObjects[11].axisData.length).toBe(0);
     });
 

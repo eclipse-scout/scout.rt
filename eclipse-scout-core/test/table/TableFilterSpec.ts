@@ -444,7 +444,7 @@ describe('TableFilter', () => {
 
       // filter table (descending)
       table.addFilter({
-        // @ts-ignore
+        // @ts-expect-error
         createKey: () => 1,
         accept: row => Number(row.$row.text()) % 2 === 0
       });

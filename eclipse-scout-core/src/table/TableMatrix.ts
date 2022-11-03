@@ -46,7 +46,7 @@ export default class TableMatrix {
    * add data axis
    */
   addData(data: Column<any>, dataGroup: TableMatrixNumberGroup): TableMatrixDataAxis {
-    // @ts-ignore
+    // @ts-expect-error
     let dataAxis: TableMatrixDataAxis = {},
       locale = this.locale;
 
@@ -92,7 +92,7 @@ export default class TableMatrix {
 
   // add x or y Axis
   addAxis(axis: Column<any>, axisGroup: TableMatrixNumberGroup | TableMatrixDateGroup): TableMatrixKeyAxis {
-    // @ts-ignore
+    // @ts-expect-error
     let keyAxis: TableMatrixKeyAxis = [],
       locale = this.locale,
       session = this.session,

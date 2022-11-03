@@ -57,7 +57,7 @@ describe('scout.URL', () => {
     let u = new URL(encodeURI('http://www.simple.example/dir/file.html?user=hugo&submit=yes&debug#66627'));
     u.addParameter('check', 'no');
     try {
-      // @ts-ignore
+      // @ts-expect-error
       u.addParameter();
       // noinspection ExceptionCaughtLocallyJS
       throw new Error('addParameter() should throw an exception');
@@ -117,7 +117,7 @@ describe('scout.URL', () => {
     u.addParameter('x', '');
     u.addParameter('user', 'admin');
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?check=no&debug&print&slow&submit=yes&user=admin&user=hugo&x=#66627');
-    // @ts-ignore
+    // @ts-expect-error
     let reverseAlphabetSorter = (a, b) => -1 * URL._sorter(a, b);
     expect(u.toString({
       sorter: reverseAlphabetSorter

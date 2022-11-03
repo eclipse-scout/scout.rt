@@ -41,19 +41,19 @@ describe('texts', () => {
 
     it('creates Texts objects for each language tag given in the model', () => {
       texts.init(model);
-      // @ts-ignore
+      // @ts-expect-error
       expect(texts._get('default')._exists('defaultKey1')).toBe(true);
-      // @ts-ignore
+      // @ts-expect-error
       expect(texts._get('default')._exists('deKey1')).toBe(false);
 
-      // @ts-ignore
+      // @ts-expect-error
       expect(texts._get('de')._exists('deKey1')).toBe(true);
-      // @ts-ignore
+      // @ts-expect-error
       expect(texts._get('de')._exists('deCHKey1')).toBe(false);
 
-      // @ts-ignore
+      // @ts-expect-error
       expect(texts._get('de-CH')._exists('deCHKey1')).toBe(true);
-      // @ts-ignore
+      // @ts-expect-error
       expect(texts._get('de-CH')._exists('deKey1')).toBe(false);
     });
 

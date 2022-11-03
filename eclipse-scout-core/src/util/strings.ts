@@ -38,7 +38,7 @@ export function insertAt(text: string, insertText: string, position: number): st
   }
   text = asString(text);
   insertText = asString(insertText);
-  // @ts-ignore
+  // @ts-expect-error
   if (insertText && (typeof position === 'number' || position instanceof Number) && position >= 0) {
     return text.substr(0, position) + insertText + text.substr(position);
   }

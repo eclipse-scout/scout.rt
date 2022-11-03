@@ -30,7 +30,7 @@ describe('MenuItemsOrder', () => {
     menuItemsOrder = new SpecMenuItemsOrder(session, 'Table');
     let nullWidget = new NullWidget();
     nullWidget.session = session;
-    // @ts-ignore
+    // @ts-expect-error
     menuItemsOrder.menuBar = nullWidget;
   });
 

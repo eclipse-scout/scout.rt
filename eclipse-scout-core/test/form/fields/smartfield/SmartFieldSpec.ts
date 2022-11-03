@@ -152,7 +152,7 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('b');
-      // @ts-ignore
+      // @ts-expect-error
       field._onFieldKeyUp({});
       jasmine.clock().tick(300);
       expect(field.$container.hasClass('loading')).toBe(false); // loading indicator is not shown before 400 ms
@@ -277,7 +277,7 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('b');
-      // @ts-ignore
+      // @ts-expect-error
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
 
@@ -344,7 +344,7 @@ describe('SmartField', () => {
       popup._field.lookupCall['data'] = [];
       popup._field.$field.focus();
       triggerKeyDown(popup._field.$field, keys.BACKSPACE);
-      // @ts-ignore
+      // @ts-expect-error
       popup._field._onFieldKeyUp({});
       jasmine.clock().tick(500);
       expect(popup).not.toBe(null);
@@ -717,7 +717,7 @@ describe('SmartField', () => {
         queryBy: QueryBy.ALL,
         lookupRows: [1, 2, 3, 4, 5]
       };
-      // @ts-ignore
+      // @ts-expect-error
       field._lookupByTextOrAllDone(result);
       expect(result.lookupRows.length).toBe(5); // no limit required
       let popup = field.popup as SmartFieldPopup<number>;
@@ -734,7 +734,7 @@ describe('SmartField', () => {
         queryBy: QueryBy.ALL,
         lookupRows: [1, 2, 3, 4, 5]
       };
-      // @ts-ignore
+      // @ts-expect-error
       field._lookupByTextOrAllDone(result);
       expect(result.lookupRows.length).toBe(3);
       expect(result.lookupRows[2]).toBe(3); // last element in array should be '3'
@@ -785,7 +785,7 @@ describe('SmartField', () => {
       expect(field._userWasTyping).toBe(false);
 
       // send a regular key-press (no navigation)
-      // @ts-ignore
+      // @ts-expect-error
       field._onFieldKeyDown({
         which: keys.A
       });
@@ -827,7 +827,7 @@ describe('SmartField', () => {
 
       spyOn(field, 'openPopup');
       keyEvents.forEach(event => {
-        // @ts-ignore
+        // @ts-expect-error
         field._onFieldKeyUp(event);
       });
       expect(field.openPopup).not.toHaveBeenCalled();
@@ -843,7 +843,7 @@ describe('SmartField', () => {
         which: keys.A
       };
       spyOn(field, '_lookupByTextOrAll').and.callThrough();
-      // @ts-ignore
+      // @ts-expect-error
       field._onFieldKeyUp(event);
       expect(field._lookupByTextOrAll).toHaveBeenCalled();
     });
@@ -986,7 +986,7 @@ describe('SmartField', () => {
       smartFieldMultiline.render();
       expect(smartFieldMultiline.value).toBe(1);
       expect(fields.valOrText(smartFieldMultiline.$field)).toBe('1:Foo');
-      // @ts-ignore
+      // @ts-expect-error
       expect(smartFieldMultiline._$multilineLines.text()).toEqual('2:Foo');
     });
   });
@@ -1061,7 +1061,7 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('Bar');
-      // @ts-ignore
+      // @ts-expect-error
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
       let popup = field.popup as SmartFieldPopup<any>;
@@ -1089,7 +1089,7 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('Bar');
-      // @ts-ignore
+      // @ts-expect-error
       field._onFieldKeyUp({});
       jasmine.clock().tick(500);
       let popup = field.popup as SmartFieldPopup<any>;

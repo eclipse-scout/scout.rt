@@ -115,7 +115,7 @@ export function getFirstOpaqueBackgroundColor($elem: JQuery<Element>): string {
   }
 
   let document = $elem.document(true);
-  // @ts-ignore
+  // @ts-expect-error
   while ($elem && $elem.length && document !== $elem[0]) {
     let rgbString = $elem.css('background-color'),
       rgba = rgb(rgbString);

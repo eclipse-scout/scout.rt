@@ -34,9 +34,8 @@ describe('ObjectFactory', () => {
     session.init({
       $entryPoint: $('#sandbox')
     });
-    // @ts-ignore
+    // @ts-expect-error
     let registry = ObjectFactory.get()._registry;
-    // @ts-ignore
     for (let objectType of registry.keys()) {
       let model = createSimpleModel(objectType, session);
       let obj = scout.create(model);
@@ -89,7 +88,7 @@ describe('ObjectFactory', () => {
 
   it('throws an error if argument list is wrong', () => {
     expect(() => {
-      // @ts-ignore
+      // @ts-expect-error
       ObjectFactory.get().create();
     }).toThrow();
     expect(() => {
@@ -97,7 +96,7 @@ describe('ObjectFactory', () => {
     }).toThrow();
     expect(() => {
       ObjectFactory.get().create({
-        // @ts-ignore
+        // @ts-expect-error
         someProperty: 'someValue'
       });
     }).toThrow();
@@ -106,7 +105,7 @@ describe('ObjectFactory', () => {
     }).toThrow();
     expect(() => {
       ObjectFactory.get().create('', {}, {
-        // @ts-ignore
+        // @ts-expect-error
         objectType: StringField
       });
     }).toThrow();
@@ -229,7 +228,7 @@ describe('ObjectFactory', () => {
   describe('finds the correct constructor function if no factory is defined', () => {
 
     it('uses scout namespace by default', () => {
-      // @ts-ignore
+      // @ts-expect-error
       let object = ObjectFactory.get()._createObjectByType('StringField');
       expect(object instanceof StringField).toBe(true);
     });
@@ -349,7 +348,7 @@ describe('ObjectFactory', () => {
         let options = {
           variantLenient: true
         };
-        // @ts-ignore
+        // @ts-expect-error
         let object = ObjectFactory.get()._createObjectByType('StringField:Variant', options);
         expect(object instanceof StringField).toBe(true);
       });
@@ -365,7 +364,7 @@ describe('ObjectFactory', () => {
         let options = {
           variantLenient: true
         };
-        // @ts-ignore
+        // @ts-expect-error
         let object = ObjectFactory.get()._createObjectByType('my.StringField:Variant', options);
         expect(object instanceof my.StringField).toBe(true);
       });

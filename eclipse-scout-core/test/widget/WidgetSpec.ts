@@ -1002,14 +1002,12 @@ describe('Widget', () => {
           })
         ];
 
-        // @ts-ignore
         widget.setChildWidget(children);
         expect(children[0].parent).toBe(widget);
         expect(children[0].owner).toBe(parent);
         expect(children[1].parent).toBe(widget);
         expect(children[1].owner).toBe(parent);
 
-        // @ts-ignore
         another.setChildWidget(children);
         expect(children[0].parent).toBe(another);
         expect(children[0].owner).toBe(parent);
@@ -1041,7 +1039,7 @@ describe('Widget', () => {
       widget.setProperty('foo', 'xyz');
 
       // Add render method and set property again
-      // @ts-ignore
+      // @ts-expect-error
       widget._renderFoo = function() {
         this.$container.text(this.foo);
       };
@@ -1463,7 +1461,7 @@ describe('Widget', () => {
       let widget = new TestClass();
 
       let _prepareModelSpy = spyOn(widget, '_prepareModel').and.callThrough();
-      // @ts-ignore
+      // @ts-expect-error
       widget.init(model);
       expect(_prepareModelSpy.calls.count()).toBe(1);
     });

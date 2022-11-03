@@ -119,7 +119,7 @@ describe('NavigateDownButton', () => {
 
       node.detailTable.selectedRows = [{
         id: '1',
-        // @ts-ignore
+        // @ts-expect-error
         page: {}
       }];
       expect(menu._buttonEnabled()).toBe(true);
@@ -136,13 +136,13 @@ describe('NavigateDownButton', () => {
       });
       expect(menu._buttonEnabled()).toBe(false);
 
-      // @ts-ignore
+      // @ts-expect-error
       node.detailTable.selectedRows = [{
         id: '1'
       }];
       expect(menu._buttonEnabled()).toBe(false);
 
-      // @ts-ignore
+      // @ts-expect-error
       node.detailTable.selectedRows[0].page = {};
       expect(menu._buttonEnabled()).toBe(true);
     });
@@ -162,12 +162,12 @@ describe('NavigateDownButton', () => {
 
       let page = scout.create(Page, {
         parent: outline,
-        // @ts-ignore
+        // @ts-expect-error
         parentNode: node
       });
       let row = scout.create(TableRow, {
         parent: node.detailTable,
-        // @ts-ignore
+        // @ts-expect-error
         nodeId: page.id
       });
       node.detailTable.insertRow(row);

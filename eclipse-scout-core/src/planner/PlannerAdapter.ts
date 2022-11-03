@@ -116,20 +116,20 @@ export default class PlannerAdapter extends ModelAdapter {
   }
 
   protected static _initResourceRemote(resource: PlannerResource) {
-    // @ts-ignore
+    // @ts-expect-error
     if (this.modelAdapter) {
       defaultValues.applyTo(resource, 'Resource');
     }
-    // @ts-ignore
+    // @ts-expect-error
     return this._initResourceOrig(resource);
   }
 
   protected static _initActivityRemote(activity: PlannerActivity) {
-    // @ts-ignore
+    // @ts-expect-error
     if (this.modelAdapter) {
       defaultValues.applyTo(activity, 'Activity');
     }
-    // @ts-ignore
+    // @ts-expect-error
     return this._initActivityOrig(activity);
   }
 

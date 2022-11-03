@@ -641,12 +641,12 @@ export default class TableAdapter extends ModelAdapter {
   }
 
   protected static _createRowRemote(rowModel: TableRowData): TableRow {
-    // @ts-ignore
+    // @ts-expect-error
     if (this.modelAdapter) {
-      // @ts-ignore
+      // @ts-expect-error
       rowModel = this.modelAdapter._initRowModel(rowModel);
     }
-    // @ts-ignore
+    // @ts-expect-error
     return this._createRowOrig(rowModel);
   }
 

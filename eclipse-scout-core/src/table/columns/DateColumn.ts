@@ -22,7 +22,7 @@ export default class DateColumn extends Column<Date> implements DateColumnModel 
   constructor() {
     super();
     this.format = null;
-    // @ts-ignore
+    // @ts-expect-error
     this.groupFormat = 'yyyy';
     this.hasDate = true;
     this.hasTime = false;

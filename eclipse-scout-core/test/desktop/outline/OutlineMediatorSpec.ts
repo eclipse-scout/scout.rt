@@ -34,7 +34,7 @@ describe('OutlineMediator', () => {
     detailTable = tableHelper.createTable(tableModel);
     firstColumn = detailTable.columns[0];
     page = scout.create(PageWithTable, {
-      // @ts-ignore
+      // @ts-expect-error
       childrenLoaded: true, // <-- this flag is important, otherwise this page would try to load children on doRowAction
       alwaysCreateChildPage: true,
       parent: outline,

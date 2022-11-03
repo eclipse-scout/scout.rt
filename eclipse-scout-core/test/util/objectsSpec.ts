@@ -248,7 +248,7 @@ describe('scout.objects', () => {
 
   describe('isString', () => {
     it('returns true iff argument is a string', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(objects.isString()).toBe(false);
       expect(objects.isString(null)).toBe(false);
       expect(objects.isString(123)).toBe(false);
@@ -284,7 +284,7 @@ describe('scout.objects', () => {
 
   describe('isPromise', () => {
     it('returns false for "not a promise" inputs', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(objects.isPromise()).toBeFalse();
       expect(objects.isPromise(null)).toBeFalse();
       expect(objects.isPromise('foo')).toBeFalse();
@@ -319,7 +319,7 @@ describe('scout.objects', () => {
       o2.a = 'X';
       o2.c = 'C';
 
-      // @ts-ignore
+      // @ts-expect-error
       expect(objects.values()).toEqual([]);
       expect(objects.values(null)).toEqual([]);
       expect(objects.values(undefined)).toEqual([]);
@@ -430,11 +430,11 @@ describe('scout.objects', () => {
 
   describe('getByPath', () => {
     it('throws on invalid arguments', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(() => objects.getByPath()).toThrowError('Missing required parameter \'object\'');
-      // @ts-ignore
+      // @ts-expect-error
       expect(() => objects.getByPath('')).toThrowError('Parameter \'object\' has wrong type');
-      // @ts-ignore
+      // @ts-expect-error
       expect(() => objects.getByPath({})).toThrowError('Missing required parameter \'path\'');
     });
 
@@ -568,9 +568,9 @@ describe('scout.objects', () => {
   describe('equals', () => {
 
     it('works as expected', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(objects.equals()).toBe(true); // undefined === undefined
-      // @ts-ignore
+      // @ts-expect-error
       expect(objects.equals(2)).toBe(false);
       expect(objects.equals(2, 2)).toBe(true);
       expect(objects.equals(2, 3)).toBe(false);
@@ -599,9 +599,9 @@ describe('scout.objects', () => {
   describe('equalsRecursive', () => {
 
     it('works as expected', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(objects.equalsRecursive()).toBe(true); // undefined === undefined
-      // @ts-ignore
+      // @ts-expect-error
       expect(objects.equalsRecursive(2)).toBe(false);
       expect(objects.equalsRecursive(2, 2)).toBe(true);
       expect(objects.equalsRecursive(2, 3)).toBe(false);
@@ -644,7 +644,7 @@ describe('scout.objects', () => {
     it('resolveConst', () => {
       expect(objects.resolveConst('${const:scout.FormField.LabelPosition.RIGHT}')).toBe(FormField.LabelPosition.RIGHT);
       expect(objects.resolveConst('${const:myConst}')).toBe(6);
-      // @ts-ignore
+      // @ts-expect-error
       expect(objects.resolveConst(3)).toBe(3); // everything that is not a string, should be returned unchanged
       expect(objects.resolveConst('foo')).toBe('foo'); // a string that is not a constant should be returned unchanged too
 
@@ -661,7 +661,7 @@ describe('scout.objects', () => {
         property: 'labelPosition',
         constType: FormField.LabelPosition
       });
-      // @ts-ignore
+      // @ts-expect-error
       expect(model.labelPosition).toBe(FormField.LabelPosition.RIGHT);
 
       // case 2: provide the 'Window' object as constType - resolver takes that object as starting point
@@ -672,7 +672,7 @@ describe('scout.objects', () => {
         property: 'labelPosition',
         constType: window
       });
-      // @ts-ignore
+      // @ts-expect-error
       expect(model.labelPosition).toBe(FormField.LabelPosition.RIGHT);
     });
 
@@ -729,7 +729,7 @@ describe('scout.objects', () => {
 
   describe('ensureValidKey', () => {
     it('always returns a string', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(objects.ensureValidKey()).toBe('undefined');
       expect(objects.ensureValidKey(null)).toBe('null');
       expect(objects.ensureValidKey(true)).toBe('true');

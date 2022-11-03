@@ -250,7 +250,7 @@ describe('Outline', () => {
       helper.setMobileFlags(outline);
       let node0 = outline.nodes[0];
       let node1 = outline.nodes[1];
-      // @ts-ignore
+      // @ts-expect-error
       let eventListeners = node0.detailTable.events._eventListeners;
       let initialListenerCount = eventListeners.length;
 
@@ -465,7 +465,7 @@ describe('Outline', () => {
         treeModel.nodes[0].id = ObjectFactory.get().createUniqueId(); // tree helper doesn't use unique ids -> do it here
         let tree = treeHelper.createTree(treeModel);
         // FIXME TS: is it correct to set a tree as outline content? or should it be a table instead?
-        // @ts-ignore
+        // @ts-expect-error
         outline.setDetailContent(tree);
 
         spyOn(outline, 'selectNodes');

@@ -782,12 +782,12 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       let xAxis = config.options.scales.x,
         yAxis = config.options.scales.y,
         axisLabels = this._getAxisLabels(config);
-      // @ts-ignore
+      // @ts-expect-error
       let xTickLabel = xAxis.ticks.callback(dataset.data[tooltipItem.dataIndex].x, null, null) as string;
       if (xTickLabel) {
         title.push(this._createTooltipAttribute(axisLabels.x, strings.encode(xTickLabel), true));
       }
-      // @ts-ignore
+      // @ts-expect-error
       let yTickLabel = yAxis.ticks.callback(dataset.data[tooltipItem.dataIndex].y, null, null) as string;
       if (yTickLabel) {
         title.push(this._createTooltipAttribute(axisLabels.y, strings.encode(yTickLabel), true));
@@ -1428,7 +1428,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (labelMap) {
       return labelMap[label];
     }
-    // @ts-ignore
+    // @ts-expect-error
     if (isNaN(label)) {
       return '' + label;
     }
@@ -1439,11 +1439,11 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   protected _formatNumberLabel(label: number | string): string {
-    // @ts-ignore
+    // @ts-expect-error
     if (isNaN(label)) {
       return '' + label;
     }
-    // @ts-ignore
+    // @ts-expect-error
     let abs = Math.abs(label);
     let abbreviation = '';
     if (abs >= 1000000) {
@@ -1464,7 +1464,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         }
       }
     }
-    // @ts-ignore
+    // @ts-expect-error
     return this.session.locale.decimalFormat.format(Math.sign(label) * abs) + abbreviation;
   }
 
@@ -1502,7 +1502,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       // => height = sin(labelRotation) * labelLength + sin(90° - labelRotation) * fontSize
       // <=> labelLength = (height - sin(90° - labelRotation) * fontSize) / sin(labelRotation)
       maxLabelLength = (maxHeight - (fontSize * Math.sin(((90 - labelRotation) / 180) * Math.PI))) / Math.sin((labelRotation / 180) * Math.PI);
-    // @ts-ignore
+    // @ts-expect-error
     let labelSizes = xAxis._labelSizes || {},
       widest = labelSizes.widest || {};
     if (widest.width > maxLabelLength) {
@@ -1511,7 +1511,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
         tick.label = strings.truncateText(tick.label as string, maxLabelLength, measureText);
       });
       // reset label sizes, chart.js will recalculate them using the new truncated labels
-      // @ts-ignore
+      // @ts-expect-error
       xAxis._labelSizes = undefined;
     }
   }
@@ -1528,7 +1528,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
     if (yAxis.options && yAxis.options.grid) {
       tickLength = yAxis.options.grid.tickLength || 0;
     }
-    // @ts-ignore
+    // @ts-expect-error
     let labelSizes = yAxis._labelSizes || {},
       widest = labelSizes.widest || {};
     if (widest.width > yAxis.maxWidth - padding) {
@@ -2228,7 +2228,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config = this.chartJs.config,
       type = config.type;
     if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-      // @ts-ignore
+      // @ts-expect-error
       index = legendItem.index;
     }
 
@@ -2260,7 +2260,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config = this.chartJs.config,
       type = config.type;
     if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-      // @ts-ignore
+      // @ts-expect-error
       index = legendItem.index;
     }
 
@@ -2345,7 +2345,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }));
     }
     if (elements && elements.length) {
-      // @ts-ignore
+      // @ts-expect-error
       this.chartJs.updateHoverStyle(elements, mode, enabled);
     }
   }

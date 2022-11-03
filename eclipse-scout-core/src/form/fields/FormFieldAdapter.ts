@@ -73,12 +73,12 @@ export default class FormFieldAdapter extends ModelAdapter {
   }
 
   static getCurrentMenuTypes(): string[] {
-    // @ts-ignore
+    // @ts-expect-error
     let modelAdapter = this.modelAdapter as FormFieldAdapter;
     if (modelAdapter) {
       return modelAdapter._currentMenuTypes;
     }
-    // @ts-ignore
+    // @ts-expect-error
     return this.getCurrentMenuTypesOrig();
   }
 }

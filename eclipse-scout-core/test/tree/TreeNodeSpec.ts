@@ -27,12 +27,12 @@ describe('TreeNode', () => {
       });
       let parentNode = scout.create(TreeNode, {
         parent: tree,
-        // @ts-ignore
+        // @ts-expect-error
         parentNode: rootNode
       });
       let node = scout.create(TreeNode, {
         parent: tree,
-        // @ts-ignore
+        // @ts-expect-error
         parentNode: parentNode
       });
       expect(rootNode.isAncestorOf(parentNode)).toBe(true);
@@ -53,12 +53,12 @@ describe('TreeNode', () => {
       });
       let parentNode = scout.create(TreeNode, {
         parent: tree,
-        // @ts-ignore
+        // @ts-expect-error
         parentNode: rootNode
       });
       let node = scout.create(TreeNode, {
         parent: tree,
-        // @ts-ignore
+        // @ts-expect-error
         parentNode: parentNode
       });
       expect(node.isDescendantOf(parentNode)).toBe(true);

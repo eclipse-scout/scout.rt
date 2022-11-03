@@ -259,7 +259,7 @@ describe('scrollbars', () => {
       $container.insertAfter($another);
 
       // MutationObserver is sometimes not executed when running headless, even when using setTimeout -> call processing explicitly
-      // @ts-ignore
+      // @ts-expect-error
       _processDomMutation({addedNodes: [$container[0]]});
       expect($scrollShadow[0]).toBe($container.next()[0]);
       expect($scrollShadow.next()[0]).toBeFalsy();

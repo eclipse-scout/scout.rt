@@ -71,7 +71,7 @@ export default class FocusFilterFieldKeyStroke extends KeyStroke {
    * Returns a virtual key to represent this keystroke.
    */
   override keys(): Key[] {
-    // @ts-ignore
+    // @ts-expect-error
     return [new Key(this, this.virtualKeyStrokeWhich)];
   }
 
@@ -86,7 +86,7 @@ export default class FocusFilterFieldKeyStroke extends KeyStroke {
   }
 
   protected _isKeyStrokeInRange(event: ScoutKeyboardEvent): boolean {
-    // @ts-ignore
+    // @ts-expect-error
     if (event.which === this.virtualKeyStrokeWhich) {
       return true; // the event has this keystroke's 'virtual which part' in case it is rendered.
     }

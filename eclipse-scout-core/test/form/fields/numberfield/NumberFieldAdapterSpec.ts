@@ -46,7 +46,7 @@ describe('NumberFieldAdapter', () => {
       // Use case: SequenceBox with number fields, second field contains smaller (invalid) value than first one, user types another too small value
       // -> error status must stay (server won't send another error status because the message has not changed)
       let modelAdapter = field.modelAdapter as NumberFieldAdapter;
-      // @ts-ignore
+      // @ts-expect-error
       modelAdapter._syncPropertiesOnPropertyChange({
         errorStatus: {
           message: 'error status from server'

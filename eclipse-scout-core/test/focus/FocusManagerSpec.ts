@@ -103,7 +103,7 @@ describe('scout.FocusManager', () => {
         let dialog = formHelper.createFormWithFields(session.desktop, true, 2);
         dialog.render();
 
-        // @ts-ignore
+        // @ts-expect-error
         expect(focusManager._focusContexts.length).toBe(2);
 
         let dialogContext = focusManager._findActiveContext();
@@ -275,7 +275,7 @@ describe('scout.FocusManager', () => {
       expect(focusManager.evaluateFocusRule($container, FocusRule.AUTO)).toBe(input1);
       expect(focusManager.evaluateFocusRule($container, FocusRule.PREPARE)).toBe(input1);
       expect(focusManager.evaluateFocusRule($container, null)).toBe(input1);
-      // @ts-ignore
+      // @ts-expect-error
       expect(focusManager.evaluateFocusRule($container, 'invalid-rule')).toBe('invalid-rule');
       expect(focusManager.evaluateFocusRule($container, input2)).toBe(input2);
     });

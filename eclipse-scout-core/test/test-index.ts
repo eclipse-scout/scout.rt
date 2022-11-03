@@ -11,6 +11,6 @@
 // Name this file 'test-index.ts' because it makes searching for 'index.ts' easier in a workspace with lots of different Scout web-projects.
 import {JasmineScout} from '../src/testing/index';
 
-// @ts-ignore
+// @ts-expect-error
 let context = require.context('./', true, /[sS]pec\.[t|j]s$/);
 JasmineScout.runTestSuite(context);

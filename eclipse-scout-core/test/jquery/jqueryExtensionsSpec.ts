@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-// @ts-ignore
 import $ from 'jquery';
 
 describe('jquery-scout', () => {
@@ -286,7 +285,7 @@ describe('jquery-scout', () => {
       expect($('.does-not-exist').nvl($e)).toBe($e);
       expect($('.does-not-exist').nvl($g)).toBe($g);
 
-      // @ts-ignore
+      // @ts-expect-error
       let $result = $('.does').nvl($('.not')).nvl(null).nvl($('.exist')).nvl();
       expect($result instanceof $).toBe(true);
       expect($result.length).toBe(0);

@@ -37,7 +37,7 @@ describe('BrowserFieldAdapter', () => {
 
     // postMessage is an async call -> hard to test -> simulate it (window.postMessage('hello world', '*');)
     let iframe = browserField.$field[0] as HTMLIFrameElement;
-    // @ts-ignore
+    // @ts-expect-error
     browserField._onMessage({
       data: 'hello world',
       origin: 'foo',

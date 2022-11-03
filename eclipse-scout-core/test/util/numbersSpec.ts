@@ -19,10 +19,10 @@ describe('scout.numbers', () => {
   describe('round', () => {
 
     it('tests special cases', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(numbers.round(undefined, 0)).toBe(undefined);
       expect(numbers.round(undefined)).toBe(undefined);
-      // @ts-ignore
+      // @ts-expect-error
       expect(numbers.round(undefined, 0, 0)).toBe(undefined);
       expect(numbers.round(undefined, undefined, 0)).toBe(undefined);
 
@@ -180,13 +180,13 @@ describe('scout.numbers', () => {
   describe('shiftDecimalPoint', () => {
 
     it('can shift decimal point to left and right', () => {
-      // @ts-ignore
+      // @ts-expect-error
       expect(numbers.shiftDecimalPoint()).toBe(undefined);
-      // @ts-ignore
+      // @ts-expect-error
       expect(numbers.shiftDecimalPoint(null)).toBe(null);
-      // @ts-ignore
+      // @ts-expect-error
       expect(numbers.shiftDecimalPoint('')).toBe('');
-      // @ts-ignore
+      // @ts-expect-error
       expect(numbers.shiftDecimalPoint(1234500)).toBe(1234500);
       expect(numbers.shiftDecimalPoint(1234500, 0)).toBe(1234500);
       expect(numbers.shiftDecimalPoint(0.1234500, 0)).toBe(0.1234500);

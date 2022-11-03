@@ -262,7 +262,7 @@ export default class TreeAdapter extends ModelAdapter {
   }
 
   protected _initNodeModel(nodeModel: TreeNodeModel): TreeNodeModel {
-    // @ts-ignore
+    // @ts-expect-error
     nodeModel = nodeModel || {};
     nodeModel.objectType = scout.nvl(nodeModel.objectType, this._getDefaultNodeObjectType());
     defaultValues.applyTo(nodeModel);
@@ -277,12 +277,12 @@ export default class TreeAdapter extends ModelAdapter {
    * 'this' in this function refers to the Tree
    */
   protected static _createTreeNodeRemote(nodeModel: TreeNodeModel) {
-    // @ts-ignore
+    // @ts-expect-error
     if (this.modelAdapter) {
-      // @ts-ignore
+      // @ts-expect-error
       nodeModel = this.modelAdapter._initNodeModel(nodeModel);
     }
-    // @ts-ignore
+    // @ts-expect-error
     return this._createTreeNodeOrig(nodeModel);
   }
 

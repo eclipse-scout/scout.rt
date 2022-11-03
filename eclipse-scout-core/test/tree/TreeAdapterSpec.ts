@@ -115,7 +115,7 @@ describe('TreeAdapter', () => {
 
       let $node0 = tree.nodes[0].$node;
       triggerMouseDown($node0);
-      // @ts-ignore
+      // @ts-expect-error
       triggerMouseUp($(window), {
         position: {
           left: 0,
@@ -137,7 +137,7 @@ describe('TreeAdapter', () => {
       jasmine.Ajax.uninstall();
       jasmine.Ajax.install();
 
-      // @ts-ignore
+      // @ts-expect-error
       triggerMouseDown($(window), {
         position: {
           left: 0,

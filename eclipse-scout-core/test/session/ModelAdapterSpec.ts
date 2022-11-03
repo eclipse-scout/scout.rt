@@ -40,7 +40,7 @@ describe('ModelAdapter', () => {
     //   adapter._addWidgetProperties('childAdapters');
     //   return adapter;
     // });
-    // // @ts-ignore
+    // // @ts-expect-error
     // ObjectFactory._set(myObjectFactory);
   });
 
@@ -48,7 +48,7 @@ describe('ModelAdapter', () => {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
-    // // @ts-ignore
+    // // @ts-expect-error
     // ObjectFactory._set(originalObjectFactory);
   });
 

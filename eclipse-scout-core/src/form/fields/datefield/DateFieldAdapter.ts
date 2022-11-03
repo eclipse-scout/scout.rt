@@ -50,9 +50,9 @@ export default class DateFieldAdapter extends ValueFieldAdapter {
   }
 
   static isDateAllowedRemote(date: Date): boolean {
-    // @ts-ignore
+    // @ts-expect-error
     if (!this.modelAdapter) {
-      // @ts-ignore
+      // @ts-expect-error
       return this.isDateAllowedOrig(date);
     }
     // Server will take care of it

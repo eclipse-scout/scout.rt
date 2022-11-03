@@ -780,7 +780,7 @@ describe('ValueField', () => {
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
 
       // 0 does not change current menu types
-      // @ts-ignore
+      // @ts-expect-error
       formField.setValue(0);
       formField.fieldStatus.showContextMenu();
 

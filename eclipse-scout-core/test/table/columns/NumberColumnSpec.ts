@@ -260,7 +260,7 @@ describe('NumberColumn', () => {
         table.render();
 
         linkWidgetAndAdapter(table, 'TableAdapter');
-        // @ts-ignore
+        // @ts-expect-error
         table.modelAdapter._onColumnBackgroundEffectChanged({
           eventParts: [{
             columnId: column0.id,

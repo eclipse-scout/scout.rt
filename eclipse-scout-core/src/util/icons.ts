@@ -153,7 +153,7 @@ export function resolveIconId(value: string): string {
       value = icons[tmp];
     } else if (tmp.length === 2) {
       // look for icon in global object [0].icons.[1]
-      // @ts-ignore
+      // @ts-expect-error
       value = window[tmp[0]].icons[tmp[1]];
     } else {
       $.log.warn('Invalid iconId: ' + value);

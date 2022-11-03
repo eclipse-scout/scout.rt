@@ -10,9 +10,8 @@
  */
 import {
   Action, arrays, ContextMenuPopup, Device, DoubleClickSupport, dragAndDrop, DragAndDropHandler, EnumObject, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, graphics, HtmlComponent, KeyStrokeContext, keyStrokeModifier,
-  LazyNodeFilter, Menu,
-  MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, objects, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeLayout,
-  TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
+  LazyNodeFilter, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, objects, Range, scout, scrollbars, tooltips, TreeBreadcrumbFilter, TreeCollapseAllKeyStroke, TreeCollapseOrDrillUpKeyStroke,
+  TreeExpandOrDrillDownKeyStroke, TreeLayout, TreeModel, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, TreeNode, TreeNodeModel, TreeSpaceKeyStroke, UpdateFilteredElementsOptions, Widget
 } from '../index';
 import $ from 'jquery';
 import {MenuFilter} from '../menu/Menu';
@@ -1926,7 +1925,7 @@ export default class Tree extends Widget implements TreeModel {
       // nothing to add
       return;
     }
-    // @ts-ignore
+    // @ts-expect-error
     this.visibleNodesFlat.splice(...insertBatch.insertNodes);
     if (showNodes) {
       let indexHint = insertBatch.insertAt();

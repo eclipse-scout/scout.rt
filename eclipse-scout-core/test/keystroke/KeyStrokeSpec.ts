@@ -53,10 +53,10 @@ describe('KeyStroke', () => {
       }
       triggerKeyUpCapture(session.desktop.$container, keys.ENTER);
 
-      // @ts-ignore
+      // @ts-expect-error
       expect(keyStroke.handle.calls.count())
         .toEqual(1, 'because an unrepeatable keystroke should only be invoked once before the closing keyup event');
-      // @ts-ignore
+      // @ts-expect-error
       expect(keyStroke._handleExecuted)
         .toBe(false, 'because an unrepeatable keystroke should be reset after the closing keyup event');
     };
