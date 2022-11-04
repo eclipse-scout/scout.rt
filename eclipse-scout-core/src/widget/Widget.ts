@@ -48,6 +48,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   declare model: WidgetModel;
   declare eventMap: WidgetEventMap;
   declare self: Widget;
+  declare widgetMap: WidgetMap;
   animateRemoval: boolean;
   animateRemovalClass: string;
   attached: boolean;
@@ -324,7 +325,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     }
     if (typeof widgetOrModel === 'string') {
       // Special case: If only an ID is supplied, try to (locally) resolve the corresponding widget
-      let existingWidget = this.widget(widgetOrModel);
+      let existingWidget: Widget = this.widget(widgetOrModel);
       if (!existingWidget) {
         throw new Error('Referenced widget not found: ' + widgetOrModel);
       }
@@ -1940,7 +1941,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
   }
 
   widget<T extends Widget>(widgetId: string, type: new() => T): T;
-  widget(widgetId: string): Widget;
+  widget<TId extends string & keyof WidgetMapOf<this>>(widgetId: TId): WidgetMapOf<this>[TId];
 
   /**
    * Traverses the object-tree (children) of this widget and searches for a widget with the given ID.
@@ -1948,7 +1949,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * @param widgetId the id of the widget to look for
    * @param type the type of the widget to look for. When specified, the return value will be cast to that type. This parameter has no effect at runtime.
    */
-  widget<T extends Widget>(widgetId: string, type?: new() => T): T {
+  widget<TId extends string & keyof WidgetMapOf<this>, T extends Widget>(widgetId: TId, type?: new() => T): WidgetMapOf<this>[TId] | T {
     if (predicate(this)) {
       return this as unknown as T;
     }
@@ -2365,3 +2366,9 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return cssClasses;
   }
 }
+
+type WidgetMap = {
+  [type: string]: Widget;
+};
+
+type WidgetMapOf<T> = T extends { widgetMap: infer TMap } ? TMap : object;
