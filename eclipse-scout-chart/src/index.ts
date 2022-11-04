@@ -12,8 +12,10 @@ import {ObjectFactory} from '@eclipse-scout/core';
 import * as self from './index';
 
 export {default as Chart} from './chart/Chart';
+export {ChartAxis, ChartConfig, ChartData, ChartPosition, ChartType, ChartValueGroup, ClickObject, NumberFormatter, UpdateChartOptions} from './chart/Chart';
 export {default as ChartAdapter} from './chart/ChartAdapter';
 export {default as ChartEventMap} from './chart/ChartEventMap';
+export {ChartValueClickEvent} from './chart/ChartEventMap';
 export {default as ChartLayout} from './chart/ChartLayout';
 export {default as ChartModel} from './chart/ChartModel';
 export {default as AbstractChartRenderer} from './chart/AbstractChartRenderer';
@@ -21,6 +23,7 @@ export {default as AbstractSvgChartRenderer} from './chart/AbstractSvgChartRende
 export {default as ChartJsRenderer} from './chart/ChartJsRenderer';
 export {default as FulfillmentChartRenderer} from './chart/FulfillmentChartRenderer';
 export {default as SpeedoChartRenderer} from './chart/SpeedoChartRenderer';
+export {GreenAreaPosition} from './chart/SpeedoChartRenderer';
 export {default as SalesfunnelChartRenderer} from './chart/SalesfunnelChartRenderer';
 export {default as VennAsync3Calculator} from './chart/VennAsync3Calculator';
 export {default as VennCircleHelper} from './chart/VennCircleHelper';

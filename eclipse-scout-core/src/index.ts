@@ -264,6 +264,7 @@ export {default as LabelAdapter} from './label/LabelAdapter';
 export {default as LabelEventMap} from './label/LabelEventMap';
 export {default as LabelModel} from './label/LabelModel';
 export {default as Popup} from './popup/Popup';
+export {PopupAlignment, PopupScrollType, PopupWindowResizeType} from './popup/Popup';
 export {default as PopupModel} from './popup/PopupModel';
 export {default as PopupEventMap} from './popup/PopupEventMap';
 export {default as PopupAdapter} from './popup/PopupAdapter';

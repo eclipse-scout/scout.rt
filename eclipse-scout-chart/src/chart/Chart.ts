@@ -392,11 +392,11 @@ export type ChartAxis = {
   label: string;
 };
 export type ChartValueGroup = {
-  type: string;
+  type?: string;
   groupName: string;
   values: number[] | Record<string, number>[];
-  colorHexValue: string;
-  cssClass: string;
+  colorHexValue?: string;
+  cssClass?: string;
 };
 
 export type ChartConfig = Partial<Omit<ChartConfiguration, 'type'>> & {
@@ -454,6 +454,7 @@ export type ChartConfig = Partial<Omit<ChartConfiguration, 'type'>> & {
   };
 };
 export type ChartType = EnumObject<typeof Chart.Type>;
+export type ChartPosition = EnumObject<typeof Chart.Position>;
 export type NumberFormatter = (label: number | string, defaultFormatter: (label: number | string) => string) => string;
 
 export type ClickObject = {
