@@ -30,7 +30,7 @@ export default class WidgetField extends FormField implements WidgetFieldModel {
     super._init(model);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'widget-field', new WidgetFieldLayout(this));
     this.addLabel();
     this.addMandatoryIndicator();

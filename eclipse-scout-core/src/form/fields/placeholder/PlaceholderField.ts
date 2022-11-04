@@ -12,7 +12,7 @@ import {FormField} from '../../../index';
 
 export default class PlaceholderField extends FormField {
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'placeholder-field');
     this.addLabel();
   }

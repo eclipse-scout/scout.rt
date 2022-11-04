@@ -21,7 +21,7 @@ export default class CalendarField extends FormField implements CalendarFieldMod
     this._addWidgetProperties(['calendar']);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'calendar-field');
     this.$container.toggleClass('mobile', Device.get().type === Device.Type.MOBILE);
     this.addLabel();

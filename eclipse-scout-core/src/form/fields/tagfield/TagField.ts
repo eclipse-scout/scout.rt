@@ -77,7 +77,7 @@ export default class TagField extends ValueField<string[]> implements TagFieldMo
     return new InputFieldKeyStrokeContext();
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'tag-field', new TagFieldLayout(this));
     this.addLabel();
     this.addMandatoryIndicator();

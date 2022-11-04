@@ -62,7 +62,7 @@ export default class FileChooserField extends ValueField<File> implements FileCh
     this.keyStrokeContext.registerKeyStroke(new FileChooserFieldDeleteKeyStroke(this));
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'file-chooser-field has-icon');
     this.addLabel();
     this.addMandatoryIndicator();

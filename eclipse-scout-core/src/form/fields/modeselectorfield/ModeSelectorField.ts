@@ -26,7 +26,7 @@ export default class ModeSelectorField<TValue> extends ValueField<TValue> implem
     this._selectedModeChangeHandler = this._onSelectedModeChange.bind(this);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'mode-selector-field');
     this.addLabel();
     this.addStatus();

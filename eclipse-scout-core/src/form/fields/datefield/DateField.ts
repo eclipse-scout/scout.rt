@@ -160,7 +160,7 @@ export default class DateField extends ValueField<Date, Date | string> implement
     });
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'date-field');
     this.addLabel();
     this.addField(this.$parent.makeDiv('date-time-composite'));

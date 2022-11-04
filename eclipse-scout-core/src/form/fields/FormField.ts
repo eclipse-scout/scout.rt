@@ -23,7 +23,7 @@ import {Optional} from '../../types';
 /**
  * Base class for all form-fields.
  */
-export default abstract class FormField extends Widget implements FormFieldModel {
+export default class FormField extends Widget implements FormFieldModel {
   declare model: FormFieldModel;
   declare eventMap: FormFieldEventMap;
   declare self: FormField;
@@ -253,7 +253,7 @@ export default abstract class FormField extends Widget implements FormFieldModel
   }
 
   /**
-   * All sub-classes of FormField must implement a _render method. It should call the various add* methods provided by the FormField class.
+   * All subclasses of FormField should implement a _render method. It should call the various add* methods provided by the FormField class.
    *
    * A possible _render implementation could look like this.
    * <pre>
@@ -264,7 +264,15 @@ export default abstract class FormField extends Widget implements FormFieldModel
    * this.addStatus();
    * </pre>
    */
-  protected abstract override _render();
+  protected override _render() {
+    // Render all the necessary parts of a form field.
+    // Subclasses typically override _render completely and add these parts by themselves
+    this.addContainer(this.$parent);
+    this.addLabel();
+    this.addField(this.$parent.makeDiv());
+    this.addMandatoryIndicator();
+    this.addStatus();
+  }
 
   protected override _renderProperties() {
     super._renderProperties();

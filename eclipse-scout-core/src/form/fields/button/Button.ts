@@ -137,7 +137,7 @@ export default class Button extends FormField implements ButtonModel {
    * The button form-field has no label and no status. Additionally it also has no container.
    * Container and field are the same thing.
    */
-  protected _render() {
+  protected override _render() {
     let $button: JQuery;
     if (this.displayStyle === Button.DisplayStyle.LINK) {
       // Render as link-button

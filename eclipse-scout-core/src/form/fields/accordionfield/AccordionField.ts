@@ -36,7 +36,7 @@ export default class AccordionField extends FormField implements AccordionFieldM
     return null;
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'accordion-field');
     this.addLabel();
     this.addMandatoryIndicator();

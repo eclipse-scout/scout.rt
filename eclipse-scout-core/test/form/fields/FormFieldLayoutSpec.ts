@@ -21,7 +21,7 @@ describe('FormFieldLayout', () => {
   let origPrefSize;
 
   class CustomFormField extends BasicField<any> {
-    _render() {
+    override _render() {
       this.addContainer(this.$parent, 'form-field');
       this.addLabel();
       this.$label.css({

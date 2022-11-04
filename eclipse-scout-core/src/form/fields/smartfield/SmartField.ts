@@ -182,7 +182,7 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
     this.keyStrokeContext.registerKeyStroke(new SmartFieldCancelKeyStroke(this));
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'has-icon ' + this.cssClassName(), new SmartFieldLayout(this));
     this.addLabel();
 

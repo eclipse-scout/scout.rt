@@ -22,7 +22,7 @@ export default class CarouselField extends FormField implements CarouselFieldMod
     this._addWidgetProperties(['carousel']);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'carousel-field');
     this.addLabel();
     this.addMandatoryIndicator();

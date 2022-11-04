@@ -25,7 +25,7 @@ export default class TreeField extends FormField implements TreeFieldModel {
     this._addWidgetProperties(['tree']);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'tree-field');
     this.addLabel();
     this.addMandatoryIndicator();

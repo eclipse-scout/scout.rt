@@ -24,7 +24,7 @@ export default class SliderField extends ValueField<number> {
     this.slider = scout.create(Slider, sliderOptions);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'slider-field');
     this.addLabel();
     this.addMandatoryIndicator();

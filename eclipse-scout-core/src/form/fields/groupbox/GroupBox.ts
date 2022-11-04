@@ -230,7 +230,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     return this.$container;
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, this.mainBox ? 'root-group-box' : 'group-box');
 
     this.$header = this.$container.appendDiv('group-box-header');

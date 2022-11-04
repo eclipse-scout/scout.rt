@@ -36,7 +36,7 @@ export function get<T>(modelFunc: () => T, parent?: object): T & { parent?: obje
  *
  * @param extensionId The id of the extension.
  */
-export function getExtension(extensionId: string): Extension {
+export function getExtension(extensionId: string): ExtensionModel {
   return _get(extensionId, 'extension');
 }
 
@@ -46,7 +46,7 @@ export function getExtension(extensionId: string): Extension {
  * @param id ID of the requested object (model or extension)
  * @param type Expected type of the requested object ('model' or 'extension')
  */
-export function _get(id: string, type: string): Extension {
+export function _get(id: string, type: string): ExtensionModel {
   let model = modelMap[id];
   if (!model) {
     throw new Error('No model map entry found for id \'' + id + '\'');
@@ -86,7 +86,7 @@ export interface InsertAction {
 
 export type ExtensionAction = AppendToAction | InsertAction;
 
-export interface Extension {
+export interface ExtensionModel {
   id?: string;
   type?: string; // 'extension'
   extensions: ExtensionAction[];
@@ -162,8 +162,8 @@ export interface Extension {
  * @param parentModel object which contains id's as properties
  * @returns parentModel extended by extension
  */
-export function extend(extension: Extension | string | (() => Extension), parentModel: object): object {
-  let extensionObject: Extension;
+export function extend(extension: ExtensionModel | string | (() => ExtensionModel), parentModel: object): object {
+  let extensionObject: ExtensionModel;
   if (typeof extension === 'string') {
     extensionObject = getExtension(extension);
   } else if (typeof extension === 'function') {

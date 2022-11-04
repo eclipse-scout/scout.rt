@@ -73,7 +73,7 @@ export default class TabBox extends CompositeField implements TabBoxModel {
     this.header.off('propertyChange', this._tabBoxHeaderPropertyChangeHandler);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'tab-box', new TabBoxLayout(this));
 
     this.header.render(this.$container);

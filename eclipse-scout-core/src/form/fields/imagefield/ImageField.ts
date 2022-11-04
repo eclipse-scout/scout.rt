@@ -62,7 +62,7 @@ export default class ImageField extends FormField implements ImageFieldModel {
     this.icon.on('error', this._onImageError.bind(this));
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'image-field', new ImageFieldLayout(this));
     this.addFieldContainer(this.$parent.makeDiv());
 

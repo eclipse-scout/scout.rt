@@ -91,7 +91,7 @@ export default class SplitBox extends CompositeField {
     });
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'split-box');
     // This widget does not support label, mandatoryIndicator and status
 

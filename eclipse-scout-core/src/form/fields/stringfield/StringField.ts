@@ -97,7 +97,7 @@ export default class StringField extends BasicField<string> {
     this._setMultilineText(this.multilineText);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'string-field', new StringFieldLayout(this));
     this.addLabel();
     this.addMandatoryIndicator();

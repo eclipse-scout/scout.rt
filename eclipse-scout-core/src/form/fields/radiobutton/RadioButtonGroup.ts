@@ -110,7 +110,7 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
     }
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'radiobutton-group');
     this.addLabel();
     this.addMandatoryIndicator();

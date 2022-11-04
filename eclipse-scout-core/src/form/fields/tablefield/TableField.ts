@@ -48,7 +48,7 @@ export default class TableField extends FormField implements TableFieldModel {
     this._setTable(this.table);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'table-field');
     this.addLabel();
     this.addMandatoryIndicator();

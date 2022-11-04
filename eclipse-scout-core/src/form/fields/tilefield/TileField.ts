@@ -35,7 +35,7 @@ export default class TileField extends FormField implements TileFieldModel {
     return null;
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'tile-field');
     this.addLabel();
     this.addMandatoryIndicator();

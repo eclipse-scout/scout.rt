@@ -33,7 +33,7 @@ export default class WrappedFormField extends FormField implements WrappedFormFi
     this._setInnerForm(this.innerForm);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'wrapped-form-field');
     this.addLabel();
     this.addStatus();

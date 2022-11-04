@@ -76,7 +76,7 @@ export default class BrowserField extends FormField implements BrowserFieldModel
     this.iframe.on('propertyChange', this._onIFramePropertyChange.bind(this));
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'browser-field', new BrowserFieldLayout(this));
     this.addLabel();
     this.addStatus();

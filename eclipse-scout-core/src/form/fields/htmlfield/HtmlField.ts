@@ -33,7 +33,7 @@ export default class HtmlField extends ValueField<string> implements HtmlFieldMo
     this.keyStrokeContext.registerKeyStroke(new AppLinkKeyStroke(this, this._onAppLinkAction));
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'html-field');
     this.addLabel();
     this.addField(this.$parent.makeDiv());

@@ -64,7 +64,7 @@ export default abstract class LookupBox<TValue> extends ValueField<TValue[], TVa
 
   protected abstract _initStructure(value: TValue[]);
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'lookup-box');
     this.addLabel();
     this.addMandatoryIndicator();

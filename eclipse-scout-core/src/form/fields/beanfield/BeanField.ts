@@ -22,7 +22,7 @@ export default class BeanField<TValue extends object> extends ValueField<TValue>
     this.preventInitialFocus = true;
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'bean-field');
     this.addLabel();
     this.addField(this.$parent.makeDiv());

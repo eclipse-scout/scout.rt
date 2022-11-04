@@ -74,7 +74,7 @@ export default class FileChooserButton extends ValueField<File> implements FileC
     return this.label;
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'file-chooser-button has-icon');
     this.addLabel();
 

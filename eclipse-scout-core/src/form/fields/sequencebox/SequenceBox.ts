@@ -80,7 +80,7 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
     }
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'sequence-box');
     this.addLabel();
     this.addField(this.$parent.makeDiv());

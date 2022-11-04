@@ -36,7 +36,7 @@ export default class LabelField extends ValueField<string> implements LabelField
     super._initValue(value);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'label-field');
     this.addLabel();
     this.addField(this.$parent.makeDiv());

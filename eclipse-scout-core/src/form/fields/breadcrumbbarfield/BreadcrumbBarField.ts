@@ -24,7 +24,7 @@ export default class BreadcrumbBarField extends FormField implements BreadcrumbB
     this._addWidgetProperties(['breadcrumbBar']);
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'breadcrumb-bar-field');
     this.addLabel();
     this.addMandatoryIndicator();

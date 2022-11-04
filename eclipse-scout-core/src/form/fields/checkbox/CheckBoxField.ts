@@ -60,7 +60,7 @@ export default class CheckBoxField extends ValueField<boolean> implements CheckB
     };
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'check-box-field');
     this.addLabel();
     this.addMandatoryIndicator();

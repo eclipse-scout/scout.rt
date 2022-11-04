@@ -50,7 +50,7 @@ export default class NumberField extends BasicField<number, number | string> imp
     return new InputFieldKeyStrokeContext();
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'number-field');
     this.addLabel();
     this.addMandatoryIndicator();

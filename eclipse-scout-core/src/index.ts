@@ -82,7 +82,7 @@ export {default as MaxLengthHandlerModel} from './util/MaxLengthHandlerModel';
 export {default as logging, Logger, LogLevel} from './logging/logging';
 export {default as NullLogger} from './logging/NullLogger';
 export {default as mimeTypes} from './util/mimeTypes';
-export {default as models} from './util/models';
+export {default as models, ExtensionModel, ExtensionAction, AppendToAction, InsertAction, InsertTarget} from './util/models';
 export {default as numbers} from './util/numbers';
 export {default as RoundingMode} from './util/RoundingMode';
 export {default as objects} from './util/objects';

@@ -71,7 +71,7 @@ export default class ClipboardField extends ValueField<string> implements Clipbo
     return new InputFieldKeyStrokeContext();
   }
 
-  protected _render() {
+  protected override _render() {
     // We don't use makeDiv() here intentionally because the DIV created must
     // not have the 'unselectable' attribute.
     this.addContainer(this.$parent, 'clipboard-field');

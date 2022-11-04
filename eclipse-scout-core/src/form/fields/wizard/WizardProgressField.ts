@@ -47,7 +47,7 @@ export default class WizardProgressField extends FormField implements WizardProg
     this._updateStepsMap();
   }
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'wizard-progress-field', new WizardProgressFieldLayout(this));
     this.addField(this.$parent.makeDiv('wizard-steps'));
     this.addStatus();

@@ -18,7 +18,7 @@ export default class SvgField extends FormField implements SvgFieldModel {
 
   svgDocument: string;
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'svg-field');
     this.addLabel();
     this.addField(this.$parent.makeDiv());

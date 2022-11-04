@@ -12,7 +12,7 @@ import {ValueField} from '../../../index';
 
 export default class ColorField extends ValueField<string> {
 
-  protected _render() {
+  protected override _render() {
     this.addContainer(this.$parent, 'color-field');
     this.addLabel();
     this.addField(this.$parent.makeDiv('not-implemented').text('not implemented yet'));
