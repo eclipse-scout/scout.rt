@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldModel, TabItem, TabItemModel} from '../../../index';
+import {FormFieldModel, TabItem} from '../../../index';
 import {TabAreaStyle} from './TabArea';
-import {RefModel} from '../../../types';
+import {ObjectOrChildModel} from '../../../scout';
 
 export default interface TabBoxModel extends FormFieldModel {
   /**
@@ -20,6 +20,6 @@ export default interface TabBoxModel extends FormFieldModel {
    * By default, the first tab will be selected.
    */
   selectedTab?: TabItem | string;
-  tabItems?: (TabItem | RefModel<TabItemModel>)[];
+  tabItems?: ObjectOrChildModel<TabItem>[];
   tabAreaStyle?: TabAreaStyle;
 }

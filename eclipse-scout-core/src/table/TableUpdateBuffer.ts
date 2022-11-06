@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, objects, Table, TableRow} from '../index';
-import {TableRowData} from './TableRowModel';
+import {ObjectOrModel} from '../scout';
 
 export default class TableUpdateBuffer {
   promises: JQuery.Promise<any>[];
   table: Table;
-  protected _rowMap: Record<string, TableRow | TableRowData>;
+  protected _rowMap: Record<string, ObjectOrModel<TableRow>>;
 
   constructor(table: Table) {
     this._rowMap = {};
@@ -49,7 +49,7 @@ export default class TableUpdateBuffer {
     return this.promises.length > 0;
   }
 
-  buffer(rows: TableRow | TableRowData | (TableRow | TableRowData)[]) {
+  buffer(rows: ObjectOrModel<TableRow> | ObjectOrModel<TableRow>[]) {
     rows = arrays.ensure(rows);
 
     // Don't buffer duplicate rows

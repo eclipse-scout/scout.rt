@@ -11,7 +11,4 @@
 import {FormAdapter} from '../index';
 
 export default class TileOverviewFormAdapter extends FormAdapter {
-  constructor() {
-    super();
-  }
 }

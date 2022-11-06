@@ -10,8 +10,8 @@
  */
 import {Group, RemoteTileFilter, scout, Tile, TileGrid, TileGridModel} from '../../src/index';
 import {triggerClick, triggerDoubleClick, triggerMouseDown} from '../../src/testing/jquery-testing';
-import {Optional} from '../../src/types';
 import TileModel from '../../src/tile/TileModel';
+import {InitModelOf} from '../../src/scout';
 
 describe('TileGrid', () => {
   let session: SandboxSession;
@@ -26,7 +26,7 @@ describe('TileGrid', () => {
     $(':animated').finish();
   });
 
-  function createTileGrid(numTiles?: number, model?: Optional<TileGridModel, 'parent'>): TileGrid {
+  function createTileGrid(numTiles?: number, model?: TileGridModel): TileGrid {
     let tiles = [];
     for (let i = 0; i < numTiles; i++) {
       tiles.push({
@@ -39,15 +39,15 @@ describe('TileGrid', () => {
       tiles: tiles
     };
     model = $.extend({}, defaults, model);
-    return scout.create(TileGrid, model as TileGridModel);
+    return scout.create(TileGrid, model as InitModelOf<TileGrid>);
   }
 
-  function createTile(model?: Optional<TileModel, 'parent'>): Tile {
+  function createTile(model?: TileModel): Tile {
     let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create(Tile, model as TileModel);
+    return scout.create(Tile, model as InitModelOf<Tile>);
   }
 
   describe('selectTiles', () => {
@@ -1010,7 +1010,7 @@ describe('TileGrid', () => {
         filters: [{
           accept: tile => {
             // Accept tile 1 only
-            return tile.label.indexOf('1') >= 0;
+            return tile['label'].indexOf('1') >= 0;
           }
         }]
       });

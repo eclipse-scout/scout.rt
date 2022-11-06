@@ -10,11 +10,12 @@
  */
 import {
   arrays, ComboMenu, EllipsisMenu, EnumObject, Event, EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, keys, KeyStroke, KeyStrokeContext, Menu, MenuBarBox, MenuBarEventMap, MenuBarLayout, MenuBarLeftKeyStroke, MenuBarModel,
-  MenuBarRightKeyStroke, MenuDestinations, MenuModel, menus, PropertyChangeEvent, RefModel, scout, Widget, widgets
+  MenuBarRightKeyStroke, MenuDestinations, menus, PropertyChangeEvent, scout, Widget, widgets
 } from '../../index';
 import {MenuOrder, OrderedMenuItems} from '../MenuItemsOrder';
 import {MenuFilter} from '../Menu';
 import {TooltipPosition} from '../../tooltip/Tooltip';
+import {InitModelOf, ObjectOrChildModel} from '../../scout';
 
 export type MenuBarEllipsisPosition = EnumObject<typeof MenuBar.EllipsisPosition>;
 export type MenuBarPosition = EnumObject<typeof MenuBar.Position>;
@@ -75,7 +76,7 @@ export default class MenuBar extends Widget implements MenuBarModel {
     BOTTOM: 'bottom'
   } as const;
 
-  protected override _init(options: MenuBarModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
 
     this.menuSorter = options.menuOrder || new GroupBoxMenuItemsOrder();
@@ -184,7 +185,7 @@ export default class MenuBar extends Widget implements MenuBarModel {
     });
   }
 
-  setMenuItems(menuOrModels: Menu | RefModel<MenuModel> | (Menu | RefModel<MenuModel>)[]) {
+  setMenuItems(menuOrModels: ObjectOrChildModel<Menu> | ObjectOrChildModel<Menu>[]) {
     let menuItems = arrays.ensure(menuOrModels);
     if (arrays.equals(this.menuItems, menuItems)) {
       // Ensure existing menus are correctly linked even if the given menuItems are the same (see TableSpec for reasons)
@@ -252,6 +253,7 @@ export default class MenuBar extends Widget implements MenuBarModel {
       // add ellipsis to the correct position
       if (this.ellipsisPosition === MenuBar.EllipsisPosition.RIGHT) {
         // try right
+        // noinspection JSVoidFunctionReturnValueUsed
         let reverseIndexPosition = this._getFirstStackableIndexPosition(orderedMenuItems.right.slice().reverse());
         if (reverseIndexPosition > -1) {
           ellipsisIndex = orderedMenuItems.right.length - reverseIndexPosition;
@@ -259,6 +261,7 @@ export default class MenuBar extends Widget implements MenuBarModel {
           orderedMenuItems.right.splice(ellipsisIndex, 0, ellipsis);
         } else {
           // try left
+          // noinspection JSVoidFunctionReturnValueUsed
           reverseIndexPosition = this._getFirstStackableIndexPosition(orderedMenuItems.left.slice().reverse());
           if (reverseIndexPosition > -1) {
             ellipsisIndex = orderedMenuItems.left.length - reverseIndexPosition;
@@ -436,7 +439,7 @@ export default class MenuBar extends Widget implements MenuBarModel {
       this.updateVisibility();
       if (!oldVisible && this.visible) {
         // If the menubar was previously invisible (because all menus were invisible) but
-        // is now visible, the menuboxes and the menus have to be rendered now. Otherwise,
+        // is now visible, the menu-boxes and the menus have to be rendered now. Otherwise,
         // calculating the preferred size of the menubar, e.g. in the TableLayout, would
         // return the wrong value (even if the menubar itself is visible).
         this.revalidateLayout();

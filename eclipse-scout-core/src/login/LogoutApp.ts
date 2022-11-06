@@ -8,19 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, LogoutAppOptions, LogoutBox, ObjectFactory, scout, texts} from '../index';
+import {App, LogoutAppModel, LogoutBox, ObjectFactory, scout, texts} from '../index';
 import $ from 'jquery';
 import {AppBootstrapOptions} from '../App';
+import {InitModelOf} from '../scout';
 
 export default class LogoutApp extends App {
 
-  declare model: LogoutAppOptions;
+  declare model: LogoutAppModel;
 
-  constructor() {
-    super();
-  }
-
-  protected override _prepareEssentials(options: LogoutAppOptions) {
+  protected override _prepareEssentials(options: LogoutAppModel) {
     ObjectFactory.get().init();
   }
 
@@ -31,8 +28,8 @@ export default class LogoutApp extends App {
     return [];
   }
 
-  protected override _init(options: LogoutAppOptions): JQuery.Promise<any> {
-    options = options || {};
+  protected override _init(options: InitModelOf<this>): JQuery.Promise<any> {
+    options = options || {} as InitModelOf<this>;
     options.texts = $.extend({}, texts.readFromDOM(), options.texts);
     this._prepareDOM();
 

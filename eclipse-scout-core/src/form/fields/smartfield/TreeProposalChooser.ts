@@ -14,10 +14,6 @@ import {SmartFieldLookupResult} from './SmartField';
 
 export default class TreeProposalChooser<TValue> extends ProposalChooser<TValue, Tree, ProposalTreeNode<TValue>> {
 
-  constructor() {
-    super();
-  }
-
   protected override _createContent(): Tree {
     let tree = scout.create(Tree, {
       parent: this,

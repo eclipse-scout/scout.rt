@@ -11,7 +11,7 @@
 import {DateField, DateFormat, PopupModel} from '../index';
 
 export default interface DatePickerPopupModel extends PopupModel {
-  field: DateField;
+  field?: DateField;
   dateFormat?: DateFormat;
   allowedDates?: Date[];
 }

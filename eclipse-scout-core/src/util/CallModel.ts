@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-export default interface CallModel {
+import {ObjectModel} from '../scout';
+import {Call} from '../index';
+
+export default interface CallModel extends ObjectModel<Call> {
   /**
    * Delays in ms between retries (from left to right). The call eventually fails when this list gets empty.
    * Example: [100, 500, 500, 500].

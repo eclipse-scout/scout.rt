@@ -12,6 +12,7 @@ import {arrays, Device, EnumObject, Event, FileInput, FormField, HtmlComponent, 
 import $ from 'jquery';
 import {DragAndDropOptions} from '../../../util/dragAndDrop';
 import {FileInputChangeEvent} from '../../../filechooser/FileInputEventMap';
+import {InitModelOf} from '../../../scout';
 
 export default class ImageField extends FormField implements ImageFieldModel {
   declare model: ImageFieldModel;
@@ -48,7 +49,7 @@ export default class ImageField extends FormField implements ImageFieldModel {
     ImageUrl: 'ImageField.ImageUrl'
   } as const;
 
-  protected override _init(model: ImageFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this.resolveIconIds(['imageUrl']);

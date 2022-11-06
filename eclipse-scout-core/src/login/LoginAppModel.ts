@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AppOptions} from '../App';
+import {AppModel} from '../App';
 
-export default interface LoginAppOptions extends AppOptions {
+export default interface LoginAppModel extends AppModel {
   /**
    * The url to the logo. Default is 'logo.png'.
    */
@@ -37,7 +37,7 @@ export default interface LoginAppOptions extends AppOptions {
   additionalData?: Record<string, any>;
 
   /**
-   * The ajax options used for the authentication request. By default only the type is set to POST but it will be extended with the url and the data.
+   * The ajax options used for the authentication request. By default, only the type is set to POST, but it will be extended with the url and the data.
    */
   ajaxOptions?: JQuery.AjaxSettings;
 
@@ -57,7 +57,7 @@ export default interface LoginAppOptions extends AppOptions {
   messageKey?: string;
 
   /**
-   * Texts to be used in the login box. By default the texts provided by the <scout-texts> tags are used, see {@link texts.readFromDOM}. Otherwise the texts will only be in English.
+   * Texts to be used in the login box. By default, the texts provided by the <scout-texts> tags are used, see {@link texts.readFromDOM}. Otherwise, the texts will only be in English.
    */
   texts?: Record<string, string>;
 }

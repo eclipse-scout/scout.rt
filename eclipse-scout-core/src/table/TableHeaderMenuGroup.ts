@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {scout, TableHeaderMenuGroupEventMap, TableHeaderMenuGroupModel, Widget, widgets} from '../index';
+import {InitModelOf} from '../scout';
 
 export default class TableHeaderMenuGroup extends Widget implements TableHeaderMenuGroupModel {
   declare model: TableHeaderMenuGroupModel;
@@ -28,7 +29,7 @@ export default class TableHeaderMenuGroup extends Widget implements TableHeaderM
     this.last = false;
   }
 
-  protected override _init(options: TableHeaderMenuGroupModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this.text = scout.nvl(this.text, this.session.text(this.textKey));
   }

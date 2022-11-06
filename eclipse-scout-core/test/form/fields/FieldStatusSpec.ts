@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FieldStatus, GroupBox, Menu, scout, SmartField, Status, StringField, StringFieldModel} from '../../../src/index';
+import {FieldStatus, GroupBox, Menu, scout, SmartField, Status, StringField} from '../../../src/index';
 import {FormSpecHelper} from '../../../src/testing/index';
 import {triggerMouseDownCapture} from '../../../src/testing/jquery-testing';
 
@@ -27,10 +27,10 @@ describe('FieldStatus', () => {
   });
 
   describe('parent changes visibility', () => {
-    let formField: StringField, model: StringFieldModel;
+    let formField: StringField;
 
     beforeEach(() => {
-      model = helper.createFieldModel();
+      let model = helper.createFieldModel(StringField);
       formField = new StringField();
       formField.init(model);
       formField.render();
@@ -91,7 +91,7 @@ describe('FieldStatus', () => {
    * In that case the tooltip must be closed. Set ticket 250554.
    */
   it('must hide tooltip when new status has no message', () => {
-    let model = helper.createFieldModel() as StringFieldModel;
+    let model = helper.createFieldModel();
     let formField = new StringField();
     formField.init(model);
     formField.render();

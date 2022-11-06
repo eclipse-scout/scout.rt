@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LogicalGridLayout} from '../../index';
+import {InitModelOf, ObjectOrModel} from '../../scout';
 
 export interface LogicalGridLayoutConfigModel {
   /**
@@ -31,7 +32,7 @@ export interface LogicalGridLayoutConfigModel {
   rowHeight?: number;
   /**
    * The minimum width of the widget.
-   * If this width is > 0 a horizontal scrollbar is shown when the widgets gets smaller than this value.
+   * If this width is > 0 a horizontal scrollbar is shown when the widgets get smaller than this value.
    */
   minWidth?: number;
 }
@@ -43,13 +44,15 @@ export interface LogicalGridLayoutConfigModel {
  * Otherwise, the default values specified by CSS are applied (see {@link LogicalGridLayout._initDefaults}).
  */
 export default class LogicalGridLayoutConfig implements LogicalGridLayoutConfigModel {
+  declare model: LogicalGridLayoutConfigModel;
+
   hgap: number;
   vgap: number;
   columnWidth: number;
   rowHeight: number;
   minWidth: number;
 
-  constructor(options?: LogicalGridLayoutConfigModel) {
+  constructor(options?: InitModelOf<LogicalGridLayoutConfig>) {
     // -1 means use the UI defaults
     options = options || {};
     if (options.hgap > -1) {
@@ -92,7 +95,7 @@ export default class LogicalGridLayoutConfig implements LogicalGridLayoutConfigM
     }
   }
 
-  static ensure(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel): LogicalGridLayoutConfig {
+  static ensure(layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>): LogicalGridLayoutConfig {
     if (!layoutConfig) {
       return null;
     }

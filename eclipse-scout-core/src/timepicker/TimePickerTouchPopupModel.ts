@@ -11,5 +11,5 @@
 import {TouchPopupModel} from '../index';
 
 export default interface TimePickerTouchPopupModel extends TouchPopupModel {
-  timeResolution: number;
+  timeResolution?: number;
 }

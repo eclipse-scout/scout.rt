@@ -12,7 +12,7 @@ import {GridData, LogicalGrid, LogicalGridContainer} from '../../index';
 import {LogicalGridOptions} from './LogicalGrid';
 import {LogicalGridWidget} from './LogicalGridData';
 
-export default class AbstractGrid extends LogicalGrid {
+export default abstract class AbstractGrid extends LogicalGrid {
   gridRows: number;
   gridColumns: number;
 

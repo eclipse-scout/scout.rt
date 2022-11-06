@@ -12,6 +12,6 @@ import {Calendar, MenuModel} from '../index';
 import {CalendarDisplayMode} from './Calendar';
 
 export default interface CalendarModesMenuModel extends MenuModel {
-  parent: Calendar;
+  parent?: Calendar;
   displayMode?: CalendarDisplayMode;
 }

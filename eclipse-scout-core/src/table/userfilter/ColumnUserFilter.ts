@@ -13,9 +13,11 @@ import {TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup} from '
 import {TableUserFilterAddedEventData, TableUserFilterRemovedEventData} from './TableUserFilter';
 import {ColumnComparator} from '../columns/comparators';
 import ColumnUserFilterModel from './ColumnUserFilterModel';
+import {SomeRequired} from '../../types';
 
 export default class ColumnUserFilter extends TableUserFilter implements ColumnUserFilterModel {
   declare model: ColumnUserFilterModel;
+  declare initModel: SomeRequired<this['model'], 'session' | 'table' | 'column'>;
   declare eventMap: ColumnUserFilterEventMap;
   declare self: ColumnUserFilter;
 

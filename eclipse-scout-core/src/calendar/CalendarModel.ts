@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CalendarComponent, CalendarComponentModel, GroupBox, Menu, MenuModel, RefModel, WidgetModel} from '../index';
+import {CalendarComponent, GroupBox, Menu, WidgetModel} from '../index';
 import {CalendarDisplayMode} from './Calendar';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface CalendarModel extends WidgetModel {
   monthViewNumberOfWeeks?: number;
@@ -18,7 +19,7 @@ export default interface CalendarModel extends WidgetModel {
   startHour?: number;
   spaceBeforeScrollTop?: number;
   displayMode?: CalendarDisplayMode;
-  components?: (CalendarComponent | RefModel<CalendarComponentModel>)[];
+  components?: ObjectOrChildModel<CalendarComponent>[];
   selectedComponent?: CalendarComponent | string;
   displayCondensed?: boolean;
   selectedDate?: Date | string;
@@ -28,5 +29,5 @@ export default interface CalendarModel extends WidgetModel {
   calendarToggleListWidth?: number;
   calendarToggleYearWidth?: number;
   menuInjectionTarget?: GroupBox;
-  menus?: (Menu | RefModel<MenuModel>)[];
+  menus?: ObjectOrChildModel<Menu>[];
 }

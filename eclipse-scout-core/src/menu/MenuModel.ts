@@ -10,11 +10,11 @@
  */
 import {ActionModel} from '../index';
 import {PopupAlignment} from '../popup/Popup';
-import Menu, {MenuFilter, MenuStyle, SubMenuVisibility} from './Menu';
-import {RefModel} from '../types';
+import Menu, {MenuFilter, SubMenuVisibility} from './Menu';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface MenuModel extends ActionModel {
-  childActions?: (Menu | RefModel<MenuModel>)[];
+  childActions?: ObjectOrChildModel<Menu>[];
   /**
    * A menu type provides a way to control the visibility of a menu for common use cases.
    * For example: a menu should be displayed only if an item is selected or a value present.

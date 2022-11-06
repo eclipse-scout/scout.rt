@@ -10,10 +10,11 @@
  */
 import {Box, Device, strings, TextMap} from '../index';
 import $ from 'jquery';
-import LoginAppOptions from './LoginAppOptions';
+import LoginAppModel from './LoginAppModel';
+import {InitModelOf} from '../scout';
 
 export default class LoginBox extends Box {
-  declare model: LoginAppOptions;
+  declare model: LoginAppModel;
 
   ajaxOptions: JQuery.AjaxSettings;
   authUrl: string;
@@ -54,8 +55,8 @@ export default class LoginBox extends Box {
     this.$button = null;
   }
 
-  init(options: LoginAppOptions) {
-    options = options || {};
+  init(options: InitModelOf<this>) {
+    options = options || {} as InitModelOf<this>;
     let allTexts = $.extend({
       'ui.Login': 'Login',
       'ui.LoginFailed': 'Login failed',

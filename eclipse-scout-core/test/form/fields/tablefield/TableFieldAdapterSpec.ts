@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, TableField, TableFieldAdapter} from '../../../../src/index';
+import {scout, Session, TableField, TableFieldAdapter} from '../../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
+import {FullModelOf, InitModelOf} from '../../../../src/scout';
 
 describe('TableFieldAdapter', () => {
   let session: SandboxSession, helper: FormSpecHelper, tableHelper: TableSpecHelper;
@@ -37,12 +38,12 @@ describe('TableFieldAdapter', () => {
     return createTableFieldModel({table: table.id});
   }
 
-  function createTableFieldAdapter(model) {
+  function createTableFieldAdapter(model: InitModelOf<TableFieldAdapter>): TableFieldAdapter {
     return scout.create(TableFieldAdapter, $.extend({}, model));
   }
 
-  function createTableFieldModel(tableModel) {
-    return helper.createFieldModel('TableField', session.desktop, tableModel);
+  function createTableFieldModel(tableModel: any): FullModelOf<TableField> & { session: Session; id: string; objectType: string } {
+    return helper.createFieldModel('TableField', session.desktop, tableModel) as FullModelOf<TableField> & { session: Session; id: string; objectType: string };
   }
 
   describe('property table', () => {
@@ -50,7 +51,6 @@ describe('TableFieldAdapter', () => {
     it('destroys the table and model adapter if value is changed to \'\'', () => {
       let model = createTableFieldWithTableModel();
       let adapter = createTableFieldAdapter(model);
-      // @ts-expect-error
       let tableField = adapter.createWidget(model, session.desktop) as TableField;
       let table = tableField.table;
       expect(session.getModelAdapter(table.id).widget).toBe(table);

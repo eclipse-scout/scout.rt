@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {Dimension, EnumObject, graphics, GroupEventMap, GroupLayout, GroupModel, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, Insets, KeyStrokeContext, LoadingSupport, RefModel, scout, tooltips, Widget, WidgetModel} from '../index';
+import {Dimension, EnumObject, graphics, GroupEventMap, GroupLayout, GroupModel, GroupToggleCollapseKeyStroke, HtmlComponent, Icon, Insets, KeyStrokeContext, LoadingSupport, scout, tooltips, Widget} from '../index';
 import $ from 'jquery';
-import {ModelOf} from '../scout';
+import {InitModelOf, ObjectOrChildModel} from '../scout';
 import MouseDownEvent = JQuery.MouseDownEvent;
 
 export type GroupCollapseStyle = EnumObject<typeof Group.CollapseStyle>;
@@ -78,7 +78,7 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
     BOTTOM: 'bottom'
   } as const;
 
-  protected override _init(model: GroupModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.resolveTextKeys(['title', 'titleSuffix']);
     this.resolveIconIds(['iconId']);
@@ -93,7 +93,7 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
   protected override _initKeyStrokeContext() {
     super._initKeyStrokeContext();
 
-    // Key stroke should only work when header is focused
+    // Keystroke should only work when header is focused
     this.keyStrokeContext.$bindTarget = () => this.$header;
     this.keyStrokeContext.registerKeyStrokes([
       new GroupToggleCollapseKeyStroke(this)
@@ -198,7 +198,7 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
   }
 
   /** @see GroupModel.header */
-  setHeader(header: Widget | RefModel<WidgetModel>) {
+  setHeader(header: ObjectOrChildModel<Widget>) {
     this.setProperty('header', header);
   }
 
@@ -251,13 +251,13 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
   }
 
   /** @see GroupModel.body */
-  setBody(body: TBody | RefModel<ModelOf<TBody>>) {
+  setBody(body: ObjectOrChildModel<TBody>) {
     this.setProperty('body', body);
   }
 
   protected _setBody(body: TBody) {
     if (!body) {
-      // Create empty body if no body was provided
+      // Create empty body if none was provided
       body = scout.create(EmptyBody, {
         parent: this
       }) as unknown as TBody;
@@ -395,7 +395,7 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
   resizeBody() {
     this.animateToggleCollapse().done(() => {
       if (this.bodyAnimating) {
-        // Another animation has been started in the mean time -> ignore done event
+        // Another animation has been started in the meantime -> ignore done event
         return;
       }
       if (this.collapsed) {
@@ -418,7 +418,6 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
       targetMargins = new Insets();
       targetPaddings = new Insets();
     } else {
-      // Expanding
       // Expand to preferred size of the body
       targetHeight = this.body.htmlComp.prefSize({
         widthHint: currentSize.width
@@ -429,7 +428,7 @@ export default class Group<TBody extends Widget = Widget> extends Widget impleme
       this.body.htmlComp.setSize(new Dimension(this.body.$container.outerWidth(), targetHeight));
 
       if (this.bodyAnimating) {
-        // The group may be expanded while being collapsed or vice verca.
+        // The group may be expanded while being collapsed or vice versa.
         // In that case, use the current values of the inline style as starting values
 
         // Clear current insets to read target insets from CSS anew

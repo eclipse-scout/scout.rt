@@ -11,6 +11,7 @@
 import {Status, strings, ValueField} from '../index';
 import $ from 'jquery';
 import CellModel from './CellModel';
+import {InitModelOf} from '../scout';
 
 /**
  * -1 for left, 0 for center and 1 for right.
@@ -54,11 +55,11 @@ export default class Cell<TValue = any> implements CellModel<TValue> {
     this.sortCode = null;
   }
 
-  init(model: CellModel<TValue>) {
+  init(model: InitModelOf<this>) {
     this._init(model);
   }
 
-  protected _init(model: CellModel<TValue>) {
+  protected _init(model: InitModelOf<this>) {
     $.extend(this, model);
   }
 

@@ -14,10 +14,6 @@ import DesktopTabAreaLayout from './DesktopTabAreaLayout';
 export default class DesktopTabArea extends SimpleTabArea<Form> {
   declare tabs: DesktopTab[];
 
-  constructor() {
-    super();
-  }
-
   protected override _render() {
     super._render();
     this.$container.addClass('desktop-tab-area');

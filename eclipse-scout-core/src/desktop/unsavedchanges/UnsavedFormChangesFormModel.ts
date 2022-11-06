@@ -11,5 +11,5 @@
 import {Form, FormModel} from '../../index';
 
 export default interface UnsavedFormChangesFormModel extends FormModel {
-  unsavedForms: Form[];
+  unsavedForms?: Form[];
 }

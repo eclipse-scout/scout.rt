@@ -10,6 +10,7 @@
  */
 import {HtmlComponent, IconDesc, IconModel, Image, scout, Widget} from '../index';
 import IconEventMap from './IconEventMap';
+import {InitModelOf} from '../scout';
 
 /**
  * Widget representing an icon. It may be a font icon or an image icon. Depending on the type, either a span or an img tag will be rendered.
@@ -38,7 +39,7 @@ export default class Icon extends Widget implements IconModel {
     this.prepend = false;
   }
 
-  protected override _init(model: IconModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setIconDesc(this.iconDesc);
   }

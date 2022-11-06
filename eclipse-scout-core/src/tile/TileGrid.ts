@@ -10,18 +10,16 @@
  */
 import {
   AbstractGrid, arrays, ContextMenuKeyStroke, ContextMenuPopup, DoubleClickSupport, Filter, FilterOrFunction, FilterResult, FilterSupport, graphics, HorizontalGrid, HtmlComponent, KeyStrokeContext, LoadingSupport, LogicalGrid,
-  LogicalGridData, Menu,
-  MenuDestinations, menus as menuUtil, numbers, objects, PlaceholderTile, Predicate, Range, RefModel, scout, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig, TileGridSelectAllKeyStroke,
-  TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke, TileTextFilter,
-  UpdateFilteredElementsOptions, VirtualScrolling, Widget
+  LogicalGridData, Menu, MenuDestinations, menus as menuUtil, numbers, objects, PlaceholderTile, Predicate, Range, scout, TextFilter, Tile, TileGridEventMap, TileGridGridConfig, TileGridLayout, TileGridLayoutConfig,
+  TileGridSelectAllKeyStroke, TileGridSelectDownKeyStroke, TileGridSelectFirstKeyStroke, TileGridSelectionHandler, TileGridSelectLastKeyStroke, TileGridSelectLeftKeyStroke, TileGridSelectRightKeyStroke, TileGridSelectUpKeyStroke,
+  TileTextFilter, UpdateFilteredElementsOptions, VirtualScrolling, Widget
 } from '../index';
 import $ from 'jquery';
 import {Comparator} from '../types';
 import TileGridModel from './TileGridModel';
-import TileModel from './TileModel';
 import {MenuFilter} from '../menu/Menu';
 import {ScrollToOptions} from '../scrollbar/scrollbars';
-import {TileGridLayoutConfigModel} from './TileGridLayoutConfig';
+import {FullModelOf, InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../scout';
 
 /**
  * Only select top-level tile elements. Do not select elements with a 'tile' class deeper in the tree.
@@ -64,6 +62,7 @@ export default class TileGrid extends Widget implements TileGridModel {
   virtual: boolean;
   virtualScrolling: VirtualScrolling;
   withPlaceholders: boolean;
+  placeholderProducer: () => ObjectOrModel<PlaceholderTile>;
   textFilterEnabled: boolean;
   filterSupport: FilterSupport<Tile>;
   createTextFilter: () => TextFilter<Tile>;
@@ -126,7 +125,7 @@ export default class TileGrid extends Widget implements TileGridModel {
     this.$fillAfter = null;
   }
 
-  protected override _init(model: TileGridModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setGridColumnCount(this.gridColumnCount);
     this._setLayoutConfig(this.layoutConfig);
@@ -249,16 +248,16 @@ export default class TileGrid extends Widget implements TileGridModel {
     }
   }
 
-  insertTile(tile: Tile | RefModel<TileModel>) {
+  insertTile(tile: ObjectOrChildModel<Tile>) {
     this.insertTiles([tile]);
   }
 
-  insertTiles(tilesToInsert: Tile | RefModel<TileModel> | (Tile | RefModel<TileModel>)[], appendPlaceholders?: boolean) {
+  insertTiles(tilesToInsert: ObjectOrChildModel<Tile> | ObjectOrChildModel<Tile>[], appendPlaceholders?: boolean) {
     tilesToInsert = arrays.ensure(tilesToInsert);
     if (tilesToInsert.length === 0) {
       return;
     }
-    let tiles = this.tiles as (Tile | RefModel<TileModel>)[];
+    let tiles = this.tiles as ObjectOrChildModel<Tile>[];
     this.setTiles(tiles.concat(tilesToInsert), appendPlaceholders);
   }
 
@@ -280,14 +279,14 @@ export default class TileGrid extends Widget implements TileGridModel {
     this.setTiles([]);
   }
 
-  setTiles(tilesOrModels: Tile | RefModel<TileModel> | (Tile | RefModel<TileModel>)[], appendPlaceholders?: boolean) {
+  setTiles(tilesOrModels: ObjectOrChildModel<Tile> | ObjectOrChildModel<Tile>[], appendPlaceholders?: boolean) {
     let tilesOrModelsArr = arrays.ensure(tilesOrModels);
     if (objects.equals(this.tiles, tilesOrModels)) {
       return;
     }
 
     // Ensure given tiles are real tiles (of type Tile)
-    let tiles = this._createChildren(tilesOrModelsArr) as unknown as Tile[];
+    let tiles = this._createChildren(tilesOrModelsArr);
 
     if (this.withPlaceholders && scout.nvl(appendPlaceholders, true)) {
       // Remove placeholders from new tiles, they will be added later
@@ -523,11 +522,11 @@ export default class TileGrid extends Widget implements TileGridModel {
   }
 
   /** @see TileGridModel.layoutConfig */
-  setLayoutConfig(layoutConfig: TileGridLayoutConfig | TileGridLayoutConfigModel) {
+  setLayoutConfig(layoutConfig: ObjectOrModel<TileGridLayoutConfig>) {
     this.setProperty('layoutConfig', layoutConfig);
   }
 
-  protected _setLayoutConfig(layoutConfig: TileGridLayoutConfig | TileGridLayoutConfigModel) {
+  protected _setLayoutConfig(layoutConfig: ObjectOrModel<TileGridLayoutConfig>) {
     if (!layoutConfig) {
       layoutConfig = new TileGridLayoutConfig();
     }
@@ -664,7 +663,7 @@ export default class TileGrid extends Widget implements TileGridModel {
     this.invalidateLayoutTree();
   }
 
-  setPlaceholderProducer(placeholderProducer) {
+  setPlaceholderProducer(placeholderProducer: () => ObjectOrModel<PlaceholderTile>) {
     this.setProperty('placeholderProducer', placeholderProducer);
   }
 
@@ -720,7 +719,7 @@ export default class TileGrid extends Widget implements TileGridModel {
       return scout.create($.extend(true, {}, {
         objectType: PlaceholderTile,
         parent: this
-      }, placeholder));
+      }, placeholder) as FullModelOf<PlaceholderTile>);
     }
     throw new Error('Placeholder producer returned unexpected result.');
   }

@@ -11,5 +11,5 @@
 import {LookupCallModel, Table} from '../index';
 
 export default interface TileTableHeaderGroupByLookupCallModel extends LookupCallModel<any> {
-  table: Table;
+  table?: Table;
 }

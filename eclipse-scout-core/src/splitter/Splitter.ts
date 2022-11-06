@@ -11,6 +11,7 @@
 import {graphics, HtmlComponent, LayoutData, SplitterEventMap, SplitterModel, Widget} from '../index';
 import $ from 'jquery';
 import {SplitterMoveEvent} from './SplitterEventMap';
+import {InitModelOf} from '../scout';
 
 export default class Splitter extends Widget implements SplitterModel {
   declare model: SplitterModel;
@@ -45,7 +46,7 @@ export default class Splitter extends Widget implements SplitterModel {
     this._$body = null;
   }
 
-  protected override _init(model: SplitterModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.setPosition(this.position);
   }

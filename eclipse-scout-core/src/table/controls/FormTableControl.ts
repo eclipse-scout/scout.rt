@@ -10,6 +10,7 @@
  */
 import {Event, EventHandler, Form, FormTableControlEventMap, FormTableControlLayout, FormTableControlModel, GroupBox, TabBox, TableControl} from '../../index';
 import AbstractLayout from '../../layout/AbstractLayout';
+import {InitModelOf} from '../../scout';
 
 export default class FormTableControl extends TableControl implements FormTableControlModel {
   declare model: FormTableControlModel;
@@ -25,7 +26,7 @@ export default class FormTableControl extends TableControl implements FormTableC
     this._formDestroyedHandler = this._onFormDestroyed.bind(this);
   }
 
-  protected override _init(model: FormTableControlModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setForm(this.form);
   }

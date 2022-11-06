@@ -9,8 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {StatusOrModel, StatusSeverity, StatusSeverityNames} from './Status';
+import {Status} from '../index';
+import {ObjectModel} from '../scout';
 
-export default interface StatusModel {
+export default interface StatusModel extends ObjectModel<Status> {
   message?: string;
   severity?: StatusSeverity | StatusSeverityNames;
   iconId?: string;

@@ -14,11 +14,7 @@ import {StringFieldSelectionChangeEvent} from './StringFieldEventMap';
 export default class StringFieldAdapter extends BasicFieldAdapter {
   declare widget: StringField;
 
-  constructor() {
-    super();
-  }
-
-  protected override _initProperties(model: StringFieldModel & {insertText?: boolean}) {
+  protected override _initProperties(model: StringFieldModel & { insertText?: boolean }) {
     if (model.insertText !== undefined) {
       // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)
       delete model.insertText;

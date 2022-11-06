@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Desktop, DisplayParent, Form, FormControllerModel, Outline, scout, Session} from '../index';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 /**
  * Controller with functionality to register and render views and dialogs.
@@ -17,11 +19,12 @@ import {arrays, Desktop, DisplayParent, Form, FormControllerModel, Outline, scou
  */
 export default class FormController implements FormControllerModel {
   declare model: FormControllerModel;
+  declare initModel: SomeRequired<this['model'], 'displayParent' | 'session'>;
 
   displayParent: DisplayParent;
   session: Session;
 
-  constructor(model: FormControllerModel) {
+  constructor(model: InitModelOf<FormController>) {
     this.displayParent = model.displayParent;
     this.session = model.session;
   }

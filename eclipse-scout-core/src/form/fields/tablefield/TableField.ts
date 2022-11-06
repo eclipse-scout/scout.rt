@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Event, EventDelegator, FormField, objects, RefModel, scout, Table, TableFieldEventMap, TableFieldModel, TableModel, TableRow, Widget} from '../../../index';
+import {arrays, Event, EventDelegator, FormField, objects, scout, Table, TableFieldEventMap, TableFieldModel, TableRow, Widget} from '../../../index';
 import {ValidationResult} from '../FormField';
 import {TableAllRowsDeletedEvent, TableRowsCheckedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent} from '../../../table/TableEventMap';
+import {InitModelOf, ObjectOrChildModel} from '../../../scout';
 
 export default class TableField extends FormField implements TableFieldModel {
   declare model: TableFieldModel;
@@ -42,7 +43,7 @@ export default class TableField extends FormField implements TableFieldModel {
 
   static TABLE_CHANGE_EVENTS = 'rowsInserted rowsDeleted allRowsDeleted rowsUpdated rowsChecked';
 
-  protected override _init(model: TableFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this._setTable(this.table);
@@ -56,7 +57,7 @@ export default class TableField extends FormField implements TableFieldModel {
     this._renderTable();
   }
 
-  setTable(table: Table | RefModel<TableModel>) {
+  setTable(table: ObjectOrChildModel<Table>) {
     this.setProperty('table', table);
   }
 

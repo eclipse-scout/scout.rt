@@ -10,7 +10,7 @@
  */
 import {arrays, keys, scout, Tile, TileGrid, TileGridModel} from '../../../src/index';
 import {triggerKeyDownCapture, triggerKeyInputCapture, triggerKeyUpCapture} from '../../../src/testing/jquery-testing';
-import {Optional} from '../../../src/types';
+import {InitModelOf} from '../../../src/scout';
 
 describe('TileGridKeyStrokes', () => {
   let session: SandboxSession;
@@ -27,7 +27,7 @@ describe('TileGridKeyStrokes', () => {
       '</style>').appendTo($('#sandbox'));
   });
 
-  function createTileGrid(numTiles: number, model?: Optional<TileGridModel, 'parent'>): TileGrid {
+  function createTileGrid(numTiles: number, model?: TileGridModel): TileGrid {
     let tiles = [];
     for (let i = 0; i < numTiles; i++) {
       tiles.push({
@@ -40,7 +40,7 @@ describe('TileGridKeyStrokes', () => {
       tiles: tiles
     };
     model = $.extend({}, defaults, model);
-    return scout.create(TileGrid, model as TileGridModel);
+    return scout.create(TileGrid, model as InitModelOf<TileGrid>);
   }
 
   describe('ctrl + a', () => {

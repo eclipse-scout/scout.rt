@@ -11,13 +11,14 @@
 import {BenchRowLayoutData} from '../../../index';
 import $ from 'jquery';
 import BenchColumnLayoutDataModel from './BenchColumnLayoutDataModel';
+import {InitModelOf, ObjectOrModel} from '../../../scout';
 
 export default class BenchColumnLayoutData implements BenchColumnLayoutDataModel {
   declare model: BenchColumnLayoutDataModel;
 
   columns: BenchRowLayoutData[];
 
-  constructor(model?: BenchColumnLayoutDataModel) {
+  constructor(model?: InitModelOf<BenchColumnLayoutData>) {
     this.columns = [null, null, null];
     $.extend(this, model);
 
@@ -34,7 +35,7 @@ export default class BenchColumnLayoutData implements BenchColumnLayoutDataModel
     return this.columns;
   }
 
-  static ensure(layoutData: BenchColumnLayoutData | BenchColumnLayoutDataModel): BenchColumnLayoutData {
+  static ensure(layoutData: ObjectOrModel<BenchColumnLayoutData>): BenchColumnLayoutData {
     if (!layoutData) {
       return new BenchColumnLayoutData();
     }

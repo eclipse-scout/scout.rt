@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {strings, SwitchEventMap, SwitchModel, tooltips, Widget} from '../index';
+import {InitModelOf} from '../scout';
 
 export default class Switch extends Widget implements SwitchModel {
   declare model: SwitchModel;
@@ -35,7 +36,7 @@ export default class Switch extends Widget implements SwitchModel {
     this.$button = null;
   }
 
-  protected override _init(model: SwitchModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.setTooltipText(model.tooltipText);
   }

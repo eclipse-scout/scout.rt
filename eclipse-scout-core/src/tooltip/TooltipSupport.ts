@@ -11,6 +11,8 @@
 import {scout, Tooltip, tooltips} from '../index';
 import $ from 'jquery';
 import TooltipModel from './TooltipModel';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 import MouseEnterEvent = JQuery.MouseEnterEvent;
 import MouseLeaveEvent = JQuery.MouseLeaveEvent;
 
@@ -33,13 +35,17 @@ export interface TooltipSupportOptions extends TooltipModel {
 }
 
 export default class TooltipSupport {
-  protected _options: TooltipSupportOptions;
+  declare model: TooltipSupportOptions;
+  declare initModel: SomeRequired<this['model'], 'parent'>;
+  declare self: TooltipSupport;
+
+  protected _options: InitModelOf<TooltipSupport>;
   protected _mouseEnterHandler: (event: MouseEnterEvent<HTMLElement>) => void;
   protected _mouseLeaveHandler: (event: MouseLeaveEvent<HTMLElement>) => void;
   protected _tooltip: Tooltip;
   protected _tooltipTimeoutId: number;
 
-  constructor(options: TooltipSupportOptions) {
+  constructor(options: InitModelOf<TooltipSupport>) {
     let defaultOptions = {
       selector: null,
       delay: tooltips.DEFAULT_TOOLTIP_DELAY,
@@ -145,7 +151,7 @@ export default class TooltipSupport {
       this._tooltip.setMenus(this._options.menus);
     } else {
       // create new tooltip
-      let options: TooltipModel = $.extend({}, this._options, {
+      let options = $.extend({}, this._options, {
         $anchor: this._options.$anchor || $comp,
         text: text,
         htmlEnabled: htmlEnabled

@@ -14,23 +14,23 @@ export default interface KeyStrokeContextOptions {
   /**
    * Indicates whether to invoke 'acceptInput' on a currently focused value field prior handling the keystroke.
    */
-  invokeAcceptInputOnActiveValueField: boolean;
+  invokeAcceptInputOnActiveValueField?: boolean;
   /**
    * Holds the keystrokes registered within this context.
    */
-  keyStrokes: KeyStroke[];
+  keyStrokes?: KeyStroke[];
   /**
    * Array of interceptors to participate in setting 'stop propagation' flags.
    */
-  stopPropagationInterceptors: ((event: ScoutKeyboardEvent) => void)[];
+  stopPropagationInterceptors?: ((event: ScoutKeyboardEvent) => void)[];
   /**
    * Holds the target where to bind this context as keydown listener.
    * This can either be a static value or a function to resolve the target.
    */
-  $bindTarget: JQuery | (() => JQuery);
+  $bindTarget?: JQuery | (() => JQuery);
   /**
    * Holds the scope of this context and is used to determine the context's accessibility, meaning not covert by a glasspane.
    * This can either be a static value or a function to resolve the target.
    */
-  $scopeTarget: JQuery | (() => JQuery);
+  $scopeTarget?: JQuery | (() => JQuery);
 }

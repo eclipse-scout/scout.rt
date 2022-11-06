@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {ContextMenuPopup, Menu, MenuBarPopupModel} from '../../index';
+import {InitModelOf} from '../../scout';
 
 /**
  * The MenuBarPopup is a special Popup that is used in the menu-bar. It is tightly coupled with a menu-item.
@@ -25,7 +26,7 @@ export default class MenuBarPopup extends ContextMenuPopup implements MenuBarPop
     this.windowPaddingY = 0;
   }
 
-  protected override _init(options: MenuBarPopupModel) {
+  protected override _init(options: InitModelOf<this>) {
     options.anchor = options.menu;
     options.closeOnAnchorMouseDown = false;
     super._init(options);

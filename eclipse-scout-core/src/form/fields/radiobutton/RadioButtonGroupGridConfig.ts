@@ -14,10 +14,6 @@ import {LogicalGridWidget} from '../../../layout/logicalgrid/LogicalGridData';
 export default class RadioButtonGroupGridConfig extends LogicalGridConfig {
   declare widget: LogicalGridContainer & RadioButtonGroup<any>;
 
-  constructor() {
-    super();
-  }
-
   override getGridWidgets(): LogicalGridWidget[] {
     return this.widget.fields;
   }

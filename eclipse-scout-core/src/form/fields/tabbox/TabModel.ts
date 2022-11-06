@@ -11,6 +11,6 @@
 import {TabItem, WidgetModel} from '../../../index';
 
 export default interface TabModel extends WidgetModel {
-  tabItem: TabItem;
+  tabItem?: TabItem;
   selected?: boolean;
 }

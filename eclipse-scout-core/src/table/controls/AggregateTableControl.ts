@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, EventHandler, graphics, icons, TableControl, TableControlModel, TableRow, tooltips} from '../../index';
+import {arrays, Device, EventHandler, graphics, icons, TableControl, TableRow, tooltips} from '../../index';
 import $ from 'jquery';
 import {TableColumnMovedEvent} from '../TableEventMap';
+import {InitModelOf} from '../../scout';
 
 export default class AggregateTableControl extends TableControl {
 
@@ -43,7 +44,7 @@ export default class AggregateTableControl extends TableControl {
 
   static override CONTAINER_ANIMATE_DURATION = 200;
 
-  protected override _init(model: TableControlModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
     this.table.on('aggregationFunctionChanged', this._aggregationFunctionChangedHandler);

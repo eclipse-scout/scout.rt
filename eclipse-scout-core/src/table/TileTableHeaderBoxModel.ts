@@ -11,5 +11,5 @@
 import {GroupBoxModel, Table} from '../index';
 
 export default interface TileTableHeaderBoxModel extends GroupBoxModel {
-  parent: Table;
+  parent?: Table;
 }

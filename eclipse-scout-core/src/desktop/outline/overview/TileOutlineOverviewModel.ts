@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {OutlineOverviewModel, PageTileGrid, PageTileGridModel, RefModel} from '../../../index';
+import {OutlineOverviewModel, PageTileGrid} from '../../../index';
+import {ObjectOrChildModel} from '../../../scout';
 
 export default interface TileOutlineOverviewModel extends OutlineOverviewModel {
-  pageTileGrid?: PageTileGrid | RefModel<PageTileGridModel>;
+  pageTileGrid?: ObjectOrChildModel<PageTileGrid>;
   titleVisible?: boolean;
 }

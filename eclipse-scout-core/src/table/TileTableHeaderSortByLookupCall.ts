@@ -9,18 +9,16 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Column, icons, LookupRow, scout, StaticLookupCall, Table, TileTableHeaderSortByLookupCallModel} from '../index';
+import {SomeRequired} from '../types';
 
 export default class TileTableHeaderSortByLookupCall extends StaticLookupCall<TileTableHeaderSortKey> implements TileTableHeaderSortByLookupCallModel {
   declare model: TileTableHeaderSortByLookupCallModel;
+  declare initModel: SomeRequired<this['model'], 'session' | 'table'>;
   table: Table;
 
   constructor() {
     super();
     this.table = null;
-  }
-
-  protected override _init(model: TileTableHeaderSortByLookupCallModel) {
-    super._init(model);
   }
 
   protected override _data(): any[] {

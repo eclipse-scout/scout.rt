@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
@@ -11,6 +11,7 @@
 import {EventHandler, GroupBoxMenuItemsOrder, HtmlComponent, MenuBar, PropertyChangeEvent, scout, TabArea, TabBoxHeaderLayout, TabItem, Widget, WidgetEventMap, WidgetModel} from '../../../index';
 import TabBox from './TabBox';
 import Tab from './Tab';
+import {InitModelOf} from '../../../scout';
 
 export interface TabBoxHeaderModel extends WidgetModel {
   tabBox: TabBox;
@@ -43,7 +44,7 @@ export default class TabBoxHeader extends Widget implements TabBoxHeaderModel {
     this._tabAreaPropertyChangeHandler = this._onTabAreaPropertyChange.bind(this);
   }
 
-  protected override _init(options: TabBoxHeaderModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
 
     this.tabArea = scout.create(TabArea, {

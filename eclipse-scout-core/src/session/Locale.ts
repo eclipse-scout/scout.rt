@@ -10,8 +10,11 @@
  */
 import {DateFormat, DecimalFormat, locales, scout} from '../index';
 import LocaleModel, {DateFormatSymbols, DecimalFormatSymbols} from './LocaleModel';
+import {InitModelOf} from '../scout';
 
-export default class Locale {
+export default class Locale implements LocaleModel {
+  declare model: LocaleModel;
+
   languageTag: string;
   language: string;
   country: string;
@@ -25,7 +28,7 @@ export default class Locale {
   timeFormatPatternDefault: string;
   dateFormat: DateFormat;
 
-  constructor(model?: LocaleModel) {
+  constructor(model?: InitModelOf<Locale>) {
     model = scout.nvl(model, Locale.DEFAULT);
 
     this.languageTag = model.languageTag;
@@ -51,7 +54,7 @@ export default class Locale {
     }
   }
 
-  static ensure(locale?: Locale | LocaleModel): Locale {
+  static ensure(locale?: Locale | InitModelOf<Locale>): Locale {
     if (!locale) {
       return locale as Locale;
     }

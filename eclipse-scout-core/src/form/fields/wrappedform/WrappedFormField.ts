@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, EventHandler, Form, FormField, FormModel, GroupBox, RefModel, WrappedFormFieldEventMap, WrappedFormFieldModel} from '../../../index';
+import {Event, EventHandler, Form, FormField, GroupBox, WrappedFormFieldEventMap, WrappedFormFieldModel} from '../../../index';
+import {InitModelOf, ObjectOrChildModel} from '../../../scout';
 
 export default class WrappedFormField extends FormField implements WrappedFormFieldModel {
   declare model: WrappedFormFieldModel;
@@ -28,7 +29,7 @@ export default class WrappedFormField extends FormField implements WrappedFormFi
     this._formDestroyHandler = this._onInnerFormDestroy.bind(this);
   }
 
-  protected override _init(model: WrappedFormFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setInnerForm(this.innerForm);
   }
@@ -44,7 +45,7 @@ export default class WrappedFormField extends FormField implements WrappedFormFi
     this._renderInnerForm();
   }
 
-  setInnerForm(innerForm: Form | RefModel<FormModel>) {
+  setInnerForm(innerForm: ObjectOrChildModel<Form>) {
     this.setProperty('innerForm', innerForm);
   }
 

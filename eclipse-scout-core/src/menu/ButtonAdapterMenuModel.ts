@@ -11,6 +11,6 @@
 import {Button, MenuBar, MenuModel} from '../index';
 
 export default interface ButtonAdapterMenuModel extends MenuModel {
-  button: Button;
+  button?: Button;
   menubar?: MenuBar;
 }

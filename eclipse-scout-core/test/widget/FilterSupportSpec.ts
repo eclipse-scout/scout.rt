@@ -12,7 +12,7 @@
 /* eslint-disable max-classes-per-file */
 import {Filter, FilterOrFunction, FilterResult, FilterSupport, HtmlComponent, KeyStrokeContext, NullWidget, numbers, StringField, strings, UpdateFilteredElementsOptions, WidgetModel} from '../../src/index';
 import $ from 'jquery';
-import {Optional} from '../../src/types';
+import {FullModelOf, InitModelOf} from '../../src/scout';
 
 describe('FilterSupport', () => {
 
@@ -51,7 +51,7 @@ describe('FilterSupport', () => {
       super._remove();
     }
 
-    protected override _init(model: WidgetModel & { elements?: object }) {
+    protected override _init(model: InitModelOf<this> & { elements?: object }) {
       super._init(model);
       this.setElements(this.elements);
       this.setFilters(this.filters);
@@ -149,14 +149,14 @@ describe('FilterSupport', () => {
     session = sandboxSession();
   });
 
-  function createWidget(model: Optional<WidgetModel, 'parent'> & { elements?: object }): FilterSupportWidget {
+  function createWidget(model: WidgetModel & { elements?: object }): FilterSupportWidget {
     let defaults = {
       parent: session.desktop,
       session: session
     };
     model = $.extend({}, defaults, model);
     let widget = new FilterSupportWidget();
-    widget.init(model as WidgetModel);
+    widget.init(model as FullModelOf<FilterSupportWidget>);
     return widget;
   }
 

@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FlexboxLayoutData, LayoutData, RefModel, SimpleTabArea, SimpleTabAreaModel, SimpleTabBoxController, WidgetModel} from '../index';
+import {LayoutData, SimpleTabArea, SimpleTabBoxController, WidgetModel} from '../index';
 import {SimpleTabView} from './SimpleTab';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface SimpleTabBoxModel<TView extends SimpleTabView = SimpleTabView> extends WidgetModel {
-  tabArea?: SimpleTabArea<TView> | RefModel<SimpleTabAreaModel>;
+  tabArea?: ObjectOrChildModel<SimpleTabArea<TView>>;
   viewStack?: TView[];
   currentView?: TView;
   controller?: SimpleTabBoxController<TView>;

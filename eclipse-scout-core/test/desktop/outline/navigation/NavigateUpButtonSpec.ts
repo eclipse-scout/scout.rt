@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, NavigateButtonModel, NavigateUpButton, Outline, Page, Table} from '../../../../src/index';
+import {Form, NavigateUpButton, Outline, Page, Table} from '../../../../src/index';
 
 describe('NavigateUpButton', () => {
 
@@ -42,7 +42,7 @@ describe('NavigateUpButton', () => {
         // nop
       }
     } as unknown as Outline;
-    let model = createSimpleModel(SpecNavigateUpButton, session) as NavigateButtonModel;
+    let model = createSimpleModel(SpecNavigateUpButton, session);
     model.outline = outline;
     model.node = node;
     menu = new SpecNavigateUpButton();

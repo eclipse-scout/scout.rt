@@ -9,14 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  CheckBoxField, CompositeField, DateField, dates, EventHandler, FormField, FormFieldModel, HorizontalGrid, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuModel, PropertyChangeEvent,
-  RefModel, scout, SequenceBoxEventMap, SequenceBoxGridConfig, SequenceBoxLayout, SequenceBoxModel, ValueField, Widget
+  CheckBoxField, CompositeField, DateField, dates, EventHandler, FormField, HorizontalGrid, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, PropertyChangeEvent, scout, SequenceBoxEventMap,
+  SequenceBoxGridConfig, SequenceBoxLayout, SequenceBoxModel, ValueField, Widget
 } from '../../../index';
 import {FormFieldSuppressStatus} from '../FormField';
-import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
 import {StatusOrModel} from '../../../status/Status';
 import {CloneOptions} from '../../../widget/Widget';
-import {Optional} from '../../../types';
+import {InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../../../scout';
 
 export default class SequenceBox extends CompositeField implements SequenceBoxModel {
   declare model: SequenceBoxModel;
@@ -50,7 +49,7 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
     this._lastVisibleFieldSuppressStatusHandler = this._onLastVisibleFieldSuppressStatusChange.bind(this);
   }
 
-  protected override _init(model: SequenceBoxModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this._setLayoutConfig(this.layoutConfig);
@@ -131,11 +130,11 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
     }
   }
 
-  setLayoutConfig(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
+  setLayoutConfig(layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
     this.setProperty('layoutConfig', layoutConfig);
   }
 
-  protected _setLayoutConfig(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
+  protected _setLayoutConfig(layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
     if (!layoutConfig) {
       layoutConfig = new LogicalGridLayoutConfig();
     }
@@ -258,9 +257,9 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
     }
   }
 
-  override setMenus(menusOrModels: (Menu | RefModel<MenuModel>)[]) {
+  override setMenus(menusOrModels: ObjectOrChildModel<Menu>[]) {
     // ensure menus are real and not just model objects
-    let menus = this._createChildren(menusOrModels) as unknown as Menu[];
+    let menus = this._createChildren(menusOrModels);
 
     if (this._isOverwritingStatusFromField && !this._isMenusOverwritten) {
       // was not overwritten, will be overwritten now -> backup old value
@@ -361,7 +360,7 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
     }
   }
 
-  setFields(fields: (FormField | RefModel<FormFieldModel>)[]) {
+  setFields(fields: ObjectOrChildModel<FormField>[]) {
     if (this.rendered) {
       throw new Error('Setting fields is not supported if sequence box is already rendered.');
     }
@@ -372,7 +371,7 @@ export default class SequenceBox extends CompositeField implements SequenceBoxMo
     return this.fields;
   }
 
-  override clone(model: Optional<SequenceBoxModel, 'parent'>, options?: CloneOptions): this {
+  override clone(model: SequenceBoxModel, options?: CloneOptions): this {
     let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'fields', options);
     return clone;

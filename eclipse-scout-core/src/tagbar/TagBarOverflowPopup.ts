@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AbstractLayout, arrays, EventHandler, Popup, PopupModel, PropertyChangeEvent, TagBar, TagBarOverflowPopupLayout, TagField, TagFieldDeleteKeyStroke, TagFieldNavigationKeyStroke} from '../index';
+import {AbstractLayout, arrays, EventHandler, Popup, PropertyChangeEvent, TagBar, TagBarOverflowPopupLayout, TagField, TagFieldDeleteKeyStroke, TagFieldNavigationKeyStroke} from '../index';
 import {TagFieldKeyStrokeAdapter} from '../form/fields/tagfield/TagField';
+import {InitModelOf} from '../scout';
 
 export default class TagBarOverflowPopup extends Popup {
   declare parent: TagBar;
@@ -34,7 +35,7 @@ export default class TagBarOverflowPopup extends Popup {
     };
   }
 
-  protected override _init(options: PopupModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this._tagBarPropertyChangeListener = this._onTagBarPropertyChange.bind(this);
     this.parent.on('propertyChange', this._tagBarPropertyChangeListener);

@@ -8,15 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, Form, FormAdapter, FormModel, JsFormModel, ObjectWithType, Widget} from '../../index';
+import {Event, Form, FormAdapter, JsFormModel, Widget} from '../../index';
+import {ChildModelOf, FullModelOf} from '../../scout';
 
 export default class JsFormAdapter extends FormAdapter {
 
-  constructor() {
-    super();
-  }
-
-  protected override _initModel(m: Omit<JsFormModel, 'parent'> & ObjectWithType, parent: Widget): FormModel & ObjectWithType {
+  protected override _initModel(m: ChildModelOf<Widget>, parent: Widget): FullModelOf<Widget> {
     let model = super._initModel(m, parent) as JsFormModel;
 
     if (!model.jsFormObjectType || !model.jsFormObjectType.length) {
@@ -39,7 +36,7 @@ export default class JsFormAdapter extends FormAdapter {
     return jsFormModel;
   }
 
-  protected override _createWidget(model: FormModel & ObjectWithType): Form {
+  protected override _createWidget(model: FullModelOf<Form>): Form {
     let widget = super._createWidget(model) as Form;
 
     widget.showOnOpen = false;

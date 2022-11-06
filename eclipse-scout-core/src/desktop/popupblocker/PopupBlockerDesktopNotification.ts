@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {DesktopNotification, PopupBlockerDesktopNotificationEventMap, PopupBlockerDesktopNotificationModel, scout, Status} from '../../index';
+import {InitModelOf} from '../../scout';
 
 export default class PopupBlockerDesktopNotification extends DesktopNotification implements PopupBlockerDesktopNotificationModel {
   declare model: PopupBlockerDesktopNotificationModel;
@@ -26,7 +27,7 @@ export default class PopupBlockerDesktopNotification extends DesktopNotification
     this.preserveOpener = false;
   }
 
-  protected override _init(model: PopupBlockerDesktopNotificationModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.linkText = scout.nvl(this.linkText, this.session.text('ui.OpenManually'));
     this._setStatus({

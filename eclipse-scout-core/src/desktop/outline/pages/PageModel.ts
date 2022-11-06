@@ -8,16 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, FormModel, Outline, Page, Table, TableModel, TreeNodeModel} from '../../../index';
-import {RefModel} from '../../../types';
+import {Form, Outline, Page, Table, TreeNodeModel} from '../../../index';
+import {ObjectOrChildModel, ObjectOrModel} from '../../../scout';
 
 export default interface PageModel extends TreeNodeModel {
-  parent: Outline;
-  childNodes?: Omit<PageModel, 'parent'>[] | Page[];
+  parent?: Outline;
+  childNodes?: ObjectOrModel<Page>[];
   compactRoot?: boolean;
-  detailTable?: Table | RefModel<TableModel>;
+  detailTable?: ObjectOrChildModel<Table>;
   detailTableVisible?: boolean;
-  detailForm?: Form | RefModel<FormModel>;
+  detailForm?: ObjectOrChildModel<Form>;
   detailFormVisible?: boolean;
   navigateButtonsVisible?: boolean;
   tableStatusVisible?: boolean;
@@ -31,5 +31,3 @@ export default interface PageModel extends TreeNodeModel {
   overviewIconId?: string;
   showTileOverview?: boolean;
 }
-
-export type PageData = Omit<PageModel, 'parent'>;

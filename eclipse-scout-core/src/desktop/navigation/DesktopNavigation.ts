@@ -13,6 +13,7 @@ import {
   styles, Tree, ViewButtonBox, Widget
 } from '../../index';
 import {CollapseHandleActionEvent} from '../../collapsehandle/CollapseHandleEventMap';
+import {InitModelOf} from '../../scout';
 
 export default class DesktopNavigation extends Widget implements DesktopNavigationModel {
   declare model: DesktopNavigationModel;
@@ -55,7 +56,7 @@ export default class DesktopNavigation extends Widget implements DesktopNavigati
   static BREADCRUMB_STYLE_WIDTH = null; // Configured in sizes.css
   static MIN_WIDTH = null; // Configured in sizes.css
 
-  protected override _init(model: DesktopNavigationModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     DesktopNavigation.MIN_WIDTH = styles.getSize('desktop-navigation', 'min-width', 'minWidth', 49);
     DesktopNavigation.DEFAULT_STYLE_WIDTH = styles.getSize('desktop-navigation', 'width', 'width', 290);

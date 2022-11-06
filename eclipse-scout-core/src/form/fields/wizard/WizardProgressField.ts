@@ -10,6 +10,7 @@
  */
 import {Device, Form, FormField, FormFieldLayout, GroupBox, icons, inspector, scout, scrollbars, strings, tooltips, WizardProgressFieldEventMap, WizardProgressFieldLayout, WizardProgressFieldModel} from '../../../index';
 import $ from 'jquery';
+import {InitModelOf} from '../../../scout';
 
 export default class WizardProgressField extends FormField implements WizardProgressFieldModel {
   declare model: WizardProgressFieldModel;
@@ -42,7 +43,7 @@ export default class WizardProgressField extends FormField implements WizardProg
     this.animateScrolling = Device.get().type === Device.Type.MOBILE;
   }
 
-  protected override _init(model: WizardProgressFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._updateStepsMap();
   }

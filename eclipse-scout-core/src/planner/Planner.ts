@@ -18,6 +18,7 @@ import {YearPanelDateSelectEvent} from '../calendar/YearPanelEventMap';
 import {PlannerHeaderDisplayModeClickEvent} from './PlannerHeaderEventMap';
 import PlannerEventMap from './PlannerEventMap';
 import {JsonDateRange} from '../util/dates';
+import {InitModelOf} from '../scout';
 
 export default class Planner extends Widget implements PlannerModel {
   declare model: PlannerModel;
@@ -138,7 +139,7 @@ export default class Planner extends Widget implements PlannerModel {
     return new KeyStrokeContext();
   }
 
-  protected override _init(model: PlannerModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.yearPanel = scout.create(YearPanel, {
       parent: this,

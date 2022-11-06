@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Group, GroupModel, WidgetModel} from '../index';
-import {Comparator, RefModel} from '../types';
+import {Group, WidgetModel} from '../index';
+import {Comparator} from '../types';
 import {GroupCollapseStyle} from '../group/Group';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface AccordionModel extends WidgetModel {
   /**
@@ -26,6 +27,6 @@ export default interface AccordionModel extends WidgetModel {
    * Default is true.
    */
   exclusiveExpand?: boolean;
-  groups?: (Group | RefModel<GroupModel>)[];
+  groups?: ObjectOrChildModel<Group>[];
   scrollable?: boolean;
 }

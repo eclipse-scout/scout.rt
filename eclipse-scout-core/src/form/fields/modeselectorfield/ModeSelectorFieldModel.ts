@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Mode, ModeModel, ModeSelector, ModeSelectorModel, ValueFieldModel} from '../../../index';
-import {RefModel} from '../../../types';
+import {ModeSelector, ValueFieldModel} from '../../../index';
+import {ObjectOrChildModel} from '../../../scout';
 
 export default interface ModeSelectorFieldModel<TValue> extends ValueFieldModel<TValue> {
-  modeSelector: ModeSelector<TValue> | RefModel<ModeSelectorModel<TValue>>;
+  modeSelector?: ObjectOrChildModel<ModeSelector<TValue>>;
 }

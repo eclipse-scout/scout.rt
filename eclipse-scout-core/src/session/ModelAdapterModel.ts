@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Session} from '../index';
-import {ObjectType} from '../ObjectFactory';
+import {ObjectWithType, Session} from '../index';
 
-export default interface ModelAdapterModel {
-  id: string;
-  session: Session;
-  objectType?: ObjectType;
+export default interface ModelAdapterModel extends Partial<ObjectWithType> {
+  id?: string;
+  session?: Session;
 }

@@ -10,10 +10,10 @@
  */
 import {ColumnDescriptor, LookupRow, ValueFieldModel} from '../../../index';
 import {SmartFieldActiveFilter, SmartFieldDisplayStyle} from './SmartField';
-import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
+import {LookupCallOrModel} from '../../../lookup/LookupCall';
 
 export default interface SmartFieldModel<TValue> extends ValueFieldModel<TValue> {
-  lookupCall?: LookupCallOrRefModel<TValue>;
+  lookupCall?: LookupCallOrModel<TValue>;
   codeType?: string;
   lookupRow?: LookupRow<TValue>;
   /**

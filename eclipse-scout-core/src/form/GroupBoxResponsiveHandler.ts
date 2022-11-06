@@ -9,9 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, Button, CheckBoxField, CompositeField, EventHandler, FormField, GridData, GroupBox, HtmlComponent, HtmlEnvironment, LabelField, PlaceholderField, PropertyChangeEvent, RadioButtonGroup, ResponsiveHandler, ResponsiveHandlerModel,
-  ResponsiveManager, SequenceBox, TreeVisitResult
+  arrays, Button, CheckBoxField, CompositeField, EventHandler, FormField, GridData, GroupBox, HtmlComponent, HtmlEnvironment, LabelField, PlaceholderField, PropertyChangeEvent, RadioButtonGroup, ResponsiveHandler, ResponsiveManager,
+  SequenceBox, TreeVisitResult
 } from '../index';
+import {InitModelOf} from '../scout';
 
 export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
   declare widget: GroupBox;
@@ -51,7 +52,7 @@ export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
     this._initDefaults();
   }
 
-  override init(model: ResponsiveHandlerModel) {
+  override init(model: InitModelOf<this>) {
     super.init(model);
 
     let transformationType = GroupBoxResponsiveHandler.TransformationType;

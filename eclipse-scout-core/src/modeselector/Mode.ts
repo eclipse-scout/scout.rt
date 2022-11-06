@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Action, ModeModel} from '../index';
+import {InitModelOf} from '../scout';
 
 export default class Mode<TRef = any> extends Action implements ModeModel<TRef> {
   declare model: ModeModel<TRef>;
@@ -22,7 +23,7 @@ export default class Mode<TRef = any> extends Action implements ModeModel<TRef> 
     this.ref = null;
   }
 
-  protected override _init(model: ModeModel<TRef>) {
+  protected override _init(model: InitModelOf<this>) {
     model.owner = model.parent;
     super._init(model);
   }

@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  App, arrays, BooleanColumn, Cell, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, objects, scout, Table, TableModel, TableRow, TableUserFilter, TableUserFilterModel, ValueField
+  App, arrays, BooleanColumn, Cell, Column, ColumnModel, ColumnUserFilter, defaultValues, Event, Filter, ModelAdapter, NumberColumn, objects, scout, Table, TableModel, TableRow, TableRowModel, TableUserFilter, ValueField
 } from '../index';
 import $ from 'jquery';
 import {
@@ -17,8 +17,8 @@ import {
   TableDropEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TablePrepareCellEditEvent, TableReloadEvent, TableRowActionEvent, TableRowClickEvent, TableRowsCheckedEvent, TableRowsExpandedEvent, TableRowsSelectedEvent,
   TableSortEvent
 } from './TableEventMap';
-import {TableRowData} from './TableRowModel';
 import {AdapterData} from '../session/Session';
+import {ChildModelOf, ModelOf, ObjectOrModel} from '../scout';
 
 export default class TableAdapter extends ModelAdapter {
   declare widget: Table;
@@ -406,7 +406,7 @@ export default class TableAdapter extends ModelAdapter {
     }
   }
 
-  protected _onRowsInserted(rows: TableRowData[]) {
+  protected _onRowsInserted(rows: ObjectOrModel<TableRow> | ObjectOrModel<TableRow>[]) {
     this.widget.insertRows(rows);
     this._rebuildingTable = false;
   }
@@ -434,7 +434,7 @@ export default class TableAdapter extends ModelAdapter {
     this.widget.selectionHandler.clearLastSelectedRowMarker();
   }
 
-  protected _onRowsChecked(rows: TableRowData[]) {
+  protected _onRowsChecked(rows: TableRowModel[]) {
     let checkedRows: TableRow[] = [],
       uncheckedRows: TableRow[] = [];
 
@@ -457,7 +457,7 @@ export default class TableAdapter extends ModelAdapter {
     });
   }
 
-  protected _onRowsExpanded(rows: TableRowData[]) {
+  protected _onRowsExpanded(rows: TableRowModel[]) {
     let expandedRows: TableRow[] = [],
       collapsedRows: TableRow[] = [];
     rows.forEach(rowData => {
@@ -567,7 +567,7 @@ export default class TableAdapter extends ModelAdapter {
     this.widget.changeAggregations(columns, functions);
   }
 
-  protected _onFiltersChanged(filters: (TableUserFilter | TableUserFilterModel | Filter<TableRow>)[]) {
+  protected _onFiltersChanged(filters: (ObjectOrModel<TableUserFilter> | Filter<TableRow>)[]) {
     this.addFilterForWidgetEventType('filterAdded');
     this.addFilterForWidgetEventType('filterRemoved');
 
@@ -633,14 +633,14 @@ export default class TableAdapter extends ModelAdapter {
     return adapterData;
   }
 
-  protected _initRowModel(rowModel: TableRowData): TableRowData {
-    rowModel = rowModel || {};
-    rowModel.objectType = scout.nvl(rowModel.objectType, 'TableRow');
-    defaultValues.applyTo(rowModel);
-    return rowModel;
+  protected _initRowModel(rowModel?: TableRowModel): ChildModelOf<TableRow> {
+    let model = (rowModel || {}) as ChildModelOf<TableRow>;
+    model.objectType = scout.nvl(model.objectType, 'TableRow');
+    defaultValues.applyTo(model);
+    return model;
   }
 
-  protected static _createRowRemote(rowModel: TableRowData): TableRow {
+  protected static _createRowRemote(rowModel: TableRowModel): TableRow {
     // @ts-expect-error
     if (this.modelAdapter) {
       // @ts-expect-error

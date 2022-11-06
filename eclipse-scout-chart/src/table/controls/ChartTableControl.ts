@@ -15,6 +15,7 @@ import {TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup, TableM
 import {BubbleDataPoint, ChartData, ChartType as ChartJsType} from 'chart.js';
 import {ChartConfig, ClickObject} from '../../chart/Chart';
 import {Event, IconDesc, Table} from '@eclipse-scout/core/src';
+import {InitModelOf} from '@eclipse-scout/core/src/scout';
 
 export default class ChartTableControl extends TableControl implements ChartTableControlModel {
   declare model: ChartTableControlModel;
@@ -77,7 +78,7 @@ export default class ChartTableControl extends TableControl implements ChartTabl
   static DATE_GROUP_FLAG = 0x100;
   static MAX_AXIS_COUNT = 100;
 
-  protected override _init(model: ChartTableControlModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
 

@@ -10,9 +10,12 @@
  */
 
 import {Point, ViewportScrollerModel} from '../index';
+import {SomeRequired} from '../types';
+import {InitModelOf} from '../scout';
 
 export default class ViewportScroller implements ViewportScrollerModel {
   declare model: ViewportScrollerModel;
+  declare initModel: SomeRequired<this['model'], 'viewportWidth' | 'viewportHeight'>;
 
   static SPEED_FACTOR_SLOW = 1 / 20;
   static SPEED_FACTOR_MEDIUM = 1 / 10;
@@ -32,7 +35,7 @@ export default class ViewportScroller implements ViewportScrollerModel {
   moved: boolean;
   protected _timeoutId: number;
 
-  constructor(model?: ViewportScrollerModel) {
+  constructor(model?: InitModelOf<ViewportScroller>) {
     this.viewportWidth = 0;
     this.viewportHeight = 0;
     this.e = 30;

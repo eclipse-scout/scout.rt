@@ -15,6 +15,7 @@ import {
 import $ from 'jquery';
 import PopupModel from './PopupModel';
 import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
+import {InitModelOf} from '../scout';
 
 export type PopupAlignment = EnumObject<typeof Popup.Alignment>;
 
@@ -164,7 +165,7 @@ export default class Popup extends Widget implements PopupModel {
 
   static SwitchRule = {};
 
-  protected override _init(options: PopupModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
 
     if (options.location) {

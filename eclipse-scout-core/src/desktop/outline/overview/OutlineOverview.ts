@@ -10,6 +10,7 @@
  */
 import {HtmlComponent, Outline, OutlineOverviewModel, scout, Widget} from '../../../index';
 import {DisplayViewId} from '../../../tabbox/SimpleTab';
+import {InitModelOf} from '../../../scout';
 
 export default class OutlineOverview extends Widget implements OutlineOverviewModel {
   declare model: OutlineOverviewModel;
@@ -23,7 +24,7 @@ export default class OutlineOverview extends Widget implements OutlineOverviewMo
     this.outline = null;
   }
 
-  protected override _init(model: OutlineOverviewModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     if (!this.outline && this.parent instanceof Outline) {
       this.outline = this.parent;

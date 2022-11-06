@@ -33,7 +33,7 @@ describe('Table', () => {
     session = sandboxSession();
     session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
     helper = new TableSpecHelper(session);
-    $.fx.off = true; // generation of sumrows is animated. leads to misleading test failures.
+    $.fx.off = true; // generation of sum rows is animated. leads to misleading test failures.
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -1263,7 +1263,7 @@ describe('Table', () => {
         column2.sortActive = true;
         column2.sortIndex = 0;
         table.updateColumnStructure(table.columns); // (re)initialize columns,
-        // have been initialised
+        // have been initialized
         // already during init
         render(table);
 
@@ -1297,7 +1297,7 @@ describe('Table', () => {
         column2.sortActive = true;
         column2.sortIndex = 0;
         table.updateColumnStructure(table.columns); // (re)initialize columns,
-        // have been initialised
+        // have been initialized
         // already during init
         render(table);
 
@@ -1331,7 +1331,7 @@ describe('Table', () => {
         column2.sortActive = true;
         column2.sortIndex = 0;
         table.updateColumnStructure(table.columns); // (re)initialize columns,
-        // have been initialised
+        // have been initialized
         // already during init
         render(table);
 
@@ -2207,7 +2207,7 @@ describe('Table', () => {
       // Check if order in the DOM is correct
       // Note: in a previous version of this test we checked if an animation was playing for certain DOM nodes,
       // but we must disable jQuery animations completely during test execution, otherwise test will fail, since
-      // the complete/done function is scheduled and executed to a time where the test that started the animation
+      // the complete/done function is scheduled and executed to a time when the test that started the animation
       // is already finished. So this will lead to unpredictable failures.
       let uiOrderedRows = [],
         $row;

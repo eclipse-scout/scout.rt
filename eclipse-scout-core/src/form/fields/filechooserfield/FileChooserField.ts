@@ -10,6 +10,7 @@
  */
 import {arrays, FileChooserFieldBrowseKeyStroke, FileChooserFieldDeleteKeyStroke, FileChooserFieldEventMap, FileChooserFieldModel, FileInput, objects, scout, ValueField} from '../../../index';
 import {FileInputChangeEvent} from '../../../filechooser/FileInputEventMap';
+import {InitModelOf} from '../../../scout';
 
 export default class FileChooserField extends ValueField<File> implements FileChooserFieldModel {
   declare model: FileChooserFieldModel;
@@ -28,7 +29,7 @@ export default class FileChooserField extends ValueField<File> implements FileCh
     this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
   }
 
-  protected override _init(model: FileChooserFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this.fileInput.on('change', this._onFileChange.bind(this));

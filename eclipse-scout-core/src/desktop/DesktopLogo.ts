@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Desktop, DesktopLogoEventMap, DesktopLogoModel, EventHandler, HtmlComponent, Image, PropertyChangeEvent, scout, Widget} from '../index';
+import {InitModelOf} from '../scout';
 
 export default class DesktopLogo extends Widget implements DesktopLogoModel {
   declare model: DesktopLogoModel;
@@ -31,7 +32,7 @@ export default class DesktopLogo extends Widget implements DesktopLogoModel {
     this._clickHandler = this._onClick.bind(this);
   }
 
-  protected override _init(model: DesktopLogoModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.desktop = this.session.desktop;
     this.clickable = this.desktop.logoActionEnabled;

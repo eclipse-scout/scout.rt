@@ -13,6 +13,7 @@ import {App, EnumObject, ResponsiveHandler, scout} from '../index';
 export type ResponsiveState = EnumObject<typeof ResponsiveManager.ResponsiveState>;
 
 let instance: ResponsiveManager;
+
 export default class ResponsiveManager {
   active: boolean;
   globalState: ResponsiveState;
@@ -21,7 +22,6 @@ export default class ResponsiveManager {
   constructor() {
     this.active = true;
     this.globalState = null;
-
     this._responsiveHandlers = [];
   }
 
@@ -125,5 +125,4 @@ App.addListener('prepare', () => {
     return;
   }
   instance = scout.create(ResponsiveManager);
-  instance.init();
 });

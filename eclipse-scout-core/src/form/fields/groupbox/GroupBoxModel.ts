@@ -8,19 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, FormFieldModel, LogicalGridLayoutConfig, Menu, MenuModel, Notification, NotificationModel} from '../../../index';
+import {FormField, FormFieldModel, LogicalGridLayoutConfig, Menu, Notification} from '../../../index';
 import {MenuBarEllipsisPosition} from '../../../menu/menubar/MenuBar';
 import {GroupBoxBorderDecoration, GroupBoxMenuBarPosition} from './GroupBox';
-import {RefModel} from '../../../types';
-import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
+import {ObjectOrChildModel, ObjectOrModel} from '../../../scout';
 
 export default interface GroupBoxModel extends FormFieldModel {
-  fields?: (FormField | RefModel<FormFieldModel>)[];
+  fields?: ObjectOrChildModel<FormField>[];
   menuBarVisible?: boolean;
   menuBarPosition?: GroupBoxMenuBarPosition;
   menuBarEllipsisPosition?: MenuBarEllipsisPosition;
-  notification?: Notification | RefModel<NotificationModel>;
-  bodyLayoutConfig?: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel;
+  notification?: ObjectOrChildModel<Notification>;
+  bodyLayoutConfig?: ObjectOrModel<LogicalGridLayoutConfig>;
   /**
    * Only has an effect if the border is visible which can be controlled using {@link borderVisible}.
    */
@@ -48,14 +47,14 @@ export default interface GroupBoxModel extends FormFieldModel {
    * Default is 2 columns.
    */
   gridColumnCount?: number;
-  staticMenus?: (Menu | MenuModel)[];
+  staticMenus?: ObjectOrChildModel<Menu>[];
   /**
    * Configures the keystroke to select this group box (inside a tab-box).
    * If the groupbox is not inside a tab-box, this configured selection keyStroke will be ignored.
    */
   selectionKeystroke?: string;
   /**
-   * If the property is set to true, the content of the group box will be adjusted to ensure best readability, when the width of the group box is less than its preferred size.
+   * If the property is set to true, the content of the group box will be adjusted to ensure the best readability, when the width of the group box is less than its preferred size.
    * If the property is set to null, it will be true if the group box is the main box in a form and false otherwise.
    * The default is null which means all main-boxes are responsive and all others are not.
    */

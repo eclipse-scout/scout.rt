@@ -8,11 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {numbers, Range, scout, VirtualScrollingOptions, Widget} from '../index';
+import {numbers, Range, scout, VirtualScrollingModel, Widget} from '../index';
 import $ from 'jquery';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
-export default class VirtualScrolling implements VirtualScrollingOptions {
-  declare model: VirtualScrollingOptions;
+export default class VirtualScrolling implements VirtualScrollingModel {
+  declare model: VirtualScrollingModel;
+  declare initModel: SomeRequired<this['model'], 'rowHeight' | 'rowCount' | '_renderViewRange'>;
 
   enabled: boolean;
   minRowHeight: number;
@@ -20,7 +23,7 @@ export default class VirtualScrolling implements VirtualScrollingOptions {
   widget: Widget;
   $scrollable: JQuery;
 
-  constructor(options: VirtualScrollingOptions) {
+  constructor(options: InitModelOf<VirtualScrolling>) {
     this.enabled = true;
     this.minRowHeight = 0;
     this.viewRangeSize = 0;

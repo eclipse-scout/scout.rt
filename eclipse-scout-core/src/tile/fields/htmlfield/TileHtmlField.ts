@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {HtmlField} from '../../../index';
-import {Optional} from '../../../types';
 import {ScrollbarInstallOptions} from '../../../scrollbar/scrollbars';
 
 export default class TileHtmlField extends HtmlField {
@@ -19,7 +18,7 @@ export default class TileHtmlField extends HtmlField {
     this.$container.addClass('scrollbar-y-outside');
   }
 
-  protected override _installScrollbars(options: Optional<ScrollbarInstallOptions, 'parent'>) {
+  protected override _installScrollbars(options: ScrollbarInstallOptions) {
     super._installScrollbars($.extend(true, {}, options, {scrollShadow: 'gradient'}));
   }
 }

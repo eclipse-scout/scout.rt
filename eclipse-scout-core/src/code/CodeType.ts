@@ -10,9 +10,8 @@
  */
 import {Code, scout, TreeVisitResult} from '../index';
 import CodeTypeModel from './CodeTypeModel';
-import CodeModel from './CodeModel';
 import {TreeVisitor} from '../widget/Widget';
-import {RefModel} from '../types';
+import {FullModelOf, InitModelOf, ObjectOrModel} from '../scout';
 
 export default class CodeType<TCodeId> {
 
@@ -28,7 +27,7 @@ export default class CodeType<TCodeId> {
     this.codeMap = {};
   }
 
-  init(model: CodeTypeModel<TCodeId>) {
+  init(model: InitModelOf<this>) {
     scout.assertParameter('id', model.id);
     this.id = model.id;
     this.modelClass = model.modelClass;
@@ -40,7 +39,7 @@ export default class CodeType<TCodeId> {
     }
   }
 
-  protected _initCode(modelCode: RefModel<CodeModel<TCodeId>>, parent?: Code<TCodeId>) {
+  protected _initCode(modelCode: FullModelOf<Code<TCodeId>>, parent?: Code<TCodeId>) {
     let code = scout.create(modelCode);
     this.add(code, parent);
     if (modelCode.children) {
@@ -116,7 +115,7 @@ export default class CodeType<TCodeId> {
     }
   }
 
-  static ensure<TCodeId>(codeType: CodeType<TCodeId> | CodeTypeModel<TCodeId>): CodeType<TCodeId> {
+  static ensure<TCodeId>(codeType: ObjectOrModel<CodeType<TCodeId>>): CodeType<TCodeId> {
     if (!codeType) {
       return codeType as CodeType<TCodeId>;
     }

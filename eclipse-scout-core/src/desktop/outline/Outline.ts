@@ -9,16 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, FormModel, GroupBox, GroupBoxMenuItemsOrder, HtmlComponent, Icon,
-  KeyStrokeContext, keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout,
-  OutlineMediator, OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, OutlineOverviewModel, Page, PageLayout, PageModel, PropertyChangeEvent, RefModel, scout, Table, TableControl, TableControlAdapterMenu, TableRow,
-  TableRowDetail, TileOutlineOverview, Tree, TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, Widget
+  arrays, CompositeField, Desktop, DetailTableTreeFilter, Device, Event, EventHandler, EventListener, FileChooser, FileChooserController, Form, FormController, GroupBox, GroupBoxMenuItemsOrder, HtmlComponent, Icon, KeyStrokeContext,
+  keyStrokeModifier, Menu, MenuBar, MenuDestinations, menus as menuUtil, MessageBox, MessageBoxController, NavigateButton, NavigateDownButton, NavigateUpButton, OutlineEventMap, OutlineKeyStrokeContext, OutlineLayout, OutlineMediator,
+  OutlineModel, OutlineNavigateToTopKeyStroke, OutlineOverview, Page, PageLayout, PageModel, PropertyChangeEvent, scout, Table, TableControl, TableControlAdapterMenu, TableRow, TableRowDetail, TileOutlineOverview, Tree,
+  TreeCollapseOrDrillUpKeyStroke, TreeExpandOrDrillDownKeyStroke, TreeNavigationDownKeyStroke, TreeNavigationEndKeyStroke, TreeNavigationUpKeyStroke, Widget
 } from '../../index';
-import {Optional, SomeRequired} from '../../types';
 import DisplayParent from '../DisplayParent';
 import {GlassPaneTarget} from '../../widget/Widget';
 import {OutlineContent} from '../bench/DesktopBench';
-import {PageData} from './pages/PageModel';
+import {FullModelOf, InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../../scout';
 
 export default class Outline extends Tree implements DisplayParent, OutlineModel {
   declare model: OutlineModel;
@@ -115,7 +114,7 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     this._addWidgetProperties(['defaultDetailForm', 'views', 'selectedViewTabs', 'dialogs', 'messageBoxes', 'fileChoosers']);
   }
 
-  protected override _init(model: OutlineModel) {
+  protected override _init(model: InitModelOf<this>) {
     // initialize now and don't wait for desktop to call setters so that compact state is correct when upcoming widgets are initialized (TileOverviewForm etc.)
     this.compact = scout.nvl(model.compact, model.parent.session.desktop.displayStyle === Desktop.DisplayStyle.COMPACT);
     this.embedDetailContent = scout.nvl(model.embedDetailContent, this.compact);
@@ -166,15 +165,15 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     return scout.create(OutlineMediator);
   }
 
-  override insertNode(node: Page | PageData, parentNode?: Page) {
+  override insertNode(node: ObjectOrModel<Page>, parentNode?: Page) {
     super.insertNode(node, parentNode);
   }
 
-  protected override _createTreeNode(nodeModel?: Optional<PageModel, 'parent'>): Page {
+  protected override _createTreeNode(nodeModel?: PageModel): Page {
     nodeModel = nodeModel || {};
     nodeModel.objectType = scout.nvl(nodeModel.objectType, Page);
     nodeModel.parent = this;
-    return scout.create(nodeModel as SomeRequired<PageModel, 'objectType'>) as Page;
+    return scout.create(nodeModel as FullModelOf<Page>);
   }
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
@@ -487,7 +486,7 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     super._removeNodeSelection(node);
   }
 
-  setDefaultDetailForm(defaultDetailForm: Form | RefModel<FormModel>) {
+  setDefaultDetailForm(defaultDetailForm: ObjectOrChildModel<Form>) {
     this.setProperty('defaultDetailForm', defaultDetailForm);
   }
 
@@ -515,12 +514,12 @@ export default class Outline extends Tree implements DisplayParent, OutlineModel
     this._setProperty('outlineOverviewVisible', outlineOverviewVisible);
   }
 
-  setOutlineOverview(outlineOverview: OutlineOverview | RefModel<OutlineOverviewModel>) {
+  setOutlineOverview(outlineOverview: ObjectOrChildModel<OutlineOverview>) {
     this.setProperty('outlineOverview', outlineOverview);
     this._updateOutlineOverview();
   }
 
-  protected _setOutlineOverview(outlineOverview: OutlineOverview | RefModel<OutlineOverviewModel>) {
+  protected _setOutlineOverview(outlineOverview: ObjectOrChildModel<OutlineOverview>) {
     // Ensure outlineOverview is of type OutlineOverview.
     // Widget property cannot be used because nodes are not of type Page yet while _prepareWidgetProperty is running during initialization
     if (outlineOverview) {

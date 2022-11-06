@@ -18,9 +18,12 @@ import {ColumnComparator} from './comparators';
 import {AggregateTableRow} from '../Table';
 import {ObjectType} from '../../ObjectFactory';
 import {TableColumnMovedEvent} from '../TableEventMap';
+import {SomeRequired} from '../../types';
+import {InitModelOf} from '../../scout';
 
 export default class Column<TValue = string> extends PropertyEventEmitter implements ColumnModel<TValue> {
   declare model: ColumnModel<TValue>;
+  declare initModel: SomeRequired<this['model'], 'session'>;
   declare eventMap: ColumnEventMap;
   declare self: Column<any>;
 
@@ -151,7 +154,7 @@ export default class Column<TValue = string> extends PropertyEventEmitter implem
   static SMALL_MIN_WIDTH = 38;
   static NARROW_MIN_WIDTH = 34;
 
-  init(model: ColumnModel<TValue>) {
+  init(model: InitModelOf<this>) {
     this.session = model.session;
 
     // Copy all properties from model to this
@@ -168,7 +171,7 @@ export default class Column<TValue = string> extends PropertyEventEmitter implem
   /**
    * Override this function in order to implement custom init logic.
    */
-  protected _init(model: ColumnModel<TValue>) {
+  protected _init(model: InitModelOf<this>) {
     texts.resolveTextProperty(this, 'text');
     texts.resolveTextProperty(this, 'headerTooltipText');
     icons.resolveIconProperty(this, 'headerIconId');

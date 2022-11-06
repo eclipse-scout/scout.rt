@@ -10,6 +10,7 @@
  */
 import {LogicalGridLayoutConfig, TileGridLayout} from '../index';
 import {LogicalGridLayoutConfigModel} from '../layout/logicalgrid/LogicalGridLayoutConfig';
+import {InitModelOf, ObjectOrModel} from '../scout';
 
 export interface TileGridLayoutConfigModel extends LogicalGridLayoutConfigModel {
   /**
@@ -28,9 +29,11 @@ export interface TileGridLayoutConfigModel extends LogicalGridLayoutConfigModel 
  * Otherwise, the default values specified by CSS are applied (see {@link TileGridLayout._initDefaults}).
  */
 export default class TileGridLayoutConfig extends LogicalGridLayoutConfig implements TileGridLayoutConfigModel {
+  declare model: TileGridLayoutConfigModel;
+
   maxWidth: number;
 
-  constructor(options?: TileGridLayoutConfigModel) {
+  constructor(options?: InitModelOf<TileGridLayoutConfig>) {
     super(options);
     options = options || {};
     if (options.maxWidth > -2) {
@@ -49,7 +52,7 @@ export default class TileGridLayoutConfig extends LogicalGridLayoutConfig implem
     return new TileGridLayoutConfig(this);
   }
 
-  static override ensure(layoutConfig: TileGridLayoutConfig | TileGridLayoutConfigModel): TileGridLayoutConfig {
+  static override ensure(layoutConfig: ObjectOrModel<TileGridLayoutConfig>): TileGridLayoutConfig {
     if (!layoutConfig) {
       return null;
     }

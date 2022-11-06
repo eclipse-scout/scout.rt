@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, MenuModel, RefModel, WidgetModel} from '../../index';
+import {Menu, WidgetModel} from '../../index';
+import {ObjectOrChildModel} from '../../scout';
 
 export default interface MenuBoxModel extends WidgetModel {
   compact?: boolean;
-  menus?: (Menu | RefModel<MenuModel>)[];
+  menus?: ObjectOrChildModel<Menu>[];
 }

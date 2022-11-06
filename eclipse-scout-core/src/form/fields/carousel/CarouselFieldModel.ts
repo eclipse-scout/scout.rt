@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Carousel, CarouselModel, FormFieldModel} from '../../../index';
-import {RefModel} from '../../../types';
+import {Carousel, FormFieldModel} from '../../../index';
+import {ObjectOrChildModel} from '../../../scout';
 
 export default interface CarouselFieldModel extends FormFieldModel {
-  carousel?: Carousel | RefModel<CarouselModel>;
+  carousel?: ObjectOrChildModel<Carousel>;
 }

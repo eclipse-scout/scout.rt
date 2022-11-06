@@ -8,14 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, FormFieldModel, FormModel} from '../../../index';
-import {RefModel} from '../../../types';
+import {Form, FormFieldModel} from '../../../index';
+import {ObjectOrChildModel} from '../../../scout';
 
 export default interface WrappedFormFieldModel extends FormFieldModel {
-  innerForm: Form | RefModel<FormModel>;
+  innerForm?: ObjectOrChildModel<Form>;
   /**
    * true if the inner form should request the initial focus once loaded, false if not.
    * Default is false.
    */
-  initialFocusEnabled: boolean;
+  initialFocusEnabled?: boolean;
 }

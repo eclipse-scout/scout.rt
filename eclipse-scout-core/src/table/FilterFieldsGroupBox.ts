@@ -10,10 +10,13 @@
  */
 import {ColumnUserFilter, FilterFieldsGroupBoxModel, GroupBox, scout, ValueField} from '../index';
 import {ObjectType} from '../ObjectFactory';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 
 export default class FilterFieldsGroupBox extends GroupBox implements FilterFieldsGroupBoxModel {
   declare model: FilterFieldsGroupBoxModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'filter'>;
 
   filter: ColumnUserFilter;
 
@@ -23,7 +26,7 @@ export default class FilterFieldsGroupBox extends GroupBox implements FilterFiel
     this.cssClass = 'filter-fields';
   }
 
-  protected override _init(model: FilterFieldsGroupBoxModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.filter.addFilterFields(this);
   }

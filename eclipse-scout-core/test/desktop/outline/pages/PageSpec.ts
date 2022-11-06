@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, FormModel, Outline, Page, PageWithTable, RefModel, scout, Table, TableModel, Widget} from '../../../../src';
+import {Form, Outline, Page, PageWithTable, scout, Table, Widget} from '../../../../src';
 import {OutlineSpecHelper} from '../../../../src/testing';
+import {ChildModelOf} from '../../../../src/scout';
 
 describe('Page', () => {
 
@@ -71,7 +72,7 @@ describe('Page', () => {
     expect(newTable.destroyed).toBe(false);
   });
 
-  function createAndInsertPage(detailTable: RefModel<TableModel>, detailForm: RefModel<FormModel>) {
+  function createAndInsertPage(detailTable: ChildModelOf<Table>, detailForm: ChildModelOf<Form>) {
     let page = new PageWithLazyCreationCounter();
     page.on('propertyChange:detailForm', e => e.source.numFormCreated++);
     page.on('propertyChange:detailTable', e => e.source.numTableCreated++);

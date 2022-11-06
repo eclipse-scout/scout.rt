@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../index';
+import {Lifecycle, Widget} from '../index';
+import {ObjectModel} from '../scout';
 
-export default interface LifecycleModel {
-  widget: Widget;
+export default interface LifecycleModel extends ObjectModel<Lifecycle<any>> {
+  widget?: Widget;
 
   validationFailedTextKey?: string;
   validationFailedText?: string;

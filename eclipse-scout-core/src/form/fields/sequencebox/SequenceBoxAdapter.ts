@@ -9,13 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {CompositeFieldAdapter, Widget} from '../../../index';
-import {RefModel, SomeRequired} from '../../../types';
-import WidgetModel from '../../../widget/WidgetModel';
+import {ChildModelOf, FullModelOf} from '../../../scout';
 
 export default class SequenceBoxAdapter extends CompositeFieldAdapter {
 
 
-  protected override _initModel(m: RefModel<WidgetModel>, parent: Widget): SomeRequired<WidgetModel, 'objectType'> {
+  protected override _initModel(m: ChildModelOf<Widget>, parent: Widget): FullModelOf<Widget> {
     let model = super._initModel(m, parent);
     // Set logical grid to null -> Calculation happens on server side
     model.logicalGrid = null;

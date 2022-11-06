@@ -11,6 +11,7 @@
 import {arrays, HierarchicalLookupResultBuilder, LookupCall, LookupRow, objects, QueryBy, scout, StaticLookupCallModel, strings} from '../index';
 import $ from 'jquery';
 import LookupResult from './LookupResult';
+import {InitModelOf} from '../scout';
 import Deferred = JQuery.Deferred;
 
 /**
@@ -32,7 +33,7 @@ export default class StaticLookupCall<TKey> extends LookupCall<TKey> implements 
     this.active = true;
   }
 
-  protected override _init(model: StaticLookupCallModel<TKey>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     if (!this.data) {
       // data may either be provided by the model or by implementing the _data function

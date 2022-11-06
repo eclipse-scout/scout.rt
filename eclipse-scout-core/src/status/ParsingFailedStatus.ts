@@ -9,10 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Status, StatusModel} from '../index';
+import {InitModelOf} from '../scout';
 
 export default class ParsingFailedStatus extends Status {
 
-  constructor(model?: StatusModel) {
+  constructor(model?: InitModelOf<ParsingFailedStatus>) {
     super(model);
   }
 

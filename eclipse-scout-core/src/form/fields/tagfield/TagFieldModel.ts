@@ -9,13 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {ValueFieldModel} from '../../../index';
-import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
+import {LookupCallOrModel} from '../../../lookup/LookupCall';
 
 export default interface TagFieldModel extends ValueFieldModel<string[]> {
   /**
    * LookupCall or LookupCallModel or LookupCall class name.
    */
-  lookupCall?: LookupCallOrRefModel<string>;
+  lookupCall?: LookupCallOrModel<string>;
   maxLength?: number;
   clickable?: boolean;
 }

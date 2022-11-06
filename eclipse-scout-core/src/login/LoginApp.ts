@@ -8,23 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, LoginAppOptions, LoginBox, ObjectFactory, scout, texts} from '../index';
+import {App, LoginAppModel, LoginBox, ObjectFactory, scout, texts} from '../index';
 import $ from 'jquery';
 import {AppBootstrapOptions} from '../App';
+import {InitModelOf} from '../scout';
 
 export default class LoginApp extends App {
 
-  declare model: LoginAppOptions;
+  declare model: LoginAppModel;
 
-  constructor() {
-    super();
-  }
-
-  override init(options?: LoginAppOptions): JQuery.Promise<any> {
+  override init(options?: InitModelOf<this>): JQuery.Promise<any> {
     return super.init(options);
   }
 
-  protected override _prepareEssentials(options: LoginAppOptions) {
+  protected override _prepareEssentials(options: LoginAppModel) {
     ObjectFactory.get().init();
   }
 
@@ -35,8 +32,8 @@ export default class LoginApp extends App {
     return [];
   }
 
-  protected override _init(options: LoginAppOptions): JQuery.Promise<any> {
-    options = options || {};
+  protected override _init(options: InitModelOf<this>): JQuery.Promise<any> {
+    options = options || {} as InitModelOf<this>;
     options.texts = $.extend({}, texts.readFromDOM(), options.texts);
     this._prepareDOM();
 

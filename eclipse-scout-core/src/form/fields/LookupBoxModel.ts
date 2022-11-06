@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ValueFieldModel, Widget, WidgetModel} from '../../index';
-import {RefModel} from '../../types';
-import {LookupCallOrRefModel} from '../../lookup/LookupCall';
+import {ValueFieldModel, Widget} from '../../index';
+import {LookupCallOrModel} from '../../lookup/LookupCall';
+import {ObjectOrChildModel} from '../../scout';
 
 export default interface LookupBoxModel<TValue> extends ValueFieldModel<TValue[], TValue | TValue[]> {
-  filterBox?: Widget | RefModel<WidgetModel>;
-  lookupCall?: LookupCallOrRefModel<TValue>;
+  filterBox?: ObjectOrChildModel<Widget>;
+  lookupCall?: LookupCallOrModel<TValue>;
 }

@@ -9,11 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {HtmlEnvironment, LogicalGridLayout, LogicalGridLayoutConfig, SequenceBox} from '../../../index';
-import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
+import {ObjectOrModel} from '../../../scout';
 
 export default class SequenceBoxLayout extends LogicalGridLayout {
 
-  constructor(widget: SequenceBox, layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
+  constructor(widget: SequenceBox, layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
     super(widget, layoutConfig);
   }
 

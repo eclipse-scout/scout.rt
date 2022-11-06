@@ -14,6 +14,7 @@ import {
 } from '../../../index';
 import $ from 'jquery';
 import {CollapseHandleHorizontalAlignment} from '../../../collapsehandle/CollapseHandle';
+import {InitModelOf} from '../../../scout';
 
 export default class SplitBox extends CompositeField {
   declare model: SplitBoxModel;
@@ -71,7 +72,7 @@ export default class SplitBox extends CompositeField {
   static SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST = 'absoluteFirst';
   static SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = 'absoluteSecond';
 
-  protected override _init(model: SplitBoxModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setToggleCollapseKeyStroke(model.toggleCollapseKeyStroke);
     this._setFirstCollapseKeyStroke(model.firstCollapseKeyStroke);

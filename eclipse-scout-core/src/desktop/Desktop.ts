@@ -11,18 +11,16 @@
 import {
   AbstractLayout, Action, arrays, BenchColumnLayoutData, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel, DesktopNavigation, DesktopNotification, Device,
   DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form, HtmlComponent, HtmlEnvironment, KeyStrokeContext, Menu,
-  MenuModel,
-  MessageBox, MessageBoxController, objects, OfflineDesktopNotification, OpenUriHandler, Outline, Popup, RefModel, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, strings, styles, Tooltip, Tree, UnsavedFormChangesForm, URL,
+  MessageBox, MessageBoxController, objects, OfflineDesktopNotification, OpenUriHandler, Outline, Popup, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, strings, styles, Tooltip, Tree, UnsavedFormChangesForm, URL,
   ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
 import {NativeNotificationVisibility} from './notification/DesktopNotification';
 import {DesktopBenchViewActivateEvent} from './bench/DesktopBenchEventMap';
 import {SplitterMoveEndEvent, SplitterMoveEvent, SplitterPositionChangeEvent} from '../splitter/SplitterEventMap';
-import BenchColumnLayoutDataModel from './bench/layout/BenchColumnLayoutDataModel';
 import {TreeDisplayStyle} from '../tree/Tree';
 import {GlassPaneTarget} from '../widget/Widget';
-import {ReloadPageOptions} from '../scout';
+import {InitModelOf, ObjectOrChildModel, ObjectOrModel, ReloadPageOptions} from '../scout';
 import {OutlineContent} from './bench/DesktopBench';
 
 export default class Desktop extends Widget implements DesktopModel, DisplayParent {
@@ -198,7 +196,7 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
 
   static DEFAULT_THEME = 'default';
 
-  protected override _init(model: DesktopModel) {
+  protected override _init(model: InitModelOf<this>) {
     // Note: session and desktop are tightly coupled. Because a lot of widgets want to register
     // a listener on the desktop in their init phase, they access the desktop by calling 'this.session.desktop'
     // that's why we need this instance as early as possible. When that happens they access a desktop which is
@@ -751,7 +749,7 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
     this._setProperty('viewButtons', viewButtons);
   }
 
-  setMenus(menus: (Menu | RefModel<MenuModel>)[]) {
+  setMenus(menus: ObjectOrChildModel<Menu>[]) {
     if (this.header) {
       this.header.setMenus(menus);
     }
@@ -789,7 +787,7 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
     this.setProperty('headerVisible', visible);
   }
 
-  protected _setBenchLayoutData(layoutData: BenchColumnLayoutData | BenchColumnLayoutDataModel) {
+  protected _setBenchLayoutData(layoutData: ObjectOrModel<BenchColumnLayoutData>) {
     layoutData = BenchColumnLayoutData.ensure(layoutData);
     this._setProperty('benchLayoutData', layoutData);
   }
@@ -1307,7 +1305,7 @@ export default class Desktop extends Widget implements DesktopModel, DisplayPare
       unsavedFormChangesForm.open();
       // promise that is resolved when the UnsavedFormChangesForm is stored
       waitFor = unsavedFormChangesForm.whenSave().then(() => {
-        let formsToSave = unsavedFormChangesForm.openFormsField.value as Form[];
+        let formsToSave = unsavedFormChangesForm.openFormsField.value;
         formsToSave.forEach(form => {
           form.visitDisplayChildren(dialog => {
             // forms should be stored with ok(). Other display children can simply be closed.

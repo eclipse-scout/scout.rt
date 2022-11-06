@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, arrays, Desktop, DesktopModel, ModelAdapter, ObjectFactory, RemoteEvent, scout, Session, SessionModel, Widget, WidgetModel} from '../index';
+import {App, arrays, Desktop, DesktopModel, ModelAdapter, ModelAdapterModel, ObjectFactory, RemoteEvent, scout, Session, SessionModel, Widget, WidgetModel} from '../index';
 import {LocaleSpecHelper, TestingApp} from './index';
-import {ObjectType} from '../ObjectFactory';
 import {AdapterData, RemoteRequest, RemoteResponse, SessionStartupResponse} from '../session/Session';
 import 'jasmine-jquery';
 import jasmineScoutMatchers from './scoutMatchers';
-import {RefModel} from '../types';
 import {JsonErrorResponse} from '../App';
+import {FullModelOf, InitModelOf} from '../scout';
 
 declare global {
 
@@ -37,7 +36,7 @@ declare global {
     override _processErrorResponse(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string, request: RemoteRequest);
   }
 
-  function sandboxSession(options?: SandboxSessionOptions & Partial<SessionModel>): SandboxSession;
+  function sandboxSession(options?: SandboxSessionOptions & SessionModel): SandboxSession;
 
   function linkWidgetAndAdapter(widget: Widget, adapterClass: (new() => ModelAdapter) | string);
 
@@ -47,9 +46,8 @@ declare global {
 
   function removePopups(session: Session, cssClass?: string): void;
 
-  function createSimpleModel<T>(objectType: ObjectType<T>, session: Session, id?: string): {
-    id: string; objectType: ObjectType<T>; parent: Widget; session: Session;
-  };
+  function createSimpleModel<O>(objectType: new(model?: any) => O, session: Session, id?: string): FullModelOf<O> & { objectType: new(model?: any) => O; id: string; session: Session; parent: Widget };
+  function createSimpleModel(objectType: string, session: Session, id?: string): { objectType: string; id: string; session: Session; parent: Widget };
 
   function mostRecentJsonRequest(): RemoteRequest;
 
@@ -62,19 +60,21 @@ declare global {
   function uninstallUnloadHandlers(session: Session);
 
   function createPropertyChangeEvent(model: { id: string }, properties: object);
+
+  function createAdapterModel(widgetModel: ModelAdapterModel): ModelAdapterModel;
 }
 
 export interface SandboxSessionOptions {
-  desktop?: RefModel<DesktopModel>;
+  desktop?: DesktopModel;
   renderDesktop?: boolean;
 }
 
 window.sandboxSession = options => {
-  options = options || {};
+  options = options || {} as SessionModel;
   let $sandbox = $('#sandbox')
     .addClass('scout');
 
-  let model = options as SessionModel;
+  let model = options as InitModelOf<Session>;
   model.portletPartId = options.portletPartId || '0';
   model.backgroundJobPollingEnabled = false;
   model.suppressErrors = true;
@@ -94,7 +94,7 @@ window.sandboxSession = options => {
   session.modelAdapterRegistry[session.uiSessionId] = session;
   session.locale = new LocaleSpecHelper().createLocale('de-CH');
 
-  let desktop = (options.desktop || {}) as DesktopModel;
+  let desktop = (options.desktop || {}) as InitModelOf<Desktop>;
   desktop.navigationVisible = scout.nvl(desktop.navigationVisible, false);
   desktop.headerVisible = scout.nvl(desktop.headerVisible, false);
   desktop.benchVisible = scout.nvl(desktop.benchVisible, false);
@@ -107,19 +107,6 @@ window.sandboxSession = options => {
   // Prevent exception when test window gets resized
   $sandbox.window().off('resize', session.desktop._resizeHandler);
   return session;
-};
-
-window.createSimpleModel = (objectType, session, id) => {
-  if (id === undefined) {
-    id = ObjectFactory.get().createUniqueId();
-  }
-  let parent = session.desktop;
-  return {
-    id: id,
-    objectType: objectType,
-    parent: parent,
-    session: session
-  };
 };
 
 /**
@@ -174,7 +161,7 @@ window.removePopups = (session, cssClass) => {
   });
 };
 
-window.createSimpleModel = (objectType, session, id) => {
+window.createSimpleModel = <T>(objectType, session, id) => {
   if (id === undefined) {
     id = ObjectFactory.get().createUniqueId();
   }

@@ -12,9 +12,12 @@ import {Action, Button, ButtonAdapterMenuModel, ButtonModel, Event, EventHandler
 import {ActionStyle, ActionTextPosition} from '../action/Action';
 import {ButtonDisplayStyle} from '../form/fields/button/Button';
 import {FormFieldLabelPosition} from '../form/fields/FormField';
+import {InitModelOf, ModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenuModel {
   declare model: ButtonAdapterMenuModel;
+  declare initModel: SomeRequired<this['model'], 'button' | 'parent'>;
 
   button: Button;
   menubar: MenuBar;
@@ -34,7 +37,7 @@ export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenu
     this.menubar = null;
   }
 
-  protected override _init(model: ButtonAdapterMenuModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     if (!this.button) {
       throw new Error('Cannot adapt to undefined button');
@@ -106,7 +109,7 @@ export default class ButtonAdapterMenu extends Menu implements ButtonAdapterMenu
     return this.session.focusManager.requestFocus(this.getFocusableElement());
   }
 
-  static adaptButtonProperties(buttonProperties: Partial<ButtonModel & {gridData: GridData}>, menuProperties?: ButtonAdapterMenuModel): ButtonAdapterMenuModel {
+  static adaptButtonProperties(buttonProperties: ButtonModel & { gridData?: GridData }, menuProperties?: InitModelOf<ButtonAdapterMenu>): InitModelOf<ButtonAdapterMenu> {
     // @ts-expect-error
     menuProperties = menuProperties || {};
 

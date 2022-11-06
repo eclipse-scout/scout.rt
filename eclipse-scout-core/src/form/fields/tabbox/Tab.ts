@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Device, Event, EventHandler, FieldStatus, FormField, HtmlComponent, HtmlEnvironment, PropertyChangeEvent, scout, Status, strings, TabItem, TabModel, tooltips, Widget} from '../../../index';
 import TabEventMap from './TabEventMap';
+import {InitModelOf} from '../../../scout';
+import {SomeRequired} from '../../../types';
 
 export default class Tab extends Widget implements TabModel {
   declare model: TabModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'tabItem'>;
   declare eventMap: TabEventMap;
   declare self: Tab;
 
@@ -57,7 +60,7 @@ export default class Tab extends Widget implements TabModel {
     this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   }
 
-  protected override _init(options: TabModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this.visible = this.tabItem.visible;
     this.label = this.tabItem.label;

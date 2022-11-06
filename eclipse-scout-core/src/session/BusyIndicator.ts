@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Action, BoxButtons, BusyIndicatorEventMap, ClickActiveElementKeyStroke, CloseKeyStroke, Event, FocusRule, GlassPaneRenderer, keys, KeyStrokeContext, scout, strings, Widget, WidgetModel} from '../index';
+import {InitModelOf} from '../scout';
 
 export interface BusyIndicatorModel extends WidgetModel {
   cancellable?: boolean;
@@ -74,7 +75,7 @@ export default class BusyIndicator extends Widget implements BusyIndicatorModel 
     ]);
   }
 
-  protected override _init(model: BusyIndicatorModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.label = scout.nvl(this.label, this.session.text('ui.PleaseWait_'));
     if (this.cancellable) {

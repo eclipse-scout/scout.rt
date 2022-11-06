@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, LookupBox, LookupResult, LookupRow, objects, scout, Tree, TreeBoxLayout, TreeBoxModel, TreeNode, TreeNodeModel, Widget} from '../../../index';
+import {arrays, LookupBox, LookupResult, LookupRow, objects, scout, Tree, TreeBoxLayout, TreeBoxModel, TreeNode, Widget} from '../../../index';
 import {TreeNodesCheckedEvent} from '../../../tree/TreeEventMap';
 import {TreeNodeUncheckOptions} from '../../../tree/Tree';
+import {InitModelOf} from '../../../scout';
 
 export default class TreeBox<TValue> extends LookupBox<TValue> implements TreeBoxModel<TValue> {
   tree: Tree;
@@ -23,7 +24,7 @@ export default class TreeBox<TValue> extends LookupBox<TValue> implements TreeBo
     this._addWidgetProperties(['tree', 'filterBox']);
   }
 
-  protected override _init(model: TreeBoxModel<TValue>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.tree.on('nodesChecked', this._onTreeNodesChecked.bind(this));
     this.tree.setScrollTop(this.scrollTop);
@@ -169,12 +170,11 @@ export default class TreeBox<TValue> extends LookupBox<TValue> implements TreeBo
   }
 
   protected _createNode(lookupRow: LookupRow<TValue>): TreeBoxTreeNode<TValue> {
-    let
-      node = scout.create(TreeNode, {
-        parent: this.tree,
-        text: lookupRow.text,
-        lookupRow: lookupRow
-      } as TreeNodeModel) as TreeBoxTreeNode<TValue>;
+    let node = scout.create(TreeNode, {
+      parent: this.tree,
+      text: lookupRow.text,
+      lookupRow: lookupRow
+    }) as TreeBoxTreeNode<TValue>;
 
     if (lookupRow.iconId) {
       node.iconId = lookupRow.iconId;

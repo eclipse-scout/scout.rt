@@ -10,10 +10,13 @@
  */
 import {Action, arrays, EventEmitter, filters, Key, keys, KeyStroke, KeyStrokeContext, KeyStrokeManagerEventMap, KeyStrokeModel, Session, ValueField, VirtualKeyStrokeEvent} from '../index';
 import $ from 'jquery';
+import {InitModelOf, ObjectModel} from '../scout';
+import {SomeRequired} from '../types';
 import KeyboardEventBase = JQuery.KeyboardEventBase;
 
 export default class KeyStrokeManager extends EventEmitter implements KeyStrokeManagerModel {
   declare model: KeyStrokeManagerModel;
+  declare initModel: SomeRequired<this['model'], 'session'>;
   declare eventMap: KeyStrokeManagerEventMap;
   declare self: KeyStrokeManager;
 
@@ -34,7 +37,7 @@ export default class KeyStrokeManager extends EventEmitter implements KeyStrokeM
     this.filters = [];
   }
 
-  init(model: KeyStrokeManagerModel) {
+  init(model: InitModelOf<this>) {
     this.session = model.session;
     this.installTopLevelKeyStrokeHandlers(this.session.$entryPoint);
   }
@@ -280,8 +283,8 @@ export default class KeyStrokeManager extends EventEmitter implements KeyStrokeM
   }
 }
 
-export interface KeyStrokeManagerModel {
-  session: Session;
+export interface KeyStrokeManagerModel extends ObjectModel<KeyStrokeManager> {
+  session?: Session;
 }
 
 export interface KeyboardEventWithMetaData extends KeyboardEventBase<HTMLElement, undefined, HTMLElement, HTMLElement> {

@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, FormFieldModel, MenuModel, RefModel} from '../../../index';
+import {FormField, MenuModel} from '../../../index';
+import {ObjectOrChildModel} from '../../../scout';
 
 export default interface FormFieldMenuModel extends MenuModel {
-  field: FormField | RefModel<FormFieldModel>;
+  field?: ObjectOrChildModel<FormField>;
 }

@@ -11,6 +11,7 @@
 import {
   Action, arrays, Desktop, EventHandler, HtmlComponent, icons, KeyStrokeContext, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewMenuOpenKeyStroke, ViewMenuPopup, ViewMenuTabEventMap, ViewMenuTabModel, Widget
 } from '../../index';
+import {InitModelOf} from '../../scout';
 
 /**
  * Shows a list of view buttons with displayStyle=MENU
@@ -45,7 +46,7 @@ export default class ViewMenuTab extends Widget implements ViewMenuTabModel {
     this._addPreserveOnPropertyChangeProperties(['selectedButton']);
   }
 
-  protected override _init(model: ViewMenuTabModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.dropdown = scout.create(Action, {
       parent: this,

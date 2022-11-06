@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EllipsisMenu, EllipsisMenuModel, Menu, MenuDestinations, scout} from '../index';
+import {arrays, EllipsisMenu, Menu, MenuDestinations, scout} from '../index';
 import $ from 'jquery';
+import {InitModelOf} from '../scout';
 
 export type MenuFilterOptions = {
   onlyVisible?: boolean;
@@ -51,7 +52,7 @@ export function filterAccordingToSelection(prefix: string, selectionLength: numb
 
 /**
  * Filters menus that don't match the given types, or in other words: only menus with the given types are returned
- * from this method. The visible state is only checked if the parameter onlyVisible is set to true. Otherwise invisible items are returned and added to the
+ * from this method. The visible state is only checked if the parameter onlyVisible is set to true. Otherwise, invisible items are returned and added to the
  * menu-bar DOM (invisible, however). They may change their visible state later. If there are any types in notAllowedTypes each menu is checked also against
  * these types and if they are matching the menu is filtered.
  */
@@ -150,7 +151,7 @@ export function _enableDisableMenuKeyStroke(menu: Menu, activated: boolean, excl
 }
 
 /**
- * Checks the type of a menu. Don't use this for menu groups.
+ * Checks the type of menu. Don't use this for menu groups.
  */
 
 export function _checkType(menu: Menu, types: string[], defaultMenuTypes: string | string[] = []): boolean {
@@ -170,7 +171,7 @@ export function _checkType(menu: Menu, types: string[], defaultMenuTypes: string
   return false;
 }
 
-export function createEllipsisMenu(options: EllipsisMenuModel): EllipsisMenu {
+export function createEllipsisMenu(options: InitModelOf<EllipsisMenu>): EllipsisMenu {
   return scout.create(EllipsisMenu, options);
 }
 

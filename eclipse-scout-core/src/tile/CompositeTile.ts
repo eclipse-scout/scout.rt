@@ -1,19 +1,20 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, PropertyChangeEvent, RefModel, Tile, Widget, WidgetModel} from '../index';
+import {HtmlComponent, PropertyChangeEvent, Tile, Widget} from '../index';
 import TileModel from './TileModel';
 import TileEventMap from './TileEventMap';
+import {ObjectOrChildModel} from '../scout';
 
 export interface CompositeTileModel extends TileModel {
-  widgets?: (Widget | RefModel<WidgetModel>)[];
+  widgets?: ObjectOrChildModel<Widget>[];
 }
 
 export interface CompositeTileEventMap extends TileEventMap {
@@ -44,7 +45,7 @@ export default class CompositeTile extends Tile implements CompositeTileModel {
     this._renderWidgets();
   }
 
-  setWidgets(widgets: (Widget | RefModel<WidgetModel>)[]) {
+  setWidgets(widgets: ObjectOrChildModel<Widget>[]) {
     this.setProperty('widgets', widgets);
   }
 

@@ -8,8 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BrowserField, BrowserFieldAdapter, RemoteEvent, scout, Session, Widget} from '../../../../src/index';
-import {ObjectType} from '../../../../src/ObjectFactory';
+import {BrowserField, BrowserFieldAdapter, RemoteEvent, scout} from '../../../../src/index';
 
 describe('BrowserFieldAdapter', () => {
 
@@ -28,11 +27,9 @@ describe('BrowserFieldAdapter', () => {
   });
 
   it('sends postMessage on message', () => {
-    let model = createSimpleModel('BrowserField', session, 'foo') as {
-      id: string; objectType: ObjectType<BrowserField>; parent: Widget; session: Session;
-    };
+    let model = createSimpleModel('BrowserField', session, 'foo');
     let adapter = scout.create(BrowserFieldAdapter, $.extend({}, model));
-    let browserField = adapter.createWidget(model, session.desktop);
+    let browserField = adapter.createWidget(model, session.desktop) as BrowserField;
     browserField.render();
 
     // postMessage is an async call -> hard to test -> simulate it (window.postMessage('hello world', '*');)

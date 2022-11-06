@@ -9,20 +9,16 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AbstractLayout, Action, arrays, Button, ButtonAdapterMenu, CompositeField, EnumObject, fields, Form, FormField, FormFieldModel, GroupBoxEventMap, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, GroupBoxModel,
-  GroupBoxResponsiveHandler,
-  HAlign, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, MenuModel, Notification, NotificationModel, RefModel, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke,
-  tooltips,
-  VerticalSmartGrid,
+  AbstractLayout, Action, arrays, Button, ButtonAdapterMenu, CompositeField, EnumObject, fields, Form, FormField, GroupBoxEventMap, GroupBoxGridConfig, GroupBoxLayout, GroupBoxMenuItemsOrder, GroupBoxModel, GroupBoxResponsiveHandler,
+  HAlign, HtmlComponent, LogicalGrid, LogicalGridData, LogicalGridLayout, LogicalGridLayoutConfig, Menu, MenuBar, Notification, ResponsiveManager, scout, SplitBox, strings, TabBox, TabItemKeyStroke, tooltips, VerticalSmartGrid,
   WrappedFormField
 } from '../../../index';
 import $ from 'jquery';
 import {MenuBarEllipsisPosition} from '../../../menu/menubar/MenuBar';
 import {FormFieldStatusPosition} from '../FormField';
 import {KeyStrokeRenderingHints} from '../../../keystroke/KeyStroke';
-import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
 import {CloneOptions} from '../../../widget/Widget';
-import {Optional} from '../../../types';
+import {InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../../../scout';
 
 export default class GroupBox extends CompositeField implements GroupBoxModel {
   declare model: GroupBoxModel;
@@ -112,7 +108,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     TITLE: 'title'
   } as const;
 
-  protected override _init(model: GroupBoxModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.resolveConsts([{
       property: 'menuBarPosition',
@@ -174,7 +170,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     this.setFields(newFields);
   }
 
-  setFields(fields: (FormField | RefModel<FormFieldModel>)[]) {
+  setFields(fields: ObjectOrChildModel<FormField>[]) {
     this.setProperty('fields', fields);
   }
 
@@ -217,8 +213,8 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
   }
 
   /**
-   * Returns a $container used as a bind target for the key-stroke context of the group-box.
-   * By default this function returns the container of the form, or when group-box is has no
+   * Returns a $container used as a bind target for the keystroke context of the group-box.
+   * By default, this function returns the container of the form, or when group-box is has no
    * form as a parent the container of the group-box.
    */
   protected _keyStrokeBindTarget(): JQuery {
@@ -273,11 +269,11 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     return new LogicalGridLayout(this, this.bodyLayoutConfig);
   }
 
-  setBodyLayoutConfig(bodyLayoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
+  setBodyLayoutConfig(bodyLayoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
     this.setProperty('bodyLayoutConfig', bodyLayoutConfig);
   }
 
-  protected _setBodyLayoutConfig(bodyLayoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
+  protected _setBodyLayoutConfig(bodyLayoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
     if (!bodyLayoutConfig) {
       bodyLayoutConfig = new LogicalGridLayoutConfig();
     }
@@ -457,7 +453,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     this.invalidateLayoutTree();
   }
 
-  setNotification(notification: Notification | RefModel<NotificationModel>) {
+  setNotification(notification: ObjectOrChildModel<Notification>) {
     this.setProperty('notification', notification);
   }
 
@@ -508,15 +504,15 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
 
     // Create menu for each process button
     this.processMenus = this.processButtons.map(button => {
-      return scout.create(ButtonAdapterMenu,
-        ButtonAdapterMenu.adaptButtonProperties(button, {
-          parent: this,
-          menubar: this.menuBar,
-          button: button,
-          // initially defaultMenu should only be set if defaultButton is set to true, false should not be mapped as the default defaultMenu = null setting
-          // would be overridden if this default null setting is overridden MenuBar.prototype.updateDefaultMenu would not consider these entries anymore
-          defaultMenu: button.defaultButton ? true : null
-        }));
+      let model = ButtonAdapterMenu.adaptButtonProperties(button, {
+        parent: this,
+        menubar: this.menuBar,
+        button: button,
+        // initially defaultMenu should only be set if defaultButton is set to true, false should not be mapped as the default defaultMenu = null setting
+        // would be overridden if this default null setting is overridden MenuBar.prototype.updateDefaultMenu would not consider these entries anymore
+        defaultMenu: button.defaultButton ? true : null
+      });
+      return scout.create(ButtonAdapterMenu, model);
     });
     this.registerKeyStrokes(this.processMenus);
   }
@@ -703,7 +699,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     this.$container.toggleClass('collapsed', !this.expanded);
 
     // Group boxes have set "useUiHeight=true" by default. When a group box is collapsed, it should not
-    // stretched vertically (no "weight Y"). However, because "weightY" is -1 by default, a calculated value
+    // stretch vertically (no "weight Y"). However, because "weightY" is -1 by default, a calculated value
     // is assigned (LogicalGridData._inheritWeightY()) that is based on the group boxes height. In collapsed
     // state, this height would be wrong. Therefore, we manually assign "weightY=0" to collapsed group boxes
     // to prevent them from being stretched.
@@ -717,7 +713,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
       this.invalidateLayout();
       this._renderControls();
     } else {
-      // If group box has a weight different than 0, we set it to zero and back up the old value
+      // If group box has a weight different from 0, we set it to zero and back up the old value
       if (this.gridData.weightY !== 0) {
         this._collapsedWeightY = this.gridData.weightY;
         this.gridData.weightY = 0;
@@ -793,7 +789,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     // menubar takes care of removal
   }
 
-  setStaticMenus(staticMenus: (Menu | RefModel<MenuModel>)[]) {
+  setStaticMenus(staticMenus: ObjectOrChildModel<Menu>[]) {
     this.setProperty('staticMenus', staticMenus);
     this._updateMenuBar();
   }
@@ -834,7 +830,7 @@ export default class GroupBox extends CompositeField implements GroupBoxModel {
     this.invalidateLayoutTree();
   }
 
-  override clone(model: Optional<GroupBoxModel, 'parent'>, options?: CloneOptions): this {
+  override clone(model: GroupBoxModel, options?: CloneOptions): this {
     let clone = super.clone(model) as GroupBox;
     this._deepCloneProperties(clone, ['fields'], options);
     clone._prepareFields();

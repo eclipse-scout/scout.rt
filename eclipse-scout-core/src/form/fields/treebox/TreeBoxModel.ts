@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {LookupBoxModel, Tree, TreeModel} from '../../../index';
-import {RefModel} from '../../../types';
+import {LookupBoxModel, Tree} from '../../../index';
+import {ObjectOrChildModel} from '../../../scout';
 
 export default interface TreeBoxModel<TValue> extends LookupBoxModel<TValue> {
-  tree?: Tree | RefModel<TreeModel>;
+  tree?: ObjectOrChildModel<Tree>;
 }

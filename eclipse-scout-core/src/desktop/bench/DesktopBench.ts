@@ -19,6 +19,7 @@ import {CollapseHandleActionEvent} from '../../collapsehandle/CollapseHandleEven
 import {SplitterMoveEvent} from '../../splitter/SplitterEventMap';
 import {TreeNodesSelectedEvent} from '../../tree/TreeEventMap';
 import {OutlinePageChangedEvent} from '../outline/OutlineEventMap';
+import {InitModelOf} from '../../scout';
 
 export default class DesktopBench extends Widget implements DesktopBenchModel {
   declare model: DesktopBenchModel;
@@ -100,7 +101,7 @@ export default class DesktopBench extends Widget implements DesktopBenchModel {
     'east'
   ] as const;
 
-  protected override _init(model: DesktopBenchModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     DesktopBench.VIEW_MIN_HEIGHT = $.pxToNumber(styles.get('view-tab-box', 'min-height').minHeight);

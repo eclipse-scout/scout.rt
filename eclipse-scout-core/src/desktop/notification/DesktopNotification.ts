@@ -10,6 +10,7 @@
  */
 import {DesktopNotificationEventMap, DesktopNotificationModel, Device, EnumObject, Notification as ScoutNotification, scout, Status, strings} from '../../index';
 import {StatusOrModel} from '../../status/Status';
+import {InitModelOf} from '../../scout';
 
 export default class DesktopNotification extends ScoutNotification implements DesktopNotificationModel {
   declare model: DesktopNotificationModel;
@@ -61,7 +62,7 @@ export default class DesktopNotification extends ScoutNotification implements De
    */
   static INFINITE = -1;
 
-  protected override _init(model: DesktopNotificationModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     let defaults = this.session.desktop.nativeNotificationDefaults;
     if (defaults) {

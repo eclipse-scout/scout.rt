@@ -15,6 +15,7 @@ import {
 import $ from 'jquery';
 import {YearPanelDateSelectEvent} from './YearPanelEventMap';
 import {JsonDateRange} from '../util/dates';
+import {InitModelOf} from '../scout';
 
 export type CalendarDisplayMode = EnumObject<typeof Calendar.DisplayMode>;
 export type CalendarDirection = EnumObject<typeof Calendar.Direction>;
@@ -173,7 +174,7 @@ export default class Calendar extends Widget implements CalendarModel {
     this._addPreserveOnPropertyChangeProperties(['selectedComponent']);
   }
 
-  override init(model: CalendarModel) {
+  override init(model: InitModelOf<this>) {
     super.init(model);
   }
 
@@ -216,7 +217,7 @@ export default class Calendar extends Widget implements CalendarModel {
     return new KeyStrokeContext();
   }
 
-  protected override _init(model: CalendarModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.yearPanel = scout.create(YearPanel, {
       parent: this

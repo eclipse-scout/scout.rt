@@ -14,7 +14,4 @@ import {Status} from '../../../index';
  * This status is used as a marker class to distinct between regular errors and errors thrown by the predict* functions of the DateField.
  */
 export default class DatePredictionFailedStatus extends Status {
-  constructor() {
-    super();
-  }
 }

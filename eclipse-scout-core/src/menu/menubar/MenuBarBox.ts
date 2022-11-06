@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, HtmlComponent, Menu, MenuBarBoxEventMap, MenuBarBoxLayout, MenuBarBoxModel, MenuModel, RefModel, Widget} from '../../index';
+import {arrays, HtmlComponent, Menu, MenuBarBoxEventMap, MenuBarBoxLayout, MenuBarBoxModel, Widget} from '../../index';
 import {TooltipPosition} from '../../tooltip/Tooltip';
+import {ObjectOrChildModel} from '../../scout';
 
 export default class MenuBarBox extends Widget implements MenuBarBoxModel {
   declare model: MenuBarBoxModel;
@@ -43,7 +44,7 @@ export default class MenuBarBox extends Widget implements MenuBarBoxModel {
     super._remove();
   }
 
-  setMenuItems(menuOrModels: Menu | RefModel<MenuModel> | (Menu | RefModel<MenuModel>)[]) {
+  setMenuItems(menuOrModels: ObjectOrChildModel<Menu> | ObjectOrChildModel<Menu>[]) {
     let menuItems = arrays.ensure(menuOrModels);
     if (!arrays.equals(this.menuItems, menuItems)) {
       this.setProperty('menuItems', menuItems);

@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Outline, OutlineViewButtonEventMap, OutlineViewButtonModel, ViewButton} from '../../index';
+import {InitModelOf} from '../../scout';
 
 export default class OutlineViewButton extends ViewButton implements OutlineViewButtonModel {
   declare model: OutlineViewButtonModel;
@@ -25,7 +26,7 @@ export default class OutlineViewButton extends ViewButton implements OutlineView
     this._addCloneProperties(['outline']);
   }
 
-  protected override _init(model: OutlineViewButtonModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setOutline(this.outline);
   }

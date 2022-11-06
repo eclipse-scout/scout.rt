@@ -12,7 +12,7 @@ import {Column, TableUserFilterModel} from '../../index';
 import {ColumnUserFilterValues} from './ColumnUserFilter';
 
 export default interface ColumnUserFilterModel extends TableUserFilterModel {
-  column: Column<any>;
+  column?: Column<any> | string;
 
   /**
    * This property is used to check early whether this filter can produce filter-fields.

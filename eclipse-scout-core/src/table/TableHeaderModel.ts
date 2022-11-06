@@ -11,6 +11,6 @@
 import {Table, WidgetModel} from '../index';
 
 export default interface TableHeaderModel extends WidgetModel {
-  table: Table;
+  table?: Table;
   headerMenusEnabled?: boolean;
 }

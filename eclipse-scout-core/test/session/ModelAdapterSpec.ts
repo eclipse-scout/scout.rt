@@ -11,6 +11,7 @@
 import {FormSpecHelper} from '../../src/testing/index';
 import {Button, GroupBox, ModelAdapter, RemoteEvent, scout, Widget, WidgetModel} from '../../src/index';
 import {RemoteResponse} from '../../src/session/Session';
+import {FullModelOf} from '../../src/scout';
 
 describe('ModelAdapter', () => {
 
@@ -55,12 +56,12 @@ describe('ModelAdapter', () => {
   /**
    * Creates a model and stores it as adapterData in the session.
    */
-  function createModel(model?: Omit<WidgetModel, 'parent'>): WidgetModel {
+  function createModel(model?: WidgetModel): FullModelOf<Widget> {
     model = scout.nvl(model, {});
     if (!model.objectType) {
       model.objectType = 'NullWidget';
     }
-    let m = $.extend(createSimpleModel(model.objectType, session), model) as WidgetModel;
+    let m = $.extend(createSimpleModel(model.objectType as string, session), model);
     registerAdapterData(m, session);
     return m;
   }

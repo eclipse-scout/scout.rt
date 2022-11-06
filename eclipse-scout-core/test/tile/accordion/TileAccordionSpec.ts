@@ -11,7 +11,7 @@
 import {Group, GroupModel, scout, Tile, TileAccordion, TileAccordionModel, TileGrid, TileGridLayoutConfig} from '../../../src/index';
 import {triggerClick, triggerDoubleClick} from '../../../src/testing/jquery-testing';
 import TileModel from '../../../src/tile/TileModel';
-import {Optional} from '../../../src/types';
+import {InitModelOf} from '../../../src/scout';
 
 describe('TileAccordion', () => {
   let session: SandboxSession;
@@ -26,7 +26,7 @@ describe('TileAccordion', () => {
     $(':animated').finish();
   });
 
-  function createAccordion(numGroups: number, model?: Optional<TileAccordionModel, 'parent'>) {
+  function createAccordion(numGroups: number, model?: TileAccordionModel) {
     let groups = [];
     for (let i = 0; i < numGroups; i++) {
       groups.push({
@@ -43,7 +43,7 @@ describe('TileAccordion', () => {
       groups: groups
     };
     model = $.extend({}, defaults, model);
-    return scout.create(TileAccordion, model as TileAccordionModel);
+    return scout.create(TileAccordion, model as InitModelOf<TileAccordion>);
   }
 
   function createGroup(model?: GroupModel): Group<TileGrid> {
@@ -55,7 +55,7 @@ describe('TileAccordion', () => {
       }
     };
     model = $.extend({}, defaults, model);
-    return scout.create(Group, model) as Group<TileGrid>;
+    return scout.create(Group, model as InitModelOf<Group>) as Group<TileGrid>;
   }
 
   function createTile(model?: TileModel): Tile {
@@ -63,7 +63,7 @@ describe('TileAccordion', () => {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create(Tile, model);
+    return scout.create(Tile, model as InitModelOf<Tile>);
   }
 
   describe('init', () => {

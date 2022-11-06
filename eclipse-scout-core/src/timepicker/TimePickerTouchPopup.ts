@@ -11,17 +11,16 @@
 import {DateField, ParsingFailedStatus, scout, TimePicker, TouchPopup} from '../index';
 import TimePickerTouchPopupModel from './TimePickerTouchPopupModel';
 import {DateFieldAcceptInputEvent} from '../form/fields/datefield/DateFieldEventMap';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
-export default class TimePickerTouchPopup extends TouchPopup {
+export default class TimePickerTouchPopup extends TouchPopup implements TimePickerTouchPopupModel {
   declare model: TimePickerTouchPopupModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'field' | 'timeResolution'>;
   declare _widget: TimePicker;
   declare _field: DateField;
 
-  constructor() {
-    super();
-  }
-
-  protected override _init(options: TimePickerTouchPopupModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
     this.addCssClass('time-picker-touch-popup');

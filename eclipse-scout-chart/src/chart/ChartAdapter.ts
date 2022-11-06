@@ -13,11 +13,6 @@ import {Chart} from '../index';
 import {ChartValueClickEvent} from './ChartEventMap';
 
 export default class ChartAdapter extends ModelAdapter {
-
-  constructor() {
-    super();
-  }
-
   protected _onWidgetValueClick(event: ChartValueClickEvent) {
     this._send('valueClick', event.data);
   }

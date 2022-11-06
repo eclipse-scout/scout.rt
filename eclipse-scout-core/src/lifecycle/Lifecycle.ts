@@ -11,6 +11,8 @@
 import {arrays, EventEmitter, LifecycleModel, MessageBox, MessageBoxes, objects, scout, Session, Status, Widget} from '../index';
 import $ from 'jquery';
 import LifecycleEventMap from './LifecycleEventMap';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 /**
  * Abstract base class for validation lifecycles as used for forms.
@@ -21,6 +23,7 @@ import LifecycleEventMap from './LifecycleEventMap';
  */
 export default abstract class Lifecycle<TValidationResult> extends EventEmitter implements LifecycleModel {
   declare model: LifecycleModel;
+  declare initModel: SomeRequired<this['model'], 'widget'>;
   declare eventMap: LifecycleEventMap<TValidationResult>;
   declare self: Lifecycle<any>;
 
@@ -57,7 +60,7 @@ export default abstract class Lifecycle<TValidationResult> extends EventEmitter 
 
   // Info: doExportXml, doImportXml, doSaveWithoutMarkerChange is not supported in Html UI
 
-  init(model: LifecycleModel) {
+  init(model: InitModelOf<this>) {
     scout.assertParameter('widget', model.widget);
     $.extend(this, model);
     if (objects.isNullOrUndefined(this.validationFailedText)) {

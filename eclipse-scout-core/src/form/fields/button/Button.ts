@@ -11,6 +11,7 @@
 import {
   ButtonAdapterMenu, ButtonEventMap, ButtonKeyStroke, ButtonLayout, ButtonModel, ContextMenuPopup, Device, DoubleClickSupport, EnumObject, FormField, icons, KeyStrokeContext, LoadingSupport, Menu, scout, styles, tooltips, Widget
 } from '../../../index';
+import {InitModelOf} from '../../../scout';
 
 export default class Button extends FormField implements ButtonModel {
   declare model: ButtonModel;
@@ -79,7 +80,7 @@ export default class Button extends FormField implements ButtonModel {
 
   static SUBMENU_ICON = icons.ANGLE_DOWN_BOLD;
 
-  protected override _init(model: ButtonModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.resolveIconIds(['iconId']);
     this._setKeyStroke(this.keyStroke);

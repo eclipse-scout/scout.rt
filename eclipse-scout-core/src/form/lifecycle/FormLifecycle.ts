@@ -10,6 +10,7 @@
  */
 import {Form, FormLifecycleModel, Lifecycle, scout, Status, strings, ValueField} from '../../index';
 import {ValidationResult} from '../fields/FormField';
+import {InitModelOf} from '../../scout';
 
 export default class FormLifecycle<TValidationResult extends ValidationResult = ValidationResult> extends Lifecycle<TValidationResult> implements FormLifecycleModel {
   declare model: FormLifecycleModel;
@@ -24,7 +25,7 @@ export default class FormLifecycle<TValidationResult extends ValidationResult = 
     this.saveChangesQuestionTextKey = 'FormSaveChangesQuestion';
   }
 
-  override init(model: FormLifecycleModel) {
+  override init(model: InitModelOf<this>) {
     scout.assertParameter('widget', model.widget, Form);
     super.init(model);
   }

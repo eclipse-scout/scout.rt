@@ -8,13 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompactTree, ModelAdapterModel, ObjectFactory, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode, Widget} from '../../index';
+import {arrays, CompactTree, ModelAdapter, ObjectFactory, RemoteEvent, Session, Tree, TreeAdapter, TreeModel, TreeNode, TreeNodeModel, Widget} from '../../index';
 import $ from 'jquery';
-import {TreeNodeData} from '../../tree/TreeNodeModel';
-import {SomeRequired} from '../../types';
 import {ObjectType} from '../../ObjectFactory';
 import SpecTree from './SpecTree';
 import SpecTreeAdapter from './SpecTreeAdapter';
+import {InitModelOf} from '../../scout';
 
 export default class TreeSpecHelper {
   session: Session;
@@ -23,21 +22,21 @@ export default class TreeSpecHelper {
     this.session = session;
   }
 
-  createModel(nodes: TreeNodeData[]): TreeModel & { id: string; objectType: ObjectType<Tree>; parent: Widget; session: Session } {
+  createModel(nodes: TreeNodeModel[]): TreeModel & { id: string; objectType: string; parent: Widget; session: Session } {
     let model = createSimpleModel('Tree', this.session) as TreeModel & { objectType: ObjectType<Tree> };
 
     if (nodes) {
       model.nodes = nodes;
     }
     model.enabled = true;
-    return model as TreeModel & { id: string; objectType: ObjectType<Tree>; parent: Widget; session: Session };
+    return model as TreeModel & { id: string; objectType: string; parent: Widget; session: Session };
   }
 
-  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): TreeModel & { id: string; objectType: ObjectType<Tree>; parent: Widget; session: Session } {
+  createModelFixture(nodeCount?: number, depth?: number, expanded?: boolean): TreeModel & { id: string; objectType: string; parent: Widget; session: Session } {
     return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
   }
 
-  createModelNode(id?: string, text?: string, position?: number): TreeNodeData {
+  createModelNode(id?: string, text?: string, position?: number): TreeNodeModel {
     return {
       id: id + '' || ObjectFactory.get().createUniqueId(),
       text: text,
@@ -47,11 +46,11 @@ export default class TreeSpecHelper {
     };
   }
 
-  createModelNodes(nodeCount?: number, depth?: number, expanded?: boolean): TreeNodeData[] {
+  createModelNodes(nodeCount?: number, depth?: number, expanded?: boolean): TreeNodeModel[] {
     return this.createModelNodesInternal(nodeCount, depth, expanded);
   }
 
-  createModelNodesInternal(nodeCount: number, depth?: number, expanded?: boolean, parentNode?: TreeNodeData): TreeNodeData[] {
+  createModelNodesInternal(nodeCount: number, depth?: number, expanded?: boolean, parentNode?: TreeNodeModel): TreeNodeModel[] {
     if (!nodeCount) {
       return;
     }
@@ -81,23 +80,23 @@ export default class TreeSpecHelper {
     };
     model = $.extend({}, defaults, model);
     let tree = new SpecTree();
-    tree.init(model);
+    tree.init(model as InitModelOf<Tree>);
     return tree;
   }
 
-  createTreeAdapter(model: ModelAdapterModel | SomeRequired<TreeModel, 'session' | 'id'>): SpecTreeAdapter {
+  createTreeAdapter(model: InitModelOf<ModelAdapter> | TreeModel & { session: Session; id: string; objectType: string }): SpecTreeAdapter {
     let adapter = new SpecTreeAdapter();
     adapter.init(model);
     return adapter;
   }
 
-  createCompactTree(model: TreeModel): CompactTree & SpecTree {
+  createCompactTree(model: InitModelOf<Tree>): CompactTree & SpecTree {
     let tree = new CompactTree();
     tree.init(model);
     return tree as CompactTree & SpecTree;
   }
 
-  createCompactTreeAdapter(model: ModelAdapterModel): TreeAdapter {
+  createCompactTreeAdapter(model: InitModelOf<TreeAdapter>): TreeAdapter {
     model.objectType = 'Tree:Compact';
     let tree = new TreeAdapter();
     tree.init(model);
@@ -143,7 +142,7 @@ export default class TreeSpecHelper {
     };
   }
 
-  createNodesInsertedEvent(model: { id: string }, nodes: TreeNodeData[], commonParentNodeId: string): RemoteEvent {
+  createNodesInsertedEvent(model: { id: string }, nodes: TreeNodeModel[], commonParentNodeId: string): RemoteEvent {
     return {
       target: model.id,
       commonParentNodeId: commonParentNodeId,
@@ -152,7 +151,7 @@ export default class TreeSpecHelper {
     };
   }
 
-  createNodesInsertedEventTopNode(model: { id: string }, nodes: TreeNodeData[]): RemoteEvent {
+  createNodesInsertedEventTopNode(model: { id: string }, nodes: TreeNodeModel[]): RemoteEvent {
     return {
       target: model.id,
       nodes: nodes,
@@ -185,7 +184,7 @@ export default class TreeSpecHelper {
     };
   }
 
-  createNodesUpdatedEvent(model: { id: string }, nodes: TreeNodeData[]): RemoteEvent {
+  createNodesUpdatedEvent(model: { id: string }, nodes: TreeNodeModel[]): RemoteEvent {
     return {
       target: model.id,
       nodes: nodes,

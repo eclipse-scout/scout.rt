@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModelAdapterModel, RemoteEvent, scout, Session, TableControl, TableControlAdapter, TableControlModel, Widget} from '../../../src/index';
+import {RemoteEvent, scout, Session, TableControl, TableControlAdapter, Widget} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
-import {ObjectType} from '../../../src/ObjectFactory';
 import SpecTable from '../../../src/testing/table/SpecTable';
+import {InitModelOf} from '../../../src/scout';
 
 describe('TableControl', () => {
   let session: SandboxSession;
@@ -34,17 +34,15 @@ describe('TableControl', () => {
     $.fx.off = false;
   });
 
-  function createModel(): {
-    id: string; objectType: ObjectType<TableControl>; parent: Widget; session: Session;
-  } {
+  function createModel(): { id: string; objectType: string; parent: Widget; session: Session } {
     return createSimpleModel('TableControl', session);
   }
 
-  function createAction(model: TableControlModel): TableControl {
+  function createAction(model: InitModelOf<TableControl>): TableControl {
     return scout.create(TableControl, model);
   }
 
-  function createTableControlAdapter(model: ModelAdapterModel): TableControlAdapter {
+  function createTableControlAdapter(model: InitModelOf<TableControlAdapter>): TableControlAdapter {
     let action = new TableControlAdapter();
     action.init(model);
     return action;
@@ -106,10 +104,10 @@ describe('TableControl', () => {
     it('sends selected events (for current and previous selection)', () => {
       let model = createModel();
       let adapter = createTableControlAdapter(model);
-      let action = adapter.createWidget(model, session.desktop);
+      let action = adapter.createWidget(model, session.desktop) as TableControl;
       let model2 = createModel();
       let adapter2 = createTableControlAdapter(model2);
-      let action2 = adapter2.createWidget(model2, session.desktop);
+      let action2 = adapter2.createWidget(model2, session.desktop) as TableControl;
       table._setTableControls([action, action2]);
 
       action.selected = true;

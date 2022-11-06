@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Widget, WidgetModel} from '../index';
-import {RefModel} from '../types';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface CompositeModel extends WidgetModel {
-  widgets: (Widget | RefModel<WidgetModel>)[];
+  widgets?: ObjectOrChildModel<Widget>[];
 }

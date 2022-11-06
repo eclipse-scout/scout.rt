@@ -13,10 +13,6 @@ import {OutlineViewButton, ViewButtonAdapter} from '../../index';
 export default class OutlineViewButtonAdapter extends ViewButtonAdapter {
   declare widget: OutlineViewButton;
 
-  constructor() {
-    super();
-  }
-
   protected override _goOffline() {
     // Disable only if outline has not been loaded yet
     if (this.widget.outline) {

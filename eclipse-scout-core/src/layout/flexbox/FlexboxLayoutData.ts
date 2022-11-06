@@ -10,6 +10,7 @@
  */
 import $ from 'jquery';
 import {FlexboxLayoutDataModel, LayoutData} from '../../index';
+import {InitModelOf} from '../../scout';
 
 export default class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
   declare model: FlexboxLayoutDataModel;
@@ -23,7 +24,7 @@ export default class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataM
   initialPx: number;
   diff: number;
 
-  constructor(model?: FlexboxLayoutDataModel) {
+  constructor(model?: InitModelOf<FlexboxLayoutData>) {
     // initial
     this.relative = true;
     this.grow = 1;

@@ -8,9 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Column, ColumnUserFilter, Table, TableRow} from '../../src/index';
+import {arrays, Column, ColumnUserFilter, Table, TableRow, TableRowModel} from '../../src/index';
 import {TableSpecHelper} from '../../src/testing/index';
-import {TableRowData} from '../../src/table/TableRowModel';
 import SpecTable from '../../src/testing/table/SpecTable';
 
 describe('HierarchicalTableSpec', () => {
@@ -71,7 +70,7 @@ describe('HierarchicalTableSpec', () => {
   }
 
   describe('add', () => {
-    let table: SpecTable, rowIds: string[], rows: TableRowData[];
+    let table: SpecTable, rowIds: string[], rows: TableRowModel[];
 
     /**
      * initial table
@@ -134,7 +133,7 @@ describe('HierarchicalTableSpec', () => {
 
     it('a child row to a row which is already a parent row (by pseudo row)', () => {
       let newRow = helper.createModelRow('33', ['newRow']),
-        pseudoParentRow = {
+        pseudoParentRow: any = {
           id: '0'
         };
       newRow.parentRow = pseudoParentRow;
@@ -178,8 +177,8 @@ describe('HierarchicalTableSpec', () => {
     });
 
     it('a child row to a model row that was inserted before', () => {
-      let parentRow = {cells: ['newRow'], expanded: true} as TableRowData;
-      let childRow = {cells: ['childRow'], parentRow: parentRow} as TableRowData;
+      let parentRow: TableRowModel = {cells: ['newRow'], expanded: true};
+      let childRow: TableRowModel = {cells: ['childRow'], parentRow: parentRow};
 
       table.deleteAllRows();
       table.insertRows([parentRow, childRow]);

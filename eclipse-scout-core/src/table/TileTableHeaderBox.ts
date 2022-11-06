@@ -15,6 +15,7 @@ import {
 import {TileTableHeaderSortKey} from './TileTableHeaderSortByLookupCall';
 import StaticLookupCall from '../lookup/StaticLookupCall';
 import {TableGroupEvent, TableSortEvent} from './TableEventMap';
+import {InitModelOf} from '../scout';
 
 export default class TileTableHeaderBox extends GroupBox implements TileTableHeaderBoxModel {
   declare model: TileTableHeaderBoxModel;
@@ -59,7 +60,7 @@ export default class TileTableHeaderBox extends GroupBox implements TileTableHea
     this.table.off('sort', this._tableSortHandler);
   }
 
-  protected override _init(model: TileTableHeaderBoxModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this.table = this.parent;

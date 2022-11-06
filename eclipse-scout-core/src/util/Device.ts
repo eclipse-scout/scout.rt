@@ -10,11 +10,12 @@
  */
 import {App, EnumObject, objects, Predicate, scout} from '../index';
 import $ from 'jquery';
+import {InitModelOf, ObjectModel} from '../scout';
 import TypeOrArray = JQuery.TypeOrArray;
 
 let instance: Device;
 
-interface DeviceModel {
+interface DeviceModel extends ObjectModel<Device> {
   userAgent: string;
 }
 
@@ -39,7 +40,7 @@ export default class Device implements DeviceModel {
   systemVersion: number;
   scrollbarWidth: number;
 
-  constructor(model?: DeviceModel) {
+  constructor(model?: InitModelOf<Device>) {
     // user agent string from browser
     this.userAgent = model.userAgent;
     this.features = {};

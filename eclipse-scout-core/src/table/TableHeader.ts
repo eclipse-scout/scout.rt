@@ -14,9 +14,12 @@ import {
 } from '../index';
 import $ from 'jquery';
 import {TableColumnMovedEvent, TableColumnResizedEvent, TableFilterAddedEvent, TableFilterRemovedEvent} from './TableEventMap';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 export default class TableHeader extends Widget implements TableHeaderModel {
   declare model: TableHeaderModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'table'>;
   declare eventMap: TableHeaderEventMap;
   declare self: TableHeader;
 
@@ -51,7 +54,7 @@ export default class TableHeader extends Widget implements TableHeaderModel {
     this._renderedColumns = [];
   }
 
-  protected override _init(options: TableHeaderModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
 
     this.menuBar = scout.create(MenuBar, {

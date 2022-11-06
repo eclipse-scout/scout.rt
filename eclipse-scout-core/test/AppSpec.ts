@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {App} from '../src/index';
-import {AppOptions} from '../src/App';
+import {AppModel} from '../src/App';
 
 describe('App', () => {
 
@@ -41,7 +41,7 @@ describe('App', () => {
     });
 
     class SpecApp extends App {
-      override _load(options: AppOptions): JQuery.Promise<any> {
+      override _load(options: AppModel): JQuery.Promise<any> {
         return super._load(options);
       }
     }

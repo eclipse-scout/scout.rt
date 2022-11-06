@@ -9,10 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {RemoteEvent, scout, StringField, StringFieldModel} from '../../../../src/index';
+import {RemoteEvent, scout, StringField} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
 import {triggerClick} from '../../../../src/testing/jquery-testing';
 import {StringFieldSelection} from '../../../../src/form/fields/stringfield/StringField';
+import {InitModelOf} from '../../../../src/scout';
 
 describe('StringField', () => {
   let session: SandboxSession, helper: FormSpecHelper, field: SpecStringField;
@@ -38,20 +39,20 @@ describe('StringField', () => {
     }
   }
 
-  function createField(model: StringFieldModel): SpecStringField {
+  function createField(model: InitModelOf<StringField>): SpecStringField {
     let field = new SpecStringField();
     field.init(model);
     return field;
   }
 
-  function createModel(): StringFieldModel {
+  function createModel(): InitModelOf<StringField> {
     return helper.createFieldModel();
   }
 
   describe('init', () => {
     it('clear does not throw exception when called in init function', () => {
       class MyStringField extends StringField {
-        override init(model) {
+        override init(model: InitModelOf<this>) {
           super.init(model);
           this.clear();
         }

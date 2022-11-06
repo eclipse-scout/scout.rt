@@ -12,5 +12,5 @@ import {ViewButton, WidgetPopupModel} from '../../index';
 
 export default interface ViewMenuPopupModel extends WidgetPopupModel {
   defaultIconId?: string;
-  viewMenus: ViewButton[];
+  viewMenus?: ViewButton[];
 }

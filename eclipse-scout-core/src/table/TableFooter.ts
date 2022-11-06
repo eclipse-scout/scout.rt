@@ -15,9 +15,12 @@ import {
 import $ from 'jquery';
 import FocusFilterFieldKeyStroke from '../keystroke/FocusFilterFieldKeyStroke';
 import {TableFilterAddedEvent, TableFilterRemovedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent} from './TableEventMap';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 export default class TableFooter extends Widget implements TableFooterModel {
   declare model: TableFooterModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'table'>;
 
   table: Table;
   filterText: string;
@@ -80,7 +83,7 @@ export default class TableFooter extends Widget implements TableFooterModel {
     this._tablePropertyChangeHandler = this._onTablePropertyChange.bind(this);
   }
 
-  protected override _init(options: TableFooterModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
 
     // Keystroke context for the search field.

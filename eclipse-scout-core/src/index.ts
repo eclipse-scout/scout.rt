@@ -234,7 +234,7 @@ export {default as ScrollbarModel} from './scrollbar/ScrollbarModel';
 export {default as ScrollbarEventMap} from './scrollbar/ScrollbarEventMap';
 export {default as scrollbars} from './scrollbar/scrollbars';
 export {default as VirtualScrolling} from './scrollbar/VirtualScrolling';
-export {default as VirtualScrollingOptions} from './scrollbar/VirtualScrollingOptions';
+export {default as VirtualScrollingModel} from './scrollbar/VirtualScrollingModel';
 export {default as Splitter} from './splitter/Splitter';
 export {default as SplitterModel} from './splitter/SplitterModel';
 export {default as SplitterEventMap} from './splitter/SplitterEventMap';
@@ -633,7 +633,7 @@ export {default as MessageBoxEventMap} from './messagebox/MessageBoxEventMap';
 export {default as MessageBoxAdapter} from './messagebox/MessageBoxAdapter';
 export {default as MessageBoxController} from './messagebox/MessageBoxController';
 export {default as MessageBoxes} from './messagebox/MessageBoxes';
-export {default as MessageBoxesOptions} from './messagebox/MessageBoxesOptions';
+export {default as MessageBoxesModel} from './messagebox/MessageBoxesModel';
 export {default as MessageBoxLayout} from './messagebox/MessageBoxLayout';
 export {default as CopyKeyStroke} from './messagebox/CopyKeyStroke';
 export {default as AccordionField} from './form/fields/accordionfield/AccordionField';
@@ -1031,10 +1031,10 @@ export {default as UnsavedFormsLookupCallModel} from './desktop/unsavedchanges/U
 export {default as TileTableHeaderBox} from './table/TileTableHeaderBox';
 export {default as TileTableHeaderBoxModel} from './table/TileTableHeaderBoxModel';
 export {default as LoginApp} from './login/LoginApp';
-export {default as LoginAppOptions} from './login/LoginAppOptions';
+export {default as LoginAppModel} from './login/LoginAppModel';
 export {default as LoginBox} from './login/LoginBox';
 export {default as LogoutApp} from './login/LogoutApp';
-export {default as LogoutAppOptions} from './login/LogoutAppOptions';
+export {default as LogoutAppModel} from './login/LogoutAppModel';
 export {default as LogoutBox} from './login/LogoutBox';
 export {default as BreadcrumbItem} from './breadcrumbbar/BreadcrumbItem';
 export {default as BreadcrumbItemModel} from './breadcrumbbar/BreadcrumbItemModel';
@@ -1049,9 +1049,9 @@ export {default as BreadcrumbBarFieldModel} from './form/fields/breadcrumbbarfie
 export {default as BreadcrumbBarFieldEventMap} from './form/fields/breadcrumbbarfield/BreadcrumbBarFieldEventMap';
 export {default as BreadcrumbBarFieldAdapter} from './form/fields/breadcrumbbarfield/BreadcrumbBarFieldAdapter';
 export {default as AnyWidget} from './AnyWidget';
-export {Predicate, EnumObject, RefModel} from './types';
+export {Predicate, EnumObject} from './types';
 
-// The following files don't export anything but they need to be imported so they participate on the webpack build
+// The following files don't export anything, but they need to be imported, so they participate on the webpack build
 import * as objectFactories from './objectFactories';
 import * as jqs from './jquery/jquery-scout';
 import * as jqss from './jquery/jquery-scout-selectors';

@@ -8,17 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {MessageBox, MessageBoxesOptions, scout, Status, strings, Widget} from '../index';
+import {MessageBox, MessageBoxesModel, scout, Status, strings, Widget} from '../index';
 import $ from 'jquery';
 import {StatusSeverity} from '../status/Status';
-import MessageBoxModel from './MessageBoxModel';
 import {MessageBoxOption} from './MessageBox';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 /**
  * This class is a convenient builder for creating message boxes. Use the static functions to
  * create and open simple and often used message boxes.
  */
-export default class MessageBoxes implements MessageBoxesOptions {
+export default class MessageBoxes implements MessageBoxesModel {
+  declare model: MessageBoxesModel;
+  declare initModel: SomeRequired<this['model'], 'parent'>;
+
   parent: Widget;
   yesText: string;
   noText: string;
@@ -44,7 +48,7 @@ export default class MessageBoxes implements MessageBoxesOptions {
     this.html = false;
   }
 
-  init(options: MessageBoxesOptions) {
+  init(options: InitModelOf<this>) {
     scout.assertParameter('parent', options.parent);
     $.extend(this, options);
   }
@@ -89,7 +93,7 @@ export default class MessageBoxes implements MessageBoxesOptions {
   }
 
   build(): MessageBox {
-    let options: MessageBoxModel = {
+    let options: InitModelOf<MessageBox> = {
       parent: this.parent,
       header: this.headerText,
       body: this.bodyText,

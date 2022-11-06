@@ -8,14 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Session} from '../../index';
+import {PopupBlockerHandler, Session} from '../../index';
+import {ObjectModel} from '../../scout';
 
-export default interface PopupBlockerHandlerModel {
-  session: Session;
+export default interface PopupBlockerHandlerModel extends ObjectModel<PopupBlockerHandler> {
+  session?: Session;
 
   /**
    * A boolean indicating if the popup-window should have a back reference to the origin window.
-   * By default this parameter is false because of security reasons.
+   * By default, this parameter is false because of security reasons.
    * Only trusted sites may be allowed to access the opener window and potentially modify the origin web application!
    * @see https://mathiasbynens.github.io/rel-noopener/
    */

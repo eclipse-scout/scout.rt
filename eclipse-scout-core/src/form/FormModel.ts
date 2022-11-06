@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FileChooser, FileChooserController, FileChooserModel, Form, FormController, GroupBox, GroupBoxModel, KeyStroke, MessageBox, MessageBoxController, MessageBoxModel, Status, Widget, WidgetModel} from '../index';
+import {FileChooser, FileChooserController, Form, FormController, GroupBox, KeyStroke, MessageBox, MessageBoxController, Widget, WidgetModel} from '../index';
 import {DisplayHint} from './Form';
-import {RefModel} from '../types';
-import StatusModel from '../status/StatusModel';
+import {ObjectOrChildModel} from '../scout';
+import {StatusOrModel} from '../status/Status';
 
 export default interface FormModel extends WidgetModel {
   /**
@@ -54,19 +54,19 @@ export default interface FormModel extends WidgetModel {
   /**
    * Default is [].
    */
-  dialogs?: Form[] | RefModel<FormModel>[];
+  dialogs?: ObjectOrChildModel<Form>[];
   /**
    * Default is [].
    */
-  views?: Form[] | RefModel<FormModel>[];
+  views?: ObjectOrChildModel<Form>[];
   /**
    * Default is [].
    */
-  messageBoxes?: MessageBox[] | RefModel<MessageBoxModel>[];
+  messageBoxes?: ObjectOrChildModel<MessageBox>[];
   /**
    * Default is [].
    */
-  fileChoosers?: FileChooser[] | RefModel<FileChooserModel>[];
+  fileChoosers?: ObjectOrChildModel<FileChooser>[];
   /**
    * Defines whether the form should display a close button [X] in the form header resp. view tab.
    *
@@ -86,13 +86,13 @@ export default interface FormModel extends WidgetModel {
    * Default is true.
    */
   movable?: boolean;
-  rootGroupBox?: GroupBox | RefModel<GroupBoxModel>;
+  rootGroupBox?: ObjectOrChildModel<GroupBox>;
   /**
    * Default is false.
    */
   saveNeeded?: boolean;
   /**
-   * Whether or not a changed form should display the save needed state (dirty) in the dialog or view header.
+   * Whether a changed form should display the save needed state (dirty) in the dialog or view header.
    * true to display the save needed state, false otherwise.
    *
    * Default is false.
@@ -126,5 +126,5 @@ export default interface FormModel extends WidgetModel {
   title?: string;
   subTitle?: string;
   iconId?: string;
-  status?: Status | StatusModel;
+  status?: StatusOrModel;
 }

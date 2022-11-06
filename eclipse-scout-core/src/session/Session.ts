@@ -19,12 +19,16 @@ import {ObjectFactoryOptions} from '../ObjectFactory';
 import {JsonErrorResponse} from '../App';
 import {ModelAdapterLike} from './ModelAdapter';
 import {StatusSeverity} from '../status/Status';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
 
-export default class Session extends EventEmitter implements ModelAdapterLike {
+export default class Session extends EventEmitter implements SessionModel, ModelAdapterLike {
   declare model: SessionModel;
+  declare initModel: SomeRequired<this['model'], '$entryPoint'>;
   declare eventMap: SessionEventMap;
   declare self: Session;
+
   partId: string;
   url: URL;
   userAgent: UserAgent;
@@ -173,8 +177,8 @@ export default class Session extends EventEmitter implements ModelAdapterLike {
   static EMPTY_UPLOAD_FILENAME = '*empty*';
 
 
-  init(model: SessionModel) {
-    let options = model || {} as SessionModel;
+  init(model: InitModelOf<this>) {
+    let options = model || {} as InitModelOf<this>;
 
     if (!options.$entryPoint) {
       throw new Error('$entryPoint is not defined');

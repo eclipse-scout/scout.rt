@@ -10,6 +10,7 @@
  */
 import {AbstractLayout, EnumObject, Event, EventHandler, HtmlComponent, SimpleTab, SimpleTabAreaEventMap, SimpleTabAreaLayout, SimpleTabAreaModel, Widget, widgets} from '../index';
 import {SimpleTabView} from './SimpleTab';
+import {InitModelOf} from '../scout';
 
 export type SimpleTabAreaDisplayStyle = EnumObject<typeof SimpleTabArea.DisplayStyle>;
 
@@ -36,7 +37,7 @@ export default class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> 
     this._selectedViewTab = null;
   }
 
-  protected override _init(model: SimpleTabAreaModel<TView>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this._tabClickHandler = this._onTabClick.bind(this);

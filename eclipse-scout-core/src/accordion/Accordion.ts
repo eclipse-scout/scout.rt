@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AccordionLayout, AccordionModel, arrays, EventHandler, Group, GroupModel, HtmlComponent, LoadingSupport, objects, PropertyChangeEvent, Widget, widgets} from '../index';
-import {Comparator, RefModel} from '../types';
+import {AccordionLayout, AccordionModel, arrays, EventHandler, Group, HtmlComponent, LoadingSupport, objects, PropertyChangeEvent, Widget, widgets} from '../index';
+import {Comparator} from '../types';
 import {GroupCollapseStyle} from '../group/Group';
+import {InitModelOf, ObjectOrChildModel} from '../scout';
 
 export default class Accordion extends Widget implements AccordionModel {
   declare model: AccordionModel;
@@ -35,7 +36,7 @@ export default class Accordion extends Widget implements AccordionModel {
     this._groupPropertyChangeHandler = this._onGroupPropertyChange.bind(this);
   }
 
-  protected override _init(model: AccordionModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._initGroups(this.groups);
     this._setExclusiveExpand(this.exclusiveExpand);
@@ -63,14 +64,14 @@ export default class Accordion extends Widget implements AccordionModel {
     this._renderGroups();
   }
 
-  insertGroup(group: Group | RefModel<GroupModel>) {
+  insertGroup(group: ObjectOrChildModel<Group>) {
     this.insertGroups([group]);
   }
 
-  insertGroups(groupsToInsert: Group | RefModel<GroupModel> | (Group | RefModel<GroupModel>)[]) {
-    groupsToInsert = arrays.ensure(groupsToInsert);
-    let groups = this.groups as (Group | RefModel<GroupModel>)[];
-    this.setGroups(groups.concat(groupsToInsert));
+  insertGroups(groupsToInsert: ObjectOrChildModel<Group> | ObjectOrChildModel<Group>[]) {
+    let additionalGroups = arrays.ensure(groupsToInsert);
+    let existingGroups: ObjectOrChildModel<Group>[] = this.groups;
+    this.setGroups(existingGroups.concat(additionalGroups));
   }
 
   deleteGroup(group: Group) {
@@ -94,14 +95,14 @@ export default class Accordion extends Widget implements AccordionModel {
     });
   }
 
-  setGroups(groupsOrModels: Group | RefModel<GroupModel> | (Group | RefModel<GroupModel>)[]) {
+  setGroups(groupsOrModels: ObjectOrChildModel<Group> | ObjectOrChildModel<Group>[]) {
     let groupsOrModelsArr = arrays.ensure(groupsOrModels);
     if (objects.equals(this.groups, groupsOrModels)) {
       return;
     }
 
     // Ensure given groups are real groups (of type Group)
-    let groups = this._createChildren(groupsOrModelsArr) as unknown as Group[];
+    let groups = this._createChildren(groupsOrModelsArr);
 
     // Only delete those which are not in the new array
     // Only insert those which are not already there

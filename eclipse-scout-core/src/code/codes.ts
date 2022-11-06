@@ -10,7 +10,7 @@
  */
 import {arrays, Code, CodeType, objects, scout, texts} from '../index';
 import $ from 'jquery';
-import CodeTypeModel from './CodeTypeModel';
+import {ObjectOrModel} from '../scout';
 
 /**
  * This default language is used whenever a code registers its texts in scout.texts.
@@ -40,7 +40,7 @@ export function init(data?: any) {
   Object.keys(data).forEach(codeTypeId => add(data[codeTypeId]));
 }
 
-export function add(codeTypes: CodeType<any> | CodeTypeModel<any> | CodeType<any>[] | CodeTypeModel<any>[]) {
+export function add(codeTypes: ObjectOrModel<CodeType<any>> | ObjectOrModel<CodeType<any>>[]) {
   let types = arrays.ensure(codeTypes);
   types.forEach(codeTypeOrModel => {
     let codeType = CodeType.ensure(codeTypeOrModel);

@@ -10,8 +10,9 @@
  */
 
 /* eslint-disable max-classes-per-file */
-import {Action, Button, KeyStroke, NumberField, ObjectFactory, scout, StringField, StringFieldModel} from '../src/index';
+import {Action, Button, KeyStroke, NumberField, ObjectFactory, scout, StringField} from '../src/index';
 import {LocaleSpecHelper} from '../src/testing/index';
+import {InitModelOf} from '../src/scout';
 
 describe('ObjectFactory', () => {
   let session: SandboxSession;
@@ -37,7 +38,7 @@ describe('ObjectFactory', () => {
     // @ts-expect-error
     let registry = ObjectFactory.get()._registry;
     for (let objectType of registry.keys()) {
-      let model = createSimpleModel(objectType, session);
+      let model = createSimpleModel(objectType as string, session);
       let obj = scout.create(model);
       expect(obj).toBeTruthy();
     }
@@ -52,7 +53,7 @@ describe('ObjectFactory', () => {
   });
 
   it('puts the object type to the resulting object', () => {
-    let model: StringFieldModel = {
+    let model: InitModelOf<StringField> = {
       parent: session.desktop
       // objectType will be set
     };
@@ -178,6 +179,7 @@ describe('ObjectFactory', () => {
       let my = window['my'];
       my.VarStringField = class VarStringField extends StringField {
         abc: any;
+
         constructor(model, abc) {
           super();
           this.abc = abc;
@@ -208,6 +210,7 @@ describe('ObjectFactory', () => {
       let my = window['my'];
       my.VarStringField = class VarStringField extends StringField {
         abc: any;
+
         constructor(abc) {
           super();
           this.abc = abc;

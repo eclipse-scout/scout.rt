@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RemoteApp, Session, SessionModel} from '../index';
+import {RemoteApp, Session} from '../index';
+import {InitModelOf} from '../scout';
 
 export default class TestingApp extends RemoteApp {
 
@@ -17,7 +18,7 @@ export default class TestingApp extends RemoteApp {
     return null;
   }
 
-  override _createSession(options: SessionModel): Session {
+  override _createSession(options: InitModelOf<Session>): Session {
     return super._createSession(options);
   }
 }

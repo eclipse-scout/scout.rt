@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Desktop, DesktopResponsiveHandlerModel, ResponsiveHandler, ResponsiveManager} from '../index';
+import {InitModelOf} from '../scout';
 
 export default class DesktopResponsiveHandler extends ResponsiveHandler implements DesktopResponsiveHandlerModel {
   declare model: DesktopResponsiveHandlerModel;
@@ -21,7 +22,7 @@ export default class DesktopResponsiveHandler extends ResponsiveHandler implemen
     this.allowedStates = [ResponsiveManager.ResponsiveState.NORMAL, ResponsiveManager.ResponsiveState.COMPACT];
   }
 
-  override init(model: DesktopResponsiveHandlerModel) {
+  override init(model: InitModelOf<this>) {
     super.init(model);
 
     this._registerTransformation('navigationVisible', this._transformNavigationVisible);

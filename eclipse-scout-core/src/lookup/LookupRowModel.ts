@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 export default interface LookupRowModel<Key> {
-  key: Key;
-  text: string;
+  key?: Key;
+  text?: string;
   parentKey?: Key;
   enabled?: boolean;
   active?: boolean;

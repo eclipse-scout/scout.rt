@@ -8,12 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, RefModel, StatusMenuMappingModel, Widget, WidgetModel} from '../../index';
+import {Menu, StatusMenuMappingModel, Widget} from '../../index';
 import {StatusSeverity} from '../../status/Status';
-import {ModelOf} from '../../scout';
+import {ObjectOrChildModel} from '../../scout';
+import {SomeRequired} from '../../types';
 
 export default class StatusMenuMapping extends Widget implements StatusMenuMappingModel {
   declare model: StatusMenuMappingModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'menu'>;
 
   codes: number[];
   severities: StatusSeverity[];
@@ -28,7 +30,7 @@ export default class StatusMenuMapping extends Widget implements StatusMenuMappi
   }
 
   /** @internal */
-  override _createChild<T extends Widget>(model: T | RefModel<ModelOf<T>> | string): T {
+  override _createChild<T extends Widget>(model: ObjectOrChildModel<T> | string): T {
     if (typeof model === 'string') {
       // If the model is a string it is probably the id of the menu.
       // Menus are defined by the parent (form field) -> search the parent's children for the menu

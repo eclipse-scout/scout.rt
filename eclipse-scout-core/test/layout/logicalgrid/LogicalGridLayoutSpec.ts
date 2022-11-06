@@ -10,6 +10,7 @@
  */
 // eslint-disable-next-line max-classes-per-file
 import {AbstractLayout, Dimension, GridData, HtmlComponent, HtmlCompPrefSizeOptions, LogicalGridData, LogicalGridLayout, Widget, WidgetModel} from '../../../src/index';
+import {InitModelOf} from '../../../src/scout';
 
 describe('LogicalGridLayout', () => {
   let session: SandboxSession;
@@ -80,7 +81,7 @@ describe('LogicalGridLayout', () => {
     };
     model = $.extend({}, defaults, model);
     let lglChild = new LglChild();
-    lglChild.init(model);
+    lglChild.init(model as InitModelOf<LglChild>);
     lglChild.render();
     lglChild.setLayoutData(new LogicalGridData(lglChild));
     return lglChild;

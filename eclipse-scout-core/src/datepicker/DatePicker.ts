@@ -13,6 +13,7 @@ import $ from 'jquery';
 import {SwipeCallbackEvent} from '../util/events';
 import {JQueryMouseWheelEvent} from '../jquery/jquery-scout-types';
 import {OldWheelEvent} from '../types';
+import {InitModelOf} from '../scout';
 
 export type DatePickerMonth = { viewDate: Date; rendered: boolean; $container: JQuery; $weekendSeparator?: JQuery };
 
@@ -54,7 +55,7 @@ export default class DatePicker extends Widget implements DatePickerModel {
     this._showWeekendSeparator = true;
   }
 
-  protected override _init(options: DatePickerModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this._setDateFormat(this.dateFormat);
     this._showWeekendSeparator = this.dateFormat.symbols.firstDayOfWeek === 1; // only add the separator if the weeks starts on Monday

@@ -10,11 +10,12 @@
  */
 import {AjaxError, Call, CallModel, URL} from '../index';
 import $ from 'jquery';
+import {InitModelOf} from '../scout';
 
 export default class AjaxCall extends Call implements AjaxCallModel {
-
   declare model: AjaxCallModel;
   declare pendingCall: JQuery.jqXHR;
+
   ajaxOptions: JQuery.AjaxSettings;
 
   constructor() {
@@ -23,7 +24,7 @@ export default class AjaxCall extends Call implements AjaxCallModel {
     this.ajaxOptions = null;
   }
 
-  override init(model: AjaxCallModel) {
+  override init(model: InitModelOf<this>) {
     if (!model) {
       throw new Error('Missing argument "model"');
     }

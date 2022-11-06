@@ -15,9 +15,12 @@ import {
 import $ from 'jquery';
 import {KeyStrokeManagerKeyStrokeEvent} from '../../keystroke/KeyStrokeManagerEventMap';
 import {TableRowOrderChangedEvent} from '../TableEventMap';
+import {InitModelOf} from '../../scout';
+import {SomeRequired} from '../../types';
 
 export default class CellEditorPopup<TValue> extends Popup implements CellEditorPopupModel<TValue> {
   declare model: CellEditorPopupModel<TValue>;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'column' | 'cell'>;
 
   table: Table;
   column: Column<TValue>;
@@ -37,7 +40,7 @@ export default class CellEditorPopup<TValue> extends Popup implements CellEditor
     this._keyStrokeHandler = this._onKeyStroke.bind(this);
   }
 
-  protected override _init(options: CellEditorPopupModel<TValue>) {
+  protected override _init(options: InitModelOf<this>) {
     options.scrollType = options.scrollType || 'position';
     super._init(options);
 

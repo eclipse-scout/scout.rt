@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ActionModel, BenchColumnLayoutData, DesktopNotification, DesktopNotificationModel, Form, FormModel, Menu, MenuModel, MessageBox, Outline, OutlineModel, ViewButton, ViewButtonModel, Widget, WidgetModel} from '../index';
+import {Action, BenchColumnLayoutData, DesktopNotification, Menu, Outline, ViewButton, Widget, WidgetModel} from '../index';
 import {DesktopDisplayStyle, NativeNotificationDefaults} from './Desktop';
-import {RefModel} from '../types';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface DesktopModel extends WidgetModel {
   nativeNotificationDefaults?: NativeNotificationDefaults;
@@ -27,12 +27,12 @@ export default interface DesktopModel extends WidgetModel {
   headerVisible?: boolean;
   splitterVisible?: boolean;
   benchLayoutData?: BenchColumnLayoutData;
-  menus?: (Menu | RefModel<MenuModel>)[];
-  notifications?: (DesktopNotification | RefModel<DesktopNotificationModel>)[];
-  addOns?: (Widget | RefModel<WidgetModel>)[];
-  keyStrokes?: (Action | RefModel<ActionModel>)[];
-  viewButtons?: (ViewButton | RefModel<ViewButtonModel>)[];
-  outline?: Outline | RefModel<OutlineModel>;
+  menus?: ObjectOrChildModel<Menu>[];
+  notifications?: ObjectOrChildModel<DesktopNotification>[];
+  addOns?: ObjectOrChildModel<Widget>[];
+  keyStrokes?: ObjectOrChildModel<Action>[];
+  viewButtons?: ObjectOrChildModel<ViewButton>[];
+  outline?: ObjectOrChildModel<Outline>;
   inBackground?: boolean;
   theme?: string;
   dense?: boolean;

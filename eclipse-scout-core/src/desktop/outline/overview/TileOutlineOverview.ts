@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Desktop, EventHandler, HtmlComponent, OutlineOverview, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOutlineOverviewEventMap, TileOutlineOverviewModel} from '../../../index';
+import {InitModelOf} from '../../../scout';
 
 export default class TileOutlineOverview extends OutlineOverview implements TileOutlineOverviewModel {
   declare model: TileOutlineOverviewModel;
@@ -31,7 +32,7 @@ export default class TileOutlineOverview extends OutlineOverview implements Tile
     this._desktopNavigationVisibilityChangeHandler = this._onDesktopNavigationVisibilityChange.bind(this);
   }
 
-  protected override _init(model: TileOutlineOverviewModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     if (!this.pageTileGrid) {
       this.pageTileGrid = this._createPageTileGrid();

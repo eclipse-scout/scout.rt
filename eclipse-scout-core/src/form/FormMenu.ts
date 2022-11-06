@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {
-  ActionKeyStroke, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, FormModel, GroupBox, Menu, MobilePopup, Popup, RefModel, scout, WidgetPopup
-} from '../index';
+import {ActionKeyStroke, ContextMenuPopup, Device, EnumObject, Event, EventHandler, Form, FormMenuActionKeyStroke, FormMenuEventMap, FormMenuModel, GroupBox, Menu, MobilePopup, Popup, scout, WidgetPopup} from '../index';
 import {CloneOptions} from '../widget/Widget';
-import {Optional} from '../types';
+import {InitModelOf, ObjectOrChildModel} from '../scout';
 
 export default class FormMenu extends Menu implements FormMenuModel {
   declare model: FormMenuModel;
@@ -43,7 +41,7 @@ export default class FormMenu extends Menu implements FormMenuModel {
     MOBILE: 'mobile'
   } as const;
 
-  protected override _init(model: FormMenuModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     if (!this.popupStyle) {
@@ -65,16 +63,16 @@ export default class FormMenu extends Menu implements FormMenuModel {
     this._renderSelected();
   }
 
-  override clone(modelOverride: Optional<FormMenuModel, 'parent'>, options: CloneOptions): this {
+  override clone(modelOverride: FormMenuModel, options: CloneOptions): this {
     modelOverride = modelOverride || {};
     // If the FormMenu is put into a context menu it will be cloned.
     // Cloning a form is not possible because it may non-cloneable components (Table, TabBox, etc.) -> exclude
     // Luckily, it is not necessary to clone it since the form is never shown multiple times at once -> Just use the same instance
     modelOverride.form = this.form;
-    return super.clone(modelOverride, options) as this;
+    return super.clone(modelOverride, options);
   }
 
-  setForm(form: Form | RefModel<FormModel>) {
+  setForm(form: ObjectOrChildModel<Form>) {
     this.setProperty('form', form);
   }
 

@@ -9,17 +9,16 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Menu, scout, TableFooter, TableInfoSelectionTooltipModel, Tooltip} from '../index';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 export default class TableInfoSelectionTooltip extends Tooltip implements TableInfoSelectionTooltipModel {
   declare model: TableInfoSelectionTooltipModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'tableFooter'>;
 
   tableFooter: TableFooter;
 
-  constructor() {
-    super();
-  }
-
-  protected override _init(options: TableInfoSelectionTooltipModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this.tableFooter = options.tableFooter;
     let selectNoneMenu = scout.create(Menu, {

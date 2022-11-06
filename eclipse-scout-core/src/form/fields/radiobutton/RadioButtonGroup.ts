@@ -9,15 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  arrays, FormField, FormFieldModel, HorizontalGrid, HtmlComponent, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupResult, LookupRow, objects, PropertyChangeEvent, RadioButton,
-  RadioButtonGroupEventMap, RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, RadioButtonModel, RefModel, scout, Status, TreeVisitResult,
-  ValueField
+  arrays, FormField, HorizontalGrid, HtmlComponent, LoadingSupport, LogicalGrid, LogicalGridData, LogicalGridLayoutConfig, LookupCall, LookupResult, LookupRow, objects, PropertyChangeEvent, RadioButton, RadioButtonGroupEventMap,
+  RadioButtonGroupGridConfig, RadioButtonGroupLayout, RadioButtonGroupLeftOrUpKeyStroke, RadioButtonGroupModel, RadioButtonGroupRightOrDownKeyStroke, scout, Status, TreeVisitResult, ValueField
 } from '../../../index';
 import $ from 'jquery';
 import {CloneOptions} from '../../../widget/Widget';
-import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
-import {Optional} from '../../../types';
-import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
+import {LookupCallOrModel} from '../../../lookup/LookupCall';
+import {InitModelOf, ObjectOrChildModel, ObjectOrModel} from '../../../scout';
 
 export default class RadioButtonGroup<TValue> extends ValueField<TValue> implements RadioButtonGroupModel<TValue> {
   declare model: RadioButtonGroupModel<TValue>;
@@ -67,7 +65,7 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
     NO_DATA: 1
   } as const;
 
-  protected override _init(model: RadioButtonGroupModel<TValue>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this._setLayoutConfig(this.layoutConfig);
@@ -148,11 +146,11 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
     }
   }
 
-  setLayoutConfig(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
+  setLayoutConfig(layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
     this.setProperty('layoutConfig', layoutConfig);
   }
 
-  protected _setLayoutConfig(layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
+  protected _setLayoutConfig(layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
     if (!layoutConfig) {
       layoutConfig = new LogicalGridLayoutConfig();
     }
@@ -199,7 +197,7 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
     return this.session.focusManager.findFirstFocusableElement(this.$container);
   }
 
-  setFields(fields: (FormField | RefModel<FormFieldModel>)[]) {
+  setFields(fields: ObjectOrChildModel<FormField>[]) {
     this.setProperty('fields', fields);
   }
 
@@ -395,7 +393,7 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
     }
   }
 
-  protected _setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
+  protected _setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
     this._lookupExecuted = false;
     if (this.rendered) {
@@ -529,7 +527,7 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
   }
 
   protected _createLookupRowRadioButton(lookupRow: LookupRow<TValue>): RadioButton<TValue> {
-    let button: RadioButtonModel<TValue> = {
+    let button: InitModelOf<RadioButton<TValue>> = {
       parent: this,
       label: lookupRow.text,
       radioValue: lookupRow.key
@@ -565,7 +563,7 @@ export default class RadioButtonGroup<TValue> extends ValueField<TValue> impleme
     return radioButton;
   }
 
-  override clone(model: Optional<RadioButtonGroupModel<TValue>, 'parent'>, options?: CloneOptions): this {
+  override clone(model: RadioButtonGroupModel<TValue>, options?: CloneOptions): this {
     let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'fields', options);
     clone._initButtons();

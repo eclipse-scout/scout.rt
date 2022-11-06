@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {HtmlComponent, Menu, MenuBoxEventMap, MenuBoxLayout, MenuBoxModel, MenuModel, RefModel, Widget} from '../../index';
+import {HtmlComponent, Menu, MenuBoxEventMap, MenuBoxLayout, MenuBoxModel, Widget} from '../../index';
+import {InitModelOf, ObjectOrChildModel} from '../../scout';
 
 export default class MenuBox extends Widget implements MenuBoxModel {
   declare model: MenuBoxModel;
@@ -28,7 +29,7 @@ export default class MenuBox extends Widget implements MenuBoxModel {
     this._addWidgetProperties('menus');
   }
 
-  protected override _init(options: MenuBoxModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this._initMenus(this.menus);
   }
@@ -54,7 +55,7 @@ export default class MenuBox extends Widget implements MenuBoxModel {
     this._renderCompact();
   }
 
-  setMenus(menus: (Menu | RefModel<MenuModel>)[]) {
+  setMenus(menus: ObjectOrChildModel<Menu>[]) {
     this.setProperty('menus', menus);
   }
 

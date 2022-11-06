@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ActionModel, FormField, GridData, Menu, MenuModel, StatusMenuMapping, StatusMenuMappingModel, WidgetModel} from '../../index';
+import {Action, FormField, GridData, Menu, StatusMenuMapping, WidgetModel} from '../../index';
 import {DropType} from '../../util/dragAndDrop';
 import {TooltipSupportOptions} from '../../tooltip/TooltipSupport';
 import {FormFieldLabelPosition, FormFieldMode, FormFieldStatusPosition, FormFieldStyle, FormFieldSuppressStatus, FormFieldTooltipAnchor} from './FormField';
 import {StatusOrModel} from '../../status/Status';
-import {RefModel} from '../../types';
+import {ObjectOrChildModel} from '../../scout';
 
 export default interface FormFieldModel extends WidgetModel {
   dropType?: DropType;
@@ -22,7 +22,7 @@ export default interface FormFieldModel extends WidgetModel {
   fieldStyle?: FormFieldStyle;
   gridDataHints?: GridData;
   mode?: FormFieldMode;
-  keyStrokes?: (Action | RefModel<ActionModel>)[];
+  keyStrokes?: ObjectOrChildModel<Action>[];
   displayText?: string;
   label?: string;
   labelVisible?: boolean;
@@ -31,8 +31,8 @@ export default interface FormFieldModel extends WidgetModel {
   labelUseUiWidth?: boolean;
   labelHtmlEnabled?: boolean;
   mandatory?: boolean;
-  statusMenuMappings?: (StatusMenuMapping | RefModel<StatusMenuMappingModel>)[];
-  menus?: (Menu | RefModel<MenuModel>)[];
+  statusMenuMappings?: ObjectOrChildModel<StatusMenuMapping>[];
+  menus?: ObjectOrChildModel<Menu>[];
   menusVisible?: boolean;
   defaultMenuTypes?: string[];
   preventInitialFocus?: boolean;

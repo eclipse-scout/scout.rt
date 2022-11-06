@@ -12,9 +12,12 @@ import {AbstractLayout, Device, Event, FormField, LookupRow, Popup, ProposalChoo
 import {ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent} from './ProposalChooserEventMap';
 import {SmartFieldLookupResult} from './SmartField';
 import {StatusOrModel} from '../../../status/Status';
+import {InitModelOf} from '../../../scout';
+import {SomeRequired} from '../../../types';
 
 export default class SmartFieldPopup<TValue> extends Popup implements SmartFieldPopupModel<TValue> {
   declare model: SmartFieldPopupModel<TValue>;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'field'>;
   declare eventMap: SmartFieldPopupEventMap<TValue>;
   declare self: SmartFieldPopup<any>;
 
@@ -30,7 +33,7 @@ export default class SmartFieldPopup<TValue> extends Popup implements SmartField
     this.windowPaddingY = 0;
   }
 
-  protected override _init(options: SmartFieldPopupModel<TValue>) {
+  protected override _init(options: InitModelOf<this>) {
     options.withFocusContext = false;
     super._init(options);
 
@@ -114,7 +117,7 @@ export default class SmartFieldPopup<TValue> extends Popup implements SmartField
   protected _onContainerMouseDown(event: JQuery.MouseDownEvent): boolean {
     // when user clicks on proposal popup with table or tree (prevent default,
     // so input-field does not lose the focus, popup will be closed by the
-    // proposal chooser impl.
+    // proposal chooser impl).
     return false;
   }
 

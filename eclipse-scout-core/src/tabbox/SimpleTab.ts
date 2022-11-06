@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Event, EventHandler, GlassPaneContribution, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, tooltips, Widget} from '../index';
+import {InitModelOf} from '../scout';
 
 export type DisplayViewId = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C' | 'OUTLINE' | 'OUTLINE_SELECTOR' | 'PAGE_DETAIL' | 'PAGE_SEARCH' | 'PAGE_TABLE';
 
@@ -73,7 +74,7 @@ export default class SimpleTab<TView extends SimpleTabView = SimpleTabView> exte
     };
   }
 
-  protected override _init(model: SimpleTabModel<TView>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this.view = model.view;

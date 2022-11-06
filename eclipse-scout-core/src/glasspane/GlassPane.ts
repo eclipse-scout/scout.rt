@@ -14,10 +14,6 @@ import MouseDownEvent = JQuery.MouseDownEvent;
 
 export default class GlassPane extends Widget {
 
-  constructor() {
-    super();
-  }
-
   protected override _render() {
     this.$container = this.$parent
       .appendDiv('glasspane')

@@ -13,10 +13,6 @@ import {arrays, ContextMenuPopup, DesktopTabArea, Form, HAlign, Menu, scout, Sim
 export default class DesktopTab extends SimpleTab<Form> {
   declare parent: DesktopTabArea;
 
-  constructor() {
-    super();
-  }
-
   protected override _render() {
     super._render();
     this.$container.addClass('desktop-tab');

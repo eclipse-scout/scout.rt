@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AjaxCall, arrays, LookupCall, LookupRow, LookupRowModel, objects, RestLookupCallModel, scout} from '../index';
+import {AjaxCall, arrays, LookupCall, LookupRow, objects, RestLookupCallModel, scout} from '../index';
 import $ from 'jquery';
 import LookupResult from './LookupResult';
+import {InitModelOf} from '../scout';
 import Deferred = JQuery.Deferred;
 
 /**
@@ -111,7 +112,7 @@ export default class RestLookupCall<TKey> extends LookupCall<TKey> implements Re
     let clone = super.cloneForAll();
     clone._addRestrictionIfAbsent('active', true);
     clone._addRestrictionIfAbsent('maxRowCount', this.maxRowCount);
-    return clone as this;
+    return clone;
   }
 
   override cloneForText(text: string): this {
@@ -134,7 +135,7 @@ export default class RestLookupCall<TKey> extends LookupCall<TKey> implements Re
 
   protected _createLookupRowFromDo(lookupRowDo: LookupRowDo<TKey>): LookupRow<TKey> {
     // propagate all properties from lookup row DO to scout lookup row (there might be custom ones on specific lookup row DOs)
-    let clonedLookupRowDo = $.extend({}, lookupRowDo) as LookupRowDo<TKey> & LookupRowModel<TKey>;
+    let clonedLookupRowDo = $.extend({}, lookupRowDo) as LookupRowDo<TKey> & InitModelOf<LookupRow<TKey>>;
 
     // [text, enabled, active, iconId, cssClass, tooltipText, additionalTableRowData] are the same for LookupRow.ts and LookupRowDo.java
     // [backgroundColor, foregroundColor, font] currently not supported by LookupRowDo.java
@@ -158,7 +159,7 @@ export default class RestLookupCall<TKey> extends LookupCall<TKey> implements Re
       }
     }
 
-    return scout.create(LookupRow, clonedLookupRowDo, {ensureUniqueId: false}) as LookupRow<TKey>;
+    return scout.create((LookupRow<TKey>), clonedLookupRowDo, {ensureUniqueId: false});
   }
 
   protected _call(): JQuery.Promise<LookupResult<TKey>> {

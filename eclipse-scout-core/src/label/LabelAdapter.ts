@@ -13,10 +13,6 @@ import {LabelAppLinkActionEvent} from './LabelEventMap';
 
 export default class LabelAdapter extends ModelAdapter {
 
-  constructor() {
-    super();
-  }
-
   protected _onWidgetAppLinkAction(event: LabelAppLinkActionEvent) {
     this._send('appLinkAction', {
       ref: event.ref

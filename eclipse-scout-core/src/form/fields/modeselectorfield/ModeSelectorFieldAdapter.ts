@@ -8,18 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ModeSelector, ModeSelectorField, ModeSelectorFieldModel, ValueFieldAdapter, Widget} from '../../../index';
-import {SomeRequired} from '../../../types';
+import {ModeSelector, ModeSelectorField, ValueFieldAdapter, Widget} from '../../../index';
+import {FullModelOf} from '../../../scout';
 
 export default class ModeSelectorFieldAdapter extends ValueFieldAdapter {
   declare widget: ModeSelectorField<any>;
 
-  protected override _createWidget(model: SomeRequired<ModeSelectorFieldModel<any>, 'objectType'>): Widget {
+  protected override _createWidget(model: FullModelOf<ModeSelectorField<any>>): Widget {
     this._addModeSelector(model);
     return super._createWidget(model);
   }
 
-  protected _addModeSelector(model: SomeRequired<ModeSelectorFieldModel<any>, 'objectType'>) {
+  protected _addModeSelector(model: FullModelOf<ModeSelectorField<any>>) {
     model.modeSelector = {
       objectType: ModeSelector
     };

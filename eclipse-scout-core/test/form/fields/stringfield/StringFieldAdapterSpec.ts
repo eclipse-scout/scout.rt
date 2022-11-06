@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {StringField, StringFieldModel} from '../../../../src/index';
+import {StringField} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
+import {FullModelOf, InitModelOf} from '../../../../src/scout';
 
 describe('StringFieldAdapter', () => {
   let session: SandboxSession, helper: FormSpecHelper;
@@ -27,14 +28,14 @@ describe('StringFieldAdapter', () => {
     jasmine.Ajax.uninstall();
   });
 
-  function createField(model: StringFieldModel): StringField {
+  function createField(model: InitModelOf<StringField>): StringField {
     let field = new StringField();
     field.init(model);
     return field;
   }
 
-  function createModel(): StringFieldModel {
-    return helper.createFieldModel();
+  function createModel(): FullModelOf<StringField> {
+    return helper.createFieldModel() as FullModelOf<StringField>;
   }
 
   describe('onModelPropertyChange', () => {

@@ -10,7 +10,6 @@
  */
 import {TableField, TableModel, TableRow} from '../../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../../src/testing/index';
-import {Optional} from '../../../../src/types';
 import SpecTable from '../../../../src/testing/table/SpecTable';
 import {TableModelWithCells} from '../../../../src/testing/table/TableSpecHelper';
 
@@ -41,7 +40,7 @@ describe('TableField', () => {
     return createTableField({table: table});
   }
 
-  function createTableField(tableModel?: Optional<TableModel, 'parent'>): TableField {
+  function createTableField(tableModel?: TableModel): TableField {
     return helper.createField(TableField, session.desktop, tableModel);
   }
 

@@ -14,7 +14,8 @@ import {
 } from '../../../index';
 import {TagBarTagRemoveEvent} from '../../../tagbar/TagBarEventMap';
 import {TagChooserPopupLookupRowSelectedEvent} from './TagChooserPopupEventMap';
-import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
+import {LookupCallOrModel} from '../../../lookup/LookupCall';
+import {InitModelOf} from '../../../scout';
 
 export default class TagField extends ValueField<string[]> implements TagFieldModel {
   declare model: TagFieldModel;
@@ -46,7 +47,7 @@ export default class TagField extends ValueField<string[]> implements TagFieldMo
     });
   }
 
-  protected override _init(model: TagFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this.tagBar = scout.create(TagBar, {
@@ -113,7 +114,7 @@ export default class TagField extends ValueField<string[]> implements TagFieldMo
     }
   }
 
-  protected _setLookupCall(lookupCall: LookupCallOrRefModel<string>) {
+  protected _setLookupCall(lookupCall: LookupCallOrModel<string>) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
   }
 

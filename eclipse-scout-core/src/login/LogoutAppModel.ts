@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AppOptions} from '../App';
+import {AppModel} from '../App';
 
-export default interface LogoutAppOptions extends AppOptions {
+export default interface LogoutAppModel extends AppModel {
   /**
    * The url to the logo. Default is 'logo.png'.
    */

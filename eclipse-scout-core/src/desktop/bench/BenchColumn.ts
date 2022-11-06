@@ -14,6 +14,7 @@ import BenchRowLayoutData from './layout/BenchRowLayoutData';
 import {DisplayViewId} from '../../tabbox/SimpleTab';
 import {SplitterMoveEvent} from '../../splitter/SplitterEventMap';
 import {OutlineContent} from './DesktopBench';
+import {InitModelOf} from '../../scout';
 
 export default class BenchColumn extends Widget implements BenchColumnModel {
   declare model: BenchColumnModel;
@@ -57,7 +58,7 @@ export default class BenchColumn extends Widget implements BenchColumnModel {
     'south'
   ] as const;
 
-  protected override _init(model: BenchColumnModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.layoutData = model.layoutData;
     this.layoutCacheKey = model.cacheKey;

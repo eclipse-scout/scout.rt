@@ -11,6 +11,7 @@
 import {ButtonTile, EventHandler, KeyStrokeContext, Outline, Page, PageTileButton, PageTileGridEventMap, PageTileGridModel, PageTileGridSelectKeyStroke, scout, TileGrid, TileGridLayoutConfig} from '../../../index';
 import {TreeAllChildNodesDeletedEvent, TreeChildNodeOrderChangedEvent, TreeNodeChangedEvent, TreeNodesDeletedEvent, TreeNodesInsertedEvent} from '../../../tree/TreeEventMap';
 import {OutlinePageChangedEvent} from '../OutlineEventMap';
+import {InitModelOf} from '../../../scout';
 
 export default class PageTileGrid extends TileGrid implements PageTileGridModel {
   declare model: PageTileGridModel;
@@ -46,7 +47,7 @@ export default class PageTileGrid extends TileGrid implements PageTileGridModel 
     this._outlineStructureChangedHandler = this._onOutlineStructureChanged.bind(this);
   }
 
-  protected override _init(model: PageTileGridModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.nodes = this.nodes || (this.page && this.page.childNodes) || (this.outline && this.outline.nodes);
     this._setCompact(this.compact);

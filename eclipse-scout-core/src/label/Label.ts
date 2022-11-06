@@ -10,6 +10,7 @@
  */
 import {AppLinkKeyStroke, HtmlComponent, KeyStrokeContext, LabelEventMap, LabelModel, strings, Widget} from '../index';
 import $ from 'jquery';
+import {InitModelOf} from '../scout';
 
 export default class Label extends Widget implements LabelModel {
   declare model: LabelModel;
@@ -37,7 +38,7 @@ export default class Label extends Widget implements LabelModel {
     this.keyStrokeContext.registerKeyStroke(new AppLinkKeyStroke(this, this._onAppLinkAction));
   }
 
-  protected override _init(model: LabelModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.resolveTextKeys(['value']);
   }

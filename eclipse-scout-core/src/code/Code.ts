@@ -11,9 +11,9 @@
 import {codes, Locale, scout, texts, TreeVisitResult} from '../index';
 import CodeModel from './CodeModel';
 import {TreeVisitor} from '../widget/Widget';
+import {InitModelOf} from '../scout';
 
 export default class Code<TCodeId> {
-
   declare model: CodeModel<TCodeId>;
 
   active: boolean;
@@ -29,7 +29,7 @@ export default class Code<TCodeId> {
     this.children = [];
   }
 
-  init(model: CodeModel<TCodeId>) {
+  init(model: InitModelOf<this>) {
     scout.assertParameter('id', model.id);
 
     this.active = model.active;

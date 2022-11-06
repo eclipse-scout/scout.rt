@@ -9,14 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {ColumnModel} from '../../index';
-import {LookupCallOrRefModel} from '../../lookup/LookupCall';
+import {LookupCallOrModel} from '../../lookup/LookupCall';
 
 export default interface SmartColumnModel<TValue> extends ColumnModel<TValue> {
   /**
    * @see codes.get
    */
   codeType?: string;
-  lookupCall?: LookupCallOrRefModel<TValue>;
+  lookupCall?: LookupCallOrModel<TValue>;
   browseHierarchy?: boolean;
   browseMaxRowCount?: number;
   browseAutoExpandAll?: boolean;

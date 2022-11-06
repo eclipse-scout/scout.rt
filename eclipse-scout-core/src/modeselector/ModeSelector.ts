@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, EventHandler, events, graphics, HtmlComponent, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorModel, PropertyChangeEvent, RefModel, Widget} from '../index';
+import {arrays, EventHandler, events, graphics, HtmlComponent, Mode, ModeSelectorEventMap, ModeSelectorLayout, ModeSelectorModel, PropertyChangeEvent, Widget} from '../index';
 import {SwipeCallbackEvent} from '../util/events';
-import {ModelOf} from '../scout';
+import {InitModelOf, ObjectOrChildModel} from '../scout';
 
 export default class ModeSelector<TModeRef = any> extends Widget implements ModeSelectorModel<TModeRef> {
   declare model: ModeSelectorModel<TModeRef>;
@@ -23,7 +23,7 @@ export default class ModeSelector<TModeRef = any> extends Widget implements Mode
 
   /**
    * When a new mode is set, the new one is marked as selected while the old one is deselected. This triggers the modePropertyChangeHandler.
-   * In this case the handler must not react on the selection event. Otherwise the value is first set to null (because the old is deselected) and then to the new value.
+   * In this case the handler must not react on the selection event. Otherwise, the value is first set to null (because the old is deselected) and then to the new value.
    * Setting a new mode should not trigger two change events.
    */
   protected _isModeChanging: boolean;
@@ -42,7 +42,7 @@ export default class ModeSelector<TModeRef = any> extends Widget implements Mode
     this._modePropertyChangeHandler = this._onModePropertyChange.bind(this);
   }
 
-  protected override _init(model: ModeSelectorModel<TModeRef>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setModes(this.modes);
     this._setSelectedMode(this.selectedMode);
@@ -60,7 +60,7 @@ export default class ModeSelector<TModeRef = any> extends Widget implements Mode
     this._renderModes();
   }
 
-  setModes(modes: (Mode<TModeRef> | RefModel<ModelOf<Mode>>)[]) {
+  setModes(modes: ObjectOrChildModel<Mode<TModeRef>>[]) {
     this.setProperty('modes', modes);
   }
 

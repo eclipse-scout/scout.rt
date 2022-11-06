@@ -13,10 +13,6 @@ import {ActionAdapter, TableControl} from '../../index';
 export default class TableControlAdapter extends ActionAdapter {
   declare widget: TableControl;
 
-  constructor() {
-    super();
-  }
-
   protected override _goOffline() {
     if (this.widget.isContentAvailable()) {
       return;

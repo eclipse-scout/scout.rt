@@ -10,13 +10,10 @@
  */
 
 import {Widget} from './index';
-import {ObjectType} from './ObjectFactory';
 
 export type Predicate<T> = (obj: T) => boolean;
 
 export type Comparator<T> = (a: T, b: T) => number;
-
-export type RefModel<TModel extends { parent?: any; objectType?: ObjectType<any> }> = Omit<SomeRequired<TModel, 'objectType'>, 'parent'>;
 
 export type Optional<TObject, TKey extends keyof TObject> = Partial<Pick<TObject, TKey>> & Omit<TObject, TKey>;
 

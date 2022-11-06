@@ -11,6 +11,7 @@
 import {Calendar, CalendarComponentEventMap, CalendarComponentModel, DateRange, , dates, icons, Label, Popup, Range, scout, strings, Widget, WidgetPopup} from '../index';
 import $ from 'jquery';
 import {JsonDateRange} from '../util/dates';
+import {InitModelOf} from '../scout';
 
 /**
  * See JsonCalendarItem.java
@@ -79,7 +80,7 @@ export default class CalendarComponent extends Widget implements CalendarCompone
    */
   static MONTH_COMPACT_THRESHOLD = 100;
 
-  protected override _init(model: CalendarComponentModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this._syncCoveredDaysRange(model.coveredDaysRange as JsonDateRange);
@@ -227,8 +228,9 @@ export default class CalendarComponent extends Widget implements CalendarCompone
 
   protected _findDayInGrid(date: Date, $grid: JQuery): JQuery {
     return $grid.find('.calendar-day')
-      .filter((i, elem) => dates.isSameDay($(this).data('date'), date))
-      .eq(0);
+      .filter(function(i, elem) {
+        return dates.isSameDay($(this).data('date'), date);
+      }).eq(0);
   }
 
   protected _isTask(): boolean {

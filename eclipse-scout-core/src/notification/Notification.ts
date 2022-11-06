@@ -11,6 +11,7 @@
 import {HtmlComponent, Icon, NotificationEventMap, NotificationModel, scout, Status, strings, texts, Widget} from '../index';
 import $ from 'jquery';
 import {StatusOrModel} from '../status/Status';
+import {InitModelOf} from '../scout';
 
 export default class Notification extends Widget implements NotificationModel {
   declare model: NotificationModel;
@@ -34,7 +35,7 @@ export default class Notification extends Widget implements NotificationModel {
     this._icon = null;
   }
 
-  protected override _init(model: NotificationModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     // this allows to set the properties severity and message directly on the model object

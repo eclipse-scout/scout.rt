@@ -1,22 +1,17 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {AccordionAdapter, TileAccordionModel, WidgetModel} from '../../index';
+import {AccordionAdapter, TileAccordionModel} from '../../index';
 
 export default class TileAccordionAdapter extends AccordionAdapter {
-
-  constructor() {
-    super();
-  }
-
-  protected override _initProperties(model: TileAccordionModel & {takeTileFiltersFromGroup: boolean}) {
+  protected override _initProperties(model: TileAccordionModel & { takeTileFiltersFromGroup: boolean }) {
     super._initProperties(model);
     // TileGridAdapter creates a RemoteTileFilter for each grid.
     // Such filters must not be added to the tile accordion, otherwise no tiles would be visible at all.

@@ -8,13 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Device, graphics, HtmlComponent, Insets, objects, scout, Scrollbar, ScrollbarModel, Session, WidgetModel} from '../index';
+import {arrays, Device, graphics, HtmlComponent, Insets, objects, scout, Scrollbar, Session, WidgetModel} from '../index';
 import $ from 'jquery';
+import {InitModelOf} from '../scout';
 
 /**
  * Static function to install a scrollbar on a container.
  * When the client supports pretty native scrollbars, we use them by default.
- * Otherwise we install JS-based scrollbars. In that case the install function
+ * Otherwise, we install JS-based scrollbars. In that case the install-function
  * creates a new scrollbar.js. For native scrollbars we
  * must set some additional CSS styles.
  */
@@ -95,7 +96,7 @@ export interface ScrollbarInstallOptions extends WidgetModel {
 }
 
 export function install($container: JQuery, options?: ScrollbarInstallOptions): JQuery {
-  options = options || {parent: undefined};
+  options = _createDefaultScrollToOptions(options);
   options.axis = options.axis || 'both';
   options.scrollShadow = options.scrollShadow || 'auto';
 
@@ -402,7 +403,7 @@ export function _installJs($container: JQuery, options: ScrollbarInstallOptions)
   });
   scrollbars = [];
   let scrollbar;
-  let scrollbarModel: ScrollbarModel = {
+  let scrollbarModel: InitModelOf<Scrollbar> = {
     session: options.session,
     parent: options.parent,
     borderless: options.borderless
@@ -512,7 +513,7 @@ export function _update(scrollbars: Scrollbar[]) {
  * If the width of the tab box is adjusted (which may happen if the tab item is selected and eventually prefSize called), the main box will go white.
  * <p>
  * This happens only if -webkit-overflow-scrolling is set to touch.
- * To workaround this bug the flag -webkit-overflow-scrolling will be removed if the scrollable component won't display any scrollbars
+ * To work around this bug the flag -webkit-overflow-scrolling will be removed if the scrollable component won't display any scrollbars
  */
 
 export function _handleIosPaintBug($scrollable: JQuery) {
@@ -563,14 +564,14 @@ export interface ScrollToOptions extends ScrollOptions {
   stop?: boolean;
 
   /**
-   * Additional margin to assume at the top of the target element (independent from any actual CSS margin).
-   * Useful when elements are positioned outside of their boundaries (e.g. focus border). Default is 4.
+   * Additional margin to assume at the top of the target element (independent of any actual CSS margin).
+   * Useful when elements are positioned outside their boundaries (e.g. focus border). Default is 4.
    */
   scrollOffsetUp?: number;
 
   /**
-   * Additional margin to assume at the bottom of the target element (independent from any actual CSS margin).
-   * Useful when elements are positioned outside of their boundaries (e.g. focus border). Default is 8.
+   * Additional margin to assume at the bottom of the target element (independent of any actual CSS margin).
+   * Useful when elements are positioned outside their boundaries (e.g. focus border). Default is 8.
    */
   scrollOffsetDown?: number;
 }
@@ -583,7 +584,7 @@ export interface ScrollToOptions extends ScrollOptions {
  * @param $element
  *          the element to scroll to
  * @param options
- *          an optional options object. Short-hand version: If a string is passed instead
+ *          an optional options object. Shorthand version: If a string is passed instead
  *          of an object, the value is automatically converted to the option {@link ScrollToOptions.align}.
  */
 export function scrollTo($scrollable: JQuery, $element: JQuery, options?: ScrollToOptions | string) {
@@ -652,7 +653,7 @@ export function scrollTo($scrollable: JQuery, $element: JQuery, options?: Scroll
   }
 }
 
-export function _createDefaultScrollToOptions(options?: ScrollToOptions): ScrollToOptions {
+export function _createDefaultScrollToOptions(options?: ScrollbarInstallOptions): ScrollToOptions & ScrollbarInstallOptions {
   let defaults: ScrollToOptions = {
     animate: false,
     stop: true
@@ -911,7 +912,7 @@ export function restoreScrollPositions($container: JQuery, session?: Session) {
         $scrollable.scrollLeft(scrollLeft);
         $scrollable.removeData('scrollLeft');
       }
-      // Also make sure that scroll bar is up to date
+      // Also make sure that scroll bar is up-to-date
       // Introduced for use case: Open large table page, edit entry, press f5
       // -> outline tab gets rendered, scrollbar gets updated with set timeout, outline tab gets detached
       // -> update event never had any effect because it executed after detaching (due to set timeout)
@@ -1001,13 +1002,13 @@ export function ensureExpansionVisible<T extends ExpandableElement>(parent: Expa
       });
     }
   } else if (isParentExpanded && children.length > 0) {
-    // parent is expanded and has children, best effort approach to show the expansion
+    // parent is expanded and has children, the best effort approach to show the expansion
     let fullDataHeight = parent.$scrollable.height();
 
     // get childRowCount considering already expanded rows
     let childRowsHeight = _getCompleteChildRowsHeightRecursive(children, parent.getChildren, parent.isExpanded, parent.defaultChildHeight);
 
-    // + 1.5 since its the parent's top position and we want to scroll half a row further to show that there's something after the expansion
+    // + 1.5 since it's the parent's top position, and we want to scroll half a row further to show that there's something after the expansion
     let additionalHeight = childRowsHeight + (1.5 * parentHeight);
     let scrollTo = parentPositionTop + additionalHeight;
     // scroll as much as needed to show the expansion but make sure that the parent row (plus one more) is still visible

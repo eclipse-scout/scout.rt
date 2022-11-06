@@ -9,9 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {EventHandler, Mode, ModeSelector, ModeSelectorFieldModel, PropertyChangeEvent, ValueField} from '../../../index';
+import {SomeRequired} from '../../../types';
 
 export default class ModeSelectorField<TValue> extends ValueField<TValue> implements ModeSelectorFieldModel<TValue> {
   declare model: ModeSelectorFieldModel<TValue>;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'modeSelector'>;
 
   modeSelector: ModeSelector<TValue>;
   modes: Mode<TValue>[];

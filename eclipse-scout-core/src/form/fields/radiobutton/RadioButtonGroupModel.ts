@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, FormFieldModel, LogicalGridLayoutConfig, ValueFieldModel} from '../../../index';
-import {RefModel} from '../../../types';
-import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
-import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
+import {FormField, LogicalGridLayoutConfig, ValueFieldModel} from '../../../index';
+import {LookupCallOrModel} from '../../../lookup/LookupCall';
+import {ObjectOrChildModel, ObjectOrModel} from '../../../scout';
 
 export default interface RadioButtonGroupModel<TValue> extends ValueFieldModel<TValue> {
-  layoutConfig?: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel;
-  fields?: (FormField | RefModel<FormFieldModel>)[];
+  layoutConfig?: ObjectOrModel<LogicalGridLayoutConfig>;
+  fields?: ObjectOrChildModel<FormField>[];
   gridColumnCount?: number;
-  lookupCall?: LookupCallOrRefModel<TValue>;
+  lookupCall?: LookupCallOrModel<TValue>;
 }

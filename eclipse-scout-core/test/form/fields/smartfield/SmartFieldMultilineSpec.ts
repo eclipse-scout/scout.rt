@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {QueryBy, scout, SmartFieldModel, SmartFieldMultiline} from '../../../../src/index';
-import {Optional} from '../../../../src/types';
 import {SmartFieldLookupResult} from '../../../../src/form/fields/smartfield/SmartField';
+import {InitModelOf} from '../../../../src/scout';
 
 describe('SmartFieldMultiline', () => {
 
@@ -34,12 +34,12 @@ describe('SmartFieldMultiline', () => {
     }
   }
 
-  function createFieldWithLookupCall(model: Optional<SmartFieldModel<number>, 'parent'>): SpecSmartFieldMultiline {
+  function createFieldWithLookupCall(model: SmartFieldModel<number>): SpecSmartFieldMultiline {
     model = $.extend({}, {
       parent: session.desktop,
       lookupCall: 'DummyLookupCall'
     }, model);
-    return scout.create(SpecSmartFieldMultiline, model as SmartFieldModel<number>);
+    return scout.create(SpecSmartFieldMultiline, model as InitModelOf<SpecSmartFieldMultiline>);
   }
 
   describe('display text', () => {

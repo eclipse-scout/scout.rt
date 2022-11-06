@@ -10,6 +10,7 @@
  */
 import {arrays, Calendar, CalendarModeMenu, CalendarModesMenuEventMap, CalendarModesMenuModel, Menu, PropertyChangeEvent, scout} from '../index';
 import {CalendarDisplayMode} from './Calendar';
+import {InitModelOf} from '../scout';
 
 export default class CalendarModesMenu extends Menu implements CalendarModesMenuModel {
   declare model: CalendarModesMenuModel;
@@ -26,7 +27,7 @@ export default class CalendarModesMenu extends Menu implements CalendarModesMenu
     this.cssClass = 'calendar-mode-menu';
   }
 
-  protected override _init(model: CalendarModesMenuModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.calendar = this.parent;
     let menusToAdd: CalendarModeMenu[] = [];

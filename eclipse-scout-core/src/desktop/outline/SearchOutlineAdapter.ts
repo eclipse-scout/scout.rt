@@ -14,11 +14,7 @@ import {SearchOutlineSearchEvent} from './SearchOutlineEventMap';
 export default class SearchOutlineAdapter extends OutlineAdapter {
   declare widget: SearchOutline;
 
-  constructor() {
-    super();
-  }
-
-  protected override _initProperties(model: SearchOutlineModel & {requestFocusQueryField?: boolean}) {
+  protected override _initProperties(model: SearchOutlineModel & { requestFocusQueryField?: boolean }) {
     if (model.requestFocusQueryField !== undefined) {
       // ignore pseudo property initially (to prevent the function SearchOutlineAdapter#requestFocusQueryField() to be replaced)
       delete model.requestFocusQueryField;

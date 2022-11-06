@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Cell, Column, ListBoxLayout, ListBoxModel, LookupBox, LookupResult, LookupRow, scout, Table, Widget} from '../../../index';
+import {arrays, Cell, Column, ListBoxLayout, ListBoxModel, LookupBox, LookupResult, LookupRow, scout, Table, TableRowModel, Widget} from '../../../index';
 import {TableRowsCheckedEvent} from '../../../table/TableEventMap';
-import {TableRowData} from '../../../table/TableRowModel';
+import {InitModelOf} from '../../../scout';
 
 export default class ListBox<TValue> extends LookupBox<TValue> implements ListBoxModel<TValue> {
   declare model: ListBoxModel<TValue>;
@@ -26,7 +26,7 @@ export default class ListBox<TValue> extends LookupBox<TValue> implements ListBo
     this._addWidgetProperties(['table', 'filterBox']);
   }
 
-  protected override _init(model: ListBoxModel<TValue>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.table.on('rowsChecked', this._onTableRowsChecked.bind(this));
     this.table.setScrollTop(this.scrollTop);
@@ -155,17 +155,18 @@ export default class ListBox<TValue> extends LookupBox<TValue> implements ListBo
       .map(row => row.lookupRow);
   }
 
-  protected _createTableRow(lookupRow: LookupRow<TValue>): ListBoxTableRowData<TValue> {
+  protected _createTableRow(lookupRow: LookupRow<TValue>): TableRowModel {
     let
       cell = scout.create(Cell, {
         text: lookupRow.text
       }),
       cells = [cell],
-      row: ListBoxTableRowData<TValue> = {
+      row: TableRowModel = {
         cells: cells,
         lookupRow: lookupRow
       };
 
+    // noinspection DuplicatedCode
     if (lookupRow.iconId) {
       cell.iconId = lookupRow.iconId;
     }
@@ -213,9 +214,3 @@ export default class ListBox<TValue> extends LookupBox<TValue> implements ListBo
     return this.table;
   }
 }
-
-type ListBoxTableRowData<TValue> = TableRowData & {
-  lookupRow: LookupRow<TValue>;
-  active?: boolean;
-};
-

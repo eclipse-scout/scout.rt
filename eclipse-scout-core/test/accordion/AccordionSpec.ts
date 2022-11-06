@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Accordion, AccordionModel, Group, GroupModel, scout} from '../../src/index';
-import {Optional} from '../../src/types';
+import {InitModelOf} from '../../src/scout';
 
 describe('Accordion', () => {
   let session: SandboxSession;
@@ -19,7 +19,7 @@ describe('Accordion', () => {
     session = sandboxSession();
   });
 
-  function createAccordion(numGroups: number, model?: Optional<AccordionModel, 'parent'>): Accordion {
+  function createAccordion(numGroups: number, model?: AccordionModel): Accordion {
     let groups = [];
     for (let i = 0; i < numGroups; i++) {
       groups.push({
@@ -31,16 +31,15 @@ describe('Accordion', () => {
       parent: session.desktop,
       groups: groups
     };
-    let m = $.extend({}, defaults, model) as AccordionModel;
+    let m = $.extend({}, defaults, model) as InitModelOf<Accordion>;
     return scout.create(Accordion, m);
   }
 
-  function createGroup(model?: Optional<GroupModel, 'parent'>): Group {
+  function createGroup(model?: GroupModel): Group {
     let defaults = {
       parent: session.desktop
     };
-    let m = $.extend({}, defaults, model) as GroupModel;
-    return scout.create(Group, m);
+    return scout.create(Group, $.extend({}, defaults, model) as InitModelOf<Group>);
   }
 
   describe('insertGroups', () => {

@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Mode, ModeModel, WidgetModel} from '../index';
-import {RefModel} from '../types';
+import {Mode, WidgetModel} from '../index';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface ModeSelectorModel<T = any> extends WidgetModel {
   /**
    * Default is [].
    */
-  modes?: (Mode<T> | RefModel<ModeModel<T>>)[];
+  modes?: ObjectOrChildModel<Mode<T>>[];
   selectedMode?: Mode<T> | string;
 }

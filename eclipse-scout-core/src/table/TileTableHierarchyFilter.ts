@@ -10,6 +10,7 @@
  */
 import {Filter, Table, TableRow} from '../index';
 import $ from 'jquery';
+import {InitModelOf} from '../scout';
 
 export interface TileTableHierarchyFilterModel {
   table: Table;
@@ -20,11 +21,7 @@ export default class TileTableHierarchyFilter implements TileTableHierarchyFilte
 
   table: Table;
 
-  constructor() {
-    // nop
-  }
-
-  init(model: TileTableHierarchyFilterModel) {
+  init(model: InitModelOf<this>) {
     $.extend(this, model);
   }
 

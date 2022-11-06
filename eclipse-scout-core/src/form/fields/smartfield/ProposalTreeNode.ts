@@ -20,10 +20,6 @@ export default class ProposalTreeNode<TValue> extends TreeNode implements Propos
   parentId: string;
   proposalChooser: TreeProposalChooser<TValue>;
 
-  constructor() {
-    super();
-  }
-
   protected override _renderText() {
     if (this.htmlEnabled) {
       this.$text.html(this.text);

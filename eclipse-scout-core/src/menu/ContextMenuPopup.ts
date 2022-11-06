@@ -12,9 +12,9 @@ import {
   AbstractLayout, Action, arrays, ContextMenuPopupLayout, ContextMenuPopupModel, Event, graphics, HtmlComponent, Menu, MenuDestinations, menuNavigationKeyStrokes, Popup, PopupLayout, PropertyChangeEvent, Rectangle, RowLayout, scout
 } from '../index';
 import $ from 'jquery';
-import {Optional} from '../types';
 import {ScrollbarInstallOptions} from '../scrollbar/scrollbars';
 import {MenuFilter} from './Menu';
+import {InitModelOf} from '../scout';
 
 export default class ContextMenuPopup extends Popup implements ContextMenuPopupModel {
   declare model: ContextMenuPopupModel;
@@ -42,7 +42,7 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
     this.animationDuration = 300;
   }
 
-  protected override _init(options: ContextMenuPopupModel) {
+  protected override _init(options: InitModelOf<this>) {
     options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
 
     // If menu items are cloned, don't link the original menus with the popup, otherwise they would be removed when the context menu is removed
@@ -89,7 +89,7 @@ export default class ContextMenuPopup extends Popup implements ContextMenuPopupM
     htmlBody.setLayout(this._createBodyLayout());
   }
 
-  protected override _installScrollbars(options?: Optional<ScrollbarInstallOptions, 'parent'>) {
+  protected override _installScrollbars(options?: ScrollbarInstallOptions) {
     super._installScrollbars({
       axis: 'y',
       scrollShadow: 'none'

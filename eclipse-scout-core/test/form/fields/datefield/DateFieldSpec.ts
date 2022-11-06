@@ -13,6 +13,7 @@ import {FormSpecHelper} from '../../../../src/testing/index';
 import {triggerClick, triggerKeyDown, triggerMouseDown} from '../../../../src/testing/jquery-testing';
 import {Optional} from '../../../../src/types';
 import {DateFieldPredictionResult} from '../../../../src/form/fields/datefield/DateField';
+import {FullModelOf} from '../../../../src/scout';
 
 describe('DateField', () => {
   let session: SandboxSession;
@@ -59,16 +60,16 @@ describe('DateField', () => {
     }
   }
 
-  function createModel(model?: Optional<DateFieldModel, 'parent'>): DateFieldModel {
+  function createModel(model?: DateFieldModel): FullModelOf<DateField> {
     model = $.extend({
       objectType: 'DateField'
     }, scout.nvl(model, {}));
-    model = $.extend(model, createSimpleModel(model.objectType, session));
-    registerAdapterData(model as DateFieldModel, session);
-    return model as DateFieldModel;
+    model = $.extend(model, createSimpleModel(model.objectType as string, session));
+    registerAdapterData(model, session);
+    return model as FullModelOf<DateField>;
   }
 
-  function createField(modelProperties?: Optional<DateFieldModel, 'parent'>): SpecDateField {
+  function createField(modelProperties?: DateFieldModel): SpecDateField {
     let model = createModel(modelProperties);
     return session.getOrCreateWidget(model.id, session.desktop) as SpecDateField;
   }

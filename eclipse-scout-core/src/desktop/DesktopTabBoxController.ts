@@ -12,10 +12,6 @@ import {DesktopTab, DesktopTabArea, Form, scout, SimpleTabBoxController} from '.
 
 export default class DesktopTabBoxController extends SimpleTabBoxController<Form> {
 
-  constructor() {
-    super();
-  }
-
   override createTabArea(): DesktopTabArea {
     return scout.create(DesktopTabArea, {
       parent: this.tabBox

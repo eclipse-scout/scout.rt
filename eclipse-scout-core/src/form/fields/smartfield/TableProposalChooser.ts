@@ -8,16 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, Cell, Column, ColumnDescriptor, lookupField, LookupRow, objects, ProposalChooser, scout, Table, TableLayoutResetter, TableRow} from '../../../index';
+import {arrays, Cell, Column, ColumnDescriptor, lookupField, LookupRow, objects, ProposalChooser, scout, Table, TableLayoutResetter, TableRow, TableRowModel} from '../../../index';
 import {TableRowClickEvent} from '../../../table/TableEventMap';
-import {TableRowData} from '../../../table/TableRowModel';
 import {SmartFieldLookupResult} from './SmartField';
+import {ModelOf} from '../../../scout';
 
 export default class TableProposalChooser<TValue> extends ProposalChooser<TValue, Table, TableRow> {
-
-  constructor() {
-    super();
-  }
 
   protected override _createContent(): Table {
     let headerVisible = false,
@@ -144,7 +140,7 @@ export default class TableProposalChooser<TValue> extends ProposalChooser<TValue
    *
    * @returns table-row model
    */
-  protected _createTableRow(lookupRow: LookupRow<TValue>, multipleColumns: boolean): TableRowData {
+  protected _createTableRow(lookupRow: LookupRow<TValue>, multipleColumns: boolean): TableRowModel {
     let row = lookupField.createTableRow(lookupRow, multipleColumns);
     if (multipleColumns) {
       arrays.pushAll(row.cells, this._transformTableRowData(lookupRow, lookupRow.additionalTableRowData));

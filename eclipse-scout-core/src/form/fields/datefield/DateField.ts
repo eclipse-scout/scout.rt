@@ -19,6 +19,7 @@ import {DateFormatAnalyzeInfo} from '../../../text/DateFormat';
 import {StatusType} from '../../../status/Status';
 import {CellEditorRenderedOptions, ValueFieldWithCellEditorRenderedCallback} from '../../../table/editor/CellEditorPopup';
 import {AddCellEditorFieldCssClassesOptions} from '../FormField';
+import {InitModelOf} from '../../../scout';
 
 export default class DateField extends ValueField<Date, Date | string> implements DateFieldModel, ValueFieldWithCellEditorRenderedCallback<Date, Date | string> {
   declare model: DateFieldModel;
@@ -113,7 +114,7 @@ export default class DateField extends ValueField<Date, Date | string> implement
     return new InputFieldKeyStrokeContext();
   }
 
-  protected override _init(model: DateFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     fields.initTouch(this, model);
     this.popup = model.popup;

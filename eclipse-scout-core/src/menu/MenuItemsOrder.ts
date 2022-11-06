@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, MenuBar, menus, scout, Session} from '../index';
+import {Menu, MenuBar, menus, ObjectWithType, scout, Session} from '../index';
 
 export interface MenuOrder {
   order(items: Menu[]): OrderedMenuItems;
@@ -16,7 +16,7 @@ export interface MenuOrder {
 
 export type OrderedMenuItems = { left: Menu[]; right: Menu[]; all: Menu[] };
 
-export default class MenuItemsOrder implements MenuOrder {
+export default class MenuItemsOrder implements MenuOrder, ObjectWithType {
   session: Session;
   objectType: string;
   emptySpaceTypes: string[];

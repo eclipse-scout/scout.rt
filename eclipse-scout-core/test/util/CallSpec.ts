@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {Call, CallModel} from '../../src/index';
+import {Call} from '../../src/index';
+import {InitModelOf} from '../../src/scout';
 
 describe('scout.Call', () => {
 
@@ -24,7 +25,7 @@ describe('scout.Call', () => {
   // ----- Test classes -----
 
   class SuccessCall extends Call {
-    override init(model?: CallModel) {
+    override init(model?: InitModelOf<this>) {
       super.init(model);
     }
 
@@ -41,7 +42,7 @@ describe('scout.Call', () => {
       this.maxRetries = 0;
     }
 
-    override init(model?: CallModel) {
+    override init(model?: InitModelOf<this>) {
       super.init(model);
     }
 
@@ -58,7 +59,7 @@ describe('scout.Call', () => {
       this.maxRetries = 5;
     }
 
-    override init(model?: CallModel) {
+    override init(model?: InitModelOf<this>) {
       super.init(model);
     }
 

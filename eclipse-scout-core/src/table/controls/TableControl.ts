@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, ActionKeyStroke, HtmlComponent, KeyStrokeContext, NullLayout, scout, styles, Table, TableControlActionKeyStroke, TableControlCloseKeyStroke, TableControlModel, TableFooter} from '../../index';
+import {Action, ActionKeyStroke, HtmlComponent, KeyStrokeContext, NullLayout, scout, styles, Table, TableControlActionKeyStroke, TableControlCloseKeyStroke, TableControlModel, TableFooter, TooltipSupport} from '../../index';
 import AbstractLayout from '../../layout/AbstractLayout';
-import {TooltipSupportOptions} from '../../tooltip/TooltipSupport';
+import {InitModelOf} from '../../scout';
 
 export default class TableControl extends Action implements TableControlModel {
   declare model: TableControlModel;
@@ -39,7 +39,7 @@ export default class TableControl extends Action implements TableControlModel {
   static CONTAINER_SIZE = 345; // Defined in sizes.less
   static CONTAINER_ANIMATE_DURATION = 350;
 
-  protected override _init(model: TableControlModel) {
+  protected override _init(model: InitModelOf<this>) {
     this.parent = model.parent;
     this.table = this.getTable();
     super._init(model);
@@ -216,7 +216,7 @@ export default class TableControl extends Action implements TableControlModel {
     this._setProperty('selected', selected);
   }
 
-  protected override _configureTooltip(): TooltipSupportOptions {
+  protected override _configureTooltip(): InitModelOf<TooltipSupport> {
     let options = super._configureTooltip();
     options.cssClass = 'table-control-tooltip';
     return options;

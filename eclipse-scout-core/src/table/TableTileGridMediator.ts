@@ -9,14 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, FilterOrFunction, Group, objects, PropertyChangeEvent, RefModel, scout, Table, TableRow, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel,
-  Tile, TileAccordion, TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
+  AggregateTableControl, arrays, Column, Event, EventHandler, Filter, FilterOrFunction, Group, objects, PropertyChangeEvent, scout, Table, TableRow, TableRowTileMapping, TableTileGridMediatorEventMap, TableTileGridMediatorModel, Tile,
+  TileAccordion, TileGrid, TileGridLayoutConfig, TileTableHierarchyFilter, Widget
 } from '../index';
 import $ from 'jquery';
 import {ScrollToOptions} from '../scrollbar/scrollbars';
 import {TableAllRowsDeletedEvent, TableFilterAddedEvent, TableFilterRemovedEvent, TableGroupEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsSelectedEvent} from './TableEventMap';
 import {TileActionEvent, TileClickEvent} from '../tile/TileGridEventMap';
-import TileModel from '../tile/TileModel';
+import {InitModelOf, ObjectOrChildModel} from '../scout';
 
 /**
  * Delegates events between the {@link Table} and it's internal {@link TileGrid}.
@@ -97,7 +97,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     this._addWidgetProperties(['tileAccordion', 'tiles', 'tileMappings']);
   }
 
-  override init(model: TableTileGridMediatorModel) {
+  override init(model: InitModelOf<this>) {
     super._init(model);
 
     this.table = this.parent;
@@ -180,7 +180,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     this._setTiles(tiles);
   }
 
-  setTiles(tiles: (Tile | RefModel<TileModel>)[]) {
+  setTiles(tiles: ObjectOrChildModel<Tile>[]) {
     this.setProperty('tiles', tiles);
   }
 
@@ -267,7 +267,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
       let group = this.tileAccordion.getGroupById(groupId);
       if (!group) {
         group = this._createTileGroup(groupId, primaryGroupingColumn, row);
-        this._adaptTileGrid(group.body as TileGrid);
+        this._adaptTileGrid(group.body);
         this.tileAccordion.insertGroup(group);
       }
       tile.parent = group;
@@ -552,7 +552,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
     let tileFilter = {
       table: this.table,
       accept: (tile: Tile) => {
-        let rowForTile = this.table.rowsMap[tile.rowId] as TableRow;
+        let rowForTile = this.table.rowsMap[tile.rowId];
         if (rowForTile) {
           return tableFilter.accept(rowForTile);
         }
@@ -591,7 +591,7 @@ export default class TableTileGridMediator extends Widget implements TableTileGr
   protected _updateGroupVisibility() {
     this.tileAccordion.groups.forEach(group => {
       // Make groups invisible if a tile filter is active and no tiles match (= no tiles are visible)
-      let body = group.body as TileGrid;
+      let body = group.body;
       let groupEmpty = body.filters.length > 0 && body.filteredTiles.length === 0;
       group.setVisible(!groupEmpty);
       group.setTitleSuffix(body.filteredTiles.length + '');

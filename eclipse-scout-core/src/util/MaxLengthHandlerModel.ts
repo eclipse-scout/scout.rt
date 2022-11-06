@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Widget} from '../index';
+import {MaxLengthHandler, Widget} from '../index';
+import {ObjectModel} from '../scout';
 
-export default interface MaxLengthHandlerModel {
-  target: MaxLengthHandlerTarget;
+export default interface MaxLengthHandlerModel extends ObjectModel<MaxLengthHandler> {
+  target?: MaxLengthHandlerTarget;
 }
 
 export type MaxLengthHandlerTarget = Widget & {

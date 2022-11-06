@@ -12,5 +12,5 @@ export default interface KeyStrokeModel {
   alt?: boolean;
   ctrl?: boolean;
   shift?: boolean;
-  which: number[];
+  which?: number[];
 }

@@ -11,8 +11,4 @@
 import {SmartFieldAdapter} from '../../../index';
 
 export default class SmartFieldMultilineAdapter extends SmartFieldAdapter {
-
-  constructor() {
-    super();
-  }
 }

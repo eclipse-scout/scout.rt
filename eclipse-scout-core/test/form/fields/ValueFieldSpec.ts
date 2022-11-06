@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {arrays, FormField, ParsingFailedStatus, scout, Status, StringField, ValueField, ValueFieldModel} from '../../../src/index';
+import {arrays, FormField, ParsingFailedStatus, scout, Status, StringField, ValueField} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '../../../src/testing/index';
 import {ValueFieldValidator} from '../../../src/form/fields/ValueField';
 
@@ -40,10 +40,10 @@ describe('ValueField', () => {
   }
 
   describe('property status visible', () => {
-    let formField: SpecValueField, model: ValueFieldModel<any>;
+    let formField: SpecValueField;
 
     beforeEach(() => {
-      model = helper.createFieldModel();
+      let model = helper.createFieldModel();
       formField = new SpecValueField();
       formField.init(model);
     });

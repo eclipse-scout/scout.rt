@@ -11,9 +11,12 @@
 import {arrays, Event, objects, ResponsiveHandlerModel, ResponsiveManager, Widget} from '../index';
 import $ from 'jquery';
 import {ResponsiveState} from './ResponsiveManager';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 export default class ResponsiveHandler implements ResponsiveHandlerModel {
   declare model: ResponsiveHandlerModel;
+  declare initModel: SomeRequired<this['model'], 'widget'>;
 
   widget: Widget;
   compactThreshold: number;
@@ -44,7 +47,7 @@ export default class ResponsiveHandler implements ResponsiveHandlerModel {
     this._destroyHandler = this._onDestroy.bind(this);
   }
 
-  init(model: ResponsiveHandlerModel) {
+  init(model: InitModelOf<this>) {
     $.extend(this, model);
 
     this.widget.one('destroy', this._destroyHandler);

@@ -10,9 +10,12 @@
  */
 import {EventEmitter, Filter, objects, Session, Table, TableRow, TableUserFilterModel} from '../../index';
 import $ from 'jquery';
+import {InitModelOf} from '../../scout';
+import {SomeRequired} from '../../types';
 
 export default abstract class TableUserFilter extends EventEmitter implements Filter<TableRow>, TableUserFilterModel {
   declare model: TableUserFilterModel;
+  declare initModel: SomeRequired<this['model'], 'session' | 'table'>;
 
   session: Session;
   table: Table;
@@ -23,7 +26,7 @@ export default abstract class TableUserFilter extends EventEmitter implements Fi
     this.session = null;
   }
 
-  init(model: TableUserFilterModel) {
+  init(model: InitModelOf<this>) {
     this.session = model.session;
     if (!this.session) {
       throw new Error('Session expected: ' + this);
@@ -31,7 +34,7 @@ export default abstract class TableUserFilter extends EventEmitter implements Fi
     this._init(model);
   }
 
-  protected _init(model: TableUserFilterModel) {
+  protected _init(model: InitModelOf<this>) {
     $.extend(this, model);
   }
 

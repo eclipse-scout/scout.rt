@@ -13,6 +13,7 @@ import $ from 'jquery';
 import {DecimalFormatOptions} from '../../text/DecimalFormat';
 import {AvgAggregationState} from '../../util/aggregation';
 import {Rgba} from '../../util/styles';
+import {InitModelOf} from '../../scout';
 
 export type NumberColumnAggregationFunction = 'sum' | 'avg' | 'min' | 'max' | 'none';
 export type NumberColumnBackgroundEffect = 'colorGradient1' | 'colorGradient2' | 'barChart';
@@ -60,7 +61,7 @@ export default class NumberColumn extends Column<number> implements NumberColumn
     this.allowedAggregationFunctions = ['sum', 'avg', 'min', 'max', 'none'];
   }
 
-  protected override _init(model: NumberColumnModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setDecimalFormat(this.decimalFormat);
     this._setAggregationFunction(this.aggregationFunction);
@@ -178,7 +179,7 @@ export default class NumberColumn extends Column<number> implements NumberColumn
     if (this.backgroundEffect && (this.calcMinValue === null || this.calcMaxValue === null)) {
       // No need to calculate the values again when switching background effects
       // If background effect is turned off and on again values will be recalculated
-      // This is necessary because in the meantime rows may got updated, deleted etc.
+      // This is necessary because in the meantime rows may get updated, deleted etc.
       this.calculateMinMaxValues();
     }
     if (!this.backgroundEffect) {

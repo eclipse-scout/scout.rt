@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {CompositeFieldAdapter, FormField, GridData, GroupBox, ResponsiveManager, Widget} from '../../../index';
-import WidgetModel from '../../../widget/WidgetModel';
-import {RefModel, SomeRequired} from '../../../types';
+import {ChildModelOf, FullModelOf} from '../../../scout';
 
 export default class GroupBoxAdapter extends CompositeFieldAdapter {
   declare widget: GroupBox;
@@ -20,7 +19,7 @@ export default class GroupBoxAdapter extends CompositeFieldAdapter {
     this._addRemoteProperties(['expanded']);
   }
 
-  protected override _initModel(m: RefModel<WidgetModel>, parent: Widget): SomeRequired<WidgetModel, 'objectType'> {
+  protected override _initModel(m: ChildModelOf<Widget>, parent: Widget): FullModelOf<Widget> {
     let model = super._initModel(m, parent);
     // Set logical grid to null -> Calculation happens on server side
     model.logicalGrid = null;

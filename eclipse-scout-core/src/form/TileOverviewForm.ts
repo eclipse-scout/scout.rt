@@ -10,6 +10,7 @@
  */
 
 import {Desktop, EventHandler, Form, HtmlComponent, Outline, Page, PageTileGrid, PropertyChangeEvent, RowLayout, scout, TileOverviewFormEventMap, TileOverviewFormModel} from '../index';
+import {InitModelOf} from '../scout';
 
 export default class TileOverviewForm extends Form implements TileOverviewFormModel {
   declare model: TileOverviewFormModel;
@@ -38,7 +39,7 @@ export default class TileOverviewForm extends Form implements TileOverviewFormMo
     this._desktopNavigationVisibilityChangeHandler = this._onDesktopNavigationVisibilityChange.bind(this);
   }
 
-  protected override _init(model: TileOverviewFormModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     if (!this.pageTileGrid) {
       this.pageTileGrid = this._createPageTileGrid();

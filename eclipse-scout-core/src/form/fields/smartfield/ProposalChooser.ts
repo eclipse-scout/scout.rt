@@ -14,6 +14,7 @@ import {
 import $ from 'jquery';
 import {SmartFieldLookupResult} from './SmartField';
 import {StatusOrModel} from '../../../status/Status';
+import {InitModelOf} from '../../../scout';
 
 export default abstract class ProposalChooser<TValue, TContent extends ProposalChooserContent, TContentRow extends ProposalChooserContentRow<TValue>> extends Widget implements ProposalChooserModel<TValue> {
   declare model: ProposalChooserModel<TValue>;
@@ -43,7 +44,7 @@ export default abstract class ProposalChooser<TValue, TContent extends ProposalC
     this._updateStatusTimeout = null;
   }
 
-  protected override _init(model: ProposalChooserModel<TValue>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     // If smartField is not explicitly provided by model, use smartField instance

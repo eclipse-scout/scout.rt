@@ -9,16 +9,18 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LogicalGridConfig, LogicalGridContainer, scout} from '../../index';
-import {ObjectWithType} from '../../scout';
+import {ObjectModel, ObjectWithType} from '../../scout';
 
-export interface LogicalGridOptions {
-  gridConfig: LogicalGrid | object;
+export interface LogicalGridOptions extends ObjectModel<LogicalGrid> {
+  gridConfig?: LogicalGridConfig | object;
 }
 
 /**
  * Base class for every logical grid. The concrete grids should implement {@link _validate}.
  */
 export default abstract class LogicalGrid implements ObjectWithType {
+  declare model: LogicalGridOptions;
+
   dirty: boolean;
   gridConfig: LogicalGridConfig;
   objectType: string;

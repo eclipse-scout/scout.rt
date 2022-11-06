@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {NotificationModel, Status, StatusModel} from '../../index';
+import {NotificationModel} from '../../index';
 import {NativeNotificationVisibility} from './DesktopNotification';
+import {StatusOrModel} from '../../status/Status';
 
 export default interface DesktopNotificationModel extends NotificationModel {
   /**
@@ -36,6 +37,6 @@ export default interface DesktopNotificationModel extends NotificationModel {
   /**
    * holds native message & native icon
    */
-  nativeNotificationStatus?: Status | StatusModel;
+  nativeNotificationStatus?: StatusOrModel;
   nativeNotificationVisibility?: NativeNotificationVisibility;
 }

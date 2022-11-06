@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventDelegator, FormField, LoadingSupport, RefModel, TileFieldEventMap, TileFieldModel, TileGrid, TileGridModel, Widget} from '../../../index';
+import {EventDelegator, FormField, LoadingSupport, TileFieldEventMap, TileFieldModel, TileGrid, Widget} from '../../../index';
+import {InitModelOf, ObjectOrChildModel} from '../../../scout';
 
 export default class TileField extends FormField implements TileFieldModel {
   declare model: TileFieldModel;
@@ -24,7 +25,7 @@ export default class TileField extends FormField implements TileFieldModel {
     this._addWidgetProperties(['tileGrid']);
   }
 
-  protected override _init(model: TileFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this._setTileGrid(this.tileGrid);
@@ -50,7 +51,7 @@ export default class TileField extends FormField implements TileFieldModel {
     this._renderDropType();
   }
 
-  setTileGrid(tileGrid: TileGrid | RefModel<TileGridModel>) {
+  setTileGrid(tileGrid: ObjectOrChildModel<TileGrid>) {
     this.setProperty('tileGrid', tileGrid);
   }
 

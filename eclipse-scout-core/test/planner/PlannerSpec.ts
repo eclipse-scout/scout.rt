@@ -11,6 +11,7 @@
 import {DateRange, dates, ObjectFactory, Planner, PlannerModel, Widget} from '../../src/index';
 import {ObjectType} from '../../src/ObjectFactory';
 import {PlannerResource} from '../../src/planner/Planner';
+import {InitModelOf} from '../../src/scout';
 
 describe('Planner', () => {
   let session: SandboxSession;
@@ -65,7 +66,7 @@ describe('Planner', () => {
     };
   }
 
-  function createPlanner(model: PlannerModel): SpecPlanner {
+  function createPlanner(model: InitModelOf<Planner>): SpecPlanner {
     let planner = new SpecPlanner();
     planner.init(model);
     return planner;

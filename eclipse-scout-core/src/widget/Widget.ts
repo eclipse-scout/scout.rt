@@ -10,45 +10,20 @@
  */
 import {
   Action, AnyWidget, arrays, DeferredGlassPaneTarget, Desktop, Device, DisplayParent, EnumObject, EventDelegator, EventHandler, filters, focusUtils, Form, graphics, HtmlComponent, icons, inspector, KeyStroke, KeyStrokeContext, LayoutData,
-  LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, RefModel, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
+  LoadingSupport, LogicalGrid, ModelAdapter, objects, ObjectWithType, Predicate, PropertyEventEmitter, scout, scrollbars, Session, strings, texts, TreeVisitResult, WidgetEventMap, WidgetModel
 } from '../index';
 import * as $ from 'jquery';
 import {ScrollbarInstallOptions, ScrollOptions, ScrollToOptions} from '../scrollbar/scrollbars';
-import {Optional, SomeRequired} from '../types';
-import {ModelOf} from '../scout';
-
-export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
-export type GlassPaneTarget = JQuery | HTMLElement | DeferredGlassPaneTarget;
-export type GlassPaneContribution = (widget: Widget) => GlassPaneTarget | GlassPaneTarget[];
-export type WidgetOrModel = Widget | RefModel<WidgetModel>;
-export type TreeVisitor<T> = (element: T) => boolean | TreeVisitResult | void;
-
-export interface CloneOptions {
-  /** An array of all properties to be delegated from the original to the clone when changed on the original widget. Default is []. */
-  delegatePropertiesToClone?: string[];
-  /** An array of all properties to be delegated from the clone to the original when changed on the clone widget. Default is []. */
-  delegatePropertiesToOriginal?: string[];
-  /** An array of all properties to be excluded from delegating from the clone to the original in any cases. Default is []. */
-  excludePropertiesToOriginal?: string[];
-  /** An array of all events to be delegated from the clone to the original when fired on the clone widget. Default is []. */
-  delegateEventsToOriginal?: string[];
-  /** True to delegate all property changes from the original to the clone. Default is false. */
-  delegateAllPropertiesToClone?: boolean;
-  /** True to delegate all property changes from the clone to the original. Default is false. */
-  delegateAllPropertiesToOriginal?: boolean;
-}
-
-interface EventDelegatorForCloning {
-  clone: Widget;
-  originalToClone: EventDelegator;
-  cloneToOriginal: EventDelegator;
-}
+import {SomeRequired} from '../types';
+import {FullModelOf, InitModelOf, ObjectOrChildModel} from '../scout';
 
 export default class Widget extends PropertyEventEmitter implements WidgetModel, ObjectWithType {
   declare model: WidgetModel;
+  declare initModel: SomeRequired<this['model'], 'parent'>;
   declare eventMap: WidgetEventMap;
   declare self: Widget;
   declare widgetMap: WidgetMap;
+
   animateRemoval: boolean;
   animateRemovalClass: string;
   attached: boolean;
@@ -221,12 +196,12 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Initializes the widget instance. All properties of the model parameter (object) are set as properties on the widget instance.
    * Calls {@link Widget#_init} and triggers an <em>init</em> event when initialization has been completed.
    */
-  init(model: WidgetModel) {
+  init(model: InitModelOf<this>) {
     let staticModel = this._jsonModel();
     if (staticModel) {
       model = $.extend({}, staticModel, model);
     }
-    model = model || {} as WidgetModel;
+    model = model || {} as InitModelOf<this>;
     model = this._prepareModel(model);
     this._init(model);
     this._initKeyStrokeContext();
@@ -240,7 +215,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * may override this method to alter the JSON model before the widgets
    * are created out of the widgetProperties in the model.
    */
-  protected _prepareModel(model: WidgetModel): WidgetModel {
+  protected _prepareModel(model: InitModelOf<this>): InitModelOf<this> {
     return model;
   }
 
@@ -248,7 +223,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Initializes the widget instance. All properties of the model parameter (object) are set as properties on the widget instance.
    * Override this function to initialize widget specific properties in subclasses.
    */
-  protected _init(model: WidgetModel) {
+  protected _init(model: InitModelOf<this>) {
     if (!model.parent) {
       throw new Error('Parent expected: ' + this);
     }
@@ -288,18 +263,18 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Default implementation simply returns undefined. A Subclass
    * may override this method to load or extend a JSON model with models.getModel or models.extend.
    */
-  protected _jsonModel(): Omit<WidgetModel, 'parent'> {
+  protected _jsonModel(): WidgetModel {
     return null;
   }
 
-  protected _createChildren<T extends Widget>(models: T | RefModel<ModelOf<T>>): T;
-  protected _createChildren<T extends Widget>(models: (T | RefModel<ModelOf<T>>)[]): T[];
-  protected _createChildren<T extends Widget>(models: T | RefModel<ModelOf<T>> | (T | RefModel<ModelOf<T>>)[]): T | T[];
+  protected _createChildren<T extends Widget>(models: ObjectOrChildModel<T>): T;
+  protected _createChildren<T extends Widget>(models: ObjectOrChildModel<T>[]): T[];
+  protected _createChildren<T extends Widget>(models: ObjectOrChildModel<T> | ObjectOrChildModel<T>[]): T | T[];
   /**
    * Creates the widgets using the given models, or returns the widgets if the given models already are widgets.
    * @returns an array of created widgets if models was an array. Or the created widget if models is not an array.
    */
-  protected _createChildren<T extends Widget>(models: T | RefModel<ModelOf<T>> | (T | RefModel<ModelOf<T>>)[]): T | T[] {
+  protected _createChildren<T extends Widget>(models: ObjectOrChildModel<T> | ObjectOrChildModel<T>[]): T | T[] {
     if (!models) {
       return null;
     }
@@ -319,7 +294,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Calls {@link scout.create} for the given model, or if model is already a Widget simply returns the widget.
    * @internal
    */
-  _createChild<T extends Widget>(widgetOrModel: T | RefModel<ModelOf<T>> | string): T {
+  _createChild<T extends Widget>(widgetOrModel: ObjectOrChildModel<T> | string): T {
     if (widgetOrModel instanceof Widget) {
       return widgetOrModel;
     }
@@ -331,9 +306,9 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
       }
       return existingWidget as T;
     }
-    let model = widgetOrModel as SomeRequired<ModelOf<T>, 'parent' | 'objectType'>;
+    let model = widgetOrModel as FullModelOf<T>;
     model.parent = this;
-    return scout.create(model) as T;
+    return scout.create(model);
   }
 
   protected _initKeyStrokeContext() {
@@ -1519,9 +1494,9 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return this._prepareWidgetProperty(propertyName, value);
   }
 
-  protected _prepareWidgetProperty(propertyName: string, models: WidgetOrModel): Widget;
-  protected _prepareWidgetProperty(propertyName: string, models: WidgetOrModel[]): Widget[];
-  protected _prepareWidgetProperty(propertyName: string, models: WidgetOrModel | WidgetOrModel[]): Widget | Widget[] {
+  protected _prepareWidgetProperty(propertyName: string, models: ObjectOrChildModel<Widget>): Widget;
+  protected _prepareWidgetProperty(propertyName: string, models: ObjectOrChildModel<Widget>[]): Widget[];
+  protected _prepareWidgetProperty(propertyName: string, models: ObjectOrChildModel<Widget> | ObjectOrChildModel<Widget>[]): Widget | Widget[] {
     // Create new child widget(s)
     let widgets = this._createChildren(models);
 
@@ -1812,7 +1787,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
    * Therefore, this model may be used to override the cloned properties or to add additional properties.
    * @param options Options passed to the mirror function.
    */
-  clone(model: Optional<WidgetModel, 'parent'>, options?: CloneOptions): this {
+  clone(model: WidgetModel, options?: CloneOptions): this {
     let clone, cloneModel;
     model = model || {};
     options = options || {};
@@ -2155,7 +2130,7 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     return null;
   }
 
-  protected _installScrollbars(options?: Optional<ScrollbarInstallOptions, 'parent'>) {
+  protected _installScrollbars(options?: ScrollbarInstallOptions) {
     let $scrollable = this.get$Scrollable();
     if (!$scrollable) {
       throw new Error('Scrollable is not defined, cannot install scrollbars');
@@ -2365,6 +2340,33 @@ export default class Widget extends PropertyEventEmitter implements WidgetModel,
     }
     return cssClasses;
   }
+}
+
+
+export type DisabledStyle = EnumObject<typeof Widget.DisabledStyle>;
+export type GlassPaneTarget = JQuery | HTMLElement | DeferredGlassPaneTarget;
+export type GlassPaneContribution = (widget: Widget) => GlassPaneTarget | GlassPaneTarget[];
+export type TreeVisitor<T> = (element: T) => boolean | TreeVisitResult | void;
+
+export interface CloneOptions {
+  /** An array of all properties to be delegated from the original to the clone when changed on the original widget. Default is []. */
+  delegatePropertiesToClone?: string[];
+  /** An array of all properties to be delegated from the clone to the original when changed on the clone widget. Default is []. */
+  delegatePropertiesToOriginal?: string[];
+  /** An array of all properties to be excluded from delegating from the clone to the original in any cases. Default is []. */
+  excludePropertiesToOriginal?: string[];
+  /** An array of all events to be delegated from the clone to the original when fired on the clone widget. Default is []. */
+  delegateEventsToOriginal?: string[];
+  /** True to delegate all property changes from the original to the clone. Default is false. */
+  delegateAllPropertiesToClone?: boolean;
+  /** True to delegate all property changes from the clone to the original. Default is false. */
+  delegateAllPropertiesToOriginal?: boolean;
+}
+
+interface EventDelegatorForCloning {
+  clone: Widget;
+  originalToClone: EventDelegator;
+  cloneToOriginal: EventDelegator;
 }
 
 type WidgetMap = {

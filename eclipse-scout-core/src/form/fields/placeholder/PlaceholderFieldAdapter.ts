@@ -11,7 +11,4 @@
 import {FormFieldAdapter} from '../../../index';
 
 export default class PlaceholderFieldAdapter extends FormFieldAdapter {
-  constructor() {
-    super();
-  }
 }

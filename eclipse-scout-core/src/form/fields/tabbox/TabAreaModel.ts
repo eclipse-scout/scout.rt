@@ -12,7 +12,7 @@ import {Tab, TabBox, WidgetModel} from '../../../index';
 import {TabAreaStyle} from './TabArea';
 
 export default interface TabAreaModel extends WidgetModel {
-  tabBox: TabBox;
+  tabBox?: TabBox;
   tabs?: Tab[];
   displayStyle?: TabAreaStyle;
   hasSubLabel?: boolean;

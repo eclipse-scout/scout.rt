@@ -11,15 +11,19 @@
 import {scout} from '../index';
 import {DeviceType} from '../util/Device';
 import UserAgentModel from './UserAgentModel';
+import {SomeRequired} from '../types';
+import {InitModelOf} from '../scout';
 
 export default class UserAgent implements UserAgentModel {
   declare model: UserAgentModel;
+  declare initModel: SomeRequired<this['model'], 'deviceType'>;
+
   deviceType: DeviceType;
   touch: boolean;
   standalone: boolean;
 
-  constructor(model: UserAgentModel) {
-    model = model || {deviceType: null};
+  constructor(model: InitModelOf<UserAgent>) {
+    model = model || {} as InitModelOf<UserAgent>;
     if (!model.deviceType) {
       throw new Error('deviceType needs to be defined');
     }

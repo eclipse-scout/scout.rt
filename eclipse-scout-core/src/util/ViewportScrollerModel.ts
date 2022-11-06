@@ -9,11 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-export default interface ViewportScrollerModel {
+import {ObjectModel} from '../scout';
+import {ViewportScroller} from '../index';
 
-  viewportWidth: number;
+export default interface ViewportScrollerModel extends ObjectModel<ViewportScroller> {
 
-  viewportHeight: number;
+  viewportWidth?: number;
+
+  viewportHeight?: number;
 
   /**
    * distance from the viewport edge (in pixel) where we start to scroll automatically

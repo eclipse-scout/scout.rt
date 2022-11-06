@@ -13,6 +13,7 @@ import {
   strings, texts
 } from '../../../index';
 import {OldWheelEvent} from '../../../types';
+import {InitModelOf} from '../../../scout';
 
 export default class StringField extends BasicField<string> {
   declare model: StringFieldModel;
@@ -92,7 +93,7 @@ export default class StringField extends BasicField<string> {
     return new InputFieldKeyStrokeContext();
   }
 
-  protected override _init(model: StringFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setMultilineText(this.multilineText);
   }

@@ -243,9 +243,7 @@ describe('OutlineAdapter', () => {
         tableHelper.createAllRowsDeletedEvent(table),
         tableHelper.createFiltersChangedEvent(table, []),
         tableHelper.createRowsInsertedEvent(table, [
-          // @ts-expect-error
           {id: 'row1', nodeId: 'node1', cells: ['cell 1']},
-          // @ts-expect-error
           {id: 'row2', nodeId: 'node2', cells: ['cell 2']}
         ])
       ]

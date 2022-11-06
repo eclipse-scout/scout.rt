@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, FormModel, MenuModel, RefModel} from '../index';
+import {Form, MenuModel} from '../index';
 import {FormMenuPopupStyle} from './FormMenu';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface FormMenuModel extends MenuModel {
-  form?: Form | RefModel<FormModel>;
+  form?: ObjectOrChildModel<Form>;
   popupStyle?: FormMenuPopupStyle;
   popupClosable?: boolean;
   popupMovable?: boolean;

@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, keys, scout, TagChooserPopup, TagField} from '../../../../src/index';
-import {DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
+import {arrays, keys, scout, StaticLookupCall, TagChooserPopup, TagField} from '../../../../src/index';
+import {FormSpecHelper} from '../../../../src/testing/index';
 
 describe('TagField', () => {
 
@@ -28,6 +28,23 @@ describe('TagField', () => {
     jasmine.clock().uninstall();
     removePopups(session);
   });
+
+  class SpecTagFieldLookupCall extends StaticLookupCall<string> {
+
+    constructor() {
+      super();
+      this.setDelay(250);
+    }
+
+    protected override _data(): any[] {
+      return [
+        ['1', 'Foo'],
+        ['2', 'Bar', '1'],
+        ['3', 'Baz', '1']
+      ];
+    }
+  }
+
 
   function typeProposal(field, text, keyCode) {
     let $input = field.$container.find('input');
@@ -89,7 +106,7 @@ describe('TagField', () => {
       field = scout.create(TagField, {
         parent: session.desktop,
         lookupCall: {
-          objectType: DummyLookupCall
+          objectType: SpecTagFieldLookupCall
         }
       });
 
@@ -129,7 +146,7 @@ describe('TagField', () => {
       field = scout.create(TagField, {
         parent: session.desktop,
         lookupCall: {
-          objectType: DummyLookupCall,
+          objectType: SpecTagFieldLookupCall,
           customProperty: templatePropertyValue
         }
       });
@@ -142,7 +159,7 @@ describe('TagField', () => {
         eventCounter++;
       });
 
-      expect(field.lookupCall instanceof DummyLookupCall).toBe(true);
+      expect(field.lookupCall instanceof SpecTagFieldLookupCall).toBe(true);
 
       field.render();
       typeProposal(field, 'ba', keys.A);

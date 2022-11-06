@@ -11,8 +11,7 @@
 import {Action, arrays, Column, Form, FormField, FormModel, GroupBox, Mode, ModeSelector, RadioButton, scout, Session, StringField, TabBox, TabItem, Table, TableField, Widget} from '../../index';
 import $ from 'jquery';
 import {ObjectType} from '../../ObjectFactory';
-import {Optional, SomeRequired} from '../../types';
-import {ModelOf} from '../../scout';
+import {FullModelOf, InitModelOf} from '../../scout';
 import SpecForm from './SpecForm';
 import SpecRadioButtonGroup from './SpecRadioButtonGroup';
 
@@ -33,24 +32,24 @@ export default class FormSpecHelper {
     }
   }
 
-  createViewWithOneField(model?: Optional<FormModel, 'parent'>): SpecForm {
+  createViewWithOneField(model?: FormModel): SpecForm {
     let form = this.createFormWithOneField(model);
     form.displayHint = Form.DisplayHint.VIEW;
     return form;
   }
 
-  createFormWithOneField(model?: Optional<FormModel, 'parent'>): SpecForm {
+  createFormWithOneField(model?: FormModel): SpecForm {
     let defaults = {
       parent: this.session.desktop
     };
     model = $.extend({}, defaults, model);
-    let form = scout.create(SpecForm, model as SomeRequired<FormModel, 'parent'>);
+    let form = scout.create(SpecForm, model as InitModelOf<Form>);
     let rootGroupBox = this.createGroupBoxWithFields(form, 1);
     form.setRootGroupBox(rootGroupBox);
     return form;
   }
 
-  createFormWithFieldsAndTabBoxes(model?: Optional<FormModel, 'parent'>): Form {
+  createFormWithFieldsAndTabBoxes(model?: FormModel): Form {
     let fieldModelPart = (id, mandatory) => ({
         id: id,
         objectType: StringField,
@@ -133,7 +132,7 @@ export default class FormSpecHelper {
     };
 
     model = $.extend({}, defaults, model);
-    let form = scout.create(Form, model as SomeRequired<FormModel, 'parent'>);
+    let form = scout.create(Form, model as InitModelOf<Form>);
     form.widget('TableFieldB5', TableField).table.insertRows([{cells: arrays.init(2, null)}, {cells: arrays.init(2, null)}]);
     return form;
   }
@@ -185,17 +184,17 @@ export default class FormSpecHelper {
     return form;
   }
 
-  createFieldModel<T>(objectType?: ObjectType<T>, parent?: Widget, modelProperties?: Record<string, any>): ModelOf<T> & { id: string; objectType: ObjectType<T>; parent: Widget; session: Session } {
+  createFieldModel<T extends FormField = StringField>(objectType?: ObjectType<T>, parent?: Widget, modelProperties?: Record<string, any>): FullModelOf<T> & { id: string; session: Session } {
     parent = scout.nvl(parent, this.session.desktop);
-    let model = createSimpleModel(objectType || 'StringField', this.session);
+    let model = createSimpleModel((objectType || 'StringField') as any, this.session);
+    model.parent = parent;
     if (modelProperties) {
       $.extend(model, modelProperties);
     }
-    return model as ModelOf<T> & { id: string; objectType: ObjectType<T>; parent: Widget; session: Session };
+    return model as FullModelOf<T> & { id: string; session: Session };
   }
 
   createField<T extends FormField>(objectType: ObjectType<T>, parent?: Widget, modelProperties?: Record<string, any>): T {
-    parent = parent || this.session.desktop;
     return scout.create(objectType, this.createFieldModel(objectType, parent, modelProperties));
   }
 

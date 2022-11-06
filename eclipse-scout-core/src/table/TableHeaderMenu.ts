@@ -10,14 +10,16 @@
  */
 import {
   AbstractLayout, arrays, Cell, Column, ColumnUserFilter, Device, EnumObject, Event, EventHandler, FilterFieldsGroupBox, graphics, HtmlComponent, NumberColumn, Point, Popup, RowLayout, scout, scrollbars, Table, TableHeader,
-  TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuLayout, TableHeaderMenuModel
+  TableHeaderMenuButton, TableHeaderMenuEventMap, TableHeaderMenuGroup, TableHeaderMenuLayout, TableHeaderMenuModel, TableRowModel
 } from '../index';
 import {NumberColumnAggregationFunction} from './columns/NumberColumn';
-import {TableRowData} from './TableRowModel';
 import {TableRowsCheckedEvent} from './TableEventMap';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 export default class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
   declare model: TableHeaderMenuModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'column' | 'tableHeader'>;
   declare eventMap: TableHeaderMenuEventMap;
   declare self: TableHeaderMenu;
 
@@ -145,7 +147,7 @@ export default class TableHeaderMenu extends Popup implements TableHeaderMenuMod
     }
   } as const;
 
-  protected override _init(options: TableHeaderMenuModel) {
+  protected override _init(options: InitModelOf<this>) {
     options.scrollType = options.scrollType || 'none';
     super._init(options);
 
@@ -747,9 +749,9 @@ export default class TableHeaderMenu extends Popup implements TableHeaderMenuMod
 
     this.filterTable = this._createFilterTable();
     this.filterTable.on('rowsChecked', this._filterTableRowsCheckedHandler);
-    let tableRows: TableRowData[] = [];
+    let tableRows: TableRowModel[] = [];
     this.filter.availableValues.forEach(filterValue => {
-      let tableRow: TableRowData = {
+      let tableRow: TableRowModel = {
         cells: [
           scout.create(Cell, {
             text: (this.filter.column instanceof NumberColumn) ? filterValue.text : null,

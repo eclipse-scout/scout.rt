@@ -10,7 +10,8 @@
  */
 import {Cell, CodeLookupCall, codes, Column, LookupCall, LookupRow, scout, SmartColumnEventMap, SmartColumnModel, SmartField, TableRow} from '../../index';
 import objects from '../../util/objects';
-import {LookupCallOrRefModel} from '../../lookup/LookupCall';
+import {LookupCallOrModel} from '../../lookup/LookupCall';
+import {InitModelOf} from '../../scout';
 
 /**
  * Column where each cell fetches its value using a lookup call.
@@ -47,7 +48,7 @@ export default class SmartColumn<TValue> extends Column<TValue> {
     this._lookupCallBatchContext = null;
   }
 
-  protected override _init(model: SmartColumnModel<TValue>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setLookupCall(this.lookupCall);
     this._setCodeType(this.codeType);
@@ -71,11 +72,11 @@ export default class SmartColumn<TValue> extends Column<TValue> {
     this.table.rows.map(row => this.cell(row)).forEach(cell => cell.setSortCode(this._calculateCellSortCode(cell)));
   }
 
-  setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
+  setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
     this.setProperty('lookupCall', lookupCall);
   }
 
-  protected _setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
+  protected _setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
     let call = LookupCall.ensure(lookupCall, this.session);
     this._setProperty('lookupCall', call);
     if (this.initialized) {

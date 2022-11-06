@@ -11,6 +11,7 @@
 import {AbstractLayout, arrays, EnumObject, focusUtils, FormField, objects, ParsingFailedStatus, scout, Status, strings, ValidationFailedStatus, ValueFieldEventMap, ValueFieldModel} from '../../index';
 import $ from 'jquery';
 import {StatusSeverity, StatusType} from '../../status/Status';
+import {InitModelOf} from '../../scout';
 
 export default abstract class ValueField<TValue extends TModelValue, TModelValue = TValue> extends FormField implements ValueFieldModel<TValue, TModelValue> {
   declare model: ValueFieldModel<TValue, TModelValue>;
@@ -67,7 +68,7 @@ export default abstract class ValueField<TValue extends TModelValue, TModelValue
     NotNull: 'ValueField.NotNull'
   } as const;
 
-  protected override _init(model: ValueFieldModel<TValue, TModelValue>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     if (model.validator) {
       // Validators are kept in a list, allow a single validator to be set in the model, similar to parser and formatter.

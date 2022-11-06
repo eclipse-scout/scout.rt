@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {defaultValues, ObjectFactory, PlannerAdapter, PlannerModel, Widget} from '../../src';
+import {defaultValues, ObjectFactory, PlannerAdapter} from '../../src';
 import Planner, {PlannerResource} from '../../src/planner/Planner';
-import {ObjectType} from '../../src/ObjectFactory';
+import {FullModelOf} from '../../src/scout';
 
 describe('PlannerAdapter', () => {
   let session: SandboxSession;
@@ -25,14 +25,14 @@ describe('PlannerAdapter', () => {
     jasmine.Ajax.uninstall();
   });
 
-  function createPlannerAdapter(model: PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession }): PlannerAdapter {
+  function createPlannerAdapter(model: FullModelOf<Planner> & { id: string; objectType: string; session: SandboxSession }): PlannerAdapter {
     let plannerAdapter = new PlannerAdapter();
     plannerAdapter.init(model);
     return plannerAdapter;
   }
 
-  function createPlannerModel(numResources): PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession } {
-    let model = createSimpleModel('Planner', session) as PlannerModel & { id: string; objectType: ObjectType<Planner>; parent: Widget; session: SandboxSession };
+  function createPlannerModel(numResources): FullModelOf<Planner> & { id: string; objectType: string; session: SandboxSession } {
+    let model = createSimpleModel('Planner', session) as FullModelOf<Planner> & { id: string; objectType: string; session: SandboxSession };
     model.resources = [];
     for (let i = 0; i < numResources; i++) {
       model.resources[i] = createResource('resource' + i);

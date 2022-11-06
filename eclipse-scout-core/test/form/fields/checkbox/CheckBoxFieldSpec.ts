@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxField, CheckBoxFieldModel, keys, scout, ValueField} from '../../../../src/index';
+import {CheckBoxField, keys, scout, ValueField} from '../../../../src/index';
 import {triggerKeyInputCapture} from '../../../../src/testing/jquery-testing';
 
 describe('CheckBoxField', () => {
@@ -21,10 +21,9 @@ describe('CheckBoxField', () => {
 
   describe('inheritance', () => {
     let checkBox: CheckBoxField;
-    let model: CheckBoxFieldModel;
 
     beforeEach(() => {
-      model = createSimpleModel('CheckBoxField', session);
+      let model = createSimpleModel('CheckBoxField', session);
       checkBox = new CheckBoxField();
       checkBox.init(model);
     });
@@ -96,7 +95,7 @@ describe('CheckBoxField', () => {
       triggerKeyInputCapture(session.desktop.$container, keys.G, 'ctrl');
       expect(field.value).toBe(true);
 
-      // Remove key stroke -> value should stay unchanged because key stroke must not be executed
+      // Remove keystroke -> value should stay unchanged because keystroke must not be executed
       field.setKeyStroke(null);
       triggerKeyInputCapture(session.desktop.$container, keys.G, 'ctrl');
       expect(field.value).toBe(true);

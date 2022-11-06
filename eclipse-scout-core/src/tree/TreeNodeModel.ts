@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Session, Tree, TreeNode} from '../index';
-import {ObjectModel} from '../scout';
+import {ObjectModel, ObjectOrModel} from '../scout';
 
-export default interface TreeNodeModel extends ObjectModel<TreeNode, TreeNodeModel> {
-  parent: Tree;
+export default interface TreeNodeModel extends ObjectModel<TreeNode> {
+  parent?: Tree;
   checked?: boolean;
-  childNodes?: (TreeNodeData | TreeNode)[];
+  childNodes?: ObjectOrModel<TreeNode>[];
   childNodeIndex?: number;
   cssClass?: string;
   enabled?: boolean;
@@ -32,6 +32,7 @@ export default interface TreeNodeModel extends ObjectModel<TreeNode, TreeNodeMod
   foregroundColor?: string;
   backgroundColor?: string;
   font?: string;
+
+  [property: string]: any; // allow custom properties
 }
 
-export type TreeNodeData = Omit<TreeNodeModel, 'parent'>;

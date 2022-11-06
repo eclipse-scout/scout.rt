@@ -9,13 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Action, ActionKeyStroke, arrays, ContextMenuPopup, EnumObject, HtmlComponent, icons, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, RefModel, scout, strings,
-  tooltips, TreeVisitResult
+  Action, ActionKeyStroke, arrays, ContextMenuPopup, EnumObject, HtmlComponent, icons, MenuBarPopup, MenuDestinations, MenuEventMap, MenuExecKeyStroke, MenuKeyStroke, MenuModel, Popup, PropertyChangeEvent, scout, strings, tooltips,
+  TreeVisitResult
 } from '../index';
 import {PopupAlignment} from '../popup/Popup';
 import {CloneOptions, TreeVisitor} from '../widget/Widget';
 import {MenuOrder} from './MenuItemsOrder';
-import {Optional} from '../types';
+import {InitModelOf, ObjectOrChildModel} from '../scout';
 
 export type SubMenuVisibility = EnumObject<typeof Menu.SubMenuVisibility>;
 export type MenuStyle = EnumObject<typeof Menu.MenuStyle>;
@@ -113,7 +113,7 @@ export default class Menu extends Action implements MenuModel {
     NEVER: 'never'
   } as const;
 
-  protected override _init(options: MenuModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this._setChildActions(this.childActions);
   }
@@ -235,7 +235,7 @@ export default class Menu extends Action implements MenuModel {
 
   /**
    * Override this method to control the toggles sub-menu behavior when this menu instance is used as parent.
-   * Some menu sub-classes like the ComboMenu need to show the popup menu instead.
+   * Some menu subclasses like the ComboMenu need to show the popup menu instead.
    * @see _doActionTogglesSubMenu
    */
   protected _togglesSubMenu(): boolean {
@@ -560,20 +560,20 @@ export default class Menu extends Action implements MenuModel {
   /**
    * @deprecated use insertChildActions instead
    */
-  addChildActions(childActions: Menu | RefModel<MenuModel> | (Menu | RefModel<MenuModel>)[]) {
+  addChildActions(childActions: ObjectOrChildModel<Menu> | ObjectOrChildModel<Menu>[]) {
     this.insertChildActions(childActions);
   }
 
-  insertChildAction(actionsToInsert: Menu | RefModel<MenuModel>) {
+  insertChildAction(actionsToInsert: ObjectOrChildModel<Menu>) {
     this.insertChildActions([actionsToInsert]);
   }
 
-  insertChildActions(actionsToInsert: Menu | RefModel<MenuModel> | (Menu | RefModel<MenuModel>)[]) {
+  insertChildActions(actionsToInsert: ObjectOrChildModel<Menu> | ObjectOrChildModel<Menu>[]) {
     actionsToInsert = arrays.ensure(actionsToInsert);
     if (actionsToInsert.length === 0) {
       return;
     }
-    let actions = this.childActions as (Menu | RefModel<MenuModel>)[];
+    let actions = this.childActions as ObjectOrChildModel<Menu>[];
     this.setChildActions(actions.concat(actionsToInsert));
   }
 
@@ -591,7 +591,7 @@ export default class Menu extends Action implements MenuModel {
     this.setChildActions(actions);
   }
 
-  setChildActions(childActions: (Menu | RefModel<MenuModel>)[]) {
+  setChildActions(childActions: ObjectOrChildModel<Menu>[]) {
     this.setProperty('childActions', childActions);
   }
 
@@ -724,7 +724,7 @@ export default class Menu extends Action implements MenuModel {
     this.childActions.forEach(child => child.setMenuFilter(menuFilter));
   }
 
-  override clone(model: Optional<MenuModel, 'parent'>, options: CloneOptions): this {
+  override clone(model: MenuModel, options: CloneOptions): this {
     let clone = super.clone(model, options) as Menu;
     this._deepCloneProperties(clone, 'childActions', options);
     clone._setChildActions(clone.childActions);

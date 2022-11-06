@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormModel} from '../../index';
+import {Form, FormModel} from '../../index';
+import {ModelOf} from '../../scout';
 
 export default interface JsFormModel extends FormModel {
   jsFormObjectType: string;

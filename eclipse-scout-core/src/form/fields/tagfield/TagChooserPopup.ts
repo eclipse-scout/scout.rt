@@ -10,9 +10,12 @@
  */
 import {AbstractLayout, Column, lookupField, LookupResult, Popup, scout, ScoutKeyboardEvent, Table, TableRow, TagChooserPopupEventMap, TagChooserPopupLayout, TagChooserPopupModel, TagField} from '../../../index';
 import {TableRowClickEvent} from '../../../table/TableEventMap';
+import {InitModelOf} from '../../../scout';
+import {SomeRequired} from '../../../types';
 
 export default class TagChooserPopup extends Popup implements TagChooserPopupModel {
   declare model: TagChooserPopupModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'field'>;
   declare eventMap: TagChooserPopupEventMap;
   declare self: TagChooserPopup;
 
@@ -26,7 +29,7 @@ export default class TagChooserPopup extends Popup implements TagChooserPopupMod
     this.windowPaddingY = 0;
   }
 
-  protected override _init(model: TagChooserPopupModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     let column = scout.create(Column, {
@@ -90,9 +93,7 @@ export default class TagChooserPopup extends Popup implements TagChooserPopupMod
    * event on the SmartField input-field.
    */
   protected _onContainerMouseDown(event: JQuery.MouseDownEvent): boolean {
-    // when user clicks on proposal popup with table or tree (prevent default,
-    // so input-field does not lose the focus, popup will be closed by the
-    // proposal chooser impl.
+    // when user clicks on proposal popup with table or tree (prevent default, so input-field does not lose the focus, popup will be closed by the proposal chooser impl.)
     return false;
   }
 

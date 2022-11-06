@@ -9,11 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {LocaleSpecHelper, TableSpecHelper} from '../../../src/testing/index';
-import {AggregateTableControl, Cell, Column, DecimalFormat, NumberColumn, scout, TableControlModel} from '../../../src/index';
-import {Optional} from '../../../src/types';
+import {AggregateTableControl, Cell, Column, DecimalFormat, NumberColumn, scout, TableControl, TableControlModel, TableRowModel} from '../../../src/index';
 import {TableModelWithCells} from '../../../src/testing/table/TableSpecHelper';
 import SpecTable from '../../../src/testing/table/SpecTable';
-import {TableRowData} from '../../../src/table/TableRowModel';
+import {InitModelOf} from '../../../src/scout';
 
 describe('AggregateTableControl', () => {
   let session: SandboxSession;
@@ -37,12 +36,12 @@ describe('AggregateTableControl', () => {
     $.fx.off = false;
   });
 
-  function createAggregateTC(model: Optional<TableControlModel, 'parent'>): AggregateTableControl {
+  function createAggregateTC(model: TableControlModel): AggregateTableControl {
     let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create(AggregateTableControl, model as TableControlModel);
+    return scout.create(AggregateTableControl, model as InitModelOf<TableControl>);
   }
 
   function $aggregateRow(tableControl: AggregateTableControl): JQuery {
@@ -61,7 +60,7 @@ describe('AggregateTableControl', () => {
 
   describe('aggregate', () => {
     let model: TableModelWithCells, table: SpecTable, column0: Column, column1: NumberColumn, column2: NumberColumn,
-      rows: (TableRowData & { cells: Cell[] })[], tableControl: AggregateTableControl;
+      rows: (TableRowModel & { cells: Cell[] })[], tableControl: AggregateTableControl;
 
     function prepareTable() {
       let columns = [helper.createModelColumn('col1'),

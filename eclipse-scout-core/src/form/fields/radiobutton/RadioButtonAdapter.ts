@@ -11,8 +11,4 @@
 import {ButtonAdapter} from '../../../index';
 
 export default class RadioButtonAdapter extends ButtonAdapter {
-
-  constructor() {
-    super();
-  }
 }

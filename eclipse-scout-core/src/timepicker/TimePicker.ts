@@ -10,12 +10,14 @@
  */
 import {dates, Device, HtmlComponent, scrollbars, TimePickerModel, TimePickerTouchPopup, Widget} from '../index';
 import $ from 'jquery';
-import {Optional} from '../types';
 import {ScrollbarInstallOptions} from '../scrollbar/scrollbars';
 import TimePickerEventMap from './TimePickerEventMap';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
-export default class TimePicker extends Widget {
+export default class TimePicker extends Widget implements TimePickerModel {
   declare model: TimePickerModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'timeResolution'>;
   declare eventMap: TimePickerEventMap;
   declare self: TimePicker;
 
@@ -32,7 +34,7 @@ export default class TimePicker extends Widget {
     this.resolution = null;
   }
 
-  protected override _init(options: TimePickerModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this.resolution = options.timeResolution;
   }
@@ -87,7 +89,7 @@ export default class TimePicker extends Widget {
     return $box;
   }
 
-  protected override _installScrollbars(options?: Optional<ScrollbarInstallOptions, 'parent'>) {
+  protected override _installScrollbars(options?: ScrollbarInstallOptions) {
     this._uninstallScrollbars();
 
     super._installScrollbars({

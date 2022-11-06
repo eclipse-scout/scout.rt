@@ -13,6 +13,7 @@ import {
   FocusRule, Form, FormLayout, GlassPaneRenderer, HtmlComponent, keys, KeyStrokeContext, MessageBoxes, scout, scrollbars, Status, Widget
 } from '../index';
 import {FileInputChangeEvent} from './FileInputEventMap';
+import {InitModelOf} from '../scout';
 
 export default class FileChooser extends Widget implements FileChooserModel {
   declare model: FileChooserModel;
@@ -48,7 +49,7 @@ export default class FileChooser extends Widget implements FileChooserModel {
     this._addWidgetProperties(['boxButtons', 'uploadButton', 'cancelButton']);
   }
 
-  protected override _init(model: FileChooserModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setDisplayParent(this.displayParent);
     this._glassPaneRenderer = new GlassPaneRenderer(this);

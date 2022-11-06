@@ -8,12 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnLayout, FormField, FormFieldMenuEventMap, FormFieldMenuModel, FormFieldModel, GridData, HtmlComponent, LogicalGridData, Menu, RefModel} from '../../../index';
+import {ColumnLayout, FormField, FormFieldMenuEventMap, FormFieldMenuModel, GridData, HtmlComponent, LogicalGridData, Menu} from '../../../index';
 import {CloneOptions} from '../../../widget/Widget';
-import {Optional} from '../../../types';
+import {ObjectOrChildModel} from '../../../scout';
+import {SomeRequired} from '../../../types';
 
 export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
   declare model: FormFieldMenuModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'field'>;
   declare eventMap: FormFieldMenuEventMap;
   declare self: FormFieldMenu;
 
@@ -48,7 +50,7 @@ export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
     }
   }
 
-  setField(field: FormField | RefModel<FormFieldModel>) {
+  setField(field: ObjectOrChildModel<FormField>) {
     this.setProperty('field', field);
   }
 
@@ -72,7 +74,7 @@ export default class FormFieldMenu extends Menu implements FormFieldMenuModel {
     }
   }
 
-  override clone(model: Optional<FormFieldMenuModel, 'parent'>, options: CloneOptions): this {
+  override clone(model: FormFieldMenuModel, options: CloneOptions): this {
     let clone = super.clone(model, options) as FormFieldMenu;
     this._deepCloneProperties(clone, ['field'], options);
     return clone as this;

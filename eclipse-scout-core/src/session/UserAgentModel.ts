@@ -11,7 +11,7 @@
 import {DeviceType} from '../util/Device';
 
 export default interface UserAgentModel {
-  deviceType: DeviceType;
+  deviceType?: DeviceType;
   /**
    * Default is false.
    */

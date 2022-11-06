@@ -10,10 +10,11 @@
  */
 import {Event, Page, PageWithTable, Table, TableRow} from '../../index';
 import {TableRowActionEvent, TableRowOrderChangedEvent, TableRowsUpdatedEvent} from '../../table/TableEventMap';
+import {InitModelOf} from '../../scout';
 
 export default class OutlineMediator {
 
-  init(model: any) {
+  init(model: InitModelOf<this>) {
     // NOP
   }
 

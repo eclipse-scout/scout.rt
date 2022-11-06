@@ -9,13 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {BenchRowLayoutDataModel, FlexboxLayoutData, scout} from '../../../index';
+import {InitModelOf} from '../../../scout';
 
 export default class BenchRowLayoutData extends FlexboxLayoutData implements BenchRowLayoutDataModel {
   declare model: BenchRowLayoutDataModel;
 
   rows: FlexboxLayoutData[];
 
-  constructor(model?: BenchRowLayoutDataModel) {
+  constructor(model?: InitModelOf<BenchRowLayoutData>) {
     super(model);
     model = model || {};
     this.rows = scout.nvl(model.rows, [null, null, null]);

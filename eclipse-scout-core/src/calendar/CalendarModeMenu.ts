@@ -16,10 +16,6 @@ export default class CalendarModeMenu extends Menu implements CalendarModeMenuMo
 
   displayMode: CalendarDisplayMode;
 
-  constructor() {
-    super();
-  }
-
   override doAction(): boolean {
     if (!this.prepareDoAction()) {
       return false;

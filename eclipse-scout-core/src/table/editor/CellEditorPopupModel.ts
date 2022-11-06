@@ -11,8 +11,8 @@
 import {Cell, Column, PopupModel, Table, TableRow} from '../../index';
 
 export default interface CellEditorPopupModel<TValue> extends PopupModel {
-  column: Column<TValue>;
-  cell: Cell<TValue>;
+  column?: Column<TValue>;
+  cell?: Cell<TValue>;
   table?: Table;
   row?: TableRow;
 }

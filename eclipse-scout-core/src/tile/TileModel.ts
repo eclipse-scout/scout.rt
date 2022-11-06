@@ -19,7 +19,7 @@ export default interface TileModel extends WidgetModel {
    * It may be a {@link ColorScheme} object or a string.
    * The string needs to consist of the color scheme id and an optional inverted identifier separated by -, e.g. default-inverted.
    *
-   * By default, the non inverted DEFAULT scheme is used, see {@link colorSchemes}.
+   * By default, the non-inverted DEFAULT scheme is used, see {@link colorSchemes}.
    */
   colorScheme?: ColorScheme | string;
   /**

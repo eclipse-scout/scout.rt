@@ -11,6 +11,7 @@
 import {arrays, AutoLeafPageWithNodes, EventHandler, Form, FormTableControl, Page, PageWithTableModel, scout, Status, Table, TableRow} from '../../../index';
 import $ from 'jquery';
 import {TableAllRowsDeletedEvent, TableReloadEvent, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent} from '../../../table/TableEventMap';
+import {InitModelOf} from '../../../scout';
 
 export default class PageWithTable extends Page implements PageWithTableModel {
   declare model: PageWithTableModel;
@@ -38,7 +39,7 @@ export default class PageWithTable extends Page implements PageWithTableModel {
     this._tableDataLoadHandler = this.loadTableData.bind(this);
   }
 
-  override init(model: PageWithTableModel) {
+  override init(model: InitModelOf<this>) {
     super.init(model);
   }
 

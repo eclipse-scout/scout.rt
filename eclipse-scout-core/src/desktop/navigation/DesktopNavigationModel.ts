@@ -12,7 +12,7 @@ import {Desktop, Outline, WidgetModel} from '../../index';
 import {DesktopNavigationLayoutData} from './DesktopNavigation';
 
 export default interface DesktopNavigationModel extends WidgetModel {
-  parent: Desktop;
+  parent?: Desktop;
   outline?: Outline;
   toolBoxVisible?: boolean;
   handleVisible?: boolean;

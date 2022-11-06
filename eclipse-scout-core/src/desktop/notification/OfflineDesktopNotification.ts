@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DesktopNotification, DesktopNotificationModel, Status} from '../../index';
+import {DesktopNotification, Status} from '../../index';
+import {InitModelOf} from '../../scout';
 
 export default class OfflineDesktopNotification extends DesktopNotification {
   connectFailedReset: number;
@@ -20,7 +21,7 @@ export default class OfflineDesktopNotification extends DesktopNotification {
     this.connectFailedReset = null;
   }
 
-  protected override _init(model: DesktopNotificationModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.closable = false;
     this.duration = DesktopNotification.INFINITE;

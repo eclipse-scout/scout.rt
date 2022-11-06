@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {BasicField, Calculator, DecimalFormat, fields, InputFieldKeyStrokeContext, KeyStrokeContext, Locale, NumberFieldEventMap, NumberFieldModel, numbers, objects} from '../../../index';
+import {InitModelOf} from '../../../scout';
 
 export default class NumberField extends BasicField<number, number | string> implements NumberFieldModel {
   declare model: NumberFieldModel;
@@ -30,7 +31,7 @@ export default class NumberField extends BasicField<number, number | string> imp
     this.gridDataHints.horizontalAlignment = 1; // number fields are right aligned by default.
   }
 
-  protected override _init(model: NumberFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setMinValue(this.minValue);
     this._setMaxValue(this.maxValue);

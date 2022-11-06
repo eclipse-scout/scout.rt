@@ -16,11 +16,10 @@ import {
 import $ from 'jquery';
 import {MenuFilter} from '../menu/Menu';
 import {ScrollDirection, ScrollToOptions} from '../scrollbar/scrollbars';
-import {Optional} from '../types';
 import TreeEventMap from './TreeEventMap';
 import {DesktopPopupOpenEvent} from '../desktop/DesktopEventMap';
-import {TreeNodeData} from './TreeNodeModel';
 import {DropType} from '../util/dragAndDrop';
+import {FullModelOf, InitModelOf, ObjectOrModel} from '../scout';
 
 export default class Tree extends Widget implements TreeModel {
   declare model: TreeModel;
@@ -200,7 +199,7 @@ export default class Tree extends Widget implements TreeModel {
    */
   static VIEW_RANGE_DIVISOR = 4;
 
-  protected override _init(model: TreeModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.setFilters(this.filters, false);
     this.addFilter(new LazyNodeFilter(this), false);
@@ -248,10 +247,9 @@ export default class Tree extends Widget implements TreeModel {
    * ensures that the attribute childNodeIndex is set. By default, we use the order of the nodes array as index
    * but only if childNodeIndex is undefined.
    */
-  ensureTreeNodes(nodes: (TreeNode | TreeNodeModel)[]) {
-    let node;
+  ensureTreeNodes(nodes: ObjectOrModel<TreeNode>[]) {
     for (let i = 0; i < nodes.length; i++) {
-      node = nodes[i];
+      let node = nodes[i];
       node.childNodeIndex = scout.nvl(node.childNodeIndex, i);
       if (node instanceof TreeNode) {
         continue;
@@ -260,11 +258,11 @@ export default class Tree extends Widget implements TreeModel {
     }
   }
 
-  protected _createTreeNode(nodeModel?: Optional<TreeNodeModel, 'parent'>): TreeNode {
+  protected _createTreeNode(nodeModel?: TreeNodeModel): TreeNode {
     nodeModel = nodeModel || {};
     nodeModel.objectType = scout.nvl(nodeModel.objectType, TreeNode);
     nodeModel.parent = this;
-    return scout.create(nodeModel as TreeNodeModel & Required<Pick<TreeNodeModel, 'objectType'>>);
+    return scout.create(nodeModel as FullModelOf<TreeNode>);
   }
 
   protected override _createKeyStrokeContext(): KeyStrokeContext {
@@ -2224,16 +2222,17 @@ export default class Tree extends Widget implements TreeModel {
     }
   }
 
-  insertNode(node: TreeNode | TreeNodeData, parentNode?: TreeNode) {
+  insertNode(node: ObjectOrModel<TreeNode>, parentNode?: TreeNode) {
     this.insertNodes([node], parentNode);
   }
 
-  insertNodes(nodes: TreeNode | TreeNodeData | (TreeNode | TreeNodeData)[], parentNode?: TreeNode) {
-    let treeNodes = arrays.ensure(nodes).slice() as TreeNode[];
-    if (treeNodes.length === 0) {
+  insertNodes(nodes: ObjectOrModel<TreeNode> | ObjectOrModel<TreeNode>[], parentNode?: TreeNode) {
+    let nodesArray = arrays.ensure(nodes).slice();
+    if (nodesArray.length === 0) {
       return;
     }
-    this.ensureTreeNodes(treeNodes);
+    this.ensureTreeNodes(nodesArray);
+    let treeNodes = nodesArray as TreeNode[];
     if (parentNode && !(parentNode instanceof TreeNode)) {
       throw new Error('parent has to be a tree node: ' + parentNode);
     }
@@ -2289,11 +2288,11 @@ export default class Tree extends Widget implements TreeModel {
     });
   }
 
-  updateNode(node: TreeNode | TreeNodeData) {
+  updateNode(node: ObjectOrModel<TreeNode>) {
     this.updateNodes([node]);
   }
 
-  updateNodes(nodes: TreeNode | TreeNodeData | (TreeNode | TreeNodeData)[]) {
+  updateNodes(nodes: ObjectOrModel<TreeNode> | ObjectOrModel<TreeNode>[]) {
     nodes = arrays.ensure(nodes);
     if (nodes.length === 0) {
       return;
@@ -2339,7 +2338,7 @@ export default class Tree extends Widget implements TreeModel {
    *          true if at least one property has changed, false otherwise. This value is used to
    *          determine if the node has to be rendered again.
    */
-  protected _applyUpdatedNodeProperties(oldNode: TreeNode, updatedNode: TreeNode | TreeNodeData): boolean {
+  protected _applyUpdatedNodeProperties(oldNode: TreeNode, updatedNode: ObjectOrModel<TreeNode>): boolean {
     // Note: We only update _some_ of the properties, because everything else will be handled
     // with separate events. --> See also: JsonTree.java/handleModelNodesUpdated()
     let propertiesChanged = false;

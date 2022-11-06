@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {HtmlEnvironment, LogicalGridLayout, LogicalGridLayoutConfig, RadioButtonGroup} from '../../../index';
-import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
+import {ObjectOrModel} from '../../../scout';
 
 export default class RadioButtonGroupLayout extends LogicalGridLayout {
   declare widget: RadioButtonGroup<any>;
 
-  constructor(widget: RadioButtonGroup<any>, layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
+  constructor(widget: RadioButtonGroup<any>, layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
     super(widget, layoutConfig);
   }
 

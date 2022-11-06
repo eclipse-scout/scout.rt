@@ -10,7 +10,7 @@
  */
 import {DateField, DateFieldModel, dates, keys, RemoteEvent, scout} from '../../../../src/index';
 import {triggerClick, triggerKeyDown, triggerMouseDown} from '../../../../src/testing/jquery-testing';
-import {Optional} from '../../../../src/types';
+import {InitModelOf} from '../../../../src/scout';
 
 describe('DateFieldAdapter', () => {
   let session: SandboxSession;
@@ -37,12 +37,12 @@ describe('DateFieldAdapter', () => {
     }
   }
 
-  function createWithAdapter(model: Optional<DateFieldModel, 'parent'>): SpecDateField {
+  function createWithAdapter(model: DateFieldModel): SpecDateField {
     model = model || {};
     model = $.extend({
       parent: session.desktop
     }, model);
-    let field = scout.create(SpecDateField, model as DateFieldModel);
+    let field = scout.create(SpecDateField, model as InitModelOf<DateField>);
     linkWidgetAndAdapter(field, 'DateFieldAdapter');
     return field;
   }

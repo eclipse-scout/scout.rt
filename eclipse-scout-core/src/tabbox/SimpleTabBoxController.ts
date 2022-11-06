@@ -13,6 +13,7 @@ import $ from 'jquery';
 import {SimpleTabBoxViewActivateEvent, SimpleTabBoxViewAddEvent, SimpleTabBoxViewDeactivateEvent, SimpleTabBoxViewRemoveEvent} from './SimpleTabBoxEventMap';
 import {SimpleTabAreaTabSelectEvent} from './SimpleTabAreaEventMap';
 import {SimpleTabView} from './SimpleTab';
+import {InitModelOf} from '../scout';
 
 /**
  * The {@link SimpleTabBoxController} is used to link a {@link SimpleTabBox} with a {@link SimpleTabArea}.
@@ -44,7 +45,7 @@ export default class SimpleTabBoxController<TView extends SimpleTabView = Simple
     this._viewTabSelectHandler = this._onViewTabSelect.bind(this);
   }
 
-  init(model: SimpleTabBoxControllerModel<TView>) {
+  init(model: InitModelOf<this>) {
     $.extend(this, model);
   }
 

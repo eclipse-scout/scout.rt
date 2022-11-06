@@ -11,9 +11,4 @@
 import {ActionAdapter} from '../index';
 
 export default class MenuAdapter extends ActionAdapter {
-
-  constructor() {
-    super();
-  }
-
 }

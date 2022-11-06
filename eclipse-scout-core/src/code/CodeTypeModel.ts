@@ -8,14 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import CodeModel from './CodeModel';
-import {ObjectType} from '../ObjectFactory';
-import {CodeType} from '../index';
-import {RefModel} from '../types';
+import {Code, CodeType} from '../index';
+import {FullModelOf, ObjectModel} from '../scout';
 
-export default interface CodeTypeModel<TCodeId> {
-  id: string;
-  objectType?: ObjectType<CodeType<TCodeId>, CodeTypeModel<TCodeId>>;
+export default interface CodeTypeModel<TCodeId> extends ObjectModel<CodeType<TCodeId>> {
   modelClass?: string;
-  codes?: RefModel<CodeModel<TCodeId>>[];
+  codes?: FullModelOf<Code<TCodeId>>[];
 }

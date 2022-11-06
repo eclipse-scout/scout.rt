@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import {arrays, BreadcrumbBarEventMap, BreadcrumbBarLayout, BreadcrumbBarModel, BreadcrumbItem, BreadcrumbItemModel, HtmlComponent, RefModel, scout, Widget} from '../index';
+import {arrays, BreadcrumbBarEventMap, BreadcrumbBarLayout, BreadcrumbBarModel, BreadcrumbItem, HtmlComponent, scout, Widget} from '../index';
+import {InitModelOf, ObjectOrChildModel} from '../scout';
 
 export default class BreadcrumbBar extends Widget implements BreadcrumbBarModel {
   declare model: BreadcrumbBarModel;
@@ -27,7 +28,7 @@ export default class BreadcrumbBar extends Widget implements BreadcrumbBarModel 
     this._addWidgetProperties(['breadcrumbItems']);
   }
 
-  protected override _init(model: BreadcrumbBarModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setBreadcrumbItems(this.breadcrumbItems);
   }
@@ -43,7 +44,7 @@ export default class BreadcrumbBar extends Widget implements BreadcrumbBarModel 
     this._renderBreadcrumbItems();
   }
 
-  setBreadcrumbItems(breadcrumbItems: (BreadcrumbItem | RefModel<BreadcrumbItemModel>) | (BreadcrumbItem | RefModel<BreadcrumbItemModel>)[]) {
+  setBreadcrumbItems(breadcrumbItems: ObjectOrChildModel<BreadcrumbItem> | ObjectOrChildModel<BreadcrumbItem>[]) {
     this.setProperty('breadcrumbItems', breadcrumbItems);
   }
 

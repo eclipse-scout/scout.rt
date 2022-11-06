@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Cell, CellEditorPopup, RemoteEvent, Session, StringField, StringFieldAdapter, StringFieldModel, Table, Widget} from '../../../src/index';
+import {Cell, CellEditorPopup, RemoteEvent, StringField, StringFieldAdapter, Table} from '../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '../../../src/testing/index';
-import {ObjectType} from '../../../src/ObjectFactory';
+import {InitModelOf} from '../../../src/scout';
 
 describe('CellEditorAdapter', () => {
   let session: SandboxSession;
@@ -37,10 +37,10 @@ describe('CellEditorAdapter', () => {
   });
 
   function createStringField(): StringField {
-    let model = formHelper.createFieldModel('StringField', session.desktop) as StringFieldModel & { id: string; objectType: ObjectType<StringField>; parent: Widget; session: Session };
+    let model = formHelper.createFieldModel('StringField', session.desktop);
     let adapter = new StringFieldAdapter();
-    adapter.init(model);
-    return adapter.createWidget(model, session.desktop) as StringField;
+    adapter.init(model as InitModelOf<StringFieldAdapter>);
+    return adapter.createWidget(model, session.desktop);
   }
 
   function $findPopup(): JQuery {

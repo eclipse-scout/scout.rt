@@ -15,7 +15,8 @@ import {
 import $ from 'jquery';
 import CellEditorPopup, {CellEditorRenderedOptions} from '../../../table/editor/CellEditorPopup';
 import {ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent} from './ProposalChooserEventMap';
-import {LookupCallOrRefModel} from '../../../lookup/LookupCall';
+import {LookupCallOrModel} from '../../../lookup/LookupCall';
+import {InitModelOf} from '../../../scout';
 
 export default class SmartField<TValue> extends ValueField<TValue> implements SmartFieldModel<TValue> {
   declare model: SmartFieldModel<TValue>;
@@ -138,7 +139,7 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
     SmartField.ActiveFilter.FALSE,
     SmartField.ActiveFilter.TRUE] as const;
 
-  protected override _init(model: SmartFieldModel<TValue>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     if (this.activeFilterLabels.length === 0) {
@@ -652,11 +653,11 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
     this.maxLengthHandler.render();
   }
 
-  setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
+  setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
     this.setProperty('lookupCall', lookupCall);
   }
 
-  protected _setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
+  protected _setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
     this._syncBrowseMaxRowCountWithLookupCall();
   }
@@ -992,7 +993,7 @@ export default class SmartField<TValue> extends ValueField<TValue> implements Sm
      *      is stateful. The java field always passes the activeFilter property to the
      *      lookup call.
      */
-    let fieldForPopup = useTouch ? (this.popup as SmartFieldTouchPopup<TValue>)._field as SmartField<TValue> : this;
+    let fieldForPopup = useTouch ? (this.popup as SmartFieldTouchPopup<TValue>)._field : this;
     this.popup.on('lookupRowSelected', fieldForPopup._onLookupRowSelected.bind(fieldForPopup));
     this.popup.on('activeFilterSelected', this._onActiveFilterSelected.bind(this)); // intentionally use this instead of fieldForPopup *1
     this.popup.one('remove', () => {

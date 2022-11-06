@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FocusRule, RefModel, ScoutKeyboardEvent, TooltipModel, Widget, WidgetModel} from '../index';
+import {FocusRule, ScoutKeyboardEvent, TooltipModel, Widget} from '../index';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface WidgetTooltipModel extends TooltipModel {
   /**
@@ -32,5 +33,5 @@ export default interface WidgetTooltipModel extends TooltipModel {
   /**
    * The {@link Widget} rendered inside the tooltip.
    */
-  content?: Widget | RefModel<WidgetModel>;
+  content?: ObjectOrChildModel<Widget>;
 }

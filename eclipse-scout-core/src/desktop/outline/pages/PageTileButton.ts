@@ -8,10 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Outline, Page, PageTileButtonModel, TileButton} from '../../../index';
+import {Button, Event, Outline, Page, PageTileButtonModel, TileButton} from '../../../index';
+import {InitModelOf} from '../../../scout';
+import {SomeRequired} from '../../../types';
 
 export default class PageTileButton extends TileButton implements PageTileButtonModel {
   declare model: PageTileButtonModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'page' | 'outline'>;
 
   page: Page;
   outline: Outline;
@@ -21,14 +24,14 @@ export default class PageTileButton extends TileButton implements PageTileButton
     this.page = null;
   }
 
-  protected override _init(model: PageTileButtonModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this.label = this.page.text;
     this.iconId = this.page.overviewIconId;
     this.labelHtmlEnabled = this.page.htmlEnabled;
 
-    this.on('click', event => {
+    this.on('click', (event: Event<Button>) => {
       this.outline.selectNode(this.page);
     });
   }

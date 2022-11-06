@@ -8,16 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {RadioButtonGroupModel, ValueFieldAdapter, Widget} from '../../../index';
-import {RefModel, SomeRequired} from '../../../types';
+import {ValueFieldAdapter, Widget} from '../../../index';
+import {ChildModelOf, FullModelOf} from '../../../scout';
 
 export default class RadioButtonGroupAdapter extends ValueFieldAdapter {
-
-  constructor() {
-    super();
-  }
-
-  protected override _initModel(m: RefModel<RadioButtonGroupModel<any>>, parent: Widget): SomeRequired<RadioButtonGroupModel<any>, 'objectType'> {
+  protected override _initModel(m: ChildModelOf<Widget>, parent: Widget): FullModelOf<Widget> {
     let model = super._initModel(m, parent);
     // Set logical grid to null -> Calculation happens on server side
     model.logicalGrid = null;

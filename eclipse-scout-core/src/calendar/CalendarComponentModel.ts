@@ -13,7 +13,7 @@ import {CalendarItem} from './CalendarComponent';
 import {JsonDateRange} from '../util/dates';
 
 export default interface CalendarComponentModel extends WidgetModel {
-  parent: Calendar;
+  parent?: Calendar;
   fromDate?: string;
   toDate?: string;
   /**

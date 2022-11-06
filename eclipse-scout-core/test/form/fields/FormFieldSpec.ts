@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxField, FormField, FormFieldModel, GridData, GroupBox, Menu, RadioButton, RadioButtonGroup, scout, Status, StringField, TreeVisitResult, Widget} from '../../../src/index';
+import {CheckBoxField, FormField, GridData, GroupBox, Menu, RadioButton, RadioButtonGroup, scout, Status, StringField, TreeVisitResult, Widget} from '../../../src/index';
 import {FormSpecHelper, MenuSpecHelper} from '../../../src/testing/index';
+import {InitModelOf} from '../../../src/scout';
 
 describe('FormField', () => {
   let session: SandboxSession;
@@ -41,7 +42,7 @@ describe('FormField', () => {
     }
   }
 
-  function createFormField(model: FormFieldModel): SpecFormField {
+  function createFormField(model: InitModelOf<FormField>): SpecFormField {
     let formField = new SpecFormField();
     formField.init(model);
     return formField;

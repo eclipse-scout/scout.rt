@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Column, comparators, DateColumnEventMap, DateColumnModel, DateField, DateFormat, dates, Locale, scout, TableRow} from '../../index';
+import {InitModelOf} from '../../scout';
 
 export default class DateColumn extends Column<Date> implements DateColumnModel {
   declare model: DateColumnModel;
@@ -32,7 +33,7 @@ export default class DateColumn extends Column<Date> implements DateColumnModel 
     this.textBased = false;
   }
 
-  protected override _init(model: DateColumnModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this._setFormat(this.format);

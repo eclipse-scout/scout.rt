@@ -11,5 +11,5 @@
 import {Desktop, FormControllerModel} from '../index';
 
 export default interface DesktopFormControllerModel extends FormControllerModel {
-  displayParent: Desktop;
+  displayParent?: Desktop;
 }

@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, Popup, PopupManagerModel, Widget} from '../index';
+import {InitModelOf} from '../scout';
 
 export default class PopupManager extends Widget implements PopupManagerModel {
   popups: Popup[];
@@ -20,7 +21,7 @@ export default class PopupManager extends Widget implements PopupManagerModel {
     this._addPreserveOnPropertyChangeProperties(['popups']);
   }
 
-  protected override _init(model: PopupManagerModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.session.layoutValidator.schedulePostValidateFunction(() => {
       this._openPopups(this.popups);

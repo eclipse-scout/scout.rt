@@ -10,9 +10,12 @@
  */
 import {arrays, Column, EventHandler, HtmlComponent, Page, strings, Table, TableRow, TableRowDetailModel, Widget} from '../index';
 import {TableRowsInsertedEvent, TableRowsUpdatedEvent} from './TableEventMap';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 export default class TableRowDetail extends Widget implements TableRowDetailModel {
   declare model: TableRowDetailModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'table' | 'page'>;
 
   table: Table;
   page: Page;
@@ -30,7 +33,7 @@ export default class TableRowDetail extends Widget implements TableRowDetailMode
     this._tableRowsInsertedHandler = this._onTableRowsInserted.bind(this);
   }
 
-  protected override _init(model: TableRowDetailModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.row = this.page.row;
     this.table.on('rowsUpdated', this._tableRowsUpdatedHandler);

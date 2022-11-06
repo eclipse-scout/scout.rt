@@ -10,6 +10,7 @@
  */
 import {arrays, Event, EventHandler, HtmlComponent, LayoutData, scout, SimpleTabArea, SimpleTabBoxController, SimpleTabBoxEventMap, SimpleTabBoxLayout, SimpleTabBoxModel, SimpleTabViewContentLayout, Widget} from '../index';
 import {SimpleTabView} from './SimpleTab';
+import {InitModelOf} from '../scout';
 
 export default class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabBoxModel<TView> {
   declare model: SimpleTabBoxModel<TView>;
@@ -39,7 +40,7 @@ export default class SimpleTabBox<TView extends SimpleTabView = SimpleTabView> e
     this._removeViewInProgress = 0;
   }
 
-  protected override _init(model: SimpleTabBoxModel<TView>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.cssClass = model.cssClass;
 

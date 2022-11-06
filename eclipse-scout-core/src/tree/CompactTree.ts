@@ -11,8 +11,8 @@
 import {
   arrays, CompactTreeDownKeyStroke, CompactTreeLeftKeyStroke, CompactTreeNode, CompactTreeRightKeyStroke, CompactTreeUpKeyStroke, HtmlComponent, MenuBar, MenuItemsOrder, Range, scout, Tree, TreeLayout, TreeNode, TreeNodeModel
 } from '../index';
-import {Optional} from '../types';
 import {TreeRenderExpansionOptions} from './Tree';
+import {InitModelOf} from '../scout';
 
 export default class CompactTree extends Tree {
 
@@ -32,10 +32,10 @@ export default class CompactTree extends Tree {
     ]);
   }
 
-  protected override _createTreeNode(nodeModel?: Optional<TreeNodeModel, 'parent'>): CompactTreeNode {
+  protected override _createTreeNode(nodeModel?: TreeNodeModel): CompactTreeNode {
     nodeModel = scout.nvl(nodeModel, {});
     nodeModel.parent = this;
-    return scout.create(CompactTreeNode, nodeModel as TreeNodeModel);
+    return scout.create(CompactTreeNode, nodeModel as InitModelOf<CompactTreeNode>);
   }
 
   protected override _render() {

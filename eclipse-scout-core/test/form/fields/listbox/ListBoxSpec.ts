@@ -10,8 +10,7 @@
  */
 import {ListBox, ListBoxModel, LookupCall, LookupResult, LookupRow, QueryBy, scout, Status} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
-import {Optional} from '../../../../src/types';
-import {LookupCallOrRefModel} from '../../../../src/lookup/LookupCall';
+import {InitModelOf, ObjectOrModel} from '../../../../src/scout';
 
 describe('ListBox', () => {
   let session: SandboxSession, field: ListBox<any>, helper: FormSpecHelper;
@@ -38,7 +37,7 @@ describe('ListBox', () => {
     }
   }
 
-  function createFieldWithLookupCall(model?: Optional<ListBoxModel<any>, 'parent'>, lookupCallModel?: LookupCallOrRefModel<any>): SpecListBox {
+  function createFieldWithLookupCall(model?: ListBoxModel<any>, lookupCallModel?: ObjectOrModel<LookupCall<any>> | string): SpecListBox {
     lookupCallModel = $.extend({
       objectType: DummyLookupCall
     }, lookupCallModel);
@@ -47,7 +46,7 @@ describe('ListBox', () => {
       parent: session.desktop,
       lookupCall: lookupCallModel
     }, model);
-    let box = scout.create(SpecListBox, model as ListBoxModel<any>);
+    let box = scout.create(SpecListBox, model as InitModelOf<ListBox<any>>);
     box.render();
     return box;
   }

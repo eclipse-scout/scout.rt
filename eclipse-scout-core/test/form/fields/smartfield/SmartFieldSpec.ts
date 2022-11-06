@@ -12,9 +12,9 @@
 import {fields, keys, LookupRow, ProposalChooser, QueryBy, scout, SmartField, SmartFieldModel, SmartFieldMultiline, SmartFieldPopup, SmartFieldTouchPopup, Status, strings} from '../../../../src/index';
 import {AbortableMicrotaskStaticLookupCall, ColumnDescriptorDummyLookupCall, DummyLookupCall, FormSpecHelper} from '../../../../src/testing/index';
 import {triggerClick, triggerKeyDown} from '../../../../src/testing/jquery-testing';
-import {Optional} from '../../../../src/types';
-import LookupCall, {LookupCallOrRefModel} from '../../../../src/lookup/LookupCall';
+import LookupCall from '../../../../src/lookup/LookupCall';
 import {SmartFieldLookupResult} from '../../../../src/form/fields/smartfield/SmartField';
+import {FullModelOf, InitModelOf, ObjectOrModel} from '../../../../src/scout';
 
 describe('SmartField', () => {
 
@@ -84,7 +84,7 @@ describe('SmartField', () => {
     removePopups(session, '.touch-popup');
   });
 
-  function createFieldWithLookupCall(model?: Optional<SmartFieldModel<number>, 'parent'>, lookupCallModel?: LookupCallOrRefModel<number>): SpecSmartField {
+  function createFieldWithLookupCall(model?: SmartFieldModel<number>, lookupCallModel?: ObjectOrModel<LookupCall<number>> | string): SpecSmartField {
     lookupCallModel = $.extend({
       objectType: DummyLookupCall
     }, lookupCallModel);
@@ -93,7 +93,7 @@ describe('SmartField', () => {
       parent: session.desktop,
       lookupCall: lookupCallModel
     }, model);
-    return scout.create(SmartField, model as SmartFieldModel<number>) as SpecSmartField;
+    return scout.create(SmartField, model as InitModelOf<SmartField<number>>) as SpecSmartField;
   }
 
   function findTableProposals(): string[] {
@@ -903,7 +903,7 @@ describe('SmartField', () => {
     it('uses a lookup call to format the value', () => {
       let model = helper.createFieldModel('SmartField', session.desktop, {
         lookupCall: lookupCall
-      }) as SmartFieldModel<number>;
+      });
       let smartField = scout.create(SmartField, model);
       expect(smartField.displayText).toBe('');
       smartField.setValue(1);
@@ -919,7 +919,7 @@ describe('SmartField', () => {
     it('returns empty string if value is null or undefined', () => {
       let model = helper.createFieldModel('SmartField', session.desktop, {
         lookupCall: lookupCall
-      }) as SmartFieldModel<number>;
+      });
       let smartField = scout.create(SmartField, model);
       expect(smartField.displayText).toBe('');
       smartField.setValue(null);
@@ -949,7 +949,7 @@ describe('SmartField', () => {
       let model = helper.createFieldModel('SmartField', session.desktop, {
         lookupCall: lookupCall,
         value: 1
-      }) as SmartFieldModel<number>;
+      }) as FullModelOf<SmartField<number>>;
       let smartField = scout.create(SpecSmartField, model);
       jasmine.clock().tick(300);
       smartField.render();
@@ -966,7 +966,7 @@ describe('SmartField', () => {
       let model = helper.createFieldModel('SmartField', session.desktop, {
         lookupCall: lookupCall,
         value: 1
-      }) as SmartFieldModel<number>;
+      }) as FullModelOf<SmartField<number>>;
       let smartField = scout.create(SpecSmartField, model);
       jasmine.clock().tick(300);
       smartField.render();
@@ -980,7 +980,7 @@ describe('SmartField', () => {
       let model = helper.createFieldModel('SmartFieldMultiline', session.desktop, {
         lookupCall: lookupCall,
         value: 1
-      }) as SmartFieldModel<number>;
+      }) as FullModelOf<SmartField<number>>;
       let smartFieldMultiline = scout.create(SmartFieldMultiline, model);
       jasmine.clock().tick(300);
       smartFieldMultiline.render();

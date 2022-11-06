@@ -10,7 +10,7 @@
  */
 import {LookupCall, LookupCallModel, LookupResult, LookupRow, QueryBy, scout, Status, TreeBox, TreeBoxModel} from '../../../../src/index';
 import {DummyLookupCall, FormSpecHelper, LanguageDummyLookupCall} from '../../../../src/testing/index';
-import {Optional} from '../../../../src/types';
+import {InitModelOf} from '../../../../src/scout';
 
 describe('TreeBox', () => {
   let session: SandboxSession, field: TreeBox<any>, helper: FormSpecHelper;
@@ -37,7 +37,7 @@ describe('TreeBox', () => {
     }
   }
 
-  function createFieldWithLookupCall<T>(model?: Optional<TreeBoxModel<T>, 'parent'>, lookupCallModel?: Optional<LookupCallModel<T>, 'session'>): SpecTreeBox<T> {
+  function createFieldWithLookupCall<T>(model?: TreeBoxModel<T>, lookupCallModel?: LookupCallModel<T>): SpecTreeBox<T> {
     lookupCallModel = $.extend({
       objectType: DummyLookupCall
     }, lookupCallModel);
@@ -46,7 +46,7 @@ describe('TreeBox', () => {
       parent: session.desktop,
       lookupCall: lookupCallModel
     }, model);
-    let box = scout.create((SpecTreeBox<T>), model as TreeBoxModel<T>);
+    let box = scout.create((SpecTreeBox<T>), model as InitModelOf<TreeBox<T>>);
     box.render();
     return box;
   }
@@ -336,7 +336,7 @@ describe('TreeBox', () => {
     it('uses a lookup call to format the value', () => {
       let model = helper.createFieldModel(TreeBox, session.desktop, {
         lookupCall: lookupCall
-      }) as TreeBoxModel<number>;
+      });
       let treeBox = scout.create(TreeBox, model);
       expect(treeBox.displayText).toBe('');
       treeBox.setValue([1]);
@@ -352,7 +352,7 @@ describe('TreeBox', () => {
     it('returns empty string if value is null or undefined', () => {
       let model = helper.createFieldModel(TreeBox, session.desktop, {
         lookupCall: lookupCall
-      }) as TreeBoxModel<number>;
+      });
       let treeBox = scout.create(TreeBox, model);
       expect(treeBox.displayText).toBe('');
 
@@ -370,7 +370,7 @@ describe('TreeBox', () => {
     it('does not auto-check child nodes if node is checked by model', () => {
       let model = helper.createFieldModel(TreeBox, session.desktop, {
         lookupCall: lookupCall
-      }) as TreeBoxModel<number>;
+      });
       let treeBox = scout.create(TreeBox, model);
       treeBox.tree.autoCheckChildren = true;
 

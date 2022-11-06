@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormFieldModel, RefModel, TileGrid, TileGridModel} from '../../../index';
+import {FormFieldModel, TileGrid} from '../../../index';
+import {ObjectOrChildModel} from '../../../scout';
 
 export default interface TileFieldModel extends FormFieldModel {
-  tileGrid?: TileGrid | RefModel<TileGridModel>;
+  tileGrid?: ObjectOrChildModel<TileGrid>;
 }

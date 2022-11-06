@@ -11,7 +11,4 @@
 import {PopupAdapter} from '../index';
 
 export default class WidgetPopupAdapter extends PopupAdapter {
-  constructor() {
-    super();
-  }
 }

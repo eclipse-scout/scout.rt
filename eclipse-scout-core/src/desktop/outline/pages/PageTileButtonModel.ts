@@ -11,6 +11,6 @@
 import {ButtonModel, Outline, Page} from '../../../index';
 
 export default interface PageTileButtonModel extends ButtonModel {
-  page: Page;
-  outline: Outline;
+  page?: Page;
+  outline?: Outline;
 }

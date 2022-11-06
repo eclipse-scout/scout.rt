@@ -10,6 +10,7 @@
  */
 import {arrays, Desktop, DesktopFormControllerModel, Dimension, Event, Form, FormController, PopupBlockerHandler, PopupWindow, scout} from '../index';
 import $ from 'jquery';
+import {InitModelOf} from '../scout';
 
 export default class DesktopFormController extends FormController implements DesktopFormControllerModel {
   declare model: DesktopFormControllerModel;
@@ -20,7 +21,7 @@ export default class DesktopFormController extends FormController implements Des
 
   protected _documentPopupWindowReadyHandler: (event: JQuery.TriggeredEvent, data: PopupWindowReadyData) => void;
 
-  constructor(model: DesktopFormControllerModel) {
+  constructor(model: InitModelOf<DesktopFormController>) {
     super(model);
     this.desktop = model.displayParent;
     this.popupWindows = [];
@@ -76,7 +77,7 @@ export default class DesktopFormController extends FormController implements Des
       resizeToPrefSize = true;
     }
 
-    // Note: Chrome does not allow to position a popup outside of the primary monitor (Firefox does)
+    // Note: Chrome does not allow to position a popup outside the primary monitor (Firefox does)
     // So the popup will always appear on the primary monitor even if we have stored the correct
     // bounds to position the popup on the secondary monitor!
     // See: https://developer.mozilla.org/en-US/docs/Web/API/Window/open#Position_and_size_features
@@ -149,7 +150,7 @@ export default class DesktopFormController extends FormController implements Des
 
   /**
    * We only close browser windows here, since during an unload event, we cannot send
-   * anything with a HTTP request anyway. So we cannot inform the server that it
+   * anything with an HTTP request anyway. So we cannot inform the server that it
    * should "kill" the forms - instead we simply render the popupWindows and forms
    * again when the page has been reloaded.
    */

@@ -11,5 +11,5 @@
 import {PageModel, TableRow} from '../../../index';
 
 export default interface AutoLeafPageWithNodesModel extends PageModel {
-  row: TableRow;
+  row?: TableRow;
 }

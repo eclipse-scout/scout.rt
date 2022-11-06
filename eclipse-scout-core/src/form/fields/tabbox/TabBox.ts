@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, CompositeField, fields, FormField, HtmlComponent, Menu, PropertyChangeEvent, RefModel, scout, SingleLayout, TabArea, TabBoxEventMap, TabBoxHeader, TabBoxLayout, TabBoxModel, TabItem, TabItemModel} from '../../../index';
+import {arrays, CompositeField, fields, FormField, HtmlComponent, Menu, PropertyChangeEvent, scout, SingleLayout, TabArea, TabBoxEventMap, TabBoxHeader, TabBoxLayout, TabBoxModel, TabItem} from '../../../index';
 import $ from 'jquery';
 import {TabAreaStyle} from './TabArea';
 import Tab from './Tab';
+import {InitModelOf, ObjectOrChildModel} from '../../../scout';
 
 /**
  * Tab-area = where the 1-n tabs are placed (may have multiple runs = lines).
@@ -51,7 +52,7 @@ export default class TabBox extends CompositeField implements TabBoxModel {
     this._tabBoxHeaderPropertyChangeHandler = this._onTabBoxHeaderPropertyChange.bind(this);
   }
 
-  protected override _init(model: TabBoxModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.header = scout.create(TabBoxHeader, {
       parent: this,
@@ -116,17 +117,17 @@ export default class TabBox extends CompositeField implements TabBoxModel {
    * Inserts a new tab item.
    * @param index The position where the new tab should be inserted. By default, it will be appended at the end of the existing tab items.
    */
-  insertTabItem(tabItem: TabItem | RefModel<TabItemModel>, index?: number) {
+  insertTabItem(tabItem: ObjectOrChildModel<TabItem>, index?: number) {
     if (!tabItem) {
       return;
     }
     index = scout.nvl(index, this.tabItems.length);
-    let tabItems = this.tabItems.slice() as (TabItem | RefModel<TabItemModel>)[];
+    let tabItems = this.tabItems.slice() as ObjectOrChildModel<TabItem>[];
     tabItems.splice(index, 0, tabItem);
     this.setTabItems(tabItems);
   }
 
-  setTabItems(tabItems: (TabItem | RefModel<TabItemModel>)[]) {
+  setTabItems(tabItems: ObjectOrChildModel<TabItem>[]) {
     this.setProperty('tabItems', tabItems);
   }
 

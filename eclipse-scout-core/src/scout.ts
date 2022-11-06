@@ -113,25 +113,51 @@ export interface ObjectWithType {
   objectType: string;
 }
 
-export interface ObjectModel<T = object, M = object> {
-  objectType?: ObjectType<T, M>;
-  id?: string;
+export interface ObjectModel<TObject = object, TId = string> {
+  objectType?: ObjectType<TObject>;
+  id?: TId;
 }
 
-export type ModelOf<T> = T extends { model: infer TModel } ? TModel : object;
+/**
+ * The minimal model declaration (usually extends {@link ObjectModel}) as it would be used in a nested declaration (e.g. a {@link FormField} within a {@link GroupBox}).
+ * The {@link objectType} is optional as sometimes it might be already given by the context (e.g. when passing a {@link MenuModel} to a method {@link insertMenu()} where the method sets a default {@link objectType} if missing).
+ */
+export type ModelOf<TObject> = TObject extends { model: infer TModel } ? TModel : object;
+/**
+ * Model used to initialize an object instance. Usually the same as {@link ModelOf} but with some minimal required properties (mandatory properties).
+ * Typically, adds an e.g. {@link parent} or {@link session} property which needs to be present when initializing an already created instance.
+ */
+export type InitModelOf<TObject> = TObject extends { initModel: infer TInitModel } ? TInitModel : ModelOf<TObject>;
+/**
+ * Model required to create a new object as child of an existing. To identify the object an {@link objectType} is mandatory.
+ * But as the properties required to initialize the instance are derived from the parent, no other mandatory properties are required.
+ */
+export type ChildModelOf<TObject> = ModelOf<TObject> & { objectType: ObjectType<TObject> };
+/**
+ * A full object model declaring all mandatory properties. Such models contain all information to create ({@link objectType}) and initialize (e.g. {@link parent}) a new object.
+ */
+export type FullModelOf<TObject> = InitModelOf<TObject> & ChildModelOf<TObject>;
+/**
+ * Represents an instance of an object or its minimal model ({@link ModelOf}).
+ */
+export type ObjectOrModel<T> = T | ModelOf<T>;
+/**
+ * Represents an instance of an object or its child model ({@link ChildModelOf}).
+ */
+export type ObjectOrChildModel<T> = T | ChildModelOf<T>;
 
-export function create<T>(objectType: new() => T, model?: ModelOf<T>, options?: ObjectFactoryOptions): T;
-export function create<T>(model: ModelOf<T> & { objectType: new () => T }, options?: ObjectFactoryOptions): T;
+export function create<T>(objectType: new() => T, model?: InitModelOf<T>, options?: ObjectFactoryOptions): T;
+export function create<T>(model: FullModelOf<T>, options?: ObjectFactoryOptions): T;
 export function create(objectType: string, model?: object, options?: ObjectFactoryOptions): any;
 export function create(model: { objectType: string; [key: string]: any }, options?: ObjectFactoryOptions): any;
-export function create<T>(objectType: ObjectType<T> | ModelOf<T> & { objectType: ObjectType<T> }, model?: ModelOf<T>, options?: ObjectFactoryOptions): T;
+export function create<T>(objectType: ObjectType<T> | FullModelOf<T>, model?: InitModelOf<T>, options?: ObjectFactoryOptions): T;
 
 /**
  * Creates a new object instance.
  *
  * Delegates the create call to {@link ObjectFactory.create}.
  */
-export function create<T extends object>(objectType: ObjectType<T> | ModelOf<T> & { objectType: ObjectType<T> }, model?: ModelOf<T>, options?: ObjectFactoryOptions): T {
+export function create<T extends object>(objectType: ObjectType<T> | FullModelOf<T>, model?: InitModelOf<T>, options?: ObjectFactoryOptions): T {
   return ObjectFactory.get().create(objectType, model, options);
 }
 
@@ -141,7 +167,7 @@ export function create<T extends object>(objectType: ObjectType<T> | ModelOf<T> 
  *
  * This is used by apps (App, LoginApp, LogoutApp)
  *
- * Currently it does the following:
+ * Currently, it does the following:
  * - Remove the <noscript> tag (obviously there is no need for it).
  * - Remove <scout-text> tags (they must have been processed before, see texts.readFromDOM())
  * - Remove <scout-version> tag (it must have been processed before, see App._initVersion())
@@ -217,7 +243,7 @@ export function widget(widgetIdOrElement: string | number | HTMLElement | JQuery
  * If the argument is a {@link HTMLElement} or {@link JQuery} element, it will use {@link widgets.get(elem)} to get the widget which belongs to the given element.
  *
  * @param widgetIdOrElement
- *          a widget ID or a HTML or jQuery element
+ *          a widget ID or an HTML or jQuery element
  * @param partId
  *          partId of the session the widget belongs to (optional, only relevant if the
  *          argument is a widget ID). If omitted, the first session is used.
@@ -279,7 +305,7 @@ export function getSession(partId: string): Session {
 }
 
 /**
- * This method exports the adapter with the given ID as JSON, it returns an plain object containing the
+ * This method exports the adapter with the given ID as JSON, it returns a plain object containing the
  * configuration of the adapter. You can transform that object into JSON by calling <code>JSON.stringify</code>.
  * This method can only be called through the browser JavaScript console.
  * Here's an example of how to call the method:
@@ -341,11 +367,11 @@ export function exportAdapter(adapterId: string, partId: string): AdapterData {
 export interface ReloadPageOptions {
   /**
    * If true, the page reload is not executed in the current thread but scheduled using setTimeout().
-   * This is useful if the caller wants to execute some other code before the reload. The default is false.
+   * This is useful if the caller wants to execute some other code before reload. The default is false.
    */
   schedule?: boolean;
   /**
-   * If true, the body is cleared first before the reload is performed. This is useful to prevent
+   * If true, the body is cleared first before reload. This is useful to prevent
    * showing "old" content in the browser until the new content arrives. The default is true.
    */
   clearBody?: boolean;

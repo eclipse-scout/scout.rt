@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Device, HtmlComponent, objects, scout, SliderEventMap, SliderLayout, SliderModel, Widget} from '../index';
+import {InitModelOf} from '../scout';
 
 export default class Slider extends Widget implements SliderModel {
   declare model: SliderModel;
@@ -34,7 +35,7 @@ export default class Slider extends Widget implements SliderModel {
     this.$sliderValue = null;
   }
 
-  protected override _init(options: SliderModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this.value = options.value;
     this.minValue = options.minValue;

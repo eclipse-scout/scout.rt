@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {GridData, RefModel, Widget, WidgetModel} from '../index';
+import {GridData, Widget, WidgetModel} from '../index';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface CarouselModel extends WidgetModel {
   /**
@@ -20,7 +21,7 @@ export default interface CarouselModel extends WidgetModel {
    * Default is 0.25
    */
   moveThreshold?: number;
-  widgets?: Widget | RefModel<Widget> | (Widget | RefModel<WidgetModel>)[];
+  widgets?: ObjectOrChildModel<Widget> | ObjectOrChildModel<Widget>[];
   currentItem?: number;
   gridData?: GridData;
 }

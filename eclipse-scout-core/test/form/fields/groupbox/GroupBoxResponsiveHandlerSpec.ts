@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxField, FormField, FormFieldModel, GroupBox, HtmlEnvironment, LabelField, RadioButton, RadioButtonGroup, RefModel, ResponsiveManager, scout, StringField} from '../../../../src/index';
+import {CheckBoxField, FormField, GroupBox, HtmlEnvironment, LabelField, RadioButton, RadioButtonGroup, ResponsiveManager, scout, StringField} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
+import {ChildModelOf} from '../../../../src/scout';
 
 describe('GroupBoxResponsiveHandler', () => {
   let session: SandboxSession;
@@ -21,7 +22,7 @@ describe('GroupBoxResponsiveHandler', () => {
     helper = new FormSpecHelper(session);
   });
 
-  function createGroupBox(fields?: RefModel<FormFieldModel>[]): GroupBox {
+  function createGroupBox(fields?: ChildModelOf<FormField>[]): GroupBox {
     fields = fields || [{
       objectType: StringField
     }, {

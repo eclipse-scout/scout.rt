@@ -10,14 +10,15 @@
  */
 import {
   AbortKeyStroke, Button, DialogLayout, DisabledStyle, DisplayParent, EnumObject, Event, FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormLayout, FormLifecycle, FormModel, GlassPaneRenderer,
-  GroupBox, GroupBoxModel, HtmlComponent, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, Point, PopupWindow, Rectangle, RefModel, scout, Status, StatusModel, strings, tooltips, TreeVisitResult, webstorage, Widget,
-  WrappedFormField
+  GroupBox, HtmlComponent, KeyStroke, KeyStrokeContext, MessageBox, MessageBoxController, Point, PopupWindow, Rectangle, scout, Status, strings, tooltips, TreeVisitResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
 import {FormRevealInvalidFieldEvent} from './FormEventMap';
 import {DisplayViewId} from '../tabbox/SimpleTab';
 import {ValidationResult} from './fields/FormField';
 import {ButtonSystemType} from './fields/button/Button';
+import {InitModelOf, ObjectOrChildModel} from '../scout';
+import {StatusOrModel} from '../status/Status';
 
 export type DisplayHint = EnumObject<typeof Form.DisplayHint>;
 
@@ -142,7 +143,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     VIEW: 'view'
   } as const;
 
-  protected override _init(model: FormModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this.resolveTextKeys(['title', 'askIfNeedSaveText']);
@@ -739,7 +740,7 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     this.$saveNeeded = null;
   }
 
-  setRootGroupBox(rootGroupBox: GroupBox | RefModel<GroupBoxModel>) {
+  setRootGroupBox(rootGroupBox: ObjectOrChildModel<GroupBox>) {
     this.setProperty('rootGroupBox', rootGroupBox);
   }
 
@@ -808,11 +809,11 @@ export default class Form extends Widget implements FormModel, DisplayParent {
     this.invalidateLayoutTree();
   }
 
-  setStatus(status: Status | StatusModel) {
+  setStatus(status: StatusOrModel) {
     this.setProperty('status', status);
   }
 
-  protected _setStatus(status: Status | StatusModel) {
+  protected _setStatus(status: StatusOrModel) {
     status = Status.ensure(status);
     this._setProperty('status', status);
   }

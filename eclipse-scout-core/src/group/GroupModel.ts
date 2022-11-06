@@ -10,8 +10,7 @@
  */
 import {Widget, WidgetModel} from '../index';
 import {GroupCollapseStyle} from './Group';
-import {RefModel} from '../types';
-import {ModelOf} from '../scout';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface GroupModel<TBody extends Widget = Widget> extends WidgetModel {
   collapsed?: boolean;
@@ -24,7 +23,7 @@ export default interface GroupModel<TBody extends Widget = Widget> extends Widge
    * If the value is null, a default header is created that consists of the {@link iconId}, {@link title} and {@link titleSuffix}.
    * Default is null.
    */
-  header?: Widget | RefModel<WidgetModel>;
+  header?: ObjectOrChildModel<Widget>;
   /**
    * Specifies whether the header should receive the focused when being clicked.
    * If set to false, it can only receive the focus by keyboard (e.g. by pressing TAB). Default is false.
@@ -36,7 +35,7 @@ export default interface GroupModel<TBody extends Widget = Widget> extends Widge
    * The body will be rendered when the group is expanded, so having a body is required.
    * Default is null.
    */
-  body?: TBody | RefModel<ModelOf<TBody>>;
+  body?: ObjectOrChildModel<TBody>;
   collapseStyle?: GroupCollapseStyle;
   /**
    * Icon that should be displayed beneath the title in the header of the group.

@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateColumnUserFilter, dates, FilterFieldsGroupBox, FilterFieldsGroupBoxModel} from '../../../src/index';
+import {DateColumnUserFilter, dates, FilterFieldsGroupBox} from '../../../src/index';
 import {TableSpecHelper} from '../../../src/testing/index';
+import {FullModelOf, InitModelOf} from '../../../src/scout';
 
 describe('DateColumnUserFilter', () => {
   let session: SandboxSession;
@@ -84,7 +85,7 @@ describe('DateColumnUserFilter', () => {
   });
 
   class SpecFilterFieldsGroupBox extends FilterFieldsGroupBox {
-    override _init(model: FilterFieldsGroupBoxModel) {
+    override _init(model: InitModelOf<this>) {
       super._init(model);
     }
   }
@@ -92,7 +93,7 @@ describe('DateColumnUserFilter', () => {
   it('addFilterFields must not create date fields with time', () => {
     // In case this test case fails, the date filter fields are created with time.
     // If this is intended, the acceptByFields() implementation for DateColumnUserFilter has to be checked/adjusted to ensure correct filter functionality.
-    let model = createSimpleModel(SpecFilterFieldsGroupBox, session) as FilterFieldsGroupBoxModel,
+    let model = createSimpleModel(SpecFilterFieldsGroupBox, session) as FullModelOf<FilterFieldsGroupBox>,
       filter = new DateColumnUserFilter(),
       box = new SpecFilterFieldsGroupBox();
     model.filter = filter;

@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Accordion, AccordionFieldEventMap, AccordionFieldModel, AccordionModel, EventDelegator, FormField, LoadingSupport, RefModel} from '../../../index';
+import {Accordion, AccordionFieldEventMap, AccordionFieldModel, EventDelegator, FormField, LoadingSupport} from '../../../index';
+import {InitModelOf, ObjectOrChildModel} from '../../../scout';
 
 export default class AccordionField extends FormField implements AccordionFieldModel {
   declare model: AccordionFieldModel;
@@ -25,7 +26,7 @@ export default class AccordionField extends FormField implements AccordionFieldM
     this._addWidgetProperties(['accordion']);
   }
 
-  protected override _init(model: AccordionFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this._setAccordion(this.accordion);
@@ -51,7 +52,7 @@ export default class AccordionField extends FormField implements AccordionFieldM
     this._renderDropType();
   }
 
-  setAccordion(accordion: Accordion | RefModel<AccordionModel>) {
+  setAccordion(accordion: ObjectOrChildModel<Accordion>) {
     this.setProperty('accordion', accordion);
   }
 

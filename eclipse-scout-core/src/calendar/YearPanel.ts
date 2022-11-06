@@ -11,6 +11,7 @@
 import {Calendar, DateRange, dates, Planner, scout, scrollbars, Widget, YearPanelEventMap, YearPanelModel} from '../index';
 import $ from 'jquery';
 import {PlannerDisplayMode} from '../planner/Planner';
+import {InitModelOf} from '../scout';
 
 export default class YearPanel extends Widget implements YearPanelModel {
   declare model: YearPanelModel;
@@ -25,14 +26,10 @@ export default class YearPanel extends Widget implements YearPanelModel {
   yearRendered: boolean;
   viewRange: DateRange;
 
-  constructor() {
-    super();
-  }
-
-  protected override _init(model: YearPanelModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
-    // If true, it is only possible to select the first day of a range, depending of the selected mode
+    // If true, it is only possible to select the first day of a range, depending on the selected mode
     // day mode: every day may be selected
     // week, work week, calendar week mode: only first day of week may be selected
     // year, month mode: only first day of month may be selected

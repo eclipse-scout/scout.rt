@@ -10,6 +10,7 @@
  */
 import {Action, ActionKeyStroke, Desktop, EventHandler, HtmlComponent, PropertyChangeEvent, ViewButtonActionKeyStroke, ViewButtonEventMap, ViewButtonModel} from '../../index';
 import {ViewButtonDisplayStyle} from './ViewButtonModel';
+import {InitModelOf} from '../../scout';
 
 export default class ViewButton extends Action implements ViewButtonModel {
   declare model: ViewButtonModel;
@@ -29,7 +30,7 @@ export default class ViewButton extends Action implements ViewButtonModel {
     this._desktopInBackgroundHandler = this._onDesktopInBackgroundChange.bind(this);
   }
 
-  protected override _init(model: ViewButtonModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.session.desktop.on('propertyChange:inBackground', this._desktopInBackgroundHandler);
   }

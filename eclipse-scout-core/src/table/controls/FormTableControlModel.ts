@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Form, FormModel, RefModel, TableControlModel} from '../../index';
+import {Form, TableControlModel} from '../../index';
+import {ObjectOrChildModel} from '../../scout';
 
 export default interface FormTableControlModel extends TableControlModel {
-  form?: Form | RefModel<FormModel>;
+  form?: ObjectOrChildModel<Form>;
 }

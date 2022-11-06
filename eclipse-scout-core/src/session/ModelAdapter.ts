@@ -15,8 +15,8 @@ import $ from 'jquery';
 import EventListener from '../events/EventListener';
 import WidgetModel from '../widget/WidgetModel';
 import {AdapterData} from './Session';
-import {RefModel, SomeRequired} from '../types';
-import {ObjectType} from '../ObjectFactory';
+import {ChildModelOf, FullModelOf, InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 /**
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
@@ -24,6 +24,7 @@ import {ObjectType} from '../ObjectFactory';
  */
 export default class ModelAdapter extends EventEmitter implements ModelAdapterModel, ModelAdapterLike {
   declare model: ModelAdapterModel;
+  declare initModel: SomeRequired<this['model'], 'session' | 'id'>;
   declare eventMap: ModelAdapterEventMap;
   declare self: ModelAdapter;
   id: string;
@@ -60,12 +61,12 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
     this.session = null;
   }
 
-  init(model: ModelAdapterModel) {
+  init(model: InitModelOf<this>) {
     this._init(model);
     this.initialized = true;
   }
 
-  protected _init(model: ModelAdapterModel) {
+  protected _init(model: InitModelOf<this>) {
     scout.assertParameter('id', model.id);
     scout.assertParameter('session', model.session);
     $.extend(this, model);
@@ -80,7 +81,7 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
     this.destroyed = true;
   }
 
-  createWidget<T extends Widget>(adapterData: Omit<WidgetModel, 'parent'> & { objectType: ObjectType<T> }, parent: Widget): T {
+  createWidget<T extends Widget>(adapterData: ChildModelOf<Widget>, parent: Widget): T {
     let model = this._initModel(adapterData, parent);
     this.widget = this._createWidget(model);
     this._attachWidget();
@@ -97,10 +98,10 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
     // NOP
   }
 
-  protected _initModel(m: RefModel<WidgetModel>, parent: Widget): SomeRequired<WidgetModel, 'objectType'> {
+  protected _initModel(m: ChildModelOf<Widget>, parent: Widget): FullModelOf<Widget> {
     // Make a copy to prevent a modification of the given model
-    let deepCopy = this.session.adapterExportEnabled;
-    let model: any = $.extend(deepCopy, {}, m);
+    let deepCopy = this.session.adapterExportEnabled as true;
+    let model: any = $.extend(deepCopy, {}, m) as FullModelOf<Widget>;
 
     // Fill in the missing default values
     defaultValues.applyTo(model);
@@ -129,7 +130,7 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
   /**
    * @returns A new widget instance. The default impl. uses calls scout.create() with property objectType from given model.
    */
-  protected _createWidget(model: SomeRequired<WidgetModel, 'objectType'>): Widget {
+  protected _createWidget(model: FullModelOf<Widget>): Widget {
     let widget = scout.create(model);
     widget._addCloneProperties(['modelClass', 'classId']);
     return widget;
@@ -208,7 +209,7 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
   }
 
   /**
-   * Creates a Event object from the current adapter instance and sends the event by using the Session#sendEvent() method.
+   * Creates an Event object from the current adapter instance and sends the event by using the Session#sendEvent() method.
    * Local objects may set a different remoteHandler to call custom code instead of the Session#sendEvent() method.
    *
    * @param type of event
@@ -438,7 +439,7 @@ export default class ModelAdapter extends EventEmitter implements ModelAdapterMo
    * This method is used to modify adapterData before the data is exported (as used for JSON export).
    */
   exportAdapterData(adapterData: AdapterData): AdapterData {
-    // use last part of class-name as ID (because that's better than having only a number as ID)
+    // use last part of class-name as ID (because that's better than having only a number for ID)
     let modelClass = adapterData.modelClass;
     if (modelClass) {
       let pos = Math.max(0,

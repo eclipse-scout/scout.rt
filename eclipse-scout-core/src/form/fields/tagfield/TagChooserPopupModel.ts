@@ -11,5 +11,5 @@
 import {PopupModel, TagField} from '../../../index';
 
 export default interface TagChooserPopupModel extends PopupModel {
-  field: TagField;
+  field?: TagField;
 }

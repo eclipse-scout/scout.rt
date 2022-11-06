@@ -9,8 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {CompositeTile, Icon, Label, scout, Tile, TileGrid, ViewButton, ViewMenuPopupEnterKeyStroke, ViewMenuPopupModel, WidgetPopup} from '../../index';
-import {RefModel} from '../../types';
 import {CompositeTileModel} from '../../tile/CompositeTile';
+import {ChildModelOf, InitModelOf} from '../../scout';
 
 /**
  * Popup menu to switch between outlines.
@@ -30,7 +30,7 @@ export default class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupM
     this.trimWidth = true;
   }
 
-  protected override _init(options: ViewMenuPopupModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     let tiles = this._createTiles();
     let noIcons = tiles.every(tile => !tile.widgets[0].visible);
@@ -55,7 +55,7 @@ export default class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupM
     }
   }
 
-  protected _computeGridColumnCount(tiles: RefModel<ViewButtonTileModel>[]): number {
+  protected _computeGridColumnCount(tiles: ChildModelOf<ViewButtonTile>[]): number {
     if (tiles.length > 8) {
       return 4;
     }
@@ -65,7 +65,7 @@ export default class ViewMenuPopup extends WidgetPopup implements ViewMenuPopupM
     return 2;
   }
 
-  protected _createTiles(): RefModel<ViewButtonTileModel>[] {
+  protected _createTiles(): ChildModelOf<ViewButtonTile>[] {
     return this.viewMenus.map(menu => ({
       objectType: CompositeTile,
       displayStyle: Tile.DisplayStyle.PLAIN,

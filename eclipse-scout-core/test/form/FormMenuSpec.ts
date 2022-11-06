@@ -10,7 +10,6 @@
  */
 import {FormSpecHelper} from '../../src/testing/index';
 import {ContextMenuPopup, Desktop, FormMenu, FormMenuModel, MenuBar, menus, scout} from '../../src/index';
-import {Optional} from '../../src/types';
 
 describe('FormMenu', () => {
   let session: SandboxSession, desktop: Desktop, helper: FormSpecHelper;
@@ -27,7 +26,7 @@ describe('FormMenu', () => {
       </style>`).appendTo($('#sandbox'));
   });
 
-  function createMenu(model?: Optional<FormMenuModel, 'parent'>): FormMenu {
+  function createMenu(model?: FormMenuModel): FormMenu {
     return scout.create(FormMenu, $.extend({
       parent: desktop,
       text: 'Menu',

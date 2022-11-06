@@ -10,6 +10,7 @@
  */
 import {arrays, CallModel, objects, scout, strings} from '../index';
 import $ from 'jquery';
+import {InitModelOf} from '../scout';
 
 /**
  * Represents a robust "call" that, when it fails, is retried automatically for a specific
@@ -61,7 +62,7 @@ export default abstract class Call implements CallModel {
 
   static GLOBAL_SEQ = 0;
 
-  init(model: CallModel) {
+  init(model: InitModelOf<this>) {
     $.extend(this, model);
 
     // Ensure "retryIntervals" is a valid array

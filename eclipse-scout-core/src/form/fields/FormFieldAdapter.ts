@@ -16,7 +16,7 @@ export default class FormFieldAdapter extends ModelAdapter {
 
   /**
    * Set this property to true when the form-field should stay enabled in offline case.
-   * By default the field will be disabled.
+   * By default, the field will be disabled.
    */
   enabledWhenOffline: boolean;
   protected _currentMenuTypes: string[];
@@ -27,7 +27,7 @@ export default class FormFieldAdapter extends ModelAdapter {
     this._currentMenuTypes = [];
   }
 
-  protected override _initProperties(model: FormFieldModel & {currentMenuTypes: string[]}) {
+  protected override _initProperties(model: FormFieldModel & { currentMenuTypes: string[] }) {
     super._initProperties(model);
     this._currentMenuTypes = arrays.ensure(model.currentMenuTypes);
     delete model.currentMenuTypes;

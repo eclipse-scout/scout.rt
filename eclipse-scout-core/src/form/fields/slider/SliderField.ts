@@ -8,17 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, Slider, SliderFieldModel, SliderModel, ValueField} from '../../../index';
+import {scout, Slider, SliderFieldModel, ValueField} from '../../../index';
 import $ from 'jquery';
+import {InitModelOf} from '../../../scout';
 
 export default class SliderField extends ValueField<number> {
   declare model: SliderFieldModel;
 
   slider: Slider;
 
-  protected override _init(model: SliderFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
-    let sliderOptions: SliderModel = $.extend({
+    let sliderOptions: InitModelOf<Slider> = $.extend({
       parent: this
     }, model);
     this.slider = scout.create(Slider, sliderOptions);

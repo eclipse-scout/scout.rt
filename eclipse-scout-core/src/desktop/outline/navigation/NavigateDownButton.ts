@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {EventHandler, icons, NavigateButton, NavigateButtonModel, Page} from '../../../index';
+import {EventHandler, icons, NavigateButton, Page} from '../../../index';
 import $ from 'jquery';
 import {TableRowsSelectedEvent} from '../../../table/TableEventMap';
 import {OutlinePageRowLinkEvent} from '../OutlineEventMap';
+import {InitModelOf} from '../../../scout';
 
 export default class NavigateDownButton extends NavigateButton {
   protected _detailTableRowsSelectedHandler: EventHandler<TableRowsSelectedEvent>;
@@ -27,7 +28,7 @@ export default class NavigateDownButton extends NavigateButton {
     this._outlinePageRowLinkHandler = this._onOutlinePageRowLink.bind(this);
   }
 
-  protected override _init(options: NavigateButtonModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
 
     if (this.node.detailTable) {

@@ -9,12 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  ButtonTile, EnumObject, Event, EventHandler, EventListener, EventSupport, Form, FormModel, HtmlComponent, icons, inspector, MenuBar, Outline, PageEventMap, PageModel, PropertyChangeEvent, scout, Table, TableModel, TableRow,
-  TileOutlineOverview, TileOverviewForm, TreeNode, Widget
+  ButtonTile, EnumObject, Event, EventHandler, EventListener, EventSupport, Form, HtmlComponent, icons, inspector, MenuBar, Outline, PageEventMap, PageModel, PropertyChangeEvent, scout, Table, TableRow, TileOutlineOverview,
+  TileOverviewForm, TreeNode, Widget
 } from '../../../index';
 import $ from 'jquery';
 import {TableRowClickEvent} from '../../../table/TableEventMap';
 import {EventMapOf, EventModel} from '../../../events/EventEmitter';
+import {ChildModelOf, InitModelOf} from '../../../scout';
 
 /**
  * This class is used differently in online and JS-only case. In the online case we only have instances
@@ -59,8 +60,8 @@ export default class Page extends TreeNode implements PageModel {
 
   protected _tableFilterHandler: EventHandler<Event<Table>>;
   protected _tableRowClickHandler: EventHandler<TableRowClickEvent>;
-  protected _detailTableModel: TableModel;
-  protected _detailFormModel: FormModel;
+  protected _detailTableModel: ChildModelOf<Table>;
+  protected _detailFormModel: ChildModelOf<Form>;
 
   constructor() {
     super();
@@ -95,9 +96,9 @@ export default class Page extends TreeNode implements PageModel {
     TABLE: 'table'
   } as const;
 
-  protected override _init(model: PageModel) {
-    this._detailTableModel = Page._removePropertyIfLazyLoading(model, 'detailTable');
-    this._detailFormModel = Page._removePropertyIfLazyLoading(model, 'detailForm');
+  protected override _init(model: InitModelOf<this>) {
+    this._detailTableModel = Page._removePropertyIfLazyLoading(model, 'detailTable') as ChildModelOf<Table>;
+    this._detailFormModel = Page._removePropertyIfLazyLoading(model, 'detailForm') as ChildModelOf<Form>;
 
     super._init(model);
     icons.resolveIconProperty(this, 'overviewIconId');
@@ -137,7 +138,7 @@ export default class Page extends TreeNode implements PageModel {
     let tableModel = this.detailTable;
     if (tableModel) {
       // this case is used for Scout classic
-      let newDetailTable = this.getOutline()._createChild(tableModel) as Table;
+      let newDetailTable = this.getOutline()._createChild(tableModel);
       this._setDetailTable(newDetailTable);
     }
   }
@@ -145,7 +146,7 @@ export default class Page extends TreeNode implements PageModel {
   protected _internalInitDetailForm() {
     let formModel = this.detailForm;
     if (formModel) {
-      let newDetailForm = this.getOutline()._createChild(formModel) as Form;
+      let newDetailForm = this.getOutline()._createChild(formModel);
       this._setDetailForm(newDetailForm);
     }
   }
@@ -164,7 +165,7 @@ export default class Page extends TreeNode implements PageModel {
   createDetailTable(): Table {
     let detailTable = this._createDetailTable();
     if (!detailTable && this._detailTableModel) {
-      detailTable = this.getOutline()._createChild(this._detailTableModel) as Table;
+      detailTable = this.getOutline()._createChild(this._detailTableModel);
       this._detailTableModel = null; // no longer needed
     }
     return detailTable;
@@ -191,7 +192,7 @@ export default class Page extends TreeNode implements PageModel {
   createDetailForm(): Form {
     let detailForm = this._createDetailForm();
     if (!detailForm && this._detailFormModel) {
-      detailForm = this.getOutline()._createChild(this._detailFormModel) as Form;
+      detailForm = this.getOutline()._createChild(this._detailFormModel);
       this._detailFormModel = null; // no longer needed
     }
     return detailForm;

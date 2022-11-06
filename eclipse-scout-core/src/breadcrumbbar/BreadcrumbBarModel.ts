@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BreadcrumbItem, BreadcrumbItemModel, WidgetModel} from '../index';
-import {RefModel} from '../types';
+import {BreadcrumbItem, WidgetModel} from '../index';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface BreadcrumbBarModel extends WidgetModel {
-  breadcrumbItems?: (BreadcrumbItem | RefModel<BreadcrumbItemModel>)[];
+  breadcrumbItems?: ObjectOrChildModel<BreadcrumbItem>[];
 }

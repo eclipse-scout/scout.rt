@@ -10,7 +10,7 @@
  */
 import {objects, scout, TypeDescriptor} from './index';
 import $ from 'jquery';
-import {ModelOf, ObjectModel} from './scout';
+import {FullModelOf, InitModelOf, ModelOf, ObjectModel} from './scout';
 import {TypeDescriptorOptions} from './TypeDescriptor';
 
 export type ObjectCreator = (model?: any) => object;
@@ -144,16 +144,16 @@ export default class ObjectFactory {
    *        'objectType' on the model object.
    * @throws Error if the argument list does not match the definition.
    */
-  create<T extends object>(objectTypeOrModel: ObjectType<T> | ModelOf<T> & { objectType: ObjectType<T> }, modelOrOptions?: ModelOf<T> | ObjectFactoryOptions, options?: ObjectFactoryOptions): T {
+  create<T extends object>(objectTypeOrModel: ObjectType<T> | FullModelOf<T>, modelOrOptions?: InitModelOf<T>, options?: ObjectFactoryOptions): T {
     // Normalize arguments
     let objectType: ObjectType<T>;
     let model: ObjectModel<T>;
     if (typeof objectTypeOrModel === 'string' || typeof objectTypeOrModel === 'function') {
       options = options || {};
-      model = modelOrOptions as ObjectModel<T>;
-      objectType = objectTypeOrModel as ObjectType<T>;
+      model = modelOrOptions;
+      objectType = objectTypeOrModel;
     } else if (objects.isPlainObject(objectTypeOrModel)) {
-      options = modelOrOptions as ObjectFactoryOptions || {};
+      options = modelOrOptions || {};
       model = objectTypeOrModel;
       if (!model.objectType) {
         throw new Error('Missing mandatory property "objectType" on model');

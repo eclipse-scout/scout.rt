@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 export default interface LocaleModel {
-  languageTag: string;
+  languageTag?: string;
   decimalFormatPatternDefault?: string;
   dateFormatPatternDefault?: string;
   timeFormatPatternDefault?: string;

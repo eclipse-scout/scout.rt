@@ -13,7 +13,7 @@ import {SmartFieldLookupResult} from './SmartField';
 import {StatusOrModel} from '../../../status/Status';
 
 export default interface SmartFieldPopupModel<TValue> extends PopupModel {
-  field: SmartField<TValue>;
+  field?: SmartField<TValue>;
   lookupResult?: SmartFieldLookupResult<TValue>;
   status?: StatusOrModel;
 }

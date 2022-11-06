@@ -12,8 +12,9 @@ import {arrays, LookupRow, objects, QueryBy, scout, Session} from '../index';
 import $ from 'jquery';
 import LookupCallModel from './LookupCallModel';
 import LookupResult from './LookupResult';
-import {Optional, SomeRequired} from '../types';
+import {SomeRequired} from '../types';
 import {ObjectType} from '../ObjectFactory';
+import {ChildModelOf, FullModelOf, InitModelOf} from '../scout';
 
 /**
  * Base class for lookup calls. A concrete implementation of LookupCall.js which uses resources over a network
@@ -21,8 +22,8 @@ import {ObjectType} from '../ObjectFactory';
  * The lookup call must _always_ return a result, otherwise the SmartField cannot work properly.
  */
 export default class LookupCall<TKey> implements LookupCallModel<TKey> {
-
   declare model: LookupCallModel<TKey>;
+  declare initModel: SomeRequired<this['model'], 'session'>;
 
   id: string;
   objectType: ObjectType<LookupCall<TKey>>;
@@ -52,12 +53,12 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
     this.maxRowCount = 100;
   }
 
-  init(model: LookupCallModel<TKey>) {
+  init(model: InitModelOf<this>) {
     scout.assertParameter('session', model.session);
     this._init(model);
   }
 
-  protected _init(model: LookupCallModel<TKey>) {
+  protected _init(model: InitModelOf<this>) {
     $.extend(this, model);
   }
 
@@ -327,13 +328,13 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
 
   // ---- static helpers ----
 
-  static ensure<K>(lookupCall: LookupCallOrRefModel<K>, session: Session): LookupCall<K> {
+  static ensure<K>(lookupCall: LookupCallOrModel<K>, session: Session): LookupCall<K> {
     if (lookupCall instanceof LookupCall) {
       return lookupCall;
     }
     if (objects.isPlainObject(lookupCall)) {
       lookupCall.session = session;
-      return scout.create(lookupCall as SomeRequired<LookupCallModel<K>, 'objectType'>);
+      return scout.create(lookupCall as FullModelOf<LookupCall<K>>);
     }
     if (typeof lookupCall === 'string') {
       lookupCall = scout.create(lookupCall, {
@@ -360,4 +361,4 @@ export default class LookupCall<TKey> implements LookupCallModel<TKey> {
 /**
  * A LookupCall, a LookupCallModel or a string with a LookupCall class name.
  */
-export type LookupCallOrRefModel<K> = LookupCall<K> | Optional<SomeRequired<LookupCallModel<K>, 'objectType'>, 'session'> | string;
+export type LookupCallOrModel<K> = LookupCall<K> | ChildModelOf<LookupCall<K>> | string;

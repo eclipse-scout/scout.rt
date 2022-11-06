@@ -10,7 +10,6 @@
  */
 import {focusUtils, WrappedFormField, WrappedFormFieldModel} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
-import {Optional} from '../../../../src/types';
 
 describe('WrappedForm', () => {
   let session: SandboxSession;
@@ -22,7 +21,7 @@ describe('WrappedForm', () => {
     helper = new FormSpecHelper(session);
   });
 
-  function createField(modelProperties: Optional<WrappedFormFieldModel, 'parent'>): WrappedFormField {
+  function createField(modelProperties: WrappedFormFieldModel): WrappedFormField {
     return helper.createField(WrappedFormField, session.desktop, modelProperties);
   }
 

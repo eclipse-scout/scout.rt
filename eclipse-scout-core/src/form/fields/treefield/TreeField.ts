@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, RefModel, Tree, TreeFieldEventMap, TreeFieldModel, TreeModel, Widget} from '../../../index';
+import {FormField, Tree, TreeFieldEventMap, TreeFieldModel, Widget} from '../../../index';
+import {ObjectOrChildModel} from '../../../scout';
 
 export default class TreeField extends FormField implements TreeFieldModel {
   declare model: TreeFieldModel;
@@ -35,7 +36,7 @@ export default class TreeField extends FormField implements TreeFieldModel {
     }
   }
 
-  setTree(tree: Tree | RefModel<TreeModel>) {
+  setTree(tree: ObjectOrChildModel<Tree>) {
     this.setProperty('tree', tree);
   }
 

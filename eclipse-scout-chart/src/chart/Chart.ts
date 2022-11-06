@@ -13,6 +13,7 @@ import {arrays, colorSchemes, EnumObject, HtmlComponent, objects, Widget} from '
 import {ColorScheme} from '@eclipse-scout/core/src/util/colorSchemes';
 import {GreenAreaPosition} from './SpeedoChartRenderer';
 import {ChartConfiguration, LinearScaleOptions, RadialLinearScaleOptions} from 'chart.js';
+import {InitModelOf} from '@eclipse-scout/core/src/scout';
 
 export default class Chart extends Widget implements ChartModel {
   declare model: ChartModel;
@@ -76,7 +77,7 @@ export default class Chart extends Widget implements ChartModel {
   static DEFAULT_ANIMATION_DURATION = 600; // ms
   static DEFAULT_DEBOUNCE_TIMEOUT = 100; // ms
 
-  protected override _init(model: ChartModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.setConfig(this.config);
   }

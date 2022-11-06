@@ -13,9 +13,12 @@ import {
 } from '../index';
 import RowLayout from '../layout/RowLayout';
 import {PopupAlignment} from './Popup';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 export default class TouchPopup extends Popup {
   declare model: TouchPopupModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'field'>;
 
   doneAction: Action;
   htmlBody: HtmlComponent;
@@ -52,7 +55,7 @@ export default class TouchPopup extends Popup {
     this._touchFieldPropertyChangeListener = this._onTouchFieldPropertyChange.bind(this);
   }
 
-  protected override _init(options: TouchPopupModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this._touchField = options.field;
     let touchFieldTooltip = this._touchField.tooltip();
@@ -83,7 +86,7 @@ export default class TouchPopup extends Popup {
     super._destroy();
   }
 
-  protected _fieldOverrides(): TouchPopupFieldModel {
+  protected _fieldOverrides(): InitModelOf<TouchPopupField> {
     return {
       parent: this,
       labelVisible: false,
@@ -154,7 +157,7 @@ export default class TouchPopup extends Popup {
     if (event.propertyName === 'errorStatus') {
       this._field.setErrorStatus(event.newValue);
     } else if (event.propertyName === 'lookupRow' && this._field instanceof SmartField) {
-      let smartfield = this._field as SmartField<any>;
+      let smartfield = this._field;
       smartfield.setLookupRow(event.newValue);
     }
   }

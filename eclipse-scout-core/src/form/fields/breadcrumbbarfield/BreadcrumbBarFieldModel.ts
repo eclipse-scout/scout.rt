@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BreadcrumbBar, BreadcrumbBarModel, FormFieldModel} from '../../../index';
-import {RefModel} from '../../../types';
+import {BreadcrumbBar, FormFieldModel} from '../../../index';
+import {ObjectOrChildModel} from '../../../scout';
 
 export default interface BreadcrumbBarFieldModel extends FormFieldModel {
-  breadcrumbBar?: BreadcrumbBar | RefModel<BreadcrumbBarModel>;
+  breadcrumbBar?: ObjectOrChildModel<BreadcrumbBar>;
 }

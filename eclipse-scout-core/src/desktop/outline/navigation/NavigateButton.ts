@@ -10,6 +10,7 @@
  */
 import {Action, KeyStrokeContext, Menu, NavigateButtonModel, Outline, Page} from '../../../index';
 import $ from 'jquery';
+import {SomeRequired} from '../../../types';
 
 /**
  * The outline navigation works mostly browser-side. The navigation logic is implemented in JavaScript.
@@ -19,6 +20,7 @@ import $ from 'jquery';
  */
 export default abstract class NavigateButton extends Menu implements NavigateButtonModel {
   declare model: NavigateButtonModel;
+  declare initModel: SomeRequired<this['model'], 'parent' | 'node' | 'outline'>;
 
   node: Page;
   outline: Outline;

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {CheckBoxField, CheckBoxFieldModel, ValueField} from '../../../../src/index';
+import {CheckBoxField, ValueField} from '../../../../src/index';
 
 describe('CheckBoxFieldWithTriState', () => {
 
@@ -16,12 +16,11 @@ describe('CheckBoxFieldWithTriState', () => {
 
     let session: SandboxSession;
     let checkBoxField: CheckBoxField;
-    let model: CheckBoxFieldModel;
 
     beforeEach(() => {
       setFixtures(sandbox());
       session = sandboxSession();
-      model = createSimpleModel('CheckBoxField', session);
+      let model = createSimpleModel(CheckBoxField, session);
       model.triStateEnabled = true;
       checkBoxField = new CheckBoxField();
       checkBoxField.init(model);

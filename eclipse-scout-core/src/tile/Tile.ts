@@ -13,6 +13,7 @@ import $ from 'jquery';
 import {ColorScheme} from '../util/colorSchemes';
 import TileModel from './TileModel';
 import TileEventMap from './TileEventMap';
+import {InitModelOf} from '../scout';
 
 export type TileDisplayStyle = EnumObject<typeof Tile.DisplayStyle>;
 
@@ -55,7 +56,7 @@ export default class Tile extends Widget implements TileModel {
     });
   }
 
-  protected override _init(model: TileModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setGridDataHints(this.gridDataHints);
     this._setColorScheme(this.colorScheme);

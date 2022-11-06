@@ -10,14 +10,14 @@
  */
 import {arrays, Column, Device, NumberColumn, Range, Table} from '../../src/index';
 import {TableSpecHelper} from '../../src/testing/index';
-import {TableModelWithCells, TableRowDataWithCells} from '../../src/testing/table/TableSpecHelper';
+import {TableModelWithCells, TableRowModelWithCells} from '../../src/testing/table/TableSpecHelper';
 import SpecTable from '../../src/testing/table/SpecTable';
 import SpecTableAdapter from '../../src/testing/table/SpecTableAdapter';
 
 describe('Table Grouping', () => {
 
   let session: SandboxSession, helper: TableSpecHelper, model: TableModelWithCells, table: SpecTable;
-  let column0: Column, column1: Column, column2: Column, column3: NumberColumn, column4: NumberColumn, rows: TableRowDataWithCells[], columns, adapter: SpecTableAdapter;
+  let column0: Column, column1: Column, column2: Column, column3: NumberColumn, column4: NumberColumn, rows: TableRowModelWithCells[], columns, adapter: SpecTableAdapter;
   let $colHeaders, $header0, $header1;
 
   beforeEach(() => {
@@ -53,7 +53,7 @@ describe('Table Grouping', () => {
     model = helper.createModel(columns, rows);
     if (withAdapter) {
       adapter = helper.createTableAdapter(model);
-      table = adapter.createWidget(model, session.desktop) as SpecTable;
+      table = adapter.createWidget(model, session.desktop);
     } else {
       table = helper.createTable(model);
     }

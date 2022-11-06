@@ -18,5 +18,5 @@ export default interface TimePickerModel extends WidgetModel {
    */
   preselectedTime?: Date;
   selectedTime?: Date;
-  timeResolution: number;
+  timeResolution?: number;
 }

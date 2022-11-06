@@ -11,7 +11,4 @@
 import {FormFieldAdapter} from '../../../index';
 
 export default class PlannerFieldAdapter extends FormFieldAdapter {
-  constructor() {
-    super();
-  }
 }

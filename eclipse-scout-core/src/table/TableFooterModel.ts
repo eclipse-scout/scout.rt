@@ -11,6 +11,6 @@
 import {Table, WidgetModel} from '../index';
 
 export default interface TableFooterModel extends WidgetModel {
-  table: Table;
+  table?: Table;
   filterText?: string;
 }

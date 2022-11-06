@@ -9,10 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {App, Desktop, Event, EventMap, Session} from './index';
-import {AppBootstrapOptions, AppOptions} from './App';
+import {AppBootstrapOptions, AppModel} from './App';
+import {ModelOf} from './scout';
 
 export interface AppInitEvent<T = App> extends Event<T> {
-  options: AppOptions;
+  options: AppModel;
 }
 
 export interface AppBootstrapEvent<T = App> extends Event<T> {

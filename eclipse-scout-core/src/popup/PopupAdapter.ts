@@ -11,11 +11,6 @@
 import {Event, ModelAdapter, Popup} from '../index';
 
 export default class PopupAdapter extends ModelAdapter {
-
-  constructor() {
-    super();
-  }
-
   protected _onWidgetClose(event: Event<Popup>) {
     // Do not close the popup immediately, server will send the close event
     event.preventDefault();

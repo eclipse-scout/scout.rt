@@ -8,18 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {arrays, DefaultStatus, EnumObject, ObjectFactory, objects, ParsingFailedStatus, Predicate, StatusModel, strings, ValidationFailedStatus} from '../index';
+import {arrays, DefaultStatus, EnumObject, ObjectFactory, objects, ObjectWithType, ParsingFailedStatus, Predicate, StatusModel, strings, ValidationFailedStatus} from '../index';
 import $ from 'jquery';
-import {ObjectType} from '../ObjectFactory';
-import {ModelOf} from '../scout';
+import {FullModelOf, InitModelOf, ObjectOrModel} from '../scout';
 
-export type StatusSeverity = EnumObject<typeof Status.Severity>;
-export type StatusSeverityNames = keyof typeof Status.Severity;
-export type StatusOrModel<T extends Status = Status> = Status | (ModelOf<T> & { objectType?: ObjectType<T> });
-
-export default class Status {
+export default class Status implements StatusModel, ObjectWithType {
   declare model: StatusModel;
 
+  objectType: string;
   message: string;
   severity: StatusSeverity;
   iconId: string;
@@ -28,7 +24,7 @@ export default class Status {
   deletable: boolean;
   uiState: string;
 
-  constructor(model?: StatusModel) {
+  constructor(model?: InitModelOf<Status>) {
     this.message = null;
     this.severity = Status.Severity.ERROR;
     this.iconId = null;
@@ -247,21 +243,6 @@ export default class Status {
     }
   }
 
-  static ensure(status: StatusOrModel): Status;
-  static ensure<T extends Status>(status: StatusOrModel<T>): T {
-    if (!status) {
-      return status as T;
-    }
-    if (status instanceof Status) {
-      return status as T;
-    }
-    // May return a specialized subclass of Status
-    if (!status.objectType) {
-      status.objectType = 'Status';
-    }
-    return ObjectFactory.get().create(status as ModelOf<T> & { objectType: ObjectType<T> }) as T;
-  }
-
   /**
    * @returns a {@link Status} object with severity OK.
    */
@@ -334,6 +315,23 @@ export default class Status {
       ValidationFailedStatus: ValidationFailedStatus
     }[className];
   }
+
+  static ensure<T extends Status = Status>(status: StatusOrModel<T>): T {
+    if (!status) {
+      return status as T;
+    }
+    if (status instanceof Status) {
+      return status;
+    }
+    // May return a specialized subclass of Status
+    if (!status.objectType) {
+      status.objectType = 'Status';
+    }
+    return ObjectFactory.get().create(status as FullModelOf<T>);
+  }
 }
 
+export type StatusSeverity = EnumObject<typeof Status.Severity>;
+export type StatusSeverityNames = keyof typeof Status.Severity;
+export type StatusOrModel<T extends Status = Status> = ObjectOrModel<T>;
 export type StatusType = 'Status' | 'DefaultStatus' | 'ParsingFailedStatus' | 'ValidationFailedStatus';

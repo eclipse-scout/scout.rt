@@ -10,15 +10,14 @@
  */
 import {
   AbstractLayout, Action, arrays, clipboard, ContextMenuPopup, Device, dragAndDrop, DragAndDropHandler, EnumObject, EventHandler, fields, FieldStatus, FormFieldEventMap, FormFieldLayout, FormFieldModel, GridData, GroupBox, HtmlComponent,
-  KeyStrokeContext, LoadingSupport, Menu, MenuModel, menus as menuUtil, objects, Predicate, PropertyChangeEvent, RefModel, scout, Status, StatusMenuMapping, strings, styles, Tooltip, tooltips, TreeVisitResult, Widget
+  KeyStrokeContext, LoadingSupport, Menu, menus as menuUtil, objects, Predicate, PropertyChangeEvent, scout, Status, StatusMenuMapping, strings, styles, Tooltip, tooltips, TooltipSupport, TreeVisitResult, Widget
 } from '../../index';
 import $ from 'jquery';
 import {DragAndDropOptions, DropType} from '../../util/dragAndDrop';
-import {TooltipSupportOptions} from '../../tooltip/TooltipSupport';
 import {StatusOrModel} from '../../status/Status';
 import {CloneOptions} from '../../widget/Widget';
 import {FormFieldClipboardExportEvent} from './FormFieldEventMap';
-import {Optional} from '../../types';
+import {InitModelOf, ObjectOrChildModel} from '../../scout';
 
 /**
  * Base class for all form-fields.
@@ -64,7 +63,7 @@ export default class FormField extends Widget implements FormFieldModel {
   labelForegroundColor: string;
   labelBackgroundColor: string;
   tooltipAnchor: FormFieldTooltipAnchor;
-  onFieldTooltipOptionsCreator: (this: FormField) => TooltipSupportOptions;
+  onFieldTooltipOptionsCreator: (this: FormField) => InitModelOf<TooltipSupport>;
   dragAndDropHandler: DragAndDropHandler;
   /**
    * Some browsers don't support copying text from disabled input fields. If such a browser is detected
@@ -213,7 +212,7 @@ export default class FormField extends Widget implements FormFieldModel {
     });
   }
 
-  protected override _init(model: FormFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.resolveConsts([{
       property: 'labelPosition',
@@ -516,11 +515,11 @@ export default class FormField extends Widget implements FormFieldModel {
     return this.tooltipAnchor === FormField.TooltipAnchor.ON_FIELD && strings.hasText(this.tooltipText);
   }
 
-  setOnFieldTooltipOptionsCreator(onFieldTooltipOptionsCreator: (this: FormField) => TooltipSupportOptions) {
+  setOnFieldTooltipOptionsCreator(onFieldTooltipOptionsCreator: (this: FormField) => InitModelOf<TooltipSupport>) {
     this.onFieldTooltipOptionsCreator = onFieldTooltipOptionsCreator;
   }
 
-  protected _createOnFieldTooltipOptions(): TooltipSupportOptions {
+  protected _createOnFieldTooltipOptions(): InitModelOf<TooltipSupport> {
     return {
       parent: this,
       text: this.tooltipText,
@@ -842,7 +841,7 @@ export default class FormField extends Widget implements FormFieldModel {
     }
   }
 
-  setMenus(menus: (Menu | RefModel<MenuModel>)[]) {
+  setMenus(menus: ObjectOrChildModel<Menu>[]) {
     this.setProperty('menus', menus);
   }
 
@@ -854,16 +853,16 @@ export default class FormField extends Widget implements FormFieldModel {
     this.menus.forEach(menu => menu.on('propertyChange', this._menuPropertyChangeHandler));
   }
 
-  insertMenu(menuToInsert: Menu | RefModel<MenuModel>) {
+  insertMenu(menuToInsert: ObjectOrChildModel<Menu>) {
     this.insertMenus([menuToInsert]);
   }
 
-  insertMenus(menusToInsert: (Menu | RefModel<MenuModel>)[]) {
+  insertMenus(menusToInsert: ObjectOrChildModel<Menu>[]) {
     menusToInsert = arrays.ensure(menusToInsert);
     if (menusToInsert.length === 0) {
       return;
     }
-    let menus = this.menus as (Menu | RefModel<MenuModel>)[];
+    let menus = this.menus as ObjectOrChildModel<Menu>[];
     this.setMenus(menus.concat(menusToInsert));
   }
 
@@ -1465,10 +1464,10 @@ export default class FormField extends Widget implements FormFieldModel {
     }
   }
 
-  override clone(model: Optional<FormFieldModel, 'parent'>, options?: CloneOptions): this {
+  override clone(model: FormFieldModel, options?: CloneOptions): this {
     let clone = super.clone(model, options);
     this._deepCloneProperties(clone, 'menus', options);
-    return clone as this;
+    return clone;
   }
 
   exportToClipboard() {

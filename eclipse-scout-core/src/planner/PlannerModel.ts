@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {DateRange, Menu, MenuModel, WidgetModel} from '../index';
+import {DateRange, Menu, WidgetModel} from '../index';
 import {PlannerActivity, PlannerDisplayMode, PlannerDisplayModeOptions, PlannerResource, PlannerSelectionMode} from './Planner';
-import {RefModel} from '../types';
 import {JsonDateRange} from '../util/dates';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface PlannerModel extends WidgetModel {
   resources?: PlannerResource[];
@@ -32,5 +32,5 @@ export default interface PlannerModel extends WidgetModel {
   headerVisible?: boolean;
   label?: string;
   selectionMode?: PlannerSelectionMode;
-  menus?: (Menu | RefModel<MenuModel>)[];
+  menus?: ObjectOrChildModel<Menu>[];
 }

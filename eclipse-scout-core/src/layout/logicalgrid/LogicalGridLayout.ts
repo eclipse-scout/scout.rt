@@ -12,6 +12,7 @@ import {AbstractLayout, Dimension, EventHandler, HtmlComponent, HtmlEnvironment,
 import $ from 'jquery';
 import {HtmlCompPrefSizeOptions} from '../HtmlComponent';
 import {LogicalGridLayoutConfigModel} from './LogicalGridLayoutConfig';
+import {ObjectOrModel} from '../../scout';
 
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayout.
@@ -32,7 +33,7 @@ export default class LogicalGridLayout extends AbstractLayout {
   rowHeight: number;
   minWidth: number;
 
-  constructor(widget: Widget, layoutConfig: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel) {
+  constructor(widget: Widget, layoutConfig: ObjectOrModel<LogicalGridLayoutConfig>) {
     super();
     this.cssClass = 'logical-grid-layout';
     this.validityBasedOnContainerSize = new Dimension();

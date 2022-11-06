@@ -10,7 +10,7 @@
  */
 import $ from 'jquery';
 import {scout, Session, TabBox, TabBoxModel, TabItem, TabItemModel} from '../../../../index';
-import {Optional} from '../../../../types';
+import {InitModelOf} from '../../../../scout';
 
 export default class TabBoxSpecHelper {
   session: Session;
@@ -40,18 +40,18 @@ export default class TabBoxSpecHelper {
     });
   }
 
-  createTabBox(model?: Optional<TabBoxModel, 'parent'>): TabBox {
+  createTabBox(model?: TabBoxModel): TabBox {
     model = $.extend({
       parent: this.session.desktop
     }, model);
 
-    return scout.create(TabBox, model as TabBoxModel);
+    return scout.create(TabBox, model as InitModelOf<TabBox>);
   }
 
-  createTabItem(model?: Optional<TabItemModel, 'parent'>): TabItem {
+  createTabItem(model?: TabItemModel): TabItem {
     model = $.extend({
       parent: this.session.desktop
     }, model);
-    return scout.create(TabItem, model as TabItemModel);
+    return scout.create(TabItem, model as InitModelOf<TabItem>);
   }
 }

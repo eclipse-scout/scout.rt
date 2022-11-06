@@ -1,17 +1,18 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * https://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {BrowserFieldLayout, EnumObject, FormField, FormFieldModel, IFrame, numbers, PopupBlockerHandler, PropertyChangeEvent, Rectangle, scout, strings} from '../../../index';
+import {BrowserFieldLayout, EnumObject, FormField, IFrame, numbers, PopupBlockerHandler, PropertyChangeEvent, Rectangle, scout, strings} from '../../../index';
 import $ from 'jquery';
 import BrowserFieldModel from './BrowserFieldModel';
 import BrowserFieldEventMap from './BrowserFieldEventMap';
+import {InitModelOf} from '../../../scout';
 import TriggeredEvent = JQuery.TriggeredEvent;
 
 export type BrowserFieldWindowStates = EnumObject<typeof BrowserField.WindowStates>;
@@ -62,7 +63,7 @@ export default class BrowserField extends FormField implements BrowserFieldModel
     WINDOW_CLOSED: 'false'
   };
 
-  protected override _init(model: FormFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this.iframe = scout.create(IFrame, {

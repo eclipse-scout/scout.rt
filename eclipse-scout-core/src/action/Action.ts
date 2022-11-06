@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ActionEventMap, ActionKeyStroke, ActionModel, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, KeyStrokeContext, NullLayout, scout, tooltips, Widget} from '../index';
+import {ActionEventMap, ActionKeyStroke, ActionModel, Device, DoubleClickSupport, EnumObject, HtmlComponent, Icon, KeyStrokeContext, NullLayout, scout, tooltips, TooltipSupport, Widget} from '../index';
 import $ from 'jquery';
 import AbstractLayout from '../layout/AbstractLayout';
-import {TooltipSupportOptions} from '../tooltip/TooltipSupport';
 import {TooltipPosition} from '../tooltip/Tooltip';
 import {Alignment} from '../cell/Cell';
+import {InitModelOf} from '../scout';
 
 export type ActionStyle = EnumObject<typeof Action.ActionStyle>;
 export type KeyStrokeFirePolicy = EnumObject<typeof Action.KeyStrokeFirePolicy>;
@@ -101,7 +101,7 @@ export default class Action extends Widget implements ActionModel {
     return new KeyStrokeContext();
   }
 
-  protected override _init(model: ActionModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.actionKeyStroke = this._createActionKeyStroke();
     this.resolveConsts([{
@@ -284,7 +284,7 @@ export default class Action extends Widget implements ActionModel {
     this.setProperty('tooltipPosition', position);
   }
 
-  protected _configureTooltip(): TooltipSupportOptions {
+  protected _configureTooltip(): InitModelOf<TooltipSupport> {
     return {
       parent: this,
       text: this.tooltipText,

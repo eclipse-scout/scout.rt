@@ -9,13 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import Table from '../Table';
-import {Column, Filter, Session, TableRow} from '../../index';
-import {ObjectType} from '../../ObjectFactory';
+import {Filter, Session, TableRow} from '../../index';
+import {ObjectModel} from '../../scout';
 
-export default interface TableUserFilterModel {
+export default interface TableUserFilterModel extends ObjectModel<Filter<TableRow>> {
   table?: Table;
   session?: Session;
-  objectType?: ObjectType<Filter<TableRow>>;
-  column?: string | Column<any>;
   filterType?: string;
 }

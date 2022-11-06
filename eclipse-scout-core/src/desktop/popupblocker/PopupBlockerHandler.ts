@@ -10,9 +10,12 @@
  */
 import {ErrorHandler, Event, EventHandler, MessageBoxes, PopupBlockerDesktopNotification, PopupBlockerHandlerModel, scout, Session, Status} from '../../index';
 import $ from 'jquery';
+import {InitModelOf} from '../../scout';
+import {SomeRequired} from '../../types';
 
 export default class PopupBlockerHandler implements PopupBlockerHandlerModel {
   declare model: PopupBlockerHandlerModel;
+  declare initModel: SomeRequired<this['model'], 'session'>;
 
   session: Session;
   preserveOpener: boolean;
@@ -22,7 +25,7 @@ export default class PopupBlockerHandler implements PopupBlockerHandlerModel {
     this.preserveOpener = false;
   }
 
-  init(options: PopupBlockerHandlerModel) {
+  init(options: InitModelOf<this>) {
     $.extend(this, options);
   }
 

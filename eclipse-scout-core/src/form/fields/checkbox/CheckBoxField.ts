@@ -10,6 +10,7 @@
  */
 import {CheckBoxFieldEventMap, CheckBoxFieldModel, CheckBoxToggleKeyStroke, Device, fields, KeyStrokeContext, styles, tooltips, ValueField} from '../../../index';
 import {AddCellEditorFieldCssClassesOptions} from '../FormField';
+import {InitModelOf} from '../../../scout';
 
 export default class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldModel {
   declare model: CheckBoxFieldModel;
@@ -35,7 +36,7 @@ export default class CheckBoxField extends ValueField<boolean> implements CheckB
     this.$checkBoxLabel = null;
   }
 
-  protected override _init(model: CheckBoxFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setKeyStroke(this.keyStroke);
   }

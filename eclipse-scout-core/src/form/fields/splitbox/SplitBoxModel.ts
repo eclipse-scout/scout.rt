@@ -9,12 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormField, FormFieldModel} from '../../../index';
-import {RefModel} from '../../../types';
+import {ObjectOrChildModel} from '../../../scout';
 
 export default interface SplitBoxModel extends FormFieldModel {
-  firstField: FormField | RefModel<FormFieldModel>;
-  secondField: FormField | RefModel<FormFieldModel>;
-  collapsibleField: FormField | string;
+  firstField?: ObjectOrChildModel<FormField>;
+  secondField?: ObjectOrChildModel<FormField>;
+  collapsibleField?: FormField | string;
   fieldCollapsed?: boolean;
   toggleCollapseKeyStroke?: string;
   firstCollapseKeyStroke?: string;

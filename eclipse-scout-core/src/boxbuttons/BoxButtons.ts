@@ -10,6 +10,7 @@
  */
 import {Action, ActionModel, BoxButtonsEventMap, BoxButtonsModel, scout, Widget} from '../index';
 import {ObjectFactoryOptions} from '../ObjectFactory';
+import {InitModelOf} from '../scout';
 
 /**
  * Widget to render a set of Actions that look like Buttons.
@@ -62,13 +63,13 @@ export default class BoxButtons extends Widget implements BoxButtonsModel {
     return index === this.defaultButtonIndex;
   }
 
-  addButton(model: Omit<ActionModel, 'parent'>, options?: ObjectFactoryOptions): Action {
+  addButton(model: ActionModel, options?: ObjectFactoryOptions): Action {
     model = model || {};
     model.parent = this;
     model.tabbable = true;
     model.actionStyle = Action.ActionStyle.BUTTON;
     model.preventDoubleClick = true;
-    let button = scout.create(Action, model as ActionModel, options);
+    let button = scout.create(Action, model as InitModelOf<Action>, options);
     this.buttons.push(button);
     return button;
   }

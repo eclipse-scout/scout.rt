@@ -14,10 +14,6 @@ import {MessageBoxActionEvent} from './MessageBoxEventMap';
 export default class MessageBoxAdapter extends ModelAdapter {
   declare widget: MessageBox;
 
-  constructor() {
-    super();
-  }
-
   protected _onWidgetAction(event: MessageBoxActionEvent) {
     this._send('action', {
       option: event.option

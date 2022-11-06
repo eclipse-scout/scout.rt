@@ -10,7 +10,8 @@
  */
 import {AbstractLayout, arrays, HtmlComponent, LookupBoxEventMap, LookupBoxModel, LookupCall, LookupResult, LookupRow, objects, PropertyChangeEvent, Status, strings, ValueField, Widget} from '../../index';
 import $ from 'jquery';
-import {LookupCallOrRefModel} from '../../lookup/LookupCall';
+import {LookupCallOrModel} from '../../lookup/LookupCall';
+import {InitModelOf} from '../../scout';
 
 export default abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TValue[]> implements LookupBoxModel<TValue> {
   declare model: LookupBoxModel<TValue>;
@@ -45,7 +46,7 @@ export default abstract class LookupBox<TValue> extends ValueField<TValue[], TVa
     NO_DATA: 1
   };
 
-  protected override _init(model: LookupBoxModel<TValue>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     if (this.filterBox) {
       this.filterBox.enabledComputed = true; // filter is always enabled
@@ -186,11 +187,11 @@ export default abstract class LookupBox<TValue> extends ValueField<TValue[], TVa
     this.setLookupStatus(null);
   }
 
-  setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
+  setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
     this.setProperty('lookupCall', lookupCall);
   }
 
-  protected _setLookupCall(lookupCall: LookupCallOrRefModel<TValue>) {
+  protected _setLookupCall(lookupCall: LookupCallOrModel<TValue>) {
     this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
     this._lookupExecuted = false;
     if (this.rendered) {

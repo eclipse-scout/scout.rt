@@ -9,10 +9,10 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {scout, Tile, TileGrid, TileGridModel} from '../../src/index';
-import {Optional} from '../../src/types';
 import {AdapterData} from '../../src/session/Session';
 import TileModel from '../../src/tile/TileModel';
 import {ObjectType} from '../../src/ObjectFactory';
+import {InitModelOf} from '../../src/scout';
 
 describe('TileGridAdapter', () => {
   let session: SandboxSession;
@@ -30,23 +30,23 @@ describe('TileGridAdapter', () => {
     jasmine.clock().uninstall();
   });
 
-  function createTileGrid(model?: Optional<TileGridModel, 'parent'>): TileGrid {
+  function createTileGrid(model?: TileGridModel): TileGrid {
     let defaults = {
       parent: session.desktop,
       session: session,
       objectType: 'TileGrid'
     };
-    let m = $.extend({}, defaults, model) as TileGridModel & {objectType: ObjectType<TileGrid>};
+    let m = $.extend({}, defaults, model) as TileGridModel & { objectType: ObjectType<TileGrid> };
     let tileGridAdapter = session.createModelAdapter(m as AdapterData);
-    return tileGridAdapter.createWidget(m, m.parent) as TileGrid;
+    return tileGridAdapter.createWidget(m, m.parent);
   }
 
-  function createTile(model?: Optional<TileModel, 'parent'>): Tile {
+  function createTile(model?: TileModel): Tile {
     let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    let tile = scout.create(Tile, model as TileModel);
+    let tile = scout.create(Tile, model as InitModelOf<Tile>);
     linkWidgetAndAdapter(tile, 'TileAdapter');
     return tile;
   }
@@ -58,6 +58,7 @@ describe('TileGridAdapter', () => {
       let tile1 = createTile();
       let tile2 = createTile();
       let tileGrid = createTileGrid({
+        // @ts-expect-error
         tiles: [tile0.id, tile1.id, tile2.id],
         filteredTiles: [tile1.id, tile2.id]
       });
@@ -89,6 +90,7 @@ describe('TileGridAdapter', () => {
       let tile1 = createTile();
       let tile2 = createTile();
       let tileGrid = createTileGrid({
+        // @ts-expect-error
         tiles: [tile0.id, tile1.id, tile2.id]
       });
       expect(tileGrid.tiles.length).toBe(3);

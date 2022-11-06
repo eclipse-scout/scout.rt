@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, MenuModel, Rectangle, RefModel, WidgetModel} from '../index';
+import {Menu, Rectangle, WidgetModel} from '../index';
 import {StatusSeverity} from '../status/Status';
 import {TooltipDirection, TooltipPosition, TooltipScrollType} from './Tooltip';
+import {ObjectOrChildModel} from '../scout';
 
 export default interface TooltipModel extends WidgetModel {
   /**
@@ -65,6 +66,6 @@ export default interface TooltipModel extends WidgetModel {
    * Default is false.
    */
   htmlEnabled?: boolean | (($comp: JQuery) => boolean);
-  menus?: (Menu | RefModel<MenuModel>)[];
+  menus?: ObjectOrChildModel<Menu>[];
   $anchor?: JQuery;
 }

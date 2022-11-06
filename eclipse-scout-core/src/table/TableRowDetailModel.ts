@@ -11,6 +11,6 @@
 import {Page, Table, WidgetModel} from '../index';
 
 export default interface TableRowDetailModel extends WidgetModel {
-  table: Table;
-  page: Page;
+  table?: Table;
+  page?: Page;
 }

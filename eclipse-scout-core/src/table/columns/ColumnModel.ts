@@ -13,7 +13,7 @@ import {Alignment} from '../../cell/Cell';
 import {ColumnComparator} from './comparators';
 import {ObjectModel} from '../../scout';
 
-export default interface ColumnModel<TValue = string> extends ObjectModel<Column<TValue>, ColumnModel<TValue>> {
+export default interface ColumnModel<TValue = string> extends ObjectModel<Column<TValue>> {
   session?: Session;
   /**
    * Configures whether the column width is auto optimized.
@@ -263,4 +263,6 @@ export default interface ColumnModel<TValue = string> extends ObjectModel<Column
    * When header menu is disabled, a click on the header will toggle between ascending and descending sorting instead of opening the header popup.
    */
   headerMenuEnabled?: boolean;
+
+  [property: string]: any; // allow custom properties
 }

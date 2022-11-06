@@ -9,14 +9,15 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {Status, StatusModel} from '../index';
+import {InitModelOf} from '../scout';
 
 /**
  * The DefaultStatus class is used add programmatic Status triggered by business logic
- * in cases where you don't want or don't have to implement your own Status sub-class.
+ * in cases where you don't want or don't have to implement your own Status subclass.
  */
 export default class DefaultStatus extends Status {
 
-  constructor(model?: StatusModel) {
+  constructor(model?: InitModelOf<DefaultStatus>) {
     super(model);
   }
 

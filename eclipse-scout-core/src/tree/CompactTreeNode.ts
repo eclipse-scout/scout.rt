@@ -14,10 +14,6 @@ export default class CompactTreeNode extends TreeNode {
   declare childNodes: CompactTreeNode[];
   declare parentNode: CompactTreeNode;
 
-  constructor() {
-    super();
-  }
-
   override render($parent: JQuery, paddingLeft: number) {
     let tree = this.getTree();
 

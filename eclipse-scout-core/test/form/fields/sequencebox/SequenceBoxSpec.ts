@@ -11,7 +11,6 @@
 import {DateField, dates, FormField, LabelField, Menu, scout, SequenceBox, SequenceBoxGridConfig, SequenceBoxModel, Status, StringField} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '../../../../src/testing/index';
 import {triggerClick} from '../../../../src/testing/jquery-testing';
-import {Optional} from '../../../../src/types';
 
 describe('SequenceBox', () => {
   let session: SandboxSession, helper: FormSpecHelper, menuHelper: MenuSpecHelper;
@@ -23,7 +22,7 @@ describe('SequenceBox', () => {
     menuHelper = new MenuSpecHelper(session);
   });
 
-  function createField(modelProperties?: Optional<SequenceBoxModel, 'parent'>): SequenceBox {
+  function createField(modelProperties?: SequenceBoxModel): SequenceBox {
     let seqBox = helper.createField(SequenceBox, session.desktop, modelProperties);
     let fields = [
       helper.createField(StringField, seqBox, {
@@ -280,6 +279,7 @@ describe('SequenceBox', () => {
     it('shows the error status of the seq box', () => {
       let field = createField({
         errorStatus: {
+          // @ts-expect-error
           statusVisible: false,
           message: 'foo'
         }

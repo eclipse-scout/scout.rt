@@ -10,16 +10,16 @@
  */
 import {Range, Widget} from '../index';
 
-export default interface VirtualScrollingOptions {
+export default interface VirtualScrollingModel {
   enabled?: boolean;
   minRowHeight?: number;
   viewRangeSize?: number;
   widget?: Widget;
   $scrollable?: JQuery;
 
-  rowHeight(row: number): number;
+  rowHeight?(row: number): number;
 
-  rowCount(): number;
+  rowCount?(): number;
 
-  _renderViewRange(viewRange: Range);
+  _renderViewRange?(viewRange: Range);
 }

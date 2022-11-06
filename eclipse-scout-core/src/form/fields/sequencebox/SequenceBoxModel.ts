@@ -9,10 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FormField, FormFieldModel, LogicalGridLayoutConfig} from '../../../index';
-import {LogicalGridLayoutConfigModel} from '../../../layout/logicalgrid/LogicalGridLayoutConfig';
-import {RefModel} from '../../../types';
+import {ObjectOrChildModel, ObjectOrModel} from '../../../scout';
 
 export default interface SequenceBoxModel extends FormFieldModel {
-  layoutConfig?: LogicalGridLayoutConfig | LogicalGridLayoutConfigModel;
-  fields?: (FormField | RefModel<FormFieldModel>)[];
+  layoutConfig?: ObjectOrModel<LogicalGridLayoutConfig>;
+  fields?: ObjectOrChildModel<FormField>[];
 }

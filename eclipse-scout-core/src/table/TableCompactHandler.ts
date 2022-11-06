@@ -10,9 +10,12 @@
  */
 import {BooleanColumn, Cell, Column, CompactBean, CompactLine, Event, EventHandler, objects, Table, TableCompactHandlerModel, TableRow} from '../index';
 import {TableRowsInsertedEvent, TableRowsUpdatedEvent} from './TableEventMap';
+import {SomeRequired} from '../types';
+import {InitModelOf} from '../scout';
 
 export default class TableCompactHandler implements TableCompactHandlerModel {
   declare model: TableCompactHandlerModel;
+  declare initModel: SomeRequired<this['model'], 'table'>;
 
   table: Table;
   useOnlyVisibleColumns: boolean;
@@ -28,7 +31,7 @@ export default class TableCompactHandler implements TableCompactHandlerModel {
     this._updateHandler = null;
   }
 
-  init(model: TableCompactHandlerModel) {
+  init(model: InitModelOf<this>) {
     $.extend(this, model);
   }
 

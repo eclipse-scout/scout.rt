@@ -10,6 +10,7 @@
  */
 import {App, arrays, CellModel, defaultValues, Event, ModelAdapter, objects, RemoteEvent, scout, Tree, TreeNode, TreeNodeModel} from '../index';
 import {TreeDropEvent, TreeNodeActionEvent, TreeNodeClickEvent, TreeNodeExpandedEvent, TreeNodesCheckedEvent, TreeNodesSelectedEvent} from './TreeEventMap';
+import {ChildModelOf} from '../scout';
 
 export default class TreeAdapter extends ModelAdapter {
   declare widget: Tree;
@@ -261,12 +262,11 @@ export default class TreeAdapter extends ModelAdapter {
     this.widget.revealSelection();
   }
 
-  protected _initNodeModel(nodeModel: TreeNodeModel): TreeNodeModel {
-    // @ts-expect-error
+  protected _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<TreeNode> {
     nodeModel = nodeModel || {};
     nodeModel.objectType = scout.nvl(nodeModel.objectType, this._getDefaultNodeObjectType());
     defaultValues.applyTo(nodeModel);
-    return nodeModel;
+    return nodeModel as ChildModelOf<TreeNode>;
   }
 
   protected _getDefaultNodeObjectType(): string {

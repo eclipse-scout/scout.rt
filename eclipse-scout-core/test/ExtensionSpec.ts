@@ -9,8 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {Extension, scout, StringField, StringFieldModel} from '../src/index';
+import {Extension, scout, StringField} from '../src/index';
 import {LocaleSpecHelper} from '../src/testing/index';
+import {InitModelOf} from '../src/scout';
 
 describe('Extension', () => {
   let session: SandboxSession;
@@ -93,8 +94,8 @@ describe('Extension', () => {
     ]);
 
     beforeEach(() => {
-      let model = createSimpleModel('StringField', session);
-      myStringField = scout.create(MyStringField, model as StringFieldModel);
+      let model = createSimpleModel('StringField', session) as InitModelOf<StringField>;
+      myStringField = scout.create(MyStringField, model);
     });
 
     it('should extend _init method', () => {

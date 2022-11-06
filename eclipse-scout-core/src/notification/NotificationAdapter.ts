@@ -13,10 +13,6 @@ import {NotificationAppLinkActionEvent} from './NotificationEventMap';
 
 export default class NotificationAdapter extends ModelAdapter {
 
-  constructor() {
-    super();
-  }
-
   protected _onWidgetClose(event: Event<Notification>) {
     this._send('close');
   }

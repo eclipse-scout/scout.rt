@@ -10,6 +10,7 @@
  */
 import {arrays, Button, Device, Event, FileChooserButtonEventMap, FileChooserButtonModel, FileInput, HtmlComponent, scout, SingleLayout, strings, ValueField} from '../../../index';
 import {FileInputChangeEvent} from '../../../filechooser/FileInputEventMap';
+import {InitModelOf} from '../../../scout';
 
 export default class FileChooserButton extends ValueField<File> implements FileChooserButtonModel {
   declare model: FileChooserButtonModel;
@@ -32,7 +33,7 @@ export default class FileChooserButton extends ValueField<File> implements FileC
     this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
   }
 
-  protected override _init(model: FileChooserButtonModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this.button = scout.create(Button, {

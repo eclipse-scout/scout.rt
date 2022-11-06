@@ -162,12 +162,10 @@ describe('NavigateDownButton', () => {
 
       let page = scout.create(Page, {
         parent: outline,
-        // @ts-expect-error
         parentNode: node
       });
       let row = scout.create(TableRow, {
         parent: node.detailTable,
-        // @ts-expect-error
         nodeId: page.id
       });
       node.detailTable.insertRow(row);

@@ -8,14 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Menu, MenuModel, WidgetModel} from '../../index';
+import {Menu, WidgetModel} from '../../index';
 import {FormFieldStatusPosition} from './FormField';
 import {StatusOrModel} from '../../status/Status';
-import {RefModel} from '../../types';
+import {ObjectOrChildModel} from '../../scout';
 
 export default interface FieldStatusModel extends WidgetModel {
   autoRemove?: boolean;
   status?: StatusOrModel;
   position?: FormFieldStatusPosition;
-  menus?: Menu[] | RefModel<MenuModel>[];
+  menus?: ObjectOrChildModel<Menu>[];
 }

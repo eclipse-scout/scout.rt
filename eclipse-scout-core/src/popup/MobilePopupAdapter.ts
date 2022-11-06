@@ -11,7 +11,4 @@
 import {WidgetPopupAdapter} from '../index';
 
 export default class MobilePopupAdapter extends WidgetPopupAdapter {
-  constructor() {
-    super();
-  }
 }

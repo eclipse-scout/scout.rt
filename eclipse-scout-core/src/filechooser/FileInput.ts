@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {arrays, dragAndDrop, DragAndDropHandler, FileInputEventMap, FileInputModel, files as fileUtil, Widget} from '../index';
+import {InitModelOf} from '../scout';
 
 export default class FileInput extends Widget implements FileInputModel {
   declare model: FileInputModel;
@@ -39,7 +40,7 @@ export default class FileInput extends Widget implements FileInputModel {
    */
   static DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024;
 
-  protected override _init(model: FileInputModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.uploadController = model.uploadController || model.parent;
   }

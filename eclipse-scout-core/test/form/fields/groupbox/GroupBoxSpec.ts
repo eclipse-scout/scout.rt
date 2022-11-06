@@ -10,7 +10,7 @@
  */
 import {DialogLayout, Form, FormField, GroupBox, GroupBoxModel, HorizontalGrid, LabelField, scout, StringField, VerticalSmartGrid, Widget} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
-import {Optional} from '../../../../src/types';
+import {InitModelOf} from '../../../../src/scout';
 
 describe('GroupBox', () => {
   let session: SandboxSession;
@@ -22,11 +22,11 @@ describe('GroupBox', () => {
     helper = new FormSpecHelper(session);
   });
 
-  function createField(model: Optional<GroupBoxModel, 'parent'>, parent?: Widget): GroupBox {
+  function createField(model: GroupBoxModel, parent?: Widget): GroupBox {
     let field = new GroupBox();
     model.session = session;
     model.parent = parent || session.desktop;
-    field.init(model as GroupBoxModel);
+    field.init(model as InitModelOf<GroupBox>);
     return field;
   }
 

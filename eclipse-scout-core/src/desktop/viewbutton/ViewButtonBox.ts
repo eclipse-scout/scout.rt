@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Desktop, Event, EventHandler, HtmlComponent, OutlineViewButton, PropertyChangeEvent, RefModel, scout, ViewButton, ViewButtonBoxEventMap, ViewButtonBoxModel, ViewButtonModel, ViewMenuTab, Widget, widgets} from '../../index';
+import {Desktop, Event, EventHandler, HtmlComponent, OutlineViewButton, PropertyChangeEvent, scout, ViewButton, ViewButtonBoxEventMap, ViewButtonBoxModel, ViewMenuTab, Widget, widgets} from '../../index';
+import {InitModelOf, ObjectOrChildModel} from '../../scout';
 
 export default class ViewButtonBox extends Widget implements ViewButtonBoxModel {
   declare model: ViewButtonBoxModel;
@@ -36,7 +37,7 @@ export default class ViewButtonBox extends Widget implements ViewButtonBoxModel 
     this._addWidgetProperties(['viewButtons']);
   }
 
-  protected override _init(model: ViewButtonBoxModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.desktop = this.session.desktop;
     this.viewMenuTab = scout.create(ViewMenuTab, {
@@ -78,7 +79,7 @@ export default class ViewButtonBox extends Widget implements ViewButtonBoxModel 
     this._updateSelectedMenuButtonVisibility();
   }
 
-  setViewButtons(viewButtons: (ViewButton | RefModel<ViewButtonModel>)[]) {
+  setViewButtons(viewButtons: ObjectOrChildModel<ViewButton>[]) {
     this.setProperty('viewButtons', viewButtons);
   }
 

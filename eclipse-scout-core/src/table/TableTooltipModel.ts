@@ -11,6 +11,6 @@
 import {Table, TableRow, TooltipModel} from '../index';
 
 export default interface TableTooltipModel extends TooltipModel {
-  table: Table;
+  table?: Table;
   row?: TableRow;
 }

@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Event, LookupRow, PropertyChangeEvent, ProposalChooser, scout, ScoutKeyboardEvent, SmartField, SmartFieldModel, SmartFieldTouchPopupEventMap, SmartFieldTouchPopupModel, TouchPopup} from '../../../index';
+import {Event, LookupRow, PropertyChangeEvent, ProposalChooser, scout, ScoutKeyboardEvent, SmartField, SmartFieldTouchPopupEventMap, SmartFieldTouchPopupModel, TouchPopup} from '../../../index';
 import {ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent} from './ProposalChooserEventMap';
 import {SmartFieldLookupResult} from './SmartField';
 import {StatusOrModel} from '../../../status/Status';
+import {InitModelOf} from '../../../scout';
 
 /**
  * Info: this class must have the same interface as SmartFieldPopup. That's why there's some
@@ -28,11 +29,7 @@ export default class SmartFieldTouchPopup<TValue> extends TouchPopup implements 
   lookupResult: SmartFieldLookupResult<TValue>;
   smartField: SmartField<TValue>;
 
-  constructor() {
-    super();
-  }
-
-  protected override _init(options: SmartFieldTouchPopupModel<TValue>) {
+  protected override _init(options: InitModelOf<this>) {
     options.withFocusContext = false;
     options.smartField = options.parent as SmartField<TValue>; // alias for parent (required by proposal chooser)
     super._init(options);
@@ -59,8 +56,8 @@ export default class SmartFieldTouchPopup<TValue> extends TouchPopup implements 
     });
   }
 
-  protected override _fieldOverrides(): SmartFieldModel<TValue> {
-    let obj = super._fieldOverrides() as SmartFieldModel<TValue> & {proposalChooser: ProposalChooser<any, any, any>};
+  protected override _fieldOverrides(): InitModelOf<SmartField<TValue>> {
+    let obj = super._fieldOverrides() as InitModelOf<SmartField<TValue>>;
     // Make sure proposal chooser does not get cloned, because it would not work (e.g. because selectedRows may not be cloned)
     // It would also generate a loop because field would try to render the chooser and the popup
     // -> The original smart field has to control the chooser

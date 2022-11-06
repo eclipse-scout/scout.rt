@@ -10,6 +10,7 @@
  */
 import {AbstractLayout, DateField, DatePicker, DatePickerTouchPopupLayout, DatePickerTouchPopupModel, ParsingFailedStatus, scout, TouchPopup} from '../index';
 import {DateFieldAcceptInputEvent} from '../form/fields/datefield/DateFieldEventMap';
+import {InitModelOf} from '../scout';
 
 export default class DatePickerTouchPopup extends TouchPopup {
   declare model: DatePickerTouchPopupModel;
@@ -17,11 +18,7 @@ export default class DatePickerTouchPopup extends TouchPopup {
   declare _field: DateField;
   declare _touchField: DateField;
 
-  constructor() {
-    super();
-  }
-
-  protected override _init(options: DatePickerTouchPopupModel) {
+  protected override _init(options: InitModelOf<this>) {
     super._init(options);
     this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
     this.addCssClass('date-picker-touch-popup');

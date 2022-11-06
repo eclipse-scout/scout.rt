@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {FlexboxLayoutData, FlexboxLayoutDataModel} from '../../../index';
+import {ObjectOrModel} from '../../../scout';
 
 export default interface BenchRowLayoutDataModel extends FlexboxLayoutDataModel {
-  rows?: FlexboxLayoutData[] | FlexboxLayoutDataModel[];
+  rows?: ObjectOrModel<FlexboxLayoutData>[];
 }

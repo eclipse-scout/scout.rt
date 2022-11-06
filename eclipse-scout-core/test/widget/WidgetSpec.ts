@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // eslint-disable-next-line max-classes-per-file
-import {EventListener, EventSupport, Form, GroupBox, HtmlComponent, Menu, NullWidget, scout, StringField, TreeVisitResult, Widget, WidgetModel} from '../../src/index';
+import {EventListener, EventSupport, Form, GroupBox, HtmlComponent, Menu, NullWidget, scout, StringField, TreeVisitResult, Widget} from '../../src/index';
+import {InitModelOf} from '../../src/scout';
 
 describe('Widget', () => {
 
@@ -1449,11 +1450,12 @@ describe('Widget', () => {
       let model = {};
 
       class TestClass extends Widget {
-        override _init(model0) {
+        override _init(model0: InitModelOf<this>) {
+          // @ts-expect-error
           expect(model0).toBe(model);
         }
 
-        override _prepareModel(model: WidgetModel): WidgetModel {
+        override _prepareModel(model: InitModelOf<this>): InitModelOf<this> {
           return super._prepareModel(model);
         }
       }
@@ -1548,10 +1550,10 @@ describe('Widget', () => {
       }).toThrow(new Error('Referenced widget not found: TI77'));
       // fix it
       delete model2.selectedItem;
-      let ctw2 = scout.create(model2);
-      expect(ctw2.items.length).toBe(1);
-      expect(ctw2.items[0].name).toBe('Item #1');
-      expect(ctw2.items[0]).not.toBe(ctw1.items[0]); // not same!
+      let ctw2 = scout.create(model2) as ComplexTestWidget;
+      expect(ctw2['items'].length).toBe(1);
+      expect(ctw2['items'][0].name).toBe('Item #1');
+      expect(ctw2['items'][0]).not.toBe(ctw1.items[0]); // not same!
 
       // Create another instance with unsupported references (same level)
       let model3 = {

@@ -8,8 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {SliderField, SliderFieldModel} from '../../../../src/index';
+import {SliderField} from '../../../../src/index';
 import {FormSpecHelper} from '../../../../src/testing/index';
+import {InitModelOf} from '../../../../src/scout';
 
 describe('SliderField', () => {
   let session: SandboxSession, helper: FormSpecHelper, field: SliderField;
@@ -28,13 +29,13 @@ describe('SliderField', () => {
     jasmine.Ajax.uninstall();
   });
 
-  function createField(model?: SliderFieldModel): SliderField {
+  function createField(model?: InitModelOf<SliderField>): SliderField {
     let field = new SliderField();
     field.init(model);
     return field;
   }
 
-  function createModel(): SliderFieldModel {
+  function createModel(): InitModelOf<SliderField> {
     return helper.createFieldModel();
   }
 

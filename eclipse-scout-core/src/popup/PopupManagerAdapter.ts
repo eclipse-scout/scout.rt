@@ -11,7 +11,4 @@
 import {ModelAdapter} from '../index';
 
 export default class PopupManagerAdapter extends ModelAdapter {
-  constructor() {
-    super();
-  }
 }

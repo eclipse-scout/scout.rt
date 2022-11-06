@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {Action, Event, graphics, icons, Insets, Point, Popup, PopupLayout, RefModel, Resizable, scout, Widget, WidgetModel, WidgetPopupEventMap, WidgetPopupLayout, WidgetPopupModel} from '../index';
+import {Action, Event, graphics, icons, Insets, Point, Popup, PopupLayout, Resizable, scout, Widget, WidgetPopupEventMap, WidgetPopupLayout, WidgetPopupModel} from '../index';
 import $ from 'jquery';
 import {ResizableMode} from '../resizable/Resizable';
 import {PopupAlignment} from './Popup';
+import {InitModelOf, ObjectOrChildModel} from '../scout';
 
 export default class WidgetPopup<TContent extends Widget = Widget> extends Popup implements WidgetPopupModel<TContent> {
   declare model: WidgetPopupModel<TContent>;
@@ -61,7 +62,7 @@ export default class WidgetPopup<TContent extends Widget = Widget> extends Popup
     return new WidgetPopupLayout(this);
   }
 
-  protected override _init(model: WidgetPopupModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setClosable(this.closable);
   }
@@ -85,7 +86,7 @@ export default class WidgetPopup<TContent extends Widget = Widget> extends Popup
     super._remove();
   }
 
-  setContent(content: TContent | RefModel<RefModel<TContent>>) {
+  setContent(content: ObjectOrChildModel<TContent>) {
     this.setProperty('content', content);
   }
 

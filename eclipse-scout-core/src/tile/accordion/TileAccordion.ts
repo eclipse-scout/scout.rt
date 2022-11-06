@@ -9,10 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 import {
-  Accordion, arrays, Event, EventDelegator, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, Group, KeyStrokeContext, objects, PropertyChangeEvent, RefModel, scout, TextFilter, Tile, TileAccordionEventMap,
-  TileAccordionLayout, TileAccordionModel, TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
+  Accordion, arrays, Event, EventDelegator, EventHandler, Filter, FilterOrFunction, FilterResult, FilterSupport, Group, KeyStrokeContext, objects, PropertyChangeEvent, scout, TextFilter, Tile, TileAccordionEventMap, TileAccordionLayout,
+  TileAccordionModel, TileAccordionSelectionHandler, TileGrid, TileGridLayout, TileGridLayoutConfig, TileTextFilter
 } from '../../index';
 import {Comparator} from '../../types';
+import {InitModelOf, ObjectOrChildModel} from '../../scout';
 
 export default class TileAccordion extends Accordion implements TileAccordionModel {
   declare model: TileAccordionModel;
@@ -84,7 +85,7 @@ export default class TileAccordion extends Accordion implements TileAccordionMod
     super._remove();
   }
 
-  protected override _init(model: TileAccordionModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.setFilters(this.filters);
   }
@@ -293,14 +294,14 @@ export default class TileAccordion extends Accordion implements TileAccordionMod
    *
    * If the list contains new tiles not assigned to a group yet, an exception will be thrown.
    */
-  setTiles(tilesOrModels: Tile | RefModel<Tile> | (Tile | RefModel<Tile>)[]) {
+  setTiles(tilesOrModels: ObjectOrChildModel<Tile> | ObjectOrChildModel<Tile>[]) {
     let tilesOrModelsArr = arrays.ensure(tilesOrModels);
     if (objects.equals(this.getTiles(), tilesOrModelsArr)) {
       return;
     }
 
     // Ensure given tiles are real tiles (of type Tile)
-    let tiles = this._createChildren(tilesOrModelsArr) as unknown as Tile[];
+    let tiles = this._createChildren(tilesOrModelsArr);
 
     // Distribute the tiles to the corresponding groups (result may contain groups without tiles)
     let tilesPerGroup = this._groupTiles(tiles);

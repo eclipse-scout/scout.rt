@@ -13,6 +13,7 @@ import $ from 'jquery';
 import {TableMatrixDateGroup, TableMatrixNumberGroup} from '../TableMatrix';
 import {TableUserFilterAddedEventData} from './TableUserFilter';
 import ColumnUserFilterModel from './ColumnUserFilterModel';
+import {InitModelOf} from '../../scout';
 
 export default class DateColumnUserFilter extends ColumnUserFilter implements ColumnUserFilterModel {
   declare model: DateColumnUserFilterModel;
@@ -33,7 +34,7 @@ export default class DateColumnUserFilter extends ColumnUserFilter implements Co
     this.hasFilterFields = true;
   }
 
-  protected override _init(model: DateColumnUserFilterModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this.dateFrom = dates.parseJsonDate(model.dateFrom);
     this.dateTo = dates.parseJsonDate(model.dateTo);

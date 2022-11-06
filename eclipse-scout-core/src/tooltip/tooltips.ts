@@ -11,13 +11,14 @@
 import {Device, Tooltip, TooltipSupport} from '../index';
 import $ from 'jquery';
 import {TooltipSupportOptions} from './TooltipSupport';
+import {InitModelOf} from '../scout';
 
 const DEFAULT_TOOLTIP_DELAY = 600; // ms
 
 // Quite long tooltip delay for cases where the normal delay would be annoying
 const LONG_TOOLTIP_DELAY = 1000; // ms
 
-export function install($comp: JQuery, options: TooltipSupportOptions) {
+export function install($comp: JQuery, options: InitModelOf<TooltipSupport>) {
   let support = $comp.data('tooltipSupport') as TooltipSupport;
   if (!support) {
     support = new TooltipSupport(options);
@@ -65,7 +66,7 @@ export function cancel($comp: JQuery) {
 /**
  * Convenient function to install tooltip support for ellipsis only.
  */
-export function installForEllipsis($comp: JQuery, options: TooltipSupportOptions) {
+export function installForEllipsis($comp: JQuery, options: InitModelOf<TooltipSupport>) {
   let defaultOptions = {
     text: $label => {
       if ($label.isContentTruncated()) {

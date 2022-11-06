@@ -15,6 +15,7 @@ import {
 import {StatusSeverity} from '../status/Status';
 import MessageBoxModel from './MessageBoxModel';
 import MessageBoxEventMap from './MessageBoxEventMap';
+import {InitModelOf} from '../scout';
 import TriggeredEvent = JQuery.TriggeredEvent;
 
 export type MessageBoxOption = EnumObject<typeof MessageBox.Buttons>;
@@ -87,7 +88,7 @@ export default class MessageBox extends Widget implements MessageBoxModel {
     CANCEL: 'cancel'
   } as const;
 
-  protected override _init(model: MessageBoxModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
     this._setDisplayParent(this.displayParent);
     this._setIconId(this.iconId);

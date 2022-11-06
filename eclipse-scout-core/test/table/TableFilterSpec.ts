@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ColumnUserFilter, Range, RefModel, RemoteEvent, Table, TextColumnUserFilter} from '../../src/index';
+import {Column, ColumnUserFilter, Range, RemoteEvent, Table, TextColumnUserFilter} from '../../src/index';
 import {TableSpecHelper} from '../../src/testing/index';
-import ColumnUserFilterModel from '../../src/table/userfilter/ColumnUserFilterModel';
 import SpecTable from '../../src/testing/table/SpecTable';
+import {ChildModelOf} from '../../src/scout';
 
 describe('TableFilter', () => {
   let session: SandboxSession;
@@ -33,7 +33,7 @@ describe('TableFilter', () => {
     $.fx.off = false;
   });
 
-  function createColumnFilterModel(columnId, selectedValues): RefModel<ColumnUserFilterModel> {
+  function createColumnFilterModel(columnId, selectedValues): ChildModelOf<ColumnUserFilter> {
     return {
       objectType: TextColumnUserFilter,
       column: columnId,
@@ -73,7 +73,7 @@ describe('TableFilter', () => {
       expect(filteredRows.length).toBe(1);
       expect(filteredRows[0]).toBe(table.rows[1]);
 
-      table.removeFilterByKey(filter.column.id);
+      table.removeFilterByKey((filter.column as Column).id);
 
       filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(2);

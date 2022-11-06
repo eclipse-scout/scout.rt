@@ -11,6 +11,7 @@
 import {arrays, Group, keys, scout, Tile, TileAccordion, TileGrid} from '../../../src/index';
 import {triggerKeyDownCapture, triggerKeyInputCapture, triggerKeyUpCapture} from '../../../src/testing/jquery-testing';
 import TileModel from '../../../src/tile/TileModel';
+import {InitModelOf} from '../../../src/scout';
 
 describe('TileAccordionKeyStrokes', () => {
   let session: SandboxSession;
@@ -58,7 +59,7 @@ describe('TileAccordionKeyStrokes', () => {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create(Tile, model);
+    return scout.create(Tile, model as InitModelOf<Tile>);
   }
 
   function createTiles(numTiles: number, model?: TileModel): Tile[] {

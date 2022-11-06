@@ -10,8 +10,8 @@
  */
 import {Group, Range, scout, Tile, TileAccordion, TileGrid, TileGridModel} from '../../src/index';
 import {triggerMouseDown} from '../../src/testing/jquery-testing';
-import {Optional} from '../../src/types';
 import TileModel from '../../src/tile/TileModel';
+import {InitModelOf} from '../../src/scout';
 
 describe('VirtualTileGrid', () => {
   let session: SandboxSession;
@@ -27,7 +27,7 @@ describe('VirtualTileGrid', () => {
     }
   }
 
-  function createTileGrid(numTiles: number, model?: Optional<TileGridModel, 'parent'>): SpecTileGrid {
+  function createTileGrid(numTiles: number, model?: TileGridModel): SpecTileGrid {
     let tiles = [];
     for (let i = 0; i < numTiles; i++) {
       tiles.push({
@@ -42,15 +42,15 @@ describe('VirtualTileGrid', () => {
       gridColumnCount: 2
     };
     model = $.extend({}, defaults, model);
-    return scout.create(SpecTileGrid, model as TileGridModel);
+    return scout.create(SpecTileGrid, model as InitModelOf<TileGrid>);
   }
 
-  function createTile(model?: Optional<TileModel, 'parent'>): Tile {
+  function createTile(model?: TileModel): Tile {
     let defaults = {
       parent: session.desktop
     };
     model = $.extend({}, defaults, model);
-    return scout.create(Tile, model as TileModel);
+    return scout.create(Tile, model as InitModelOf<Tile>);
   }
 
   describe('virtual', () => {
@@ -644,7 +644,7 @@ describe('VirtualTileGrid', () => {
         filters: [{
           accept: tile => {
             // Accept tile 1 only
-            return tile.label.indexOf('1') >= 0;
+            return tile['label'].indexOf('1') >= 0;
           }
         }]
       });

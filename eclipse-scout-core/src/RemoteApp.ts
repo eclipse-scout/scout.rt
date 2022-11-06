@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {App, defaultValues, ErrorHandler, SessionModel} from './index';
+import {App, defaultValues, ErrorHandler, Session, SessionModel} from './index';
 import $ from 'jquery';
 import {AppBootstrapOptions} from './App';
-import {ErrorHandlerOptions} from './ErrorHandler';
+import {InitModelOf} from './scout';
 
 export default class RemoteApp extends App {
 
@@ -30,15 +30,15 @@ export default class RemoteApp extends App {
     return defaultValues.bootstrap();
   }
 
-  protected override _createErrorHandler(opts?: ErrorHandlerOptions): ErrorHandler {
+  protected override _createErrorHandler(opts?: InitModelOf<ErrorHandler>): ErrorHandler {
     opts = $.extend({
       sendError: true
     }, opts);
     return super._createErrorHandler(opts);
   }
 
-  protected override _loadSession($entryPoint: JQuery, options: Omit<SessionModel, '$entryPoint'>): JQuery.Promise<any> {
-    let model = (options || {}) as SessionModel;
+  protected override _loadSession($entryPoint: JQuery, options: SessionModel): JQuery.Promise<any> {
+    let model = (options || {}) as InitModelOf<Session>;
     model.$entryPoint = $entryPoint;
     let session = this._createSession(model);
     App.get().sessions.push(session);

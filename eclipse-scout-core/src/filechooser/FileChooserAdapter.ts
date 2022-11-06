@@ -13,10 +13,6 @@ import {Event, FileChooser, ModelAdapter} from '../index';
 export default class FileChooserAdapter extends ModelAdapter {
   declare widget: FileChooser;
 
-  constructor() {
-    super();
-  }
-
   protected _onWidgetCancel(event: Event<FileChooser>) {
     // Do not close the file chooser immediately, server will send the close event
     event.preventDefault();

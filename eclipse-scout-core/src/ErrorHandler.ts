@@ -11,8 +11,9 @@
 import {AjaxError, App, arrays, icons, LogLevel, NullLogger, scout, Session, strings} from './index';
 import $ from 'jquery';
 import sourcemappedStacktrace from 'sourcemapped-stacktrace';
+import {InitModelOf, ObjectModel} from './scout';
 
-export interface ErrorHandlerOptions {
+export interface ErrorHandlerModel extends ObjectModel<ErrorHandler> {
   /**
    * Default is true
    */
@@ -34,7 +35,7 @@ export interface ErrorHandlerOptions {
 export interface ErrorInfo {
   log: string;
   level?: LogLevel;
-  error?: any; // May be Error, AjaxError or any other type like string, number etc. since the any object can be thrown.
+  error?: any; // May be Error, AjaxError or any other type like string, number etc. since any object can be thrown.
   mappingError?: string;
   code?: string;
   message?: string;
@@ -43,8 +44,8 @@ export interface ErrorInfo {
   debugInfo?: string;
 }
 
-export default class ErrorHandler implements ErrorHandlerOptions {
-  declare model: ErrorHandlerOptions;
+export default class ErrorHandler implements ErrorHandlerModel {
+  declare model: ErrorHandlerModel;
   logError: boolean;
   displayError: boolean;
   sendError: boolean;
@@ -60,14 +61,14 @@ export default class ErrorHandler implements ErrorHandlerOptions {
   }
 
   /**
-   * Use this constant to configure whether or not all instances of the ErrorHandler should write
+   * Use this constant to configure whether all instances of the ErrorHandler should write
    * to the console. When you've installed a console appender to log4javascript you can set the
    * value to false, because the ErrorHandler also calls $.log.error and thus the appender has
    * already written the message to the console. We don't want to see it twice.
    */
   static CONSOLE_OUTPUT = true;
 
-  init(options?: ErrorHandlerOptions) {
+  init(options?: InitModelOf<this>) {
     $.extend(this, options);
   }
 
@@ -105,7 +106,7 @@ export default class ErrorHandler implements ErrorHandlerOptions {
     // Ignore errors caused by scripts from a different origin.
     // Example: Firefox on iOS throws an error, probably caused by an internal Firefox script.
     // The error does not affect the application and cannot be prevented by the app either since we don't know what script it is and what it does.
-    // In that case the error must no be shown to the user, instead just log it silently.
+    // In that case the error must not be shown to the user, instead just log it silently.
     // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
     return message && message.toLowerCase().indexOf('script error') > -1 && !fileName && !lineNumber && !columnNumber && !error;
   }
@@ -289,7 +290,7 @@ export default class ErrorHandler implements ErrorHandlerOptions {
   /**
    * Expects an object as returned by {@link analyzeError} and handles it:
    * - If the flag "logError" is set, the log message is printed to the console
-   * - If there is a scout session and the flag "displayError" is set, the error is shown in a a message box.
+   * - If there is a scout session and the flag "displayError" is set, the error is shown in a message box.
    * - If there is a scout session and the flag "sendError" is set, the error is sent to the UI server.
    */
   handleErrorInfo(errorInfo: ErrorInfo): ErrorInfo {
@@ -298,7 +299,7 @@ export default class ErrorHandler implements ErrorHandlerOptions {
       this._logErrorInfo(errorInfo);
     }
 
-    // Note: The error handler is installed globally and we cannot tell in which scout session the error happened.
+    // Note: The error handler is installed globally, and we cannot tell in which scout session the error happened.
     // We simply use the first scout session to display the message box and log the error. This is not ideal in the
     // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
     let session = this.session || App.get().sessions[0];

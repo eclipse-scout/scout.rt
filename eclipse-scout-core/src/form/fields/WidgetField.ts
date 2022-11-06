@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {FormField, RefModel, Widget, WidgetFieldEventMap, WidgetFieldLayout, WidgetFieldModel, WidgetModel} from '../../index';
+import {FormField, Widget, WidgetFieldEventMap, WidgetFieldLayout, WidgetFieldModel} from '../../index';
+import {InitModelOf, ObjectOrChildModel} from '../../scout';
 
 export default class WidgetField extends FormField implements WidgetFieldModel {
   declare model: WidgetFieldModel;
@@ -26,7 +27,7 @@ export default class WidgetField extends FormField implements WidgetFieldModel {
     this._addWidgetProperties(['fieldWidget']);
   }
 
-  protected override _init(model: WidgetFieldModel) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
   }
 
@@ -43,7 +44,7 @@ export default class WidgetField extends FormField implements WidgetFieldModel {
     this._renderScrollable();
   }
 
-  setFieldWidget(fieldWidget: Widget | RefModel<WidgetModel>) {
+  setFieldWidget(fieldWidget: ObjectOrChildModel<Widget>) {
     this.setProperty('fieldWidget', fieldWidget);
   }
 

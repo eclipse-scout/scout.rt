@@ -10,9 +10,12 @@
  */
 import {icons, objects, scout, Session, styles, texts, Tree, TreeNodeModel} from '../index';
 import $ from 'jquery';
+import {InitModelOf} from '../scout';
+import {SomeRequired} from '../types';
 
 export default class TreeNode implements TreeNodeModel {
   declare model: TreeNodeModel;
+  declare initModel: SomeRequired<this['model'], 'parent'>;
 
   checked: boolean;
   childNodes: TreeNode[];
@@ -90,7 +93,7 @@ export default class TreeNode implements TreeNodeModel {
     this._loadChildrenPromise = null;
   }
 
-  init(model: TreeNodeModel) {
+  init(model: InitModelOf<this>) {
     let staticModel = this._jsonModel();
     if (staticModel) {
       model = $.extend({}, staticModel, model);
@@ -121,7 +124,7 @@ export default class TreeNode implements TreeNodeModel {
     return this.parent;
   }
 
-  protected _init(model: TreeNodeModel) {
+  protected _init(model: InitModelOf<this>) {
     scout.assertParameter('parent', model.parent, Tree);
     this.session = model.session || model.parent.session;
 

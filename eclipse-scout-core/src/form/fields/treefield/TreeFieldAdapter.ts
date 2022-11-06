@@ -11,8 +11,4 @@
 import {FormFieldAdapter} from '../../../index';
 
 export default class TreeFieldAdapter extends FormFieldAdapter {
-
-  constructor() {
-    super();
-  }
 }
