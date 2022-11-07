@@ -55,6 +55,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
   private static final String EVENT_RELOAD = "reload";
   private static final String EVENT_SELECTION_CHANGE = "selectionChange";
   private static final String EVENT_VIEW_RANGE_CHANGE = "viewRangeChange";
+  private static final String EVENT_SELECTED_RANGE_CHANGE = "selectedRangeChange";
   private static final String EVENT_MODEL_CHANGE = "modelChange";
 
   private CalendarListener m_calendarListener;
@@ -167,6 +168,21 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
         return new JsonDate((Date) value).asJsonString();
       }
     });
+    putJsonProperty(new JsonProperty<>(ICalendar.PROP_SELECTED_RANGE, model) {
+      @Override
+      protected Range<Date> modelValue() {
+        return getModel().getSelectedRange();
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        if (value == null) {
+          return null;
+        }
+        return new JsonDateRange((Range<Date>) value).toJson();
+      }
+    });
     putJsonProperty(new JsonProperty<>(ICalendar.PROP_LOAD_IN_PROGRESS, model) {
       @Override
       protected Boolean modelValue() {
@@ -189,6 +205,12 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
       @Override
       protected Boolean modelValue() {
         return getModel().getShowDisplayModeSelection();
+      }
+    });
+    putJsonProperty(new JsonProperty<>(ICalendar.PROP_RANGE_SELECTION_ALLOWED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().getRangeSelectionAllowed();
       }
     });
     putJsonProperty(new JsonProperty<>(ICalendar.PROP_MENU_INJECTION_TARGET, model) {
@@ -229,6 +251,9 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
     }
     else if (EVENT_VIEW_RANGE_CHANGE.equals(event.getType())) {
       handleUiViewRangeChange(event);
+    }
+    else if (EVENT_SELECTED_RANGE_CHANGE.equals(event.getType())) {
+      handleUiSelectedRangeChange(event);
     }
     else {
       super.handleUiEvent(event);
@@ -294,7 +319,11 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
     addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_DATE, selectedDate);
     uiFacade.setSelectedDateFromUI(selectedDate);
 
-    LOG.debug("displayMode={} viewRange={} selectedDate={}", displayMode, viewRange, selectedDate);
+    Range<Date> selectedRange = extractSelectedRange(data);
+    addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_RANGE, selectedRange);
+    uiFacade.setSelectedRangeFromUI(selectedRange);
+
+    LOG.debug("displayMode={} viewRange={} selectedDate={} selectedRange={}", displayMode, viewRange, selectedDate, selectedRange);
   }
 
   /**
@@ -316,6 +345,20 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
 
   protected Date extractSelectedDate(JSONObject data) {
     return toJavaDate(data, "selectedDate");
+  }
+
+  protected void handleUiSelectedRangeChange(JsonEvent event) {
+    Range<Date> selectedRange = extractSelectedRange(event.getData());
+    addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_RANGE, selectedRange);
+    getModel().getUIFacade().setSelectedRangeFromUI(selectedRange);
+    LOG.debug("selectedRange={}", selectedRange);
+  }
+
+  protected Range<Date> extractSelectedRange(JSONObject data) {
+    JSONObject selectedRange = data.optJSONObject("selectedRange");
+    Date fromDate = toJavaDate(selectedRange, "from");
+    Date toDate = toJavaDate(selectedRange, "to");
+    return new Range<>(fromDate, toDate);
   }
 
   protected Date toJavaDate(JSONObject data, String propertyName) {

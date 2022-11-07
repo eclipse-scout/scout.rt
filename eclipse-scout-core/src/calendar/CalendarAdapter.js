@@ -37,6 +37,8 @@ export default class CalendarAdapter extends ModelAdapter {
       this._sendSelectionChange();
     } else if (event.type === 'componentMove') {
       this._sendComponentMove(event);
+    } else if (event.type === 'selectedRangeChange') {
+      this._sendSelectedRangeChange();
     } else {
       super._onWidgetEvent(event);
     }
@@ -46,6 +48,13 @@ export default class CalendarAdapter extends ModelAdapter {
     return dates.toJsonDateRange(this.widget.viewRange);
   }
 
+  _jsonSelectedRange() {
+    if (!this.widget.selectedRange) {
+      return null;
+    }
+    return dates.toJsonDateRange(this.widget.selectedRange);
+  }
+
   _jsonSelectedDate() {
     return dates.toJsonDate(this.widget.selectedDate);
   }
@@ -53,6 +62,12 @@ export default class CalendarAdapter extends ModelAdapter {
   _sendViewRangeChange() {
     this._send('viewRangeChange', {
       viewRange: this._jsonViewRange()
+    });
+  }
+
+  _sendSelectedRangeChange() {
+    this._send('selectedRangeChange', {
+      selectedRange: this._jsonSelectedRange()
     });
   }
 

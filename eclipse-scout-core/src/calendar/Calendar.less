@@ -583,6 +583,7 @@
       & > .calendar-component-leftcolorborder {
         height: calc(~'100% + 10px');
         top: -10px;
+        position: relative;
       }
 
       &::before {
@@ -728,4 +729,11 @@
   left: 7px;
   color: @calendar-week-axis-color;
   content: attr(data-axis-name);
+}
+
+.calendar-range-selector {
+  background-color: @selected-background-color;
+  position: absolute;
+  opacity: 0.3;
+  width: 100%;
 }
