@@ -10,6 +10,9 @@
  */
 package org.eclipse.scout.rt.client.ui.form.js;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
+import static org.eclipse.scout.rt.platform.util.ObjectUtility.nvl;
+
 import java.lang.reflect.ParameterizedType;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -22,7 +25,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.util.Assertions;
 
 @ClassId("371cbcfe-b79b-4d20-acfb-2a1b5ca375bf")
 public abstract class AbstractJsForm<IN extends IDataObject, OUT extends IDataObject> extends AbstractForm implements IJsForm<IN, OUT> {
@@ -36,26 +38,42 @@ public abstract class AbstractJsForm<IN extends IDataObject, OUT extends IDataOb
   private volatile OUT m_outputData;
 
   public AbstractJsForm() {
-    this(true);
+    this(null, null, true);
   }
 
-  public AbstractJsForm(boolean callInitializer) {
+  protected AbstractJsForm(Class<IN> inputDataType, Class<OUT> outputDataType, boolean callInitializer) {
     super(false);
 
-    Class<?> clazz = getClass();
-    while (clazz.getSuperclass() != AbstractJsForm.class) {
-      clazz = clazz.getSuperclass();
-    }
+    ParameterizedType parameterizedType = inputDataType == null || outputDataType == null ? getGenericsDefiningParameterizedType(getGenericsDefiningClass()) : null;
 
-    ParameterizedType parameterizedType = Assertions.assertInstance(clazz.getGenericSuperclass(), ParameterizedType.class);
+    m_inputDataType = assertNotNull(nvl(inputDataType, resolveInDataType(parameterizedType)));
+    m_outputDataType = assertNotNull(nvl(outputDataType, resolveOutDataType(parameterizedType)));
 
-    //noinspection unchecked
-    m_inputDataType = (Class<IN>) parameterizedType.getActualTypeArguments()[0];
-    //noinspection unchecked
-    m_outputDataType = (Class<OUT>) parameterizedType.getActualTypeArguments()[1];
     if (callInitializer) {
       callInitializer();
     }
+  }
+
+  protected Class<? extends AbstractJsForm> getGenericsDefiningClass() {
+    return AbstractJsForm.class;
+  }
+
+  protected ParameterizedType getGenericsDefiningParameterizedType(Class<? extends AbstractJsForm> genericsDefiningClass) {
+    Class<?> clazz = getClass();
+    while (clazz.getSuperclass() != genericsDefiningClass) {
+      clazz = clazz.getSuperclass();
+    }
+    return assertInstance(clazz.getGenericSuperclass(), ParameterizedType.class);
+  }
+
+  protected Class<IN> resolveInDataType(ParameterizedType parameterizedType) {
+    //noinspection unchecked
+    return (Class<IN>) assertInstance(parameterizedType.getActualTypeArguments()[0], Class.class);
+  }
+
+  protected Class<OUT> resolveOutDataType(ParameterizedType parameterizedType) {
+    //noinspection unchecked
+    return (Class<OUT>) assertInstance(parameterizedType.getActualTypeArguments()[1], Class.class);
   }
 
   @Override
