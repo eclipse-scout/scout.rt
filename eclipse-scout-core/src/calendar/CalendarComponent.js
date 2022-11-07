@@ -269,6 +269,11 @@ export default class CalendarComponent extends Widget {
       return;
     }
 
+    // don't show popup when range selection is in progress
+    if (this.parent._rangeSelectionStarted) {
+      return;
+    }
+
     let $part = $(event.delegateTarget);
     this.updateSelectedComponent($part, false);
 

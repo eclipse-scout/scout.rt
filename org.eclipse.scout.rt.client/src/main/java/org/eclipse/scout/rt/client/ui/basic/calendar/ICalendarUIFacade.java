@@ -28,6 +28,10 @@ public interface ICalendarUIFacade {
 
   void setViewRangeFromUI(Date from, Date to);
 
+  void setSelectedRangeFromUI(Range<Date> selectedRange);
+
+  void setSelectedRangeFromUI(Date from, Date to);
+
   void setDisplayModeFromUI(int displayMode);
 
   void setSelectionFromUI(Date date, CalendarComponent comp);

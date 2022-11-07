@@ -162,6 +162,12 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     return true;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(530)
+  protected boolean getConfiguredRangeSelectionAllowed() {
+    return false;
+  }
+
   private List<Class<? extends ICalendarItemProvider>> getConfiguredProducers() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<ICalendarItemProvider>> filtered = ConfigurationUtility.filterClasses(dca, ICalendarItemProvider.class);
@@ -219,6 +225,7 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     setStartHour(getConfiguredStartHour());
     setUseOverflowCells(getConfiguredUseOverflowCells());
     setShowDisplayModeSelection(getConfiguredShowDisplayModeSelection());
+    setRangeSelectionAllowed(getConfiguredRangeSelectionAllowed());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -380,6 +387,16 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   }
 
   @Override
+  public boolean getRangeSelectionAllowed() {
+    return (Boolean) propertySupport.getProperty(PROP_RANGE_SELECTION_ALLOWED);
+  }
+
+  @Override
+  public void setRangeSelectionAllowed(boolean rangeSelectionAllowed) {
+    propertySupport.setProperty(PROP_RANGE_SELECTION_ALLOWED, rangeSelectionAllowed);
+  }
+
+  @Override
   public boolean isLoadInProgress() {
     return propertySupport.getPropertyBool(PROP_LOAD_IN_PROGRESS);
   }
@@ -533,6 +550,34 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   @Override
   public void setSelectedDate(Date d) {
     propertySupport.setProperty(PROP_SELECTED_DATE, d);
+  }
+
+  public Range<Date> getSelectedRange() {
+    @SuppressWarnings("unchecked")
+    Range<Date> propValue = (Range<Date>) propertySupport.getProperty(PROP_SELECTED_RANGE);
+    if (propValue == null) {
+      return null;
+    }
+    // return a copy
+    return new Range<>(propValue);
+  }
+
+  @Override
+  public void setSelectedRange(Date minDate, Date maxDate) {
+    setSelectedRangeInternal(new Range<>(minDate, maxDate));
+  }
+
+  @Override
+  public void setSelectedRange(Range<Date> selectedRange) {
+    setSelectedRangeInternal(new Range<>(selectedRange));
+  }
+
+  private void setSelectedRangeInternal(Range<Date> selectedRange) {
+    if (!getRangeSelectionAllowed()) {
+      propertySupport.setProperty(PROP_SELECTED_RANGE, null);
+      return;
+    }
+    propertySupport.setProperty(PROP_SELECTED_RANGE, selectedRange);
   }
 
   @Override
@@ -861,6 +906,22 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
       try {
         pushUIProcessor();
         setViewRange(from, to);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
+    public void setSelectedRangeFromUI(Range<Date> selectedRange) {
+      setSelectedRangeFromUI(selectedRange.getFrom(), selectedRange.getTo());
+    }
+
+    @Override
+    public void setSelectedRangeFromUI(Date from, Date to) {
+      try {
+        pushUIProcessor();
+        setSelectedRange(from, to);
       }
       finally {
         popUIProcessor();

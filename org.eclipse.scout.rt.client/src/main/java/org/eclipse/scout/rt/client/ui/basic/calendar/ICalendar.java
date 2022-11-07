@@ -55,6 +55,10 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    */
   String PROP_SELECTED_DATE = "selectedDate";
   /**
+   * type {@link Date}[2]
+   */
+  String PROP_SELECTED_RANGE = "selectedRange";
+  /**
    * type {@link Boolean}
    */
   String PROP_LOAD_IN_PROGRESS = "loadInProgress";
@@ -70,6 +74,10 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * type {@link Boolean}
    */
   String PROP_SHOW_DISPLAY_MODE_SELECTION = "showDisplayModeSelection";
+  /**
+   * type {@link Boolean}
+   */
+  String PROP_RANGE_SELECTION_ALLOWED = "rangeSelectionAllowed";
 
   /**
    * @since 4.0.0 {@link IContextMenu}
@@ -102,6 +110,15 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
   Date getSelectedDate();
 
   void setSelectedDate(Date d);
+
+  /**
+   * @return a Date tupel [begin, end]
+   */
+  Range<Date> getSelectedRange();
+
+  void setSelectedRange(Date selectedRangeStart, Date selectedRangeEnd);
+
+  void setSelectedRange(Range<Date> dateRange);
 
   CalendarComponent getSelectedComponent();
 
@@ -194,6 +211,15 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
   boolean getShowDisplayModeSelection();
 
   void setShowDisplayModeSelection(boolean showDisplayModeSelection);
+
+  /**
+   * Specifies whether a range in the calendar can be selected.
+   * <p>
+   * Default {@code false}.
+   */
+  boolean getRangeSelectionAllowed();
+
+  void setRangeSelectionAllowed(boolean rangeSelectionAllowed);
 
   /*
    * UI interface

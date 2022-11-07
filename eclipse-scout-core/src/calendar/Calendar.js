@@ -30,6 +30,7 @@ export default class Calendar extends Widget {
     this.loadInProgress = false;
     this.selectedDate = null;
     this.showDisplayModeSelection = true;
+    this.rangeSelectionAllowed = false;
     this.title = null;
     this.useOverflowCells = true;
     this.viewRange = null;
@@ -72,6 +73,10 @@ export default class Calendar extends Widget {
 
     this._mouseMoveHandler = this._onMouseMove.bind(this);
     this._mouseUpHandler = this._onMouseUp.bind(this);
+
+    this._mouseMoveRangeSelectionHandler = this._onMouseMoveRangeSelection.bind(this);
+    this._mouseUpRangeSelectionHandler = this._onMouseUpRangeSelection.bind(this);
+    this.selectedRange = null;
 
     this._addWidgetProperties(['components', 'menus', 'selectedComponent']);
     this._addPreserveOnPropertyChangeProperties(['selectedComponent']);
@@ -190,6 +195,8 @@ export default class Calendar extends Widget {
         this.setSelectedDate(new Date(p.year, p.month, p.date - p.day + 4));
       }
     }
+    this.selectedRange = null;
+    this.trigger('selectedRangeChange');
   }
 
   _renderDisplayMode(oldDisplayMode) {
@@ -209,6 +216,31 @@ export default class Calendar extends Widget {
   _setViewRange(viewRange) {
     viewRange = DateRange.ensure(viewRange);
     this._setProperty('viewRange', viewRange);
+  }
+
+  _setRangeSelectionAllowed(rangeSelectionAllowed) {
+    this.rangeSelectionAllowed = rangeSelectionAllowed;
+    if (!this.rangeSelectionAllowed) {
+      this._setSelectedRange(null);
+    }
+  }
+
+  _setSelectedRange(selectedRange) {
+    selectedRange = DateRange.ensure(selectedRange);
+
+    if (selectedRange && selectedRange.from && selectedRange.to) {
+      this.selectorStart = new Date(selectedRange.from);
+      this.selectorStart.setHours(0, this._getHours(this.selectorStart) * 60);
+
+      this.selectorEnd = new Date(selectedRange.to);
+      this.selectorEnd.setHours(0, this._getHours(this.selectorEnd) * 60 - 30);
+      this._setRangeSelection();
+    } else {
+      this.selectorStart = null;
+      this.selectorEnd = null;
+      this._removeRangeSelection();
+    }
+    this._updateSelectedRange();
   }
 
   _setMenus(menus) {
@@ -565,35 +597,77 @@ export default class Calendar extends Widget {
   }
 
   _onDayMouseDown(withTime, event) {
-    let selectedDate = new Date($(event.delegateTarget).data('date'));
+    let selectedDate = new Date($(event.delegateTarget).data('date')),
+      timeChanged = false;
     if (withTime && (this._isDay() || this._isWeek() || this._isWorkWeek())) {
-      let seconds = Math.floor(event.originalEvent.layerY / this.heightPerDivision) / this.numberOfHourDivisions * 60 * 60;
+      let seconds = this._getSelectedSeconds(event);
+      if (seconds < 60 * 60 * 24) {
+        selectedDate.setSeconds(seconds);
+        timeChanged = true;
+      }
+      this._startRangeSelection(event);
+    }
+    this._setSelection(selectedDate, null, false, timeChanged);
+  }
+
+  _getSelectedDate(event) {
+    let date = null;
+    if ($(event.target).hasClass('calendar-day')) {
+      date = $(event.target).data('date');
+    } else if ($(event.target).hasClass('calendar-component')
+      || $(event.target).parents('.calendar-component').length > 0
+      || $(event.target).hasClass('calendar-range-selector')) {
+      date = $(event.target).closest('.calendar-day').data('date');
+    }
+    if (date) {
+      return new Date(date);
+    }
+    return null;
+  }
+
+  _getSelectedSeconds(event) {
+    let y = event.originalEvent.layerY;
+    if ($(event.target).hasClass('calendar-component') || $(event.target).parents('.calendar-component').length > 0) {
+      y += $(event.target).closest('.calendar-component').position().top;
+    } else if ($(event.target).hasClass('calendar-range-selector')) {
+      y += $(event.target).position().top;
+    }
+    return Math.floor(y / this.heightPerDivision) / this.numberOfHourDivisions * 60 * 60;
+  }
+
+  _getSelectedDateTime(event) {
+    let selectedDate = this._getSelectedDate(event);
+    if (selectedDate && (this._isDay() || this._isWeek() || this._isWorkWeek())) {
+      let seconds = this._getSelectedSeconds(event);
       if (seconds < 60 * 60 * 24) {
         selectedDate.setSeconds(seconds);
       }
     }
-    this._setSelection(selectedDate, null, false);
+    return selectedDate;
   }
 
   /**
    * @param selectedDate
    * @param selectedComponent may be null when a day is selected
    */
-  _setSelection(selectedDate, selectedComponent, updateScrollPosition) {
+  _setSelection(selectedDate, selectedComponent, updateScrollPosition, timeChanged) {
     let changed = false;
+    let dateChanged = dates.compareDays(this.selectedDate, selectedDate) !== 0;
 
     // selected date
-    if (dates.compareDays(this.selectedDate, selectedDate) !== 0) {
+    if (dateChanged || timeChanged) {
       changed = true;
-      $('.calendar-day', this.$container).each((index, element) => {
-        let $day = $(element),
-          date = $day.data('date');
-        if (!date || dates.compareDays(date, this.selectedDate) === 0) {
-          $day.select(false); // de-select old date
-        } else if (dates.compareDays(date, selectedDate) === 0) {
-          $day.select(true); // select new date
-        }
-      });
+      if (dateChanged) {
+        $('.calendar-day', this.$container).each((index, element) => {
+          let $day = $(element),
+            date = $day.data('date');
+          if (!date || dates.compareDays(date, this.selectedDate) === 0) {
+            $day.select(false); // de-select old date
+          } else if (dates.compareDays(date, selectedDate) === 0) {
+            $day.select(true); // select new date
+          }
+        });
+      }
       this.selectedDate = selectedDate;
     }
 
@@ -611,7 +685,9 @@ export default class Calendar extends Widget {
 
     if (changed) {
       this.trigger('selectionChange');
-      this._updateListPanel();
+      if (dateChanged) {
+        this._updateListPanel();
+      }
       if (updateScrollPosition) {
         this._updateScrollPosition(false, true);
       }
@@ -648,6 +724,8 @@ export default class Calendar extends Widget {
     if (updateTopGrid && !this._isMonth()) {
       this._updateTopGrid();
     }
+
+    this._setSelectedRange(this.selectedRange);
   }
 
   layoutSize(animate) {
@@ -1075,7 +1153,7 @@ export default class Calendar extends Widget {
   /* -- components, events-------------------------------------------- */
 
   _selectedComponentChanged(component, partDay, updateScrollPosition) {
-    this._setSelection(partDay, component, updateScrollPosition);
+    this._setSelection(partDay, component, updateScrollPosition, false);
   }
 
   _onDayContextMenu(event) {
@@ -1669,5 +1747,161 @@ export default class Calendar extends Widget {
     let s1 = c1.item && c1.item.subject ? c1.item.subject : '';
     let s2 = c2.item && c2.item.subject ? c2.item.subject : '';
     return s1.localeCompare(s2);
+  }
+
+  _startRangeSelection(event) {
+    if (!this.rangeSelectionAllowed || this._rangeSelectionStarted || Device.get().type === Device.Type.MOBILE) {
+      return;
+    }
+
+    // Ignore right mouse button clicks within current selection
+    let selectedDateTime = this._getSelectedDateTime(event);
+    if (event.which === 3 &&
+      this.selectedRange && selectedDateTime &&
+      dates.compare(selectedDateTime, this.selectedRange.from) >= 0 &&
+      dates.compare(selectedDateTime, this.selectedRange.to) < 0) {
+      return;
+    }
+
+    // Ignore clicks to calendar components, this should open the tooltip
+    if (!$(event.target).hasClass('calendar-range-selector') && !$(event.target).hasClass('calendar-day')) {
+      return;
+    }
+
+    // init selector
+    this.selectorStart = this._getSelectedDateTime(event);
+    if (!this.selectorStart) {
+      return;
+    }
+    this.selectorEnd = new Date(this.selectorStart);
+    if (!this.selectorStart || !this.selectorEnd) {
+      return;
+    }
+
+    this.$window
+      .off('mousemove', this._mouseMoveRangeSelectionHandler)
+      .off('mouseup', this._mouseUpRangeSelectionHandler)
+      .on('mousemove', this._mouseMoveRangeSelectionHandler)
+      .on('mouseup', this._mouseUpRangeSelectionHandler);
+
+    // draw
+    this._setRangeSelection();
+    this._rangeSelectionStarted = true;
+  }
+
+  _findDayInCalendar(selectedDate) {
+    let $foundDay = null;
+    $('.calendar-day', this.$container).each((index, element) => {
+      let $day = $(element),
+        date = $day.data('date');
+      if (dates.compareDays(date, selectedDate) === 0) {
+        $foundDay = $day;
+      }
+    });
+    return $foundDay;
+  }
+
+  _setRangeSelection() {
+    let selectorFirst, selectorLast, numberOfDays, day;
+
+    if (!this.selectorStart || !this.selectorEnd) {
+      return;
+    }
+
+    this._removeRangeSelection();
+
+    if (dates.compare(this.selectorStart, this.selectorEnd) > 0) {
+      selectorFirst = this.selectorEnd;
+      selectorLast = this.selectorStart;
+    } else {
+      selectorFirst = this.selectorStart;
+      selectorLast = this.selectorEnd;
+    }
+
+    numberOfDays = dates.compareDays(selectorLast, selectorFirst) + 1;
+    if (numberOfDays === 1) {
+      this._appendCalendarRangeSelection(selectorFirst, selectorFirst, selectorLast);
+    } else if (numberOfDays > 1) {
+      this._appendCalendarRangeSelection(selectorFirst, selectorFirst, null);
+      for (let i = 1; i < numberOfDays - 1; i++) {
+        day = new Date(selectorFirst);
+        day.setDate(day.getDate() + i);
+        this._appendCalendarRangeSelection(day, null, null);
+      }
+      this._appendCalendarRangeSelection(selectorLast, null, selectorLast);
+    }
+  }
+
+  _removeRangeSelection() {
+    $('.calendar-range-selector').remove();
+  }
+
+  _appendCalendarRangeSelection(date, fromTime, toTime) {
+    let $parent = this._findDayInCalendar(date),
+      startPosition, endPosition;
+    if (!$parent) {
+      return;
+    }
+
+    // top and height
+    startPosition = fromTime ? this._dayPosition(this._getHours(fromTime), 0) : 0;
+    endPosition = toTime ? this._dayPosition(this._getHours(toTime) + 0.5, 0) : 100;
+
+    $parent.appendDiv('calendar-range-selector')
+      .css('top', startPosition + '%')
+      .css('height', endPosition - startPosition + '%');
+  }
+
+  _getHours(date) {
+    // round to 0.5h
+    return Math.round((date.getHours() + date.getMinutes() / 60) * 2) / 2;
+  }
+
+  _onMouseMoveRangeSelection(event) {
+    let selectorEndTime = this._getSelectedDateTime(event);
+    if (selectorEndTime) {
+      this.selectorEnd = selectorEndTime;
+    }
+
+    this._setRangeSelection();
+  }
+
+  _onMouseUpRangeSelection(event) {
+    if (this._mouseMoveRangeSelectionHandler) {
+      this.$window.off('mousemove', this._mouseMoveRangeSelectionHandler);
+    }
+    if (this._mouseUpRangeSelectionHandler) {
+      this.$window.off('mouseup', this._mouseUpRangeSelectionHandler);
+    }
+    if (!this._rangeSelectionStarted) {
+      return;
+    }
+    this._rangeSelectionStarted = false;
+    if (this.rendered) {
+      this._setRangeSelection();
+      this._updateSelectedRange();
+    }
+  }
+
+  _updateSelectedRange() {
+    let start, end;
+
+    if (this.selectorStart && this.selectorEnd) {
+      if (dates.compare(this.selectorStart, this.selectorEnd) > 0) {
+        start = new Date(this.selectorEnd);
+        end = new Date(this.selectorStart);
+      } else {
+        start = new Date(this.selectorStart);
+        end = new Date(this.selectorEnd);
+      }
+
+      start.setHours(0, this._getHours(start) * 60);
+      end.setHours(0, this._getHours(end) * 60 + 30);
+
+      this.selectedRange = new Range(start, end);
+    } else {
+      this.selectedRange = null;
+    }
+    this.trigger('selectedRangeChange');
   }
 }
