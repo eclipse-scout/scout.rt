@@ -87,7 +87,7 @@ $.extend(true, ChartJs.defaults, {
     legend: {
       labels: {
         usePointStyle: true,
-        boxWidth: 7
+        boxHeight: 7
       }
     }
   }
