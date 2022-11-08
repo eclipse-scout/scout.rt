@@ -70,4 +70,48 @@ describe('StaticLookupCall', () => {
     jasmine.clock().tick(500);
   });
 
+  it('filter: text', () => {
+    let lookupCall = scout.create('DummyLookupCall', {
+      session: session
+    });
+
+    const expectLookupRows = result => expect(result.lookupRows.map(row => row.text));
+
+    lookupCall.getByText().then(result => expectLookupRows(result).toEqual(['Foo', 'Bar', 'Baz']));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('').then(result => expectLookupRows(result).toEqual(['Foo', 'Bar', 'Baz']));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('x').then(result => expectLookupRows(result).toEqual([]));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('f').then(result => expectLookupRows(result).toEqual(['Foo']));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('a').then(result => expectLookupRows(result).toEqual([]));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('*a').then(result => expectLookupRows(result).toEqual(['Bar', 'Baz']));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('*Ar').then(result => expectLookupRows(result).toEqual(['Bar']));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('*a*z*').then(result => expectLookupRows(result).toEqual(['Baz']));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('f*a').then(result => expectLookupRows(result).toEqual([]));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('******************').then(result => expectLookupRows(result).toEqual(['Foo', 'Bar', 'Baz']));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('.*').then(result => expectLookupRows(result).toEqual([]));
+    jasmine.clock().tick(500);
+
+    lookupCall.getByText('[').then(result => expectLookupRows(result).toEqual([]));
+    jasmine.clock().tick(500);
+  });
+
 });
