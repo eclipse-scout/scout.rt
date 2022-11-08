@@ -879,7 +879,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   protected _generateTooltipLabelValue(tooltipItem: TooltipItem<any>): string | { x: string; y: string } {
-    let config = tooltipItem.chart.config,
+    let config = tooltipItem.chart.config as ChartConfiguration,
       dataset = tooltipItem.dataset;
     if (config.type === Chart.Type.BUBBLE) {
       return strings.encode(this._formatLabel(dataset.data[tooltipItem.dataIndex].z));
@@ -893,7 +893,7 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   protected _generateTooltipLabelColor(tooltipItem: TooltipItem<any>): TooltipLabelStyle {
-    let config = tooltipItem.chart.config,
+    let config = tooltipItem.chart.config as ChartConfiguration,
       dataset = tooltipItem.dataset,
       legendColor, backgroundColor, borderColor, index;
     if (scout.isOneOf((dataset.type || config.type), Chart.Type.LINE, Chart.Type.BAR, Chart.Type.BAR_HORIZONTAL, Chart.Type.RADAR, Chart.Type.BUBBLE, Chart.Type.SCATTER)) {
@@ -1583,9 +1583,10 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
   }
 
   protected _formatDatalabels(value: number | ScatterDataPoint | BubbleDataPoint, context: Context): string {
-    if (context.chart.config.type === Chart.Type.BUBBLE) {
+    let config = context.chart.config as ChartConfiguration;
+    if (config.type === Chart.Type.BUBBLE) {
       return this._formatLabel((value as BubbleDataPoint).z);
-    } else if (context.chart.config.type === Chart.Type.SCATTER) {
+    } else if (config.type === Chart.Type.SCATTER) {
       return strings.join(' / ', this._formatLabel((value as ScatterDataPoint).x), this._formatLabel((value as ScatterDataPoint).y));
     }
     return this._formatLabel(value as number);
@@ -2228,7 +2229,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config = this.chartJs.config,
       type = config.type;
     if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-      // @ts-expect-error
       index = legendItem.index;
     }
 
@@ -2260,7 +2260,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       config = this.chartJs.config,
       type = config.type;
     if (scout.isOneOf(type, Chart.Type.PIE, Chart.Type.DOUGHNUT, Chart.Type.POLAR_AREA)) {
-      // @ts-expect-error
       index = legendItem.index;
     }
 
@@ -2345,7 +2344,6 @@ export default class ChartJsRenderer extends AbstractChartRenderer {
       }));
     }
     if (elements && elements.length) {
-      // @ts-expect-error
       this.chartJs.updateHoverStyle(elements, mode, enabled);
     }
   }
