@@ -23,6 +23,7 @@ export class Table extends Widget implements TableModel {
   declare model: TableModel;
   declare eventMap: TableEventMap;
   declare self: Table;
+  declare columnMap: ColumnMap;
 
   autoResizeColumns: boolean;
   columnAddable: boolean;
@@ -3532,8 +3533,8 @@ export class Table extends Widget implements TableModel {
     return $row.children('.table-cell').eq(columnIndex);
   }
 
-  columnById(columnId: string): Column<any> {
-    return arrays.find(this.columns, column => column.id === columnId);
+  columnById<TId extends string & keyof ColumnMapOf<this>>(columnId: TId): ColumnMapOf<this>[TId] {
+    return arrays.find(this.columns, column => column.id === columnId) as ColumnMapOf<this>[TId];
   }
 
   /**
@@ -3547,7 +3548,7 @@ export class Table extends Widget implements TableModel {
     return this.visibleColumns()[cellIndex];
   }
 
-  columnsByIds(columnIds: string[]): Column<any>[] {
+  columnsByIds<TId extends string & keyof ColumnMapOf<this>>(columnIds: TId[]): ColumnMapOf<this>[TId][] {
     return columnIds.map(this.columnById.bind(this));
   }
 
@@ -5569,3 +5570,9 @@ export type AggregateTableRow = {
   $row?: JQuery;
   height?: number;
 };
+
+type ColumnMap = {
+  [type: string]: Column<any>;
+};
+
+type ColumnMapOf<T> = T extends { columnMap: infer TMap } ? TMap : object;
