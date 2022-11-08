@@ -120,12 +120,37 @@ export default class StaticLookupCall extends LookupCall {
   }
 
   _lookupRowsByText(text) {
-    let datas = this.data.filter(data => {
-      return strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
-    });
+    let regex = this._createSearchPattern(text);
+    let datas = this.data.filter(data => regex.test(data[1].toLowerCase()));
     return datas
       .map(this._dataToLookupRow, this)
       .filter(this._filterActiveLookupRow, this);
+  }
+
+  _createSearchPattern(text) {
+    // Implementation copied from LocalLookupRow.java
+
+    const WILDCARD = '*';
+    const WILDCARD_PLACEHOLDER = '@wildcard@';
+
+    text = strings.nvl(text);
+    text = text.toLowerCase();
+    text = text.replace(new RegExp(strings.quote(WILDCARD), 'g'), WILDCARD_PLACEHOLDER);
+    text = strings.quote(text);
+
+    // replace repeating wildcards to prevent regex DoS
+    let duplicateWildcards = WILDCARD_PLACEHOLDER + WILDCARD_PLACEHOLDER;
+    while (strings.contains(text, duplicateWildcards)) {
+      text = text.replace(duplicateWildcards, WILDCARD_PLACEHOLDER);
+    }
+
+    if (!strings.endsWith(WILDCARD_PLACEHOLDER)) {
+      text += WILDCARD_PLACEHOLDER;
+    }
+
+    text = text.replace(new RegExp(strings.quote(WILDCARD_PLACEHOLDER), 'g'), '.*');
+
+    return new RegExp('^' + text + '$', 's'); // s = DOT_ALL
   }
 
   _getByKey(key) {
